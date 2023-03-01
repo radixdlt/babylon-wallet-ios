@@ -35,85 +35,83 @@ extension FungibleTokenDetails {
 		public init(store: StoreOf<FungibleTokenDetails>) {
 			self.store = store
 		}
-	}
-}
 
-extension FungibleTokenDetails.View {
-	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			NavigationStack {
-				ScrollView {
-					VStack(spacing: .medium3) {
-						LazyImage(url: viewStore.iconURL) { _ in
-							Image(asset: viewStore.placeholderAsset)
-								.resizable()
-						}
-						.frame(width: 104, height: 104)
-						.clipShape(Circle())
-						if let amount = viewStore.amount, let symbol = viewStore.symbol {
-							Text(amount).font(.app.sheetTitle).kerning(-0.5) +
-								Text(" " + symbol).font(.app.sectionHeader)
-						}
-					}
-					.padding(.top, .small2)
-					VStack(spacing: .medium1) {
-						let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
-						if let description = viewStore.description {
-							divider
-							Text(description)
-								.textStyle(.body1Regular)
-								.frame(maxWidth: .infinity, alignment: .leading)
-								.padding(.horizontal, .large2)
-						}
-						divider
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				NavigationStack {
+					ScrollView {
 						VStack(spacing: .medium3) {
-							HStack {
-								Text(L10n.FungibleTokenList.Detail.resourceAddress)
-									.textStyle(.body1Regular)
-									.foregroundColor(.app.gray2)
-								AddressView(
-									viewStore.address,
-									textStyle: .body1Regular,
-									copyAddressAction: {
-										viewStore.send(.copyAddressButtonTapped)
-									}
-								)
-								.frame(maxWidth: .infinity, alignment: .trailing)
-								.multilineTextAlignment(.trailing)
+							LazyImage(url: viewStore.iconURL) { _ in
+								Image(asset: viewStore.placeholderAsset)
+									.resizable()
 							}
-							if let currentSupply = viewStore.currentSupply {
+							.frame(width: 104, height: 104)
+							.clipShape(Circle())
+							if let amount = viewStore.amount, let symbol = viewStore.symbol {
+								Text(amount).font(.app.sheetTitle).kerning(-0.5) +
+									Text(" " + symbol).font(.app.sectionHeader)
+							}
+						}
+						.padding(.top, .small2)
+						VStack(spacing: .medium1) {
+							let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
+							if let description = viewStore.description {
+								divider
+								Text(description)
+									.textStyle(.body1Regular)
+									.frame(maxWidth: .infinity, alignment: .leading)
+									.padding(.horizontal, .large2)
+							}
+							divider
+							VStack(spacing: .medium3) {
 								HStack {
-									Text(L10n.FungibleTokenList.Detail.currentSupply)
+									Text(L10n.FungibleTokenList.Detail.resourceAddress)
 										.textStyle(.body1Regular)
 										.foregroundColor(.app.gray2)
-									Text(currentSupply.description)
-										.frame(maxWidth: .infinity, alignment: .trailing)
-										.multilineTextAlignment(.trailing)
+									AddressView(
+										viewStore.address,
+										textStyle: .body1Regular,
+										copyAddressAction: {
+											viewStore.send(.copyAddressButtonTapped)
+										}
+									)
+									.frame(maxWidth: .infinity, alignment: .trailing)
+									.multilineTextAlignment(.trailing)
+								}
+								if let currentSupply = viewStore.currentSupply {
+									HStack {
+										Text(L10n.FungibleTokenList.Detail.currentSupply)
+											.textStyle(.body1Regular)
+											.foregroundColor(.app.gray2)
+										Text(currentSupply.description)
+											.frame(maxWidth: .infinity, alignment: .trailing)
+											.multilineTextAlignment(.trailing)
+									}
 								}
 							}
-						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal, .large2)
-						.textStyle(.body1Regular)
-						.lineLimit(1)
-					}
-				}
-				#if os(iOS)
-				.navigationBarTitle(viewStore.displayName)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						CloseButton {
-							viewStore.send(.closeButtonTapped)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding(.horizontal, .large2)
+							.textStyle(.body1Regular)
+							.lineLimit(1)
 						}
 					}
+					#if os(iOS)
+					.navigationBarTitle(viewStore.displayName)
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
+							}
+						}
+					}
+					#endif
 				}
-				#endif
+				.tint(.app.gray1)
+				.foregroundColor(.app.gray1)
 			}
-			.tint(.app.gray1)
-			.foregroundColor(.app.gray1)
 		}
 	}
 }
