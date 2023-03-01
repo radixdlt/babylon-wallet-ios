@@ -1,5 +1,5 @@
 import Foundation
-import P2PModels
+import Prelude
 
 // MARK: - SignalingServerMessage.Incoming.ResponseType
 extension SignalingServerMessage.Incoming {

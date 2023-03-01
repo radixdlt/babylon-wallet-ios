@@ -1,5 +1,4 @@
 import EngineToolkitModels
-import P2PModels
 import Prelude
 
 // MARK: - EngineToolkit.Error

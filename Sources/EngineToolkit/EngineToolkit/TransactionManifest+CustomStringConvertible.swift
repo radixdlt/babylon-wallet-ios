@@ -1,6 +1,5 @@
 import Cryptography
 import EngineToolkitModels
-import P2PModels
 import Prelude
 
 // MARK: - TransactionManifest + CustomStringConvertible

@@ -1,5 +1,5 @@
 import Foundation
-import P2PModels
+import Prelude
 
 // MARK: - SignalingServerMessage.Incoming.FromSignalingServerItself.ResponseForRequest.RequestFailure.ValidationError
 extension SignalingServerMessage.Incoming.FromSignalingServerItself.ResponseForRequest.RequestFailure {

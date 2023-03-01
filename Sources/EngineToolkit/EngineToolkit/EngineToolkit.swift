@@ -1,5 +1,4 @@
 import EngineToolkitModels
-import P2PModels
 import Prelude
 @_implementationOnly import RadixEngineToolkit
 
