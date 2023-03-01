@@ -57,7 +57,7 @@ extension AssetTransfer {
 extension AssetTransfer.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			NavigationView {
+			NavigationStack {
 				Form {
 					VStack(alignment: .leading) {
 						Text("From")
@@ -114,9 +114,6 @@ extension AssetTransfer.View {
 						content: { TransactionSigning.View(store: $0) }
 					)
 			}
-			#if os(iOS)
-			.navigationViewStyle(.stack)
-			#endif
 		}
 	}
 }
