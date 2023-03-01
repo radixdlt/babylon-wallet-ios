@@ -16,20 +16,24 @@ extension TransactionManifest {
 	}
 
 	public enum ManifestConversionError: Error {
-		case networkMismatch(found: UInt?, expected: UInt?)
+		case networkMismatch(found: NetworkID?, expected: NetworkID?)
 		case manifestGeneration(messsage: String?)
+		case unknown(type: String)
 
 		public init?(error: Error) {
 			guard case let .deserializeResponseFailure(.errorResponse(json)) = error as? EngineToolkit.Error else { return nil }
 			guard let errorType = json["error"]?.string else { return nil }
 			switch errorType {
 			case "NetworkMismatchError":
-				self = .networkMismatch(found: json["found"]?.uint,
-				                        expected: json["expected"]?.uint)
+				func networkID(_ key: String) -> NetworkID? {
+					json[key]?.int
+						.map { NetworkID(rawValue: UInt8($0)) }
+				}
+				self = .networkMismatch(found: networkID("found"), expected: networkID("expected"))
 			case "ManifestGenerationError":
 				self = .manifestGeneration(messsage: json["message"]?.string)
 			default:
-				return nil
+				self = .unknown(type: errorType)
 			}
 		}
 	}
