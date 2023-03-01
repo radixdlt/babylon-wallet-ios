@@ -87,7 +87,9 @@ extension TransactionManifest {
 				do {
 					return try stringifyManifest(networkForRequest: networkID)
 				} catch {
-					guard case .networkMismatch = ManifestConversionError(error: error) else { throw error }
+					guard let conversionError = ManifestConversionError(error: error) else { throw error }
+					guard case .networkMismatch = conversionError else { throw conversionError }
+
 					for networkForRequest in NetworkID.all(but: networkID) {
 						do {
 							return try stringifyManifest(networkForRequest: networkForRequest)
@@ -97,7 +99,7 @@ extension TransactionManifest {
 						}
 					}
 
-					throw error
+					throw conversionError
 				}
 			}
 
