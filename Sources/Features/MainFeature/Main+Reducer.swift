@@ -23,7 +23,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case destination(PresentationActionOf<Destinations>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {

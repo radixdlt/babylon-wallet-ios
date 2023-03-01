@@ -26,7 +26,7 @@ public struct NonFungibleTokenList: Sendable, ReducerProtocol {
 		.forEach(\.rows, action: /Action.child .. Action.ChildAction.asset) {
 			NonFungibleTokenList.Row()
 		}
-		.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+		.ifLet(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 			Destinations()
 		}
 	}

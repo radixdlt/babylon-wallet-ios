@@ -15,7 +15,7 @@ public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 extension ManageGatewayAPIEndpoints {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 				Destinations()
 			}
 	}

@@ -15,7 +15,7 @@ extension NonFungibleTokenList {
 extension NonFungibleTokenList.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case asset(id: NonFungibleTokenContainer.ID, action: NonFungibleTokenList.Row.Action)
-		case destination(PresentationActionOf<NonFungibleTokenList.Destinations>)
+		case destination(PresentationAction<NonFungibleTokenList.Destinations.Action>)
 	}
 }
 

@@ -71,4 +71,5 @@ extension ReducerProtocol where Self: FeatureReducer {
 	}
 }
 
+public typealias AlertPresentationStore<AlertAction> = Store<PresentationState<AlertState<AlertAction>>, PresentationAction<AlertAction>>
 public typealias PresentationStoreOf<R: ReducerProtocol> = Store<PresentationState<R.State>, PresentationAction<R.Action>>
