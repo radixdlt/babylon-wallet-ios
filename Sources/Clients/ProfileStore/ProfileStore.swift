@@ -155,6 +155,21 @@ extension ProfileStore {
 		changeState(to: .persisted(ephemeral.profile))
 	}
 
+	/// Syntactic sugar for:
+	///     var profile = await profileStore.profile
+	///     mutateProfile(&profile)
+	///     try await profileStore.update(profile: profile)
+	public func updating<T>(
+		_ mutateProfile: @Sendable (inout Profile) async throws -> T
+	) async throws -> T {
+		var copy = profile
+		let result = try await mutateProfile(&copy)
+		try await update(profile: copy)
+		return result // in many cases `Void`.
+	}
+
+	/// Updates the in-memomry across app used Profile and also
+	/// sync the new value to secure storage (and iCloud if enabled/able).
 	public func update(profile: Profile) async throws {
 		try await isInitialized() // it should not be possible for us to not be initialized...
 		guard profile != profileStateSubject.value.profile else {

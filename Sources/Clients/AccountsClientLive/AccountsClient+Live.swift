@@ -9,8 +9,14 @@ extension AccountsClient: DependencyKey {
 		Self(
 			getAccountsOnCurrentNetwork: { await profileStore.network.accounts },
 			accountsOnCurrentNetwork: { await profileStore.accountValues() },
-			createUnsavedVirtualAccount: { _ in fatalError("impl me") },
-			saveVirtualAccount: { _ in fatalError("impl me") }
+			createUnsavedVirtualAccount: { request in
+				try await profileStore.profile.createUnsavedVirtualEntity(request: request)
+			},
+			saveVirtualAccount: { account in
+				try await profileStore.updating {
+					try $0.addAccount(account)
+				}
+			}
 		)
 	}
 

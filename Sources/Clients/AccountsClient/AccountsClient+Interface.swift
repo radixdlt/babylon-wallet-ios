@@ -35,7 +35,7 @@ extension AccountsClient {
 }
 
 // MARK: - CreateVirtualAccountRequest
-public struct CreateVirtualAccountRequest: Sendable, Equatable {
+public struct CreateVirtualAccountRequest: CreateVirtualEntityRequest, Equatable {
 	// if `nil` we will use current networkID
 	public let networkID: NetworkID?
 

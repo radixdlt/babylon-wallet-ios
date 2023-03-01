@@ -334,6 +334,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"SecureStorageClient",
+			"UseFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
 		],
 		tests: .yes()
 	),

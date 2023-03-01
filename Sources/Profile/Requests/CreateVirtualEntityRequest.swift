@@ -19,7 +19,7 @@ public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 }
 
 // MARK: - CreateVirtualEntityRequest
-public protocol CreateVirtualEntityRequest: Sendable, Equatable {
+public protocol CreateVirtualEntityRequest: Sendable {
 	// if `nil` we will use current networkID
 	var networkID: NetworkID? { get }
 
