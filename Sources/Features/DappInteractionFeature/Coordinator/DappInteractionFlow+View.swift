@@ -1,3 +1,5 @@
+import AccountsClient
+import AuthorizedDappsClient
 import FeaturePrelude
 import PersonasClient
 import TransactionSigningFeature

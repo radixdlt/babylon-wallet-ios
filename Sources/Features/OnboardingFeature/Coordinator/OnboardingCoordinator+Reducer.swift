@@ -3,19 +3,21 @@ import FeaturePrelude
 
 // MARK: - OnboardingCoordinator
 public struct OnboardingCoordinator: Sendable, FeatureReducer {
-	public enum State: Equatable {
+	public enum State: Hashable {
 		case importProfile(ImportProfile.State)
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
 		public init() {
-			self = .createAccountCoordinator(.init())
+			self = .createAccountCoordinator(
+				.init(
+					config: .init(
+						isFirstEntity: true,
+						canBeDismissed: false,
+						navigationButtonCTA: .goHome
+					)
+				)
+			)
 		}
-	}
-
-	// MARK: Action
-	public enum Action: Sendable, Equatable {
-		case child(ChildAction)
-		case delegate(DelegateAction)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -33,13 +35,13 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		Reduce(core)
 			.ifCaseLet(
 				/OnboardingCoordinator.State.importProfile,
-				action: /Action.child .. Action.ChildAction.importProfile
+				action: /Action.child .. ChildAction.importProfile
 			) {
 				ImportProfile()
 			}
 			.ifCaseLet(
 				/OnboardingCoordinator.State.createAccountCoordinator,
-				action: /Action.child .. Action.ChildAction.createAccountCoordinator
+				action: /Action.child .. ChildAction.createAccountCoordinator
 			) {
 				CreateAccountCoordinator()
 			}
@@ -49,10 +51,9 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .send(.delegate(.completed))
-		case .createAccountCoordinator(.delegate(.dismiss)):
-			fatalError("not possible")
 		case .importProfile(.delegate(.imported)):
 			return .send(.delegate(.completed))
+		default: return .none
 		}
 	}
 }

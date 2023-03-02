@@ -23,7 +23,7 @@ extension NetworkSwitchingClient {
 		}
 
 		let validateGatewayURL: ValidateGatewayURL = { newURL -> Gateway? in
-			let currentURL = await getGateway().url
+			let currentURL = await gatewaysClient.getGatewayAPIEndpointBaseURL()
 			guard newURL != currentURL else {
 				return nil
 			}
