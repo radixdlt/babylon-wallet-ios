@@ -1,3 +1,5 @@
+import RadixConnectModels
+
 // MARK: - IncommingMessage
 enum IncommingMessage: Sendable, Equatable {
 	enum FromSignalingServer: Sendable, Equatable {
@@ -27,9 +29,9 @@ extension IncommingMessage {
 
 extension IncommingMessage.FromSignalingServer {
 	enum Notification: Sendable, Equatable {
-		case remoteClientJustConnected(ClientID)
-		case remoteClientDisconnected(ClientID)
-		case remoteClientIsAlreadyConnected(ClientID)
+		case remoteClientJustConnected(RemoteClientID)
+		case remoteClientDisconnected(RemoteClientID)
+		case remoteClientIsAlreadyConnected(RemoteClientID)
 	}
 
 	enum ResponseForRequest: Sendable, Equatable {
@@ -110,9 +112,11 @@ extension IncommingMessage.FromSignalingServer.Notification {
 		}
 	}
 
-	var remoteClientId: ClientID {
+	var remoteClientId: RemoteClientID {
 		switch self {
-		case let .remoteClientDisconnected(id), let .remoteClientIsAlreadyConnected(id), let .remoteClientJustConnected(id):
+		case let .remoteClientDisconnected(id),
+                        let .remoteClientIsAlreadyConnected(id),
+                        let .remoteClientJustConnected(id):
 			return id
 		}
 	}

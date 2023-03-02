@@ -6,7 +6,7 @@ import RadixConnect
 // MARK: - DappInteractionHook
 struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var requestQueue: OrderedSet<RTCIncommingWalletInteraction> = []
+                var requestQueue: OrderedSet<P2P.RTCIncommingWalletInteraction> = []
 
 		@PresentationState
 		var currentModal: Destinations.State?
@@ -22,17 +22,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case responseFailureAlert(PresentationAction<AlertState<ViewAction.ResponseFailureAlertAction>, ViewAction.ResponseFailureAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
-			case cancelButtonTapped(RTCIncommingWalletInteraction)
-			case retryButtonTapped(RTCOutgoingMessage, for: RTCIncommingWalletInteraction, DappMetadata?)
+                        case cancelButtonTapped(P2P.RTCIncommingWalletInteraction)
+                        case retryButtonTapped(P2P.RTCOutgoingMessage, for: P2P.RTCIncommingWalletInteraction, DappMetadata?)
 		}
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case receivedRequestFromDapp(RTCIncommingWalletInteraction)
+                case receivedRequestFromDapp(P2P.RTCIncommingWalletInteraction)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: RTCIncommingWalletInteraction, DappMetadata?)
-		case failedToSendResponseToDapp(RTCOutgoingMessage, for: RTCIncommingWalletInteraction, DappMetadata?, reason: String)
-		case presentResponseFailureAlert(RTCOutgoingMessage, for: RTCIncommingWalletInteraction, DappMetadata?, reason: String)
+                case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: P2P.RTCIncommingWalletInteraction, DappMetadata?)
+                case failedToSendResponseToDapp(P2P.RTCOutgoingMessage, for: P2P.RTCIncommingWalletInteraction, DappMetadata?, reason: String)
+                case presentResponseFailureAlert(P2P.RTCOutgoingMessage, for: P2P.RTCIncommingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
 		case ensureCurrentModalIsActuallyPresented
 	}
@@ -43,12 +43,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
-			case dappInteraction(RelayState<RTCIncommingWalletInteraction, DappInteractionCoordinator.State>)
+                        case dappInteraction(RelayState<P2P.RTCIncommingWalletInteraction, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
-			case dappInteraction(RelayAction<RTCIncommingWalletInteraction, DappInteractionCoordinator.Action>)
+                        case dappInteraction(RelayAction<P2P.RTCIncommingWalletInteraction, DappInteractionCoordinator.Action>)
 			case dappInteractionCompletion(Completion.Action)
 		}
 
@@ -80,10 +80,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				try await p2pConnectivityClient.loadFromProfileAndConnectAll()
+                                await p2pConnectivityClient.loadFromProfileAndConnectAll()
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
 
-				for try await message in try await p2pConnectivityClient.receiveMessages() {
+				for try await message in await p2pConnectivityClient.receiveMessages() {
 					guard !Task.isCancelled else {
 						return
 					}
@@ -131,7 +131,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		case .moveToForeground:
 			return .fireAndForget {
-				try await p2pConnectivityClient.loadFromProfileAndConnectAll()
+                                await p2pConnectivityClient.loadFromProfileAndConnectAll()
 			}
 		}
 	}
@@ -240,8 +240,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func sendResponseToDappEffect(
-		_ response: RTCOutgoingMessage,
-		for request: RTCIncommingWalletInteraction,
+                _ response: P2P.RTCOutgoingMessage,
+                for request: P2P.RTCIncommingWalletInteraction,
 		dappMetadata: DappMetadata?
 	) -> EffectTask<Action> {
 		.run { send in
@@ -252,7 +252,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func dismissCurrentModalAndRequest(_ request: RTCIncommingWalletInteraction, for state: inout State) {
+        func dismissCurrentModalAndRequest(_ request: P2P.RTCIncommingWalletInteraction, for state: inout State) {
 		state.requestQueue.remove(request)
 		state.currentModal = nil
 		onDismiss?()

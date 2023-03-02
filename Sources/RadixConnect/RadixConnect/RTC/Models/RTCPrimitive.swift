@@ -1,3 +1,5 @@
+import RadixConnectModels
+
 // MARK: - Identified
 struct Identified<T, Id> {
 	let content: T
@@ -10,7 +12,7 @@ extension Identified: Equatable where T: Equatable, Id: Equatable {}
 // MARK: Sendable
 extension Identified: Sendable where T: Sendable, Id: Sendable {}
 
-typealias IdentifiedPrimitive<T: Sendable> = Identified<T, ClientID>
+typealias IdentifiedPrimitive<T: Sendable> = Identified<T, RemoteClientID>
 
 // MARK: - RTCPrimitive
 enum RTCPrimitive: Equatable, Sendable {

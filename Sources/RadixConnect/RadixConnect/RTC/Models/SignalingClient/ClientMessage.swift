@@ -1,10 +1,11 @@
 // MARK: - ClientMessage
 import Foundation
 import Prelude
+import RadixConnectModels
 
 // MARK: - RemoteData
 struct RemoteData: Equatable, Sendable {
-	let remoteClientId: ClientID
+	let remoteClientId: RemoteClientID
 	let message: ClientMessage
 }
 
@@ -40,7 +41,7 @@ struct ClientMessage: Sendable, Equatable {
 	}
 
 	let requestId: RequestID
-	let targetClientId: ClientID
+	let targetClientId: RemoteClientID
 	let primitive: RTCPrimitive
 }
 
@@ -54,7 +55,7 @@ extension ClientMessage: Decodable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
 		self.requestId = try container.decode(RequestID.self, forKey: .requestId)
-		self.targetClientId = try container.decode(ClientID.self, forKey: .targetClientId)
+		self.targetClientId = try container.decode(RemoteClientID.self, forKey: .targetClientId)
 
 		let encryptedPayload = try container.decode(EncryptedPayload.self, forKey: .encryptedPayload)
 		let encryptionKey = decoder.userInfo[.clientMessageEncryptonKey] as! EncryptionKey

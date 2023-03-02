@@ -4,70 +4,12 @@ import Foundation
 import SharedModels
 
 // MARK: - RTCClients
-
-public typealias RTCIncommingMessageResult = RTCIncommingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
-public typealias RTCIncommingWalletInteraction = RTCIncommingMessage<P2P.FromDapp.WalletInteraction>
-
-// MARK: - RTCIncommingMessage
-public struct RTCIncommingMessage<PeerConnectionContent: Sendable>: Sendable {
-	public let connectionId: ConnectionPassword
-	public let content: PeerConnectionMessage
-
-	public struct PeerConnectionMessage: Sendable {
-		public let peerConnectionId: PeerConnectionId
-		public let content: PeerConnectionContent
-	}
-}
-
-extension RTCIncommingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
-	public func unwrapResult() throws -> RTCIncommingWalletInteraction {
-		try .init(connectionId: connectionId,
-		          content: .init(peerConnectionId: content.peerConnectionId, content: content.content.get()))
-	}
-}
-
-// MARK: - RTCIncommingMessage.PeerConnectionMessage + Hashable, Equatable
-extension RTCIncommingMessage.PeerConnectionMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
-
-// MARK: - RTCIncommingMessage + Hashable, Equatable
-extension RTCIncommingMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
-
-extension RTCIncommingMessage {
-	public func toOutgoingMessage(_ response: P2P.ToDapp.WalletInteractionResponse) -> RTCOutgoingMessage {
-		.init(connectionId: connectionId,
-		      content: .init(peerConnectionId: content.peerConnectionId,
-		                     content: response))
-	}
-}
-
-// MARK: - RTCOutgoingMessage
-public struct RTCOutgoingMessage: Sendable, Hashable {
-	public let connectionId: ConnectionPassword
-	public let content: PeerConnectionMessage
-
-	public struct PeerConnectionMessage: Sendable, Hashable {
-		public let peerConnectionId: PeerConnectionId
-		public let content: P2P.ToDapp.WalletInteractionResponse
-
-		public init(peerConnectionId: PeerConnectionId, content: P2P.ToDapp.WalletInteractionResponse) {
-			self.peerConnectionId = peerConnectionId
-			self.content = content
-		}
-	}
-
-	public init(connectionId: ConnectionPassword, content: PeerConnectionMessage) {
-		self.connectionId = connectionId
-		self.content = content
-	}
-}
-
-// MARK: - RTCClients
 /// Meant to hold all of the created RTCClients
 public actor RTCClients {
-	public let incommingMessages: AsyncStream<RTCIncommingMessageResult>
+        public let incommingMessages: AsyncStream<P2P.RTCIncommingMessageResult>
 
 	private(set) var clients: [RTCClient] = []
-	private let incommingMessagesContinuation: AsyncStream<RTCIncommingMessageResult>.Continuation!
+        private let incommingMessagesContinuation: AsyncStream<P2P.RTCIncommingMessageResult>.Continuation!
 	private let peerConnectionFactory: PeerConnectionFactory
 	private let signalingServerBaseURL: URL
 
@@ -76,7 +18,7 @@ public actor RTCClients {
 	}
 
 	init(peerConnectionFactory: PeerConnectionFactory = WebRTCFactory(), signalingServerBaseURL: URL = .prodSignalingServer) {
-		(incommingMessages, incommingMessagesContinuation) = AsyncStream<RTCIncommingMessageResult>.streamWithContinuation()
+		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
 		self.peerConnectionFactory = peerConnectionFactory
 		self.signalingServerBaseURL = signalingServerBaseURL
 	}
@@ -119,7 +61,7 @@ public actor RTCClients {
 		clients.removeAll()
 	}
 
-	public func sendMessage(_ message: RTCOutgoingMessage) async throws {
+        public func sendMessage(_ message: P2P.RTCOutgoingMessage) async throws {
 		guard let rtcClient = clients.first(where: { $0.id == message.connectionId }) else {
 			fatalError()
 		}
@@ -146,8 +88,8 @@ actor RTCClient {
 	private let peerConnectionBuilder: PeerConnectionBuilder
 	private(set) var peerConnections: [PeerConnectionClient] = []
 
-	let incommingMessages: AsyncStream<RTCIncommingMessageResult>
-	private let incommingMessagesContinuation: AsyncStream<RTCIncommingMessageResult>.Continuation!
+        let incommingMessages: AsyncStream<P2P.RTCIncommingMessageResult>
+        private let incommingMessagesContinuation: AsyncStream<P2P.RTCIncommingMessageResult>.Continuation!
 	private var connectionsTask: Task<Void, Error>?
 
 	private let onPeerConnectionDisconnected: AsyncStream<PeerConnectionId>
@@ -205,10 +147,10 @@ actor RTCClient {
 				let interaction = messageResult.flatMap { message in
 					.init { try JSONDecoder().decode(P2P.FromDapp.WalletInteraction.self, from: message.messageContent) }
 				}
-				return RTCIncommingMessage.PeerConnectionMessage(peerConnectionId: connection.id,
+                                return P2P.RTCIncommingMessage.PeerConnectionMessage(peerConnectionId: connection.id,
 				                                                 content: interaction)
 			}.map {
-				RTCIncommingMessageResult(connectionId: self.id, content: $0)
+                                P2P.RTCIncommingMessageResult(connectionId: self.id, content: $0)
 			}
 			.susbscribe(incommingMessagesContinuation)
 		connection
@@ -227,7 +169,7 @@ actor RTCClient {
 		peerConnections.removeAll(where: { $0.id == id })
 	}
 
-	func sendMessage(_ message: RTCOutgoingMessage.PeerConnectionMessage) async throws {
+        func sendMessage(_ message: P2P.RTCOutgoingMessage.PeerConnectionMessage) async throws {
 		guard let client = peerConnections.first(where: { $0.id == message.peerConnectionId }) else {
 			throw PeerConnectionDidCloseError()
 		}
@@ -241,10 +183,6 @@ public struct PeerConnectionDidCloseError: Error, LocalizedError {
 	public var errorDescription: String? {
 		"Peer Connection did close, retry the operation from dapp"
 	}
-//
-	//        var localizedDescription: String {
-	//                "Peer Connection did close, retry the operation from Dapp"
-	//        }
 }
 
 public extension URL {

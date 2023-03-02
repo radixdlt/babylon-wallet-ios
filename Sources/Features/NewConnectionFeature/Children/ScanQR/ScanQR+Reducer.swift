@@ -43,7 +43,7 @@ extension ScanQR {
 		.run { send in
 			await send(.internal(.system(.connectionPasswordFromScannedStringResult(
 				TaskResult {
-					try ConnectionPassword(hex: hexString)
+                                        try  ConnectionPassword.init(.init(hex: hexString))
 				}
 			))))
 		}

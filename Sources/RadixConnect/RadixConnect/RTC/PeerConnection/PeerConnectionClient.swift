@@ -1,7 +1,7 @@
 import AsyncExtensions
 import Foundation
+import RadixConnectModels
 
-public typealias PeerConnectionId = ClientID
 
 // MARK: - PeerConnectionClient
 public struct PeerConnectionClient: Sendable {

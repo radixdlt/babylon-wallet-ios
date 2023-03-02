@@ -1,10 +1,11 @@
 import Algorithms
 import Foundation
 import Prelude
+import RadixConnectModels
 
 // MARK: - PeerConnectionFactory
 protocol PeerConnectionFactory: Sendable {
-	func makePeerConnectionClient(for clientId: ClientID) throws -> PeerConnectionClient
+	func makePeerConnectionClient(for clientId: RemoteClientID) throws -> PeerConnectionClient
 }
 
 // MARK: - OfferingPeerConnectionBuilder
@@ -180,6 +181,6 @@ struct PeerConnectionBuilder {
 
 // MARK: - FailedToCreatePeerConnectionError
 struct FailedToCreatePeerConnectionError: Error {
-	let remoteClientId: ClientID
+	let remoteClientId: RemoteClientID
 	let underlyingError: Error
 }

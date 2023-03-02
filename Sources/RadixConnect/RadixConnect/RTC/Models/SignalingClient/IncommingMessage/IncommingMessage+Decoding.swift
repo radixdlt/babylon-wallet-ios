@@ -1,4 +1,5 @@
 import Foundation
+import RadixConnectModels
 
 // MARK: - IncommingMessage.ResponseType
 extension IncommingMessage {
@@ -51,17 +52,17 @@ extension IncommingMessage: Decodable {
 		case .fromRemoteClient:
 			let encryptionKey = decoder.userInfo[.clientMessageEncryptonKey] as! EncryptionKey
 			let message = try container.decode(ClientMessage.self, forKey: .message)
-			let remoteClientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			let remoteClientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromRemoteClient(.init(remoteClientId: remoteClientId, message: message))
 
 		case .remoteClientJustConnected:
-			let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			let clientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientJustConnected(clientId)))
 		case .remoteClientIsAlreadyConnected:
-			let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			let clientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientIsAlreadyConnected(clientId)))
 		case .remoteClientDisconnected:
-			let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			let clientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientDisconnected(clientId)))
 
 		case .missingRemoteClientError:

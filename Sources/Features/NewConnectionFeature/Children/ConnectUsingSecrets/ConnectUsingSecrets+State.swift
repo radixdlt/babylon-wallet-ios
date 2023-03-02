@@ -30,6 +30,6 @@ extension ConnectUsingSecrets {
 
 #if DEBUG
 extension ConnectUsingSecrets.State {
-	public static let previewValue: Self = .init(connectionSecrets: .placeholder)
+        public static let previewValue: Self = .init(connectionSecrets: try! .init(.init(.deadbeef32Bytes)))
 }
 #endif

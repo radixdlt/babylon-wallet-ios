@@ -1,4 +1,5 @@
 import WebRTC
+import RadixConnectModels
 
 // MARK: - WebRTCFactory
 struct WebRTCFactory: PeerConnectionFactory {
@@ -59,10 +60,10 @@ struct WebRTCFactory: PeerConnectionFactory {
 		return peerConnection
 	}
 
-	func makePeerConnectionClient(for clientId: ClientID) throws -> PeerConnectionClient {
+	func makePeerConnectionClient(for clientId: RemoteClientID) throws -> PeerConnectionClient {
 		let delegate = RTCPeerConnectionAsyncDelegate()
 		let peerConnection = try Self.makeRTCPeerConnection(delegate: delegate)
-		return try .init(id: clientId, peerConnection: peerConnection, delegate: delegate)
+                return try .init(id: .init(clientId), peerConnection: peerConnection, delegate: delegate)
 	}
 }
 
