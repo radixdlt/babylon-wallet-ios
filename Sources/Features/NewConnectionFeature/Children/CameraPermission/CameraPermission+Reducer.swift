@@ -20,7 +20,7 @@ public struct CameraPermission: Sendable, FeatureReducer {
 		}
 
 		case appeared
-		case permissionDeniedAlert(PresentationAction<AlertState<PermissionDeniedAlertAction>, PermissionDeniedAlertAction>)
+		case permissionDeniedAlert(PresentationAction<PermissionDeniedAlertAction>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {

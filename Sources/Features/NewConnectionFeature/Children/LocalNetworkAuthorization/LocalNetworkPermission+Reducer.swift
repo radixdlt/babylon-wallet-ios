@@ -20,7 +20,7 @@ public struct LocalNetworkPermission: Sendable, FeatureReducer {
 		}
 
 		case appeared
-		case permissionDeniedAlert(PresentationAction<AlertState<PermissionDeniedAlertAction>, PermissionDeniedAlertAction>)
+		case permissionDeniedAlert(PresentationAction<PermissionDeniedAlertAction>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -38,7 +38,7 @@ public struct LocalNetworkPermission: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$permissionDeniedAlert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.permissionDeniedAlert)
+			.ifLet(\.$permissionDeniedAlert, action: /Action.view .. ViewAction.permissionDeniedAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
