@@ -14,3 +14,10 @@ public struct MnemonicWithPassphrase: Sendable, Hashable, Codable {
 		try mnemonic.hdRoot(passphrase: passphrase)
 	}
 }
+
+#if DEBUG
+extension MnemonicWithPassphrase {
+	public static let testValue: Self = .init(mnemonic: .testValue)
+}
+
+#endif

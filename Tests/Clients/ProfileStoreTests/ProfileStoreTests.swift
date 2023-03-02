@@ -150,22 +150,7 @@ private var expectedDeviceDescription: NonEmptyString {
 }
 
 extension PrivateHDFactorSource {
-	static let testValue: Self = {
-		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
-		let factorSource = try! FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, hint: "ProfileStoreUnitTest")
-		return try! .init(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
-	}()
-}
-
-extension MnemonicWithPassphrase {
-	static let testValue: Self = .init(mnemonic: .testValue)
-}
-
-extension Mnemonic {
-	static let testValue: Self = try! Mnemonic(
-		phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
-		language: .english
-	)
+	static let testValue: Self = .testValue(hint: "ProfileStoreUnitTest")
 }
 
 extension FactorSource {

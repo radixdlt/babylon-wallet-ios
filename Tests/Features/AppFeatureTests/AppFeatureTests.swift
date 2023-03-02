@@ -5,9 +5,7 @@ import OnboardingFeature
 @testable import Profile
 @testable import SplashFeature
 
-private let ephemeralPrivateProfile: Profile.Ephemeral.Private = {
-	fatalError()
-}()
+private let ephemeralPrivateProfile: Profile.Ephemeral.Private = .testValue(hint: "AppFeatureTest")
 
 // MARK: - AppFeatureTests
 @MainActor

@@ -73,3 +73,22 @@ extension Profile {
 		self.factorSources = .init(rawValue: factorSources)!
 	}
 }
+
+#if DEBUG
+extension Profile.Ephemeral.Private {
+	public static func testValue(hint: NonEmptyString) -> Self {
+		let privateFS = PrivateHDFactorSource.testValue(hint: hint)
+		let profile = Profile(factorSource: privateFS.factorSource, creatingDevice: hint)
+		return Self(privateFactorSource: privateFS, profile: profile)
+	}
+}
+
+extension Profile.Ephemeral {
+	public static func testValue(
+		hint: NonEmptyString = "placeholder",
+		loadFailure: Profile.LoadingFailure? = nil
+	) -> Self {
+		.init(private: .testValue(hint: hint), loadFailure: loadFailure)
+	}
+}
+#endif

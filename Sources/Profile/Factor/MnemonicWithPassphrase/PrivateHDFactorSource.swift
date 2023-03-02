@@ -25,3 +25,13 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 		self.factorSource = factorSource
 	}
 }
+
+#if DEBUG
+extension PrivateHDFactorSource {
+	public static func testValue(hint: NonEmptyString) -> Self {
+		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
+		let factorSource = try! FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, hint: hint)
+		return try! .init(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
+	}
+}
+#endif
