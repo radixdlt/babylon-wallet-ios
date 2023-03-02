@@ -69,12 +69,11 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 				} catch let error as TransactionFailure {
 					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(error))))
 				} catch TransactionManifest.ManifestConversionError.manifestGeneration {
-					// do something else? This will lead to the dApp showing "Transaction failed" (which seems incorrect), but for the lock fee message below that is surfaced all the way to the dApp
 					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(.failedToCompileOrSign(.failedToCompileTXIntent)))))
 				} catch {
 					errorQueue.schedule(error)
 					// this seems like jumping to conclusions, but we can't currently "send" general errors, only TransactionFailure as above
-					// await send(.internal(.addLockFeeInstructionToManifestResult(.failure(.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)))))
+					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)))))
 				}
 			}
 
