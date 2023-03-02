@@ -328,7 +328,9 @@ package.addModules([
 	),
 	.client(
 		name: "ROLAClient",
-		dependencies: [],
+		dependencies: [
+			"GatewayAPI",
+		],
 		tests: .yes()
 	),
 	.client(

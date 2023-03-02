@@ -44,8 +44,8 @@ public struct PlainListRow<Icon: View>: View {
 				}
 			}
 			.frame(height: .largeButtonHeight)
+			.padding(.horizontal, .medium3)
 		}
-		.padding(.horizontal, .medium3)
 	}
 }
 
@@ -54,6 +54,19 @@ public extension PlainListRow {
 		VStack(spacing: .zero) {
 			self
 			Separator()
+				.padding(.horizontal, .medium3)
 		}
+	}
+}
+
+// MARK: - PlainListRow_Previews
+struct PlainListRow_Previews: PreviewProvider {
+	static var previews: some View {
+		PlainListRow(
+			showChevron: true,
+			title: "A title",
+			asset: AssetResource.appSettings,
+			action: {}
+		)
 	}
 }

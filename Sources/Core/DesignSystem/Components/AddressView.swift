@@ -29,7 +29,6 @@ extension AddressView {
 
 				if copyAddressAction != nil {
 					Image(asset: AssetResource.copy)
-						.foregroundColor(.app.gray2)
 				}
 			}
 		}
@@ -83,7 +82,7 @@ struct AddressView_Previews: PreviewProvider {
 				address: "account_wqs8qxdx7qw8c",
 				format: .default
 			),
-			copyAddressAction: nil
+			copyAddressAction: {}
 		)
 	}
 }
