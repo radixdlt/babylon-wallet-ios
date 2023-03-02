@@ -65,6 +65,7 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .dappInteractionPresented:
+			state.home.destination = nil
 			state.destination = nil
 			return .none
 		}

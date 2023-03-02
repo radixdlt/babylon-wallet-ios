@@ -201,7 +201,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = nil
 			state.currentModal = currentModal
 			return .run { send in
-				try await clock.sleep(for: .seconds(2))
+				try await clock.sleep(for: .seconds(1.5))
 				await send(.internal(.ensureCurrentModalIsActuallyPresented))
 			}
 		} else {
