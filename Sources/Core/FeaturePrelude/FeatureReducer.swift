@@ -65,6 +65,12 @@ public protocol FeatureViewState<State>: Equatable {
 	init(state: State)
 }
 
+extension FeatureViewState where Self == State {
+	public init(state: State) {
+		self = state
+	}
+}
+
 public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>
 
 extension WithViewStore where Content: View {
