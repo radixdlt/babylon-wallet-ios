@@ -2,6 +2,7 @@ import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import SplashFeature
+import TransactionReviewFeature
 
 // MARK: - App.View
 extension App {
@@ -50,6 +51,10 @@ extension App {
 				.showDeveloperDisclaimerBanner()
 				.presentsLoadingViewOverlay()
 			}
+		}
+		.sheet(isPresented: .constant(true)) {
+			let store = StoreOf<TransactionReview>.init(initialState: .init(), reducer: TransactionReview())
+			TransactionReview.View(store: store)
 		}
 	}
 }
