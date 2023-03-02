@@ -2,72 +2,6 @@ import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Row.View
 extension NonFungibleTokenList.Row {
-	@MainActor
-	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
-
-		@SwiftUI.State private var expandedHeight: CGFloat = .zero
-		@SwiftUI.State private var rowHeights: [Int: CGFloat] = [:] {
-			didSet {
-				expandedHeight = rowHeights.map(\.value).reduce(0, +)
-			}
-		}
-
-		public init(
-			store: Store
-		) {
-			self.store = store
-		}
-	}
-}
-
-extension NonFungibleTokenList.Row.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(spacing: .small3 / 2) {
-				if viewStore.container.assets.isEmpty {
-					EmptyView()
-				} else {
-					ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
-						Group {
-							switch index {
-							case -1:
-								headerView(with: viewStore, index: index)
-							default:
-								componentView(with: viewStore, index: index)
-							}
-						}
-						.onSizeChanged { size in
-							if rowHeights[index] == nil {
-								rowHeights[index] = size.height
-							} else {
-								withAnimation {
-									rowHeights[index] = size.height
-								}
-							}
-						}
-					}
-					.padding(.horizontal, .medium3)
-				}
-			}
-			.frame(height: viewStore.isExpanded ? expandedHeight : collapsedHeight(with: viewStore), alignment: .top)
-		}
-	}
-}
-
-// MARK: - NonFungibleTokenList.Row.View.ViewStore
-extension NonFungibleTokenList.Row.View {
-	fileprivate typealias ViewStore = ComposableArchitecture.ViewStore<NonFungibleTokenList.Row.View.ViewState, NonFungibleTokenList.Row.Action.ViewAction>
-}
-
-// MARK: - NonFungibleTokenList.Row.View.ViewState
-extension NonFungibleTokenList.Row.View {
-	// MARK: ViewState
 	struct ViewState: Equatable {
 		let container: NonFungibleTokenContainer
 		var isExpanded: Bool
@@ -77,6 +11,63 @@ extension NonFungibleTokenList.Row.View {
 			isExpanded = state.isExpanded
 		}
 	}
+
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<NonFungibleTokenList.Row>
+
+		@SwiftUI.State private var expandedHeight: CGFloat = .zero
+		@SwiftUI.State private var rowHeights: [Int: CGFloat] = [:] {
+			didSet {
+				expandedHeight = rowHeights.map(\.value).reduce(0, +)
+			}
+		}
+
+		public init(store: StoreOf<NonFungibleTokenList.Row>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				VStack(spacing: .small3 / 2) {
+					if viewStore.container.assets.isEmpty {
+						EmptyView()
+					} else {
+						ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
+							Group {
+								switch index {
+								case -1:
+									headerView(with: viewStore, index: index)
+								default:
+									componentView(with: viewStore, index: index)
+								}
+							}
+							.onSizeChanged { size in
+								if rowHeights[index] == nil {
+									rowHeights[index] = size.height
+								} else {
+									withAnimation {
+										rowHeights[index] = size.height
+									}
+								}
+							}
+						}
+						.padding(.horizontal, .medium3)
+					}
+				}
+				.frame(height: viewStore.isExpanded ? expandedHeight : collapsedHeight(with: viewStore), alignment: .top)
+			}
+		}
+	}
+}
+
+// MARK: - NonFungibleTokenList.Row.View.ViewStore
+extension NonFungibleTokenList.Row.View {
+	fileprivate typealias ViewStore = ComposableArchitecture.ViewStore<NonFungibleTokenList.Row.ViewState, NonFungibleTokenList.Row.ViewAction>
 }
 
 // MARK: - Private Methods
@@ -209,5 +200,11 @@ struct Row_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension NonFungibleTokenList.Row.State {
+	public static let previewValue = Self(
+		container: .mock1
+	)
 }
 #endif
