@@ -12,8 +12,8 @@ extension GatewaysClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
-		getAllGateways: { fatalError() },
-		getCurrentGateway: { fatalError() },
+		getAllGateways: { .init(rawValue: .init(uniqueElements: [.nebunet]))! },
+		getCurrentGateway: { .nebunet },
 		addGateway: { _ in },
 		changeGateway: { _ in }
 	)

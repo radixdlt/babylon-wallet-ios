@@ -12,7 +12,7 @@ extension AccountPortfolioFetcherClient: TestDependencyKey {
 
 extension AccountPortfolioFetcherClient {
 	public static let noop = Self(
-		fetchPortfolioForAccount: { _ in fatalError() },
-		fetchPortfolioForAccounts: { _ in fatalError() }
+		fetchPortfolioForAccount: { _ in throw NoopError() },
+		fetchPortfolioForAccounts: { _ in throw NoopError() }
 	)
 }

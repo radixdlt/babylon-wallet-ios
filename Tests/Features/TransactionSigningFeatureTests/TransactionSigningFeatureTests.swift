@@ -91,7 +91,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			manifestWithLockFeeString: transactionWithLockFeeString
 		)
 		await store.receive(.internal(.addLockFeeInstructionToManifestResult(.success(values)))) { [weak self] in
-			guard let self = self else { fatalError() }
+			guard let self = self else { return XCTFail("Unexpected nil self.") }
 			$0.transactionWithLockFee = self.mockManifestWithLockFee
 			$0.transactionWithLockFeeString = self.transactionWithLockFeeString
 		}
