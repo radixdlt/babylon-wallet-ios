@@ -2,28 +2,6 @@ import ClientPrelude
 import Profile
 import UseFactorSourceClient
 
-extension EntityProtocol {
-	public func cast<Entity: EntityProtocol>() throws -> Entity {
-		self.cast(to: Entity.self)
-	}
-
-	public func cast<Entity: EntityProtocol>(
-		to entityType: Entity.Type
-	) throws -> Entity {
-		guard
-			self.kind == request.entityKind,
-			let entity = self as? Entity
-		else {
-			let errorMsg = "Critical error, entity kind mismatch discrepancy"
-			loggerGlobal.critical(.init(stringLiteral: errorMsg))
-			assertionFailure(errorMsg)
-			struct EntityKindMismatchDiscrepancy: Swift.Error {}
-			throw EntityKindMismatchDiscrepancy()
-		}
-		return entity
-	}
-}
-
 extension Profile {
 	public func createNewUnsavedVirtualEntity<Entity: EntityProtocol>(
 		request: CreateVirtualEntityRequestProtocol

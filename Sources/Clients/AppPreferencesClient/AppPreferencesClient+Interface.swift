@@ -12,8 +12,8 @@ public struct AppPreferencesClient: Sendable {
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
 	public init(
-		getPreferences: @escaping LoadPreferences,
-		updatePreferences: @escaping SavePreferences,
+		getPreferences: @escaping GetPreferences,
+		updatePreferences: @escaping UpdatePreferences,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot
 	) {

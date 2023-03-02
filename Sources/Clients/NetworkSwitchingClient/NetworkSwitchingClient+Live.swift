@@ -1,5 +1,5 @@
 import AccountsClient
-import ClientsPrelude
+import ClientPrelude
 import GatewayAPI
 import GatewaysClient
 import ProfileStore

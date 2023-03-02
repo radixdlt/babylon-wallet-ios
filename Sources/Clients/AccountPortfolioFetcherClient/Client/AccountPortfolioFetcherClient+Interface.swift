@@ -26,3 +26,13 @@ extension DependencyValues {
 		set { self[AccountPortfolioFetcherClient.self] = newValue }
 	}
 }
+
+extension AccountPortfolioFetcherClient {
+	public func fetchPortfolioFor(accounts: OnNetwork.Accounts) async throws -> IdentifiedArrayOf<AccountPortfolio> {
+		try await fetchPortfolioForAccounts(accounts.map(\.address))
+	}
+
+	public func fetchPortfolioFor(account: OnNetwork.Account) async throws -> AccountPortfolio {
+		try await fetchPortfolioForAccount(account.address)
+	}
+}

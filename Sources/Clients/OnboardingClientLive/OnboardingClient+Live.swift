@@ -21,12 +21,12 @@ extension OnboardingClient: DependencyKey {
 
 			},
 			commitEphemeral: { try await profileStore.commitEphemeral() },
-			createNewUnsavedVirtualEntity: { request in
-				let profile = try await profileStore.profile
-				return try profile.createNewUnsavedVirtualEntity(request: request)
+			createUnsavedVirtualEntity: { request in
+				let profile = await profileStore.profile
+				return try await profile.createNewUnsavedVirtualEntity(request: request)
 			},
 			saveNewVirtualEntity: { entity in
-				switch entity.entityKind {
+				switch entity.kind {
 				case .account:
 					try await profileStore.updating {
 						try $0.addAccount(entity.cast())
@@ -37,7 +37,7 @@ extension OnboardingClient: DependencyKey {
 					}
 				}
 			},
-			importProfileSnapshot: { try await profileStore.import(profileSnapshot: $0) }
+			importProfileSnapshot: { try await profileStore.importProfileSnapshot($0) }
 		)
 	}
 }

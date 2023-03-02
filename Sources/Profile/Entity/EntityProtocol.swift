@@ -31,8 +31,32 @@ public protocol EntityProtocol: Sendable, Equatable {
 
 	/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 	var displayName: NonEmpty<String> { get }
+
+	func cast<Entity: EntityProtocol>() throws -> Entity
 }
 
 extension EntityProtocol {
 	public var kind: EntityKind { Self.entityKind }
+}
+
+// MARK: - EntityKindMismatchDiscrepancy
+struct EntityKindMismatchDiscrepancy: Swift.Error {}
+extension EntityProtocol {
+	public func cast<Entity: EntityProtocol>() throws -> Entity {
+		try self.cast(to: Entity.self)
+	}
+
+	public func cast<Entity: EntityProtocol>(
+		to entityType: Entity.Type
+	) throws -> Entity {
+		guard
+			let entity = self as? Entity
+		else {
+			let errorMsg = "Critical error, entity kind mismatch discrepancy"
+			loggerGlobal.critical(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+			throw EntityKindMismatchDiscrepancy()
+		}
+		return entity
+	}
 }

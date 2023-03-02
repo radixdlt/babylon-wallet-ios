@@ -41,7 +41,7 @@ extension FaucetClient: DependencyKey {
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
 			@Dependency(\.transactionClient.signAndSubmitTransaction) var signAndSubmitTransaction
-			@Dependency(\.gatewaysClient.getCurrentNetworkID) var getCurrentNetworkID
+			@Dependency(\.gatewaysClient) var gatewaysClient
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 			let accountAddress = faucetRequest.recipientAccountAddress
@@ -52,7 +52,7 @@ extension FaucetClient: DependencyKey {
 				return
 			}
 
-			let networkID = await getCurrentNetworkID()
+			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try engineToolkitClient.manifestForFaucet(
 				includeLockFeeInstruction: faucetRequest.addLockFeeInstructionToManifest,
 				networkID: networkID,

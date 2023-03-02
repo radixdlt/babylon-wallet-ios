@@ -38,7 +38,7 @@ import SecureStorageClient
 ///     func commitEphemeral() async throws
 ///     func deleteProfile() async throws
 ///     func update(profile: Profile) async throws
-///     func import(profileSnapshot: ProfileSnapshot) async throws
+///     func importProfileSnapshot(:ProfileSnapshot) async throws
 ///
 ///
 public final actor ProfileStore {
@@ -122,10 +122,10 @@ extension ProfileStore {
 		lens(\.profile.network.accounts)
 	}
 
-	public func import (profileSnapshot: ProfileSnapshot) async throws {
+	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
 		try await isInitialized()
 		try assertProfileStateIsEphemeral()
-		guard try? await secureStorageClient.loadProfileSnapshotData() == nil else {
+		guard (try? await secureStorageClient.loadProfileSnapshotData()) == Data?.none else {
 			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
 			throw ExistingProfileSnapshotFoundAbortingImport()
 		}
@@ -144,7 +144,7 @@ extension ProfileStore {
 	@discardableResult
 	private func assertProfileStateIsEphemeral() throws -> Profile.Ephemeral {
 		struct ExpectedProfileStateToBeEphemeralButItWasNot: Swift.Error {}
-		guard let ephemeral {
+		guard let ephemeral else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
@@ -276,17 +276,9 @@ extension ProfileStore.ProfileState {
 	}
 }
 
-// MARK: Private
+// MARK: Internal (for tests)
 extension ProfileStore {
-	private func lens<Property>(
-		_ keyPath: KeyPath<ProfileState, Property>
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileStateSubject.map { $0[keyPath: keyPath] }
-			.share() // Multicast
-			.eraseToAnyAsyncSequence()
-	}
-
-	private static func newEphemeral() -> ProfileState {
+	internal static func newEphemeral() -> ProfileState {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 		do {
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
@@ -304,6 +296,17 @@ extension ProfileStore {
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			fatalError(errorMessage)
 		}
+	}
+}
+
+// MARK: Private
+extension ProfileStore {
+	private func lens<Property>(
+		_ keyPath: KeyPath<ProfileState, Property>
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		profileStateSubject.map { $0[keyPath: keyPath] }
+			.share() // Multicast
+			.eraseToAnyAsyncSequence()
 	}
 
 	private func restoreFromSecureStorageIfAble() async {

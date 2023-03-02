@@ -15,6 +15,9 @@ public struct Home: Sendable, FeatureReducer {
 		// MARK: - Components
 		public var header: Header.State
 		public var accountList: AccountList.State
+		public var accounts: OnNetwork.Accounts {
+			.init(rawValue: .init(uniqueElements: accountList.accounts.map(\.account)))!
+		}
 
 		// MARK: - Destinations
 		@PresentationState
@@ -42,7 +45,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountsLoadedResult(TaskResult<OnNetwork.Accounts>)
-		case appPreferencesLoadedResult(TaskResult<AppPreferences>)
+		case gotAppPreferences(AppPreferences)
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case accountPortfoliosResult(TaskResult<IdentifiedArrayOf<AccountPortfolio>>)
 		case singleAccountPortfolioResult(TaskResult<AccountPortfolio>)
@@ -119,7 +122,7 @@ public struct Home: Sendable, FeatureReducer {
 		case .task:
 			return .run { send in
 				do {
-					for try await accounts in try await accountsClient.accountsOnCurrentNetwork() {
+					for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
 						guard !Task.isCancelled else {
 							return
 						}
@@ -133,7 +136,8 @@ public struct Home: Sendable, FeatureReducer {
 			return getAppPreferences()
 
 		case .pullToRefreshStarted:
-			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList.accounts))
+//			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList.accounts))
+			fatalError()
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -157,7 +161,7 @@ public struct Home: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .appPreferencesLoadedResult(.success(appPreferences)):
+		case let .gotAppPreferences(appPreferences):
 			// FIXME: Replace currency with value from Profile!
 			let currency = appPreferences.display.fiatCurrencyPriceTarget
 			state.accountList.accounts.forEach {
@@ -166,10 +170,6 @@ public struct Home: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.isCurrencyAmountVisibleLoaded(appPreferences.display.isCurrencyAmountVisible)))
 			}
-
-		case let .appPreferencesLoadedResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
 
 		case let .isCurrencyAmountVisibleLoaded(isVisible):
 			// account list
@@ -241,7 +241,7 @@ public struct Home: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .accountList(.delegate(.fetchPortfolioForAccounts)):
-			return loadAccountsAndSettings()
+			return refreshAccounts(state.accounts)
 
 		case let .accountList(.delegate(.displayAccountDetails(account))):
 			state.destination = .accountDetails(.init(for: account))
@@ -289,6 +289,14 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
+	private func refreshAccounts(_ accounts: OnNetwork.Accounts) -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.accountPortfoliosResult(TaskResult {
+				try await accountPortfolioFetcherClient.fetchPortfolioFor(accounts: accounts)
+			})))
+		}
+	}
+
 	private func toggleCurrencyAmountVisible() -> EffectTask<Action> {
 		.run { _ in
 			try await appPreferencesClient.updatingDisplay {
@@ -299,10 +307,8 @@ public struct Home: Sendable, FeatureReducer {
 
 	private func getAppPreferences() -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.appPreferencesLoadedResult(
-				TaskResult {
-					try await appPreferencesClient.getPreferences()
-				}
+			await send(.internal(.gotAppPreferences(
+				appPreferencesClient.getPreferences()
 			)))
 		}
 	}

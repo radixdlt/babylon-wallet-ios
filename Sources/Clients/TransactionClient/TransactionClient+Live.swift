@@ -293,7 +293,7 @@ extension TransactionClient {
 
 				let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>> = try await {
 					let accounts = try await addressesNeededToSign.asyncMap {
-						try await accountsClient.lookupAccountByAddress($0)
+						try await accountsClient.getAccountByAddress($0)
 					}
 					guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
 						// TransactionManifest does not reference any accounts => use any account!

@@ -45,7 +45,7 @@ public struct AccountsClient: Sendable {
 
 extension AccountsClient {
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async -> OnNetwork.Accounts
-	public typealias GetAccountsOnNetwork = @Sendable () async throws -> OnNetwork.Accounts
+	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> OnNetwork.Accounts
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<OnNetwork.Accounts>
 

@@ -374,7 +374,7 @@ package.addModules([
 		name: "NetworkSwitchingClient",
 		dependencies: [
 			"AccountsClient",
-			"GatewaysAPI",
+			"GatewayAPI",
 			"ProfileStore",
 			"GatewaysClient",
 		],
