@@ -5,6 +5,11 @@ import OnboardingFeature
 @testable import Profile
 @testable import SplashFeature
 
+private let ephemeralPrivateProfile: Profile.Ephemeral.Private = {
+	fatalError()
+}()
+
+// MARK: - AppFeatureTests
 @MainActor
 final class AppFeatureTests: TestCase {
 	let networkID = NetworkID.nebunet
@@ -25,7 +30,7 @@ final class AppFeatureTests: TestCase {
 		// when
 		await store.send(.child(.main(.delegate(.removedWallet)))) {
 			// then
-			$0.root = .onboardingCoordinator(.init())
+			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 	}
 
@@ -86,7 +91,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser))))) {
-			$0.root = .onboardingCoordinator(.init())
+			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
@@ -122,7 +127,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
-			$0.root = .onboardingCoordinator(.init())
+			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
 		await store.receive(.internal(.system(.displayErrorAlert(
@@ -195,7 +200,7 @@ final class AppFeatureTests: TestCase {
 			$0.alert = nil
 		}
 		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
-			$0.root = .onboardingCoordinator(.init())
+			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
 		waitForExpectations(timeout: 1)
@@ -251,7 +256,7 @@ final class AppFeatureTests: TestCase {
 			$0.alert = nil
 		}
 		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
-			$0.root = .onboardingCoordinator(.init())
+			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 		waitForExpectations(timeout: 1)
 		await testScheduler.run() // fast-forward scheduler to the end of time

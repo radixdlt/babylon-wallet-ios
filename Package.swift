@@ -204,6 +204,7 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",

@@ -17,11 +17,11 @@ final class CreationOfEntityTests: TestCase {
 			),
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {
-			$0.onboardingClient.createNewUnsavedVirtualEntity = { request in
+			$0.accountsClient.createUnsavedVirtualAccount = { request in
 				XCTAssertEqual(request.displayName, account.displayName)
 				return account
 			}
-			$0.onboardingClient.saveNewVirtualEntity = {
+			$0.accountsClient.saveVirtualAccount = {
 				XCTAssertEqual($0, account)
 			}
 		}
@@ -42,7 +42,7 @@ final class CreationOfEntityTests: TestCase {
 			),
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {
-			$0.onboardingClient.createNewUnsavedVirtualEntity = { request in
+			$0.accountsClient.createUnsavedVirtualAccount = { request in
 				XCTAssertEqual(request.displayName, "NeverCreated")
 				throw createNewAccountError
 			}
