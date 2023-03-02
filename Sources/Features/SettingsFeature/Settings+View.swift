@@ -5,7 +5,7 @@ import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import PersonasFeature
 #if DEBUG
-// import ProfileView
+import InspectProfileFeature
 import SecureStorageClient
 #endif
 
@@ -97,12 +97,11 @@ extension View {
 				)
 			) {
 				if let profile = viewStore.profileToInspect {
-//					ProfileView(
-//						profile: profile,
-//						// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-//						secureStorageClient: SecureStorageClient.liveValue
-//					)
-					Text("Fix Inspect Profile View please")
+					ProfileView(
+						profile: profile,
+						// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+						secureStorageClient: SecureStorageClient.liveValue
+					)
 				} else {
 					Text(L10n.Settings.noProfileText)
 				}
