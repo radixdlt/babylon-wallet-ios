@@ -11,7 +11,7 @@ extension Home.State {
 
 // MARK: - Home.View
 extension Home {
-	struct ViewState: Equatable {}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
