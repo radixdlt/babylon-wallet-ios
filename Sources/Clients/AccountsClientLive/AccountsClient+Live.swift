@@ -9,6 +9,7 @@ extension AccountsClient: DependencyKey {
 		Self(
 			getAccountsOnCurrentNetwork: { await profileStore.network.accounts },
 			accountsOnCurrentNetwork: { await profileStore.accountValues() },
+			getAccountsOnNetwork: { try await profileStore.profile.onNetwork(id: $0).accounts },
 			createUnsavedVirtualAccount: { request in
 				try await profileStore.profile.createUnsavedVirtualEntity(request: request)
 			},

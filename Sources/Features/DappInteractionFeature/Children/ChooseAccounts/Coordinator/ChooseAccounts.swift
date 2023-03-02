@@ -1,6 +1,6 @@
+import AccountsClient
 import CreateEntityFeature
 import FeaturePrelude
-import ProfileClient
 
 // MARK: - ChooseAccounts
 struct ChooseAccounts: Sendable, FeatureReducer {
@@ -60,7 +60,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.accountsClient) var accountsClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -77,7 +77,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case .didAppear:
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
-					try await profileClient.getAccounts()
+					try await accountsClient.getAccountsOnCurrentNetwork()
 				})))
 			}
 
@@ -147,7 +147,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			state.createAccountCoordinator = nil
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
-					try await profileClient.getAccounts()
+					try await accountsClient.getAccountsOnCurrentNetwork()
 				})))
 			}
 

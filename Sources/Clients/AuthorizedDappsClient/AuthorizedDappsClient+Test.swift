@@ -16,6 +16,7 @@ extension AuthorizedDappsClient: TestDependencyKey {
 		addAuthorizedDapp: { _ in },
 		forgetAuthorizedDapp: { _, _ in },
 		updateAuthorizedDapp: { _ in },
+		updateOrAddAuthorizedDapp: { _ in },
 		disconnectPersonaFromDapp: { _, _, _ in },
 		detailsForAuthorizedDapp: { _ in throw NoopError() }
 	)
@@ -25,6 +26,7 @@ extension AuthorizedDappsClient: TestDependencyKey {
 		addAuthorizedDapp: unimplemented("\(Self.self).addAuthorizedDapp"),
 		forgetAuthorizedDapp: unimplemented("\(Self.self).forgetAuthorizedDapp"),
 		updateAuthorizedDapp: unimplemented("\(Self.self).updateAuthorizedDapp"),
+		updateOrAddAuthorizedDapp: unimplemented("\(Self.self).updateOrAddAuthorizedDapp"),
 		disconnectPersonaFromDapp: unimplemented("\(Self.self).disconnectPersonaFromDapp"),
 		detailsForAuthorizedDapp: unimplemented("\(Self.self).detailsForAuthorizedDapp")
 	)

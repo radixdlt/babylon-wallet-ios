@@ -1,6 +1,6 @@
 import FeaturePrelude
+import GatewaysClient
 import P2PConnectivityClient
-import ProfileClient
 import ROLAClient
 
 // MARK: - DappInteractionHook
@@ -62,7 +62,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	var onPresent: (@Sendable () -> Void)? = nil
 	var onDismiss: (@Sendable () -> Void)? = nil
 
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
@@ -88,7 +88,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(clientID) {
 							try await p2pConnectivityClient.sendMessageReadReceipt(clientID, request.originalMessage)
 
-							let currentNetworkID = await profileClient.getCurrentNetworkID()
+							let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
 							guard request.interaction.metadata.networkId == currentNetworkID else {
 								let incomingRequestNetwork = try Network.lookupBy(id: request.interaction.metadata.networkId)

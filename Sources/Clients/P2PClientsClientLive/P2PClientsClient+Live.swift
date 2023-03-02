@@ -13,7 +13,7 @@ extension P2PClientsClient: DependencyKey {
 
 		return Self(
 			getP2PClients: {
-				await appPreferencesClient.loadPreferences().p2pClients
+				await appPreferencesClient.getPreferences().p2pClients
 			},
 			addP2PClient: { newClient in
 				try await appPreferencesClient.updating {

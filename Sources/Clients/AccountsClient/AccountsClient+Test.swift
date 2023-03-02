@@ -10,8 +10,9 @@ extension DependencyValues {
 // MARK: - AccountsClient + TestDependencyKey
 extension AccountsClient: TestDependencyKey {
 	public static let noop = Self(
-		getAccountsOnCurrentNetwork: { fatalError("impl me") },
-		accountsOnCurrentNetwork: { fatalError("impl me") },
+		getAccountsOnCurrentNetwork: { .init(OnNetwork.Account.previewValue0) },
+		accountsOnCurrentNetwork: { [].async.eraseToAnyAsyncSequence() },
+		getAccountsOnNetwork: { _ in throw NoopError() },
 		createUnsavedVirtualAccount: { _ in throw NoopError() },
 		saveVirtualAccount: { _ in },
 		getAccountByAddress: { _ in throw NoopError() },
@@ -21,6 +22,7 @@ extension AccountsClient: TestDependencyKey {
 	public static let testValue = Self(
 		getAccountsOnCurrentNetwork: unimplemented("\(Self.self).getAccountsOnCurrentNetwork"),
 		accountsOnCurrentNetwork: unimplemented("\(Self.self).accountsOnCurrentNetwork"),
+		getAccountsOnNetwork: unimplemented("\(Self.self).getAccountsOnNetwork"),
 		createUnsavedVirtualAccount: unimplemented("\(Self.self).createUnsavedVirtualAccount"),
 		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),

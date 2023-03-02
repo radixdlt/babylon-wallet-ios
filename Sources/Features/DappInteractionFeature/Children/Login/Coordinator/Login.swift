@@ -1,5 +1,7 @@
+import AuthorizedDappsClient
 import CreateEntityFeature
 import FeaturePrelude
+import PersonasClient
 
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
@@ -47,7 +49,8 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -125,8 +128,8 @@ struct Login: Sendable, FeatureReducer {
 
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
 		.run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
-			let personas = try await profileClient.getPersonas()
-			let authorizedDapps = try await profileClient.getAuthorizedDapps()
+			let personas = try await personasClient.getPersonas()
+			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
 			let authorizedDapp = authorizedDapps.first(by: dappDefinitionAddress)
 			let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple? = {
 				guard let authorizedDapp else {

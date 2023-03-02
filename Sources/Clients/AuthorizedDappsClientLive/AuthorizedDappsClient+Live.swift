@@ -25,6 +25,11 @@ extension AuthorizedDappsClient: DependencyKey {
 					try $0.updateAuthorizedDapp(toUpdate)
 				}
 			},
+			updateOrAddAuthorizedDapp: { dapp in
+				try await profileStore.updating {
+					try $0.updateOrAddAuthorizedDapp(dapp)
+				}
+			},
 			disconnectPersonaFromDapp: { personaID, authorizedDappID, networkID in
 				try await profileStore.updating {
 					try $0.disconnectPersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)

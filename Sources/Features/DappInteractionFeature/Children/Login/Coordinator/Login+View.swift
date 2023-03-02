@@ -138,8 +138,10 @@ struct Login_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: Login()
-					.dependency(\.profileClient, .previewValueTwoPersonas(existing: true))
-					.dependency(\.profileClient, .previewValueTwoPersonas(existing: false))
+					.dependency(\.accountsClient, .previewValueTwoAccounts())
+					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
+					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 			)
 		)
 	}

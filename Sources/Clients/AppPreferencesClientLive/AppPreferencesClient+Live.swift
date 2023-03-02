@@ -6,8 +6,8 @@ import ProfileStore
 extension AppPreferencesClient: DependencyKey {
 	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
-			loadPreferences: { await profileStore.profile.appPreferences },
-			savePreferences: { newPreferences in
+			getPreferences: { await profileStore.profile.appPreferences },
+			updatePreferences: { newPreferences in
 				try await profileStore.updating {
 					$0.appPreferences = newPreferences
 				}

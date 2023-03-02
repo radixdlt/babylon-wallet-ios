@@ -1,7 +1,7 @@
 import ClientPrelude
 import EngineToolkitClient
 import GatewayAPI
-import ProfileClient
+import GatewaysClient
 import TransactionClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
@@ -41,7 +41,7 @@ extension FaucetClient: DependencyKey {
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
 			@Dependency(\.transactionClient.signAndSubmitTransaction) var signAndSubmitTransaction
-			@Dependency(\.profileClient.getCurrentNetworkID) var getCurrentNetworkID
+			@Dependency(\.gatewaysClient.getCurrentNetworkID) var getCurrentNetworkID
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 			let accountAddress = faucetRequest.recipientAccountAddress

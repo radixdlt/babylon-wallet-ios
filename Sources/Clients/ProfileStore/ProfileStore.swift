@@ -14,11 +14,11 @@ import SecureStorageClient
 ///
 /// This actor is meant **not** meant to be used directly by the
 /// apps reducers, but rather always indirectly, via the live
-/// implementations of a set of clients (dependencies), namely:
+/// implementations of a set of clients (dependencies), e.g.:
 /// * AccountsClient
 /// * PersonasClient
 /// * AuthorizedDappsClient
-/// * AppPreferencesClient (P2PClients)
+/// * AppPreferencesClient
 ///
 /// These live implementaions will all references the one and only
 /// ProfileStore singleton instance `shared`.
@@ -38,6 +38,7 @@ import SecureStorageClient
 ///     func commitEphemeral() async throws
 ///     func deleteProfile() async throws
 ///     func update(profile: Profile) async throws
+///     func import(profileSnapshot: ProfileSnapshot) async throws
 ///
 ///
 public final actor ProfileStore {
@@ -121,12 +122,35 @@ extension ProfileStore {
 		lens(\.profile.network.accounts)
 	}
 
-	private func lens<Property>(
-		_ keyPath: KeyPath<ProfileState, Property>
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileStateSubject.map { $0[keyPath: keyPath] }
-			.share() // Multicast
-			.eraseToAnyAsyncSequence()
+	public func import (profileSnapshot: ProfileSnapshot) async throws {
+		try await isInitialized()
+		try assertProfileStateIsEphemeral()
+		guard try? await secureStorageClient.loadProfileSnapshotData() == nil else {
+			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
+			throw ExistingProfileSnapshotFoundAbortingImport()
+		}
+		let profile = try Profile(snapshot: profileSnapshot)
+		do {
+			try await secureStorageClient.saveProfileSnapshot(profileSnapshot)
+		} catch {
+			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
+			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage) // for DEBUG builds we want to crash
+			throw error
+		}
+		changeState(to: .persisted(profile))
+	}
+
+	@discardableResult
+	private func assertProfileStateIsEphemeral() throws -> Profile.Ephemeral {
+		struct ExpectedProfileStateToBeEphemeralButItWasNot: Swift.Error {}
+		guard let ephemeral {
+			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
+			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
+			throw ExpectedProfileStateToBeEphemeralButItWasNot()
+		}
+		return ephemeral
 	}
 
 	public func commitEphemeral() async throws {
@@ -142,12 +166,7 @@ extension ProfileStore {
 		deviceDescription = "macOS"
 		#endif
 
-		guard case var .ephemeral(ephemeral) = profileStateSubject.value else {
-			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
-			return
-		}
+		var ephemeral = try assertProfileStateIsEphemeral()
 		ephemeral.update(deviceDescription: deviceDescription)
 
 		do {
@@ -155,27 +174,11 @@ extension ProfileStore {
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			// Unlucky... we earlier successfully managed to save the mnemonic for the factor source, but
-			// we failed to save the profile snapshot => tidy up by trying to delete the just saved mnemonic, before
-			// we propate the error
 			assertionFailure(errorMessage) // for DEBUG builds we want to crash
 			throw error
 		}
 
 		changeState(to: .persisted(ephemeral.private.profile))
-	}
-
-	/// Syntactic sugar for:
-	///     var profile = await profileStore.profile
-	///     mutateProfile(&profile)
-	///     try await profileStore.update(profile: profile)
-	public func updating<T>(
-		_ mutateProfile: @Sendable (inout Profile) async throws -> T
-	) async throws -> T {
-		var copy = profile
-		let result = try await mutateProfile(&copy)
-		try await update(profile: copy)
-		return result // in many cases `Void`.
 	}
 
 	/// Updates the in-memomry across app used Profile and also
@@ -219,6 +222,22 @@ extension ProfileStore {
 	}
 }
 
+// MARK: Sugar (Public)
+extension ProfileStore {
+	/// Syntactic sugar for:
+	///     var profile = await profileStore.profile
+	///     mutateProfile(&profile)
+	///     try await profileStore.update(profile: profile)
+	public func updating<T>(
+		_ mutateProfile: @Sendable (inout Profile) async throws -> T
+	) async throws -> T {
+		var copy = profile
+		let result = try await mutateProfile(&copy)
+		try await update(profile: copy)
+		return result // in many cases `Void`.
+	}
+}
+
 extension ProfileStore.ProfileState {
 	public var description: String {
 		discriminator.rawValue
@@ -259,7 +278,15 @@ extension ProfileStore.ProfileState {
 
 // MARK: Private
 extension ProfileStore {
-	static func newEphemeral() -> ProfileState {
+	private func lens<Property>(
+		_ keyPath: KeyPath<ProfileState, Property>
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		profileStateSubject.map { $0[keyPath: keyPath] }
+			.share() // Multicast
+			.eraseToAnyAsyncSequence()
+	}
+
+	private static func newEphemeral() -> ProfileState {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 		do {
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)

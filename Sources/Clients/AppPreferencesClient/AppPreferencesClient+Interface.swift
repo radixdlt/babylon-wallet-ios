@@ -3,8 +3,8 @@ import Profile
 
 // MARK: - AppPreferencesClient
 public struct AppPreferencesClient: Sendable {
-	public var loadPreferences: LoadPreferences
-	public var savePreferences: SavePreferences
+	public var getPreferences: GetPreferences
+	public var updatePreferences: UpdatePreferences
 
 	// FIXME: find a better home for this...? Should we have some actual `ProfileSnapshotClient`
 	// for this and `delete` method?
@@ -12,13 +12,13 @@ public struct AppPreferencesClient: Sendable {
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
 	public init(
-		loadPreferences: @escaping LoadPreferences,
-		savePreferences: @escaping SavePreferences,
+		getPreferences: @escaping LoadPreferences,
+		updatePreferences: @escaping SavePreferences,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot
 	) {
-		self.loadPreferences = loadPreferences
-		self.savePreferences = savePreferences
+		self.getPreferences = getPreferences
+		self.updatePreferences = updatePreferences
 
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
@@ -27,23 +27,23 @@ public struct AppPreferencesClient: Sendable {
 
 // MARK: - Typealias
 extension AppPreferencesClient {
-	public typealias LoadPreferences = @Sendable () async -> AppPreferences
-	public typealias SavePreferences = @Sendable (AppPreferences) async throws -> Void
+	public typealias GetPreferences = @Sendable () async -> AppPreferences
+	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
 	public typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
 	public typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 }
 
 extension AppPreferencesClient {
 	/// Syntactic sugar for:
-	///      var copy = try await loadPreferences()
+	///      var copy = try await getPreferences()
 	///      try await mutatePreferences(&copy)
-	///      try await savePreferences(copy)
+	///      try await updatePreferences(copy)
 	public func updating<T>(
 		_ mutatePreferences: @Sendable (inout AppPreferences) throws -> T
 	) async throws -> T {
-		var copy = await loadPreferences()
+		var copy = await getPreferences()
 		let result = try mutatePreferences(&copy)
-		try await savePreferences(copy)
+		try await updatePreferences(copy)
 		return result // in many cases `Void`.
 	}
 

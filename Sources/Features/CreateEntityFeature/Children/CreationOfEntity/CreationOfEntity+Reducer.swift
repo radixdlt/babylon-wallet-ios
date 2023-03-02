@@ -1,10 +1,10 @@
 import FeaturePrelude
-import ProfileClient
+import OnboardingClient
 
 // MARK: - CreationOfEntity
 public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.onboardingClient) var onboardingClient
 
 	public init() {}
 
@@ -26,14 +26,14 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtoco
 						displayName: name
 					)
 
-					let entity: Entity = try await profileClient.createNewUnsavedVirtualEntity(request: request)
+					let entity: Entity = try await onboardingClient.createNewUnsavedVirtualEntity(request: request)
 
 					// N.B. if this CreateEntity flow is triggered from NewProfileThenAccount flow
 					// (part of onboarding), the ProfileClients live implemntation will hold onto
 					// an "ephemeral" profile and this entity gets saved into this ephemeral profile.
 					// so at end of NewProfileThenAccount flow we need to "commit" the
 					// ephemeral profile so it gets persisted.
-					try await profileClient.saveNewEntity(entity)
+					try await onboardingClient.saveNewVirtualEntity(entity)
 
 					return entity
 				}

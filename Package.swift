@@ -52,7 +52,6 @@ package.addModules([
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
-			"ProfileClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -78,7 +77,7 @@ package.addModules([
 			"Cryptography",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
-			"ProfileClient",
+			"OnboardingClient",
 		],
 		tests: .yes()
 	),
@@ -86,17 +85,20 @@ package.addModules([
 		name: "AuthorizedDAppsFeatures",
 		dependencies: [
 			"GatewayAPI",
-			"ProfileClient",
+			"AuthorizedDappsClient",
 		],
 		tests: .no
 	),
 	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
+			"AccountsClient",
+			"AuthorizedDappsClient",
 			"CreateEntityFeature",
 			"GatewayAPI",
+			"GatewaysClient", // get current network
 			"P2PConnectivityClient",
-			"ProfileClient",
+			"PersonasClient",
 			"ROLAClient",
 			"TransactionSigningFeature",
 		],
@@ -120,9 +122,9 @@ package.addModules([
 			"AccountDetailsFeature",
 			"AccountListFeature",
 			"AccountPortfolioFetcherClient",
+			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateEntityFeature",
-			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [
@@ -185,7 +187,7 @@ package.addModules([
 		name: "OnboardingFeature",
 		dependencies: [
 			"CreateEntityFeature",
-			"ProfileClient",
+			"OnboardingClient",
 		],
 		tests: .yes()
 	),
@@ -322,7 +324,7 @@ package.addModules([
 		dependencies: [
 			"EngineToolkitClient",
 			"GatewayAPI",
-			"ProfileClient",
+			"GatewaysClient", // getCurrentNetworkID
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -335,7 +337,7 @@ package.addModules([
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
 			"Cryptography",
-			"ProfileClient",
+			"GatewaysClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
@@ -397,12 +399,11 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "P2PConnectivityClient", // FIXME: once @ghenadie merges multichannel support, rename this `RadixConnectClient`?
 		dependencies: [
 			"P2PConnection",
-			"ProfileClient",
+			"P2PClientsClient",
 		],
 		tests: .yes()
 	),
@@ -423,24 +424,6 @@ package.addModules([
 		tests: .yes()
 	),
 
-	.client(
-		name: "ProfileClient",
-		dependencies: [
-			"Profile",
-			"Cryptography",
-			"UseFactorSourceClient",
-		],
-		tests: .no
-	),
-	.client(
-		name: "ProfileClientLive",
-		dependencies: [
-			"ProfileClient",
-			"EngineToolkitClient",
-			"SecureStorageClient",
-		],
-		tests: .yes()
-	),
 	.client(
 		name: "ProfileStore",
 		dependencies: [
@@ -468,12 +451,14 @@ package.addModules([
 	.client(
 		name: "TransactionClient",
 		dependencies: [
-			"EngineToolkitClient",
-			"GatewayAPI",
-			"ProfileClient",
 			"AccountPortfolioFetcherClient",
-			"UseFactorSourceClient",
+			"AccountsClient",
+			"EngineToolkitClient",
+			"FactorSourcesClient",
+			"GatewayAPI",
+			"GatewaysClient",
 			"SecureStorageClient",
+			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),

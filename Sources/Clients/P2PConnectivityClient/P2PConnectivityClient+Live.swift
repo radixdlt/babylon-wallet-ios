@@ -1,7 +1,7 @@
 import ClientPrelude
 import Network
+import P2PClientsClient
 import P2PConnection
-import ProfileClient
 
 extension P2P.ClientWithConnectionStatus {
 	func connected() -> Self {
@@ -9,21 +9,15 @@ extension P2P.ClientWithConnectionStatus {
 	}
 }
 
-extension ProfileClient {
-	func p2pClient(for id: P2PConnectionID) async throws -> P2PClient? {
-		try await getP2PClients().first(where: { $0.id == id })
-	}
-}
-
 // MARK: - P2PConnectivityClient + :LiveValue
 extension P2PConnectivityClient {
 	public static let liveValue: Self = {
-		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.p2pClientsClient) var p2pClientsClient
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		@Sendable func client(byID id: P2PClient.ID) async throws -> P2PClient {
-			guard let client = try await profileClient.p2pClient(for: id) else {
+			guard let client = try await p2pClientsClient.p2pClient(for: id) else {
 				throw P2PClientNotFoundInProfile()
 			}
 			return client
@@ -59,7 +53,7 @@ extension P2PConnectivityClient {
 		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
 			Task {
 				_ = try await P2PConnections.shared.add(
-					connectionsFor: profileClient.getP2PClients(),
+					connectionsFor: p2pClientsClient.getP2PClients(),
 					connectMode: .connect(force: true, inBackground: true),
 					emitConnectionsUpdate: true
 				)
@@ -87,7 +81,7 @@ extension P2PConnectivityClient {
 				})
 			},
 			addP2PClientWithConnection: { client in
-				try await profileClient.addP2PClient(client)
+				try await p2pClientsClient.addP2PClient(client)
 				_ = try await P2PConnections.shared.add(
 					config: client.config,
 					connectMode: .skipConnecting, // should already be committed
@@ -95,7 +89,7 @@ extension P2PConnectivityClient {
 				)
 			},
 			deleteP2PClientByID: { id in
-				try await profileClient.deleteP2PClientByID(id)
+				try await p2pClientsClient.deleteP2PClientByID(id)
 				try await P2PConnections.shared.removeAndDisconnect(id: id)
 			},
 			getConnectionStatusAsyncSequence: { id in

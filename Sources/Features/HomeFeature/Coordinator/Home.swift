@@ -1,11 +1,11 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolioFetcherClient
+import AccountsClient
 import AppPreferencesClient
 import CreateEntityFeature
 import FeaturePrelude
 import FungibleTokenListFeature
-import ProfileClient
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
@@ -94,7 +94,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.accountsClient) var accountsClient
 
 	public init() {}
 
@@ -287,12 +287,12 @@ public struct Home: Sendable, FeatureReducer {
 		.run { send in
 			await send(.internal(.accountsLoadedResult(
 				TaskResult {
-					try await profileClient.getAccounts()
+					try await accountsClient.getAccountsOnCurrentNetwork()
 				}
 			)))
 			await send(.internal(.appPreferencesLoadedResult(
 				TaskResult {
-					try await appPreferencesClient.loadPreferences()
+					try await appPreferencesClient.getPreferences()
 				}
 			)))
 		}

@@ -2,18 +2,41 @@ import ClientPrelude
 import Profile
 import UseFactorSourceClient
 
+extension EntityProtocol {
+	public func cast<Entity: EntityProtocol>() throws -> Entity {
+		self.cast(to: Entity.self)
+	}
+
+	public func cast<Entity: EntityProtocol>(
+		to entityType: Entity.Type
+	) throws -> Entity {
+		guard
+			self.kind == request.entityKind,
+			let entity = self as? Entity
+		else {
+			let errorMsg = "Critical error, entity kind mismatch discrepancy"
+			loggerGlobal.critical(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+			struct EntityKindMismatchDiscrepancy: Swift.Error {}
+			throw EntityKindMismatchDiscrepancy()
+		}
+		return entity
+	}
+}
+
 extension Profile {
-	public func createUnsavedVirtualEntity<Entity: EntityProtocol>(
+	public func createNewUnsavedVirtualEntity<Entity: EntityProtocol>(
 		request: CreateVirtualEntityRequestProtocol
 	) async throws -> Entity {
+		try await self.createNewUnsavedVirtualEntity(request: request)
+			.cast()
+	}
+
+	public func createNewUnsavedVirtualEntity(
+		request: CreateVirtualEntityRequestProtocol
+	) async throws -> any EntityProtocol {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
-		//        let networkID: NetworkID = await {
-		//            if let networkID = request.networkID {
-		//                return networkID
-		//            }
-		//            return await getCurrentNetworkID()
-		//        }()
 		let networkID = request.networkID ?? self.network.networkID
 		let getDerivationPathRequest = try request.getDerivationPathRequest()
 		let getDerivationPathForNewEntity = { (request: GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int) in
@@ -99,7 +122,7 @@ extension Profile {
 				displayName: displayName,
 				fields: .init()
 			)
-			return persona as! Entity
+			return persona
 		case .account:
 			let accountAddress = try OnNetwork.Account.deriveAddress(
 				networkID: networkID,
@@ -113,7 +136,7 @@ extension Profile {
 				index: index,
 				displayName: displayName
 			)
-			return account as! Entity
+			return account
 		}
 	}
 }

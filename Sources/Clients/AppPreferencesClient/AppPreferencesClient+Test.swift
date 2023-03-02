@@ -5,8 +5,8 @@ extension AppPreferencesClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
-		loadPreferences: unimplemented("\(Self.self).loadPreferences"),
-		savePreferences: unimplemented("\(Self.self).savePreferences"),
+		getPreferences: unimplemented("\(Self.self).getPreferences"),
+		updatePreferences: unimplemented("\(Self.self).updatePreferences"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources")
 	)
@@ -14,8 +14,8 @@ extension AppPreferencesClient: TestDependencyKey {
 
 extension AppPreferencesClient {
 	static let noop = Self(
-		loadPreferences: { .default },
-		savePreferences: { _ in },
+		getPreferences: { .default },
+		updatePreferences: { _ in },
 		extractProfileSnapshot: { throw NoopError() },
 		deleteProfileAndFactorSources: {}
 	)

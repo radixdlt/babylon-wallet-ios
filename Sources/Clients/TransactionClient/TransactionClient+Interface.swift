@@ -24,8 +24,6 @@ extension DependencyValues {
 	}
 }
 
-import ProfileClient
-
 // MARK: - SignManifestRequest
 public struct SignManifestRequest: Sendable {
 	public let manifestToSign: TransactionManifest

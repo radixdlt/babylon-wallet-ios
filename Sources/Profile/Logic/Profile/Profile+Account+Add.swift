@@ -3,7 +3,9 @@ import EngineToolkit
 import Prelude
 
 // MARK: - AuthorizedDappDoesNotExists
-struct AuthorizedDappDoesNotExists: Swift.Error {}
+public struct AuthorizedDappDoesNotExists: Swift.Error {
+	public init() {}
+}
 
 // MARK: - DappWasNotConnected
 struct DappWasNotConnected: Swift.Error {}
@@ -184,5 +186,25 @@ extension Profile {
 			fatalError("Incorrect implementation, should have been an existing AuthorizedDapp")
 		}
 		try updateOnNetwork(network)
+	}
+
+	/// Updates or adds a `AuthorizedDapp` in the profile
+	public mutating func updateOrAddAuthorizedDapp(
+		_ unvalidatedAuthorizedDapp: OnNetwork.AuthorizedDapp
+	) throws {
+		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
+		let networkID = dapp.networkID
+		var network = try onNetwork(id: networkID)
+		if network.authorizedDapps.contains(dapp: dapp) {
+			try updateAuthorizedDapp(dapp)
+		} else {
+			try addAuthorizedDapp(dapp)
+		}
+	}
+}
+
+extension OnNetwork.AuthorizedDapps {
+	public func contains(dapp authorizedDapp: OnNetwork.AuthorizedDapp) -> Bool {
+		self[id: authorizedDapp.id] != nil
 	}
 }

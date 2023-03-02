@@ -1,7 +1,6 @@
 import FeaturePrelude
 import MainFeature
 import OnboardingFeature
-import ProfileClient
 import SplashFeature
 
 // MARK: - App.Action

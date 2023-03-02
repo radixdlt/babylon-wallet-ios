@@ -159,6 +159,9 @@ extension SecureStorageClient {
 		do {
 			try await saveProfileSnapshot(ephemeral.profile.snapshot())
 		} catch {
+			// Unlucky... we earlier successfully managed to save the mnemonic for the factor source, but
+			// we failed to save the profile snapshot => tidy up by trying to delete the just saved mnemonic, before
+			// we propate the error
 			try? await deleteMnemonicByFactorSourceID(ephemeral.privateFactorSource.factorSource.id)
 			throw error
 		}
