@@ -12,17 +12,15 @@ extension OnboardingClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
-		commitEphemeral: unimplemented("\(Self.self).commitEphemeral"),
-		createUnsavedVirtualEntity: unimplemented("\(Self.self).createUnsavedVirtualEntity"),
-		saveNewVirtualEntity: unimplemented("\(Self.self).saveNewVirtualEntity"),
-		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot")
+		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot"),
+		createAccountInEphemeralProfile: unimplemented("\(Self.self).createAccountInEphemeralProfile"),
+		commitEphemeral: unimplemented("\(Self.self).commitEphemeral")
 	)
 
 	public static let noop = Self(
 		loadProfile: { .newUser },
-		commitEphemeral: {},
-		createUnsavedVirtualEntity: { _ in throw NoopError() },
-		saveNewVirtualEntity: { _ in throw NoopError() },
-		importProfileSnapshot: { _ in throw NoopError() }
+		importProfileSnapshot: { _ in throw NoopError() },
+		createAccountInEphemeralProfile: { _ in throw NoopError() },
+		commitEphemeral: {}
 	)
 }

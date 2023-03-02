@@ -105,13 +105,6 @@ extension ProfileStore {
 	/// The current network with a non empty set of accounts.
 	public var network: OnNetwork { profile.network }
 
-	public var ephemeral: Profile.Ephemeral? {
-		switch profileStateSubject.value {
-		case let .ephemeral(ephemeral): return ephemeral
-		case .newWithEphemeral, .persisted: return nil
-		}
-	}
-
 	/// A multicasting replaying async sequence of distinct Profile.
 	public func values() async -> AnyAsyncSequence<Profile> {
 		lens(\.profile)
@@ -120,6 +113,11 @@ extension ProfileStore {
 	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
 	public func accountValues() async -> AnyAsyncSequence<OnNetwork.Accounts> {
 		lens(\.profile.network.accounts)
+	}
+
+	public func getEphemeral() async -> Profile.Ephemeral? {
+		try? await isInitialized()
+		return self.ephemeral
 	}
 
 	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
@@ -301,6 +299,13 @@ extension ProfileStore {
 
 // MARK: Private
 extension ProfileStore {
+	private var ephemeral: Profile.Ephemeral? {
+		switch profileStateSubject.value {
+		case let .ephemeral(ephemeral): return ephemeral
+		case .newWithEphemeral, .persisted: return nil
+		}
+	}
+
 	private func lens<Property>(
 		_ keyPath: KeyPath<ProfileState, Property>
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
