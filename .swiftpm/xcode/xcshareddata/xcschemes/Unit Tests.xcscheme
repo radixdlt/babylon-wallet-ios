@@ -416,6 +416,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ROLAClientTests"
+               BuildableName = "ROLAClientTests"
+               BlueprintName = "ROLAClientTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "ProfileStoreTests"
                BuildableName = "ProfileStoreTests"
                BlueprintName = "ProfileStoreTests"

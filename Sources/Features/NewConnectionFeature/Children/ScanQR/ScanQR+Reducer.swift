@@ -2,51 +2,80 @@ import CameraPermissionClient
 import FeaturePrelude
 
 // MARK: - ScanQR
-public struct ScanQR: Sendable, ReducerProtocol {
+public struct ScanQR: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		public var connectionPassword: String
+
+		public init(
+			connectionPassword: String = ""
+		) {
+			self.connectionPassword = connectionPassword
+		}
+		#else
+		public init() {}
+		#endif // macOS
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case scanned(TaskResult<String>)
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		case macInputConnectionPasswordChanged(String)
+		case macConnectButtonTapped
+		#endif // macOS
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case connectionSecretsFromScannedStringResult(TaskResult<ConnectionSecrets>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case connectionSecretsFromScannedQR(ConnectionSecrets)
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
-}
 
-extension ScanQR {
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-		case let .internal(.view(.macInputConnectionPasswordChanged(connectionPassword))):
+		case let .macInputConnectionPasswordChanged(connectionPassword):
 			state.connectionPassword = connectionPassword
 			return .none
-		case .internal(.view(.macConnectButtonTapped)):
+
+		case .macConnectButtonTapped:
 			return parseConnectionPassword(hexString: state.connectionPassword)
 		#endif // macOS
 
-		case let .internal(.view(.scanResult(.success(qrString)))):
+		case let .scanned(.success(qrString)):
 			return parseConnectionPassword(hexString: qrString)
 
-		case let .internal(.view(.scanResult(.failure(error)))):
+		case let .scanned(.failure(error)):
 			errorQueue.schedule(error)
-			return .none
-		case let .internal(.system(.connectionSecretsFromScannedStringResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
-		case let .internal(.system(.connectionSecretsFromScannedStringResult(.success(connectionSecrets)))):
-			return .run { send in
-				await send(.delegate(.connectionSecretsFromScannedQR(connectionSecrets)))
-			}
-		case .delegate:
 			return .none
 		}
 	}
-}
 
-extension ScanQR {
-	fileprivate func parseConnectionPassword(hexString: String) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .connectionSecretsFromScannedStringResult(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .connectionSecretsFromScannedStringResult(.success(connectionSecrets)):
+			return .send(.delegate(.connectionSecretsFromScannedQR(connectionSecrets)))
+		}
+	}
+
+	private func parseConnectionPassword(hexString: String) -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.system(.connectionSecretsFromScannedStringResult(
+			await send(.internal(.connectionSecretsFromScannedStringResult(
 				TaskResult {
 					let password = try ConnectionPassword(hex: hexString)
 					return try ConnectionSecrets.from(connectionPassword: password)
 				}
-			))))
+			)))
 		}
 	}
 }

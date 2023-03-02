@@ -21,46 +21,48 @@ extension NameNewEntity.View {
 				observe: ViewState.init(state:),
 				send: { .view($0) }
 			) { viewStore in
-				VStack {
-					title(with: viewStore)
+				ScrollView {
+					VStack(spacing: .medium1) {
+						title(with: viewStore)
 
-					Spacer()
-						.frame(minHeight: .small2, maxHeight: .large1)
+						VStack(spacing: .large1) {
+							subtitle(with: viewStore)
 
-					VStack(spacing: .large1) {
-						subtitle(with: viewStore)
-
-						let nameBinding = viewStore.binding(
-							get: \.entityName,
-							send: { .textFieldChanged($0) }
-						)
-
-						AppTextField(
-							placeholder: viewStore.namePlaceholder,
-							text: nameBinding,
-							hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
-							binding: $focusedField,
-							equals: .entityName,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
+							let nameBinding = viewStore.binding(
+								get: \.entityName,
+								send: { .textFieldChanged($0) }
 							)
-						)
-						#if os(iOS)
-						.textFieldCharacterLimit(30, forText: nameBinding)
-						#endif
-						.autocorrectionDisabled()
+
+							AppTextField(
+								placeholder: viewStore.namePlaceholder,
+								text: nameBinding,
+								hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
+								binding: $focusedField,
+								equals: .entityName,
+								first: viewStore.binding(
+									get: \.focusedField,
+									send: { .textFieldFocused($0) }
+								)
+							)
+							#if os(iOS)
+							.textFieldCharacterLimit(30, forText: nameBinding)
+							#endif
+							.autocorrectionDisabled()
+						}
 					}
-
-					Spacer(minLength: .small2)
-
+					.padding([.horizontal, .bottom], .medium1)
+				}
+				#if os(iOS)
+				.toolbar(.visible, for: .navigationBar)
+				#endif
+				.safeAreaInset(edge: .bottom, spacing: 0) {
 					Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
 						viewStore.send(.confirmNameButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.createEntityButtonState)
+					.padding([.horizontal, .bottom], .medium1)
 				}
-				.padding([.horizontal, .bottom], .medium1)
 				.onAppear {
 					viewStore.send(.viewAppeared)
 				}

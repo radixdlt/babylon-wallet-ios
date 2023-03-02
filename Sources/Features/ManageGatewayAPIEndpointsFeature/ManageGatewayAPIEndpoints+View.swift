@@ -21,19 +21,13 @@ extension ManageGatewayAPIEndpoints.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
-				ZStack {
-					core(viewStore: viewStore)
-
-					IfLetStore(
-						store.scope(
-							state: \.createAccountCoordinator,
-							action: { .createAccountCoordinator($0) }
-						),
-						then: { CreateAccountCoordinator.View(store: $0) }
-					)
-				}
-			}
+			core(viewStore: viewStore)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ManageGatewayAPIEndpoints.Destinations.State.createAccount,
+					action: ManageGatewayAPIEndpoints.Destinations.Action.createAccount,
+					content: { CreateAccountCoordinator.View(store: $0) }
+				)
 		}
 	}
 }

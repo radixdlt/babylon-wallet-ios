@@ -1,45 +1,30 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - _FeatureReducer
-public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Hashable {
+// MARK: - FeatureReducer
+public protocol FeatureReducer: ReducerProtocol where State: Sendable & Hashable, Action == FeatureAction<Self> {
 	associatedtype ViewAction: Sendable & Equatable = Never
 	associatedtype InternalAction: Sendable & Equatable = Never
 	associatedtype ChildAction: Sendable & Equatable = Never
 	associatedtype DelegateAction: Sendable & Equatable = Never
 
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action>
+	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
+	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
+
 	associatedtype View: SwiftUI.View
 }
 
 // MARK: - FeatureAction
-public enum FeatureAction<
-	ViewAction: Sendable & Equatable,
-	InternalAction: Sendable & Equatable,
-	ChildAction: Sendable & Equatable,
-	DelegateAction: Sendable & Equatable
->: Sendable, Equatable {
-	case view(ViewAction)
-	case `internal`(InternalAction)
-	case child(ChildAction)
-	case delegate(DelegateAction)
-}
-
-public typealias ActionOf<Feature: _FeatureReducer> = FeatureAction<
-	Feature.ViewAction,
-	Feature.InternalAction,
-	Feature.ChildAction,
-	Feature.DelegateAction
->
-
-// MARK: - FeatureReducer
-public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action>
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
+public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
+	case view(Feature.ViewAction)
+	case `internal`(Feature.InternalAction)
+	case child(Feature.ChildAction)
+	case delegate(Feature.DelegateAction)
 }
 
 extension ReducerProtocol where Self: FeatureReducer {
-	public typealias Action = ActionOf<Self>
+	public typealias Action = FeatureAction<Self>
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
