@@ -280,7 +280,7 @@ package.addModules([
 		dependencies: [
 			"ProfileClient",
 			"RadixConnect",
-			"P2PModels",
+			"RadixConnectModels",
 		],
 		tests: .yes()
 	),
@@ -392,7 +392,7 @@ package.addModules([
 		dependencies: [
 			"EngineToolkitModels",
 			"ProfileModels",
-			"P2PModels",
+			"RadixConnectModels",
 		],
 		exclude: [
 			"P2P/Codable/README.md",
@@ -420,7 +420,7 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit",
 			"ProfileModels",
-			"P2PModels",
+			"RadixConnectModels",
 		],
 		tests: .yes(
 			dependencies: [
@@ -434,7 +434,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit", // address derivation
-			"P2PModels",
+			"RadixConnectModels",
 			.product(name: "DeviceKit", package: "DeviceKit", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/devicekit/DeviceKit", from: "5.0.0")
 			},
@@ -464,14 +464,6 @@ package.addModules([
 			"Cryptography",
 		],
 		tests: .no
-	),
-	.module(
-		name: "P2PModels",
-		category: .radixConnect,
-		dependencies: [
-			"Cryptography",
-		],
-		tests: .yes()
 	),
 	.module(
 		name: "RadixConnectModels",

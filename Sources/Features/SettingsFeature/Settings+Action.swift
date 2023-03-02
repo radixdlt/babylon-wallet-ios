@@ -2,9 +2,9 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
-import P2PModels
 import PersonasFeature
 import Profile
+import RadixConnectModels
 
 // MARK: - AppSettings.Action
 extension AppSettings {

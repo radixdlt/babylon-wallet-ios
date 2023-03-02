@@ -1,5 +1,4 @@
 import FeaturePrelude
-import P2PModels
 
 // MARK: - CameraPermission.Action
 extension CameraPermission {

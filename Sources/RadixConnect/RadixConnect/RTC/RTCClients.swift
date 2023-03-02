@@ -27,7 +27,6 @@ extension RTCIncommingMessage where PeerConnectionContent == Result<P2P.FromDapp
 }
 
 // MARK: - RTCIncommingMessage.PeerConnectionMessage + Hashable, Equatable
-// extension RTCIncommingMessage.PeerConnectionMessage: Equatable where PeerConnectionContent: Hashable & Equatable {}
 extension RTCIncommingMessage.PeerConnectionMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
 
 // MARK: - RTCIncommingMessage + Hashable, Equatable

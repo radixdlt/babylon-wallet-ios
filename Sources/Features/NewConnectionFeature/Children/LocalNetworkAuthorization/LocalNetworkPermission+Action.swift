@@ -1,5 +1,4 @@
 import FeaturePrelude
-import P2PModels
 
 // MARK: - LocalNetworkPermission.Action
 extension LocalNetworkPermission {

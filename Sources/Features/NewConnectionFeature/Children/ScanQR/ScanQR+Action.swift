@@ -1,5 +1,5 @@
 import FeaturePrelude
-import P2PModels
+import RadixConnectModels
 
 // MARK: - ScanQR.Action
 extension ScanQR {

@@ -1,6 +1,6 @@
 import EngineToolkitModels
-import P2PModels
 import Prelude
+import RadixConnectModels
 
 // MARK: - AppPreferences
 /// Security structure, connected P2P clients, and display settings.

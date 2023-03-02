@@ -1,6 +1,6 @@
-import P2PModels
 import Prelude
 import Profile
+import RadixConnectModels
 import SwiftUI
 
 // MARK: - ProfileView
