@@ -1,3 +1,4 @@
+import AppPreferencesClient
 import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
@@ -7,6 +8,7 @@ import PersonasFeature
 
 // MARK: - AppSettings
 public struct AppSettings: FeatureReducer {
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pClientsClient) var p2pClientsClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
@@ -142,12 +144,11 @@ public struct AppSettings: FeatureReducer {
 
 		#if DEBUG
 		case .debugInspectProfileButtonTapped:
-//			return .run { send in
-//				guard let snapshot = try? await ...
-//				      let profile = try? Profile(snapshot: snapshot) else { return }
-//				await send(.internal(.profileToDebugLoaded(profile)))
-//			}
-			fatalError("impl me")
+			return .run { send in
+				let snapshot = await appPreferencesClient.extractProfileSnapshot()
+				guard let profile = try? Profile(snapshot: snapshot) else { return }
+				await send(.internal(.profileToDebugLoaded(profile)))
+			}
 
 		case let .setDebugProfileSheet(isPresented):
 			precondition(!isPresented)

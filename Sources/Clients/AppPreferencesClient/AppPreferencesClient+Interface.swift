@@ -29,7 +29,7 @@ public struct AppPreferencesClient: Sendable {
 extension AppPreferencesClient {
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
-	public typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
+	public typealias ExtractProfileSnapshot = @Sendable () async -> ProfileSnapshot
 	public typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 }
 
