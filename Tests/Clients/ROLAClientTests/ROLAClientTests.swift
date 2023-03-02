@@ -20,22 +20,14 @@ final class ROLAClientTests: TestCase {
 		epoch: 0,
 		round: 0
 	)
-	private func interaction(
+	private func metadata(
 		origin: String,
 		dAppDefinitionAddress: DappDefinitionAddress
-	) -> P2P.FromDapp.WalletInteraction {
+	) -> P2P.FromDapp.WalletInteraction.Metadata {
 		.init(
-			id: "",
-			items: .request(.authorized(.init(
-				auth: .login(.init(challenge: nil)),
-				oneTimeAccounts: nil,
-				ongoingAccounts: nil
-			))),
-			metadata: .init(
-				networkId: 0,
-				origin: .init(rawValue: origin),
-				dAppDefinitionAddress: dAppDefinitionAddress
-			)
+			networkId: 0,
+			origin: .init(rawValue: origin),
+			dAppDefinitionAddress: dAppDefinitionAddress
 		)
 	}
 
@@ -62,7 +54,7 @@ final class ROLAClientTests: TestCase {
 	func testHappyPath_performWellKnownFileCheck() async throws {
 		// given
 		let origin = "https://origin.com"
-		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
 		let expectedURL = URL(string: "https://origin.com/.well-known/radix.json")!
 
@@ -86,16 +78,16 @@ final class ROLAClientTests: TestCase {
 		try await withDependencies {
 			$0.urlSession = urlSession
 		} operation: {
-			try await sut.performWellKnownFileCheck(interaction)
+			try await sut.performWellKnownFileCheck(metadata)
 		}
 	}
 
 	func testHappyPath_performDappDefinitionVerification() async throws {
 		// given
 		let origin = "https://origin.com"
-		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
-		let metadata = GatewayAPI.EntityMetadataCollection(items: [
+		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
 			.init(key: "account_type", value: accountType),
 			.init(key: "related_websites", value: origin),
 		])
@@ -106,21 +98,21 @@ final class ROLAClientTests: TestCase {
 				GatewayAPI.EntityDetailsResponse(
 					ledgerState: self.ledgerState,
 					address: "address-deadbeef",
-					metadata: metadata
+					metadata: metadataCollection
 				)
 			}
 		} operation: {
-			try await sut.performDappDefinitionVerification(interaction)
+			try await sut.performDappDefinitionVerification(metadata)
 		}
 	}
 
 	func testUnhappyPath_whenAccountTypeIsWrong_thenWrongAccountTypeErrorIsThrown() async throws {
 		// given
 		let origin = "https://origin.com"
-		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let wrongAccountType = "wrong account type"
 
-		let metadata = GatewayAPI.EntityMetadataCollection(items: [
+		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
 			.init(key: "account_type", value: wrongAccountType),
 			.init(key: "related_websites", value: origin),
 		])
@@ -133,15 +125,15 @@ final class ROLAClientTests: TestCase {
 				GatewayAPI.EntityDetailsResponse(
 					ledgerState: self.ledgerState,
 					address: "address-deadbeef",
-					metadata: metadata
+					metadata: metadataCollection
 				)
 			}
 		} operation: {
 			do {
-				try await sut.performDappDefinitionVerification(interaction)
+				try await sut.performDappDefinitionVerification(metadata)
 				XCTFail("Expected error: wrongAccountType")
 			} catch {
-				XCTAssertEqual(error as! ROLAFailure, expectedError)
+				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}
 		}
 	}
@@ -150,10 +142,10 @@ final class ROLAClientTests: TestCase {
 		// given
 		let origin = "https://origin.com"
 		let originFromDapp = "https://someotherorigin.com"
-		let interaction = interaction(origin: originFromDapp, dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = metadata(origin: originFromDapp, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
 
-		let metadata = GatewayAPI.EntityMetadataCollection(items: [
+		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
 			.init(key: "account_type", value: accountType),
 			.init(key: "related_websites", value: origin),
 		])
@@ -166,15 +158,15 @@ final class ROLAClientTests: TestCase {
 				GatewayAPI.EntityDetailsResponse(
 					ledgerState: self.ledgerState,
 					address: "address-deadbeef",
-					metadata: metadata
+					metadata: metadataCollection
 				)
 			}
 		} operation: {
 			do {
-				try await sut.performDappDefinitionVerification(interaction)
+				try await sut.performDappDefinitionVerification(metadata)
 				XCTFail("Expected error: unknownWebsite")
 			} catch {
-				XCTAssertEqual(error as! ROLAFailure, expectedError)
+				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}
 		}
 	}
@@ -182,7 +174,7 @@ final class ROLAClientTests: TestCase {
 	func testUnhappyPath_whenOriginURLIsInvalid_thenInvalidOriginURLErrorIsThrown() async throws {
 		// given
 		let origin = ""
-		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
 		let expectedURL = URL(string: "/.well-known/radix.json")!
 
@@ -203,10 +195,10 @@ final class ROLAClientTests: TestCase {
 			$0.urlSession = urlSession
 		} operation: {
 			do {
-				try await sut.performWellKnownFileCheck(interaction)
+				try await sut.performWellKnownFileCheck(metadata)
 				XCTFail("Expected error: invalidOriginURL")
 			} catch {
-				XCTAssertEqual(error as! ROLAFailure, expectedError)
+				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}
 		}
 	}
@@ -214,7 +206,7 @@ final class ROLAClientTests: TestCase {
 	func testUnhappyPath_whenJsonFileFormatIsInvalid_thenUknownFileFormatErrorIsThrown() async throws {
 		// given
 		let origin = "https://origin.com"
-		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
+		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json: JSON = []
 		let expectedURL = URL(string: "/.well-known/radix.json")!
 
@@ -235,10 +227,10 @@ final class ROLAClientTests: TestCase {
 			$0.urlSession = urlSession
 		} operation: {
 			do {
-				try await sut.performWellKnownFileCheck(interaction)
+				try await sut.performWellKnownFileCheck(metadata)
 				XCTFail("Expected error: radixJsonUnknownFileFormat")
 			} catch {
-				XCTAssertEqual(error as! ROLAFailure, expectedError)
+				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}
 		}
 	}
@@ -247,7 +239,7 @@ final class ROLAClientTests: TestCase {
 		// given
 		let origin = "https://origin.com"
 		let unknownDappDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh-unknown") // TODO: use another valid DappDefinitionAddress
-		let interaction = interaction(origin: origin, dAppDefinitionAddress: unknownDappDefinitionAddress)
+		let metadata = metadata(origin: origin, dAppDefinitionAddress: unknownDappDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
 		let expectedURL = URL(string: "/.well-known/radix.json")!
 
@@ -268,10 +260,10 @@ final class ROLAClientTests: TestCase {
 			$0.urlSession = urlSession
 		} operation: {
 			do {
-				try await sut.performWellKnownFileCheck(interaction)
+				try await sut.performWellKnownFileCheck(metadata)
 				XCTFail("Expected error: unknownDappDefinitionAddress")
 			} catch {
-				XCTAssertEqual(error as! ROLAFailure, expectedError)
+				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}
 		}
 	}

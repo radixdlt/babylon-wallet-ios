@@ -3,10 +3,10 @@ import GatewayAPI
 
 extension ROLAClient {
 	public static let liveValue = Self(
-		performDappDefinitionVerification: { interaction async throws in
+		performDappDefinitionVerification: { metadata async throws in
 			@Dependency(\.gatewayAPIClient) var gatewayAPI
 
-			let response = try await gatewayAPI.resourceDetailsByResourceIdentifier(interaction.metadata.dAppDefinitionAddress.address)
+			let response = try await gatewayAPI.resourceDetailsByResourceIdentifier(metadata.dAppDefinitionAddress.address)
 
 			let dict: [Metadata.Key: String] = .init(
 				uniqueKeysWithValues: response.metadata.items.compactMap { item in
@@ -24,14 +24,14 @@ extension ROLAClient {
 				throw ROLAFailure.wrongAccountType
 			}
 
-			guard dAppDefinitionMetadata.relatedWebsites == interaction.metadata.origin.rawValue else {
+			guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.rawValue else {
 				throw ROLAFailure.unknownWebsite
 			}
 		},
-		performWellKnownFileCheck: { interaction async throws in
+		performWellKnownFileCheck: { metadata async throws in
 			@Dependency(\.urlSession) var urlSession
 
-			guard let originURL = URL(string: interaction.metadata.origin.rawValue) else {
+			guard let originURL = URL(string: metadata.origin.rawValue) else {
 				throw ROLAFailure.invalidOriginURL
 			}
 			let url = originURL.appending(path: Constants.wellKnownFilePath)
@@ -58,7 +58,7 @@ extension ROLAClient {
 			}
 
 			let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
-			guard dAppDefinitionAddresses.contains(interaction.metadata.dAppDefinitionAddress) else {
+			guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {
 				throw ROLAFailure.unknownDappDefinitionAddress
 			}
 		}
@@ -78,7 +78,7 @@ extension ROLAClient {
 	}
 
 	enum Metadata {
-		public enum Key: String, Sendable, Hashable {
+		enum Key: String, Sendable, Hashable {
 			case accountType = "account_type"
 			case relatedWebsites = "related_websites"
 		}
