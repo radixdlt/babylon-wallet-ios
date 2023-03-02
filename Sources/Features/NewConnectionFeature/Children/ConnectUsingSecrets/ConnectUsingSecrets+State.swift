@@ -1,21 +1,18 @@
 import FeaturePrelude
-import P2PConnection
 
 // MARK: - ConnectUsingSecrets.State
 extension ConnectUsingSecrets {
 	public struct State: Equatable {
-		public var connectionSecrets: ConnectionSecrets
+		public var connectionSecrets: ConnectionPassword
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-		public var idOfNewConnection: P2PConnectionID?
 		public var isNameValid: Bool
 		@BindableState public var focusedField: Field?
 
 		public init(
-			connectionSecrets: ConnectionSecrets,
+			connectionSecrets: ConnectionPassword,
 			isConnecting: Bool = true,
-			idOfNewConnection: P2PConnectionID? = nil,
 			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
 			nameOfConnection: String = "",
@@ -26,7 +23,6 @@ extension ConnectUsingSecrets {
 			self.isConnecting = isConnecting
 			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
-			self.idOfNewConnection = idOfNewConnection
 			self.isNameValid = isNameValid
 		}
 	}

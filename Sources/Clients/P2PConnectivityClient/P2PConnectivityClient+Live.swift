@@ -1,6 +1,5 @@
 import ClientPrelude
 import Network
-import P2PConnection
 import ProfileClient
 import RadixConnect
 
@@ -13,18 +12,6 @@ extension AnyAsyncSequence: @unchecked Sendable where Element: Sendable {}
 // MARK: - AsyncThrowingStream.Iterator + Sendable
 extension AsyncThrowingStream.Iterator: @unchecked Sendable where Element: Sendable {}
 
-extension P2P.ClientWithConnectionStatus {
-	func connected() -> Self {
-		.init(p2pClient: p2pClient, connectionStatus: .connected)
-	}
-}
-
-extension ProfileClient {
-	func p2pClient(for id: P2PConnectionID) async throws -> P2PClient? {
-		try await getP2PClients().first(where: { $0.id == id })
-	}
-}
-
 // MARK: - P2PConnectivityClient + :LiveValue
 extension P2PConnectivityClient {
 	public static let liveValue: Self = {
@@ -33,40 +20,6 @@ extension P2PConnectivityClient {
 
 		let rtcClients = RTCClients(signalingServerBaseURL: .devSignalingServer)
 		let localNetworkAuthorization = LocalNetworkAuthorization()
-
-		@Sendable func client(byID id: P2PClient.ID) async throws -> P2PClient {
-			guard let client = try await profileClient.p2pClient(for: id) else {
-				throw P2PClientNotFoundInProfile()
-			}
-			return client
-		}
-
-		// It is unfortunate that this actor is needed. The intention is that ONLY the `P2PConnections`
-		// actor should be needed. And using the
-		actor MulticastHolder: GlobalActor {
-			typealias Value = OrderedSet<P2PClient.ID>
-			private let subject = AsyncCurrentValueSubject<Value>([])
-			static let shared = MulticastHolder()
-			init() {}
-
-			func emit(_ value: Value) {
-				subject.send(value)
-			}
-
-			func clientIDsAsyncSequence() -> AnyAsyncSequence<Value> {
-				subject
-					.eraseToAnyAsyncSequence()
-			}
-		}
-
-		Task {
-			for try await ids in try await P2PConnections
-				.shared
-				.connectionIDsAsyncSequence()
-			{
-				await MulticastHolder.shared.emit(ids)
-			}
-		}
 
 		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
 			Task {
@@ -86,73 +39,23 @@ extension P2PConnectivityClient {
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
-			getP2PClientIDs: {
-				await MulticastHolder.shared.clientIDsAsyncSequence()
-			},
-			getP2PClientsByIDs: { _ in
+			getP2PClients: {
 				try await OrderedSet(profileClient.getP2PClients())
 			},
-			addP2PClientWithConnection: { client in
+			storeP2PClient: { client in
 				try await profileClient.addP2PClient(client)
-				try await rtcClients.add(client.connectionPassword)
 			},
 			deleteP2PClientByID: { id in
-
 				try await profileClient.deleteP2PClientByID(id)
-				try await rtcClients.remove(id)
-				//                                try await rtcClients.remove(id)
+				await rtcClients.remove(id)
 			},
-			addP2PWithSecrets: { _ in
-				//                                try await rtcClients.add(.init(.init(password.data)))
+			addP2PWithSecrets: { password in
+				try await rtcClients.addNewConnection(password)
 			},
-//			getConnectionStatusAsyncSequence: { id in
-//				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {
-//					try await P2P.ClientWithConnectionStatus(
-//						p2pClient: client(byID: id),
-//						connectionStatus: $0.connectionStatus
-//					)
-//				}.eraseToAnyAsyncSequence()
-//			},
 			receiveMessages: { await rtcClients.incommingMessages },
-//			getRequestsFromP2PClientAsyncSequence: { id in
-//				try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
-//					@Dependency(\.jsonDecoder) var jsonDecoder
-//					let jsonData = msg.messagePayload
-//					do {
-//						let interaction = try jsonDecoder().decode(P2P.FromDapp.WalletInteraction.self, from: jsonData)
-//						return try await P2P.RequestFromClient(
-//							originalMessage: msg,
-//							interaction: interaction,
-//							client: client(byID: id)
-//						)
-//					} catch {
-//						throw FailedToDecodeRequestFromDappError(
-//							error: error,
-//							jsonString: String(data: jsonData, encoding: .utf8) ?? jsonData.hex
-//						)
-//					}
-//				}
-//				.eraseToAnyAsyncSequence()
-//
-//			},
 			sendMessage: { outgoingMsg in
 				try await rtcClients.sendMessage(outgoingMsg)
 			}
-//			_sendTestMessage: { id, message in
-//				let msgID = UUID().uuidString
-//				do {
-//					try await P2PConnections.shared.sendData(for: id, data: Data(message.utf8), messageID: msgID)
-//				} catch {
-//					print("Failed to send test message, error: \(String(describing: error))")
-//				}
-//				// does not care about sent message receipts
-//			},
-//			_debugWebsocketStatusAsyncSequence: { id in
-//				try await P2PConnections.shared.debugWebSocketState(for: id).eraseToAnyAsyncSequence()
-//			},
-//			_debugDataChannelStatusAsyncSequence: { id in
-//				try await P2PConnections.shared.debugDataChannelState(for: id).eraseToAnyAsyncSequence()
-//			}
 		)
 	}()
 }

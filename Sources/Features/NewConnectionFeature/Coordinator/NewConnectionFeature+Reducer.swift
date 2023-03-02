@@ -32,24 +32,7 @@ public struct NewConnection: Sendable, ReducerProtocol {
 					await send(.delegate(.dismiss))
 				}
 			case let .connectUsingSecrets(connectUsingSecrets):
-				// checks if we are indded connected
-				guard let _ = connectUsingSecrets.idOfNewConnection else {
-					return .run { send in
-						await send(.delegate(.dismiss))
-					}
-				}
-				return body.reduce(
-					into: &state,
-					action: .child(.connectUsingSecrets(.delegate(.connected(
-						.init(
-							p2pClient: .init(
-								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword,
-								displayName: L10n.NewConnection.defaultNameOfConnection
-							),
-							connectionStatus: .connected
-						)
-					))))
-				)
+				return .none
 			}
 
 		case let .child(.localNetworkPermission(.delegate(.permissionResponse(allowed)))):
@@ -72,13 +55,13 @@ public struct NewConnection: Sendable, ReducerProtocol {
 				return .run { send in await send(.delegate(.dismiss)) }
 			}
 
-		case let .child(.scanQR(.delegate(.connectionSecretsFromScannedQR(connectionSecrets)))):
-			state = .connectUsingSecrets(.init(connectionSecrets: connectionSecrets))
+		case let .child(.scanQR(.delegate(.connectionSecretsFromScannedQR(connectionPassword)))):
+			state = .connectUsingSecrets(.init(connectionSecrets: connectionPassword))
 			return .none
 
-		case let .child(.connectUsingSecrets(.delegate(.connected(connection)))):
+		case let .child(.connectUsingSecrets(.delegate(.connected(client)))):
 			return .run { send in
-				await send(.delegate(.newConnection(connection)))
+				await send(.delegate(.newConnection(client)))
 			}
 
 		case .child, .delegate:

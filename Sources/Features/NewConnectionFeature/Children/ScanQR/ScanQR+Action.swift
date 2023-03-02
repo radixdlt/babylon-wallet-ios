@@ -35,13 +35,13 @@ extension ScanQR.Action {
 // MARK: - ScanQR.Action.SystemAction
 extension ScanQR.Action {
 	public enum SystemAction: Sendable, Equatable {
-		case connectionSecretsFromScannedStringResult(TaskResult<ConnectionSecrets>)
+		case connectionPasswordFromScannedStringResult(TaskResult<ConnectionPassword>)
 	}
 }
 
 // MARK: - ScanQR.Action.DelegateAction
 extension ScanQR.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case connectionSecretsFromScannedQR(ConnectionSecrets)
+		case connectionSecretsFromScannedQR(ConnectionPassword)
 	}
 }

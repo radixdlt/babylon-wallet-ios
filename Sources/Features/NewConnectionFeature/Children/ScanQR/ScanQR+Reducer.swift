@@ -25,10 +25,10 @@ extension ScanQR {
 		case let .internal(.view(.scanResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
-		case let .internal(.system(.connectionSecretsFromScannedStringResult(.failure(error)))):
+		case let .internal(.system(.connectionPasswordFromScannedStringResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
-		case let .internal(.system(.connectionSecretsFromScannedStringResult(.success(connectionSecrets)))):
+		case let .internal(.system(.connectionPasswordFromScannedStringResult(.success(connectionSecrets)))):
 			return .run { send in
 				await send(.delegate(.connectionSecretsFromScannedQR(connectionSecrets)))
 			}
@@ -41,10 +41,9 @@ extension ScanQR {
 extension ScanQR {
 	fileprivate func parseConnectionPassword(hexString: String) -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.system(.connectionSecretsFromScannedStringResult(
+			await send(.internal(.system(.connectionPasswordFromScannedStringResult(
 				TaskResult {
-					let password = try ConnectionPassword(hex: hexString)
-					return try ConnectionSecrets.from(connectionPassword: password)
+					try ConnectionPassword(hex: hexString)
 				}
 			))))
 		}

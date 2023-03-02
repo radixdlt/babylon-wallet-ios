@@ -46,12 +46,9 @@ extension ManageP2PClients.Action {
 // MARK: - ManageP2PClients.Action.InternalAction.SystemAction
 extension ManageP2PClients.Action.InternalAction {
 	public enum SystemAction: Sendable, Equatable {
-		case loadClientIDsResult(TaskResult<OrderedSet<P2PClient.ID>>)
-		case loadClientsByIDsResult(TaskResult<OrderedSet<P2PClient>>)
-
-		case saveNewConnectionResult(TaskResult<P2P.ClientWithConnectionStatus>)
+		case loadClientsResult(TaskResult<OrderedSet<P2PClient>>)
+		case saveNewConnectionResult(TaskResult<P2PClient>)
 		case deleteConnectionResult(TaskResult<ConnectionPassword>)
-		case sendTestMessageResult(TaskResult<String>)
 	}
 }
 

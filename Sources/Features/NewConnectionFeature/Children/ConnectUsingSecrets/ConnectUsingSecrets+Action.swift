@@ -1,5 +1,4 @@
 import FeaturePrelude
-import P2PConnection
 
 // MARK: - ConnectUsingSecrets.Action
 extension ConnectUsingSecrets {
@@ -36,13 +35,13 @@ extension ConnectUsingSecrets.Action {
 extension ConnectUsingSecrets.Action {
 	public enum SystemAction: Sendable, Equatable {
 		case focusTextField(ConnectUsingSecrets.State.Field?)
-		case establishConnectionResult(TaskResult<P2PConnectionID>)
+		case establishConnectionResult(TaskResult<ConnectionPassword>)
 	}
 }
 
 // MARK: - ConnectUsingSecrets.Action.DelegateAction
 extension ConnectUsingSecrets.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case connected(P2P.ClientWithConnectionStatus)
+		case connected(P2PClient)
 	}
 }

@@ -278,7 +278,6 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
-			"P2PConnection",
 			"ProfileClient",
 			"RadixConnect",
 			"P2PModels",
@@ -393,7 +392,6 @@ package.addModules([
 		dependencies: [
 			"EngineToolkitModels",
 			"ProfileModels",
-			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
 		],
 		exclude: [
@@ -468,28 +466,6 @@ package.addModules([
 		tests: .no
 	),
 	.module(
-		name: "P2PConnection",
-		category: .radixConnect,
-		dependencies: [
-			"Cryptography",
-			"P2PModels",
-			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
-			},
-		],
-		exclude: [
-			"ChunkingTransport/README.md",
-		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			],
-			resources: [
-				.process("SignalingServerTests/TestVectors/"),
-			]
-		)
-	),
-	.module(
 		name: "P2PModels",
 		category: .radixConnect,
 		dependencies: [
@@ -499,7 +475,7 @@ package.addModules([
 	),
 	.module(
 		name: "RadixConnectModels",
-		category: .radixConnectRewrite,
+		category: .radixConnect,
 		dependencies: [
 			"Cryptography",
 		],
@@ -507,10 +483,13 @@ package.addModules([
 	),
 	.module(
 		name: "RadixConnect",
-		category: .radixConnectRewrite,
+		category: .radixConnect,
 		dependencies: [
 			"RadixConnectModels",
 			"SharedModels",
+			.product(name: "WebRTC", package: "WebRTC") {
+				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
+			},
 		],
 		tests: .yes()
 	),
@@ -655,7 +634,6 @@ extension Package {
 			static let testing: Self = .module(name: "Testing")
 			static let engineToolkit: Self = .module(name: "EngineToolkit")
 			static let radixConnect: Self = .module(name: "RadixConnect")
-			static let radixConnectRewrite: Self = .module(name: "RadixConnectRewrite")
 			static let profile: Self = .module(name: "Profile")
 			var pathComponent: String {
 				switch self {

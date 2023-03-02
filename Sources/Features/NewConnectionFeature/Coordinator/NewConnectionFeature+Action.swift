@@ -44,6 +44,6 @@ extension NewConnection.Action {
 extension NewConnection.Action {
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case newConnection(P2P.ClientWithConnectionStatus)
+		case newConnection(P2PClient)
 	}
 }

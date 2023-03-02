@@ -1,5 +1,4 @@
 import FeaturePrelude
-import P2PConnection
 import RadixConnect
 
 // MARK: - ConnectUsingSecrets
@@ -16,15 +15,16 @@ extension ConnectUsingSecrets {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.task)):
-			return .run { [connectionPassword = state.connectionSecrets.connectionPassword] send in
+			let connectionPassword = state.connectionSecrets
+
+			return .run { send in
 				await send(.internal(.system(.establishConnectionResult(
-					TaskResult {
-						//                                                try await p2pConnectivityClient.addP2PWithSecrets(connectionPassword)
-						try P2PConnectionID(password: connectionPassword)
-					}
+					TaskResult(catching: {
+						try await p2pConnectivityClient.addP2PWithSecrets(connectionPassword)
+						return connectionPassword
+					})
 				))))
-			}
-			.cancellable(id: ConnectID.self)
+			}.cancellable(id: ConnectID.self)
 
 		case .internal(.view(.appeared)):
 			return .task {
@@ -32,9 +32,7 @@ extension ConnectUsingSecrets {
 			}
 			.cancellable(id: FocusFieldID.self)
 
-		case let .internal(.system(.establishConnectionResult(.success(idOfNewConnection)))):
-			state.idOfNewConnection = idOfNewConnection
-			state.isConnecting = false
+		case .internal(.system(.establishConnectionResult(.success))):
 			state.isPromptingForName = true
 			return .none
 
@@ -56,22 +54,9 @@ extension ConnectUsingSecrets {
 			return .none
 
 		case .internal(.view(.confirmNameButtonTapped)):
-			// determines if we are indeed connected...
-			guard let _ = state.idOfNewConnection else {
-				// invalid state
-				return .none
-			}
-
-			let clientWithConnectionStatus = P2P.ClientWithConnectionStatus(
-				p2pClient: .init(
-					connectionPassword: state.connectionSecrets.connectionPassword,
-					displayName: state.nameOfConnection.trimmed()
-				),
-				connectionStatus: .connected
-			)
-
+			let p2pClient = P2PClient(connectionPassword: state.connectionSecrets, displayName: state.nameOfConnection)
 			return .run { send in
-				await send(.delegate(.connected(clientWithConnectionStatus)))
+				await send(.delegate(.connected(p2pClient)))
 			}
 
 		case let .internal(.view(.nameOfConnectionChanged(connectionName))):
