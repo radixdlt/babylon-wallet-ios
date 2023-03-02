@@ -24,7 +24,7 @@ extension ManageGatewayAPIEndpoints {
 		case .internal(.view(.didAppear)):
 			return .task {
 				let result = await TaskResult {
-					await networkSwitchingClient.getGateway()
+					await networkSwitchingClient.getCurrentGateway()
 				}
 				return .internal(.system(.loadGatewayResult(result)))
 			}
