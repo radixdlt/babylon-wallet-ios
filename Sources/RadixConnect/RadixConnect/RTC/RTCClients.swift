@@ -3,57 +3,70 @@ import CryptoKit
 import Foundation
 import SharedModels
 
-// MARK: - RTCClients
-/// Meant to hold all of the created RTCClients
+/// Holds and manages all of added RTCClients
 public actor RTCClients {
-        public let incommingMessages: AsyncStream<P2P.RTCIncommingMessageResult>
+        public struct RTCClientDidCloseError: Error, LocalizedError {
+                public var errorDescription: String? {
+                        "RTCClient did close, retry connecting the browser with the Wallet"
+                }
+        }
 
-	private(set) var clients: [RTCClient] = []
+        // MARK: - Streams
+
+        /// Incomming peer messages. This is the single channel for the received messages from all RTCClients
+        public let incommingMessages: AsyncStream<P2P.RTCIncommingMessageResult>
         private let incommingMessagesContinuation: AsyncStream<P2P.RTCIncommingMessageResult>.Continuation!
+
+        // MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
 	private let signalingServerBaseURL: URL
+
+        // MARK: - Internal state
+        private var clients: [RTCClient] = []
+
+        // MARK: - Initialisers
 
 	public init(signalingServerBaseURL: URL = .prodSignalingServer) {
 		self.init(peerConnectionFactory: WebRTCFactory(), signalingServerBaseURL: signalingServerBaseURL)
 	}
 
-	init(peerConnectionFactory: PeerConnectionFactory = WebRTCFactory(), signalingServerBaseURL: URL = .prodSignalingServer) {
-		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
+	init(peerConnectionFactory: PeerConnectionFactory = WebRTCFactory(),
+             signalingServerBaseURL: URL = .prodSignalingServer) {
 		self.peerConnectionFactory = peerConnectionFactory
 		self.signalingServerBaseURL = signalingServerBaseURL
+                (incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
 	}
 
-	public func add(_ password: ConnectionPassword) async throws {
-		let client = try await makeRTCClient(password)
+        // MARK: - Public API
+
+
+        /// Add an existng RTCClient for the given password
+        /// - Parameter password: The connection password used to previously connect the RTCClient
+	public func addExistingClient(_ password: ConnectionPassword) throws {
+		let client = try makeRTCClient(password)
 		add(client)
 	}
 
-	public func addNewConnection(_ password: ConnectionPassword) async throws {
-		let client = try await makeRTCClient(password)
+        /// Adds a new RTCClient for the given password.
+        /// In comparison with `addExistingClient`, this function will await for the first connection
+        /// to be established. If establishing the connection fails, the RTCClient will not be added
+        /// and a specific error will be thrown
+        ///
+        /// - Parameter password: The connection password to be used to creat the new RTCClient
+	public func addNewClient(_ password: ConnectionPassword) async throws {
+		let client = try makeRTCClient(password)
 		try await client.waitForFirstConnection()
 		add(client)
 	}
 
-	func add(_ client: RTCClient) {
-		client.incommingMessages.susbscribe(incommingMessagesContinuation)
-		self.clients.append(client)
+        /// Remove the RTCClient for the given connection password
+        /// - Parameter password: The connection password identifying the RTCClient
+	public func removeClient(_ password: ConnectionPassword) async {
+		await clients.first(where: { $0.id == password })?.cancel()
+		clients.removeAll(where: { $0.id == password })
 	}
 
-	private func makeRTCClient(_ password: ConnectionPassword) async throws -> RTCClient {
-		let signalingClient = try SignalingClient(password: password, source: .wallet, baseURL: signalingServerBaseURL)
-		let builder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
-		let client = RTCClient(id: password, peerConnectionBuilder: builder)
-
-		await client.listenForPeerConnections()
-
-		return client
-	}
-
-	public func remove(_ connectionId: ConnectionPassword) async {
-		await clients.first(where: { $0.id == connectionId })?.cancel()
-		clients.removeAll(where: { $0.id == connectionId })
-	}
-
+        /// Remove all RTCClients
 	public func removeAll() async {
 		for client in clients {
 			await client.cancel()
@@ -61,41 +74,52 @@ public actor RTCClients {
 		clients.removeAll()
 	}
 
+        /// Sends the given message using the specific RTCClient.
+        /// If the target RTCClient did close, an error will be thrown
+        ///
+        /// - Parameter message: The message to be sent
         public func sendMessage(_ message: P2P.RTCOutgoingMessage) async throws {
 		guard let rtcClient = clients.first(where: { $0.id == message.connectionId }) else {
-			fatalError()
+			throw RTCClientDidCloseError()
 		}
 
 		try await rtcClient.sendMessage(message.content)
 	}
+
+        // MARK: - Private
+
+        private func add(_ client: RTCClient) {
+                client.incommingMessages.susbscribe(incommingMessagesContinuation)
+                self.clients.append(client)
+        }
+
+        private func makeRTCClient(_ password: ConnectionPassword) throws -> RTCClient {
+                let signalingClient = try SignalingClient(password: password, source: .wallet, baseURL: signalingServerBaseURL)
+                let builder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+                return RTCClient(id: password, peerConnectionBuilder: builder)
+        }
 }
 
-extension SignalingClient {
-	init(password: ConnectionPassword, source: ClientSource, baseURL: URL) throws {
-		let connectionId = try SignalingServerConnectionID(.init(.init(data: Data(SHA256.hash(data: password.data.data)))))
-		let connectionURL = try signalingServerURL(connectionID: connectionId, source: source, baseURL: baseURL)
-		let webSocket = AsyncWebSocket(url: connectionURL)
-		let encryptionKey = try EncryptionKey(.init(data: password.data.data))
-
-		self.init(encryptionKey: encryptionKey, webSocketClient: webSocket, connectionID: connectionId, clientSource: source)
-	}
-}
-
-// MARK: - RTCClient
-/// Meant to hold all of the peerConnections for the given SignalingServerConnectionID
 actor RTCClient {
+        // MARK: - PeerConnectionDidCloseError
+        public struct PeerConnectionDidCloseError: Error, LocalizedError {
+                public var errorDescription: String? {
+                        "Peer Connection did close, retry the operation from dapp"
+                }
+        }
+
 	let id: ConnectionPassword
-	private let peerConnectionBuilder: PeerConnectionBuilder
-	private(set) var peerConnections: [PeerConnectionClient] = []
-
+        /// Incomming peer messages. This is the single channel for the received messages from all PeerConnections.
         let incommingMessages: AsyncStream<P2P.RTCIncommingMessageResult>
+
         private let incommingMessagesContinuation: AsyncStream<P2P.RTCIncommingMessageResult>.Continuation!
-	private var connectionsTask: Task<Void, Error>?
+        private let peerConnectionBuilder: PeerConnectionBuilder
+        private var peerConnections: [PeerConnectionClient] = []
+        private var connectionsTask: Task<Void, Error>?
 
-	private let onPeerConnectionDisconnected: AsyncStream<PeerConnectionId>
-	private let onPeerConnectionDisconnectedContinuation: AsyncStream<PeerConnectionId>.Continuation!
-
-	private var disconnectTask: Task<Void, Never>?
+	private let disconnectedPeerConnection: AsyncStream<PeerConnectionId>
+	private let disconnectedPeerConnectionContinuation: AsyncStream<PeerConnectionId>.Continuation!
+        private var disconnectTask: Task<Void, Never>?
 
 	init(id: ConnectionPassword,
 	     peerConnectionBuilder: PeerConnectionBuilder)
@@ -103,26 +127,46 @@ actor RTCClient {
 		self.id = id
 		self.peerConnectionBuilder = peerConnectionBuilder
 		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
-		(onPeerConnectionDisconnected, onPeerConnectionDisconnectedContinuation) = AsyncStream<PeerConnectionId>.streamWithContinuation()
+		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream<PeerConnectionId>.streamWithContinuation()
+
+                Task {
+                        await listenForPeerConnections()
+                }
 	}
+
+        /// Cancel all of the related operations allowing this RTCClient to be deallocated.
+        func cancel() async {
+                for peerConnection in peerConnections {
+                        await peerConnection.cancel()
+                }
+                peerConnections.removeAll()
+                peerConnectionBuilder.cancel()
+                incommingMessagesContinuation.finish()
+                disconnectedPeerConnectionContinuation.finish()
+                connectionsTask?.cancel()
+                disconnectTask?.cancel()
+        }
 
 	func waitForFirstConnection() async throws {
 		_ = try await peerConnectionBuilder.peerConnections.prefix(1).collect().first!.get()
 	}
 
-	func cancel() async {
-		for peerConnection in peerConnections {
-			await peerConnection.cancel()
-		}
-		peerConnections.removeAll()
-		peerConnectionBuilder.cancel()
-		incommingMessagesContinuation.finish()
-		onPeerConnectionDisconnectedContinuation.finish()
-		connectionsTask?.cancel()
-		disconnectTask?.cancel()
-	}
+        func removePeerConnection(_ id: PeerConnectionId) async {
+                await peerConnections.first(where: { $0.id == id })?.cancel()
+                peerConnections.removeAll(where: { $0.id == id })
+        }
 
-	func listenForPeerConnections() {
+        func sendMessage(_ message: P2P.RTCOutgoingMessage.PeerConnectionMessage) async throws {
+                guard let client = peerConnections.first(where: { $0.id == message.peerConnectionId }) else {
+                        throw PeerConnectionDidCloseError()
+                }
+                let data = try JSONEncoder().encode(message.content)
+                try await client.sendData(data)
+        }
+
+        // MARK: - Private
+
+	private func listenForPeerConnections() {
 		connectionsTask = Task {
 			for try await connectionResult in peerConnectionBuilder.peerConnections {
 				do {
@@ -134,13 +178,13 @@ actor RTCClient {
 		}
 
 		disconnectTask = Task {
-			for await id in onPeerConnectionDisconnected {
+			for await id in disconnectedPeerConnection {
 				await removePeerConnection(id)
 			}
 		}
 	}
 
-	func onPeerConnectionCreated(_ connection: PeerConnectionClient) async {
+	private func onPeerConnectionCreated(_ connection: PeerConnectionClient) async {
 		await connection
 			.receivedMessagesStream()
 			.map { messageResult in
@@ -154,91 +198,12 @@ actor RTCClient {
 			}
 			.susbscribe(incommingMessagesContinuation)
 		connection
-			.onIceConnectionState
+			.iceConnectionStates
 			.filter {
 				$0 == .disconnected
 			}
 			.map { _ in connection.id }
-			.susbscribe(onPeerConnectionDisconnectedContinuation)
+			.susbscribe(disconnectedPeerConnectionContinuation)
 		self.peerConnections.append(connection)
-	}
-
-	func removePeerConnection(_ id: PeerConnectionId) async {
-		print("Removing peer connection for id: \(id)")
-		await peerConnections.first(where: { $0.id == id })?.cancel()
-		peerConnections.removeAll(where: { $0.id == id })
-	}
-
-        func sendMessage(_ message: P2P.RTCOutgoingMessage.PeerConnectionMessage) async throws {
-		guard let client = peerConnections.first(where: { $0.id == message.peerConnectionId }) else {
-			throw PeerConnectionDidCloseError()
-		}
-		let data = try JSONEncoder().encode(message.content)
-		try await client.sendData(data)
-	}
-}
-
-// MARK: - PeerConnectionDidCloseError
-public struct PeerConnectionDidCloseError: Error, LocalizedError {
-	public var errorDescription: String? {
-		"Peer Connection did close, retry the operation from dapp"
-	}
-}
-
-public extension URL {
-	static let prodSignalingServer = Self(string: "wss://signaling-server-betanet.radixdlt.com")!
-	static let devSignalingServer = Self(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
-}
-
-// MARK: - FailedToCreateSignalingServerURL
-struct FailedToCreateSignalingServerURL: LocalizedError {
-	var errorDescription: String? {
-		"Failed to create url"
-	}
-}
-
-// MARK: - QueryParameterName
-enum QueryParameterName: String {
-	case target, source
-}
-
-func signalingServerURL(
-	connectionID: SignalingServerConnectionID,
-	source: ClientSource = .wallet,
-	baseURL: URL = .prodSignalingServer
-) throws -> URL {
-	let target: ClientSource = source == .wallet ? .extension : .wallet
-
-	let url = baseURL.appendingPathComponent(
-		connectionID.hex
-	)
-
-	guard
-		var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
-	else {
-		throw FailedToCreateSignalingServerURL()
-	}
-
-	urlComponents.queryItems = [
-		.init(
-			name: QueryParameterName.target.rawValue,
-			value: target.rawValue
-		),
-		.init(
-			name: QueryParameterName.source.rawValue,
-			value: source.rawValue
-		),
-	]
-
-	guard let serverURL = urlComponents.url else {
-		throw FailedToCreateSignalingServerURL()
-	}
-
-	return serverURL
-}
-
-extension SignalingServerConnectionID {
-	var hex: String {
-		self.rawValue.data.hex()
 	}
 }

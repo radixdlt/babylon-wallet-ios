@@ -1,5 +1,6 @@
 import WebRTC
 import RadixConnectModels
+import Prelude
 
 // MARK: - WebRTCFactory
 struct WebRTCFactory: PeerConnectionFactory {
@@ -81,13 +82,13 @@ extension RTCPeerConnection: PeerConnection {
 		return DataChannelClient(dataChannel: dataChannel, delegate: delegate)
 	}
 
-	func setLocalAnswer(_ answer: RTCPrimitive.Answer) async throws {
-		try await setLocalDescription(.init(from: answer))
-	}
+        func setLocalDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws {
+                try await setLocalDescription(.init(from: description))
+        }
 
-	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
-		try await setRemoteDescription(.init(from: offer))
-	}
+        func setRemoteDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws {
+                try await setRemoteDescription(.init(from: description))
+        }
 
 	func createLocalOffer() async throws -> RTCPrimitive.Offer {
 		.init(from: try await self.offer(for: .negotiationConstraints))
@@ -99,18 +100,6 @@ extension RTCPeerConnection: PeerConnection {
 
 	func addRemoteICECandidate(_ candidate: RTCPrimitive.ICECandidate) async throws {
 		try await self.add(.init(from: candidate))
-	}
-
-	func setRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws {
-		try await setRemoteDescription(.init(from: answer))
-	}
-
-	func createOffer() async throws -> RTCPrimitive.Offer {
-		try await .init(from: offer(for: .negotiationConstraints))
-	}
-
-	func setLocalOffer(_ offer: RTCPrimitive.Offer) async throws {
-		try await setLocalDescription(.init(from: offer))
 	}
 }
 
@@ -143,13 +132,14 @@ extension RTCPrimitive.Answer {
 }
 
 extension RTCSessionDescription {
-	convenience init(from offer: RTCPrimitive.Offer) {
-		self.init(type: .offer, sdp: offer.sdp.rawValue)
-	}
-
-	convenience init(from answer: RTCPrimitive.Answer) {
-		self.init(type: .answer, sdp: answer.sdp.rawValue)
-	}
+        convenience init(from sdp: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) {
+                switch sdp {
+                case let .left(offer):
+                        self.init(type: .offer, sdp: offer.sdp.rawValue)
+                case let .right(answer):
+                        self.init(type: .answer, sdp: answer.sdp.rawValue)
+                }
+        }
 }
 
 extension RTCIceCandidate {

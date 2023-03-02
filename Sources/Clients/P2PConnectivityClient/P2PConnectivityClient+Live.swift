@@ -25,7 +25,7 @@ extension P2PConnectivityClient {
 			Task {
 				print("🔌 Loading and connecting all P2P connections")
 				for client in try await profileClient.getP2PClients() {
-					try await rtcClients.add(client.connectionPassword)
+					try await rtcClients.addExistingClient(client.connectionPassword)
 				}
 			}
 		}
@@ -47,10 +47,10 @@ extension P2PConnectivityClient {
 			},
 			deleteP2PClientByID: { id in
 				try await profileClient.deleteP2PClientByID(id)
-				await rtcClients.remove(id)
+				await rtcClients.removeClient(id)
 			},
 			addP2PWithSecrets: { password in
-				try await rtcClients.addNewConnection(password)
+				try await rtcClients.addNewClient(password)
 			},
 			receiveMessages: { await rtcClients.incommingMessages },
 			sendMessage: { outgoingMsg in
