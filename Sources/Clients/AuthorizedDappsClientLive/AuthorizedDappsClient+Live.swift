@@ -8,7 +8,10 @@ extension AuthorizedDappsClient: DependencyKey {
 	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
 			getAuthorizedDapps: {
-				await profileStore.network.authorizedDapps
+				guard let network = await profileStore.network else {
+					return .init()
+				}
+				return network.authorizedDapps
 			},
 			addAuthorizedDapp: { newDapp in
 				try await profileStore.updating {

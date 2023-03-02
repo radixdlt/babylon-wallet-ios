@@ -10,7 +10,7 @@ extension DependencyValues {
 // MARK: - AccountsClient + TestDependencyKey
 extension AccountsClient: TestDependencyKey {
 	public static let noop = Self(
-		getAccountsOnCurrentNetwork: { .init(OnNetwork.Account.previewValue0) },
+		getAccountsOnCurrentNetwork: { throw NoopError() },
 		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAccountsOnNetwork: { _ in throw NoopError() },
 		createUnsavedVirtualAccount: { _ in throw NoopError() },

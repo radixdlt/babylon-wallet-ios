@@ -102,8 +102,14 @@ extension ProfileStore {
 	/// for an async sequence of Profile.
 	public var profile: Profile { profileStateSubject.value.profile }
 
-	/// The current network with a non empty set of accounts.
-	public var network: OnNetwork { profile.network }
+	/// The current network if any
+	public func network() async throws -> OnNetwork {
+		try profile.onNetwork(id: profile.networkID)
+	}
+
+	public var network: OnNetwork? {
+		profile.network
+	}
 
 	/// A multicasting replaying async sequence of distinct Profile.
 	public func values() async -> AnyAsyncSequence<Profile> {
@@ -112,7 +118,9 @@ extension ProfileStore {
 
 	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
 	public func accountValues() async -> AnyAsyncSequence<OnNetwork.Accounts> {
-		lens(\.profile.network.accounts)
+		lens {
+			$0.profile.network?.accounts
+		}
 	}
 
 	public func getEphemeral() async -> Profile.Ephemeral? {
@@ -314,10 +322,23 @@ extension ProfileStore {
 		}
 	}
 
+	@_disfavoredOverload
+	private func lens<Property>(
+		_ keyPath: KeyPath<ProfileState, Property?>
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		lens { $0[keyPath: keyPath] }
+	}
+
 	private func lens<Property>(
 		_ keyPath: KeyPath<ProfileState, Property>
 	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileStateSubject.map { $0[keyPath: keyPath] }
+		lens { $0[keyPath: keyPath] }
+	}
+
+	private func lens<Property>(
+		_ map: @escaping @Sendable (ProfileState) -> Property?
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		profileStateSubject.compactMap { map($0) }
 			.share() // Multicast
 			.eraseToAnyAsyncSequence()
 	}

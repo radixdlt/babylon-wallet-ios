@@ -7,7 +7,9 @@ extension AccountsClient: DependencyKey {
 
 	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
-			getAccountsOnCurrentNetwork: { await profileStore.network.accounts },
+			getAccountsOnCurrentNetwork: {
+				try await profileStore.network().accounts
+			},
 			accountsOnCurrentNetwork: { await profileStore.accountValues() },
 			getAccountsOnNetwork: { try await profileStore.profile.onNetwork(id: $0).accounts },
 			createUnsavedVirtualAccount: { request in
@@ -19,7 +21,7 @@ extension AccountsClient: DependencyKey {
 				}
 			},
 			getAccountByAddress: { address in
-				try await profileStore.network.entity(address: address)
+				try await profileStore.network().entity(address: address)
 			},
 			hasAccountOnNetwork: { networkID in
 				do {

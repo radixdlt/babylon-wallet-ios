@@ -8,7 +8,10 @@ extension PersonasClient: DependencyKey {
 	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
 			getPersonas: {
-				await profileStore.network.personas
+				guard let network = await profileStore.network else {
+					return .init()
+				}
+				return network.personas
 			},
 			createUnsavedVirtualPersona: { request in
 				try await profileStore.profile.createNewUnsavedVirtualEntity(request: request)

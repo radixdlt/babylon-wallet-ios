@@ -8,15 +8,14 @@ extension Profile {
 }
 
 extension Profile {
+	/// The networkID of the current gateway.
+	public var networkID: NetworkID {
+		appPreferences.gateways.current.network.id
+	}
+
 	/// The current network with a non empty set of accounts.
-	public var network: OnNetwork {
-		do {
-			return try onNetwork(id: self.appPreferences.gateways.current.network.id)
-		} catch {
-			let errorMsg = "Critical error, `self.appPreferences.gateways.current.network.id` not found in `self.perNetwork`, indication of incorrect implementation of Profile. We have probably forgot to add the network that was added to `appPreferences.gateways` into `perNetwork`. Failure: \(String(describing: error))"
-			loggerGlobal.critical(.init(stringLiteral: errorMsg))
-			fatalError(errorMsg)
-		}
+	public var network: OnNetwork? {
+		try? onNetwork(id: networkID)
 	}
 
 	public func onNetwork(id needle: NetworkID) throws -> OnNetwork {
