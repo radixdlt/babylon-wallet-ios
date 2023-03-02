@@ -29,6 +29,10 @@ extension DependencyValues {
 
 extension AccountPortfolioFetcherClient {
 	public func fetchPortfolioFor(accounts: OnNetwork.Accounts) async throws -> IdentifiedArrayOf<AccountPortfolio> {
+		try await fetchPortfolioFor(accounts: accounts.rawValue)
+	}
+
+	public func fetchPortfolioFor(accounts: IdentifiedArrayOf<OnNetwork.Account>) async throws -> IdentifiedArrayOf<AccountPortfolio> {
 		try await fetchPortfolioForAccounts(accounts.map(\.address))
 	}
 

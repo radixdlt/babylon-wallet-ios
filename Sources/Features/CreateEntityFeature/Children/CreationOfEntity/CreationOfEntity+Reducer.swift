@@ -1,10 +1,12 @@
+import AccountsClient
 import FeaturePrelude
-import OnboardingClient
+import PersonasClient
 
 // MARK: - CreationOfEntity
 public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.onboardingClient) var onboardingClient
+	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.personasClient) var personasClient
 
 	public init() {}
 
@@ -26,11 +28,16 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtoco
 						displayName: name
 					)
 
-					let entity: Entity = try await onboardingClient.createNewUnsavedVirtualEntity(request: request)
-
-					try await onboardingClient.saveNewVirtualEntity(entity)
-
-					return entity
+					switch entityKind {
+					case .account:
+						let account = try await accountsClient.createUnsavedVirtualAccount(request: request)
+						try await accountsClient.saveVirtualAccount(account)
+						return try account.cast()
+					case .identity:
+						let persona = try await personasClient.createUnsavedVirtualPersona(request: request)
+						try await personasClient.saveVirtualPersona(persona)
+						return try persona.cast()
+					}
 				}
 				))))
 			}

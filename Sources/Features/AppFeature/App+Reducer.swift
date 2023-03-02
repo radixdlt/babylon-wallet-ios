@@ -9,6 +9,8 @@ import SplashFeature
 public struct App: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
+	// FIXME: this is temporary and will be reworked during multifactor work.
+	@Dependency(\.onboardingClient.loadEphemeralPrivateProfile) var loadEphemeralPrivateProfile
 
 	public init() {}
 
@@ -89,6 +91,14 @@ public struct App: Sendable, ReducerProtocol {
 				}
 				await send(.internal(.system(.incompatibleProfileDeleted)))
 			}
+
+		case let .internal(.system(.loadEphemeralPrivateProfileResult(.failure(error)))):
+			fatalError("Unable to use app, failed to load ephemeral private profile, failure: \(String(describing: error))")
+
+		case let .internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))):
+			state.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
+			return .none
+
 		case .internal(.system(.incompatibleProfileDeleted)):
 			return goToOnboarding(state: &state)
 
@@ -118,8 +128,11 @@ public struct App: Sendable, ReducerProtocol {
 	}
 
 	func goToOnboarding(state: inout State) -> EffectTask<Action> {
-		state.root = .onboardingCoordinator(.init())
-		return .none
+		.run { send in
+			await send(.internal(.system(.loadEphemeralPrivateProfileResult(TaskResult {
+				try await loadEphemeralPrivateProfile()
+			}))))
+		}
 	}
 }
 

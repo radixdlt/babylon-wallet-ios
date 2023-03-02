@@ -81,3 +81,16 @@ public struct CreateVirtualAccountRequest: CreateVirtualEntityRequestProtocol, E
 		self.displayName = displayName
 	}
 }
+
+extension AccountsClient {
+	public func createUnsavedVirtualAccount(request: CreateVirtualEntityRequest) async throws -> OnNetwork.Account {
+		try await self.createUnsavedVirtualAccount(
+			.init(
+				curve: request.curve,
+				networkID: request.networkID,
+				genesisFactorInstanceDerivationStrategy: request.genesisFactorInstanceDerivationStrategy,
+				displayName: request.displayName
+			)
+		)
+	}
+}

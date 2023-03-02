@@ -74,11 +74,12 @@ package.addModules([
 	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
+			"AccountsClient",
 			"Cryptography",
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
-			"OnboardingClient",
+			"PersonasClient",
 		],
 		tests: .yes()
 	),

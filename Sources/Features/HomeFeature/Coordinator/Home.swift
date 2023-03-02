@@ -15,8 +15,8 @@ public struct Home: Sendable, FeatureReducer {
 		// MARK: - Components
 		public var header: Header.State
 		public var accountList: AccountList.State
-		public var accounts: OnNetwork.Accounts {
-			.init(rawValue: .init(uniqueElements: accountList.accounts.map(\.account)))!
+		public var accounts: IdentifiedArrayOf<OnNetwork.Account> {
+			.init(uniqueElements: accountList.accounts.map(\.account))
 		}
 
 		// MARK: - Destinations
@@ -289,7 +289,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	private func refreshAccounts(_ accounts: OnNetwork.Accounts) -> EffectTask<Action> {
+	private func refreshAccounts(_ accounts: IdentifiedArrayOf<OnNetwork.Account>) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.accountPortfoliosResult(TaskResult {
 				try await accountPortfolioFetcherClient.fetchPortfolioFor(accounts: accounts)

@@ -42,6 +42,7 @@ extension App.Action {
 extension App.Action {
 	public enum SystemAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
+		case loadEphemeralPrivateProfileResult(TaskResult<Profile.Ephemeral.Private>)
 		case displayErrorAlert(App.UserFacingError)
 	}
 }

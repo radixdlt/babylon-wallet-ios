@@ -10,6 +10,9 @@ extension PersonasClient: DependencyKey {
 			getPersonas: {
 				await profileStore.network.personas
 			},
+			createUnsavedVirtualPersona: { request in
+				try await profileStore.profile.createNewUnsavedVirtualEntity(request: request)
+			},
 			saveVirtualPersona: { persona in
 				try await profileStore.updating {
 					try $0.addPersona(persona)

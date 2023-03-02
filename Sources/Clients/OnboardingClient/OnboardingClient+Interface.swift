@@ -5,18 +5,18 @@ import Profile
 public struct OnboardingClient: Sendable {
 	public var loadProfile: LoadProfile
 	public var importProfileSnapshot: ImportProfileSnapshot
-	public var createAccountInEphemeralProfile: CreateAccountInEphemeralProfile
+	public var loadEphemeralPrivateProfile: LoadEphemeralPrivateProfile
 	public var commitEphemeral: CommitEphemeral
 
 	public init(
 		loadProfile: @escaping LoadProfile,
 		importProfileSnapshot: @escaping ImportProfileSnapshot,
-		createAccountInEphemeralProfile: @escaping CreateAccountInEphemeralProfile,
+		loadEphemeralPrivateProfile: @escaping LoadEphemeralPrivateProfile,
 		commitEphemeral: @escaping CommitEphemeral
 	) {
 		self.loadProfile = loadProfile
 		self.importProfileSnapshot = importProfileSnapshot
-		self.createAccountInEphemeralProfile = createAccountInEphemeralProfile
+		self.loadEphemeralPrivateProfile = loadEphemeralPrivateProfile
 		self.commitEphemeral = commitEphemeral
 	}
 }
@@ -32,6 +32,6 @@ extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> LoadProfileOutcome
 
 	public typealias CommitEphemeral = @Sendable () async throws -> Void
-	public typealias CreateAccountInEphemeralProfile = @Sendable (_ name: NonEmptyString) async throws -> OnNetwork.Account
+	public typealias LoadEphemeralPrivateProfile = @Sendable () async throws -> Profile.Ephemeral.Private
 	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
 }

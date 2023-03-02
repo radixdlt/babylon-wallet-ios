@@ -15,7 +15,7 @@ extension Profile {
 	) async throws -> any EntityProtocol {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
-		let networkID = request.networkID ?? self.network.networkID
+		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
 		let getDerivationPathRequest = try request.getDerivationPathRequest()
 		let getDerivationPathForNewEntity = { (request: GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int) in
 

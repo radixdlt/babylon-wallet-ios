@@ -179,32 +179,37 @@ extension ProfileStore {
 		changeState(to: .persisted(ephemeral.private.profile))
 	}
 
-	/// Updates the in-memomry across app used Profile and also
+	/// if persisted: Updates the in-memomry across app used Profile and also
 	/// sync the new value to secure storage (and iCloud if enabled/able).
+	///
+	/// if ephemeral: Updates the ephemeral profile.
 	public func update(profile: Profile) async throws {
 		try await isInitialized() // it should not be possible for us to not be initialized...
 		guard profile != profileStateSubject.value.profile else {
 			// prevent duplicates
 			return
 		}
-
-		guard case let .persisted(persistedProfile) = profileStateSubject.value else {
-			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
-			return
-		}
-
-		guard persistedProfile.id == profile.id else {
+		guard self.profile.id == profile.id else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called with a Profile which UUID does not match the current one. This should never happen."
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 			return
 		}
 
-		try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
+		switch profileStateSubject.value {
+		case var .ephemeral(ephemeral):
+			// E.g. Creation of first Account during onboarding flow
+			// we will not persist in secureStorage, nor change state from `.ephemeral`,
+			// but we will update the in memory epheral profile
+			ephemeral.updateProfile(profile)
+			changeState(to: .ephemeral(ephemeral))
 
-		changeState(to: .persisted(profile))
+		case .persisted:
+			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
+			changeState(to: .persisted(profile))
+
+		case .newWithEphemeral: fatalError("should not be possible, we await `isInitialized` in top.")
+		}
 	}
 
 	public func deleteProfile() async throws {
@@ -216,7 +221,7 @@ extension ProfileStore {
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 		}
-		changeState(to: Self.newEphemeral())
+		changeState(to: .ephemeral(.init(private: Self.newEphemeralProfile(), loadFailure: nil)))
 	}
 }
 
@@ -277,6 +282,10 @@ extension ProfileStore.ProfileState {
 // MARK: Internal (for tests)
 extension ProfileStore {
 	internal static func newEphemeral() -> ProfileState {
+		.newWithEphemeral(Self.newEphemeralProfile())
+	}
+
+	internal static func newEphemeralProfile() -> Profile.Ephemeral.Private {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 		do {
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
@@ -287,8 +296,7 @@ extension ProfileStore {
 			)
 			let privateFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
 			let profile = Profile(factorSource: factorSource)
-			let ephemeral = Profile.Ephemeral.Private(privateFactorSource: privateFactorSource, profile: profile)
-			return .newWithEphemeral(ephemeral)
+			return Profile.Ephemeral.Private(privateFactorSource: privateFactorSource, profile: profile)
 		} catch {
 			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -421,8 +429,10 @@ extension ProfileStore {
 		switch (profileStateSubject.value, newState) {
 		case (.newWithEphemeral, .ephemeral): break // `init` finished, no profile saved.
 		case (.newWithEphemeral, .persisted): break // `init` finished, found saved profile.
+		case (.ephemeral, .ephemeral): break // user created first account during onboarding
 		case (.ephemeral, .persisted): break // user finished onboarding.
 		case (.persisted, .persisted): break // user updated profile, e.g. added another account.
+		case (.persisted, .ephemeral): break // user deleted wallet from settings
 		default:
 			let errorMsg = "Incorrect implementation: invalid state transition from '\(String(describing: profileStateSubject.value))' to '\(String(describing: newState))'"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))

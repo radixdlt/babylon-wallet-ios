@@ -20,6 +20,11 @@ extension Profile {
 		public mutating func update(deviceDescription: NonEmptyString) {
 			`private`.update(deviceDescription: deviceDescription)
 		}
+
+		/// E.g. when first account is created during onboarding.
+		public mutating func updateProfile(_ profile: Profile) {
+			`private`.updateProfile(profile)
+		}
 	}
 }
 
@@ -44,6 +49,12 @@ extension Profile.Ephemeral {
 		public mutating func update(deviceDescription: NonEmptyString) {
 			privateFactorSource.factorSource.update(deviceDescription: deviceDescription)
 			profile.update(deviceDescription: deviceDescription)
+		}
+
+		/// E.g. when first account is created during onboarding.
+		public mutating func updateProfile(_ profile: Profile) {
+			precondition(profile.id == self.profile.id)
+			self.profile = profile
 		}
 	}
 }
