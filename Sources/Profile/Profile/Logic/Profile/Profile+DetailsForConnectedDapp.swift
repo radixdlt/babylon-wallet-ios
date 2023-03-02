@@ -1,8 +1,8 @@
 import Prelude
 
 extension Profile {
-	public func detailsForConnectedDapp(_ dapp: OnNetwork.ConnectedDapp) throws -> OnNetwork.ConnectedDappDetailed {
+	public func detailsForAuthorizedDapp(_ dapp: OnNetwork.AuthorizedDapp) throws -> OnNetwork.AuthorizedDappDetailed {
 		let network = try onNetwork(id: dapp.networkID)
-		return try network.detailsForConnectedDapp(dapp)
+		return try network.detailsForAuthorizedDapp(dapp)
 	}
 }

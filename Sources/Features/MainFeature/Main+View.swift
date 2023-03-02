@@ -7,40 +7,39 @@ import SettingsFeature
 extension Main {
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<Main>
 
-		public init(store: Store) {
+		public init(store: StoreOf<Main>) {
 			self.store = store
 		}
-	}
-}
 
-extension Main.View {
-	public var body: some View {
-		ZStack {
+		public var body: some SwiftUI.View {
 			Home.View(
 				store: store.scope(
 					state: \.home,
 					action: { .child(.home($0)) }
 				)
 			)
-			.zIndex(0)
-
-			IfLetStore(
-				store.scope(
-					state: \.settings,
-					action: { .child(.settings($0)) }
-				),
-				then: { AppSettings.View(store: $0) }
+			#if os(iOS)
+			// NB: has to be fullScreenCover because of https://stackoverflow.com/q/69101690
+			.fullScreenCover(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /Main.Destinations.State.settings,
+				action: Main.Destinations.Action.settings,
+				content: { AppSettings.View(store: $0) }
 			)
-			.zIndex(1)
+			#endif
+			.presentsDappInteractions(
+				onPresent: { [store = store.stateless] in
+					ViewStore(store).send(.view(.dappInteractionPresented))
+				},
+				onDismiss: { [store = store.stateless] in
+					// FIXME: ideally profileClient.getAccounts() would return a stream that'd allow all relevant screens to update independently.
+					// Until then, manual reloading is necessary when we come back from interaction flow (in case we created accounts).
+					ViewStore(store).send(.child(.home(.view(.appeared))))
+				}
+			)
 		}
-		.presentsDappInteractions(onDismiss: { [store = store.stateless] in
-			// FIXME: ideally profileClient.getAccounts() would return a stream that'd allow all relevant screens to update independently.
-			// Until then, manual reloading is necessary when we come back from interaction flow (in case we created accounts).
-			ViewStore(store).send(.child(.home(.view(.appeared))))
-		})
 	}
 }
 
@@ -48,7 +47,7 @@ extension Main.View {
 import SwiftUI // NB: necessary for previews to appear
 
 struct MainView_Previews: PreviewProvider {
-	static var previews: some View {
+	static var previews: some SwiftUI.View {
 		Main.View(
 			store: .init(
 				initialState: .previewValue,
@@ -56,5 +55,9 @@ struct MainView_Previews: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension Main.State {
+	public static let previewValue = Self(home: .previewValue)
 }
 #endif

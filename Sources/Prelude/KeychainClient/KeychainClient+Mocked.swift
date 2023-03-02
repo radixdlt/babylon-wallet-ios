@@ -10,16 +10,22 @@ extension DependencyValues {
 // MARK: - KeychainClient + TestDependencyKey
 extension KeychainClient: TestDependencyKey {
 	public static var testValue = Self(
-		dataForKey: unimplemented("\(Self.self).dataForKey"),
+		setDataWithoutAuthForKey: unimplemented("\(Self.self).setDataWithoutAuthForKey"),
+		setDataWithAuthForKey: unimplemented("\(Self.self).setDataWithAuthForKey"),
+		getDataWithoutAuthForKey: unimplemented("\(Self.self).getDataWithoutAuthForKey"),
+		getDataWithAuthForKey: unimplemented("\(Self.self).getDataWithAuthForKey"),
 		removeDataForKey: unimplemented("\(Self.self).removeDataForKey"),
-		setDataForKey: unimplemented("\(Self.self).setDataForKey"),
-		updateDataForKey: unimplemented("\(Self.self).updateDataForKey")
+		removeAllItems: unimplemented("\(Self.self).removeAllItems")
 	)
 
-	public static var previewValue = Self(
-		dataForKey: { _, _ in Data([0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF, 0xDE, 0xAD, 0xBE, 0xEF]) },
-		removeDataForKey: { _ in },
-		setDataForKey: { _, _, _ in },
-		updateDataForKey: { _, _, _, _ in }
+	public static let noop: Self = .init(
+		setDataWithoutAuthForKey: { _ in throw NoopError() },
+		setDataWithAuthForKey: { _ in throw NoopError() },
+		getDataWithoutAuthForKey: { _ in throw NoopError() },
+		getDataWithAuthForKey: { _, _ in throw NoopError() },
+		removeDataForKey: { _ in throw NoopError() },
+		removeAllItems: {}
 	)
+
+	public static let previewValue: Self = .noop
 }

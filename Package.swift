@@ -83,12 +83,21 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "AuthorizedDAppsFeatures",
+		dependencies: [
+			"GatewayAPI",
+			"ProfileClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"CreateEntityFeature",
 			"GatewayAPI",
 			"P2PConnectivityClient",
 			"ProfileClient",
+			"ROLAClient",
 			"TransactionSigningFeature",
 		],
 		tests: .yes()
@@ -108,15 +117,12 @@ package.addModules([
 	.feature(
 		name: "HomeFeature",
 		dependencies: [
-			"AccountListFeature",
 			"AccountDetailsFeature",
+			"AccountListFeature",
 			"AccountPortfolio",
-			"AccountPreferencesFeature",
 			"AppSettings",
 			"CreateEntityFeature",
-			"P2PConnectivityClient",
 			"ProfileClient",
-			"TransactionSigningFeature",
 		],
 		tests: .yes(
 			dependencies: [
@@ -186,6 +192,7 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
@@ -298,6 +305,32 @@ package.addModules([
 		dependencies: [
 			"ProfileClient",
 			"EngineToolkitClient",
+			"SecureStorageClient",
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "ProfileStore",
+		dependencies: [
+			"Profile",
+			"SecureStorageClient",
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "SecureStorageClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+			"LocalAuthenticationClient",
+			"Resources", // L10n for keychain auth prompts
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "ROLAClient",
+		dependencies: [
+			"GatewayAPI",
 		],
 		tests: .yes()
 	),
@@ -309,6 +342,7 @@ package.addModules([
 			"ProfileClient",
 			"AccountPortfolio",
 			"UseFactorSourceClient",
+			"SecureStorageClient",
 		],
 		tests: .yes()
 	),
@@ -317,6 +351,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+			"SecureStorageClient",
 		],
 		tests: .no
 	),
@@ -410,6 +445,7 @@ package.addModules([
 		category: .profile,
 		dependencies: [
 			"Profile",
+			"SecureStorageClient",
 		],
 		tests: .no
 	),

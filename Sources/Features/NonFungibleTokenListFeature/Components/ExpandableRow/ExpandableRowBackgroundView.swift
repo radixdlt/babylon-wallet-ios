@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-struct ExpandableRowBackgroundView: SwiftUI.View {
+struct ExpandableRowBackgroundView: View {
 	let paddingEdge: Edge.Set
 	let paddingValue: CGFloat
 	let cornerRadius: CGFloat

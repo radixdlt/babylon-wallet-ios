@@ -9,19 +9,17 @@ extension CameraPermission {
 		public init(store: StoreOf<CameraPermission>) {
 			self.store = store
 		}
-	}
-}
 
-extension CameraPermission.View {
-	public var body: some View {
-		ZStack {}
-			.alert(
-				store: store.scope(
-					state: \.$permissionDeniedAlert,
-					action: { .view(.permissionDeniedAlert($0)) }
+		public var body: some SwiftUI.View {
+			ZStack {}
+				.alert(
+					store: store.scope(
+						state: \.$permissionDeniedAlert,
+						action: { .view(.permissionDeniedAlert($0)) }
+					)
 				)
-			)
-			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+				.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+		}
 	}
 }
 
@@ -37,5 +35,9 @@ struct CameraPermission_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension CameraPermission.State {
+	public static let previewValue: Self = .init()
 }
 #endif

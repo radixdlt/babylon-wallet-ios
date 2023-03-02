@@ -95,7 +95,7 @@ extension AccountList.Row.View {
 
 		init(state: AccountList.Row.State) {
 			self.name = state.account.displayName.rawValue
-			self.address = .init(address: state.account.address.address, format: .short())
+			self.address = .init(address: state.account.address.address, format: .default)
 			self.appearanceID = state.account.appearanceID
 			self.aggregatedValue = state.aggregatedValue
 			self.currency = state.currency

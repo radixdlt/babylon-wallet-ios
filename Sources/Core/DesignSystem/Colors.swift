@@ -49,6 +49,11 @@ extension Color {
 	public static let app = App()
 }
 
+extension ShapeStyle where Self == Color {
+	/// Namespace only
+	public static var app: Color.App { Color.app }
+}
+
 extension Color.App {
 	// blue
 	public var blue1: Color { .init(hex: .blue1) }
@@ -90,6 +95,8 @@ extension Color.App {
 	public var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
 
 	public var shadowBlack: Color { .black.opacity(0.08) }
+
+	public var cardShadowBlack: Color { .black.opacity(0.15) }
 
 	// gradient
 	public var account0green: Color { .init(hex: .account0green) }

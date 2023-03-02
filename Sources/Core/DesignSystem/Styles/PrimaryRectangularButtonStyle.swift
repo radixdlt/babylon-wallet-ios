@@ -4,6 +4,8 @@ import SwiftUI
 public struct PrimaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
 
+	let isDestructive: Bool
+
 	public func makeBody(configuration: Configuration) -> some View {
 		ZStack {
 			configuration.label
@@ -11,7 +13,7 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 				.font(.app.body1Header)
 				.frame(maxWidth: .infinity)
 				.frame(height: .standardButtonHeight)
-				.background(controlState.isEnabled ? Color.app.blue2 : Color.app.gray4)
+				.background(backgroundColor)
 				.cornerRadius(.small2)
 				.brightness(configuration.isPressed ? -0.1 : 0)
 
@@ -24,6 +26,12 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 
 	var shouldShowSpinner: Bool {
 		controlState == .loading(.local)
+	}
+
+	var backgroundColor: Color {
+		controlState.isEnabled
+			? isDestructive ? .app.red1 : .app.blue2
+			: .app.gray4
 	}
 }
 
@@ -41,5 +49,9 @@ extension PrimaryRectangularButtonStyle {
 }
 
 extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
-	public static var primaryRectangular: Self { Self() }
+	public static var primaryRectangular: Self { .primaryRectangular() }
+
+	public static func primaryRectangular(isDestructive: Bool = false) -> Self {
+		Self(isDestructive: isDestructive)
+	}
 }

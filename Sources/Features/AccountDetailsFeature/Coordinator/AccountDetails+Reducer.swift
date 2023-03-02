@@ -21,27 +21,24 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			return .run { [address = state.address] send in
-				await send(.delegate(.refresh(address)))
-			}
-		case .internal(.view(.dismissAccountDetailsButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismissAccountDetails))
-			}
-		case .internal(.view(.displayAccountPreferencesButtonTapped)):
-			return .run { [address = state.address] send in
-				await send(.delegate(.displayAccountPreferences(address)))
-			}
+			return .send(.delegate(.refresh(state.address)))
+		case .internal(.view(.backButtonTapped)):
+			return .send(.delegate(.dismiss))
+		case .internal(.view(.preferencesButtonTapped)):
+			state.destination = .preferences(.init(address: state.address))
+			return .none
 		case .internal(.view(.copyAddressButtonTapped)):
-			let address = state.address.address
-			return .fireAndForget { pasteboardClient.copyString(address) }
-		case .internal(.view(.pullToRefreshStarted)):
-			return .run { [address = state.address] send in
-				await send(.delegate(.refresh(address)))
+			return .fireAndForget { [address = state.address.address] in
+				pasteboardClient.copyString(address)
 			}
+		case .internal(.view(.pullToRefreshStarted)):
+			return .send(.delegate(.refresh(state.address)))
 		case .internal(.view(.transferButtonTapped)):
 			// FIXME: fix post betanet v2
 //			state.destination = .transfer(AssetTransfer.State(from: state.account))
+			return .none
+		case .child(.destination(.presented(.preferences(.delegate(.dismiss))))):
+			state.destination = nil
 			return .none
 		case .child, .delegate:
 			return .none

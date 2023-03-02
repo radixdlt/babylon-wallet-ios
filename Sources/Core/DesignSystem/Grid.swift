@@ -37,8 +37,19 @@ extension Grid {
 
 extension CGFloat {
 	/// 50
+	public static let navigationBarHeight: Self = 50
+
+	/// 50
 	public static let standardButtonHeight: Self = 50
+
+	/// 250
+	public static let standardButtonWidth: Self = 250
 
 	/// 75
 	public static let largeButtonHeight: Self = 75
+}
+
+extension CGSize {
+	/// 38 x 4
+	public static let sheetDragHandleSize: Self = .init(width: 38, height: 4)
 }

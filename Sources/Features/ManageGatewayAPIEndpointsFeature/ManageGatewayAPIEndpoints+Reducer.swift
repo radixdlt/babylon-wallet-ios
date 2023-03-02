@@ -15,43 +15,37 @@ public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 extension ManageGatewayAPIEndpoints {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.createAccountCoordinator, action: /Action.createAccountCoordinator) {
-				CreateAccountCoordinator()
+			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+				Destinations()
 			}
 	}
 
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
-			return .run { send in
-				await send(.internal(.system(.loadNetworkAndGatewayResult(
-					TaskResult {
-						await networkSwitchingClient.getNetworkAndGateway()
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					await networkSwitchingClient.getGateway()
+				}
+				return .internal(.system(.loadGatewayResult(result)))
 			}
 
-		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
-			state.currentNetworkAndGateway = currentNetworkAndGateway
+		case let .internal(.system(.loadGatewayResult(.success(currentGateway)))):
+			state.currentGateway = currentGateway
 			#if DEBUG
 			// convenient when testing
-			state.urlString = currentNetworkAndGateway.gatewayAPIEndpointURL.absoluteString
+			state.urlString = currentGateway.url.absoluteString
 			#endif
 			return .none
 
-		case let .internal(.system(.loadNetworkAndGatewayResult(.failure(error)))):
+		case let .internal(.system(.loadGatewayResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
-
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
 
 		case let .internal(.view(.urlStringChanged(urlString))):
 			state.urlString = urlString
 			let maybeURL = URL(string: urlString)
-			state.isSwitchToButtonEnabled = maybeURL != nil && !(state.currentNetworkAndGateway?.gatewayAPIEndpointURL == maybeURL)
+			state.isSwitchToButtonEnabled = maybeURL != nil && !(state.currentGateway?.url == maybeURL)
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
@@ -60,12 +54,11 @@ extension ManageGatewayAPIEndpoints {
 				return .none
 			}
 			state.isValidatingEndpoint = true
-			return .run { send in
-				await send(.internal(.system(.gatewayValidationResult(
-					TaskResult {
-						try await networkSwitchingClient.validateGatewayURL(url)
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await networkSwitchingClient.validateGatewayURL(url)
+				}
+				return .internal(.system(.gatewayValidationResult(result)))
 			}
 
 		case let .internal(.view(.focusTextField(focus))):
@@ -82,28 +75,26 @@ extension ManageGatewayAPIEndpoints {
 			guard let new = maybeNew else {
 				return .none
 			}
-			state.validatedNewNetworkAndGatewayToSwitchTo = new
-			return .run { send in
-				await send(.internal(.system(.hasAccountsResult(
-					TaskResult {
-						try await networkSwitchingClient.hasAccountOnNetwork(new)
-					}
-				))))
+			state.validatedNewGatewayToSwitchTo = new
+			return .task {
+				let result = await TaskResult {
+					try await networkSwitchingClient.hasAccountOnNetwork(new)
+				}
+				return .internal(.system(.hasAccountsResult(result)))
 			}
 		case let .internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))):
-			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
+			guard let new = state.validatedNewGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
 			}
-			return .run { send in
+			return .task {
 				if hasAccountsOnNetwork {
-					await send(.internal(.system(.switchToResult(
-						TaskResult {
-							try await networkSwitchingClient.switchTo(new)
-						}
-					))))
+					let result = await TaskResult {
+						try await networkSwitchingClient.switchTo(new)
+					}
+					return .internal(.system(.switchToResult(result)))
 				} else {
-					await send(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new))))
+					return .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new)))
 				}
 			}
 
@@ -111,15 +102,15 @@ extension ManageGatewayAPIEndpoints {
 			errorQueue.schedule(error)
 			return skipSwitching(state: &state)
 
-		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
-
-			state.createAccountCoordinator = .init(config: .init(
-				specificNetworkID: newNetworkAndGateway.network.id,
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
-			))
-
+		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway))):
+			state.destination = .createAccount(
+				.init(config: .init(
+					specificNetworkID: newGateway.network.id,
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				))
+			)
 			return .none
 
 		case let .internal(.system(.switchToResult(.failure(error)))):
@@ -127,35 +118,32 @@ extension ManageGatewayAPIEndpoints {
 			return .none
 
 		case .internal(.system(.switchToResult(.success))):
-			return .run { send in
-				await send(.delegate(.networkChanged))
-			}
+			return .send(.delegate(.networkChanged))
 
-		case .createAccountCoordinator(.delegate(.dismissed)):
+		case .child(.destination(.presented(.createAccount(.delegate(.dismissed))))):
 			return skipSwitching(state: &state)
 
-		case .createAccountCoordinator(.delegate(.completed)):
-			state.createAccountCoordinator = nil
-			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
+		case .child(.destination(.presented(.createAccount(.delegate(.completed))))):
+			state.destination = nil
+			guard let new = state.validatedNewGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
 			}
-			return .run { send in
-				await send(.internal(.system(.switchToResult(
-					TaskResult {
-						try await networkSwitchingClient.switchTo(new)
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await networkSwitchingClient.switchTo(new)
+				}
+				return .internal(.system(.switchToResult(result)))
 			}
 
-		case .createAccountCoordinator, .delegate:
+		case .child, .delegate:
 			return .none
 		}
 	}
 
 	public func skipSwitching(state: inout State) -> EffectTask<Action> {
-		state.createAccountCoordinator = nil
-		state.validatedNewNetworkAndGatewayToSwitchTo = nil
+		state.destination = nil
+		state.validatedNewGatewayToSwitchTo = nil
 		return .none
 	}
 }

@@ -20,37 +20,39 @@ extension NewEntityCompletion.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
-				VStack(spacing: .medium2) {
-					if let whenAccount = viewStore.whenAccount {
-						Spacer()
-						accountsStackView(with: viewStore, for: whenAccount)
-						Spacer()
-					}
-
-					VStack(spacing: .medium1) {
-						Text(L10n.CreateEntity.Completion.title)
-							.foregroundColor(.app.gray1)
-							.textStyle(.sheetTitle)
-
-						Text(subtitleText(with: viewStore))
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1Regular)
-
-						Text(viewStore.explaination)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1Regular)
-							.multilineTextAlignment(.center)
-					}
-					.padding(.horizontal, .small1)
-
+			VStack(spacing: .medium2) {
+				if let whenAccount = viewStore.whenAccount {
 					Spacer()
-
-					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {
-						viewStore.send(.goToDestination)
-					}
-					.buttonStyle(.primaryRectangular)
+					accountsStackView(with: viewStore, for: whenAccount)
+					Spacer()
+				} else {
+					Spacer()
 				}
+
+				VStack(spacing: .medium1) {
+					Text(L10n.CreateEntity.Completion.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
+
+					Text(subtitleText(with: viewStore))
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
+
+					Text(viewStore.explaination)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
+						.multilineTextAlignment(.center)
+				}
+				.padding(.horizontal, .small1)
+
+				Spacer()
+			}
+			.padding(.medium1)
+			.safeAreaInset(edge: .bottom, spacing: 0) {
+				Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {
+					viewStore.send(.goToDestination)
+				}
+				.buttonStyle(.primaryRectangular)
 				.padding(.medium1)
 			}
 		}
@@ -166,7 +168,7 @@ extension NewEntityCompletion.View {
 
 			if let account = state.entity as? OnNetwork.Account {
 				self.whenAccount = WhenAccount(
-					accountAddress: .init(address: account.address.address, format: .short()),
+					accountAddress: .init(address: account.address.address, format: .default),
 					appearanceID: account.appearanceID
 				)
 				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.account

@@ -2,6 +2,7 @@ import FeaturePrelude
 import P2PConnectivityClient
 import ProfileClient
 import RadixConnect
+import ROLAClient
 
 // MARK: - DappInteractionHook
 struct DappInteractor: Sendable, FeatureReducer {
@@ -62,12 +63,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	let onDismiss: (@Sendable () -> Void)?
+	var onPresent: (@Sendable () -> Void)? = nil
+	var onDismiss: (@Sendable () -> Void)? = nil
 
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.rolaClient) var rolaClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -90,8 +93,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 					do {
 						let interactionMessage = try message.unwrapResult()
-						guard interactionMessage.content.content.metadata.networkId == currentNetworkID else {
-							let interaction = interactionMessage.content.content
+                                                let interaction = interactionMessage.content.content
+                                                guard interaction.metadata.networkId == currentNetworkID else {
+							let interaction = interaction
 							let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
 							let currentNetwork = try Network.lookupBy(id: currentNetworkID)
 							let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
@@ -104,6 +108,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 							return
 						}
 
+                                                try await rolaClient.performDappDefinitionVerification(interaction.metadata)
+                                                try await rolaClient.performWellKnownFileCheck(interaction.metadata)
 						await send(.internal(.receivedRequestFromDapp(interactionMessage)))
 					} catch {
 						loggerGlobal.error("Failed to create Peer Connection")
@@ -139,6 +145,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
+			onPresent?()
 			state.requestQueue.append(request)
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
@@ -210,7 +217,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = nil
 			state.currentModal = currentModal
 			return .run { send in
-				try await clock.sleep(for: .seconds(0.5))
+				try await clock.sleep(for: .seconds(2))
 				await send(.internal(.ensureCurrentModalIsActuallyPresented))
 			}
 		} else {

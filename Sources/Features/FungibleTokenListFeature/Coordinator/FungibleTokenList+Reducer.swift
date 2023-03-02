@@ -1,30 +1,77 @@
 import FeaturePrelude
 import FungibleTokenDetailsFeature
 
-public struct FungibleTokenList: Sendable, ReducerProtocol {
+public struct FungibleTokenList: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public var sections: IdentifiedArrayOf<FungibleTokenList.Section.State>
+
+		@PresentationState
+		public var destination: Destinations.State?
+
+		public init(sections: IdentifiedArrayOf<FungibleTokenList.Section.State>) {
+			self.sections = sections
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case selectedTokenChanged(FungibleTokenContainer?)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
+		case destination(PresentationActionOf<FungibleTokenList.Destinations>)
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case details(FungibleTokenDetails.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case details(FungibleTokenDetails.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.details, action: /Action.details) {
+				FungibleTokenDetails()
+			}
+		}
+	}
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce { state, action in
-			switch action {
-			case .child(.section(_, action: .child(.asset(_, action: .delegate(.selected(let token)))))):
-				state.selectedToken = token
-				return .none
-			case let .internal(.view(.selectedTokenChanged(token))):
-				state.selectedToken = token
-				return .none
-			case .child(.details(.delegate(.closeButtonTapped))):
-				state.selectedToken = nil
-				return .none
-			case .child:
-				return .none
+		Reduce(core)
+			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
+				FungibleTokenList.Section()
 			}
+			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case let .selectedTokenChanged(token):
+			if let token {
+				state.destination = .details(token)
+			} else {
+				state.destination = nil
+			}
+			return .none
 		}
-		.forEach(\.sections, action: /Action.child .. Action.ChildAction.section) {
-			FungibleTokenList.Section()
-		}
-		.ifLet(\.selectedToken, action: /Action.child .. Action.ChildAction.details) {
-			FungibleTokenDetails()
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .section(_, action: .child(.asset(_, action: .delegate(.selected(let token))))):
+			state.destination = .details(token)
+			return .none
+		case .destination(.presented(.details(.delegate(.dismiss)))):
+			state.destination = nil
+			return .none
+		default:
+			return .none
 		}
 	}
 }

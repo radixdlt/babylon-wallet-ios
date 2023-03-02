@@ -5,7 +5,7 @@ import Prelude
 public struct MnemonicWithPassphrase: Sendable, Hashable, Codable {
 	public let mnemonic: Mnemonic
 	public let passphrase: String
-	public init(mnemonic: Mnemonic, passphrase: String) {
+	public init(mnemonic: Mnemonic, passphrase: String = "") {
 		self.mnemonic = mnemonic
 		self.passphrase = passphrase
 	}

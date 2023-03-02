@@ -41,7 +41,7 @@ extension DappInteractionFlow {
 					#endif
 				}
 				#if os(iOS)
-				.navigationTransition(.slide)
+				.navigationTransition(.slide, interactivity: .disabled)
 				#endif
 			}
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
@@ -121,8 +121,8 @@ extension ProfileClient {
 					return [.previewValue0]
 				}
 			}
-			$0.getConnectedDapps = {
-				var dapp = OnNetwork.ConnectedDapp(
+			$0.getAuthorizedDapps = {
+				var dapp = OnNetwork.AuthorizedDapp(
 					networkID: .nebunet,
 					dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
 					displayName: .init(rawValue: "something")!

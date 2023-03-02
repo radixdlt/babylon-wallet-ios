@@ -24,17 +24,14 @@ extension FaucetClient {
 extension FaucetClient {
 	public struct FaucetRequest: Sendable, Hashable {
 		public let recipientAccountAddress: AccountAddress
-		public let unlockKeychainPromptShowToUser: String
 		public let addLockFeeInstructionToManifest: Bool
 		public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 		public init(
 			recipientAccountAddress: AccountAddress,
-			unlockKeychainPromptShowToUser: String,
 			addLockFeeInstructionToManifest: Bool = true,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default
 		) {
 			self.recipientAccountAddress = recipientAccountAddress
-			self.unlockKeychainPromptShowToUser = unlockKeychainPromptShowToUser
 			self.addLockFeeInstructionToManifest = addLockFeeInstructionToManifest
 			self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		}

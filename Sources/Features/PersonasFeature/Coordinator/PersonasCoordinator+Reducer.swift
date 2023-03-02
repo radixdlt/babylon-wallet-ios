@@ -38,11 +38,6 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .personaList(.delegate(.dismiss)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
-
 		case .personaList(.delegate(.createNewPersona)):
 			let isFirst = state.personaList.personas.count == 0
 			state.createPersonaCoordinator = .init(config: .init(
@@ -68,12 +63,11 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 extension PersonasCoordinator {
 	func loadPersonas() -> EffectTask<Action> {
-		.run { send in
-			await send(.internal(.loadPersonasResult(
-				TaskResult {
-					try await profileClient.getPersonas()
-				}
-			)))
+		.task {
+			let result = await TaskResult {
+				try await profileClient.getPersonas()
+			}
+			return .internal(.loadPersonasResult(result))
 		}
 	}
 }

@@ -3,24 +3,34 @@ import FeaturePrelude
 // MARK: - NonFungibleTokenList.Detail
 extension NonFungibleTokenList {
 	// MARK: - NonFungibleTokenDetails
-	public struct Detail: Sendable, ReducerProtocol {
+	public struct Detail: Sendable, FeatureReducer {
+		public struct State: Sendable, Hashable {
+			var container: NonFungibleTokenContainer
+			var asset: NonFungibleToken
+		}
+
+		public enum ViewAction: Sendable, Equatable {
+			case closeButtonTapped
+			case copyAddressButtonTapped(String)
+		}
+
+		public enum DelegateAction: Sendable, Equatable {
+			case dismiss
+		}
+
 		@Dependency(\.pasteboardClient) var pasteboardClient
 
 		public init() {}
-	}
-}
 
-extension NonFungibleTokenList.Detail {
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.closeButtonTapped)):
-			return .run { send in await send(.delegate(.closeButtonTapped)) }
-		case let .internal(.view(.copyAddressButtonTapped(address))):
-			return .run { _ in
-				pasteboardClient.copyString(address)
+		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+			switch viewAction {
+			case .closeButtonTapped:
+				return .send(.delegate(.dismiss))
+			case let .copyAddressButtonTapped(address):
+				return .run { _ in
+					pasteboardClient.copyString(address)
+				}
 			}
-		case .delegate:
-			return .none
 		}
 	}
 }

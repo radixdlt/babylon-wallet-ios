@@ -20,16 +20,16 @@ public struct AppPreferences:
 	public var p2pClients: P2PClients
 
 	/// The active network
-	public var networkAndGateway: NetworkAndGateway
+	public var gateways: Gateways
 
 	public init(
 		display: Display = .default,
 		p2pClients: P2PClients = [],
-		networkAndGateway: NetworkAndGateway = .nebunet
+		gateways: Gateways = .init(current: .nebunet)
 	) {
 		self.display = display
 		self.p2pClients = p2pClients
-		self.networkAndGateway = networkAndGateway
+		self.gateways = gateways
 	}
 
 	public static let `default`: Self = .init()
@@ -42,6 +42,7 @@ extension AppPreferences {
 			children: [
 				"display": display,
 				"p2pClients": p2pClients,
+				"gateways": gateways,
 			],
 			displayStyle: .struct
 		)
@@ -51,6 +52,7 @@ extension AppPreferences {
 		"""
 		display: \(display),
 		p2pClients: \(p2pClients),
+		gateways: \(gateways)
 		"""
 	}
 }

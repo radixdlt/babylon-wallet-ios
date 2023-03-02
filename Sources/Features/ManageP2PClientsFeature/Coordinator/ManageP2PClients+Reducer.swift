@@ -12,20 +12,13 @@ public struct ManageP2PClients: Sendable, ReducerProtocol {
 
 extension ManageP2PClients {
 	public var body: some ReducerProtocolOf<Self> {
-		CombineReducers {
-			EmptyReducer()
-				.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
-					ManageP2PClient()
-				}
-				.ifLet(
-					\.newConnection,
-					action: /Action.child .. Action.ChildAction.newConnection
-				) {
-					NewConnection()
-				}
-
-			Reduce(self.core)
-		}
+		Reduce(core)
+			.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
+				ManageP2PClient()
+			}
+			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -66,13 +59,12 @@ extension ManageP2PClients {
 			}
 
 		case let .child(.connection(id, .delegate(.deleteConnection))):
-			return .run { send in
-				await send(.internal(.system(.deleteConnectionResult(
-					TaskResult {
-						try await p2pConnectivityClient.deleteP2PClientByID(id)
-						return id
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await p2pConnectivityClient.deleteP2PClientByID(id)
+					return id
+				}
+				return .internal(.system(.deleteConnectionResult(result)))
 			}
 
 		case let .internal(.system(.deleteConnectionResult(.success(deletedID)))):
@@ -84,7 +76,7 @@ extension ManageP2PClients {
 			return .none
 
 		case .internal(.view(.addNewConnectionButtonTapped)):
-			state.newConnection = .init()
+			state.destination = .newConnection(.init())
 			return .none
 
 		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
@@ -99,11 +91,11 @@ extension ManageP2PClients {
 				))))
 			}
 
-		case .child(.newConnection(.delegate(.dismiss))):
-			state.newConnection = nil
+		case .child(.destination(.presented(.newConnection(.delegate(.dismiss))))):
+			state.destination = nil
 			return .none
 
-		case .child, .delegate:
+		case .child:
 			return .none
 		}
 	}

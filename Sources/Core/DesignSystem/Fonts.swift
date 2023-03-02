@@ -20,6 +20,10 @@ extension SwiftUI.Font.App {
 		.custom(FontFamily.IBMPlexSans.semiBold, size: 18)
 	}
 
+	public var backButton: SwiftUI.Font {
+		.custom(FontFamily.IBMPlexSans.medium, size: 18)
+	}
+
 	public var body1Header: SwiftUI.Font {
 		.custom(FontFamily.IBMPlexSans.semiBold, size: 16)
 	}
@@ -58,5 +62,26 @@ extension SwiftUI.Font.App {
 
 	public var button: SwiftUI.Font {
 		.custom(FontFamily.IBMPlexSans.bold, size: 16)
+	}
+}
+
+/// UIFont/NSFont depending on platform.
+extension FontConvertible.Font {
+	/// Namespace only
+	public struct App { fileprivate init() {} }
+	public static let app = App()
+}
+
+extension FontConvertible.Font.App {
+	public var sheetTitle: FontConvertible.Font {
+		FontFamily.IBMPlexSans.bold.font(size: 32)
+	}
+
+	public var secondaryHeader: FontConvertible.Font {
+		FontFamily.IBMPlexSans.semiBold.font(size: 18)
+	}
+
+	public var backButton: FontConvertible.Font {
+		FontFamily.IBMPlexSans.medium.font(size: 18)
 	}
 }

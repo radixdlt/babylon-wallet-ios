@@ -1,22 +1,23 @@
 import Prelude
 import Profile
 import RadixConnectModels
+import SecureStorageClient
 import SwiftUI
 
 // MARK: - ProfileView
 public struct ProfileView: IndentedView {
 	public let profile: Profile
 	public let indentation: Indentation
-	public var keychainClient: KeychainClient?
+	public var secureStorageClient: SecureStorageClient?
 
 	public init(
 		profile: Profile,
 		indentation: Indentation = .init(),
-		keychainClient: KeychainClient? = nil
+		secureStorageClient: SecureStorageClient? = nil
 	) {
 		self.profile = profile
 		self.indentation = indentation
-		self.keychainClient = keychainClient
+		self.secureStorageClient = secureStorageClient
 	}
 }
 
@@ -69,7 +70,7 @@ extension ProfileView {
 				FactorSourcesView(
 					factorSources: profile.factorSources,
 					indentation: inOneLevel,
-					keychainClient: keychainClient
+					secureStorageClient: secureStorageClient
 				)
 			}
 		}
@@ -95,7 +96,7 @@ extension IndentedView {
 public struct FactorSourcesView: IndentedView {
 	public let factorSources: FactorSources
 	public let indentation: Indentation
-	public var keychainClient: KeychainClient?
+	public var secureStorageClient: SecureStorageClient?
 }
 
 extension FactorSourcesView {
@@ -112,7 +113,7 @@ extension FactorSourcesView {
 				FactorSourceView(
 					factorSource: factorSource,
 					indentation: inOneLevel,
-					keychainClient: keychainClient
+					secureStorageClient: secureStorageClient
 				)
 			}
 		}
@@ -124,7 +125,7 @@ extension FactorSourcesView {
 public struct FactorSourceView: IndentedView {
 	public let factorSource: FactorSource
 	public let indentation: Indentation
-	public var keychainClient: KeychainClient?
+	public var secureStorageClient: SecureStorageClient?
 	@State private var mnemonicPhraseLoadedFromKeychain: String?
 	@State private var mnemonicPassphraseLoadedFromKeychain: String?
 }
@@ -159,13 +160,12 @@ extension FactorSourceView {
 		}
 		.padding([.leading], leadingPadding)
 		.task {
-			if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonicWithPassphrase(
-				factorSourceID: factorSource.id,
-				authenticationPrompt: "Load Mnemonic to display for debugging"
-			) {
+			#if DEBUG
+			if let mnemonic = try? await secureStorageClient?.loadMnemonicByFactorSourceID(factorSource.id, .debugOnlyInspect) {
 				self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
 				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
 			}
+			#endif
 		}
 	}
 }
@@ -190,8 +190,8 @@ extension AppPreferencesView {
 				indentation: inOneLevel
 			)
 
-			NetworkAndGatewayView(
-				networkAndGateway: appPreferences.networkAndGateway,
+			GatewaysView(
+				gateways: appPreferences.gateways,
 				indentation: inOneLevel
 			)
 
@@ -204,13 +204,33 @@ extension AppPreferencesView {
 	}
 }
 
-// MARK: - NetworkAndGatewayView
-public struct NetworkAndGatewayView: IndentedView {
-	public let networkAndGateway: AppPreferences.NetworkAndGateway
+// MARK: - GatewaysView
+public struct GatewaysView: IndentedView {
+	public let gateways: Gateways
 	public let indentation: Indentation
 }
 
-extension NetworkAndGatewayView {
+extension GatewaysView {
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			ForEach(gateways.all) { gateway in
+				GatewayView(
+					gateway: gateway,
+					indentation: inOneLevel
+				)
+			}
+		}
+		.padding([.leading], leadingPadding)
+	}
+}
+
+// MARK: - GatewayView
+public struct GatewayView: IndentedView {
+	public let gateway: Gateway
+	public let indentation: Indentation
+}
+
+extension GatewayView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network & Gateway")
@@ -218,9 +238,9 @@ extension NetworkAndGatewayView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("Network Name", value: networkAndGateway.network.name.rawValue)
-			Labeled("Network ID", value: networkAndGateway.network.id.description)
-			Labeled("Gateway API Base URL", value: networkAndGateway.gatewayAPIEndpointURL.absoluteString)
+			Labeled("Network Name", value: gateway.network.name.rawValue)
+			Labeled("Network ID", value: gateway.network.id.description)
+			Labeled("Gateway API Base URL", value: gateway.url.absoluteString)
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -275,29 +295,29 @@ extension P2PClientsView {
 	}
 }
 
-// MARK: - ConnectedDappsView
-public struct ConnectedDappsView: IndentedView {
-	public let connectedDapps: [OnNetwork.ConnectedDapp]
+// MARK: - AuthorizedDappsView
+public struct AuthorizedDappsView: IndentedView {
+	public let authorizedDapps: OnNetwork.AuthorizedDapps
 	public let indentation: Indentation
-	public let getDetailedConnectedDapp: (OnNetwork.ConnectedDapp) -> OnNetwork.ConnectedDappDetailed
+	public let getDetailedAuthorizedDapp: (OnNetwork.AuthorizedDapp) -> OnNetwork.AuthorizedDappDetailed
 }
 
-extension ConnectedDappsView {
+extension AuthorizedDappsView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Connected Dapps")
+			Text("Authorized Dapps")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			if connectedDapps.isEmpty {
+			if authorizedDapps.isEmpty {
 				Text("<None yet>").font(.callout)
 			} else {
-				ForEach(connectedDapps) { connectedDapp in
-					ConnectedDappView(
-						connectedDapp: connectedDapp,
+				ForEach(authorizedDapps) { authorizedDapp in
+					AuthorizedDappView(
+						authorizedDapp: authorizedDapp,
 						indentation: inOneLevel,
-						authorizedPersonas: getDetailedConnectedDapp(connectedDapp).detailedAuthorizedPersonas
+						authorizedPersonas: getDetailedAuthorizedDapp(authorizedDapp).detailedAuthorizedPersonas
 					)
 				}
 			}
@@ -306,18 +326,18 @@ extension ConnectedDappsView {
 	}
 }
 
-// MARK: - ConnectedDappView
-public struct ConnectedDappView: IndentedView {
-	public let connectedDapp: OnNetwork.ConnectedDapp
+// MARK: - AuthorizedDappView
+public struct AuthorizedDappView: IndentedView {
+	public let authorizedDapp: OnNetwork.AuthorizedDapp
 	public let indentation: Indentation
 	public let authorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 }
 
-extension ConnectedDappView {
+extension AuthorizedDappView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Name", value: String(describing: connectedDapp.displayName))
-			Labeled("Dapp def address", value: String(describing: connectedDapp.dAppDefinitionAddress))
+			Labeled("Name", value: String(describing: authorizedDapp.displayName))
+			Labeled("Dapp def address", value: String(describing: authorizedDapp.dAppDefinitionAddress))
 			ForEach(authorizedPersonas) {
 				DappAuthorizedPersonaView(
 					detailedAuthorizedPersona: $0,
@@ -436,11 +456,11 @@ extension OnNetworkView {
 				indentation: inOneLevel
 			)
 
-			ConnectedDappsView(
-				connectedDapps: onNetwork.connectedDapps.elements,
+			AuthorizedDappsView(
+				authorizedDapps: onNetwork.authorizedDapps,
 				indentation: inOneLevel
 			) {
-				try! onNetwork.detailsForConnectedDapp($0)
+				try! onNetwork.detailsForAuthorizedDapp($0)
 			}
 		}
 		.padding([.leading], leadingPadding)

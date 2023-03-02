@@ -6,12 +6,12 @@ import ProfileModels
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 	case loadMnemonicFromKeychainForFactorSource(FactorSource)
 
-	case useOnboardingWallet(OnboardingWallet)
+	case useEphemeralPrivateProfile(EphemeralPrivateProfile)
 
 	public var factorSource: FactorSource {
 		switch self {
 		case let .loadMnemonicFromKeychainForFactorSource(factorSource): return factorSource
-		case let .useOnboardingWallet(onboardingWallet): return onboardingWallet.privateFactorSource.factorSource
+		case let .useEphemeralPrivateProfile(ephemeralPrivateProfile): return ephemeralPrivateProfile.privateFactorSource.factorSource
 		}
 	}
 }
@@ -27,22 +27,19 @@ public struct CreateVirtualEntityRequest: Sendable, Equatable {
 	public let curve: Slip10Curve
 	public let entityKind: EntityKind
 	public let displayName: NonEmpty<String>
-	public let keychainAccessFactorSourcesAuthPrompt: String
 
 	public init(
 		curve: Slip10Curve,
 		networkID: NetworkID?,
 		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
 		entityKind: EntityKind,
-		displayName: NonEmpty<String>,
-		keychainAccessFactorSourcesAuthPrompt: String
+		displayName: NonEmpty<String>
 	) throws {
 		self.curve = curve
 		self.networkID = networkID
 		self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
 		self.entityKind = entityKind
 		self.displayName = displayName
-		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
 	}
 }
 

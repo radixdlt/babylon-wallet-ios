@@ -1,5 +1,6 @@
 import ClientPrelude
 import Profile
+import SecureStorageClient
 
 // MARK: - UseFactorSourceClient + DependencyKey
 extension UseFactorSourceClient: DependencyKey {
@@ -26,26 +27,35 @@ extension UseFactorSourceClient: DependencyKey {
 
 import Cryptography
 extension UseFactorSourceClient {
+	public enum Purpose: Sendable, Equatable {
+		case signData(Data, isTransaction: Bool)
+		case createEntity(kind: EntityKind)
+		fileprivate var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
+			switch self {
+			case let .signData(_, isTransaction): return isTransaction ? .signTransaction : .signAuthChallenge
+			case let .createEntity(kind): return .createEntity(kind: kind)
+			}
+		}
+	}
+
 	// FIXME: temporary only
 	public func onDeviceHD(
 		factorSourceID: FactorSource.ID,
-		keychainAccessFactorSourcesAuthPrompt: String,
 		derivationPath: DerivationPath,
 		curve: Slip10Curve,
-		dataToSign: Data? = nil
+		purpose: Purpose
 	) async throws -> (publicKey: Engine.PublicKey, signature: SignatureWithPublicKey?) {
-		@Dependency(\.keychainClient) var keychainClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		guard let loadedMnemonicWithPassphrase = try await keychainClient.loadFactorSourceMnemonicWithPassphrase(
-			factorSourceID: factorSourceID,
-			authenticationPrompt: keychainAccessFactorSourcesAuthPrompt
-		) else {
+		guard let loadedMnemonicWithPassphrase = try await secureStorageClient
+			.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
+		else {
 			struct FailedToFindFactorSource: Swift.Error {}
 			throw FailedToFindFactorSource()
 		}
 		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 
-		if let dataToSign {
+		if case let .signData(dataToSign, _) = purpose {
 			let result = try self.signatureFromOnDeviceHD(.init(hdRoot: hdRoot, derivationPath: derivationPath, curve: curve, data: dataToSign))
 			return try (publicKey: result.publicKey.intoEngine(), signature: result)
 		} else {

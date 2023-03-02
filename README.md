@@ -52,15 +52,6 @@ A blanket rule for what to import in which situation is:
   - if you are testing a **Feature**: `import FeatureTestingPrelude` (automatically linked to all **Feature** test targets).
   - if you are testing **Core** or standalone module: `import TestingPrelude` (automatically linked to all other test targets).
 
-# Navigation
-We are not doing navigation, for now. We defer choice of Navigation solution to "as late as possible". What this means is that we do not use any navigation stack, maybe no NavigationView, at all, for now. So we will have zero transition animation, and no automatic means of "go back" (which means that *for now* we will not try to impl any "go back" logic at all).
-
-The reason for this is that some of us iOS devs still hope for Apple to back-deploy its new NavigationStack API introduced in iOS 16 to iOS 15. Maybe maybe they will do that.
-
-Or Point-Free will make something amazing and iOS 15 compatible, follow [thread related to iOS 16 NavigationStack in TCA here](https://github.com/pointfreeco/swift-composable-architecture/discussions/1140).
-
-So for now, we just use `IfletStore` and `SwitchStore` for displaying correct screen according to state.
-
 # Code style
 
 ## No `protocol`s

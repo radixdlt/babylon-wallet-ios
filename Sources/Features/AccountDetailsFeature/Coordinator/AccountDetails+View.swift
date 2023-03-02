@@ -1,3 +1,4 @@
+import AccountPreferencesFeature
 import AssetsViewFeature
 import AssetTransferFeature
 import FeaturePrelude
@@ -26,16 +27,6 @@ extension AccountDetails.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					NavigationBar(
-						titleText: viewStore.displayName,
-						leadingItem: BackButton {
-							viewStore.send(.dismissAccountDetailsButtonTapped)
-						},
-						trailingItem: accountPreferencesButton(with: viewStore)
-					)
-					.foregroundColor(.app.white)
-					.padding([.horizontal, .top], .medium3)
-
 					AddressView(
 						viewStore.address,
 						copyAddressAction: {
@@ -77,15 +68,42 @@ extension AccountDetails.View {
 				}
 				.background(viewStore.appearanceID.gradient)
 			}
-			.onAppear {
-				viewStore.send(.appeared)
-			}
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AccountDetails.Destinations.State.transfer,
-				action: AccountDetails.Destinations.Action.transfer,
-				content: { AssetTransfer.View(store: $0) }
-			)
+			.navigationBarBackButtonHidden()
+			#if os(iOS)
+				.navigationBarTitleDisplayMode(.inline)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							viewStore.send(.backButtonTapped)
+						}
+						.foregroundColor(.app.white)
+					}
+					ToolbarItem(placement: .principal) {
+						Text(viewStore.displayName)
+							.textStyle(.secondaryHeader)
+							.foregroundColor(.app.white)
+					}
+					ToolbarItem(placement: .navigationBarTrailing) {
+						accountPreferencesButton(with: viewStore)
+							.foregroundColor(.app.white)
+					}
+				}
+			#endif
+				.onAppear {
+					viewStore.send(.appeared)
+				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AccountDetails.Destinations.State.preferences,
+					action: AccountDetails.Destinations.Action.preferences,
+					content: { AccountPreferences.View(store: $0) }
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AccountDetails.Destinations.State.transfer,
+					action: AccountDetails.Destinations.Action.transfer,
+					content: { AssetTransfer.View(store: $0) }
+				)
 		}
 	}
 }
@@ -100,7 +118,7 @@ extension AccountDetails.View {
 	fileprivate func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(
 			action: {
-				viewStore.send(.displayAccountPreferencesButtonTapped)
+				viewStore.send(.preferencesButtonTapped)
 			}, label: {
 				Image(asset: AssetResource.ellipsis)
 			}
@@ -119,7 +137,7 @@ extension AccountDetails.View {
 
 		init(state: AccountDetails.State) {
 			appearanceID = state.account.appearanceID
-			address = .init(address: state.address.address, format: .short())
+			address = .init(address: state.address.address, format: .default)
 			displayName = state.displayName
 		}
 	}
@@ -130,12 +148,17 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountDetails.View(
-			store: .init(
-				initialState: .init(for: .previewValue),
-				reducer: AccountDetails()
+		NavigationStack {
+			AccountDetails.View(
+				store: .init(
+					initialState: .init(for: .previewValue),
+					reducer: AccountDetails()
+				)
 			)
-		)
+			#if os(iOS)
+			.navigationBarTitleDisplayMode(.inline)
+			#endif
+		}
 	}
 }
 #endif

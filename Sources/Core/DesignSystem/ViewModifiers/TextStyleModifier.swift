@@ -170,3 +170,38 @@ extension CGFloat {
 		case 𝟙𝟠 = 18
 	}
 }
+
+extension Text {
+	/// Text formatted as a section heading
+	public var sectionHeading: some View {
+		textStyle(.body1Regular)
+			.foregroundColor(.app.gray2)
+	}
+
+	/// Text formatted as an info item
+	public var infoItem: some View {
+		textStyle(.body1HighImportance)
+			.foregroundColor(.app.gray1)
+	}
+
+	/// An informative block of text
+	public var textBlock: some View {
+		textStyle(.body1HighImportance)
+			.foregroundColor(.app.gray2)
+	}
+
+	/// A url
+	public var urlLink: some View {
+		textStyle(.body1HighImportance)
+			.foregroundColor(.app.blue2)
+	}
+}
+
+extension View {
+	public var flushedLeft: some View {
+		HStack(spacing: 0) {
+			self
+			Spacer(minLength: 0)
+		}
+	}
+}

@@ -1,0 +1,67 @@
+name: CD
+
+on:
+  workflow_dispatch:
+    inputs:
+      flavour:
+        type: choice
+        description: App flavour
+        options:
+          - alpha
+          - beta
+          # - release
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+
+  testFlightDeploy:
+    name: "Test Flight Deploy"
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' && !(contains(github.event.head_commit.message, '[skip cd]') || contains(github.event.head_commit.message, '[cd skip]')) }}
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
+        with:
+          token: ${{ secrets.RADIX_BOT_PAT }}
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2
+          bundler-cache: true
+
+      - uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SWIFT_PROFILE_SSH_KEY }}
+            ${{ secrets.SLIP_10_SSH_KEY }}
+            ${{ secrets.MNEMONIC_SSH_KEY }}
+            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+            ${{ secrets.CONVERSE_SSH_KEY }}
+            ${{ secrets.BITE_SSH_KEY }}
+            ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
+
+      - name: Config local env
+        run: |
+          git config user.name $GIT_USER
+          git config user.email $GIT_USER
+          echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
+          brew install xcbeautify
+        env:
+          GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
+
+      - name: "Deploy"
+        run: |
+          FLAVOUR=alpha
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]
+          then
+            FLAVOUR=${{ github.event.inputs.flavour }}
+          fi
+          bundle exec fastlane ios deploy --env ios.$FLAVOUR
+        env:
+          GIT_TOKEN: ${{ secrets.RADIX_BOT_PAT }}

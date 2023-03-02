@@ -23,12 +23,12 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .newProfile(.delegate(.createdOnboardingWallet(onboardingWallet))):
-			state.onboardingWallet = onboardingWallet
+		case let .newProfile(.delegate(.createdEphemeralPrivateProfile(ephemeralPrivateProfile))):
+			state.ephemeralPrivateProfile = ephemeralPrivateProfile
 
 			state.step = .createAccountCoordinator(.init(
 				config: .init(
-					specificGenesisFactorInstanceDerivationStrategy: .useOnboardingWallet(onboardingWallet),
+					specificGenesisFactorInstanceDerivationStrategy: .useEphemeralPrivateProfile(ephemeralPrivateProfile),
 					isFirstEntity: true,
 					canBeDismissed: false,
 					navigationButtonCTA: .goHome
@@ -40,14 +40,14 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 			fatalError("Failed to create new profile, what to do other than crash..?")
 
 		case .createAccountCoordinator(.delegate(.completed)):
-			guard let onboardingWallet = state.onboardingWallet else {
+			guard let ephemeralPrivateProfile = state.ephemeralPrivateProfile else {
 				assertionFailure("incorrect implementation")
 				return .none
 			}
 
 			return .run { send in
-				await send(.internal(.commitOnboardingWallet(TaskResult {
-					try await profileClient.commitOnboardingWallet(onboardingWallet)
+				await send(.internal(.commitEphemeralPrivateProfile(TaskResult {
+					try await profileClient.commitEphemeralPrivateProfile(ephemeralPrivateProfile)
 				})))
 			}
 		default:
@@ -57,11 +57,11 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case .commitOnboardingWallet(.success):
+		case .commitEphemeralPrivateProfile(.success):
 			return .run { send in
 				await send(.delegate(.completed))
 			}
-		case let .commitOnboardingWallet(.failure(error)):
+		case let .commitEphemeralPrivateProfile(.failure(error)):
 			errorQueue.schedule(error)
 			return .run { send in
 				await send(.delegate(.criticialErrorFailedToCommitEphemeralProfile))

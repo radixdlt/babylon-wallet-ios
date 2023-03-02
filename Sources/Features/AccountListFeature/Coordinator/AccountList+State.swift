@@ -16,7 +16,7 @@ extension AccountList {
 
 // MARK: - Convenience
 extension AccountList.State {
-	public init(accounts: NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>) {
+	public init(accounts: OnNetwork.Accounts) {
 		self.init(
 			accounts: .init(uniqueElements: accounts.rawValue.elements.map(AccountList.Row.State.init(account:)))
 		)

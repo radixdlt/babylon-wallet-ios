@@ -29,8 +29,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
 		var persona: OnNetwork.Persona?
-		var connectedDapp: OnNetwork.ConnectedDapp?
-		var authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
+		var authorizedDapp: OnNetwork.AuthorizedDapp?
+		var authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
@@ -73,8 +73,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case usePersona(
 			P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem,
 			OnNetwork.Persona,
-			OnNetwork.ConnectedDapp?,
-			OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
+			OnNetwork.AuthorizedDapp?,
+			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
@@ -169,9 +169,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return .run { [usePersonaItem, dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
 					if let persona = try await profileClient.getPersonas().first(by: identityAddress) {
-						let connectedDapp = try await profileClient.getConnectedDapps().first(by: dappDefinitionAddress)
-						let authorizedPersona = connectedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
-						await send(.internal(.usePersona(usePersonaItem, persona, connectedDapp, authorizedPersona)))
+						let authorizedDapp = try await profileClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
+						let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
+						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
 					} else {
 						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
 					}
@@ -198,9 +198,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .usePersona(item, persona, connectedDapp, authorizedPersona):
+		case let .usePersona(item, persona, authorizedDapp, authorizedPersona):
 			state.persona = persona
-			state.connectedDapp = connectedDapp
+			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersona
 
 			state.responseItems[.remote(.auth(.usePersona(item)))] = .remote(.auth(.usePersona(.init(
@@ -241,10 +241,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case
-			let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, connectedDapp, authorizedPersona))))),
-			let .path(.element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, connectedDapp, authorizedPersona)))))):
+			let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))),
+			let .path(.element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona)))))):
 			state.persona = persona
-			state.connectedDapp = connectedDapp
+			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersona
 
 			let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
@@ -364,7 +364,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					// Save login date, data fields, and ongoing accounts to Profile
 					if let persona = state.persona {
 						let networkID = await profileClient.getCurrentNetworkID()
-						var connectedDapp = state.connectedDapp ?? .init(
+						var authorizedDapp = state.authorizedDapp ?? .init(
 							networkID: networkID,
 							dAppDefinitionAddress: state.remoteInteraction.metadata.dAppDefinitionAddress,
 							displayName: state.dappMetadata.name
@@ -399,7 +399,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							}
 							return (numberOfAccounts, accounts)
 						}()
-						let sharedAccounts: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts?
+						let sharedAccounts: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 							sharedAccounts = try .init(
 								accountsReferencedByAddress: OrderedSet(try accounts.map { try .init(address: $0.address) }),
@@ -409,7 +409,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							sharedAccounts = nil
 						}
 						@Dependency(\.date) var now
-						let authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple = {
+						let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple = {
 							if var authorizedPersona = state.authorizedPersona {
 								// NB: update personal data fields here
 								authorizedPersona.lastLogin = now()
@@ -426,14 +426,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 								)
 							}
 						}()
-						connectedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+						authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
 						// FIXME: @Cyon these add/update funcs should probably be one single function.
-						// Something like `profileClient.saveConnectedDapp` which updates by
+						// Something like `profileClient.saveAuthorizedDapp` which updates by
 						// dApp ID or adds the whole dApp if it doesn't exist.
-						if state.connectedDapp == nil {
-							try await profileClient.addConnectedDapp(connectedDapp)
+						if state.authorizedDapp == nil {
+							try await profileClient.addAuthorizedDapp(authorizedDapp)
 						} else {
-							try await profileClient.updateConnectedDapp(connectedDapp)
+							try await profileClient.updateAuthorizedDapp(authorizedDapp)
 						}
 					}
 
