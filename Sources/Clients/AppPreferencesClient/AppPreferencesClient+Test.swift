@@ -16,7 +16,7 @@ extension AppPreferencesClient {
 	static let noop = Self(
 		getPreferences: { .default },
 		updatePreferences: { _ in },
-		extractProfileSnapshot: { throw NoopError() },
+		extractProfileSnapshot: { fatalError() },
 		deleteProfileAndFactorSources: {}
 	)
 }
