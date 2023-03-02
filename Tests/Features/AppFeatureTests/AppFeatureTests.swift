@@ -3,7 +3,6 @@ import FeatureTestingPrelude
 import OnboardingClient
 import OnboardingFeature
 @testable import Profile
-import ProfileClient
 @testable import SplashFeature
 
 @MainActor
@@ -112,9 +111,7 @@ final class AppFeatureTests: TestCase {
 		let error = Profile.JSONDecodingError.KnownDecodingError.decodingError(.init(decodingError: decodingError))
 		let foobar: Profile.JSONDecodingError = .known(error)
 		let failure: Profile.LoadingFailure = .decodingFailure(json: Data(), foobar)
-//		let result: ProfileClient.LoadProfileResult = .failure(
-//			failure
-//		)
+
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: failure)
 		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
 			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, loadProfileOutcome: outcome))
@@ -171,7 +168,7 @@ final class AppFeatureTests: TestCase {
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = 0
 		let failedToCreateProfileFromSnapshot = Profile.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
-//		let result = ProfileClient.LoadProfileResult.failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
+
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: Profile.LoadingFailure.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
 		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
 			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, loadProfileOutcome: outcome))

@@ -75,6 +75,7 @@ package.addModules([
 		name: "CreateEntityFeature",
 		dependencies: [
 			"Cryptography",
+			"FactorSourcesClient",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
@@ -163,7 +164,7 @@ package.addModules([
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
 			"CreateEntityFeature",
-			"GatewayAPI",
+			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),
@@ -195,6 +196,7 @@ package.addModules([
 		name: "PersonasFeature",
 		dependencies: [
 			"CreateEntityFeature",
+			"PersonasClient",
 		],
 		tests: .yes()
 	),
@@ -223,6 +225,7 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			"GatewayAPI",
+			"GatewaysClient",
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -365,6 +368,17 @@ package.addModules([
 		name: "LocalAuthenticationClient",
 		dependencies: [],
 		tests: .yes()
+	),
+
+	.client(
+		name: "NetworkSwitchingClient",
+		dependencies: [
+			"AccountsClient",
+			"GatewaysAPI",
+			"ProfileStore",
+			"GatewaysClient",
+		],
+		tests: .no
 	),
 
 	.client(

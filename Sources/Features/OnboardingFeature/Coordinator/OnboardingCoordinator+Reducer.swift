@@ -1,8 +1,32 @@
 import CreateEntityFeature
 import FeaturePrelude
 
-// MARK: - Onboarding
-public struct OnboardingCoordinator: Sendable, ReducerProtocol {
+// MARK: - OnboardingCoordinator
+public struct OnboardingCoordinator: Sendable, FeatureReducer {
+	public enum State: Equatable {
+		case importProfile(ImportProfile.State)
+		case createAccountCoordinator(CreateAccountCoordinator.State)
+
+		public init() {
+			self = .createAccountCoordinator(.init())
+		}
+	}
+
+	// MARK: Action
+	public enum Action: Sendable, Equatable {
+		case child(ChildAction)
+		case delegate(DelegateAction)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case importProfile(ImportProfile.Action)
+		case createAccountCoordinator(CreateAccountCoordinator.Action)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case completed
+	}
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -14,30 +38,27 @@ public struct OnboardingCoordinator: Sendable, ReducerProtocol {
 				ImportProfile()
 			}
 			.ifCaseLet(
-				/OnboardingCoordinator.State.newProfileThenAccountCoordinator,
-				action: /Action.child .. Action.ChildAction.newProfileThenAccountCoordinator
+				/OnboardingCoordinator.State.createAccountCoordinator,
+				action: /Action.child .. Action.ChildAction.createAccountCoordinator
 			) {
-				NewProfileThenAccountCoordinator()
+				CreateAccountCoordinator()
 			}
 	}
 
-	private func core(state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .child(.importProfile(.delegate(.imported))):
-			return .run { send in
-				await send(.delegate(.completed))
-			}
-
-		case .child(.newProfileThenAccountCoordinator(.delegate(.completed))):
-			return .run { send in
-				await send(.delegate(.completed))
-			}
-
-		case .child(.newProfileThenAccountCoordinator(.delegate(.criticialErrorFailedToCommitEphemeralProfile))):
-			fatalError("Failed to commit ephemeral profile")
-
-		case .child, .delegate:
-			return .none
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .createAccountCoordinator(.delegate(.completed)):
+			return .send(.delegate(.completed))
+		case .createAccountCoordinator(.delegate(.dismiss)):
+			fatalError("not possible")
+		case .importProfile(.delegate(.imported)):
+			return .send(.delegate(.completed))
 		}
 	}
 }
+
+#if DEBUG
+extension OnboardingCoordinator.State {
+	public static let previewValue: Self = .init()
+}
+#endif

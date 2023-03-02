@@ -55,7 +55,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			),
 			reducer: TransactionSigning()
 		) {
-			$0.profileClient.getCurrentNetworkID = { .nebunet }
+			$0.gateways.getCurrentGateway = { .nebunet }
 			$0.transactionClient.addLockFeeInstructionToManifest = { _ in throw transactionError }
 			$0.errorQueue.schedule = { XCTAssertEqual($0 as? NoopError, NoopError()) }
 		}
@@ -75,7 +75,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			),
 			reducer: TransactionSigning()
 		) {
-			$0.profileClient.getCurrentNetworkID = { .nebunet }
+			$0.gateways.getCurrentGateway = { .nebunet }
 			$0.transactionClient.addLockFeeInstructionToManifest = { [self] _ in mockManifestWithLockFee }
 			$0.errorQueue.schedule = { _ in }
 		}

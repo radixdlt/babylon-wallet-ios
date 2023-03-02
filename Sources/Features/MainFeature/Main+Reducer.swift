@@ -1,6 +1,6 @@
+import AppPreferencesClient
 import FeaturePrelude
 import HomeFeature
-import ProfileClient
 import SettingsFeature
 
 public struct Main: Sendable, FeatureReducer {
@@ -47,7 +47,7 @@ public struct Main: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.keychainClient) var keychainClient
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
 
@@ -78,7 +78,7 @@ public struct Main: Sendable, FeatureReducer {
 
 		case .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources)))):
 			return .run { send in
-				try await profileClient.deleteProfileAndFactorSources()
+				try await appPreferencesClient.deleteProfileAndFactorSources()
 				await send(.delegate(.removedWallet))
 			}
 

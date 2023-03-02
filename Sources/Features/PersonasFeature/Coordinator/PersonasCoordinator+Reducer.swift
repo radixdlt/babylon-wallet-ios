@@ -1,10 +1,11 @@
 import CreateEntityFeature
 import FeaturePrelude
+import PersonasClient
 
 // MARK: - PersonasCoordinator
 public struct PersonasCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.personasClient) var personasClient
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -65,7 +66,7 @@ extension PersonasCoordinator {
 	func loadPersonas() -> EffectTask<Action> {
 		.task {
 			let result = await TaskResult {
-				try await profileClient.getPersonas()
+				try await personasClient.getPersonas()
 			}
 			return .internal(.loadPersonasResult(result))
 		}

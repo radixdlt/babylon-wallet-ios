@@ -1,6 +1,7 @@
 import AccountsClient
 import AuthorizedDappsClient
 import FeaturePrelude
+import GatewaysClient
 import PersonasClient
 import TransactionSigningFeature
 
@@ -152,6 +153,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 	}
 
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
@@ -368,7 +370,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return .run { [state] send in
 					// Save login date, data fields, and ongoing accounts to Profile
 					if let persona = state.persona {
-						let networkID = await profileClient.getCurrentNetworkID()
+						let networkID = await gatewaysClient.getCurrentNetworkID()
 						var authorizedDapp = state.authorizedDapp ?? .init(
 							networkID: networkID,
 							dAppDefinitionAddress: state.remoteInteraction.metadata.dAppDefinitionAddress,

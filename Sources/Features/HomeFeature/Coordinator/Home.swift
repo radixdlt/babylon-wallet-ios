@@ -35,6 +35,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case task
 		case pullToRefreshStarted
 		case createAccountButtonTapped
 	}
@@ -115,11 +116,24 @@ public struct Home: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .task:
+			return .run { send in
+				do {
+					for try await accounts in try await accountsClient.accountsOnCurrentNetwork() {
+						guard !Task.isCancelled else {
+							return
+						}
+						await send(.internal(.accountsLoadedResult(.success(accounts))))
+					}
+				} catch {
+					errorQueue.schedule(error)
+				}
+			}
 		case .appeared:
-			return loadAccountsAndSettings()
+			return getAppPreferences()
 
 		case .pullToRefreshStarted:
-			return loadAccountsAndSettings()
+			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList.accounts))
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -260,7 +274,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		case .destination(.presented(.createAccount(.delegate(.completed)))):
 			state.destination = nil
-			return loadAccountsAndSettings()
+			return .none
 
 		default:
 			return .none
@@ -283,13 +297,8 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadAccountsAndSettings() -> EffectTask<Action> {
+	private func getAppPreferences() -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.accountsLoadedResult(
-				TaskResult {
-					try await accountsClient.getAccountsOnCurrentNetwork()
-				}
-			)))
 			await send(.internal(.appPreferencesLoadedResult(
 				TaskResult {
 					try await appPreferencesClient.getPreferences()

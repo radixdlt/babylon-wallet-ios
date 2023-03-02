@@ -1,6 +1,6 @@
 import Cryptography
+import FactorSourcesClient
 import FeaturePrelude
-import ProfileClient
 
 public typealias CreateAccountCoordinator = CreateEntityCoordinator<OnNetwork.Account>
 public typealias CreatePersonaCoordinator = CreateEntityCoordinator<OnNetwork.Persona>
@@ -10,7 +10,7 @@ public struct CreateEntityCoordinator<
 	_Entity: EntityProtocol & Sendable & Hashable
 >: Sendable, ReducerProtocol {
 	public typealias Entity = _Entity
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
@@ -43,7 +43,7 @@ public struct CreateEntityCoordinator<
 		case let .child(.step0_nameNewEntity(.delegate(.named(name)))):
 			return .run { send in
 				await send(.internal(.loadFactorSourcesResult(TaskResult {
-					try await profileClient.getFactorSources()
+					try await factorSourcesClient.getFactorSources()
 				}, beforeCreatingEntityWithName: name)))
 			}
 

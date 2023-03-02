@@ -1,7 +1,6 @@
 @testable import CreateEntityFeature
 import Cryptography
 import FeatureTestingPrelude
-import ProfileClient
 
 @MainActor
 final class CreationOfEntityTests: TestCase {
@@ -18,11 +17,11 @@ final class CreationOfEntityTests: TestCase {
 			),
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {
-			$0.profileClient.createUnsavedVirtualEntity = { request in
+			$0.onboardingClient.createNewUnsavedVirtualEntity = { request in
 				XCTAssertEqual(request.displayName, account.displayName)
 				return account
 			}
-			$0.profileClient.addAccount = {
+			$0.onboardingClient.saveNewVirtualEntity = {
 				XCTAssertEqual($0, account)
 			}
 		}
@@ -43,7 +42,7 @@ final class CreationOfEntityTests: TestCase {
 			),
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {
-			$0.profileClient.createUnsavedVirtualEntity = { request in
+			$0.onboardingClient.createNewUnsavedVirtualEntity = { request in
 				XCTAssertEqual(request.displayName, "NeverCreated")
 				throw createNewAccountError
 			}

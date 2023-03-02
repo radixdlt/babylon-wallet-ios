@@ -4,7 +4,6 @@ import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import PersonasFeature
-import ProfileClient
 #if DEBUG
 // import ProfileView
 import SecureStorageClient

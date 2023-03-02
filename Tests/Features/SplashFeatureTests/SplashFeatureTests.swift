@@ -11,13 +11,6 @@ final class SplashFeatureTests: TestCase {
 
 		let testScheduler = DispatchQueue.test
 
-		//        let newProfile = withDependencies {
-		//            $0.uuid = .incrementing
-		//        } operation: {
-		//            Profile(factorSource: factorSource)
-//
-		//        }
-
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
@@ -27,9 +20,6 @@ final class SplashFeatureTests: TestCase {
 			}
 
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			//            store.dependencies.profileClient.loadProfile = {
-			//                .success(newProfile)
-			//            }
 			$0.onboardingClient.loadProfile = {
 				.newUser
 			}

@@ -1,6 +1,8 @@
-import FeaturePrelude
+import AccountsClient
+import ClientsPrelude
 import GatewayAPI
-import ProfileClient
+import GatewaysClient
+import ProfileStore
 
 extension DependencyValues {
 	public var networkSwitchingClient: NetworkSwitchingClient {
@@ -10,12 +12,14 @@ extension DependencyValues {
 }
 
 extension NetworkSwitchingClient {
-	public static let liveValue: Self = {
+	public static let liveValue = Self.live()
+	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.accountsClient) var accountsClient
 
-		let getGateway: GetGateway = {
-			await profileClient.getGateways().current
+		let getCurrentGateway: GetCurrentGateway = {
+			await gatewaysClient.getCurrentGateway()
 		}
 
 		let validateGatewayURL: ValidateGatewayURL = { newURL -> Gateway? in
@@ -37,7 +41,7 @@ extension NetworkSwitchingClient {
 		}
 
 		let hasAccountOnNetwork: HasAccountOnNetwork = { gateway in
-			try await profileClient.hasAccountOnNetwork(gateway.network.id)
+			try await accountsClient.hasAccountOnNetwork(gateway.network.id)
 		}
 
 		let switchTo: SwitchTo = { gateway in
@@ -45,17 +49,17 @@ extension NetworkSwitchingClient {
 				throw NoAccountOnNetwork()
 			}
 
-			try await profileClient.setGateway(gateway)
+			try await gatewaysClient.changeGateway(gateway)
 			return gateway
 		}
 
 		return Self(
-			getGateway: getGateway,
+			getCurrentGateway: getCurrentGateway,
 			validateGatewayURL: validateGatewayURL,
 			hasAccountOnNetwork: hasAccountOnNetwork,
 			switchTo: switchTo
 		)
-	}()
+	}
 }
 
 // MARK: - NoAccountOnNetwork

@@ -1,13 +1,12 @@
 import CreateEntityFeature
 import FeaturePrelude
 import GatewayAPI
-import ProfileClient
+import NetworkSwitchingClient
 
 // MARK: - ManageGatewayAPIEndpoints
 public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
-	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
 }
