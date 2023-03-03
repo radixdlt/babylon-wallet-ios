@@ -9,16 +9,8 @@ extension PersonaList {
 		public init(store: StoreOf<PersonaList>) {
 			self.store = store
 		}
-	}
-}
 
-extension PersonaList.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { _ in
+		public var body: some SwiftUI.View {
 			ScrollView {
 				Text(L10n.PersonaList.subtitle)
 					.foregroundColor(.app.gray2)
@@ -48,15 +40,6 @@ extension PersonaList.View {
 	}
 }
 
-// MARK: - PersonaList.View.ViewState
-extension PersonaList.View {
-	struct ViewState: Equatable {
-		init(state: PersonaList.State) {
-			// TODO: implement
-		}
-	}
-}
-
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
@@ -70,5 +53,9 @@ struct Personas_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension PersonaList.State {
+	public static let previewValue: Self = .init()
 }
 #endif

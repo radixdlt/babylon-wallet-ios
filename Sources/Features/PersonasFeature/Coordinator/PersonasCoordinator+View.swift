@@ -10,16 +10,8 @@ extension PersonasCoordinator {
 		public init(store: StoreOf<PersonasCoordinator>) {
 			self.store = store
 		}
-	}
-}
 
-extension PersonasCoordinator.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
+		public var body: some SwiftUI.View {
 			ZStack {
 				PersonaList.View(
 					store: store.scope(
@@ -27,7 +19,7 @@ extension PersonasCoordinator.View {
 						action: { .child(.personaList($0)) }
 					)
 				)
-				.onAppear { viewStore.send(.appeared) }
+				.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 
 				IfLetStore(
 					store.scope(
@@ -37,15 +29,6 @@ extension PersonasCoordinator.View {
 					then: { CreatePersonaCoordinator.View(store: $0) }
 				)
 			}
-		}
-	}
-}
-
-// MARK: - PersonasCoordinator.View.ViewState
-extension PersonasCoordinator.View {
-	struct ViewState: Equatable {
-		init(state: PersonasCoordinator.State) {
-			// TODO: implement
 		}
 	}
 }
@@ -63,5 +46,9 @@ struct PersonasCoordinator_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension PersonasCoordinator.State {
+	public static let previewValue: Self = .init()
 }
 #endif
