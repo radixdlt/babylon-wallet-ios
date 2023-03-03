@@ -39,14 +39,9 @@ extension SecureStorageClient: DependencyKey {
 			// BEWARE! If the user deletes the passcode any item protected by this `accessibility` WILL GET DELETED.
 			let mostSecureAccessibility: KeychainAccess.Accessibility = .whenPasscodeSetThisDeviceOnly
 
-			guard config.isBiometricsSetUp == true else {
-				// We use `userPresence` instead of explictly using `.devicePasscode` to enabled user to "upgrade" to
-				// biometrics in the future (`.userPresence` "includes" `.devicePasscode`).
-				return .init(accessibility: mostSecureAccessibility, authenticationPolicy: .userPresence)
-			}
-
-			// We use `biometryAny` to allow user to delete/update biometry.
-			return .init(accessibility: mostSecureAccessibility, authenticationPolicy: .biometryAny)
+			// We use `userPresence` always, disregardong of biometrics being setup up or not,
+			// to allow user to be able to fallback to passcode if biometrics.
+			return .init(accessibility: mostSecureAccessibility, authenticationPolicy: .userPresence)
 		}
 
 		let loadProfileSnapshotData: LoadProfileSnapshotData = {

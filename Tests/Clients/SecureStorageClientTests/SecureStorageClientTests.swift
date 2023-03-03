@@ -30,11 +30,11 @@ final class SecureStorageClientTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_authPolicy_biometryAny() async throws {
+	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_authPolicy_userPresence() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
 		} assertKeychainSetItemWithAuthRequest: { request in
-			XCTAssertEqual(request.authenticationPolicy, .biometryAny)
+			XCTAssertEqual(request.authenticationPolicy, .userPresence)
 		}
 	}
 
