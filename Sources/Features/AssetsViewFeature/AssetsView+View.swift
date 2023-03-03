@@ -5,10 +5,10 @@ import NonFungibleTokenListFeature
 // MARK: - AssetsView.View
 extension AssetsView {
 	public struct ViewState: Equatable {
-		var type: AssetsView.AssetsViewType
+		let assetKind: AssetsView.State.AssetKind
 
 		init(state: AssetsView.State) {
-			type = state.type
+			assetKind = state.kind
 		}
 	}
 
@@ -30,7 +30,7 @@ extension AssetsView {
 					selectorView(with: viewStore)
 						.padding([.top, .horizontal], .medium1)
 
-					switch viewStore.state.type {
+					switch viewStore.assetKind {
 					case .tokens:
 						FungibleTokenList.View(
 							store: store.scope(
@@ -62,12 +62,12 @@ extension AssetsView {
 
 // MARK: - Private Methods
 extension AssetsView.View {
-	fileprivate func selectorView(with viewStore: ViewStoreOf<AssetsView>) -> some View {
+	private func selectorView(with viewStore: ViewStoreOf<AssetsView>) -> some SwiftUI.View {
 		HStack(spacing: .zero) {
 			Spacer()
 
-			ForEach(AssetsView.AssetsViewType.allCases) { type in
-				selectorButton(type: type, with: viewStore) {
+			ForEach(AssetsView.State.AssetKind.allCases) { assetKind in
+				selectorButton(for: assetKind, with: viewStore) {
 					viewStore.send(.listSelectorTapped(type))
 				}
 			}
@@ -76,21 +76,24 @@ extension AssetsView.View {
 		}
 	}
 
-	fileprivate func selectorButton(
-		type: AssetsView.AssetsViewType,
+	@ViewBuilder
+	private func selectorButton(
+		for assetKind: AssetsView.State.AssetKind,
 		with viewStore: ViewStoreOf<AssetsView>,
 		action: @escaping () -> Void
-	) -> some View {
-		Text(type.displayText)
-			.foregroundColor(type == viewStore.type ? .app.white : .app.gray1)
+	) -> some SwiftUI.View {
+		let isSelected = assetKind == viewStore.assetKind
+		Text(assetKind.displayText)
+			.foregroundColor(isSelected ? .app.white : .app.gray1)
 			.textStyle(.body1HighImportance)
 			.frame(height: .large1)
 			.padding(.horizontal, .medium2)
-			.background(type == viewStore.type ?
-				RoundedRectangle(cornerRadius: .medium2)
-				.fill(Color.app.gray1) : nil
+			.background(
+				isSelected
+					? RoundedRectangle(cornerRadius: .medium2).fill(Color.app.gray1)
+					: nil
 			)
-			.id(type)
+			.id(assetKind)
 			.onTapGesture {
 				action()
 			}
