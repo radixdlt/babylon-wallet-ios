@@ -12,7 +12,7 @@ extension ScanQR.State {
 
 // MARK: - ScanQR.View
 extension ScanQR {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 		#endif // macOS
@@ -52,7 +52,7 @@ extension ScanQR {
 extension ScanQR.View {
 	@ViewBuilder
 	private func scanQRCode(
-		viewStore: ViewStore<ScanQR.ViewState, ScanQR.ViewAction>
+		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
@@ -80,7 +80,7 @@ extension ScanQR.View {
 
 	@ViewBuilder
 	private func macOSInputView(
-		viewStore: ViewStore<ScanQR.ViewState, ScanQR.ViewAction>
+		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {

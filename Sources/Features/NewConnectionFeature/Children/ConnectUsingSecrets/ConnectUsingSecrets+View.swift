@@ -9,7 +9,7 @@ extension ConnectUsingSecrets.State {
 
 // MARK: - ConnectUsingSecrets.View
 extension ConnectUsingSecrets {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		public var screenState: ControlState
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String

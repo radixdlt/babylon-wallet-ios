@@ -28,7 +28,7 @@ extension AssetTransfer.State {
 
 // MARK: - AssetTransfer.View
 extension AssetTransfer {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		struct Input: Equatable {
 			let fromAddress: AddressView.ViewState
 			let amount: String

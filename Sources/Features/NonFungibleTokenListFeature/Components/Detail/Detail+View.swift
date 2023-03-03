@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenList.Detail {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		var nftID: AddressView.ViewState
 		var fullNFTAddress: String
 		var description: String?
