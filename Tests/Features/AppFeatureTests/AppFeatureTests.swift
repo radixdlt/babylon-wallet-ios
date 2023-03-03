@@ -58,7 +58,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.existingProfileLoaded)))))
@@ -91,7 +91,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser)))))
@@ -131,7 +131,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome)))))
@@ -193,7 +193,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
@@ -253,7 +253,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.alert = .incompatibleProfileErrorAlert(

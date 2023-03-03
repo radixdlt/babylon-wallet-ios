@@ -35,22 +35,22 @@ final class SplashFeatureTests: TestCase {
 			$0.loadProfileOutcome = .newUser
 		}
 		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig)))) {
+		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.passcodeCheckFailedAlert = .init(
-				title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
+				title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
 				actions: {
 					ButtonState(
 						role: .cancel,
 						action: .send(.cancelButtonTapped),
-						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.cancelButtonTitle) }
+						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.cancelButtonTitle) }
 					)
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.settingsButtonTitle) }
+						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.settingsButtonTitle) }
 					)
 				},
-				message: { .init(L10n.Splash.Alert.BiometricsCheckFailed.message) }
+				message: { .init(L10n.Splash.Alert.PasscodeCheckFailed.message) }
 			)
 		}
 	}
@@ -99,7 +99,7 @@ final class SplashFeatureTests: TestCase {
 			$0.loadProfileOutcome = outcome
 		}
 		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig))))
+		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig))))
 		await store.receive(.delegate(.loadProfileOutcome(outcome)))
 	}
 }
