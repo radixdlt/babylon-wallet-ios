@@ -96,7 +96,7 @@ public struct CreateEntityCoordinator<
 				state.step = .step0_nameNewEntity(
 					.init(
 						isFirst: state.config.isFirstEntity,
-						inputtedEntityName: createState.name // preserve the name
+						inputtedEntityName: createState.name.rawValue // preserve the name
 					)
 				)
 			default:
