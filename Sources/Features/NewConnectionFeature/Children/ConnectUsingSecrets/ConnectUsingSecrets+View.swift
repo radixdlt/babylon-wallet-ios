@@ -10,10 +10,10 @@ extension ConnectUsingSecrets.State {
 // MARK: - ConnectUsingSecrets.View
 extension ConnectUsingSecrets {
 	public struct ViewState: Equatable {
-		public var screenState: ControlState
-		public var nameOfConnection: String
-		public var saveButtonControlState: ControlState
-		@BindableState public var focusedField: ConnectUsingSecrets.State.Field?
+		let screenState: ControlState
+		let nameOfConnection: String
+		let saveButtonControlState: ControlState
+		let focusedField: ConnectUsingSecrets.State.Field?
 
 		init(state: ConnectUsingSecrets.State) {
 			nameOfConnection = state.nameOfConnection
@@ -51,7 +51,7 @@ extension ConnectUsingSecrets {
 							send: { .nameOfConnectionChanged($0) }
 						),
 						hint: L10n.NewConnection.textFieldHint,
-						binding: $focusedField,
+						focusState: $focusedField,
 						equals: .connectionName,
 						first: viewStore.binding(
 							get: \.focusedField,

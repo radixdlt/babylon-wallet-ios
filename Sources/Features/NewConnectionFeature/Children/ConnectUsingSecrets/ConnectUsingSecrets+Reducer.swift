@@ -8,7 +8,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 		public var isConnecting: Bool
 		public var nameOfConnection: String
 		public var isNameValid: Bool
-		@BindableState public var focusedField: Field?
+		public var focusedField: Field?
 
 		public init(
 			connectionPassword: ConnectionPassword,

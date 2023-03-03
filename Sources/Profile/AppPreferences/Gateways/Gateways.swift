@@ -70,10 +70,14 @@ extension Gateways {
 	fileprivate mutating func add(_ newOther: Gateway) {
 		other.append(newOther)
 	}
+
+	fileprivate mutating func remove(_ gateway: Gateway) {
+		other.remove(gateway)
+	}
 }
 
 extension Profile {
-	/// Requires the presense of an `OnNetwork` in `perNetwork` for
+	/// Requires the presence of an `OnNetwork` in `perNetwork` for
 	/// `newGateway.network.id`, otherwise an error is thrown.
 	public mutating func changeGateway(to newGateway: Gateway) throws {
 		let newNetworkID = newGateway.network.id
@@ -82,13 +86,12 @@ extension Profile {
 		try appPreferences.gateways.changeCurrent(to: newGateway)
 	}
 
-	/// Requires the presense of an `OnNetwork` in `perNetwork` for
-	/// `newGateway.network.id`, otherwise an error is thrown.
 	public mutating func addNewGateway(_ newGateway: Gateway) throws {
-		let newNetworkID = newGateway.network.id
-		// Ensure we have accounts on network, else do not change
-		_ = try onNetwork(id: newNetworkID)
 		appPreferences.gateways.add(newGateway)
+	}
+
+	public mutating func removeGateway(_ gateway: Gateway) throws {
+		appPreferences.gateways.remove(gateway)
 	}
 }
 

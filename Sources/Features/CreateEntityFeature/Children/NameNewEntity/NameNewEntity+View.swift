@@ -10,13 +10,13 @@ extension NameNewEntity.State {
 extension NameNewEntity {
 	public struct ViewState: Equatable {
 		public let namePlaceholder: String
-		public var titleText: String
-		public var entityName: String
+		public let titleText: String
+		public let entityName: String
 		public let entityKindName: String
-		public var createEntityButtonState: ControlState
-		@BindingState public var focusedField: NameNewEntity.State.Field?
+		public let createEntityButtonState: ControlState
+		public let focusedField: State.Field?
 
-		init(state: NameNewEntity.State) {
+		init(state: State) {
 			let entityKind = Entity.entityKind
 			let entityKindName = entityKind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
 			self.entityKindName = entityKindName
@@ -39,7 +39,7 @@ extension NameNewEntity {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<NameNewEntity>
-		@FocusState private var focusedField: NameNewEntity.State.Field?
+		@FocusState private var focusedField: State.Field?
 
 		public init(store: StoreOf<NameNewEntity>) {
 			self.store = store
@@ -64,7 +64,7 @@ extension NameNewEntity {
 									placeholder: viewStore.namePlaceholder,
 									text: nameBinding,
 									hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
-									binding: $focusedField,
+									focusState: $focusedField,
 									equals: .entityName,
 									first: viewStore.binding(
 										get: \.focusedField,
