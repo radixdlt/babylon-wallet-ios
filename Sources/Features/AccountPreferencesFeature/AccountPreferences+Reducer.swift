@@ -2,27 +2,57 @@ import FaucetClient
 import FeaturePrelude
 
 // MARK: - AccountPreferences
-public struct AccountPreferences: Sendable, ReducerProtocol {
+public struct AccountPreferences: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public let address: AccountAddress
+		public var faucetButtonState: ControlState
+
+		public init(
+			address: AccountAddress,
+			faucetButtonState: ControlState = .enabled
+		) {
+			self.address = address
+			self.faucetButtonState = faucetButtonState
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case appeared
+		case closeButtonTapped
+		case faucetButtonTapped
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case isAllowedToUseFaucet(TaskResult<Bool>)
+		case refreshAccountCompleted
+		case hideLoader
+		case cancelRefresh
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case dismiss
+		case refreshAccount(AccountAddress)
+	}
+
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
+
 	private enum RefreshID {}
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.closeButtonTapped)):
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return loadIsAllowedToUseFaucet(&state)
+
+		case .closeButtonTapped:
 			return .run { [address = state.address] send in
 				await send(.delegate(.refreshAccount(address)))
 				await send(.delegate(.dismiss))
 			}
 
-		case .delegate:
-			return .cancel(id: RefreshID.self)
-
-		case .internal(.view(.didAppear)):
-			return loadIsAllowedToUseFaucet(&state)
-
-		case .internal(.view(.faucetButtonTapped)):
+		case .faucetButtonTapped:
 			state.faucetButtonState = .loading(.local)
 			return .run { [address = state.address] send in
 				do {
@@ -33,28 +63,35 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 					await send(.delegate(.refreshAccount(address)))
 				} catch {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.system(.hideLoader)))
+					await send(.internal(.hideLoader))
 					errorQueue.schedule(error)
 				}
 			}
 			.cancellable(id: RefreshID.self)
+		}
+	}
 
-		case let .internal(.system(.isAllowedToUseFaucet(.success(value)))):
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .isAllowedToUseFaucet(.success(value)):
 			state.faucetButtonState = value ? .enabled : .disabled
 			return .none
 
-		case let .internal(.system(.isAllowedToUseFaucet(.failure(error)))):
+		case let .isAllowedToUseFaucet(.failure(error)):
 			state.faucetButtonState = .disabled
 			errorQueue.schedule(error)
 			return .none
 
-		case .internal(.system(.refreshAccountCompleted)):
+		case .refreshAccountCompleted:
 			state.faucetButtonState = .disabled
 			return .none
 
-		case .internal(.system(.hideLoader)):
+		case .hideLoader:
 			state.faucetButtonState = .enabled
 			return .none
+
+		case .cancelRefresh:
+			return .cancel(id: RefreshID.self)
 		}
 	}
 }
@@ -63,11 +100,11 @@ extension AccountPreferences {
 	private func loadIsAllowedToUseFaucet(_ state: inout State) -> EffectTask<Action> {
 		state.faucetButtonState = .loading(.local)
 		return .run { [address = state.address] send in
-			await send(.internal(.system(.isAllowedToUseFaucet(
+			await send(.internal(.isAllowedToUseFaucet(
 				TaskResult {
 					try await faucetClient.isAllowedToUseFaucet(address)
 				}
-			))))
+			)))
 		}
 	}
 }

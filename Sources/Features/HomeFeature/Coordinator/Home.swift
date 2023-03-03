@@ -165,7 +165,7 @@ public struct Home: Sendable, FeatureReducer {
 			// FIXME: Replace currency with value from Profile!
 			let currency = appPreferences.display.fiatCurrencyPriceTarget
 			state.accountList.accounts.forEach {
-				state.accountList.accounts[id: $0.address]?.currency = currency
+				state.accountList.accounts[id: $0.account.address]?.currency = currency
 			}
 			return .run { send in
 				await send(.internal(.isCurrencyAmountVisibleLoaded(appPreferences.display.isCurrencyAmountVisible)))
@@ -175,7 +175,7 @@ public struct Home: Sendable, FeatureReducer {
 			// account list
 			state.accountList.accounts.forEach {
 				// TODO: replace hardcoded true value with isVisible value
-				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = true
+				state.accountList.accounts[id: $0.account.address]?.isCurrencyAmountVisible = true
 			}
 
 			// account details
@@ -189,8 +189,8 @@ public struct Home: Sendable, FeatureReducer {
 
 		case let .accountPortfoliosResult(.success(accountPortfolios)):
 			state.accountPortfolios = accountPortfolios
-			state.accountList.accounts.forEach { account in
-				let address = account.address
+			state.accountList.accounts.forEach { row in
+				let address = row.account.address
 				let accountPortfolio = accountPortfolios[id: address] ?? AccountPortfolio.empty(owner: address)
 				state.accountList.accounts[id: address]?.portfolio = accountPortfolio
 			}
@@ -258,7 +258,7 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.internal(.singleAccountPortfolioResult(TaskResult {
 					try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
 				})))
-				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.system(.refreshAccountCompleted)))))))))))
+				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.refreshAccountCompleted))))))))))
 			}
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
