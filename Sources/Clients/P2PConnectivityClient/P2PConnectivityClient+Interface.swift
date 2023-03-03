@@ -1,6 +1,5 @@
 import ClientPrelude
 import RadixConnect
-import RadixConnectModels
 
 // MARK: - DependencyValues
 extension DependencyValues {

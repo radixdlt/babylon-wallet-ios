@@ -580,7 +580,7 @@ package.addModules([
 		name: "Profile",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit",
+			"EngineToolkit", // address derivation
 			"RadixConnectModels",
 			"Resources",
 		],

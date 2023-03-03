@@ -8,16 +8,10 @@ import PersonasFeature
 
 // MARK: - AppSettings
 public struct AppSettings: FeatureReducer {
-<<<<<<< HEAD
-        @Dependency(\.errorQueue) var errorQueue
-        @Dependency(\.profileClient) var profileClient
-        @Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
-=======
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pClientsClient) var p2pClientsClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
->>>>>>> main
 
         public typealias Store = StoreOf<Self>
 
@@ -152,15 +146,6 @@ public struct AppSettings: FeatureReducer {
                 case .appSettingsButtonTapped:
                         return .none
 
-<<<<<<< HEAD
-                #if DEBUG
-                case .debugInspectProfileButtonTapped:
-                        return .run { send in
-                                guard let snapshot = try? await profileClient.extractProfileSnapshot(),
-                                      let profile = try? Profile(snapshot: snapshot) else { return }
-                                await send(.internal(.profileToDebugLoaded(profile)))
-                        }
-=======
 		#if DEBUG
 		case .debugInspectProfileButtonTapped:
 			return .run { send in
@@ -168,7 +153,6 @@ public struct AppSettings: FeatureReducer {
 				guard let profile = try? Profile(snapshot: snapshot) else { return }
 				await send(.internal(.profileToDebugLoaded(profile)))
 			}
->>>>>>> main
 
                 case let .setDebugProfileSheet(isPresented):
                         precondition(!isPresented)
@@ -214,17 +198,6 @@ public struct AppSettings: FeatureReducer {
 
 // MARK: Private
 extension AppSettings {
-<<<<<<< HEAD
-        fileprivate func loadP2PClients() -> EffectTask<Action> {
-                .task {
-                        await .internal(.loadP2PClientsResult(
-                                TaskResult {
-                                        try await profileClient.getP2PClients()
-                                }
-                        ))
-                }
-        }
-=======
 	fileprivate func loadP2PClients() -> EffectTask<Action> {
 		.task {
 			await .internal(.loadP2PClientsResult(
@@ -234,5 +207,4 @@ extension AppSettings {
 			))
 		}
 	}
->>>>>>> main
 }
