@@ -420,7 +420,7 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient", // FIXME: once @ghenadie merges multichannel support, rename this `RadixConnectClient`?
 		dependencies: [
-			"P2PConnection",
+			"RadixConnect",
 			"P2PClientsClient",
 		],
 		tests: .yes()
