@@ -1,4 +1,4 @@
-import FeaturePrelude
+import ClientPrelude
 
 #if DEBUG
 extension NetworkSwitchingClient: TestDependencyKey {

@@ -52,7 +52,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.createPersonaCoordinator = nil
 			return loadPersonas()
 
-		case .createPersonaCoordinator(.delegate(.dismissed)):
+		case .createPersonaCoordinator(.delegate(.dismiss)):
 			state.createPersonaCoordinator = nil
 			return .none
 

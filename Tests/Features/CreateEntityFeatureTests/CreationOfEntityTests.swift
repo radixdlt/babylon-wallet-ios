@@ -25,8 +25,8 @@ final class CreationOfEntityTests: TestCase {
 				XCTAssertEqual($0, account)
 			}
 		}
-		await store.send(.internal(.view(.appeared)))
-		await store.receive(.internal(.system(.createEntityResult(.success(account)))))
+		await store.send(.view(.appeared))
+		await store.receive(.internal(.createEntityResult(.success(account))))
 		await store.receive(.delegate(.createdEntity(account)))
 	}
 
@@ -57,7 +57,7 @@ final class CreationOfEntityTests: TestCase {
 
 		let expectedErrors = Set([createNewAccountError])
 		await store.send(.view(.appeared))
-		await store.receive(.internal(.system(.createEntityResult(.failure(createNewAccountError)))))
+		await store.receive(.internal(.createEntityResult(.failure(createNewAccountError))))
 		await store.receive(.delegate(.createEntityFailed))
 	}
 }

@@ -113,7 +113,7 @@ struct Login: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case .createPersonaCoordinator(.presented(.delegate(.dismissed))):
+		case .createPersonaCoordinator(.presented(.delegate(.dismiss))):
 			state.createPersonaCoordinator = nil
 			return .none
 

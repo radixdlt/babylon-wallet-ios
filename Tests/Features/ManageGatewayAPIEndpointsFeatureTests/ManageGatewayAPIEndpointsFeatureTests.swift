@@ -215,7 +215,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 				))
 			)
 		}
-		await store.send(.child(.destination(.presented(.createAccount(.delegate(.dismissed)))))) {
+		await store.send(.child(.destination(.presented(.createAccount(.delegate(.dismiss)))))) {
 			$0.destination = nil
 			$0.validatedNewGatewayToSwitchTo = nil
 		}

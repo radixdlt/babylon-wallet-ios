@@ -1,4 +1,4 @@
-import FeaturePrelude
+import ClientPrelude
 
 // MARK: - NetworkSwitchingClient
 public struct NetworkSwitchingClient: Sendable, DependencyKey {
