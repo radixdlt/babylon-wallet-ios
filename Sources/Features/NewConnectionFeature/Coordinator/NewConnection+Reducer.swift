@@ -27,7 +27,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case newConnection(P2P.ClientWithConnectionStatus)
+		case newConnection(P2PClient)
 	}
 
 	public init() {}
@@ -55,21 +55,10 @@ public struct NewConnection: Sendable, FeatureReducer {
 			case .localNetworkPermission, .cameraPermission, .scanQR:
 				return .send(.delegate(.dismiss))
 			case let .connectUsingSecrets(connectUsingSecrets):
-				// checks if we are indded connected
-				guard let _ = connectUsingSecrets.idOfNewConnection else {
-					return .run { send in
-						await send(.delegate(.dismiss))
-					}
-				}
 				return .send(
 					.child(.connectUsingSecrets(.delegate(.connected(
-						.init(
-							p2pClient: .init(
-								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword,
-								displayName: L10n.NewConnection.defaultNameOfConnection
-							),
-							connectionStatus: .connected
-						)
+                                                .init(connectionPassword: connectUsingSecrets.connectionSecrets,
+                                                      displayName: L10n.NewConnection.defaultNameOfConnection)
 					))))
 				)
 			}
@@ -104,9 +93,6 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):
 			return .send(.delegate(.newConnection(connection)))
-			return .run { send in
-				await send(.delegate(.newConnection(connection)))
-			}
 
 		default:
 			return .none

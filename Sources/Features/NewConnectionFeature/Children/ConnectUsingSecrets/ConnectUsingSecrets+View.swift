@@ -81,21 +81,21 @@ extension ConnectUsingSecrets {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct ConnectUsingPassword_Preview: PreviewProvider {
-	static var previews: some View {
-		ConnectUsingSecrets.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: ConnectUsingSecrets()
-			)
-		)
-	}
-}
-
-extension ConnectUsingSecrets.State {
-	public static let previewValue: Self = .init(connectionSecrets: .placeholder)
-}
-#endif
+//#if DEBUG
+//import SwiftUI // NB: necessary for previews to appear
+//
+//struct ConnectUsingPassword_Preview: PreviewProvider {
+//	static var previews: some View {
+//		ConnectUsingSecrets.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: ConnectUsingSecrets()
+//			)
+//		)
+//	}
+//}
+//
+//extension ConnectUsingSecrets.State {
+//	public static let previewValue: Self = .init(connectionSecrets: .placeholder)
+//}
+//#endif

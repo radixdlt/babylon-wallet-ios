@@ -31,57 +31,22 @@ extension ManageP2PClients.View {
 
 				Separator()
 
-				VStack(alignment: .leading) {
-					ForEachStore(
-						store.scope(
-							state: \.clients,
-							action: { .child(.connection(id: $0, action: $1)) }
-						),
-						content: {
-							ManageP2PClient.View(store: $0)
-								.padding(.medium3)
-
-<<<<<<< HEAD
-						Spacer()
-					}
-
-					Separator()
-
-					VStack(alignment: .leading) {
-						ForEachStore(
-							store.scope(
-								state: \.clients,
-								action: { .child(.connection(id: $0, action: $1)) }
-							),
-							content: {
-								ManageP2PClient.View(store: $0)
-									.padding(.medium3)
-
-								Separator()
-							}
-						)
-					}
-
-					Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
-						viewStore.send(.addNewConnectionButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(
-						shouldExpand: true,
-						image: .init(asset: AssetResource.qrCodeScanner)
-					))
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .large1)
-=======
-							Separator()
-						}
-					)
->>>>>>> main
-				}
-
+                                VStack(alignment: .leading) {
+                                        ForEachStore(
+                                                store.scope(
+                                                        state: \.clients,
+                                                        action: { .child(.connection(id: $0, action: $1)) }
+                                                ),
+                                                content: {
+                                                        ManageP2PClient.View(store: $0)
+                                                                .padding(.medium3)
+                                                        Spacer()
+                                                }
+                                        )
+                                }
 				Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
 					viewStore.send(.addNewConnectionButtonTapped)
 				}
-				.controlState(viewStore.canAddMoreConnections ? .enabled : .disabled)
 				.buttonStyle(.secondaryRectangular(
 					shouldExpand: true,
 					image: .init(asset: AssetResource.qrCodeScanner)

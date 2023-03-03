@@ -53,10 +53,6 @@ extension ManageP2PClients {
 			)
 			return .none
 
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
 
 		case let .child(.connection(id, .delegate(.deleteConnection))):
 			return .task {
@@ -79,8 +75,8 @@ extension ManageP2PClients {
 			state.destination = .newConnection(.init())
 			return .none
 
-		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
-			state.newConnection = nil
+                case let .child(.destination(.presented(.newConnection(.delegate(.newConnection(connectedClient)))))):
+			state.destination = nil
 			return .run { send in
 				await send(.internal(.system(.saveNewConnectionResult(
 					TaskResult {

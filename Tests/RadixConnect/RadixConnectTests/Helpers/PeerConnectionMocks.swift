@@ -1,4 +1,6 @@
 import Foundation
+import RadixConnectModels
+import TestingPrelude
 @testable import RadixConnect
 
 // MARK: - MockPeerConnectionFactory
@@ -8,7 +10,7 @@ final class MockPeerConnectionFactory: PeerConnectionFactory {
 		self.clients = clients
 	}
 
-	func makePeerConnectionClient(for clientID: ClientID) throws -> PeerConnectionClient {
+	func makePeerConnectionClient(for clientID: RemoteClientID) throws -> PeerConnectionClient {
 		clients.first { $0.id == clientID }!
 	}
 }
@@ -53,54 +55,61 @@ final class MockPeerConnectionDelegate: PeerConnectionDelegate {
 
 // MARK: - MockPeerConnection
 final class MockPeerConnection: PeerConnection {
-	func close() {}
-
-	func setRemoteAnswer(_ answer: RadixConnect.RTCPrimitive.Answer) async throws {}
-
-	func createOffer() async throws -> RadixConnect.RTCPrimitive.Offer {
-		.any
-	}
-
-	func setLocalOffer(_ offer: RadixConnect.RTCPrimitive.Offer) async throws {}
-
-	let configuredRemoteOffer: AsyncStream<RTCPrimitive.Offer>
-	let configuredLocalAnswer: AsyncStream<RTCPrimitive.Answer>
+        let configuredRemoteDescription: AsyncStream<Either<RTCPrimitive.Offer, RTCPrimitive.Answer>>
+        let configuredLocalDescription: AsyncStream<Either<RTCPrimitive.Offer, RTCPrimitive.Answer>>
 	let configuredICECandidate: AsyncStream<RTCPrimitive.ICECandidate>
 	let onCreateLocalAnswer: AsyncStream<Void>
+        let onCreateLocalOffer: AsyncStream<Void>
 
-	private let configuredRemoteOfferContinuation: AsyncStream<RTCPrimitive.Offer>.Continuation
-	private let configuredLocalAnswerContinuation: AsyncStream<RTCPrimitive.Answer>.Continuation
+	private let configuredRemoteDescriptionContinuation: AsyncStream<Either<RTCPrimitive.Offer, RTCPrimitive.Answer>>.Continuation
+	private let configuredLocalDescriptionContinuation: AsyncStream<Either<RTCPrimitive.Offer, RTCPrimitive.Answer>>.Continuation
 	private let configuredICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
 	private let onCreateLocalAnswerContinuation: AsyncStream<Void>.Continuation
+        private let onCreateLocalOfferContinuation: AsyncStream<Void>.Continuation
 	private let stubDataChannel: Result<DataChannelClient, Error>
 
-	private var localAnswerContinuation: CheckedContinuation<RTCPrimitive.Answer, any Error>?
-	private var setRemoteOfferContinuation: CheckedContinuation<Void, any Error>?
+	private var createLocalAnswerContinuation: CheckedContinuation<RTCPrimitive.Answer, any Error>?
+        private var createLocalOfferContinuation: CheckedContinuation<RTCPrimitive.Offer, any Error>?
+	private var setLocalDescriptionContinuation: CheckedContinuation<Void, any Error>?
+        private var setRemoteDescriptionContinuation: CheckedContinuation<Void, any Error>?
 	private var addICECandidateContinuation: CheckedContinuation<Void, any Error>?
 
 	init(dataChannel: Result<DataChannelClient, Error> = .failure(NSError(domain: "test", code: 1))) {
 		self.stubDataChannel = dataChannel
-		(configuredRemoteOffer, configuredRemoteOfferContinuation) = AsyncStream<RTCPrimitive.Offer>.streamWithContinuation()
-		(configuredLocalAnswer, configuredLocalAnswerContinuation) = AsyncStream<RTCPrimitive.Answer>.streamWithContinuation()
-		(configuredICECandidate, configuredICECandidateContinuation) = AsyncStream<RTCPrimitive.ICECandidate>.streamWithContinuation()
-		(onCreateLocalAnswer, onCreateLocalAnswerContinuation) = AsyncStream<Void>.streamWithContinuation()
+		(configuredRemoteDescription, configuredRemoteDescriptionContinuation) = AsyncStream.streamWithContinuation()
+		(configuredLocalDescription, configuredLocalDescriptionContinuation) = AsyncStream.streamWithContinuation()
+		(configuredICECandidate, configuredICECandidateContinuation) = AsyncStream.streamWithContinuation()
+		(onCreateLocalAnswer, onCreateLocalAnswerContinuation) = AsyncStream.streamWithContinuation()
+                (onCreateLocalOffer, onCreateLocalOfferContinuation) = AsyncStream.streamWithContinuation()
 	}
 
-	func setLocalAnswer(_ answer: RTCPrimitive.Answer) async throws {
-		configuredLocalAnswerContinuation.yield(answer)
-	}
+        func close() {}
 
-	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
-		configuredRemoteOfferContinuation.yield(offer)
-		return try await withCheckedThrowingContinuation { continuation in
-			setRemoteOfferContinuation = continuation
-		}
-	}
+        func setLocalDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws {
+                configuredLocalDescriptionContinuation.yield(description)
+                return try await withCheckedThrowingContinuation { continuation in
+                        setLocalDescriptionContinuation = continuation
+                }
+        }
+
+        func setRemoteDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws {
+                configuredRemoteDescriptionContinuation.yield(description)
+                return try await withCheckedThrowingContinuation { continuation in
+                        setRemoteDescriptionContinuation = continuation
+                }
+        }
+
+        func createLocalOffer() async throws -> RTCPrimitive.Offer {
+                onCreateLocalOfferContinuation.yield(())
+                return try await withCheckedThrowingContinuation { continuation in
+                        createLocalOfferContinuation = continuation
+                }
+        }
 
 	func createLocalAnswer() async throws -> RTCPrimitive.Answer {
 		onCreateLocalAnswerContinuation.yield(())
 		return try await withCheckedThrowingContinuation { continuation in
-			localAnswerContinuation = continuation
+                        createLocalAnswerContinuation = continuation
 		}
 	}
 
@@ -117,25 +126,29 @@ final class MockPeerConnection: PeerConnection {
 
 	// MARK: - Helper API
 
-	func onRemoteOffer() async -> RTCPrimitive.Offer {
-		await configuredRemoteOffer.first { _ in true }!
-	}
+        func onOfferConfigured() async -> RTCPrimitive.Offer? {
+                return await configuredRemoteDescription.prefix(1).collect().first?.left
+        }
 
-	func onCreateLocalAnswer() async {
-		_ = await onCreateLocalAnswer.prefix(1).collect()
-	}
+        func onLocalAnswerCreated() async {
+                _ = await onCreateLocalAnswer.prefix(1).collect()
+        }
 
-	func onSetLocalAnswer() async -> RTCPrimitive.Answer {
-		await configuredLocalAnswer.first { _ in true }!
-	}
+        func completeSetLocalDescription(with result: Result<Void, any Error>) {
+                setLocalDescriptionContinuation?.resume(with: result)
+        }
+
+        func completeSetRemoteDescription(with result: Result<Void, any Error>) {
+                setRemoteDescriptionContinuation?.resume(with: result)
+        }
 
 	func completeCreateLocalAnswerRequest(with answer: Result<RTCPrimitive.Answer, Error>) {
-		localAnswerContinuation?.resume(with: answer)
+		createLocalAnswerContinuation?.resume(with: answer)
 	}
 
-	func completeSetRemoteOffer(with result: Result<Void, Error>) {
-		setRemoteOfferContinuation?.resume(with: result)
-	}
+        func completeCreateLocalOfferRequest(with answer: Result<RTCPrimitive.Offer, Error>) {
+                createLocalOfferContinuation?.resume(with: answer)
+        }
 
 	func completeAddICECandidate(with result: Result<Void, Error>) {
 		addICECandidateContinuation?.resume(with: result)

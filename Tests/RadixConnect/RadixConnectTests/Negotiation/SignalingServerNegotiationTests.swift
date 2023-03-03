@@ -1,4 +1,5 @@
 @testable import RadixConnect
+import RadixConnectModels
 import TestingPrelude
 
 // MARK: - SignalingServerNegotiationTests
@@ -27,29 +28,29 @@ final class SignalingServerNegotiationTests: TestCase {
 	                                           connectionID: Self.connectionID)
 
 	func test_makePeerConnection_happyFlow() async throws {
-		let remoteClientID = ClientID.any
+		let remoteClientID = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientID)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
 		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			await conenctionBuilder.peerConnections.prefix(1).collect()
+			try await conenctionBuilder.peerConnections.prefix(1).collect()
 		}
 
 		// Negotiate the PeerConnection
 		try await performNegotiation(forClient: remoteClientID, peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
 		// Await for PeerConnection to be estblished
-		let result = await peerConnectionTask.value.first!
-		XCTAssertEqual(result.map(\.id), .success(remoteClientID))
+		let result = try await peerConnectionTask.value.first!
+                XCTAssertEqual(result.map(\.id), .success(.init(remoteClientID)))
 	}
 
 	func test_makePeerConnection_parallelNegotiation() async throws {
 		// Configure 4 peer connections to be negotiated in parallel
-		let remoteClientId2 = ClientID(rawValue: UUID().uuidString)
-		let remoteClientId3 = ClientID(rawValue: UUID().uuidString)
-		let remoteClientId1 = ClientID(rawValue: UUID().uuidString)
-		let remoteClientId4 = ClientID(rawValue: UUID().uuidString)
+		let remoteClientId2 = RemoteClientID(rawValue: UUID().uuidString)
+		let remoteClientId3 = RemoteClientID(rawValue: UUID().uuidString)
+		let remoteClientId1 = RemoteClientID(rawValue: UUID().uuidString)
+		let remoteClientId4 = RemoteClientID(rawValue: UUID().uuidString)
 
 		let (client1, peerConnection1, delegate1) = makePeerConnectionClient(remoteClientId1)
 		let (client2, peerConnection2, delegate2) = makePeerConnectionClient(remoteClientId2)
@@ -60,7 +61,7 @@ final class SignalingServerNegotiationTests: TestCase {
 
 		let peerConnectionTask = Task {
 			// Await for 4 PeerConnection to be made
-			await conenctionBuilder.peerConnections.prefix(4).collect()
+			try await conenctionBuilder.peerConnections.prefix(4).collect()
 		}
 
 		// Trigger negotiations
@@ -84,35 +85,35 @@ final class SignalingServerNegotiationTests: TestCase {
 		// Assert that the result for all negotiations are returns
 
 		/// We are interested only comparing the created `PeerConnectionClient.id`'s, or the failure
-		let result: [ClientID: Result<ClientID, FailedToCreatePeerConnectionError>] = await peerConnectionTask
+                let result: [PeerConnectionId: Result<PeerConnectionId, PeerConnectionBuilder.FailedToCreatePeerConnectionError>] = try await peerConnectionTask
 			.value
 			.reduce(into: [:]) { partialResult, nextResult in
 				switch nextResult {
 				case let .success(peerConnection):
 					partialResult[peerConnection.id] = .success(peerConnection.id)
 				case let .failure(failure):
-					partialResult[failure.remoteClientId] = .failure(failure)
+                                        partialResult[.init(failure.remoteClientId)] = .failure(failure)
 				}
 			}
 
-		let expectedResults: [ClientID: Result<ClientID, FailedToCreatePeerConnectionError>] = [
-			remoteClientId1: .success(remoteClientId1),
-			remoteClientId2: .success(remoteClientId2),
-			remoteClientId3: .success(remoteClientId3),
-			remoteClientId4: .failure(FailedToCreatePeerConnectionError(remoteClientId: remoteClientId4, underlyingError: NSError(domain: "dom", code: 1))),
+                let expectedResults: [PeerConnectionId: Result<PeerConnectionId, PeerConnectionBuilder.FailedToCreatePeerConnectionError>] = [
+                        .init(remoteClientId1): .success(.init(remoteClientId1)),
+                        .init(remoteClientId2): .success(.init(remoteClientId2)),
+                        .init(remoteClientId3): .success(.init(remoteClientId3)),
+                        .init(remoteClientId4): .failure(PeerConnectionBuilder.FailedToCreatePeerConnectionError(remoteClientId: remoteClientId4, underlyingError: NSError(domain: "dom", code: 1))),
 		]
 
 		XCTAssertEqual(result, expectedResults)
 	}
 
 	func test_makePeerConnection_failedToSetRemoteDescriptionAfterOffer() async throws {
-		let remoteClientId = ClientID.any
+		let remoteClientId = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
 		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			await conenctionBuilder.peerConnections.prefix(1).collect().first!
+			try await conenctionBuilder.peerConnections.prefix(1).collect().first!
 		}
 
 		try webSocketClient.receiveIncommingMessage(
@@ -121,52 +122,52 @@ final class SignalingServerNegotiationTests: TestCase {
 		delegate.sendNegotiationNeededEvent()
 
 		// Await set offer
-		_ = await peerConnection.onRemoteOffer()
-		peerConnection.completeSetRemoteOffer(with: .failure(NSError(domain: "dom", code: 1)))
+                _ = await peerConnection.onOfferConfigured()
+		peerConnection.completeSetRemoteDescription(with: .failure(NSError(domain: "dom", code: 1)))
 
-		let result = await peerConnectionTask.value
+		let result = try await peerConnectionTask.value
 
 		XCTAssertThrowsError(try result.get())
 	}
 
 	func test_makePeerConnection_failsToGenerateAnswer() async throws {
-		let remoteClientId = ClientID.any
+		let remoteClientId = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
 		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			await conenctionBuilder.peerConnections.prefix(1).collect().first!
+			try await conenctionBuilder.peerConnections.prefix(1).collect().first!
 		}
 
 		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
-		await peerConnection.onCreateLocalAnswer()
+		await peerConnection.onLocalAnswerCreated()
 		peerConnection.completeCreateLocalAnswerRequest(with: .failure(NSError(domain: "dom", code: 1)))
 
-		let result = await peerConnectionTask.value
+		let result = try await peerConnectionTask.value
 
 		XCTAssertThrowsError(try result.get())
 	}
 
 	func test_makePeerConnection_failsToSendAnswerToRemote() async throws {
-		let remoteClientId = ClientID.any
+		let remoteClientId = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
 		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			await conenctionBuilder.peerConnections.prefix(1).collect().first!
+			try await conenctionBuilder.peerConnections.prefix(1).collect().first!
 		}
 
 		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
-		await peerConnection.onCreateLocalAnswer()
+		await peerConnection.onLocalAnswerCreated()
 		peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
 
 		let message = try await jsonDecoder.decode(ClientMessage.self, from: webSocketClient.onClientMessageSent())
 		webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
-		let result = await peerConnectionTask.value
+		let result = try await peerConnectionTask.value
 
 		XCTAssertThrowsError(try result.get())
 	}
@@ -175,7 +176,7 @@ final class SignalingServerNegotiationTests: TestCase {
 
 	/// Performs the full successfull negotiation flow for the given remoteClientId
 	private func performNegotiation(
-		forClient remoteClientId: ClientID,
+		forClient remoteClientId: RemoteClientID,
 		peerConnection: MockPeerConnection,
 		peerConnectionDelegate: MockPeerConnectionDelegate
 	) async throws {
@@ -196,7 +197,7 @@ final class SignalingServerNegotiationTests: TestCase {
 	}
 
 	/// Performs a failing negotiation flow for the given remoteClientId
-	private func performFailingNegotiation(forClient remoteClientId: ClientID,
+	private func performFailingNegotiation(forClient remoteClientId: RemoteClientID,
 	                                       peerConnection: MockPeerConnection,
 	                                       peerConnectionDelegate: MockPeerConnectionDelegate) async throws
 	{
@@ -207,8 +208,8 @@ final class SignalingServerNegotiationTests: TestCase {
 		peerConnectionDelegate.sendNegotiationNeededEvent()
 
 		// Await set offer
-		_ = await peerConnection.onRemoteOffer()
-		peerConnection.completeSetRemoteOffer(with: .failure(NSError(domain: "dom", code: 1)))
+                _ = await peerConnection.onOfferConfigured()
+		peerConnection.completeSetRemoteDescription(with: .failure(NSError(domain: "dom", code: 1)))
 	}
 
 	/// This function will trigger the negotiation flow for the given offer,
@@ -226,13 +227,13 @@ final class SignalingServerNegotiationTests: TestCase {
 		peerConnectionDelegate.sendNegotiationNeededEvent()
 
 		// Await for the remote offer to be configured on the peer connection
-		let configuredOffer = await peerConnection.configuredRemoteOffer.prefix(1).collect().first!
+		let configuredOffer = await peerConnection.configuredRemoteDescription.prefix(1).collect().first!
 
 		// Assert that the configured offer does amtch the incomming offer
-		XCTAssertEqual(configuredOffer, primitive.content.offer)
+                XCTAssertEqual(configuredOffer, .left(primitive.content.offer!))
 
 		// Complete the set remote offer action on peerConnection, thus allowing the negotiation to flow further
-		peerConnection.completeSetRemoteOffer(with: .success(()))
+		peerConnection.completeSetRemoteDescription(with: .success(()))
 	}
 
 	/// Trigger a `receiveICECandidate` event, as well assert that the received ICECanddiate is properly set on the PeerConnection
@@ -264,16 +265,16 @@ final class SignalingServerNegotiationTests: TestCase {
 	/// Trigger the `create local answer` event.
 	private func createAndSendAnswer(_ primitive: IdentifiedPrimitive<RTCPrimitive>, peerConnection: MockPeerConnection) async throws {
 		// Await for create local answer to be triggered
-		await peerConnection.onCreateLocalAnswer()
+		await peerConnection.onLocalAnswerCreated()
 
 		// Complete the create local answer request
 		peerConnection.completeCreateLocalAnswerRequest(with: .success(primitive.content.answer!))
 
 		// Await for the created local answer to be configured on the peerConnection
-		let configuredAnswer = await peerConnection.configuredLocalAnswer.prefix(1).collect().first!
+                let sdp = await peerConnection.configuredLocalDescription.prefix(1).collect().first!
 
 		// Assert that the configured answer does match the created one
-		XCTAssertEqual(configuredAnswer, primitive.content.answer)
+                XCTAssertEqual(sdp, .right(primitive.content.answer!))
 
 		// Assert that the created answer is properly sent through the webSocket
 		try await assertDidSendMessage(primitive)
@@ -318,11 +319,11 @@ final class SignalingServerNegotiationTests: TestCase {
 	}
 
 	/// Creates a PeerConnectionClient for the given remoteClientID and returns also its collaborators
-	private func makePeerConnectionClient(_ remoteClientID: ClientID) -> (client: PeerConnectionClient, peerConnection: MockPeerConnection, delegate: MockPeerConnectionDelegate) {
+	private func makePeerConnectionClient(_ remoteClientID: RemoteClientID) -> (client: PeerConnectionClient, peerConnection: MockPeerConnection, delegate: MockPeerConnectionDelegate) {
 		let peerConnection = MockPeerConnection(dataChannel: .success(dataChannelClient))
 		let delegate = MockPeerConnectionDelegate()
 		return (
-			try! PeerConnectionClient(id: remoteClientID, peerConnection: peerConnection, delegate: delegate),
+                        try! PeerConnectionClient(id: .init(remoteClientID), peerConnection: peerConnection, delegate: delegate),
 			peerConnection,
 			delegate
 		)
@@ -330,8 +331,8 @@ final class SignalingServerNegotiationTests: TestCase {
 }
 
 // MARK: - FailedToCreatePeerConnectionError + Equatable
-extension FailedToCreatePeerConnectionError: Equatable {
-	public static func == (lhs: RadixConnect.FailedToCreatePeerConnectionError, rhs: RadixConnect.FailedToCreatePeerConnectionError) -> Bool {
+extension PeerConnectionBuilder.FailedToCreatePeerConnectionError: Equatable {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.remoteClientId == rhs.remoteClientId && lhs.underlyingError as NSError == rhs.underlyingError as NSError
 	}
 }
