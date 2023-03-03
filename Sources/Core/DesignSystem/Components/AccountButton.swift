@@ -56,7 +56,7 @@ public struct AccountLabel: View {
 			AddressView(.init(address: address, format: .default), copyAddressAction: copyAction)
 				.foregroundColor(.app.whiteTransparent)
 		}
-		.padding(.horizontal, .large2)
+		.padding(.horizontal, .medium3)
 		.frame(height: .standardButtonHeight)
 		.background {
 			LinearGradient(gradient: gradient, startPoint: .leading, endPoint: .trailing)

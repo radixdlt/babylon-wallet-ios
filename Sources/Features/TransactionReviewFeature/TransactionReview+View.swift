@@ -27,6 +27,19 @@ private let viewState1 = TransactionAccountView.ViewState(account: testAccount1,
                                                           thumbnail: .userDirectory,
                                                           amount: .exact(134.2044, dollars: 35.5422))
 
+extension View {
+	var sectionHeading: some View {
+		textCase(.uppercase)
+			.textStyle(.body1Header)
+			.foregroundColor(.app.gray2)
+	}
+
+	var message: some View {
+		textStyle(.body1Regular)
+			.foregroundColor(.app.gray1)
+	}
+}
+
 // MARK: - TransactionReview.View
 extension TransactionReview {
 	struct ViewState: Equatable {
@@ -44,13 +57,43 @@ extension TransactionReview {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				VStack {
-					TransactionAccountView(viewState: viewState0) {}
+					Rectangle()
+						.fill(.gray)
+						.frame(width: 200, height: 60)
+						.inSpeechbubble
+						.border(.yellow)
 
-					TransactionAccountView(viewState: viewState1) {}
+					SpeechbubbleShape(cornerRadius: .medium3)
+						.stroke(.orange)
+						.frame(width: 200, height: 60)
+						.border(.yellow)
+
+					Text("Withdrawing")
+						.sectionHeading
+						.flushedLeft
+					TransactionAccountView(viewState: viewState1) {} customizeGuaranteesAction: {}
+						.padding(.bottom, 30)
+
+					Text("Depositing")
+						.sectionHeading
+						.flushedLeft
+					TransactionAccountView(viewState: viewState0) {} customizeGuaranteesAction: {}
 				}
-				.backgroundStyle(.gray)
+				.background(.app.gray5)
 				.padding(30)
 			}
+		}
+	}
+}
+
+// MARK: - TransactionMessageView
+struct TransactionMessageView: View {
+	let message: String
+
+	var body: some View {
+		Card {
+			Text("Royalties claim")
+				.message
 		}
 	}
 }
@@ -61,7 +104,7 @@ struct TransactionAccountView: View {
 		let account: OnNetwork.AccountForDisplay
 		let currency: String
 		let thumbnail: URL
-		let amount: AmountView.ViewState
+		let amount: TransactionAmountView.Amount
 
 		var label: String { account.label.rawValue }
 		var address: String { account.address.address }
@@ -70,27 +113,55 @@ struct TransactionAccountView: View {
 
 	let viewState: ViewState
 	let copyAction: () -> Void
+	let customizeGuaranteesAction: () -> Void
 
 	var body: some View {
-		Card(insetContents: true) {
-			VStack(spacing: 0) {
-				AccountLabel(viewState.label, address: viewState.address, gradient: viewState.gradient, copyAction: copyAction)
+		Card(insetContents: true, verticalSpacing: .small1) {
+			FlatCard {
+				AccountLabel(viewState.label,
+				             address: viewState.address,
+				             gradient: viewState.gradient,
+				             copyAction: copyAction)
 
-				HStack(spacing: 0) {
-					TokenView(name: viewState.currency, thumbnail: viewState.thumbnail)
-						.padding(.vertical, .small1)
-					Spacer(minLength: 0)
-					AmountView(viewState: viewState.amount)
-						.padding(.vertical, .medium3)
+				TransactionAmountView(currency: viewState.currency,
+				                      thumbnail: viewState.thumbnail,
+				                      amount: viewState.amount)
+			}
+			if case .estimated = viewState.amount {
+				Button("Customize guarantees") { // TODO: 
+					customizeGuaranteesAction()
 				}
-				.padding(.horizontal, .medium3)
-				.background(.app.gray5)
+				.textStyle(.body1Header)
+				.foregroundColor(.app.blue2)
+				.padding(.vertical, .small3)
 			}
 		}
 	}
 }
 
-extension TransactionAccountView {
+// MARK: - TransactionAmountView
+struct TransactionAmountView: View {
+	enum Amount: Equatable {
+		case exact(Double, dollars: Double)
+		case estimated(Double, dollars: Double, guaranteed: Double)
+	}
+
+	let currency: String
+	let thumbnail: URL
+	let amount: Amount
+
+	var body: some View {
+		HStack(spacing: 0) {
+			TokenView(name: currency, thumbnail: thumbnail)
+				.padding(.vertical, .small1)
+			Spacer(minLength: 0)
+			AmountView(amount: amount)
+				.padding(.vertical, .medium3)
+		}
+		.padding(.horizontal, .medium3)
+		.background(.app.gray5)
+	}
+
 	struct TokenView: View {
 		let name: String
 		let thumbnail: URL
@@ -105,45 +176,40 @@ extension TransactionAccountView {
 	}
 
 	struct AmountView: View {
-		enum ViewState: Equatable {
-			case exact(Double, dollars: Double)
-			case estimated(Double, dollars: Double, guaranteed: Double)
-		}
-
-		let viewState: ViewState
+		let amount: Amount
 
 		var body: some View {
-			switch viewState {
+			switch amount {
 			case let .exact(amount, dollarAmount):
-				VStack(alignment: .trailing, spacing: .small1) {
-					Text(amount.formatted(.number))
-						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.gray1)
+				coreView(amount: amount, dollarAmount: dollarAmount, isEstimated: false)
 
-					Text(dollarAmount.formatted(.currency(code: "USD")))
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
-				}
 			case let .estimated(amount, dollarAmount, guaranteedAmount):
-				VStack(alignment: .trailing, spacing: 0) {
-					HStack(spacing: .small2) {
-						Text("Estimated") // TODO: 
-							.textStyle(.body2Regular) // TODO:  unknown textStyle
-						Text(amount.formatted(.number))
-							.textStyle(.secondaryHeader)
-					}
-					.foregroundColor(.app.gray1)
-					.padding(.bottom, .small2)
-
-					Text(dollarAmount.formatted(.currency(code: "USD")))
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
-						.padding(.bottom, .small1)
+				VStack(alignment: .trailing, spacing: .small1) {
+					coreView(amount: amount, dollarAmount: dollarAmount, isEstimated: true)
 
 					Text("Guaranteed **\(guaranteedAmount.formatted(.number))**")
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 				}
+			}
+		}
+
+		@ViewBuilder
+		private func coreView(amount: Double, dollarAmount: Double, isEstimated: Bool) -> some View {
+			VStack(alignment: .trailing, spacing: .small1) {
+				HStack(spacing: .small2) {
+					if isEstimated {
+						Text("Estimated") // TODO: 
+							.textStyle(.body2Regular) // TODO:  unknown textStyle
+					}
+					Text(amount.formatted(.number))
+						.textStyle(.secondaryHeader)
+				}
+				.foregroundColor(.app.gray1)
+
+				Text(dollarAmount.formatted(.currency(code: "USD")))
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray1)
 			}
 		}
 	}
