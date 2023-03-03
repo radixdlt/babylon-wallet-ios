@@ -91,7 +91,19 @@ public struct CreateEntityCoordinator<
 			)
 
 		case .child(.step2_creationOfEntity(.delegate(.createEntityFailed))):
-			state.step = .step0_nameNewEntity(.init(config: state.config))
+			switch state.step {
+			case let .step2_creationOfEntity(createState):
+				state.step = .step0_nameNewEntity(
+					.init(
+						isFirst: state.config.isFirstEntity,
+						inputtedEntityName: createState.name // preserve the name
+					)
+				)
+			default:
+				// Should not happen...
+				state.step = .step0_nameNewEntity(.init(config: state.config))
+			}
+
 			return .none
 
 		case .child(.step3_completion(.delegate(.completed))):
