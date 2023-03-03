@@ -1,5 +1,4 @@
 import FeaturePrelude
-import ProfileClient
 
 // MARK: - CreateEntityCoordinator.State
 extension CreateEntityCoordinator {

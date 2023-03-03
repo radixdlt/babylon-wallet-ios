@@ -1,10 +1,10 @@
+import AuthorizedDappsClient
 import FeaturePrelude
-import ProfileClient
 
 // MARK: - AuthorizedDapps
 public struct AuthorizedDapps: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	public typealias Store = StoreOf<Self>
 
@@ -60,7 +60,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 		case let .didSelectDapp(dAppID):
 			return .run { send in
-				let details = try await profileClient.getDetailedDapp(dAppID)
+				let details = try await authorizedDappsClient.getDetailedDapp(dAppID)
 				let presentedState = DappDetails.State(dApp: details)
 				await send(.child(.presentedDapp(.present(presentedState))))
 			} catch: { error, _ in
@@ -95,7 +95,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	private func loadAuthorizedDapps() async -> Action {
 		let result = await TaskResult {
-			try await profileClient.getAuthorizedDapps()
+			try await authorizedDappsClient.getAuthorizedDapps()
 		}
 		return .internal(.loadedDapps(result))
 	}

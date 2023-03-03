@@ -28,7 +28,7 @@ package.addModules([
 	.feature(
 		name: "AccountListFeature",
 		dependencies: [
-			"AccountPortfolio",
+			"AccountPortfolioFetcherClient",
 			"FungibleTokenListFeature",
 		],
 		tests: .yes()
@@ -48,11 +48,10 @@ package.addModules([
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			"AccountPortfolio",
-			"AppSettings",
+			"AccountPortfolioFetcherClient",
+			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
-			"ProfileClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -75,10 +74,12 @@ package.addModules([
 	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
+			"AccountsClient",
 			"Cryptography",
+			"FactorSourcesClient",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
-			"ProfileClient",
+			"PersonasClient",
 		],
 		tests: .yes()
 	),
@@ -86,17 +87,20 @@ package.addModules([
 		name: "AuthorizedDAppsFeatures",
 		dependencies: [
 			"GatewayAPI",
-			"ProfileClient",
+			"AuthorizedDappsClient",
 		],
 		tests: .no
 	),
 	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
+			"AccountsClient",
+			"AuthorizedDappsClient",
 			"CreateEntityFeature",
 			"GatewayAPI",
+			"GatewaysClient", // get current network
 			"P2PConnectivityClient",
-			"ProfileClient",
+			"PersonasClient",
 			"ROLAClient",
 			"TransactionSigningFeature",
 		],
@@ -119,10 +123,10 @@ package.addModules([
 		dependencies: [
 			"AccountDetailsFeature",
 			"AccountListFeature",
-			"AccountPortfolio",
-			"AppSettings",
+			"AccountPortfolioFetcherClient",
+			"AccountsClient",
+			"AppPreferencesClient",
 			"CreateEntityFeature",
-			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [
@@ -132,10 +136,17 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "InspectProfileFeature",
+		dependencies: [
+			"SecureStorageClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "MainFeature",
 		dependencies: [
-			"AppSettings",
-			"AccountPortfolio",
+			"AppPreferencesClient",
+			"AccountPortfolioFetcherClient",
 			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
@@ -154,7 +165,7 @@ package.addModules([
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
 			"CreateEntityFeature",
-			"GatewayAPI",
+			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),
@@ -178,7 +189,7 @@ package.addModules([
 		name: "OnboardingFeature",
 		dependencies: [
 			"CreateEntityFeature",
-			"ProfileClient",
+			"OnboardingClient",
 		],
 		tests: .yes()
 	),
@@ -186,19 +197,21 @@ package.addModules([
 		name: "PersonasFeature",
 		dependencies: [
 			"CreateEntityFeature",
+			"PersonasClient",
 		],
 		tests: .yes()
 	),
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"PersonasFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
-			"ProfileView",
+			"InspectProfileFeature",
 		],
 		tests: .yes()
 	),
@@ -206,7 +219,7 @@ package.addModules([
 		name: "SplashFeature",
 		dependencies: [
 			"LocalAuthenticationClient",
-			"ProfileClient",
+			"OnboardingClient",
 		],
 		tests: .yes()
 	),
@@ -214,6 +227,7 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			"GatewayAPI",
+			"GatewaysClient",
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -224,20 +238,61 @@ package.addModules([
 
 package.addModules([
 	.client(
-		name: "AccountPortfolio",
+		name: "AccountsClient",
 		dependencies: [
-			"AppSettings",
-			"EngineToolkitClient",
-			"GatewayAPI",
-			"ProfileClient",
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AccountsClientLive",
+		dependencies: [
+			"AccountsClient",
+			"ProfileStore",
 		],
 		tests: .yes()
 	),
 	.client(
-		name: "AppSettings",
-		dependencies: [],
+		name: "AccountPortfolioFetcherClient",
+		dependencies: [
+			"EngineToolkitClient",
+			"GatewayAPI",
+		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "AppPreferencesClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AppPreferencesClientLive",
+		dependencies: [
+			"AppPreferencesClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
+	.client(
+		name: "AuthorizedDappsClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AuthorizedDappsClientLive",
+		dependencies: [
+			"AuthorizedDappsClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "CameraPermissionClient",
 		dependencies: [],
@@ -252,12 +307,29 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "FactorSourcesClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "FactorSourcesClientLive",
+		dependencies: [
+			"FactorSourcesClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "FaucetClient",
 		dependencies: [
 			"EngineToolkitClient",
 			"GatewayAPI",
-			"ProfileClient",
+			"GatewaysClient", // getCurrentNetworkID
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -270,50 +342,112 @@ package.addModules([
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
 			"Cryptography",
-			"ProfileClient",
+			"GatewaysClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "GatewaysClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "GatewaysClientLive",
+		dependencies: [
+			"GatewaysClient",
+			"AppPreferencesClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
 		tests: .yes()
 	),
+
 	.client(
-		name: "P2PConnectivityClient",
+		name: "NetworkSwitchingClient",
 		dependencies: [
-			"ProfileClient",
-			"RadixConnect",
-			"RadixConnectModels",
+			"AccountsClient",
+			"GatewayAPI",
+			"ProfileStore",
+			"GatewaysClient",
 		],
-		tests: .yes()
+		tests: .no
 	),
+
 	.client(
-		name: "ProfileClient",
+		name: "OnboardingClient",
 		dependencies: [
 			"Profile",
 			"Cryptography",
-			"UseFactorSourceClient",
 		],
 		tests: .no
 	),
 	.client(
-		name: "ProfileClientLive",
+		name: "OnboardingClientLive",
 		dependencies: [
-			"ProfileClient",
-			"EngineToolkitClient",
-			"SecureStorageClient",
+			"OnboardingClient",
+			"ProfileStore",
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "P2PClientsClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "P2PClientsClientLive",
+		dependencies: [
+			"ProfileStore",
+			"P2PClientsClient",
+			"AppPreferencesClient",
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "P2PConnectivityClient", // FIXME: once @ghenadie merges multichannel support, rename this `RadixConnectClient`?
+		dependencies: [
+			"P2PConnection",
+			"P2PClientsClient",
+		],
+		tests: .yes()
+	),
+
+	.client(
+		name: "PersonasClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "PersonasClientLive",
+		dependencies: [
+			"PersonasClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "ProfileStore",
 		dependencies: [
 			"Profile",
 			"SecureStorageClient",
+			"UseFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
 		],
 		tests: .yes()
 	),
@@ -337,12 +471,14 @@ package.addModules([
 	.client(
 		name: "TransactionClient",
 		dependencies: [
+			"AccountPortfolioFetcherClient",
+			"AccountsClient",
 			"EngineToolkitClient",
+			"FactorSourcesClient",
 			"GatewayAPI",
-			"ProfileClient",
-			"AccountPortfolio",
-			"UseFactorSourceClient",
+			"GatewaysClient",
 			"SecureStorageClient",
+			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),
@@ -426,8 +562,8 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"EngineToolkitModels",
-			"ProfileModels",
 			"RadixConnectModels",
+			"Profile",
 		],
 		exclude: [
 			"P2P/Codable/README.md",
@@ -441,42 +577,18 @@ package.addModules([
 
 package.addModules([
 	.module(
-		name: "ProfileView",
-		category: .profile,
-		dependencies: [
-			"Profile",
-			"SecureStorageClient",
-		],
-		tests: .no
-	),
-	.module(
 		name: "Profile",
-		category: .profile,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit",
-			"ProfileModels",
 			"RadixConnectModels",
+			"Resources",
 		],
 		tests: .yes(
 			dependencies: [
 				"SharedTestingModels",
 			]
 		)
-	),
-	.module(
-		name: "ProfileModels",
-		category: .profile,
-		dependencies: [
-			"Cryptography",
-			"EngineToolkit", // address derivation
-			"RadixConnectModels",
-			.product(name: "DeviceKit", package: "DeviceKit", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/devicekit/DeviceKit", from: "5.0.0")
-			},
-			"Resources", // L10n
-		],
-		tests: .no
 	),
 	.module(
 		name: "EngineToolkit",
@@ -662,7 +774,6 @@ extension Package {
 			static let testing: Self = .module(name: "Testing")
 			static let engineToolkit: Self = .module(name: "EngineToolkit")
 			static let radixConnect: Self = .module(name: "RadixConnect")
-			static let profile: Self = .module(name: "Profile")
 			var pathComponent: String {
 				switch self {
 				case .client: return "Clients"

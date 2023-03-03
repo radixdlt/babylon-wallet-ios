@@ -1,5 +1,4 @@
 import FeaturePrelude
-import ProfileClient
 
 // MARK: - ImportProfile.Action
 extension ImportProfile {

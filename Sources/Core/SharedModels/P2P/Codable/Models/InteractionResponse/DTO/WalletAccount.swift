@@ -1,6 +1,6 @@
 import Cryptography
 import Prelude
-import ProfileModels
+import Profile
 
 // MARK: - P2P.ToDapp.WalletAccount
 extension P2P.ToDapp {

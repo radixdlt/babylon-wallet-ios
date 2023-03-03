@@ -11,7 +11,7 @@ extension Home.State {
 
 // MARK: - Home.View
 extension Home {
-	struct ViewState: Equatable {}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -57,6 +57,9 @@ extension Home {
 					}
 					.onAppear {
 						viewStore.send(.appeared)
+					}
+					.task { @MainActor in
+						await ViewStore(store.stateless).send(.view(.task)).finish()
 					}
 					.navigationDestination(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),

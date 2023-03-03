@@ -55,7 +55,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			),
 			reducer: TransactionSigning()
 		) {
-			$0.profileClient.getCurrentNetworkID = { .nebunet }
+			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 			$0.transactionClient.addLockFeeInstructionToManifest = { _ in throw transactionError }
 			$0.errorQueue.schedule = { XCTAssertEqual($0 as? NoopError, NoopError()) }
 		}
@@ -75,7 +75,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			),
 			reducer: TransactionSigning()
 		) {
-			$0.profileClient.getCurrentNetworkID = { .nebunet }
+			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 			$0.transactionClient.addLockFeeInstructionToManifest = { [self] _ in mockManifestWithLockFee }
 			$0.errorQueue.schedule = { _ in }
 		}
@@ -91,7 +91,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			manifestWithLockFeeString: transactionWithLockFeeString
 		)
 		await store.receive(.internal(.addLockFeeInstructionToManifestResult(.success(values)))) { [weak self] in
-			guard let self = self else { fatalError() }
+			guard let self = self else { return XCTFail("Unexpected nil self.") }
 			$0.transactionWithLockFee = self.mockManifestWithLockFee
 			$0.transactionWithLockFeeString = self.transactionWithLockFeeString
 		}

@@ -1,6 +1,6 @@
 import FeaturePrelude
+import GatewaysClient
 import P2PConnectivityClient
-import ProfileClient
 import RadixConnect
 import ROLAClient
 
@@ -66,7 +66,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	var onPresent: (@Sendable () -> Void)? = nil
 	var onDismiss: (@Sendable () -> Void)? = nil
 
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
@@ -84,7 +84,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .task:
 			return .run { send in
                                 await p2pConnectivityClient.loadFromProfileAndConnectAll()
-				let currentNetworkID = await profileClient.getCurrentNetworkID()
+				let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
 				for try await message in await p2pConnectivityClient.receiveMessages() {
 					guard !Task.isCancelled else {
@@ -217,7 +217,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = nil
 			state.currentModal = currentModal
 			return .run { send in
-				try await clock.sleep(for: .seconds(2))
+				try await clock.sleep(for: .seconds(1.5))
 				await send(.internal(.ensureCurrentModalIsActuallyPresented))
 			}
 		} else {

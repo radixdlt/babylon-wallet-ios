@@ -17,7 +17,7 @@ extension FungibleTokenDetails.State {
 
 // MARK: - FungibleTokenDetails.View
 extension FungibleTokenDetails {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		let displayName: String
 		let iconURL: URL?
 		let placeholderAsset: ImageAsset

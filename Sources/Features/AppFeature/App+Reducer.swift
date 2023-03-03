@@ -1,7 +1,7 @@
 import FeaturePrelude
 import MainFeature
+import OnboardingClient
 import OnboardingFeature
-import ProfileClient
 import SecureStorageClient
 import SplashFeature
 
@@ -9,7 +9,8 @@ import SplashFeature
 public struct App: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
-	@Dependency(\.profileClient) var profileClient
+	// FIXME: this is temporary and will be reworked during multifactor work.
+	@Dependency(\.onboardingClient.loadEphemeralPrivateProfile) var loadEphemeralPrivateProfile
 
 	public init() {}
 
@@ -62,23 +63,23 @@ public struct App: Sendable, ReducerProtocol {
 		case .child(.onboardingCoordinator(.delegate(.completed))):
 			return goToMain(state: &state)
 
-		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
-			switch profileResult {
-			case .success(.none):
+		case let .child(.splash(.delegate(.loadProfileOutcome(loadProfileOutcome)))):
+			switch loadProfileOutcome {
+			case .newUser:
 				return goToOnboarding(state: &state)
 
-			case .success(.some(_)):
-				return goToMain(state: &state)
-
-			case let .failure(.decodingFailure(_, error)):
+			case let .usersExistingProfileCouldNotBeLoaded(.decodingFailure(_, error)):
 				errorQueue.schedule(error)
 				return goToOnboarding(state: &state)
 
-			case let .failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot)):
+			case let .usersExistingProfileCouldNotBeLoaded(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot)):
 				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.version, state: &state)
 
-			case let .failure(.profileVersionOutdated(_, version)):
+			case let .usersExistingProfileCouldNotBeLoaded(.profileVersionOutdated(_, version)):
 				return incompatibleSnapshotData(version: version, state: &state)
+
+			case .existingProfileLoaded:
+				return goToMain(state: &state)
 			}
 
 		case .internal(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))):
@@ -90,6 +91,14 @@ public struct App: Sendable, ReducerProtocol {
 				}
 				await send(.internal(.system(.incompatibleProfileDeleted)))
 			}
+
+		case let .internal(.system(.loadEphemeralPrivateProfileResult(.failure(error)))):
+			fatalError("Unable to use app, failed to load ephemeral private profile, failure: \(String(describing: error))")
+
+		case let .internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))):
+			state.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
+			return .none
+
 		case .internal(.system(.incompatibleProfileDeleted)):
 			return goToOnboarding(state: &state)
 
@@ -119,8 +128,11 @@ public struct App: Sendable, ReducerProtocol {
 	}
 
 	func goToOnboarding(state: inout State) -> EffectTask<Action> {
-		state.root = .onboardingCoordinator(.init())
-		return .none
+		.run { send in
+			await send(.internal(.system(.loadEphemeralPrivateProfileResult(TaskResult {
+				try await loadEphemeralPrivateProfile()
+			}))))
+		}
 	}
 }
 

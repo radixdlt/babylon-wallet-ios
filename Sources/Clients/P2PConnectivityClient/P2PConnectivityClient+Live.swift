@@ -1,22 +1,12 @@
 import ClientPrelude
 import Network
-import ProfileClient
 import RadixConnect
-
-// MARK: - AnyAsyncIterator + Sendable
-extension AnyAsyncIterator: @unchecked Sendable where Element: Sendable {}
-
-// MARK: - AnyAsyncSequence + Sendable
-extension AnyAsyncSequence: @unchecked Sendable where Element: Sendable {}
-
-// MARK: - AsyncThrowingStream.Iterator + Sendable
-extension AsyncThrowingStream.Iterator: @unchecked Sendable where Element: Sendable {}
+import P2PClientsClient
 
 // MARK: - P2PConnectivityClient + :LiveValue
 extension P2PConnectivityClient {
 	public static let liveValue: Self = {
-		@Dependency(\.profileClient) var profileClient
-		@Dependency(\.jsonDecoder) var jsonDecoder
+		@Dependency(\.p2pClientsClient) var p2pClientsClient
 
 		let rtcClients = RTCClients(signalingServerBaseURL: .devSignalingServer)
 		let localNetworkAuthorization = LocalNetworkAuthorization()
@@ -24,7 +14,7 @@ extension P2PConnectivityClient {
 		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
 			Task {
 				print("🔌 Loading and connecting all P2P connections")
-				for client in try await profileClient.getP2PClients() {
+				for client in try await p2pClientsClient.getP2PClients() {
 					try await rtcClients.addExistingClient(client.connectionPassword)
 				}
 			}

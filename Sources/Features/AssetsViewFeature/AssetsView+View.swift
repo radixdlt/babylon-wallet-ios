@@ -4,65 +4,65 @@ import NonFungibleTokenListFeature
 
 // MARK: - AssetsView.View
 extension AssetsView {
-	@MainActor
-	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+	public struct ViewState: Equatable {
+		var type: AssetsView.AssetsViewType
 
-		public init(store: Store) {
-			self.store = store
+		init(state: AssetsView.State) {
+			type = state.type
 		}
 	}
-}
 
-extension AssetsView.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(spacing: .large3) {
-				selectorView(with: viewStore)
-					.padding([.top, .horizontal], .medium1)
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<AssetsView>
 
-				switch viewStore.state.type {
-				case .tokens:
-					FungibleTokenList.View(
-						store: store.scope(
-							state: \.fungibleTokenList,
-							action: { .child(.fungibleTokenList($0)) }
+		public init(store: StoreOf<AssetsView>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				VStack(spacing: .large3) {
+					selectorView(with: viewStore)
+						.padding([.top, .horizontal], .medium1)
+
+					switch viewStore.state.type {
+					case .tokens:
+						FungibleTokenList.View(
+							store: store.scope(
+								state: \.fungibleTokenList,
+								action: { .child(.fungibleTokenList($0)) }
+							)
 						)
-					)
-				case .nfts:
-					NonFungibleTokenList.View(
-						store: store.scope(
-							state: \.nonFungibleTokenList,
-							action: { .child(.nonFungibleTokenList($0)) }
+					case .nfts:
+						NonFungibleTokenList.View(
+							store: store.scope(
+								state: \.nonFungibleTokenList,
+								action: { .child(.nonFungibleTokenList($0)) }
+							)
 						)
-					)
 
-					// TODO: uncomment when ready for implementation
-					/*
-					 case .poolUnits:
-					 	Text("Pool Units")
-					 case .badges:
-					 	Text("Badges")
-					 */
+						// TODO: uncomment when ready for implementation
+						/*
+						 case .poolUnits:
+						 Text("Pool Units")
+						 case .badges:
+						 Text("Badges")
+						 */
+					}
 				}
 			}
 		}
 	}
 }
 
-// MARK: - AssetsView.View.AssetsViewViewStore
-extension AssetsView.View {
-	fileprivate typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.ViewAction>
-}
-
 // MARK: - Private Methods
 extension AssetsView.View {
-	fileprivate func selectorView(with viewStore: AssetsViewViewStore) -> some View {
+	fileprivate func selectorView(with viewStore: ViewStoreOf<AssetsView>) -> some View {
 		HStack(spacing: .zero) {
 			Spacer()
 
@@ -78,7 +78,7 @@ extension AssetsView.View {
 
 	fileprivate func selectorButton(
 		type: AssetsView.AssetsViewType,
-		with viewStore: AssetsViewViewStore,
+		with viewStore: ViewStoreOf<AssetsView>,
 		action: @escaping () -> Void
 	) -> some View {
 		Text(type.displayText)
@@ -94,18 +94,6 @@ extension AssetsView.View {
 			.onTapGesture {
 				action()
 			}
-	}
-}
-
-// MARK: - AssetsView.View.ViewState
-extension AssetsView.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		var type: AssetsView.AssetsViewType
-
-		init(state: AssetsView.State) {
-			type = state.type
-		}
 	}
 }
 

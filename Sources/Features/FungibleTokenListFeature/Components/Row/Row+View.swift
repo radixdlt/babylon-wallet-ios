@@ -30,7 +30,7 @@ extension FungibleTokenList.Row.State {
 
 // MARK: - FungibleTokenList.Row.View
 extension FungibleTokenList.Row {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		let isXRD: Bool
 		let iconURL: URL?
 		let symbol: String

@@ -59,7 +59,7 @@ final class ImportProfileTests: TestCase {
 		wait(for: [expectation], timeout: 0)
 	}
 
-	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__it_gets_injected_into_profileClient() async throws {
+	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__it_gets_imported() async throws {
 		let profileSnapshotData = try profileSnapshotData()
 		let profileSnapshot = try profileSnapshot()
 		let injectedProfileSnapshot = ActorIsolated<ProfileSnapshot?>(nil)
@@ -73,7 +73,7 @@ final class ImportProfileTests: TestCase {
 				XCTAssertEqual(options, .uncached)
 				return profileSnapshotData
 			}
-			$0.profileClient.injectProfileSnapshot = {
+			$0.onboardingClient.importProfileSnapshot = {
 				await injectedProfileSnapshot.setValue($0)
 			}
 		}

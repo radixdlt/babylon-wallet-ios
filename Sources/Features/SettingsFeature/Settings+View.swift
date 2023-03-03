@@ -4,9 +4,8 @@ import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import PersonasFeature
-import ProfileClient
 #if DEBUG
-import ProfileView
+import InspectProfileFeature
 import SecureStorageClient
 #endif
 
@@ -21,7 +20,7 @@ extension AppSettings {
 		}
 	}
 
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		#if DEBUG
 		let isDebugProfileViewSheetPresented: Bool
 		let profileToInspect: Profile?
@@ -85,10 +84,7 @@ extension View {
 	//
 	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
 	@MainActor
-	fileprivate func navigationDestinations(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStore<AppSettings.ViewState, AppSettings.ViewAction>
-	) -> some View {
+	fileprivate func navigationDestinations(with store: StoreOf<AppSettings>, _ viewStore: ViewStoreOf<AppSettings>) -> some View {
 		self
 		#if DEBUG
 			.navigationDestination(
@@ -163,7 +159,7 @@ extension AppSettings.View {
 		       action: .appSettingsButtonTapped)]
 	}
 
-	private func settingsView(viewStore: ViewStore<AppSettings.ViewState, AppSettings.ViewAction>) -> some View {
+	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
 		VStack(spacing: 0) {
 			ScrollView {
 				VStack(spacing: .zero) {
