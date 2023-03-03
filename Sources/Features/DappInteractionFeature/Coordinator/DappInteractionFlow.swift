@@ -1,4 +1,8 @@
+import AccountsClient
+import AuthorizedDappsClient
 import FeaturePrelude
+import GatewaysClient
+import PersonasClient
 import TransactionSigningFeature
 
 // MARK: - DappInteractionFlow
@@ -149,7 +153,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 	}
 
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -168,8 +175,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}() {
 				return .run { [usePersonaItem, dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
-					if let persona = try await profileClient.getPersonas().first(by: identityAddress) {
-						let authorizedDapp = try await profileClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
+					if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
+						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
 						let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
 						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
 					} else {
@@ -307,7 +314,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				let sharedAccounts = state.authorizedPersona?.sharedAccounts
 			{
 				if ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request {
-					let allAccounts = try await profileClient.getAccounts()
+					let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if
 						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
 							allAccounts.first(by: try .init(address: sharedAccount.address))
@@ -363,7 +370,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return .run { [state] send in
 					// Save login date, data fields, and ongoing accounts to Profile
 					if let persona = state.persona {
-						let networkID = await profileClient.getCurrentNetworkID()
+						let networkID = await gatewaysClient.getCurrentNetworkID()
 						var authorizedDapp = state.authorizedDapp ?? .init(
 							networkID: networkID,
 							dAppDefinitionAddress: state.remoteInteraction.metadata.dAppDefinitionAddress,
@@ -427,14 +434,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							}
 						}()
 						authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
-						// FIXME: @Cyon these add/update funcs should probably be one single function.
-						// Something like `profileClient.saveAuthorizedDapp` which updates by
-						// dApp ID or adds the whole dApp if it doesn't exist.
-						if state.authorizedDapp == nil {
-							try await profileClient.addAuthorizedDapp(authorizedDapp)
-						} else {
-							try await profileClient.updateAuthorizedDapp(authorizedDapp)
-						}
+						try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 					}
 
 					await send(.delegate(.submit(response, state.dappMetadata)))

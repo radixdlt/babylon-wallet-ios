@@ -1,9 +1,11 @@
-import AccountPortfolio
+import AccountPortfolioFetcherClient
+import AccountsClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
+import FactorSourcesClient
 import GatewayAPI
-import ProfileClient
+import GatewaysClient
 import Resources
 import SecureStorageClient
 import UseFactorSourceClient
@@ -13,8 +15,10 @@ extension TransactionClient {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
-		@Dependency(\.profileClient) var profileClient
-		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let pollStrategy: PollStrategy = .default
@@ -41,7 +45,7 @@ extension TransactionClient {
 			let hdRoot: HD.Root
 			let factorSource: FactorSource
 			do {
-				factorSource = try await profileClient.getFactorSources().device
+				factorSource = try await factorSourcesClient.getFactorSources().device
 				guard let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSource.id, .signTransaction) else {
 					return .failure(.failedToLoadFactorSourceForSigning)
 				}
@@ -262,7 +266,7 @@ extension TransactionClient {
 			getNotaryAndSigners: @escaping @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
 		) async -> TransactionResult {
 			await buildTransactionIntent(
-				networkID: profileClient.getCurrentNetworkID(),
+				networkID: gatewaysClient.getCurrentNetworkID(),
 				manifest: manifest,
 				makeTransactionHeaderInput: makeTransactionHeaderInput,
 				getNotaryAndSigners: getNotaryAndSigners
@@ -289,11 +293,11 @@ extension TransactionClient {
 
 				let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>> = try await {
 					let accounts = try await addressesNeededToSign.asyncMap {
-						try await profileClient.lookupAccountByAddress($0)
+						try await accountsClient.getAccountByAddress($0)
 					}
 					guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
 						// TransactionManifest does not reference any accounts => use any account!
-						let first = try await profileClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
+						let first = try await accountsClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
 						return NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [first]))!
 					}
 					return accounts
@@ -307,7 +311,7 @@ extension TransactionClient {
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
 			let version = engineToolkitClient.getTransactionVersion()
-			let networkID = await profileClient.getCurrentNetworkID()
+			let networkID = await gatewaysClient.getCurrentNetworkID()
 
 			let conversionRequest = ConvertManifestInstructionsToJSONIfItWasStringRequest(
 				version: version,
@@ -330,7 +334,7 @@ extension TransactionClient {
 				}
 
 				var instructions = manifestWithJSONInstructions.instructions
-				let networkID = await profileClient.getCurrentNetworkID()
+				let networkID = await gatewaysClient.getCurrentNetworkID()
 
 				let version = engineToolkitClient.getTransactionVersion()
 
@@ -346,7 +350,7 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID) }
 					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
 					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
 

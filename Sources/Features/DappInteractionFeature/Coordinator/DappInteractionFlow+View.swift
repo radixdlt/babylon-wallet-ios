@@ -1,4 +1,7 @@
+import AccountsClient
+import AuthorizedDappsClient
 import FeaturePrelude
+import PersonasClient
 import TransactionSigningFeature
 
 // MARK: - DappInteractionFlow.View
@@ -99,32 +102,32 @@ struct DappInteraction_Preview: PreviewProvider {
 					)
 				)!,
 				reducer: DappInteractionFlow()
-					.dependency(\.profileClient, .previewValueTwoPersonas(existing: true))
-					.dependency(\.profileClient, .previewValueTwoPersonas(existing: false))
+					.dependency(\.accountsClient, .previewValueTwoAccounts())
+					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
+					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 			)
 		)
 	}
 }
 
-import ProfileClient
-
-extension ProfileClient {
-	static func previewValueTwoPersonas(existing: Bool) -> Self {
+extension AccountsClient {
+	static func previewValueTwoAccounts() -> Self {
 		with(noop) {
-			$0.getAccounts = {
+			$0.getAccountsOnCurrentNetwork = {
 				NonEmpty(.previewValue0, .previewValue1)
 			}
-			$0.getPersonas = {
-				if existing {
-					return [.previewValue0, .previewValue1]
-				} else {
-					return [.previewValue0]
-				}
-			}
+		}
+	}
+}
+
+extension AuthorizedDappsClient {
+	static func previewValueOnePersona() -> Self {
+		with(noop) {
 			$0.getAuthorizedDapps = {
 				var dapp = OnNetwork.AuthorizedDapp(
 					networkID: .nebunet,
-					dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
+					dAppDefinitionAddress: try! .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
 					displayName: .init(rawValue: "something")!
 				)
 				dapp.referencesToAuthorizedPersonas = [
@@ -133,12 +136,26 @@ extension ProfileClient {
 						fieldIDs: [],
 						lastLogin: .now,
 						sharedAccounts: try! .init(
-							accountsReferencedByAddress: [try! AccountAddress(address: "abc")],
+							accountsReferencedByAddress: [try! AccountAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")],
 							forRequest: .exactly(1)
 						)
 					),
 				]
 				return [dapp]
+			}
+		}
+	}
+}
+
+extension PersonasClient {
+	static func previewValueTwoPersonas(existing: Bool) -> Self {
+		with(noop) {
+			$0.getPersonas = {
+				if existing {
+					return [.previewValue0, .previewValue1]
+				} else {
+					return [.previewValue0]
+				}
 			}
 		}
 	}

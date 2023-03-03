@@ -22,9 +22,9 @@ extension OnboardingCoordinator.View {
 				then: { ImportProfile.View(store: $0) }
 			)
 			CaseLet(
-				state: /OnboardingCoordinator.State.newProfileThenAccountCoordinator,
-				action: { OnboardingCoordinator.Action.child(.newProfileThenAccountCoordinator($0)) },
-				then: { NewProfileThenAccountCoordinator.View(store: $0) }
+				state: /OnboardingCoordinator.State.createAccountCoordinator,
+				action: { OnboardingCoordinator.Action.child(.createAccountCoordinator($0)) },
+				then: { CreateAccountCoordinator.View(store: $0) }
 			)
 		}
 	}

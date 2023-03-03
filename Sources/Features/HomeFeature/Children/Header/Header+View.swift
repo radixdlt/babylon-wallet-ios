@@ -25,22 +25,23 @@ extension Header {
 				observe: \.viewState,
 				send: { .view($0) }
 			) { viewStore in
-				ZStack {
-					Text(L10n.Home.Header.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body1HighImportance)
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.leading, .large2)
-						.padding(.trailing, 100)
+				VStack(alignment: .leading, spacing: .small2) {
+					Text(L10n.Home.Header.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
+
+					HStack {
+						Text(L10n.Home.Header.subtitle)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1HighImportance)
+
+						Spacer()
+							.frame(width: .large1 * 3)
+					}
 				}
+				.padding(.leading, .medium1)
 				.padding(.top, .small3)
-				.navigationTitle(L10n.Home.Header.title)
 				#if os(iOS)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.large)
-					.navigationBarLargeTitleFont(.app.sheetTitle)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.navigationBarLargeTitleInsets(.init(top: 0, leading: .large2, bottom: 0, trailing: .large2))
 					.toolbar {
 						ToolbarItem(placement: .navigationBarTrailing) {
 							SettingsButton(

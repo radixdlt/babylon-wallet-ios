@@ -1,7 +1,6 @@
 @testable import CreateEntityFeature
 import Cryptography
 import FeatureTestingPrelude
-import ProfileClient
 
 @MainActor
 final class NameNewEntityTests: TestCase {

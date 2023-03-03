@@ -58,6 +58,9 @@ extension Home {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
+					.task { @MainActor in
+						await ViewStore(store.stateless).send(.view(.task)).finish()
+					}
 					.navigationDestination(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /Home.Destinations.State.accountDetails,

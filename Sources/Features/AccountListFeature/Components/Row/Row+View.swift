@@ -1,4 +1,4 @@
-import AccountPortfolio
+import struct AccountPortfolioFetcherClient.AccountPortfolio // TODO: move to some new model package
 import FeaturePrelude
 import FungibleTokenListFeature
 

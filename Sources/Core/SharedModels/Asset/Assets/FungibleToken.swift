@@ -1,6 +1,6 @@
 import EngineToolkitModels
 import Prelude
-import ProfileModels
+import Profile
 
 // MARK: - FungibleToken
 public struct FungibleToken: Sendable, Asset, Token, Hashable {

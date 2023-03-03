@@ -2,12 +2,14 @@ import ClientPrelude
 
 // MARK: - ROLAClient
 public struct ROLAClient: Sendable, DependencyKey {
+	public var performDappDefinitionVerification: PerformDappDefinitionVerification
 	public var performWellKnownFileCheck: PerformWellKnownFileCheck
 }
 
 // MARK: ROLAClient.PerformWellKnownFileCheck
 extension ROLAClient {
-	public typealias PerformWellKnownFileCheck = @Sendable (P2P.FromDapp.WalletInteraction) async throws -> Void
+	public typealias PerformDappDefinitionVerification = @Sendable (P2P.FromDapp.WalletInteraction.Metadata) async throws -> Void
+	public typealias PerformWellKnownFileCheck = @Sendable (P2P.FromDapp.WalletInteraction.Metadata) async throws -> Void
 }
 
 extension DependencyValues {

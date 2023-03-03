@@ -4,9 +4,8 @@ import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import PersonasFeature
-import ProfileClient
 #if DEBUG
-import ProfileView
+import InspectProfileFeature
 import SecureStorageClient
 #endif
 
@@ -154,7 +153,10 @@ extension AppSettings.View {
 		       action: .authorizedDappsButtonTapped),
 		 .init(title: L10n.Settings.personasButtonTitle,
 		       asset: AssetResource.personas,
-		       action: .personasButtonTapped)]
+		       action: .personasButtonTapped),
+		 .init(title: L10n.Settings.appSettingsButtonTitle,
+		       asset: AssetResource.appSettings,
+		       action: .appSettingsButtonTapped)]
 	}
 
 	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {

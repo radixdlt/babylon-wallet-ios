@@ -1,15 +1,16 @@
+import AppPreferencesClient
 import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import PersonasFeature
-import ProfileClient
 
 // MARK: - AppSettings
 public struct AppSettings: FeatureReducer {
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.p2pClientsClient) var p2pClientsClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 
 	public typealias Store = StoreOf<Self>
@@ -43,6 +44,7 @@ public struct AppSettings: FeatureReducer {
 		case editGatewayAPIEndpointButtonTapped
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
+		case appSettingsButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -141,11 +143,14 @@ public struct AppSettings: FeatureReducer {
 			state.destination = .personas(.init())
 			return .none
 
+		case .appSettingsButtonTapped:
+			return .none
+
 		#if DEBUG
 		case .debugInspectProfileButtonTapped:
 			return .run { send in
-				guard let snapshot = try? await profileClient.extractProfileSnapshot(),
-				      let profile = try? Profile(snapshot: snapshot) else { return }
+				let snapshot = await appPreferencesClient.extractProfileSnapshot()
+				guard let profile = try? Profile(snapshot: snapshot) else { return }
 				await send(.internal(.profileToDebugLoaded(profile)))
 			}
 
@@ -197,7 +202,7 @@ extension AppSettings {
 		.task {
 			await .internal(.loadP2PClientsResult(
 				TaskResult {
-					try await profileClient.getP2PClients()
+					try await p2pClientsClient.getP2PClients()
 				}
 			))
 		}
