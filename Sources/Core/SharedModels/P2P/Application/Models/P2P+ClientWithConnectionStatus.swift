@@ -1,6 +1,6 @@
 import P2PModels
 import Prelude
-import ProfileModels
+import Profile
 
 // MARK: - P2P.ClientWithConnectionStatus
 extension P2P {

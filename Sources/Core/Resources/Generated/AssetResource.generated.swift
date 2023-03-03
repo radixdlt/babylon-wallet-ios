@@ -41,6 +41,7 @@ public enum AssetResource {
   public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
   public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
+  public static let appSettings = ImageAsset(name: "appSettings")
   public static let authorizedDapps = ImageAsset(name: "authorized-dapps")
   public static let browsers = ImageAsset(name: "browsers")
   public static let delete = ImageAsset(name: "delete")

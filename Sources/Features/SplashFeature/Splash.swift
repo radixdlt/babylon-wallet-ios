@@ -1,20 +1,20 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import ProfileClient
+import OnboardingClient
 
 // MARK: - Splash
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
 		public var biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>?
-		public var loadProfileResult: ProfileClient.LoadProfileResult?
+		public var loadProfileOutcome: LoadProfileOutcome?
 
 		public init(
 			biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>? = nil,
-			profileResult loadProfileResult: ProfileClient.LoadProfileResult? = nil
+			loadProfileOutcome: LoadProfileOutcome? = nil
 		) {
 			self.biometricsCheckFailedAlert = biometricsCheckFailedAlert
-			self.loadProfileResult = loadProfileResult
+			self.loadProfileOutcome = loadProfileOutcome
 		}
 	}
 
@@ -30,17 +30,17 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadProfileResult(ProfileClient.LoadProfileResult)
+		case loadProfileOutcome(LoadProfileOutcome)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case profileResultLoaded(ProfileClient.LoadProfileResult)
+		case loadProfileOutcome(LoadProfileOutcome)
 	}
 
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-	@Dependency(\.profileClient.loadProfile) var loadProfile
+	@Dependency(\.onboardingClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
 
 	public init() {}
@@ -54,13 +54,13 @@ public struct Splash: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-				await send(.internal(.loadProfileResult(loadProfile())))
+				await send(.internal(.loadProfileOutcome(loadProfile())))
 			}
 
 		case let .biometricsCheckFailedAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
-				return notifyDelegate(profileResult: state.loadProfileResult)
+				return notifyDelegate(loadProfileOutcome: state.loadProfileOutcome)
 			case .openSettingsButtonTapped:
 				#if os(iOS)
 				return .run { _ in
@@ -101,10 +101,10 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return notifyDelegate(profileResult: state.loadProfileResult)
+			return notifyDelegate(loadProfileOutcome: state.loadProfileOutcome)
 
-		case let .loadProfileResult(result):
-			state.loadProfileResult = result
+		case let .loadProfileOutcome(loadProfileOutcome):
+			state.loadProfileOutcome = loadProfileOutcome
 			return delay().concatenate(with: verifyBiometrics())
 		}
 	}
@@ -121,11 +121,11 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 	}
 
-	private func notifyDelegate(profileResult: ProfileClient.LoadProfileResult?) -> EffectTask<Action> {
-		precondition(profileResult != nil)
+	private func notifyDelegate(loadProfileOutcome: LoadProfileOutcome?) -> EffectTask<Action> {
+		precondition(loadProfileOutcome != nil)
 
 		return .run { send in
-			await send(.delegate(.profileResultLoaded(profileResult!)))
+			await send(.delegate(.loadProfileOutcome(loadProfileOutcome!)))
 		}
 	}
 

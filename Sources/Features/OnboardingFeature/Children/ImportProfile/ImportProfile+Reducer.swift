@@ -1,13 +1,12 @@
 import FeaturePrelude
-import ProfileClient
-import SecureStorageClient
+import OnboardingClient
 
 // MARK: - ImportProfile
 public struct ImportProfile: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.onboardingClient) var onboardingClient
 	public init() {}
 }
 
@@ -35,7 +34,7 @@ extension ImportProfile {
 			return .run { send in
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
 				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
-				try await profileClient.injectProfileSnapshot(snapshot)
+				try await onboardingClient.importProfileSnapshot(snapshot)
 				await send(.delegate(.imported))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

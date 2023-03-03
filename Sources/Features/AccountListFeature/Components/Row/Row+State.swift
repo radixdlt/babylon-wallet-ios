@@ -1,4 +1,4 @@
-import AccountPortfolio
+import struct AccountPortfolioFetcherClient.AccountPortfolio // TODO: move to some new model package
 import FeaturePrelude
 
 // MARK: - AccountList.Row.State
@@ -20,6 +20,7 @@ extension AccountList.Row {
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
 		) {
+			precondition(account.address == portfolio.owner)
 			self.account = account
 			self.aggregatedValue = aggregatedValue
 			self.portfolio = portfolio
@@ -35,7 +36,7 @@ extension AccountList.Row.State {
 		self.init(
 			account: account,
 			aggregatedValue: nil,
-			portfolio: .empty,
+			portfolio: .empty(owner: account.address),
 			currency: .usd,
 			isCurrencyAmountVisible: false
 		)

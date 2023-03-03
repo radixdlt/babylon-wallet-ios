@@ -1,6 +1,6 @@
 import EngineToolkitModels
 import Prelude
-import ProfileModels
+import Profile
 
 // MARK: - P2P.FromDapp
 extension P2P {

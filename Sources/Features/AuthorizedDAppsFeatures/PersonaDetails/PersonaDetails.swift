@@ -1,10 +1,10 @@
+import AuthorizedDappsClient
 import FeaturePrelude
-import ProfileClient
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	public typealias Store = StoreOf<Self>
 
@@ -78,7 +78,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .confirmForgetAlert(.presented(.confirmTapped)):
 			let (personaID, dAppID, networkID) = (state.persona.id, state.dAppID, state.networkID)
 			return .run { send in
-				try await profileClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
+				try await authorizedDappsClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
 				await send(.delegate(.personaDisconnected))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

@@ -199,6 +199,8 @@
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";
 
+"settings.appSettingsButtonTitle" = "App Settings";
+"settings.authorizedDappsButtonTitle" = "Authorized dApps";
 "settings.closeButtonTitle" = "Close";
 "settings.connectExtension.buttonTitle" = "Link to Connector";
 "settings.connectExtension.subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
@@ -207,7 +209,6 @@
 "settings.desktopConnectionsButtonTitle" = "Linked Connector";
 "settings.gatewayButtonTitle" = "Network Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
-"settings.authorizedDappsButtonTitle" = "Authorized dApps";
 "settings.noProfileText" = "No Wallet Data Found";
 "settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";

@@ -1,6 +1,6 @@
+import AppPreferencesClient
 import FeaturePrelude
 import HomeFeature
-import ProfileClient
 import SettingsFeature
 
 public struct Main: Sendable, FeatureReducer {
@@ -47,7 +47,7 @@ public struct Main: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.keychainClient) var keychainClient
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
 
@@ -65,6 +65,7 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .dappInteractionPresented:
+			state.home.destination = nil
 			state.destination = nil
 			return .none
 		}
@@ -78,7 +79,7 @@ public struct Main: Sendable, FeatureReducer {
 
 		case .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources)))):
 			return .run { send in
-				try await profileClient.deleteProfileAndFactorSources()
+				try await appPreferencesClient.deleteProfileAndFactorSources()
 				await send(.delegate(.removedWallet))
 			}
 

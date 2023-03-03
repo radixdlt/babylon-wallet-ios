@@ -1,6 +1,6 @@
+import AuthorizedDappsClient
 import FeaturePrelude
 import GatewayAPI
-import ProfileClient
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
@@ -8,7 +8,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	public struct FailedToLoadMetadata: Error, Hashable {}
 
@@ -131,7 +131,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .confirmDisconnectAlert(.presented(.confirmTapped)):
 			let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
 			return .run { send in
-				try await profileClient.forgetAuthorizedDapp(dAppID, networkID)
+				try await authorizedDappsClient.forgetAuthorizedDapp(dAppID, networkID)
 				await send(.internal(.dAppForgotten))
 				await send(.delegate(.dAppForgotten))
 			} catch: { error, _ in
@@ -148,7 +148,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .presentedPersona(.presented(.delegate(.personaDisconnected))):
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .run { send in
-				let updatedDapp = try await profileClient.getDetailedDapp(dAppID)
+				let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
 				await send(.internal(.dAppUpdated(updatedDapp)))
 				await send(.child(.presentedPersona(.dismiss)))
 			} catch: { error, _ in
