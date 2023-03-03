@@ -1,6 +1,5 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import ProfileClient
 
 // MARK: - NameNewEntity.Action
 extension NameNewEntity {

@@ -1,5 +1,6 @@
 import EngineToolkitClient
 import FeaturePrelude
+import GatewaysClient
 import SecureStorageClient
 import TransactionClient
 
@@ -43,7 +44,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.transactionClient) var transactionClient
 
 	public init() {}
@@ -53,7 +54,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 		case .appeared:
 			return .run { [manifest = state.transactionManifestWithoutLockFee] send in
 				do {
-					let networkID = await profileClient.getCurrentNetworkID()
+					let networkID = await gatewaysClient.getCurrentNetworkID()
 					let manifestWithLockFee = try await transactionClient.addLockFeeInstructionToManifest(manifest)
 					let manifestWithLockFeeString = manifestWithLockFee.toString(
 						preamble: "",

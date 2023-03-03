@@ -23,7 +23,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			initialState: ManageGatewayAPIEndpoints.State(),
 			reducer: ManageGatewayAPIEndpoints()
 		) {
-			$0.networkSwitchingClient.getGateway = {
+			$0.networkSwitchingClient.getCurrentGateway = {
 				await getGatewayCalled.setValue(true)
 				return .previewValue
 			}

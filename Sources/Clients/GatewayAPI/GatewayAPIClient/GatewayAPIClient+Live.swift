@@ -1,6 +1,6 @@
 import ClientPrelude
 import Cryptography
-import ProfileClient
+import GatewaysClient
 
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
@@ -26,10 +26,10 @@ extension GatewayAPIClient {
 		jsonEncoder: JSONEncoder,
 		jsonDecoder: JSONDecoder
 	) -> Self {
-		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		let getCurrentBaseURL: @Sendable () async -> URL = {
-			await profileClient.getGatewayAPIEndpointBaseURL()
+			await gatewaysClient.getGatewayAPIEndpointBaseURL()
 		}
 
 		@Sendable

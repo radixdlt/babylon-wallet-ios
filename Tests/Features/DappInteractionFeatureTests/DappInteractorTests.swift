@@ -21,7 +21,7 @@
 //				AsyncJustSequence(clientIDs).eraseToAnyAsyncSequence()
 //			}
 //			$0.p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence = { _ in incomingRequestsAsyncChannel.eraseToAnyAsyncSequence() }
-//			$0.profileClient.getCurrentNetworkID = { .simulator }
+//			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 //			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
 //		}
 //
@@ -73,7 +73,7 @@
 //			),
 //			reducer: DappInteractor()
 //		) {
-//			$0.profileClient.getCurrentNetworkID = { .simulator }
+//			$0.getCurrentGateway.getCurrentNetworkID = { .simulator }
 //			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
 //		}
 //
@@ -91,7 +91,8 @@
 //	func test__GIVEN__on_network_nebunet__WHEN__received_request_specifying_another_network__THEN__we_respond_back_to_dapp_with_error() async throws {
 //		let messageSentToDapp = ActorIsolated<P2P.ResponseToClientByID?>(nil)
 //
-//		let currentNetworkID = NetworkID.mardunet
+//      let currentGateway: Gateway = .mardunet
+//        let currentNetworkID = currentGateway.network.id
 //		let request = P2P.RequestFromClient(
 //			originalMessage: .previewValue,
 //			interaction: .init(
@@ -125,7 +126,7 @@
 //			),
 //			reducer: DappInteractor()
 //		) {
-//			$0.profileClient.getCurrentNetworkID = { currentNetworkID }
+//			$0.gatewaysClient.getCurrentGateway = { currentGateway }
 //			$0.errorQueue.schedule = {
 //				guard let error = $0 as? P2P.ToDapp.WalletInteractionFailureResponse.ErrorType else {
 //					return XCTFail("wrong error type")

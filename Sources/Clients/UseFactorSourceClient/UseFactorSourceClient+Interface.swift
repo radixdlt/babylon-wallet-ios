@@ -1,6 +1,6 @@
 import ClientPrelude
 import Cryptography
-import ProfileModels
+import Profile
 
 // MARK: - UseFactorSourceClient
 public struct UseFactorSourceClient: Sendable {

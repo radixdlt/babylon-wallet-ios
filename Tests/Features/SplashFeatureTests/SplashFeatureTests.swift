@@ -1,6 +1,6 @@
 import FeatureTestingPrelude
 import LocalAuthenticationClient
-import ProfileClient
+import OnboardingClient
 @testable import SplashFeature
 
 // MARK: - SplashFeatureTests
@@ -10,29 +10,29 @@ final class SplashFeatureTests: TestCase {
 		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
 
 		let testScheduler = DispatchQueue.test
+
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
-		)
+		) {
+			$0.localAuthenticationClient = LocalAuthenticationClient {
+				authBiometricsConfig
+			}
 
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.onboardingClient.loadProfile = {
+				.newUser
+			}
 		}
-
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-		let newProfile = withDependencies { $0.uuid = .incrementing } operation: { Profile(factorSource: factorSource) }
-		store.dependencies.profileClient.loadProfile = {
-			.success(newProfile)
-		}
 
 		// when
 		await store.send(.view(.appeared))
 
 		// then
-		await store.receive(.internal(.loadProfileResult(.success(newProfile)))) {
-			$0.loadProfileResult = .success(newProfile)
+		await store.receive(.internal(.loadProfileOutcome(.newUser))) {
+			$0.loadProfileOutcome = .newUser
 		}
 		await testScheduler.advance(by: .seconds(0.2))
 		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig)))) {
@@ -59,22 +59,23 @@ final class SplashFeatureTests: TestCase {
 		/// Profile load success
 		let factorSource = try FactorSource.babylon(mnemonic: .generate())
 		let newProfile = withDependencies { $0.uuid = .incrementing } operation: { Profile(factorSource: factorSource) }
-		try await assertNotifiesDelegateWithProfileResult(.success(newProfile))
-		try await assertNotifiesDelegateWithProfileResult(.success(nil))
+		try await assertNotifiesDelegateWithLoadProfileOutcome(.newUser)
+		try await assertNotifiesDelegateWithLoadProfileOutcome(.existingProfileLoaded)
 
 		/// Profile load failure
-		try await assertNotifiesDelegateWithProfileResult(
-			.failure(.profileVersionOutdated(json: Data(), version: .minimum))
+		try await assertNotifiesDelegateWithLoadProfileOutcome(
+			.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data(), version: .minimum))
 		)
-		try await assertNotifiesDelegateWithProfileResult(
-			.failure(.failedToCreateProfileFromSnapshot(.init(version: .minimum, error: NSError.any)))
-		)
-		try await assertNotifiesDelegateWithProfileResult(
-			.failure(.decodingFailure(json: Data(), .unknown(.init(error: NSError.any))))
+		try await assertNotifiesDelegateWithLoadProfileOutcome(
+			.usersExistingProfileCouldNotBeLoaded(failure: .failedToCreateProfileFromSnapshot(.init(version: .minimum, error: NSError.any))
+			))
+
+		try await assertNotifiesDelegateWithLoadProfileOutcome(
+			.usersExistingProfileCouldNotBeLoaded(failure: .decodingFailure(json: Data(), .unknown(.init(error: NSError.any))))
 		)
 	}
 
-	func assertNotifiesDelegateWithProfileResult(_ result: ProfileClient.LoadProfileResult) async throws {
+	func assertNotifiesDelegateWithLoadProfileOutcome(_ outcome: LoadProfileOutcome) async throws {
 		let authBiometricsConfig = LocalAuthenticationConfig.biometricsAndPasscodeSetUp
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
@@ -85,8 +86,8 @@ final class SplashFeatureTests: TestCase {
 				authBiometricsConfig
 			}
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.profileClient.loadProfile = {
-				result
+			$0.onboardingClient.loadProfile = {
+				outcome
 			}
 		}
 
@@ -94,12 +95,12 @@ final class SplashFeatureTests: TestCase {
 		await store.send(.view(.appeared))
 
 		// then
-		await store.receive(.internal(.loadProfileResult(result))) {
-			$0.loadProfileResult = result
+		await store.receive(.internal(.loadProfileOutcome(outcome))) {
+			$0.loadProfileOutcome = outcome
 		}
 		await testScheduler.advance(by: .seconds(0.2))
 		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig))))
-		await store.receive(.delegate(.profileResultLoaded(result)))
+		await store.receive(.delegate(.loadProfileOutcome(outcome)))
 	}
 }
 

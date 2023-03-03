@@ -1,6 +1,6 @@
 import EngineToolkitModels
 import Prelude
-import ProfileModels
+import Profile
 
 // MARK: - Badge
 public struct Badge: Asset {

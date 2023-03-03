@@ -66,3 +66,12 @@ extension Mnemonic: Codable {
 		try singleValueContainer.encode(phrase)
 	}
 }
+
+#if DEBUG
+extension Mnemonic {
+	public static let testValue: Self = try! Mnemonic(
+		phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
+		language: .english
+	)
+}
+#endif
