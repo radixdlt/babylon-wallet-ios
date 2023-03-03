@@ -42,7 +42,7 @@ public struct CreateEntityCoordinator<
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case dismiss
+		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -58,7 +58,7 @@ public struct CreateEntityCoordinator<
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismissed
+		case dismiss
 		case completed
 	}
 
@@ -88,11 +88,9 @@ public struct CreateEntityCoordinator<
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .dismiss:
+		case .closeButtonTapped:
 			precondition(state.config.canBeDismissed)
-			return .run { send in
-				await send(.delegate(.dismissed))
-			}
+			return .send(.delegate(.dismiss))
 		}
 	}
 

@@ -50,7 +50,7 @@ extension CreateEntityCoordinator {
 						if viewStore.shouldDisplayNavBar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
-									viewStore.send(.view(.dismiss))
+									viewStore.send(.view(.closeButtonTapped))
 								}
 							}
 						}
