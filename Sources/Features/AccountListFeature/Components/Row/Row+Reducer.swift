@@ -1,17 +1,51 @@
+import struct AccountPortfolioFetcherClient.AccountPortfolio // TODO: move to some new model package
 import FeaturePrelude
 
 // MARK: - AccountList.Row
 extension AccountList {
-	public struct Row: Sendable, ReducerProtocol {
-		public init() {}
+	public struct Row: Sendable, FeatureReducer {
+		public struct State: Sendable, Hashable, Identifiable {
+			public var id: AccountAddress { account.address }
 
-		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-			switch action {
-			case .internal(.view(.copyAddressButtonTapped)):
-				return .none
-			case .internal(.view(.selected)):
-				return .none
+			public let account: OnNetwork.Account
+			public var aggregatedValue: BigDecimal?
+			public var portfolio: AccountPortfolio
+
+			// MARK: - AppSettings properties
+			public var currency: FiatCurrency
+			public var isCurrencyAmountVisible: Bool
+
+			public init(
+				account: OnNetwork.Account,
+				aggregatedValue: BigDecimal?,
+				portfolio: AccountPortfolio,
+				currency: FiatCurrency,
+				isCurrencyAmountVisible: Bool
+			) {
+				precondition(account.address == portfolio.owner)
+				self.account = account
+				self.aggregatedValue = aggregatedValue
+				self.portfolio = portfolio
+				self.currency = currency
+				self.isCurrencyAmountVisible = isCurrencyAmountVisible
+			}
+
+			public init(account: OnNetwork.Account) {
+				self.init(
+					account: account,
+					aggregatedValue: nil,
+					portfolio: .empty(owner: account.address),
+					currency: .usd,
+					isCurrencyAmountVisible: false
+				)
 			}
 		}
+
+		public enum ViewAction: Sendable, Equatable {
+			case copyAddressButtonTapped
+			case tapped
+		}
+
+		public init() {}
 	}
 }
