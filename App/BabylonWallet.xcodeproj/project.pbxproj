@@ -11,24 +11,26 @@
 		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5B176A029267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
-		E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */; };
-		E62B6BD82965C15800AA08E4 /* TransactionClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD72965C15800AA08E4 /* TransactionClient */; };
-		E62B6BDA2965C16600AA08E4 /* EngineToolkitClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD92965C16600AA08E4 /* EngineToolkitClient */; };
-		E62B6BF02965C1AD00AA08E4 /* EngineToolkitClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */; };
-		E62B6BF62965C1AD00AA08E4 /* P2PConnectivityClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */; };
-		E62B6BFA2965C1AD00AA08E4 /* TransactionClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF92965C1AD00AA08E4 /* TransactionClient */; };
-		E636FA8E29AF983A00BA2540 /* P2PClientsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E636FA8D29AF983A00BA2540 /* P2PClientsClientLive */; };
-		E636FA9329AFA39900BA2540 /* GatewaysClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E636FA9229AFA39900BA2540 /* GatewaysClientLive */; };
-		E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E667FFD228F6F7ED0015544F /* AppFeature */; };
+		E6203E3E29B1E939000B8784 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E3D29B1E939000B8784 /* AppFeature */; };
+		E6203E4029B1E943000B8784 /* AccountsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E3F29B1E943000B8784 /* AccountsClientLive */; };
+		E6203E4229B1E943000B8784 /* AppPreferencesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E4129B1E943000B8784 /* AppPreferencesClientLive */; };
+		E6203E4429B1E943000B8784 /* AuthorizedDappsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E4329B1E943000B8784 /* AuthorizedDappsClientLive */; };
+		E6203E4629B1E943000B8784 /* FactorSourcesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E4529B1E943000B8784 /* FactorSourcesClientLive */; };
+		E6203E4829B1E943000B8784 /* GatewaysClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E4729B1E943000B8784 /* GatewaysClientLive */; };
+		E6203E4A29B1E943000B8784 /* OnboardingClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E4929B1E943000B8784 /* OnboardingClientLive */; };
+		E6203E4C29B1E943000B8784 /* P2PClientsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E4B29B1E943000B8784 /* P2PClientsClientLive */; };
+		E6203E4E29B1E943000B8784 /* PersonasClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E4D29B1E943000B8784 /* PersonasClientLive */; };
+		E6203E6229B1E963000B8784 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6129B1E963000B8784 /* AppFeature */; };
+		E6203E6429B1E96A000B8784 /* AccountsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6329B1E96A000B8784 /* AccountsClientLive */; };
+		E6203E6629B1E96A000B8784 /* AppPreferencesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6529B1E96A000B8784 /* AppPreferencesClientLive */; };
+		E6203E6829B1E96A000B8784 /* AuthorizedDappsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6729B1E96A000B8784 /* AuthorizedDappsClientLive */; };
+		E6203E6A29B1E96A000B8784 /* FactorSourcesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6929B1E96A000B8784 /* FactorSourcesClientLive */; };
+		E6203E6C29B1E96A000B8784 /* GatewaysClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6B29B1E96A000B8784 /* GatewaysClientLive */; };
+		E6203E6E29B1E96A000B8784 /* OnboardingClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6D29B1E96A000B8784 /* OnboardingClientLive */; };
+		E6203E7029B1E96A000B8784 /* P2PClientsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E6F29B1E96A000B8784 /* P2PClientsClientLive */; };
+		E6203E7229B1E96A000B8784 /* PersonasClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E7129B1E96A000B8784 /* PersonasClientLive */; };
 		E6805BCD286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BCE286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
-		E6805BDF286DB74300861180 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6805BDE286DB74300861180 /* AppFeature */; settings = {ATTRIBUTES = (Required, ); }; };
-		E6A021E229AFA75D0095FACD /* AuthorizedDappsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6A021E129AFA75D0095FACD /* AuthorizedDappsClientLive */; };
-		E6E2FC1F29AF8A2E001BEA5B /* AccountsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6E2FC1E29AF8A2E001BEA5B /* AccountsClientLive */; };
-		E6E2FC2129AF8A2E001BEA5B /* AppPreferencesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6E2FC2029AF8A2E001BEA5B /* AppPreferencesClientLive */; };
-		E6E2FC2329AF8A2E001BEA5B /* FactorSourcesClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6E2FC2229AF8A2E001BEA5B /* FactorSourcesClientLive */; };
-		E6E2FC2529AF8A2E001BEA5B /* OnboardingClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6E2FC2429AF8A2E001BEA5B /* OnboardingClientLive */; };
-		E6E2FC2729AF8A2E001BEA5B /* PersonasClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6E2FC2629AF8A2E001BEA5B /* PersonasClientLive */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,18 +66,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E6805BDF286DB74300861180 /* AppFeature in Frameworks */,
-				E6E2FC2329AF8A2E001BEA5B /* FactorSourcesClientLive in Frameworks */,
-				E6E2FC2729AF8A2E001BEA5B /* PersonasClientLive in Frameworks */,
-				E62B6BD82965C15800AA08E4 /* TransactionClient in Frameworks */,
-				E6E2FC2129AF8A2E001BEA5B /* AppPreferencesClientLive in Frameworks */,
-				E62B6BDA2965C16600AA08E4 /* EngineToolkitClient in Frameworks */,
-				E6A021E229AFA75D0095FACD /* AuthorizedDappsClientLive in Frameworks */,
-				E6E2FC1F29AF8A2E001BEA5B /* AccountsClientLive in Frameworks */,
-				E6E2FC2529AF8A2E001BEA5B /* OnboardingClientLive in Frameworks */,
-				E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */,
-				E636FA8E29AF983A00BA2540 /* P2PClientsClientLive in Frameworks */,
-				E636FA9329AFA39900BA2540 /* GatewaysClientLive in Frameworks */,
+				E6203E4229B1E943000B8784 /* AppPreferencesClientLive in Frameworks */,
+				E6203E4629B1E943000B8784 /* FactorSourcesClientLive in Frameworks */,
+				E6203E3E29B1E939000B8784 /* AppFeature in Frameworks */,
+				E6203E4029B1E943000B8784 /* AccountsClientLive in Frameworks */,
+				E6203E4829B1E943000B8784 /* GatewaysClientLive in Frameworks */,
+				E6203E4A29B1E943000B8784 /* OnboardingClientLive in Frameworks */,
+				E6203E4429B1E943000B8784 /* AuthorizedDappsClientLive in Frameworks */,
+				E6203E4E29B1E943000B8784 /* PersonasClientLive in Frameworks */,
+				E6203E4C29B1E943000B8784 /* P2PClientsClientLive in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,10 +82,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E62B6BFA2965C1AD00AA08E4 /* TransactionClient in Frameworks */,
-				E62B6BF02965C1AD00AA08E4 /* EngineToolkitClient in Frameworks */,
-				E62B6BF62965C1AD00AA08E4 /* P2PConnectivityClient in Frameworks */,
-				E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */,
+				E6203E6629B1E96A000B8784 /* AppPreferencesClientLive in Frameworks */,
+				E6203E6A29B1E96A000B8784 /* FactorSourcesClientLive in Frameworks */,
+				E6203E6229B1E963000B8784 /* AppFeature in Frameworks */,
+				E6203E6429B1E96A000B8784 /* AccountsClientLive in Frameworks */,
+				E6203E6C29B1E96A000B8784 /* GatewaysClientLive in Frameworks */,
+				E6203E6E29B1E96A000B8784 /* OnboardingClientLive in Frameworks */,
+				E6203E6829B1E96A000B8784 /* AuthorizedDappsClientLive in Frameworks */,
+				E6203E7229B1E96A000B8784 /* PersonasClientLive in Frameworks */,
+				E6203E7029B1E96A000B8784 /* P2PClientsClientLive in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,28 +215,27 @@
 			buildRules = (
 			);
 			dependencies = (
-				E62B6BEE2965C19D00AA08E4 /* PBXTargetDependency */,
-				E62B6BEC2965C19800AA08E4 /* PBXTargetDependency */,
-				E62B6BEA2965C19200AA08E4 /* PBXTargetDependency */,
-				E62B6BDC2965C17D00AA08E4 /* PBXTargetDependency */,
-				E62B6BDE2965C17D00AA08E4 /* PBXTargetDependency */,
-				E62B6BE22965C17D00AA08E4 /* PBXTargetDependency */,
-				E6A17E57292FB01500D40EDB /* PBXTargetDependency */,
+				E6203E5229B1E957000B8784 /* PBXTargetDependency */,
+				E6203E5429B1E957000B8784 /* PBXTargetDependency */,
+				E6203E5629B1E957000B8784 /* PBXTargetDependency */,
+				E6203E5829B1E957000B8784 /* PBXTargetDependency */,
+				E6203E5A29B1E957000B8784 /* PBXTargetDependency */,
+				E6203E5C29B1E957000B8784 /* PBXTargetDependency */,
+				E6203E5E29B1E957000B8784 /* PBXTargetDependency */,
+				E6203E6029B1E957000B8784 /* PBXTargetDependency */,
+				E6203E5029B1E951000B8784 /* PBXTargetDependency */,
 			);
 			name = "Radix Wallet (iOS)";
 			packageProductDependencies = (
-				E6805BDE286DB74300861180 /* AppFeature */,
-				E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */,
-				E62B6BD72965C15800AA08E4 /* TransactionClient */,
-				E62B6BD92965C16600AA08E4 /* EngineToolkitClient */,
-				E6E2FC1E29AF8A2E001BEA5B /* AccountsClientLive */,
-				E6E2FC2029AF8A2E001BEA5B /* AppPreferencesClientLive */,
-				E6E2FC2229AF8A2E001BEA5B /* FactorSourcesClientLive */,
-				E6E2FC2429AF8A2E001BEA5B /* OnboardingClientLive */,
-				E6E2FC2629AF8A2E001BEA5B /* PersonasClientLive */,
-				E636FA8D29AF983A00BA2540 /* P2PClientsClientLive */,
-				E636FA9229AFA39900BA2540 /* GatewaysClientLive */,
-				E6A021E129AFA75D0095FACD /* AuthorizedDappsClientLive */,
+				E6203E3D29B1E939000B8784 /* AppFeature */,
+				E6203E3F29B1E943000B8784 /* AccountsClientLive */,
+				E6203E4129B1E943000B8784 /* AppPreferencesClientLive */,
+				E6203E4329B1E943000B8784 /* AuthorizedDappsClientLive */,
+				E6203E4529B1E943000B8784 /* FactorSourcesClientLive */,
+				E6203E4729B1E943000B8784 /* GatewaysClientLive */,
+				E6203E4929B1E943000B8784 /* OnboardingClientLive */,
+				E6203E4B29B1E943000B8784 /* P2PClientsClientLive */,
+				E6203E4D29B1E943000B8784 /* PersonasClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -249,20 +252,27 @@
 			buildRules = (
 			);
 			dependencies = (
-				E62B6BFE2965C1BF00AA08E4 /* PBXTargetDependency */,
-				E62B6C002965C1BF00AA08E4 /* PBXTargetDependency */,
-				E62B6C022965C1BF00AA08E4 /* PBXTargetDependency */,
-				E62B6C042965C1BF00AA08E4 /* PBXTargetDependency */,
-				E62B6C082965C1BF00AA08E4 /* PBXTargetDependency */,
-				E62B6C0A2965C1BF00AA08E4 /* PBXTargetDependency */,
-				E667FFD528F6F7F00015544F /* PBXTargetDependency */,
+				E6203E7629B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E7829B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E7A29B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E7C29B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E7E29B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E8029B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E8229B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E8429B1E97A000B8784 /* PBXTargetDependency */,
+				E6203E7429B1E973000B8784 /* PBXTargetDependency */,
 			);
 			name = "Radix Wallet (macOS)";
 			packageProductDependencies = (
-				E667FFD228F6F7ED0015544F /* AppFeature */,
-				E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */,
-				E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */,
-				E62B6BF92965C1AD00AA08E4 /* TransactionClient */,
+				E6203E6129B1E963000B8784 /* AppFeature */,
+				E6203E6329B1E96A000B8784 /* AccountsClientLive */,
+				E6203E6529B1E96A000B8784 /* AppPreferencesClientLive */,
+				E6203E6729B1E96A000B8784 /* AuthorizedDappsClientLive */,
+				E6203E6929B1E96A000B8784 /* FactorSourcesClientLive */,
+				E6203E6B29B1E96A000B8784 /* GatewaysClientLive */,
+				E6203E6D29B1E96A000B8784 /* OnboardingClientLive */,
+				E6203E6F29B1E96A000B8784 /* P2PClientsClientLive */,
+				E6203E7129B1E96A000B8784 /* PersonasClientLive */,
 			);
 			productName = "Wallet (macOS)";
 			productReference = E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -346,61 +356,77 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		E62B6BDC2965C17D00AA08E4 /* PBXTargetDependency */ = {
+		E6203E5029B1E951000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BDB2965C17D00AA08E4 /* EngineToolkitClient */;
+			productRef = E6203E4F29B1E951000B8784 /* AppFeature */;
 		};
-		E62B6BDE2965C17D00AA08E4 /* PBXTargetDependency */ = {
+		E6203E5229B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BDD2965C17D00AA08E4 /* P2PConnectivityClient */;
+			productRef = E6203E5129B1E957000B8784 /* AccountsClientLive */;
 		};
-		E62B6BE22965C17D00AA08E4 /* PBXTargetDependency */ = {
+		E6203E5429B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BE12965C17D00AA08E4 /* TransactionClient */;
+			productRef = E6203E5329B1E957000B8784 /* AppPreferencesClientLive */;
 		};
-		E62B6BEA2965C19200AA08E4 /* PBXTargetDependency */ = {
+		E6203E5629B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BE92965C19200AA08E4 /* KeychainClientDependency */;
+			productRef = E6203E5529B1E957000B8784 /* AuthorizedDappsClientLive */;
 		};
-		E62B6BEC2965C19800AA08E4 /* PBXTargetDependency */ = {
+		E6203E5829B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BEB2965C19800AA08E4 /* FileClient */;
+			productRef = E6203E5729B1E957000B8784 /* FactorSourcesClientLive */;
 		};
-		E62B6BEE2965C19D00AA08E4 /* PBXTargetDependency */ = {
+		E6203E5A29B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BED2965C19D00AA08E4 /* UserDefaultsClient */;
+			productRef = E6203E5929B1E957000B8784 /* GatewaysClientLive */;
 		};
-		E62B6BFE2965C1BF00AA08E4 /* PBXTargetDependency */ = {
+		E6203E5C29B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BFD2965C1BF00AA08E4 /* EngineToolkitClient */;
+			productRef = E6203E5B29B1E957000B8784 /* OnboardingClientLive */;
 		};
-		E62B6C002965C1BF00AA08E4 /* PBXTargetDependency */ = {
+		E6203E5E29B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6BFF2965C1BF00AA08E4 /* FileClient */;
+			productRef = E6203E5D29B1E957000B8784 /* P2PClientsClientLive */;
 		};
-		E62B6C022965C1BF00AA08E4 /* PBXTargetDependency */ = {
+		E6203E6029B1E957000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6C012965C1BF00AA08E4 /* KeychainClientDependency */;
+			productRef = E6203E5F29B1E957000B8784 /* PersonasClientLive */;
 		};
-		E62B6C042965C1BF00AA08E4 /* PBXTargetDependency */ = {
+		E6203E7429B1E973000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6C032965C1BF00AA08E4 /* P2PConnectivityClient */;
+			productRef = E6203E7329B1E973000B8784 /* AppFeature */;
 		};
-		E62B6C082965C1BF00AA08E4 /* PBXTargetDependency */ = {
+		E6203E7629B1E97A000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6C072965C1BF00AA08E4 /* TransactionClient */;
+			productRef = E6203E7529B1E97A000B8784 /* AccountsClientLive */;
 		};
-		E62B6C0A2965C1BF00AA08E4 /* PBXTargetDependency */ = {
+		E6203E7829B1E97A000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E62B6C092965C1BF00AA08E4 /* UserDefaultsClient */;
+			productRef = E6203E7729B1E97A000B8784 /* AppPreferencesClientLive */;
 		};
-		E667FFD528F6F7F00015544F /* PBXTargetDependency */ = {
+		E6203E7A29B1E97A000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E667FFD428F6F7F00015544F /* AppFeature */;
+			productRef = E6203E7929B1E97A000B8784 /* AuthorizedDappsClientLive */;
 		};
-		E6A17E57292FB01500D40EDB /* PBXTargetDependency */ = {
+		E6203E7C29B1E97A000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E6A17E56292FB01500D40EDB /* AppFeature */;
+			productRef = E6203E7B29B1E97A000B8784 /* FactorSourcesClientLive */;
+		};
+		E6203E7E29B1E97A000B8784 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E6203E7D29B1E97A000B8784 /* GatewaysClientLive */;
+		};
+		E6203E8029B1E97A000B8784 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E6203E7F29B1E97A000B8784 /* OnboardingClientLive */;
+		};
+		E6203E8229B1E97A000B8784 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E6203E8129B1E97A000B8784 /* P2PClientsClientLive */;
+		};
+		E6203E8429B1E97A000B8784 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E6203E8329B1E97A000B8784 /* PersonasClientLive */;
 		};
 /* End PBXTargetDependency section */
 
@@ -543,123 +569,147 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = P2PConnectivityClient;
-		};
-		E62B6BD72965C15800AA08E4 /* TransactionClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TransactionClient;
-		};
-		E62B6BD92965C16600AA08E4 /* EngineToolkitClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EngineToolkitClient;
-		};
-		E62B6BDB2965C17D00AA08E4 /* EngineToolkitClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EngineToolkitClient;
-		};
-		E62B6BDD2965C17D00AA08E4 /* P2PConnectivityClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = P2PConnectivityClient;
-		};
-		E62B6BE12965C17D00AA08E4 /* TransactionClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TransactionClient;
-		};
-		E62B6BE92965C19200AA08E4 /* KeychainClientDependency */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KeychainClientDependency;
-		};
-		E62B6BEB2965C19800AA08E4 /* FileClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = FileClient;
-		};
-		E62B6BED2965C19D00AA08E4 /* UserDefaultsClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UserDefaultsClient;
-		};
-		E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EngineToolkitClient;
-		};
-		E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = P2PConnectivityClient;
-		};
-		E62B6BF92965C1AD00AA08E4 /* TransactionClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TransactionClient;
-		};
-		E62B6BFD2965C1BF00AA08E4 /* EngineToolkitClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = EngineToolkitClient;
-		};
-		E62B6BFF2965C1BF00AA08E4 /* FileClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = FileClient;
-		};
-		E62B6C012965C1BF00AA08E4 /* KeychainClientDependency */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KeychainClientDependency;
-		};
-		E62B6C032965C1BF00AA08E4 /* P2PConnectivityClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = P2PConnectivityClient;
-		};
-		E62B6C072965C1BF00AA08E4 /* TransactionClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TransactionClient;
-		};
-		E62B6C092965C1BF00AA08E4 /* UserDefaultsClient */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UserDefaultsClient;
-		};
-		E636FA8D29AF983A00BA2540 /* P2PClientsClientLive */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = P2PClientsClientLive;
-		};
-		E636FA9229AFA39900BA2540 /* GatewaysClientLive */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = GatewaysClientLive;
-		};
-		E667FFD228F6F7ED0015544F /* AppFeature */ = {
+		E6203E3D29B1E939000B8784 /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
 		};
-		E667FFD428F6F7F00015544F /* AppFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AppFeature;
-		};
-		E6805BDE286DB74300861180 /* AppFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AppFeature;
-		};
-		E6A021E129AFA75D0095FACD /* AuthorizedDappsClientLive */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AuthorizedDappsClientLive;
-		};
-		E6A17E56292FB01500D40EDB /* AppFeature */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AppFeature;
-		};
-		E6E2FC1E29AF8A2E001BEA5B /* AccountsClientLive */ = {
+		E6203E3F29B1E943000B8784 /* AccountsClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AccountsClientLive;
 		};
-		E6E2FC2029AF8A2E001BEA5B /* AppPreferencesClientLive */ = {
+		E6203E4129B1E943000B8784 /* AppPreferencesClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppPreferencesClientLive;
 		};
-		E6E2FC2229AF8A2E001BEA5B /* FactorSourcesClientLive */ = {
+		E6203E4329B1E943000B8784 /* AuthorizedDappsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AuthorizedDappsClientLive;
+		};
+		E6203E4529B1E943000B8784 /* FactorSourcesClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FactorSourcesClientLive;
 		};
-		E6E2FC2429AF8A2E001BEA5B /* OnboardingClientLive */ = {
+		E6203E4729B1E943000B8784 /* GatewaysClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GatewaysClientLive;
+		};
+		E6203E4929B1E943000B8784 /* OnboardingClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OnboardingClientLive;
 		};
-		E6E2FC2629AF8A2E001BEA5B /* PersonasClientLive */ = {
+		E6203E4B29B1E943000B8784 /* P2PClientsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PClientsClientLive;
+		};
+		E6203E4D29B1E943000B8784 /* PersonasClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PersonasClientLive;
+		};
+		E6203E4F29B1E951000B8784 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
+		};
+		E6203E5129B1E957000B8784 /* AccountsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AccountsClientLive;
+		};
+		E6203E5329B1E957000B8784 /* AppPreferencesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppPreferencesClientLive;
+		};
+		E6203E5529B1E957000B8784 /* AuthorizedDappsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AuthorizedDappsClientLive;
+		};
+		E6203E5729B1E957000B8784 /* FactorSourcesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FactorSourcesClientLive;
+		};
+		E6203E5929B1E957000B8784 /* GatewaysClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GatewaysClientLive;
+		};
+		E6203E5B29B1E957000B8784 /* OnboardingClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OnboardingClientLive;
+		};
+		E6203E5D29B1E957000B8784 /* P2PClientsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PClientsClientLive;
+		};
+		E6203E5F29B1E957000B8784 /* PersonasClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PersonasClientLive;
+		};
+		E6203E6129B1E963000B8784 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
+		};
+		E6203E6329B1E96A000B8784 /* AccountsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AccountsClientLive;
+		};
+		E6203E6529B1E96A000B8784 /* AppPreferencesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppPreferencesClientLive;
+		};
+		E6203E6729B1E96A000B8784 /* AuthorizedDappsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AuthorizedDappsClientLive;
+		};
+		E6203E6929B1E96A000B8784 /* FactorSourcesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FactorSourcesClientLive;
+		};
+		E6203E6B29B1E96A000B8784 /* GatewaysClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GatewaysClientLive;
+		};
+		E6203E6D29B1E96A000B8784 /* OnboardingClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OnboardingClientLive;
+		};
+		E6203E6F29B1E96A000B8784 /* P2PClientsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PClientsClientLive;
+		};
+		E6203E7129B1E96A000B8784 /* PersonasClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PersonasClientLive;
+		};
+		E6203E7329B1E973000B8784 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
+		};
+		E6203E7529B1E97A000B8784 /* AccountsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AccountsClientLive;
+		};
+		E6203E7729B1E97A000B8784 /* AppPreferencesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppPreferencesClientLive;
+		};
+		E6203E7929B1E97A000B8784 /* AuthorizedDappsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AuthorizedDappsClientLive;
+		};
+		E6203E7B29B1E97A000B8784 /* FactorSourcesClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FactorSourcesClientLive;
+		};
+		E6203E7D29B1E97A000B8784 /* GatewaysClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GatewaysClientLive;
+		};
+		E6203E7F29B1E97A000B8784 /* OnboardingClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = OnboardingClientLive;
+		};
+		E6203E8129B1E97A000B8784 /* P2PClientsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PClientsClientLive;
+		};
+		E6203E8329B1E97A000B8784 /* PersonasClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PersonasClientLive;
 		};

@@ -1,4 +1,4 @@
-import AppPreferencesClientLive
+import AppPreferencesClient
 import ClientPrelude
 import P2PClientsClient
 import ProfileStore

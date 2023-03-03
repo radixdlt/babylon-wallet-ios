@@ -361,7 +361,8 @@ package.addModules([
 		name: "GatewaysClientLive",
 		dependencies: [
 			"GatewaysClient",
-			"AppPreferencesClientLive",
+			"AppPreferencesClient",
+			"ProfileStore",
 		],
 		tests: .yes()
 	),
@@ -410,8 +411,9 @@ package.addModules([
 	.client(
 		name: "P2PClientsClientLive",
 		dependencies: [
+			"ProfileStore",
 			"P2PClientsClient",
-			"AppPreferencesClientLive",
+			"AppPreferencesClient",
 		],
 		tests: .yes()
 	),

@@ -5,7 +5,9 @@ import OnboardingFeature
 @testable import Profile
 @testable import SplashFeature
 
-private let ephemeralPrivateProfile: Profile.Ephemeral.Private = .testValue(hint: "AppFeatureTest")
+private let ephemeralPrivateProfile: Profile.Ephemeral.Private = withDependencies { $0.uuid = .incrementing } operation: {
+	Profile.Ephemeral.Private.testValue(hint: "AppFeatureTest")
+}
 
 // MARK: - AppFeatureTests
 @MainActor
@@ -23,31 +25,31 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: App.State(root: .main(.previewValue)),
 			reducer: App()
-		)
-
+		) {
+			$0.onboardingClient.loadEphemeralPrivateProfile = {
+				ephemeralPrivateProfile
+			}
+		}
 		// when
-		await store.send(.child(.main(.delegate(.removedWallet)))) {
+		await store.send(.child(.main(.delegate(.removedWallet))))
+		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
 			// then
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
-		// GIVEN: an existing profile
-		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-
+		// GIVEN: an existing profile (ephemeralPrivateProfile)
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-		}
-
-		let existingProfile = withDependencies {
-			$0.uuid = .incrementing
-		} operation: {
-			Profile(factorSource: factorSource)
+			$0.onboardingClient.loadEphemeralPrivateProfile = {
+				ephemeralPrivateProfile
+			}
+			$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 		}
 
 		// WHEN: existing profile is loaded
@@ -59,9 +61,10 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.existingProfileLoaded))))) {
-			$0.root = .main(.init())
-		}
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.existingProfileLoaded)))))
+			{
+				$0.root = .main(.init())
+			}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
 	}
@@ -75,6 +78,9 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.onboardingClient.loadEphemeralPrivateProfile = {
+				ephemeralPrivateProfile
+			}
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -88,7 +94,8 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser))))) {
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser)))))
+		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
@@ -105,6 +112,9 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.onboardingClient.loadEphemeralPrivateProfile = {
+				ephemeralPrivateProfile
+			}
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -124,9 +134,7 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
-			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
-		}
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome)))))
 
 		await store.receive(.internal(.system(.displayErrorAlert(
 			App.UserFacingError(foobar)
@@ -138,6 +146,10 @@ final class AppFeatureTests: TestCase {
 					message: { TextState("Failed to create Wallet from backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))") }
 				)
 			)
+		}
+
+		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
+			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
 		await store.send(.view(.alert(.dismiss))) {
@@ -162,6 +174,9 @@ final class AppFeatureTests: TestCase {
 
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
 				expectationProfileGotDeleted.fulfill()
+			}
+			$0.onboardingClient.loadEphemeralPrivateProfile = {
+				ephemeralPrivateProfile
 			}
 		}
 
@@ -197,7 +212,8 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
+		await store.receive(.internal(.system(.incompatibleProfileDeleted)))
+		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
@@ -218,6 +234,9 @@ final class AppFeatureTests: TestCase {
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
 				profileDeletedExpectation.fulfill()
+			}
+			$0.onboardingClient.loadEphemeralPrivateProfile = {
+				ephemeralPrivateProfile
 			}
 		}
 
@@ -253,9 +272,11 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
+		await store.receive(.internal(.system(.incompatibleProfileDeleted)))
+		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
+
 		waitForExpectations(timeout: 1)
 		await testScheduler.run() // fast-forward scheduler to the end of time
 		await viewTask.cancel()
