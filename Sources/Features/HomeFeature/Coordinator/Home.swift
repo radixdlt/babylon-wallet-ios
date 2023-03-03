@@ -136,8 +136,7 @@ public struct Home: Sendable, FeatureReducer {
 			return getAppPreferences()
 
 		case .pullToRefreshStarted:
-//			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList.accounts))
-			fatalError()
+			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList))
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -311,6 +310,10 @@ public struct Home: Sendable, FeatureReducer {
 				appPreferencesClient.getPreferences()
 			)))
 		}
+	}
+
+	private func fetchPortfolio(_ accounts: AccountList.State) -> EffectTask<Action> {
+		fetchPortfolio(accounts.accounts.map(\.account))
 	}
 
 	private func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account> & Sendable) -> EffectTask<Action> {
