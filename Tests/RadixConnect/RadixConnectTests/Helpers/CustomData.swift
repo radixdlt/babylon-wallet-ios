@@ -1,6 +1,6 @@
 import Foundation
-import RadixConnectModels
 @testable import RadixConnect
+import RadixConnectModels
 
 extension IdentifiedPrimitive {
 	static func anyOffer(for id: RemoteClientID) -> IdentifiedPrimitive<RTCPrimitive> {

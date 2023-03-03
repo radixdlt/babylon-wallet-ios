@@ -2,14 +2,13 @@ import Prelude
 
 // MARK: - PeerConnection
 protocol PeerConnection: Sendable {
-
-        func setLocalDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws
-        func setRemoteDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws
+	func setLocalDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws
+	func setRemoteDescription(_ description: Either<RTCPrimitive.Offer, RTCPrimitive.Answer>) async throws
 
 	/// Generate a SDP answer.
 	func createLocalAnswer() async throws -> RTCPrimitive.Answer
 
-        /// Generate a SDP offer.
+	/// Generate a SDP offer.
 	func createLocalOffer() async throws -> RTCPrimitive.Offer
 
 	/// Provide a remote candidate to the ICE Agent.

@@ -31,19 +31,19 @@ extension ManageP2PClients.View {
 
 				Separator()
 
-                                VStack(alignment: .leading) {
-                                        ForEachStore(
-                                                store.scope(
-                                                        state: \.clients,
-                                                        action: { .child(.connection(id: $0, action: $1)) }
-                                                ),
-                                                content: {
-                                                        ManageP2PClient.View(store: $0)
-                                                                .padding(.medium3)
-                                                        Spacer()
-                                                }
-                                        )
-                                }
+				VStack(alignment: .leading) {
+					ForEachStore(
+						store.scope(
+							state: \.clients,
+							action: { .child(.connection(id: $0, action: $1)) }
+						),
+						content: {
+							ManageP2PClient.View(store: $0)
+								.padding(.medium3)
+							Spacer()
+						}
+					)
+				}
 				Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
 					viewStore.send(.addNewConnectionButtonTapped)
 				}

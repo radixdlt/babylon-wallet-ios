@@ -1,17 +1,29 @@
 import RadixConnectModels
 
-// MARK: - IncommingMessage
-enum IncommingMessage: Sendable, Equatable {
+// MARK: - SignalingClient.IncommingMessage
+/// IncommingMessage from SignalingClient
+extension SignalingClient {
+	enum IncommingMessage: Sendable, Equatable {
+		case fromSignalingServer(FromSignalingServer)
+		case fromRemoteClient(RemoteData)
+	}
+}
+
+extension SignalingClient.IncommingMessage {
+	/// Received from SignalingServer itself
 	enum FromSignalingServer: Sendable, Equatable {
 		case notification(Notification)
 		case responseForRequest(ResponseForRequest)
 	}
 
-	case fromSignalingServer(FromSignalingServer)
-	case fromRemoteClient(RemoteData)
-}
+	/// Received from Remote client itself
+	struct RemoteData: Equatable, Sendable {
+		/// The id of the remote client which sent the message.
+		/// This field is actualy set by the SignalingServer, it is never configured by the client.
+		let remoteClientId: RemoteClientID
+		let message: SignalingClient.ClientMessage
+	}
 
-extension IncommingMessage {
 	var fromSignalingServer: FromSignalingServer? {
 		guard case let .fromSignalingServer(value) = self else {
 			return nil
@@ -27,7 +39,8 @@ extension IncommingMessage {
 	}
 }
 
-extension IncommingMessage.FromSignalingServer {
+extension SignalingClient.IncommingMessage.FromSignalingServer {
+	/// Remote client status notifications
 	enum Notification: Sendable, Equatable {
 		case remoteClientJustConnected(RemoteClientID)
 		case remoteClientDisconnected(RemoteClientID)
@@ -35,7 +48,7 @@ extension IncommingMessage.FromSignalingServer {
 	}
 
 	enum ResponseForRequest: Sendable, Equatable {
-		case success(RequestID)
+		case success(SignalingClient.ClientMessage.RequestID)
 		case failure(RequestFailure)
 	}
 
@@ -54,26 +67,50 @@ extension IncommingMessage.FromSignalingServer {
 	}
 }
 
-extension IncommingMessage.FromSignalingServer.ResponseForRequest {
+extension SignalingClient.IncommingMessage.RemoteData {
+	/// Extract the Offer by attaching the remote client id.
+	var offer: IdentifiedPrimitive<RTCPrimitive.Offer>? {
+		guard let offer = message.primitive.offer else {
+			return nil
+		}
+		return .init(content: offer, id: remoteClientId)
+	}
+
+	/// Extract the Answer by attaching the remote client id.
+	var answer: IdentifiedPrimitive<RTCPrimitive.Answer>? {
+		guard let answer = message.primitive.answer else {
+			return nil
+		}
+		return .init(content: answer, id: remoteClientId)
+	}
+
+	/// Extract the ICECandidate by attaching the remote client id.
+	var iceCandidate: IdentifiedPrimitive<RTCPrimitive.ICECandidate>? {
+		guard let candidate = message.primitive.iceCandidate else {
+			return nil
+		}
+		return .init(content: candidate, id: remoteClientId)
+	}
+}
+
+extension SignalingClient.IncommingMessage.FromSignalingServer.ResponseForRequest {
 	enum RequestFailure: Sendable, Equatable, Error {
-		case noRemoteClientToTalkTo(RequestID)
+		case noRemoteClientToTalkTo(SignalingClient.ClientMessage.RequestID)
 		case validationError(ValidationError)
 		case invalidMessageError(InvalidMessageError)
 	}
 
 	struct ValidationError: Sendable, Equatable {
 		public let reason: JSONValue
-		public let requestId: RequestID
+		public let requestId: SignalingClient.ClientMessage.RequestID
 	}
 
 	struct InvalidMessageError: Sendable, Equatable {
 		public let reason: JSONValue
-		public let messageSentThatWasInvalid: ClientMessage
+		public let messageSentThatWasInvalid: SignalingClient.ClientMessage
 	}
-}
 
-extension IncommingMessage.FromSignalingServer.ResponseForRequest {
-	func resultOfRequest(id needle: RequestID) -> Result<Void, RequestFailure>? {
+	func resultOfRequest(id needle: SignalingClient.ClientMessage.RequestID) -> Result<Void, RequestFailure>? {
 		switch self {
 		case let .success(id) where id == needle:
 			return .success(())
@@ -87,7 +124,7 @@ extension IncommingMessage.FromSignalingServer.ResponseForRequest {
 		}
 	}
 
-	var requestId: RequestID? {
+	var requestId: SignalingClient.ClientMessage.RequestID? {
 		switch self {
 		case let .success(id):
 			return id
@@ -101,7 +138,7 @@ extension IncommingMessage.FromSignalingServer.ResponseForRequest {
 	}
 }
 
-extension IncommingMessage.FromSignalingServer.Notification {
+extension SignalingClient.IncommingMessage.FromSignalingServer.Notification {
 	var remoteClientDidConnect: Bool {
 		switch self {
 		case .remoteClientJustConnected,
@@ -115,8 +152,8 @@ extension IncommingMessage.FromSignalingServer.Notification {
 	var remoteClientId: RemoteClientID {
 		switch self {
 		case let .remoteClientDisconnected(id),
-                        let .remoteClientIsAlreadyConnected(id),
-                        let .remoteClientJustConnected(id):
+		     let .remoteClientIsAlreadyConnected(id),
+		     let .remoteClientJustConnected(id):
 			return id
 		}
 	}

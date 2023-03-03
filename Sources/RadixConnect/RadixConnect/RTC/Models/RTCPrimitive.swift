@@ -1,24 +1,48 @@
 import RadixConnectModels
+import Tagged
 
-// MARK: - Identified
-struct Identified<T, Id> {
-	let content: T
-	let id: Id
-}
-
-// MARK: Equatable
-extension Identified: Equatable where T: Equatable, Id: Equatable {}
-
-// MARK: Sendable
-extension Identified: Sendable where T: Sendable, Id: Sendable {}
-
+/// The RTCPrimitive with its respective remote client ID.
+/// The is `T` to allow to either embed the full RTCPrimitive type or a specifc primitive - Offer, Answer, ICECanidate.
 typealias IdentifiedPrimitive<T: Sendable> = Identified<T, RemoteClientID>
 
 // MARK: - RTCPrimitive
+/// Describes the possible RTC primitive exchanged during the WebRTC negotiation
 enum RTCPrimitive: Equatable, Sendable {
 	case offer(RTCPrimitive.Offer)
 	case answer(RTCPrimitive.Answer)
 	case iceCandidate(RTCPrimitive.ICECandidate)
+}
+
+extension RTCPrimitive {
+	enum SDPTag {}
+	typealias SDP = Tagged<SDPTag, String>
+
+	struct Offer: Sendable, Codable, Equatable {
+		let sdp: SDP
+		init(sdp: SDP) {
+			self.sdp = sdp
+		}
+	}
+
+	struct Answer: Sendable, Codable, Equatable {
+		let sdp: SDP
+		init(sdp: SDP) {
+			self.sdp = sdp
+		}
+	}
+
+	struct ICECandidate: Sendable, Codable, Equatable {
+		let candidate: SDP
+		var sdp: SDP { candidate }
+		let sdpMLineIndex: Int32
+		let sdpMid: String?
+
+		init(sdp: SDP, sdpMLineIndex: Int32, sdpMid: String?) {
+			self.candidate = sdp
+			self.sdpMLineIndex = sdpMLineIndex
+			self.sdpMid = sdpMid
+		}
+	}
 }
 
 extension RTCPrimitive {
@@ -41,35 +65,6 @@ extension RTCPrimitive {
 			return nil
 		}
 		return ice
-	}
-}
-
-extension RTCPrimitive {
-	struct Offer: Sendable, Codable, Equatable {
-		let sdp: SDP
-		init(sdp: SDP) {
-			self.sdp = sdp
-		}
-	}
-
-	struct Answer: Sendable, Codable, Equatable {
-		let sdp: SDP
-		init(sdp: SDP) {
-			self.sdp = sdp
-		}
-	}
-
-	public struct ICECandidate: Sendable, Codable, Equatable {
-		public let candidate: SDP
-		public var sdp: SDP { candidate }
-		public let sdpMLineIndex: Int32
-		public let sdpMid: String?
-
-		public init(sdp: SDP, sdpMLineIndex: Int32, sdpMid: String?) {
-			self.candidate = sdp
-			self.sdpMLineIndex = sdpMLineIndex
-			self.sdpMid = sdpMid
-		}
 	}
 }
 

@@ -3,17 +3,16 @@ import Foundation
 import RadixConnectModels
 
 // MARK: - PeerConnectionClient
-
 /// A client that manages a given PeerConnection and its related DataChannel.
 public struct PeerConnectionClient: Sendable {
-	let id: PeerConnectionId
+	let id: PeerConnectionID
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
 	private let dataChannelClient: DataChannelClient
 
 	let iceConnectionStates: AnyAsyncSequence<ICEConnectionState>
 
-	init(id: PeerConnectionId, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
+	init(id: PeerConnectionID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
 		self.id = id
 		self.peerConnection = peerConnection
 		self.delegate = delegate
@@ -28,22 +27,22 @@ public struct PeerConnectionClient: Sendable {
 	}
 
 	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
-                try await peerConnection.setRemoteDescription(.left(offer))
+		try await peerConnection.setRemoteDescription(.left(offer))
 	}
 
 	func setRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws {
-                try await peerConnection.setRemoteDescription(.right(answer))
+		try await peerConnection.setRemoteDescription(.right(answer))
 	}
 
 	func createAnswer() async throws -> RTCPrimitive.Answer {
 		let answer = try await peerConnection.createLocalAnswer()
-                try await peerConnection.setLocalDescription(.right(answer))
+		try await peerConnection.setLocalDescription(.right(answer))
 		return answer
 	}
 
 	func createLocalOffer() async throws -> RTCPrimitive.Offer {
 		let offer = try await peerConnection.createLocalOffer()
-                try await peerConnection.setLocalDescription(.left(offer))
+		try await peerConnection.setLocalDescription(.left(offer))
 		return offer
 	}
 

@@ -2,7 +2,7 @@ import CryptoKit
 import Foundation
 import Prelude
 
-public extension EncryptionKey {
+public extension SignalingClient.EncryptionKey {
 	private var symmetric: SymmetricKey {
 		.init(data: self.data.data)
 	}

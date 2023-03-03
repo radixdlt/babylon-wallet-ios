@@ -38,6 +38,6 @@ extension P2PConnectivityClient {
 	public typealias AddP2PWithPassword = @Sendable (ConnectionPassword) async throws -> Void
 	public typealias DeleteP2PClientByID = @Sendable (ConnectionPassword) async throws -> Void
 
-        public typealias ReceiveMessages = @Sendable () async -> AsyncStream<P2P.RTCIncommingMessageResult>
-        public typealias SendMessage = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
+	public typealias ReceiveMessages = @Sendable () async -> AsyncStream<P2P.RTCIncommingMessageResult>
+	public typealias SendMessage = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
 }

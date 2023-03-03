@@ -72,7 +72,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 		.run { send in
 			await send(.internal(.connectionSecretsFromScannedStringResult(
 				TaskResult {
-                                        try  ConnectionPassword.init(.init(hex: hexString))
+					try ConnectionPassword(.init(hex: hexString))
 				}
 			)))
 		}

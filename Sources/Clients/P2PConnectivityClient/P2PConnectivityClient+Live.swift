@@ -1,20 +1,20 @@
 import ClientPrelude
 import Network
-import RadixConnect
 import P2PClientsClient
+import RadixConnect
 
 // MARK: - P2PConnectivityClient + :LiveValue
 extension P2PConnectivityClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pClientsClient) var p2pClientsClient
 
-		let rtcClients = RTCClients(signalingServerBaseURL: .devSignalingServer)
+		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
 			Task {
 				print("🔌 Loading and connecting all P2P connections")
-				for client in try await p2pClientsClient.getP2PClients() {
+				for client in await p2pClientsClient.getP2PClients() {
 					try await rtcClients.addExistingClient(client.connectionPassword)
 				}
 			}
@@ -30,13 +30,13 @@ extension P2PConnectivityClient {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClients: {
-				try await OrderedSet(profileClient.getP2PClients())
+				await OrderedSet(p2pClientsClient.getP2PClients())
 			},
 			storeP2PClient: { client in
-				try await profileClient.addP2PClient(client)
+				try await p2pClientsClient.addP2PClient(client)
 			},
 			deleteP2PClientByID: { id in
-				try await profileClient.deleteP2PClientByID(id)
+				try await p2pClientsClient.deleteP2PClientByID(id)
 				await rtcClients.removeClient(id)
 			},
 			addP2PWithSecrets: { password in

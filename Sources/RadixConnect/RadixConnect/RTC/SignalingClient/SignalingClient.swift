@@ -3,6 +3,7 @@ import Foundation
 import Prelude
 
 // MARK: - SignalingTransport
+/// The Transport used to send and receive messages
 protocol SignalingTransport: Sendable {
 	var incommingMessages: AsyncStream<Data> { get }
 	func send(message: Data) async throws
@@ -10,27 +11,28 @@ protocol SignalingTransport: Sendable {
 	func cancel() async
 }
 
-// MARK: - ClientSource
-enum ClientSource: String, Sendable, Codable, Equatable {
-	case wallet
-	case `extension`
-}
-
 // MARK: - SignalingClient
 struct SignalingClient {
+	enum ClientSource: String, Sendable, Codable, Equatable {
+		case wallet
+		case `extension`
+	}
+
 	// MARK: - Configuration
+
+	/// The transport to be used to send and receive client messages
+	private let transport: SignalingTransport
+	private let clientSource: ClientSource
+	/// Key to be used to encrypt/decrypt client messages
 	private let encryptionKey: EncryptionKey
 	private let jsonDecoder: JSONDecoder
 	private let jsonEncoder: JSONEncoder
-	private let connectionID: SignalingServerConnectionID
-	private let idBuilder: @Sendable () -> RequestID
-	private let webSocketClient: SignalingTransport
-	private let clientSource: ClientSource
+	private let idBuilder: @Sendable () -> ClientMessage.RequestID
 
 	// MARK: - Streams
 	private let incommingMessages: AnyAsyncSequence<IncommingMessage>
 	private let incommingSignalingServerMessagges: AnyAsyncSequence<IncommingMessage.FromSignalingServer>
-	private let incommingRemoteClientMessagges: AnyAsyncSequence<RemoteData>
+	private let incommingRemoteClientMessagges: AnyAsyncSequence<IncommingMessage.RemoteData>
 
 	let onICECanddiate: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.ICECandidate>>
 	let onOffer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Offer>>
@@ -40,16 +42,14 @@ struct SignalingClient {
 	// MARK: - Initializer
 
 	init(encryptionKey: EncryptionKey,
-	     webSocketClient: SignalingTransport,
-	     connectionID: SignalingServerConnectionID,
-	     idBuilder: @Sendable @escaping () -> RequestID = { .init(UUID().uuidString) },
+	     transport: SignalingTransport,
+	     idBuilder: @Sendable @escaping () -> ClientMessage.RequestID = { .init(UUID().uuidString) },
 	     jsonDecoder: JSONDecoder = .init(),
 	     jsonEncoder: JSONEncoder = .init(),
 	     clientSource: ClientSource = .wallet)
 	{
 		self.encryptionKey = encryptionKey
-		self.webSocketClient = webSocketClient
-		self.connectionID = connectionID
+		self.transport = transport
 		self.idBuilder = idBuilder
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
@@ -57,12 +57,11 @@ struct SignalingClient {
 		self.jsonDecoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 		self.jsonEncoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 
-		self.incommingMessages = webSocketClient
+		self.incommingMessages = transport
 			.incommingMessages
 			.eraseToAnyAsyncSequence()
 			.mapSkippingError {
-				print("Received message \(String(describing: String(data: $0, encoding: .utf8)))")
-				return try jsonDecoder.decode(IncommingMessage.self, from: $0)
+				try jsonDecoder.decode(IncommingMessage.self, from: $0)
 			} logError: { error in
 				loggerGlobal.info("Failed to decode incomming Message - \(error)")
 			}
@@ -99,12 +98,16 @@ struct SignalingClient {
 			.eraseToAnyAsyncSequence()
 	}
 
+	// MARK: - Public API
+
+	/// Cancel all ongoing tasks and prepare for deallocation
 	func cancel() {
 		Task {
-			await webSocketClient.cancel()
+			await transport.cancel()
 		}
 	}
 
+	/// Send the given primitive to remote client. Will await for receive confirmation
 	func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
 		let message = ClientMessage(
 			requestId: idBuilder(),
@@ -112,11 +115,13 @@ struct SignalingClient {
 			primitive: primitive.content
 		)
 		let encodedMessage = try jsonEncoder.encode(message)
-		try await webSocketClient.send(message: encodedMessage)
+		try await transport.send(message: encodedMessage)
 		try await waitForRequestAck(message.requestId)
 	}
 
-	private func waitForRequestAck(_ requestId: RequestID) async throws {
+	// MARK: - Private API
+
+	private func waitForRequestAck(_ requestId: ClientMessage.RequestID) async throws {
 		try await self.incommingSignalingServerMessagges
 			.compactMap(\.responseForRequest)
 			.compactMap { incoming in

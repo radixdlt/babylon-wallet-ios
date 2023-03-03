@@ -1,7 +1,7 @@
 import Cryptography
 import EngineToolkit
-import RadixConnectModels
 @testable import Profile
+import RadixConnectModels
 import SharedTestingModels
 import TestingPrelude
 
@@ -10,7 +10,7 @@ final class ProfileTests: TestCase {
 	let gateway = Gateway.nebunet
 
 	func test_p2p_client_eq() throws {
-                let pw = try ConnectionPassword.init(.init(.deadbeef32Bytes))
+		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
 		let first = P2PClient(connectionPassword: pw, displayName: "first")
 		let second = P2PClient(connectionPassword: pw, displayName: "second")
 		XCTAssertEqual(first, second)
@@ -165,7 +165,7 @@ final class ProfileTests: TestCase {
 			.init(kind: .lastName, value: "Publicson"),
 		])
 
-                let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
+		let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
 		XCTAssertNotNil(profile.appendP2PClient(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
 		// Should not be possible to add a client with the same password
 		XCTAssertNil(profile.appendP2PClient(
@@ -177,7 +177,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertNotNil(profile.appendP2PClient(
 			P2PClient(
-                                connectionPassword: try! ConnectionPassword(.init(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef")),
+				connectionPassword: try! ConnectionPassword(.init(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef")),
 				displayName: "iPhone 13"
 			)
 		))
@@ -345,7 +345,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(profile.appPreferences.p2pClients.clients.count, 2)
 		let p2pClient0 = try XCTUnwrap(profile.appPreferences.p2pClients.first)
-                XCTAssertEqual(p2pClient0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+		XCTAssertEqual(p2pClient0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 		let p2pClient1 = profile.appPreferences.p2pClients[1]
 
 		XCTAssertEqual(onNetwork.authorizedDapps.count, 1)

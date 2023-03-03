@@ -1,8 +1,12 @@
 import Foundation
 import RadixConnectModels
 
-// MARK: - IncommingMessage.ResponseType
-extension IncommingMessage {
+extension CodingUserInfoKey {
+	static let clientMessageEncryptonKey = CodingUserInfoKey(rawValue: "clientMessageEncryptonKey")!
+}
+
+// MARK: - SignalingClient.IncommingMessage + Decodable
+extension SignalingClient.IncommingMessage: Decodable {
 	enum ResponseType: String, Decodable, Sendable {
 		// MARK: ResponseToRequest
 
@@ -31,14 +35,7 @@ extension IncommingMessage {
 		/// RPC message sent by the remote client originally, dispatch to us through the signaling server
 		case fromRemoteClient = "remoteData"
 	}
-}
 
-extension CodingUserInfoKey {
-	static let clientMessageEncryptonKey = CodingUserInfoKey(rawValue: "clientMessageEncryptonKey")!
-}
-
-// MARK: - IncommingMessage + Decodable
-extension IncommingMessage: Decodable {
 	enum CodingKeys: String, CodingKey {
 		case responseType = "info", requestId, error,
 		     source = "target", message = "data", remoteClientId, targetClientId
@@ -50,8 +47,8 @@ extension IncommingMessage: Decodable {
 
 		switch responseType {
 		case .fromRemoteClient:
-			let encryptionKey = decoder.userInfo[.clientMessageEncryptonKey] as! EncryptionKey
-			let message = try container.decode(ClientMessage.self, forKey: .message)
+			let encryptionKey = decoder.userInfo[.clientMessageEncryptonKey] as! SignalingClient.EncryptionKey
+			let message = try container.decode(SignalingClient.ClientMessage.self, forKey: .message)
 			let remoteClientId = try container.decode(RemoteClientID.self, forKey: .remoteClientId)
 			self = .fromRemoteClient(.init(remoteClientId: remoteClientId, message: message))
 
@@ -66,7 +63,7 @@ extension IncommingMessage: Decodable {
 			self = .fromSignalingServer(.notification(.remoteClientDisconnected(clientId)))
 
 		case .missingRemoteClientError:
-			let requestId = try container.decode(RequestID.self, forKey: .requestId)
+			let requestId = try container.decode(SignalingClient.ClientMessage.RequestID.self, forKey: .requestId)
 
 			self = .fromSignalingServer(
 				.responseForRequest(
@@ -78,7 +75,7 @@ extension IncommingMessage: Decodable {
 
 		case .validationError:
 			let error = try container.decode(JSONValue.self, forKey: .error)
-			let requestId = try container.decode(RequestID.self, forKey: .requestId)
+			let requestId = try container.decode(SignalingClient.ClientMessage.RequestID.self, forKey: .requestId)
 			self = .fromSignalingServer(
 				.responseForRequest(
 					.failure(
@@ -93,7 +90,7 @@ extension IncommingMessage: Decodable {
 			)
 		case .invalidMessageError:
 			let error = try container.decode(JSONValue.self, forKey: .error)
-			let message = try container.decode(ClientMessage.self, forKey: .message)
+			let message = try container.decode(SignalingClient.ClientMessage.self, forKey: .message)
 			self = .fromSignalingServer(
 				.responseForRequest(
 					.failure(
@@ -107,7 +104,7 @@ extension IncommingMessage: Decodable {
 				)
 			)
 		case .success:
-			let requestId = try container.decode(RequestID.self, forKey: .requestId)
+			let requestId = try container.decode(SignalingClient.ClientMessage.RequestID.self, forKey: .requestId)
 			self = .fromSignalingServer(.responseForRequest(.success(requestId)))
 		}
 	}

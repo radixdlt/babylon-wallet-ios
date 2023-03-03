@@ -1,5 +1,4 @@
-import ClientPrelude
-import Profile
+import RadixConnectModels
 
 // MARK: - P2PClientsClient
 public struct P2PClientsClient: Sendable {
@@ -22,10 +21,4 @@ extension P2PClientsClient {
 	public typealias GetP2PClients = @Sendable () async -> P2PClients
 	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
-}
-
-extension P2PClientsClient {
-	public func p2pClient(for id: P2PConnectionID) async throws -> P2PClient? {
-		try await getP2PClients().first(where: { $0.id == id })
-	}
 }

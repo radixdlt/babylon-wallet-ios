@@ -56,7 +56,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	private enum ConnectID {}
 	public func reduce(into state: inout State, action: ViewAction) -> EffectTask<Action> {
 		switch action {
-                case .task:
+		case .task:
 			let connectionPassword = state.connectionSecrets
 
 			return .run { send in
@@ -68,13 +68,13 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 				)))
 			}.cancellable(id: ConnectID.self)
 
-                case .appeared:
+		case .appeared:
 			return .task {
 				return .view(.textFieldFocused(.connectionName))
 			}
 			.cancellable(id: FocusFieldID.self)
 
-                case let .textFieldFocused(focus):
+		case let .textFieldFocused(focus):
 			return .run { send in
 				do {
 					try await self.mainQueue.sleep(for: .seconds(0.5))
@@ -87,15 +87,15 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			}
 			.cancellable(id: FocusFieldID.self)
 
-                case let .nameOfConnectionChanged(connectionName):
+		case let .nameOfConnectionChanged(connectionName):
 			state.nameOfConnection = connectionName
 			state.isNameValid = !connectionName.trimmed().isEmpty
 			return .none
 
-                case .confirmNameButtonTapped:
+		case .confirmNameButtonTapped:
 			let p2pClient = P2PClient(connectionPassword: state.connectionSecrets, displayName: state.nameOfConnection)
 			return .run { send in
-                                await send(.internal(.cancelOngoingEffects))
+				await send(.internal(.cancelOngoingEffects))
 				await send(.delegate(.connected(p2pClient)))
 			}
 		}

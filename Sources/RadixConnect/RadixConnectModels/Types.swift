@@ -1,13 +1,14 @@
 import Prelude
 
-// MARK: - ClientIDTag
-public enum RemoteClientIDTag {}
-public typealias RemoteClientID = Tagged<RemoteClientIDTag, String>
-
+// MARK: - PeerConnectionIdTag
+/// The Established Peer Connection ID.
 public enum PeerConnectionIdTag {}
-public typealias PeerConnectionId = Tagged<PeerConnectionIdTag, RemoteClientID>
+public typealias PeerConnectionID = Tagged<PeerConnectionIdTag, String>
 
-extension PeerConnectionId: Sendable {}
+// MARK: Sendable
+extension PeerConnectionID: Sendable {}
 
+// MARK: - ConnectionPasswordTag
+/// The ConnectionPassword to be used to connect to the SignalingServer.
 public enum ConnectionPasswordTag {}
 public typealias ConnectionPassword = Tagged<ConnectionPasswordTag, HexCodable32Bytes>
