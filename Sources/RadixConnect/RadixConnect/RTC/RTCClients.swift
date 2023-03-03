@@ -96,7 +96,7 @@ public actor RTCClients {
 
 	private func makeRTCClient(_ password: ConnectionPassword) throws -> RTCClient {
 		let signalingClient = try SignalingClient(password: password, source: .wallet, baseURL: signalingServerBaseURL)
-		let builder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+		let builder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 		return RTCClient(id: password, peerConnectionBuilder: builder)
 	}
 }
@@ -115,7 +115,7 @@ actor RTCClient {
 	let incommingMessages: AsyncStream<P2P.RTCIncommingMessageResult>
 
 	private let incommingMessagesContinuation: AsyncStream<P2P.RTCIncommingMessageResult>.Continuation!
-	private let peerConnectionBuilder: PeerConnectionBuilder
+	private let peerConnectionBuilder: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient] = []
 	private var connectionsTask: Task<Void, Error>?
 
@@ -124,7 +124,7 @@ actor RTCClient {
 	private var disconnectTask: Task<Void, Never>?
 
 	init(id: ConnectionPassword,
-	     peerConnectionBuilder: PeerConnectionBuilder)
+	     peerConnectionBuilder: PeerConnectionNegotiator)
 	{
 		self.id = id
 		self.peerConnectionBuilder = peerConnectionBuilder
@@ -150,7 +150,7 @@ actor RTCClient {
 	}
 
 	func waitForFirstConnection() async throws {
-		_ = try await peerConnectionBuilder.peerConnections.prefix(1).collect().first!.get()
+		_ = try await peerConnectionBuilder.negotiationResults.prefix(1).collect().first!.get()
 	}
 
 	func removePeerConnection(_ id: PeerConnectionID) async {
@@ -170,7 +170,7 @@ actor RTCClient {
 
 	private func listenForPeerConnections() {
 		connectionsTask = Task {
-			for try await connectionResult in peerConnectionBuilder.peerConnections {
+			for try await connectionResult in peerConnectionBuilder.negotiationResults {
 				do {
 					try await onPeerConnectionCreated(connectionResult.get())
 				} catch {

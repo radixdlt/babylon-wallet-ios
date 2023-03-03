@@ -6,23 +6,6 @@ import RadixConnectModels
 extension SignalingClient {
 	/// Describes the DTO exchanged between clients during WebRTC negotiation
 	struct ClientMessage: Sendable, Equatable {
-		enum Method: String, Sendable, Codable, Equatable {
-			case offer
-			case answer
-			case iceCandidate
-
-			init(from primitive: RTCPrimitive) {
-				switch primitive {
-				case .offer:
-					self = .offer
-				case .answer:
-					self = .answer
-				case .iceCandidate:
-					self = .iceCandidate
-				}
-			}
-		}
-
 		let requestId: RequestID
 		/// The ID of the client to whom to send the message
 		let targetClientId: RemoteClientID
@@ -34,10 +17,27 @@ extension SignalingClient {
 // MARK: - SignalingClient.ClientMessage.RequestID
 extension SignalingClient.ClientMessage {
 	typealias RequestID = Tagged<Self, String>
+
+	enum Method: String, Sendable, Codable, Equatable {
+		case offer
+		case answer
+		case iceCandidate
+
+		init(from primitive: RTCPrimitive) {
+			switch primitive {
+			case .offer:
+				self = .offer
+			case .answer:
+				self = .answer
+			case .iceCandidate:
+				self = .iceCandidate
+			}
+		}
+	}
 }
 
-// MARK: - SignalingClient.ClientMessage + Decodable
-extension SignalingClient.ClientMessage: Decodable {
+// MARK: - SignalingClient.ClientMessage + Codable
+extension SignalingClient.ClientMessage: Codable {
 	enum CodingKeys: String, CodingKey {
 		case requestId, method, targetClientId, encryptedPayload
 	}
@@ -64,10 +64,7 @@ extension SignalingClient.ClientMessage: Decodable {
 			self.primitive = .iceCandidate(try JSONDecoder().decode(RTCPrimitive.ICECandidate.self, from: decryptedPyload))
 		}
 	}
-}
 
-// MARK: - SignalingClient.ClientMessage + Encodable
-extension SignalingClient.ClientMessage: Encodable {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 

@@ -35,6 +35,18 @@ public enum Either<Left, Right> {
 		}
 	}
 
+	public func doAsync(
+		ifLeft: (Left) async throws -> Void,
+		ifRight: (Right) async throws -> Void
+	) async rethrows {
+		switch self {
+		case let .left(left):
+			try await ifLeft(left)
+		case let .right(right):
+			try await ifRight(right)
+		}
+	}
+
 	public func bimap<NewLeft, NewRight>(
 		ifLeft transformLeft: (Left) throws -> NewLeft,
 		ifRight transformRight: (Right) throws -> NewRight

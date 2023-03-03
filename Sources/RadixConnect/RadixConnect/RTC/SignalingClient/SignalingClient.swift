@@ -12,12 +12,8 @@ protocol SignalingTransport: Sendable {
 }
 
 // MARK: - SignalingClient
-struct SignalingClient {
-	enum ClientSource: String, Sendable, Codable, Equatable {
-		case wallet
-		case `extension`
-	}
-
+/// The client communicating with SignalingServer
+struct SignalingClient: Sendable {
 	// MARK: - Configuration
 
 	/// The transport to be used to send and receive client messages
@@ -34,9 +30,13 @@ struct SignalingClient {
 	private let incommingSignalingServerMessagges: AnyAsyncSequence<IncommingMessage.FromSignalingServer>
 	private let incommingRemoteClientMessagges: AnyAsyncSequence<IncommingMessage.RemoteData>
 
+	/// The received ICECandidates
 	let onICECanddiate: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.ICECandidate>>
+	/// The received Offers
 	let onOffer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Offer>>
+	/// The received Answers
 	let onAnswer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Answer>>
+	/// The received client state notifications
 	let onRemoteClientState: AnyAsyncSequence<IncommingMessage.FromSignalingServer.Notification>
 
 	// MARK: - Initializer
