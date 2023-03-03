@@ -9,14 +9,14 @@
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AuthorizedDAppsFeatures"
-               BuildableName = "AuthorizedDAppsFeatures"
-               BlueprintName = "AuthorizedDAppsFeatures"
+               BlueprintIdentifier = "ProfileStore"
+               BuildableName = "ProfileStore"
+               BlueprintName = "ProfileStore"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,16 +28,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AuthorizedDappsClientLiveTests"
-               BuildableName = "AuthorizedDappsClientLiveTests"
-               BlueprintName = "AuthorizedDappsClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -60,9 +50,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AuthorizedDAppsFeatures"
-            BuildableName = "AuthorizedDAppsFeatures"
-            BlueprintName = "AuthorizedDAppsFeatures"
+            BlueprintIdentifier = "ProfileStore"
+            BuildableName = "ProfileStore"
+            BlueprintName = "ProfileStore"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

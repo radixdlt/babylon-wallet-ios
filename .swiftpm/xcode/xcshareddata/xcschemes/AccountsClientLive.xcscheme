@@ -7,16 +7,16 @@
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
-            buildForTesting = "NO"
+            buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileStore"
-               BuildableName = "ProfileStore"
-               BlueprintName = "ProfileStore"
+               BlueprintIdentifier = "AccountsClientLive"
+               BuildableName = "AccountsClientLive"
+               BlueprintName = "AccountsClientLive"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileStoreTests"
-               BuildableName = "ProfileStoreTests"
-               BlueprintName = "ProfileStoreTests"
+               BlueprintIdentifier = "AccountsClientLiveTests"
+               BuildableName = "AccountsClientLiveTests"
+               BlueprintName = "AccountsClientLiveTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -60,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "ProfileStore"
-            BuildableName = "ProfileStore"
-            BlueprintName = "ProfileStore"
+            BlueprintIdentifier = "AccountsClientLive"
+            BuildableName = "AccountsClientLive"
+            BlueprintName = "AccountsClientLive"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>
