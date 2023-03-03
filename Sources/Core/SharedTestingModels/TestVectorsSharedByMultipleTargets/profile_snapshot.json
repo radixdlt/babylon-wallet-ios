@@ -20,8 +20,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-03-01T19:06:14Z",
-        "lastUsedOn" : "2023-03-01T19:06:14Z",
+        "firstEstablishedOn" : "2023-03-03T14:12:48Z",
+        "lastUsedOn" : "2023-03-03T14:12:48Z",
         "platform" : "browser"
       },
       {
@@ -36,8 +36,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-03-01T19:06:14Z",
-        "lastUsedOn" : "2023-03-01T19:06:14Z",
+        "firstEstablishedOn" : "2023-03-03T14:12:48Z",
+        "lastUsedOn" : "2023-03-03T14:12:48Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -68,16 +68,19 @@
           }
         }
       }
-    ]
+    ],
+    "security" : {
+      "iCloudProfileSyncEnabled" : true
+    }
   },
   "creatingDevice" : "computerRunningUnitTest",
   "factorSources" : [
     {
-      "addedOn" : "2023-03-01T19:06:14Z",
+      "addedOn" : "2023-03-03T14:12:48Z",
       "hint" : "computerRunningUnitTest",
       "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-01T19:06:14Z",
+      "lastUsedOn" : "2023-03-03T14:12:48Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519"
@@ -88,11 +91,11 @@
       }
     },
     {
-      "addedOn" : "2023-03-01T19:06:14Z",
+      "addedOn" : "2023-03-03T14:12:48Z",
       "hint" : "computerRunningUnitTest",
       "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-01T19:06:14Z",
+      "lastUsedOn" : "2023-03-03T14:12:48Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519",
@@ -187,8 +190,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "FB1E6B4C-FA0D-4E25-BC4E-F0563073CBD1",
-                "01830D24-104F-41FA-A755-45A3D07E7E4B"
+                "B3AEC91A-6981-4810-83DC-F05F52FC3C63",
+                "52C528C2-7DF9-4223-8920-14C78724228F"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -205,8 +208,8 @@
             },
             {
               "fieldIDs" : [
-                "FAC41EE7-3ED5-4071-B544-1CC20863D7EB",
-                "54969729-482C-4A04-8639-542B589868B7"
+                "845DF781-CC20-471A-80E1-BDDD2B182A8A",
+                "53431D08-CB00-4AD0-A815-BE96853070D7"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -230,12 +233,12 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "FB1E6B4C-FA0D-4E25-BC4E-F0563073CBD1",
+              "id" : "B3AEC91A-6981-4810-83DC-F05F52FC3C63",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "01830D24-104F-41FA-A755-45A3D07E7E4B",
+              "id" : "52C528C2-7DF9-4223-8920-14C78724228F",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -264,12 +267,12 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "FAC41EE7-3ED5-4071-B544-1CC20863D7EB",
+              "id" : "845DF781-CC20-471A-80E1-BDDD2B182A8A",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "54969729-482C-4A04-8639-542B589868B7",
+              "id" : "53431D08-CB00-4AD0-A815-BE96853070D7",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -296,5 +299,5 @@
       ]
     }
   ],
-  "version" : 18
+  "version" : 19
 }
