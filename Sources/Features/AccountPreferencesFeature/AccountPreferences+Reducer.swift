@@ -26,7 +26,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case refreshAccountCompleted
 		case hideLoader
-		case cancelRefresh
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -38,8 +37,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
-
-	private enum RefreshID {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -59,15 +56,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 					_ = try await faucetClient.getFreeXRD(.init(
 						recipientAccountAddress: address
 					))
-					guard !Task.isCancelled else { return }
 					await send(.delegate(.refreshAccount(address)))
 				} catch {
-					guard !Task.isCancelled else { return }
 					await send(.internal(.hideLoader))
-					errorQueue.schedule(error)
+					if !Task.isCancelled {
+						errorQueue.schedule(error)
+					}
 				}
 			}
-			.cancellable(id: RefreshID.self)
 		}
 	}
 
@@ -89,9 +85,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideLoader:
 			state.faucetButtonState = .enabled
 			return .none
-
-		case .cancelRefresh:
-			return .cancel(id: RefreshID.self)
 		}
 	}
 }
