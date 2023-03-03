@@ -2,14 +2,16 @@ import FeaturePrelude
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
+extension AssetsView.State {
+	var viewState: AssetsView.ViewState {
+		.init(assetKind: kind)
+	}
+}
+
 // MARK: - AssetsView.View
 extension AssetsView {
 	public struct ViewState: Equatable {
 		let assetKind: AssetsView.State.AssetKind
-
-		init(state: AssetsView.State) {
-			assetKind = state.kind
-		}
 	}
 
 	@MainActor
@@ -21,11 +23,7 @@ extension AssetsView {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .large3) {
 					selectorView(with: viewStore)
 						.padding([.top, .horizontal], .medium1)
@@ -68,7 +66,7 @@ extension AssetsView.View {
 
 			ForEach(AssetsView.State.AssetKind.allCases) { assetKind in
 				selectorButton(for: assetKind, with: viewStore) {
-					viewStore.send(.listSelectorTapped(type))
+					viewStore.send(.listSelectorTapped(assetKind))
 				}
 			}
 

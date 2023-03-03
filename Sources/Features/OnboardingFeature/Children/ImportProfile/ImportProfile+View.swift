@@ -1,7 +1,19 @@
 import FeaturePrelude
 
+extension ImportProfile.State {
+	var viewState: ImportProfile.ViewState {
+		.init(
+			isDisplayingFileImporter: isDisplayingFileImporter
+		)
+	}
+}
+
 // MARK: - ImportProfile.View
 extension ImportProfile {
+	public struct ViewState: Equatable {
+		let isDisplayingFileImporter: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<ImportProfile>
@@ -13,20 +25,12 @@ extension ImportProfile {
 
 extension ImportProfile.View {
 	public var body: some View {
-		WithViewStore(
-			store,
-			observe: { $0 },
-			send: { .view($0) }
-		) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			VStack {
 				HStack {
-					Button(
-						action: {
-							viewStore.send(.goBack)
-						}, label: {
-							Image(asset: AssetResource.arrowBack)
-						}
-					)
+					Button(action: { viewStore.send(.goBack) }) {
+						Image(asset: AssetResource.arrowBack)
+					}
 					Spacer()
 					Text(L10n.ImportProfile.importProfile)
 					Spacer()
@@ -64,5 +68,9 @@ struct ImportProfile_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension ImportProfile.State {
+	public static let previewValue: Self = .init()
 }
 #endif

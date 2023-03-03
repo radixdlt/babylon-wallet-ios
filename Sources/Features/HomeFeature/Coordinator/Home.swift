@@ -205,7 +205,7 @@ public struct Home: Sendable, FeatureReducer {
 				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				state.destination?.accountDetails?.assets = .init(
-					type: details.assets.type,
+					kind: details.assets.kind,
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
 							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }

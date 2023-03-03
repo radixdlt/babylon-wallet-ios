@@ -73,15 +73,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			}
 		case .importProfile(.delegate(.imported)):
 			return .send(.delegate(.completed))
-		default: return .none
+		default:
+			return .none
 		}
 	}
 }
-
-#if DEBUG
-extension OnboardingCoordinator.State {
-	public static let previewValue: Self = {
-		fatalError("impl me")
-	}()
-}
-#endif

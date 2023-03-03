@@ -11,7 +11,7 @@ final class ImportProfileTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		await sut.send(.internal(.view(.goBack)))
+		await sut.send(.view(.goBack))
 		await sut.receive(.delegate(.goBack))
 	}
 
@@ -21,7 +21,7 @@ final class ImportProfileTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		await sut.send(.internal(.view(.importProfileFileButtonTapped))) {
+		await sut.send(.view(.importProfileFileButtonTapped)) {
 			$0.isDisplayingFileImporter = true
 		}
 	}
@@ -32,7 +32,7 @@ final class ImportProfileTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		await sut.send(.internal(.view(.dismissFileImporter))) {
+		await sut.send(.view(.dismissFileImporter)) {
 			$0.isDisplayingFileImporter = false
 		}
 	}
