@@ -36,7 +36,7 @@ final class SplashFeatureTests: TestCase {
 		}
 		await testScheduler.advance(by: .seconds(0.2))
 		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig)))) {
-			$0.biometricsCheckFailedAlert = .init(
+			$0.passcodeCheckFailedAlert = .init(
 				title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
 				actions: {
 					ButtonState(

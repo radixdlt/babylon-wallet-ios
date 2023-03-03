@@ -54,7 +54,7 @@ final class AppFeatureTests: TestCase {
 
 		// WHEN: existing profile is loaded
 		await store.send(.child(.splash(.internal(.loadProfileOutcome(.existingProfileLoaded))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, loadProfileOutcome: .existingProfileLoaded))
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .existingProfileLoaded))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -87,7 +87,7 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		await store.send(.child(.splash(.internal(.loadProfileOutcome(.newUser))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, loadProfileOutcome: .newUser))
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .newUser))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -127,7 +127,7 @@ final class AppFeatureTests: TestCase {
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: failure)
 		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, loadProfileOutcome: outcome))
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -189,7 +189,7 @@ final class AppFeatureTests: TestCase {
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: Profile.LoadingFailure.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
 		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, loadProfileOutcome: outcome))
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -249,7 +249,7 @@ final class AppFeatureTests: TestCase {
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
 		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, loadProfileOutcome: outcome))
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
 		await testScheduler.advance(by: .seconds(2))

@@ -27,21 +27,19 @@ extension SecureStorageClient: DependencyKey {
 			let authenticationPolicy: AuthenticationPolicy?
 		}
 
-		let leastSecureAccessibility: KeychainAccess.Accessibility = .whenUnlocked
 		@Sendable func queryMostSecureAccesibilityAndAuthenticationPolicy() async throws -> AccesibilityAndAuthenticationPolicy {
 			let config = try await localAuthenticationClient.queryConfig()
 
 			guard config.isPasscodeSetUp else {
-				return .init(accessibility: leastSecureAccessibility, authenticationPolicy: nil)
+				struct PasscodeMustBeSetup: Swift.Error {}
+				throw PasscodeMustBeSetup()
 			}
 
 			// we know that user has `passcode` enabled, thus we will use `.whenPasscodeSetThisDeviceOnly`
 			// BEWARE! If the user deletes the passcode any item protected by this `accessibility` WILL GET DELETED.
-			let mostSecureAccessibility: KeychainAccess.Accessibility = .whenPasscodeSetThisDeviceOnly
-
 			// We use `userPresence` always, disregardong of biometrics being setup up or not,
 			// to allow user to be able to fallback to passcode if biometrics.
-			return .init(accessibility: mostSecureAccessibility, authenticationPolicy: .userPresence)
+			return .init(accessibility: .whenPasscodeSetThisDeviceOnly, authenticationPolicy: .userPresence)
 		}
 
 		let loadProfileSnapshotData: LoadProfileSnapshotData = {
@@ -61,7 +59,7 @@ extension SecureStorageClient: DependencyKey {
 						data: data,
 						key: profileSnapshotKeychainKey,
 						iCloudSyncEnabled: true,
-						accessibility: leastSecureAccessibility, // do not delete the Profile if passcode gets deleted.
+						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
 					)
