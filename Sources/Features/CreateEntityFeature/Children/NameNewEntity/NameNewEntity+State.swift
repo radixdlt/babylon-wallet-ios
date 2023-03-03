@@ -5,17 +5,19 @@ extension NameNewEntity {
 	public struct State: Sendable, Hashable {
 		public var isFirst: Bool
 		public var inputtedName: String
-		public var sanitizedName: NonEmpty<String>?
+		public var sanitizedName: NonEmptyString?
 
 		@BindingState public var focusedField: Field?
 
 		public init(
 			isFirst: Bool,
 			inputtedEntityName: String = "",
+			sanitizedName: NonEmptyString? = nil,
 			focusedField: Field? = nil
 		) {
 			self.inputtedName = inputtedEntityName
 			self.focusedField = focusedField
+			self.sanitizedName = sanitizedName
 			self.isFirst = isFirst
 		}
 	}

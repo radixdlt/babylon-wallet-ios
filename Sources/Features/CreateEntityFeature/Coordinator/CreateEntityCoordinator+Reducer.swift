@@ -97,6 +97,7 @@ public struct CreateEntityCoordinator<
 					.init(
 						isFirst: state.config.isFirstEntity,
 						inputtedEntityName: createState.name.rawValue // preserve the name
+						sanitizedName: createState.name
 					)
 				)
 			default:
