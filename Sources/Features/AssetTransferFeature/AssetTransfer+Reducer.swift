@@ -52,7 +52,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<AssetTransfer.Destinations.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {

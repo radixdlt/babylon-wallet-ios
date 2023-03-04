@@ -18,7 +18,7 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case asset(id: NonFungibleTokenContainer.ID, action: NonFungibleTokenList.Row.Action)
-		case destination(PresentationAction<NonFungibleTokenList.Destinations.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {

@@ -26,7 +26,7 @@ public struct App: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case alert(PresentationActionOf<App.Alerts>)
+		case alert(PresentationAction<App.Alerts.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {

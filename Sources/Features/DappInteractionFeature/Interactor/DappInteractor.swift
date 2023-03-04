@@ -17,7 +17,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case responseFailureAlert(PresentationAction<ViewAction.ResponseFailureAlertAction>)
+		case responseFailureAlert(PresentationAction<ResponseFailureAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
 			case cancelButtonTapped(P2P.RequestFromClient)
@@ -73,6 +73,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			.ifLet(\.$currentModal, action: /Action.child .. ChildAction.modal) {
 				Destinations()
 			}
+			.ifLet(\.$responseFailureAlert, action: /Action.view .. ViewAction.responseFailureAlert)
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -118,9 +119,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case let .responseFailureAlert(action):
-			state.responseFailureAlert = nil
 			switch action {
-			case .dismiss, .present:
+			case .dismiss:
 				return .none
 			case let .presented(.cancelButtonTapped(request)):
 				dismissCurrentModalAndRequest(request, for: &state)

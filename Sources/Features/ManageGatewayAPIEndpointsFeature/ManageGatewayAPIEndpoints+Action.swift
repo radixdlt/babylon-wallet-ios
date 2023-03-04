@@ -44,7 +44,7 @@ extension ManageGatewayAPIEndpoints.Action {
 // MARK: - ManageGatewayAPIEndpoints.Action.ChildAction
 extension ManageGatewayAPIEndpoints.Action {
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<ManageGatewayAPIEndpoints.Destinations.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 }
 
