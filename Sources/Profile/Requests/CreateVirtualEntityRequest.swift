@@ -3,7 +3,7 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - CreateVirtualEntityRequest
-public struct CreateVirtualEntityRequest: Sendable, Equatable {
+public struct CreateVirtualEntityRequest: Sendable, Hashable {
 	// if `nil` we will use current networkID
 	public let networkID: NetworkID?
 	public let factorSource: FactorSource
