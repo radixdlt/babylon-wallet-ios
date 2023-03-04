@@ -13,16 +13,11 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		factorSource: FactorSource
 	) throws {
-		guard factorSource.kind.isHD else {
-			fatalError("must be HD")
-		}
+		self.factorSource = try factorSource.assertIsHD()
 		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-
 		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)
-
 		guard factorSourceID == factorSource.id else { fatalError("discrepancy") }
 		self.mnemonicWithPassphrase = mnemonicWithPassphrase
-		self.factorSource = factorSource
 	}
 }
 
@@ -31,7 +26,10 @@ extension PrivateHDFactorSource {
 	public static func testValue(hint: NonEmptyString) -> Self {
 		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
 		let factorSource = try! FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, hint: hint)
-		return try! .init(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
+		return try! .init(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			factorSource: factorSource
+		)
 	}
 }
 #endif
