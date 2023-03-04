@@ -96,7 +96,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}

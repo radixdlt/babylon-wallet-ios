@@ -87,7 +87,7 @@ public struct App: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.presentationDestination(\.$alert, action: /Action.view .. ViewAction.alert) {
+			.ifLet(\.$alert, action: /Action.view .. ViewAction.alert) {
 				Alerts()
 			}
 	}
