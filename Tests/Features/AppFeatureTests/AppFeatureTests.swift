@@ -32,7 +32,7 @@ final class AppFeatureTests: TestCase {
 		}
 		// when
 		await store.send(.child(.main(.delegate(.removedWallet))))
-		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
+		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
 			// then
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
@@ -95,7 +95,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser)))))
-		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
+		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
@@ -136,9 +136,9 @@ final class AppFeatureTests: TestCase {
 		// then
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome)))))
 
-		await store.receive(.internal(.system(.displayErrorAlert(
+		await store.receive(.internal(.displayErrorAlert(
 			App.UserFacingError(foobar)
-		)))) {
+		))) {
 			$0.alert = .userErrorAlert(
 				.init(
 					title: { TextState("An Error Occurred") },
@@ -148,7 +148,7 @@ final class AppFeatureTests: TestCase {
 			)
 		}
 
-		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
+		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
@@ -212,8 +212,8 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.system(.incompatibleProfileDeleted)))
-		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
+		await store.receive(.internal(.incompatibleProfileDeleted))
+		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
@@ -272,8 +272,8 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.system(.incompatibleProfileDeleted)))
-		await store.receive(.internal(.system(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile))))) {
+		await store.receive(.internal(.incompatibleProfileDeleted))
+		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
 			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 

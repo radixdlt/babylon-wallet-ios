@@ -9,8 +9,8 @@ final class CreateAccountCoordinatorTests: TestCase {
 			reducer: CreateAccountCoordinator()
 		)
 
-		await store.send(.view(.dismiss))
-		await store.receive(.delegate(.dismissed))
+		await store.send(.view(.closeButtonTapped))
+		await store.receive(.delegate(.dismiss))
 	}
 
 	func test_completionFlow() async throws {

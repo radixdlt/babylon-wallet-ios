@@ -2,15 +2,15 @@ import Cryptography
 import FeaturePrelude
 
 // MARK: - SelectGenesisFactorSource
-public struct SelectGenesisFactorSource: Sendable, ReducerProtocol {
+public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 	// MARK: State
 	public struct State: Sendable, Hashable {
-		public let specifiedNameForNewEntityToCreate: NonEmpty<String>
+		public let specifiedNameForNewEntityToCreate: NonEmptyString
 		public let factorSources: FactorSources
 		public var curve: Slip10Curve
 
 		public init(
-			specifiedNameForNewEntityToCreate: NonEmpty<String>,
+			specifiedNameForNewEntityToCreate: NonEmptyString,
 			factorSources: FactorSources,
 			curve: Slip10Curve = .curve25519 // default to new
 		) {
@@ -20,15 +20,24 @@ public struct SelectGenesisFactorSource: Sendable, ReducerProtocol {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case confirmOnDeviceFactorSource
+		case selectedCurve(Slip10Curve)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case confirmedFactorSource(FactorSource, specifiedNameForNewEntityToCreate: NonEmpty<String>, curve: Slip10Curve)
+	}
+
 	public init() {}
 
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case let .internal(.view(.selectedCurve(selectedCurve))):
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case let .selectedCurve(selectedCurve):
 			state.curve = selectedCurve
 			return .none
 
-		case .internal(.view(.confirmOnDeviceFactorSource)):
+		case .confirmOnDeviceFactorSource:
 			let factorSource = state.factorSources.device
 			return .run { [entityName = state.specifiedNameForNewEntityToCreate, curve = state.curve] send in
 				await send(.delegate(
@@ -39,7 +48,6 @@ public struct SelectGenesisFactorSource: Sendable, ReducerProtocol {
 					))
 				)
 			}
-		case .delegate: return .none
 		}
 	}
 }

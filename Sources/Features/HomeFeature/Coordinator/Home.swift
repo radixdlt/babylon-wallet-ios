@@ -267,7 +267,7 @@ public struct Home: Sendable, FeatureReducer {
 		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
 			return refreshAccount(address)
 
-		case .destination(.presented(.createAccount(.delegate(.dismissed)))):
+		case .destination(.presented(.createAccount(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
 
