@@ -139,7 +139,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 			return .none
 
-		case .createAccountCoordinator(.presented(.delegate(.dismissed))):
+		case .createAccountCoordinator(.presented(.delegate(.dismiss))):
 			state.createAccountCoordinator = nil
 			return .none
 

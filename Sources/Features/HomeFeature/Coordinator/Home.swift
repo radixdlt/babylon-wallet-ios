@@ -136,8 +136,7 @@ public struct Home: Sendable, FeatureReducer {
 			return getAppPreferences()
 
 		case .pullToRefreshStarted:
-//			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList.accounts))
-			fatalError()
+			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList))
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -165,7 +164,7 @@ public struct Home: Sendable, FeatureReducer {
 			// FIXME: Replace currency with value from Profile!
 			let currency = appPreferences.display.fiatCurrencyPriceTarget
 			state.accountList.accounts.forEach {
-				state.accountList.accounts[id: $0.address]?.currency = currency
+				state.accountList.accounts[id: $0.account.address]?.currency = currency
 			}
 			return .run { send in
 				await send(.internal(.isCurrencyAmountVisibleLoaded(appPreferences.display.isCurrencyAmountVisible)))
@@ -175,7 +174,7 @@ public struct Home: Sendable, FeatureReducer {
 			// account list
 			state.accountList.accounts.forEach {
 				// TODO: replace hardcoded true value with isVisible value
-				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = true
+				state.accountList.accounts[id: $0.account.address]?.isCurrencyAmountVisible = true
 			}
 
 			// account details
@@ -189,8 +188,8 @@ public struct Home: Sendable, FeatureReducer {
 
 		case let .accountPortfoliosResult(.success(accountPortfolios)):
 			state.accountPortfolios = accountPortfolios
-			state.accountList.accounts.forEach { account in
-				let address = account.address
+			state.accountList.accounts.forEach { row in
+				let address = row.account.address
 				let accountPortfolio = accountPortfolios[id: address] ?? AccountPortfolio.empty(owner: address)
 				state.accountList.accounts[id: address]?.portfolio = accountPortfolio
 			}
@@ -205,7 +204,7 @@ public struct Home: Sendable, FeatureReducer {
 				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				state.destination?.accountDetails?.assets = .init(
-					type: details.assets.type,
+					kind: details.assets.kind,
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
 							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
@@ -258,7 +257,7 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.internal(.singleAccountPortfolioResult(TaskResult {
 					try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
 				})))
-				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.system(.refreshAccountCompleted)))))))))))
+				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.refreshAccountCompleted))))))))))
 			}
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
@@ -268,7 +267,7 @@ public struct Home: Sendable, FeatureReducer {
 		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
 			return refreshAccount(address)
 
-		case .destination(.presented(.createAccount(.delegate(.dismissed)))):
+		case .destination(.presented(.createAccount(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
 
@@ -311,6 +310,10 @@ public struct Home: Sendable, FeatureReducer {
 				appPreferencesClient.getPreferences()
 			)))
 		}
+	}
+
+	private func fetchPortfolio(_ accounts: AccountList.State) -> EffectTask<Action> {
+		fetchPortfolio(accounts.accounts.map(\.account))
 	}
 
 	private func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account> & Sendable) -> EffectTask<Action> {

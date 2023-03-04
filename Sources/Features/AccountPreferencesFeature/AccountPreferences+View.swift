@@ -1,72 +1,61 @@
 import FeaturePrelude
 
+extension AccountPreferences.State {
+	var viewState: AccountPreferences.ViewState {
+		.init(faucetButtonState: faucetButtonState)
+	}
+}
+
 // MARK: - AccountPreferences.View
 extension AccountPreferences {
+	public struct ViewState: Equatable {
+		public var faucetButtonState: ControlState
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<AccountPreferences>
 
-		public init(
-			store: Store
-		) {
+		public init(store: StoreOf<AccountPreferences>) {
 			self.store = store
 		}
-	}
-}
 
-extension AccountPreferences.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			NavigationStack {
-				VStack(alignment: .leading) {
-					Button(L10n.AccountPreferences.faucetButtonTitle) {
-						viewStore.send(.faucetButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(shouldExpand: true))
-					.controlState(viewStore.faucetButtonState)
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				NavigationStack {
+					VStack(alignment: .leading) {
+						Button(L10n.AccountPreferences.faucetButtonTitle) {
+							viewStore.send(.faucetButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+						.controlState(viewStore.faucetButtonState)
 
-					if viewStore.faucetButtonState.isLoading {
-						Text(L10n.AccountPreferences.loadingPrompt)
-							.font(.app.body2Regular)
-							.foregroundColor(.app.gray1)
-					}
-				}
-				.frame(maxHeight: .infinity, alignment: .top)
-				.padding(.medium1)
-				.onAppear {
-					viewStore.send(.didAppear)
-				}
-				.navigationTitle(L10n.AccountPreferences.title)
-				#if os(iOS)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							CloseButton {
-								viewStore.send(.closeButtonTapped)
-							}
+						if viewStore.faucetButtonState.isLoading {
+							Text(L10n.AccountPreferences.loadingPrompt)
+								.font(.app.body2Regular)
+								.foregroundColor(.app.gray1)
 						}
 					}
-				#endif
+					.frame(maxHeight: .infinity, alignment: .top)
+					.padding(.medium1)
+					.onAppear {
+						viewStore.send(.appeared)
+					}
+					.navigationTitle(L10n.AccountPreferences.title)
+					#if os(iOS)
+						.navigationBarTitleColor(.app.gray1)
+						.navigationBarTitleDisplayMode(.inline)
+						.navigationBarInlineTitleFont(.app.secondaryHeader)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									viewStore.send(.closeButtonTapped)
+								}
+							}
+						}
+					#endif
+				}
 			}
-		}
-	}
-}
-
-// MARK: - AccountPreferences.View.ViewState
-extension AccountPreferences.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		public var faucetButtonState: ControlState
-
-		init(state: AccountPreferences.State) {
-			faucetButtonState = state.faucetButtonState
 		}
 	}
 }

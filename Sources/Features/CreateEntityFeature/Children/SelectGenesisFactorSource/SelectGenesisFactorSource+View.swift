@@ -1,8 +1,23 @@
 import Cryptography
 import FeaturePrelude
 
+extension SelectGenesisFactorSource.State {
+	var viewState: SelectGenesisFactorSource.ViewState {
+		.init(
+			// TODO: implement
+			curves: Array(Set(factorSources.flatMap(\.parameters.supportedCurves.elements))),
+			selectedCurve: curve
+		)
+	}
+}
+
 // MARK: - SelectGenesisFactorSource.View
 extension SelectGenesisFactorSource {
+	public struct ViewState: Equatable {
+		let curves: [Slip10Curve]
+		let selectedCurve: Slip10Curve
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SelectGenesisFactorSource>
@@ -10,49 +25,30 @@ extension SelectGenesisFactorSource {
 		public init(store: StoreOf<SelectGenesisFactorSource>) {
 			self.store = store
 		}
-	}
-}
 
-extension SelectGenesisFactorSource.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ForceFullScreen {
-				// FIXME: appStore submission: implement this screen with a picker
-				VStack {
-					Picker(
-						"Curve",
-						selection: viewStore.binding(
-							get: \.selectedCurve,
-							send: { .selectedCurve($0) }
-						)
-					) {
-						Text("Heh")
-					}
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				ForceFullScreen {
+					// FIXME: appStore submission: implement this screen with a picker
+					VStack {
+						Picker(
+							"Curve",
+							selection: viewStore.binding(
+								get: \.selectedCurve,
+								send: { .selectedCurve($0) }
+							)
+						) {
+							Text("Heh")
+						}
 
-					Spacer()
-					Button("Confirm OnDevice factor source") {
-						viewStore.send(.confirmOnDeviceFactorSource)
+						Spacer()
+						Button("Confirm OnDevice factor source") {
+							viewStore.send(.confirmOnDeviceFactorSource)
+						}
+						Spacer()
 					}
-					Spacer()
 				}
 			}
-		}
-	}
-}
-
-// MARK: - SelectGenesisFactorSource.View.ViewState
-extension SelectGenesisFactorSource.View {
-	struct ViewState: Equatable {
-		let curves: [Slip10Curve]
-		let selectedCurve: Slip10Curve
-		init(state: SelectGenesisFactorSource.State) {
-			// TODO: implement
-			selectedCurve = state.curve
-			curves = Array(Set(state.factorSources.flatMap(\.parameters.supportedCurves.elements)))
 		}
 	}
 }

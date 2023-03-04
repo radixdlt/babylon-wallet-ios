@@ -11,6 +11,9 @@ public struct AppPreferences:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
+	/// Controls e.g. if Profile Snapshot gets synced to iCloud or not.
+	public var security: Security
+
 	/// Display settings in the wallet app, such as appearences, currency etc.
 	public var display: Display
 
@@ -23,10 +26,12 @@ public struct AppPreferences:
 	public var gateways: Gateways
 
 	public init(
+		security: Security = .default,
 		display: Display = .default,
 		p2pClients: P2PClients = [],
 		gateways: Gateways = .init(current: .nebunet)
 	) {
+		self.security = security
 		self.display = display
 		self.p2pClients = p2pClients
 		self.gateways = gateways
@@ -40,6 +45,7 @@ extension AppPreferences {
 		.init(
 			self,
 			children: [
+				"security": security,
 				"display": display,
 				"p2pClients": p2pClients,
 				"gateways": gateways,
@@ -50,56 +56,10 @@ extension AppPreferences {
 
 	public var description: String {
 		"""
+		security: \(security),
 		display: \(display),
 		p2pClients: \(p2pClients),
 		gateways: \(gateways)
-		"""
-	}
-}
-
-// MARK: AppPreferences.Display
-extension AppPreferences {
-	/// Display settings in the wallet app, such as appearences, currency etc.
-	public struct Display:
-		Sendable,
-		Hashable,
-		Codable,
-		CustomStringConvertible,
-		CustomDumpReflectable
-	{
-		/// Which fiat currency the prices are measured in, e.g. EUR.
-		public var fiatCurrencyPriceTarget: FiatCurrency
-
-		public var isCurrencyAmountVisible: Bool
-
-		public init(
-			fiatCurrencyPriceTarget: FiatCurrency = .usd,
-			isCurrencyAmountVisible: Bool = true
-		) {
-			self.fiatCurrencyPriceTarget = fiatCurrencyPriceTarget
-			self.isCurrencyAmountVisible = isCurrencyAmountVisible
-		}
-	}
-}
-
-extension AppPreferences.Display {
-	public static let `default` = Self()
-}
-
-extension AppPreferences.Display {
-	public var customDumpMirror: Mirror {
-		.init(
-			self,
-			children: [
-				"fiatCurrencyPriceTarget": fiatCurrencyPriceTarget,
-			],
-			displayStyle: .struct
-		)
-	}
-
-	public var description: String {
-		"""
-		fiatCurrencyPriceTarget: \(fiatCurrencyPriceTarget),
 		"""
 	}
 }

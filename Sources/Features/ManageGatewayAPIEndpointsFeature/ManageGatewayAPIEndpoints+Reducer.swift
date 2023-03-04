@@ -119,7 +119,7 @@ extension ManageGatewayAPIEndpoints {
 		case .internal(.system(.switchToResult(.success))):
 			return .send(.delegate(.networkChanged))
 
-		case .child(.destination(.presented(.createAccount(.delegate(.dismissed))))):
+		case .child(.destination(.presented(.createAccount(.delegate(.dismiss))))):
 			return skipSwitching(state: &state)
 
 		case .child(.destination(.presented(.createAccount(.delegate(.completed))))):

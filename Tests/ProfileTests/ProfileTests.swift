@@ -165,6 +165,8 @@ final class ProfileTests: TestCase {
 			.init(kind: .lastName, value: "Publicson"),
 		])
 
+		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+
 		let connectionPassword = try ConnectionPassword(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 		XCTAssertNotNil(profile.appendP2PClient(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
 		// Should not be possible to add a client with the same password
@@ -278,6 +280,8 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.personas[1].displayName, "Mrs Public")
 		XCTAssertEqual(onNetwork.personas.count, 2)
 		XCTAssertEqual(onNetwork.networkID, networkID)
+
+		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",

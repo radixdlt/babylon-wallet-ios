@@ -2,60 +2,75 @@ import struct AccountPortfolioFetcherClient.AccountPortfolio // TODO: move to so
 import FeaturePrelude
 import FungibleTokenListFeature
 
-// MARK: - AccountList.Row.View
-extension AccountList.Row {
-	@MainActor
-	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
-
-		public init(
-			store: Store
-		) {
-			self.store = store
-		}
+extension AccountList.Row.State {
+	var viewState: AccountList.Row.ViewState {
+		.init(
+			name: account.displayName.rawValue,
+			address: .init(address: account.address.address, format: .default),
+			appearanceID: account.appearanceID,
+			aggregatedValue: aggregatedValue,
+			currency: currency,
+			isCurrencyAmountVisible: isCurrencyAmountVisible,
+			portfolio: portfolio
+		)
 	}
 }
 
-extension AccountList.Row.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(alignment: .leading) {
-				VStack(alignment: .leading, spacing: .zero) {
-					HeaderView(
-						name: viewStore.name,
-						value: formattedAmount(
-							viewStore.aggregatedValue,
-							isVisible: viewStore.isCurrencyAmountVisible,
+// MARK: - AccountList.Row.View
+extension AccountList.Row {
+	public struct ViewState: Equatable {
+		let name: String
+		let address: AddressView.ViewState
+		let appearanceID: OnNetwork.Account.AppearanceID
+		let aggregatedValue: BigDecimal?
+		let currency: FiatCurrency
+		let isCurrencyAmountVisible: Bool
+		let portfolio: AccountPortfolio
+	}
+
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<AccountList.Row>
+
+		public init(store: StoreOf<AccountList.Row>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(alignment: .leading) {
+					VStack(alignment: .leading, spacing: .zero) {
+						HeaderView(
+							name: viewStore.name,
+							value: formattedAmount(
+								viewStore.aggregatedValue,
+								isVisible: viewStore.isCurrencyAmountVisible,
+								currency: viewStore.currency
+							),
+							isValueVisible: viewStore.isCurrencyAmountVisible,
 							currency: viewStore.currency
-						),
-						isValueVisible: viewStore.isCurrencyAmountVisible,
-						currency: viewStore.currency
-					)
+						)
 
-					AddressView(
-						viewStore.address,
-						copyAddressAction: {
-							viewStore.send(.copyAddressButtonTapped)
-						}
-					)
-					.foregroundColor(.app.whiteTransparent)
+						AddressView(
+							viewStore.address,
+							copyAddressAction: {
+								viewStore.send(.copyAddressButtonTapped)
+							}
+						)
+						.foregroundColor(.app.whiteTransparent)
 
-					// TODO: replace spacer with token list when API is available
-					Spacer()
-						.frame(height: 64)
+						// TODO: replace spacer with token list when API is available
+						Spacer()
+							.frame(height: 64)
+					}
 				}
-			}
-			.padding(.horizontal, .medium1)
-			.padding(.vertical, .medium2)
-			.background(viewStore.appearanceID.gradient)
-			.cornerRadius(.small1)
-			.onTapGesture {
-				viewStore.send(.selected)
+				.padding(.horizontal, .medium1)
+				.padding(.vertical, .medium2)
+				.background(viewStore.appearanceID.gradient)
+				.cornerRadius(.small1)
+				.onTapGesture {
+					viewStore.send(.tapped)
+				}
 			}
 		}
 	}
@@ -77,30 +92,6 @@ extension AccountList.Row.View {
 			}
 		} else {
 			return "\(currency.sign) ••••"
-		}
-	}
-}
-
-// MARK: - AccountList.Row.View.ViewState
-extension AccountList.Row.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		let name: String
-		let address: AddressView.ViewState
-		let appearanceID: OnNetwork.Account.AppearanceID
-		let aggregatedValue: BigDecimal?
-		let currency: FiatCurrency
-		let isCurrencyAmountVisible: Bool
-		let portfolio: AccountPortfolio
-
-		init(state: AccountList.Row.State) {
-			self.name = state.account.displayName.rawValue
-			self.address = .init(address: state.account.address.address, format: .default)
-			self.appearanceID = state.account.appearanceID
-			self.aggregatedValue = state.aggregatedValue
-			self.currency = state.currency
-			self.isCurrencyAmountVisible = state.isCurrencyAmountVisible
-			self.portfolio = state.portfolio
 		}
 	}
 }
@@ -137,5 +128,9 @@ struct Row_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension AccountList.Row.State {
+	public static let previewValue = Self(account: .previewValue0)
 }
 #endif

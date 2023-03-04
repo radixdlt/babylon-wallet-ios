@@ -38,19 +38,20 @@ final class NameNewEntityTests: TestCase {
 			)
 		)
 
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: initialState,
 			reducer: NameNewEntity<OnNetwork.Account>()
 		) {
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 		}
 
 		// when
-		await store.send(.view(.viewAppeared))
+		await store.send(.view(.appeared))
 
 		// then
-		await testScheduler.advance(by: .seconds(0.5))
-		await store.receive(.internal(.system(.focusTextField(.entityName)))) {
+		await clock.advance(by: .seconds(0.5))
+		await store.receive(.internal(.focusTextField(.entityName))) {
 			$0.focusedField = .entityName
 		}
 		await testScheduler.run() // fast-forward scheduler to the end of time
