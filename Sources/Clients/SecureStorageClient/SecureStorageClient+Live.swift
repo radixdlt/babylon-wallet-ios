@@ -9,6 +9,13 @@ extension KeychainAccess.Accessibility: @unchecked Sendable {}
 // MARK: - KeychainAccess.AuthenticationPolicy + Sendable
 extension KeychainAccess.AuthenticationPolicy: @unchecked Sendable {}
 
+// MARK: - SecureStorageError
+public enum SecureStorageError: Swift.Error, Equatable {
+	case evaluateLocalAuthenticationFailed(reason: LocalAuthenticationClient.Error)
+	case evaluateLocalAuthenticationFailedUnknown(reason: String)
+	case passcodeNotSet
+}
+
 // MARK: - SecureStorageClient + DependencyKey
 extension SecureStorageClient: DependencyKey {
 	public typealias Value = SecureStorageClient
@@ -28,11 +35,17 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func queryMostSecureAccesibilityAndAuthenticationPolicy() async throws -> AccesibilityAndAuthenticationPolicy {
-			let config = try await localAuthenticationClient.queryConfig()
+			let config: LocalAuthenticationConfig
+			do {
+				config = try await localAuthenticationClient.queryConfig()
+			} catch let failure as LocalAuthenticationClient.Error {
+				throw SecureStorageError.evaluateLocalAuthenticationFailed(reason: failure)
+			} catch {
+				throw SecureStorageError.evaluateLocalAuthenticationFailedUnknown(reason: String(describing: error))
+			}
 
 			guard config.isPasscodeSetUp else {
-				struct PasscodeMustBeSetup: Swift.Error {}
-				throw PasscodeMustBeSetup()
+				throw SecureStorageError.passcodeNotSet
 			}
 
 			// we know that user has `passcode` enabled, thus we will use `.whenPasscodeSetThisDeviceOnly`
