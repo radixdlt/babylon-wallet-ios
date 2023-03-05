@@ -50,7 +50,7 @@ extension Profile {
 
 		let genesisFactorInstance: FactorInstance = try await {
 			let factorSource = request.factorSource
-			let publicKey: Engine.PublicKey = try await try await useFactorSourceClient.onDeviceHD(
+			let publicKey: Engine.PublicKey = try await useFactorSourceClient.onDeviceHD(
 				factorSourceID: factorSource.id,
 				derivationPath: derivationPath,
 				curve: request.curve,

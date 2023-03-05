@@ -17,10 +17,6 @@ extension Profile {
 			self.loadFailure = loadFailure
 		}
 
-		public mutating func update(deviceDescription: NonEmptyString) {
-			`private`.update(deviceDescription: deviceDescription)
-		}
-
 		/// E.g. when first account is created during onboarding.
 		public mutating func updateProfile(_ profile: Profile) {
 			`private`.updateProfile(profile)
@@ -46,31 +42,11 @@ extension Profile.Ephemeral {
 			self.profile = profile
 		}
 
-		public mutating func update(deviceDescription: NonEmptyString) {
-			privateFactorSource.factorSource.update(deviceDescription: deviceDescription)
-			profile.update(deviceDescription: deviceDescription)
-		}
-
 		/// E.g. when first account is created during onboarding.
 		public mutating func updateProfile(_ profile: Profile) {
 			precondition(profile.id == self.profile.id)
 			self.profile = profile
 		}
-	}
-}
-
-extension FactorSource {
-	public mutating func update(deviceDescription hint: NonEmptyString) {
-		self.hint = hint
-	}
-}
-
-extension Profile {
-	public mutating func update(deviceDescription: NonEmptyString) {
-		self.creatingDevice = deviceDescription
-		var factorSources = self.factorSources.rawValue
-		factorSources[id: self.factorSources.first.id]?.hint = deviceDescription
-		self.factorSources = .init(rawValue: factorSources)!
 	}
 }
 
@@ -85,7 +61,7 @@ extension Profile.Ephemeral.Private {
 
 extension Profile.Ephemeral {
 	public static func testValue(
-		hint: NonEmptyString = "placeholder",
+		hint: NonEmptyString,
 		loadFailure: Profile.LoadingFailure? = nil
 	) -> Self {
 		.init(private: .testValue(hint: hint), loadFailure: loadFailure)

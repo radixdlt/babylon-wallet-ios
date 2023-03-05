@@ -68,6 +68,13 @@ extension CreateEntityConfig {
 				navigationButtonCTA: .goHome,
 				specificNetworkID: nil
 			)
+		case let .newPersonaFromSettings(isFirst):
+			self.init(
+				isFirstEntity: isFirst,
+				canBeDismissed: true,
+				navigationButtonCTA: .goBackToPersonaList,
+				specificNetworkID: nil
+			)
 		}
 	}
 }
@@ -79,4 +86,5 @@ public enum CreateEntityPurpose {
 	case newAccountDuringDappInteraction
 	case newPersonaDuringDappInteract(isFirst: Bool)
 	case newAccountFromHome
+	case newPersonaFromSettings(isFirst: Bool)
 }

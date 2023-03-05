@@ -23,9 +23,8 @@ import SecureStorageClient
 /// These live implementaions will all references the one and only
 /// ProfileStore singleton instance `shared`.
 ///
-/// Internally, the ProfileStore is a state machine starting during
-/// init in a first state `new`, then `async` (within a `Task`), it
-/// transitions to either `ephemeral` or `persisted`. The former state
+/// Internally, the ProfileStore is a state machine which can be either
+/// in state`ephemeral` or `persisted`. The former state
 /// is used if no ProfileSnapshot was found in `secureStorageClient`,
 /// and will trigger the user to perform onboarding in the wallet. If
 /// a ProfileSnapshot was found instead the state `persisted` is used.
@@ -45,25 +44,28 @@ public final actor ProfileStore {
 	@Dependency(\.assertionFailure) var assertionFailure
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
-	public static let shared = ProfileStore()
+	public final actor NestedHolder {
+		private var _shared: ProfileStore?
+		public func shared() async -> ProfileStore {
+			if let shared = _shared {
+				return shared
+			}
+			let shared = await ProfileStore()
+			_shared = shared
+			return shared
+		}
+	}
+
+	private static let sharedNestedHolder = NestedHolder()
+	public static func shared() async -> ProfileStore {
+		await Self.sharedNestedHolder.shared()
+	}
 
 	/// Current Profile
 	let profileStateSubject: AsyncCurrentValueSubject<ProfileState>
 
-	init(
-		profileStateSubject: AsyncCurrentValueSubject<ProfileState>
-	) {
-		self.profileStateSubject = profileStateSubject
-
-		Task {
-			await restoreFromSecureStorageIfAble()
-		}
-	}
-
-	init() {
-		self.init(
-			profileStateSubject: AsyncCurrentValueSubject<ProfileState>(Self.newEphemeral())
-		)
+	init() async {
+		self.profileStateSubject = await .init(Self.restoreFromSecureStorageIfAble())
 	}
 }
 
@@ -73,12 +75,6 @@ extension ProfileStore {
 	/// `changeState:to` in `ProfileStore` for state machines valid
 	/// transitions.
 	enum ProfileState: Sendable, CustomStringConvertible {
-		/// The initial state, set during start of init, have not yet
-		/// checked Secure Storage for an potentially existing stored
-		/// profile, which require an async Task to be done at end of
-		/// init (which will complete after init is done).
-		case newWithEphemeral(Profile.Ephemeral.Private)
-
 		/// If data was found but failed to deserialize it `loadFailure` will
 		/// be present.
 		///
@@ -123,14 +119,21 @@ extension ProfileStore {
 		}
 	}
 
-	public func getEphemeral() async -> Profile.Ephemeral? {
-		try? await isInitialized()
-		return self.ephemeral
+	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
+		switch self.profileStateSubject.value {
+		case .persisted: return .existingProfileLoaded
+		case let .ephemeral(ephemeral):
+			if let error = ephemeral.loadFailure {
+				return .usersExistingProfileCouldNotBeLoaded(failure: error)
+			} else {
+				return .newUser
+			}
+		}
 	}
 
 	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
-		try await isInitialized()
 		try assertProfileStateIsEphemeral()
+
 		guard (try? await secureStorageClient.loadProfileSnapshotData()) == Data?.none else {
 			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
 			throw ExistingProfileSnapshotFoundAbortingImport()
@@ -147,36 +150,11 @@ extension ProfileStore {
 		changeState(to: .persisted(profile))
 	}
 
-	@discardableResult
-	private func assertProfileStateIsEphemeral() throws -> Profile.Ephemeral {
-		struct ExpectedProfileStateToBeEphemeralButItWasNot: Swift.Error {}
-		guard let ephemeral else {
-			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
-			throw ExpectedProfileStateToBeEphemeralButItWasNot()
-		}
-		return ephemeral
-	}
-
 	public func commitEphemeral() async throws {
-		try await isInitialized()
-
-		let deviceDescription: NonEmptyString
-		#if canImport(UIKit)
-		@Dependency(\.device) var device
-		let deviceModelName = await device.model
-		let deviceGivenName = await device.name
-		deviceDescription = NonEmptyString(rawValue: "\(deviceGivenName) (\(deviceModelName))")!
-		#else
-		deviceDescription = "macOS"
-		#endif
-
-		var ephemeral = try assertProfileStateIsEphemeral()
-		ephemeral.update(deviceDescription: deviceDescription)
+		let ephemeral = try assertProfileStateIsEphemeral()
 
 		do {
-			try await secureStorageClient.save(ephemeral: ephemeral.private)
+			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -192,7 +170,6 @@ extension ProfileStore {
 	///
 	/// if ephemeral: Updates the ephemeral profile.
 	public func update(profile: Profile) async throws {
-		try await isInitialized() // it should not be possible for us to not be initialized...
 		guard profile != profileStateSubject.value.profile else {
 			// prevent duplicates
 			return
@@ -206,22 +183,25 @@ extension ProfileStore {
 
 		switch profileStateSubject.value {
 		case var .ephemeral(ephemeral):
-			// E.g. Creation of first Account during onboarding flow
-			// we will not persist in secureStorage, nor change state from `.ephemeral`,
-			// but we will update the in memory epheral profile
+			// The user is still on onboarding flow, since the Profile has not
+			// yet been commited. `update:profile:` was called, meaning some
+			// state was added to this ephemeral profile, but user has not
+			// yet finished onboarding. The call to `update:profile` might
+			// originate from creation of first account, but we do not persist
+			// the ephemeral profile until `commitEphemeral` has been called,
+			// we do, however, update the ProfileStore's in-memory profile...
 			ephemeral.updateProfile(profile)
+
+			// ... and then make the update.
 			changeState(to: .ephemeral(ephemeral))
 
 		case .persisted:
 			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 			changeState(to: .persisted(profile))
-
-		case .newWithEphemeral: fatalError("should not be possible, we await `isInitialized` in top.")
 		}
 	}
 
 	public func deleteProfile() async throws {
-		try await isInitialized() // it should not be possible for us to not be initialized...
 		do {
 			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
 		} catch {
@@ -229,7 +209,8 @@ extension ProfileStore {
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 		}
-		changeState(to: .ephemeral(.init(private: Self.newEphemeralProfile(), loadFailure: nil)))
+		let ephemeralPrivate = await Self.newEphemeralProfile()
+		changeState(to: .ephemeral(.init(private: ephemeralPrivate, loadFailure: nil)))
 	}
 }
 
@@ -256,16 +237,8 @@ extension ProfileStore.ProfileState {
 
 	fileprivate var profile: Profile {
 		switch self {
-		case let .newWithEphemeral(ephemeral): return ephemeral.profile
 		case let .ephemeral(ephemeral): return ephemeral.private.profile
 		case let .persisted(profile): return profile
-		}
-	}
-
-	fileprivate var isNew: Bool {
-		switch self {
-		case .newWithEphemeral: return true
-		case .ephemeral, .persisted: return false
 		}
 	}
 }
@@ -280,81 +253,35 @@ extension ProfileStore.ProfileState {
 
 	var discriminator: Discriminator {
 		switch self {
-		case .newWithEphemeral: return .newWithEphemeral
 		case .ephemeral: return .ephemeral
 		case .persisted: return .persisted
 		}
 	}
 }
 
-// MARK: Internal (for tests)
+// MARK: Internal
 extension ProfileStore {
-	internal static func newEphemeral() -> ProfileState {
-		.newWithEphemeral(Self.newEphemeralProfile())
-	}
+	#if !canImport(UIKit)
+	/// used by tests
+	internal static let macOSDeviceDescriptionFallback: NonEmptyString = "macOS"
+	#endif
 
-	internal static func newEphemeralProfile() -> Profile.Ephemeral.Private {
-		@Dependency(\.mnemonicClient) var mnemonicClient
-		do {
-			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
-			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic)
-			let factorSource = try FactorSource.babylon(
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hint: "ephemeral"
-			)
-			let privateFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
-			let profile = Profile(factorSource: factorSource)
-			return Profile.Ephemeral.Private(privateFactorSource: privateFactorSource, profile: profile)
-		} catch {
-			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			fatalError(errorMessage)
-		}
+	internal static func deviceDescription(
+		deviceGivenName: String,
+		deviceModel: String
+	) -> NonEmptyString {
+		"\(deviceGivenName) (\(deviceModel))"
 	}
 }
 
 // MARK: Private
 extension ProfileStore {
-	private var ephemeral: Profile.Ephemeral? {
-		switch profileStateSubject.value {
-		case let .ephemeral(ephemeral): return ephemeral
-		case .newWithEphemeral, .persisted: return nil
-		}
-	}
-
-	@_disfavoredOverload
-	private func lens<Property>(
-		_ keyPath: KeyPath<ProfileState, Property?>
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		lens { $0[keyPath: keyPath] }
-	}
-
-	private func lens<Property>(
-		_ keyPath: KeyPath<ProfileState, Property>
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		lens { $0[keyPath: keyPath] }
-	}
-
-	private func lens<Property>(
-		_ map: @escaping @Sendable (ProfileState) -> Property?
-	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
-		profileStateSubject.compactMap { map($0) }
-			.share() // Multicast
-			.eraseToAnyAsyncSequence()
-	}
-
-	private func restoreFromSecureStorageIfAble() async {
+	private static func restoreFromSecureStorageIfAble() async -> ProfileState {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.errorQueue) var errorQueue
+		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		guard case let .newWithEphemeral(ephemeral) = profileStateSubject.value else {
-			let errorMsg = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: '\(String(describing: ProfileState.Discriminator.newWithEphemeral))' but was in state: '\(String(describing: profileStateSubject.value.discriminator))'"
-			loggerGlobal.critical(.init(stringLiteral: errorMsg))
-			assertionFailure(errorMsg)
-			return
-		}
-
-		@Sendable func load() async -> Swift.Result<Profile?, Profile.LoadingFailure> {
+		let loadResult: Swift.Result<Profile?, Profile.LoadingFailure> = await {
 			guard
 				let profileSnapshotData = try? await secureStorageClient.loadProfileSnapshotData()
 			else {
@@ -416,51 +343,104 @@ extension ProfileStore {
 			}
 
 			return .success(profile)
-		}
+		}()
 
-		@Sendable func newState(from loadProfileResult: Swift.Result<Profile?, Profile.LoadingFailure>) -> ProfileState {
-			switch loadProfileResult {
-			case let .success(.some(existing)):
-				return .persisted(existing)
-			case .success(.none):
-				return .ephemeral(.init(private: ephemeral, loadFailure: nil))
-			case let .failure(loadFailure):
-				return .ephemeral(.init(private: ephemeral, loadFailure: loadFailure))
-			}
+		switch loadResult {
+		case let .success(.some(existing)):
+			return .persisted(existing)
+		case .success(.none):
+			return await .ephemeral(.init(private: Self.newEphemeralProfile(), loadFailure: nil))
+		case let .failure(loadFailure):
+			return await .ephemeral(.init(private: self.newEphemeralProfile(), loadFailure: loadFailure))
 		}
-
-		let newState = await newState(from: load())
-		changeState(to: newState)
 	}
 
-	private func isInitialized() async throws {
-		if !profileStateSubject.value.isNew {
-			return // done
+	private static func newEphemeralProfile() async -> Profile.Ephemeral.Private {
+		@Dependency(\.mnemonicClient) var mnemonicClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		do {
+			let deviceDescription: NonEmptyString
+			#if canImport(UIKit)
+			@Dependency(\.device) var device
+			let deviceGivenName = await device.name
+			let deviceModel = await device.model
+			deviceDescription = Self.deviceDescription(deviceGivenName: deviceGivenName, deviceModel: deviceModel)
+			#else
+			deviceDescription = macOSDeviceDescriptionFallback
+			#endif
+
+			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
+			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic)
+			let factorSource = try FactorSource.babylon(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				hint: deviceDescription
+			)
+			let privateFactorSource = try PrivateHDFactorSource(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				factorSource: factorSource
+			)
+
+			// We eagerly save the factor source here because we wanna use the same flow for
+			// creation of first account during onboarding like we do from home. This drastically
+			// reduces complexity of the app. However, please note that we do NOT persist the
+			// profile, since it contains no network yet (no account).
+			try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
+
+			let profile = Profile(factorSource: factorSource, creatingDevice: deviceDescription)
+
+			return Profile.Ephemeral.Private(
+				privateFactorSource: privateFactorSource,
+				profile: profile
+			)
+		} catch {
+			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"
+			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			fatalError(errorMessage)
 		}
-		for await value in profileStateSubject {
-			if !value.isNew {
-				return // done
-			}
-			continue
+	}
+
+	private var ephemeral: Profile.Ephemeral? {
+		switch profileStateSubject.value {
+		case let .ephemeral(ephemeral): return ephemeral
+		case .persisted: return nil
 		}
-		throw CancellationError()
+	}
+
+	@discardableResult
+	private func assertProfileStateIsEphemeral() throws -> Profile.Ephemeral {
+		struct ExpectedProfileStateToBeEphemeralButItWasNot: Swift.Error {}
+		guard let ephemeral else {
+			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
+			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
+			throw ExpectedProfileStateToBeEphemeralButItWasNot()
+		}
+		return ephemeral
+	}
+
+	@_disfavoredOverload
+	private func lens<Property>(
+		_ keyPath: KeyPath<ProfileState, Property?>
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		lens { $0[keyPath: keyPath] }
+	}
+
+	private func lens<Property>(
+		_ keyPath: KeyPath<ProfileState, Property>
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		lens { $0[keyPath: keyPath] }
+	}
+
+	private func lens<Property>(
+		_ map: @escaping @Sendable (ProfileState) -> Property?
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		profileStateSubject.compactMap { map($0) }
+			.share() // Multicast
+			.eraseToAnyAsyncSequence()
 	}
 
 	private func changeState(to newState: ProfileState) {
-		switch (profileStateSubject.value, newState) {
-		case (.newWithEphemeral, .ephemeral): break // `init` finished, no profile saved.
-		case (.newWithEphemeral, .persisted): break // `init` finished, found saved profile.
-		case (.ephemeral, .ephemeral): break // user created first account during onboarding
-		case (.ephemeral, .persisted): break // user finished onboarding.
-		case (.persisted, .persisted): break // user updated profile, e.g. added another account.
-		case (.persisted, .ephemeral): break // user deleted wallet from settings
-		default:
-			let errorMsg = "Incorrect implementation: invalid state transition from '\(String(describing: profileStateSubject.value))' to '\(String(describing: newState))'"
-			loggerGlobal.critical(.init(stringLiteral: errorMsg))
-			assertionFailure(errorMsg)
-			return
-		}
-
 		profileStateSubject.send(newState)
 	}
 }

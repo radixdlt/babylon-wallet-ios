@@ -4,7 +4,11 @@ import Resources
 // MARK: - Profile.LoadingFailure
 extension Profile {
 	public enum LoadingFailure: Sendable, Swift.Error, Hashable {
-		case profileVersionOutdated(json: Data, version: ProfileSnapshot.Version)
+		case profileVersionOutdated(
+			json: Data,
+			version: ProfileSnapshot.Version
+		)
+
 		case decodingFailure(json: Data, JSONDecodingError)
 
 		// This might happen to due to incompatible version, and some
@@ -16,29 +20,31 @@ extension Profile {
 
 extension Profile {
 	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Hashable {
-		public static func == (lhs: Self, rhs: Self) -> Bool {
-			lhs.version == rhs.version && String(describing: lhs.error) == String(describing: rhs.error)
-		}
-
-		public func hash(into hasher: inout Hasher) {
-			hasher.combine(version)
-			hasher.combine(String(describing: error))
-		}
-
 		public let version: ProfileSnapshot.Version
 		public let error: Swift.Error
 		public init(version: ProfileSnapshot.Version, error: Error) {
 			self.version = version
 			self.error = error
 		}
-
-		public var errorDescription: String? { L10n.ProfileLoad.failedToCreateProfileFromSnapshotError(error, version) }
 	}
 
 	public enum JSONDecodingError: Sendable, LocalizedError, Equatable {
 		case known(KnownDecodingError)
 		case unknown(UnknownDecodingError)
 	}
+}
+
+extension Profile.FailedToCreateProfileFromSnapshot {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.version == rhs.version && String(describing: lhs.error) == String(describing: rhs.error)
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(version)
+		hasher.combine(String(describing: error))
+	}
+
+	public var errorDescription: String? { L10n.ProfileLoad.failedToCreateProfileFromSnapshotError(error, version) }
 }
 
 // MARK: - Profile.JSONDecodingError + Hashable

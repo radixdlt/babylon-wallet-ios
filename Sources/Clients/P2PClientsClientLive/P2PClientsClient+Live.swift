@@ -7,7 +7,7 @@ extension P2PClientsClient: DependencyKey {
 	public typealias Value = P2PClientsClient
 
 	public static func live(
-		profileStore: ProfileStore = .shared
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await ProfileStore.shared() }
 	) -> Self {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 

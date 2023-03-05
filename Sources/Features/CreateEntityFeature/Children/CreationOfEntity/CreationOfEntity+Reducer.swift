@@ -11,6 +11,9 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 //		public let name: NonEmptyString
 		//        public let factorSource: FactorSource
 		public let request: CreateVirtualEntityRequest
+		public var name: NonEmptyString {
+			request.displayName
+		}
 
 		public init(request: CreateVirtualEntityRequest) {
 			self.request = request

@@ -5,10 +5,6 @@ import OnboardingFeature
 @testable import Profile
 @testable import SplashFeature
 
-private let ephemeralPrivateProfile: Profile.Ephemeral.Private = withDependencies { $0.uuid = .incrementing } operation: {
-	Profile.Ephemeral.Private.testValue(hint: "AppFeatureTest")
-}
-
 // MARK: - AppFeatureTests
 @MainActor
 final class AppFeatureTests: TestCase {
@@ -25,16 +21,11 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: App.State(root: .main(.previewValue)),
 			reducer: App()
-		) {
-			$0.onboardingClient.loadEphemeralPrivateProfile = {
-				ephemeralPrivateProfile
-			}
-		}
+		)
 		// when
-		await store.send(.child(.main(.delegate(.removedWallet))))
-		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
+		await store.send(.child(.main(.delegate(.removedWallet)))) {
 			// then
-			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
+			$0.root = .onboardingCoordinator(.init())
 		}
 	}
 
@@ -46,9 +37,6 @@ final class AppFeatureTests: TestCase {
 			reducer: App()
 		) {
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.onboardingClient.loadEphemeralPrivateProfile = {
-				ephemeralPrivateProfile
-			}
 			$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 		}
 
@@ -78,9 +66,6 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.onboardingClient.loadEphemeralPrivateProfile = {
-				ephemeralPrivateProfile
-			}
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -94,9 +79,8 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser)))))
-		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
-			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser))))) {
+			$0.root = .onboardingCoordinator(.init())
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
@@ -112,9 +96,6 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.onboardingClient.loadEphemeralPrivateProfile = {
-				ephemeralPrivateProfile
-			}
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -134,7 +115,9 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome)))))
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
+			$0.root = .onboardingCoordinator(.init())
+		}
 
 		await store.receive(.internal(.displayErrorAlert(
 			App.UserFacingError(foobar)
@@ -146,10 +129,6 @@ final class AppFeatureTests: TestCase {
 					message: { TextState("Failed to create Wallet from backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))") }
 				)
 			)
-		}
-
-		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
-			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
 		}
 
 		await store.send(.view(.alert(.dismiss))) {
@@ -174,9 +153,6 @@ final class AppFeatureTests: TestCase {
 
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
 				expectationProfileGotDeleted.fulfill()
-			}
-			$0.onboardingClient.loadEphemeralPrivateProfile = {
-				ephemeralPrivateProfile
 			}
 		}
 
@@ -212,9 +188,8 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.incompatibleProfileDeleted))
-		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
-			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
+		await store.receive(.internal(.incompatibleProfileDeleted)) {
+			$0.root = .onboardingCoordinator(.init())
 		}
 
 		waitForExpectations(timeout: 1)
@@ -234,9 +209,6 @@ final class AppFeatureTests: TestCase {
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
 				profileDeletedExpectation.fulfill()
-			}
-			$0.onboardingClient.loadEphemeralPrivateProfile = {
-				ephemeralPrivateProfile
 			}
 		}
 
@@ -272,9 +244,8 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.incompatibleProfileDeleted))
-		await store.receive(.internal(.loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)))) {
-			$0.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
+		await store.receive(.internal(.incompatibleProfileDeleted)) {
+			$0.root = .onboardingCoordinator(.init())
 		}
 
 		waitForExpectations(timeout: 1)

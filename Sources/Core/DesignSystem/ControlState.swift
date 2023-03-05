@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - ControlState
-public enum ControlState: Hashable {
+public enum ControlState: Sendable, Hashable {
 	case enabled
 	case loading(LoadingContext)
 	case disabled
@@ -23,7 +23,7 @@ public enum ControlState: Hashable {
 }
 
 // MARK: - LoadingContext
-public enum LoadingContext: Hashable {
+public enum LoadingContext: Sendable, Hashable {
 	case local
 	case global(text: String?)
 }

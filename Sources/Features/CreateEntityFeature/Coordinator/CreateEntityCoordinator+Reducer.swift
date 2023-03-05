@@ -190,10 +190,11 @@ public struct CreateEntityCoordinator<
 		factorSource: FactorSource,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = .step2_creationOfEntity(.init(
+		state.step = try! .step2_creationOfEntity(.init(
 			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
+			factorSource: factorSource
 		))
 		return .none
 	}

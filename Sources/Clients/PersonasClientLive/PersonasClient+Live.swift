@@ -5,19 +5,21 @@ import ProfileStore
 extension PersonasClient: DependencyKey {
 	public typealias Value = PersonasClient
 
-	public static func live(profileStore: ProfileStore = .shared) -> Self {
+	public static func live(
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await ProfileStore.shared() }
+	) -> Self {
 		Self(
 			getPersonas: {
-				guard let network = await profileStore.network else {
+				guard let network = await getProfileStore().network else {
 					return .init()
 				}
 				return network.personas
 			},
 			createUnsavedVirtualPersona: { request in
-				try await profileStore.profile.createNewUnsavedVirtualEntity(request: request)
+				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},
 			saveVirtualPersona: { persona in
-				try await profileStore.updating {
+				try await getProfileStore().updating {
 					try $0.addPersona(persona)
 				}
 			}
