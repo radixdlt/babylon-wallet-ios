@@ -6,10 +6,6 @@ import PersonasClient
 // MARK: - CreationOfEntity
 public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-//		public let curve: Slip10Curve
-//		public let networkID: NetworkID?
-//		public let name: NonEmptyString
-		//        public let factorSource: FactorSource
 		public let request: CreateVirtualEntityRequest
 		public var name: NonEmptyString {
 			request.displayName
@@ -25,10 +21,6 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			name: NonEmptyString,
 			factorSource: FactorSource
 		) throws {
-			//            self.factorSource = try factorSource.assertIsHD()
-//			self.curve = curve
-//			self.networkID = networkID
-//			self.name = name
 			try self.init(request: .init(curve: curve, networkID: networkID, factorSource: factorSource, displayName: name))
 		}
 	}

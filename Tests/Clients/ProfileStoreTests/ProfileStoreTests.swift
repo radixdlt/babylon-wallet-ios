@@ -59,8 +59,8 @@ final class ProfileStoreTests: TestCase {
 				XCTAssertNoDifference(profileSnapshot.id, profileID)
 
 				XCTAssertNoDifference(
-					profileSnapshot.factorSources.first, // .ignoringDate(),
-					privateFactor.factorSource // .ignoringDate()
+					profileSnapshot.factorSources.first,
+					privateFactor.factorSource
 				)
 				XCTAssertNoDifference(profileSnapshot.creatingDevice, expectedDeviceDescription)
 			}
