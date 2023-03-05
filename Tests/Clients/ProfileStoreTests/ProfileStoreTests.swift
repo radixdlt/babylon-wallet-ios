@@ -110,8 +110,8 @@ private extension ProfileStoreTests {
 			for await state in await sut.profileStateSubject {
 				switch state {
 				case let .ephemeral(ephemeral):
-					profile = ephemeral.private.profile
-					XCTAssertNoDifference(ephemeral.private.privateFactorSource, privateFactor)
+					profile = ephemeral.profile
+					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.factorSource)
 					try await sut.commitEphemeral()
 				case let .persisted(persistedProfile):
 					XCTAssertNoDifference(

@@ -83,7 +83,7 @@ extension ProfileStore {
 		/// `ephemeral`, no data has been persisted into secure storage,
 		/// and both the Profile and the private factor source can safely
 		/// be discarded.
-		case ephemeral(Profile.Ephemeral)
+		case ephemeral(EphemeralProfile)
 
 		/// When the async Task that loads profile - if any - from secure
 		/// storage completes and indeed a profile was found, the state
@@ -162,7 +162,7 @@ extension ProfileStore {
 			throw error
 		}
 
-		changeState(to: .persisted(ephemeral.private.profile))
+		changeState(to: .persisted(ephemeral.profile))
 	}
 
 	/// if persisted: Updates the in-memomry across app used Profile and also
@@ -190,7 +190,7 @@ extension ProfileStore {
 			// originate from creation of first account, but we do not persist
 			// the ephemeral profile until `commitEphemeral` has been called,
 			// we do, however, update the ProfileStore's in-memory profile...
-			ephemeral.updateProfile(profile)
+			ephemeral.profile = profile
 
 			// ... and then make the update.
 			changeState(to: .ephemeral(ephemeral))
@@ -209,8 +209,8 @@ extension ProfileStore {
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 		}
-		let ephemeralPrivate = await Self.newEphemeralProfile()
-		changeState(to: .ephemeral(.init(private: ephemeralPrivate, loadFailure: nil)))
+		let ephemeral = await Self.newEphemeralProfile()
+		changeState(to: .ephemeral(.init(profile: ephemeral, loadFailure: nil)))
 	}
 }
 
@@ -237,7 +237,7 @@ extension ProfileStore.ProfileState {
 
 	fileprivate var profile: Profile {
 		switch self {
-		case let .ephemeral(ephemeral): return ephemeral.private.profile
+		case let .ephemeral(ephemeral): return ephemeral.profile
 		case let .persisted(profile): return profile
 		}
 	}
@@ -349,13 +349,13 @@ extension ProfileStore {
 		case let .success(.some(existing)):
 			return .persisted(existing)
 		case .success(.none):
-			return await .ephemeral(.init(private: Self.newEphemeralProfile(), loadFailure: nil))
+			return await .ephemeral(.init(profile: Self.newEphemeralProfile(), loadFailure: nil))
 		case let .failure(loadFailure):
-			return await .ephemeral(.init(private: self.newEphemeralProfile(), loadFailure: loadFailure))
+			return await .ephemeral(.init(profile: Self.newEphemeralProfile(), loadFailure: loadFailure))
 		}
 	}
 
-	private static func newEphemeralProfile() async -> Profile.Ephemeral.Private {
+	private static func newEphemeralProfile() async -> Profile {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
@@ -376,23 +376,18 @@ extension ProfileStore {
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				hint: deviceDescription
 			)
-			let privateFactorSource = try PrivateHDFactorSource(
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				factorSource: factorSource
-			)
 
 			// We eagerly save the factor source here because we wanna use the same flow for
 			// creation of first account during onboarding like we do from home. This drastically
 			// reduces complexity of the app. However, please note that we do NOT persist the
 			// profile, since it contains no network yet (no account).
-			try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
+			try await secureStorageClient.saveMnemonicForFactorSource(PrivateHDFactorSource(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				factorSource: factorSource
+			))
 
-			let profile = Profile(factorSource: factorSource, creatingDevice: deviceDescription)
+			return Profile(factorSource: factorSource, creatingDevice: deviceDescription)
 
-			return Profile.Ephemeral.Private(
-				privateFactorSource: privateFactorSource,
-				profile: profile
-			)
 		} catch {
 			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -400,7 +395,7 @@ extension ProfileStore {
 		}
 	}
 
-	private var ephemeral: Profile.Ephemeral? {
+	private var ephemeral: EphemeralProfile? {
 		switch profileStateSubject.value {
 		case let .ephemeral(ephemeral): return ephemeral
 		case .persisted: return nil
@@ -408,7 +403,7 @@ extension ProfileStore {
 	}
 
 	@discardableResult
-	private func assertProfileStateIsEphemeral() throws -> Profile.Ephemeral {
+	private func assertProfileStateIsEphemeral() throws -> EphemeralProfile {
 		struct ExpectedProfileStateToBeEphemeralButItWasNot: Swift.Error {}
 		guard let ephemeral else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: ProfileState.Discriminator.ephemeral))' but was in '\(String(describing: profileStateSubject.value.description))'"
@@ -443,4 +438,11 @@ extension ProfileStore {
 	private func changeState(to newState: ProfileState) {
 		profileStateSubject.send(newState)
 	}
+}
+
+// MARK: - EphemeralProfile
+struct EphemeralProfile: Sendable, Hashable {
+	var profile: Profile
+	/// If this during startup an earlier Profile was found but we failed to load it.
+	let loadFailure: Profile.LoadingFailure?
 }
