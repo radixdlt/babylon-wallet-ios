@@ -9,6 +9,13 @@ extension KeychainAccess.Accessibility: @unchecked Sendable {}
 // MARK: - KeychainAccess.AuthenticationPolicy + Sendable
 extension KeychainAccess.AuthenticationPolicy: @unchecked Sendable {}
 
+// MARK: - SecureStorageError
+public enum SecureStorageError: Swift.Error, Equatable {
+	case evaluateLocalAuthenticationFailed(reason: LocalAuthenticationClient.Error)
+	case evaluateLocalAuthenticationFailedUnknown(reason: String)
+	case passcodeNotSet
+}
+
 // MARK: - SecureStorageClient + DependencyKey
 extension SecureStorageClient: DependencyKey {
 	public typealias Value = SecureStorageClient
@@ -27,21 +34,25 @@ extension SecureStorageClient: DependencyKey {
 			let authenticationPolicy: AuthenticationPolicy?
 		}
 
-		let leastSecureAccessibility: KeychainAccess.Accessibility = .whenUnlocked
 		@Sendable func queryMostSecureAccesibilityAndAuthenticationPolicy() async throws -> AccesibilityAndAuthenticationPolicy {
-			let config = try await localAuthenticationClient.queryConfig()
+			let config: LocalAuthenticationConfig
+			do {
+				config = try await localAuthenticationClient.queryConfig()
+			} catch let failure as LocalAuthenticationClient.Error {
+				throw SecureStorageError.evaluateLocalAuthenticationFailed(reason: failure)
+			} catch {
+				throw SecureStorageError.evaluateLocalAuthenticationFailedUnknown(reason: String(describing: error))
+			}
 
 			guard config.isPasscodeSetUp else {
-				return .init(accessibility: leastSecureAccessibility, authenticationPolicy: nil)
+				throw SecureStorageError.passcodeNotSet
 			}
 
 			// we know that user has `passcode` enabled, thus we will use `.whenPasscodeSetThisDeviceOnly`
 			// BEWARE! If the user deletes the passcode any item protected by this `accessibility` WILL GET DELETED.
-			let mostSecureAccessibility: KeychainAccess.Accessibility = .whenPasscodeSetThisDeviceOnly
-
 			// We use `userPresence` always, disregardong of biometrics being setup up or not,
 			// to allow user to be able to fallback to passcode if biometrics.
-			return .init(accessibility: mostSecureAccessibility, authenticationPolicy: .userPresence)
+			return .init(accessibility: .whenPasscodeSetThisDeviceOnly, authenticationPolicy: .userPresence)
 		}
 
 		let loadProfileSnapshotData: LoadProfileSnapshotData = {
@@ -61,7 +72,7 @@ extension SecureStorageClient: DependencyKey {
 						data: data,
 						key: profileSnapshotKeychainKey,
 						iCloudSyncEnabled: true,
-						accessibility: leastSecureAccessibility, // do not delete the Profile if passcode gets deleted.
+						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
 					)
