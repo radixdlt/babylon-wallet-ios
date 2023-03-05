@@ -1,14 +1,16 @@
 import Prelude
 import Tagged
 
-// MARK: - DataChannelMessageIDTag
-public enum DataChannelMessageIDTag {}
-public typealias DataChannelMessageID = Tagged<DataChannelMessageIDTag, String>
+// MARK: - DataChannelClient.Message
+extension DataChannelClient {
+	enum Message: Codable, Sendable, Equatable {
+		case chunkedMessage(ChunkedMessage)
+		case receipt(Receipt)
+	}
+}
 
-// MARK: - DataChannelMessage
-enum DataChannelMessage: Codable, Sendable, Equatable {
-	case chunkedMessage(ChunkedMessage)
-	case receipt(Receipt)
+extension DataChannelClient.Message {
+	typealias ID = Tagged<Self, String>
 
 	enum ChunkedMessage: Codable, Sendable, Equatable {
 		case metaData(MetaDataPackage)
@@ -35,21 +37,21 @@ enum DataChannelMessage: Codable, Sendable, Equatable {
 	}
 }
 
-extension DataChannelMessage.ChunkedMessage {
+extension DataChannelClient.Message.ChunkedMessage {
 	struct MetaDataPackage: Sendable, Equatable, Codable {
-		let messageId: DataChannelMessageID
+		let messageId: DataChannelClient.Message.ID
 		let chunkCount: Int
 		let messageByteCount: Int
 		let hashOfMessage: HexCodable
 	}
 
 	struct ChunkPackage: Sendable, Equatable, Codable {
-		let messageId: DataChannelMessageID
+		let messageId: DataChannelClient.Message.ID
 		let chunkIndex: Int
 		let chunkData: Data
 	}
 
-	var messageID: DataChannelMessageID {
+	var messageID: DataChannelClient.Message.ID {
 		switch self {
 		case let .metaData(metadata):
 			return metadata.messageId
@@ -66,17 +68,17 @@ extension DataChannelMessage.ChunkedMessage {
 	}
 }
 
-// MARK: - DataChannelMessage.ChunkedMessage.ChunkPackage + Comparable
-extension DataChannelMessage.ChunkedMessage.ChunkPackage: Comparable {
+// MARK: - DataChannelClient.Message.ChunkedMessage.ChunkPackage + Comparable
+extension DataChannelClient.Message.ChunkedMessage.ChunkPackage: Comparable {
 	// Comparable so we can sort them conveniently if received unsorted.
 	static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.chunkIndex < rhs.chunkIndex
 	}
 }
 
-extension DataChannelMessage.Receipt {
+extension DataChannelClient.Message.Receipt {
 	struct ReceiveConfirmation: Sendable, Equatable, Codable {
-		let messageId: DataChannelMessageID
+		let messageId: DataChannelClient.Message.ID
 	}
 
 	struct ReceiveError: Sendable, Equatable, Codable, LocalizedError {
@@ -84,11 +86,11 @@ extension DataChannelMessage.Receipt {
 			case messageHashesMismatch
 		}
 
-		let messageId: DataChannelMessageID
+		let messageId: DataChannelClient.Message.ID
 		let error: Reason
 	}
 
-	var messageID: DataChannelMessageID {
+	var messageID: DataChannelClient.Message.ID {
 		switch self {
 		case let .receiveMessageConfirmation(confirmation):
 			return confirmation.messageId

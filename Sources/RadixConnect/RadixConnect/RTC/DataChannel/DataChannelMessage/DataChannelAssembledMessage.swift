@@ -2,40 +2,36 @@ import CryptoKit
 import Foundation
 import Prelude
 
-// MARK: - DataChannelAssembledMessage
-public struct DataChannelAssembledMessage: Equatable, Sendable {
-	// According to CAP19
-	static let chunkSize = 15441
+// MARK: - DataChannelClient.AssembledMessage
+extension DataChannelClient {
+	public struct AssembledMessage: Equatable, Sendable {
+		// According to CAP19
+		static let chunkSize = 15441
 
-	public let idOfChunks: DataChannelMessageID
-	public let messageContent: Data
-	public let messageHash: Data
+		public let idOfChunks: Message.ID
+		public let messageContent: Data
+		public let messageHash: Data
 
-	public init(message: Data, id: DataChannelMessageID, messageHash: Data) {
-		self.idOfChunks = id
-		self.messageContent = message
-		self.messageHash = messageHash
-	}
+		public init(message: Data, id: Message.ID, messageHash: Data) {
+			self.idOfChunks = id
+			self.messageContent = message
+			self.messageHash = messageHash
+		}
 
-	public init(message: Data, id: DataChannelMessageID) {
-		self.init(message: message, id: id, messageHash: message.hash)
-	}
-}
-
-extension Data {
-	var hash: Data {
-		Data(SHA256.hash(data: self))
+		public init(message: Data, id: Message.ID) {
+			self.init(message: message, id: id, messageHash: message.hash)
+		}
 	}
 }
 
-extension DataChannelAssembledMessage {
+extension DataChannelClient.AssembledMessage {
 	static func assembleFrom(
-		chunks: [DataChannelMessage.ChunkedMessage.ChunkPackage],
-		metaData: DataChannelMessage.ChunkedMessage.MetaDataPackage
+		chunks: [DataChannelClient.Message.ChunkedMessage.ChunkPackage],
+		metaData: DataChannelClient.Message.ChunkedMessage.MetaDataPackage
 	) throws -> Self {
 		// For now ther is only one error type that can be handled in any manner - `messageHashesMismatch`
 		// thus, collapse all possible errors in this one.
-		func error() -> DataChannelMessage.Receipt.ReceiveError {
+		func error() -> DataChannelClient.Message.Receipt.ReceiveError {
 			.init(messageId: metaData.messageId, error: .messageHashesMismatch)
 		}
 
@@ -80,15 +76,15 @@ extension DataChannelAssembledMessage {
 			throw error()
 		}
 
-		return DataChannelAssembledMessage(message: message, id: metaData.messageId, messageHash: hash)
+		return .init(message: message, id: metaData.messageId, messageHash: hash)
 	}
 }
 
-extension DataChannelAssembledMessage {
-	func split() -> [DataChannelMessage.ChunkedMessage] {
+extension DataChannelClient.AssembledMessage {
+	func split() -> [DataChannelClient.Message.ChunkedMessage] {
 		let chunks = messageContent.chunks(ofCount: Self.chunkSize)
 
-		let metaDataPackage = DataChannelMessage.ChunkedMessage.metaData(
+		let metaDataPackage = DataChannelClient.Message.ChunkedMessage.metaData(
 			.init(
 				messageId: idOfChunks,
 				chunkCount: chunks.count,
@@ -97,8 +93,8 @@ extension DataChannelAssembledMessage {
 			)
 		)
 
-		let chunkPackages: [DataChannelMessage.ChunkedMessage] = chunks.enumerated().map { chunkIndex, chunkData in
-			DataChannelMessage.ChunkedMessage.chunk(
+		let chunkPackages: [DataChannelClient.Message.ChunkedMessage] = chunks.enumerated().map { chunkIndex, chunkData in
+			DataChannelClient.Message.ChunkedMessage.chunk(
 				.init(
 					messageId: idOfChunks,
 					chunkIndex: chunkIndex,

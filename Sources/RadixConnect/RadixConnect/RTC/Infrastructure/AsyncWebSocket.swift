@@ -11,46 +11,69 @@ extension DispatchQueue.SchedulerTimeType.Stride: @unchecked Sendable {}
 public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	struct UnknownMessageTypeError: Error {}
 
-	struct WebSocketSession {
-		let urlSession: URLSession
-		let task: URLSessionWebSocketTask
-	}
 
-	// MARK: - Private properties
+	// MARK: - Configuration
+        struct WebSocketSession {
+                let urlSession: URLSession
+                let task: URLSessionWebSocketTask
+        }
+
+        struct Config {
+                let reconnectDelay: Double
+                let pingInterval: Double
+
+                static let `default` = Config(reconnectDelay: 5, pingInterval: 60)
+        }
 
 	private let url: URL
-	private var session: WebSocketSession?
 	private let sessionConfig: URLSessionConfiguration
-
+        private var session: WebSocketSession?
 	private let scheduler: AnySchedulerOf<DispatchQueue>
+
+        // MARK: - State
 	private let incommingMessagesContinuation: AsyncStream<Data>.Continuation
-
-	// Test values
-	let sessionInvalidated: AsyncStream<Void>
-	let sessionInvalidatedContinuation: AsyncStream<Void>.Continuation
-
 	private var isRestarting: Bool = false
 
-	// MARK: - Public API
+	// MARK: - Internal API
+        let incommingMessages: AsyncStream<Data>
 
-	public let incommingMessages: AsyncStream<Data>
-
-	public init(url: URL, sessionConfig: URLSessionConfiguration = .default, scheduler: AnySchedulerOf<DispatchQueue> = DispatchQueue.global().eraseToAnyScheduler()) {
+        init(url: URL, sessionConfig: URLSessionConfiguration = .default, scheduler: AnySchedulerOf<DispatchQueue> = DispatchQueue.global().eraseToAnyScheduler()) {
 		self.url = url
 		self.sessionConfig = sessionConfig
 		self.sessionConfig.waitsForConnectivity = true
 		self.scheduler = scheduler
 
 		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
-		(sessionInvalidated, sessionInvalidatedContinuation) = AsyncStream.streamWithContinuation()
 
 		super.init()
-		Task {
-			await self.startSession()
-		}
+		Task { await self.startSession() }
 	}
 
-	func invalidateSession() {
+        func send(message: Data) async throws {
+                guard let session else {
+                        loggerGlobal.info("WebSocket: Attempt to send message when session was invalidated")
+                        await invalidateAndRestartSession()
+                        try await send(message: message)
+                        return
+                }
+                do {
+                        try await session.task.send(.data(message))
+                } catch {
+                        Task {
+                                await invalidateAndRestartSession()
+                        }
+                        throw error
+                }
+        }
+
+        func cancel() async {
+                incommingMessagesContinuation.finish()
+                invalidateSession()
+        }
+
+        // MARK: - Private API
+
+	private func invalidateSession() {
 		guard let session else {
 			loggerGlobal.info("WebSocket: Attempt to invalidate a missing session")
 			return
@@ -58,23 +81,21 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		session.task.cancel(with: .normalClosure, reason: nil)
 		session.urlSession.invalidateAndCancel()
 		loggerGlobal.info("WebSocket: Session was invalidated and terminated")
-
-		sessionInvalidatedContinuation.yield(())
 	}
 
-	func invalidateAndRestartSession() async {
+	private func invalidateAndRestartSession() async {
 		guard !isRestarting else { return }
 
 		isRestarting = true
 		loggerGlobal.info("WebSocket: Invalidate session and restart")
 		invalidateSession()
 
-		try? await scheduler.sleep(for: .seconds(2))
+                try? await scheduler.sleep(for: .seconds(Config.default.reconnectDelay))
 		startSession()
 		isRestarting = false
 	}
 
-	func startSession() {
+	private func startSession() {
 		let delegate = Delegate(onClose: {
 			Task {
 				await self.invalidateAndRestartSession()
@@ -89,36 +110,42 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 
 		let urlSession = URLSession(configuration: sessionConfig, delegate: delegate, delegateQueue: nil)
 		let task = urlSession.webSocketTask(with: url)
+                task.resume()
 		self.session = .init(urlSession: urlSession, task: task)
-
-		task.resume()
 	}
 
-	public func send(message: Data) async throws {
-		guard let session else {
-			loggerGlobal.info("WebSocket: Attempt to send message when session was invalidated")
-			await invalidateAndRestartSession()
-			try await send(message: message)
-			return
-		}
-		do {
-			try await session.task.send(.data(message))
-		} catch {
-			Task {
-				await invalidateAndRestartSession()
-			}
-			throw error
-		}
-	}
+        private func receiveMessages() {
+                guard let session else {
+                        loggerGlobal.info("WebSocket: Session was invalidated, stop receiving messages")
+                        return
+                }
 
-	public func cancel() async {
-		incommingMessagesContinuation.finish()
-		invalidateSession()
-	}
+                session.task.receive { [weak self] result in
+                        guard let self else { return }
+                        do {
+                                let message = try result.get()
+                                switch message {
+                                case let .data(data):
+                                        self.incommingMessagesContinuation.yield(data)
+                                case let .string(string):
+                                        self.incommingMessagesContinuation.yield(Data(string.utf8))
+                                @unknown default:
+                                        throw UnknownMessageTypeError()
+                                }
+                        } catch {
+                                loggerGlobal.error("WebSocket: receive message failed \(error)")
+                                return
+                        }
+
+                        Task {
+                                await self.receiveMessages()
+                        }
+                }
+        }
 
 	private func sendPingContinuously() {
 		Task {
-			try? await scheduler.sleep(for: .seconds(5))
+                        try? await scheduler.sleep(for: .seconds(Config.default.pingInterval))
 			try? Task.checkCancellation()
 			guard !Task.isCancelled else {
 				loggerGlobal.debug("WebSocket: Aborting ping, task cancelled.")
@@ -137,39 +164,10 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 					loggerGlobal.trace("WebSocket: Failed to send ping: \(String(describing: error))")
 					return
 				}
-				loggerGlobal.trace("WebSocket:Got pong 🏓")
+				loggerGlobal.trace("WebSocket: Got pong 🏓")
 				Task {
 					await self.sendPingContinuously()
 				}
-			}
-		}
-	}
-
-	private func receiveMessages() {
-		guard let session else {
-			loggerGlobal.info("WebSocket: Session was invalidated, stop receiving messages")
-			return
-		}
-
-		session.task.receive { [weak self] result in
-			guard let self else { return }
-			do {
-				let message = try result.get()
-				switch message {
-				case let .data(data):
-					self.incommingMessagesContinuation.yield(data)
-				case let .string(string):
-					self.incommingMessagesContinuation.yield(Data(string.utf8))
-				@unknown default:
-					throw UnknownMessageTypeError()
-				}
-			} catch {
-				loggerGlobal.error("WebSocket: receive message failed \(error)")
-				return
-			}
-
-			Task {
-				await self.receiveMessages()
 			}
 		}
 	}
@@ -186,6 +184,8 @@ extension AsyncWebSocket {
 			self.onOpen = onOpen
 		}
 
+                // MARK: - Open events
+
 		func urlSession(
 			_ session: URLSession,
 			webSocketTask: URLSessionWebSocketTask,
@@ -194,6 +194,8 @@ extension AsyncWebSocket {
 			loggerGlobal.debug("websocket task=\(webSocketTask.taskIdentifier) didOpenWithProtocol: \(String(describing: `protocol`))")
 			onOpen()
 		}
+
+                // MARK: - Close events
 
 		func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
 			loggerGlobal.debug("websocket task=\(webSocketTask.taskIdentifier) didCloseWith: \(String(describing: closeCode)), reason: \(String(describing: reason))")
@@ -205,13 +207,15 @@ extension AsyncWebSocket {
 			onClose()
 		}
 
-		func urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask) {
-			loggerGlobal.debug("WebSocket: Internet connection seems to be down, waiting for connectivity")
-		}
-
 		func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-			loggerGlobal.debug("WebSocket: Task failed with error \(error)")
+                        loggerGlobal.debug("WebSocket: Task failed with error \(String(describing: error))")
 			onClose()
 		}
+
+                // MARK: - Connectivity
+
+                func urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask) {
+                        loggerGlobal.debug("WebSocket: Internet connection seems to be down, waiting for connectivity")
+                }
 	}
 }

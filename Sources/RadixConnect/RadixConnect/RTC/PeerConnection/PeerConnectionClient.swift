@@ -6,11 +6,11 @@ import RadixConnectModels
 /// A client that manages a given PeerConnection and its related DataChannel.
 public struct PeerConnectionClient: Sendable {
 	let id: PeerConnectionID
+        let iceConnectionStates: AnyAsyncSequence<ICEConnectionState>
+
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
 	private let dataChannelClient: DataChannelClient
-
-	let iceConnectionStates: AnyAsyncSequence<ICEConnectionState>
 
 	init(id: PeerConnectionID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
 		self.id = id
@@ -26,6 +26,24 @@ public struct PeerConnectionClient: Sendable {
 			.eraseToAnyAsyncSequence()
 	}
 
+        func cancel() async {
+                delegate.cancel()
+                await dataChannelClient.cancel()
+                peerConnection.close()
+        }
+
+        func createAnswer() async throws -> RTCPrimitive.Answer {
+                let answer = try await peerConnection.createLocalAnswer()
+                try await peerConnection.setLocalDescription(.right(answer))
+                return answer
+        }
+
+        func createLocalOffer() async throws -> RTCPrimitive.Offer {
+                let offer = try await peerConnection.createLocalOffer()
+                try await peerConnection.setLocalDescription(.left(offer))
+                return offer
+        }
+
 	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
 		try await peerConnection.setRemoteDescription(.left(offer))
 	}
@@ -34,26 +52,8 @@ public struct PeerConnectionClient: Sendable {
 		try await peerConnection.setRemoteDescription(.right(answer))
 	}
 
-	func createAnswer() async throws -> RTCPrimitive.Answer {
-		let answer = try await peerConnection.createLocalAnswer()
-		try await peerConnection.setLocalDescription(.right(answer))
-		return answer
-	}
-
-	func createLocalOffer() async throws -> RTCPrimitive.Offer {
-		let offer = try await peerConnection.createLocalOffer()
-		try await peerConnection.setLocalDescription(.left(offer))
-		return offer
-	}
-
 	func setRemoteICECandidate(_ candidate: RTCPrimitive.ICECandidate) async throws {
 		try await peerConnection.addRemoteICECandidate(candidate)
-	}
-
-	func cancel() async {
-		delegate.cancel()
-		await dataChannelClient.cancel()
-		peerConnection.close()
 	}
 }
 
@@ -62,7 +62,7 @@ extension PeerConnectionClient {
 		try await dataChannelClient.sendMessage(data)
 	}
 
-	func receivedMessagesStream() async -> AnyAsyncSequence<Result<DataChannelAssembledMessage, Error>> {
+        func receivedMessagesStream() async -> AnyAsyncSequence<Result<DataChannelClient.AssembledMessage, Error>> {
 		await dataChannelClient.incommingAssembledMessages
 	}
 }

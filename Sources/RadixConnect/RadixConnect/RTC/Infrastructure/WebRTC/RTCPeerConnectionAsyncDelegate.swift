@@ -18,10 +18,10 @@ final class RTCPeerConnectionAsyncDelegate:
 	private let onGeneratedICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
 
 	override internal init() {
-		(onNegotiationNeeded, onNegotiationNeededContinuation) = AsyncStream.streamWithContinuation(Void.self)
-		(onIceConnectionState, onIceConnectionStateContinuation) = AsyncStream.streamWithContinuation(ICEConnectionState.self)
-		(onSignalingState, onSignalingStateContinuation) = AsyncStream.streamWithContinuation(SignalingState.self)
-		(onGeneratedICECandidate, onGeneratedICECandidateContinuation) = AsyncStream.streamWithContinuation(RTCPrimitive.ICECandidate.self)
+		(onNegotiationNeeded, onNegotiationNeededContinuation) = AsyncStream.streamWithContinuation()
+		(onIceConnectionState, onIceConnectionStateContinuation) = AsyncStream.streamWithContinuation()
+		(onSignalingState, onSignalingStateContinuation) = AsyncStream.streamWithContinuation()
+		(onGeneratedICECandidate, onGeneratedICECandidateContinuation) = AsyncStream.streamWithContinuation()
 
 		super.init()
 	}

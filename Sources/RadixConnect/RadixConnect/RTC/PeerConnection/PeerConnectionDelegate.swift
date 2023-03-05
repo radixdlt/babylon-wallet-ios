@@ -30,6 +30,16 @@ protocol PeerConnectionDelegate: Sendable {
 	func cancel()
 }
 
+public enum ICEConnectionState: String, Sendable {
+        case new
+        case checking
+        case connected
+        case completed
+        case failed
+        case disconnected
+        case closed
+}
+
 // MARK: - SignalingState
 public enum SignalingState: String, Sendable, Hashable, Codable {
 	case closed, stable, haveLocalOffer, haveLocalPrAnswer, haveRemoteOffer, haveRemotePrAnswer

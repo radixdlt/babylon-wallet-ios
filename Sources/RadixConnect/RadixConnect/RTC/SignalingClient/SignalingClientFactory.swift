@@ -38,7 +38,7 @@ extension SignalingClient {
 	) throws -> URL {
 		let target: ClientSource = source == .wallet ? .extension : .wallet
 
-		let connectionID = try HexCodable32Bytes(.init(data: Data(SHA256.hash(data: connectionPassword.data.data))))
+		let connectionID = try HexCodable32Bytes(.init(data: connectionPassword.hash))
 
 		let url = baseURL.appendingPathComponent(
 			connectionID.data.hex()

@@ -2,32 +2,40 @@ import AsyncExtensions
 import CryptoKit
 import Foundation
 import Prelude
-import WebRTC
+
+// MARK: - DataChannel
+/// This is mainly added to abstract the WebRTC.RTCDataChannel;
+/// If in future WebRTC update the RTCDataChannel will expose the API to instantiate it, this protocol can go away.
+protocol DataChannel: Sendable {
+	func sendData(_ data: Data)
+	func close()
+}
+
+// MARK: - DataChannelDelegate
+/// This is only needed to make RTCDataChannelDelegate to have async API
+protocol DataChannelDelegate: Sendable {
+	var receivedMessages: AsyncStream<Data> { get }
+	func cancel()
+}
 
 // MARK: - DataChannelClient
-actor DataChannelClient: NSObject {
+/// The client that manages the communication over RTCDataChannel.
+actor DataChannelClient {
 	// Configuration
 	private let jsonDecoder: JSONDecoder = .init()
 	private let jsonEncoder: JSONEncoder = .init()
 	private let dataChannel: DataChannel
 	private let delegate: DataChannelDelegate
-	private let idBuilder: @Sendable () -> DataChannelMessageID
+	private let idBuilder: @Sendable () -> Message.ID
 
 	// MARK: - Streams
-	let onMessageReceived: AsyncStream<Data>
-	let onReadyState: AsyncStream<DataChannelState>
 
-	private let onMessageReceivedContinuation: AsyncStream<Data>.Continuation
-	private let onReadyStateContinuation: AsyncStream<DataChannelState>.Continuation
+	private let incommingMessages: AnyAsyncSequence<Message>
+	private let incommingReceipts: AnyAsyncSequence<Message.Receipt>
+	private let incommingChunks: AnyAsyncSequence<Message.ChunkedMessage>
 
-	private let incommingMessages: AnyAsyncSequence<DataChannelMessage>
-	private let incommingReceipts: AnyAsyncSequence<DataChannelMessage.Receipt>
-	private let incommingChunks: AnyAsyncSequence<DataChannelMessage.ChunkedMessage>
-
-	lazy var incommingAssembledMessages: AnyAsyncSequence<Result<DataChannelAssembledMessage, Error>> = self.incommingChunks
-		.compactMap {
-			try await self.handleIncommingChunks($0)
-		}
+	lazy var incommingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incommingChunks
+		.compactMap(handleIncommingChunks)
 		.mapToResult()
 		.handleEvents(onElement: {
 			try? await self.sendReceiptForResult($0)
@@ -35,27 +43,25 @@ actor DataChannelClient: NSObject {
 		.eraseToAnyAsyncSequence()
 
 	// Mutable State
-	private typealias ChunksWithMetaData = (metaData: DataChannelMessage.ChunkedMessage.MetaDataPackage?,
-	                                        chunks: [DataChannelMessage.ChunkedMessage.ChunkPackage])
-	private var messagesByID: [DataChannelMessageID: ChunksWithMetaData] = [:]
+	private typealias ChunksWithMetaData = (metaData: Message.ChunkedMessage.MetaDataPackage?,
+	                                        chunks: [Message.ChunkedMessage.ChunkPackage])
+	private var messagesByID: [Message.ID: ChunksWithMetaData] = [:]
 
 	// MARK: - Initializer
 
 	@Sendable init(
 		dataChannel: DataChannel,
 		delegate: DataChannelDelegate,
-		idBuilder: @Sendable @escaping () -> DataChannelMessageID = { .init(rawValue: UUID().uuidString) }
+		idBuilder: @Sendable @escaping () -> Message.ID = { .init(rawValue: UUID().uuidString) }
 	) {
 		self.dataChannel = dataChannel
 		self.delegate = delegate
 		self.idBuilder = idBuilder
-		(onMessageReceived, onMessageReceivedContinuation) = AsyncStream.streamWithContinuation(Data.self)
-		(onReadyState, onReadyStateContinuation) = AsyncStream.streamWithContinuation(DataChannelState.self)
 
 		self.incommingMessages = delegate
-			.onMessageReceived
+			.receivedMessages
 			.mapSkippingError {
-				try JSONDecoder().decode(DataChannelMessage.self, from: $0)
+				try JSONDecoder().decode(Message.self, from: $0)
 			} logError: { error in
 				loggerGlobal.error("Critical: Could not decode the incomming DataChannel message \(error)")
 			}
@@ -65,13 +71,11 @@ actor DataChannelClient: NSObject {
 
 		self.incommingReceipts = self.incommingMessages.compactMap(\.receipt).eraseToAnyAsyncSequence()
 		self.incommingChunks = self.incommingMessages.compactMap(\.chunkedMessage).eraseToAnyAsyncSequence()
-
-		super.init()
 	}
 
 	func sendMessage(_ data: Data) async throws {
 		let id = idBuilder()
-		let assembledMessage = DataChannelAssembledMessage(
+		let assembledMessage = AssembledMessage(
 			message: data,
 			id: id
 		)
@@ -85,26 +89,24 @@ actor DataChannelClient: NSObject {
 	}
 
 	func cancel() {
-		onMessageReceivedContinuation.finish()
-		onReadyStateContinuation.finish()
 		delegate.cancel()
 		dataChannel.close()
 	}
 
 	// MARK: - Private
 
-	private func sendMessageOverDataChannel(_ message: DataChannelMessage) throws {
+	private func sendMessageOverDataChannel(_ message: Message) throws {
 		let data = try jsonEncoder.encode(message)
 		dataChannel.sendData(data)
 	}
 
-	private func sendReceiptForResult(_ result: Result<DataChannelAssembledMessage, Error>) throws {
+	private func sendReceiptForResult(_ result: Result<AssembledMessage, Error>) throws {
 		switch result {
 		case let .success(message):
 			try sendMessageOverDataChannel(
 				.receipt(.receiveMessageConfirmation(.init(messageId: message.idOfChunks)))
 			)
-		case let .failure(error as DataChannelMessage.Receipt.ReceiveError):
+		case let .failure(error as Message.Receipt.ReceiveError):
 			try sendMessageOverDataChannel(
 				.receipt(.receiveMessageError(error))
 			)
@@ -114,7 +116,7 @@ actor DataChannelClient: NSObject {
 		}
 	}
 
-	private func waitForMessageConfirmation(_ messageID: DataChannelMessageID) async throws {
+	private func waitForMessageConfirmation(_ messageID: Message.ID) async throws {
 		_ = try await incommingReceipts
 			.filter { $0.messageID == messageID }
 			.prefix(1)
@@ -127,13 +129,13 @@ actor DataChannelClient: NSObject {
 			.collect()
 	}
 
-	private func handleIncommingChunks(_ chunk: DataChannelMessage.ChunkedMessage) async throws -> DataChannelAssembledMessage? {
+	@Sendable private func handleIncommingChunks(_ chunk: Message.ChunkedMessage) async throws -> AssembledMessage? {
 		var (metadata, chunks) = messagesByID[chunk.messageID] ?? (metadata: nil, chunks: [])
 
-		func assembleMessage() throws -> DataChannelAssembledMessage? {
+		func assembleMessage() throws -> AssembledMessage? {
 			if let metadata, metadata.chunkCount == chunks.count {
 				messagesByID.removeValue(forKey: metadata.messageId)
-				return try DataChannelAssembledMessage.assembleFrom(chunks: chunks, metaData: metadata)
+				return try AssembledMessage.assembleFrom(chunks: chunks, metaData: metadata)
 			}
 			messagesByID[chunk.messageID] = (metadata, chunks)
 			return nil
