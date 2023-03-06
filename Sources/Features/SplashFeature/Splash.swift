@@ -25,7 +25,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 
 		case appeared
-		case passcodeCheckFailedAlert(PresentationAction<AlertState<PasscodeCheckFailedAlertAction>, PasscodeCheckFailedAlertAction>)
+		case passcodeCheckFailedAlert(PresentationAction<PasscodeCheckFailedAlertAction>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -47,9 +47,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$passcodeCheckFailedAlert, action: /Action.view .. ViewAction.passcodeCheckFailedAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$passcodeCheckFailedAlert, action: /Action.view .. ViewAction.passcodeCheckFailedAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
