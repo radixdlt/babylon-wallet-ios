@@ -6,7 +6,7 @@ extension PersonasClient: DependencyKey {
 	public typealias Value = PersonasClient
 
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await ProfileStore.shared() }
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
 		Self(
 			getPersonas: {

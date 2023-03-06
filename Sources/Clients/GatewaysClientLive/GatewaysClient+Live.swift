@@ -7,7 +7,7 @@ extension GatewaysClient: DependencyKey {
 	public typealias Value = GatewaysClient
 
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await ProfileStore.shared() }
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 

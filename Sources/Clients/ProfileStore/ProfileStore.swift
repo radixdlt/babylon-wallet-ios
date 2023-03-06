@@ -46,19 +46,23 @@ public final actor ProfileStore {
 
 	public final actor NestedHolder {
 		private var _shared: ProfileStore?
-		public func shared() async -> ProfileStore {
-			if let shared = _shared {
+		public var shared: ProfileStore {
+			get async {
+				if let shared = _shared {
+					return shared
+				}
+				let shared = await ProfileStore()
+				_shared = shared
 				return shared
 			}
-			let shared = await ProfileStore()
-			_shared = shared
-			return shared
 		}
 	}
 
 	private static let sharedNestedHolder = NestedHolder()
-	public static func shared() async -> ProfileStore {
-		await Self.sharedNestedHolder.shared()
+	public static var shared: ProfileStore {
+		get async {
+			await Self.sharedNestedHolder.shared
+		}
 	}
 
 	/// Current Profile
