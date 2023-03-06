@@ -199,10 +199,15 @@ extension Text {
 
 extension View {
 	public var flushedLeft: some View {
+		flushedLeft(padding: 0)
+	}
+
+	public func flushedLeft(padding: CGFloat) -> some View {
 		HStack(spacing: 0) {
 			self
 			Spacer(minLength: 0)
 		}
+		.padding(.leading, padding)
 	}
 
 	public var flushedRight: some View {

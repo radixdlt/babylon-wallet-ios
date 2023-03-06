@@ -49,6 +49,7 @@ extension TransactionReviewAccount {
 					ForEach(viewStore.details, id: \.self) { details in
 						TransactionDetailsView(viewState: details)
 					}
+					.background(.app.gray5)
 				}
 			}
 		}
@@ -132,19 +133,20 @@ public struct TransactionDetailsView: View {
 						if guaranteedAmount != nil {
 							Text("Estimated") // TODO:  string
 								.textStyle(.body2Regular) // TODO:  unknown textStyle
+								.foregroundColor(.app.gray1)
 						}
 						//					Text(amount.formatted(.number))
 						Text(amount.description)
 							.textStyle(.secondaryHeader)
 					}
 					.foregroundColor(.app.gray1)
-					.padding(.bottom, .small2)
 
 					if let dollarAmount {
 						//					Text(dollarAmount.formatted(.currency(code: "USD")))
 						Text(dollarAmount.description)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)
+							.padding(.top, .small2)
 					}
 
 					if let guaranteedAmount {
