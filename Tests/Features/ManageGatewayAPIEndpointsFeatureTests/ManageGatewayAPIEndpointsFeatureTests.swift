@@ -177,10 +177,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
 			$0.destination = .createAccount(
 				.init(config: .init(
-					specificNetworkID: newGateway.network.id,
-					isFirstEntity: false,
-					canBeDismissed: true,
-					navigationButtonCTA: .goHome
+					purpose: .firstAccountOnNewNetwork(newGateway.network.id)
 				))
 			)
 		}
@@ -208,10 +205,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
 			$0.destination = .createAccount(
 				.init(config: .init(
-					specificNetworkID: newGateway.network.id,
-					isFirstEntity: false,
-					canBeDismissed: true,
-					navigationButtonCTA: .goHome
+					purpose: .firstAccountOnNewNetwork(newGateway.network.id)
 				))
 			)
 		}

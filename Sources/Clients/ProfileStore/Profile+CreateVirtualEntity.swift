@@ -4,21 +4,22 @@ import UseFactorSourceClient
 
 extension Profile {
 	public func createNewUnsavedVirtualEntity<Entity: EntityProtocol>(
-		request: CreateVirtualEntityRequestProtocol
+		request: CreateVirtualEntityRequest
 	) async throws -> Entity {
-		try await self.createNewUnsavedVirtualEntity(request: request)
-			.cast()
+		try await self.createNewUnsavedVirtualEntity(
+			request: request,
+			entityKind: Entity.entityKind
+		).cast()
 	}
 
 	public func createNewUnsavedVirtualEntity(
-		request: CreateVirtualEntityRequestProtocol
+		request: CreateVirtualEntityRequest,
+		entityKind: EntityKind
 	) async throws -> any EntityProtocol {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
-		let getDerivationPathRequest = try request.getDerivationPathRequest()
-		let getDerivationPathForNewEntity = { (request: GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int) in
-
+		let (derivationPath, index) = try {
 			let index: Int = {
 				// FIXME: - Multifactor, in the future update to:
 				// We are NOT counting the number of accounts/personas
@@ -26,7 +27,7 @@ extension Profile {
 				// for this particular factor source on this particular
 				// network for this particular entity type.
 				if let network = try? self.onNetwork(id: networkID) {
-					switch request.entityKind {
+					switch entityKind {
 					case .account:
 						return network.accounts.count
 					case .identity:
@@ -36,42 +37,25 @@ extension Profile {
 					return 0
 				}
 			}()
-
-			switch request.entityKind {
+			let keyKind = KeyKind.virtualEntity
+			switch entityKind {
 			case .account:
-				let path = try DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+				let path = try DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: keyKind))
 				return (path: path, index: index)
 			case .identity:
-				let path = try DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+				let path = try DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: keyKind))
 				return (path: path, index: index)
 			}
-		}
-		let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
+		}()
 
 		let genesisFactorInstance: FactorInstance = try await {
-			let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
-
-			let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
-			let publicKey: Engine.PublicKey = try await {
-				switch genesisFactorInstanceDerivationStrategy {
-				case .loadMnemonicFromKeychainForFactorSource:
-					return try await useFactorSourceClient.onDeviceHD(
-						factorSourceID: factorSource.id,
-						derivationPath: derivationPath,
-						curve: request.curve,
-						purpose: .createEntity(kind: request.entityKind)
-					).publicKey
-
-				case let .useEphemeralPrivateProfile(ephemeralPrivateProfile):
-					let hdRoot = try ephemeralPrivateProfile.privateFactorSource.mnemonicWithPassphrase.hdRoot()
-					return try useFactorSourceClient.publicKeyFromOnDeviceHD(.init(
-						hdRoot: hdRoot,
-						derivationPath: derivationPath,
-						curve: request.curve
-					))
-				}
-
-			}()
+			let factorSource = request.factorSource
+			let publicKey: Engine.PublicKey = try await useFactorSourceClient.onDeviceHD(
+				factorSourceID: factorSource.id,
+				derivationPath: derivationPath,
+				curve: request.curve,
+				purpose: .createEntity(kind: entityKind)
+			).publicKey
 
 			return try FactorInstance(
 				factorSourceID: factorSource.id,
@@ -85,7 +69,7 @@ extension Profile {
 			genesisFactorInstance: genesisFactorInstance
 		)
 
-		switch request.entityKind {
+		switch entityKind {
 		case .identity:
 			let identityAddress = try OnNetwork.Persona.deriveAddress(
 				networkID: networkID,

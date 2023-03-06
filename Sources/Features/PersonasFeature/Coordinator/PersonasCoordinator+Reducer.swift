@@ -69,11 +69,11 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case .personaList(.delegate(.createNewPersona)):
 			let isFirst = state.personaList.personas.count == 0
-			state.createPersonaCoordinator = .init(config: .init(
-				isFirstEntity: isFirst,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToPersonaList
-			))
+			state.createPersonaCoordinator = .init(
+				config: .init(
+					purpose: .newPersonaFromSettings(isFirst: isFirst)
+				)
+			)
 			return .none
 
 		case .createPersonaCoordinator(.delegate(.completed)):

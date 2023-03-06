@@ -31,7 +31,6 @@ public struct App: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
-		case loadEphemeralPrivateProfileResult(TaskResult<Profile.Ephemeral.Private>)
 		case displayErrorAlert(App.UserFacingError)
 	}
 
@@ -67,8 +66,6 @@ public struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
-	// FIXME: this is temporary and will be reworked during multifactor work.
-	@Dependency(\.onboardingClient.loadEphemeralPrivateProfile) var loadEphemeralPrivateProfile
 
 	public init() {}
 
@@ -131,13 +128,6 @@ public struct App: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .loadEphemeralPrivateProfileResult(.failure(error)):
-			fatalError("Unable to use app, failed to load ephemeral private profile, failure: \(String(describing: error))")
-
-		case let .loadEphemeralPrivateProfileResult(.success(ephemeralPrivateProfile)):
-			state.root = .onboardingCoordinator(.init(ephemeralPrivateProfile: ephemeralPrivateProfile))
-			return .none
-
 		case .incompatibleProfileDeleted:
 			return goToOnboarding(state: &state)
 		}
@@ -175,7 +165,10 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
-	func incompatibleSnapshotData(version: ProfileSnapshot.Version, state: inout State) -> EffectTask<Action> {
+	func incompatibleSnapshotData(
+		version: ProfileSnapshot.Version,
+		state: inout State
+	) -> EffectTask<Action> {
 		state.alert = .incompatibleProfileErrorAlert(
 			.init(
 				title: { TextState(L10n.Splash.incompatibleProfileVersionAlertTitle) },
@@ -196,11 +189,8 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func goToOnboarding(state: inout State) -> EffectTask<Action> {
-		.run { send in
-			await send(.internal(.loadEphemeralPrivateProfileResult(TaskResult {
-				try await loadEphemeralPrivateProfile()
-			})))
-		}
+		state.root = .onboardingCoordinator(.init())
+		return .none
 	}
 }
 

@@ -103,24 +103,17 @@ public struct CreateEntityCoordinator<
 		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate):
 			precondition(!factorSources.isEmpty)
 
-			if state.config.specificGenesisFactorInstanceDerivationStrategy == nil, factorSources.count > 1, factorSources.contains(where: \.supportsOlympia) {
+			if factorSources.count > 1, factorSources.contains(where: \.supportsOlympia) {
 				return goToStep1SelectGenesisFactorSource(
 					entityName: specifiedNameForNewEntityToCreate,
 					factorSources: factorSources,
 					state: &state
 				)
 			} else {
-				let genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy = {
-					if let specific = state.config.specificGenesisFactorInstanceDerivationStrategy {
-						return specific
-					}
-					return .loadMnemonicFromKeychainForFactorSource(factorSources.device)
-				}()
-
 				return goToStep2Creation(
 					curve: .curve25519, // The babylon execution path, safe to default to curve25519
 					entityName: specifiedNameForNewEntityToCreate,
-					genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy,
+					factorSource: factorSources.first,
 					state: &state
 				)
 			}
@@ -140,7 +133,7 @@ public struct CreateEntityCoordinator<
 			return goToStep2Creation(
 				curve: curve,
 				entityName: specifiedNameForNewEntityToCreate,
-				genesisFactorInstanceDerivationStrategy: .loadMnemonicFromKeychainForFactorSource(factorSource),
+				factorSource: factorSource,
 				state: &state
 			)
 
@@ -194,14 +187,14 @@ public struct CreateEntityCoordinator<
 	private func goToStep2Creation(
 		curve: Slip10Curve,
 		entityName: NonEmpty<String>,
-		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
+		factorSource: FactorSource,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = .step2_creationOfEntity(.init(
+		state.step = try! .step2_creationOfEntity(.init(
 			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
-			genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy
+			factorSource: factorSource
 		))
 		return .none
 	}

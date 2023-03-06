@@ -17,7 +17,10 @@ public struct NewEntityCompletion<Entity: EntityProtocol & Sendable & Hashable>:
 			self.navigationButtonCTA = navigationButtonCTA
 		}
 
-		public init(entity: Entity, config: CreateEntityConfig) {
+		public init(
+			entity: Entity,
+			config: CreateEntityConfig
+		) {
 			self.init(
 				entity: entity,
 				isFirstOnNetwork: config.isFirstEntity,

@@ -69,9 +69,7 @@ struct Login: Sendable, FeatureReducer {
 
 		case .createNewPersonaButtonTapped:
 			state.createPersonaCoordinator = .init(config: .init(
-				isFirstEntity: state.personas.isEmpty,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToChoosePersonas
+				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
 			))
 			return .none
 		case let .continueButtonTapped(persona):

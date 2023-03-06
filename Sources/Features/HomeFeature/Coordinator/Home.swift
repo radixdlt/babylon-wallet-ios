@@ -141,9 +141,7 @@ public struct Home: Sendable, FeatureReducer {
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
 				.init(config: .init(
-					isFirstEntity: false,
-					canBeDismissed: true,
-					navigationButtonCTA: .goHome
+					purpose: .newAccountFromHome
 				))
 			)
 			return .none

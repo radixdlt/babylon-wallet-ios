@@ -179,11 +179,7 @@ struct AccountCompletion_Preview: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					entity: .previewValue0,
-					config: .init(
-						isFirstEntity: true,
-						canBeDismissed: false,
-						navigationButtonCTA: .goBackToChooseAccounts
-					)
+					config: .init(purpose: .newAccountFromHome)
 				),
 				reducer: NewEntityCompletion()
 			)
