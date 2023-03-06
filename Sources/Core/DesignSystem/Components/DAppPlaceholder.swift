@@ -40,7 +40,7 @@ public struct NFTPlaceholder: View {
 	}
 
 	public var body: some View {
-		Rectangle()
+		RoundedRectangle(cornerRadius: size.cornerRadius)
 			.fill(.app.green2)
 			.frame(size)
 	}

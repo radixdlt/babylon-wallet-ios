@@ -56,7 +56,7 @@ extension App {
 			decodeActions()
 		}
 		.sheet(isPresented: .constant(true)) {
-			let store = StoreOf<TransactionReview>.init(initialState: .mock0, reducer: TransactionReview())
+			let store = StoreOf<TransactionReview>.init(initialState: .mock1, reducer: TransactionReview())
 			TransactionReview.View(store: store)
 		}
 	}
