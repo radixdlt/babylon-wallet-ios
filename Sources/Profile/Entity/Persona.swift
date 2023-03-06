@@ -24,11 +24,6 @@ extension OnNetwork {
 		/// the `DeviceFactorSource`
 		public let address: EntityAddress
 
-		/// The index of this Persona, in the list of personas for a certain network. This means that
-		/// profile on network `mainnet` will have a persona with `personaIndex = 0`, but so can a
-		/// peresona on network `testnet` too! However, their `identityAddress`es will differ!
-		public let index: Int
-
 		/// Security of this persona
 		public var securityState: EntitySecurityState
 
@@ -42,14 +37,12 @@ extension OnNetwork {
 			networkID: NetworkID,
 			address: EntityAddress,
 			securityState: EntitySecurityState,
-			index: Index,
 			displayName: NonEmpty<String>,
 			fields: IdentifiedArrayOf<Field>
 		) {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.index = index
 			self.fields = fields
 			self.displayName = displayName
 		}
@@ -60,9 +53,6 @@ extension OnNetwork.Persona {
 	public static var entityKind: EntityKind { .identity }
 
 	public typealias EntityAddress = IdentityAddress
-
-	/// Index in list of collection of personas, per network.
-	public typealias Index = Int
 
 	/// A stable and globally unique identifier of an account.
 	public typealias ID = EntityAddress
@@ -78,7 +68,6 @@ extension OnNetwork.Persona {
 			children: [
 				"address": address,
 				"securityState": securityState,
-				"index": index,
 				"fields": fields,
 				"displayName": String(describing: displayName),
 			],
@@ -89,7 +78,6 @@ extension OnNetwork.Persona {
 	public var description: String {
 		"""
 		"displayName": \(String(describing: displayName)),
-		"index": \(index),
 		"address": \(address),
 		"securityState": \(securityState),
 		"fields": \(fields)

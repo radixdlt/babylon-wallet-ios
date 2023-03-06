@@ -18,7 +18,7 @@ extension OnNetwork.Account {
 				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/0H/1238H"))
 			)
 		)),
-		index: 0,
+		appearanceID: ._0,
 		displayName: "Main"
 	)
 
@@ -36,7 +36,7 @@ extension OnNetwork.Account {
 				)),
 				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/1H/1238H"))
 			))),
-		index: 1,
+		appearanceID: ._1,
 		displayName: "Secondary"
 	)
 }

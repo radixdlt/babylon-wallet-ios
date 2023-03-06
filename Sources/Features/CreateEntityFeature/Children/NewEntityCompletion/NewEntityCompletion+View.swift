@@ -11,7 +11,6 @@ extension NewEntityCompletion {
 	public struct ViewState: Equatable {
 		let entityKind: String
 		let entityName: String
-		let entityIndex: Int
 		let destinationDisplayText: String
 		let isFirstOnNetwork: Bool
 		let explaination: String
@@ -28,7 +27,6 @@ extension NewEntityCompletion {
 			let entityKind = state.entity.kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
 			self.entityKind = entityKind
 			entityName = state.entity.displayName.rawValue
-			entityIndex = state.entity.index
 
 			destinationDisplayText = {
 				switch state.navigationButtonCTA {
@@ -130,7 +128,7 @@ private extension NewEntityCompletion.View {
 
 			Group {
 				ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
-					nextAppearanceId(from: viewStore.entityIndex + index).gradient.opacity(0.2)
+					OnNetwork.Account.AppearanceID.fromIndex(Int(whenAccount.appearanceID.rawValue) + index).gradient.opacity(0.2)
 						.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
 						.cornerRadius(.small1)
 						.scaleEffect(scale(index: index))
@@ -148,10 +146,6 @@ private extension NewEntityCompletion.View {
 
 	func reversedZIndex(count: Int, index: Int) -> Double {
 		Double(count - index)
-	}
-
-	func nextAppearanceId(from accountIndex: OnNetwork.Account.Index) -> OnNetwork.Account.AppearanceID {
-		OnNetwork.Account.AppearanceID.fromIndex(accountIndex + 1)
 	}
 
 	func subtitleText(with viewStore: ViewStoreOf<NewEntityCompletion>) -> String {

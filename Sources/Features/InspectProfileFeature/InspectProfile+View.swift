@@ -489,7 +489,7 @@ extension EntitiesView {
 			if entities.isEmpty {
 				Text("<None yet>")
 			} else {
-				ForEach(entities, id: \.index) { entity in
+				ForEach(entities, id: \.address) { entity in
 					EntityView(
 						entity: entity,
 						indentation: inOneLevel
@@ -514,7 +514,6 @@ extension EntityView {
 				Labeled("DisplayName", value: displayName.rawValue)
 			}
 
-			Labeled("Index", value: String(describing: entity.index))
 			Labeled("Address", value: entity.address.address)
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):

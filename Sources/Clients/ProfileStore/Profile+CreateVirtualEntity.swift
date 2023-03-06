@@ -80,7 +80,6 @@ extension Profile {
 				networkID: networkID,
 				address: identityAddress,
 				securityState: .unsecured(unsecuredControl),
-				index: index,
 				displayName: displayName,
 				fields: .init()
 			)
@@ -95,7 +94,7 @@ extension Profile {
 				networkID: networkID,
 				address: accountAddress,
 				securityState: .unsecured(unsecuredControl),
-				index: index,
+				appearanceID: .fromIndex(index),
 				displayName: displayName
 			)
 			return account

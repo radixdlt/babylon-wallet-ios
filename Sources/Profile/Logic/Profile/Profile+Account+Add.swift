@@ -30,34 +30,6 @@ extension NonEmpty where Collection == IdentifiedArrayOf<OnNetwork.Account> {
 	}
 }
 
-extension Profile {
-	public struct NetworkAlreadyExists: Swift.Error {}
-	public struct AccountDoesNotHaveIndexZero: Swift.Error {}
-
-	/// Throws if the network of the account is not new and does not have index 0.
-	@discardableResult
-	public mutating func add(
-		account account0: OnNetwork.Account,
-		toNewNetworkWithID networkID: NetworkID
-	) throws -> OnNetwork {
-		guard !containsNetwork(withID: networkID) else {
-			throw NetworkAlreadyExists()
-		}
-		guard account0.index == 0 else {
-			throw AccountDoesNotHaveIndexZero()
-		}
-
-		let onNetwork = OnNetwork(
-			networkID: networkID,
-			accounts: .init(rawValue: .init(uniqueElements: [account0]))!,
-			personas: [],
-			authorizedDapps: []
-		)
-		try self.perNetwork.add(onNetwork)
-		return onNetwork
-	}
-}
-
 // MARK: Add Virtual Account
 extension Profile {
 	/// Saves an `Account` into the profile

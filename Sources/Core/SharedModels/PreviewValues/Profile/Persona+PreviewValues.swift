@@ -19,7 +19,6 @@ extension OnNetwork.Persona {
 					derivationPath: .identityPath(.init(derivationPath: "m/44H/1022H/10H/618H/0H/1238H"))
 				)
 			)),
-			index: 0,
 			displayName: "Alan",
 			fields: [
 				Field(kind: .firstName, value: "Alan"),
@@ -44,7 +43,6 @@ extension OnNetwork.Persona {
 					derivationPath: .identityPath(.init(derivationPath: "m/44H/1022H/10H/618H/1H/1238H"))
 				)
 			)),
-			index: 1,
 			displayName: "Rick",
 			fields: [
 				Field(kind: .firstName, value: "Rick"),
