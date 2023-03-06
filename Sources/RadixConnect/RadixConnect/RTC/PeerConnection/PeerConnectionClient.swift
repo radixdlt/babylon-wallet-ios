@@ -5,14 +5,15 @@ import RadixConnectModels
 // MARK: - PeerConnectionClient
 /// A client that manages a given PeerConnection and its related DataChannel.
 public struct PeerConnectionClient: Sendable {
-	let id: PeerConnectionID
+        typealias ID = PeerConnectionID
+	let id: ID
         let iceConnectionStates: AnyAsyncSequence<ICEConnectionState>
 
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
 	private let dataChannelClient: DataChannelClient
 
-	init(id: PeerConnectionID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
+	init(id: ID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
 		self.id = id
 		self.peerConnection = peerConnection
 		self.delegate = delegate
