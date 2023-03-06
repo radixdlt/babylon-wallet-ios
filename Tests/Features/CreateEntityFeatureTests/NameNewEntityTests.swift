@@ -10,9 +10,10 @@ final class NameNewEntityTests: TestCase {
 		// given
 		let initialState = NameNewEntity<OnNetwork.Account>.State(
 			config: .init(
-				isFirstEntity: true,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
+				//				isFirstEntity: true,
+//				canBeDismissed: true,
+//				navigationButtonCTA: .goHome
+				purpose: .newAccountFromHome
 			))
 
 		let store = TestStore(
@@ -32,9 +33,7 @@ final class NameNewEntityTests: TestCase {
 		// given
 		let initialState = NameNewEntity<OnNetwork.Account>.State(
 			config: .init(
-				isFirstEntity: true,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
+				purpose: .newAccountFromHome
 			)
 		)
 

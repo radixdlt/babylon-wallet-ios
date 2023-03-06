@@ -13,7 +13,10 @@ extension DependencyValues {
 
 extension NetworkSwitchingClient {
 	public static let liveValue = Self.live()
-	public static func live(profileStore: ProfileStore = .shared) -> Self {
+
+	public static func live(
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+	) -> Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient

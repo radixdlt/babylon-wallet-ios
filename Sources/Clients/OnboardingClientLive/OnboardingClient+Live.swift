@@ -6,30 +6,19 @@ extension OnboardingClient: DependencyKey {
 	public typealias Value = OnboardingClient
 
 	public static let liveValue = Self.live()
-	public static func live(profileStore: ProfileStore = .shared) -> Self {
+
+	public static func live(
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+	) -> Self {
 		Self(
 			loadProfile: {
-				if let ephemeral = await profileStore.getEphemeral() {
-					if let error = ephemeral.loadFailure {
-						return .usersExistingProfileCouldNotBeLoaded(failure: error)
-					} else {
-						return .newUser
-					}
-				} else {
-					return .existingProfileLoaded
-				}
-
+				await getProfileStore().getLoadProfileOutcome()
 			},
-			importProfileSnapshot: { try await profileStore.importProfileSnapshot($0) },
-			loadEphemeralPrivateProfile: {
-				guard let ephemeralPrivateProfile = await profileStore.getEphemeral() else {
-					struct ExpectedEphemeralButWasNot: Swift.Error {}
-					throw ExpectedEphemeralButWasNot()
-				}
-				return ephemeralPrivateProfile.private
+			importProfileSnapshot: {
+				try await getProfileStore().importProfileSnapshot($0)
 			},
 			commitEphemeral: {
-				try await profileStore.commitEphemeral()
+				try await getProfileStore().commitEphemeral()
 			}
 		)
 	}

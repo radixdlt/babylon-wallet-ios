@@ -5,10 +5,12 @@ import ProfileStore
 extension FactorSourcesClient: DependencyKey {
 	public typealias Value = FactorSourcesClient
 
-	public static func live(profileStore: ProfileStore = .shared) -> Self {
+	public static func live(
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+	) -> Self {
 		Self(
 			getFactorSources: {
-				await profileStore.profile.factorSources
+				await getProfileStore().profile.factorSources
 			}
 		)
 	}

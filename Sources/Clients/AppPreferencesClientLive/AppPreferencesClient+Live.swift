@@ -4,19 +4,21 @@ import ProfileStore
 
 // MARK: - AppPreferencesClient + DependencyKey
 extension AppPreferencesClient: DependencyKey {
-	public static func live(profileStore: ProfileStore = .shared) -> Self {
+	public static func live(
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+	) -> Self {
 		Self(
-			getPreferences: { await profileStore.profile.appPreferences },
+			getPreferences: { await getProfileStore().profile.appPreferences },
 			updatePreferences: { newPreferences in
-				try await profileStore.updating {
+				try await getProfileStore().updating {
 					$0.appPreferences = newPreferences
 				}
 			},
 			extractProfileSnapshot: {
-				await profileStore.profile.snapshot()
+				await getProfileStore().profile.snapshot()
 			},
 			deleteProfileAndFactorSources: {
-				try await profileStore.deleteProfile()
+				try await getProfileStore().deleteProfile()
 			}
 		)
 	}

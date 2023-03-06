@@ -122,13 +122,6 @@ extension FactorSource {
 		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
 		return try! Self.device(mnemonic: mnemonic, hint: "preview", olympiaCompatible: false)
 	}()
-
-	internal func ignoringDate() -> Self {
-		var copy = self
-		copy.addedOn = .init(timeIntervalSince1970: 0)
-		copy.lastUsedOn = .init(timeIntervalSince1970: 0)
-		return copy
-	}
 }
 
 #endif
