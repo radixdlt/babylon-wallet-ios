@@ -18,7 +18,8 @@ extension ProfileSnapshot.Version {
 	/// - 17: Rename `"authorizedDapps"` -> `"authorizedDapps"`
 	/// - 18: Add `isCurrencyAmountVisible` to app preferences.
 	/// - 19: Add `security` to `appPreferences` (iCloud sync)
-	public static let minimum: Self = 19
+	/// - 20: Add `storage` for `device` FactorSource (`nextDerivationIndices`).
+	public static let minimum: Self = 20
 }
 
 // MARK: - Profile

@@ -31,7 +31,8 @@ import SecureStorageClient
 ///
 /// The public interface of the ProfileStore is:
 ///
-///     static let shared: ProfileStore
+///     static func shared() async -> ProfileStore
+///     func getLoadProfileOutcome() async -> LoadProfileOutcome
 ///     var profile: Profile (async)
 ///     func values() -> AnyAsyncSequence<Profile>
 ///     func commitEphemeral() async throws

@@ -265,6 +265,8 @@ final class ProfileTests: TestCase {
 		for factorSource in profile.factorSources {
 			XCTAssertEqual(factorSource.hint, creatingDevice)
 		}
+		let deviceFactorSource = profile.factorSources.device
+		XCTAssertEqual(deviceFactorSource.storage?.forDevice, .init(nextDerivationIndicies: .init(forAccount: 0, forIdentity: 0)))
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
 		let networkID = gateway.network.id
