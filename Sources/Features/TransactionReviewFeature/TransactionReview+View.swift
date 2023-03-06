@@ -41,46 +41,57 @@ extension TransactionReview {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium1) {
-					if let message = viewStore.message {
-						TransactionMessageView(message: message)
-					}
+			ScrollView(showsIndicators: false) {
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+					VStack(spacing: .medium2) {
+						if let message = viewStore.message {
+							VStack(spacing: .small1) {
+								Text("MESSAGE")
+									.sectionHeading
+									.flushedLeft(padding: .medium3)
+								TransactionMessageView(message: message)
+							}
+						}
 
-					let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
-					IfLetStore(withdrawingStore) { accountsStore in
-						Text("WITHDRAWING")
-							.sectionHeading
-							.flushedLeft
-						Card(insetContents: true) {
-							ForEachStore(accountsStore) { accountStore in
-								TransactionReviewAccount.View(store: accountStore)
+						let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
+						IfLetStore(withdrawingStore) { accountsStore in
+							VStack(spacing: .small1) {
+								Text("WITHDRAWING")
+									.sectionHeading
+									.flushedLeft(padding: .medium3)
+								Card(insetContents: true) {
+									ForEachStore(accountsStore) { accountStore in
+										TransactionReviewAccount.View(store: accountStore)
+									}
+								}
+							}
+						}
+
+						let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
+						IfLetStore(depositingStore) { accountsStore in
+							VStack(spacing: .small1) {
+								Text("DEPOSITING")
+									.sectionHeading
+									.flushedLeft(padding: .medium3)
+								Card(insetContents: true) {
+									ForEachStore(accountsStore) { accountStore in
+										TransactionReviewAccount.View(store: accountStore)
+									}
+
+									if viewStore.showCustomizeguaranteesButton {
+										Button("Customize guarantees") { // TODO: 
+											viewStore.send(.customizeGuaranteesTapped)
+										}
+										.textStyle(.body1Header)
+										.foregroundColor(.app.blue2)
+										.padding(.vertical, .small3)
+									}
+								}
 							}
 						}
 					}
-
-					let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
-					IfLetStore(depositingStore) { accountsStore in
-						Text("DEPOSITING")
-							.sectionHeading
-							.flushedLeft
-						Card(insetContents: true) {
-							ForEachStore(accountsStore) { accountStore in
-								TransactionReviewAccount.View(store: accountStore)
-							}
-						}
-					}
-
-					if viewStore.showCustomizeguaranteesButton {
-						Button("Customize guarantees") { // TODO: 
-							viewStore.send(.customizeGuaranteesTapped)
-						}
-						.textStyle(.body1Header)
-						.foregroundColor(.app.blue2)
-						.padding(.vertical, .small3)
-					}
+					.padding(.horizontal, .medium3)
 				}
-				.padding(30)
 				.background(.app.gray5)
 			}
 		}
@@ -92,18 +103,12 @@ struct TransactionMessageView: View {
 	let message: String
 
 	var body: some View {
-		VStack(spacing: .medium3) {
-			Text("MESSAGE")
-				.sectionHeading
+		Speechbubble {
+			Text(message)
+				.message
 				.flushedLeft
-
-			Speechbubble {
-				Text(message)
-					.message
-					.flushedLeft
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .small3)
-			}
+				.padding(.horizontal, .medium3)
+				.padding(.vertical, .small1)
 		}
 	}
 }

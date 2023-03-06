@@ -59,7 +59,7 @@ extension TransactionReview.State {
 	                               isNetworkCongested: false)
 
 	public static let mock1 = Self(message: "Royalties claim",
-	                               withdrawing: [.mockWithdraw1],
+	                               withdrawing: [.mockWithdraw0, .mockWithdraw1],
 	                               usedDapps: [.mock2],
 	                               depositing: [.mockDeposit2],
 	                               networkFee: 0.2,
