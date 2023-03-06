@@ -6,7 +6,7 @@ public struct Card<Contents: View>: View {
 	let verticalSpacing: CGFloat
 	let contents: Contents
 
-	public init(insetContents: Bool = false, verticalSpacing: CGFloat = 0, @ViewBuilder contents: () -> Contents) {
+	public init(insetContents: Bool = false, verticalSpacing: CGFloat = .small1, @ViewBuilder contents: () -> Contents) {
 		self.insetContents = insetContents
 		self.verticalSpacing = verticalSpacing
 		self.contents = contents()
@@ -21,8 +21,25 @@ public struct Card<Contents: View>: View {
 	}
 }
 
-// MARK: - FlatCard
-public struct FlatCard<Contents: View>: View {
+// MARK: - Speechbubble
+public struct Speechbubble<Contents: View>: View {
+	let insetContents: Bool
+	let contents: Contents
+
+	public init(insetContents: Bool = false, @ViewBuilder contents: () -> Contents) {
+		self.insetContents = insetContents
+		self.contents = contents()
+	}
+
+	public var body: some View {
+		contents
+			.padding(insetContents ? .small1 : 0)
+			.inSpeechbubble
+	}
+}
+
+// MARK: - InnerCard
+public struct InnerCard<Contents: View>: View {
 	let verticalSpacing: CGFloat
 	let contents: Contents
 
@@ -48,8 +65,8 @@ extension View {
 	}
 
 	public var inSpeechbubble: some View {
-		padding(.bottom, 20)
-			.background(.app.account1pink)
+		padding(.bottom, SpeechbubbleShape.triangleSize.height)
+			.background(.app.white)
 			.clipShape(SpeechbubbleShape(cornerRadius: .medium3))
 			.cardShadow
 	}
@@ -67,29 +84,41 @@ extension View {
 // MARK: - SpeechbubbleShape
 public struct SpeechbubbleShape: Shape {
 	let cornerRadius: CGFloat
+	static let triangleSize: CGSize = .init(width: 20, height: 10) // TODO:  constant
+	static let triangleInset: CGFloat = 40 // TODO:  constant
 
 	public init(cornerRadius: CGFloat) {
 		self.cornerRadius = cornerRadius
 	}
 
 	public func path(in rect: CGRect) -> Path {
-		Path { path in
-			path.addRelativeArc(center: .init(x: rect.minX + cornerRadius, y: rect.minY + cornerRadius),
+		let inner = rect.inset(by: .init(top: 0, left: 0, bottom: Self.triangleSize.height, right: 0))
+		let arcCenters = inner.insetBy(dx: cornerRadius, dy: cornerRadius)
+		return Path { path in
+			path.addRelativeArc(center: .init(x: arcCenters.minX, y: arcCenters.minY),
 			                    radius: cornerRadius,
 			                    startAngle: .radians(.pi),
 			                    delta: .radians(.pi / 2))
 
-			path.addRelativeArc(center: .init(x: rect.maxX - cornerRadius, y: rect.minY + cornerRadius),
+			path.addRelativeArc(center: .init(x: arcCenters.maxX, y: arcCenters.minY),
 			                    radius: cornerRadius,
 			                    startAngle: -.radians(.pi / 2),
 			                    delta: .radians(.pi / 2))
 
-			path.addRelativeArc(center: .init(x: rect.maxX - cornerRadius, y: rect.maxY - cornerRadius),
+			path.addRelativeArc(center: .init(x: arcCenters.maxX, y: arcCenters.maxY),
 			                    radius: cornerRadius,
 			                    startAngle: .zero,
 			                    delta: .radians(.pi / 2))
 
-			path.addLine(to: .init(x: 0, y: rect.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset, y: inner.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset - Self.triangleSize.width / 2, y: rect.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset - Self.triangleSize.width, y: inner.maxY))
+
+			path.addRelativeArc(center: .init(x: arcCenters.minX, y: arcCenters.maxY),
+			                    radius: cornerRadius,
+			                    startAngle: .radians(.pi / 2),
+			                    delta: .radians(.pi / 2))
+
 			path.closeSubpath()
 		}
 	}

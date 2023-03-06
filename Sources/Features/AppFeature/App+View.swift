@@ -52,8 +52,11 @@ extension App {
 				.presentsLoadingViewOverlay()
 			}
 		}
+		.onAppear {
+			decodeActions()
+		}
 		.sheet(isPresented: .constant(true)) {
-			let store = StoreOf<TransactionReview>.init(initialState: .init(), reducer: TransactionReview())
+			let store = StoreOf<TransactionReview>.init(initialState: .mock0, reducer: TransactionReview())
 			TransactionReview.View(store: store)
 		}
 	}
