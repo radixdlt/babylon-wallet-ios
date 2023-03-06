@@ -5,7 +5,7 @@ import ProfileStore
 // MARK: - AppPreferencesClient + DependencyKey
 extension AppPreferencesClient: DependencyKey {
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await ProfileStore.shared() }
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
 		Self(
 			getPreferences: { await getProfileStore().profile.appPreferences },

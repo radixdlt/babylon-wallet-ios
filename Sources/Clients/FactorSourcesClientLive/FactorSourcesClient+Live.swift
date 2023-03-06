@@ -6,7 +6,7 @@ extension FactorSourcesClient: DependencyKey {
 	public typealias Value = FactorSourcesClient
 
 	public static func live(
-		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await ProfileStore.shared() }
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
 		Self(
 			getFactorSources: {
