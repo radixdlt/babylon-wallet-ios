@@ -3,6 +3,7 @@ import CryptoKit
 import Foundation
 import SharedModels
 
+// MARK: - RTCClients
 /// Holds and manages all of added RTCClients
 public actor RTCClients {
 	public struct RTCClientDidCloseError: Error, LocalizedError {
@@ -22,7 +23,7 @@ public actor RTCClients {
 	private let signalingServerBaseURL: URL
 
 	// MARK: - Internal state
-        private var clients: [RTCClient.ID: RTCClient] = [:]
+	private var clients: [RTCClient.ID: RTCClient] = [:]
 
 	// MARK: - Initialisers
 
@@ -62,14 +63,14 @@ public actor RTCClients {
 	/// Remove the RTCClient for the given connection password
 	/// - Parameter password: The connection password identifying the RTCClient
 	public func removeClient(_ password: ConnectionPassword) async {
-                await clients[password]?.cancel()
-                clients.removeValue(forKey: password)
+		await clients[password]?.cancel()
+		clients.removeValue(forKey: password)
 	}
 
 	/// Remove all RTCClients
 	public func removeAll() async {
-                for id in clients.keys {
-                        await removeClient(id)
+		for id in clients.keys {
+			await removeClient(id)
 		}
 	}
 
@@ -78,7 +79,7 @@ public actor RTCClients {
 	///
 	/// - Parameter message: The message to be sent
 	public func sendMessage(_ message: P2P.RTCOutgoingMessage) async throws {
-                guard let rtcClient = clients[message.connectionId] else {
+		guard let rtcClient = clients[message.connectionId] else {
 			throw RTCClientDidCloseError()
 		}
 
@@ -89,7 +90,7 @@ public actor RTCClients {
 
 	private func add(_ client: RTCClient) {
 		client.incommingMessages.susbscribe(incommingMessagesContinuation)
-                self.clients[client.id] = client
+		self.clients[client.id] = client
 	}
 
 	private func makeRTCClient(_ password: ConnectionPassword) throws -> RTCClient {
@@ -101,7 +102,7 @@ public actor RTCClients {
 
 // MARK: - RTCClient
 actor RTCClient {
-        typealias ID = ConnectionPassword
+	typealias ID = ConnectionPassword
 
 	// MARK: - PeerConnectionDidCloseError
 	public struct PeerConnectionDidCloseError: Error, LocalizedError {
@@ -116,7 +117,7 @@ actor RTCClient {
 
 	private let incommingMessagesContinuation: AsyncStream<P2P.RTCIncommingMessageResult>.Continuation!
 	private let peerConnectionBuilder: PeerConnectionNegotiator
-        private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
+	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
 
 	private let disconnectedPeerConnection: AsyncStream<PeerConnectionID>
@@ -138,7 +139,7 @@ actor RTCClient {
 
 	/// Cancel all of the related operations allowing this RTCClient to be deallocated.
 	func cancel() async {
-                for peerConnection in peerConnections.values {
+		for peerConnection in peerConnections.values {
 			await peerConnection.cancel()
 		}
 		peerConnections.removeAll()
@@ -154,12 +155,12 @@ actor RTCClient {
 	}
 
 	func removePeerConnection(_ id: PeerConnectionID) async {
-                await peerConnections[id]?.cancel()
-                peerConnections.removeValue(forKey: id)
+		await peerConnections[id]?.cancel()
+		peerConnections.removeValue(forKey: id)
 	}
 
 	func sendMessage(_ message: P2P.RTCOutgoingMessage.PeerConnectionMessage) async throws {
-                guard let client = peerConnections[message.peerConnectionId] else {
+		guard let client = peerConnections[message.peerConnectionId] else {
 			throw PeerConnectionDidCloseError()
 		}
 		let data = try JSONEncoder().encode(message.content)
@@ -208,6 +209,6 @@ actor RTCClient {
 			.map { _ in connection.id }
 			.susbscribe(disconnectedPeerConnectionContinuation)
 
-                self.peerConnections[connection.id] = connection
+		self.peerConnections[connection.id] = connection
 	}
 }

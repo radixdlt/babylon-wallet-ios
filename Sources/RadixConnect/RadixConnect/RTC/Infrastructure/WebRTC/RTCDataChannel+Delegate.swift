@@ -5,9 +5,9 @@ extension RTCDataChannel: @unchecked Sendable {}
 
 // MARK: - RTCDataChannel + DataChannel
 extension RTCDataChannel: DataChannel {
-        func sendData(_ data: Data) {
-                self.sendData(.init(data: data, isBinary: true))
-        }
+	func sendData(_ data: Data) {
+		self.sendData(.init(data: data, isBinary: true))
+	}
 }
 
 // MARK: - RTCDataChannelAsyncDelegate
@@ -26,15 +26,15 @@ final class RTCDataChannelAsyncDelegate: NSObject,
 	}
 
 	func cancel() {
-                receivedMessagesContinuation.finish()
+		receivedMessagesContinuation.finish()
 	}
 }
 
 // MARK: RTCDataChannelDelegate
 extension RTCDataChannelAsyncDelegate {
 	func dataChannel(_ dataChannel: RTCDataChannel, didReceiveMessageWith buffer: RTCDataBuffer) {
-                receivedMessagesContinuation.yield(buffer.data)
+		receivedMessagesContinuation.yield(buffer.data)
 	}
 
-        func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {}
+	func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {}
 }

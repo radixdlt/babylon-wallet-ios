@@ -5,9 +5,9 @@ import RadixConnectModels
 // MARK: - PeerConnectionClient
 /// A client that manages a given PeerConnection and its related DataChannel.
 public struct PeerConnectionClient: Sendable {
-        typealias ID = PeerConnectionID
+	typealias ID = PeerConnectionID
 	let id: ID
-        let iceConnectionStates: AnyAsyncSequence<ICEConnectionState>
+	let iceConnectionStates: AnyAsyncSequence<ICEConnectionState>
 
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
@@ -27,23 +27,23 @@ public struct PeerConnectionClient: Sendable {
 			.eraseToAnyAsyncSequence()
 	}
 
-        func cancel() async {
-                delegate.cancel()
-                await dataChannelClient.cancel()
-                peerConnection.close()
-        }
+	func cancel() async {
+		delegate.cancel()
+		await dataChannelClient.cancel()
+		peerConnection.close()
+	}
 
-        func createAnswer() async throws -> RTCPrimitive.Answer {
-                let answer = try await peerConnection.createLocalAnswer()
-                try await peerConnection.setLocalDescription(.right(answer))
-                return answer
-        }
+	func createAnswer() async throws -> RTCPrimitive.Answer {
+		let answer = try await peerConnection.createLocalAnswer()
+		try await peerConnection.setLocalDescription(.right(answer))
+		return answer
+	}
 
-        func createLocalOffer() async throws -> RTCPrimitive.Offer {
-                let offer = try await peerConnection.createLocalOffer()
-                try await peerConnection.setLocalDescription(.left(offer))
-                return offer
-        }
+	func createLocalOffer() async throws -> RTCPrimitive.Offer {
+		let offer = try await peerConnection.createLocalOffer()
+		try await peerConnection.setLocalDescription(.left(offer))
+		return offer
+	}
 
 	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
 		try await peerConnection.setRemoteDescription(.left(offer))
@@ -63,7 +63,7 @@ extension PeerConnectionClient {
 		try await dataChannelClient.sendMessage(data)
 	}
 
-        func receivedMessagesStream() async -> AnyAsyncSequence<Result<DataChannelClient.AssembledMessage, Error>> {
+	func receivedMessagesStream() async -> AnyAsyncSequence<Result<DataChannelClient.AssembledMessage, Error>> {
 		await dataChannelClient.incommingAssembledMessages
 	}
 }

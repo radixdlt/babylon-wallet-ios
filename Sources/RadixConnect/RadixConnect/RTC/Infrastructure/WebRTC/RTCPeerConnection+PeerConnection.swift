@@ -1,7 +1,7 @@
+import Foundation
 import Prelude
 import RadixConnectModels
 import WebRTC
-import Foundation
 
 // MARK: - RTCPeerConnection + PeerConnection
 extension RTCPeerConnection: PeerConnection {
@@ -38,6 +38,7 @@ extension RTCPeerConnection: PeerConnection {
 	}
 }
 
+// MARK: - RTCPeerConnection + Sendable
 extension RTCPeerConnection: @unchecked Sendable {}
 
 extension RTCMediaConstraints {
