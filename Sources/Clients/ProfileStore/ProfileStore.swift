@@ -44,24 +44,15 @@ public final actor ProfileStore {
 	@Dependency(\.assertionFailure) var assertionFailure
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
-	public final actor NestedHolder {
-		private var _shared: ProfileStore?
-		public var shared: ProfileStore {
-			get async {
-				if let shared = _shared {
-					return shared
-				}
-				let shared = await ProfileStore()
-				_shared = shared
-				return shared
-			}
-		}
-	}
-
-	private static let sharedNestedHolder = NestedHolder()
+	private static let _shared = ActorIsolated<ProfileStore?>(nil)
 	public static var shared: ProfileStore {
 		get async {
-			await Self.sharedNestedHolder.shared
+			if let shared = await _shared.value {
+				return shared
+			}
+			let shared = await ProfileStore()
+			await _shared.setValue(shared)
+			return shared
 		}
 	}
 
