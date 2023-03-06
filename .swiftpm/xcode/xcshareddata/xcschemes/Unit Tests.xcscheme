@@ -20,20 +20,6 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AccountsClientLiveTests"
-               BuildableName = "AccountsClientLiveTests"
-               BlueprintName = "AccountsClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -66,6 +52,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AccountPortfolioTests"
+               BuildableName = "AccountPortfolioTests"
+               BlueprintName = "AccountPortfolioTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "AccountPreferencesFeatureTests"
                BuildableName = "AccountPreferencesFeatureTests"
                BlueprintName = "AccountPreferencesFeatureTests"
@@ -89,6 +85,16 @@
                BlueprintIdentifier = "AppFeatureTests"
                BuildableName = "AppFeatureTests"
                BlueprintName = "AppFeatureTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AppSettingsTests"
+               BuildableName = "AppSettingsTests"
+               BlueprintName = "AppSettingsTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -429,96 +435,6 @@
                BlueprintIdentifier = "ProfileStoreTests"
                BuildableName = "ProfileStoreTests"
                BlueprintName = "ProfileStoreTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AccountsClientLiveTests"
-               BuildableName = "AccountsClientLiveTests"
-               BlueprintName = "AccountsClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OnboardingClientLiveTests"
-               BuildableName = "OnboardingClientLiveTests"
-               BlueprintName = "OnboardingClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AccountPortfolioFetcherClientTests"
-               BuildableName = "AccountPortfolioFetcherClientTests"
-               BlueprintName = "AccountPortfolioFetcherClientTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AppPreferencesClientLiveTests"
-               BuildableName = "AppPreferencesClientLiveTests"
-               BlueprintName = "AppPreferencesClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FactorSourcesClientLiveTests"
-               BuildableName = "FactorSourcesClientLiveTests"
-               BlueprintName = "FactorSourcesClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PersonasClientLiveTests"
-               BuildableName = "PersonasClientLiveTests"
-               BlueprintName = "PersonasClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "P2PClientsClientLiveTests"
-               BuildableName = "P2PClientsClientLiveTests"
-               BlueprintName = "P2PClientsClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "GatewaysClientLiveTests"
-               BuildableName = "GatewaysClientLiveTests"
-               BlueprintName = "GatewaysClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AuthorizedDappsClientLiveTests"
-               BuildableName = "AuthorizedDappsClientLiveTests"
-               BlueprintName = "AuthorizedDappsClientLiveTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
