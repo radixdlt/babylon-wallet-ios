@@ -124,7 +124,7 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			.replacingOccurrences(of: "{owner_badge_non_fungible_local_id}", with: "#1#")
 			.replacingOccurrences(of: "{auth_badge_non_fungible_local_id}", with: "#1#")
 			.replacingOccurrences(of: "{code_blob_hash}", with: sha256(data: Data([10])).hex)
-			.replacingOccurrences(of: "{abi_blob_hash}", with: sha256(data: Data([10])).hex)
+			.replacingOccurrences(of: "{schema_blob_hash}", with: sha256(data: Data([10])).hex)
 			.replacingOccurrences(of: "{initial_supply}", with: "12")
 			.replacingOccurrences(of: "{mint_amount}", with: "12")
 			.replacingOccurrences(of: "{non_fungible_local_id}", with: "#1#")

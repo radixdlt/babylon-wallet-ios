@@ -13,23 +13,23 @@ final class ManifestToStringTests: TestCase {
 		let packages = [
 			(
 				code: try resource(named: "hello", extension: "code"),
-				abi: try resource(named: "hello", extension: "abi")
+				schema: try resource(named: "hello", extension: "schema")
 			),
 			(
 				code: try resource(named: "hello_world", extension: "code"),
-				abi: try resource(named: "hello_world", extension: "abi")
+				schema: try resource(named: "hello_world", extension: "schema")
 			),
 			(
 				code: try resource(named: "RaDEX", extension: "code"),
-				abi: try resource(named: "RaDEX", extension: "abi")
+				schema: try resource(named: "RaDEX", extension: "schema")
 			),
 			(
 				code: try resource(named: "account", extension: "code"),
-				abi: try resource(named: "account", extension: "abi")
+				schema: try resource(named: "account", extension: "schema")
 			),
 			(
 				code: try resource(named: "faucet", extension: "code"),
-				abi: try resource(named: "faucet", extension: "abi")
+				schema: try resource(named: "faucet", extension: "schema")
 			),
 		]
 
@@ -54,7 +54,7 @@ final class ManifestToStringTests: TestCase {
 				instructions: manifestInstructions,
 				blobs: [
 					[UInt8](package.code),
-					[UInt8](package.abi),
+					[UInt8](package.schema),
 				]
 			)
 
