@@ -9,6 +9,7 @@ extension DependencyValues {
 	}
 }
 
+// MARK: - RadixConnectClient
 public struct RadixConnectClient: DependencyKey, Sendable {
 	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
 	public var disconnectAndRemoveAll: DisconnectAndRemoveAll

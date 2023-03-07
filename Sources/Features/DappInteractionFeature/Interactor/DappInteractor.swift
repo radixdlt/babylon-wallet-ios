@@ -1,7 +1,7 @@
 import FeaturePrelude
 import GatewaysClient
-import RadixConnectClient
 import RadixConnect
+import RadixConnectClient
 import ROLAClient
 
 // MARK: - DappInteractionHook
