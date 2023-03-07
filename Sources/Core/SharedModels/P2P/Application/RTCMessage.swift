@@ -1,10 +1,10 @@
 import RadixConnectModels
 
 public extension P2P {
-	typealias RTCIncommingMessageResult = RTCIncommingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
-	typealias RTCIncommingWalletInteraction = RTCIncommingMessage<P2P.FromDapp.WalletInteraction>
+	typealias RTCIncomingMessageResult = RTCIncomingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
+	typealias RTCIncomingWalletInteraction = RTCIncomingMessage<P2P.FromDapp.WalletInteraction>
 
-	struct RTCIncommingMessage<PeerConnectionContent: Sendable>: Sendable {
+	struct RTCIncomingMessage<PeerConnectionContent: Sendable>: Sendable {
 		public let connectionId: ConnectionPassword
 		public let peerMessage: PeerConnectionMessage
 
@@ -45,19 +45,19 @@ public extension P2P {
 	}
 }
 
-public extension P2P.RTCIncommingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
-	func unwrapResult() throws -> P2P.RTCIncommingWalletInteraction {
+public extension P2P.RTCIncomingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
+	func unwrapResult() throws -> P2P.RTCIncomingWalletInteraction {
 		try .init(
 			connectionId: connectionId,
 			content: .init(
-				peerConnectionId: peerMessage.peerConnectionId, 
+				peerConnectionId: peerMessage.peerConnectionId,
 				content: peerMessage.content.get()
 			)
 		)
 	}
 }
 
-public extension P2P.RTCIncommingMessage {
+public extension P2P.RTCIncomingMessage {
 	/// Transforms to an OutgoingMessage by preserving the RTCClient and PeerConnection IDs
 	func toOutgoingMessage(_ response: P2P.ToDapp.WalletInteractionResponse) -> P2P.RTCOutgoingMessage {
 		.init(
@@ -70,8 +70,8 @@ public extension P2P.RTCIncommingMessage {
 	}
 }
 
-// MARK: - P2P.RTCIncommingMessage.PeerConnectionMessage + Hashable, Equatable
-extension P2P.RTCIncommingMessage.PeerConnectionMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
+// MARK: - P2P.RTCIncomingMessage.PeerConnectionMessage + Hashable, Equatable
+extension P2P.RTCIncomingMessage.PeerConnectionMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
 
-// MARK: - P2P.RTCIncommingMessage + Hashable, Equatable
-extension P2P.RTCIncommingMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
+// MARK: - P2P.RTCIncomingMessage + Hashable, Equatable
+extension P2P.RTCIncomingMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}

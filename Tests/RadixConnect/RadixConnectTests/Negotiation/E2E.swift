@@ -52,7 +52,7 @@ final class E2ETests: TestCase {
 	//                let testData = try Data.random(length: DataChannelAssembledMessage.chunkSize * 4)
 	//                try await webPage.sendData(testData)
 //
-	//                let receivedMessage = try await rtcClients.incommingMessages.prefix(1).collect().first!
+	//                let receivedMessage = try await rtcClients.IncomingMessages.prefix(1).collect().first!
 	//                XCTAssertEqual(try! receivedMessage.content.content.get().messageContent, testData)
 //
 	//                let responseData = try Data.random(length: DataChannelAssembledMessage.chunkSize * 4)

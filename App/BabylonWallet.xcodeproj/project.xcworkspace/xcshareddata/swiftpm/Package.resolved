@@ -181,6 +181,15 @@
       }
     },
     {
+      "identity" : "swift-either",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-either",
+      "state" : {
+        "branch" : "main",
+        "revision" : "db33f4084304e2ef47c8b4d2949f0eb286f95b90"
+      }
+    },
+    {
       "identity" : "swift-identified-collections",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",

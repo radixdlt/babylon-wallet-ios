@@ -24,7 +24,7 @@ final class DataChannelClientTests: TestCase {
 
 	func test_sendMessage_receiveConfirmation_success() async throws {
 		// Stub the message confirmation
-		try self.delegate.receiveIncommingMessage(
+		try self.delegate.receiveIncomingMessage(
 			.receipt(.receiveMessageConfirmation(.init(messageId: self.messageID)))
 		)
 
@@ -42,7 +42,7 @@ final class DataChannelClientTests: TestCase {
 
 	func test_sendMessage_receiveError_throwsError() async throws {
 		// Stub the message confirmation
-		try self.delegate.receiveIncommingMessage(
+		try self.delegate.receiveIncomingMessage(
 			.receipt(.receiveMessageError(.init(messageId: self.messageID, error: .messageHashesMismatch)))
 		)
 
@@ -159,8 +159,8 @@ final class DataChannelClientTests: TestCase {
 		_ messages: [DataChannelClient.Message.ChunkedMessage],
 		expected: Result<DataChannelClient.AssembledMessage, Error>
 	) async throws {
-		try messages.map(DataChannelClient.Message.chunkedMessage).forEach(delegate.receiveIncommingMessage)
-		let receivedMessageResult = try await client.incommingAssembledMessages.prefix(1).collect().first!
+		try messages.map(DataChannelClient.Message.chunkedMessage).forEach(delegate.receiveIncomingMessage)
+		let receivedMessageResult = try await client.IncomingAssembledMessages.prefix(1).collect().first!
 
 		switch (expected, receivedMessageResult) {
 		case let (.success(expectedMessage), .success(receivedMessage)):

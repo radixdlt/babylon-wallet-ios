@@ -39,7 +39,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	private let scheduler: AnySchedulerOf<DispatchQueue>
 
 	// MARK: - State
-	private let incommingMessagesContinuation: AsyncStream<Data>.Continuation
+	private let IncomingMessagesContinuation: AsyncStream<Data>.Continuation
 	private var isRestarting: Bool = false
 	private var isConnectedToInternet: Bool = false
 	private var pingTask: Task<Void, Error>? = nil
@@ -47,7 +47,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	private var terminated: Bool = false
 
 	// MARK: - Internal API
-	let incommingMessages: AsyncStream<Data>
+	let IncomingMessages: AsyncStream<Data>
 
 	init(
 		url: URL,
@@ -60,7 +60,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		self.sessionConfig.waitsForConnectivity = true
 		self.scheduler = scheduler
 
-		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 
 		super.init()
 
@@ -119,7 +119,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 
 	func cancel() async {
 		terminated = true
-		incommingMessagesContinuation.finish()
+		IncomingMessagesContinuation.finish()
 		pingTask?.cancel()
 		invalidateSession()
 		monitor.cancel()
@@ -198,9 +198,9 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 					let message = try result.get()
 					switch message {
 					case let .data(data):
-						self.incommingMessagesContinuation.yield(data)
+						self.IncomingMessagesContinuation.yield(data)
 					case let .string(string):
-						self.incommingMessagesContinuation.yield(Data(string.utf8))
+						self.IncomingMessagesContinuation.yield(Data(string.utf8))
 					@unknown default:
 						throw UnknownMessageTypeError()
 					}

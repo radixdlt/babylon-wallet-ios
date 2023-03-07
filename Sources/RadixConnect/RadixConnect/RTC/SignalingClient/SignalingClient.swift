@@ -5,7 +5,7 @@ import Prelude
 // MARK: - SignalingTransport
 /// The Transport used to send and receive messages
 protocol SignalingTransport: Sendable {
-	var incommingMessages: AsyncStream<Data> { get }
+	var IncomingMessages: AsyncStream<Data> { get }
 	func send(message: Data) async throws
 
 	func cancel() async
@@ -26,9 +26,9 @@ struct SignalingClient: Sendable {
 	private let idBuilder: @Sendable () -> ClientMessage.RequestID
 
 	// MARK: - Streams
-	private let incommingMessages: AnyAsyncSequence<IncommingMessage>
-	private let incommingSignalingServerMessagges: AnyAsyncSequence<IncommingMessage.FromSignalingServer>
-	private let incommingRemoteClientMessagges: AnyAsyncSequence<IncommingMessage.RemoteData>
+	private let IncomingMessages: AnyAsyncSequence<IncomingMessage>
+	private let IncomingSignalingServerMessagges: AnyAsyncSequence<IncomingMessage.FromSignalingServer>
+	private let IncomingRemoteClientMessagges: AnyAsyncSequence<IncomingMessage.RemoteData>
 
 	/// The received ICECandidates
 	let onICECanddiate: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.ICECandidate>>
@@ -37,7 +37,7 @@ struct SignalingClient: Sendable {
 	/// The received Answers
 	let onAnswer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Answer>>
 	/// The received client state notifications
-	let onRemoteClientState: AnyAsyncSequence<IncommingMessage.FromSignalingServer.Notification>
+	let onRemoteClientState: AnyAsyncSequence<IncomingMessage.FromSignalingServer.Notification>
 
 	// MARK: - Initializer
 
@@ -57,42 +57,42 @@ struct SignalingClient: Sendable {
 		self.jsonDecoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 		self.jsonEncoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 
-		self.incommingMessages = transport
-			.incommingMessages
+		self.IncomingMessages = transport
+			.IncomingMessages
 			.eraseToAnyAsyncSequence()
 			.mapSkippingError {
-				try jsonDecoder.decode(IncommingMessage.self, from: $0)
+				try jsonDecoder.decode(IncomingMessage.self, from: $0)
 			} logError: { error in
-				loggerGlobal.info("Failed to decode incomming Message - \(error)")
+				loggerGlobal.info("Failed to decode Incoming Message - \(error)")
 			}
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.incommingRemoteClientMessagges = self.incommingMessages
+		self.IncomingRemoteClientMessagges = self.IncomingMessages
 			.compactMap(\.fromRemoteClient)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.incommingSignalingServerMessagges = self.incommingMessages
+		self.IncomingSignalingServerMessagges = self.IncomingMessages
 			.compactMap(\.fromSignalingServer)
 			.eraseToAnyAsyncSequence()
 
-		self.onOffer = self.incommingRemoteClientMessagges
+		self.onOffer = self.IncomingRemoteClientMessagges
 			.compactMap(\.offer)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.onAnswer = self.incommingRemoteClientMessagges
+		self.onAnswer = self.IncomingRemoteClientMessagges
 			.compactMap(\.answer)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.onICECanddiate = self.incommingRemoteClientMessagges
+		self.onICECanddiate = self.IncomingRemoteClientMessagges
 			.compactMap(\.iceCandidate)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.onRemoteClientState = self.incommingSignalingServerMessagges
+		self.onRemoteClientState = self.IncomingSignalingServerMessagges
 			.compactMap(\.notification)
 			.share()
 			.eraseToAnyAsyncSequence()
@@ -122,7 +122,7 @@ struct SignalingClient: Sendable {
 	// MARK: - Private API
 
 	private func waitForRequestAck(_ requestId: ClientMessage.RequestID) async throws {
-		try await self.incommingSignalingServerMessagges
+		try await self.IncomingSignalingServerMessagges
 			.compactMap(\.responseForRequest)
 			.compactMap { incoming in
 				try incoming.resultOfRequest(id: requestId)?.get()

@@ -55,7 +55,7 @@ final class SignalingClientTests: TestCase {
 			try await signalingClient.sendToRemote(Self.offer)
 			exp.fulfill()
 		}
-		webSocketClient.receiveIncommingMessage(.dictionary([
+		webSocketClient.receiveIncomingMessage(.dictionary([
 			"info": .string("confirmation"),
 			"requestId": .string(Self.requestId.rawValue),
 		]))
@@ -63,12 +63,12 @@ final class SignalingClientTests: TestCase {
 		wait(for: [exp], timeout: 1.0)
 	}
 
-	// MARK: - Incomming Messages
+	// MARK: - Incoming Messages
 
 	func test_receivedMessagesAreProperlyDecoded_remoteClientDisconnected() throws {
-		let notification = SignalingClient.IncommingMessage.FromSignalingServer.Notification.remoteClientDisconnected(Self.remoteClientId)
+		let notification = SignalingClient.IncomingMessage.FromSignalingServer.Notification.remoteClientDisconnected(Self.remoteClientId)
 
-		try assertIncommingMessageDecoding(
+		try assertIncomingMessageDecoding(
 			msg: notification.payload,
 			stream: signalingClient.onRemoteClientState,
 			expected: notification
@@ -76,9 +76,9 @@ final class SignalingClientTests: TestCase {
 	}
 
 	func test_receivedMessagesAreProperlyDecoded_remoteClientIsAlreadyConnected() throws {
-		let notification = SignalingClient.IncommingMessage.FromSignalingServer.Notification.remoteClientIsAlreadyConnected(Self.remoteClientId)
+		let notification = SignalingClient.IncomingMessage.FromSignalingServer.Notification.remoteClientIsAlreadyConnected(Self.remoteClientId)
 
-		try assertIncommingMessageDecoding(
+		try assertIncomingMessageDecoding(
 			msg: notification.payload,
 			stream: signalingClient.onRemoteClientState,
 			expected: notification
@@ -86,8 +86,8 @@ final class SignalingClientTests: TestCase {
 	}
 
 	func test_receivedMessagesAreProperlyDecoded_remoteClientJustConnected() throws {
-		let notification = SignalingClient.IncommingMessage.FromSignalingServer.Notification.remoteClientJustConnected(Self.remoteClientId)
-		try assertIncommingMessageDecoding(
+		let notification = SignalingClient.IncomingMessage.FromSignalingServer.Notification.remoteClientJustConnected(Self.remoteClientId)
+		try assertIncomingMessageDecoding(
 			msg: notification.payload,
 			stream: signalingClient.onRemoteClientState,
 			expected: notification
@@ -95,7 +95,7 @@ final class SignalingClientTests: TestCase {
 	}
 
 	func test_receivedMessagesAreProperlyDecoded_offer() throws {
-		try assertIncommingPrimitiveDecoding(
+		try assertIncomingPrimitiveDecoding(
 			payload: Self.offer.content.payload,
 			method: "offer",
 			stream: signalingClient.onOffer,
@@ -104,7 +104,7 @@ final class SignalingClientTests: TestCase {
 	}
 
 	func test_receivedMessagesAreProperlyDecoded_answer() throws {
-		try assertIncommingPrimitiveDecoding(
+		try assertIncomingPrimitiveDecoding(
 			payload: Self.answer.content.payload,
 			method: "answer",
 			stream: signalingClient.onAnswer,
@@ -113,7 +113,7 @@ final class SignalingClientTests: TestCase {
 	}
 
 	func test_receivedMessagesAreProperlyDecoded_iceCandidate() throws {
-		try assertIncommingPrimitiveDecoding(
+		try assertIncomingPrimitiveDecoding(
 			payload: Self.iceCandidate.content.payload,
 			method: "iceCandidate",
 			stream: signalingClient.onICECanddiate,
@@ -123,8 +123,8 @@ final class SignalingClientTests: TestCase {
 
 	// MARK: - Helpers
 
-	func assertIncommingMessageDecoding<Decoded: Sendable & Equatable>(
-		msg incomming: JSONValue,
+	func assertIncomingMessageDecoding<Decoded: Sendable & Equatable>(
+		msg Incoming: JSONValue,
 		stream: AnyAsyncSequence<Decoded>,
 		expected: Decoded,
 		file: StaticString = #filePath,
@@ -136,11 +136,11 @@ final class SignalingClientTests: TestCase {
 			XCTAssertEqual(value, expected, file: file, line: line)
 			exp.fulfill()
 		}
-		webSocketClient.receiveIncommingMessage(incomming)
+		webSocketClient.receiveIncomingMessage(Incoming)
 		wait(for: [exp], timeout: 1.0)
 	}
 
-	func assertIncommingPrimitiveDecoding<Decoded: Sendable & Equatable>(
+	func assertIncomingPrimitiveDecoding<Decoded: Sendable & Equatable>(
 		payload: JSONValue,
 		method: String,
 		stream: AnyAsyncSequence<Decoded>,
@@ -164,7 +164,7 @@ final class SignalingClientTests: TestCase {
 			"data": data,
 		])
 
-		try assertIncommingMessageDecoding(
+		try assertIncomingMessageDecoding(
 			msg: remoteData,
 			stream: stream,
 			expected: expected

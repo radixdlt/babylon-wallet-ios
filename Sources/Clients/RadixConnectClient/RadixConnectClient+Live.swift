@@ -49,7 +49,7 @@ extension RadixConnectClient {
 			addP2PWithPassword: { password in
 				try await rtcClients.addNewClient(password)
 			},
-			receiveMessages: { await rtcClients.incommingMessages },
+			receiveMessages: { await rtcClients.IncomingMessages },
 			sendMessage: { outgoingMsg in
 				try await rtcClients.sendMessage(outgoingMsg)
 			}

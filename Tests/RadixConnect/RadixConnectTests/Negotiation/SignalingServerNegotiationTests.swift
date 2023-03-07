@@ -114,7 +114,7 @@ final class SignalingServerNegotiationTests: TestCase {
 			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
 		}
 
-		try webSocketClient.receiveIncommingMessage(
+		try webSocketClient.receiveIncomingMessage(
 			makeClientMessage(.anyOffer(for: remoteClientId))
 		)
 		delegate.sendNegotiationNeededEvent()
@@ -178,7 +178,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		peerConnection: MockPeerConnection,
 		peerConnectionDelegate: MockPeerConnectionDelegate
 	) async throws {
-		// Receive incomming offer from remoteClientId
+		// Receive Incoming offer from remoteClientId
 		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: peerConnectionDelegate)
 
 		// Send answer
@@ -199,7 +199,7 @@ final class SignalingServerNegotiationTests: TestCase {
 	                                       peerConnection: MockPeerConnection,
 	                                       peerConnectionDelegate: MockPeerConnectionDelegate) async throws
 	{
-		try webSocketClient.receiveIncommingMessage(
+		try webSocketClient.receiveIncomingMessage(
 			makeClientMessage(.anyOffer(for: remoteClientId))
 		)
 
@@ -216,8 +216,8 @@ final class SignalingServerNegotiationTests: TestCase {
 	                                peerConnection: MockPeerConnection,
 	                                peerConnectionDelegate: MockPeerConnectionDelegate) async throws
 	{
-		// Receive the incomming offer
-		try webSocketClient.receiveIncommingMessage(
+		// Receive the Incoming offer
+		try webSocketClient.receiveIncomingMessage(
 			makeClientMessage(primitive)
 		)
 
@@ -227,7 +227,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		// Await for the remote offer to be configured on the peer connection
 		let configuredOffer = await peerConnection.configuredRemoteDescription.prefix(1).collect().first!
 
-		// Assert that the configured offer does amtch the incomming offer
+		// Assert that the configured offer does amtch the Incoming offer
 		XCTAssertEqual(configuredOffer, .left(primitive.content.offer!))
 
 		// Complete the set remote offer action on peerConnection, thus allowing the negotiation to flow further
@@ -236,15 +236,15 @@ final class SignalingServerNegotiationTests: TestCase {
 
 	/// Trigger a `receiveICECandidate` event, as well assert that the received ICECanddiate is properly set on the PeerConnection
 	private func receiveICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive>, peerConnection: MockPeerConnection) async throws {
-		// Receive the incomming ICECandidate
-		try webSocketClient.receiveIncommingMessage(
+		// Receive the Incoming ICECandidate
+		try webSocketClient.receiveIncomingMessage(
 			makeClientMessage(primitive)
 		)
 
 		// Await for the ICECandidate to be configured on peerConnection
 		let configuredICECandidate = await peerConnection.configuredICECandidate.prefix(1).collect().first!
 
-		// Assert that the configured ICECandidate does match the incomming ICECanddiate
+		// Assert that the configured ICECandidate does match the Incoming ICECanddiate
 		XCTAssertEqual(configuredICECandidate, primitive.content.iceCandidate)
 
 		// Complete the add ICECandidate action on PeerConnection

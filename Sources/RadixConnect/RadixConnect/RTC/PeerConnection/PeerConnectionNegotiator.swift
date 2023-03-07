@@ -186,11 +186,4 @@ private extension PeerConnectionNegotiator.NegotiationRole {
 			remoteClientID
 		}
 	}
-
-	func doAsync(
-		ifOfferer: (Left) async throws -> Void,
-		ifAnswerer: (Right) async throws -> Void
-	) async rethrows {
-		try await self.doAsync(ifLeft: ifOfferer, ifRight: ifAnswerer)
-	}
 }

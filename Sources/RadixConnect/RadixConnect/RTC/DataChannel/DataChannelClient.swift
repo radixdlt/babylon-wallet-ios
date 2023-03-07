@@ -48,11 +48,11 @@ actor DataChannelClient {
 	 */
 	private var messagesByID: [Message.ID: ChunksWithMetaData] = [:]
 
-	// MARK: - Incomming Messages
+	// MARK: - Incoming Messages
 
-	/// Incomming messages received over the DataChannel after being assembled.
-	lazy var incommingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incommingChunks
-		.compactMap(handleIncommingChunks)
+	/// Incoming messages received over the DataChannel after being assembled.
+	lazy var IncomingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incomingChunks
+		.compactMap(handleIncomingChunks)
 		.mapToResult()
 		.handleEvents(onElement: {
 			try? await self.sendReceiptForResult($0)
@@ -70,19 +70,19 @@ actor DataChannelClient {
 		self.delegate = delegate
 		self.messageIDBuilder = idBuilder
 
-		self.incommingMessages = delegate
+		self.incomingMessages = delegate
 			.receivedMessages
 			.mapSkippingError {
 				try JSONDecoder().decode(Message.self, from: $0)
 			} logError: { error in
-				loggerGlobal.error("Critical: Could not decode the incomming DataChannel message \(error)")
+				loggerGlobal.error("Critical: Could not decode the Incoming DataChannel message \(error)")
 			}
 			.eraseToAnyAsyncSequence()
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.incommingReceipts = self.incommingMessages.compactMap(\.receipt).eraseToAnyAsyncSequence()
-		self.incommingChunks = self.incommingMessages.compactMap(\.chunkedMessage).eraseToAnyAsyncSequence()
+		self.incomingReceipts = self.incomingMessages.compactMap(\.receipt).eraseToAnyAsyncSequence()
+		self.incomingChunks = self.incomingMessages.compactMap(\.chunkedMessage).eraseToAnyAsyncSequence()
 	}
 
 	func sendMessage(_ data: Data) async throws {
@@ -129,7 +129,7 @@ actor DataChannelClient {
 	}
 
 	private func waitForMessageConfirmation(_ messageID: Message.ID) async throws {
-		_ = try await incommingReceipts
+		_ = try await incomingReceipts
 			.filter { $0.messageID == messageID }
 			.prefix(1)
 			.map {
@@ -141,7 +141,7 @@ actor DataChannelClient {
 			.collect()
 	}
 
-	@Sendable private func handleIncommingChunks(_ chunk: Message.ChunkedMessage) async throws -> AssembledMessage? {
+	@Sendable private func handleIncomingChunks(_ chunk: Message.ChunkedMessage) async throws -> AssembledMessage? {
 		var (metadata, chunks) = messagesByID[chunk.messageID] ?? (metadata: nil, chunks: [])
 
 		func assembleMessage() throws -> AssembledMessage? {

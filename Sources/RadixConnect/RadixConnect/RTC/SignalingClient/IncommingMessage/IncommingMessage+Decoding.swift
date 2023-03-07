@@ -6,8 +6,8 @@ extension CodingUserInfoKey {
 	static let clientMessageEncryptonKey = CodingUserInfoKey(rawValue: "clientMessageEncryptonKey")!
 }
 
-// MARK: - SignalingClient.IncommingMessage + Decodable
-extension SignalingClient.IncommingMessage: Decodable {
+// MARK: - SignalingClient.IncomingMessage + Decodable
+extension SignalingClient.IncomingMessage: Decodable {
 	enum ResponseType: String, Decodable, Sendable {
 		// MARK: ResponseToRequest
 

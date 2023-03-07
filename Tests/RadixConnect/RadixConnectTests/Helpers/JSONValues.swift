@@ -2,7 +2,7 @@ import Foundation
 @testable import RadixConnect
 import TestingPrelude
 
-extension SignalingClient.IncommingMessage.FromSignalingServer.ResponseForRequest {
+extension SignalingClient.IncomingMessage.FromSignalingServer.ResponseForRequest {
 	var json: JSONValue {
 		switch self {
 		case let .success(value):
@@ -58,7 +58,7 @@ extension RTCPrimitive {
 	}
 }
 
-extension SignalingClient.IncommingMessage.FromSignalingServer.Notification {
+extension SignalingClient.IncomingMessage.FromSignalingServer.Notification {
 	var payload: JSONValue {
 		let infoKey: String = {
 			switch self {

@@ -732,6 +732,9 @@ package.addModules([
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
 			},
+			.product(name: "Either", package: "swift-either") {
+				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
+			},
 			.product(name: "CollectionConcurrencyKit", package: "CollectionConcurrencyKit") {
 				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
 			},

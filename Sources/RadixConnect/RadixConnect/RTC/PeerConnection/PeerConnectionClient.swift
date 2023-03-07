@@ -64,7 +64,7 @@ extension PeerConnectionClient {
 	}
 
 	func receivedMessagesStream() async -> AnyAsyncSequence<Result<DataChannelClient.AssembledMessage, Error>> {
-		await dataChannelClient.incommingAssembledMessages
+		await dataChannelClient.IncomingAssembledMessages
 	}
 }
 

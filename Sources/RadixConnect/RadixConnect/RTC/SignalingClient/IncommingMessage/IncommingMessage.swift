@@ -1,16 +1,16 @@
 import Prelude
 import RadixConnectModels
 
-// MARK: - SignalingClient.IncommingMessage
-/// IncommingMessage from SignalingClient
+// MARK: - SignalingClient.IncomingMessage
+/// IncomingMessage from SignalingClient
 extension SignalingClient {
-	enum IncommingMessage: Sendable, Equatable {
+	enum IncomingMessage: Sendable, Equatable {
 		case fromSignalingServer(FromSignalingServer)
 		case fromRemoteClient(RemoteData)
 	}
 }
 
-extension SignalingClient.IncommingMessage {
+extension SignalingClient.IncomingMessage {
 	/// Received from SignalingServer itself
 	enum FromSignalingServer: Sendable, Equatable {
 		case notification(Notification)
@@ -40,7 +40,7 @@ extension SignalingClient.IncommingMessage {
 	}
 }
 
-extension SignalingClient.IncommingMessage.FromSignalingServer {
+extension SignalingClient.IncomingMessage.FromSignalingServer {
 	/// Remote client status notifications
 	enum Notification: Sendable, Equatable {
 		case remoteClientJustConnected(RemoteClientID)
@@ -68,7 +68,7 @@ extension SignalingClient.IncommingMessage.FromSignalingServer {
 	}
 }
 
-extension SignalingClient.IncommingMessage.RemoteData {
+extension SignalingClient.IncomingMessage.RemoteData {
 	/// Extract the Offer by attaching the remote client id.
 	var offer: IdentifiedPrimitive<RTCPrimitive.Offer>? {
 		guard let offer = message.primitive.offer else {
@@ -94,7 +94,7 @@ extension SignalingClient.IncommingMessage.RemoteData {
 	}
 }
 
-extension SignalingClient.IncommingMessage.FromSignalingServer.ResponseForRequest {
+extension SignalingClient.IncomingMessage.FromSignalingServer.ResponseForRequest {
 	enum RequestFailure: Sendable, Equatable, Error {
 		case noRemoteClientToTalkTo(SignalingClient.ClientMessage.RequestID)
 		case validationError(ValidationError)
@@ -139,7 +139,7 @@ extension SignalingClient.IncommingMessage.FromSignalingServer.ResponseForReques
 	}
 }
 
-extension SignalingClient.IncommingMessage.FromSignalingServer.Notification {
+extension SignalingClient.IncomingMessage.FromSignalingServer.Notification {
 	var remoteClientDidConnect: Bool {
 		switch self {
 		case .remoteClientJustConnected,
