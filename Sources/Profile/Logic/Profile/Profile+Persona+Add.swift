@@ -24,7 +24,7 @@ extension Profile {
 		case let .unsecured(entityControl):
 			let factorSourceID = entityControl.genesisFactorInstance.factorSourceID
 			try self.factorSources.updateFactorSource(id: factorSourceID) {
-                try $0.increaseNextDerivationIndex(for: persona.kind)
+				try $0.increaseNextDerivationIndex(for: persona.kind, networkID: persona.networkID)
 			}
 		}
 	}
@@ -32,4 +32,3 @@ extension Profile {
 
 // MARK: - Discrepancy
 struct Discrepancy: Swift.Error {}
-

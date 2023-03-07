@@ -14,7 +14,7 @@ public extension FactorSource {
 			id: id(fromRoot: mnemonic.hdRoot(passphrase: bip39Passphrase)),
 			hint: hint,
 			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
-			storage: .forDevice(.init(nextDerivationIndicies: .init(forAccount: 0, forIdentity: 0)))
+			storage: .forDevice(.init())
 		)
 	}
 

@@ -21,7 +21,7 @@ extension Profile {
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
 		let factorSource = request.factorSource
 		let deviceFactorSourceStorage = try factorSource.deviceStorage()
-		let index = deviceFactorSourceStorage.nextDerivationIndicies.nextForEntity(kind: entityKind)
+		let index = deviceFactorSourceStorage.nextForEntity(kind: entityKind, networkID: networkID)
 		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let genesisFactorInstance: FactorInstance = try await {

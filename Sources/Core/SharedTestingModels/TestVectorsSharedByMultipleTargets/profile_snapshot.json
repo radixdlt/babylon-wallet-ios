@@ -20,8 +20,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-03-07T07:25:19Z",
-        "lastUsedOn" : "2023-03-07T07:25:19Z",
+        "firstEstablishedOn" : "2023-03-07T09:51:10Z",
+        "lastUsedOn" : "2023-03-07T09:51:10Z",
         "platform" : "browser"
       },
       {
@@ -36,8 +36,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-03-07T07:25:19Z",
-        "lastUsedOn" : "2023-03-07T07:25:19Z",
+        "firstEstablishedOn" : "2023-03-07T09:51:10Z",
+        "lastUsedOn" : "2023-03-07T09:51:10Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -76,11 +76,11 @@
   "creatingDevice" : "computerRunningUnitTest",
   "factorSources" : [
     {
-      "addedOn" : "2023-03-07T07:25:19Z",
+      "addedOn" : "2023-03-07T09:51:10Z",
       "hint" : "computerRunningUnitTest",
       "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-07T07:25:19Z",
+      "lastUsedOn" : "2023-03-07T09:51:10Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519"
@@ -92,19 +92,22 @@
       "storage" : {
         "discriminator" : "device",
         "properties" : {
-          "nextDerivationIndicies" : {
-            "forAccount" : 3,
-            "forIdentity" : 2
-          }
+          "nextDerivationIndiciesPerNetwork" : [
+            {
+              "forAccount" : 3,
+              "forIdentity" : 2,
+              "networkID" : 11
+            }
+          ]
         }
       }
     },
     {
-      "addedOn" : "2023-03-07T07:25:19Z",
+      "addedOn" : "2023-03-07T09:51:10Z",
       "hint" : "computerRunningUnitTest",
       "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-07T07:25:19Z",
+      "lastUsedOn" : "2023-03-07T09:51:10Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519",
@@ -118,10 +121,9 @@
       "storage" : {
         "discriminator" : "device",
         "properties" : {
-          "nextDerivationIndicies" : {
-            "forAccount" : 0,
-            "forIdentity" : 0
-          }
+          "nextDerivationIndiciesPerNetwork" : [
+
+          ]
         }
       }
     }
@@ -205,8 +207,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "DB491E22-A415-4BBC-A734-D26592683A9C",
-                "E95539AF-ABF2-42B2-8B8B-9E430B646D8E"
+                "C657436E-4CB4-4B65-B4ED-F2D7ADB60D18",
+                "64603522-14B3-46F1-8189-CDEB31F79D63"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -223,8 +225,8 @@
             },
             {
               "fieldIDs" : [
-                "2AF9B799-3161-40EC-9263-11038E293C66",
-                "6E51EE57-C3BB-459B-B585-CC01083EECFE"
+                "FBFBCAEC-378E-4693-9C67-1FC9C724F48A",
+                "10D16017-4E6E-45DC-A013-A1BBD22B33E1"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -248,12 +250,12 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "DB491E22-A415-4BBC-A734-D26592683A9C",
+              "id" : "C657436E-4CB4-4B65-B4ED-F2D7ADB60D18",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "E95539AF-ABF2-42B2-8B8B-9E430B646D8E",
+              "id" : "64603522-14B3-46F1-8189-CDEB31F79D63",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -281,12 +283,12 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "2AF9B799-3161-40EC-9263-11038E293C66",
+              "id" : "FBFBCAEC-378E-4693-9C67-1FC9C724F48A",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "6E51EE57-C3BB-459B-B585-CC01083EECFE",
+              "id" : "10D16017-4E6E-45DC-A013-A1BBD22B33E1",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -312,5 +314,5 @@
       ]
     }
   ],
-  "version" : 21
+  "version" : 20
 }

@@ -157,11 +157,10 @@ extension FactorSourceView {
 				.padding()
 				.border(Color.green, width: 2)
 			}
-            
-            if let deviceStore = factorSource.storage?.forDevice {
-                Labeled("Next index for account", value: String(describing: deviceStore.nextDerivationIndicies.forAccount))
-                Labeled("Next index for persona", value: String(describing: deviceStore.nextDerivationIndicies.forIdentity))
-            }
+
+			if let deviceStore = factorSource.storage?.forDevice {
+				NextDerivationIndiciesPerNetworkView(nextDerivationIndiciesPerNetwork: deviceStore.nextDerivationIndiciesPerNetwork, indentation: indentation.inOneLevel)
+			}
 		}
 		.padding([.leading], leadingPadding)
 		.task {
@@ -171,6 +170,39 @@ extension FactorSourceView {
 				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
 			}
 			#endif
+		}
+	}
+}
+
+// MARK: - NextDerivationIndiciesPerNetworkView
+public struct NextDerivationIndiciesPerNetworkView: IndentedView {
+	public let nextDerivationIndiciesPerNetwork: NextDerivationIndiciesPerNetwork
+	public let indentation: Indentation
+
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Text("Next derivation indicies per network")
+				.fontWeight(.heavy)
+			#if os(macOS)
+				.font(.title)
+			#endif // os(macOS)
+
+			ForEach(nextDerivationIndiciesPerNetwork.perNetwork) { nextIndices in
+				NextDerivationIndiciesForNetworkView(nextIndices: nextIndices, indentation: indentation.inOneLevel)
+			}
+		}
+	}
+}
+
+// MARK: - NextDerivationIndiciesForNetworkView
+public struct NextDerivationIndiciesForNetworkView: IndentedView {
+	public let nextIndices: OnNetwork.NextDerivationIndicies
+	public let indentation: Indentation
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Labeled("NetworkID", value: String(describing: nextIndices.networkID))
+			Labeled("    Next index for account", value: String(describing: nextIndices.forAccount))
+			Labeled("    Next index for persona", value: String(describing: nextIndices.forIdentity))
 		}
 	}
 }
