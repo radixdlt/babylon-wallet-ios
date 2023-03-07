@@ -1,5 +1,6 @@
 import Foundation
 @testable import RadixConnect
+import TestingPrelude
 
 extension SignalingClient.IncommingMessage.FromSignalingServer.ResponseForRequest {
 	var json: JSONValue {
