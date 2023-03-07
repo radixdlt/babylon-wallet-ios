@@ -1,6 +1,6 @@
 import Foundation
-import RadixConnectModels
 import Prelude
+import RadixConnectModels
 
 extension CodingUserInfoKey {
 	static let clientMessageEncryptonKey = CodingUserInfoKey(rawValue: "clientMessageEncryptonKey")!
