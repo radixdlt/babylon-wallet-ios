@@ -1,6 +1,7 @@
 import AsyncExtensions
 import CryptoKit
 import Foundation
+import Prelude
 import SharedModels
 
 // MARK: - RTCClients
@@ -16,7 +17,7 @@ public actor RTCClients {
 
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
 	public let IncomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
-	private let IncomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation!
+	private let IncomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -27,10 +28,6 @@ public actor RTCClients {
 
 	// MARK: - Initialisers
 
-	public init() {
-		self.init(peerConnectionFactory: WebRTCFactory())
-	}
-
 	init(peerConnectionFactory: PeerConnectionFactory,
 	     signalingServerBaseURL: URL = SignalingClient.default)
 	{
@@ -38,25 +35,23 @@ public actor RTCClients {
 		self.signalingServerBaseURL = signalingServerBaseURL
 		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 	}
+}
 
+extension RTCClients {
+	// Initializer for public clients
+	public init() {
+		self.init(peerConnectionFactory: WebRTCFactory())
+	}
+}
+
+extension RTCClients {
 	// MARK: - Public API
 
-	/// Add an existng RTCClient for the given password
-	/// - Parameter password: The connection password used to previously connect the RTCClient
-	public func addExistingClient(_ password: ConnectionPassword) throws {
-		let client = try makeRTCClient(password)
-		add(client)
-	}
-
-	/// Adds a new RTCClient for the given password.
-	/// In comparison with `addExistingClient`, this function will await for the first connection
-	/// to be established. If establishing the connection fails, the RTCClient will not be added
-	/// and a specific error will be thrown
-	///
-	/// - Parameter password: The connection password to be used to creat the new RTCClient
-	public func addNewClient(_ password: ConnectionPassword) async throws {
-		let client = try makeRTCClient(password)
-		try await client.waitForFirstConnection()
+	public func connect(_ linkPassword: ConnectionPassword, waitsForConnectionToBeEstablished: Bool = false) async throws {
+		let client = try makeRTCClient(linkPassword)
+		if waitsForConnectionToBeEstablished {
+			try await client.waitForFirstConnection()
+		}
 		add(client)
 	}
 
@@ -102,26 +97,17 @@ public actor RTCClients {
 
 // MARK: - RTCClient
 actor RTCClient {
-	typealias ID = ConnectionPassword
-
-	// MARK: - PeerConnectionDidCloseError
-	public struct PeerConnectionDidCloseError: Error, LocalizedError {
-		public var errorDescription: String? {
-			"Peer Connection did close, retry the operation from dapp"
-		}
-	}
-
 	let id: ID
 	/// Incoming peer messages. This is the single channel for the received messages from all PeerConnections.
 	let IncomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
 
-	private let IncomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation!
+	private let IncomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
 	private let peerConnectionBuilder: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
 
 	private let disconnectedPeerConnection: AsyncStream<PeerConnectionID>
-	private let disconnectedPeerConnectionContinuation: AsyncStream<PeerConnectionID>.Continuation!
+	private let disconnectedPeerConnectionContinuation: AsyncStream<PeerConnectionID>.Continuation
 	private var disconnectTask: Task<Void, Never>?
 
 	init(id: ID,
@@ -130,13 +116,24 @@ actor RTCClient {
 		self.id = id
 		self.peerConnectionBuilder = peerConnectionBuilder
 		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
-		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream<PeerConnectionID>.streamWithContinuation()
+		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.streamWithContinuation()
 
 		Task {
 			await listenForPeerConnections()
 		}
 	}
+}
 
+extension RTCClient {
+	typealias ID = ConnectionPassword
+	public struct PeerConnectionDidCloseError: Error, LocalizedError {
+		public var errorDescription: String? {
+			"Peer Connection did close, retry the operation from dapp"
+		}
+	}
+}
+
+extension RTCClient {
 	/// Cancel all of the related operations allowing this RTCClient to be deallocated.
 	func cancel() async {
 		for peerConnection in peerConnections.values {
@@ -151,7 +148,7 @@ actor RTCClient {
 	}
 
 	func waitForFirstConnection() async throws {
-		_ = try await peerConnectionBuilder.negotiationResults.prefix(1).collect().first!.get()
+		_ = try await peerConnectionBuilder.negotiationResults.first().get()
 	}
 
 	func removePeerConnection(_ id: PeerConnectionID) async {
@@ -176,6 +173,7 @@ actor RTCClient {
 					try await onPeerConnectionCreated(connectionResult.get())
 				} catch {
 					// log error
+					loggerGlobal.error("Failed to establish PeerConnection: \(error.localizedDescription)")
 				}
 			}
 		}

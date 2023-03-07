@@ -124,7 +124,7 @@ struct PeerConnectionNegotiator {
 			}
 			.prefix(1)
 
-		_ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
+		_ = try await peerConnectionClient.onNegotiationNeeded.first()
 		log("Starting negotiation")
 
 		log("Start ICE Candidates exchange")
@@ -150,7 +150,7 @@ struct PeerConnectionNegotiator {
 			try await signalingServerClient.sendToRemote(.init(content: .offer(offer), id: answerrerID))
 			log("Sent Offer to remote client")
 
-			let answer = try await signalingServerClient.onAnswer.filter { $0.id == answerrerID }.prefix(1).collect().first!
+			let answer = try await signalingServerClient.onAnswer.filter { $0.id == answerrerID }.first()
 			try await peerConnectionClient.setRemoteAnswer(answer.content)
 			log("Received and configured remote Answer")
 		}

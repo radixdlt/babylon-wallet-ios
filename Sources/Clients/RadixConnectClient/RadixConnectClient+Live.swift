@@ -15,7 +15,10 @@ extension RadixConnectClient {
 				Task {
 					loggerGlobal.info("🔌 Loading and connecting all P2P connections")
 					for client in await p2pClientsClient.getP2PClients() {
-						try await rtcClients.addExistingClient(client.connectionPassword)
+						try await rtcClients.connect(
+							client.connectionPassword,
+							waitsForConnectionToBeEstablished: true
+						)
 					}
 				}
 			},
@@ -47,7 +50,7 @@ extension RadixConnectClient {
 				await rtcClients.removeClient(password)
 			},
 			addP2PWithPassword: { password in
-				try await rtcClients.addNewClient(password)
+				try await rtcClients.connect(password)
 			},
 			receiveMessages: { await rtcClients.IncomingMessages },
 			sendMessage: { outgoingMsg in

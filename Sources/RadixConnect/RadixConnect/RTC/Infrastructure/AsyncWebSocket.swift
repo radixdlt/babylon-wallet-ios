@@ -36,7 +36,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	private let url: URL
 	private let sessionConfig: URLSessionConfiguration
 	private var session: WebSocketSession?
-	private let scheduler: AnySchedulerOf<DispatchQueue>
+	private let clock: any Clock<Duration>
 
 	// MARK: - State
 	private let IncomingMessagesContinuation: AsyncStream<Data>.Continuation
@@ -52,13 +52,13 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	init(
 		url: URL,
 		sessionConfig: URLSessionConfiguration = .default,
-		scheduler: AnySchedulerOf<DispatchQueue> = DispatchQueue.global().eraseToAnyScheduler()
+		clock: any Clock<Duration> = ContinuousClock()
 	) {
 		self.url = url
 		self.sessionConfig = sessionConfig
 		// Will wait for the internet connection to be re-established in case of a disconnect
 		self.sessionConfig.waitsForConnectivity = true
-		self.scheduler = scheduler
+		self.clock = clock
 
 		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 
@@ -147,7 +147,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		loggerGlobal.info("WebSocket: Invalidate session and restart")
 		invalidateSession()
 
-		try? await scheduler.sleep(for: .seconds(Config.default.reconnectDelay))
+		try? await clock.sleep(for: .seconds(Config.default.reconnectDelay))
 		startSession()
 		isRestarting = false
 	}
@@ -218,7 +218,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 
 	private func sendPingContinuously() {
 		pingTask = Task {
-			try? await scheduler.sleep(for: .seconds(Config.default.pingInterval))
+			try? await clock.sleep(for: .seconds(Config.default.pingInterval))
 			try? Task.checkCancellation()
 			guard !Task.isCancelled else {
 				loggerGlobal.debug("WebSocket: Aborting ping, task cancelled.")
