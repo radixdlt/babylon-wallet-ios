@@ -107,8 +107,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 								continue
 							}
 
-							try await rolaClient.performDappDefinitionVerification(request.interaction.metadata)
-							try await rolaClient.performWellKnownFileCheck(request.interaction.metadata)
+							// TODO: uncomment and enable / disable based on developer mode preference
+							/*
+							 try await rolaClient.performDappDefinitionVerification(request.interaction.metadata)
+							 try await rolaClient.performWellKnownFileCheck(request.interaction.metadata)
+							 */
 							await send(.internal(.receivedRequestFromDapp(request)))
 						}
 					}
