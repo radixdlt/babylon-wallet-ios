@@ -14,7 +14,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.view(.backButtonTapped)))
+		await store.send(.view(.backButtonTapped))
 
 		// then
 		await store.receive(.delegate(.dismiss))
@@ -56,7 +56,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		}
 
 		// when
-		await store.send(.internal(.view(.copyAddressButtonTapped)))
+		await store.send(.view(.copyAddressButtonTapped))
 		wait(for: [expectation], timeout: 0)
 	}
 
@@ -71,7 +71,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.view(.pullToRefreshStarted)))
+		await store.send(.view(.pullToRefreshStarted))
 
 		// then
 		await store.receive(.delegate(.refresh(account.address)))

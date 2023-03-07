@@ -55,7 +55,7 @@ extension EngineToolkit.Error {
 
 		/// JSON decoding of response from library call was successful, but the
 		/// actual call failed with an error response, a sematnic
-		case errorResponse(String)
+		case errorResponse(JSONValue)
 
 		/// Failed to decode the JSON response into expected resonse type and also failed to decode
 		/// it into an `ErrorResponse`.

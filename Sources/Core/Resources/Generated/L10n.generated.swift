@@ -597,26 +597,26 @@ public enum L10n {
     }
   }
   public enum Splash {
-    /// This app requires your phone to have biometrics set up
-    public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "splash.biometricsNotSetUpMessage", fallback: "This app requires your phone to have biometrics set up")
-    /// Biometrics not set up
-    public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
     /// Delete Wallet Data
     public static let incompatibleProfileVersionAlertDeleteButton = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertDeleteButton", fallback: "Delete Wallet Data")
     /// For this Preview wallet version, you must delete your wallet data to continue.
     public static let incompatibleProfileVersionAlertMessage = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertMessage", fallback: "For this Preview wallet version, you must delete your wallet data to continue.")
     /// Wallet Data is Incompatible
     public static let incompatibleProfileVersionAlertTitle = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertTitle", fallback: "Wallet Data is Incompatible")
+    /// This app requires your phone to have a passcode set up
+    public static let passcodeNotSetUpMessage = L10n.tr("Localizable", "splash.passcodeNotSetUpMessage", fallback: "This app requires your phone to have a passcode set up")
+    /// Passcode not set up
+    public static let passcodeNotSetUpTitle = L10n.tr("Localizable", "splash.passcodeNotSetUpTitle", fallback: "Passcode not set up")
     public enum Alert {
-      public enum BiometricsCheckFailed {
+      public enum PasscodeCheckFailed {
         /// Cancel
-        public static let cancelButtonTitle = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.cancelButtonTitle", fallback: "Cancel")
-        /// Biometrics are not set up. Please update settings.
-        public static let message = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.message", fallback: "Biometrics are not set up. Please update settings.")
+        public static let cancelButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.cancelButtonTitle", fallback: "Cancel")
+        /// Passcode are not set up. Please update settings.
+        public static let message = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.message", fallback: "Passcode are not set up. Please update settings.")
         /// Settings
-        public static let settingsButtonTitle = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.settingsButtonTitle", fallback: "Settings")
+        public static let settingsButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.settingsButtonTitle", fallback: "Settings")
         /// Warning
-        public static let title = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.title", fallback: "Warning")
+        public static let title = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.title", fallback: "Warning")
       }
     }
   }

@@ -87,9 +87,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		case .createAccountButtonTapped:
 			state.createAccountCoordinator = .init(config: .init(
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToChooseAccounts
+				purpose: .newAccountDuringDappInteraction
 			))
 			return .none
 		}
@@ -139,7 +137,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 			return .none
 
-		case .createAccountCoordinator(.presented(.delegate(.dismissed))):
+		case .createAccountCoordinator(.presented(.delegate(.dismiss))):
 			state.createAccountCoordinator = nil
 			return .none
 

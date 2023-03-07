@@ -17,7 +17,8 @@ extension ProfileSnapshot.Version {
 	/// - 16: Add `"gateways"` replacing `"networkAndGateway"`
 	/// - 17: Rename `"authorizedDapps"` -> `"authorizedDapps"`
 	/// - 18: Add `isCurrencyAmountVisible` to app preferences.
-	public static let minimum: Self = 18
+	/// - 19: Add `security` to `appPreferences` (iCloud sync)
+	public static let minimum: Self = 19
 }
 
 // MARK: - Profile

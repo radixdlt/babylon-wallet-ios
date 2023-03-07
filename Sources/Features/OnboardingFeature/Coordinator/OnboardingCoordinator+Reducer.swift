@@ -7,15 +7,10 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		case importProfile(ImportProfile.State)
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
-		public init(ephemeralPrivateProfile: Profile.Ephemeral.Private) {
+		public init() {
 			self = .createAccountCoordinator(
 				.init(
-					config: .init(
-						specificGenesisFactorInstanceDerivationStrategy: .useEphemeralPrivateProfile(ephemeralPrivateProfile),
-						isFirstEntity: true,
-						canBeDismissed: false,
-						navigationButtonCTA: .goHome
-					)
+					config: .init(purpose: .firstAccountForNewProfile)
 				)
 			)
 		}
@@ -73,15 +68,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			}
 		case .importProfile(.delegate(.imported)):
 			return .send(.delegate(.completed))
-		default: return .none
+		default:
+			return .none
 		}
 	}
 }
-
-#if DEBUG
-extension OnboardingCoordinator.State {
-	public static let previewValue: Self = {
-		fatalError("impl me")
-	}()
-}
-#endif

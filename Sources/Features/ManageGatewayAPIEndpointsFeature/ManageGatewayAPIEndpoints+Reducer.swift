@@ -104,10 +104,7 @@ extension ManageGatewayAPIEndpoints {
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway))):
 			state.destination = .createAccount(
 				.init(config: .init(
-					specificNetworkID: newGateway.network.id,
-					isFirstEntity: false,
-					canBeDismissed: true,
-					navigationButtonCTA: .goHome
+					purpose: .firstAccountOnNewNetwork(newGateway.network.id)
 				))
 			)
 			return .none
@@ -119,7 +116,7 @@ extension ManageGatewayAPIEndpoints {
 		case .internal(.system(.switchToResult(.success))):
 			return .send(.delegate(.networkChanged))
 
-		case .child(.destination(.presented(.createAccount(.delegate(.dismissed))))):
+		case .child(.destination(.presented(.createAccount(.delegate(.dismiss))))):
 			return skipSwitching(state: &state)
 
 		case .child(.destination(.presented(.createAccount(.delegate(.completed))))):

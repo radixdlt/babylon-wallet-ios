@@ -1,4 +1,5 @@
 import RadixConnectModels
+import Prelude
 
 // MARK: - SignalingClient.IncommingMessage
 /// IncommingMessage from SignalingClient

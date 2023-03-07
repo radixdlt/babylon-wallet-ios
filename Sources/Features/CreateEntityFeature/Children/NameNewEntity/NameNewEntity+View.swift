@@ -1,80 +1,14 @@
 import FeaturePrelude
 
+extension NameNewEntity.State {
+	var viewState: NameNewEntity.ViewState {
+		.init(state: self)
+	}
+}
+
 // MARK: - NameNewEntity.View
 extension NameNewEntity {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<NameNewEntity>
-		@FocusState private var focusedField: NameNewEntity.State.Field?
-
-		public init(store: StoreOf<NameNewEntity>) {
-			self.store = store
-		}
-	}
-}
-
-extension NameNewEntity.View {
-	public var body: some View {
-		ForceFullScreen {
-			WithViewStore(
-				store,
-				observe: ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium1) {
-						title(with: viewStore)
-
-						VStack(spacing: .large1) {
-							subtitle(with: viewStore)
-
-							let nameBinding = viewStore.binding(
-								get: \.entityName,
-								send: { .textFieldChanged($0) }
-							)
-
-							AppTextField(
-								placeholder: viewStore.namePlaceholder,
-								text: nameBinding,
-								hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
-								binding: $focusedField,
-								equals: .entityName,
-								first: viewStore.binding(
-									get: \.focusedField,
-									send: { .textFieldFocused($0) }
-								)
-							)
-							#if os(iOS)
-							.textFieldCharacterLimit(30, forText: nameBinding)
-							#endif
-							.autocorrectionDisabled()
-						}
-					}
-					.padding([.horizontal, .bottom], .medium1)
-				}
-				#if os(iOS)
-				.toolbar(.visible, for: .navigationBar)
-				#endif
-				.safeAreaInset(edge: .bottom, spacing: 0) {
-					Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
-						viewStore.send(.confirmNameButtonTapped)
-					}
-					.buttonStyle(.primaryRectangular)
-					.controlState(viewStore.createEntityButtonState)
-					.padding([.horizontal, .bottom], .medium1)
-				}
-				.onAppear {
-					viewStore.send(.viewAppeared)
-				}
-			}
-		}
-	}
-}
-
-// MARK: - NameNewEntity.View.ViewState
-extension NameNewEntity.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		public let namePlaceholder: String
 		public var titleText: String
 		public var entityName: String
@@ -101,21 +35,78 @@ extension NameNewEntity.View {
 			focusedField = state.focusedField
 		}
 	}
+
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<NameNewEntity>
+		@FocusState private var focusedField: NameNewEntity.State.Field?
+
+		public init(store: StoreOf<NameNewEntity>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			ForceFullScreen {
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+					ScrollView {
+						VStack(spacing: .medium1) {
+							title(with: viewStore)
+
+							VStack(spacing: .large1) {
+								subtitle(with: viewStore)
+
+								let nameBinding = viewStore.binding(
+									get: \.entityName,
+									send: { .textFieldChanged($0) }
+								)
+
+								AppTextField(
+									placeholder: viewStore.namePlaceholder,
+									text: nameBinding,
+									hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
+									binding: $focusedField,
+									equals: .entityName,
+									first: viewStore.binding(
+										get: \.focusedField,
+										send: { .textFieldFocused($0) }
+									)
+								)
+								#if os(iOS)
+								.textFieldCharacterLimit(30, forText: nameBinding)
+								#endif
+								.autocorrectionDisabled()
+							}
+						}
+						.padding([.horizontal, .bottom], .medium1)
+					}
+					#if os(iOS)
+					.toolbar(.visible, for: .navigationBar)
+					#endif
+					.safeAreaInset(edge: .bottom, spacing: 0) {
+						Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
+							viewStore.send(.confirmNameButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.createEntityButtonState)
+						.padding([.horizontal, .bottom], .medium1)
+					}
+					.onAppear {
+						viewStore.send(.appeared)
+					}
+				}
+			}
+		}
+	}
 }
 
-// MARK: - NameNewEntity.View.ViewStore
 extension NameNewEntity.View {
-	fileprivate typealias ViewStore = ComposableArchitecture.ViewStore<NameNewEntity.View.ViewState, NameNewEntity.Action.ViewAction>
-}
-
-extension NameNewEntity.View {
-	fileprivate func title(with viewStore: ViewStore) -> some View {
+	private func title(with viewStore: ViewStoreOf<NameNewEntity>) -> some View {
 		Text(viewStore.titleText)
 			.foregroundColor(.app.gray1)
 			.textStyle(.sheetTitle)
 	}
 
-	fileprivate func subtitle(with viewStore: ViewStore) -> some View {
+	private func subtitle(with viewStore: ViewStoreOf<NameNewEntity>) -> some View {
 		Text(L10n.CreateEntity.NameNewEntity.subtitle(viewStore.entityKindName.lowercased()))
 			.fixedSize(horizontal: false, vertical: true)
 			.padding(.horizontal, .large1)

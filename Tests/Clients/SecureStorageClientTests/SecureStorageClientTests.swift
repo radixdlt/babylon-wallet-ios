@@ -30,11 +30,11 @@ final class SecureStorageClientTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_authPolicy_biometryAny() async throws {
+	func test__GIVEN__biometricsAndPasscodeSetUp__WHEN__factorSource_is_saved__THEN__setDataWithAuth_called_with_authPolicy_userPresence() async throws {
 		try await doTest(authConfig: .biometricsAndPasscodeSetUp) { sut, factorSource, _ in
 			try await sut.saveMnemonicForFactorSource(factorSource)
 		} assertKeychainSetItemWithAuthRequest: { request in
-			XCTAssertEqual(request.authenticationPolicy, .biometryAny)
+			XCTAssertEqual(request.authenticationPolicy, .userPresence)
 		}
 	}
 
@@ -54,9 +54,14 @@ final class SecureStorageClientTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__no_passcode__WHEN__factorSource_is_saved__THEN__setDataWithoutAuth_called_with_accessibility_whenUnlocked() async throws {
+	func test__GIVEN__no_passcode__WHEN__factorSource_is_saved__THEN__an_error_is_thrown() async throws {
 		try await doTest(authConfig: .neitherBiometricsNorPasscodeSetUp) { sut, factorSource, _ in
-			try await sut.saveMnemonicForFactorSource(factorSource)
+			do {
+				try await sut.saveMnemonicForFactorSource(factorSource)
+				XCTFail("expected failure")
+			} catch {
+				XCTAssertEqual(error as? SecureStorageError, SecureStorageError.passcodeNotSet)
+			}
 		} assertKeychainSetItemWithoutAuthRequest: { request in
 			XCTAssertEqual(request.accessibility, .whenUnlocked)
 		}

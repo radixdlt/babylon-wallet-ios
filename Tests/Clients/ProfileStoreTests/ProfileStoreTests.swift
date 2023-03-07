@@ -7,17 +7,22 @@ import SecureStorageClient
 
 // MARK: - ProfileStoreTests
 final class ProfileStoreTests: TestCase {
-	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() {
-		withDependencies {
+	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {
+		await withDependencies {
+			#if canImport(UIKit)
+			$0.device.$model = deviceModel
+			$0.device.$name = deviceName
+			#endif
 			$0.uuid = .incrementing
 			$0.mnemonicClient.generate = {
 				XCTAssertNoDifference($0, BIP39.WordCount.twentyFour)
 				XCTAssertNoDifference($1, BIP39.Language.english)
 				return .testValue
 			}
+			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
 			$0.secureStorageClient.loadProfileSnapshotData = { nil }
 		} operation: {
-			_ = ProfileStore()
+			_ = await ProfileStore()
 		}
 	}
 
@@ -54,8 +59,8 @@ final class ProfileStoreTests: TestCase {
 				XCTAssertNoDifference(profileSnapshot.id, profileID)
 
 				XCTAssertNoDifference(
-					profileSnapshot.factorSources.first.ignoringDate(),
-					privateFactor.factorSource.with(deviceDescription: expectedDeviceDescription).ignoringDate()
+					profileSnapshot.factorSources.first,
+					privateFactor.factorSource
 				)
 				XCTAssertNoDifference(profileSnapshot.creatingDevice, expectedDeviceDescription)
 			}
@@ -77,12 +82,13 @@ private extension ProfileStoreTests {
 			$0.uuid = .constant(profileID)
 			$0.mnemonicClient.generate = { _, _ in privateFactor.mnemonicWithPassphrase.mnemonic }
 			#if canImport(UIKit)
-			$0.device.$model = "MODEL"
-			$0.device.$name = "NAME"
+			$0.device.$model = deviceModel
+			$0.device.$name = deviceName
 			#endif
 			$0.secureStorageClient.loadProfileSnapshotData = {
 				provideProfileSnapshotLoaded
 			}
+
 			$0.secureStorageClient.saveMnemonicForFactorSource = { privateFactorSource in
 				if assertMnemonicWithPassphraseSaved == nil, assertFactorSourceSaved == nil {
 					XCTFail("Did not expect `saveMnemonicForFactorSource` to be called")
@@ -99,40 +105,31 @@ private extension ProfileStoreTests {
 				await profileSnapshotSavedIntoSecureStorage.setValue($0)
 			}
 		} operation: {
-			let profileStateSubject: AsyncCurrentValueSubject<ProfileStore.ProfileState> = .init(ProfileStore.newEphemeral())
-
-			Task {
-				var profile: Profile?
-				// N.B. normally async tests like this requires use of `Set` since ordering
-				// is not guaranteed by `Task`, however, the `ProfileStore` is a state machine
-				// only allowing for certain state transitions
-				var values: [ProfileStore.ProfileState.Discriminator] = .init()
-				let expectedValues: [ProfileStore.ProfileState.Discriminator] = [.newWithEphemeral, .ephemeral, .persisted]
-				for await state in profileStateSubject.prefix(expectedValues.count) {
-					values.append(state.discriminator)
-					switch state {
-					case let .newWithEphemeral(newEphemeral):
-						profile = newEphemeral.profile
-						XCTAssertNoDifference(newEphemeral.privateFactorSource.mnemonicWithPassphrase, privateFactor.mnemonicWithPassphrase)
-					case let .ephemeral(ephemeral):
-						XCTAssertNoDifference(ephemeral.private.profile, profile)
-						XCTAssertNoDifference(ephemeral.private.privateFactorSource.mnemonicWithPassphrase, privateFactor.mnemonicWithPassphrase)
-					case let .persisted(persistedProfile):
-
-						XCTAssertNoDifference(
-							persistedProfile,
-							profile?.with(creatingDevice: expectedDeviceDescription)
-						)
-					}
+			let sut = await ProfileStore()
+			var profile: Profile?
+			for await state in await sut.profileStateSubject {
+				switch state {
+				case let .ephemeral(ephemeral):
+					profile = ephemeral.profile
+					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.factorSource)
+					try await sut.commitEphemeral()
+				case let .persisted(persistedProfile):
+					XCTAssertNoDifference(
+						persistedProfile,
+						profile
+					)
+					return
 				}
-				XCTAssertNoDifference(values, expectedValues)
 			}
 
-			let sut = ProfileStore(profileStateSubject: profileStateSubject)
-			try await sut.commitEphemeral()
 			let profileSnapshotMaybe = await profileSnapshotSavedIntoSecureStorage.value
+
 			if let assertProfileSnapshotSaved {
 				let profileSnapshot = try XCTUnwrap(profileSnapshotMaybe)
+				XCTAssertNoDifference(
+					profileSnapshot,
+					profile?.snapshot()
+				)
 				assertProfileSnapshotSaved(profileSnapshot)
 			} else {
 				XCTFail("Did not expect `saveProfileSnapshot` to be called")
@@ -141,34 +138,14 @@ private extension ProfileStoreTests {
 	}
 }
 
-private var expectedDeviceDescription: NonEmptyString {
-	#if canImport(UIKit)
-	return "NAME (MODEL)"
-	#else
-	return "macOS"
-	#endif
-}
+#if canImport(UIKit)
+private let deviceName = "NAME"
+private let deviceModel = "MODEL"
+private let expectedDeviceDescription = ProfileStore.deviceDescription(deviceGivenName: deviceName, deviceModel: deviceModel)
+#else
+private let expectedDeviceDescription = ProfileStore.macOSDeviceDescriptionFallback
+#endif
 
 extension PrivateHDFactorSource {
-	static let testValue: Self = .testValue(hint: "ProfileStoreUnitTest")
-}
-
-extension FactorSource {
-	func with(deviceDescription: NonEmptyString) -> Self {
-		var copy = self
-		copy.hint = deviceDescription
-		return copy
-	}
-}
-
-extension Profile {
-	func with(creatingDevice: NonEmptyString) -> Self {
-		var copy = self
-		copy.update(deviceDescription: creatingDevice)
-		return copy
-	}
-
-	func ignoringCreatingDevice() -> Self {
-		with(creatingDevice: "ignored")
-	}
+	static let testValue: Self = .testValue(hint: expectedDeviceDescription)
 }

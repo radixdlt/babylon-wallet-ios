@@ -8,7 +8,7 @@ extension ___VARIABLE_featureName___.State {
 
 // MARK: - ___VARIABLE_featureName___.View
 extension ___VARIABLE_featureName___ {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 

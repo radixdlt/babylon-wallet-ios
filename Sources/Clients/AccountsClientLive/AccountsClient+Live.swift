@@ -5,27 +5,29 @@ import ProfileStore
 extension AccountsClient: DependencyKey {
 	public typealias Value = AccountsClient
 
-	public static func live(profileStore: ProfileStore = .shared) -> Self {
+	public static func live(
+		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
+	) -> Self {
 		Self(
 			getAccountsOnCurrentNetwork: {
-				try await profileStore.network().accounts
+				try await getProfileStore().network().accounts
 			},
-			accountsOnCurrentNetwork: { await profileStore.accountValues() },
-			getAccountsOnNetwork: { try await profileStore.profile.onNetwork(id: $0).accounts },
+			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
+			getAccountsOnNetwork: { try await getProfileStore().profile.onNetwork(id: $0).accounts },
 			createUnsavedVirtualAccount: { request in
-				try await profileStore.profile.createNewUnsavedVirtualEntity(request: request)
+				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},
 			saveVirtualAccount: { account in
-				try await profileStore.updating {
+				try await getProfileStore().updating {
 					try $0.addAccount(account)
 				}
 			},
 			getAccountByAddress: { address in
-				try await profileStore.network().entity(address: address)
+				try await getProfileStore().network().entity(address: address)
 			},
 			hasAccountOnNetwork: { networkID in
 				do {
-					let network = try await profileStore.profile.onNetwork(id: networkID)
+					let network = try await getProfileStore().profile.onNetwork(id: networkID)
 					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
 					return !network.accounts.isEmpty
 				} catch {

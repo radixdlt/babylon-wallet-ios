@@ -1,9 +1,43 @@
 import AccountsClient
+import Cryptography
 import FeaturePrelude
 import PersonasClient
 
 // MARK: - CreationOfEntity
-public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtocol {
+public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public let request: CreateVirtualEntityRequest
+		public var name: NonEmptyString {
+			request.displayName
+		}
+
+		public init(request: CreateVirtualEntityRequest) {
+			self.request = request
+		}
+
+		public init(
+			curve: Slip10Curve,
+			networkID: NetworkID?,
+			name: NonEmptyString,
+			factorSource: FactorSource
+		) throws {
+			try self.init(request: .init(curve: curve, networkID: networkID, factorSource: factorSource, displayName: name))
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case appeared
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case createEntityResult(TaskResult<Entity>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case createdEntity(Entity)
+		case createEntityFailed
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.personasClient) var personasClient
@@ -14,44 +48,35 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtoco
 		Reduce(core)
 	}
 
-	func core(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.appeared)):
-			return .run { [networkID = state.networkID, genesisFactorInstanceDerivationStrategy = state.genesisFactorInstanceDerivationStrategy, name = state.name, curve = state.curve] send in
-				await send(.internal(.system(.createEntityResult(TaskResult {
-					let entityKind = Entity.entityKind
-					let request = try CreateVirtualEntityRequest(
-						curve: curve,
-						networkID: networkID,
-						genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy,
-						entityKind: entityKind,
-						displayName: name
-					)
-
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			let entityKind = Entity.entityKind
+			return .run { [request = state.request] send in
+				await send(.internal(.createEntityResult(TaskResult {
 					switch entityKind {
 					case .account:
-						let account = try await accountsClient.createUnsavedVirtualAccount(request: request)
+						let account = try await accountsClient.createUnsavedVirtualAccount(request)
 						try await accountsClient.saveVirtualAccount(account)
 						return try account.cast()
 					case .identity:
-						let persona = try await personasClient.createUnsavedVirtualPersona(request: request)
+						let persona = try await personasClient.createUnsavedVirtualPersona(request)
 						try await personasClient.saveVirtualPersona(persona)
 						return try persona.cast()
 					}
 				}
-				))))
+				)))
 			}
+		}
+	}
 
-		case .internal(.system(.createEntityResult(.failure))):
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case .createEntityResult(.failure):
 			return .send(.delegate(.createEntityFailed))
 
-		case let .internal(.system(.createEntityResult(.success(entity)))):
-			return .run { send in
-				await send(.delegate(.createdEntity(entity)))
-			}
-
-		case .delegate:
-			return .none
+		case let .createEntityResult(.success(entity)):
+			return .send(.delegate(.createdEntity(entity)))
 		}
 	}
 }

@@ -9,14 +9,14 @@
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AuthorizedDAppsFeatures"
-               BuildableName = "AuthorizedDAppsFeatures"
-               BlueprintName = "AuthorizedDAppsFeatures"
+               BlueprintIdentifier = "PersonasFeature"
+               BuildableName = "PersonasFeature"
+               BlueprintName = "PersonasFeature"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AuthorizedDappsClientLiveTests"
-               BuildableName = "AuthorizedDappsClientLiveTests"
-               BlueprintName = "AuthorizedDappsClientLiveTests"
+               BlueprintIdentifier = "PersonasFeatureTests"
+               BuildableName = "PersonasFeatureTests"
+               BlueprintName = "PersonasFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -60,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AuthorizedDAppsFeatures"
-            BuildableName = "AuthorizedDAppsFeatures"
-            BlueprintName = "AuthorizedDAppsFeatures"
+            BlueprintIdentifier = "PersonasFeature"
+            BuildableName = "PersonasFeature"
+            BlueprintName = "PersonasFeature"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

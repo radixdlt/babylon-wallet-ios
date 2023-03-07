@@ -107,8 +107,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 							return
 						}
 
-						try await rolaClient.performDappDefinitionVerification(interaction.metadata)
-						try await rolaClient.performWellKnownFileCheck(interaction.metadata)
+                                                // TODO: uncomment and enable / disable based on developer mode preference
+                                                /*
+                                                 try await rolaClient.performDappDefinitionVerification(request.interaction.metadata)
+                                                 try await rolaClient.performWellKnownFileCheck(request.interaction.metadata)
+                                                 */
 						await send(.internal(.receivedRequestFromDapp(interactionMessage)))
 					} catch {
 						loggerGlobal.error("Received message contans error: \(error.localizedDescription)")

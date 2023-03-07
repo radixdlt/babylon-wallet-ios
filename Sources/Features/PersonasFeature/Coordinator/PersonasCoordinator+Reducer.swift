@@ -4,8 +4,36 @@ import PersonasClient
 
 // MARK: - PersonasCoordinator
 public struct PersonasCoordinator: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public var personaList: PersonaList.State
+
+		public var createPersonaCoordinator: CreatePersonaCoordinator.State?
+
+		public init(
+			personaList: PersonaList.State = .init(),
+			createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
+		) {
+			self.personaList = personaList
+			self.createPersonaCoordinator = createPersonaCoordinator
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case appeared
+	}
+
+	public enum InternalAction: Sendable & Equatable {
+		case loadPersonasResult(TaskResult<IdentifiedArrayOf<OnNetwork.Persona>>)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case personaList(PersonaList.Action)
+		case createPersonaCoordinator(CreatePersonaCoordinator.Action)
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -41,18 +69,18 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case .personaList(.delegate(.createNewPersona)):
 			let isFirst = state.personaList.personas.count == 0
-			state.createPersonaCoordinator = .init(config: .init(
-				isFirstEntity: isFirst,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToPersonaList
-			))
+			state.createPersonaCoordinator = .init(
+				config: .init(
+					purpose: .newPersonaFromSettings(isFirst: isFirst)
+				)
+			)
 			return .none
 
 		case .createPersonaCoordinator(.delegate(.completed)):
 			state.createPersonaCoordinator = nil
 			return loadPersonas()
 
-		case .createPersonaCoordinator(.delegate(.dismissed)):
+		case .createPersonaCoordinator(.delegate(.dismiss)):
 			state.createPersonaCoordinator = nil
 			return .none
 

@@ -211,12 +211,12 @@
 "settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
 
-"splash.alert.biometricsCheckFailed.cancelButtonTitle" = "Cancel";
-"splash.alert.biometricsCheckFailed.message" = "Biometrics are not set up. Please update settings.";
-"splash.alert.biometricsCheckFailed.settingsButtonTitle" = "Settings";
-"splash.alert.biometricsCheckFailed.title" = "Warning";
-"splash.biometricsNotSetUpMessage" = "This app requires your phone to have biometrics set up";
-"splash.biometricsNotSetUpTitle" = "Biometrics not set up";
+"splash.alert.passcodeCheckFailed.cancelButtonTitle" = "Cancel";
+"splash.alert.passcodeCheckFailed.message" = "Passcode are not set up. Please update settings.";
+"splash.alert.passcodeCheckFailed.settingsButtonTitle" = "Settings";
+"splash.alert.passcodeCheckFailed.title" = "Warning";
+"splash.passcodeNotSetUpMessage" = "This app requires your phone to have a passcode set up";
+"splash.passcodeNotSetUpTitle" = "Passcode not set up";
 "splash.incompatibleProfileVersionAlertDeleteButton" = "Delete Wallet Data";
 "splash.incompatibleProfileVersionAlertMessage" = "For this Preview wallet version, you must delete your wallet data to continue.";
 "splash.incompatibleProfileVersionAlertTitle" = "Wallet Data is Incompatible";

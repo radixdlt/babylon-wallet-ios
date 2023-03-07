@@ -75,6 +75,8 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 			return "[" + array.map { $0.stringRepresentation /* recursion */ }.joined(separator: ", ") + "]"
 		case let .bool(bool):
 			return bool ? "true" : "false"
+		case let .int(int):
+			return String(int)
 		case let .double(double):
 			let formatter = NumberFormatter()
 			formatter.maximumFractionDigits = 3
@@ -87,8 +89,6 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 			}.joined(separator: ", ")
 		case let .int32(int):
 			return "\(int)"
-		case let .int(int):
-			return "\(int)"
 		}
 	}
 }
@@ -98,6 +98,15 @@ public extension JSONValue {
 	var string: String? {
 		switch self {
 		case let .string(value):
+			return value
+		default:
+			return nil
+		}
+	}
+
+	var int: Int? {
+		switch self {
+		case let .int(value):
 			return value
 		default:
 			return nil
@@ -147,5 +156,17 @@ public extension JSONValue {
 		default:
 			return false
 		}
+	}
+}
+
+// MARK: - Even More Convenience
+
+extension JSONValue {
+	public var uint: UInt? {
+		int.map(UInt.init)
+	}
+
+	public subscript(key: String) -> JSONValue? {
+		dictionary?[key]
 	}
 }
