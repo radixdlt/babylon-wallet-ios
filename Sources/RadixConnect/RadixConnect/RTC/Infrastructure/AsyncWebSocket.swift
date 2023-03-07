@@ -42,6 +42,9 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	private let incommingMessagesContinuation: AsyncStream<Data>.Continuation
 	private var isRestarting: Bool = false
 	private var isConnectedToInternet: Bool = false
+	private var pingTask: Task<Void, Error>? = nil
+	private var receiveMessagesTask: Task<Void, Error>? = nil
+	private var terminated: Bool = false
 
 	// MARK: - Internal API
 	let incommingMessages: AsyncStream<Data>
@@ -61,7 +64,8 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 
 		super.init()
 
-		monitor.pathUpdateHandler = { path in
+		monitor.pathUpdateHandler = { [weak self] path in
+			guard let self else { return }
 			switch path.status {
 			case .unsatisfied:
 				Task {
@@ -114,14 +118,18 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	}
 
 	func cancel() async {
+		terminated = true
 		incommingMessagesContinuation.finish()
+		pingTask?.cancel()
 		invalidateSession()
 		monitor.cancel()
+		receiveMessagesTask?.cancel()
 	}
 
 	// MARK: - Private API
 
 	private func invalidateSession() {
+		guard !terminated else { return }
 		guard let session else {
 			loggerGlobal.info("WebSocket: Attempt to invalidate a missing session")
 			return
@@ -145,16 +153,19 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	}
 
 	private func startSession() {
+		guard !terminated else { return }
 		guard session == nil else {
 			loggerGlobal.info("Tried to start a session when existing one is still valid")
 			return
 		}
 
-		let delegate = Delegate(onClose: {
+		let delegate = Delegate(onClose: { [weak self] in
+			guard let self else { return }
 			Task {
 				await self.invalidateAndRestartSession()
 			}
-		}, onOpen: {
+		}, onOpen: { [weak self] in
+			guard let self else { return }
 			Task {
 				await self.receiveMessages()
 				await self.sendPingContinuously()
@@ -169,36 +180,44 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	}
 
 	private func receiveMessages() {
-		guard let session else {
-			loggerGlobal.info("WebSocket: Session was invalidated, stop receiving messages")
-			return
-		}
-
-		session.task.receive { [weak self] result in
-			guard let self else { return }
-			do {
-				let message = try result.get()
-				switch message {
-				case let .data(data):
-					self.incommingMessagesContinuation.yield(data)
-				case let .string(string):
-					self.incommingMessagesContinuation.yield(Data(string.utf8))
-				@unknown default:
-					throw UnknownMessageTypeError()
-				}
-			} catch {
-				loggerGlobal.error("WebSocket: receive message failed \(error)")
+		receiveMessagesTask = Task {
+			try? Task.checkCancellation()
+			guard !Task.isCancelled else {
+				loggerGlobal.debug("WebSocket: Aborting receive messages, task cancelled.")
 				return
 			}
 
-			Task {
-				await self.receiveMessages()
+			guard let session else {
+				loggerGlobal.info("WebSocket: Session was invalidated, stop receiving messages")
+				return
+			}
+
+			session.task.receive { [weak self] result in
+				guard let self else { return }
+				do {
+					let message = try result.get()
+					switch message {
+					case let .data(data):
+						self.incommingMessagesContinuation.yield(data)
+					case let .string(string):
+						self.incommingMessagesContinuation.yield(Data(string.utf8))
+					@unknown default:
+						throw UnknownMessageTypeError()
+					}
+				} catch {
+					loggerGlobal.error("WebSocket: receive message failed \(error)")
+					return
+				}
+
+				Task {
+					await self.receiveMessages()
+				}
 			}
 		}
 	}
 
 	private func sendPingContinuously() {
-		Task {
+		pingTask = Task {
 			try? await scheduler.sleep(for: .seconds(Config.default.pingInterval))
 			try? Task.checkCancellation()
 			guard !Task.isCancelled else {

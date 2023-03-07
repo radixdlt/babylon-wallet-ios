@@ -101,6 +101,9 @@ struct PeerConnectionNegotiator {
 			.onGeneratedICECandidate
 			.map { candidate in
 				log("Sending local ICE Candidate")
+				defer {
+					log("Sent local ICE Candidate")
+				}
 				return try await signalingServerClient.sendToRemote(.init(content: .iceCandidate(candidate), id: clientID))
 			}.eraseToAnyAsyncSequence()
 
