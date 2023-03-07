@@ -1,6 +1,6 @@
 import FeaturePrelude
 import GatewaysClient
-import P2PConnectivityClient
+import RadixConnectClient
 import RadixConnect
 import ROLAClient
 
@@ -67,7 +67,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	var onDismiss: (@Sendable () -> Void)? = nil
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.rolaClient) var rolaClient
@@ -83,10 +83,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				await p2pConnectivityClient.loadFromProfileAndConnectAll()
+				await radixConnectClient.loadFromProfileAndConnectAll()
 				let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
-				for try await incommingMessageResult in await p2pConnectivityClient.receiveMessages() {
+				for try await incommingMessageResult in await radixConnectClient.receiveMessages() {
 					guard !Task.isCancelled else {
 						return
 					}
@@ -103,7 +103,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 								message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
 							)))
 
-							try await p2pConnectivityClient.sendMessage(outMessage)
+							try await radixConnectClient.sendMessage(outMessage)
 							return
 						}
 
@@ -135,11 +135,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		case .moveToBackground:
 			return .fireAndForget {
-				await p2pConnectivityClient.disconnectAll()
+				await radixConnectClient.disconnectAll()
 			}
 		case .moveToForeground:
 			return .fireAndForget {
-				await p2pConnectivityClient.loadFromProfileAndConnectAll()
+				await radixConnectClient.loadFromProfileAndConnectAll()
 			}
 		}
 	}
@@ -254,7 +254,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		dappMetadata: DappMetadata?
 	) -> EffectTask<Action> {
 		.run { send in
-			_ = try await p2pConnectivityClient.sendMessage(response)
+			_ = try await radixConnectClient.sendMessage(response)
 			await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
 		} catch: { error, send in
 			await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))

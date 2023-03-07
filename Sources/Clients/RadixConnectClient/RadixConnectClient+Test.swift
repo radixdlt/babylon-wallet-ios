@@ -2,8 +2,7 @@ import ClientPrelude
 
 #if DEBUG
 
-// MARK: - P2PConnectivityClient + TestDependencyKey
-extension P2PConnectivityClient: TestDependencyKey {
+extension RadixConnectClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
 		loadFromProfileAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
@@ -19,7 +18,7 @@ extension P2PConnectivityClient: TestDependencyKey {
 	)
 }
 
-extension P2PConnectivityClient {
+extension RadixConnectClient {
 	static let noop = Self(
 		loadFromProfileAndConnectAll: {},
 		disconnectAndRemoveAll: {},

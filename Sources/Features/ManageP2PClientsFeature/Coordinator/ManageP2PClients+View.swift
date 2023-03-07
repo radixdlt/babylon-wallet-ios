@@ -1,6 +1,6 @@
 import FeaturePrelude
 import NewConnectionFeature
-import P2PConnectivityClient
+import RadixConnectClient
 
 // MARK: - ManageP2PClients.View
 extension ManageP2PClients {

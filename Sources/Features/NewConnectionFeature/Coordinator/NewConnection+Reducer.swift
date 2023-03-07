@@ -1,5 +1,5 @@
 import FeaturePrelude
-import P2PConnectivityClient
+import RadixConnectClient
 
 // MARK: - NewConnection
 public struct NewConnection: Sendable, FeatureReducer {

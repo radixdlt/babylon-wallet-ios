@@ -48,7 +48,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mainQueue) var mainQueue
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 
@@ -63,7 +63,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.establishConnectionResult(
 					TaskResult(catching: {
-						try await p2pConnectivityClient.addP2PWithPassword(connectionPassword)
+						try await radixConnectClient.addP2PWithPassword(connectionPassword)
 						return connectionPassword
 					})
 				)))

@@ -1,10 +1,10 @@
 import FeaturePrelude
 import NewConnectionFeature
-import P2PConnectivityClient
+import RadixConnectClient
 
 // MARK: - ManageP2PClients
 public struct ManageP2PClients: Sendable, ReducerProtocol {
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
@@ -27,7 +27,7 @@ extension ManageP2PClients {
 			return .run { send in
 				await send(.internal(.system(.loadClientsResult(
 					TaskResult {
-						try await p2pConnectivityClient.getP2PClients()
+						try await radixConnectClient.getP2PClients()
 					}
 				))))
 			}
@@ -56,7 +56,7 @@ extension ManageP2PClients {
 		case let .child(.connection(id, .delegate(.deleteConnection))):
 			return .task {
 				let result = await TaskResult {
-					try await p2pConnectivityClient.deleteP2PClientByPassword(id)
+					try await radixConnectClient.deleteP2PClientByPassword(id)
 					return id
 				}
 				return .internal(.system(.deleteConnectionResult(result)))
@@ -79,7 +79,7 @@ extension ManageP2PClients {
 			return .run { send in
 				await send(.internal(.system(.saveNewConnectionResult(
 					TaskResult {
-						try await p2pConnectivityClient.storeP2PClient(
+						try await radixConnectClient.storeP2PClient(
 							connectedClient
 						)
 					}.map { connectedClient }

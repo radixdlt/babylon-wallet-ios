@@ -1,10 +1,10 @@
 import FeaturePrelude
-import P2PConnectivityClient
+import RadixConnectClient
 
 // MARK: - ManageP2PClient
 public struct ManageP2PClient: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	public init() {}
 }
 

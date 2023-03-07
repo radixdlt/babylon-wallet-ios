@@ -99,7 +99,7 @@ package.addModules([
 			"CreateEntityFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
-			"P2PConnectivityClient",
+			"RadixConnectClient",
 			"PersonasClient",
 			"ROLAClient",
 			"TransactionSigningFeature",
@@ -157,7 +157,7 @@ package.addModules([
 		name: "ManageP2PClientsFeature",
 		dependencies: [
 			"NewConnectionFeature",
-			"P2PConnectivityClient",
+			"RadixConnectClient",
 		],
 		tests: .yes()
 	),
@@ -176,7 +176,7 @@ package.addModules([
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
-			"P2PConnectivityClient",
+			"RadixConnectClient",
 		],
 		tests: .yes()
 	),
@@ -210,7 +210,7 @@ package.addModules([
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"PersonasFeature",
-			"P2PConnectivityClient", // deleting connections when wallet is deleted
+			"RadixConnectClient", // deleting connections when wallet is deleted
 			"InspectProfileFeature",
 		],
 		tests: .yes()
@@ -418,7 +418,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "P2PConnectivityClient", // FIXME: once @ghenadie merges multichannel support, rename this `RadixConnectClient`?
+		name: "RadixConnectClient",
 		dependencies: [
 			"RadixConnect",
 			"P2PClientsClient",

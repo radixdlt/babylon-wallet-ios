@@ -3,8 +3,7 @@ import Network
 import P2PClientsClient
 import RadixConnect
 
-// MARK: - P2PConnectivityClient + :LiveValue
-extension P2PConnectivityClient {
+extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pClientsClient) var p2pClientsClient
 

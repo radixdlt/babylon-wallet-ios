@@ -3,16 +3,13 @@ import RadixConnect
 
 // MARK: - DependencyValues
 extension DependencyValues {
-	public var p2pConnectivityClient: P2PConnectivityClient {
-		get { self[P2PConnectivityClient.self] }
-		set { self[P2PConnectivityClient.self] = newValue }
+	public var radixConnectClient: RadixConnectClient {
+		get { self[RadixConnectClient.self] }
+		set { self[RadixConnectClient.self] = newValue }
 	}
 }
 
-// MARK: - P2PConnectivityClient
-
-//  MARK: - P2PConnectivityClient
-public struct P2PConnectivityClient: DependencyKey, Sendable {
+public struct RadixConnectClient: DependencyKey, Sendable {
 	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
 	public var disconnectAndRemoveAll: DisconnectAndRemoveAll
 	public var disconnectAll: DisconnectAll
@@ -28,7 +25,7 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 	public var sendMessage: SendMessage
 }
 
-extension P2PConnectivityClient {
+extension RadixConnectClient {
 	public typealias LoadFromProfileAndConnectAll = @Sendable () async -> Void
 	public typealias DisconnectAndRemoveAll = @Sendable () async -> Void
 	public typealias DisconnectAll = @Sendable () async -> Void
