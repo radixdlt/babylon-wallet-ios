@@ -24,6 +24,24 @@ extension FactorSource.Storage {
 		}
 		return storage
 	}
+
+	public func asDevice() throws -> DeviceStorage {
+		guard let forDevice else {
+			throw WasNotDeviceFactorSource()
+		}
+		return forDevice
+	}
+}
+
+// MARK: - WasNotDeviceFactorSource
+struct WasNotDeviceFactorSource: Swift.Error {}
+extension FactorSource {
+	public func deviceStorage() throws -> DeviceStorage {
+		guard let storage else {
+			throw WasNotDeviceFactorSource()
+		}
+		return try storage.asDevice()
+	}
 }
 
 // MARK: Codable

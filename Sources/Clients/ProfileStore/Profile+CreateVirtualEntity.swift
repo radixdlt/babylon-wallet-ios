@@ -19,37 +19,12 @@ extension Profile {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
-		let (derivationPath, index) = try {
-			let index: Int = {
-				// FIXME: - Multifactor, in the future update to:
-				// We are NOT counting the number of accounts/personas
-				// and returning the next index. We returning index
-				// for this particular factor source on this particular
-				// network for this particular entity type.
-				if let network = try? self.onNetwork(id: networkID) {
-					switch entityKind {
-					case .account:
-						return network.accounts.count
-					case .identity:
-						return network.personas.count
-					}
-				} else {
-					return 0
-				}
-			}()
-			let keyKind = KeyKind.virtualEntity
-			switch entityKind {
-			case .account:
-				let path = try DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: keyKind))
-				return (path: path, index: index)
-			case .identity:
-				let path = try DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: keyKind))
-				return (path: path, index: index)
-			}
-		}()
+		let factorSource = request.factorSource
+		let deviceFactorSourceStorage = try factorSource.deviceStorage()
+		let index = deviceFactorSourceStorage.nextDerivationIndicies.nextForEntity(kind: entityKind)
+		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let genesisFactorInstance: FactorInstance = try await {
-			let factorSource = request.factorSource
 			let publicKey: Engine.PublicKey = try await useFactorSourceClient.onDeviceHD(
 				factorSourceID: factorSource.id,
 				derivationPath: derivationPath,
@@ -89,12 +64,13 @@ extension Profile {
 				networkID: networkID,
 				publicKey: genesisFactorInstance.publicKey
 			)
-
+			let index = (try? self.onNetwork(id: networkID))?.accounts.count ?? 0
+			let appearanceID = OnNetwork.Account.AppearanceID.fromIndex(index)
 			let account = OnNetwork.Account(
 				networkID: networkID,
 				address: accountAddress,
 				securityState: .unsecured(unsecuredControl),
-				appearanceID: .fromIndex(index),
+				appearanceID: appearanceID,
 				displayName: displayName
 			)
 			return account

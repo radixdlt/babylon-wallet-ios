@@ -91,6 +91,21 @@ extension DerivationPath {
 	public static func customPath(_ path: CustomHierarchicalDeterministicDerivationPath) -> Self {
 		Self(scheme: .cap26, path: path.derivationPath)
 	}
+
+	public static func forEntity(
+		kind entityKind: EntityKind,
+		networkID: Network.ID,
+		index: Int,
+		keyKind: KeyKind = .virtualEntity
+	) throws -> Self {
+		let path = try HD.Path.Full.defaultForEntity(
+			networkID: networkID,
+			entityKind: .identity,
+			index: index,
+			keyKind: keyKind
+		)
+		return Self(scheme: .cap26, path: path.toString())
+	}
 }
 
 extension DerivationPath {
