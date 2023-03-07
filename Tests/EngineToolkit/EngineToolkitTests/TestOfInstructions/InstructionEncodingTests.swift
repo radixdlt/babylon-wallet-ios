@@ -10,6 +10,15 @@ final class InstructionEncodingTests: TestCase {
 	}
 
 	func test_value_encoding_and_decoding() throws {
+		let accessRules = Tuple {
+			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
+			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Enum(.u8(0), fields: [])
+			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
+			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Enum(.u8(0), fields: [])
+		}
+
 		// Arrange
 		let testVectors: [(value: Instruction, jsonRepresentation: String)] = [
 			(
@@ -172,17 +181,16 @@ final class InstructionEncodingTests: TestCase {
 				{"instruction":"DROP_ALL_PROOFS"}
 				"""
 			),
-			try (
-				value: .publishPackageWithOwner(.init(
-					code: .init(hex: "36dae540b7889956f1f1d8d46ba23e5e44bf5723aef2a8e6b698686c02583618"),
-					abi: .init(hex: "15e8699a6d63a96f66f6feeb609549be2688b96b02119f260ae6dfd012d16a5d"),
-					ownerBadge: .init(
-						resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-						nonFungibleLocalId: .integer(1)
-					)
+			(
+				value: .publishPackage(.init(
+					code: try .init(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
+					schema: try .init(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
+					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
+					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
+					accessRules: accessRules
 				)),
 				jsonRepresentation: """
-				{"abi":{"hash":"15e8699a6d63a96f66f6feeb609549be2688b96b02119f260ae6dfd012d16a5d","type":"Blob"},"code":{"hash":"36dae540b7889956f1f1d8d46ba23e5e44bf5723aef2a8e6b698686c02583618","type":"Blob"},"instruction":"PUBLISH_PACKAGE_WITH_OWNER","owner_badge":{"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"},"type":"NonFungibleGlobalId"}}
+				{"access_rules":{"elements":[{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Tuple"},"code":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"},"instruction":"PUBLISH_PACKAGE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"},"schema":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"}}
 				"""
 			),
 			(
