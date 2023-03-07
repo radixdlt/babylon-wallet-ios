@@ -87,10 +87,11 @@ struct PeerConnectionNegotiator {
 		signalingServerClient.cancel()
 	}
 
-	private static func negotiatePeerConnection(_ role: NegotiationRole,
-	                                            signalingServerClient: SignalingClient,
-	                                            factory: PeerConnectionFactory) async throws -> PeerConnectionClient
-	{
+	private static func negotiatePeerConnection(
+		_ role: NegotiationRole,
+		signalingServerClient: SignalingClient,
+		factory: PeerConnectionFactory
+	) async throws -> PeerConnectionClient {
 		let clientID = role.clientID
 		let log = Self.tracePeerConnectionNegotiation(clientID)
 

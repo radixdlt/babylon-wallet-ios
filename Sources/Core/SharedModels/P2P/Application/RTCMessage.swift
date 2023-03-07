@@ -47,17 +47,26 @@ public extension P2P {
 
 public extension P2P.RTCIncommingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
 	func unwrapResult() throws -> P2P.RTCIncommingWalletInteraction {
-		try .init(connectionId: connectionId,
-		          content: .init(peerConnectionId: peerMessage.peerConnectionId, content: peerMessage.content.get()))
+		try .init(
+			connectionId: connectionId,
+			content: .init(
+				peerConnectionId: peerMessage.peerConnectionId, 
+				content: peerMessage.content.get()
+			)
+		)
 	}
 }
 
 public extension P2P.RTCIncommingMessage {
 	/// Transforms to an OutgoingMessage by preserving the RTCClient and PeerConnection IDs
 	func toOutgoingMessage(_ response: P2P.ToDapp.WalletInteractionResponse) -> P2P.RTCOutgoingMessage {
-		.init(connectionId: connectionId,
-		      content: .init(peerConnectionId: peerMessage.peerConnectionId,
-		                     content: response))
+		.init(
+			connectionId: connectionId,
+			content: .init(
+				peerConnectionId: peerMessage.peerConnectionId,
+				content: response
+			)
+		)
 	}
 }
 
