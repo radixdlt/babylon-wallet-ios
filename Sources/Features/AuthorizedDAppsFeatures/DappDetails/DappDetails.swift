@@ -140,7 +140,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .presentedPersona(.presented(.delegate(.personaDisconnected))):
+		case .presentedPersona(.presented(.delegate(.personaDeauthorized))):
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .run { send in
 				let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)

@@ -154,12 +154,12 @@
 "personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
 
 "personaDetails.editAccountSharing" = "Edit Account Sharing";
-"personaDetails.disconnectPersona" = "Remove Authorization";
+"personaDetails.deauthorizePersona" = "Remove Authorization";
 
-"personaDetails.disconnectPersonaAlertTitle" = "Remove Authorization";
-"personaDetails.disconnectPersonaAlertMessage" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
-"personaDetails.disconnectPersonaAlertConfirm" = "Confirm";
-"personaDetails.disconnectPersonaAlertCancel" = "Cancel";
+"personaDetails.deauthorizePersonaAlertTitle" = "Remove Authorization";
+"personaDetails.deauthorizePersonaAlertMessage" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
+"personaDetails.deauthorizePersonaAlertConfirm" = "Confirm";
+"personaDetails.deauthorizePersonaAlertCancel" = "Cancel";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";
