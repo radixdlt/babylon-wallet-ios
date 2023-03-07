@@ -30,13 +30,15 @@ actor DataChannelClient {
 
 	// MARK: - Streams
 
-	private let incommingMessages: AnyAsyncSequence<Message>
-	private let incommingReceipts: AnyAsyncSequence<Message.Receipt>
-	private let incommingChunks: AnyAsyncSequence<Message.ChunkedMessage>
+	private let incomingMessages: AnyAsyncSequence<Message>
+	private let incomingReceipts: AnyAsyncSequence<Message.Receipt>
+	private let incomingChunks: AnyAsyncSequence<Message.ChunkedMessage>
 
 	// Mutable State
-	private typealias ChunksWithMetaData = (metaData: Message.ChunkedMessage.MetaDataPackage?,
-	                                        chunks: [Message.ChunkedMessage.ChunkPackage])
+	private typealias ChunksWithMetaData = (
+		metaData: Message.ChunkedMessage.MetaDataPackage?,
+		chunks: [Message.ChunkedMessage.ChunkPackage]
+	)
 
 	/*
 	 TODO: Check if this is really needed.
