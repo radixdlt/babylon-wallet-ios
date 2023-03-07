@@ -7,7 +7,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var message: String?
 		public var presenting: IdentifiedArrayOf<Dapp>?
 		public var withdrawing: IdentifiedArrayOf<TransactionReviewAccount.State>?
-		public var usedDapps: IdentifiedArrayOf<Dapp>?
+		public var usedDapps: TransactionReviewDappsUsed.State
 		public var depositing: IdentifiedArrayOf<TransactionReviewAccount.State>?
 		public var networkFee: BigDecimal
 		public var isNetworkCongested: Bool
@@ -33,6 +33,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case account(id: AccountAddress.ID, action: TransactionReviewAccount.Action)
+		case dapp(TransactionReviewDappsUsed.Action)
 	}
 
 	public init() {}
@@ -53,14 +54,14 @@ extension TransactionReview.State {
 	public static let mock0 = Self(message: "Royalties claim",
 	                               presenting: [.mock1, .mock0],
 	                               withdrawing: [.mockWithdraw0],
-	                               usedDapps: nil,
+	                               usedDapps: .init(isExpanded: false, dapps: []),
 	                               depositing: [.mockDeposit1],
 	                               networkFee: 0.1,
 	                               isNetworkCongested: false)
 
 	public static let mock1 = Self(message: "Royalties claim",
 	                               withdrawing: [.mockWithdraw0, .mockWithdraw1],
-	                               usedDapps: [.mock2],
+	                               usedDapps: .init(isExpanded: true, dapps: [.mock3, .mock2]),
 	                               depositing: [.mockDeposit2],
 	                               networkFee: 0.2,
 	                               isNetworkCongested: false)
@@ -70,6 +71,7 @@ extension TransactionReview.State.Dapp {
 	public static let mock0 = Self(id: .deadbeef32Bytes, name: "Collabofi User Badge", thumbnail: nil)
 	public static let mock1 = Self(id: .deadbeef64Bytes, name: "Oh Babylon Founder NFT", thumbnail: nil)
 	public static let mock2 = Self(id: "lkjl", name: "Megaswap", thumbnail: nil)
+	public static let mock3 = Self(id: "lkhgh", name: "Superswap", thumbnail: nil)
 }
 
 extension TransactionReviewAccount.State {
