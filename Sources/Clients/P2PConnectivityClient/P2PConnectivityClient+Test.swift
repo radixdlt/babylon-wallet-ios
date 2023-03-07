@@ -8,6 +8,7 @@ extension P2PConnectivityClient: TestDependencyKey {
 	public static let testValue = Self(
 		loadFromProfileAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
 		disconnectAndRemoveAll: unimplemented("\(Self.self).disconnectAndRemoveAll"),
+		disconnectAll: unimplemented("\(Self.self).disconnectAll"),
 		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
 		storeP2PClient: unimplemented("\(Self.self).storeP2PClient"),
@@ -22,6 +23,7 @@ extension P2PConnectivityClient {
 	static let noop = Self(
 		loadFromProfileAndConnectAll: {},
 		disconnectAndRemoveAll: {},
+		disconnectAll: {},
 		getLocalNetworkAccess: { false },
 		getP2PClients: { [] },
 		storeP2PClient: { _ in },

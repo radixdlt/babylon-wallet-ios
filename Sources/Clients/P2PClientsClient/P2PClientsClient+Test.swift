@@ -13,11 +13,13 @@ extension P2PClientsClient: TestDependencyKey {
 	public static let noop = Self(
 		getP2PClients: { [] },
 		addP2PClient: { _ in },
-		deleteP2PClientByPassword: { _ in }
+		deleteP2PClientByPassword: { _ in },
+		deleteAllP2PClients: {}
 	)
 	public static let testValue = Self(
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
 		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
-		deleteP2PClientByPassword: unimplemented("\(Self.self).deleteP2PClientByPassword")
+		deleteP2PClientByPassword: unimplemented("\(Self.self).deleteP2PClientByPassword"),
+		deleteAllP2PClients: unimplemented("\(Self.self).deleteAllP2pClients")
 	)
 }

@@ -135,7 +135,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		case .moveToBackground:
 			return .fireAndForget {
-				await p2pConnectivityClient.disconnectAndRemoveAll()
+				await p2pConnectivityClient.disconnectAll()
 			}
 		case .moveToForeground:
 			return .fireAndForget {

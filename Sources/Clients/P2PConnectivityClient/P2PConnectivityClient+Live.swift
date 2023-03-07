@@ -23,6 +23,15 @@ extension P2PConnectivityClient {
 			disconnectAndRemoveAll: {
 				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
 				await rtcClients.removeAll()
+				do {
+					try await p2pClientsClient.deleteAllP2PClients()
+				} catch {
+					loggerGlobal.error("Failed to delete P2PClients -> \(error)")
+				}
+			},
+			disconnectAll: {
+				loggerGlobal.info("🔌 Disconnecting all P2P connections")
+				await rtcClients.removeAll()
 			},
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
