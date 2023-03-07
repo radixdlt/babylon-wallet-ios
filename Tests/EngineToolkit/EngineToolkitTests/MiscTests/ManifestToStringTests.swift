@@ -33,6 +33,15 @@ final class ManifestToStringTests: TestCase {
 			),
 		]
 
+		let accessRules = Tuple {
+			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
+			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Enum(.u8(0), fields: [])
+			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
+			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Enum(.u8(0), fields: [])
+		}
+
 		for package in packages {
 			let manifestInstructions = TransactionManifest {
 				CallMethod(
@@ -40,13 +49,12 @@ final class ManifestToStringTests: TestCase {
 					methodName: "lock_fee"
 				) { Decimal_(value: "100") }
 
-				PublishPackageWithOwner(
+				PublishPackage(
 					code: Blob(data: sha256(data: package.code)),
-					abi: Blob(data: sha256(data: package.abi)),
-					ownerBadge: NonFungibleGlobalId(
-						resourceAddress: .init(address: "resource_sim1qzf8hl3azz2q0e5s33nh2mt8wmvqjfxdrv06ysus4alqh0994h"),
-						nonFungibleLocalId: .integer(12)
-					)
+					schema: Blob(data: sha256(data: package.schema)),
+					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
+					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
+					accessRules: accessRules
 				)
 			}.instructions
 
