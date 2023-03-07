@@ -35,7 +35,7 @@ struct WebRTCFactory: PeerConnectionFactory {
 		RTCIceServer(urlStrings: ["stun:stun2.l.google.com:19302"]),
 		RTCIceServer(urlStrings: ["stun:stun3.l.google.com:19302"]),
 		RTCIceServer(urlStrings: ["stun:stun4.l.google.com:19302"]),
-	] // + turnServers
+	] + turnServers
 
 	static let peerConnectionConfig: RTCConfiguration = {
 		let config = RTCConfiguration()

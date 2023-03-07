@@ -41,6 +41,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	// MARK: - State
 	private let incommingMessagesContinuation: AsyncStream<Data>.Continuation
 	private var isRestarting: Bool = false
+	private var isConnectedToInternet: Bool = false
 
 	// MARK: - Internal API
 	let incommingMessages: AsyncStream<Data>
@@ -53,28 +54,44 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		self.url = url
 		self.sessionConfig = sessionConfig
 		// Will wait for the internet connection to be re-established in case of a disconnect
-//		self.sessionConfig.waitsForConnectivity = true
+		self.sessionConfig.waitsForConnectivity = true
 		self.scheduler = scheduler
 
 		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
 
 		super.init()
-		Task { await self.startSession() }
 
 		monitor.pathUpdateHandler = { path in
 			switch path.status {
 			case .unsatisfied:
 				Task {
-					await self.invalidateAndRestartSession()
+					await self.handleNoInternetConnection()
+				}
+			case .satisfied:
+				Task {
+					await self.handleInternetConnectionEstablished()
 				}
 			default:
 				break
 			}
-			print("Network monitor \(path)")
 		}
 
 		let queue = DispatchQueue(label: "Monitor")
 		monitor.start(queue: queue)
+	}
+
+	private func handleNoInternetConnection() {
+		if isConnectedToInternet {
+			invalidateSession()
+			isConnectedToInternet = false
+		}
+	}
+
+	private func handleInternetConnectionEstablished() {
+		if !isConnectedToInternet {
+			startSession()
+			isConnectedToInternet = true
+		}
 	}
 
 	func send(message: Data) async throws {
@@ -111,6 +128,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		}
 		session.task.cancel(with: .normalClosure, reason: nil)
 		session.urlSession.invalidateAndCancel()
+		self.session = nil
 		loggerGlobal.info("WebSocket: Session was invalidated and terminated")
 	}
 
@@ -127,6 +145,11 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	}
 
 	private func startSession() {
+		guard session == nil else {
+			loggerGlobal.info("Tried to start a session when existing one is still valid")
+			return
+		}
+
 		let delegate = Delegate(onClose: {
 			Task {
 				await self.invalidateAndRestartSession()
@@ -227,16 +250,6 @@ extension AsyncWebSocket {
 		}
 
 		// MARK: - Close events
-
-		func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
-			loggerGlobal.debug("websocket task=\(webSocketTask.taskIdentifier) didCloseWith: \(String(describing: closeCode)), reason: \(String(describing: reason))")
-			onClose()
-		}
-
-		func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
-			loggerGlobal.debug("WebSocket session didBecomeInvalid, reason: \(String(describing: error))")
-			onClose()
-		}
 
 		func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
 			loggerGlobal.debug("WebSocket: Task failed with error \(String(describing: error))")
