@@ -159,7 +159,7 @@ extension FactorSourceView {
 			}
 
 			if let deviceStore = factorSource.storage?.forDevice {
-				NextDerivationIndiciesPerNetworkView(nextDerivationIndiciesPerNetwork: deviceStore.nextDerivationIndiciesPerNetwork, indentation: indentation.inOneLevel)
+				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: deviceStore.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
 			}
 		}
 		.padding([.leading], leadingPadding)
@@ -174,29 +174,29 @@ extension FactorSourceView {
 	}
 }
 
-// MARK: - NextDerivationIndiciesPerNetworkView
-public struct NextDerivationIndiciesPerNetworkView: IndentedView {
-	public let nextDerivationIndiciesPerNetwork: NextDerivationIndiciesPerNetwork
+// MARK: - NextDerivationIndicesPerNetworkView
+public struct NextDerivationIndicesPerNetworkView: IndentedView {
+	public let nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
 	public let indentation: Indentation
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Next derivation indicies per network")
+			Text("Next derivation indices per network")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
 
-			ForEach(nextDerivationIndiciesPerNetwork.perNetwork) { nextIndices in
-				NextDerivationIndiciesForNetworkView(nextIndices: nextIndices, indentation: indentation.inOneLevel)
+			ForEach(nextDerivationIndicesPerNetwork.perNetwork) { nextIndices in
+				NextDerivationIndicesForNetworkView(nextIndices: nextIndices, indentation: indentation.inOneLevel)
 			}
 		}
 	}
 }
 
-// MARK: - NextDerivationIndiciesForNetworkView
-public struct NextDerivationIndiciesForNetworkView: IndentedView {
-	public let nextIndices: OnNetwork.NextDerivationIndicies
+// MARK: - NextDerivationIndicesForNetworkView
+public struct NextDerivationIndicesForNetworkView: IndentedView {
+	public let nextIndices: OnNetwork.NextDerivationIndices
 	public let indentation: Indentation
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {

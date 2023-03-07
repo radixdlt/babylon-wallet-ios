@@ -1,9 +1,9 @@
 import EngineToolkitModels
 import Prelude
 
-// MARK: - OnNetwork.NextDerivationIndicies
+// MARK: - OnNetwork.NextDerivationIndices
 extension OnNetwork {
-	public struct NextDerivationIndicies: Sendable, Hashable, Codable, Identifiable {
+	public struct NextDerivationIndices: Sendable, Hashable, Codable, Identifiable {
 		public typealias Index = Int
 
 		public typealias ID = NetworkID
@@ -25,24 +25,24 @@ extension OnNetwork {
 	}
 }
 
-// MARK: - NextDerivationIndiciesPerNetwork
-/// An ordered dictionary mapping from a `Network` to a `NextDerivationIndicies`, which is a
+// MARK: - NextDerivationIndicesPerNetwork
+/// An ordered dictionary mapping from a `Network` to a `NextDerivationIndices`, which is a
 /// holds derivation indices for entities.
-public struct NextDerivationIndiciesPerNetwork:
+public struct NextDerivationIndicesPerNetwork:
 	Sendable,
 	Hashable,
 	Codable,
 	CustomStringConvertible,
 	CustomDumpStringConvertible
 {
-	public internal(set) var perNetwork: IdentifiedArrayOf<OnNetwork.NextDerivationIndicies>
+	public internal(set) var perNetwork: IdentifiedArrayOf<OnNetwork.NextDerivationIndices>
 
-	public init(perNetwork: IdentifiedArrayOf<OnNetwork.NextDerivationIndicies>) {
+	public init(perNetwork: IdentifiedArrayOf<OnNetwork.NextDerivationIndices>) {
 		self.perNetwork = perNetwork
 	}
 
-	public init(nextDerivationIndicies: OnNetwork.NextDerivationIndicies) {
-		self.init(perNetwork: .init(uncheckedUniqueElements: [nextDerivationIndicies]))
+	public init(nextDerivationIndices: OnNetwork.NextDerivationIndices) {
+		self.init(perNetwork: .init(uncheckedUniqueElements: [nextDerivationIndices]))
 	}
 
 	public init() {
@@ -50,10 +50,10 @@ public struct NextDerivationIndiciesPerNetwork:
 	}
 }
 
-extension NextDerivationIndiciesPerNetwork {
+extension NextDerivationIndicesPerNetwork {
 	public init(from decoder: Decoder) throws {
 		let singleValueContainer = try decoder.singleValueContainer()
-		try self.init(perNetwork: singleValueContainer.decode(IdentifiedArrayOf<OnNetwork.NextDerivationIndicies>.self))
+		try self.init(perNetwork: singleValueContainer.decode(IdentifiedArrayOf<OnNetwork.NextDerivationIndices>.self))
 	}
 
 	public func encode(to encoder: Encoder) throws {
@@ -62,7 +62,7 @@ extension NextDerivationIndiciesPerNetwork {
 	}
 }
 
-extension NextDerivationIndiciesPerNetwork {
+extension NextDerivationIndicesPerNetwork {
 	public var _description: String {
 		String(describing: perNetwork)
 	}
@@ -78,13 +78,13 @@ extension NextDerivationIndiciesPerNetwork {
 
 // MARK: - DeviceStorage
 public struct DeviceStorage: Sendable, Hashable, Codable {
-	public var nextDerivationIndiciesPerNetwork: NextDerivationIndiciesPerNetwork
-	public init(nextDerivationIndiciesPerNetwork: NextDerivationIndiciesPerNetwork = .init()) {
-		self.nextDerivationIndiciesPerNetwork = nextDerivationIndiciesPerNetwork
+	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
+	public init(nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork = .init()) {
+		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
 	}
 }
 
-extension OnNetwork.NextDerivationIndicies {
+extension OnNetwork.NextDerivationIndices {
 	public func nextForEntity(kind entityKind: EntityKind) -> Index {
 		switch entityKind {
 		case .identity: return forIdentity
@@ -93,13 +93,13 @@ extension OnNetwork.NextDerivationIndicies {
 	}
 }
 
-// MARK: - UnknownNetworkForDerivationIndicies
-struct UnknownNetworkForDerivationIndicies: Swift.Error {}
-extension NextDerivationIndiciesPerNetwork {
+// MARK: - UnknownNetworkForDerivationIndices
+struct UnknownNetworkForDerivationIndices: Swift.Error {}
+extension NextDerivationIndicesPerNetwork {
 	public func nextForEntity(
 		kind entityKind: EntityKind,
 		networkID: Network.ID
-	) -> OnNetwork.NextDerivationIndicies.Index {
+	) -> OnNetwork.NextDerivationIndices.Index {
 		guard let onNetwork = self.perNetwork[id: networkID] else {
 			return 0
 		}
@@ -111,8 +111,8 @@ extension DeviceStorage {
 	public func nextForEntity(
 		kind entityKind: EntityKind,
 		networkID: Network.ID
-	) -> OnNetwork.NextDerivationIndicies.Index {
-		self.nextDerivationIndiciesPerNetwork.nextForEntity(kind: entityKind, networkID: networkID)
+	) -> OnNetwork.NextDerivationIndices.Index {
+		self.nextDerivationIndicesPerNetwork.nextForEntity(kind: entityKind, networkID: networkID)
 	}
 }
 
@@ -147,11 +147,11 @@ extension DeviceStorage {
 		for entityKind: EntityKind,
 		networkID: NetworkID
 	) {
-		nextDerivationIndiciesPerNetwork.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
+		nextDerivationIndicesPerNetwork.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
 	}
 }
 
-extension NextDerivationIndiciesPerNetwork {
+extension NextDerivationIndicesPerNetwork {
 	public mutating func increaseNextDerivationIndex(
 		for entityKind: EntityKind,
 		networkID: NetworkID
@@ -170,7 +170,7 @@ extension NextDerivationIndiciesPerNetwork {
 	}
 }
 
-extension OnNetwork.NextDerivationIndicies {
+extension OnNetwork.NextDerivationIndices {
 	public mutating func increaseNextDerivationIndex(for entityKind: EntityKind) {
 		switch entityKind {
 		case .account: self.forAccount += 1
