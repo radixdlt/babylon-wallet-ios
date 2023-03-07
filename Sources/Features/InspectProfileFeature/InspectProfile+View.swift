@@ -236,6 +236,11 @@ extension AppPreferencesView {
 				p2pClients: appPreferences.p2pClients,
 				indentation: inOneLevel
 			)
+
+			AppSecurityView(
+				security: appPreferences.security,
+				indentation: inOneLevel
+			)
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -253,6 +258,7 @@ extension GatewaysView {
 			ForEach(gateways.all) { gateway in
 				GatewayView(
 					gateway: gateway,
+					isCurrent: self.gateways.current == gateway,
 					indentation: inOneLevel
 				)
 			}
@@ -264,6 +270,7 @@ extension GatewaysView {
 // MARK: - GatewayView
 public struct GatewayView: IndentedView {
 	public let gateway: Gateway
+	public let isCurrent: Bool
 	public let indentation: Indentation
 }
 
@@ -277,6 +284,9 @@ extension GatewayView {
 			#endif // os(macOS)
 			Labeled("Network Name", value: gateway.network.name.rawValue)
 			Labeled("Network ID", value: gateway.network.id.description)
+			if isCurrent {
+				Text("Is current gateway ✅")
+			}
 			Labeled("Gateway API Base URL", value: gateway.url.absoluteString)
 		}
 		.padding([.leading], leadingPadding)
@@ -298,6 +308,26 @@ extension DisplayView {
 				.font(.title)
 			#endif // os(macOS)
 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
+		}
+		.padding([.leading], leadingPadding)
+	}
+}
+
+// MARK: - AppSecurityView
+public struct AppSecurityView: IndentedView {
+	public let security: AppPreferences.Security
+	public let indentation: Indentation
+}
+
+extension AppSecurityView {
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Text("App Security")
+				.fontWeight(.heavy)
+			#if os(macOS)
+				.font(.title)
+			#endif // os(macOS)
+			Labeled("iCloudProfileSyncEnabled", value: String(describing: security.iCloudProfileSyncEnabled))
 		}
 		.padding([.leading], leadingPadding)
 	}
