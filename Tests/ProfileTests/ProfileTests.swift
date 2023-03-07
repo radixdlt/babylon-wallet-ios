@@ -70,7 +70,7 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
-			let index = (try? profile.onNetwork(id: networkID))?.accounts.count ?? 0
+            let index = try profile.factorSources.device.deviceStorage().nextForEntity(kind: .account)
 			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
@@ -98,7 +98,7 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				index: index,
+                appearanceID: .fromIndex(index),
 				displayName: name
 			)
 
@@ -108,8 +108,10 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<OnNetwork.Persona.Field>) throws -> OnNetwork.Persona {
-			let index = (try? profile.onNetwork(id: networkID))?.personas.count ?? 0
-			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
+            
+            let index = try profile.factorSources.device.deviceStorage().nextForEntity(kind: .identity)
+			
+            let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
 				keyKind: .transactionSigningKey
@@ -136,7 +138,6 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				index: index,
 				displayName: name,
 				fields: fields
 			)
@@ -266,7 +267,7 @@ final class ProfileTests: TestCase {
 			XCTAssertEqual(factorSource.hint, creatingDevice)
 		}
 		let deviceFactorSource = profile.factorSources.device
-		XCTAssertEqual(deviceFactorSource.storage?.forDevice, .init(nextDerivationIndicies: .init(forAccount: 0, forIdentity: 0)))
+		XCTAssertEqual(deviceFactorSource.storage?.forDevice, .init(nextDerivationIndicies: .init(forAccount: 3, forIdentity: 2)))
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
 		let networkID = gateway.network.id

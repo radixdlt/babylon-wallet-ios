@@ -20,8 +20,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-03-06T10:51:28Z",
-        "lastUsedOn" : "2023-03-06T10:51:28Z",
+        "firstEstablishedOn" : "2023-03-07T07:25:19Z",
+        "lastUsedOn" : "2023-03-07T07:25:19Z",
         "platform" : "browser"
       },
       {
@@ -36,8 +36,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-03-06T10:51:28Z",
-        "lastUsedOn" : "2023-03-06T10:51:28Z",
+        "firstEstablishedOn" : "2023-03-07T07:25:19Z",
+        "lastUsedOn" : "2023-03-07T07:25:19Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -76,11 +76,11 @@
   "creatingDevice" : "computerRunningUnitTest",
   "factorSources" : [
     {
-      "addedOn" : "2023-03-06T10:51:28Z",
+      "addedOn" : "2023-03-07T07:25:19Z",
       "hint" : "computerRunningUnitTest",
       "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-06T10:51:28Z",
+      "lastUsedOn" : "2023-03-07T07:25:19Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519"
@@ -93,18 +93,18 @@
         "discriminator" : "device",
         "properties" : {
           "nextDerivationIndicies" : {
-            "forAccount" : 0,
-            "forIdentity" : 0
+            "forAccount" : 3,
+            "forIdentity" : 2
           }
         }
       }
     },
     {
-      "addedOn" : "2023-03-06T10:51:28Z",
+      "addedOn" : "2023-03-07T07:25:19Z",
       "hint" : "computerRunningUnitTest",
       "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-06T10:51:28Z",
+      "lastUsedOn" : "2023-03-07T07:25:19Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519",
@@ -134,7 +134,6 @@
           "address" : "account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f",
           "appearanceID" : 0,
           "displayName" : "First",
-          "index" : 0,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -157,7 +156,6 @@
           "address" : "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
           "appearanceID" : 1,
           "displayName" : "Second",
-          "index" : 1,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -180,7 +178,6 @@
           "address" : "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6",
           "appearanceID" : 2,
           "displayName" : "Third",
-          "index" : 2,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -208,8 +205,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "B428922D-8F7C-49F6-9B30-2260AE8587A6",
-                "E8A7853B-CC8E-4512-972C-141A24ECA6A8"
+                "DB491E22-A415-4BBC-A734-D26592683A9C",
+                "E95539AF-ABF2-42B2-8B8B-9E430B646D8E"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -226,8 +223,8 @@
             },
             {
               "fieldIDs" : [
-                "CB8FAAF8-CD22-42D0-9743-915C4981A5BD",
-                "6AB68C84-EB92-4B69-8C08-0599BF5C052E"
+                "2AF9B799-3161-40EC-9263-11038E293C66",
+                "6E51EE57-C3BB-459B-B585-CC01083EECFE"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -251,17 +248,16 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "B428922D-8F7C-49F6-9B30-2260AE8587A6",
+              "id" : "DB491E22-A415-4BBC-A734-D26592683A9C",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "E8A7853B-CC8E-4512-972C-141A24ECA6A8",
+              "id" : "E95539AF-ABF2-42B2-8B8B-9E430B646D8E",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
           ],
-          "index" : 0,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -285,17 +281,16 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "CB8FAAF8-CD22-42D0-9743-915C4981A5BD",
+              "id" : "2AF9B799-3161-40EC-9263-11038E293C66",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "6AB68C84-EB92-4B69-8C08-0599BF5C052E",
+              "id" : "6E51EE57-C3BB-459B-B585-CC01083EECFE",
               "kind" : "lastName",
               "value" : "Publicson"
             }
           ],
-          "index" : 1,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -317,5 +312,5 @@
       ]
     }
   ],
-  "version" : 20
+  "version" : 21
 }
