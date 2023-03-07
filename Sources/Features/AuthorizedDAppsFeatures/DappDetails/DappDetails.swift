@@ -171,7 +171,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .dAppForgotten:
 			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 			state.isDismissed = true
-			return .none
+			return .send(.delegate(.dAppForgotten))
 		}
 	}
 
@@ -180,7 +180,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		return .run { send in
 			try await authorizedDappsClient.forgetAuthorizedDapp(dAppID, networkID)
 			await send(.internal(.dAppForgotten))
-			await send(.delegate(.dAppForgotten))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
