@@ -49,7 +49,7 @@ extension Profile {
 		case let .unsecured(entityControl):
 			let factorSourceID = entityControl.genesisFactorInstance.factorSourceID
 			try self.factorSources.updateFactorSource(id: factorSourceID) {
-				try $0.increaseNextDerivationIndex(for: .identity)
+                try $0.increaseNextDerivationIndex(for: account.kind)
 			}
 		}
 	}

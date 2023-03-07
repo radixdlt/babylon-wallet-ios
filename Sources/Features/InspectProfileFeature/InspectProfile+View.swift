@@ -157,6 +157,11 @@ extension FactorSourceView {
 				.padding()
 				.border(Color.green, width: 2)
 			}
+            
+            if let deviceStore = factorSource.storage?.forDevice {
+                Labeled("Next index for account", value: String(describing: deviceStore.nextDerivationIndicies.forAccount))
+                Labeled("Next index for persona", value: String(describing: deviceStore.nextDerivationIndicies.forIdentity))
+            }
 		}
 		.padding([.leading], leadingPadding)
 		.task {
