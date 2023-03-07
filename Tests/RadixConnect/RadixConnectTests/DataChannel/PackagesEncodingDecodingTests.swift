@@ -5,24 +5,24 @@ import TestingPrelude
 // MARK: - DataChannelMessageEncodingDecodingTests
 @MainActor
 final class DataChannelMessageEncodingDecodingTests: TestCase {
-        let messageID: DataChannelClient.Message.ID = .init(rawValue: "Id")
+	let messageID: DataChannelClient.Message.ID = .init(rawValue: "Id")
 
 	func test_decoding_receiveError() throws {
-                let expectedError = DataChannelClient.Message.receipt(.receiveMessageError(
+		let expectedError = DataChannelClient.Message.receipt(.receiveMessageError(
 			.init(messageId: messageID, error: .messageHashesMismatch)
 		))
 		try assertDecoding(of: expectedError)
 	}
 
 	func test_decoding_receiveMesageConfirmation() throws {
-                let expectedConfirmation = DataChannelClient.Message.receipt(.receiveMessageConfirmation(
+		let expectedConfirmation = DataChannelClient.Message.receipt(.receiveMessageConfirmation(
 			.init(messageId: messageID)
 		))
 		try assertDecoding(of: expectedConfirmation)
 	}
 
 	func test_decoding_encoding_receiveMetaData() throws {
-                let expectedMetaData = DataChannelClient.Message.chunkedMessage(.metaData(
+		let expectedMetaData = DataChannelClient.Message.chunkedMessage(.metaData(
 			.init(
 				messageId: messageID,
 				chunkCount: 3,
@@ -36,7 +36,7 @@ final class DataChannelMessageEncodingDecodingTests: TestCase {
 	}
 
 	func test_decoding_encoding_receiveChunk() throws {
-                let expectedChunk = DataChannelClient.Message.chunkedMessage(.chunk(
+		let expectedChunk = DataChannelClient.Message.chunkedMessage(.chunk(
 			.init(messageId: messageID, chunkIndex: 3, chunkData: Data())
 		))
 		try assertDecoding(of: expectedChunk)
@@ -45,13 +45,13 @@ final class DataChannelMessageEncodingDecodingTests: TestCase {
 
 	// MARK: - Helpers
 
-        private func assertDecoding(of message: DataChannelClient.Message, file: StaticString = #filePath, line: UInt = #line) throws {
+	private func assertDecoding(of message: DataChannelClient.Message, file: StaticString = #filePath, line: UInt = #line) throws {
 		let encoded = try JSONEncoder().encode(message.json)
-                let decoded = try JSONDecoder().decode(DataChannelClient.Message.self, from: encoded)
+		let decoded = try JSONDecoder().decode(DataChannelClient.Message.self, from: encoded)
 		XCTAssertEqual(message, decoded, file: file, line: line)
 	}
 
-        private func assertEncoding(of message: DataChannelClient.Message, file: StaticString = #filePath, line: UInt = #line) throws {
+	private func assertEncoding(of message: DataChannelClient.Message, file: StaticString = #filePath, line: UInt = #line) throws {
 		let encoded = try JSONEncoder().encode(message)
 		let decoded = try JSONDecoder().decode(JSONValue.self, from: encoded)
 		XCTAssertEqual(message.json, decoded, file: file, line: line)

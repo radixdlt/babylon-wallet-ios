@@ -22,7 +22,7 @@ extension P2PClientsClient: DependencyKey {
 			},
 			deleteP2PClientByPassword: { password in
 				try await appPreferencesClient.updating {
-                                        $0.p2pClients.clients.removeAll(where: { $0.connectionPassword == password })
+					$0.p2pClients.clients.removeAll(where: { $0.connectionPassword == password })
 				}
 			}
 		)

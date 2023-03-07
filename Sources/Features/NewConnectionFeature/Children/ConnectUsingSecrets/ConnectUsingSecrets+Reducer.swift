@@ -54,12 +54,12 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 	private enum FocusFieldID {}
 	private enum ConnectID {}
-        
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
 			let connectionPassword = state.connectionPassword
-                        state.isConnecting = true
+			state.isConnecting = true
 			return .run { send in
 				await send(.internal(.establishConnectionResult(
 					TaskResult(catching: {

@@ -26,10 +26,10 @@ final class DataChannelDelegateMock: DataChannelDelegate, Sendable {
 		(receivedMessages, onMessageReceivedContinuation) = AsyncStream<Data>.streamWithContinuation()
 	}
 
-        func receiveIncommingMessage(_ message: DataChannelClient.Message) throws {
+	func receiveIncommingMessage(_ message: DataChannelClient.Message) throws {
 		let data = try JSONEncoder().encode(message)
 		onMessageReceivedContinuation.yield(data)
 	}
 
-        func cancel() {}
+	func cancel() {}
 }

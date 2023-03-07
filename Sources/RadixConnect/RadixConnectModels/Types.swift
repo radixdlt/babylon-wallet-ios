@@ -14,5 +14,5 @@ public enum ConnectionPasswordTag {}
 public typealias ConnectionPassword = Tagged<ConnectionPasswordTag, HexCodable32Bytes>
 
 public extension ConnectionPassword {
-        static let placeholder = try! Self.init(.init(.deadbeef32Bytes))
+	static let placeholder = try! Self(.init(.deadbeef32Bytes))
 }

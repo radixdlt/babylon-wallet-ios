@@ -23,7 +23,7 @@ protocol PeerConnectionDelegate: Sendable {
 
 // MARK: - ICEConnectionState
 public enum ICEConnectionState: String, Sendable {
-        case new, checking, connected, completed, failed, disconnected, closed
+	case new, checking, connected, completed, failed, disconnected, closed
 }
 
 // MARK: - SignalingState

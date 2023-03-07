@@ -25,7 +25,7 @@ final class NewConnectionTests: TestCase {
 			),
 			reducer: NewConnection()
 		)
-                let connectedClient = P2PClient(connectionPassword: .placeholder, displayName: "name")
+		let connectedClient = P2PClient(connectionPassword: .placeholder, displayName: "name")
 
 		await store.send(.child(.connectUsingSecrets(.delegate(.connected(connectedClient)))))
 		await store.receive(.delegate(.newConnection(connectedClient)))
@@ -37,7 +37,7 @@ final class NewConnectionTests: TestCase {
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-                                ConnectUsingSecrets.State(connectionPassword: connection.connectionPassword)
+				ConnectUsingSecrets.State(connectionPassword: connection.connectionPassword)
 			),
 			reducer: NewConnection()
 		)

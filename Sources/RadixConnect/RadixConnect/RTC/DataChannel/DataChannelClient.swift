@@ -38,25 +38,24 @@ actor DataChannelClient {
 	private typealias ChunksWithMetaData = (metaData: Message.ChunkedMessage.MetaDataPackage?,
 	                                        chunks: [Message.ChunkedMessage.ChunkPackage])
 
-        /*
-         TODO: Check if this is really needed.
-         The datachannel messages are ordered, thus it should not be possible to receive mixed chunks from different messages.
-         So, either this can be just an array of `ChunksWithMetaData`, or maybe an extension on AsyncStream to
-         allow collection multiple values in one, like `reduce`
-         */
+	/*
+	 TODO: Check if this is really needed.
+	 The datachannel messages are ordered, thus it should not be possible to receive mixed chunks from different messages.
+	 So, either this can be just an array of `ChunksWithMetaData`, or maybe an extension on AsyncStream to
+	 allow collection multiple values in one, like `reduce`
+	 */
 	private var messagesByID: [Message.ID: ChunksWithMetaData] = [:]
 
-        // MARK: - Incomming Messages
+	// MARK: - Incomming Messages
 
-        /// Incomming messages received over the DataChannel after being assembled.
-        lazy var incommingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incommingChunks
-                .compactMap(handleIncommingChunks)
-                .mapToResult()
-                .handleEvents(onElement: {
-                        try? await self.sendReceiptForResult($0)
-                })
-                .eraseToAnyAsyncSequence()
-
+	/// Incomming messages received over the DataChannel after being assembled.
+	lazy var incommingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incommingChunks
+		.compactMap(handleIncommingChunks)
+		.mapToResult()
+		.handleEvents(onElement: {
+			try? await self.sendReceiptForResult($0)
+		})
+		.eraseToAnyAsyncSequence()
 
 	// MARK: - Initializer
 

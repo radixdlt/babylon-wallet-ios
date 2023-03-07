@@ -38,6 +38,7 @@ extension RTCPeerConnection: PeerConnection {
 	}
 }
 
+// MARK: - RTCPeerConnection + Sendable
 extension RTCPeerConnection: @unchecked Sendable {}
 
 extension RTCMediaConstraints {

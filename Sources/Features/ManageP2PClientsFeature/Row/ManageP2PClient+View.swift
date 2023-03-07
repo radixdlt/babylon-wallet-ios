@@ -40,7 +40,6 @@ extension ManageP2PClient.View {
 					)
 				}
 			}
-
 		}
 	}
 }
@@ -60,15 +59,15 @@ extension ManageP2PClient.View {
 import SwiftUI // NB: necessary for previews to appear
 
 struct ManageP2PClient_Preview: PreviewProvider {
-        static var previews: some View {
-                ManageP2PClient.View(
-                        store: .init(
-                                initialState: .init(client:
-                                                .init(connectionPassword: .placeholder, displayName: "Test")
-                                ),
-                                reducer: ManageP2PClient()
-                        )
-                )
-        }
+	static var previews: some View {
+		ManageP2PClient.View(
+			store: .init(
+				initialState: .init(client:
+					.init(connectionPassword: .placeholder, displayName: "Test")
+				),
+				reducer: ManageP2PClient()
+			)
+		)
+	}
 }
 #endif

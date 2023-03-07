@@ -18,6 +18,6 @@ extension P2PClientsClient: TestDependencyKey {
 	public static let testValue = Self(
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
 		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
-                deleteP2PClientByPassword: unimplemented("\(Self.self).deleteP2PClientByPassword")
+		deleteP2PClientByPassword: unimplemented("\(Self.self).deleteP2PClientByPassword")
 	)
 }

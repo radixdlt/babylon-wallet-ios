@@ -48,24 +48,24 @@ extension DataChannelClient.Message {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 
-                func encodeType() throws {
-                        var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
-                        try keyedContainer.encode(packageType, forKey: .packageType)
-                }
+		func encodeType() throws {
+			var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
+			try keyedContainer.encode(packageType, forKey: .packageType)
+		}
 
 		switch self {
 		case let .chunkedMessage(.chunk(chunk)):
 			try container.encode(chunk)
-                        try encodeType()
+			try encodeType()
 		case let .chunkedMessage(.metaData(metaData)):
 			try container.encode(metaData)
-                        try encodeType()
+			try encodeType()
 		case let .receipt(.receiveMessageConfirmation(confirmation)):
 			try container.encode(confirmation)
-                        try encodeType()
+			try encodeType()
 		case let .receipt(.receiveMessageError(receiveMessageError)):
 			try container.encode(receiveMessageError)
-                        try encodeType()
+			try encodeType()
 		}
 	}
 }

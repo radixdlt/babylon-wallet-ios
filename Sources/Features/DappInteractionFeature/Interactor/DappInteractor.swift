@@ -111,7 +111,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						try await rolaClient.performWellKnownFileCheck(interaction.metadata)
 						await send(.internal(.receivedRequestFromDapp(interactionMessage)))
 					} catch {
-                                                loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
+						loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
 						errorQueue.schedule(error)
 					}
 				}

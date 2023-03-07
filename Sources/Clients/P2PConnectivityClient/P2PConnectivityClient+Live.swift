@@ -12,16 +12,16 @@ extension P2PConnectivityClient {
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		return Self(
-                        loadFromProfileAndConnectAll: {
-                                Task {
-                                        loggerGlobal.info("🔌 Loading and connecting all P2P connections")
-                                        for client in await p2pClientsClient.getP2PClients() {
-                                                try await rtcClients.addExistingClient(client.connectionPassword)
-                                        }
-                                }
-                        },
+			loadFromProfileAndConnectAll: {
+				Task {
+					loggerGlobal.info("🔌 Loading and connecting all P2P connections")
+					for client in await p2pClientsClient.getP2PClients() {
+						try await rtcClients.addExistingClient(client.connectionPassword)
+					}
+				}
+			},
 			disconnectAndRemoveAll: {
-                                loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
+				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
 				await rtcClients.removeAll()
 			},
 			getLocalNetworkAccess: {
@@ -34,7 +34,7 @@ extension P2PConnectivityClient {
 				try await p2pClientsClient.addP2PClient(client)
 			},
 			deleteP2PClientByPassword: { password in
-                                loggerGlobal.info("Deleting P2P Connection")
+				loggerGlobal.info("Deleting P2P Connection")
 				try await p2pClientsClient.deleteP2PClientByPassword(password)
 				await rtcClients.removeClient(password)
 			},

@@ -396,7 +396,7 @@ extension P2PClientView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-                        Labeled("ID", value: String(p2pClient.id.data.hex().mask(showLast: 6)))
+			Labeled("ID", value: String(p2pClient.id.data.hex().mask(showLast: 6)))
 			Labeled("Client Name", value: p2pClient.displayName)
 		}
 		.padding([.leading], leadingPadding)
