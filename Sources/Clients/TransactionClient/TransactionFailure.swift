@@ -33,7 +33,7 @@ extension TransactionFailure {
 		case let .failedToCompileOrSign(error):
 			switch error {
 			case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId, .failedToLoadFactorSourceForSigning:
-				return (errorKind: .failedToCompileTransaction, message: nil)
+				return (errorKind: .failedToCompileTransaction, message: error.errorDescription)
 			case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
 				return (errorKind: .failedToSignTransaction, message: nil)
 			}

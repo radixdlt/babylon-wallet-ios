@@ -299,13 +299,19 @@ extension EngineToolkit {
 		do {
 			let response = try jsonDecoder.decode(Response.self, from: jsonData)
 			return .success(response)
-		} catch let error as Swift.DecodingError {
-			#if DEBUG
-			prettyPrint(responseJSONString: jsonString, error: error, failedToDecodeInto: Response.self)
-			#endif
-			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: error))
-		} catch {
-			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: error)))
+		} catch let firstError {
+			do {
+				/// We might have got an error from the Radix Engine Toolkit, try to decode that as **JSONValue**
+				let jsonValue = try jsonDecoder.decode(JSONValue.self, from: jsonData)
+				return .failure(.errorResponse(jsonValue))
+			} catch let decodingError as Swift.DecodingError {
+				#if DEBUG
+				prettyPrint(responseJSONString: jsonString, error: firstError, failedToDecodeInto: Response.self)
+				#endif
+				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: decodingError))
+			} catch {
+				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: firstError)))
+			}
 		}
 	}
 

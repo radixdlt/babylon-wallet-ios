@@ -56,7 +56,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 				do {
 					let networkID = await gatewaysClient.getCurrentNetworkID()
 					let manifestWithLockFee = try await transactionClient.addLockFeeInstructionToManifest(manifest)
-					let manifestWithLockFeeString = manifestWithLockFee.toString(
+					let manifestWithLockFeeString = try manifestWithLockFee.toString(
 						preamble: "",
 						blobOutputFormat: .includeBlobsByByteCountOnly,
 						blobPreamble: "\n\nBLOBS:\n",
@@ -69,7 +69,11 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 					await send(.internal(.addLockFeeInstructionToManifestResult(.success(result))))
 				} catch let error as TransactionFailure {
 					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(error))))
+				} catch TransactionManifest.ManifestConversionError.manifestGeneration {
+					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(.failedToCompileOrSign(.failedToCompileTXIntent)))))
 				} catch {
+					errorQueue.schedule(error)
+					// this seems like jumping to conclusions, but we can't currently "send" general errors, only TransactionFailure as above
 					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)))))
 				}
 			}
