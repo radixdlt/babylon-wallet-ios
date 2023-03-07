@@ -11,25 +11,25 @@ final class ManifestToStringTests: TestCase {
 
 	func test_transactionManifest_toString_on_multiple_packages() throws {
 		let packages = [
-			try (
-				code: resource(named: "hello", extension: "code"),
-				abi: resource(named: "hello", extension: "abi")
+			(
+				code: try resource(named: "hello", extension: "code"),
+				schema: try resource(named: "hello", extension: "schema")
 			),
-			try (
-				code: resource(named: "hello_world", extension: "code"),
-				abi: resource(named: "hello_world", extension: "abi")
+			(
+				code: try resource(named: "hello_world", extension: "code"),
+				schema: try resource(named: "hello_world", extension: "schema")
 			),
-			try (
-				code: resource(named: "RaDEX", extension: "code"),
-				abi: resource(named: "RaDEX", extension: "abi")
+			(
+				code: try resource(named: "RaDEX", extension: "code"),
+				schema: try resource(named: "RaDEX", extension: "schema")
 			),
-			try (
-				code: resource(named: "account", extension: "code"),
-				abi: resource(named: "account", extension: "abi")
+			(
+				code: try resource(named: "account", extension: "code"),
+				schema: try resource(named: "account", extension: "schema")
 			),
-			try (
-				code: resource(named: "faucet", extension: "code"),
-				abi: resource(named: "faucet", extension: "abi")
+			(
+				code: try resource(named: "faucet", extension: "code"),
+				schema: try resource(named: "faucet", extension: "schema")
 			),
 		]
 
@@ -54,7 +54,7 @@ final class ManifestToStringTests: TestCase {
 				instructions: manifestInstructions,
 				blobs: [
 					[UInt8](package.code),
-					[UInt8](package.abi),
+					[UInt8](package.schema),
 				]
 			)
 
