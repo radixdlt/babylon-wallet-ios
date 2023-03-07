@@ -55,17 +55,17 @@ extension RTCClients {
 		add(client)
 	}
 
-	/// Remove the RTCClient for the given connection password
+	/// Disconnect and remove the RTCClient for the given connection password
 	/// - Parameter password: The connection password identifying the RTCClient
-	public func removeClient(_ password: ConnectionPassword) async {
+	public func disconnectAndRemoveClient(_ password: ConnectionPassword) async {
 		await clients[password]?.cancel()
 		clients.removeValue(forKey: password)
 	}
 
-	/// Remove all RTCClients
-	public func removeAll() async {
+	/// Disconnect and remove all RTCClients
+	public func disconnectAndRemoveAll() async {
 		for id in clients.keys {
-			await removeClient(id)
+			await disconnectAndRemoveClient(id)
 		}
 	}
 
@@ -89,9 +89,19 @@ extension RTCClients {
 	}
 
 	private func makeRTCClient(_ password: ConnectionPassword) throws -> RTCClient {
-		let signalingClient = try SignalingClient(password: password, source: .wallet, baseURL: signalingServerBaseURL)
-		let builder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
-		return RTCClient(id: password, peerConnectionBuilder: builder)
+		let signalingClient = try SignalingClient(
+			password: password,
+			source: .wallet,
+			baseURL: signalingServerBaseURL
+		)
+		let negotiator = PeerConnectionNegotiator(
+			signalingServerClient: signalingClient,
+			factory: peerConnectionFactory
+		)
+		return RTCClient(
+			id: password,
+			peerConnectionNegotiator: negotiator
+		)
 	}
 }
 
@@ -102,7 +112,7 @@ actor RTCClient {
 	let IncomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
 
 	private let IncomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
-	private let peerConnectionBuilder: PeerConnectionNegotiator
+	private let peerConnectionNegotiator: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
 
@@ -111,10 +121,10 @@ actor RTCClient {
 	private var disconnectTask: Task<Void, Never>?
 
 	init(id: ID,
-	     peerConnectionBuilder: PeerConnectionNegotiator)
+	     peerConnectionNegotiator: PeerConnectionNegotiator)
 	{
 		self.id = id
-		self.peerConnectionBuilder = peerConnectionBuilder
+		self.peerConnectionNegotiator = peerConnectionNegotiator
 		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.streamWithContinuation()
 
@@ -140,7 +150,7 @@ extension RTCClient {
 			await peerConnection.cancel()
 		}
 		peerConnections.removeAll()
-		peerConnectionBuilder.cancel()
+		peerConnectionNegotiator.cancel()
 		IncomingMessagesContinuation.finish()
 		disconnectedPeerConnectionContinuation.finish()
 		connectionsTask?.cancel()
@@ -148,7 +158,7 @@ extension RTCClient {
 	}
 
 	func waitForFirstConnection() async throws {
-		_ = try await peerConnectionBuilder.negotiationResults.first().get()
+		_ = try await peerConnectionNegotiator.negotiationResults.first().get()
 	}
 
 	func removePeerConnection(_ id: PeerConnectionID) async {
@@ -168,7 +178,7 @@ extension RTCClient {
 
 	private func listenForPeerConnections() {
 		connectionsTask = Task {
-			for try await connectionResult in peerConnectionBuilder.negotiationResults {
+			for try await connectionResult in peerConnectionNegotiator.negotiationResults {
 				do {
 					try await onPeerConnectionCreated(connectionResult.get())
 				} catch {

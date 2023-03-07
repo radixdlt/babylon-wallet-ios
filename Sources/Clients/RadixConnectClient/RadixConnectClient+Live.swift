@@ -24,7 +24,7 @@ extension RadixConnectClient {
 			},
 			disconnectAndRemoveAll: {
 				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
-				await rtcClients.removeAll()
+				await rtcClients.disconnectAndRemoveAll()
 				do {
 					try await p2pClientsClient.deleteAllP2PClients()
 				} catch {
@@ -33,7 +33,7 @@ extension RadixConnectClient {
 			},
 			disconnectAll: {
 				loggerGlobal.info("🔌 Disconnecting all P2P connections")
-				await rtcClients.removeAll()
+				await rtcClients.disconnectAndRemoveAll()
 			},
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
@@ -47,7 +47,7 @@ extension RadixConnectClient {
 			deleteP2PClientByPassword: { password in
 				loggerGlobal.info("Deleting P2P Connection")
 				try await p2pClientsClient.deleteP2PClientByPassword(password)
-				await rtcClients.removeClient(password)
+				await rtcClients.disconnectAndRemoveClient(password)
 			},
 			addP2PWithPassword: { password in
 				try await rtcClients.connect(password)
