@@ -57,7 +57,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 			case let .connectUsingSecrets(connectUsingSecrets):
 				return .send(
 					.child(.connectUsingSecrets(.delegate(.connected(
-						.init(connectionPassword: connectUsingSecrets.connectionSecrets,
+						.init(connectionPassword: connectUsingSecrets.connectionPassword,
 						      displayName: L10n.NewConnection.defaultNameOfConnection)
 					))))
 				)
@@ -67,6 +67,9 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+                case .connectUsingSecrets(.view(.task)):
+                        return .none
+                        
 		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
 				#if os(iOS)
@@ -88,7 +91,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 			}
 
 		case let .scanQR(.delegate(.connectionSecretsFromScannedQR(connectionSecrets))):
-			state = .connectUsingSecrets(.init(connectionSecrets: connectionSecrets))
+			state = .connectUsingSecrets(.init(connectionPassword: connectionSecrets))
 			return .none
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):

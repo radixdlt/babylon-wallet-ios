@@ -40,7 +40,8 @@ extension ManageP2PClients.View {
 						content: {
 							ManageP2PClient.View(store: $0)
 								.padding(.medium3)
-							Spacer()
+                                                        
+							Separator()
 						}
 					)
 				}

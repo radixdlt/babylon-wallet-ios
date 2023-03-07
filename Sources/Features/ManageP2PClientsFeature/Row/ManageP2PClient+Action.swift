@@ -13,24 +13,15 @@ extension ManageP2PClient {
 extension ManageP2PClient.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case deleteConnectionButtonTapped
-		case viewAppeared
 	}
 }
 
 extension ManageP2PClient.Action {
 	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
-		case system(SystemAction)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case deleteConnection
-	}
-}
-
-// MARK: - ManageP2PClient.Action.InternalAction.SystemAction
-extension ManageP2PClient.Action.InternalAction {
-	public enum SystemAction: Sendable, Equatable {
-//		case connectionStatusResult(TaskResult<ConnectionStatus>)
 	}
 }

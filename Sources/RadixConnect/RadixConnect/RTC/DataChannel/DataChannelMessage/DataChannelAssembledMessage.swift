@@ -29,7 +29,7 @@ extension DataChannelClient.AssembledMessage {
 		chunks: [DataChannelClient.Message.ChunkedMessage.ChunkPackage],
 		metaData: DataChannelClient.Message.ChunkedMessage.MetaDataPackage
 	) throws -> Self {
-		// For now ther is only one error type that can be handled in any manner - `messageHashesMismatch`
+		// For now there is only one error type that can be handled in any manner - `messageHashesMismatch`
 		// thus, collapse all possible errors in this one.
 		func error() -> DataChannelClient.Message.Receipt.ReceiveError {
 			.init(messageId: metaData.messageId, error: .messageHashesMismatch)

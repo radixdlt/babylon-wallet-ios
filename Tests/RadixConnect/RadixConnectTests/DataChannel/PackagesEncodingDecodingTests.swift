@@ -5,24 +5,24 @@ import TestingPrelude
 // MARK: - DataChannelMessageEncodingDecodingTests
 @MainActor
 final class DataChannelMessageEncodingDecodingTests: TestCase {
-	let messageID: DataChannelMessageID = .init(rawValue: "Id")
+        let messageID: DataChannelClient.Message.ID = .init(rawValue: "Id")
 
 	func test_decoding_receiveError() throws {
-		let expectedError = DataChannelMessage.receipt(.receiveMessageError(
+                let expectedError = DataChannelClient.Message.receipt(.receiveMessageError(
 			.init(messageId: messageID, error: .messageHashesMismatch)
 		))
 		try assertDecoding(of: expectedError)
 	}
 
 	func test_decoding_receiveMesageConfirmation() throws {
-		let expectedConfirmation = DataChannelMessage.receipt(.receiveMessageConfirmation(
+                let expectedConfirmation = DataChannelClient.Message.receipt(.receiveMessageConfirmation(
 			.init(messageId: messageID)
 		))
 		try assertDecoding(of: expectedConfirmation)
 	}
 
 	func test_decoding_encoding_receiveMetaData() throws {
-		let expectedMetaData = DataChannelMessage.chunkedMessage(.metaData(
+                let expectedMetaData = DataChannelClient.Message.chunkedMessage(.metaData(
 			.init(
 				messageId: messageID,
 				chunkCount: 3,
@@ -36,7 +36,7 @@ final class DataChannelMessageEncodingDecodingTests: TestCase {
 	}
 
 	func test_decoding_encoding_receiveChunk() throws {
-		let expectedChunk = DataChannelMessage.chunkedMessage(.chunk(
+                let expectedChunk = DataChannelClient.Message.chunkedMessage(.chunk(
 			.init(messageId: messageID, chunkIndex: 3, chunkData: Data())
 		))
 		try assertDecoding(of: expectedChunk)
@@ -45,13 +45,13 @@ final class DataChannelMessageEncodingDecodingTests: TestCase {
 
 	// MARK: - Helpers
 
-	private func assertDecoding(of message: DataChannelMessage, file: StaticString = #filePath, line: UInt = #line) throws {
+        private func assertDecoding(of message: DataChannelClient.Message, file: StaticString = #filePath, line: UInt = #line) throws {
 		let encoded = try JSONEncoder().encode(message.json)
-		let decoded = try JSONDecoder().decode(DataChannelMessage.self, from: encoded)
+                let decoded = try JSONDecoder().decode(DataChannelClient.Message.self, from: encoded)
 		XCTAssertEqual(message, decoded, file: file, line: line)
 	}
 
-	private func assertEncoding(of message: DataChannelMessage, file: StaticString = #filePath, line: UInt = #line) throws {
+        private func assertEncoding(of message: DataChannelClient.Message, file: StaticString = #filePath, line: UInt = #line) throws {
 		let encoded = try JSONEncoder().encode(message)
 		let decoded = try JSONDecoder().decode(JSONValue.self, from: encoded)
 		XCTAssertEqual(message.json, decoded, file: file, line: line)
@@ -60,7 +60,7 @@ final class DataChannelMessageEncodingDecodingTests: TestCase {
 
 // MARK: - JSON format According to CAP-21
 
-extension DataChannelMessage.Receipt.ReceiveError {
+extension DataChannelClient.Message.Receipt.ReceiveError {
 	var json: JSONValue {
 		.dictionary([
 			"packageType": .string("receiveMessageError"),
@@ -70,7 +70,7 @@ extension DataChannelMessage.Receipt.ReceiveError {
 	}
 }
 
-extension DataChannelMessage.Receipt.ReceiveConfirmation {
+extension DataChannelClient.Message.Receipt.ReceiveConfirmation {
 	var json: JSONValue {
 		.dictionary([
 			"packageType": .string("receiveMessageConfirmation"),
@@ -79,7 +79,7 @@ extension DataChannelMessage.Receipt.ReceiveConfirmation {
 	}
 }
 
-extension DataChannelMessage.ChunkedMessage.MetaDataPackage {
+extension DataChannelClient.Message.ChunkedMessage.MetaDataPackage {
 	var json: JSONValue {
 		.dictionary([
 			"packageType": .string("metaData"),
@@ -91,7 +91,7 @@ extension DataChannelMessage.ChunkedMessage.MetaDataPackage {
 	}
 }
 
-extension DataChannelMessage.ChunkedMessage.ChunkPackage {
+extension DataChannelClient.Message.ChunkedMessage.ChunkPackage {
 	var json: JSONValue {
 		.dictionary([
 			"packageType": .string("chunk"),
@@ -102,7 +102,7 @@ extension DataChannelMessage.ChunkedMessage.ChunkPackage {
 	}
 }
 
-extension DataChannelMessage {
+extension DataChannelClient.Message {
 	var json: JSONValue {
 		switch self {
 		case let .chunkedMessage(.metaData(metaData)):

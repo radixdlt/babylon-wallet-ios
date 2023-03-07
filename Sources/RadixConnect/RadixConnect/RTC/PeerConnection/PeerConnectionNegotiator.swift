@@ -131,27 +131,25 @@ struct PeerConnectionNegotiator {
 			}
 		}
 
-		try await role.doAsync(
-			ifOfferer: { offer in
-				try await peerConnectionClient.setRemoteOffer(offer.content)
-				log("Remote Offer was configured as local description")
+                switch role {
+                case let .left(offer):
+                        try await peerConnectionClient.setRemoteOffer(offer.content)
+                        log("Remote Offer was configured as local description")
 
-				let localAnswer = try await peerConnectionClient.createAnswer()
-				log("Created Answer")
+                        let localAnswer = try await peerConnectionClient.createAnswer()
+                        log("Created Answer")
 
-				try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
-				log("Sent Answer to remote client")
-			},
-			ifAnswerer: { _ in
-				let offer = try await peerConnectionClient.createLocalOffer()
-				try await signalingServerClient.sendToRemote(.init(content: .offer(offer), id: clientID))
-				log("Sent Offer to remote client")
+                        try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
+                        log("Sent Answer to remote client")
+                case let .right(answerrerID):
+                        let offer = try await peerConnectionClient.createLocalOffer()
+                        try await signalingServerClient.sendToRemote(.init(content: .offer(offer), id: answerrerID))
+                        log("Sent Offer to remote client")
 
-				let answer = try await signalingServerClient.onAnswer.filter { $0.id == clientID }.prefix(1).collect().first!
-				try await peerConnectionClient.setRemoteAnswer(answer.content)
-				log("Received and configured remote Answer")
-			}
-		)
+                        let answer = try await signalingServerClient.onAnswer.filter { $0.id == answerrerID }.prefix(1).collect().first!
+                        try await peerConnectionClient.setRemoteAnswer(answer.content)
+                        log("Received and configured remote Answer")
+                }
 
 		_ = try await onConnectionEstablished.collect()
 		log("Connection established")

@@ -40,8 +40,8 @@ extension RemoteClientID {
 	}
 }
 
-extension RequestID {
-	static var any: RequestID {
+extension SignalingClient.ClientMessage.RequestID {
+	static var any: Self {
 		.init(rawValue: UUID().uuidString)
 	}
 }

@@ -19,21 +19,17 @@ final class DataChannelMock: DataChannel {
 
 // MARK: - DataChannelDelegateMock
 final class DataChannelDelegateMock: DataChannelDelegate, Sendable {
-	func cancel() {}
-
-	let onMessageReceived: AsyncStream<Data>
-	let onReadyState: AsyncStream<DataChannelState>
-
+	let receivedMessages: AsyncStream<Data>
 	private let onMessageReceivedContinuation: AsyncStream<Data>.Continuation
-	private let onReadyStateContinuation: AsyncStream<DataChannelState>.Continuation
 
 	init() {
-		(onMessageReceived, onMessageReceivedContinuation) = AsyncStream<Data>.streamWithContinuation()
-		(onReadyState, onReadyStateContinuation) = AsyncStream<DataChannelState>.streamWithContinuation()
+		(receivedMessages, onMessageReceivedContinuation) = AsyncStream<Data>.streamWithContinuation()
 	}
 
-	func receiveIncommingMessage(_ message: DataChannelMessage) throws {
+        func receiveIncommingMessage(_ message: DataChannelClient.Message) throws {
 		let data = try JSONEncoder().encode(message)
 		onMessageReceivedContinuation.yield(data)
 	}
+
+        func cancel() {}
 }

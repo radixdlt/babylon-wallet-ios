@@ -21,12 +21,12 @@ protocol DataChannelDelegate: Sendable {
 // MARK: - DataChannelClient
 /// The client that manages the communication over RTCDataChannel.
 actor DataChannelClient {
-	// Configuration
+	// MARK: - Configuration
 	private let jsonDecoder: JSONDecoder = .init()
 	private let jsonEncoder: JSONEncoder = .init()
 	private let dataChannel: DataChannel
 	private let delegate: DataChannelDelegate
-	private let idBuilder: @Sendable () -> Message.ID
+	private let messageIDBuilder: @Sendable () -> Message.ID
 
 	// MARK: - Streams
 
@@ -34,18 +34,29 @@ actor DataChannelClient {
 	private let incommingReceipts: AnyAsyncSequence<Message.Receipt>
 	private let incommingChunks: AnyAsyncSequence<Message.ChunkedMessage>
 
-	lazy var incommingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incommingChunks
-		.compactMap(handleIncommingChunks)
-		.mapToResult()
-		.handleEvents(onElement: {
-			try? await self.sendReceiptForResult($0)
-		})
-		.eraseToAnyAsyncSequence()
-
 	// Mutable State
 	private typealias ChunksWithMetaData = (metaData: Message.ChunkedMessage.MetaDataPackage?,
 	                                        chunks: [Message.ChunkedMessage.ChunkPackage])
+
+        /*
+         TODO: Check if this is really needed.
+         The datachannel messages are ordered, thus it should not be possible to receive mixed chunks from different messages.
+         So, either this can be just an array of `ChunksWithMetaData`, or maybe an extension on AsyncStream to
+         allow collection multiple values in one, like `reduce`
+         */
 	private var messagesByID: [Message.ID: ChunksWithMetaData] = [:]
+
+        // MARK: - Incomming Messages
+
+        /// Incomming messages received over the DataChannel after being assembled.
+        lazy var incommingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incommingChunks
+                .compactMap(handleIncommingChunks)
+                .mapToResult()
+                .handleEvents(onElement: {
+                        try? await self.sendReceiptForResult($0)
+                })
+                .eraseToAnyAsyncSequence()
+
 
 	// MARK: - Initializer
 
@@ -56,7 +67,7 @@ actor DataChannelClient {
 	) {
 		self.dataChannel = dataChannel
 		self.delegate = delegate
-		self.idBuilder = idBuilder
+		self.messageIDBuilder = idBuilder
 
 		self.incommingMessages = delegate
 			.receivedMessages
@@ -74,7 +85,7 @@ actor DataChannelClient {
 	}
 
 	func sendMessage(_ data: Data) async throws {
-		let id = idBuilder()
+		let id = messageIDBuilder()
 		let assembledMessage = AssembledMessage(
 			message: data,
 			id: id
@@ -84,7 +95,7 @@ actor DataChannelClient {
 			try sendMessageOverDataChannel(.chunkedMessage($0))
 		}
 
-		// TODO: Add timeout
+		// TODO: Add timeout. What to do in case of timeout -> throw error? recend the message?
 		try await waitForMessageConfirmation(id)
 	}
 

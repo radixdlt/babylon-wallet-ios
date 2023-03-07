@@ -6,8 +6,7 @@ import TestingPrelude
 @MainActor
 final class SignalingServerNegotiationTests: TestCase {
 	// Static config
-	static let connectionID = try! SignalingServerConnectionID(.init(.deadbeef32Bytes))
-	static let encryptionKey = try! EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
+        static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 	lazy var jsonDecoder: JSONDecoder = {
 		let decoder = JSONDecoder()
 		decoder.userInfo[.clientMessageEncryptonKey] = Self.encryptionKey
@@ -24,8 +23,7 @@ final class SignalingServerNegotiationTests: TestCase {
 	let dataChannelClient = DataChannelClient(dataChannel: DataChannelMock(), delegate: DataChannelDelegateMock())
 	let webSocketClient = MockWebSocketClient()
 	lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
-	                                           webSocketClient: webSocketClient,
-	                                           connectionID: Self.connectionID)
+	                                           transport: webSocketClient)
 
 	func test_makePeerConnection_happyFlow() async throws {
 		let remoteClientID = RemoteClientID.any
@@ -34,7 +32,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await conenctionBuilder.peerConnections.prefix(1).collect()
+                        try await conenctionBuilder.negotiationResults.prefix(1).collect()
 		}
 
 		// Negotiate the PeerConnection
@@ -42,7 +40,7 @@ final class SignalingServerNegotiationTests: TestCase {
 
 		// Await for PeerConnection to be estblished
 		let result = try await peerConnectionTask.value.first!
-		XCTAssertEqual(result.map(\.id), .success(.init(remoteClientID)))
+                XCTAssertEqual(result.map(\.id), .success(.init(remoteClientID.rawValue)))
 	}
 
 	func test_makePeerConnection_parallelNegotiation() async throws {
@@ -61,7 +59,7 @@ final class SignalingServerNegotiationTests: TestCase {
 
 		let peerConnectionTask = Task {
 			// Await for 4 PeerConnection to be made
-			try await conenctionBuilder.peerConnections.prefix(4).collect()
+			try await conenctionBuilder.negotiationResults.prefix(4).collect()
 		}
 
 		// Trigger negotiations
@@ -85,22 +83,22 @@ final class SignalingServerNegotiationTests: TestCase {
 		// Assert that the result for all negotiations are returns
 
 		/// We are interested only comparing the created `PeerConnectionClient.id`'s, or the failure
-		let result: [PeerConnectionId: Result<PeerConnectionId, PeerConnectionBuilder.FailedToCreatePeerConnectionError>] = try await peerConnectionTask
+                let result: [PeerConnectionClient.ID: Result<PeerConnectionClient.ID, PeerConnectionNegotiator.FailedToCreatePeerConnectionError>] = try await peerConnectionTask
 			.value
 			.reduce(into: [:]) { partialResult, nextResult in
 				switch nextResult {
 				case let .success(peerConnection):
 					partialResult[peerConnection.id] = .success(peerConnection.id)
 				case let .failure(failure):
-					partialResult[.init(failure.remoteClientId)] = .failure(failure)
+                                        partialResult[.init(failure.remoteClientId.rawValue)] = .failure(failure)
 				}
 			}
 
-		let expectedResults: [PeerConnectionId: Result<PeerConnectionId, PeerConnectionBuilder.FailedToCreatePeerConnectionError>] = [
-			.init(remoteClientId1): .success(.init(remoteClientId1)),
-			.init(remoteClientId2): .success(.init(remoteClientId2)),
-			.init(remoteClientId3): .success(.init(remoteClientId3)),
-			.init(remoteClientId4): .failure(PeerConnectionBuilder.FailedToCreatePeerConnectionError(remoteClientId: remoteClientId4, underlyingError: NSError(domain: "dom", code: 1))),
+                let expectedResults: [PeerConnectionClient.ID: Result<PeerConnectionClient.ID, PeerConnectionNegotiator.FailedToCreatePeerConnectionError>] = [
+                        .init(remoteClientId1.rawValue): .success(.init(remoteClientId1.rawValue)),
+                        .init(remoteClientId2.rawValue): .success(.init(remoteClientId2.rawValue)),
+                        .init(remoteClientId3.rawValue): .success(.init(remoteClientId3.rawValue)),
+                        .init(remoteClientId4.rawValue): .failure(PeerConnectionNegotiator.FailedToCreatePeerConnectionError(remoteClientId: remoteClientId4, underlyingError: NSError(domain: "dom", code: 1))),
 		]
 
 		XCTAssertEqual(result, expectedResults)
@@ -113,7 +111,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await conenctionBuilder.peerConnections.prefix(1).collect().first!
+			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
 		}
 
 		try webSocketClient.receiveIncommingMessage(
@@ -137,7 +135,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await conenctionBuilder.peerConnections.prefix(1).collect().first!
+			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
 		}
 
 		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
@@ -157,7 +155,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await conenctionBuilder.peerConnections.prefix(1).collect().first!
+			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
 		}
 
 		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
@@ -165,7 +163,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		await peerConnection.onLocalAnswerCreated()
 		peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
 
-		let message = try await jsonDecoder.decode(ClientMessage.self, from: webSocketClient.onClientMessageSent())
+                let message = try await jsonDecoder.decode(SignalingClient.ClientMessage.self, from: webSocketClient.onClientMessageSent())
 		webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
 		let result = try await peerConnectionTask.value
 
@@ -285,7 +283,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let sentMessage = try await webSocketClient
 			.sentMessagesSequence
 			.map {
-				try await self.jsonDecoder.decode(ClientMessage.self, from: $0)
+                                try await self.jsonDecoder.decode(SignalingClient.ClientMessage.self, from: $0)
 			}
 			.filter {
 				$0.targetClientId == primitive.id && $0.primitive == primitive.content
@@ -298,12 +296,12 @@ final class SignalingServerNegotiationTests: TestCase {
 
 	/// Creates a client message that is to be received from remote client
 	func makeClientMessage(_ primitive: IdentifiedPrimitive<RTCPrimitive>) throws -> JSONValue {
-		let requestId = RequestID.any.rawValue
+                let requestId = SignalingClient.ClientMessage.RequestID.any.rawValue
 		let encoded = try jsonEncoder.encode(primitive.content.payload)
 		let encrypted = try Self.encryptionKey.encrypt(data: encoded)
 		let data = JSONValue.dictionary([
 			"requestId": .string(requestId),
-			"method": .string(ClientMessage.Method(from: primitive.content).rawValue),
+                        "method": .string(SignalingClient.ClientMessage.Method(from: primitive.content).rawValue),
 			"targetClientId": .string(UUID().uuidString),
 			"encryptedPayload": .string(encrypted.hex),
 		])
@@ -323,7 +321,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let peerConnection = MockPeerConnection(dataChannel: .success(dataChannelClient))
 		let delegate = MockPeerConnectionDelegate()
 		return (
-			try! PeerConnectionClient(id: .init(remoteClientID), peerConnection: peerConnection, delegate: delegate),
+                        try! PeerConnectionClient(id: .init(remoteClientID.rawValue), peerConnection: peerConnection, delegate: delegate),
 			peerConnection,
 			delegate
 		)

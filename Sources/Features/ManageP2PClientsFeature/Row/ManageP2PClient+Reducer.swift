@@ -12,9 +12,6 @@ extension ManageP2PClient {
 	private enum ConnectionUpdateTasksID {}
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.viewAppeared)):
-			return .none
-
 		case .internal(.view(.deleteConnectionButtonTapped)):
 			return .run { send in
 				await send(.delegate(.deleteConnection))

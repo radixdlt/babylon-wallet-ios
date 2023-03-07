@@ -4,7 +4,7 @@ import RadixConnect
 // MARK: - ConnectUsingSecrets
 public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var connectionSecrets: ConnectionPassword
+		public var connectionPassword: ConnectionPassword
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
@@ -12,7 +12,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 		@BindableState public var focusedField: Field?
 
 		public init(
-			connectionSecrets: ConnectionPassword,
+			connectionPassword: ConnectionPassword,
 			isConnecting: Bool = true,
 			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
@@ -20,7 +20,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			isNameValid: Bool = false
 		) {
 			self.focusedField = focusedField
-			self.connectionSecrets = connectionSecrets
+			self.connectionPassword = connectionPassword
 			self.isConnecting = isConnecting
 			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
@@ -54,15 +54,16 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 	private enum FocusFieldID {}
 	private enum ConnectID {}
-	public func reduce(into state: inout State, action: ViewAction) -> EffectTask<Action> {
-		switch action {
+        
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
 		case .task:
-			let connectionPassword = state.connectionSecrets
-
+			let connectionPassword = state.connectionPassword
+                        state.isConnecting = true
 			return .run { send in
 				await send(.internal(.establishConnectionResult(
 					TaskResult(catching: {
-						try await p2pConnectivityClient.addP2PWithSecrets(connectionPassword)
+						try await p2pConnectivityClient.addP2PWithPassword(connectionPassword)
 						return connectionPassword
 					})
 				)))
@@ -93,7 +94,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmNameButtonTapped:
-			let p2pClient = P2PClient(connectionPassword: state.connectionSecrets, displayName: state.nameOfConnection)
+			let p2pClient = P2PClient(connectionPassword: state.connectionPassword, displayName: state.nameOfConnection)
 			return .run { send in
 				await send(.internal(.cancelOngoingEffects))
 				await send(.delegate(.connected(p2pClient)))

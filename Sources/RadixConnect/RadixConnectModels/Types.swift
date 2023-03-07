@@ -12,3 +12,7 @@ extension PeerConnectionID: Sendable {}
 /// The ConnectionPassword to be used to connect to the SignalingServer.
 public enum ConnectionPasswordTag {}
 public typealias ConnectionPassword = Tagged<ConnectionPasswordTag, HexCodable32Bytes>
+
+public extension ConnectionPassword {
+        static let placeholder = try! Self.init(.init(.deadbeef32Bytes))
+}

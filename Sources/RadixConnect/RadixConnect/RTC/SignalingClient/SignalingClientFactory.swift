@@ -17,6 +17,12 @@ extension SignalingClient {
 extension SignalingClient {
 	static let prodSignalingServer = URL(string: "wss://signaling-server-betanet.radixdlt.com")!
 	static let devSignalingServer = URL(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
+
+        #if DEBUG
+        static let `default` = SignalingClient.devSignalingServer
+        #else
+        static let `default` = SignalingClient.prodSignalingServer
+        #endif
 }
 
 /// Signaling Server URL build

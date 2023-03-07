@@ -56,7 +56,7 @@ extension ManageP2PClients {
 		case let .child(.connection(id, .delegate(.deleteConnection))):
 			return .task {
 				let result = await TaskResult {
-					try await p2pConnectivityClient.deleteP2PClientByID(id)
+					try await p2pConnectivityClient.deleteP2PClientByPassword(id)
 					return id
 				}
 				return .internal(.system(.deleteConnectionResult(result)))

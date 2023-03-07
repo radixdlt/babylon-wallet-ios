@@ -86,16 +86,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 				await p2pConnectivityClient.loadFromProfileAndConnectAll()
 				let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
-				for try await message in await p2pConnectivityClient.receiveMessages() {
+				for try await incommingMessageResult in await p2pConnectivityClient.receiveMessages() {
 					guard !Task.isCancelled else {
 						return
 					}
 
 					do {
-						let interactionMessage = try message.unwrapResult()
-						let interaction = interactionMessage.content.content
+						let interactionMessage = try incommingMessageResult.unwrapResult()
+						let interaction = interactionMessage.peerMessage.content
 						guard interaction.metadata.networkId == currentNetworkID else {
-							let interaction = interaction
 							let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
 							let currentNetwork = try Network.lookupBy(id: currentNetworkID)
 							let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
@@ -112,7 +111,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						try await rolaClient.performWellKnownFileCheck(interaction.metadata)
 						await send(.internal(.receivedRequestFromDapp(interactionMessage)))
 					} catch {
-						loggerGlobal.error("Failed to create Peer Connection")
+                                                loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
 						errorQueue.schedule(error)
 					}
 				}
@@ -202,7 +201,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .some(.dappInteractionCompletion):
 			return .send(.child(.modal(.presented(.dappInteractionCompletion(.delegate(.dismiss))))))
 		case .none:
-			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.content.content)))
+			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.peerMessage.content)))
 			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
 		default:
 			return .none
@@ -253,7 +252,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		.run { send in
 			_ = try await p2pConnectivityClient.sendMessage(response)
-			await send(.internal(.sentResponseToDapp(response.content.content, for: request, dappMetadata)))
+			await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
 		} catch: { error, send in
 			await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
 		}

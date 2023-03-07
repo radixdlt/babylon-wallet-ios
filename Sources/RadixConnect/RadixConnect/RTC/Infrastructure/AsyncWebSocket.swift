@@ -1,5 +1,6 @@
 import Foundation
 import Prelude
+import Network
 
 // MARK: - DispatchQueue.SchedulerOptions + Sendable
 extension DispatchQueue.SchedulerOptions: @unchecked Sendable {}
@@ -8,8 +9,16 @@ extension DispatchQueue.SchedulerOptions: @unchecked Sendable {}
 extension DispatchQueue.SchedulerTimeType.Stride: @unchecked Sendable {}
 
 // MARK: - AsyncWebSocket
+
+/*
+ A WebSocket implementation with AsyncAPI.
+ One of the main functionality of this component is the recovering after
+ any possible error: send/receive errors, aswell intternet connection going down.
+ This is very crucial, failing to reconnect the websocket will result in inability to establish new peer connections.
+ */
 public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	struct UnknownMessageTypeError: Error {}
+        struct NoSessionAvailableError: Error {}
 
 	// MARK: - Configuration
 	struct WebSocketSession {
@@ -24,6 +33,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		static let `default` = Config(reconnectDelay: 5, pingInterval: 60)
 	}
 
+        let monitor = NWPathMonitor()
 	private let url: URL
 	private let sessionConfig: URLSessionConfiguration
 	private var session: WebSocketSession?
@@ -36,24 +46,46 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	// MARK: - Internal API
 	let incommingMessages: AsyncStream<Data>
 
-	init(url: URL, sessionConfig: URLSessionConfiguration = .default, scheduler: AnySchedulerOf<DispatchQueue> = DispatchQueue.global().eraseToAnyScheduler()) {
-		self.url = url
+        init(
+                url: URL,
+                sessionConfig: URLSessionConfiguration = .default,
+                scheduler: AnySchedulerOf<DispatchQueue> = DispatchQueue.global().eraseToAnyScheduler()
+        ) {
+                self.url = url
 		self.sessionConfig = sessionConfig
-		self.sessionConfig.waitsForConnectivity = true
+                // Will wait for the internet connection to be re-established in case of a disconnect
+//		self.sessionConfig.waitsForConnectivity = true
 		self.scheduler = scheduler
 
 		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
 
 		super.init()
 		Task { await self.startSession() }
+
+                monitor.pathUpdateHandler = { path in
+                        switch path.status {
+                        case .unsatisfied:
+                                Task {
+                                        await self.invalidateAndRestartSession()
+                                }
+                        default:
+                                break
+                        }
+                        print("Network monitor \(path)")
+                }
+
+                let queue = DispatchQueue(label: "Monitor")
+                monitor.start(queue: queue)
 	}
 
 	func send(message: Data) async throws {
 		guard let session else {
 			loggerGlobal.info("WebSocket: Attempt to send message when session was invalidated")
 			await invalidateAndRestartSession()
-			try await send(message: message)
-			return
+                        // We could attemtpt to send the message after connection was established,
+                        // but most probably the other client will not expect to receive it, since
+                        // it will receive `remoteClientDidDisconnect` from the SS.
+                        throw NoSessionAvailableError()
 		}
 		do {
 			try await session.task.send(.data(message))
@@ -68,6 +100,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	func cancel() async {
 		incommingMessagesContinuation.finish()
 		invalidateSession()
+                monitor.cancel()
 	}
 
 	// MARK: - Private API
@@ -103,7 +136,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 			Task {
 				await self.receiveMessages()
 				await self.sendPingContinuously()
-				loggerGlobal.info("WebSocket: Session Restarted")
+				loggerGlobal.info("WebSocket: Session Started")
 			}
 		})
 

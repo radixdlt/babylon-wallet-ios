@@ -4,10 +4,9 @@ public extension P2P {
 	typealias RTCIncommingMessageResult = RTCIncommingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
 	typealias RTCIncommingWalletInteraction = RTCIncommingMessage<P2P.FromDapp.WalletInteraction>
 
-	// MARK: - RTCIncommingMessage
 	struct RTCIncommingMessage<PeerConnectionContent: Sendable>: Sendable {
 		public let connectionId: ConnectionPassword
-		public let content: PeerConnectionMessage
+		public let peerMessage: PeerConnectionMessage
 
 		public struct PeerConnectionMessage: Sendable {
 			public let peerConnectionId: PeerConnectionID
@@ -21,14 +20,13 @@ public extension P2P {
 
 		public init(connectionId: ConnectionPassword, content: PeerConnectionMessage) {
 			self.connectionId = connectionId
-			self.content = content
+			self.peerMessage = content
 		}
 	}
 
-	// MARK: - RTCOutgoingMessage
 	struct RTCOutgoingMessage: Sendable, Hashable {
 		public let connectionId: ConnectionPassword
-		public let content: PeerConnectionMessage
+		public let peerMessage: PeerConnectionMessage
 
 		public struct PeerConnectionMessage: Sendable, Hashable {
 			public let peerConnectionId: PeerConnectionID
@@ -42,7 +40,7 @@ public extension P2P {
 
 		public init(connectionId: ConnectionPassword, content: PeerConnectionMessage) {
 			self.connectionId = connectionId
-			self.content = content
+			self.peerMessage = content
 		}
 	}
 }
@@ -50,14 +48,15 @@ public extension P2P {
 public extension P2P.RTCIncommingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
 	func unwrapResult() throws -> P2P.RTCIncommingWalletInteraction {
 		try .init(connectionId: connectionId,
-		          content: .init(peerConnectionId: content.peerConnectionId, content: content.content.get()))
+		          content: .init(peerConnectionId: peerMessage.peerConnectionId, content: peerMessage.content.get()))
 	}
 }
 
 public extension P2P.RTCIncommingMessage {
+        /// Transforms to an OutgoingMessage by preserving the RTCClient and PeerConnection IDs
 	func toOutgoingMessage(_ response: P2P.ToDapp.WalletInteractionResponse) -> P2P.RTCOutgoingMessage {
 		.init(connectionId: connectionId,
-		      content: .init(peerConnectionId: content.peerConnectionId,
+		      content: .init(peerConnectionId: peerMessage.peerConnectionId,
 		                     content: response))
 	}
 }

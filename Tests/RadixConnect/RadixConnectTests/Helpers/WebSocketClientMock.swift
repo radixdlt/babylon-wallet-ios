@@ -37,7 +37,7 @@ final class MockWebSocketClient: SignalingTransport, Sendable {
 		messagesStreamContinuation.yield(encoded)
 	}
 
-	func respondToRequest(message: IncommingMessage.FromSignalingServer.ResponseForRequest) {
+        func respondToRequest(message: SignalingClient.IncommingMessage.FromSignalingServer.ResponseForRequest) {
 		receiveIncommingMessage(message.json)
 	}
 

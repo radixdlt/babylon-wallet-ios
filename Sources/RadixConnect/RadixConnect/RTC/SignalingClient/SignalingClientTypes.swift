@@ -32,7 +32,3 @@ extension SignalingClient.EncryptionKey {
 			.combined!
 	}
 }
-
-// MARK: - SDPTag
-enum SDPTag {}
-typealias SDP = Tagged<SDPTag, String>

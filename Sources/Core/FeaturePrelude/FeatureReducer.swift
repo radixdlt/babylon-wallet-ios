@@ -34,6 +34,7 @@ extension ReducerProtocol where Self: FeatureReducer {
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .view(viewAction):
+                print("Reducing action: \(viewAction), over state: \(state)")
 			return reduce(into: &state, viewAction: viewAction)
 		case let .internal(internalAction):
 			return reduce(into: &state, internalAction: internalAction)
@@ -45,7 +46,7 @@ extension ReducerProtocol where Self: FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		.none
+		return .none
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {

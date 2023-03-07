@@ -28,11 +28,11 @@ public actor RTCClients {
 	// MARK: - Initialisers
 
 	public init() {
-		self.init(peerConnectionFactory: WebRTCFactory(), signalingServerBaseURL: SignalingClient.prodSignalingServer)
+		self.init(peerConnectionFactory: WebRTCFactory())
 	}
 
 	init(peerConnectionFactory: PeerConnectionFactory,
-	     signalingServerBaseURL: URL)
+             signalingServerBaseURL: URL = SignalingClient.default)
 	{
 		self.peerConnectionFactory = peerConnectionFactory
 		self.signalingServerBaseURL = signalingServerBaseURL
@@ -83,7 +83,7 @@ public actor RTCClients {
 			throw RTCClientDidCloseError()
 		}
 
-		try await rtcClient.sendMessage(message.content)
+		try await rtcClient.sendMessage(message.peerMessage)
 	}
 
 	// MARK: - Private

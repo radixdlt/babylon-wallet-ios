@@ -1,4 +1,4 @@
-// MARK: - Either
+// From -> https://github.com/pointfreeco/swift-either
 public enum Either<Left, Right> {
 	case left(Left)
 	case right(Right)

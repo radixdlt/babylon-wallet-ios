@@ -17,7 +17,6 @@ final class RTCDataChannelAsyncDelegate: NSObject,
 	Sendable
 {
 	let receivedMessages: AsyncStream<Data>
-
 	private let receivedMessagesContinuation: AsyncStream<Data>.Continuation
 
 	override init() {

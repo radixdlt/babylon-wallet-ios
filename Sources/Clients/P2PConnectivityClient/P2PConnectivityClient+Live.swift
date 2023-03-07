@@ -11,19 +11,17 @@ extension P2PConnectivityClient {
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
-		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
-			Task {
-				print("🔌 Loading and connecting all P2P connections")
-				for client in await p2pClientsClient.getP2PClients() {
-					try await rtcClients.addExistingClient(client.connectionPassword)
-				}
-			}
-		}
-
 		return Self(
-			loadFromProfileAndConnectAll: loadFromProfileAndConnectAll,
+                        loadFromProfileAndConnectAll: {
+                                Task {
+                                        loggerGlobal.info("🔌 Loading and connecting all P2P connections")
+                                        for client in await p2pClientsClient.getP2PClients() {
+                                                try await rtcClients.addExistingClient(client.connectionPassword)
+                                        }
+                                }
+                        },
 			disconnectAndRemoveAll: {
-				print("🔌 Disconnecting and removing all P2P connections")
+                                loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
 				await rtcClients.removeAll()
 			},
 			getLocalNetworkAccess: {
@@ -35,11 +33,12 @@ extension P2PConnectivityClient {
 			storeP2PClient: { client in
 				try await p2pClientsClient.addP2PClient(client)
 			},
-			deleteP2PClientByID: { id in
-				try await p2pClientsClient.deleteP2PClientByID(id)
-				await rtcClients.removeClient(id)
+			deleteP2PClientByPassword: { password in
+                                loggerGlobal.info("Deleting P2P Connection")
+				try await p2pClientsClient.deleteP2PClientByPassword(password)
+				await rtcClients.removeClient(password)
 			},
-			addP2PWithSecrets: { password in
+			addP2PWithPassword: { password in
 				try await rtcClients.addNewClient(password)
 			},
 			receiveMessages: { await rtcClients.incommingMessages },
@@ -48,22 +47,6 @@ extension P2PConnectivityClient {
 			}
 		)
 	}()
-}
-
-// MARK: - P2PConnectionOffline
-struct P2PConnectionOffline: LocalizedError {
-	init() {}
-	var errorDescription: String? {
-		L10n.Common.p2PConnectionOffline
-	}
-}
-
-// MARK: - P2PClientNotFoundInProfile
-struct P2PClientNotFoundInProfile: LocalizedError {
-	init() {}
-	var errorDescription: String? {
-		L10n.Common.p2PClientNotFoundInProfile
-	}
 }
 
 // MARK: - LocalNetworkAuthorization
@@ -128,22 +111,5 @@ extension LocalNetworkAuthorization: NetServiceDelegate {
 		self.reset()
 		print("Local network permission has been granted")
 		completion?(true)
-	}
-}
-
-// MARK: - FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp
-struct FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp: Swift.Error {}
-
-// MARK: - FailedToDecodeRequestFromDappError
-public struct FailedToDecodeRequestFromDappError: LocalizedError {
-	public let error: Error
-	public let jsonString: String
-	public init(error: Error, jsonString: String) {
-		self.error = error
-		self.jsonString = jsonString
-	}
-
-	public var errorDescription: String? {
-		"Failed to decode request from Dapp got: \(jsonString)\nerror: \(String(describing: error))"
 	}
 }
