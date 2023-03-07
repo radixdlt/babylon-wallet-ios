@@ -45,56 +45,33 @@ extension TransactionReview {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack(spacing: .medium2) {
 						if let message = viewStore.message {
-							VStack(spacing: .small1) {
-								Text("MESSAGE")
-									.sectionHeading
-									.flushedLeft(padding: .medium3)
-								TransactionMessageView(message: message)
-							}
+							TransactionHeading("MESSAGE") // TODO:  localize
+							TransactionMessageView(message: message)
 						}
 
-						let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
-						IfLetStore(withdrawingStore) { accountsStore in
-							VStack(spacing: .small1) {
-								Text("WITHDRAWING")
-									.sectionHeading
-									.flushedLeft(padding: .medium3)
-								Card(insetContents: true) {
-									ForEachStore(accountsStore) { accountStore in
-										TransactionReviewAccount.View(store: accountStore)
-									}
-								}
-							}
-						}
-
-						let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
-						IfLetStore(depositingStore) { accountsStore in
-							VStack(spacing: .small1) {
-								Text("DEPOSITING")
-									.sectionHeading
-									.flushedLeft(padding: .medium3)
-								Card(insetContents: true) {
-									ForEachStore(accountsStore) { accountStore in
-										TransactionReviewAccount.View(store: accountStore)
-									}
-
-									if viewStore.showCustomizeguaranteesButton {
-										Button("Customize guarantees") { // TODO: 
-											viewStore.send(.customizeGuaranteesTapped)
-										}
-										.textStyle(.body1Header)
-										.foregroundColor(.app.blue2)
-										.padding(.vertical, .small3)
-									}
-								}
-							}
-						}
+						TransactionActionsView(store: store)
 					}
 					.padding(.horizontal, .medium3)
 				}
 				.background(.app.gray5)
 			}
 		}
+	}
+}
+
+// MARK: - TransactionHeading
+struct TransactionHeading: View {
+	let heading: String
+
+	init(_ heading: String) {
+		self.heading = heading
+	}
+
+	var body: some View {
+		Text(heading)
+			.sectionHeading
+			.flushedLeft(padding: .medium3)
+			.padding(.bottom, .small1)
 	}
 }
 
@@ -110,6 +87,62 @@ struct TransactionMessageView: View {
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
 		}
+	}
+}
+
+// MARK: - TransactionActionsView
+struct TransactionActionsView: View {
+	private let store: StoreOf<TransactionReview>
+
+	public init(store: StoreOf<TransactionReview>) {
+		self.store = store
+	}
+
+	var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+
+			let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
+			IfLetStore(withdrawingStore) { accountsStore in
+				TransactionHeading("WITHDRAWING") // TODO:  localize
+				Card(insetContents: true) {
+					ForEachStore(accountsStore) { accountStore in
+						TransactionReviewAccount.View(store: accountStore)
+					}
+				}
+			}
+
+			let usedDappsStore = store.scope(state: \.usedDapps) { .child(.dapp($0)) }
+			TransactionReviewDappsUsed.View(store: usedDappsStore)
+
+			let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
+			IfLetStore(depositingStore) { accountsStore in
+				TransactionHeading("DEPOSITING") // TODO:  localize
+
+				Card(insetContents: true) {
+					ForEachStore(accountsStore) { accountStore in
+						TransactionReviewAccount.View(store: accountStore)
+					}
+
+					if viewStore.showCustomizeguaranteesButton {
+						Button("Customize guarantees") { // TODO: 
+							viewStore.send(.customizeGuaranteesTapped)
+						}
+						.textStyle(.body1Header)
+						.foregroundColor(.app.blue2)
+						.padding(.vertical, .small3)
+					}
+				}
+			}
+		}
+
+//			.overlay(alignment: .trailing) {
+//				Rectangle()
+//					.fill(.red)
+//					.frame(width: 2)
+//					.padding(.vertical, 10)
+//					.padding(.trailing, SpeechbubbleShape.triangleInset)
+//			}
+//			.border(.purple)
 	}
 }
 

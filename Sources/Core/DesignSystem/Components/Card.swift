@@ -84,8 +84,8 @@ extension View {
 // MARK: - SpeechbubbleShape
 public struct SpeechbubbleShape: Shape {
 	let cornerRadius: CGFloat
-	static let triangleSize: CGSize = .init(width: 20, height: 10) // TODO:  constant
-	static let triangleInset: CGFloat = 40 // TODO:  constant
+	public static let triangleSize: CGSize = .init(width: 20, height: 10) // TODO:  constant
+	public static let triangleInset: CGFloat = 50 // TODO:  constant
 
 	public init(cornerRadius: CGFloat) {
 		self.cornerRadius = cornerRadius
@@ -110,9 +110,9 @@ public struct SpeechbubbleShape: Shape {
 			                    startAngle: .zero,
 			                    delta: .radians(.pi / 2))
 
-			path.addLine(to: .init(x: inner.maxX - Self.triangleInset, y: inner.maxY))
-			path.addLine(to: .init(x: inner.maxX - Self.triangleInset - Self.triangleSize.width / 2, y: rect.maxY))
-			path.addLine(to: .init(x: inner.maxX - Self.triangleInset - Self.triangleSize.width, y: inner.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset - Self.triangleSize.width / 2, y: inner.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset, y: rect.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset + Self.triangleSize.width / 2, y: inner.maxY))
 
 			path.addRelativeArc(center: .init(x: arcCenters.minX, y: arcCenters.maxY),
 			                    radius: cornerRadius,
