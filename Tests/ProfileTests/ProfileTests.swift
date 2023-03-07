@@ -70,7 +70,7 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
-			let index = (try? profile.onNetwork(id: networkID))?.accounts.count ?? 0
+			let index = try profile.factorSources.device.deviceStorage().nextForEntity(kind: .account, networkID: profile.networkID)
 			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
@@ -98,7 +98,7 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				index: index,
+				appearanceID: .fromIndex(index),
 				displayName: name
 			)
 
@@ -108,7 +108,8 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<OnNetwork.Persona.Field>) throws -> OnNetwork.Persona {
-			let index = (try? profile.onNetwork(id: networkID))?.personas.count ?? 0
+			let index = try profile.factorSources.device.deviceStorage().nextForEntity(kind: .identity, networkID: profile.networkID)
+
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
@@ -136,7 +137,6 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				index: index,
 				displayName: name,
 				fields: fields
 			)
@@ -251,8 +251,8 @@ final class ProfileTests: TestCase {
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		/* Uncomment the lines below to generate a new test vector */
-		let data = try jsonEncoder.encode(snapshot)
-		print(String(data: data, encoding: .utf8)!)
+//		let data = try jsonEncoder.encode(snapshot)
+//		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -265,6 +265,9 @@ final class ProfileTests: TestCase {
 		for factorSource in profile.factorSources {
 			XCTAssertEqual(factorSource.hint, creatingDevice)
 		}
+		let deviceFactorSource = profile.factorSources.device
+		XCTAssertEqual(deviceFactorSource.storage?.forDevice?.nextForEntity(kind: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(deviceFactorSource.storage?.forDevice?.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
 		let networkID = gateway.network.id

@@ -59,7 +59,7 @@ public struct FactorSource:
 	/// for most FactorSource, we model this with one single optional
 	/// being an enym modelling all possible required extra stored
 	/// properties.
-	public let storage: Storage?
+	public var storage: Storage?
 
 	public init(
 		kind: FactorSourceKind,

@@ -6,7 +6,7 @@ import Prelude
 /// An `Account` or a `Persona`
 public protocol EntityProtocol: Sendable, Equatable {
 	/// The type of address of entity.
-	associatedtype EntityAddress: AddressKindProtocol
+	associatedtype EntityAddress: AddressKindProtocol & Hashable
 
 	static var entityKind: EntityKind { get }
 
@@ -17,9 +17,6 @@ public protocol EntityProtocol: Sendable, Equatable {
 
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }
-
-	/// Index of the entity in some collection if entities of the same type.
-	var index: Int { get }
 
 	/// The globally unique and identifiable Radix component address of this entity. Can be used as
 	/// a stable ID. Cryptographically derived from a seeding public key which typically was created by

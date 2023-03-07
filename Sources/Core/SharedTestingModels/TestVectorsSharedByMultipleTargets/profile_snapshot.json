@@ -20,8 +20,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-03-03T14:12:48Z",
-        "lastUsedOn" : "2023-03-03T14:12:48Z",
+        "firstEstablishedOn" : "2023-03-07T10:48:21Z",
+        "lastUsedOn" : "2023-03-07T10:48:21Z",
         "platform" : "browser"
       },
       {
@@ -36,8 +36,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-03-03T14:12:48Z",
-        "lastUsedOn" : "2023-03-03T14:12:48Z",
+        "firstEstablishedOn" : "2023-03-07T10:48:21Z",
+        "lastUsedOn" : "2023-03-07T10:48:21Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -76,11 +76,11 @@
   "creatingDevice" : "computerRunningUnitTest",
   "factorSources" : [
     {
-      "addedOn" : "2023-03-03T14:12:48Z",
+      "addedOn" : "2023-03-07T10:48:21Z",
       "hint" : "computerRunningUnitTest",
       "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-03T14:12:48Z",
+      "lastUsedOn" : "2023-03-07T10:48:21Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519"
@@ -88,14 +88,26 @@
         "supportedDerivationPathSchemes" : [
           "cap26"
         ]
+      },
+      "storage" : {
+        "discriminator" : "device",
+        "properties" : {
+          "nextDerivationIndicesPerNetwork" : [
+            {
+              "forAccount" : 3,
+              "forIdentity" : 2,
+              "networkID" : 11
+            }
+          ]
+        }
       }
     },
     {
-      "addedOn" : "2023-03-03T14:12:48Z",
+      "addedOn" : "2023-03-07T10:48:21Z",
       "hint" : "computerRunningUnitTest",
       "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-03T14:12:48Z",
+      "lastUsedOn" : "2023-03-07T10:48:21Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519",
@@ -105,6 +117,14 @@
           "cap26",
           "bip44Olympia"
         ]
+      },
+      "storage" : {
+        "discriminator" : "device",
+        "properties" : {
+          "nextDerivationIndicesPerNetwork" : [
+
+          ]
+        }
       }
     }
   ],
@@ -116,7 +136,6 @@
           "address" : "account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f",
           "appearanceID" : 0,
           "displayName" : "First",
-          "index" : 0,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -139,7 +158,6 @@
           "address" : "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
           "appearanceID" : 1,
           "displayName" : "Second",
-          "index" : 1,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -162,7 +180,6 @@
           "address" : "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6",
           "appearanceID" : 2,
           "displayName" : "Third",
-          "index" : 2,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -190,8 +207,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "B3AEC91A-6981-4810-83DC-F05F52FC3C63",
-                "52C528C2-7DF9-4223-8920-14C78724228F"
+                "8262CDF8-306D-43DF-90A5-32BCE03C9AED",
+                "84F2DC0C-EB4C-4A12-8E7A-946C69EB0155"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -208,8 +225,8 @@
             },
             {
               "fieldIDs" : [
-                "845DF781-CC20-471A-80E1-BDDD2B182A8A",
-                "53431D08-CB00-4AD0-A815-BE96853070D7"
+                "06D4FDBA-AECE-44D3-930A-A90040AC8231",
+                "C32A67AF-4E55-4E14-992C-BD6C6F8408BA"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -233,17 +250,16 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "B3AEC91A-6981-4810-83DC-F05F52FC3C63",
+              "id" : "8262CDF8-306D-43DF-90A5-32BCE03C9AED",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "52C528C2-7DF9-4223-8920-14C78724228F",
+              "id" : "84F2DC0C-EB4C-4A12-8E7A-946C69EB0155",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
           ],
-          "index" : 0,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -267,17 +283,16 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "845DF781-CC20-471A-80E1-BDDD2B182A8A",
+              "id" : "06D4FDBA-AECE-44D3-930A-A90040AC8231",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "53431D08-CB00-4AD0-A815-BE96853070D7",
+              "id" : "C32A67AF-4E55-4E14-992C-BD6C6F8408BA",
               "kind" : "lastName",
               "value" : "Publicson"
             }
           ],
-          "index" : 1,
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -299,5 +314,5 @@
       ]
     }
   ],
-  "version" : 19
+  "version" : 20
 }

@@ -41,7 +41,7 @@ extension OnNetwork.Account.AppearanceID {
 		String(describing: id)
 	}
 
-	public static func fromIndex(_ accountIndex: OnNetwork.Account.Index) -> Self {
+	public static func fromIndex(_ accountIndex: Int) -> Self {
 		let mod = allCases.count
 		let gradientIndex = accountIndex % mod
 		return allCases[gradientIndex]
