@@ -38,7 +38,6 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case dropAllProofs(DropAllProofs)
 
 	case publishPackage(PublishPackage)
-	case publishPackageWithOwner(PublishPackageWithOwner)
 
 	case burnResource(BurnResource)
 	case recallResource(RecallResource)
@@ -122,8 +121,6 @@ extension Instruction {
 
 		case .publishPackage:
 			return .publishPackage
-		case .publishPackageWithOwner:
-			return .publishPackageWithOwner
 
 		case .burnResource:
 			return .burnResource
@@ -234,8 +231,6 @@ extension Instruction {
 
 		case let .publishPackage(instruction):
 			try instruction.encode(to: encoder)
-		case let .publishPackageWithOwner(instruction):
-			try instruction.encode(to: encoder)
 
 		case let .burnResource(instruction):
 			try instruction.encode(to: encoder)
@@ -340,8 +335,6 @@ extension Instruction {
 
 		case .publishPackage:
 			self = try .publishPackage(.init(from: decoder))
-		case .publishPackageWithOwner:
-			self = try .publishPackageWithOwner(.init(from: decoder))
 
 		case .burnResource:
 			self = try .burnResource(.init(from: decoder))
