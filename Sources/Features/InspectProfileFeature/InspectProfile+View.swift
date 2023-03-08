@@ -1,6 +1,6 @@
-import P2PModels
 import Prelude
 import Profile
+import RadixConnectModels
 import SecureStorageClient
 import SwiftUI
 
@@ -157,6 +157,10 @@ extension FactorSourceView {
 				.padding()
 				.border(Color.green, width: 2)
 			}
+
+			if let deviceStore = factorSource.storage?.forDevice {
+				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: deviceStore.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
+			}
 		}
 		.padding([.leading], leadingPadding)
 		.task {
@@ -166,6 +170,39 @@ extension FactorSourceView {
 				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
 			}
 			#endif
+		}
+	}
+}
+
+// MARK: - NextDerivationIndicesPerNetworkView
+public struct NextDerivationIndicesPerNetworkView: IndentedView {
+	public let nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
+	public let indentation: Indentation
+
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Text("Next derivation indices per network")
+				.fontWeight(.heavy)
+			#if os(macOS)
+				.font(.title)
+			#endif // os(macOS)
+
+			ForEach(nextDerivationIndicesPerNetwork.perNetwork) { nextIndices in
+				NextDerivationIndicesForNetworkView(nextIndices: nextIndices, indentation: indentation.inOneLevel)
+			}
+		}
+	}
+}
+
+// MARK: - NextDerivationIndicesForNetworkView
+public struct NextDerivationIndicesForNetworkView: IndentedView {
+	public let nextIndices: OnNetwork.NextDerivationIndices
+	public let indentation: Indentation
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Labeled("NetworkID", value: String(describing: nextIndices.networkID))
+			Labeled("    Next index for account", value: String(describing: nextIndices.forAccount))
+			Labeled("    Next index for persona", value: String(describing: nextIndices.forIdentity))
 		}
 	}
 }
@@ -199,6 +236,11 @@ extension AppPreferencesView {
 				p2pClients: appPreferences.p2pClients,
 				indentation: inOneLevel
 			)
+
+			AppSecurityView(
+				security: appPreferences.security,
+				indentation: inOneLevel
+			)
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -216,6 +258,7 @@ extension GatewaysView {
 			ForEach(gateways.all) { gateway in
 				GatewayView(
 					gateway: gateway,
+					isCurrent: self.gateways.current == gateway,
 					indentation: inOneLevel
 				)
 			}
@@ -227,6 +270,7 @@ extension GatewaysView {
 // MARK: - GatewayView
 public struct GatewayView: IndentedView {
 	public let gateway: Gateway
+	public let isCurrent: Bool
 	public let indentation: Indentation
 }
 
@@ -240,6 +284,9 @@ extension GatewayView {
 			#endif // os(macOS)
 			Labeled("Network Name", value: gateway.network.name.rawValue)
 			Labeled("Network ID", value: gateway.network.id.description)
+			if isCurrent {
+				Text("Is current gateway ✅")
+			}
 			Labeled("Gateway API Base URL", value: gateway.url.absoluteString)
 		}
 		.padding([.leading], leadingPadding)
@@ -261,6 +308,26 @@ extension DisplayView {
 				.font(.title)
 			#endif // os(macOS)
 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
+		}
+		.padding([.leading], leadingPadding)
+	}
+}
+
+// MARK: - AppSecurityView
+public struct AppSecurityView: IndentedView {
+	public let security: AppPreferences.Security
+	public let indentation: Indentation
+}
+
+extension AppSecurityView {
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Text("App Security")
+				.fontWeight(.heavy)
+			#if os(macOS)
+				.font(.title)
+			#endif // os(macOS)
+			Labeled("iCloudProfileSyncEnabled", value: String(describing: security.iCloudProfileSyncEnabled))
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -396,10 +463,8 @@ extension P2PClientView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("ID", value: String(p2pClient.id.hex().mask(showLast: 6)))
+			Labeled("ID", value: String(p2pClient.id.data.hex().mask(showLast: 6)))
 			Labeled("Client Name", value: p2pClient.displayName)
-			Labeled("First established", value: p2pClient.firstEstablishedOn.ISO8601Format())
-			Labeled("Last used", value: p2pClient.lastUsedOn.ISO8601Format())
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -489,7 +554,7 @@ extension EntitiesView {
 			if entities.isEmpty {
 				Text("<None yet>")
 			} else {
-				ForEach(entities, id: \.index) { entity in
+				ForEach(entities, id: \.address) { entity in
 					EntityView(
 						entity: entity,
 						indentation: inOneLevel
@@ -514,7 +579,6 @@ extension EntityView {
 				Labeled("DisplayName", value: displayName.rawValue)
 			}
 
-			Labeled("Index", value: String(describing: entity.index))
 			Labeled("Address", value: entity.address.address)
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):

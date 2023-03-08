@@ -2,6 +2,23 @@ import Prelude
 
 public typealias FactorSources = NonEmpty<IdentifiedArrayOf<FactorSource>>
 
+// MARK: - FactorSourceWithIDNotFound
+struct FactorSourceWithIDNotFound: Swift.Error {}
+extension FactorSources {
+	public mutating func updateFactorSource(
+		id: FactorSourceID,
+		_ mutate: (inout FactorSource) throws -> Void
+	) throws {
+		guard var factorSource = self[id: id] else {
+			throw FactorSourceWithIDNotFound()
+		}
+		try mutate(&factorSource)
+		var identifiedArrayOfFactorSources = self.rawValue
+		identifiedArrayOfFactorSources[id: id] = factorSource
+		self = .init(rawValue: .init(uncheckedUniqueElements: identifiedArrayOfFactorSources))!
+	}
+}
+
 extension FactorSources {
 	/// Babylon `device` factor source
 	public var device: FactorSource {

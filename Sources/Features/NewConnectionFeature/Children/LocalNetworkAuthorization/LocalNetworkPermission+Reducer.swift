@@ -1,5 +1,5 @@
 import FeaturePrelude
-import P2PConnectivityClient
+import RadixConnectClient
 #if os(iOS)
 import class UIKit.UIApplication
 #endif
@@ -31,7 +31,7 @@ public struct LocalNetworkPermission: Sendable, FeatureReducer {
 		case permissionResponse(Bool)
 	}
 
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.openURL) var openURL
 
 	public init() {}
@@ -45,7 +45,7 @@ public struct LocalNetworkPermission: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-				let allowed = await p2pConnectivityClient.getLocalNetworkAccess()
+				let allowed = await radixConnectClient.getLocalNetworkAccess()
 				if allowed {
 					await send(.delegate(.permissionResponse(true)))
 				} else {

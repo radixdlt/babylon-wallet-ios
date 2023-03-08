@@ -14,15 +14,15 @@
 //			initialState: DappInteractor.State(),
 //			reducer: DappInteractor()
 //		) {
-//			$0.p2pConnectivityClient.loadFromProfileAndConnectAll = {
+//			$0.radixConnectClient.loadFromProfileAndConnectAll = {
 //				await clientsWasLoaded.setValue(true)
 //			}
-//			$0.p2pConnectivityClient.getP2PClientIDs = {
+//			$0.radixConnectClient.getP2PClientIDs = {
 //				AsyncJustSequence(clientIDs).eraseToAnyAsyncSequence()
 //			}
-//			$0.p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence = { _ in incomingRequestsAsyncChannel.eraseToAnyAsyncSequence() }
+//			$0.radixConnectClient.getRequestsFromP2PClientAsyncSequence = { _ in incomingRequestsAsyncChannel.eraseToAnyAsyncSequence() }
 //			$0.gatewaysClient.getCurrentGateway = { .nebunet }
-//			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
+//			$0.radixConnectClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
 //		}
 //
 //		let task = await store.send(.view(.task))
@@ -74,7 +74,7 @@
 //			reducer: DappInteractor()
 //		) {
 //			$0.getCurrentGateway.getCurrentNetworkID = { .simulator }
-//			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
+//			$0.radixConnectClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
 //		}
 //
 //		let newRequest = P2P.RequestFromClient.previewValueSignTXRequest
@@ -134,7 +134,7 @@
 //				XCTAssertEqual(error, .wrongNetwork)
 //			}
 //
-//			$0.p2pConnectivityClient.sendMessage = {
+//			$0.radixConnectClient.sendMessage = {
 //				await messageSentToDapp.setValue($0)
 //				return P2P.SentResponseToClient(
 //					sentReceipt: .init(

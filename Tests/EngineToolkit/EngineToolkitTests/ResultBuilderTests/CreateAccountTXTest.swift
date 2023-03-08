@@ -92,7 +92,7 @@ final class CreateAccountTXTest: TestCase {
 			)
 		).get()
 
-		let manifestString = jsonManifest.toString(
+		let manifestString = try jsonManifest.toString(
 			preamble: "",
 			instructionsSeparator: "",
 			instructionsArgumentSeparator: " ",

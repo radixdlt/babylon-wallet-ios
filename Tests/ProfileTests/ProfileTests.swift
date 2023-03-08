@@ -1,7 +1,7 @@
 import Cryptography
 import EngineToolkit
-import P2PModels
 @testable import Profile
+import RadixConnectModels
 import SharedTestingModels
 import TestingPrelude
 
@@ -10,7 +10,7 @@ final class ProfileTests: TestCase {
 	let gateway = Gateway.nebunet
 
 	func test_p2p_client_eq() throws {
-		let pw = try ConnectionPassword(data: .deadbeef32Bytes)
+		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
 		let first = P2PClient(connectionPassword: pw, displayName: "first")
 		let second = P2PClient(connectionPassword: pw, displayName: "second")
 		XCTAssertEqual(first, second)
@@ -70,7 +70,7 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
-			let index = (try? profile.onNetwork(id: networkID))?.accounts.count ?? 0
+			let index = try profile.factorSources.device.deviceStorage().nextForEntity(kind: .account, networkID: profile.networkID)
 			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
@@ -98,7 +98,7 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				index: index,
+				appearanceID: .fromIndex(index),
 				displayName: name
 			)
 
@@ -108,7 +108,8 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<OnNetwork.Persona.Field>) throws -> OnNetwork.Persona {
-			let index = (try? profile.onNetwork(id: networkID))?.personas.count ?? 0
+			let index = try profile.factorSources.device.deviceStorage().nextForEntity(kind: .identity, networkID: profile.networkID)
+
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
@@ -136,7 +137,6 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				index: index,
 				displayName: name,
 				fields: fields
 			)
@@ -167,7 +167,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
-		let connectionPassword = try ConnectionPassword(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+		let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
 		XCTAssertNotNil(profile.appendP2PClient(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
 		// Should not be possible to add a client with the same password
 		XCTAssertNil(profile.appendP2PClient(
@@ -179,12 +179,8 @@ final class ProfileTests: TestCase {
 
 		XCTAssertNotNil(profile.appendP2PClient(
 			P2PClient(
-				connectionPassword: try! ConnectionPassword(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef"),
-				customWebRTCConfig: .init(peerConnectionConfig: .init(iceServerConfigs: ["example.com", "anotherexample.com"])),
-				customSignalingServerConfig: .init(signalingServerBaseURL: URL(string: "custom.signal.com")!),
-				customConnectorConfig: .init(reconnectRetryDelay: 3),
-				displayName: "iPhone 13",
-				platform: .iPhone
+				connectionPassword: try! ConnectionPassword(.init(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef")),
+				displayName: "iPhone 13"
 			)
 		))
 
@@ -251,8 +247,8 @@ final class ProfileTests: TestCase {
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		/* Uncomment the lines below to generate a new test vector */
-		let data = try jsonEncoder.encode(snapshot)
-		print(String(data: data, encoding: .utf8)!)
+//		let data = try jsonEncoder.encode(snapshot)
+//		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -265,6 +261,9 @@ final class ProfileTests: TestCase {
 		for factorSource in profile.factorSources {
 			XCTAssertEqual(factorSource.hint, creatingDevice)
 		}
+		let deviceFactorSource = profile.factorSources.device
+		XCTAssertEqual(deviceFactorSource.storage?.forDevice?.nextForEntity(kind: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(deviceFactorSource.storage?.forDevice?.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
 		let networkID = gateway.network.id
@@ -353,11 +352,8 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(profile.appPreferences.p2pClients.clients.count, 2)
 		let p2pClient0 = try XCTUnwrap(profile.appPreferences.p2pClients.first)
-		XCTAssertEqual(p2pClient0.connectionPassword.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+		XCTAssertEqual(p2pClient0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 		let p2pClient1 = profile.appPreferences.p2pClients[1]
-		XCTAssertNotNil(p2pClient1.signalingServerConfig)
-		XCTAssertNotNil(p2pClient1.webRTCConfig)
-		XCTAssertNotNil(p2pClient1.connectorConfig)
 
 		XCTAssertEqual(onNetwork.authorizedDapps.count, 1)
 		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)

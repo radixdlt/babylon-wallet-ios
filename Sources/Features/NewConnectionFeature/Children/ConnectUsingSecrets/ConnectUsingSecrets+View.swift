@@ -96,6 +96,6 @@ struct ConnectUsingPassword_Preview: PreviewProvider {
 }
 
 extension ConnectUsingSecrets.State {
-	public static let previewValue: Self = .init(connectionSecrets: .placeholder)
+	public static let previewValue: Self = .init(connectionPassword: .placeholder)
 }
 #endif

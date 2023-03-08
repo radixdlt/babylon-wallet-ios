@@ -30,11 +30,6 @@ extension OnNetwork {
 		/// Security of this account
 		public var securityState: EntitySecurityState
 
-		/// The index of this account, in the list of accounts for a certain network. This means that
-		/// profile on network `mainnet` will have an account with `accountIndex = 0`, but so can an
-		/// account on network `testnet` too! However, their `address`es will differ!
-		public let index: Index
-
 		/// An indentifier for the gradient for this account, to be displayed in wallet
 		/// and possibly by dApps.
 		public let appearanceID: AppearanceID
@@ -46,15 +41,13 @@ extension OnNetwork {
 			networkID: NetworkID,
 			address: EntityAddress,
 			securityState: EntitySecurityState,
-			index: Index,
-			appearanceID: AppearanceID? = nil,
+			appearanceID: AppearanceID,
 			displayName: NonEmpty<String>
 		) {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.index = index
-			self.appearanceID = appearanceID ?? AppearanceID.fromIndex(index)
+			self.appearanceID = appearanceID
 			self.displayName = displayName
 		}
 	}
@@ -81,9 +74,6 @@ extension OnNetwork.Account {
 
 	public typealias EntityAddress = AccountAddress
 
-	/// Index in list of collection of accounts, per network.
-	public typealias Index = Int
-
 	/// A stable and globally unique identifier of an account.
 	public typealias ID = EntityAddress
 
@@ -97,7 +87,6 @@ extension OnNetwork.Account {
 			self,
 			children: [
 				"displayName": String(describing: displayName),
-				"index": index,
 				"address": address,
 				"securityState": securityState,
 			],
@@ -108,7 +97,6 @@ extension OnNetwork.Account {
 	public var description: String {
 		"""
 		"displayName": \(String(describing: displayName)),
-		"index": \(index),
 		"address": \(address),
 		"securityState": \(securityState)
 		"""

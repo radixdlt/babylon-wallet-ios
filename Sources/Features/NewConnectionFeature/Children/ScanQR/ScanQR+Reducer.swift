@@ -26,11 +26,11 @@ public struct ScanQR: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case connectionSecretsFromScannedStringResult(TaskResult<ConnectionSecrets>)
+		case connectionSecretsFromScannedStringResult(TaskResult<ConnectionPassword>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case connectionSecretsFromScannedQR(ConnectionSecrets)
+		case connectionSecretsFromScannedQR(ConnectionPassword)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -72,8 +72,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 		.run { send in
 			await send(.internal(.connectionSecretsFromScannedStringResult(
 				TaskResult {
-					let password = try ConnectionPassword(hex: hexString)
-					return try ConnectionSecrets.from(connectionPassword: password)
+					try ConnectionPassword(.init(hex: hexString))
 				}
 			)))
 		}

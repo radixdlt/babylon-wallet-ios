@@ -36,6 +36,12 @@ extension HexCodable {
 	}
 }
 
+extension String {
+	public func mask(showLast suffixCount: Int) -> String.SubSequence {
+		"..." + suffix(suffixCount)
+	}
+}
+
 // MARK: Identifiable
 extension HexCodable {
 	public typealias ID = String
