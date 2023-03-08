@@ -2,20 +2,22 @@ import FeaturePrelude
 
 extension ImportOlympiaFactorSource.State {
 	var viewState: ImportOlympiaFactorSource.ViewState {
-		.init()
+		.init(mnemonic: mnemonic, passphrase: passphrase, focusedField: focusedField)
 	}
 }
 
 // MARK: - ImportOlympiaFactorSource.View
 extension ImportOlympiaFactorSource {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
 		let mnemonic: String
+		let passphrase: String
+		@BindingState public var focusedField: ImportOlympiaFactorSource.State.Field?
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ImportOlympiaFactorSource>
+		@FocusState private var focusedField: ImportOlympiaFactorSource.State.Field?
 
 		public init(store: StoreOf<ImportOlympiaFactorSource>) {
 			self.store = store
@@ -30,9 +32,25 @@ extension ImportOlympiaFactorSource {
 							get: \.mnemonic,
 							send: { .mnemonicChanged($0) }
 						),
-						hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
+						hint: "Seed phrase",
 						binding: $focusedField,
-						equals: .entityName,
+						equals: .mnemonic,
+						first: viewStore.binding(
+							get: \.focusedField,
+							send: { .textFieldFocused($0) }
+						)
+					)
+					.autocorrectionDisabled()
+
+					AppTextField(
+						placeholder: "Passphrase",
+						text: viewStore.binding(
+							get: \.passphrase,
+							send: { .passphraseChanged($0) }
+						),
+						hint: "BIP39 Passphrase is often called a '25th word'.",
+						binding: $focusedField,
+						equals: .passphrase,
 						first: viewStore.binding(
 							get: \.focusedField,
 							send: { .textFieldFocused($0) }
