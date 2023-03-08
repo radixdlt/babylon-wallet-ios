@@ -160,24 +160,6 @@ extension EngineToolkit {
 		)
 	}
 
-	public func sborDecodeRequest(
-		request: SborDecodeRequest
-	) -> Result<SborDecodeResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: sbor_decode
-		)
-	}
-
-	public func sborEncodeRequest(
-		request: SborEncodeRequest
-	) -> Result<SborEncodeResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: sbor_encode
-		)
-	}
-
 	public func deriveNonFungibleGlobalIdFromPublicKeyRequest(
 		request: DeriveNonFungibleGlobalIdFromPublicKeyRequest
 	) -> Result<DeriveNonFungibleGlobalIdFromPublicKeyResponse, Error> {
