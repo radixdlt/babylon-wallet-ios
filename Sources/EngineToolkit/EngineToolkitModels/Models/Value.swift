@@ -58,8 +58,6 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 	case nonFungibleLocalId(NonFungibleLocalId)
 	case nonFungibleGlobalId(NonFungibleGlobalId)
 
-	case hash(Hash)
-
 	case ecdsaSecp256k1PublicKey(EcdsaSecp256k1PublicKey)
 	case ecdsaSecp256k1Signature(EcdsaSecp256k1Signature)
 	case eddsaEd25519PublicKey(EddsaEd25519PublicKey)
@@ -145,9 +143,6 @@ extension Value_ {
 
 		case .resourceAddress:
 			return .resourceAddress
-
-		case .hash:
-			return .hash
 
 		case .bucket:
 			return .bucket
@@ -275,9 +270,6 @@ extension Value_ {
 		case let .resourceAddress(value):
 			try value.encode(to: encoder)
 
-		case let .hash(value):
-			try value.encode(to: encoder)
-
 		case let .bucket(value):
 			try value.encode(to: encoder)
 
@@ -399,9 +391,6 @@ extension Value_ {
 
 		case .resourceAddress:
 			self = try .resourceAddress(.init(from: decoder))
-
-		case .hash:
-			self = try .hash(.init(from: decoder))
 
 		case .bucket:
 			self = try .bucket(.init(from: decoder))
