@@ -13,7 +13,8 @@ public extension FactorSource {
 			kind: .device,
 			id: id(fromRoot: mnemonic.hdRoot(passphrase: bip39Passphrase)),
 			hint: hint,
-			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon
+			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
+			storage: .forDevice(.init())
 		)
 	}
 
