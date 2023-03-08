@@ -20,7 +20,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case task
 		case moveToBackground
 		case moveToForeground
-		case responseFailureAlert(PresentationAction<AlertState<ViewAction.ResponseFailureAlertAction>, ViewAction.ResponseFailureAlertAction>)
+		case responseFailureAlert(PresentationAction<ResponseFailureAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
 			case cancelButtonTapped(P2P.RTCIncomingWalletInteraction)
