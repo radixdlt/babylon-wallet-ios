@@ -25,8 +25,6 @@ final class SplashFeatureTests: TestCase {
 			}
 		}
 
-		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-
 		// when
 		await store.send(.view(.appeared))
 
@@ -56,9 +54,6 @@ final class SplashFeatureTests: TestCase {
 	}
 
 	func test__GIVEN__splash_appeared__WHEN__biometrics_configured__THEN__notifies_delegate_with_profile_result() async throws {
-		/// Profile load success
-		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-		let newProfile = withDependencies { $0.uuid = .incrementing } operation: { Profile(factorSource: factorSource) }
 		try await assertNotifiesDelegateWithLoadProfileOutcome(.newUser)
 		try await assertNotifiesDelegateWithLoadProfileOutcome(.existingProfileLoaded)
 
