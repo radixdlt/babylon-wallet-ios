@@ -83,12 +83,6 @@ private extension SecureStorageClientTests {
 		assertKeychainSetItemWithoutAuthRequest: (@Sendable (KeychainClient.SetItemWithoutAuthRequest) throws -> Void)? = nil,
 		assertKeychainSetItemWithAuthRequest: (@Sendable (KeychainClient.SetItemWithAuthRequest) throws -> Void)? = nil
 	) async throws {
-		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-		let passphrase = ""
-		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
-		let factorSource = try FactorSource.babylon(mnemonic: mnemonicWithPassphrase.mnemonic, bip39Passphrase: passphrase)
-		let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
-
 		try await withDependencies {
 			$0.uuid = .incrementing
 			$0.keychainClient.setDataWithoutAuthForKey = { request in
@@ -106,7 +100,14 @@ private extension SecureStorageClientTests {
 				}
 			}
 			$0.localAuthenticationClient.queryConfig = { authConfig }
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
 		} operation: {
+			let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+			let passphrase = ""
+			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+			let factorSource = try FactorSource.babylon(mnemonic: mnemonicWithPassphrase.mnemonic, bip39Passphrase: passphrase)
+			let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
+
 			let sut = SecureStorageClient.liveValue
 			let profile = Profile(factorSource: factorSource)
 			try await operation(sut, privateHDFactorSource, profile.snapshot())

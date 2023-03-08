@@ -20,6 +20,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 		let config = CreateEntityConfig(
 			purpose: .newAccountFromHome
 		)
+
 		let initialState = try CreateAccountCoordinator.State(
 			step: .step2_creationOfEntity(.init(
 				curve: .curve25519,

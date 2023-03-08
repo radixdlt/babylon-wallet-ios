@@ -25,7 +25,17 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 extension PrivateHDFactorSource {
 	public static func testValue(hint: NonEmptyString) -> Self {
 		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
-		let factorSource = try! FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, hint: hint)
+
+		let factorSource = try! FactorSource(
+			kind: .device,
+			id: FactorSource.id(fromRoot: mnemonicWithPassphrase.hdRoot()),
+			hint: hint,
+			parameters: .babylon,
+			storage: .forDevice(.init()),
+			addedOn: .init(timeIntervalSince1970: 0),
+			lastUsedOn: .init(timeIntervalSince1970: 0)
+		)
+
 		return try! .init(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			factorSource: factorSource
