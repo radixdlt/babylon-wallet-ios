@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/twostraws/CodeScanner",
       "state" : {
-        "revision" : "88a61323cae0aa4e7056f122600e5d38fd305a77",
-        "version" : "2.3.0"
+        "revision" : "d8f10d992ef32a4187b78a6df320facf75d631d8",
+        "version" : "2.3.1"
       }
     },
     {
@@ -178,6 +178,15 @@
       "state" : {
         "revision" : "842f6f2f03c591275a40550839bfa20b05e85072",
         "version" : "0.3.0"
+      }
+    },
+    {
+      "identity" : "swift-either",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-either",
+      "state" : {
+        "branch" : "main",
+        "revision" : "db33f4084304e2ef47c8b4d2949f0eb286f95b90"
       }
     },
     {

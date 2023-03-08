@@ -99,7 +99,7 @@ package.addModules([
 			"CreateEntityFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
-			"P2PConnectivityClient",
+			"RadixConnectClient",
 			"PersonasClient",
 			"ROLAClient",
 			"TransactionSigningFeature",
@@ -157,7 +157,7 @@ package.addModules([
 		name: "ManageP2PClientsFeature",
 		dependencies: [
 			"NewConnectionFeature",
-			"P2PConnectivityClient",
+			"RadixConnectClient",
 		],
 		tests: .yes()
 	),
@@ -176,7 +176,7 @@ package.addModules([
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
-			"P2PConnectivityClient",
+			"RadixConnectClient",
 		],
 		tests: .yes()
 	),
@@ -210,7 +210,7 @@ package.addModules([
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"PersonasFeature",
-			"P2PConnectivityClient", // deleting connections when wallet is deleted
+			"RadixConnectClient", // deleting connections when wallet is deleted
 			"InspectProfileFeature",
 		],
 		tests: .yes()
@@ -418,9 +418,9 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "P2PConnectivityClient", // FIXME: once @ghenadie merges multichannel support, rename this `RadixConnectClient`?
+		name: "RadixConnectClient",
 		dependencies: [
-			"P2PConnection",
+			"RadixConnect",
 			"P2PClientsClient",
 		],
 		tests: .yes()
@@ -562,9 +562,8 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"EngineToolkitModels",
+			"RadixConnectModels",
 			"Profile",
-			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
-			"P2PModels",
 		],
 		exclude: [
 			"P2P/Codable/README.md",
@@ -582,7 +581,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit", // address derivation
-			"P2PModels",
+			"RadixConnectModels",
 			"Resources",
 		],
 		tests: .yes(
@@ -615,32 +614,22 @@ package.addModules([
 		tests: .no
 	),
 	.module(
-		name: "P2PConnection",
+		name: "RadixConnectModels",
 		category: .radixConnect,
 		dependencies: [
 			"Cryptography",
-			"P2PModels",
+		],
+		tests: .yes()
+	),
+	.module(
+		name: "RadixConnect",
+		category: .radixConnect,
+		dependencies: [
+			"RadixConnectModels",
+			"SharedModels",
 			.product(name: "WebRTC", package: "WebRTC") {
 				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
 			},
-		],
-		exclude: [
-			"ChunkingTransport/README.md",
-		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			],
-			resources: [
-				.process("SignalingServerTests/TestVectors/"),
-			]
-		)
-	),
-	.module(
-		name: "P2PModels",
-		category: .radixConnect,
-		dependencies: [
-			"Cryptography",
 		],
 		tests: .yes()
 	),
@@ -742,6 +731,9 @@ package.addModules([
 			},
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
+			},
+			.product(name: "Either", package: "swift-either") {
+				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
 			},
 			.product(name: "CollectionConcurrencyKit", package: "CollectionConcurrencyKit") {
 				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")

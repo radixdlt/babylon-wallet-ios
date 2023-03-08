@@ -26,39 +26,51 @@ extension DappInteractor {
 	typealias View = Never
 
 	struct ViewModifier: SwiftUI.ViewModifier {
+		@Environment(\.scenePhase) var scenePhase
+
 		let store: StoreOf<DappInteractor>
 
 		func body(content: Content) -> some SwiftUI.View {
-			content
-			#if os(iOS)
-			.fullScreenCover(
-				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-				state: /DappInteractor.Destinations.State.dappInteraction,
-				action: DappInteractor.Destinations.Action.dappInteraction,
-				content: { DappInteractionCoordinator.View(store: $0.relay()) }
-			)
-			#elseif os(macOS) // .fullScreenCover is not available on macOS
-			.sheet(
-				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-				state: /DappInteractor.Destinations.State.dappInteraction,
-				action: DappInteractor.Destinations.Action.dappInteraction,
-				content: { DappInteractionCoordinator.View(store: $0.relay()) }
-			)
-			#endif
-			.sheet(
-				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-				state: /DappInteractor.Destinations.State.dappInteractionCompletion,
-				action: DappInteractor.Destinations.Action.dappInteractionCompletion,
-				content: { Completion.View(store: $0) }
-			)
-			.alert(
-				store: store.scope(
-					state: \.$responseFailureAlert,
-					action: { .view(.responseFailureAlert($0)) }
+			WithViewStore(store) { viewStore in
+				content
+				#if os(iOS)
+				.fullScreenCover(
+					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+					state: /DappInteractor.Destinations.State.dappInteraction,
+					action: DappInteractor.Destinations.Action.dappInteraction,
+					content: { DappInteractionCoordinator.View(store: $0.relay()) }
 				)
-			)
-			.task {
-				await ViewStore(store.stateless).send(.view(.task)).finish()
+				#elseif os(macOS) // .fullScreenCover is not available on macOS
+				.sheet(
+					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+					state: /DappInteractor.Destinations.State.dappInteraction,
+					action: DappInteractor.Destinations.Action.dappInteraction,
+					content: { DappInteractionCoordinator.View(store: $0.relay()) }
+				)
+				#endif
+				.sheet(
+					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+					state: /DappInteractor.Destinations.State.dappInteractionCompletion,
+					action: DappInteractor.Destinations.Action.dappInteractionCompletion,
+					content: { Completion.View(store: $0) }
+				)
+				.alert(
+					store: store.scope(
+						state: \.$responseFailureAlert,
+						action: { .view(.responseFailureAlert($0)) }
+					)
+				)
+				.task {
+					await ViewStore(store.stateless).send(.view(.task)).finish()
+				}
+				#if os(iOS)
+				.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+					viewStore.send(.view(.moveToForeground))
+				}
+				.onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+					viewStore.send(.view(.moveToBackground))
+				}
+				#endif
 			}
 		}
 	}
