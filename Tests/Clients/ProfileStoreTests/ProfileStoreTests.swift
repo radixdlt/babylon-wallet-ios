@@ -122,7 +122,6 @@ private extension ProfileStoreTests {
 				case let .ephemeral(ephemeral):
 					profile = ephemeral.profile
 					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.factorSource)
-					//                    XCTAssertNoDifference(ephemeral.profile.factorSources.first.ignoringDate(), privateFactor.factorSource.ignoringDate())
 					try await sut.commitEphemeral()
 				case let .persisted(persistedProfile):
 					XCTAssertNoDifference(
