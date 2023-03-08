@@ -3,11 +3,6 @@ import FeaturePrelude
 
 extension SelectGenesisFactorSource.State {
 	var viewState: SelectGenesisFactorSource.ViewState {
-//		.init(
-//			// TODO: implement
-//			curves: Array(Set(factorSources.flatMap(\.parameters.supportedCurves.elements))),
-//			selectedCurve: curve
-//		)
 		.init(factorSources: factorSources, selectedFactorSource: selectedFactorSource, selectedCurve: self.selectedCurve)
 	}
 }
