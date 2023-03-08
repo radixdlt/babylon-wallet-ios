@@ -34,16 +34,19 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
+		case imported
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(ImportOlympiaFactorSource.State.Field?)
-		case importMnemonicResult(TaskResult<MnemonicWithPassphrase>)
+		case mnemonicFromPhraseResult(TaskResult<Mnemonic>)
+		case importOlympiaFactorSourceResult(TaskResult<EquatableVoid>)
 	}
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicClient) var mnemonicClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
@@ -55,10 +58,9 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 				await send(.internal(.focusTextField(.mnemonic)))
 			}
 		case .importButtonTapped:
-			return .run { [mnemonicPhrase = state.mnemonic, passphrase = state.passphrase] send in
-				await send(.internal(.importMnemonicResult(TaskResult {
-					let mnemonic = try mnemonicClient.import(mnemonicPhrase, BIP39.Language?.none)
-					return MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+			return .run { [mnemonicPhrase = state.mnemonic] send in
+				await send(.internal(.mnemonicFromPhraseResult(TaskResult {
+					try mnemonicClient.import(mnemonicPhrase, BIP39.Language?.none)
 				})))
 			}
 
@@ -84,12 +86,24 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		case let .focusTextField(field):
 			state.focusedField = field
 			return .none
-		case let .importMnemonicResult(.failure(error)):
+		case let .mnemonicFromPhraseResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
-		case let .importMnemonicResult(.success(mnemonicWithPassphrase)):
-			print("🔮 Success")
+		case let .mnemonicFromPhraseResult(.success(mnemonic)):
+			return .run { [passphrase = state.passphrase] send in
+				await send(.internal(.importOlympiaFactorSourceResult(
+					TaskResult {
+						try await factorSourcesClient.importOlympiaFactorSource(
+							MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+						)
+					}
+				)))
+			}
+		case let .importOlympiaFactorSourceResult(.failure(error)):
+			errorQueue.schedule(error)
 			return .none
+		case .importOlympiaFactorSourceResult(.success):
+			return .send(.delegate(.imported))
 		}
 	}
 }

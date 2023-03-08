@@ -84,6 +84,9 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 		case .destination(.presented(.importOlympiaFactorSource(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
+		case .destination(.presented(.importOlympiaFactorSource(.delegate(.imported)))):
+			state.destination = nil
+			return .none
 		default:
 			return .none
 		}
