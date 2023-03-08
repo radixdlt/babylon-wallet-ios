@@ -4,7 +4,7 @@ import Foundation
 import TestingPrelude
 
 final class MockWebSocketClient: SignalingTransport, Sendable {
-	var IncomingMessages: AsyncStream<Data>
+	var incomingMessages: AsyncStream<Data>
 
 	func cancel() {}
 
@@ -18,7 +18,7 @@ final class MockWebSocketClient: SignalingTransport, Sendable {
 	lazy var sentMessagesSequence: AnyAsyncSequence<Data> = sentMessages.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 
 	init() {
-		(IncomingMessages, messagesStreamContinuation) = AsyncStream<Data>.streamWithContinuation()
+		(incomingMessages, messagesStreamContinuation) = AsyncStream<Data>.streamWithContinuation()
 		(sentMessages, sentMessagesStreamContinuation) = AsyncStream<Data>.streamWithContinuation()
 		(stateStream, stateStreamContinuation) = AsyncStream<URLSessionWebSocketTask.State>.streamWithContinuation()
 	}

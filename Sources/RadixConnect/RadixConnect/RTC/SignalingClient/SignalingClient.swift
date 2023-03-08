@@ -5,7 +5,7 @@ import Prelude
 // MARK: - SignalingTransport
 /// The Transport used to send and receive messages
 protocol SignalingTransport: Sendable {
-	var IncomingMessages: AsyncStream<Data> { get }
+	var incomingMessages: AsyncStream<Data> { get }
 	func send(message: Data) async throws
 
 	func cancel() async
@@ -26,16 +26,16 @@ struct SignalingClient: Sendable {
 	private let idBuilder: @Sendable () -> ClientMessage.RequestID
 
 	// MARK: - Streams
-	private let IncomingMessages: AnyAsyncSequence<IncomingMessage>
-	private let IncomingSignalingServerMessagges: AnyAsyncSequence<IncomingMessage.FromSignalingServer>
-	private let IncomingRemoteClientMessagges: AnyAsyncSequence<IncomingMessage.RemoteData>
+	private let incomingMessages: AnyAsyncSequence<IncomingMessage>
+	private let incomingSignalingServerMessagges: AnyAsyncSequence<IncomingMessage.FromSignalingServer>
+	private let incomingRemoteClientMessagges: AnyAsyncSequence<IncomingMessage.RemoteData>
 
 	/// The received ICECandidates
-	let onICECanddiate: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.ICECandidate>>
+	let onICECanddiate: AnyAsyncSequence<IdentifiedRTCICECandidate>
 	/// The received Offers
-	let onOffer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Offer>>
+	let onOffer: AnyAsyncSequence<IdentifiedRTCOffer>
 	/// The received Answers
-	let onAnswer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Answer>>
+	let onAnswer: AnyAsyncSequence<IdentifiedRTCAnswer>
 	/// The received client state notifications
 	let onRemoteClientState: AnyAsyncSequence<IncomingMessage.FromSignalingServer.Notification>
 
@@ -57,8 +57,8 @@ struct SignalingClient: Sendable {
 		self.jsonDecoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 		self.jsonEncoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 
-		self.IncomingMessages = transport
-			.IncomingMessages
+		self.incomingMessages = transport
+			.incomingMessages
 			.eraseToAnyAsyncSequence()
 			.mapSkippingError {
 				try jsonDecoder.decode(IncomingMessage.self, from: $0)
@@ -68,31 +68,31 @@ struct SignalingClient: Sendable {
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.IncomingRemoteClientMessagges = self.IncomingMessages
+		self.incomingRemoteClientMessagges = self.incomingMessages
 			.compactMap(\.fromRemoteClient)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.IncomingSignalingServerMessagges = self.IncomingMessages
+		self.incomingSignalingServerMessagges = self.incomingMessages
 			.compactMap(\.fromSignalingServer)
 			.eraseToAnyAsyncSequence()
 
-		self.onOffer = self.IncomingRemoteClientMessagges
+		self.onOffer = self.incomingRemoteClientMessagges
 			.compactMap(\.offer)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.onAnswer = self.IncomingRemoteClientMessagges
+		self.onAnswer = self.incomingRemoteClientMessagges
 			.compactMap(\.answer)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.onICECanddiate = self.IncomingRemoteClientMessagges
+		self.onICECanddiate = self.incomingRemoteClientMessagges
 			.compactMap(\.iceCandidate)
 			.share()
 			.eraseToAnyAsyncSequence()
 
-		self.onRemoteClientState = self.IncomingSignalingServerMessagges
+		self.onRemoteClientState = self.incomingSignalingServerMessagges
 			.compactMap(\.notification)
 			.share()
 			.eraseToAnyAsyncSequence()
@@ -108,7 +108,7 @@ struct SignalingClient: Sendable {
 	}
 
 	/// Send the given primitive to remote client. Will await for receive confirmation
-	func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
+	func sendToRemote(_ primitive: IdentifiedRTCPrimitive) async throws {
 		let message = ClientMessage(
 			requestId: idBuilder(),
 			targetClientId: primitive.id,
@@ -122,7 +122,7 @@ struct SignalingClient: Sendable {
 	// MARK: - Private API
 
 	private func waitForRequestAck(_ requestId: ClientMessage.RequestID) async throws {
-		try await self.IncomingSignalingServerMessagges
+		try await self.incomingSignalingServerMessagges
 			.compactMap(\.responseForRequest)
 			.compactMap { incoming in
 				try incoming.resultOfRequest(id: requestId)?.get()

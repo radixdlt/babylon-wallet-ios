@@ -1,4 +1,5 @@
 import Foundation
+import Prelude
 import WebRTC
 
 // MARK: - RTCPeerConnectionAsyncDelegate
@@ -53,11 +54,28 @@ extension RTCPeerConnectionAsyncDelegate: RTCPeerConnectionDelegate {
 	}
 
 	// IGNORED - below events are ignored
-	func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {}
-	func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream) {}
-	func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {}
-	func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {}
-	func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState) {}
+	func peerConnection(_ peerConnection: RTCPeerConnection, didAdd stream: RTCMediaStream) {
+		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
+	}
+
+	func peerConnection(_ peerConnection: RTCPeerConnection, didRemove stream: RTCMediaStream) {
+		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
+	}
+
+	func peerConnection(_ peerConnection: RTCPeerConnection, didRemove candidates: [RTCIceCandidate]) {
+		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
+		loggerGlobal.trace("RTCPeerConnection did remove ICECandidates")
+	}
+
+	func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
+		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
+		loggerGlobal.trace("RTCPeerConnection did open DataChannel \(dataChannel.channelId)")
+	}
+
+	func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceGatheringState) {
+		loggerGlobal.trace("\(Self.self).\(#function) is ignored")
+		loggerGlobal.trace("RTCPeerConnection did change ICEGatheringState to \(newState)")
+	}
 }
 
 private extension SignalingState {

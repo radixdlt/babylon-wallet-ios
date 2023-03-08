@@ -47,7 +47,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	private var terminated: Bool = false
 
 	// MARK: - Internal API
-	let IncomingMessages: AsyncStream<Data>
+	let incomingMessages: AsyncStream<Data>
 
 	init(
 		url: URL,
@@ -60,7 +60,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		self.sessionConfig.waitsForConnectivity = true
 		self.clock = clock
 
-		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(incomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 
 		super.init()
 

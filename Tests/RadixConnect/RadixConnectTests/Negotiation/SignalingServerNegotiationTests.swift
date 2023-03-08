@@ -29,7 +29,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let remoteClientID = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientID)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
-		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
 			try await conenctionBuilder.negotiationResults.prefix(1).collect()
@@ -55,7 +55,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let (client3, peerConnection3, delegate3) = makePeerConnectionClient(remoteClientId3)
 		let (client4, peerConnection4, delegate4) = makePeerConnectionClient(remoteClientId4)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client1, client2, client3, client4])
-		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
 			// Await for 4 PeerConnection to be made
@@ -108,7 +108,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let remoteClientId = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
-		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
 			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
@@ -132,7 +132,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let remoteClientId = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
-		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
 			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
@@ -152,7 +152,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let remoteClientId = RemoteClientID.any
 		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
-		let conenctionBuilder = PeerConnectionNegotiator(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
 			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!

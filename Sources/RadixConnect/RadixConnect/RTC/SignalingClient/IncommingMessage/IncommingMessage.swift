@@ -70,7 +70,7 @@ extension SignalingClient.IncomingMessage.FromSignalingServer {
 
 extension SignalingClient.IncomingMessage.RemoteData {
 	/// Extract the Offer by attaching the remote client id.
-	var offer: IdentifiedPrimitive<RTCPrimitive.Offer>? {
+	var offer: IdentifiedRTCOffer? {
 		guard let offer = message.primitive.offer else {
 			return nil
 		}
@@ -78,7 +78,7 @@ extension SignalingClient.IncomingMessage.RemoteData {
 	}
 
 	/// Extract the Answer by attaching the remote client id.
-	var answer: IdentifiedPrimitive<RTCPrimitive.Answer>? {
+	var answer: IdentifiedRTCAnswer? {
 		guard let answer = message.primitive.answer else {
 			return nil
 		}
@@ -86,7 +86,7 @@ extension SignalingClient.IncomingMessage.RemoteData {
 	}
 
 	/// Extract the ICECandidate by attaching the remote client id.
-	var iceCandidate: IdentifiedPrimitive<RTCPrimitive.ICECandidate>? {
+	var iceCandidate: IdentifiedRTCICECandidate? {
 		guard let candidate = message.primitive.iceCandidate else {
 			return nil
 		}

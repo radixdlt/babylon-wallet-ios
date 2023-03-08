@@ -26,7 +26,9 @@ public struct PeerConnectionClient: Sendable {
 			.share()
 			.eraseToAnyAsyncSequence()
 	}
+}
 
+extension PeerConnectionClient {
 	func cancel() async {
 		delegate.cancel()
 		await dataChannelClient.cancel()

@@ -1,17 +1,17 @@
 // MARK: - Identified
 /// Attaches a given ID to a given type
-public struct Identified<T, ID> {
-	public let content: T
+public struct Identified<Content, ID: Hashable>: Identifiable {
+	public let content: Content
 	public let id: ID
 
-	init(content: T, id: ID) {
+	init(content: Content, id: ID) {
 		self.content = content
 		self.id = id
 	}
 }
 
 // MARK: Equatable
-extension Identified: Equatable where T: Equatable, ID: Equatable {}
+extension Identified: Equatable where Content: Equatable, ID: Equatable {}
 
 // MARK: Sendable
-extension Identified: Sendable where T: Sendable, ID: Sendable {}
+extension Identified: Sendable where Content: Sendable, ID: Sendable {}

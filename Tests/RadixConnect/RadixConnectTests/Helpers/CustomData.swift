@@ -2,16 +2,16 @@ import Foundation
 @testable import RadixConnect
 import RadixConnectModels
 
-extension IdentifiedPrimitive {
-	static func anyOffer(for id: RemoteClientID) -> IdentifiedPrimitive<RTCPrimitive> {
+extension IdentifiedRTCPrimitive {
+	static func anyOffer(for id: RemoteClientID) -> IdentifiedRTCPrimitive {
 		.init(content: .offer(.any), id: id)
 	}
 
-	static func anyAnswer(for id: RemoteClientID) -> IdentifiedPrimitive<RTCPrimitive> {
+	static func anyAnswer(for id: RemoteClientID) -> IdentifiedRTCPrimitive {
 		.init(content: .answer(.any), id: id)
 	}
 
-	static func anyICECandidate(for id: RemoteClientID) -> IdentifiedPrimitive<RTCPrimitive> {
+	static func anyICECandidate(for id: RemoteClientID) -> IdentifiedRTCPrimitive {
 		.init(content: .iceCandidate(.any), id: id)
 	}
 }

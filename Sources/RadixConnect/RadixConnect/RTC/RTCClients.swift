@@ -95,7 +95,7 @@ extension RTCClients {
 			baseURL: signalingServerBaseURL
 		)
 		let negotiator = PeerConnectionNegotiator(
-			signalingServerClient: signalingClient,
+			signalingClient: signalingClient,
 			factory: peerConnectionFactory
 		)
 		return RTCClient(
@@ -120,9 +120,10 @@ actor RTCClient {
 	private let disconnectedPeerConnectionContinuation: AsyncStream<PeerConnectionID>.Continuation
 	private var disconnectTask: Task<Void, Never>?
 
-	init(id: ID,
-	     peerConnectionNegotiator: PeerConnectionNegotiator)
-	{
+	init(
+		id: ID,
+		peerConnectionNegotiator: PeerConnectionNegotiator
+	) {
 		self.id = id
 		self.peerConnectionNegotiator = peerConnectionNegotiator
 		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()

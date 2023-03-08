@@ -24,7 +24,7 @@ struct PeerConnectionNegotiator {
 	}
 
 	typealias NegotiationResult = Result<PeerConnectionClient, FailedToCreatePeerConnectionError>
-	fileprivate typealias NegotiationRole = Either<IdentifiedPrimitive<RTCPrimitive.Offer>, RemoteClientID>
+	fileprivate typealias NegotiationRole = Either<IdentifiedRTCOffer, RemoteClientID>
 
 	// MARK: - Negotiation
 
@@ -35,22 +35,45 @@ struct PeerConnectionNegotiator {
 	private let negotiationTask: Task<Void, Error>
 
 	// MARK: - Config
-	private let signalingServerClient: SignalingClient
+	private let singlaingClient: SignalingClient
 	private let factory: PeerConnectionFactory
-	private let isOferer: Bool
 
-	init(signalingServerClient: SignalingClient, factory: PeerConnectionFactory, isOferer: Bool = true) {
-		self.signalingServerClient = signalingServerClient
+	init(
+		signalingClient: SignalingClient,
+		factory: PeerConnectionFactory,
+		isOfferer: Bool = false
+	) {
+		self.singlaingClient = signalingClient
 		self.factory = factory
-		self.isOferer = isOferer
 
 		let (negotiationResultsStream, negotiationResultsContinuation) = AsyncStream<NegotiationResult>.streamWithContinuation()
 		self.negotiationResults = negotiationResultsStream.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 		self.negotiationResultsContinuation = negotiationResultsContinuation
+		self.negotiationTask = Self.listenForNegotiationTriggers(
+			signalingClient: signalingClient,
+			factory: factory,
+			isOfferer: isOfferer,
+			negotiationResultsContinuation: negotiationResultsContinuation
+		)
+	}
+}
 
+extension PeerConnectionNegotiator {
+	func cancel() {
+		negotiationResultsContinuation.finish()
+		negotiationTask.cancel()
+		singlaingClient.cancel()
+	}
+
+	private static func listenForNegotiationTriggers(
+		signalingClient: SignalingClient,
+		factory: PeerConnectionFactory,
+		isOfferer: Bool,
+		negotiationResultsContinuation: AsyncStream<NegotiationResult>.Continuation
+	) -> Task<Void, Error> {
 		@Sendable func negotiate(_ role: NegotiationRole) async {
 			do {
-				let peerConnection = try await Self.negotiatePeerConnection(role, signalingServerClient: signalingServerClient, factory: factory)
+				let peerConnection = try await Self.negotiatePeerConnection(role, signalingServerClient: signalingClient, factory: factory)
 				negotiationResultsContinuation.yield(.success(peerConnection))
 			} catch {
 				negotiationResultsContinuation.yield(
@@ -64,11 +87,11 @@ struct PeerConnectionNegotiator {
 			}
 		}
 
-		let negotiationTriggers: AnyAsyncSequence<NegotiationRole> = isOferer ?
-			signalingServerClient.onOffer.map { NegotiationRole.answerer($0) }.eraseToAnyAsyncSequence() :
-			signalingServerClient.onRemoteClientState.filter(\.remoteClientDidConnect).map { NegotiationRole.offerer($0.remoteClientId) }.eraseToAnyAsyncSequence()
+		let negotiationTriggers: AnyAsyncSequence<NegotiationRole> = isOfferer ?
+			signalingClient.onOffer.map { NegotiationRole.answerer($0) }.eraseToAnyAsyncSequence() :
+			signalingClient.onRemoteClientState.filter(\.remoteClientDidConnect).map { NegotiationRole.offerer($0.remoteClientId) }.eraseToAnyAsyncSequence()
 
-		self.negotiationTask = Task {
+		return Task {
 			try await withThrowingTaskGroup(of: Void.self) { group in
 				for try await trigger in negotiationTriggers {
 					_ = group.addTaskUnlessCancelled {
@@ -79,12 +102,6 @@ struct PeerConnectionNegotiator {
 				}
 			}
 		}
-	}
-
-	func cancel() {
-		negotiationResultsContinuation.finish()
-		negotiationTask.cancel()
-		signalingServerClient.cancel()
 	}
 
 	private static func negotiatePeerConnection(
@@ -171,7 +188,7 @@ struct PeerConnectionNegotiator {
 
 /// Just syntactic sugar
 private extension PeerConnectionNegotiator.NegotiationRole {
-	static func answerer(_ offer: IdentifiedPrimitive<RTCPrimitive.Offer>) -> Self {
+	static func answerer(_ offer: IdentifiedRTCOffer) -> Self {
 		.left(offer)
 	}
 
