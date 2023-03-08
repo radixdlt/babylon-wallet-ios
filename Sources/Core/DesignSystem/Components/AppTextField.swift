@@ -9,7 +9,6 @@ public struct AppTextField<Value: Hashable>: View {
 	let binding: FocusState<Value>.Binding
 	let equals: Value
 	let first: Binding<Value>
-	let textCase: Text.Case?
 	public init(
 		placeholder: String,
 		text: Binding<String>,
@@ -25,7 +24,6 @@ public struct AppTextField<Value: Hashable>: View {
 		self.binding = binding
 		self.equals = equals
 		self.first = first
-		self.textCase = textCase
 	}
 
 	public var body: some View {
@@ -34,7 +32,6 @@ public struct AppTextField<Value: Hashable>: View {
 				placeholder,
 				text: text.removeDuplicates()
 			)
-			.textCase(textCase)
 			.focused(binding, equals: equals)
 			.bind(first, to: binding)
 			.padding()
