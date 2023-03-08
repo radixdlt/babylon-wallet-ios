@@ -49,13 +49,12 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmOnDeviceFactorSource:
-			let factorSource = state.factorSources.device
-			return .run { [entityName = state.specifiedNameForNewEntityToCreate, selectedCurve = state.selectedCurve] send in
+			return .run { [state] send in
 				await send(.delegate(
 					.confirmedFactorSource(
-						factorSource,
-						specifiedNameForNewEntityToCreate: entityName,
-						curve: selectedCurve
+						state.selectedFactorSource,
+						specifiedNameForNewEntityToCreate: state.specifiedNameForNewEntityToCreate,
+						curve: state.selectedCurve
 					))
 				)
 			}

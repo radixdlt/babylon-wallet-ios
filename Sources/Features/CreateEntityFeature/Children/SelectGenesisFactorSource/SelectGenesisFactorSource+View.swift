@@ -36,7 +36,7 @@ extension SelectGenesisFactorSource {
 							)
 						) {
 							ForEach(viewStore.factorSources, id: \.self) { factorSource in
-								Text("\(factorSource.hint.rawValue) \(factorSource.supportsOlympia ? "(Olympia)" : "")").tag(factorSource)
+								Text("\(factorSource.hint.rawValue) (\(factorSource.supportsOlympia ? "Olympia" : "Babylon"))").tag(factorSource)
 							}
 						}
 
@@ -61,6 +61,7 @@ extension SelectGenesisFactorSource {
 						.buttonStyle(.primaryRectangular)
 						Spacer()
 					}
+					.padding([.horizontal, .bottom], .medium1)
 				}
 			}
 		}
