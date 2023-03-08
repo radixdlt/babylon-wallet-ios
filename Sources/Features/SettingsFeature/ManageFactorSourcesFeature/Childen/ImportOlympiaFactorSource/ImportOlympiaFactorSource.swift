@@ -20,9 +20,6 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		) {
 			self.mnemonic = mnemonic
 			self.passphrase = passphrase
-			#if DEBUG
-			self.mnemonic = "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow"
-			#endif
 		}
 	}
 

@@ -39,7 +39,8 @@ extension ImportOlympiaFactorSource {
 							first: viewStore.binding(
 								get: \.focusedField,
 								send: { .textFieldFocused($0) }
-							)
+							),
+							textCase: .lowercase
 						)
 						.autocorrectionDisabled()
 
