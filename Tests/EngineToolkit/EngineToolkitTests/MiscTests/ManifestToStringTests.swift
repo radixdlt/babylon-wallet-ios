@@ -1,9 +1,12 @@
 import Cryptography
 @testable import EngineToolkit
+import EngineToolkitModels
 import TestingPrelude
 
 // MARK: - ManifestToStringTests
 final class ManifestToStringTests: TestCase {
+	private let engineToolkit = EngineToolkit()
+
 	override func setUp() {
 		debugPrint = false
 		super.setUp()
@@ -43,15 +46,15 @@ final class ManifestToStringTests: TestCase {
 		}
 
 		for package in packages {
-			let manifestInstructions = TransactionManifest {
+			let manifestInstructions = try TransactionManifest {
 				CallMethod(
 					receiver: ComponentAddress("account_sim1qdfapg25xjpned3q5k8vcku6vdp55rs493lqtjeky9wqse9w34"),
 					methodName: "lock_fee"
 				) { Decimal_(value: "100") }
 
 				PublishPackage(
-					code: Blob(data: sha256(data: package.code)),
-					schema: Blob(data: sha256(data: package.schema)),
+					code: Blob(data: try hash(data: package.code)),
+					schema: Blob(data: try hash(data: package.schema)),
 					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
 					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
 					accessRules: accessRules
@@ -74,6 +77,12 @@ final class ManifestToStringTests: TestCase {
 				)).get().toString(networkID: 0xF2))
 			}
 		}
+	}
+
+	private func hash(data: Data) throws -> Data {
+		let request = HashRequest(payload: data.hex)
+		let hashed = try engineToolkit.hashRequest(request: request).get().value
+		return try .init(hex: hashed)
 	}
 }
 
