@@ -13,6 +13,8 @@ extension PeerConnectionID: Sendable {}
 public enum ConnectionPasswordTag {}
 public typealias ConnectionPassword = Tagged<ConnectionPasswordTag, HexCodable32Bytes>
 
+#if DEBUG
 public extension ConnectionPassword {
 	static let placeholder = try! Self(.init(.deadbeef32Bytes))
 }
+#endif // DEBUG
