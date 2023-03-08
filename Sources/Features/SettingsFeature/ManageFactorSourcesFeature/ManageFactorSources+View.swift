@@ -37,9 +37,12 @@ extension ManageFactorSources {
 				.padding([.horizontal, .bottom], .medium1)
 				.onAppear { viewStore.send(.appeared) }
 				.navigationTitle("Factor Sources")
-				.navigationDestination(store: store.presentedImportOlympiaFactorSource) { store in
-					ImportOlympiaFactorSource.View(store: store)
-				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ManageFactorSources.Destinations.State.importOlympiaFactorSource,
+					action: ManageFactorSources.Destinations.Action.importOlympiaFactorSource,
+					content: { ImportOlympiaFactorSource.View(store: $0) }
+				)
 			}
 		}
 	}
@@ -94,9 +97,3 @@ extension ManageFactorSources.State {
 	public static let previewValue = Self()
 }
 #endif
-
-extension StoreOf<ManageFactorSources> {
-	var presentedImportOlympiaFactorSource: PresentationStoreOf<ImportOlympiaFactorSource> {
-		scope(state: \.$presentedImportOlympiaFactorSource) { .child(.presentedImportOlympiaFactorSource($0)) }
-	}
-}

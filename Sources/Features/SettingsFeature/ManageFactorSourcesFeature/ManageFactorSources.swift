@@ -7,9 +7,25 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 		public var factorSources: FactorSources?
 
 		@PresentationState
-		public var presentedImportOlympiaFactorSource: ImportOlympiaFactorSource.State?
+		public var destination: Destinations.State?
 
 		public init() {}
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case importOlympiaFactorSource(ImportOlympiaFactorSource.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case importOlympiaFactorSource(ImportOlympiaFactorSource.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.importOlympiaFactorSource, action: /Action.importOlympiaFactorSource) {
+				ImportOlympiaFactorSource()
+			}
+		}
 	}
 
 	// MARK: Action
@@ -23,7 +39,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedImportOlympiaFactorSource(PresentationActionOf<ImportOlympiaFactorSource>)
+		case destination(PresentationActionOf<ManageFactorSources.Destinations>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -33,8 +49,8 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$presentedImportOlympiaFactorSource, action: /Action.child .. ChildAction.presentedImportOlympiaFactorSource) {
-				ImportOlympiaFactorSource()
+			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -47,10 +63,8 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 				})))
 			}
 		case .importOlympiaFactorSourceButtonTapped:
-			let presentedState = ImportOlympiaFactorSource.State()
-			return .run { send in
-				await send(.child(.presentedImportOlympiaFactorSource(.present(presentedState))))
-			}
+			state.destination = .importOlympiaFactorSource(.init())
+			return .none
 		}
 	}
 
