@@ -66,7 +66,7 @@ public struct FactorSource:
 		id: ID,
 		hint: NonEmptyString,
 		parameters: Parameters,
-		storage: Storage? = nil,
+		storage: Storage?,
 		addedOn: Date,
 		lastUsedOn: Date
 	) {
@@ -93,6 +93,7 @@ public struct FactorSource:
 			id: id,
 			hint: hint,
 			parameters: parameters,
+			storage: storage,
 			addedOn: date(),
 			lastUsedOn: date()
 		)
