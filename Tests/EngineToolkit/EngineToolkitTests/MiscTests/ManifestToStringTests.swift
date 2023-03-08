@@ -53,8 +53,8 @@ final class ManifestToStringTests: TestCase {
 				) { Decimal_(value: "100") }
 
 				PublishPackage(
-					code: Blob(data: try hash(data: package.code)),
-					schema: Blob(data: try hash(data: package.schema)),
+					code: Blob(data: try blake2b(data: package.code)),
+					schema: Blob(data: try blake2b(data: package.schema)),
 					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
 					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
 					accessRules: accessRules
@@ -77,12 +77,6 @@ final class ManifestToStringTests: TestCase {
 				)).get().toString(networkID: 0xF2))
 			}
 		}
-	}
-
-	private func hash(data: Data) throws -> Data {
-		let request = HashRequest(payload: data.hex)
-		let hashed = try engineToolkit.hashRequest(request: request).get().value
-		return try .init(hex: hashed)
 	}
 }
 
