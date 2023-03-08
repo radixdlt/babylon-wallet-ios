@@ -8,8 +8,7 @@ public struct P2PClient:
 	Sendable,
 	Hashable,
 	Codable,
-	Identifiable,
-	Equatable
+	Identifiable
 {
 	public var id: ConnectionPassword {
 		connectionPassword
@@ -30,5 +29,12 @@ public struct P2PClient:
 	) {
 		self.connectionPassword = connectionPassword
 		self.displayName = displayName
+	}
+}
+
+// MARK: Equatable
+extension P2PClient: Equatable {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.connectionPassword == rhs.connectionPassword
 	}
 }

@@ -32,7 +32,7 @@ final class NewConnectionTests: TestCase {
 	}
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
-		let connection = P2PClient(connectionPassword: .placeholder, displayName: "name")
+		let connection = P2PClient(connectionPassword: .placeholder, displayName: "Unnamed")
 
 		let store = TestStore(
 			// GIVEN initial state
@@ -61,7 +61,7 @@ final class NewConnectionTests: TestCase {
 		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
 			$0 = .connectUsingSecrets(.init(
 				connectionPassword: password,
-				nameOfConnection: connectionName + " ",
+				nameOfConnection: connectionName,
 				isNameValid: true
 			))
 		}

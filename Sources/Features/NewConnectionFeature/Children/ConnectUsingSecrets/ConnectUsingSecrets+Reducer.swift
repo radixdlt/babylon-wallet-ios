@@ -89,7 +89,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			.cancellable(id: FocusFieldID.self)
 
 		case let .nameOfConnectionChanged(connectionName):
-			state.nameOfConnection = connectionName
+			state.nameOfConnection = connectionName.trimmed()
 			state.isNameValid = !connectionName.trimmed().isEmpty
 			return .none
 

@@ -2,9 +2,9 @@
 import RadixConnectModels
 import TestingPrelude
 
-// MARK: - PeerConnectionNegotiatorTests.swift
+// MARK: - PeerConnectionNegotiatorTests
 @MainActor
-final class PeerConnectionNegotiatorTests.swift: TestCase {
+final class PeerConnectionNegotiatorTests: TestCase {
 	// Static config
 	static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 	lazy var jsonDecoder: JSONDecoder = {
