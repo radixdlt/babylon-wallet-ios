@@ -1,6 +1,15 @@
+import EngineToolkit
+import EngineToolkitModels
 import Foundation
 
 public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]])] {
+	let engineToolkit = EngineToolkit()
+
+	func hash(data: Data) throws -> String {
+		let request = HashRequest(payload: data.hex)
+		return try engineToolkit.hashRequest(request: request).get().value
+	}
+
 	var testVectors: [(manifest: String, blobs: [[UInt8]])] = [
 		try (
 			manifest: String(decoding: resource(named: "values", extension: ".rtm"), as: UTF8.self),
@@ -123,8 +132,8 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			.replacingOccurrences(of: "{mintable_resource_address}", with: "resource_sim1qqgvpz8q7ypeueqcv4qthsv7ezt8h9m3depmqqw7pc4sfmucfx")
 			.replacingOccurrences(of: "{owner_badge_non_fungible_local_id}", with: "#1#")
 			.replacingOccurrences(of: "{auth_badge_non_fungible_local_id}", with: "#1#")
-			.replacingOccurrences(of: "{code_blob_hash}", with: sha256(data: Data([10])).hex)
-			.replacingOccurrences(of: "{schema_blob_hash}", with: sha256(data: Data([10])).hex)
+			.replacingOccurrences(of: "{code_blob_hash}", with: try hash(data: Data([10])))
+			.replacingOccurrences(of: "{schema_blob_hash}", with: try hash(data: Data([10])))
 			.replacingOccurrences(of: "{initial_supply}", with: "12")
 			.replacingOccurrences(of: "{mint_amount}", with: "12")
 			.replacingOccurrences(of: "{non_fungible_local_id}", with: "#1#")
