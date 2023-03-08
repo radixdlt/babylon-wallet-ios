@@ -140,7 +140,15 @@ extension FactorSource {
 extension FactorSource {
 	public static let previewValueDevice: Self = {
 		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
-		return try! Self.device(mnemonic: mnemonic, hint: "preview", olympiaCompatible: false)
+		return try! Self(
+			kind: .device,
+			id: id(fromRoot: mnemonic.hdRoot(passphrase: "")),
+			hint: "previewValue",
+			parameters: .default,
+			storage: .forDevice(.init()),
+			addedOn: .init(timeIntervalSince1970: 0),
+			lastUsedOn: .init(timeIntervalSince1970: 0)
+		)
 	}()
 }
 
