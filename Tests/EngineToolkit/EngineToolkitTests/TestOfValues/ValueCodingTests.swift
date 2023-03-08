@@ -13,321 +13,300 @@ final class ValueEncodingTests: TestCase {
 		// Arrange
 		let testVectors: [(value: Value_, jsonRepresentation: String)] = [
 			(
-				value: Value_.boolean(true),
+				value: .boolean(false),
+				jsonRepresentation: """
+				{"type":"Bool","value":false}
+				"""
+			),
+			(
+				value: .boolean(true),
 				jsonRepresentation: """
 				{"type":"Bool","value":true}
 				"""
 			),
-
 			(
-				value: Value_.u8(1),
+				value: .u8(1),
 				jsonRepresentation: """
 				{"type":"U8","value":"1"}
 				"""
 			),
 			(
-				value: Value_.u16(1),
+				value: .u16(1),
 				jsonRepresentation: """
 				{"type":"U16","value":"1"}
 				"""
 			),
 			(
-				value: Value_.u32(1),
+				value: .u32(1),
 				jsonRepresentation: """
 				{"type":"U32","value":"1"}
 				"""
 			),
 			(
-				value: Value_.u64(1),
+				value: .u64(1),
 				jsonRepresentation: """
 				{"type":"U64","value":"1"}
 				"""
 			),
 			(
-				value: Value_.u128("1"),
+				value: .u128("1"),
 				jsonRepresentation: """
 				{"type":"U128","value":"1"}
 				"""
 			),
-
 			(
-				value: Value_.i8(1),
+				value: .i8(1),
 				jsonRepresentation: """
 				{"type":"I8","value":"1"}
 				"""
 			),
 			(
-				value: Value_.i16(1),
+				value: .i16(1),
 				jsonRepresentation: """
 				{"type":"I16","value":"1"}
 				"""
 			),
 			(
-				value: Value_.i32(1),
+				value: .i32(1),
 				jsonRepresentation: """
 				{"type":"I32","value":"1"}
 				"""
 			),
 			(
-				value: Value_.i64(1),
+				value: .i64(1),
 				jsonRepresentation: """
 				{"type":"I64","value":"1"}
 				"""
 			),
 			(
-				value: Value_.i128("1"),
+				value: .i128("1"),
 				jsonRepresentation: """
 				{"type":"I128","value":"1"}
 				"""
 			),
-
 			(
-				value: Value_.string("P2P Cash System"),
+				value: .string("Scrypto"),
 				jsonRepresentation: """
-				{"type":"String","value":"P2P Cash System"}
+				{"type":"String","value":"Scrypto"}
 				"""
 			),
 			(
-				value: Value_.enum(.init(.string("HelloWold"), fields: [.u8(1)])),
+				value: .enum(.init(.u8(1))),
 				jsonRepresentation: """
-				{"type":"Enum","variant":{"type":"String","discriminator":"HelloWold"},"fields":[{"type":"U8","value":"1"}]}
-				"""
-			),
-
-			(
-				value: Value_.enum(.init(.u8(1), fields: [.u8(1)])),
-				jsonRepresentation: """
-				{"type":"Enum","variant":{"type":"U8","discriminator":"1"},"fields":[{"type":"U8","value":"1"}]}
+				{"type":"Enum","variant":{"type":"U8","discriminator":"1"}}
 				"""
 			),
 			(
-				value: Value_.some(.init(Value_.string("Component"))),
+				value: .enum(.init(.string("EnumName::Variant"))),
 				jsonRepresentation: """
-				{"type":"Some","value":{"type":"String","value":"Component"}}
+				{"type":"Enum","variant":{"type":"String","discriminator":"EnumName::Variant"}}
 				"""
 			),
 			(
-				value: Value_.none,
+				value: .enum(.init(.string("EnumName::Variant"), fields: [.u8(1)])),
+				jsonRepresentation: """
+				{"type":"Enum","variant":{"type":"String","discriminator":"EnumName::Variant"},"fields":[{"type":"U8","value":"1"}]}
+				"""
+			),
+			(
+				value: .some(.init(.u8(1))),
+				jsonRepresentation: """
+				{"type":"Some","value":{"type":"U8","value":"1"}}
+				"""
+			),
+			(
+				value: .none,
 				jsonRepresentation: """
 				{"type":"None"}
 				"""
 			),
 			(
-				value: Value_.ok(.init(Value_.string("Component"))),
+				value: .ok(.init(.u8(1))),
 				jsonRepresentation: """
-				{"type":"Ok","value":{"type":"String","value":"Component"}}
+				{"type":"Ok","value":{"type":"U8","value":"1"}}
 				"""
 			),
 			(
-				value: Value_.err(.init(Value_.string("Component"))),
+				value: .err(.init(.u8(1))),
 				jsonRepresentation: """
-				{"type":"Err","value":{"type":"String","value":"Component"}}
-				"""
-			),
-
-			try (
-				value: Value_.array(.init(elementKind: .string, elements: [.string("World, Hello!")])),
-				jsonRepresentation: """
-				{"type":"Array","element_kind":"String","elements":[{"type":"String","value":"World, Hello!"}]}
+				{"type":"Err","value":{"type":"U8","value":"1"}}
 				"""
 			),
 			(
-				value: Value_.tuple(.init(values: [
-					.i64(19),
-					.i8(19),
+				value: try .array(.init(elementKind: .u8, elements: [.u8(1), .u8(2), .u8(3)])),
+				jsonRepresentation: """
+				{"type":"Array","element_kind":"U8","elements":[{"type":"U8","value":"1"},{"type":"U8","value":"2"},{"type":"U8","value":"3"}]}
+				"""
+			),
+			(
+				value: .map(.init(keyValueKind: .u8,
+				                  valueValueKind: .string,
+				                  entries: [
+				                  	[.u8(65), .string("A")],
+				                  	[.u8(66), .string("B")],
+				                  ])),
+				jsonRepresentation: """
+				{"entries":[[{"type":"U8","value":"65"},{"type":"String","value":"A"}],[{"type":"U8","value":"66"},{"type":"String","value":"B"}]],"type":"Map","key_value_kind":"U8","value_value_kind":"String"}
+				"""
+			),
+			(
+				value: .tuple(.init(values: [
+					.tuple(.init(values: [.u8(1), .string("Something")])),
 				])),
 				jsonRepresentation: """
-				{"type":"Tuple","elements":[{"type":"I64","value":"19"},{"type":"I8","value":"19"}]}
+				{"type":"Tuple","elements":[{"type":"Tuple","elements":[{"type":"U8","value":"1"},{"type":"String","value":"Something"}]}]}
 				"""
 			),
 			(
-				value: Value_.map(.init(
-					keyValueKind: .string,
-					valueValueKind: .u16,
-					entries: [
-						[
-							Value_.string("Hello,World!"),
-							Value_.u16(919),
-						],
-						[
-							Value_.string("World,Hello!"),
-							Value_.u16(111),
-						],
-					]
-				)),
+				value: .decimal(.init(value: "1")),
 				jsonRepresentation: """
-				{"entries":[[{"type":"String","value":"Hello,World!"},{"type":"U16","value":"919"}],[{"type":"String","value":"World,Hello!"},{"type":"U16","value":"111"}]],"type":"Map","key_value_kind":"String","value_value_kind":"U16"}
+				{"type":"Decimal","value":"1"}
 				"""
 			),
 			(
-				value: Value_.decimal(.init(value: "1923319912.102221313")),
+				value: .preciseDecimal(.init(value: "1")),
 				jsonRepresentation: """
-				{"type":"Decimal","value":"1923319912.102221313"}
+				{"type":"PreciseDecimal","value":"1"}
+				"""
+			),
+//			(
+//				value: .address(.componentAddress(.init(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"))),
+//				jsonRepresentation: """
+//				{"type":"Address","address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"}
+//				"""
+//			),
+//			(
+//				value: .address(.componentAddress(.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"))),
+//				jsonRepresentation: """
+//				{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"}
+//				"""
+//			),
+//			(
+//				value: .address(.componentAddress(.init(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"))),
+//				jsonRepresentation: """
+//				{"type":"Address","address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"}
+//				"""
+//			),
+			(
+				value: .componentAddress(.init(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")),
+				jsonRepresentation: """
+				{"type":"ComponentAddress","address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"}
 				"""
 			),
 			(
-				value: Value_.preciseDecimal(.init(value: "1923319912.102221313")),
+				value: .resourceAddress(.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")),
 				jsonRepresentation: """
-				{"type":"PreciseDecimal","value":"1923319912.102221313"}
-				"""
-			),
-
-			(
-				value: Value_.componentAddress(.init(address: "account_sim1qvqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg5cu7q")),
-				jsonRepresentation: """
-				{"type":"ComponentAddress","address":"account_sim1qvqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg5cu7q"}
+				{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"}
 				"""
 			),
 			(
-				value: Value_.resourceAddress(.init(address: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety")),
+				value: .packageAddress(.init(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8")),
 				jsonRepresentation: """
-				{"type":"ResourceAddress","address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"}
+				{"type":"PackageAddress","address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"}
 				"""
 			),
 			(
-				value: Value_.packageAddress(.init(address: "package_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxrmwtq")),
+				value: .bucket(.init(identifier: .string("bucket"))),
 				jsonRepresentation: """
-				{"type":"PackageAddress","address":"package_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxrmwtq"}
-				"""
-			),
-			try (
-				value: Value_.hash(.init(hex: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")),
-				jsonRepresentation: """
-				{"type":"Hash","value":"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"}
-				"""
-			),
-			try (
-				value: Value_.ecdsaSecp256k1PublicKey(.init(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")),
-				jsonRepresentation: """
-				{"type":"EcdsaSecp256k1PublicKey","public_key":"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"}
-				"""
-			),
-			try (
-				value: Value_.eddsaEd25519PublicKey(.init(hex: "4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29")),
-				jsonRepresentation: """
-				{"type":"EddsaEd25519PublicKey","public_key":"4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29"}
-				"""
-			),
-
-			try (
-				value: Value_.ecdsaSecp256k1Signature(.init(hex: "0079224ea514206706298d8d620f660828f7987068d6d02757e6f3cbbf4a51ab133395db69db1bc9b2726dd99e34efc252d8258dcb003ebaba42be349f50f7765e")),
-				jsonRepresentation: """
-				{"type":"EcdsaSecp256k1Signature","signature":"0079224ea514206706298d8d620f660828f7987068d6d02757e6f3cbbf4a51ab133395db69db1bc9b2726dd99e34efc252d8258dcb003ebaba42be349f50f7765e"}
-				"""
-			),
-			try (
-				value: Value_.eddsaEd25519Signature(.init(hex: "ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09")),
-				jsonRepresentation: """
-				{"type":"EddsaEd25519Signature","signature":"ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09"}
+				{"type":"Bucket","identifier":{"type":"String","value":"bucket"}}
 				"""
 			),
 			(
-				value: Value_.bucket(.init(stringLiteral: "xrd_bucket")),
-				jsonRepresentation: """
-				{"type":"Bucket","identifier":{"type":"String","value":"xrd_bucket"}}
-				"""
-			),
-			(
-				value: Value_.proof(.init(stringLiteral: "xrd_bucket")),
-				jsonRepresentation: """
-				{"type":"Proof","identifier":{"type":"String","value":"xrd_bucket"}}
-				"""
-			),
-			(
-				value: Value_.bucket(.init(integerLiteral: 1)),
+				value: .bucket(.init(identifier: .u32(1))),
 				jsonRepresentation: """
 				{"type":"Bucket","identifier":{"type":"U32","value":"1"}}
 				"""
 			),
 			(
-				value: Value_.proof(.init(integerLiteral: 1)),
+				value: .proof(.init(identifier: .string("proof"))),
+				jsonRepresentation: """
+				{"type":"Proof","identifier":{"type":"String","value":"proof"}}
+				"""
+			),
+			(
+				value: .proof(.init(identifier: .u32(1))),
 				jsonRepresentation: """
 				{"type":"Proof","identifier":{"type":"U32","value":"1"}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleLocalId(.integer(114_441_894_733_333)),
+				value: .nonFungibleLocalId(.uuid("241008287272164729465721528295504357972")),
 				jsonRepresentation: """
-				{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"114441894733333"}}
+				{"type":"NonFungibleLocalId","value":{"type":"UUID","value":"241008287272164729465721528295504357972"}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleLocalId(.uuid("238510006928098330588051703199685491739")),
+				value: .nonFungibleLocalId(.integer(1)),
 				jsonRepresentation: """
-				{"type":"NonFungibleLocalId","value":{"type":"UUID","value":"238510006928098330588051703199685491739"}}
+				{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleLocalId(.string("hello_world")),
+				value: .nonFungibleLocalId(.string("Scrypto")),
 				jsonRepresentation: """
-				{"type":"NonFungibleLocalId","value":{"type":"String","value":"hello_world"}}
+				{"type":"NonFungibleLocalId","value":{"type":"String","value":"Scrypto"}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleLocalId(.bytes([0x10, 0xA2, 0x31, 0x01])),
+				value: .nonFungibleLocalId(.bytes([0x01, 0x02, 0x03, 0x04])),
 				jsonRepresentation: """
-				{"type":"NonFungibleLocalId","value":{"type":"Bytes","value":"10a23101"}}
+				{"type":"NonFungibleLocalId","value":{"type":"Bytes","value":"01020304"}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleGlobalId(.init(
-					resourceAddress: .init(address: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"),
-					nonFungibleLocalId: .integer(114_441_894_733_333)
-				)),
+				value: .nonFungibleGlobalId(.init(resourceAddress:
+					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
+					nonFungibleLocalId: .uuid("241008287272164729465721528295504357972"))),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"114441894733333"}}}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"UUID","value":"241008287272164729465721528295504357972"}}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleGlobalId(.init(
-					resourceAddress: .init(address: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"),
-					nonFungibleLocalId: .uuid("238510006928098330588051703199685491739")
-				)),
+				value: .nonFungibleGlobalId(.init(resourceAddress:
+					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
+					nonFungibleLocalId: .integer(1))),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"UUID","value":"238510006928098330588051703199685491739"}}}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleGlobalId(.init(
-					resourceAddress: .init(address: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"),
-					nonFungibleLocalId: .string("hello_world")
-				)),
+				value: .nonFungibleGlobalId(.init(resourceAddress:
+					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
+					nonFungibleLocalId: .string("Scrypto"))),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"String","value":"hello_world"}}}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"String","value":"Scrypto"}}}
 				"""
 			),
 			(
-				value: Value_.nonFungibleGlobalId(.init(
-					resourceAddress: .init(address: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"),
-					nonFungibleLocalId: .bytes([0x10, 0xA2, 0x31, 0x01])
-				)),
+				value: .nonFungibleGlobalId(.init(resourceAddress:
+					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
+					nonFungibleLocalId: .bytes([0x01, 0x02, 0x03, 0x04]))),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Bytes","value":"10a23101"}}}
-				"""
-			),
-
-			try (
-				value: Value_.blob(.init(hex: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")),
-				jsonRepresentation: """
-				{"type":"Blob","hash":"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Bytes","value":"01020304"}}}
 				"""
 			),
 			(
-				value: Value_.expression(.init(value: "ENTIRE_AUTH_ZONE")),
+				value: .expression(.init(value: "ENTIRE_AUTH_ZONE")),
 				jsonRepresentation: """
 				{"type":"Expression","value":"ENTIRE_AUTH_ZONE"}
 				"""
 			),
 			(
-				value: Value_.expression(.init(value: "ENTIRE_WORKTOP")),
+				value: .expression(.init(value: "ENTIRE_WORKTOP")),
 				jsonRepresentation: """
 				{"type":"Expression","value":"ENTIRE_WORKTOP"}
 				"""
 			),
-			try (
-				value: Value_.bytes(.init(hex: "1219122008")),
+			(
+				value: .blob(try .init(hex: "d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e")),
 				jsonRepresentation: """
-				{"type":"Bytes","value":"1219122008"}
+				{"type":"Blob","hash":"d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e"}
+				"""
+			),
+			(
+				value: .bytes(try .init(hex: "d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e")),
+				jsonRepresentation: """
+				{"type":"Bytes","value":"d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e"}
 				"""
 			),
 		]
