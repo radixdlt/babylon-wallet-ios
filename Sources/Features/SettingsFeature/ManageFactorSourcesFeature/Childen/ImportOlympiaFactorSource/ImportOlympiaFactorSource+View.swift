@@ -10,6 +10,7 @@ extension ImportOlympiaFactorSource.State {
 extension ImportOlympiaFactorSource {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
+		let mnemonic: String
 	}
 
 	@MainActor
@@ -22,11 +23,24 @@ extension ImportOlympiaFactorSource {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: ImportOlympiaFactorSource")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					AppTextField(
+						placeholder: "Mnemonic",
+						text: viewStore.binding(
+							get: \.mnemonic,
+							send: { .mnemonicChanged($0) }
+						),
+						hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
+						binding: $focusedField,
+						equals: .entityName,
+						first: viewStore.binding(
+							get: \.focusedField,
+							send: { .textFieldFocused($0) }
+						)
+					)
+					.autocorrectionDisabled()
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}
