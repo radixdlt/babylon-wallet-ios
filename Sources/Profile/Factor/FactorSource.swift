@@ -61,22 +61,41 @@ public struct FactorSource:
 	/// properties.
 	public var storage: Storage?
 
-	public init(
+	init(
 		kind: FactorSourceKind,
 		id: ID,
 		hint: NonEmptyString,
 		parameters: Parameters,
-		addedOn: Date = .now,
-		lastUsedOn: Date = .now,
-		storage: Storage? = nil
+		storage: Storage? = nil,
+		addedOn: Date,
+		lastUsedOn: Date
 	) {
 		self.id = id
 		self.kind = kind
 		self.hint = hint
 		self.parameters = parameters
-		self.addedOn = addedOn.stableEquatableAfterJSONRoundtrip
-		self.lastUsedOn = lastUsedOn.stableEquatableAfterJSONRoundtrip
 		self.storage = storage
+		self.addedOn = addedOn
+		self.lastUsedOn = lastUsedOn
+	}
+
+	public init(
+		kind: FactorSourceKind,
+		id: ID,
+		hint: NonEmptyString,
+		parameters: Parameters,
+		storage: Storage? = nil
+	) {
+		@Dependency(\.date) var date
+
+		self.init(
+			kind: kind,
+			id: id,
+			hint: hint,
+			parameters: parameters,
+			addedOn: date(),
+			lastUsedOn: date()
+		)
 	}
 }
 

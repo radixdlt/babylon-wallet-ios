@@ -21,13 +21,18 @@ final class ProfileStoreTests: TestCase {
 			}
 			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
 			$0.secureStorageClient.loadProfileSnapshotData = { nil }
+			$0.date = .constant(Date(timeIntervalSince1970: 0))
 		} operation: {
 			_ = await ProfileStore()
 		}
 	}
 
 	func test_fullOnboarding_assert_mnemonic_persisted_when_commitEphemeral_called() async throws {
-		let privateFactor = PrivateHDFactorSource.testValue
+		let privateFactor = withDependencies {
+			$0.date = .constant(Date(timeIntervalSince1970: 0))
+		} operation: {
+			PrivateHDFactorSource.testValue
+		}
 
 		try await doTestFullOnboarding(
 			privateFactor: privateFactor,
@@ -50,7 +55,11 @@ final class ProfileStoreTests: TestCase {
 
 	func test_fullOnboarding_assert_profileSnapshot_persisted_when_commitEphemeral_called() async throws {
 		let profileID = UUID()
-		let privateFactor = PrivateHDFactorSource.testValue
+		let privateFactor = withDependencies {
+			$0.date = .constant(Date(timeIntervalSince1970: 0))
+		} operation: {
+			PrivateHDFactorSource.testValue
+		}
 
 		try await doTestFullOnboarding(
 			profileID: profileID,
@@ -104,6 +113,7 @@ private extension ProfileStoreTests {
 			$0.secureStorageClient.saveProfileSnapshot = {
 				await profileSnapshotSavedIntoSecureStorage.setValue($0)
 			}
+			$0.date = .constant(Date(timeIntervalSince1970: 0))
 		} operation: {
 			let sut = await ProfileStore()
 			var profile: Profile?
@@ -112,6 +122,7 @@ private extension ProfileStoreTests {
 				case let .ephemeral(ephemeral):
 					profile = ephemeral.profile
 					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.factorSource)
+					//                    XCTAssertNoDifference(ephemeral.profile.factorSources.first.ignoringDate(), privateFactor.factorSource.ignoringDate())
 					try await sut.commitEphemeral()
 				case let .persisted(persistedProfile):
 					XCTAssertNoDifference(
@@ -147,5 +158,9 @@ private let expectedDeviceDescription = ProfileStore.macOSDeviceDescriptionFallb
 #endif
 
 extension PrivateHDFactorSource {
-	static let testValue: Self = .testValue(hint: expectedDeviceDescription)
+	static let testValue: Self = withDependencies {
+		$0.date = .constant(Date(timeIntervalSince1970: 0))
+	} operation: {
+		Self.testValue(hint: expectedDeviceDescription)
+	}
 }
