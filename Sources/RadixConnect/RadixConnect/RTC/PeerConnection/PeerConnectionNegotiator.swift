@@ -9,14 +9,11 @@ protocol PeerConnectionFactory: Sendable {
 }
 
 // MARK: - PeerConnectionNegotiator
-/*
-   Handles the Peer Connection negations.
-
-   This component assumes that a single SignalingClient will be used to negotiate multiple PeerConnections.
-   Thus, on each negotiation trigger(Offer or RemoteClientDidConnect), it will create a Task managing the negotiation between the Peers.
-   Once the negotiation completes, the result of it will be published on `peerConnections` async sequence.
-   The result of the negotiation is either a PeerConnectionClient ready for use, or the error that occurred during the negotiation.
- */
+/// Handles the Peer Connection negations.
+/// This component assumes that a single SignalingClient will be used to negotiate multiple PeerConnections.
+/// Thus, on each negotiation trigger(Offer or RemoteClientDidConnect), it will create a Task managing the negotiation between the Peers.
+/// Once the negotiation completes, the result of it will be published on `negotiationResults` async sequence.
+/// The result of the negotiation is either a PeerConnectionClient ready for use, or the error that occurred during the negotiation.
 struct PeerConnectionNegotiator {
 	struct FailedToCreatePeerConnectionError: Error {
 		let remoteClientId: RemoteClientID
@@ -24,7 +21,7 @@ struct PeerConnectionNegotiator {
 	}
 
 	typealias NegotiationResult = Result<PeerConnectionClient, FailedToCreatePeerConnectionError>
-	fileprivate typealias NegotiationRole = Either<IdentifiedRTCOffer, RemoteClientID>
+	fileprivate typealias NegotiationTrigger = Either<IdentifiedRTCOffer, RemoteClientID>
 
 	// MARK: - Negotiation
 
@@ -71,15 +68,19 @@ extension PeerConnectionNegotiator {
 		isOfferer: Bool,
 		negotiationResultsContinuation: AsyncStream<NegotiationResult>.Continuation
 	) -> Task<Void, Error> {
-		@Sendable func negotiate(_ role: NegotiationRole) async {
+		@Sendable func negotiate(_ trigger: NegotiationTrigger) async {
 			do {
-				let peerConnection = try await Self.negotiatePeerConnection(role, signalingServerClient: signalingClient, factory: factory)
+				let peerConnection = try await Self.negotiatePeerConnection(
+					trigger,
+					signalingServerClient: signalingClient,
+					factory: factory
+				)
 				negotiationResultsContinuation.yield(.success(peerConnection))
 			} catch {
 				negotiationResultsContinuation.yield(
 					.failure(
 						FailedToCreatePeerConnectionError(
-							remoteClientId: role.clientID,
+							remoteClientId: trigger.clientID,
 							underlyingError: error
 						)
 					)
@@ -87,9 +88,18 @@ extension PeerConnectionNegotiator {
 			}
 		}
 
-		let negotiationTriggers: AnyAsyncSequence<NegotiationRole> = isOfferer ?
-			signalingClient.onOffer.map { NegotiationRole.answerer($0) }.eraseToAnyAsyncSequence() :
-			signalingClient.onRemoteClientState.filter(\.remoteClientDidConnect).map { NegotiationRole.offerer($0.remoteClientId) }.eraseToAnyAsyncSequence()
+		let negotiationTriggers: AnyAsyncSequence<NegotiationTrigger> = {
+			if isOfferer {
+				return signalingClient.onRemoteClientState
+					.filter(\.remoteClientDidConnect)
+					.map { NegotiationTrigger.remoteClientDidConnect($0.remoteClientId) }
+					.eraseToAnyAsyncSequence()
+			} else {
+				return signalingClient.onOffer
+					.map { NegotiationTrigger.receivedOffer($0) }
+					.eraseToAnyAsyncSequence()
+			}
+		}()
 
 		return Task {
 			try await withThrowingTaskGroup(of: Void.self) { group in
@@ -105,11 +115,11 @@ extension PeerConnectionNegotiator {
 	}
 
 	private static func negotiatePeerConnection(
-		_ role: NegotiationRole,
+		_ trigger: NegotiationTrigger,
 		signalingServerClient: SignalingClient,
 		factory: PeerConnectionFactory
 	) async throws -> PeerConnectionClient {
-		let clientID = role.clientID
+		let clientID = trigger.clientID
 		let log = Self.tracePeerConnectionNegotiation(clientID)
 
 		log("Triggered")
@@ -152,25 +162,27 @@ extension PeerConnectionNegotiator {
 			}
 		}
 
-		switch role {
-		case let .left(offer):
-			try await peerConnectionClient.setRemoteOffer(offer.content)
-			log("Remote Offer was configured as local description")
+		try await trigger.doAsync(
+			receivedOffer: { offer in
+				try await peerConnectionClient.setRemoteOffer(offer.content)
+				log("Remote Offer was configured as local description")
 
-			let localAnswer = try await peerConnectionClient.createAnswer()
-			log("Created Answer")
+				let localAnswer = try await peerConnectionClient.createAnswer()
+				log("Created Answer")
 
-			try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
-			log("Sent Answer to remote client")
-		case let .right(answerrerID):
-			let offer = try await peerConnectionClient.createLocalOffer()
-			try await signalingServerClient.sendToRemote(.init(content: .offer(offer), id: answerrerID))
-			log("Sent Offer to remote client")
+				try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
+				log("Sent Answer to remote client")
+			},
+			remoteClientDidConnect: { clientID in
+				let offer = try await peerConnectionClient.createLocalOffer()
+				try await signalingServerClient.sendToRemote(.init(content: .offer(offer), id: clientID))
+				log("Sent Offer to remote client")
 
-			let answer = try await signalingServerClient.onAnswer.filter { $0.id == answerrerID }.first()
-			try await peerConnectionClient.setRemoteAnswer(answer.content)
-			log("Received and configured remote Answer")
-		}
+				let answer = try await signalingServerClient.onAnswer.filter { $0.id == clientID }.first()
+				try await peerConnectionClient.setRemoteAnswer(answer.content)
+				log("Received and configured remote Answer")
+			}
+		)
 
 		_ = try await onConnectionEstablished.collect()
 		log("Connection established")
@@ -187,12 +199,12 @@ extension PeerConnectionNegotiator {
 }
 
 /// Just syntactic sugar
-private extension PeerConnectionNegotiator.NegotiationRole {
-	static func answerer(_ offer: IdentifiedRTCOffer) -> Self {
+private extension PeerConnectionNegotiator.NegotiationTrigger {
+	static func receivedOffer(_ offer: IdentifiedRTCOffer) -> Self {
 		.left(offer)
 	}
 
-	static func offerer(_ remoteClientID: RemoteClientID) -> Self {
+	static func remoteClientDidConnect(_ remoteClientID: RemoteClientID) -> Self {
 		.right(remoteClientID)
 	}
 
@@ -202,5 +214,12 @@ private extension PeerConnectionNegotiator.NegotiationRole {
 		} ifRight: { remoteClientID in
 			remoteClientID
 		}
+	}
+
+	func doAsync(
+		receivedOffer: (Left) async throws -> Void,
+		remoteClientDidConnect: (Right) async throws -> Void
+	) async rethrows {
+		try await doAsync(ifLeft: receivedOffer, ifRight: remoteClientDidConnect)
 	}
 }
