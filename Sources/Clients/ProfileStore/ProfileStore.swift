@@ -1,6 +1,7 @@
 import AsyncExtensions
 import ClientPrelude
 import Cryptography
+import MnemonicClient
 import Profile
 import SecureStorageClient
 

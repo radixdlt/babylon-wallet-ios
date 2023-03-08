@@ -24,41 +24,62 @@ extension ImportOlympiaFactorSource {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					AppTextField(
-						placeholder: "Mnemonic",
-						text: viewStore.binding(
-							get: \.mnemonic,
-							send: { .mnemonicChanged($0) }
-						),
-						hint: "Seed phrase",
-						binding: $focusedField,
-						equals: .mnemonic,
-						first: viewStore.binding(
-							get: \.focusedField,
-							send: { .textFieldFocused($0) }
+			NavigationStack {
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+					VStack {
+						AppTextField(
+							placeholder: "Mnemonic",
+							text: viewStore.binding(
+								get: \.mnemonic,
+								send: { .mnemonicChanged($0) }
+							),
+							hint: "Seed phrase",
+							binding: $focusedField,
+							equals: .mnemonic,
+							first: viewStore.binding(
+								get: \.focusedField,
+								send: { .textFieldFocused($0) }
+							)
 						)
-					)
-					.autocorrectionDisabled()
+						.autocorrectionDisabled()
 
-					AppTextField(
-						placeholder: "Passphrase",
-						text: viewStore.binding(
-							get: \.passphrase,
-							send: { .passphraseChanged($0) }
-						),
-						hint: "BIP39 Passphrase is often called a '25th word'.",
-						binding: $focusedField,
-						equals: .passphrase,
-						first: viewStore.binding(
-							get: \.focusedField,
-							send: { .textFieldFocused($0) }
+						AppTextField(
+							placeholder: "Passphrase",
+							text: viewStore.binding(
+								get: \.passphrase,
+								send: { .passphraseChanged($0) }
+							),
+							hint: "BIP39 Passphrase is often called a '25th word'.",
+							binding: $focusedField,
+							equals: .passphrase,
+							first: viewStore.binding(
+								get: \.focusedField,
+								send: { .textFieldFocused($0) }
+							)
 						)
-					)
-					.autocorrectionDisabled()
+						.autocorrectionDisabled()
+
+						Button("Import") {
+							viewStore.send(.importButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+					}
+					.padding([.horizontal, .bottom], .medium1)
+					.onAppear { viewStore.send(.appeared) }
+					.navigationTitle("Import Mnemonic")
+					#if os(iOS)
+						.navigationBarTitleColor(.app.gray1)
+						.navigationBarTitleDisplayMode(.inline)
+						.navigationBarInlineTitleFont(.app.secondaryHeader)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									ViewStore(store.stateless).send(.view(.closeButtonTapped))
+								}
+							}
+						}
+					#endif
 				}
-				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

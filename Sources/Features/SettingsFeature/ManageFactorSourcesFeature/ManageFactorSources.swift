@@ -78,4 +78,14 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .destination(.presented(.importOlympiaFactorSource(.delegate(.dismiss)))):
+			state.destination = nil
+			return .none
+		default:
+			return .none
+		}
+	}
 }

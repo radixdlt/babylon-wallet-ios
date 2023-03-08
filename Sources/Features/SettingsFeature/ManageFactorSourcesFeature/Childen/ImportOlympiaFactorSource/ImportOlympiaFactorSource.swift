@@ -1,4 +1,6 @@
+import Cryptography
 import FeaturePrelude
+import MnemonicClient
 
 // MARK: - ImportOlympiaFactorSource
 public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
@@ -23,16 +25,25 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case closeButtonTapped
+		case importButtonTapped
 		case mnemonicChanged(String)
 		case passphraseChanged(String)
 		case textFieldFocused(ImportOlympiaFactorSource.State.Field?)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case dismiss
+	}
+
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(ImportOlympiaFactorSource.State.Field?)
+		case importMnemonicResult(TaskResult<MnemonicWithPassphrase>)
 	}
 
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.mnemonicClient) var mnemonicClient
 
 	public init() {}
 
@@ -43,6 +54,17 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 				try await clock.sleep(for: .seconds(0.5))
 				await send(.internal(.focusTextField(.mnemonic)))
 			}
+		case .importButtonTapped:
+			return .run { [mnemonicPhrase = state.mnemonic, passphrase = state.passphrase] send in
+				await send(.internal(.importMnemonicResult(TaskResult {
+					let mnemonic = try mnemonicClient.import(mnemonicPhrase, BIP39.Language?.none)
+					return MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+				})))
+			}
+
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
+
 		case let .mnemonicChanged(mnemonic):
 			state.mnemonic = mnemonic
 			return .none
@@ -61,6 +83,12 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .focusTextField(field):
 			state.focusedField = field
+			return .none
+		case let .importMnemonicResult(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+		case let .importMnemonicResult(.success(mnemonicWithPassphrase)):
+			print("🔮 Success")
 			return .none
 		}
 	}
