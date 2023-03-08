@@ -8,17 +8,17 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 		public let specifiedNameForNewEntityToCreate: NonEmptyString
 		public let factorSources: FactorSources
 		public var selectedFactorSource: FactorSource
-		public var curve: Slip10Curve
+		public var selectedCurve: Slip10Curve
 
 		public init(
 			specifiedNameForNewEntityToCreate: NonEmptyString,
 			factorSources: FactorSources,
-			curve: Slip10Curve = .curve25519 // default to new
+			selectedCurve: Slip10Curve = .curve25519 // default to new
 		) {
 			self.specifiedNameForNewEntityToCreate = specifiedNameForNewEntityToCreate
 			self.factorSources = factorSources
 			self.selectedFactorSource = factorSources.first
-			self.curve = curve
+			self.selectedCurve = selectedCurve
 		}
 	}
 
@@ -38,20 +38,24 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .selectedFactorSource(selectedFactorSource):
 			state.selectedFactorSource = selectedFactorSource
+			if !selectedFactorSource.parameters.supportedCurves.contains(state.selectedCurve) {
+				state.selectedCurve = selectedFactorSource.parameters.supportedCurves.first
+			}
 			return .none
 
 		case let .selectedCurve(selectedCurve):
-			state.curve = selectedCurve
+			precondition(state.selectedFactorSource.parameters.supportedCurves.contains(selectedCurve))
+			state.selectedCurve = selectedCurve
 			return .none
 
 		case .confirmOnDeviceFactorSource:
 			let factorSource = state.factorSources.device
-			return .run { [entityName = state.specifiedNameForNewEntityToCreate, curve = state.curve] send in
+			return .run { [entityName = state.specifiedNameForNewEntityToCreate, selectedCurve = state.selectedCurve] send in
 				await send(.delegate(
 					.confirmedFactorSource(
 						factorSource,
 						specifiedNameForNewEntityToCreate: entityName,
-						curve: curve
+						curve: selectedCurve
 					))
 				)
 			}

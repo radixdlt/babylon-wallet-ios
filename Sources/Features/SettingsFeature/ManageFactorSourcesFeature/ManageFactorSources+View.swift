@@ -26,7 +26,7 @@ extension ManageFactorSources {
 				VStack(alignment: .leading) {
 					if let factorSources = viewStore.factorSources {
 						ScrollView(showsIndicators: false) {
-							VStack(spacing: 0) {
+							VStack(alignment: .leading, spacing: .medium2) {
 								ForEach(factorSources) {
 									FactorSourceView(factorSource: $0)
 								}
@@ -51,6 +51,23 @@ extension ManageFactorSources {
 				)
 			}
 		}
+	}
+}
+
+// MARK: - FactorSourceView
+struct FactorSourceView: SwiftUI.View {
+	let factorSource: FactorSource
+}
+
+extension FactorSourceView {
+	var body: some View {
+		VStack(alignment: .leading, spacing: 0) {
+			InfoPair(heading: "Kind", item: factorSource.kind)
+			InfoPair(heading: "Hint", item: factorSource.hint)
+			InfoPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
+			InfoPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
+		}
+		.border(Color.app.gray1, width: 2)
 	}
 }
 

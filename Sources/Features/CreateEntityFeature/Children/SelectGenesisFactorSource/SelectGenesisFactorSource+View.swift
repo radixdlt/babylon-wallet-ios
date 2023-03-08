@@ -8,17 +8,17 @@ extension SelectGenesisFactorSource.State {
 //			curves: Array(Set(factorSources.flatMap(\.parameters.supportedCurves.elements))),
 //			selectedCurve: curve
 //		)
-		.init(factorSources: factorSources, selectedFactorSource: selectedFactorSource)
+		.init(factorSources: factorSources, selectedFactorSource: selectedFactorSource, selectedCurve: self.selectedCurve)
 	}
 }
 
 // MARK: - SelectGenesisFactorSource.View
 extension SelectGenesisFactorSource {
 	public struct ViewState: Equatable {
-//		let curves: [Slip10Curve]
-//		let selectedCurve: Slip10Curve
 		let factorSources: FactorSources
 		let selectedFactorSource: FactorSource
+		let selectedCurve: Slip10Curve
+		var supportedCurves: [Slip10Curve] { selectedFactorSource.parameters.supportedCurves.rawValue.elements }
 	}
 
 	@MainActor
@@ -33,7 +33,6 @@ extension SelectGenesisFactorSource {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ForceFullScreen {
 					VStack {
-						Text("Derive accounts using...")
 						Picker(
 							"Factor Source",
 							selection: viewStore.binding(
@@ -41,21 +40,24 @@ extension SelectGenesisFactorSource {
 								send: { .selectedFactorSource($0) }
 							)
 						) {
-							ForEach(viewStore.factorSources, id: \.id) { factorSource in
-								//                                FactorSourceView(factorSource: factorSource)
-								Text("\(factorSource.hint.rawValue) \(factorSource.supportsOlympia ? "(Olympia)" : "")")
+							ForEach(viewStore.factorSources, id: \.self) { factorSource in
+								Text("\(factorSource.hint.rawValue) \(factorSource.supportsOlympia ? "(Olympia)" : "")").tag(factorSource)
 							}
 						}
 
-//						Picker(
-//							"Curve",
-//							selection: viewStore.binding(
-//								get: \.selectedCurve,
-//								send: { .selectedCurve($0) }
-//							)
-//						) {
-//							Text("Heh")
-//						}
+						if viewStore.supportedCurves.count > 1 {
+							Picker(
+								"Curve",
+								selection: viewStore.binding(
+									get: \.selectedCurve,
+									send: { .selectedCurve($0) }
+								)
+							) {
+								ForEach(viewStore.supportedCurves, id: \.self) { curve in
+									Text("\(String(describing: curve))").tag(curve.rawValue)
+								}
+							}
+						}
 
 						Spacer()
 						Button("Confirm OnDevice factor source") {
@@ -66,22 +68,6 @@ extension SelectGenesisFactorSource {
 					}
 				}
 			}
-		}
-	}
-}
-
-// MARK: - FactorSourceView
-struct FactorSourceView: SwiftUI.View {
-	let factorSource: FactorSource
-}
-
-extension FactorSourceView {
-	var body: some View {
-		VStack(alignment: .leading, spacing: 0) {
-			InfoPair(heading: "Kind", item: factorSource.kind)
-			InfoPair(heading: "Hint", item: factorSource.hint)
-			InfoPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
-			InfoPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 		}
 	}
 }
