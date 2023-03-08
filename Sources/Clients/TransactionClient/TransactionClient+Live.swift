@@ -42,30 +42,29 @@ extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
-			let hdRoot: HD.Root
-			let factorSource: FactorSource
-			do {
-				factorSource = try await factorSourcesClient.getFactorSources().device
-				guard let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSource.id, .signTransaction) else {
-					return .failure(.failedToLoadFactorSourceForSigning)
-				}
-				hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
-			} catch {
-				return .failure(.failedToLoadFactorSourceForSigning)
-			}
-
-			@Sendable func sign(data: any DataProtocol, with account: OnNetwork.Account) async throws -> SignatureWithPublicKey {
+			@Sendable func sign(
+				data: any DataProtocol,
+				with account: OnNetwork.Account
+			) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
 				case let .unsecured(unsecuredControl):
 					let factorInstance = unsecuredControl.genesisFactorInstance
-					guard factorInstance.factorSourceID == factorSource.id else {
-						assertionFailure("this should not happen")
+					let factorSources = try await factorSourcesClient.getFactorSources()
+
+					guard
+						let factorSource = factorSources[id: factorInstance.factorSourceID],
+						let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorInstance.factorSourceID, .signTransaction)
+					else {
 						throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
 					}
+					let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
+					let curve = factorSource.parameters.supportedCurves.last
+					print("🔮 signing with account=\(account.displayName), using curve: \(curve)")
+
 					let sigRes: SignatureWithPublicKey = try useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,
 						derivationPath: factorInstance.derivationPath!,
-						curve: factorSource.parameters.supportedCurves.first,
+						curve: curve,
 						data: Data(data)
 					))
 					return sigRes
