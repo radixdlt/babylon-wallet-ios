@@ -25,8 +25,12 @@ extension ManageFactorSources {
 
 				VStack(alignment: .leading) {
 					if let factorSources = viewStore.factorSources {
-						ForEach(factorSources) {
-							FactorSourceView(factorSource: $0)
+						ScrollView(showsIndicators: false) {
+							VStack(spacing: 0) {
+								ForEach(factorSources) {
+									FactorSourceView(factorSource: $0)
+								}
+							}
 						}
 					}
 					Button("Import Olympia factor source") {
@@ -35,7 +39,9 @@ extension ManageFactorSources {
 					.buttonStyle(.primaryRectangular)
 				}
 				.padding([.horizontal, .bottom], .medium1)
-				.onAppear { viewStore.send(.appeared) }
+				.task { @MainActor in
+					await ViewStore(store.stateless).send(.view(.task)).finish()
+				}
 				.navigationTitle("Factor Sources")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -43,36 +49,6 @@ extension ManageFactorSources {
 					action: ManageFactorSources.Destinations.Action.importOlympiaFactorSource,
 					content: { ImportOlympiaFactorSource.View(store: $0) }
 				)
-			}
-		}
-	}
-}
-
-// MARK: - FactorSourceView
-public struct FactorSourceView: SwiftUI.View {
-	public let factorSource: FactorSource
-}
-
-extension FactorSourceView {
-	public var body: some View {
-		VStack(alignment: .leading) {
-			Text("Factor Source")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-
-			InfoPair(heading: "Kind", item: factorSource.kind.rawValue)
-			InfoPair(heading: "Hint", item: factorSource.hint.rawValue)
-			InfoPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
-			InfoPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
-
-			if let deviceStore = factorSource.storage?.forDevice {
-				ForEach(deviceStore.nextDerivationIndicesPerNetwork.perNetwork) { nextIndices in
-					InfoPair(heading: "NetworkID", item: nextIndices.networkID)
-					InfoPair(heading: "Next index for account", item: nextIndices.nextForEntity(kind: .account))
-					InfoPair(heading: "Next index for persona", item: nextIndices.nextForEntity(kind: .identity))
-				}
 			}
 		}
 	}

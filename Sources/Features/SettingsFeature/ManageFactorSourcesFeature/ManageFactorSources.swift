@@ -30,7 +30,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 	// MARK: Action
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case importOlympiaFactorSourceButtonTapped
 	}
 
@@ -56,11 +56,18 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			return .run { send in
-				await send(.internal(.loadFactorSourcesResult(TaskResult {
-					try await factorSourcesClient.getFactorSources()
-				})))
+				do {
+					for try await factorSources in await factorSourcesClient.factorSourcesAsyncSequence() {
+						guard !Task.isCancelled else {
+							return
+						}
+						await send(.internal(.loadFactorSourcesResult(.success(factorSources))))
+					}
+				} catch {
+					errorQueue.schedule(error)
+				}
 			}
 		case .importOlympiaFactorSourceButtonTapped:
 			state.destination = .importOlympiaFactorSource(.init())

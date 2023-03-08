@@ -116,6 +116,13 @@ extension ProfileStore {
 		}
 	}
 
+	/// A multicasting replaying async sequence of distinct FactorSources
+	public func factorSourcesValues() async -> AnyAsyncSequence<FactorSources> {
+		lens {
+			$0.profile.factorSources
+		}
+	}
+
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
 		case .persisted: return .existingProfileLoaded

@@ -14,6 +14,9 @@ extension FactorSourcesClient: DependencyKey {
 			getFactorSources: {
 				await getProfileStore().profile.factorSources
 			},
+			factorSourcesAsyncSequence: {
+				await getProfileStore().factorSourcesValues()
+			},
 			importOlympiaFactorSource: { mnemonicWithPassphrase in
 				let factorSource = try FactorSource.olympia(
 					mnemonicWithPassphrase: mnemonicWithPassphrase

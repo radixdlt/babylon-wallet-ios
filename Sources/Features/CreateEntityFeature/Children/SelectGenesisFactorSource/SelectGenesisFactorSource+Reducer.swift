@@ -7,6 +7,7 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let specifiedNameForNewEntityToCreate: NonEmptyString
 		public let factorSources: FactorSources
+		public var selectedFactorSource: FactorSource
 		public var curve: Slip10Curve
 
 		public init(
@@ -16,12 +17,14 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 		) {
 			self.specifiedNameForNewEntityToCreate = specifiedNameForNewEntityToCreate
 			self.factorSources = factorSources
+			self.selectedFactorSource = factorSources.first
 			self.curve = curve
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case confirmOnDeviceFactorSource
+		case selectedFactorSource(FactorSource)
 		case selectedCurve(Slip10Curve)
 	}
 
@@ -33,6 +36,10 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case let .selectedFactorSource(selectedFactorSource):
+			state.selectedFactorSource = selectedFactorSource
+			return .none
+
 		case let .selectedCurve(selectedCurve):
 			state.curve = selectedCurve
 			return .none

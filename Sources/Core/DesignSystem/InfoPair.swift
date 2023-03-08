@@ -14,10 +14,13 @@ public struct InfoPair: View {
 extension InfoPair {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small2) {
-			Text(heading)
-				.sectionHeading
-			Text(item)
-				.infoItem
+			Group {
+				Text(heading)
+					.sectionHeading
+				Text(item)
+					.infoItem
+			}
+			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 	}
 }

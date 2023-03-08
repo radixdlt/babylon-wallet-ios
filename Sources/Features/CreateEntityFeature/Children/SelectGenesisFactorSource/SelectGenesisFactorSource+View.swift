@@ -3,19 +3,22 @@ import FeaturePrelude
 
 extension SelectGenesisFactorSource.State {
 	var viewState: SelectGenesisFactorSource.ViewState {
-		.init(
-			// TODO: implement
-			curves: Array(Set(factorSources.flatMap(\.parameters.supportedCurves.elements))),
-			selectedCurve: curve
-		)
+//		.init(
+//			// TODO: implement
+//			curves: Array(Set(factorSources.flatMap(\.parameters.supportedCurves.elements))),
+//			selectedCurve: curve
+//		)
+		.init(factorSources: factorSources, selectedFactorSource: selectedFactorSource)
 	}
 }
 
 // MARK: - SelectGenesisFactorSource.View
 extension SelectGenesisFactorSource {
 	public struct ViewState: Equatable {
-		let curves: [Slip10Curve]
-		let selectedCurve: Slip10Curve
+//		let curves: [Slip10Curve]
+//		let selectedCurve: Slip10Curve
+		let factorSources: FactorSources
+		let selectedFactorSource: FactorSource
 	}
 
 	@MainActor
@@ -29,26 +32,56 @@ extension SelectGenesisFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ForceFullScreen {
-					// FIXME: appStore submission: implement this screen with a picker
 					VStack {
+						Text("Derive accounts using...")
 						Picker(
-							"Curve",
+							"Factor Source",
 							selection: viewStore.binding(
-								get: \.selectedCurve,
-								send: { .selectedCurve($0) }
+								get: \.selectedFactorSource,
+								send: { .selectedFactorSource($0) }
 							)
 						) {
-							Text("Heh")
+							ForEach(viewStore.factorSources, id: \.id) { factorSource in
+								//                                FactorSourceView(factorSource: factorSource)
+								Text("\(factorSource.hint.rawValue) \(factorSource.supportsOlympia ? "(Olympia)" : "")")
+							}
 						}
+
+//						Picker(
+//							"Curve",
+//							selection: viewStore.binding(
+//								get: \.selectedCurve,
+//								send: { .selectedCurve($0) }
+//							)
+//						) {
+//							Text("Heh")
+//						}
 
 						Spacer()
 						Button("Confirm OnDevice factor source") {
 							viewStore.send(.confirmOnDeviceFactorSource)
 						}
+						.buttonStyle(.primaryRectangular)
 						Spacer()
 					}
 				}
 			}
+		}
+	}
+}
+
+// MARK: - FactorSourceView
+struct FactorSourceView: SwiftUI.View {
+	let factorSource: FactorSource
+}
+
+extension FactorSourceView {
+	var body: some View {
+		VStack(alignment: .leading, spacing: 0) {
+			InfoPair(heading: "Kind", item: factorSource.kind)
+			InfoPair(heading: "Hint", item: factorSource.hint)
+			InfoPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
+			InfoPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 		}
 	}
 }
