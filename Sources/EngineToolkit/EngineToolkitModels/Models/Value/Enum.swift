@@ -72,7 +72,9 @@ extension Enum {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(variant, forKey: .variant)
-		try container.encode(fields, forKey: .fields)
+		if !fields.isEmpty {
+			try container.encode(fields, forKey: .fields)
+		}
 	}
 
 	public init(from decoder: Decoder) throws {
