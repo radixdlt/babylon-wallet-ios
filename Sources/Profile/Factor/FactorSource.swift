@@ -61,22 +61,42 @@ public struct FactorSource:
 	/// properties.
 	public var storage: Storage?
 
-	public init(
+	init(
 		kind: FactorSourceKind,
 		id: ID,
 		hint: NonEmptyString,
 		parameters: Parameters,
-		addedOn: Date = .now,
-		lastUsedOn: Date = .now,
-		storage: Storage? = nil
+		storage: Storage?,
+		addedOn: Date,
+		lastUsedOn: Date
 	) {
 		self.id = id
 		self.kind = kind
 		self.hint = hint
 		self.parameters = parameters
-		self.addedOn = addedOn.stableEquatableAfterJSONRoundtrip
-		self.lastUsedOn = lastUsedOn.stableEquatableAfterJSONRoundtrip
 		self.storage = storage
+		self.addedOn = addedOn
+		self.lastUsedOn = lastUsedOn
+	}
+
+	public init(
+		kind: FactorSourceKind,
+		id: ID,
+		hint: NonEmptyString,
+		parameters: Parameters,
+		storage: Storage? = nil
+	) {
+		@Dependency(\.date) var date
+
+		self.init(
+			kind: kind,
+			id: id,
+			hint: hint,
+			parameters: parameters,
+			storage: storage,
+			addedOn: date(),
+			lastUsedOn: date()
+		)
 	}
 }
 
@@ -120,7 +140,15 @@ extension FactorSource {
 extension FactorSource {
 	public static let previewValueDevice: Self = {
 		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
-		return try! Self.device(mnemonic: mnemonic, hint: "preview", olympiaCompatible: false)
+		return try! Self(
+			kind: .device,
+			id: id(fromRoot: mnemonic.hdRoot(passphrase: "")),
+			hint: "previewValue",
+			parameters: .default,
+			storage: .forDevice(.init()),
+			addedOn: .init(timeIntervalSince1970: 0),
+			lastUsedOn: .init(timeIntervalSince1970: 0)
+		)
 	}()
 }
 

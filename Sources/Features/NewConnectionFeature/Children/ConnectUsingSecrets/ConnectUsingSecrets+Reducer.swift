@@ -1,32 +1,29 @@
 import FeaturePrelude
-import P2PConnection
+import RadixConnect
 
 // MARK: - ConnectUsingSecrets
 public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var connectionSecrets: ConnectionSecrets
+		public var connectionPassword: ConnectionPassword
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-		public var idOfNewConnection: P2PConnectionID?
 		public var isNameValid: Bool
 		@BindableState public var focusedField: Field?
 
 		public init(
-			connectionSecrets: ConnectionSecrets,
+			connectionPassword: ConnectionPassword,
 			isConnecting: Bool = true,
-			idOfNewConnection: P2PConnectionID? = nil,
 			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
 			nameOfConnection: String = "",
 			isNameValid: Bool = false
 		) {
 			self.focusedField = focusedField
-			self.connectionSecrets = connectionSecrets
+			self.connectionPassword = connectionPassword
 			self.isConnecting = isConnecting
 			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
-			self.idOfNewConnection = idOfNewConnection
 			self.isNameValid = isNameValid
 		}
 	}
@@ -41,16 +38,17 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(ConnectUsingSecrets.State.Field?)
-		case establishConnectionResult(TaskResult<P2PConnectionID>)
+		case establishConnectionResult(TaskResult<ConnectionPassword>)
 		case cancelOngoingEffects
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case connected(P2P.ClientWithConnectionStatus)
+		case connected(P2PClient)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 
@@ -60,18 +58,16 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return .run { [connectionPassword = state.connectionSecrets.connectionPassword] send in
+			let connectionPassword = state.connectionPassword
+			state.isConnecting = true
+			return .run { send in
 				await send(.internal(.establishConnectionResult(
-					TaskResult {
-						try await P2PConnections.shared.add(
-							connectionPassword: connectionPassword,
-							connectMode: .connect(force: true, inBackground: false),
-							emitConnectionsUpdate: false // we wanna emit after we have added the connectionID to Profile
-						)
-					}
+					TaskResult(catching: {
+						try await radixConnectClient.addP2PWithPassword(connectionPassword)
+						return connectionPassword
+					})
 				)))
-			}
-			.cancellable(id: ConnectID.self)
+			}.cancellable(id: ConnectID.self)
 
 		case .appeared:
 			return .task {
@@ -93,36 +89,22 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			.cancellable(id: FocusFieldID.self)
 
 		case let .nameOfConnectionChanged(connectionName):
-			state.nameOfConnection = connectionName
+			state.nameOfConnection = connectionName.trimmed()
 			state.isNameValid = !connectionName.trimmed().isEmpty
 			return .none
 
 		case .confirmNameButtonTapped:
-			// determines if we are indeed connected...
-			guard let _ = state.idOfNewConnection else {
-				// invalid state
-				return .none
-			}
-
-			let clientWithConnectionStatus = P2P.ClientWithConnectionStatus(
-				p2pClient: .init(
-					connectionPassword: state.connectionSecrets.connectionPassword,
-					displayName: state.nameOfConnection.trimmed()
-				),
-				connectionStatus: .connected
-			)
-
+			let p2pClient = P2PClient(connectionPassword: state.connectionPassword, displayName: state.nameOfConnection)
 			return .run { send in
 				await send(.internal(.cancelOngoingEffects))
-				await send(.delegate(.connected(clientWithConnectionStatus)))
+				await send(.delegate(.connected(p2pClient)))
 			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .establishConnectionResult(.success(idOfNewConnection)):
-			state.idOfNewConnection = idOfNewConnection
+		case .establishConnectionResult(.success):
 			state.isConnecting = false
 			state.isPromptingForName = true
 			return .none

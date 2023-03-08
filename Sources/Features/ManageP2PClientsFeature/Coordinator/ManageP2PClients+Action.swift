@@ -1,6 +1,6 @@
 import FeaturePrelude
 import NewConnectionFeature
-import P2PConnectivityClient
+import RadixConnectClient
 
 // MARK: - ManageP2PClients.Action
 extension ManageP2PClients {
@@ -19,7 +19,7 @@ extension ManageP2PClients.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationActionOf<ManageP2PClients.Destinations>)
 		case connection(
-			id: P2PClient.ID,
+			id: ConnectionPassword,
 			action: ManageP2PClient.Action
 		)
 	}
@@ -44,11 +44,8 @@ extension ManageP2PClients.Action {
 // MARK: - ManageP2PClients.Action.InternalAction.SystemAction
 extension ManageP2PClients.Action.InternalAction {
 	public enum SystemAction: Sendable, Equatable {
-		case loadClientIDsResult(TaskResult<OrderedSet<P2PClient.ID>>)
-		case loadClientsByIDsResult(TaskResult<OrderedSet<P2PClient>>)
-
-		case saveNewConnectionResult(TaskResult<P2P.ClientWithConnectionStatus>)
-		case deleteConnectionResult(TaskResult<P2PClient.ID>)
-		case sendTestMessageResult(TaskResult<String>)
+		case loadClientsResult(TaskResult<OrderedSet<P2PClient>>)
+		case saveNewConnectionResult(TaskResult<P2PClient>)
+		case deleteConnectionResult(TaskResult<ConnectionPassword>)
 	}
 }

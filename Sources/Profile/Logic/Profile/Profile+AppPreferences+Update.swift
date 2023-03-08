@@ -1,5 +1,5 @@
-import P2PModels
 import Prelude
+import RadixConnectModels
 
 extension AppPreferences {
 	public mutating func updateDisplay(_ display: Display) {

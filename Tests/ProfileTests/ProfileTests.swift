@@ -1,7 +1,7 @@
 import Cryptography
 import EngineToolkit
-import P2PModels
 @testable import Profile
+import RadixConnectModels
 import SharedTestingModels
 import TestingPrelude
 
@@ -10,7 +10,7 @@ final class ProfileTests: TestCase {
 	let gateway = Gateway.nebunet
 
 	func test_p2p_client_eq() throws {
-		let pw = try ConnectionPassword(data: .deadbeef32Bytes)
+		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
 		let first = P2PClient(connectionPassword: pw, displayName: "first")
 		let second = P2PClient(connectionPassword: pw, displayName: "second")
 		XCTAssertEqual(first, second)
@@ -52,21 +52,29 @@ final class ProfileTests: TestCase {
 			language: .english
 		)
 		let networkID = gateway.network.id
-		let babylonFactorSource = try FactorSource.babylon(
-			mnemonic: curve25519FactorSourceMnemonic,
-			hint: creatingDevice
-		)
 
-		var profile = withDependencies {
+		let (_profile, babylonFactorSource, olympiaFactorSource) = try withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
 			$0.uuid = .constant(.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!)
 		} operation: {
-			Profile(factorSource: babylonFactorSource, creatingDevice: creatingDevice)
+			let babylonFactorSource = try FactorSource.babylon(
+				mnemonic: curve25519FactorSourceMnemonic,
+				hint: creatingDevice
+			)
+			let olympiaFactorSource = try FactorSource.olympia(
+				mnemonic: secp256K1FactorMnemonic,
+				hint: creatingDevice
+			)
+			let profile = Profile(
+				factorSource: babylonFactorSource,
+				creatingDevice: creatingDevice
+			)
+
+			return (profile, babylonFactorSource, olympiaFactorSource)
 		}
 
-		let olympiaFactorSource = try FactorSource.olympia(
-			mnemonic: secp256K1FactorMnemonic,
-			hint: creatingDevice
-		)
+		var profile = _profile
+
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
@@ -167,7 +175,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
-		let connectionPassword = try ConnectionPassword(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+		let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
 		XCTAssertNotNil(profile.appendP2PClient(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
 		// Should not be possible to add a client with the same password
 		XCTAssertNil(profile.appendP2PClient(
@@ -179,12 +187,8 @@ final class ProfileTests: TestCase {
 
 		XCTAssertNotNil(profile.appendP2PClient(
 			P2PClient(
-				connectionPassword: try! ConnectionPassword(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef"),
-				customWebRTCConfig: .init(peerConnectionConfig: .init(iceServerConfigs: ["example.com", "anotherexample.com"])),
-				customSignalingServerConfig: .init(signalingServerBaseURL: URL(string: "custom.signal.com")!),
-				customConnectorConfig: .init(reconnectRetryDelay: 3),
-				displayName: "iPhone 13",
-				platform: .iPhone
+				connectionPassword: try! ConnectionPassword(.init(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef")),
+				displayName: "iPhone 13"
 			)
 		))
 
@@ -356,11 +360,8 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(profile.appPreferences.p2pClients.clients.count, 2)
 		let p2pClient0 = try XCTUnwrap(profile.appPreferences.p2pClients.first)
-		XCTAssertEqual(p2pClient0.connectionPassword.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+		XCTAssertEqual(p2pClient0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 		let p2pClient1 = profile.appPreferences.p2pClients[1]
-		XCTAssertNotNil(p2pClient1.signalingServerConfig)
-		XCTAssertNotNil(p2pClient1.webRTCConfig)
-		XCTAssertNotNil(p2pClient1.connectorConfig)
 
 		XCTAssertEqual(onNetwork.authorizedDapps.count, 1)
 		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)

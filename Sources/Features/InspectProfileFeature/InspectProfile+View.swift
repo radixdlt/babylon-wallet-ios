@@ -1,6 +1,6 @@
-import P2PModels
 import Prelude
 import Profile
+import RadixConnectModels
 import SecureStorageClient
 import SwiftUI
 
@@ -463,10 +463,8 @@ extension P2PClientView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("ID", value: String(p2pClient.id.hex().mask(showLast: 6)))
+			Labeled("ID", value: String(p2pClient.id.data.hex().mask(showLast: 6)))
 			Labeled("Client Name", value: p2pClient.displayName)
-			Labeled("First established", value: p2pClient.firstEstablishedOn.ISO8601Format())
-			Labeled("Last used", value: p2pClient.lastUsedOn.ISO8601Format())
 		}
 		.padding([.leading], leadingPadding)
 	}

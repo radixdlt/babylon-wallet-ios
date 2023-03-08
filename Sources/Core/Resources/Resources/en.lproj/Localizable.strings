@@ -21,9 +21,6 @@
 "common.account.kind" = "Account";
 "common.persona.kind" = "Persona";
 
-"common.P2PClientNotFoundInProfile" = "Inconsistency trying to use deleted Linked Connector.";
-"common.P2PConnectionOffline" = "Linked Connector Offline";
-
 "createEntity.nameNewEntity.account.title.first" = "Create First Account";
 "createEntity.nameNewEntity.account.title.notFirst" = "Create New Account";
 "createEntity.nameNewEntity.persona.title" = "Create a Persona";

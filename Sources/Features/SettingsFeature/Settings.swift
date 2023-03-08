@@ -11,7 +11,7 @@ public struct AppSettings: FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pClientsClient) var p2pClientsClient
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public typealias Store = StoreOf<Self>
 
@@ -124,7 +124,7 @@ public struct AppSettings: FeatureReducer {
 
 		case .deleteProfileAndFactorSourcesButtonTapped:
 			return .task {
-				await p2pConnectivityClient.disconnectAndRemoveAll()
+				await radixConnectClient.disconnectAndRemoveAll()
 				return .delegate(.deleteProfileAndFactorSources)
 			}
 
