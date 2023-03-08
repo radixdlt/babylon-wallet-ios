@@ -160,7 +160,7 @@ final class DataChannelClientTests: TestCase {
 		expected: Result<DataChannelClient.AssembledMessage, Error>
 	) async throws {
 		try messages.map(DataChannelClient.Message.chunkedMessage).forEach(delegate.receiveIncomingMessage)
-		let receivedMessageResult = try await client.IncomingAssembledMessages.prefix(1).collect().first!
+		let receivedMessageResult = try await client.IncomingAssembledMessages.first()
 
 		switch (expected, receivedMessageResult) {
 		case let (.success(expectedMessage), .success(receivedMessage)):
@@ -174,7 +174,7 @@ final class DataChannelClientTests: TestCase {
 	}
 
 	func assertSendsErrorReceipt() async throws {
-		let sentMessage = await dataChannel.sentData.prefix(1).collect().first!
+		let sentMessage = try await dataChannel.sentData.first()
 		let decodedSentMessage = try JSONDecoder().decode(DataChannelClient.Message.self, from: sentMessage)
 
 		XCTAssertEqual(
@@ -184,7 +184,7 @@ final class DataChannelClientTests: TestCase {
 	}
 
 	func assertSendsConfirmationReceipt() async throws {
-		let sentMessage = await dataChannel.sentData.prefix(1).collect().first!
+		let sentMessage = try await dataChannel.sentData.first()
 		let decodedSentMessage = try JSONDecoder().decode(DataChannelClient.Message.self, from: sentMessage)
 
 		XCTAssertEqual(

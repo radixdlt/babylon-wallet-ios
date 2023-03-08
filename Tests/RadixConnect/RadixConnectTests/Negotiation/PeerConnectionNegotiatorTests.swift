@@ -2,9 +2,9 @@
 import RadixConnectModels
 import TestingPrelude
 
-// MARK: - SignalingServerNegotiationTests
+// MARK: - PeerConnectionNegotiatorTests.swift
 @MainActor
-final class SignalingServerNegotiationTests: TestCase {
+final class PeerConnectionNegotiatorTests.swift: TestCase {
 	// Static config
 	static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 	lazy var jsonDecoder: JSONDecoder = {
@@ -111,7 +111,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
+			try await conenctionBuilder.negotiationResults.first()
 		}
 
 		try webSocketClient.receiveIncomingMessage(
@@ -120,7 +120,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		delegate.sendNegotiationNeededEvent()
 
 		// Await set offer
-		_ = await peerConnection.onOfferConfigured()
+		_ = try await peerConnection.onOfferConfigured()
 		peerConnection.completeSetRemoteDescription(with: .failure(NSError(domain: "dom", code: 1)))
 
 		let result = try await peerConnectionTask.value
@@ -135,7 +135,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
+			try await conenctionBuilder.negotiationResults.first()
 		}
 
 		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
@@ -155,13 +155,16 @@ final class SignalingServerNegotiationTests: TestCase {
 		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await conenctionBuilder.negotiationResults.prefix(1).collect().first!
+			try await conenctionBuilder.negotiationResults.first()
 		}
 
 		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
 		await peerConnection.onLocalAnswerCreated()
 		peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
+
+		_ = try await peerConnection.onAnswerConfigured()
+		peerConnection.completeSetLocalDescription(with: .success(()))
 
 		let message = try await jsonDecoder.decode(SignalingClient.ClientMessage.self, from: webSocketClient.onClientMessageSent())
 		webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
@@ -195,10 +198,11 @@ final class SignalingServerNegotiationTests: TestCase {
 	}
 
 	/// Performs a failing negotiation flow for the given remoteClientId
-	private func performFailingNegotiation(forClient remoteClientId: RemoteClientID,
-	                                       peerConnection: MockPeerConnection,
-	                                       peerConnectionDelegate: MockPeerConnectionDelegate) async throws
-	{
+	private func performFailingNegotiation(
+		forClient remoteClientId: RemoteClientID,
+		peerConnection: MockPeerConnection,
+		peerConnectionDelegate: MockPeerConnectionDelegate
+	) async throws {
 		try webSocketClient.receiveIncomingMessage(
 			makeClientMessage(.anyOffer(for: remoteClientId))
 		)
@@ -206,16 +210,17 @@ final class SignalingServerNegotiationTests: TestCase {
 		peerConnectionDelegate.sendNegotiationNeededEvent()
 
 		// Await set offer
-		_ = await peerConnection.onOfferConfigured()
+		_ = try await peerConnection.onOfferConfigured()
 		peerConnection.completeSetRemoteDescription(with: .failure(NSError(domain: "dom", code: 1)))
 	}
 
 	/// This function will trigger the negotiation flow for the given offer,
 	/// as well it will assert that the Offer was properly set on the created PeerConnection.
-	private func receiveRemoteOffer(_ primitive: IdentifiedPrimitive<RTCPrimitive>,
-	                                peerConnection: MockPeerConnection,
-	                                peerConnectionDelegate: MockPeerConnectionDelegate) async throws
-	{
+	private func receiveRemoteOffer(
+		_ primitive: IdentifiedRTCPrimitive,
+		peerConnection: MockPeerConnection,
+		peerConnectionDelegate: MockPeerConnectionDelegate
+	) async throws {
 		// Receive the Incoming offer
 		try webSocketClient.receiveIncomingMessage(
 			makeClientMessage(primitive)
@@ -225,24 +230,27 @@ final class SignalingServerNegotiationTests: TestCase {
 		peerConnectionDelegate.sendNegotiationNeededEvent()
 
 		// Await for the remote offer to be configured on the peer connection
-		let configuredOffer = await peerConnection.configuredRemoteDescription.prefix(1).collect().first!
+		let configuredOffer = try await peerConnection.onOfferConfigured()
 
 		// Assert that the configured offer does amtch the Incoming offer
-		XCTAssertEqual(configuredOffer, .left(primitive.content.offer!))
+		XCTAssertEqual(configuredOffer, primitive.content.offer!)
 
 		// Complete the set remote offer action on peerConnection, thus allowing the negotiation to flow further
 		peerConnection.completeSetRemoteDescription(with: .success(()))
 	}
 
 	/// Trigger a `receiveICECandidate` event, as well assert that the received ICECanddiate is properly set on the PeerConnection
-	private func receiveICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive>, peerConnection: MockPeerConnection) async throws {
+	private func receiveICECandidate(
+		_ primitive: IdentifiedRTCPrimitive,
+		peerConnection: MockPeerConnection
+	) async throws {
 		// Receive the Incoming ICECandidate
 		try webSocketClient.receiveIncomingMessage(
 			makeClientMessage(primitive)
 		)
 
 		// Await for the ICECandidate to be configured on peerConnection
-		let configuredICECandidate = await peerConnection.configuredICECandidate.prefix(1).collect().first!
+		let configuredICECandidate = try await peerConnection.configuredICECandidate.first()
 
 		// Assert that the configured ICECandidate does match the Incoming ICECanddiate
 		XCTAssertEqual(configuredICECandidate, primitive.content.iceCandidate)
@@ -252,7 +260,10 @@ final class SignalingServerNegotiationTests: TestCase {
 	}
 
 	/// Trigger the `generated local ICECandidate` event, as well assert that the generated ICECandidate is sent throught he WebSocket to the proper client
-	private func sendICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive>, peerConnectionDelegate: MockPeerConnectionDelegate) async throws {
+	private func sendICECandidate(
+		_ primitive: IdentifiedRTCPrimitive,
+		peerConnectionDelegate: MockPeerConnectionDelegate
+	) async throws {
 		// Generate local ICECandidate
 		peerConnectionDelegate.generateICECandiddate(primitive.content.iceCandidate!)
 
@@ -261,25 +272,28 @@ final class SignalingServerNegotiationTests: TestCase {
 	}
 
 	/// Trigger the `create local answer` event.
-	private func createAndSendAnswer(_ primitive: IdentifiedPrimitive<RTCPrimitive>, peerConnection: MockPeerConnection) async throws {
+	private func createAndSendAnswer(
+		_ primitive: IdentifiedRTCPrimitive,
+		peerConnection: MockPeerConnection
+	) async throws {
 		// Await for create local answer to be triggered
 		await peerConnection.onLocalAnswerCreated()
 
 		// Complete the create local answer request
 		peerConnection.completeCreateLocalAnswerRequest(with: .success(primitive.content.answer!))
 
-		// Await for the created local answer to be configured on the peerConnection
-		let sdp = await peerConnection.configuredLocalDescription.prefix(1).collect().first!
+		let answer = try await peerConnection.onAnswerConfigured()
+		peerConnection.completeSetLocalDescription(with: .success(()))
 
 		// Assert that the configured answer does match the created one
-		XCTAssertEqual(sdp, .right(primitive.content.answer!))
+		XCTAssertEqual(answer, primitive.content.answer!)
 
 		// Assert that the created answer is properly sent through the webSocket
 		try await assertDidSendMessage(primitive)
 	}
 
 	/// Assert the given primitive was properly sent through the WebSocketClient
-	func assertDidSendMessage(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
+	func assertDidSendMessage(_ primitive: IdentifiedRTCPrimitive) async throws {
 		let sentMessage = try await webSocketClient
 			.sentMessagesSequence
 			.map {
@@ -295,7 +309,7 @@ final class SignalingServerNegotiationTests: TestCase {
 	}
 
 	/// Creates a client message that is to be received from remote client
-	func makeClientMessage(_ primitive: IdentifiedPrimitive<RTCPrimitive>) throws -> JSONValue {
+	func makeClientMessage(_ primitive: IdentifiedRTCPrimitive) throws -> JSONValue {
 		let requestId = SignalingClient.ClientMessage.RequestID.any.rawValue
 		let encoded = try jsonEncoder.encode(primitive.content.payload)
 		let encrypted = try Self.encryptionKey.encrypt(data: encoded)

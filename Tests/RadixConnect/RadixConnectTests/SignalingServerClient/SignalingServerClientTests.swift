@@ -8,12 +8,14 @@ final class SignalingClientTests: TestCase {
 	static let ownClientId = RemoteClientID(rawValue: UUID().uuidString)
 	static let requestId = SignalingClient.ClientMessage.RequestID(rawValue: UUID().uuidString)
 	static let sdp = RTCPrimitive.SDP(rawValue: "Some sdp desc")
-	static let offer = IdentifiedPrimitive(content: RTCPrimitive.offer(.init(sdp: sdp)), id: remoteClientId)
-	static let answer = IdentifiedPrimitive(content: RTCPrimitive.answer(.init(sdp: sdp)), id: remoteClientId)
-	static let iceCandidate = IdentifiedPrimitive(content: RTCPrimitive.iceCandidate(.init(sdp: sdp,
-	                                                                                       sdpMLineIndex: 32,
-	                                                                                       sdpMid: "Mid")),
-	id: remoteClientId)
+	static let offer = IdentifiedRTCPrimitive(content: .offer(.init(sdp: sdp)), id: remoteClientId)
+	static let answer = IdentifiedRTCPrimitive(content: .answer(.init(sdp: sdp)), id: remoteClientId)
+	static let iceCandidate = IdentifiedRTCPrimitive(
+		content: .iceCandidate(.init(sdp: sdp,
+		                             sdpMLineIndex: 32,
+		                             sdpMid: "Mid")),
+		id: remoteClientId
+	)
 	static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 
 	var jsonDecoder: JSONDecoder = {
@@ -99,7 +101,7 @@ final class SignalingClientTests: TestCase {
 			payload: Self.offer.content.payload,
 			method: "offer",
 			stream: signalingClient.onOffer,
-			expected: IdentifiedPrimitive(content: Self.offer.content.offer!, id: Self.offer.id)
+			expected: IdentifiedRTCOffer(content: Self.offer.content.offer!, id: Self.offer.id)
 		)
 	}
 
@@ -108,7 +110,7 @@ final class SignalingClientTests: TestCase {
 			payload: Self.answer.content.payload,
 			method: "answer",
 			stream: signalingClient.onAnswer,
-			expected: IdentifiedPrimitive(content: Self.answer.content.answer!, id: Self.answer.id)
+			expected: IdentifiedRTCAnswer(content: Self.answer.content.answer!, id: Self.answer.id)
 		)
 	}
 
@@ -117,7 +119,7 @@ final class SignalingClientTests: TestCase {
 			payload: Self.iceCandidate.content.payload,
 			method: "iceCandidate",
 			stream: signalingClient.onICECanddiate,
-			expected: IdentifiedPrimitive(content: Self.iceCandidate.content.iceCandidate!, id: Self.iceCandidate.id)
+			expected: IdentifiedRTCICECandidate(content: Self.iceCandidate.content.iceCandidate!, id: Self.iceCandidate.id)
 		)
 	}
 
@@ -132,7 +134,7 @@ final class SignalingClientTests: TestCase {
 	) throws {
 		let exp = expectation(description: "Wait for message")
 		Task {
-			let value = try await stream.prefix(1).collect().first!
+			let value = try await stream.first()
 			XCTAssertEqual(value, expected, file: file, line: line)
 			exp.fulfill()
 		}
@@ -171,7 +173,7 @@ final class SignalingClientTests: TestCase {
 		)
 	}
 
-	func assertSentMessageFormat(_ primitive: IdentifiedPrimitive<RTCPrimitive>,
+	func assertSentMessageFormat(_ primitive: IdentifiedRTCPrimitive,
 	                             expectedPayload: JSONValue,
 	                             file: StaticString = #filePath,
 	                             line: UInt = #line) throws

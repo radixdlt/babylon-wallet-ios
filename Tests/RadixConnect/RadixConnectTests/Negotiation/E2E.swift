@@ -1,71 +1,78 @@
-import CryptoKit
-@testable import RadixConnect
-import TestingPrelude
-
-@MainActor
-final class E2ETests: TestCase {
-	let webSocketBaseURL = URL(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
-
-	//        func test() async throws {
-	//                let random32Bytes: Data = SymmetricKey(size: .bits256).withUnsafeBytes({ Data($0) })
-	//                let connectionId: SignalingServerConnectionID = try .init(.init(.init(data: random32Bytes)))
+// TODO: Revive this test and see if it can run in GH actions
+// import CryptoKit
+// @testable import RadixConnect
+// import TestingPrelude
+// import SharedModels
 //
+// @MainActor
+// final class E2ETests: TestCase {
+//	let webSocketBaseURL = URL(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
 //
-	//                let rtcClients = RTCClients(signalingServerBaseURL: .devSignalingServer)
-	//                try await rtcClients.add(connectionId)
+//        func test() async throws {
+//                let random32Bytes: Data = SymmetricKey(size: .bits256).withUnsafeBytes({ Data($0) })
+//                let connectionPassword = try ConnectionPassword(.init(data: random32Bytes))
 //
-	//                // Negotiate 3 connection in parallel
+//                let walletRTCClients = RTCClients(peerConnectionFactory: WebRTCFactory(), signalingServerBaseURL: webSocketBaseURL)
+//                try await walletRTCClients.connect(connectionPassword)
 //
-	//                let (webPagePeerConnectionsStream, webPagePeerConnectionsContinuation) = AsyncStream<PeerConnectionClient>.streamWithContinuation()
-	//                Task {
-	//                        let webPagePeerConnection = try await OfferingPeerConnectionBuilder.negotiatePeerConnection(
-	//                                signalingServerClient: try! SignalingClient(connectionId: connectionId, source: .extension, baseURL: webSocketBaseURL)
-	//                        )
-	//                        webPagePeerConnectionsContinuation.yield(webPagePeerConnection)
-	//                }
+//                let webPage1RTCClients = RTCClients(peerConnectionFactory: WebRTCFactory(), signalingServerBaseURL: webSocketBaseURL)
+//                try await walletRTCClients.connect(connectionPassword)
 //
-	//                Task {
-	//                        let webPagePeerConnection = try await OfferingPeerConnectionBuilder.negotiatePeerConnection(
-	//                                signalingServerClient: try! SignalingClient(connectionId: connectionId, source: .extension, baseURL: webSocketBaseURL)
-	//                        )
-	//                        webPagePeerConnectionsContinuation.yield(webPagePeerConnection)
-	//                }
+//                // Negotiate 3 connection in parallel
 //
-	//                Task {
-	//                        let webPagePeerConnection = try await OfferingPeerConnectionBuilder.negotiatePeerConnection(
-	//                                signalingServerClient: try! SignalingClient(connectionId: connectionId, source: .extension, baseURL: webSocketBaseURL)
-	//                        )
-	//                        webPagePeerConnectionsContinuation.yield(webPagePeerConnection)
-	//                }
+//                let (webPagePeerConnectionsStream, webPagePeerConnectionsContinuation) = AsyncStream<PeerConnectionClient>.streamWithContinuation()
+//                Task {
+//                        let ss = try! SignalingClient(password: connectionPassword, source: .extension, baseURL: webSocketBaseURL)
+//                        let webPagePeerConnection = try await PeerConnectionNegotiator(signalingClient: ss, factory: WebRTCFactory(), isOfferer: true).negotiationResults.first().get()
+//                        webPagePeerConnectionsContinuation.yield(webPagePeerConnection)
+//                }
 //
-	//                // Wait for all 3 connections to be established
-	//                let webPagePeerConnections = await webPagePeerConnectionsStream.prefix(3).collect()
+//                Task {
+//                        let ss = try! SignalingClient(password: connectionPassword, source: .extension, baseURL: webSocketBaseURL)
+//                        let webPagePeerConnection = try await PeerConnectionNegotiator(signalingClient: ss, factory: WebRTCFactory(), isOfferer: true).negotiationResults.first().get()
+//                        webPagePeerConnectionsContinuation.yield(webPagePeerConnection)
+//                }
 //
-	//                // Assert communication
+//                Task {
+//                        let ss = try! SignalingClient(password: connectionPassword, source: .extension, baseURL: webSocketBaseURL)
+//                        let webPagePeerConnection = try await PeerConnectionNegotiator(signalingClient: ss, factory: WebRTCFactory(), isOfferer: true).negotiationResults.first().get()
+//                        webPagePeerConnectionsContinuation.yield(webPagePeerConnection)
+//                }
 //
-	//                try await assertCommunicationWorks(with: webPagePeerConnections[0], rtcClients)
-	//                try await assertCommunicationWorks(with: webPagePeerConnections[1], rtcClients)
-	//                try await assertCommunicationWorks(with: webPagePeerConnections[2], rtcClients)
-	//        }
+//                // Wait for all 3 connections to be established
+//                let webPagePeerConnections = await webPagePeerConnectionsStream.prefix(3).collect()
 //
-	//        private func assertCommunicationWorks(with webPage: PeerConnectionClient, _ rtcClients: RTCClients) async throws {
-	//                let testData = try Data.random(length: DataChannelAssembledMessage.chunkSize * 4)
-	//                try await webPage.sendData(testData)
+//                // Assert communication
 //
-	//                let receivedMessage = try await rtcClients.IncomingMessages.prefix(1).collect().first!
-	//                XCTAssertEqual(try! receivedMessage.content.content.get().messageContent, testData)
+//                try await assertCommunicationWorks(with: webPagePeerConnections[0], rtcClients)
+//                try await assertCommunicationWorks(with: webPagePeerConnections[1], rtcClients)
+//                try await assertCommunicationWorks(with: webPagePeerConnections[2], rtcClients)
+//        }
 //
-	//                let responseData = try Data.random(length: DataChannelAssembledMessage.chunkSize * 4)
-	//                Task {
-	//                        try await rtcClients.sendMessage(
-	//                                .init(
-	//                                        connectionId: receivedMessage.connectionId,
-	//                                        content: .init(peerConnectionId: receivedMessage.content.peerConnectionId, content: responseData)
-	//                                )
-	//                        )
-	//                }
+//        private func assertCommunicationWorks(with webPage: PeerConnectionClient, _ rtcClients: RTCClients) async throws {
+//                let request = P2P.FromDapp.WalletInteraction.testValue
+//                try await webPage.sendData(JSONEncoder().encode(request))
 //
-	//                let receivedMessageWeb = try await webPage.receivedMessagesStream().prefix(1).collect().first!.get()
-	//                XCTAssertEqual(receivedMessageWeb.messageContent, responseData)
-	//        }
-}
+//                let receivedMessage = try await rtcClients.IncomingMessages.first()
+//                XCTAssertEqual(try! receivedMessage.peerMessage.content.get()., testData)
+//
+//                let responseData = try Data.random(length: DataChannelClient.AssembledMessage.chunkSize * 4)
+//                Task {
+//                        try await rtcClients.sendMessage(
+//                                .init(
+//                                        connectionId: receivedMessage.connectionId,
+//                                        content: .init(peerConnectionId: receivedMessage.content.peerConnectionId, content: responseData)
+//                                )
+//                        )
+//                }
+//
+//                let receivedMessageWeb = try await webPage.receivedMessagesStream().first().get()
+//                XCTAssertEqual(receivedMessageWeb.messageContent, responseData)
+//        }
+// }
+//
+// extension P2P.FromDapp.WalletInteraction {
+//        static var testValue: Self {
+//                .init(id: .previewValue, items: .request(.unauthorized(.init(oneTimeAccounts: .previewValue))), metadata: .previewValue)
+//        }
+// }

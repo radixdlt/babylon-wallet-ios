@@ -43,6 +43,6 @@ final class MockWebSocketClient: SignalingTransport, Sendable {
 	}
 
 	func onClientMessageSent() async throws -> Data {
-		try await sentMessagesSequence.prefix(1).collect().first!
+		try await sentMessagesSequence.first()
 	}
 }

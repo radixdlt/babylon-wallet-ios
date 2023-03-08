@@ -126,12 +126,16 @@ final class MockPeerConnection: PeerConnection {
 
 	// MARK: - Helper API
 
-	func onOfferConfigured() async -> RTCPrimitive.Offer? {
-		await configuredRemoteDescription.prefix(1).collect().first?.left
+	func onOfferConfigured() async throws -> RTCPrimitive.Offer? {
+		try await configuredRemoteDescription.first().left
 	}
 
 	func onLocalAnswerCreated() async {
 		_ = await onCreateLocalAnswer.prefix(1).collect()
+	}
+
+	func onAnswerConfigured() async throws -> RTCPrimitive.Answer? {
+		try await configuredLocalDescription.first().right
 	}
 
 	func completeSetLocalDescription(with result: Result<Void, any Error>) {

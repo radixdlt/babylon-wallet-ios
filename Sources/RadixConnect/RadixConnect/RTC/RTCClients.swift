@@ -83,15 +83,14 @@ extension RTCClients {
 
 	// MARK: - Private
 
-	private func add(_ client: RTCClient) {
-		client.IncomingMessages.susbscribe(IncomingMessagesContinuation)
+	func add(_ client: RTCClient) {
+		client.incomingMessages.susbscribe(IncomingMessagesContinuation)
 		self.clients[client.id] = client
 	}
 
-	private func makeRTCClient(_ password: ConnectionPassword) throws -> RTCClient {
+	func makeRTCClient(_ password: ConnectionPassword) throws -> RTCClient {
 		let signalingClient = try SignalingClient(
 			password: password,
-			source: .wallet,
 			baseURL: signalingServerBaseURL
 		)
 		let negotiator = PeerConnectionNegotiator(
@@ -109,9 +108,9 @@ extension RTCClients {
 actor RTCClient {
 	let id: ID
 	/// Incoming peer messages. This is the single channel for the received messages from all PeerConnections.
-	let IncomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
+	let incomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
 
-	private let IncomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
+	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
 	private let peerConnectionNegotiator: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
@@ -126,7 +125,7 @@ actor RTCClient {
 	) {
 		self.id = id
 		self.peerConnectionNegotiator = peerConnectionNegotiator
-		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.streamWithContinuation()
 
 		Task {
@@ -152,7 +151,7 @@ extension RTCClient {
 		}
 		peerConnections.removeAll()
 		peerConnectionNegotiator.cancel()
-		IncomingMessagesContinuation.finish()
+		incomingMessagesContinuation.finish()
 		disconnectedPeerConnectionContinuation.finish()
 		connectionsTask?.cancel()
 		disconnectTask?.cancel()
@@ -208,7 +207,7 @@ extension RTCClient {
 			}.map {
 				P2P.RTCIncomingMessageResult(connectionId: self.id, content: $0)
 			}
-			.susbscribe(IncomingMessagesContinuation)
+			.susbscribe(incomingMessagesContinuation)
 
 		connection
 			.iceConnectionStates
