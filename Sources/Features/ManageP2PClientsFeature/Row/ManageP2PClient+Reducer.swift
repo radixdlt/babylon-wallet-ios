@@ -2,22 +2,38 @@ import FeaturePrelude
 import RadixConnectClient
 
 // MARK: - ManageP2PClient
-public struct ManageP2PClient: Sendable, ReducerProtocol {
+public struct ManageP2PClient: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable, Identifiable {
+		public typealias ID = ConnectionPassword
+		public var id: ID { client.connectionPassword }
+		public let client: P2PClient
+
+		public init(
+			client: P2PClient
+		) {
+			self.client = client
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case deleteConnectionButtonTapped
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case deleteConnection
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.radixConnectClient) var radixConnectClient
-	public init() {}
-}
 
-extension ManageP2PClient {
+	public init() {}
+
 	private enum ConnectionUpdateTasksID {}
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.deleteConnectionButtonTapped)):
-			return .run { send in
-				await send(.delegate(.deleteConnection))
-			}
-		case .delegate:
-			return .none
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .deleteConnectionButtonTapped:
+			return .send(.delegate(.deleteConnection))
 		}
 	}
 }
