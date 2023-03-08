@@ -151,6 +151,15 @@ extension EngineToolkit {
 		)
 	}
 
+	public func hashRequest(
+		request: HashRequest
+	) -> Result<HashResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: hash
+		)
+	}
+
 	public func sborDecodeRequest(
 		request: SborDecodeRequest
 	) -> Result<SborDecodeResponse, Error> {
