@@ -7,21 +7,24 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let specifiedNameForNewEntityToCreate: NonEmptyString
 		public let factorSources: FactorSources
-		public var curve: Slip10Curve
+		public var selectedFactorSource: FactorSource
+		public var selectedCurve: Slip10Curve
 
 		public init(
 			specifiedNameForNewEntityToCreate: NonEmptyString,
 			factorSources: FactorSources,
-			curve: Slip10Curve = .curve25519 // default to new
+			selectedCurve: Slip10Curve = .curve25519 // default to new
 		) {
 			self.specifiedNameForNewEntityToCreate = specifiedNameForNewEntityToCreate
 			self.factorSources = factorSources
-			self.curve = curve
+			self.selectedFactorSource = factorSources.first
+			self.selectedCurve = selectedCurve
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case confirmOnDeviceFactorSource
+		case selectedFactorSource(FactorSource)
 		case selectedCurve(Slip10Curve)
 	}
 
@@ -33,18 +36,25 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case let .selectedFactorSource(selectedFactorSource):
+			state.selectedFactorSource = selectedFactorSource
+			if !selectedFactorSource.parameters.supportedCurves.contains(state.selectedCurve) {
+				state.selectedCurve = selectedFactorSource.parameters.supportedCurves.first
+			}
+			return .none
+
 		case let .selectedCurve(selectedCurve):
-			state.curve = selectedCurve
+			precondition(state.selectedFactorSource.parameters.supportedCurves.contains(selectedCurve))
+			state.selectedCurve = selectedCurve
 			return .none
 
 		case .confirmOnDeviceFactorSource:
-			let factorSource = state.factorSources.device
-			return .run { [entityName = state.specifiedNameForNewEntityToCreate, curve = state.curve] send in
+			return .run { [state] send in
 				await send(.delegate(
 					.confirmedFactorSource(
-						factorSource,
-						specifiedNameForNewEntityToCreate: entityName,
-						curve: curve
+						state.selectedFactorSource,
+						specifiedNameForNewEntityToCreate: state.specifiedNameForNewEntityToCreate,
+						curve: state.selectedCurve
 					))
 				)
 			}

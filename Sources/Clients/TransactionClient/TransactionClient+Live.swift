@@ -42,30 +42,46 @@ extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
-			let hdRoot: HD.Root
-			let factorSource: FactorSource
-			do {
-				factorSource = try await factorSourcesClient.getFactorSources().device
-				guard let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSource.id, .signTransaction) else {
-					return .failure(.failedToLoadFactorSourceForSigning)
-				}
-				hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
-			} catch {
-				return .failure(.failedToLoadFactorSourceForSigning)
-			}
+			// Enables us to only read from keychain once per mnemonic
+			let cachedPrivateHDFactorSources = ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>>([])
 
-			@Sendable func sign(data: any DataProtocol, with account: OnNetwork.Account) async throws -> SignatureWithPublicKey {
+			@Sendable func sign(
+				data: any DataProtocol,
+				with account: OnNetwork.Account
+			) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
 				case let .unsecured(unsecuredControl):
 					let factorInstance = unsecuredControl.genesisFactorInstance
-					guard factorInstance.factorSourceID == factorSource.id else {
-						assertionFailure("this should not happen")
-						throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
-					}
-					let sigRes: SignatureWithPublicKey = try useFactorSourceClient.signatureFromOnDeviceHD(.init(
+					let factorSources = try await factorSourcesClient.getFactorSources()
+
+					let privateHDFactorSource: PrivateHDFactorSource = try await { @Sendable () async throws -> PrivateHDFactorSource in
+
+						let cache = await cachedPrivateHDFactorSources.value
+						if let cached = cache[id: factorInstance.factorSourceID] {
+							return cached
+						}
+
+						guard
+							let factorSource = factorSources[id: factorInstance.factorSourceID],
+							let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorInstance.factorSourceID, .signTransaction)
+						else {
+							throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
+						}
+
+						let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: loadedMnemonicWithPassphrase, factorSource: factorSource)
+
+						await cachedPrivateHDFactorSources.setValue(cache.appending(privateHDFactorSource))
+
+						return privateHDFactorSource
+					}()
+
+					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
+					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
+
+					let sigRes: SignatureWithPublicKey = try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,
 						derivationPath: factorInstance.derivationPath!,
-						curve: factorSource.parameters.supportedCurves.first,
+						curve: curve,
 						data: Data(data)
 					))
 					return sigRes
@@ -483,5 +499,13 @@ public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable 
 extension LocalizedError where Self: Equatable {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.errorDescription == rhs.errorDescription
+	}
+}
+
+extension IdentifiedArrayOf {
+	func appending(_ element: Element) -> Self {
+		var copy = self
+		copy.append(element)
+		return copy
 	}
 }

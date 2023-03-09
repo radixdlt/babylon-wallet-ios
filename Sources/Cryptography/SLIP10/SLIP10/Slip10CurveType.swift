@@ -14,7 +14,13 @@ public struct Slip10CurveType: Equatable {
 }
 
 // MARK: - Slip10Curve
-public enum Slip10Curve: String, Sendable, Hashable, Codable {
+public enum Slip10Curve: String, Sendable, Hashable, Codable, CustomStringConvertible {
 	case curve25519
 	case secp256k1
+}
+
+extension Slip10Curve {
+	public var description: String {
+		rawValue
+	}
 }

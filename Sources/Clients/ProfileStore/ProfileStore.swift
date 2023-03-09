@@ -1,6 +1,7 @@
 import AsyncExtensions
 import ClientPrelude
 import Cryptography
+import MnemonicClient
 import Profile
 import SecureStorageClient
 
@@ -112,6 +113,13 @@ extension ProfileStore {
 	public func accountValues() async -> AnyAsyncSequence<OnNetwork.Accounts> {
 		lens {
 			$0.profile.network?.accounts
+		}
+	}
+
+	/// A multicasting replaying async sequence of distinct FactorSources
+	public func factorSourcesValues() async -> AnyAsyncSequence<FactorSources> {
+		lens {
+			$0.profile.factorSources
 		}
 	}
 
