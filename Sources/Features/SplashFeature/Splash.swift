@@ -37,8 +37,8 @@ public struct Splash: Sendable, FeatureReducer {
 		case loadProfileOutcome(LoadProfileOutcome)
 	}
 
-	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.onboardingClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
@@ -117,7 +117,7 @@ public struct Splash: Sendable, FeatureReducer {
 			#else
 			durationInMS = 800
 			#endif
-			try? await mainQueue.sleep(for: .milliseconds(durationInMS))
+			try? await clock.sleep(for: .milliseconds(durationInMS))
 		}
 	}
 
