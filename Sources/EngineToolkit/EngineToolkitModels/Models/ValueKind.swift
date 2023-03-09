@@ -33,6 +33,8 @@ public enum ValueKind: String, Codable, Sendable, Hashable {
 
 	// case own = "Own" // Commented out since the manifest doesn't support this too well right now.
 
+	case address = "Address"
+
 	case componentAddress = "ComponentAddress"
 	case resourceAddress = "ResourceAddress"
 	case packageAddress = "PackageAddress"
