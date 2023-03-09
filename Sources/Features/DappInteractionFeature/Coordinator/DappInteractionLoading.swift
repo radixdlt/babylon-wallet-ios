@@ -65,7 +65,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
 				do {
-					return DappMetadata(try await gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
+					return try await DappMetadata(gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
 				} catch is BadHTTPResponseCode {
 					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {

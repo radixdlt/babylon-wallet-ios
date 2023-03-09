@@ -50,9 +50,9 @@ extension Engine.Signature {
 
 		switch discriminator {
 		case .ecdsaSecp256k1:
-			self = .ecdsaSecp256k1(try container.decode(Engine.EcdsaSecp256k1Signature.self, forKey: .signature))
+			self = try .ecdsaSecp256k1(container.decode(Engine.EcdsaSecp256k1Signature.self, forKey: .signature))
 		case .eddsaEd25519:
-			self = .eddsaEd25519(try container.decode(Engine.EddsaEd25519Signature.self, forKey: .signature))
+			self = try .eddsaEd25519(container.decode(Engine.EddsaEd25519Signature.self, forKey: .signature))
 		}
 	}
 }

@@ -94,11 +94,11 @@ extension DecompileUnknownTransactionIntentResponse {
 
 		switch kind {
 		case .transactionIntent:
-			self = .transactionIntent(try container.decode(TransactionIntent.self, forKey: .value))
+			self = try .transactionIntent(container.decode(TransactionIntent.self, forKey: .value))
 		case .signedTransactionIntent:
-			self = .signedTransactionIntent(try container.decode(SignedTransactionIntent.self, forKey: .value))
+			self = try .signedTransactionIntent(container.decode(SignedTransactionIntent.self, forKey: .value))
 		case .notarizedTransactionIntent:
-			self = .notarizedTransactionIntent(try container.decode(NotarizedTransaction.self, forKey: .value))
+			self = try .notarizedTransactionIntent(container.decode(NotarizedTransaction.self, forKey: .value))
 		}
 	}
 }

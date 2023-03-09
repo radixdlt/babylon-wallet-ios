@@ -13,7 +13,7 @@ public struct SborDecodeRequest: Sendable, Codable, Hashable {
 	}
 
 	public init(encodedHex: String, networkId: NetworkID) throws {
-		self.init(encodedBytes: try [UInt8](hex: encodedHex), networkId: networkId)
+		try self.init(encodedBytes: [UInt8](hex: encodedHex), networkId: networkId)
 	}
 }
 

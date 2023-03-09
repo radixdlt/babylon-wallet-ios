@@ -361,7 +361,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if
 						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
-							allAccounts.first(by: try .init(address: sharedAccount.address))
+							try allAccounts.first(by: .init(address: sharedAccount.address))
 						}),
 						selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
 					{
@@ -453,7 +453,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						let sharedAccounts: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 							sharedAccounts = try .init(
-								accountsReferencedByAddress: OrderedSet(try accounts.map { try .init(address: $0.address) }),
+								accountsReferencedByAddress: OrderedSet(accounts.map { try .init(address: $0.address) }),
 								forRequest: numberOfAccounts
 							)
 						} else {

@@ -72,13 +72,13 @@ final class CreateAccountTXTest: TestCase {
 
 		let startEpoch: Epoch = 8000
 		let endEpochExclusive = startEpoch + 2
-		let header = TransactionHeader(
+		let header = try TransactionHeader(
 			version: .default,
 			networkId: networkID,
 			startEpochInclusive: startEpoch,
 			endEpochExclusive: endEpochExclusive,
 			nonce: 12345,
-			publicKey: try privateKey.publicKey(),
+			publicKey: privateKey.publicKey(),
 			notaryAsSignatory: true,
 			costUnitLimit: 10_000_000,
 			tipPercentage: 0

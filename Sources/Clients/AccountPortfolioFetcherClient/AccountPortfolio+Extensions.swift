@@ -15,8 +15,8 @@ extension AccountPortfolio {
 			let componentAddress = ComponentAddress(address: fungibleBalance.address)
 			let networkID = try Network.lookupBy(name: response.ledgerState.network).id
 			let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
-			return FungibleTokenContainer(
-				owner: try .init(address: response.address),
+			return try FungibleTokenContainer(
+				owner: .init(address: response.address),
 				asset: .init(
 					componentAddress: componentAddress,
 					divisibility: nil,
@@ -34,8 +34,8 @@ extension AccountPortfolio {
 		}
 
 		let nonFungibleContainers = try response.nonFungibleResources.items.map {
-			NonFungibleTokenContainer(
-				owner: try .init(address: response.address),
+			try NonFungibleTokenContainer(
+				owner: .init(address: response.address),
 				resourceAddress: .init(address: $0.address),
 				assets: [],
 				name: nil,

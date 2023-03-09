@@ -20,7 +20,7 @@ final class CompileNotarizedTransactionIntentTests: TestCase {
 
 	func test__common_manifests_can_be_notarized_without_issues() throws {
 		for testVector in try manifestTestVectors() {
-			let notaryPrivateKey = Engine.PrivateKey.secp256k1(try K1.PrivateKey.generateNew())
+			let notaryPrivateKey = try Engine.PrivateKey.secp256k1(K1.PrivateKey.generateNew())
 			let notarizedTransaction = try TransactionManifest(instructions: .string(testVector.manifest), blobs: testVector.blobs.map { [UInt8]($0) })
 				.header(TransactionHeader(
 					version: 0x01,
@@ -28,7 +28,7 @@ final class CompileNotarizedTransactionIntentTests: TestCase {
 					startEpochInclusive: 0,
 					endEpochExclusive: 10,
 					nonce: 0,
-					publicKey: try notaryPrivateKey.publicKey(),
+					publicKey: notaryPrivateKey.publicKey(),
 					notaryAsSignatory: true,
 					costUnitLimit: 10_000_000,
 					tipPercentage: 0
