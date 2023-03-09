@@ -48,6 +48,8 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 
 	// case own(Own) // Not implemented and commented out because it isn't supported to well by Scrypto
 
+	case address(Address_)
+
 	case packageAddress(PackageAddress)
 	case componentAddress(ComponentAddress)
 	case resourceAddress(ResourceAddress)
@@ -129,6 +131,9 @@ extension Value_ {
 
 		case .preciseDecimal:
 			return .preciseDecimal
+
+		case .address:
+			return .address
 
 		case .packageAddress:
 			return .packageAddress
@@ -244,6 +249,9 @@ extension Value_ {
 		case let .preciseDecimal(value):
 			try value.encode(to: encoder)
 
+		case let .address(value):
+			try value.encode(to: encoder)
+
 		case let .packageAddress(value):
 			try value.encode(to: encoder)
 
@@ -353,6 +361,9 @@ extension Value_ {
 
 		case .preciseDecimal:
 			self = try .preciseDecimal(.init(from: decoder))
+
+		case .address:
+			self = try .address(.init(from: decoder))
 
 		case .packageAddress:
 			self = try .packageAddress(.init(from: decoder))
