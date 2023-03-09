@@ -9,8 +9,8 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-
-	public let resourceAddress: ResourceAddress
+	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
+	public let resourceAddress: Value_
 	public let ids: Set<NonFungibleLocalId>
 	public let bucket: Bucket
 
@@ -22,7 +22,17 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 		resourceAddress: ResourceAddress,
 		bucket: Bucket
 	) {
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = .resourceAddress(resourceAddress)
+		self.ids = ids
+		self.bucket = bucket
+	}
+
+	public init(
+		_ ids: Set<NonFungibleLocalId>,
+		resourceAddress: Address_,
+		bucket: Bucket
+	) {
+		self.resourceAddress = .address(resourceAddress)
 		self.ids = ids
 		self.bucket = bucket
 	}
@@ -57,10 +67,8 @@ extension TakeFromWorktopByIds {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let resourceAddress = try container.decode(ResourceAddress.self, forKey: .resourceAddress)
-		let ids = try container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
-		let bucket = try container.decode(Bucket.self, forKey: .intoBucket)
-
-		self.init(ids, resourceAddress: resourceAddress, bucket: bucket)
+		self.resourceAddress = try container.decode(Value_.self, forKey: .resourceAddress)
+		self.ids = try container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
+		self.bucket = try container.decode(Bucket.self, forKey: .intoBucket)
 	}
 }
