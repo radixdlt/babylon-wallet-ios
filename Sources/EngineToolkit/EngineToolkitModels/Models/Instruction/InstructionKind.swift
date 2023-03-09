@@ -56,5 +56,7 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case createIdentity = "CREATE_IDENTITY"
 	case assertAccessRule = "ASSERT_ACCESS_RULE"
 
+	case createAccount = "CREATE_ACCOUNT"
+
 	case createValidator = "CREATE_VALIDATOR"
 }
