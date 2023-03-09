@@ -13,7 +13,7 @@ extension ManageGatewayAPIEndpoints {
 		public let urlString: String
 		public let gatewayInfo: GatewayInfo?
 		public let controlState: ControlState
-		@BindingState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
+		public let focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		init(state: ManageGatewayAPIEndpoints.State) {
 			if let gateway = state.currentGateway {

@@ -19,7 +19,7 @@ public struct ManageGatewayAPIEndpoints: Sendable, FeatureReducer {
 		public var isSwitchToButtonEnabled: Bool
 
 		public var validatedNewGatewayToSwitchTo: Gateway?
-		@BindingState public var focusedField: Field?
+		public var focusedField: Field?
 
 		var controlState: ControlState {
 			if isValidatingEndpoint {
