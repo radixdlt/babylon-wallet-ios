@@ -48,7 +48,9 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case mintUuidNonFungible = "MINT_UUID_NON_FUNGIBLE"
 
 	case createFungibleResource = "CREATE_FUNGIBLE_RESOURCE"
+	case createFungibleResourceWithInitialSupply = "CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY"
 	case createNonFungibleResource = "CREATE_NON_FUNGIBLE_RESOURCE"
+	case createNonFungibleResourceWithInitialSupply = "CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY"
 
 	case createAccessController = "CREATE_ACCESS_CONTROLLER"
 	case createIdentity = "CREATE_IDENTITY"
