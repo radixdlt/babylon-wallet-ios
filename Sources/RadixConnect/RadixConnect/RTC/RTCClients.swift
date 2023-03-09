@@ -16,8 +16,8 @@ public actor RTCClients {
 	// MARK: - Streams
 
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
-	public let IncomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
-	private let IncomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
+	public let incomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
+	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -33,7 +33,7 @@ public actor RTCClients {
 	{
 		self.peerConnectionFactory = peerConnectionFactory
 		self.signalingServerBaseURL = signalingServerBaseURL
-		(IncomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 	}
 }
 
@@ -84,7 +84,7 @@ extension RTCClients {
 	// MARK: - Private
 
 	func add(_ client: RTCClient) {
-		client.incomingMessages.susbscribe(IncomingMessagesContinuation)
+		client.incomingMessages.susbscribe(incomingMessagesContinuation)
 		self.clients[client.id] = client
 	}
 

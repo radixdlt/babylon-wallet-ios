@@ -86,13 +86,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 				await radixConnectClient.loadFromProfileAndConnectAll()
 				let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
-				for try await IncomingMessageResult in await radixConnectClient.receiveMessages() {
+				for try await incomingMessageResult in await radixConnectClient.receiveMessages() {
 					guard !Task.isCancelled else {
 						return
 					}
 
 					do {
-						let interactionMessage = try IncomingMessageResult.unwrapResult()
+						let interactionMessage = try incomingMessageResult.unwrapResult()
 						let interaction = interactionMessage.peerMessage.content
 						guard interaction.metadata.networkId == currentNetworkID else {
 							let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
