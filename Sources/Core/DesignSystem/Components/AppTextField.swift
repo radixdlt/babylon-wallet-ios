@@ -15,7 +15,7 @@ public struct AppTextField<Value: Hashable>: View {
 		hint: String,
 		binding: FocusState<Value>.Binding,
 		equals: Value,
-		first: Binding<Value>,
+		first: Binding<Value>
 	) {
 		self.placeholder = placeholder
 		self.text = text
