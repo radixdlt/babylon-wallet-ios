@@ -169,24 +169,24 @@ final class ValueEncodingTests: TestCase {
 				{"type":"PreciseDecimal","value":"1"}
 				"""
 			),
-//			(
-//				value: .address(.componentAddress(.init(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"))),
-//				jsonRepresentation: """
-//				{"type":"Address","address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"}
-//				"""
-//			),
-//			(
-//				value: .address(.componentAddress(.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"))),
-//				jsonRepresentation: """
-//				{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"}
-//				"""
-//			),
-//			(
-//				value: .address(.componentAddress(.init(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"))),
-//				jsonRepresentation: """
-//				{"type":"Address","address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"}
-//				"""
-//			),
+			(
+				value: .address(.init(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")),
+				jsonRepresentation: """
+				{"type":"Address","address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"}
+				"""
+			),
+			(
+				value: .address(.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")),
+				jsonRepresentation: """
+				{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"}
+				"""
+			),
+			(
+				value: .address(.init(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8")),
+				jsonRepresentation: """
+				{"type":"Address","address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"}
+				"""
+			),
 			(
 				value: .componentAddress(.init(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")),
 				jsonRepresentation: """
