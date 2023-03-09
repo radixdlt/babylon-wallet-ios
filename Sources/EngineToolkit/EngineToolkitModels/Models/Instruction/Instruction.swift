@@ -56,7 +56,9 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case mintUuidNonFungible(MintUuidNonFungible)
 
 	case createFungibleResource(CreateFungibleResource)
+	case createFungibleResourceWithInitialSupply(CreateFungibleResourceWithInitialSupply)
 	case createNonFungibleResource(CreateNonFungibleResource)
+	case createNonFungibleResourceWithInitialSupply(CreateNonFungibleResourceWithInitialSupply)
 
 	case createAccessController(CreateAccessController)
 	case createIdentity(CreateIdentity)
@@ -149,6 +151,10 @@ extension Instruction {
 
 		case .createFungibleResource:
 			return .createFungibleResource
+		case .createFungibleResourceWithInitialSupply:
+			return .createFungibleResourceWithInitialSupply
+		case .createNonFungibleResourceWithInitialSupply:
+			return .createNonFungibleResourceWithInitialSupply
 		case .createNonFungibleResource:
 			return .createNonFungibleResource
 
@@ -255,7 +261,11 @@ extension Instruction {
 
 		case let .createFungibleResource(instruction):
 			try instruction.encode(to: encoder)
+		case let .createFungibleResourceWithInitialSupply(instruction):
+			try instruction.encode(to: encoder)
 		case let .createNonFungibleResource(instruction):
+			try instruction.encode(to: encoder)
+		case let .createNonFungibleResourceWithInitialSupply(instruction):
 			try instruction.encode(to: encoder)
 
 		case let .createAccessController(instruction):
@@ -355,8 +365,12 @@ extension Instruction {
 
 		case .createFungibleResource:
 			self = try .createFungibleResource(.init(from: decoder))
+		case .createFungibleResourceWithInitialSupply:
+			self = try .createFungibleResourceWithInitialSupply(.init(from: decoder))
 		case .createNonFungibleResource:
 			self = try .createNonFungibleResource(.init(from: decoder))
+		case .createNonFungibleResourceWithInitialSupply:
+			self = try .createNonFungibleResourceWithInitialSupply(.init(from: decoder))
 
 		case .createAccessController:
 			self = try .createAccessController(.init(from: decoder))
