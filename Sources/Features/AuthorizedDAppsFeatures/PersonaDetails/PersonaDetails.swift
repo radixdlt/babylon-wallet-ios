@@ -40,7 +40,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editPersonaTapped
 		case accountTapped(AccountAddress)
 		case editAccountSharingTapped
-		case disconnectPersonaTapped
+		case deauthorizePersonaTapped
 		case confirmForgetAlert(PresentationAction<AlertState<ConfirmForgetAlert>, ConfirmForgetAlert>)
 
 		public enum ConfirmForgetAlert: Sendable, Equatable {
@@ -50,7 +50,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case personaDisconnected
+		case personaDeauthorized
 	}
 
 	// MARK: - Reducer
@@ -73,15 +73,15 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .editAccountSharingTapped:
 			return .none
 
-		case .disconnectPersonaTapped:
+		case .deauthorizePersonaTapped:
 			state.confirmForgetAlert = .confirmForget
 			return .none
 
 		case .confirmForgetAlert(.presented(.confirmTapped)):
 			let (personaID, dAppID, networkID) = (state.persona.id, state.dAppID, state.networkID)
 			return .run { send in
-				try await authorizedDappsClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
-				await send(.delegate(.personaDisconnected))
+				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
+				await send(.delegate(.personaDeauthorized))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
@@ -95,16 +95,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 extension AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert> {
 	static var confirmForget: AlertState {
 		AlertState {
-			TextState(L10n.PersonaDetails.disconnectPersonaAlertTitle)
+			TextState(L10n.PersonaDetails.deauthorizePersonaAlertTitle)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState(L10n.PersonaDetails.disconnectPersonaAlertConfirm)
+				TextState(L10n.PersonaDetails.deauthorizePersonaAlertConfirm)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.PersonaDetails.disconnectPersonaAlertCancel)
+				TextState(L10n.PersonaDetails.deauthorizePersonaAlertCancel)
 			}
 		} message: {
-			TextState(L10n.PersonaDetails.disconnectPersonaAlertMessage)
+			TextState(L10n.PersonaDetails.deauthorizePersonaAlertMessage)
 		}
 	}
 }

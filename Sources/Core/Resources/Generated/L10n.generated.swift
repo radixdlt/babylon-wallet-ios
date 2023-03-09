@@ -503,16 +503,16 @@ public enum L10n {
     public static func accountSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
     }
-    /// Disconnect Persona from this dApp
-    public static let disconnectPersona = L10n.tr("Localizable", "personaDetails.disconnectPersona", fallback: "Disconnect Persona from this dApp")
+    /// Remove Authorization
+    public static let deauthorizePersona = L10n.tr("Localizable", "personaDetails.deauthorizePersona", fallback: "Remove Authorization")
     /// Cancel
-    public static let disconnectPersonaAlertCancel = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertCancel", fallback: "Cancel")
-    /// Disconnect
-    public static let disconnectPersonaAlertConfirm = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertConfirm", fallback: "Disconnect")
-    /// Do you really want to disconnect the Persona from this dApp?
-    public static let disconnectPersonaAlertMessage = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertMessage", fallback: "Do you really want to disconnect the Persona from this dApp?")
-    /// Disconnect Persona?
-    public static let disconnectPersonaAlertTitle = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertTitle", fallback: "Disconnect Persona?")
+    public static let deauthorizePersonaAlertCancel = L10n.tr("Localizable", "personaDetails.deauthorizePersonaAlertCancel", fallback: "Cancel")
+    /// Confirm
+    public static let deauthorizePersonaAlertConfirm = L10n.tr("Localizable", "personaDetails.deauthorizePersonaAlertConfirm", fallback: "Confirm")
+    /// This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.
+    public static let deauthorizePersonaAlertMessage = L10n.tr("Localizable", "personaDetails.deauthorizePersonaAlertMessage", fallback: "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.")
+    /// Remove Authorization
+    public static let deauthorizePersonaAlertTitle = L10n.tr("Localizable", "personaDetails.deauthorizePersonaAlertTitle", fallback: "Remove Authorization")
     /// Edit Account Sharing
     public static let editAccountSharing = L10n.tr("Localizable", "personaDetails.editAccountSharing", fallback: "Edit Account Sharing")
     /// Edit Persona
