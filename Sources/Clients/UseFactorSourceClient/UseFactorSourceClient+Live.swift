@@ -20,7 +20,15 @@ extension UseFactorSourceClient: DependencyKey {
 				path: request.derivationPath,
 				curve: request.curve
 			)
-			return try privateKey.sign(data: request.data)
+			let signature = try privateKey.sign(data: request.data)
+			switch signature.signature {
+			case .eddsaEd25519: print("❌ Curve25519 sig..")
+			case .ecdsaSecp256k1: print("🔮 ECDSA sig! nice!")
+			}
+			print("🔮 successfully signed: \(signature)")
+			print("🔮 is valid sig?: \(signature.publicKey.isValidSignature(signature.signature, for: request.data))")
+
+			return signature
 		}
 	)
 }
