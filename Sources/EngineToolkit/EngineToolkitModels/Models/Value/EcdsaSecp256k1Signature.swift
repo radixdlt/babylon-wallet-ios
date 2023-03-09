@@ -29,7 +29,7 @@ extension EcdsaSecp256k1Signature {
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.curve, forKey: .type)
+		try container.encode(Self.curve.rawValue + Self.keyType.rawValue, forKey: .type)
 		try container.encode(bytes.hex(), forKey: .signature)
 	}
 
