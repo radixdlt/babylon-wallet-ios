@@ -26,10 +26,10 @@ public struct CallMethod: InstructionProtocol {
 		methodName: String,
 		@ValuesBuilder buildValues: () throws -> [any ValueProtocol]
 	) rethrows {
-		self.init(
+		try self.init(
 			receiver: receiver,
 			methodName: methodName,
-			arguments: try buildValues().map { $0.embedValue() }
+			arguments: buildValues().map { $0.embedValue() }
 		)
 	}
 
@@ -38,10 +38,10 @@ public struct CallMethod: InstructionProtocol {
 		methodName: String,
 		@SpecificValuesBuilder buildValues: () throws -> [Value_]
 	) rethrows {
-		self.init(
+		try self.init(
 			receiver: receiver,
 			methodName: methodName,
-			arguments: try buildValues()
+			arguments: buildValues()
 		)
 	}
 

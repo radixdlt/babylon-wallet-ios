@@ -11,25 +11,25 @@ final class ManifestToStringTests: TestCase {
 
 	func test_transactionManifest_toString_on_multiple_packages() throws {
 		let packages = [
-			(
-				code: try resource(named: "hello", extension: "code"),
-				abi: try resource(named: "hello", extension: "abi")
+			try (
+				code: resource(named: "hello", extension: "code"),
+				abi: resource(named: "hello", extension: "abi")
 			),
-			(
-				code: try resource(named: "hello_world", extension: "code"),
-				abi: try resource(named: "hello_world", extension: "abi")
+			try (
+				code: resource(named: "hello_world", extension: "code"),
+				abi: resource(named: "hello_world", extension: "abi")
 			),
-			(
-				code: try resource(named: "RaDEX", extension: "code"),
-				abi: try resource(named: "RaDEX", extension: "abi")
+			try (
+				code: resource(named: "RaDEX", extension: "code"),
+				abi: resource(named: "RaDEX", extension: "abi")
 			),
-			(
-				code: try resource(named: "account", extension: "code"),
-				abi: try resource(named: "account", extension: "abi")
+			try (
+				code: resource(named: "account", extension: "code"),
+				abi: resource(named: "account", extension: "abi")
 			),
-			(
-				code: try resource(named: "faucet", extension: "code"),
-				abi: try resource(named: "faucet", extension: "abi")
+			try (
+				code: resource(named: "faucet", extension: "code"),
+				abi: resource(named: "faucet", extension: "abi")
 			),
 		]
 

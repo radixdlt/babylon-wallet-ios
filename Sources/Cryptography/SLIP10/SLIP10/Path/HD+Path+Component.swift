@@ -23,7 +23,7 @@ extension HD.Path.Component {
 		case Self.rootOnlyPublicKey:
 			return .root(onlyPublic: true)
 		default:
-			return .child(try HD.Path.Component.Child(
+			return try .child(HD.Path.Component.Child(
 				depth: HD.Path.Component.Child.Depth.inferred,
 				string: string
 			))
@@ -39,7 +39,7 @@ extension HD.Path.Component {
 			guard explicitDepth == 0 else { throw Error.expectedRootToBeAtDepthZero }
 			self = .root(onlyPublic: true)
 		default:
-			self = .child(try HD.Path.Component.Child(
+			self = try .child(HD.Path.Component.Child(
 				depth: HD.Path.Component.Child.Depth.explicit(Child.Depth.Value(explicitDepth)),
 				string: string
 			))

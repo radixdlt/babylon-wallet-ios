@@ -36,7 +36,7 @@ extension DecompileSignedTransactionIntentRequest {
 
 		try self.init(
 			compiledSignedIntentHex: container.decode(String.self, forKey: .compiledSignedIntent),
-			instructionsOutputKind: try container.decode(ManifestInstructionsKind.self, forKey: .instructionsOutputKind)
+			instructionsOutputKind: container.decode(ManifestInstructionsKind.self, forKey: .instructionsOutputKind)
 		)
 	}
 }

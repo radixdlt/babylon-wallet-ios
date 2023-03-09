@@ -890,13 +890,13 @@ extension SLIP10TestVectorsTests {
 		}
 
 		try doInnerTest(
-			childKey: try root.derivePrivateKey(path: testCase.path)
+			childKey: root.derivePrivateKey(path: testCase.path)
 		)
 
 		let depth = try testCase.path.depth()
 		if !(C.isCurve25519 && depth > 2) {
 			try doInnerTest(
-				childKey: try root.derivePublicKey(path: testCase.path),
+				childKey: root.derivePublicKey(path: testCase.path),
 				expectPrivateToBePresent: false
 			)
 		}
