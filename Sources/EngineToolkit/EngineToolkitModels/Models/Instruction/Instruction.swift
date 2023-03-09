@@ -64,6 +64,7 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case createIdentity(CreateIdentity)
 	case assertAccessRule(AssertAccessRule)
 
+	case createAccount(CreateAccount)
 	case createValidator(CreateValidator)
 }
 
@@ -164,6 +165,9 @@ extension Instruction {
 			return .createIdentity
 		case .assertAccessRule:
 			return .assertAccessRule
+
+		case .createAccount:
+			return .createAccount
 
 		case .createValidator:
 			return .createValidator
@@ -275,6 +279,9 @@ extension Instruction {
 		case let .assertAccessRule(instruction):
 			try instruction.encode(to: encoder)
 
+		case let .createAccount(instruction):
+			try instruction.encode(to: encoder)
+
 		case let .createValidator(instruction):
 			try instruction.encode(to: encoder)
 		}
@@ -378,6 +385,9 @@ extension Instruction {
 			self = try .createIdentity(.init(from: decoder))
 		case .assertAccessRule:
 			self = try .assertAccessRule(.init(from: decoder))
+
+		case .createAccount:
+			self = try .createAccount(.init(from: decoder))
 
 		case .createValidator:
 			self = try .createValidator(.init(from: decoder))
