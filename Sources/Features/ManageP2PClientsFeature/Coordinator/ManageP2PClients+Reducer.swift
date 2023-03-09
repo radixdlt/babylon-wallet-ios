@@ -31,7 +31,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationActionOf<ManageP2PClients.Destinations>)
+		case destination(PresentationAction<Destinations.Action>)
 		case connection(
 			id: ConnectionPassword,
 			action: ManageP2PClient.Action
@@ -64,7 +64,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 			.forEach(\.clients, action: /Action.child .. ChildAction.connection) {
 				ManageP2PClient()
 			}
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}

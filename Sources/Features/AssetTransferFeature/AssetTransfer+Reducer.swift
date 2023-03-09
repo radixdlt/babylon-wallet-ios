@@ -29,8 +29,8 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public var amount: Decimal_?
 		public var to: To?
 
-		@PresentationStateOf<Destinations>
-		public var destination
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public init(
 			from: From,
@@ -52,7 +52,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationActionOf<AssetTransfer.Destinations>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -75,7 +75,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}

@@ -62,10 +62,7 @@ private extension PersonaDetails.State {
 }
 
 private extension PersonaDetails.Store {
-	var confirmForgetAlert: Store<PresentationState<AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert>>,
-		PresentationAction<AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert>,
-			PersonaDetails.ViewAction.ConfirmForgetAlert>>
-	{
+	var confirmForgetAlert: AlertPresentationStore<PersonaDetails.ViewAction.ConfirmForgetAlert> {
 		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
 	}
 }
@@ -163,10 +160,11 @@ extension PersonaDetails.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.sharingAccounts) { account in
-							AccountButton(account.label.rawValue,
-							              address: account.address.address,
-							              gradient: .init(account.appearanceID))
-							{
+							AccountButton(
+								account.label.rawValue,
+								address: account.address.address,
+								gradient: .init(account.appearanceID)
+							) {
 								viewStore.send(.accountTapped(account.address))
 							}
 						}

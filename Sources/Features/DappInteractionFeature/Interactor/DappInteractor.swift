@@ -20,7 +20,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case task
 		case moveToBackground
 		case moveToForeground
-		case responseFailureAlert(PresentationAction<AlertState<ViewAction.ResponseFailureAlertAction>, ViewAction.ResponseFailureAlertAction>)
+		case responseFailureAlert(PresentationAction<ResponseFailureAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
 			case cancelButtonTapped(P2P.RTCIncomingWalletInteraction)
@@ -39,7 +39,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case modal(PresentationActionOf<Destinations>)
+		case modal(PresentationAction<Destinations.Action>)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -74,9 +74,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$currentModal, action: /Action.child .. ChildAction.modal) {
+			.ifLet(\.$currentModal, action: /Action.child .. ChildAction.modal) {
 				Destinations()
 			}
+			.ifLet(\.$responseFailureAlert, action: /Action.view .. ViewAction.responseFailureAlert)
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -123,9 +124,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 
 		case let .responseFailureAlert(action):
-			state.responseFailureAlert = nil
 			switch action {
-			case .dismiss, .present:
+			case .dismiss:
 				return .none
 			case let .presented(.cancelButtonTapped(request)):
 				dismissCurrentModalAndRequest(request, for: &state)

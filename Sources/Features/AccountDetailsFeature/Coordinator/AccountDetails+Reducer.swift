@@ -11,8 +11,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
 
-		@PresentationStateOf<Destinations>
-		public var destination
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account
@@ -56,7 +56,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
-		case destination(PresentationActionOf<Destinations>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -96,7 +96,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
