@@ -39,8 +39,8 @@ public extension PersonaDetails.View {
 					AccountSection(store: store)
 						.background(.app.gray5)
 
-					Button(L10n.PersonaDetails.disconnectPersona) {
-						viewStore.send(.disconnectPersonaTapped)
+					Button(L10n.PersonaDetails.deauthorizePersona) {
+						viewStore.send(.deauthorizePersonaTapped)
 					}
 					.buttonStyle(.primaryRectangular(isDestructive: true))
 					.padding([.horizontal, .top], .medium3)

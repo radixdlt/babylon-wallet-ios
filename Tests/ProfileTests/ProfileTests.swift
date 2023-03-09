@@ -52,21 +52,29 @@ final class ProfileTests: TestCase {
 			language: .english
 		)
 		let networkID = gateway.network.id
-		let babylonFactorSource = try FactorSource.babylon(
-			mnemonic: curve25519FactorSourceMnemonic,
-			hint: creatingDevice
-		)
 
-		var profile = withDependencies {
+		let (_profile, babylonFactorSource, olympiaFactorSource) = try withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
 			$0.uuid = .constant(.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!)
 		} operation: {
-			Profile(factorSource: babylonFactorSource, creatingDevice: creatingDevice)
+			let babylonFactorSource = try FactorSource.babylon(
+				mnemonic: curve25519FactorSourceMnemonic,
+				hint: creatingDevice
+			)
+			let olympiaFactorSource = try FactorSource.olympia(
+				mnemonic: secp256K1FactorMnemonic,
+				hint: creatingDevice
+			)
+			let profile = Profile(
+				factorSource: babylonFactorSource,
+				creatingDevice: creatingDevice
+			)
+
+			return (profile, babylonFactorSource, olympiaFactorSource)
 		}
 
-		let olympiaFactorSource = try FactorSource.olympia(
-			mnemonic: secp256K1FactorMnemonic,
-			hint: creatingDevice
-		)
+		var profile = _profile
+
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {

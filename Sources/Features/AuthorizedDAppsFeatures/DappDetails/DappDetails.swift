@@ -129,14 +129,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmDisconnectAlert(.presented(.confirmTapped)):
-			let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
-			return .run { send in
-				try await authorizedDappsClient.forgetAuthorizedDapp(dAppID, networkID)
-				await send(.internal(.dAppForgotten))
-				await send(.delegate(.dAppForgotten))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+			return disconnectDappEffect(state: state)
 
 		case .confirmDisconnectAlert:
 			return .none
@@ -145,7 +138,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .presentedPersona(.presented(.delegate(.personaDisconnected))):
+		case .presentedPersona(.presented(.delegate(.personaDeauthorized))):
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .run { send in
 				let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
@@ -166,12 +159,27 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$metadata = metadata
 			return .none
 		case let .dAppUpdated(dApp):
+			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
+				return disconnectDappEffect(state: state)
+			}
+
 			state.dApp = dApp
 			return .none
+
 		case .dAppForgotten:
 			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 			state.isDismissed = true
-			return .none
+			return .send(.delegate(.dAppForgotten))
+		}
+	}
+
+	private func disconnectDappEffect(state: State) -> EffectTask<Action> {
+		let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
+		return .run { send in
+			try await authorizedDappsClient.forgetAuthorizedDapp(dAppID, networkID)
+			await send(.internal(.dAppForgotten))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }
