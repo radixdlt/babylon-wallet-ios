@@ -81,7 +81,7 @@ extension Profile {
 	}
 
 	/// Removes a Persona from a dApp in the Profile
-	public mutating func disconnectPersonaFromDapp(
+	public mutating func deauthorizePersonaFromDapp(
 		_ personaID: OnNetwork.Persona.ID,
 		dAppID: OnNetwork.AuthorizedDapp.ID,
 		networkID: NetworkID

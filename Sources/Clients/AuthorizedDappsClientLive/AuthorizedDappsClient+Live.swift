@@ -35,9 +35,9 @@ extension AuthorizedDappsClient: DependencyKey {
 					try $0.updateOrAddAuthorizedDapp(dapp)
 				}
 			},
-			disconnectPersonaFromDapp: { personaID, authorizedDappID, networkID in
+			deauthorizePersonaFromDapp: { personaID, authorizedDappID, networkID in
 				try await getProfileStore().updating {
-					try $0.disconnectPersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
+					try $0.deauthorizePersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
 				}
 			},
 			detailsForAuthorizedDapp: { simple in

@@ -8,7 +8,7 @@ public struct AuthorizedDappsClient: Sendable {
 	public var forgetAuthorizedDapp: ForgetAuthorizedDapp
 	public var updateAuthorizedDapp: UpdateAuthorizedDapp
 	public var updateOrAddAuthorizedDapp: UpdateOrAddAuthorizedDapp
-	public var disconnectPersonaFromDapp: DisconnectPersonaFromDapp
+	public var deauthorizePersonaFromDapp: DeauthorizePersonaFromDapp
 	public var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
 
 	public init(
@@ -17,7 +17,7 @@ public struct AuthorizedDappsClient: Sendable {
 		forgetAuthorizedDapp: @escaping ForgetAuthorizedDapp,
 		updateAuthorizedDapp: @escaping UpdateAuthorizedDapp,
 		updateOrAddAuthorizedDapp: @escaping UpdateOrAddAuthorizedDapp,
-		disconnectPersonaFromDapp: @escaping DisconnectPersonaFromDapp,
+		deauthorizePersonaFromDapp: @escaping DeauthorizePersonaFromDapp,
 		detailsForAuthorizedDapp: @escaping DetailsForAuthorizedDapp
 	) {
 		self.getAuthorizedDapps = getAuthorizedDapps
@@ -25,7 +25,7 @@ public struct AuthorizedDappsClient: Sendable {
 		self.forgetAuthorizedDapp = forgetAuthorizedDapp
 		self.updateAuthorizedDapp = updateAuthorizedDapp
 		self.updateOrAddAuthorizedDapp = updateOrAddAuthorizedDapp
-		self.disconnectPersonaFromDapp = disconnectPersonaFromDapp
+		self.deauthorizePersonaFromDapp = deauthorizePersonaFromDapp
 		self.detailsForAuthorizedDapp = detailsForAuthorizedDapp
 	}
 }
@@ -37,7 +37,7 @@ extension AuthorizedDappsClient {
 	public typealias UpdateOrAddAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
 	public typealias ForgetAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
 	public typealias UpdateAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
-	public typealias DisconnectPersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
+	public typealias DeauthorizePersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
 }
 
 extension AuthorizedDappsClient {
