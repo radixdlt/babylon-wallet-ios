@@ -41,7 +41,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case accountTapped(AccountAddress)
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
-		case confirmForgetAlert(PresentationAction<AlertState<ConfirmForgetAlert>, ConfirmForgetAlert>)
+		case confirmForgetAlert(PresentationAction<ConfirmForgetAlert>)
 
 		public enum ConfirmForgetAlert: Sendable, Equatable {
 			case confirmTapped

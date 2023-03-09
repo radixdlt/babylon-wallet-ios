@@ -64,7 +64,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 			.forEach(\.clients, action: /Action.child .. ChildAction.connection) {
 				ManageP2PClient()
 			}
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}

@@ -93,7 +93,7 @@ public struct ManageGatewayAPIEndpoints: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
