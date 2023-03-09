@@ -196,6 +196,15 @@ public extension EngineToolkit {
             function: analyze_manifest_with_preview_context
         )
     }
+    
+    func analyzeManifest(
+        request: AnalyzeManifestRequest
+    ) -> Result<AnalyzeManifestResponse, Error> {
+        callLibraryFunction(
+            request: request,
+            function: analyze_manifest
+        )
+    }
 }
 
 // MARK: Private (But Internal For Tests)
