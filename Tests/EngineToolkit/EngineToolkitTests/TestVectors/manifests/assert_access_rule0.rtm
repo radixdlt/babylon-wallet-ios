@@ -13,7 +13,7 @@ ASSERT_ACCESS_RULE
                 Enum(
                     "SoftResourceOrNonFungible::StaticNonFungible", 
                     NonFungibleGlobalId(
-                        "{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}"
+                        "${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}"
                     )
                 )
             )
