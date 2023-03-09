@@ -9,7 +9,8 @@ public struct CallFunction: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let packageAddress: PackageAddress
+	/// This can actually only be either `PackageAddress` or `Address_`. Temporary, will change to `Address`
+	public let packageAddress: Value_
 	public let blueprintName: String
 	public let functionName: String
 	public let arguments: [Value_]
@@ -22,7 +23,19 @@ public struct CallFunction: InstructionProtocol {
 		functionName: String,
 		arguments: [Value_] = []
 	) {
-		self.packageAddress = packageAddress
+		self.packageAddress = .packageAddress(packageAddress)
+		self.blueprintName = blueprintName
+		self.functionName = functionName
+		self.arguments = arguments
+	}
+
+	public init(
+		packageAddress: Address_,
+		blueprintName: String,
+		functionName: String,
+		arguments: [Value_] = []
+	) {
+		self.packageAddress = .address(packageAddress)
 		self.blueprintName = blueprintName
 		self.functionName = functionName
 		self.arguments = arguments
@@ -100,16 +113,9 @@ extension CallFunction {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let packageAddress = try container.decode(PackageAddress.self, forKey: .packageAddress)
-		let blueprintName = try container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded
-		let functionName = try container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded
-		let arguments = try container.decodeIfPresent([Value_].self, forKey: .arguments) ?? []
-
-		self.init(
-			packageAddress: packageAddress,
-			blueprintName: blueprintName,
-			functionName: functionName,
-			arguments: arguments
-		)
+		self.packageAddress = try container.decode(Value_.self, forKey: .packageAddress)
+		self.blueprintName = try container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded
+		self.functionName = try container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded
+		self.arguments = try container.decodeIfPresent([Value_].self, forKey: .arguments) ?? []
 	}
 }
