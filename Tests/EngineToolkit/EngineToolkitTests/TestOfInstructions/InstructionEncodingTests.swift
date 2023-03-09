@@ -324,7 +324,7 @@ final class InstructionEncodingTests: TestCase {
 					accessRules: accessRules
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"elements":[{"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Tuple"},"code":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"},"instruction":"PUBLISH_PACKAGE","metadata":{"key_value_kind":"String","type":"Map","value_value_kind":"String"},"royalty_config":{"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"},"schema":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"}}
+				{"access_rules":{"elements":[{"key_value_kind":"Tuple","type":"Map", "entries": [],"value_value_kind":"Enum"},{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"key_value_kind":"Tuple","type":"Map", "entries": [],"value_value_kind":"Enum"},{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Tuple"},"code":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"},"instruction":"PUBLISH_PACKAGE","metadata":{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"String"},"royalty_config":{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"Tuple"},"schema":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"}}
 				"""
 			),
 			(
@@ -356,7 +356,7 @@ final class InstructionEncodingTests: TestCase {
 					)
 				)),
 				jsonRepresentation: """
-				{"instruction":"SET_PACKAGE_ROYALTY_CONFIG","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"PackageAddress"},"royalty_config":{"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"}}
+				{"instruction":"SET_PACKAGE_ROYALTY_CONFIG","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"PackageAddress"},"royalty_config":{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"Tuple"}}
 				"""
 			),
 			(
@@ -372,7 +372,7 @@ final class InstructionEncodingTests: TestCase {
 					]))
 				)),
 				jsonRepresentation: """
-				{"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"SET_COMPONENT_ROYALTY_CONFIG","royalty_config":{"elements":[{"key_value_kind":"String","type":"Map","value_value_kind":"U32"},{"type":"U32","value":"1"}],"type":"Tuple"}}
+				{"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"SET_COMPONENT_ROYALTY_CONFIG","royalty_config":{"elements":[{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"U32"},{"type":"U32","value":"1"}],"type":"Tuple"}}
 				"""
 			),
 			(
@@ -416,7 +416,7 @@ final class InstructionEncodingTests: TestCase {
 					))
 				)),
 				jsonRepresentation: """
-				{"entries":{"key_value_kind":"NonFungibleLocalId","type":"Map","value_value_kind":"Tuple"},"instruction":"MINT_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"entries":{"key_value_kind":"NonFungibleLocalId","type":"Map", "entries": [],"value_value_kind":"Tuple"},"instruction":"MINT_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
 			(
@@ -439,7 +439,7 @@ final class InstructionEncodingTests: TestCase {
 					accessRules: .init(keyValueKind: .enum, valueValueKind: .tuple, entries: [])
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"divisibility":{"type":"U8","value":"18"},"instruction":"CREATE_FUNGIBLE_RESOURCE","metadata":{"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"key_value_kind":"Enum","type":"Map", "entries": [],"value_value_kind":"Tuple"},"divisibility":{"type":"U8","value":"18"},"instruction":"CREATE_FUNGIBLE_RESOURCE","metadata":{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"String"}}
 				"""
 			),
 			(
@@ -450,7 +450,7 @@ final class InstructionEncodingTests: TestCase {
 					initialSupply: .decimal(.init(value: "1"))
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"divisibility":{"type":"U8","value":"18"},"initial_supply":{"type":"Decimal","value":"1"},"instruction":"CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY","metadata":{"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"key_value_kind":"Enum","type":"Map", "entries": [],"value_value_kind":"Tuple"},"divisibility":{"type":"U8","value":"18"},"initial_supply":{"type":"Decimal","value":"1"},"instruction":"CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY","metadata":{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"String"}}
 				"""
 			),
 			(
@@ -460,7 +460,7 @@ final class InstructionEncodingTests: TestCase {
 					accessRules: Map_(keyValueKind: .enum, valueValueKind: .tuple, entries: [])
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","metadata":{"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"key_value_kind":"Enum","type":"Map", "entries": [],"value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","metadata":{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"String"}}
 				"""
 			),
 			(
@@ -471,7 +471,7 @@ final class InstructionEncodingTests: TestCase {
 					initialSupply: .decimal(.init(value: "1"))
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"initial_supply":{"type":"Decimal","value":"1"},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY","metadata":{"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"key_value_kind":"Enum","type":"Map", "entries": [],"value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"initial_supply":{"type":"Decimal","value":"1"},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY","metadata":{"key_value_kind":"String","type":"Map", "entries": [],"value_value_kind":"String"}}
 				"""
 			),
 			(
