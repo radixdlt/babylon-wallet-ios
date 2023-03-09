@@ -147,7 +147,7 @@ extension DataReader {
 
 	public func skip(byteCount: Int) throws {
 		// Discard data
-		let _ = try read(byteCount: byteCount)
+		_ = try read(byteCount: byteCount)
 	}
 
 	public func read<R>(_ rawRepresentable: R.Type, endianess: Endianess = .big) throws -> R where R: RawRepresentable, R.RawValue: FixedWidthInteger & SignedInteger {

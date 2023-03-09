@@ -71,7 +71,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 		case .appeared:
 			return .task {
-				return .view(.textFieldFocused(.connectionName))
+				.view(.textFieldFocused(.connectionName))
 			}
 			.cancellable(id: FocusFieldID.self)
 

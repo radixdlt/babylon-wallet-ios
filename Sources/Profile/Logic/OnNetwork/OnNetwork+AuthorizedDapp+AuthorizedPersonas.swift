@@ -62,10 +62,10 @@ extension OnNetwork {
 				throw DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist()
 			}
 
-			return AuthorizedPersonaDetailed(
+			return try AuthorizedPersonaDetailed(
 				identityAddress: persona.address,
 				displayName: persona.displayName,
-				fields: try .init(uniqueElements: simple.fieldIDs.map { fieldID in
+				fields: .init(uniqueElements: simple.fieldIDs.map { fieldID in
 					guard
 						let field = persona.fields.first(where: { $0.id == fieldID })
 					else {
@@ -74,7 +74,7 @@ extension OnNetwork {
 					}
 					return field
 				}),
-				simpleAccounts: try {
+				simpleAccounts: {
 					if let sharedAccounts = simple.sharedAccounts {
 						return try .init(sharedAccounts.accountsReferencedByAddress.map { accountAddress in
 							guard

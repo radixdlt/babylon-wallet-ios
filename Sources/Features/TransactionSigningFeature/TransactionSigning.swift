@@ -94,7 +94,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 
 			return .run { send in
 				await send(.internal(.signTransactionResult(
-					await transactionClient.signAndSubmitTransaction(signRequest)
+					transactionClient.signAndSubmitTransaction(signRequest)
 				)))
 			}
 		}

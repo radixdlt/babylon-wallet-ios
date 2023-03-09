@@ -44,9 +44,9 @@ extension NonFungibleGlobalId {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.init(
-			resourceAddress: try container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			nonFungibleLocalId: try container.decode(NonFungibleLocalId.self, forKey: .nonFungibleLocalId)
+		try self.init(
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			nonFungibleLocalId: container.decode(NonFungibleLocalId.self, forKey: .nonFungibleLocalId)
 		)
 	}
 }

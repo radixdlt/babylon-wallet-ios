@@ -6,7 +6,7 @@ public extension FactorSource {
 		fromRoot hdRoot: HD.Root
 	) throws -> FactorSourceID {
 		try Self.id(
-			publicKey: try hdRoot.publicKeyForFactorSourceID()
+			publicKey: hdRoot.publicKeyForFactorSourceID()
 		)
 	}
 

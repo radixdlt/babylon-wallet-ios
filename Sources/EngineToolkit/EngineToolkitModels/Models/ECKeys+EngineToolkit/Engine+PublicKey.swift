@@ -62,9 +62,9 @@ extension Engine.PublicKey {
 
 		switch discriminator {
 		case .ecdsaSecp256k1:
-			self = .ecdsaSecp256k1(try container.decode(Engine.EcdsaSecp256k1PublicKey.self, forKey: .publicKey))
+			self = try .ecdsaSecp256k1(container.decode(Engine.EcdsaSecp256k1PublicKey.self, forKey: .publicKey))
 		case .eddsaEd25519:
-			self = .eddsaEd25519(try container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey))
+			self = try .eddsaEd25519(container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey))
 		}
 	}
 }

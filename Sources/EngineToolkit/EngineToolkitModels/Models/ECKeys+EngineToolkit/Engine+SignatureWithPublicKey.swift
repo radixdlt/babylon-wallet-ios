@@ -78,13 +78,13 @@ extension Engine.SignatureWithPublicKey {
 
 		switch discriminator {
 		case .ecdsaSecp256k1:
-			self = .ecdsaSecp256k1(
-				signature: try container.decode(Engine.EcdsaSecp256k1Signature.self, forKey: .signature)
+			self = try .ecdsaSecp256k1(
+				signature: container.decode(Engine.EcdsaSecp256k1Signature.self, forKey: .signature)
 			)
 		case .eddsaEd25519:
-			self = .eddsaEd25519(
-				signature: try container.decode(Engine.EddsaEd25519Signature.self, forKey: .signature),
-				publicKey: try container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey)
+			self = try .eddsaEd25519(
+				signature: container.decode(Engine.EddsaEd25519Signature.self, forKey: .signature),
+				publicKey: container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey)
 			)
 		}
 	}
