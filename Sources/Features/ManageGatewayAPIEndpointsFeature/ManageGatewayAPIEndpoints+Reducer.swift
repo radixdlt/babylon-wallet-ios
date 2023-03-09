@@ -63,7 +63,7 @@ public struct ManageGatewayAPIEndpoints: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationActionOf<ManageGatewayAPIEndpoints.Destinations>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
