@@ -47,21 +47,21 @@ extension EngineToolkit {
 
 // MARK: Public
 
-public extension EngineToolkit {
+extension EngineToolkit {
 	/// Obtains information on the current transaction library used.
 	///
 	/// This function is used to get information on the transaction library such as the package version. You may
 	/// think of this information request as the "Hello World" example of the transaction library where, this is
 	/// typically the first request type to be implemented in any implementation of the transaction library, if this
 	/// request works then you can be assured that all of the other lower level operations work as well.
-	func information() -> Result<InformationResponse, Error> {
+	public func information() -> Result<InformationResponse, Error> {
 		callLibraryFunction(
 			request: InformationRequest(),
 			function: RadixEngineToolkit.information
 		)
 	}
 
-	func convertManifest(
+	public func convertManifest(
 		request: ConvertManifestRequest
 	) -> Result<ConvertManifestResponse, Error> {
 		callLibraryFunction(
@@ -70,7 +70,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func compileTransactionIntentRequest(
+	public func compileTransactionIntentRequest(
 		request: CompileTransactionIntentRequest
 	) -> Result<CompileTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -79,7 +79,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decompileTransactionIntentRequest(
+	public func decompileTransactionIntentRequest(
 		request: DecompileTransactionIntentRequest
 	) -> Result<DecompileTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -88,7 +88,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func compileSignedTransactionIntentRequest(
+	public func compileSignedTransactionIntentRequest(
 		request: CompileSignedTransactionIntentRequest
 	) -> Result<CompileSignedTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -97,7 +97,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decompileSignedTransactionIntentRequest(
+	public func decompileSignedTransactionIntentRequest(
 		request: DecompileSignedTransactionIntentRequest
 	) -> Result<DecompileSignedTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -106,7 +106,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func compileNotarizedTransactionIntentRequest(
+	public func compileNotarizedTransactionIntentRequest(
 		request: CompileNotarizedTransactionIntentRequest
 	) -> Result<CompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -115,7 +115,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decompileNotarizedTransactionIntentRequest(
+	public func decompileNotarizedTransactionIntentRequest(
 		request: DecompileNotarizedTransactionIntentRequest
 	) -> Result<DecompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -124,7 +124,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decompileUnknownTransactionIntentRequest(
+	public func decompileUnknownTransactionIntentRequest(
 		request: DecompileUnknownTransactionIntentRequest
 	) -> Result<DecompileUnknownTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -133,7 +133,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decodeAddressRequest(
+	public func decodeAddressRequest(
 		request: DecodeAddressRequest
 	) -> Result<DecodeAddressResponse, Error> {
 		callLibraryFunction(
@@ -142,7 +142,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func encodeAddressRequest(
+	public func encodeAddressRequest(
 		request: EncodeAddressRequest
 	) -> Result<EncodeAddressResponse, Error> {
 		callLibraryFunction(
@@ -151,7 +151,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func hashRequest(
+	public func hashRequest(
 		request: HashRequest
 	) -> Result<HashResponse, Error> {
 		callLibraryFunction(
@@ -160,7 +160,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func deriveVirtualAccountAddressRequest(
+	public func deriveVirtualAccountAddressRequest(
 		request: DeriveVirtualAccountAddressRequest
 	) -> Result<DeriveVirtualAccountAddressResponse, Error> {
 		callLibraryFunction(
@@ -169,7 +169,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func deriveVirtualIdentityAddressRequest(
+	public func deriveVirtualIdentityAddressRequest(
 		request: DeriveVirtualIdentityAddressRequest
 	) -> Result<DeriveVirtualIdentityAddressResponse, Error> {
 		callLibraryFunction(
@@ -178,7 +178,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func knownEntityAddresses(
+	public func knownEntityAddresses(
 		request: KnownEntityAddressesRequest
 	) -> Result<KnownEntityAddressesResponse, Error> {
 		callLibraryFunction(
@@ -187,7 +187,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func analyzeManifestWithPreviewContext(
+	public func analyzeManifestWithPreviewContext(
 		request: AnalyzeManifestWithPreviewContextRequest
 	) -> Result<AnalyzeManifestWithPreviewContextResponse, Error> {
 		callLibraryFunction(
@@ -196,7 +196,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func analyzeManifest(
+	public func analyzeManifest(
 		request: AnalyzeManifestRequest
 	) -> Result<AnalyzeManifestResponse, Error> {
 		callLibraryFunction(
