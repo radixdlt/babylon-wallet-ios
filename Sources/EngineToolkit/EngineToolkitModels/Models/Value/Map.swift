@@ -53,7 +53,9 @@ extension Map_ {
 
 		try container.encode(keyValueKind, forKey: .keyValueKind)
 		try container.encode(valueValueKind, forKey: .valueValueKind)
-		try container.encode(entries, forKey: .entries) // TODO: Fix map
+		if !entries.isEmpty {
+			try container.encode(entries, forKey: .entries) // TODO: Fix map
+		}
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -64,11 +66,11 @@ extension Map_ {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let entries = try container.decode([[Value_]].self, forKey: .entries)
+		let entries = try container.decodeIfPresent([[Value_]].self, forKey: .entries) ?? []
 		let keyValueKind = try container.decode(ValueKind.self, forKey: .keyValueKind)
 		let valueValueKind = try container.decode(ValueKind.self, forKey: .valueValueKind)
 
-		try self.init(
+		self.init(
 			keyValueKind: keyValueKind, valueValueKind: valueValueKind, entries: entries
 		)
 	}
