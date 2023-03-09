@@ -58,11 +58,6 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 	case nonFungibleLocalId(NonFungibleLocalId)
 	case nonFungibleGlobalId(NonFungibleGlobalId)
 
-	case ecdsaSecp256k1PublicKey(EcdsaSecp256k1PublicKey)
-	case ecdsaSecp256k1Signature(EcdsaSecp256k1Signature)
-	case eddsaEd25519PublicKey(EddsaEd25519PublicKey)
-	case eddsaEd25519Signature(EddsaEd25519Signature)
-
 	case blob(Blob)
 	case expression(Expression)
 	case bytes(Bytes)
@@ -154,18 +149,6 @@ extension Value_ {
 
 		case .nonFungibleGlobalId:
 			return .nonFungibleGlobalId
-
-		case .ecdsaSecp256k1PublicKey:
-			return .ecdsaSecp256k1PublicKey
-
-		case .ecdsaSecp256k1Signature:
-			return .ecdsaSecp256k1Signature
-
-		case .eddsaEd25519PublicKey:
-			return .eddsaEd25519PublicKey
-
-		case .eddsaEd25519Signature:
-			return .eddsaEd25519Signature
 
 		case .blob:
 			return .blob
@@ -282,18 +265,6 @@ extension Value_ {
 		case let .nonFungibleGlobalId(value):
 			try value.encode(to: encoder)
 
-		case let .ecdsaSecp256k1PublicKey(value):
-			try value.encode(to: encoder)
-
-		case let .ecdsaSecp256k1Signature(value):
-			try value.encode(to: encoder)
-
-		case let .eddsaEd25519PublicKey(value):
-			try value.encode(to: encoder)
-
-		case let .eddsaEd25519Signature(value):
-			try value.encode(to: encoder)
-
 		case let .blob(value):
 			try value.encode(to: encoder)
 
@@ -403,18 +374,6 @@ extension Value_ {
 
 		case .nonFungibleGlobalId:
 			self = try .nonFungibleGlobalId(.init(from: decoder))
-
-		case .ecdsaSecp256k1PublicKey:
-			self = try .ecdsaSecp256k1PublicKey(.init(from: decoder))
-
-		case .ecdsaSecp256k1Signature:
-			self = try .ecdsaSecp256k1Signature(.init(from: decoder))
-
-		case .eddsaEd25519PublicKey:
-			self = try .eddsaEd25519PublicKey(.init(from: decoder))
-
-		case .eddsaEd25519Signature:
-			self = try .eddsaEd25519Signature(.init(from: decoder))
 
 		case .blob:
 			self = try .blob(.init(from: decoder))
