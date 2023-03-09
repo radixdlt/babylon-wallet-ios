@@ -57,6 +57,10 @@ final class NewConnectionTests: TestCase {
 			),
 			reducer: NewConnection()
 		)
+		let addP2PWithPassword = ActorIsolated<ConnectionPassword?>(nil)
+		store.dependencies.radixConnectClient.addP2PWithPassword = { password in
+			await addP2PWithPassword.setValue(password)
+		}
 		let connectionName = "Foobar"
 		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
 			$0 = .connectUsingSecrets(.init(
@@ -68,12 +72,30 @@ final class NewConnectionTests: TestCase {
 
 		let testScheduler = DispatchQueue.test
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-		await store.send(.child(.connectUsingSecrets(.view(.confirmNameButtonTapped))))
+		await store.send(.child(.connectUsingSecrets(.view(.confirmNameButtonTapped)))) {
+			$0 = .connectUsingSecrets(.init(
+				connectionPassword: password,
+				isConnecting: true,
+				nameOfConnection: connectionName,
+				isNameValid: true
+			))
+		}
 		await testScheduler.advance(by: .seconds(1))
 		let connection = P2PClient(connectionPassword: password, displayName: connectionName)
 
+		await store.receive(.child(.connectUsingSecrets(.internal(.establishConnectionResult(.success(password)))))) {
+			$0 = .connectUsingSecrets(.init(
+				connectionPassword: password,
+				isConnecting: false,
+				nameOfConnection: connectionName,
+				isNameValid: true
+			))
+		}
 		await store.receive(.child(.connectUsingSecrets(.internal(.cancelOngoingEffects))))
 		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(connection)))))
 		await store.receive(.delegate(.newConnection(connection)))
+
+		let addedP2PWithPassword = await addP2PWithPassword.value
+		XCTAssertEqual(addedP2PWithPassword, password)
 	}
 }
