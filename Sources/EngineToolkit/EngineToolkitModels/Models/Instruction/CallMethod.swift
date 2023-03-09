@@ -9,14 +9,35 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let receiver: ComponentAddress
+	/// Temporary, will change to `Address`. This can actually only be either `ComponentAddress` or `Address_`.
+	public let receiver: Value_
 	public let methodName: String
 	public let arguments: [Value_]
+
+	// MARK: Computed properties
+
+	/// Temporary. This can actually only be either `ComponentAddress` or `Address_`.
+	public var receiverAsAccountComponentAddress: ComponentAddress? {
+		switch receiver {
+		case let .address(address) where address.address.starts(with: "account"):
+			return ComponentAddress(address: address.address)
+		case let .componentAddress(componentAddress):
+			return componentAddress
+		default:
+			return nil
+		}
+	}
 
 	// MARK: Init
 
 	public init(receiver: ComponentAddress, methodName: String, arguments: [Value_] = []) {
-		self.receiver = receiver
+		self.receiver = .componentAddress(receiver)
+		self.methodName = methodName
+		self.arguments = arguments
+	}
+
+	public init(receiver: Address_, methodName: String, arguments: [Value_] = []) {
+		self.receiver = .address(receiver)
 		self.methodName = methodName
 		self.arguments = arguments
 	}
@@ -85,14 +106,8 @@ extension CallMethod {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let receiver = try container.decode(ComponentAddress.self, forKey: .receiver)
-		let methodName = try container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded
-		let arguments = try container.decodeIfPresent([Value_].self, forKey: .arguments) ?? []
-
-		self.init(
-			receiver: receiver,
-			methodName: methodName,
-			arguments: arguments
-		)
+		self.receiver = try container.decode(Value_.self, forKey: .receiver)
+		self.methodName = try container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded
+		self.arguments = try container.decodeIfPresent([Value_].self, forKey: .arguments) ?? []
 	}
 }
