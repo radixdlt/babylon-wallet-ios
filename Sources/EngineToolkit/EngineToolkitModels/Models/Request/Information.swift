@@ -6,14 +6,14 @@ public struct InformationRequest: Sendable, Codable, Hashable {
 // MARK: - InformationResponse
 public struct InformationResponse: Sendable, Codable, Hashable {
 	public let packageVersion: String
-	public let gitHash: String
-	public init(packageVersion: String, gitHash: String) {
+	public let lastCommitHash: String
+	public init(packageVersion: String, lastCommitHash: String) {
 		self.packageVersion = packageVersion
-		self.gitHash = gitHash
+		self.lastCommitHash = lastCommitHash
 	}
 
 	private enum CodingKeys: String, CodingKey {
 		case packageVersion = "package_version"
-		case gitHash = "git_hash"
+		case lastCommitHash = "last_commit_hash"
 	}
 }
