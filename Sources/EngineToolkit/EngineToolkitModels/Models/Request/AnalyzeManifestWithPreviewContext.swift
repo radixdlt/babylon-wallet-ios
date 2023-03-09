@@ -85,11 +85,11 @@ public struct AccountWithdraw: Codable {
 
 // MARK: - AccountDeposit
 public enum AccountDeposit: Codable {
-	case Exact(
+	case exact(
 		componentAddress: ComponentAddress,
 		resourceSpecifier: ResourceSpecifier
 	)
-	case Estimate(
+	case estimate(
 		index: UInt32,
 		componentAddress: ComponentAddress,
 		resourceSpecifier: ResourceSpecifier
@@ -105,8 +105,8 @@ public enum AccountDeposit: Codable {
 
 // MARK: - ResourceSpecifier
 public enum ResourceSpecifier: Codable {
-	case Amount(ResourceAddress, Decimal_)
-	case Ids(ResourceAddress, Set<NonFungibleLocalId>)
+	case amount(ResourceAddress, Decimal_)
+	case ids(ResourceAddress, Set<NonFungibleLocalId>)
 
 	enum CodingKeys: String, CodingKey {
 		case type
@@ -120,19 +120,19 @@ public enum ResourceSpecifier: Codable {
 
 public extension ResourceSpecifier {
 	internal enum Kind: String, Codable {
-		case Amount
-		case Ids
+		case amount = "Amount"
+		case ids = "Ids"
 	}
 
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
-		case let .Amount(resourceAddress, amount):
+		case let .amount(resourceAddress, amount):
 			try container.encode("Amount", forKey: .type)
 			try container.encode(resourceAddress, forKey: .resourceAddress)
 			try container.encode(amount.value, forKey: .amount)
-		case let .Ids(resourceAddress, ids):
+		case let .ids(resourceAddress, ids):
 			try container.encode("Ids", forKey: .type)
 			try container.encode(resourceAddress, forKey: .resourceAddress)
 			try container.encode(ids, forKey: .ids)
@@ -143,13 +143,13 @@ public extension ResourceSpecifier {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(Kind.self, forKey: .type)
 		switch kind {
-		case .Amount:
-			self = Self.Amount(
+		case .amount:
+			self = .amount(
 				try container.decode(ResourceAddress.self, forKey: .resourceAddress),
 				try Decimal_(value: container.decode(String.self, forKey: .amount))
 			)
-		case .Ids:
-			self = Self.Ids(
+		case .ids:
+			self = .ids(
 				try container.decode(ResourceAddress.self, forKey: .resourceAddress),
 				try container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
 			)
@@ -159,20 +159,20 @@ public extension ResourceSpecifier {
 
 public extension AccountDeposit {
 	internal enum Kind: String, Codable {
-		case Exact
-		case Estimate
+		case exact = "Exact"
+		case estimate = "Estimate"
 	}
 
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
-		case let .Exact(componentAddress, resourceSpecifier):
-			try container.encode(Kind.Exact, forKey: .type)
+		case let .exact(componentAddress, resourceSpecifier):
+			try container.encode(Kind.exact, forKey: .type)
 			try container.encode(componentAddress, forKey: .componentAddress)
 			try container.encode(resourceSpecifier, forKey: .resourceSpecifier)
-		case let .Estimate(index, componentAddress, resourceSpecifier):
-			try container.encode(Kind.Estimate, forKey: .type)
+		case let .estimate(index, componentAddress, resourceSpecifier):
+			try container.encode(Kind.estimate, forKey: .type)
 			try container.encode(String(index), forKey: .index)
 			try container.encode(componentAddress, forKey: .componentAddress)
 			try container.encode(resourceSpecifier, forKey: .resourceSpecifier)
@@ -183,13 +183,13 @@ public extension AccountDeposit {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(Kind.self, forKey: .type)
 		switch kind {
-		case .Exact:
-			self = Self.Exact(
+		case .exact:
+			self = .exact(
 				componentAddress: try container.decode(ComponentAddress.self, forKey: .componentAddress),
 				resourceSpecifier: try container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
 			)
-		case .Estimate:
-			self = Self.Estimate(
+		case .estimate:
+			self = .estimate(
 				index: try decodeAndConvertToNumericType(container: container, key: .index),
 				componentAddress: try container.decode(ComponentAddress.self, forKey: .componentAddress),
 				resourceSpecifier: try container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
