@@ -34,16 +34,14 @@ final class HomeFeatureTests: TestCase {
 			),
 		])
 
-		let accountRowState = AccountList.Row.State(account: account)
-		let accountDetailsState = AccountDetails.State(for: accountRowState)
-		var initialState: Home.State = .previewValue
-		initialState.destination = .accountDetails(accountDetailsState)
-		initialState.accountList = .init(accounts: .init(uniqueElements: [account].map(AccountList.Row.State.init(account:))))
-
 		let store = TestStore(
-			initialState: initialState,
+			initialState: with(Home.State()) {
+				$0.destination = .accountDetails(AccountDetails.State(for: AccountList.Row.State(account: account)))
+				$0.accountList = .init(accounts: .init(uniqueElements: [account].map(AccountList.Row.State.init(account:))))
+			},
 			reducer: Home()
 		)
+		store.exhaustivity = .off
 
 		// when
 		await store.send(.internal(.accountPortfoliosResult(.success(portfolios)))) { [address] in
