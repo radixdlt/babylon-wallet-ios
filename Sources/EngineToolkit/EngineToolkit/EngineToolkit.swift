@@ -61,15 +61,6 @@ public extension EngineToolkit {
 		)
 	}
 
-	func analyzeManifest(
-		request: AnalyzeManifestRequest
-	) -> Result<AnalyzeManifestResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: analyze_manifest
-		)
-	}
-
 	func convertManifest(
 		request: ConvertManifestRequest
 	) -> Result<ConvertManifestResponse, Error> {
@@ -195,6 +186,24 @@ public extension EngineToolkit {
 			function: known_entity_addresses
 		)
 	}
+
+	func analyzeManifestWithPreviewContext(
+		request: AnalyzeManifestWithPreviewContextRequest
+	) -> Result<AnalyzeManifestWithPreviewContextResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: analyze_manifest_with_preview_context
+		)
+	}
+
+	func analyzeManifest(
+		request: AnalyzeManifestRequest
+	) -> Result<AnalyzeManifestResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: analyze_manifest
+		)
+	}
 }
 
 // MARK: Private (But Internal For Tests)
@@ -292,6 +301,9 @@ extension EngineToolkit {
 			return .success(response)
 		} catch let firstError {
 			do {
+				#if DEBUG
+				print(firstError)
+				#endif
 				/// We might have got an error from the Radix Engine Toolkit, try to decode that as **JSONValue**
 				let jsonValue = try jsonDecoder.decode(JSONValue.self, from: jsonData)
 				return .failure(.errorResponse(jsonValue))
