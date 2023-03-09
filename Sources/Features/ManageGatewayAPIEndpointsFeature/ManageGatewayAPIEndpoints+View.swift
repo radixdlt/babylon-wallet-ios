@@ -3,6 +3,34 @@ import FeaturePrelude
 
 // MARK: - ManageGatewayAPIEndpoints.View
 extension ManageGatewayAPIEndpoints {
+	public struct ViewState: Equatable {
+		public struct GatewayInfo: Equatable {
+			let id: String
+			let url: String
+			let name: String
+		}
+
+		public let urlString: String
+		public let gatewayInfo: GatewayInfo?
+		public let controlState: ControlState
+		public let focusedField: ManageGatewayAPIEndpoints.State.Field?
+
+		init(state: ManageGatewayAPIEndpoints.State) {
+			if let gateway = state.currentGateway {
+				gatewayInfo = .init(
+					id: String(gateway.network.id),
+					url: gateway.url.absoluteString,
+					name: [.nebunet: "betanet", .mardunet: "betanet"][gateway.network] ?? gateway.network.name.rawValue
+				)
+			} else {
+				gatewayInfo = nil
+			}
+			urlString = state.urlString
+			controlState = state.controlState
+			focusedField = state.focusedField
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ManageGatewayAPIEndpoints>
@@ -11,35 +39,28 @@ extension ManageGatewayAPIEndpoints {
 		public init(store: StoreOf<ManageGatewayAPIEndpoints>) {
 			self.store = store
 		}
-	}
-}
 
-extension ManageGatewayAPIEndpoints.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			core(viewStore: viewStore)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageGatewayAPIEndpoints.Destinations.State.createAccount,
-					action: ManageGatewayAPIEndpoints.Destinations.Action.createAccount,
-					content: { CreateAccountCoordinator.View(store: $0) }
-				)
+		public var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				core(viewStore: viewStore)
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /ManageGatewayAPIEndpoints.Destinations.State.createAccount,
+						action: ManageGatewayAPIEndpoints.Destinations.Action.createAccount,
+						content: { CreateAccountCoordinator.View(store: $0) }
+					)
+			}
 		}
 	}
 }
 
-// MARK: - ManageGatewayAPIEndpoints.View.ViewStore
-extension ManageGatewayAPIEndpoints.View {
-	fileprivate typealias ViewStore = ComposableArchitecture.ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>
-}
-
 extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
-	fileprivate func core(viewStore: ViewStore) -> some View {
+	private func core(viewStore: ViewStoreOf<ManageGatewayAPIEndpoints>) -> some View {
 		ScrollView {
 			Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
 				.foregroundColor(.app.gray2)
@@ -50,8 +71,8 @@ extension ManageGatewayAPIEndpoints.View {
 			Separator()
 
 			VStack(alignment: .leading) {
-				if let gateway = viewStore.gateway {
-					networkAndGatewayView(gateway)
+				if let gatewayInfo = viewStore.gatewayInfo {
+					networkAndGatewayView(gatewayInfo)
 				}
 
 				Spacer(minLength: .large1 * 2)
@@ -87,15 +108,15 @@ extension ManageGatewayAPIEndpoints.View {
 			.padding(.medium3)
 			.navigationTitle(L10n.ManageGateway.title)
 			.onAppear {
-				viewStore.send(.didAppear)
+				viewStore.send(.appeared)
 			}
 		}
 	}
 
 	@ViewBuilder
-	fileprivate func label(
+	private func label(
 		_ label: String,
-		value: CustomStringConvertible,
+		value: String,
 		valueColor: Color = Color.app.gray2
 	) -> some View {
 		VStack(alignment: .leading, spacing: 0) {
@@ -103,7 +124,7 @@ extension ManageGatewayAPIEndpoints.View {
 				.foregroundColor(.app.gray1)
 				.textStyle(.body1HighImportance)
 
-			Text(String(describing: value))
+			Text(value)
 				.textSelection(.enabled)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2Regular)
@@ -112,7 +133,7 @@ extension ManageGatewayAPIEndpoints.View {
 	}
 
 	fileprivate func networkAndGatewayView(
-		_ gateway: Gateway
+		_ gatewayInfo: ManageGatewayAPIEndpoints.ViewState.GatewayInfo
 	) -> some View {
 		Group {
 			Text(L10n.ManageGateway.currentGatewayTitle)
@@ -120,42 +141,17 @@ extension ManageGatewayAPIEndpoints.View {
 				.textStyle(.secondaryHeader)
 
 			HStack {
-				label(L10n.ManageGateway.networkName, value: ViewState.resolveName(network: gateway.network))
+				label(L10n.ManageGateway.networkName, value: gatewayInfo.name)
 				Spacer()
-				label(L10n.ManageGateway.networkID, value: gateway.network.id)
+				label(L10n.ManageGateway.networkID, value: gatewayInfo.id)
 			}
 
 			label(
 				L10n.ManageGateway.gatewayAPIEndpoint,
-				value: gateway.url.absoluteString, valueColor: .app.blue2
+				value: gatewayInfo.url, valueColor: .app.blue2
 			)
 		}
 	}
-}
-
-// MARK: - ManageGatewayAPIEndpoints.View.ViewState
-extension ManageGatewayAPIEndpoints.View {
-	struct ViewState: Equatable {
-		public var urlString: String
-		public var gateway: Gateway?
-		public var controlState: ControlState
-		@BindingState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
-
-		init(state: ManageGatewayAPIEndpoints.State) {
-			urlString = state.urlString
-			gateway = state.currentGateway
-			controlState = state.controlState
-			focusedField = state.focusedField
-		}
-	}
-}
-
-extension ManageGatewayAPIEndpoints.View.ViewState {
-	static func resolveName(network: Network) -> String {
-		networkNameMap[network] ?? network.name.rawValue
-	}
-
-	private static let networkNameMap: [Network: String] = [.nebunet: "betanet", .mardunet: "betanet"]
 }
 
 #if DEBUG
@@ -170,5 +166,9 @@ struct ManageGatewayAPIEndpoints_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension ManageGatewayAPIEndpoints.State {
+	public static let previewValue: Self = .init()
 }
 #endif
