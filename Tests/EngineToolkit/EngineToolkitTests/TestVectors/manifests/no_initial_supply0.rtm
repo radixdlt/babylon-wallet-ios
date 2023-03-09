@@ -1,4 +1,4 @@
-# This transaction manifest creates a new fungible resource with no initial supply and with the 
+# This transaction manifest creates a new non-fungible resource with no initial supply and with the 
 # default auth.
 
 # ==================================================================================================
@@ -9,19 +9,17 @@
 
 # Locking 10 XRD in fees from the account component. 
 CALL_METHOD 
-    ComponentAddress("{account_component_address}") 
+    ComponentAddress("${account_component_address}") 
     "lock_fee"
     Decimal("10");
 
-# Creating a new resource with a divisibility of 18 and a name of `MyResource`. The resource has 
-# default resource behavior where it can be withdrawn and deposited by anybody.
-CREATE_FUNGIBLE_RESOURCE
-    18u8
+# Creating a new resource 
+CREATE_NON_FUNGIBLE_RESOURCE
+    Enum("NonFungibleIdType::Integer")
     Map<String, String>(
         "name", "MyResource",                                        # Resource Name
-        "symbol", "RSRC",                                            # Resource Symbol
         "description", "A very innovative and important resource"    # Resource Description
-    ) 
+    )
     Map<Enum, Tuple>(
         # This array of tuples defines the behavior of the resource. Each element in the array 
         # defines different resource behaviors. As an example, the first element in this array
@@ -51,5 +49,4 @@ CREATE_FUNGIBLE_RESOURCE
         #        │                       │                 │
         Enum("ResourceMethodAuthKey::Withdraw"), Tuple(Enum("AccessRule::AllowAll"), Enum("AccessRule::DenyAll")),
         Enum("ResourceMethodAuthKey::Deposit"), Tuple(Enum("AccessRule::AllowAll"), Enum("AccessRule::DenyAll"))
-    )
-    None;
+    );

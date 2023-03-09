@@ -8,47 +8,21 @@
 
 # Locking 10 XRD in fees from the account component. 
 CALL_METHOD 
-    ComponentAddress("{account_component_address}") 
+    ComponentAddress("${account_component_address}") 
     "lock_fee"
     Decimal("10");
 
 # Publishing a new package and setting some of its royalty and access rules.
 PUBLISH_PACKAGE 
-    Blob("{code_blob_hash}") 
-    Blob("{schema_blob_hash}")
+    Blob("${code_blob_hash}") 
+    Blob("${schema_blob_hash}") 
     Map<String, Tuple>()       # Royalty Configuration
     Map<String, String>()      # Metadata 
     Tuple(                     # Access Rules Struct
-        Map<Enum, Enum>(       # Method auth Field
-            Enum(
-                "AccessRuleKey::Native", 
-                Enum(
-                    "NativeFn::Package",
-                    Enum("PackageFn::SetRoyaltyConfig")
-                )
-            ), 
-            Enum(
-                "AccessRuleEntry::AccessRule", 
-                Enum(
-                    "AccessRule::Protected", 
-                    Enum(
-                        "AccessRuleNode::ProofRule", 
-                        Enum(
-                            "ProofRule::Require", 
-                            Enum(
-                                "SoftResourceOrNonFungible::StaticNonFungible", 
-                                NonFungibleGlobalId("{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}")
-                            )
-                        )
-                    )
-                )
-            ),
-            Enum(
-                "AccessRuleKey::Native", 
-                Enum(
-                    "NativeFn::Package",
-                    Enum("PackageFn::ClaimRoyalty")
-                )
+        Map<Tuple, Enum>(       # Method auth Field
+            Tuple(
+                Enum("NodeModuleId::PackageRoyalty"),
+                "set_royalty_config"
             ),
             Enum(
                 "AccessRuleEntry::AccessRule", 
@@ -60,18 +34,15 @@ PUBLISH_PACKAGE
                             "ProofRule::Require", 
                             Enum(
                                 "SoftResourceOrNonFungible::StaticNonFungible", 
-                                NonFungibleGlobalId("{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}")
+                                NonFungibleGlobalId("${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}")
                             )
                         )
                     )
                 )
             ),
-            Enum(
-                "AccessRuleKey::Native", 
-                Enum(
-                    "NativeFn::Metadata",
-                    Enum("MetadataFn::Set")
-                )
+            Tuple(
+                Enum("NodeModuleId::PackageRoyalty"),
+                "claim_royalty"
             ),
             Enum(
                 "AccessRuleEntry::AccessRule", 
@@ -83,18 +54,35 @@ PUBLISH_PACKAGE
                             "ProofRule::Require", 
                             Enum(
                                 "SoftResourceOrNonFungible::StaticNonFungible", 
-                                NonFungibleGlobalId("{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}")
+                                NonFungibleGlobalId("${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}")
                             )
                         )
                     )
                 )
             ),
+            Tuple(
+                Enum("NodeModuleId::Metadata"),
+                "set"
+            ),
             Enum(
-                "AccessRuleKey::Native", 
+                "AccessRuleEntry::AccessRule", 
                 Enum(
-                    "NativeFn::Metadata",
-                    Enum("MetadataFn::Get")
+                    "AccessRule::Protected", 
+                    Enum(
+                        "AccessRuleNode::ProofRule", 
+                        Enum(
+                            "ProofRule::Require", 
+                            Enum(
+                                "SoftResourceOrNonFungible::StaticNonFungible", 
+                                NonFungibleGlobalId("${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}")
+                            )
+                        )
+                    )
                 )
+            ),
+            Tuple(
+                Enum("NodeModuleId::Metadata"),
+                "get"
             ),
             Enum(
                 "AccessRuleEntry::AccessRule", 
@@ -103,14 +91,11 @@ PUBLISH_PACKAGE
         ), 
         Map<String, Enum>(),     # Grouped Auth Field
         Enum("AccessRule::DenyAll"),         # Default Auth Field
-        Map<Enum, Enum>(         # Method Auth Mutability Field
-            Enum(
-                "AccessRuleKey::Native", 
-                Enum(
-                    "NativeFn::Package",
-                    Enum("PackageFn::SetRoyaltyConfig")
-                )
-            ), 
+        Map<Tuple, Enum>(         # Method Auth Mutability Field
+            Tuple(
+                Enum("NodeModuleId::PackageRoyalty"),
+                "set_royalty_config"
+            ),
             Enum(
                 "AccessRule::Protected", 
                 Enum(
@@ -119,18 +104,15 @@ PUBLISH_PACKAGE
                         "ProofRule::Require", 
                         Enum(
                             "SoftResourceOrNonFungible::StaticNonFungible", 
-                            NonFungibleGlobalId("{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}")
+                            NonFungibleGlobalId("${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}")
                         )
                     )
                 )
             ),
-            Enum(
-                "AccessRuleKey::Native", 
-                Enum(
-                    "NativeFn::Package",
-                    Enum("PackageFn::ClaimRoyalty")
-                )
-            ), 
+            Tuple(
+                Enum("NodeModuleId::PackageRoyalty"),
+                "claim_royalty"
+            ),
             Enum(
                 "AccessRule::Protected", 
                 Enum(
@@ -139,17 +121,14 @@ PUBLISH_PACKAGE
                         "ProofRule::Require", 
                         Enum(
                             "SoftResourceOrNonFungible::StaticNonFungible", 
-                            NonFungibleGlobalId("{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}")
+                            NonFungibleGlobalId("${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}")
                         )
                     )
                 )
             ),
-            Enum(
-                "AccessRuleKey::Native", 
-                Enum(
-                    "NativeFn::Metadata",
-                    Enum("MetadataFn::Set")
-                )
+            Tuple(
+                Enum("NodeModuleId::Metadata"),
+                "set"
             ), 
             Enum(
                 "AccessRule::Protected", 
@@ -159,18 +138,15 @@ PUBLISH_PACKAGE
                         "ProofRule::Require", 
                         Enum(
                             "SoftResourceOrNonFungible::StaticNonFungible", 
-                            NonFungibleGlobalId("{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}")
+                            NonFungibleGlobalId("${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}")
                         )
                     )
                 )
             ),
-            Enum(
-                "AccessRuleKey::Native", 
-                Enum(
-                    "NativeFn::Metadata",
-                    Enum("MetadataFn::Get")
-                )
-            ), 
+            Tuple(
+                Enum("NodeModuleId::Metadata"),
+                "get"
+            ),
             Enum(
                 "AccessRule::Protected", 
                 Enum(
@@ -179,7 +155,7 @@ PUBLISH_PACKAGE
                         "ProofRule::Require", 
                         Enum(
                             "SoftResourceOrNonFungible::StaticNonFungible", 
-                            NonFungibleGlobalId("{auth_badge_resource_address}:{auth_badge_non_fungible_local_id}")
+                            NonFungibleGlobalId("${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}")
                         )
                     )
                 )
