@@ -3,19 +3,17 @@ import FeaturePrelude
 
 extension SelectGenesisFactorSource.State {
 	var viewState: SelectGenesisFactorSource.ViewState {
-		.init(
-			// TODO: implement
-			curves: Array(Set(factorSources.flatMap(\.parameters.supportedCurves.elements))),
-			selectedCurve: curve
-		)
+		.init(factorSources: factorSources, selectedFactorSource: selectedFactorSource, selectedCurve: self.selectedCurve)
 	}
 }
 
 // MARK: - SelectGenesisFactorSource.View
 extension SelectGenesisFactorSource {
 	public struct ViewState: Equatable {
-		let curves: [Slip10Curve]
+		let factorSources: FactorSources
+		let selectedFactorSource: FactorSource
 		let selectedCurve: Slip10Curve
+		var supportedCurves: [Slip10Curve] { selectedFactorSource.parameters.supportedCurves.rawValue.elements }
 	}
 
 	@MainActor
@@ -29,24 +27,41 @@ extension SelectGenesisFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ForceFullScreen {
-					// FIXME: appStore submission: implement this screen with a picker
 					VStack {
 						Picker(
-							"Curve",
+							"Factor Source",
 							selection: viewStore.binding(
-								get: \.selectedCurve,
-								send: { .selectedCurve($0) }
+								get: \.selectedFactorSource,
+								send: { .selectedFactorSource($0) }
 							)
 						) {
-							Text("Heh")
+							ForEach(viewStore.factorSources, id: \.self) { factorSource in
+								Text("\(factorSource.hint.rawValue) (\(factorSource.supportsOlympia ? "Olympia" : "Babylon"))").tag(factorSource)
+							}
+						}
+
+						if viewStore.supportedCurves.count > 1 {
+							Picker(
+								"Curve",
+								selection: viewStore.binding(
+									get: \.selectedCurve,
+									send: { .selectedCurve($0) }
+								)
+							) {
+								ForEach(viewStore.supportedCurves, id: \.self) { curve in
+									Text("\(String(describing: curve))").tag(curve.rawValue)
+								}
+							}
 						}
 
 						Spacer()
 						Button("Confirm OnDevice factor source") {
 							viewStore.send(.confirmOnDeviceFactorSource)
 						}
+						.buttonStyle(.primaryRectangular)
 						Spacer()
 					}
+					.padding([.horizontal, .bottom], .medium1)
 				}
 			}
 		}

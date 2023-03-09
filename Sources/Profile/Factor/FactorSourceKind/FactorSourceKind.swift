@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - FactorSourceKind
-public enum FactorSourceKind: String, Sendable, Hashable, Codable {
+public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringConvertible {
 	/// A user owned unencrypted mnemonic (and BIP39 passphrase) stored on device,
 	/// thus directly usable. This kind is used as the standard factor source for all new
 	/// wallet users.
@@ -84,6 +84,10 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable {
 }
 
 extension FactorSourceKind {
+	public var description: String {
+		rawValue
+	}
+
 	public var isHD: Bool {
 		switch self {
 		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic, .securityQuestions, .offDeviceInputKeyMaterialForMnemonic: return true

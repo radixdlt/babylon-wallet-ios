@@ -209,6 +209,7 @@ package.addModules([
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
+			"MnemonicClient",
 			"PersonasFeature",
 			"RadixConnectClient", // deleting connections when wallet is deleted
 			"InspectProfileFeature",
@@ -374,6 +375,12 @@ package.addModules([
 	),
 
 	.client(
+		name: "MnemonicClient",
+		dependencies: ["Cryptography"],
+		tests: .no
+	),
+
+	.client(
 		name: "NetworkSwitchingClient",
 		dependencies: [
 			"AccountsClient",
@@ -447,6 +454,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"SecureStorageClient",
+			"MnemonicClient",
 			"UseFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
 		],
 		tests: .yes()
