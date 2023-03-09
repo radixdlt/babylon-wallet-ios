@@ -25,12 +25,6 @@ extension Profile {
 		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let genesisFactorInstance: FactorInstance = try await {
-//			let publicKey: Engine.PublicKey = try await useFactorSourceClient.onDeviceHD(
-//				factorSourceID: factorSource.id,
-//				derivationPath: derivationPath,
-//				curve: request.curve,
-//				purpose: .createEntity(kind: entityKind)
-//			).publicKey
 			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(.init(factorSource: factorSource, derivationPath: derivationPath, curve: request.curve, creationOfEntity: entityKind))
 
 			return try FactorInstance(
