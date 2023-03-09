@@ -13,20 +13,17 @@ public struct CreateFungibleResource: InstructionProtocol {
 	public let divisibility: UInt8
 	public let metadata: Map_
 	public let accessRules: Map_
-	public let initialSupply: Value_
 
 	// MARK: Init
 
 	public init(
 		divisibility: UInt8,
 		metadata: Map_,
-		accessRules: Map_,
-		initialSupply: Value_
+		accessRules: Map_
 	) {
 		self.divisibility = divisibility
 		self.metadata = metadata
 		self.accessRules = accessRules
-		self.initialSupply = initialSupply
 	}
 }
 
@@ -38,7 +35,6 @@ extension CreateFungibleResource {
 		case divisibility
 		case metadata
 		case accessRules = "access_rules"
-		case initialSupply = "initial_supply"
 	}
 
 	// MARK: Codable
@@ -50,7 +46,6 @@ extension CreateFungibleResource {
 		try container.encode(divisibility.proxyEncodable, forKey: .divisibility)
 		try container.encode(metadata, forKey: .metadata)
 		try container.encode(accessRules, forKey: .accessRules)
-		try container.encode(initialSupply, forKey: .initialSupply)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -64,13 +59,11 @@ extension CreateFungibleResource {
 		let divisibility = try container.decode(UInt8.ProxyDecodable.self, forKey: .divisibility).decoded
 		let metadata = try container.decode(Map_.self, forKey: .metadata)
 		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-		let initialSupply = try container.decode(Value_.self, forKey: .initialSupply)
 
 		self.init(
 			divisibility: divisibility,
 			metadata: metadata,
-			accessRules: accessRules,
-			initialSupply: initialSupply
+			accessRules: accessRules
 		)
 	}
 }
