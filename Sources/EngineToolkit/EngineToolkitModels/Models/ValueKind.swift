@@ -37,11 +37,6 @@ public enum ValueKind: String, Codable, Sendable, Hashable {
 	case resourceAddress = "ResourceAddress"
 	case packageAddress = "PackageAddress"
 
-	case ecdsaSecp256k1PublicKey = "EcdsaSecp256k1PublicKey"
-	case ecdsaSecp256k1Signature = "EcdsaSecp256k1Signature"
-	case eddsaEd25519PublicKey = "EddsaEd25519PublicKey"
-	case eddsaEd25519Signature = "EddsaEd25519Signature"
-
 	case bucket = "Bucket"
 	case proof = "Proof"
 
