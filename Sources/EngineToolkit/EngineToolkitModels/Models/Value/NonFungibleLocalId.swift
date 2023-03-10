@@ -118,11 +118,11 @@ extension NonFungibleLocalIdInternal {
 		let value = try container.decode(Kind.self, forKey: .type)
 		switch value {
 		case .integer:
-			self = .integer(try decodeAndConvertToNumericType(container: container, key: .value))
+			self = try .integer(decodeAndConvertToNumericType(container: container, key: .value))
 		case .uuid:
-			self = .uuid(try container.decode(String.self, forKey: .value))
+			self = try .uuid(container.decode(String.self, forKey: .value))
 		case .string:
-			self = .string(try container.decode(String.self, forKey: .value))
+			self = try .string(container.decode(String.self, forKey: .value))
 		case .bytes:
 			self = try .bytes(.init(hex: container.decode(String.self, forKey: .value)))
 		}

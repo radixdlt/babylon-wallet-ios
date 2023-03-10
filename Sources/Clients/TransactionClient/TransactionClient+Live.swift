@@ -146,7 +146,7 @@ extension TransactionClient {
 		func submitNotarizedTX(
 			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
 		) async -> Result<TXID, SubmitTXFailure> {
-			@Dependency(\.mainQueue) var mainQueue
+			@Dependency(\.continuousClock) var clock
 
 			// MARK: Submit TX
 
@@ -181,7 +181,7 @@ extension TransactionClient {
 			var pollCount = 0
 			while !txStatus.isComplete {
 				defer { pollCount += 1 }
-				try? await mainQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
+				try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
 
 				do {
 					txStatus = try await pollTransactionStatus()

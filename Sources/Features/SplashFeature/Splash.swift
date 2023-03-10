@@ -25,7 +25,7 @@ public struct Splash: Sendable, FeatureReducer {
 		}
 
 		case appeared
-		case passcodeCheckFailedAlert(PresentationAction<AlertState<PasscodeCheckFailedAlertAction>, PasscodeCheckFailedAlertAction>)
+		case passcodeCheckFailedAlert(PresentationAction<PasscodeCheckFailedAlertAction>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -37,8 +37,8 @@ public struct Splash: Sendable, FeatureReducer {
 		case loadProfileOutcome(LoadProfileOutcome)
 	}
 
-	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.onboardingClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
@@ -47,9 +47,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$passcodeCheckFailedAlert, action: /Action.view .. ViewAction.passcodeCheckFailedAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$passcodeCheckFailedAlert, action: /Action.view .. ViewAction.passcodeCheckFailedAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -119,7 +117,7 @@ public struct Splash: Sendable, FeatureReducer {
 			#else
 			durationInMS = 800
 			#endif
-			try? await mainQueue.sleep(for: .milliseconds(durationInMS))
+			try? await clock.sleep(for: .milliseconds(durationInMS))
 		}
 	}
 

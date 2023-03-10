@@ -508,7 +508,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/davdroman/swift-composable-architecture", branch: "navigation-relay")
+				.package(url: "https://github.com/davdroman/swift-composable-architecture", branch: "navigation-beta-stack-and-relay")
 			},
 			"DesignSystem",
 			"Resources",
@@ -645,7 +645,7 @@ package.addModules([
 		name: "Cryptography",
 		dependencies: [
 			.product(name: "K1", package: "K1") {
-				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
+				.package(url: "https://github.com/Sajjon/K1.git", exact: "0.0.4")
 			},
 		],
 		exclude: [

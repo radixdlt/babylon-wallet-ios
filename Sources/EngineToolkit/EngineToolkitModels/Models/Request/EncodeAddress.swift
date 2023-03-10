@@ -13,8 +13,8 @@ public struct EncodeAddressRequest: Sendable, Codable, Hashable {
 	}
 
 	public init(addressHex: String, networkId: NetworkID) throws {
-		self.init(
-			addressBytes: try [UInt8](hex: addressHex),
+		try self.init(
+			addressBytes: [UInt8](hex: addressHex),
 			networkId: networkId
 		)
 	}

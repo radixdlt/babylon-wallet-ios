@@ -39,7 +39,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationActionOf<ManageFactorSources.Destinations>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -49,7 +49,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}

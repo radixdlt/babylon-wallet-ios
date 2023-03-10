@@ -47,7 +47,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
@@ -71,14 +71,14 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 		case .appeared:
 			return .task {
-				return .view(.textFieldFocused(.connectionName))
+				.view(.textFieldFocused(.connectionName))
 			}
 			.cancellable(id: FocusFieldID.self)
 
 		case let .textFieldFocused(focus):
 			return .run { send in
 				do {
-					try await self.mainQueue.sleep(for: .seconds(0.5))
+					try await clock.sleep(for: .seconds(0.5))
 					try Task.checkCancellation()
 					await send(.internal(.focusTextField(focus)))
 				} catch {

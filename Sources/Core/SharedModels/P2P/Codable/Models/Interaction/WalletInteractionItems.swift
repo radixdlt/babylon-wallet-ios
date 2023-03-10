@@ -21,11 +21,11 @@ extension P2P.FromDapp.WalletInteraction {
 			let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 			switch discriminator {
 			case .unauthorizedRequest:
-				self = .request(.unauthorized(try .init(from: decoder)))
+				self = try .request(.unauthorized(.init(from: decoder)))
 			case .authorizedRequest:
-				self = .request(.authorized(try .init(from: decoder)))
+				self = try .request(.authorized(.init(from: decoder)))
 			case .transaction:
-				self = .transaction(try .init(from: decoder))
+				self = try .transaction(.init(from: decoder))
 			}
 		}
 	}

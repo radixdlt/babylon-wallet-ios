@@ -138,7 +138,7 @@ extension ProfileStore {
 	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
 		try assertProfileStateIsEphemeral()
 
-		guard (try? await secureStorageClient.loadProfileSnapshotData()) == Data?.none else {
+		guard await (try? secureStorageClient.loadProfileSnapshotData()) == Data?.none else {
 			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
 			throw ExistingProfileSnapshotFoundAbortingImport()
 		}

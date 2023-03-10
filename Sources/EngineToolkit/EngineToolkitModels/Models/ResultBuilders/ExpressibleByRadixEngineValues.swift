@@ -51,11 +51,11 @@ extension SpecificValuesBuilder {
 
 extension ExpressibleByRadixEngineValues {
 	public init(@ValuesBuilder buildValues: () throws -> [any ValueProtocol]) rethrows {
-		self.init(try buildValues())
+		try self.init(buildValues())
 	}
 
 	public init(@SpecificValuesBuilder buildValues: () throws -> [Value_]) rethrows {
-		self.init(values: try buildValues())
+		try self.init(values: buildValues())
 	}
 
 	public init(@SpecificValuesBuilder buildValue: () throws -> Value_) rethrows {

@@ -172,10 +172,10 @@ final class InstructionEncodingTests: TestCase {
 				{"instruction":"DROP_ALL_PROOFS"}
 				"""
 			),
-			(
+			try (
 				value: .publishPackageWithOwner(.init(
-					code: try .init(hex: "36dae540b7889956f1f1d8d46ba23e5e44bf5723aef2a8e6b698686c02583618"),
-					abi: try .init(hex: "15e8699a6d63a96f66f6feeb609549be2688b96b02119f260ae6dfd012d16a5d"),
+					code: .init(hex: "36dae540b7889956f1f1d8d46ba23e5e44bf5723aef2a8e6b698686c02583618"),
+					abi: .init(hex: "15e8699a6d63a96f66f6feeb609549be2688b96b02119f260ae6dfd012d16a5d"),
 					ownerBadge: .init(
 						resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
 						nonFungibleLocalId: .integer(1)
@@ -193,8 +193,8 @@ final class InstructionEncodingTests: TestCase {
 				{"bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"instruction":"BURN_RESOURCE"}
 				"""
 			),
-			(
-				value: try .recallResource(.init(
+			try (
+				value: .recallResource(.init(
 					vault_id: .init(hex: "776e134adba9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"),
 					amount: .init(value: "1")
 				)),
@@ -296,10 +296,10 @@ final class InstructionEncodingTests: TestCase {
 				{"entries":{"entries":[],"key_value_kind":"NonFungibleLocalId","type":"Map","value_value_kind":"Tuple"},"instruction":"MINT_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
-			(
+			try (
 				value: .mintUuidNonFungible(.init(
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-					entries: try .array(.init(elementKind: .tuple, elements: []))
+					entries: .array(.init(elementKind: .tuple, elements: []))
 				)),
 				jsonRepresentation: """
 				{"entries":{"element_kind":"Tuple","elements":[],"type":"Array"},"instruction":"MINT_UUID_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
@@ -353,8 +353,8 @@ final class InstructionEncodingTests: TestCase {
 				{"access_rule":{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"ASSERT_ACCESS_RULE"}
 				"""
 			),
-			(
-				value: try .createValidator(.init(
+			try (
+				value: .createValidator(.init(
 					key: .init(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"),
 					ownerAccessRule: .init(.u8(0))
 				)),

@@ -26,11 +26,11 @@ extension RTCPeerConnection: PeerConnection {
 	}
 
 	func createLocalOffer() async throws -> RTCPrimitive.Offer {
-		.init(from: try await self.offer(for: .negotiationConstraints))
+		try await .init(from: self.offer(for: .negotiationConstraints))
 	}
 
 	func createLocalAnswer() async throws -> RTCPrimitive.Answer {
-		.init(from: try await self.answer(for: .negotiationConstraints))
+		try await .init(from: self.answer(for: .negotiationConstraints))
 	}
 
 	func addRemoteICECandidate(_ candidate: RTCPrimitive.ICECandidate) async throws {

@@ -3,6 +3,7 @@ import AuthorizedDappsClient
 import FeaturePrelude
 import GatewaysClient
 import PersonasClient
+import TransactionClient
 import TransactionSigningFeature
 
 // MARK: - DappInteractionFlow
@@ -43,8 +44,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
 		var root: Destinations.State?
-		@NavigationStateOf<Destinations>
-		var path
+		@StackState<Destinations.State>
+		var path = []
 
 		init?(
 			dappMetadata: DappMetadata,
@@ -66,7 +67,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case appeared
 		case closeButtonTapped
 		case backButtonTapped
-		case personaNotFoundErrorAlert(PresentationAction<AlertState<PersonaNotFoundErrorAlertAction>, PersonaNotFoundErrorAlertAction>)
+		case personaNotFoundErrorAlert(PresentationAction<PersonaNotFoundErrorAlertAction>)
 
 		enum PersonaNotFoundErrorAlertAction: Sendable, Equatable {
 			case cancelButtonTapped
@@ -96,7 +97,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case root(Destinations.Action)
-		case path(NavigationActionOf<Destinations>)
+		case path(StackAction<Destinations.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -145,12 +146,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Destinations()
 			}
-			.navigationDestination(\.$path, action: /Action.child .. ChildAction.path) {
+			.forEach(\.$path, action: /Action.child .. ChildAction.path) {
 				Destinations()
 			}
-			.presentationDestination(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert)
 	}
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
@@ -246,10 +245,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case
-			let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))),
-			let .path(.element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona)))))):
+		func handleLogin(
+			_ item: State.AnyInteractionItem,
+			_ persona: OnNetwork.Persona,
+			_ authorizedDapp: OnNetwork.AuthorizedDapp?,
+			_ authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
+		) -> EffectTask<Action> {
 			state.persona = persona
 			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersona
@@ -263,31 +264,74 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			state.responseItems[item] = responseItem
 
 			return autofillOngoingResponseItemsIfPossibleEffect(for: &state)
-		case
-			let .root(.relay(item, .permission(.delegate(.continueButtonTapped)))),
-			let .path(.element(_, .relay(item, .permission(.delegate(.continueButtonTapped))))):
+		}
 
+		func handlePermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
 			let responseItem: State.AnyInteractionResponseItem = .local(.permissionGranted)
 			state.responseItems[item] = responseItem
 			return continueEffect(for: &state)
-		case
-			let .root(.relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))),
-			let .path(.element(_, .relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind)))))):
+		}
 
+		func handleAccounts(
+			_ item: State.AnyInteractionItem,
+			_ accounts: IdentifiedArrayOf<OnNetwork.Account>,
+			_ accessKind: ChooseAccounts.State.AccessKind
+		) -> EffectTask<Action> {
 			setAccountsResponse(to: item, accounts, accessKind: accessKind, into: &state)
 			return continueEffect(for: &state)
-		case
-			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),
-			let .path(.element(_, .relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID)))))):
+		}
 
+		func handleSignAndSubmitTX(
+			_ item: State.AnyInteractionItem,
+			_ txID: TransactionIntent.TXID
+		) -> EffectTask<Action> {
 			state.responseItems[item] = .remote(.send(.init(txID: txID)))
 			return continueEffect(for: &state)
-		case
-			let .root(.relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))),
-			let .path(.element(_, .relay(_, .signAndSubmitTransaction(.delegate(.failed(error)))))):
+		}
 
+		func handleSignAndSubmitTXFailed(
+			_ error: TransactionFailure
+		) -> EffectTask<Action> {
 			let (errorKind, message) = error.errorKindAndMessage
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
+		}
+
+		switch childAction {
+		case let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))):
+			return handleLogin(item, persona, authorizedDapp, authorizedPersona)
+
+		case let .root(.relay(item, .permission(.delegate(.continueButtonTapped)))):
+			return handlePermission(item)
+
+		case let .root(.relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))):
+			return handleAccounts(item, accounts, accessKind)
+
+		case let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))):
+			return handleSignAndSubmitTX(item, txID)
+
+		case let .root(.relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))):
+			return handleSignAndSubmitTXFailed(error)
+
+		case let .path(pathAction):
+			switch pathAction.type {
+			case let .element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))):
+				return handleLogin(item, persona, authorizedDapp, authorizedPersona)
+
+			case let .element(_, .relay(item, .permission(.delegate(.continueButtonTapped)))):
+				return handlePermission(item)
+
+			case let .element(_, .relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))):
+				return handleAccounts(item, accounts, accessKind)
+
+			case let .element(_, .relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))):
+				return handleSignAndSubmitTX(item, txID)
+
+			case let .element(_, .relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))):
+				return handleSignAndSubmitTXFailed(error)
+
+			default:
+				return .none
+			}
 
 		default:
 			return .none
@@ -317,7 +361,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if
 						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
-							allAccounts.first(by: try .init(address: sharedAccount.address))
+							try allAccounts.first(by: .init(address: sharedAccount.address))
 						}),
 						selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
 					{
@@ -409,7 +453,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						let sharedAccounts: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 							sharedAccounts = try .init(
-								accountsReferencedByAddress: OrderedSet(try accounts.map { try .init(address: $0.address) }),
+								accountsReferencedByAddress: OrderedSet(accounts.map { try .init(address: $0.address) }),
 								forRequest: numberOfAccounts
 							)
 						} else {

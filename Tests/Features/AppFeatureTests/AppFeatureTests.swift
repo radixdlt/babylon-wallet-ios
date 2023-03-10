@@ -31,13 +31,13 @@ final class AppFeatureTests: TestCase {
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
 		// GIVEN: an existing profile (ephemeralPrivateProfile)
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
 			$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
+			$0.continuousClock = clock
 		}
 
 		// WHEN: existing profile is loaded
@@ -45,7 +45,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .existingProfileLoaded))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
+		await clock.advance(by: .seconds(2))
 		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
@@ -54,18 +54,18 @@ final class AppFeatureTests: TestCase {
 				$0.root = .main(.init())
 			}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {
 		// given
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -75,7 +75,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .newUser))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
+		await clock.advance(by: .seconds(2))
 		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
@@ -83,19 +83,19 @@ final class AppFeatureTests: TestCase {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_decodingError__THEN__display_errorAlert_and_navigate_to_onboarding() async throws {
 		// given
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -111,7 +111,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
+		await clock.advance(by: .seconds(2))
 		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
@@ -136,20 +136,20 @@ final class AppFeatureTests: TestCase {
 			$0.alert = nil
 		}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_failedToCreateProfileFromSnapshot__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
 		// given
 		let expectationProfileGotDeleted = expectation(description: "Profile gets deleted")
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
 				expectationProfileGotDeleted.fulfill()
@@ -168,7 +168,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
+		await clock.advance(by: .seconds(2))
 		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
@@ -193,20 +193,20 @@ final class AppFeatureTests: TestCase {
 		}
 
 		waitForExpectations(timeout: 1)
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_profileVersionOutdated__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
 		// given
 		let profileDeletedExpectation = expectation(description: "Profile got deleted")
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
 				profileDeletedExpectation.fulfill()
 			}
@@ -224,7 +224,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
+		await clock.advance(by: .seconds(2))
 		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
@@ -249,7 +249,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		waitForExpectations(timeout: 1)
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 }

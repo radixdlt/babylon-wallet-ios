@@ -20,9 +20,9 @@ extension P2P.FromDapp.WalletInteraction {
 			let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 			switch discriminator {
 			case .login:
-				self = .login(try .init(from: decoder))
+				self = try .login(.init(from: decoder))
 			case .usePersona:
-				self = .usePersona(try .init(from: decoder))
+				self = try .usePersona(.init(from: decoder))
 			}
 		}
 	}
