@@ -4,16 +4,16 @@ import Foundation
 public struct Tuple: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByRadixEngineValues {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .tuple
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.tuple(self)
 	}
 
 	// MARK: Stored properties
-	public let elements: [Value_]
+	public let elements: [ManifestASTValue]
 
 	// MARK: Init
 
-	public init(values: [Value_]) {
+	public init(values: [ManifestASTValue]) {
 		self.elements = values
 	}
 }
@@ -42,6 +42,6 @@ extension Tuple {
 
 		// Decoding `elements`
 		// TODO: Validate that all elements are of type `elementType`
-		try self.init(values: container.decode([Value_].self, forKey: .elements))
+		try self.init(values: container.decode([ManifestASTValue].self, forKey: .elements))
 	}
 }

@@ -4,7 +4,7 @@ import Foundation
 extension String: ValueProtocol, ProxyCodable {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .string
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.string(self)
 	}
 

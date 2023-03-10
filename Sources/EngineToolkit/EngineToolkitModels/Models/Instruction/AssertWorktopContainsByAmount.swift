@@ -11,7 +11,7 @@ public struct AssertWorktopContainsByAmount: InstructionProtocol {
 	// MARK: Stored properties
 	public let amount: Decimal_
 	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: Value_
+	public let resourceAddress: ManifestASTValue
 
 	// MARK: Init
 
@@ -58,7 +58,7 @@ extension AssertWorktopContainsByAmount {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(Value_.self, forKey: .resourceAddress)
+		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
 		self.amount = try container.decode(Decimal_.self, forKey: .amount)
 	}
 }
