@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Tuple
 public struct Tuple: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByRadixEngineValues {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .tuple
+	public static let kind: ManifestASTValueKind = .tuple
 	public func embedValue() -> ManifestASTValue {
 		.tuple(self)
 	}
@@ -35,7 +35,7 @@ extension Tuple {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}

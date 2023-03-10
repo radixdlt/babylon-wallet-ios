@@ -2,7 +2,7 @@ import Foundation
 
 extension UInt64: ValueProtocol, ProxyCodable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .u64
+	public static let kind: ManifestASTValueKind = .u64
 	public func embedValue() -> ManifestASTValue {
 		.u64(self)
 	}
