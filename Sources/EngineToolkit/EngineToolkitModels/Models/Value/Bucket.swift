@@ -4,7 +4,7 @@ import Foundation
 public struct Bucket: ValueProtocol, Sendable, Codable, Hashable, IdentifierConvertible {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .bucket
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.bucket(self)
 	}
 

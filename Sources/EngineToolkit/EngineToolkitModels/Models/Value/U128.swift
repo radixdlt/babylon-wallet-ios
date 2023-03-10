@@ -4,7 +4,7 @@ import Foundation
 public struct U128: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStringLiteral {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .u128
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.u128(self)
 	}
 

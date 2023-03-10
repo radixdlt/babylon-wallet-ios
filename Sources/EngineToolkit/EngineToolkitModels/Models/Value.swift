@@ -3,15 +3,15 @@ import Foundation
 // MARK: - ValueProtocol
 public protocol ValueProtocol {
 	static var kind: ValueKind { get }
-	func embedValue() -> Value_
+	func embedValue() -> ManifestASTValue
 }
 
 extension ValueProtocol {
 	public var kind: ValueKind { Self.kind }
 }
 
-// MARK: - Value_
-public indirect enum Value_: Sendable, Codable, Hashable {
+// MARK: - ManifestASTValue
+public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 	// ==============
 	// Enum Variants
 	// ==============
@@ -65,7 +65,7 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 	case bytes(Bytes)
 }
 
-extension Value_ {
+extension ManifestASTValue {
 	// ===========
 	// Value Kind
 	// ===========
@@ -166,7 +166,7 @@ extension Value_ {
 	}
 }
 
-extension Value_ {
+extension ManifestASTValue {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {

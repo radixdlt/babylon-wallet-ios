@@ -10,7 +10,7 @@ public struct TakeFromWorktop: InstructionProtocol {
 
 	// MARK: Stored properties
 	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: Value_
+	public let resourceAddress: ManifestASTValue
 	public let bucket: Bucket
 
 	// MARK: Init
@@ -51,7 +51,7 @@ extension TakeFromWorktop {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(Value_.self, forKey: .resourceAddress)
+		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
 		self.bucket = try container.decode(Bucket.self, forKey: .intoBucket)
 	}
 }

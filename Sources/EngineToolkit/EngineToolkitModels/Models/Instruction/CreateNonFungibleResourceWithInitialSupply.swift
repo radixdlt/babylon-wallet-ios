@@ -13,7 +13,7 @@ public struct CreateNonFungibleResourceWithInitialSupply: InstructionProtocol {
 	public let idType: Enum
 	public let metadata: Map_
 	public let accessRules: Map_
-	public let initialSupply: Value_
+	public let initialSupply: ManifestASTValue
 
 	// MARK: Init
 
@@ -21,7 +21,7 @@ public struct CreateNonFungibleResourceWithInitialSupply: InstructionProtocol {
 		idType: Enum,
 		metadata: Map_,
 		accessRules: Map_,
-		initialSupply: Value_
+		initialSupply: ManifestASTValue
 	) {
 		self.idType = idType
 		self.metadata = metadata
@@ -64,7 +64,7 @@ extension CreateNonFungibleResourceWithInitialSupply {
 		let idType = try container.decode(Enum.self, forKey: .idType)
 		let metadata = try container.decode(Map_.self, forKey: .metadata)
 		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-		let initialSupply = try container.decode(Value_.self, forKey: .initialSupply)
+		let initialSupply = try container.decode(ManifestASTValue.self, forKey: .initialSupply)
 
 		self.init(
 			idType: idType,

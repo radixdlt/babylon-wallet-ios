@@ -12,14 +12,14 @@ public struct CreateAccessController: InstructionProtocol {
 
 	public let controlledAsset: Bucket
 	public let ruleSet: Tuple
-	public let timedRecoveryDelayInMinutes: Value_
+	public let timedRecoveryDelayInMinutes: ManifestASTValue
 
 	// MARK: Init
 
 	public init(
 		controlledAsset: Bucket,
 		ruleSet: Tuple,
-		timedRecoveryDelayInMinutes: Value_
+		timedRecoveryDelayInMinutes: ManifestASTValue
 	) {
 		self.controlledAsset = controlledAsset
 		self.ruleSet = ruleSet
@@ -58,7 +58,7 @@ extension CreateAccessController {
 
 		let controlledAsset = try container.decode(Bucket.self, forKey: .controlledAsset)
 		let ruleSet = try container.decode(Tuple.self, forKey: .ruleSet)
-		let timedRecoveryDelayInMinutes = try container.decode(Value_.self, forKey: .timedRecoveryDelayInMinutes).self
+		let timedRecoveryDelayInMinutes = try container.decode(ManifestASTValue.self, forKey: .timedRecoveryDelayInMinutes).self
 
 		self.init(
 			controlledAsset: controlledAsset,
