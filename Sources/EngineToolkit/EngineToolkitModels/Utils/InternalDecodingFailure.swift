@@ -3,7 +3,7 @@ import Foundation
 // MARK: - InternalDecodingFailure
 /// Not to be confused with `DecodeError` case of `ErrorResponse` enum.
 public enum InternalDecodingFailure: Swift.Error, Sendable, Equatable, Codable {
-	case valueTypeDiscriminatorMismatch(expectedAnyOf: [ValueKind], butGot: ValueKind)
+	case valueTypeDiscriminatorMismatch(expectedAnyOf: [ManifestASTValueKind], butGot: ManifestASTValueKind)
 	case instructionTypeDiscriminatorMismatch(expected: InstructionKind, butGot: InstructionKind)
 	case curvePrimitiveKindMismatch(expected: ECPrimitiveKind, butGot: String)
 	case curveMismatch(expected: CurveDiscriminator, butGot: String)
@@ -11,7 +11,7 @@ public enum InternalDecodingFailure: Swift.Error, Sendable, Equatable, Codable {
 }
 
 extension InternalDecodingFailure {
-	static func valueTypeDiscriminatorMismatch(expected: ValueKind, butGot: ValueKind) -> Self {
+	static func valueTypeDiscriminatorMismatch(expected: ManifestASTValueKind, butGot: ManifestASTValueKind) -> Self {
 		.valueTypeDiscriminatorMismatch(expectedAnyOf: [expected], butGot: butGot)
 	}
 }

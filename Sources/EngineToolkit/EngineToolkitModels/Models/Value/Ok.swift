@@ -1,6 +1,6 @@
 // MARK: - Ok
 public struct Ok: ValueProtocol, Sendable, Codable, Hashable {
-	public static let kind: ValueKind = .ok
+	public static let kind: ManifestASTValueKind = .ok
 	public func embedValue() -> ManifestASTValue {
 		.ok(self)
 	}
@@ -32,7 +32,7 @@ extension Ok {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
