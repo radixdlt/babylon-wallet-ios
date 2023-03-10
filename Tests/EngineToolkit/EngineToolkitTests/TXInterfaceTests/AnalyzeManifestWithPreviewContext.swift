@@ -5,7 +5,7 @@ import TestingPrelude
 
 final class AnalyzeManifestWithPreviewContextTests: TestCase {
 	override func setUp() {
-		debugPrint = true
+		debugPrint = false
 		super.setUp()
 	}
 
