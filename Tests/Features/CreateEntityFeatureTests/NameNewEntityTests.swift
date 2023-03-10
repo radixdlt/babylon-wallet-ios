@@ -4,8 +4,6 @@ import FeatureTestingPrelude
 
 @MainActor
 final class NameNewEntityTests: TestCase {
-	let testScheduler = DispatchQueue.test
-
 	func test_textFieldDidChange_whenUserEntersAccountName_thenUpdateState() async {
 		// given
 		let initialState = NameNewEntity<OnNetwork.Account>.State(
@@ -53,6 +51,6 @@ final class NameNewEntityTests: TestCase {
 		await store.receive(.internal(.focusTextField(.entityName))) {
 			$0.focusedField = .entityName
 		}
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 	}
 }

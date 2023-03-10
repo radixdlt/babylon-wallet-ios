@@ -4,8 +4,6 @@ import FeatureTestingPrelude
 
 @MainActor
 final class CreationOfEntityTests: TestCase {
-	let testScheduler = DispatchQueue.test
-
 	func test__WHEN__account_is_created__THEN__it_is_added_to_profile() async throws {
 		let account = OnNetwork.Account.previewValue0
 		let initialState = try CreationOfEntity<OnNetwork.Account>.State(
