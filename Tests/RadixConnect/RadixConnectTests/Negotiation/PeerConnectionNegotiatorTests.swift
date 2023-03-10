@@ -31,15 +31,11 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
 		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
-		let peerConnectionTask = Task {
-			try await conenctionBuilder.negotiationResults.prefix(1).collect()
-		}
-
 		// Negotiate the PeerConnection
 		try await performNegotiation(forClient: remoteClientID, peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
 		// Await for PeerConnection to be estblished
-		let result = try await peerConnectionTask.value.first!
+		let result = try await conenctionBuilder.negotiationResults.first()
 		XCTAssertEqual(result.map(\.id), .success(.init(remoteClientID.rawValue)))
 	}
 
@@ -57,33 +53,35 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client1, client2, client3, client4])
 		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
-		try await withThrowingTaskGroup(of: Void.self, body: { group in
-			group.addTask {
-				try await self.performNegotiation(forClient: remoteClientId1, peerConnection: peerConnection1, peerConnectionDelegate: delegate1)
-			}
+		let negotiationResults = try await doAsync(withTimeout: .seconds(2)) {
+			try await withThrowingTaskGroup(of: Void.self, body: { group in
+				group.addTask {
+					try await self.performNegotiation(forClient: remoteClientId1, peerConnection: peerConnection1, peerConnectionDelegate: delegate1)
+				}
 
-			group.addTask {
-				try await self.performNegotiation(forClient: remoteClientId2, peerConnection: peerConnection2, peerConnectionDelegate: delegate2)
-			}
+				group.addTask {
+					try await self.performNegotiation(forClient: remoteClientId2, peerConnection: peerConnection2, peerConnectionDelegate: delegate2)
+				}
 
-			group.addTask {
-				try await self.performNegotiation(forClient: remoteClientId3, peerConnection: peerConnection3, peerConnectionDelegate: delegate3)
-			}
+				group.addTask {
+					try await self.performNegotiation(forClient: remoteClientId3, peerConnection: peerConnection3, peerConnectionDelegate: delegate3)
+				}
 
-			group.addTask {
-				try await self.performFailingNegotiation(forClient: remoteClientId4, peerConnection: peerConnection4, peerConnectionDelegate: delegate4)
-			}
+				group.addTask {
+					try await self.performFailingNegotiation(forClient: remoteClientId4, peerConnection: peerConnection4, peerConnectionDelegate: delegate4)
+				}
 
-			try await group.waitForAll()
-		})
+				try await group.waitForAll()
+			})
 
-		// Assert that the result for all negotiations are returns
+			return try await conenctionBuilder.negotiationResults.prefix(4).collect()
+		}
 
 		/// We are interested only comparing the created `PeerConnectionClient.id`'s, or the failure
 		let result: [
 			PeerConnectionClient.ID:
 				Result<PeerConnectionClient.ID, PeerConnectionNegotiator.FailedToCreatePeerConnectionError>
-		] = try await conenctionBuilder.negotiationResults.prefix(4).collect()
+		] = negotiationResults
 			.reduce(into: [:]) { partialResult, nextResult in
 				switch nextResult {
 				case let .success(peerConnection):
@@ -301,9 +299,7 @@ final class PeerConnectionNegotiatorTests: TestCase {
 			.filter {
 				$0.targetClientId == primitive.id && $0.primitive == primitive.content
 			}
-			.prefix(1)
-			.collect()
-			.first!
+			.first()
 		webSocketClient.respondToRequest(message: .success(sentMessage.requestId))
 	}
 
