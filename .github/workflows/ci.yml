@@ -21,7 +21,8 @@ jobs:
 
       - name: "Run Lint"
         run: |
-          brew install swiftformat
+          brew update
+          brew upgrade swiftformat
           swiftformat . --lint
 
   test-and-build:
