@@ -52,7 +52,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case account(id: ChooseAccountsRow.State.ID, action: ChooseAccountsRow.Action)
-		case createAccountCoordinator(PresentationActionOf<CreateAccountCoordinator>)
+		case createAccountCoordinator(PresentationAction<CreateAccountCoordinator.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -67,7 +67,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			.forEach(\.availableAccounts, action: /Action.child .. ChildAction.account) {
 				ChooseAccountsRow()
 			}
-			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
+			.ifLet(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
 	}

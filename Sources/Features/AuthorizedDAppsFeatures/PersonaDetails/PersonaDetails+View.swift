@@ -62,10 +62,7 @@ private extension PersonaDetails.State {
 }
 
 private extension PersonaDetails.Store {
-	var confirmForgetAlert: Store<PresentationState<AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert>>,
-		PresentationAction<AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert>,
-			PersonaDetails.ViewAction.ConfirmForgetAlert>>
-	{
+	var confirmForgetAlert: AlertPresentationStore<PersonaDetails.ViewAction.ConfirmForgetAlert> {
 		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
 	}
 }
@@ -163,9 +160,11 @@ extension PersonaDetails.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.sharingAccounts) { account in
-							AccountButton(account.label.rawValue,
-							              address: account.address.address,
-							              gradient: .init(account.appearanceID)) {
+							AccountButton(
+								account.label.rawValue,
+								address: account.address.address,
+								gradient: .init(account.appearanceID)
+							) {
 								viewStore.send(.accountTapped(account.address))
 							}
 						}
@@ -186,26 +185,6 @@ extension PersonaDetails.View {
 private extension PersonaDetails.State {
 	var accountSectionViewState: PersonaDetails.View.AccountSection.ViewState {
 		.init(dAppName: dAppName, sharingAccounts: persona.simpleAccounts ?? [])
-	}
-}
-
-// MARK: - InfoPair
-public struct InfoPair: View {
-	let heading: String
-	let item: String
-
-	public init(heading: String, item: String) {
-		self.heading = heading
-		self.item = item
-	}
-
-	public var body: some View {
-		VStack(alignment: .leading, spacing: .small2) {
-			Text(heading)
-				.sectionHeading
-			Text(item)
-				.infoItem
-		}
 	}
 }
 

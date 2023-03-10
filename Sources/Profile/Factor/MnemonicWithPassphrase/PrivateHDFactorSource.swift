@@ -2,7 +2,9 @@ import Foundation
 import NonEmpty
 
 // MARK: - PrivateHDFactorSource
-public struct PrivateHDFactorSource: Sendable, Hashable {
+public struct PrivateHDFactorSource: Sendable, Hashable, Identifiable {
+	public typealias ID = FactorSourceID
+	public var id: ID { factorSource.id }
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 
 	// Only mutable so that `hint` inside factorSource can be changed

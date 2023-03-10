@@ -11,10 +11,14 @@ extension DependencyValues {
 extension FactorSourcesClient: TestDependencyKey {
 	public static let previewValue: Self = noop
 	public static let testValue = Self(
-		getFactorSources: unimplemented("\(Self.self).getFactorSources")
+		getFactorSources: unimplemented("\(Self.self).getFactorSources"),
+		factorSourcesAsyncSequence: unimplemented("\(Self.self).factorSourcesAsyncSequence"),
+		importOlympiaFactorSource: unimplemented("\(Self.self).importOlympiaFactorSource")
 	)
 
 	public static let noop = Self(
-		getFactorSources: { throw NoopError() }
+		getFactorSources: { throw NoopError() },
+		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		importOlympiaFactorSource: { _ in throw NoopError() }
 	)
 }

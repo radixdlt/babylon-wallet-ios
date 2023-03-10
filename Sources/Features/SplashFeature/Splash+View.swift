@@ -53,7 +53,7 @@ struct SplashView_Previews: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: Splash()
-					.dependency(\.mainQueue, .immediate)
+					.dependency(\.continuousClock, ImmediateClock())
 			)
 		)
 	}

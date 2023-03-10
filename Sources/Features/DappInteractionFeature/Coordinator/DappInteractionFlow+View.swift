@@ -28,25 +28,22 @@ extension DappInteractionFlow {
 						}
 					#endif
 				}
-				.navigationDestination(
-					store: store.scope(state: \.$path, action: { .child(.path($0)) })
-				) {
-					destination(for: $0)
-					#if os(iOS)
-						.navigationBarBackButtonHidden()
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								BackButton {
-									ViewStore(store.stateless).send(.view(.backButtonTapped))
-								}
+			} destination: {
+				destination(for: $0)
+				#if os(iOS)
+					.navigationBarBackButtonHidden()
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							BackButton {
+								ViewStore(store.stateless).send(.view(.backButtonTapped))
 							}
 						}
-					#endif
-				}
-				#if os(iOS)
-				.navigationTransition(.slide, interactivity: .disabled)
+					}
 				#endif
 			}
+			#if os(iOS)
+			.navigationTransition(.slide, interactivity: .disabled)
+			#endif
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 			.alert(
 				store: store.scope(

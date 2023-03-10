@@ -30,9 +30,9 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		}
 		store.exhaustivity = .off
 		// WHEN view did appear
-		await store.send(.internal(.view(.didAppear)))
+		await store.send(.view(.appeared))
 		// THEN current network is loaded
-		await store.receive(.internal(.system(.loadGatewayResult(.success(.previewValue)))))
+		await store.receive(.internal(.loadGatewayResult(.success(.previewValue))))
 		await getGatewayCalled.withValue {
 			XCTAssertTrue($0)
 		}
@@ -121,10 +121,10 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-		await store.send(.internal(.view(.switchToButtonTapped))) {
+		await store.send(.view(.switchToButtonTapped)) {
 			$0.isValidatingEndpoint = true
 		}
-		await store.receive(.internal(.system(.gatewayValidationResult(.success(newGateway)))))
+		await store.receive(.internal(.gatewayValidationResult(.success(newGateway))))
 		await validatedGatewayURL.withValue {
 			XCTAssertEqual($0, newGateway.url)
 		}
@@ -148,11 +148,11 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-		await store.send(.internal(.system(.gatewayValidationResult(.success(newGateway))))) {
+		await store.send(.internal(.gatewayValidationResult(.success(newGateway)))) {
 			$0.isValidatingEndpoint = false
 			$0.validatedNewGatewayToSwitchTo = newGateway
 		}
-		await store.receive(.internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))))
+		await store.receive(.internal(.hasAccountsResult(.success(hasAccountsOnNetwork))))
 	}
 
 	func test__GIVEN__no_existing_accounts_on_a_new_network__THEN__display_createAccount__flow() async throws {
@@ -173,8 +173,8 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		}
 		store.exhaustivity = .off
 		// FIXME: tests should never send internal actions into the store. they should only send view or child actions.
-		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
-		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
+		await store.send(.internal(.hasAccountsResult(.success(false))))
+		await store.receive(.internal(.createAccountOnNetworkBeforeSwitchingToIt(newGateway))) {
 			$0.destination = .createAccount(
 				.init(config: .init(
 					purpose: .firstAccountOnNewNetwork(newGateway.network.id)
@@ -184,7 +184,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		await store.send(.child(.destination(.presented(.createAccount(.delegate(.completed)))))) {
 			$0.destination = nil
 		}
-		await store.receive(.internal(.system(.switchToResult(.success(newGateway)))))
+		await store.receive(.internal(.switchToResult(.success(newGateway))))
 		await networkSwitchedTo.withValue {
 			XCTAssertEqual($0, newGateway)
 		}
@@ -201,8 +201,8 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		)
 		store.exhaustivity = .on // we ensure `exhaustivity` is on, to assert nothing happens, i.e. `switchTo` is not called on networkSwitchingClient
 		// FIXME: tests should never send internal actions into the store. they should only send view or child actions.
-		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
-		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
+		await store.send(.internal(.hasAccountsResult(.success(false))))
+		await store.receive(.internal(.createAccountOnNetworkBeforeSwitchingToIt(newGateway))) {
 			$0.destination = .createAccount(
 				.init(config: .init(
 					purpose: .firstAccountOnNewNetwork(newGateway.network.id)

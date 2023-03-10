@@ -17,7 +17,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
-		case errorAlert(PresentationAction<AlertState<ErrorAlertAction>, ErrorAlertAction>)
+		case errorAlert(PresentationAction<ErrorAlertAction>)
 		case dismissButtonTapped
 
 		enum ErrorAlertAction: Sendable, Equatable {
@@ -39,9 +39,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$errorAlert, action: /Action.view .. ViewAction.errorAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$errorAlert, action: /Action.view .. ViewAction.errorAlert)
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -67,7 +65,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
 				do {
-					return DappMetadata(try await gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
+					return try await DappMetadata(gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
 				} catch is BadHTTPResponseCode {
 					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {

@@ -84,7 +84,10 @@ extension View {
 	//
 	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
 	@MainActor
-	fileprivate func navigationDestinations(with store: StoreOf<AppSettings>, _ viewStore: ViewStoreOf<AppSettings>) -> some View {
+	fileprivate func navigationDestinations(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
 		self
 		#if DEBUG
 			.navigationDestination(
@@ -104,30 +107,78 @@ extension View {
 				}
 			}
 		#endif
-			.navigationDestination(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AppSettings.Destinations.State.manageP2PClients,
-				action: AppSettings.Destinations.Action.manageP2PClients,
-				destination: { ManageP2PClients.View(store: $0) }
-			)
-			.navigationDestination(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AppSettings.Destinations.State.manageGatewayAPIEndpoints,
-				action: AppSettings.Destinations.Action.manageGatewayAPIEndpoints,
-				destination: { ManageGatewayAPIEndpoints.View(store: $0) }
-			)
-			.navigationDestination(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AppSettings.Destinations.State.authorizedDapps,
-				action: AppSettings.Destinations.Action.authorizedDapps,
-				destination: { AuthorizedDapps.View(store: $0) }
-			)
-			.navigationDestination(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AppSettings.Destinations.State.personas,
-				action: AppSettings.Destinations.Action.personas,
-				destination: { PersonasCoordinator.View(store: $0) }
-			)
+			.factorSources(with: store, viewStore)
+			.manageP2PClients(with: store, viewStore)
+			.manageGatewayAPIEndpoints(with: store, viewStore)
+			.authorizedDapps(with: store, viewStore)
+			.personas(with: store, viewStore)
+	}
+}
+
+extension View {
+	@MainActor
+	private func factorSources(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.manageFactorSources,
+			action: AppSettings.Destinations.Action.manageFactorSources,
+			destination: { ManageFactorSources.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func manageP2PClients(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.manageP2PClients,
+			action: AppSettings.Destinations.Action.manageP2PClients,
+			destination: { ManageP2PClients.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func manageGatewayAPIEndpoints(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.manageGatewayAPIEndpoints,
+			action: AppSettings.Destinations.Action.manageGatewayAPIEndpoints,
+			destination: { ManageGatewayAPIEndpoints.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	fileprivate func authorizedDapps(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.authorizedDapps,
+			action: AppSettings.Destinations.Action.authorizedDapps,
+			destination: { AuthorizedDapps.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	fileprivate func personas(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.personas,
+			action: AppSettings.Destinations.Action.personas,
+			destination: { PersonasCoordinator.View(store: $0) }
+		)
 	}
 }
 
@@ -142,21 +193,33 @@ extension AppSettings.View {
 	}
 
 	private func settingsRows() -> [RowModel] {
-		[.init(title: L10n.Settings.desktopConnectionsButtonTitle,
-		       asset: AssetResource.desktopConnections,
-		       action: .manageP2PClientsButtonTapped),
-		 .init(title: L10n.Settings.gatewayButtonTitle,
-		       asset: AssetResource.gateway,
-		       action: .editGatewayAPIEndpointButtonTapped),
-		 .init(title: L10n.Settings.authorizedDappsButtonTitle,
-		       asset: AssetResource.authorizedDapps,
-		       action: .authorizedDappsButtonTapped),
-		 .init(title: L10n.Settings.personasButtonTitle,
-		       asset: AssetResource.personas,
-		       action: .personasButtonTapped),
-		 .init(title: L10n.Settings.appSettingsButtonTitle,
-		       asset: AssetResource.appSettings,
-		       action: .appSettingsButtonTapped)]
+		[
+			.init(
+				title: L10n.Settings.desktopConnectionsButtonTitle,
+				asset: AssetResource.desktopConnections,
+				action: .manageP2PClientsButtonTapped
+			),
+			.init(
+				title: L10n.Settings.gatewayButtonTitle,
+				asset: AssetResource.gateway,
+				action: .editGatewayAPIEndpointButtonTapped
+			),
+			.init(
+				title: L10n.Settings.authorizedDappsButtonTitle,
+				asset: AssetResource.authorizedDapps,
+				action: .authorizedDappsButtonTapped
+			),
+			.init(
+				title: L10n.Settings.personasButtonTitle,
+				asset: AssetResource.personas,
+				action: .personasButtonTapped
+			),
+			.init(
+				title: L10n.Settings.appSettingsButtonTitle,
+				asset: AssetResource.appSettings,
+				action: .appSettingsButtonTapped
+			),
+		]
 	}
 
 	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
@@ -175,6 +238,15 @@ extension AppSettings.View {
 						viewStore.send(.debugInspectProfileButtonTapped)
 					} icon: {
 						Image(systemName: "wallet.pass")
+							.frame(.verySmall)
+					}
+					.withSeparator
+					.buttonStyle(.settingsRowStyle)
+
+					PlainListRow(title: "Factor Sources") {
+						viewStore.send(.factorSourcesButtonTapped)
+					} icon: {
+						Image(systemName: "person.badge.key")
 							.frame(.verySmall)
 					}
 					.withSeparator

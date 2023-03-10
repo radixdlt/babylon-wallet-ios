@@ -50,13 +50,16 @@ final class NewConnectionTests: TestCase {
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
 		let password = ConnectionPassword.placeholder
 
+		let clock = TestClock()
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
 				ConnectUsingSecrets.State(connectionPassword: password)
 			),
 			reducer: NewConnection()
-		)
+		) {
+			$0.continuousClock = clock
+		}
 		let addP2PWithPassword = ActorIsolated<ConnectionPassword?>(nil)
 		store.dependencies.radixConnectClient.addP2PWithPassword = { password in
 			await addP2PWithPassword.setValue(password)
@@ -70,8 +73,6 @@ final class NewConnectionTests: TestCase {
 			))
 		}
 
-		let testScheduler = DispatchQueue.test
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 		await store.send(.child(.connectUsingSecrets(.view(.confirmNameButtonTapped)))) {
 			$0 = .connectUsingSecrets(.init(
 				connectionPassword: password,
@@ -80,7 +81,9 @@ final class NewConnectionTests: TestCase {
 				isNameValid: true
 			))
 		}
-		await testScheduler.advance(by: .seconds(1))
+
+		await clock.advance(by: .seconds(1))
+
 		let connection = P2PClient(connectionPassword: password, displayName: connectionName)
 
 		await store.receive(.child(.connectUsingSecrets(.internal(.establishConnectionResult(.success(password)))))) {

@@ -41,7 +41,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case accountTapped(AccountAddress)
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
-		case confirmForgetAlert(PresentationAction<AlertState<ConfirmForgetAlert>, ConfirmForgetAlert>)
+		case confirmForgetAlert(PresentationAction<ConfirmForgetAlert>)
 
 		public enum ConfirmForgetAlert: Sendable, Equatable {
 			case confirmTapped
@@ -57,9 +57,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

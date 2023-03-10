@@ -125,8 +125,8 @@ final class ValueEncodingTests: TestCase {
 				"""
 			),
 
-			(
-				value: try Value_.array(.init(elementKind: .string, elements: [.string("World, Hello!")])),
+			try (
+				value: Value_.array(.init(elementKind: .string, elements: [.string("World, Hello!")])),
 				jsonRepresentation: """
 				{"type":"Array","element_kind":"String","elements":[{"type":"String","value":"World, Hello!"}]}
 				"""
@@ -190,33 +190,33 @@ final class ValueEncodingTests: TestCase {
 				{"type":"PackageAddress","address":"package_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxrmwtq"}
 				"""
 			),
-			(
-				value: try Value_.hash(.init(hex: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")),
+			try (
+				value: Value_.hash(.init(hex: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")),
 				jsonRepresentation: """
 				{"type":"Hash","value":"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"}
 				"""
 			),
-			(
-				value: try Value_.ecdsaSecp256k1PublicKey(.init(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")),
+			try (
+				value: Value_.ecdsaSecp256k1PublicKey(.init(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")),
 				jsonRepresentation: """
 				{"type":"EcdsaSecp256k1PublicKey","public_key":"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"}
 				"""
 			),
-			(
-				value: try Value_.eddsaEd25519PublicKey(.init(hex: "4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29")),
+			try (
+				value: Value_.eddsaEd25519PublicKey(.init(hex: "4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29")),
 				jsonRepresentation: """
 				{"type":"EddsaEd25519PublicKey","public_key":"4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29"}
 				"""
 			),
 
-			(
-				value: try Value_.ecdsaSecp256k1Signature(.init(hex: "0079224ea514206706298d8d620f660828f7987068d6d02757e6f3cbbf4a51ab133395db69db1bc9b2726dd99e34efc252d8258dcb003ebaba42be349f50f7765e")),
+			try (
+				value: Value_.ecdsaSecp256k1Signature(.init(hex: "0079224ea514206706298d8d620f660828f7987068d6d02757e6f3cbbf4a51ab133395db69db1bc9b2726dd99e34efc252d8258dcb003ebaba42be349f50f7765e")),
 				jsonRepresentation: """
 				{"type":"EcdsaSecp256k1Signature","signature":"0079224ea514206706298d8d620f660828f7987068d6d02757e6f3cbbf4a51ab133395db69db1bc9b2726dd99e34efc252d8258dcb003ebaba42be349f50f7765e"}
 				"""
 			),
-			(
-				value: try Value_.eddsaEd25519Signature(.init(hex: "ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09")),
+			try (
+				value: Value_.eddsaEd25519Signature(.init(hex: "ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09")),
 				jsonRepresentation: """
 				{"type":"EddsaEd25519Signature","signature":"ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09"}
 				"""
@@ -306,8 +306,8 @@ final class ValueEncodingTests: TestCase {
 				"""
 			),
 
-			(
-				value: try Value_.blob(.init(hex: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")),
+			try (
+				value: Value_.blob(.init(hex: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")),
 				jsonRepresentation: """
 				{"type":"Blob","hash":"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"}
 				"""
@@ -324,8 +324,8 @@ final class ValueEncodingTests: TestCase {
 				{"type":"Expression","value":"ENTIRE_WORKTOP"}
 				"""
 			),
-			(
-				value: try Value_.bytes(.init(hex: "1219122008")),
+			try (
+				value: Value_.bytes(.init(hex: "1219122008")),
 				jsonRepresentation: """
 				{"type":"Bytes","value":"1219122008"}
 				"""

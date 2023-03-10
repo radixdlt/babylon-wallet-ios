@@ -57,11 +57,11 @@ extension SignalingClient.ClientMessage: Codable {
 		// Based on the method, decode to specific RTCPrimitive
 		switch method {
 		case .offer:
-			self.primitive = .offer(try JSONDecoder().decode(RTCPrimitive.Offer.self, from: decryptedPyload))
+			self.primitive = try .offer(JSONDecoder().decode(RTCPrimitive.Offer.self, from: decryptedPyload))
 		case .answer:
-			self.primitive = .answer(try JSONDecoder().decode(RTCPrimitive.Answer.self, from: decryptedPyload))
+			self.primitive = try .answer(JSONDecoder().decode(RTCPrimitive.Answer.self, from: decryptedPyload))
 		case .iceCandidate:
-			self.primitive = .iceCandidate(try JSONDecoder().decode(RTCPrimitive.ICECandidate.self, from: decryptedPyload))
+			self.primitive = try .iceCandidate(JSONDecoder().decode(RTCPrimitive.ICECandidate.self, from: decryptedPyload))
 		}
 	}
 

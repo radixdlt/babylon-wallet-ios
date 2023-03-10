@@ -45,6 +45,7 @@ public struct AppSettings: FeatureReducer {
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
 		case appSettingsButtonTapped
+		case factorSourcesButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -60,7 +61,7 @@ public struct AppSettings: FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationActionOf<Destinations>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -70,6 +71,7 @@ public struct AppSettings: FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case manageFactorSources(ManageFactorSources.State)
 			case manageP2PClients(ManageP2PClients.State)
 			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.State)
 			case authorizedDapps(AuthorizedDapps.State)
@@ -77,6 +79,7 @@ public struct AppSettings: FeatureReducer {
 		}
 
 		public enum Action: Sendable, Equatable {
+			case manageFactorSources(ManageFactorSources.Action)
 			case manageP2PClients(ManageP2PClients.Action)
 			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
@@ -84,6 +87,9 @@ public struct AppSettings: FeatureReducer {
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.manageFactorSources, action: /Action.manageFactorSources) {
+				ManageFactorSources()
+			}
 			Scope(state: /State.manageP2PClients, action: /Action.manageP2PClients) {
 				ManageP2PClients()
 			}
@@ -103,7 +109,7 @@ public struct AppSettings: FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
@@ -121,6 +127,10 @@ public struct AppSettings: FeatureReducer {
 				await radixConnectClient.disconnectAndRemoveAll()
 				return .delegate(.deleteProfileAndFactorSources)
 			}
+
+		case .factorSourcesButtonTapped:
+			state.destination = .manageFactorSources(.init())
+			return .none
 
 		case .addP2PClientButtonTapped:
 			state.destination = .manageP2PClients(.init(destination: .newConnection(.init())))

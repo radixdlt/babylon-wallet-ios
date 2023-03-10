@@ -2,106 +2,106 @@ import Foundation
 
 public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]])] {
 	var testVectors: [(manifest: String, blobs: [[UInt8]])] = [
-		(
-			manifest: String(decoding: try resource(named: "values", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "values", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "royalty", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "royalty", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "worktop", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "worktop", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "recall", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "recall", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "mint_fungible", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "mint_fungible", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "mint_non_fungible", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "mint_non_fungible", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "metadata", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "metadata", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "free_funds", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "free_funds", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "invocation", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "invocation", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "publish", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "publish", extension: ".rtm"), as: UTF8.self),
 			blobs: [
 				[10],
 				[10],
 			]
 		),
-		(
-			manifest: String(decoding: try resource(named: "publish_with_owner", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "publish_with_owner", extension: ".rtm"), as: UTF8.self),
 			blobs: [
 				[10],
 				[10],
 			]
 		),
-		(
-			manifest: String(decoding: try resource(named: "non_fungible_with_initial_supply", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "non_fungible_with_initial_supply", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "non_fungible_no_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "non_fungible_no_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "non_fungible_no_initial_supply", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "non_fungible_no_initial_supply", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "non_fungible_with_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "non_fungible_with_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "fungible_no_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "fungible_no_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "fungible_no_initial_supply", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "fungible_no_initial_supply", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "fungible_with_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "fungible_with_initial_supply_with_owner", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "fungible_with_initial_supply", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "fungible_with_initial_supply", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "resource_transfer", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "resource_transfer", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "multi_account_resource_transfer", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "multi_account_resource_transfer", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "assert_access_rule", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "assert_access_rule", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "access_rule", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "access_rule", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
-		(
-			manifest: String(decoding: try resource(named: "create", extension: ".rtm"), as: UTF8.self),
+		try (
+			manifest: String(decoding: resource(named: "create", extension: ".rtm"), as: UTF8.self),
 			blobs: []
 		),
 	]

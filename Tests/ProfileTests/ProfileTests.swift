@@ -201,7 +201,7 @@ final class ProfileTests: TestCase {
 		var authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
-				dAppDefinitionAddress: try .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
+				dAppDefinitionAddress: .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
 				displayName: "RadiSwap",
 				referencesToAuthorizedPersonas:
 				.init(arrayLiteral:
@@ -209,7 +209,7 @@ final class ProfileTests: TestCase {
 						identityAddress: firstPersona.address,
 						fieldIDs: .init(firstPersona.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
-						sharedAccounts: try .init(
+						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
 								thirdAccount.address,
@@ -221,7 +221,7 @@ final class ProfileTests: TestCase {
 						identityAddress: secondPersona.address,
 						fieldIDs: .init(secondPersona.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
-						sharedAccounts: try .init(
+						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
 							],

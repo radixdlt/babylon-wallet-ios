@@ -1,6 +1,7 @@
 import AsyncExtensions
 import ClientPrelude
 import Cryptography
+import MnemonicClient
 import Profile
 import SecureStorageClient
 
@@ -115,6 +116,13 @@ extension ProfileStore {
 		}
 	}
 
+	/// A multicasting replaying async sequence of distinct FactorSources
+	public func factorSourcesValues() async -> AnyAsyncSequence<FactorSources> {
+		lens {
+			$0.profile.factorSources
+		}
+	}
+
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
 		case .persisted: return .existingProfileLoaded
@@ -130,7 +138,7 @@ extension ProfileStore {
 	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
 		try assertProfileStateIsEphemeral()
 
-		guard (try? await secureStorageClient.loadProfileSnapshotData()) == Data?.none else {
+		guard await (try? secureStorageClient.loadProfileSnapshotData()) == Data?.none else {
 			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
 			throw ExistingProfileSnapshotFoundAbortingImport()
 		}

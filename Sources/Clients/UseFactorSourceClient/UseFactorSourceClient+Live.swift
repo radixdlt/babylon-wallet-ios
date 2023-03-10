@@ -2,30 +2,48 @@ import ClientPrelude
 import Profile
 import SecureStorageClient
 
+// MARK: - FailedToFindFactorSource
+struct FailedToFindFactorSource: Swift.Error {}
+
 // MARK: - UseFactorSourceClient + DependencyKey
 extension UseFactorSourceClient: DependencyKey {
 	public typealias Value = Self
 
-	public static let liveValue: Self = .init(
-		publicKeyFromOnDeviceHD: { request in
-			let privateKey = try request.hdRoot.derivePrivateKey(
-				path: request.derivationPath,
-				curve: request.curve
-			)
+	public static let liveValue: Self = {
+		@Dependency(\.secureStorageClient) var secureStorageClient
 
-			return try privateKey.publicKey().intoEngine()
-		},
-		signatureFromOnDeviceHD: { request in
-			let privateKey = try request.hdRoot.derivePrivateKey(
-				path: request.derivationPath,
-				curve: request.curve
-			)
-			return try privateKey.sign(data: request.data)
-		}
-	)
+		return Self(
+			publicKeyFromOnDeviceHD: { request in
+				let factorSourceID = request.factorSource.id
+
+				guard
+					let mnemonicWithPassphrase = try await secureStorageClient
+					.loadMnemonicByFactorSourceID(factorSourceID, .createEntity(kind: request.entityKind))
+				else {
+					throw FailedToFindFactorSource()
+				}
+				let hdRoot = try mnemonicWithPassphrase.hdRoot()
+				let privateKey = try hdRoot.derivePrivateKey(
+					path: request.derivationPath,
+					curve: request.curve
+				)
+
+				return try privateKey.publicKey().intoEngine()
+			},
+			signatureFromOnDeviceHD: { request in
+				let privateKey = try request.hdRoot.derivePrivateKey(
+					path: request.derivationPath,
+					curve: request.curve
+				)
+				return try privateKey.sign(data: request.data)
+			}
+		)
+	}()
 }
 
 import Cryptography
+
+// MARK: - UseFactorSourceClient.Purpose
 extension UseFactorSourceClient {
 	public enum Purpose: Sendable, Equatable {
 		case signData(Data, isTransaction: Bool)
@@ -35,31 +53,6 @@ extension UseFactorSourceClient {
 			case let .signData(_, isTransaction): return isTransaction ? .signTransaction : .signAuthChallenge
 			case let .createEntity(kind): return .createEntity(kind: kind)
 			}
-		}
-	}
-
-	// FIXME: temporary only
-	public func onDeviceHD(
-		factorSourceID: FactorSource.ID,
-		derivationPath: DerivationPath,
-		curve: Slip10Curve,
-		purpose: Purpose
-	) async throws -> (publicKey: Engine.PublicKey, signature: SignatureWithPublicKey?) {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-
-		guard let loadedMnemonicWithPassphrase = try await secureStorageClient
-			.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
-		else {
-			struct FailedToFindFactorSource: Swift.Error {}
-			throw FailedToFindFactorSource()
-		}
-		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
-
-		if case let .signData(dataToSign, _) = purpose {
-			let result = try self.signatureFromOnDeviceHD(.init(hdRoot: hdRoot, derivationPath: derivationPath, curve: curve, data: dataToSign))
-			return try (publicKey: result.publicKey.intoEngine(), signature: result)
-		} else {
-			return try (publicKey: self.publicKeyFromOnDeviceHD(.init(hdRoot: hdRoot, derivationPath: derivationPath, curve: curve)), signature: nil)
 		}
 	}
 }

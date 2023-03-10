@@ -9,7 +9,6 @@ public struct AppTextField<Value: Hashable>: View {
 	let binding: FocusState<Value>.Binding
 	let equals: Value
 	let first: Binding<Value>
-
 	public init(
 		placeholder: String,
 		text: Binding<String>,

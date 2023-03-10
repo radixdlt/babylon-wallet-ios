@@ -19,7 +19,7 @@ public struct Hash: ValueProtocol, Sendable, Codable, Hashable {
 
 	public init(hex: String) throws {
 		// TODO: Validation of length of Hash
-		self.init(bytes: try [UInt8](hex: hex))
+		try self.init(bytes: [UInt8](hex: hex))
 	}
 }
 
