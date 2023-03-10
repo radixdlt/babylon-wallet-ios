@@ -10,7 +10,7 @@ public struct CreateProofFromAuthZoneByAmount: InstructionProtocol {
 
 	// MARK: Stored properties
 	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: Value_
+	public let resourceAddress: ManifestASTValue
 	public let amount: Decimal_
 	public let intoProof: Proof
 
@@ -64,7 +64,7 @@ extension CreateProofFromAuthZoneByAmount {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(Value_.self, forKey: .resourceAddress)
+		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
 		self.amount = try container.decode(Decimal_.self, forKey: .amount)
 		self.intoProof = try container.decode(Proof.self, forKey: .intoProof)
 	}

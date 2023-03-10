@@ -4,7 +4,7 @@ import Foundation
 extension Bool: ValueProtocol {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .bool
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.boolean(self)
 	}
 }

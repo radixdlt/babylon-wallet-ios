@@ -13,7 +13,7 @@ public struct CreateFungibleResourceWithInitialSupply: InstructionProtocol {
 	public let divisibility: UInt8
 	public let metadata: Map_
 	public let accessRules: Map_
-	public let initialSupply: Value_
+	public let initialSupply: ManifestASTValue
 
 	// MARK: Init
 
@@ -21,7 +21,7 @@ public struct CreateFungibleResourceWithInitialSupply: InstructionProtocol {
 		divisibility: UInt8,
 		metadata: Map_,
 		accessRules: Map_,
-		initialSupply: Value_
+		initialSupply: ManifestASTValue
 	) {
 		self.divisibility = divisibility
 		self.metadata = metadata
@@ -64,7 +64,7 @@ extension CreateFungibleResourceWithInitialSupply {
 		let divisibility = try container.decode(UInt8.ProxyDecodable.self, forKey: .divisibility).decoded
 		let metadata = try container.decode(Map_.self, forKey: .metadata)
 		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-		let initialSupply = try container.decode(Value_.self, forKey: .initialSupply)
+		let initialSupply = try container.decode(ManifestASTValue.self, forKey: .initialSupply)
 
 		self.init(
 			divisibility: divisibility,

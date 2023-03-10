@@ -4,7 +4,7 @@ import Foundation
 public struct Map_: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .map
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.map(self)
 	}
 
@@ -12,14 +12,14 @@ public struct Map_: ValueProtocol, Sendable, Codable, Hashable {
 
 	public let keyValueKind: ValueKind
 	public let valueValueKind: ValueKind
-	public let entries: [[Value_]]
+	public let entries: [[ManifestASTValue]]
 
 	// MARK: Init
 
 	public init(
 		keyValueKind: ValueKind,
 		valueValueKind: ValueKind,
-		entries: [[Value_]]
+		entries: [[ManifestASTValue]]
 	) {
 		self.keyValueKind = keyValueKind
 		self.valueValueKind = valueValueKind
@@ -64,7 +64,7 @@ extension Map_ {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let entries = try container.decode([[Value_]].self, forKey: .entries)
+		let entries = try container.decode([[ManifestASTValue]].self, forKey: .entries)
 		let keyValueKind = try container.decode(ValueKind.self, forKey: .keyValueKind)
 		let valueValueKind = try container.decode(ValueKind.self, forKey: .valueValueKind)
 
