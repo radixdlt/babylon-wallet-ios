@@ -14,25 +14,25 @@ final class ManifestToStringTests: TestCase {
 
 	func test_transactionManifest_toString_on_multiple_packages() throws {
 		let packages = [
-			(
-				code: try resource(named: "hello", extension: "code"),
-				schema: try resource(named: "hello", extension: "schema")
+			try (
+				code: resource(named: "hello", extension: "code"),
+				schema: resource(named: "hello", extension: "schema")
 			),
-			(
-				code: try resource(named: "hello_world", extension: "code"),
-				schema: try resource(named: "hello_world", extension: "schema")
+			try (
+				code: resource(named: "hello_world", extension: "code"),
+				schema: resource(named: "hello_world", extension: "schema")
 			),
-			(
-				code: try resource(named: "RaDEX", extension: "code"),
-				schema: try resource(named: "RaDEX", extension: "schema")
+			try (
+				code: resource(named: "RaDEX", extension: "code"),
+				schema: resource(named: "RaDEX", extension: "schema")
 			),
-			(
-				code: try resource(named: "account", extension: "code"),
-				schema: try resource(named: "account", extension: "schema")
+			try (
+				code: resource(named: "account", extension: "code"),
+				schema: resource(named: "account", extension: "schema")
 			),
-			(
-				code: try resource(named: "faucet", extension: "code"),
-				schema: try resource(named: "faucet", extension: "schema")
+			try (
+				code: resource(named: "faucet", extension: "code"),
+				schema: resource(named: "faucet", extension: "schema")
 			),
 		]
 
@@ -52,9 +52,9 @@ final class ManifestToStringTests: TestCase {
 					methodName: "lock_fee"
 				) { Decimal_(value: "100") }
 
-				PublishPackage(
-					code: Blob(data: try blake2b(data: package.code)),
-					schema: Blob(data: try blake2b(data: package.schema)),
+				try PublishPackage(
+					code: Blob(data: blake2b(data: package.code)),
+					schema: Blob(data: blake2b(data: package.schema)),
 					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
 					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
 					accessRules: accessRules

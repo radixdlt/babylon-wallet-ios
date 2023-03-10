@@ -132,8 +132,8 @@ final class ValueEncodingTests: TestCase {
 				{"type":"Err","value":{"type":"U8","value":"1"}}
 				"""
 			),
-			(
-				value: try .array(.init(elementKind: .u8, elements: [.u8(1), .u8(2), .u8(3)])),
+			try (
+				value: .array(.init(elementKind: .u8, elements: [.u8(1), .u8(2), .u8(3)])),
 				jsonRepresentation: """
 				{"type":"Array","element_kind":"U8","elements":[{"type":"U8","value":"1"},{"type":"U8","value":"2"},{"type":"U8","value":"3"}]}
 				"""
@@ -297,14 +297,14 @@ final class ValueEncodingTests: TestCase {
 				{"type":"Expression","value":"ENTIRE_WORKTOP"}
 				"""
 			),
-			(
-				value: .blob(try .init(hex: "d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e")),
+			try (
+				value: .blob(.init(hex: "d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e")),
 				jsonRepresentation: """
 				{"type":"Blob","hash":"d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e"}
 				"""
 			),
-			(
-				value: .bytes(try .init(hex: "d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e")),
+			try (
+				value: .bytes(.init(hex: "d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e")),
 				jsonRepresentation: """
 				{"type":"Bytes","value":"d28d2c3710601fbc097000ec73455693f4861dc0eb7c90d8821f2a13f617313e"}
 				"""
