@@ -11,7 +11,7 @@ final class AnalyzeManifestWithPreviewContextTests: TestCase {
 
 	func test_analyzeManifestWithPreviewContext_succeeds() throws {
 		// Arrange
-		let request = AnalyzeManifestWithPreviewContextRequest(
+		let request = try AnalyzeManifestWithPreviewContextRequest(
 			networkId: 0xF2,
 			manifest: .init(instructions: .string("""
 			CALL_METHOD
@@ -35,7 +35,7 @@ final class AnalyzeManifestWithPreviewContextTests: TestCase {
 			    "deposit_batch"
 			    Expression("ENTIRE_WORKTOP");
 			""")),
-			transactionReceipt: [UInt8](try resource(named: "file", extension: "blob"))
+			transactionReceipt: [UInt8](resource(named: "file", extension: "blob"))
 		)
 
 		// Act

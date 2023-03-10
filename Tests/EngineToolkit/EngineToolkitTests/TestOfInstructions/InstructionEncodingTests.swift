@@ -315,10 +315,10 @@ final class InstructionEncodingTests: TestCase {
 				{"instruction":"DROP_ALL_PROOFS"}
 				"""
 			),
-			(
+			try (
 				value: .publishPackage(.init(
-					code: try Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
-					schema: try Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
+					code: Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
+					schema: Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
 					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
 					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
 					accessRules: accessRules
@@ -327,8 +327,8 @@ final class InstructionEncodingTests: TestCase {
 				{"access_rules":{"elements":[{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Tuple"},"code":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"},"instruction":"PUBLISH_PACKAGE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"},"schema":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"}}
 				"""
 			),
-			(
-				value: try .recallResource(.init(
+			try (
+				value: .recallResource(.init(
 					vault_id: .init(hex: "776e134adba9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"),
 					amount: .init(value: "1")
 				)),
@@ -419,14 +419,14 @@ final class InstructionEncodingTests: TestCase {
 				{"entries":{"entries":[],"key_value_kind":"NonFungibleLocalId","type":"Map","value_value_kind":"Tuple"},"instruction":"MINT_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
-			(
+			try (
 				value: .mintUuidNonFungible(.init(
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-					entries: try .array(.init(elementKind: .tuple,
-					                          elements: [
-					                          	.tuple(.init([Tuple([]), Tuple([])])),
-					                          	.tuple(.init([Tuple([]), Tuple([])])),
-					                          ]))
+					entries: .array(.init(elementKind: .tuple,
+					                      elements: [
+					                      	.tuple(.init([Tuple([]), Tuple([])])),
+					                      	.tuple(.init([Tuple([]), Tuple([])])),
+					                      ]))
 				)),
 				jsonRepresentation: """
 				{"entries":{"element_kind":"Tuple","elements":[{"elements":[{"elements":[],"type":"Tuple"},{"elements":[],"type":"Tuple"}],"type":"Tuple"},{"elements":[{"elements":[],"type":"Tuple"},{"elements":[],"type":"Tuple"}],"type":"Tuple"}],"type":"Array"},"instruction":"MINT_UUID_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
@@ -500,8 +500,8 @@ final class InstructionEncodingTests: TestCase {
 				{"access_rule":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"ASSERT_ACCESS_RULE"}
 				"""
 			),
-			(
-				value: try .createValidator(.init(
+			try (
+				value: .createValidator(.init(
 					key: Bytes(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"),
 					ownerAccessRule: Enum(.u8(0))
 				)),
