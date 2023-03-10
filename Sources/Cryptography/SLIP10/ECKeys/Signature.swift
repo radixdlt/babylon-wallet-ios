@@ -14,7 +14,7 @@ extension SLIP10.Signature {
 	public var rawRepresentation: Data {
 		switch self {
 		case let .ecdsaSecp256k1(secp256k1):
-                        return secp256k1.rawRepresentation()
+			return secp256k1.rawRepresentation
 		case let .eddsaEd25519(curve25519):
 			return curve25519
 		}
