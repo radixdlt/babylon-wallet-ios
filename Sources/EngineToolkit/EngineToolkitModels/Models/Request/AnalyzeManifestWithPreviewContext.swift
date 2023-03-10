@@ -144,14 +144,14 @@ public extension ResourceSpecifier {
 		let kind = try container.decode(Kind.self, forKey: .type)
 		switch kind {
 		case .amount:
-			self = .amount(
-				try container.decode(ResourceAddress.self, forKey: .resourceAddress),
-				try Decimal_(value: container.decode(String.self, forKey: .amount))
+			self = try .amount(
+				container.decode(ResourceAddress.self, forKey: .resourceAddress),
+				Decimal_(value: container.decode(String.self, forKey: .amount))
 			)
 		case .ids:
-			self = .ids(
-				try container.decode(ResourceAddress.self, forKey: .resourceAddress),
-				try container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
+			self = try .ids(
+				container.decode(ResourceAddress.self, forKey: .resourceAddress),
+				container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
 			)
 		}
 	}
@@ -184,15 +184,15 @@ public extension AccountDeposit {
 		let kind = try container.decode(Kind.self, forKey: .type)
 		switch kind {
 		case .exact:
-			self = .exact(
-				componentAddress: try container.decode(ComponentAddress.self, forKey: .componentAddress),
-				resourceSpecifier: try container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
+			self = try .exact(
+				componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress),
+				resourceSpecifier: container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
 			)
 		case .estimate:
-			self = .estimate(
-				index: try decodeAndConvertToNumericType(container: container, key: .index),
-				componentAddress: try container.decode(ComponentAddress.self, forKey: .componentAddress),
-				resourceSpecifier: try container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
+			self = try .estimate(
+				index: decodeAndConvertToNumericType(container: container, key: .index),
+				componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress),
+				resourceSpecifier: container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
 			)
 		}
 	}
@@ -208,10 +208,10 @@ public extension AnalyzeManifestWithPreviewContextRequest {
 
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		self.init(
-			networkId: try NetworkID(decodeAndConvertToNumericType(container: container, key: .networkId)),
-			manifest: try container.decode(TransactionManifest.self, forKey: .manifest),
-			transactionReceipt: try [UInt8](hex: container.decode(String.self, forKey: .transactionReceipt))
+		try self.init(
+			networkId: NetworkID(decodeAndConvertToNumericType(container: container, key: .networkId)),
+			manifest: container.decode(TransactionManifest.self, forKey: .manifest),
+			transactionReceipt: [UInt8](hex: container.decode(String.self, forKey: .transactionReceipt))
 		)
 	}
 }
