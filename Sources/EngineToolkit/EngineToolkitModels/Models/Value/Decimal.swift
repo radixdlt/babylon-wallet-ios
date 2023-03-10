@@ -4,7 +4,7 @@ import Foundation
 public struct Decimal_: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .decimal
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.decimal(self)
 	}
 

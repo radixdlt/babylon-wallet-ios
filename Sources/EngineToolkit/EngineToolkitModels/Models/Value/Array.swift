@@ -4,20 +4,20 @@ import Foundation
 public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .array
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.array(self)
 	}
 
 	// MARK: Stored properties
 
 	public let elementKind: ValueKind
-	public let elements: [Value_]
+	public let elements: [ManifestASTValue]
 
 	// MARK: Init
 
 	public init(
 		elementKind: ValueKind,
-		elements: [Value_]
+		elements: [ManifestASTValue]
 	) throws {
 		self.elementKind = elementKind
 		self.elements = elements
@@ -35,7 +35,7 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 
 	public init(
 		elementKind: ValueKind,
-		@SpecificValuesBuilder buildValues: () throws -> [Value_]
+		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
 	) throws {
 		try self.init(
 			elementKind: elementKind,
@@ -78,7 +78,7 @@ extension Array_ {
 
 		try self.init(
 			elementKind: container.decode(ValueKind.self, forKey: .elementKind),
-			elements: container.decode([Value_].self, forKey: .elements)
+			elements: container.decode([ManifestASTValue].self, forKey: .elements)
 		)
 	}
 }

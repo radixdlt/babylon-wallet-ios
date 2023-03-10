@@ -12,7 +12,7 @@ public enum NonFungibleLocalId {
 extension NonFungibleLocalId: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .nonFungibleLocalId
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.nonFungibleLocalId(self)
 	}
 

@@ -4,7 +4,7 @@ import Foundation
 public struct PreciseDecimal: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStringLiteral, ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .preciseDecimal
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.preciseDecimal(self)
 	}
 

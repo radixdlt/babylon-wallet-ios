@@ -1,7 +1,7 @@
 // MARK: - None
 public struct None: ValueProtocol, Sendable, Codable, Hashable {
 	public static let kind: ValueKind = .none
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.none
 	}
 }

@@ -4,7 +4,7 @@ import Foundation
 public struct Expression: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStringLiteral {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .expression
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.expression(self)
 	}
 

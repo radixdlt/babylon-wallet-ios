@@ -4,7 +4,7 @@ import Foundation
 public struct ComponentAddress: ValueProtocol, Sendable, Codable, Hashable, AddressProtocol {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .componentAddress
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.componentAddress(self)
 	}
 
