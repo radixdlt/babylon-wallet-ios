@@ -8,7 +8,7 @@ final class ManifestToStringTests: TestCase {
 	private let engineToolkit = EngineToolkit()
 
 	override func setUp() {
-		debugPrint = true
+		debugPrint = false
 		super.setUp()
 	}
 
