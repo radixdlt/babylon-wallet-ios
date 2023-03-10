@@ -15,7 +15,7 @@ public enum ECPrimitiveKind: String, Sendable, Codable, Hashable {
 extension String {
 	public func confirmCurveDiscriminator(curve: CurveDiscriminator, kind: ECPrimitiveKind) throws {
 		guard hasSuffix(kind.rawValue) else {
-			throw InternalDecodingFailure.curveKeyTypeMismatch(expected: kind, butGot: self)
+			throw InternalDecodingFailure.curvePrimitiveKindMismatch(expected: kind, butGot: self)
 		}
 		let curveString = String(dropLast(kind.rawValue.count))
 		guard CurveDiscriminator(rawValue: curveString) == curve else {
