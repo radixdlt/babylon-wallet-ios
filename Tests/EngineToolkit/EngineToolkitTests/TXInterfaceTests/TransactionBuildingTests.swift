@@ -38,8 +38,8 @@ final class TransactionBuildingTests: TestCase {
 	}
 }
 
-public extension TransactionHeader {
-	static func example(
+extension TransactionHeader {
+	public static func example(
 		notaryPrivateKey: Engine.PrivateKey
 	) throws -> Self {
 		try Self(
