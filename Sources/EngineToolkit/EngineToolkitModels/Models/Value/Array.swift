@@ -3,20 +3,20 @@ import Foundation
 // MARK: - Array_
 public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .array
+	public static let kind: ManifestASTValueKind = .array
 	public func embedValue() -> ManifestASTValue {
 		.array(self)
 	}
 
 	// MARK: Stored properties
 
-	public let elementKind: ValueKind
+	public let elementKind: ManifestASTValueKind
 	public let elements: [ManifestASTValue]
 
 	// MARK: Init
 
 	public init(
-		elementKind: ValueKind,
+		elementKind: ManifestASTValueKind,
 		elements: [ManifestASTValue]
 	) throws {
 		self.elementKind = elementKind
@@ -24,7 +24,7 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 	}
 
 	public init(
-		elementKind: ValueKind,
+		elementKind: ManifestASTValueKind,
 		@ValuesBuilder buildValues: () throws -> [ValueProtocol]
 	) throws {
 		try self.init(
@@ -34,7 +34,7 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 	}
 
 	public init(
-		elementKind: ValueKind,
+		elementKind: ManifestASTValueKind,
 		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
 	) throws {
 		try self.init(
@@ -71,13 +71,13 @@ extension Array_ {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
 		try self.init(
-			elementKind: container.decode(ValueKind.self, forKey: .elementKind),
+			elementKind: container.decode(ManifestASTValueKind.self, forKey: .elementKind),
 			elements: container.decode([ManifestASTValue].self, forKey: .elements)
 		)
 	}
