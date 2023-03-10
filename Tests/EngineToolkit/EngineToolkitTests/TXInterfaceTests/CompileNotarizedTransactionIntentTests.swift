@@ -4,7 +4,7 @@ import TestingPrelude
 
 final class CompileNotarizedTransactionIntentTests: TestCase {
 	override func setUp() {
-		debugPrint = true
+		debugPrint = false
 		super.setUp()
 	}
 

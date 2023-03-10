@@ -3,7 +3,7 @@ import Prelude
 
 final class AccountsRequiredToSignTests: TestCase {
 	override func setUp() {
-		debugPrint = true
+		debugPrint = false
 		super.setUp()
 	}
 
