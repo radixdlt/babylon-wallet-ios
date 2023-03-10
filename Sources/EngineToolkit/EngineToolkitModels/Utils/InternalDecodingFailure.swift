@@ -5,7 +5,7 @@ import Foundation
 public enum InternalDecodingFailure: Swift.Error, Sendable, Equatable, Codable {
 	case valueTypeDiscriminatorMismatch(expectedAnyOf: [ValueKind], butGot: ValueKind)
 	case instructionTypeDiscriminatorMismatch(expected: InstructionKind, butGot: InstructionKind)
-	case curveKeyTypeMismatch(expected: ECPrimitiveKind, butGot: String)
+	case curvePrimitiveKindMismatch(expected: ECPrimitiveKind, butGot: String)
 	case curveMismatch(expected: CurveDiscriminator, butGot: String)
 	case parsingError
 }
