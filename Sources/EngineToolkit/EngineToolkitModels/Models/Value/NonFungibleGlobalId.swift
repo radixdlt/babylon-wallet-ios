@@ -4,7 +4,7 @@ import Foundation
 public struct NonFungibleGlobalId: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .nonFungibleGlobalId
-	public func embedValue() -> Value_ {
+	public func embedValue() -> ManifestASTValue {
 		.nonFungibleGlobalId(self)
 	}
 

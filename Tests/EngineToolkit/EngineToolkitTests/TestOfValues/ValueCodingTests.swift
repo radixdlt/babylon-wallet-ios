@@ -11,7 +11,7 @@ final class ValueEncodingTests: TestCase {
 
 	func test_value_encoding_and_decoding() throws {
 		// Arrange
-		let testVectors: [(value: Value_, jsonRepresentation: String)] = [
+		let testVectors: [(value: ManifestASTValue, jsonRepresentation: String)] = [
 			(
 				value: .boolean(false),
 				jsonRepresentation: """
@@ -323,7 +323,7 @@ final class ValueEncodingTests: TestCase {
 			XCTAssertNoDifference(string, jsonRepresentation)
 
 			// Act
-			let decodedValue = try decoder.decode(Value_.self, from: jsonRepresentation.data(using: .utf8)!)
+			let decodedValue = try decoder.decode(ManifestASTValue.self, from: jsonRepresentation.data(using: .utf8)!)
 
 			// Assert
 			XCTAssertEqual(value, decodedValue)
