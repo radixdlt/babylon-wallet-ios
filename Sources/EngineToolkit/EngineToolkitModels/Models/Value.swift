@@ -2,12 +2,12 @@ import Foundation
 
 // MARK: - ValueProtocol
 public protocol ValueProtocol {
-	static var kind: ValueKind { get }
+	static var kind: ManifestASTValueKind { get }
 	func embedValue() -> ManifestASTValue
 }
 
 extension ValueProtocol {
-	public var kind: ValueKind { Self.kind }
+	public var kind: ManifestASTValueKind { Self.kind }
 }
 
 // MARK: - ManifestASTValue
@@ -70,7 +70,7 @@ extension ManifestASTValue {
 	// Value Kind
 	// ===========
 
-	public var kind: ValueKind {
+	public var kind: ManifestASTValueKind {
 		switch self {
 		case .boolean:
 			return .bool
@@ -286,7 +286,7 @@ extension ManifestASTValue {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 
 		switch kind {
 		case .bool:

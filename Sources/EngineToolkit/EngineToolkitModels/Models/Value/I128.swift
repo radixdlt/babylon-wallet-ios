@@ -3,7 +3,7 @@ import Foundation
 // MARK: - I128
 public struct I128: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStringLiteral {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .i128
+	public static let kind: ManifestASTValueKind = .i128
 	public func embedValue() -> ManifestASTValue {
 		.i128(self)
 	}
@@ -40,7 +40,7 @@ extension I128 {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
