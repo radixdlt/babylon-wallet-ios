@@ -129,11 +129,11 @@ public extension ResourceSpecifier {
 
 		switch self {
 		case let .amount(resourceAddress, amount):
-			try container.encode("Amount", forKey: .type)
+			try container.encode(Kind.amount, forKey: .type)
 			try container.encode(resourceAddress, forKey: .resourceAddress)
 			try container.encode(amount.value, forKey: .amount)
 		case let .ids(resourceAddress, ids):
-			try container.encode("Ids", forKey: .type)
+			try container.encode(Kind.ids, forKey: .type)
 			try container.encode(resourceAddress, forKey: .resourceAddress)
 			try container.encode(ids, forKey: .ids)
 		}
