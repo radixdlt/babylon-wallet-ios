@@ -144,6 +144,10 @@ extension RTCClient {
 }
 
 extension RTCClient {
+	static var firstConnectionTimeout: Duration {
+		.seconds(10)
+	}
+
 	/// Cancel all of the related operations allowing this RTCClient to be deallocated.
 	func cancel() async {
 		for peerConnection in peerConnections.values {
@@ -158,7 +162,9 @@ extension RTCClient {
 	}
 
 	func waitForFirstConnection() async throws {
-		_ = try await peerConnectionNegotiator.negotiationResults.first().get()
+		_ = try await doAsync(withTimeout: Self.firstConnectionTimeout) {
+			try await self.peerConnectionNegotiator.negotiationResults.first().get()
+		}
 	}
 
 	func removePeerConnection(_ id: PeerConnectionID) async {

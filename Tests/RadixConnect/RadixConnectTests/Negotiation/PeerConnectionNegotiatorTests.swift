@@ -57,34 +57,33 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client1, client2, client3, client4])
 		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
-		let peerConnectionTask = Task {
-			// Await for 4 PeerConnection to be made
-			try await conenctionBuilder.negotiationResults.prefix(4).collect()
-		}
+		try await withThrowingTaskGroup(of: Void.self, body: { group in
+			group.addTask {
+				try await self.performNegotiation(forClient: remoteClientId1, peerConnection: peerConnection1, peerConnectionDelegate: delegate1)
+			}
 
-		// Trigger negotiations
+			group.addTask {
+				try await self.performNegotiation(forClient: remoteClientId2, peerConnection: peerConnection2, peerConnectionDelegate: delegate2)
+			}
 
-		Task {
-			try await performNegotiation(forClient: remoteClientId1, peerConnection: peerConnection1, peerConnectionDelegate: delegate1)
-		}
+			group.addTask {
+				try await self.performNegotiation(forClient: remoteClientId3, peerConnection: peerConnection3, peerConnectionDelegate: delegate3)
+			}
 
-		Task {
-			try await performNegotiation(forClient: remoteClientId2, peerConnection: peerConnection2, peerConnectionDelegate: delegate2)
-		}
+			group.addTask {
+				try await self.performFailingNegotiation(forClient: remoteClientId4, peerConnection: peerConnection4, peerConnectionDelegate: delegate4)
+			}
 
-		Task {
-			try await performNegotiation(forClient: remoteClientId3, peerConnection: peerConnection3, peerConnectionDelegate: delegate3)
-		}
-
-		Task {
-			try await performFailingNegotiation(forClient: remoteClientId4, peerConnection: peerConnection4, peerConnectionDelegate: delegate4)
-		}
+			try await group.waitForAll()
+		})
 
 		// Assert that the result for all negotiations are returns
 
 		/// We are interested only comparing the created `PeerConnectionClient.id`'s, or the failure
-		let result: [PeerConnectionClient.ID: Result<PeerConnectionClient.ID, PeerConnectionNegotiator.FailedToCreatePeerConnectionError>] = try await peerConnectionTask
-			.value
+		let result: [
+			PeerConnectionClient.ID:
+				Result<PeerConnectionClient.ID, PeerConnectionNegotiator.FailedToCreatePeerConnectionError>
+		] = try await conenctionBuilder.negotiationResults.prefix(4).collect()
 			.reduce(into: [:]) { partialResult, nextResult in
 				switch nextResult {
 				case let .success(peerConnection):
