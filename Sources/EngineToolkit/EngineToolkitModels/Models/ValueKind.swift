@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ValueKind: String, Codable, Sendable, Hashable {
+public enum ManifestASTValueKind: String, Codable, Sendable, Hashable {
 	case bool = "Bool"
 
 	case u8 = "U8"
