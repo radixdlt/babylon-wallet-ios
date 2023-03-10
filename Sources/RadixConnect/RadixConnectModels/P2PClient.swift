@@ -1,10 +1,10 @@
 import Prelude
 
-// MARK: - P2PClient
+// MARK: - P2PLink
 /// A client the user have connected P2P with, typically a
 /// WebRTC connections with a DApp, but might be Android or iPhone
 /// client as well.
-public struct P2PClient:
+public struct P2PLink:
 	Sendable,
 	Hashable,
 	Codable,
@@ -33,7 +33,7 @@ public struct P2PClient:
 }
 
 // MARK: Equatable
-extension P2PClient: Equatable {
+extension P2PLink: Equatable {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.connectionPassword == rhs.connectionPassword
 	}

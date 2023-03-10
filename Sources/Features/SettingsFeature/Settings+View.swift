@@ -2,7 +2,7 @@ import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
-import ManageP2PClientsFeature
+import ManageP2PLinksFeature
 import PersonasFeature
 #if DEBUG
 import InspectProfileFeature
@@ -25,7 +25,7 @@ extension AppSettings {
 		let isDebugProfileViewSheetPresented: Bool
 		let profileToInspect: Profile?
 		#endif
-		let shouldShowAddP2PClientButton: Bool
+		let shouldShowAddP2PLinkButton: Bool
 		let appVersion: String
 
 		init(state: AppSettings.State) {
@@ -33,7 +33,7 @@ extension AppSettings {
 			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			self.profileToInspect = state.profileToInspect
 			#endif
-			self.shouldShowAddP2PClientButton = state.userHasNoP2PClients ?? false
+			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
@@ -108,7 +108,7 @@ extension View {
 			}
 		#endif
 			.factorSources(with: store, viewStore)
-			.manageP2PClients(with: store, viewStore)
+			.manageP2PLinks(with: store, viewStore)
 			.manageGatewayAPIEndpoints(with: store, viewStore)
 			.authorizedDapps(with: store, viewStore)
 			.personas(with: store, viewStore)
@@ -130,15 +130,15 @@ extension View {
 	}
 
 	@MainActor
-	private func manageP2PClients(
+	private func manageP2PLinks(
 		with store: StoreOf<AppSettings>,
 		_ viewStore: ViewStoreOf<AppSettings>
 	) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /AppSettings.Destinations.State.manageP2PClients,
-			action: AppSettings.Destinations.Action.manageP2PClients,
-			destination: { ManageP2PClients.View(store: $0) }
+			state: /AppSettings.Destinations.State.manageP2PLinks,
+			action: AppSettings.Destinations.Action.manageP2PLinks,
+			destination: { ManageP2PLinks.View(store: $0) }
 		)
 	}
 
@@ -197,7 +197,7 @@ extension AppSettings.View {
 			.init(
 				title: L10n.Settings.desktopConnectionsButtonTitle,
 				asset: AssetResource.desktopConnections,
-				action: .manageP2PClientsButtonTapped
+				action: .manageP2PLinksButtonTapped
 			),
 			.init(
 				title: L10n.Settings.gatewayButtonTitle,
@@ -226,9 +226,9 @@ extension AppSettings.View {
 		VStack(spacing: 0) {
 			ScrollView {
 				VStack(spacing: .zero) {
-					if viewStore.shouldShowAddP2PClientButton {
+					if viewStore.shouldShowAddP2PLinkButton {
 						ConnectExtensionView {
-							viewStore.send(.addP2PClientButtonTapped)
+							viewStore.send(.addP2PLinkButtonTapped)
 						}
 						.padding(.medium3)
 					}

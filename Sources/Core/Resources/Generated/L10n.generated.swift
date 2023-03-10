@@ -416,21 +416,21 @@ public enum L10n {
     /// https://example.com:8080
     public static let urlString = L10n.tr("Localizable", "manageGateway.urlString", fallback: "https://example.com:8080")
   }
-  public enum ManageP2PClients {
+  public enum ManageP2PLinks {
     /// Connector ID: %@
     public static func connectionID(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "manageP2PClients.connectionID", String(describing: p1), fallback: "Connector ID: %@")
+      return L10n.tr("Localizable", "manageP2PLinks.connectionID", String(describing: p1), fallback: "Connector ID: %@")
     }
     /// Link New Connector
-    public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "Link New Connector")
+    public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PLinks.newConnectionButtonTitle", fallback: "Link New Connector")
     /// Link New Connector
-    public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionTitle", fallback: "Link New Connector")
+    public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PLinks.newConnectionTitle", fallback: "Link New Connector")
     /// Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.
-    public static let p2PConnectionsSubtitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsSubtitle", fallback: "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.")
+    public static let p2PConnectionsSubtitle = L10n.tr("Localizable", "manageP2PLinks.P2PConnectionsSubtitle", fallback: "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.")
     /// Linked Connector
-    public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "Linked Connector")
+    public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PLinks.P2PConnectionsTitle", fallback: "Linked Connector")
     /// Send Test Msg
-    public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PClients.sendTestMessageButtonTitle", fallback: "Send Test Msg")
+    public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PLinks.sendTestMessageButtonTitle", fallback: "Send Test Msg")
   }
   public enum NewConnection {
     /// Linking...

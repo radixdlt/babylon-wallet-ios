@@ -27,7 +27,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case newConnection(P2PClient)
+		case newConnection(P2PLink)
 	}
 
 	public init() {}

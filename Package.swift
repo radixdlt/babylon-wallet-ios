@@ -154,7 +154,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ManageP2PClientsFeature",
+		name: "ManageP2PLinksFeature",
 		dependencies: [
 			"NewConnectionFeature",
 			"RadixConnectClient",
@@ -207,7 +207,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
-			"ManageP2PClientsFeature",
+			"ManageP2PLinksFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"MnemonicClient",
 			"PersonasFeature",
@@ -409,17 +409,17 @@ package.addModules([
 	),
 
 	.client(
-		name: "P2PClientsClient",
+		name: "P2PLinksClient",
 		dependencies: [
 			"Profile",
 		],
 		tests: .no
 	),
 	.client(
-		name: "P2PClientsClientLive",
+		name: "P2PLinksClientLive",
 		dependencies: [
 			"ProfileStore",
-			"P2PClientsClient",
+			"P2PLinksClient",
 			"AppPreferencesClient",
 		],
 		tests: .yes()
@@ -428,7 +428,7 @@ package.addModules([
 		name: "RadixConnectClient",
 		dependencies: [
 			"RadixConnect",
-			"P2PClientsClient",
+			"P2PLinksClient",
 		],
 		tests: .yes()
 	),

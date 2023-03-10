@@ -14,25 +14,25 @@ extension Profile {
 }
 
 extension Profile {
-	/// Appends a new `P2PClient` to the Profile's `AppPreferences`, returns `nil` if it was not inserted (because already present).
+	/// Appends a new `P2PLink` to the Profile's `AppPreferences`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	public mutating func appendP2PClient(_ p2pClient: P2PClient) -> P2PClient? {
-		self.appPreferences.appendP2PClient(p2pClient)
+	public mutating func appendP2PLink(_ p2pLinks: P2PLink) -> P2PLink? {
+		self.appPreferences.appendP2PLink(p2pLinks)
 	}
 }
 
 extension AppPreferences {
-	/// Appends a new `P2PClient`, returns `nil` if it was not inserted (because already present).
+	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	public mutating func appendP2PClient(_ p2pClient: P2PClient) -> P2PClient? {
-		self.p2pClients.append(p2pClient)
+	public mutating func appendP2PLink(_ p2pLinks: P2PLink) -> P2PLink? {
+		self.p2pLinkss.append(p2pLinks)
 	}
 }
 
-extension P2PClients {
-	/// Appends a new `P2PClient`, returns `nil` if it was not inserted (because already present).
+extension P2PLinks {
+	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	internal mutating func append(_ client: P2PClient) -> P2PClient? {
+	internal mutating func append(_ client: P2PLink) -> P2PLink? {
 		guard !clients.contains(where: { client.id == $0.id }) else {
 			return nil
 		}

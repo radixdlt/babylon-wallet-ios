@@ -20,7 +20,7 @@ public struct AppPreferences:
 	/// Collection of clients user have connected P2P with, typically these
 	/// are WebRTC connections with DApps, but might be Android or iPhone
 	/// clients as well.
-	public var p2pClients: P2PClients
+	public var p2pLinkss: P2PLinks
 
 	/// The active network
 	public var gateways: Gateways
@@ -28,12 +28,12 @@ public struct AppPreferences:
 	public init(
 		security: Security = .default,
 		display: Display = .default,
-		p2pClients: P2PClients = [],
+		p2pLinkss: P2PLinks = [],
 		gateways: Gateways = .init(current: .nebunet)
 	) {
 		self.security = security
 		self.display = display
-		self.p2pClients = p2pClients
+		self.p2pLinkss = p2pLinkss
 		self.gateways = gateways
 	}
 
@@ -47,7 +47,7 @@ extension AppPreferences {
 			children: [
 				"security": security,
 				"display": display,
-				"p2pClients": p2pClients,
+				"p2pLinkss": p2pLinkss,
 				"gateways": gateways,
 			],
 			displayStyle: .struct
@@ -58,7 +58,7 @@ extension AppPreferences {
 		"""
 		security: \(security),
 		display: \(display),
-		p2pClients: \(p2pClients),
+		p2pLinkss: \(p2pLinkss),
 		gateways: \(gateways)
 		"""
 	}

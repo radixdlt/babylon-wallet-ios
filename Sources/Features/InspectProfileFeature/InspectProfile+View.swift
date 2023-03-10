@@ -232,8 +232,8 @@ extension AppPreferencesView {
 				indentation: inOneLevel
 			)
 
-			P2PClientsView(
-				p2pClients: appPreferences.p2pClients,
+			P2PLinksView(
+				p2pLinkss: appPreferences.p2pLinkss,
 				indentation: inOneLevel
 			)
 
@@ -333,26 +333,26 @@ extension AppSecurityView {
 	}
 }
 
-// MARK: - P2PClientsView
-public struct P2PClientsView: IndentedView {
-	public let p2pClients: P2PClients
+// MARK: - P2PLinksView
+public struct P2PLinksView: IndentedView {
+	public let p2pLinkss: P2PLinks
 	public let indentation: Indentation
 }
 
-extension P2PClientsView {
+extension P2PLinksView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("P2PClients")
+			Text("P2PLinks")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			if p2pClients.isEmpty {
+			if p2pLinkss.isEmpty {
 				Text("<None yet>").font(.callout)
 			} else {
-				ForEach(p2pClients) { p2pClient in
-					P2PClientView(
-						p2pClient: p2pClient,
+				ForEach(p2pLinkss) { p2pLinks in
+					P2PLinkView(
+						p2pLinks: p2pLinks,
 						indentation: inOneLevel
 					)
 				}
@@ -449,13 +449,13 @@ public struct DappAuthorizedPersonaView: IndentedView {
 	}
 }
 
-// MARK: - P2PClientView
-public struct P2PClientView: IndentedView {
-	public let p2pClient: P2PClient
+// MARK: - P2PLinkView
+public struct P2PLinkView: IndentedView {
+	public let p2pLinks: P2PLink
 	public let indentation: Indentation
 }
 
-extension P2PClientView {
+extension P2PLinkView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("P2P Client")
@@ -463,8 +463,8 @@ extension P2PClientView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("ID", value: String(p2pClient.id.data.hex().mask(showLast: 6)))
-			Labeled("Client Name", value: p2pClient.displayName)
+			Labeled("ID", value: String(p2pLinks.id.data.hex().mask(showLast: 6)))
+			Labeled("Client Name", value: p2pLinks.displayName)
 		}
 		.padding([.leading], leadingPadding)
 	}

@@ -2,16 +2,16 @@ import FeaturePrelude
 import NewConnectionFeature
 import RadixConnectClient
 
-// MARK: - ManageP2PClients
-public struct ManageP2PClients: Sendable, FeatureReducer {
+// MARK: - ManageP2PLinks
+public struct ManageP2PLinks: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
+		public var clients: IdentifiedArrayOf<ManageP2PLink.State>
 
 		@PresentationState
 		public var destination: Destinations.State?
 
 		public init(
-			clients: IdentifiedArrayOf<ManageP2PClient.State> = .init(),
+			clients: IdentifiedArrayOf<ManageP2PLink.State> = .init(),
 			destination: Destinations.State? = nil
 		) {
 			self.clients = clients
@@ -25,8 +25,8 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadClientsResult(TaskResult<OrderedSet<P2PClient>>)
-		case saveNewConnectionResult(TaskResult<P2PClient>)
+		case loadClientsResult(TaskResult<OrderedSet<P2PLink>>)
+		case saveNewConnectionResult(TaskResult<P2PLink>)
 		case deleteConnectionResult(TaskResult<ConnectionPassword>)
 	}
 
@@ -34,7 +34,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 		case connection(
 			id: ConnectionPassword,
-			action: ManageP2PClient.Action
+			action: ManageP2PLink.Action
 		)
 	}
 
@@ -62,7 +62,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.clients, action: /Action.child .. ChildAction.connection) {
-				ManageP2PClient()
+				ManageP2PLink()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -75,7 +75,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.loadClientsResult(
 					TaskResult {
-						try await radixConnectClient.getP2PClients()
+						try await radixConnectClient.getP2PLinks()
 					}
 				)))
 			}
@@ -90,7 +90,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadClientsResult(.success(clientsFromProfile)):
 			state.clients = .init(
-				uniqueElements: clientsFromProfile.map { ManageP2PClient.State(client: $0) }
+				uniqueElements: clientsFromProfile.map { ManageP2PLink.State(client: $0) }
 			)
 			return .none
 
@@ -104,7 +104,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 
 		case let .saveNewConnectionResult(.success(newConnection)):
 			state.clients.append(
-				ManageP2PClient.State(client: newConnection)
+				ManageP2PLink.State(client: newConnection)
 			)
 			return .none
 
@@ -123,7 +123,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 		case let .connection(id, .delegate(.deleteConnection)):
 			return .task {
 				let result = await TaskResult {
-					try await radixConnectClient.deleteP2PClientByPassword(id)
+					try await radixConnectClient.deleteP2PLinkByPassword(id)
 					return id
 				}
 				return .internal(.deleteConnectionResult(result))
@@ -134,7 +134,7 @@ public struct ManageP2PClients: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.saveNewConnectionResult(
 					TaskResult {
-						try await radixConnectClient.storeP2PClient(
+						try await radixConnectClient.storeP2PLink(
 							connectedClient
 						)
 					}.map { connectedClient }

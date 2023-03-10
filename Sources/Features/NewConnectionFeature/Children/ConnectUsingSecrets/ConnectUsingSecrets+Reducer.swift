@@ -43,7 +43,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case connected(P2PClient)
+		case connected(P2PLink)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -94,10 +94,10 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmNameButtonTapped:
-			let p2pClient = P2PClient(connectionPassword: state.connectionPassword, displayName: state.nameOfConnection)
+			let p2pLinks = P2PLink(connectionPassword: state.connectionPassword, displayName: state.nameOfConnection)
 			return .run { send in
 				await send(.internal(.cancelOngoingEffects))
-				await send(.delegate(.connected(p2pClient)))
+				await send(.delegate(.connected(p2pLinks)))
 			}
 		}
 	}

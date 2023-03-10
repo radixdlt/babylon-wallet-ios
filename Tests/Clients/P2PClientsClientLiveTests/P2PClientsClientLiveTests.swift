@@ -1,7 +1,7 @@
 import ClientTestingPrelude
-@testable import P2PClientsClientLive
+@testable import P2PLinksClientLive
 
-final class P2PClientsClientLiveTests: TestCase {
+final class P2PLinksClientLiveTests: TestCase {
 	func testTrivial() {
 		XCTAssert(true)
 	}

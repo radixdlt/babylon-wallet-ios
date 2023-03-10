@@ -1,25 +1,25 @@
 import ClientPrelude
 
 extension DependencyValues {
-	public var p2pClientsClient: P2PClientsClient {
-		get { self[P2PClientsClient.self] }
-		set { self[P2PClientsClient.self] = newValue }
+	public var p2pLinkssClient: P2PLinksClient {
+		get { self[P2PLinksClient.self] }
+		set { self[P2PLinksClient.self] = newValue }
 	}
 }
 
-// MARK: - P2PClientsClient + TestDependencyKey
-extension P2PClientsClient: TestDependencyKey {
+// MARK: - P2PLinksClient + TestDependencyKey
+extension P2PLinksClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 	public static let noop = Self(
-		getP2PClients: { [] },
-		addP2PClient: { _ in },
-		deleteP2PClientByPassword: { _ in },
-		deleteAllP2PClients: {}
+		getP2PLinks: { [] },
+		addP2PLink: { _ in },
+		deleteP2PLinkByPassword: { _ in },
+		deleteAllP2PLinks: {}
 	)
 	public static let testValue = Self(
-		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
-		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
-		deleteP2PClientByPassword: unimplemented("\(Self.self).deleteP2PClientByPassword"),
-		deleteAllP2PClients: unimplemented("\(Self.self).deleteAllP2pClients")
+		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
+		addP2PLink: unimplemented("\(Self.self).addP2PLink"),
+		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
+		deleteAllP2PLinks: unimplemented("\(Self.self).deleteAllp2pLinkss")
 	)
 }

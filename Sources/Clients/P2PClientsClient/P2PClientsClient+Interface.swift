@@ -1,28 +1,28 @@
 import RadixConnectModels
 
-// MARK: - P2PClientsClient
-public struct P2PClientsClient: Sendable {
-	public var getP2PClients: GetP2PClients
-	public var addP2PClient: AddP2PClient
-	public var deleteP2PClientByPassword: DeleteP2PClientByPassword
-	public var deleteAllP2PClients: DeleteAllP2PClients
+// MARK: - P2PLinksClient
+public struct P2PLinksClient: Sendable {
+	public var getP2PLinks: GetP2PLinks
+	public var addP2PLink: AddP2PLink
+	public var deleteP2PLinkByPassword: DeleteP2PLinkByPassword
+	public var deleteAllP2PLinks: DeleteAllP2PLinks
 
 	public init(
-		getP2PClients: @escaping GetP2PClients,
-		addP2PClient: @escaping AddP2PClient,
-		deleteP2PClientByPassword: @escaping DeleteP2PClientByPassword,
-		deleteAllP2PClients: @escaping DeleteAllP2PClients
+		getP2PLinks: @escaping GetP2PLinks,
+		addP2PLink: @escaping AddP2PLink,
+		deleteP2PLinkByPassword: @escaping DeleteP2PLinkByPassword,
+		deleteAllP2PLinks: @escaping DeleteAllP2PLinks
 	) {
-		self.getP2PClients = getP2PClients
-		self.addP2PClient = addP2PClient
-		self.deleteP2PClientByPassword = deleteP2PClientByPassword
-		self.deleteAllP2PClients = deleteAllP2PClients
+		self.getP2PLinks = getP2PLinks
+		self.addP2PLink = addP2PLink
+		self.deleteP2PLinkByPassword = deleteP2PLinkByPassword
+		self.deleteAllP2PLinks = deleteAllP2PLinks
 	}
 }
 
-extension P2PClientsClient {
-	public typealias GetP2PClients = @Sendable () async -> P2PClients
-	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
-	public typealias DeleteP2PClientByPassword = @Sendable (ConnectionPassword) async throws -> Void
-	public typealias DeleteAllP2PClients = @Sendable () async throws -> Void
+extension P2PLinksClient {
+	public typealias GetP2PLinks = @Sendable () async -> P2PLinks
+	public typealias AddP2PLink = @Sendable (P2PLink) async throws -> Void
+	public typealias DeleteP2PLinkByPassword = @Sendable (ConnectionPassword) async throws -> Void
+	public typealias DeleteAllP2PLinks = @Sendable () async throws -> Void
 }

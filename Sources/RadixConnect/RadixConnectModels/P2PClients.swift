@@ -1,10 +1,10 @@
 import Prelude
 
-// MARK: - P2PClients
+// MARK: - P2PLinks
 /// Collection of clients user have connected P2P with, typically these
 /// are WebRTC connections with DApps, but might be Android or iPhone
 /// clients as well.
-public struct P2PClients:
+public struct P2PLinks:
 	Sendable,
 	Hashable,
 	Codable,
@@ -13,22 +13,22 @@ public struct P2PClients:
 	RandomAccessCollection
 {
 	/// Ordered set of unique P2P connections made by the user with another client.
-	public var clients: OrderedSet<P2PClient>
+	public var clients: OrderedSet<P2PLink>
 
-	public init(_ clients: OrderedSet<P2PClient>) {
+	public init(_ clients: OrderedSet<P2PLink>) {
 		self.clients = clients
 	}
 }
 
 // MARK: RandomAccessCollection
-extension P2PClients {
-	public typealias Element = P2PClient
+extension P2PLinks {
+	public typealias Element = P2PLink
 
-	public typealias Index = OrderedSet<P2PClient>.Index
+	public typealias Index = OrderedSet<P2PLink>.Index
 
-	public typealias SubSequence = OrderedSet<P2PClient>.SubSequence
+	public typealias SubSequence = OrderedSet<P2PLink>.SubSequence
 
-	public typealias Indices = OrderedSet<P2PClient>.Indices
+	public typealias Indices = OrderedSet<P2PLink>.Indices
 
 	public var startIndex: Index {
 		clients.startIndex
@@ -59,10 +59,10 @@ extension P2PClients {
 	}
 }
 
-extension P2PClients {
+extension P2PLinks {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
-		try self.init(.init(container.decode([P2PClient].self)))
+		try self.init(.init(container.decode([P2PLink].self)))
 	}
 
 	public func encode(to encoder: Encoder) throws {
@@ -71,13 +71,13 @@ extension P2PClients {
 	}
 }
 
-extension P2PClients {
-	public init(arrayLiteral elements: P2PClient...) {
+extension P2PLinks {
+	public init(arrayLiteral elements: P2PLink...) {
 		self.init(OrderedSet(elements))
 	}
 }
 
-extension P2PClients {
+extension P2PLinks {
 	public var _description: String {
 		String(describing: clients)
 	}
@@ -88,7 +88,7 @@ extension P2PClients {
 }
 
 // MARK: CustomDumpStringConvertible
-extension P2PClients: CustomDumpStringConvertible {
+extension P2PLinks: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
 		_description
 	}
