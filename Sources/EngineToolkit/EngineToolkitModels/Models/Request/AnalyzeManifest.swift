@@ -47,11 +47,6 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 	public let accountsDepositedInto: [ComponentAddress]
 	public let accountsWithdrawnFrom: [ComponentAddress]
 
-	// MARK: Init
-}
-
-// MARK: AnalyzeManifestResponse.CodingKeys
-extension AnalyzeManifestResponse {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
