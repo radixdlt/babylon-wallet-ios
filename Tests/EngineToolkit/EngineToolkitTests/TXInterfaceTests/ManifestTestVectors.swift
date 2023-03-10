@@ -3,103 +3,103 @@ import EngineToolkitModels
 import Foundation
 
 public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]])] {
-	var testVectors: [(manifest: String, blobs: [[UInt8]])] = [
+	var testVectors: [(manifest: String, blobs: [[UInt8]])] = try [
 		(
-			manifest: String(decoding: try resource(named: "new1", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "new1", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "access_rule0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "access_rule0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "analyze_manifest_sample", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "analyze_manifest_sample", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "assert_access_rule0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "assert_access_rule0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "call_function0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "call_function0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "call_method0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "call_method0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "free_funds0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "free_funds0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "metadata0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "metadata0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "mint0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "mint0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "mint1", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "mint1", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "multi_account_resource_transfer0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "multi_account_resource_transfer0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "new0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "new0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "new2", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "new2", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "no_initial_supply0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "no_initial_supply0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "no_initial_supply1", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "no_initial_supply1", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "publish0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "publish0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "recall0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "recall0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "resource_transfer0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "resource_transfer0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "royalty0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "royalty0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "values0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "values0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "with_initial_supply0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "with_initial_supply0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "with_initial_supply1", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "with_initial_supply1", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: try resource(named: "worktop0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "worktop0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 	]
 
 	for (index, _) in testVectors.enumerated() {
-		testVectors[index].manifest = testVectors[index]
+		testVectors[index].manifest = try testVectors[index]
 			.manifest
 			.replacingOccurrences(of: "${", with: "{")
 			.replacingOccurrences(of: "{xrd_resource_address}", with: "resource_sim1qzkcyv5dwq3r6kawy6pxpvcythx8rh8ntum6ws62p95sqjjpwr")
@@ -116,8 +116,8 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			.replacingOccurrences(of: "{mintable_resource_address}", with: "resource_sim1qqgvpz8q7ypeueqcv4qthsv7ezt8h9m3depmqqw7pc4sfmucfx")
 			.replacingOccurrences(of: "{owner_badge_non_fungible_local_id}", with: "#1#")
 			.replacingOccurrences(of: "{auth_badge_non_fungible_local_id}", with: "#1#")
-			.replacingOccurrences(of: "{code_blob_hash}", with: try blake2b(data: Data([10])).hex)
-			.replacingOccurrences(of: "{schema_blob_hash}", with: try blake2b(data: Data([10])).hex)
+			.replacingOccurrences(of: "{code_blob_hash}", with: blake2b(data: Data([10])).hex)
+			.replacingOccurrences(of: "{schema_blob_hash}", with: blake2b(data: Data([10])).hex)
 			.replacingOccurrences(of: "{initial_supply}", with: "12")
 			.replacingOccurrences(of: "{mint_amount}", with: "12")
 			.replacingOccurrences(of: "{non_fungible_local_id}", with: "#1#")
