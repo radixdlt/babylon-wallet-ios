@@ -13,20 +13,17 @@ public struct CreateNonFungibleResource: InstructionProtocol {
 	public let idType: Enum
 	public let metadata: Map_
 	public let accessRules: Map_
-	public let initialSupply: Value_
 
 	// MARK: Init
 
 	public init(
 		idType: Enum,
 		metadata: Map_,
-		accessRules: Map_,
-		initialSupply: Value_
+		accessRules: Map_
 	) {
 		self.idType = idType
 		self.metadata = metadata
 		self.accessRules = accessRules
-		self.initialSupply = initialSupply
 	}
 }
 
@@ -38,7 +35,6 @@ extension CreateNonFungibleResource {
 		case idType = "id_type"
 		case metadata
 		case accessRules = "access_rules"
-		case initialSupply = "initial_supply"
 	}
 
 	// MARK: Codable
@@ -50,7 +46,6 @@ extension CreateNonFungibleResource {
 		try container.encode(idType, forKey: .idType)
 		try container.encode(metadata, forKey: .metadata)
 		try container.encode(accessRules, forKey: .accessRules)
-		try container.encode(initialSupply, forKey: .initialSupply)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -64,13 +59,11 @@ extension CreateNonFungibleResource {
 		let idType = try container.decode(Enum.self, forKey: .idType)
 		let metadata = try container.decode(Map_.self, forKey: .metadata)
 		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-		let initialSupply = try container.decode(Value_.self, forKey: .initialSupply)
 
 		self.init(
 			idType: idType,
 			metadata: metadata,
-			accessRules: accessRules,
-			initialSupply: initialSupply
+			accessRules: accessRules
 		)
 	}
 }

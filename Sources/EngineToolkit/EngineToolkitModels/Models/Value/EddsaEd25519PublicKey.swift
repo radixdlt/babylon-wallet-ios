@@ -1,12 +1,10 @@
 import Foundation
 
 // MARK: - EddsaEd25519PublicKey
-public struct EddsaEd25519PublicKey: ValueProtocol, Sendable, Codable, Hashable {
-	// Type name, used as a discriminator
-	public static let kind: ValueKind = .eddsaEd25519PublicKey
-	public func embedValue() -> Value_ {
-		.eddsaEd25519PublicKey(self)
-	}
+public struct EddsaEd25519PublicKey: Sendable, Codable, Hashable {
+	// Curve name and key type, used as a discriminators
+	public static let curve: CurveDiscriminator = .eddsaEd25519
+	public static let kind: ECPrimitiveKind = .publicKey
 
 	// MARK: Stored properties
 	public let bytes: [UInt8]
@@ -32,18 +30,15 @@ extension EddsaEd25519PublicKey {
 	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .type)
-
+		try container.encode(Self.curve.rawValue + Self.kind.rawValue, forKey: .type)
 		try container.encode(bytes.hex(), forKey: .publicKey)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
-		}
+		let type = try container.decode(String.self, forKey: .type)
+		try type.confirmCurveDiscriminator(curve: Self.curve, kind: Self.kind)
 
 		// Decoding `publicKey`
 		try self.init(hex: container.decode(String.self, forKey: .publicKey))

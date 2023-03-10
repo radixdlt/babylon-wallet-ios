@@ -3,8 +3,8 @@ import Foundation
 // MARK: - Bool + ValueProtocol
 extension Bool: ValueProtocol {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .bool
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .bool
+	public func embedValue() -> ManifestASTValue {
 		.boolean(self)
 	}
 }
@@ -21,7 +21,7 @@ extension Bool: ProxyCodable {
 		public let decoded: Decoded
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
-			let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+			let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 			if kind != Decoded.kind {
 				throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Decoded.kind, butGot: kind)
 			}
