@@ -3,8 +3,8 @@ import Prelude
 // MARK: - Blob
 public struct Blob: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .blob
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .blob
+	public func embedValue() -> ManifestASTValue {
 		.blob(self)
 	}
 
@@ -44,7 +44,7 @@ extension Blob {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}

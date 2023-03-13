@@ -11,17 +11,20 @@ extension ConnectUsingSecrets.State {
 extension ConnectUsingSecrets {
 	public struct ViewState: Equatable {
 		public var screenState: ControlState
-		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-		public var isSaveConnectionButtonEnabled: Bool
+		public var saveButtonControlState: ControlState
 		@BindableState public var focusedField: ConnectUsingSecrets.State.Field?
 
 		init(state: ConnectUsingSecrets.State) {
 			nameOfConnection = state.nameOfConnection
-			isPromptingForName = state.isPromptingForName
 			screenState = state.isConnecting ? .loading(.global(text: L10n.NewConnection.connecting)) : .enabled
 			focusedField = state.focusedField
-			isSaveConnectionButtonEnabled = state.isNameValid
+			saveButtonControlState = {
+				if state.isConnecting {
+					return .loading(.local)
+				}
+				return state.isNameValid ? .enabled : .disabled
+			}()
 		}
 	}
 
@@ -41,40 +44,35 @@ extension ConnectUsingSecrets {
 				send: { .view($0) }
 			) { viewStore in
 				VStack(alignment: .leading) {
-					if viewStore.isPromptingForName {
-						AppTextField(
-							placeholder: L10n.NewConnection.textFieldPlaceholder,
-							text: viewStore.binding(
-								get: \.nameOfConnection,
-								send: { .nameOfConnectionChanged($0) }
-							),
-							hint: L10n.NewConnection.textFieldHint,
-							binding: $focusedField,
-							equals: .connectionName,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
-							)
+					AppTextField(
+						placeholder: L10n.NewConnection.textFieldPlaceholder,
+						text: viewStore.binding(
+							get: \.nameOfConnection,
+							send: { .nameOfConnectionChanged($0) }
+						),
+						hint: L10n.NewConnection.textFieldHint,
+						binding: $focusedField,
+						equals: .connectionName,
+						first: viewStore.binding(
+							get: \.focusedField,
+							send: { .textFieldFocused($0) }
 						)
-						.autocorrectionDisabled()
-						.padding(.medium3)
+					)
+					.autocorrectionDisabled()
+					.padding(.medium3)
 
-						Spacer()
+					Spacer()
 
-						Button(L10n.NewConnection.saveNamedConnectionButton) {
-							viewStore.send(.confirmNameButtonTapped)
-						}
-						.controlState(viewStore.isSaveConnectionButtonEnabled ? .enabled : .disabled)
-						.buttonStyle(.primaryRectangular)
-						.padding(.medium3)
+					Button(L10n.NewConnection.saveNamedConnectionButton) {
+						viewStore.send(.confirmNameButtonTapped)
 					}
+					.controlState(viewStore.saveButtonControlState)
+					.buttonStyle(.primaryRectangular)
+					.padding(.medium3)
 				}
 				.controlState(viewStore.screenState)
 				.onAppear {
 					viewStore.send(.appeared)
-				}
-				.task { @MainActor in
-					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
 			}
 		}

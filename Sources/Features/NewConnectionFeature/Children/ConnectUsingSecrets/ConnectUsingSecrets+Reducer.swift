@@ -6,30 +6,26 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var connectionPassword: ConnectionPassword
 		public var isConnecting: Bool
-		public var isPromptingForName: Bool
 		public var nameOfConnection: String
 		public var isNameValid: Bool
 		@BindableState public var focusedField: Field?
 
 		public init(
 			connectionPassword: ConnectionPassword,
-			isConnecting: Bool = true,
+			isConnecting: Bool = false,
 			focusedField: Field? = nil,
-			isPromptingForName: Bool = false,
 			nameOfConnection: String = "",
 			isNameValid: Bool = false
 		) {
 			self.focusedField = focusedField
 			self.connectionPassword = connectionPassword
 			self.isConnecting = isConnecting
-			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
 			self.isNameValid = isNameValid
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
 		case appeared
 		case textFieldFocused(ConnectUsingSecrets.State.Field?)
 		case nameOfConnectionChanged(String)
@@ -47,7 +43,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
@@ -57,18 +53,6 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .task:
-			let connectionPassword = state.connectionPassword
-			state.isConnecting = true
-			return .run { send in
-				await send(.internal(.establishConnectionResult(
-					TaskResult(catching: {
-						try await radixConnectClient.addP2PWithPassword(connectionPassword)
-						return connectionPassword
-					})
-				)))
-			}.cancellable(id: ConnectID.self)
-
 		case .appeared:
 			return .task {
 				.view(.textFieldFocused(.connectionName))
@@ -78,7 +62,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 		case let .textFieldFocused(focus):
 			return .run { send in
 				do {
-					try await self.mainQueue.sleep(for: .seconds(0.5))
+					try await clock.sleep(for: .seconds(0.5))
 					try Task.checkCancellation()
 					await send(.internal(.focusTextField(focus)))
 				} catch {
@@ -94,20 +78,27 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmNameButtonTapped:
-			let p2pLinks = P2PLink(connectionPassword: state.connectionPassword, displayName: state.nameOfConnection)
+			let connectionPassword = state.connectionPassword
+			state.isConnecting = true
 			return .run { send in
-				await send(.internal(.cancelOngoingEffects))
-				await send(.delegate(.connected(p2pLinks)))
-			}
-		}
+				await send(.internal(.establishConnectionResult(
+					TaskResult(catching: {
+						try await radixConnectClient.addP2PWithPassword(connectionPassword)
+						return connectionPassword
+					})
+				)))
+			}.cancellable(id: ConnectID.self)
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .establishConnectionResult(.success):
 			state.isConnecting = false
-			state.isPromptingForName = true
-			return .none
+			let p2pClient = P2PClient(connectionPassword: state.connectionPassword, displayName: state.nameOfConnection)
+			return .run { send in
+				await send(.internal(.cancelOngoingEffects))
+				await send(.delegate(.connected(p2pClient)))
+			}
 
 		case let .focusTextField(focus):
 			state.focusedField = focus

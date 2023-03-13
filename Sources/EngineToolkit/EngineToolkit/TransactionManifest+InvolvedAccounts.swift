@@ -20,7 +20,7 @@ extension TransactionManifest {
 				switch instruction {
 				case let .callMethod(callMethodInstruction):
 					guard
-						let accountAddress = callMethodInstruction.receiver.asAccountComponentAddress,
+						let accountAddress = callMethodInstruction.receiverAsAccountComponentAddress,
 						callMethodFilter(callMethodInstruction)
 					else {
 						continue

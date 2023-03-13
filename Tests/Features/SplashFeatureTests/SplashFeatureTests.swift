@@ -9,7 +9,7 @@ final class SplashFeatureTests: TestCase {
 	func test__GIVEN__splash_appeared__WHEN__no_biometrics_config__THEN__alert_is_shown() async throws {
 		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
 
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 
 		let store = TestStore(
 			initialState: Splash.State(),
@@ -19,7 +19,7 @@ final class SplashFeatureTests: TestCase {
 				authBiometricsConfig
 			}
 
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 			$0.onboardingClient.loadProfile = {
 				.newUser
 			}
@@ -32,7 +32,7 @@ final class SplashFeatureTests: TestCase {
 		await store.receive(.internal(.loadProfileOutcome(.newUser))) {
 			$0.loadProfileOutcome = .newUser
 		}
-		await testScheduler.advance(by: .seconds(0.2))
+		await clock.advance(by: .seconds(0.2))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.passcodeCheckFailedAlert = .init(
 				title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
@@ -72,7 +72,7 @@ final class SplashFeatureTests: TestCase {
 
 	func assertNotifiesDelegateWithLoadProfileOutcome(_ outcome: LoadProfileOutcome) async throws {
 		let authBiometricsConfig = LocalAuthenticationConfig.biometricsAndPasscodeSetUp
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
@@ -80,7 +80,7 @@ final class SplashFeatureTests: TestCase {
 			$0.localAuthenticationClient = LocalAuthenticationClient {
 				authBiometricsConfig
 			}
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 			$0.onboardingClient.loadProfile = {
 				outcome
 			}
@@ -93,7 +93,7 @@ final class SplashFeatureTests: TestCase {
 		await store.receive(.internal(.loadProfileOutcome(outcome))) {
 			$0.loadProfileOutcome = outcome
 		}
-		await testScheduler.advance(by: .seconds(0.2))
+		await clock.advance(by: .seconds(0.2))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig))))
 		await store.receive(.delegate(.loadProfileOutcome(outcome)))
 	}

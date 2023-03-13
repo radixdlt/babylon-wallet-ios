@@ -11,24 +11,18 @@ public struct CreateAccessController: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let controlledAsset: Bucket
-	public let primaryRole: Enum
-	public let recoveryRole: Enum
-	public let confirmationRole: Enum
-	public let timedRecoveryDelayInMinutes: Value_
+	public let ruleSet: Tuple
+	public let timedRecoveryDelayInMinutes: ManifestASTValue
 
 	// MARK: Init
 
 	public init(
 		controlledAsset: Bucket,
-		primaryRole: Enum,
-		recoveryRole: Enum,
-		confirmationRole: Enum,
-		timedRecoveryDelayInMinutes: Value_
+		ruleSet: Tuple,
+		timedRecoveryDelayInMinutes: ManifestASTValue
 	) {
 		self.controlledAsset = controlledAsset
-		self.primaryRole = primaryRole
-		self.recoveryRole = recoveryRole
-		self.confirmationRole = confirmationRole
+		self.ruleSet = ruleSet
 		self.timedRecoveryDelayInMinutes = timedRecoveryDelayInMinutes
 	}
 }
@@ -39,9 +33,7 @@ extension CreateAccessController {
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case controlledAsset = "controlled_asset"
-		case primaryRole = "primary_role"
-		case recoveryRole = "recovery_role"
-		case confirmationRole = "confirmation_role"
+		case ruleSet = "rule_set"
 		case timedRecoveryDelayInMinutes = "timed_recovery_delay_in_minutes"
 	}
 
@@ -52,9 +44,7 @@ extension CreateAccessController {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(controlledAsset, forKey: .controlledAsset)
-		try container.encode(primaryRole, forKey: .primaryRole)
-		try container.encode(recoveryRole, forKey: .recoveryRole)
-		try container.encode(confirmationRole, forKey: .confirmationRole)
+		try container.encode(ruleSet, forKey: .ruleSet)
 		try container.encode(timedRecoveryDelayInMinutes, forKey: .timedRecoveryDelayInMinutes)
 	}
 
@@ -67,16 +57,12 @@ extension CreateAccessController {
 		}
 
 		let controlledAsset = try container.decode(Bucket.self, forKey: .controlledAsset)
-		let primaryRole = try container.decode(Enum.self, forKey: .primaryRole)
-		let recoveryRole = try container.decode(Enum.self, forKey: .recoveryRole)
-		let confirmationRole = try container.decode(Enum.self, forKey: .confirmationRole)
-		let timedRecoveryDelayInMinutes = try container.decode(Value_.self, forKey: .timedRecoveryDelayInMinutes).self
+		let ruleSet = try container.decode(Tuple.self, forKey: .ruleSet)
+		let timedRecoveryDelayInMinutes = try container.decode(ManifestASTValue.self, forKey: .timedRecoveryDelayInMinutes).self
 
 		self.init(
 			controlledAsset: controlledAsset,
-			primaryRole: primaryRole,
-			recoveryRole: recoveryRole,
-			confirmationRole: confirmationRole,
+			ruleSet: ruleSet,
 			timedRecoveryDelayInMinutes: timedRecoveryDelayInMinutes
 		)
 	}

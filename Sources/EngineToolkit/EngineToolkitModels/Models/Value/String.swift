@@ -3,8 +3,8 @@ import Foundation
 // TODO: The underscore is added here to avoid name collisions. Something better is needed.
 extension String: ValueProtocol, ProxyCodable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .string
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .string
+	public func embedValue() -> ManifestASTValue {
 		.string(self)
 	}
 
@@ -18,7 +18,7 @@ extension String: ValueProtocol, ProxyCodable {
 		public let decoded: Decoded
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
-			let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+			let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 			if kind != Decoded.kind {
 				throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Decoded.kind, butGot: kind)
 			}
