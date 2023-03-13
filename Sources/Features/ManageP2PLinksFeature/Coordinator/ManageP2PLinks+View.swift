@@ -8,7 +8,7 @@ extension ManageP2PLinks {
 		public let clients: IdentifiedArrayOf<ManageP2PLink.State>
 
 		init(state: ManageP2PLinks.State) {
-			clients = state.clients
+			clients = state.links
 		}
 	}
 
@@ -39,7 +39,7 @@ extension ManageP2PLinks {
 					VStack(alignment: .leading) {
 						ForEachStore(
 							store.scope(
-								state: \.clients,
+								state: \.links,
 								action: { .child(.connection(id: $0, action: $1)) }
 							),
 							content: {
