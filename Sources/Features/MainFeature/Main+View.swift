@@ -14,21 +14,23 @@ extension Main {
 		}
 
 		public var body: some SwiftUI.View {
-			Home.View(
-				store: store.scope(
-					state: \.home,
-					action: { .child(.home($0)) }
+			NavigationStack {
+				Home.View(
+					store: store.scope(
+						state: \.home,
+						action: { .child(.home($0)) }
+					)
 				)
-			)
-			#if os(iOS)
-			// NB: has to be fullScreenCover because of https://stackoverflow.com/q/69101690
-			.fullScreenCover(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /Main.Destinations.State.settings,
-				action: Main.Destinations.Action.settings,
-				content: { AppSettings.View(store: $0) }
-			)
-			#endif
+				#if os(iOS)
+				// NB: has to be fullScreenCover because of https://stackoverflow.com/q/69101690
+				.navigationDestination(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Main.Destinations.State.settings,
+					action: Main.Destinations.Action.settings,
+					destination: { AppSettings.View(store: $0) }
+				)
+				#endif
+			}
 			.presentsDappInteractions(
 				onPresent: { [store = store.stateless] in
 					ViewStore(store).send(.view(.dappInteractionPresented))
