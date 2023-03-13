@@ -183,31 +183,22 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			var effects: [EffectTask<Action>] = []
-			if let resetItem = state.resetRequestItem {
-				effects.append(
-					.run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] _ in
-						// TODO: implement
-					}
-				)
-			}
 			if let usePersonaItem = state.usePersonaRequestItem {
-				effects.append(
-					.run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
-						let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
-						if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
-							let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
-							let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
-							await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
-						} else {
-							await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
-						}
-					} catch: { error, send in
-						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
+					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
+					if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
+						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
+						let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
+						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
+					} else {
+						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
 					}
-				)
+				} catch: { error, send in
+					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+				}
+			} else {
+				return .none
 			}
-			return .concatenate(effects)
 
 		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
@@ -240,7 +231,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			))))
 
-			return autofillOngoingResponseItemsIfPossibleEffect(for: &state)
+			return .concatenate(
+				resetOngoingResponseItemsIfNeededEffect(for: state),
+				autofillOngoingResponseItemsIfPossibleEffect(for: state)
+			)
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
 			if let accountsPayload = payload.accountsPayload {
@@ -287,7 +281,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)))))
 			state.responseItems[item] = responseItem
 
-			return autofillOngoingResponseItemsIfPossibleEffect(for: &state)
+			return .concatenate(
+				resetOngoingResponseItemsIfNeededEffect(for: state),
+				autofillOngoingResponseItemsIfPossibleEffect(for: state)
+			)
 		}
 
 		func handlePermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
@@ -362,13 +359,35 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
+	func resetOngoingResponseItemsIfNeededEffect(
+		for state: State
+	) -> EffectTask<Action> {
+		.run { [state] _ in
+			guard
+				let resetItem = state.resetRequestItem,
+				var authorizedDapp = state.authorizedDapp,
+				var authorizedPersona = state.authorizedPersona
+			else {
+				return
+			}
+			if resetItem.accounts {
+				authorizedPersona.sharedAccounts = nil
+			}
+			if resetItem.personaData {
+				authorizedPersona.fieldIDs = [] // TODO: check if this is correct as part of https://radixdlt.atlassian.net/browse/ABW-1123
+			}
+			authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+			try await authorizedDappsClient.updateAuthorizedDapp(authorizedDapp)
+		}
+	}
+
 	func autofillOngoingResponseItemsIfPossibleEffect(
-		for state: inout State
+		for state: State
 	) -> EffectTask<Action> {
 		.run { [state] send in
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
-			// TODO: autofill persona data here too
+			// TODO: autofill persona data here too - https://radixdlt.atlassian.net/browse/ABW-1123
 
 			if
 				let ongoingAccountsRequestItem = { () -> P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? in
