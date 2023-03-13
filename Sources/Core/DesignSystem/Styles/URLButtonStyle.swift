@@ -16,6 +16,6 @@ public struct URLButtonStyle: ButtonStyle {
 	}
 }
 
-public extension ButtonStyle where Self == URLButtonStyle {
-	static var url: URLButtonStyle { .init() }
+extension ButtonStyle where Self == URLButtonStyle {
+	public static var url: URLButtonStyle { .init() }
 }

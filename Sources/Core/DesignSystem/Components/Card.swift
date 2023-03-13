@@ -16,8 +16,8 @@ public struct Card<Contents: View>: View {
 	}
 }
 
-public extension View {
-	var cardStyle: some View {
+extension View {
+	public var cardStyle: some View {
 		background {
 			RoundedRectangle(cornerRadius: .small1)
 				.fill(.white)
@@ -25,7 +25,7 @@ public extension View {
 		}
 	}
 
-	var cardShadow: some View {
+	public var cardShadow: some View {
 		shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 	}
 }
