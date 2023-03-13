@@ -19,7 +19,7 @@ extension ProfileSnapshot.Version {
 	/// - 18: Add `isCurrencyAmountVisible` to app preferences.
 	/// - 19: Add `security` to `appPreferences` (iCloud sync)
 	/// - 20: Add `storage` for `device` FactorSource (`nextDerivationIndices`), remove `index`
-        /// - 21: Rename `P2PClient` to `P2PLink`.
+	/// - 21: Rename `P2PClient` to `P2PLink`.
 	public static let minimum: Self = 21
 }
 

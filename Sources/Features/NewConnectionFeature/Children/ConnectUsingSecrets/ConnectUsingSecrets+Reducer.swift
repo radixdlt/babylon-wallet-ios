@@ -51,45 +51,45 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	private enum FocusFieldID {}
 	private enum ConnectID {}
 
-        public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-                switch viewAction {
-                case .appeared:
-                        return .task {
-                                .view(.textFieldFocused(.connectionName))
-                        }
-                        .cancellable(id: FocusFieldID.self)
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return .task {
+				.view(.textFieldFocused(.connectionName))
+			}
+			.cancellable(id: FocusFieldID.self)
 
-                case let .textFieldFocused(focus):
-                        return .run { send in
-                                do {
-                                        try await clock.sleep(for: .seconds(0.5))
-                                        try Task.checkCancellation()
-                                        await send(.internal(.focusTextField(focus)))
-                                } catch {
-                                        /* noop */
-                                        print("failed to sleep or task cancelled? error: \(String(describing: error))")
-                                }
-                        }
-                        .cancellable(id: FocusFieldID.self)
+		case let .textFieldFocused(focus):
+			return .run { send in
+				do {
+					try await clock.sleep(for: .seconds(0.5))
+					try Task.checkCancellation()
+					await send(.internal(.focusTextField(focus)))
+				} catch {
+					/* noop */
+					print("failed to sleep or task cancelled? error: \(String(describing: error))")
+				}
+			}
+			.cancellable(id: FocusFieldID.self)
 
-                case let .nameOfConnectionChanged(connectionName):
-                        state.nameOfConnection = connectionName.trimmed()
-                        state.isNameValid = !connectionName.trimmed().isEmpty
-                        return .none
+		case let .nameOfConnectionChanged(connectionName):
+			state.nameOfConnection = connectionName.trimmed()
+			state.isNameValid = !connectionName.trimmed().isEmpty
+			return .none
 
-                case .confirmNameButtonTapped:
-                        let connectionPassword = state.connectionPassword
-                        state.isConnecting = true
-                        return .run { send in
-                                await send(.internal(.establishConnectionResult(
-                                        TaskResult(catching: {
-                                                try await radixConnectClient.addP2PWithPassword(connectionPassword)
-                                                return connectionPassword
-                                        })
-                                )))
-                        }.cancellable(id: ConnectID.self)
-                }
-        }
+		case .confirmNameButtonTapped:
+			let connectionPassword = state.connectionPassword
+			state.isConnecting = true
+			return .run { send in
+				await send(.internal(.establishConnectionResult(
+					TaskResult(catching: {
+						try await radixConnectClient.addP2PWithPassword(connectionPassword)
+						return connectionPassword
+					})
+				)))
+			}.cancellable(id: ConnectID.self)
+		}
+	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
