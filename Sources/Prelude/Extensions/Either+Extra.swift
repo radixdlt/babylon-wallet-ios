@@ -1,8 +1,8 @@
 // MARK: - Either + Sendable
 extension Either: @unchecked Sendable {}
 
-public extension Either {
-	func doAsync(
+extension Either {
+	public func doAsync(
 		ifLeft: (Left) async throws -> Void,
 		ifRight: (Right) async throws -> Void
 	) async rethrows {
