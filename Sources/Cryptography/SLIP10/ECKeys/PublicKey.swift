@@ -15,7 +15,7 @@ extension SLIP10.PublicKey {
 	/// but not for Curve25519.
 	public func isValidSignature(
 		_ signatureWrapper: SLIP10.Signature,
-		for message: any DataProtocol
+		for message: some DataProtocol
 	) -> Bool {
 		switch (signatureWrapper, self) {
 		case let (.ecdsaSecp256k1(ecdsaSecp256k1Signature), .ecdsaSecp256k1(ecdsaSecp256k1PublicKey)):
