@@ -118,13 +118,13 @@ public enum ResourceSpecifier: Codable {
 
 // MARK: Codable stuff
 
-public extension ResourceSpecifier {
-	internal enum Kind: String, Codable {
+extension ResourceSpecifier {
+	enum Kind: String, Codable {
 		case amount = "Amount"
 		case ids = "Ids"
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
@@ -139,7 +139,7 @@ public extension ResourceSpecifier {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(Kind.self, forKey: .type)
 		switch kind {
@@ -157,13 +157,13 @@ public extension ResourceSpecifier {
 	}
 }
 
-public extension AccountDeposit {
-	internal enum Kind: String, Codable {
+extension AccountDeposit {
+	enum Kind: String, Codable {
 		case exact = "Exact"
 		case estimate = "Estimate"
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
@@ -179,7 +179,7 @@ public extension AccountDeposit {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(Kind.self, forKey: .type)
 		switch kind {
@@ -198,15 +198,15 @@ public extension AccountDeposit {
 	}
 }
 
-public extension AnalyzeManifestWithPreviewContextRequest {
-	func encode(to encoder: Encoder) throws {
+extension AnalyzeManifestWithPreviewContextRequest {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(manifest, forKey: .manifest)
 		try container.encode(String(networkId), forKey: .networkId)
 		try container.encode(transactionReceipt.hex(), forKey: .transactionReceipt)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(
 			networkId: NetworkID(decodeAndConvertToNumericType(container: container, key: .networkId)),
