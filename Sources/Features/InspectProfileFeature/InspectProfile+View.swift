@@ -233,7 +233,7 @@ extension AppPreferencesView {
 			)
 
 			P2PLinksView(
-				p2pLinkss: appPreferences.p2pLinkss,
+				p2pLinks: appPreferences.p2pLinks,
 				indentation: inOneLevel
 			)
 
@@ -335,7 +335,7 @@ extension AppSecurityView {
 
 // MARK: - P2PLinksView
 public struct P2PLinksView: IndentedView {
-	public let p2pLinkss: P2PLinks
+	public let p2pLinks: P2PLinks
 	public let indentation: Indentation
 }
 
@@ -347,10 +347,10 @@ extension P2PLinksView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			if p2pLinkss.isEmpty {
+			if p2pLinks.isEmpty {
 				Text("<None yet>").font(.callout)
 			} else {
-				ForEach(p2pLinkss) { p2pLinks in
+				ForEach(p2pLinks) { p2pLinks in
 					P2PLinkView(
 						p2pLinks: p2pLinks,
 						indentation: inOneLevel

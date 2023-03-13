@@ -358,10 +358,10 @@ final class ProfileTests: TestCase {
 			"identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen"
 		)
 
-		XCTAssertEqual(profile.appPreferences.p2pLinkss.clients.count, 2)
-		let p2pLinks0 = try XCTUnwrap(profile.appPreferences.p2pLinkss.first)
+		XCTAssertEqual(profile.appPreferences.p2pLinks.clients.count, 2)
+		let p2pLinks0 = try XCTUnwrap(profile.appPreferences.p2pLinks.first)
 		XCTAssertEqual(p2pLinks0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
-		let p2pLinks1 = profile.appPreferences.p2pLinkss[1]
+		let p2pLinks1 = profile.appPreferences.p2pLinks[1]
 
 		XCTAssertEqual(onNetwork.authorizedDapps.count, 1)
 		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)

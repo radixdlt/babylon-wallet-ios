@@ -1,7 +1,7 @@
 import ClientPrelude
 
 extension DependencyValues {
-	public var p2pLinkssClient: P2PLinksClient {
+	public var p2pLinksClient: P2PLinksClient {
 		get { self[P2PLinksClient.self] }
 		set { self[P2PLinksClient.self] = newValue }
 	}
@@ -20,6 +20,6 @@ extension P2PLinksClient: TestDependencyKey {
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
 		addP2PLink: unimplemented("\(Self.self).addP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
-		deleteAllP2PLinks: unimplemented("\(Self.self).deleteAllp2pLinkss")
+		deleteAllP2PLinks: unimplemented("\(Self.self).deleteAllp2pLinks")
 	)
 }

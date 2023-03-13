@@ -13,7 +13,7 @@ extension P2PLinksClient: DependencyKey {
 
 		return Self(
 			getP2PLinks: {
-				await appPreferencesClient.getPreferences().p2pLinkss
+				await appPreferencesClient.getPreferences().p2pLinks
 			},
 			addP2PLink: { newClient in
 				try await appPreferencesClient.updating {
@@ -22,12 +22,12 @@ extension P2PLinksClient: DependencyKey {
 			},
 			deleteP2PLinkByPassword: { password in
 				try await appPreferencesClient.updating {
-					$0.p2pLinkss.clients.removeAll(where: { $0.connectionPassword == password })
+					$0.p2pLinks.clients.removeAll(where: { $0.connectionPassword == password })
 				}
 			},
 			deleteAllP2PLinks: {
 				try await appPreferencesClient.updating {
-					$0.p2pLinkss.clients.removeAll()
+					$0.p2pLinks.clients.removeAll()
 				}
 			}
 		)

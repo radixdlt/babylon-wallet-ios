@@ -10,7 +10,7 @@ import PersonasFeature
 public struct AppSettings: FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.p2pLinkssClient) var p2pLinkssClient
+	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public typealias Store = StoreOf<Self>
@@ -212,7 +212,7 @@ extension AppSettings {
 		.task {
 			await .internal(.loadP2PLinksResult(
 				TaskResult {
-					try await p2pLinkssClient.getP2PLinks()
+					try await p2pLinksClient.getP2PLinks()
 				}
 			))
 		}

@@ -5,7 +5,7 @@ import RadixConnect
 
 extension RadixConnectClient {
 	public static let liveValue: Self = {
-		@Dependency(\.p2pLinkssClient) var p2pLinkssClient
+		@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
@@ -14,7 +14,7 @@ extension RadixConnectClient {
 			loadFromProfileAndConnectAll: {
 				Task {
 					loggerGlobal.info("🔌 Loading and connecting all P2P connections")
-					for client in await p2pLinkssClient.getP2PLinks() {
+					for client in await p2pLinksClient.getP2PLinks() {
 						try await rtcClients.connect(
 							client.connectionPassword
 						)
@@ -25,7 +25,7 @@ extension RadixConnectClient {
 				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
 				await rtcClients.disconnectAndRemoveAll()
 				do {
-					try await p2pLinkssClient.deleteAllP2PLinks()
+					try await p2pLinksClient.deleteAllP2PLinks()
 				} catch {
 					loggerGlobal.error("Failed to delete P2PLinks -> \(error)")
 				}
@@ -38,14 +38,14 @@ extension RadixConnectClient {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PLinks: {
-				await OrderedSet(p2pLinkssClient.getP2PLinks())
+				await OrderedSet(p2pLinksClient.getP2PLinks())
 			},
 			storeP2PLink: { client in
-				try await p2pLinkssClient.addP2PLink(client)
+				try await p2pLinksClient.addP2PLink(client)
 			},
 			deleteP2PLinkByPassword: { password in
 				loggerGlobal.info("Deleting P2P Connection")
-				try await p2pLinkssClient.deleteP2PLinkByPassword(password)
+				try await p2pLinksClient.deleteP2PLinkByPassword(password)
 				await rtcClients.disconnectAndRemoveClient(password)
 			},
 			addP2PWithPassword: { password in
