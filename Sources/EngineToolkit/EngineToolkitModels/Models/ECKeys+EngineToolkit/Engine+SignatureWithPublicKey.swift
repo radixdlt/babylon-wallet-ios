@@ -8,12 +8,12 @@ extension Engine {
 		// ==============
 
 		case ecdsaSecp256k1(
-			signature: EcdsaSecp256k1Signature
+			signature: ECPrimitive
 		)
 
 		case eddsaEd25519(
-			signature: EddsaEd25519Signature,
-			publicKey: EddsaEd25519PublicKey
+			signature: ECPrimitive,
+			publicKey: ECPrimitive
 		)
 	}
 }
@@ -75,17 +75,14 @@ extension Engine.SignatureWithPublicKey {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(CurveDiscriminator.self, forKey: .discriminator)
+		let signature = try container.decode(Engine.ECPrimitive.self, forKey: .signature)
 
 		switch discriminator {
 		case .ecdsaSecp256k1:
-			self = try .ecdsaSecp256k1(
-				signature: container.decode(Engine.EcdsaSecp256k1Signature.self, forKey: .signature)
-			)
+			self = .ecdsaSecp256k1(signature: signature)
 		case .eddsaEd25519:
-			self = try .eddsaEd25519(
-				signature: container.decode(Engine.EddsaEd25519Signature.self, forKey: .signature),
-				publicKey: container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey)
-			)
+			let publicKey = try container.decode(Engine.ECPrimitive.self, forKey: .publicKey)
+			self = .eddsaEd25519(signature: signature, publicKey: publicKey)
 		}
 	}
 }

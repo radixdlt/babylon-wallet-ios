@@ -38,13 +38,14 @@ extension SLIP10.PublicKey {
 		case let .ecdsaSecp256k1(key):
 			return try .ecdsaSecp256k1(key.intoEngine())
 		case let .eddsaEd25519(key):
-			return .eddsaEd25519(Engine.EddsaEd25519PublicKey(bytes: [UInt8](key.rawRepresentation)))
+			return .eddsaEd25519(.init(bytes: [UInt8](key.rawRepresentation)))
 		}
 	}
 }
 
 extension K1.PublicKey {
-	public func intoEngine() throws -> Engine.EcdsaSecp256k1PublicKey {
+	// NOTE: Here we're not capturing the fact that this is a EcdsaSecp256k1PublicKey
+	public func intoEngine() throws -> Engine.ECPrimitive {
 		try .init(bytes: self.rawRepresentation(format: .compressed))
 	}
 }
@@ -70,8 +71,8 @@ extension SignatureWithPublicKey {
 			)
 		case let .eddsaEd25519(signature, publicKey):
 			return .eddsaEd25519(
-				signature: Engine.EddsaEd25519Signature(bytes: [UInt8](signature)),
-				publicKey: Engine.EddsaEd25519PublicKey(bytes: [UInt8](publicKey.rawRepresentation))
+				signature: .init(bytes: [UInt8](signature)),
+				publicKey: .init(bytes: [UInt8](publicKey.rawRepresentation))
 			)
 		}
 	}

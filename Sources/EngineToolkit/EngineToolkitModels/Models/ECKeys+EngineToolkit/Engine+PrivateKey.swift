@@ -41,7 +41,27 @@ extension Engine.PrivateKey {
 			unhashed: unhashed,
 			ifECDSASkipHashingBeforeSigning: ifECDSASkipHashingBeforeSigning
 		)
-		let signatureWithPublicKey = try signatureAndMessage.signatureWithPublicKey.intoEngine()
+		var signatureWithPublicKey = try signatureAndMessage.signatureWithPublicKey.intoEngine()
+
+		// TODO: Remove when a fix is implemented at the K1 side.
+
+		// The following is a temporary fix for the ECDSA signatures to allow them to be put in a format that is
+		// expected. Currently, K1 returns a bytearray of (reverded(r) + reversed(s) + [v]) which Scrypto does not
+		// expect. Therefore, the following code modifies the above-mentioned format to be ([v] + r + s).
+		// Note: Correction is only needed for Ecdsa Secp256k1 and not Eddsa Ed25519
+		switch signatureWithPublicKey {
+		case let .ecdsaSecp256k1(ecdsaSignature):
+			let signatureBytes = ecdsaSignature.bytes
+
+			let r = signatureBytes[0 ..< 32].reversed()
+			let s = signatureBytes[32 ..< 64].reversed()
+			let v = signatureBytes[64]
+
+			signatureWithPublicKey = .ecdsaSecp256k1(signature: .init(bytes: [v] + r + s))
+		default:
+			break
+		}
+
 		return (
 			signatureWithPublicKey: signatureWithPublicKey,
 			hashOfMessage: signatureAndMessage.hashOfMessage

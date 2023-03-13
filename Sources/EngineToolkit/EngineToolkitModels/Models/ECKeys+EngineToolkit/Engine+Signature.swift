@@ -7,8 +7,8 @@ extension Engine {
 		// Enum Variants
 		// ==============
 
-		case ecdsaSecp256k1(EcdsaSecp256k1Signature)
-		case eddsaEd25519(EddsaEd25519Signature)
+		case ecdsaSecp256k1(ECPrimitive)
+		case eddsaEd25519(ECPrimitive)
 	}
 }
 
@@ -17,6 +17,13 @@ extension Engine.Signature {
 		switch self {
 		case .ecdsaSecp256k1: return .ecdsaSecp256k1
 		case .eddsaEd25519: return .eddsaEd25519
+		}
+	}
+
+	fileprivate var primitive: Engine.ECPrimitive {
+		switch self {
+		case let .ecdsaSecp256k1(primitive), let .eddsaEd25519(primitive):
+			return primitive
 		}
 	}
 }
@@ -47,24 +54,20 @@ extension Engine.Signature {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(CurveDiscriminator.self, forKey: .discriminator)
+		let primitive = try container.decode(Engine.ECPrimitive.self, forKey: .signature)
 
 		switch discriminator {
 		case .ecdsaSecp256k1:
-			self = try .ecdsaSecp256k1(container.decode(Engine.EcdsaSecp256k1Signature.self, forKey: .signature))
+			self = .ecdsaSecp256k1(primitive)
 		case .eddsaEd25519:
-			self = try .eddsaEd25519(container.decode(Engine.EddsaEd25519Signature.self, forKey: .signature))
+			self = .eddsaEd25519(primitive)
 		}
 	}
 }
 
 extension Engine.Signature {
 	public var bytes: [UInt8] {
-		switch self {
-		case let .ecdsaSecp256k1(signature):
-			return signature.bytes
-		case let .eddsaEd25519(signature):
-			return signature.bytes
-		}
+		primitive.bytes
 	}
 
 	public var hex: String {

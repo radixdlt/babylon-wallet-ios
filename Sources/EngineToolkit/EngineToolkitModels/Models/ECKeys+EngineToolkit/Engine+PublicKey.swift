@@ -7,8 +7,8 @@ extension Engine {
 		// ==============
 		// Enum Variants
 		// ==============
-		case ecdsaSecp256k1(EcdsaSecp256k1PublicKey)
-		case eddsaEd25519(EddsaEd25519PublicKey)
+		case ecdsaSecp256k1(ECPrimitive)
+		case eddsaEd25519(ECPrimitive)
 	}
 }
 
@@ -33,10 +33,17 @@ extension Engine.PublicKey {
 		case publicKey = "public_key"
 	}
 
-	internal var discriminator: CurveDiscriminator {
+	var discriminator: CurveDiscriminator {
 		switch self {
 		case .ecdsaSecp256k1: return .ecdsaSecp256k1
 		case .eddsaEd25519: return .eddsaEd25519
+		}
+	}
+
+	var primitive: Engine.ECPrimitive {
+		switch self {
+		case let .ecdsaSecp256k1(primitive), let .eddsaEd25519(primitive):
+			return primitive
 		}
 	}
 
@@ -44,27 +51,21 @@ extension Engine.PublicKey {
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-
-		switch self {
-		case let .ecdsaSecp256k1(publicKey):
-			try container.encode(discriminator, forKey: .discriminator)
-			try container.encode(publicKey, forKey: .publicKey)
-		case let .eddsaEd25519(publicKey):
-			try container.encode(discriminator, forKey: .discriminator)
-			try container.encode(publicKey, forKey: .publicKey)
-		}
+		try container.encode(discriminator, forKey: .discriminator)
+		try container.encode(primitive, forKey: .publicKey)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(CurveDiscriminator.self, forKey: .discriminator)
+		let primitive = try container.decode(Engine.ECPrimitive.self, forKey: .publicKey)
 
 		switch discriminator {
 		case .ecdsaSecp256k1:
-			self = try .ecdsaSecp256k1(container.decode(Engine.EcdsaSecp256k1PublicKey.self, forKey: .publicKey))
+			self = .ecdsaSecp256k1(primitive)
 		case .eddsaEd25519:
-			self = try .eddsaEd25519(container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey))
+			self = .eddsaEd25519(primitive)
 		}
 	}
 }
