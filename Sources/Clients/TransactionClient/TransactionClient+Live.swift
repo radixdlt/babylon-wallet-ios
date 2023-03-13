@@ -77,13 +77,39 @@ extension TransactionClient {
 
 					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
 					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
-
+					let unhashedData = Data(data)
 					let sigRes: SignatureWithPublicKey = try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,
 						derivationPath: factorInstance.derivationPath!,
 						curve: curve,
-						data: Data(data)
+						unhashedData: unhashedData
 					))
+					switch sigRes.signature {
+					case let .ecdsaSecp256k1(ecdsaSig):
+						switch sigRes.publicKey {
+						case let .ecdsaSecp256k1(pubkey):
+							let isValid = (try? pubkey.isValid(signature: ecdsaSig, unhashed: unhashedData)) ?? false
+							if isValid {
+								print("✅ nice!")
+							} else {
+								fatalError("❌ bad! not valid")
+							}
+						case .eddsaEd25519:
+							fatalError("bad")
+						}
+					case let .eddsaEd25519(sigCurve25518):
+						switch sigRes.publicKey {
+						case .ecdsaSecp256k1:
+							fatalError("bad")
+						case let .eddsaEd25519(pubKey):
+							let isValid = pubKey.isValidSignature(sigCurve25518, for: unhashedData)
+							if isValid {
+								print("✅ nice!")
+							} else {
+								fatalError("❌ bad! not valid")
+							}
+						}
+					}
 					return sigRes
 				}
 			}
