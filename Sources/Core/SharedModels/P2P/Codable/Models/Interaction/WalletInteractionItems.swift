@@ -49,15 +49,18 @@ extension P2P.FromDapp.WalletInteraction {
 		public let auth: AuthRequestItem
 		public let oneTimeAccounts: OneTimeAccountsRequestItem?
 		public let ongoingAccounts: OngoingAccountsRequestItem?
+		public let reset: ResetRequestItem?
 
 		public init(
 			auth: AuthRequestItem,
 			oneTimeAccounts: OneTimeAccountsRequestItem?,
-			ongoingAccounts: OngoingAccountsRequestItem?
+			ongoingAccounts: OngoingAccountsRequestItem?,
+			reset: ResetRequestItem?
 		) {
 			self.auth = auth
 			self.oneTimeAccounts = oneTimeAccounts
 			self.ongoingAccounts = ongoingAccounts
+			self.reset = reset
 		}
 	}
 }
