@@ -40,6 +40,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
+		var usePersonaRequestItem: P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? {
+			// NB: this if let should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items,
+				case let .usePersona(item) = item.auth
+			else {
+				return nil
+			}
+			return item
+		}
+
 		@PresentationState
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
@@ -160,18 +172,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			// NB: this if let should become a one liner with native case paths:
-			// if let usePersonaRequest = state.remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?] {
-			if let usePersonaItem = { () -> P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? in
-				switch state.remoteInteraction.items {
-				case let .request(.authorized(item)):
-					switch item.auth {
-					case let .usePersona(item): return item
-					default: return nil
-					}
-				default: return nil
-				}
-			}() {
+			if let usePersonaItem = state.usePersonaRequestItem {
 				return .run { [usePersonaItem, dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
 					if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
