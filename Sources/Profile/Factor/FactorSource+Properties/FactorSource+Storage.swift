@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - FactorSource.Storage
-public extension FactorSource {
-	enum Storage: Sendable, Hashable, Codable {
+extension FactorSource {
+	public enum Storage: Sendable, Hashable, Codable {
 		/// `device`
 		case forDevice(DeviceStorage)
 		/// `securityQuestions`
@@ -35,6 +35,7 @@ extension FactorSource.Storage {
 
 // MARK: - WasNotDeviceFactorSource
 struct WasNotDeviceFactorSource: Swift.Error {}
+
 extension FactorSource {
 	public func deviceStorage() throws -> DeviceStorage {
 		guard let storage else {
