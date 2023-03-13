@@ -40,6 +40,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
+		var resetRequestItem: P2P.FromDapp.WalletInteraction.ResetRequestItem? {
+			// NB: this if let should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.reset]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.reset
+		}
+
 		var usePersonaRequestItem: P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? {
 			// NB: this if let should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
@@ -172,22 +183,32 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			if let usePersonaItem = state.usePersonaRequestItem {
-				return .run { [usePersonaItem, dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
-					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
-					if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
-						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
-						let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
-						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
-					} else {
-						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
+			var effects: [EffectTask<Action>] = []
+			if let resetItem = state.resetRequestItem {
+				effects.append(
+					.run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] _ in
+						// TODO: implement
 					}
-				} catch: { error, send in
-					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
-				}
-			} else {
-				return .none
+				)
 			}
+			if let usePersonaItem = state.usePersonaRequestItem {
+				effects.append(
+					.run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
+						let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
+						if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
+							let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
+							let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
+							await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
+						} else {
+							await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
+						}
+					} catch: { error, send in
+						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+					}
+				)
+			}
+			return .concatenate(effects)
+
 		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
@@ -196,8 +217,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 		case .personaNotFoundErrorAlert:
 			return .none
+
 		case .closeButtonTapped:
 			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+
 		case .backButtonTapped:
 			return goBackEffect(for: &state)
 		}
