@@ -46,7 +46,7 @@ extension TransactionClient {
 			let cachedPrivateHDFactorSources = ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>>([])
 
 			@Sendable func doSign(
-				data: any DataProtocol,
+				unhashed unhashed_: any DataProtocol,
 				with account: OnNetwork.Account,
 				purpose: String
 			) async throws -> SignatureWithPublicKey {
@@ -78,7 +78,7 @@ extension TransactionClient {
 
 					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
 					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
-					let unhashedData = Data(data)
+					let unhashedData = Data(unhashed_)
 					print("🔮 purpose=\(purpose), account: \(account.displayName), is signign data, using curve: \(curve), derivationpath: \(factorInstance.derivationPath!), from factor source id: \(privateHDFactorSource.factorSource.id), factor source hint: \(privateHDFactorSource.factorSource.hint)")
 					let sigRes: SignatureWithPublicKey = try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,
@@ -91,12 +91,12 @@ extension TransactionClient {
 						switch sigRes.publicKey {
 						case let .ecdsaSecp256k1(pubkey):
 							do {
-								let isValid = try pubkey.isValid(signature: ecdsaSig, unhashed:
-									unhashedData)
+								let isValid = try pubkey.isValid(signature: ecdsaSig, hashed:
+									Data(SHA256.twice(data: unhashedData)))
 								if isValid {
 									print("✅ purpose=\(purpose), Very nice! Signature is valid!")
 								} else {
-									try! print("❌ purpose=\(purpose), bad! invalid secp256k1 sig\nPubKey: \(pubkey.rawRepresentation(format: .uncompressed).hex)\nsignature(radixformat):\(ecdsaSig.radixSerialize().hex)\nsignature(raw):\(ecdsaSig.rawRepresentation.hex)\nunhashedData:\(unhashedData.hex)"); break
+									try! print("❌ purpose=\(purpose), bad! invalid secp256k1 sig\n🎉factorInstance.publicKey=\(factorInstance.publicKey.uncompressedRepresentation.hex)🎉\n❌PubKey: \(pubkey.rawRepresentation(format: .uncompressed).hex)❌\nsignature(radixformat):\(ecdsaSig.radixSerialize().hex)\nsignature(raw):\(ecdsaSig.rawRepresentation.hex)\nunhashedData:\(unhashedData.hex)"); break
 								}
 							} catch {
 								print("❌ purpose=\(purpose), failed to validate secp256k1, \(String(describing: error))"); break
@@ -124,7 +124,7 @@ extension TransactionClient {
 			let intentSignatures_: [SignatureWithPublicKey]
 			do {
 				intentSignatures_ = try await notaryAndSigners.accountsNeededToSign.asyncMap {
-					try await doSign(data: compiledTransactionIntent.compiledIntent, with: $0, purpose: "signers of intent")
+					try await doSign(unhashed: compiledTransactionIntent.compiledIntent, with: $0, purpose: "signers of intent")
 				}
 			} catch {
 				return .failure(.failedToSignIntentWithAccountSigners)
@@ -150,7 +150,7 @@ extension TransactionClient {
 
 			let notarySignatureWithPublicKey: SignatureWithPublicKey
 			do {
-				notarySignatureWithPublicKey = try await doSign(data: compiledSignedIntent.compiledIntent, with: notaryAndSigners.notarySigner, purpose: "notary")
+				notarySignatureWithPublicKey = try await doSign(unhashed: compiledSignedIntent.compiledIntent, with: notaryAndSigners.notarySigner, purpose: "notary")
 			} catch {
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}

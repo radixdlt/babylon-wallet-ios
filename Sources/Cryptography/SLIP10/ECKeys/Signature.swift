@@ -25,15 +25,9 @@ extension ECDSASignatureRecoverable {
 	/// `v || R || S` instead of `rawRepresentation` which does `R || S || v`
 	public func radixSerialize() throws -> Data {
 		let (rs, v) = try compact()
-		return Data([UInt8(v)] + rs)
+		let res = Data([UInt8(v)] + rs)
+		return res
 	}
-
-	//    public func radixSerialize() throws -> Data {
-//
-	//            let rs = Data(rawRepresentation.prefix(64))
-	//            let v = Data([rawRepresentation[64]])
-	//            return v + rs
-	//        }
 }
 
 extension ECDSASignatureRecoverable {
@@ -46,16 +40,21 @@ extension ECDSASignatureRecoverable {
 		let v = Int32(radixFormat[0])
 		let rs = radixFormat.suffix(64)
 		try self.init(compactRepresentation: Data(rs), recoveryID: v)
-	}
 
-	//      /// expects `v || R || S` instead of `rawRepresentation` which is `R || S || v`
-	//      public init(radixFormat: Data) throws {
-	//          guard radixFormat.count == 65 else {
-	//              struct InvalidLength: Swift.Error {}
-	//              throw InvalidLength()
-	//          }
-	//          let v = Data([radixFormat[0]])
-	//          let rs = Data(radixFormat.suffix(64))
-	//          try self.init(rawRepresentation: rs + v)
-	//      }
+		//        let v2 = try Self(radixFormatVersion2: radixFormat)
+		//        assert(self == v2)
+	}
+}
+
+extension ECDSASignatureRecoverable {
+	/// expects `v || R || S` instead of `rawRepresentation` which is `R || S || v`
+	public init(radixFormatVersion2 radixFormat: Data) throws {
+		guard radixFormat.count == 65 else {
+			struct InvalidLength: Swift.Error {}
+			throw InvalidLength()
+		}
+		let v = Data([radixFormat[0]])
+		let rs = Data(radixFormat.suffix(64))
+		try self.init(rawRepresentation: rs + v)
+	}
 }
