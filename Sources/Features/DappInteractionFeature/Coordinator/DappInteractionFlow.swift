@@ -41,7 +41,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
 		var resetRequestItem: P2P.FromDapp.WalletInteraction.ResetRequestItem? {
-			// NB: this if let should become a one liner with native case paths:
+			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.reset]
 			guard
 				case let .request(.authorized(item)) = remoteInteraction.items
@@ -52,7 +52,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		var usePersonaRequestItem: P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? {
-			// NB: this if let should become a one liner with native case paths:
+			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
 			guard
 				case let .request(.authorized(item)) = remoteInteraction.items,
@@ -61,6 +61,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return nil
 			}
 			return item
+		}
+
+		var ongoingAccountsRequestItem: P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingAccounts]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.ongoingAccounts
 		}
 
 		@PresentationState
@@ -390,14 +401,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			// TODO: autofill persona data here too - https://radixdlt.atlassian.net/browse/ABW-1123
 
 			if
-				let ongoingAccountsRequestItem = { () -> P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? in
-					switch state.remoteInteraction.items {
-					case let .request(.authorized(items)):
-						return items.ongoingAccounts
-					default:
-						return nil
-					}
-				}(),
+				let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
 				let sharedAccounts = state.authorizedPersona?.sharedAccounts
 			{
 				if ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request {
