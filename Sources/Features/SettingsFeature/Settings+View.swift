@@ -1,8 +1,8 @@
 import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
-import P2PLinksFeature
 import GatewaySettingsFeature
+import P2PLinksFeature
 import PersonasFeature
 #if DEBUG
 import InspectProfileFeature
