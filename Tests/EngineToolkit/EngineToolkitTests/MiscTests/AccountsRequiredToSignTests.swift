@@ -12,13 +12,13 @@ final class AccountsRequiredToSignTests: TestCase {
 			SetMetadata(
 				entityAddress: "account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3",
 				key: "name",
-				value: "Radix Dashboard"
+				value: .string("Radix Dashboard")
 			)
 
 			SetMetadata(
 				entityAddress: "component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr",
 				key: "name",
-				value: "Radix Dashboard"
+				value: .string("Radix Dashboard")
 			)
 		}
 		let networkID: NetworkID = .simulator
