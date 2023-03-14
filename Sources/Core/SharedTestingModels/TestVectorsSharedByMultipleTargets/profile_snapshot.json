@@ -10,7 +10,8 @@
         {
           "network" : {
             "id" : 11,
-            "name" : "nebunet"
+            "name" : "nebunet",
+			"displayDescription": "Radix Public Network",
           },
           "url" : "https://betanet.radixdlt.com"
         }

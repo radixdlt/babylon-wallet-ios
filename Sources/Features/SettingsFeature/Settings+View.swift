@@ -1,7 +1,7 @@
 import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
-import ManageGatewayAPIEndpointsFeature
+import GatewaySettingsFeature
 import ManageP2PClientsFeature
 import PersonasFeature
 #if DEBUG
@@ -149,9 +149,9 @@ extension View {
 	) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /AppSettings.Destinations.State.manageGatewayAPIEndpoints,
-			action: AppSettings.Destinations.Action.manageGatewayAPIEndpoints,
-			destination: { ManageGatewayAPIEndpoints.View(store: $0) }
+			state: /AppSettings.Destinations.State.gatewaySettings,
+			action: AppSettings.Destinations.Action.gatewaySettings,
+			destination: { GatewaySettings.View(store: $0) }
 		)
 	}
 
@@ -200,9 +200,9 @@ extension AppSettings.View {
 				action: .manageP2PClientsButtonTapped
 			),
 			.init(
-				title: L10n.Settings.gatewayButtonTitle,
+				title: L10n.Settings.gatewaysButtonTitle,
 				asset: AssetResource.gateway,
-				action: .editGatewayAPIEndpointButtonTapped
+				action: .gatewaysButtonTapped
 			),
 			.init(
 				title: L10n.Settings.authorizedDappsButtonTitle,
@@ -241,7 +241,7 @@ extension AppSettings.View {
 							.frame(.verySmall)
 					}
 					.withSeparator
-					.buttonStyle(.settingsRowStyle)
+					.buttonStyle(.tappableRowStyle)
 
 					PlainListRow(title: "Factor Sources") {
 						viewStore.send(.factorSourcesButtonTapped)
@@ -250,7 +250,7 @@ extension AppSettings.View {
 							.frame(.verySmall)
 					}
 					.withSeparator
-					.buttonStyle(.settingsRowStyle)
+					.buttonStyle(.tappableRowStyle)
 					#endif
 
 					ForEach(settingsRows()) { row in
@@ -258,7 +258,7 @@ extension AppSettings.View {
 							viewStore.send(row.action)
 						}
 						.withSeparator
-						.buttonStyle(.settingsRowStyle)
+						.buttonStyle(.tappableRowStyle)
 					}
 				}
 				.padding(.bottom, .large3)
@@ -276,7 +276,7 @@ extension AppSettings.View {
 				}
 			}
 			.onAppear {
-				viewStore.send(.didAppear)
+				viewStore.send(.appeared)
 			}
 		}
 	}
