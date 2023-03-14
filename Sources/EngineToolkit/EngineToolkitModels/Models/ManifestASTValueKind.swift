@@ -35,10 +35,6 @@ public enum ManifestASTValueKind: String, Codable, Sendable, Hashable {
 
 	case address = "Address"
 
-	case componentAddress = "ComponentAddress"
-	case resourceAddress = "ResourceAddress"
-	case packageAddress = "PackageAddress"
-
 	case bucket = "Bucket"
 	case proof = "Proof"
 

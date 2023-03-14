@@ -9,8 +9,7 @@ public struct CallFunction: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// This can actually only be either `PackageAddress` or `Address_`. Temporary, will change to `Address`
-	public let packageAddress: ManifestASTValue
+	public let packageAddress: Address_
 	public let blueprintName: String
 	public let functionName: String
 	public let arguments: [ManifestASTValue]
@@ -23,19 +22,7 @@ public struct CallFunction: InstructionProtocol {
 		functionName: String,
 		arguments: [ManifestASTValue] = []
 	) {
-		self.packageAddress = .packageAddress(packageAddress)
-		self.blueprintName = blueprintName
-		self.functionName = functionName
-		self.arguments = arguments
-	}
-
-	public init(
-		packageAddress: Address_,
-		blueprintName: String,
-		functionName: String,
-		arguments: [ManifestASTValue] = []
-	) {
-		self.packageAddress = .address(packageAddress)
+		self.packageAddress = packageAddress.asGeneral
 		self.blueprintName = blueprintName
 		self.functionName = functionName
 		self.arguments = arguments
@@ -113,9 +100,11 @@ extension CallFunction {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.packageAddress = try container.decode(ManifestASTValue.self, forKey: .packageAddress)
-		self.blueprintName = try container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded
-		self.functionName = try container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded
-		self.arguments = try container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
+		try self.init(
+			packageAddress: container.decode(Address_.self, forKey: .packageAddress).asSpecific(),
+			blueprintName: container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded,
+			functionName: container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded,
+			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
+		)
 	}
 }

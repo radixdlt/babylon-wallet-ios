@@ -46,10 +46,8 @@ extension CreateIdentity {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let accessRule = try container.decode(Enum.self, forKey: .accessRule)
-
-		self.init(
-			accessRule: accessRule
+		try self.init(
+			accessRule: container.decode(Enum.self, forKey: .accessRule)
 		)
 	}
 }

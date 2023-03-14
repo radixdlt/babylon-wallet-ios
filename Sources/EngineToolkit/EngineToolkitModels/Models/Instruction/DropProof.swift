@@ -49,6 +49,8 @@ extension DropProof {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		try self.init(container.decode(Proof.self, forKey: .proof))
+		try self.init(
+			container.decode(Proof.self, forKey: .proof)
+		)
 	}
 }
