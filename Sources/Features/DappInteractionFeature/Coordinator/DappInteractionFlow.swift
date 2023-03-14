@@ -116,6 +116,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
+		case resetOngoingResponseItemsCompleted(
+			OnNetwork.AuthorizedDapp?,
+			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
+		)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
@@ -242,10 +246,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			))))
 
-			return .concatenate(
-				resetOngoingResponseItemsIfNeededEffect(for: state),
-				autofillOngoingResponseItemsIfPossibleEffect(for: state)
-			)
+			return resetOngoingResponseItemsIfNeededEffect(for: state)
+
+		case let .resetOngoingResponseItemsCompleted(updatedAuthorizedDapp, updatedAuthorizedPersona):
+			state.authorizedDapp = updatedAuthorizedDapp
+			state.authorizedPersona = updatedAuthorizedPersona
+			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
 			if let accountsPayload = payload.accountsPayload {
@@ -292,10 +298,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)))))
 			state.responseItems[item] = responseItem
 
-			return .concatenate(
-				resetOngoingResponseItemsIfNeededEffect(for: state),
-				autofillOngoingResponseItemsIfPossibleEffect(for: state)
-			)
+			return resetOngoingResponseItemsIfNeededEffect(for: state)
 		}
 
 		func handlePermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
@@ -373,12 +376,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func resetOngoingResponseItemsIfNeededEffect(
 		for state: State
 	) -> EffectTask<Action> {
-		.run { [state] _ in
+		.run { [state] send in
 			guard
 				let resetItem = state.resetRequestItem,
 				var authorizedDapp = state.authorizedDapp,
 				var authorizedPersona = state.authorizedPersona
 			else {
+				await send(.internal(.resetOngoingResponseItemsCompleted(state.authorizedDapp, state.authorizedPersona)))
 				return
 			}
 			if resetItem.accounts {
@@ -389,6 +393,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 			authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
 			try await authorizedDappsClient.updateAuthorizedDapp(authorizedDapp)
+			await send(.internal(.resetOngoingResponseItemsCompleted(authorizedDapp, authorizedPersona)))
 		}
 	}
 
