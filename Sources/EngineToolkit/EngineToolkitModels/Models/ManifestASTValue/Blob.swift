@@ -1,27 +1,36 @@
-import Foundation
+import Prelude
 
-// MARK: - Bucket
-public struct Bucket: ValueProtocol, Sendable, Codable, Hashable, IdentifierConvertible {
+// MARK: - Blob
+public struct Blob: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .bucket
+	public static let kind: ManifestASTValueKind = .blob
 	public func embedValue() -> ManifestASTValue {
-		.bucket(self)
+		.blob(self)
 	}
 
 	// MARK: Stored properties
-	public let identifier: TransientIdentifier
+	public let bytes: [UInt8]
 
 	// MARK: Init
 
-	public init(identifier: TransientIdentifier) {
-		self.identifier = identifier
+	public init(bytes: [UInt8]) {
+		self.bytes = bytes
+	}
+
+	public init(hex: String) throws {
+		// TODO: Validation of length of Hash
+		try self.init(bytes: [UInt8](hex: hex))
+	}
+
+	public init(data: Data) {
+		self.init(bytes: [UInt8](data))
 	}
 }
 
-extension Bucket {
+extension Blob {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case identifier, type
+		case hash, type
 	}
 
 	// MARK: Codable
@@ -29,7 +38,7 @@ extension Bucket {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(identifier, forKey: .identifier)
+		try container.encode(bytes.hex(), forKey: .hash)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -40,7 +49,9 @@ extension Bucket {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		// Decoding `identifier`
-		try self.init(identifier: container.decode(TransientIdentifier.self, forKey: .identifier))
+		// Decoding `hash`
+		try self.init(
+			hex: container.decode(String.self, forKey: .hash)
+		)
 	}
 }

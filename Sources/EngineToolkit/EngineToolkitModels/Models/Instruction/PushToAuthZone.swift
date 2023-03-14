@@ -41,6 +41,8 @@ extension PushToAuthZone {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		try self.init(proof: container.decode(Proof.self, forKey: .proof))
+		try self.init(
+			proof: container.decode(Proof.self, forKey: .proof)
+		)
 	}
 }

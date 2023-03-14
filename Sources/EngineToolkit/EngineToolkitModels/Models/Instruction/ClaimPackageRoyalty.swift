@@ -10,12 +10,12 @@ public struct ClaimComponentRoyalty: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let componentAddress: ComponentAddress
+	public let componentAddress: Address_
 
 	// MARK: Init
 
 	public init(componentAddress: ComponentAddress) {
-		self.componentAddress = componentAddress
+		self.componentAddress = componentAddress.asGeneral
 	}
 }
 
@@ -44,8 +44,8 @@ extension ClaimComponentRoyalty {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let componentAddress = try container.decode(ComponentAddress.self, forKey: .componentAddress)
-
-		self.init(componentAddress: componentAddress)
+		try self.init(
+			componentAddress: container.decode(Address_.self, forKey: .componentAddress).asSpecific()
+		)
 	}
 }

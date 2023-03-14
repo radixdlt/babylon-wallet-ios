@@ -50,10 +50,6 @@ public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 
 	case address(Address_)
 
-	case packageAddress(PackageAddress)
-	case componentAddress(ComponentAddress)
-	case resourceAddress(ResourceAddress)
-
 	case bucket(Bucket)
 	case proof(Proof)
 
@@ -134,15 +130,6 @@ extension ManifestASTValue {
 
 		case .address:
 			return .address
-
-		case .packageAddress:
-			return .packageAddress
-
-		case .componentAddress:
-			return .componentAddress
-
-		case .resourceAddress:
-			return .resourceAddress
 
 		case .bucket:
 			return .bucket
@@ -252,15 +239,6 @@ extension ManifestASTValue {
 		case let .address(value):
 			try value.encode(to: encoder)
 
-		case let .packageAddress(value):
-			try value.encode(to: encoder)
-
-		case let .componentAddress(value):
-			try value.encode(to: encoder)
-
-		case let .resourceAddress(value):
-			try value.encode(to: encoder)
-
 		case let .bucket(value):
 			try value.encode(to: encoder)
 
@@ -364,15 +342,6 @@ extension ManifestASTValue {
 
 		case .address:
 			self = try .address(.init(from: decoder))
-
-		case .packageAddress:
-			self = try .packageAddress(.init(from: decoder))
-
-		case .componentAddress:
-			self = try .componentAddress(.init(from: decoder))
-
-		case .resourceAddress:
-			self = try .resourceAddress(.init(from: decoder))
 
 		case .bucket:
 			self = try .bucket(.init(from: decoder))
