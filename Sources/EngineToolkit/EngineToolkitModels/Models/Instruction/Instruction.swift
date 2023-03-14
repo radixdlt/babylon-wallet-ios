@@ -43,6 +43,7 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case recallResource(RecallResource)
 
 	case setMetadata(SetMetadata)
+	case removeMetadata(RemoveMetadata)
 
 	case setPackageRoyaltyConfig(SetPackageRoyaltyConfig)
 	case setComponentRoyaltyConfig(SetComponentRoyaltyConfig)
@@ -130,6 +131,8 @@ extension Instruction {
 
 		case .setMetadata:
 			return .setMetadata
+		case .removeMetadata:
+			return .removeMetadata
 
 		case .setPackageRoyaltyConfig:
 			return .setPackageRoyaltyConfig
@@ -243,6 +246,8 @@ extension Instruction {
 
 		case let .setMetadata(instruction):
 			try instruction.encode(to: encoder)
+		case let .removeMetadata(instruction):
+			try instruction.encode(to: encoder)
 
 		case let .setPackageRoyaltyConfig(instruction):
 			try instruction.encode(to: encoder)
@@ -350,6 +355,8 @@ extension Instruction {
 
 		case .setMetadata:
 			self = try .setMetadata(.init(from: decoder))
+		case .removeMetadata:
+			self = try .removeMetadata(.init(from: decoder))
 
 		case .setPackageRoyaltyConfig:
 			self = try .setPackageRoyaltyConfig(.init(from: decoder))
