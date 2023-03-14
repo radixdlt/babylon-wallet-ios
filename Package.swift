@@ -248,7 +248,6 @@ package.addModules([
 		name: "TransactionReviewFeature",
 		dependencies: [
 			"GatewayAPI",
-			"ProfileClient",
 			"TransactionClient",
 		],
 		tests: .yes()

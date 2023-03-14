@@ -18,18 +18,18 @@ extension TransactionReview.State {
 	var viewState: TransactionReview.ViewState {
 		.init(
 			message: message,
-			networkFee: networkFee,
-			showCustomizeguaranteesButton: true
+			showDepositingHeading: depositing != nil,
+			showCustomizeGuaranteesButton: true
 		)
 	}
 }
 
 // MARK: - TransactionReview.View
 extension TransactionReview {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		let message: String?
-		let networkFee: BigDecimal
-		let showCustomizeguaranteesButton: Bool
+		let showDepositingHeading: Bool
+		let showCustomizeGuaranteesButton: Bool
 	}
 
 	@MainActor
@@ -41,19 +41,142 @@ extension TransactionReview {
 		}
 
 		public var body: some SwiftUI.View {
-			ScrollView(showsIndicators: false) {
-				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					VStack(spacing: .medium2) {
-						if let message = viewStore.message {
-							TransactionHeading("MESSAGE") // TODO:  localize
-							TransactionMessageView(message: message)
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				NavigationStack {
+					ScrollView(showsIndicators: false) {
+						VStack(spacing: 0) {
+							FixedSpacer(height: .medium2)
+
+							if let message = viewStore.message {
+								TransactionHeading("MESSAGE") // TODO:  localize
+									.padding(.bottom, .small2)
+								TransactionMessageView(message: message)
+									.padding(.bottom, .medium2)
+							}
+
+							ActionsView(store: store)
+								.padding(.bottom, .medium1)
+
+							Separator()
+								.padding(.bottom, .medium1)
+
+							let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
+							TransactionReviewNetworkFee.View(store: feeStore)
+
+							Button("Approve", asset: AssetResource.lock) { // TODO:  localize
+								viewStore.send(.approveTapped)
+							}
+							.buttonStyle(.primaryRectangular)
+						}
+						.padding(.horizontal, .medium3)
+					}
+					.background(.app.gray5)
+					.navigationTitle("Review transaction") // TODO:  localize
+					.toolbar {
+						ToolbarItem(placement: .cancellationAction) {
+							CloseButton {
+								viewStore.send(.closeTapped)
+							}
+						}
+						ToolbarItem(placement: .automatic) {
+							Button {
+								viewStore.send(.closeTapped)
+							} label: {
+								Image(asset: AssetResource.code)
+							}
+							.buttonStyle(.secondaryRectangular)
+						}
+					}
+				}
+			}
+			.onAppear {
+				//				decodeActions()
+			}
+		}
+	}
+}
+
+// MARK: - TransactionReview.View.ActionsView
+extension TransactionReview.View {
+	// MARK: - TransactionActionsView
+	struct ActionsView: View {
+		let store: StoreOf<TransactionReview>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
+				IfLetStore(withdrawingStore) { accountsStore in
+					TransactionHeading("WITHDRAWING") // TODO:  localize
+					Card(insetContents: true) {
+						ForEachStore(accountsStore) { accountStore in
+							TransactionReviewAccount.View(store: accountStore)
+						}
+					}
+				}
+				VStack(spacing: .medium2) {
+					let usedDappsStore = store.scope(state: \.usedDapps) { .child(.dapp($0)) }
+					TransactionReviewDappsUsed.View(store: usedDappsStore)
+
+					if viewStore.showDepositingHeading {
+						TransactionHeading("DEPOSITING") // TODO:  localize
+					}
+				}
+				.background(alignment: .trailing) {
+					Rectangle()
+						.fill(.red)
+						.frame(width: 1)
+						.padding(.trailing, SpeechbubbleShape.triangleInset)
+				}
+
+				let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
+				IfLetStore(depositingStore) { accountsStore in
+					Card(insetContents: true) {
+						ForEachStore(accountsStore) { accountStore in
+							TransactionReviewAccount.View(store: accountStore)
 						}
 
-						TransactionActionsView(store: store)
+						if viewStore.showCustomizeGuaranteesButton {
+							Button("Customize guarantees") { // TODO: 
+								viewStore.send(.customizeGuaranteesTapped)
+							}
+							.textStyle(.body1Header)
+							.foregroundColor(.app.blue2)
+							.padding(.vertical, .small3)
+						}
 					}
-					.padding(.horizontal, .medium3)
 				}
-				.background(.app.gray5)
+			}
+
+			//			.overlay(alignment: .trailing) {
+			//				Rectangle()
+			//					.fill(.red)
+			//					.frame(width: 2)
+			//					.padding(.vertical, 10)
+			//					.padding(.trailing, SpeechbubbleShape.triangleInset)
+			//			}
+			//			.border(.purple)
+		}
+	}
+}
+
+// MARK: - TransactionPresentingView
+struct TransactionPresentingView: View {
+	let presenters: IdentifiedArrayOf<TransactionReview.State.Dapp>
+	let tapPresenterAction: (TransactionReview.State.Dapp.ID) -> Void
+
+	var body: some View {
+		Card {
+			List(presenters) { presenter in
+				Button {
+					tapPresenterAction(presenter.id)
+				} label: {
+					HStack(spacing: .small1) {
+						DappPlaceholder(size: .smallest)
+						Text(presenter.name)
+						Spacer(minLength: 0)
+					}
+				}
+				.padding(.horizontal, .large2)
 			}
 		}
 	}
@@ -90,94 +213,22 @@ struct TransactionMessageView: View {
 	}
 }
 
-// MARK: - TransactionActionsView
-struct TransactionActionsView: View {
-	private let store: StoreOf<TransactionReview>
+// MARK: - FixedSpacer
+public struct FixedSpacer: View {
+	let width: CGFloat
+	let height: CGFloat
 
-	public init(store: StoreOf<TransactionReview>) {
-		self.store = store
+	public init(width: CGFloat = 1, height: CGFloat = 1) {
+		self.width = width
+		self.height = height
 	}
 
-	var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-
-			let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
-			IfLetStore(withdrawingStore) { accountsStore in
-				TransactionHeading("WITHDRAWING") // TODO:  localize
-				Card(insetContents: true) {
-					ForEachStore(accountsStore) { accountStore in
-						TransactionReviewAccount.View(store: accountStore)
-					}
-				}
-			}
-
-			let usedDappsStore = store.scope(state: \.usedDapps) { .child(.dapp($0)) }
-			TransactionReviewDappsUsed.View(store: usedDappsStore)
-
-			let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
-			IfLetStore(depositingStore) { accountsStore in
-				TransactionHeading("DEPOSITING") // TODO:  localize
-
-				Card(insetContents: true) {
-					ForEachStore(accountsStore) { accountStore in
-						TransactionReviewAccount.View(store: accountStore)
-					}
-
-					if viewStore.showCustomizeguaranteesButton {
-						Button("Customize guarantees") { // TODO: 
-							viewStore.send(.customizeGuaranteesTapped)
-						}
-						.textStyle(.body1Header)
-						.foregroundColor(.app.blue2)
-						.padding(.vertical, .small3)
-					}
-				}
-			}
-		}
-
-//			.overlay(alignment: .trailing) {
-//				Rectangle()
-//					.fill(.red)
-//					.frame(width: 2)
-//					.padding(.vertical, 10)
-//					.padding(.trailing, SpeechbubbleShape.triangleInset)
-//			}
-//			.border(.purple)
+	public var body: some View {
+		Rectangle()
+			.fill(.clear)
+			.frame(width: width, height: height)
 	}
 }
-
-// MARK: - TransactionPresentingView
-struct TransactionPresentingView: View {
-	let presenters: IdentifiedArrayOf<TransactionReview.State.Dapp>
-	let tapPresenterAction: (TransactionReview.State.Dapp.ID) -> Void
-
-	var body: some View {
-		Card {
-			List(presenters) { presenter in
-				Button {
-					tapPresenterAction(presenter.id)
-				} label: {
-					HStack(spacing: .small1) {
-						DappPlaceholder(size: .smallest)
-						Text(presenter.name)
-						Spacer(minLength: 0)
-					}
-				}
-				.padding(.horizontal, .large2)
-			}
-		}
-	}
-}
-
-// struct TransactionAccountsView: View {
-//	let viewState: IdentifiedArrayOf<TransactionAccountView.ViewState>
-//
-//	let copyAction: (TransactionReview.State.Account.ID) -> Void
-//	let customizeGuaranteesAction: () -> Void
-//
-//	var body: some View {
-//	}
-// }
 
 // #if DEBUG
 // import SwiftUI // NB: necessary for previews to appear
@@ -198,3 +249,35 @@ struct TransactionPresentingView: View {
 //	public static let previewValue = Self()
 // }
 // #endif
+
+extension Label where Title == Text, Icon == Image {
+	public init(_ titleKey: LocalizedStringKey, asset: ImageAsset) {
+		self.init {
+			Text(titleKey)
+		} icon: {
+			Image(asset: asset)
+		}
+	}
+
+	public init<S>(_ title: S, asset: ImageAsset) where S: StringProtocol {
+		self.init {
+			Text(title)
+		} icon: {
+			Image(asset: asset)
+		}
+	}
+}
+
+extension Button where Label == SwiftUI.Label<Text, Image> {
+	public init(_ titleKey: LocalizedStringKey, asset: ImageAsset, action: @escaping () -> Void) {
+		self.init(action: action) {
+			SwiftUI.Label(titleKey, asset: asset)
+		}
+	}
+
+	public init<S>(_ title: S, asset: ImageAsset, action: @escaping () -> Void) where S: StringProtocol {
+		self.init(action: action) {
+			SwiftUI.Label(title, asset: asset)
+		}
+	}
+}
