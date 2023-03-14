@@ -347,6 +347,15 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
+				value: .removeMetadata(.init(
+					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+					key: "name"
+				)),
+				jsonRepresentation: """
+				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"REMOVE_METADATA","key":{"type":"String","value":"name"}}
+				"""
+			),
+			(
 				value: .setPackageRoyaltyConfig(.init(
 					packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8",
 					royaltyConfig: .init(
