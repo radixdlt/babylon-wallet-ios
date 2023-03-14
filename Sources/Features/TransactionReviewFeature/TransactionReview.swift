@@ -5,12 +5,14 @@ import FeaturePrelude
 public struct TransactionReview: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var message: String?
-		public var presenting: IdentifiedArrayOf<Dapp>?
+
 		public var withdrawing: IdentifiedArrayOf<TransactionReviewAccount.State>?
 		public var usedDapps: TransactionReviewDappsUsed.State
 		public var depositing: IdentifiedArrayOf<TransactionReviewAccount.State>?
-		public var networkFee: BigDecimal
-		public var isNetworkCongested: Bool
+
+		public var presenting: IdentifiedArrayOf<Dapp>?
+
+		public var networkFee: TransactionReviewNetworkFee.State
 
 		public struct Dapp: Sendable, Identifiable, Hashable {
 			public let id: AccountAddress.ID
@@ -27,13 +29,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case customizeNetworkFeeTapped
+		case closeTapped
+		case showRawTransactionTapped
+
 		case customizeGuaranteesTapped
+		case approveTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case account(id: AccountAddress.ID, action: TransactionReviewAccount.Action)
 		case dapp(TransactionReviewDappsUsed.Action)
+		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
 	public init() {}
@@ -42,9 +48,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
-		case .customizeNetworkFeeTapped:
+		case .closeTapped:
 			return .none
+		case .showRawTransactionTapped:
+			return .none
+
 		case .customizeGuaranteesTapped:
+			return .none
+
+		case .approveTapped:
 			return .none
 		}
 	}
@@ -52,19 +64,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 extension TransactionReview.State {
 	public static let mock0 = Self(message: "Royalties claim",
-	                               presenting: [.mock1, .mock0],
 	                               withdrawing: [.mockWithdraw0],
 	                               usedDapps: .init(isExpanded: false, dapps: []),
 	                               depositing: [.mockDeposit1],
-	                               networkFee: 0.1,
-	                               isNetworkCongested: false)
+	                               presenting: [.mock1, .mock0],
+	                               networkFee: .init(fee: 0.1, isCongested: false))
 
 	public static let mock1 = Self(message: "Royalties claim",
 	                               withdrawing: [.mockWithdraw0, .mockWithdraw1],
 	                               usedDapps: .init(isExpanded: true, dapps: [.mock3, .mock2]),
 	                               depositing: [.mockDeposit2],
-	                               networkFee: 0.2,
-	                               isNetworkCongested: false)
+	                               networkFee: .init(fee: 0.2, isCongested: true))
 }
 
 extension TransactionReview.State.Dapp {
@@ -105,20 +115,24 @@ extension AccountAddress {
 	public static let mock2 = try! Self(address: "account_tdx_b_1pzq8y440g6nc4vuz0ghu84e84ak088fah9u6ad6j9dlqnuzk59")
 }
 
+extension URL {
+	static let mock = URL(string: "test")!
+}
+
 extension TransactionReviewAccount.State.Details {
-	public static let mock0 = Self(metadata: .init(name: "TSLA", thumbnail: .placeholder),
+	public static let mock0 = Self(metadata: .init(name: "TSLA", thumbnail: .mock),
 	                               transferred: .token(1.0396, guaranteed: 1.0188, dollars: 301.91))
 
-	public static let mock1 = Self(metadata: .init(name: "XRD", thumbnail: .placeholder),
+	public static let mock1 = Self(metadata: .init(name: "XRD", thumbnail: .mock),
 	                               transferred: .token(500, guaranteed: nil, dollars: 301.91))
 
-	public static let mock2 = Self(metadata: .init(name: "PXL", thumbnail: .placeholder),
+	public static let mock2 = Self(metadata: .init(name: "PXL", thumbnail: .mock),
 	                               transferred: .token(5.123, guaranteed: 5.10, dollars: nil))
 
-	public static let mock3 = Self(metadata: .init(name: "PXL", thumbnail: .placeholder),
+	public static let mock3 = Self(metadata: .init(name: "PXL", thumbnail: .mock),
 	                               transferred: .token(5.123, guaranteed: nil, dollars: nil))
 
-	public static let mock4 = Self(metadata: .init(name: "Block 14F5", thumbnail: .placeholder),
+	public static let mock4 = Self(metadata: .init(name: "Block 14F5", thumbnail: .mock),
 	                               transferred: .nft)
 }
 
@@ -338,108 +352,3 @@ private let fullResponse =
 	  }
 	}
 	"""
-
-// MARK: - AddressType
-public protocol AddressType {
-	static var kind: ValueKind { get }
-	static func embed(address: NewAddress<Self>) -> Value_
-}
-
-// MARK: - ResourceAddressType
-public enum ResourceAddressType: AddressType {
-	public static let kind: ValueKind = .resourceAddress
-
-	public static func embed(address: NewAddress<Self>) -> Value_ {
-		.resourceAddress(.init(address: address.address))
-	}
-}
-
-// MARK: - ComponentAddressType
-public enum ComponentAddressType: AddressType {
-	public static let kind: ValueKind = .componentAddress
-
-	public static func embed(address: NewAddress<Self>) -> Value_ {
-		.componentAddress(.init(address: address.address))
-	}
-}
-
-// MARK: - PackageAddressType
-public enum PackageAddressType: AddressType {
-	public static let kind: ValueKind = .packageAddress
-
-	public static func embed(address: NewAddress<Self>) -> Value_ {
-		.packageAddress(.init(address: address.address))
-	}
-}
-
-// MARK: - NewAddress
-public struct NewAddress<T: AddressType>: Sendable, Codable, Hashable {
-	public let address: String
-
-	public init(address: String) {
-		// TODO: Perform some simple Bech32m validation.
-		self.address = address
-	}
-}
-
-// MARK: ValueProtocol
-extension NewAddress: ValueProtocol {
-	public static var kind: ValueKind { T.kind }
-
-	public func embedValue() -> Value_ {
-		T.embed(address: self)
-	}
-}
-
-// MARK: - AnyAddress
-public struct AnyAddress: Sendable, Codable, Hashable {
-	public let address: String
-	public let kind: ValueKind
-
-	init<T: AddressType>(_ address: NewAddress<T>) {
-		self.address = address.address
-		self.kind = T.kind
-	}
-
-	public var resourceAddress: NewAddress<ResourceAddressType>? {
-		guard kind == .resourceAddress else { return nil }
-		return .init(address: address)
-	}
-
-	public var componentAddress: NewAddress<ComponentAddressType>? {
-		guard kind == .componentAddress else { return nil }
-		return .init(address: address)
-	}
-
-	public var packageAddress: NewAddress<PackageAddressType>? {
-		guard kind == .packageAddress else { return nil }
-		return .init(address: address)
-	}
-}
-
-extension NewAddress {
-	// MARK: CodingKeys
-	private enum CodingKeys: String, CodingKey {
-		case address, type
-	}
-
-	// MARK: Codable
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Self.kind, forKey: .type)
-		try container.encode(String(address), forKey: .address)
-	}
-
-	public init(from decoder: Decoder) throws {
-		// Checking for type discriminator
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind = try container.decode(ValueKind.self, forKey: .type)
-
-		if kind != Self.kind {
-			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expectedAnyOf: [Self.kind], butGot: kind)
-		}
-
-		// Decoding `address`
-		try self.init(address: container.decode(String.self, forKey: .address))
-	}
-}
