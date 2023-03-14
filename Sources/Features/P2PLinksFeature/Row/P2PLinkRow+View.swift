@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-// MARK: - ManageP2PLink.View
+// MARK: - P2PLink.View
 extension P2PLinkRow {
 	public struct ViewState: Equatable {
 		public let connectionName: String

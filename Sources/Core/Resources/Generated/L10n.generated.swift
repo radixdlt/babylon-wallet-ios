@@ -10,6 +10,22 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
+  public enum P2PLinks {
+    /// Connector ID: %@
+    public static func connectionID(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "P2PLinks.connectionID", String(describing: p1), fallback: "Connector ID: %@")
+    }
+    /// Link New Connector
+    public static let newConnectionButtonTitle = L10n.tr("Localizable", "P2PLinks.newConnectionButtonTitle", fallback: "Link New Connector")
+    /// Link New Connector
+    public static let newConnectionTitle = L10n.tr("Localizable", "P2PLinks.newConnectionTitle", fallback: "Link New Connector")
+    /// Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.
+    public static let p2PConnectionsSubtitle = L10n.tr("Localizable", "P2PLinks.P2PConnectionsSubtitle", fallback: "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.")
+    /// Linked Connector
+    public static let p2PConnectionsTitle = L10n.tr("Localizable", "P2PLinks.P2PConnectionsTitle", fallback: "Linked Connector")
+    /// Send Test Msg
+    public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "P2PLinks.sendTestMessageButtonTitle", fallback: "Send Test Msg")
+  }
   public enum AccountDetails {
     /// Transfer
     public static let transferButtonTitle = L10n.tr("Localizable", "accountDetails.transferButtonTitle", fallback: "Transfer")
@@ -415,22 +431,6 @@ public enum L10n {
     public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Network Gateway")
     /// https://example.com:8080
     public static let urlString = L10n.tr("Localizable", "manageGateway.urlString", fallback: "https://example.com:8080")
-  }
-  public enum ManageP2PLinks {
-    /// Connector ID: %@
-    public static func connectionID(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "manageP2PLinks.connectionID", String(describing: p1), fallback: "Connector ID: %@")
-    }
-    /// Link New Connector
-    public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PLinks.newConnectionButtonTitle", fallback: "Link New Connector")
-    /// Link New Connector
-    public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PLinks.newConnectionTitle", fallback: "Link New Connector")
-    /// Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.
-    public static let p2PConnectionsSubtitle = L10n.tr("Localizable", "manageP2PLinks.P2PConnectionsSubtitle", fallback: "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.")
-    /// Linked Connector
-    public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PLinks.P2PConnectionsTitle", fallback: "Linked Connector")
-    /// Send Test Msg
-    public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PLinks.sendTestMessageButtonTitle", fallback: "Send Test Msg")
   }
   public enum NewConnection {
     /// Linking...

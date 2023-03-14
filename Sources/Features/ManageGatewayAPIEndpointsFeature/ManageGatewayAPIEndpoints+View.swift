@@ -62,7 +62,7 @@ extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
 	private func core(viewStore: ViewStoreOf<ManageGatewayAPIEndpoints>) -> some View {
 		ScrollView {
-			Text(L10n.ManageP2PLinks.p2PConnectionsSubtitle)
+			Text(L10n.P2PLinks.p2PConnectionsSubtitle)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body1HighImportance)
 				.flushedLeft

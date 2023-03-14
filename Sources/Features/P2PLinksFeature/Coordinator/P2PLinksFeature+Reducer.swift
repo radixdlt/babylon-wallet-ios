@@ -2,7 +2,7 @@ import FeaturePrelude
 import NewConnectionFeature
 import RadixConnectClient
 
-// MARK: - ManageP2PLinks
+// MARK: - P2PLinks
 public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var links: IdentifiedArrayOf<P2PLinkRow.State>

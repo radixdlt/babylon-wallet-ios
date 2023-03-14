@@ -2,7 +2,7 @@ import FeaturePrelude
 import NewConnectionFeature
 import RadixConnectClient
 
-// MARK: - ManageP2PLinks.View
+// MARK: - P2PLinks.View
 extension P2PLinksFeature {
 	public struct ViewState: Equatable {
 		public let linkRows: IdentifiedArrayOf<P2PLinkRow.State>
@@ -27,7 +27,7 @@ extension P2PLinksFeature {
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
-					Text(L10n.ManageP2PLinks.p2PConnectionsSubtitle)
+					Text(L10n.P2PLinks.p2PConnectionsSubtitle)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body1HighImportance)
 						.flushedLeft
@@ -50,7 +50,7 @@ extension P2PLinksFeature {
 							}
 						)
 					}
-					Button(L10n.ManageP2PLinks.newConnectionButtonTitle) {
+					Button(L10n.P2PLinks.newConnectionButtonTitle) {
 						viewStore.send(.addNewConnectionButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular(
@@ -60,7 +60,7 @@ extension P2PLinksFeature {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
-				.navigationTitle(L10n.ManageP2PLinks.p2PConnectionsTitle)
+				.navigationTitle(L10n.P2PLinks.p2PConnectionsTitle)
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
