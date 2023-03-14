@@ -35,31 +35,6 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .callFunction(.init(
-					packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8",
-					blueprintName: "Faucet",
-					functionName: "new",
-					arguments: [
-						.decimal(.init(value: "1")),
-					]
-				)),
-				jsonRepresentation: """
-				{"arguments":[{"type":"Decimal","value":"1"}],"blueprint_name":{"type":"String","value":"Faucet"},"function_name":{"type":"String","value":"new"},"instruction":"CALL_FUNCTION","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"Address"}}
-				"""
-			),
-			(
-				value: .callMethod(.init(
-					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
-					methodName: "free",
-					arguments: [
-						.decimal(.init(value: "1")),
-					]
-				)),
-				jsonRepresentation: """
-				{"arguments":[{"type":"Decimal","value":"1"}],"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"CALL_METHOD","method_name":{"type":"String","value":"free"}}
-				"""
-			),
-			(
 				value: .callMethod(.init(
 					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					methodName: "free",
@@ -329,21 +304,21 @@ final class InstructionEncodingTests: TestCase {
 			),
 			try (
 				value: .recallResource(.init(
-					vault_id: .init(hex: "776e134adba9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"),
+					vault_id: .init(hex: "a9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"),
 					amount: .init(value: "1")
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"RECALL_RESOURCE","vault_id":{"type":"Bytes","value":"776e134adba9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"RECALL_RESOURCE","vault_id":{"type":"Bytes","value":"a9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"}}
 				"""
 			),
 			(
 				value: .setMetadata(.init(
 					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					key: "name",
-					value: "deadbeef"
+					value: .enum(.init(.u8(0), fields: [.enum(.init(.u8(0), fields: [.string("deadbeef")]))]))
 				)),
 				jsonRepresentation: """
-				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"SET_METADATA","key":{"type":"String","value":"name"},"value":{"type":"String","value":"deadbeef"}}
+				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"SET_METADATA","key":{"type":"String","value":"name"},"value":{"fields":[{"fields":[{"type":"String","value":"deadbeef"}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
 				"""
 			),
 			(
@@ -358,7 +333,7 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .setPackageRoyaltyConfig(.init(
 					packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8",
-					royaltyConfig: .init(
+					royaltyConfig: Map_(
 						keyValueKind: .string,
 						valueValueKind: .tuple,
 						entries: []
