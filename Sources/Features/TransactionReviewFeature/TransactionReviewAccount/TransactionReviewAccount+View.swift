@@ -21,7 +21,7 @@ extension TransactionReviewAccount.State {
 
 // MARK: - TransactionReviewAccount.View
 extension TransactionReviewAccount {
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		let label: String
 		let address: String
 		let gradient: Gradient
@@ -42,7 +42,8 @@ extension TransactionReviewAccount {
 				InnerCard {
 					AccountLabel(viewStore.label,
 					             address: viewStore.address,
-					             gradient: viewStore.gradient) {
+					             gradient: viewStore.gradient)
+					{
 						viewStore.send(.copyAddress)
 					}
 
