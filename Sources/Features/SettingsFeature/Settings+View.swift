@@ -50,7 +50,7 @@ extension AppSettings.View {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							BackButton {
-								viewStore.send(.closeButtonTapped)
+								viewStore.send(.backButtonTapped)
 							}
 							.foregroundColor(Color.black)
 						}

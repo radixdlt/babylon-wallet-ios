@@ -34,6 +34,9 @@ extension Main {
 			.presentsDappInteractions(
 				onPresent: { [store = store.stateless] in
 					ViewStore(store).send(.view(.dappInteractionPresented))
+				},
+				canPresentInteraction: { [store = store.actionless] in
+					ViewStore(store).canShowDappRequest
 				}
 			)
 		}
