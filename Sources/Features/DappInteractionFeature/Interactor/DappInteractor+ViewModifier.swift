@@ -2,16 +2,12 @@ import FeaturePrelude
 
 extension View {
 	public func presentsDappInteractions(
-		onPresent: (@Sendable () -> Void)? = nil,
-		onDismiss: (@Sendable () -> Void)? = nil,
 		canPresentInteraction: @Sendable @escaping () -> Bool = { true }
 	) -> some View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
 				reducer: DappInteractor(
-					onPresent: onPresent,
-					onDismiss: onDismiss,
 					canShowInteraction: canPresentInteraction
 				)
 			)

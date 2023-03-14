@@ -64,8 +64,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	var onPresent: (@Sendable () -> Void)? = nil
-	var onDismiss: (@Sendable () -> Void)? = nil
 	var canShowInteraction: @Sendable () -> Bool = { true }
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
@@ -155,7 +153,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return delayedEffect(for: .internal(.checkCanShowDappInteraction))
 			}
 		case let .receivedRequestFromDapp(request):
-			onPresent?()
 			state.requestQueue.append(request)
 			return .send(.internal(.checkCanShowDappInteraction))
 
@@ -271,7 +268,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func dismissCurrentModalAndRequest(_ request: P2P.RTCIncomingWalletInteraction, for state: inout State) {
 		state.requestQueue.remove(request)
 		state.currentModal = nil
-		onDismiss?()
 	}
 
 	func delayedEffect(
