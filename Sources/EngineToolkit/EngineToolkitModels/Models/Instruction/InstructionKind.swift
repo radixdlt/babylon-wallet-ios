@@ -35,6 +35,7 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case recallResource = "RECALL_RESOURCE"
 
 	case setMetadata = "SET_METADATA"
+	case removeMetadata = "REMOVE_METADATA"
 
 	case setPackageRoyaltyConfig = "SET_PACKAGE_ROYALTY_CONFIG"
 	case setComponentRoyaltyConfig = "SET_COMPONENT_ROYALTY_CONFIG"
