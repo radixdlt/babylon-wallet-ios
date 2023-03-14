@@ -112,7 +112,7 @@ extension GatewaySettings {
 			HStack {
 				whatIsAGatewayButton(with: viewStore)
 				#if os(iOS)
-					.customPopover(
+					.floatingPopover(
 						isPresented: viewStore.binding(
 							get: \.isPopoverPresented,
 							send: { .popoverStateChanged($0) }

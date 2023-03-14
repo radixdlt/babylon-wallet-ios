@@ -1,18 +1,18 @@
 #if canImport(UIKit)
 import SwiftUI
 
-// MARK: - CustomPopover
-struct CustomPopover<Content: View> {
+// MARK: - FloatingPopover
+struct FloatingPopover<Content: View> {
 	@Binding var isPresented: Bool
 	let onDismiss: (() -> Void)?
 	@ViewBuilder let content: () -> Content
 
 	class Coordinator: NSObject, UIPopoverPresentationControllerDelegate {
 		let host: UIHostingController<Content>
-		private let parent: CustomPopover
+		private let parent: FloatingPopover
 
 		init(
-			parent: CustomPopover,
+			parent: FloatingPopover,
 			content: Content
 		) {
 			self.parent = parent
@@ -33,7 +33,7 @@ struct CustomPopover<Content: View> {
 }
 
 // MARK: UIViewControllerRepresentable
-extension CustomPopover: UIViewControllerRepresentable {
+extension FloatingPopover: UIViewControllerRepresentable {
 	typealias UIViewControllerType = UIViewController
 
 	func makeUIViewController(context: Context) -> UIViewController {
@@ -63,15 +63,15 @@ extension CustomPopover: UIViewControllerRepresentable {
 	}
 }
 
-// MARK: - CustomPopoverViewModifier
-struct CustomPopoverViewModifier<PopoverContent>: ViewModifier where PopoverContent: View {
+// MARK: - FloatingPopoverViewModifier
+struct FloatingPopoverViewModifier<PopoverContent>: ViewModifier where PopoverContent: View {
 	@Binding var isPresented: Bool
 	let onDismiss: (() -> Void)?
 	let content: () -> PopoverContent
 
 	func body(content: Content) -> some View {
 		content.background(
-			CustomPopover(
+			FloatingPopover(
 				isPresented: self.$isPresented,
 				onDismiss: self.onDismiss,
 				content: self.content
@@ -82,13 +82,13 @@ struct CustomPopoverViewModifier<PopoverContent>: ViewModifier where PopoverCont
 
 // MARK: - ViewModifier
 extension View {
-	public func customPopover<Content>(
+	public func floatingPopover<Content>(
 		isPresented: Binding<Bool>,
 		onDismiss: (() -> Void)? = nil,
 		content: @escaping () -> Content
 	) -> some View where Content: View {
 		modifier(
-			CustomPopoverViewModifier(
+			FloatingPopoverViewModifier(
 				isPresented: isPresented,
 				onDismiss: onDismiss,
 				content: content
