@@ -2,7 +2,7 @@ import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
-import ManageP2PLinksFeature
+import P2PLinksFeature
 import PersonasFeature
 #if DEBUG
 import InspectProfileFeature
@@ -138,7 +138,7 @@ extension View {
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.manageP2PLinks,
 			action: AppSettings.Destinations.Action.manageP2PLinks,
-			destination: { ManageP2PLinks.View(store: $0) }
+			destination: { P2PLinksFeature.View(store: $0) }
 		)
 	}
 

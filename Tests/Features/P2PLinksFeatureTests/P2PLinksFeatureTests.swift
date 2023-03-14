@@ -1,8 +1,8 @@
 import FeatureTestingPrelude
-@testable import ManageP2PLinksFeature
+@testable import P2PLinksFeature
 
 // MARK: - ManageP2PLinksFeatureTests
-final class ManageP2PLinksFeatureTests: TestCase {
+final class P2PLinksFeatureTests: TestCase {
 	func testTrivial() {
 		XCTAssert(true)
 	}

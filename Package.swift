@@ -154,7 +154,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ManageP2PLinksFeature",
+		name: "P2PLinksFeature",
 		dependencies: [
 			"NewConnectionFeature",
 			"RadixConnectClient",
@@ -207,7 +207,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
-			"ManageP2PLinksFeature",
+			"P2PLinksFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"MnemonicClient",
 			"PersonasFeature",

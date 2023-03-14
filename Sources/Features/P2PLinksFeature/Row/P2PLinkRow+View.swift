@@ -1,20 +1,20 @@
 import FeaturePrelude
 
 // MARK: - ManageP2PLink.View
-extension ManageP2PLink {
+extension P2PLinkRow {
 	public struct ViewState: Equatable {
 		public let connectionName: String
 
-		init(state: ManageP2PLink.State) {
-			connectionName = state.client.displayName
+		init(state: P2PLinkRow.State) {
+			connectionName = state.link.displayName
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ManageP2PLink>
+		private let store: StoreOf<P2PLinkRow>
 
-		public init(store: StoreOf<ManageP2PLink>) {
+		public init(store: StoreOf<P2PLinkRow>) {
 			self.store = store
 		}
 
@@ -53,14 +53,14 @@ extension ManageP2PLink {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-struct ManageP2PLink_Preview: PreviewProvider {
+struct P2PLinkRow_Preview: PreviewProvider {
 	static var previews: some View {
-		ManageP2PLink.View(
+		P2PLinkRow.View(
 			store: .init(
-				initialState: .init(client:
+				initialState: .init(link:
 					.init(connectionPassword: .placeholder, displayName: "Test")
 				),
-				reducer: ManageP2PLink()
+				reducer: P2PLinkRow()
 			)
 		)
 	}

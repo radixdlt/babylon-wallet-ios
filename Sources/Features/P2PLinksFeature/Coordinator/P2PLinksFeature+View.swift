@@ -3,20 +3,20 @@ import NewConnectionFeature
 import RadixConnectClient
 
 // MARK: - ManageP2PLinks.View
-extension ManageP2PLinks {
+extension P2PLinksFeature {
 	public struct ViewState: Equatable {
-		public let clients: IdentifiedArrayOf<ManageP2PLink.State>
+		public let linkRows: IdentifiedArrayOf<P2PLinkRow.State>
 
-		init(state: ManageP2PLinks.State) {
-			clients = state.links
+		init(state: P2PLinksFeature.State) {
+			linkRows = state.links
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ManageP2PLinks>
+		private let store: StoreOf<P2PLinksFeature>
 
-		public init(store: StoreOf<ManageP2PLinks>) {
+		public init(store: StoreOf<P2PLinksFeature>) {
 			self.store = store
 		}
 
@@ -43,7 +43,7 @@ extension ManageP2PLinks {
 								action: { .child(.connection(id: $0, action: $1)) }
 							),
 							content: {
-								ManageP2PLink.View(store: $0)
+								P2PLinkRow.View(store: $0)
 									.padding(.medium3)
 
 								Separator()
@@ -66,8 +66,8 @@ extension ManageP2PLinks {
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageP2PLinks.Destinations.State.newConnection,
-					action: ManageP2PLinks.Destinations.Action.newConnection,
+					state: /P2PLinksFeature.Destinations.State.newConnection,
+					action: P2PLinksFeature.Destinations.Action.newConnection,
 					content: { NewConnection.View(store: $0) }
 				)
 			}
@@ -78,13 +78,13 @@ extension ManageP2PLinks {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-struct ManageP2PLinks_Preview: PreviewProvider {
+struct P2PLinksFeature_Preview: PreviewProvider {
 	static var previews: some View {
 		NavigationStack {
-			ManageP2PLinks.View(
+			P2PLinksFeature.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: ManageP2PLinks()
+					reducer: P2PLinksFeature()
 				)
 			)
 			#if os(iOS)
@@ -94,7 +94,7 @@ struct ManageP2PLinks_Preview: PreviewProvider {
 	}
 }
 
-extension ManageP2PLinks.State {
+extension P2PLinksFeature.State {
 	public static let previewValue: Self = .init()
 }
 #endif

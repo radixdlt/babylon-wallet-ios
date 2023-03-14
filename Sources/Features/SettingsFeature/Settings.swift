@@ -3,7 +3,7 @@ import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
-import ManageP2PLinksFeature
+import P2PLinksFeature
 import PersonasFeature
 
 // MARK: - AppSettings
@@ -72,7 +72,7 @@ public struct AppSettings: FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case manageFactorSources(ManageFactorSources.State)
-			case manageP2PLinks(ManageP2PLinks.State)
+			case manageP2PLinks(P2PLinksFeature.State)
 			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.State)
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
@@ -80,7 +80,7 @@ public struct AppSettings: FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case manageFactorSources(ManageFactorSources.Action)
-			case manageP2PLinks(ManageP2PLinks.Action)
+			case manageP2PLinks(P2PLinksFeature.Action)
 			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
@@ -91,7 +91,7 @@ public struct AppSettings: FeatureReducer {
 				ManageFactorSources()
 			}
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
-				ManageP2PLinks()
+				P2PLinksFeature()
 			}
 			Scope(state: /State.manageGatewayAPIEndpoints, action: /Action.manageGatewayAPIEndpoints) {
 				ManageGatewayAPIEndpoints()

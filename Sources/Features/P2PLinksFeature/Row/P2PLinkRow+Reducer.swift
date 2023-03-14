@@ -2,16 +2,16 @@ import FeaturePrelude
 import RadixConnectClient
 
 // MARK: - ManageP2PLink
-public struct ManageP2PLink: Sendable, FeatureReducer {
+public struct P2PLinkRow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = ConnectionPassword
-		public var id: ID { client.connectionPassword }
-		public let client: P2PLink
+		public var id: ID { link.connectionPassword }
+		public let link: P2PLink
 
 		public init(
-			client: P2PLink
+			link: P2PLink
 		) {
-			self.client = client
+			self.link = link
 		}
 	}
 

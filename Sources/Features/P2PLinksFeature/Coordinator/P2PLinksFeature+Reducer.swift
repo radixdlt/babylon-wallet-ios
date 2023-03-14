@@ -3,15 +3,15 @@ import NewConnectionFeature
 import RadixConnectClient
 
 // MARK: - ManageP2PLinks
-public struct ManageP2PLinks: Sendable, FeatureReducer {
+public struct P2PLinksFeature: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var links: IdentifiedArrayOf<ManageP2PLink.State>
+		public var links: IdentifiedArrayOf<P2PLinkRow.State>
 
 		@PresentationState
 		public var destination: Destinations.State?
 
 		public init(
-			links: IdentifiedArrayOf<ManageP2PLink.State> = .init(),
+			links: IdentifiedArrayOf<P2PLinkRow.State> = .init(),
 			destination: Destinations.State? = nil
 		) {
 			self.links = links
@@ -34,7 +34,7 @@ public struct ManageP2PLinks: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 		case connection(
 			id: ConnectionPassword,
-			action: ManageP2PLink.Action
+			action: P2PLinkRow.Action
 		)
 	}
 
@@ -62,7 +62,7 @@ public struct ManageP2PLinks: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.links, action: /Action.child .. ChildAction.connection) {
-				ManageP2PLink()
+				P2PLinkRow()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -88,9 +88,9 @@ public struct ManageP2PLinks: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadLinksResult(.success(clientsFromProfile)):
+		case let .loadLinksResult(.success(linksFromProfile)):
 			state.links = .init(
-				uniqueElements: clientsFromProfile.map { ManageP2PLink.State(client: $0) }
+				uniqueElements: linksFromProfile.map { P2PLinkRow.State(link: $0) }
 			)
 			return .none
 
@@ -104,7 +104,7 @@ public struct ManageP2PLinks: Sendable, FeatureReducer {
 
 		case let .saveNewConnectionResult(.success(newConnection)):
 			state.links.append(
-				ManageP2PLink.State(client: newConnection)
+				P2PLinkRow.State(link: newConnection)
 			)
 			return .none
 
