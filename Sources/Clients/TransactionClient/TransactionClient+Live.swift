@@ -45,9 +45,10 @@ extension TransactionClient {
 			// Enables us to only read from keychain once per mnemonic
 			let cachedPrivateHDFactorSources = ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>>([])
 
-			@Sendable func sign(
+			@Sendable func doSign(
 				data: any DataProtocol,
-				with account: OnNetwork.Account
+				with account: OnNetwork.Account,
+				purpose: String
 			) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
 				case let .unsecured(unsecuredControl):
@@ -78,6 +79,7 @@ extension TransactionClient {
 					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
 					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
 					let unhashedData = Data(data)
+					print("🔮 purpose=\(purpose), account: \(account.displayName), is signign data, using curve: \(curve), derivationpath: \(factorInstance.derivationPath!), from factor source id: \(privateHDFactorSource.factorSource.id), factor source hint: \(privateHDFactorSource.factorSource.hint)")
 					let sigRes: SignatureWithPublicKey = try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,
 						derivationPath: factorInstance.derivationPath!,
@@ -88,11 +90,16 @@ extension TransactionClient {
 					case let .ecdsaSecp256k1(ecdsaSig):
 						switch sigRes.publicKey {
 						case let .ecdsaSecp256k1(pubkey):
-							let isValid = (try? pubkey.isValid(signature: ecdsaSig, unhashed: unhashedData)) ?? false
-							if isValid {
-								print("✅ nice!")
-							} else {
-								fatalError("❌ bad! not valid")
+							do {
+								let isValid = try pubkey.isValid(signature: ecdsaSig, unhashed:
+									unhashedData)
+								if isValid {
+									print("✅ purpose=\(purpose), Very nice! Signature is valid!")
+								} else {
+									try! print("❌ purpose=\(purpose), bad! invalid secp256k1 sig\nPubKey: \(pubkey.rawRepresentation(format: .uncompressed).hex)\nsignature(radixformat):\(ecdsaSig.radixSerialize().hex)\nsignature(raw):\(ecdsaSig.rawRepresentation.hex)\nunhashedData:\(unhashedData.hex)"); break
+								}
+							} catch {
+								print("❌ purpose=\(purpose), failed to validate secp256k1, \(String(describing: error))"); break
 							}
 						case .eddsaEd25519:
 							fatalError("bad")
@@ -104,9 +111,9 @@ extension TransactionClient {
 						case let .eddsaEd25519(pubKey):
 							let isValid = pubKey.isValidSignature(sigCurve25518, for: unhashedData)
 							if isValid {
-								print("✅ nice!")
+								print("✅ purpose=\(purpose), Very nice! Signature is valid")
 							} else {
-								fatalError("❌ bad! not valid")
+								print("❌ purpose=\(purpose), bad! invalid ed25519"); break
 							}
 						}
 					}
@@ -117,7 +124,7 @@ extension TransactionClient {
 			let intentSignatures_: [SignatureWithPublicKey]
 			do {
 				intentSignatures_ = try await notaryAndSigners.accountsNeededToSign.asyncMap {
-					try await sign(data: compiledTransactionIntent.compiledIntent, with: $0)
+					try await doSign(data: compiledTransactionIntent.compiledIntent, with: $0, purpose: "signers of intent")
 				}
 			} catch {
 				return .failure(.failedToSignIntentWithAccountSigners)
@@ -143,7 +150,7 @@ extension TransactionClient {
 
 			let notarySignatureWithPublicKey: SignatureWithPublicKey
 			do {
-				notarySignatureWithPublicKey = try await sign(data: compiledSignedIntent.compiledIntent, with: notaryAndSigners.notarySigner)
+				notarySignatureWithPublicKey = try await doSign(data: compiledSignedIntent.compiledIntent, with: notaryAndSigners.notarySigner, purpose: "notary")
 			} catch {
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}

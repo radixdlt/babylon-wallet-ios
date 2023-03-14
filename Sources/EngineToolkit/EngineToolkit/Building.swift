@@ -74,7 +74,7 @@ extension TransactionIntent {
 		let compiledTransactionIntent = compiledTransactionIntentResponse.compiledIntent
 
 		let intentSignaturesWithHash = try privateKeys.map {
-			try $0.signReturningHashOfMessage(data: compiledTransactionIntent)
+			try $0.signReturningHashOfMessage(unhashed: compiledTransactionIntent)
 		}
 		let transactionIntentHash = intentSignaturesWithHash.first?.hashOfMessage ?? Data(SHA256.twice(data: compiledTransactionIntent))
 		assert(intentSignaturesWithHash.map(\.hashOfMessage).allSatisfy { $0 == transactionIntentHash })
@@ -111,7 +111,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 			request: self.signedTransactionIntent
 		).get().compiledIntent
 
-		let (signature, _) = try privateKey.signReturningHashOfMessage(data: compiledSignedTransactionIntent)
+		let (signature, _) = try privateKey.signReturningHashOfMessage(unhashed: compiledSignedTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
 			intent: transactionIntent,
@@ -145,7 +145,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 
 		// Notarize the signed intent to create a notarized transaction
 		let (notarySignature, notarizedTransactionHash) = try notaryPrivateKey.signReturningHashOfMessage(
-			data: compiledSignedTransactionIntent
+			unhashed: compiledSignedTransactionIntent
 		)
 
 		let notarizedTransaction = NotarizedTransaction(
