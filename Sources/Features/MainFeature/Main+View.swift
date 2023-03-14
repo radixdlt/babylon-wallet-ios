@@ -22,6 +22,9 @@ extension Main {
 					)
 				)
 				#if os(iOS)
+				.navigationBarBackButtonFont(.app.backButton)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
+				.navigationBarTitleColor(.app.gray1)
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /Main.Destinations.State.settings,
@@ -30,6 +33,7 @@ extension Main {
 				)
 				#endif
 			}
+			.tint(.app.gray1)
 			.presentsDappInteractions(
 				canPresentInteraction: { [store = store.actionless] in
 					ViewStore(store).canPresentDappInteraction

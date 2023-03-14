@@ -44,21 +44,9 @@ extension AppSettings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			settingsView(viewStore: viewStore)
+				.navigationTitle(L10n.Settings.title)
 			#if os(iOS)
-				.navigationBarBackButtonHidden()
-				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						BackButton {
-							viewStore.send(.backButtonTapped)
-						}
-						.foregroundColor(Color.black)
-					}
-					ToolbarItem(placement: .principal) {
-						Text("Settings")
-							.textStyle(.secondaryHeader)
-							.foregroundColor(Color.black)
-					}
-				}
+				.navigationBarTitleDisplayMode(.inline)
 			#endif
 				.navigationDestinations(with: store, viewStore)
 				.tint(.app.gray1)
