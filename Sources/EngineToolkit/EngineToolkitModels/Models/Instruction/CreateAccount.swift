@@ -44,8 +44,8 @@ extension CreateAccount {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let withdrawRule = try container.decode(Enum.self, forKey: .withdrawRule)
-
-		self.init(withdrawRule: withdrawRule)
+		try self.init(
+			withdrawRule: container.decode(Enum.self, forKey: .withdrawRule)
+		)
 	}
 }

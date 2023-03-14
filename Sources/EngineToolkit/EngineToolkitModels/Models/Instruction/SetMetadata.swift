@@ -10,13 +10,13 @@ public struct SetMetadata: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let entityAddress: Address
+	public let entityAddress: Address_ // TODO:  What should this actually be?
 	public let key: String
 	public let value: String
 
 	// MARK: Init
 
-	public init(entityAddress: Address, key: String, value: String) {
+	public init(entityAddress: Address_, key: String, value: String) {
 		self.entityAddress = entityAddress
 		self.key = key
 		self.value = value
@@ -52,10 +52,10 @@ extension SetMetadata {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let entityAddress = try container.decode(Address.self, forKey: .entityAddress)
-		let key = try container.decode(String.ProxyDecodable.self, forKey: .key).decoded
-		let value = try container.decode(String.ProxyDecodable.self, forKey: .value).decoded
-
-		self.init(entityAddress: entityAddress, key: key, value: value)
+		try self.init(
+			entityAddress: container.decode(Address_.self, forKey: .entityAddress),
+			key: container.decode(String.ProxyDecodable.self, forKey: .key).decoded,
+			value: container.decode(String.ProxyDecodable.self, forKey: .value).decoded
+		)
 	}
 }

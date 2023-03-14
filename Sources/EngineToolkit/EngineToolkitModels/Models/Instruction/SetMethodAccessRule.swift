@@ -10,13 +10,13 @@ public struct SetMethodAccessRule: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let entityAddress: Address
+	public let entityAddress: Address_ // TODO:  What should this actually be?
 	public let key: Tuple
 	public let rule: Enum
 
 	// MARK: Init
 
-	public init(entityAddress: Address, key: Tuple, rule: Enum) {
+	public init(entityAddress: Address_, key: Tuple, rule: Enum) {
 		self.entityAddress = entityAddress
 		self.key = key
 		self.rule = rule
@@ -52,10 +52,10 @@ extension SetMethodAccessRule {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let entityAddress = try container.decode(Address.self, forKey: .entityAddress)
-		let key = try container.decode(Tuple.self, forKey: .key)
-		let rule = try container.decode(Enum.self, forKey: .rule)
-
-		self.init(entityAddress: entityAddress, key: key, rule: rule)
+		try self.init(
+			entityAddress: container.decode(Address_.self, forKey: .entityAddress),
+			key: container.decode(Tuple.self, forKey: .key),
+			rule: container.decode(Enum.self, forKey: .rule)
+		)
 	}
 }

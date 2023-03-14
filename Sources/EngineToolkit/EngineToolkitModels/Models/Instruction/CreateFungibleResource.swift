@@ -56,14 +56,10 @@ extension CreateFungibleResource {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let divisibility = try container.decode(UInt8.ProxyDecodable.self, forKey: .divisibility).decoded
-		let metadata = try container.decode(Map_.self, forKey: .metadata)
-		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-
-		self.init(
-			divisibility: divisibility,
-			metadata: metadata,
-			accessRules: accessRules
+		try self.init(
+			divisibility: container.decode(UInt8.ProxyDecodable.self, forKey: .divisibility).decoded,
+			metadata: container.decode(Map_.self, forKey: .metadata),
+			accessRules: container.decode(Map_.self, forKey: .accessRules)
 		)
 	}
 }
