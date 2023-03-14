@@ -56,14 +56,10 @@ extension CreateNonFungibleResource {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let idType = try container.decode(Enum.self, forKey: .idType)
-		let metadata = try container.decode(Map_.self, forKey: .metadata)
-		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-
-		self.init(
-			idType: idType,
-			metadata: metadata,
-			accessRules: accessRules
+		try self.init(
+			idType: container.decode(Enum.self, forKey: .idType),
+			metadata: container.decode(Map_.self, forKey: .metadata),
+			accessRules: container.decode(Map_.self, forKey: .accessRules)
 		)
 	}
 }

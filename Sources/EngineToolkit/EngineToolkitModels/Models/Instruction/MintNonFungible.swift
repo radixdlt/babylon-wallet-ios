@@ -10,7 +10,7 @@ public struct MintNonFungible: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 	public let entries: ManifestASTValue
 
 	// MARK: Init
@@ -19,7 +19,7 @@ public struct MintNonFungible: InstructionProtocol {
 		resourceAddress: ResourceAddress,
 		entries: ManifestASTValue
 	) {
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 		self.entries = entries
 	}
 }
@@ -52,7 +52,7 @@ extension MintNonFungible {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
 			entries: container.decode(ManifestASTValue.self, forKey: .entries)
 		)
 	}

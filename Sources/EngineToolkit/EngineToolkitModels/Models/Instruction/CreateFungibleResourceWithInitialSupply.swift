@@ -61,16 +61,11 @@ extension CreateFungibleResourceWithInitialSupply {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let divisibility = try container.decode(UInt8.ProxyDecodable.self, forKey: .divisibility).decoded
-		let metadata = try container.decode(Map_.self, forKey: .metadata)
-		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-		let initialSupply = try container.decode(ManifestASTValue.self, forKey: .initialSupply)
-
-		self.init(
-			divisibility: divisibility,
-			metadata: metadata,
-			accessRules: accessRules,
-			initialSupply: initialSupply
+		try self.init(
+			divisibility: container.decode(UInt8.ProxyDecodable.self, forKey: .divisibility).decoded,
+			metadata: container.decode(Map_.self, forKey: .metadata),
+			accessRules: container.decode(Map_.self, forKey: .accessRules),
+			initialSupply: container.decode(ManifestASTValue.self, forKey: .initialSupply)
 		)
 	}
 }

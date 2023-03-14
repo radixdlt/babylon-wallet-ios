@@ -170,39 +170,21 @@ final class ValueEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .address(.init(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")),
+				value: .address("component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"),
 				jsonRepresentation: """
 				{"type":"Address","address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"}
 				"""
 			),
 			(
-				value: .address(.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")),
+				value: .address("resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
 				jsonRepresentation: """
 				{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"}
 				"""
 			),
 			(
-				value: .address(.init(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8")),
+				value: .address("package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"),
 				jsonRepresentation: """
 				{"type":"Address","address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"}
-				"""
-			),
-			(
-				value: .componentAddress(.init(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")),
-				jsonRepresentation: """
-				{"type":"ComponentAddress","address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"}
-				"""
-			),
-			(
-				value: .resourceAddress(.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")),
-				jsonRepresentation: """
-				{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"}
-				"""
-			),
-			(
-				value: .packageAddress(.init(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8")),
-				jsonRepresentation: """
-				{"type":"PackageAddress","address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"}
 				"""
 			),
 			(
@@ -254,35 +236,39 @@ final class ValueEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .nonFungibleGlobalId(.init(resourceAddress:
-					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
-					nonFungibleLocalId: .uuid("241008287272164729465721528295504357972"))),
+				value: .nonFungibleGlobalId(.init(
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g",
+					nonFungibleLocalId: .uuid("241008287272164729465721528295504357972")
+				)),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"UUID","value":"241008287272164729465721528295504357972"}}}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"UUID","value":"241008287272164729465721528295504357972"}}}
 				"""
 			),
 			(
-				value: .nonFungibleGlobalId(.init(resourceAddress:
-					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
-					nonFungibleLocalId: .integer(1))),
+				value: .nonFungibleGlobalId(.init(
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g",
+					nonFungibleLocalId: .integer(1)
+				)),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}}
 				"""
 			),
 			(
-				value: .nonFungibleGlobalId(.init(resourceAddress:
-					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
-					nonFungibleLocalId: .string("Scrypto"))),
+				value: .nonFungibleGlobalId(.init(
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g",
+					nonFungibleLocalId: .string("Scrypto")
+				)),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"String","value":"Scrypto"}}}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"String","value":"Scrypto"}}}
 				"""
 			),
 			(
-				value: .nonFungibleGlobalId(.init(resourceAddress:
-					.init(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"),
-					nonFungibleLocalId: .bytes([0x01, 0x02, 0x03, 0x04]))),
+				value: .nonFungibleGlobalId(.init(
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g",
+					nonFungibleLocalId: .bytes([0x01, 0x02, 0x03, 0x04])
+				)),
 				jsonRepresentation: """
-				{"type":"NonFungibleGlobalId","resource_address":{"type":"ResourceAddress","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Bytes","value":"01020304"}}}
+				{"type":"NonFungibleGlobalId","resource_address":{"type":"Address","address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs3ydc4g"},"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Bytes","value":"01020304"}}}
 				"""
 			),
 			(

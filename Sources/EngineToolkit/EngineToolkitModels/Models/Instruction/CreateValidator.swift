@@ -51,12 +51,9 @@ extension CreateValidator {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let key = try container.decode(Bytes.self, forKey: .key)
-		let ownerAccessRule = try container.decode(Enum.self, forKey: .ownerAccessRule)
-
-		self.init(
-			key: key,
-			ownerAccessRule: ownerAccessRule
+		try self.init(
+			key: container.decode(Bytes.self, forKey: .key),
+			ownerAccessRule: container.decode(Enum.self, forKey: .ownerAccessRule)
 		)
 	}
 }

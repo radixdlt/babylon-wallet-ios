@@ -40,6 +40,8 @@ extension ReturnToWorktop {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		try self.init(bucket: container.decode(Bucket.self, forKey: .bucket))
+		try self.init(
+			bucket: container.decode(Bucket.self, forKey: .bucket)
+		)
 	}
 }

@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define RADIX_ENGINE_NODE_IDENTIFIER_LENGTH 36
-
 #define RADIX_ENGINE_HASH_LENGTH 32
 
 typedef char *Pointer;

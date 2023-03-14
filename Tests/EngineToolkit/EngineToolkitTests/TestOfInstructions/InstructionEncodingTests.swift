@@ -23,7 +23,7 @@ final class InstructionEncodingTests: TestCase {
 		let testVectors: [(value: Instruction, jsonRepresentation: String)] = [
 			(
 				value: .callFunction(.init(
-					packageAddress: PackageAddress(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"),
+					packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8",
 					blueprintName: "Faucet",
 					functionName: "new",
 					arguments: [
@@ -31,12 +31,12 @@ final class InstructionEncodingTests: TestCase {
 					]
 				)),
 				jsonRepresentation: """
-				{"arguments":[{"type":"Decimal","value":"1"}],"blueprint_name":{"type":"String","value":"Faucet"},"function_name":{"type":"String","value":"new"},"instruction":"CALL_FUNCTION","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"PackageAddress"}}
+				{"arguments":[{"type":"Decimal","value":"1"}],"blueprint_name":{"type":"String","value":"Faucet"},"function_name":{"type":"String","value":"new"},"instruction":"CALL_FUNCTION","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"Address"}}
 				"""
 			),
 			(
 				value: .callFunction(.init(
-					packageAddress: Address_(address: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8"),
+					packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8",
 					blueprintName: "Faucet",
 					functionName: "new",
 					arguments: [
@@ -49,7 +49,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .callMethod(.init(
-					receiver: Address_(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"),
+					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					methodName: "free",
 					arguments: [
 						.decimal(.init(value: "1")),
@@ -61,19 +61,19 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .callMethod(.init(
-					receiver: ComponentAddress(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"),
+					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					methodName: "free",
 					arguments: [
 						.decimal(.init(value: "1")),
 					]
 				)),
 				jsonRepresentation: """
-				{"arguments":[{"type":"Decimal","value":"1"}],"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"CALL_METHOD","method_name":{"type":"String","value":"free"}}
+				{"arguments":[{"type":"Decimal","value":"1"}],"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"CALL_METHOD","method_name":{"type":"String","value":"free"}}
 				"""
 			),
 			(
 				value: .callMethod(.init(
-					receiver: Address_(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"),
+					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					methodName: "free"
 				)),
 				jsonRepresentation: """
@@ -82,16 +82,16 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .callMethod(.init(
-					receiver: ComponentAddress(address: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"),
+					receiver: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					methodName: "free"
 				)),
 				jsonRepresentation: """
-				{"arguments":[],"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"CALL_METHOD","method_name":{"type":"String","value":"free"}}
+				{"arguments":[],"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"CALL_METHOD","method_name":{"type":"String","value":"free"}}
 				"""
 			),
 			(
 				value: .takeFromWorktop(.init(
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -100,17 +100,17 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .takeFromWorktop(.init(
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"instruction":"TAKE_FROM_WORKTOP","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"instruction":"TAKE_FROM_WORKTOP","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
 				value: .takeFromWorktopByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -120,27 +120,27 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .takeFromWorktopByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"TAKE_FROM_WORKTOP_BY_AMOUNT","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"TAKE_FROM_WORKTOP_BY_AMOUNT","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
 				value: .takeFromWorktopByIds(.init(
 					[.integer(1)],
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"TAKE_FROM_WORKTOP_BY_IDS","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"TAKE_FROM_WORKTOP_BY_IDS","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
 				value: .takeFromWorktopByIds(.init(
 					[.integer(1)],
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -157,7 +157,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .assertWorktopContains(.init(
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
 				)),
 				jsonRepresentation: """
 				{"instruction":"ASSERT_WORKTOP_CONTAINS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -165,16 +165,16 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .assertWorktopContains(.init(
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
 				)),
 				jsonRepresentation: """
-				{"instruction":"ASSERT_WORKTOP_CONTAINS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"instruction":"ASSERT_WORKTOP_CONTAINS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
 				value: .assertWorktopContainsByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
 				)),
 				jsonRepresentation: """
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"ASSERT_WORKTOP_CONTAINS_BY_AMOUNT","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
@@ -183,15 +183,15 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .assertWorktopContainsByAmount(.init(
 					amount: .init(value: "1"),
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm")
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"ASSERT_WORKTOP_CONTAINS_BY_AMOUNT","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"ASSERT_WORKTOP_CONTAINS_BY_AMOUNT","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
 				value: .assertWorktopContainsByIds(.init(
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					ids: [.integer(1)]
 				)),
 				jsonRepresentation: """
@@ -200,11 +200,11 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .assertWorktopContainsByIds(.init(
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					ids: [.integer(1)]
 				)),
 				jsonRepresentation: """
-				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"ASSERT_WORKTOP_CONTAINS_BY_IDS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"ASSERT_WORKTOP_CONTAINS_BY_IDS","resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
@@ -227,7 +227,7 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZone(.init(
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
@@ -236,16 +236,16 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZone(.init(
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"instruction":"CREATE_PROOF_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"instruction":"CREATE_PROOF_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
 				value: .createProofFromAuthZoneByAmount(.init(
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					amount: .init(value: "1"),
 					intoProof: .init(stringLiteral: "ident")
 				)),
@@ -255,17 +255,17 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZoneByAmount(.init(
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					amount: .init(value: "1"),
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
 				value: .createProofFromAuthZoneByIds(.init(
-					resourceAddress: Address_(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					ids: [.integer(1)],
 					intoProof: .init(stringLiteral: "ident")
 				)),
@@ -275,12 +275,12 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .createProofFromAuthZoneByIds(.init(
-					resourceAddress: ResourceAddress(address: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm"),
+					resourceAddress: "resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm",
 					ids: [.integer(1)],
 					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"ResourceAddress"}}
+				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_rdx1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy99qqm","type":"Address"}}
 				"""
 			),
 			(
@@ -338,12 +338,12 @@ final class InstructionEncodingTests: TestCase {
 			),
 			(
 				value: .setMetadata(.init(
-					entityAddress: .componentAddress("component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"),
+					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					key: "name",
 					value: "deadbeef"
 				)),
 				jsonRepresentation: """
-				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"SET_METADATA","key":{"type":"String","value":"name"},"value":{"type":"String","value":"deadbeef"}}
+				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"SET_METADATA","key":{"type":"String","value":"name"},"value":{"type":"String","value":"deadbeef"}}
 				"""
 			),
 			(
@@ -356,7 +356,7 @@ final class InstructionEncodingTests: TestCase {
 					)
 				)),
 				jsonRepresentation: """
-				{"instruction":"SET_PACKAGE_ROYALTY_CONFIG","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"PackageAddress"},"royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"}}
+				{"instruction":"SET_PACKAGE_ROYALTY_CONFIG","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"Address"},"royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"}}
 				"""
 			),
 			(
@@ -372,29 +372,29 @@ final class InstructionEncodingTests: TestCase {
 					]))
 				)),
 				jsonRepresentation: """
-				{"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"SET_COMPONENT_ROYALTY_CONFIG","royalty_config":{"elements":[{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"U32"},{"type":"U32","value":"1"}],"type":"Tuple"}}
+				{"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"SET_COMPONENT_ROYALTY_CONFIG","royalty_config":{"elements":[{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"U32"},{"type":"U32","value":"1"}],"type":"Tuple"}}
 				"""
 			),
 			(
 				value: .claimPackageRoyalty(.init(packageAddress: "package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8")),
 				jsonRepresentation: """
-				{"instruction":"CLAIM_PACKAGE_ROYALTY","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"PackageAddress"}}
+				{"instruction":"CLAIM_PACKAGE_ROYALTY","package_address":{"address":"package_rdx1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqzrhqe8","type":"Address"}}
 				"""
 			),
 			(
 				value: .claimComponentRoyalty(.init(componentAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt")),
 				jsonRepresentation: """
-				{"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"CLAIM_COMPONENT_ROYALTY"}
+				{"component_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"CLAIM_COMPONENT_ROYALTY"}
 				"""
 			),
 			(
 				value: .setMethodAccessRule(.init(
-					entityAddress: .componentAddress("component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt"),
+					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
 					key: Tuple(values: [.enum(.init(.u8(0))), .string("free")]),
 					rule: Enum(.u8(0), fields: [])
 				)),
 				jsonRepresentation: """
-				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"ComponentAddress"},"instruction":"SET_METHOD_ACCESS_RULE","key":{"elements":[{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"type":"String","value":"free"}],"type":"Tuple"},"rule":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
+				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"SET_METHOD_ACCESS_RULE","key":{"elements":[{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"type":"String","value":"free"}],"type":"Tuple"},"rule":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
 				"""
 			),
 			(
@@ -403,7 +403,7 @@ final class InstructionEncodingTests: TestCase {
 					amount: .init(value: "1")
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"MINT_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"MINT_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"Address"}}
 				"""
 			),
 			(
@@ -416,7 +416,7 @@ final class InstructionEncodingTests: TestCase {
 					))
 				)),
 				jsonRepresentation: """
-				{"entries":{"entries":[],"key_value_kind":"NonFungibleLocalId","type":"Map","value_value_kind":"Tuple"},"instruction":"MINT_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"entries":{"entries":[],"key_value_kind":"NonFungibleLocalId","type":"Map","value_value_kind":"Tuple"},"instruction":"MINT_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"Address"}}
 				"""
 			),
 			try (
@@ -429,7 +429,7 @@ final class InstructionEncodingTests: TestCase {
 					                      ]))
 				)),
 				jsonRepresentation: """
-				{"entries":{"element_kind":"Tuple","elements":[{"elements":[{"elements":[],"type":"Tuple"},{"elements":[],"type":"Tuple"}],"type":"Tuple"},{"elements":[{"elements":[],"type":"Tuple"},{"elements":[],"type":"Tuple"}],"type":"Tuple"}],"type":"Array"},"instruction":"MINT_UUID_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"entries":{"element_kind":"Tuple","elements":[{"elements":[{"elements":[],"type":"Tuple"},{"elements":[],"type":"Tuple"}],"type":"Tuple"},{"elements":[{"elements":[],"type":"Tuple"},{"elements":[],"type":"Tuple"}],"type":"Tuple"}],"type":"Array"},"instruction":"MINT_UUID_NON_FUNGIBLE","resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"Address"}}
 				"""
 			),
 			(

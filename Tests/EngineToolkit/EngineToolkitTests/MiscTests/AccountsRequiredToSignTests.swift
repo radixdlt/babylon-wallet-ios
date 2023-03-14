@@ -10,13 +10,13 @@ final class AccountsRequiredToSignTests: TestCase {
 	func test_setMetaData() throws {
 		let transactionManifest = TransactionManifest {
 			SetMetadata(
-				entityAddress: .componentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
+				entityAddress: "account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3",
 				key: "name",
 				value: "Radix Dashboard"
 			)
 
 			SetMetadata(
-				entityAddress: .componentAddress("component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr"),
+				entityAddress: "component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr",
 				key: "name",
 				value: "Radix Dashboard"
 			)
