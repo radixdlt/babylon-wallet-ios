@@ -32,12 +32,12 @@ extension AppPreferences {
 extension P2PLinks {
 	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	internal mutating func append(_ client: P2PLink) -> P2PLink? {
-		guard !clients.contains(where: { client.id == $0.id }) else {
+	internal mutating func append(_ link: P2PLink) -> P2PLink? {
+		guard !links.contains(where: { link.id == $0.id }) else {
 			return nil
 		}
-		let (inserted, _) = clients.append(client)
+		let (inserted, _) = links.append(link)
 		assert(inserted)
-		return client
+		return link
 	}
 }

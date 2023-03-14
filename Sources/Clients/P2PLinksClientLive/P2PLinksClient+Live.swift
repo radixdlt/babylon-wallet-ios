@@ -15,19 +15,19 @@ extension P2PLinksClient: DependencyKey {
 			getP2PLinks: {
 				await appPreferencesClient.getPreferences().p2pLinks
 			},
-			addP2PLink: { newClient in
+			addP2PLink: { newLink in
 				try await appPreferencesClient.updating {
-					_ = $0.appendP2PLink(newClient)
+					_ = $0.appendP2PLink(newLink)
 				}
 			},
 			deleteP2PLinkByPassword: { password in
 				try await appPreferencesClient.updating {
-					$0.p2pLinks.clients.removeAll(where: { $0.connectionPassword == password })
+					$0.p2pLinks.links.removeAll(where: { $0.connectionPassword == password })
 				}
 			},
 			deleteAllP2PLinks: {
 				try await appPreferencesClient.updating {
-					$0.p2pLinks.clients.removeAll()
+					$0.p2pLinks.links.removeAll()
 				}
 			}
 		)

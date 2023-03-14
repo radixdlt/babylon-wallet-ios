@@ -13,10 +13,10 @@ public struct P2PLinks:
 	RandomAccessCollection
 {
 	/// Ordered set of unique P2P connections made by the user with another client.
-	public var clients: OrderedSet<P2PLink>
+	public var links: OrderedSet<P2PLink>
 
-	public init(_ clients: OrderedSet<P2PLink>) {
-		self.clients = clients
+	public init(_ links: OrderedSet<P2PLink>) {
+		self.links = links
 	}
 }
 
@@ -31,31 +31,31 @@ extension P2PLinks {
 	public typealias Indices = OrderedSet<P2PLink>.Indices
 
 	public var startIndex: Index {
-		clients.startIndex
+		links.startIndex
 	}
 
 	public var indices: Indices {
-		clients.indices
+		links.indices
 	}
 
 	public var endIndex: Index {
-		clients.endIndex
+		links.endIndex
 	}
 
 	public func formIndex(after index: inout Index) {
-		clients.formIndex(after: &index)
+		links.formIndex(after: &index)
 	}
 
 	public func formIndex(before index: inout Index) {
-		clients.formIndex(before: &index)
+		links.formIndex(before: &index)
 	}
 
 	public subscript(bounds: Range<Index>) -> SubSequence {
-		clients[bounds]
+		links[bounds]
 	}
 
 	public subscript(position: Index) -> Element {
-		clients[position]
+		links[position]
 	}
 }
 
@@ -67,7 +67,7 @@ extension P2PLinks {
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
-		try container.encode(clients.elements)
+		try container.encode(links.elements)
 	}
 }
 
@@ -79,7 +79,7 @@ extension P2PLinks {
 
 extension P2PLinks {
 	public var _description: String {
-		String(describing: clients)
+		String(describing: links)
 	}
 
 	public var description: String {
