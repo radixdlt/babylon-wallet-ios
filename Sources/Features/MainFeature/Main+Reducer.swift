@@ -12,15 +12,12 @@ public struct Main: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public var canShowDappRequest: Bool = true
+		// MARK: - State
+		public var canPresentDappInteraction: Bool = true
 
 		public init(home: Home.State = .init()) {
 			self.home = home
 		}
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-		case dappInteractionPresented
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -64,15 +61,6 @@ public struct Main: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .dappInteractionPresented:
-			// state.home.destination = nil
-			// state.destination = nil
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .home(.child(.destination(.presented(.createAccount(.delegate(.dismiss)))))),
@@ -85,7 +73,7 @@ public struct Main: Sendable, FeatureReducer {
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.confirmDisconnectAlert(.presented(.cancelTapped))))))))))))),
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.confirmDisconnectAlert(.presented(.confirmTapped))))))))))))),
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.child(.presentedPersona(.dismiss)))))))))))):
-			state.canShowDappRequest = true
+			state.canPresentDappInteraction = true
 			return .none
 
 		case .home(.child(.destination(.presented(.createAccount)))), // Create Account modal
@@ -94,8 +82,7 @@ public struct Main: Sendable, FeatureReducer {
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.personaTapped))))))))))), // Persona details modal
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.forgetThisDappTapped))))))))))), // Forget Dapp Alert
 		     .destination(.presented(.settings(.child(.destination(.presented(.manageFactorSources(.child(.destination(.presented(.importOlympiaFactorSource)))))))))): // Import Olympia Factor Source modal
-
-			state.canShowDappRequest = false
+			state.canPresentDappInteraction = false
 			return .none
 
 		case .home(.delegate(.displaySettings)):

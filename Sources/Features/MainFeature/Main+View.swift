@@ -22,7 +22,6 @@ extension Main {
 					)
 				)
 				#if os(iOS)
-				// NB: has to be fullScreenCover because of https://stackoverflow.com/q/69101690
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /Main.Destinations.State.settings,
@@ -32,11 +31,8 @@ extension Main {
 				#endif
 			}
 			.presentsDappInteractions(
-				onPresent: { [store = store.stateless] in
-					ViewStore(store).send(.view(.dappInteractionPresented))
-				},
 				canPresentInteraction: { [store = store.actionless] in
-					ViewStore(store).canShowDappRequest
+					ViewStore(store).canPresentDappInteraction
 				}
 			)
 		}
