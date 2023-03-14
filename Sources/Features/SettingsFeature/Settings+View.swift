@@ -43,28 +43,26 @@ extension AppSettings {
 extension AppSettings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			ForceFullScreen {
-				settingsView(viewStore: viewStore)
-				#if os(iOS)
-					.navigationBarBackButtonHidden()
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							BackButton {
-								viewStore.send(.backButtonTapped)
-							}
-							.foregroundColor(Color.black)
+			settingsView(viewStore: viewStore)
+			#if os(iOS)
+				.navigationBarBackButtonHidden()
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							viewStore.send(.backButtonTapped)
 						}
-						ToolbarItem(placement: .principal) {
-							Text("Settings")
-								.textStyle(.secondaryHeader)
-								.foregroundColor(Color.black)
-						}
+						.foregroundColor(Color.black)
 					}
-				#endif
-					.navigationDestinations(with: store, viewStore)
-					.tint(.app.gray1)
-					.foregroundColor(.app.gray1)
-			}
+					ToolbarItem(placement: .principal) {
+						Text("Settings")
+							.textStyle(.secondaryHeader)
+							.foregroundColor(Color.black)
+					}
+				}
+			#endif
+				.navigationDestinations(with: store, viewStore)
+				.tint(.app.gray1)
+				.foregroundColor(.app.gray1)
 		}
 		.presentsLoadingViewOverlay()
 	}
