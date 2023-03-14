@@ -61,16 +61,11 @@ extension CreateNonFungibleResourceWithInitialSupply {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let idType = try container.decode(Enum.self, forKey: .idType)
-		let metadata = try container.decode(Map_.self, forKey: .metadata)
-		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-		let initialSupply = try container.decode(ManifestASTValue.self, forKey: .initialSupply)
-
-		self.init(
-			idType: idType,
-			metadata: metadata,
-			accessRules: accessRules,
-			initialSupply: initialSupply
+		try self.init(
+			idType: container.decode(Enum.self, forKey: .idType),
+			metadata: container.decode(Map_.self, forKey: .metadata),
+			accessRules: container.decode(Map_.self, forKey: .accessRules),
+			initialSupply: container.decode(ManifestASTValue.self, forKey: .initialSupply)
 		)
 	}
 }

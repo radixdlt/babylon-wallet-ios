@@ -9,21 +9,14 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// Temporary, will change to `Address`. This can actually only be either `ComponentAddress` or `Address_`.
-	public let receiver: ManifestASTValue
+	public let receiver: Address_
 	public let methodName: String
 	public let arguments: [ManifestASTValue]
 
 	// MARK: Init
 
 	public init(receiver: ComponentAddress, methodName: String, arguments: [ManifestASTValue] = []) {
-		self.receiver = .componentAddress(receiver)
-		self.methodName = methodName
-		self.arguments = arguments
-	}
-
-	public init(receiver: Address_, methodName: String, arguments: [ManifestASTValue] = []) {
-		self.receiver = .address(receiver)
+		self.receiver = receiver.asGeneral
 		self.methodName = methodName
 		self.arguments = arguments
 	}
@@ -92,8 +85,10 @@ extension CallMethod {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.receiver = try container.decode(ManifestASTValue.self, forKey: .receiver)
-		self.methodName = try container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded
-		self.arguments = try container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
+		try self.init(
+			receiver: container.decode(Address_.self, forKey: .receiver).asSpecific(),
+			methodName: container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded,
+			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
+		)
 	}
 }

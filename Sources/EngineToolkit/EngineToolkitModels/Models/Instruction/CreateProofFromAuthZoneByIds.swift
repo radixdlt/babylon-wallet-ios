@@ -9,8 +9,7 @@ public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: ManifestASTValue
+	public let resourceAddress: Address_
 	public let ids: Set<NonFungibleLocalId>
 	public let intoProof: Proof
 
@@ -21,17 +20,7 @@ public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
 		ids: Set<NonFungibleLocalId>,
 		intoProof: Proof
 	) {
-		self.resourceAddress = .resourceAddress(resourceAddress)
-		self.ids = ids
-		self.intoProof = intoProof
-	}
-
-	public init(
-		resourceAddress: Address_,
-		ids: Set<NonFungibleLocalId>,
-		intoProof: Proof
-	) {
-		self.resourceAddress = .address(resourceAddress)
+		self.resourceAddress = resourceAddress.asGeneral
 		self.ids = ids
 		self.intoProof = intoProof
 	}
@@ -64,8 +53,10 @@ extension CreateProofFromAuthZoneByIds {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
-		self.ids = try container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
-		self.intoProof = try container.decode(Proof.self, forKey: .intoProof)
+		try self.init(
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
+			intoProof: container.decode(Proof.self, forKey: .intoProof)
+		)
 	}
 }

@@ -1,11 +1,11 @@
 import Foundation
 
-// MARK: - ResourceAddress
-public struct ResourceAddress: ValueProtocol, Sendable, Codable, Hashable, AddressProtocol {
+// MARK: - Address_
+public struct Address_: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .resourceAddress
+	public static let kind: ManifestASTValueKind = .address
 	public func embedValue() -> ManifestASTValue {
-		.resourceAddress(self)
+		.address(self)
 	}
 
 	// MARK: Stored properties
@@ -19,7 +19,7 @@ public struct ResourceAddress: ValueProtocol, Sendable, Codable, Hashable, Addre
 	}
 }
 
-extension ResourceAddress {
+extension Address_ {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case address, type
@@ -47,3 +47,16 @@ extension ResourceAddress {
 		)
 	}
 }
+
+extension Address_ {
+	public var asAccountComponentAddress: ComponentAddress? {
+		isAccountAddress ? .init(address: address) : nil
+	}
+
+	public var isAccountAddress: Bool {
+		address.starts(with: "account")
+	}
+}
+
+// MARK: AddressProtocol
+extension Address_: AddressProtocol {}

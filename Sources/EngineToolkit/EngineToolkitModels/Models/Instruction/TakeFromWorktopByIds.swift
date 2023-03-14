@@ -9,8 +9,7 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: ManifestASTValue
+	public let resourceAddress: Address_
 	public let ids: Set<NonFungibleLocalId>
 	public let bucket: Bucket
 
@@ -22,17 +21,7 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 		resourceAddress: ResourceAddress,
 		bucket: Bucket
 	) {
-		self.resourceAddress = .resourceAddress(resourceAddress)
-		self.ids = ids
-		self.bucket = bucket
-	}
-
-	public init(
-		_ ids: Set<NonFungibleLocalId>,
-		resourceAddress: Address_,
-		bucket: Bucket
-	) {
-		self.resourceAddress = .address(resourceAddress)
+		self.resourceAddress = resourceAddress.asGeneral
 		self.ids = ids
 		self.bucket = bucket
 	}
@@ -67,8 +56,10 @@ extension TakeFromWorktopByIds {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
-		self.ids = try container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
-		self.bucket = try container.decode(Bucket.self, forKey: .intoBucket)
+		try self.init(
+			container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			bucket: container.decode(Bucket.self, forKey: .intoBucket)
+		)
 	}
 }

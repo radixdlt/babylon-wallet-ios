@@ -9,17 +9,12 @@ public struct AssertWorktopContains: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: ManifestASTValue
+	public let resourceAddress: Address_
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress) {
-		self.resourceAddress = .resourceAddress(resourceAddress)
-	}
-
-	public init(resourceAddress: Address_) {
-		self.resourceAddress = .address(resourceAddress)
+		self.resourceAddress = resourceAddress.asGeneral
 	}
 }
 
@@ -46,6 +41,8 @@ extension AssertWorktopContains {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
+		try self.init(
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific()
+		)
 	}
 }

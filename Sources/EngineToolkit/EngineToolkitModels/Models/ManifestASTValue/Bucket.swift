@@ -1,28 +1,27 @@
 import Foundation
 
-// MARK: - ComponentAddress
-public struct ComponentAddress: ValueProtocol, Sendable, Codable, Hashable, AddressProtocol {
+// MARK: - Bucket
+public struct Bucket: ValueProtocol, Sendable, Codable, Hashable, IdentifierConvertible {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .componentAddress
+	public static let kind: ManifestASTValueKind = .bucket
 	public func embedValue() -> ManifestASTValue {
-		.componentAddress(self)
+		.bucket(self)
 	}
 
 	// MARK: Stored properties
-	public let address: String
+	public let identifier: TransientIdentifier
 
 	// MARK: Init
 
-	public init(address: String) {
-		// TODO: Perform some simple Bech32m validation.
-		self.address = address
+	public init(identifier: TransientIdentifier) {
+		self.identifier = identifier
 	}
 }
 
-extension ComponentAddress {
+extension Bucket {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case address, type
+		case identifier, type
 	}
 
 	// MARK: Codable
@@ -30,7 +29,7 @@ extension ComponentAddress {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(String(address), forKey: .address)
+		try container.encode(identifier, forKey: .identifier)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -41,7 +40,9 @@ extension ComponentAddress {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		// Decoding `address`
-		try self.init(address: container.decode(String.self, forKey: .address))
+		// Decoding `identifier`
+		try self.init(
+			identifier: container.decode(TransientIdentifier.self, forKey: .identifier)
+		)
 	}
 }
