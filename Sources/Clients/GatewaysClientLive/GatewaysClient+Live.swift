@@ -19,6 +19,11 @@ extension GatewaysClient: DependencyKey {
 					try profile.addNewGateway(gateway)
 				}
 			},
+			removeGateway: { gateway in
+				try await getProfileStore().updating { profile in
+					try profile.removeGateway(gateway)
+				}
+			},
 			changeGateway: { gateway in
 				try await getProfileStore().updating { profile in
 					try profile.changeGateway(to: gateway)

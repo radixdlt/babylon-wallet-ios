@@ -119,6 +119,15 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "GatewaySettingsFeature",
+		dependencies: [
+			"CreateEntityFeature",
+			"GatewaysClient",
+			"NetworkSwitchingClient",
+		],
+		tests: .yes()
+	),
+	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			"AccountDetailsFeature",
@@ -162,14 +171,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ManageGatewayAPIEndpointsFeature",
-		dependencies: [
-			"CreateEntityFeature",
-			"NetworkSwitchingClient",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
 			"CameraPermissionClient",
@@ -208,7 +209,7 @@ package.addModules([
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
 			"P2PLinksFeature",
-			"ManageGatewayAPIEndpointsFeature",
+			"GatewaySettingsFeature",
 			"MnemonicClient",
 			"PersonasFeature",
 			"RadixConnectClient", // deleting connections when wallet is deleted

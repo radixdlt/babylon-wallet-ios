@@ -382,6 +382,44 @@ public enum L10n {
       public static let resourceAddress = L10n.tr("Localizable", "fungibleTokenList.detail.resourceAddress", fallback: "Resource Address")
     }
   }
+  public enum GatewaySettings {
+    /// Add New Gateway
+    public static let addNewGatewayButtonTitle = L10n.tr("Localizable", "gatewaySettings.addNewGatewayButtonTitle", fallback: "Add New Gateway")
+    /// Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.
+    public static let subtitle = L10n.tr("Localizable", "gatewaySettings.subtitle", fallback: "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.")
+    /// Gateways
+    public static let title = L10n.tr("Localizable", "gatewaySettings.title", fallback: "Gateways")
+    public enum AddNewGateway {
+      /// Add Gateway
+      public static let addGatewayButtonTitle = L10n.tr("Localizable", "gatewaySettings.addNewGateway.addGatewayButtonTitle", fallback: "Add Gateway")
+      /// Enter a Gateway URL
+      public static let subtitle = L10n.tr("Localizable", "gatewaySettings.addNewGateway.subtitle", fallback: "Enter a Gateway URL")
+      /// Enter full URL
+      public static let textFieldPlaceholder = L10n.tr("Localizable", "gatewaySettings.addNewGateway.textFieldPlaceholder", fallback: "Enter full URL")
+      /// Add New Gateway
+      public static let title = L10n.tr("Localizable", "gatewaySettings.addNewGateway.title", fallback: "Add New Gateway")
+      public enum Error {
+        /// No Gateway found at specified URL
+        public static let noGatewayFound = L10n.tr("Localizable", "gatewaySettings.addNewGateway.error.noGatewayFound", fallback: "No Gateway found at specified URL")
+      }
+    }
+    public enum RemoveGatewayAlert {
+      /// Cancel
+      public static let cancelButtonTitle = L10n.tr("Localizable", "gatewaySettings.removeGatewayAlert.cancelButtonTitle", fallback: "Cancel")
+      /// You will no longer be able to connect to this Gateway
+      public static let message = L10n.tr("Localizable", "gatewaySettings.removeGatewayAlert.message", fallback: "You will no longer be able to connect to this Gateway")
+      /// Remove
+      public static let removeButtonTitle = L10n.tr("Localizable", "gatewaySettings.removeGatewayAlert.removeButtonTitle", fallback: "Remove")
+      /// Remove Gateway
+      public static let title = L10n.tr("Localizable", "gatewaySettings.removeGatewayAlert.title", fallback: "Remove Gateway")
+    }
+    public enum WhatIsAGateway {
+      /// What is a Gateway
+      public static let buttonText = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.buttonText", fallback: "What is a Gateway")
+      /// What is a Gateway
+      public static let explanationText = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.explanationText", fallback: "What is a Gateway")
+    }
+  }
   public enum Home {
     public enum CreateAccount {
       /// Create Account
@@ -573,8 +611,8 @@ public enum L10n {
     public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete Wallet Data")
     /// Linked Connector
     public static let desktopConnectionsButtonTitle = L10n.tr("Localizable", "settings.desktopConnectionsButtonTitle", fallback: "Linked Connector")
-    /// Network Gateway
-    public static let gatewayButtonTitle = L10n.tr("Localizable", "settings.gatewayButtonTitle", fallback: "Network Gateway")
+    /// Gateways
+    public static let gatewaysButtonTitle = L10n.tr("Localizable", "settings.gatewaysButtonTitle", fallback: "Gateways")
     /// Inspect Profile
     public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
     /// No Wallet Data Found

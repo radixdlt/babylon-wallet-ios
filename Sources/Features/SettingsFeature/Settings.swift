@@ -2,8 +2,8 @@ import AppPreferencesClient
 import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
-import ManageGatewayAPIEndpointsFeature
 import P2PLinksFeature
+import GatewaySettingsFeature
 import PersonasFeature
 
 // MARK: - AppSettings
@@ -34,14 +34,14 @@ public struct AppSettings: FeatureReducer {
 	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case didAppear
+		case appeared
 		case closeButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
 
 		case manageP2PLinksButtonTapped
 		case addP2PLinkButtonTapped
 
-		case editGatewayAPIEndpointButtonTapped
+		case gatewaysButtonTapped
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
 		case appSettingsButtonTapped
@@ -73,7 +73,7 @@ public struct AppSettings: FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case manageFactorSources(ManageFactorSources.State)
 			case manageP2PLinks(P2PLinksFeature.State)
-			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.State)
+			case gatewaySettings(GatewaySettings.State)
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 		}
@@ -81,7 +81,7 @@ public struct AppSettings: FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case manageFactorSources(ManageFactorSources.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
-			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
+			case gatewaySettings(GatewaySettings.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 		}
@@ -93,8 +93,8 @@ public struct AppSettings: FeatureReducer {
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
 				P2PLinksFeature()
 			}
-			Scope(state: /State.manageGatewayAPIEndpoints, action: /Action.manageGatewayAPIEndpoints) {
-				ManageGatewayAPIEndpoints()
+			Scope(state: /State.gatewaySettings, action: /Action.gatewaySettings) {
+				GatewaySettings()
 			}
 			Scope(state: /State.authorizedDapps, action: /Action.authorizedDapps) {
 				AuthorizedDapps()
@@ -116,7 +116,7 @@ public struct AppSettings: FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .didAppear:
+		case .appeared:
 			return loadP2PLinks()
 
 		case .closeButtonTapped:
@@ -140,8 +140,8 @@ public struct AppSettings: FeatureReducer {
 			state.destination = .manageP2PLinks(.init())
 			return .none
 
-		case .editGatewayAPIEndpointButtonTapped:
-			state.destination = .manageGatewayAPIEndpoints(.init())
+		case .gatewaysButtonTapped:
+			state.destination = .gatewaySettings(.init())
 			return .none
 
 		case .authorizedDappsButtonTapped:

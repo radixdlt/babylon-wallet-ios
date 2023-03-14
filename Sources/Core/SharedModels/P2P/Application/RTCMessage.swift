@@ -1,10 +1,10 @@
 import RadixConnectModels
 
-public extension P2P {
-	typealias RTCIncomingMessageResult = RTCIncomingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
-	typealias RTCIncomingWalletInteraction = RTCIncomingMessage<P2P.FromDapp.WalletInteraction>
+extension P2P {
+	public typealias RTCIncomingMessageResult = RTCIncomingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
+	public typealias RTCIncomingWalletInteraction = RTCIncomingMessage<P2P.FromDapp.WalletInteraction>
 
-	struct RTCIncomingMessage<PeerConnectionContent: Sendable>: Sendable {
+	public struct RTCIncomingMessage<PeerConnectionContent: Sendable>: Sendable {
 		public let connectionId: ConnectionPassword
 		public let peerMessage: PeerConnectionMessage
 
@@ -24,7 +24,7 @@ public extension P2P {
 		}
 	}
 
-	struct RTCOutgoingMessage: Sendable, Hashable {
+	public struct RTCOutgoingMessage: Sendable, Hashable {
 		public let connectionId: ConnectionPassword
 		public let peerMessage: PeerConnectionMessage
 
@@ -45,8 +45,8 @@ public extension P2P {
 	}
 }
 
-public extension P2P.RTCIncomingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
-	func unwrapResult() throws -> P2P.RTCIncomingWalletInteraction {
+extension P2P.RTCIncomingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
+	public func unwrapResult() throws -> P2P.RTCIncomingWalletInteraction {
 		try .init(
 			connectionId: connectionId,
 			content: .init(
@@ -57,9 +57,9 @@ public extension P2P.RTCIncomingMessage where PeerConnectionContent == Result<P2
 	}
 }
 
-public extension P2P.RTCIncomingMessage {
+extension P2P.RTCIncomingMessage {
 	/// Transforms to an OutgoingMessage by preserving the RTCClient and PeerConnection IDs
-	func toOutgoingMessage(_ response: P2P.ToDapp.WalletInteractionResponse) -> P2P.RTCOutgoingMessage {
+	public func toOutgoingMessage(_ response: P2P.ToDapp.WalletInteractionResponse) -> P2P.RTCOutgoingMessage {
 		.init(
 			connectionId: connectionId,
 			content: .init(
