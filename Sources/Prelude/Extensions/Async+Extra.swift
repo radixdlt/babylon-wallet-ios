@@ -1,6 +1,6 @@
-public extension AsyncSequence {
+extension AsyncSequence {
 	/// Waits and returns the first element from the seqeunce
-	func first() async throws -> Element {
+	public func first() async throws -> Element {
 		for try await element in self.prefix(1) {
 			return element
 		}
@@ -10,12 +10,12 @@ public extension AsyncSequence {
 
 public func doAsync<Result: Sendable>(
 	withTimeout duration: Duration,
-	clock: any Clock<Duration> = ContinuousClock(),
+	clock: some Clock<Duration> = ContinuousClock(),
 	work: @Sendable @escaping () async throws -> Result
 ) async throws -> Result {
 	try await withThrowingTaskGroup(of: Result.self) { group in
 		_ = group.addTaskUnlessCancelled {
-			try await Task.sleep(for: duration)
+			try await clock.sleep(for: duration)
 			try Task.checkCancellation()
 
 			throw TimeoutError()

@@ -20,8 +20,8 @@ extension PersonaDetails {
 
 // MARK: - Body
 
-public extension PersonaDetails.View {
-	var body: some View {
+extension PersonaDetails.View {
+	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {

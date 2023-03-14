@@ -96,7 +96,7 @@ public struct Main: Sendable, FeatureReducer {
 			}
 
 		// this should go away via network stream observation in the reducer (with .task)
-		case .destination(.presented(.settings(.child(.destination(.presented(.manageGatewayAPIEndpoints(.delegate(.networkChanged)))))))):
+		case .destination(.presented(.settings(.child(.destination(.presented(.gatewaySettings(.delegate(.networkChanged)))))))):
 			state.destination = nil
 			state.home = .init()
 			return .send(.child(.home(.view(.pullToRefreshStarted))))

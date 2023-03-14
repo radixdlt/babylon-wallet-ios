@@ -1,11 +1,11 @@
 import SwiftUI
 
-public extension LabelStyle where Self == TrailingIconLabelStyle {
+extension LabelStyle where Self == TrailingIconLabelStyle {
 	/// Applies the `trailingIcon` style with the default spacing
-	static var trailingIcon: Self { .trailingIcon() }
+	public static var trailingIcon: Self { .trailingIcon() }
 
 	/// A label style where the icon follows the "title", or text part
-	static func trailingIcon(spacing: CGFloat = .small2) -> Self {
+	public static func trailingIcon(spacing: CGFloat = .small2) -> Self {
 		.init(spacing: spacing)
 	}
 }

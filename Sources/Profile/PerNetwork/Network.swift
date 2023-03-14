@@ -12,10 +12,16 @@ public struct Network:
 {
 	public let name: Name
 	public let id: NetworkID
+	public let displayDescription: String
 
-	public init(name: Name, id: NetworkID) {
+	public init(
+		name: Name,
+		id: NetworkID,
+		displayDescription: String
+	) {
 		self.name = name
 		self.id = id
+		self.displayDescription = displayDescription
 	}
 }
 
@@ -24,19 +30,23 @@ extension Network {
 
 	public static let nebunet = Self(
 		name: "nebunet",
-		id: .nebunet
+		id: .nebunet,
+		displayDescription: "Radix Public Network"
 	)
 	public static let hammunet = Self(
 		name: "hammunet",
-		id: .hammunet
+		id: .hammunet,
+		displayDescription: "Hammunet (Test Network)"
 	)
 	public static let enkinet = Self(
 		name: "enkinet",
-		id: .enkinet
+		id: .enkinet,
+		displayDescription: "Enkinet (Test Network)"
 	)
 	public static let mardunet = Self(
 		name: "mardunet",
-		id: .mardunet
+		id: .mardunet,
+		displayDescription: "Mardunet (Test Network)"
 	)
 }
 
