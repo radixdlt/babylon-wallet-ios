@@ -377,14 +377,25 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID) }
-					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
+					let xrdContainers = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap {
+						await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
+					}.compactMap { $0 }
 					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
 
 					if let firstWithEnoughFunds = firstWithEnoughFunds {
 						return firstWithEnoughFunds
 					} else {
-						throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+						let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+						let xrdContainers = await accounts.concurrentMap {
+							await accountPortfolioFetcherClient.fetchXRDBalance(of: $0.address, on: networkID)
+						}.compactMap { $0 }
+						let anyAccountWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
+
+						if let anyAccountWithEnoughFunds = anyAccountWithEnoughFunds {
+							return anyAccountWithEnoughFunds
+						} else {
+							throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+						}
 					}
 				}()
 
