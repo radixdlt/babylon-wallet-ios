@@ -191,7 +191,11 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case .switchToGatewayResult(.success):
+		case let .switchToGatewayResult(.success(gateway)):
+			state.gatewayList.gateways.forEach {
+				state.gatewayList.gateways[id: $0.id]?.isSelected = $0.id == gateway.id
+			}
+
 			if let gatewayForRemoval = state.gatewayForRemoval {
 				state.gatewayForRemoval = nil
 				return .run { send in

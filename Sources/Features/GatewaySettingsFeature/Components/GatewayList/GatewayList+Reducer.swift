@@ -46,9 +46,6 @@ public struct GatewayList: Sendable, FeatureReducer {
 		case let .gateway(id: id, action: .delegate(action)):
 			switch action {
 			case .didSelect:
-				state.gateways.forEach {
-					state.gateways[id: $0.id]?.isSelected = $0.id == id
-				}
 				guard let gateway = state.gateways[id: id] else { return .none }
 				return .send(.delegate(.switchToGateway(gateway.gateway)))
 
