@@ -63,7 +63,9 @@ extension GatewayAPIClient {
 			}
 
 			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
+				#if DEBUG
 				loggerGlobal.error("Request with URL: \(urlRequest.url!.absoluteString) failed with status code: \(httpURLResponse.statusCode), data: \(data.prettyPrintedJSONString ?? "<NOT_JSON>")")
+				#endif
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
