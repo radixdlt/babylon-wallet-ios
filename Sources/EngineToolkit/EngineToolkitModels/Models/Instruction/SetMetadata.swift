@@ -12,11 +12,11 @@ public struct SetMetadata: InstructionProtocol {
 
 	public let entityAddress: Address_ // TODO:  What should this actually be?
 	public let key: String
-	public let value: ManifestASTValue
+	public let value: String
 
 	// MARK: Init
 
-	public init(entityAddress: Address_, key: String, value: ManifestASTValue) {
+	public init(entityAddress: Address_, key: String, value: String) {
 		self.entityAddress = entityAddress
 		self.key = key
 		self.value = value
@@ -41,7 +41,7 @@ extension SetMetadata {
 
 		try container.encode(entityAddress, forKey: .entityAddress)
 		try container.encode(key.proxyEncodable, forKey: .key)
-		try container.encode(value, forKey: .value)
+		try container.encode(value.proxyEncodable, forKey: .value)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -55,7 +55,7 @@ extension SetMetadata {
 		try self.init(
 			entityAddress: container.decode(Address_.self, forKey: .entityAddress),
 			key: container.decode(String.ProxyDecodable.self, forKey: .key).decoded,
-			value: container.decode(ManifestASTValue.self, forKey: .value)
+			value: container.decode(String.ProxyDecodable.self, forKey: .value).decoded
 		)
 	}
 }
