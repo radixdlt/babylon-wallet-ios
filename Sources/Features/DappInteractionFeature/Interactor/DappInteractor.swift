@@ -204,13 +204,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 		}
 
-		switch state.currentModal {
-		case .some(.dappInteractionCompletion):
-			return .send(.child(.modal(.presented(.dappInteractionCompletion(.delegate(.dismiss))))))
-		case .none:
+		if state.currentModal == nil {
 			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.peerMessage.content)))
 			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
-		default:
+		} else {
 			return .none
 		}
 	}

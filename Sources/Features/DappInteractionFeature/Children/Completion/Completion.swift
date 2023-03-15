@@ -15,7 +15,7 @@ struct Completion: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
-		case disappeared
+		case willDisappear
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -27,9 +27,7 @@ struct Completion: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .send(.delegate(.presented))
-		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
-		case .disappeared:
+		case .closeButtonTapped, .willDisappear:
 			return .send(.delegate(.dismiss))
 		}
 	}
