@@ -38,11 +38,11 @@ extension DeriveVirtualIdentityAddressRequestTests {
 
 // MARK: - DeriveVirtualIdentityAddressTestVectors
 enum DeriveVirtualIdentityAddressTestVectors {
-	typealias Vector = (publicKey: Engine.PublicKey, virtualIdentityComponentAddress: ComponentAddress)
+	typealias Vector = (publicKey: Engine.PublicKey, virtualIdentityComponentAddress: ComponentAddress) // FIXME: Address_
 	static let vectors: [Vector] = [
 		(
 			publicKey: try! Engine.PublicKey.eddsaEd25519(Engine.EddsaEd25519PublicKey(hex: "1262bc6d5408a3c4e025aa0c15e64f69197cdb38911be5ad344a949779df3da6")),
-			virtualIdentityComponentAddress: ComponentAddress(address: "identity_sim1pv4zv7pqlfq8tqqns9qqreegtct6r3n8kcq0ag3q7v7sujmz2r")
+			virtualIdentityComponentAddress: "identity_sim1pv4zv7pqlfq8tqqns9qqreegtct6r3n8kcq0ag3q7v7sujmz2r"
 		),
 	]
 }

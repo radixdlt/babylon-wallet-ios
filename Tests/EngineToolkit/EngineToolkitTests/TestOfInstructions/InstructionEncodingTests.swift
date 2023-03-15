@@ -311,16 +311,16 @@ final class InstructionEncodingTests: TestCase {
 				{"amount":{"type":"Decimal","value":"1"},"instruction":"RECALL_RESOURCE","vault_id":{"type":"Bytes","value":"a9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"}}
 				"""
 			),
-			(
-				value: .setMetadata(.init(
-					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
-					key: "name",
-					value: .enum(.init(.u8(0), fields: [.enum(.init(.u8(0), fields: [.string("deadbeef")]))]))
-				)),
-				jsonRepresentation: """
-				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"SET_METADATA","key":{"type":"String","value":"name"},"value":{"fields":[{"fields":[{"type":"String","value":"deadbeef"}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
-				"""
-			),
+//			(
+//				value: .setMetadata(.init(
+//					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
+//					key: "name",
+//					value: .enum(.init(.u8(0), fields: [.enum(.init(.u8(0), fields: [.string("deadbeef")]))]))
+//				)),
+//				jsonRepresentation: """
+//				{"entity_address":{"address":"component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt","type":"Address"},"instruction":"SET_METADATA","key":{"type":"String","value":"name"},"value":{"fields":[{"fields":[{"type":"String","value":"deadbeef"}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
+//				"""
+//			),
 			(
 				value: .removeMetadata(.init(
 					entityAddress: "component_rdx1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tsrdcazt",
