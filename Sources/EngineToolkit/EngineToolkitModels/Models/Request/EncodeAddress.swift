@@ -47,4 +47,4 @@ extension EncodeAddressRequest {
 	}
 }
 
-public typealias EncodeAddressResponse = _TemporaryAddressType
+public typealias EncodeAddressResponse = __Address

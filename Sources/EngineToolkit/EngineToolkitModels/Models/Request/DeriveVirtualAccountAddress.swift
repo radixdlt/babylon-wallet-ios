@@ -34,7 +34,7 @@ extension DeriveVirtualAccountAddressRequest {
 
 // MARK: - DeriveVirtualAccountAddressResponse
 public struct DeriveVirtualAccountAddressResponse: Sendable, Codable, Hashable {
-	public let virtualAccountAddress: ComponentAddress
+	public let virtualAccountAddress: ComponentAddress // FIXME: Should be Address_
 
 	public init(
 		virtualAccountAddress: ComponentAddress
