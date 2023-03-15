@@ -35,7 +35,7 @@ public struct AppSettings: FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case closeButtonTapped
+		case backButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
 
 		case manageP2PClientsButtonTapped
@@ -119,7 +119,7 @@ public struct AppSettings: FeatureReducer {
 		case .appeared:
 			return loadP2PClients()
 
-		case .closeButtonTapped:
+		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 
 		case .deleteProfileAndFactorSourcesButtonTapped:

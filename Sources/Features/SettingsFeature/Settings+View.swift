@@ -43,29 +43,15 @@ extension AppSettings {
 extension AppSettings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			NavigationStack {
-				settingsView(viewStore: viewStore)
-					.navigationTitle(L10n.Settings.title)
-				#if os(iOS)
-					.navigationBarBackButtonFont(.app.backButton)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							CloseButton {
-								viewStore.send(.closeButtonTapped)
-							}
-						}
-					}
-					.navigationTransition(.default, interactivity: .pan)
-				#endif
-					.navigationDestinations(with: store, viewStore)
-			}
-			.tint(.app.gray1)
-			.foregroundColor(.app.gray1)
+			settingsView(viewStore: viewStore)
+				.navigationTitle(L10n.Settings.title)
+			#if os(iOS)
+				.navigationBarTitleDisplayMode(.inline)
+			#endif
+				.navigationDestinations(with: store, viewStore)
+				.tint(.app.gray1)
+				.foregroundColor(.app.gray1)
 		}
-		.showDeveloperDisclaimerBanner()
 		.presentsLoadingViewOverlay()
 	}
 }
