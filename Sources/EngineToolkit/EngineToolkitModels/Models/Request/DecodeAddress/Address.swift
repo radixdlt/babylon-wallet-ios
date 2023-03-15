@@ -7,21 +7,32 @@ public typealias ComponentAddress = SpecificAddress<ComponentAddressKind>
 // MARK: - SpecificAddressKind
 public protocol SpecificAddressKind: Sendable {
 	static func validate(address: String) throws
+	static var type: AddressDiscriminator { get }
+}
+
+// MARK: - AddressDiscriminator
+public enum AddressDiscriminator: String, Sendable, Hashable, Codable {
+	case packageAddress = "PackageAddress"
+	case resourceAddress = "ResourceAddress"
+	case componentAddress = "ComponentAddress"
 }
 
 // MARK: - PackageAddressKind
 public enum PackageAddressKind: SpecificAddressKind {
 	public static func validate(address: String) throws {}
+	public static let type: AddressDiscriminator = .packageAddress
 }
 
 // MARK: - ResourceAddressKind
 public enum ResourceAddressKind: SpecificAddressKind {
 	public static func validate(address: String) throws {}
+	public static let type: AddressDiscriminator = .resourceAddress
 }
 
 // MARK: - ComponentAddressKind
 public enum ComponentAddressKind: SpecificAddressKind {
 	public static func validate(address: String) throws {}
+	public static let type: AddressDiscriminator = .componentAddress
 }
 
 extension SpecificAddress {
@@ -34,6 +45,7 @@ extension SpecificAddress {
 // MARK: - SpecificAddress
 public struct SpecificAddress<Kind: SpecificAddressKind>: AddressProtocol, Sendable, Codable, Hashable {
 	// MARK: Stored properties
+	public let type: AddressDiscriminator = Kind.type
 	public let address: String
 
 	// MARK: Init
@@ -43,16 +55,29 @@ public struct SpecificAddress<Kind: SpecificAddressKind>: AddressProtocol, Senda
 		self.address = address
 	}
 
-	// MARK: Codable
+	// MARK: CodingKeys
+	private enum CodingKeys: String, CodingKey {
+		case address, type
+	}
 
+	// MARK: Codable
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(address)
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(Kind.type, forKey: .type)
+		try container.encode(address, forKey: .address)
 	}
 
 	public init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		self.address = try container.decode(String.self)
+		// Checking for type discriminator
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let type = try container.decode(AddressDiscriminator.self, forKey: .type)
+		if type != Kind.type {
+			throw InternalDecodingFailure.addressDiscriminatorMismatch(expected: Kind.type, butGot: type)
+		}
+
+		try self.init(
+			address: container.decode(String.self, forKey: .address)
+		)
 	}
 }
 
@@ -97,9 +122,9 @@ extension AddressProtocol {
 	}
 }
 
-// MARK: - _TemporaryAddressType
-/// This type mimics the old enum based Address
-public struct _TemporaryAddressType: Sendable, Codable, Hashable {
+// MARK: - __Address
+// FIXME: Remove. This type mimics the old enum based Address
+public struct __Address: Sendable, Codable, Hashable {
 	public let type: AddressType
 	public let address: String
 
@@ -116,8 +141,6 @@ public struct _TemporaryAddressType: Sendable, Codable, Hashable {
 			address: container.decode(String.self, forKey: .address)
 		)
 	}
-
-	private static let kind: String = "PackageAddress"
 
 	public enum AddressType: String, Sendable, Codable, Hashable {
 		case packageAddress = "PackageAddress"

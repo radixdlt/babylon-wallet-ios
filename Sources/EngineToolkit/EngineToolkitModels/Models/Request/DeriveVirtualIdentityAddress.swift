@@ -34,7 +34,7 @@ extension DeriveVirtualIdentityAddressRequest {
 
 // MARK: - DeriveVirtualIdentityAddressResponse
 public struct DeriveVirtualIdentityAddressResponse: Sendable, Codable, Hashable {
-	public let virtualIdentityAddress: ComponentAddress
+	public let virtualIdentityAddress: ComponentAddress // FIXME: Should be Address_
 
 	public init(
 		virtualIdentityAddress: ComponentAddress

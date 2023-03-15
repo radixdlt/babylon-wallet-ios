@@ -12,13 +12,13 @@ final class AccountsRequiredToSignTests: TestCase {
 			SetMetadata(
 				entityAddress: "account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3",
 				key: "name",
-				value: .string("Radix Dashboard")
+				value: "Radix Dashboard"
 			)
 
 			SetMetadata(
 				entityAddress: "component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr",
 				key: "name",
-				value: .string("Radix Dashboard")
+				value: "Radix Dashboard"
 			)
 		}
 		let networkID: NetworkID = .simulator
@@ -51,7 +51,7 @@ final class AccountsRequiredToSignTests: TestCase {
 
 
 			CALL_METHOD
-			    ComponentAddress("account_tdx_22_1pz8jpmse7hv0uueppwcksp2h60hkcdsfefm40cye9f3qlqau64")
+			    Address("account_tdx_22_1pz8jpmse7hv0uueppwcksp2h60hkcdsfefm40cye9f3qlqau64")
 			    "deposit_batch"
 			    Expression("ENTIRE_WORKTOP");
 			"""
