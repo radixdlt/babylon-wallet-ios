@@ -306,11 +306,13 @@ extension TransactionClient {
 							accountAddressesNeedingToSignTransactionRequest
 						)
 				)
-
+				print("🔮 addressesNeededToSign: \(addressesNeededToSign)")
 				let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>> = try await {
+					print("🔮🧵 fetching accounts")
 					let accounts = try await addressesNeededToSign.asyncMap {
 						try await accountsClient.getAccountByAddress($0)
 					}
+					print("🔮🧵 found #\(accounts.count) accounts")
 					guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
 						// TransactionManifest does not reference any accounts => use any account!
 						let first = try await accountsClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
@@ -318,6 +320,7 @@ extension TransactionClient {
 					}
 					return accounts
 				}()
+				print("🔮 accountsNeededToSign: \(accountsNeededToSign)")
 
 				let notary = await request.selectNotary(accountsNeededToSign)
 

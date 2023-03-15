@@ -16,13 +16,13 @@ public struct CallMethod: InstructionProtocol {
 
 	// MARK: Computed properties
 
-	/// Temporary. This can actually only be either `ComponentAddress` or `Address_`.
 	public var receiverAsAccountComponentAddress: ComponentAddress? {
+		let accountHRP = "account"
 		switch receiver {
-		case let .address(address) where address.address.starts(with: "account"):
+		case let .address(address) where address.address.starts(with: accountHRP):
 			return ComponentAddress(address: address.address)
-		case let .componentAddress(componentAddress):
-			return componentAddress
+		case let .componentAddress(address) where address.address.starts(with: accountHRP):
+			return ComponentAddress(address: address.address)
 		default:
 			return nil
 		}
