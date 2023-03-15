@@ -1,10 +1,10 @@
 import AppPreferencesClient
 import ClientPrelude
-import P2PClientsClient
+import P2PLinksClient
 import ProfileStore
 
-extension P2PClientsClient: DependencyKey {
-	public typealias Value = P2PClientsClient
+extension P2PLinksClient: DependencyKey {
+	public typealias Value = P2PLinksClient
 
 	public static func live(
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
@@ -12,22 +12,22 @@ extension P2PClientsClient: DependencyKey {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 		return Self(
-			getP2PClients: {
-				await appPreferencesClient.getPreferences().p2pClients
+			getP2PLinks: {
+				await appPreferencesClient.getPreferences().p2pLinks
 			},
-			addP2PClient: { newClient in
+			addP2PLink: { newLink in
 				try await appPreferencesClient.updating {
-					_ = $0.appendP2PClient(newClient)
+					_ = $0.appendP2PLink(newLink)
 				}
 			},
-			deleteP2PClientByPassword: { password in
+			deleteP2PLinkByPassword: { password in
 				try await appPreferencesClient.updating {
-					$0.p2pClients.clients.removeAll(where: { $0.connectionPassword == password })
+					$0.p2pLinks.links.removeAll(where: { $0.connectionPassword == password })
 				}
 			},
-			deleteAllP2PClients: {
+			deleteAllP2PLinks: {
 				try await appPreferencesClient.updating {
-					$0.p2pClients.clients.removeAll()
+					$0.p2pLinks.links.removeAll()
 				}
 			}
 		)

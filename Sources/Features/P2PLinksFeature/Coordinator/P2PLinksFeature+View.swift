@@ -2,21 +2,21 @@ import FeaturePrelude
 import NewConnectionFeature
 import RadixConnectClient
 
-// MARK: - ManageP2PClients.View
-extension ManageP2PClients {
+// MARK: - P2PLinks.View
+extension P2PLinksFeature {
 	public struct ViewState: Equatable {
-		public let clients: IdentifiedArrayOf<ManageP2PClient.State>
+		public let linkRows: IdentifiedArrayOf<P2PLinkRow.State>
 
-		init(state: ManageP2PClients.State) {
-			clients = state.clients
+		init(state: P2PLinksFeature.State) {
+			linkRows = state.links
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ManageP2PClients>
+		private let store: StoreOf<P2PLinksFeature>
 
-		public init(store: StoreOf<ManageP2PClients>) {
+		public init(store: StoreOf<P2PLinksFeature>) {
 			self.store = store
 		}
 
@@ -27,7 +27,7 @@ extension ManageP2PClients {
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
-					Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
+					Text(L10n.P2PLinks.p2PConnectionsSubtitle)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body1HighImportance)
 						.flushedLeft
@@ -39,18 +39,18 @@ extension ManageP2PClients {
 					VStack(alignment: .leading) {
 						ForEachStore(
 							store.scope(
-								state: \.clients,
+								state: \.links,
 								action: { .child(.connection(id: $0, action: $1)) }
 							),
 							content: {
-								ManageP2PClient.View(store: $0)
+								P2PLinkRow.View(store: $0)
 									.padding(.medium3)
 
 								Separator()
 							}
 						)
 					}
-					Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
+					Button(L10n.P2PLinks.newConnectionButtonTitle) {
 						viewStore.send(.addNewConnectionButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular(
@@ -60,14 +60,14 @@ extension ManageP2PClients {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
-				.navigationTitle(L10n.ManageP2PClients.p2PConnectionsTitle)
+				.navigationTitle(L10n.P2PLinks.p2PConnectionsTitle)
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageP2PClients.Destinations.State.newConnection,
-					action: ManageP2PClients.Destinations.Action.newConnection,
+					state: /P2PLinksFeature.Destinations.State.newConnection,
+					action: P2PLinksFeature.Destinations.Action.newConnection,
 					content: { NewConnection.View(store: $0) }
 				)
 			}
@@ -78,13 +78,13 @@ extension ManageP2PClients {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-struct ManageP2PClients_Preview: PreviewProvider {
+struct P2PLinksFeature_Preview: PreviewProvider {
 	static var previews: some View {
 		NavigationStack {
-			ManageP2PClients.View(
+			P2PLinksFeature.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: ManageP2PClients()
+					reducer: P2PLinksFeature()
 				)
 			)
 			#if os(iOS)
@@ -94,7 +94,7 @@ struct ManageP2PClients_Preview: PreviewProvider {
 	}
 }
 
-extension ManageP2PClients.State {
+extension P2PLinksFeature.State {
 	public static let previewValue: Self = .init()
 }
 #endif

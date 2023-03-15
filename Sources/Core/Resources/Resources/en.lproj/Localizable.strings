@@ -119,12 +119,12 @@
 "manageGateway.title" = "Network Gateway";
 "manageGateway.urlString" = "https://example.com:8080";
 
-"manageP2PClients.P2PConnectionsSubtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
-"manageP2PClients.P2PConnectionsTitle" = "Linked Connector";
-"manageP2PClients.connectionID" = "Connector ID: %@";
-"manageP2PClients.newConnectionButtonTitle" = "Link New Connector";
-"manageP2PClients.newConnectionTitle" = "Link New Connector";
-"manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
+"P2PLinks.P2PConnectionsSubtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
+"P2PLinks.P2PConnectionsTitle" = "Linked Connector";
+"P2PLinks.connectionID" = "Connector ID: %@";
+"P2PLinks.newConnectionButtonTitle" = "Link New Connector";
+"P2PLinks.newConnectionTitle" = "Link New Connector";
+"P2PLinks.sendTestMessageButtonTitle" = "Send Test Msg";
 
 "authorizedDapps.title" = "Authorized dApps";
 "authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";

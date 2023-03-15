@@ -17,10 +17,10 @@
 //			$0.radixConnectClient.loadFromProfileAndConnectAll = {
 //				await clientsWasLoaded.setValue(true)
 //			}
-//			$0.radixConnectClient.getP2PClientIDs = {
+//			$0.radixConnectClient.getP2PLinkIDs = {
 //				AsyncJustSequence(clientIDs).eraseToAnyAsyncSequence()
 //			}
-//			$0.radixConnectClient.getRequestsFromP2PClientAsyncSequence = { _ in incomingRequestsAsyncChannel.eraseToAnyAsyncSequence() }
+//			$0.radixConnectClient.getRequestsFromP2PLinkAsyncSequence = { _ in incomingRequestsAsyncChannel.eraseToAnyAsyncSequence() }
 //			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 //			$0.radixConnectClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
 //		}
@@ -32,7 +32,7 @@
 //
 //		await store.receive(.internal(.system(.sendMessageReceivedReceiptBackToPeer(.previewValue, readMessage: request.originalMessage))))
 //
-//		await store.receive(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
+//		await store.receive(.internal(.system(.receiveRequestFromP2PLinkResult(.success(request)))))
 //		await store.receive(.internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.success(request.originalMessage)))))
 //
 //		await store.receive(.internal(.system(.receivedRequestIsValidHandleIt(request)))) {
@@ -78,7 +78,7 @@
 //		}
 //
 //		let newRequest = P2P.RequestFromClient.previewValueSignTXRequest
-//		await store.send(.internal(.system(.receiveRequestFromP2PClientResult(
+//		await store.send(.internal(.system(.receiveRequestFromP2PLinkResult(
 //			.success(newRequest)
 //		))))
 //
@@ -147,7 +147,7 @@
 //		}
 //		store.exhaustivity = .off
 //
-//		await store.send(.internal(.system(.receiveRequestFromP2PClientResult(
+//		await store.send(.internal(.system(.receiveRequestFromP2PLinkResult(
 //			.success(request)
 //		))))
 //

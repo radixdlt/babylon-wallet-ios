@@ -34,6 +34,34 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ManageP2PLinksFeatureTests"
+               BuildableName = "ManageP2PLinksFeatureTests"
+               BlueprintName = "ManageP2PLinksFeatureTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "P2PLinksClientLiveTests"
+               BuildableName = "P2PLinksClientLiveTests"
+               BlueprintName = "P2PLinksClientLiveTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -199,16 +227,6 @@
                BlueprintIdentifier = "ManageGatewayAPIEndpointsFeatureTests"
                BuildableName = "ManageGatewayAPIEndpointsFeatureTests"
                BlueprintName = "ManageGatewayAPIEndpointsFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ManageP2PClientsFeatureTests"
-               BuildableName = "ManageP2PClientsFeatureTests"
-               BlueprintName = "ManageP2PClientsFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -449,16 +467,6 @@
                BlueprintIdentifier = "PersonasClientLiveTests"
                BuildableName = "PersonasClientLiveTests"
                BlueprintName = "PersonasClientLiveTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "P2PClientsClientLiveTests"
-               BuildableName = "P2PClientsClientLiveTests"
-               BlueprintName = "P2PClientsClientLiveTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

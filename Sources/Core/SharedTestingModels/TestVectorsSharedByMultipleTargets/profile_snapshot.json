@@ -17,7 +17,7 @@
         }
       ]
     },
-    "p2pClients" : [
+    "p2pLinks" : [
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
@@ -315,5 +315,5 @@
       ]
     }
   ],
-  "version" : 20
+  "version" : 21
 }
