@@ -37,7 +37,9 @@ extension Completion {
 				.padding(.horizontal, .small2)
 				.padding(.bottom, .medium3)
 				.onAppear { viewStore.send(.appeared) }
-				.onDisappear { viewStore.send(.disappeared) }
+				.onWillDisappear {
+					viewStore.send(.willDisappear)
+				}
 				.frame(maxWidth: .infinity)
 				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
 					CloseButton { viewStore.send(.closeButtonTapped) }
