@@ -40,6 +40,40 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
+		var resetRequestItem: P2P.FromDapp.WalletInteraction.ResetRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.reset]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.reset
+		}
+
+		var usePersonaRequestItem: P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items,
+				case let .usePersona(item) = item.auth
+			else {
+				return nil
+			}
+			return item
+		}
+
+		var ongoingAccountsRequestItem: P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingAccounts]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.ongoingAccounts
+		}
+
 		@PresentationState
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
@@ -160,19 +194,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			// NB: this if let should become a one liner with native case paths:
-			// if let usePersonaRequest = state.remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?] {
-			if let usePersonaItem = { () -> P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? in
-				switch state.remoteInteraction.items {
-				case let .request(.authorized(item)):
-					switch item.auth {
-					case let .usePersona(item): return item
-					default: return nil
-					}
-				default: return nil
-				}
-			}() {
-				return .run { [usePersonaItem, dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
+			if let usePersonaItem = state.usePersonaRequestItem {
+				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
 					if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
 						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
@@ -187,6 +210,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			} else {
 				return .none
 			}
+
 		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
@@ -195,8 +219,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 		case .personaNotFoundErrorAlert:
 			return .none
+
 		case .closeButtonTapped:
 			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+
 		case .backButtonTapped:
 			return goBackEffect(for: &state)
 		}
@@ -216,7 +242,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			))))
 
-			return autofillOngoingResponseItemsIfPossibleEffect(for: &state)
+			resetOngoingResponseItemsIfNeeded(for: &state)
+
+			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
 			if let accountsPayload = payload.accountsPayload {
@@ -263,7 +291,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)))))
 			state.responseItems[item] = responseItem
 
-			return autofillOngoingResponseItemsIfPossibleEffect(for: &state)
+			resetOngoingResponseItemsIfNeeded(for: &state)
+
+			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 		}
 
 		func handlePermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
@@ -338,23 +368,37 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	func autofillOngoingResponseItemsIfPossibleEffect(
+	func resetOngoingResponseItemsIfNeeded(
 		for state: inout State
+	) {
+		guard
+			let resetItem = state.resetRequestItem,
+			var authorizedDapp = state.authorizedDapp,
+			var authorizedPersona = state.authorizedPersona
+		else {
+			return
+		}
+		if resetItem.accounts {
+			authorizedPersona.sharedAccounts = nil
+		}
+		if resetItem.personaData {
+			authorizedPersona.fieldIDs = [] // TODO: check if this is correct as part of https://radixdlt.atlassian.net/browse/ABW-1123
+		}
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		state.authorizedDapp = authorizedDapp
+		state.authorizedPersona = authorizedPersona
+	}
+
+	func autofillOngoingResponseItemsIfPossibleEffect(
+		for state: State
 	) -> EffectTask<Action> {
 		.run { [state] send in
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
-			// TODO: autofill persona data here too
+			// TODO: autofill persona data here too - https://radixdlt.atlassian.net/browse/ABW-1123
 
 			if
-				let ongoingAccountsRequestItem = { () -> P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? in
-					switch state.remoteInteraction.items {
-					case let .request(.authorized(items)):
-						return items.ongoingAccounts
-					default:
-						return nil
-					}
-				}(),
+				let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
 				let sharedAccounts = state.authorizedPersona?.sharedAccounts
 			{
 				if ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request {
