@@ -22,6 +22,7 @@ extension SLIP10.Signature {
 }
 
 extension ECDSASignatureRecoverable {
+	/// Let `v` denote `RecoveryID` or `recid`.
 	/// `v || R || S` instead of `rawRepresentation` which does `R || S || v`
 	public func radixSerialize() throws -> Data {
 		let (rs, v) = try compact()
@@ -31,6 +32,7 @@ extension ECDSASignatureRecoverable {
 }
 
 extension ECDSASignatureRecoverable {
+	/// Let `v` denote `RecoveryID` or `recid`.
 	/// expects `v || R || S` instead of `rawRepresentation` which is `R || S || v`
 	public init(radixFormat: Data) throws {
 		guard radixFormat.count == 65 else {
@@ -40,21 +42,5 @@ extension ECDSASignatureRecoverable {
 		let v = Int32(radixFormat[0])
 		let rs = radixFormat.suffix(64)
 		try self.init(compactRepresentation: Data(rs), recoveryID: v)
-
-		//        let v2 = try Self(radixFormatVersion2: radixFormat)
-		//        assert(self == v2)
-	}
-}
-
-extension ECDSASignatureRecoverable {
-	/// expects `v || R || S` instead of `rawRepresentation` which is `R || S || v`
-	public init(radixFormatVersion2 radixFormat: Data) throws {
-		guard radixFormat.count == 65 else {
-			struct InvalidLength: Swift.Error {}
-			throw InvalidLength()
-		}
-		let v = Data([radixFormat[0]])
-		let rs = Data(radixFormat.suffix(64))
-		try self.init(rawRepresentation: rs + v)
 	}
 }

@@ -65,6 +65,10 @@ extension SLIP10.PrivateKey {
 			// but for secp256k1 we sign the hash.
 			let signature = try key.signature(for: unhashed)
 			let publicKey = key.publicKey
+			let isValid = publicKey.isValidSignature(signature, for: unhashed)
+			guard isValid else {
+				throw Curve25519SignatureJustProducedIsInvalid()
+			}
 			return (signatureWithPublicKey: SignatureWithPublicKey.eddsaEd25519(
 				signature: signature,
 				publicKey: publicKey
@@ -86,18 +90,19 @@ extension SLIP10.PrivateKey {
 			let signature = try key.ecdsaSignRecoverable(hashed: messageToSign)
 			let publicKey = key.publicKey
 
-			let isValid = try publicKey.isValid(signature: signature, hashed: messageToSign)
+			let isValid = try publicKey.isValid(
+				signature: signature,
+				hashed: messageToSign
+			)
+
 			guard isValid else {
-				fatalError("invalid sig")
+				throw Secp256k1SignatureJustProducedIsInvalid()
 			}
 
 			let signatureWithPublicKey = SignatureWithPublicKey.ecdsaSecp256k1(
 				signature: signature,
 				publicKey: publicKey
 			)
-
-			try print("🎉 secp256k1 signed unhashed=\(unhashed.hex), hashed message: '\(Data(messageToSign).hex)'\npublicKey: \(publicKey.rawRepresentation(format: .compressed).hex),\nproduced recoverable signature raw: \(signature.rawRepresentation.hex),\nsig.radixFormat: '\(signature.radixSerialize().hex)'")
-
 			return (
 				signatureWithPublicKey,
 				hashOfMessage
@@ -108,6 +113,12 @@ extension SLIP10.PrivateKey {
 
 // MARK: - SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong
 struct SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong: Swift.Error {}
+
+// MARK: - Secp256k1SignatureJustProducedIsInvalid
+struct Secp256k1SignatureJustProducedIsInvalid: Swift.Error {}
+
+// MARK: - Curve25519SignatureJustProducedIsInvalid
+struct Curve25519SignatureJustProducedIsInvalid: Swift.Error {}
 
 extension SLIP10.PrivateKey {
 	public func publicKey() -> SLIP10.PublicKey {
