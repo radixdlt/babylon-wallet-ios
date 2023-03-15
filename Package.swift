@@ -637,7 +637,7 @@ package.addModules([
 			"RadixConnectModels",
 			"SharedModels",
 			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
+				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
 			},
 		],
 		tests: .yes()
