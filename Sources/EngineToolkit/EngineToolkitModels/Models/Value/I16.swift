@@ -3,8 +3,8 @@ import Foundation
 // MARK: - Int16 + ValueProtocol, ProxyCodable
 extension Int16: ValueProtocol, ProxyCodable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .i16
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .i16
+	public func embedValue() -> ManifestASTValue {
 		.i16(self)
 	}
 
@@ -42,7 +42,7 @@ public struct ProxyDecodableInt<I: FixedWidthInteger & Codable & ValueProtocol>:
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: ProxyCodableIntCodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Decoded.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Decoded.kind, butGot: kind)
 		}

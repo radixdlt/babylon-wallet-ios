@@ -38,7 +38,6 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case dropAllProofs(DropAllProofs)
 
 	case publishPackage(PublishPackage)
-	case publishPackageWithOwner(PublishPackageWithOwner)
 
 	case burnResource(BurnResource)
 	case recallResource(RecallResource)
@@ -57,14 +56,15 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case mintUuidNonFungible(MintUuidNonFungible)
 
 	case createFungibleResource(CreateFungibleResource)
-	case createFungibleResourceWithOwner(CreateFungibleResourceWithOwner)
+	case createFungibleResourceWithInitialSupply(CreateFungibleResourceWithInitialSupply)
 	case createNonFungibleResource(CreateNonFungibleResource)
-	case createNonFungibleResourceWithOwner(CreateNonFungibleResourceWithOwner)
+	case createNonFungibleResourceWithInitialSupply(CreateNonFungibleResourceWithInitialSupply)
 
 	case createAccessController(CreateAccessController)
 	case createIdentity(CreateIdentity)
 	case assertAccessRule(AssertAccessRule)
 
+	case createAccount(CreateAccount)
 	case createValidator(CreateValidator)
 }
 
@@ -122,8 +122,6 @@ extension Instruction {
 
 		case .publishPackage:
 			return .publishPackage
-		case .publishPackageWithOwner:
-			return .publishPackageWithOwner
 
 		case .burnResource:
 			return .burnResource
@@ -154,12 +152,12 @@ extension Instruction {
 
 		case .createFungibleResource:
 			return .createFungibleResource
-		case .createFungibleResourceWithOwner:
-			return .createFungibleResourceWithOwner
+		case .createFungibleResourceWithInitialSupply:
+			return .createFungibleResourceWithInitialSupply
+		case .createNonFungibleResourceWithInitialSupply:
+			return .createNonFungibleResourceWithInitialSupply
 		case .createNonFungibleResource:
 			return .createNonFungibleResource
-		case .createNonFungibleResourceWithOwner:
-			return .createNonFungibleResourceWithOwner
 
 		case .createAccessController:
 			return .createAccessController
@@ -167,6 +165,9 @@ extension Instruction {
 			return .createIdentity
 		case .assertAccessRule:
 			return .assertAccessRule
+
+		case .createAccount:
+			return .createAccount
 
 		case .createValidator:
 			return .createValidator
@@ -234,8 +235,6 @@ extension Instruction {
 
 		case let .publishPackage(instruction):
 			try instruction.encode(to: encoder)
-		case let .publishPackageWithOwner(instruction):
-			try instruction.encode(to: encoder)
 
 		case let .burnResource(instruction):
 			try instruction.encode(to: encoder)
@@ -266,11 +265,11 @@ extension Instruction {
 
 		case let .createFungibleResource(instruction):
 			try instruction.encode(to: encoder)
-		case let .createFungibleResourceWithOwner(instruction):
+		case let .createFungibleResourceWithInitialSupply(instruction):
 			try instruction.encode(to: encoder)
 		case let .createNonFungibleResource(instruction):
 			try instruction.encode(to: encoder)
-		case let .createNonFungibleResourceWithOwner(instruction):
+		case let .createNonFungibleResourceWithInitialSupply(instruction):
 			try instruction.encode(to: encoder)
 
 		case let .createAccessController(instruction):
@@ -278,6 +277,9 @@ extension Instruction {
 		case let .createIdentity(instruction):
 			try instruction.encode(to: encoder)
 		case let .assertAccessRule(instruction):
+			try instruction.encode(to: encoder)
+
+		case let .createAccount(instruction):
 			try instruction.encode(to: encoder)
 
 		case let .createValidator(instruction):
@@ -340,8 +342,6 @@ extension Instruction {
 
 		case .publishPackage:
 			self = try .publishPackage(.init(from: decoder))
-		case .publishPackageWithOwner:
-			self = try .publishPackageWithOwner(.init(from: decoder))
 
 		case .burnResource:
 			self = try .burnResource(.init(from: decoder))
@@ -372,12 +372,12 @@ extension Instruction {
 
 		case .createFungibleResource:
 			self = try .createFungibleResource(.init(from: decoder))
-		case .createFungibleResourceWithOwner:
-			self = try .createFungibleResourceWithOwner(.init(from: decoder))
+		case .createFungibleResourceWithInitialSupply:
+			self = try .createFungibleResourceWithInitialSupply(.init(from: decoder))
 		case .createNonFungibleResource:
 			self = try .createNonFungibleResource(.init(from: decoder))
-		case .createNonFungibleResourceWithOwner:
-			self = try .createNonFungibleResourceWithOwner(.init(from: decoder))
+		case .createNonFungibleResourceWithInitialSupply:
+			self = try .createNonFungibleResourceWithInitialSupply(.init(from: decoder))
 
 		case .createAccessController:
 			self = try .createAccessController(.init(from: decoder))
@@ -385,6 +385,9 @@ extension Instruction {
 			self = try .createIdentity(.init(from: decoder))
 		case .assertAccessRule:
 			self = try .assertAccessRule(.init(from: decoder))
+
+		case .createAccount:
+			self = try .createAccount(.init(from: decoder))
 
 		case .createValidator:
 			self = try .createValidator(.init(from: decoder))

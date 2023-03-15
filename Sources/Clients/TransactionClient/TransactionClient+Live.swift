@@ -46,7 +46,7 @@ extension TransactionClient {
 			let cachedPrivateHDFactorSources = ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>>([])
 
 			@Sendable func sign(
-				unhashed unhashed_: any DataProtocol,
+				unhashed unhashed_: some DataProtocol,
 				with account: OnNetwork.Account,
 				debugOrigin origin: String
 			) async throws -> SignatureWithPublicKey {

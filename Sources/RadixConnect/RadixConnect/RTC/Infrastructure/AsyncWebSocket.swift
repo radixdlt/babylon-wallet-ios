@@ -39,7 +39,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 	private let clock: any Clock<Duration>
 
 	// MARK: - State
-	private let IncomingMessagesContinuation: AsyncStream<Data>.Continuation
+	private let incomingMessagesContinuation: AsyncStream<Data>.Continuation
 	private var isRestarting: Bool = false
 	private var isConnectedToInternet: Bool = false
 	private var pingTask: Task<Void, Error>? = nil
@@ -60,7 +60,7 @@ public final actor AsyncWebSocket: NSObject, SignalingTransport {
 		self.sessionConfig.waitsForConnectivity = true
 		self.clock = clock
 
-		(incomingMessages, IncomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 
 		super.init()
 
@@ -107,7 +107,7 @@ extension AsyncWebSocket {
 
 	func cancel() async {
 		terminated = true
-		IncomingMessagesContinuation.finish()
+		incomingMessagesContinuation.finish()
 		pingTask?.cancel()
 		invalidateSession()
 		monitor.cancel()
@@ -135,9 +135,9 @@ extension AsyncWebSocket {
 					let message = try result.get()
 					switch message {
 					case let .data(data):
-						self.IncomingMessagesContinuation.yield(data)
+						self.incomingMessagesContinuation.yield(data)
 					case let .string(string):
-						self.IncomingMessagesContinuation.yield(Data(string.utf8))
+						self.incomingMessagesContinuation.yield(Data(string.utf8))
 					@unknown default:
 						throw UnknownMessageTypeError()
 					}

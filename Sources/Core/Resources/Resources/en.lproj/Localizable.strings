@@ -119,12 +119,12 @@
 "manageGateway.title" = "Network Gateway";
 "manageGateway.urlString" = "https://example.com:8080";
 
-"manageP2PClients.P2PConnectionsSubtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
-"manageP2PClients.P2PConnectionsTitle" = "Linked Connector";
-"manageP2PClients.connectionID" = "Connector ID: %@";
-"manageP2PClients.newConnectionButtonTitle" = "Link New Connector";
-"manageP2PClients.newConnectionTitle" = "Link New Connector";
-"manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
+"P2PLinks.P2PConnectionsSubtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
+"P2PLinks.P2PConnectionsTitle" = "Linked Connector";
+"P2PLinks.connectionID" = "Connector ID: %@";
+"P2PLinks.newConnectionButtonTitle" = "Link New Connector";
+"P2PLinks.newConnectionTitle" = "Link New Connector";
+"P2PLinks.sendTestMessageButtonTitle" = "Send Test Msg";
 
 "authorizedDapps.title" = "Authorized dApps";
 "authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
@@ -204,7 +204,7 @@
 "settings.connectExtension.title" = "Link your Wallet to a Desktop Browser";
 "settings.deleteAllButtonTitle" = "Delete Wallet Data";
 "settings.desktopConnectionsButtonTitle" = "Linked Connector";
-"settings.gatewayButtonTitle" = "Network Gateway";
+"settings.gatewaysButtonTitle" = "Gateways";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
 "settings.noProfileText" = "No Wallet Data Found";
 "settings.personasButtonTitle" = "Personas";
@@ -225,3 +225,18 @@
 "transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction...";
 "transactionSigning.title" = "Approve Transaction";
+
+"gatewaySettings.addNewGateway.addGatewayButtonTitle" = "Add Gateway";
+"gatewaySettings.addNewGateway.error.noGatewayFound" = "No Gateway found at specified URL";
+"gatewaySettings.addNewGateway.subtitle" = "Enter a Gateway URL";
+"gatewaySettings.addNewGateway.textFieldPlaceholder" = "Enter full URL";
+"gatewaySettings.addNewGateway.title" = "Add New Gateway";
+"gatewaySettings.addNewGatewayButtonTitle" = "Add New Gateway";
+"gatewaySettings.removeGatewayAlert.cancelButtonTitle" = "Cancel";
+"gatewaySettings.removeGatewayAlert.message" = "You will no longer be able to connect to this Gateway";
+"gatewaySettings.removeGatewayAlert.removeButtonTitle" = "Remove";
+"gatewaySettings.removeGatewayAlert.title" = "Remove Gateway";
+"gatewaySettings.subtitle" = "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.";
+"gatewaySettings.title" = "Gateways";
+"gatewaySettings.whatIsAGateway.buttonText" = "What is a Gateway";
+"gatewaySettings.whatIsAGateway.explanationText" = "What is a Gateway";

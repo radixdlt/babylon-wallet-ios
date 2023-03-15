@@ -1,11 +1,11 @@
 import ClientPrelude
 import Network
-import P2PClientsClient
+import P2PLinksClient
 import RadixConnect
 
 extension RadixConnectClient {
 	public static let liveValue: Self = {
-		@Dependency(\.p2pClientsClient) var p2pClientsClient
+		@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
@@ -14,10 +14,9 @@ extension RadixConnectClient {
 			loadFromProfileAndConnectAll: {
 				Task {
 					loggerGlobal.info("🔌 Loading and connecting all P2P connections")
-					for client in await p2pClientsClient.getP2PClients() {
+					for client in await p2pLinksClient.getP2PLinks() {
 						try await rtcClients.connect(
-							client.connectionPassword,
-							waitsForConnectionToBeEstablished: true
+							client.connectionPassword
 						)
 					}
 				}
@@ -26,9 +25,9 @@ extension RadixConnectClient {
 				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
 				await rtcClients.disconnectAndRemoveAll()
 				do {
-					try await p2pClientsClient.deleteAllP2PClients()
+					try await p2pLinksClient.deleteAllP2PLinks()
 				} catch {
-					loggerGlobal.error("Failed to delete P2PClients -> \(error)")
+					loggerGlobal.error("Failed to delete P2PLinks -> \(error)")
 				}
 			},
 			disconnectAll: {
@@ -38,21 +37,21 @@ extension RadixConnectClient {
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
-			getP2PClients: {
-				await OrderedSet(p2pClientsClient.getP2PClients())
+			getP2PLinks: {
+				await OrderedSet(p2pLinksClient.getP2PLinks())
 			},
-			storeP2PClient: { client in
-				try await p2pClientsClient.addP2PClient(client)
+			storeP2PLink: { client in
+				try await p2pLinksClient.addP2PLink(client)
 			},
-			deleteP2PClientByPassword: { password in
+			deleteP2PLinkByPassword: { password in
 				loggerGlobal.info("Deleting P2P Connection")
-				try await p2pClientsClient.deleteP2PClientByPassword(password)
+				try await p2pLinksClient.deleteP2PLinkByPassword(password)
 				await rtcClients.disconnectAndRemoveClient(password)
 			},
 			addP2PWithPassword: { password in
-				try await rtcClients.connect(password)
+				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
-			receiveMessages: { await rtcClients.IncomingMessages },
+			receiveMessages: { await rtcClients.incomingMessages },
 			sendMessage: { outgoingMsg in
 				try await rtcClients.sendMessage(outgoingMsg)
 			}

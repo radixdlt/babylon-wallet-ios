@@ -11,10 +11,10 @@ final class ProfileTests: TestCase {
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
-		let first = P2PClient(connectionPassword: pw, displayName: "first")
-		let second = P2PClient(connectionPassword: pw, displayName: "second")
+		let first = P2PLink(connectionPassword: pw, displayName: "first")
+		let second = P2PLink(connectionPassword: pw, displayName: "second")
 		XCTAssertEqual(first, second)
-		var clients = P2PClients(.init())
+		var clients = P2PLinks(.init())
 		XCTAssertEqual(clients.append(first), first)
 		XCTAssertNil(clients.append(second))
 	}
@@ -176,17 +176,17 @@ final class ProfileTests: TestCase {
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
 		let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
-		XCTAssertNotNil(profile.appendP2PClient(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
+		XCTAssertNotNil(profile.appendP2PLink(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
 		// Should not be possible to add a client with the same password
-		XCTAssertNil(profile.appendP2PClient(
-			P2PClient(
+		XCTAssertNil(profile.appendP2PLink(
+			P2PLink(
 				connectionPassword: connectionPassword,
 				displayName: "irrelevant"
 			)
-		), "Should not be possible to add another P2PClient with same password")
+		), "Should not be possible to add another P2PLink with same password")
 
-		XCTAssertNotNil(profile.appendP2PClient(
-			P2PClient(
+		XCTAssertNotNil(profile.appendP2PLink(
+			P2PLink(
 				connectionPassword: try! ConnectionPassword(.init(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef")),
 				displayName: "iPhone 13"
 			)
@@ -358,10 +358,9 @@ final class ProfileTests: TestCase {
 			"identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen"
 		)
 
-		XCTAssertEqual(profile.appPreferences.p2pClients.clients.count, 2)
-		let p2pClient0 = try XCTUnwrap(profile.appPreferences.p2pClients.first)
-		XCTAssertEqual(p2pClient0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
-		let p2pClient1 = profile.appPreferences.p2pClients[1]
+		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
+		let p2pLinks0 = try XCTUnwrap(profile.appPreferences.p2pLinks.first)
+		XCTAssertEqual(p2pLinks0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 
 		XCTAssertEqual(onNetwork.authorizedDapps.count, 1)
 		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)

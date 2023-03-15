@@ -27,7 +27,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case newConnection(P2PClient)
+		case newConnection(P2PLink)
 	}
 
 	public init() {}
@@ -67,9 +67,6 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .connectUsingSecrets(.view(.task)):
-			return .none
-
 		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
 				#if os(iOS)

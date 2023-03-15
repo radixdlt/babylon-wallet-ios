@@ -1,8 +1,8 @@
 import Cryptography
 import Prelude
 
-public extension HD.Root {
-	func derivePrivateKey(
+extension HD.Root {
+	public func derivePrivateKey(
 		path: DerivationPath,
 		curve: Slip10Curve
 	) throws -> SLIP10.PrivateKey {
@@ -18,7 +18,7 @@ public extension HD.Root {
 		}
 	}
 
-	func derivePublicKey(
+	public func derivePublicKey(
 		path: DerivationPath,
 		curve: Slip10Curve
 	) throws -> SLIP10.PublicKey {

@@ -11,8 +11,7 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 		public var isFirst: Bool
 		public var inputtedName: String
 		public var sanitizedName: NonEmptyString?
-
-		@BindingState public var focusedField: Field?
+		public var focusedField: Field?
 
 		public init(
 			isFirst: Bool,
@@ -34,12 +33,12 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case confirmNameButtonTapped
-		case textFieldFocused(NameNewEntity.State.Field?)
+		case textFieldFocused(State.Field?)
 		case textFieldChanged(String)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case focusTextField(NameNewEntity.State.Field?)
+		case focusTextField(State.Field?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {

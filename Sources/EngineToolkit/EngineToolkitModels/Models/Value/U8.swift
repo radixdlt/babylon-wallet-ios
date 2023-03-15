@@ -2,8 +2,8 @@ import Foundation
 
 extension UInt8: ValueProtocol, ProxyCodable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .u8
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .u8
+	public func embedValue() -> ManifestASTValue {
 		.u8(self)
 	}
 

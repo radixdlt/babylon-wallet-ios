@@ -2,8 +2,8 @@ import Cryptography
 import Prelude
 
 // MARK: FactorSources
-public extension FactorSource {
-	static func device(
+extension FactorSource {
+	public static func device(
 		mnemonic: Mnemonic,
 		hint: NonEmptyString,
 		bip39Passphrase: String = "",
@@ -18,7 +18,7 @@ public extension FactorSource {
 		)
 	}
 
-	static func babylon(
+	public static func babylon(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		hint: NonEmptyString = "babylon"
 	) throws -> Self {
@@ -29,7 +29,7 @@ public extension FactorSource {
 		)
 	}
 
-	static func babylon(
+	public static func babylon(
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = "",
 		hint: NonEmptyString = "babylon"
@@ -42,7 +42,7 @@ public extension FactorSource {
 		)
 	}
 
-	static func olympia(
+	public static func olympia(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		hint: NonEmptyString = "olympia"
 	) throws -> Self {
@@ -53,7 +53,7 @@ public extension FactorSource {
 		)
 	}
 
-	static func olympia(
+	public static func olympia(
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = "",
 		hint: NonEmptyString = "olympia"
@@ -66,7 +66,7 @@ public extension FactorSource {
 		)
 	}
 
-	static func trustedContact(
+	public static func trustedContact(
 		publicKey: SLIP10.PublicKey,
 		nameOfContact: NonEmpty<String>
 	) throws -> Self {
