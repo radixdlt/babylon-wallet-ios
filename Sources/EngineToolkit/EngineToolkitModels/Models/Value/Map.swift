@@ -28,8 +28,8 @@ public struct Map_: ValueProtocol, Sendable, Codable, Hashable {
 }
 
 // MARK: Map_.Error
-public extension Map_ {
-	enum Error: String, Swift.Error, Sendable, Hashable {
+extension Map_ {
+	public enum Error: String, Swift.Error, Sendable, Hashable {
 		case homogeneousMapRequired
 	}
 }

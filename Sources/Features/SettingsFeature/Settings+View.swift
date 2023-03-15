@@ -1,8 +1,8 @@
 import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
-import ManageGatewayAPIEndpointsFeature
-import ManageP2PClientsFeature
+import GatewaySettingsFeature
+import P2PLinksFeature
 import PersonasFeature
 #if DEBUG
 import InspectProfileFeature
@@ -25,7 +25,7 @@ extension AppSettings {
 		let isDebugProfileViewSheetPresented: Bool
 		let profileToInspect: Profile?
 		#endif
-		let shouldShowAddP2PClientButton: Bool
+		let shouldShowAddP2PLinkButton: Bool
 		let appVersion: String
 
 		init(state: AppSettings.State) {
@@ -33,7 +33,7 @@ extension AppSettings {
 			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			self.profileToInspect = state.profileToInspect
 			#endif
-			self.shouldShowAddP2PClientButton = state.userHasNoP2PClients ?? false
+			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
@@ -43,29 +43,15 @@ extension AppSettings {
 extension AppSettings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			NavigationStack {
-				settingsView(viewStore: viewStore)
-					.navigationTitle(L10n.Settings.title)
-				#if os(iOS)
-					.navigationBarBackButtonFont(.app.backButton)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							CloseButton {
-								viewStore.send(.closeButtonTapped)
-							}
-						}
-					}
-					.navigationTransition(.default, interactivity: .pan)
-				#endif
-					.navigationDestinations(with: store, viewStore)
-			}
-			.tint(.app.gray1)
-			.foregroundColor(.app.gray1)
+			settingsView(viewStore: viewStore)
+				.navigationTitle(L10n.Settings.title)
+			#if os(iOS)
+				.navigationBarTitleDisplayMode(.inline)
+			#endif
+				.navigationDestinations(with: store, viewStore)
+				.tint(.app.gray1)
+				.foregroundColor(.app.gray1)
 		}
-		.showDeveloperDisclaimerBanner()
 		.presentsLoadingViewOverlay()
 	}
 }
@@ -108,7 +94,7 @@ extension View {
 			}
 		#endif
 			.factorSources(with: store, viewStore)
-			.manageP2PClients(with: store, viewStore)
+			.manageP2PLinks(with: store, viewStore)
 			.manageGatewayAPIEndpoints(with: store, viewStore)
 			.authorizedDapps(with: store, viewStore)
 			.personas(with: store, viewStore)
@@ -130,15 +116,15 @@ extension View {
 	}
 
 	@MainActor
-	private func manageP2PClients(
+	private func manageP2PLinks(
 		with store: StoreOf<AppSettings>,
 		_ viewStore: ViewStoreOf<AppSettings>
 	) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /AppSettings.Destinations.State.manageP2PClients,
-			action: AppSettings.Destinations.Action.manageP2PClients,
-			destination: { ManageP2PClients.View(store: $0) }
+			state: /AppSettings.Destinations.State.manageP2PLinks,
+			action: AppSettings.Destinations.Action.manageP2PLinks,
+			destination: { P2PLinksFeature.View(store: $0) }
 		)
 	}
 
@@ -149,9 +135,9 @@ extension View {
 	) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /AppSettings.Destinations.State.manageGatewayAPIEndpoints,
-			action: AppSettings.Destinations.Action.manageGatewayAPIEndpoints,
-			destination: { ManageGatewayAPIEndpoints.View(store: $0) }
+			state: /AppSettings.Destinations.State.gatewaySettings,
+			action: AppSettings.Destinations.Action.gatewaySettings,
+			destination: { GatewaySettings.View(store: $0) }
 		)
 	}
 
@@ -197,12 +183,12 @@ extension AppSettings.View {
 			.init(
 				title: L10n.Settings.desktopConnectionsButtonTitle,
 				asset: AssetResource.desktopConnections,
-				action: .manageP2PClientsButtonTapped
+				action: .manageP2PLinksButtonTapped
 			),
 			.init(
-				title: L10n.Settings.gatewayButtonTitle,
+				title: L10n.Settings.gatewaysButtonTitle,
 				asset: AssetResource.gateway,
-				action: .editGatewayAPIEndpointButtonTapped
+				action: .gatewaysButtonTapped
 			),
 			.init(
 				title: L10n.Settings.authorizedDappsButtonTitle,
@@ -226,9 +212,9 @@ extension AppSettings.View {
 		VStack(spacing: 0) {
 			ScrollView {
 				VStack(spacing: .zero) {
-					if viewStore.shouldShowAddP2PClientButton {
+					if viewStore.shouldShowAddP2PLinkButton {
 						ConnectExtensionView {
-							viewStore.send(.addP2PClientButtonTapped)
+							viewStore.send(.addP2PLinkButtonTapped)
 						}
 						.padding(.medium3)
 					}
@@ -241,7 +227,7 @@ extension AppSettings.View {
 							.frame(.verySmall)
 					}
 					.withSeparator
-					.buttonStyle(.settingsRowStyle)
+					.buttonStyle(.tappableRowStyle)
 
 					PlainListRow(title: "Factor Sources") {
 						viewStore.send(.factorSourcesButtonTapped)
@@ -250,7 +236,7 @@ extension AppSettings.View {
 							.frame(.verySmall)
 					}
 					.withSeparator
-					.buttonStyle(.settingsRowStyle)
+					.buttonStyle(.tappableRowStyle)
 					#endif
 
 					ForEach(settingsRows()) { row in
@@ -258,7 +244,7 @@ extension AppSettings.View {
 							viewStore.send(row.action)
 						}
 						.withSeparator
-						.buttonStyle(.settingsRowStyle)
+						.buttonStyle(.tappableRowStyle)
 					}
 				}
 				.padding(.bottom, .large3)
@@ -276,7 +262,7 @@ extension AppSettings.View {
 				}
 			}
 			.onAppear {
-				viewStore.send(.didAppear)
+				viewStore.send(.appeared)
 			}
 		}
 	}

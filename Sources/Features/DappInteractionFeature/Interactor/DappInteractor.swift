@@ -36,6 +36,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case presentResponseFailureAlert(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
 		case ensureCurrentModalIsActuallyPresented
+		case checkCanShowDappInteraction
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -63,8 +64,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	var onPresent: (@Sendable () -> Void)? = nil
-	var onDismiss: (@Sendable () -> Void)? = nil
+	var canShowInteraction: @Sendable () -> Bool = { true }
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
@@ -129,7 +129,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return .none
 			case let .presented(.cancelButtonTapped(request)):
 				dismissCurrentModalAndRequest(request, for: &state)
-				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
+				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			case let .presented(.retryButtonTapped(response, request, dappMetadata)):
 				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
 			}
@@ -146,30 +146,34 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case .checkCanShowDappInteraction:
+			if canShowInteraction() {
+				return presentQueuedRequestIfNeededEffect(for: &state)
+			} else {
+				return delayedEffect(for: .internal(.checkCanShowDappInteraction))
+			}
 		case let .receivedRequestFromDapp(request):
-			onPresent?()
 			state.requestQueue.append(request)
-			return presentQueuedRequestIfNeededEffect(for: &state)
+			return .send(.internal(.checkCanShowDappInteraction))
 
 		case .presentQueuedRequestIfNeeded:
-			return presentQueuedRequestIfNeededEffect(for: &state)
+			return .send(.internal(.checkCanShowDappInteraction))
 
 		case let .sentResponseToDapp(response, for: request, dappMetadata):
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return delayedPresentationEffect(
+				return delayedEffect(
 					for: .internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil)))
 				)
 			case .failure:
-				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
+				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
 		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return delayedPresentationEffect(for: .internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
+			return delayedEffect(for: .internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
 
 		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
-
 			state.responseFailureAlert = .init(
 				title: { TextState(L10n.App.errorOccurredTitle) },
 				actions: {
@@ -236,7 +240,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
-			return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
+			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 		case
 			.modal(.presented(.dappInteraction(.relay(_, .delegate(.presented))))),
 			.modal(.presented(.dappInteractionCompletion(.delegate(.presented)))):
@@ -264,10 +268,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func dismissCurrentModalAndRequest(_ request: P2P.RTCIncomingWalletInteraction, for state: inout State) {
 		state.requestQueue.remove(request)
 		state.currentModal = nil
-		onDismiss?()
 	}
 
-	func delayedPresentationEffect(
+	func delayedEffect(
 		delay: Duration = .seconds(0.75),
 		for action: Action
 	) -> EffectTask<Action> {

@@ -10,13 +10,14 @@
         {
           "network" : {
             "id" : 11,
-            "name" : "nebunet"
+            "name" : "nebunet",
+			"displayDescription": "Radix Public Network",
           },
           "url" : "https://betanet.radixdlt.com"
         }
       ]
     },
-    "p2pClients" : [
+    "p2pLinks" : [
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
@@ -314,5 +315,5 @@
       ]
     }
   ],
-  "version" : 20
+  "version" : 21
 }

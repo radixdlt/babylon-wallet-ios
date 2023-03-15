@@ -119,6 +119,15 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "GatewaySettingsFeature",
+		dependencies: [
+			"CreateEntityFeature",
+			"GatewaysClient",
+			"NetworkSwitchingClient",
+		],
+		tests: .yes()
+	),
+	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			"AccountDetailsFeature",
@@ -154,18 +163,10 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ManageP2PClientsFeature",
+		name: "P2PLinksFeature",
 		dependencies: [
 			"NewConnectionFeature",
 			"RadixConnectClient",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "ManageGatewayAPIEndpointsFeature",
-		dependencies: [
-			"CreateEntityFeature",
-			"NetworkSwitchingClient",
 		],
 		tests: .yes()
 	),
@@ -207,8 +208,8 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
-			"ManageP2PClientsFeature",
-			"ManageGatewayAPIEndpointsFeature",
+			"P2PLinksFeature",
+			"GatewaySettingsFeature",
 			"MnemonicClient",
 			"PersonasFeature",
 			"RadixConnectClient", // deleting connections when wallet is deleted
@@ -409,17 +410,17 @@ package.addModules([
 	),
 
 	.client(
-		name: "P2PClientsClient",
+		name: "P2PLinksClient",
 		dependencies: [
 			"Profile",
 		],
 		tests: .no
 	),
 	.client(
-		name: "P2PClientsClientLive",
+		name: "P2PLinksClientLive",
 		dependencies: [
 			"ProfileStore",
-			"P2PClientsClient",
+			"P2PLinksClient",
 			"AppPreferencesClient",
 		],
 		tests: .yes()
@@ -428,7 +429,7 @@ package.addModules([
 		name: "RadixConnectClient",
 		dependencies: [
 			"RadixConnect",
-			"P2PClientsClient",
+			"P2PLinksClient",
 		],
 		tests: .yes()
 	),
@@ -636,7 +637,7 @@ package.addModules([
 			"RadixConnectModels",
 			"SharedModels",
 			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
+				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
 			},
 		],
 		tests: .yes()

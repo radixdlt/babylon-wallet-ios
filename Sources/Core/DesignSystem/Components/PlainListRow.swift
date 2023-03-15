@@ -49,8 +49,8 @@ public struct PlainListRow<Icon: View>: View {
 	}
 }
 
-public extension PlainListRow {
-	var withSeparator: some View {
+extension PlainListRow {
+	public var withSeparator: some View {
 		VStack(spacing: .zero) {
 			self
 			Separator()

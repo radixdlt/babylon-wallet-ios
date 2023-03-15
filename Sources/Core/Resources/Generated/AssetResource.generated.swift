@@ -23,6 +23,7 @@ public typealias AssetImageTypeAlias = ImageAsset.Image
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
 public enum AssetResource {
   public static let arrowBack = ImageAsset(name: "arrow-back")
+  public static let checkmarkBig = ImageAsset(name: "checkmark-big")
   public static let checkmarkDarkSelected = ImageAsset(name: "checkmark-dark-selected")
   public static let checkmarkDarkUnselected = ImageAsset(name: "checkmark-dark-unselected")
   public static let checkmarkLightSelected = ImageAsset(name: "checkmark-light-selected")
@@ -32,12 +33,14 @@ public enum AssetResource {
   public static let copy = ImageAsset(name: "copy")
   public static let ellipsis = ImageAsset(name: "ellipsis")
   public static let iconLinkOut = ImageAsset(name: "icon-link-out")
+  public static let info = ImageAsset(name: "info")
   public static let radioButtonDarkDisabled = ImageAsset(name: "radioButton-dark-disabled")
   public static let radioButtonDarkSelected = ImageAsset(name: "radioButton-dark-selected")
   public static let radioButtonDarkUnselected = ImageAsset(name: "radioButton-dark-unselected")
   public static let radioButtonLightDisabled = ImageAsset(name: "radioButton-light-disabled")
   public static let radioButtonLightSelected = ImageAsset(name: "radioButton-light-selected")
   public static let radioButtonLightUnselected = ImageAsset(name: "radioButton-light-unselected")
+  public static let trash = ImageAsset(name: "trash")
   public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
   public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")

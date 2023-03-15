@@ -28,7 +28,7 @@ extension SLIP10 {
 
 extension SHA256 {
 	/// SHA256 hashes `data` twice, as in `SHA256(SHA256(data))`
-	public static func twice(data: any DataProtocol) -> SHA256.Digest {
+	public static func twice(data: some DataProtocol) -> SHA256.Digest {
 		SHA256.hash(data: Data(SHA256.hash(data: data)))
 	}
 }
@@ -38,7 +38,7 @@ extension SLIP10.PrivateKey {
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
 	public func sign(
-		data: any DataProtocol,
+		data: some DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> SignatureWithPublicKey {
 		try signReturningHashOfMessage(

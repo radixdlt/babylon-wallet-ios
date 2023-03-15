@@ -25,14 +25,14 @@ final class NewConnectionTests: TestCase {
 			),
 			reducer: NewConnection()
 		)
-		let connectedClient = P2PClient(connectionPassword: .placeholder, displayName: "name")
+		let connectedClient = P2PLink(connectionPassword: .placeholder, displayName: "name")
 
 		await store.send(.child(.connectUsingSecrets(.delegate(.connected(connectedClient)))))
 		await store.receive(.delegate(.newConnection(connectedClient)))
 	}
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
-		let connection = P2PClient(connectionPassword: .placeholder, displayName: "Unnamed")
+		let connection = P2PLink(connectionPassword: .placeholder, displayName: "Unnamed")
 
 		let store = TestStore(
 			// GIVEN initial state
@@ -84,7 +84,7 @@ final class NewConnectionTests: TestCase {
 
 		await clock.advance(by: .seconds(1))
 
-		let connection = P2PClient(connectionPassword: password, displayName: connectionName)
+		let link = P2PLink(connectionPassword: password, displayName: connectionName)
 
 		await store.receive(.child(.connectUsingSecrets(.internal(.establishConnectionResult(.success(password)))))) {
 			$0 = .connectUsingSecrets(.init(
@@ -95,8 +95,8 @@ final class NewConnectionTests: TestCase {
 			))
 		}
 		await store.receive(.child(.connectUsingSecrets(.internal(.cancelOngoingEffects))))
-		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(connection)))))
-		await store.receive(.delegate(.newConnection(connection)))
+		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(link)))))
+		await store.receive(.delegate(.newConnection(link)))
 
 		let addedP2PWithPassword = await addP2PWithPassword.value
 		XCTAssertEqual(addedP2PWithPassword, password)
