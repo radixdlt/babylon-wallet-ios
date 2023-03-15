@@ -94,7 +94,6 @@ final class AccountsRequiredToSignTests: TestCase {
 		XCTAssertNoDifference(Set(), accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be empty, but not the 'accountsSuitableToPayTXFee'")
 
 		let accountsSuitableToPayTXFee = try transactionManifest.accountsSuitableToPayTXFee(networkId: networkID)
-		print("🔮 'accountsSuitableToPayTXFee': '\(accountsSuitableToPayTXFee)'")
 		XCTAssertNoDifference(accountsSuitableToPayTXFee, ["account_tdx_22_1pz8jpmse7hv0uueppwcksp2h60hkcdsfefm40cye9f3qlqau64"])
 	}
 }
