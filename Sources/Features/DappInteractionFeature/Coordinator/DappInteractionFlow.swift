@@ -116,10 +116,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
-		case resetOngoingResponseItemsCompleted(
-			OnNetwork.AuthorizedDapp?,
-			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
-		)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
@@ -246,11 +242,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			))))
 
-			return resetOngoingResponseItemsIfNeededEffect(for: state)
+			resetOngoingResponseItemsIfNeeded(for: &state)
 
-		case let .resetOngoingResponseItemsCompleted(updatedAuthorizedDapp, updatedAuthorizedPersona):
-			state.authorizedDapp = updatedAuthorizedDapp
-			state.authorizedPersona = updatedAuthorizedPersona
 			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
@@ -298,7 +291,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)))))
 			state.responseItems[item] = responseItem
 
-			return resetOngoingResponseItemsIfNeededEffect(for: state)
+			resetOngoingResponseItemsIfNeeded(for: &state)
+
+			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 		}
 
 		func handlePermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
@@ -373,28 +368,25 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	func resetOngoingResponseItemsIfNeededEffect(
-		for state: State
-	) -> EffectTask<Action> {
-		.run { [state] send in
-			guard
-				let resetItem = state.resetRequestItem,
-				var authorizedDapp = state.authorizedDapp,
-				var authorizedPersona = state.authorizedPersona
-			else {
-				await send(.internal(.resetOngoingResponseItemsCompleted(state.authorizedDapp, state.authorizedPersona)))
-				return
-			}
-			if resetItem.accounts {
-				authorizedPersona.sharedAccounts = nil
-			}
-			if resetItem.personaData {
-				authorizedPersona.fieldIDs = [] // TODO: check if this is correct as part of https://radixdlt.atlassian.net/browse/ABW-1123
-			}
-			authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
-			try await authorizedDappsClient.updateAuthorizedDapp(authorizedDapp)
-			await send(.internal(.resetOngoingResponseItemsCompleted(authorizedDapp, authorizedPersona)))
+	func resetOngoingResponseItemsIfNeeded(
+		for state: inout State
+	) {
+		guard
+			let resetItem = state.resetRequestItem,
+			var authorizedDapp = state.authorizedDapp,
+			var authorizedPersona = state.authorizedPersona
+		else {
+			return
 		}
+		if resetItem.accounts {
+			authorizedPersona.sharedAccounts = nil
+		}
+		if resetItem.personaData {
+			authorizedPersona.fieldIDs = [] // TODO: check if this is correct as part of https://radixdlt.atlassian.net/browse/ABW-1123
+		}
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		state.authorizedDapp = authorizedDapp
+		state.authorizedPersona = authorizedPersona
 	}
 
 	func autofillOngoingResponseItemsIfPossibleEffect(
