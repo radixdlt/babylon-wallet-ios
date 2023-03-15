@@ -68,8 +68,8 @@ public struct Main: Sendable, FeatureReducer {
 		     .home(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.delegate(.dismiss)))))))))),
 		     .destination(.presented(.settings(.child(.destination(.presented(.manageFactorSources(.child(.destination(.presented(.importOlympiaFactorSource(.delegate(.dismiss)))))))))))),
 		     .destination(.presented(.settings(.child(.destination(.presented(.manageFactorSources(.child(.destination(.presented(.importOlympiaFactorSource(.delegate(.imported)))))))))))),
-		     .destination(.presented(.settings(.child(.destination(.presented(.manageP2PClients(.child(.destination(.presented(.newConnection(.delegate(.dismiss)))))))))))),
-		     .destination(.presented(.settings(.child(.destination(.presented(.manageP2PClients(.child(.destination(.presented(.newConnection(.delegate(.newConnection)))))))))))),
+		     .destination(.presented(.settings(.child(.destination(.presented(.manageP2PLinks(.child(.destination(.presented(.newConnection(.delegate(.dismiss)))))))))))),
+		     .destination(.presented(.settings(.child(.destination(.presented(.manageP2PLinks(.child(.destination(.presented(.newConnection(.delegate(.newConnection)))))))))))),
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.confirmDisconnectAlert(.presented(.cancelTapped))))))))))))),
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.confirmDisconnectAlert(.presented(.confirmTapped))))))))))))),
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.child(.presentedPersona(.dismiss)))))))))))):
@@ -78,7 +78,7 @@ public struct Main: Sendable, FeatureReducer {
 
 		case .home(.child(.destination(.presented(.createAccount)))), // Create Account modal
 		     .home(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.view(.appeared)))))))))), // Account preferences modal
-		     .destination(.presented(.settings(.child(.destination(.presented(.manageP2PClients(.child(.destination(.presented(.newConnection)))))))))), // New P2PLink connection modal
+		     .destination(.presented(.settings(.child(.destination(.presented(.manageP2PLinks(.child(.destination(.presented(.newConnection)))))))))), // New P2PLink connection modal
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.personaTapped))))))))))), // Persona details modal
 		     .destination(.presented(.settings(.child(.destination(.presented(.authorizedDapps(.child(.presentedDapp(.presented(.view(.forgetThisDappTapped))))))))))), // Forget Dapp Alert
 		     .destination(.presented(.settings(.child(.destination(.presented(.manageFactorSources(.child(.destination(.presented(.importOlympiaFactorSource)))))))))): // Import Olympia Factor Source modal
