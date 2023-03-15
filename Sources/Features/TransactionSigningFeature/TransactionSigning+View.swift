@@ -77,7 +77,7 @@ struct TransactionSigning_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: TransactionSigning()
-					.dependency(\.profileClient.getCurrentNetworkID) { .nebunet }
+					.dependency(\.gatewaysClient.getCurrentGateway) { .nebunet }
 					.dependency(\.transactionClient.addLockFeeInstructionToManifest) { _ in .previewValue }
 			)
 		)

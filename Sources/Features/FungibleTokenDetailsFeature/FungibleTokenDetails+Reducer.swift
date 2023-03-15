@@ -1,23 +1,30 @@
 import FeaturePrelude
 
 // MARK: - FungibleTokenDetails
-public struct FungibleTokenDetails: Sendable, ReducerProtocol {
+public struct FungibleTokenDetails: Sendable, FeatureReducer {
+	public typealias State = FungibleTokenContainer
+
+	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
+		case copyAddressButtonTapped
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case dismiss
+	}
+
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	public init() {}
-}
 
-extension FungibleTokenDetails {
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.closeButtonTapped)):
-			return .run { send in await send(.delegate(.closeButtonTapped)) }
-		case .internal(.view(.copyAddressButtonTapped)):
+	public func reduce(into state: inout FungibleTokenContainer, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
+		case .copyAddressButtonTapped:
 			return .run { [address = state.asset.componentAddress.address] _ in
 				pasteboardClient.copyString(address)
 			}
-		case .delegate:
-			return .none
 		}
 	}
 }

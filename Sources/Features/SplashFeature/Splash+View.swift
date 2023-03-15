@@ -32,8 +32,8 @@ extension Splash {
 				.edgesIgnoringSafeArea(.all)
 				.alert(
 					store: store.scope(
-						state: \.$biometricsCheckFailedAlert,
-						action: { .view(.biometricsCheckFailedAlert($0)) }
+						state: \.$passcodeCheckFailedAlert,
+						action: { .view(.passcodeCheckFailedAlert($0)) }
 					)
 				)
 				.onAppear {
@@ -53,7 +53,7 @@ struct SplashView_Previews: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: Splash()
-					.dependency(\.mainQueue, .immediate)
+					.dependency(\.continuousClock, ImmediateClock())
 			)
 		)
 	}

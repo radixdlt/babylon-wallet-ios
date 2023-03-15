@@ -41,8 +41,8 @@ func testTransactionSecp256k1(
 	line: UInt = #line
 ) throws -> TestTransaction {
 	try _testTransaction(
-		notaryPrivateKey: .secp256k1(try K1.PrivateKey.generateNew()),
-		signerPrivateKeys: (0 ..< signerCount).map { _ in .secp256k1(try K1.PrivateKey.generateNew()) },
+		notaryPrivateKey: .secp256k1(K1.PrivateKey.generateNew()),
+		signerPrivateKeys: (0 ..< signerCount).map { _ in try .secp256k1(K1.PrivateKey.generateNew()) },
 		file: file, line: line
 	)
 }
@@ -58,13 +58,13 @@ private func _testTransaction(
 	let sut = EngineToolkit()
 
 	let transactionManifest = TransactionManifest(instructions: .string(complexManifestString))
-	let transactionHeader = TransactionHeader(
+	let transactionHeader = try TransactionHeader(
 		version: 0x01,
 		networkId: 0xF2,
 		startEpochInclusive: 0,
 		endEpochExclusive: 10,
 		nonce: 0,
-		publicKey: try notaryPrivateKey.publicKey(),
+		publicKey: notaryPrivateKey.publicKey(),
 		notaryAsSignatory: notaryAsSignatory,
 		costUnitLimit: 10_000_000,
 		tipPercentage: 0

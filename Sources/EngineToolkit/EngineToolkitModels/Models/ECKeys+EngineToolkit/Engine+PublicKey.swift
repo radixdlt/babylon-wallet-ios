@@ -15,7 +15,7 @@ extension Engine {
 extension Engine.PublicKey {
 	public func isValidSignature(
 		_ engineSignature: Engine.Signature,
-		for message: any DataProtocol
+		for message: some DataProtocol
 	) throws -> Bool {
 		try SLIP10.PublicKey(engine: self)
 			.isValidSignature(
@@ -62,9 +62,9 @@ extension Engine.PublicKey {
 
 		switch discriminator {
 		case .ecdsaSecp256k1:
-			self = .ecdsaSecp256k1(try container.decode(Engine.EcdsaSecp256k1PublicKey.self, forKey: .publicKey))
+			self = try .ecdsaSecp256k1(container.decode(Engine.EcdsaSecp256k1PublicKey.self, forKey: .publicKey))
 		case .eddsaEd25519:
-			self = .eddsaEd25519(try container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey))
+			self = try .eddsaEd25519(container.decode(Engine.EddsaEd25519PublicKey.self, forKey: .publicKey))
 		}
 	}
 }

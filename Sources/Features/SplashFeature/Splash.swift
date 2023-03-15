@@ -1,68 +1,66 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import ProfileClient
+import OnboardingClient
 
 // MARK: - Splash
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>?
-		public var loadProfileResult: ProfileClient.LoadProfileResult?
+		public var passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>?
+		public var loadProfileOutcome: LoadProfileOutcome?
 
 		public init(
-			biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>? = nil,
-			profileResult loadProfileResult: ProfileClient.LoadProfileResult? = nil
+			passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>? = nil,
+			loadProfileOutcome: LoadProfileOutcome? = nil
 		) {
-			self.biometricsCheckFailedAlert = biometricsCheckFailedAlert
-			self.loadProfileResult = loadProfileResult
+			self.passcodeCheckFailedAlert = passcodeCheckFailedAlert
+			self.loadProfileOutcome = loadProfileOutcome
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		public enum BiometricsCheckFailedAlertAction: Sendable, Equatable {
+		public enum PasscodeCheckFailedAlertAction: Sendable, Equatable {
 			case cancelButtonTapped
 			case openSettingsButtonTapped
 		}
 
 		case appeared
-		case biometricsCheckFailedAlert(PresentationAction<AlertState<BiometricsCheckFailedAlertAction>, BiometricsCheckFailedAlertAction>)
+		case passcodeCheckFailedAlert(PresentationAction<PasscodeCheckFailedAlertAction>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadProfileResult(ProfileClient.LoadProfileResult)
+		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
+		case loadProfileOutcome(LoadProfileOutcome)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case profileResultLoaded(ProfileClient.LoadProfileResult)
+		case loadProfileOutcome(LoadProfileOutcome)
 	}
 
-	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-	@Dependency(\.profileClient.loadProfile) var loadProfile
+	@Dependency(\.onboardingClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$biometricsCheckFailedAlert, action: /Action.view .. ViewAction.biometricsCheckFailedAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$passcodeCheckFailedAlert, action: /Action.view .. ViewAction.passcodeCheckFailedAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-				await send(.internal(.loadProfileResult(loadProfile())))
+				await send(.internal(.loadProfileOutcome(loadProfile())))
 			}
 
-		case let .biometricsCheckFailedAlert(.presented(action)):
+		case let .passcodeCheckFailedAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
-				return notifyDelegate(profileResult: state.loadProfileResult)
+				return notifyDelegate(loadProfileOutcome: state.loadProfileOutcome)
 			case .openSettingsButtonTapped:
 				#if os(iOS)
 				return .run { _ in
@@ -72,42 +70,42 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 				#endif
 			}
-		case .biometricsCheckFailedAlert:
+		case .passcodeCheckFailedAlert:
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .biometricsConfigResult(result):
+		case let .passcodeConfigResult(result):
 			let config = try? result.value
 
-			guard config?.isBiometricsSetUp == true else {
-				state.biometricsCheckFailedAlert = .init(
-					title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
+			guard config?.isPasscodeSetUp == true else {
+				state.passcodeCheckFailedAlert = .init(
+					title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
 					actions: {
 						ButtonState(
 							role: .cancel,
 							action: .send(.cancelButtonTapped),
-							label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.cancelButtonTitle) }
+							label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.cancelButtonTitle) }
 						)
 						ButtonState(
 							role: .none,
 							action: .send(.openSettingsButtonTapped),
-							label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.settingsButtonTitle) }
+							label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.settingsButtonTitle) }
 						)
 					},
-					message: { .init(L10n.Splash.Alert.BiometricsCheckFailed.message) }
+					message: { .init(L10n.Splash.Alert.PasscodeCheckFailed.message) }
 				)
 
 				return .none
 			}
 
-			return notifyDelegate(profileResult: state.loadProfileResult)
+			return notifyDelegate(loadProfileOutcome: state.loadProfileOutcome)
 
-		case let .loadProfileResult(result):
-			state.loadProfileResult = result
-			return delay().concatenate(with: verifyBiometrics())
+		case let .loadProfileOutcome(loadProfileOutcome):
+			state.loadProfileOutcome = loadProfileOutcome
+			return delay().concatenate(with: verifyPasscode())
 		}
 	}
 
@@ -119,21 +117,21 @@ public struct Splash: Sendable, FeatureReducer {
 			#else
 			durationInMS = 800
 			#endif
-			try? await mainQueue.sleep(for: .milliseconds(durationInMS))
+			try? await clock.sleep(for: .milliseconds(durationInMS))
 		}
 	}
 
-	private func notifyDelegate(profileResult: ProfileClient.LoadProfileResult?) -> EffectTask<Action> {
-		precondition(profileResult != nil)
+	private func notifyDelegate(loadProfileOutcome: LoadProfileOutcome?) -> EffectTask<Action> {
+		precondition(loadProfileOutcome != nil)
 
 		return .run { send in
-			await send(.delegate(.profileResultLoaded(profileResult!)))
+			await send(.delegate(.loadProfileOutcome(loadProfileOutcome!)))
 		}
 	}
 
-	private func verifyBiometrics() -> EffectTask<Action> {
+	private func verifyPasscode() -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.biometricsConfigResult(
+			await send(.internal(.passcodeConfigResult(
 				TaskResult {
 					try await localAuthenticationClient.queryConfig()
 				}

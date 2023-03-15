@@ -3,8 +3,8 @@ import Foundation
 // MARK: - Bytes
 public struct Bytes: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .bytes
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .bytes
+	public func embedValue() -> ManifestASTValue {
 		.bytes(self)
 	}
 
@@ -19,7 +19,7 @@ public struct Bytes: ValueProtocol, Sendable, Codable, Hashable {
 
 	public init(hex: String) throws {
 		// TODO: Validation of length of Bytes
-		self.init(bytes: try [UInt8](hex: hex))
+		try self.init(bytes: [UInt8](hex: hex))
 	}
 }
 
@@ -40,7 +40,7 @@ extension Bytes {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}

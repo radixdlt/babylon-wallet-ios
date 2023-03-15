@@ -4,8 +4,25 @@ import FeaturePrelude
 import CodeScanner
 #endif // iOS
 
+extension ScanQR.State {
+	var viewState: ScanQR.ViewState {
+		.init(state: self)
+	}
+}
+
 // MARK: - ScanQR.View
 extension ScanQR {
+	public struct ViewState: Equatable {
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+		public var connectionPassword: String
+		#endif // macOS
+		init(state: ScanQR.State) {
+			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
+			connectionPassword = state.connectionPassword
+			#endif // macOS
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ScanQR>
@@ -13,21 +30,19 @@ extension ScanQR {
 		public init(store: StoreOf<ScanQR>) {
 			self.store = store
 		}
-	}
-}
 
-extension ScanQR.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(alignment: .center, spacing: .large3) {
-				contentView(viewStore: viewStore)
-				Spacer()
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(alignment: .center, spacing: .large3) {
+					#if os(iOS) && !targetEnvironment(simulator)
+					scanQRCode(viewStore: viewStore)
+					#else
+					macOSInputView(viewStore: viewStore)
+					#endif
+					Spacer()
+				}
+				.padding(.all, .large3)
 			}
-			.padding(.all, .large3)
 		}
 	}
 }
@@ -36,19 +51,8 @@ extension ScanQR.View {
 
 extension ScanQR.View {
 	@ViewBuilder
-	fileprivate func contentView(
-		viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>
-	) -> some View {
-		#if os(iOS) && !targetEnvironment(simulator)
-		scanQRCode(viewStore: viewStore)
-		#else
-		macOSInputView(viewStore: viewStore)
-		#endif
-	}
-
-	@ViewBuilder
-	fileprivate func scanQRCode(
-		viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>
+	private func scanQRCode(
+		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
@@ -61,9 +65,9 @@ extension ScanQR.View {
 		) { response in
 			switch response {
 			case let .failure(error):
-				viewStore.send(.scanResult(.failure(error)))
+				viewStore.send(.scanned(.failure(error)))
 			case let .success(result):
-				viewStore.send(.scanResult(.success(result.string)))
+				viewStore.send(.scanned(.success(result.string)))
 			}
 		}
 		.aspectRatio(1, contentMode: .fit)
@@ -75,7 +79,9 @@ extension ScanQR.View {
 	}
 
 	@ViewBuilder
-	fileprivate func macOSInputView(viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>) -> some View {
+	private func macOSInputView(
+		viewStore: ViewStoreOf<ScanQR>
+	) -> some View {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {
 			Text("Manually input connection password which you can see if you right click and inspect the browser window.")
@@ -97,20 +103,6 @@ extension ScanQR.View {
 	}
 }
 
-// MARK: - ScanQR.View.ViewState
-extension ScanQR.View {
-	struct ViewState: Equatable {
-		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-		public var connectionPassword: String
-		#endif // macOS
-		init(state: ScanQR.State) {
-			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-			connectionPassword = state.connectionPassword
-			#endif // macOS
-		}
-	}
-}
-
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
@@ -123,5 +115,9 @@ struct ScanQR_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension ScanQR.State {
+	public static let previewValue: Self = .init()
 }
 #endif

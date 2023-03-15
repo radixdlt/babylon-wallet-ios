@@ -1,7 +1,17 @@
 import FeaturePrelude
 
+extension CreateEntityCoordinator.State {
+	fileprivate var viewState: CreateEntityCoordinator.ViewState {
+		.init(shouldDisplayNavBar: shouldDisplayNavBar)
+	}
+}
+
 // MARK: - CreateEntityCoordinator.View
 extension CreateEntityCoordinator {
+	public struct ViewState: Sendable, Equatable {
+		let shouldDisplayNavBar: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<CreateEntityCoordinator>
@@ -9,26 +19,10 @@ extension CreateEntityCoordinator {
 		public init(store: StoreOf<CreateEntityCoordinator>) {
 			self.store = store
 		}
-	}
-}
 
-extension CreateEntityCoordinator.View {
-	public var body: some View {
-		WithViewStore(store, observe: { $0 }) { viewStore in
-			ForceFullScreen {
-				VStack {
-					if viewStore.state.shouldDisplayNavBar {
-						NavigationBar(
-							leadingItem: CloseButton {
-								viewStore.send(.view(.dismiss))
-							}
-						)
-						.foregroundColor(.app.gray1)
-						.padding([.horizontal, .top], .medium3)
-					} else {
-						Spacer()
-							.frame(minHeight: .small2, maxHeight: .large1)
-					}
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				NavigationStack {
 					SwitchStore(store.scope(state: \.step)) {
 						CaseLet(
 							state: /CreateEntityCoordinator.State.Step.step0_nameNewEntity,
@@ -51,6 +45,17 @@ extension CreateEntityCoordinator.View {
 							then: { NewEntityCompletion.View(store: $0) }
 						)
 					}
+					#if os(iOS)
+					.toolbar {
+						if viewStore.shouldDisplayNavBar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									viewStore.send(.view(.closeButtonTapped))
+								}
+							}
+						}
+					}
+					#endif
 				}
 			}
 		}

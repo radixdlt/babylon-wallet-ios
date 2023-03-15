@@ -9,25 +9,41 @@ extension ConnectUsingSecrets.State {
 
 // MARK: - ConnectUsingSecrets.View
 extension ConnectUsingSecrets {
+	public struct ViewState: Equatable {
+		let screenState: ControlState
+		let nameOfConnection: String
+		let saveButtonControlState: ControlState
+		let focusedField: ConnectUsingSecrets.State.Field?
+
+		init(state: ConnectUsingSecrets.State) {
+			nameOfConnection = state.nameOfConnection
+			screenState = state.isConnecting ? .loading(.global(text: L10n.NewConnection.connecting)) : .enabled
+			focusedField = state.focusedField
+			saveButtonControlState = {
+				if state.isConnecting {
+					return .loading(.local)
+				}
+				return state.isNameValid ? .enabled : .disabled
+			}()
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ConnectUsingSecrets>
+
 		@FocusState private var focusedField: ConnectUsingSecrets.State.Field?
 		public init(store: StoreOf<ConnectUsingSecrets>) {
 			self.store = store
 		}
-	}
-}
 
-extension ConnectUsingSecrets.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(alignment: .leading) {
-				if viewStore.isPromptingForName {
+		public var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				VStack(alignment: .leading) {
 					AppTextField(
 						placeholder: L10n.NewConnection.textFieldPlaceholder,
 						text: viewStore.binding(
@@ -35,7 +51,7 @@ extension ConnectUsingSecrets.View {
 							send: { .nameOfConnectionChanged($0) }
 						),
 						hint: L10n.NewConnection.textFieldHint,
-						binding: $focusedField,
+						focusState: $focusedField,
 						equals: .connectionName,
 						first: viewStore.binding(
 							get: \.focusedField,
@@ -50,37 +66,15 @@ extension ConnectUsingSecrets.View {
 					Button(L10n.NewConnection.saveNamedConnectionButton) {
 						viewStore.send(.confirmNameButtonTapped)
 					}
-					.controlState(viewStore.isSaveConnectionButtonEnabled ? .enabled : .disabled)
+					.controlState(viewStore.saveButtonControlState)
 					.buttonStyle(.primaryRectangular)
 					.padding(.medium3)
 				}
+				.controlState(viewStore.screenState)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
-			.controlState(viewStore.screenState)
-			.onAppear {
-				viewStore.send(.appeared)
-			}
-			.task { @MainActor in
-				await ViewStore(store.stateless).send(.view(.task)).finish()
-			}
-		}
-	}
-}
-
-// MARK: - ConnectUsingSecrets.View.ViewState
-extension ConnectUsingSecrets.View {
-	struct ViewState: Equatable {
-		public var screenState: ControlState
-		public var isPromptingForName: Bool
-		public var nameOfConnection: String
-		public var isSaveConnectionButtonEnabled: Bool
-		@BindableState public var focusedField: ConnectUsingSecrets.State.Field?
-
-		init(state: ConnectUsingSecrets.State) {
-			nameOfConnection = state.nameOfConnection
-			isPromptingForName = state.isPromptingForName
-			screenState = state.isConnecting ? .loading(.global(text: L10n.NewConnection.connecting)) : .enabled
-			focusedField = state.focusedField
-			isSaveConnectionButtonEnabled = state.isNameValid
 		}
 	}
 }
@@ -97,5 +91,9 @@ struct ConnectUsingPassword_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension ConnectUsingSecrets.State {
+	public static let previewValue: Self = .init(connectionPassword: .placeholder)
 }
 #endif

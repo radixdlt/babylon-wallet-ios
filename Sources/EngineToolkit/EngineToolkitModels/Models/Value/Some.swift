@@ -1,15 +1,15 @@
 // MARK: - Some
 public struct Some: ValueProtocol, Sendable, Codable, Hashable {
-	public static let kind: ValueKind = .some
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .some
+	public func embedValue() -> ManifestASTValue {
 		.some(self)
 	}
 
 	// MARK: Stored properties
 
-	public let value: Value_
+	public let value: ManifestASTValue
 
-	public init(_ value: Value_) {
+	public init(_ value: ManifestASTValue) {
 		self.value = value
 	}
 }
@@ -32,11 +32,11 @@ extension Some {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		try self.init(container.decode(Value_.self, forKey: .value))
+		try self.init(container.decode(ManifestASTValue.self, forKey: .value))
 	}
 }

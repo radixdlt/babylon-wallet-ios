@@ -1,9 +1,11 @@
 @testable import AppFeature
 import FeatureTestingPrelude
+import OnboardingClient
 import OnboardingFeature
-import ProfileClient
+@testable import Profile
 @testable import SplashFeature
 
+// MARK: - AppFeatureTests
 @MainActor
 final class AppFeatureTests: TestCase {
 	let networkID = NetworkID.nebunet
@@ -20,7 +22,6 @@ final class AppFeatureTests: TestCase {
 			initialState: App.State(root: .main(.previewValue)),
 			reducer: App()
 		)
-
 		// when
 		await store.send(.child(.main(.delegate(.removedWallet)))) {
 			// then
@@ -29,75 +30,72 @@ final class AppFeatureTests: TestCase {
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
-		// GIVEN: an existing profile
-		let existingProfile = try await Profile.new(
-			networkAndGateway: .nebunet,
-			mnemonic: .generate()
-		)
-
-		let testScheduler = DispatchQueue.test
+		// GIVEN: an existing profile (ephemeralPrivateProfile)
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
+			$0.continuousClock = clock
 		}
 
 		// WHEN: existing profile is loaded
-		await store.send(.child(.splash(.internal(.loadProfileResult(.success(existingProfile)))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: .success(existingProfile)))
+		await store.send(.child(.splash(.internal(.loadProfileOutcome(.existingProfileLoaded))))) {
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .existingProfileLoaded))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await clock.advance(by: .seconds(2))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(existingProfile)))))) {
-			$0.root = .main(.init())
-		}
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.existingProfileLoaded)))))
+			{
+				$0.root = .main(.init())
+			}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {
 		// given
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 		}
 
 		let viewTask = await store.send(.view(.task))
 
 		// when
-		await store.send(.child(.splash(.internal(.loadProfileResult(.success(nil)))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: .success(nil)))
+		await store.send(.child(.splash(.internal(.loadProfileOutcome(.newUser))))) {
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .newUser))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await clock.advance(by: .seconds(2))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(nil)))))) {
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_decodingError__THEN__display_errorAlert_and_navigate_to_onboarding() async throws {
 		// given
-		let testScheduler = DispatchQueue.test
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.continuousClock = clock
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -107,24 +105,23 @@ final class AppFeatureTests: TestCase {
 		let error = Profile.JSONDecodingError.KnownDecodingError.decodingError(.init(decodingError: decodingError))
 		let foobar: Profile.JSONDecodingError = .known(error)
 		let failure: Profile.LoadingFailure = .decodingFailure(json: Data(), foobar)
-		let result: ProfileClient.LoadProfileResult = .failure(
-			failure
-		)
-		await store.send(.child(.splash(.internal(.loadProfileResult(result))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
+
+		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: failure)
+		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await clock.advance(by: .seconds(2))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		await store.receive(.internal(.system(.displayErrorAlert(
+		await store.receive(.internal(.displayErrorAlert(
 			App.UserFacingError(foobar)
-		)))) {
+		))) {
 			$0.alert = .userErrorAlert(
 				.init(
 					title: { TextState("An Error Occurred") },
@@ -139,21 +136,23 @@ final class AppFeatureTests: TestCase {
 			$0.alert = nil
 		}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_failedToCreateProfileFromSnapshot__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
 		// given
-		let testScheduler = DispatchQueue.test
+		let expectationProfileGotDeleted = expectation(description: "Profile gets deleted")
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.keychainClient.removeDataForKey = { key in
-				XCTAssertEqual(key, "profileSnapshotKeychainKey")
+			$0.continuousClock = clock
+
+			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
+				expectationProfileGotDeleted.fulfill()
 			}
 		}
 
@@ -163,15 +162,16 @@ final class AppFeatureTests: TestCase {
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = 0
 		let failedToCreateProfileFromSnapshot = Profile.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
-		let result = ProfileClient.LoadProfileResult.failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
-		await store.send(.child(.splash(.internal(.loadProfileResult(result))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
+
+		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: Profile.LoadingFailure.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
+		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await clock.advance(by: .seconds(2))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
 					title: { TextState("Wallet Data is Incompatible") },
@@ -188,25 +188,27 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
+		await store.receive(.internal(.incompatibleProfileDeleted)) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		waitForExpectations(timeout: 1)
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_profileVersionOutdated__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
 		// given
-		let testScheduler = DispatchQueue.test
+		let profileDeletedExpectation = expectation(description: "Profile got deleted")
+		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.keychainClient.removeDataForKey = { key in
-				XCTAssertEqual(key, "profileSnapshotKeychainKey")
+			$0.continuousClock = clock
+			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
+				profileDeletedExpectation.fulfill()
 			}
 		}
 
@@ -215,15 +217,17 @@ final class AppFeatureTests: TestCase {
 		// when
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = 0
-		let result = ProfileClient.LoadProfileResult.failure(.profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
-		await store.send(.child(.splash(.internal(.loadProfileResult(result))))) {
-			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
+
+		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
+
+		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
+			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
 		}
 
-		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
+		await clock.advance(by: .seconds(2))
+		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
+		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
 					title: { TextState("Wallet Data is Incompatible") },
@@ -240,11 +244,12 @@ final class AppFeatureTests: TestCase {
 		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
 			$0.alert = nil
 		}
-		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
+		await store.receive(.internal(.incompatibleProfileDeleted)) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		await testScheduler.run() // fast-forward scheduler to the end of time
+		waitForExpectations(timeout: 1)
+		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
 }

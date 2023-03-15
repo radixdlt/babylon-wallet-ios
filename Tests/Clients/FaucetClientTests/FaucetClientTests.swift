@@ -157,7 +157,7 @@ final class FaucetClientTests: TestCase {
 		try await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
 			$0.transactionClient.signAndSubmitTransaction = { _ in .success("mocked_txid") }
-			$0.profileClient.getCurrentNetworkID = { .nebunet }
+			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 			$0.engineToolkitClient.knownEntityAddresses = { _ in KnownEntityAddressesResponse.previewValue }
 			$0.userDefaultsClient.dataForKey = { _ in json.data }
 			$0.userDefaultsClient.setData = { maybeData, key in
@@ -171,7 +171,7 @@ final class FaucetClientTests: TestCase {
 				}
 			}
 		} operation: {
-			try await sut.getFreeXRD(.init(recipientAccountAddress: acco0, unlockKeychainPromptShowToUser: "not_used"))
+			try await sut.getFreeXRD(.init(recipientAccountAddress: acco0))
 		}
 	}
 }

@@ -35,6 +35,6 @@ extension CompileSignedTransactionIntentResponse {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		try self.init(hex: try container.decode(String.self, forKey: .compiledIntent))
+		try self.init(hex: container.decode(String.self, forKey: .compiledIntent))
 	}
 }

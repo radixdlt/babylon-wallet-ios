@@ -1,16 +1,25 @@
-import AccountPortfolio
+import AccountPortfolioFetcherClient
+import AccountsClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
+import FactorSourcesClient
 import GatewayAPI
-import ProfileClient
+import GatewaysClient
+import Resources
+import SecureStorageClient
+import UseFactorSourceClient
 
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.profileClient) var profileClient
-		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let pollStrategy: PollStrategy = .default
 
@@ -33,11 +42,56 @@ extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
+			// Enables us to only read from keychain once per mnemonic
+			let cachedPrivateHDFactorSources = ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>>([])
+
+			@Sendable func sign(
+				data: some DataProtocol,
+				with account: OnNetwork.Account
+			) async throws -> SignatureWithPublicKey {
+				switch account.securityState {
+				case let .unsecured(unsecuredControl):
+					let factorInstance = unsecuredControl.genesisFactorInstance
+					let factorSources = try await factorSourcesClient.getFactorSources()
+
+					let privateHDFactorSource: PrivateHDFactorSource = try await { @Sendable () async throws -> PrivateHDFactorSource in
+
+						let cache = await cachedPrivateHDFactorSources.value
+						if let cached = cache[id: factorInstance.factorSourceID] {
+							return cached
+						}
+
+						guard
+							let factorSource = factorSources[id: factorInstance.factorSourceID],
+							let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorInstance.factorSourceID, .signTransaction)
+						else {
+							throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
+						}
+
+						let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: loadedMnemonicWithPassphrase, factorSource: factorSource)
+
+						await cachedPrivateHDFactorSources.setValue(cache.appending(privateHDFactorSource))
+
+						return privateHDFactorSource
+					}()
+
+					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
+					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
+
+					let sigRes: SignatureWithPublicKey = try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
+						hdRoot: hdRoot,
+						derivationPath: factorInstance.derivationPath!,
+						curve: curve,
+						data: Data(data)
+					))
+					return sigRes
+				}
+			}
+
 			let intentSignatures_: [SignatureWithPublicKey]
 			do {
-				intentSignatures_ = try await notaryAndSigners.signers.asyncMap { signer in
-					// FIXME: mainnet: Sign with ALL provided signers of the account.
-					try await signer.notarySigner(compiledTransactionIntent.compiledIntent)
+				intentSignatures_ = try await notaryAndSigners.accountsNeededToSign.asyncMap {
+					try await sign(data: compiledTransactionIntent.compiledIntent, with: $0)
 				}
 			} catch {
 				return .failure(.failedToSignIntentWithAccountSigners)
@@ -63,9 +117,7 @@ extension TransactionClient {
 
 			let notarySignatureWithPublicKey: SignatureWithPublicKey
 			do {
-				notarySignatureWithPublicKey = try await notaryAndSigners.notarySigner.notarySigner(
-					compiledSignedIntent.compiledIntent
-				)
+				notarySignatureWithPublicKey = try await sign(data: compiledSignedIntent.compiledIntent, with: notaryAndSigners.notarySigner)
 			} catch {
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}
@@ -94,7 +146,7 @@ extension TransactionClient {
 		func submitNotarizedTX(
 			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
 		) async -> Result<TXID, SubmitTXFailure> {
-			@Dependency(\.mainQueue) var mainQueue
+			@Dependency(\.continuousClock) var clock
 
 			// MARK: Submit TX
 
@@ -129,7 +181,7 @@ extension TransactionClient {
 			var pollCount = 0
 			while !txStatus.isComplete {
 				defer { pollCount += 1 }
-				try? await mainQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
+				try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
 
 				do {
 					txStatus = try await pollTransactionStatus()
@@ -194,7 +246,11 @@ extension TransactionClient {
 			}
 			let notaryPublicKey: Engine.PublicKey
 			do {
-				notaryPublicKey = try notaryAndSigners.notarySigner.notaryPublicKey.intoEngine()
+				let notarySigner = notaryAndSigners.notarySigner
+				switch notarySigner.securityState {
+				case let .unsecured(unsecuredControl):
+					notaryPublicKey = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
+				}
 			} catch {
 				return .failure(.failedToLoadNotaryPublicKey)
 			}
@@ -226,7 +282,7 @@ extension TransactionClient {
 			getNotaryAndSigners: @escaping @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
 		) async -> TransactionResult {
 			await buildTransactionIntent(
-				networkID: profileClient.getCurrentNetworkID(),
+				networkID: gatewaysClient.getCurrentNetworkID(),
 				manifest: manifest,
 				makeTransactionHeaderInput: makeTransactionHeaderInput,
 				getNotaryAndSigners: getNotaryAndSigners
@@ -251,23 +307,27 @@ extension TransactionClient {
 						)
 				)
 
-				let signersForAccounts = try await profileClient.signersForAccountsGivenAddresses(
-					.init(
-						networkID: accountAddressesNeedingToSignTransactionRequest.networkID,
-						addresses: addressesNeededToSign,
-						keychainAccessFactorSourcesAuthPrompt: request.unlockKeychainPromptShowToUser
-					)
-				)
+				let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>> = try await {
+					let accounts = try await addressesNeededToSign.asyncMap {
+						try await accountsClient.getAccountByAddress($0)
+					}
+					guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
+						// TransactionManifest does not reference any accounts => use any account!
+						let first = try await accountsClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
+						return NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [first]))!
+					}
+					return accounts
+				}()
 
-				let notary = await request.selectNotary(signersForAccounts)
+				let notary = await request.selectNotary(accountsNeededToSign)
 
-				return .init(notarySigner: notary, signers: signersForAccounts)
+				return .init(notarySigner: notary, accountsNeededToSign: accountsNeededToSign)
 			}
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
 			let version = engineToolkitClient.getTransactionVersion()
-			let networkID = await profileClient.getCurrentNetworkID()
+			let networkID = await gatewaysClient.getCurrentNetworkID()
 
 			let conversionRequest = ConvertManifestInstructionsToJSONIfItWasStringRequest(
 				version: version,
@@ -290,7 +350,7 @@ extension TransactionClient {
 				}
 
 				var instructions = manifestWithJSONInstructions.instructions
-				let networkID = await profileClient.getCurrentNetworkID()
+				let networkID = await gatewaysClient.getCurrentNetworkID()
 
 				let version = engineToolkitClient.getTransactionVersion()
 
@@ -306,7 +366,7 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID) }
 					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
 					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
 
@@ -333,9 +393,9 @@ extension TransactionClient {
 // MARK: - NotaryAndSigners
 struct NotaryAndSigners: Sendable, Hashable {
 	/// Notary signer
-	public let notarySigner: SignersOfAccount
+	public let notarySigner: OnNetwork.Account
 	/// Never empty, since this also contains the notary signer.
-	public let signers: NonEmpty<OrderedSet<SignersOfAccount>>
+	public let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>>
 }
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities
@@ -439,5 +499,13 @@ public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable 
 extension LocalizedError where Self: Equatable {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.errorDescription == rhs.errorDescription
+	}
+}
+
+extension IdentifiedArrayOf {
+	func appending(_ element: Element) -> Self {
+		var copy = self
+		copy.append(element)
+		return copy
 	}
 }

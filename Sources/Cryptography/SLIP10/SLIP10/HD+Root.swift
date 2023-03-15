@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - HD.Root
 extension HD {
-	public struct Root {
+	public struct Root: Sendable, Hashable {
 		public let seed: Data
 
 		/// Initialize HD Root with 128-512 bits. 256 bits is recommended.

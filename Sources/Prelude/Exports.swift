@@ -10,6 +10,7 @@
 @_exported import CustomDump
 @_exported import Dependencies
 @_exported import DependenciesAdditions
+@_exported import Either
 @_exported import IdentifiedCollections
 @_exported import KeychainAccess
 @_exported import LegibleError

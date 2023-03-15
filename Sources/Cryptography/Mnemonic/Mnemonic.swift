@@ -52,3 +52,26 @@ public struct Mnemonic: Sendable, Hashable {
 extension Mnemonic {
 	public var phrase: String { words.joined(separator: String(Self.wordSeparator)) }
 }
+
+// MARK: Codable
+extension Mnemonic: Codable {
+	public init(from decoder: Decoder) throws {
+		let singleValueContainer = try decoder.singleValueContainer()
+		let phrase = try singleValueContainer.decode(String.self)
+		try self.init(phrase: phrase, language: nil)
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var singleValueContainer = encoder.singleValueContainer()
+		try singleValueContainer.encode(phrase)
+	}
+}
+
+#if DEBUG
+extension Mnemonic {
+	public static let testValue: Self = try! Mnemonic(
+		phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
+		language: .english
+	)
+}
+#endif

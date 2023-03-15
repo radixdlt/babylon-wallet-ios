@@ -1,6 +1,6 @@
+import AccountsClient
 import CreateEntityFeature
 import FeaturePrelude
-import ProfileClient
 
 // MARK: - ChooseAccounts
 struct ChooseAccounts: Sendable, FeatureReducer {
@@ -47,12 +47,12 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>>)
+		case loadAccountsResult(TaskResult<OnNetwork.Accounts>)
 	}
 
 	enum ChildAction: Sendable, Equatable {
 		case account(id: ChooseAccountsRow.State.ID, action: ChooseAccountsRow.Action)
-		case createAccountCoordinator(PresentationActionOf<CreateAccountCoordinator>)
+		case createAccountCoordinator(PresentationAction<CreateAccountCoordinator.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -60,14 +60,14 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.accountsClient) var accountsClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.availableAccounts, action: /Action.child .. ChildAction.account) {
 				ChooseAccountsRow()
 			}
-			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
+			.ifLet(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
 	}
@@ -77,7 +77,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case .didAppear:
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
-					try await profileClient.getAccounts()
+					try await accountsClient.getAccountsOnCurrentNetwork()
 				})))
 			}
 
@@ -87,9 +87,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		case .createAccountButtonTapped:
 			state.createAccountCoordinator = .init(config: .init(
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToChooseAccounts
+				purpose: .newAccountDuringDappInteraction
 			))
 			return .none
 		}
@@ -139,7 +137,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 			return .none
 
-		case .createAccountCoordinator(.presented(.delegate(.dismissed))):
+		case .createAccountCoordinator(.presented(.delegate(.dismiss))):
 			state.createAccountCoordinator = nil
 			return .none
 
@@ -147,7 +145,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			state.createAccountCoordinator = nil
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
-					try await profileClient.getAccounts()
+					try await accountsClient.getAccountsOnCurrentNetwork()
 				})))
 			}
 

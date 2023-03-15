@@ -28,7 +28,7 @@ package.addModules([
 	.feature(
 		name: "AccountListFeature",
 		dependencies: [
-			"AccountPortfolio",
+			"AccountPortfolioFetcherClient",
 			"FungibleTokenListFeature",
 		],
 		tests: .yes()
@@ -48,11 +48,10 @@ package.addModules([
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			"AccountPortfolio",
-			"AppSettings",
+			"AccountPortfolioFetcherClient",
+			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
-			"ProfileClient",
 			"SplashFeature",
 		],
 		tests: .yes()
@@ -75,20 +74,34 @@ package.addModules([
 	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
+			"AccountsClient",
 			"Cryptography",
+			"FactorSourcesClient",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
-			"ProfileClient",
+			"PersonasClient",
 		],
 		tests: .yes()
 	),
 	.feature(
+		name: "AuthorizedDAppsFeatures",
+		dependencies: [
+			"GatewayAPI",
+			"AuthorizedDappsClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
+			"AccountsClient",
+			"AuthorizedDappsClient",
 			"CreateEntityFeature",
 			"GatewayAPI",
-			"P2PConnectivityClient",
-			"ProfileClient",
+			"GatewaysClient", // get current network
+			"RadixConnectClient",
+			"PersonasClient",
+			"ROLAClient",
 			"TransactionSigningFeature",
 		],
 		tests: .yes()
@@ -106,17 +119,23 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "GatewaySettingsFeature",
+		dependencies: [
+			"CreateEntityFeature",
+			"GatewaysClient",
+			"NetworkSwitchingClient",
+		],
+		tests: .yes()
+	),
+	.feature(
 		name: "HomeFeature",
 		dependencies: [
-			"AccountListFeature",
 			"AccountDetailsFeature",
-			"AccountPortfolio",
-			"AccountPreferencesFeature",
-			"AppSettings",
+			"AccountListFeature",
+			"AccountPortfolioFetcherClient",
+			"AccountsClient",
+			"AppPreferencesClient",
 			"CreateEntityFeature",
-			"P2PConnectivityClient",
-			"ProfileClient",
-			"TransactionSigningFeature",
 		],
 		tests: .yes(
 			dependencies: [
@@ -126,10 +145,17 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "InspectProfileFeature",
+		dependencies: [
+			"SecureStorageClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "MainFeature",
 		dependencies: [
-			"AppSettings",
-			"AccountPortfolio",
+			"AppPreferencesClient",
+			"AccountPortfolioFetcherClient",
 			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
@@ -137,18 +163,10 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ManageP2PClientsFeature",
+		name: "P2PLinksFeature",
 		dependencies: [
 			"NewConnectionFeature",
-			"P2PConnectivityClient",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "ManageGatewayAPIEndpointsFeature",
-		dependencies: [
-			"CreateEntityFeature",
-			"GatewayAPI",
+			"RadixConnectClient",
 		],
 		tests: .yes()
 	),
@@ -159,7 +177,7 @@ package.addModules([
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
-			"P2PConnectivityClient",
+			"RadixConnectClient",
 		],
 		tests: .yes()
 	),
@@ -172,7 +190,7 @@ package.addModules([
 		name: "OnboardingFeature",
 		dependencies: [
 			"CreateEntityFeature",
-			"ProfileClient",
+			"OnboardingClient",
 		],
 		tests: .yes()
 	),
@@ -180,18 +198,22 @@ package.addModules([
 		name: "PersonasFeature",
 		dependencies: [
 			"CreateEntityFeature",
+			"PersonasClient",
 		],
 		tests: .yes()
 	),
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"AppPreferencesClient",
+			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
-			"ManageP2PClientsFeature",
-			"ManageGatewayAPIEndpointsFeature",
+			"P2PLinksFeature",
+			"GatewaySettingsFeature",
+			"MnemonicClient",
 			"PersonasFeature",
-			"P2PConnectivityClient", // deleting connections when wallet is deleted
-			"ProfileView",
+			"RadixConnectClient", // deleting connections when wallet is deleted
+			"InspectProfileFeature",
 		],
 		tests: .yes()
 	),
@@ -199,7 +221,7 @@ package.addModules([
 		name: "SplashFeature",
 		dependencies: [
 			"LocalAuthenticationClient",
-			"ProfileClient",
+			"OnboardingClient",
 		],
 		tests: .yes()
 	),
@@ -207,6 +229,7 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			"GatewayAPI",
+			"GatewaysClient",
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -217,20 +240,61 @@ package.addModules([
 
 package.addModules([
 	.client(
-		name: "AccountPortfolio",
+		name: "AccountsClient",
 		dependencies: [
-			"AppSettings",
-			"EngineToolkitClient",
-			"GatewayAPI",
-			"ProfileClient",
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AccountsClientLive",
+		dependencies: [
+			"AccountsClient",
+			"ProfileStore",
 		],
 		tests: .yes()
 	),
 	.client(
-		name: "AppSettings",
-		dependencies: [],
+		name: "AccountPortfolioFetcherClient",
+		dependencies: [
+			"EngineToolkitClient",
+			"GatewayAPI",
+		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "AppPreferencesClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AppPreferencesClientLive",
+		dependencies: [
+			"AppPreferencesClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
+	.client(
+		name: "AuthorizedDappsClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AuthorizedDappsClientLive",
+		dependencies: [
+			"AuthorizedDappsClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "CameraPermissionClient",
 		dependencies: [],
@@ -245,12 +309,29 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "FactorSourcesClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "FactorSourcesClientLive",
+		dependencies: [
+			"FactorSourcesClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "FaucetClient",
 		dependencies: [
 			"EngineToolkitClient",
 			"GatewayAPI",
-			"ProfileClient",
+			"GatewaysClient", // getCurrentNetworkID
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -263,28 +344,56 @@ package.addModules([
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
 			"Cryptography",
-			"ProfileClient",
+			"GatewaysClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "GatewaysClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "GatewaysClientLive",
+		dependencies: [
+			"GatewaysClient",
+			"AppPreferencesClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
 		tests: .yes()
 	),
+
 	.client(
-		name: "P2PConnectivityClient",
-		dependencies: [
-			"P2PConnection",
-			"ProfileClient",
-		],
-		tests: .yes()
+		name: "MnemonicClient",
+		dependencies: ["Cryptography"],
+		tests: .no
 	),
+
 	.client(
-		name: "ProfileClient",
+		name: "NetworkSwitchingClient",
+		dependencies: [
+			"AccountsClient",
+			"GatewayAPI",
+			"ProfileStore",
+			"GatewaysClient",
+		],
+		tests: .no
+	),
+
+	.client(
+		name: "OnboardingClient",
 		dependencies: [
 			"Profile",
 			"Cryptography",
@@ -292,22 +401,104 @@ package.addModules([
 		tests: .no
 	),
 	.client(
-		name: "ProfileClientLive",
+		name: "OnboardingClientLive",
 		dependencies: [
-			"ProfileClient",
-			"EngineToolkitClient",
+			"OnboardingClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
+	.client(
+		name: "P2PLinksClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "P2PLinksClientLive",
+		dependencies: [
+			"ProfileStore",
+			"P2PLinksClient",
+			"AppPreferencesClient",
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "RadixConnectClient",
+		dependencies: [
+			"RadixConnect",
+			"P2PLinksClient",
+		],
+		tests: .yes()
+	),
+
+	.client(
+		name: "PersonasClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "PersonasClientLive",
+		dependencies: [
+			"PersonasClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
+	.client(
+		name: "ProfileStore",
+		dependencies: [
+			"Profile",
+			"SecureStorageClient",
+			"MnemonicClient",
+			"UseFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "SecureStorageClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+			"LocalAuthenticationClient",
+			"Resources", // L10n for keychain auth prompts
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "ROLAClient",
+		dependencies: [
+			"GatewayAPI",
 		],
 		tests: .yes()
 	),
 	.client(
 		name: "TransactionClient",
 		dependencies: [
+			"AccountPortfolioFetcherClient",
+			"AccountsClient",
 			"EngineToolkitClient",
+			"FactorSourcesClient",
 			"GatewayAPI",
-			"ProfileClient",
-			"AccountPortfolio",
+			"GatewaysClient",
+			"SecureStorageClient",
+			"UseFactorSourceClient",
 		],
 		tests: .yes()
+	),
+	.client(
+		name: "UseFactorSourceClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+			"SecureStorageClient",
+		],
+		tests: .no
 	),
 ])
 
@@ -318,7 +509,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/davdroman/swift-composable-architecture", branch: "navigation-relay")
+				.package(url: "https://github.com/davdroman/swift-composable-architecture", branch: "navigation-beta-stack-and-relay")
 			},
 			"DesignSystem",
 			"Resources",
@@ -380,9 +571,8 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"EngineToolkitModels",
-			"ProfileModels",
-			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
-			"P2PModels",
+			"RadixConnectModels",
+			"Profile",
 		],
 		exclude: [
 			"P2P/Codable/README.md",
@@ -396,37 +586,18 @@ package.addModules([
 
 package.addModules([
 	.module(
-		name: "ProfileView",
-		category: .profile,
-		dependencies: [
-			"Profile",
-		],
-		tests: .no
-	),
-	.module(
 		name: "Profile",
-		category: .profile,
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit",
-			"ProfileModels",
-			"P2PModels",
+			"EngineToolkit", // address derivation
+			"RadixConnectModels",
+			"Resources",
 		],
 		tests: .yes(
 			dependencies: [
 				"SharedTestingModels",
 			]
 		)
-	),
-	.module(
-		name: "ProfileModels",
-		category: .profile,
-		dependencies: [
-			"Cryptography",
-			"EngineToolkit", // address derivation
-			"P2PModels",
-		],
-		tests: .no
 	),
 	.module(
 		name: "EngineToolkit",
@@ -452,29 +623,7 @@ package.addModules([
 		tests: .no
 	),
 	.module(
-		name: "P2PConnection",
-		category: .radixConnect,
-		dependencies: [
-			"Cryptography",
-			"P2PModels",
-			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
-			},
-		],
-		exclude: [
-			"ChunkingTransport/README.md",
-		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			],
-			resources: [
-				.process("SignalingServerTests/TestVectors/"),
-			]
-		)
-	),
-	.module(
-		name: "P2PModels",
+		name: "RadixConnectModels",
 		category: .radixConnect,
 		dependencies: [
 			"Cryptography",
@@ -482,10 +631,22 @@ package.addModules([
 		tests: .yes()
 	),
 	.module(
+		name: "RadixConnect",
+		category: .radixConnect,
+		dependencies: [
+			"RadixConnectModels",
+			"SharedModels",
+			.product(name: "WebRTC", package: "WebRTC") {
+				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
+			},
+		],
+		tests: .yes()
+	),
+	.module(
 		name: "Cryptography",
 		dependencies: [
 			.product(name: "K1", package: "K1") {
-				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
+				.package(url: "https://github.com/Sajjon/K1.git", exact: "0.0.4")
 			},
 		],
 		exclude: [
@@ -580,6 +741,9 @@ package.addModules([
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
 			},
+			.product(name: "Either", package: "swift-either") {
+				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
+			},
 			.product(name: "CollectionConcurrencyKit", package: "CollectionConcurrencyKit") {
 				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
 			},
@@ -622,7 +786,6 @@ extension Package {
 			static let testing: Self = .module(name: "Testing")
 			static let engineToolkit: Self = .module(name: "EngineToolkit")
 			static let radixConnect: Self = .module(name: "RadixConnect")
-			static let profile: Self = .module(name: "Profile")
 			var pathComponent: String {
 				switch self {
 				case .client: return "Clients"

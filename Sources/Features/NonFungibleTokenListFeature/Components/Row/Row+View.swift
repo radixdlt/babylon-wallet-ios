@@ -2,73 +2,7 @@ import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Row.View
 extension NonFungibleTokenList.Row {
-	@MainActor
-	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
-
-		@SwiftUI.State private var expandedHeight: CGFloat = .zero
-		@SwiftUI.State private var rowHeights: [Int: CGFloat] = [:] {
-			didSet {
-				expandedHeight = rowHeights.map(\.value).reduce(0, +)
-			}
-		}
-
-		public init(
-			store: Store
-		) {
-			self.store = store
-		}
-	}
-}
-
-extension NonFungibleTokenList.Row.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(spacing: .small3 / 2) {
-				if viewStore.container.assets.isEmpty {
-					EmptyView()
-				} else {
-					ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
-						Group {
-							switch index {
-							case -1:
-								headerView(with: viewStore, index: index)
-							default:
-								componentView(with: viewStore, index: index)
-							}
-						}
-						.onSizeChanged { size in
-							if rowHeights[index] == nil {
-								rowHeights[index] = size.height
-							} else {
-								withAnimation {
-									rowHeights[index] = size.height
-								}
-							}
-						}
-					}
-					.padding(.horizontal, .medium3)
-				}
-			}
-			.frame(height: viewStore.isExpanded ? expandedHeight : collapsedHeight(with: viewStore), alignment: .top)
-		}
-	}
-}
-
-// MARK: - NonFungibleTokenList.Row.View.ViewStore
-extension NonFungibleTokenList.Row.View {
-	fileprivate typealias ViewStore = ComposableArchitecture.ViewStore<NonFungibleTokenList.Row.View.ViewState, NonFungibleTokenList.Row.Action.ViewAction>
-}
-
-// MARK: - NonFungibleTokenList.Row.View.ViewState
-extension NonFungibleTokenList.Row.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		let container: NonFungibleTokenContainer
 		var isExpanded: Bool
 
@@ -77,11 +11,63 @@ extension NonFungibleTokenList.Row.View {
 			isExpanded = state.isExpanded
 		}
 	}
+
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<NonFungibleTokenList.Row>
+
+		@SwiftUI.State private var expandedHeight: CGFloat = .zero
+		@SwiftUI.State private var rowHeights: [Int: CGFloat] = [:] {
+			didSet {
+				expandedHeight = rowHeights.map(\.value).reduce(0, +)
+			}
+		}
+
+		public init(store: StoreOf<NonFungibleTokenList.Row>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				VStack(spacing: .small3 / 2) {
+					if viewStore.container.assets.isEmpty {
+						EmptyView()
+					} else {
+						ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
+							Group {
+								switch index {
+								case -1:
+									headerView(with: viewStore, index: index)
+								default:
+									componentView(with: viewStore, index: index)
+								}
+							}
+							.onSizeChanged { size in
+								if rowHeights[index] == nil {
+									rowHeights[index] = size.height
+								} else {
+									withAnimation {
+										rowHeights[index] = size.height
+									}
+								}
+							}
+						}
+						.padding(.horizontal, .medium3)
+					}
+				}
+				.frame(height: viewStore.isExpanded ? expandedHeight : collapsedHeight(with: viewStore), alignment: .top)
+			}
+		}
+	}
 }
 
 // MARK: - Private Methods
 extension NonFungibleTokenList.Row.View {
-	fileprivate func scale(with viewStore: ViewStore, index: Int) -> CGFloat {
+	fileprivate func scale(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> CGFloat {
 		if index >= Constants.cardLimit {
 			return viewStore.isExpanded ? 1 : 1 - (CGFloat(Constants.cardLimit) * Constants.scale)
 		} else {
@@ -89,7 +75,7 @@ extension NonFungibleTokenList.Row.View {
 		}
 	}
 
-	fileprivate func offset(with viewStore: ViewStore, index: Int) -> CGFloat {
+	fileprivate func offset(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> CGFloat {
 		if index >= Constants.cardLimit {
 			return viewStore.isExpanded ? 0 : CGFloat((index + 1) * Constants.nonVisibleCardOffset)
 		} else {
@@ -104,7 +90,7 @@ extension NonFungibleTokenList.Row.View {
 
 // MARK: - Private Computed Properties
 extension NonFungibleTokenList.Row.View {
-	fileprivate func headerView(with viewStore: ViewStore, index: Int) -> some View {
+	fileprivate func headerView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
 		Header(
 			name: viewStore.container.name ?? "",
 			iconAsset: headerIconAsset,
@@ -117,7 +103,7 @@ extension NonFungibleTokenList.Row.View {
 	}
 
 	@ViewBuilder
-	fileprivate func componentView(with viewStore: ViewStore, index: Int) -> some View {
+	fileprivate func componentView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
 		let asset = viewStore.container.assets[index]
 		Component(
 			token: asset,
@@ -132,14 +118,14 @@ extension NonFungibleTokenList.Row.View {
 		.onTapGesture { viewStore.send(.selected(.init(container: viewStore.container, asset: asset))) }
 	}
 
-	fileprivate func collapsedHeight(with viewStore: ViewStore) -> CGFloat {
+	fileprivate func collapsedHeight(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> CGFloat {
 		let headerHeight = rowHeights[Constants.headerIndex] ?? 0
 		let collapsedRowsCount = nftCount(with: viewStore)
 		let visibleCollapsedRowsHeight: CGFloat = collapsedRowsCount > 1 ? Constants.twoOrMoreCollapsedCardsHeight : Constants.oneCollapsedCardHeight
 		return headerHeight + visibleCollapsedRowsHeight
 	}
 
-	fileprivate func headerSupplyText(with _: ViewStore) -> String {
+	fileprivate func headerSupplyText(with _: ViewStoreOf<NonFungibleTokenList.Row>) -> String {
 		// TODO: remove when API is ready
 		L10n.NftList.Header.supplyUnknown
 
@@ -163,7 +149,7 @@ extension NonFungibleTokenList.Row.View {
 		AssetResource.nft
 	}
 
-	fileprivate func nftCount(with viewStore: ViewStore) -> Int {
+	fileprivate func nftCount(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> Int {
 		viewStore.container.assets.count
 	}
 }
@@ -209,5 +195,11 @@ struct Row_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension NonFungibleTokenList.Row.State {
+	public static let previewValue = Self(
+		container: .mock1
+	)
 }
 #endif

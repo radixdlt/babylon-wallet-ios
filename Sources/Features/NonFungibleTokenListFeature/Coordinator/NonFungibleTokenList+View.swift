@@ -4,25 +4,14 @@ import FeaturePrelude
 extension NonFungibleTokenList {
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<NonFungibleTokenList>
 
-		public init(
-			store: Store
-		) {
+		public init(store: StoreOf<NonFungibleTokenList>) {
 			self.store = store
 		}
-	}
-}
 
-extension NonFungibleTokenList.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(spacing: .medium1) {
+		public var body: some SwiftUI.View {
+			LazyVStack(spacing: .medium1) {
 				ForEachStore(
 					store.scope(
 						state: \.rows,
@@ -32,32 +21,11 @@ extension NonFungibleTokenList.View {
 				)
 			}
 			.sheet(
-				unwrapping: viewStore.binding(
-					get: \.selectedToken,
-					send: { .selectedTokenChanged($0) }
-				),
-				content: { _ in
-					IfLetStore(
-						store.scope(
-							state: \.selectedToken,
-							action: { .child(.details($0)) }
-						),
-						then: { NonFungibleTokenList.Detail.View(store: $0) }
-					)
-				}
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /NonFungibleTokenList.Destinations.State.details,
+				action: NonFungibleTokenList.Destinations.Action.details,
+				content: { NonFungibleTokenList.Detail.View(store: $0) }
 			)
-		}
-	}
-}
-
-// MARK: - NonFungibleTokenList.View.ViewState
-extension NonFungibleTokenList.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		var selectedToken: NonFungibleTokenList.Detail.State?
-
-		init(state: NonFungibleTokenList.State) {
-			self.selectedToken = state.selectedToken
 		}
 	}
 }
@@ -69,7 +37,7 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.View(
 			store: .init(
-				initialState: .init(rows: []),
+				initialState: .init(rows: [.init(container: .mock1)]),
 				reducer: NonFungibleTokenList()
 			)
 		)

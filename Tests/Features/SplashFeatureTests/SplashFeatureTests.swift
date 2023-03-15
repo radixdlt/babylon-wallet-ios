@@ -1,6 +1,6 @@
 import FeatureTestingPrelude
 import LocalAuthenticationClient
-import ProfileClient
+import OnboardingClient
 @testable import SplashFeature
 
 // MARK: - SplashFeatureTests
@@ -9,72 +9,8 @@ final class SplashFeatureTests: TestCase {
 	func test__GIVEN__splash_appeared__WHEN__no_biometrics_config__THEN__alert_is_shown() async throws {
 		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
 
-		let testScheduler = DispatchQueue.test
-		let store = TestStore(
-			initialState: Splash.State(),
-			reducer: Splash()
-		)
+		let clock = TestClock()
 
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
-		}
-
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-
-		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
-		store.dependencies.profileClient.loadProfile = {
-			.success(newProfile)
-		}
-
-		// when
-		await store.send(.view(.appeared))
-
-		// then
-		await store.receive(.internal(.loadProfileResult(.success(newProfile)))) {
-			$0.loadProfileResult = .success(newProfile)
-		}
-		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig)))) {
-			$0.biometricsCheckFailedAlert = .init(
-				title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
-				actions: {
-					ButtonState(
-						role: .cancel,
-						action: .send(.cancelButtonTapped),
-						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.cancelButtonTitle) }
-					)
-					ButtonState(
-						role: .none,
-						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.settingsButtonTitle) }
-					)
-				},
-				message: { .init(L10n.Splash.Alert.BiometricsCheckFailed.message) }
-			)
-		}
-	}
-
-	func test__GIVEN__splash_appeared__WHEN__biometrics_configured__THEN__notifies_delegate_with_profile_result() async throws {
-		/// Profile load success
-		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
-		try await assertNotifiesDelegateWithProfileResult(.success(newProfile))
-		try await assertNotifiesDelegateWithProfileResult(.success(nil))
-
-		/// Profile load failure
-		try await assertNotifiesDelegateWithProfileResult(
-			.failure(.profileVersionOutdated(json: Data(), version: .minimum))
-		)
-		try await assertNotifiesDelegateWithProfileResult(
-			.failure(.failedToCreateProfileFromSnapshot(.init(version: .minimum, error: NSError.any)))
-		)
-		try await assertNotifiesDelegateWithProfileResult(
-			.failure(.decodingFailure(json: Data(), .unknown(.init(error: NSError.any))))
-		)
-	}
-
-	func assertNotifiesDelegateWithProfileResult(_ result: ProfileClient.LoadProfileResult) async throws {
-		let authBiometricsConfig = LocalAuthenticationConfig.biometricsAndPasscodeSetUp
-		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
@@ -82,9 +18,10 @@ final class SplashFeatureTests: TestCase {
 			$0.localAuthenticationClient = LocalAuthenticationClient {
 				authBiometricsConfig
 			}
-			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.profileClient.loadProfile = {
-				result
+
+			$0.continuousClock = clock
+			$0.onboardingClient.loadProfile = {
+				.newUser
 			}
 		}
 
@@ -92,12 +29,73 @@ final class SplashFeatureTests: TestCase {
 		await store.send(.view(.appeared))
 
 		// then
-		await store.receive(.internal(.loadProfileResult(result))) {
-			$0.loadProfileResult = result
+		await store.receive(.internal(.loadProfileOutcome(.newUser))) {
+			$0.loadProfileOutcome = .newUser
 		}
-		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig))))
-		await store.receive(.delegate(.profileResultLoaded(result)))
+		await clock.advance(by: .seconds(0.2))
+		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
+			$0.passcodeCheckFailedAlert = .init(
+				title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
+				actions: {
+					ButtonState(
+						role: .cancel,
+						action: .send(.cancelButtonTapped),
+						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.cancelButtonTitle) }
+					)
+					ButtonState(
+						role: .none,
+						action: .send(.openSettingsButtonTapped),
+						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.settingsButtonTitle) }
+					)
+				},
+				message: { .init(L10n.Splash.Alert.PasscodeCheckFailed.message) }
+			)
+		}
+	}
+
+	func test__GIVEN__splash_appeared__WHEN__biometrics_configured__THEN__notifies_delegate_with_profile_result() async throws {
+		try await assertNotifiesDelegateWithLoadProfileOutcome(.newUser)
+		try await assertNotifiesDelegateWithLoadProfileOutcome(.existingProfileLoaded)
+
+		/// Profile load failure
+		try await assertNotifiesDelegateWithLoadProfileOutcome(
+			.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data(), version: .minimum))
+		)
+		try await assertNotifiesDelegateWithLoadProfileOutcome(
+			.usersExistingProfileCouldNotBeLoaded(failure: .failedToCreateProfileFromSnapshot(.init(version: .minimum, error: NSError.any))
+			))
+
+		try await assertNotifiesDelegateWithLoadProfileOutcome(
+			.usersExistingProfileCouldNotBeLoaded(failure: .decodingFailure(json: Data(), .unknown(.init(error: NSError.any))))
+		)
+	}
+
+	func assertNotifiesDelegateWithLoadProfileOutcome(_ outcome: LoadProfileOutcome) async throws {
+		let authBiometricsConfig = LocalAuthenticationConfig.biometricsAndPasscodeSetUp
+		let clock = TestClock()
+		let store = TestStore(
+			initialState: Splash.State(),
+			reducer: Splash()
+		) {
+			$0.localAuthenticationClient = LocalAuthenticationClient {
+				authBiometricsConfig
+			}
+			$0.continuousClock = clock
+			$0.onboardingClient.loadProfile = {
+				outcome
+			}
+		}
+
+		// when
+		await store.send(.view(.appeared))
+
+		// then
+		await store.receive(.internal(.loadProfileOutcome(outcome))) {
+			$0.loadProfileOutcome = outcome
+		}
+		await clock.advance(by: .seconds(0.2))
+		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig))))
+		await store.receive(.delegate(.loadProfileOutcome(outcome)))
 	}
 }
 

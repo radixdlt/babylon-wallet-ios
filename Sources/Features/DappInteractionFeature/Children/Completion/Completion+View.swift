@@ -22,35 +22,27 @@ extension Completion {
 				observe: Completion.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				VStack(spacing: 0) {
-					NavigationBar(
-						leadingItem: CloseButton { viewStore.send(.closeButtonTapped) }
-					)
-					VStack(spacing: .medium2) {
-						Image(asset: AssetResource.successCheckmark)
+				VStack(spacing: .medium2) {
+					Image(asset: AssetResource.successCheckmark)
 
-						Text(viewStore.title)
-							.foregroundColor(.app.gray1)
-							.textStyle(.sheetTitle)
+					Text(viewStore.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
 
-						Text(viewStore.subtitle)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1Regular)
-							.multilineTextAlignment(.center)
-					}
-					.padding(.horizontal, .medium1)
-					#if os(iOS)
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton { viewStore.send(.closeButtonTapped) }
-							}
-						}
-					#endif
+					Text(viewStore.subtitle)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
+						.multilineTextAlignment(.center)
 				}
-				.padding([.top, .horizontal], .small2)
+				.padding(.horizontal, .small2)
 				.padding(.bottom, .medium3)
 				.onAppear { viewStore.send(.appeared) }
 				.onDisappear { viewStore.send(.disappeared) }
+				.frame(maxWidth: .infinity)
+				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
+					CloseButton { viewStore.send(.closeButtonTapped) }
+						.padding([.top, .leading], .small2)
+				}
 			}
 			.presentationDragIndicator(.visible)
 			.presentationDetentIntrinsicHeight()

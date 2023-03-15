@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 extension ___VARIABLE_featureName___.State {
-	public var viewState: ___VARIABLE_featureName___.ViewState {
+	var viewState: ___VARIABLE_featureName___.ViewState {
 		.init()
 	}
 }

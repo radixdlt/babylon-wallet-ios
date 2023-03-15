@@ -1,3 +1,4 @@
+import Resources
 import SwiftUI
 import SwiftUINavigation
 
@@ -5,23 +6,25 @@ import SwiftUINavigation
 public struct AppTextField<Value: Hashable>: View {
 	let placeholder: String
 	let text: Binding<String>
-	let hint: String
-	let binding: FocusState<Value>.Binding
+	let hint: String?
+	let presentsError: Bool
+	let focusState: FocusState<Value>.Binding
 	let equals: Value
 	let first: Binding<Value>
-
 	public init(
 		placeholder: String,
 		text: Binding<String>,
-		hint: String,
-		binding: FocusState<Value>.Binding,
+		hint: String?,
+		presentsError: Bool = false,
+		focusState: FocusState<Value>.Binding,
 		equals: Value,
 		first: Binding<Value>
 	) {
 		self.placeholder = placeholder
 		self.text = text
 		self.hint = hint
-		self.binding = binding
+		self.presentsError = presentsError
+		self.focusState = focusState
 		self.equals = equals
 		self.first = first
 	}
@@ -32,8 +35,8 @@ public struct AppTextField<Value: Hashable>: View {
 				placeholder,
 				text: text.removeDuplicates()
 			)
-			.focused(binding, equals: equals)
-			.bind(first, to: binding)
+			.focused(focusState, equals: equals)
+			.bind(first, to: focusState)
 			.padding()
 			.frame(height: .standardButtonHeight)
 			.background(Color.app.gray5)
@@ -45,9 +48,18 @@ public struct AppTextField<Value: Hashable>: View {
 					.stroke(Color.app.gray1, lineWidth: 1)
 			)
 
-			Text(hint)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
+			HStack(alignment: .top) {
+				if presentsError {
+					Image(asset: AssetResource.info)
+						.foregroundColor(.app.red1)
+				}
+
+				Text(hint ?? "")
+					.foregroundColor(presentsError ? .app.red1 : .app.gray2)
+					.textStyle(.body2Regular)
+			}
+			.opacity(hint != nil ? 1 : 0)
+			.frame(height: .medium2)
 		}
 	}
 }

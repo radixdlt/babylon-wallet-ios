@@ -36,6 +36,12 @@ extension HexCodable {
 	}
 }
 
+extension String {
+	public func mask(showLast suffixCount: Int) -> String.SubSequence {
+		"..." + suffix(suffixCount)
+	}
+}
+
 // MARK: Identifiable
 extension HexCodable {
 	public typealias ID = String
@@ -132,3 +138,35 @@ extension HexCodable {
 	public static let deadbeef32Bytes = Self(data: .deadbeef32Bytes)
 }
 #endif // DEBUG
+
+// MARK: - CodableViaHexCodable
+public protocol CodableViaHexCodable: Codable {
+	var hexCodable: HexCodable { get }
+	init(hexCodable: HexCodable) throws
+}
+
+extension CodableViaHexCodable {
+	public func hex(options: Data.HexEncodingOptions = []) -> String {
+		self.hexCodable.hex(options: options)
+	}
+
+	public init(hex: String) throws {
+		try self.init(data: .init(hex: hex))
+	}
+
+	public init(data: Data) throws {
+		try self.init(hexCodable: .init(data: data))
+	}
+}
+
+extension CodableViaHexCodable {
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(self.hexCodable)
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		try self.init(hexCodable: container.decode(HexCodable.self))
+	}
+}

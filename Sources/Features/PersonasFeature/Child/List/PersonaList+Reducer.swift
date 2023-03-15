@@ -1,29 +1,38 @@
 import FeaturePrelude
 
 // MARK: - PersonaList
-public struct PersonaList: Sendable, ReducerProtocol {
+public struct PersonaList: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public var personas: IdentifiedArrayOf<Persona.State>
+
+		public init(
+			personas: IdentifiedArrayOf<Persona.State> = .init()
+		) {
+			self.personas = personas
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case createNewPersonaButtonTapped
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case persona(
+			id: OnNetwork.Persona.ID,
+			action: Persona.Action
+		)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case createNewPersona
+	}
+
 	public init() {}
-}
 
-extension PersonaList {
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
-
-		case .internal(.view(.createNewPersonaButtonTapped)):
-			return .run { send in
-				await send(.delegate(.createNewPersona))
-			}
-
-		case .delegate:
-			return .none
-
-		case .child:
-			// TODO: implement
-			return .none
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .createNewPersonaButtonTapped:
+			return .send(.delegate(.createNewPersona))
 		}
 	}
 }

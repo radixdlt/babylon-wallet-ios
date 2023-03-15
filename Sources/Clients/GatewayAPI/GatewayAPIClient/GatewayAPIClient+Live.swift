@@ -1,19 +1,9 @@
 import ClientPrelude
 import Cryptography
-import ProfileClient
+import GatewaysClient
 
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
-
-// MARK: - ExpectedHTTPURLResponse
-struct ExpectedHTTPURLResponse: Swift.Error {}
-
-// MARK: - BadHTTPResponseCode
-public struct BadHTTPResponseCode: Swift.Error {
-	public let got: Int
-	public let butExpected = Self.expected
-	static let expected = 200
-}
 
 extension JSONDecoder {
 	static var `default`: JSONDecoder {
@@ -36,10 +26,10 @@ extension GatewayAPIClient {
 		jsonEncoder: JSONEncoder,
 		jsonDecoder: JSONDecoder
 	) -> Self {
-		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		let getCurrentBaseURL: @Sendable () async -> URL = {
-			await profileClient.getGatewayAPIEndpointBaseURL()
+			await gatewaysClient.getGatewayAPIEndpointBaseURL()
 		}
 
 		@Sendable

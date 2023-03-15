@@ -1,48 +1,61 @@
 import FeaturePrelude
-import ProfileClient
+import OnboardingClient
 
 // MARK: - ImportProfile
-public struct ImportProfile: Sendable, ReducerProtocol {
+public struct ImportProfile: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public var isDisplayingFileImporter = false
+
+		public init(isDisplayingFileImporter: Bool = false) {
+			self.isDisplayingFileImporter = isDisplayingFileImporter
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case goBack
+		case dismissFileImporter
+		case importProfileFileButtonTapped
+		case profileImported(Result<URL, NSError>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case goBack
+		case imported
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
-	@Dependency(\.keychainClient) var keychainClient
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.onboardingClient) var onboardingClient
+
 	public init() {}
-}
 
-extension ImportProfile {
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.goBack)):
-			return .run { send in
-				await send(.delegate(.goBack))
-			}
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .goBack:
+			return .send(.delegate(.goBack))
 
-		case .internal(.view(.dismissFileImporter)):
+		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
 			return .none
 
-		case .internal(.view(.importProfileFileButtonTapped)):
+		case .importProfileFileButtonTapped:
 			state.isDisplayingFileImporter = true
 			return .none
 
-		case let .internal(.view(.profileImported(.failure(error)))):
+		case let .profileImported(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.view(.profileImported(.success(profileURL)))):
+		case let .profileImported(.success(profileURL)):
 			return .run { send in
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
 				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
-				try await profileClient.injectProfileSnapshot(snapshot)
+				try await onboardingClient.importProfileSnapshot(snapshot)
 				await send(.delegate(.imported))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-
-		case .delegate:
-			return .none
 		}
 	}
 }

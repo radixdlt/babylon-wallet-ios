@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  linting:
+    name: "Linting"
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v3.1.0
+
+      - name: "Run Lint"
+        run: |
+          brew update
+          brew upgrade swiftformat
+          swiftformat . --lint
+
+  test-and-build:
+    name: "Test and build"
+    runs-on: macos-12
+
+    needs:
+      - linting
+
+    steps:
+      - uses: actions/checkout@v3.1.0
+
+      - uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SWIFT_PROFILE_SSH_KEY }}
+            ${{ secrets.SLIP_10_SSH_KEY }}
+            ${{ secrets.MNEMONIC_SSH_KEY }}
+            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+            ${{ secrets.CONVERSE_SSH_KEY }}
+            ${{ secrets.BITE_SSH_KEY }}
+            ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
+
+      - name: "Set up ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2
+          bundler-cache: true
+
+      - name: "Install additional deps"
+        run: |
+          echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
+          brew install xcbeautify
+
+      - name: "Unit tests (debug)"
+        run: bundle exec fastlane ios tests
+
+      - name: "Build and archive (release)"
+        run: bundle exec fastlane ios build --env ios.beta
+
+  # snapshot_tests:
+  #   name: "Snapshot tests"
+  #   runs-on: macos-12
+
+  #   needs:
+  #     - assertFormated
+
+  #   steps:
+  #     - uses: actions/checkout@v3.1.0
+
+  #     - name: "Run snapshot tests"
+  #       run: echo "Runing snapshot tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+
+  # ui_tests:
+  #   name: "UI tests"
+  #   runs-on: macos-12
+
+  #   needs:
+  #     - assertFormated
+
+  #   steps:
+  #     - uses: actions/checkout@v3.1.0
+
+  #     - name: "Run UI tests"
+  #       run: echo "Runing UI tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED

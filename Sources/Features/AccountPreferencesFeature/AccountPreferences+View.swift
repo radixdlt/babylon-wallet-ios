@@ -1,42 +1,29 @@
 import FeaturePrelude
 
-// MARK: - AccountPreferences.View
-extension AccountPreferences {
-	@MainActor
-	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
-
-		public init(
-			store: Store
-		) {
-			self.store = store
-		}
+extension AccountPreferences.State {
+	var viewState: AccountPreferences.ViewState {
+		.init(faucetButtonState: faucetButtonState)
 	}
 }
 
-extension AccountPreferences.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ForceFullScreen {
-				VStack {
-					NavigationBar(
-						titleText: L10n.AccountPreferences.title,
-						leadingItem: BackButton {
-							viewStore.send(.dismissButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
+// MARK: - AccountPreferences.View
+extension AccountPreferences {
+	public struct ViewState: Equatable {
+		public var faucetButtonState: ControlState
+	}
 
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<AccountPreferences>
+
+		public init(store: StoreOf<AccountPreferences>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				NavigationStack {
 					VStack(alignment: .leading) {
-						Spacer()
-							.frame(height: .large1)
-
 						Button(L10n.AccountPreferences.faucetButtonTitle) {
 							viewStore.send(.faucetButtonTapped)
 						}
@@ -48,27 +35,27 @@ extension AccountPreferences.View {
 								.font(.app.body2Regular)
 								.foregroundColor(.app.gray1)
 						}
-
-						Spacer()
 					}
-					.padding([.horizontal, .bottom], .medium1)
-				}
-				.onAppear {
-					viewStore.send(.didAppear)
+					.frame(maxHeight: .infinity, alignment: .top)
+					.padding(.medium1)
+					.onAppear {
+						viewStore.send(.appeared)
+					}
+					.navigationTitle(L10n.AccountPreferences.title)
+					#if os(iOS)
+						.navigationBarTitleColor(.app.gray1)
+						.navigationBarTitleDisplayMode(.inline)
+						.navigationBarInlineTitleFont(.app.secondaryHeader)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									viewStore.send(.closeButtonTapped)
+								}
+							}
+						}
+					#endif
 				}
 			}
-		}
-	}
-}
-
-// MARK: - AccountPreferences.View.ViewState
-extension AccountPreferences.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		public var faucetButtonState: ControlState
-
-		init(state: AccountPreferences.State) {
-			faucetButtonState = state.faucetButtonState
 		}
 	}
 }

@@ -1,79 +1,104 @@
 import AccountDetailsFeature
 import AccountListFeature
-import AccountPortfolio
-import AccountPreferencesFeature
-import AppSettings
+import AccountPortfolioFetcherClient
+import AccountsClient
+import AppPreferencesClient
 import CreateEntityFeature
 import FeaturePrelude
 import FungibleTokenListFeature
-import P2PConnectivityClient
-import ProfileClient
-import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var accountPortfolioDictionary: AccountPortfolioDictionary
+		public var accountPortfolios: IdentifiedArrayOf<AccountPortfolio>
 
 		// MARK: - Components
 		public var header: Header.State
 		public var accountList: AccountList.State
+		public var accounts: IdentifiedArrayOf<OnNetwork.Account> {
+			.init(uniqueElements: accountList.accounts.map(\.account))
+		}
 
-		// MARK: - Children
-		public var accountDetails: AccountDetails.State?
-		public var accountPreferences: AccountPreferences.State?
-		public var createAccountCoordinator: CreateAccountCoordinator.State?
+		// MARK: - Destinations
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public init(
-			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
+			accountPortfolios: IdentifiedArrayOf<AccountPortfolio> = .init(),
 			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
-			accountDetails: AccountDetails.State? = nil,
-			accountPreferences: AccountPreferences.State? = nil,
-			createAccount: CreateAccountCoordinator.State? = nil
+			destination: Destinations.State? = nil
 		) {
-			self.accountPortfolioDictionary = accountPortfolioDictionary
+			self.accountPortfolios = accountPortfolios
 			self.header = header
 			self.accountList = accountList
-			self.accountDetails = accountDetails
-			self.accountPreferences = accountPreferences
-			self.createAccountCoordinator = createAccount
+			self.destination = destination
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case task
 		case pullToRefreshStarted
 		case createAccountButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case accountsLoadedResult(TaskResult<NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>>)
-		case appSettingsLoadedResult(TaskResult<AppSettings>)
+		case accountsLoadedResult(TaskResult<OnNetwork.Accounts>)
+		case gotAppPreferences(AppPreferences)
 		case isCurrencyAmountVisibleLoaded(Bool)
-		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
-		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
+		case accountPortfoliosResult(TaskResult<IdentifiedArrayOf<AccountPortfolio>>)
+		case singleAccountPortfolioResult(TaskResult<AccountPortfolio>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case accountList(AccountList.Action)
 		case header(Header.Action)
-		case accountPreferences(AccountPreferences.Action)
-		case accountDetails(AccountDetails.Action)
-		case createAccountCoordinator(CreateAccountCoordinator.Action)
+		case accountList(AccountList.Action)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 	}
 
-	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
-	@Dependency(\.appSettingsClient) var appSettingsClient
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
-	@Dependency(\.mainQueue) var mainQueue
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case accountDetails(AccountDetails.State)
+			case createAccount(CreateAccountCoordinator.State)
+
+			// NB: native case paths should deem this obsolete.
+			// e.g. `state.destination?[keyPath: \.accountDetails] = ...` or even conciser via `@dynamicMemberLookup`
+			var accountDetails: AccountDetails.State? {
+				get {
+					guard case let .accountDetails(state) = self else { return nil }
+					return state
+				}
+				set {
+					guard case .accountDetails = self, let state = newValue else { return }
+					self = .accountDetails(state)
+				}
+			}
+		}
+
+		public enum Action: Sendable, Equatable {
+			case accountDetails(AccountDetails.Action)
+			case createAccount(CreateAccountCoordinator.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
+				AccountDetails()
+			}
+			Scope(state: /State.createAccount, action: /Action.createAccount) {
+				CreateAccountCoordinator()
+			}
+		}
+	}
+
+	@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.openURL) var openURL
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.accountsClient) var accountsClient
 
 	public init() {}
 
@@ -82,40 +107,43 @@ public struct Home: Sendable, FeatureReducer {
 			Header()
 		}
 
-		accountListReducer()
-
-		Reduce(self.core)
-	}
-
-	func accountListReducer() -> some ReducerProtocolOf<Self> {
 		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
 			AccountList()
 		}
-		.ifLet(\.accountDetails, action: /Action.child .. ChildAction.accountDetails) {
-			AccountDetails()
-		}
-		.ifLet(\.accountPreferences, action: /Action.child .. ChildAction.accountPreferences) {
-			AccountPreferences()
-		}
-		.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
-			CreateAccountCoordinator()
-		}
+
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .task:
+			return .run { send in
+				do {
+					for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
+						guard !Task.isCancelled else {
+							return
+						}
+						await send(.internal(.accountsLoadedResult(.success(accounts))))
+					}
+				} catch {
+					errorQueue.schedule(error)
+				}
+			}
 		case .appeared:
-			return loadAccountsAndSettings()
+			return getAppPreferences()
 
 		case .pullToRefreshStarted:
-			return loadAccountsAndSettings()
+			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList))
 
 		case .createAccountButtonTapped:
-			state.createAccountCoordinator = .init(config: .init(
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
-			))
+			state.destination = .createAccount(
+				.init(config: .init(
+					purpose: .newAccountFromHome
+				))
+			)
 			return .none
 		}
 	}
@@ -130,53 +158,51 @@ public struct Home: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .appSettingsLoadedResult(.success(appSettings)):
+		case let .gotAppPreferences(appPreferences):
 			// FIXME: Replace currency with value from Profile!
-			let currency = appSettings.currency
+			let currency = appPreferences.display.fiatCurrencyPriceTarget
 			state.accountList.accounts.forEach {
-				state.accountList.accounts[id: $0.address]?.currency = currency
+				state.accountList.accounts[id: $0.account.address]?.currency = currency
 			}
 			return .run { send in
-				await send(.internal(.isCurrencyAmountVisibleLoaded(appSettings.isCurrencyAmountVisible)))
+				await send(.internal(.isCurrencyAmountVisibleLoaded(appPreferences.display.isCurrencyAmountVisible)))
 			}
-
-		case let .appSettingsLoadedResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
 
 		case let .isCurrencyAmountVisibleLoaded(isVisible):
 			// account list
 			state.accountList.accounts.forEach {
 				// TODO: replace hardcoded true value with isVisible value
-				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = true
+				state.accountList.accounts[id: $0.account.address]?.isCurrencyAmountVisible = true
 			}
 
 			// account details
-			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
+			state.destination?.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
 				section.assets.forEach { row in
-					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
+					state.destination?.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
 				}
 			}
 
 			return .none
 
-		case let .fetchPortfolioResult(.success(totalPortfolio)):
-			state.accountPortfolioDictionary = totalPortfolio
-			state.accountList.accounts.forEach {
-				let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
-				state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
+		case let .accountPortfoliosResult(.success(accountPortfolios)):
+			state.accountPortfolios = accountPortfolios
+			state.accountList.accounts.forEach { row in
+				let address = row.account.address
+				let accountPortfolio = accountPortfolios[id: address] ?? AccountPortfolio.empty(owner: address)
+				state.accountList.accounts[id: address]?.portfolio = accountPortfolio
 			}
 
 			// account details
-			if let details = state.accountDetails {
+			if let details = state.destination?.accountDetails {
 				let account = details.account
+				let address = account.address
 
 				// asset list
-				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+				let accountPortfolio = accountPortfolios[id: address] ?? AccountPortfolio.empty(owner: address)
 				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
-				state.accountDetails?.assets = .init(
-					type: details.assets.type,
+				state.destination?.accountDetails?.assets = .init(
+					kind: details.assets.kind,
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
 							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
@@ -193,18 +219,17 @@ public struct Home: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .fetchPortfolioResult(.failure(error)):
+		case let .accountPortfoliosResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .accountPortfolioResult(.success(accountPortfolio)):
-			guard let key = accountPortfolio.first?.key else { return .none }
-			state.accountPortfolioDictionary[key] = accountPortfolio.first?.value
-			return .run { [portfolio = state.accountPortfolioDictionary] send in
-				await send(.internal(.fetchPortfolioResult(.success(portfolio))))
+		case let .singleAccountPortfolioResult(.success(accountPortfolio)):
+			state.accountPortfolios[id: accountPortfolio.owner] = accountPortfolio
+			return .run { [accountPortfolios = state.accountPortfolios] send in
+				await send(.internal(.accountPortfoliosResult(.success(accountPortfolios))))
 			}
 
-		case let .accountPortfolioResult(.failure(error)):
+		case let .singleAccountPortfolioResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 		}
@@ -213,10 +238,10 @@ public struct Home: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .accountList(.delegate(.fetchPortfolioForAccounts)):
-			return loadAccountsAndSettings()
+			return refreshAccounts(state.accounts)
 
 		case let .accountList(.delegate(.displayAccountDetails(account))):
-			state.accountDetails = .init(for: account)
+			state.destination = .accountDetails(.init(for: account))
 			return .none
 
 		case .header(.delegate(.displaySettings)):
@@ -224,36 +249,29 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.delegate(.displaySettings))
 			}
 
-		case .accountPreferences(.delegate(.dismissAccountPreferences)):
-			state.accountPreferences = nil
-			return .none
-
-		case let .accountPreferences(.delegate(.refreshAccount(address))):
+		// this whole case is just plain awful, but hopefully only temporary until we introduce account streams.
+		case let .destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.delegate(.refreshAccount(address))))))))):
 			return .run { send in
-				await send(.internal(.accountPortfolioResult(TaskResult {
-					try await accountPortfolioFetcher.fetchPortfolio([address])
+				await send(.internal(.singleAccountPortfolioResult(TaskResult {
+					try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
 				})))
-				await send(.child(.accountPreferences(.internal(.system(.refreshAccountCompleted)))))
+				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.refreshAccountCompleted))))))))))
 			}
 
-		case .accountDetails(.delegate(.dismissAccountDetails)):
-			state.accountDetails = nil
+		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
+			state.destination = nil
 			return .none
 
-		case let .accountDetails(.delegate(.displayAccountPreferences(address))):
-			state.accountPreferences = .init(address: address)
-			return .none
-
-		case let .accountDetails(.delegate(.refresh(address))):
+		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
 			return refreshAccount(address)
 
-		case .createAccountCoordinator(.delegate(.dismissed)):
-			state.createAccountCoordinator = nil
+		case .destination(.presented(.createAccount(.delegate(.dismiss)))):
+			state.destination = nil
 			return .none
 
-		case .createAccountCoordinator(.delegate(.completed)):
-			state.createAccountCoordinator = nil
-			return loadAccountsAndSettings()
+		case .destination(.presented(.createAccount(.delegate(.completed)))):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none
@@ -262,40 +280,44 @@ public struct Home: Sendable, FeatureReducer {
 
 	private func refreshAccount(_ address: AccountAddress) -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.accountPortfolioResult(TaskResult {
-				try await accountPortfolioFetcher.fetchPortfolio([address])
+			await send(.internal(.singleAccountPortfolioResult(TaskResult {
+				try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
+			})))
+		}
+	}
+
+	private func refreshAccounts(_ accounts: IdentifiedArrayOf<OnNetwork.Account>) -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.accountPortfoliosResult(TaskResult {
+				try await accountPortfolioFetcherClient.fetchPortfolioFor(accounts: accounts)
 			})))
 		}
 	}
 
 	private func toggleCurrencyAmountVisible() -> EffectTask<Action> {
-		.run { send in
-			var isVisible = try await appSettingsClient.loadSettings().isCurrencyAmountVisible
-			isVisible.toggle()
-			try await appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
-			await send(.internal(.isCurrencyAmountVisibleLoaded(isVisible)))
+		.run { _ in
+			try await appPreferencesClient.updatingDisplay {
+				$0.isCurrencyAmountVisible.toggle()
+			}
 		}
 	}
 
-	private func loadAccountsAndSettings() -> EffectTask<Action> {
+	private func getAppPreferences() -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.accountsLoadedResult(
-				TaskResult {
-					try await profileClient.getAccounts()
-				}
-			)))
-			await send(.internal(.appSettingsLoadedResult(
-				TaskResult {
-					try await appSettingsClient.loadSettings()
-				}
+			await send(.internal(.gotAppPreferences(
+				appPreferencesClient.getPreferences()
 			)))
 		}
+	}
+
+	private func fetchPortfolio(_ accounts: AccountList.State) -> EffectTask<Action> {
+		fetchPortfolio(accounts.accounts.map(\.account))
 	}
 
 	private func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account> & Sendable) -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.fetchPortfolioResult(TaskResult {
-				try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))
+			await send(.internal(.accountPortfoliosResult(TaskResult {
+				try await accountPortfolioFetcherClient.fetchPortfolioForAccounts(accounts.map(\.address))
 			})))
 		}
 	}

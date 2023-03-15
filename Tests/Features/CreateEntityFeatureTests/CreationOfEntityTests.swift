@@ -1,47 +1,48 @@
 @testable import CreateEntityFeature
 import Cryptography
 import FeatureTestingPrelude
-import ProfileClient
 
 @MainActor
 final class CreationOfEntityTests: TestCase {
-	let testScheduler = DispatchQueue.test
-
 	func test__WHEN__account_is_created__THEN__it_is_added_to_profile() async throws {
 		let account = OnNetwork.Account.previewValue0
+		let initialState = try CreationOfEntity<OnNetwork.Account>.State(
+			curve: .curve25519,
+			networkID: .nebunet,
+			name: account.displayName,
+			factorSource: .previewValueDevice
+		)
 		let store = TestStore(
-			initialState: CreationOfEntity<OnNetwork.Account>.State(
-				networkID: .nebunet,
-				name: account.displayName,
-				genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy.loadMnemonicFromKeychainForFactorSource(.previewValue)
-			),
+			initialState: initialState,
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {
-			$0.profileClient.createUnsavedVirtualEntity = { request in
+			$0.accountsClient.createUnsavedVirtualAccount = { request in
 				XCTAssertEqual(request.displayName, account.displayName)
 				return account
 			}
-			$0.profileClient.addAccount = {
+			$0.accountsClient.saveVirtualAccount = {
 				XCTAssertEqual($0, account)
 			}
 		}
-		await store.send(.internal(.view(.appeared)))
-		await store.receive(.internal(.system(.createEntityResult(.success(account)))))
+		await store.send(.view(.appeared))
+		await store.receive(.internal(.createEntityResult(.success(account))))
 		await store.receive(.delegate(.createdEntity(account)))
 	}
 
 	func test__WHEN__creation_fails__THEN__error_is_propagated() async throws {
 		let errorQueue = ActorIsolated<Set<NSError>>([])
 		let createNewAccountError = NSError.testValue(domain: "Create New Account Request")
+		let initialState = try CreationOfEntity<OnNetwork.Account>.State(
+			curve: .curve25519,
+			networkID: .nebunet,
+			name: "NeverCreated",
+			factorSource: .previewValueDevice
+		)
 		let store = TestStore(
-			initialState: CreationOfEntity<OnNetwork.Account>.State(
-				networkID: .nebunet,
-				name: "NeverCreated",
-				genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy.loadMnemonicFromKeychainForFactorSource(.previewValue)
-			),
+			initialState: initialState,
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {
-			$0.profileClient.createUnsavedVirtualEntity = { request in
+			$0.accountsClient.createUnsavedVirtualAccount = { request in
 				XCTAssertEqual(request.displayName, "NeverCreated")
 				throw createNewAccountError
 			}
@@ -54,9 +55,8 @@ final class CreationOfEntityTests: TestCase {
 			}
 		}
 
-		let expectedErrors = Set([createNewAccountError])
 		await store.send(.view(.appeared))
-		await store.receive(.internal(.system(.createEntityResult(.failure(createNewAccountError)))))
+		await store.receive(.internal(.createEntityResult(.failure(createNewAccountError))))
 		await store.receive(.delegate(.createEntityFailed))
 	}
 }

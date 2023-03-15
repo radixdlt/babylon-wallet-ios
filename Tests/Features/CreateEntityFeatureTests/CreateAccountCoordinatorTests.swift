@@ -5,30 +5,32 @@ import FeatureTestingPrelude
 final class CreateAccountCoordinatorTests: TestCase {
 	func test_dismissCoordinator_onCreateAccountDismiss() async throws {
 		let store = TestStore(
-			initialState: CreateEntityCoordinator.State(config: .init(isFirstEntity: false, canBeDismissed: true, navigationButtonCTA: .goHome)),
+			initialState: CreateEntityCoordinator.State(
+				config: .init(purpose: .newAccountFromHome)
+			),
 			reducer: CreateAccountCoordinator()
 		)
 
-		await store.send(.view(.dismiss))
-		await store.receive(.delegate(.dismissed))
+		await store.send(.view(.closeButtonTapped))
+		await store.receive(.delegate(.dismiss))
 	}
 
 	func test_completionFlow() async throws {
 		let isFirstAccount = false
 		let config = CreateEntityConfig(
-			isFirstEntity: isFirstAccount,
-			canBeDismissed: true,
-			navigationButtonCTA: .goHome
+			purpose: .newAccountFromHome
 		)
-		let initialState = CreateAccountCoordinator.State(
+
+		let initialState = try CreateAccountCoordinator.State(
 			step: .step2_creationOfEntity(.init(
+				curve: .curve25519,
 				networkID: nil,
 				name: "Main",
-				genesisFactorInstanceDerivationStrategy: .loadMnemonicFromKeychainForFactorSource(.previewValue)
+				factorSource: .previewValueDevice
 			)),
 			config: config
 		)
-		let account = OnNetwork.Account.testValue
+		let account = OnNetwork.Account.previewValue0
 
 		let store = TestStore(
 			initialState: initialState,

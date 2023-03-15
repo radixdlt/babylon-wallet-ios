@@ -1,51 +1,42 @@
 import FeaturePrelude
 
+extension AggregatedValue.State {
+	var viewState: AggregatedValue.ViewState {
+		.init(
+			isValueVisible: isCurrencyAmountVisible,
+			value: value,
+			currency: currency
+		)
+	}
+}
+
 // MARK: - AggregatedValue.View
 extension AggregatedValue {
+	public struct ViewState: Equatable {
+		let isValueVisible: Bool
+		let value: BigDecimal?
+		let currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<AggregatedValue>
 
-		public init(
-			store: Store
-		) {
+		public init(store: StoreOf<AggregatedValue>) {
 			self.store = store
 		}
-	}
-}
 
-extension AggregatedValue.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			AggregatedValueView(
-				value: viewStore.value,
-				currency: viewStore.currency,
-				isValueVisible: viewStore.isValueVisible,
-				toggleVisibilityAction: {
-					viewStore.send(.toggleVisibilityButtonTapped)
-				}
-			)
-		}
-	}
-}
-
-// MARK: - AggregatedValue.View.ViewState
-extension AggregatedValue.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		var isValueVisible: Bool
-		var value: BigDecimal?
-		var currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
-
-		init(state: AggregatedValue.State) {
-			isValueVisible = state.isCurrencyAmountVisible
-			value = state.value
-			currency = state.currency
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				AggregatedValueView(
+					value: viewStore.value,
+					currency: viewStore.currency,
+					isValueVisible: viewStore.isValueVisible,
+					toggleVisibilityAction: {
+						viewStore.send(.toggleVisibilityButtonTapped)
+					}
+				)
+			}
 		}
 	}
 }
@@ -143,5 +134,12 @@ struct AggregatedValue_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension AggregatedValue.State {
+	public static let previewValue = AggregatedValue.State(
+		value: 1_000_000,
+		currency: .usd
+	)
 }
 #endif

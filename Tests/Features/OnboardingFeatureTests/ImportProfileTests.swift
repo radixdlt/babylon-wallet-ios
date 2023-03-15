@@ -11,7 +11,7 @@ final class ImportProfileTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		await sut.send(.internal(.view(.goBack)))
+		await sut.send(.view(.goBack))
 		await sut.receive(.delegate(.goBack))
 	}
 
@@ -21,7 +21,7 @@ final class ImportProfileTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		await sut.send(.internal(.view(.importProfileFileButtonTapped))) {
+		await sut.send(.view(.importProfileFileButtonTapped)) {
 			$0.isDisplayingFileImporter = true
 		}
 	}
@@ -32,7 +32,7 @@ final class ImportProfileTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		await sut.send(.internal(.view(.dismissFileImporter))) {
+		await sut.send(.view(.dismissFileImporter)) {
 			$0.isDisplayingFileImporter = false
 		}
 	}
@@ -44,9 +44,6 @@ final class ImportProfileTests: TestCase {
 		)
 		let invalidProfileData = Data("deadbeef".utf8) // invalid data
 		sut.dependencies.dataReader = .init { _, _ in
-			invalidProfileData
-		}
-		sut.dependencies.keychainClient.dataForKey = { _, _ in
 			invalidProfileData
 		}
 
@@ -62,7 +59,7 @@ final class ImportProfileTests: TestCase {
 		wait(for: [expectation], timeout: 0)
 	}
 
-	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__it_gets_injected_into_profileClient() async throws {
+	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__it_gets_imported() async throws {
 		let profileSnapshotData = try profileSnapshotData()
 		let profileSnapshot = try profileSnapshot()
 		let injectedProfileSnapshot = ActorIsolated<ProfileSnapshot?>(nil)
@@ -76,7 +73,7 @@ final class ImportProfileTests: TestCase {
 				XCTAssertEqual(options, .uncached)
 				return profileSnapshotData
 			}
-			$0.profileClient.injectProfileSnapshot = {
+			$0.onboardingClient.importProfileSnapshot = {
 				await injectedProfileSnapshot.setValue($0)
 			}
 		}

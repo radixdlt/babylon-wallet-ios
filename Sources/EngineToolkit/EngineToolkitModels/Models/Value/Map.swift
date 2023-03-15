@@ -3,24 +3,23 @@ import Foundation
 // MARK: - Map_
 public struct Map_: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .map
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .map
+	public func embedValue() -> ManifestASTValue {
 		.map(self)
 	}
 
 	// MARK: Stored properties
 
-	public let keyValueKind: ValueKind
-	public let valueValueKind: ValueKind
-	public let entries: [[Value_]]
-	//    public let entries: [(Value_, Value_)]
+	public let keyValueKind: ManifestASTValueKind
+	public let valueValueKind: ManifestASTValueKind
+	public let entries: [[ManifestASTValue]]
 
 	// MARK: Init
 
 	public init(
-		keyValueKind: ValueKind,
-		valueValueKind: ValueKind,
-		entries: [[Value_]]
+		keyValueKind: ManifestASTValueKind,
+		valueValueKind: ManifestASTValueKind,
+		entries: [[ManifestASTValue]]
 	) {
 		self.keyValueKind = keyValueKind
 		self.valueValueKind = valueValueKind
@@ -53,22 +52,23 @@ extension Map_ {
 
 		try container.encode(keyValueKind, forKey: .keyValueKind)
 		try container.encode(valueValueKind, forKey: .valueValueKind)
+
 		try container.encode(entries, forKey: .entries) // TODO: Fix map
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let entries = try container.decode([[Value_]].self, forKey: .entries)
-		let keyValueKind = try container.decode(ValueKind.self, forKey: .keyValueKind)
-		let valueValueKind = try container.decode(ValueKind.self, forKey: .valueValueKind)
+		let entries = try container.decode([[ManifestASTValue]].self, forKey: .entries)
+		let keyValueKind = try container.decode(ManifestASTValueKind.self, forKey: .keyValueKind)
+		let valueValueKind = try container.decode(ManifestASTValueKind.self, forKey: .valueValueKind)
 
-		try self.init(
+		self.init(
 			keyValueKind: keyValueKind, valueValueKind: valueValueKind, entries: entries
 		)
 	}

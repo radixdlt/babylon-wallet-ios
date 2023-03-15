@@ -10,22 +10,20 @@ extension OnboardingCoordinator {
 		public init(store: StoreOf<OnboardingCoordinator>) {
 			self.store = store
 		}
-	}
-}
 
-extension OnboardingCoordinator.View {
-	public var body: some View {
-		SwitchStore(store) {
-			CaseLet(
-				state: /OnboardingCoordinator.State.importProfile,
-				action: { OnboardingCoordinator.Action.child(.importProfile($0)) },
-				then: { ImportProfile.View(store: $0) }
-			)
-			CaseLet(
-				state: /OnboardingCoordinator.State.newProfileThenAccountCoordinator,
-				action: { OnboardingCoordinator.Action.child(.newProfileThenAccountCoordinator($0)) },
-				then: { NewProfileThenAccountCoordinator.View(store: $0) }
-			)
+		public var body: some SwiftUI.View {
+			SwitchStore(store) {
+				CaseLet(
+					state: /OnboardingCoordinator.State.importProfile,
+					action: { OnboardingCoordinator.Action.child(.importProfile($0)) },
+					then: { ImportProfile.View(store: $0) }
+				)
+				CaseLet(
+					state: /OnboardingCoordinator.State.createAccountCoordinator,
+					action: { OnboardingCoordinator.Action.child(.createAccountCoordinator($0)) },
+					then: { CreateAccountCoordinator.View(store: $0) }
+				)
+			}
 		}
 	}
 }
@@ -42,5 +40,11 @@ struct Onboarding_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension OnboardingCoordinator.State {
+	public static let previewValue: Self = {
+		fatalError("impl me")
+	}()
 }
 #endif

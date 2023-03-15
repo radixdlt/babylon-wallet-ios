@@ -11,8 +11,8 @@ public enum NonFungibleLocalId {
 // MARK: ValueProtocol, Sendable, Codable, Hashable
 extension NonFungibleLocalId: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .nonFungibleLocalId
-	public func embedValue() -> Value_ {
+	public static let kind: ManifestASTValueKind = .nonFungibleLocalId
+	public func embedValue() -> ManifestASTValue {
 		.nonFungibleLocalId(self)
 	}
 
@@ -61,7 +61,7 @@ extension NonFungibleLocalId {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
+		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
@@ -118,11 +118,11 @@ extension NonFungibleLocalIdInternal {
 		let value = try container.decode(Kind.self, forKey: .type)
 		switch value {
 		case .integer:
-			self = .integer(try decodeAndConvertToNumericType(container: container, key: .value))
+			self = try .integer(decodeAndConvertToNumericType(container: container, key: .value))
 		case .uuid:
-			self = .uuid(try container.decode(String.self, forKey: .value))
+			self = try .uuid(container.decode(String.self, forKey: .value))
 		case .string:
-			self = .string(try container.decode(String.self, forKey: .value))
+			self = try .string(container.decode(String.self, forKey: .value))
 		case .bytes:
 			self = try .bytes(.init(hex: container.decode(String.self, forKey: .value)))
 		}
