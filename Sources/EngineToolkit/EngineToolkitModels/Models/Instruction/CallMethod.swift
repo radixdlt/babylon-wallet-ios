@@ -9,35 +9,14 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// Temporary, will change to `Address`. This can actually only be either `ComponentAddress` or `Address_`.
-	public let receiver: ManifestASTValue
+	public let receiver: ComponentAddress
 	public let methodName: String
-	public let arguments: [ManifestASTValue]
-
-	// MARK: Computed properties
-
-	/// Temporary. This can actually only be either `ComponentAddress` or `Address_`.
-	public var receiverAsAccountComponentAddress: ComponentAddress? {
-		switch receiver {
-		case let .address(address) where address.address.starts(with: "account"):
-			return ComponentAddress(address: address.address)
-		case let .componentAddress(componentAddress):
-			return componentAddress
-		default:
-			return nil
-		}
-	}
+	public let arguments: [Value_]
 
 	// MARK: Init
 
-	public init(receiver: ComponentAddress, methodName: String, arguments: [ManifestASTValue] = []) {
-		self.receiver = .componentAddress(receiver)
-		self.methodName = methodName
-		self.arguments = arguments
-	}
-
-	public init(receiver: Address_, methodName: String, arguments: [ManifestASTValue] = []) {
-		self.receiver = .address(receiver)
+	public init(receiver: ComponentAddress, methodName: String, arguments: [Value_] = []) {
+		self.receiver = receiver
 		self.methodName = methodName
 		self.arguments = arguments
 	}
@@ -57,7 +36,7 @@ public struct CallMethod: InstructionProtocol {
 	public init(
 		receiver: ComponentAddress,
 		methodName: String,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
+		@SpecificValuesBuilder buildValues: () throws -> [Value_]
 	) rethrows {
 		try self.init(
 			receiver: receiver,
@@ -69,7 +48,7 @@ public struct CallMethod: InstructionProtocol {
 	public init(
 		receiver: ComponentAddress,
 		methodName: String,
-		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
+		@SpecificValuesBuilder buildValue: () throws -> Value_
 	) rethrows {
 		self.init(
 			receiver: receiver,
@@ -106,8 +85,14 @@ extension CallMethod {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.receiver = try container.decode(ManifestASTValue.self, forKey: .receiver)
-		self.methodName = try container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded
-		self.arguments = try container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
+		let receiver = try container.decode(ComponentAddress.self, forKey: .receiver)
+		let methodName = try container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded
+		let arguments = try container.decodeIfPresent([Value_].self, forKey: .arguments) ?? []
+
+		self.init(
+			receiver: receiver,
+			methodName: methodName,
+			arguments: arguments
+		)
 	}
 }

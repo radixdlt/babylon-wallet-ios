@@ -11,11 +11,11 @@ public struct SetComponentRoyaltyConfig: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let componentAddress: ComponentAddress
-	public let royaltyConfig: ManifestASTValue
+	public let royaltyConfig: Value_
 
 	// MARK: Init
 
-	public init(componentAddress: ComponentAddress, royaltyConfig: ManifestASTValue) {
+	public init(componentAddress: ComponentAddress, royaltyConfig: Value_) {
 		self.componentAddress = componentAddress
 		self.royaltyConfig = royaltyConfig
 	}
@@ -49,7 +49,7 @@ extension SetComponentRoyaltyConfig {
 		}
 
 		let componentAddress = try container.decode(ComponentAddress.self, forKey: .componentAddress)
-		let royaltyConfig = try container.decode(ManifestASTValue.self, forKey: .royaltyConfig)
+		let royaltyConfig = try container.decode(Value_.self, forKey: .royaltyConfig)
 
 		self.init(componentAddress: componentAddress, royaltyConfig: royaltyConfig)
 	}

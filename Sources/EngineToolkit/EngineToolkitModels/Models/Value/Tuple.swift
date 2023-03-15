@@ -3,17 +3,17 @@ import Foundation
 // MARK: - Tuple
 public struct Tuple: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByRadixEngineValues {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .tuple
-	public func embedValue() -> ManifestASTValue {
+	public static let kind: ValueKind = .tuple
+	public func embedValue() -> Value_ {
 		.tuple(self)
 	}
 
 	// MARK: Stored properties
-	public let elements: [ManifestASTValue]
+	public let elements: [Value_]
 
 	// MARK: Init
 
-	public init(values: [ManifestASTValue]) {
+	public init(values: [Value_]) {
 		self.elements = values
 	}
 }
@@ -35,13 +35,13 @@ extension Tuple {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
 		// Decoding `elements`
 		// TODO: Validate that all elements are of type `elementType`
-		try self.init(values: container.decode([ManifestASTValue].self, forKey: .elements))
+		try self.init(values: container.decode([Value_].self, forKey: .elements))
 	}
 }

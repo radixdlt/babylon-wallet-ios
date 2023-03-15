@@ -11,13 +11,13 @@ public struct MintUuidNonFungible: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let resourceAddress: ResourceAddress
-	public let entries: ManifestASTValue
+	public let entries: Value_
 
 	// MARK: Init
 
 	public init(
 		resourceAddress: ResourceAddress,
-		entries: ManifestASTValue
+		entries: Value_
 	) {
 		self.resourceAddress = resourceAddress
 		self.entries = entries
@@ -53,7 +53,7 @@ extension MintUuidNonFungible {
 
 		try self.init(
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			entries: container.decode(ManifestASTValue.self, forKey: .entries)
+			entries: container.decode(Value_.self, forKey: .entries)
 		)
 	}
 }

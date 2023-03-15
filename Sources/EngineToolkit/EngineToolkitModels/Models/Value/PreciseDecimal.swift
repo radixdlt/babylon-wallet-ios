@@ -3,8 +3,8 @@ import Foundation
 // MARK: - PreciseDecimal
 public struct PreciseDecimal: ValueProtocol, Sendable, Codable, Hashable, ExpressibleByStringLiteral, ExpressibleByFloatLiteral, ExpressibleByIntegerLiteral {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .preciseDecimal
-	public func embedValue() -> ManifestASTValue {
+	public static let kind: ValueKind = .preciseDecimal
+	public func embedValue() -> Value_ {
 		.preciseDecimal(self)
 	}
 
@@ -50,7 +50,7 @@ extension PreciseDecimal {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}

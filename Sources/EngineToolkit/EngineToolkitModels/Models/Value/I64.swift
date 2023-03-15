@@ -2,8 +2,8 @@ import Foundation
 
 extension Int64: ValueProtocol, ProxyCodable {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .i64
-	public func embedValue() -> ManifestASTValue {
+	public static let kind: ValueKind = .i64
+	public func embedValue() -> Value_ {
 		.i64(self)
 	}
 
