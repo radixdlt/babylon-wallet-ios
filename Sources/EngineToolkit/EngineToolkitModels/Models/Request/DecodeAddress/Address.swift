@@ -122,29 +122,59 @@ extension AddressProtocol {
 	}
 }
 
-// MARK: - __Address
-// FIXME: Remove. This type mimics the old enum based Address
-public struct __Address: Sendable, Codable, Hashable {
-	public let type: AddressType
-	public let address: String
+// MARK: - PolymorphicAddress
+public enum PolymorphicAddress: Sendable, Codable, Hashable, AddressStringConvertible {
+	case packageAddress(PackageAddress)
+	case componentAddress(ComponentAddress)
+	case resourceAddress(ResourceAddress)
 
-	public init(type: AddressType, address: String) {
-		self.type = type
-		self.address = address
+	public enum Kind: String, Sendable, Codable, Hashable {
+		case packageAddress = "PackageAddress"
+		case componentAddress = "ComponentAddress"
+		case resourceAddress = "ResourceAddress"
+	}
+}
+
+// MARK: Codable
+extension PolymorphicAddress {
+	private enum CodingKeys: String, CodingKey {
+		case type
 	}
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try container.decode(Kind.self, forKey: .type)
 
-		try self.init(
-			type: container.decode(AddressType.self, forKey: .type),
-			address: container.decode(String.self, forKey: .address)
-		)
+		let singleValueContainer = try decoder.singleValueContainer()
+		switch discriminator {
+		case .packageAddress:
+			self = try .packageAddress(singleValueContainer.decode(PackageAddress.self))
+		case .componentAddress:
+			self = try .componentAddress(singleValueContainer.decode(ComponentAddress.self))
+		case .resourceAddress:
+			self = try .resourceAddress(singleValueContainer.decode(ResourceAddress.self))
+		}
 	}
 
-	public enum AddressType: String, Sendable, Codable, Hashable {
-		case packageAddress = "PackageAddress"
-		case resourceAddress = "ResourceAddress"
-		case componentAddress = "ComponentAddress"
+	public func encode(to encoder: Encoder) throws {
+		var singleValueContainer = encoder.singleValueContainer()
+		switch self {
+		case let .packageAddress(encodable):
+			try singleValueContainer.encode(encodable)
+		case let .componentAddress(encodable):
+			try singleValueContainer.encode(encodable)
+		case let .resourceAddress(encodable):
+			try singleValueContainer.encode(encodable)
+		}
+	}
+}
+
+extension PolymorphicAddress {
+	public var address: String {
+		switch self {
+		case let .packageAddress(address): return address.address
+		case let .componentAddress(address): return address.address
+		case let .resourceAddress(address): return address.address
+		}
 	}
 }
