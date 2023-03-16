@@ -11,3 +11,12 @@ extension Binding where Value: Equatable {
 		)
 	}
 }
+
+extension Binding {
+	public static func ?? <T>(lhs: Binding<T?>, rhs: T) -> Binding<T> {
+		.init(
+			get: { lhs.wrappedValue ?? rhs },
+			set: { lhs.wrappedValue = $0 }
+		)
+	}
+}
