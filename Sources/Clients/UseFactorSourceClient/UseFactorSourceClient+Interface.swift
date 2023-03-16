@@ -46,18 +46,18 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	public let derivationPath: DerivationPath
 	public let curve: Slip10Curve
 
-	/// The data to sign
-	public let data: Data
+	/// The data to hash and sign
+	public let unhashedData: Data
 
 	public init(
 		hdRoot: HD.Root,
 		derivationPath: DerivationPath,
 		curve: Slip10Curve,
-		data: Data
+		unhashedData: Data
 	) {
 		self.hdRoot = hdRoot
 		self.derivationPath = derivationPath
 		self.curve = curve
-		self.data = data
+		self.unhashedData = unhashedData
 	}
 }

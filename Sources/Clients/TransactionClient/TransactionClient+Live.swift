@@ -46,8 +46,9 @@ extension TransactionClient {
 			let cachedPrivateHDFactorSources = ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>>([])
 
 			@Sendable func sign(
-				data: some DataProtocol,
-				with account: OnNetwork.Account
+				unhashed unhashed_: some DataProtocol,
+				with account: OnNetwork.Account,
+				debugOrigin origin: String
 			) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
 				case let .unsecured(unsecuredControl):
@@ -77,21 +78,27 @@ extension TransactionClient {
 
 					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
 					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
+					let unhashedData = Data(unhashed_)
 
-					let sigRes: SignatureWithPublicKey = try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
+					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.factorSource.kind), factorSourceHint=\(privateHDFactorSource.factorSource.hint)")
+
+					return try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,
 						derivationPath: factorInstance.derivationPath!,
 						curve: curve,
-						data: Data(data)
+						unhashedData: unhashedData
 					))
-					return sigRes
 				}
 			}
 
 			let intentSignatures_: [SignatureWithPublicKey]
 			do {
 				intentSignatures_ = try await notaryAndSigners.accountsNeededToSign.asyncMap {
-					try await sign(data: compiledTransactionIntent.compiledIntent, with: $0)
+					try await sign(
+						unhashed: compiledTransactionIntent.compiledIntent,
+						with: $0,
+						debugOrigin: "Intent Signers"
+					)
 				}
 			} catch {
 				return .failure(.failedToSignIntentWithAccountSigners)
@@ -117,7 +124,11 @@ extension TransactionClient {
 
 			let notarySignatureWithPublicKey: SignatureWithPublicKey
 			do {
-				notarySignatureWithPublicKey = try await sign(data: compiledSignedIntent.compiledIntent, with: notaryAndSigners.notarySigner)
+				notarySignatureWithPublicKey = try await sign(
+					unhashed: compiledSignedIntent.compiledIntent,
+					with: notaryAndSigners.notarySigner,
+					debugOrigin: "Notary signer"
+				)
 			} catch {
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}

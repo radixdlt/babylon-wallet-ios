@@ -38,11 +38,11 @@ extension SLIP10.PrivateKey {
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
 	public func sign(
-		data: some DataProtocol,
+		unhashed: some DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> SignatureWithPublicKey {
 		try signReturningHashOfMessage(
-			data: data,
+			unhashed: unhashed,
 			ifECDSASkipHashingBeforeSigning: ifECDSASkipHashingBeforeSigning
 		).signatureWithPublicKey
 	}
@@ -51,44 +51,61 @@ extension SLIP10.PrivateKey {
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
 	public func signReturningHashOfMessage(
-		data: any DataProtocol,
+		unhashed unhashed_: some DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> (signatureWithPublicKey: SignatureWithPublicKey, hashOfMessage: Data) {
 		// We do Radix double SHA256 hashing, needed for secp256k1 but not for Curve25519, however,
 		// the hash is used as Transaction Identifier, disregarding of Curveu used.
-		let hashOfMessage = Data(SHA256.twice(data: data))
+		let unhashed = Data(unhashed_)
+		let hashOfMessage = Data(SHA256.twice(data: unhashed))
 
 		switch self {
 		case let .curve25519(key):
 			// For Curve25519 we do not sign the hash but rather the original message,
 			// but for secp256k1 we sign the hash.
-			let signature = try key.signature(for: data)
+			let signature = try key.signature(for: unhashed)
 			let publicKey = key.publicKey
+			let isValid = publicKey.isValidSignature(signature, for: unhashed)
+			guard isValid else {
+				throw Curve25519SignatureJustProducedIsInvalid()
+			}
 			return (signatureWithPublicKey: SignatureWithPublicKey.eddsaEd25519(
 				signature: signature,
 				publicKey: publicKey
 			), hashOfMessage: hashOfMessage)
+
 		case let .secp256k1(key):
 			// We do sign the hash of the message for secp256k1 but not for Curve25519.
 			// Recoverable signature is needed
 			let messageToSign = try {
 				if ifECDSASkipHashingBeforeSigning {
-					guard data.count == 32 else {
+					guard unhashed.count == 32 else {
 						throw SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong()
 					}
-					return data
+					return unhashed
 				} else {
 					return hashOfMessage
 				}
 			}()
 			let signature = try key.ecdsaSignRecoverable(hashed: messageToSign)
 			let publicKey = key.publicKey
+
+			let isValid = try publicKey.isValid(
+				signature: signature,
+				hashed: messageToSign
+			)
+
+			guard isValid else {
+				throw Secp256k1SignatureJustProducedIsInvalid()
+			}
+
+			let signatureWithPublicKey = SignatureWithPublicKey.ecdsaSecp256k1(
+				signature: signature,
+				publicKey: publicKey
+			)
 			return (
-				signatureWithPublicKey: SignatureWithPublicKey.ecdsaSecp256k1(
-					signature: signature,
-					publicKey: publicKey
-				),
-				hashOfMessage: hashOfMessage
+				signatureWithPublicKey,
+				hashOfMessage
 			)
 		}
 	}
@@ -96,6 +113,12 @@ extension SLIP10.PrivateKey {
 
 // MARK: - SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong
 struct SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong: Swift.Error {}
+
+// MARK: - Secp256k1SignatureJustProducedIsInvalid
+struct Secp256k1SignatureJustProducedIsInvalid: Swift.Error {}
+
+// MARK: - Curve25519SignatureJustProducedIsInvalid
+struct Curve25519SignatureJustProducedIsInvalid: Swift.Error {}
 
 extension SLIP10.PrivateKey {
 	public func publicKey() -> SLIP10.PublicKey {

@@ -35,7 +35,7 @@ extension UseFactorSourceClient: DependencyKey {
 					path: request.derivationPath,
 					curve: request.curve
 				)
-				return try privateKey.sign(data: request.data)
+				return try privateKey.sign(unhashed: request.unhashedData)
 			}
 		)
 	}()

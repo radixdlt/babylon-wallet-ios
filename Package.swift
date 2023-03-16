@@ -646,7 +646,7 @@ package.addModules([
 		name: "Cryptography",
 		dependencies: [
 			.product(name: "K1", package: "K1") {
-				.package(url: "https://github.com/Sajjon/K1.git", exact: "0.0.4")
+				.package(url: "https://github.com/Sajjon/K1.git", exact: "0.0.8")
 			},
 		],
 		exclude: [

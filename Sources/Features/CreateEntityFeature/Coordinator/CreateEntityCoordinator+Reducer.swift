@@ -103,7 +103,11 @@ public struct CreateEntityCoordinator<
 		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate):
 			precondition(!factorSources.isEmpty)
 
-			if factorSources.count > 1, factorSources.contains(where: \.supportsOlympia) {
+			// We ALWAYS use "babylon" `device` factor source and `Curve25519` for Personas.
+			// However, when creating accounts if we have multiple `device` factors sources, or
+			// in general if we have an "olympia" `devive` factor source, we let user choose.
+			if Entity.entityKind == .account, factorSources.filter({ $0.kind == .device }).count > 1 || factorSources.contains(where: \.supportsOlympia)
+			{
 				return goToStep1SelectGenesisFactorSource(
 					entityName: specifiedNameForNewEntityToCreate,
 					factorSources: factorSources,

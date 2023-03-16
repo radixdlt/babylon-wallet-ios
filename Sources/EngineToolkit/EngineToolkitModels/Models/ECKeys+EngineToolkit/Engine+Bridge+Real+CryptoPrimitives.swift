@@ -56,7 +56,7 @@ extension SLIP10.Signature {
 			// TODO: validate
 			self = .eddsaEd25519(Data(signature.bytes))
 		case let .ecdsaSecp256k1(signature):
-			self = try .ecdsaSecp256k1(.init(rawRepresentation: signature.bytes))
+			self = try .ecdsaSecp256k1(.init(radixFormat: Data(signature.bytes)))
 		}
 	}
 }
@@ -65,8 +65,8 @@ extension SignatureWithPublicKey {
 	public func intoEngine() throws -> Engine.SignatureWithPublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(signature, _):
-			return .ecdsaSecp256k1(
-				signature: .init(bytes: [UInt8](signature.rawRepresentation))
+			return try .ecdsaSecp256k1(
+				signature: .init(bytes: [UInt8](signature.radixSerialize()))
 			)
 		case let .eddsaEd25519(signature, publicKey):
 			return .eddsaEd25519(
