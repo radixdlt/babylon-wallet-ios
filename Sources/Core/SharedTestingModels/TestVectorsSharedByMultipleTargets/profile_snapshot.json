@@ -252,12 +252,12 @@
           "fields" : [
             {
               "id" : "8262CDF8-306D-43DF-90A5-32BCE03C9AED",
-              "kind" : "firstName",
+              "kind" : "givenName",
               "value" : "Jane"
             },
             {
               "id" : "84F2DC0C-EB4C-4A12-8E7A-946C69EB0155",
-              "kind" : "lastName",
+              "kind" : "familyName",
               "value" : "Incognitoson"
             }
           ],
@@ -285,12 +285,12 @@
           "fields" : [
             {
               "id" : "06D4FDBA-AECE-44D3-930A-A90040AC8231",
-              "kind" : "firstName",
+              "kind" : "givenName",
               "value" : "Maria"
             },
             {
               "id" : "C32A67AF-4E55-4E14-992C-BD6C6F8408BA",
-              "kind" : "lastName",
+              "kind" : "familyName",
               "value" : "Publicson"
             }
           ],

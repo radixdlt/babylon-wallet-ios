@@ -168,12 +168,12 @@ final class ProfileTests: TestCase {
 		let thirdAccount = try addNewAccount("Third")
 
 		let firstPersona = try addNewPersona("Mrs Incognito", fields: [
-			.init(kind: .firstName, value: "Jane"),
-			.init(kind: .lastName, value: "Incognitoson"),
+			.init(kind: .givenName, value: "Jane"),
+			.init(kind: .familyName, value: "Incognitoson"),
 		])
 		let secondPersona = try addNewPersona("Mrs Public", fields: [
-			.init(kind: .firstName, value: "Maria"),
-			.init(kind: .lastName, value: "Publicson"),
+			.init(kind: .givenName, value: "Maria"),
+			.init(kind: .familyName, value: "Publicson"),
 		])
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")

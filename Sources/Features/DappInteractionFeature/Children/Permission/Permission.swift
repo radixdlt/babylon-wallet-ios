@@ -8,7 +8,7 @@ struct Permission: Sendable, FeatureReducer {
 
 		enum PermissionKind: Sendable, Hashable {
 			case accounts(DappInteraction.NumberOfAccounts)
-			case personalData
+			case personaData
 		}
 
 		init(

@@ -11,8 +11,8 @@ extension Permission {
 			switch state.permissionKind {
 			case .accounts:
 				title = L10n.DApp.Permission.Title.accounts
-			case .personalData:
-				title = L10n.DApp.Permission.Title.personalData
+			case .personaData:
+				title = L10n.DApp.Permission.Title.personaData
 			}
 
 			subtitle = {
@@ -35,14 +35,14 @@ extension Permission {
 								L10n.DApp.Permission.Subtitle.Explanation.Accounts.second,
 								foregroundColor: normalColor
 							)
-					case .personalData:
+					case .personaData:
 						return AttributedString(
-							L10n.DApp.Permission.Subtitle.Explanation.PersonalData.first,
+							L10n.DApp.Permission.Subtitle.Explanation.PersonaData.first,
 							foregroundColor: normalColor
 						)
 							+ always
 							+ AttributedString(
-								L10n.DApp.Permission.Subtitle.Explanation.PersonalData.second,
+								L10n.DApp.Permission.Subtitle.Explanation.PersonaData.second,
 								foregroundColor: normalColor
 							)
 					}
@@ -65,7 +65,7 @@ extension Permission {
 						case let (.exactly, number):
 							return L10n.DApp.Permission.NumberOfAccounts.exactly(number)
 						}
-					case .personalData:
+					case .personaData:
 						return ""
 					}
 				}()

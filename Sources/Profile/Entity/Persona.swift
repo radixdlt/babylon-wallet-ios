@@ -100,11 +100,11 @@ extension OnNetwork.Persona {
 		/// A locally generated, globally unique ID for this personal information "field".
 		public let id: ID
 
-		/// Content type, e.g. `email` or `zip`
+		/// Content type, e.g. `emailAddress` or `phoneNumber`
 		public let kind: Kind
 
-		/// The content of this field, a non empty string, e.g. "foo@bar.com" for email
-		/// or "GWC8+3H" as ZIP code
+		/// The content of this field, a non empty string,
+		/// e.g. "foo@bar.com" for email address or "555-5555" as phone number.
 		public let value: Value
 
 		public init(kind: Kind, value: Value) {
@@ -145,11 +145,10 @@ extension OnNetwork.Persona.Field {
 		CustomStringConvertible,
 		CustomDumpRepresentable
 	{
-		case firstName
-		case lastName
-		case email
-		case personalIdentificationNumber
-		case zipCode
+		case givenName
+		case familyName
+		case emailAddress
+		case phoneNumber
 	}
 }
 

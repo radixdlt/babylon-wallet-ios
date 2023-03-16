@@ -286,11 +286,11 @@ public enum L10n {
             ///  be able to view account information when you login with this Persona.
             public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.accounts.second", fallback: " be able to view account information when you login with this Persona.")
           }
-          public enum PersonalData {
+          public enum PersonaData {
             ///  is requesting permission to 
-            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.first", fallback: " is requesting permission to ")
+            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personaData.first", fallback: " is requesting permission to ")
             ///  be able to view the following personal data when you login with this Persona.
-            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.second", fallback: " be able to view the following personal data when you login with this Persona.")
+            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personaData.second", fallback: " be able to view the following personal data when you login with this Persona.")
           }
         }
       }
@@ -298,7 +298,7 @@ public enum L10n {
         /// Account Permission
         public static let accounts = L10n.tr("Localizable", "dApp.permission.title.accounts", fallback: "Account Permission")
         /// Personal Data Permission
-        public static let personalData = L10n.tr("Localizable", "dApp.permission.title.personalData", fallback: "Personal Data Permission")
+        public static let personaData = L10n.tr("Localizable", "dApp.permission.title.personaData", fallback: "Personal Data Permission")
       }
     }
     public enum Request {
@@ -543,24 +543,24 @@ public enum L10n {
     public static let editAccountSharing = L10n.tr("Localizable", "personaDetails.editAccountSharing", fallback: "Edit Account Sharing")
     /// Edit Persona
     public static let editPersona = L10n.tr("Localizable", "personaDetails.editPersona", fallback: "Edit Persona")
-    /// Email
-    public static let emailHeading = L10n.tr("Localizable", "personaDetails.emailHeading", fallback: "Email")
+    /// Email Address
+    public static let emailAddressHeading = L10n.tr("Localizable", "personaDetails.emailAddressHeading", fallback: "Email Address")
+    /// Last Name
+    public static let familyNameHeading = L10n.tr("Localizable", "personaDetails.familyNameHeading", fallback: "Last Name")
     /// First Name
-    public static let firstNameHeading = L10n.tr("Localizable", "personaDetails.firstNameHeading", fallback: "First Name")
+    public static let givenNameHeading = L10n.tr("Localizable", "personaDetails.givenNameHeading", fallback: "First Name")
     /// You are not sharing any personal data with %@
     public static func notSharingAnything(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
     }
     /// Here is the personal data that you are sharing with %@
-    public static func personalDataSharingDescription(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "personaDetails.personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
+    public static func personaDataSharingDescription(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "personaDetails.personaDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
     }
     /// Persona Name
     public static let personaNameHeading = L10n.tr("Localizable", "personaDetails.personaNameHeading", fallback: "Persona Name")
-    /// Second Name
-    public static let secondNameHeading = L10n.tr("Localizable", "personaDetails.secondNameHeading", fallback: "Second Name")
-    /// Zip Code
-    public static let zipCodeHeading = L10n.tr("Localizable", "personaDetails.zipCodeHeading", fallback: "Zip Code")
+    /// Phone Number
+    public static let phoneNumberHeading = L10n.tr("Localizable", "personaDetails.phoneNumberHeading", fallback: "Phone Number")
   }
   public enum PersonaList {
     /// Create new persona

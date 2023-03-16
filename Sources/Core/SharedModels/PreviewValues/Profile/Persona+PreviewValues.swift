@@ -21,8 +21,8 @@ extension OnNetwork.Persona {
 			)),
 			displayName: "Alan",
 			fields: [
-				Field(kind: .firstName, value: "Alan"),
-				Field(kind: .lastName, value: "Turing"),
+				Field(kind: .givenName, value: "Alan"),
+				Field(kind: .familyName, value: "Turing"),
 			]
 		)
 	}()
@@ -45,8 +45,8 @@ extension OnNetwork.Persona {
 			)),
 			displayName: "Rick",
 			fields: [
-				Field(kind: .firstName, value: "Rick"),
-				Field(kind: .lastName, value: "Sanchez"),
+				Field(kind: .givenName, value: "Rick"),
+				Field(kind: .familyName, value: "Sanchez"),
 			]
 		)
 	}()
