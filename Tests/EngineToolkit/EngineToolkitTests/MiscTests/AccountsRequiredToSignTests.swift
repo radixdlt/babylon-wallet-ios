@@ -10,7 +10,7 @@ final class AccountsRequiredToSignTests: TestCase {
 	func test_setMetaData() throws {
 		let transactionManifest = TransactionManifest {
 			SetMetadata(
-				entityAddress: "account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3",
+				entityAddress: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064",
 				key: "name",
 				value: Enum(.string("Radix Dashboard"))
 			)
