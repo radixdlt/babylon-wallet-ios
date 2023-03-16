@@ -16,7 +16,7 @@ extension Address {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let singleValueContainer = try decoder.singleValueContainer()
-		let discriminator = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let discriminator = try container.decode(ValueKind.self, forKey: .type)
 		switch discriminator {
 		case .packageAddress:
 			self = try .packageAddress(singleValueContainer.decode(PackageAddress.self))

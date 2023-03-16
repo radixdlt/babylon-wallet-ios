@@ -11,16 +11,16 @@ public struct PublishPackage: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let code: Blob
-	public let schema: Blob
+	public let abi: Blob
 	public let royaltyConfig: Map_
 	public let metadata: Map_
 	public let accessRules: Tuple
 
 	// MARK: Init
 
-	public init(code: Blob, schema: Blob, royaltyConfig: Map_, metadata: Map_, accessRules: Tuple) {
+	public init(code: Blob, abi: Blob, royaltyConfig: Map_, metadata: Map_, accessRules: Tuple) {
 		self.code = code
-		self.schema = schema
+		self.abi = abi
 		self.royaltyConfig = royaltyConfig
 		self.metadata = metadata
 		self.accessRules = accessRules
@@ -36,7 +36,7 @@ extension PublishPackage {
 		case metadata
 		case accessRules = "access_rules"
 		case code
-		case schema
+		case abi
 	}
 
 	// MARK: Codable
@@ -46,7 +46,7 @@ extension PublishPackage {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(code, forKey: .code)
-		try container.encode(schema, forKey: .schema)
+		try container.encode(abi, forKey: .abi)
 		try container.encode(metadata, forKey: .metadata)
 		try container.encode(accessRules, forKey: .accessRules)
 		try container.encode(royaltyConfig, forKey: .royaltyConfig)
@@ -62,7 +62,7 @@ extension PublishPackage {
 
 		try self.init(
 			code: container.decode(Blob.self, forKey: .code),
-			schema: container.decode(Blob.self, forKey: .schema),
+			abi: container.decode(Blob.self, forKey: .abi),
 			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig),
 			metadata: container.decode(Map_.self, forKey: .metadata),
 			accessRules: container.decode(Tuple.self, forKey: .accessRules)

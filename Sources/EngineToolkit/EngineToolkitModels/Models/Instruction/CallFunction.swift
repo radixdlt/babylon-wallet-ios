@@ -9,11 +9,10 @@ public struct CallFunction: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// This can actually only be either `PackageAddress` or `Address_`. Temporary, will change to `Address`
-	public let packageAddress: ManifestASTValue
+	public let packageAddress: PackageAddress
 	public let blueprintName: String
 	public let functionName: String
-	public let arguments: [ManifestASTValue]
+	public let arguments: [Value_]
 
 	// MARK: Init
 
@@ -21,21 +20,9 @@ public struct CallFunction: InstructionProtocol {
 		packageAddress: PackageAddress,
 		blueprintName: String,
 		functionName: String,
-		arguments: [ManifestASTValue] = []
+		arguments: [Value_] = []
 	) {
-		self.packageAddress = .packageAddress(packageAddress)
-		self.blueprintName = blueprintName
-		self.functionName = functionName
-		self.arguments = arguments
-	}
-
-	public init(
-		packageAddress: Address_,
-		blueprintName: String,
-		functionName: String,
-		arguments: [ManifestASTValue] = []
-	) {
-		self.packageAddress = .address(packageAddress)
+		self.packageAddress = packageAddress
 		self.blueprintName = blueprintName
 		self.functionName = functionName
 		self.arguments = arguments
@@ -59,7 +46,7 @@ public struct CallFunction: InstructionProtocol {
 		packageAddress: PackageAddress,
 		blueprintName: String,
 		functionName: String,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
+		@SpecificValuesBuilder buildValues: () throws -> [Value_]
 	) rethrows {
 		try self.init(
 			packageAddress: packageAddress,
@@ -73,7 +60,7 @@ public struct CallFunction: InstructionProtocol {
 		packageAddress: PackageAddress,
 		blueprintName: String,
 		functionName: String,
-		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
+		@SpecificValuesBuilder buildValue: () throws -> Value_
 	) rethrows {
 		try self.init(
 			packageAddress: packageAddress,
@@ -113,9 +100,16 @@ extension CallFunction {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.packageAddress = try container.decode(ManifestASTValue.self, forKey: .packageAddress)
-		self.blueprintName = try container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded
-		self.functionName = try container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded
-		self.arguments = try container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
+		let packageAddress = try container.decode(PackageAddress.self, forKey: .packageAddress)
+		let blueprintName = try container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded
+		let functionName = try container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded
+		let arguments = try container.decodeIfPresent([Value_].self, forKey: .arguments) ?? []
+
+		self.init(
+			packageAddress: packageAddress,
+			blueprintName: blueprintName,
+			functionName: functionName,
+			arguments: arguments
+		)
 	}
 }

@@ -3,15 +3,15 @@ import Foundation
 // MARK: - Enum
 public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .enum
-	public func embedValue() -> ManifestASTValue {
+	public static let kind: ValueKind = .enum
+	public func embedValue() -> Value_ {
 		.enum(self)
 	}
 
 	// MARK: Stored properties
 
 	public let variant: EnumDiscriminator
-	public let fields: [ManifestASTValue]
+	public let fields: [Value_]
 
 	// MARK: Init
 
@@ -20,7 +20,7 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 		self.fields = []
 	}
 
-	public init(_ variant: EnumDiscriminator, fields: [ManifestASTValue]) {
+	public init(_ variant: EnumDiscriminator, fields: [Value_]) {
 		self.variant = variant
 		self.fields = fields
 	}
@@ -29,7 +29,7 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 		self.init(.string(variant))
 	}
 
-	public init(_ variant: String, fields: [ManifestASTValue]) {
+	public init(_ variant: String, fields: [Value_]) {
 		self.init(.string(variant), fields: fields)
 	}
 
@@ -37,7 +37,7 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 		self.init(.u8(variant))
 	}
 
-	public init(_ variant: UInt8, fields: [ManifestASTValue]) {
+	public init(_ variant: UInt8, fields: [Value_]) {
 		self.init(.u8(variant), fields: fields)
 	}
 
@@ -50,7 +50,7 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 
 	public init(
 		_ variant: EnumDiscriminator,
-		@SpecificValuesBuilder fields: () throws -> [ManifestASTValue]
+		@SpecificValuesBuilder fields: () throws -> [Value_]
 	) rethrows {
 		try self.init(variant, fields: fields())
 	}
@@ -72,22 +72,20 @@ extension Enum {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(variant, forKey: .variant)
-		if !fields.isEmpty {
-			try container.encode(fields, forKey: .fields)
-		}
+		try container.encode(fields, forKey: .fields)
 	}
 
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
 		try self.init(
 			container.decode(EnumDiscriminator.self, forKey: .variant),
-			fields: container.decodeIfPresent([ManifestASTValue].self, forKey: .fields) ?? []
+			fields: container.decodeIfPresent([Value_].self, forKey: .fields) ?? []
 		)
 	}
 }

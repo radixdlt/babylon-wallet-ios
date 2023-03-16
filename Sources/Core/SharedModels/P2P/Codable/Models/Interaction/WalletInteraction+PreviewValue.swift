@@ -83,7 +83,8 @@ extension P2P.FromDapp.WalletInteraction {
 				ongoingAccounts: .init(
 					numberOfAccounts: .atLeast(2),
 					requiresProofOfOwnership: false
-				)
+				),
+				reset: nil
 			))),
 			metadata: .previewValue
 		)

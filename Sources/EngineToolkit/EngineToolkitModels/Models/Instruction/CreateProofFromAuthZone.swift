@@ -9,19 +9,13 @@ public struct CreateProofFromAuthZone: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: ManifestASTValue
+	public let resourceAddress: ResourceAddress
 	public let intoProof: Proof
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, intoProof: Proof) {
-		self.resourceAddress = .resourceAddress(resourceAddress)
-		self.intoProof = intoProof
-	}
-
-	public init(resourceAddress: Address_, intoProof: Proof) {
-		self.resourceAddress = .address(resourceAddress)
+		self.resourceAddress = resourceAddress
 		self.intoProof = intoProof
 	}
 }
@@ -51,7 +45,9 @@ extension CreateProofFromAuthZone {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
-		self.intoProof = try container.decode(Proof.self, forKey: .intoProof)
+		try self.init(
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			intoProof: container.decode(Proof.self, forKey: .intoProof)
+		)
 	}
 }
