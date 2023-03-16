@@ -14,20 +14,6 @@ public struct CallMethod: InstructionProtocol {
 	public let methodName: String
 	public let arguments: [ManifestASTValue]
 
-	// MARK: Computed properties
-
-	/// Temporary. This can actually only be either `ComponentAddress` or `Address_`.
-	public var receiverAsAccountComponentAddress: ComponentAddress? {
-		switch receiver {
-		case let .address(address) where address.address.starts(with: "account"):
-			return ComponentAddress(address: address.address)
-		case let .componentAddress(componentAddress):
-			return componentAddress
-		default:
-			return nil
-		}
-	}
-
 	// MARK: Init
 
 	public init(receiver: ComponentAddress, methodName: String, arguments: [ManifestASTValue] = []) {
