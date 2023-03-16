@@ -73,7 +73,7 @@ struct Login: Sendable, FeatureReducer {
 			))
 			return .none
 		case let .continueButtonTapped(persona):
-			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas.first(by: persona.address)
+			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
 			return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona)))
 		}
 	}
@@ -128,13 +128,13 @@ struct Login: Sendable, FeatureReducer {
 		.run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
-			let authorizedDapp = authorizedDapps.first(by: dappDefinitionAddress)
+			let authorizedDapp = authorizedDapps[id: dappDefinitionAddress]
 			let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple? = {
 				guard let authorizedDapp else {
 					return nil
 				}
 				return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
-					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(by: currentPersona.address) else {
+					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: currentPersona.address] else {
 						return
 					}
 					if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {

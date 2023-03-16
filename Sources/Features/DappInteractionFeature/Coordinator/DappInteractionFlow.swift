@@ -198,8 +198,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
 					if
-						let persona = try await personasClient.getPersonas().first(by: identityAddress),
-						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress),
+						let persona = try await personasClient.getPersonas()[id: identityAddress],
+						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
 						let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: identityAddress]
 					{
 						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
@@ -407,7 +407,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if
 						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
-							try allAccounts.first(by: .init(address: sharedAccount.address))
+							try allAccounts[id: .init(address: sharedAccount.address)]
 						}),
 						selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
 					{
