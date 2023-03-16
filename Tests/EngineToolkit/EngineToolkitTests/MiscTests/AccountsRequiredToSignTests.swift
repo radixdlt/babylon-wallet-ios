@@ -10,7 +10,7 @@ final class AccountsRequiredToSignTests: TestCase {
 	func test_setMetaData() throws {
 		let transactionManifest = TransactionManifest {
 			SetMetadata(
-				entityAddress: .componentAddress("account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3"),
+				entityAddress: .componentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
 				key: "name",
 				value: "Radix Dashboard"
 			)
@@ -23,7 +23,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		}
 		let networkID: NetworkID = .simulator
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
-		let expected: Set<ComponentAddress> = Set(["account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3"])
+		let expected: Set<ComponentAddress> = Set(["account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"])
 		XCTAssertNoDifference(expected, accountsRequiredToSign)
 
 		// Accounts suitable to pay TX fee is ought to be a superset of accountsRequiredToSign
