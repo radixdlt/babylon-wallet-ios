@@ -29,6 +29,8 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 		case focusTextField(State.Field?)
 		case gatewayValidationResult(TaskResult<Radix.Gateway?>)
 		case addGatewayResult(TaskResult<EquatableVoid>)
+		case showDuplicateURLError
+		case validateNewGateway(URL)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -52,13 +54,16 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			return .send(.delegate(.dismiss))
 
 		case .addNewGatewayButtonTapped:
-			guard let url = URL(string: state.inputtedURL) else { return .none }
-			state.addGatewayButtonState = .loading(.local)
-			return .task {
-				let result = await TaskResult {
-					try await networkSwitchingClient.validateGatewayURL(url)
+			guard let url = URL(string: state.inputtedURL)?.httpsURL else { return .none }
+
+			return .run { send in
+				let gateways = await gatewaysClient.getAllGateways()
+				let duplicate = gateways.rawValue.elements.first(where: { $0.url == url })
+				if let _ = duplicate {
+					await send(.internal(.showDuplicateURLError))
+				} else {
+					await send(.internal(.validateNewGateway(url)))
 				}
-				return .internal(.gatewayValidationResult(result))
 			}
 
 		case let .textFieldFocused(focus):
@@ -103,13 +108,26 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 		case let .addGatewayResult(.failure(error)):
 			return handle(error, state: &state)
+
+		case .showDuplicateURLError:
+			state.errorText = L10n.GatewaySettings.AddNewGateway.Error.duplicateURL
+			return .none
+
+		case let .validateNewGateway(url):
+			state.addGatewayButtonState = .loading(.local)
+			return .task {
+				let result = await TaskResult {
+					try await networkSwitchingClient.validateGatewayURL(url)
+				}
+				return .internal(.gatewayValidationResult(result))
+			}
 		}
 	}
 }
 
 private extension AddNewGateway {
 	func handle(_ error: Error, state: inout State) -> EffectTask<Action> {
-		state.errorText = error.legibleLocalizedDescription.capitalized
+		state.errorText = L10n.GatewaySettings.AddNewGateway.Error.noGatewayFound
 		state.addGatewayButtonState = .disabled
 		errorQueue.schedule(error)
 		return .none

@@ -103,6 +103,8 @@ public enum L10n {
         public static func chooseEntities(_ p1: UnsafePointer<CChar>) -> String {
           return L10n.tr("Localizable", "createEntity.completion.destination.chooseEntities", p1, fallback: "Choose %ss")
         }
+        /// Gateways
+        public static let gateways = L10n.tr("Localizable", "createEntity.completion.destination.gateways", fallback: "Gateways")
         /// Account List
         public static let home = L10n.tr("Localizable", "createEntity.completion.destination.home", fallback: "Account List")
         /// Persona List
@@ -387,6 +389,8 @@ public enum L10n {
       /// Add New Gateway
       public static let title = L10n.tr("Localizable", "gatewaySettings.addNewGateway.title", fallback: "Add New Gateway")
       public enum Error {
+        /// This url is already added
+        public static let duplicateURL = L10n.tr("Localizable", "gatewaySettings.addNewGateway.error.duplicateURL", fallback: "This url is already added")
         /// No Gateway found at specified URL
         public static let noGatewayFound = L10n.tr("Localizable", "gatewaySettings.addNewGateway.error.noGatewayFound", fallback: "No Gateway found at specified URL")
       }

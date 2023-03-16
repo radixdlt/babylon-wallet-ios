@@ -43,6 +43,7 @@
 "createEntity.completion.explanation.specific.persona" = "Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.";
 "createEntity.completion.destination.home" = "Account List";
 "createEntity.completion.destination.settingsPersonaList" = "Persona List";
+"createEntity.completion.destination.gateways" = "Gateways";
 "createEntity.completion.destination.chooseEntities" = "Choose %ss";
 "createEntity.completion.goToDestination" = "Go to %@";
 
@@ -228,6 +229,7 @@
 
 "gatewaySettings.addNewGateway.addGatewayButtonTitle" = "Add Gateway";
 "gatewaySettings.addNewGateway.error.noGatewayFound" = "No Gateway found at specified URL";
+"gatewaySettings.addNewGateway.error.duplicateURL" = "This url is already added";
 "gatewaySettings.addNewGateway.subtitle" = "Enter a Gateway URL";
 "gatewaySettings.addNewGateway.textFieldPlaceholder" = "Enter full URL";
 "gatewaySettings.addNewGateway.title" = "Add New Gateway";
