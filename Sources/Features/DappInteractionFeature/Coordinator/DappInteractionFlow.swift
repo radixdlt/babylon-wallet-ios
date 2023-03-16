@@ -112,8 +112,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case usePersona(
 			P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem,
 			OnNetwork.Persona,
-			OnNetwork.AuthorizedDapp?,
-			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
+			OnNetwork.AuthorizedDapp,
+			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
@@ -197,9 +197,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			if let usePersonaItem = state.usePersonaRequestItem {
 				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
-					if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
-						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
-						let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
+					if
+						let persona = try await personasClient.getPersonas().first(by: identityAddress),
+						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress),
+						let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: identityAddress]
+					{
 						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
 					} else {
 						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
