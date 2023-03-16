@@ -1,15 +1,15 @@
 // MARK: - Err
 public struct Err: ValueProtocol, Sendable, Codable, Hashable {
-	public static let kind: ManifestASTValueKind = .err
-	public func embedValue() -> ManifestASTValue {
+	public static let kind: ValueKind = .err
+	public func embedValue() -> Value_ {
 		.err(self)
 	}
 
 	// MARK: Stored properties
 
-	public let value: ManifestASTValue
+	public let value: Value_
 
-	public init(_ value: ManifestASTValue) {
+	public init(_ value: Value_) {
 		self.value = value
 	}
 }
@@ -32,11 +32,11 @@ extension Err {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		try self.init(container.decode(ManifestASTValue.self, forKey: .value))
+		try self.init(container.decode(Value_.self, forKey: .value))
 	}
 }

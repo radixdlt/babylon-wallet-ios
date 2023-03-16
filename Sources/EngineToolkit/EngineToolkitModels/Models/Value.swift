@@ -2,16 +2,16 @@ import Foundation
 
 // MARK: - ValueProtocol
 public protocol ValueProtocol {
-	static var kind: ManifestASTValueKind { get }
-	func embedValue() -> ManifestASTValue
+	static var kind: ValueKind { get }
+	func embedValue() -> Value_
 }
 
 extension ValueProtocol {
-	public var kind: ManifestASTValueKind { Self.kind }
+	public var kind: ValueKind { Self.kind }
 }
 
-// MARK: - ManifestASTValue
-public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
+// MARK: - Value_
+public indirect enum Value_: Sendable, Codable, Hashable {
 	// ==============
 	// Enum Variants
 	// ==============
@@ -48,8 +48,6 @@ public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 
 	// case own(Own) // Not implemented and commented out because it isn't supported to well by Scrypto
 
-	case address(Address_)
-
 	case packageAddress(PackageAddress)
 	case componentAddress(ComponentAddress)
 	case resourceAddress(ResourceAddress)
@@ -60,17 +58,24 @@ public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 	case nonFungibleLocalId(NonFungibleLocalId)
 	case nonFungibleGlobalId(NonFungibleGlobalId)
 
+	case hash(Hash)
+
+	case ecdsaSecp256k1PublicKey(EcdsaSecp256k1PublicKey)
+	case ecdsaSecp256k1Signature(EcdsaSecp256k1Signature)
+	case eddsaEd25519PublicKey(EddsaEd25519PublicKey)
+	case eddsaEd25519Signature(EddsaEd25519Signature)
+
 	case blob(Blob)
 	case expression(Expression)
 	case bytes(Bytes)
 }
 
-extension ManifestASTValue {
+extension Value_ {
 	// ===========
 	// Value Kind
 	// ===========
 
-	public var kind: ManifestASTValueKind {
+	public var kind: ValueKind {
 		switch self {
 		case .boolean:
 			return .bool
@@ -132,9 +137,6 @@ extension ManifestASTValue {
 		case .preciseDecimal:
 			return .preciseDecimal
 
-		case .address:
-			return .address
-
 		case .packageAddress:
 			return .packageAddress
 
@@ -143,6 +145,9 @@ extension ManifestASTValue {
 
 		case .resourceAddress:
 			return .resourceAddress
+
+		case .hash:
+			return .hash
 
 		case .bucket:
 			return .bucket
@@ -155,6 +160,18 @@ extension ManifestASTValue {
 		case .nonFungibleGlobalId:
 			return .nonFungibleGlobalId
 
+		case .ecdsaSecp256k1PublicKey:
+			return .ecdsaSecp256k1PublicKey
+
+		case .ecdsaSecp256k1Signature:
+			return .ecdsaSecp256k1Signature
+
+		case .eddsaEd25519PublicKey:
+			return .eddsaEd25519PublicKey
+
+		case .eddsaEd25519Signature:
+			return .eddsaEd25519Signature
+
 		case .blob:
 			return .blob
 
@@ -166,7 +183,7 @@ extension ManifestASTValue {
 	}
 }
 
-extension ManifestASTValue {
+extension Value_ {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -249,9 +266,6 @@ extension ManifestASTValue {
 		case let .preciseDecimal(value):
 			try value.encode(to: encoder)
 
-		case let .address(value):
-			try value.encode(to: encoder)
-
 		case let .packageAddress(value):
 			try value.encode(to: encoder)
 
@@ -259,6 +273,9 @@ extension ManifestASTValue {
 			try value.encode(to: encoder)
 
 		case let .resourceAddress(value):
+			try value.encode(to: encoder)
+
+		case let .hash(value):
 			try value.encode(to: encoder)
 
 		case let .bucket(value):
@@ -271,6 +288,18 @@ extension ManifestASTValue {
 			try value.encode(to: encoder)
 
 		case let .nonFungibleGlobalId(value):
+			try value.encode(to: encoder)
+
+		case let .ecdsaSecp256k1PublicKey(value):
+			try value.encode(to: encoder)
+
+		case let .ecdsaSecp256k1Signature(value):
+			try value.encode(to: encoder)
+
+		case let .eddsaEd25519PublicKey(value):
+			try value.encode(to: encoder)
+
+		case let .eddsaEd25519Signature(value):
 			try value.encode(to: encoder)
 
 		case let .blob(value):
@@ -286,7 +315,7 @@ extension ManifestASTValue {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 
 		switch kind {
 		case .bool:
@@ -362,9 +391,6 @@ extension ManifestASTValue {
 		case .preciseDecimal:
 			self = try .preciseDecimal(.init(from: decoder))
 
-		case .address:
-			self = try .address(.init(from: decoder))
-
 		case .packageAddress:
 			self = try .packageAddress(.init(from: decoder))
 
@@ -373,6 +399,9 @@ extension ManifestASTValue {
 
 		case .resourceAddress:
 			self = try .resourceAddress(.init(from: decoder))
+
+		case .hash:
+			self = try .hash(.init(from: decoder))
 
 		case .bucket:
 			self = try .bucket(.init(from: decoder))
@@ -385,6 +414,18 @@ extension ManifestASTValue {
 
 		case .nonFungibleGlobalId:
 			self = try .nonFungibleGlobalId(.init(from: decoder))
+
+		case .ecdsaSecp256k1PublicKey:
+			self = try .ecdsaSecp256k1PublicKey(.init(from: decoder))
+
+		case .ecdsaSecp256k1Signature:
+			self = try .ecdsaSecp256k1Signature(.init(from: decoder))
+
+		case .eddsaEd25519PublicKey:
+			self = try .eddsaEd25519PublicKey(.init(from: decoder))
+
+		case .eddsaEd25519Signature:
+			self = try .eddsaEd25519Signature(.init(from: decoder))
 
 		case .blob:
 			self = try .blob(.init(from: decoder))

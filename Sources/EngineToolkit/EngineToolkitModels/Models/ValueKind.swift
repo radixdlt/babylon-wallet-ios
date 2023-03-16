@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ManifestASTValueKind: String, Codable, Sendable, Hashable {
+public enum ValueKind: String, Codable, Sendable, Hashable {
 	case bool = "Bool"
 
 	case u8 = "U8"
@@ -33,11 +33,16 @@ public enum ManifestASTValueKind: String, Codable, Sendable, Hashable {
 
 	// case own = "Own" // Commented out since the manifest doesn't support this too well right now.
 
-	case address = "Address"
-
 	case componentAddress = "ComponentAddress"
 	case resourceAddress = "ResourceAddress"
 	case packageAddress = "PackageAddress"
+
+	case hash = "Hash"
+
+	case ecdsaSecp256k1PublicKey = "EcdsaSecp256k1PublicKey"
+	case ecdsaSecp256k1Signature = "EcdsaSecp256k1Signature"
+	case eddsaEd25519PublicKey = "EddsaEd25519PublicKey"
+	case eddsaEd25519Signature = "EddsaEd25519Signature"
 
 	case bucket = "Bucket"
 	case proof = "Proof"

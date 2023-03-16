@@ -40,9 +40,9 @@ public struct EngineToolkit {
 }
 
 extension EngineToolkit {
-	typealias JSONStringFromJSONData = @Sendable (Data) -> String?
-	typealias CCharsFromJSONString = @Sendable (String) -> [CChar]?
-	typealias JSONDataFromJSONString = @Sendable (String) -> Data?
+	internal typealias JSONStringFromJSONData = @Sendable (Data) -> String?
+	internal typealias CCharsFromJSONString = @Sendable (String) -> [CChar]?
+	internal typealias JSONDataFromJSONString = @Sendable (String) -> Data?
 }
 
 // MARK: Public
@@ -151,12 +151,30 @@ extension EngineToolkit {
 		)
 	}
 
-	public func hashRequest(
-		request: HashRequest
-	) -> Result<HashResponse, Error> {
+	public func sborDecodeRequest(
+		request: SborDecodeRequest
+	) -> Result<SborDecodeResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: hash
+			function: sbor_decode
+		)
+	}
+
+	public func sborEncodeRequest(
+		request: SborEncodeRequest
+	) -> Result<SborEncodeResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: sbor_encode
+		)
+	}
+
+	public func deriveNonFungibleGlobalIdFromPublicKeyRequest(
+		request: DeriveNonFungibleGlobalIdFromPublicKeyRequest
+	) -> Result<DeriveNonFungibleGlobalIdFromPublicKeyResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: derive_non_fungible_global_id_from_public_key
 		)
 	}
 
@@ -186,24 +204,6 @@ extension EngineToolkit {
 			function: known_entity_addresses
 		)
 	}
-
-	public func analyzeManifestWithPreviewContext(
-		request: AnalyzeManifestWithPreviewContextRequest
-	) -> Result<AnalyzeManifestWithPreviewContextResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: analyze_manifest_with_preview_context
-		)
-	}
-
-	public func analyzeManifest(
-		request: AnalyzeManifestRequest
-	) -> Result<AnalyzeManifestResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: analyze_manifest
-		)
-	}
 }
 
 // MARK: Private (But Internal For Tests)
@@ -213,7 +213,7 @@ extension EngineToolkit {
 	///
 	/// This function abstracts away how the transaction library is called and provides a high level interface for
 	/// communicating and getting responses back from the library.
-	func callLibraryFunction<Request, Response>(
+	internal func callLibraryFunction<Request, Response>(
 		request: Request,
 		function: (MutableToolkitPointer?) -> MutableToolkitPointer?
 	) -> Result<Response, Error> where Request: Encodable, Response: Decodable {
@@ -301,9 +301,6 @@ extension EngineToolkit {
 			return .success(response)
 		} catch let firstError {
 			do {
-				#if DEBUG
-				print(firstError)
-				#endif
 				/// We might have got an error from the Radix Engine Toolkit, try to decode that as **JSONValue**
 				let jsonValue = try jsonDecoder.decode(JSONValue.self, from: jsonData)
 				return .failure(.errorResponse(jsonValue))

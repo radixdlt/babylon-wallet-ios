@@ -11,8 +11,8 @@ public enum NonFungibleLocalId {
 // MARK: ValueProtocol, Sendable, Codable, Hashable
 extension NonFungibleLocalId: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .nonFungibleLocalId
-	public func embedValue() -> ManifestASTValue {
+	public static let kind: ValueKind = .nonFungibleLocalId
+	public func embedValue() -> Value_ {
 		.nonFungibleLocalId(self)
 	}
 
@@ -61,7 +61,7 @@ extension NonFungibleLocalId {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}

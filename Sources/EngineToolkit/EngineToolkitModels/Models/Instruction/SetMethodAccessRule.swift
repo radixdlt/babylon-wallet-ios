@@ -11,13 +11,15 @@ public struct SetMethodAccessRule: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let entityAddress: Address
-	public let key: Tuple
+	public let index: UInt32
+	public let key: Enum
 	public let rule: Enum
 
 	// MARK: Init
 
-	public init(entityAddress: Address, key: Tuple, rule: Enum) {
+	public init(entityAddress: Address, index: UInt32, key: Enum, rule: Enum) {
 		self.entityAddress = entityAddress
+		self.index = index
 		self.key = key
 		self.rule = rule
 	}
@@ -31,6 +33,7 @@ extension SetMethodAccessRule {
 		case entityAddress = "entity_address"
 		case key
 		case rule
+		case index
 	}
 
 	// MARK: Codable
@@ -40,6 +43,7 @@ extension SetMethodAccessRule {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(entityAddress, forKey: .entityAddress)
+		try container.encode(index.proxyEncodable, forKey: .index)
 		try container.encode(key, forKey: .key)
 		try container.encode(rule, forKey: .rule)
 	}
@@ -53,9 +57,10 @@ extension SetMethodAccessRule {
 		}
 
 		let entityAddress = try container.decode(Address.self, forKey: .entityAddress)
-		let key = try container.decode(Tuple.self, forKey: .key)
+		let index = try container.decode(UInt32.ProxyDecodable.self, forKey: .index).decoded
+		let key = try container.decode(Enum.self, forKey: .key)
 		let rule = try container.decode(Enum.self, forKey: .rule)
 
-		self.init(entityAddress: entityAddress, key: key, rule: rule)
+		self.init(entityAddress: entityAddress, index: index, key: key, rule: rule)
 	}
 }

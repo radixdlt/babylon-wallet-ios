@@ -3,28 +3,28 @@ import Foundation
 // MARK: - Array_
 public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ManifestASTValueKind = .array
-	public func embedValue() -> ManifestASTValue {
+	public static let kind: ValueKind = .array
+	public func embedValue() -> Value_ {
 		.array(self)
 	}
 
 	// MARK: Stored properties
 
-	public let elementKind: ManifestASTValueKind
-	public let elements: [ManifestASTValue]
+	public let elementKind: ValueKind
+	public let elements: [Value_]
 
 	// MARK: Init
 
 	public init(
-		elementKind: ManifestASTValueKind,
-		elements: [ManifestASTValue]
+		elementKind: ValueKind,
+		elements: [Value_]
 	) throws {
 		self.elementKind = elementKind
 		self.elements = elements
 	}
 
 	public init(
-		elementKind: ManifestASTValueKind,
+		elementKind: ValueKind,
 		@ValuesBuilder buildValues: () throws -> [ValueProtocol]
 	) throws {
 		try self.init(
@@ -34,8 +34,8 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 	}
 
 	public init(
-		elementKind: ManifestASTValueKind,
-		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
+		elementKind: ValueKind,
+		@SpecificValuesBuilder buildValues: () throws -> [Value_]
 	) throws {
 		try self.init(
 			elementKind: elementKind,
@@ -71,14 +71,14 @@ extension Array_ {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
+		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
 		try self.init(
-			elementKind: container.decode(ManifestASTValueKind.self, forKey: .elementKind),
-			elements: container.decode([ManifestASTValue].self, forKey: .elements)
+			elementKind: container.decode(ValueKind.self, forKey: .elementKind),
+			elements: container.decode([Value_].self, forKey: .elements)
 		)
 	}
 }

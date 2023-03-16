@@ -9,19 +9,13 @@ public struct TakeFromWorktop: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	/// Temporary, will change to `Address`. This can actually only be either `ResourceAddress` or `Address_`.
-	public let resourceAddress: ManifestASTValue
+	public let resourceAddress: ResourceAddress
 	public let bucket: Bucket
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, bucket: Bucket) {
-		self.resourceAddress = .resourceAddress(resourceAddress)
-		self.bucket = bucket
-	}
-
-	public init(resourceAddress: Address_, bucket: Bucket) {
-		self.resourceAddress = .address(resourceAddress)
+		self.resourceAddress = resourceAddress
 		self.bucket = bucket
 	}
 }
@@ -51,7 +45,9 @@ extension TakeFromWorktop {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		self.resourceAddress = try container.decode(ManifestASTValue.self, forKey: .resourceAddress)
-		self.bucket = try container.decode(Bucket.self, forKey: .intoBucket)
+		let resourceAddress = try container.decode(ResourceAddress.self, forKey: .resourceAddress)
+		let bucket = try container.decode(Bucket.self, forKey: .intoBucket)
+
+		self.init(resourceAddress: resourceAddress, bucket: bucket)
 	}
 }

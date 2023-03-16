@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - ExpressibleByRadixEngineValues
 public protocol ExpressibleByRadixEngineValues: ExpressibleByArrayLiteral {
-	init(values: [ManifestASTValue])
+	init(values: [Value_])
 }
 
 extension ExpressibleByRadixEngineValues {
@@ -10,7 +10,7 @@ extension ExpressibleByRadixEngineValues {
 		self.init(values: values.map { $0.embedValue() })
 	}
 
-	public init(arrayLiteral elements: ManifestASTValue...) {
+	public init(arrayLiteral elements: Value_...) {
 		self.init(values: elements)
 	}
 }
@@ -36,15 +36,15 @@ extension ValuesBuilder {
 @resultBuilder
 public struct SpecificValuesBuilder {}
 extension SpecificValuesBuilder {
-	public static func buildBlock(_ values: ManifestASTValue...) -> [ManifestASTValue] {
+	public static func buildBlock(_ values: Value_...) -> [Value_] {
 		values
 	}
 
-	public static func buildBlock(_ value: ManifestASTValue) -> [ManifestASTValue] {
+	public static func buildBlock(_ value: Value_) -> [Value_] {
 		[value]
 	}
 
-	public static func buildBlock(_ value: ManifestASTValue) -> ManifestASTValue {
+	public static func buildBlock(_ value: Value_) -> Value_ {
 		value
 	}
 }
@@ -54,11 +54,11 @@ extension ExpressibleByRadixEngineValues {
 		try self.init(buildValues())
 	}
 
-	public init(@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]) rethrows {
+	public init(@SpecificValuesBuilder buildValues: () throws -> [Value_]) rethrows {
 		try self.init(values: buildValues())
 	}
 
-	public init(@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue) rethrows {
+	public init(@SpecificValuesBuilder buildValue: () throws -> Value_) rethrows {
 		self.init(values: [try buildValue()])
 	}
 }
