@@ -47,4 +47,4 @@ extension EncodeAddressRequest {
 	}
 }
 
-public typealias EncodeAddressResponse = __Address
+public typealias EncodeAddressResponse = PolymorphicAddress
