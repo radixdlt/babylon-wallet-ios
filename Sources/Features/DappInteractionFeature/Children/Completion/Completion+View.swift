@@ -37,14 +37,16 @@ extension Completion {
 				.padding(.horizontal, .small2)
 				.padding(.bottom, .medium3)
 				.onAppear { viewStore.send(.appeared) }
-				.onWillDisappear {
-					viewStore.send(.willDisappear)
-				}
-				.frame(maxWidth: .infinity)
-				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
-					CloseButton { viewStore.send(.closeButtonTapped) }
-						.padding([.top, .leading], .small2)
-				}
+				#if os(iOS)
+					.onWillDisappear {
+						viewStore.send(.willDisappear)
+					}
+				#endif
+					.frame(maxWidth: .infinity)
+					.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
+						CloseButton { viewStore.send(.closeButtonTapped) }
+							.padding([.top, .leading], .small2)
+					}
 			}
 			.presentationDragIndicator(.visible)
 			.presentationDetentIntrinsicHeight()
