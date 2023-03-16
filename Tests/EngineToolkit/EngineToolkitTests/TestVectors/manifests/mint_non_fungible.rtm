@@ -13,7 +13,7 @@
 # a method for creating a proof and locking a fee at the same time. Therefore, locking a fee will be
 # its own method call and creating a proof will be its own method call.
 CALL_METHOD 
-    Address("${account_component_address}")
+    Address("${account_component_address}") 
     "lock_fee"
     Decimal("10");
 
@@ -29,7 +29,7 @@ CALL_METHOD
 # is what the 5c2100 bit means, it's the SBOR representation of an empty struct) and has an id that
 # is user specified.
 MINT_NON_FUNGIBLE
-    Address("${mintable_resource_address}")
+    Address("${mintable_resource_address}") 
     Map<NonFungibleLocalId, Tuple>(
         NonFungibleLocalId("${non_fungible_local_id}"), 
         Tuple(

@@ -13,7 +13,7 @@
 # a method for creating a proof and locking a fee at the same time. Therefore, locking a fee will be
 # its own method call and creating a proof will be its own method call.
 CALL_METHOD 
-    Address("${account_component_address}")
+    Address("${account_component_address}") 
     "lock_fee"
     Decimal("10");
 
@@ -32,6 +32,6 @@ MINT_FUNGIBLE
 
 # Depositing the entirety of the newly minted tokens into out account
 CALL_METHOD
-    Address("${account_component_address}")
+    Address("${account_component_address}") 
     "deposit_batch"
     Expression("ENTIRE_WORKTOP");
