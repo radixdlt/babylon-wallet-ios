@@ -47,33 +47,6 @@ public protocol AddressStringConvertible {
 	var address: String { get }
 }
 
-extension Address {
-	public var componentAddress: ComponentAddress? {
-		switch self {
-		case let .componentAddress(componentAddress): return componentAddress
-		case .packageAddress, .resourceAddress: return nil
-		}
-	}
-
-	public var asAccountComponentAddress: ComponentAddress? {
-		guard let componentAddress else {
-			return nil
-		}
-		return componentAddress.asAccountComponentAddress
-	}
-}
-
-extension ComponentAddress {
-	public var asAccountComponentAddress: ComponentAddress? {
-		guard isAccountAddress else { return nil }
-		return self
-	}
-
-	public var isAccountAddress: Bool {
-		address.starts(with: "account")
-	}
-}
-
 // MARK: - AddressProtocol
 public protocol AddressProtocol: AddressStringConvertible, ExpressibleByStringLiteral {
 	init(address: String)
