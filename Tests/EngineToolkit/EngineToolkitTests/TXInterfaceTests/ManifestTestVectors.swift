@@ -5,51 +5,55 @@ import Foundation
 public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]])] {
 	var testVectors: [(manifest: String, blobs: [[UInt8]])] = try [
 		(
+			manifest: String(decoding: resource(named: "assert_access_rule", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "access_rule", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "call_function", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "call_method", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "create_fungible_no_initial_supply", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "create_fungible_with_initial_supply", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "create_non_fungible_no_initial_supply", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "create_non_fungible_with_initial_supply", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "free_funds", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "mint_fungible", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "mint_non_fungible", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
+			manifest: String(decoding: resource(named: "multi_account_resource_transfer", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
 			manifest: String(decoding: resource(named: "new1", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "access_rule0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "analyze_manifest_sample", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "assert_access_rule0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "call_function0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "call_method0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "free_funds0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-//		( // FIXME:  Problem
-//			manifest: String(decoding: resource(named: "metadata0", extension: ".rtm"), as: UTF8.self),
-//			blobs: [[10]]
-//		),
-		(
-			manifest: String(decoding: resource(named: "mint0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "mint1", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "multi_account_resource_transfer0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "new0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
@@ -57,43 +61,31 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "no_initial_supply0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "new0", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "no_initial_supply1", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "publish", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "publish0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		( // FIXME:  Problem
-			manifest: String(decoding: resource(named: "recall0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "recall", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "resource_transfer0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "resource_transfer", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "royalty0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "royalty", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "values0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "values", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 		(
-			manifest: String(decoding: resource(named: "with_initial_supply0", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "with_initial_supply1", extension: ".rtm"), as: UTF8.self),
-			blobs: [[10]]
-		),
-		(
-			manifest: String(decoding: resource(named: "worktop0", extension: ".rtm"), as: UTF8.self),
+			manifest: String(decoding: resource(named: "worktop", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
 	]
