@@ -19,7 +19,7 @@ final class ProfileStoreTests: TestCase {
 				XCTAssertNoDifference($1, BIP39.Language.english)
 				return .testValue
 			}
-			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
+			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.hdOnDeviceFactorSource.factorSource.kind, .device) }
 			$0.secureStorageClient.loadProfileSnapshotData = { nil }
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 		} operation: {
@@ -69,7 +69,7 @@ final class ProfileStoreTests: TestCase {
 
 				XCTAssertNoDifference(
 					profileSnapshot.factorSources.first,
-					privateFactor.factorSource
+					privateFactor.hdOnDeviceFactorSource.factorSource
 				)
 				XCTAssertNoDifference(profileSnapshot.creatingDevice, expectedDeviceDescription)
 			}
@@ -106,7 +106,7 @@ private extension ProfileStoreTests {
 						assertMnemonicWithPassphraseSaved(privateFactorSource.mnemonicWithPassphrase)
 					}
 					if let assertFactorSourceSaved {
-						assertFactorSourceSaved(privateFactorSource.factorSource)
+						assertFactorSourceSaved(privateFactorSource.hdOnDeviceFactorSource.factorSource)
 					}
 				}
 			}
@@ -121,7 +121,7 @@ private extension ProfileStoreTests {
 				switch state {
 				case let .ephemeral(ephemeral):
 					profile = ephemeral.profile
-					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.factorSource)
+					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.hdOnDeviceFactorSource.factorSource)
 					try await sut.commitEphemeral()
 				case let .persisted(persistedProfile):
 					XCTAssertNoDifference(

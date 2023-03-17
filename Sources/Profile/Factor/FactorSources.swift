@@ -21,13 +21,32 @@ extension FactorSources {
 
 extension FactorSources {
 	/// Babylon `device` factor source
-	public var device: FactorSource {
-		guard let babylon = device(filter: { !$0.supportsOlympia }) else {
+	public var babylonDevice: HDOnDeviceFactorSource {
+		guard
+			let babylon = device(filter: { !$0.supportsOlympia }),
+			let hdFactorSource = try? HDOnDeviceFactorSource(factorSource: babylon)
+		else {
 			let errorMsg = "Critical failure, every single execution path of the babylon wallet should ALWAYS contain a 'babylon' device factorsource, did you do something weird in a test?"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))
 			fatalError(errorMsg)
 		}
-		return babylon
+		return hdFactorSource
+	}
+
+	public func hdOnDeviceFactorSource() -> NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>> {
+		guard
+			case let array = self.compactMap({
+				try? HDOnDeviceFactorSource(factorSource: $0)
+			}),
+			case let identifiedArray = IdentifiedArrayOf<HDOnDeviceFactorSource>(uncheckedUniqueElements: array),
+			let nonEmpty = NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>(rawValue: identifiedArray)
+		else {
+			let errorMsg = "Critical failure, every single execution path of the babylon wallet should ALWAYS contain a device factorsource, did you do something weird in a test?"
+			loggerGlobal.critical(.init(stringLiteral: errorMsg))
+			fatalError(errorMsg)
+		}
+
+		return nonEmpty
 	}
 
 	private func device(filter: (FactorSource) -> Bool) -> FactorSource? {

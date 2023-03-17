@@ -6,30 +6,30 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 	// MARK: State
 	public struct State: Sendable, Hashable {
 		public let specifiedNameForNewEntityToCreate: NonEmptyString
-		public let factorSources: FactorSources
-		public var selectedFactorSource: FactorSource
+		public let hdOnDeviceFactorSources: NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>
+		public var selectedFactorSource: HDOnDeviceFactorSource
 		public var selectedCurve: Slip10Curve
 
 		public init(
 			specifiedNameForNewEntityToCreate: NonEmptyString,
-			factorSources: FactorSources,
+			hdOnDeviceFactorSources: HDOnDeviceFactorSources,
 			selectedCurve: Slip10Curve = .curve25519 // default to new
 		) {
 			self.specifiedNameForNewEntityToCreate = specifiedNameForNewEntityToCreate
-			self.factorSources = factorSources
-			self.selectedFactorSource = factorSources.first
+			self.hdOnDeviceFactorSources = hdOnDeviceFactorSources
+			self.selectedFactorSource = hdOnDeviceFactorSources.first
 			self.selectedCurve = selectedCurve
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case confirmOnDeviceFactorSource
-		case selectedFactorSource(FactorSource)
+		case selectedFactorSource(HDOnDeviceFactorSource)
 		case selectedCurve(Slip10Curve)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case confirmedFactorSource(FactorSource, specifiedNameForNewEntityToCreate: NonEmpty<String>, curve: Slip10Curve)
+		case confirmedFactorSource(HDOnDeviceFactorSource, specifiedNameForNewEntityToCreate: NonEmpty<String>, curve: Slip10Curve)
 	}
 
 	public init() {}
@@ -66,7 +66,7 @@ public struct SelectGenesisFactorSource: Sendable, FeatureReducer {
 extension SelectGenesisFactorSource.State {
 	public static let previewValue: Self = .init(
 		specifiedNameForNewEntityToCreate: "preview",
-		factorSources: .previewValue
+		hdOnDeviceFactorSources: .previewValues
 	)
 }
 #endif

@@ -19,13 +19,20 @@ extension Profile {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
-		let factorSource = request.factorSource
-		let deviceFactorSourceStorage = try factorSource.deviceStorage()
+		let factorSource = request.hdOnDeviceFactorSource
+		let deviceFactorSourceStorage = factorSource.storage
 		let index = deviceFactorSourceStorage.nextForEntity(kind: entityKind, networkID: networkID)
 		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let genesisFactorInstance: FactorInstance = try await {
-			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(.init(factorSource: factorSource, derivationPath: derivationPath, curve: request.curve, creationOfEntity: entityKind))
+			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(
+				.init(
+					hdOnDeviceFactorSource: factorSource,
+					derivationPath: derivationPath,
+					curve: request.curve,
+					creationOfEntity: entityKind
+				)
+			)
 
 			return try FactorInstance(
 				factorSourceID: factorSource.id,

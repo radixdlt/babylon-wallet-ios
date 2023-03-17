@@ -26,7 +26,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 				curve: .curve25519,
 				networkID: nil,
 				name: "Main",
-				factorSource: .previewValueDevice
+				hdOnDeviceFactorSource: .previewValue
 			)),
 			config: config
 		)

@@ -71,7 +71,7 @@ extension SecureStorageClient: DependencyKey {
 					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
 						key: profileSnapshotKeychainKey,
-						iCloudSyncEnabled: true,
+						iCloudSyncEnabled: profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled,
 						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
@@ -80,7 +80,7 @@ extension SecureStorageClient: DependencyKey {
 			},
 			loadProfileSnapshotData: loadProfileSnapshotData,
 			saveMnemonicForFactorSource: { privateFactorSource in
-				let factorSource = privateFactorSource.factorSource
+				let factorSource = privateFactorSource.hdOnDeviceFactorSource.factorSource
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
 				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
