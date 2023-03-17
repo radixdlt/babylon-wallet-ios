@@ -92,7 +92,17 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 						TextState(L10n.DApp.MetadataLoading.ErrorAlert.cancelButtonTitle)
 					}
 				},
-				message: { TextState(L10n.DApp.MetadataLoading.ErrorAlert.message(error.legibleLocalizedDescription)) }
+				message: {
+					TextState(
+						L10n.DApp.MetadataLoading.ErrorAlert.message + {
+							#if DEBUG
+							"\n\n" + error.legibleLocalizedDescription
+							#else
+							""
+							#endif
+						}()
+					)
+				}
 			)
 			return .none
 		}
