@@ -28,7 +28,8 @@
       }
     ],
     "security" : {
-      "iCloudProfileSyncEnabled" : true
+      "iCloudProfileSyncEnabled" : true,
+	  "isDeveloperModeEnabled": true
     }
   },
   "creatingDevice" : "computerRunningUnitTest",
@@ -272,5 +273,5 @@
       ]
     }
   ],
-  "version" : 23
+  "version" : 24
 }

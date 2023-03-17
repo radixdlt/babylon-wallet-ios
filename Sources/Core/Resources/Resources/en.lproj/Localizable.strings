@@ -197,7 +197,7 @@
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";
 
-"settings.appSettingsButtonTitle" = "App Settings";
+"settings.generalSettingsButtonTitle" = "App Settings";
 "settings.authorizedDappsButtonTitle" = "Authorized dApps";
 "settings.closeButtonTitle" = "Close";
 "settings.connectExtension.buttonTitle" = "Link to Connector";
@@ -244,3 +244,7 @@
 "gatewaySettings.whatIsAGateway.buttonText" = "What is a Gateway";
 "gatewaySettings.whatIsAGateway.explanation" = "This is a placeholder for gateway explanation text";
 "gatewaySettings.whatIsAGateway.title" = "What is a Gateway";
+
+"generalSettings.title" = "App Settings";
+"generalSettings.developerMode.title" = "Developer Mode";
+"generalSettings.developerMode.subtitle" = "Warning: Disables website validity checks";
