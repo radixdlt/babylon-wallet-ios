@@ -4,17 +4,33 @@
 @propertyWrapper
 public struct Validation<Value, Error> {
 	@_spi(ValidationInternals) public var rawValue: Value?
-	private var rules: [ValidationRule<Value, Error>]
+	private let rules: [ValidationRule<Value, Error>]
+	private let exceptions: [(Value) -> Bool]
+	private let onNil: () -> Error?
 
 	@_disfavoredOverload
-	public init(wrappedValue rawValue: Value? = nil, _ rules: [ValidationRule<Value, Error>]) {
+	public init(
+		wrappedValue rawValue: Value?,
+		rules: [ValidationRule<Value, Error>],
+		exceptions: [(Value) -> Bool] = [],
+		onNil: @escaping @autoclosure () -> Error?
+	) {
 		self.rawValue = rawValue
 		self.rules = rules
+		self.exceptions = exceptions
+		self.onNil = onNil
 	}
 
 	public var projectedValue: Validated<Value, Error>? {
 		guard let rawValue else {
-			return nil
+			if let error = onNil() {
+				return .invalid(NonEmptyArray(error))
+			} else {
+				return nil
+			}
+		}
+		if exceptions.contains(where: { $0(rawValue) }) {
+			return .valid(rawValue)
 		}
 		if let errors = NonEmpty(rawValue: rules.compactMap { $0.validate(rawValue) }) {
 			return .invalid(errors)
@@ -65,29 +81,29 @@ public struct ValidationRule<Value, Error> {
 }
 
 // MARK: - ValidationError
-public protocol ValidationError<Value>: CaseIterable {
-	associatedtype Value
+// public protocol ValidationError<Value>: CaseIterable {
+//	associatedtype Value
+//
+//	var condition: (Value) -> Bool { get }
+// }
 
-	var condition: (Value) -> Bool { get }
-}
+// extension Validation where Error: ValidationError<Value> {
+//	public init(wrappedValue: Value? = nil) {
+//		self.init(wrappedValue: wrappedValue, rules: Error.rules)
+//	}
+// }
 
-extension Validation where Error: ValidationError<Value> {
-	public init(wrappedValue: Value? = nil) {
-		self.init(wrappedValue: wrappedValue, Error.rules)
-	}
-}
+// extension ValidationError {
+//	public static var rules: [ValidationRule<Value, Self>] {
+//		allCases.map { error in
+//			ValidationRule { value in
+//				error.condition(value) ? error : nil
+//			}
+//		}
+//	}
+// }
 
-extension ValidationError {
-	public static var rules: [ValidationRule<Value, Self>] {
-		allCases.map { error in
-			ValidationRule { value in
-				error.condition(value) ? error : nil
-			}
-		}
-	}
-}
-
-public typealias ValidationRuleOf<Error: ValidationError> = ValidationRule<Error.Value, Error>
+// public typealias ValidationRuleOf<Error: ValidationError> = ValidationRule<Error.Value, Error>
 
 #if canImport(SwiftUI)
 import SwiftUI
