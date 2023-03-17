@@ -21,9 +21,11 @@ public struct Validation<Value, Error> {
 		self.exceptions = exceptions
 	}
 
-	public subscript<T>(dynamicMember keyPath: KeyPath<Validated<Value, Error>, T?>) -> T? { projectedValue?[keyPath: keyPath] }
+	public var projectedValue: Self {
+		self
+	}
 
-	public var projectedValue: Validated<Value, Error>? {
+	public var validated: Validated<Value, Error>? {
 		guard let rawValue else {
 			if let error = onNil() {
 				return .invalid(NonEmptyArray(error))
@@ -41,12 +43,42 @@ public struct Validation<Value, Error> {
 		}
 	}
 
+	public subscript<T>(dynamicMember keyPath: KeyPath<Validated<Value, Error>, T?>) -> T? {
+		validated?[keyPath: keyPath]
+	}
+
 	public var wrappedValue: Value? {
 		get {
-			projectedValue?.value
+			validated?.value
 		}
 		set {
 			rawValue = newValue
+		}
+	}
+}
+
+// MARK: Equatable
+extension Validation: Equatable where Value: Equatable, Error: Equatable {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.projectedValue == rhs.projectedValue
+	}
+}
+
+// MARK: Hashable
+extension Validation: Hashable where Value: Hashable, Error: Hashable {
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(projectedValue)
+	}
+}
+
+// MARK: - Validated + Hashable
+extension Validated: Hashable where Value: Hashable, Error: Hashable {
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .valid(value):
+			hasher.combine(value)
+		case let .invalid(errors):
+			hasher.combine(errors)
 		}
 	}
 }
