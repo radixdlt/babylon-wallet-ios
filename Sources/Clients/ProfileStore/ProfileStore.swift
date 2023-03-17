@@ -390,6 +390,8 @@ extension ProfileStore {
 				factorSource: factorSource
 			))
 
+			loggerGlobal.debug("Created new profile with factorSourceID: \(factorSource.id)")
+
 			return Profile(factorSource: factorSource, creatingDevice: deviceDescription)
 
 		} catch {
