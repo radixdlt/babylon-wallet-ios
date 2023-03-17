@@ -64,4 +64,28 @@ final class AccountsRequiredToSignTests: TestCase {
 		let accountsSuitableToPayTXFee = try transactionManifest.accountsSuitableToPayTXFee(networkId: networkID)
 		XCTAssertNoDifference(accountsSuitableToPayTXFee, ["account_tdx_22_1pz8jpmse7hv0uueppwcksp2h60hkcdsfefm40cye9f3qlqau64"])
 	}
+
+	func test_faucet() throws {
+		let transactionManifest = TransactionManifest(instructions: .string(
+			"""
+			CALL_METHOD
+				Address("component_tdx_b_1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0ts04jjcz")
+				"lock_fee"
+				Decimal("10");
+
+			CALL_METHOD
+				Address("component_tdx_b_1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0ts04jjcz")
+				"free";
+
+			CALL_METHOD
+				Address("account_tdx_b_1ppmpw7aze06f736werqmnnvsehkwemcxn0dff9shsnkqnzzrll")
+				"deposit_batch"
+				Expression("ENTIRE_WORKTOP");
+			"""
+		))
+		let networkID: NetworkID = .nebunet
+
+		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
+		XCTAssertNoDifference(Set(), accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be empty")
+	}
 }
