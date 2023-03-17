@@ -349,6 +349,14 @@ extension TransactionClient {
 			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
 		}
 
+		@Sendable
+		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
+			let xrdContainers = await addresses.concurrentMap {
+				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
+			}.compactMap { $0 }
+			return xrdContainers.first(where: { $0.amount >= fee })?.owner
+		}
+
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: { maybeStringManifest in
@@ -377,22 +385,21 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainers = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap {
-						await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
-					}.compactMap { $0 }
-					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
-
-					if let firstWithEnoughFunds = firstWithEnoughFunds {
-						return firstWithEnoughFunds
+					if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
+						from: Array(accountAddressesSuitableToPayTransactionFeeRef),
+						toPay: lockFeeAmount,
+						on: networkID
+					) {
+						return accountInvolvedInTransaction
 					} else {
-						let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-						let xrdContainers = await accounts.concurrentMap {
-							await accountPortfolioFetcherClient.fetchXRDBalance(of: $0.address, on: networkID)
-						}.compactMap { $0 }
-						let anyAccountWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
+						let allAccountAddresses = try await accountsClient.getAccountsOnCurrentNetwork().map(\.address)
 
-						if let anyAccountWithEnoughFunds = anyAccountWithEnoughFunds {
-							return anyAccountWithEnoughFunds
+						if let anyAccount = await firstAccountAddressWithEnoughFunds(
+							from: allAccountAddresses.rawValue,
+							toPay: lockFeeAmount,
+							on: networkID
+						) {
+							return anyAccount
 						} else {
 							throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 						}
