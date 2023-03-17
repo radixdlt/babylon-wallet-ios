@@ -33,7 +33,7 @@ extension ImportOlympiaFactorSource {
 								get: \.mnemonic,
 								send: { .mnemonicChanged($0) }
 							),
-							hint: "Seed phrase",
+							hint: .info("Seed phrase"),
 							focusState: $focusedField,
 							equals: .mnemonic,
 							first: viewStore.binding(
@@ -49,7 +49,7 @@ extension ImportOlympiaFactorSource {
 								get: \.passphrase,
 								send: { .passphraseChanged($0) }
 							),
-							hint: "BIP39 Passphrase is often called a '25th word'.",
+							hint: .info("BIP39 Passphrase is often called a '25th word'."),
 							focusState: $focusedField,
 							equals: .passphrase,
 							first: viewStore.binding(

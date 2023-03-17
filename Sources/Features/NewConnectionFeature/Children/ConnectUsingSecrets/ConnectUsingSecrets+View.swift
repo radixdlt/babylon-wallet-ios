@@ -50,7 +50,7 @@ extension ConnectUsingSecrets {
 							get: \.nameOfConnection,
 							send: { .nameOfConnectionChanged($0) }
 						),
-						hint: L10n.NewConnection.textFieldHint,
+						hint: .info(L10n.NewConnection.textFieldHint),
 						focusState: $focusedField,
 						equals: .connectionName,
 						first: viewStore.binding(
