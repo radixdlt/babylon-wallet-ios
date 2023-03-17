@@ -127,12 +127,6 @@ public enum PolymorphicAddress: Sendable, Codable, Hashable, AddressStringConver
 	case packageAddress(PackageAddress)
 	case componentAddress(ComponentAddress)
 	case resourceAddress(ResourceAddress)
-
-	public enum Kind: String, Sendable, Codable, Hashable {
-		case packageAddress = "PackageAddress"
-		case componentAddress = "ComponentAddress"
-		case resourceAddress = "ResourceAddress"
-	}
 }
 
 // MARK: Codable
@@ -143,7 +137,7 @@ extension PolymorphicAddress {
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try container.decode(Kind.self, forKey: .type)
+		let discriminator = try container.decode(AddressDiscriminator.self, forKey: .type)
 
 		let singleValueContainer = try decoder.singleValueContainer()
 		switch discriminator {
