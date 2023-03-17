@@ -349,6 +349,14 @@ extension TransactionClient {
 			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
 		}
 
+		@Sendable
+		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
+			let xrdContainers = await addresses.concurrentMap {
+				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
+			}.compactMap { $0 }
+			return xrdContainers.first(where: { $0.amount >= fee })?.owner
+		}
+
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: { maybeStringManifest in
@@ -377,14 +385,24 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID) }
-					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
-					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
-
-					if let firstWithEnoughFunds = firstWithEnoughFunds {
-						return firstWithEnoughFunds
+					if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
+						from: Array(accountAddressesSuitableToPayTransactionFeeRef),
+						toPay: lockFeeAmount,
+						on: networkID
+					) {
+						return accountInvolvedInTransaction
 					} else {
-						throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+						let allAccountAddresses = try await accountsClient.getAccountsOnCurrentNetwork().map(\.address)
+
+						if let anyAccount = await firstAccountAddressWithEnoughFunds(
+							from: allAccountAddresses.rawValue,
+							toPay: lockFeeAmount,
+							on: networkID
+						) {
+							return anyAccount
+						} else {
+							throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+						}
 					}
 				}()
 
