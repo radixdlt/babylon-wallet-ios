@@ -112,8 +112,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case usePersona(
 			P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem,
 			OnNetwork.Persona,
-			OnNetwork.AuthorizedDapp?,
-			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
+			OnNetwork.AuthorizedDapp,
+			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
@@ -197,9 +197,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			if let usePersonaItem = state.usePersonaRequestItem {
 				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
-					if let persona = try await personasClient.getPersonas().first(by: identityAddress) {
-						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps().first(by: dappDefinitionAddress)
-						let authorizedPersona = authorizedDapp?.referencesToAuthorizedPersonas.first(by: identityAddress)
+					if
+						let persona = try await personasClient.getPersonas()[id: identityAddress],
+						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
+						let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: identityAddress]
+					{
 						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
 					} else {
 						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
@@ -266,7 +268,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						TextState(L10n.DApp.Request.SpecifiedPersonaNotFoundError.cancelButtonTitle)
 					}
 				},
-				message: { TextState(L10n.DApp.Request.SpecifiedPersonaNotFoundError.message(reason)) }
+				message: {
+					TextState(
+						L10n.DApp.Request.SpecifiedPersonaNotFoundError.message + {
+							#if DEBUG
+							"\n\n" + reason
+							#else
+							""
+							#endif
+						}()
+					)
+				}
 			)
 			return .none
 		}
@@ -405,7 +417,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if
 						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
-							try allAccounts.first(by: .init(address: sharedAccount.address))
+							try allAccounts[id: .init(address: sharedAccount.address)]
 						}),
 						selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
 					{

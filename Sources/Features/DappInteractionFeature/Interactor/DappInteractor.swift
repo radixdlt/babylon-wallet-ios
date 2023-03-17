@@ -184,7 +184,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)
 					}
 				},
-				message: { TextState(L10n.DApp.Response.FailureAlert.message(reason)) }
+				message: {
+					TextState(
+						L10n.DApp.Response.FailureAlert.message + {
+							#if DEBUG
+							"\n\n" + reason
+							#else
+							""
+							#endif
+						}()
+					)
+				}
 			)
 			return .none
 

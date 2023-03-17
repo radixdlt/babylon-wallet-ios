@@ -254,11 +254,7 @@ public enum L10n {
         /// Cancel
         public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.cancelButtonTitle", fallback: "Cancel")
         /// Danger! Bad dApp config or you're being spoofed!
-        /// 
-        /// %@
-        public static func message(_ p1: Any) -> String {
-          return L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.message", String(describing: p1), fallback: "Danger! Bad dApp config or you're being spoofed!\n\n%@")
-        }
+        public static let message = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.message", fallback: "Danger! Bad dApp config or you're being spoofed!")
         /// Retry
         public static let retryButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.retryButtonTitle", fallback: "Retry")
       }
@@ -320,11 +316,7 @@ public enum L10n {
         /// Cancel
         public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle", fallback: "Cancel")
         /// Persona specified by dApp does not exist.
-        /// 
-        /// %@
-        public static func message(_ p1: Any) -> String {
-          return L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.message", String(describing: p1), fallback: "Persona specified by dApp does not exist.\n\n%@")
-        }
+        public static let message = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.message", fallback: "Persona specified by dApp does not exist.")
       }
     }
     public enum Response {
@@ -332,11 +324,7 @@ public enum L10n {
         /// Cancel
         public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.cancelButtonTitle", fallback: "Cancel")
         /// Failed to send response payload back to dApp.
-        /// 
-        /// %@
-        public static func message(_ p1: Any) -> String {
-          return L10n.tr("Localizable", "dApp.response.failureAlert.message", String(describing: p1), fallback: "Failed to send response payload back to dApp.\n\n%@")
-        }
+        public static let message = L10n.tr("Localizable", "dApp.response.failureAlert.message", fallback: "Failed to send response payload back to dApp.")
         /// Retry
         public static let retryButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.retryButtonTitle", fallback: "Retry")
       }
