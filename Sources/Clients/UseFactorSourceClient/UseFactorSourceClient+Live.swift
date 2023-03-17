@@ -20,6 +20,7 @@ extension UseFactorSourceClient: DependencyKey {
 					let mnemonicWithPassphrase = try await secureStorageClient
 					.loadMnemonicByFactorSourceID(factorSourceID, .createEntity(kind: request.entityKind))
 				else {
+					loggerGlobal.critical("Failed to find factor source.")
 					throw FailedToFindFactorSource()
 				}
 				let hdRoot = try mnemonicWithPassphrase.hdRoot()
