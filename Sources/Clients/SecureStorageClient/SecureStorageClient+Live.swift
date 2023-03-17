@@ -118,9 +118,6 @@ extension SecureStorageClient: DependencyKey {
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
 			deleteProfileAndMnemonicsByFactorSourceIDs: {
-				#if DEBUG
-				try await keychainClient.removeAllItems()
-				#else
 				guard let profileSnapshotData = try await loadProfileSnapshotData() else {
 					return
 				}
@@ -129,9 +126,9 @@ extension SecureStorageClient: DependencyKey {
 					return
 				}
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
+					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
-				#endif
 			}
 		)
 	}()
