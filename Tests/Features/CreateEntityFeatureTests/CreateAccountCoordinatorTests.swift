@@ -21,7 +21,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 			purpose: .newAccountFromHome
 		)
 
-		let initialState = try CreateAccountCoordinator.State(
+		let initialState = CreateAccountCoordinator.State(
 			step: .step2_creationOfEntity(.init(
 				curve: .curve25519,
 				networkID: nil,
