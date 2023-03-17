@@ -2,24 +2,26 @@
 
 // MARK: - Validation
 @propertyWrapper
+@dynamicMemberLookup
 public struct Validation<Value, Error> {
-	@_spi(ValidationInternals) public var rawValue: Value?
+	@_spi(Validation) public var rawValue: Value?
+	private let onNil: () -> Error?
 	private let rules: [ValidationRule<Value, Error>]
 	private let exceptions: [(Value) -> Bool]
-	private let onNil: () -> Error?
 
-	@_disfavoredOverload
 	public init(
 		wrappedValue rawValue: Value?,
+		onNil: @escaping @autoclosure () -> Error?,
 		rules: [ValidationRule<Value, Error>],
-		exceptions: [(Value) -> Bool] = [],
-		onNil: @escaping @autoclosure () -> Error?
+		exceptions: [(Value) -> Bool] = []
 	) {
 		self.rawValue = rawValue
+		self.onNil = onNil
 		self.rules = rules
 		self.exceptions = exceptions
-		self.onNil = onNil
 	}
+
+	public subscript<T>(dynamicMember keyPath: KeyPath<Validated<Value, Error>, T?>) -> T? { projectedValue?[keyPath: keyPath] }
 
 	public var projectedValue: Validated<Value, Error>? {
 		guard let rawValue else {
@@ -104,16 +106,3 @@ public struct ValidationRule<Value, Error> {
 // }
 
 // public typealias ValidationRuleOf<Error: ValidationError> = ValidationRule<Error.Value, Error>
-
-#if canImport(SwiftUI)
-import SwiftUI
-
-extension Binding {
-	public static func validation<Value, Error>(
-		get: @escaping () -> Validation<Value, Error>,
-		set: @escaping (Value?) -> Void
-	) -> Binding<Value?> {
-		.init(get: { get().rawValue }, set: { set($0) })
-	}
-}
-#endif

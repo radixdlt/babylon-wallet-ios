@@ -5,7 +5,6 @@ import XCTest
 final class ValidationTests: XCTestCase {
 	func test() {
 		struct Person {
-//			@Sanitized
 //			@Validation<String, NameValidationError>() var name
 			@Validation<String, String> var name: String?
 //			@Validation(NameValidationError.self) var name
