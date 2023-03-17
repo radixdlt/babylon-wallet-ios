@@ -35,8 +35,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case failedToSendResponseToDapp(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseFailureAlert(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
-		case ensureCurrentModalIsActuallyPresented
-		case checkCanShowDappInteraction
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -146,32 +144,24 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case .checkCanShowDappInteraction:
-			if canShowInteraction() {
-				return presentQueuedRequestIfNeededEffect(for: &state)
-			} else {
-				return delayedEffect(for: .internal(.checkCanShowDappInteraction))
-			}
 		case let .receivedRequestFromDapp(request):
 			state.requestQueue.append(request)
-			return .send(.internal(.checkCanShowDappInteraction))
+			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case .presentQueuedRequestIfNeeded:
-			return .send(.internal(.checkCanShowDappInteraction))
+			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case let .sentResponseToDapp(response, for: request, dappMetadata):
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return delayedEffect(
-					for: .internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil)))
-				)
+				return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
 			case .failure:
-				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+				return .send(.internal(.presentQueuedRequestIfNeeded))
 			}
 		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return delayedEffect(for: .internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
+			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
 
 		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
 			state.responseFailureAlert = .init(
@@ -190,43 +180,19 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentResponseSuccessView(dappMetadata):
 			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
-			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
-
-		case .ensureCurrentModalIsActuallyPresented:
-			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
+			return .none
 		}
 	}
 
 	func presentQueuedRequestIfNeededEffect(
 		for state: inout State
 	) -> EffectTask<Action> {
-		guard let next = state.requestQueue.first else {
+		guard let next = state.requestQueue.first, state.currentModal == nil else {
 			return .none
 		}
 
-		if state.currentModal == nil {
-			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.peerMessage.content)))
-			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
-		} else {
-			return .none
-		}
-	}
-
-	func ensureCurrentModalIsActuallyPresentedEffect(
-		for state: inout State
-	) -> EffectTask<Action> {
-		guard let currentModal = state.currentModal else { return .none }
-		if state.currentModalIsActuallyPresented == false {
-			state.currentModal = nil
-			state.currentModal = currentModal
-			return .run { send in
-				try await clock.sleep(for: .seconds(1.5))
-				await send(.internal(.ensureCurrentModalIsActuallyPresented))
-			}
-		} else {
-			state.currentModalIsActuallyPresented = false
-			return .none
-		}
+		state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.peerMessage.content)))
+		return .none
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
@@ -237,7 +203,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
-			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+			return .send(.internal(.presentQueuedRequestIfNeeded))
 		case
 			.modal(.presented(.dappInteraction(.relay(_, .delegate(.presented))))),
 			.modal(.presented(.dappInteractionCompletion(.delegate(.presented)))):
