@@ -224,16 +224,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ManageGatewayAPIEndpointsFeatureTests"
-               BuildableName = "ManageGatewayAPIEndpointsFeatureTests"
-               BlueprintName = "ManageGatewayAPIEndpointsFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "NewConnectionFeatureTests"
                BuildableName = "NewConnectionFeatureTests"
                BlueprintName = "NewConnectionFeatureTests"
@@ -527,6 +517,26 @@
                BlueprintIdentifier = "GatewaySettingsFeatureTests"
                BuildableName = "GatewaySettingsFeatureTests"
                BlueprintName = "GatewaySettingsFeatureTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "P2PLinksClientLiveTests"
+               BuildableName = "P2PLinksClientLiveTests"
+               BlueprintName = "P2PLinksClientLiveTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "P2PLinksFeatureTests"
+               BuildableName = "P2PLinksFeatureTests"
+               BlueprintName = "P2PLinksFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
