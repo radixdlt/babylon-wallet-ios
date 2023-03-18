@@ -60,7 +60,7 @@ public struct Validation<Value, Error> {
 // MARK: Equatable
 extension Validation: Equatable where Value: Equatable, Error: Equatable {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
-		lhs.projectedValue == rhs.projectedValue
+		lhs.validated == rhs.validated
 	}
 }
 
