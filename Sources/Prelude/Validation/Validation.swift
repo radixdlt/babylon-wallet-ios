@@ -11,7 +11,7 @@ public struct Validation<Value, Error> {
 
 	public init(
 		wrappedValue rawValue: Value?,
-		onNil: @escaping @autoclosure () -> Error?,
+		onNil: @autoclosure @escaping () -> Error?,
 		rules: [ValidationRule<Value, Error>],
 		exceptions: [(Value) -> Bool] = []
 	) {
