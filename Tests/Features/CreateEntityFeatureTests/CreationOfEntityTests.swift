@@ -6,11 +6,11 @@ import FeatureTestingPrelude
 final class CreationOfEntityTests: TestCase {
 	func test__WHEN__account_is_created__THEN__it_is_added_to_profile() async throws {
 		let account = OnNetwork.Account.previewValue0
-		let initialState = try CreationOfEntity<OnNetwork.Account>.State(
+		let initialState = CreationOfEntity<OnNetwork.Account>.State(
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: account.displayName,
-			factorSource: .previewValueDevice
+			hdOnDeviceFactorSource: .previewValue
 		)
 		let store = TestStore(
 			initialState: initialState,
@@ -32,11 +32,11 @@ final class CreationOfEntityTests: TestCase {
 	func test__WHEN__creation_fails__THEN__error_is_propagated() async throws {
 		let errorQueue = ActorIsolated<Set<NSError>>([])
 		let createNewAccountError = NSError.testValue(domain: "Create New Account Request")
-		let initialState = try CreationOfEntity<OnNetwork.Account>.State(
+		let initialState = CreationOfEntity<OnNetwork.Account>.State(
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: "NeverCreated",
-			factorSource: .previewValueDevice
+			hdOnDeviceFactorSource: .previewValue
 		)
 		let store = TestStore(
 			initialState: initialState,

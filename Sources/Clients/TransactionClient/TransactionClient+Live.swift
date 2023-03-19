@@ -69,7 +69,10 @@ extension TransactionClient {
 							throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
 						}
 
-						let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: loadedMnemonicWithPassphrase, factorSource: factorSource)
+						let privateHDFactorSource = try PrivateHDFactorSource(
+							mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
+							hdOnDeviceFactorSource: .init(factorSource: factorSource)
+						)
 
 						await cachedPrivateHDFactorSources.setValue(cache.appending(privateHDFactorSource))
 
@@ -77,10 +80,10 @@ extension TransactionClient {
 					}()
 
 					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
-					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
+					let curve = privateHDFactorSource.hdOnDeviceFactorSource.parameters.supportedCurves.last
 					let unhashedData = Data(unhashed_)
 
-					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.factorSource.kind), factorSourceHint=\(privateHDFactorSource.factorSource.hint)")
+					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.hdOnDeviceFactorSource.kind), factorSourceHint=\(privateHDFactorSource.hdOnDeviceFactorSource.hint)")
 
 					return try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,

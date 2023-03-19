@@ -20,6 +20,11 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		) {
 			self.mnemonic = mnemonic
 			self.passphrase = passphrase
+			#if DEBUG
+			if let new = (try? Mnemonic.generate(wordCount: .twelve))?.phrase {
+				self.mnemonic = new
+			}
+			#endif
 		}
 	}
 

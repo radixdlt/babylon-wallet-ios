@@ -1,26 +1,35 @@
-import Foundation
-import NonEmpty
+import Prelude
 
 // MARK: - PrivateHDFactorSource
 public struct PrivateHDFactorSource: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
-	public var id: ID { factorSource.id }
+	public var id: ID { hdOnDeviceFactorSource.id }
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 
-	// Only mutable so that `hint` inside factorSource can be changed
-	// before persisted.
-	public var factorSource: FactorSource
+	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
+
+	public init(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		hdOnDeviceFactorSource: HDOnDeviceFactorSource
+	) throws {
+		self.hdOnDeviceFactorSource = hdOnDeviceFactorSource // try factorSource.assertIsHD()
+		let hdRoot = try mnemonicWithPassphrase.hdRoot()
+		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)
+		guard factorSourceID == hdOnDeviceFactorSource.id else {
+			loggerGlobal.critical("FactorSourceOD of new factor does not match mnemonic.")
+			throw CriticalDisrepancyBetweenFactorSourceID()
+		}
+		self.mnemonicWithPassphrase = mnemonicWithPassphrase
+	}
 
 	public init(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		factorSource: FactorSource
 	) throws {
-		self.factorSource = try factorSource.assertIsHD()
-		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)
-		guard factorSourceID == factorSource.id else { fatalError("discrepancy") }
-		self.mnemonicWithPassphrase = mnemonicWithPassphrase
+		try self.init(mnemonicWithPassphrase: mnemonicWithPassphrase, hdOnDeviceFactorSource: .init(factorSource: factorSource))
 	}
+
+	struct CriticalDisrepancyBetweenFactorSourceID: Swift.Error {}
 }
 
 #if DEBUG
@@ -38,9 +47,11 @@ extension PrivateHDFactorSource {
 			lastUsedOn: .init(timeIntervalSince1970: 0)
 		)
 
+		let hdOnDeviceFactorSource = try! HDOnDeviceFactorSource(factorSource: factorSource)
+
 		return try! .init(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			factorSource: factorSource
+			hdOnDeviceFactorSource: hdOnDeviceFactorSource
 		)
 	}
 }
