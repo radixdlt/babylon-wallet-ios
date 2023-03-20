@@ -37,7 +37,7 @@ extension Radix.Network {
 	public static let nebunet = Self(
 		name: "nebunet",
 		id: .nebunet,
-		displayDescription: "Radix Public Network"
+		displayDescription: "Betanet"
 	)
 	public static let hammunet = Self(
 		name: "hammunet",

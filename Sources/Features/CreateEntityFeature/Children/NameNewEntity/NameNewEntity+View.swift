@@ -24,7 +24,9 @@ extension NameNewEntity {
 			titleText = {
 				switch entityKind {
 				case .account:
-					return state.isFirst ? L10n.CreateEntity.NameNewEntity.Account.Title.first : L10n.CreateEntity.NameNewEntity.Account.Title.notFirst
+					return state.isFirst ?
+						L10n.CreateEntity.NameNewEntity.Account.Title.first :
+						L10n.CreateEntity.NameNewEntity.Account.Title.notFirst
 				case .identity:
 					return L10n.CreateEntity.NameNewEntity.Persona.title
 				}

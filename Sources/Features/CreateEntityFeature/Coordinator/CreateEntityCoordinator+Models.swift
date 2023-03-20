@@ -43,7 +43,7 @@ extension CreateEntityConfig {
 			)
 		case let .firstAccountOnNewNetwork(specificNetworkID):
 			self.init(
-				isFirstEntity: false,
+				isFirstEntity: true,
 				canBeDismissed: false,
 				navigationButtonCTA: .goBackToGateways,
 				specificNetworkID: specificNetworkID
