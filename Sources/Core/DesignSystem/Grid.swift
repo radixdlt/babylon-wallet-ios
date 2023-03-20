@@ -42,6 +42,9 @@ extension CGFloat {
 	/// 50
 	public static let standardButtonHeight: Self = 50
 
+	/// 32
+	public static let toolbatButtonHeight: Self = 32
+
 	/// 250
 	public static let standardButtonWidth: Self = 250
 

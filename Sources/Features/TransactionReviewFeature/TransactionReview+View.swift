@@ -79,12 +79,10 @@ extension TransactionReview {
 							}
 						}
 						ToolbarItem(placement: .automatic) {
-							Button {
+							Button(asset: AssetResource.code) {
 								viewStore.send(.closeTapped)
-							} label: {
-								Image(asset: AssetResource.code)
 							}
-							.buttonStyle(.secondaryRectangular)
+							.buttonStyle(.secondaryRectangular(isInToolbar: true))
 						}
 					}
 				}
@@ -278,6 +276,14 @@ extension Button where Label == SwiftUI.Label<Text, Image> {
 	public init<S>(_ title: S, asset: ImageAsset, action: @escaping () -> Void) where S: StringProtocol {
 		self.init(action: action) {
 			SwiftUI.Label(title, asset: asset)
+		}
+	}
+}
+
+extension Button where Label == Image {
+	public init(asset: ImageAsset, action: @escaping () -> Void) {
+		self.init(action: action) {
+			Image(asset: asset)
 		}
 	}
 }
