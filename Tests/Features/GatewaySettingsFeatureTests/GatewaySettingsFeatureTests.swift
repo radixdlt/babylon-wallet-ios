@@ -108,10 +108,11 @@ final class GatewaySettingsFeatureTests: TestCase {
 		}
 	}
 
-	func test_removeNonCurrentGatewayIsConfirmed_removeGateway() async throws {
+	func test_whenNonCurrentGatewayRemovalIsConfirmed_removeGateway() async throws {
 		// given
 		let gatewayToBeDeleted = GatewayRow.State(gateway: .enkinet, isSelected: false, canBeDeleted: true)
 		let allGateways: [Radix.Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let gatewaysAfterDeletion: [Radix.Gateway] = [.nebunet, .hammunet, .mardunet]
 		let currentGateway: Radix.Gateway = .nebunet
 
 		var initialState = GatewaySettings.State()
@@ -129,13 +130,20 @@ final class GatewaySettingsFeatureTests: TestCase {
 		)
 		initialState.currentGateway = currentGateway
 
+		let removedGateway = ActorIsolated<Bool>(false)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: GatewaySettings()
 		) {
-			$0.gatewaysClient.removeGateway = { _ in }
+			$0.gatewaysClient.removeGateway = { _ in
+				await removedGateway.setValue(true)
+			}
 			$0.gatewaysClient.getAllGateways = {
-				.init(rawValue: .init(uniqueElements: allGateways))!
+				if await removedGateway.value == true {
+					return .init(rawValue: .init(uniqueElements: gatewaysAfterDeletion))!
+				} else {
+					return .init(rawValue: .init(uniqueElements: allGateways))!
+				}
 			}
 			$0.gatewaysClient.getCurrentGateway = {
 				currentGateway
@@ -145,10 +153,43 @@ final class GatewaySettingsFeatureTests: TestCase {
 		store.exhaustivity = .off
 
 		// when
-		await store.send(.view(.removeGateway(.presented(.removeButtonTapped(gatewayToBeDeleted)))))
+		await store.send(.view(.appeared))
 
 		// then
-		await store.receive(.internal(.removeGateway(gatewayToBeDeleted.gateway)))
+		await store.receive(.internal(.presentGateways(all: allGateways, current: currentGateway))) {
+			$0.gatewayList = .init(gateways: .init(
+				uniqueElements: allGateways.map {
+					GatewayRow.State(
+						gateway: $0,
+						isSelected: currentGateway.id == $0.id,
+						canBeDeleted: $0.id != Radix.Gateway.nebunet.id
+					)
+				}
+				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
+			))
+
+			$0.currentGateway = .nebunet
+		}
+
+		// when
+		await store.send(.view(.removeGateway(.presented(.removeButtonTapped(gatewayToBeDeleted))))) {
+			// then
+			$0.removeGatewayAlert = nil
+		}
+		await store.receive(.internal(.presentGateways(all: gatewaysAfterDeletion, current: currentGateway))) {
+			$0.gatewayList = .init(gateways: .init(
+				uniqueElements: gatewaysAfterDeletion.map {
+					GatewayRow.State(
+						gateway: $0,
+						isSelected: currentGateway.id == $0.id,
+						canBeDeleted: $0.id != Radix.Gateway.nebunet.id
+					)
+				}
+				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
+			))
+
+			$0.currentGateway = .nebunet
+		}
 	}
 
 	func test_whenAddGatewayButtonIsTapped_thenPresentAddNewGatewayScreen() async throws {
@@ -168,6 +209,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenNewAddGatewayButtonIsTapped_thenDelegateIsCalled() async throws {
 		// given
+		let allGateways: [Radix.Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
 		let validURL = URL.previewValue.absoluteString
 		var initialState = AddNewGateway.State()
 		initialState.inputtedURL = validURL
@@ -178,14 +220,14 @@ final class GatewaySettingsFeatureTests: TestCase {
 		) {
 			$0.networkSwitchingClient.validateGatewayURL = { _ in .previewValue }
 			$0.gatewaysClient.addGateway = { _ in }
+			$0.gatewaysClient.getAllGateways = {
+				.init(rawValue: .init(uniqueElements: allGateways))!
+			}
 		}
 		store.exhaustivity = .off
 
 		// when
-		await store.send(.view(.addNewGatewayButtonTapped)) {
-			// then
-			$0.addGatewayButtonState = .loading(.local)
-		}
+		await store.send(.view(.addNewGatewayButtonTapped))
 		await store.receive(.internal(.gatewayValidationResult(.success(.previewValue))))
 		await store.receive(.internal(.addGatewayResult(.success(.init()))))
 		await store.receive(.delegate(.dismiss))
