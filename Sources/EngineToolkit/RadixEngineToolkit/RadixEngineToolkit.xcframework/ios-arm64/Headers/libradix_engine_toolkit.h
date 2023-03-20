@@ -13,8 +13,6 @@ Pointer convert_manifest(Pointer string_pointer);
 
 Pointer analyze_manifest(Pointer string_pointer);
 
-Pointer analyze_manifest_with_preview_context(Pointer string_pointer);
-
 Pointer compile_transaction_intent(Pointer string_pointer);
 
 Pointer compile_signed_transaction_intent(Pointer string_pointer);
