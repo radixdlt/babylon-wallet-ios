@@ -557,8 +557,8 @@ public enum L10n {
     public static func personaDataSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.personaDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
     }
-    /// Persona Name
-    public static let personaNameHeading = L10n.tr("Localizable", "personaDetails.personaNameHeading", fallback: "Persona Name")
+    /// Persona Label
+    public static let personaLabelHeading = L10n.tr("Localizable", "personaDetails.personaLabelHeading", fallback: "Persona Label")
     /// Phone Number
     public static let phoneNumberHeading = L10n.tr("Localizable", "personaDetails.phoneNumberHeading", fallback: "Phone Number")
   }

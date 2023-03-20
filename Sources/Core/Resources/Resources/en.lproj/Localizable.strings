@@ -142,7 +142,7 @@
 "dAppDetails.forgetDappAlertConfirm" = "Forget";
 "dAppDetails.forgetDappAlertCancel" = "Cancel";
 
-"personaDetails.personaNameHeading" = "Persona Name";
+"personaDetails.personaLabelHeading" = "Persona Label";
 "personaDetails.personaDataSharingDescription" = "Here is the personal data that you are sharing with %@";
 "personaDetails.editPersona" = "Edit Persona";
 "personaDetails.givenNameHeading" = "First Name";

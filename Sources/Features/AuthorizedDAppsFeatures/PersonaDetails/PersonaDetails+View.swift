@@ -14,7 +14,7 @@ extension PersonaDetails {
 
 	public struct ViewState: Equatable {
 		let url: URL
-		let personaName: String
+		let personaLabel: String
 	}
 }
 
@@ -47,7 +47,7 @@ extension PersonaDetails.View {
 					.padding(.bottom, .large2)
 				}
 			}
-			.navigationTitle(viewStore.personaName)
+			.navigationTitle(viewStore.personaLabel)
 			.alert(store: store.confirmForgetAlert)
 			.sheet(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -63,7 +63,7 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(url: .init(string: "placeholder")!, personaName: persona.displayName.rawValue)
+		.init(url: .init(string: "placeholder")!, personaLabel: persona.displayName.rawValue)
 	}
 }
 
@@ -92,7 +92,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					InfoPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaLabel)
+					InfoPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaLabel)
 
 					Separator()
 
