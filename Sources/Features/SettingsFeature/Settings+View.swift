@@ -93,6 +93,7 @@ extension View {
 				}
 			}
 		#endif
+			.importFromOlympiaLegacyWallet(with: store, viewStore)
 			.factorSources(with: store, viewStore)
 			.manageP2PLinks(with: store, viewStore)
 			.manageGatewayAPIEndpoints(with: store, viewStore)
@@ -102,6 +103,19 @@ extension View {
 }
 
 extension View {
+	@MainActor
+	private func importFromOlympiaLegacyWallet(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.importFromOlympiaLegacyWallet,
+			action: AppSettings.Destinations.Action.importFromOlympiaLegacyWallet,
+			destination: { ImportFromOlympiaLegacyWallet.View(store: $0) }
+		)
+	}
+
 	@MainActor
 	private func factorSources(
 		with store: StoreOf<AppSettings>,
@@ -234,6 +248,14 @@ extension AppSettings.View {
 					} icon: {
 						Image(systemName: "person.badge.key")
 							.frame(.verySmall)
+					}
+					.withSeparator
+					.buttonStyle(.tappableRowStyle)
+
+					PlainListRow(title: "Import from a Legacy Wallet") {
+						viewStore.send(.importFromOlympiaWalletButtonTapped)
+					} icon: {
+						Image(asset: AssetResource.appSettings)
 					}
 					.withSeparator
 					.buttonStyle(.tappableRowStyle)

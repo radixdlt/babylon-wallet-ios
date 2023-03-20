@@ -46,6 +46,7 @@ public struct AppSettings: FeatureReducer {
 		case personasButtonTapped
 		case appSettingsButtonTapped
 		case factorSourcesButtonTapped
+		case importFromOlympiaWalletButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -71,6 +72,7 @@ public struct AppSettings: FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case importFromOlympiaLegacyWallet(ImportFromOlympiaLegacyWallet.State)
 			case manageFactorSources(ManageFactorSources.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
@@ -79,6 +81,7 @@ public struct AppSettings: FeatureReducer {
 		}
 
 		public enum Action: Sendable, Equatable {
+			case importFromOlympiaLegacyWallet(ImportFromOlympiaLegacyWallet.Action)
 			case manageFactorSources(ManageFactorSources.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
@@ -130,6 +133,10 @@ public struct AppSettings: FeatureReducer {
 
 		case .factorSourcesButtonTapped:
 			state.destination = .manageFactorSources(.init())
+			return .none
+
+		case .importFromOlympiaWalletButtonTapped:
+			state.destination = .importFromOlympiaLegacyWallet(.init())
 			return .none
 
 		case .addP2PLinkButtonTapped:
