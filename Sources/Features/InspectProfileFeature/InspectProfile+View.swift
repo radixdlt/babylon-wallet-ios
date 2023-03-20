@@ -486,8 +486,8 @@ extension PerNetworkView {
 				.font(.title)
 			#endif // os(macOS)
 			ForEach(networks.keys, id: \.self) { networkID in
-				OnNetworkView(
-					onNetwork: try! networks.onNetwork(id: networkID),
+				ProfileNetworkView(
+					network: try! networks.onNetwork(id: networkID),
 					indentation: inOneLevel
 				)
 			}
@@ -496,13 +496,13 @@ extension PerNetworkView {
 	}
 }
 
-// MARK: - OnNetworkView
-public struct OnNetworkView: IndentedView {
-	public let onNetwork: Profile.Network
+// MARK: - ProfileNetworkView
+public struct ProfileNetworkView: IndentedView {
+	public let network: Profile.Network
 	public let indentation: Indentation
 }
 
-extension OnNetworkView {
+extension ProfileNetworkView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network")
@@ -511,23 +511,23 @@ extension OnNetworkView {
 				.font(.title)
 			#endif // os(macOS)
 
-			Labeled("ID", value: String(describing: onNetwork.networkID))
+			Labeled("ID", value: String(describing: network.networkID))
 
 			AccountsView(
-				entities: onNetwork.accounts.rawValue.elements,
+				entities: network.accounts.rawValue.elements,
 				indentation: inOneLevel
 			)
 
 			PersonasView(
-				entities: onNetwork.personas.elements,
+				entities: network.personas.elements,
 				indentation: inOneLevel
 			)
 
 			AuthorizedDappsView(
-				authorizedDapps: onNetwork.authorizedDapps,
+				authorizedDapps: network.authorizedDapps,
 				indentation: inOneLevel
 			) {
-				try! onNetwork.detailsForAuthorizedDapp($0)
+				try! network.detailsForAuthorizedDapp($0)
 			}
 		}
 		.padding([.leading], leadingPadding)
