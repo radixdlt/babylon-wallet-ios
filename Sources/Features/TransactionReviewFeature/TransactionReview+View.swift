@@ -18,6 +18,7 @@ extension TransactionReview.State {
 	var viewState: TransactionReview.ViewState {
 		.init(
 			message: message,
+			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositingHeading: depositing != nil,
 			showCustomizeGuaranteesButton: true
 		)
@@ -28,6 +29,7 @@ extension TransactionReview.State {
 extension TransactionReview {
 	public struct ViewState: Equatable {
 		let message: String?
+		let isExpandedDappUsed: Bool
 		let showDepositingHeading: Bool
 		let showCustomizeGuaranteesButton: Bool
 	}
@@ -48,13 +50,14 @@ extension TransactionReview {
 							FixedSpacer(height: .medium2)
 
 							if let message = viewStore.message {
-								TransactionHeading("MESSAGE") // TODO:  localize
+								TransactionHeading(L10n.TransactionReview.messageHeading)
 									.padding(.bottom, .small2)
 								TransactionMessageView(message: message)
 									.padding(.bottom, .medium2)
 							}
 
 							ActionsView(store: store)
+								.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
 								.padding(.bottom, .medium1)
 
 							Separator()
@@ -63,7 +66,7 @@ extension TransactionReview {
 							let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
 							TransactionReviewNetworkFee.View(store: feeStore)
 
-							Button("Approve", asset: AssetResource.lock) { // TODO:  localize
+							Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
 								viewStore.send(.approveTapped)
 							}
 							.buttonStyle(.primaryRectangular)
@@ -71,7 +74,7 @@ extension TransactionReview {
 						.padding(.horizontal, .medium3)
 					}
 					.background(.app.gray5)
-					.navigationTitle("Review transaction") // TODO:  localize
+					.navigationTitle(L10n.TransactionReview.title)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {
@@ -102,57 +105,67 @@ extension TransactionReview.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
-				IfLetStore(withdrawingStore) { accountsStore in
-					TransactionHeading("WITHDRAWING") // TODO:  localize
-					Card(insetContents: true) {
-						ForEachStore(accountsStore) { accountStore in
-							TransactionReviewAccount.View(store: accountStore)
-						}
-					}
-				}
-				VStack(spacing: .medium2) {
-					let usedDappsStore = store.scope(state: \.usedDapps) { .child(.dapp($0)) }
-					TransactionReviewDappsUsed.View(store: usedDappsStore)
-
-					if viewStore.showDepositingHeading {
-						TransactionHeading("DEPOSITING") // TODO:  localize
-					}
-				}
-				.background(alignment: .trailing) {
-					Rectangle()
-						.fill(.red)
-						.frame(width: 1)
-						.padding(.trailing, SpeechbubbleShape.triangleInset)
-				}
-
-				let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
-				IfLetStore(depositingStore) { accountsStore in
-					Card(insetContents: true) {
-						ForEachStore(accountsStore) { accountStore in
-							TransactionReviewAccount.View(store: accountStore)
-						}
-
-						if viewStore.showCustomizeGuaranteesButton {
-							Button("Customize guarantees") { // TODO: 
-								viewStore.send(.customizeGuaranteesTapped)
+				VStack(spacing: 0) {
+					let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
+					IfLetStore(withdrawingStore) { withdrawingStore in
+						TransactionHeading(L10n.TransactionReview.withdrawingHeading)
+							.padding(.bottom, .small2)
+						Card(insetContents: true) {
+							ForEachStore(withdrawingStore) { accountStore in
+								TransactionReviewAccount.View(store: accountStore)
 							}
-							.textStyle(.body1Header)
-							.foregroundColor(.app.blue2)
-							.padding(.vertical, .small3)
+						}
+					}
+
+					VStack(alignment: .trailing, spacing: .medium2) {
+						let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
+						IfLetStore(usedDappsStore) { usedDappsStoreUnwrapped in
+							TransactionReviewDappsUsed.View(store: usedDappsStoreUnwrapped)
+								.padding(.top, .medium2)
+						}
+
+						if viewStore.showDepositingHeading {
+							TransactionHeading(L10n.TransactionReview.depositingHeading)
+								.padding(.bottom, .small2)
+						}
+					}
+					.background(alignment: .trailing) {
+						VLine()
+							.stroke(.app.gray3, style: .transactionReview)
+							.frame(width: 1)
+							.padding(.trailing, SpeechbubbleShape.triangleInset)
+					}
+
+					let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
+					IfLetStore(depositingStore) { accountsStore in
+						Card(insetContents: true) {
+							ForEachStore(accountsStore) { accountStore in
+								TransactionReviewAccount.View(store: accountStore)
+							}
+
+							if viewStore.showCustomizeGuaranteesButton {
+								Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
+									viewStore.send(.customizeGuaranteesTapped)
+								}
+								.textStyle(.body1Header)
+								.foregroundColor(.app.blue2)
+								.padding(.vertical, .small3)
+							}
 						}
 					}
 				}
+				.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
 			}
+		}
+	}
+}
 
-			//			.overlay(alignment: .trailing) {
-			//				Rectangle()
-			//					.fill(.red)
-			//					.frame(width: 2)
-			//					.padding(.vertical, 10)
-			//					.padding(.trailing, SpeechbubbleShape.triangleInset)
-			//			}
-			//			.border(.purple)
+// MARK: - VLine
+struct VLine: Shape {
+	func path(in rect: CGRect) -> SwiftUI.Path {
+		SwiftUI.Path { path in
+			path.move(to: .init(x: rect.midX, y: rect.minY))
+			path.addLine(to: .init(x: rect.midX, y: rect.maxY))
 		}
 	}
 }
@@ -192,7 +205,6 @@ struct TransactionHeading: View {
 		Text(heading)
 			.sectionHeading
 			.flushedLeft(padding: .medium3)
-			.padding(.bottom, .small1)
 	}
 }
 
@@ -228,25 +240,9 @@ public struct FixedSpacer: View {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - TransactionReview_Preview
-// struct TransactionReview_Preview: PreviewProvider {
-//	static var previews: some View {
-//		TransactionReview.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: TransactionReview()
-//			)
-//		)
-//	}
-// }
-//
-// extension TransactionReview.State {
-//	public static let previewValue = Self()
-// }
-// #endif
+extension StrokeStyle {
+	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
+}
 
 extension Label where Title == Text, Icon == Image {
 	public init(_ titleKey: LocalizedStringKey, asset: ImageAsset) {
