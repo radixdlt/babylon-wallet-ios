@@ -32,8 +32,8 @@ extension DappInteractor {
 						action: DappInteractor.Destinations.Action.dappInteraction,
 						then: { DappInteractionCoordinator.View(store: $0.relay()) }
 					)
-					.transition(.identity.combined(with: .move(edge: .bottom)))
-					.animation(.linear, value: UUID())
+					.transition(.move(edge: .bottom))
+					.animation(.linear, value: viewStore.currentModal != nil)
 					.zIndex(1)
 				}
 				.sheet(
