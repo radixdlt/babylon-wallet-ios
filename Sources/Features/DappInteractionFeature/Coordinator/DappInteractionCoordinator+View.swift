@@ -5,6 +5,7 @@ extension DappInteractionCoordinator {
 	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<DappInteractionCoordinator>
+		var isShown: Bool = true
 
 		var body: some SwiftUI.View {
 			ZStack {

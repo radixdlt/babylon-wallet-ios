@@ -44,6 +44,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 		enum State: Sendable, Hashable {
 			case dappInteraction(RelayState<P2P.RTCIncomingWalletInteraction, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
+
+			var isDappInteraction: Bool {
+				if case .dappInteraction = self {
+					print("Is Dapp Interaction: true")
+					return true
+				}
+				print("Is Dapp Interaction: false")
+				return false
+			}
 		}
 
 		enum Action: Sendable, Equatable {
@@ -218,7 +227,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					 try await rolaClient.performDappDefinitionVerification(request.interaction.metadata)
 					 try await rolaClient.performWellKnownFileCheck(request.interaction.metadata)
 					 */
-					await send(.internal(.receivedRequestFromDapp(interactionMessage)))
+					await send(.internal(.receivedRequestFromDapp(interactionMessage)), animation: .linear)
 				} catch {
 					loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
 					errorQueue.schedule(error)
@@ -235,7 +244,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		.run { send in
 			try await clock.sleep(for: delay)
-			await send(action)
+			await send(action, animation: .linear)
 		}
 	}
 }
