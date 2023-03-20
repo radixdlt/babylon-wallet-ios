@@ -28,10 +28,10 @@ extension Profile.Network {
 		public var securityState: EntitySecurityState
 
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
-		public let displayName: NonEmpty<String>
+		public var displayName: NonEmpty<String>
 
 		/// Fields containing personal information you have inputted.
-		public let fields: IdentifiedArrayOf<Field>
+		public var fields: IdentifiedArrayOf<Field>
 
 		public init(
 			networkID: NetworkID,

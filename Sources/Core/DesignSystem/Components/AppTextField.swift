@@ -24,6 +24,7 @@ public enum AppTextFieldHint: Equatable {
 public struct AppTextField<Value: Hashable>: View {
 	public typealias Hint = AppTextFieldHint
 
+	let heading: String?
 	let placeholder: String
 	let text: Binding<String>
 	let hint: Hint?
@@ -32,14 +33,15 @@ public struct AppTextField<Value: Hashable>: View {
 	let first: Binding<Value>
 
 	public init(
+		heading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
 		hint: Hint?,
-		presentsError: Bool = false,
 		focusState: FocusState<Value>.Binding,
 		equals: Value,
 		first: Binding<Value>
 	) {
+		self.heading = heading
 		self.placeholder = placeholder
 		self.text = text
 		self.hint = hint
@@ -50,6 +52,12 @@ public struct AppTextField<Value: Hashable>: View {
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small2) {
+			if let heading {
+				Text(heading)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+			}
+
 			TextField(
 				placeholder,
 				text: text.removeDuplicates()

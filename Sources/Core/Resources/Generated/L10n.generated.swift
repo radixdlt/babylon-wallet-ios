@@ -356,6 +356,18 @@ public enum L10n {
     /// Website
     public static let website = L10n.tr("Localizable", "dAppDetails.website", fallback: "Website")
   }
+  public enum EditPersona {
+    public enum InputError {
+      public enum All {
+        /// Required field for this dApp
+        public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputError.all.requiredByDapp", fallback: "Required field for this dApp")
+      }
+      public enum PersonaLabel {
+        /// Label cannot be blank
+        public static let blank = L10n.tr("Localizable", "editPersona.inputError.personaLabel.blank", fallback: "Label cannot be blank")
+      }
+    }
+  }
   public enum FactorSource {
     public enum Device {
       /// Unknown iPhone
