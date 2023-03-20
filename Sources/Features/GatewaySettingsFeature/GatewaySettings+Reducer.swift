@@ -36,7 +36,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadGateways
 		case presentGateways(all: [Radix.Gateway], current: Radix.Gateway)
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(Radix.Gateway)
@@ -147,9 +146,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case .loadGateways:
-			return loadGateways(&state)
-
 		case let .presentGateways(all: gateways, current: current):
 			state.currentGateway = current
 			state.gatewayList = .init(gateways: .init(
