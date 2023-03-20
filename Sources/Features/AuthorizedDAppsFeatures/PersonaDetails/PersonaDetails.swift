@@ -20,6 +20,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var confirmForgetAlert: AlertState<ViewAction.ConfirmForgetAlert>? = nil
+		@PresentationState
+		public var destination: Destinations.State? = nil
 
 		public init(
 			dAppName: String,
@@ -49,8 +51,30 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
+	}
+
+	// MARK: - Destinations
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case editPersona(EditPersonaDetails.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case editPersona(EditPersonaDetails.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.editPersona, action: /Action.editPersona) {
+				EditPersonaDetails()
+			}
+		}
 	}
 
 	// MARK: - Reducer
@@ -58,11 +82,15 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .editPersonaTapped:
+			state.destination = .editPersona(.previewValue)
 			return .none
 
 		case let .accountTapped(address):
