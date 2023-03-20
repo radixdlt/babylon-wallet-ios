@@ -157,14 +157,15 @@
 "transactionReview.depositingHeading" = "DEPOSITING";
 "transactionReview.sendingToHeading" = "SENDING TO";
 "transactionReview.presentingtingHeading" = "PRESENTING";
-"transactionReview.networkFeeHeading" = "NETWORK FEE";
-"transactionReview.networkFeeText" = "The network is currently congested. Add a tip to speed up your transfer.";
 "transactionReview.customizeGuaranteesButtonTitle" = "Customize Guarantees";
-"transactionReview.customizeButtonTitle" = "Customize";
 "transactionReview.approveButtonTitle" = "Approve";
 "transactionReview.externalAccountName" = "Account";
 "transactionReview.estimated" = "Estimated";
 "transactionReview.guaranteed" = "Guaranteed";
+
+"transactionReview.networkFee.heading" = "NETWORK FEE";
+"transactionReview.networkFee.congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
+"transactionReview.networkFee.customizeButtonTitle" = "Customize";
 
 "authorizedDapps.title" = "Authorized dApps";
 "authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
