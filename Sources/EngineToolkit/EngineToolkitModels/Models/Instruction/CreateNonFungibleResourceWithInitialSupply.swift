@@ -11,6 +11,7 @@ public struct CreateNonFungibleResourceWithInitialSupply: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let idType: Enum
+	public let schema: Tuple
 	public let metadata: Map_
 	public let accessRules: Map_
 	public let initialSupply: ManifestASTValue
@@ -19,11 +20,13 @@ public struct CreateNonFungibleResourceWithInitialSupply: InstructionProtocol {
 
 	public init(
 		idType: Enum,
+		schema: Tuple,
 		metadata: Map_,
 		accessRules: Map_,
 		initialSupply: ManifestASTValue
 	) {
 		self.idType = idType
+		self.schema = schema
 		self.metadata = metadata
 		self.accessRules = accessRules
 		self.initialSupply = initialSupply
@@ -36,6 +39,7 @@ extension CreateNonFungibleResourceWithInitialSupply {
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case idType = "id_type"
+		case schema
 		case metadata
 		case accessRules = "access_rules"
 		case initialSupply = "initial_supply"
@@ -48,6 +52,7 @@ extension CreateNonFungibleResourceWithInitialSupply {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(idType, forKey: .idType)
+		try container.encode(schema, forKey: .schema)
 		try container.encode(metadata, forKey: .metadata)
 		try container.encode(accessRules, forKey: .accessRules)
 		try container.encode(initialSupply, forKey: .initialSupply)
@@ -63,6 +68,7 @@ extension CreateNonFungibleResourceWithInitialSupply {
 
 		try self.init(
 			idType: container.decode(Enum.self, forKey: .idType),
+			schema: container.decode(Tuple.self, forKey: .schema),
 			metadata: container.decode(Map_.self, forKey: .metadata),
 			accessRules: container.decode(Map_.self, forKey: .accessRules),
 			initialSupply: container.decode(ManifestASTValue.self, forKey: .initialSupply)

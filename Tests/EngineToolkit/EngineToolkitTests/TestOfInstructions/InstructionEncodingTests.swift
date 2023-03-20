@@ -19,6 +19,16 @@ final class InstructionEncodingTests: TestCase {
 			Enum(.u8(0), fields: [])
 		}
 
+		let schema = try Tuple {
+			try Tuple {
+				try Array_(elementKind: .enum, elements: [])
+				try Array_(elementKind: .tuple, elements: [])
+				try Array_(elementKind: .enum, elements: [])
+			}
+			Enum(.u8(0), fields: [.u8(64)])
+			try Array_(elementKind: .string, elements: [])
+		}
+
 		// Arrange
 		let testVectors: [(value: Instruction, jsonRepresentation: String)] = [
 			(
@@ -440,22 +450,24 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .createNonFungibleResource(.init(
 					idType: Enum(.u8(0), fields: []),
+					schema: schema,
 					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
 					accessRules: Map_(keyValueKind: .enum, valueValueKind: .tuple, entries: [])
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"schema":{"elements":[{"elements":[{"element_kind":"Enum","elements":[],"type":"Array"},{"element_kind":"Tuple","elements":[],"type":"Array"},{"element_kind":"Enum","elements":[],"type":"Array"}],"type":"Tuple"},{"fields":[{"type":"U8","value":"64"}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"element_kind":"String","elements":[],"type":"Array"}],"type":"Tuple"}}
 				"""
 			),
 			(
 				value: .createNonFungibleResourceWithInitialSupply(.init(
 					idType: Enum(.u8(0), fields: []),
+					schema: schema,
 					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
 					accessRules: Map_(keyValueKind: .enum, valueValueKind: .tuple, entries: []),
 					initialSupply: .decimal(.init(value: "1"))
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"initial_supply":{"type":"Decimal","value":"1"},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"initial_supply":{"type":"Decimal","value":"1"},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"schema":{"elements":[{"elements":[{"element_kind":"Enum","elements":[],"type":"Array"},{"element_kind":"Tuple","elements":[],"type":"Array"},{"element_kind":"Enum","elements":[],"type":"Array"}],"type":"Tuple"},{"fields":[{"type":"U8","value":"64"}],"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"element_kind":"String","elements":[],"type":"Array"}],"type":"Tuple"}}
 				"""
 			),
 			(
