@@ -90,7 +90,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .editPersonaTapped:
-			state.destination = .editPersona(.previewValue)
+			state.destination = .editPersona(.init(personaLabel: NonEmptyString("blabla"), existingFields: []))
 			return .none
 
 		case let .accountTapped(address):
