@@ -20,7 +20,6 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case appeared
 		case malformedInteractionErrorAlert(PresentationAction<MalformedInteractionErrorAlertAction>)
 
 		enum MalformedInteractionErrorAlertAction: Sendable, Equatable {
@@ -38,7 +37,6 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case presented
 		case submitAndDismiss(P2P.ToDapp.WalletInteractionResponse, DappMetadata? = nil)
 	}
 
@@ -64,8 +62,6 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .send(.delegate(.presented))
 		case let .malformedInteractionErrorAlert(.presented(action)):
 			switch action {
 			case .okButtonTapped:

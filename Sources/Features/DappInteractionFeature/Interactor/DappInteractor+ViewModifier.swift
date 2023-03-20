@@ -1,15 +1,11 @@
 import FeaturePrelude
 
 extension View {
-	public func presentsDappInteractions(
-		canPresentInteraction: @Sendable @escaping () -> Bool = { true }
-	) -> some View {
+	public func presentsDappInteractions() -> some View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor(
-					canShowInteraction: canPresentInteraction
-				)
+				reducer: DappInteractor()
 			)
 		)
 	}
@@ -28,22 +24,18 @@ extension DappInteractor {
 
 		func body(content: Content) -> some SwiftUI.View {
 			WithViewStore(store) { viewStore in
-				content
-				#if os(iOS)
-				.fullScreenCover(
-					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-					state: /DappInteractor.Destinations.State.dappInteraction,
-					action: DappInteractor.Destinations.Action.dappInteraction,
-					content: { DappInteractionCoordinator.View(store: $0.relay()) }
-				)
-				#elseif os(macOS) // .fullScreenCover is not available on macOS
-				.sheet(
-					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-					state: /DappInteractor.Destinations.State.dappInteraction,
-					action: DappInteractor.Destinations.Action.dappInteraction,
-					content: { DappInteractionCoordinator.View(store: $0.relay()) }
-				)
-				#endif
+				ZStack {
+					content
+					IfLetStore(
+						store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+						state: /DappInteractor.Destinations.State.dappInteraction,
+						action: DappInteractor.Destinations.Action.dappInteraction,
+						then: { DappInteractionCoordinator.View(store: $0.relay()) }
+					)
+					.transition(.move(edge: .bottom))
+					.animation(.linear, value: viewStore.currentModal)
+					.zIndex(1)
+				}
 				.sheet(
 					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
 					state: /DappInteractor.Destinations.State.dappInteractionCompletion,
