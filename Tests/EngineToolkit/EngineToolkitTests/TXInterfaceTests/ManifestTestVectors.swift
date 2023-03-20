@@ -13,6 +13,10 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			blobs: [[10]]
 		),
 		(
+			manifest: String(decoding: resource(named: "auth_zone", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
+		(
 			manifest: String(decoding: resource(named: "call_function", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),

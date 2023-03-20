@@ -18,6 +18,7 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case pushToAuthZone = "PUSH_TO_AUTH_ZONE"
 
 	case clearAuthZone = "CLEAR_AUTH_ZONE"
+	case clearSignatureProofs = "CLEAR_SIGNATURE_PROOFS"
 
 	case createProofFromAuthZone = "CREATE_PROOF_FROM_AUTH_ZONE"
 	case createProofFromAuthZoneByAmount = "CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT"

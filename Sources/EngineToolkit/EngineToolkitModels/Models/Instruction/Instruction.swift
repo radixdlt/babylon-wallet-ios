@@ -26,6 +26,7 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case pushToAuthZone(PushToAuthZone)
 
 	case clearAuthZone(ClearAuthZone)
+	case clearSignatureProofs(ClearSignatureProofs)
 
 	case createProofFromAuthZone(CreateProofFromAuthZone)
 	case createProofFromAuthZoneByAmount(CreateProofFromAuthZoneByAmount)
@@ -103,6 +104,9 @@ extension Instruction {
 
 		case .clearAuthZone:
 			return .clearAuthZone
+
+		case .clearSignatureProofs:
+			return .clearSignatureProofs
 
 		case .createProofFromAuthZone:
 			return .createProofFromAuthZone
@@ -219,6 +223,9 @@ extension Instruction {
 		case let .clearAuthZone(instruction):
 			try instruction.encode(to: encoder)
 
+		case let .clearSignatureProofs(instruction):
+			try instruction.encode(to: encoder)
+
 		case let .createProofFromAuthZone(instruction):
 			try instruction.encode(to: encoder)
 		case let .createProofFromAuthZoneByAmount(instruction):
@@ -327,6 +334,9 @@ extension Instruction {
 
 		case .clearAuthZone:
 			self = try .clearAuthZone(.init(from: decoder))
+
+		case .clearSignatureProofs:
+			self = try .clearSignatureProofs(.init(from: decoder))
 
 		case .createProofFromAuthZone:
 			self = try .createProofFromAuthZone(.init(from: decoder))
