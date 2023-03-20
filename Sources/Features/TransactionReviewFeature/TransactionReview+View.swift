@@ -56,9 +56,54 @@ extension TransactionReview {
 									.padding(.bottom, .medium2)
 							}
 
-							ActionsView(store: store)
-								.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
-								.padding(.bottom, .medium1)
+							let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
+							IfLetStore(withdrawingStore) { withdrawingStore in
+								TransactionHeading(L10n.TransactionReview.withdrawingHeading)
+									.padding(.bottom, .small2)
+								Card(insetContents: true) {
+									ForEachStore(withdrawingStore) { accountStore in
+										TransactionReviewAccount.View(store: accountStore)
+									}
+								}
+							}
+
+							VStack(alignment: .trailing, spacing: .medium2) {
+								let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
+								IfLetStore(usedDappsStore) { usedDappsStoreUnwrapped in
+									TransactionReviewDappsUsed.View(store: usedDappsStoreUnwrapped, isExpanded: viewStore.isExpandedDappUsed)
+										.padding(.top, .medium2)
+								}
+
+								if viewStore.showDepositingHeading {
+									TransactionHeading(L10n.TransactionReview.depositingHeading)
+										.padding(.bottom, .small2)
+								}
+							}
+							.background(alignment: .trailing) {
+								VLine()
+									.stroke(.app.gray3, style: .transactionReview)
+									.frame(width: 1)
+									.padding(.trailing, SpeechbubbleShape.triangleInset)
+							}
+
+							let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
+							IfLetStore(depositingStore) { accountsStore in
+								Card(insetContents: true) {
+									ForEachStore(accountsStore) { accountStore in
+										TransactionReviewAccount.View(store: accountStore)
+									}
+
+									if viewStore.showCustomizeGuaranteesButton {
+										Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
+											viewStore.send(.customizeGuaranteesTapped)
+										}
+										.textStyle(.body1Header)
+										.foregroundColor(.app.blue2)
+										.padding(.vertical, .small3)
+									}
+								}
+							}
+							.padding(.bottom, .medium1)
 
 							Separator()
 								.padding(.bottom, .medium1)
@@ -74,6 +119,7 @@ extension TransactionReview {
 						.padding(.horizontal, .medium3)
 					}
 					.background(.app.gray5)
+					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
 					.navigationTitle(L10n.TransactionReview.title)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
@@ -92,69 +138,6 @@ extension TransactionReview {
 			}
 			.onAppear {
 				//				decodeActions()
-			}
-		}
-	}
-}
-
-// MARK: - TransactionReview.View.ActionsView
-extension TransactionReview.View {
-	// MARK: - TransactionActionsView
-	struct ActionsView: View {
-		let store: StoreOf<TransactionReview>
-
-		var body: some View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: 0) {
-					let withdrawingStore = store.scope(state: \.withdrawing) { .child(.account(id: $0, action: $1)) }
-					IfLetStore(withdrawingStore) { withdrawingStore in
-						TransactionHeading(L10n.TransactionReview.withdrawingHeading)
-							.padding(.bottom, .small2)
-						Card(insetContents: true) {
-							ForEachStore(withdrawingStore) { accountStore in
-								TransactionReviewAccount.View(store: accountStore)
-							}
-						}
-					}
-
-					VStack(alignment: .trailing, spacing: .medium2) {
-						let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
-						IfLetStore(usedDappsStore) { usedDappsStoreUnwrapped in
-							TransactionReviewDappsUsed.View(store: usedDappsStoreUnwrapped)
-								.padding(.top, .medium2)
-						}
-
-						if viewStore.showDepositingHeading {
-							TransactionHeading(L10n.TransactionReview.depositingHeading)
-								.padding(.bottom, .small2)
-						}
-					}
-					.background(alignment: .trailing) {
-						VLine()
-							.stroke(.app.gray3, style: .transactionReview)
-							.frame(width: 1)
-							.padding(.trailing, SpeechbubbleShape.triangleInset)
-					}
-
-					let depositingStore = store.scope(state: \.depositing) { .child(.account(id: $0, action: $1)) }
-					IfLetStore(depositingStore) { accountsStore in
-						Card(insetContents: true) {
-							ForEachStore(accountsStore) { accountStore in
-								TransactionReviewAccount.View(store: accountStore)
-							}
-
-							if viewStore.showCustomizeGuaranteesButton {
-								Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
-									viewStore.send(.customizeGuaranteesTapped)
-								}
-								.textStyle(.body1Header)
-								.foregroundColor(.app.blue2)
-								.padding(.vertical, .small3)
-							}
-						}
-					}
-				}
-				.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
 			}
 		}
 	}
