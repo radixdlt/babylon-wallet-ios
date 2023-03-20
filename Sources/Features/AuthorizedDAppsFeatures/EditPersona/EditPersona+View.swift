@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-extension EditPersonaDetails.State {
-	var viewState: EditPersonaDetails.ViewState {
+extension EditPersona.State {
+	var viewState: EditPersona.ViewState {
 		.init(
 			focus: focus,
 			personaLabel: $personaLabel,
@@ -15,7 +15,7 @@ extension EditPersonaDetails.State {
 }
 
 // MARK: - EditPersonaDetails.View
-extension EditPersonaDetails {
+extension EditPersona {
 	public struct ViewState: Equatable {
 		let focus: State.Focus?
 
@@ -34,11 +34,11 @@ extension EditPersonaDetails {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<EditPersonaDetails>
+		private let store: StoreOf<EditPersona>
 
 		@FocusState private var focus: State.Focus?
 
-		public init(store: StoreOf<EditPersonaDetails>) {
+		public init(store: StoreOf<EditPersona>) {
 			self.store = store
 		}
 
@@ -114,18 +114,18 @@ extension EditPersonaDetails {
 import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - EditPersonaDetails_Preview
-struct EditPersonaDetails_Preview: PreviewProvider {
+struct EditPersona_Preview: PreviewProvider {
 	static var previews: some View {
-		EditPersonaDetails.View(
+		EditPersona.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: EditPersonaDetails()
+				reducer: EditPersona()
 			)
 		)
 	}
 }
 
-extension EditPersonaDetails.State {
+extension EditPersona.State {
 	public static let previewValue = Self(
 		personaLabel: NonEmptyString("RadIpsum"),
 		existingFields: [

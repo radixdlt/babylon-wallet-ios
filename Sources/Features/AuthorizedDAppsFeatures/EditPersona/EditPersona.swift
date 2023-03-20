@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaDetails
-public struct EditPersonaDetails: Sendable, FeatureReducer {
+public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Focus: Sendable, Hashable {
 			case personaLabel
