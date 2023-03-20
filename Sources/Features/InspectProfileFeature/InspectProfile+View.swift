@@ -487,7 +487,7 @@ extension PerNetworkView {
 			#endif // os(macOS)
 			ForEach(networks.keys, id: \.self) { networkID in
 				ProfileNetworkView(
-					network: try! networks.onNetwork(id: networkID),
+					network: try! networks.network(id: networkID),
 					indentation: inOneLevel
 				)
 			}

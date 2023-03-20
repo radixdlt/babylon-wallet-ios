@@ -97,7 +97,7 @@ extension ProfileStore {
 
 	/// The current network if any
 	public func network() async throws -> Profile.Network {
-		try profile.onNetwork(id: profile.networkID)
+		try profile.network(id: profile.networkID)
 	}
 
 	public var network: Profile.Network? {

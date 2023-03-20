@@ -11,15 +11,15 @@ extension Profile {
 		_ persona: Profile.Network.Persona
 	) throws {
 		let networkID = persona.networkID
-		var onNetwork = try onNetwork(id: networkID)
+		var network = try network(id: networkID)
 
-		guard !onNetwork.personas.contains(where: { $0 == persona }) else {
+		guard !network.personas.contains(where: { $0 == persona }) else {
 			throw PersonaAlreadyExists()
 		}
 
-		let updatedElement = onNetwork.personas.updateOrAppend(persona)
+		let updatedElement = network.personas.updateOrAppend(persona)
 		assert(updatedElement == nil)
-		try updateOnNetwork(onNetwork)
+		try updateOnNetwork(network)
 		switch persona.securityState {
 		case let .unsecured(entityControl):
 			let factorSourceID = entityControl.genesisFactorInstance.factorSourceID

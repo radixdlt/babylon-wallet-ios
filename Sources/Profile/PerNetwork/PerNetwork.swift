@@ -21,8 +21,8 @@ extension Profile {
 			self.dictionary = dictionary
 		}
 
-		public init(onNetwork: Profile.Network) {
-			self.init(dictionary: [onNetwork.networkID: onNetwork])
+		public init(network: Profile.Network) {
+			self.init(dictionary: [network.networkID: network])
 		}
 	}
 }
@@ -44,11 +44,11 @@ extension Profile.Networks {
 		dictionary.keys
 	}
 
-	public func onNetwork(id needle: NetworkID) throws -> Profile.Network {
-		guard let onNetwork = dictionary[needle] else {
+	public func network(id needle: NetworkID) throws -> Profile.Network {
+		guard let network = dictionary[needle] else {
 			throw Error.unknownNetworkWithID(needle)
 		}
-		return onNetwork
+		return network
 	}
 
 	public enum Error:
@@ -62,19 +62,19 @@ extension Profile.Networks {
 		case networkAlreadyExistsWithID(NetworkID)
 	}
 
-	public mutating func update(_ onNetwork: Profile.Network) throws {
-		guard dictionary.contains(where: { $0.key == onNetwork.networkID }) else {
-			throw Error.unknownNetworkWithID(onNetwork.networkID)
+	public mutating func update(_ network: Profile.Network) throws {
+		guard dictionary.contains(where: { $0.key == network.networkID }) else {
+			throw Error.unknownNetworkWithID(network.networkID)
 		}
-		let updatedElement = dictionary.updateValue(onNetwork, forKey: onNetwork.networkID)
+		let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
 		assert(updatedElement != nil)
 	}
 
-	public mutating func add(_ onNetwork: Profile.Network) throws {
-		guard !dictionary.contains(where: { $0.key == onNetwork.networkID }) else {
-			throw Error.networkAlreadyExistsWithID(onNetwork.networkID)
+	public mutating func add(_ network: Profile.Network) throws {
+		guard !dictionary.contains(where: { $0.key == network.networkID }) else {
+			throw Error.networkAlreadyExistsWithID(network.networkID)
 		}
-		let updatedElement = dictionary.updateValue(onNetwork, forKey: onNetwork.networkID)
+		let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
 		assert(updatedElement == nil)
 	}
 }
@@ -107,8 +107,8 @@ extension Profile.Networks {
 
 	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
-		let onNetworkArray = [Profile.Network](self.dictionary.values)
-		try singleValueContainer.encode(onNetworkArray)
+		let networkArray = [Profile.Network](self.dictionary.values)
+		try singleValueContainer.encode(networkArray)
 	}
 }
 

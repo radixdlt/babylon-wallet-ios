@@ -66,7 +66,7 @@ extension Profile {
 				networkID: networkID,
 				publicKey: genesisFactorInstance.publicKey
 			)
-			let index = (try? self.onNetwork(id: networkID))?.accounts.count ?? 0
+			let index = (try? self.network(id: networkID))?.accounts.count ?? 0
 			let appearanceID = Profile.Network.Account.AppearanceID.fromIndex(index)
 			let account = Profile.Network.Account(
 				networkID: networkID,

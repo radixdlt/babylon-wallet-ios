@@ -82,7 +82,7 @@ extension Profile {
 	public mutating func changeGateway(to newGateway: Radix.Gateway) throws {
 		let newNetworkID = newGateway.network.id
 		// Ensure we have accounts on network, else do not change
-		_ = try onNetwork(id: newNetworkID)
+		_ = try network(id: newNetworkID)
 		try appPreferences.gateways.changeCurrent(to: newGateway)
 	}
 

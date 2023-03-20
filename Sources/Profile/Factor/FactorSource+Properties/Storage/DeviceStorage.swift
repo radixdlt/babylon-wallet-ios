@@ -100,10 +100,10 @@ extension NextDerivationIndicesPerNetwork {
 		kind entityKind: EntityKind,
 		networkID: Radix.Network.ID
 	) -> Profile.Network.NextDerivationIndices.Index {
-		guard let onNetwork = self.networks[id: networkID] else {
+		guard let network = self.networks[id: networkID] else {
 			return 0
 		}
-		return onNetwork.nextForEntity(kind: entityKind)
+		return network.nextForEntity(kind: entityKind)
 	}
 }
 
@@ -156,7 +156,7 @@ extension NextDerivationIndicesPerNetwork {
 		for entityKind: EntityKind,
 		networkID: NetworkID
 	) {
-		guard var onNetwork = self.networks[id: networkID] else {
+		guard var network = self.networks[id: networkID] else {
 			// first on network
 			self.networks[id: networkID] = .init(
 				networkID: networkID,
@@ -165,8 +165,8 @@ extension NextDerivationIndicesPerNetwork {
 			)
 			return
 		}
-		onNetwork.increaseNextDerivationIndex(for: entityKind)
-		self.networks[id: networkID] = onNetwork
+		network.increaseNextDerivationIndex(for: entityKind)
+		self.networks[id: networkID] = network
 	}
 }
 

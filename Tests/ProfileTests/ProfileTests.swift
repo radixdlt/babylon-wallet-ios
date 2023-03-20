@@ -158,12 +158,12 @@ final class ProfileTests: TestCase {
 		}
 
 		let firstAccount = try addNewAccount("First")
-		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.count, 1)
-		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.first, firstAccount)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.count, 1)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
 		let secondAccount = try addNewAccount("Second")
-		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.count, 2)
-		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.first, firstAccount)
-		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.last!, secondAccount)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.count, 2)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.last!, secondAccount)
 
 		let thirdAccount = try addNewAccount("Third")
 
@@ -196,10 +196,10 @@ final class ProfileTests: TestCase {
 		))
 
 		XCTAssertEqual(profile.networks.count, 1)
-		let onNetwork = try profile.onNetwork(id: networkID)
-		XCTAssertEqual(onNetwork.networkID, networkID)
-		XCTAssertEqual(onNetwork.accounts.count, 3)
-		XCTAssertEqual(onNetwork.personas.count, 2)
+		let network = try profile.network(id: networkID)
+		XCTAssertEqual(network.networkID, networkID)
+		XCTAssertEqual(network.accounts.count, 3)
+		XCTAssertEqual(network.personas.count, 2)
 
 		var authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
@@ -278,18 +278,18 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id
-		let onNetwork = try profile.networks.onNetwork(id: networkID)
-		XCTAssertEqual(onNetwork.accounts.count, 3)
+		let network = try profile.networks.network(id: networkID)
+		XCTAssertEqual(network.accounts.count, 3)
 
-		XCTAssertEqual(onNetwork.accounts[0].networkID, networkID)
-		XCTAssertEqual(onNetwork.accounts[0].displayName, "First")
-		XCTAssertEqual(onNetwork.accounts[1].displayName, "Second")
-		XCTAssertEqual(onNetwork.accounts[2].displayName, "Third")
-		XCTAssertEqual(onNetwork.personas[0].networkID, networkID)
-		XCTAssertEqual(onNetwork.personas[0].displayName, "Mrs Incognito")
-		XCTAssertEqual(onNetwork.personas[1].displayName, "Mrs Public")
-		XCTAssertEqual(onNetwork.personas.count, 2)
-		XCTAssertEqual(onNetwork.networkID, networkID)
+		XCTAssertEqual(network.accounts[0].networkID, networkID)
+		XCTAssertEqual(network.accounts[0].displayName, "First")
+		XCTAssertEqual(network.accounts[1].displayName, "Second")
+		XCTAssertEqual(network.accounts[2].displayName, "Third")
+		XCTAssertEqual(network.personas[0].networkID, networkID)
+		XCTAssertEqual(network.personas[0].displayName, "Mrs Incognito")
+		XCTAssertEqual(network.personas[1].displayName, "Mrs Public")
+		XCTAssertEqual(network.personas.count, 2)
+		XCTAssertEqual(network.networkID, networkID)
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
@@ -313,51 +313,51 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(
-			onNetwork.accounts[0].publicKey()?.compressedData.hex(),
+			network.accounts[0].publicKey()?.compressedData.hex(),
 			"b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c"
 		)
 
 		XCTAssertEqual(
-			onNetwork.accounts[0].address.address,
+			network.accounts[0].address.address,
 			"account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f"
 		)
 
 		XCTAssertEqual(
-			onNetwork.accounts[1].publicKey()?.compressedData.hex(),
+			network.accounts[1].publicKey()?.compressedData.hex(),
 			"7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86"
 		)
 
 		XCTAssertEqual(
-			onNetwork.accounts[1].address.address,
+			network.accounts[1].address.address,
 			"account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu"
 		)
 
 		XCTAssertEqual(
-			onNetwork.accounts[2].publicKey()?.compressedData.hex(),
+			network.accounts[2].publicKey()?.compressedData.hex(),
 			"3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6"
 		)
 
 		XCTAssertEqual(
-			onNetwork.accounts[2].address.address,
+			network.accounts[2].address.address,
 			"account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"
 		)
 
 		XCTAssertEqual(
-			onNetwork.personas[0].publicKey()?.compressedData.hex(),
+			network.personas[0].publicKey()?.compressedData.hex(),
 			"f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b"
 		)
 		XCTAssertEqual(
-			onNetwork.personas[0].address.address,
+			network.personas[0].address.address,
 			"identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm"
 		)
 
 		XCTAssertEqual(
-			onNetwork.personas[1].publicKey()?.compressedData.hex(),
+			network.personas[1].publicKey()?.compressedData.hex(),
 			"772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51"
 		)
 
 		XCTAssertEqual(
-			onNetwork.personas[1].address.address,
+			network.personas[1].address.address,
 			"identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen"
 		)
 
@@ -365,12 +365,12 @@ final class ProfileTests: TestCase {
 		let p2pLinks0 = try XCTUnwrap(profile.appPreferences.p2pLinks.first)
 		XCTAssertEqual(p2pLinks0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 
-		XCTAssertEqual(onNetwork.authorizedDapps.count, 1)
-		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
-		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
-		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
-		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
+		XCTAssertEqual(network.authorizedDapps.count, 1)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {

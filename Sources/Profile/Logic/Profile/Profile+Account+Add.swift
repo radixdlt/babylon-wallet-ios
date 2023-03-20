@@ -27,22 +27,22 @@ extension Profile {
 	) throws {
 		let networkID = account.networkID
 		// can be nil if this is a new network
-		let maybeNetwork = try? onNetwork(id: networkID)
+		let maybeNetwork = try? network(id: networkID)
 
-		if var onNetwork = maybeNetwork {
-			guard !onNetwork.accounts.contains(where: { $0 == account }) else {
+		if var network = maybeNetwork {
+			guard !network.accounts.contains(where: { $0 == account }) else {
 				throw AccountAlreadyExists()
 			}
-			onNetwork.accounts.appendAccount(account)
-			try updateOnNetwork(onNetwork)
+			network.accounts.appendAccount(account)
+			try updateOnNetwork(network)
 		} else {
-			let onNetwork = Profile.Network(
+			let network = Profile.Network(
 				networkID: networkID,
 				accounts: .init(rawValue: .init(uniqueElements: [account]))!,
 				personas: [],
 				authorizedDapps: []
 			)
-			try networks.add(onNetwork)
+			try networks.add(network)
 		}
 
 		switch account.securityState {

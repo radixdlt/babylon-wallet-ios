@@ -13,7 +13,7 @@ extension AccountsClient: DependencyKey {
 				try await getProfileStore().network().accounts
 			},
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
-			getAccountsOnNetwork: { try await getProfileStore().profile.onNetwork(id: $0).accounts },
+			getAccountsOnNetwork: { try await getProfileStore().profile.network(id: $0).accounts },
 			createUnsavedVirtualAccount: { request in
 				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},
@@ -27,7 +27,7 @@ extension AccountsClient: DependencyKey {
 			},
 			hasAccountOnNetwork: { networkID in
 				do {
-					let network = try await getProfileStore().profile.onNetwork(id: networkID)
+					let network = try await getProfileStore().profile.network(id: networkID)
 					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
 					return !network.accounts.isEmpty
 				} catch {
