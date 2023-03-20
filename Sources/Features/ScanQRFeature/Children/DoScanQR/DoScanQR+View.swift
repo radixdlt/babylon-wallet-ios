@@ -4,19 +4,19 @@ import FeaturePrelude
 import CodeScanner
 #endif // iOS
 
-extension ScanQR.State {
-	var viewState: ScanQR.ViewState {
+extension DoScanQR.State {
+	var viewState: DoScanQR.ViewState {
 		.init(state: self)
 	}
 }
 
-// MARK: - ScanQR.View
-extension ScanQR {
+// MARK: - DoScanQR.View
+extension DoScanQR {
 	public struct ViewState: Equatable {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 		#endif // macOS
-		init(state: ScanQR.State) {
+		init(state: DoScanQR.State) {
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 			connectionPassword = state.connectionPassword
 			#endif // macOS
@@ -25,9 +25,9 @@ extension ScanQR {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ScanQR>
+		private let store: StoreOf<DoScanQR>
 
-		public init(store: StoreOf<ScanQR>) {
+		public init(store: StoreOf<DoScanQR>) {
 			self.store = store
 		}
 
@@ -49,10 +49,10 @@ extension ScanQR {
 
 // MARK: Private Views
 
-extension ScanQR.View {
+extension DoScanQR.View {
 	@ViewBuilder
 	private func scanQRCode(
-		viewStore: ViewStoreOf<ScanQR>
+		viewStore: ViewStoreOf<DoScanQR>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
@@ -80,7 +80,7 @@ extension ScanQR.View {
 
 	@ViewBuilder
 	private func macOSInputView(
-		viewStore: ViewStoreOf<ScanQR>
+		viewStore: ViewStoreOf<DoScanQR>
 	) -> some View {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {
@@ -108,16 +108,16 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct ScanQR_Preview: PreviewProvider {
 	static var previews: some View {
-		ScanQR.View(
+		DoScanQR.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ScanQR()
+				reducer: DoScanQR()
 			)
 		)
 	}
 }
 
-extension ScanQR.State {
+extension DoScanQR.State {
 	public static let previewValue: Self = .init()
 }
 #endif

@@ -173,11 +173,8 @@ package.addModules([
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
-			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
-			},
 			"RadixConnectClient",
+			"ScanQRFeature",
 		],
 		tests: .yes()
 	),
@@ -201,6 +198,16 @@ package.addModules([
 			"PersonasClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "ScanQRFeature",
+		dependencies: [
+			"CameraPermissionClient",
+			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
+			},
+		],
+		tests: .no
 	),
 	.feature(
 		name: "SettingsFeature",
