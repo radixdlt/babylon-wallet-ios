@@ -11,6 +11,7 @@ public struct CreateNonFungibleResource: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let idType: Enum
+	public let schema: Tuple
 	public let metadata: Map_
 	public let accessRules: Map_
 
@@ -18,10 +19,12 @@ public struct CreateNonFungibleResource: InstructionProtocol {
 
 	public init(
 		idType: Enum,
+		schema: Tuple,
 		metadata: Map_,
 		accessRules: Map_
 	) {
 		self.idType = idType
+		self.schema = schema
 		self.metadata = metadata
 		self.accessRules = accessRules
 	}
@@ -33,6 +36,7 @@ extension CreateNonFungibleResource {
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case idType = "id_type"
+		case schema
 		case metadata
 		case accessRules = "access_rules"
 	}
@@ -44,6 +48,7 @@ extension CreateNonFungibleResource {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(idType, forKey: .idType)
+		try container.encode(schema, forKey: .schema)
 		try container.encode(metadata, forKey: .metadata)
 		try container.encode(accessRules, forKey: .accessRules)
 	}
@@ -58,6 +63,7 @@ extension CreateNonFungibleResource {
 
 		try self.init(
 			idType: container.decode(Enum.self, forKey: .idType),
+			schema: container.decode(Tuple.self, forKey: .schema),
 			metadata: container.decode(Map_.self, forKey: .metadata),
 			accessRules: container.decode(Map_.self, forKey: .accessRules)
 		)
