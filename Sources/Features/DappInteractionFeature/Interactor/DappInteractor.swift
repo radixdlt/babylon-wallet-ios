@@ -117,7 +117,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case .success:
 				return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
 			case .failure:
-				return .send(.internal(.presentQueuedRequestIfNeeded))
+				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
 		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
 			dismissCurrentModalAndRequest(request, for: &state)
@@ -152,7 +152,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
-			return .send(.internal(.presentQueuedRequestIfNeeded))
+			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 		default:
 			return .none
 		}
@@ -226,6 +226,16 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+
+	func delayedEffect(
+		delay: Duration = .seconds(0.75),
+		for action: Action
+	) -> EffectTask<Action> {
+		.run { send in
+			try await clock.sleep(for: delay)
+			await send(action)
 		}
 	}
 }

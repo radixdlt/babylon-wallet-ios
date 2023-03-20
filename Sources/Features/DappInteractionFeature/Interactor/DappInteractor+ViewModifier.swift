@@ -26,13 +26,15 @@ extension DappInteractor {
 			WithViewStore(store) { viewStore in
 				ZStack {
 					content
-					IfLetStore(store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-					           state: /DappInteractor.Destinations.State.dappInteraction,
-					           action: DappInteractor.Destinations.Action.dappInteraction,
-					           then: {
-					           	DappInteractionCoordinator.View(store: $0.relay())
-					           })
-					           .zIndex(1)
+					IfLetStore(
+						store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+						state: /DappInteractor.Destinations.State.dappInteraction,
+						action: DappInteractor.Destinations.Action.dappInteraction,
+						then: { DappInteractionCoordinator.View(store: $0.relay()) }
+					)
+					.transition(.identity.combined(with: .move(edge: .bottom)))
+					.animation(.linear, value: UUID())
+					.zIndex(1)
 				}
 				.sheet(
 					store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),

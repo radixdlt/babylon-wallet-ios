@@ -28,7 +28,6 @@ extension DappInteractionCoordinator {
 				)
 			)
 			.presentsLoadingViewOverlay()
-			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 		}
 	}
 }
