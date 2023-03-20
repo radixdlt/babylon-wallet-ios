@@ -245,7 +245,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		.run { send in
 			try await clock.sleep(for: delay)
-			await send(action, animation: .linear)
+			await send(action)
 		}
 	}
 }
