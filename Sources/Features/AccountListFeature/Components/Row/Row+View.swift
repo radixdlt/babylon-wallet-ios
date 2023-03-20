@@ -21,7 +21,7 @@ extension AccountList.Row {
 	public struct ViewState: Equatable {
 		let name: String
 		let address: AddressView.ViewState
-		let appearanceID: OnNetwork.Account.AppearanceID
+		let appearanceID: Profile.Network.Account.AppearanceID
 		let aggregatedValue: BigDecimal?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool

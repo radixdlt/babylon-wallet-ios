@@ -47,7 +47,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<OnNetwork.Accounts>)
+		case loadAccountsResult(TaskResult<Profile.Network.Accounts>)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -56,7 +56,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(IdentifiedArrayOf<OnNetwork.Account>, ChooseAccounts.State.AccessKind)
+		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Account>, ChooseAccounts.State.AccessKind)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue

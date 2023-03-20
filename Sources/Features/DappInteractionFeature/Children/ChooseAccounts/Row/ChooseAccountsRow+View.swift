@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - ChooseAccountsRow.View
 extension ChooseAccountsRow {
 	struct ViewState: Equatable {
-		let appearanceID: OnNetwork.Account.AppearanceID
+		let appearanceID: Profile.Network.Account.AppearanceID
 		let isSelected: Bool
 		let accountName: String
 		let accountAddress: AddressView.ViewState

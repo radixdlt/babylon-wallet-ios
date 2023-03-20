@@ -9,7 +9,7 @@ public struct AccountList: Sendable, FeatureReducer {
 			self.accounts = accounts
 		}
 
-		public init(accounts: OnNetwork.Accounts) {
+		public init(accounts: Profile.Network.Accounts) {
 			self.init(
 				accounts: .init(uniqueElements: accounts.rawValue.elements.map(AccountList.Row.State.init(account:)))
 			)

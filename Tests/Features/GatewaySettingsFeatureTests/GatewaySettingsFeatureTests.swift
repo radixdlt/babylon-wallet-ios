@@ -16,8 +16,8 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let allGateways: [Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
-		let currentGateway: Gateway = .nebunet
+		let allGateways: [Radix.Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let currentGateway: Radix.Gateway = .nebunet
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
 			reducer: GatewaySettings()
@@ -39,7 +39,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: currentGateway.id == $0.id,
-						canBeDeleted: $0.id != Gateway.nebunet.id
+						canBeDeleted: $0.id != Radix.Gateway.nebunet.id
 					)
 				}
 				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
@@ -111,8 +111,8 @@ final class GatewaySettingsFeatureTests: TestCase {
 	func test_removeNonCurrentGatewayIsConfirmed_removeGateway() async throws {
 		// given
 		let gatewayToBeDeleted = GatewayRow.State(gateway: .enkinet, isSelected: false, canBeDeleted: true)
-		let allGateways: [Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
-		let currentGateway: Gateway = .nebunet
+		let allGateways: [Radix.Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let currentGateway: Radix.Gateway = .nebunet
 
 		var initialState = GatewaySettings.State()
 		initialState.removeGatewayAlert = .init(
@@ -198,7 +198,7 @@ extension URL {
 	public static let previewValue = URL(string: "https://example.com")!
 }
 
-extension Network {
+extension Radix.Network {
 	public static let previewValue = Self(
 		name: "Placeholder",
 		id: .simulator,
@@ -206,7 +206,7 @@ extension Network {
 	)
 }
 
-extension Gateway {
+extension Radix.Gateway {
 	public static let previewValue = Self(
 		network: .previewValue,
 		url: .previewValue

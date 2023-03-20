@@ -31,19 +31,19 @@ public struct AuthorizedDappsClient: Sendable {
 }
 
 extension AuthorizedDappsClient {
-	public typealias GetAuthorizedDapps = @Sendable () async throws -> OnNetwork.AuthorizedDapps
-	public typealias DetailsForAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> OnNetwork.AuthorizedDappDetailed
-	public typealias AddAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
-	public typealias UpdateOrAddAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
-	public typealias ForgetAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
-	public typealias UpdateAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
-	public typealias DeauthorizePersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
+	public typealias GetAuthorizedDapps = @Sendable () async throws -> Profile.Network.AuthorizedDapps
+	public typealias DetailsForAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Profile.Network.AuthorizedDappDetailed
+	public typealias AddAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Void
+	public typealias UpdateOrAddAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Void
+	public typealias ForgetAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp.ID, NetworkID) async throws -> Void
+	public typealias UpdateAuthorizedDapp = @Sendable (Profile.Network.AuthorizedDapp) async throws -> Void
+	public typealias DeauthorizePersonaFromDapp = @Sendable (Profile.Network.Persona.ID, Profile.Network.AuthorizedDapp.ID, NetworkID) async throws -> Void
 }
 
 extension AuthorizedDappsClient {
 	public func getDetailedDapp(
-		_ id: OnNetwork.AuthorizedDapp.ID
-	) async throws -> OnNetwork.AuthorizedDappDetailed {
+		_ id: Profile.Network.AuthorizedDapp.ID
+	) async throws -> Profile.Network.AuthorizedDappDetailed {
 		let dApps = try await getAuthorizedDapps()
 		guard let dApp = dApps[id: id] else {
 			throw AuthorizedDappDoesNotExists()

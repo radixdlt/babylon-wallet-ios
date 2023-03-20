@@ -15,7 +15,7 @@ public struct Home: Sendable, FeatureReducer {
 		// MARK: - Components
 		public var header: Header.State
 		public var accountList: AccountList.State
-		public var accounts: IdentifiedArrayOf<OnNetwork.Account> {
+		public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
 			.init(uniqueElements: accountList.accounts.map(\.account))
 		}
 
@@ -44,7 +44,7 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case accountsLoadedResult(TaskResult<OnNetwork.Accounts>)
+		case accountsLoadedResult(TaskResult<Profile.Network.Accounts>)
 		case gotAppPreferences(AppPreferences)
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case accountPortfoliosResult(TaskResult<IdentifiedArrayOf<AccountPortfolio>>)
@@ -286,7 +286,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	private func refreshAccounts(_ accounts: IdentifiedArrayOf<OnNetwork.Account>) -> EffectTask<Action> {
+	private func refreshAccounts(_ accounts: IdentifiedArrayOf<Profile.Network.Account>) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.accountPortfoliosResult(TaskResult {
 				try await accountPortfolioFetcherClient.fetchPortfolioFor(accounts: accounts)
@@ -314,7 +314,7 @@ public struct Home: Sendable, FeatureReducer {
 		fetchPortfolio(accounts.accounts.map(\.account))
 	}
 
-	private func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account> & Sendable) -> EffectTask<Action> {
+	private func fetchPortfolio(_ accounts: some Collection<Profile.Network.Account> & Sendable) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.accountPortfoliosResult(TaskResult {
 				try await accountPortfolioFetcherClient.fetchPortfolioForAccounts(accounts.map(\.address))

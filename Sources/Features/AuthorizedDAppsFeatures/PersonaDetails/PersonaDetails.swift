@@ -14,18 +14,18 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public let dAppName: String
-		public let dAppID: OnNetwork.AuthorizedDapp.ID
+		public let dAppID: Profile.Network.AuthorizedDapp.ID
 		public let networkID: NetworkID
-		public let persona: OnNetwork.AuthorizedPersonaDetailed
+		public let persona: Profile.Network.AuthorizedPersonaDetailed
 
 		@PresentationState
 		public var confirmForgetAlert: AlertState<ViewAction.ConfirmForgetAlert>? = nil
 
 		public init(
 			dAppName: String,
-			dAppID: OnNetwork.AuthorizedDapp.ID,
+			dAppID: Profile.Network.AuthorizedDapp.ID,
 			networkID: NetworkID,
-			persona: OnNetwork.AuthorizedPersonaDetailed
+			persona: Profile.Network.AuthorizedPersonaDetailed
 		) {
 			self.dAppName = dAppName
 			self.dAppID = dAppID

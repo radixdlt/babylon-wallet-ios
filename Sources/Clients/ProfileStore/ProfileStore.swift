@@ -96,11 +96,11 @@ extension ProfileStore {
 	public var profile: Profile { profileStateSubject.value.profile }
 
 	/// The current network if any
-	public func network() async throws -> OnNetwork {
+	public func network() async throws -> Profile.Network {
 		try profile.onNetwork(id: profile.networkID)
 	}
 
-	public var network: OnNetwork? {
+	public var network: Profile.Network? {
 		profile.network
 	}
 
@@ -110,7 +110,7 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
-	public func accountValues() async -> AnyAsyncSequence<OnNetwork.Accounts> {
+	public func accountValues() async -> AnyAsyncSequence<Profile.Network.Accounts> {
 		lens {
 			$0.profile.network?.accounts
 		}

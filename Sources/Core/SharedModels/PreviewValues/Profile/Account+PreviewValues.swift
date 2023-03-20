@@ -2,7 +2,7 @@
 import Prelude
 import Profile
 
-extension OnNetwork.Account {
+extension Profile.Network.Account {
 	public static let previewValue0: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(

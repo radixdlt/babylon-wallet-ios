@@ -1,8 +1,8 @@
 import EngineToolkitModels
 import Prelude
 
-// MARK: - OnNetwork.NextDerivationIndices
-extension OnNetwork {
+// MARK: - Profile.Network.NextDerivationIndices
+extension Profile.Network {
 	public struct NextDerivationIndices: Sendable, Hashable, Codable, Identifiable {
 		public typealias Index = Int
 
@@ -35,36 +35,36 @@ public struct NextDerivationIndicesPerNetwork:
 	CustomStringConvertible,
 	CustomDumpStringConvertible
 {
-	public internal(set) var perNetwork: IdentifiedArrayOf<OnNetwork.NextDerivationIndices>
+	public internal(set) var networks: IdentifiedArrayOf<Profile.Network.NextDerivationIndices>
 
-	public init(perNetwork: IdentifiedArrayOf<OnNetwork.NextDerivationIndices>) {
-		self.perNetwork = perNetwork
+	public init(networks: IdentifiedArrayOf<Profile.Network.NextDerivationIndices>) {
+		self.networks = networks
 	}
 
-	public init(nextDerivationIndices: OnNetwork.NextDerivationIndices) {
-		self.init(perNetwork: .init(uncheckedUniqueElements: [nextDerivationIndices]))
+	public init(nextDerivationIndices: Profile.Network.NextDerivationIndices) {
+		self.init(networks: .init(uncheckedUniqueElements: [nextDerivationIndices]))
 	}
 
 	public init() {
-		self.init(perNetwork: .init())
+		self.init(networks: .init())
 	}
 }
 
 extension NextDerivationIndicesPerNetwork {
 	public init(from decoder: Decoder) throws {
 		let singleValueContainer = try decoder.singleValueContainer()
-		try self.init(perNetwork: singleValueContainer.decode(IdentifiedArrayOf<OnNetwork.NextDerivationIndices>.self))
+		try self.init(networks: singleValueContainer.decode(IdentifiedArrayOf<Profile.Network.NextDerivationIndices>.self))
 	}
 
 	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
-		try singleValueContainer.encode(self.perNetwork)
+		try singleValueContainer.encode(self.networks)
 	}
 }
 
 extension NextDerivationIndicesPerNetwork {
 	public var _description: String {
-		String(describing: perNetwork)
+		String(describing: networks)
 	}
 
 	public var description: String {
@@ -84,7 +84,7 @@ public struct DeviceStorage: Sendable, Hashable, Codable {
 	}
 }
 
-extension OnNetwork.NextDerivationIndices {
+extension Profile.Network.NextDerivationIndices {
 	public func nextForEntity(kind entityKind: EntityKind) -> Index {
 		switch entityKind {
 		case .identity: return forIdentity
@@ -98,9 +98,9 @@ struct UnknownNetworkForDerivationIndices: Swift.Error {}
 extension NextDerivationIndicesPerNetwork {
 	public func nextForEntity(
 		kind entityKind: EntityKind,
-		networkID: Network.ID
-	) -> OnNetwork.NextDerivationIndices.Index {
-		guard let onNetwork = self.perNetwork[id: networkID] else {
+		networkID: Radix.Network.ID
+	) -> Profile.Network.NextDerivationIndices.Index {
+		guard let onNetwork = self.networks[id: networkID] else {
 			return 0
 		}
 		return onNetwork.nextForEntity(kind: entityKind)
@@ -110,8 +110,8 @@ extension NextDerivationIndicesPerNetwork {
 extension DeviceStorage {
 	public func nextForEntity(
 		kind entityKind: EntityKind,
-		networkID: Network.ID
-	) -> OnNetwork.NextDerivationIndices.Index {
+		networkID: Radix.Network.ID
+	) -> Profile.Network.NextDerivationIndices.Index {
 		self.nextDerivationIndicesPerNetwork.nextForEntity(kind: entityKind, networkID: networkID)
 	}
 }
@@ -156,9 +156,9 @@ extension NextDerivationIndicesPerNetwork {
 		for entityKind: EntityKind,
 		networkID: NetworkID
 	) {
-		guard var onNetwork = self.perNetwork[id: networkID] else {
+		guard var onNetwork = self.networks[id: networkID] else {
 			// first on network
-			self.perNetwork[id: networkID] = .init(
+			self.networks[id: networkID] = .init(
 				networkID: networkID,
 				forAccount: entityKind == .account ? 1 : 0,
 				forIdentity: entityKind == .identity ? 1 : 0
@@ -166,11 +166,11 @@ extension NextDerivationIndicesPerNetwork {
 			return
 		}
 		onNetwork.increaseNextDerivationIndex(for: entityKind)
-		self.perNetwork[id: networkID] = onNetwork
+		self.networks[id: networkID] = onNetwork
 	}
 }
 
-extension OnNetwork.NextDerivationIndices {
+extension Profile.Network.NextDerivationIndices {
 	public mutating func increaseNextDerivationIndex(for entityKind: EntityKind) {
 		switch entityKind {
 		case .account: self.forAccount += 1

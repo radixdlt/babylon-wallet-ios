@@ -12,7 +12,7 @@ extension AuthorizedDapps {
 	}
 
 	public struct ViewState: Equatable {
-		let dApps: OnNetwork.AuthorizedDapps
+		let dApps: Profile.Network.AuthorizedDapps
 	}
 }
 

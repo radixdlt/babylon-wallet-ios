@@ -57,7 +57,7 @@ extension Profile {
 // MARK: - IncorrectEntityType
 public struct IncorrectEntityType: Swift.Error {}
 
-extension OnNetwork {
+extension Profile.Network {
 	public func entity<Entity: EntityProtocol>(
 		address: Entity.EntityAddress
 	) throws -> Entity {

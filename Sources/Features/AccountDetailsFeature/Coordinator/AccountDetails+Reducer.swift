@@ -8,7 +8,7 @@ import NonFungibleTokenListFeature
 
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let account: OnNetwork.Account
+		public let account: Profile.Network.Account
 		public var assets: AssetsView.State
 
 		@PresentationState

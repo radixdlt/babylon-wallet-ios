@@ -6,7 +6,7 @@ import PersonasClient
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var selectedPersona: OnNetwork.Persona? {
+		var selectedPersona: Profile.Network.Persona? {
 			personas.first(where: { $0.isSelected })?.persona
 		}
 
@@ -14,8 +14,8 @@ struct Login: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 
 		var personas: IdentifiedArrayOf<PersonaRow.State> = []
-		var authorizedDapp: OnNetwork.AuthorizedDapp?
-		var authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
+		var authorizedDapp: Profile.Network.AuthorizedDapp?
+		var authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?
 
 		@PresentationState
 		var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
@@ -32,11 +32,11 @@ struct Login: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case createNewPersonaButtonTapped
-		case continueButtonTapped(OnNetwork.Persona)
+		case continueButtonTapped(Profile.Network.Persona)
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<OnNetwork.Persona>, OnNetwork.AuthorizedDapp?, OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?)
+		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>, Profile.Network.AuthorizedDapp?, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -45,7 +45,7 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(OnNetwork.Persona, OnNetwork.AuthorizedDapp?, OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?)
+		case continueButtonTapped(Profile.Network.Persona, Profile.Network.AuthorizedDapp?, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -82,7 +82,7 @@ struct Login: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .personasLoaded(personas, authorizedDapp, authorizedPersonaSimple):
 			state.personas = .init(uniqueElements:
-				personas.map { (persona: OnNetwork.Persona) in
+				personas.map { (persona: Profile.Network.Persona) in
 					let lastLogin: Date? = {
 						guard let authorizedPersonaSimple else { return nil }
 						return persona.address == authorizedPersonaSimple.identityAddress
@@ -129,7 +129,7 @@ struct Login: Sendable, FeatureReducer {
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
 			let authorizedDapp = authorizedDapps[id: dappDefinitionAddress]
-			let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple? = {
+			let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple? = {
 				guard let authorizedDapp else {
 					return nil
 				}

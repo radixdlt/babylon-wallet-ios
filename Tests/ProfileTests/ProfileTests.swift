@@ -7,7 +7,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let gateway = Gateway.nebunet
+	let gateway = Radix.Gateway.nebunet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
@@ -77,7 +77,7 @@ final class ProfileTests: TestCase {
 
 		profile.factorSources.append(olympiaFactorSource)
 
-		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
+		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
 			let index = profile.factorSources.babylonDevice.storage.nextForEntity(
 				kind: .account,
 				networkID: profile.networkID
@@ -97,7 +97,7 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let address = try OnNetwork.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
+			let address = try Profile.Network.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
 
 			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
@@ -105,7 +105,7 @@ final class ProfileTests: TestCase {
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let account = OnNetwork.Account(
+			let account = Profile.Network.Account(
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
@@ -118,7 +118,7 @@ final class ProfileTests: TestCase {
 			return account
 		}
 
-		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<OnNetwork.Persona.Field>) throws -> OnNetwork.Persona {
+		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
 			let index = profile.factorSources.babylonDevice.storage.nextForEntity(kind: .identity, networkID: profile.networkID)
 
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
@@ -136,7 +136,7 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let address = try OnNetwork.Persona.deriveAddress(networkID: networkID, publicKey: publicKey)
+			let address = try Profile.Network.Persona.deriveAddress(networkID: networkID, publicKey: publicKey)
 
 			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
@@ -144,7 +144,7 @@ final class ProfileTests: TestCase {
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let persona = OnNetwork.Persona(
+			let persona = Profile.Network.Persona(
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
@@ -195,7 +195,7 @@ final class ProfileTests: TestCase {
 			)
 		))
 
-		XCTAssertEqual(profile.perNetwork.count, 1)
+		XCTAssertEqual(profile.networks.count, 1)
 		let onNetwork = try profile.onNetwork(id: networkID)
 		XCTAssertEqual(onNetwork.networkID, networkID)
 		XCTAssertEqual(onNetwork.accounts.count, 3)
@@ -250,7 +250,7 @@ final class ProfileTests: TestCase {
 			]), "Should be able to specify more accounts if `atLeast` was specified."
 		)
 
-		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(Profile.Network.Persona.Field.ID()) // add unknown fieldID
 
 		XCTAssertThrowsError(try profile.updateAuthorizedDapp(authorizedDapp))
 
@@ -258,8 +258,8 @@ final class ProfileTests: TestCase {
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		/* Uncomment the lines below to generate a new test vector */
-//		let data = try jsonEncoder.encode(snapshot)
-//		print(String(data: data, encoding: .utf8)!)
+		let data = try jsonEncoder.encode(snapshot)
+		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -276,9 +276,9 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
 		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
-		XCTAssertEqual(profile.perNetwork.count, 1)
+		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id
-		let onNetwork = try profile.perNetwork.onNetwork(id: networkID)
+		let onNetwork = try profile.networks.onNetwork(id: networkID)
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 
 		XCTAssertEqual(onNetwork.accounts[0].networkID, networkID)

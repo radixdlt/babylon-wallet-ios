@@ -8,7 +8,7 @@ struct PersonaAlreadyExists: Swift.Error {}
 // MARK: Add Persona
 extension Profile {
 	public mutating func addPersona(
-		_ persona: OnNetwork.Persona
+		_ persona: Profile.Network.Persona
 	) throws {
 		let networkID = persona.networkID
 		var onNetwork = try onNetwork(id: networkID)

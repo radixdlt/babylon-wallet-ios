@@ -170,7 +170,7 @@ public struct AccountHierarchicalDeterministicDerivationPath:
 	CustomStringConvertible,
 	CustomDumpStringConvertible
 {
-	public typealias Entity = OnNetwork.Account
+	public typealias Entity = Profile.Network.Account
 	public let fullPath: HD.Path.Full
 
 	public init(
