@@ -1,11 +1,5 @@
 import FeaturePrelude
 
-extension TransactionReviewNetworkFee.State {
-	var viewState: TransactionReviewNetworkFee.ViewState {
-		.init()
-	}
-}
-
 // MARK: - TransactionReviewNetworkFee
 public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {

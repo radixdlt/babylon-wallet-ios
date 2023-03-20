@@ -667,8 +667,6 @@ public enum L10n {
   public enum TransactionReview {
     /// Approve
     public static let approveButtonTitle = L10n.tr("Localizable", "transactionReview.approveButtonTitle", fallback: "Approve")
-    /// Customize
-    public static let customizeButtonTitle = L10n.tr("Localizable", "transactionReview.customizeButtonTitle", fallback: "Customize")
     /// Customize Guarantees
     public static let customizeGuaranteesButtonTitle = L10n.tr("Localizable", "transactionReview.customizeGuaranteesButtonTitle", fallback: "Customize Guarantees")
     /// DEPOSITING
@@ -681,10 +679,6 @@ public enum L10n {
     public static let guaranteed = L10n.tr("Localizable", "transactionReview.guaranteed", fallback: "Guaranteed")
     /// MESSAGE
     public static let messageHeading = L10n.tr("Localizable", "transactionReview.messageHeading", fallback: "MESSAGE")
-    /// NETWORK FEE
-    public static let networkFeeHeading = L10n.tr("Localizable", "transactionReview.networkFeeHeading", fallback: "NETWORK FEE")
-    /// The network is currently congested. Add a tip to speed up your transfer.
-    public static let networkFeeText = L10n.tr("Localizable", "transactionReview.networkFeeText", fallback: "The network is currently congested. Add a tip to speed up your transfer.")
     /// PRESENTING
     public static let presentingtingHeading = L10n.tr("Localizable", "transactionReview.presentingtingHeading", fallback: "PRESENTING")
     /// SENDING TO
@@ -695,6 +689,14 @@ public enum L10n {
     public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview.usingDappsHeading", fallback: "Using dApps")
     /// WITHDRAWING
     public static let withdrawingHeading = L10n.tr("Localizable", "transactionReview.withdrawingHeading", fallback: "WITHDRAWING")
+    public enum NetworkFee {
+      /// The network is currently congested. Add a tip to speed up your transfer.
+      public static let congestedText = L10n.tr("Localizable", "transactionReview.networkFee.congestedText", fallback: "The network is currently congested. Add a tip to speed up your transfer.")
+      /// Customize
+      public static let customizeButtonTitle = L10n.tr("Localizable", "transactionReview.networkFee.customizeButtonTitle", fallback: "Customize")
+      /// NETWORK FEE
+      public static let heading = L10n.tr("Localizable", "transactionReview.networkFee.heading", fallback: "NETWORK FEE")
+    }
   }
   public enum TransactionSigning {
     /// Preparing transaction...

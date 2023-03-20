@@ -81,6 +81,7 @@ extension Color.App {
 	public var orange2: Color { .init(hex: .orange2) }
 
 	// alert
+	public var alert: Color { .init(hex: .alert) }
 	public var red1: Color { .init(hex: .red1) }
 
 	public var background: Color { .dynamic(light: .white, dark: .black) }
@@ -148,6 +149,8 @@ extension Color {
 		// orange
 		case orange1 = 0xF2AD21
 		case orange2 = 0xEC633E
+
+		case alert = 0xE59700
 
 		// alert
 		case red1 = 0xC82020
