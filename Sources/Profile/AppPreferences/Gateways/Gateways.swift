@@ -9,21 +9,21 @@ public struct Gateways:
 	CustomDumpReflectable
 {
 	/// Current
-	public private(set) var current: Gateway
+	public private(set) var current: Radix.Gateway
 
 	/// Other, does not contain current, use `all` if you want to get all.
-	public private(set) var other: IdentifiedArrayOf<Gateway>
+	public private(set) var other: IdentifiedArrayOf<Radix.Gateway>
 
 	public init(
-		current: Gateway
+		current: Radix.Gateway
 	) {
 		self.current = current
 		self.other = .init()
 	}
 
 	public init(
-		current: Gateway,
-		other: IdentifiedArrayOf<Gateway>
+		current: Radix.Gateway,
+		other: IdentifiedArrayOf<Radix.Gateway>
 	) throws {
 		guard other[id: current.id] == nil else {
 			throw DiscrepancyOtherShouldNotContainCurrent()
@@ -34,11 +34,11 @@ public struct Gateways:
 }
 
 extension Gateways {
-	public typealias Elements = NonEmpty<IdentifiedArrayOf<Gateway>>
+	public typealias Elements = NonEmpty<IdentifiedArrayOf<Radix.Gateway>>
 
 	/// All gateways
 	public var all: Elements {
-		var elements = IdentifiedArrayOf<Gateway>(uniqueElements: [current])
+		var elements = IdentifiedArrayOf<Radix.Gateway>(uniqueElements: [current])
 		elements.append(contentsOf: other)
 		return .init(rawValue: elements)!
 	}
@@ -52,7 +52,7 @@ extension Gateways {
 	/// * Adds (old)`current` to `other` (throws error if it was already present)
 	/// * Removes `newCurrent` from `other` (if present)
 	/// * Sets `current = newCurrent`
-	fileprivate mutating func changeCurrent(to newCurrent: Gateway) throws {
+	fileprivate mutating func changeCurrent(to newCurrent: Radix.Gateway) throws {
 		guard newCurrent != current else {
 			assert(other[id: current.id] == nil, "Discrepancy, `other` should not contain `current`.")
 			return
@@ -67,30 +67,30 @@ extension Gateways {
 	}
 
 	/// Adds `newOther` to `other` (if indeed new).
-	fileprivate mutating func add(_ newOther: Gateway) {
+	fileprivate mutating func add(_ newOther: Radix.Gateway) {
 		other.append(newOther)
 	}
 
-	fileprivate mutating func remove(_ gateway: Gateway) {
+	fileprivate mutating func remove(_ gateway: Radix.Gateway) {
 		other.remove(gateway)
 	}
 }
 
 extension Profile {
-	/// Requires the presence of an `OnNetwork` in `perNetwork` for
+	/// Requires the presence of an `Profile.Network` in `networks` for
 	/// `newGateway.network.id`, otherwise an error is thrown.
-	public mutating func changeGateway(to newGateway: Gateway) throws {
+	public mutating func changeGateway(to newGateway: Radix.Gateway) throws {
 		let newNetworkID = newGateway.network.id
 		// Ensure we have accounts on network, else do not change
-		_ = try onNetwork(id: newNetworkID)
+		_ = try network(id: newNetworkID)
 		try appPreferences.gateways.changeCurrent(to: newGateway)
 	}
 
-	public mutating func addNewGateway(_ newGateway: Gateway) throws {
+	public mutating func addNewGateway(_ newGateway: Radix.Gateway) throws {
 		appPreferences.gateways.add(newGateway)
 	}
 
-	public mutating func removeGateway(_ gateway: Gateway) throws {
+	public mutating func removeGateway(_ gateway: Radix.Gateway) throws {
 		appPreferences.gateways.remove(gateway)
 	}
 }
@@ -104,7 +104,7 @@ extension Gateways {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let urlOfCurrent = try container.decode(URL.self, forKey: .current)
-		let all = try container.decode(IdentifiedArrayOf<Gateway>.self, forKey: .all)
+		let all = try container.decode(IdentifiedArrayOf<Radix.Gateway>.self, forKey: .all)
 		guard let current = all.first(where: { $0.id == urlOfCurrent }) else {
 			struct DiscrepancyCurrentNotFoundAmongstSavedGateways: Swift.Error {}
 			throw DiscrepancyCurrentNotFoundAmongstSavedGateways()

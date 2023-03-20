@@ -121,7 +121,7 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct NameNewEntity_Previews: PreviewProvider {
 	static var previews: some View {
-		NameNewEntity<OnNetwork.Account>.View(
+		NameNewEntity<Profile.Network.Account>.View(
 			store: .init(
 				initialState: .init(isFirst: true),
 				reducer: NameNewEntity()

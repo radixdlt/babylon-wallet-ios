@@ -5,8 +5,8 @@ import FeatureTestingPrelude
 @MainActor
 final class CreationOfEntityTests: TestCase {
 	func test__WHEN__account_is_created__THEN__it_is_added_to_profile() async throws {
-		let account = OnNetwork.Account.previewValue0
-		let initialState = CreationOfEntity<OnNetwork.Account>.State(
+		let account = Profile.Network.Account.previewValue0
+		let initialState = CreationOfEntity<Profile.Network.Account>.State(
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: account.displayName,
@@ -14,7 +14,7 @@ final class CreationOfEntityTests: TestCase {
 		)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: CreationOfEntity<OnNetwork.Account>()
+			reducer: CreationOfEntity<Profile.Network.Account>()
 		) {
 			$0.accountsClient.createUnsavedVirtualAccount = { request in
 				XCTAssertEqual(request.displayName, account.displayName)
@@ -32,7 +32,7 @@ final class CreationOfEntityTests: TestCase {
 	func test__WHEN__creation_fails__THEN__error_is_propagated() async throws {
 		let errorQueue = ActorIsolated<Set<NSError>>([])
 		let createNewAccountError = NSError.testValue(domain: "Create New Account Request")
-		let initialState = CreationOfEntity<OnNetwork.Account>.State(
+		let initialState = CreationOfEntity<Profile.Network.Account>.State(
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: "NeverCreated",
@@ -40,7 +40,7 @@ final class CreationOfEntityTests: TestCase {
 		)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: CreationOfEntity<OnNetwork.Account>()
+			reducer: CreationOfEntity<Profile.Network.Account>()
 		) {
 			$0.accountsClient.createUnsavedVirtualAccount = { request in
 				XCTAssertEqual(request.displayName, "NeverCreated")

@@ -18,7 +18,7 @@ extension NewEntityCompletion {
 		// Account only
 		struct WhenAccount: Equatable {
 			let accountAddress: AddressView.ViewState
-			let appearanceID: OnNetwork.Account.AppearanceID
+			let appearanceID: Profile.Network.Account.AppearanceID
 		}
 
 		let whenAccount: WhenAccount?
@@ -41,7 +41,7 @@ extension NewEntityCompletion {
 
 			isFirstOnNetwork = state.isFirstOnNetwork
 
-			if let account = state.entity as? OnNetwork.Account {
+			if let account = state.entity as? Profile.Network.Account {
 				self.whenAccount = WhenAccount(
 					accountAddress: .init(address: account.address.address, format: .default),
 					appearanceID: account.appearanceID
@@ -128,7 +128,7 @@ private extension NewEntityCompletion.View {
 
 			Group {
 				ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
-					OnNetwork.Account.AppearanceID.fromIndex(Int(whenAccount.appearanceID.rawValue) + index).gradient.opacity(0.2)
+					Profile.Network.Account.AppearanceID.fromIndex(Int(whenAccount.appearanceID.rawValue) + index).gradient.opacity(0.2)
 						.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
 						.cornerRadius(.small1)
 						.scaleEffect(scale(index: index))
@@ -169,7 +169,7 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct AccountCompletion_Preview: PreviewProvider {
 	static var previews: some View {
-		NewEntityCompletion<OnNetwork.Account>.View(
+		NewEntityCompletion<Profile.Network.Account>.View(
 			store: .init(
 				initialState: .init(
 					entity: .previewValue0,

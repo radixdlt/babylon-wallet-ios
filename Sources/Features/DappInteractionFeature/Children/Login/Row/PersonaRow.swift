@@ -6,12 +6,12 @@ struct PersonaRow: Sendable, FeatureReducer {
 		typealias ID = IdentityAddress
 
 		var id: ID { persona.address }
-		let persona: OnNetwork.Persona
+		let persona: Profile.Network.Persona
 		var isSelected: Bool
 		let lastLogin: Date?
 
 		init(
-			persona: OnNetwork.Persona,
+			persona: Profile.Network.Persona,
 			isSelected: Bool,
 			lastLogin: Date?
 		) {

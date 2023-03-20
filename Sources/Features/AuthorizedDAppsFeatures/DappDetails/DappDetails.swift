@@ -17,7 +17,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApp: OnNetwork.AuthorizedDappDetailed
+		public var dApp: Profile.Network.AuthorizedDappDetailed
 
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
@@ -31,7 +31,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 		public var isDismissed: Bool = false
 
-		public init(dApp: OnNetwork.AuthorizedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
+		public init(dApp: Profile.Network.AuthorizedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
 		}
@@ -45,7 +45,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case copyAddressButtonTapped
 		case fungibleTokenTapped(ComponentAddress)
 		case nonFungibleTokenTapped(ComponentAddress)
-		case personaTapped(OnNetwork.Persona.ID)
+		case personaTapped(Profile.Network.Persona.ID)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
 		case confirmDisconnectAlert(PresentationAction<ConfirmDisconnectAlert>)
@@ -62,7 +62,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
-		case dAppUpdated(OnNetwork.AuthorizedDappDetailed)
+		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 		case dAppForgotten
 	}
 

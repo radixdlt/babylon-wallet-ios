@@ -1,31 +1,37 @@
 import EngineToolkitModels
 import Prelude
 
-// MARK: - Network
-public struct Network:
-	Sendable,
-	Hashable,
-	Codable,
-	Identifiable,
-	CustomStringConvertible,
-	CustomDumpReflectable
-{
-	public let name: Name
-	public let id: NetworkID
-	public let displayDescription: String
+// MARK: - Radix
+/// Just a namespace for Radix entities, e.g. `Radix.Network`
+public enum Radix {}
 
-	public init(
-		name: Name,
-		id: NetworkID,
-		displayDescription: String
-	) {
-		self.name = name
-		self.id = id
-		self.displayDescription = displayDescription
+// MARK: Radix.Network
+extension Radix {
+	public struct Network:
+		Sendable,
+		Hashable,
+		Codable,
+		Identifiable,
+		CustomStringConvertible,
+		CustomDumpReflectable
+	{
+		public let name: Name
+		public let id: NetworkID
+		public let displayDescription: String
+
+		public init(
+			name: Name,
+			id: NetworkID,
+			displayDescription: String
+		) {
+			self.name = name
+			self.id = id
+			self.displayDescription = displayDescription
+		}
 	}
 }
 
-extension Network {
+extension Radix.Network {
 	public typealias Name = Tagged<Self, String>
 
 	public static let nebunet = Self(
@@ -50,8 +56,8 @@ extension Network {
 	)
 }
 
-extension Network {
-	fileprivate static let lookupSet: Set<Network> = [
+extension Radix.Network {
+	fileprivate static let lookupSet: Set<Self> = [
 		.nebunet,
 		.hammunet,
 		.enkinet,
@@ -59,7 +65,7 @@ extension Network {
 	]
 }
 
-extension Network {
+extension Radix.Network {
 	public static func lookupBy(name rawValue: Name.RawValue) throws -> Self {
 		guard let network = lookupSet.first(where: { $0.name.rawValue == rawValue }) else {
 			throw UnknownNetwork(description: "No network found with name: '\(rawValue)'")
@@ -84,7 +90,7 @@ struct UnknownNetwork: Swift.Error, CustomStringConvertible {
 	let description: String
 }
 
-extension Network {
+extension Radix.Network {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

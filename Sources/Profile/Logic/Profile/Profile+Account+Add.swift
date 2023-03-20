@@ -8,10 +8,10 @@ struct PersonaNotConnected: Swift.Error {}
 // MARK: - AccountAlreadyExists
 struct AccountAlreadyExists: Swift.Error {}
 
-extension OnNetwork.Accounts {
+extension Profile.Network.Accounts {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult
-	public mutating func appendAccount(_ account: OnNetwork.Account) -> OnNetwork.Account {
+	public mutating func appendAccount(_ account: Profile.Network.Account) -> Profile.Network.Account {
 		var orderedSet = self.rawValue
 		orderedSet.append(account)
 		self = .init(rawValue: orderedSet)!
@@ -23,26 +23,26 @@ extension OnNetwork.Accounts {
 extension Profile {
 	/// Saves an `Account` into the profile
 	public mutating func addAccount(
-		_ account: OnNetwork.Account
+		_ account: Profile.Network.Account
 	) throws {
 		let networkID = account.networkID
 		// can be nil if this is a new network
-		let maybeNetwork = try? onNetwork(id: networkID)
+		let maybeNetwork = try? network(id: networkID)
 
-		if var onNetwork = maybeNetwork {
-			guard !onNetwork.accounts.contains(where: { $0 == account }) else {
+		if var network = maybeNetwork {
+			guard !network.accounts.contains(where: { $0 == account }) else {
 				throw AccountAlreadyExists()
 			}
-			onNetwork.accounts.appendAccount(account)
-			try updateOnNetwork(onNetwork)
+			network.accounts.appendAccount(account)
+			try updateOnNetwork(network)
 		} else {
-			let onNetwork = OnNetwork(
+			let network = Profile.Network(
 				networkID: networkID,
 				accounts: .init(rawValue: .init(uniqueElements: [account]))!,
 				personas: [],
 				authorizedDapps: []
 			)
-			try perNetwork.add(onNetwork)
+			try networks.add(network)
 		}
 
 		switch account.securityState {

@@ -18,7 +18,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case persona(
-			id: OnNetwork.Persona.ID,
+			id: Profile.Network.Persona.ID,
 			action: Persona.Action
 		)
 	}

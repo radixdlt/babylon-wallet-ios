@@ -29,7 +29,7 @@ public struct IdentityHierarchicalDeterministicDerivationPath:
 	CustomStringConvertible,
 	CustomDumpStringConvertible
 {
-	public typealias Entity = OnNetwork.Persona
+	public typealias Entity = Profile.Network.Persona
 	public let fullPath: HD.Path.Full
 
 	public init(

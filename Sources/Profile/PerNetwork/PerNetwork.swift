@@ -1,34 +1,36 @@
 import EngineToolkitModels
 import Prelude
 
-// MARK: - PerNetwork
-/// An ordered dictionary mapping from a `Network` to an `OnNetwork`, which is a
-/// collection of accounts, personas and connected dapps.
-public struct PerNetwork:
-	Sendable,
-	Hashable,
-	Codable,
-	CustomStringConvertible,
-	CustomDumpStringConvertible,
-	ExpressibleByDictionaryLiteral
-{
-	/// An ordered dictionary mapping from a `Network` to an `OnNetwork`, which is a
+// MARK: - Profile.Networks
+extension Profile {
+	/// An ordered dictionary mapping from a `Network` to an `Profile.Network`, which is a
 	/// collection of accounts, personas and connected dapps.
-	public internal(set) var dictionary: OrderedDictionary<NetworkID, OnNetwork>
+	public struct Networks:
+		Sendable,
+		Hashable,
+		Codable,
+		CustomStringConvertible,
+		CustomDumpStringConvertible,
+		ExpressibleByDictionaryLiteral
+	{
+		/// An ordered dictionary mapping from a `Network` to an `Profile.Network`, which is a
+		/// collection of accounts, personas and connected dapps.
+		public internal(set) var dictionary: OrderedDictionary<NetworkID, Profile.Network>
 
-	public init(dictionary: OrderedDictionary<NetworkID, OnNetwork>) {
-		self.dictionary = dictionary
-	}
+		public init(dictionary: OrderedDictionary<NetworkID, Profile.Network>) {
+			self.dictionary = dictionary
+		}
 
-	public init(onNetwork: OnNetwork) {
-		self.init(dictionary: [onNetwork.networkID: onNetwork])
+		public init(network: Profile.Network) {
+			self.init(dictionary: [network.networkID: network])
+		}
 	}
 }
 
-extension PerNetwork {
+extension Profile.Networks {
 	public typealias Key = NetworkID
 
-	public typealias Value = OnNetwork
+	public typealias Value = Profile.Network
 
 	public init(dictionaryLiteral elements: (Key, Value)...) {
 		self.init(dictionary: .init(uniqueKeysWithValues: elements))
@@ -42,11 +44,11 @@ extension PerNetwork {
 		dictionary.keys
 	}
 
-	public func onNetwork(id needle: NetworkID) throws -> OnNetwork {
-		guard let onNetwork = dictionary[needle] else {
+	public func network(id needle: NetworkID) throws -> Profile.Network {
+		guard let network = dictionary[needle] else {
 			throw Error.unknownNetworkWithID(needle)
 		}
-		return onNetwork
+		return network
 	}
 
 	public enum Error:
@@ -60,24 +62,24 @@ extension PerNetwork {
 		case networkAlreadyExistsWithID(NetworkID)
 	}
 
-	public mutating func update(_ onNetwork: OnNetwork) throws {
-		guard dictionary.contains(where: { $0.key == onNetwork.networkID }) else {
-			throw Error.unknownNetworkWithID(onNetwork.networkID)
+	public mutating func update(_ network: Profile.Network) throws {
+		guard dictionary.contains(where: { $0.key == network.networkID }) else {
+			throw Error.unknownNetworkWithID(network.networkID)
 		}
-		let updatedElement = dictionary.updateValue(onNetwork, forKey: onNetwork.networkID)
+		let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
 		assert(updatedElement != nil)
 	}
 
-	public mutating func add(_ onNetwork: OnNetwork) throws {
-		guard !dictionary.contains(where: { $0.key == onNetwork.networkID }) else {
-			throw Error.networkAlreadyExistsWithID(onNetwork.networkID)
+	public mutating func add(_ network: Profile.Network) throws {
+		guard !dictionary.contains(where: { $0.key == network.networkID }) else {
+			throw Error.networkAlreadyExistsWithID(network.networkID)
 		}
-		let updatedElement = dictionary.updateValue(onNetwork, forKey: onNetwork.networkID)
+		let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
 		assert(updatedElement == nil)
 	}
 }
 
-extension PerNetwork.Error {
+extension Profile.Networks.Error {
 	public var customDumpDescription: String {
 		_description
 	}
@@ -88,16 +90,16 @@ extension PerNetwork.Error {
 
 	public var _description: String {
 		switch self {
-		case let .unknownNetworkWithID(id): return "PerNetwork.Error.unknownNetworkWithID(\(id))"
-		case let .networkAlreadyExistsWithID(id): return "PerNetwork.Error.networkAlreadyExistsWithID(\(id))"
+		case let .unknownNetworkWithID(id): return "Profile.Networks.Error.unknownNetworkWithID(\(id))"
+		case let .networkAlreadyExistsWithID(id): return "Profile.Networks.Error.networkAlreadyExistsWithID(\(id))"
 		}
 	}
 }
 
-extension PerNetwork {
+extension Profile.Networks {
 	public init(from decoder: Decoder) throws {
 		let singleValueContainer = try decoder.singleValueContainer()
-		let array = try singleValueContainer.decode([OnNetwork].self)
+		let array = try singleValueContainer.decode([Profile.Network].self)
 		self.init(dictionary: .init(uniqueKeysWithValues: array.map { element in
 			(key: element.networkID, value: element)
 		}))
@@ -105,12 +107,12 @@ extension PerNetwork {
 
 	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
-		let onNetworkArray = [OnNetwork](self.dictionary.values)
-		try singleValueContainer.encode(onNetworkArray)
+		let networkArray = [Profile.Network](self.dictionary.values)
+		try singleValueContainer.encode(networkArray)
 	}
 }
 
-extension PerNetwork {
+extension Profile.Networks {
 	public var _description: String {
 		String(describing: dictionary)
 	}

@@ -13,12 +13,12 @@ extension P2P.ToDapp {
 	public struct WalletAccount: Sendable, Hashable, Encodable {
 		public let address: String
 		public let label: NonEmpty<String>
-		public let appearanceId: OnNetwork.Account.AppearanceID
+		public let appearanceId: Profile.Network.Account.AppearanceID
 
 		public init(
 			accountAddress: AccountAddress,
 			label: NonEmpty<String>,
-			appearanceId: OnNetwork.Account.AppearanceID
+			appearanceId: Profile.Network.Account.AppearanceID
 		) {
 			address = accountAddress.address
 			self.label = label
@@ -45,7 +45,7 @@ extension P2P.ToDapp {
 }
 
 extension P2P.ToDapp.WalletAccount {
-	public init(account: OnNetwork.Account) {
+	public init(account: Profile.Network.Account) {
 		self.init(
 			accountAddress: account.address,
 			label: account.displayName,

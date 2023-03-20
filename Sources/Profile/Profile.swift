@@ -11,7 +11,7 @@ extension ProfileSnapshot.Version {
 	/// - 10: Temp switch default network to Hammunet as RC for Betanet v2
 	/// - 11: Switch back default network to Nebunet before Betanet v2 release.
 	/// - 12: Added `"id"`
-	/// - 13: Reverted unintentially change of `"perNetwork"`
+	/// - 13: Reverted unintentially change of `"networks"`
 	/// - 14: Reverted `Engine.PublicKey` -> `SLIP10.PublicKey` for entities.
 	/// - 15: Add `"creatingDevice"` property
 	/// - 16: Add `"gateways"` replacing `"networkAndGateway"`
@@ -20,7 +20,8 @@ extension ProfileSnapshot.Version {
 	/// - 19: Add `security` to `appPreferences` (iCloud sync)
 	/// - 20: Add `storage` for `device` FactorSource (`nextDerivationIndices`), remove `index`
 	/// - 21: Rename `P2PClient` to `P2PLink`.
-	public static let minimum: Self = 21
+	/// - 22: Rename `perNetwork` to `networks`
+	public static let minimum: Self = 22
 }
 
 // MARK: - Profile
@@ -61,7 +62,7 @@ public struct Profile:
 	public var appPreferences: AppPreferences
 
 	/// Effectivly **per network**: a list of accounts, personas and connected dApps.
-	public var perNetwork: PerNetwork
+	public var networks: Networks
 
 	public init(
 		version: ProfileSnapshot.Version = .minimum,
@@ -69,14 +70,14 @@ public struct Profile:
 		creatingDevice: NonEmptyString,
 		factorSources: FactorSources,
 		appPreferences: AppPreferences,
-		perNetwork: PerNetwork
+		networks: Networks
 	) {
 		self.version = version
 		self.id = id
 		self.creatingDevice = creatingDevice
 		self.factorSources = factorSources
 		self.appPreferences = appPreferences
-		self.perNetwork = perNetwork
+		self.networks = networks
 	}
 
 	public init(
@@ -89,7 +90,7 @@ public struct Profile:
 			creatingDevice: creatingDevice,
 			factorSources: .init(factorSource),
 			appPreferences: .default,
-			perNetwork: .init()
+			networks: .init()
 		)
 	}
 }
@@ -108,7 +109,7 @@ extension Profile {
 				"version": version,
 				"factorSources": factorSources,
 				"appPreferences": appPreferences,
-				"perNetwork": perNetwork,
+				"networks": networks,
 			],
 			displayStyle: .struct
 		)
@@ -119,7 +120,7 @@ extension Profile {
 		"version", \(version),
 		"factorSources": \(factorSources),
 		"appPreferences": \(appPreferences),
-		"perNetwork": \(perNetwork)
+		"networks": \(networks)
 		"""
 	}
 }

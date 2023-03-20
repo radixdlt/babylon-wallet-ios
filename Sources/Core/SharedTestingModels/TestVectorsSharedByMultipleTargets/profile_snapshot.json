@@ -9,9 +9,9 @@
       "saved" : [
         {
           "network" : {
+            "displayDescription" : "Radix Public Network",
             "id" : 11,
-            "name" : "nebunet",
-			"displayDescription": "Radix Public Network",
+            "name" : "nebunet"
           },
           "url" : "https://betanet.radixdlt.com"
         }
@@ -20,54 +20,11 @@
     "p2pLinks" : [
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
-        "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-03-07T10:48:21Z",
-        "lastUsedOn" : "2023-03-07T10:48:21Z",
-        "platform" : "browser"
+        "displayName" : "Brave browser on Mac Studio"
       },
       {
         "connectionPassword" : "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef",
-        "connectorConfig" : {
-          "connectionStatusesTriggeringReconnect" : [
-            "failed",
-            "closed"
-          ],
-          "establishConnectionTimeout" : 10,
-          "reconnectRetryDelay" : 3,
-          "retryAttempts" : 3
-        },
-        "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-03-07T10:48:21Z",
-        "lastUsedOn" : "2023-03-07T10:48:21Z",
-        "platform" : "iPhone",
-        "signalingServerConfig" : {
-          "signalingServerBaseURL" : "custom.signal.com",
-          "websocketPingInterval" : 55
-        },
-        "webRTCConfig" : {
-          "dataChannelConfig" : {
-            "dataChannelLabelledID" : {
-              "channelId" : 0,
-              "channelLabel" : "data"
-            },
-            "isNegotiated" : true,
-            "isOrdered" : true,
-            "maxPacketLifeTime" : -1,
-            "maxRetransmits" : -1
-          },
-          "peerConnectionConfig" : {
-            "continualGatheringPolicy" : "gatherContinually",
-            "iceServerConfigs" : [
-              {
-                "url" : "example.com"
-              },
-              {
-                "url" : "anotherexample.com"
-              }
-            ],
-            "sdpSemantics" : "unifiedPlan"
-          }
-        }
+        "displayName" : "iPhone 13"
       }
     ],
     "security" : {
@@ -77,11 +34,11 @@
   "creatingDevice" : "computerRunningUnitTest",
   "factorSources" : [
     {
-      "addedOn" : "2023-03-07T10:48:21Z",
+      "addedOn" : "1970-01-01T00:00:00Z",
       "hint" : "computerRunningUnitTest",
       "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-07T10:48:21Z",
+      "lastUsedOn" : "1970-01-01T00:00:00Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519"
@@ -104,11 +61,11 @@
       }
     },
     {
-      "addedOn" : "2023-03-07T10:48:21Z",
+      "addedOn" : "1970-01-01T00:00:00Z",
       "hint" : "computerRunningUnitTest",
       "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
       "kind" : "device",
-      "lastUsedOn" : "2023-03-07T10:48:21Z",
+      "lastUsedOn" : "1970-01-01T00:00:00Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519",
@@ -130,7 +87,7 @@
     }
   ],
   "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
-  "perNetwork" : [
+  "networks" : [
     {
       "accounts" : [
         {
@@ -208,8 +165,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "8262CDF8-306D-43DF-90A5-32BCE03C9AED",
-                "84F2DC0C-EB4C-4A12-8E7A-946C69EB0155"
+                "304E7416-B1BC-4BED-AFAB-5BB2ABD7FB91",
+                "F472AAAA-A8A2-448B-B3A4-2D85BB5F075C"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -226,8 +183,8 @@
             },
             {
               "fieldIDs" : [
-                "06D4FDBA-AECE-44D3-930A-A90040AC8231",
-                "C32A67AF-4E55-4E14-992C-BD6C6F8408BA"
+                "D7246130-5FB4-4320-B988-3D552250785C",
+                "48E60F3A-F1B9-464F-98FE-2944910F4CDA"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -251,12 +208,12 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "8262CDF8-306D-43DF-90A5-32BCE03C9AED",
+              "id" : "304E7416-B1BC-4BED-AFAB-5BB2ABD7FB91",
               "kind" : "givenName",
               "value" : "Jane"
             },
             {
-              "id" : "84F2DC0C-EB4C-4A12-8E7A-946C69EB0155",
+              "id" : "F472AAAA-A8A2-448B-B3A4-2D85BB5F075C",
               "kind" : "familyName",
               "value" : "Incognitoson"
             }
@@ -284,12 +241,12 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "06D4FDBA-AECE-44D3-930A-A90040AC8231",
+              "id" : "D7246130-5FB4-4320-B988-3D552250785C",
               "kind" : "givenName",
               "value" : "Maria"
             },
             {
-              "id" : "C32A67AF-4E55-4E14-992C-BD6C6F8408BA",
+              "id" : "48E60F3A-F1B9-464F-98FE-2944910F4CDA",
               "kind" : "familyName",
               "value" : "Publicson"
             }
@@ -315,5 +272,5 @@
       ]
     }
   ],
-  "version" : 21
+  "version" : 22
 }

@@ -3,8 +3,8 @@ import EngineToolkit
 import EngineToolkitModels
 import Prelude
 
-// MARK: - OnNetwork.Account
-extension OnNetwork {
+// MARK: - Profile.Network.Account
+extension Profile.Network {
 	/// A network unique account with a unique public address and a set of cryptographic
 	/// factors used to control it. The account is either `virtual` or not. By "virtual"
 	/// we mean that the Radix Public Ledger does not yet know of the public address
@@ -53,7 +53,7 @@ extension OnNetwork {
 	}
 }
 
-extension OnNetwork.Account {
+extension Profile.Network.Account {
 	public static func deriveAddress(
 		networkID: NetworkID,
 		publicKey: SLIP10.PublicKey
@@ -69,7 +69,7 @@ extension OnNetwork.Account {
 	}
 }
 
-extension OnNetwork.Account {
+extension Profile.Network.Account {
 	public static var entityKind: EntityKind { .account }
 
 	public typealias EntityAddress = AccountAddress
@@ -81,7 +81,7 @@ extension OnNetwork.Account {
 	public var id: ID { address }
 }
 
-extension OnNetwork.Account {
+extension Profile.Network.Account {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

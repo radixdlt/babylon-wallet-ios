@@ -146,7 +146,7 @@ extension PersonaDetails.View {
 	struct AccountSection: View {
 		struct ViewState: Equatable {
 			let dAppName: String
-			let sharingAccounts: OrderedSet<OnNetwork.AccountForDisplay>
+			let sharingAccounts: OrderedSet<Profile.Network.AccountForDisplay>
 		}
 
 		let store: StoreOf<PersonaDetails>
@@ -192,8 +192,8 @@ private extension PersonaDetails.State {
 
 // MARK: Extensions
 
-extension IdentifiedArrayOf<OnNetwork.Persona.Field> {
-	subscript(kind kind: OnNetwork.Persona.Field.Kind) -> String? {
+extension IdentifiedArrayOf<Profile.Network.Persona.Field> {
+	subscript(kind kind: Profile.Network.Persona.Field.Kind) -> String? {
 		first { $0.kind == kind }?.value.rawValue
 	}
 }

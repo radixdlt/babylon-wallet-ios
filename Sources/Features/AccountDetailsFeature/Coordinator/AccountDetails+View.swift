@@ -16,7 +16,7 @@ extension AccountDetails.State {
 // MARK: - AccountDetails.View
 extension AccountDetails {
 	public struct ViewState: Equatable {
-		let appearanceID: OnNetwork.Account.AppearanceID
+		let appearanceID: Profile.Network.Account.AppearanceID
 		let address: AddressView.ViewState
 		let displayName: String
 	}

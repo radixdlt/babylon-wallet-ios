@@ -95,7 +95,7 @@ public struct ProfileSnapshot:
 	public let appPreferences: AppPreferences
 
 	/// Effectivly **per network**: a list of accounts, personas and connected dApps.
-	public let perNetwork: PerNetwork
+	public let networks: Profile.Networks
 
 	fileprivate init(
 		profile: Profile
@@ -104,7 +104,7 @@ public struct ProfileSnapshot:
 		self.id = profile.id
 		self.creatingDevice = profile.creatingDevice
 		self.appPreferences = profile.appPreferences
-		self.perNetwork = profile.perNetwork
+		self.networks = profile.networks
 		self.factorSources = profile.factorSources
 	}
 }
@@ -128,7 +128,7 @@ extension Profile {
 			creatingDevice: snapshot.creatingDevice,
 			factorSources: snapshot.factorSources,
 			appPreferences: snapshot.appPreferences,
-			perNetwork: snapshot.perNetwork
+			networks: snapshot.networks
 		)
 	}
 }
@@ -143,7 +143,7 @@ extension ProfileSnapshot {
 				"creatingDevice": creatingDevice,
 				"factorSources": factorSources,
 				"appPreferences": appPreferences,
-				"perNetwork": perNetwork,
+				"networks": networks,
 			],
 			displayStyle: .struct
 		)
@@ -156,7 +156,7 @@ extension ProfileSnapshot {
 		creatingDevice: \(creatingDevice),
 		id: \(id),
 		appPreferences: \(appPreferences),
-		perNetwork: \(perNetwork),
+		networks: \(networks),
 		"""
 	}
 }

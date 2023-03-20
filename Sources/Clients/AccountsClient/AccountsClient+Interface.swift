@@ -44,15 +44,15 @@ public struct AccountsClient: Sendable {
 }
 
 extension AccountsClient {
-	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> OnNetwork.Accounts
-	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> OnNetwork.Accounts
+	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Accounts
+	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Profile.Network.Accounts
 
-	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<OnNetwork.Accounts>
+	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
 
-	public typealias CreateUnsavedVirtualAccount = @Sendable (CreateVirtualEntityRequest) async throws -> OnNetwork.Account
-	public typealias SaveVirtualAccount = @Sendable (OnNetwork.Account) async throws -> Void
+	public typealias CreateUnsavedVirtualAccount = @Sendable (CreateVirtualEntityRequest) async throws -> Profile.Network.Account
+	public typealias SaveVirtualAccount = @Sendable (Profile.Network.Account) async throws -> Void
 
-	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
+	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 }

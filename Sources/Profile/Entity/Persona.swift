@@ -1,8 +1,8 @@
 import EngineToolkitModels
 import Prelude
 
-// MARK: - OnNetwork.Persona
-extension OnNetwork {
+// MARK: - Profile.Network.Persona
+extension Profile.Network {
 	/// A network unique account with a unique public address and a set of cryptographic
 	/// factors used to control it. The account is either `virtual` or not. By "virtual"
 	/// we mean that the Radix Public Ledger does not yet know of the public address
@@ -49,7 +49,7 @@ extension OnNetwork {
 	}
 }
 
-extension OnNetwork.Persona {
+extension Profile.Network.Persona {
 	public static var entityKind: EntityKind { .identity }
 
 	public typealias EntityAddress = IdentityAddress
@@ -61,7 +61,7 @@ extension OnNetwork.Persona {
 	public var id: ID { address }
 }
 
-extension OnNetwork.Persona {
+extension Profile.Network.Persona {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,
@@ -85,8 +85,8 @@ extension OnNetwork.Persona {
 	}
 }
 
-// MARK: - OnNetwork.Persona.Field
-extension OnNetwork.Persona {
+// MARK: - Profile.Network.Persona.Field
+extension Profile.Network.Persona {
 	/// A field containing personal informations
 	public struct Field:
 		Sendable,
@@ -117,7 +117,7 @@ extension OnNetwork.Persona {
 
 import Cryptography
 import EngineToolkit
-extension OnNetwork.Persona {
+extension Profile.Network.Persona {
 	public static func deriveAddress(
 		networkID: NetworkID,
 		publicKey: SLIP10.PublicKey
@@ -133,7 +133,7 @@ extension OnNetwork.Persona {
 	}
 }
 
-extension OnNetwork.Persona.Field {
+extension Profile.Network.Persona.Field {
 	public typealias ID = UUID
 	public typealias Value = NonEmpty<String>
 
@@ -152,7 +152,7 @@ extension OnNetwork.Persona.Field {
 	}
 }
 
-extension OnNetwork.Persona.Field {
+extension Profile.Network.Persona.Field {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

@@ -28,7 +28,7 @@ extension DependencyValues {
 public struct SignManifestRequest: Sendable {
 	public let manifestToSign: TransactionManifest
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<OnNetwork.Account>>) async -> OnNetwork.Account
+	public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<Profile.Network.Account>>) async -> Profile.Network.Account
 	public let selectNotary: SelectNotary
 
 	public init(

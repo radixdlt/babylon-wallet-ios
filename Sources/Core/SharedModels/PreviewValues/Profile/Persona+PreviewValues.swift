@@ -2,7 +2,7 @@
 import Prelude
 import Profile
 
-extension OnNetwork.Persona {
+extension Profile.Network.Persona {
 	public static let previewValue0: Self = {
 		try! Self(
 			networkID: .nebunet,

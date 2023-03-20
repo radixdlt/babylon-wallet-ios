@@ -22,7 +22,7 @@ public struct GatewayList: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case removeGateway(GatewayRow.State)
-		case switchToGateway(Gateway)
+		case switchToGateway(Radix.Gateway)
 	}
 
 	public init() {}
