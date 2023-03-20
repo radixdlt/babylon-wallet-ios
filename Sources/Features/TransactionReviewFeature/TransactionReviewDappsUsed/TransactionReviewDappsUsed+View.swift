@@ -1,39 +1,31 @@
 import FeaturePrelude
 
-// extension TransactionReviewDappsUsed.State {
-//	var viewState: TransactionReviewDappsUsed.ViewState {
-//		.init()
-//	}
-// }
-
 // MARK: - TransactionReviewDappsUsed.View
 extension TransactionReviewDappsUsed {
-//	struct ViewState: Equatable {
-//		// TODO: declare some properties
-//	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewDappsUsed>
+		let isExpanded: Bool
 
-		public init(store: StoreOf<TransactionReviewDappsUsed>) {
+		public init(store: StoreOf<TransactionReviewDappsUsed>, isExpanded: Bool) {
 			self.store = store
+			self.isExpanded = isExpanded
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.dApps, send: { .view($0) }) { viewStore in
 				VStack(alignment: .trailing, spacing: .medium2) {
 					Button {
 						viewStore.send(.expandTapped)
 					} label: {
-						HeadingLabel(isExpanded: viewStore.isExpanded)
+						HeadingLabel(isExpanded: isExpanded)
 					}
 					.background(.app.gray5)
 					.padding(.trailing, .medium3)
 
-					if viewStore.isExpanded {
+					if isExpanded {
 						VStack(spacing: .small2) {
-							ForEach(viewStore.dApps) { dApp in
+							ForEach(viewStore.state) { dApp in
 								Button {
 									viewStore.send(.dappTapped(dApp.id))
 								} label: {
@@ -44,7 +36,7 @@ extension TransactionReviewDappsUsed {
 						.background(.app.gray5)
 					}
 				}
-				.animation(.easeInOut, value: viewStore.isExpanded)
+				.animation(.easeInOut, value: isExpanded)
 			}
 		}
 
