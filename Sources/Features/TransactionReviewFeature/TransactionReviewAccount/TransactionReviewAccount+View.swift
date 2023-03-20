@@ -10,7 +10,7 @@ extension TransactionReviewAccount.State {
 			             details: details,
 			             showApprovedMark: false)
 		case let .external(accountAddress, approved):
-			return .init(label: "Account", // TODO:  Localise
+			return .init(label: L10n.TransactionReview.externalAccountName,
 			             address: accountAddress.address,
 			             gradient: .init(colors: [.app.gray2]),
 			             details: details,
@@ -132,18 +132,18 @@ public struct TransactionDetailsView: View {
 				VStack(alignment: .trailing, spacing: 0) {
 					HStack(spacing: .small2) {
 						if guaranteedAmount != nil {
-							Text("Estimated") // TODO:  string
+							Text(L10n.TransactionReview.estimated)
 								.textStyle(.body2Regular) // TODO:  unknown textStyle
 								.foregroundColor(.app.gray1)
 						}
-						//					Text(amount.formatted(.number))
+						// Text(amount.formatted(.number))
 						Text(amount.description)
 							.textStyle(.secondaryHeader)
 					}
 					.foregroundColor(.app.gray1)
 
 					if let dollarAmount {
-						//					Text(dollarAmount.formatted(.currency(code: "USD")))
+						// Text(dollarAmount.formatted(.currency(code: "USD")))
 						Text(dollarAmount.description)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)
@@ -152,7 +152,7 @@ public struct TransactionDetailsView: View {
 
 					if let guaranteedAmount {
 						//					Text("Guaranteed **\(guaranteedAmount.formatted(.number))**")
-						Text("Guaranteed **\(guaranteedAmount.description)**")
+						Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.description)**")
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray2)
 							.padding(.top, .small1)
@@ -164,23 +164,3 @@ public struct TransactionDetailsView: View {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - TransactionReviewAccount_Preview
-// struct TransactionReviewAccount_Preview: PreviewProvider {
-//	static var previews: some View {
-//		TransactionReviewAccount.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: TransactionReviewAccount()
-//			)
-//		)
-//	}
-// }
-//
-// extension TransactionReviewAccount.State {
-//	public static let previewValue = Self()
-// }
-// #endif
