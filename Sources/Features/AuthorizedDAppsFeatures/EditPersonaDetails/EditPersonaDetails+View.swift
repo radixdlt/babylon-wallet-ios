@@ -47,7 +47,7 @@ extension EditPersonaDetails {
 				viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
 					AppTextField(
-						heading: L10n.PersonaDetails.personaLabelHeading,
+						primaryHeading: L10n.PersonaDetails.personaLabelHeading,
 						placeholder: "",
 						text: viewStore.validation(
 							get: \.$personaLabel,
@@ -65,7 +65,7 @@ extension EditPersonaDetails {
 					Separator()
 
 					AppTextField(
-						heading: L10n.PersonaDetails.givenNameHeading,
+						primaryHeading: L10n.PersonaDetails.givenNameHeading,
 						placeholder: "",
 						text: viewStore.validation(
 							get: \.$givenName,
@@ -84,7 +84,7 @@ extension EditPersonaDetails {
 					#endif // iOS
 
 					AppTextField(
-						heading: L10n.PersonaDetails.familyNameHeading,
+						primaryHeading: L10n.PersonaDetails.familyNameHeading,
 						placeholder: "",
 						text: viewStore.validation(
 							get: \.$familyName,
