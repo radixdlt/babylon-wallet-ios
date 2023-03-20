@@ -72,6 +72,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "AuthorizedDAppsFeatures",
+		dependencies: [
+			"GatewayAPI",
+			"AuthorizedDappsClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
 			"AccountsClient",
@@ -82,14 +90,6 @@ package.addModules([
 			"PersonasClient",
 		],
 		tests: .yes()
-	),
-	.feature(
-		name: "AuthorizedDAppsFeatures",
-		dependencies: [
-			"GatewayAPI",
-			"AuthorizedDappsClient",
-		],
-		tests: .no
 	),
 	.feature(
 		name: "DappInteractionFeature",
