@@ -5,6 +5,7 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
 	let shouldExpand: Bool
 	let isDestructive: Bool
+	let isInToolbar: Bool
 	let image: Image?
 
 	public func makeBody(configuration: Configuration) -> some View {
@@ -15,11 +16,11 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 			}
 			.foregroundColor(foregroundColor)
 			.font(.app.body1Header)
-			.frame(height: .standardButtonHeight)
+			.frame(height: isInToolbar ? .toolbatButtonHeight : .standardButtonHeight)
 			.frame(maxWidth: shouldExpand ? .infinity : nil)
-			.padding(.horizontal, .medium1)
-			.background(Color.app.gray4)
-			.cornerRadius(.small2)
+			.padding(.horizontal, isInToolbar ? .small1 : .medium1)
+			.background(.app.gray4)
+			.cornerRadius(isInToolbar ? .small3 : .small2)
 			.brightness(configuration.isPressed ? -0.1 : 0)
 
 			if shouldShowSpinner {
@@ -53,11 +54,13 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 	public static func secondaryRectangular(
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
+		isInToolbar: Bool = false,
 		image: Image? = nil
 	) -> Self {
 		Self(
 			shouldExpand: shouldExpand,
 			isDestructive: isDestructive,
+			isInToolbar: isInToolbar,
 			image: image
 		)
 	}
