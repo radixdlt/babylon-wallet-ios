@@ -33,9 +33,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
-		var persona: OnNetwork.Persona?
-		var authorizedDapp: OnNetwork.AuthorizedDapp?
-		var authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
+		var persona: Profile.Network.Persona?
+		var authorizedDapp: Profile.Network.AuthorizedDapp?
+		var authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?
 
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
@@ -111,9 +111,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case usePersona(
 			P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem,
-			OnNetwork.Persona,
-			OnNetwork.AuthorizedDapp,
-			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple
+			Profile.Network.Persona,
+			Profile.Network.AuthorizedDapp,
+			Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
@@ -121,7 +121,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
-				var accounts: [OnNetwork.Account]
+				var accounts: [Profile.Network.Account]
 				var numberOfAccountsRequested: DappInteraction.NumberOfAccounts
 			}
 
@@ -287,9 +287,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		func handleLogin(
 			_ item: State.AnyInteractionItem,
-			_ persona: OnNetwork.Persona,
-			_ authorizedDapp: OnNetwork.AuthorizedDapp?,
-			_ authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
+			_ persona: Profile.Network.Persona,
+			_ authorizedDapp: Profile.Network.AuthorizedDapp?,
+			_ authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?
 		) -> EffectTask<Action> {
 			state.persona = persona
 			state.authorizedDapp = authorizedDapp
@@ -316,7 +316,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		func handleAccounts(
 			_ item: State.AnyInteractionItem,
-			_ accounts: IdentifiedArrayOf<OnNetwork.Account>,
+			_ accounts: IdentifiedArrayOf<Profile.Network.Account>,
 			_ accessKind: ChooseAccounts.State.AccessKind
 		) -> EffectTask<Action> {
 			setAccountsResponse(to: item, accounts, accessKind: accessKind, into: &state)
@@ -436,7 +436,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	func setAccountsResponse(
 		to item: State.AnyInteractionItem,
-		_ accounts: some Collection<OnNetwork.Account>,
+		_ accounts: some Collection<Profile.Network.Account>,
 		accessKind: ChooseAccounts.State.AccessKind,
 		into state: inout State
 	) {
@@ -506,7 +506,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							}
 							return (numberOfAccounts, accounts)
 						}()
-						let sharedAccounts: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
+						let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 							sharedAccounts = try .init(
 								accountsReferencedByAddress: OrderedSet(accounts.map { try .init(address: $0.address) }),
@@ -516,7 +516,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							sharedAccounts = nil
 						}
 						@Dependency(\.date) var now
-						let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple = {
+						let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple = {
 							if var authorizedPersona = state.authorizedPersona {
 								// NB: update personal data fields here
 								authorizedPersona.lastLogin = now()

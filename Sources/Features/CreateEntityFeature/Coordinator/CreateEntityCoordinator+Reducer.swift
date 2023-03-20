@@ -2,8 +2,8 @@ import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 
-public typealias CreateAccountCoordinator = CreateEntityCoordinator<OnNetwork.Account>
-public typealias CreatePersonaCoordinator = CreateEntityCoordinator<OnNetwork.Persona>
+public typealias CreateAccountCoordinator = CreateEntityCoordinator<Profile.Network.Account>
+public typealias CreatePersonaCoordinator = CreateEntityCoordinator<Profile.Network.Persona>
 
 // MARK: - CreateEntityCoordinator
 public struct CreateEntityCoordinator<

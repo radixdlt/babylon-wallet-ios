@@ -31,7 +31,7 @@ extension DappDetails {
 		}
 
 		struct Persona: Identifiable, Hashable, Sendable {
-			let id: OnNetwork.Persona.ID
+			let id: Profile.Network.Persona.ID
 			let name: String
 			let thumbnail: URL
 		}
@@ -123,7 +123,7 @@ private extension DappDetails.State {
 }
 
 private extension DappDetails.ViewState.Persona {
-	init(persona: OnNetwork.AuthorizedPersonaDetailed) {
+	init(persona: Profile.Network.AuthorizedPersonaDetailed) {
 		self.init(
 			id: persona.id,
 			name: persona.displayName.rawValue,

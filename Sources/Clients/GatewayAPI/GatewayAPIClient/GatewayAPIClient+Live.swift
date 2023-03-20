@@ -131,7 +131,7 @@ extension GatewayAPIClient {
 				) {
 					$0.appendingPathComponent("gateway/information")
 				}
-				return Network.Name(response.ledgerState.network)
+				return Radix.Network.Name(response.ledgerState.network)
 			},
 			getEpoch: {
 				let response = try await makeRequest(

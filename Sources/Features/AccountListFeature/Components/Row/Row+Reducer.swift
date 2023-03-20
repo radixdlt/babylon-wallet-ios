@@ -7,7 +7,7 @@ extension AccountList {
 		public struct State: Sendable, Hashable, Identifiable {
 			public var id: AccountAddress { account.address }
 
-			public let account: OnNetwork.Account
+			public let account: Profile.Network.Account
 			public var aggregatedValue: BigDecimal?
 			public var portfolio: AccountPortfolio
 
@@ -16,7 +16,7 @@ extension AccountList {
 			public var isCurrencyAmountVisible: Bool
 
 			public init(
-				account: OnNetwork.Account,
+				account: Profile.Network.Account,
 				aggregatedValue: BigDecimal?,
 				portfolio: AccountPortfolio,
 				currency: FiatCurrency,
@@ -30,7 +30,7 @@ extension AccountList {
 				self.isCurrencyAmountVisible = isCurrencyAmountVisible
 			}
 
-			public init(account: OnNetwork.Account) {
+			public init(account: Profile.Network.Account) {
 				self.init(
 					account: account,
 					aggregatedValue: nil,

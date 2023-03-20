@@ -30,7 +30,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 			)),
 			config: config
 		)
-		let account = OnNetwork.Account.previewValue0
+		let account = Profile.Network.Account.previewValue0
 
 		let store = TestStore(
 			initialState: initialState,

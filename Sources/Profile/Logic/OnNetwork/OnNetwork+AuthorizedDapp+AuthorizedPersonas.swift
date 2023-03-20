@@ -1,18 +1,18 @@
 import Prelude
 
 // MARK: ~~~=== LOGIC ===~~~
-extension OnNetwork {
+extension Profile.Network {
 	public struct AccountForDisplay: Sendable, Hashable, Identifiable {
 		public typealias ID = AccountAddress
 		public var id: ID { address }
 		public let address: AccountAddress
 		public let label: NonEmpty<String>
-		public let appearanceID: OnNetwork.Account.AppearanceID
+		public let appearanceID: Profile.Network.Account.AppearanceID
 
 		public init(
 			address: AccountAddress,
 			label: NonEmpty<String>,
-			appearanceID: OnNetwork.Account.AppearanceID
+			appearanceID: Profile.Network.Account.AppearanceID
 		) {
 			self.address = address
 			self.label = label
@@ -27,12 +27,12 @@ extension OnNetwork {
 		public let identityAddress: IdentityAddress
 
 		// FIXME: change Persona and Account to require displayname, and make this non optional?
-		/// The display name of the Persona, as stored in `OnNetwork.Persona`
+		/// The display name of the Persona, as stored in `Profile.Network.Persona`
 		public let displayName: NonEmpty<String>
 
 		/// The persona data that the user has given the Dapp access to,
 		/// being the trippple: `(id, kind, value)`
-		public let fields: IdentifiedArrayOf<OnNetwork.Persona.Field>
+		public let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 
 		/// Information of accounts the user has given the Dapp access to,
 		/// being the tripple `(accountAddress, displayName, appearanceID)`
@@ -40,10 +40,10 @@ extension OnNetwork {
 	}
 
 	public struct AuthorizedDappDetailed: Sendable, Hashable {
-		public let networkID: Network.ID
+		public let networkID: Radix.Network.ID
 		public let dAppDefinitionAddress: DappDefinitionAddress
 		public let displayName: NonEmpty<String>
-		public let detailedAuthorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
+		public let detailedAuthorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>
 	}
 
 	public func detailsForAuthorizedDapp(_ dapp: AuthorizedDapp) throws -> AuthorizedDappDetailed {
@@ -53,7 +53,7 @@ extension OnNetwork {
 			/// this is a sign that ProfileSnapshot is in a bad state somehow...
 			throw NetworkDiscrepancyError()
 		}
-		let detailedAuthorizedPersonas = try IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
+		let detailedAuthorizedPersonas = try IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
 
 			guard
 				let persona = self.personas.first(where: { $0.address == simple.identityAddress })

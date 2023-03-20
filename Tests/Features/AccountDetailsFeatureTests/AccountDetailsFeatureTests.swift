@@ -23,7 +23,7 @@ final class AccountDetailsFeatureTests: TestCase {
 	// FIXME: @davdroman-rdx after proper TCA tools are released
 //	func test_navigateToAccountPreferences_whenTappedOnPreferencesButton_thenCoordinateNavigationToPreferences() async {
 //		// given
-//		let account = OnNetwork.Account.previewValue0
+//		let account = Profile.Network.Account.previewValue0
 //		let store = TestStore(
 //			initialState: AccountDetails.State(
 //				for: AccountList.Row.State(account: account)
@@ -40,7 +40,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_copyAddress_whenTappedOnCopyAddress_thenCopyToPasteboard() async {
 		// given
-		let account = OnNetwork.Account.previewValue0
+		let account = Profile.Network.Account.previewValue0
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
@@ -62,7 +62,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
 		// given
-		let account = OnNetwork.Account.previewValue0
+		let account = Profile.Network.Account.previewValue0
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
@@ -80,7 +80,7 @@ final class AccountDetailsFeatureTests: TestCase {
 	// FIXME: @davdroman-rdx after proper TCA tools are released
 //	func test_displayTransfer_whenTappedOnDisplayTransfer_thenCoordinateNavigationToTransfer() async {
 //		// given
-//		let account = OnNetwork.Account.testValue
+//		let account = Profile.Network.Account.testValue
 //		let accountListRowState = AccountList.Row.State(account: account)
 //		let initialState = AccountDetails.State(for: accountListRowState)
 //		let store = TestStore(

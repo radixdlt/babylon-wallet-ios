@@ -96,8 +96,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 						let interactionMessage = try incomingMessageResult.unwrapResult()
 						let interaction = interactionMessage.peerMessage.content
 						guard interaction.metadata.networkId == currentNetworkID else {
-							let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
-							let currentNetwork = try Network.lookupBy(id: currentNetworkID)
+							let incomingRequestNetwork = try Radix.Network.lookupBy(id: interaction.metadata.networkId)
+							let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
 							let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
 								interactionId: interaction.id,
 								errorType: .wrongNetwork,

@@ -9,8 +9,8 @@ public struct NetworkSwitchingClient: Sendable, DependencyKey {
 }
 
 extension NetworkSwitchingClient {
-	public typealias GetCurrentGateway = @Sendable () async -> Gateway
-	public typealias ValidateGatewayURL = @Sendable (URL) async throws -> Gateway?
-	public typealias HasAccountOnNetwork = @Sendable (Gateway) async throws -> Bool
-	public typealias SwitchTo = @Sendable (Gateway) async throws -> Gateway
+	public typealias GetCurrentGateway = @Sendable () async -> Radix.Gateway
+	public typealias ValidateGatewayURL = @Sendable (URL) async throws -> Radix.Gateway?
+	public typealias HasAccountOnNetwork = @Sendable (Radix.Gateway) async throws -> Bool
+	public typealias SwitchTo = @Sendable (Radix.Gateway) async throws -> Radix.Gateway
 }

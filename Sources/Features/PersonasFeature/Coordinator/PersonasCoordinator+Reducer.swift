@@ -23,7 +23,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable & Equatable {
-		case loadPersonasResult(TaskResult<IdentifiedArrayOf<OnNetwork.Persona>>)
+		case loadPersonasResult(TaskResult<IdentifiedArrayOf<Profile.Network.Persona>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {

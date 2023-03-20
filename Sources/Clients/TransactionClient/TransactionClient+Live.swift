@@ -47,7 +47,7 @@ extension TransactionClient {
 
 			@Sendable func sign(
 				unhashed unhashed_: some DataProtocol,
-				with account: OnNetwork.Account,
+				with account: Profile.Network.Account,
 				debugOrigin origin: String
 			) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
@@ -321,7 +321,7 @@ extension TransactionClient {
 						)
 				)
 
-				let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>> = try await {
+				let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>> = try await {
 					let accounts = try await addressesNeededToSign.asyncMap {
 						try await accountsClient.getAccountByAddress($0)
 					}
@@ -425,9 +425,9 @@ extension TransactionClient {
 // MARK: - NotaryAndSigners
 struct NotaryAndSigners: Sendable, Hashable {
 	/// Notary signer
-	public let notarySigner: OnNetwork.Account
+	public let notarySigner: Profile.Network.Account
 	/// Never empty, since this also contains the notary signer.
-	public let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>>
+	public let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>
 }
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities

@@ -2,8 +2,8 @@ import EngineToolkit
 import Prelude
 
 extension Profile {
-	internal mutating func updateOnNetwork(_ onNetwork: OnNetwork) throws {
-		try perNetwork.update(onNetwork)
+	internal mutating func updateOnNetwork(_ network: Profile.Network) throws {
+		try networks.update(network)
 	}
 }
 
@@ -14,15 +14,15 @@ extension Profile {
 	}
 
 	/// The current network with a non empty set of accounts.
-	public var network: OnNetwork? {
-		try? onNetwork(id: networkID)
+	public var network: Profile.Network? {
+		try? network(id: networkID)
 	}
 
-	public func onNetwork(id needle: NetworkID) throws -> OnNetwork {
-		try perNetwork.onNetwork(id: needle)
+	public func network(id needle: NetworkID) throws -> Profile.Network {
+		try networks.network(id: needle)
 	}
 
 	public func containsNetwork(withID networkID: NetworkID) -> Bool {
-		(try? onNetwork(id: networkID)) != nil
+		(try? network(id: networkID)) != nil
 	}
 }

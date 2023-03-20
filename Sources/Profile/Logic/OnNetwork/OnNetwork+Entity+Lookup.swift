@@ -20,18 +20,18 @@ extension Profile {
 		kind: EntityKind,
 		entityIndex: Int
 	) throws -> any EntityProtocol {
-		let onNetwork = try onNetwork(id: networkID)
+		let network = try network(id: networkID)
 		switch kind {
 		case .account:
-			guard entityIndex < onNetwork.accounts.count else {
+			guard entityIndex < network.accounts.count else {
 				throw AccountIndexOutOfBounds()
 			}
-			return onNetwork.accounts[entityIndex]
+			return network.accounts[entityIndex]
 		case .identity:
-			guard entityIndex < onNetwork.personas.count else {
+			guard entityIndex < network.personas.count else {
 				throw PersonaIndexOutOfBounds()
 			}
-			return onNetwork.personas[entityIndex]
+			return network.personas[entityIndex]
 		}
 	}
 
@@ -50,14 +50,14 @@ extension Profile {
 		networkID: NetworkID,
 		address: AddressProtocol
 	) throws -> any EntityProtocol {
-		try onNetwork(id: networkID).entity(address: address)
+		try network(id: networkID).entity(address: address)
 	}
 }
 
 // MARK: - IncorrectEntityType
 public struct IncorrectEntityType: Swift.Error {}
 
-extension OnNetwork {
+extension Profile.Network {
 	public func entity<Entity: EntityProtocol>(
 		address: Entity.EntityAddress
 	) throws -> Entity {

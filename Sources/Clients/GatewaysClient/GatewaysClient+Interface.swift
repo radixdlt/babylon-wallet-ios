@@ -25,11 +25,11 @@ public struct GatewaysClient: Sendable {
 }
 
 extension GatewaysClient {
-	public typealias GetCurrentGateway = @Sendable () async -> Gateway
+	public typealias GetCurrentGateway = @Sendable () async -> Radix.Gateway
 	public typealias GetAllGateways = @Sendable () async -> Gateways.Elements
-	public typealias AddGateway = @Sendable (Gateway) async throws -> Void
-	public typealias RemoveGateway = @Sendable (Gateway) async throws -> Void
-	public typealias ChangeGateway = @Sendable (Gateway) async throws -> Void
+	public typealias AddGateway = @Sendable (Radix.Gateway) async throws -> Void
+	public typealias RemoveGateway = @Sendable (Radix.Gateway) async throws -> Void
+	public typealias ChangeGateway = @Sendable (Radix.Gateway) async throws -> Void
 }
 
 extension GatewaysClient {

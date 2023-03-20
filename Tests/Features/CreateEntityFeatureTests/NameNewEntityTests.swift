@@ -6,7 +6,7 @@ import FeatureTestingPrelude
 final class NameNewEntityTests: TestCase {
 	func test_textFieldDidChange_whenUserEntersAccountName_thenUpdateState() async {
 		// given
-		let initialState = NameNewEntity<OnNetwork.Account>.State(
+		let initialState = NameNewEntity<Profile.Network.Account>.State(
 			config: .init(
 				//				isFirstEntity: true,
 //				canBeDismissed: true,
@@ -16,7 +16,7 @@ final class NameNewEntityTests: TestCase {
 
 		let store = TestStore(
 			initialState: initialState,
-			reducer: NameNewEntity<OnNetwork.Account>()
+			reducer: NameNewEntity<Profile.Network.Account>()
 		)
 		let inputtedAccountName = "My account"
 		// when
@@ -29,7 +29,7 @@ final class NameNewEntityTests: TestCase {
 
 	func test__GIVEN__textFieldNotFocused__WHEN__viewDidAppear__THEN__textFieldGetsFocused() async {
 		// given
-		let initialState = NameNewEntity<OnNetwork.Account>.State(
+		let initialState = NameNewEntity<Profile.Network.Account>.State(
 			config: .init(
 				purpose: .newAccountFromHome
 			)
@@ -38,7 +38,7 @@ final class NameNewEntityTests: TestCase {
 		let clock = TestClock()
 		let store = TestStore(
 			initialState: initialState,
-			reducer: NameNewEntity<OnNetwork.Account>()
+			reducer: NameNewEntity<Profile.Network.Account>()
 		) {
 			$0.continuousClock = clock
 		}

@@ -6,12 +6,12 @@ public struct GatewayRow: Sendable, FeatureReducer {
 		public typealias ID = URL
 		public var id: URL { gateway.id }
 
-		let gateway: Gateway
+		let gateway: Radix.Gateway
 		var isSelected: Bool
 		let canBeDeleted: Bool
 
 		public init(
-			gateway: Gateway,
+			gateway: Radix.Gateway,
 			isSelected: Bool,
 			canBeDeleted: Bool
 		) {

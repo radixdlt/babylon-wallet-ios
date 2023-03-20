@@ -1,27 +1,29 @@
 import Prelude
 
-// MARK: - Gateway
-public struct Gateway:
-	Sendable,
-	Hashable,
-	Codable,
-	Identifiable,
-	CustomStringConvertible,
-	CustomDumpReflectable
-{
-	public typealias ID = URL
-	public let network: Network
-	/// The URL to the gateways API endpoint
-	public let url: URL
-	public var id: ID { url }
+// MARK: - Radix.Gateway
+extension Radix {
+	public struct Gateway:
+		Sendable,
+		Hashable,
+		Codable,
+		Identifiable,
+		CustomStringConvertible,
+		CustomDumpReflectable
+	{
+		public typealias ID = URL
+		public let network: Network
+		/// The URL to the gateways API endpoint
+		public let url: URL
+		public var id: ID { url }
 
-	public init(network: Network, url: URL) {
-		self.network = network
-		self.url = url
+		public init(network: Network, url: URL) {
+			self.network = network
+			self.url = url
+		}
 	}
 }
 
-extension Gateway {
+extension Radix.Gateway {
 	/// `"https://betanet.radixdlt.com"`
 	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
 	public static var nebunet: Self {
@@ -53,7 +55,7 @@ extension Gateway {
 	}
 }
 
-extension Gateway {
+extension Radix.Gateway {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

@@ -1,7 +1,7 @@
 import Foundation
 
-// MARK: - OnNetwork.Account.AppearanceID
-extension OnNetwork.Account {
+// MARK: - Profile.Network.Account.AppearanceID
+extension Profile.Network.Account {
 	/// An identifier for a certain User Interface rendered appearance for a account (or accounts
 	/// if user has many accounts, since we recycle them).
 	///
@@ -32,9 +32,9 @@ extension OnNetwork.Account {
 	}
 }
 
-extension OnNetwork.Account.AppearanceID {
+extension Profile.Network.Account.AppearanceID {
 	public struct UnknownID: Swift.Error {
-		let unknown: OnNetwork.Account.AppearanceID.ID
+		let unknown: Profile.Network.Account.AppearanceID.ID
 	}
 
 	public var description: String {
@@ -48,7 +48,7 @@ extension OnNetwork.Account.AppearanceID {
 	}
 }
 
-extension OnNetwork.Account.AppearanceID {
+extension Profile.Network.Account.AppearanceID {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(id)
