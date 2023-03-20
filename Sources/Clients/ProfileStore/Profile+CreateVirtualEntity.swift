@@ -19,13 +19,20 @@ extension Profile {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
-		let factorSource = request.factorSource
-		let deviceFactorSourceStorage = try factorSource.deviceStorage()
+		let factorSource = request.hdOnDeviceFactorSource
+		let deviceFactorSourceStorage = factorSource.storage
 		let index = deviceFactorSourceStorage.nextForEntity(kind: entityKind, networkID: networkID)
 		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let genesisFactorInstance: FactorInstance = try await {
-			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(.init(factorSource: factorSource, derivationPath: derivationPath, curve: request.curve, creationOfEntity: entityKind))
+			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(
+				.init(
+					hdOnDeviceFactorSource: factorSource,
+					derivationPath: derivationPath,
+					curve: request.curve,
+					creationOfEntity: entityKind
+				)
+			)
 
 			return try FactorInstance(
 				factorSourceID: factorSource.id,
@@ -41,12 +48,12 @@ extension Profile {
 
 		switch entityKind {
 		case .identity:
-			let identityAddress = try OnNetwork.Persona.deriveAddress(
+			let identityAddress = try Profile.Network.Persona.deriveAddress(
 				networkID: networkID,
 				publicKey: genesisFactorInstance.publicKey
 			)
 
-			let persona = OnNetwork.Persona(
+			let persona = Profile.Network.Persona(
 				networkID: networkID,
 				address: identityAddress,
 				securityState: .unsecured(unsecuredControl),
@@ -55,13 +62,13 @@ extension Profile {
 			)
 			return persona
 		case .account:
-			let accountAddress = try OnNetwork.Account.deriveAddress(
+			let accountAddress = try Profile.Network.Account.deriveAddress(
 				networkID: networkID,
 				publicKey: genesisFactorInstance.publicKey
 			)
-			let index = (try? self.onNetwork(id: networkID))?.accounts.count ?? 0
-			let appearanceID = OnNetwork.Account.AppearanceID.fromIndex(index)
-			let account = OnNetwork.Account(
+			let index = (try? self.network(id: networkID))?.accounts.count ?? 0
+			let appearanceID = Profile.Network.Account.AppearanceID.fromIndex(index)
+			let account = Profile.Network.Account(
 				networkID: networkID,
 				address: accountAddress,
 				securityState: .unsecured(unsecuredControl),

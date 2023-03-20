@@ -21,16 +21,16 @@ final class CreateAccountCoordinatorTests: TestCase {
 			purpose: .newAccountFromHome
 		)
 
-		let initialState = try CreateAccountCoordinator.State(
+		let initialState = CreateAccountCoordinator.State(
 			step: .step2_creationOfEntity(.init(
 				curve: .curve25519,
 				networkID: nil,
 				name: "Main",
-				factorSource: .previewValueDevice
+				hdOnDeviceFactorSource: .previewValue
 			)),
 			config: config
 		)
-		let account = OnNetwork.Account.previewValue0
+		let account = Profile.Network.Account.previewValue0
 
 		let store = TestStore(
 			initialState: initialState,

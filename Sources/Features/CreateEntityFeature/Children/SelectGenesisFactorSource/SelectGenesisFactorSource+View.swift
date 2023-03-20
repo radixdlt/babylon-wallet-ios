@@ -3,15 +3,19 @@ import FeaturePrelude
 
 extension SelectGenesisFactorSource.State {
 	var viewState: SelectGenesisFactorSource.ViewState {
-		.init(factorSources: factorSources, selectedFactorSource: selectedFactorSource, selectedCurve: self.selectedCurve)
+		.init(
+			factorSources: hdOnDeviceFactorSources,
+			selectedFactorSource: selectedFactorSource,
+			selectedCurve: self.selectedCurve
+		)
 	}
 }
 
 // MARK: - SelectGenesisFactorSource.View
 extension SelectGenesisFactorSource {
 	public struct ViewState: Equatable {
-		let factorSources: FactorSources
-		let selectedFactorSource: FactorSource
+		let factorSources: NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>
+		let selectedFactorSource: HDOnDeviceFactorSource
 		let selectedCurve: Slip10Curve
 		var supportedCurves: [Slip10Curve] { selectedFactorSource.parameters.supportedCurves.rawValue.elements }
 	}

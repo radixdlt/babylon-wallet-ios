@@ -23,7 +23,7 @@ extension FactorSourcesClient: DependencyKey {
 				)
 				let privateFactorSource = try PrivateHDFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					factorSource: factorSource
+					hdOnDeviceFactorSource: .init(factorSource: factorSource)
 				)
 
 				try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)

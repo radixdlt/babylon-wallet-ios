@@ -47,7 +47,7 @@ extension TransactionClient {
 
 			@Sendable func sign(
 				unhashed unhashed_: some DataProtocol,
-				with account: OnNetwork.Account,
+				with account: Profile.Network.Account,
 				debugOrigin origin: String
 			) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
@@ -69,7 +69,10 @@ extension TransactionClient {
 							throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
 						}
 
-						let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: loadedMnemonicWithPassphrase, factorSource: factorSource)
+						let privateHDFactorSource = try PrivateHDFactorSource(
+							mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
+							hdOnDeviceFactorSource: .init(factorSource: factorSource)
+						)
 
 						await cachedPrivateHDFactorSources.setValue(cache.appending(privateHDFactorSource))
 
@@ -77,10 +80,10 @@ extension TransactionClient {
 					}()
 
 					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
-					let curve = privateHDFactorSource.factorSource.parameters.supportedCurves.last
+					let curve = privateHDFactorSource.hdOnDeviceFactorSource.parameters.supportedCurves.last
 					let unhashedData = Data(unhashed_)
 
-					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.factorSource.kind), factorSourceHint=\(privateHDFactorSource.factorSource.hint)")
+					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.hdOnDeviceFactorSource.kind), factorSourceHint=\(privateHDFactorSource.hdOnDeviceFactorSource.hint)")
 
 					return try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,
@@ -318,7 +321,7 @@ extension TransactionClient {
 						)
 				)
 
-				let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>> = try await {
+				let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>> = try await {
 					let accounts = try await addressesNeededToSign.asyncMap {
 						try await accountsClient.getAccountByAddress($0)
 					}
@@ -422,9 +425,9 @@ extension TransactionClient {
 // MARK: - NotaryAndSigners
 struct NotaryAndSigners: Sendable, Hashable {
 	/// Notary signer
-	public let notarySigner: OnNetwork.Account
+	public let notarySigner: Profile.Network.Account
 	/// Never empty, since this also contains the notary signer.
-	public let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>>
+	public let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>
 }
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities

@@ -11,13 +11,13 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps: OnNetwork.AuthorizedDapps
+		public var dApps: Profile.Network.AuthorizedDapps
 
 		@PresentationState
 		public var presentedDapp: DappDetails.State?
 
 		public init(
-			dApps: OnNetwork.AuthorizedDapps = [],
+			dApps: Profile.Network.AuthorizedDapps = [],
 			presentedDapp: DappDetails.State? = nil
 		) {
 			self.dApps = dApps
@@ -29,11 +29,11 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case didSelectDapp(OnNetwork.AuthorizedDapp.ID)
+		case didSelectDapp(Profile.Network.AuthorizedDapp.ID)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedDapps(TaskResult<OnNetwork.AuthorizedDapps>)
+		case loadedDapps(TaskResult<Profile.Network.AuthorizedDapps>)
 		case presentDappDetails(DappDetails.State)
 	}
 

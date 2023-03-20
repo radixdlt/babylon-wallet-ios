@@ -19,21 +19,21 @@ struct DiscrepancyUnsupportedCurve: Swift.Error {}
 
 // MARK: - PublicKeyFromOnDeviceHDRequest
 public struct PublicKeyFromOnDeviceHDRequest: Sendable, Hashable {
-	public let factorSource: FactorSource
+	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
 	public let derivationPath: DerivationPath
 	public let curve: Slip10Curve
 	public let entityKind: EntityKind
 
 	public init(
-		factorSource: FactorSource,
+		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
 		derivationPath: DerivationPath,
 		curve: Slip10Curve,
 		creationOfEntity entityKind: EntityKind
 	) throws {
-		guard factorSource.parameters.supportedCurves.contains(curve) else {
+		guard hdOnDeviceFactorSource.parameters.supportedCurves.contains(curve) else {
 			throw DiscrepancyUnsupportedCurve()
 		}
-		self.factorSource = factorSource
+		self.hdOnDeviceFactorSource = hdOnDeviceFactorSource
 		self.derivationPath = derivationPath
 		self.curve = curve
 		self.entityKind = entityKind

@@ -69,7 +69,7 @@
 "dApp.login.title.knownDapp" = "Login Request";
 "dApp.login.title.newDapp" = "New Login Request";
 "dApp.metadataLoading.errorAlert.cancelButtonTitle" = "Cancel";
-"dApp.metadataLoading.errorAlert.message" = "Danger! Bad dApp config or you're being spoofed!\n\n%@";
+"dApp.metadataLoading.errorAlert.message" = "Danger! Bad dApp config or you're being spoofed!";
 "dApp.metadataLoading.errorAlert.retryButtonTitle" = "Retry";
 "dApp.metadataLoading.prompt" = "Loading...";
 "dApp.permission.numberOfAccounts.atLeast" = "%d or more accounts";
@@ -87,12 +87,12 @@
 "dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";
 "dApp.request.malformedErrorAlert.okButtonTitle" = "OK";
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
-"dApp.request.specifiedPersonaNotFoundError.message" = "Persona specified by dApp does not exist.\n\n%@";
+"dApp.request.specifiedPersonaNotFoundError.message" = "Persona specified by dApp does not exist.";
 "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle" = "Cancel";
 "dApp.metadata.unknownName" = "Unknown dApp";
 "dApp.response.failureAlert.cancelButtonTitle" = "Cancel";
 "dApp.response.failureAlert.retryButtonTitle" = "Retry";
-"dApp.response.failureAlert.message" = "Failed to send response payload back to dApp.\n\n%@";
+"dApp.response.failureAlert.message" = "Failed to send response payload back to dApp.";
 
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
 "fungibleTokenList.detail.resourceAddress" = "Resource Address";

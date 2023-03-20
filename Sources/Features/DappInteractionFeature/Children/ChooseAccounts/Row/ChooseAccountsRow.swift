@@ -13,12 +13,12 @@ struct ChooseAccountsRow: Sendable, FeatureReducer {
 		var address: AccountAddress { account.address }
 		var id: ID { address }
 
-		let account: OnNetwork.Account
+		let account: Profile.Network.Account
 		let mode: Mode
 		var isSelected: Bool = false
 
 		init(
-			account: OnNetwork.Account,
+			account: Profile.Network.Account,
 			mode: Mode
 		) {
 			self.account = account

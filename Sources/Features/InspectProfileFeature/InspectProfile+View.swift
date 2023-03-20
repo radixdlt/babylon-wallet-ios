@@ -58,7 +58,7 @@ extension ProfileView {
 				Labeled("Version", value: String(describing: profile.version))
 
 				PerNetworkView(
-					perNetwork: profile.perNetwork,
+					networks: profile.networks,
 					indentation: inOneLevel
 				)
 
@@ -187,7 +187,7 @@ public struct NextDerivationIndicesPerNetworkView: IndentedView {
 				.font(.title)
 			#endif // os(macOS)
 
-			ForEach(nextDerivationIndicesPerNetwork.perNetwork) { nextIndices in
+			ForEach(nextDerivationIndicesPerNetwork.networks) { nextIndices in
 				NextDerivationIndicesForNetworkView(nextIndices: nextIndices, indentation: indentation.inOneLevel)
 			}
 		}
@@ -196,7 +196,7 @@ public struct NextDerivationIndicesPerNetworkView: IndentedView {
 
 // MARK: - NextDerivationIndicesForNetworkView
 public struct NextDerivationIndicesForNetworkView: IndentedView {
-	public let nextIndices: OnNetwork.NextDerivationIndices
+	public let nextIndices: Profile.Network.NextDerivationIndices
 	public let indentation: Indentation
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
@@ -269,7 +269,7 @@ extension GatewaysView {
 
 // MARK: - GatewayView
 public struct GatewayView: IndentedView {
-	public let gateway: Gateway
+	public let gateway: Radix.Gateway
 	public let isCurrent: Bool
 	public let indentation: Indentation
 }
@@ -364,9 +364,9 @@ extension P2PLinksView {
 
 // MARK: - AuthorizedDappsView
 public struct AuthorizedDappsView: IndentedView {
-	public let authorizedDapps: OnNetwork.AuthorizedDapps
+	public let authorizedDapps: Profile.Network.AuthorizedDapps
 	public let indentation: Indentation
-	public let getDetailedAuthorizedDapp: (OnNetwork.AuthorizedDapp) -> OnNetwork.AuthorizedDappDetailed
+	public let getDetailedAuthorizedDapp: (Profile.Network.AuthorizedDapp) -> Profile.Network.AuthorizedDappDetailed
 }
 
 extension AuthorizedDappsView {
@@ -395,9 +395,9 @@ extension AuthorizedDappsView {
 
 // MARK: - AuthorizedDappView
 public struct AuthorizedDappView: IndentedView {
-	public let authorizedDapp: OnNetwork.AuthorizedDapp
+	public let authorizedDapp: Profile.Network.AuthorizedDapp
 	public let indentation: Indentation
-	public let authorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
+	public let authorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>
 }
 
 extension AuthorizedDappView {
@@ -418,7 +418,7 @@ extension AuthorizedDappView {
 
 // MARK: - DappAuthorizedPersonaView
 public struct DappAuthorizedPersonaView: IndentedView {
-	public let detailedAuthorizedPersona: OnNetwork.AuthorizedPersonaDetailed
+	public let detailedAuthorizedPersona: Profile.Network.AuthorizedPersonaDetailed
 	public let indentation: Indentation
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
@@ -472,7 +472,7 @@ extension P2PLinkView {
 
 // MARK: - PerNetworkView
 public struct PerNetworkView: IndentedView {
-	public let perNetwork: PerNetwork
+	public let networks: Profile.Networks
 	public let indentation: Indentation
 }
 
@@ -485,9 +485,9 @@ extension PerNetworkView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			ForEach(perNetwork.keys, id: \.self) { networkID in
-				OnNetworkView(
-					onNetwork: try! perNetwork.onNetwork(id: networkID),
+			ForEach(networks.keys, id: \.self) { networkID in
+				ProfileNetworkView(
+					network: try! networks.network(id: networkID),
 					indentation: inOneLevel
 				)
 			}
@@ -496,13 +496,13 @@ extension PerNetworkView {
 	}
 }
 
-// MARK: - OnNetworkView
-public struct OnNetworkView: IndentedView {
-	public let onNetwork: OnNetwork
+// MARK: - ProfileNetworkView
+public struct ProfileNetworkView: IndentedView {
+	public let network: Profile.Network
 	public let indentation: Indentation
 }
 
-extension OnNetworkView {
+extension ProfileNetworkView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network")
@@ -511,31 +511,31 @@ extension OnNetworkView {
 				.font(.title)
 			#endif // os(macOS)
 
-			Labeled("ID", value: String(describing: onNetwork.networkID))
+			Labeled("ID", value: String(describing: network.networkID))
 
 			AccountsView(
-				entities: onNetwork.accounts.rawValue.elements,
+				entities: network.accounts.rawValue.elements,
 				indentation: inOneLevel
 			)
 
 			PersonasView(
-				entities: onNetwork.personas.elements,
+				entities: network.personas.elements,
 				indentation: inOneLevel
 			)
 
 			AuthorizedDappsView(
-				authorizedDapps: onNetwork.authorizedDapps,
+				authorizedDapps: network.authorizedDapps,
 				indentation: inOneLevel
 			) {
-				try! onNetwork.detailsForAuthorizedDapp($0)
+				try! network.detailsForAuthorizedDapp($0)
 			}
 		}
 		.padding([.leading], leadingPadding)
 	}
 }
 
-public typealias AccountsView = EntitiesView<OnNetwork.Account>
-public typealias PersonasView = EntitiesView<OnNetwork.Persona>
+public typealias AccountsView = EntitiesView<Profile.Network.Account>
+public typealias PersonasView = EntitiesView<Profile.Network.Persona>
 
 // MARK: - EntitiesView
 public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
@@ -588,7 +588,7 @@ extension EntityView {
 				)
 			}
 
-			if let persona = self.entity as? OnNetwork.Persona {
+			if let persona = self.entity as? Profile.Network.Persona {
 				Group {
 					Text("Persona fields")
 					ForEach(persona.fields) { field in
@@ -596,7 +596,7 @@ extension EntityView {
 					}
 				}.padding([.leading], indentation.inOneLevel.leadingPadding)
 			}
-			if let account = self.entity as? OnNetwork.Account {
+			if let account = self.entity as? Profile.Network.Account {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}
 		}

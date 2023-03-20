@@ -10,9 +10,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		@PresentationState var removeGatewayAlert: AlertState<ViewAction.RemoveGatewayAction>?
 		@PresentationState var destination: Destinations.State?
-		var currentGateway: Gateway?
-		var validatedNewGatewayToSwitchTo: Gateway?
-		var gatewayForRemoval: Gateway?
+		var currentGateway: Radix.Gateway?
+		var validatedNewGatewayToSwitchTo: Radix.Gateway?
+		var gatewayForRemoval: Radix.Gateway?
 		var isPopoverPresented = false
 
 		public init(
@@ -36,11 +36,11 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case presentGateways(all: [Gateway], current: Gateway)
+		case presentGateways(all: [Radix.Gateway], current: Radix.Gateway)
 		case hasAccountsResult(TaskResult<Bool>)
-		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
-		case switchToGatewayResult(TaskResult<Gateway>)
-		case removeGateway(Gateway)
+		case createAccountOnNetworkBeforeSwitchingToIt(Radix.Gateway)
+		case switchToGatewayResult(TaskResult<Radix.Gateway>)
+		case removeGateway(Radix.Gateway)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -156,7 +156,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: current.id == $0.id,
-						canBeDeleted: $0.id != Gateway.nebunet.id
+						canBeDeleted: $0.id != Radix.Gateway.nebunet.id
 					)
 				}
 				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
@@ -287,7 +287,7 @@ private extension GatewaySettings {
 		return .none
 	}
 
-	func switchToGateway(_ state: inout State, gateway: Gateway) -> EffectTask<Action> {
+	func switchToGateway(_ state: inout State, gateway: Radix.Gateway) -> EffectTask<Action> {
 		guard
 			let current = state.currentGateway,
 			current.id != gateway.id
@@ -304,7 +304,7 @@ private extension GatewaySettings {
 		}
 	}
 
-	func removeGateway(_ gateway: Gateway) -> EffectTask<Action> {
+	func removeGateway(_ gateway: Radix.Gateway) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.removeGateway(gateway)))
 		}

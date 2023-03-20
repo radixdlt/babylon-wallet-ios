@@ -13,7 +13,7 @@ extension AccountPortfolio {
 		let fungibleContainers = try response.fungibleResources.items.map { fungibleBalance in
 			let balance = try BigDecimal(fromString: fungibleBalance.amount.value)
 			let componentAddress = ComponentAddress(address: fungibleBalance.address)
-			let networkID = try Network.lookupBy(name: response.ledgerState.network).id
+			let networkID = try Radix.Network.lookupBy(name: response.ledgerState.network).id
 			let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
 			return try FungibleTokenContainer(
 				owner: .init(address: response.address),

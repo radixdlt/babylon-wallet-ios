@@ -21,7 +21,7 @@ public struct PersonasClient: Sendable {
 
 // MARK: PersonasClient.GetPersonas
 extension PersonasClient {
-	public typealias GetPersonas = @Sendable () async throws -> OnNetwork.Personas
-	public typealias SaveVirtualPersona = @Sendable (OnNetwork.Persona) async throws -> Void
-	public typealias CreateUnsavedVirtualPersona = @Sendable (CreateVirtualEntityRequest) async throws -> OnNetwork.Persona
+	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas
+	public typealias SaveVirtualPersona = @Sendable (Profile.Network.Persona) async throws -> Void
+	public typealias CreateUnsavedVirtualPersona = @Sendable (CreateVirtualEntityRequest) async throws -> Profile.Network.Persona
 }

@@ -1,7 +1,7 @@
 import Prelude
 
-// MARK: - OnNetwork.AuthorizedDapp
-extension OnNetwork {
+// MARK: - Profile.Network.AuthorizedDapp
+extension Profile.Network {
 	/// A connection made between a Radix Dapp and the user.
 	public struct AuthorizedDapp:
 		Sendable,
@@ -11,7 +11,7 @@ extension OnNetwork {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public let networkID: Network.ID
+		public let networkID: Radix.Network.ID
 
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
@@ -21,7 +21,7 @@ extension OnNetwork {
 		public var referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple>
 
 		public init(
-			networkID: Network.ID,
+			networkID: Radix.Network.ID,
 			dAppDefinitionAddress: DappDefinitionAddress,
 			displayName: NonEmpty<String>,
 			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
@@ -34,8 +34,8 @@ extension OnNetwork {
 	}
 }
 
-// MARK: - OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple
-extension OnNetwork.AuthorizedDapp {
+// MARK: - Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple
+extension Profile.Network.AuthorizedDapp {
 	public struct AuthorizedPersonaSimple:
 		Sendable,
 		Hashable,
@@ -47,9 +47,9 @@ extension OnNetwork.AuthorizedDapp {
 		/// to lookup persona
 		public let identityAddress: IdentityAddress
 
-		/// List of "ongoing personaData" (identified by OnNetwork.Persona.Field.ID) that user has given the Dapp access to.
+		/// List of "ongoing personaData" (identified by Profile.Network.Persona.Field.ID) that user has given the Dapp access to.
 		/// mutable so that we can mutate the fields
-		public var fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>
+		public var fieldIDs: OrderedSet<Profile.Network.Persona.Field.ID>
 
 		/// Date of last login for this persona.
 		public var lastLogin: Date
@@ -95,7 +95,7 @@ extension OnNetwork.AuthorizedDapp {
 
 		public init(
 			identityAddress: IdentityAddress,
-			fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>,
+			fieldIDs: OrderedSet<Profile.Network.Persona.Field.ID>,
 			lastLogin: Date,
 			sharedAccounts: SharedAccounts?
 		) {
@@ -107,7 +107,7 @@ extension OnNetwork.AuthorizedDapp {
 	}
 }
 
-extension OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
 	public static func validate(
 		accountsReferencedByAddress: OrderedSet<AccountAddress>,
 		forRequest request: NumberOfAccounts
@@ -134,19 +134,19 @@ extension OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
 	}
 }
 
-extension OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple {
+extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple {
 	public var id: ID {
 		identityAddress
 	}
 }
 
-extension OnNetwork.AuthorizedDapp {
+extension Profile.Network.AuthorizedDapp {
 	public var id: DappDefinitionAddress {
 		dAppDefinitionAddress
 	}
 }
 
-extension OnNetwork.AuthorizedDapp {
+extension Profile.Network.AuthorizedDapp {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

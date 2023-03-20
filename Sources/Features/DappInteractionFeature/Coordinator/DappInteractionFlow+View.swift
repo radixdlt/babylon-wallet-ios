@@ -96,7 +96,7 @@ struct DappInteraction_Preview: PreviewProvider {
 					dappMetadata: .previewValue,
 					interaction: .previewValueAllRequests(
 						auth: .login(.init(challenge: nil))
-//						auth: .usePersona(.init(identityAddress: OnNetwork.Persona.previewValue0.address.address))
+//						auth: .usePersona(.init(identityAddress: Profile.Network.Persona.previewValue0.address.address))
 //						auth: .usePersona(.init(identityAddress: "invalidaddress"))
 					)
 				)!,
@@ -124,14 +124,14 @@ extension AuthorizedDappsClient {
 	static func previewValueOnePersona() -> Self {
 		with(noop) {
 			$0.getAuthorizedDapps = {
-				var dapp = OnNetwork.AuthorizedDapp(
+				var dapp = Profile.Network.AuthorizedDapp(
 					networkID: .nebunet,
 					dAppDefinitionAddress: try! .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
 					displayName: .init(rawValue: "something")!
 				)
 				dapp.referencesToAuthorizedPersonas = [
 					.init(
-						identityAddress: OnNetwork.Persona.previewValue1.address,
+						identityAddress: Profile.Network.Persona.previewValue1.address,
 						fieldIDs: [],
 						lastLogin: .now,
 						sharedAccounts: try! .init(

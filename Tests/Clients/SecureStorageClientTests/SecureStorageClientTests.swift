@@ -106,7 +106,11 @@ private extension SecureStorageClientTests {
 			let passphrase = ""
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
 			let factorSource = try FactorSource.babylon(mnemonic: mnemonicWithPassphrase.mnemonic, bip39Passphrase: passphrase)
-			let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
+
+			let privateHDFactorSource = try PrivateHDFactorSource(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				factorSource: factorSource
+			)
 
 			let sut = SecureStorageClient.liveValue
 			let profile = Profile(factorSource: factorSource)

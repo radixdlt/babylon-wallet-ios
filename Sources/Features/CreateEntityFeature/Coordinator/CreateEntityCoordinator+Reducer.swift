@@ -2,8 +2,8 @@ import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 
-public typealias CreateAccountCoordinator = CreateEntityCoordinator<OnNetwork.Account>
-public typealias CreatePersonaCoordinator = CreateEntityCoordinator<OnNetwork.Persona>
+public typealias CreateAccountCoordinator = CreateEntityCoordinator<Profile.Network.Account>
+public typealias CreatePersonaCoordinator = CreateEntityCoordinator<Profile.Network.Persona>
 
 // MARK: - CreateEntityCoordinator
 public struct CreateEntityCoordinator<
@@ -102,22 +102,23 @@ public struct CreateEntityCoordinator<
 
 		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate):
 			precondition(!factorSources.isEmpty)
+			let hdOnDeviceFactorSources = factorSources.hdOnDeviceFactorSource()
 
 			// We ALWAYS use "babylon" `device` factor source and `Curve25519` for Personas.
 			// However, when creating accounts if we have multiple `device` factors sources, or
 			// in general if we have an "olympia" `devive` factor source, we let user choose.
-			if Entity.entityKind == .account, factorSources.filter({ $0.kind == .device }).count > 1 || factorSources.contains(where: \.supportsOlympia)
+			if Entity.entityKind == .account, hdOnDeviceFactorSources.count > 1 || factorSources.contains(where: \.supportsOlympia)
 			{
 				return goToStep1SelectGenesisFactorSource(
 					entityName: specifiedNameForNewEntityToCreate,
-					factorSources: factorSources,
+					hdOnDeviceFactorSources: hdOnDeviceFactorSources,
 					state: &state
 				)
 			} else {
 				return goToStep2Creation(
 					curve: .curve25519, // The babylon execution path, safe to default to curve25519
 					entityName: specifiedNameForNewEntityToCreate,
-					factorSource: factorSources.first,
+					hdOnDeviceFactorSource: hdOnDeviceFactorSources.first,
 					state: &state
 				)
 			}
@@ -137,7 +138,7 @@ public struct CreateEntityCoordinator<
 			return goToStep2Creation(
 				curve: curve,
 				entityName: specifiedNameForNewEntityToCreate,
-				factorSource: factorSource,
+				hdOnDeviceFactorSource: factorSource,
 				state: &state
 			)
 
@@ -176,13 +177,13 @@ public struct CreateEntityCoordinator<
 
 	private func goToStep1SelectGenesisFactorSource(
 		entityName: NonEmpty<String>,
-		factorSources: NonEmpty<IdentifiedArrayOf<FactorSource>>,
+		hdOnDeviceFactorSources: NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>,
 		state: inout State
 	) -> EffectTask<Action> {
 		state.step = .step1_selectGenesisFactorSource(
 			.init(
 				specifiedNameForNewEntityToCreate: entityName,
-				factorSources: factorSources
+				hdOnDeviceFactorSources: hdOnDeviceFactorSources
 			)
 		)
 		return .none
@@ -191,14 +192,14 @@ public struct CreateEntityCoordinator<
 	private func goToStep2Creation(
 		curve: Slip10Curve,
 		entityName: NonEmpty<String>,
-		factorSource: FactorSource,
+		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = try! .step2_creationOfEntity(.init(
+		state.step = .step2_creationOfEntity(.init(
 			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
-			factorSource: factorSource
+			hdOnDeviceFactorSource: hdOnDeviceFactorSource
 		))
 		return .none
 	}

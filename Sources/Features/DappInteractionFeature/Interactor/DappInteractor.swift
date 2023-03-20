@@ -143,7 +143,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)
 					}
 				},
-				message: { TextState(L10n.DApp.Response.FailureAlert.message(reason)) }
+				message: {
+					TextState(
+						L10n.DApp.Response.FailureAlert.message + {
+							#if DEBUG
+							"\n\n" + reason
+							#else
+							""
+							#endif
+						}()
+					)
+				}
 			)
 			return .none
 
@@ -196,46 +206,48 @@ struct DappInteractor: Sendable, FeatureReducer {
 		state.currentModal = nil
 	}
 
+        
 	func handleIncommintRequests() -> EffectTask<Action> {
-		.run { send in
-			await radixConnectClient.loadFromProfileAndConnectAll()
-			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
+                .run { send in
+                        await radixConnectClient.loadFromProfileAndConnectAll()
+                        let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
-			for try await incomingMessageResult in await radixConnectClient.receiveMessages() {
-				guard !Task.isCancelled else {
-					return
-				}
+                        for try await incomingMessageResult in await radixConnectClient.receiveMessages() {
+                                guard !Task.isCancelled else {
+                                        return
+                                }
 
-				do {
-					let interactionMessage = try incomingMessageResult.unwrapResult()
-					let interaction = interactionMessage.peerMessage.content
-					guard interaction.metadata.networkId == currentNetworkID else {
-						let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
-						let currentNetwork = try Network.lookupBy(id: currentNetworkID)
-						let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
-							interactionId: interaction.id,
-							errorType: .wrongNetwork,
-							message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
-						)))
+                                do {
+                                        let interactionMessage = try incomingMessageResult.unwrapResult()
+                                        let interaction = interactionMessage.peerMessage.content
+                                        guard interaction.metadata.networkId == currentNetworkID else {
+                                                let incomingRequestNetwork = try Radix.Network.lookupBy(id: interaction.metadata.networkId)
+                                                let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
+                                                let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
+                                                        interactionId: interaction.id,
+                                                        errorType: .wrongNetwork,
+                                                        message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
+                                                )))
 
-						try await radixConnectClient.sendMessage(outMessage)
-						return
-					}
+                                                try await radixConnectClient.sendMessage(outMessage)
+                                                return
+                                        }
 
-					// TODO: uncomment and enable / disable based on developer mode preference
-					/*
-					 try await rolaClient.performDappDefinitionVerification(request.interaction.metadata)
-					 try await rolaClient.performWellKnownFileCheck(request.interaction.metadata)
-					 */
-					await send(.internal(.receivedRequestFromDapp(interactionMessage)), animation: .linear)
-				} catch {
-					loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
-					errorQueue.schedule(error)
-				}
-			}
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-		}
+                                        // TODO: uncomment and enable / disable based on developer mode preference
+                                        /*
+                                         try await rolaClient.performDappDefinitionVerification(request.interaction.metadata)
+                                         try await rolaClient.performWellKnownFileCheck(request.interaction.metadata)
+                                         */
+                                        await send(.internal(.receivedRequestFromDapp(interactionMessage)))
+                                } catch {
+                                        loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
+                                        errorQueue.schedule(error)
+                                }
+                        }
+                } catch: { error, _ in
+                        errorQueue.schedule(error)
+                }
+
 	}
 
 	func delayedEffect(

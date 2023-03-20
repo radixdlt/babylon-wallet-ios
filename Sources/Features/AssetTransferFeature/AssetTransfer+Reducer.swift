@@ -4,7 +4,7 @@ import TransactionSigningFeature
 // MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public typealias From = OnNetwork.Account
+		public typealias From = Profile.Network.Account
 
 		// TODO: declare union type for this in SharedModels
 		public enum AssetToTransfer: Sendable, Hashable {
@@ -13,7 +13,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		}
 
 		public enum To: Sendable, Hashable {
-//			case account(OnNetwork.Account)
+//			case account(Profile.Network.Account)
 			case address(AccountAddress)
 
 			var address: AccountAddress {

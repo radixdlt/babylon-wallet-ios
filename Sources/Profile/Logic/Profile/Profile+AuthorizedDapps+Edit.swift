@@ -17,11 +17,11 @@ extension Profile {
 	/// Saves a `AuthorizedDapp` into the profile
 	@discardableResult
 	public mutating func addAuthorizedDapp(
-		_ unvalidatedAuthorizedDapp: OnNetwork.AuthorizedDapp
-	) throws -> OnNetwork.AuthorizedDapp {
+		_ unvalidatedAuthorizedDapp: Profile.Network.AuthorizedDapp
+	) throws -> Profile.Network.AuthorizedDapp {
 		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = authorizedDapp.networkID
-		var network = try onNetwork(id: networkID)
+		var network = try network(id: networkID)
 		guard !network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
 			throw AuthorizedDappAlreadyExists()
 		}
@@ -34,10 +34,10 @@ extension Profile {
 
 	/// Forgets  a `AuthorizedDapp`
 	public mutating func forgetAuthorizedDapp(
-		_ authorizedDappID: OnNetwork.AuthorizedDapp.ID,
+		_ authorizedDappID: Profile.Network.AuthorizedDapp.ID,
 		on networkID: NetworkID
 	) throws {
-		var network = try onNetwork(id: networkID)
+		var network = try network(id: networkID)
 		guard network.authorizedDapps.remove(id: authorizedDappID) != nil else {
 			throw DappWasNotConnected()
 		}
@@ -46,9 +46,9 @@ extension Profile {
 	}
 
 	@discardableResult
-	private func validateAuthorizedPersonas(of authorizedDapp: OnNetwork.AuthorizedDapp) throws -> OnNetwork.AuthorizedDapp {
+	private func validateAuthorizedPersonas(of authorizedDapp: Profile.Network.AuthorizedDapp) throws -> Profile.Network.AuthorizedDapp {
 		let networkID = authorizedDapp.networkID
-		let network = try onNetwork(id: networkID)
+		let network = try network(id: networkID)
 
 		// Validate that all Personas are known and that every Field.ID is known
 		// for each Persona.
@@ -82,11 +82,11 @@ extension Profile {
 
 	/// Removes a Persona from a dApp in the Profile
 	public mutating func deauthorizePersonaFromDapp(
-		_ personaID: OnNetwork.Persona.ID,
-		dAppID: OnNetwork.AuthorizedDapp.ID,
+		_ personaID: Profile.Network.Persona.ID,
+		dAppID: Profile.Network.AuthorizedDapp.ID,
 		networkID: NetworkID
 	) throws {
-		var network = try onNetwork(id: networkID)
+		var network = try network(id: networkID)
 		guard var authorizedDapp = network.authorizedDapps[id: dAppID] else {
 			throw AuthorizedDappDoesNotExists()
 		}
@@ -103,11 +103,11 @@ extension Profile {
 
 	/// Updates a `AuthorizedDapp` in the profile
 	public mutating func updateAuthorizedDapp(
-		_ unvalidatedAuthorizedDapp: OnNetwork.AuthorizedDapp
+		_ unvalidatedAuthorizedDapp: Profile.Network.AuthorizedDapp
 	) throws {
 		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = authorizedDapp.networkID
-		var network = try onNetwork(id: networkID)
+		var network = try network(id: networkID)
 		guard network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
 			throw AuthorizedDappDoesNotExists()
 		}
@@ -119,11 +119,11 @@ extension Profile {
 
 	/// Updates or adds a `AuthorizedDapp` in the profile
 	public mutating func updateOrAddAuthorizedDapp(
-		_ unvalidatedAuthorizedDapp: OnNetwork.AuthorizedDapp
+		_ unvalidatedAuthorizedDapp: Profile.Network.AuthorizedDapp
 	) throws {
 		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = dapp.networkID
-		var network = try onNetwork(id: networkID)
+		var network = try network(id: networkID)
 		if network.authorizedDapps.contains(dapp: dapp) {
 			try updateAuthorizedDapp(dapp)
 		} else {
@@ -132,8 +132,8 @@ extension Profile {
 	}
 }
 
-extension OnNetwork.AuthorizedDapps {
-	public func contains(dapp authorizedDapp: OnNetwork.AuthorizedDapp) -> Bool {
+extension Profile.Network.AuthorizedDapps {
+	public func contains(dapp authorizedDapp: Profile.Network.AuthorizedDapp) -> Bool {
 		self[id: authorizedDapp.id] != nil
 	}
 }

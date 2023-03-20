@@ -14,12 +14,13 @@ extension UseFactorSourceClient: DependencyKey {
 
 		return Self(
 			publicKeyFromOnDeviceHD: { request in
-				let factorSourceID = request.factorSource.id
+				let factorSourceID = request.hdOnDeviceFactorSource.id
 
 				guard
 					let mnemonicWithPassphrase = try await secureStorageClient
 					.loadMnemonicByFactorSourceID(factorSourceID, .createEntity(kind: request.entityKind))
 				else {
+					loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
 					throw FailedToFindFactorSource()
 				}
 				let hdRoot = try mnemonicWithPassphrase.hdRoot()

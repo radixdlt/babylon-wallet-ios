@@ -40,7 +40,7 @@ public struct FactorSource:
 	public let parameters: Parameters
 
 	/// When this factor source for originally added by the user.
-	public private(set) var addedOn: Date // mutable for tests only
+	public let addedOn: Date
 
 	/// Date of last usage of this factor source
 	///
