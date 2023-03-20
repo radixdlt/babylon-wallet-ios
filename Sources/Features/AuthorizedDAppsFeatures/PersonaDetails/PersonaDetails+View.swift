@@ -49,12 +49,6 @@ extension PersonaDetails.View {
 			}
 			.navigationTitle(viewStore.personaLabel)
 			.alert(store: store.confirmForgetAlert)
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /PersonaDetails.Destinations.State.editPersona,
-				action: PersonaDetails.Destinations.Action.editPersona,
-				content: { EditPersonaDetails.View(store: $0) }
-			)
 		}
 	}
 }
