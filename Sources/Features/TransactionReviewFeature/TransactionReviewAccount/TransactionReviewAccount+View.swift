@@ -1,5 +1,49 @@
 import FeaturePrelude
 
+extension TransactionReviewAccounts.State {
+	var viewState: TransactionReviewAccounts.ViewState {
+		.init(showCustomizeGuarantees: showCustomizeGuarantees)
+	}
+}
+
+extension TransactionReviewAccounts {
+	public struct ViewState: Equatable {
+		let showCustomizeGuarantees: Bool
+	}
+
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<TransactionReviewAccounts>
+
+		public init(store: StoreOf<TransactionReviewAccounts>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				Card(insetContents: true) {
+					ForEachStore(
+						store.scope(
+							state: \.accounts,
+							action: { .child(.account(id: $0, action: $1)) }
+						),
+						content: { TransactionReviewAccount.View(store: $0) }
+					)
+
+					if viewStore.showCustomizeGuarantees {
+						Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
+							viewStore.send(.customizeGuaranteesTapped)
+						}
+						.textStyle(.body1Header)
+						.foregroundColor(.app.blue2)
+						.padding(.vertical, .small3)
+					}
+				}
+			}
+		}
+	}
+}
+
 extension TransactionReviewAccount.State {
 	var viewState: TransactionReviewAccount.ViewState {
 		switch account {

@@ -1,6 +1,31 @@
 import ComposableArchitecture
 import FeaturePrelude
 
+// MARK: - TransactionReviewAccounts
+public struct TransactionReviewAccounts: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public var accounts: IdentifiedArrayOf<TransactionReviewAccount.State>
+		public let showCustomizeGuarantees: Bool
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case customizeGuaranteesTapped
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case account(id: AccountAddress.ID, action: TransactionReviewAccount.Action)
+	}
+
+	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.forEach(\.accounts, action: /Action.child .. ChildAction.account) {
+				TransactionReviewAccount()
+			}
+	}
+}
+
 // MARK: - TransactionReviewAccount
 public struct TransactionReviewAccount: Sendable, FeatureReducer {
 	@Dependency(\.pasteboardClient) private var pasteboardClient

@@ -6,9 +6,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var message: String?
 
-		public var withdrawing: IdentifiedArrayOf<TransactionReviewAccount.State>?
+		public var withdrawing: TransactionReviewAccounts.State?
 		public var dAppsUsed: TransactionReviewDappsUsed.State?
-		public var depositing: IdentifiedArrayOf<TransactionReviewAccount.State>?
+		public var depositing: TransactionReviewAccounts.State?
 
 		public var presenting: IdentifiedArrayOf<Dapp>?
 
@@ -34,12 +34,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case closeTapped
 		case showRawTransactionTapped
 
-		case customizeGuaranteesTapped
 		case approveTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case account(id: AccountAddress.ID, action: TransactionReviewAccount.Action)
+		case withdrawing(TransactionReviewAccounts.Action)
+		case depositing(TransactionReviewAccounts.Action)
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
@@ -54,9 +54,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.dAppsUsed, action: /Action.child .. ChildAction.dAppsUsed) {
 				TransactionReviewDappsUsed()
 			}
-//			.ifLet(\.depositing, action: /Action.child .. ChildAction.depositing) {
-//
-//			}
+			.ifLet(\.withdrawing, action: /Action.child .. ChildAction.withdrawing) {
+				TransactionReviewAccounts()
+			}
+			.ifLet(\.depositing, action: /Action.child .. ChildAction.depositing) {
+				TransactionReviewAccounts()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -68,9 +71,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .showRawTransactionTapped:
 			return .none
 
-		case .customizeGuaranteesTapped:
-			return .none
-
 		case .approveTapped:
 			return .none
 		}
@@ -79,16 +79,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 extension TransactionReview.State {
 	public static let mock0 = Self(message: "Royalties claim",
-	                               withdrawing: [.mockWithdraw0],
+	                               withdrawing: .init(accounts: [.mockWithdraw0], showCustomizeGuarantees: false),
 	                               dAppsUsed: .init(isExpanded: false, dApps: []),
-	                               depositing: [.mockDeposit1],
+	                               depositing: .init(accounts: [.mockDeposit1], showCustomizeGuarantees: true),
 	                               presenting: [.mock1, .mock0],
 	                               networkFee: .init(fee: 0.1, isCongested: false))
 
 	public static let mock1 = Self(message: "Royalties claim",
-	                               withdrawing: [.mockWithdraw0, .mockWithdraw1],
+	                               withdrawing: .init(accounts: [.mockWithdraw0, .mockWithdraw1], showCustomizeGuarantees: false),
 	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
-	                               depositing: [.mockDeposit2],
+	                               depositing: .init(accounts: [.mockDeposit2], showCustomizeGuarantees: true),
 	                               networkFee: .init(fee: 0.2, isCongested: true))
 }
 
