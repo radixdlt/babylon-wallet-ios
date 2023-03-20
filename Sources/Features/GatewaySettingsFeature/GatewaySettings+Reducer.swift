@@ -100,7 +100,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadGateways(&state)
+			return .run { send in
+				await send(loadGateways())
+			}
 
 		case let .removeGateway(.presented(action)):
 			switch action {
@@ -119,7 +121,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				default:
 					return .run { send in
 						try await gatewaysClient.removeGateway(gateway.gateway)
-						await send(loadGatewaysAction())
+						await send(loadGateways())
 					}
 				}
 
@@ -198,7 +200,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				state.gatewayForRemoval = nil
 				return .run { send in
 					try await gatewaysClient.removeGateway(gatewayForRemoval)
-					await send(loadGatewaysAction())
+					await send(loadGateways())
 				}
 			} else {
 				return .none
@@ -235,7 +237,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		case .destination(.presented(.addNewGateway(.delegate(.dismiss)))):
 			state.destination = nil
-			return loadGateways(&state)
+			return .run { send in
+				await send(loadGateways())
+			}
 
 		case .destination(.presented(.createAccount(.delegate(.dismiss)))):
 			return skipSwitching(&state)
@@ -260,13 +264,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 }
 
 private extension GatewaySettings {
-	func loadGateways(_ state: inout State) -> EffectTask<Action> {
-		.run { send in
-			await send(loadGatewaysAction())
-		}
-	}
-
-	func loadGatewaysAction() async -> FeatureAction<GatewaySettings> {
+	func loadGateways() async -> FeatureAction<GatewaySettings> {
 		let gateways = await gatewaysClient.getAllGateways()
 		let current = await gatewaysClient.getCurrentGateway()
 		return .internal(.presentGateways(all: gateways.rawValue.elements, current: current))

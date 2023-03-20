@@ -130,16 +130,16 @@ final class GatewaySettingsFeatureTests: TestCase {
 		)
 		initialState.currentGateway = currentGateway
 
-		let removedGateway = ActorIsolated<Bool>(false)
+		let isGatewayRemoved = ActorIsolated<Bool>(false)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: GatewaySettings()
 		) {
 			$0.gatewaysClient.removeGateway = { _ in
-				await removedGateway.setValue(true)
+				await isGatewayRemoved.setValue(true)
 			}
 			$0.gatewaysClient.getAllGateways = {
-				if await removedGateway.value == true {
+				if await isGatewayRemoved.value == true {
 					return .init(rawValue: .init(uniqueElements: gatewaysAfterDeletion))!
 				} else {
 					return .init(rawValue: .init(uniqueElements: allGateways))!
