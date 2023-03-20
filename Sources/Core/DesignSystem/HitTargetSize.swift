@@ -8,6 +8,9 @@ public enum HitTargetSize: CGFloat {
 	/// 28
 	case verySmall = 28
 
+	/// 34
+	case smaller = 34
+
 	/// 44
 	case small = 44
 
@@ -26,6 +29,8 @@ public enum HitTargetSize: CGFloat {
 		case .smallest:
 			return .small3
 		case .verySmall:
+			return .small3
+		case .smaller:
 			return .small3
 		case .small:
 			return .small2

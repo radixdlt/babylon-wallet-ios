@@ -17,7 +17,7 @@ extension TransactionReviewNetworkFee {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				// TODO: implement
-				Text("Implement: TransactionReviewNetworkFee")
+				Text(L10n.TransactionReview.networkFeeText)
 					.background(Color.yellow)
 					.foregroundColor(.red)
 			}

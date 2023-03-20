@@ -7,7 +7,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var message: String?
 
 		public var withdrawing: IdentifiedArrayOf<TransactionReviewAccount.State>?
-		public var usedDapps: TransactionReviewDappsUsed.State
+		public var dAppsUsed: TransactionReviewDappsUsed.State?
 		public var depositing: IdentifiedArrayOf<TransactionReviewAccount.State>?
 
 		public var presenting: IdentifiedArrayOf<Dapp>?
@@ -16,13 +16,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public struct Dapp: Sendable, Identifiable, Hashable {
 			public let id: AccountAddress.ID
-			public let name: String
 			public let thumbnail: URL?
+			public let name: String
+			public let description: String?
 
-			public init(id: AccountAddress.ID, name: String, thumbnail: URL?) {
+			public init(id: AccountAddress.ID, thumbnail: URL?, name: String, description: String?) {
 				self.id = id
-				self.name = name
 				self.thumbnail = thumbnail
+				self.name = name
+				self.description = description
 			}
 		}
 	}
@@ -38,11 +40,24 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case account(id: AccountAddress.ID, action: TransactionReviewAccount.Action)
-		case dapp(TransactionReviewDappsUsed.Action)
+		case dAppsUsed(TransactionReviewDappsUsed.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.networkFee, action: /Action.child .. ChildAction.networkFee) {
+			TransactionReviewNetworkFee()
+		}
+		Reduce(core)
+			.ifLet(\.dAppsUsed, action: /Action.child .. ChildAction.dAppsUsed) {
+				TransactionReviewDappsUsed()
+			}
+//			.ifLet(\.depositing, action: /Action.child .. ChildAction.depositing) {
+//
+//			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -65,23 +80,23 @@ public struct TransactionReview: Sendable, FeatureReducer {
 extension TransactionReview.State {
 	public static let mock0 = Self(message: "Royalties claim",
 	                               withdrawing: [.mockWithdraw0],
-	                               usedDapps: .init(isExpanded: false, dapps: []),
+	                               dAppsUsed: .init(isExpanded: false, dApps: []),
 	                               depositing: [.mockDeposit1],
 	                               presenting: [.mock1, .mock0],
 	                               networkFee: .init(fee: 0.1, isCongested: false))
 
 	public static let mock1 = Self(message: "Royalties claim",
 	                               withdrawing: [.mockWithdraw0, .mockWithdraw1],
-	                               usedDapps: .init(isExpanded: true, dapps: [.mock3, .mock2]),
+	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
 	                               depositing: [.mockDeposit2],
 	                               networkFee: .init(fee: 0.2, isCongested: true))
 }
 
 extension TransactionReview.State.Dapp {
-	public static let mock0 = Self(id: .deadbeef32Bytes, name: "Collabofi User Badge", thumbnail: nil)
-	public static let mock1 = Self(id: .deadbeef64Bytes, name: "Oh Babylon Founder NFT", thumbnail: nil)
-	public static let mock2 = Self(id: "lkjl", name: "Megaswap", thumbnail: nil)
-	public static let mock3 = Self(id: "lkhgh", name: "Superswap", thumbnail: nil)
+	public static let mock0 = Self(id: .deadbeef32Bytes, thumbnail: nil, name: "Collabofi User Badge", description: nil)
+	public static let mock1 = Self(id: .deadbeef64Bytes, thumbnail: nil, name: "Oh Babylon Founder NFT", description: "Investor 2 lines")
+	public static let mock2 = Self(id: "lkjl", thumbnail: nil, name: "Megaswap", description: nil)
+	public static let mock3 = Self(id: "lkhgh", thumbnail: nil, name: "Superswap", description: nil)
 }
 
 extension TransactionReviewAccount.State {
@@ -237,7 +252,7 @@ struct TransactionAmount: Sendable, Hashable {
 // MARK: Codable
 extension TransactionAmount: Codable {
 	init(from decoder: Decoder) throws {
-		var container = try decoder.singleValueContainer()
+		let container = try decoder.singleValueContainer()
 		let string = try container.decode(String.self)
 		self.wrappedValue = try BigDecimal(fromString: string)
 	}
