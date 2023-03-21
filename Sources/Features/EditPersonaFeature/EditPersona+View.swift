@@ -22,22 +22,6 @@ extension EditPersona {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) {
 				_ in
 				VStack(alignment: .leading, spacing: .medium1) {
-//					AppTextField(
-//						primaryHeading: L10n.PersonaDetails.personaLabelHeading,
-//						placeholder: "",
-//						text: viewStore.validation(
-//							get: \.$personaLabel,
-//							send: { .personaLabelTextFieldChanged($0) }
-//						),
-//						hint: viewStore.personaLabelHint,
-//						focusState: $focus,
-//						equals: .personaLabel,
-//						first: viewStore.binding(
-//							get: \.focus,
-//							send: { .focusChanged($0) }
-//						)
-//					)
-
 					EditPersonaField.View(
 						store: store.scope(
 							state: \.labelField,
@@ -54,46 +38,6 @@ extension EditPersona {
 						),
 						content: { EditPersonaField.View(store: $0) }
 					)
-
-//					AppTextField(
-//						primaryHeading: L10n.PersonaDetails.givenNameHeading,
-//						placeholder: "",
-//						text: viewStore.validation(
-//							get: \.$givenName,
-//							send: { .givenNameTextFieldChanged($0) }
-//						),
-//						hint: viewStore.givenNameHint,
-//						focusState: $focus,
-//						equals: .givenName,
-//						first: viewStore.binding(
-//							get: \.focus,
-//							send: { .focusChanged($0) }
-//						)
-//					)
-//					#if os(iOS)
-//					.textInputAutocapitalization(.words)
-//					#endif // iOS
-//
-//					AppTextField(
-//						primaryHeading: L10n.PersonaDetails.familyNameHeading,
-//						placeholder: "",
-//						text: viewStore.validation(
-//							get: \.$familyName,
-//							send: { .familyNameTextFieldChanged($0) }
-//						),
-//						hint: viewStore.familyNameHint,
-//						focusState: $focus,
-//						equals: .familyName,
-//						first: viewStore.binding(
-//							get: \.focus,
-//							send: { .focusChanged($0) }
-//						)
-//					)
-//					#if os(iOS)
-//					.textInputAutocapitalization(.words)
-//					#endif // iOS
-
-					//                    .keyboardType(.emailAddress)
 				}
 			}
 			.padding(.horizontal, .medium1)
@@ -118,6 +62,7 @@ struct EditPersona_Preview: PreviewProvider {
 
 extension EditPersona.State {
 	public static let previewValue = Self(
+		mode: .edit,
 		personaLabel: NonEmptyString("RadIpsum"),
 		existingFields: [
 			.init(kind: .givenName, value: "Lorem"),

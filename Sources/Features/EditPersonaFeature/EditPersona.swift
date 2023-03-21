@@ -4,6 +4,11 @@ import Profile
 // MARK: - EditPersonaDetails
 public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Mode: Sendable, Hashable {
+			case edit
+			case dapp(requiredFields: [Profile.Network.Persona.Field.Kind])
+		}
+
 		public enum Field: Sendable, Hashable {
 			case personaLabel
 
@@ -22,27 +27,13 @@ public struct EditPersona: Sendable, FeatureReducer {
 			}
 		}
 
-//		@Validation<String, String>
-//		var personaLabel: String?
-//		@Validation<String, String>
-//		var givenName: String?
-//		@Validation<String, String>
-//		var familyName: String?
-
-		//            personaLabel: $personaLabel,
-		//            personaLabelHint: ($personaLabel.errors?.first).map { .error($0) },
-		//            givenName: $givenName,
-		//            givenNameHint: ($givenName.errors?.first).map { .error($0) },
-		//            familyName: $familyName,
-		//            familyNameHint: ($familyName.errors?.first).map { .error($0) }
-
 		var labelField: EditPersonaField.State
 		var fields: IdentifiedArrayOf<EditPersonaField.State>
 
 		public init(
+			mode: Mode,
 			personaLabel: NonEmptyString,
-			existingFields: IdentifiedArrayOf<Profile.Network.Persona.Field>,
-			fieldsRequiredByDapp: [Profile.Network.Persona.Field.Kind] = []
+			existingFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) {
 			self.labelField = .label(initial: personaLabel.rawValue)
 			self.fields = IdentifiedArray(
@@ -50,7 +41,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 					EditPersonaField.State.other(
 						.init(field.kind),
 						initial: field.value.rawValue,
-						isRequiredByDapp: fieldsRequiredByDapp.contains(field.kind)
+						isRequiredByDapp: {
+							switch mode {
+							case .edit:
+								return false
+							case let .dapp(requiredFields):
+								return requiredFields.contains(field.kind)
+							}
+						}()
 					)
 				}
 			)
@@ -77,9 +75,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-//		case personaLabelTextFieldChanged(String)
-//		case givenNameTextFieldChanged(String)
-//		case familyNameTextFieldChanged(String)
+		case cancelButtonTapped
+		case saveButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -88,19 +85,15 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public init() {}
 
+	@Dependency(\.dismiss) var dismiss
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-//		case let .personaLabelTextFieldChanged(personaLabel):
-//			state.personaLabel = personaLabel
-//			return .none
-//
-//		case let .givenNameTextFieldChanged(givenName):
-//			state.givenName = givenName
-//			return .none
-//
-//		case let .familyNameTextFieldChanged(familyName):
-//			state.familyName = familyName
-//			return .none
+		case .cancelButtonTapped:
+			return .run { _ in await dismiss() }
+		case .saveButtonTapped:
+			// TODO:
+			return .none
 		}
 	}
 }

@@ -358,9 +358,9 @@ public enum L10n {
   }
   public enum EditPersona {
     public enum InputError {
-      public enum All {
+      public enum General {
         /// Required field for this dApp
-        public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputError.all.requiredByDapp", fallback: "Required field for this dApp")
+        public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputError.general.requiredByDapp", fallback: "Required field for this dApp")
       }
       public enum PersonaLabel {
         /// Label cannot be blank

@@ -8,6 +8,8 @@ public struct EditPersonaField: Sendable, FeatureReducer {
 		@Validation<String, String>
 		public var input: String?
 
+		public let isRequiredByDapp: Bool
+
 		public static func label(
 			initial: String?
 		) -> Self {
@@ -17,7 +19,8 @@ public struct EditPersonaField: Sendable, FeatureReducer {
 					wrappedValue: initial,
 					onNil: L10n.EditPersona.InputError.PersonaLabel.blank,
 					rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.PersonaLabel.blank)]
-				)
+				),
+				isRequiredByDapp: false
 			)
 		}
 
@@ -32,7 +35,8 @@ public struct EditPersonaField: Sendable, FeatureReducer {
 					wrappedValue: initial,
 					onNil: nil, // TODO:
 					rules: []
-				)
+				),
+				isRequiredByDapp: isRequiredByDapp
 			)
 		}
 	}

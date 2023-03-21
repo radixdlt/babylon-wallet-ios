@@ -161,7 +161,7 @@
 "personaDetails.deauthorizePersonaAlertConfirm" = "Confirm";
 "personaDetails.deauthorizePersonaAlertCancel" = "Cancel";
 
-"editPersona.inputError.all.requiredByDapp" = "Required field for this dApp";
+"editPersona.inputError.general.requiredByDapp" = "Required field for this dApp";
 "editPersona.inputError.personaLabel.blank" = "Label cannot be blank";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
