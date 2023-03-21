@@ -166,7 +166,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gateways.current.id == $0.id,
-						canBeDeleted: $0.id != Radix.Gateway.nebunet.id
+						canBeDeleted: !$0.isDefault
 					)
 				}
 				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })

@@ -34,6 +34,8 @@ extension Radix {
 extension Radix.Network {
 	public typealias Name = Tagged<Self, String>
 
+	static let `default`: Self = .nebunet
+
 	public static let nebunet = Self(
 		name: "nebunet",
 		id: .nebunet,
@@ -91,6 +93,10 @@ struct UnknownNetwork: Swift.Error, CustomStringConvertible {
 }
 
 extension Radix.Network {
+	public var isDefault: Bool {
+		id == Self.default.id
+	}
+
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

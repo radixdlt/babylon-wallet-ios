@@ -2,13 +2,9 @@ import FeaturePrelude
 
 extension GatewayRow.State {
 	var viewState: GatewayRow.ViewState {
-		let name: String = {
-			if gateway.id == Radix.Gateway.nebunet.id {
-				return L10n.GatewaySettings.radixBetanetGateway
-			} else {
-				return gateway.url.absoluteString
-			}
-		}()
+		let name = gateway.isDefault ?
+			L10n.GatewaySettings.radixBetanetGateway :
+			gateway.url.absoluteString
 
 		return .init(
 			name: name,
