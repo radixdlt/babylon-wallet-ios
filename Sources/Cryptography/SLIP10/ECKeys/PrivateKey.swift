@@ -37,30 +37,18 @@ extension SLIP10.PrivateKey {
 	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
-	public func sign(
-		unhashed: some DataProtocol,
-		hashOfMessage: some DataProtocol,
-		ifECDSASkipHashingBeforeSigning: Bool = false
-	) throws -> SignatureWithPublicKey {
-		try signReturningHashOfMessage(
-			unhashed: unhashed,
-			hashOfMessage: hashOfMessage,
-			ifECDSASkipHashingBeforeSigning: ifECDSASkipHashingBeforeSigning
-		).signatureWithPublicKey
+	public func sign(hashOfMessage: some DataProtocol) throws -> SignatureWithPublicKey {
+		try signReturningHashOfMessage(hashOfMessage: hashOfMessage)
+			.signatureWithPublicKey
 	}
 
 	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
-	public func signReturningHashOfMessage(
-		unhashed unhashed_: some DataProtocol,
-		hashOfMessage hashOfMessage_: some DataProtocol,
-		ifECDSASkipHashingBeforeSigning: Bool = false
-	) throws -> (signatureWithPublicKey: SignatureWithPublicKey, hashOfMessage: Data) {
+	public func signReturningHashOfMessage(hashOfMessage hashOfMessage_: some DataProtocol) throws -> (signatureWithPublicKey: SignatureWithPublicKey, hashOfMessage: Data) {
 		// TODO: Update this comment:
 		// We do Radix double SHA256 hashing, needed for secp256k1 but not for Curve25519, however,
 		// the hash is used as Transaction Identifier, disregarding of Curveu used.
-		let unhashed = Data(unhashed_)
 		let hashOfMessage = Data(hashOfMessage_)
 
 		// We now sign the hash of the message for both secp256k1 and Curve25519.
@@ -79,22 +67,12 @@ extension SLIP10.PrivateKey {
 
 		case let .secp256k1(key):
 			// Recoverable signature is needed
-			let messageToSign = try {
-				if ifECDSASkipHashingBeforeSigning {
-					guard unhashed.count == 32 else {
-						throw SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong()
-					}
-					return unhashed
-				} else {
-					return hashOfMessage
-				}
-			}()
-			let signature = try key.ecdsaSignRecoverable(hashed: messageToSign)
+			let signature = try key.ecdsaSignRecoverable(hashed: hashOfMessage)
 			let publicKey = key.publicKey
 
 			let isValid = try publicKey.isValid(
 				signature: signature,
-				hashed: messageToSign
+				hashed: hashOfMessage
 			)
 
 			guard isValid else {

@@ -38,7 +38,7 @@ extension UseFactorSourceClient: DependencyKey {
 					curve: request.curve
 				)
 				let hashedData = try blake2b(data: request.unhashedData)
-				return try privateKey.sign(unhashed: request.unhashedData, hashOfMessage: hashedData)
+				return try privateKey.sign(hashOfMessage: hashedData)
 			}
 		)
 	}()
