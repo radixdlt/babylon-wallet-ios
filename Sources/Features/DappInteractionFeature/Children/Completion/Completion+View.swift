@@ -36,7 +36,6 @@ extension Completion {
 				}
 				.padding(.horizontal, .small2)
 				.padding(.bottom, .medium3)
-				.onAppear { viewStore.send(.appeared) }
 				#if os(iOS)
 					.onWillDisappear {
 						viewStore.send(.willDisappear)

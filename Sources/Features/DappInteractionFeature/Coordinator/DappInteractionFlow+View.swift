@@ -28,6 +28,8 @@ extension DappInteractionFlow {
 						}
 					#endif
 				}
+				// This is required to disable the animation of internal components during transition
+				.transaction { $0.animation = nil }
 			} destination: {
 				destination(for: $0)
 				#if os(iOS)

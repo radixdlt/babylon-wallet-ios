@@ -13,20 +13,16 @@ struct Completion: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case appeared
 		case closeButtonTapped
 		case willDisappear
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case presented
 		case dismiss
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .send(.delegate(.presented))
 		case .closeButtonTapped, .willDisappear:
 			return .send(.delegate(.dismiss))
 		}
