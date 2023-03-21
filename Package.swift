@@ -107,6 +107,13 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "EditPersonaFeature",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [],
 		tests: .no

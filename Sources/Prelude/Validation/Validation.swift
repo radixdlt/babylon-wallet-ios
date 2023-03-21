@@ -113,28 +113,3 @@ public struct ValidationRule<Value, Error> {
 		}
 	}
 }
-
-// MARK: - ValidationError
-// public protocol ValidationError<Value>: CaseIterable {
-//	associatedtype Value
-//
-//	var condition: (Value) -> Bool { get }
-// }
-
-// extension Validation where Error: ValidationError<Value> {
-//	public init(wrappedValue: Value? = nil) {
-//		self.init(wrappedValue: wrappedValue, rules: Error.rules)
-//	}
-// }
-
-// extension ValidationError {
-//	public static var rules: [ValidationRule<Value, Self>] {
-//		allCases.map { error in
-//			ValidationRule { value in
-//				error.condition(value) ? error : nil
-//			}
-//		}
-//	}
-// }
-
-// public typealias ValidationRuleOf<Error: ValidationError> = ValidationRule<Error.Value, Error>
