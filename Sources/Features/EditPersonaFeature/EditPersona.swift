@@ -28,7 +28,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 
 		var labelField: EditPersonaField.State
-		var fields: IdentifiedArrayOf<EditPersonaField.State>
+		var dynamicFields: IdentifiedArrayOf<EditPersonaField.State>
 
 		public init(
 			mode: Mode,
@@ -36,7 +36,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			existingFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) {
 			self.labelField = .label(initial: personaLabel.rawValue)
-			self.fields = IdentifiedArray(
+			self.dynamicFields = IdentifiedArray(
 				uncheckedUniqueElements: existingFields.map { field in
 					EditPersonaField.State.other(
 						.init(field.kind),
@@ -81,7 +81,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaField.Action)
-		case field(id: State.Field, action: EditPersonaField.Action)
+		case dynamicField(id: State.Field, action: EditPersonaField.Action)
 	}
 
 	public init() {}
@@ -94,7 +94,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.forEach(\.fields, action: /Action.child .. ChildAction.field) {
+			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
 				EditPersonaField()
 			}
 	}

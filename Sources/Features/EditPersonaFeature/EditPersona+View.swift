@@ -8,8 +8,8 @@ extension EditPersona.State {
 				if let labelErrors = labelField.$input.errors {
 					allErrors.append(contentsOf: labelErrors)
 				}
-				let otherErrors = fields.compactMap(\.$input.errors).flatMap { $0 }
-				allErrors.append(contentsOf: otherErrors)
+				let dynamicErrors = dynamicFields.compactMap(\.$input.errors).flatMap { $0 }
+				allErrors.append(contentsOf: dynamicErrors)
 				return !allErrors.isEmpty
 			}()
 		)
@@ -46,8 +46,8 @@ extension EditPersona {
 
 							ForEachStore(
 								store.scope(
-									state: \.fields,
-									action: { .child(.field(id: $0, action: $1)) }
+									state: \.dynamicFields,
+									action: { .child(.dynamicField(id: $0, action: $1)) }
 								),
 								content: { EditPersonaField.View(store: $0) }
 							)
@@ -85,23 +85,41 @@ struct EditPersona_Preview: PreviewProvider {
 	static var previews: some View {
 		EditPersona.View(
 			store: .init(
-				initialState: .previewValue,
+				initialState: .previewValue(mode: .edit),
 				reducer: EditPersona()
 			)
 		)
+		.previewDisplayName("Edit Mode")
+
+		EditPersona.View(
+			store: .init(
+				initialState: .previewValue(
+					mode: .dapp(
+						requiredFields: [
+							.givenName,
+							.emailAddress,
+						]
+					)
+				),
+				reducer: EditPersona()
+			)
+		)
+		.previewDisplayName("dApp Mode")
 	}
 }
 
 extension EditPersona.State {
-	public static let previewValue = Self(
-		mode: .edit,
-		personaLabel: NonEmptyString("RadIpsum"),
-		existingFields: [
-			.init(kind: .givenName, value: "Lorem"),
-			.init(kind: .familyName, value: "Ipsum"),
-			.init(kind: .emailAddress, value: "lorem.ipsum@example.com"),
-			.init(kind: .phoneNumber, value: "555-5555"),
-		]
-	)
+	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
+		.init(
+			mode: mode,
+			personaLabel: NonEmptyString("RadIpsum"),
+			existingFields: [
+				//                .init(kind: .givenName, value: "Lorem"),
+				//                .init(kind: .familyName, value: "Ipsum"),
+				//                .init(kind: .emailAddress, value: "lorem.ipsum@example.com"),
+				//                .init(kind: .phoneNumber, value: "555-5555"),
+			]
+		)
+	}
 }
 #endif
