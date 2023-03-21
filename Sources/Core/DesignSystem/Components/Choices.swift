@@ -167,10 +167,9 @@ public struct Choose_Preview: View {
 					} else {
 						Text("Result: nil")
 					}
-					Button("Continue", action: {})
-						.buttonStyle(.primaryRectangular)
-						.disabled(choices == nil)
-						.opacity(choices == nil ? 0.3 : 1)
+					WithControlRequirements(choices, forAction: { print($0) }) { action in
+						Button("Continue", action: action).buttonStyle(.primaryRectangular)
+					}
 				}
 				.padding()
 			}
