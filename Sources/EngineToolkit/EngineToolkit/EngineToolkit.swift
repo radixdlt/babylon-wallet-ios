@@ -187,14 +187,14 @@ extension EngineToolkit {
 		)
 	}
 
-	public func analyzeManifestWithPreviewContext(
-		request: AnalyzeManifestWithPreviewContextRequest
-	) -> Result<AnalyzeManifestWithPreviewContextResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: analyze_manifest_with_preview_context
-		)
-	}
+//	public func analyzeManifestWithPreviewContext(
+//		request: AnalyzeManifestWithPreviewContextRequest
+//	) -> Result<AnalyzeManifestWithPreviewContextResponse, Error> {
+//		callLibraryFunction(
+//			request: request,
+//			function: analyze_manifest_with_preview_context
+//		)
+//	}
 
 	public func analyzeManifest(
 		request: AnalyzeManifestRequest

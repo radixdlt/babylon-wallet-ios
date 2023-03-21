@@ -6,11 +6,11 @@ import GatewayAPI
 extension AccountPortfolio {
 	init(
 		owner: AccountAddress,
-		response: GatewayAPI.EntityResourcesResponse
+		response: GatewayAPI.StateEntityDetailsResponse
 	) throws {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
-		let fungibleContainers = try response.fungibleResources.items.map { fungibleBalance in
+		let fungibleContainers = try response.items.compactMap(\.fungibleResources).flatMap(\.items).map { fungibleBalance in
 			let balance = try BigDecimal(fromString: fungibleBalance.amount.value)
 			let componentAddress = ComponentAddress(address: fungibleBalance.address)
 			let networkID = try Radix.Network.lookupBy(name: response.ledgerState.network).id

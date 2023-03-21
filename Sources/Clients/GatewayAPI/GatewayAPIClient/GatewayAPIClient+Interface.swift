@@ -9,7 +9,6 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
-	public var accountMetadataByAddress: GetAccountMetadataByAddress
 	public var resourcesOverview: GetResourcesOverview
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
 	public var getNonFungibleLocalIds: GetNonFungibleLocalIds
@@ -22,15 +21,13 @@ extension GatewayAPIClient {
 
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
-	public typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
+	public typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.StateEntityDetailsResponse
 
-	public typealias GetAccountMetadataByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityMetadataResponse
+	public typealias GetResourcesOverview = @Sendable (GatewayAPI.StateEntityDetailsRequest) async throws -> GatewayAPI.StateEntityDetailsResponse
 
-	public typealias GetResourcesOverview = @Sendable (GatewayAPI.EntityOverviewRequest) async throws -> GatewayAPI.EntityOverviewResponse
+	public typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.StateEntityDetailsResponse
 
-	public typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
-
-	public typealias GetNonFungibleLocalIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.NonFungibleIdsResponseAllOf
+	public typealias GetNonFungibleLocalIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.StateNonFungibleIdsResponseAllOf
 
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 

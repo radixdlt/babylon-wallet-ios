@@ -16,6 +16,7 @@ public typealias PublicKeyEddsaEd25519AllOf = GatewayAPI.PublicKeyEddsaEd25519Al
 // MARK: - GatewayAPI.PublicKeyEddsaEd25519AllOf
 extension GatewayAPI {
 	public struct PublicKeyEddsaEd25519AllOf: Codable, Hashable {
+		static let keyHexRule = StringRule(minLength: 64, maxLength: 64, pattern: nil)
 		/** The hex-encoded compressed EdDSA Ed25519 public key (32 bytes) */
 		public private(set) var keyHex: String
 

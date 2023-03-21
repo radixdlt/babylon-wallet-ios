@@ -148,26 +148,22 @@ extension GatewayAPIClient {
 			},
 			accountResourcesByAddress: { @Sendable accountAddress in
 				try await post(
-					request: GatewayAPI.EntityResourcesRequest(address: accountAddress.address)
-				) { @Sendable base in base.appendingPathComponent("entity/resources") }
-			},
-			accountMetadataByAddress: { @Sendable accountAddress in
-				try await post(
-					request: GatewayAPI.EntityMetadataRequest(address: accountAddress.address)
-				) { @Sendable base in base.appendingPathComponent("entity/metadata") }
+					request: GatewayAPI.StateEntityDetailsRequest(addresses: [accountAddress.address])
+				) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 			},
 			resourcesOverview: { resourcesOverviewRequest in
 				try await post(
 					request: resourcesOverviewRequest
-				) { $0.appendingPathComponent("entity/overview") }
+				) { $0.appendingPathComponent("state/entity/details") }
 			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
 				try await post(
 					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
-				) { $0.appendingPathComponent("entity/details") }
-			}, getNonFungibleLocalIds: { accountAddress, resourceAddress in
+				) { $0.appendingPathComponent("state/entity/details") }
+			},
+			getNonFungibleLocalIds: { accountAddress, resourceAddress in
 				try await post(
-					request: GatewayAPI.EntityNonFungibleIdsRequestAllOf(
+					request: GatewayAPI.EntityNonFungibleIds(
 						address: accountAddress.address,
 						resourceAddress: resourceAddress
 					)

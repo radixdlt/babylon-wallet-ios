@@ -1,0 +1,37 @@
+import Foundation
+
+@available(*, deprecated, renamed: "GatewayAPI.FungibleResourcesCollectionItem")
+public typealias NonFungibleResourcesCollectionItem = GatewayAPI.FungibleResourcesCollectionItem
+
+// MARK: - GatewayAPI.NonFungibleResourcesCollectionItem
+extension GatewayAPI {
+	public enum NonFungibleResourcesCollectionItem: Codable, Hashable {
+		case globallyAggregated(NonFungibleResourcesCollectionItemGloballyAggregated)
+		case vaultAggregated(NonFungibleResourcesCollectionItemVaultAggregated)
+
+		private enum CodingKeys: String, CodingKey {
+			case aggregationLevel = "aggregation_level"
+		}
+
+		public init(from decoder: Decoder) throws {
+			let container = try decoder.container(keyedBy: CodingKeys.self)
+			let aggregationLevel = try container.decode(ResourceAggregationLevel.self, forKey: .aggregationLevel)
+
+			switch aggregationLevel {
+			case .global:
+				self = .globallyAggregated(try NonFungibleResourcesCollectionItemGloballyAggregated(from: decoder))
+			case .vault:
+				self = .vaultAggregated(try NonFungibleResourcesCollectionItemVaultAggregated(from: decoder))
+			}
+		}
+
+		public func encode(to encoder: Encoder) throws {
+			switch self {
+			case let .globallyAggregated(item):
+				try item.encode(to: encoder)
+			case let .vaultAggregated(item):
+				try item.encode(to: encoder)
+			}
+		}
+	}
+}

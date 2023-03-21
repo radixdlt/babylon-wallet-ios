@@ -9,8 +9,8 @@ fi
 
 cd $(dirname $0)
 INPUTDIR=$PWD
-# using https://github.com/radixdlt/babylon-gateway/blob/release/betanet-v2/src/RadixDlt.NetworkGateway.GatewayApi/gateway-api-schema.yaml
-# commit 074cad8 from 2023-02-01
+# using https://github.com/radixdlt/babylon-gateway/blob/develop/src/RadixDlt.NetworkGateway.GatewayApi/gateway-api-schema.yaml
+# commit 0836c93 from 2023-03-17
 PROJECT_NAME=Gateway
 SWAGGER_TEMPLATE="$INPUTDIR/gateway-api-spec.yml"
 OUTPUTDIR="$INPUTDIR/.."
@@ -22,7 +22,7 @@ echo "🎯 Destination for generated files: '$DESTINATION'"
 $GEN_TOOL generate -i $SWAGGER_TEMPLATE \
 -g swift5 \
 -o $OUTPUTDIR \
---additional-properties=useJsonEncodable=false,readonlyProperties=true,swiftUseApiNamespace=true,projectName=Gateway # CONFIG OPTIONS
+--additional-properties=useJsonEncodable=false,legacyDiscriminatorBehavior=true,readonlyProperties=true,swiftUseApiNamespace=true,projectName=Gateway # CONFIG OPTIONS
 
 echo "✨ Generation of models done, Removing some files we dont need."
 cd $INPUTDIR

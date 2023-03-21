@@ -52,33 +52,9 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
-					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
-					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
 			)
 		)
 		.presentsLoadingViewOverlay()
-	}
-}
-
-extension GatewayAPIClient {
-	// TODO: should be with(noop) — see GatewayAPIClient+Mock.swift for deets.
-	static let previewValueDappMetadataSuccess = with(previewValue) {
-		$0.accountMetadataByAddress = { @Sendable _ in
-			try await Task.sleep(for: .seconds(2))
-			return GatewayAPI.EntityMetadataResponse(
-				ledgerState: .previewValue,
-				address: "abc",
-				metadata: .init(items: [])
-			)
-		}
-	}
-
-	// TODO: should be with(noop) — see GatewayAPIClient+Mock.swift for deets.
-	static let previewValueDappMetadataFailure = with(previewValue) {
-		$0.accountMetadataByAddress = { @Sendable _ in
-			try await Task.sleep(for: .seconds(2))
-			throw NoopError()
-		}
 	}
 }
 #endif
