@@ -29,8 +29,8 @@ public enum ChoiceRequirement: Hashable {
 	}
 }
 
-// MARK: - Choose
-public struct Choose<Value: Hashable, Content: View>: View {
+// MARK: - Choices
+public struct Choices<Value: Hashable, Content: View>: View {
 	public struct Item {
 		public let value: Value
 		public var isChosen: Bool
@@ -38,24 +38,24 @@ public struct Choose<Value: Hashable, Content: View>: View {
 		public var action: () -> Void
 	}
 
-	let requirement: ChoiceRequirement
-	let values: OrderedSet<Value>
-	@State
-	var chosenValues: Set<Value>
 	@Binding
 	var result: [Value]?
+	@State
+	var chosenValues: Set<Value>
+	let values: OrderedSet<Value>
+	let requirement: ChoiceRequirement
 	let content: (Item) -> Content
 
 	public init(
-		_ requirement: ChoiceRequirement,
-		from values: some Collection<Value>,
-		through result: Binding<[Value]?>,
+		_ choices: Binding<[Value]?>,
+		in values: some Sequence<Value>,
+		requiring requirement: ChoiceRequirement,
 		@ViewBuilder content: @escaping (Item) -> Content
 	) {
-		self.requirement = requirement
+		self._result = choices
+		self.chosenValues = choices.wrappedValue.map(Set.init) ?? []
 		self.values = OrderedSet(values)
-		self.chosenValues = result.wrappedValue.map(Set.init) ?? []
-		self._result = result
+		self.requirement = requirement
 		self.content = content
 	}
 
@@ -143,7 +143,7 @@ public struct Choose_Preview: View {
 
 	public var body: some View {
 		List {
-			Choose(requirement, from: Array(1 ... 10), through: $choices) { item in
+			Choices($choices, in: 1 ... 10, requiring: requirement) { item in
 				HStack {
 					Text(String(item.value))
 					Spacer()
