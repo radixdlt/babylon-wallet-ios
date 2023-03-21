@@ -152,6 +152,22 @@ extension Profile.Network.Persona.Field {
 	}
 }
 
+// MARK: - Profile.Network.Persona.Field.Kind + Comparable
+extension Profile.Network.Persona.Field.Kind: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.index < rhs.index
+	}
+
+	private var index: Int {
+		switch self {
+		case .givenName: return 0
+		case .familyName: return 1
+		case .emailAddress: return 2
+		case .phoneNumber: return 3
+		}
+	}
+}
+
 extension Profile.Network.Persona.Field {
 	public var customDumpMirror: Mirror {
 		.init(

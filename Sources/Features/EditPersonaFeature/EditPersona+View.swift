@@ -35,7 +35,7 @@ extension EditPersona {
 				NavigationStack {
 					ScrollView {
 						VStack(alignment: .leading, spacing: .medium1) {
-							EditPersonaField.View(
+							EditPersonaStaticField.View(
 								store: store.scope(
 									state: \.labelField,
 									action: { .child(.labelField($0)) }
@@ -49,7 +49,7 @@ extension EditPersona {
 									state: \.dynamicFields,
 									action: { .child(.dynamicField(id: $0, action: $1)) }
 								),
-								content: { EditPersonaField.View(store: $0) }
+								content: { EditPersonaDynamicField.View(store: $0) }
 							)
 						}
 						.padding(.horizontal, .medium1)

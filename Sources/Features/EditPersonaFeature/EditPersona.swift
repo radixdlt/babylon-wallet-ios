@@ -6,40 +6,28 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
-			case dapp(requiredFields: [Profile.Network.Persona.Field.Kind])
+			case dapp(requiredFields: [DynamicField])
 		}
 
-		public enum Field: Sendable, Hashable {
+		public enum StaticField: Sendable, Hashable {
 			case personaLabel
-
-			case givenName
-			case familyName
-			case emailAddress
-			case phoneNumber
-
-			public init(_ field: Profile.Network.Persona.Field.Kind) {
-				switch field {
-				case .givenName: self = .givenName
-				case .familyName: self = .familyName
-				case .emailAddress: self = .emailAddress
-				case .phoneNumber: self = .phoneNumber
-				}
-			}
 		}
 
-		var labelField: EditPersonaField.State
-		var dynamicFields: IdentifiedArrayOf<EditPersonaField.State>
+		public typealias DynamicField = Profile.Network.Persona.Field.Kind
+
+		var labelField: EditPersonaStaticField.State
+		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
 
 		public init(
 			mode: Mode,
 			personaLabel: NonEmptyString,
 			existingFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) {
-			self.labelField = .label(initial: personaLabel.rawValue)
+			self.labelField = EditPersonaStaticField.State(initial: personaLabel.rawValue)
 			self.dynamicFields = IdentifiedArray(
 				uncheckedUniqueElements: existingFields.map { field in
-					EditPersonaField.State.other(
-						.init(field.kind),
+					EditPersonaDynamicField.State(
+						field.kind,
 						initial: field.value.rawValue,
 						isRequiredByDapp: {
 							switch mode {
@@ -80,8 +68,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case labelField(EditPersonaField.Action)
-		case dynamicField(id: State.Field, action: EditPersonaField.Action)
+		case labelField(EditPersonaStaticField.Action)
+		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
 	}
 
 	public init() {}
