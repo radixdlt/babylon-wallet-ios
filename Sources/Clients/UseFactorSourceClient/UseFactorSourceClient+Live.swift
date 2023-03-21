@@ -1,4 +1,5 @@
 import ClientPrelude
+import EngineToolkit
 import Profile
 import SecureStorageClient
 
@@ -36,7 +37,8 @@ extension UseFactorSourceClient: DependencyKey {
 					path: request.derivationPath,
 					curve: request.curve
 				)
-				return try privateKey.sign(unhashed: request.unhashedData)
+				let hashedData = try blake2b(data: request.unhashedData)
+				return try privateKey.sign(unhashed: request.unhashedData, hashOfMessage: hashedData)
 			}
 		)
 	}()

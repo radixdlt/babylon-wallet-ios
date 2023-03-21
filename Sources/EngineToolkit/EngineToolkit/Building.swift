@@ -73,8 +73,12 @@ extension TransactionIntent {
 			).get()
 		let compiledTransactionIntent = compiledTransactionIntentResponse.compiledIntent
 
+		let hashOfTransactionIntent = try blake2b(data: compiledTransactionIntent)
 		let intentSignaturesWithHash = try privateKeys.map {
-			try $0.signReturningHashOfMessage(unhashed: compiledTransactionIntent)
+			try $0.signReturningHashOfMessage(
+				unhashed: compiledTransactionIntent,
+				hashOfMessage: hashOfTransactionIntent
+			)
 		}
 		let transactionIntentHash = intentSignaturesWithHash.first?.hashOfMessage ?? Data(SHA256.twice(data: compiledTransactionIntent))
 		assert(intentSignaturesWithHash.map(\.hashOfMessage).allSatisfy { $0 == transactionIntentHash })
@@ -111,7 +115,11 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 			request: self.signedTransactionIntent
 		).get().compiledIntent
 
-		let (signature, _) = try privateKey.signReturningHashOfMessage(unhashed: compiledSignedTransactionIntent)
+		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
+		let (signature, _) = try privateKey.signReturningHashOfMessage(
+			unhashed: compiledSignedTransactionIntent,
+			hashOfMessage: hashOfTransactionIntent
+		)
 
 		let signedTransactionIntent = SignedTransactionIntent(
 			intent: transactionIntent,
@@ -143,10 +151,14 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 
 		let compiledSignedTransactionIntent = compileSignedTransactionIntentResponse.compiledIntent
 
+		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
+
 		// Notarize the signed intent to create a notarized transaction
-		let (notarySignature, notarizedTransactionHash) = try notaryPrivateKey.signReturningHashOfMessage(
-			unhashed: compiledSignedTransactionIntent
-		)
+		let (notarySignature, notarizedTransactionHash) = try notaryPrivateKey
+			.signReturningHashOfMessage(
+				unhashed: compiledSignedTransactionIntent,
+				hashOfMessage: hashOfTransactionIntent
+			)
 
 		let notarizedTransaction = NotarizedTransaction(
 			signedIntent: signedTransactionIntent,

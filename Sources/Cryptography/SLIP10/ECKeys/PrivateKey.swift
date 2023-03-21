@@ -39,10 +39,12 @@ extension SLIP10.PrivateKey {
 	/// recoverable ECDSA signature.
 	public func sign(
 		unhashed: some DataProtocol,
+		hashOfMessage: some DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> SignatureWithPublicKey {
 		try signReturningHashOfMessage(
 			unhashed: unhashed,
+			hashOfMessage: hashOfMessage,
 			ifECDSASkipHashingBeforeSigning: ifECDSASkipHashingBeforeSigning
 		).signatureWithPublicKey
 	}
@@ -52,12 +54,13 @@ extension SLIP10.PrivateKey {
 	/// recoverable ECDSA signature.
 	public func signReturningHashOfMessage(
 		unhashed unhashed_: some DataProtocol,
+		hashOfMessage hashOfMessage_: some DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> (signatureWithPublicKey: SignatureWithPublicKey, hashOfMessage: Data) {
 		// We do Radix double SHA256 hashing, needed for secp256k1 but not for Curve25519, however,
 		// the hash is used as Transaction Identifier, disregarding of Curveu used.
 		let unhashed = Data(unhashed_)
-		let hashOfMessage = Data(SHA256.twice(data: unhashed))
+		let hashOfMessage = Data(hashOfMessage_)
 
 		switch self {
 		case let .curve25519(key):
