@@ -1,17 +1,17 @@
 CALL_METHOD
-    Address("account_sim1qwskd4q5jdywfw6f7jlwmcyp2xxq48uuwruc003x2kcskxh3na")
+    Address("account_sim1qjy5fakwygc45fkyhyxxulsf5zfae0ycez0x05et9hqs7d0gtn")
     "lock_fee"
     Decimal("10");
 
-ASSERT_ACCESS_RULE 
+ASSERT_ACCESS_RULE
     Enum(
-        "AccessRule::Protected", 
+        "AccessRule::Protected",
         Enum(
-            "AccessRuleNode::ProofRule", 
+            "AccessRuleNode::ProofRule",
             Enum(
-                "ProofRule::Require", 
+                "ProofRule::Require",
                 Enum(
-                    "SoftResourceOrNonFungible::StaticNonFungible", 
+                    "SoftResourceOrNonFungible::StaticNonFungible",
                     NonFungibleGlobalId(
                         "${auth_badge_resource_address}:${auth_badge_non_fungible_local_id}"
                     )
