@@ -410,8 +410,10 @@ public enum L10n {
     public enum WhatIsAGateway {
       /// What is a Gateway
       public static let buttonText = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.buttonText", fallback: "What is a Gateway")
+      /// This is a placeholder for gateway explanation text
+      public static let explanation = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.explanation", fallback: "This is a placeholder for gateway explanation text")
       /// What is a Gateway
-      public static let explanationText = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.explanationText", fallback: "What is a Gateway")
+      public static let title = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.title", fallback: "What is a Gateway")
     }
   }
   public enum Home {

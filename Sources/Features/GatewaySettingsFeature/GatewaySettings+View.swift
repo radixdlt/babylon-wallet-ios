@@ -2,16 +2,12 @@ import CreateEntityFeature
 import FeaturePrelude
 
 extension GatewaySettings.State {
-	var viewState: GatewaySettings.ViewState {
-		.init(isPopoverPresented: isPopoverPresented)
-	}
+	var viewState: GatewaySettings.ViewState { .init() }
 }
 
 // MARK: - GatewaySettings.View
 extension GatewaySettings {
-	public struct ViewState: Equatable {
-		let isPopoverPresented: Bool
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -53,6 +49,19 @@ extension GatewaySettings {
 							action: Destinations.Action.createAccount,
 							content: { CreateAccountCoordinator.View(store: $0) }
 						)
+						.sheet(
+							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+							state: /Destinations.State.explanationPanel,
+							action: Destinations.Action.explanationPanel,
+							content: {
+								ExplanationPanel.View(store: $0)
+									.presentationDetents([.medium])
+									.presentationDragIndicator(.visible)
+								#if os(iOS)
+									.presentationBackground(.blur)
+								#endif
+							}
+						)
 				}
 			}
 		}
@@ -61,7 +70,11 @@ extension GatewaySettings {
 			VStack(spacing: .zero) {
 				VStack(spacing: .small2) {
 					subtitle
-					whatIsAGatewayView(with: viewStore)
+
+					whatIsAGatewayButton(with: viewStore)
+						.flushedLeft
+						.padding(.vertical, .medium2)
+
 					Separator()
 				}
 				.padding([.leading, .trailing, .top], .medium3)
@@ -99,34 +112,13 @@ extension GatewaySettings {
 			Button {
 				viewStore.send(.popoverButtonTapped)
 			} label: {
-				Group {
+				HStack {
 					Image(asset: AssetResource.info)
 					Text(L10n.GatewaySettings.WhatIsAGateway.buttonText)
 						.textStyle(.body1StandaloneLink)
 				}
 				.tint(.app.blue2)
 			}
-		}
-
-		private func whatIsAGatewayView(with viewStore: ViewStoreOf<GatewaySettings>) -> some SwiftUI.View {
-			HStack {
-				whatIsAGatewayButton(with: viewStore)
-				#if os(iOS)
-					.floatingPopover(
-						isPresented: viewStore.binding(
-							get: \.isPopoverPresented,
-							send: { .popoverStateChanged($0) }
-						),
-						content: {
-							Text("What is a gateway explanation") // TODO: replace when defined
-								.padding()
-						}
-					)
-				#endif
-
-				Spacer()
-			}
-			.padding(.vertical, .medium2)
 		}
 	}
 }

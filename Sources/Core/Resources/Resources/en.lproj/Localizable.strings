@@ -242,4 +242,5 @@
 "gatewaySettings.subtitle" = "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.";
 "gatewaySettings.title" = "Gateways";
 "gatewaySettings.whatIsAGateway.buttonText" = "What is a Gateway";
-"gatewaySettings.whatIsAGateway.explanationText" = "What is a Gateway";
+"gatewaySettings.whatIsAGateway.explanation" = "This is a placeholder for gateway explanation text";
+"gatewaySettings.whatIsAGateway.title" = "What is a Gateway";

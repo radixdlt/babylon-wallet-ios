@@ -13,7 +13,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		var currentGateway: Radix.Gateway?
 		var validatedNewGatewayToSwitchTo: Radix.Gateway?
 		var gatewayForRemoval: Radix.Gateway?
-		var isPopoverPresented = false
 
 		public init(
 			gatewayList: GatewayList.State = .init(gateways: [])
@@ -27,7 +26,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case removeGateway(PresentationAction<RemoveGatewayAction>)
 		case addGatewayButtonTapped
 		case popoverButtonTapped
-		case popoverStateChanged(Bool)
 
 		public enum RemoveGatewayAction: Sendable, Hashable {
 			case removeButtonTapped(GatewayRow.State)
@@ -51,11 +49,13 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
+			case explanationPanel(ExplanationPanel.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
+			case explanationPanel(ExplanationPanel.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -65,6 +65,10 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
+			}
+
+			Scope(state: /State.explanationPanel, action: /Action.explanationPanel) {
+				ExplanationPanel()
 			}
 		}
 	}
@@ -134,11 +138,12 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			return .none
 
 		case .popoverButtonTapped:
-			state.isPopoverPresented = true
-			return .none
-
-		case let .popoverStateChanged(value):
-			state.isPopoverPresented = value
+			state.destination = .explanationPanel(
+				.init(
+					title: L10n.GatewaySettings.WhatIsAGateway.title,
+					explanation: L10n.GatewaySettings.WhatIsAGateway.explanation
+				)
+			)
 			return .none
 
 		default:
@@ -256,6 +261,10 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				}
 				return .internal(.switchToGatewayResult(result))
 			}
+
+		case .destination(.presented(.explanationPanel(.delegate(.dismiss)))):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none
