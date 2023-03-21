@@ -215,12 +215,13 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
-			"P2PLinksFeature",
 			"GatewaySettingsFeature",
+			"InspectProfileFeature",
 			"MnemonicClient",
+			"P2PLinksFeature",
 			"PersonasFeature",
 			"RadixConnectClient", // deleting connections when wallet is deleted
-			"InspectProfileFeature",
+			"ScanQRFeature", // scan legacy wallet QR
 		],
 		tests: .yes()
 	),

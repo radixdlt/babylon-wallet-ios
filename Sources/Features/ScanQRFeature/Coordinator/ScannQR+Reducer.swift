@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - ScannQR
-public struct ScannQR: Sendable, FeatureReducer {
+// MARK: - ScanQR
+public struct ScanQR: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
 		case cameraPermission(CameraPermission.State)
 		case doScanQR(DoScanQR.State)

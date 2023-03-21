@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ScanQRFeature
 
 extension ImportFromOlympiaLegacyWallet.State {
 	var viewState: ImportFromOlympiaLegacyWallet.ViewState {
@@ -21,12 +22,12 @@ extension ImportFromOlympiaLegacyWallet {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: ImportFromOlympiaLegacyWallet")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			SwitchStore(store) {
+				CaseLet(
+					state: /ImportFromOlympiaLegacyWallet.State.scanQR,
+					action: { ImportFromOlympiaLegacyWallet.Action.child(.scanQR($0)) },
+					then: { ScanQR.View(store: $0) }
+				)
 			}
 		}
 	}
@@ -48,6 +49,6 @@ struct ImportFromOlympiaLegacyWallet_Preview: PreviewProvider {
 }
 
 extension ImportFromOlympiaLegacyWallet.State {
-	public static let previewValue = Self()
+	public static let previewValue: Self = .scanQR(.init())
 }
 #endif
