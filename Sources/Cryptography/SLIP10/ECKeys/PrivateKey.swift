@@ -57,15 +57,15 @@ extension SLIP10.PrivateKey {
 		hashOfMessage hashOfMessage_: some DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> (signatureWithPublicKey: SignatureWithPublicKey, hashOfMessage: Data) {
+		// TODO: Update this comment:
 		// We do Radix double SHA256 hashing, needed for secp256k1 but not for Curve25519, however,
 		// the hash is used as Transaction Identifier, disregarding of Curveu used.
 		let unhashed = Data(unhashed_)
 		let hashOfMessage = Data(hashOfMessage_)
 
+		// We now sign the hash of the message for both secp256k1 and Curve25519.
 		switch self {
 		case let .curve25519(key):
-			// For Curve25519 we do not sign the hash but rather the original message,
-			// but for secp256k1 we sign the hash.
 			let signature = try key.signature(for: hashOfMessage)
 			let publicKey = key.publicKey
 			let isValid = publicKey.isValidSignature(signature, for: hashOfMessage)
@@ -78,7 +78,6 @@ extension SLIP10.PrivateKey {
 			), hashOfMessage: hashOfMessage)
 
 		case let .secp256k1(key):
-			// We do sign the hash of the message for secp256k1 but not for Curve25519.
 			// Recoverable signature is needed
 			let messageToSign = try {
 				if ifECDSASkipHashingBeforeSigning {
