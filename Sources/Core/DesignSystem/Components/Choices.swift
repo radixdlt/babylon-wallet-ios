@@ -98,18 +98,17 @@ public struct Choices<Value: Hashable, Content: View>: View {
 			)
 		}
 		.onAppear {
-			updateResult(&result, with: chosenValues, from: values, under: requirement)
+			updateResult(with: chosenValues, in: values, requiring: requirement)
 		}
 		.onChange(of: chosenValues) { chosenValues in
-			updateResult(&result, with: chosenValues, from: values, under: requirement)
+			updateResult(with: chosenValues, in: values, requiring: requirement)
 		}
 	}
 
 	private func updateResult(
-		_ result: inout [Value]?,
 		with chosenValues: Set<Value>,
-		from values: some Collection<Value>,
-		under requirement: ChoiceRequirement
+		in values: some Collection<Value>,
+		requiring requirement: ChoiceRequirement
 	) {
 		if requirement.quantifier == .exactly {
 			self.chosenValues = Set(values.filter(chosenValues.contains).prefix(requirement.count))
