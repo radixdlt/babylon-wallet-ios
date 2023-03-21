@@ -34,22 +34,12 @@ extension SHA256 {
 }
 
 extension SLIP10.PrivateKey {
-	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
-	/// but not for Curve25519, before signing, for secp256k1 we produce a
-	/// recoverable ECDSA signature.
+	/// For secp256k1 we produce a recoverable ECDSA signature.
 	public func sign(hashOfMessage: some DataProtocol) throws -> SignatureWithPublicKey {
-		try signReturningHashOfMessage(hashOfMessage: hashOfMessage)
-			.signatureWithPublicKey
-	}
-
-	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
-	/// but not for Curve25519, before signing, for secp256k1 we produce a
-	/// recoverable ECDSA signature.
-	public func signReturningHashOfMessage(hashOfMessage hashOfMessage_: some DataProtocol) throws -> (signatureWithPublicKey: SignatureWithPublicKey, hashOfMessage: Data) {
 		// TODO: Update this comment:
 		// We do Radix double SHA256 hashing, needed for secp256k1 but not for Curve25519, however,
 		// the hash is used as Transaction Identifier, disregarding of Curveu used.
-		let hashOfMessage = Data(hashOfMessage_)
+		let hashOfMessage = Data(hashOfMessage)
 
 		// We now sign the hash of the message for both secp256k1 and Curve25519.
 		switch self {
@@ -60,10 +50,10 @@ extension SLIP10.PrivateKey {
 			guard isValid else {
 				throw Curve25519SignatureJustProducedIsInvalid()
 			}
-			return (signatureWithPublicKey: SignatureWithPublicKey.eddsaEd25519(
+			return .eddsaEd25519(
 				signature: signature,
 				publicKey: publicKey
-			), hashOfMessage: hashOfMessage)
+			)
 
 		case let .secp256k1(key):
 			// Recoverable signature is needed
@@ -79,13 +69,9 @@ extension SLIP10.PrivateKey {
 				throw Secp256k1SignatureJustProducedIsInvalid()
 			}
 
-			let signatureWithPublicKey = SignatureWithPublicKey.ecdsaSecp256k1(
+			return .ecdsaSecp256k1(
 				signature: signature,
 				publicKey: publicKey
-			)
-			return (
-				signatureWithPublicKey,
-				hashOfMessage
 			)
 		}
 	}

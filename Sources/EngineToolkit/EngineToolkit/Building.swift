@@ -73,16 +73,14 @@ extension TransactionIntent {
 			).get()
 		let compiledTransactionIntent = compiledTransactionIntentResponse.compiledIntent
 
-		let hashOfTransactionIntent = try blake2b(data: compiledTransactionIntent)
-		let intentSignaturesWithHash = try privateKeys.map {
-			try $0.signReturningHashOfMessage(hashOfMessage: hashOfTransactionIntent)
+		let transactionIntentHash = try blake2b(data: compiledTransactionIntent)
+		let intentSignatures = try privateKeys.map {
+			try $0.sign(hashOfMessage: transactionIntentHash)
 		}
-		let transactionIntentHash = intentSignaturesWithHash.first?.hashOfMessage ?? Data(SHA256.twice(data: compiledTransactionIntent))
-		assert(intentSignaturesWithHash.map(\.hashOfMessage).allSatisfy { $0 == transactionIntentHash })
 
 		let signedTransactionIntent = SignedTransactionIntent(
 			intent: self,
-			intentSignatures: intentSignaturesWithHash.map(\.signatureWithPublicKey)
+			intentSignatures: intentSignatures
 		)
 
 		return NotarizedNonNotarySignedButIntentSignedTransctionContext(
@@ -113,7 +111,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		).get().compiledIntent
 
 		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
-		let (signature, _) = try privateKey.signReturningHashOfMessage(hashOfMessage: hashOfTransactionIntent)
+		let signature = try privateKey.sign(hashOfMessage: hashOfTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
 			intent: transactionIntent,
@@ -148,8 +146,8 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
 
 		// Notarize the signed intent to create a notarized transaction
-		let (notarySignature, notarizedTransactionHash) = try notaryPrivateKey
-			.signReturningHashOfMessage(hashOfMessage: hashOfTransactionIntent)
+		let notarySignature = try notaryPrivateKey
+			.sign(hashOfMessage: hashOfTransactionIntent)
 
 		let notarizedTransaction = NotarizedTransaction(
 			signedIntent: signedTransactionIntent,
@@ -159,7 +157,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		return with(
 			compileSignedTransactionIntentResponse: compileSignedTransactionIntentResponse,
 			notarizedTransaction: notarizedTransaction,
-			notarizedTransactionHash: notarizedTransactionHash
+			notarizedTransactionHash: hashOfTransactionIntent
 		)
 	}
 }
