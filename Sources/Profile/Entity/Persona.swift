@@ -142,6 +142,7 @@ extension Profile.Network.Persona.Field {
 		Sendable,
 		Hashable,
 		Codable,
+		CaseIterable,
 		CustomStringConvertible,
 		CustomDumpRepresentable
 	{

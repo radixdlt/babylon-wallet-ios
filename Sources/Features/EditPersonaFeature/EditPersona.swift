@@ -122,7 +122,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			// TODO:
 			return .none
 		case .addAFieldButtonTapped:
-			state.destination = .addFields(.init())
+			state.destination = .addFields(.init(excludedFields: state.dynamicFields.map(\.id)))
 			return .none
 		}
 	}
