@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - ExplanationPanel
-public struct ExplanationPanel: Sendable, FeatureReducer {
+// MARK: - SlideUpPanel
+public struct SlideUpPanel: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var title: String
 		var explanation: String

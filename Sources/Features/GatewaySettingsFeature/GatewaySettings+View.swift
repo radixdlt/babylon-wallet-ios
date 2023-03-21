@@ -51,10 +51,10 @@ extension GatewaySettings {
 						)
 						.sheet(
 							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-							state: /Destinations.State.explanationPanel,
-							action: Destinations.Action.explanationPanel,
+							state: /Destinations.State.slideUpPanel,
+							action: Destinations.Action.slideUpPanel,
 							content: {
-								ExplanationPanel.View(store: $0)
+								SlideUpPanel.View(store: $0)
 									.presentationDetents([.medium])
 									.presentationDragIndicator(.visible)
 								#if os(iOS)

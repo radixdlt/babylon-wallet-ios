@@ -49,13 +49,13 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
-			case explanationPanel(ExplanationPanel.State)
+			case slideUpPanel(SlideUpPanel.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
-			case explanationPanel(ExplanationPanel.Action)
+			case slideUpPanel(SlideUpPanel.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -67,8 +67,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				CreateAccountCoordinator()
 			}
 
-			Scope(state: /State.explanationPanel, action: /Action.explanationPanel) {
-				ExplanationPanel()
+			Scope(state: /State.slideUpPanel, action: /Action.slideUpPanel) {
+				SlideUpPanel()
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			return .none
 
 		case .popoverButtonTapped:
-			state.destination = .explanationPanel(
+			state.destination = .slideUpPanel(
 				.init(
 					title: L10n.GatewaySettings.WhatIsAGateway.title,
 					explanation: L10n.GatewaySettings.WhatIsAGateway.explanation
@@ -269,7 +269,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				return .internal(.switchToGatewayResult(result))
 			}
 
-		case .destination(.presented(.explanationPanel(.delegate(.dismiss)))):
+		case .destination(.presented(.slideUpPanel(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
 

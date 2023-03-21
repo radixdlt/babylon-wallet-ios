@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-extension ExplanationPanel.State {
-	var viewState: ExplanationPanel.ViewState {
+extension SlideUpPanel.State {
+	var viewState: SlideUpPanel.ViewState {
 		.init(
 			title: title,
 			explanation: explanation
@@ -9,8 +9,8 @@ extension ExplanationPanel.State {
 	}
 }
 
-// MARK: - ExplanationPanel.View
-extension ExplanationPanel {
+// MARK: - SlideUpPanel.View
+extension SlideUpPanel {
 	public struct ViewState: Equatable {
 		let title: String
 		let explanation: String
@@ -18,9 +18,9 @@ extension ExplanationPanel {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ExplanationPanel>
+		private let store: StoreOf<SlideUpPanel>
 
-		public init(store: StoreOf<ExplanationPanel>) {
+		public init(store: StoreOf<SlideUpPanel>) {
 			self.store = store
 		}
 
@@ -53,7 +53,7 @@ extension ExplanationPanel {
 			}
 		}
 
-		private func topBar(with viewStore: ViewStoreOf<ExplanationPanel>) -> some SwiftUI.View {
+		private func topBar(with viewStore: ViewStoreOf<SlideUpPanel>) -> some SwiftUI.View {
 			HStack {
 				CloseButton { viewStore.send(.closeButtonTapped) }
 				Spacer()
@@ -66,19 +66,19 @@ extension ExplanationPanel {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - ExplanationPanel_Preview
-struct ExplanationPanel_Preview: PreviewProvider {
+// MARK: - SlideUpPanel_Preview
+struct SlideUpPanel_Preview: PreviewProvider {
 	static var previews: some View {
-		ExplanationPanel.View(
+		SlideUpPanel.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ExplanationPanel()
+				reducer: SlideUpPanel()
 			)
 		)
 	}
 }
 
-extension ExplanationPanel.State {
+extension SlideUpPanel.State {
 	public static let previewValue = Self(
 		title: "A title",
 		explanation: "Explanation text that can span across multiple lines and can probably be very long"
