@@ -1,0 +1,26 @@
+SET_METADATA
+    Address("package_sim1qr46xrzzzlgvqccwqptp9ujlqncamd6kexux05essnuqc933em")
+    "k"
+    Enum(0u8, Enum(0u8, "v"));
+
+SET_METADATA
+    Address("account_sim1qnkhnw506drsfhrjrzaw4aj2yrucezvj2w7jqqqm5zds7mngxh")
+    "k"
+    Enum(0u8, Enum(0u8, "v"));
+
+SET_METADATA
+    Address("resource_sim1q2ym536cwvvf3cy9p777t4qjczqwf79hagp3wn93srvsgvqtwe")
+    "k"
+    Enum(0u8, Enum(0u8, "v"));
+
+REMOVE_METADATA
+    Address("package_sim1qr46xrzzzlgvqccwqptp9ujlqncamd6kexux05essnuqc933em")
+    "k";
+
+REMOVE_METADATA
+    Address("account_sim1qnkhnw506drsfhrjrzaw4aj2yrucezvj2w7jqqqm5zds7mngxh")
+    "k";
+
+REMOVE_METADATA
+    Address("resource_sim1q2ym536cwvvf3cy9p777t4qjczqwf79hagp3wn93srvsgvqtwe")
+    "k";
