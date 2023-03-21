@@ -126,6 +126,10 @@ extension DerivationPath {
 	public func asCustomPath() throws -> CustomHierarchicalDeterministicDerivationPath {
 		try CustomHierarchicalDeterministicDerivationPath(derivationPath: path)
 	}
+
+	public func asLegacyOlympiaBIP44LikePath() throws -> LegacyOlympiaBIP44LikeDerivationPath {
+		try LegacyOlympiaBIP44LikeDerivationPath(derivationPath: path)
+	}
 }
 
 extension DerivationPath {

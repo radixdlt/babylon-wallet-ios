@@ -22,12 +22,14 @@ extension ImportFromOlympiaLegacyWallet {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store) {
-				CaseLet(
-					state: /ImportFromOlympiaLegacyWallet.State.scanQR,
-					action: { ImportFromOlympiaLegacyWallet.Action.child(.scanQR($0)) },
-					then: { ScanQR.View(store: $0) }
-				)
+			NavigationStack {
+				SwitchStore(store.scope(state: \.step)) {
+					CaseLet(
+						state: /ImportFromOlympiaLegacyWallet.State.Step.scanQR,
+						action: { ImportFromOlympiaLegacyWallet.Action.child(.scanQR($0)) },
+						then: { ScanQR.View(store: $0) }
+					)
+				}
 			}
 		}
 	}
@@ -49,6 +51,6 @@ struct ImportFromOlympiaLegacyWallet_Preview: PreviewProvider {
 }
 
 extension ImportFromOlympiaLegacyWallet.State {
-	public static let previewValue: Self = .scanQR(.init())
+	public static let previewValue: Self = .init()
 }
 #endif
