@@ -53,11 +53,13 @@ extension AddNewGateway {
 							placeholder: viewStore.textFieldPlaceholder,
 							text: gatewayURLBinding,
 							hint: viewStore.fieldHint,
-							focusState: $focusedField,
-							equals: .gatewayURL,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
+							focus: .on(
+								.gatewayURL,
+								binding: viewStore.binding(
+									get: \.focusedField,
+									send: { .textFieldFocused($0) }
+								),
+								to: $focusedField
 							)
 						)
 						.autocorrectionDisabled()

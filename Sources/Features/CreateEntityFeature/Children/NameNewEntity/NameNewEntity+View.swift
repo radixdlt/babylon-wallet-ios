@@ -64,11 +64,13 @@ extension NameNewEntity {
 									placeholder: viewStore.namePlaceholder,
 									text: nameBinding,
 									hint: .info(L10n.CreateEntity.NameNewEntity.Name.Field.explanation),
-									focusState: $focusedField,
-									equals: .entityName,
-									first: viewStore.binding(
-										get: \.focusedField,
-										send: { .textFieldFocused($0) }
+									focus: .on(
+										.entityName,
+										binding: viewStore.binding(
+											get: \.focusedField,
+											send: { .textFieldFocused($0) }
+										),
+										to: $focusedField
 									)
 								)
 								#if os(iOS)

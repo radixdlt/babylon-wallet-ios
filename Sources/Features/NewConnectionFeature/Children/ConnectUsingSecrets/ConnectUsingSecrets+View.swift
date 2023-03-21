@@ -51,11 +51,13 @@ extension ConnectUsingSecrets {
 							send: { .nameOfConnectionChanged($0) }
 						),
 						hint: .info(L10n.NewConnection.textFieldHint),
-						focusState: $focusedField,
-						equals: .connectionName,
-						first: viewStore.binding(
-							get: \.focusedField,
-							send: { .textFieldFocused($0) }
+						focus: .on(
+							.connectionName,
+							binding: viewStore.binding(
+								get: \.focusedField,
+								send: { .textFieldFocused($0) }
+							),
+							to: $focusedField
 						)
 					)
 					.autocorrectionDisabled()

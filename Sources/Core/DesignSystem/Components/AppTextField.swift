@@ -21,17 +21,29 @@ public enum AppTextFieldHint: Equatable {
 }
 
 // MARK: - AppTextField
-public struct AppTextField<Value: Hashable>: View {
+public struct AppTextField<FocusValue: Hashable>: View {
 	public typealias Hint = AppTextFieldHint
+
+	public struct Focus {
+		let value: FocusValue
+		let binding: Binding<FocusValue>
+		let focusState: FocusState<FocusValue>.Binding
+
+		public static func on(
+			_ value: FocusValue,
+			binding: Binding<FocusValue>,
+			to focusState: FocusState<FocusValue>.Binding
+		) -> Self {
+			.init(value: value, binding: binding, focusState: focusState)
+		}
+	}
 
 	let primaryHeading: String?
 	let secondaryHeading: String?
 	let placeholder: String
 	let text: Binding<String>
 	let hint: Hint?
-	let focusState: FocusState<Value>.Binding
-	let equals: Value
-	let first: Binding<Value>
+	let focus: Focus?
 
 	public init(
 		primaryHeading: String? = nil,
@@ -39,18 +51,29 @@ public struct AppTextField<Value: Hashable>: View {
 		placeholder: String,
 		text: Binding<String>,
 		hint: Hint?,
-		focusState: FocusState<Value>.Binding,
-		equals: Value,
-		first: Binding<Value>
+		focus: Focus
 	) {
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
 		self.placeholder = placeholder
 		self.text = text
 		self.hint = hint
-		self.focusState = focusState
-		self.equals = equals
-		self.first = first
+		self.focus = focus
+	}
+
+	public init(
+		primaryHeading: String? = nil,
+		secondaryHeading: String? = nil,
+		placeholder: String,
+		text: Binding<String>,
+		hint: Hint?
+	) where FocusValue == Never {
+		self.primaryHeading = primaryHeading
+		self.secondaryHeading = secondaryHeading
+		self.placeholder = placeholder
+		self.text = text
+		self.hint = hint
+		self.focus = nil
 	}
 
 	public var body: some View {
@@ -63,7 +86,9 @@ public struct AppTextField<Value: Hashable>: View {
 						.multilineTextAlignment(.leading)
 				}
 
-				Spacer(minLength: 0)
+				if primaryHeading != nil || secondaryHeading != nil {
+					Spacer(minLength: 0)
+				}
 
 				if let secondaryHeading {
 					Text(secondaryHeading)
@@ -77,8 +102,14 @@ public struct AppTextField<Value: Hashable>: View {
 				placeholder,
 				text: text.removeDuplicates()
 			)
-			.focused(focusState, equals: equals)
-			.bind(first, to: focusState)
+			.modifier { view in
+				if let focus {
+					view.focused(focus.focusState, equals: focus.value)
+						.bind(focus.binding, to: focus.focusState)
+				} else {
+					view
+				}
+			}
 			.padding()
 			.frame(height: .standardButtonHeight)
 			.background(Color.app.gray5)
@@ -119,6 +150,8 @@ public struct AppTextField<Value: Hashable>: View {
 struct AppTextField_Previews: PreviewProvider {
 	static var previews: some View {
 		AppTextFieldPreview()
+			.background(Color.red)
+			.padding()
 	}
 }
 
@@ -141,11 +174,8 @@ struct AppTextFieldPreview: View {
 			placeholder: "Placeholder",
 			text: $text,
 			hint: .error("Hint"),
-			focusState: $focusState,
-			equals: .field,
-			first: $focus
+			focus: .on(.field, binding: $focus, to: $focusState)
 		)
-		.padding()
 	}
 }
 #endif
