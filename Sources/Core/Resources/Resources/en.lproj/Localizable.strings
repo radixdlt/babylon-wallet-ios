@@ -228,12 +228,13 @@
 "transactionSigning.title" = "Approve Transaction";
 
 "gatewaySettings.addNewGateway.addGatewayButtonTitle" = "Add Gateway";
-"gatewaySettings.addNewGateway.error.noGatewayFound" = "No Gateway found at specified URL";
 "gatewaySettings.addNewGateway.error.duplicateURL" = "This url is already added";
+"gatewaySettings.addNewGateway.error.noGatewayFound" = "No Gateway found at specified URL";
 "gatewaySettings.addNewGateway.subtitle" = "Enter a Gateway URL";
 "gatewaySettings.addNewGateway.textFieldPlaceholder" = "Enter full URL";
 "gatewaySettings.addNewGateway.title" = "Add New Gateway";
 "gatewaySettings.addNewGatewayButtonTitle" = "Add New Gateway";
+"gatewaySettings.radixBetanetGateway" = "Radix Betanet Gateway";
 "gatewaySettings.removeGatewayAlert.cancelButtonTitle" = "Cancel";
 "gatewaySettings.removeGatewayAlert.message" = "You will no longer be able to connect to this Gateway";
 "gatewaySettings.removeGatewayAlert.removeButtonTitle" = "Remove";

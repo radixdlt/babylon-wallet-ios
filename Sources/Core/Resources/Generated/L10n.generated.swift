@@ -375,6 +375,8 @@ public enum L10n {
   public enum GatewaySettings {
     /// Add New Gateway
     public static let addNewGatewayButtonTitle = L10n.tr("Localizable", "gatewaySettings.addNewGatewayButtonTitle", fallback: "Add New Gateway")
+    /// Radix Betanet Gateway
+    public static let radixBetanetGateway = L10n.tr("Localizable", "gatewaySettings.radixBetanetGateway", fallback: "Radix Betanet Gateway")
     /// Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.
     public static let subtitle = L10n.tr("Localizable", "gatewaySettings.subtitle", fallback: "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.")
     /// Gateways

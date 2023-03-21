@@ -4,7 +4,7 @@ extension GatewayRow.State {
 	var viewState: GatewayRow.ViewState {
 		let name: String = {
 			if gateway.id == Radix.Gateway.nebunet.id {
-				return "Radix Betanet Gateway"
+				return L10n.GatewaySettings.radixBetanetGateway
 			} else {
 				return gateway.url.absoluteString
 			}
