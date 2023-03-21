@@ -18,6 +18,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 		var labelField: EditPersonaStaticField.State
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
 
+		@PresentationState
+		var destination: Destinations.State? = nil
+
 		public init(
 			mode: Mode,
 			personaLabel: NonEmptyString,
@@ -68,11 +71,29 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case cancelButtonTapped
 		case saveButtonTapped
+		case addAFieldButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
 		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case addFields(EditPersonaAddFields.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case addFields(EditPersonaAddFields.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.addFields, action: /Action.addFields) {
+				EditPersonaAddFields()
+			}
+		}
 	}
 
 	public init() {}
@@ -88,6 +109,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 			.forEach(\.dynamicFields, action: /Action.child .. ChildAction.dynamicField) {
 				EditPersonaField()
 			}
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -96,6 +120,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .run { _ in await dismiss() }
 		case .saveButtonTapped:
 			// TODO:
+			return .none
+		case .addAFieldButtonTapped:
+			state.destination = .addFields(.init())
 			return .none
 		}
 	}

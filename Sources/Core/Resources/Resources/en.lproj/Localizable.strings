@@ -164,6 +164,14 @@
 "editPersona.inputError.general.requiredByDapp" = "Required field for this dApp";
 "editPersona.inputError.personaLabel.blank" = "Label cannot be blank";
 
+"editPersona.button.cancel" = "Cancel";
+"editPersona.button.save" = "Save";
+"editPersona.button.addAField" = "Add a Field";
+
+"editPersona.addAField.title" = "Add a Field";
+"editPersona.addAField.explanation" = "Select from the following fields to add them to this persona.";
+"editPersona.addAField.button.add" = "Add";
+
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";
 "newConnection.cameraPermission.deniedAlert.settingsButtonTitle" = "Settings";

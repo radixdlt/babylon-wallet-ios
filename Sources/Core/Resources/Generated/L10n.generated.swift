@@ -357,6 +357,24 @@ public enum L10n {
     public static let website = L10n.tr("Localizable", "dAppDetails.website", fallback: "Website")
   }
   public enum EditPersona {
+    public enum AddAField {
+      /// Select from the following fields to add them to this persona.
+      public static let explanation = L10n.tr("Localizable", "editPersona.addAField.explanation", fallback: "Select from the following fields to add them to this persona.")
+      /// Add a Field
+      public static let title = L10n.tr("Localizable", "editPersona.addAField.title", fallback: "Add a Field")
+      public enum Button {
+        /// Add
+        public static let add = L10n.tr("Localizable", "editPersona.addAField.button.add", fallback: "Add")
+      }
+    }
+    public enum Button {
+      /// Add a Field
+      public static let addAField = L10n.tr("Localizable", "editPersona.button.addAField", fallback: "Add a Field")
+      /// Cancel
+      public static let cancel = L10n.tr("Localizable", "editPersona.button.cancel", fallback: "Cancel")
+      /// Save
+      public static let save = L10n.tr("Localizable", "editPersona.button.save", fallback: "Save")
+    }
     public enum InputError {
       public enum General {
         /// Required field for this dApp

@@ -34,7 +34,7 @@ extension EditPersona {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					ScrollView {
-						VStack(alignment: .leading, spacing: .medium1) {
+						VStack(spacing: .medium1) {
 							EditPersonaStaticField.View(
 								store: store.scope(
 									state: \.labelField,
@@ -51,6 +51,12 @@ extension EditPersona {
 								),
 								content: { EditPersonaDynamicField.View(store: $0) }
 							)
+
+							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
+								Text(L10n.EditPersona.Button.addAField).padding(.horizontal, .medium2)
+							}
+							.buttonStyle(.secondaryRectangular)
+							.padding(.top, .medium2)
 						}
 						.padding(.horizontal, .medium1)
 						.padding(.vertical, .medium1)
@@ -58,12 +64,12 @@ extension EditPersona {
 					#if os(iOS)
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
-							Button("Cancel", action: { viewStore.send(.cancelButtonTapped) })
+							Button(L10n.EditPersona.Button.cancel, action: { viewStore.send(.cancelButtonTapped) })
 								.textStyle(.body1Link)
 								.foregroundColor(.app.blue2)
 						}
 						ToolbarItem(placement: .navigationBarTrailing) {
-							Button("Save", action: { viewStore.send(.saveButtonTapped) })
+							Button(L10n.EditPersona.Button.save, action: { viewStore.send(.saveButtonTapped) })
 								.textStyle(.body1Link)
 								.foregroundColor(.app.blue2)
 								.disabled(viewStore.isSaveButtonDisabled)
@@ -72,6 +78,12 @@ extension EditPersona {
 					}
 					#endif
 				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /EditPersona.Destinations.State.addFields,
+					action: EditPersona.Destinations.Action.addFields,
+					content: { EditPersonaAddFields.View(store: $0) }
+				)
 			}
 		}
 	}
