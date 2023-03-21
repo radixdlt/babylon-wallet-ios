@@ -39,19 +39,25 @@ extension EncodeDecodeAddressRequestTests {
 // MARK: - AddressDecodeEncodeTestVectors
 enum AddressDecodeEncodeTestVectors {
 	private static let encoded: [String] = [
-		"package_sim1q88ghe0tnzqqc90xjskj0cmntxwp3gv7pzjnx7p5r54qjm0utr",
-		"package_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsnznk7n",
-		"package_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpsuluv44",
-		"package_sim1qy7rfwzgm99jp4lwngv8utfnzxd7zv2fq9p279rzzmws555ujt",
-		"package_sim1q8jy0frw4en9cdc63cyj2n7pdefj95lftvrdamjhhyqqlgshez",
-		"account_sim1qv0z2nsg5aqayjeszxa9uc6p82nalts0cm2sdna69g7sm3626z",
-		"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqshxgp7h",
-		"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqd60rqz",
-		"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag",
-		"resource_sim1qqe4m2jlrz5y82syz3y76yf9ztd4trj7fmlq4vf4gmzsf6wgzy",
+		"resource_sim1q2ym536cwvvf3cy9p777t4qjczqwf79hagp3wn93srvsgvqtwe",
+		"account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md",
+		"package_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqkul8u2",
+		"resource_sim1q88ghe0tnzqqc90xjskj0cmntxwp3gv7pzjnx7p5r54qyze494",
+		"resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs9m9ls9",
+		"resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqps2x29mr",
+		"resource_sim1qy7rfwzgm99jp4lwngv8utfnzxd7zv2fq9p279rzzmwszdz4ua",
+		"resource_sim1q8jy0frw4en9cdc63cyj2n7pdefj95lftvrdamjhhyqqf3x7h5",
+		"component_sim1qv0z2nsg5aqayjeszxa9uc6p82nalts0cm2sdna69g7sxph27u",
+		"package_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqspl7gsp",
+		"package_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqmre2w5",
+		"package_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzq2dgdn7",
+		"package_sim1qqe4m2jlrz5y82syz3y76yf9ztd4trj7fmlq4vf4gmzslrcpvj",
 	]
 
 	private static let decoded: [String] = [
+		"0289ba4758731898e0850fbde5d412c080e4f8b7ea03174cb180d9",
+		"04032fcdc6aa1b8e8ae3effd51c9024120387d279a069d8479c0c7",
+		"000000000000000000000000000000000000000000000000000040",
 		"01ce8be5eb98800c15e6942d27e373599c18a19e08a53378341d2a",
 		"010000000000000000000000000000000000000000000000000001",
 		"010000000000000000000000000000000000000000000000000003",

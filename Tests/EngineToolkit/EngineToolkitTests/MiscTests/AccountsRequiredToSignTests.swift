@@ -10,20 +10,20 @@ final class AccountsRequiredToSignTests: TestCase {
 	func test_setMetaData() throws {
 		let transactionManifest = TransactionManifest {
 			SetMetadata(
-				entityAddress: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064",
+				entityAddress: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md",
 				key: "name",
 				value: Enum(.string("Radix Dashboard"))
 			)
 
 			SetMetadata(
-				entityAddress: "component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr",
+				entityAddress: "component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x",
 				key: "name",
 				value: Enum(.string("Radix Dashboard"))
 			)
 		}
 		let networkID: NetworkID = .simulator
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
-		let expected: Set<ComponentAddress> = Set(["account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"])
+		let expected: Set<ComponentAddress> = ["account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"]
 		XCTAssertNoDifference(expected, accountsRequiredToSign)
 
 		// Accounts suitable to pay TX fee is ought to be a superset of accountsRequiredToSign
@@ -59,7 +59,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		let networkID: NetworkID = .hammunet
 
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
-		XCTAssertNoDifference(Set(), accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be empty, but not the 'accountsSuitableToPayTXFee'")
+		XCTAssertNoDifference([], accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be empty, but not the 'accountsSuitableToPayTXFee'")
 
 		let accountsSuitableToPayTXFee = try transactionManifest.accountsSuitableToPayTXFee(networkId: networkID)
 		XCTAssertNoDifference(accountsSuitableToPayTXFee, ["account_tdx_22_1pz8jpmse7hv0uueppwcksp2h60hkcdsfefm40cye9f3qlqau64"])
@@ -69,21 +69,21 @@ final class AccountsRequiredToSignTests: TestCase {
 		let transactionManifest = TransactionManifest(instructions: .string(
 			"""
 			CALL_METHOD
-				Address("component_tdx_b_1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0ts04jjcz")
+				Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x")
 				"lock_fee"
 				Decimal("10");
 
 			CALL_METHOD
-				Address("component_tdx_b_1qtkryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0ts04jjcz")
+				Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x")
 				"free";
 
 			CALL_METHOD
-				Address("account_tdx_b_1ppmpw7aze06f736werqmnnvsehkwemcxn0dff9shsnkqnzzrll")
+				Address("account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
 				"deposit_batch"
 				Expression("ENTIRE_WORKTOP");
 			"""
 		))
-		let networkID: NetworkID = .nebunet
+		let networkID: NetworkID = .simulator
 
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
 		XCTAssertNoDifference(Set(), accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be empty")
