@@ -23,11 +23,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 			personaLabel: NonEmptyString,
 			existingFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) {
-			self.labelField = EditPersonaStaticField.State(initial: personaLabel.rawValue)
+			self.labelField = EditPersonaStaticField.State(
+				kind: .personaLabel,
+				initial: personaLabel.rawValue
+			)
 			self.dynamicFields = IdentifiedArray(
 				uncheckedUniqueElements: existingFields.map { field in
 					EditPersonaDynamicField.State(
-						field.kind,
+						kind: field.kind,
 						initial: field.value.rawValue,
 						isRequiredByDapp: {
 							switch mode {

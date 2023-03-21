@@ -58,17 +58,16 @@ extension EditPersona.State.StaticField: EditPersonaFieldProtocol {
 
 extension EditPersonaStaticField.State {
 	public init(
+		kind: Field,
 		initial: String?
 	) {
-		self.init(
-			id: .personaLabel,
-			input: .init(
-				wrappedValue: initial,
-				onNil: L10n.EditPersona.InputError.PersonaLabel.blank,
-				rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.PersonaLabel.blank)]
-			),
-			isRequiredByDapp: false
+		self.id = kind
+		self._input = .init(
+			wrappedValue: initial,
+			onNil: L10n.EditPersona.InputError.PersonaLabel.blank,
+			rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.PersonaLabel.blank)]
 		)
+		self.isRequiredByDapp = false
 	}
 }
 
@@ -108,18 +107,16 @@ extension EditPersona.State.DynamicField: EditPersonaFieldProtocol {
 
 extension EditPersonaDynamicField.State {
 	public init(
-		_ id: Field,
+		kind: Field,
 		initial: String?,
 		isRequiredByDapp: Bool
 	) {
-		self.init(
-			id: id,
-			input: .init(
-				wrappedValue: initial,
-				onNil: nil, // TODO:
-				rules: []
-			),
-			isRequiredByDapp: isRequiredByDapp
+		self.id = kind
+		self._input = .init(
+			wrappedValue: initial,
+			onNil: nil, // TODO:
+			rules: []
 		)
+		self.isRequiredByDapp = isRequiredByDapp
 	}
 }
