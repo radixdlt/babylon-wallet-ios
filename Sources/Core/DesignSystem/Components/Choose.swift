@@ -7,6 +7,18 @@ public enum ChoiceRequirement: Hashable {
 	case exactly(Int)
 	case atLeast(Int)
 
+	public enum Quantifier: Hashable {
+		case exactly
+		case atLeast
+	}
+
+	public var quantifier: Quantifier {
+		switch self {
+		case .exactly: return .exactly
+		case .atLeast: return .atLeast
+		}
+	}
+
 	public var count: Int {
 		switch self {
 		case
@@ -99,14 +111,10 @@ public struct Choose<Value: Hashable, Content: View>: View {
 		from values: some Collection<Value>,
 		under requirement: ChoiceRequirement
 	) {
-		let rawValue = {
-			switch requirement {
-			case let .exactly(count):
-				return Array(values.filter(chosenValues.contains).prefix(count))
-			case .atLeast:
-				return Array(values.filter(chosenValues.contains))
-			}
-		}()
+		if requirement.quantifier == .exactly {
+			self.chosenValues = Set(values.filter(chosenValues.contains).prefix(requirement.count))
+		}
+		let rawValue = Array(values.filter(chosenValues.contains))
 		if rawValue.count >= requirement.count {
 			result = rawValue
 		} else {
@@ -129,46 +137,44 @@ public struct Choose_PreviewProvider: PreviewProvider {
 }
 
 public struct Choose_Preview: View {
+	@State
+	var choices: [Int]? = nil
 	let requirement: ChoiceRequirement
 
 	public var body: some View {
-		WithState(initialValue: [Int]?.none) { $choices in
-			VStack {
-				List {
-					Choose(requirement, from: Array(1 ... 10), through: $choices) { item in
-						HStack {
-							Text(String(item.value))
-							Spacer()
-							Button(action: item.action) {
-								if requirement == .exactly(1) {
-									Image(systemName: item.isChosen ? "circle.fill" : "circle")
-								} else {
-									Image(systemName: item.isChosen ? "square.fill" : "square")
-								}
-							}
+		List {
+			Choose(requirement, from: Array(1 ... 10), through: $choices) { item in
+				HStack {
+					Text(String(item.value))
+					Spacer()
+					Button(action: item.action) {
+						if requirement == .exactly(1) {
+							Image(systemName: item.isChosen ? "circle.fill" : "circle")
+						} else {
+							Image(systemName: item.isChosen ? "square.fill" : "square")
 						}
-						.disabled(item.isDisabled)
 					}
 				}
-				.safeAreaInset(edge: .bottom, spacing: 0) {
-					VStack(spacing: 0) {
-						Divider()
-						VStack {
-							if let choices {
-								Text("Result: \(String(describing: choices))")
-							} else {
-								Text("Result: nil")
-							}
-							Button("Continue", action: {})
-								.buttonStyle(.primaryRectangular)
-								.disabled(choices == nil)
-								.opacity(choices == nil ? 0.3 : 1)
-						}
-						.padding()
-					}
-					.background(Color.white)
-				}
+				.disabled(item.isDisabled)
 			}
+		}
+		.safeAreaInset(edge: .bottom, spacing: 0) {
+			VStack(spacing: 0) {
+				Divider()
+				VStack {
+					if let choices {
+						Text("Result: \(String(describing: choices))")
+					} else {
+						Text("Result: nil")
+					}
+					Button("Continue", action: {})
+						.buttonStyle(.primaryRectangular)
+						.disabled(choices == nil)
+						.opacity(choices == nil ? 0.3 : 1)
+				}
+				.padding()
+			}
+			.background(Color.white)
 		}
 	}
 }
