@@ -66,9 +66,9 @@ extension SLIP10.PrivateKey {
 		case let .curve25519(key):
 			// For Curve25519 we do not sign the hash but rather the original message,
 			// but for secp256k1 we sign the hash.
-			let signature = try key.signature(for: unhashed)
+			let signature = try key.signature(for: hashOfMessage)
 			let publicKey = key.publicKey
-			let isValid = publicKey.isValidSignature(signature, for: unhashed)
+			let isValid = publicKey.isValidSignature(signature, for: hashOfMessage)
 			guard isValid else {
 				throw Curve25519SignatureJustProducedIsInvalid()
 			}
