@@ -112,7 +112,7 @@ extension EditPersona.State {
 	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
 		.init(
 			mode: mode,
-			personaLabel: NonEmptyString("RadIpsum"),
+			personaLabel: NonEmptyString(rawValue: "RadIpsum")!,
 			existingFields: [
 				//                .init(kind: .givenName, value: "Lorem"),
 				//                .init(kind: .familyName, value: "Ipsum"),
