@@ -34,11 +34,7 @@ extension Main {
 				#endif
 			}
 			.tint(.app.gray1)
-			.presentsDappInteractions(
-				canPresentInteraction: { [store = store.actionless] in
-					ViewStore(store).canPresentDappInteraction
-				}
-			)
+			.presentsDappInteractions()
 		}
 	}
 }
