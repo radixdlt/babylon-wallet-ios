@@ -80,12 +80,24 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
+		case labelField(EditPersonaField.Action)
 		case field(id: State.Field, action: EditPersonaField.Action)
 	}
 
 	public init() {}
 
 	@Dependency(\.dismiss) var dismiss
+
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
+			EditPersonaField()
+		}
+
+		Reduce(core)
+			.forEach(\.fields, action: /Action.child .. ChildAction.field) {
+				EditPersonaField()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
