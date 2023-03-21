@@ -589,7 +589,7 @@ package.addModules([
 		name: "Profile",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit", // address derivation
+			"EngineToolkit", // address derivation, blake hash
 			"RadixConnectModels",
 			"Resources",
 		],

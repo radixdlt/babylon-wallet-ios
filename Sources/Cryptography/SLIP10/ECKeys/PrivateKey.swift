@@ -26,21 +26,9 @@ extension SLIP10 {
 	}
 }
 
-extension SHA256 {
-	/// SHA256 hashes `data` twice, as in `SHA256(SHA256(data))`
-	public static func twice(data: some DataProtocol) -> SHA256.Digest {
-		SHA256.hash(data: Data(SHA256.hash(data: data)))
-	}
-}
-
 extension SLIP10.PrivateKey {
 	/// For secp256k1 we produce a recoverable ECDSA signature.
 	public func sign(hashOfMessage: some DataProtocol) throws -> SignatureWithPublicKey {
-		// TODO: Update this comment:
-		// We do Radix double SHA256 hashing, needed for secp256k1 but not for Curve25519, however,
-		// the hash is used as Transaction Identifier, disregarding of Curveu used.
-		let hashOfMessage = Data(hashOfMessage)
-
 		// We now sign the hash of the message for both secp256k1 and Curve25519.
 		switch self {
 		case let .curve25519(key):
@@ -76,9 +64,6 @@ extension SLIP10.PrivateKey {
 		}
 	}
 }
-
-// MARK: - SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong
-struct SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong: Swift.Error {}
 
 // MARK: - Secp256k1SignatureJustProducedIsInvalid
 struct Secp256k1SignatureJustProducedIsInvalid: Swift.Error {}
