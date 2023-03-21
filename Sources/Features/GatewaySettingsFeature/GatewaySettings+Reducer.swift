@@ -22,7 +22,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case removeGateway(PresentationAction<RemoveGatewayAction>)
 		case addGatewayButtonTapped
 		case popoverButtonTapped
@@ -34,7 +34,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case presentGateways(all: [Radix.Gateway], current: Radix.Gateway)
+		case gatewaysLoadedResult(TaskResult<Gateways>)
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(Radix.Gateway)
 		case switchToGatewayResult(TaskResult<Radix.Gateway>)
@@ -103,9 +103,16 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			return .run { send in
-				await send(loadGateways())
+				do {
+					for try await gateways in await gatewaysClient.allGateways() {
+						guard !Task.isCancelled else { return }
+						await send(.internal(.gatewaysLoadedResult(.success(gateways))))
+					}
+				} catch {
+					errorQueue.schedule(error)
+				}
 			}
 
 		case let .removeGateway(.presented(action)):
@@ -123,9 +130,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 					return switchToGateway(&state, gateway: firstPredefined)
 
 				default:
-					return .run { send in
+					return .run { _ in
 						try await gatewaysClient.removeGateway(gateway.gateway)
-						await send(loadGateways())
 					}
 				}
 
@@ -153,18 +159,22 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .presentGateways(all: gateways, current: current):
-			state.currentGateway = current
+		case let .gatewaysLoadedResult(.success(gateways)):
+			state.currentGateway = gateways.current
 			state.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.map {
+				uniqueElements: gateways.all.elements.map {
 					GatewayRow.State(
 						gateway: $0,
-						isSelected: current.id == $0.id,
+						isSelected: gateways.current.id == $0.id,
 						canBeDeleted: $0.id != Radix.Gateway.nebunet.id
 					)
 				}
 				.sorted(by: { !$0.canBeDeleted && $1.canBeDeleted })
 			))
+			return .none
+
+		case let .gatewaysLoadedResult(.failure(error)):
+			errorQueue.schedule(error)
 			return .none
 
 		case let .hasAccountsResult(.success(hasAccountsOnNetwork)):
@@ -203,9 +213,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 			if let gatewayForRemoval = state.gatewayForRemoval {
 				state.gatewayForRemoval = nil
-				return .run { send in
+				return .run { _ in
 					try await gatewaysClient.removeGateway(gatewayForRemoval)
-					await send(loadGateways())
 				}
 			} else {
 				return .none
@@ -242,9 +251,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		case .destination(.presented(.addNewGateway(.delegate(.dismiss)))):
 			state.destination = nil
-			return .run { send in
-				await send(loadGateways())
-			}
+			return .none
 
 		case .destination(.presented(.createAccount(.delegate(.dismiss)))):
 			return skipSwitching(&state)
@@ -273,12 +280,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 }
 
 private extension GatewaySettings {
-	func loadGateways() async -> FeatureAction<GatewaySettings> {
-		let gateways = await gatewaysClient.getAllGateways()
-		let current = await gatewaysClient.getCurrentGateway()
-		return .internal(.presentGateways(all: gateways.rawValue.elements, current: current))
-	}
-
 	func skipSwitching(_ state: inout State) -> EffectTask<Action> {
 		state.destination = nil
 		state.validatedNewGatewayToSwitchTo = nil
