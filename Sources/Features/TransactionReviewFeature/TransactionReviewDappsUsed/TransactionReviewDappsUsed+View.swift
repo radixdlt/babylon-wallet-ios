@@ -99,8 +99,7 @@ extension TransactionReviewDappsUsed {
 						if let url {
 							DappPlaceholder(size: .smaller)
 						} else {
-							DappPlaceholder(size: .smaller)
-								.border(.red)
+							DappPlaceholder(known: true, size: .smaller)
 						}
 
 						VStack(alignment: .leading, spacing: .small3) {
@@ -114,8 +113,7 @@ extension TransactionReviewDappsUsed {
 						.padding(.leading, .small2)
 
 					case let .unknown(count):
-						DappPlaceholder(size: .smaller)
-							.border(.blue)
+						DappPlaceholder(known: false, size: .smaller)
 							.padding(.trailing, .small2)
 						Text(L10n.TransactionReview.UsingDapps.unknownComponents(count))
 							.lineLimit(2)
