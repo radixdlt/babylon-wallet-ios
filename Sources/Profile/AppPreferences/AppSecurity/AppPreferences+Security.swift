@@ -10,11 +10,14 @@ extension AppPreferences {
 		CustomDumpReflectable
 	{
 		public var iCloudProfileSyncEnabled: Bool
+		public var isDeveloperModeEnabled: Bool
 
 		public init(
-			iCloudProfileSyncEnabled: Bool = true
+			iCloudProfileSyncEnabled: Bool = true,
+			isDeveloperModeEnabled: Bool = true
 		) {
 			self.iCloudProfileSyncEnabled = iCloudProfileSyncEnabled
+			self.isDeveloperModeEnabled = isDeveloperModeEnabled
 		}
 	}
 }
@@ -29,6 +32,7 @@ extension AppPreferences.Security {
 			self,
 			children: [
 				"iCloudProfileSyncEnabled": iCloudProfileSyncEnabled,
+				"isDeveloperModeEnabled": isDeveloperModeEnabled,
 			],
 			displayStyle: .struct
 		)
@@ -37,6 +41,7 @@ extension AppPreferences.Security {
 	public var description: String {
 		"""
 		iCloudProfileSyncEnabled: \(iCloudProfileSyncEnabled),
+		  isDeveloperModeEnabled: \(isDeveloperModeEnabled)
 		"""
 	}
 }

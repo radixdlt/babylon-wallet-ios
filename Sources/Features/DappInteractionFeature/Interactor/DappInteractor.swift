@@ -1,3 +1,4 @@
+import AppPreferencesClient
 import FeaturePrelude
 import GatewaysClient
 import RadixConnect
@@ -68,6 +69,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.rolaClient) var rolaClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -80,7 +82,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return handleIncommintRequests()
+			return handleIncommingRequests()
 		case let .responseFailureAlert(action):
 			switch action {
 			case .dismiss:
@@ -197,7 +199,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		state.currentModal = nil
 	}
 
-	func handleIncommintRequests() -> EffectTask<Action> {
+	func handleIncommingRequests() -> EffectTask<Action> {
 		.run { send in
 			await radixConnectClient.loadFromProfileAndConnectAll()
 			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
@@ -223,11 +225,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 						return
 					}
 
-					// TODO: uncomment and enable / disable based on developer mode preference
-					/*
-					 try await rolaClient.performDappDefinitionVerification(request.interaction.metadata)
-					 try await rolaClient.performWellKnownFileCheck(request.interaction.metadata)
-					 */
+					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+					if !isDeveloperModeEnabled {
+						try await rolaClient.performDappDefinitionVerification(interaction.metadata)
+						try await rolaClient.performWellKnownFileCheck(interaction.metadata)
+					}
 					await send(.internal(.receivedRequestFromDapp(interactionMessage)))
 				} catch {
 					loggerGlobal.error("Received message contans error: \(error.localizedDescription)")

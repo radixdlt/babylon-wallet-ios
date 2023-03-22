@@ -95,6 +95,7 @@ package.addModules([
 		name: "DappInteractionFeature",
 		dependencies: [
 			"AccountsClient",
+			"AppPreferencesClient",
 			"AuthorizedDappsClient",
 			"CreateEntityFeature",
 			"GatewayAPI",
@@ -126,6 +127,13 @@ package.addModules([
 			"NetworkSwitchingClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "GeneralSettings",
+		dependencies: [
+			"AppPreferencesClient",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "HomeFeature",
@@ -210,6 +218,7 @@ package.addModules([
 			"GatewayAPI",
 			"P2PLinksFeature",
 			"GatewaySettingsFeature",
+			"GeneralSettings",
 			"MnemonicClient",
 			"PersonasFeature",
 			"RadixConnectClient", // deleting connections when wallet is deleted

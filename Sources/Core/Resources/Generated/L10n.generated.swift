@@ -416,6 +416,16 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.title", fallback: "What is a Gateway")
     }
   }
+  public enum GeneralSettings {
+    /// App Settings
+    public static let title = L10n.tr("Localizable", "generalSettings.title", fallback: "App Settings")
+    public enum DeveloperMode {
+      /// Warning: Disables website validity checks
+      public static let subtitle = L10n.tr("Localizable", "generalSettings.developerMode.subtitle", fallback: "Warning: Disables website validity checks")
+      /// Developer Mode
+      public static let title = L10n.tr("Localizable", "generalSettings.developerMode.title", fallback: "Developer Mode")
+    }
+  }
   public enum Home {
     public enum CreateAccount {
       /// Create Account
@@ -597,8 +607,6 @@ public enum L10n {
     }
   }
   public enum Settings {
-    /// App Settings
-    public static let appSettingsButtonTitle = L10n.tr("Localizable", "settings.appSettingsButtonTitle", fallback: "App Settings")
     /// Authorized dApps
     public static let authorizedDappsButtonTitle = L10n.tr("Localizable", "settings.authorizedDappsButtonTitle", fallback: "Authorized dApps")
     /// Close
@@ -609,6 +617,8 @@ public enum L10n {
     public static let desktopConnectionsButtonTitle = L10n.tr("Localizable", "settings.desktopConnectionsButtonTitle", fallback: "Linked Connector")
     /// Gateways
     public static let gatewaysButtonTitle = L10n.tr("Localizable", "settings.gatewaysButtonTitle", fallback: "Gateways")
+    /// App Settings
+    public static let generalSettingsButtonTitle = L10n.tr("Localizable", "settings.generalSettingsButtonTitle", fallback: "App Settings")
     /// Inspect Profile
     public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
     /// No Wallet Data Found
