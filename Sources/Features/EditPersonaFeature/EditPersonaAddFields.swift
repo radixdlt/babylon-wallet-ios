@@ -14,11 +14,11 @@ public struct EditPersonaAddFields: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case selectedFieldsChanged([EditPersona.State.DynamicFieldID]?)
-		case addButtonTapped(NonEmptyArray<EditPersona.State.DynamicFieldID>)
+		case addButtonTapped([EditPersona.State.DynamicFieldID])
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case addFields(NonEmptyArray<EditPersona.State.DynamicFieldID>)
+		case addFields([EditPersona.State.DynamicFieldID])
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

@@ -46,7 +46,7 @@ extension EditPersonaAddFields {
 					}
 					.safeAreaInset(edge: .bottom, spacing: 0) {
 						WithControlRequirements(
-							viewStore.selectedFields.flatMap(NonEmptyArray.init(rawValue:)),
+							viewStore.selectedFields,
 							forAction: { viewStore.send(.addButtonTapped($0)) }
 						) { action in
 							Button(L10n.EditPersona.AddAField.Button.add, action: action)
