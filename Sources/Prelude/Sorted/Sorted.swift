@@ -18,19 +18,22 @@ public struct Sorted<S: Sequence, Value: Comparable> {
 
 	private var _wrappedValue: S
 	private let keyPath: KeyPath<S.Element, Value>
-	private let fromArray: ([S.Element]) -> S
+	private let fromArray: @Sendable ([S.Element]) -> S
 
 	@_spi(Sorted)
 	public init(
 		wrappedValue: S,
 		by keyPath: KeyPath<S.Element, Value>,
-		fromArray: @escaping ([S.Element]) -> S
+		fromArray: @escaping @Sendable ([S.Element]) -> S
 	) {
 		self._wrappedValue = wrappedValue
 		self.keyPath = keyPath
 		self.fromArray = fromArray
 	}
 }
+
+// MARK: Sendable
+extension Sorted: Sendable where S: Sendable, Value: Sendable {}
 
 // MARK: Equatable
 extension Sorted: Equatable where S: Equatable {
@@ -69,6 +72,6 @@ extension Sorted {
 	) where S == IdentifiedArrayOf<E>, E: Identifiable {
 		self._wrappedValue = wrappedValue
 		self.keyPath = keyPath
-		self.fromArray = IdentifiedArray.init(uniqueElements:)
+		self.fromArray = { IdentifiedArray(uncheckedUniqueElements: $0) }
 	}
 }
