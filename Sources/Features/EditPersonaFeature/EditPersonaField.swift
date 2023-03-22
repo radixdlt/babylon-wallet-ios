@@ -10,12 +10,23 @@ public protocol EditPersonaFieldProtocol: Hashable, Comparable {
 // MARK: - EditPersonaField
 public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public let id: Field
+		public var id: Field { kind }
+		public let kind: Field
 
 		@Validation<String, String>
 		public var input: String?
 
 		public let isRequiredByDapp: Bool
+
+		private init(
+			kind: Field,
+			input: Validation<String, String>,
+			isRequiredByDapp: Bool
+		) {
+			self.kind = kind
+			self._input = input
+			self.isRequiredByDapp = isRequiredByDapp
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -61,13 +72,15 @@ extension EditPersonaStaticField.State {
 		kind: Field,
 		initial: String?
 	) {
-		self.id = kind
-		self._input = .init(
-			wrappedValue: initial,
-			onNil: L10n.EditPersona.InputError.PersonaLabel.blank,
-			rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.PersonaLabel.blank)]
+		self.init(
+			kind: kind,
+			input: .init(
+				wrappedValue: initial,
+				onNil: L10n.EditPersona.InputError.PersonaLabel.blank,
+				rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.PersonaLabel.blank)]
+			),
+			isRequiredByDapp: false
 		)
-		self.isRequiredByDapp = false
 	}
 }
 
@@ -111,12 +124,14 @@ extension EditPersonaDynamicField.State {
 		initial: String?,
 		isRequiredByDapp: Bool
 	) {
-		self.id = kind
-		self._input = .init(
-			wrappedValue: initial,
-			onNil: nil, // TODO:
-			rules: []
+		self.init(
+			kind: kind,
+			input: .init(
+				wrappedValue: initial,
+				onNil: nil, // TODO:
+				rules: []
+			),
+			isRequiredByDapp: isRequiredByDapp
 		)
-		self.isRequiredByDapp = isRequiredByDapp
 	}
 }

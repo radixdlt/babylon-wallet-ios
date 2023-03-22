@@ -16,7 +16,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		public typealias DynamicField = Profile.Network.Persona.Field.Kind
 
 		var labelField: EditPersonaStaticField.State
-		@Sorted(by: \.id)
+		@Sorted(by: \.kind)
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 
 		@PresentationState
