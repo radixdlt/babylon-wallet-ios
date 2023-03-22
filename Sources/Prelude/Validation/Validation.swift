@@ -5,15 +5,15 @@
 @dynamicMemberLookup
 public struct Validation<Value, Error> {
 	@_spi(Validation) public var rawValue: Value?
-	private let onNil: () -> Error?
+	private let onNil: @Sendable () -> Error?
 	private let rules: [ValidationRule<Value, Error>]
-	private let exceptions: [(Value) -> Bool]
+	private let exceptions: [@Sendable (Value) -> Bool]
 
 	public init(
 		wrappedValue rawValue: Value?,
-		onNil: @autoclosure @escaping () -> Error?,
+		onNil: @autoclosure @escaping @Sendable () -> Error?,
 		rules: [ValidationRule<Value, Error>],
-		exceptions: [(Value) -> Bool] = []
+		exceptions: [@Sendable (Value) -> Bool] = []
 	) {
 		self.rawValue = rawValue
 		self.onNil = onNil
@@ -57,6 +57,9 @@ public struct Validation<Value, Error> {
 	}
 }
 
+// MARK: Sendable
+extension Validation: Sendable where Value: Sendable, Error: Sendable {}
+
 // MARK: Equatable
 extension Validation: Equatable where Value: Equatable, Error: Equatable {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -85,11 +88,11 @@ extension Validated: Hashable where Value: Hashable, Error: Hashable {
 
 // MARK: - ValidationRule
 public struct ValidationRule<Value, Error> {
-	let validate: (Value) -> Error?
+	let validate: @Sendable (Value) -> Error?
 
 	public static func `if`(
-		_ condition: @escaping (Value) -> Bool,
-		error: @autoclosure @escaping () -> Error
+		_ condition: @escaping @Sendable (Value) -> Bool,
+		error: @autoclosure @escaping @Sendable () -> Error
 	) -> Self {
 		ValidationRule {
 			if condition($0) {
@@ -101,8 +104,8 @@ public struct ValidationRule<Value, Error> {
 	}
 
 	public static func unless(
-		_ condition: @escaping (Value) -> Bool,
-		error: @autoclosure @escaping () -> Error
+		_ condition: @escaping @Sendable (Value) -> Bool,
+		error: @autoclosure @escaping @Sendable () -> Error
 	) -> Self {
 		ValidationRule {
 			if !condition($0) {
@@ -113,3 +116,6 @@ public struct ValidationRule<Value, Error> {
 		}
 	}
 }
+
+// MARK: Sendable
+extension ValidationRule: Sendable where Value: Sendable, Error: Sendable {}
