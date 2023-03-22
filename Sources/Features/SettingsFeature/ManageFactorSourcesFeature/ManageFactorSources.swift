@@ -58,16 +58,14 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				do {
-					for try await factorSources in await factorSourcesClient.factorSourcesAsyncSequence() {
-						guard !Task.isCancelled else {
-							return
-						}
-						await send(.internal(.loadFactorSourcesResult(.success(factorSources))))
+				for try await factorSources in await factorSourcesClient.factorSourcesAsyncSequence() {
+					guard !Task.isCancelled else {
+						return
 					}
-				} catch {
-					errorQueue.schedule(error)
+					await send(.internal(.loadFactorSourcesResult(.success(factorSources))))
 				}
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		case .importOlympiaFactorSourceButtonTapped:
 			state.destination = .importOlympiaFactorSource(.init())

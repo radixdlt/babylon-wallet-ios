@@ -105,14 +105,12 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				do {
-					for try await gateways in await gatewaysClient.gatewaysValues() {
-						guard !Task.isCancelled else { return }
-						await send(.internal(.gatewaysLoadedResult(.success(gateways))))
-					}
-				} catch {
-					errorQueue.schedule(error)
+				for try await gateways in await gatewaysClient.gatewaysValues() {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.gatewaysLoadedResult(.success(gateways))))
 				}
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		case let .removeGateway(.presented(action)):
