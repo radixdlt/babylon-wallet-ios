@@ -156,9 +156,9 @@ extension GatewayAPIClient {
 					request: GatewayAPI.StateEntityMetadataPageRequest(address: address)
 				) { @Sendable base in base.appendingPathComponent("/state/entity/page/metadata") }
 			},
-			getNonFungibleLocalIds: { accountAddress, resourceAddress in
+			getNonFungibleIds: { resourceAddress in
 				try await post(
-					request: GatewayAPI.StateEntityNonFungibleIdsPageRequest(address: accountAddress.address, vaultAddress: "", resourceAddress: resourceAddress)
+					request: GatewayAPI.StateNonFungibleIdsRequest(resourceAddress: <#T##String#>)(address: accountAddress.address, vaultAddress: "", resourceAddress: resourceAddress)
 				) { $0.appendingPathComponent("/state/entity/page/non-fungible-vault/ids") }
 			},
 			submitTransaction: { transactionSubmitRequest in

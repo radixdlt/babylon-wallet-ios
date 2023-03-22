@@ -10,7 +10,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getEpoch: GetEpoch
 	public var getEntityDetails: GetEntityDetails
 	public var getEntityMetadata: GetEntityMetadata
-	public var getNonFungibleLocalIds: GetNonFungibleLocalIds
+	public var getNonFungibleIds: GetNonFungibleIds
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 }
@@ -24,7 +24,7 @@ extension GatewayAPIClient {
 
 	public typealias GetEntityMetadata = @Sendable (_ address: String) async throws -> GatewayAPI.StateEntityMetadataPageResponse
 
-	public typealias GetNonFungibleLocalIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.StateEntityNonFungibleIdsPageResponse
+	public typealias GetNonFungibleIds = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.StateNonFungibleIdsResponse
 
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 
