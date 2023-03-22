@@ -40,6 +40,9 @@ extension TransactionReviewDappsUsed {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				// If this is done in the if statement the compiler faints
+				let showUnknownDapps = viewStore.unknownDappCount > 0
+
 				VStack(alignment: .trailing, spacing: .medium2) {
 					Button {
 						viewStore.send(.expandTapped)
@@ -55,13 +58,14 @@ extension TransactionReviewDappsUsed {
 								Button {
 									viewStore.send(.dappTapped(dApp.id))
 								} label: {
-									DappView(thumbnail: .known(dApp.thumbnail), name: dApp.name, description: dApp.description)
+									DappView(type: .known(name: dApp.name, thumbnail: dApp.thumbnail, description: dApp.description))
 								}
 							}
-							if viewStore.unknownDappCount > 0 {
-								DappView(thumbnail: .unknown, name: text, description: nil)
+							if showUnknownDapps {
+								DappView(type: .unknown(count: viewStore.unknownDappCount))
 							}
 						}
+						.transition(.opacity.combined(with: .scale(scale: 0.95)))
 						.background(.app.gray5)
 					}
 				}
@@ -86,14 +90,12 @@ extension TransactionReviewDappsUsed {
 		struct DappView: SwiftUI.View {
 			private let dAppBoxWidth: CGFloat = 190
 
-			let thumbnail: Thumbnail
-			let name: String
-			let description: String?
+			let type: DappType
 
 			var body: some SwiftUI.View {
 				HStack(spacing: 0) {
-					switch thumbnail {
-					case let .known(url):
+					switch type {
+					case let .known(name, url, description):
 						if let url {
 							DappPlaceholder(size: .smaller)
 						} else {
@@ -103,25 +105,26 @@ extension TransactionReviewDappsUsed {
 
 						VStack(alignment: .leading, spacing: .small3) {
 							Text(name)
-
+								.lineLimit(description != nil ? 1 : 2)
 							if let description {
 								Text(description)
+									.lineLimit(1)
 							}
 						}
-						.lineLimit(1)
 						.padding(.leading, .small2)
 
-					case .unknown:
+					case let .unknown(count):
 						DappPlaceholder(size: .smaller)
 							.border(.blue)
 							.padding(.trailing, .small2)
-						Text(name)
+						Text(L10n.TransactionReview.UsingDapps.unknownComponents(count))
 							.lineLimit(2)
 					}
 					Spacer(minLength: 0)
 				}
 				.textStyle(.body2HighImportance)
 				.foregroundColor(.app.gray2)
+				.multilineTextAlignment(.leading)
 				.padding(.small2)
 				.frame(width: dAppBoxWidth)
 				.background {
@@ -130,30 +133,10 @@ extension TransactionReviewDappsUsed {
 				}
 			}
 
-			enum Thumbnail: Equatable {
-				case known(URL?)
-				case unknown
+			enum DappType: Equatable {
+				case known(name: String, thumbnail: URL?, description: String?)
+				case unknown(count: Int)
 			}
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - TransactionReviewDappsUsed_Preview
-// struct TransactionReviewDappsUsed_Preview: PreviewProvider {
-//	static var previews: some View {
-//		TransactionReviewDappsUsed.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: TransactionReviewDappsUsed()
-//			)
-//		)
-//	}
-// }
-//
-// extension TransactionReviewDappsUsed.State {
-//	public static let previewValue = Self()
-// }
-// #endif
