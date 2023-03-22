@@ -35,6 +35,8 @@ public enum AssetResource {
   public static let ellipsis = ImageAsset(name: "ellipsis")
   public static let error = ImageAsset(name: "error")
   public static let iconLinkOut = ImageAsset(name: "icon-link-out")
+  public static let iconUnknownComponent = ImageAsset(name: "icon-unknown-component")
+  public static let iconUnknownResource = ImageAsset(name: "icon-unknown-resource")
   public static let info = ImageAsset(name: "info")
   public static let lock = ImageAsset(name: "lock")
   public static let radioButtonDarkDisabled = ImageAsset(name: "radioButton-dark-disabled")

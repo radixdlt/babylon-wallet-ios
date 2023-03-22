@@ -53,12 +53,12 @@ extension TransactionReview {
 								TransactionHeading(L10n.TransactionReview.messageHeading)
 									.padding(.bottom, .small2)
 								TransactionMessageView(message: message)
-									.padding(.bottom, .medium2)
 							}
 
 							let withdrawingStore = store.scope(state: \.withdrawing) { .child(.withdrawing($0)) }
 							IfLetStore(withdrawingStore) { withdrawingStore in
 								TransactionHeading(L10n.TransactionReview.withdrawingHeading)
+									.padding(.top, .medium2)
 									.padding(.bottom, .small2)
 								TransactionReviewAccounts.View(store: withdrawingStore)
 							}
