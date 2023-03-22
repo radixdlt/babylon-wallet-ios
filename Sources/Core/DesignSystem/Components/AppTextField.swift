@@ -51,7 +51,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		hint: Hint?,
+		hint: Hint? = nil,
 		focus: Focus,
 		@ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }
 	) {
@@ -69,7 +69,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		hint: Hint?,
+		hint: Hint? = nil,
 		@ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }
 	) where FocusValue == Never {
 		self.primaryHeading = primaryHeading
@@ -82,28 +82,28 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 	}
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .small2) {
-			HStack {
-				if let primaryHeading {
-					Text(primaryHeading)
-						.textStyle(.body1HighImportance)
-						.foregroundColor(.app.gray1)
-						.multilineTextAlignment(.leading)
+		HStack(alignment: .textFieldAlignment, spacing: 0) {
+			VStack(alignment: .leading, spacing: .small2) {
+				HStack {
+					if let primaryHeading {
+						Text(primaryHeading)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.leading)
+					}
+
+					if primaryHeading != nil || secondaryHeading != nil {
+						Spacer(minLength: 0)
+					}
+
+					if let secondaryHeading {
+						Text(secondaryHeading)
+							.textStyle(.body2Regular)
+							.foregroundColor(.app.gray2)
+							.multilineTextAlignment(.trailing)
+					}
 				}
 
-				if primaryHeading != nil || secondaryHeading != nil {
-					Spacer(minLength: 0)
-				}
-
-				if let secondaryHeading {
-					Text(secondaryHeading)
-						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
-						.multilineTextAlignment(.trailing)
-				}
-			}
-
-			HStack(spacing: 0) {
 				TextField(
 					placeholder,
 					text: text.removeDuplicates()
@@ -126,22 +126,24 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 					RoundedRectangle(cornerRadius: .small2)
 						.stroke(borderColor(for: hint), lineWidth: 1)
 				)
+				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
-				accessory
-			}
-
-			if let hint {
-				HStack(alignment: .top) {
-					if hint.isError {
-						Image(asset: AssetResource.error)
-							.foregroundColor(.app.red1)
+				if let hint {
+					HStack(alignment: .top) {
+						if hint.isError {
+							Image(asset: AssetResource.error)
+								.foregroundColor(.app.red1)
+						}
+						Text(hint.string)
+							.foregroundColor(foregroundColor(for: hint))
+							.textStyle(.body2Regular)
 					}
-					Text(hint.string)
-						.foregroundColor(foregroundColor(for: hint))
-						.textStyle(.body2Regular)
+					.frame(height: .medium2)
 				}
-				.frame(height: .medium2)
 			}
+
+			accessory
+				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 		}
 	}
 
@@ -166,11 +168,21 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 	}
 }
 
+extension VerticalAlignment {
+	private enum TextFieldAlignment: AlignmentID {
+		static func defaultValue(in d: ViewDimensions) -> CGFloat {
+			d[.bottom]
+		}
+	}
+
+	fileprivate static let textFieldAlignment = VerticalAlignment(TextFieldAlignment.self)
+}
+
 #if DEBUG
 struct AppTextField_Previews: PreviewProvider {
 	static var previews: some View {
 		AppTextFieldPreview()
-			.background(Color.red)
+			.background(Color.gray.opacity(0.2))
 			.padding()
 	}
 }

@@ -16,6 +16,15 @@ public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, Featu
 			case `static`
 			case dynamic(isRequiredByDapp: Bool)
 
+			var isDynamic: Bool {
+				switch self {
+				case .static:
+					return false
+				case .dynamic:
+					return true
+				}
+			}
+
 			var isRequiredByDapp: Bool {
 				switch self {
 				case .static: return false
