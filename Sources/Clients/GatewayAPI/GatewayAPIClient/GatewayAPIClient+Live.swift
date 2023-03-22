@@ -128,11 +128,11 @@ extension GatewayAPIClient {
 		return Self(
 			getNetworkName: { baseURL in
 				let response = try await makeRequest(
-					responseType: GatewayAPI.GatewayInformationResponse.self,
+					responseType: GatewayAPI.GatewayStatusResponse.self,
 					baseURL: baseURL,
 					timeoutInterval: nil
 				) {
-					$0.appendingPathComponent("gateway/information")
+					$0.appendingPathComponent("status/gateway-status")
 				}
 				return Radix.Network.Name(response.ledgerState.network)
 			},
@@ -146,28 +146,20 @@ extension GatewayAPIClient {
 				}
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
-			accountResourcesByAddress: { @Sendable accountAddress in
-				try await post(
-					request: GatewayAPI.StateEntityDetailsRequest(addresses: [accountAddress.address])
-				) { @Sendable base in base.appendingPathComponent("state/entity/details") }
-			},
-			resourcesOverview: { resourcesOverviewRequest in
-				try await post(
-					request: resourcesOverviewRequest
-				) { $0.appendingPathComponent("state/entity/details") }
-			},
-			resourceDetailsByResourceIdentifier: { resourceAddress in
-				try await post(
-					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
-				) { $0.appendingPathComponent("state/entity/details") }
-			},
+                        getEntityDetails:  { @Sendable addresses in
+                                try await post(
+                                        request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses)
+                                ) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+                        },
+                        getEntityMetadata: { @Sendable address in
+                                try await post(
+                                        request: GatewayAPI.StateEntityMetadataPageRequest(address: address)
+                                ) { @Sendable base in base.appendingPathComponent("/state/entity/page/metadata") }
+                        },
 			getNonFungibleLocalIds: { accountAddress, resourceAddress in
 				try await post(
-					request: GatewayAPI.EntityNonFungibleIds(
-						address: accountAddress.address,
-						resourceAddress: resourceAddress
-					)
-				) { $0.appendingPathComponent("entity/non-fungible/ids") }
+                                        request: GatewayAPI.StateEntityNonFungibleIdsPageRequest(address: accountAddress.address, vaultAddress: "", resourceAddress: resourceAddress)
+				) { $0.appendingPathComponent("/state/entity/page/non-fungible-vault/ids") }
 			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(

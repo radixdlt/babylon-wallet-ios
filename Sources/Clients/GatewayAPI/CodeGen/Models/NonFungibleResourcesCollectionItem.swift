@@ -13,6 +13,29 @@ extension GatewayAPI {
 			case aggregationLevel = "aggregation_level"
 		}
 
+		public var global: NonFungibleResourcesCollectionItemGloballyAggregated? {
+			if case let .globallyAggregated(wrapped) = self {
+				return wrapped
+			}
+			return nil
+		}
+
+		public var vault: NonFungibleResourcesCollectionItemVaultAggregated? {
+			if case let .vaultAggregated(wrapped) = self {
+				return wrapped
+			}
+			return nil
+		}
+
+		public var resourceAddress: String {
+			switch self {
+			case let .globallyAggregated(wrapped):
+				return wrapped.resourceAddress
+			case let .vaultAggregated(wrapped):
+				return wrapped.resourceAddress
+			}
+		}
+
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let aggregationLevel = try container.decode(ResourceAggregationLevel.self, forKey: .aggregationLevel)
