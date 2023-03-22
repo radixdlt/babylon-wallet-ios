@@ -103,6 +103,8 @@ public enum L10n {
         public static func chooseEntities(_ p1: UnsafePointer<CChar>) -> String {
           return L10n.tr("Localizable", "createEntity.completion.destination.chooseEntities", p1, fallback: "Choose %ss")
         }
+        /// Gateways
+        public static let gateways = L10n.tr("Localizable", "createEntity.completion.destination.gateways", fallback: "Gateways")
         /// Account List
         public static let home = L10n.tr("Localizable", "createEntity.completion.destination.home", fallback: "Account List")
         /// Persona List
@@ -373,6 +375,8 @@ public enum L10n {
   public enum GatewaySettings {
     /// Add New Gateway
     public static let addNewGatewayButtonTitle = L10n.tr("Localizable", "gatewaySettings.addNewGatewayButtonTitle", fallback: "Add New Gateway")
+    /// Radix Betanet Gateway
+    public static let radixBetanetGateway = L10n.tr("Localizable", "gatewaySettings.radixBetanetGateway", fallback: "Radix Betanet Gateway")
     /// Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.
     public static let subtitle = L10n.tr("Localizable", "gatewaySettings.subtitle", fallback: "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.")
     /// Gateways
@@ -387,6 +391,8 @@ public enum L10n {
       /// Add New Gateway
       public static let title = L10n.tr("Localizable", "gatewaySettings.addNewGateway.title", fallback: "Add New Gateway")
       public enum Error {
+        /// This url is already added
+        public static let duplicateURL = L10n.tr("Localizable", "gatewaySettings.addNewGateway.error.duplicateURL", fallback: "This url is already added")
         /// No Gateway found at specified URL
         public static let noGatewayFound = L10n.tr("Localizable", "gatewaySettings.addNewGateway.error.noGatewayFound", fallback: "No Gateway found at specified URL")
       }
@@ -404,8 +410,10 @@ public enum L10n {
     public enum WhatIsAGateway {
       /// What is a Gateway
       public static let buttonText = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.buttonText", fallback: "What is a Gateway")
+      /// This is a placeholder for gateway explanation text
+      public static let explanation = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.explanation", fallback: "This is a placeholder for gateway explanation text")
       /// What is a Gateway
-      public static let explanationText = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.explanationText", fallback: "What is a Gateway")
+      public static let title = L10n.tr("Localizable", "gatewaySettings.whatIsAGateway.title", fallback: "What is a Gateway")
     }
   }
   public enum Home {

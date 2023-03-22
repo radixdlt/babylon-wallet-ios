@@ -24,6 +24,8 @@ extension Radix {
 }
 
 extension Radix.Gateway {
+	static let `default`: Self = .nebunet
+
 	/// `"https://betanet.radixdlt.com"`
 	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
 	public static var nebunet: Self {
@@ -56,6 +58,10 @@ extension Radix.Gateway {
 }
 
 extension Radix.Gateway {
+	public var isDefault: Bool {
+		id == Self.default.id
+	}
+
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

@@ -25,6 +25,7 @@ public enum CreateEntityNavigationButtonCTA: Sendable, Equatable {
 	case goHome
 	case goBackToPersonaList
 	case goBackToChooseEntities
+	case goBackToGateways
 
 	public static let goBackToChooseAccounts: Self = .goBackToChooseEntities
 	public static let goBackToChoosePersonas: Self = .goBackToChooseEntities
@@ -42,9 +43,9 @@ extension CreateEntityConfig {
 			)
 		case let .firstAccountOnNewNetwork(specificNetworkID):
 			self.init(
-				isFirstEntity: false,
+				isFirstEntity: true,
 				canBeDismissed: false,
-				navigationButtonCTA: .goHome,
+				navigationButtonCTA: .goBackToGateways,
 				specificNetworkID: specificNetworkID
 			)
 		case .newAccountDuringDappInteraction:

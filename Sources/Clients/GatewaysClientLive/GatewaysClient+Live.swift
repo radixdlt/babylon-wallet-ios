@@ -12,6 +12,7 @@ extension GatewaysClient: DependencyKey {
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 		return Self(
+			gatewaysValues: { await getProfileStore().gatewaysValues() },
 			getAllGateways: { await appPreferencesClient.getPreferences().gateways.all },
 			getCurrentGateway: { await appPreferencesClient.getPreferences().gateways.current },
 			addGateway: { gateway in

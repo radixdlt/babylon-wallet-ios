@@ -12,6 +12,7 @@ extension GatewaysClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
+		gatewaysValues: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAllGateways: { .init(rawValue: .init(uniqueElements: [.nebunet]))! },
 		getCurrentGateway: { .nebunet },
 		addGateway: { _ in },
@@ -20,6 +21,7 @@ extension GatewaysClient: TestDependencyKey {
 	)
 
 	public static let testValue = Self(
+		gatewaysValues: unimplemented("\(Self.self).gatewaysValues"),
 		getAllGateways: unimplemented("\(Self.self).getAllGateways"),
 		getCurrentGateway: unimplemented("\(Self.self).getCurrentGateway"),
 		addGateway: unimplemented("\(Self.self).addGateway"),
