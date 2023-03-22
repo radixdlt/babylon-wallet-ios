@@ -34,7 +34,6 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 							taskGroup.addTask {
 								try Task.checkCancellation()
 								let response = try await gatewayAPIClient.getNonFungibleIds(resourceAddress.address)
-								// LocalFungible ids cannot be derived from Global aggregation?
 
 								let nonFungibleLocalIds = response.nonFungibleIds.items.map(\.nonFungibleId)
 								return (resourceAddress, nonFungibleLocalIds)
