@@ -65,7 +65,7 @@ struct PlainListRow_Previews: PreviewProvider {
 		PlainListRow(
 			showChevron: true,
 			title: "A title",
-			asset: AssetResource.appSettings,
+			asset: AssetResource.generalSettings,
 			action: {}
 		)
 	}

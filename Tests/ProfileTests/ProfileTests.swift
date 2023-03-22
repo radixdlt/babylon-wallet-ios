@@ -292,6 +292,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.networkID, networkID)
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+		XCTAssertTrue(profile.appPreferences.security.isDeveloperModeEnabled, "Developer mode should default to on")
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",

@@ -3,6 +3,7 @@ import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
+import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
 
@@ -44,7 +45,7 @@ public struct AppSettings: FeatureReducer {
 		case gatewaysButtonTapped
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
-		case appSettingsButtonTapped
+		case generalSettingsButtonTapped
 		case factorSourcesButtonTapped
 
 		#if DEBUG
@@ -76,6 +77,7 @@ public struct AppSettings: FeatureReducer {
 			case gatewaySettings(GatewaySettings.State)
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
+			case generalSettings(GeneralSettings.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -84,6 +86,7 @@ public struct AppSettings: FeatureReducer {
 			case gatewaySettings(GatewaySettings.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
+			case generalSettings(GeneralSettings.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -101,6 +104,9 @@ public struct AppSettings: FeatureReducer {
 			}
 			Scope(state: /State.personas, action: /Action.personas) {
 				PersonasCoordinator()
+			}
+			Scope(state: /State.generalSettings, action: /Action.generalSettings) {
+				GeneralSettings()
 			}
 		}
 	}
@@ -153,7 +159,8 @@ public struct AppSettings: FeatureReducer {
 			state.destination = .personas(.init())
 			return .none
 
-		case .appSettingsButtonTapped:
+		case .generalSettingsButtonTapped:
+			state.destination = .generalSettings(.init())
 			return .none
 
 		#if DEBUG

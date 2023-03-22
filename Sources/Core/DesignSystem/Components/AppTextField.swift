@@ -118,13 +118,13 @@ public struct AppTextField<FocusValue: Hashable>: View {
 			.cornerRadius(.small2)
 			.overlay(
 				RoundedRectangle(cornerRadius: .small2)
-					.stroke(Color.app.gray1, lineWidth: 1)
+					.stroke(borderColor, lineWidth: 1)
 			)
 
 			if let hint {
 				HStack(alignment: .top) {
 					if hint.isError {
-						Image(asset: AssetResource.info)
+						Image(asset: AssetResource.error)
 							.foregroundColor(.app.red1)
 					}
 					Text(hint.string)
@@ -143,6 +143,10 @@ public struct AppTextField<FocusValue: Hashable>: View {
 		case .error:
 			return .app.red1
 		}
+	}
+
+	private var borderColor: Color {
+		presentsError ? .app.red1 : .app.gray1
 	}
 }
 
