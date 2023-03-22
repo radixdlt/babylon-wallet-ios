@@ -12,27 +12,51 @@ public protocol EditPersonaFieldProtocol: Sendable, Hashable, Comparable {
 // MARK: - EditPersonaField
 public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
+		public enum Mode: Sendable, Hashable {
+			case `static`
+			case dynamic(isRequiredByDapp: Bool)
+
+			var isRequiredByDapp: Bool {
+				switch self {
+				case .static: return false
+				case let .dynamic(isRequiredByDapp): return isRequiredByDapp
+				}
+			}
+
+			var canBeDeleted: Bool {
+				switch self {
+				case .static: return false
+				case let .dynamic(isRequiredByDapp): return !isRequiredByDapp
+				}
+			}
+		}
+
 		public var id: Field { kind }
 		public let kind: Field
 
 		@Validation<String, String>
 		public var input: String?
 
-		public let isRequiredByDapp: Bool
+		public let mode: Mode
 
 		private init(
 			kind: Field,
 			input: Validation<String, String>,
-			isRequiredByDapp: Bool
+			mode: Mode
 		) {
 			self.kind = kind
 			self._input = input
-			self.isRequiredByDapp = isRequiredByDapp
+			self.mode = mode
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case inputFieldChanged(String)
+		case deleteButtonTapped
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case delete
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -40,6 +64,9 @@ public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, Featu
 		case let .inputFieldChanged(input):
 			state.input = input
 			return .none
+
+		case .deleteButtonTapped:
+			return .send(.delegate(.delete))
 		}
 	}
 }
@@ -83,7 +110,7 @@ extension EditPersonaStaticField.State {
 				onNil: L10n.EditPersona.InputField.Error.PersonaLabel.blank,
 				rules: [.if(\.isBlank, error: L10n.EditPersona.InputField.Error.PersonaLabel.blank)]
 			),
-			isRequiredByDapp: false
+			mode: .static
 		)
 	}
 }
@@ -147,7 +174,7 @@ extension EditPersonaDynamicField.State {
 					)
 				}
 			}(),
-			isRequiredByDapp: isRequiredByDapp
+			mode: .dynamic(isRequiredByDapp: isRequiredByDapp)
 		)
 	}
 }

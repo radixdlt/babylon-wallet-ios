@@ -21,7 +21,7 @@ public enum AppTextFieldHint: Equatable {
 }
 
 // MARK: - AppTextField
-public struct AppTextField<FocusValue: Hashable>: View {
+public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 	public typealias Hint = AppTextFieldHint
 
 	public struct Focus {
@@ -44,6 +44,7 @@ public struct AppTextField<FocusValue: Hashable>: View {
 	let text: Binding<String>
 	let hint: Hint?
 	let focus: Focus?
+	let accessory: Accessory
 
 	public init(
 		primaryHeading: String? = nil,
@@ -51,7 +52,8 @@ public struct AppTextField<FocusValue: Hashable>: View {
 		placeholder: String,
 		text: Binding<String>,
 		hint: Hint?,
-		focus: Focus
+		focus: Focus,
+		@ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }
 	) {
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
@@ -59,6 +61,7 @@ public struct AppTextField<FocusValue: Hashable>: View {
 		self.text = text
 		self.hint = hint
 		self.focus = focus
+		self.accessory = accessory()
 	}
 
 	public init(
@@ -66,7 +69,8 @@ public struct AppTextField<FocusValue: Hashable>: View {
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		hint: Hint?
+		hint: Hint?,
+		@ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }
 	) where FocusValue == Never {
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
@@ -74,6 +78,7 @@ public struct AppTextField<FocusValue: Hashable>: View {
 		self.text = text
 		self.hint = hint
 		self.focus = nil
+		self.accessory = accessory()
 	}
 
 	public var body: some View {
@@ -98,28 +103,32 @@ public struct AppTextField<FocusValue: Hashable>: View {
 				}
 			}
 
-			TextField(
-				placeholder,
-				text: text.removeDuplicates()
-			)
-			.modifier { view in
-				if let focus {
-					view.focused(focus.focusState, equals: focus.value)
-						.bind(focus.binding, to: focus.focusState)
-				} else {
-					view
+			HStack(spacing: 0) {
+				TextField(
+					placeholder,
+					text: text.removeDuplicates()
+				)
+				.modifier { view in
+					if let focus {
+						view.focused(focus.focusState, equals: focus.value)
+							.bind(focus.binding, to: focus.focusState)
+					} else {
+						view
+					}
 				}
+				.padding()
+				.frame(height: .standardButtonHeight)
+				.background(Color.app.gray5)
+				.foregroundColor(.app.gray1)
+				.textStyle(.body1Regular)
+				.cornerRadius(.small2)
+				.overlay(
+					RoundedRectangle(cornerRadius: .small2)
+						.stroke(borderColor(for: hint), lineWidth: 1)
+				)
+
+				accessory
 			}
-			.padding()
-			.frame(height: .standardButtonHeight)
-			.background(Color.app.gray5)
-			.foregroundColor(.app.gray1)
-			.textStyle(.body1Regular)
-			.cornerRadius(.small2)
-			.overlay(
-				RoundedRectangle(cornerRadius: .small2)
-					.stroke(borderColor(for: hint), lineWidth: 1)
-			)
 
 			if let hint {
 				HStack(alignment: .top) {
@@ -186,7 +195,9 @@ struct AppTextFieldPreview: View {
 			text: $text,
 			hint: .error("Hint"),
 			focus: .on(.field, binding: $focus, to: $focusState)
-		)
+		) {
+			Image(asset: AssetResource.trash).frame(.small)
+		}
 	}
 }
 #endif

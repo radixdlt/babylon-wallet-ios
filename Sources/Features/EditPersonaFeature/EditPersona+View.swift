@@ -126,10 +126,10 @@ extension EditPersona.State {
 			mode: mode,
 			personaLabel: NonEmptyString(rawValue: "RadIpsum")!,
 			existingFields: [
-				//                .init(kind: .givenName, value: "Lorem"),
-				//                .init(kind: .familyName, value: "Ipsum"),
-				//                .init(kind: .emailAddress, value: "lorem.ipsum@example.com"),
-				//                .init(kind: .phoneNumber, value: "555-5555"),
+				.init(kind: .givenName, value: "Lorem"),
+				.init(kind: .familyName, value: "Ipsum"),
+				.init(kind: .emailAddress, value: "lorem.ipsum@example.com"),
+				.init(kind: .phoneNumber, value: "555-5555"),
 			]
 		)
 	}

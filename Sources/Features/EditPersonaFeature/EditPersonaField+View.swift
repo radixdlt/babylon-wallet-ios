@@ -11,16 +11,18 @@ extension EditPersonaField {
 		let capitalization: EquatableTextInputCapitalization
 		let keyboardType: UIKeyboardType
 		#endif
+		let canBeDeleted: Bool
 
 		init(state: State) {
 			self.primaryHeading = state.id.title
-			self.secondaryHeading = state.isRequiredByDapp ? L10n.EditPersona.InputField.Heading.General.requiredByDapp : nil
+			self.secondaryHeading = state.mode.isRequiredByDapp ? L10n.EditPersona.InputField.Heading.General.requiredByDapp : nil
 			self._input = state.$input
 			self.inputHint = (state.$input.errors?.first).map { .error($0) }
 			#if os(iOS)
 			self.capitalization = state.id.capitalization
 			self.keyboardType = state.id.keyboardType
 			#endif
+			self.canBeDeleted = state.mode.canBeDeleted
 		}
 	}
 
@@ -42,7 +44,15 @@ extension EditPersonaField {
 						send: { .inputFieldChanged($0) }
 					),
 					hint: viewStore.inputHint
-				)
+				) {
+					if viewStore.canBeDeleted {
+						Button(action: { viewStore.send(.deleteButtonTapped) }) {
+							Image(asset: AssetResource.trash)
+								.offset(x: .small3)
+								.frame(.verySmall, alignment: .trailing)
+						}
+					}
+				}
 				#if os(iOS)
 				.textInputAutocapitalization(viewStore.capitalization.rawValue)
 				.keyboardType(viewStore.keyboardType)
