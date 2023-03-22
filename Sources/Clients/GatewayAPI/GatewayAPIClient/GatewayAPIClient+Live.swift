@@ -146,19 +146,19 @@ extension GatewayAPIClient {
 				}
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
-                        getEntityDetails:  { @Sendable addresses in
-                                try await post(
-                                        request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses)
-                                ) { @Sendable base in base.appendingPathComponent("state/entity/details") }
-                        },
-                        getEntityMetadata: { @Sendable address in
-                                try await post(
-                                        request: GatewayAPI.StateEntityMetadataPageRequest(address: address)
-                                ) { @Sendable base in base.appendingPathComponent("/state/entity/page/metadata") }
-                        },
+			getEntityDetails: { @Sendable addresses in
+				try await post(
+					request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses)
+				) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+			},
+			getEntityMetadata: { @Sendable address in
+				try await post(
+					request: GatewayAPI.StateEntityMetadataPageRequest(address: address)
+				) { @Sendable base in base.appendingPathComponent("/state/entity/page/metadata") }
+			},
 			getNonFungibleLocalIds: { accountAddress, resourceAddress in
 				try await post(
-                                        request: GatewayAPI.StateEntityNonFungibleIdsPageRequest(address: accountAddress.address, vaultAddress: "", resourceAddress: resourceAddress)
+					request: GatewayAPI.StateEntityNonFungibleIdsPageRequest(address: accountAddress.address, vaultAddress: "", resourceAddress: resourceAddress)
 				) { $0.appendingPathComponent("/state/entity/page/non-fungible-vault/ids") }
 			},
 			submitTransaction: { transactionSubmitRequest in

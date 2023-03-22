@@ -8,8 +8,8 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let testValue = Self(
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
-                getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
-                getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
+		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
+		getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
 		getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus")
@@ -25,8 +25,8 @@ extension GatewayAPIClient: TestDependencyKey {
 		.init(
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
-                        getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
-                        getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
+			getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
+			getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
 			getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
