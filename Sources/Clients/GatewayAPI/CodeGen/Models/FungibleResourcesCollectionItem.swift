@@ -42,9 +42,9 @@ extension GatewayAPI {
 
 			switch aggregationLevel {
 			case .global:
-				self = .globallyAggregated(try FungibleResourcesCollectionItemGloballyAggregated(from: decoder))
+				self = try .globallyAggregated(FungibleResourcesCollectionItemGloballyAggregated(from: decoder))
 			case .vault:
-				self = .vaultAggregated(try FungibleResourcesCollectionItemVaultAggregated(from: decoder))
+				self = try .vaultAggregated(FungibleResourcesCollectionItemVaultAggregated(from: decoder))
 			}
 		}
 
