@@ -10,7 +10,7 @@ extension TransactionManifest {
 		case excludeBlobs
 		case includeBlobsByByteCountOnly
 		case includeBlobs
-		/// Blob + SHA256.twice hash of blob
+		/// Blob + Blake hash of blob
 		case includeBlobsWithHash
 		public static let `default`: Self = .includeBlobsByByteCountOnly
 	}
