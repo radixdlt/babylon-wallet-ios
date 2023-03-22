@@ -74,6 +74,14 @@ extension TransactionReview {
 							Separator()
 								.padding(.bottom, .medium1)
 
+							let presentingStore = store.scope(state: \.presenting) { .child(.presenting($0)) }
+							IfLetStore(presentingStore) { childStore in
+								TransactionReviewPresenting.View(store: childStore)
+
+								Separator()
+									.padding(.bottom, .medium1)
+							}
+
 							let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
 							TransactionReviewNetworkFee.View(store: feeStore)
 
@@ -189,6 +197,23 @@ struct TransactionMessageView: View {
 				.flushedLeft
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
+		}
+	}
+}
+
+// MARK: - TransactionReviewInfoButton
+public struct TransactionReviewInfoButton: View {
+	private let action: () -> Void
+
+	public init(action: @escaping () -> Void) {
+		self.action = action
+	}
+
+	public var body: some SwiftUI.View {
+		Button(action: action) {
+			Image(asset: AssetResource.info)
+				.renderingMode(.template)
+				.foregroundColor(.app.gray3)
 		}
 	}
 }
