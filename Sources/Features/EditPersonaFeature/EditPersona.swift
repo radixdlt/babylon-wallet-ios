@@ -47,25 +47,6 @@ public struct EditPersona: Sendable, FeatureReducer {
 					)
 				}
 			)
-//			self._personaLabel = .init(
-//				wrappedValue: personaLabel.rawValue,
-//				onNil: L10n.EditPersona.InputError.PersonaLabel.blank,
-//				rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.PersonaLabel.blank)]
-//			)
-//			let isGivenNameRequiredByDapp = fieldsRequiredByDapp.contains(.givenName)
-//			self._givenName = .init(
-//				wrappedValue: existingFields.first(where: { $0.kind == .givenName })?.value.rawValue,
-//				onNil: isGivenNameRequiredByDapp ? L10n.EditPersona.InputError.All.requiredByDapp : nil,
-//				rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.All.requiredByDapp)],
-//				exceptions: isGivenNameRequiredByDapp ? [] : [\.isEmpty]
-//			)
-//			let isFamilyNameRequiredByDapp = fieldsRequiredByDapp.contains(.familyName)
-//			self._familyName = .init(
-//				wrappedValue: existingFields.first(where: { $0.kind == .familyName })?.value.rawValue,
-//				onNil: isFamilyNameRequiredByDapp ? L10n.EditPersona.InputError.All.requiredByDapp : nil,
-//				rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.All.requiredByDapp)],
-//				exceptions: isFamilyNameRequiredByDapp ? [] : [\.isEmpty]
-//			)
 		}
 	}
 

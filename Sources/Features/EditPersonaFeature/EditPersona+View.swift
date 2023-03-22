@@ -97,14 +97,6 @@ struct EditPersona_Preview: PreviewProvider {
 	static var previews: some View {
 		EditPersona.View(
 			store: .init(
-				initialState: .previewValue(mode: .edit),
-				reducer: EditPersona()
-			)
-		)
-		.previewDisplayName("Edit Mode")
-
-		EditPersona.View(
-			store: .init(
 				initialState: .previewValue(
 					mode: .dapp(
 						requiredFields: [
@@ -117,6 +109,14 @@ struct EditPersona_Preview: PreviewProvider {
 			)
 		)
 		.previewDisplayName("dApp Mode")
+
+		EditPersona.View(
+			store: .init(
+				initialState: .previewValue(mode: .edit),
+				reducer: EditPersona()
+			)
+		)
+		.previewDisplayName("Edit Mode")
 	}
 }
 

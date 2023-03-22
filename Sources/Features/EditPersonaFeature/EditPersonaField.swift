@@ -132,11 +132,21 @@ extension EditPersonaDynamicField.State {
 	) {
 		self.init(
 			kind: kind,
-			input: .init(
-				wrappedValue: initial,
-				onNil: nil, // TODO:
-				rules: []
-			),
+			input: {
+				if isRequiredByDapp {
+					return .init(
+						wrappedValue: initial,
+						onNil: L10n.EditPersona.InputError.General.requiredByDapp,
+						rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.General.requiredByDapp)]
+					)
+				} else {
+					return .init(
+						wrappedValue: initial,
+						onNil: nil,
+						rules: []
+					)
+				}
+			}(),
 			isRequiredByDapp: isRequiredByDapp
 		)
 	}
