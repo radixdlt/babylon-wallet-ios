@@ -18,7 +18,11 @@ extension EditPersona.State {
 						let fieldInput = field.input,
 						let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmed())
 					else {
-						return nil
+						if field.kind == .dynamic(isRequiredByDapp: true) {
+							return nil
+						} else {
+							continue
+						}
 					}
 					fieldsOutput[id: field.id] = .init(id: field.id, value: fieldOutput)
 				}
