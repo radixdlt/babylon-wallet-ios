@@ -86,7 +86,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 }
 
 extension TransactionReview.State {
-	public static let mock0 = Self(message: longMessage,
+	public static let mock0 = Self(message: "Royalties claim",
 	                               withdrawing: .init(accounts: [.mockWithdraw0], showCustomizeGuarantees: false),
 	                               dAppsUsed: .init(isExpanded: false, dApps: []),
 	                               depositing: .init(accounts: [.mockDeposit1], showCustomizeGuarantees: true),
@@ -98,15 +98,6 @@ extension TransactionReview.State {
 	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
 	                               depositing: .init(accounts: [.mockDeposit2], showCustomizeGuarantees: true),
 	                               networkFee: .init(fee: 0.2, isCongested: true))
-
-	static let longMessage: String = """
-	**Receipt**
-	1 capuccino, double                                $6.50
-	Mavs fan game day discount                        -$5.00
-	tip                                                $1.00
-
-	**Total due**                                          **$2.50**
-	"""
 }
 
 extension TransactionReview.State.Dapp {
