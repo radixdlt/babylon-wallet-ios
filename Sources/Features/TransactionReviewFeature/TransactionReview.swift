@@ -16,15 +16,23 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public struct Dapp: Sendable, Identifiable, Hashable {
 			public let id: AccountAddress.ID
-			public let thumbnail: URL?
-			public let name: String
-			public let description: String?
+			public let metadata: Metadata?
 
-			public init(id: AccountAddress.ID, thumbnail: URL?, name: String, description: String?) {
+			init(id: AccountAddress.ID, metadata: Metadata?) {
 				self.id = id
-				self.thumbnail = thumbnail
-				self.name = name
-				self.description = description
+				self.metadata = metadata
+			}
+
+			public struct Metadata: Sendable, Hashable {
+				public let name: String
+				public let thumbnail: URL?
+				public let description: String?
+
+				public init(name: String, thumbnail: URL?, description: String?) {
+					self.name = name
+					self.thumbnail = thumbnail
+					self.description = description
+				}
 			}
 		}
 	}
@@ -78,7 +86,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 }
 
 extension TransactionReview.State {
-	public static let mock0 = Self(message: "Royalties claim",
+	public static let mock0 = Self(message: longMessage,
 	                               withdrawing: .init(accounts: [.mockWithdraw0], showCustomizeGuarantees: false),
 	                               dAppsUsed: .init(isExpanded: false, dApps: []),
 	                               depositing: .init(accounts: [.mockDeposit1], showCustomizeGuarantees: true),
@@ -90,13 +98,27 @@ extension TransactionReview.State {
 	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
 	                               depositing: .init(accounts: [.mockDeposit2], showCustomizeGuarantees: true),
 	                               networkFee: .init(fee: 0.2, isCongested: true))
+
+	static let longMessage: String = """
+	**Receipt**
+	1 capuccino, double                                $6.50
+	Mavs fan game day discount                        -$5.00
+	tip                                                $1.00
+
+	**Total due**                                          **$2.50**
+	"""
 }
 
 extension TransactionReview.State.Dapp {
-	public static let mock0 = Self(id: .deadbeef32Bytes, thumbnail: nil, name: "Collabofi User Badge", description: nil)
-	public static let mock1 = Self(id: .deadbeef64Bytes, thumbnail: nil, name: "Oh Babylon Founder NFT", description: "Investor 2 lines")
-	public static let mock2 = Self(id: "lkjl", thumbnail: nil, name: "Megaswap", description: nil)
-	public static let mock3 = Self(id: "lkhgh", thumbnail: nil, name: "Superswap", description: nil)
+	public static let mock0 = Self(id: .deadbeef32Bytes,
+	                               metadata: .init(name: "Collabofi User Badge", thumbnail: nil, description: nil))
+
+	public static let mock1 = Self(id: .deadbeef64Bytes,
+	                               metadata: .init(name: "Oh Babylon Founder NFT", thumbnail: nil, description: nil))
+
+	public static let mock2 = Self(id: "deadbeef64Bytes", metadata: nil)
+
+	public static let mock3 = Self(id: "deadbeef32Bytes", metadata: nil)
 }
 
 extension TransactionReviewAccount.State {

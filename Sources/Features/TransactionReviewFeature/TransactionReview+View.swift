@@ -153,7 +153,7 @@ struct TransactionPresentingView: View {
 				} label: {
 					HStack(spacing: .small1) {
 						DappPlaceholder(size: .smallest)
-						Text(presenter.name)
+//						Text(presenter.name)
 						Spacer(minLength: 0)
 					}
 				}

@@ -795,6 +795,12 @@ public enum L10n {
       /// NETWORK FEE
       public static let heading = L10n.tr("Localizable", "transactionReview.networkFee.heading", fallback: "NETWORK FEE")
     }
+    public enum UsingDapps {
+      /// %d Unknown Components
+      public static func unknownComponents(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "transactionReview.usingDapps.unknownComponents", p1, fallback: "%d Unknown Components")
+      }
+    }
   }
   public enum TransactionSigning {
     /// Preparing transaction...
