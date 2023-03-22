@@ -134,7 +134,7 @@
 "transactionReview.withdrawingHeading" = "WITHDRAWING";
 "transactionReview.depositingHeading" = "DEPOSITING";
 "transactionReview.sendingToHeading" = "SENDING TO";
-"transactionReview.presentingtingHeading" = "PRESENTING";
+"transactionReview.presentingHeading" = "PRESENTING";
 "transactionReview.customizeGuaranteesButtonTitle" = "Customize Guarantees";
 "transactionReview.approveButtonTitle" = "Approve";
 "transactionReview.externalAccountName" = "Account";

@@ -680,7 +680,7 @@ public enum L10n {
     /// MESSAGE
     public static let messageHeading = L10n.tr("Localizable", "transactionReview.messageHeading", fallback: "MESSAGE")
     /// PRESENTING
-    public static let presentingtingHeading = L10n.tr("Localizable", "transactionReview.presentingtingHeading", fallback: "PRESENTING")
+    public static let presentingHeading = L10n.tr("Localizable", "transactionReview.presentingHeading", fallback: "PRESENTING")
     /// SENDING TO
     public static let sendingToHeading = L10n.tr("Localizable", "transactionReview.sendingToHeading", fallback: "SENDING TO")
     /// Review Transaction
