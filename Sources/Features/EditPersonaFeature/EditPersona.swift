@@ -124,6 +124,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
+		case let .dynamicField(id, action: .delegate(.delete)):
+			state.dynamicFields.remove(id: id)
+			return .none
+
 		default:
 			return .none
 		}
