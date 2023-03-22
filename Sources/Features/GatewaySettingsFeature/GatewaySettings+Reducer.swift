@@ -106,7 +106,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case .task:
 			return .run { send in
 				do {
-					for try await gateways in await gatewaysClient.allGateways() {
+					for try await gateways in await gatewaysClient.gatewaysValues() {
 						guard !Task.isCancelled else { return }
 						await send(.internal(.gatewaysLoadedResult(.success(gateways))))
 					}

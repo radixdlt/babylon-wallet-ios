@@ -29,7 +29,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 			$0.gatewaysClient.getAllGateways = {
 				.init(rawValue: .init(uniqueElements: otherGateways))!
 			}
-			$0.gatewaysClient.allGateways = { AsyncLazySequence([
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([
 				try! .init(current: currentGateway, other: .init(uniqueElements: otherGateways)),
 			]
 			).eraseToAnyAsyncSequence() }
@@ -169,7 +169,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 					return .init(rawValue: .init(uniqueElements: otherGateways))!
 				}
 			}
-			$0.gatewaysClient.allGateways = {
+			$0.gatewaysClient.gatewaysValues = {
 				let gateways = await isGatewayRemoved.value ? otherAfterDeletion : otherGateways
 				return AsyncLazySequence([
 					try! .init(current: currentGateway, other: .init(uniqueElements: gateways)),

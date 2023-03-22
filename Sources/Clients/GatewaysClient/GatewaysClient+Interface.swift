@@ -4,7 +4,7 @@ import Profile
 // MARK: - GatewaysClient
 public struct GatewaysClient: Sendable {
 	/// Async sequence of Gateways, emits new value of Gateways
-	public var allGateways: AllGateways
+	public var gatewaysValues: GatewaysValues
 	public var getAllGateways: GetAllGateways
 	public var getCurrentGateway: GetCurrentGateway
 	public var addGateway: AddGateway
@@ -12,14 +12,14 @@ public struct GatewaysClient: Sendable {
 	public var changeGateway: ChangeGateway
 
 	public init(
-		allGateways: @escaping AllGateways,
+		gatewaysValues: @escaping GatewaysValues,
 		getAllGateways: @escaping GetAllGateways,
 		getCurrentGateway: @escaping GetCurrentGateway,
 		addGateway: @escaping AddGateway,
 		removeGateway: @escaping RemoveGateway,
 		changeGateway: @escaping ChangeGateway
 	) {
-		self.allGateways = allGateways
+		self.gatewaysValues = gatewaysValues
 		self.getAllGateways = getAllGateways
 		self.getCurrentGateway = getCurrentGateway
 		self.addGateway = addGateway
@@ -29,7 +29,7 @@ public struct GatewaysClient: Sendable {
 }
 
 extension GatewaysClient {
-	public typealias AllGateways = @Sendable () async -> AnyAsyncSequence<Gateways>
+	public typealias GatewaysValues = @Sendable () async -> AnyAsyncSequence<Gateways>
 	public typealias GetCurrentGateway = @Sendable () async -> Radix.Gateway
 	public typealias GetAllGateways = @Sendable () async -> Gateways.Elements
 	public typealias AddGateway = @Sendable (Radix.Gateway) async throws -> Void
