@@ -168,12 +168,12 @@ final class ProfileTests: TestCase {
 		let thirdAccount = try addNewAccount("Third")
 
 		let firstPersona = try addNewPersona("Mrs Incognito", fields: [
-			.init(kind: .givenName, value: "Jane"),
-			.init(kind: .familyName, value: "Incognitoson"),
+			.init(id: .givenName, value: "Jane"),
+			.init(id: .familyName, value: "Incognitoson"),
 		])
 		let secondPersona = try addNewPersona("Mrs Public", fields: [
-			.init(kind: .givenName, value: "Maria"),
-			.init(kind: .familyName, value: "Publicson"),
+			.init(id: .givenName, value: "Maria"),
+			.init(id: .familyName, value: "Publicson"),
 		])
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
@@ -249,10 +249,6 @@ final class ProfileTests: TestCase {
 				thirdAccount.address,
 			]), "Should be able to specify more accounts if `atLeast` was specified."
 		)
-
-		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(Profile.Network.Persona.Field.ID()) // add unknown fieldID
-
-		XCTAssertThrowsError(try profile.updateAuthorizedDapp(authorizedDapp))
 
 		let snapshot = profile.snapshot()
 		let jsonEncoder = JSONEncoder.iso8601

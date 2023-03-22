@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - EditPersonaFieldProtocol
-public protocol EditPersonaFieldProtocol: Sendable, Hashable, Comparable {
+// MARK: - EditPersonaFieldID
+public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 	var title: String { get }
 	#if os(iOS)
 	var capitalization: EquatableTextInputCapitalization { get }
@@ -10,7 +10,7 @@ public protocol EditPersonaFieldProtocol: Sendable, Hashable, Comparable {
 }
 
 // MARK: - EditPersonaField
-public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, FeatureReducer {
+public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public enum Mode: Sendable, Hashable {
 			case `static`
@@ -40,8 +40,7 @@ public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, Featu
 			}
 		}
 
-		public var id: Field { kind }
-		public let kind: Field
+		public let id: ID
 
 		@Validation<String, String>
 		public var input: String?
@@ -49,11 +48,11 @@ public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, Featu
 		public let mode: Mode
 
 		private init(
-			kind: Field,
+			id: ID,
 			input: Validation<String, String>,
 			mode: Mode
 		) {
-			self.kind = kind
+			self.id = id
 			self._input = input
 			self.mode = mode
 		}
@@ -84,8 +83,8 @@ public struct EditPersonaField<Field: EditPersonaFieldProtocol>: Sendable, Featu
 
 public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.StaticField>
 
-// MARK: - EditPersona.State.StaticField + EditPersonaFieldProtocol
-extension EditPersona.State.StaticField: EditPersonaFieldProtocol {
+// MARK: - EditPersona.State.StaticField + EditPersonaFieldID
+extension EditPersona.State.StaticField: EditPersonaFieldID {
 	public var title: String {
 		switch self {
 		case .personaLabel: return L10n.PersonaDetails.personaLabelHeading
@@ -109,11 +108,11 @@ extension EditPersona.State.StaticField: EditPersonaFieldProtocol {
 
 extension EditPersonaStaticField.State {
 	public init(
-		kind: Field,
+		id: ID,
 		initial: String?
 	) {
 		self.init(
-			kind: kind,
+			id: id,
 			input: .init(
 				wrappedValue: initial,
 				onNil: L10n.EditPersona.InputField.Error.PersonaLabel.blank,
@@ -128,8 +127,8 @@ extension EditPersonaStaticField.State {
 
 public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicField>
 
-// MARK: - EditPersona.State.DynamicField + EditPersonaFieldProtocol
-extension EditPersona.State.DynamicField: EditPersonaFieldProtocol {
+// MARK: - EditPersona.State.DynamicField + EditPersonaFieldID
+extension EditPersona.State.DynamicField: EditPersonaFieldID {
 	public var title: String {
 		switch self {
 		case .givenName: return L10n.PersonaDetails.givenNameHeading
@@ -162,12 +161,12 @@ extension EditPersona.State.DynamicField: EditPersonaFieldProtocol {
 
 extension EditPersonaDynamicField.State {
 	public init(
-		kind: Field,
+		id: ID,
 		initial: String?,
 		isRequiredByDapp: Bool
 	) {
 		self.init(
-			kind: kind,
+			id: id,
 			input: {
 				if isRequiredByDapp {
 					return .init(

@@ -126,10 +126,10 @@ private extension PersonaDetails.State {
 			dAppName: dAppName,
 			personaLabel: persona.displayName.rawValue,
 			isSharingAnything: !persona.fields.isEmpty,
-			givenName: persona.fields[kind: .givenName],
-			familyName: persona.fields[kind: .familyName],
-			emailAddress: persona.fields[kind: .emailAddress],
-			phoneNumber: persona.fields[kind: .phoneNumber]
+			givenName: persona.fields[id: .givenName]?.value.rawValue,
+			familyName: persona.fields[id: .familyName]?.value.rawValue,
+			emailAddress: persona.fields[id: .emailAddress]?.value.rawValue,
+			phoneNumber: persona.fields[id: .phoneNumber]?.value.rawValue
 		)
 	}
 }
@@ -181,13 +181,5 @@ extension PersonaDetails.View {
 private extension PersonaDetails.State {
 	var accountSectionViewState: PersonaDetails.View.AccountSection.ViewState {
 		.init(dAppName: dAppName, sharingAccounts: persona.simpleAccounts ?? [])
-	}
-}
-
-// MARK: Extensions
-
-extension IdentifiedArrayOf<Profile.Network.Persona.Field> {
-	subscript(kind kind: Profile.Network.Persona.Field.Kind) -> String? {
-		first { $0.kind == kind }?.value.rawValue
 	}
 }

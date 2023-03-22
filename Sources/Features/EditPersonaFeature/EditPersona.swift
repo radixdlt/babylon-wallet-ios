@@ -1,23 +1,31 @@
 import FeaturePrelude
 import Profile
 
+// MARK: - EditPersona.Output
+extension EditPersona {
+	public struct Output: Sendable, Hashable {
+		let personaLabel: NonEmptyString
+		let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+	}
+}
+
 // MARK: - EditPersona
 public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
-			case dapp(requiredFields: [DynamicField])
+			case dapp(requiredFieldIDs: [DynamicField])
 		}
 
 		public enum StaticField: Sendable, Hashable, Comparable {
 			case personaLabel
 		}
 
-		public typealias DynamicField = Profile.Network.Persona.Field.Kind
+		public typealias DynamicField = Profile.Network.Persona.Field.ID
 
 		let avatarURL: URL
 		var labelField: EditPersonaStaticField.State
-		@Sorted(by: \.kind)
+		@Sorted(by: \.id)
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 
 		@PresentationState
@@ -31,28 +39,28 @@ public struct EditPersona: Sendable, FeatureReducer {
 		) {
 			self.avatarURL = avatarURL
 			self.labelField = EditPersonaStaticField.State(
-				kind: .personaLabel,
+				id: .personaLabel,
 				initial: personaLabel.rawValue
 			)
 			self.dynamicFields = IdentifiedArray(
 				uncheckedUniqueElements: existingFields.map { field in
 					EditPersonaDynamicField.State(
-						kind: field.kind,
+						id: field.id,
 						initial: field.value.rawValue,
 						isRequiredByDapp: {
 							switch mode {
 							case .edit:
 								return false
-							case let .dapp(requiredFields):
-								return requiredFields.contains(field.kind)
+							case let .dapp(requiredFieldIDs):
+								return requiredFieldIDs.contains(field.id)
 							}
 						}()
 					)
 				}
 			)
-			if case let .dapp(requiredFields) = mode {
-				for requiredField in requiredFields where dynamicFields[id: requiredField] == nil {
-					dynamicFields.append(.init(kind: requiredField, initial: nil, isRequiredByDapp: true))
+			if case let .dapp(requiredFieldIDs) = mode {
+				for requiredFieldID in requiredFieldIDs where dynamicFields[id: requiredFieldID] == nil {
+					dynamicFields.append(.init(id: requiredFieldID, initial: nil, isRequiredByDapp: true))
 				}
 			}
 		}
@@ -60,7 +68,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case cancelButtonTapped
-		case saveButtonTapped
+		case saveButtonTapped(Output)
 		case addAFieldButtonTapped
 	}
 
@@ -68,6 +76,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 		case labelField(EditPersonaStaticField.Action)
 		case dynamicField(id: EditPersonaDynamicField.State.ID, action: EditPersonaDynamicField.Action)
 		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case save(Output)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -108,11 +120,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 		switch viewAction {
 		case .cancelButtonTapped:
 			return .run { _ in await dismiss() }
-		case .saveButtonTapped:
-			// TODO:
-			return .none
+
+		case let .saveButtonTapped(output):
+			return .send(.delegate(.save(output)))
+
 		case .addAFieldButtonTapped:
-			state.destination = .addFields(.init(excludedFields: state.dynamicFields.map(\.id)))
+			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.id)))
 			return .none
 		}
 	}
@@ -120,7 +133,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
-			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(kind: $0, initial: nil, isRequiredByDapp: false) })
+			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, initial: nil, isRequiredByDapp: false) })
 			state.destination = nil
 			return .none
 

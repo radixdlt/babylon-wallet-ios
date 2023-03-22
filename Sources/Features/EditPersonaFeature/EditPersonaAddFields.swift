@@ -6,9 +6,9 @@ public struct EditPersonaAddFields: Sendable, FeatureReducer {
 		var selectedFields: [EditPersona.State.DynamicField]? = nil
 
 		public init(
-			excludedFields: [EditPersona.State.DynamicField]
+			excludedFieldIDs: [EditPersona.State.DynamicField]
 		) {
-			self.availableFields = EditPersona.State.DynamicField.allCases.filter { !excludedFields.contains($0) }
+			self.availableFields = EditPersona.State.DynamicField.allCases.filter { !excludedFieldIDs.contains($0) }
 		}
 	}
 

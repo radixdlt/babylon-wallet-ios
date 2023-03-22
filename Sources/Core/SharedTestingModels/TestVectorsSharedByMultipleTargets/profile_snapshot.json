@@ -166,8 +166,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "304E7416-B1BC-4BED-AFAB-5BB2ABD7FB91",
-                "F472AAAA-A8A2-448B-B3A4-2D85BB5F075C"
+                "givenName",
+                "familyName"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -184,8 +184,8 @@
             },
             {
               "fieldIDs" : [
-                "D7246130-5FB4-4320-B988-3D552250785C",
-                "48E60F3A-F1B9-464F-98FE-2944910F4CDA"
+                "givenName",
+                "familyName"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -209,13 +209,11 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "304E7416-B1BC-4BED-AFAB-5BB2ABD7FB91",
-              "kind" : "givenName",
+              "id" : "givenName",
               "value" : "Jane"
             },
             {
-              "id" : "F472AAAA-A8A2-448B-B3A4-2D85BB5F075C",
-              "kind" : "familyName",
+              "id" : "familyName",
               "value" : "Incognitoson"
             }
           ],
@@ -242,13 +240,11 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "D7246130-5FB4-4320-B988-3D552250785C",
-              "kind" : "givenName",
+              "id" : "givenName",
               "value" : "Maria"
             },
             {
-              "id" : "48E60F3A-F1B9-464F-98FE-2944910F4CDA",
-              "kind" : "familyName",
+              "id" : "familyName",
               "value" : "Publicson"
             }
           ],

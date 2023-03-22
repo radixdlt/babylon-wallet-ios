@@ -75,7 +75,7 @@ struct EditPersonaAddFields_Preview: View {
 		EditPersonaAddFields.View(
 			store: Store(
 				initialState: EditPersonaAddFields.State(
-					excludedFields: [
+					excludedFieldIDs: [
 						.emailAddress,
 					]
 				),

@@ -95,21 +95,33 @@ extension Profile.Network.Persona {
 		Identifiable,
 		CustomStringConvertible,
 		CustomDumpReflectable
-
 	{
-		/// A locally generated, globally unique ID for this personal information "field".
-		public let id: ID
+		public enum ID:
+			String,
+			Sendable,
+			Hashable,
+			Codable,
+			CaseIterable,
+			CustomStringConvertible,
+			CustomDumpRepresentable
+		{
+			case givenName
+			case familyName
+			case emailAddress
+			case phoneNumber
+		}
 
-		/// Content type, e.g. `emailAddress` or `phoneNumber`
-		public let kind: Kind
+		public typealias Value = NonEmpty<String>
+
+		/// Field identifier, e.g. `emailAddress` or `phoneNumber`.
+		public let id: ID
 
 		/// The content of this field, a non empty string,
 		/// e.g. "foo@bar.com" for email address or "555-5555" as phone number.
 		public let value: Value
 
-		public init(kind: Kind, value: Value) {
-			self.id = ID()
-			self.kind = kind
+		public init(id: ID, value: Value) {
+			self.id = id
 			self.value = value
 		}
 	}
@@ -133,28 +145,8 @@ extension Profile.Network.Persona {
 	}
 }
 
-extension Profile.Network.Persona.Field {
-	public typealias ID = UUID
-	public typealias Value = NonEmpty<String>
-
-	public enum Kind:
-		String,
-		Sendable,
-		Hashable,
-		Codable,
-		CaseIterable,
-		CustomStringConvertible,
-		CustomDumpRepresentable
-	{
-		case givenName
-		case familyName
-		case emailAddress
-		case phoneNumber
-	}
-}
-
-// MARK: - Profile.Network.Persona.Field.Kind + Comparable
-extension Profile.Network.Persona.Field.Kind: Comparable {
+// MARK: - Profile.Network.Persona.Field.ID + Comparable
+extension Profile.Network.Persona.Field.ID: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.index < rhs.index
 	}
@@ -175,7 +167,6 @@ extension Profile.Network.Persona.Field {
 			self,
 			children: [
 				"id": id,
-				"kind": kind,
 				"value": value,
 			],
 			displayStyle: .struct
@@ -185,11 +176,7 @@ extension Profile.Network.Persona.Field {
 	public var description: String {
 		"""
 		"id": \(id),
-		"kind": \(kind),
 		"value": \(value)
 		"""
 	}
 }
-
-// MARK: - UUID + Sendable
-extension UUID: @unchecked Sendable {}

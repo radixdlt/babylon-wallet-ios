@@ -1,17 +1,28 @@
 import FeaturePrelude
+import Profile
 
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
 			avatarURL: avatarURL,
-			isSaveButtonDisabled: {
-				var allErrors: [String] = []
-				if let labelErrors = labelField.$input.errors {
-					allErrors.append(contentsOf: labelErrors)
+			output: { () -> EditPersona.Output? in
+				guard
+					let personaLabelInput = labelField.input,
+					let personaLabelOutput = NonEmptyString(rawValue: personaLabelInput.trimmed())
+				else {
+					return nil
 				}
-				let dynamicErrors = dynamicFields.compactMap(\.$input.errors).flatMap { $0 }
-				allErrors.append(contentsOf: dynamicErrors)
-				return !allErrors.isEmpty
+				var fieldsOutput: IdentifiedArrayOf<Profile.Network.Persona.Field> = []
+				for field in dynamicFields {
+					guard
+						let fieldInput = field.input,
+						let fieldOutput = NonEmptyString(rawValue: fieldInput.trimmed())
+					else {
+						return nil
+					}
+					fieldsOutput[id: field.id] = .init(id: field.id, value: fieldOutput)
+				}
+				return EditPersona.Output(personaLabel: personaLabelOutput, fields: fieldsOutput)
 			}()
 		)
 	}
@@ -21,7 +32,7 @@ extension EditPersona.State {
 extension EditPersona {
 	public struct ViewState: Equatable {
 		let avatarURL: URL
-		let isSaveButtonDisabled: Bool
+		let output: Output?
 	}
 
 	@MainActor
@@ -73,11 +84,12 @@ extension EditPersona {
 								.foregroundColor(.app.blue2)
 						}
 						ToolbarItem(placement: .navigationBarTrailing) {
-							Button(L10n.EditPersona.Button.save, action: { viewStore.send(.saveButtonTapped) })
-								.textStyle(.body1Link)
-								.foregroundColor(.app.blue2)
-								.disabled(viewStore.isSaveButtonDisabled)
-								.opacity(viewStore.isSaveButtonDisabled ? 0.3 : 1)
+							WithControlRequirements(viewStore.output, forAction: { viewStore.send(.saveButtonTapped($0)) }) { action in
+								Button(L10n.EditPersona.Button.save, action: action)
+									.textStyle(.body1Link)
+									.foregroundColor(.app.blue2)
+									.opacity(viewStore.output == nil ? 0.3 : 1)
+							}
 						}
 					}
 					#endif
@@ -103,7 +115,7 @@ struct EditPersona_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue(
 					mode: .dapp(
-						requiredFields: [
+						requiredFieldIDs: [
 							.givenName,
 							.emailAddress,
 						]
@@ -131,10 +143,10 @@ extension EditPersona.State {
 			avatarURL: URL(string: "something")!,
 			personaLabel: NonEmptyString(rawValue: "RadIpsum")!,
 			existingFields: [
-				.init(kind: .givenName, value: "Lorem"),
-				.init(kind: .familyName, value: "Ipsum"),
-				.init(kind: .emailAddress, value: "lorem.ipsum@example.com"),
-				.init(kind: .phoneNumber, value: "555-5555"),
+				.init(id: .givenName, value: "Lorem"),
+				.init(id: .familyName, value: "Ipsum"),
+				.init(id: .emailAddress, value: "lorem.ipsum@example.com"),
+				.init(id: .phoneNumber, value: "555-5555"),
 			]
 		)
 	}
