@@ -1,11 +1,11 @@
+import CryptoKit
+import EngineToolkit
 import Foundation
 import RadixConnectModels
 
-import CryptoKit
-
 extension Data {
 	var hash: Data {
-		Data(SHA256.hash(data: self))
+		try! blake2b(data: self)
 	}
 }
 
