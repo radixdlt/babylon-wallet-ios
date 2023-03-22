@@ -7,12 +7,12 @@ import NetworkSwitchingClient
 public struct GatewaySettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var gatewayList: GatewayList.State
-
-		@PresentationState var removeGatewayAlert: AlertState<ViewAction.RemoveGatewayAction>?
-		@PresentationState var destination: Destinations.State?
 		var currentGateway: Radix.Gateway?
 		var validatedNewGatewayToSwitchTo: Radix.Gateway?
 		var gatewayForRemoval: Radix.Gateway?
+
+		@PresentationState var removeGatewayAlert: AlertState<ViewAction.RemoveGatewayAction>?
+		@PresentationState var destination: Destinations.State?
 
 		public init(
 			gatewayList: GatewayList.State = .init(gateways: [])
