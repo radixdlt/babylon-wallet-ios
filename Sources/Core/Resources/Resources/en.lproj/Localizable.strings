@@ -162,8 +162,9 @@
 "personaDetails.deauthorizePersonaAlertConfirm" = "Confirm";
 "personaDetails.deauthorizePersonaAlertCancel" = "Cancel";
 
-"editPersona.inputError.general.requiredByDapp" = "Required field for this dApp";
-"editPersona.inputError.personaLabel.blank" = "Label cannot be blank";
+"editPersona.inputField.heading.general.requiredByDapp" = "Required by dApp";
+"editPersona.inputField.error.general.requiredByDapp" = "Required field for this dApp";
+"editPersona.inputField.error.personaLabel.blank" = "Label cannot be blank";
 
 "editPersona.button.cancel" = "Cancel";
 "editPersona.button.save" = "Save";

@@ -80,8 +80,8 @@ extension EditPersonaStaticField.State {
 			kind: kind,
 			input: .init(
 				wrappedValue: initial,
-				onNil: L10n.EditPersona.InputError.PersonaLabel.blank,
-				rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.PersonaLabel.blank)]
+				onNil: L10n.EditPersona.InputField.Error.PersonaLabel.blank,
+				rules: [.if(\.isBlank, error: L10n.EditPersona.InputField.Error.PersonaLabel.blank)]
 			),
 			isRequiredByDapp: false
 		)
@@ -136,8 +136,8 @@ extension EditPersonaDynamicField.State {
 				if isRequiredByDapp {
 					return .init(
 						wrappedValue: initial,
-						onNil: L10n.EditPersona.InputError.General.requiredByDapp,
-						rules: [.if(\.isBlank, error: L10n.EditPersona.InputError.General.requiredByDapp)]
+						onNil: L10n.EditPersona.InputField.Error.General.requiredByDapp,
+						rules: [.if(\.isBlank, error: L10n.EditPersona.InputField.Error.General.requiredByDapp)]
 					)
 				} else {
 					return .init(

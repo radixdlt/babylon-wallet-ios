@@ -377,14 +377,22 @@ public enum L10n {
       /// Save
       public static let save = L10n.tr("Localizable", "editPersona.button.save", fallback: "Save")
     }
-    public enum InputError {
-      public enum General {
-        /// Required field for this dApp
-        public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputError.general.requiredByDapp", fallback: "Required field for this dApp")
+    public enum InputField {
+      public enum Error {
+        public enum General {
+          /// Required field for this dApp
+          public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputField.error.general.requiredByDapp", fallback: "Required field for this dApp")
+        }
+        public enum PersonaLabel {
+          /// Label cannot be blank
+          public static let blank = L10n.tr("Localizable", "editPersona.inputField.error.personaLabel.blank", fallback: "Label cannot be blank")
+        }
       }
-      public enum PersonaLabel {
-        /// Label cannot be blank
-        public static let blank = L10n.tr("Localizable", "editPersona.inputError.personaLabel.blank", fallback: "Label cannot be blank")
+      public enum Heading {
+        public enum General {
+          /// Required by dApp
+          public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputField.heading.general.requiredByDapp", fallback: "Required by dApp")
+        }
       }
     }
   }

@@ -14,7 +14,7 @@ extension EditPersonaField {
 
 		init(state: State) {
 			self.primaryHeading = state.id.title
-			self.secondaryHeading = state.isRequiredByDapp ? L10n.EditPersona.InputError.General.requiredByDapp : nil
+			self.secondaryHeading = state.isRequiredByDapp ? L10n.EditPersona.InputField.Heading.General.requiredByDapp : nil
 			self._input = state.$input
 			self.inputHint = (state.$input.errors?.first).map { .error($0) }
 			#if os(iOS)
