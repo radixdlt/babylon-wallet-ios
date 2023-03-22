@@ -6,51 +6,50 @@ import GatewayAPI
 extension AccountPortfolio {
 	init(
 		owner: AccountAddress,
-		response: GatewayAPI.StateEntityDetailsResponse
+		response: GatewayAPIClient.AccountDetailsResponse
 	) throws {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 		let networkID = try Radix.Network.lookupBy(name: response.ledgerState.network).id
 
-		let fungibleContainers = try response
+		let fungibleContainers: [FungibleTokenContainer] = try response
+			.details
+			.fungibleResources?
 			.items
-			.compactMap { entity in
-				let entityAddress = entity.address
-				return try entity.fungibleResources?
-					.items
-					.compactMap(\.global)
-					.map { item in
-						let balance = try BigDecimal(fromString: item.amount)
-						let componentAddress = ComponentAddress(address: item.resourceAddress)
-						let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
+			.compactMap(\.global)
+			.map { item in
+				let balance = try BigDecimal(fromString: item.amount)
+				let componentAddress = ComponentAddress(address: item.resourceAddress)
+				let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
 
-						return try FungibleTokenContainer(owner: .init(address: entityAddress),
-						                                  asset: .init(
-						                                  	componentAddress: componentAddress,
-						                                  	isXRD: isXRD
-						                                  ),
-						                                  amount: balance,
-						                                  worth: nil)
-					}
-			}
+				return try FungibleTokenContainer(owner: .init(address: response.details.address),
+				                                  asset: .init(
+				                                  	componentAddress: componentAddress,
+				                                  	isXRD: isXRD
+				                                  ),
+				                                  amount: balance,
+				                                  worth: nil)
+			} ?? []
 
-		let nonFungibleContainers = try response.items.compactMap { entity in
-			let entityAddress = entity.address
-			return try entity.nonFungibleResources?.items.compactMap(\.global).map { item in
+		let nonFungibleContainers: [NonFungibleTokenContainer] = try response
+			.details
+			.nonFungibleResources?
+			.items
+			.compactMap(\.global)
+			.map { item in
 				try NonFungibleTokenContainer(
-					owner: .init(address: entityAddress),
+					owner: .init(address: response.details.address),
 					resourceAddress: .init(address: item.resourceAddress),
 					assets: [],
 					name: nil,
 					description: nil,
 					iconURL: nil
 				)
-			}
-		}
+			} ?? []
 
 		self.owner = owner
-		fungibleTokenContainers = .init(uniqueElements: fungibleContainers.flatMap { $0 })
-		nonFungibleTokenContainers = .init(uniqueElements: nonFungibleContainers.flatMap { $0 })
+		fungibleTokenContainers = .init(uniqueElements: fungibleContainers)
+		nonFungibleTokenContainers = .init(uniqueElements: nonFungibleContainers)
 		poolUnitContainers = []
 		badgeContainers = []
 	}

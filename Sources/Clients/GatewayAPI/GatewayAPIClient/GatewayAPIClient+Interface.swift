@@ -9,10 +9,32 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
 	public var getEntityDetails: GetEntityDetails
-	public var getEntityMetadata: GetEntityMetadata
 	public var getNonFungibleIds: GetNonFungibleIds
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
+}
+
+extension GatewayAPIClient {
+	public struct EmptyEntityDetailsResponse: Error {}
+	public typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
+	public typealias AccountDetailsResponse = SingleEntityDetailsResponse
+
+	public func getAccountDetails(_ accountAddress: AccountAddress) async throws -> AccountDetailsResponse {
+		try await getSingleEntityDetails(accountAddress.address)
+	}
+
+	public func getEntityMetadata(_ address: String) async throws -> GatewayAPI.EntityMetadataCollection {
+		try await getSingleEntityDetails(address).details.metadata
+	}
+
+	func getSingleEntityDetails(_ address: String) async throws -> SingleEntityDetailsResponse {
+		let response = try await getEntityDetails([address])
+		guard let item = response.items.first else {
+			throw EmptyEntityDetailsResponse()
+		}
+
+		return (response.ledgerState, item)
+	}
 }
 
 extension GatewayAPIClient {
@@ -21,8 +43,6 @@ extension GatewayAPIClient {
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	public typealias GetEntityDetails = @Sendable (_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse
-
-	public typealias GetEntityMetadata = @Sendable (_ address: String) async throws -> GatewayAPI.StateEntityMetadataPageResponse
 
 	public typealias GetNonFungibleIds = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.StateNonFungibleIdsResponse
 

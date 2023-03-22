@@ -65,7 +65,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
 				do {
-					return try await DappMetadata(gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
+					return try await DappMetadata(gatewayAPI.getEntityMetadata(dappDefinitionAddress.address).items)
 				} catch is BadHTTPResponseCode {
 					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {
@@ -110,10 +110,10 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 }
 
 extension DappMetadata {
-	init(_ metadata: GatewayAPI.EntityMetadataCollection) {
+	init(_ items: [GatewayAPI.EntityMetadataItem]) {
 		self.init(
-			name: metadata.items.first(where: { $0.key == "name" })?.value,
-			description: metadata.items.first(where: { $0.key == "description" })?.value
+			name: items.first(where: { $0.key == "name" })?.value.asString,
+			description: items.first(where: { $0.key == "description" })?.value.asString
 		)
 	}
 }

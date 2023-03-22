@@ -7,7 +7,7 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 		let fetchPortfolioForAccount: FetchPortfolioForAccount = { (accountAddress: AccountAddress) async throws -> AccountPortfolio in
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-			let resourcesResponse = try await gatewayAPIClient.getEntityDetails([accountAddress.address])
+			let resourcesResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
 			var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
 
 			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress)
@@ -33,7 +33,7 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 						for resourceAddress in nonFungibleTokenAddresses {
 							taskGroup.addTask {
 								try Task.checkCancellation()
-								let response = try await gatewayAPIClient.getNonFungibleLocalIds(accountAddress, resourceAddress.address)
+								let response = try await gatewayAPIClient.getNonFungibleIds(resourceAddress.address)
 								// LocalFungible ids cannot be derived from Global aggregation?
 
 								let nonFungibleLocalIds = response.nonFungibleIds.items.map(\.nonFungibleId)
