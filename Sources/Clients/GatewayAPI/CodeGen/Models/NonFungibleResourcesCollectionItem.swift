@@ -44,7 +44,7 @@ extension GatewayAPI {
 			case .global:
 				self = try .globallyAggregated(NonFungibleResourcesCollectionItemGloballyAggregated(from: decoder))
 			case .vault:
-                                self = try .vaultAggregated(NonFungibleResourcesCollectionItemVaultAggregated(from: decoder))
+				self = try .vaultAggregated(NonFungibleResourcesCollectionItemVaultAggregated(from: decoder))
 			}
 		}
 
