@@ -36,7 +36,7 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 		public let details: [Details]
 
 		public enum Account: Sendable, Hashable {
-			case user(OnNetwork.AccountForDisplay)
+			case user(Profile.Network.AccountForDisplay)
 			case external(AccountAddress, approved: Bool)
 
 			var address: AccountAddress {
