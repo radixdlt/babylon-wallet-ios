@@ -118,7 +118,7 @@ public struct AppTextField<FocusValue: Hashable>: View {
 			.cornerRadius(.small2)
 			.overlay(
 				RoundedRectangle(cornerRadius: .small2)
-					.stroke(borderColor, lineWidth: 1)
+					.stroke(borderColor(for: hint), lineWidth: 1)
 			)
 
 			if let hint {
@@ -136,7 +136,7 @@ public struct AppTextField<FocusValue: Hashable>: View {
 		}
 	}
 
-	func foregroundColor(for hint: Hint) -> Color {
+	private func foregroundColor(for hint: Hint) -> Color {
 		switch hint {
 		case .info:
 			return .app.gray2
@@ -145,8 +145,15 @@ public struct AppTextField<FocusValue: Hashable>: View {
 		}
 	}
 
-	private var borderColor: Color {
-		presentsError ? .app.red1 : .app.gray1
+	private func borderColor(for hint: Hint?) -> Color {
+		switch hint {
+		case .none:
+			return .app.gray1
+		case .info:
+			return .app.gray1
+		case .error:
+			return .app.red1
+		}
 	}
 }
 
