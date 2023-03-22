@@ -9,15 +9,18 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 			case mnemonic, passphrase
 		}
 
+		public let shouldPersist: Bool
 		public var mnemonic: String
 		public var passphrase: String
 
 		@BindingState public var focusedField: Field?
 
 		public init(
+			shouldPersist: Bool = true,
 			mnemonic: String = "",
 			passphrase: String = ""
 		) {
+			self.shouldPersist = shouldPersist
 			self.mnemonic = mnemonic
 			self.passphrase = passphrase
 			#if DEBUG
@@ -39,13 +42,14 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case imported
+		case persisted(FactorSourceID)
+		case notPersisted(MnemonicWithPassphrase)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(ImportOlympiaFactorSource.State.Field?)
 		case mnemonicFromPhraseResult(TaskResult<Mnemonic>)
-		case importOlympiaFactorSourceResult(TaskResult<EquatableVoid>)
+		case importOlympiaFactorSourceResult(TaskResult<FactorSourceID>)
 	}
 
 	@Dependency(\.continuousClock) var clock
@@ -95,11 +99,21 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		case let .mnemonicFromPhraseResult(.success(mnemonic)):
-			return .run { [passphrase = state.passphrase] send in
+
+			let mnemonicWithPassphrase = MnemonicWithPassphrase(
+				mnemonic: mnemonic,
+				passphrase: state.passphrase
+			)
+
+			guard state.shouldPersist else {
+				return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
+			}
+
+			return .run { send in
 				await send(.internal(.importOlympiaFactorSourceResult(
 					TaskResult {
 						try await factorSourcesClient.importOlympiaFactorSource(
-							MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+							mnemonicWithPassphrase
 						)
 					}
 				)))
@@ -107,8 +121,8 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		case let .importOlympiaFactorSourceResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
-		case .importOlympiaFactorSourceResult(.success):
-			return .send(.delegate(.imported))
+		case let .importOlympiaFactorSourceResult(.success(factorSourceID)):
+			return .send(.delegate(.persisted(factorSourceID)))
 		}
 	}
 }

@@ -2,8 +2,8 @@ import Cryptography
 import FeaturePrelude
 import ScanQRFeature
 
-// MARK: - ImportFromOlympiaLegacyWallet
-public struct ImportFromOlympiaLegacyWallet: Sendable, FeatureReducer {
+// MARK: - ScanMultipleOlympiaQRCodes
+public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
 			case scanQR(ScanQR.State)
@@ -35,6 +35,10 @@ public struct ImportFromOlympiaLegacyWallet: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case legacyWalletInfoResult(TaskResult<ImportedOlympiaLegacyWalletInfo>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case finishedScanning(OrderedSet<ImportedOlympiaLegacyWalletInfo>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -72,7 +76,8 @@ public struct ImportFromOlympiaLegacyWallet: Sendable, FeatureReducer {
 		case let .legacyWalletInfoResult(.success(info)):
 			state.DelEteMeNoooooooooooWwwWw += 1
 			state.importedWalletInfos.append(info)
-			return .none
+			guard info.isLast else { return .none }
+			return .send(.delegate(.finishedScanning(state.importedWalletInfos)))
 		case let .legacyWalletInfoResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -99,6 +104,10 @@ public struct ImportedOlympiaLegacyWalletInfo: Decodable, Sendable, Hashable {
 	public let words: Int
 
 	private let accounts: [AccountNonChecked]
+
+	var isLast: Bool {
+		index >= (payloads - 1)
+	}
 
 	fileprivate static let mockMany: OrderedSet<Self> = try! {
 		let numberOfPayLoads = 3

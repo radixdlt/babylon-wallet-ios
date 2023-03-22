@@ -70,7 +70,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 				}
 			}
 		case .importOlympiaFactorSourceButtonTapped:
-			state.destination = .importOlympiaFactorSource(.init())
+			state.destination = .importOlympiaFactorSource(.init(shouldPersist: true))
 			return .none
 		}
 	}
@@ -91,7 +91,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 		case .destination(.presented(.importOlympiaFactorSource(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
-		case .destination(.presented(.importOlympiaFactorSource(.delegate(.imported)))):
+		case .destination(.presented(.importOlympiaFactorSource(.delegate(.persisted)))):
 			state.destination = nil
 			return .none
 		default:

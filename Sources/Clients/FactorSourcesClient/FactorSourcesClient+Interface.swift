@@ -22,5 +22,5 @@ public struct FactorSourcesClient: Sendable {
 extension FactorSourcesClient {
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias ImportOlympiaFactorSource = @Sendable (MnemonicWithPassphrase) async throws -> Void
+	public typealias ImportOlympiaFactorSource = @Sendable (MnemonicWithPassphrase) async throws -> FactorSourceID
 }

@@ -41,6 +41,8 @@ extension FactorSourcesClient: DependencyKey {
 					try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSource.id)
 					throw error
 				}
+
+				return factorSource.id
 			}
 		)
 	}
