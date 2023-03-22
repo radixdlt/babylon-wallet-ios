@@ -3,8 +3,10 @@ import FeaturePrelude
 // MARK: - EditPersonaFieldProtocol
 public protocol EditPersonaFieldProtocol: Hashable, Comparable {
 	var title: String { get }
+	#if os(iOS)
 	var capitalization: EquatableTextInputCapitalization { get }
 	var keyboardType: UIKeyboardType { get }
+	#endif
 }
 
 // MARK: - EditPersonaField
@@ -54,6 +56,7 @@ extension EditPersona.State.StaticField: EditPersonaFieldProtocol {
 		}
 	}
 
+	#if os(iOS)
 	public var capitalization: EquatableTextInputCapitalization {
 		switch self {
 		case .personaLabel: return .words
@@ -65,6 +68,7 @@ extension EditPersona.State.StaticField: EditPersonaFieldProtocol {
 		case .personaLabel: return .default
 		}
 	}
+	#endif
 }
 
 extension EditPersonaStaticField.State {
@@ -99,6 +103,7 @@ extension EditPersona.State.DynamicField: EditPersonaFieldProtocol {
 		}
 	}
 
+	#if os(iOS)
 	public var capitalization: EquatableTextInputCapitalization {
 		switch self {
 		case .givenName: return .words
@@ -116,6 +121,7 @@ extension EditPersona.State.DynamicField: EditPersonaFieldProtocol {
 		case .phoneNumber: return .phonePad
 		}
 	}
+	#endif
 }
 
 extension EditPersonaDynamicField.State {

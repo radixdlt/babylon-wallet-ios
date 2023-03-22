@@ -1,7 +1,6 @@
 import SwiftUI
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, *)
-@available(macOS, unavailable)
+#if os(iOS)
 public enum EquatableTextInputCapitalization: Equatable {
 	case never
 	case words
@@ -17,3 +16,4 @@ public enum EquatableTextInputCapitalization: Equatable {
 		}
 	}
 }
+#endif
