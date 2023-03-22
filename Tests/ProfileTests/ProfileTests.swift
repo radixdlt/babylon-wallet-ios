@@ -39,7 +39,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "3b4fc51ce164be26723264f0a78b7e5ab44a143520c77e0e82bfbb9642e9cfd4")
 		let factorSourceID = try FactorSource.id(fromRoot: root)
-		XCTAssertEqual(factorSourceID.hex(), "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287")
+		XCTAssertEqual(factorSourceID.hex(), "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
 	func test_new_profile() async throws {
@@ -316,7 +316,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f"
+			"account_tdx_b_1pr5v6mt035ny0j35jp8l6sy49gj0c3seda4tsuqvpstq39h8xk"
 		)
 
 		XCTAssertEqual(
@@ -326,7 +326,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu"
+			"account_tdx_b_1pp3amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsqw4u76"
 		)
 
 		XCTAssertEqual(
@@ -336,7 +336,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"
+			"account_tdx_b_1prafjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qqgm7dgm"
 		)
 
 		XCTAssertEqual(
@@ -345,7 +345,7 @@ final class ProfileTests: TestCase {
 		)
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm"
+			"identity_tdx_b_1pvauxn0kkttjn3xhw6lvjudnrx48mu0jaxt0crp09d4s787q03"
 		)
 
 		XCTAssertEqual(
@@ -355,7 +355,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen"
+			"identity_tdx_b_1p0ec3phquyel59q39v3kcyc6z3ljy9jv40mdwf4dgxps399u40"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -367,7 +367,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1pp3amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsqw4u76", "account_tdx_b_1prafjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qqgm7dgm"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {

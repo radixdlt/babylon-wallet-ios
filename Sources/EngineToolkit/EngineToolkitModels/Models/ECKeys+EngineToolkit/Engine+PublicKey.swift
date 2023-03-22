@@ -15,12 +15,12 @@ extension Engine {
 extension Engine.PublicKey {
 	public func isValidSignature(
 		_ engineSignature: Engine.Signature,
-		for message: some DataProtocol
+		hashed: some DataProtocol
 	) throws -> Bool {
 		try SLIP10.PublicKey(engine: self)
 			.isValidSignature(
 				SLIP10.Signature(engine: engineSignature),
-				for: message
+				hashed: hashed
 			)
 	}
 }

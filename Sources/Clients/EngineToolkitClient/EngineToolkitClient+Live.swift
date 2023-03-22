@@ -50,9 +50,7 @@ extension EngineToolkitClient {
 			},
 			generateTXID: { transactionIntent in
 				let compiledTransactionIntent = try compileTransactionIntent(transactionIntent)
-				let hash = Data(
-					SHA256.twice(data: Data(compiledTransactionIntent.compiledIntent))
-				)
+				let hash = try blake2b(data: compiledTransactionIntent.compiledIntent)
 				return TXID(rawValue: hash.hex)
 			},
 			accountAddressesNeedingToSignTransaction: { request throws -> Set<AccountAddress> in

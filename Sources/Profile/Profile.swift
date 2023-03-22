@@ -21,7 +21,8 @@ extension ProfileSnapshot.Version {
 	/// - 20: Add `storage` for `device` FactorSource (`nextDerivationIndices`), remove `index`
 	/// - 21: Rename `P2PClient` to `P2PLink`.
 	/// - 22: Rename `perNetwork` to `networks`
-	public static let minimum: Self = 22
+	/// - 23: Replace `SHA256` hash for FactorSource with `Blake2`
+	public static let minimum: Self = 23
 }
 
 // MARK: - Profile
