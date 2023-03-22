@@ -94,13 +94,13 @@ extension FixedWidthInteger {
 }
 
 extension Data {
-	fileprivate var asUInt: UInt {
+	private var asUInt: UInt {
 		withUnsafeBytes { $0.load(as: UInt.self) }
 	}
 }
 
 private func amount(at index: Int) -> UInt {
-	Data(SHA256.hash(data: index.data)).asUInt
+	UInt(index.data.hashValue)
 }
 
 private func amountAttos(at index: Int) -> String {
