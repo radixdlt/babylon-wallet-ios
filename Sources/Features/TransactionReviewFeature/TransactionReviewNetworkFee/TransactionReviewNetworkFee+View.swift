@@ -18,12 +18,8 @@ extension TransactionReviewNetworkFee {
 						Text(L10n.TransactionReview.NetworkFee.heading)
 							.sectionHeading
 
-						Button {
+						TransactionReviewInfoButton {
 							viewStore.send(.infoTapped)
-						} label: {
-							Image(asset: AssetResource.info)
-								.renderingMode(.template)
-								.foregroundColor(.app.gray3)
 						}
 
 						Spacer(minLength: 0)
