@@ -26,19 +26,19 @@ extension EditPersonaAddFields {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					List {
-						Choices(
+						Selection(
 							viewStore.binding(
 								get: \.chosenFields,
 								send: { .chosenFieldsChanged($0) }
 							),
-							in: viewStore.availableFields,
+							from: viewStore.availableFields,
 							requiring: .atLeast(1)
 						) { item in
 							HStack {
 								Text(item.value.title)
 								Spacer()
 								Button(action: item.action) {
-									Image(systemName: item.isChosen ? "square.fill" : "square")
+									Image(systemName: item.isSelected ? "square.fill" : "square")
 								}
 							}
 							.disabled(item.isDisabled)
