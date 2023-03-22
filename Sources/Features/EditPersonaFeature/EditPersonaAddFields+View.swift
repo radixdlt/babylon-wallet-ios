@@ -44,7 +44,7 @@ extension EditPersonaAddFields {
 							.disabled(item.isDisabled)
 						}
 					}
-					.safeAreaInset(edge: .bottom, spacing: 0) {
+					.footer {
 						WithControlRequirements(
 							viewStore.selectedFields,
 							forAction: { viewStore.send(.addButtonTapped($0)) }
@@ -52,8 +52,6 @@ extension EditPersonaAddFields {
 							Button(L10n.EditPersona.AddAField.Button.add, action: action)
 								.buttonStyle(.primaryRectangular)
 						}
-						.padding(.medium2)
-						.background(Color.white)
 					}
 				}
 			}
