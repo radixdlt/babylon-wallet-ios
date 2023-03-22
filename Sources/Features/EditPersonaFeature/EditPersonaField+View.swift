@@ -16,15 +16,28 @@ extension EditPersonaField {
 
 		init(state: State) {
 			self.primaryHeading = state.id.title
-			self.secondaryHeading = state.mode.isRequiredByDapp ? L10n.EditPersona.InputField.Heading.General.requiredByDapp : nil
+			self.secondaryHeading = {
+				if state.kind == .dynamic(isRequiredByDapp: true) {
+					return L10n.EditPersona.InputField.Heading.General.requiredByDapp
+				} else {
+					return nil
+				}
+			}()
 			self._input = state.$input
 			self.inputHint = (state.$input.errors?.first).map { .error($0) }
 			#if os(iOS)
 			self.capitalization = state.id.capitalization
 			self.keyboardType = state.id.keyboardType
 			#endif
-			self.isDynamic = state.mode.isDynamic
-			self.canBeDeleted = state.mode.canBeDeleted
+			self.isDynamic = state.kind.isDynamic
+			self.canBeDeleted = {
+				switch state.kind {
+				case .static:
+					return false
+				case let .dynamic(isRequiredByDapp):
+					return !isRequiredByDapp
+				}
+			}()
 		}
 	}
 
@@ -54,11 +67,7 @@ extension EditPersonaField {
 								.frame(.verySmall, alignment: .trailing)
 						}
 						.modifier {
-							if !viewStore.canBeDeleted {
-								$0.hidden()
-							} else {
-								$0
-							}
+							if viewStore.canBeDeleted { $0 } else { $0.hidden() }
 						}
 					}
 				}

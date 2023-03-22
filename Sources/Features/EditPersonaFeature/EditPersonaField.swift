@@ -12,31 +12,18 @@ public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 // MARK: - EditPersonaField
 public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public enum Mode: Sendable, Hashable {
+		public enum Kind: Sendable, Hashable {
 			case `static`
 			case dynamic(isRequiredByDapp: Bool)
 
+			var isStatic: Bool {
+				guard case .static = self else { return false }
+				return true
+			}
+
 			var isDynamic: Bool {
-				switch self {
-				case .static:
-					return false
-				case .dynamic:
-					return true
-				}
-			}
-
-			var isRequiredByDapp: Bool {
-				switch self {
-				case .static: return false
-				case let .dynamic(isRequiredByDapp): return isRequiredByDapp
-				}
-			}
-
-			var canBeDeleted: Bool {
-				switch self {
-				case .static: return false
-				case let .dynamic(isRequiredByDapp): return !isRequiredByDapp
-				}
+				guard case .dynamic = self else { return false }
+				return true
 			}
 		}
 
@@ -45,16 +32,16 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 		@Validation<String, String>
 		public var input: String?
 
-		public let mode: Mode
+		public let kind: Kind
 
 		private init(
 			id: ID,
 			input: Validation<String, String>,
-			mode: Mode
+			kind: Kind
 		) {
 			self.id = id
 			self._input = input
-			self.mode = mode
+			self.kind = kind
 		}
 	}
 
@@ -118,7 +105,7 @@ extension EditPersonaStaticField.State {
 				onNil: L10n.EditPersona.InputField.Error.PersonaLabel.blank,
 				rules: [.if(\.isBlank, error: L10n.EditPersona.InputField.Error.PersonaLabel.blank)]
 			),
-			mode: .static
+			kind: .static
 		)
 	}
 }
@@ -182,7 +169,7 @@ extension EditPersonaDynamicField.State {
 					)
 				}
 			}(),
-			mode: .dynamic(isRequiredByDapp: isRequiredByDapp)
+			kind: .dynamic(isRequiredByDapp: isRequiredByDapp)
 		)
 	}
 }
