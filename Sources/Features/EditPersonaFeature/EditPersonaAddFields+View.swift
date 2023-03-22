@@ -4,7 +4,7 @@ extension EditPersonaAddFields.State {
 	var viewState: EditPersonaAddFields.ViewState {
 		.init(
 			availableFields: availableFields,
-			chosenFields: chosenFields
+			selectedFields: selectedFields
 		)
 	}
 }
@@ -12,7 +12,7 @@ extension EditPersonaAddFields.State {
 extension EditPersonaAddFields {
 	public struct ViewState: Equatable {
 		let availableFields: [EditPersona.State.DynamicField]
-		let chosenFields: [EditPersona.State.DynamicField]?
+		let selectedFields: [EditPersona.State.DynamicField]?
 	}
 
 	public struct View: SwiftUI.View {
@@ -28,8 +28,8 @@ extension EditPersonaAddFields {
 					List {
 						Selection(
 							viewStore.binding(
-								get: \.chosenFields,
-								send: { .chosenFieldsChanged($0) }
+								get: \.selectedFields,
+								send: { .selectedFieldsChanged($0) }
 							),
 							from: viewStore.availableFields,
 							requiring: .atLeast(1)
@@ -46,7 +46,7 @@ extension EditPersonaAddFields {
 					}
 					.safeAreaInset(edge: .bottom, spacing: 0) {
 						WithControlRequirements(
-							viewStore.chosenFields.flatMap(NonEmptyArray.init(rawValue:)),
+							viewStore.selectedFields.flatMap(NonEmptyArray.init(rawValue:)),
 							forAction: { viewStore.send(.addButtonTapped($0)) }
 						) { action in
 							Button(L10n.EditPersona.AddAField.Button.add, action: action)
