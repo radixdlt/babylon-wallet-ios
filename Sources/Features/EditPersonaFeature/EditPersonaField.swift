@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 // MARK: - EditPersonaFieldProtocol
-public protocol EditPersonaFieldProtocol: Hashable {
+public protocol EditPersonaFieldProtocol: Hashable, Comparable {
 	var title: String { get }
 	var capitalization: EquatableTextInputCapitalization { get }
 	var keyboardType: UIKeyboardType { get }

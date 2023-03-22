@@ -1,7 +1,7 @@
 import FeaturePrelude
 import Profile
 
-// MARK: - EditPersonaDetails
+// MARK: - EditPersona
 public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
@@ -9,14 +9,15 @@ public struct EditPersona: Sendable, FeatureReducer {
 			case dapp(requiredFields: [DynamicField])
 		}
 
-		public enum StaticField: Sendable, Hashable {
+		public enum StaticField: Sendable, Hashable, Comparable {
 			case personaLabel
 		}
 
 		public typealias DynamicField = Profile.Network.Persona.Field.Kind
 
 		var labelField: EditPersonaStaticField.State
-		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State>
+		@Sorted(by: \.id)
+		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
 
 		@PresentationState
 		var destination: Destinations.State? = nil
@@ -123,6 +124,18 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .none
 		case .addAFieldButtonTapped:
 			state.destination = .addFields(.init(excludedFields: state.dynamicFields.map(\.id)))
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
+			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(kind: $0, initial: nil, isRequiredByDapp: false) })
+			state.destination = nil
+			return .none
+
+		default:
 			return .none
 		}
 	}

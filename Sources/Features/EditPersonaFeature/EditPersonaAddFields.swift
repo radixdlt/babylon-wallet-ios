@@ -17,6 +17,10 @@ public struct EditPersonaAddFields: Sendable, FeatureReducer {
 		case addButtonTapped(NonEmptyArray<EditPersona.State.DynamicField>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case addFields(NonEmptyArray<EditPersona.State.DynamicField>)
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .selectedFieldsChanged(selectedFields):
@@ -24,9 +28,7 @@ public struct EditPersonaAddFields: Sendable, FeatureReducer {
 			return .none
 
 		case let .addButtonTapped(selectedFields):
-			print(selectedFields)
-			// TODO:
-			return .none
+			return .send(.delegate(.addFields(selectedFields)))
 		}
 	}
 }
