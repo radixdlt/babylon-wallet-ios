@@ -14,11 +14,11 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		}
 
 		public var step: Step
-		public var importedWalletInfos: OrderedSet<ImportedOlympiaLegacyWalletInfo>
+		public var importedWalletInfos: OrderedSet<UncheckedImportedOlympiaWalletPayload>
 		fileprivate var DelEteMeNoooooooooooWwwWw = 0
 		public init(
 			step: Step = .init(),
-			importedWalletInfos: OrderedSet<ImportedOlympiaLegacyWalletInfo> = .init()
+			importedWalletInfos: OrderedSet<UncheckedImportedOlympiaWalletPayload> = .init()
 		) {
 			self.step = step
 			self.importedWalletInfos = importedWalletInfos
@@ -34,14 +34,16 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case legacyWalletInfoResult(TaskResult<ImportedOlympiaLegacyWalletInfo>)
+		case legacyWalletInfoResult(TaskResult<UncheckedImportedOlympiaWalletPayload>)
+		case olympiaWallet(ImportedOlympiaWallet)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case finishedScanning(OrderedSet<ImportedOlympiaLegacyWalletInfo>)
+		case finishedScanning(ImportedOlympiaWallet)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.jsonDecoder) var jsonDecoder
 
 	public init() {}
 
@@ -62,7 +64,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			return .run { [DelEteMeNoooWWw = state.DelEteMeNoooooooooooWwwWw] send in
 				loggerGlobal.critical("IGNORE SCANNED CONTENT. MOCKING RESPONSE!: \(qrString)")
 				await send(.internal(.legacyWalletInfoResult(TaskResult {
-					ImportedOlympiaLegacyWalletInfo.mockMany[DelEteMeNoooWWw]
+					UncheckedImportedOlympiaWalletPayload.mockMany[DelEteMeNoooWWw]
 				})))
 			}
 
@@ -77,7 +79,17 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			state.DelEteMeNoooooooooooWwwWw += 1
 			state.importedWalletInfos.append(info)
 			guard info.isLast else { return .none }
-			return .send(.delegate(.finishedScanning(state.importedWalletInfos)))
+
+			return .run { [infos = state.importedWalletInfos] send in
+				let wallet = try importWallet(infos)
+				await send(.internal(.olympiaWallet(wallet)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
+		case let .olympiaWallet(olympiaWallet):
+			return .send(.delegate(.finishedScanning(olympiaWallet)))
+
 		case let .legacyWalletInfoResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -92,8 +104,27 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - ImportedOlympiaLegacyWalletInfo
-public struct ImportedOlympiaLegacyWalletInfo: Decodable, Sendable, Hashable {
+extension ScanMultipleOlympiaQRCodes {
+	private func importWallet(_ info: OrderedSet<UncheckedImportedOlympiaWalletPayload>) throws -> ImportedOlympiaWallet {
+		fatalError()
+	}
+}
+
+// MARK: - ImportedOlympiaWallet
+public struct ImportedOlympiaWallet: Sendable, Hashable {
+	public let mnemonicWordCount: BIP39.WordCount
+	public let accounts: NonEmpty<OrderedSet<Account>>
+
+	public struct Account: Sendable, Hashable {
+		public let publicKey: K1.PublicKey
+		public let path: LegacyOlympiaBIP44LikeDerivationPath
+		public let xrd: BigDecimal
+		public let displayName: NonEmptyString?
+	}
+}
+
+// MARK: - UncheckedImportedOlympiaWalletPayload
+public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashable {
 	/// number of payloads (might be 1)
 	public let payloads: Int
 
@@ -143,7 +174,7 @@ public struct ImportedOlympiaLegacyWalletInfo: Decodable, Sendable, Hashable {
 		let xrd: String
 		let name: String?
 
-		func checked() throws -> Account {
+		func checked() throws -> ImportedOlympiaWallet.Account {
 			try .init(
 				publicKey: .init(compressedRepresentation: Data(hex: pk)),
 				path: .init(derivationPath: path),
@@ -153,14 +184,34 @@ public struct ImportedOlympiaLegacyWalletInfo: Decodable, Sendable, Hashable {
 		}
 	}
 
-	public struct Account: Sendable, Hashable {
-		public let publicKey: K1.PublicKey
-		public let path: LegacyOlympiaBIP44LikeDerivationPath
-		public let xrd: BigDecimal
-		public let displayName: NonEmptyString?
-	}
-
-	public func accountsToImport() throws -> [Account] {
-		fatalError()
+	public func accountsToImport() throws -> [ImportedOlympiaWallet.Account] {
+		try self.accounts.map {
+			try $0.checked()
+		}
 	}
 }
+
+#if DEBUG
+extension UncheckedImportedOlympiaWalletPayload {
+	public static let previewValue: Self = .init(
+		payloads: 1,
+		index: 0,
+		words: 12,
+		accounts: [.previewValue]
+	)
+}
+
+extension UncheckedImportedOlympiaWalletPayload.AccountNonChecked {
+	public static let previewValue = Self(
+		pk: "022a471424da5e657499d1ff51cb43c47481a03b1e77f951fe64cec9f5a48f7011",
+		path: "m/44'/1022'/0'/0/1'",
+		xrd: "1337",
+		name: "PreviewValue"
+	)
+}
+
+extension ImportedOlympiaWallet.Account {
+	public static let previewValue = try! UncheckedImportedOlympiaWalletPayload.AccountNonChecked.previewValue.checked()
+}
+
+#endif // DEBUG

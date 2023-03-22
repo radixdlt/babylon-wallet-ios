@@ -1,3 +1,4 @@
+import Cryptography
 import FeaturePrelude
 
 // MARK: - ImportOlympiaWalletCoordinator
@@ -5,10 +6,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
+			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
 		}
 
-		public var importedWalletInfos: OrderedSet<ImportedOlympiaLegacyWalletInfo>?
+		public var expectedMnemonicWordCount: BIP39.WordCount?
+		public var selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>?
 		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
 		public var step: Step
 		public init() {
@@ -22,6 +25,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
+		case selectAccountsToImport(SelectAccountsToImport.Action)
 		case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
 	}
 
@@ -53,14 +57,22 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(infos))):
-			state.importedWalletInfos = infos
+		case let .scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet))):
+			state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
+			state.step = .selectAccountsToImport(.init(scannedAccounts: olympiaWallet.accounts))
+			return .none
+
+		case let .selectAccountsToImport(.delegate(.selectedAccounts(accounts))):
+			state.selectedAccounts = accounts
 			state.step = .importOlympiaMnemonic(.init(shouldPersist: false))
 			return .none
 
 		case let .importOlympiaMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))):
 			state.mnemonicWithPassphrase = mnemonicWithPassphrase
-			return validate(mnemonicWithPassphrase, infos: state.importedWalletInfos)
+			guard let selectedAccounts = state.selectedAccounts else {
+				fatalError()
+			}
+			return validate(mnemonicWithPassphrase, selectedAccounts: selectedAccounts)
 
 		default: return .none
 		}
@@ -77,11 +89,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 extension ImportOlympiaWalletCoordinator {
 	private func validate(
 		_ mnemonicWithPassphrase: MnemonicWithPassphrase,
-		infos: OrderedSet<ImportedOlympiaLegacyWalletInfo>?
+		selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>
 	) -> EffectTask<Action> {
 		.run { send in
-			guard let infos, let olympia = NonEmpty<OrderedSet<ImportedOlympiaLegacyWalletInfo>>(rawValue: infos) else { throw GotNoAccountsToImport() }
-			let olympiaAccounts = try mnemonicWithPassphrase.createUnsavedAccountsFrom(olympia: olympia)
+			let olympiaAccounts = try mnemonicWithPassphrase.createUnsavedAccountsFrom(selectedAccounts: selectedAccounts)
 			await send(.internal(.createdUnsavedOlympiaAccounts(olympiaAccounts)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
@@ -99,7 +110,7 @@ enum ValidateOlympiaAccountsFailure: LocalizedError {
 
 extension MnemonicWithPassphrase {
 	func createUnsavedAccountsFrom(
-		olympia infos: NonEmpty<OrderedSet<ImportedOlympiaLegacyWalletInfo>>
+		selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>
 	) throws -> Profile.Network.Accounts {
 		fatalError()
 	}
