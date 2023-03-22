@@ -27,21 +27,20 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 			}
 		}
 
+		public let kind: Kind
 		public let id: ID
 
 		@Validation<String, String>
 		public var input: String?
 
-		public let kind: Kind
-
 		private init(
+			kind: Kind,
 			id: ID,
-			input: Validation<String, String>,
-			kind: Kind
+			input: Validation<String, String>
 		) {
+			self.kind = kind
 			self.id = id
 			self._input = input
-			self.kind = kind
 		}
 	}
 
@@ -99,13 +98,13 @@ extension EditPersonaStaticField.State {
 		initial: String?
 	) {
 		self.init(
+			kind: .static,
 			id: id,
 			input: .init(
 				wrappedValue: initial,
 				onNil: L10n.EditPersona.InputField.Error.PersonaLabel.blank,
 				rules: [.if(\.isBlank, error: L10n.EditPersona.InputField.Error.PersonaLabel.blank)]
-			),
-			kind: .static
+			)
 		)
 	}
 }
@@ -153,6 +152,7 @@ extension EditPersonaDynamicField.State {
 		isRequiredByDapp: Bool
 	) {
 		self.init(
+			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
 			id: id,
 			input: {
 				if isRequiredByDapp {
@@ -168,8 +168,7 @@ extension EditPersonaDynamicField.State {
 						rules: []
 					)
 				}
-			}(),
-			kind: .dynamic(isRequiredByDapp: isRequiredByDapp)
+			}()
 		)
 	}
 }

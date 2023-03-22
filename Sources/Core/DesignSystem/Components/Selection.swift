@@ -21,9 +21,7 @@ public enum SelectionRequirement: Hashable {
 
 	public var count: Int {
 		switch self {
-		case
-			let .exactly(count),
-			let .atLeast(count):
+		case let .exactly(count), let .atLeast(count):
 			return count
 		}
 	}
