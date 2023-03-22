@@ -97,6 +97,7 @@ package.addModules([
 			"AccountsClient",
 			"AuthorizedDappsClient",
 			"CreateEntityFeature",
+			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
 			"RadixConnectClient",
