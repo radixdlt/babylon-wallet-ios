@@ -81,10 +81,10 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 
 // MARK: Static Fields
 
-public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.StaticField>
+public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.StaticFieldID>
 
-// MARK: - EditPersona.State.StaticField + EditPersonaFieldID
-extension EditPersona.State.StaticField: EditPersonaFieldID {
+// MARK: - EditPersona.State.StaticFieldID + EditPersonaFieldID
+extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
 		case .personaLabel: return L10n.PersonaDetails.personaLabelHeading
@@ -125,10 +125,10 @@ extension EditPersonaStaticField.State {
 
 // MARK: Dynamic Fields
 
-public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicField>
+public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.DynamicFieldID>
 
-// MARK: - EditPersona.State.DynamicField + EditPersonaFieldID
-extension EditPersona.State.DynamicField: EditPersonaFieldID {
+// MARK: - EditPersona.State.DynamicFieldID + EditPersonaFieldID
+extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
 		case .givenName: return L10n.PersonaDetails.givenNameHeading

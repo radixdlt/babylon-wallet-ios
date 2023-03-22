@@ -14,14 +14,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
-			case dapp(requiredFieldIDs: [DynamicField])
+			case dapp(requiredFieldIDs: [DynamicFieldID])
 		}
 
-		public enum StaticField: Sendable, Hashable, Comparable {
+		public enum StaticFieldID: Sendable, Hashable, Comparable {
 			case personaLabel
 		}
 
-		public typealias DynamicField = Profile.Network.Persona.Field.ID
+		public typealias DynamicFieldID = Profile.Network.Persona.Field.ID
 
 		let avatarURL: URL
 		var labelField: EditPersonaStaticField.State

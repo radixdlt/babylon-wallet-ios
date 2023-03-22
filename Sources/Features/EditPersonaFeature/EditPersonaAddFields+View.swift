@@ -11,8 +11,8 @@ extension EditPersonaAddFields.State {
 
 extension EditPersonaAddFields {
 	public struct ViewState: Equatable {
-		let availableFields: [EditPersona.State.DynamicField]
-		let selectedFields: [EditPersona.State.DynamicField]?
+		let availableFields: [EditPersona.State.DynamicFieldID]
+		let selectedFields: [EditPersona.State.DynamicFieldID]?
 	}
 
 	public struct View: SwiftUI.View {
