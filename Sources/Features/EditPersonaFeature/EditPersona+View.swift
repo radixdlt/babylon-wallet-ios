@@ -3,6 +3,7 @@ import FeaturePrelude
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
+			avatarURL: avatarURL,
 			isSaveButtonDisabled: {
 				var allErrors: [String] = []
 				if let labelErrors = labelField.$input.errors {
@@ -19,6 +20,7 @@ extension EditPersona.State {
 // MARK: - EditPersonaDetails.View
 extension EditPersona {
 	public struct ViewState: Equatable {
+		let avatarURL: URL
 		let isSaveButtonDisabled: Bool
 	}
 
@@ -33,8 +35,10 @@ extension EditPersona {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
-					ScrollView {
+					ScrollView(showsIndicators: false) {
 						VStack(spacing: .medium1) {
+							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
+
 							EditPersonaStaticField.View(
 								store: store.scope(
 									state: \.labelField,
@@ -59,7 +63,7 @@ extension EditPersona {
 							.padding(.top, .medium2)
 						}
 						.padding(.horizontal, .medium1)
-						.padding(.vertical, .medium1)
+						.padding(.bottom, .medium1)
 					}
 					#if os(iOS)
 					.toolbar {
@@ -124,6 +128,7 @@ extension EditPersona.State {
 	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
 		.init(
 			mode: mode,
+			avatarURL: URL(string: "something")!,
 			personaLabel: NonEmptyString(rawValue: "RadIpsum")!,
 			existingFields: [
 				.init(kind: .givenName, value: "Lorem"),

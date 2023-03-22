@@ -15,6 +15,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		public typealias DynamicField = Profile.Network.Persona.Field.Kind
 
+		let avatarURL: URL
 		var labelField: EditPersonaStaticField.State
 		@Sorted(by: \.kind)
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
@@ -24,9 +25,11 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		public init(
 			mode: Mode,
+			avatarURL: URL,
 			personaLabel: NonEmptyString,
 			existingFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) {
+			self.avatarURL = avatarURL
 			self.labelField = EditPersonaStaticField.State(
 				kind: .personaLabel,
 				initial: personaLabel.rawValue
