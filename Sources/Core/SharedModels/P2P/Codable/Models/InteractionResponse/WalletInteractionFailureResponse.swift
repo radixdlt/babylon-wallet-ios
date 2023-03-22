@@ -48,6 +48,7 @@ extension P2P.ToDapp.WalletInteractionFailureResponse {
 		case radixJsonNotFound
 		case radixJsonUnknownFileFormat
 		case unknownDappDefinitionAddress
+		case invalidPersona
 
 		public var errorDescription: String? {
 			switch self {
@@ -85,6 +86,8 @@ extension P2P.ToDapp.WalletInteractionFailureResponse {
 				return "radix.json file format mismatch "
 			case .unknownDappDefinitionAddress:
 				return "dApp definition address does not match any well known definition address"
+			case .invalidPersona:
+				return "Invalid persona specified by dApp"
 			}
 		}
 	}
