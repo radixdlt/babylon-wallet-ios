@@ -1,7 +1,33 @@
 import FeaturePrelude
 
+extension TransactionReviewDappsUsed.State {
+	var viewState: TransactionReviewDappsUsed.ViewState {
+		let knownDapps = dApps.compactMap(\.knownDapp)
+		return .init(knownDapps: knownDapps, unknownDappCount: dApps.count - knownDapps.count)
+	}
+}
+
+extension TransactionReview.State.Dapp {
+	fileprivate var knownDapp: TransactionReviewDappsUsed.ViewState.KnownDapp? {
+		guard let metadata else { return nil }
+		return .init(id: id, thumbnail: metadata.thumbnail, name: metadata.name, description: metadata.description)
+	}
+}
+
 // MARK: - TransactionReviewDappsUsed.View
 extension TransactionReviewDappsUsed {
+	public struct ViewState: Equatable {
+		let knownDapps: [KnownDapp]
+		let unknownDappCount: Int
+
+		struct KnownDapp: Identifiable, Equatable {
+			let id: AccountAddress.ID
+			let thumbnail: URL?
+			let name: String
+			let description: String?
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewDappsUsed>
@@ -13,7 +39,7 @@ extension TransactionReviewDappsUsed {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.dApps, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .trailing, spacing: .medium2) {
 					Button {
 						viewStore.send(.expandTapped)
@@ -25,12 +51,15 @@ extension TransactionReviewDappsUsed {
 
 					if isExpanded {
 						VStack(spacing: .small2) {
-							ForEach(viewStore.state) { dApp in
+							ForEach(viewStore.knownDapps) { dApp in
 								Button {
 									viewStore.send(.dappTapped(dApp.id))
 								} label: {
-									DappView(thumbnail: dApp.thumbnail, name: dApp.name, description: dApp.description)
+									DappView(thumbnail: .known(dApp.thumbnail), name: dApp.name, description: dApp.description)
 								}
+							}
+							if viewStore.unknownDappCount > 0 {
+								DappView(thumbnail: .unknown, name: text, description: nil)
 							}
 						}
 						.background(.app.gray5)
@@ -57,34 +86,53 @@ extension TransactionReviewDappsUsed {
 		struct DappView: SwiftUI.View {
 			private let dAppBoxWidth: CGFloat = 190
 
-			let thumbnail: URL?
+			let thumbnail: Thumbnail
 			let name: String
 			let description: String?
 
 			var body: some SwiftUI.View {
 				HStack(spacing: 0) {
-					DappPlaceholder(size: .smaller)
-						.padding(.trailing, .small2)
-
-					VStack(alignment: .leading, spacing: .small3) {
-						Text(name)
-
-						if let description {
-							Text(description)
+					switch thumbnail {
+					case let .known(url):
+						if let url {
+							DappPlaceholder(size: .smaller)
+						} else {
+							DappPlaceholder(size: .smaller)
+								.border(.red)
 						}
-					}
-					.lineLimit(1)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
 
+						VStack(alignment: .leading, spacing: .small3) {
+							Text(name)
+
+							if let description {
+								Text(description)
+							}
+						}
+						.lineLimit(1)
+						.padding(.leading, .small2)
+
+					case .unknown:
+						DappPlaceholder(size: .smaller)
+							.border(.blue)
+							.padding(.trailing, .small2)
+						Text(name)
+							.lineLimit(2)
+					}
 					Spacer(minLength: 0)
 				}
+				.textStyle(.body2HighImportance)
+				.foregroundColor(.app.gray2)
 				.padding(.small2)
 				.frame(width: dAppBoxWidth)
 				.background {
 					RoundedRectangle(cornerRadius: .small2)
 						.stroke(.app.gray3, style: .transactionReview)
 				}
+			}
+
+			enum Thumbnail: Equatable {
+				case known(URL?)
+				case unknown
 			}
 		}
 	}

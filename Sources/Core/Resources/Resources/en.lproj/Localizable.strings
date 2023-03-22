@@ -167,6 +167,8 @@
 "transactionReview.networkFee.congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
 "transactionReview.networkFee.customizeButtonTitle" = "Customize";
 
+"transactionReview.usingDapps.unknownComponents" = "%d Unknown Components";
+
 "authorizedDapps.title" = "Authorized dApps";
 "authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 
