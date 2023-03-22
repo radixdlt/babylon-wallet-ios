@@ -59,25 +59,26 @@ public struct Selection<Value: Hashable, Content: View>: View {
 
 	public var body: some View {
 		ForEach(values, id: \.self) { value in
+			let isDisabled: Bool = {
+				guard !selectedValues.contains(value) else {
+					return false
+				}
+				switch requirement {
+				case let .exactly(count):
+					if count == 1 {
+						return false
+					} else {
+						return selectedValues.count >= count
+					}
+				case .atLeast:
+					return false
+				}
+			}()
 			content(
 				Item(
 					value: value,
 					isSelected: selectedValues.contains(value),
-					isDisabled: {
-						guard !selectedValues.contains(value) else {
-							return false
-						}
-						switch requirement {
-						case let .exactly(count):
-							if count == 1 {
-								return false
-							} else {
-								return selectedValues.count >= count
-							}
-						case .atLeast:
-							return false
-						}
-					}(),
+					isDisabled: isDisabled,
 					action: {
 						if requirement == .exactly(1) {
 							if !selectedValues.contains(value) {
@@ -94,6 +95,7 @@ public struct Selection<Value: Hashable, Content: View>: View {
 					}
 				)
 			)
+			.disabled(isDisabled)
 		}
 		.onAppear {
 			updateResult(with: selectedValues, in: values, requiring: requirement)
@@ -152,25 +154,17 @@ public struct Selection_Preview: View {
 						}
 					}
 				}
-				.disabled(item.isDisabled)
 			}
 		}
-		.safeAreaInset(edge: .bottom, spacing: 0) {
-			VStack(spacing: 0) {
-				Divider()
-				VStack {
-					if let selection {
-						Text("Result: \(String(describing: selection))")
-					} else {
-						Text("Result: nil")
-					}
-					WithControlRequirements(selection, forAction: { print($0) }) { action in
-						Button("Continue", action: action).buttonStyle(.primaryRectangular)
-					}
-				}
-				.padding()
+		.footer {
+			if let selection {
+				Text("Result: \(String(describing: selection))")
+			} else {
+				Text("Result: nil")
 			}
-			.background(Color.white)
+			WithControlRequirements(selection, forAction: { print($0) }) { action in
+				Button("Continue", action: action).buttonStyle(.primaryRectangular)
+			}
 		}
 	}
 }

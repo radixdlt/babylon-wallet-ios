@@ -16,8 +16,10 @@ struct FooterModifier<FooterContent: View>: ViewModifier {
 			.safeAreaInset(edge: .bottom, spacing: 0) {
 				VStack(spacing: 0) {
 					Separator()
-					footerContent
-						.padding(.medium3)
+					VStack {
+						footerContent
+					}
+					.padding(.medium3)
 				}
 				.background(Color.app.background)
 			}

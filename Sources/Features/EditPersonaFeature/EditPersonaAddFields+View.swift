@@ -41,7 +41,6 @@ extension EditPersonaAddFields {
 									Image(systemName: item.isSelected ? "square.fill" : "square")
 								}
 							}
-							.disabled(item.isDisabled)
 						}
 					}
 					.footer {
