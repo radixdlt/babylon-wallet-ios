@@ -25,33 +25,70 @@ extension EditPersonaAddFields {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
-					List {
-						Selection(
-							viewStore.binding(
-								get: \.selectedFields,
-								send: { .selectedFieldsChanged($0) }
-							),
-							from: viewStore.availableFields,
-							requiring: .atLeast(1)
-						) { item in
-							HStack {
-								Text(item.value.title)
-								Spacer()
-								Button(action: item.action) {
-									Image(systemName: item.isSelected ? "square.fill" : "square")
+					VStack(spacing: .medium3) {
+						Text(L10n.EditPersona.AddAField.explanation)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray2)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding([.top, .horizontal], .medium3)
+
+						ScrollView {
+							LazyVStack(spacing: 0) {
+								Selection(
+									viewStore.binding(
+										get: \.selectedFields,
+										send: { .selectedFieldsChanged($0) }
+									),
+									from: viewStore.availableFields,
+									requiring: .atLeast(1)
+								) { item in
+									Button(action: item.action) {
+										HStack(spacing: 0) {
+											Text(item.value.title)
+												.textStyle(.body1HighImportance)
+												.foregroundColor(.app.gray1)
+											Spacer()
+											Image(
+												asset: item.isSelected
+													? AssetResource.checkmarkDarkSelected
+													: AssetResource.checkmarkDarkUnselected
+											)
+											.padding(.trailing, .small3)
+										}
+										.padding(.vertical, .medium3)
+									}
+									.buttonStyle(.inert)
+									.safeAreaInset(edge: .bottom, spacing: 0) {
+										Separator()
+									}
 								}
 							}
+							.padding(.horizontal, .medium3)
 						}
 					}
-					.footer {
-						WithControlRequirements(
-							viewStore.selectedFields,
-							forAction: { viewStore.send(.addButtonTapped($0)) }
-						) { action in
-							Button(L10n.EditPersona.AddAField.Button.add, action: action)
-								.buttonStyle(.primaryRectangular)
+					.navigationTitle(Text(L10n.EditPersona.AddAField.title))
+					#if os(iOS)
+						.navigationBarTitleColor(.app.gray1)
+						.navigationBarTitleDisplayMode(.inline)
+						.navigationBarInlineTitleFont(.app.secondaryHeader)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton(action: {})
+							}
 						}
-					}
+					#endif
+						.safeAreaInset(edge: .top, spacing: 0) {
+							Separator()
+						}
+						.footer {
+							WithControlRequirements(
+								viewStore.selectedFields,
+								forAction: { viewStore.send(.addButtonTapped($0)) }
+							) { action in
+								Button(L10n.EditPersona.AddAField.Button.add, action: action)
+									.buttonStyle(.primaryRectangular)
+							}
+						}
 				}
 			}
 		}
