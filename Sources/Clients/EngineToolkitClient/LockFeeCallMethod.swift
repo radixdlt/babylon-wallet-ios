@@ -131,8 +131,7 @@ extension EngineToolkitClient {
 		networkID: NetworkID,
 		accountAddress: AccountAddress,
 		nftName: String = "NFT Test",
-		nftDescription: String = "Artsy cool unique NFT",
-		initialSupply: String = "1337"
+		nftDescription: String = "Artsy cool unique NFT"
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
 		let instructions: [any InstructionProtocol] = [
@@ -141,7 +140,11 @@ extension EngineToolkitClient {
 			try CreateNonFungibleResourceWithInitialSupply(
 				idType: .init(.string("NonFungibleIdType::Integer")),
 				schema: [
-					.tuple([]),
+					.tuple([
+						.array(.init(elementKind: .enum, elements: [])),
+						.array(.init(elementKind: .tuple, elements: [])),
+						.array(.init(elementKind: .enum, elements: [])),
+					]),
 					.enum(.init(.u8(0), fields: [.u8(64)])),
 					.array(.init(elementKind: .string, elements: [])),
 				],
@@ -161,7 +164,11 @@ extension EngineToolkitClient {
 						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
 					]
 				),
-				initialSupply: .decimal(.init(value: initialSupply))
+				initialSupply: .map(
+					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
+						[.nonFungibleLocalId(.integer(UInt64.random(in: 0 ..< UInt64.max))), .tuple([.string("Hello World"), .decimal(.init(value: "12"))])],
+					])
+				)
 			),
 
 			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
