@@ -49,7 +49,7 @@ extension EditPersonaAddFields {
 						.navigationBarInlineTitleFont(.app.secondaryHeader)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton(action: {})
+								CloseButton(action: { viewStore.send(.closeButtonTapped) })
 							}
 						}
 					#endif

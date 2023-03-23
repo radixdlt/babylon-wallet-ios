@@ -13,6 +13,7 @@ public struct EditPersonaAddFields: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
 		case selectedFieldsChanged([EditPersona.State.DynamicFieldID]?)
 		case addButtonTapped([EditPersona.State.DynamicFieldID])
 	}
@@ -21,8 +22,13 @@ public struct EditPersonaAddFields: Sendable, FeatureReducer {
 		case addFields([EditPersona.State.DynamicFieldID])
 	}
 
+	@Dependency(\.dismiss) var dismiss
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .closeButtonTapped:
+			return .run { _ in await dismiss() }
+
 		case let .selectedFieldsChanged(selectedFields):
 			state.selectedFields = selectedFields
 			return .none
