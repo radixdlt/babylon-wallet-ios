@@ -22,7 +22,7 @@ echo "🎯 Destination for generated files: '$DESTINATION'"
 $GEN_TOOL generate -i $SWAGGER_TEMPLATE \
 -g swift5 \
 -o $OUTPUTDIR \
---additional-properties=useJsonEncodable=false,legacyDiscriminatorBehavior=true,readonlyProperties=true,swiftUseApiNamespace=true,projectName=Gateway # CONFIG OPTIONS
+--additional-properties=useJsonEncodable=false,readonlyProperties=true,swiftUseApiNamespace=true,projectName=Gateway # CONFIG OPTIONS
 
 echo "✨ Generation of models done, Removing some files we dont need."
 cd $INPUTDIR
