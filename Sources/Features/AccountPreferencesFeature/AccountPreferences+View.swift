@@ -3,9 +3,9 @@ import FeaturePrelude
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		#if DEBUG
-		(faucetButtonState: faucetButtonState, createFungibleTokenButtonState: createFungibleTokenButtonState)
+		return .init(faucetButtonState: faucetButtonState, createFungibleTokenButtonState: createFungibleTokenButtonState)
 		#else
-			.init(faucetButtonState: faucetButtonState)
+		return .init(faucetButtonState: faucetButtonState)
 		#endif // DEBUG
 	}
 }

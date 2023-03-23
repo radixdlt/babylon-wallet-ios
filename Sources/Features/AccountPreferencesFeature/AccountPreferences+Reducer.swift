@@ -62,23 +62,32 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case .faucetButtonTapped:
-			state.faucetButtonState = .loading(.local)
-			return .run { [address = state.address] send in
-				do {
-					_ = try await faucetClient.getFreeXRD(.init(
-						recipientAccountAddress: address
-					))
-					await send(.delegate(.refreshAccount(address)))
-				} catch {
-					await send(.internal(.hideLoader))
-					if !Task.isCancelled {
-						errorQueue.schedule(error)
-					}
-				}
+			return call(buttonState: \.faucetButtonState, into: &state) {
+				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
 		#if DEBUG
-		case .createFungibleTokenButtonTapped: fatalError()
+		case .createFungibleTokenButtonTapped:
+			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
+				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
+			}
 		#endif
+		}
+	}
+
+	private func call(
+		buttonState: WritableKeyPath<State, ControlState>,
+		into state: inout State,
+		call: @escaping @Sendable (AccountAddress) async throws -> Void
+	) -> EffectTask<Action> {
+		state[keyPath: buttonState] = .loading(.local)
+		return .run { [address = state.address] send in
+			try await call(address)
+			await send(.delegate(.refreshAccount(address)))
+		} catch: { error, send in
+			await send(.internal(.hideLoader))
+			if !Task.isCancelled {
+				errorQueue.schedule(error)
+			}
 		}
 	}
 
