@@ -148,16 +148,18 @@ extension Profile.Network.Persona {
 // MARK: - Profile.Network.Persona.Field.ID + Comparable
 extension Profile.Network.Persona.Field.ID: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.index < rhs.index
-	}
-
-	private var index: Int {
-		switch self {
-		case .givenName: return 0
-		case .familyName: return 1
-		case .emailAddress: return 2
-		case .phoneNumber: return 3
+		guard
+			let lhsIndex = Self.allCases.firstIndex(of: lhs),
+			let rhsIndex = Self.allCases.firstIndex(of: rhs)
+		else {
+			assertionFailure(
+				"""
+				This code path should never occur, unless you're manually conforming to `CaseIterable` and `allCases` is incomplete.
+				"""
+			)
+			return false
 		}
+		return lhsIndex < rhsIndex
 	}
 }
 
