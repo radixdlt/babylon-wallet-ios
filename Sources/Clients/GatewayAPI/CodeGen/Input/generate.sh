@@ -36,10 +36,10 @@ mv ../$PROJECT_NAME/Classes/OpenAPIs/Extensions.swift ../Generated/AUXILARY
 mv ../$PROJECT_NAME/Classes/OpenAPIs/CodableHelper.swift ../Generated/AUXILARY
 mv ../$PROJECT_NAME/Classes/OpenAPIs/OpenISO8601DateFormatter.swift ../Generated/AUXILARY
 
-echo "Replacing the malformed models"
-mv ../$PROJECT_NAME/Classes/OpenAPIs/FungibleResourcesCollectionItem.swift ../Generated
-mv ../$PROJECT_NAME/Classes/OpenAPIs/NonFungibleResourcesCollectionItem.swift ../Generated
+# Remove malformed models
+rm ../Generated/FungibleResourcesCollectionItem.swift
+rm ../Generated/NonFungibleResourcesCollectionItem.swift
 
 cd $OUTPUTDIR
-find $PROJECT_NAME -type f -not -name 'Configuration.swift' -delete
+find $PROJECT_NAME -type f -not -name 'Configuration.swift' -not -name 'FungibleResourcesCollectionItem.swift' -not -name 'NonFungibleResourcesCollectionItem.swift' -delete
 rm -r docs Cartfile git_push.sh $PROJECT_NAME.podspec Package.swift project.yml README.md .gitignore .openapi-generator-ignore .swiftformat .openapi-generator/FILES  .openapi-generator/VERSION
