@@ -59,7 +59,6 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			loggerGlobal.info("Making request \(urlRequest)")
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
 
 			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
@@ -188,6 +187,11 @@ extension GatewayAPIClient {
 				try await post(
 					request: transactionStatusRequest
 				) { $0.appendingPathComponent("transaction/status") }
+			},
+			transactionPreview: { transactionPreviewRequest in
+				try await post(
+					request: transactionPreviewRequest
+				) { $0.appendingPathComponent("transaction/preview") }
 			}
 		)
 	}
