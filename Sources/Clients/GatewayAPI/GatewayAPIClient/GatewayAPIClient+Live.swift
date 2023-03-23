@@ -14,7 +14,10 @@ extension JSONDecoder {
 }
 
 extension GatewayAPIClient {
+	public struct EmptyEntityDetailsResponse: Error {}
+	public typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
 	public typealias Value = GatewayAPIClient
+
 	public static let liveValue = GatewayAPIClient.live(
 		urlSession: .shared,
 		jsonEncoder: .init(),
@@ -56,6 +59,7 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
+			loggerGlobal.info("Making request \(urlRequest)")
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
 
 			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
@@ -125,6 +129,23 @@ extension GatewayAPIClient {
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
+		@Sendable
+		func getEntityDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
+			try await post(
+				request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses)
+			) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+		}
+
+		@Sendable
+		func getSingleEntityDetails(_ address: String) async throws -> SingleEntityDetailsResponse {
+			let response = try await getEntityDetails([address])
+			guard let item = response.items.first else {
+				throw EmptyEntityDetailsResponse()
+			}
+
+			return (response.ledgerState, item)
+		}
+
 		return Self(
 			getNetworkName: { baseURL in
 				let response = try await makeRequest(
@@ -146,15 +167,17 @@ extension GatewayAPIClient {
 				}
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
-			getEntityDetails: { @Sendable addresses in
-				try await post(
-					request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses)
-				) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+			getEntityDetails: getEntityDetails,
+			getAccountDetails: { accountAddress in
+				try await getSingleEntityDetails(accountAddress.address)
+			},
+			getEntityMetadata: { address in
+				try await getSingleEntityDetails(address).details.metadata
 			},
 			getNonFungibleIds: { resourceAddress in
 				try await post(
 					request: GatewayAPI.StateNonFungibleIdsRequest(resourceAddress: resourceAddress)
-				) { $0.appendingPathComponent("/state/non-fungible/ids") }
+				) { $0.appendingPathComponent("state/non-fungible/ids") }
 			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
