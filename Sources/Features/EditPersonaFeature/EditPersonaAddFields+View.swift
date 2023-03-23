@@ -58,9 +58,7 @@ extension EditPersonaAddFields {
 										.padding(.vertical, .medium3)
 									}
 									.buttonStyle(.inert)
-									.safeAreaInset(edge: .bottom, spacing: 0) {
-										Separator()
-									}
+									.separator(.bottom)
 								}
 							}
 							.padding(.horizontal, .medium3)
@@ -77,9 +75,7 @@ extension EditPersonaAddFields {
 							}
 						}
 					#endif
-						.safeAreaInset(edge: .top, spacing: 0) {
-							Separator()
-						}
+						.separator(.top)
 						.footer {
 							WithControlRequirements(
 								viewStore.selectedFields,
