@@ -2,7 +2,11 @@ import FeaturePrelude
 
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
-		.init(faucetButtonState: faucetButtonState)
+		#if DEBUG
+		(faucetButtonState: faucetButtonState, createFungibleTokenButtonState: createFungibleTokenButtonState)
+		#else
+			.init(faucetButtonState: faucetButtonState)
+		#endif // DEBUG
 	}
 }
 
@@ -10,6 +14,21 @@ extension AccountPreferences.State {
 extension AccountPreferences {
 	public struct ViewState: Equatable {
 		public var faucetButtonState: ControlState
+
+		#if DEBUG
+		public var createFungibleTokenButtonState: ControlState
+		#endif // DEBUG
+
+		#if DEBUG
+		public init(faucetButtonState: ControlState, createFungibleTokenButtonState: ControlState) {
+			self.faucetButtonState = faucetButtonState
+			self.createFungibleTokenButtonState = createFungibleTokenButtonState
+		}
+		#else
+		public init(faucetButtonState: ControlState) {
+			self.faucetButtonState = faucetButtonState
+		}
+		#endif // DEBUG
 	}
 
 	@MainActor
@@ -24,17 +43,10 @@ extension AccountPreferences {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					VStack(alignment: .leading) {
-						Button(L10n.AccountPreferences.faucetButtonTitle) {
-							viewStore.send(.faucetButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: true))
-						.controlState(viewStore.faucetButtonState)
-
-						if viewStore.faucetButtonState.isLoading {
-							Text(L10n.AccountPreferences.loadingPrompt)
-								.font(.app.body2Regular)
-								.foregroundColor(.app.gray1)
-						}
+						faucetButton(with: viewStore)
+						#if DEBUG
+						createFungibleTokenButton(with: viewStore)
+						#endif // DEBUG
 					}
 					.frame(maxHeight: .infinity, alignment: .top)
 					.padding(.medium1)
@@ -53,12 +65,49 @@ extension AccountPreferences {
 								}
 							}
 						}
-					#endif
+					#endif // os(iOS)
 				}
 			}
 		}
 	}
 }
+
+extension AccountPreferences.View {
+	@ViewBuilder
+	private func faucetButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button(L10n.AccountPreferences.faucetButtonTitle) {
+			viewStore.send(.faucetButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.faucetButtonState)
+
+		if viewStore.faucetButtonState.isLoading {
+			Text(L10n.AccountPreferences.loadingPrompt)
+				.font(.app.body2Regular)
+				.foregroundColor(.app.gray1)
+		}
+	}
+}
+
+#if DEBUG
+extension AccountPreferences.View {
+	@ViewBuilder
+	private func createFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Create Fungible Token") {
+			viewStore.send(.createFungibleTokenButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.createFungibleTokenButtonState)
+
+		if viewStore.createFungibleTokenButtonState.isLoading {
+			Text("Creating Token")
+				.font(.app.body2Regular)
+				.foregroundColor(.app.gray1)
+		}
+	}
+}
+
+#endif // DEBUG
 
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear

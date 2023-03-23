@@ -7,12 +7,20 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 
+		#if DEBUG
+		public var createFungibleTokenButtonState: ControlState
+		#endif
+
 		public init(
 			address: AccountAddress,
 			faucetButtonState: ControlState = .enabled
 		) {
 			self.address = address
 			self.faucetButtonState = faucetButtonState
+
+			#if DEBUG
+			self.createFungibleTokenButtonState = .enabled
+			#endif
 		}
 	}
 
@@ -20,6 +28,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case appeared
 		case closeButtonTapped
 		case faucetButtonTapped
+
+		#if DEBUG
+		case createFungibleTokenButtonTapped
+		#endif
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -64,6 +76,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 					}
 				}
 			}
+		#if DEBUG
+		case .createFungibleTokenButtonTapped: fatalError()
+		#endif
 		}
 	}
 
@@ -95,7 +110,7 @@ extension AccountPreferences {
 		return .run { [address = state.address] send in
 			await send(.internal(.isAllowedToUseFaucet(
 				TaskResult {
-					try await faucetClient.isAllowedToUseFaucet(address)
+					await faucetClient.isAllowedToUseFaucet(address)
 				}
 			)))
 		}
