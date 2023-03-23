@@ -43,51 +43,12 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress.ID { account.address.id }
-		public let account: Account
-		public let details: [Details]
+		public let account: TransactionReview.Account
+		public let transfer: [TransactionReview.Transfer]
 
-		public enum Account: Sendable, Hashable {
-			case user(Profile.Network.AccountForDisplay)
-			case external(AccountAddress, approved: Bool)
-
-			var address: AccountAddress {
-				switch self {
-				case let .user(account):
-					return account.address
-				case let .external(address, _):
-					return address
-				}
-			}
-		}
-
-		public init(account: Account, details: [Details]) {
+		public init(account: TransactionReview.Account, transfer: [TransactionReview.Transfer]) {
 			self.account = account
-			self.details = details
-		}
-
-		public struct Details: Sendable, Hashable {
-			public let metadata: Metadata?
-			public let transferred: Transferred
-
-			public init(metadata: Metadata?, transferred: Transferred) {
-				self.metadata = metadata
-				self.transferred = transferred
-			}
-
-			public struct Metadata: Sendable, Hashable {
-				public let name: String
-				public let thumbnail: URL
-
-				public init(name: String, thumbnail: URL) {
-					self.name = name
-					self.thumbnail = thumbnail
-				}
-			}
-
-			public enum Transferred: Sendable, Hashable {
-				case nft
-				case token(BigDecimal, guaranteed: BigDecimal?, dollars: BigDecimal?)
-			}
+			self.transfer = transfer
 		}
 	}
 

@@ -16,28 +16,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
-
-		public struct Dapp: Sendable, Identifiable, Hashable {
-			public let id: AccountAddress.ID
-			public let metadata: Metadata?
-
-			init(id: AccountAddress.ID, metadata: Metadata?) {
-				self.id = id
-				self.metadata = metadata
-			}
-
-			public struct Metadata: Sendable, Hashable {
-				public let name: String
-				public let thumbnail: URL?
-				public let description: String?
-
-				public init(name: String, thumbnail: URL?, description: String?) {
-					self.name = name
-					self.thumbnail = thumbnail
-					self.description = description
-				}
-			}
-		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -99,7 +77,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
-			state.customizeGuarantees = .init(dApps: [])
+
+//			let dApps =
+
+			state.customizeGuarantees = .init(transfers: [])
 			return .none
 
 		case .depositing:
@@ -112,6 +93,72 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 		case .customizeGuarantees:
 			return .none
+		}
+	}
+}
+
+// MARK: Useful types
+
+extension TransactionReview {
+	public struct Dapp: Sendable, Identifiable, Hashable {
+		public let id: AccountAddress.ID
+		public let metadata: Metadata?
+
+		init(id: AccountAddress.ID, metadata: Metadata?) {
+			self.id = id
+			self.metadata = metadata
+		}
+
+		public struct Metadata: Sendable, Hashable {
+			public let name: String
+			public let thumbnail: URL?
+			public let description: String?
+
+			public init(name: String, thumbnail: URL?, description: String?) {
+				self.name = name
+				self.thumbnail = thumbnail
+				self.description = description
+			}
+		}
+	}
+
+	public enum Account: Sendable, Hashable {
+		case user(Profile.Network.AccountForDisplay)
+		case external(AccountAddress, approved: Bool)
+
+		var address: AccountAddress {
+			switch self {
+			case let .user(account):
+				return account.address
+			case let .external(address, _):
+				return address
+			}
+		}
+	}
+
+	public struct Transfer: Sendable, Identifiable, Hashable {
+		public var id: Payload { payload } // TODO: Find actual ID
+		public let metadata: Metadata?
+		public let payload: Payload
+
+		public init(metadata: Metadata?, transferred: Payload) {
+			self.metadata = metadata
+			self.payload = transferred
+		}
+
+		public struct Metadata: Sendable, Hashable {
+			public let name: String
+			public let thumbnail: URL
+
+			public init(name: String, thumbnail: URL) {
+				self.name = name
+				self.thumbnail = thumbnail
+			}
+		}
+
+		public enum Payload: Sendable, Hashable {
+			case nft
+			case token(BigDecimal, guaranteed: BigDecimal?, dollars: BigDecimal?)
 		}
 	}
 }
@@ -132,7 +179,7 @@ extension TransactionReview.State {
 	                               networkFee: .init(fee: 0.2, isCongested: true))
 }
 
-extension TransactionReview.State.Dapp {
+extension TransactionReview.Dapp {
 	public static let mock0 = Self(id: .deadbeef32Bytes,
 	                               metadata: .init(name: "Collabofi User Badge", thumbnail: nil, description: nil))
 
@@ -145,18 +192,18 @@ extension TransactionReview.State.Dapp {
 }
 
 extension TransactionReviewAccount.State {
-	public static let mockWithdraw0 = Self(account: .mockUser0, details: [.mock0, .mock1])
+	public static let mockWithdraw0 = Self(account: .mockUser0, transfer: [.mock0, .mock1])
 
-	public static let mockWithdraw1 = Self(account: .mockUser1, details: [.mock1, .mock3, .mock4])
+	public static let mockWithdraw1 = Self(account: .mockUser1, transfer: [.mock1, .mock3, .mock4])
 
-	public static let mockWithdraw2 = Self(account: .mockUser0, details: [.mock1, .mock3])
+	public static let mockWithdraw2 = Self(account: .mockUser0, transfer: [.mock1, .mock3])
 
-	public static let mockDeposit1 = Self(account: .mockExternal0, details: [.mock1, .mock3, .mock4])
+	public static let mockDeposit1 = Self(account: .mockExternal0, transfer: [.mock1, .mock3, .mock4])
 
-	public static let mockDeposit2 = Self(account: .mockExternal1, details: [.mock1, .mock3])
+	public static let mockDeposit2 = Self(account: .mockExternal1, transfer: [.mock1, .mock3])
 }
 
-extension TransactionReviewAccount.State.Account {
+extension TransactionReview.Account {
 	public static let mockUser0 = user(.init(address: .mock0,
 	                                         label: "My Main Account",
 	                                         appearanceID: ._1))
@@ -179,7 +226,7 @@ extension URL {
 	static let mock = URL(string: "test")!
 }
 
-extension TransactionReviewAccount.State.Details {
+extension TransactionReview.Transfer {
 	public static let mock0 = Self(metadata: .init(name: "TSLA", thumbnail: .mock),
 	                               transferred: .token(1.0396, guaranteed: 1.0188, dollars: 301.91))
 

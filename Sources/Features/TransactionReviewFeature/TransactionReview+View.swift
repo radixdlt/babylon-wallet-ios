@@ -153,8 +153,8 @@ struct VLine: Shape {
 
 // MARK: - TransactionPresentingView
 struct TransactionPresentingView: View {
-	let presenters: IdentifiedArrayOf<TransactionReview.State.Dapp>
-	let tapPresenterAction: (TransactionReview.State.Dapp.ID) -> Void
+	let presenters: IdentifiedArrayOf<TransactionReview.Dapp>
+	let tapPresenterAction: (TransactionReview.Dapp.ID) -> Void
 
 	var body: some View {
 		Card {

@@ -2,6 +2,10 @@ import FeaturePrelude
 
 // MARK: - TransactionReviewPresenting.View
 extension TransactionReviewGuarantees {
+	public struct ViewState: Equatable {
+		let guarantees: [View.GuaranteeView.ViewState]
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewGuarantees>
@@ -20,26 +24,33 @@ extension TransactionReviewGuarantees {
 		}
 
 		struct GuaranteeView: SwiftUI.View {
-			let name: String?
-			let thumbnail: URL?
-
-			let amount: BigDecimal
-			let guaranteedAmount: BigDecimal?
-			let dollarAmount: BigDecimal?
-
-			let action: (Change) -> Void
-
-			enum Change {
-				case increase, decrease
+			struct ViewState: Equatable {
+				let token: TransactionReviewTokenView.ViewState
+				let minimum: Double
 			}
 
+			let viewState: ViewState
+			let increaseAction: () -> Void
+			let decreaseAction: () -> Void
+
 			public var body: some SwiftUI.View {
-				VStack(spacing: .medium2) {
-					TransactionReviewTokenView(name: name,
-					                           thumbnail: thumbnail,
-					                           amount: amount,
-					                           guaranteedAmount: guaranteedAmount,
-					                           dollarAmount: dollarAmount)
+				Card {
+					VStack(spacing: 0) {
+						TransactionReviewTokenView(viewState: viewState.token)
+
+						Rectangle()
+							.stroke(.pink)
+							.padding(.medium3)
+							.overlay {
+								Button(action: increaseAction) {
+									Image(systemName: "minus.circle")
+								}
+								Text(viewState.minimum.formatted(.number))
+								Button(action: increaseAction) {
+									Image(systemName: "plus.circle")
+								}
+							}
+					}
 				}
 			}
 		}
