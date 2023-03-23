@@ -33,18 +33,27 @@ public struct FaucetClient: Sendable {
 public struct CreateFungibleTokenRequest: Sendable {
 	public let recipientAccountAddress: AccountAddress
 	public let name: String
+	public let symbol: String
+
 	public init(
 		recipientAccountAddress: AccountAddress,
-		name: String
+		name: String,
+		symbol: String
 	) {
 		self.recipientAccountAddress = recipientAccountAddress
 		self.name = name
+		self.symbol = symbol
 	}
 
-	public init(recipientAccountAddress: AccountAddress) {
+	public init(
+		recipientAccountAddress: AccountAddress
+	) {
+		let randomName = BIP39.WordList.english.randomElement() ?? "Unnamed"
+
 		self.init(
 			recipientAccountAddress: recipientAccountAddress,
-			name: BIP39.WordList.english.randomElement() ?? "Unnamed"
+			name: randomName.lowercased(),
+			symbol: randomName.uppercased()
 		)
 	}
 }

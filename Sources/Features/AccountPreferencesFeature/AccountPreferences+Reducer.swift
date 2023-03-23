@@ -70,7 +70,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
 				try await faucetClient.createFungibleToken(.init(
 					recipientAccountAddress: $0,
-					name: "CYON"
+					name: "Sajjon",
+					symbol: "CYON"
 				))
 			}
 		#endif

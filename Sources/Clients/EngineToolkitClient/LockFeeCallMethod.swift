@@ -84,33 +84,33 @@ extension EngineToolkitClient {
 #if DEBUG
 extension EngineToolkitClient {
 	public func manifestForCreateFungibleToken(
-		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
-		accountAddress: AccountAddress
+		accountAddress: AccountAddress,
+		tokenDivisivility: UInt8 = 18,
+		tokenName: String = "Test",
+		tokenDescription: String = "A very innovative and important resource.",
+		tokenSymbol: String = "TEST",
+		initialSupply: String = "21000000"
 	) throws -> TransactionManifest {
-		//        let faucetAddress = try faucetAddress(for: networkID)
-		//        var instructions: [any InstructionProtocol] = [
-		//            CallMethod(
-		//                receiver: faucetAddress,
-		//                methodName: "free"
-		//            ),
-//
-		//            CallMethod(
-		//                receiver: componentAddress,
-		//                methodName: "deposit_batch"
-		//            ) {
-		//                Expression("ENTIRE_WORKTOP")
-		//            },
-		//        ]
-//
-		//        if includeLockFeeInstruction {
-		//            instructions.insert(
-		//                lockFeeCallMethod(address: faucetAddress),
-		//                at: 0
-		//            )
-		//        }
-		//        return .init(instructions: .parsed(instructions.map { $0.embed() }))
-		fatalError()
+		var instructions: [any InstructionProtocol] = [
+			CreateFungibleResourceWithInitialSupply(
+				divisibility: tokenDivisivility,
+				metadata: Map_(
+					keyValueKind: .string,
+					valueValueKind: .string,
+					entries: [
+						[.string("name"), .string(tokenName)],
+						[.string("symbol"), .string(tokenSymbol)],
+						[.string("description"), .string(tokenDescription)],
+					]
+				),
+
+				accessRules: .init(keyValueKind: .enum, valueValueKind: .tuple, entries: []),
+				initialSupply: .decimal(.init(value: initialSupply))
+			),
+		]
+
+		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
 }
 #endif // DEBUG

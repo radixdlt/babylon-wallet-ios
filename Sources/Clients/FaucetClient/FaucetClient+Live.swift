@@ -90,9 +90,10 @@ extension FaucetClient: DependencyKey {
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try engineToolkitClient.manifestForCreateFungibleToken(
-				includeLockFeeInstruction: true,
 				networkID: networkID,
-				accountAddress: request.recipientAccountAddress
+				accountAddress: request.recipientAccountAddress,
+				tokenName: request.name,
+				tokenSymbol: request.symbol
 			)
 
 			try await signSubmitTX(manifest: manifest)
