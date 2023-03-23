@@ -88,17 +88,18 @@ final class ROLAClientTests: TestCase {
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let accountType = "dapp definition"
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: accountType),
-			.init(key: "related_websites", value: origin),
+			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", asString: accountType), lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", asString: origin), lastUpdatedAtStateVersion: 0),
 		])
 
 		// when
 		try await withDependencies {
-			$0.gatewayAPIClient.resourceDetailsByResourceIdentifier = { _ in
-				GatewayAPI.EntityDetailsResponse(
+			$0.gatewayAPIClient.getEntityDetails = { _ in
+				GatewayAPI.StateEntityDetailsResponse(
 					ledgerState: self.ledgerState,
-					address: "address-deadbeef",
-					metadata: metadataCollection
+					items: [
+						.init(address: "address-deadbeef", metadata: metadataCollection),
+					]
 				)
 			}
 		} operation: {
@@ -113,19 +114,20 @@ final class ROLAClientTests: TestCase {
 		let wrongAccountType = "wrong account type"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: wrongAccountType),
-			.init(key: "related_websites", value: origin),
+			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", asString: wrongAccountType), lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", asString: origin), lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.wrongAccountType
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.resourceDetailsByResourceIdentifier = { _ in
-				GatewayAPI.EntityDetailsResponse(
+			$0.gatewayAPIClient.getEntityDetails = { _ in
+				GatewayAPI.StateEntityDetailsResponse(
 					ledgerState: self.ledgerState,
-					address: "address-deadbeef",
-					metadata: metadataCollection
+					items: [
+						.init(address: "address-deadbeef", metadata: metadataCollection),
+					]
 				)
 			}
 		} operation: {
@@ -146,19 +148,20 @@ final class ROLAClientTests: TestCase {
 		let accountType = "dapp definition"
 
 		let metadataCollection = GatewayAPI.EntityMetadataCollection(items: [
-			.init(key: "account_type", value: accountType),
-			.init(key: "related_websites", value: origin),
+			.init(key: "account_type", value: .init(rawHex: "", rawJson: "", asString: accountType), lastUpdatedAtStateVersion: 0),
+			.init(key: "related_websites", value: .init(rawHex: "", rawJson: "", asString: origin), lastUpdatedAtStateVersion: 0),
 		])
 
 		let expectedError = ROLAFailure.unknownWebsite
 
 		// when
 		await withDependencies {
-			$0.gatewayAPIClient.resourceDetailsByResourceIdentifier = { _ in
-				GatewayAPI.EntityDetailsResponse(
+			$0.gatewayAPIClient.getEntityDetails = { _ in
+				GatewayAPI.StateEntityDetailsResponse(
 					ledgerState: self.ledgerState,
-					address: "address-deadbeef",
-					metadata: metadataCollection
+					items: [
+						.init(address: "address-deadbeef", metadata: metadataCollection),
+					]
 				)
 			}
 		} operation: {
