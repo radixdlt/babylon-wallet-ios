@@ -91,7 +91,7 @@ extension FaucetClient: DependencyKey {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try engineToolkitClient.manifestForCreateFungibleToken(
 				includeLockFeeInstruction: true,
-				networkID: gatewaysClient.getCurrentNetworkID(),
+				networkID: networkID,
 				accountAddress: request.recipientAccountAddress
 			)
 
