@@ -92,7 +92,7 @@ extension EngineToolkitClient {
 		tokenSymbol: String = "TEST",
 		initialSupply: String = "21000000"
 	) throws -> TransactionManifest {
-		var instructions: [any InstructionProtocol] = [
+		let instructions: [any InstructionProtocol] = [
 			CreateFungibleResourceWithInitialSupply(
 				divisibility: tokenDivisivility,
 				metadata: Map_(
@@ -105,7 +105,14 @@ extension EngineToolkitClient {
 					]
 				),
 
-				accessRules: .init(keyValueKind: .enum, valueValueKind: .tuple, entries: []),
+				accessRules: .init(
+					keyValueKind: .enum,
+					valueValueKind: .tuple,
+					entries: [
+						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					]
+				),
 				initialSupply: .decimal(.init(value: initialSupply))
 			),
 		]
