@@ -3,7 +3,11 @@ import FeaturePrelude
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		#if DEBUG
-		return .init(faucetButtonState: faucetButtonState, createFungibleTokenButtonState: createFungibleTokenButtonState)
+		return .init(
+			faucetButtonState: faucetButtonState,
+			createFungibleTokenButtonState: createFungibleTokenButtonState,
+			createNonFungibleTokenButtonState: createNonFungibleTokenButtonState
+		)
 		#else
 		return .init(faucetButtonState: faucetButtonState)
 		#endif // DEBUG
@@ -17,12 +21,18 @@ extension AccountPreferences {
 
 		#if DEBUG
 		public var createFungibleTokenButtonState: ControlState
+		public var createNonFungibleTokenButtonState: ControlState
 		#endif // DEBUG
 
 		#if DEBUG
-		public init(faucetButtonState: ControlState, createFungibleTokenButtonState: ControlState) {
+		public init(
+			faucetButtonState: ControlState,
+			createFungibleTokenButtonState: ControlState,
+			createNonFungibleTokenButtonState: ControlState
+		) {
 			self.faucetButtonState = faucetButtonState
 			self.createFungibleTokenButtonState = createFungibleTokenButtonState
+			self.createNonFungibleTokenButtonState = createNonFungibleTokenButtonState
 		}
 		#else
 		public init(faucetButtonState: ControlState) {
@@ -46,6 +56,7 @@ extension AccountPreferences {
 						faucetButton(with: viewStore)
 						#if DEBUG
 						createFungibleTokenButton(with: viewStore)
+						createNonFungibleTokenButton(with: viewStore)
 						#endif // DEBUG
 					}
 					.frame(maxHeight: .infinity, alignment: .top)
@@ -101,6 +112,21 @@ extension AccountPreferences.View {
 
 		if viewStore.createFungibleTokenButtonState.isLoading {
 			Text("Creating Token")
+				.font(.app.body2Regular)
+				.foregroundColor(.app.gray1)
+		}
+	}
+
+	@ViewBuilder
+	private func createNonFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Create NFT") {
+			viewStore.send(.createNonFungibleTokenButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.createNonFungibleTokenButtonState)
+
+		if viewStore.createNonFungibleTokenButtonState.isLoading {
+			Text("Creating NFT")
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}

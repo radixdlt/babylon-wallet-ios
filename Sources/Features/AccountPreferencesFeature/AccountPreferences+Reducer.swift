@@ -9,6 +9,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		#if DEBUG
 		public var createFungibleTokenButtonState: ControlState
+		public var createNonFungibleTokenButtonState: ControlState
 		#endif
 
 		public init(
@@ -20,6 +21,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 			#if DEBUG
 			self.createFungibleTokenButtonState = .enabled
+			self.createNonFungibleTokenButtonState = .enabled
 			#endif
 		}
 	}
@@ -31,6 +33,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case createFungibleTokenButtonTapped
+		case createNonFungibleTokenButtonTapped
 		#endif
 	}
 
@@ -68,6 +71,15 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case .createFungibleTokenButtonTapped:
 			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
+				try await faucetClient.createFungibleToken(.init(
+					recipientAccountAddress: $0,
+					name: "Sajjon",
+					symbol: "CYON"
+				))
+			}
+
+		case .createNonFungibleTokenButtonTapped:
+			return call(buttonState: \.createNonFungibleTokenButtonState, into: &state) {
 				try await faucetClient.createFungibleToken(.init(
 					recipientAccountAddress: $0,
 					name: "Sajjon",
