@@ -24,14 +24,23 @@ extension Radix {
 }
 
 extension Radix.Gateway {
-	static let `default`: Self = .nebunet
+	public static let `default` = kisharnet
+}
 
+extension Radix.Gateway {
 	/// `"https://betanet.radixdlt.com"`
 	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
 	public static var nebunet: Self {
 		.init(
 			network: .nebunet,
 			url: URL(string: "https://betanet.radixdlt.com")!
+		)
+	}
+
+	public static var kisharnet: Self {
+		.init(
+			network: .kisharnet,
+			url: URL(string: "https://rcnet.radixdlt.com/")!
 		)
 	}
 
