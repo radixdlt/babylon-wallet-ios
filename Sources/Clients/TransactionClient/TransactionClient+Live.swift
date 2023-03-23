@@ -169,7 +169,7 @@ extension TransactionClient {
 				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
-			//            debugPrintTX()
+			debugPrintTX()
 
 			return .success((txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
 		}

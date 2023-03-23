@@ -84,7 +84,6 @@ extension EngineToolkitClient {
 #if DEBUG
 extension EngineToolkitClient {
 	public func manifestForCreateFungibleToken(
-		networkID: NetworkID,
 		accountAddress: AccountAddress,
 		tokenDivisivility: UInt8 = 18,
 		tokenName: String = "Test",
@@ -115,6 +114,10 @@ extension EngineToolkitClient {
 				),
 				initialSupply: .decimal(.init(value: initialSupply))
 			),
+
+			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			},
 		]
 
 		return .init(instructions: .parsed(instructions.map { $0.embed() }))

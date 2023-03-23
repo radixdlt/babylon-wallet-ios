@@ -86,17 +86,13 @@ extension FaucetClient: DependencyKey {
 
 		#if DEBUG
 		let createFungibleToken: CreateFungibleToken = { request in
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
-
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try engineToolkitClient.manifestForCreateFungibleToken(
-				networkID: networkID,
-				accountAddress: request.recipientAccountAddress,
-				tokenName: request.name,
-				tokenSymbol: request.symbol
+			try await signSubmitTX(
+				manifest: engineToolkitClient.manifestForCreateFungibleToken(
+					accountAddress: request.recipientAccountAddress,
+					tokenName: request.name,
+					tokenSymbol: request.symbol
+				)
 			)
-
-			try await signSubmitTX(manifest: manifest)
 		}
 
 		return Self(
