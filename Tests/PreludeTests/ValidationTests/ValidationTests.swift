@@ -3,62 +3,52 @@ import XCTest
 
 // MARK: - ValidationTests
 final class ValidationTests: XCTestCase {
-	func test() {
-		struct Person {
-//			@Validation<String, NameValidationError>() var name
+	func testPropertyWrapper() {
+		struct InputState {
 			@Validation<String, String> var name: String?
-//			@Validation(NameValidationError.self) var name
 
-//			init() {
-//				self._name = .personName
-//			}
+			init(initialName: String?) {
+				self._name = .init(
+					wrappedValue: initialName,
+					onNil: "Name cannot be nil",
+					rules: [
+						.if(\.isBlank, error: "Name cannot be blank"),
+						.unless({ $0.count >= 2 }, error: "Name cannot be shorter than 2 characters"),
+						.if({ $0.rangeOfCharacter(from: .symbols) != nil }, error: "Name cannot contain special characters or symbols"),
+					]
+				)
+			}
 		}
 
-//		let sut = Person()
+		var sut = InputState(initialName: nil)
+		XCTAssertNil(sut.name)
+		XCTAssertEqual(sut.$name.errors, NonEmptyArray("Name cannot be nil"))
+
+		sut.name = ""
+		XCTAssertNil(sut.name)
+		XCTAssertEqual(sut.$name.errors, NonEmptyArray(
+			"Name cannot be blank",
+			"Name cannot be shorter than 2 characters"
+		))
+
+		sut.name = "D"
+		XCTAssertNil(sut.name)
+		XCTAssertEqual(sut.$name.errors, NonEmptyArray(
+			"Name cannot be shorter than 2 characters"
+		))
+
+		sut.name = "Da"
+		XCTAssertEqual(sut.name, "Da")
+		XCTAssertNil(sut.$name.errors)
+
+		sut.name = "David"
+		XCTAssertEqual(sut.name, "David")
+		XCTAssertNil(sut.$name.errors)
+
+		sut.name = "David$"
+		XCTAssertNil(sut.name)
+		XCTAssertEqual(sut.$name.errors, NonEmptyArray(
+			"Name cannot contain special characters or symbols"
+		))
 	}
 }
-
-// extension [ValidationRuleOf<NameValidationError>] {
-// }
-
-// extension Validation<String, String> {
-//	static let personName = Self.init(
-//		wrappedValue: <#T##String?#>,
-//		rules: <#T##[ValidationRule<String, String>]#>,
-//		onNil: <#T##String?#>
-//	)
-// }
-
-// MARK: - NameValidationError
-// public enum NameValidationError: ValidationError, LocalizedError {
-//	case blank
-//	case tooShort
-//	case tooLong
-//	case invalidCharacters
-//
-//	public var condition: (String) -> Bool {
-//		switch self {
-//		case .blank:
-//			return \.isBlank
-//		case .tooShort:
-//			return { $0.count <= 2 }
-//		case .tooLong:
-//			return { $0.count > 15 }
-//		case .invalidCharacters:
-//			return { $0.rangeOfCharacter(from: .symbols) != nil }
-//		}
-//	}
-//
-//	public var errorDescription: String? {
-//		switch self {
-//		case .blank:
-//			return "First name cannot be blank"
-//		case .tooShort:
-//			return "First name is too short"
-//		case .tooLong:
-//			return "First name is too long"
-//		case .invalidCharacters:
-//			return "First name contains invalid characters"
-//		}
-//	}
-// }
