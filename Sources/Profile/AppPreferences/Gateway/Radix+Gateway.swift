@@ -67,6 +67,10 @@ extension Radix.Gateway {
 }
 
 extension Radix.Gateway {
+	public var isDefault: Bool {
+		id == Self.default.id
+	}
+
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

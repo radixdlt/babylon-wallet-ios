@@ -147,10 +147,10 @@
     {
       "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/davdroman/swift-composable-architecture",
+      "location" : "https://github.com/radixdlt/swift-composable-architecture",
       "state" : {
-        "branch" : "navigation-beta-stack-and-relay",
-        "revision" : "7d836ec048dddb0071e19a3ebb49378dbd31d0eb"
+        "branch" : "navigation-stack-and-full-scope",
+        "revision" : "a823c7d3237769feb9f19e4f609de03ba80fca76"
       }
     },
     {
@@ -275,8 +275,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swiftui-navigation",
       "state" : {
-        "revision" : "0a0e1b321d70ee6a464ecfe6b0136d9eff77ebfc",
-        "version" : "0.7.0"
+        "revision" : "47dd574b900ba5ba679f56ea00d4d282fc7305a6",
+        "version" : "0.7.1"
       }
     },
     {
@@ -302,8 +302,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "62041e6016a30f56952f5d7d3f12a3fd7029e1cd",
-        "version" : "0.8.3"
+        "revision" : "ab8c9f45843694dd16be4297e6d44c0634fd9913",
+        "version" : "0.8.4"
       }
     }
   ],

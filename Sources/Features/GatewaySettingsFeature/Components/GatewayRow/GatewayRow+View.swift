@@ -2,8 +2,12 @@ import FeaturePrelude
 
 extension GatewayRow.State {
 	var viewState: GatewayRow.ViewState {
-		.init(
-			name: gateway.network.name.rawValue.capitalized,
+		let name = gateway.isDefault ?
+			L10n.GatewaySettings.radixBetanetGateway :
+			gateway.url.absoluteString
+
+		return .init(
+			name: name,
 			description: gateway.network.displayDescription,
 			isSelected: isSelected,
 			canBeDeleted: canBeDeleted
@@ -43,6 +47,8 @@ extension GatewayRow {
 								Text(viewStore.name)
 									.foregroundColor(.app.gray1)
 									.textStyle(.body1HighImportance)
+									.lineLimit(1)
+									.minimumScaleFactor(0.5)
 
 								Text(viewStore.description)
 									.foregroundColor(.app.gray2)
@@ -77,7 +83,7 @@ struct GatewayRow_Preview: PreviewProvider {
 	static var previews: some View {
 		GatewayRow.View(
 			store: .init(
-				initialState: .previewValue1,
+				initialState: .previewValue2,
 				reducer: GatewayRow()
 			)
 		)
