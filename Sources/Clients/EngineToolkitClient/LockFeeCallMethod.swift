@@ -166,7 +166,7 @@ extension EngineToolkitClient {
 				),
 				initialSupply: .map(
 					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
-						[.nonFungibleLocalId(.integer(UInt64.random(in: 0 ..< UInt64.max))), .tuple([.string("Hello World"), .decimal(.init(value: "12"))])],
+						[.nonFungibleLocalId(.integer(1)), .tuple([.string("Hello World"), .decimal(.init(value: "12"))])],
 					])
 				)
 			),
