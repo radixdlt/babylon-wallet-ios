@@ -84,14 +84,18 @@ extension EngineToolkitClient {
 #if DEBUG
 extension EngineToolkitClient {
 	public func manifestForCreateFungibleToken(
+		networkID: NetworkID,
 		accountAddress: AccountAddress,
 		tokenDivisivility: UInt8 = 18,
-		tokenName: String = "Test",
+		tokenName: String = "Token Test",
 		tokenDescription: String = "A very innovative and important resource.",
 		tokenSymbol: String = "TEST",
 		initialSupply: String = "21000000"
 	) throws -> TransactionManifest {
+		let faucetAddress = try faucetAddress(for: networkID)
 		let instructions: [any InstructionProtocol] = [
+			lockFeeCallMethod(address: faucetAddress),
+
 			CreateFungibleResourceWithInitialSupply(
 				divisibility: tokenDivisivility,
 				metadata: Map_(
@@ -104,6 +108,51 @@ extension EngineToolkitClient {
 					]
 				),
 
+				accessRules: .init(
+					keyValueKind: .enum,
+					valueValueKind: .tuple,
+					entries: [
+						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					]
+				),
+				initialSupply: .decimal(.init(value: initialSupply))
+			),
+
+			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			},
+		]
+
+		return .init(instructions: .parsed(instructions.map { $0.embed() }))
+	}
+
+	public func manifestForCreateNonFungibleToken(
+		networkID: NetworkID,
+		accountAddress: AccountAddress,
+		nftName: String = "NFT Test",
+		nftDescription: String = "Artsy cool unique NFT",
+		initialSupply: String = "1337"
+	) throws -> TransactionManifest {
+		let faucetAddress = try faucetAddress(for: networkID)
+		let instructions: [any InstructionProtocol] = [
+			lockFeeCallMethod(address: faucetAddress),
+
+			try CreateNonFungibleResourceWithInitialSupply(
+				idType: .init(.string("NonFungibleIdType::Integer")),
+				schema: [
+					.tuple([]),
+					.enum(.init(.u8(0), fields: [.u8(64)])),
+					.array(.init(elementKind: .string, elements: [])),
+				],
+				metadata: Map_(
+					keyValueKind: .string,
+					valueValueKind: .string,
+					entries: [
+						[.string("name"), .string(nftName)],
+						[.string("description"), .string(nftDescription)],
+					]
+				),
 				accessRules: .init(
 					keyValueKind: .enum,
 					valueValueKind: .tuple,

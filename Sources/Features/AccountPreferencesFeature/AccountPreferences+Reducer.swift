@@ -72,18 +72,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case .createFungibleTokenButtonTapped:
 			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
 				try await faucetClient.createFungibleToken(.init(
-					recipientAccountAddress: $0,
-					name: "Sajjon",
-					symbol: "CYON"
+					recipientAccountAddress: $0
 				))
 			}
 
 		case .createNonFungibleTokenButtonTapped:
 			return call(buttonState: \.createNonFungibleTokenButtonState, into: &state) {
-				try await faucetClient.createFungibleToken(.init(
-					recipientAccountAddress: $0,
-					name: "Sajjon",
-					symbol: "CYON"
+				try await faucetClient.createNonFungibleToken(.init(
+					recipientAccountAddress: $0
 				))
 			}
 		#endif

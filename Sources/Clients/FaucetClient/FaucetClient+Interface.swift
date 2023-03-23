@@ -9,14 +9,17 @@ public struct FaucetClient: Sendable {
 
 	#if DEBUG
 	public var createFungibleToken: CreateFungibleToken
+	public var createNonFungibleToken: CreateNonFungibleToken
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
 		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
-		createFungibleToken: @escaping CreateFungibleToken
+		createFungibleToken: @escaping CreateFungibleToken,
+		createNonFungibleToken: @escaping CreateNonFungibleToken
 	) {
 		self.getFreeXRD = getFreeXRD
 		self.isAllowedToUseFaucet = isAllowedToUseFaucet
 		self.createFungibleToken = createFungibleToken
+		self.createNonFungibleToken = createNonFungibleToken
 	}
 	#else
 	public init(
@@ -57,6 +60,30 @@ public struct CreateFungibleTokenRequest: Sendable {
 		)
 	}
 }
+
+public struct CreateNonFungibleTokenRequest: Sendable {
+	public let recipientAccountAddress: AccountAddress
+	public let name: String
+
+	public init(
+		recipientAccountAddress: AccountAddress,
+		name: String
+	) {
+		self.recipientAccountAddress = recipientAccountAddress
+		self.name = name
+	}
+
+	public init(
+		recipientAccountAddress: AccountAddress
+	) {
+		let randomName = BIP39.WordList.english.randomElement() ?? "Unnamed"
+
+		self.init(
+			recipientAccountAddress: recipientAccountAddress,
+			name: randomName.lowercased()
+		)
+	}
+}
 #endif // DEBUG
 
 extension FaucetClient {
@@ -64,6 +91,7 @@ extension FaucetClient {
 	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async -> Bool
 	#if DEBUG
 	public typealias CreateFungibleToken = @Sendable (CreateFungibleTokenRequest) async throws -> Void
+	public typealias CreateNonFungibleToken = @Sendable (CreateNonFungibleTokenRequest) async throws -> Void
 	#endif // DEBUG
 }
 

@@ -86,8 +86,10 @@ extension FaucetClient: DependencyKey {
 
 		#if DEBUG
 		let createFungibleToken: CreateFungibleToken = { request in
+			let networkID = await gatewaysClient.getCurrentNetworkID()
 			try await signSubmitTX(
 				manifest: engineToolkitClient.manifestForCreateFungibleToken(
+					networkID: networkID,
 					accountAddress: request.recipientAccountAddress,
 					tokenName: request.name,
 					tokenSymbol: request.symbol
@@ -95,10 +97,22 @@ extension FaucetClient: DependencyKey {
 			)
 		}
 
+		let createNonFungibleToken: CreateNonFungibleToken = { request in
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+			try await signSubmitTX(
+				manifest: engineToolkitClient.manifestForCreateNonFungibleToken(
+					networkID: networkID,
+					accountAddress: request.recipientAccountAddress,
+					nftName: request.name
+				)
+			)
+		}
+
 		return Self(
 			getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet,
-			createFungibleToken: createFungibleToken
+			createFungibleToken: createFungibleToken,
+			createNonFungibleToken: createNonFungibleToken
 		)
 		#else
 		return Self(
