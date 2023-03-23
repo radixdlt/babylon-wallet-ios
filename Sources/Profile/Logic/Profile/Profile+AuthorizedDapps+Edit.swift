@@ -14,18 +14,6 @@ struct DappWasNotConnected: Swift.Error {}
 struct AuthorizedDappAlreadyExists: Swift.Error {}
 
 extension Profile {
-	/// Updates a `Persona` in the profile
-	public mutating func updatePersona(
-		_ persona: Profile.Network.Persona,
-		networkID: NetworkID
-	) throws {
-		var network = try network(id: networkID)
-		guard network.personas.updateOrAppend(persona) != nil else {
-			fatalError("Incorrect implementation, should have been an existing Persona")
-		}
-		try updateOnNetwork(network)
-	}
-
 	/// Saves a `AuthorizedDapp` into the profile
 	@discardableResult
 	public mutating func addAuthorizedDapp(
