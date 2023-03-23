@@ -1556,7 +1556,6 @@ components:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
         - type: object
           required:
-            - package_address
             - blueprint_name
             - access_rules_chain
           properties:

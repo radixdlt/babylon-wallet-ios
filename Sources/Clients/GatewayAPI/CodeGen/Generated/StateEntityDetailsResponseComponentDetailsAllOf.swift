@@ -17,13 +17,13 @@ public typealias StateEntityDetailsResponseComponentDetailsAllOf = GatewayAPI.St
 extension GatewayAPI {
 	public struct StateEntityDetailsResponseComponentDetailsAllOf: Codable, Hashable {
 		/** Bech32m-encoded human readable version of the entity's global address or hex-encoded id. */
-		public private(set) var packageAddress: String
+		public private(set) var packageAddress: String?
 		public private(set) var blueprintName: String
 		public private(set) var state: AnyCodable?
 		public private(set) var accessRulesChain: AnyCodable
 		public private(set) var royaltyAggregator: FungibleResourcesCollectionItemGloballyAggregated?
 
-		public init(packageAddress: String, blueprintName: String, state: AnyCodable? = nil, accessRulesChain: AnyCodable, royaltyAggregator: FungibleResourcesCollectionItemGloballyAggregated? = nil) {
+		public init(packageAddress: String? = nil, blueprintName: String, state: AnyCodable? = nil, accessRulesChain: AnyCodable, royaltyAggregator: FungibleResourcesCollectionItemGloballyAggregated? = nil) {
 			self.packageAddress = packageAddress
 			self.blueprintName = blueprintName
 			self.state = state
@@ -43,7 +43,7 @@ extension GatewayAPI {
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(packageAddress, forKey: .packageAddress)
+			try container.encodeIfPresent(packageAddress, forKey: .packageAddress)
 			try container.encode(blueprintName, forKey: .blueprintName)
 			try container.encodeIfPresent(state, forKey: .state)
 			try container.encode(accessRulesChain, forKey: .accessRulesChain)
