@@ -16,6 +16,10 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 		case account(id: AccountAddress.ID, action: TransactionReviewAccount.Action)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case showCustomizeGuarantees
+	}
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -23,6 +27,13 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 			.forEach(\.accounts, action: /Action.child .. ChildAction.account) {
 				TransactionReviewAccount()
 			}
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .customizeGuaranteesTapped:
+			return .send(.delegate(.showCustomizeGuarantees))
+		}
 	}
 }
 

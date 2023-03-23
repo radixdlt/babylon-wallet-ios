@@ -14,6 +14,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public var networkFee: TransactionReviewNetworkFee.State
 
+		@PresentationState
+		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
+
 		public struct Dapp: Sendable, Identifiable, Hashable {
 			public let id: AccountAddress.ID
 			public let metadata: Metadata?
@@ -51,6 +54,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
 		case presenting(TransactionReviewPresenting.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
+
+		case customizeGuarantees(PresentationAction<TransactionReviewGuarantees.Action>)
 	}
 
 	public init() {}
@@ -69,6 +74,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.depositing, action: /Action.child .. ChildAction.depositing) {
 				TransactionReviewAccounts()
 			}
+			.ifLet(\.$customizeGuarantees, action: /Action.child .. ChildAction.customizeGuarantees) {
+				TransactionReviewGuarantees()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -81,6 +89,28 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .approveTapped:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .withdrawing:
+			return .none
+
+		case .depositing(.delegate(.showCustomizeGuarantees)):
+			state.customizeGuarantees = .init(dApps: [])
+			return .none
+
+		case .depositing:
+			return .none
+		case .dAppsUsed:
+			return .none
+		case .presenting:
+			return .none
+		case .networkFee:
+			return .none
+		case .customizeGuarantees:
 			return .none
 		}
 	}
