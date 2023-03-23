@@ -43,6 +43,8 @@ final class ProfileTests: TestCase {
 	}
 
 	func test_new_profile() async throws {
+		continueAfterFailure = false
+
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
 			language: .english
@@ -67,13 +69,15 @@ final class ProfileTests: TestCase {
 			)
 			let profile = Profile(
 				factorSource: babylonFactorSource,
-				creatingDevice: creatingDevice
+				creatingDevice: creatingDevice,
+				appPreferences: .init(gateways: .init(current: gateway))
 			)
 
 			return (profile, babylonFactorSource, olympiaFactorSource)
 		}
 
 		var profile = _profile
+		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
 
 		profile.factorSources.append(olympiaFactorSource)
 
@@ -82,6 +86,7 @@ final class ProfileTests: TestCase {
 				kind: .account,
 				networkID: profile.networkID
 			)
+
 			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
@@ -114,6 +119,9 @@ final class ProfileTests: TestCase {
 			)
 
 			try profile.addAccount(account)
+
+			XCTAssertEqual(profile.network?.networkID, gateway.network.id)
+			XCTAssertEqual(profile.network?.networkID, networkID)
 
 			return account
 		}
@@ -153,6 +161,9 @@ final class ProfileTests: TestCase {
 			)
 
 			try profile.addPersona(persona)
+
+			XCTAssertEqual(profile.network?.networkID, gateway.network.id)
+			XCTAssertEqual(profile.network?.networkID, networkID)
 
 			return persona
 		}
@@ -253,7 +264,7 @@ final class ProfileTests: TestCase {
 		let snapshot = profile.snapshot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
-		/* Uncomment the lines below to generate a new test vector */
+		// Uncomment the lines below to generate a new test vector
 //		let data = try jsonEncoder.encode(snapshot)
 //		print(String(data: data, encoding: .utf8)!)
 	}
@@ -316,7 +327,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_b_1pr5v6mt035ny0j35jp8l6sy49gj0c3seda4tsuqvpstq39h8xk"
+			"account_tdx_b_1p85v6mt035ny0j35jp8l6sy49gj0c3seda4tsuqvpstqrc6egy"
 		)
 
 		XCTAssertEqual(
@@ -326,7 +337,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_b_1pp3amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsqw4u76"
+			"account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg"
 		)
 
 		XCTAssertEqual(
@@ -336,7 +347,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_b_1prafjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qqgm7dgm"
+			"account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"
 		)
 
 		XCTAssertEqual(
@@ -345,7 +356,7 @@ final class ProfileTests: TestCase {
 		)
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_b_1pvauxn0kkttjn3xhw6lvjudnrx48mu0jaxt0crp09d4s787q03"
+			"identity_tdx_b_1psauxn0kkttjn3xhw6lvjudnrx48mu0jaxt0crp09d4smx5gv5"
 		)
 
 		XCTAssertEqual(
@@ -355,7 +366,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_b_1p0ec3phquyel59q39v3kcyc6z3ljy9jv40mdwf4dgxps399u40"
+			"identity_tdx_b_1pnec3phquyel59q39v3kcyc6z3ljy9jv40mdwf4dgxps5y05k2"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -367,7 +378,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1pp3amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsqw4u76", "account_tdx_b_1prafjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qqgm7dgm"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg", "account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {
