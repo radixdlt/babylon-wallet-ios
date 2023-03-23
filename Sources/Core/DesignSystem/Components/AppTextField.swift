@@ -45,12 +45,12 @@ public struct AppTextField<Value: Hashable>: View {
 			.cornerRadius(.small2)
 			.overlay(
 				RoundedRectangle(cornerRadius: .small2)
-					.stroke(Color.app.gray1, lineWidth: 1)
+					.stroke(borderColor, lineWidth: 1)
 			)
 
 			HStack(alignment: .top) {
 				if presentsError {
-					Image(asset: AssetResource.info)
+					Image(asset: AssetResource.error)
 						.foregroundColor(.app.red1)
 				}
 
@@ -61,5 +61,9 @@ public struct AppTextField<Value: Hashable>: View {
 			.opacity(hint != nil ? 1 : 0)
 			.frame(height: .medium2)
 		}
+	}
+
+	private var borderColor: Color {
+		presentsError ? .app.red1 : .app.gray1
 	}
 }

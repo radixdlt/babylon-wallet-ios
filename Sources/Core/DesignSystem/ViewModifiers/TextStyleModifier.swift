@@ -204,4 +204,11 @@ extension View {
 			Spacer(minLength: 0)
 		}
 	}
+
+	public var flushedRight: some View {
+		HStack(spacing: 0) {
+			Spacer(minLength: 0)
+			self
+		}
+	}
 }

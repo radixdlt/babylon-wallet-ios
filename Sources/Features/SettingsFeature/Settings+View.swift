@@ -2,6 +2,7 @@ import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
+import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
 #if DEBUG
@@ -95,9 +96,10 @@ extension View {
 		#endif
 			.factorSources(with: store, viewStore)
 			.manageP2PLinks(with: store, viewStore)
-			.manageGatewayAPIEndpoints(with: store, viewStore)
+			.gatewaySettings(with: store, viewStore)
 			.authorizedDapps(with: store, viewStore)
 			.personas(with: store, viewStore)
+			.generalSettings(with: store, viewStore)
 	}
 }
 
@@ -129,7 +131,7 @@ extension View {
 	}
 
 	@MainActor
-	private func manageGatewayAPIEndpoints(
+	private func gatewaySettings(
 		with store: StoreOf<AppSettings>,
 		_ viewStore: ViewStoreOf<AppSettings>
 	) -> some View {
@@ -164,6 +166,19 @@ extension View {
 			state: /AppSettings.Destinations.State.personas,
 			action: AppSettings.Destinations.Action.personas,
 			destination: { PersonasCoordinator.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func generalSettings(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStoreOf<AppSettings>
+	) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.generalSettings,
+			action: AppSettings.Destinations.Action.generalSettings,
+			destination: { GeneralSettings.View(store: $0) }
 		)
 	}
 }
@@ -201,9 +216,9 @@ extension AppSettings.View {
 				action: .personasButtonTapped
 			),
 			.init(
-				title: L10n.Settings.appSettingsButtonTitle,
-				asset: AssetResource.appSettings,
-				action: .appSettingsButtonTapped
+				title: L10n.Settings.generalSettingsButtonTitle,
+				asset: AssetResource.generalSettings,
+				action: .generalSettingsButtonTapped
 			),
 		]
 	}

@@ -121,16 +121,14 @@ public struct Home: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-				do {
-					for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
-						guard !Task.isCancelled else {
-							return
-						}
-						await send(.internal(.accountsLoadedResult(.success(accounts))))
+				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
+					guard !Task.isCancelled else {
+						return
 					}
-				} catch {
-					errorQueue.schedule(error)
+					await send(.internal(.accountsLoadedResult(.success(accounts))))
 				}
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		case .appeared:
 			return getAppPreferences()

@@ -9,7 +9,7 @@
       "saved" : [
         {
           "network" : {
-            "displayDescription" : "Radix Public Network",
+            "displayDescription" : "Betanet",
             "id" : 11,
             "name" : "nebunet"
           },
@@ -28,7 +28,8 @@
       }
     ],
     "security" : {
-      "iCloudProfileSyncEnabled" : true
+      "iCloudProfileSyncEnabled" : true,
+	  "isDeveloperModeEnabled": true
     }
   },
   "creatingDevice" : "computerRunningUnitTest",
@@ -272,5 +273,5 @@
       ]
     }
   ],
-  "version" : 23
+  "version" : 24
 }
