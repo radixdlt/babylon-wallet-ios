@@ -19,7 +19,7 @@ extension View {
 }
 
 // MARK: - SeparatorModifier
-struct SeparatorModifier: ViewModifier {
+private struct SeparatorModifier: ViewModifier {
 	let edges: SeparatorEdgeSet
 
 	func body(content: Content) -> some View {

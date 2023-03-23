@@ -7,7 +7,7 @@ extension View {
 }
 
 // MARK: - FooterModifier
-struct FooterModifier<FooterContent: View>: ViewModifier {
+private struct FooterModifier<FooterContent: View>: ViewModifier {
 	@ViewBuilder
 	let footerContent: FooterContent
 
