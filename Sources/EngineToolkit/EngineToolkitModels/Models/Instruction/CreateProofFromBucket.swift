@@ -48,9 +48,9 @@ extension CreateProofFromBucket {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let bucket = try container.decode(Bucket.self, forKey: .bucket)
-		let proof = try container.decode(Proof.self, forKey: .intoProof)
-
-		self.init(bucket: bucket, proof: proof)
+		try self.init(
+			bucket: container.decode(Bucket.self, forKey: .bucket),
+			proof: container.decode(Proof.self, forKey: .intoProof)
+		)
 	}
 }

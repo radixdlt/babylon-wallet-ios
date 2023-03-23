@@ -89,7 +89,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
 				let result = await TaskResult {
-					try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
+					try await gatewayClient.getEntityMetadata(dAppID.address)
 				}
 				return .internal(.metadataLoaded(.init(result: result)))
 			}
@@ -192,7 +192,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	subscript(key: String) -> String? {
-		items.first { $0.key == key }?.value
+		items.first { $0.key == key }?.value.asString
 	}
 }
 

@@ -9,7 +9,7 @@ public struct CreateProofFromAuthZoneByAmount: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 	public let amount: Decimal_
 	public let intoProof: Proof
 
@@ -20,7 +20,7 @@ public struct CreateProofFromAuthZoneByAmount: InstructionProtocol {
 		amount: Decimal_,
 		intoProof: Proof
 	) {
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 		self.amount = amount
 		self.intoProof = intoProof
 	}
@@ -54,7 +54,7 @@ extension CreateProofFromAuthZoneByAmount {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
 			amount: container.decode(Decimal_.self, forKey: .amount),
 			intoProof: container.decode(Proof.self, forKey: .intoProof)
 		)

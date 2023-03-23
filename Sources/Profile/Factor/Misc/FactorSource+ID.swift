@@ -1,4 +1,5 @@
 import Cryptography
+import EngineToolkit
 import Prelude
 
 extension FactorSource {
@@ -13,7 +14,7 @@ extension FactorSource {
 	public static func id(
 		publicKey: SLIP10.PublicKey
 	) throws -> FactorSourceID {
-		let hash = Data(SHA256.twice(data: publicKey.compressedRepresentation))
+		let hash = try blake2b(data: publicKey.compressedRepresentation)
 		return try FactorSourceID(data: hash)
 	}
 }

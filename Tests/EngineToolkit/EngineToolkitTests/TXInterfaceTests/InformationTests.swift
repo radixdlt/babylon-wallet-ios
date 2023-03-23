@@ -6,8 +6,8 @@ final class InformationTests: TestCase {
 		XCTAssertNoDifference(
 			information,
 			.init(
-				packageVersion: "0.8.0",
-				gitHash: "d6dbcead25e6e7cc2fb229e3b1ef79ea6371f423"
+				packageVersion: "0.9.0",
+				lastCommitHash: "a354c356201165e08d258aba798c29c377a05198"
 			)
 		)
 	}

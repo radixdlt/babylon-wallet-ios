@@ -48,6 +48,9 @@ extension RecallResource {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		try self.init(vault_id: container.decode(Bytes.self, forKey: .vaultId), amount: container.decode(Decimal_.self, forKey: .amount))
+		try self.init(
+			vault_id: container.decode(Bytes.self, forKey: .vaultId),
+			amount: container.decode(Decimal_.self, forKey: .amount)
+		)
 	}
 }
