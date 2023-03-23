@@ -110,6 +110,9 @@ extension TransactionReview {
 					}
 				}
 			}
+			.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
+				TransactionReviewGuarantees.View(store: childStore)
+			}
 			.onAppear {
 				// decodeActions()
 			}
@@ -198,6 +201,72 @@ struct TransactionMessageView: View {
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
 		}
+	}
+}
+
+// MARK: - TransactionReviewTokenView
+struct TransactionReviewTokenView: View {
+	struct ViewState: Equatable {
+		let name: String?
+		let thumbnail: URL?
+
+		let amount: BigDecimal
+		let guaranteedAmount: BigDecimal?
+		let dollarAmount: BigDecimal?
+	}
+
+	let viewState: ViewState
+
+	var body: some View {
+		HStack(spacing: .small1) {
+			if let thumbnail = viewState.thumbnail {
+				TokenPlaceholder(size: .small) // TODO:  Actually use URL
+					.padding(.vertical, .small1)
+			} else {
+				TokenPlaceholder(size: .small)
+					.padding(.vertical, .small1)
+			}
+
+			if let name = viewState.name {
+				Text(name)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray1)
+			}
+
+			Spacer(minLength: 0)
+
+			VStack(alignment: .trailing, spacing: 0) {
+				HStack(spacing: .small2) {
+					if viewState.guaranteedAmount != nil {
+						Text(L10n.TransactionReview.estimated)
+							.textStyle(.body2Regular) // TODO:  unknown textStyle
+							.foregroundColor(.app.gray1)
+					}
+					// Text(amount.formatted(.number))
+					Text(viewState.amount.description)
+						.textStyle(.secondaryHeader)
+				}
+				.foregroundColor(.app.gray1)
+
+				if let dollarAmount = viewState.dollarAmount {
+					// Text(dollarAmount.formatted(.currency(code: "USD")))
+					Text(dollarAmount.description)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.padding(.top, .small2)
+				}
+
+				if let guaranteedAmount = viewState.guaranteedAmount {
+					//					Text("Guaranteed **\(guaranteedAmount.formatted(.number))**")
+					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.description)**")
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray2)
+						.padding(.top, .small1)
+				}
+			}
+			.padding(.vertical, .medium3)
+		}
+		.padding(.horizontal, .medium3)
 	}
 }
 

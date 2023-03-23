@@ -113,11 +113,11 @@ public struct TransactionDetailsView: View {
 			NFTView(name: viewState.metadata?.name,
 			        thumbnail: viewState.metadata?.thumbnail)
 		case let .token(amount, guaranteedAmount, dollarAmount):
-			TokenView(name: viewState.metadata?.name,
-			          thumbnail: viewState.metadata?.thumbnail,
-			          amount: amount,
-			          guaranteedAmount: guaranteedAmount,
-			          dollarAmount: dollarAmount)
+			TransactionReviewTokenView(name: viewState.metadata?.name,
+			                           thumbnail: viewState.metadata?.thumbnail,
+			                           amount: amount,
+			                           guaranteedAmount: guaranteedAmount,
+			                           dollarAmount: dollarAmount)
 		}
 	}
 
@@ -142,67 +142,6 @@ public struct TransactionDetailsView: View {
 				}
 
 				Spacer(minLength: 0)
-			}
-			.padding(.horizontal, .medium3)
-		}
-	}
-
-	struct TokenView: View {
-		let name: String?
-		let thumbnail: URL?
-
-		let amount: BigDecimal
-		let guaranteedAmount: BigDecimal?
-		let dollarAmount: BigDecimal?
-
-		var body: some View {
-			HStack(spacing: .small1) {
-				if let thumbnail {
-					TokenPlaceholder(size: .small) // TODO:  Actually use URL
-						.padding(.vertical, .small1)
-				} else {
-					TokenPlaceholder(size: .small)
-						.padding(.vertical, .small1)
-				}
-
-				if let name {
-					Text(name)
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
-				}
-
-				Spacer(minLength: 0)
-
-				VStack(alignment: .trailing, spacing: 0) {
-					HStack(spacing: .small2) {
-						if guaranteedAmount != nil {
-							Text(L10n.TransactionReview.estimated)
-								.textStyle(.body2Regular) // TODO:  unknown textStyle
-								.foregroundColor(.app.gray1)
-						}
-						// Text(amount.formatted(.number))
-						Text(amount.description)
-							.textStyle(.secondaryHeader)
-					}
-					.foregroundColor(.app.gray1)
-
-					if let dollarAmount {
-						// Text(dollarAmount.formatted(.currency(code: "USD")))
-						Text(dollarAmount.description)
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
-							.padding(.top, .small2)
-					}
-
-					if let guaranteedAmount {
-						//					Text("Guaranteed **\(guaranteedAmount.formatted(.number))**")
-						Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.description)**")
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray2)
-							.padding(.top, .small1)
-					}
-				}
-				.padding(.vertical, .medium3)
 			}
 			.padding(.horizontal, .medium3)
 		}
