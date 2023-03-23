@@ -80,3 +80,37 @@ extension EngineToolkitClient {
 		try knownEntityAddresses(networkID).faucetComponentAddress
 	}
 }
+
+#if DEBUG
+extension EngineToolkitClient {
+	public func manifestForCreateFungibleToken(
+		includeLockFeeInstruction: Bool,
+		networkID: NetworkID,
+		accountAddress: AccountAddress
+	) throws -> TransactionManifest {
+		//        let faucetAddress = try faucetAddress(for: networkID)
+		//        var instructions: [any InstructionProtocol] = [
+		//            CallMethod(
+		//                receiver: faucetAddress,
+		//                methodName: "free"
+		//            ),
+//
+		//            CallMethod(
+		//                receiver: componentAddress,
+		//                methodName: "deposit_batch"
+		//            ) {
+		//                Expression("ENTIRE_WORKTOP")
+		//            },
+		//        ]
+//
+		//        if includeLockFeeInstruction {
+		//            instructions.insert(
+		//                lockFeeCallMethod(address: faucetAddress),
+		//                at: 0
+		//            )
+		//        }
+		//        return .init(instructions: .parsed(instructions.map { $0.embed() }))
+		fatalError()
+	}
+}
+#endif // DEBUG

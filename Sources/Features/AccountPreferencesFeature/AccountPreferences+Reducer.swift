@@ -68,7 +68,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case .createFungibleTokenButtonTapped:
 			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
-				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
+				try await faucetClient.createFungibleToken(.init(
+					recipientAccountAddress: $0,
+					name: "CYON"
+				))
 			}
 		#endif
 		}
