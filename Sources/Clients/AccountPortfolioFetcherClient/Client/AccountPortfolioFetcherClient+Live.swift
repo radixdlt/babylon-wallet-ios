@@ -1,11 +1,22 @@
+import CacheClient
 import ClientPrelude
 import GatewayAPI
 
 // MARK: - AccountPortfolioFetcherClient + DependencyKey
 extension AccountPortfolioFetcherClient: DependencyKey {
 	public static let liveValue: Self = {
-		let fetchPortfolioForAccount: FetchPortfolioForAccount = { (accountAddress: AccountAddress) async throws -> AccountPortfolio in
+		let fetchPortfolioForAccount: FetchPortfolioForAccount = { accountAddress, forceRefresh async throws -> AccountPortfolio in
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+			@Dependency(\.cacheClient) var cacheClient
+
+			let cacheEntry: CacheClient.Entry = .accountPortfolio(.single(accountAddress.address))
+			if !forceRefresh, let accountPortfolio =
+				try? cacheClient.load(AccountPortfolio.self, cacheEntry) as? AccountPortfolio
+			{
+				return accountPortfolio
+			}
+
+			loggerGlobal.debug("📡 fetching new data from gateway: \(accountAddress.address)")
 
 			let resourcesResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
 			var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
@@ -15,7 +26,9 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 			let nonFungibleTokenAddresses = Array(accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress).prefix(tmpMaxRequestAmount))
 
 			if fungibleTokenAddresses.isEmpty, nonFungibleTokenAddresses.isEmpty {
-				return .empty(owner: accountAddress)
+				let empty: AccountPortfolio = .empty(owner: accountAddress)
+				cacheClient.save(empty, cacheEntry)
+				return empty
 			}
 
 			if !fungibleTokenAddresses.isEmpty {
@@ -50,20 +63,22 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 				)
 			}
 
+			cacheClient.save(accountPortfolio, cacheEntry)
+
 			return accountPortfolio
 		}
 
 		return Self(
 			fetchPortfolioForAccount: fetchPortfolioForAccount,
-			fetchPortfolioForAccounts: { addresses in
+			fetchPortfolioForAccounts: { accountAddresses, forceRefresh in
 
 				let portfolios = try await withThrowingTaskGroup(
 					of: AccountPortfolio.self,
 					returning: IdentifiedArrayOf<AccountPortfolio>.self,
 					body: { taskGroup in
-						for address in addresses {
+						for address in accountAddresses {
 							_ = taskGroup.addTaskUnlessCancelled {
-								try await fetchPortfolioForAccount(address)
+								try await fetchPortfolioForAccount(address, forceRefresh)
 							}
 						}
 						var portfolios: IdentifiedArrayOf<AccountPortfolio> = .init()
@@ -84,9 +99,10 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 extension AccountPortfolioFetcherClient {
 	public func fetchXRDBalance(
 		of accountAddress: AccountAddress,
-		on networkID: NetworkID
+		on networkID: NetworkID,
+		forceRefresh: Bool
 	) async -> FungibleTokenContainer? {
-		guard let portfolio = try? await fetchPortfolioForAccount(accountAddress) else {
+		guard let portfolio = try? await fetchPortfolioForAccount(accountAddress, forceRefresh) else {
 			return nil
 		}
 		return portfolio.fungibleTokenContainers

@@ -9,7 +9,7 @@ extension DappInteraction {
 }
 
 // MARK: - DappMetadata
-struct DappMetadata: Sendable, Hashable {
+struct DappMetadata: Sendable, Hashable, Codable {
 	static let defaultName = NonEmptyString(rawValue: L10n.DApp.Metadata.unknownName)!
 
 	let name: NonEmpty<String>

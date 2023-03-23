@@ -1,3 +1,4 @@
+import CacheClient
 import FeaturePrelude
 import GatewayAPI
 
@@ -35,7 +36,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	@Dependency(\.gatewayAPIClient) var gatewayAPI
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.cacheClient) var cacheClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -65,7 +67,15 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
 				do {
-					return try await DappMetadata(gatewayAPI.getEntityMetadata(dappDefinitionAddress.address).items)
+					let dAppMetadata: DappMetadata
+					let cacheEntry: CacheClient.Entry = .dAppRequestMetadata(dappDefinitionAddress.address)
+					if let data = try? cacheClient.load(DappMetadata.self, cacheEntry) as? DappMetadata {
+						dAppMetadata = data
+					} else {
+						dAppMetadata = try await DappMetadata(gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items)
+						cacheClient.save(dAppMetadata, cacheEntry)
+					}
+					return dAppMetadata
 				} catch is BadHTTPResponseCode {
 					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {

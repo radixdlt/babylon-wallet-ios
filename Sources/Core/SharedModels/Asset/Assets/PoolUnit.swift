@@ -3,7 +3,7 @@ import Prelude
 import Profile
 
 // MARK: - PoolUnit
-public struct PoolUnit: Asset {
+public struct PoolUnit: Asset, Codable {
 	public let resourceAddress: ResourceAddress
 
 	public init(
@@ -14,7 +14,7 @@ public struct PoolUnit: Asset {
 }
 
 // MARK: - PoolUnitContainer
-public struct PoolUnitContainer: AssetContainer, Sendable, Hashable {
+public struct PoolUnitContainer: AssetContainer, Sendable, Hashable, Codable {
 	public var owner: AccountAddress
 	public typealias T = PoolUnit
 	public var asset: PoolUnit

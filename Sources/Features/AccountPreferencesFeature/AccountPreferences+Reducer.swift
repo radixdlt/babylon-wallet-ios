@@ -46,7 +46,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case refreshAccount(AccountAddress)
+		case refresh(_ accountAddress: AccountAddress, forceRefresh: Bool)
 	}
 
 	@Dependency(\.faucetClient) var faucetClient
@@ -61,7 +61,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		case .closeButtonTapped:
 			return .run { [address = state.address] send in
-				await send(.delegate(.refreshAccount(address)))
+				await send(.delegate(.refresh(address, forceRefresh: false)))
 				await send(.delegate(.dismiss))
 			}
 
@@ -125,10 +125,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		case let .callDone(controlStateKeyPath):
 			if controlStateKeyPath == \State.faucetButtonState {
-				return .send(.delegate(.refreshAccount(state.address))).concatenate(with: loadIsAllowedToUseFaucet(&state))
+				return .send(.delegate(.refresh(state.address, forceRefresh: true))).concatenate(with: loadIsAllowedToUseFaucet(&state))
 			} else {
 				state[keyPath: controlStateKeyPath] = .enabled
-				return .send(.delegate(.refreshAccount(state.address)))
+				return .send(.delegate(.refresh(state.address, forceRefresh: true)))
 			}
 		}
 	}

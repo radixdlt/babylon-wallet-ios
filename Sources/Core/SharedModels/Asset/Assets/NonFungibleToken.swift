@@ -3,7 +3,7 @@ import Prelude
 import Profile
 
 // MARK: - NonFungibleToken
-public struct NonFungibleToken: Sendable, Token, Hashable {
+public struct NonFungibleToken: Sendable, Token, Hashable, Codable {
 	public let nonFungibleLocalId: ID
 	public typealias ID = NonFungibleLocalId
 	public var id: ID { nonFungibleLocalId }
@@ -16,7 +16,7 @@ public struct NonFungibleToken: Sendable, Token, Hashable {
 }
 
 // MARK: - NonFungibleTokenContainer
-public struct NonFungibleTokenContainer: Sendable, Identifiable, Hashable {
+public struct NonFungibleTokenContainer: Sendable, Identifiable, Hashable, Codable {
 	public let owner: AccountAddress
 	public let resourceAddress: ComponentAddress
 	public var assets: [NonFungibleToken]

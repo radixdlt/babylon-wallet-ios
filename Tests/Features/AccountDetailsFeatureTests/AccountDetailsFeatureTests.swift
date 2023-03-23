@@ -74,7 +74,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		await store.send(.view(.pullToRefreshStarted))
 
 		// then
-		await store.receive(.delegate(.refresh(account.address)))
+		await store.receive(.delegate(.refresh(account.address, forceRefresh: true)))
 	}
 
 	// FIXME: @davdroman-rdx after proper TCA tools are released

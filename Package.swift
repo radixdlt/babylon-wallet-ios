@@ -74,8 +74,9 @@ package.addModules([
 	.feature(
 		name: "AuthorizedDAppsFeatures",
 		dependencies: [
-			"GatewayAPI",
 			"AuthorizedDappsClient",
+			"CacheClient",
+			"GatewayAPI",
 		],
 		tests: .no
 	),
@@ -98,6 +99,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
 			"CreateEntityFeature",
+			"CacheClient",
 			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
@@ -224,14 +226,15 @@ package.addModules([
 		dependencies: [
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
+			"CacheClient",
 			"GatewayAPI",
-			"P2PLinksFeature",
 			"GatewaySettingsFeature",
 			"GeneralSettings",
+			"InspectProfileFeature",
 			"MnemonicClient",
+			"P2PLinksFeature",
 			"PersonasFeature",
 			"RadixConnectClient", // deleting connections when wallet is deleted
-			"InspectProfileFeature",
 		],
 		tests: .yes()
 	),
@@ -284,6 +287,7 @@ package.addModules([
 	.client(
 		name: "AccountPortfolioFetcherClient",
 		dependencies: [
+			"CacheClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
 		],
@@ -321,9 +325,20 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.client(
+		name: "CacheClient",
+		dependencies: [
+			"DiskPersistenceClient",
+		],
+		tests: .no
+	),
 	.client(
 		name: "CameraPermissionClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "DiskPersistenceClient",
 		dependencies: [],
 		tests: .no
 	),
@@ -412,9 +427,10 @@ package.addModules([
 		name: "NetworkSwitchingClient",
 		dependencies: [
 			"AccountsClient",
+			"CacheClient",
 			"GatewayAPI",
-			"ProfileStore",
 			"GatewaysClient",
+			"ProfileStore",
 		],
 		tests: .no
 	),
@@ -501,6 +517,7 @@ package.addModules([
 		name: "ROLAClient",
 		dependencies: [
 			"GatewayAPI",
+			"CacheClient",
 		],
 		tests: .yes()
 	),
@@ -509,6 +526,7 @@ package.addModules([
 		dependencies: [
 			"AccountPortfolioFetcherClient",
 			"AccountsClient",
+			"CacheClient",
 			"EngineToolkitClient",
 			"FactorSourcesClient",
 			"GatewayAPI",
