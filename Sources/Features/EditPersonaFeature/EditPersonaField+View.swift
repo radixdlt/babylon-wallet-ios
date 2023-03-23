@@ -8,8 +8,9 @@ extension EditPersonaField {
 		var input: String?
 		let inputHint: AppTextFieldHint?
 		#if os(iOS)
-		let capitalization: EquatableTextInputCapitalization
+		let contentType: UITextContentType?
 		let keyboardType: UIKeyboardType
+		let capitalization: EquatableTextInputCapitalization?
 		#endif
 		let isDynamic: Bool
 		let canBeDeleted: Bool
@@ -28,6 +29,7 @@ extension EditPersonaField {
 			#if os(iOS)
 			self.capitalization = state.id.capitalization
 			self.keyboardType = state.id.keyboardType
+			self.contentType = state.id.contentType
 			#endif
 			self.isDynamic = state.kind.isDynamic
 			self.canBeDeleted = {
@@ -72,8 +74,9 @@ extension EditPersonaField {
 					}
 				}
 				#if os(iOS)
-				.textInputAutocapitalization(viewStore.capitalization.rawValue)
+				.textContentType(viewStore.contentType)
 				.keyboardType(viewStore.keyboardType)
+				.textInputAutocapitalization(viewStore.capitalization?.rawValue)
 				#endif
 			}
 		}

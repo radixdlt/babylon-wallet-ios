@@ -4,8 +4,9 @@ import FeaturePrelude
 public protocol EditPersonaFieldID: Sendable, Hashable, Comparable {
 	var title: String { get }
 	#if os(iOS)
-	var capitalization: EquatableTextInputCapitalization { get }
+	var contentType: UITextContentType? { get }
 	var keyboardType: UIKeyboardType { get }
+	var capitalization: EquatableTextInputCapitalization? { get }
 	#endif
 }
 
@@ -78,15 +79,21 @@ extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 	}
 
 	#if os(iOS)
-	public var capitalization: EquatableTextInputCapitalization {
+	public var contentType: UITextContentType? {
 		switch self {
-		case .personaLabel: return .words
+		case .personaLabel: return .none
 		}
 	}
 
 	public var keyboardType: UIKeyboardType {
 		switch self {
 		case .personaLabel: return .default
+		}
+	}
+
+	public var capitalization: EquatableTextInputCapitalization? {
+		switch self {
+		case .personaLabel: return .words
 		}
 	}
 	#endif
@@ -125,21 +132,30 @@ extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	}
 
 	#if os(iOS)
-	public var capitalization: EquatableTextInputCapitalization {
+	public var contentType: UITextContentType? {
 		switch self {
-		case .givenName: return .words
-		case .familyName: return .words
-		case .emailAddress: return .never
-		case .phoneNumber: return .never
+		case .givenName: return .givenName
+		case .familyName: return .familyName
+		case .emailAddress: return .emailAddress
+		case .phoneNumber: return .telephoneNumber
 		}
 	}
 
 	public var keyboardType: UIKeyboardType {
 		switch self {
-		case .givenName: return .namePhonePad
-		case .familyName: return .namePhonePad
+		case .givenName: return .default
+		case .familyName: return .default
 		case .emailAddress: return .emailAddress
 		case .phoneNumber: return .phonePad
+		}
+	}
+
+	public var capitalization: EquatableTextInputCapitalization? {
+		switch self {
+		case .givenName: return .words
+		case .familyName: return .words
+		case .emailAddress: return .never
+		case .phoneNumber: return .none
 		}
 	}
 	#endif
