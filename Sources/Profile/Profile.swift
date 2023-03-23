@@ -22,7 +22,8 @@ extension ProfileSnapshot.Version {
 	/// - 21: Rename `P2PClient` to `P2PLink`.
 	/// - 22: Rename `perNetwork` to `networks`
 	/// - 23: Replace `SHA256` hash for FactorSource with `Blake2`
-	public static let minimum: Self = 23
+	/// - 24: Add `isDeveloperModeEnabled` to AppPreferences.
+	public static let minimum: Self = 24
 }
 
 // MARK: - Profile
@@ -83,14 +84,15 @@ public struct Profile:
 
 	public init(
 		factorSource: FactorSource,
-		creatingDevice: NonEmptyString = "placeholder"
+		creatingDevice: NonEmptyString = "placeholder",
+		appPreferences: AppPreferences = .init()
 	) {
 		@Dependency(\.uuid) var uuid
 		self.init(
 			id: uuid(),
 			creatingDevice: creatingDevice,
 			factorSources: .init(factorSource),
-			appPreferences: .default,
+			appPreferences: appPreferences,
 			networks: .init()
 		)
 	}
