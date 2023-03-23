@@ -2,6 +2,14 @@ import NonEmpty
 import OrderedCollections
 import SwiftUI
 
+// MARK: - SelectionItem
+public struct SelectionItem<Value> {
+	public let value: Value
+	public var isSelected: Bool
+	public var isDisabled: Bool
+	public var action: () -> Void
+}
+
 // MARK: - SelectionRequirement
 public enum SelectionRequirement: Hashable {
 	case exactly(Int)
@@ -29,12 +37,7 @@ public enum SelectionRequirement: Hashable {
 
 // MARK: - Selection
 public struct Selection<Value: Hashable, Content: View>: View {
-	public struct Item {
-		public let value: Value
-		public var isSelected: Bool
-		public var isDisabled: Bool
-		public var action: () -> Void
-	}
+	public typealias Item = SelectionItem<Value>
 
 	@Binding
 	var selection: [Value]?

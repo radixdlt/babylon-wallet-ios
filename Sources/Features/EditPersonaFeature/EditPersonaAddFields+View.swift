@@ -32,37 +32,15 @@ extension EditPersonaAddFields {
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding([.top, .horizontal], .medium3)
 
-						ScrollView {
-							LazyVStack(spacing: 0) {
-								Selection(
-									viewStore.binding(
-										get: \.selectedFields,
-										send: { .selectedFieldsChanged($0) }
-									),
-									from: viewStore.availableFields,
-									requiring: .atLeast(1)
-								) { item in
-									Button(action: item.action) {
-										HStack(spacing: 0) {
-											Text(item.value.title)
-												.textStyle(.body1HighImportance)
-												.foregroundColor(.app.gray1)
-											Spacer()
-											Image(
-												asset: item.isSelected
-													? AssetResource.checkmarkDarkSelected
-													: AssetResource.checkmarkDarkUnselected
-											)
-											.padding(.trailing, .small3)
-										}
-										.padding(.vertical, .medium3)
-									}
-									.buttonStyle(.inert)
-									.separator(.bottom)
-								}
-							}
-							.padding(.horizontal, .medium3)
-						}
+						SelectionList(
+							viewStore.availableFields,
+							title: \.title,
+							selection: viewStore.binding(
+								get: \.selectedFields,
+								send: { .selectedFieldsChanged($0) }
+							),
+							requiring: .atLeast(1)
+						)
 					}
 					.navigationTitle(Text(L10n.EditPersona.AddAField.title))
 					#if os(iOS)
