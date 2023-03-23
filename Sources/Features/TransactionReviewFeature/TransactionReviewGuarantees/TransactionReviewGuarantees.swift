@@ -1,18 +1,18 @@
 import FeaturePrelude
 
-// MARK: - TransactionReviewPresenting
+// MARK: - TransactionReviewGuarantees
 public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var dApps: IdentifiedArrayOf<TransactionReview.State.Dapp>
+		public var transfers: IdentifiedArrayOf<TransactionReview.Transfer>
 
-		public init(dApps: IdentifiedArrayOf<TransactionReview.State.Dapp>) {
-			self.dApps = dApps
+		public init(transfers: IdentifiedArrayOf<TransactionReview.Transfer>) {
+			self.transfers = transfers
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case infoTapped
-		case dAppTapped(id: TransactionReview.State.Dapp.ID)
+		case dAppTapped(id: TransactionReview.Dapp.ID)
 	}
 
 	public init() {}

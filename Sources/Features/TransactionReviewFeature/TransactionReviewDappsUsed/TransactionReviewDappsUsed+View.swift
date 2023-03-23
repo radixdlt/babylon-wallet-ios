@@ -7,7 +7,7 @@ extension TransactionReviewDappsUsed.State {
 	}
 }
 
-extension TransactionReview.State.Dapp {
+extension TransactionReview.Dapp {
 	fileprivate var knownDapp: TransactionReviewDappsUsed.ViewState.KnownDapp? {
 		guard let metadata else { return nil }
 		return .init(id: id, thumbnail: metadata.thumbnail, name: metadata.name, description: metadata.description)

@@ -51,13 +51,13 @@ extension TransactionReviewAccount.State {
 			return .init(label: account.label.rawValue,
 			             address: account.address.address,
 			             gradient: .init(account.appearanceID),
-			             details: details,
+			             details: transfer,
 			             showApprovedMark: false)
 		case let .external(accountAddress, approved):
 			return .init(label: L10n.TransactionReview.externalAccountName,
 			             address: accountAddress.address,
 			             gradient: .init(colors: [.app.gray2]),
-			             details: details,
+			             details: transfer,
 			             showApprovedMark: approved)
 		}
 	}
@@ -103,21 +103,23 @@ extension TransactionReviewAccount {
 
 // MARK: - TransactionDetailsView
 public struct TransactionDetailsView: View {
-	public typealias ViewState = TransactionReviewAccount.State.Details
+	public typealias ViewState = TransactionReview.Transfer
 
 	public let viewState: ViewState
 
 	public var body: some View {
-		switch viewState.transferred {
+		switch viewState.payload {
 		case .nft:
 			NFTView(name: viewState.metadata?.name,
 			        thumbnail: viewState.metadata?.thumbnail)
 		case let .token(amount, guaranteedAmount, dollarAmount):
-			TransactionReviewTokenView(name: viewState.metadata?.name,
-			                           thumbnail: viewState.metadata?.thumbnail,
-			                           amount: amount,
-			                           guaranteedAmount: guaranteedAmount,
-			                           dollarAmount: dollarAmount)
+			TransactionReviewTokenView(viewState: .init(
+				name: viewState.metadata?.name,
+				thumbnail: viewState.metadata?.thumbnail,
+				amount: amount,
+				guaranteedAmount: guaranteedAmount,
+				dollarAmount: dollarAmount
+			))
 		}
 	}
 
