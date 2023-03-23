@@ -11,9 +11,10 @@ extension GatewayAPIClient: TestDependencyKey {
 		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
 		getAccountDetails: unimplemented("\(Self.self).getAccountDetails"),
 		getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
-		getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
+		getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		transactionStatus: unimplemented("\(Self.self).transactionStatus")
+		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
+		transactionPreview: unimplemented("\(Self.self).transactionPreview")
 	)
 
 	// TODO: convert to noop, don't use in tests.
@@ -40,7 +41,8 @@ extension GatewayAPIClient: TestDependencyKey {
 					knownPayloads: [.init(payloadHashHex: "payload-hash-hex", status: .committedSuccess)],
 					errorMessage: nil
 				)
-			}
+			},
+			transactionPreview: unimplemented("\(Self.self).transactionPreview")
 		)
 	}
 }

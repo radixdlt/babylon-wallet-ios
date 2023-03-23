@@ -18,13 +18,12 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 }
 
 extension GatewayAPIClient {
-	public typealias AccountDetailsResponse = SingleEntityDetailsResponse
-
 	public typealias GetNetworkName = @Sendable (URL) async throws -> Radix.Network.Name
 
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	// MARK: - state/entity
+	public typealias AccountDetailsResponse = SingleEntityDetailsResponse
 
 	public typealias GetEntityDetails = @Sendable (_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse
 
@@ -33,9 +32,11 @@ extension GatewayAPIClient {
 	public typealias GetEntityMetdata = @Sendable (_ address: String) async throws -> GatewayAPI.EntityMetadataCollection
 
 	// MARK: - state/non-fungible
+
 	public typealias GetNonFungibleIds = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.StateNonFungibleIdsResponse
 
 	// MARK: - transaction
+
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 
 	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
