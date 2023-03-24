@@ -8,13 +8,13 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let testValue = Self(
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
-		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
-		accountMetadataByAddress: unimplemented("\(Self.self).accountMetadataByAddress"),
-		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
-		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-		getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
+		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
+		getAccountDetails: unimplemented("\(Self.self).getAccountDetails"),
+		getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
+		getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		transactionStatus: unimplemented("\(Self.self).transactionStatus")
+		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
+		transactionPreview: unimplemented("\(Self.self).transactionPreview")
 	)
 
 	// TODO: convert to noop, don't use in tests.
@@ -27,11 +27,10 @@ extension GatewayAPIClient: TestDependencyKey {
 		.init(
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
-			accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
-			accountMetadataByAddress: unimplemented("\(Self.self).accountMetadataByAddress"),
-			resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
-			resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-			getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
+			getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
+			getAccountDetails: unimplemented("\(Self.self).getAccountDetails"),
+			getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
+			getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
@@ -42,7 +41,8 @@ extension GatewayAPIClient: TestDependencyKey {
 					knownPayloads: [.init(payloadHashHex: "payload-hash-hex", status: .committedSuccess)],
 					errorMessage: nil
 				)
-			}
+			},
+			transactionPreview: unimplemented("\(Self.self).transactionPreview")
 		)
 	}
 }

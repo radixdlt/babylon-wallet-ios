@@ -63,19 +63,17 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 extension GatewayAPIClient {
 	// TODO: should be with(noop) — see GatewayAPIClient+Mock.swift for deets.
 	static let previewValueDappMetadataSuccess = with(previewValue) {
-		$0.accountMetadataByAddress = { @Sendable _ in
+		$0.getEntityMetadata = { @Sendable _ in
 			try await Task.sleep(for: .seconds(2))
-			return GatewayAPI.EntityMetadataResponse(
-				ledgerState: .previewValue,
-				address: "abc",
-				metadata: .init(items: [])
+			return GatewayAPI.EntityMetadataCollection(
+				items: []
 			)
 		}
 	}
 
 	// TODO: should be with(noop) — see GatewayAPIClient+Mock.swift for deets.
 	static let previewValueDappMetadataFailure = with(previewValue) {
-		$0.accountMetadataByAddress = { @Sendable _ in
+		$0.getEntityMetadata = { @Sendable _ in
 			try await Task.sleep(for: .seconds(2))
 			throw NoopError()
 		}

@@ -17,16 +17,17 @@ public typealias TransactionCommittedDetailsRequest = GatewayAPI.TransactionComm
 extension GatewayAPI {
 	public struct TransactionCommittedDetailsRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
-		public private(set) var transactionIdentifier: TransactionCommittedDetailsRequestIdentifier
+		/** Hex-encoded SHA-256 hash. */
+		public private(set) var intentHashHex: String
 
-		public init(atLedgerState: LedgerStateSelector? = nil, transactionIdentifier: TransactionCommittedDetailsRequestIdentifier) {
+		public init(atLedgerState: LedgerStateSelector? = nil, intentHashHex: String) {
 			self.atLedgerState = atLedgerState
-			self.transactionIdentifier = transactionIdentifier
+			self.intentHashHex = intentHashHex
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case atLedgerState = "at_ledger_state"
-			case transactionIdentifier = "transaction_identifier"
+			case intentHashHex = "intent_hash_hex"
 		}
 
 		// Encodable protocol methods
@@ -34,7 +35,7 @@ extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
-			try container.encode(transactionIdentifier, forKey: .transactionIdentifier)
+			try container.encode(intentHashHex, forKey: .intentHashHex)
 		}
 	}
 }

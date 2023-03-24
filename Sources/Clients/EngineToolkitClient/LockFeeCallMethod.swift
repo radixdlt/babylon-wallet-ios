@@ -80,3 +80,103 @@ extension EngineToolkitClient {
 		try knownEntityAddresses(networkID).faucetComponentAddress
 	}
 }
+
+#if DEBUG
+extension EngineToolkitClient {
+	public func manifestForCreateFungibleToken(
+		networkID: NetworkID,
+		accountAddress: AccountAddress,
+		tokenDivisivility: UInt8 = 18,
+		tokenName: String = "Token Test",
+		tokenDescription: String = "A very innovative and important resource.",
+		tokenSymbol: String = "TEST",
+		initialSupply: String = "21000000"
+	) throws -> TransactionManifest {
+		let faucetAddress = try faucetAddress(for: networkID)
+		let instructions: [any InstructionProtocol] = [
+			lockFeeCallMethod(address: faucetAddress),
+
+			CreateFungibleResourceWithInitialSupply(
+				divisibility: tokenDivisivility,
+				metadata: Map_(
+					keyValueKind: .string,
+					valueValueKind: .string,
+					entries: [
+						[.string("name"), .string(tokenName)],
+						[.string("symbol"), .string(tokenSymbol)],
+						[.string("description"), .string(tokenDescription)],
+					]
+				),
+
+				accessRules: .init(
+					keyValueKind: .enum,
+					valueValueKind: .tuple,
+					entries: [
+						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					]
+				),
+				initialSupply: .decimal(.init(value: initialSupply))
+			),
+
+			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			},
+		]
+
+		return .init(instructions: .parsed(instructions.map { $0.embed() }))
+	}
+
+	public func manifestForCreateNonFungibleToken(
+		networkID: NetworkID,
+		accountAddress: AccountAddress,
+		nftName: String = "NFT Test",
+		nftDescription: String = "Artsy cool unique NFT"
+	) throws -> TransactionManifest {
+		let faucetAddress = try faucetAddress(for: networkID)
+		let instructions: [any InstructionProtocol] = [
+			lockFeeCallMethod(address: faucetAddress),
+
+			try CreateNonFungibleResourceWithInitialSupply(
+				idType: .init(.string("NonFungibleIdType::Integer")),
+				schema: [
+					.tuple([
+						.array(.init(elementKind: .enum, elements: [])),
+						.array(.init(elementKind: .tuple, elements: [])),
+						.array(.init(elementKind: .enum, elements: [])),
+					]),
+					.enum(.init(.u8(0), fields: [.u8(64)])),
+					.array(.init(elementKind: .string, elements: [])),
+				],
+				metadata: Map_(
+					keyValueKind: .string,
+					valueValueKind: .string,
+					entries: [
+						[.string("name"), .string(nftName)],
+						[.string("description"), .string(nftDescription)],
+					]
+				),
+				accessRules: .init(
+					keyValueKind: .enum,
+					valueValueKind: .tuple,
+					entries: [
+						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					]
+				),
+				initialSupply: .map(
+					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
+						[.nonFungibleLocalId(.integer(1)), .tuple([.string("Hello World"), .decimal(.init(value: "12"))])],
+					])
+				)
+			),
+
+			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			},
+		]
+
+		return .init(instructions: .parsed(instructions.map { $0.embed() }))
+	}
+}
+#endif // DEBUG

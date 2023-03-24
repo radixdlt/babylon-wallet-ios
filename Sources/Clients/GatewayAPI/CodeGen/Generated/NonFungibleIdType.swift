@@ -16,9 +16,9 @@ public typealias NonFungibleIdType = GatewayAPI.NonFungibleIdType
 // MARK: - GatewayAPI.NonFungibleIdType
 extension GatewayAPI {
 	public enum NonFungibleIdType: String, Codable, CaseIterable {
-		case string
-		case number
-		case bytes
-		case uuid
+		case string = "String"
+		case integer = "Integer"
+		case bytes = "Bytes"
+		case uuid = "Uuid"
 	}
 }

@@ -12,6 +12,8 @@ let epochForWhenLastUsedByAccountAddressKey = "faucet.epochForWhenLastUsedByAcco
 extension FaucetClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 		// Return `nil` for `not allowed to use` else: return `some` for `is alllowed to use`
 		@Sendable func isAllowedToUseFaucetIfSoGetEpochs(accountAddress: AccountAddress) async -> (epochs: EpochForWhenLastUsedByAccountAddress, current: Epoch?)? {
@@ -39,10 +41,18 @@ extension FaucetClient: DependencyKey {
 			await isAllowedToUseFaucetIfSoGetEpochs(accountAddress: accountAddress) != nil
 		}
 
-		let getFreeXRD: GetFreeXRD = { faucetRequest in
+		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
 			@Dependency(\.transactionClient.signAndSubmitTransaction) var signAndSubmitTransaction
-			@Dependency(\.gatewaysClient) var gatewaysClient
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
+
+			let signSubmitTXRequest = SignManifestRequest(
+				manifestToSign: manifest,
+				makeTransactionHeaderInput: .default
+			)
+
+			let _ = try await signAndSubmitTransaction(signSubmitTXRequest).get()
+		}
+
+		let getFreeXRD: GetFreeXRD = { faucetRequest in
 
 			let accountAddress = faucetRequest.recipientAccountAddress
 			guard let epochsAndMaybeCurrent = await isAllowedToUseFaucetIfSoGetEpochs(
@@ -54,17 +64,12 @@ extension FaucetClient: DependencyKey {
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try engineToolkitClient.manifestForFaucet(
-				includeLockFeeInstruction: faucetRequest.addLockFeeInstructionToManifest,
+				includeLockFeeInstruction: true,
 				networkID: networkID,
 				accountAddress: accountAddress
 			)
 
-			let signSubmitTXRequest = SignManifestRequest(
-				manifestToSign: manifest,
-				makeTransactionHeaderInput: faucetRequest.makeTransactionHeaderInput
-			)
-
-			let _ = try await signAndSubmitTransaction(signSubmitTXRequest).get()
+			try await signSubmitTX(manifest: manifest)
 
 			// Try update last used
 			guard let current = epochsAndMaybeCurrent.current else {
@@ -79,10 +84,42 @@ extension FaucetClient: DependencyKey {
 			// Done
 		}
 
+		#if DEBUG
+		let createFungibleToken: CreateFungibleToken = { request in
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+			try await signSubmitTX(
+				manifest: engineToolkitClient.manifestForCreateFungibleToken(
+					networkID: networkID,
+					accountAddress: request.recipientAccountAddress,
+					tokenName: request.name,
+					tokenSymbol: request.symbol
+				)
+			)
+		}
+
+		let createNonFungibleToken: CreateNonFungibleToken = { request in
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+			try await signSubmitTX(
+				manifest: engineToolkitClient.manifestForCreateNonFungibleToken(
+					networkID: networkID,
+					accountAddress: request.recipientAccountAddress,
+					nftName: request.name
+				)
+			)
+		}
+
+		return Self(
+			getFreeXRD: getFreeXRD,
+			isAllowedToUseFaucet: isAllowedToUseFaucet,
+			createFungibleToken: createFungibleToken,
+			createNonFungibleToken: createNonFungibleToken
+		)
+		#else
 		return Self(
 			getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet
 		)
+		#endif // DEBUG
 	}()
 }
 
