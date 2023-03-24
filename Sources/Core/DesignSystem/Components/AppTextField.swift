@@ -129,7 +129,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
 				if let hint {
-					HStack(alignment: .top) {
+					HStack(spacing: .small3) {
 						if hint.isError {
 							Image(asset: AssetResource.error)
 								.foregroundColor(.app.red1)
