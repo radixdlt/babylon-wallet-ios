@@ -11,10 +11,10 @@ public struct TransactionClient: Sendable, DependencyKey {
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
-	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> TransactionManifest
+	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> (manifest: TransactionManifest, feeAdded: BigDecimal)
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
 	public typealias SignAndSubmitTransaction = @Sendable (SignManifestRequest) async -> TransactionResult
-	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> AnalyzeManifestWithPreviewContextResponse
+	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
 }
 
 public typealias TransactionResult = Swift.Result<TXID, TransactionFailure>
@@ -48,17 +48,28 @@ public struct SignManifestRequest: Sendable {
 // MARK: - ManifestReviewRequest
 // Duplicated for now, very similar to SignManifestRequest
 public struct ManifestReviewRequest: Sendable {
+	public let message: String?
 	public let manifestToSign: TransactionManifest
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let selectNotary: SelectNotary
 
 	public init(
+		message: String?,
 		manifestToSign: TransactionManifest,
-		makeTransactionHeaderInput: MakeTransactionHeaderInput,
+		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		selectNotary: @escaping SelectNotary = { $0.first }
 	) {
+		self.message = message
 		self.manifestToSign = manifestToSign
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.selectNotary = selectNotary
 	}
+}
+
+// MARK: - TransactionToReview
+public struct TransactionToReview: Sendable, Hashable {
+	public let analizedManifestToReview: AnalyzeManifestWithPreviewContextResponse
+	public let manifestIncludingLockFee: TransactionManifest
+	public let transactionFeeAdded: BigDecimal
+	public let messageFromDapp: String?
 }

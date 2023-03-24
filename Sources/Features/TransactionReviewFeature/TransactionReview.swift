@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import FeaturePrelude
+import TransactionClient
 
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
@@ -16,6 +17,32 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
+
+		public init(
+			message: String?,
+			withdrawing: TransactionReviewAccounts.State?,
+			dAppsUsed: TransactionReviewDappsUsed.State?,
+			depositing: TransactionReviewAccounts.State?,
+			presenting: TransactionReviewPresenting.State?,
+			networkFee: TransactionReviewNetworkFee.State,
+			customizeGuarantees: TransactionReviewGuarantees.State? = nil
+		) {
+			fatalError()
+		}
+
+		public init(
+			transactionToReview: TransactionToReview
+		) {
+			fatalError("impl below please...")
+			//            self.init(
+			//                message: transactionToReview.messageFromDapp,
+			//                withdrawing: .init(accounts: .init(uncheckedUniqueElements: transactionToReview.analizedManifestToReview.accountDeposits), showCustomizeGuarantees: false),
+			//                dAppsUsed: .init(isExpanded: true, dApps: .init()),
+			//                depositing: .init(accounts: .init(), showCustomizeGuarantees: false),
+			//                presenting: .init(dApps: .init()),
+			//                networkFee: .init(fee: transactionToReview.transactionFeeAdded, isCongested: false)
+			//            )
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
