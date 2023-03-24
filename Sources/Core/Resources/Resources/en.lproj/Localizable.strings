@@ -80,10 +80,10 @@
 "dApp.permission.subtitle.always" = "always";
 "dApp.permission.subtitle.explanation.accounts.first" = " is requesting permission to ";
 "dApp.permission.subtitle.explanation.accounts.second" = " be able to view account information when you login with this Persona.";
-"dApp.permission.subtitle.explanation.personalData.first" = " is requesting permission to ";
-"dApp.permission.subtitle.explanation.personalData.second" = " be able to view the following personal data when you login with this Persona.";
+"dApp.permission.subtitle.explanation.personaData.first" = " is requesting permission to ";
+"dApp.permission.subtitle.explanation.personaData.second" = " be able to view the following personal data when you login with this Persona.";
 "dApp.permission.title.accounts" = "Account Permission";
-"dApp.permission.title.personalData" = "Personal Data Permission";
+"dApp.permission.title.personaData" = "Personal Data Permission";
 "dApp.permission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
 "dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";
 "dApp.request.malformedErrorAlert.okButtonTitle" = "OK";
@@ -143,13 +143,13 @@
 "dAppDetails.forgetDappAlertConfirm" = "Forget";
 "dAppDetails.forgetDappAlertCancel" = "Cancel";
 
-"personaDetails.personaNameHeading" = "Persona Name";
-"personaDetails.personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
+"personaDetails.personaLabelHeading" = "Persona Label";
+"personaDetails.personaDataSharingDescription" = "Here is the personal data that you are sharing with %@";
 "personaDetails.editPersona" = "Edit Persona";
-"personaDetails.firstNameHeading" = "First Name";
-"personaDetails.secondNameHeading" = "Second Name";
-"personaDetails.emailHeading" = "Email";
-"personaDetails.zipCodeHeading" = "Zip Code";
+"personaDetails.givenNameHeading" = "First Name";
+"personaDetails.familyNameHeading" = "Last Name";
+"personaDetails.emailAddressHeading" = "Email Address";
+"personaDetails.phoneNumberHeading" = "Phone Number";
 "personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
 
 "personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
@@ -161,6 +161,18 @@
 "personaDetails.deauthorizePersonaAlertMessage" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
 "personaDetails.deauthorizePersonaAlertConfirm" = "Confirm";
 "personaDetails.deauthorizePersonaAlertCancel" = "Cancel";
+
+"editPersona.inputField.heading.general.requiredByDapp" = "Required by dApp";
+"editPersona.inputField.error.general.requiredByDapp" = "Required field for this dApp";
+"editPersona.inputField.error.personaLabel.blank" = "Label cannot be blank";
+
+"editPersona.button.cancel" = "Cancel";
+"editPersona.button.save" = "Save";
+"editPersona.button.addAField" = "Add a Field";
+
+"editPersona.addAField.title" = "Add a Field";
+"editPersona.addAField.explanation" = "Select from the following fields to add them to this persona.";
+"editPersona.addAField.button.add" = "Add";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";

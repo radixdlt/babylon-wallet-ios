@@ -5,7 +5,7 @@ extension AddNewGateway.State {
 		.init(
 			gatewayURL: inputtedURL,
 			focusedField: focusedField,
-			errorText: errorText,
+			fieldHint: errorText.map(AppTextFieldHint.error),
 			addGatewayButtonState: addGatewayButtonState
 		)
 	}
@@ -17,7 +17,7 @@ extension AddNewGateway {
 		let gatewayURL: String
 		let textFieldPlaceholder: String = L10n.GatewaySettings.AddNewGateway.textFieldPlaceholder
 		let focusedField: State.Field?
-		let errorText: String?
+		let fieldHint: AppTextFieldHint?
 		let addGatewayButtonState: ControlState
 	}
 
@@ -52,13 +52,14 @@ extension AddNewGateway {
 						AppTextField(
 							placeholder: viewStore.textFieldPlaceholder,
 							text: gatewayURLBinding,
-							hint: viewStore.errorText,
-							presentsError: !viewStore.errorText.isNilOrBlank,
-							focusState: $focusedField,
-							equals: .gatewayURL,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
+							hint: viewStore.fieldHint,
+							focus: .on(
+								.gatewayURL,
+								binding: viewStore.binding(
+									get: \.focusedField,
+									send: { .textFieldFocused($0) }
+								),
+								to: $focusedField
 							)
 						)
 						.autocorrectionDisabled()

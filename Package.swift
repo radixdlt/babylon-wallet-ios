@@ -72,6 +72,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "AuthorizedDAppsFeatures",
+		dependencies: [
+			"GatewayAPI",
+			"AuthorizedDappsClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
 			"AccountsClient",
@@ -84,20 +92,13 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AuthorizedDAppsFeatures",
-		dependencies: [
-			"GatewayAPI",
-			"AuthorizedDappsClient",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"AccountsClient",
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
 			"CreateEntityFeature",
+			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
 			"RadixConnectClient",
@@ -106,6 +107,13 @@ package.addModules([
 			"TransactionSigningFeature",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "EditPersonaFeature",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "FungibleTokenDetailsFeature",
@@ -723,6 +731,9 @@ package.addModules([
 			.product(name: "BitCollections", package: "swift-collections"),
 			.product(name: "Collections", package: "swift-collections"),
 
+			.product(name: "CollectionConcurrencyKit", package: "CollectionConcurrencyKit") {
+				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
+			},
 			.product(name: "CustomDump", package: "swift-custom-dump") {
 				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1")
 			},
@@ -731,6 +742,9 @@ package.addModules([
 			},
 			.product(name: "DependenciesAdditions", package: "swift-dependencies-additions") {
 				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "0.2.0")
+			},
+			.product(name: "Either", package: "swift-either") {
+				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
 			},
 			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
 				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0")
@@ -750,11 +764,8 @@ package.addModules([
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
 			},
-			.product(name: "Either", package: "swift-either") {
-				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
-			},
-			.product(name: "CollectionConcurrencyKit", package: "CollectionConcurrencyKit") {
-				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
+			.product(name: "Validated", package: "swift-validated") {
+				.package(url: "https://github.com/pointfreeco/swift-validated", from: "0.2.1")
 			},
 		],
 		tests: .yes(dependencies: [])

@@ -288,11 +288,11 @@ public enum L10n {
             ///  be able to view account information when you login with this Persona.
             public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.accounts.second", fallback: " be able to view account information when you login with this Persona.")
           }
-          public enum PersonalData {
+          public enum PersonaData {
             ///  is requesting permission to 
-            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.first", fallback: " is requesting permission to ")
+            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personaData.first", fallback: " is requesting permission to ")
             ///  be able to view the following personal data when you login with this Persona.
-            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.second", fallback: " be able to view the following personal data when you login with this Persona.")
+            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personaData.second", fallback: " be able to view the following personal data when you login with this Persona.")
           }
         }
       }
@@ -300,7 +300,7 @@ public enum L10n {
         /// Account Permission
         public static let accounts = L10n.tr("Localizable", "dApp.permission.title.accounts", fallback: "Account Permission")
         /// Personal Data Permission
-        public static let personalData = L10n.tr("Localizable", "dApp.permission.title.personalData", fallback: "Personal Data Permission")
+        public static let personaData = L10n.tr("Localizable", "dApp.permission.title.personaData", fallback: "Personal Data Permission")
       }
     }
     public enum Request {
@@ -357,6 +357,44 @@ public enum L10n {
     public static let tokens = L10n.tr("Localizable", "dAppDetails.tokens", fallback: "Associated Tokens")
     /// Website
     public static let website = L10n.tr("Localizable", "dAppDetails.website", fallback: "Website")
+  }
+  public enum EditPersona {
+    public enum AddAField {
+      /// Select from the following fields to add them to this persona.
+      public static let explanation = L10n.tr("Localizable", "editPersona.addAField.explanation", fallback: "Select from the following fields to add them to this persona.")
+      /// Add a Field
+      public static let title = L10n.tr("Localizable", "editPersona.addAField.title", fallback: "Add a Field")
+      public enum Button {
+        /// Add
+        public static let add = L10n.tr("Localizable", "editPersona.addAField.button.add", fallback: "Add")
+      }
+    }
+    public enum Button {
+      /// Add a Field
+      public static let addAField = L10n.tr("Localizable", "editPersona.button.addAField", fallback: "Add a Field")
+      /// Cancel
+      public static let cancel = L10n.tr("Localizable", "editPersona.button.cancel", fallback: "Cancel")
+      /// Save
+      public static let save = L10n.tr("Localizable", "editPersona.button.save", fallback: "Save")
+    }
+    public enum InputField {
+      public enum Error {
+        public enum General {
+          /// Required field for this dApp
+          public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputField.error.general.requiredByDapp", fallback: "Required field for this dApp")
+        }
+        public enum PersonaLabel {
+          /// Label cannot be blank
+          public static let blank = L10n.tr("Localizable", "editPersona.inputField.error.personaLabel.blank", fallback: "Label cannot be blank")
+        }
+      }
+      public enum Heading {
+        public enum General {
+          /// Required by dApp
+          public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputField.heading.general.requiredByDapp", fallback: "Required by dApp")
+        }
+      }
+    }
   }
   public enum FactorSource {
     public enum Device {
@@ -561,24 +599,24 @@ public enum L10n {
     public static let editAccountSharing = L10n.tr("Localizable", "personaDetails.editAccountSharing", fallback: "Edit Account Sharing")
     /// Edit Persona
     public static let editPersona = L10n.tr("Localizable", "personaDetails.editPersona", fallback: "Edit Persona")
-    /// Email
-    public static let emailHeading = L10n.tr("Localizable", "personaDetails.emailHeading", fallback: "Email")
+    /// Email Address
+    public static let emailAddressHeading = L10n.tr("Localizable", "personaDetails.emailAddressHeading", fallback: "Email Address")
+    /// Last Name
+    public static let familyNameHeading = L10n.tr("Localizable", "personaDetails.familyNameHeading", fallback: "Last Name")
     /// First Name
-    public static let firstNameHeading = L10n.tr("Localizable", "personaDetails.firstNameHeading", fallback: "First Name")
+    public static let givenNameHeading = L10n.tr("Localizable", "personaDetails.givenNameHeading", fallback: "First Name")
     /// You are not sharing any personal data with %@
     public static func notSharingAnything(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
     }
     /// Here is the personal data that you are sharing with %@
-    public static func personalDataSharingDescription(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "personaDetails.personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
+    public static func personaDataSharingDescription(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "personaDetails.personaDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
     }
-    /// Persona Name
-    public static let personaNameHeading = L10n.tr("Localizable", "personaDetails.personaNameHeading", fallback: "Persona Name")
-    /// Second Name
-    public static let secondNameHeading = L10n.tr("Localizable", "personaDetails.secondNameHeading", fallback: "Second Name")
-    /// Zip Code
-    public static let zipCodeHeading = L10n.tr("Localizable", "personaDetails.zipCodeHeading", fallback: "Zip Code")
+    /// Persona Label
+    public static let personaLabelHeading = L10n.tr("Localizable", "personaDetails.personaLabelHeading", fallback: "Persona Label")
+    /// Phone Number
+    public static let phoneNumberHeading = L10n.tr("Localizable", "personaDetails.phoneNumberHeading", fallback: "Phone Number")
   }
   public enum PersonaList {
     /// Create new persona

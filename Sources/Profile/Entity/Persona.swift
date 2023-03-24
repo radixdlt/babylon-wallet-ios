@@ -28,10 +28,10 @@ extension Profile.Network {
 		public var securityState: EntitySecurityState
 
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
-		public let displayName: NonEmpty<String>
+		public var displayName: NonEmpty<String>
 
 		/// Fields containing personal information you have inputted.
-		public let fields: IdentifiedArrayOf<Field>
+		public var fields: IdentifiedArrayOf<Field>
 
 		public init(
 			networkID: NetworkID,
@@ -95,21 +95,33 @@ extension Profile.Network.Persona {
 		Identifiable,
 		CustomStringConvertible,
 		CustomDumpReflectable
-
 	{
-		/// A locally generated, globally unique ID for this personal information "field".
+		public enum ID:
+			String,
+			Sendable,
+			Hashable,
+			Codable,
+			CaseIterable,
+			CustomStringConvertible,
+			CustomDumpRepresentable
+		{
+			case givenName
+			case familyName
+			case emailAddress
+			case phoneNumber
+		}
+
+		public typealias Value = NonEmpty<String>
+
+		/// Field identifier, e.g. `emailAddress` or `phoneNumber`.
 		public let id: ID
 
-		/// Content type, e.g. `email` or `zip`
-		public let kind: Kind
-
-		/// The content of this field, a non empty string, e.g. "foo@bar.com" for email
-		/// or "GWC8+3H" as ZIP code
+		/// The content of this field, a non empty string,
+		/// e.g. "foo@bar.com" for email address or "555-5555" as phone number.
 		public let value: Value
 
-		public init(kind: Kind, value: Value) {
-			self.id = ID()
-			self.kind = kind
+		public init(id: ID, value: Value) {
+			self.id = id
 			self.value = value
 		}
 	}
@@ -133,23 +145,21 @@ extension Profile.Network.Persona {
 	}
 }
 
-extension Profile.Network.Persona.Field {
-	public typealias ID = UUID
-	public typealias Value = NonEmpty<String>
-
-	public enum Kind:
-		String,
-		Sendable,
-		Hashable,
-		Codable,
-		CustomStringConvertible,
-		CustomDumpRepresentable
-	{
-		case firstName
-		case lastName
-		case email
-		case personalIdentificationNumber
-		case zipCode
+// MARK: - Profile.Network.Persona.Field.ID + Comparable
+extension Profile.Network.Persona.Field.ID: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		guard
+			let lhsIndex = Self.allCases.firstIndex(of: lhs),
+			let rhsIndex = Self.allCases.firstIndex(of: rhs)
+		else {
+			assertionFailure(
+				"""
+				This code path should never occur, unless you're manually conforming to `CaseIterable` and `allCases` is incomplete.
+				"""
+			)
+			return false
+		}
+		return lhsIndex < rhsIndex
 	}
 }
 
@@ -159,7 +169,6 @@ extension Profile.Network.Persona.Field {
 			self,
 			children: [
 				"id": id,
-				"kind": kind,
 				"value": value,
 			],
 			displayStyle: .struct
@@ -169,11 +178,7 @@ extension Profile.Network.Persona.Field {
 	public var description: String {
 		"""
 		"id": \(id),
-		"kind": \(kind),
 		"value": \(value)
 		"""
 	}
 }
-
-// MARK: - UUID + Sendable
-extension UUID: @unchecked Sendable {}

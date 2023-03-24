@@ -253,6 +253,15 @@
       }
     },
     {
+      "identity" : "swift-validated",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-validated",
+      "state" : {
+        "revision" : "e9685ce68943c9e9d26f9f999c64823dea3ef0e7",
+        "version" : "0.2.1"
+      }
+    },
+    {
       "identity" : "swiftgenplugin",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftGen/SwiftGenPlugin",

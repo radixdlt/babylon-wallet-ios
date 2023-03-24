@@ -429,7 +429,6 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			ForEach(detailedAuthorizedPersona.fields) { field in
 				VStack {
 					Labeled("id", value: field.id.description)
-					Labeled("kind", value: field.kind.rawValue)
 					Labeled("value", value: field.value.rawValue)
 				}
 			}
@@ -592,7 +591,7 @@ extension EntityView {
 				Group {
 					Text("Persona fields")
 					ForEach(persona.fields) { field in
-						Labeled(field.kind.rawValue, value: field.value.rawValue)
+						Labeled(field.id.rawValue, value: field.value.rawValue)
 					}
 				}.padding([.leading], indentation.inOneLevel.leadingPadding)
 			}
