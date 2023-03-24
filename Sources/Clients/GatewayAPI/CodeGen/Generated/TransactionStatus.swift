@@ -16,10 +16,10 @@ public typealias TransactionStatus = GatewayAPI.TransactionStatus
 // MARK: - GatewayAPI.TransactionStatus
 extension GatewayAPI {
 	public enum TransactionStatus: String, Codable, CaseIterable {
-		case unknown
-		case committedSuccess = "committed_success"
-		case committedFailure = "committed_failure"
-		case pending
-		case rejected
+		case unknown = "Unknown"
+		case committedSuccess = "CommittedSuccess"
+		case committedFailure = "CommittedFailure"
+		case pending = "Pending"
+		case rejected = "Rejected"
 	}
 }

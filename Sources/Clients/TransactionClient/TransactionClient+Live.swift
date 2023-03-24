@@ -153,6 +153,24 @@ extension TransactionClient {
 				return .failure(.failedToCompileNotarizedTXIntent)
 			}
 
+			func debugPrintTX() {
+				// RET prints when convertManifest is called, when it is removed, this can be moved down
+				// inline inside `print`.
+				let txIntentString = transactionIntent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
+				print("TXID: \(txID.rawValue)")
+				print("TransactionIntent: \(txIntentString)")
+				print("intentSignatures: \(signedTransactionIntent.intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
+				do {
+					try print("NotarySignature: \(notarySignatureWithPublicKey.signature.serialize().hex)")
+				} catch {}
+				print("Compiled Transaction Intent:\n\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
+				print("Compiled Notarized Intent:\n\n\(compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
+				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
+			}
+
+//			debugPrintTX()
+
 			return .success((txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
 		}
 

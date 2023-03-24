@@ -106,7 +106,11 @@ private extension DappDetails.State {
 
 		let otherMetadata = metadata?.items
 			.filter { !ignoredKeys.contains($0.key) }
-			.map { DappDetails.ViewState.MetadataItem(key: $0.key, value: $0.value) } ?? []
+			.compactMap { item in
+				item.value.asString.map {
+					DappDetails.ViewState.MetadataItem(key: item.key, value: $0)
+				}
+			} ?? []
 
 		return .init(
 			title: dApp.displayName.rawValue,
