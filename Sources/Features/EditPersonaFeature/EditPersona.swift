@@ -14,7 +14,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
 			case edit
-			case dapp(requiredFieldIDs: [DynamicFieldID])
+			case dapp(requiredFieldIDs: Set<DynamicFieldID>)
 		}
 
 		public enum StaticFieldID: Sendable, Hashable, Comparable {

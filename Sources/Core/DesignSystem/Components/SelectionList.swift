@@ -2,22 +2,22 @@ import Resources
 import SwiftUI
 
 // MARK: - SelectionList
-public struct SelectionList<Data: Sequence>: View where Data.Element: Hashable {
-	public typealias Element = Data.Element
+public struct SelectionList<Choices: Sequence>: View where Choices.Element: Hashable {
+	public typealias Element = Choices.Element
 
-	let data: Data
+	let choices: Choices
 	let title: (Element) -> String
 	@Binding
 	var selection: [Element]?
 	let requirement: SelectionRequirement
 
 	public init(
-		_ data: Data,
+		_ choices: Choices,
 		title: @escaping (Element) -> String,
 		selection: Binding<[Element]?>,
 		requiring requirement: SelectionRequirement
 	) {
-		self.data = data
+		self.choices = choices
 		self.title = title
 		self._selection = selection
 		self.requirement = requirement
@@ -26,7 +26,7 @@ public struct SelectionList<Data: Sequence>: View where Data.Element: Hashable {
 	public var body: some View {
 		ScrollView {
 			LazyVStack(spacing: 0) {
-				Selection($selection, from: data, requiring: requirement) { item in
+				Selection($selection, from: choices, requiring: requirement) { item in
 					Button(action: item.action) {
 						HStack(spacing: 0) {
 							Text(title(item.value))

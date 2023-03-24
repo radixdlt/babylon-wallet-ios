@@ -53,7 +53,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		text: Binding<String>,
 		hint: Hint? = nil,
 		focus: Focus,
-		@ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }
+		@ViewBuilder accessory: () -> Accessory = { EmptyView() }
 	) {
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
@@ -70,7 +70,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		placeholder: String,
 		text: Binding<String>,
 		hint: Hint? = nil,
-		@ViewBuilder accessory: @escaping () -> Accessory = { EmptyView() }
+		@ViewBuilder accessory: () -> Accessory = { EmptyView() }
 	) where FocusValue == Never {
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
