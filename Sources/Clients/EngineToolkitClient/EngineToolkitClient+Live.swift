@@ -73,6 +73,9 @@ extension EngineToolkitClient {
 			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
+			},
+			generateTransactionReview: { manifestWithPreviewContext in
+				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
 			}
 		)
 	}()

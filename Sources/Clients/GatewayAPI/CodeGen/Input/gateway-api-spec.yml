@@ -1253,6 +1253,7 @@ components:
               type: boolean
             permit_invalid_header_epoch:
               type: boolean
+
     TransactionPreviewResponse:
       type: object
       required:
@@ -1261,7 +1262,7 @@ components:
         - logs
       properties:
         receipt:
-          type: object
+          $ref: "#/components/schemas/TransactionReceipt"
         resource_changes:
           type: array
           items:
@@ -1279,6 +1280,42 @@ components:
               message:
                 type: string
 
+    TransactionReceiptStatus:
+      type: string
+      enum:
+        - Succeeded
+        - Failed
+        - Rejected
+      description: The status of the transaction
+    TransactionReceipt:
+      type: object
+      description: The transaction execution receipt
+      required:
+        - status
+      properties:
+        status:
+          $ref: "#/components/schemas/TransactionReceiptStatus"
+        output:
+          type: array
+          description: The manifest line-by-line engine return data (only present if `status` is `Succeeded`)
+          items:
+            $ref: "#/components/schemas/SborData"
+        error_message:
+          type: string
+          description: Error message (only present if status is `Failed` or `Rejected`)
+
+    SborData:
+      type: object
+      required:
+        - data_hex
+        - data_json
+      properties:
+        data_hex:
+          type: string
+          description: The hex-encoded, raw SBOR-encoded data
+        data_json:
+          description: An untyped JSON body representing the content of the SBOR data
+          
     TransactionSubmitRequest:
       type: object
       required:
