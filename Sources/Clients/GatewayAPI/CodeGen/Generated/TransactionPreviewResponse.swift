@@ -16,11 +16,11 @@ public typealias TransactionPreviewResponse = GatewayAPI.TransactionPreviewRespo
 // MARK: - GatewayAPI.TransactionPreviewResponse
 extension GatewayAPI {
 	public struct TransactionPreviewResponse: Codable, Hashable {
-		public private(set) var receipt: AnyCodable
+		public private(set) var receipt: TransactionReceipt
 		public private(set) var resourceChanges: [AnyCodable]
 		public private(set) var logs: [TransactionPreviewResponseLogsInner]
 
-		public init(receipt: AnyCodable, resourceChanges: [AnyCodable], logs: [TransactionPreviewResponseLogsInner]) {
+		public init(receipt: TransactionReceipt, resourceChanges: [AnyCodable], logs: [TransactionPreviewResponseLogsInner]) {
 			self.receipt = receipt
 			self.resourceChanges = resourceChanges
 			self.logs = logs
