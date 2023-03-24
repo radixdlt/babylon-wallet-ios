@@ -505,7 +505,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						@Dependency(\.date) var now
 						let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple = {
 							if var authorizedPersona = state.authorizedPersona {
-								// NB: update personal data fields here
+								// TODO: update personal data fields here
 								authorizedPersona.lastLogin = now()
 								if let sharedAccounts = sharedAccounts {
 									authorizedPersona.sharedAccounts = sharedAccounts
@@ -514,7 +514,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							} else {
 								return .init(
 									identityAddress: persona.address,
-									fieldIDs: [], // NB: set personal data fields here
+									fieldIDs: [], // TODO: set personal data fields here
 									lastLogin: now(),
 									sharedAccounts: sharedAccounts
 								)
