@@ -536,7 +536,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						} else {
 							sharedAccounts = nil
 						}
-						let fieldIDs: Set<Profile.Network.Persona.Field.ID>? = {
+						let sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>? = {
 							switch state.remoteInteraction.items {
 							case let .request(.authorized(items)):
 								return items.ongoingPersonaData?.fields
@@ -551,14 +551,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 								if let sharedAccounts {
 									authorizedPersona.sharedAccounts = sharedAccounts
 								}
-								if let fieldIDs {
-									authorizedPersona.fieldIDs = fieldIDs
+								if let sharedFieldIDs {
+									authorizedPersona.fieldIDs = sharedFieldIDs
 								}
 								return authorizedPersona
 							} else {
 								return .init(
 									identityAddress: persona.address,
-									fieldIDs: fieldIDs,
+									fieldIDs: sharedFieldIDs,
 									lastLogin: now(),
 									sharedAccounts: sharedAccounts
 								)
