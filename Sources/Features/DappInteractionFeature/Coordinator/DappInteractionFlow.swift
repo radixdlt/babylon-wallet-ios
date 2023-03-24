@@ -137,7 +137,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			struct PersonaDataPayload: Sendable, Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
-				var personaData: IdentifiedArrayOf<Profile.Network.Persona.Field>
+				var fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 			}
 
 			var accountsPayload: AccountsPayload?
@@ -444,7 +444,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						if sharedFields.count == sharedFieldIDs.count {
 							payload.personaDataPayload = .init(
 								requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
-								personaData: sharedFields
+								fields: sharedFields
 							)
 						}
 					}
