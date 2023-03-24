@@ -8,7 +8,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public var withdrawing: TransactionReviewAccounts.State?
 		public var dAppsUsed: TransactionReviewDappsUsed.State?
-		public var depositing: TransactionReviewAccounts.State?
+		public var depositing: TransactionReviewAccounts.State
 
 		public var presenting: TransactionReviewPresenting.State?
 
@@ -42,14 +42,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		Scope(state: \.networkFee, action: /Action.child .. ChildAction.networkFee) {
 			TransactionReviewNetworkFee()
 		}
+		Scope(state: \.depositing, action: /Action.child .. ChildAction.depositing) {
+			TransactionReviewAccounts()
+		}
 		Reduce(core)
 			.ifLet(\.dAppsUsed, action: /Action.child .. ChildAction.dAppsUsed) {
 				TransactionReviewDappsUsed()
 			}
 			.ifLet(\.withdrawing, action: /Action.child .. ChildAction.withdrawing) {
-				TransactionReviewAccounts()
-			}
-			.ifLet(\.depositing, action: /Action.child .. ChildAction.depositing) {
 				TransactionReviewAccounts()
 			}
 			.ifLet(\.$customizeGuarantees, action: /Action.child .. ChildAction.customizeGuarantees) {
@@ -77,10 +77,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
-
-//			let dApps =
-
-			state.customizeGuarantees = .init(transfers: [])
+			var accounts = state.depositing.accounts
+			for account in accounts {
+				let fungibleTransfers = account.transfers.filter { $0.metadata.type == .fungible }
+				accounts[id: account.id] = .init(account: account.account, transfers: fungibleTransfers)
+			}
+			state.customizeGuarantees = .init(transferAccounts: accounts)
 			return .none
 
 		case .depositing:
@@ -90,6 +92,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .presenting:
 			return .none
 		case .networkFee:
+			return .none
+//		case .customizeGuarantees(.presented(.delegate(.dismiss))):
+//
+//			return .none
+
+		case .customizeGuarantees(.presented(.delegate(.dismiss))):
+			state.customizeGuarantees = nil
 			return .none
 		case .customizeGuarantees:
 			return .none
@@ -122,6 +131,11 @@ extension TransactionReview {
 		}
 	}
 
+	public enum ResourceType: Sendable, Hashable {
+		case fungible
+		case nonFungible
+	}
+
 	public enum Account: Sendable, Hashable {
 		case user(Profile.Network.AccountForDisplay)
 		case external(AccountAddress, approved: Bool)
@@ -137,28 +151,39 @@ extension TransactionReview {
 	}
 
 	public struct Transfer: Sendable, Identifiable, Hashable {
-		public var id: Payload { payload } // TODO: Find actual ID
-		public let metadata: Metadata?
-		public let payload: Payload
+		public var id: AccountAction { action }
 
-		public init(metadata: Metadata?, transferred: Payload) {
+		public let action: AccountAction
+		public var metadata: ResourceMetadata
+
+		public init(
+			action: AccountAction,
+			metadata: ResourceMetadata
+		) {
+			self.action = action
 			self.metadata = metadata
-			self.payload = transferred
 		}
+	}
 
-		public struct Metadata: Sendable, Hashable {
-			public let name: String
-			public let thumbnail: URL
+	public struct ResourceMetadata: Sendable, Hashable {
+		public let name: String?
+		public let thumbnail: URL?
+		public var type: ResourceType?
+		public var guaranteedAmount: BigDecimal?
+		public var dollarAmount: BigDecimal?
 
-			public init(name: String, thumbnail: URL) {
-				self.name = name
-				self.thumbnail = thumbnail
-			}
-		}
-
-		public enum Payload: Sendable, Hashable {
-			case nft
-			case token(BigDecimal, guaranteed: BigDecimal?, dollars: BigDecimal?)
+		public init(
+			name: String?,
+			thumbnail: URL?,
+			type: ResourceType? = nil,
+			guaranteedAmount: BigDecimal? = nil,
+			dollarAmount: BigDecimal? = nil
+		) {
+			self.name = name
+			self.thumbnail = thumbnail
+			self.type = type
+			self.guaranteedAmount = guaranteedAmount
+			self.dollarAmount = dollarAmount
 		}
 	}
 }
@@ -192,15 +217,15 @@ extension TransactionReview.Dapp {
 }
 
 extension TransactionReviewAccount.State {
-	public static let mockWithdraw0 = Self(account: .mockUser0, transfer: [.mock0, .mock1])
+	public static let mockWithdraw0 = Self(account: .mockUser0, transfers: [.mock0, .mock1])
 
-	public static let mockWithdraw1 = Self(account: .mockUser1, transfer: [.mock1, .mock3, .mock4])
+	public static let mockWithdraw1 = Self(account: .mockUser1, transfers: [.mock1, .mock3, .mock4])
 
-	public static let mockWithdraw2 = Self(account: .mockUser0, transfer: [.mock1, .mock3])
+	public static let mockWithdraw2 = Self(account: .mockUser0, transfers: [.mock1, .mock3])
 
-	public static let mockDeposit1 = Self(account: .mockExternal0, transfer: [.mock1, .mock3, .mock4])
+	public static let mockDeposit1 = Self(account: .mockExternal0, transfers: [.mock1, .mock3, .mock4])
 
-	public static let mockDeposit2 = Self(account: .mockExternal1, transfer: [.mock1, .mock3])
+	public static let mockDeposit2 = Self(account: .mockExternal1, transfers: [.mock1, .mock3])
 }
 
 extension TransactionReview.Account {
@@ -222,25 +247,72 @@ extension AccountAddress {
 	public static let mock2 = try! Self(address: "account_tdx_b_1pzq8y440g6nc4vuz0ghu84e84ak088fah9u6ad6j9dlqnuzk59")
 }
 
+extension ComponentAddress {
+	public static let mock0 = Self(address: "account_tdx_b_k591p8y440g69dlqnuzghu84e84ak088fah9u6ay440g6pzq8y4")
+	public static let mock1 = Self(address: "account_tdx_b_e84ak088fah9u6ad6j9dlqnuz84e84ak088fau6ad6j9dlqnuzk")
+	public static let mock2 = Self(address: "account_tdx_b_1pzq8y440g6nc4vuz0ghu84e84ak088fah9u6ad6j9dlqnuzk59")
+}
+
+extension ResourceAddress {
+	public static let mock0 = Self(address: "resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp")
+	public static let mock1 = Self(address: "resource_tdx_b_1qre9sv98scqut4k9g3j6kxuvscczv0lzumefwgwhuf6qdu4c3r")
+}
+
 extension URL {
 	static let mock = URL(string: "test")!
 }
 
 extension TransactionReview.Transfer {
-	public static let mock0 = Self(metadata: .init(name: "TSLA", thumbnail: .mock),
-	                               transferred: .token(1.0396, guaranteed: 1.0188, dollars: 301.91))
+	public static let mock0 = Self(action: .mock0,
+	                               metadata: .init(name: "TSLA",
+	                                               thumbnail: .mock,
+	                                               type: .fungible,
+	                                               guaranteedAmount: 1.0188,
+	                                               dollarAmount: 301.91))
 
-	public static let mock1 = Self(metadata: .init(name: "XRD", thumbnail: .mock),
-	                               transferred: .token(500, guaranteed: nil, dollars: 301.91))
+	public static let mock1 = Self(action: .mock1,
+	                               metadata: .init(name: "XRD",
+	                                               thumbnail: .mock,
+	                                               type: .fungible,
+	                                               dollarAmount: 301.91))
 
-	public static let mock2 = Self(metadata: .init(name: "PXL", thumbnail: .mock),
-	                               transferred: .token(5.123, guaranteed: 5.10, dollars: nil))
+	public static let mock2 = Self(action: .mock2,
+	                               metadata: .init(name: "PXL",
+	                                               thumbnail: .mock,
+	                                               type: .fungible,
+	                                               guaranteedAmount: 5.10))
 
-	public static let mock3 = Self(metadata: .init(name: "PXL", thumbnail: .mock),
-	                               transferred: .token(5.123, guaranteed: nil, dollars: nil))
+	public static let mock3 = Self(action: .mock3,
+	                               metadata: .init(name: "PXL",
+	                                               thumbnail: .mock,
+	                                               type: .fungible))
 
-	public static let mock4 = Self(metadata: .init(name: "Block 14F5", thumbnail: .mock),
-	                               transferred: .nft)
+	public static let mock4 = Self(action: .mock4,
+	                               metadata: .init(name: "Block 14F5",
+	                                               thumbnail: .mock,
+	                                               type: .nonFungible))
+}
+
+extension AccountAction {
+	public static let mock0 = Self(componentAddress: .mock0,
+	                               resourceAddress: .mock0,
+	                               amount: 1.0396)
+
+	public static let mock1 = Self(componentAddress: .mock1,
+	                               resourceAddress: .mock1,
+	                               amount: 500)
+
+	public static let mock2 = Self(componentAddress: .mock0,
+	                               resourceAddress: .mock1,
+	                               amount: 5.123)
+
+	public static let mock3 = Self(componentAddress: .mock1,
+	                               resourceAddress: .mock0,
+	                               amount: 500)
+
+	public static let mock4 = Self(componentAddress: .mock0,
+	                               resourceAddress: .mock0,
+	                               amount: 1)
 }
 
 public func decodeActions() {
@@ -249,7 +321,7 @@ public func decodeActions() {
 		return
 	}
 
-	print("Data: \(String(data: data, encoding: .utf8))")
+	print("Data: \(String(data: data, encoding: .utf8) ?? "nil")")
 
 	let decoder = JSONDecoder()
 
