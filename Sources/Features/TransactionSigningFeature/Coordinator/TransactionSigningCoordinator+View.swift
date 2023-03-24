@@ -1,68 +1,67 @@
 import FeaturePrelude
+import TransactionReviewFeature
+
+extension TransactionSigningCoordinator.State {
+	fileprivate var viewState: TransactionSigningCoordinator.ViewState {
+		fatalError()
+	}
+}
 
 // MARK: - TransactionSigning.View
-extension TransactionSigning {
+extension TransactionSigningCoordinator {
 	public struct ViewState: Equatable {
-		let manifest: String?
 		let isShowingLoader: Bool
-		let signButtonEnabled: Bool // TODO: ControlState instead
-		let viewControlState: ControlState
 
-		init(state: TransactionSigning.State) {
-			manifest = state.transactionWithLockFeeString
-			isShowingLoader = state.isSigningTX
-			signButtonEnabled = !state.isSigningTX
-			viewControlState = {
-				if state.transactionWithLockFeeString == nil {
-					return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
-				} else if state.isSigningTX {
-					return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
-				} else {
-					return .enabled
-				}
-			}()
+		init(state: TransactionSigningCoordinator.State) {
+//			manifest = state.transactionWithLockFeeString
+//			isShowingLoader = state.isSigningTX
+//			signButtonEnabled = !state.isSigningTX
+//			viewControlState = {
+//				if state.transactionWithLockFeeString == nil {
+//					return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+//				} else if state.isSigningTX {
+//					return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+//				} else {
+//					return .enabled
+//				}
+//			}()
+			fatalError()
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<TransactionSigning>
+		private let store: StoreOf<TransactionSigningCoordinator>
 
-		public init(store: StoreOf<TransactionSigning>) {
+		public init(store: StoreOf<TransactionSigningCoordinator>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: TransactionSigning.ViewState.init,
-				send: { .view($0) }
-			) { viewStore in
-				ForceFullScreen {
-					ScrollView(showsIndicators: false) {
-						if let manifest = viewStore.manifest {
-							Text(manifest)
-								.font(.system(size: 13, design: .monospaced))
-								.frame(
-									maxWidth: .infinity,
-									maxHeight: .infinity,
-									alignment: .topLeading
-								)
-								.padding()
-								.multilineTextAlignment(.leading)
-								.background(Color(white: 0.9))
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				NavigationStack {
+					SwitchStore(store.scope(state: \.step)) {
+						CaseLet(
+							state: /TransactionSigningCoordinator.State.Step.prepare,
+							action: { TransactionSigningCoordinator.Action.child(.prepare($0)) },
+							then: { TransactionSigningPrepare.View(store: $0) }
+						)
+						CaseLet(
+							state: /TransactionSigningCoordinator.State.Step.review,
+							action: { TransactionSigningCoordinator.Action.child(.review($0)) },
+							then: { TransactionReview.View(store: $0) }
+						)
+					}
+					#if os(iOS)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.view(.closeButtonTapped))
+							}
 						}
 					}
+					#endif
 				}
-				.safeAreaInset(edge: .bottom, spacing: .zero) {
-					ConfirmationFooter(
-						title: L10n.TransactionSigning.signTransactionButtonTitle,
-						isEnabled: viewStore.signButtonEnabled,
-						action: { viewStore.send(.signTransactionButtonTapped) }
-					)
-				}
-				.controlState(viewStore.viewControlState)
-				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}
@@ -71,18 +70,18 @@ extension TransactionSigning {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-struct TransactionSigning_Preview: PreviewProvider {
-	static var previews: some View {
-		TransactionSigning.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: TransactionSigning()
-					.dependency(\.gatewaysClient.getCurrentGateway) { .nebunet }
-					.dependency(\.transactionClient.addLockFeeInstructionToManifest) { _ in .previewValue }
-			)
-		)
-	}
-}
+// struct TransactionSigning_Preview: PreviewProvider {
+//	static var previews: some View {
+//		TransactionSigning.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: TransactionSigning()
+//					.dependency(\.gatewaysClient.getCurrentGateway) { .nebunet }
+//					.dependency(\.transactionClient.addLockFeeInstructionToManifest) { _ in .previewValue }
+//			)
+//		)
+//	}
+// }
 
 extension TransactionManifest {
 	public static var previewValue: Self {
@@ -129,7 +128,7 @@ extension TransactionManifest {
 	}
 }
 
-extension TransactionSigning.State {
-	public static let previewValue = Self(transactionManifestWithoutLockFee: .previewValue)
-}
+// extension TransactionSigningCoordinate.State {
+//	public static let previewValue = Self(transactionManifestWithoutLockFee: .previewValue)
+// }
 #endif

@@ -56,17 +56,17 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
-		public enum State: Hashable {
-			case transactionSigning(TransactionSigning.State)
+		public enum State: Sendable, Hashable {
+			case transactionSigning(TransactionSigningCoordinator.State)
 		}
 
-		public enum Action: Equatable {
-			case transactionSigning(TransactionSigning.Action)
+		public enum Action: Sendable, Equatable {
+			case transactionSigning(TransactionSigningCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocol<State, Action> {
 			Scope(state: /State.transactionSigning, action: /Action.transactionSigning) {
-				TransactionSigning()
+				TransactionSigningCoordinator()
 			}
 		}
 	}

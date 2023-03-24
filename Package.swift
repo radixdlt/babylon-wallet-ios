@@ -53,7 +53,6 @@ package.addModules([
 			"MainFeature",
 			"OnboardingFeature",
 			"SplashFeature",
-			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
@@ -249,6 +248,7 @@ package.addModules([
 			"GatewayAPI",
 			"GatewaysClient",
 			"TransactionClient",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),

@@ -146,14 +146,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case login(Login.State)
 			case permission(Permission.State)
 			case chooseAccounts(ChooseAccounts.State)
-			case signAndSubmitTransaction(TransactionSigning.State)
+			case signAndSubmitTransaction(TransactionSigningCoordinator.State)
 		}
 
 		enum MainAction: Sendable, Equatable {
 			case login(Login.Action)
 			case permission(Permission.Action)
 			case chooseAccounts(ChooseAccounts.Action)
-			case signAndSubmitTransaction(TransactionSigning.Action)
+			case signAndSubmitTransaction(TransactionSigningCoordinator.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
@@ -168,7 +168,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					ChooseAccounts()
 				}
 				Scope(state: /MainState.signAndSubmitTransaction, action: /MainAction.signAndSubmitTransaction) {
-					TransactionSigning()
+					TransactionSigningCoordinator()
 				}
 			}
 		}
@@ -609,7 +609,7 @@ extension DappInteractionFlow.Destinations.State {
 			)))
 		case let .remote(.send(item)):
 			self = .relayed(anyItem, with: .signAndSubmitTransaction(.init(
-				transactionManifestWithoutLockFee: item.transactionManifest
+				rawTransactionManifest: item.transactionManifest
 			)))
 		}
 	}

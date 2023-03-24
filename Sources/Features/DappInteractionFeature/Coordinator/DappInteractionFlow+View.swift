@@ -77,7 +77,7 @@ extension DappInteractionFlow {
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.signAndSubmitTransaction,
 					action: DappInteractionFlow.Destinations.MainAction.signAndSubmitTransaction,
-					then: { TransactionSigning.View(store: $0) }
+					then: { TransactionSigningCoordinator.View(store: $0) }
 				)
 			}
 		}
