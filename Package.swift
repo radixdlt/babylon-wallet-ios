@@ -532,7 +532,7 @@ package.addModules([
 			"Resources",
 			"SharedModels",
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.core(
 		name: "ClientPrelude",
