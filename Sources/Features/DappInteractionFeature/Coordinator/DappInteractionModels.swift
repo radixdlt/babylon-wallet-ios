@@ -73,9 +73,9 @@ extension P2P.FromDapp.WalletInteraction {
 		case let .request(.authorized(items)):
 			return [
 				.auth(items.auth),
-				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
 				items.ongoingAccounts.map(AnyInteractionItem.ongoingAccounts),
 				items.ongoingPersonaData.map(AnyInteractionItem.ongoingPersonaData),
+				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
 			]
 			.compactMap { $0 }
 		case let .request(.unauthorized(items)):

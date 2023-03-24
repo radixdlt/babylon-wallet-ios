@@ -398,7 +398,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			authorizedPersona.sharedAccounts = nil
 		}
 		if resetItem.personaData {
-			authorizedPersona.fieldIDs = [] // TODO: check if this is correct as part of https://radixdlt.atlassian.net/browse/ABW-1123
+			authorizedPersona.sharedFieldIDs = nil
 		}
 		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
 		state.authorizedDapp = authorizedDapp
@@ -435,7 +435,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			if
 				let ongoingPersonaDataRequestItem = state.ongoingPersonaDataRequestItem,
 				let authorizedPersonaID = state.authorizedPersona?.id,
-				let sharedFieldIDs = state.authorizedPersona?.fieldIDs
+				let sharedFieldIDs = state.authorizedPersona?.sharedFieldIDs
 			{
 				if ongoingPersonaDataRequestItem.fields.isSubset(of: sharedFieldIDs) {
 					let allPersonas = try await personasClient.getPersonas()
@@ -552,15 +552,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 									authorizedPersona.sharedAccounts = sharedAccounts
 								}
 								if let sharedFieldIDs {
-									authorizedPersona.fieldIDs = sharedFieldIDs
+									authorizedPersona.sharedFieldIDs = sharedFieldIDs
 								}
 								return authorizedPersona
 							} else {
 								return .init(
 									identityAddress: persona.address,
-									fieldIDs: sharedFieldIDs,
 									lastLogin: now(),
-									sharedAccounts: sharedAccounts
+									sharedAccounts: sharedAccounts,
+									sharedFieldIDs: sharedFieldIDs
 								)
 							}
 						}()

@@ -426,7 +426,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
 
 			Text("Shared Fields")
-			if let sharedFields = detailedAuthorizedPersona.fields {
+			if let sharedFields = detailedAuthorizedPersona.sharedFields {
 				ForEach(sharedFields) { field in
 					VStack {
 						Labeled("id", value: field.id.description)
