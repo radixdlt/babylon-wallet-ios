@@ -265,6 +265,106 @@ extension TransactionClient {
 				}
 		}
 
+		// TODO: Should the request manifest have lockFee?
+		@Sendable
+		func getTransactionPreview(_ request: ManifestReviewRequest) async throws -> AnalyzeManifestWithPreviewContextResponse {
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+
+			let transactionPreviewRequest = try await createTransactionPreviewRequest(
+				for: request,
+				networkID: networkID
+			).get()
+			let response = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
+			guard let rawReceipt = response.receipt.output else {
+				throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
+			}
+
+			let receiptBytes = try rawReceipt.flatMap { try [UInt8](hex: $0.dataHex) }
+
+			let generateTransactionReviewRequest = AnalyzeManifestWithPreviewContextRequest(
+				networkId: networkID,
+				manifest: request.manifestToSign,
+				transactionReceipt: receiptBytes
+			)
+			return try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
+		}
+
+		@Sendable
+		func createTransactionPreviewRequest(
+			for request: ManifestReviewRequest,
+			networkID: NetworkID
+		) async -> Result<GatewayAPI.TransactionPreviewRequest, TransactionFailure.FailedToPrepareForTXSigning> {
+			let manifestString: String = {
+				if case let .string(str) = request.manifestToSign.instructions {
+					return str
+				}
+				return nil
+			}()!
+
+			// TODO: Duplicated code from buildTransactionIntent
+
+			let nonce = engineToolkitClient.generateTXNonce()
+			let epoch: Epoch
+			do {
+				epoch = try await gatewayAPIClient.getEpoch()
+			} catch {
+				return .failure(.failedToGetEpoch)
+			}
+
+			let version = engineToolkitClient.getTransactionVersion()
+
+			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
+				version: version,
+				manifest: request.manifestToSign,
+				networkID: networkID
+			)
+
+			let notaryAndSigners: NotaryAndSigners
+			do {
+				notaryAndSigners = try await getNotaryAndSigners(accountAddressesNeedingToSignTransactionRequest, selectNotary: request.selectNotary)
+			} catch {
+				return .failure(.failedToLoadNotaryAndSigners)
+			}
+			let notaryPublicKey: Engine.PublicKey
+			do {
+				let notarySigner = notaryAndSigners.notarySigner
+				switch notarySigner.securityState {
+				case let .unsecured(unsecuredControl):
+					notaryPublicKey = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
+				}
+			} catch {
+				return .failure(.failedToLoadNotaryPublicKey)
+			}
+
+			let publicKey: GatewayAPI.PublicKey = {
+				switch notaryPublicKey {
+				case let .ecdsaSecp256k1(key):
+					return .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex()))
+				case let .eddsaEd25519(key):
+					return .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex()))
+				}
+			}()
+
+			let header = request.makeTransactionHeaderInput
+			// TODO: What are the proper flags to set?
+			let flags = GatewayAPI.TransactionPreviewRequestFlags(
+				unlimitedLoan: false,
+				assumeAllSignatureProofs: false,
+				permitDuplicateIntentHash: false,
+				permitInvalidHeaderEpoch: false
+			)
+			return .success(
+				.init(manifest: manifestString,
+				      startEpochInclusive: Int64(epoch.rawValue),
+				      endEpochExclusive: Int64((epoch + header.epochWindow).rawValue),
+				      costUnitLimit: Int64(header.costUnitLimit),
+				      tipPercentage: Int(header.tipPercentage),
+				      nonce: String(nonce.rawValue),
+				      signerPublicKeys: [publicKey],
+				      flags: flags)
+			)
+		}
+
 		@Sendable
 		func buildTransactionIntent(
 			networkID: NetworkID,
@@ -341,6 +441,32 @@ extension TransactionClient {
 			}.asyncFlatMap { intent, notaryAndSigners in
 				await signAndSubmit(transactionIntent: intent, notaryAndSigners: notaryAndSigners)
 			}
+		}
+
+		func getNotaryAndSigners(_ accountAddressesNeedingToSignTransactionRequest: AccountAddressesInvolvedInTransactionRequest, selectNotary: SelectNotary) async throws -> NotaryAndSigners {
+			// Might be empty
+			let addressesNeededToSign = try OrderedSet(
+				engineToolkitClient
+					.accountAddressesNeedingToSignTransaction(
+						accountAddressesNeedingToSignTransactionRequest
+					)
+			)
+
+			let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>> = try await {
+				let accounts = try await addressesNeededToSign.asyncMap {
+					try await accountsClient.getAccountByAddress($0)
+				}
+				guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
+					// TransactionManifest does not reference any accounts => use any account!
+					let first = try await accountsClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
+					return NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [first]))!
+				}
+				return accounts
+			}()
+
+			let notary = await selectNotary(accountsNeededToSign)
+
+			return .init(notarySigner: notary, accountsNeededToSign: accountsNeededToSign)
 		}
 
 		let signAndSubmitTransaction: SignAndSubmitTransaction = { @Sendable request in
@@ -453,7 +579,8 @@ extension TransactionClient {
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)
 				return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
 			},
-			signAndSubmitTransaction: signAndSubmitTransaction
+			signAndSubmitTransaction: signAndSubmitTransaction,
+			getTransactionReview: getTransactionPreview
 		)
 	}
 }

@@ -18,7 +18,8 @@ extension EngineToolkitClient: TestDependencyKey {
 		generateTXID: { _ in "deadbeef" },
 		accountAddressesNeedingToSignTransaction: { _ in [] },
 		accountAddressesSuitableToPayTransactionFee: { _ in [] },
-		knownEntityAddresses: { _ in throw NoopError() }
+		knownEntityAddresses: { _ in throw NoopError() },
+		generateTransactionReview: unimplemented("\(Self.self).generateTransactionReview")
 	)
 
 	public static let testValue = Self(
@@ -31,6 +32,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		generateTXID: unimplemented("\(Self.self).generateTXID"),
 		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction"),
 		accountAddressesSuitableToPayTransactionFee: unimplemented("\(Self.self).accountAddressesSuitableToPayTransactionFee"),
-		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses")
+		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses"),
+		generateTransactionReview: unimplemented("\(Self.self).generateTransactionReview")
 	)
 }
