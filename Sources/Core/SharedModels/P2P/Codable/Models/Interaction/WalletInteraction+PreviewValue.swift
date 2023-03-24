@@ -79,7 +79,7 @@ extension P2P.FromDapp.WalletInteraction {
 			id: .previewValue0,
 			items: .request(.authorized(.init(
 				auth: auth,
-				oneTimeAccounts: .previewValue,
+				reset: nil,
 				ongoingAccounts: .init(
 					numberOfAccounts: .atLeast(2),
 					requiresProofOfOwnership: false
@@ -87,7 +87,7 @@ extension P2P.FromDapp.WalletInteraction {
 				ongoingPersonaData: .init(
 					fields: [.givenName, .familyName, .emailAddress]
 				),
-				reset: nil
+				oneTimeAccounts: .previewValue
 			))),
 			metadata: .previewValue
 		)

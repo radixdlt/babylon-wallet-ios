@@ -58,7 +58,7 @@ extension Profile {
 			guard let persona = network.personas.first(where: { $0.address == personaNeedle.identityAddress }) else {
 				throw AuthorizedDappReferencesUnknownPersonas()
 			}
-			let fieldIDNeedles = Set(personaNeedle.fieldIDs)
+			let fieldIDNeedles = personaNeedle.fieldIDs ?? []
 			let fieldIDHaystack = Set(persona.fields.map(\.id))
 			guard fieldIDHaystack.isSuperset(of: fieldIDNeedles) else {
 				throw AuthorizedDappReferencesUnknownPersonaField()

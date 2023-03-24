@@ -32,7 +32,7 @@ extension Profile.Network {
 
 		/// The persona data that the user has given the Dapp access to,
 		/// being the trippple: `(id, kind, value)`
-		public let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		public let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		/// Information of accounts the user has given the Dapp access to,
 		/// being the tripple `(accountAddress, displayName, appearanceID)`
@@ -65,15 +65,21 @@ extension Profile.Network {
 			return try AuthorizedPersonaDetailed(
 				identityAddress: persona.address,
 				displayName: persona.displayName,
-				fields: .init(uniqueElements: simple.fieldIDs.map { fieldID in
-					guard
-						let field = persona.fields.first(where: { $0.id == fieldID })
-					else {
-						// FIXME: Should we maybe just skip this field instead of throwing an error? Probably?!
-						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
+				fields: {
+					if let fieldIDs = simple.fieldIDs {
+						return try .init(uniqueElements: fieldIDs.map { fieldID in
+							guard
+								let field = persona.fields.first(where: { $0.id == fieldID })
+							else {
+								// FIXME: Should we maybe just skip this field instead of throwing an error? Probably?!
+								throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
+							}
+							return field
+						})
+					} else {
+						return nil
 					}
-					return field
-				}),
+				}(),
 				simpleAccounts: {
 					if let sharedAccounts = simple.sharedAccounts {
 						return try .init(sharedAccounts.accountsReferencedByAddress.map { accountAddress in

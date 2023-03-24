@@ -40,17 +40,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
-		var resetRequestItem: P2P.FromDapp.WalletInteraction.ResetRequestItem? {
-			// NB: this should become a one liner with native case paths:
-			// remoteInteractions.items[keyPath: \.request?.authorized?.reset]
-			guard
-				case let .request(.authorized(item)) = remoteInteraction.items
-			else {
-				return nil
-			}
-			return item.reset
-		}
-
 		var usePersonaRequestItem: P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
@@ -63,6 +52,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return item
 		}
 
+		var resetRequestItem: P2P.FromDapp.WalletInteraction.ResetRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.reset]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.reset
+		}
+
 		var ongoingAccountsRequestItem: P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingAccounts]
@@ -72,6 +72,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return nil
 			}
 			return item.ongoingAccounts
+		}
+
+		var ongoingPersonaDataRequestItem: P2P.FromDapp.WalletInteraction.OngoingPersonaDataRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingPersonaData]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.ongoingPersonaData
 		}
 
 		@PresentationState
@@ -124,7 +135,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				var numberOfAccountsRequested: DappInteraction.NumberOfAccounts
 			}
 
+			struct PersonaDataPayload: Sendable, Equatable {
+				var requestItem: DappInteractionFlow.State.AnyInteractionItem
+				var personaData: IdentifiedArrayOf<Profile.Network.Persona.Field>
+			}
+
 			var accountsPayload: AccountsPayload?
+			var personaDataPayload: PersonaDataPayload?
 		}
 	}
 
@@ -394,8 +411,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		.run { [state] send in
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
-			// TODO: autofill persona data here too - https://radixdlt.atlassian.net/browse/ABW-1123
-
 			if
 				let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
 				let sharedAccounts = state.authorizedPersona?.sharedAccounts
@@ -413,6 +428,25 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							accounts: selectedAccounts,
 							numberOfAccountsRequested: sharedAccounts.request
 						)
+					}
+				}
+			}
+
+			if
+				let ongoingPersonaDataRequestItem = state.ongoingPersonaDataRequestItem,
+				let authorizedPersonaID = state.authorizedPersona?.id,
+				let sharedFieldIDs = state.authorizedPersona?.fieldIDs
+			{
+				if ongoingPersonaDataRequestItem.fields.isSubset(of: sharedFieldIDs) {
+					let allPersonas = try await personasClient.getPersonas()
+					if let persona = allPersonas[id: authorizedPersonaID] {
+						let sharedFields = persona.fields.filter { sharedFieldIDs.contains($0.id) }
+						if sharedFields.count == sharedFieldIDs.count {
+							payload.personaDataPayload = .init(
+								requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
+								personaData: sharedFields
+							)
+						}
 					}
 				}
 			}
@@ -502,19 +536,29 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						} else {
 							sharedAccounts = nil
 						}
+						let fieldIDs: Set<Profile.Network.Persona.Field.ID>? = {
+							switch state.remoteInteraction.items {
+							case let .request(.authorized(items)):
+								return items.ongoingPersonaData?.fields
+							default:
+								return nil
+							}
+						}()
 						@Dependency(\.date) var now
 						let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple = {
 							if var authorizedPersona = state.authorizedPersona {
-								// TODO: update personal data fields here
 								authorizedPersona.lastLogin = now()
-								if let sharedAccounts = sharedAccounts {
+								if let sharedAccounts {
 									authorizedPersona.sharedAccounts = sharedAccounts
+								}
+								if let fieldIDs {
+									authorizedPersona.fieldIDs = fieldIDs
 								}
 								return authorizedPersona
 							} else {
 								return .init(
 									identityAddress: persona.address,
-									fieldIDs: [], // TODO: set personal data fields here
+									fieldIDs: fieldIDs,
 									lastLogin: now(),
 									sharedAccounts: sharedAccounts
 								)
@@ -563,6 +607,8 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 					case let .ongoingAccounts(item):
 						items.append(.local(.permissionRequested(.accounts(item.numberOfAccounts))))
 						items.append(.remote(currentItem))
+					case .ongoingPersonaData:
+						items.append(.remote(currentItem))
 					case .oneTimeAccounts:
 						items.append(.remote(currentItem))
 					case .send:
@@ -599,6 +645,8 @@ extension DappInteractionFlow.Destinations.State {
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))
+		case let .remote(.ongoingPersonaData(item)):
+			return nil // TODO:
 		case let .remote(.oneTimeAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				accessKind: .oneTime,

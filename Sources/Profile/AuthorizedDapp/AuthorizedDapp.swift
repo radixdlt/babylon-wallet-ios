@@ -49,7 +49,7 @@ extension Profile.Network.AuthorizedDapp {
 
 		/// List of "ongoing personaData" (identified by Profile.Network.Persona.Field.ID) that user has given the Dapp access to.
 		/// mutable so that we can mutate the fields
-		public var fieldIDs: OrderedSet<Profile.Network.Persona.Field.ID>
+		public var fieldIDs: Set<Profile.Network.Persona.Field.ID>?
 
 		/// Date of last login for this persona.
 		public var lastLogin: Date
@@ -101,7 +101,7 @@ extension Profile.Network.AuthorizedDapp {
 
 		public init(
 			identityAddress: IdentityAddress,
-			fieldIDs: OrderedSet<Profile.Network.Persona.Field.ID>,
+			fieldIDs: Set<Profile.Network.Persona.Field.ID>?,
 			lastLogin: Date,
 			sharedAccounts: SharedAccounts?
 		) {
