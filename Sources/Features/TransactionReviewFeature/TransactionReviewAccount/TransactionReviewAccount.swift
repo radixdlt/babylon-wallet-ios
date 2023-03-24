@@ -44,11 +44,11 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress.ID { account.address.id }
 		public let account: TransactionReview.Account
-		public let transfer: [TransactionReview.Transfer]
+		public let transfers: [TransactionReview.Transfer]
 
-		public init(account: TransactionReview.Account, transfer: [TransactionReview.Transfer]) {
+		public init(account: TransactionReview.Account, transfers: [TransactionReview.Transfer]) {
 			self.account = account
-			self.transfer = transfer
+			self.transfers = transfers
 		}
 	}
 

@@ -51,13 +51,13 @@ extension TransactionReviewAccount.State {
 			return .init(label: account.label.rawValue,
 			             address: account.address.address,
 			             gradient: .init(account.appearanceID),
-			             details: transfer,
+			             details: transfers,
 			             showApprovedMark: false)
 		case let .external(accountAddress, approved):
 			return .init(label: L10n.TransactionReview.externalAccountName,
 			             address: accountAddress.address,
 			             gradient: .init(colors: [.app.gray2]),
-			             details: transfer,
+			             details: transfers,
 			             showApprovedMark: approved)
 		}
 	}
@@ -84,10 +84,11 @@ extension TransactionReviewAccount {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				InnerCard {
-					AccountLabel(viewStore.label,
-					             address: viewStore.address,
-					             gradient: viewStore.gradient)
-					{
+					AccountLabel(
+						viewStore.label,
+						address: viewStore.address,
+						gradient: viewStore.gradient
+					) {
 						viewStore.send(.copyAddress)
 					}
 
@@ -108,18 +109,20 @@ public struct TransactionDetailsView: View {
 	public let viewState: ViewState
 
 	public var body: some View {
-		switch viewState.payload {
-		case .nft:
-			NFTView(name: viewState.metadata?.name,
-			        thumbnail: viewState.metadata?.thumbnail)
-		case let .token(amount, guaranteedAmount, dollarAmount):
+		switch viewState.metadata.type {
+		case .nonFungible:
+			NFTView(name: viewState.metadata.name,
+			        thumbnail: viewState.metadata.thumbnail)
+		case .fungible:
 			TransactionReviewTokenView(viewState: .init(
-				name: viewState.metadata?.name,
-				thumbnail: viewState.metadata?.thumbnail,
-				amount: amount,
-				guaranteedAmount: guaranteedAmount,
-				dollarAmount: dollarAmount
+				name: viewState.metadata.name,
+				thumbnail: viewState.metadata.thumbnail,
+				amount: viewState.action.amount,
+				guaranteedAmount: viewState.metadata.guaranteedAmount,
+				dollarAmount: viewState.metadata.dollarAmount
 			))
+		case .none:
+			EmptyView()
 		}
 	}
 

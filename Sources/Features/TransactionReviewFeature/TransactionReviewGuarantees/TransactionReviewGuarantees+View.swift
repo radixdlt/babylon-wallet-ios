@@ -15,12 +15,40 @@ extension TransactionReviewGuarantees {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
-				Text("HELLO WORLD")
-					.sectionHeading
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				NavigationStack {
+					ScrollView(showsIndicators: false) {
+						VStack(spacing: 0) {
+							Text("Customize Guarantees")
+								.textStyle(.sheetTitle)
+								.foregroundColor(.app.gray1)
+								.padding(.top, .small3)
+								.padding(.bottom, .medium3)
+
+							Button("How do guarantees work", asset: AssetResource.info) {
+								viewStore.send(.infoTapped)
+							}
+							.textStyle(.body1Header)
+							.foregroundColor(.app.blue2)
+							.padding(.bottom, .medium1)
+
+							Text("Protect yourself by setting guaranteed minimums for estimated deposits")
+								.textStyle(.body1Regular)
+								.foregroundColor(.app.gray1)
+								.padding(.bottom, .medium1)
+						}
+					}
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .medium1)
+					.toolbar {
+						ToolbarItem(placement: .cancellationAction) {
+							CloseButton {
+								viewStore.send(.closeTapped)
+							}
+						}
+					}
+				}
 			}
-			.padding(.horizontal, .medium3)
-			.padding(.bottom, .medium1)
 		}
 
 		struct GuaranteeView: SwiftUI.View {

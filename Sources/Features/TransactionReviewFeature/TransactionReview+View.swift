@@ -66,10 +66,8 @@ extension TransactionReview {
 							usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositingHeading: viewStore.showDepositingHeading)
 
 							let depositingStore = store.scope(state: \.depositing) { .child(.depositing($0)) }
-							IfLetStore(depositingStore) { childStore in
-								TransactionReviewAccounts.View(store: childStore)
-							}
-							.padding(.bottom, .medium1)
+							TransactionReviewAccounts.View(store: depositingStore)
+								.padding(.bottom, .medium1)
 
 							Separator()
 								.padding(.bottom, .medium1)
@@ -109,9 +107,9 @@ extension TransactionReview {
 						}
 					}
 				}
-			}
-			.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
-				TransactionReviewGuarantees.View(store: childStore)
+				.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
+					TransactionReviewGuarantees.View(store: childStore)
+				}
 			}
 			.onAppear {
 				// decodeActions()
