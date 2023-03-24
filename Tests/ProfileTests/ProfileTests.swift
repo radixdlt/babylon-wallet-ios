@@ -210,7 +210,6 @@ final class ProfileTests: TestCase {
 				.init(arrayLiteral:
 					.init(
 						identityAddress: firstPersona.address,
-						fieldIDs: .init(firstPersona.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
@@ -218,18 +217,19 @@ final class ProfileTests: TestCase {
 								thirdAccount.address,
 							],
 							forRequest: .exactly(2)
-						)
+						),
+						sharedFieldIDs: .init(firstPersona.fields.map(\.id))
 					),
 					.init(
 						identityAddress: secondPersona.address,
-						fieldIDs: .init(secondPersona.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
 							],
 							forRequest: .atLeast(1)
-						)
+						),
+						sharedFieldIDs: .init(secondPersona.fields.map(\.id))
 					))
 			)
 		)
