@@ -165,6 +165,7 @@
 "editPersona.inputField.heading.general.requiredByDapp" = "Required by dApp";
 "editPersona.inputField.error.general.requiredByDapp" = "Required field for this dApp";
 "editPersona.inputField.error.personaLabel.blank" = "Label cannot be blank";
+"editPersona.inputField.error.emailAddress.invalid" = "Invalid email address";
 
 "editPersona.button.cancel" = "Cancel";
 "editPersona.button.save" = "Save";

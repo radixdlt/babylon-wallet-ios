@@ -379,6 +379,10 @@ public enum L10n {
     }
     public enum InputField {
       public enum Error {
+        public enum EmailAddress {
+          /// Invalid email address
+          public static let invalid = L10n.tr("Localizable", "editPersona.inputField.error.emailAddress.invalid", fallback: "Invalid email address")
+        }
         public enum General {
           /// Required field for this dApp
           public static let requiredByDapp = L10n.tr("Localizable", "editPersona.inputField.error.general.requiredByDapp", fallback: "Required field for this dApp")
