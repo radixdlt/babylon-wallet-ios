@@ -7,7 +7,7 @@ final class InformationTests: TestCase {
 			information,
 			.init(
 				packageVersion: "0.9.0",
-				lastCommitHash: "a354c356201165e08d258aba798c29c377a05198"
+				lastCommitHash: "9d140797d5641179fa78566b0f3e66fc6fe01e4c"
 			)
 		)
 	}
