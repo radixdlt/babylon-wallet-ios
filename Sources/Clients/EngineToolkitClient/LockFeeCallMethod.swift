@@ -166,7 +166,9 @@ extension EngineToolkitClient {
 				),
 				initialSupply: .map(
 					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
-						[.nonFungibleLocalId(.integer(1)), .tuple([.string("Hello World"), .decimal(.init(value: "12"))])],
+						[.nonFungibleLocalId(.integer(1)), .tuple([.tuple(
+							[.string("Hello World"), .decimal(.init(value: "12"))]
+						)])],
 					])
 				)
 			),
@@ -176,7 +178,7 @@ extension EngineToolkitClient {
 			},
 		]
 
-		return .init(instructions: .parsed(instructions.map { $0.embed() }))
+		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))
 	}
 }
 #endif // DEBUG

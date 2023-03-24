@@ -39,6 +39,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case isAllowedToUseFaucet(TaskResult<Bool>)
+		case callDone(updateControlState: WritableKeyPath<State, ControlState>)
 		case refreshAccountCompleted
 		case hideLoader
 	}
@@ -94,7 +95,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		state[keyPath: buttonState] = .loading(.local)
 		return .run { [address = state.address] send in
 			try await call(address)
-			await send(.delegate(.refreshAccount(address)))
+			await send(.internal(.callDone(updateControlState: buttonState)))
 		} catch: { error, send in
 			await send(.internal(.hideLoader))
 			if !Task.isCancelled {
@@ -121,6 +122,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideLoader:
 			state.faucetButtonState = .enabled
 			return .none
+
+		case let .callDone(controlStateKeyPath):
+			if controlStateKeyPath == \State.faucetButtonState {
+				return .send(.delegate(.refreshAccount(state.address))).concatenate(with: loadIsAllowedToUseFaucet(&state))
+			} else {
+				state[keyPath: controlStateKeyPath] = .enabled
+				return .send(.delegate(.refreshAccount(state.address)))
+			}
 		}
 	}
 }
