@@ -425,12 +425,16 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
 			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
 
-			Text("Fields")
-			ForEach(detailedAuthorizedPersona.fields) { field in
-				VStack {
-					Labeled("id", value: field.id.description)
-					Labeled("value", value: field.value.rawValue)
+			Text("Shared Fields")
+			if let sharedFields = detailedAuthorizedPersona.fields {
+				ForEach(sharedFields) { field in
+					VStack {
+						Labeled("id", value: field.id.description)
+						Labeled("value", value: field.value.rawValue)
+					}
 				}
+			} else {
+				Text("Never requested")
 			}
 
 			Text("Shared Accounts")
@@ -441,7 +445,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 					Labeled("appearanceID", value: simpleAccount.appearanceID.description)
 				}
 			} else {
-				Text("None yet")
+				Text("Never requested")
 			}
 		}
 		.padding([.leading], leadingPadding)

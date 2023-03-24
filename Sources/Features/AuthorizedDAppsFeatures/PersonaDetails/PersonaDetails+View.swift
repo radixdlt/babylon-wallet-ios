@@ -125,11 +125,11 @@ private extension PersonaDetails.State {
 		.init(
 			dAppName: dAppName,
 			personaLabel: persona.displayName.rawValue,
-			isSharingAnything: !persona.fields.isEmpty,
-			givenName: persona.fields[id: .givenName]?.value.rawValue,
-			familyName: persona.fields[id: .familyName]?.value.rawValue,
-			emailAddress: persona.fields[id: .emailAddress]?.value.rawValue,
-			phoneNumber: persona.fields[id: .phoneNumber]?.value.rawValue
+			isSharingAnything: persona.fields?.isEmpty == false,
+			givenName: persona.fields?[id: .givenName]?.value.rawValue,
+			familyName: persona.fields?[id: .familyName]?.value.rawValue,
+			emailAddress: persona.fields?[id: .emailAddress]?.value.rawValue,
+			phoneNumber: persona.fields?[id: .phoneNumber]?.value.rawValue
 		)
 	}
 }
