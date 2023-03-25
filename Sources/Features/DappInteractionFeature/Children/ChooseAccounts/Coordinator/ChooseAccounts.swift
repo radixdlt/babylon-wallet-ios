@@ -10,15 +10,12 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			case oneTime
 		}
 
-		var selectedAccounts: [ChooseAccountsRow.State] {
-			availableAccounts.filter(\.isSelected)
-		}
-
 		let accessKind: AccessKind
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
-		var availableAccounts: IdentifiedArrayOf<ChooseAccountsRow.State>
+		var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
+		var selectedAccounts: [ChooseAccountsRow.State]?
 
 		@PresentationState
 		var createAccountCoordinator: CreateAccountCoordinator.State?
@@ -28,7 +25,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
 			numberOfAccounts: DappInteraction.NumberOfAccounts,
-			availableAccounts: IdentifiedArrayOf<ChooseAccountsRow.State> = [],
+			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
+			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
 			self.accessKind = accessKind
@@ -36,14 +34,16 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			self.dappMetadata = dappMetadata
 			self.numberOfAccounts = numberOfAccounts
 			self.availableAccounts = availableAccounts
+			self.selectedAccounts = selectedAccounts
 			self.createAccountCoordinator = createAccountCoordinator
 		}
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case didAppear
-		case continueButtonTapped
+		case appeared
 		case createAccountButtonTapped
+		case selectedAccountsChanged([ChooseAccountsRow.State]?)
+		case continueButtonTapped([ChooseAccountsRow.State])
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -51,7 +51,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case account(id: ChooseAccountsRow.State.ID, action: ChooseAccountsRow.Action)
 		case createAccountCoordinator(PresentationAction<CreateAccountCoordinator.Action>)
 	}
 
@@ -64,9 +63,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.forEach(\.availableAccounts, action: /Action.child .. ChildAction.account) {
-				ChooseAccountsRow()
-			}
 			.ifLet(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
@@ -74,34 +70,33 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .didAppear:
+		case .appeared:
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
 					try await accountsClient.getAccountsOnCurrentNetwork()
 				})))
 			}
 
-		case .continueButtonTapped:
-			let selectedAccounts = IdentifiedArrayOf(uniqueElements: state.selectedAccounts.map(\.account))
-			return .send(.delegate(.continueButtonTapped(selectedAccounts, state.accessKind)))
-
 		case .createAccountButtonTapped:
 			state.createAccountCoordinator = .init(config: .init(
 				purpose: .newAccountDuringDappInteraction
 			))
 			return .none
+
+		case let .selectedAccountsChanged(selectedAccounts):
+			state.selectedAccounts = selectedAccounts
+			return .none
+
+		case let .continueButtonTapped(selectedAccounts):
+			let selectedAccounts = IdentifiedArray(uncheckedUniqueElements: selectedAccounts.map(\.account))
+			return .send(.delegate(.continueButtonTapped(selectedAccounts, state.accessKind)))
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
-			let mode: ChooseAccountsRow.State.Mode = state.numberOfAccounts.quantifier == .exactly &&
-				state.numberOfAccounts.quantity == 1 ? .radioButton : .checkmark
-
-			state.availableAccounts = .init(uniqueElements: accounts.map {
-				ChooseAccountsRow.State(account: $0, mode: mode)
-			})
+			state.availableAccounts = .init(uniqueElements: accounts)
 			return .none
 
 		case let .loadAccountsResult(.failure(error)):
@@ -112,31 +107,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .account(id: id, action: .delegate(.didSelect)):
-			guard let account = state.availableAccounts[id: id] else { return .none }
-			let numberOfAccounts = state.numberOfAccounts
-
-			if account.isSelected {
-				state.availableAccounts[id: id]?.isSelected = false
-			} else {
-				switch numberOfAccounts.quantifier {
-				case .atLeast:
-					state.availableAccounts[id: id]?.isSelected = true
-				case .exactly:
-					switch numberOfAccounts.quantity {
-					case 1:
-						state.availableAccounts.forEach {
-							state.availableAccounts[id: $0.id]?.isSelected = $0.id == id
-						}
-					default:
-						guard state.selectedAccounts.count < numberOfAccounts.quantity else { break }
-						state.availableAccounts[id: id]?.isSelected = true
-					}
-				}
-			}
-
-			return .none
-
 		case .createAccountCoordinator(.presented(.delegate(.dismiss))):
 			state.createAccountCoordinator = nil
 			return .none
