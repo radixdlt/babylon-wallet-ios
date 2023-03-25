@@ -57,38 +57,36 @@ extension AccountPermission {
 				observe: AccountPermission.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				ForceFullScreen {
-					ScrollView {
-						VStack(spacing: .medium2) {
-							DappHeader(
-								icon: nil,
-								title: viewStore.title,
-								subtitle: viewStore.subtitle
-							)
+				ScrollView {
+					VStack(spacing: .medium2) {
+						DappHeader(
+							icon: nil,
+							title: viewStore.title,
+							subtitle: viewStore.subtitle
+						)
 
-							DappPermissionBox {
-								Text(viewStore.numberOfAccounts)
-									.foregroundColor(.app.gray1)
-									.textStyle(.body1Regular)
-									.padding(.small3)
-							}
-							.padding(.horizontal, .medium2)
-
-							Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
-								.foregroundColor(.app.gray2)
+						DappPermissionBox {
+							Text(viewStore.numberOfAccounts)
+								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
-								.padding(.horizontal, .medium2)
+								.padding(.small3)
 						}
-						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium2)
+						.padding(.horizontal, .medium2)
+
+						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
+							.padding(.horizontal, .medium2)
 					}
-					.footer {
-						Button(L10n.DApp.AccountPermission.Button.continue) {
-							viewStore.send(.continueButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .medium2)
+				}
+				.footer {
+					Button(L10n.DApp.AccountPermission.Button.continue) {
+						viewStore.send(.continueButtonTapped)
 					}
+					.buttonStyle(.primaryRectangular)
 				}
 			}
 		}
@@ -101,12 +99,15 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - Permission_Preview
 struct AccountPermission_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		AccountPermission.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: AccountPermission()
+		NavigationStack {
+			AccountPermission.View(
+				store: .init(
+					initialState: .previewValue,
+					reducer: AccountPermission()
+				)
 			)
-		)
+			.toolbar(.visible, for: .navigationBar)
+		}
 	}
 }
 
