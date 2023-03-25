@@ -180,13 +180,13 @@ extension ChooseAccounts.State {
 		accessKind: .ongoing,
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,
-		numberOfAccounts: .exactly(1),
 		availableAccounts: .init(
 			uniqueElements: [
 				.previewValue0,
 				.previewValue1,
 			]
 		),
+		numberOfAccounts: .exactly(1),
 		createAccountCoordinator: nil
 	)
 }

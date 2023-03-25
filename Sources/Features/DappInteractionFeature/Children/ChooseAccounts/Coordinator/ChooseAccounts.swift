@@ -13,8 +13,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		let accessKind: AccessKind
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
-		let numberOfAccounts: DappInteraction.NumberOfAccounts
 		var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
+		let numberOfAccounts: DappInteraction.NumberOfAccounts
 		var selectedAccounts: [ChooseAccountsRow.State]?
 
 		@PresentationState
@@ -24,16 +24,16 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			accessKind: AccessKind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
-			numberOfAccounts: DappInteraction.NumberOfAccounts,
 			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
+			numberOfAccounts: DappInteraction.NumberOfAccounts,
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
 			self.accessKind = accessKind
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
-			self.numberOfAccounts = numberOfAccounts
 			self.availableAccounts = availableAccounts
+			self.numberOfAccounts = numberOfAccounts
 			self.selectedAccounts = selectedAccounts
 			self.createAccountCoordinator = createAccountCoordinator
 		}
