@@ -1,3 +1,4 @@
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - Permission.View
@@ -52,41 +53,45 @@ extension PersonaDataPermission {
 				observe: PersonaDataPermission.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				ForceFullScreen {
-					ScrollView {
-						VStack(spacing: .medium2) {
-							DappHeader(
-								icon: nil,
-								title: viewStore.title,
-								subtitle: viewStore.subtitle
-							)
+				ScrollView {
+					VStack(spacing: .medium2) {
+						DappHeader(
+							icon: nil,
+							title: viewStore.title,
+							subtitle: viewStore.subtitle
+						)
 
-							PersonaDataPermissionBox.View(
-								store: store.scope(
-									state: \.persona,
-									action: { .child(.persona($0)) }
-								)
+						PersonaDataPermissionBox.View(
+							store: store.scope(
+								state: \.persona,
+								action: { .child(.persona($0)) }
 							)
+						)
 
-							Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
-								.foregroundColor(.app.gray2)
-								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
-								.padding(.horizontal, .medium2)
-						}
-						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium2)
+						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
+							.padding(.horizontal, .medium2)
 					}
-					.footer {
-						WithControlRequirements(
-							viewStore.output,
-							forAction: { viewStore.send(.continueButtonTapped($0)) }
-						) { action in
-							Button(L10n.DApp.PersonaDataPermission.Button.continue, action: action)
-								.buttonStyle(.primaryRectangular)
-						}
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .medium2)
+				}
+				.footer {
+					WithControlRequirements(
+						viewStore.output,
+						forAction: { viewStore.send(.continueButtonTapped($0)) }
+					) { action in
+						Button(L10n.DApp.PersonaDataPermission.Button.continue, action: action)
+							.buttonStyle(.primaryRectangular)
 					}
 				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /PersonaDataPermission.Destinations.State.editPersona,
+					action: PersonaDataPermission.Destinations.Action.editPersona,
+					content: { EditPersona.View(store: $0) }
+				)
 			}
 		}
 	}
@@ -98,12 +103,15 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - Permission_Preview
 struct PersonaDataPermission_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		PersonaDataPermission.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: PersonaDataPermission()
+		NavigationStack {
+			PersonaDataPermission.View(
+				store: .init(
+					initialState: .previewValue,
+					reducer: PersonaDataPermission()
+				)
 			)
-		)
+			.toolbar(.visible, for: .navigationBar)
+		}
 	}
 }
 

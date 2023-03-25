@@ -52,6 +52,10 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.persona, action: /Action.child .. ChildAction.persona) {
+			PersonaDataPermissionBox()
+		}
+
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
