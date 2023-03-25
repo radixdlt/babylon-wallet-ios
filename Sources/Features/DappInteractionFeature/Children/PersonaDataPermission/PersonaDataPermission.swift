@@ -1,6 +1,5 @@
 import EditPersonaFeature
 import FeaturePrelude
-import PersonasClient
 
 // MARK: - AccountPermission
 struct PersonaDataPermission: Sendable, FeatureReducer {
@@ -51,8 +50,6 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			}
 		}
 	}
-
-	@Dependency(\.personasClient) var personasClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
