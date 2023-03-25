@@ -21,7 +21,11 @@ extension PersonaDataPermissionBox.State {
 					.sorted(by: { $0.id < $1.id })
 					.map(\.value.rawValue)
 
-				return ([name].compacted() + otherFields).joined(separator: "\n")
+				if let allFields = ([name].compacted() + otherFields).nilIfEmpty {
+					return allFields.joined(separator: "\n")
+				} else {
+					return nil
+				}
 			}(),
 			requiredFields: { () -> Hint? in
 				if let requiredFieldIDs {
