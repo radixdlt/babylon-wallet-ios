@@ -85,48 +85,46 @@ extension ChooseAccounts {
 				observe: ChooseAccounts.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				ForceFullScreen {
-					ScrollView {
-						VStack(spacing: .medium2) {
-							DappHeader(
-								icon: nil,
-								title: viewStore.title,
-								subtitle: viewStore.subtitle
-							)
+				ScrollView {
+					VStack(spacing: .medium2) {
+						DappHeader(
+							icon: nil,
+							title: viewStore.title,
+							subtitle: viewStore.subtitle
+						)
 
-							VStack(spacing: .small1) {
-								Selection(
-									viewStore.binding(
-										get: \.selectedAccounts,
-										send: { .selectedAccountsChanged($0) }
-									),
-									from: viewStore.availableAccounts,
-									requiring: viewStore.selectionRequirement
-								) { item in
-									ChooseAccountsRow.View(
-										viewState: .init(state: item.value),
-										isSelected: item.isSelected,
-										action: item.action
-									)
-								}
+						VStack(spacing: .small1) {
+							Selection(
+								viewStore.binding(
+									get: \.selectedAccounts,
+									send: { .selectedAccountsChanged($0) }
+								),
+								from: viewStore.availableAccounts,
+								requiring: viewStore.selectionRequirement
+							) { item in
+								ChooseAccountsRow.View(
+									viewState: .init(state: item.value),
+									isSelected: item.isSelected,
+									action: item.action
+								)
 							}
-
-							Button(L10n.DApp.ChooseAccounts.createNewAccount) {
-								viewStore.send(.createAccountButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
-						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium2)
+
+						Button(L10n.DApp.ChooseAccounts.createNewAccount) {
+							viewStore.send(.createAccountButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: false))
 					}
-					.footer {
-						WithControlRequirements(
-							viewStore.selectedAccounts,
-							forAction: { viewStore.send(.continueButtonTapped($0)) }
-						) { action in
-							Button(L10n.DApp.Login.continueButtonTitle, action: action)
-								.buttonStyle(.primaryRectangular)
-						}
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .medium2)
+				}
+				.footer {
+					WithControlRequirements(
+						viewStore.selectedAccounts,
+						forAction: { viewStore.send(.continueButtonTapped($0)) }
+					) { action in
+						Button(L10n.DApp.Login.continueButtonTitle, action: action)
+							.buttonStyle(.primaryRectangular)
 					}
 				}
 				.onAppear {
