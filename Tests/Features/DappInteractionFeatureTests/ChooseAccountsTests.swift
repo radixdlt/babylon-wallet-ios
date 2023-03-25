@@ -3,7 +3,7 @@ import FeatureTestingPrelude
 
 @MainActor
 final class ChooseAccountsTests: TestCase {
-	let interactionItem: DappInteractionFlow.State.AnyInteractionItem = .local(.permissionRequested(.accounts(.exactly(2))))
+	let interactionItem: DappInteractionFlow.State.AnyInteractionItem = .local(.accountPermissionRequested(.exactly(2)))
 
 	func test_continueFromChooseAccounts_whenTappedOnContinue_thenFinishAccountSelection() async {
 		// given
