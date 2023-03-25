@@ -28,14 +28,16 @@ extension PersonaDataPermissionBox.State {
 				}
 			}(),
 			missingRequiredFields: { () -> Hint? in
-				guard let missingRequiredFieldIDs else { return nil }
-
-				return .error {
-					Text {
-						L10n.DApp.PersonaDataPermission.requiredInformation.text.bold()
-						" "
-						missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+				if let missingRequiredFieldIDs {
+					return .error {
+						Text {
+							L10n.DApp.PersonaDataPermission.requiredInformation.text.bold()
+							" "
+							missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+						}
 					}
+				} else {
+					return nil
 				}
 			}()
 		)

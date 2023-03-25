@@ -131,12 +131,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
-				var accounts: [Profile.Network.Account]
 				var numberOfAccountsRequested: DappInteraction.NumberOfAccounts
+				var accounts: [Profile.Network.Account]
 			}
 
 			struct PersonaDataPayload: Sendable, Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
+				var fieldsRequested: Set<Profile.Network.Persona.Field.ID>
 				var fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 			}
 
@@ -278,6 +279,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					accessKind: .ongoing,
 					into: &state
 				)
+			}
+			if let personaDataPayload = payload.personaDataPayload {
+				let fields = personaDataPayload.fields.map { P2P.ToDapp.PersonaData(field: $0.id, value: $0.value) }
+				state.responseItems[.remote(.ongoingPersonaData(.init(fields: personaDataPayload.fieldsRequested)))] = .remote(.ongoingPersonaData(.init(fields: fields)))
 			}
 			return continueEffect(for: &state)
 
@@ -451,8 +456,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					{
 						payload.accountsPayload = .init(
 							requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
-							accounts: selectedAccounts,
-							numberOfAccountsRequested: sharedAccounts.request
+							numberOfAccountsRequested: sharedAccounts.request,
+							accounts: selectedAccounts
 						)
 					}
 				}
@@ -470,6 +475,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						if sharedFields.count == sharedFieldIDs.count {
 							payload.personaDataPayload = .init(
 								requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
+								fieldsRequested: sharedFieldIDs,
 								fields: sharedFields
 							)
 						}
