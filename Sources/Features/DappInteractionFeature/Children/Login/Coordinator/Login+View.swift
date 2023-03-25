@@ -6,7 +6,6 @@ extension Login {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
-		let canProceed: Bool
 		let continueButtonRequirements: ContinueButtonRequirements?
 
 		struct ContinueButtonRequirements: Equatable {
@@ -33,8 +32,6 @@ extension Login {
 				return dappName + explanation
 			}()
 
-			canProceed = state.selectedPersona != nil
-
 			if let persona = state.selectedPersona {
 				continueButtonRequirements = .init(persona: persona)
 			} else {
@@ -53,50 +50,43 @@ extension Login {
 				observe: Login.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				ForceFullScreen {
-					ScrollView {
-						VStack(spacing: .medium2) {
-							DappHeader(
-								icon: nil,
-								title: viewStore.title,
-								subtitle: viewStore.subtitle
+				ScrollView {
+					VStack(spacing: .medium2) {
+						DappHeader(
+							icon: nil,
+							title: viewStore.title,
+							subtitle: viewStore.subtitle
+						)
+
+						Text(L10n.DApp.Login.chooseAPersonaTitle)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Header)
+
+						VStack(spacing: .small1) {
+							ForEachStore(
+								store.scope(
+									state: \.personas,
+									action: { .child(.persona(id: $0, action: $1)) }
+								),
+								content: { PersonaRow.View(store: $0) }
 							)
-
-							Text(L10n.DApp.Login.chooseAPersonaTitle)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Header)
-
-							VStack(spacing: .small1) {
-								ForEachStore(
-									store.scope(
-										state: \.personas,
-										action: { .child(.persona(id: $0, action: $1)) }
-									),
-									content: { PersonaRow.View(store: $0) }
-								)
-							}
-
-							Button(L10n.Personas.createNewPersonaButtonTitle) {
-								viewStore.send(.createNewPersonaButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
-						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium2)
+
+						Button(L10n.Personas.createNewPersonaButtonTitle) {
+							viewStore.send(.createNewPersonaButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: false))
 					}
-					.safeAreaInset(edge: .bottom, spacing: .zero) {
-						WithControlRequirements(
-							viewStore.continueButtonRequirements,
-							forAction: {
-								viewStore.send(.continueButtonTapped($0.persona))
-							}
-						) { action in
-							ConfirmationFooter(
-								title: L10n.DApp.Login.continueButtonTitle,
-								isEnabled: viewStore.canProceed,
-								action: action
-							)
-						}
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .medium2)
+				}
+				.footer {
+					WithControlRequirements(
+						viewStore.continueButtonRequirements,
+						forAction: { viewStore.send(.continueButtonTapped($0.persona)) }
+					) { action in
+						Button(L10n.DApp.Login.continueButtonTitle, action: action)
+							.buttonStyle(.primaryRectangular)
 					}
 				}
 				.onAppear {
