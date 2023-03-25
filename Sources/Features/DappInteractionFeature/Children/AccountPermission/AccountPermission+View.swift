@@ -54,7 +54,7 @@ extension AccountPermission {
 		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: ViewState.init,
+				observe: AccountPermission.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
 				ForceFullScreen {
@@ -102,7 +102,7 @@ extension AccountPermission {
 						.padding(.horizontal, .medium1)
 					}
 					.footer {
-						Button(L10n.DApp.Login.continueButtonTitle) {
+						Button(L10n.DApp.AccountPermission.Button.continue) {
 							viewStore.send(.continueButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)

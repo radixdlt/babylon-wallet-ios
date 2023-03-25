@@ -172,6 +172,10 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "dApp.accountPermission.title", fallback: "Account Permission")
       /// You can update this permission in your settings at any time.
       public static let updateInSettingsExplanation = L10n.tr("Localizable", "dApp.accountPermission.updateInSettingsExplanation", fallback: "You can update this permission in your settings at any time.")
+      public enum Button {
+        /// Continue
+        public static let `continue` = L10n.tr("Localizable", "dApp.accountPermission.button.continue", fallback: "Continue")
+      }
       public enum NumberOfAccounts {
         /// %d or more accounts
         public static func atLeast(_ p1: Int) -> String {
@@ -296,6 +300,10 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "dApp.personaDataPermission.title", fallback: "Personal Data Permission")
       /// You can update this permission in your settings at any time.
       public static let updateInSettingsExplanation = L10n.tr("Localizable", "dApp.personaDataPermission.updateInSettingsExplanation", fallback: "You can update this permission in your settings at any time.")
+      public enum Button {
+        /// Continue
+        public static let `continue` = L10n.tr("Localizable", "dApp.personaDataPermission.button.continue", fallback: "Continue")
+      }
       public enum Subtitle {
         /// always
         public static let always = L10n.tr("Localizable", "dApp.personaDataPermission.subtitle.always", fallback: "always")

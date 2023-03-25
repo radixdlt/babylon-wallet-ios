@@ -83,12 +83,14 @@
 "dApp.accountPermission.numberOfAccounts.exactly" = "%d accounts";
 "dApp.accountPermission.numberOfAccounts.exactlyOne" = "1 account";
 "dApp.accountPermission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
+"dApp.accountPermission.button.continue" = "Continue";
 
 "dApp.personaDataPermission.title" = "Personal Data Permission";
 "dApp.personaDataPermission.subtitle.explanation.first" = " is requesting permission to ";
 "dApp.personaDataPermission.subtitle.always" = "always";
 "dApp.personaDataPermission.subtitle.explanation.second" = " be able to view the following personal data when you login with this Persona.";
 "dApp.personaDataPermission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
+"dApp.personaDataPermission.button.continue" = "Continue";
 
 "dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";
 "dApp.request.malformedErrorAlert.okButtonTitle" = "OK";
