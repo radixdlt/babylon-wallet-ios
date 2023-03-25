@@ -66,12 +66,11 @@ extension AccountPermission {
 								subtitle: viewStore.subtitle
 							)
 
-							DappEntityBox {
+							DappPermissionBox {
 								Text(viewStore.numberOfAccounts)
 									.foregroundColor(.app.gray1)
 									.textStyle(.body1Regular)
 									.padding(.small3)
-									.frame(maxWidth: .infinity, alignment: .leading)
 							}
 							.padding(.horizontal, .medium2)
 

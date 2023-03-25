@@ -2,28 +2,8 @@ import Resources
 import SwiftUI
 import SwiftUINavigation
 
-// MARK: - AppTextFieldHint
-public enum AppTextFieldHint: Equatable {
-	case info(String)
-	case error(String)
-
-	var string: String {
-		switch self {
-		case let .info(string), let .error(string):
-			return string
-		}
-	}
-
-	var isError: Bool {
-		guard case .error = self else { return false }
-		return true
-	}
-}
-
 // MARK: - AppTextField
 public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
-	public typealias Hint = AppTextFieldHint
-
 	public struct Focus {
 		let value: FocusValue
 		let binding: Binding<FocusValue>
@@ -124,22 +104,11 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(borderColor(for: hint), lineWidth: 1)
+						.stroke(borderColor, lineWidth: 1)
 				)
 				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
-				if let hint {
-					HStack(spacing: .small3) {
-						if hint.isError {
-							Image(asset: AssetResource.error)
-								.foregroundColor(.app.red1)
-						}
-						Text(hint.string)
-							.foregroundColor(foregroundColor(for: hint))
-							.textStyle(.body2Regular)
-					}
-					.frame(height: .medium2)
-				}
+				hint
 			}
 
 			accessory
@@ -147,17 +116,8 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		}
 	}
 
-	private func foregroundColor(for hint: Hint) -> Color {
-		switch hint {
-		case .info:
-			return .app.gray2
-		case .error:
-			return .app.red1
-		}
-	}
-
-	private func borderColor(for hint: Hint?) -> Color {
-		switch hint {
+	private var borderColor: Color {
+		switch hint?.kind {
 		case .none:
 			return .app.gray1
 		case .info:

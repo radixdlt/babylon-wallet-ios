@@ -52,10 +52,28 @@ extension PersonaDataPermission {
 								subtitle: viewStore.subtitle
 							)
 
-							DappEntityBox {
-								Text("s")
+							DappPermissionBox {
+								HStack(spacing: .medium2) {
+									PersonaThumbnail(URL(string: "something")!, size: .small)
+									Text("RadMatt")
+										.foregroundColor(.app.gray1)
+										.textStyle(.secondaryHeader)
+								}
 							} content: {
-								Text("s")
+								VStack(alignment: .leading, spacing: .small1) {
+									Text("Matt Smith")
+										.foregroundColor(.app.gray2)
+										.textStyle(.body2Regular)
+									HStack(spacing: .small3) {
+										Image(asset: AssetResource.error)
+										Text("**Required information**: phone number, email address")
+											.textStyle(.body2Regular)
+									}
+									.foregroundColor(.app.red1)
+
+									Button("Edit", action: {})
+										.buttonStyle(.primaryRectangular)
+								}
 							}
 
 							Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)

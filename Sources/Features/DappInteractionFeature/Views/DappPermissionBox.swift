@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-struct DappEntityBox<Header: View, Content: View>: View {
+struct DappPermissionBox<Header: View, Content: View>: View {
 	let header: Header
 	let content: Content
 
@@ -15,10 +15,15 @@ struct DappEntityBox<Header: View, Content: View>: View {
 	var body: some View {
 		VStack(spacing: 0) {
 			if !(header is EmptyView) {
-				header.padding(.medium2)
+				header
+					.padding(.vertical, .medium1)
+					.padding(.horizontal, .medium2)
+					.frame(maxWidth: .infinity, alignment: .leading)
 				Separator()
 			}
-			content.padding(.medium2)
+			content
+				.padding(.medium2)
+				.frame(maxWidth: .infinity, alignment: .leading)
 		}
 		.background(Color.app.gray5)
 		.cornerRadius(.medium3)
