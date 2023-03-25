@@ -6,18 +6,18 @@ extension PersonaDataPermissionBox.State {
 		.init(
 			avatarURL: URL(string: "something")!,
 			personaLabel: persona.displayName.rawValue,
-			existingFields: {
-				var fields = persona.fields
+			existingRequiredFields: {
+				var existingRequiredFields = persona.fields.filter { allRequiredFieldIDs.contains($0.id) }
 
 				let name = [
-					fields.remove(id: .givenName)?.value.rawValue,
-					fields.remove(id: .familyName)?.value.rawValue,
+					existingRequiredFields.remove(id: .givenName)?.value.rawValue,
+					existingRequiredFields.remove(id: .familyName)?.value.rawValue,
 				]
 				.compacted()
 				.joined(separator: " ")
 				.nilIfBlank
 
-				let otherFields = fields
+				let otherFields = existingRequiredFields
 					.sorted(by: { $0.id < $1.id })
 					.map(\.value.rawValue)
 
@@ -27,17 +27,15 @@ extension PersonaDataPermissionBox.State {
 					return nil
 				}
 			}(),
-			requiredFields: { () -> Hint? in
-				if let requiredFieldIDs {
-					return Hint(
-						.error,
-						Text(L10n.DApp.PersonaDataPermission.requiredInformation).bold() +
-							Text(" ") +
-							Text(requiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", "))
-					)
-				} else {
-					return nil
-				}
+			missingRequiredFields: { () -> Hint? in
+				guard let missingRequiredFieldIDs else { return nil }
+
+				return Hint(
+					.error,
+					Text(L10n.DApp.PersonaDataPermission.requiredInformation).bold() +
+						Text(" ") +
+						Text(missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", "))
+				)
 			}()
 		)
 	}
@@ -47,8 +45,8 @@ extension PersonaDataPermissionBox {
 	struct ViewState: Equatable {
 		let avatarURL: URL
 		let personaLabel: String
-		let existingFields: String?
-		let requiredFields: Hint?
+		let existingRequiredFields: String?
+		let missingRequiredFields: Hint?
 	}
 
 	@MainActor
@@ -70,13 +68,13 @@ extension PersonaDataPermissionBox {
 					}
 				} content: {
 					VStack(alignment: .leading, spacing: .small1) {
-						if let existingFields = viewStore.existingFields {
-							Text(existingFields)
+						if let existingRequiredFields = viewStore.existingRequiredFields {
+							Text(existingRequiredFields)
 								.foregroundColor(.app.gray2)
 								.textStyle(.body2Regular)
 						}
 
-						viewStore.requiredFields
+						viewStore.missingRequiredFields
 
 						Button("Edit") {
 							viewStore.send(.editButtonTapped)
