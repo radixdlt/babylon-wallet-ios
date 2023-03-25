@@ -75,6 +75,11 @@ extension DappInteractionFlow {
 					then: { ChooseAccounts.View(store: $0) }
 				)
 				CaseLet(
+					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
+					action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
+					then: { PersonaDataPermission.View(store: $0) }
+				)
+				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.signAndSubmitTransaction,
 					action: DappInteractionFlow.Destinations.MainAction.signAndSubmitTransaction,
 					then: { TransactionSigning.View(store: $0) }
