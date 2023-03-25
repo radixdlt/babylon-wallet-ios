@@ -65,9 +65,9 @@ extension DappInteractionFlow {
 					then: { Login.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.permission,
-					action: DappInteractionFlow.Destinations.MainAction.permission,
-					then: { Permission.View(store: $0) }
+					state: /DappInteractionFlow.Destinations.MainState.accountPermission,
+					action: DappInteractionFlow.Destinations.MainAction.accountPermission,
+					then: { AccountPermission.View(store: $0) }
 				)
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,

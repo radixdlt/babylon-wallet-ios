@@ -1,20 +1,14 @@
 import FeaturePrelude
 
 // MARK: - Permission.View
-extension Permission {
+extension AccountPermission {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
 		let numberOfAccounts: String
 
-		init(state: Permission.State) {
-			switch state.permissionKind {
-			case .accounts:
-				title = L10n.DApp.Permission.Title.accounts
-			case .personaData:
-				title = L10n.DApp.Permission.Title.personaData
-			}
-
+		init(state: AccountPermission.State) {
+			title = L10n.DApp.Permission.Title.accounts
 			subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
@@ -24,65 +18,43 @@ extension Permission {
 				let explanation: AttributedString = {
 					let always = AttributedString(L10n.DApp.Permission.Subtitle.always, foregroundColor: highlightColor)
 
-					switch state.permissionKind {
-					case .accounts:
-						return AttributedString(
-							L10n.DApp.Permission.Subtitle.Explanation.Accounts.first,
+					return AttributedString(
+						L10n.DApp.Permission.Subtitle.Explanation.Accounts.first,
+						foregroundColor: normalColor
+					)
+						+ always
+						+ AttributedString(
+							L10n.DApp.Permission.Subtitle.Explanation.Accounts.second,
 							foregroundColor: normalColor
 						)
-							+ always
-							+ AttributedString(
-								L10n.DApp.Permission.Subtitle.Explanation.Accounts.second,
-								foregroundColor: normalColor
-							)
-					case .personaData:
-						return AttributedString(
-							L10n.DApp.Permission.Subtitle.Explanation.PersonaData.first,
-							foregroundColor: normalColor
-						)
-							+ always
-							+ AttributedString(
-								L10n.DApp.Permission.Subtitle.Explanation.PersonaData.second,
-								foregroundColor: normalColor
-							)
-					}
 				}()
 
 				return dappName + explanation
 			}()
 
-			numberOfAccounts = {
-				let message: String = {
-					switch state.permissionKind {
-					case let .accounts(numberOfAccounts):
-						switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
-						case (.atLeast, 0):
-							return L10n.DApp.Permission.NumberOfAccounts.atLeastZero
-						case let (.atLeast, number):
-							return L10n.DApp.Permission.NumberOfAccounts.atLeast(number)
-						case (.exactly, 1):
-							return L10n.DApp.Permission.NumberOfAccounts.exactlyOne
-						case let (.exactly, number):
-							return L10n.DApp.Permission.NumberOfAccounts.exactly(number)
-						}
-					case .personaData:
-						return ""
-					}
-				}()
-
-				return "•  " + message
+			numberOfAccounts = "•  " + {
+				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
+				case (.atLeast, 0):
+					return L10n.DApp.Permission.NumberOfAccounts.atLeastZero
+				case let (.atLeast, number):
+					return L10n.DApp.Permission.NumberOfAccounts.atLeast(number)
+				case (.exactly, 1):
+					return L10n.DApp.Permission.NumberOfAccounts.exactlyOne
+				case let (.exactly, number):
+					return L10n.DApp.Permission.NumberOfAccounts.exactly(number)
+				}
 			}()
 		}
 	}
 
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<Permission>
+		let store: StoreOf<AccountPermission>
 
 		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: Permission.ViewState.init,
+				observe: AccountPermission.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
 				ForceFullScreen {
@@ -154,19 +126,19 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - Permission_Preview
 struct Permission_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		Permission.View(
+		AccountPermission.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: Permission()
+				reducer: AccountPermission()
 			)
 		)
 	}
 }
 
-extension Permission.State {
+extension AccountPermission.State {
 	static let previewValue: Self = .init(
-		permissionKind: .accounts(.exactly(1)),
-		dappMetadata: .previewValue
+		dappMetadata: .previewValue,
+		numberOfAccounts: .exactly(1)
 	)
 }
 #endif

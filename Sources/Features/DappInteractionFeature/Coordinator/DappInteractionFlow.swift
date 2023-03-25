@@ -24,11 +24,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		typealias RemoteInteractionResponseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
 
 		enum LocalInteractionItem: Sendable, Hashable {
-			case permissionRequested(Permission.State.PermissionKind)
+			case accountPermissionRequested(DappInteraction.NumberOfAccounts)
 		}
 
 		enum LocalInteractionResponseItem: Sendable, Hashable {
-			case permissionGranted
+			case accountPermissionGranted
 		}
 
 		let dappMetadata: DappMetadata
@@ -161,14 +161,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		enum MainState: Sendable, Hashable {
 			case login(Login.State)
-			case permission(Permission.State)
+			case accountPermission(AccountPermission.State)
 			case chooseAccounts(ChooseAccounts.State)
 			case signAndSubmitTransaction(TransactionSigning.State)
 		}
 
 		enum MainAction: Sendable, Equatable {
 			case login(Login.Action)
-			case permission(Permission.Action)
+			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(ChooseAccounts.Action)
 			case signAndSubmitTransaction(TransactionSigning.Action)
 		}
@@ -178,8 +178,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				Scope(state: /MainState.login, action: /MainAction.login) {
 					Login()
 				}
-				Scope(state: /MainState.permission, action: /MainAction.permission) {
-					Permission()
+				Scope(state: /MainState.accountPermission, action: /MainAction.accountPermission) {
+					AccountPermission()
 				}
 				Scope(state: /MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
 					ChooseAccounts()
@@ -265,7 +265,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
 			if let accountsPayload = payload.accountsPayload {
-				state.responseItems[.local(.permissionRequested(.accounts(accountsPayload.numberOfAccountsRequested)))] = .local(.permissionGranted)
+				state.responseItems[.local(.accountPermissionRequested(accountsPayload.numberOfAccountsRequested))] = .local(.accountPermissionGranted)
 				setAccountsResponse(
 					to: accountsPayload.requestItem,
 					accountsPayload.accounts,
@@ -323,8 +323,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 		}
 
-		func handlePermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
-			let responseItem: State.AnyInteractionResponseItem = .local(.permissionGranted)
+		func handleAccountPermission(_ item: State.AnyInteractionItem) -> EffectTask<Action> {
+			let responseItem: State.AnyInteractionResponseItem = .local(.accountPermissionGranted)
 			state.responseItems[item] = responseItem
 			return continueEffect(for: &state)
 		}
@@ -360,9 +360,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return handleLogin(item, persona, authorizedDapp, authorizedPersona)
 
 		case
-			let .root(.relay(item, .permission(.delegate(.continueButtonTapped)))),
-			let .path(.element(_, .relay(item, .permission(.delegate(.continueButtonTapped))))):
-			return handlePermission(item)
+			let .root(.relay(item, .accountPermission(.delegate(.continueButtonTapped)))),
+			let .path(.element(_, .relay(item, .accountPermission(.delegate(.continueButtonTapped))))):
+			return handleAccountPermission(item)
 
 		case
 			let .root(.relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))),
@@ -601,7 +601,7 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 					case .auth:
 						items.append(.remote(currentItem))
 					case let .ongoingAccounts(item):
-						items.append(.local(.permissionRequested(.accounts(item.numberOfAccounts))))
+						items.append(.local(.accountPermissionRequested(item.numberOfAccounts)))
 						items.append(.remote(currentItem))
 					case .ongoingPersonaData:
 						items.append(.remote(currentItem))
@@ -629,10 +629,10 @@ extension DappInteractionFlow.Destinations.State {
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata
 			)))
-		case let .local(.permissionRequested(permissionKind)):
-			self = .relayed(anyItem, with: .permission(.init(
-				permissionKind: permissionKind,
-				dappMetadata: dappMetadata
+		case let .local(.accountPermissionRequested(numberOfAccounts)):
+			self = .relayed(anyItem, with: .accountPermission(.init(
+				dappMetadata: dappMetadata,
+				numberOfAccounts: numberOfAccounts
 			)))
 		case let .remote(.ongoingAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
