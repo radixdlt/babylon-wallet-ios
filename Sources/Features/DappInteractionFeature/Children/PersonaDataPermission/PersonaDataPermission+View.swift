@@ -52,7 +52,12 @@ extension PersonaDataPermission {
 								subtitle: viewStore.subtitle
 							)
 
-//							PersonaDataPermissionBox
+							PersonaDataPermissionBox.View(
+								store: store.scope(
+									state: \.persona,
+									action: { .child(.persona($0)) }
+								)
+							)
 
 							Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
 								.foregroundColor(.app.gray2)
@@ -93,6 +98,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 extension PersonaDataPermission.State {
 	static let previewValue: Self = .init(
 		dappMetadata: .previewValue,
+		persona: .previewValue0,
 		requiredFieldIDs: [.givenName, .emailAddress]
 	)
 }

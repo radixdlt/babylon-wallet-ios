@@ -4,7 +4,7 @@ import Profile
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
-			avatarURL: avatarURL,
+			avatarURL: URL(string: "something")!,
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
@@ -145,14 +145,7 @@ extension EditPersona.State {
 	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
 		.init(
 			mode: mode,
-			avatarURL: URL(string: "something")!,
-			personaLabel: NonEmptyString(rawValue: "RadIpsum")!,
-			existingFields: [
-				.init(id: .givenName, value: "Lorem"),
-				.init(id: .familyName, value: "Ipsum"),
-				.init(id: .emailAddress, value: "lorem.ipsum@example.com"),
-				.init(id: .phoneNumber, value: "555-5555"),
-			]
+			persona: .previewValue0
 		)
 	}
 }

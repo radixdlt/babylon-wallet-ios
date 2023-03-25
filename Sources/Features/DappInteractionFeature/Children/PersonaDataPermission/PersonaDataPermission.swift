@@ -5,9 +5,8 @@ import PersonasClient
 // MARK: - AccountPermission
 struct PersonaDataPermission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-//		let personaID: Profile.Network.Persona.ID
 		let dappMetadata: DappMetadata
-		var personas: IdentifiedArrayOf<Profile.Network.Persona> = []
+		var persona: PersonaDataPermissionBox.State
 		let requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
 
 		@PresentationState
@@ -15,24 +14,21 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 		init(
 			dappMetadata: DappMetadata,
+			persona: Profile.Network.Persona,
 			requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
 		) {
 			self.dappMetadata = dappMetadata
+			self.persona = .init(persona: persona, requiredFieldIDs: requiredFieldIDs)
 			self.requiredFieldIDs = requiredFieldIDs
 		}
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case appeared
 		case continueButtonTapped
 	}
 
-	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>)
-	}
-
 	enum ChildAction: Sendable, Equatable {
-		case persona(id: PersonaDataPermissionBox.State.ID, action: PersonaDataPermissionBox.Action)
+		case persona(PersonaDataPermissionBox.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -57,7 +53,6 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.personasClient) var personasClient
-	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -68,37 +63,18 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .run { send in
-				let personas = try await personasClient.getPersonas()
-				await send(.internal(.personasLoaded(personas)))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
 		case .continueButtonTapped:
 			return .send(.delegate(.continueButtonTapped))
 		}
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .personasLoaded(personas):
-			state.personas = personas
-			return .none
-		}
-	}
-
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .persona(id, action: .delegate(.edit)):
-			if let persona = state.personas[id: id] {
-//				state.destination = .editPersona(.init(
-//					mode: .dapp(requiredFieldIDs: state.requiredFieldIDs),
-//					avatarURL: URL(string: "something")!,
-//					personaLabel: <#T##NonEmptyString#>,
-//					existingFields: <#T##IdentifiedArrayOf<Profile.Network.Persona.Field>#>
-//				))
-			}
+		case .persona(.delegate(.edit)):
+			state.destination = .editPersona(.init(
+				mode: .dapp(requiredFieldIDs: state.requiredFieldIDs),
+				persona: state.persona.persona
+			))
 			return .none
 
 		default:

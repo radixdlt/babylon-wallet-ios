@@ -100,7 +100,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
-				self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
+				self.root = Destinations.State(for: interactionItems.first, remoteInteraction, dappMetadata, nil)
 			} else {
 				return nil
 			}
@@ -163,6 +163,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case login(Login.State)
 			case accountPermission(AccountPermission.State)
 			case chooseAccounts(ChooseAccounts.State)
+			case personaDataPermission(PersonaDataPermission.State)
 			case signAndSubmitTransaction(TransactionSigning.State)
 		}
 
@@ -170,23 +171,28 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case login(Login.Action)
 			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(ChooseAccounts.Action)
+			case personaDataPermission(PersonaDataPermission.Action)
 			case signAndSubmitTransaction(TransactionSigning.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
 			Relay {
-				Scope(state: /MainState.login, action: /MainAction.login) {
-					Login()
-				}
-				Scope(state: /MainState.accountPermission, action: /MainAction.accountPermission) {
-					AccountPermission()
-				}
-				Scope(state: /MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
-					ChooseAccounts()
-				}
-				Scope(state: /MainState.signAndSubmitTransaction, action: /MainAction.signAndSubmitTransaction) {
-					TransactionSigning()
-				}
+				EmptyReducer()
+					.ifCaseLet(/MainState.login, action: /MainAction.login) {
+						Login()
+					}
+					.ifCaseLet(/MainState.accountPermission, action: /MainAction.accountPermission) {
+						AccountPermission()
+					}
+					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
+						ChooseAccounts()
+					}
+					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
+						PersonaDataPermission()
+					}
+					.ifCaseLet(/MainState.signAndSubmitTransaction, action: /MainAction.signAndSubmitTransaction) {
+						TransactionSigning()
+					}
 			}
 		}
 	}
@@ -475,7 +481,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(for: nextRequest, in: state.remoteInteraction, with: state.dappMetadata)
+			let destination = Destinations.State(for: nextRequest, state.remoteInteraction, state.dappMetadata, state.persona)
 		{
 			if state.root == nil {
 				state.root = destination
@@ -618,8 +624,9 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 extension DappInteractionFlow.Destinations.State {
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
-		in interaction: DappInteractionFlow.State.RemoteInteraction,
-		with dappMetadata: DappMetadata
+		_ interaction: DappInteractionFlow.State.RemoteInteraction,
+		_ dappMetadata: DappMetadata,
+		_ persona: Profile.Network.Persona?
 	) {
 		switch anyItem {
 		case .remote(.auth(.usePersona)):
@@ -642,7 +649,16 @@ extension DappInteractionFlow.Destinations.State {
 				numberOfAccounts: item.numberOfAccounts
 			)))
 		case let .remote(.ongoingPersonaData(item)):
-			return nil // TODO:
+			if let persona {
+				self = .relayed(anyItem, with: .personaDataPermission(.init(
+					dappMetadata: dappMetadata,
+					persona: persona,
+					requiredFieldIDs: item.fields
+				)))
+			} else {
+				assertionFailure("Persona data request requires a persona")
+				return nil
+			}
 		case let .remote(.oneTimeAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				accessKind: .oneTime,
