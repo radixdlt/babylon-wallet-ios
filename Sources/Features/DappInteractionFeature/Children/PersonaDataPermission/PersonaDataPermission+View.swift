@@ -52,29 +52,7 @@ extension PersonaDataPermission {
 								subtitle: viewStore.subtitle
 							)
 
-							DappPermissionBox {
-								HStack(spacing: .medium2) {
-									PersonaThumbnail(URL(string: "something")!, size: .small)
-									Text("RadMatt")
-										.foregroundColor(.app.gray1)
-										.textStyle(.secondaryHeader)
-								}
-							} content: {
-								VStack(alignment: .leading, spacing: .small1) {
-									Text("Matt Smith")
-										.foregroundColor(.app.gray2)
-										.textStyle(.body2Regular)
-									HStack(spacing: .small3) {
-										Image(asset: AssetResource.error)
-										Text("**Required information**: phone number, email address")
-											.textStyle(.body2Regular)
-									}
-									.foregroundColor(.app.red1)
-
-									Button("Edit", action: {})
-										.buttonStyle(.primaryRectangular)
-								}
-							}
+//							PersonaDataPermissionBox
 
 							Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
 								.foregroundColor(.app.gray2)
@@ -115,7 +93,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 extension PersonaDataPermission.State {
 	static let previewValue: Self = .init(
 		dappMetadata: .previewValue,
-		numberOfAccounts: .exactly(1)
+		requiredFieldIDs: [.givenName, .emailAddress]
 	)
 }
 #endif

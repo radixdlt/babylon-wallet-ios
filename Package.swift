@@ -111,6 +111,7 @@ package.addModules([
 	.feature(
 		name: "EditPersonaFeature",
 		dependencies: [
+			"PersonasClient",
 			"Profile",
 		],
 		tests: .no

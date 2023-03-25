@@ -1,5 +1,5 @@
 import FeaturePrelude
-import Profile
+import PersonasClient
 
 // MARK: - EditPersona.Output
 extension EditPersona {

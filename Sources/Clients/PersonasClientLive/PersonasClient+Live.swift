@@ -15,6 +15,11 @@ extension PersonasClient: DependencyKey {
 				}
 				return network.personas
 			},
+			updatePersona: { persona in
+				try await getProfileStore().updating {
+					try $0.updatePersona(persona, networkID: $0.networkID)
+				}
+			},
 			createUnsavedVirtualPersona: { request in
 				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},

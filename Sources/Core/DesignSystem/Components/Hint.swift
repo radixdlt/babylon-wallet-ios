@@ -21,7 +21,7 @@ public struct Hint: View, Equatable {
 
 	public var body: some View {
 		Label {
-			text.textStyle(.body2Regular)
+			text.lineSpacing(0).textStyle(.body2Regular)
 		} icon: {
 			if kind == .error {
 				Image(asset: AssetResource.error)

@@ -296,6 +296,8 @@ public enum L10n {
       }
     }
     public enum PersonaDataPermission {
+      /// Required information:
+      public static let requiredInformation = L10n.tr("Localizable", "dApp.personaDataPermission.requiredInformation", fallback: "Required information:")
       /// Personal Data Permission
       public static let title = L10n.tr("Localizable", "dApp.personaDataPermission.title", fallback: "Personal Data Permission")
       /// You can update this permission in your settings at any time.
