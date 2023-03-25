@@ -7,7 +7,7 @@ extension PersonaDataPermission {
 		let subtitle: AttributedString
 
 		init(state: PersonaDataPermission.State) {
-			title = L10n.DApp.AccountPermission.title
+			title = L10n.DApp.PersonaDataPermission.title
 			subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
@@ -40,68 +40,41 @@ extension PersonaDataPermission {
 		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: ViewState.init,
+				observe: PersonaDataPermission.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
 				ForceFullScreen {
 					ScrollView {
 						VStack(spacing: .medium2) {
-							VStack(spacing: .medium2) {
-								dappImage
+							DappHeader(
+								icon: nil,
+								title: viewStore.title,
+								subtitle: viewStore.subtitle
+							)
 
-								Text(viewStore.title)
-									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								Text(viewStore.subtitle)
-									.textStyle(.secondaryHeader)
-									.multilineTextAlignment(.center)
+							DappEntityBox {
+								Text("s")
+							} content: {
+								Text("s")
 							}
-							.padding(.bottom, .medium2)
 
-							//                            VStack {
-							//                                HStack {
-							//                                    Text(viewStore.numberOfAccounts)
-							//                                        .foregroundColor(.app.gray1)
-							//                                        .textStyle(.body1Regular)
-							//                                        .padding([.horizontal, .vertical], .medium1)
-//
-							//                                    Spacer()
-							//                                }
-							//                                .background(Color.app.gray5)
-							//                                .cornerRadius(.medium3)
-//
-							//                                Spacer()
-							//                                    .frame(height: .large1 * 1.5)
-//
-							//                                Text(L10n.DApp.Permission.updateInSettingsExplanation)
-							//                                    .foregroundColor(.app.gray2)
-							//                                    .textStyle(.body1Regular)
-							//                                    .multilineTextAlignment(.center)
-							//                                    .padding(.horizontal, .medium3)
-							//                            }
-							//                            .padding(.horizontal, .medium3)
-
-							Spacer()
-								.frame(height: .large1 * 1.5)
+							Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+								.foregroundColor(.app.gray2)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .medium2)
 						}
 						.padding(.horizontal, .medium1)
+						.padding(.bottom, .medium2)
 					}
 					.footer {
-						Button(L10n.DApp.Login.continueButtonTitle) {
+						Button(L10n.DApp.PersonaDataPermission.Button.continue) {
 							viewStore.send(.continueButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
 					}
 				}
 			}
-		}
-
-		var dappImage: some SwiftUI.View {
-			// NOTE: using placeholder until API is available
-			Color.app.gray4
-				.frame(.medium)
-				.cornerRadius(.medium3)
 		}
 	}
 }

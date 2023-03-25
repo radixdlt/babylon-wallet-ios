@@ -60,46 +60,29 @@ extension AccountPermission {
 				ForceFullScreen {
 					ScrollView {
 						VStack(spacing: .medium2) {
-							VStack(spacing: .medium2) {
-								dappImage
+							DappHeader(
+								icon: nil,
+								title: viewStore.title,
+								subtitle: viewStore.subtitle
+							)
 
-								Text(viewStore.title)
+							DappEntityBox {
+								Text(viewStore.numberOfAccounts)
 									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								Text(viewStore.subtitle)
-									.textStyle(.secondaryHeader)
-									.multilineTextAlignment(.center)
-							}
-							.padding(.bottom, .medium2)
-
-							VStack {
-								HStack {
-									Text(viewStore.numberOfAccounts)
-										.foregroundColor(.app.gray1)
-										.textStyle(.body1Regular)
-										.padding([.horizontal, .vertical], .medium1)
-
-									Spacer()
-								}
-								.background(Color.app.gray5)
-								.cornerRadius(.medium3)
-
-								Spacer()
-									.frame(height: .large1 * 1.5)
-
-								Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
-									.foregroundColor(.app.gray2)
 									.textStyle(.body1Regular)
-									.multilineTextAlignment(.center)
-									.padding(.horizontal, .medium3)
+									.padding(.small3)
+									.frame(maxWidth: .infinity, alignment: .leading)
 							}
-							.padding(.horizontal, .medium3)
+							.padding(.horizontal, .medium2)
 
-							Spacer()
-								.frame(height: .large1 * 1.5)
+							Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+								.foregroundColor(.app.gray2)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .medium2)
 						}
 						.padding(.horizontal, .medium1)
+						.padding(.bottom, .medium2)
 					}
 					.footer {
 						Button(L10n.DApp.AccountPermission.Button.continue) {
@@ -109,13 +92,6 @@ extension AccountPermission {
 					}
 				}
 			}
-		}
-
-		var dappImage: some SwiftUI.View {
-			// NOTE: using placeholder until API is available
-			Color.app.gray4
-				.frame(.medium)
-				.cornerRadius(.medium3)
 		}
 	}
 }
