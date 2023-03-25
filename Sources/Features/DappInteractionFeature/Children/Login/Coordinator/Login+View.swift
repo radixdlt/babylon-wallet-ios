@@ -66,13 +66,15 @@ extension Login {
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 
-							ForEachStore(
-								store.scope(
-									state: \.personas,
-									action: { .child(.persona(id: $0, action: $1)) }
-								),
-								content: { PersonaRow.View(store: $0) }
-							)
+							VStack(spacing: .small1) {
+								ForEachStore(
+									store.scope(
+										state: \.personas,
+										action: { .child(.persona(id: $0, action: $1)) }
+									),
+									content: { PersonaRow.View(store: $0) }
+								)
+							}
 
 							Button(L10n.Personas.createNewPersonaButtonTitle) {
 								viewStore.send(.createNewPersonaButtonTapped)
@@ -118,16 +120,19 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - LoginRequest_Preview
 struct Login_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		Login.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: Login()
-					.dependency(\.accountsClient, .previewValueTwoAccounts())
-					.dependency(\.authorizedDappsClient, .previewValueOnePersona())
-					.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
-					.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
+		NavigationStack {
+			Login.View(
+				store: .init(
+					initialState: .previewValue,
+					reducer: Login()
+						.dependency(\.accountsClient, .previewValueTwoAccounts())
+						.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+						.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
+						.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
+				)
 			)
-		)
+			.toolbar(.visible, for: .navigationBar)
+		}
 	}
 }
 
