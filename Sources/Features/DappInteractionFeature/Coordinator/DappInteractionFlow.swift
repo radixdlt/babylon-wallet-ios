@@ -344,6 +344,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return continueEffect(for: &state)
 		}
 
+		func handleOngoingPersonaDataPermission(
+			_ item: State.AnyInteractionItem,
+			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		) -> EffectTask<Action> {
+			let fields = fields.map { P2P.ToDapp.PersonaData(field: $0.id, value: $0.value) }
+			state.responseItems[item] = .remote(.ongoingPersonaData(.init(fields: fields)))
+			return continueEffect(for: &state)
+		}
+
 		func handleSignAndSubmitTX(
 			_ item: State.AnyInteractionItem,
 			_ txID: TransactionIntent.TXID
@@ -374,6 +383,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			let .root(.relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))),
 			let .path(.element(_, .relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind)))))):
 			return handleAccounts(item, accounts, accessKind)
+
+		case
+			let .root(.relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields))))),
+			let .path(.element(_, .relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields)))))):
+			return handleOngoingPersonaDataPermission(item, fields)
 
 		case
 			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),

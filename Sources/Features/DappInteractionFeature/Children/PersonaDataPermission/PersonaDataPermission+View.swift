@@ -5,6 +5,7 @@ extension PersonaDataPermission {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
+		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: PersonaDataPermission.State) {
 			title = L10n.DApp.PersonaDataPermission.title
@@ -29,6 +30,14 @@ extension PersonaDataPermission {
 				}()
 
 				return dappName + explanation
+			}()
+			output = {
+				let fields = state.persona.persona.fields
+					.filter { state.requiredFieldIDs.contains($0.id) }
+				guard fields.count == state.requiredFieldIDs.count else {
+					return nil
+				}
+				return fields
 			}()
 		}
 	}
@@ -69,10 +78,13 @@ extension PersonaDataPermission {
 						.padding(.bottom, .medium2)
 					}
 					.footer {
-						Button(L10n.DApp.PersonaDataPermission.Button.continue) {
-							viewStore.send(.continueButtonTapped)
+						WithControlRequirements(
+							viewStore.output,
+							forAction: { viewStore.send(.continueButtonTapped($0)) }
+						) { action in
+							Button(L10n.DApp.PersonaDataPermission.Button.continue, action: action)
+								.buttonStyle(.primaryRectangular)
 						}
-						.buttonStyle(.primaryRectangular)
 					}
 				}
 			}

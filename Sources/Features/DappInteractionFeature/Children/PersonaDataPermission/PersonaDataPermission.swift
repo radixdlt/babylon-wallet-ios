@@ -23,7 +23,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case continueButtonTapped
+		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -32,7 +32,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped
+		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -60,8 +60,8 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .continueButtonTapped:
-			return .send(.delegate(.continueButtonTapped))
+		case let .continueButtonTapped(fields):
+			return .send(.delegate(.continueButtonTapped(fields)))
 		}
 	}
 
