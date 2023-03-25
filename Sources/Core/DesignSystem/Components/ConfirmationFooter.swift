@@ -6,6 +6,7 @@ public struct ConfirmationFooter: View {
 	public let isEnabled: Bool // TODO: remove post betanet v2, just set .controlState from outside instead
 	public let action: () -> Void
 
+	@available(*, deprecated, message: "Use `.footer` instead")
 	public init(
 		title: String,
 		isEnabled: Bool,
@@ -35,6 +36,7 @@ extension ConfirmationFooter {
 }
 
 // MARK: - ConfirmationFooter_Previews
+#if DEBUG
 struct ConfirmationFooter_Previews: PreviewProvider {
 	static var previews: some View {
 		Color.red
@@ -43,3 +45,4 @@ struct ConfirmationFooter_Previews: PreviewProvider {
 			}
 	}
 }
+#endif

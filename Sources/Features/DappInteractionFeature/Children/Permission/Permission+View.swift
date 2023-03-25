@@ -129,12 +129,11 @@ extension Permission {
 						}
 						.padding(.horizontal, .medium1)
 					}
-					.safeAreaInset(edge: .bottom, spacing: .zero) {
-						ConfirmationFooter(
-							title: L10n.DApp.Login.continueButtonTitle,
-							isEnabled: true,
-							action: { viewStore.send(.continueButtonTapped) }
-						)
+					.footer {
+						Button(L10n.DApp.Login.continueButtonTitle) {
+							viewStore.send(.continueButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
 					}
 				}
 			}
