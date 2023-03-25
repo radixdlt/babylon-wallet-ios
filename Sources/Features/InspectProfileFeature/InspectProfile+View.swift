@@ -427,11 +427,15 @@ public struct DappAuthorizedPersonaView: IndentedView {
 
 			Text("Shared Fields")
 			if let sharedFields = detailedAuthorizedPersona.sharedFields {
-				ForEach(sharedFields) { field in
-					VStack {
-						Labeled("id", value: field.id.description)
-						Labeled("value", value: field.value.rawValue)
+				if !sharedFields.isEmpty {
+					ForEach(sharedFields) { field in
+						VStack {
+							Labeled("id", value: field.id.description)
+							Labeled("value", value: field.value.rawValue)
+						}
 					}
+				} else {
+					Text("None yet")
 				}
 			} else {
 				Text("Never requested")
@@ -439,10 +443,14 @@ public struct DappAuthorizedPersonaView: IndentedView {
 
 			Text("Shared Accounts")
 			if let simpleAccounts = detailedAuthorizedPersona.simpleAccounts {
-				ForEach(simpleAccounts) { simpleAccount in
-					Labeled("displayName", value: simpleAccount.label.rawValue)
-					Labeled("address", value: simpleAccount.address.address)
-					Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+				if !simpleAccounts.isEmpty {
+					ForEach(simpleAccounts) { simpleAccount in
+						Labeled("displayName", value: simpleAccount.label.rawValue)
+						Labeled("address", value: simpleAccount.address.address)
+						Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+					}
+				} else {
+					Text("None yet")
 				}
 			} else {
 				Text("Never requested")
