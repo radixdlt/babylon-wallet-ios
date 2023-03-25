@@ -498,35 +498,31 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							displayName: state.dappMetadata.name
 						)
 						// This extraction is really verbose right now, but it should become a lot simpler with native case paths
-						let sharedAccountsInfo = { () -> (P2P.FromDapp.WalletInteraction.NumberOfAccounts, [P2P.ToDapp.WalletAccount])? in
-							let numberOfAccounts: P2P.FromDapp.WalletInteraction.NumberOfAccounts
-							switch state.remoteInteraction.items {
-							case let .request(.authorized(items)):
-								if let ongoingAccounts = items.ongoingAccounts {
-									numberOfAccounts = ongoingAccounts.numberOfAccounts
-								} else {
-									return nil
-								}
-							default:
-								return nil
-							}
-
-							let accounts: [P2P.ToDapp.WalletAccount]
-							switch response.items {
-							case let .request(.authorized(items)):
-								switch items.ongoingAccounts {
-								case let .withProof(item):
-									accounts = item.accounts.map(\.account)
-								case let .withoutProof(item):
-									accounts = item.accounts
+						let sharedAccountsInfo: (P2P.FromDapp.WalletInteraction.NumberOfAccounts, [P2P.ToDapp.WalletAccount])? = unwrap(
+							{
+								switch state.remoteInteraction.items {
+								case let .request(.authorized(items)):
+									return items.ongoingAccounts?.numberOfAccounts
 								default:
 									return nil
 								}
-							default:
-								return nil
-							}
-							return (numberOfAccounts, accounts)
-						}()
+							}(),
+							{
+								switch response.items {
+								case let .request(.authorized(items)):
+									switch items.ongoingAccounts {
+									case nil:
+										return nil
+									case let .withProof(item):
+										return item.accounts.map(\.account)
+									case let .withoutProof(item):
+										return item.accounts
+									}
+								default:
+									return nil
+								}
+							}()
+						)
 						let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 							sharedAccounts = try .init(
