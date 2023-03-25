@@ -78,6 +78,10 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			))
 			return .none
 
+		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
+			state.persona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
+			return .none
+
 		default:
 			return .none
 		}

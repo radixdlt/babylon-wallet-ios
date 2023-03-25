@@ -79,7 +79,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case save(Output)
+		case personaSaved(Profile.Network.Persona)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -101,6 +101,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public init() {}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
@@ -122,7 +124,16 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .run { _ in await dismiss() }
 
 		case let .saveButtonTapped(output):
-			return .send(.delegate(.save(output)))
+			return .run { [state] send in
+				var persona = state.persona
+				persona.displayName = output.personaLabel
+				persona.fields = output.fields
+				try await personasClient.updatePersona(persona)
+				await send(.delegate(.personaSaved(persona)))
+				await dismiss()
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case .addAFieldButtonTapped:
 			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.id)))
