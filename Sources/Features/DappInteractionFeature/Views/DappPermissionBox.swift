@@ -16,8 +16,7 @@ struct DappPermissionBox<Header: View, Content: View>: View {
 		VStack(spacing: 0) {
 			if !(header is EmptyView) {
 				header
-					.padding(.vertical, .medium1)
-					.padding(.horizontal, .medium2)
+					.padding(.medium2)
 					.frame(maxWidth: .infinity, alignment: .leading)
 				Separator()
 			}
