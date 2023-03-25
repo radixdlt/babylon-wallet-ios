@@ -56,18 +56,11 @@ extension Login {
 				ForceFullScreen {
 					ScrollView {
 						VStack(spacing: .medium2) {
-							VStack(spacing: .medium2) {
-								dappImage
-
-								Text(viewStore.title)
-									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								Text(viewStore.subtitle)
-									.textStyle(.secondaryHeader)
-									.multilineTextAlignment(.center)
-							}
-							.padding(.bottom, .small2)
+							DappHeader(
+								icon: nil,
+								title: viewStore.title,
+								subtitle: viewStore.subtitle
+							)
 
 							Text(L10n.DApp.Login.chooseAPersonaTitle)
 								.foregroundColor(.app.gray1)
@@ -84,12 +77,10 @@ extension Login {
 							Button(L10n.Personas.createNewPersonaButtonTitle) {
 								viewStore.send(.createNewPersonaButtonTapped)
 							}
-							.buttonStyle(.secondaryRectangular(
-								shouldExpand: false
-							))
+							.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
 						.padding(.horizontal, .medium1)
-						.padding(.bottom, .large1 * 1.5)
+						.padding(.bottom, .medium2)
 					}
 					.safeAreaInset(edge: .bottom, spacing: .zero) {
 						WithControlRequirements(
@@ -117,13 +108,6 @@ extension Login {
 					content: { CreatePersonaCoordinator.View(store: $0) }
 				)
 			}
-		}
-
-		var dappImage: some SwiftUI.View {
-			// NOTE: using placeholder until API is available
-			Color.app.gray4
-				.frame(.medium)
-				.cornerRadius(.medium3)
 		}
 	}
 }

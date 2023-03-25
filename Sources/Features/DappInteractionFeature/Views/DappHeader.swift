@@ -6,7 +6,7 @@ struct DappHeader: View {
 	let subtitle: AttributedString
 
 	var body: some View {
-		VStack(spacing: .medium2) {
+		VStack(spacing: .medium3) {
 			// NOTE: using placeholder until API is available
 			Color.app.gray4
 				.frame(.medium)
@@ -21,6 +21,6 @@ struct DappHeader: View {
 				.textStyle(.secondaryHeader)
 		}
 		.multilineTextAlignment(.center)
-		.padding(.bottom, .medium2)
+		.padding(.bottom, .small2)
 	}
 }

@@ -87,47 +87,37 @@ extension ChooseAccounts {
 			) { viewStore in
 				ForceFullScreen {
 					ScrollView {
-						VStack(spacing: .small1) {
-							VStack(spacing: .medium2) {
-								dappImage
+						VStack(spacing: .medium2) {
+							DappHeader(
+								icon: nil,
+								title: viewStore.title,
+								subtitle: viewStore.subtitle
+							)
 
-								Text(viewStore.title)
-									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								Text(viewStore.subtitle)
-									.textStyle(.secondaryHeader)
-									.multilineTextAlignment(.center)
+							VStack(spacing: .small1) {
+								Selection(
+									viewStore.binding(
+										get: \.selectedAccounts,
+										send: { .selectedAccountsChanged($0) }
+									),
+									from: viewStore.availableAccounts,
+									requiring: viewStore.selectionRequirement
+								) { item in
+									ChooseAccountsRow.View(
+										viewState: .init(state: item.value),
+										isSelected: item.isSelected,
+										action: item.action
+									)
+								}
 							}
-							.padding(.bottom, .medium2)
-
-							Selection(
-								viewStore.binding(
-									get: \.selectedAccounts,
-									send: { .selectedAccountsChanged($0) }
-								),
-								from: viewStore.availableAccounts,
-								requiring: viewStore.selectionRequirement
-							) { item in
-								ChooseAccountsRow.View(
-									viewState: .init(state: item.value),
-									isSelected: item.isSelected,
-									action: item.action
-								)
-							}
-
-							Spacer()
-								.frame(height: .small3)
 
 							Button(L10n.DApp.ChooseAccounts.createNewAccount) {
 								viewStore.send(.createAccountButtonTapped)
 							}
 							.buttonStyle(.secondaryRectangular(shouldExpand: false))
-
-							Spacer()
-								.frame(height: .large1 * 1.5)
 						}
 						.padding(.horizontal, .medium1)
+						.padding(.bottom, .medium2)
 					}
 					.footer {
 						WithControlRequirements(
@@ -151,13 +141,6 @@ extension ChooseAccounts {
 				)
 			}
 		}
-
-		var dappImage: some SwiftUI.View {
-			// NOTE: using placeholder until API is available
-			Color.app.gray4
-				.frame(.medium)
-				.cornerRadius(.medium3)
-		}
 	}
 }
 
@@ -166,12 +149,15 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct ChooseAccounts_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		ChooseAccounts.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: ChooseAccounts()
+		NavigationStack {
+			ChooseAccounts.View(
+				store: .init(
+					initialState: .previewValue,
+					reducer: ChooseAccounts()
+				)
 			)
-		)
+			.toolbar(.visible, for: .navigationBar)
+		}
 	}
 }
 
