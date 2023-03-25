@@ -15,17 +15,15 @@ extension Login {
 		init(state: Login.State) {
 			let isKnownDapp = state.authorizedPersona != nil
 
-			title = isKnownDapp ?
-				L10n.DApp.Login.Title.knownDapp :
-				L10n.DApp.Login.Title.newDapp
+			title = isKnownDapp
+				? L10n.DApp.Login.Title.knownDapp
+				: L10n.DApp.Login.Title.newDapp
 
 			subtitle = {
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
 
 				let explanation = AttributedString(
-					isKnownDapp ?
-						L10n.DApp.Login.Subtitle.knownDapp :
-						L10n.DApp.Login.Subtitle.newDapp,
+					isKnownDapp ? L10n.DApp.Login.Subtitle.knownDapp : L10n.DApp.Login.Subtitle.newDapp,
 					foregroundColor: .app.gray2
 				)
 
