@@ -307,6 +307,15 @@
       }
     },
     {
+      "identity" : "textbuilder",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davdroman/TextBuilder",
+      "state" : {
+        "revision" : "bec40373ebb5840473e01ca0485fc91ad6c8c9e9",
+        "version" : "2.2.0"
+      }
+    },
+    {
       "identity" : "webrtc",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stasel/WebRTC",

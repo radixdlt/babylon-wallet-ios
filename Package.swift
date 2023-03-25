@@ -559,6 +559,9 @@ package.addModules([
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
 				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
 			},
+			.product(name: "TextBuilder", package: "TextBuilder") {
+				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
+			},
 		],
 		tests: .yes()
 	),

@@ -30,12 +30,13 @@ extension PersonaDataPermissionBox.State {
 			missingRequiredFields: { () -> Hint? in
 				guard let missingRequiredFieldIDs else { return nil }
 
-				return Hint(
-					.error,
-					Text(L10n.DApp.PersonaDataPermission.requiredInformation).bold() +
-						Text(" ") +
-						Text(missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", "))
-				)
+				return .error {
+					Text {
+						L10n.DApp.PersonaDataPermission.requiredInformation.text.bold()
+						" "
+						missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
+					}
+				}
 			}()
 		)
 	}
