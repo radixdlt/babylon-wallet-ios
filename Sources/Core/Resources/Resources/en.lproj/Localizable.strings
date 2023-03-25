@@ -73,18 +73,23 @@
 "dApp.metadataLoading.errorAlert.message" = "Danger! Bad dApp config or you're being spoofed!";
 "dApp.metadataLoading.errorAlert.retryButtonTitle" = "Retry";
 "dApp.metadataLoading.prompt" = "Loading...";
-"dApp.permission.numberOfAccounts.atLeast" = "%d or more accounts";
-"dApp.permission.numberOfAccounts.atLeastZero" = "Any number of accounts";
-"dApp.permission.numberOfAccounts.exactly" = "%d accounts";
-"dApp.permission.numberOfAccounts.exactlyOne" = "1 account";
-"dApp.permission.subtitle.always" = "always";
-"dApp.permission.subtitle.explanation.accounts.first" = " is requesting permission to ";
-"dApp.permission.subtitle.explanation.accounts.second" = " be able to view account information when you login with this Persona.";
-"dApp.permission.subtitle.explanation.personaData.first" = " is requesting permission to ";
-"dApp.permission.subtitle.explanation.personaData.second" = " be able to view the following personal data when you login with this Persona.";
-"dApp.permission.title.accounts" = "Account Permission";
-"dApp.permission.title.personaData" = "Personal Data Permission";
-"dApp.permission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
+
+"dApp.accountPermission.title" = "Account Permission";
+"dApp.accountPermission.subtitle.explanation.first" = " is requesting permission to ";
+"dApp.accountPermission.subtitle.always" = "always";
+"dApp.accountPermission.subtitle.explanation.second" = " be able to view account information when you login with this Persona.";
+"dApp.accountPermission.numberOfAccounts.atLeast" = "%d or more accounts";
+"dApp.accountPermission.numberOfAccounts.atLeastZero" = "Any number of accounts";
+"dApp.accountPermission.numberOfAccounts.exactly" = "%d accounts";
+"dApp.accountPermission.numberOfAccounts.exactlyOne" = "1 account";
+"dApp.accountPermission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
+
+"dApp.personaDataPermission.title" = "Personal Data Permission";
+"dApp.personaDataPermission.subtitle.explanation.first" = " is requesting permission to ";
+"dApp.personaDataPermission.subtitle.always" = "always";
+"dApp.personaDataPermission.subtitle.explanation.second" = " be able to view the following personal data when you login with this Persona.";
+"dApp.personaDataPermission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
+
 "dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";
 "dApp.request.malformedErrorAlert.okButtonTitle" = "OK";
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
