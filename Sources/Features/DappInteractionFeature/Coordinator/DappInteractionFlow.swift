@@ -385,6 +385,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return handleAccounts(item, accounts, accessKind)
 
 		case
+			let .root(.relay(_, .personaDataPermission(.delegate(.personaUpdated(persona))))),
+			let .path(.element(_, .relay(_, .personaDataPermission(.delegate(.personaUpdated(persona)))))):
+			state.persona = persona
+			return .none
+
+		case
 			let .root(.relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields))))),
 			let .path(.element(_, .relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields)))))):
 			return handleOngoingPersonaDataPermission(item, fields)
