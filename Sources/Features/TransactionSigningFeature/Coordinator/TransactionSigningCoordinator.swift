@@ -17,10 +17,14 @@ public struct TransactionSigningCoordinator: Sendable, FeatureReducer {
 		public var step: Step
 
 		public init(
+			messageFromDapp: String?,
 			rawTransactionManifest: TransactionManifest
 		) {
 			self.rawTransactionManifest = rawTransactionManifest
-			self.step = .prepare(.init(rawTransactionManifest: rawTransactionManifest))
+			self.step = .prepare(.init(
+				messageFromDapp: messageFromDapp,
+				rawTransactionManifest: rawTransactionManifest
+			))
 		}
 	}
 
@@ -55,6 +59,19 @@ public struct TransactionSigningCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.transactionClient) var transactionClient
 
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.step, action: /Action.self) {
+			EmptyReducer()
+				.ifCaseLet(/State.Step.prepare, action: /Action.child .. ChildAction.prepare) {
+					TransactionSigningPrepare()
+				}
+				.ifCaseLet(/State.Step.review, action: /Action.child .. ChildAction.review) {
+					TransactionReview()
+				}
+		}
+		Reduce(core)
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {

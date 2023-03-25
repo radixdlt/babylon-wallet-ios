@@ -1,34 +1,8 @@
 import FeaturePrelude
 import TransactionReviewFeature
 
-extension TransactionSigningCoordinator.State {
-	fileprivate var viewState: TransactionSigningCoordinator.ViewState {
-		fatalError()
-	}
-}
-
-// MARK: - TransactionSigning.View
+// MARK: - TransactionSigningCoordinator.View
 extension TransactionSigningCoordinator {
-	public struct ViewState: Equatable {
-		let isShowingLoader: Bool
-
-		init(state: TransactionSigningCoordinator.State) {
-//			manifest = state.transactionWithLockFeeString
-//			isShowingLoader = state.isSigningTX
-//			signButtonEnabled = !state.isSigningTX
-//			viewControlState = {
-//				if state.transactionWithLockFeeString == nil {
-//					return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
-//				} else if state.isSigningTX {
-//					return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
-//				} else {
-//					return .enabled
-//				}
-//			}()
-			fatalError()
-		}
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionSigningCoordinator>
@@ -38,7 +12,7 @@ extension TransactionSigningCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState) { viewStore in
+			WithViewStore(store, observe: { $0 }) { viewStore in
 				NavigationStack {
 					SwitchStore(store.scope(state: \.step)) {
 						CaseLet(

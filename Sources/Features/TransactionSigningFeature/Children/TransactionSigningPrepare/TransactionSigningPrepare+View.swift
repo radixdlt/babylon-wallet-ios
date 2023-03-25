@@ -22,10 +22,8 @@ extension TransactionSigningPrepare {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: TransactionSigningPrepare")
-					.background(Color.yellow)
-					.foregroundColor(.red)
+				Color.clear
+					.presentsLoadingViewOverlay()
 					.onAppear { viewStore.send(.appeared) }
 			}
 		}
@@ -48,6 +46,6 @@ struct TransactionSigningPrepare_Preview: PreviewProvider {
 }
 
 extension TransactionSigningPrepare.State {
-	public static let previewValue = Self(rawTransactionManifest: .previewValue)
+	public static let previewValue = Self(messageFromDapp: "Hello", rawTransactionManifest: .previewValue)
 }
 #endif

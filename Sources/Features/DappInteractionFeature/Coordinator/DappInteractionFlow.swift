@@ -609,6 +609,7 @@ extension DappInteractionFlow.Destinations.State {
 			)))
 		case let .remote(.send(item)):
 			self = .relayed(anyItem, with: .signAndSubmitTransaction(.init(
+				messageFromDapp: item.message,
 				rawTransactionManifest: item.transactionManifest
 			)))
 		}
