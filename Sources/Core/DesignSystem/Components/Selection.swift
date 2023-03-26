@@ -77,7 +77,7 @@ public struct Selection<Value: Hashable, Content: View>: View {
 				selection.wrappedValue = newValue?.first
 			}
 		)
-		self.selectedValues = selection.wrappedValue.map { Set([$0]) } ?? []
+		self.selectedValues = selection.wrappedValue.map { [$0] } ?? []
 		self.values = OrderedSet(values)
 		self.requirement = .exactly(1)
 		self.content = content
