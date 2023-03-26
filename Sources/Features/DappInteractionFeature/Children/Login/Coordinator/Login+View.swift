@@ -6,6 +6,8 @@ extension Login {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
+		let availablePersonas: IdentifiedArrayOf<PersonaRow.State>
+		let selectedPersona: PersonaRow.State?
 		let continueButtonRequirements: ContinueButtonRequirements?
 
 		struct ContinueButtonRequirements: Equatable {
@@ -30,8 +32,11 @@ extension Login {
 				return dappName + explanation
 			}()
 
+			availablePersonas = state.personas
+			selectedPersona = state.selectedPersona
+
 			if let persona = state.selectedPersona {
-				continueButtonRequirements = .init(persona: persona)
+				continueButtonRequirements = .init(persona: persona.persona)
 			} else {
 				continueButtonRequirements = nil
 			}
@@ -61,13 +66,19 @@ extension Login {
 							.textStyle(.body1Header)
 
 						VStack(spacing: .small1) {
-							ForEachStore(
-								store.scope(
-									state: \.personas,
-									action: { .child(.persona(id: $0, action: $1)) }
+							Selection(
+								viewStore.binding(
+									get: \.selectedPersona,
+									send: { .selectedPersonaChanged($0) }
 								),
-								content: { PersonaRow.View(store: $0) }
-							)
+								from: viewStore.availablePersonas
+							) { item in
+								PersonaRow.View(
+									viewState: .init(state: item.value),
+									isSelected: item.isSelected,
+									action: item.action
+								)
+							}
 						}
 
 						Button(L10n.Personas.createNewPersonaButtonTitle) {
