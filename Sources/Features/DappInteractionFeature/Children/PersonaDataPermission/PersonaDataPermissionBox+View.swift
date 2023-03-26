@@ -54,13 +54,9 @@ extension PersonaDataPermissionBox {
 
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<PersonaDataPermissionBox>
+		let store: StoreOf<PersonaDataPermissionBox>
 
-		public init(store: StoreOf<PersonaDataPermissionBox>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
+		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DappPermissionBox {
 					HStack(spacing: .medium2) {
