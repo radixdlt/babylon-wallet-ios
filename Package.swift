@@ -232,6 +232,7 @@ package.addModules([
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
+			"GeneralSettings",
 			"InspectProfileFeature",
 			"MnemonicClient",
 			"P2PLinksFeature",
