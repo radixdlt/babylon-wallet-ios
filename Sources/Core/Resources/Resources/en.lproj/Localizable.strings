@@ -91,6 +91,7 @@
 "dApp.personaDataPermission.subtitle.explanation.second" = " be able to view the following personal data when you login with this Persona.";
 "dApp.personaDataPermission.requiredInformation" = "Required information:";
 "dApp.personaDataPermission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
+"dApp.personaDataPermission.button.edit" = "Edit";
 "dApp.personaDataPermission.button.continue" = "Continue";
 
 "dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";

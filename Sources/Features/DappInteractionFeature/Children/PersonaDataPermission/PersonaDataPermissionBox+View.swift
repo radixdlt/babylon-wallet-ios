@@ -75,7 +75,7 @@ extension PersonaDataPermissionBox {
 
 						viewStore.missingRequiredFields
 
-						Button("Edit") {
+						Button(L10n.DApp.PersonaDataPermission.Button.edit) {
 							viewStore.send(.editButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)

@@ -305,6 +305,8 @@ public enum L10n {
       public enum Button {
         /// Continue
         public static let `continue` = L10n.tr("Localizable", "dApp.personaDataPermission.button.continue", fallback: "Continue")
+        /// Edit
+        public static let edit = L10n.tr("Localizable", "dApp.personaDataPermission.button.edit", fallback: "Edit")
       }
       public enum Subtitle {
         /// always
