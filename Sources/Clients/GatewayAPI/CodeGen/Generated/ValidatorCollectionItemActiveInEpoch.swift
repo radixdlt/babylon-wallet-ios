@@ -16,20 +16,21 @@ public typealias ValidatorCollectionItemActiveInEpoch = GatewayAPI.ValidatorColl
 // MARK: - GatewayAPI.ValidatorCollectionItemActiveInEpoch
 extension GatewayAPI {
 	public struct ValidatorCollectionItemActiveInEpoch: Codable, Hashable {
-		public private(set) var stake: ValidatorCollectionItemActiveInEpochStake
+		/** String-encoded decimal representing the amount of a related fungible resource. */
+		public private(set) var stake: String
+		public private(set) var stakePercentage: Double
 		public private(set) var key: PublicKey
-		public private(set) var metadata: EntityMetadataCollection?
 
-		public init(stake: ValidatorCollectionItemActiveInEpochStake, key: PublicKey, metadata: EntityMetadataCollection? = nil) {
+		public init(stake: String, stakePercentage: Double, key: PublicKey) {
 			self.stake = stake
+			self.stakePercentage = stakePercentage
 			self.key = key
-			self.metadata = metadata
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case stake
+			case stakePercentage = "stake_percentage"
 			case key
-			case metadata
 		}
 
 		// Encodable protocol methods
@@ -37,8 +38,8 @@ extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(stake, forKey: .stake)
+			try container.encode(stakePercentage, forKey: .stakePercentage)
 			try container.encode(key, forKey: .key)
-			try container.encodeIfPresent(metadata, forKey: .metadata)
 		}
 	}
 }

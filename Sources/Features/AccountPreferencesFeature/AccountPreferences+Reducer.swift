@@ -7,12 +7,22 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 
+		#if DEBUG
+		public var createFungibleTokenButtonState: ControlState
+		public var createNonFungibleTokenButtonState: ControlState
+		#endif
+
 		public init(
 			address: AccountAddress,
 			faucetButtonState: ControlState = .enabled
 		) {
 			self.address = address
 			self.faucetButtonState = faucetButtonState
+
+			#if DEBUG
+			self.createFungibleTokenButtonState = .enabled
+			self.createNonFungibleTokenButtonState = .enabled
+			#endif
 		}
 	}
 
@@ -20,10 +30,16 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case appeared
 		case closeButtonTapped
 		case faucetButtonTapped
+
+		#if DEBUG
+		case createFungibleTokenButtonTapped
+		case createNonFungibleTokenButtonTapped
+		#endif
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case isAllowedToUseFaucet(TaskResult<Bool>)
+		case callDone(updateControlState: WritableKeyPath<State, ControlState>)
 		case refreshAccountCompleted
 		case hideLoader
 	}
@@ -50,19 +66,40 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case .faucetButtonTapped:
-			state.faucetButtonState = .loading(.local)
-			return .run { [address = state.address] send in
-				do {
-					_ = try await faucetClient.getFreeXRD(.init(
-						recipientAccountAddress: address
-					))
-					await send(.delegate(.refreshAccount(address)))
-				} catch {
-					await send(.internal(.hideLoader))
-					if !Task.isCancelled {
-						errorQueue.schedule(error)
-					}
-				}
+			return call(buttonState: \.faucetButtonState, into: &state) {
+				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
+			}
+		#if DEBUG
+		case .createFungibleTokenButtonTapped:
+			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
+				try await faucetClient.createFungibleToken(.init(
+					recipientAccountAddress: $0
+				))
+			}
+
+		case .createNonFungibleTokenButtonTapped:
+			return call(buttonState: \.createNonFungibleTokenButtonState, into: &state) {
+				try await faucetClient.createNonFungibleToken(.init(
+					recipientAccountAddress: $0
+				))
+			}
+		#endif
+		}
+	}
+
+	private func call(
+		buttonState: WritableKeyPath<State, ControlState>,
+		into state: inout State,
+		call: @escaping @Sendable (AccountAddress) async throws -> Void
+	) -> EffectTask<Action> {
+		state[keyPath: buttonState] = .loading(.local)
+		return .run { [address = state.address] send in
+			try await call(address)
+			await send(.internal(.callDone(updateControlState: buttonState)))
+		} catch: { error, send in
+			await send(.internal(.hideLoader))
+			if !Task.isCancelled {
+				errorQueue.schedule(error)
 			}
 		}
 	}
@@ -85,6 +122,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case .hideLoader:
 			state.faucetButtonState = .enabled
 			return .none
+
+		case let .callDone(controlStateKeyPath):
+			if controlStateKeyPath == \State.faucetButtonState {
+				return .send(.delegate(.refreshAccount(state.address))).concatenate(with: loadIsAllowedToUseFaucet(&state))
+			} else {
+				state[keyPath: controlStateKeyPath] = .enabled
+				return .send(.delegate(.refreshAccount(state.address)))
+			}
 		}
 	}
 }
@@ -95,7 +140,7 @@ extension AccountPreferences {
 		return .run { [address = state.address] send in
 			await send(.internal(.isAllowedToUseFaucet(
 				TaskResult {
-					try await faucetClient.isAllowedToUseFaucet(address)
+					await faucetClient.isAllowedToUseFaucet(address)
 				}
 			)))
 		}

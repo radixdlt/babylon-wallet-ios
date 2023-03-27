@@ -36,13 +36,13 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 	public init(
 		componentAddress: ComponentAddress,
-		divisibility: Int?,
-		totalSupply: BigDecimal?,
-		totalMinted: BigDecimal?,
-		totalBurnt: BigDecimal?,
-		tokenDescription: String?,
-		name: String?,
-		symbol: String?,
+		divisibility: Int? = nil,
+		totalSupply: BigDecimal? = nil,
+		totalMinted: BigDecimal? = nil,
+		totalBurnt: BigDecimal? = nil,
+		tokenDescription: String? = nil,
+		name: String? = nil,
+		symbol: String? = nil,
 		isXRD: Bool,
 		tokenInfoURL: String? = nil,
 		iconURL: URL? = nil

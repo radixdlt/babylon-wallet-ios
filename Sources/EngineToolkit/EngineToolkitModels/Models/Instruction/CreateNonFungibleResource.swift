@@ -11,22 +11,22 @@ public struct CreateNonFungibleResource: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let idType: Enum
+	public let schema: Tuple
 	public let metadata: Map_
 	public let accessRules: Map_
-	public let initialSupply: Value_
 
 	// MARK: Init
 
 	public init(
 		idType: Enum,
+		schema: Tuple,
 		metadata: Map_,
-		accessRules: Map_,
-		initialSupply: Value_
+		accessRules: Map_
 	) {
 		self.idType = idType
+		self.schema = schema
 		self.metadata = metadata
 		self.accessRules = accessRules
-		self.initialSupply = initialSupply
 	}
 }
 
@@ -36,9 +36,9 @@ extension CreateNonFungibleResource {
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case idType = "id_type"
+		case schema
 		case metadata
 		case accessRules = "access_rules"
-		case initialSupply = "initial_supply"
 	}
 
 	// MARK: Codable
@@ -48,9 +48,9 @@ extension CreateNonFungibleResource {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(idType, forKey: .idType)
+		try container.encode(schema, forKey: .schema)
 		try container.encode(metadata, forKey: .metadata)
 		try container.encode(accessRules, forKey: .accessRules)
-		try container.encode(initialSupply, forKey: .initialSupply)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -61,16 +61,11 @@ extension CreateNonFungibleResource {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let idType = try container.decode(Enum.self, forKey: .idType)
-		let metadata = try container.decode(Map_.self, forKey: .metadata)
-		let accessRules = try container.decode(Map_.self, forKey: .accessRules)
-		let initialSupply = try container.decode(Value_.self, forKey: .initialSupply)
-
-		self.init(
-			idType: idType,
-			metadata: metadata,
-			accessRules: accessRules,
-			initialSupply: initialSupply
+		try self.init(
+			idType: container.decode(Enum.self, forKey: .idType),
+			schema: container.decode(Tuple.self, forKey: .schema),
+			metadata: container.decode(Map_.self, forKey: .metadata),
+			accessRules: container.decode(Map_.self, forKey: .accessRules)
 		)
 	}
 }

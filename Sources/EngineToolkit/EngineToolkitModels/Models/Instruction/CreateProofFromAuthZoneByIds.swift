@@ -9,7 +9,7 @@ public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 	public let ids: Set<NonFungibleLocalId>
 	public let intoProof: Proof
 
@@ -20,7 +20,7 @@ public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
 		ids: Set<NonFungibleLocalId>,
 		intoProof: Proof
 	) {
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 		self.ids = ids
 		self.intoProof = intoProof
 	}
@@ -54,7 +54,7 @@ extension CreateProofFromAuthZoneByIds {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
 			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
 			intoProof: container.decode(Proof.self, forKey: .intoProof)
 		)

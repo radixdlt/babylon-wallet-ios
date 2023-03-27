@@ -11,17 +11,18 @@ extension SLIP10 {
 }
 
 extension SLIP10.PublicKey {
-	/// Expects a non hashed `message`, will SHA256 double hash it for secp256k1,
-	/// but not for Curve25519.
 	public func isValidSignature(
 		_ signatureWrapper: SLIP10.Signature,
-		for message: some DataProtocol
+		hashed: some DataProtocol
 	) -> Bool {
 		switch (signatureWrapper, self) {
 		case let (.ecdsaSecp256k1(ecdsaSecp256k1Signature), .ecdsaSecp256k1(ecdsaSecp256k1PublicKey)):
-			// We do Radix double SHA256 hashing, needed for secp256k1 but not for Curve25519
-			let hashed = Data(SHA256.hash(data: Data(SHA256.hash(data: message))))
-			return (try? ecdsaSecp256k1Signature.wasSigned(by: ecdsaSecp256k1PublicKey, hashedMessage: hashed, mode: .default)) ?? false
+
+			do {
+				return try ecdsaSecp256k1PublicKey.isValid(signature: ecdsaSecp256k1Signature, hashed: hashed)
+			} catch {
+				return false
+			}
 
 		case (.ecdsaSecp256k1, .eddsaEd25519):
 			return false
@@ -30,7 +31,7 @@ extension SLIP10.PublicKey {
 			return false
 
 		case let (.eddsaEd25519(eddsaEd25519Signature), .eddsaEd25519(eddsaEd25519PublicKey)):
-			return eddsaEd25519PublicKey.isValidSignature(eddsaEd25519Signature, for: message)
+			return eddsaEd25519PublicKey.isValidSignature(eddsaEd25519Signature, for: hashed)
 		}
 	}
 }

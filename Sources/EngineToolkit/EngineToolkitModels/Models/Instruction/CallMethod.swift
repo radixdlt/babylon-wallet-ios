@@ -9,14 +9,14 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let receiver: ComponentAddress
+	public let receiver: Address_
 	public let methodName: String
-	public let arguments: [Value_]
+	public let arguments: [ManifestASTValue]
 
 	// MARK: Init
 
-	public init(receiver: ComponentAddress, methodName: String, arguments: [Value_] = []) {
-		self.receiver = receiver
+	public init(receiver: ComponentAddress, methodName: String, arguments: [ManifestASTValue] = []) {
+		self.receiver = receiver.asGeneral
 		self.methodName = methodName
 		self.arguments = arguments
 	}
@@ -36,7 +36,7 @@ public struct CallMethod: InstructionProtocol {
 	public init(
 		receiver: ComponentAddress,
 		methodName: String,
-		@SpecificValuesBuilder buildValues: () throws -> [Value_]
+		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
 	) rethrows {
 		try self.init(
 			receiver: receiver,
@@ -48,7 +48,7 @@ public struct CallMethod: InstructionProtocol {
 	public init(
 		receiver: ComponentAddress,
 		methodName: String,
-		@SpecificValuesBuilder buildValue: () throws -> Value_
+		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
 	) rethrows {
 		self.init(
 			receiver: receiver,
@@ -85,14 +85,10 @@ extension CallMethod {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let receiver = try container.decode(ComponentAddress.self, forKey: .receiver)
-		let methodName = try container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded
-		let arguments = try container.decodeIfPresent([Value_].self, forKey: .arguments) ?? []
-
-		self.init(
-			receiver: receiver,
-			methodName: methodName,
-			arguments: arguments
+		try self.init(
+			receiver: container.decode(Address_.self, forKey: .receiver).asSpecific(),
+			methodName: container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded,
+			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
 		)
 	}
 }

@@ -32,6 +32,7 @@ extension TransactionClient {
 			do {
 				compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 			} catch {
+				loggerGlobal.error("Failed to compile TX intent: \(error)")
 				return .failure(.failedToCompileTXIntent)
 			}
 
@@ -39,6 +40,7 @@ extension TransactionClient {
 			do {
 				txID = try engineToolkitClient.generateTXID(transactionIntent)
 			} catch {
+				loggerGlobal.error("Failed to generate TX ID: \(error)")
 				return .failure(.failedToGenerateTXId)
 			}
 
@@ -104,6 +106,7 @@ extension TransactionClient {
 					)
 				}
 			} catch {
+				loggerGlobal.error("Failed to sign intent with account signers: \(error)")
 				return .failure(.failedToSignIntentWithAccountSigners)
 			}
 
@@ -111,6 +114,7 @@ extension TransactionClient {
 			do {
 				intentSignatures = try intentSignatures_.map { try $0.intoEngine() }
 			} catch {
+				loggerGlobal.error("Failed to convert account signatures: \(error)")
 				return .failure(.failedToConvertAccountSignatures)
 			}
 
@@ -122,6 +126,7 @@ extension TransactionClient {
 			do {
 				compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
 			} catch {
+				loggerGlobal.error("Failed to compile signed TX intent: \(error)")
 				return .failure(.failedToCompileSignedTXIntent)
 			}
 
@@ -133,6 +138,7 @@ extension TransactionClient {
 					debugOrigin: "Notary signer"
 				)
 			} catch {
+				loggerGlobal.error("Failed to sign compiled TX intent with notary signer: \(error)")
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}
 
@@ -140,6 +146,7 @@ extension TransactionClient {
 			do {
 				notarySignature = try notarySignatureWithPublicKey.intoEngine().signature
 			} catch {
+				loggerGlobal.error("Failed to convert notary signature: \(error)")
 				return .failure(.failedToConvertNotarySignature)
 			}
 			let uncompiledNotarized = NotarizedTransaction(
@@ -150,8 +157,27 @@ extension TransactionClient {
 			do {
 				compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
 			} catch {
+				loggerGlobal.error("Failed to compile notarized tx intent: \(error)")
 				return .failure(.failedToCompileNotarizedTXIntent)
 			}
+
+			func debugPrintTX() {
+				// RET prints when convertManifest is called, when it is removed, this can be moved down
+				// inline inside `print`.
+				let txIntentString = transactionIntent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
+				print("TXID: \(txID.rawValue)")
+				print("TransactionIntent: \(txIntentString)")
+				print("intentSignatures: \(signedTransactionIntent.intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
+				do {
+					try print("NotarySignature: \(notarySignatureWithPublicKey.signature.serialize().hex)")
+				} catch {}
+				print("Compiled Transaction Intent:\n\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
+				print("Compiled Notarized Intent:\n\n\(compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
+				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
+			}
+
+//			debugPrintTX()
 
 			return .success((txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
 		}
@@ -160,9 +186,10 @@ extension TransactionClient {
 		func submitNotarizedTX(
 			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
 		) async -> Result<TXID, SubmitTXFailure> {
-			@Dependency(\.continuousClock) var clock
+			@Dependency(\.continuousClock) var clock;
 
 			// MARK: Submit TX
+			loggerGlobal.debug("About to submit notarized TX")
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 				notarizedTransactionHex: Data(compiledNotarizedTXIntent.compiledIntent).hex
@@ -173,10 +200,12 @@ extension TransactionClient {
 			do {
 				response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
 			} catch {
+				loggerGlobal.error("Failed to submit TX to gateway, error: \(error)")
 				return .failure(.failedToSubmitTX)
 			}
 
 			guard !response.duplicate else {
+				loggerGlobal.error("Submitted TX was duplicate.")
 				return .failure(.invalidTXWasDuplicate(txID: txID))
 			}
 
@@ -193,22 +222,29 @@ extension TransactionClient {
 			}
 
 			var pollCount = 0
+
+			loggerGlobal.debug("About to start polling")
+
 			while !txStatus.isComplete {
 				defer { pollCount += 1 }
 				try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
 
 				do {
 					txStatus = try await pollTransactionStatus()
+					loggerGlobal.debug("Polled TX status is: \(txStatus)")
 				} catch {
+					loggerGlobal.error("Failed to poll TX status, error \(error)")
 					// FIXME: - mainnet: improve handling of polling failure, should probably not return failure..
 					return .failure(.failedToPollTX(txID: txID, error: .init(error: error)))
 				}
 
 				if pollCount >= pollStrategy.maxPollTries {
+					loggerGlobal.error("Failed to poll TX, timed out after \(pollCount) attempts.")
 					return .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))
 				}
 			}
 			guard txStatus == .committedSuccess else {
+				loggerGlobal.error("TX finished but not `committedSuccess`, got: \(txStatus)")
 				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed))
 			}
 

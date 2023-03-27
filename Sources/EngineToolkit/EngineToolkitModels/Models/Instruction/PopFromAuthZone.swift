@@ -41,6 +41,8 @@ extension PopFromAuthZone {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		try self.init(proof: container.decode(Proof.self, forKey: .intoProof))
+		try self.init(
+			proof: container.decode(Proof.self, forKey: .intoProof)
+		)
 	}
 }

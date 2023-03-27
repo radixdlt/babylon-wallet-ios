@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define RADIX_ENGINE_NODE_IDENTIFIER_LENGTH 36
-
 #define RADIX_ENGINE_HASH_LENGTH 32
 
 typedef char *Pointer;
@@ -12,6 +10,10 @@ typedef char *Pointer;
 Pointer information(Pointer string_pointer);
 
 Pointer convert_manifest(Pointer string_pointer);
+
+Pointer analyze_manifest(Pointer string_pointer);
+
+Pointer analyze_manifest_with_preview_context(Pointer string_pointer);
 
 Pointer compile_transaction_intent(Pointer string_pointer);
 
@@ -26,6 +28,8 @@ Pointer decompile_signed_transaction_intent(Pointer string_pointer);
 Pointer decompile_notarized_transaction(Pointer string_pointer);
 
 Pointer decompile_unknown_transaction_intent(Pointer string_pointer);
+
+Pointer derive_babylon_address_from_olympia_address(Pointer string_pointer);
 
 Pointer derive_virtual_account_address(Pointer string_pointer);
 
@@ -44,6 +48,8 @@ Pointer sbor_decode(Pointer string_pointer);
 Pointer known_entity_addresses(Pointer string_pointer);
 
 Pointer statically_validate_transaction(Pointer string_pointer);
+
+Pointer hash(Pointer string_pointer);
 
 Pointer toolkit_alloc(uintptr_t capacity);
 

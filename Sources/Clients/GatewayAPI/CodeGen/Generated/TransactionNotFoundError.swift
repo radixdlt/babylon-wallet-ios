@@ -18,16 +18,17 @@ extension GatewayAPI {
 	public struct TransactionNotFoundError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
-		public private(set) var transactionNotFound: TransactionCommittedDetailsRequestIdentifier
+		/** Hex-encoded SHA-256 hash. */
+		public private(set) var intentHashHex: String
 
-		public init(type: String, transactionNotFound: TransactionCommittedDetailsRequestIdentifier) {
+		public init(type: String, intentHashHex: String) {
 			self.type = type
-			self.transactionNotFound = transactionNotFound
+			self.intentHashHex = intentHashHex
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case type
-			case transactionNotFound = "transaction_not_found"
+			case intentHashHex = "intent_hash_hex"
 		}
 
 		// Encodable protocol methods
@@ -35,7 +36,7 @@ extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(type, forKey: .type)
-			try container.encode(transactionNotFound, forKey: .transactionNotFound)
+			try container.encode(intentHashHex, forKey: .intentHashHex)
 		}
 	}
 }
