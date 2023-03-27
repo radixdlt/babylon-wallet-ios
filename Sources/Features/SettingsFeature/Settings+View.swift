@@ -270,7 +270,7 @@ extension AppSettings.View {
 					PlainListRow(title: "Import from a Legacy Wallet") {
 						viewStore.send(.importFromOlympiaWalletButtonTapped)
 					} icon: {
-						Image(asset: AssetResource.appSettings)
+						Image(asset: AssetResource.generalSettings)
 					}
 					.withSeparator
 					.buttonStyle(.tappableRowStyle)
