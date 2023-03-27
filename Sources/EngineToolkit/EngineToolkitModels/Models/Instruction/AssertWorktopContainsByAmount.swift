@@ -10,7 +10,7 @@ public struct AssertWorktopContainsByAmount: InstructionProtocol {
 
 	// MARK: Stored properties
 	public let amount: Decimal_
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 
 	// MARK: Init
 
@@ -20,7 +20,7 @@ public struct AssertWorktopContainsByAmount: InstructionProtocol {
 		resourceAddress: ResourceAddress
 	) {
 		self.amount = amount
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 	}
 }
 
@@ -49,12 +49,9 @@ extension AssertWorktopContainsByAmount {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let resourceAddress: ResourceAddress = try container.decode(ResourceAddress.self, forKey: .resourceAddress)
-		let amount: Decimal_ = try container.decode(Decimal_.self, forKey: .amount)
-
-		self.init(
-			amount: amount,
-			resourceAddress: resourceAddress
+		try self.init(
+			amount: container.decode(Decimal_.self, forKey: .amount),
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific()
 		)
 	}
 }

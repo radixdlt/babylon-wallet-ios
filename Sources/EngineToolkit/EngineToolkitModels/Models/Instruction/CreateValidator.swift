@@ -10,13 +10,13 @@ public struct CreateValidator: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let key: EcdsaSecp256k1PublicKey
+	public let key: Bytes
 	public let ownerAccessRule: Enum
 
 	// MARK: Init
 
 	public init(
-		key: EcdsaSecp256k1PublicKey,
+		key: Bytes,
 		ownerAccessRule: Enum
 	) {
 		self.key = key
@@ -51,12 +51,9 @@ extension CreateValidator {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let key = try container.decode(EcdsaSecp256k1PublicKey.self, forKey: .key)
-		let ownerAccessRule = try container.decode(Enum.self, forKey: .ownerAccessRule)
-
-		self.init(
-			key: key,
-			ownerAccessRule: ownerAccessRule
+		try self.init(
+			key: container.decode(Bytes.self, forKey: .key),
+			ownerAccessRule: container.decode(Enum.self, forKey: .ownerAccessRule)
 		)
 	}
 }

@@ -14,7 +14,10 @@ extension JSONDecoder {
 }
 
 extension GatewayAPIClient {
+	public struct EmptyEntityDetailsResponse: Error {}
+	public typealias SingleEntityDetailsResponse = (ledgerState: GatewayAPI.LedgerState, details: GatewayAPI.StateEntityDetailsResponseItem)
 	public typealias Value = GatewayAPIClient
+
 	public static let liveValue = GatewayAPIClient.live(
 		urlSession: .shared,
 		jsonEncoder: .init(),
@@ -63,6 +66,9 @@ extension GatewayAPIClient {
 			}
 
 			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
+				#if DEBUG
+				loggerGlobal.error("Request with URL: \(urlRequest.url!.absoluteString) failed with status code: \(httpURLResponse.statusCode), data: \(data.prettyPrintedJSONString ?? "<NOT_JSON>")")
+				#endif
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
@@ -122,14 +128,31 @@ extension GatewayAPIClient {
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
+		@Sendable
+		func getEntityDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
+			try await post(
+				request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses)
+			) { @Sendable base in base.appendingPathComponent("state/entity/details") }
+		}
+
+		@Sendable
+		func getSingleEntityDetails(_ address: String) async throws -> SingleEntityDetailsResponse {
+			let response = try await getEntityDetails([address])
+			guard let item = response.items.first else {
+				throw EmptyEntityDetailsResponse()
+			}
+
+			return (response.ledgerState, item)
+		}
+
 		return Self(
 			getNetworkName: { baseURL in
 				let response = try await makeRequest(
-					responseType: GatewayAPI.GatewayInformationResponse.self,
+					responseType: GatewayAPI.GatewayStatusResponse.self,
 					baseURL: baseURL,
 					timeoutInterval: nil
 				) {
-					$0.appendingPathComponent("gateway/information")
+					$0.appendingPathComponent("status/gateway-status")
 				}
 				return Radix.Network.Name(response.ledgerState.network)
 			},
@@ -143,32 +166,17 @@ extension GatewayAPIClient {
 				}
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
-			accountResourcesByAddress: { @Sendable accountAddress in
-				try await post(
-					request: GatewayAPI.EntityResourcesRequest(address: accountAddress.address)
-				) { @Sendable base in base.appendingPathComponent("entity/resources") }
+			getEntityDetails: getEntityDetails,
+			getAccountDetails: { accountAddress in
+				try await getSingleEntityDetails(accountAddress.address)
 			},
-			accountMetadataByAddress: { @Sendable accountAddress in
-				try await post(
-					request: GatewayAPI.EntityMetadataRequest(address: accountAddress.address)
-				) { @Sendable base in base.appendingPathComponent("entity/metadata") }
+			getEntityMetadata: { address in
+				try await getSingleEntityDetails(address).details.metadata
 			},
-			resourcesOverview: { resourcesOverviewRequest in
+			getNonFungibleIds: { resourceAddress in
 				try await post(
-					request: resourcesOverviewRequest
-				) { $0.appendingPathComponent("entity/overview") }
-			},
-			resourceDetailsByResourceIdentifier: { resourceAddress in
-				try await post(
-					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
-				) { $0.appendingPathComponent("entity/details") }
-			}, getNonFungibleLocalIds: { accountAddress, resourceAddress in
-				try await post(
-					request: GatewayAPI.EntityNonFungibleIdsRequestAllOf(
-						address: accountAddress.address,
-						resourceAddress: resourceAddress
-					)
-				) { $0.appendingPathComponent("entity/non-fungible/ids") }
+					request: GatewayAPI.StateNonFungibleIdsRequest(resourceAddress: resourceAddress)
+				) { $0.appendingPathComponent("state/non-fungible/ids") }
 			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
@@ -179,6 +187,11 @@ extension GatewayAPIClient {
 				try await post(
 					request: transactionStatusRequest
 				) { $0.appendingPathComponent("transaction/status") }
+			},
+			transactionPreview: { transactionPreviewRequest in
+				try await post(
+					request: transactionPreviewRequest
+				) { $0.appendingPathComponent("transaction/preview") }
 			}
 		)
 	}

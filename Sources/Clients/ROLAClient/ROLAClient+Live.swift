@@ -6,12 +6,13 @@ extension ROLAClient {
 		performDappDefinitionVerification: { metadata async throws in
 			@Dependency(\.gatewayAPIClient) var gatewayAPI
 
-			let response = try await gatewayAPI.resourceDetailsByResourceIdentifier(metadata.dAppDefinitionAddress.address)
+			let response = try await gatewayAPI.getEntityMetadata(metadata.dAppDefinitionAddress.address)
 
 			let dict: [Metadata.Key: String] = .init(
-				uniqueKeysWithValues: response.metadata.items.compactMap { item in
-					guard let key = Metadata.Key(rawValue: item.key) else { return nil }
-					return (key: key, value: item.value)
+				uniqueKeysWithValues: response.items.compactMap { item in
+					guard let key = Metadata.Key(rawValue: item.key),
+					      let value = item.value.asString else { return nil }
+					return (key: key, value: value)
 				}
 			)
 

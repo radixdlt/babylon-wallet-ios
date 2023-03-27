@@ -73,15 +73,14 @@ extension TransactionIntent {
 			).get()
 		let compiledTransactionIntent = compiledTransactionIntentResponse.compiledIntent
 
-		let intentSignaturesWithHash = try privateKeys.map {
-			try $0.signReturningHashOfMessage(unhashed: compiledTransactionIntent)
+		let transactionIntentHash = try blake2b(data: compiledTransactionIntent)
+		let intentSignatures = try privateKeys.map {
+			try $0.sign(hashOfMessage: transactionIntentHash)
 		}
-		let transactionIntentHash = intentSignaturesWithHash.first?.hashOfMessage ?? Data(SHA256.twice(data: compiledTransactionIntent))
-		assert(intentSignaturesWithHash.map(\.hashOfMessage).allSatisfy { $0 == transactionIntentHash })
 
 		let signedTransactionIntent = SignedTransactionIntent(
 			intent: self,
-			intentSignatures: intentSignaturesWithHash.map(\.signatureWithPublicKey)
+			intentSignatures: intentSignatures
 		)
 
 		return NotarizedNonNotarySignedButIntentSignedTransctionContext(
@@ -111,7 +110,8 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 			request: self.signedTransactionIntent
 		).get().compiledIntent
 
-		let (signature, _) = try privateKey.signReturningHashOfMessage(unhashed: compiledSignedTransactionIntent)
+		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
+		let signature = try privateKey.sign(hashOfMessage: hashOfTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
 			intent: transactionIntent,
@@ -143,10 +143,11 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 
 		let compiledSignedTransactionIntent = compileSignedTransactionIntentResponse.compiledIntent
 
+		let hashOfTransactionIntent = try blake2b(data: compiledSignedTransactionIntent)
+
 		// Notarize the signed intent to create a notarized transaction
-		let (notarySignature, notarizedTransactionHash) = try notaryPrivateKey.signReturningHashOfMessage(
-			unhashed: compiledSignedTransactionIntent
-		)
+		let notarySignature = try notaryPrivateKey
+			.sign(hashOfMessage: hashOfTransactionIntent)
 
 		let notarizedTransaction = NotarizedTransaction(
 			signedIntent: signedTransactionIntent,
@@ -156,7 +157,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		return with(
 			compileSignedTransactionIntentResponse: compileSignedTransactionIntentResponse,
 			notarizedTransaction: notarizedTransaction,
-			notarizedTransactionHash: notarizedTransactionHash
+			notarizedTransactionHash: hashOfTransactionIntent
 		)
 	}
 }

@@ -1,4 +1,4 @@
-import struct CryptoKit.SHA256
+import CryptoKit
 import Prelude
 
 extension BIP39 {

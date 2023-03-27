@@ -1,9 +1,12 @@
 import Cryptography
 @testable import EngineToolkit
+import EngineToolkitModels
 import TestingPrelude
 
 // MARK: - ManifestToStringTests
 final class ManifestToStringTests: TestCase {
+	private let engineToolkit = EngineToolkit()
+
 	override func setUp() {
 		debugPrint = false
 		super.setUp()
@@ -13,40 +16,48 @@ final class ManifestToStringTests: TestCase {
 		let packages = [
 			try (
 				code: resource(named: "hello", extension: "code"),
-				abi: resource(named: "hello", extension: "abi")
+				schema: resource(named: "hello", extension: "schema")
 			),
 			try (
 				code: resource(named: "hello_world", extension: "code"),
-				abi: resource(named: "hello_world", extension: "abi")
+				schema: resource(named: "hello_world", extension: "schema")
 			),
 			try (
 				code: resource(named: "RaDEX", extension: "code"),
-				abi: resource(named: "RaDEX", extension: "abi")
+				schema: resource(named: "RaDEX", extension: "schema")
 			),
 			try (
 				code: resource(named: "account", extension: "code"),
-				abi: resource(named: "account", extension: "abi")
+				schema: resource(named: "account", extension: "schema")
 			),
 			try (
 				code: resource(named: "faucet", extension: "code"),
-				abi: resource(named: "faucet", extension: "abi")
+				schema: resource(named: "faucet", extension: "schema")
 			),
 		]
 
+		let accessRules = Tuple {
+			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
+			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Enum(.u8(0), fields: [])
+			Map_(keyValueKind: .tuple, valueValueKind: .enum, entries: [])
+			Map_(keyValueKind: .string, valueValueKind: .enum, entries: [])
+			Enum(.u8(0), fields: [])
+		}
+
 		for package in packages {
-			let manifestInstructions = TransactionManifest {
+			let manifestInstructions = try TransactionManifest {
 				CallMethod(
-					receiver: ComponentAddress("account_sim1qdfapg25xjpned3q5k8vcku6vdp55rs493lqtjeky9wqse9w34"),
+					receiver: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md",
 					methodName: "lock_fee"
 				) { Decimal_(value: "100") }
 
-				PublishPackageWithOwner(
-					code: Blob(data: sha256(data: package.code)),
-					abi: Blob(data: sha256(data: package.abi)),
-					ownerBadge: NonFungibleGlobalId(
-						resourceAddress: .init(address: "resource_sim1qzf8hl3azz2q0e5s33nh2mt8wmvqjfxdrv06ysus4alqh0994h"),
-						nonFungibleLocalId: .integer(12)
-					)
+				try PublishPackage(
+					code: Blob(data: blake2b(data: package.code)),
+					schema: Blob(data: blake2b(data: package.schema)),
+					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
+					metadata: Map_(keyValueKind: .string, valueValueKind: .string, entries: []),
+					accessRules: accessRules
 				)
 			}.instructions
 
@@ -54,7 +65,7 @@ final class ManifestToStringTests: TestCase {
 				instructions: manifestInstructions,
 				blobs: [
 					[UInt8](package.code),
-					[UInt8](package.abi),
+					[UInt8](package.schema),
 				]
 			)
 
@@ -75,8 +86,4 @@ public func resource(
 ) throws -> Data {
 	let fileURL = Bundle.module.url(forResource: fileName, withExtension: fileExtension)
 	return try Data(contentsOf: fileURL!)
-}
-
-public func sha256(data: Data) -> Data {
-	SHA256.hash(data: data).data
 }

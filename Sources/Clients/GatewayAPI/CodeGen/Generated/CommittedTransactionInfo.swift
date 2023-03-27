@@ -19,14 +19,14 @@ extension GatewayAPI {
 		public private(set) var stateVersion: Int64?
 		public private(set) var transactionStatus: TransactionStatus
 		/** Hex-encoded SHA-256 hash. */
-		public private(set) var payloadHashHex: String
+		public private(set) var payloadHashHex: String?
 		/** Hex-encoded SHA-256 hash. */
-		public private(set) var intentHashHex: String
+		public private(set) var intentHashHex: String?
 		public private(set) var feePaid: TokenAmount?
 		public private(set) var confirmedAt: Date?
 		public private(set) var errorMessage: String?
 
-		public init(stateVersion: Int64?, transactionStatus: TransactionStatus, payloadHashHex: String, intentHashHex: String, feePaid: TokenAmount? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil) {
+		public init(stateVersion: Int64?, transactionStatus: TransactionStatus, payloadHashHex: String? = nil, intentHashHex: String? = nil, feePaid: TokenAmount? = nil, confirmedAt: Date? = nil, errorMessage: String? = nil) {
 			self.stateVersion = stateVersion
 			self.transactionStatus = transactionStatus
 			self.payloadHashHex = payloadHashHex
@@ -52,8 +52,8 @@ extension GatewayAPI {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(stateVersion, forKey: .stateVersion)
 			try container.encode(transactionStatus, forKey: .transactionStatus)
-			try container.encode(payloadHashHex, forKey: .payloadHashHex)
-			try container.encode(intentHashHex, forKey: .intentHashHex)
+			try container.encodeIfPresent(payloadHashHex, forKey: .payloadHashHex)
+			try container.encodeIfPresent(intentHashHex, forKey: .intentHashHex)
 			try container.encodeIfPresent(feePaid, forKey: .feePaid)
 			try container.encodeIfPresent(confirmedAt, forKey: .confirmedAt)
 			try container.encodeIfPresent(errorMessage, forKey: .errorMessage)

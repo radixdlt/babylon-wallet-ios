@@ -9,12 +9,12 @@ public struct AssertWorktopContains: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress) {
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 	}
 }
 
@@ -41,8 +41,8 @@ extension AssertWorktopContains {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let resourceAddress: ResourceAddress = try container.decode(ResourceAddress.self, forKey: .resourceAddress)
-
-		self.init(resourceAddress: resourceAddress)
+		try self.init(
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific()
+		)
 	}
 }

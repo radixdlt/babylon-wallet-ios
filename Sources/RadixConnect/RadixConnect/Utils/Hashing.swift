@@ -1,7 +1,6 @@
+import CryptoKit
 import Foundation
 import RadixConnectModels
-
-import CryptoKit
 
 extension Data {
 	var hash: Data {

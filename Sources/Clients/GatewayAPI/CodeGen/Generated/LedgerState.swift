@@ -17,7 +17,7 @@ public typealias LedgerState = GatewayAPI.LedgerState
 extension GatewayAPI {
 	/** The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.  */
 	public struct LedgerState: Codable, Hashable {
-		/** The name of the network against which the request is made. */
+		/** The logical name of the network */
 		public private(set) var network: String
 		/** The state version of the ledger. Each transaction increments the state version by 1. */
 		public private(set) var stateVersion: Int64

@@ -10,7 +10,7 @@ extension TransactionManifest {
 		case excludeBlobs
 		case includeBlobsByByteCountOnly
 		case includeBlobs
-		/// Blob + SHA256.twice hash of blob
+		/// Blob + Blake hash of blob
 		case includeBlobsWithHash
 		public static let `default`: Self = .includeBlobsByByteCountOnly
 	}
@@ -148,7 +148,7 @@ extension TransactionManifest {
 			}.joined(separator: separator)
 		case .includeBlobsWithHash:
 			body = blobs.enumerated().map { index, blob in
-				let hash = Data(SHA256.twice(data: blob))
+				let hash = try! blake2b(data: blob)
 				let hashHex = hash.hex
 				return "\(label)[\(index)] hash = \(hashHex):\n\(blob.hex)\n"
 			}.joined(separator: separator)

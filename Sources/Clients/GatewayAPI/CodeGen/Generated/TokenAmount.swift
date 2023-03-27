@@ -19,7 +19,7 @@ extension GatewayAPI {
 	public struct TokenAmount: Codable, Hashable {
 		/** String-encoded decimal representing the amount of a related fungible resource. */
 		public private(set) var value: String
-		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address or hex-encoded id. */
 		public private(set) var address: String?
 
 		public init(value: String, address: String? = nil) {

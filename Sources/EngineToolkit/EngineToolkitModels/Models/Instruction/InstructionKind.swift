@@ -18,6 +18,7 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case pushToAuthZone = "PUSH_TO_AUTH_ZONE"
 
 	case clearAuthZone = "CLEAR_AUTH_ZONE"
+	case clearSignatureProofs = "CLEAR_SIGNATURE_PROOFS"
 
 	case createProofFromAuthZone = "CREATE_PROOF_FROM_AUTH_ZONE"
 	case createProofFromAuthZoneByAmount = "CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT"
@@ -30,12 +31,12 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case dropAllProofs = "DROP_ALL_PROOFS"
 
 	case publishPackage = "PUBLISH_PACKAGE"
-	case publishPackageWithOwner = "PUBLISH_PACKAGE_WITH_OWNER"
 
 	case burnResource = "BURN_RESOURCE"
 	case recallResource = "RECALL_RESOURCE"
 
 	case setMetadata = "SET_METADATA"
+	case removeMetadata = "REMOVE_METADATA"
 
 	case setPackageRoyaltyConfig = "SET_PACKAGE_ROYALTY_CONFIG"
 	case setComponentRoyaltyConfig = "SET_COMPONENT_ROYALTY_CONFIG"
@@ -49,13 +50,15 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case mintUuidNonFungible = "MINT_UUID_NON_FUNGIBLE"
 
 	case createFungibleResource = "CREATE_FUNGIBLE_RESOURCE"
-	case createFungibleResourceWithOwner = "CREATE_FUNGIBLE_RESOURCE_WITH_OWNER"
+	case createFungibleResourceWithInitialSupply = "CREATE_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY"
 	case createNonFungibleResource = "CREATE_NON_FUNGIBLE_RESOURCE"
-	case createNonFungibleResourceWithOwner = "CREATE_NON_FUNGIBLE_RESOURCE_WITH_OWNER"
+	case createNonFungibleResourceWithInitialSupply = "CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY"
 
 	case createAccessController = "CREATE_ACCESS_CONTROLLER"
 	case createIdentity = "CREATE_IDENTITY"
 	case assertAccessRule = "ASSERT_ACCESS_RULE"
+
+	case createAccount = "CREATE_ACCOUNT"
 
 	case createValidator = "CREATE_VALIDATOR"
 }

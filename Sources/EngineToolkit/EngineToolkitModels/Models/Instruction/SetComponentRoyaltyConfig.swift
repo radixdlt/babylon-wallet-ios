@@ -10,13 +10,13 @@ public struct SetComponentRoyaltyConfig: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let componentAddress: ComponentAddress
-	public let royaltyConfig: Value_
+	public let componentAddress: Address_
+	public let royaltyConfig: ManifestASTValue
 
 	// MARK: Init
 
-	public init(componentAddress: ComponentAddress, royaltyConfig: Value_) {
-		self.componentAddress = componentAddress
+	public init(componentAddress: ComponentAddress, royaltyConfig: ManifestASTValue) {
+		self.componentAddress = componentAddress.asGeneral
 		self.royaltyConfig = royaltyConfig
 	}
 }
@@ -48,9 +48,9 @@ extension SetComponentRoyaltyConfig {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let componentAddress = try container.decode(ComponentAddress.self, forKey: .componentAddress)
-		let royaltyConfig = try container.decode(Value_.self, forKey: .royaltyConfig)
-
-		self.init(componentAddress: componentAddress, royaltyConfig: royaltyConfig)
+		try self.init(
+			componentAddress: container.decode(Address_.self, forKey: .componentAddress).asSpecific(),
+			royaltyConfig: container.decode(ManifestASTValue.self, forKey: .royaltyConfig)
+		)
 	}
 }

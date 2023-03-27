@@ -10,13 +10,13 @@ public struct SetPackageRoyaltyConfig: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let packageAddress: PackageAddress
+	public let packageAddress: Address_
 	public let royaltyConfig: Map_
 
 	// MARK: Init
 
 	public init(packageAddress: PackageAddress, royaltyConfig: Map_) {
-		self.packageAddress = packageAddress
+		self.packageAddress = packageAddress.asGeneral
 		self.royaltyConfig = royaltyConfig
 	}
 }
@@ -48,9 +48,9 @@ extension SetPackageRoyaltyConfig {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let packageAddress = try container.decode(PackageAddress.self, forKey: .packageAddress)
-		let royaltyConfig = try container.decode(Map_.self, forKey: .royaltyConfig)
-
-		self.init(packageAddress: packageAddress, royaltyConfig: royaltyConfig)
+		try self.init(
+			packageAddress: container.decode(Address_.self, forKey: .packageAddress).asSpecific(),
+			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig)
+		)
 	}
 }
