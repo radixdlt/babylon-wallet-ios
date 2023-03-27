@@ -78,7 +78,13 @@ extension PersonaDataPermissionBox {
 						Button(L10n.DApp.PersonaDataPermission.Button.edit) {
 							viewStore.send(.editButtonTapped)
 						}
-						.buttonStyle(.primaryRectangular)
+						.modifier {
+							if viewStore.missingRequiredFields != nil {
+								$0.buttonStyle(.primaryRectangular)
+							} else {
+								$0.buttonStyle(.secondaryRectangular(shouldExpand: true))
+							}
+						}
 					}
 				}
 			}
@@ -95,7 +101,7 @@ struct PersonaDataPermissionBox_PreviewProvider: PreviewProvider {
 			store: Store(
 				initialState: .init(
 					persona: .previewValue0,
-					requiredFieldIDs: [.givenName, .emailAddress, .phoneNumber]
+					requiredFieldIDs: [.givenName, .emailAddress]
 				),
 				reducer: PersonaDataPermissionBox()
 			)

@@ -682,7 +682,8 @@ extension DappInteractionFlow.Destinations.State {
 					requiredFieldIDs: item.fields
 				)))
 			} else {
-				preconditionFailure("Persona data request requires a persona")
+				assertionFailure("Persona data request requires a persona")
+				return nil
 			}
 		case let .remote(.oneTimeAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
