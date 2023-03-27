@@ -191,6 +191,18 @@ extension GatewayAPI.EntityMetadataCollection {
 		self["description"]
 	}
 
+	var symbol: String? {
+		self["symbol"]
+	}
+
+	var name: String? {
+		self["name"]
+	}
+
+	var url: String? {
+		self["url"]
+	}
+
 	subscript(key: String) -> String? {
 		items.first { $0.key == key }?.value.asString
 	}

@@ -32,7 +32,6 @@ extension TransactionClient {
 			do {
 				compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 			} catch {
-				loggerGlobal.error("Failed to compile TX intent: \(error)")
 				return .failure(.failedToCompileTXIntent)
 			}
 
@@ -40,7 +39,6 @@ extension TransactionClient {
 			do {
 				txID = try engineToolkitClient.generateTXID(transactionIntent)
 			} catch {
-				loggerGlobal.error("Failed to generate TX ID: \(error)")
 				return .failure(.failedToGenerateTXId)
 			}
 
@@ -106,7 +104,6 @@ extension TransactionClient {
 					)
 				}
 			} catch {
-				loggerGlobal.error("Failed to sign intent with account signers: \(error)")
 				return .failure(.failedToSignIntentWithAccountSigners)
 			}
 
@@ -114,7 +111,6 @@ extension TransactionClient {
 			do {
 				intentSignatures = try intentSignatures_.map { try $0.intoEngine() }
 			} catch {
-				loggerGlobal.error("Failed to convert account signatures: \(error)")
 				return .failure(.failedToConvertAccountSignatures)
 			}
 
@@ -126,7 +122,6 @@ extension TransactionClient {
 			do {
 				compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
 			} catch {
-				loggerGlobal.error("Failed to compile signed TX intent: \(error)")
 				return .failure(.failedToCompileSignedTXIntent)
 			}
 
@@ -138,7 +133,6 @@ extension TransactionClient {
 					debugOrigin: "Notary signer"
 				)
 			} catch {
-				loggerGlobal.error("Failed to sign compiled TX intent with notary signer: \(error)")
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}
 
@@ -146,7 +140,6 @@ extension TransactionClient {
 			do {
 				notarySignature = try notarySignatureWithPublicKey.intoEngine().signature
 			} catch {
-				loggerGlobal.error("Failed to convert notary signature: \(error)")
 				return .failure(.failedToConvertNotarySignature)
 			}
 			let uncompiledNotarized = NotarizedTransaction(
@@ -157,7 +150,6 @@ extension TransactionClient {
 			do {
 				compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
 			} catch {
-				loggerGlobal.error("Failed to compile notarized tx intent: \(error)")
 				return .failure(.failedToCompileNotarizedTXIntent)
 			}
 
@@ -186,10 +178,9 @@ extension TransactionClient {
 		func submitNotarizedTX(
 			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
 		) async -> Result<TXID, SubmitTXFailure> {
-			@Dependency(\.continuousClock) var clock;
+			@Dependency(\.continuousClock) var clock
 
 			// MARK: Submit TX
-			loggerGlobal.debug("About to submit notarized TX")
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 				notarizedTransactionHex: Data(compiledNotarizedTXIntent.compiledIntent).hex
@@ -200,12 +191,10 @@ extension TransactionClient {
 			do {
 				response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
 			} catch {
-				loggerGlobal.error("Failed to submit TX to gateway, error: \(error)")
 				return .failure(.failedToSubmitTX)
 			}
 
 			guard !response.duplicate else {
-				loggerGlobal.error("Submitted TX was duplicate.")
 				return .failure(.invalidTXWasDuplicate(txID: txID))
 			}
 
@@ -222,29 +211,22 @@ extension TransactionClient {
 			}
 
 			var pollCount = 0
-
-			loggerGlobal.debug("About to start polling")
-
 			while !txStatus.isComplete {
 				defer { pollCount += 1 }
 				try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
 
 				do {
 					txStatus = try await pollTransactionStatus()
-					loggerGlobal.debug("Polled TX status is: \(txStatus)")
 				} catch {
-					loggerGlobal.error("Failed to poll TX status, error \(error)")
 					// FIXME: - mainnet: improve handling of polling failure, should probably not return failure..
 					return .failure(.failedToPollTX(txID: txID, error: .init(error: error)))
 				}
 
 				if pollCount >= pollStrategy.maxPollTries {
-					loggerGlobal.error("Failed to poll TX, timed out after \(pollCount) attempts.")
 					return .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))
 				}
 			}
 			guard txStatus == .committedSuccess else {
-				loggerGlobal.error("TX finished but not `committedSuccess`, got: \(txStatus)")
 				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed))
 			}
 
@@ -265,103 +247,102 @@ extension TransactionClient {
 				}
 		}
 
+		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
+			let version = engineToolkitClient.getTransactionVersion()
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+
+			let conversionRequest = ConvertManifestInstructionsToJSONIfItWasStringRequest(
+				version: version,
+				networkID: networkID,
+				manifest: manifest
+			)
+
+			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
+		}
+
+		let addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest = { maybeStringManifest in
+			let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
+			do {
+				manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+			} catch {
+				loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
+				throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
+			}
+
+			var instructions = manifestWithJSONInstructions.instructions
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+
+			let version = engineToolkitClient.getTransactionVersion()
+
+			let accountsSuitableToPayForTXFeeRequest = AccountAddressesInvolvedInTransactionRequest(
+				version: version,
+				manifest: manifestWithJSONInstructions.convertedManifestThatContainsThem,
+				networkID: networkID
+			)
+
+			let feeAdded: BigDecimal = 10
+
+			let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
+				let accountAddressesSuitableToPayTransactionFeeRef =
+					try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
+
+				if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
+					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
+					toPay: feeAdded,
+					on: networkID
+				) {
+					return accountInvolvedInTransaction
+				} else {
+					let allAccountAddresses = try await accountsClient.getAccountsOnCurrentNetwork().map(\.address)
+
+					if let anyAccount = await firstAccountAddressWithEnoughFunds(
+						from: allAccountAddresses.rawValue,
+						toPay: feeAdded,
+						on: networkID
+					) {
+						return anyAccount
+					} else {
+						throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+					}
+				}
+			}()
+
+			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
+				address: ComponentAddress(address: accountAddress.address),
+				fee: feeAdded.description
+			).embed()
+
+			instructions.insert(lockFeeCallMethodInstruction, at: 0)
+			let manifest = TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
+			return (manifest, feeAdded)
+		}
+
 		// TODO: Should the request manifest have lockFee?
-		@Sendable
-		func getTransactionPreview(_ request: ManifestReviewRequest) async throws -> AnalyzeManifestWithPreviewContextResponse {
+		let getTransactionPreview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(
 				for: request,
 				networkID: networkID
 			).get()
-			let response = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
-			guard let rawReceipt = response.receipt.output else {
-				throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
-			}
 
-			let receiptBytes = try rawReceipt.flatMap { try [UInt8](hex: $0.dataHex) }
+			let response = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
+			let receiptBytes = try [UInt8](hex: response.encodedReceipt)
 
 			let generateTransactionReviewRequest = AnalyzeManifestWithPreviewContextRequest(
 				networkId: networkID,
 				manifest: request.manifestToSign,
 				transactionReceipt: receiptBytes
 			)
-			return try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
-		}
 
-		@Sendable
-		func createTransactionPreviewRequest(
-			for request: ManifestReviewRequest,
-			networkID: NetworkID
-		) async -> Result<GatewayAPI.TransactionPreviewRequest, TransactionFailure.FailedToPrepareForTXSigning> {
-			let manifestString: String = {
-				if case let .string(str) = request.manifestToSign.instructions {
-					return str
-				}
-				return nil
-			}()!
+			let analizedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
 
-			// TODO: Duplicated code from buildTransactionIntent
+			let (manifestIncludingLockFee, transactionFeeAdded) = try await addLockFeeInstructionToManifest(request.manifestToSign)
 
-			let nonce = engineToolkitClient.generateTXNonce()
-			let epoch: Epoch
-			do {
-				epoch = try await gatewayAPIClient.getEpoch()
-			} catch {
-				return .failure(.failedToGetEpoch)
-			}
-
-			let version = engineToolkitClient.getTransactionVersion()
-
-			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
-				version: version,
-				manifest: request.manifestToSign,
-				networkID: networkID
-			)
-
-			let notaryAndSigners: NotaryAndSigners
-			do {
-				notaryAndSigners = try await getNotaryAndSigners(accountAddressesNeedingToSignTransactionRequest, selectNotary: request.selectNotary)
-			} catch {
-				return .failure(.failedToLoadNotaryAndSigners)
-			}
-			let notaryPublicKey: Engine.PublicKey
-			do {
-				let notarySigner = notaryAndSigners.notarySigner
-				switch notarySigner.securityState {
-				case let .unsecured(unsecuredControl):
-					notaryPublicKey = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
-				}
-			} catch {
-				return .failure(.failedToLoadNotaryPublicKey)
-			}
-
-			let publicKey: GatewayAPI.PublicKey = {
-				switch notaryPublicKey {
-				case let .ecdsaSecp256k1(key):
-					return .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex()))
-				case let .eddsaEd25519(key):
-					return .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex()))
-				}
-			}()
-
-			let header = request.makeTransactionHeaderInput
-			// TODO: What are the proper flags to set?
-			let flags = GatewayAPI.TransactionPreviewRequestFlags(
-				unlimitedLoan: false,
-				assumeAllSignatureProofs: false,
-				permitDuplicateIntentHash: false,
-				permitInvalidHeaderEpoch: false
-			)
-			return .success(
-				.init(manifest: manifestString,
-				      startEpochInclusive: Int64(epoch.rawValue),
-				      endEpochExclusive: Int64((epoch + header.epochWindow).rawValue),
-				      costUnitLimit: Int64(header.costUnitLimit),
-				      tipPercentage: Int(header.tipPercentage),
-				      nonce: String(nonce.rawValue),
-				      signerPublicKeys: [publicKey],
-				      flags: flags)
+			return TransactionToReview(
+				analizedManifestToReview: analizedManifestToReview,
+				manifestIncludingLockFee: manifestIncludingLockFee,
+				transactionFeeAdded: transactionFeeAdded
 			)
 		}
 
@@ -426,24 +407,10 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func signAndSubmit(
-			manifest: TransactionManifest,
-			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotaryAndSigners: @escaping @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
-		) async -> TransactionResult {
-			await buildTransactionIntent(
-				networkID: gatewaysClient.getCurrentNetworkID(),
-				manifest: manifest,
-				makeTransactionHeaderInput: makeTransactionHeaderInput,
-				getNotaryAndSigners: getNotaryAndSigners
-			).mapError {
-				TransactionFailure.failedToPrepareForTXSigning($0)
-			}.asyncFlatMap { intent, notaryAndSigners in
-				await signAndSubmit(transactionIntent: intent, notaryAndSigners: notaryAndSigners)
-			}
-		}
-
-		func getNotaryAndSigners(_ accountAddressesNeedingToSignTransactionRequest: AccountAddressesInvolvedInTransactionRequest, selectNotary: SelectNotary) async throws -> NotaryAndSigners {
+		func getNotaryAndSigners(
+			_ accountAddressesNeedingToSignTransactionRequest: AccountAddressesInvolvedInTransactionRequest,
+			selectNotary: SelectNotary
+		) async throws -> NotaryAndSigners {
 			// Might be empty
 			let addressesNeededToSign = try OrderedSet(
 				engineToolkitClient
@@ -467,6 +434,44 @@ extension TransactionClient {
 			let notary = await selectNotary(accountsNeededToSign)
 
 			return .init(notarySigner: notary, accountsNeededToSign: accountsNeededToSign)
+		}
+
+		@Sendable
+		func createTransactionPreviewRequest(
+			for request: ManifestReviewRequest,
+			networkID: NetworkID
+		) async -> Result<GatewayAPI.TransactionPreviewRequest, TransactionFailure.FailedToPrepareForTXSigning> {
+			await buildTransactionIntent(
+				networkID: gatewaysClient.getCurrentNetworkID(),
+				manifest: request.manifestToSign,
+				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
+				getNotaryAndSigners: {
+					try await getNotaryAndSigners($0, selectNotary: request.selectNotary)
+				}
+			).map {
+				GatewayAPI.TransactionPreviewRequest(
+					rawManifest: request.manifestToSign,
+					header: $0.intent.header
+				)
+			}
+		}
+
+		@Sendable
+		func signAndSubmit(
+			manifest: TransactionManifest,
+			makeTransactionHeaderInput: MakeTransactionHeaderInput,
+			getNotaryAndSigners: @escaping @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
+		) async -> TransactionResult {
+			await buildTransactionIntent(
+				networkID: gatewaysClient.getCurrentNetworkID(),
+				manifest: manifest,
+				makeTransactionHeaderInput: makeTransactionHeaderInput,
+				getNotaryAndSigners: getNotaryAndSigners
+			).mapError {
+				TransactionFailure.failedToPrepareForTXSigning($0)
+			}.asyncFlatMap { intent, notaryAndSigners in
+				await signAndSubmit(transactionIntent: intent, notaryAndSigners: notaryAndSigners)
+			}
 		}
 
 		let signAndSubmitTransaction: SignAndSubmitTransaction = { @Sendable request in
@@ -501,19 +506,6 @@ extension TransactionClient {
 			}
 		}
 
-		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
-			let version = engineToolkitClient.getTransactionVersion()
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-
-			let conversionRequest = ConvertManifestInstructionsToJSONIfItWasStringRequest(
-				version: version,
-				networkID: networkID,
-				manifest: manifest
-			)
-
-			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
-		}
-
 		@Sendable
 		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
 			let xrdContainers = await addresses.concurrentMap {
@@ -524,61 +516,7 @@ extension TransactionClient {
 
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
-			addLockFeeInstructionToManifest: { maybeStringManifest in
-				let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
-				do {
-					manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
-				} catch {
-					loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
-					throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
-				}
-
-				var instructions = manifestWithJSONInstructions.instructions
-				let networkID = await gatewaysClient.getCurrentNetworkID()
-
-				let version = engineToolkitClient.getTransactionVersion()
-
-				let accountsSuitableToPayForTXFeeRequest = AccountAddressesInvolvedInTransactionRequest(
-					version: version,
-					manifest: manifestWithJSONInstructions.convertedManifestThatContainsThem,
-					networkID: networkID
-				)
-
-				let lockFeeAmount: BigDecimal = 10
-
-				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
-					let accountAddressesSuitableToPayTransactionFeeRef =
-						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
-
-					if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
-						from: Array(accountAddressesSuitableToPayTransactionFeeRef),
-						toPay: lockFeeAmount,
-						on: networkID
-					) {
-						return accountInvolvedInTransaction
-					} else {
-						let allAccountAddresses = try await accountsClient.getAccountsOnCurrentNetwork().map(\.address)
-
-						if let anyAccount = await firstAccountAddressWithEnoughFunds(
-							from: allAccountAddresses.rawValue,
-							toPay: lockFeeAmount,
-							on: networkID
-						) {
-							return anyAccount
-						} else {
-							throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
-						}
-					}
-				}()
-
-				let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
-					address: ComponentAddress(address: accountAddress.address),
-					fee: lockFeeAmount.description
-				).embed()
-
-				instructions.insert(lockFeeCallMethodInstruction, at: 0)
-				return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
-			},
+			addLockFeeInstructionToManifest: addLockFeeInstructionToManifest,
 			signAndSubmitTransaction: signAndSubmitTransaction,
 			getTransactionReview: getTransactionPreview
 		)
@@ -702,5 +640,51 @@ extension IdentifiedArrayOf {
 		var copy = self
 		copy.append(element)
 		return copy
+	}
+}
+
+extension GatewayAPI.TransactionPreviewRequest {
+	init(
+		rawManifest: TransactionManifest,
+		header: TransactionHeader
+	) {
+		let manifestString = {
+			switch rawManifest.instructions {
+			case let .string(manifestString): return manifestString
+			case .parsed: fatalError("you should have converted manifest to string first")
+			}
+		}()
+
+		let flags = GatewayAPI.TransactionPreviewRequestFlags(
+			unlimitedLoan: true, // True since no lock fee is added
+			assumeAllSignatureProofs: false,
+			permitDuplicateIntentHash: false,
+			permitInvalidHeaderEpoch: false
+		)
+
+		self.init(
+			manifest: manifestString,
+			blobsHex: [],
+			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
+			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
+			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
+			notaryAsSignatory: false,
+			costUnitLimit: .init(header.costUnitLimit),
+			tipPercentage: .init(header.tipPercentage),
+			nonce: .init(header.nonce.rawValue),
+			signerPublicKeys: [GatewayAPI.PublicKey(from: header.publicKey)],
+			flags: flags
+		)
+	}
+}
+
+extension GatewayAPI.PublicKey {
+	init(from engine: Engine.PublicKey) {
+		switch engine {
+		case let .ecdsaSecp256k1(key):
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex))
+		case let .eddsaEd25519(key):
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex))
+		}
 	}
 }
