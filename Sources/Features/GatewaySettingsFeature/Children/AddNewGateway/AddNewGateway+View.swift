@@ -5,7 +5,7 @@ extension AddNewGateway.State {
 		.init(
 			gatewayURL: inputtedURL,
 			focusedField: focusedField,
-			fieldHint: errorText.map(AppTextFieldHint.error),
+			fieldHint: errorText.map(Hint.error),
 			addGatewayButtonState: addGatewayButtonState
 		)
 	}
@@ -17,7 +17,7 @@ extension AddNewGateway {
 		let gatewayURL: String
 		let textFieldPlaceholder: String = L10n.GatewaySettings.AddNewGateway.textFieldPlaceholder
 		let focusedField: State.Field?
-		let fieldHint: AppTextFieldHint?
+		let fieldHint: Hint?
 		let addGatewayButtonState: ControlState
 	}
 

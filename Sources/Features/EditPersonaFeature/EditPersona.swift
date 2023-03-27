@@ -1,5 +1,5 @@
 import FeaturePrelude
-import Profile
+import PersonasClient
 
 // MARK: - EditPersona.Output
 extension EditPersona {
@@ -23,7 +23,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		public typealias DynamicFieldID = Profile.Network.Persona.Field.ID
 
-		let avatarURL: URL
+		let mode: Mode
+		let persona: Profile.Network.Persona
 		var labelField: EditPersonaStaticField.State
 		@Sorted(by: \.id)
 		var dynamicFields: IdentifiedArrayOf<EditPersonaDynamicField.State> = []
@@ -33,17 +34,16 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		public init(
 			mode: Mode,
-			avatarURL: URL,
-			personaLabel: NonEmptyString,
-			existingFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+			persona: Profile.Network.Persona
 		) {
-			self.avatarURL = avatarURL
+			self.mode = mode
+			self.persona = persona
 			self.labelField = EditPersonaStaticField.State(
 				id: .personaLabel,
-				initial: personaLabel.rawValue
+				initial: persona.displayName.rawValue
 			)
 			self.dynamicFields = IdentifiedArray(
-				uncheckedUniqueElements: existingFields.map { field in
+				uncheckedUniqueElements: persona.fields.map { field in
 					EditPersonaDynamicField.State(
 						id: field.id,
 						initial: field.value.rawValue,
@@ -79,7 +79,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case save(Output)
+		case personaSaved(Profile.Network.Persona)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -101,6 +101,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public init() {}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
@@ -122,7 +124,16 @@ public struct EditPersona: Sendable, FeatureReducer {
 			return .run { _ in await dismiss() }
 
 		case let .saveButtonTapped(output):
-			return .send(.delegate(.save(output)))
+			return .run { [state] send in
+				var persona = state.persona
+				persona.displayName = output.personaLabel
+				persona.fields = output.fields
+				try await personasClient.updatePersona(persona)
+				await send(.delegate(.personaSaved(persona)))
+				await dismiss()
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case .addAFieldButtonTapped:
 			state.destination = .addFields(.init(excludedFieldIDs: state.dynamicFields.map(\.id)))

@@ -47,20 +47,23 @@ extension P2P.FromDapp.WalletInteraction {
 
 	public struct AuthorizedRequestItems: Sendable, Hashable, Decodable {
 		public let auth: AuthRequestItem
-		public let oneTimeAccounts: OneTimeAccountsRequestItem?
-		public let ongoingAccounts: OngoingAccountsRequestItem?
 		public let reset: ResetRequestItem?
+		public let ongoingAccounts: OngoingAccountsRequestItem?
+		public let ongoingPersonaData: OngoingPersonaDataRequestItem?
+		public let oneTimeAccounts: OneTimeAccountsRequestItem?
 
 		public init(
 			auth: AuthRequestItem,
-			oneTimeAccounts: OneTimeAccountsRequestItem?,
+			reset: ResetRequestItem?,
 			ongoingAccounts: OngoingAccountsRequestItem?,
-			reset: ResetRequestItem?
+			ongoingPersonaData: OngoingPersonaDataRequestItem?,
+			oneTimeAccounts: OneTimeAccountsRequestItem?
 		) {
 			self.auth = auth
-			self.oneTimeAccounts = oneTimeAccounts
-			self.ongoingAccounts = ongoingAccounts
 			self.reset = reset
+			self.ongoingAccounts = ongoingAccounts
+			self.ongoingPersonaData = ongoingPersonaData
+			self.oneTimeAccounts = oneTimeAccounts
 		}
 	}
 }

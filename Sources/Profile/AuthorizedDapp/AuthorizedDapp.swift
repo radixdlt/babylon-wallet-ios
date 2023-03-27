@@ -47,15 +47,15 @@ extension Profile.Network.AuthorizedDapp {
 		/// to lookup persona
 		public let identityAddress: IdentityAddress
 
-		/// List of "ongoing personaData" (identified by Profile.Network.Persona.Field.ID) that user has given the Dapp access to.
-		/// mutable so that we can mutate the fields
-		public var fieldIDs: OrderedSet<Profile.Network.Persona.Field.ID>
-
 		/// Date of last login for this persona.
 		public var lastLogin: Date
 
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
 		public var sharedAccounts: SharedAccounts?
+
+		/// List of "ongoing personaData" (identified by Profile.Network.Persona.Field.ID) that user has given the Dapp access to.
+		/// mutable so that we can mutate the fields
+		public var sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>?
 
 		public struct SharedAccounts:
 			Sendable,
@@ -101,14 +101,14 @@ extension Profile.Network.AuthorizedDapp {
 
 		public init(
 			identityAddress: IdentityAddress,
-			fieldIDs: OrderedSet<Profile.Network.Persona.Field.ID>,
 			lastLogin: Date,
-			sharedAccounts: SharedAccounts?
+			sharedAccounts: SharedAccounts?,
+			sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>?
 		) {
 			self.identityAddress = identityAddress
-			self.fieldIDs = fieldIDs
 			self.lastLogin = lastLogin
 			self.sharedAccounts = sharedAccounts
+			self.sharedFieldIDs = sharedFieldIDs
 		}
 	}
 }

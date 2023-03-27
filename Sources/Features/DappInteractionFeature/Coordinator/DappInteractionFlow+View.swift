@@ -65,14 +65,19 @@ extension DappInteractionFlow {
 					then: { Login.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.permission,
-					action: DappInteractionFlow.Destinations.MainAction.permission,
-					then: { Permission.View(store: $0) }
+					state: /DappInteractionFlow.Destinations.MainState.accountPermission,
+					action: DappInteractionFlow.Destinations.MainAction.accountPermission,
+					then: { AccountPermission.View(store: $0) }
 				)
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,
 					action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
 					then: { ChooseAccounts.View(store: $0) }
+				)
+				CaseLet(
+					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,
+					action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
+					then: { PersonaDataPermission.View(store: $0) }
 				)
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.signAndSubmitTransaction,
@@ -132,12 +137,12 @@ extension AuthorizedDappsClient {
 				dapp.referencesToAuthorizedPersonas = [
 					.init(
 						identityAddress: Profile.Network.Persona.previewValue1.address,
-						fieldIDs: [],
 						lastLogin: .now,
 						sharedAccounts: try! .init(
 							accountsReferencedByAddress: [try! AccountAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")],
 							forRequest: .exactly(1)
-						)
+						),
+						sharedFieldIDs: nil
 					),
 				]
 				return [dapp]

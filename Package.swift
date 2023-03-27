@@ -111,6 +111,7 @@ package.addModules([
 	.feature(
 		name: "EditPersonaFeature",
 		dependencies: [
+			"PersonasClient",
 			"Profile",
 		],
 		tests: .no
@@ -532,7 +533,7 @@ package.addModules([
 			"Resources",
 			"SharedModels",
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.core(
 		name: "ClientPrelude",
@@ -557,6 +558,9 @@ package.addModules([
 			"Resources",
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
 				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
+			},
+			.product(name: "TextBuilder", package: "TextBuilder") {
+				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
 			},
 		],
 		tests: .yes()
@@ -729,6 +733,11 @@ package.addModules([
 			},
 
 			.product(name: "BitCollections", package: "swift-collections"),
+
+			.product(name: "Builders", package: "swift-builders") {
+				.package(url: "https://github.com/davdroman/swift-builders", from: "0.4.0")
+			},
+
 			.product(name: "Collections", package: "swift-collections"),
 
 			.product(name: "CollectionConcurrencyKit", package: "CollectionConcurrencyKit") {

@@ -60,6 +60,29 @@ public struct Selection<Value: Hashable, Content: View>: View {
 		self.content = content
 	}
 
+	public init(
+		_ selection: Binding<Value?>,
+		from values: some Sequence<Value>,
+		@ViewBuilder content: @escaping (Item) -> Content
+	) {
+		self._selection = Binding<[Value]?>(
+			get: {
+				if let value = selection.wrappedValue {
+					return [value]
+				} else {
+					return nil
+				}
+			},
+			set: { newValue in
+				selection.wrappedValue = newValue?.first
+			}
+		)
+		self.selectedValues = selection.wrappedValue.map { [$0] } ?? []
+		self.values = OrderedSet(values)
+		self.requirement = .exactly(1)
+		self.content = content
+	}
+
 	public var body: some View {
 		ForEach(values, id: \.self) { value in
 			let isDisabled: Bool = {
@@ -128,17 +151,48 @@ public struct Selection<Value: Hashable, Content: View>: View {
 #if DEBUG
 public struct Selection_PreviewProvider: PreviewProvider {
 	public static var previews: some View {
-		Selection_Preview(requirement: .exactly(0)).previewDisplayName("Exactly 0")
-		Selection_Preview(requirement: .exactly(1)).previewDisplayName("Exactly 1")
-		Selection_Preview(requirement: .exactly(2)).previewDisplayName("Exactly 2")
+		SingleSelection_Preview().previewDisplayName("Single - Exactly 1")
 
-		Selection_Preview(requirement: .atLeast(0)).previewDisplayName("At least 0")
-		Selection_Preview(requirement: .atLeast(1)).previewDisplayName("At least 1")
-		Selection_Preview(requirement: .atLeast(2)).previewDisplayName("At least 2")
+		MultiSelection_Preview(requirement: .exactly(0)).previewDisplayName("Multi - Exactly 0")
+		MultiSelection_Preview(requirement: .exactly(1)).previewDisplayName("Multi - Exactly 1")
+		MultiSelection_Preview(requirement: .exactly(2)).previewDisplayName("Multi - Exactly 2")
+
+		MultiSelection_Preview(requirement: .atLeast(0)).previewDisplayName("Multi - At least 0")
+		MultiSelection_Preview(requirement: .atLeast(1)).previewDisplayName("Multi - At least 1")
+		MultiSelection_Preview(requirement: .atLeast(2)).previewDisplayName("Multi - At least 2")
 	}
 }
 
-public struct Selection_Preview: View {
+public struct SingleSelection_Preview: View {
+	@State
+	var selection: Int? = nil
+
+	public var body: some View {
+		List {
+			Selection($selection, from: 1 ... 10) { item in
+				HStack {
+					Text(String(item.value))
+					Spacer()
+					Button(action: item.action) {
+						Image(systemName: item.isSelected ? "circle.fill" : "circle")
+					}
+				}
+			}
+		}
+		.footer {
+			if let selection {
+				Text("Result: \(String(describing: selection))")
+			} else {
+				Text("Result: nil")
+			}
+			WithControlRequirements(selection, forAction: { print($0) }) { action in
+				Button("Continue", action: action).buttonStyle(.primaryRectangular)
+			}
+		}
+	}
+}
+
+public struct MultiSelection_Preview: View {
 	@State
 	var selection: [Int]? = nil
 	let requirement: SelectionRequirement

@@ -1,22 +1,17 @@
 import FeaturePrelude
 
-// MARK: - Permission
-struct Permission: Sendable, FeatureReducer {
+// MARK: - AccountPermission
+struct AccountPermission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let permissionKind: PermissionKind
 		let dappMetadata: DappMetadata
-
-		enum PermissionKind: Sendable, Hashable {
-			case accounts(DappInteraction.NumberOfAccounts)
-			case personaData
-		}
+		let numberOfAccounts: DappInteraction.NumberOfAccounts
 
 		init(
-			permissionKind: PermissionKind,
-			dappMetadata: DappMetadata
+			dappMetadata: DappMetadata,
+			numberOfAccounts: DappInteraction.NumberOfAccounts
 		) {
-			self.permissionKind = permissionKind
 			self.dappMetadata = dappMetadata
+			self.numberOfAccounts = numberOfAccounts
 		}
 	}
 

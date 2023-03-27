@@ -118,6 +118,15 @@
       }
     },
     {
+      "identity" : "swift-builders",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davdroman/swift-builders",
+      "state" : {
+        "revision" : "a8fd97e32b7bb65f3fc1bd7d72725155fb2b4d77",
+        "version" : "0.4.0"
+      }
+    },
+    {
       "identity" : "swift-case-paths",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
@@ -295,6 +304,15 @@
       "state" : {
         "revision" : "df1c4e432c5e584cd6d6849c069d3df9ca7e86d8",
         "version" : "0.9.0"
+      }
+    },
+    {
+      "identity" : "textbuilder",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davdroman/TextBuilder",
+      "state" : {
+        "revision" : "bec40373ebb5840473e01ca0485fc91ad6c8c9e9",
+        "version" : "2.2.0"
       }
     },
     {

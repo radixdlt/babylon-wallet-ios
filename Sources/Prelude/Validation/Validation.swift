@@ -61,28 +61,16 @@ public struct Validation<Value, Error> {
 extension Validation: Sendable where Value: Sendable, Error: Sendable {}
 
 // MARK: Equatable
-extension Validation: Equatable where Value: Equatable, Error: Equatable {
+extension Validation: Equatable where Value: Equatable {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
-		lhs.validated == rhs.validated
+		lhs.rawValue == rhs.rawValue
 	}
 }
 
 // MARK: Hashable
-extension Validation: Hashable where Value: Hashable, Error: Hashable {
+extension Validation: Hashable where Value: Hashable {
 	public func hash(into hasher: inout Hasher) {
-		hasher.combine(projectedValue)
-	}
-}
-
-// MARK: - Validated + Hashable
-extension Validated: Hashable where Value: Hashable, Error: Hashable {
-	public func hash(into hasher: inout Hasher) {
-		switch self {
-		case let .valid(value):
-			hasher.combine(value)
-		case let .invalid(errors):
-			hasher.combine(errors)
-		}
+		hasher.combine(rawValue)
 	}
 }
 
