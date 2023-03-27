@@ -13,10 +13,12 @@ extension DoScanQR.State {
 // MARK: - DoScanQR.View
 extension DoScanQR {
 	public struct ViewState: Equatable {
+		public let scanMode: QRScanMode
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 		#endif // macOS
 		init(state: DoScanQR.State) {
+			scanMode = state.scanMode
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 			connectionPassword = state.connectionPassword
 			#endif // macOS
@@ -47,7 +49,33 @@ extension DoScanQR {
 	}
 }
 
-// MARK: Private Views
+// MARK: - QRScanMode
+public enum QRScanMode: Sendable, Hashable {
+	/// Scan exactly one code, then stop.
+	case once
+
+	/// Scan each code no more than once.
+	case oncePerCode
+
+	/// Keep scanning all codes until dismissed.
+	case continuous
+
+	/// Scan only when capture button is tapped.
+	case manual
+
+	public static let `default`: Self = .oncePerCode
+
+	#if os(iOS)
+	func forCodeScannerView() -> ScanMode {
+		switch self {
+		case .continuous: return .continuous
+		case .manual: return .manual
+		case .oncePerCode: return .oncePerCode
+		case .once: return .once
+		}
+	}
+	#endif
+}
 
 extension DoScanQR.View {
 	@ViewBuilder
@@ -61,7 +89,8 @@ extension DoScanQR.View {
 			.textStyle(.body1Regular)
 
 		CodeScannerView(
-			codeTypes: [.qr]
+			codeTypes: [.qr],
+			scanMode: viewStore.scanMode.forCodeScannerView()
 		) { response in
 			switch response {
 			case let .failure(error):

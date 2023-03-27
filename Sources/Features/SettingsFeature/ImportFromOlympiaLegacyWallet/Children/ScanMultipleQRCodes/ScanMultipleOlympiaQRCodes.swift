@@ -164,7 +164,7 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 				accounts: Array(accounts[$0 ..< (($0 + 1) * accountsPerPayload)])
 			)
 		}
-		print("🎉 array: \(array)")
+		print("🎉 mocking: \(array)")
 		return OrderedSet(uncheckedUniqueElements: array)
 	}()
 
