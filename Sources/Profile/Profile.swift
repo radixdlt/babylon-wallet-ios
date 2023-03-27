@@ -23,7 +23,8 @@ extension ProfileSnapshot.Version {
 	/// - 22: Rename `perNetwork` to `networks`
 	/// - 23: Replace `SHA256` hash for FactorSource with `Blake2`
 	/// - 24: Add `isDeveloperModeEnabled` to AppPreferences.
-	public static let minimum: Self = 24
+	/// - 25: Merge two conflicting Profile versions together.
+	public static let minimum: Self = 25
 }
 
 // MARK: - Profile

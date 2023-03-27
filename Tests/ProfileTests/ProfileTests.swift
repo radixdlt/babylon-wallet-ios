@@ -212,7 +212,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.accounts.count, 3)
 		XCTAssertEqual(network.personas.count, 2)
 
-		var authorizedDapp = try profile.addAuthorizedDapp(
+		let authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
 				dAppDefinitionAddress: .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
