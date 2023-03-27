@@ -43,6 +43,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				.ifCaseLet(/State.Step.scanMultipleOlympiaQRCodes, action: /Action.child .. ChildAction.scanMultipleOlympiaQRCodes) {
 					ScanMultipleOlympiaQRCodes()
 				}
+				.ifCaseLet(/State.Step.selectAccountsToImport, action: /Action.child .. ChildAction.selectAccountsToImport) {
+					SelectAccountsToImport()
+				}
+				.ifCaseLet(/State.Step.importOlympiaMnemonic, action: /Action.child .. ChildAction.importOlympiaMnemonic) {
+					ImportOlympiaFactorSource()
+				}
 		}
 
 		Reduce(core)

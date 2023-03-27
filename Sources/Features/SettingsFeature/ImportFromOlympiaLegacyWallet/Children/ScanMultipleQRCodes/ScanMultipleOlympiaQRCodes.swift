@@ -104,9 +104,31 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	}
 }
 
+// MARK: - ImportedOlympiaWalletFailPayloadsEmpty
+struct ImportedOlympiaWalletFailPayloadsEmpty: Swift.Error {}
+
+// MARK: - ImportedOlympiaWalletFailInvalidWordCount
+struct ImportedOlympiaWalletFailInvalidWordCount: Swift.Error {}
+
+// MARK: - ImportedOlympiaWalletFailedToFindAnyAccounts
+struct ImportedOlympiaWalletFailedToFindAnyAccounts: Swift.Error {}
 extension ScanMultipleOlympiaQRCodes {
 	private func importWallet(_ info: OrderedSet<UncheckedImportedOlympiaWalletPayload>) throws -> ImportedOlympiaWallet {
-		fatalError()
+		guard let first = info.first else {
+			throw ImportedOlympiaWalletFailPayloadsEmpty()
+		}
+		guard let wordCount = BIP39.WordCount(wordCount: first.words) else {
+			throw ImportedOlympiaWalletFailInvalidWordCount()
+		}
+		let accounts = try info.flatMap { try $0.accountsToImport() }
+		let accountSet = OrderedSet(uncheckedUniqueElements: accounts)
+		guard let nonEmpty = NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>(rawValue: accountSet) else {
+			throw ImportedOlympiaWalletFailedToFindAnyAccounts()
+		}
+		return .init(
+			mnemonicWordCount: wordCount,
+			accounts: nonEmpty
+		)
 	}
 }
 
@@ -115,11 +137,20 @@ public struct ImportedOlympiaWallet: Sendable, Hashable {
 	public let mnemonicWordCount: BIP39.WordCount
 	public let accounts: NonEmpty<OrderedSet<Account>>
 
-	public struct Account: Sendable, Hashable {
+	public struct Account: Sendable, Hashable, CustomDebugStringConvertible {
 		public let publicKey: K1.PublicKey
 		public let path: LegacyOlympiaBIP44LikeDerivationPath
 		public let xrd: BigDecimal
 		public let displayName: NonEmptyString?
+
+		public var debugDescription: String {
+			"""
+			name: \(displayName ?? "")
+			xrd: \(xrd.description)
+			path: \(path.derivationPath)
+			publicKey: \(publicKey.compressedRepresentation.hex)
+			"""
+		}
 	}
 }
 
@@ -161,10 +192,9 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 				payloads: numberOfPayLoads,
 				index: $0,
 				words: 12,
-				accounts: Array(accounts[$0 ..< (($0 + 1) * accountsPerPayload)])
+				accounts: Array(accounts[($0 * accountsPerPayload) ..< (($0 + 1) * accountsPerPayload)])
 			)
 		}
-		print("🎉 mocking: \(array)")
 		return OrderedSet(uncheckedUniqueElements: array)
 	}()
 

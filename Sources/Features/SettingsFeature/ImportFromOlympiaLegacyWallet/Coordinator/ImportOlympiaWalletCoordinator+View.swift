@@ -28,6 +28,16 @@ extension ImportOlympiaWalletCoordinator {
 						action: { ImportOlympiaWalletCoordinator.Action.child(.scanMultipleOlympiaQRCodes($0)) },
 						then: { ScanMultipleOlympiaQRCodes.View(store: $0) }
 					)
+					CaseLet(
+						state: /ImportOlympiaWalletCoordinator.State.Step.selectAccountsToImport,
+						action: { ImportOlympiaWalletCoordinator.Action.child(.selectAccountsToImport($0)) },
+						then: { SelectAccountsToImport.View(store: $0) }
+					)
+					CaseLet(
+						state: /ImportOlympiaWalletCoordinator.State.Step.importOlympiaMnemonic,
+						action: { ImportOlympiaWalletCoordinator.Action.child(.importOlympiaMnemonic($0)) },
+						then: { ImportOlympiaFactorSource.View(store: $0) }
+					)
 				}
 			}
 		}
