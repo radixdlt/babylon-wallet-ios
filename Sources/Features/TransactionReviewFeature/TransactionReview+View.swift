@@ -20,7 +20,16 @@ extension TransactionReview.State {
 			message: message,
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositingHeading: depositing != nil,
-			showCustomizeGuaranteesButton: true
+			showCustomizeGuaranteesButton: true,
+			viewControlState: {
+				if transactionWithLockFee == nil {
+					return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+				} else if isSigningTX {
+					return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+				} else {
+					return .enabled
+				}
+			}()
 		)
 	}
 }
@@ -32,6 +41,7 @@ extension TransactionReview {
 		let isExpandedDappUsed: Bool
 		let showDepositingHeading: Bool
 		let showCustomizeGuaranteesButton: Bool
+		let viewControlState: ControlState
 	}
 
 	@MainActor
@@ -44,7 +54,7 @@ extension TransactionReview {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				NavigationStack {
+				ForceFullScreen {
 					ScrollView(showsIndicators: false) {
 						VStack(spacing: 0) {
 							FixedSpacer(height: .medium2)
@@ -66,8 +76,10 @@ extension TransactionReview {
 							usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositingHeading: viewStore.showDepositingHeading)
 
 							let depositingStore = store.scope(state: \.depositing) { .child(.depositing($0)) }
-							TransactionReviewAccounts.View(store: depositingStore)
-								.padding(.bottom, .medium1)
+							IfLetStore(depositingStore) { depositingStore in
+								TransactionReviewAccounts.View(store: depositingStore)
+									.padding(.bottom, .medium1)
+							}
 
 							Separator()
 								.padding(.bottom, .medium1)
@@ -81,12 +93,9 @@ extension TransactionReview {
 							}
 
 							let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
-							TransactionReviewNetworkFee.View(store: feeStore)
-
-							Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
-								viewStore.send(.approveTapped)
+							IfLetStore(feeStore) { feeStore in
+								TransactionReviewNetworkFee.View(store: feeStore)
 							}
-							.buttonStyle(.primaryRectangular)
 						}
 						.padding(.horizontal, .medium3)
 					}
@@ -94,14 +103,9 @@ extension TransactionReview {
 					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
 					.navigationTitle(L10n.TransactionReview.title)
 					.toolbar {
-						ToolbarItem(placement: .cancellationAction) {
-							CloseButton {
-								viewStore.send(.closeTapped)
-							}
-						}
 						ToolbarItem(placement: .automatic) {
 							Button(asset: AssetResource.code) {
-								viewStore.send(.closeTapped)
+								viewStore.send(.showRawTransactionTapped)
 							}
 							.buttonStyle(.secondaryRectangular(isInToolbar: true))
 						}
@@ -110,9 +114,17 @@ extension TransactionReview {
 				.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
 					TransactionReviewGuarantees.View(store: childStore)
 				}
-			}
-			.onAppear {
-				// decodeActions()
+				.safeAreaInset(edge: .bottom, spacing: .zero) {
+					ConfirmationFooter(
+						title: L10n.TransactionSigning.signTransactionButtonTitle,
+						isEnabled: viewStore.viewControlState.isEnabled,
+						action: { viewStore.send(.approveTapped) }
+					)
+				}
+				.controlState(viewStore.viewControlState)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 		}
 

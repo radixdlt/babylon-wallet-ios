@@ -1,21 +1,55 @@
 import ComposableArchitecture
 import FeaturePrelude
+import GatewayAPI
+import TransactionClient
 
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
+	public struct TransactionReviewContent: Equatable {
+		public var withdrawing: TransactionReviewAccounts.State?
+		public var dAppsUsed: TransactionReviewDappsUsed.State?
+		public var depositing: TransactionReviewAccounts.State?
+		public var presenting: TransactionReviewPresenting.State?
+		public var networkFee: TransactionReviewNetworkFee.State?
+	}
+
 	public struct State: Sendable, Hashable {
-		public var message: String?
+		public var message: String? {
+			transaction.message
+		}
 
 		public var withdrawing: TransactionReviewAccounts.State?
 		public var dAppsUsed: TransactionReviewDappsUsed.State?
-		public var depositing: TransactionReviewAccounts.State
-
+		public var depositing: TransactionReviewAccounts.State?
 		public var presenting: TransactionReviewPresenting.State?
-
-		public var networkFee: TransactionReviewNetworkFee.State
+		public var networkFee: TransactionReviewNetworkFee.State?
 
 		@PresentationState
 		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
+
+		var isSigningTX: Bool = false
+		var transactionWithLockFee: TransactionManifest?
+
+		public let transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem
+
+		public init(
+			transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem,
+			message: String? = nil,
+			withdrawing: TransactionReviewAccounts.State? = nil,
+			dAppsUsed: TransactionReviewDappsUsed.State? = nil,
+			depositing: TransactionReviewAccounts.State? = nil,
+			presenting: TransactionReviewPresenting.State? = nil,
+			networkFee: TransactionReviewNetworkFee.State? = nil,
+			customizeGuarantees: TransactionReviewGuarantees.State? = nil
+		) {
+			self.transaction = transaction
+			self.withdrawing = withdrawing
+			self.dAppsUsed = dAppsUsed
+			self.depositing = depositing
+			self.presenting = presenting
+			self.networkFee = networkFee
+			self.customizeGuarantees = customizeGuarantees
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -36,16 +70,31 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case customizeGuarantees(PresentationAction<TransactionReviewGuarantees.Action>)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case previewLoaded(TaskResult<TransactionToReview>)
+		case createTransactionReview(TransactionReviewContent)
+		case signTransactionResult(TransactionResult)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case failed(TransactionFailure)
+		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
+	}
+
+	@Dependency(\.transactionClient) var transactionClient
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.accountsClient) var accountsClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.networkFee, action: /Action.child .. ChildAction.networkFee) {
-			TransactionReviewNetworkFee()
-		}
-		Scope(state: \.depositing, action: /Action.child .. ChildAction.depositing) {
-			TransactionReviewAccounts()
-		}
 		Reduce(core)
+			.ifLet(\.networkFee, action: /Action.child .. ChildAction.networkFee) {
+				TransactionReviewNetworkFee()
+			}
+			.ifLet(\.depositing, action: /Action.child .. ChildAction.depositing) {
+				TransactionReviewAccounts()
+			}
 			.ifLet(\.dAppsUsed, action: /Action.child .. ChildAction.dAppsUsed) {
 				TransactionReviewDappsUsed()
 			}
@@ -60,14 +109,42 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none
+			let manifest = state.transaction.transactionManifest
+			return .run { send in
+				await send(.internal(.previewLoaded(
+					TaskResult(catching: {
+						try await transactionClient.getTransactionReview(
+							.init(
+								manifestToSign: manifest
+							)
+						)
+					})
+				)))
+			}
 		case .closeTapped:
 			return .none
 		case .showRawTransactionTapped:
 			return .none
 
 		case .approveTapped:
-			return .none
+			guard
+				let transactionWithLockFee = state.transactionWithLockFee
+			else {
+				return .none
+			}
+
+			let signRequest = SignManifestRequest(
+				manifestToSign: transactionWithLockFee,
+				makeTransactionHeaderInput: .default
+			)
+
+			state.isSigningTX = true
+
+			return .run { send in
+				await send(.internal(.signTransactionResult(
+					transactionClient.signAndSubmitTransaction(signRequest)
+				)))
+			}
 		}
 	}
 
@@ -77,7 +154,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
-			var accounts = state.depositing.accounts
+			var accounts = state.depositing!.accounts
 			for account in accounts {
 				let fungibleTransfers = account.transfers.filter { $0.metadata.type == .fungible }
 				accounts[id: account.id] = .init(account: account.account, transfers: fungibleTransfers)
@@ -103,6 +180,137 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .customizeGuarantees:
 			return .none
 		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .previewLoaded(.success(review)):
+			let reviewedManifest = review.analizedManifestToReview
+			state.transactionWithLockFee = review.manifestIncludingLockFee
+			return .run { send in
+				let userAccounts = (try? await extractAccounts(reviewedManifest)) ?? []
+				let usedDapps = (try? await extractUsedDapps(reviewedManifest)) ?? []
+				let deposits = (try? await extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts)) ?? []
+				let withdraws = (try? await extractWithdrawls(reviewedManifest.accountWithdraws, userAccounts: userAccounts)) ?? []
+				let badges = (try? await exctractBadges(reviewedManifest)) ?? []
+
+				let content = TransactionReviewContent(
+					withdrawing: .init(accounts: .init(uniqueElements: withdraws), showCustomizeGuarantees: false),
+					dAppsUsed: .init(isExpanded: false, dApps: .init(uniqueElements: usedDapps)),
+					depositing: .init(accounts: .init(uniqueElements: deposits), showCustomizeGuarantees: false),
+					presenting: .init(dApps: badges),
+					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
+				)
+				await send(.internal(.createTransactionReview(content)))
+			}
+		case let .createTransactionReview(content):
+			state.depositing = content.depositing
+			state.dAppsUsed = content.dAppsUsed
+			state.withdrawing = content.withdrawing
+			state.presenting = content.presenting
+			state.networkFee = content.networkFee
+			return .none
+
+		case let .signTransactionResult(.success(txID)):
+			state.isSigningTX = false
+			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+
+		case let .signTransactionResult(.failure(transactionFailure)):
+			state.isSigningTX = false
+			return .send(.delegate(.failed(transactionFailure)))
+		default:
+			return .none
+		}
+	}
+
+	func extractAccounts(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> [Account] {
+		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+
+		return manifest
+			.encounteredAddresses
+			.componentAddresses
+			.accounts
+			.map { encounteredAccount in
+				if let userAccount = userAccounts.first(where: { userAccount in
+					userAccount.address.address == encounteredAccount.address
+				}) {
+					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
+				} else {
+					// TODO: Extract Approved state
+					// Probably retrieve account metadata
+					return try! .external(.init(componentAddress: encounteredAccount), approved: true)
+				}
+			}
+	}
+
+	private func exctractBadges(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> IdentifiedArrayOf<TransactionReview.Dapp> {
+		// TODO: implement
+		[]
+	}
+
+	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> [TransactionReview.Dapp] {
+		var dapps: [TransactionReview.Dapp] = []
+		for app in manifest.encounteredAddresses.componentAddresses.userApplications {
+			let metadata = try await gatewayAPIClient.getEntityMetadata(app.address)
+			let dApp = TransactionReview.Dapp(id: app.address, metadata: .init(name: metadata.name ?? "Unknown", thumbnail: nil, description: metadata.description))
+			dapps.append(dApp)
+		}
+
+		return dapps
+	}
+
+	private func extractDeposits(_ accountDeposits: [AccountDeposit], userAccounts: [Account]) async throws -> [TransactionReviewAccount.State] {
+		var deposits: [Account: [Transfer]] = [:]
+
+		for deposit in accountDeposits {
+			switch deposit {
+			case let .exact(componentAddress, resourceSpecifier):
+				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits)
+			case let .estimate(_, componentAddress, resourceSpecifier):
+				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits)
+			}
+		}
+
+		return .init(deposits.map {
+			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+		})
+	}
+
+	func collectTransferInfo(componentAddress: ComponentAddress,
+	                         resourceSpecifier: ResourceSpecifier,
+	                         userAccounts: [Account],
+	                         container: inout [Account: [Transfer]]) async throws
+	{
+		switch resourceSpecifier {
+		case let .amount(resourceAddress, amount):
+			let account = userAccounts.first { $0.address.address == componentAddress.address }!
+			let metadata = try await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			let transfer = TransactionReview.Transfer(
+				action: .init(
+					componentAddress: componentAddress,
+					resourceAddress: resourceAddress,
+					amount: try! .init(fromString: amount.value)
+				),
+				metadata: .init(name: metadata.symbol, thumbnail: nil, type: .fungible)
+			)
+			container[account] = (container[account] ?? []) + [transfer]
+
+		case let .ids(resourceAddress, nfts):
+			// TODO: Add support for NFtS
+			break
+		}
+	}
+
+	private func extractWithdrawls(_ accountWithdraws: [AccountWithdraw], userAccounts: [Account]) async throws -> [TransactionReviewAccount.State] {
+		var withdraws: [Account: [Transfer]] = [:]
+
+		for withdraw in accountWithdraws {
+			try await collectTransferInfo(componentAddress: withdraw.componentAddress, resourceSpecifier: withdraw.resourceSpecifier, userAccounts: userAccounts, container: &withdraws)
+		}
+
+		return .init(withdraws.map {
+			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+		})
 	}
 }
 
@@ -189,14 +397,16 @@ extension TransactionReview {
 }
 
 extension TransactionReview.State {
-	public static let mock0 = Self(message: "Royalties claim",
+	public static let mock0 = Self(transaction: .previewValue,
+	                               message: "Royalties claim",
 	                               withdrawing: .init(accounts: [.mockWithdraw0], showCustomizeGuarantees: false),
 	                               dAppsUsed: .init(isExpanded: false, dApps: []),
 	                               depositing: .init(accounts: [.mockDeposit1], showCustomizeGuarantees: true),
 	                               presenting: .init(dApps: [.mock1, .mock0]),
 	                               networkFee: .init(fee: 0.1, isCongested: false))
 
-	public static let mock1 = Self(message: "Royalties claim",
+	public static let mock1 = Self(transaction: .previewValue,
+	                               message: "Royalties claim",
 	                               withdrawing: .init(accounts: [.mockWithdraw0, .mockWithdraw1], showCustomizeGuarantees: false),
 	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
 	                               depositing: .init(accounts: [.mockDeposit2], showCustomizeGuarantees: true),
@@ -531,3 +741,25 @@ private let fullResponse =
 	  }
 	}
 	"""
+
+extension GatewayAPI.EntityMetadataCollection {
+	var description: String? {
+		self["description"]
+	}
+
+	var symbol: String? {
+		self["symbol"]
+	}
+
+	var name: String? {
+		self["name"]
+	}
+
+	var url: String? {
+		self["url"]
+	}
+
+	subscript(key: String) -> String? {
+		items.first { $0.key == key }?.value.asString
+	}
+}

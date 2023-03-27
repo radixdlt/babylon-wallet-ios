@@ -11,10 +11,10 @@ public struct TransactionClient: Sendable, DependencyKey {
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
-	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> TransactionManifest
+	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> (manifest: TransactionManifest, feeAdded: BigDecimal)
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
 	public typealias SignAndSubmitTransaction = @Sendable (SignManifestRequest) async -> TransactionResult
-	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> AnalyzeManifestWithPreviewContextResponse
+	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
 }
 
 public typealias TransactionResult = Swift.Result<TXID, TransactionFailure>
@@ -54,11 +54,18 @@ public struct ManifestReviewRequest: Sendable {
 
 	public init(
 		manifestToSign: TransactionManifest,
-		makeTransactionHeaderInput: MakeTransactionHeaderInput,
+		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		selectNotary: @escaping SelectNotary = { $0.first }
 	) {
 		self.manifestToSign = manifestToSign
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.selectNotary = selectNotary
 	}
+}
+
+// MARK: - TransactionToReview
+public struct TransactionToReview: Sendable, Equatable {
+	public let analizedManifestToReview: AnalyzeManifestWithPreviewContextResponse
+	public let manifestIncludingLockFee: TransactionManifest
+	public let transactionFeeAdded: BigDecimal
 }

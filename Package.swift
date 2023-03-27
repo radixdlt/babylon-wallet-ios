@@ -105,7 +105,7 @@ package.addModules([
 			"RadixConnectClient",
 			"PersonasClient",
 			"ROLAClient",
-			"TransactionSigningFeature",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),

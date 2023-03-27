@@ -51,10 +51,6 @@ extension App {
 				.showDeveloperDisclaimerBanner()
 				.presentsLoadingViewOverlay()
 			}
-			.sheet(isPresented: .constant(true)) {
-				let store = StoreOf<TransactionReview>(initialState: .mock1, reducer: TransactionReview())
-				TransactionReview.View(store: store)
-			}
 		}
 	}
 }

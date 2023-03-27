@@ -1257,10 +1257,14 @@ components:
     TransactionPreviewResponse:
       type: object
       required:
+        - encoded_receipt
         - receipt
         - resource_changes
         - logs
       properties:
+        encoded_receipt:
+          type: string
+          description: The hex-sbor-encoded receipt
         receipt:
           $ref: "#/components/schemas/TransactionReceipt"
         resource_changes:

@@ -4,6 +4,11 @@ import FeaturePrelude
 // MARK: - TransactionReviewAccounts
 public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public init(accounts: IdentifiedArrayOf<TransactionReviewAccount.State>, showCustomizeGuarantees: Bool) {
+			self.accounts = accounts
+			self.showCustomizeGuarantees = showCustomizeGuarantees
+		}
+
 		public var accounts: IdentifiedArrayOf<TransactionReviewAccount.State>
 		public let showCustomizeGuarantees: Bool
 	}

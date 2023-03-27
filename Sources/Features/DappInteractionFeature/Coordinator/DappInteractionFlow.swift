@@ -4,7 +4,7 @@ import FeaturePrelude
 import GatewaysClient
 import PersonasClient
 import TransactionClient
-import TransactionSigningFeature
+import TransactionReviewFeature
 
 // MARK: - DappInteractionFlow
 struct DappInteractionFlow: Sendable, FeatureReducer {
@@ -166,7 +166,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case chooseAccounts(ChooseAccounts.State)
 			case personaDataPermission(PersonaDataPermission.State)
 			case oneTimePersonaData(OneTimePersonaData.State)
-			case signAndSubmitTransaction(TransactionSigning.State)
+			case reviewTransaction(TransactionReview.State)
 		}
 
 		enum MainAction: Sendable, Equatable {
@@ -175,7 +175,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case chooseAccounts(ChooseAccounts.Action)
 			case personaDataPermission(PersonaDataPermission.Action)
 			case oneTimePersonaData(OneTimePersonaData.Action)
-			case signAndSubmitTransaction(TransactionSigning.Action)
+			case reviewTransaction(TransactionReview.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
@@ -196,8 +196,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
 						OneTimePersonaData()
 					}
-					.ifCaseLet(/MainState.signAndSubmitTransaction, action: /MainAction.signAndSubmitTransaction) {
-						TransactionSigning()
+					.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
+                                                TransactionReview()
 					}
 			}
 		}
@@ -457,13 +457,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return handleOneTimePersonaData(item, fields)
 
 		case
-			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),
-			let .path(.element(_, .relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID)))))):
+			let .root(.relay(item, .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),
+			let .path(.element(_, .relay(item, .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID)))))):
 			return handleSignAndSubmitTX(item, txID)
 
 		case
-			let .root(.relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))),
-			let .path(.element(_, .relay(_, .signAndSubmitTransaction(.delegate(.failed(error)))))):
+			let .root(.relay(_, .reviewTransaction(.delegate(.failed(error))))),
+			let .path(.element(_, .relay(_, .reviewTransaction(.delegate(.failed(error)))))):
 			return handleSignAndSubmitTXFailed(error)
 
 		default:
@@ -760,9 +760,7 @@ extension DappInteractionFlow.Destinations.State {
 				requiredFieldIDs: item.fields
 			)))
 		case let .remote(.send(item)):
-			self = .relayed(anyItem, with: .signAndSubmitTransaction(.init(
-				transactionManifestWithoutLockFee: item.transactionManifest
-			)))
+			self = .relayed(anyItem, with: .reviewTransaction(.init(transaction: item)))
 		}
 	}
 }
