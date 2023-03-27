@@ -12,7 +12,7 @@ extension DappInteractionFlow {
 
 		var body: some SwiftUI.View {
 			NavigationStackStore(
-				store.scope(state: \.$path, action: { .child(.path($0)) })
+				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
 				IfLetStore(
 					store.scope(state: \.root, action: { .child(.root($0)) })

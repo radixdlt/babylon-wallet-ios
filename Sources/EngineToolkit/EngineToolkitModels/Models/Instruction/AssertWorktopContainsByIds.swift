@@ -9,13 +9,13 @@ public struct AssertWorktopContainsByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 	public let ids: Set<NonFungibleLocalId>
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, ids: Set<NonFungibleLocalId>) {
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 		self.ids = ids
 	}
 }
@@ -46,7 +46,7 @@ extension AssertWorktopContainsByIds {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
 			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
 		)
 	}

@@ -36,6 +36,8 @@ extension NewEntityCompletion {
 					return L10n.CreateEntity.Completion.Destination.chooseEntities(entityKind)
 				case .goBackToPersonaList:
 					return L10n.CreateEntity.Completion.Destination.settingsPersonaList
+				case .goBackToGateways:
+					return L10n.CreateEntity.Completion.Destination.gateways
 				}
 			}()
 

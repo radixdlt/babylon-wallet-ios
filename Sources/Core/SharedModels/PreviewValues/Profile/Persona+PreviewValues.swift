@@ -21,8 +21,8 @@ extension Profile.Network.Persona {
 			)),
 			displayName: "Alan",
 			fields: [
-				Field(kind: .firstName, value: "Alan"),
-				Field(kind: .lastName, value: "Turing"),
+				Field(id: .givenName, value: "Alan"),
+				Field(id: .familyName, value: "Turing"),
 			]
 		)
 	}()
@@ -45,8 +45,8 @@ extension Profile.Network.Persona {
 			)),
 			displayName: "Rick",
 			fields: [
-				Field(kind: .firstName, value: "Rick"),
-				Field(kind: .lastName, value: "Sanchez"),
+				Field(id: .givenName, value: "Rick"),
+				Field(id: .familyName, value: "Sanchez"),
 			]
 		)
 	}()

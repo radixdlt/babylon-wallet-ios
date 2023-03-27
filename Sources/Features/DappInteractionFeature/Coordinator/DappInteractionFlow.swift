@@ -78,8 +78,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
 		var root: Destinations.State?
-		@StackState<Destinations.State>
-		var path = []
+		var path: StackState<Destinations.State> = []
 
 		init?(
 			dappMetadata: DappMetadata,
@@ -180,7 +179,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
 				Destinations()
 			}
-			.forEach(\.$path, action: /Action.child .. ChildAction.path) {
+			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Destinations()
 			}
 			.ifLet(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert)
@@ -216,8 +215,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
-				// FIXME: .rejectedByUser should perhaps be a different, more specialized error (.invalidSpecifiedPersona?)
-				return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+				return dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
 			}
 		case .personaNotFoundErrorAlert:
 			return .none
@@ -339,41 +337,30 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		switch childAction {
-		case let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))):
+		case
+			let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))),
+			let .path(.element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona)))))):
 			return handleLogin(item, persona, authorizedDapp, authorizedPersona)
 
-		case let .root(.relay(item, .permission(.delegate(.continueButtonTapped)))):
+		case
+			let .root(.relay(item, .permission(.delegate(.continueButtonTapped)))),
+			let .path(.element(_, .relay(item, .permission(.delegate(.continueButtonTapped))))):
 			return handlePermission(item)
 
-		case let .root(.relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))):
+		case
+			let .root(.relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))),
+			let .path(.element(_, .relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind)))))):
 			return handleAccounts(item, accounts, accessKind)
 
-		case let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))):
+		case
+			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),
+			let .path(.element(_, .relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID)))))):
 			return handleSignAndSubmitTX(item, txID)
 
-		case let .root(.relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))):
+		case
+			let .root(.relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))),
+			let .path(.element(_, .relay(_, .signAndSubmitTransaction(.delegate(.failed(error)))))):
 			return handleSignAndSubmitTXFailed(error)
-
-		case let .path(pathAction):
-			switch pathAction.type {
-			case let .element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))):
-				return handleLogin(item, persona, authorizedDapp, authorizedPersona)
-
-			case let .element(_, .relay(item, .permission(.delegate(.continueButtonTapped)))):
-				return handlePermission(item)
-
-			case let .element(_, .relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))):
-				return handleAccounts(item, accounts, accessKind)
-
-			case let .element(_, .relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))):
-				return handleSignAndSubmitTX(item, txID)
-
-			case let .element(_, .relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))):
-				return handleSignAndSubmitTXFailed(error)
-
-			default:
-				return .none
-			}
 
 		default:
 			return .none

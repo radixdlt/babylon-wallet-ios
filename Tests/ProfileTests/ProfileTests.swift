@@ -39,10 +39,12 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "3b4fc51ce164be26723264f0a78b7e5ab44a143520c77e0e82bfbb9642e9cfd4")
 		let factorSourceID = try FactorSource.id(fromRoot: root)
-		XCTAssertEqual(factorSourceID.hex(), "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287")
+		XCTAssertEqual(factorSourceID.hex(), "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
 	func test_new_profile() async throws {
+		continueAfterFailure = false
+
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
 			language: .english
@@ -67,13 +69,15 @@ final class ProfileTests: TestCase {
 			)
 			let profile = Profile(
 				factorSource: babylonFactorSource,
-				creatingDevice: creatingDevice
+				creatingDevice: creatingDevice,
+				appPreferences: .init(gateways: .init(current: gateway))
 			)
 
 			return (profile, babylonFactorSource, olympiaFactorSource)
 		}
 
 		var profile = _profile
+		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
 
 		profile.factorSources.append(olympiaFactorSource)
 
@@ -82,6 +86,7 @@ final class ProfileTests: TestCase {
 				kind: .account,
 				networkID: profile.networkID
 			)
+
 			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
@@ -114,6 +119,9 @@ final class ProfileTests: TestCase {
 			)
 
 			try profile.addAccount(account)
+
+			XCTAssertEqual(profile.network?.networkID, gateway.network.id)
+			XCTAssertEqual(profile.network?.networkID, networkID)
 
 			return account
 		}
@@ -154,6 +162,9 @@ final class ProfileTests: TestCase {
 
 			try profile.addPersona(persona)
 
+			XCTAssertEqual(profile.network?.networkID, gateway.network.id)
+			XCTAssertEqual(profile.network?.networkID, networkID)
+
 			return persona
 		}
 
@@ -168,12 +179,12 @@ final class ProfileTests: TestCase {
 		let thirdAccount = try addNewAccount("Third")
 
 		let firstPersona = try addNewPersona("Mrs Incognito", fields: [
-			.init(kind: .firstName, value: "Jane"),
-			.init(kind: .lastName, value: "Incognitoson"),
+			.init(id: .givenName, value: "Jane"),
+			.init(id: .familyName, value: "Incognitoson"),
 		])
 		let secondPersona = try addNewPersona("Mrs Public", fields: [
-			.init(kind: .firstName, value: "Maria"),
-			.init(kind: .lastName, value: "Publicson"),
+			.init(id: .givenName, value: "Maria"),
+			.init(id: .familyName, value: "Publicson"),
 		])
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
@@ -201,7 +212,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.accounts.count, 3)
 		XCTAssertEqual(network.personas.count, 2)
 
-		var authorizedDapp = try profile.addAuthorizedDapp(
+		let authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
 				dAppDefinitionAddress: .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
@@ -250,14 +261,10 @@ final class ProfileTests: TestCase {
 			]), "Should be able to specify more accounts if `atLeast` was specified."
 		)
 
-		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(Profile.Network.Persona.Field.ID()) // add unknown fieldID
-
-		XCTAssertThrowsError(try profile.updateAuthorizedDapp(authorizedDapp))
-
 		let snapshot = profile.snapshot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
-		/* Uncomment the lines below to generate a new test vector */
+		// Uncomment the lines below to generate a new test vector
 //		let data = try jsonEncoder.encode(snapshot)
 //		print(String(data: data, encoding: .utf8)!)
 	}
@@ -292,6 +299,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.networkID, networkID)
 
 		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+		XCTAssertTrue(profile.appPreferences.security.isDeveloperModeEnabled, "Developer mode should default to on")
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
@@ -319,7 +327,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f"
+			"account_tdx_b_1p85v6mt035ny0j35jp8l6sy49gj0c3seda4tsuqvpstqrc6egy"
 		)
 
 		XCTAssertEqual(
@@ -329,7 +337,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu"
+			"account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg"
 		)
 
 		XCTAssertEqual(
@@ -339,7 +347,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"
+			"account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"
 		)
 
 		XCTAssertEqual(
@@ -348,7 +356,7 @@ final class ProfileTests: TestCase {
 		)
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm"
+			"identity_tdx_b_1psauxn0kkttjn3xhw6lvjudnrx48mu0jaxt0crp09d4smx5gv5"
 		)
 
 		XCTAssertEqual(
@@ -358,7 +366,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen"
+			"identity_tdx_b_1pnec3phquyel59q39v3kcyc6z3ljy9jv40mdwf4dgxps5y05k2"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -370,7 +378,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg", "account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {

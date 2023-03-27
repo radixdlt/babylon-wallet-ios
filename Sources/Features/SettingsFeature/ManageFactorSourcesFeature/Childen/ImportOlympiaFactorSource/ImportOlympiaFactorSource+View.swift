@@ -27,19 +27,19 @@ extension ImportOlympiaFactorSource {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack {
+						let focusedFieldBinding = viewStore.binding(
+							get: \.focusedField,
+							send: { .textFieldFocused($0) }
+						)
+
 						AppTextField(
 							placeholder: "Mnemonic",
 							text: viewStore.binding(
 								get: \.mnemonic,
 								send: { .mnemonicChanged($0) }
 							),
-							hint: "Seed phrase",
-							focusState: $focusedField,
-							equals: .mnemonic,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
-							)
+							hint: .info("Seed phrase"),
+							focus: .on(.mnemonic, binding: focusedFieldBinding, to: $focusedField)
 						)
 						.autocorrectionDisabled()
 
@@ -49,13 +49,8 @@ extension ImportOlympiaFactorSource {
 								get: \.passphrase,
 								send: { .passphraseChanged($0) }
 							),
-							hint: "BIP39 Passphrase is often called a '25th word'.",
-							focusState: $focusedField,
-							equals: .passphrase,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
-							)
+							hint: .info("BIP39 Passphrase is often called a '25th word'."),
+							focus: .on(.passphrase, binding: focusedFieldBinding, to: $focusedField)
 						)
 						.autocorrectionDisabled()
 

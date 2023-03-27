@@ -10,7 +10,7 @@ public struct TakeFromWorktopByAmount: InstructionProtocol {
 
 	// MARK: Stored properties
 	public let amount: Decimal_
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 	public let bucket: Bucket
 
 	// MARK: Init
@@ -22,7 +22,7 @@ public struct TakeFromWorktopByAmount: InstructionProtocol {
 		bucket: Bucket
 	) {
 		self.amount = amount
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 		self.bucket = bucket
 	}
 }
@@ -54,10 +54,10 @@ extension TakeFromWorktopByAmount {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let resourceAddress = try container.decode(ResourceAddress.self, forKey: .resourceAddress)
-		let amount = try container.decode(Decimal_.self, forKey: .amount)
-		let bucket = try container.decode(Bucket.self, forKey: .intoBucket)
-
-		self.init(amount: amount, resourceAddress: resourceAddress, bucket: bucket)
+		try self.init(
+			amount: container.decode(Decimal_.self, forKey: .amount),
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			bucket: container.decode(Bucket.self, forKey: .intoBucket)
+		)
 	}
 }

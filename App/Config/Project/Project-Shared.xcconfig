@@ -514,3 +514,15 @@ SWIFT_EMIT_LOC_STRINGS = YES
 // key in the Info.plist file to the value of this build setting.
 
 INFOPLIST_KEY_UIUserInterfaceStyle = Light
+
+
+
+//
+// When GENERATE_INFOPLIST_FILE is enabled, sets the value of the NSCameraUsageDescription key in the Info.plist file to the value of this build setting.
+INFOPLIST_KEY_NSCameraUsageDescription = "This lets you scan QR codes for Radix Connect linking.";
+
+
+
+//
+// When GENERATE_INFOPLIST_FILE is enabled, sets the value of the NSFaceIDUsageDescription key in the Info.plist file to the value of this build setting.
+INFOPLIST_KEY_NSFaceIDUsageDescription = "This app authenticates you when signing transactions and connecting to dApps.";

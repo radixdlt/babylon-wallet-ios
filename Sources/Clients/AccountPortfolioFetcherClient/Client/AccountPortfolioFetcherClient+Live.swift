@@ -7,7 +7,7 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 		let fetchPortfolioForAccount: FetchPortfolioForAccount = { (accountAddress: AccountAddress) async throws -> AccountPortfolio in
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-			let resourcesResponse = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
+			let resourcesResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
 			var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
 
 			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress)
@@ -18,15 +18,13 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 			}
 
 			if !fungibleTokenAddresses.isEmpty {
-				let request = GatewayAPI.EntityOverviewRequest(addresses: fungibleTokenAddresses.map(\.address))
-				let overviewResponse = try await gatewayAPIClient.resourcesOverview(request)
-				accountPortfolio.updateFungibleTokens(with: overviewResponse)
+				let response = try await gatewayAPIClient.getEntityDetails(fungibleTokenAddresses.map(\.address))
+				accountPortfolio.updateFungibleTokens(with: response)
 			}
 
 			if !nonFungibleTokenAddresses.isEmpty {
-				let request = GatewayAPI.EntityOverviewRequest(addresses: nonFungibleTokenAddresses.map(\.address))
-				let overviewResponse = try await gatewayAPIClient.resourcesOverview(request)
-				accountPortfolio.updateNonFungibleTokens(with: overviewResponse)
+				let response = try await gatewayAPIClient.getEntityDetails(nonFungibleTokenAddresses.map(\.address))
+				accountPortfolio.updateNonFungibleTokens(with: response)
 
 				try await withThrowingTaskGroup(
 					of: (ComponentAddress, [String]).self,
@@ -35,7 +33,8 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 						for resourceAddress in nonFungibleTokenAddresses {
 							taskGroup.addTask {
 								try Task.checkCancellation()
-								let response = try await gatewayAPIClient.getNonFungibleLocalIds(accountAddress, resourceAddress.address)
+								let response = try await gatewayAPIClient.getNonFungibleIds(resourceAddress.address)
+
 								let nonFungibleLocalIds = response.nonFungibleIds.items.map(\.nonFungibleId)
 								return (resourceAddress, nonFungibleLocalIds)
 							}

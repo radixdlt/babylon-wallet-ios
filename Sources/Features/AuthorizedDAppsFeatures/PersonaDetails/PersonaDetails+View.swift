@@ -14,7 +14,7 @@ extension PersonaDetails {
 
 	public struct ViewState: Equatable {
 		let url: URL
-		let personaName: String
+		let personaLabel: String
 	}
 }
 
@@ -47,7 +47,7 @@ extension PersonaDetails.View {
 					.padding(.bottom, .large2)
 				}
 			}
-			.navigationTitle(viewStore.personaName)
+			.navigationTitle(viewStore.personaLabel)
 			.alert(store: store.confirmForgetAlert)
 		}
 	}
@@ -57,7 +57,7 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(url: .init(string: "placeholder")!, personaName: persona.displayName.rawValue)
+		.init(url: .init(string: "placeholder")!, personaLabel: persona.displayName.rawValue)
 	}
 }
 
@@ -73,16 +73,12 @@ extension PersonaDetails.View {
 	struct InfoSection: View {
 		struct ViewState: Equatable {
 			let dAppName: String
-			let personaName: String
-			let firstName: String?
-			let lastName: String?
-			let email: String?
-			let zipCode: String?
-			let personalIdentificationNumber: String?
-
-			var isSharingSomething: Bool {
-				firstName != nil || lastName != nil || email != nil || zipCode != nil || personalIdentificationNumber != nil
-			}
+			let personaLabel: String
+			let isSharingAnything: Bool
+			let givenName: String?
+			let familyName: String?
+			let emailAddress: String?
+			let phoneNumber: String?
 		}
 
 		let store: Store<PersonaDetails.State, Never>
@@ -90,32 +86,32 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					InfoPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
+					InfoPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaLabel)
 
 					Separator()
 
-					if viewStore.isSharingSomething {
-						Text(L10n.PersonaDetails.personalDataSharingDescription(viewStore.dAppName))
+					if viewStore.isSharingAnything {
+						Text(L10n.PersonaDetails.personaDataSharingDescription(viewStore.dAppName))
 							.textBlock
 					} else {
 						Text(L10n.PersonaDetails.notSharingAnything(viewStore.dAppName))
 							.textBlock
 					}
 
-					if let firstName = viewStore.firstName {
-						InfoPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)
+					if let givenName = viewStore.givenName {
+						InfoPair(heading: L10n.PersonaDetails.givenNameHeading, item: givenName)
 					}
 
-					if let lastName = viewStore.lastName {
-						InfoPair(heading: L10n.PersonaDetails.secondNameHeading, item: lastName)
+					if let familyName = viewStore.familyName {
+						InfoPair(heading: L10n.PersonaDetails.familyNameHeading, item: familyName)
 					}
 
-					if let email = viewStore.email {
-						InfoPair(heading: L10n.PersonaDetails.emailHeading, item: email)
+					if let emailAddress = viewStore.emailAddress {
+						InfoPair(heading: L10n.PersonaDetails.emailAddressHeading, item: emailAddress)
 					}
 
-					if let zipCode = viewStore.zipCode {
-						InfoPair(heading: L10n.PersonaDetails.zipCodeHeading, item: zipCode)
+					if let phoneNumber = viewStore.phoneNumber {
+						InfoPair(heading: L10n.PersonaDetails.phoneNumberHeading, item: phoneNumber)
 					}
 				}
 				.padding(.horizontal, .medium1)
@@ -128,12 +124,12 @@ private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
 		.init(
 			dAppName: dAppName,
-			personaName: persona.displayName.rawValue,
-			firstName: persona.fields[kind: .firstName],
-			lastName: persona.fields[kind: .lastName],
-			email: persona.fields[kind: .email],
-			zipCode: persona.fields[kind: .zipCode],
-			personalIdentificationNumber: persona.fields[kind: .personalIdentificationNumber]
+			personaLabel: persona.displayName.rawValue,
+			isSharingAnything: !persona.fields.isEmpty,
+			givenName: persona.fields[id: .givenName]?.value.rawValue,
+			familyName: persona.fields[id: .familyName]?.value.rawValue,
+			emailAddress: persona.fields[id: .emailAddress]?.value.rawValue,
+			phoneNumber: persona.fields[id: .phoneNumber]?.value.rawValue
 		)
 	}
 }
@@ -185,13 +181,5 @@ extension PersonaDetails.View {
 private extension PersonaDetails.State {
 	var accountSectionViewState: PersonaDetails.View.AccountSection.ViewState {
 		.init(dAppName: dAppName, sharingAccounts: persona.simpleAccounts ?? [])
-	}
-}
-
-// MARK: Extensions
-
-extension IdentifiedArrayOf<Profile.Network.Persona.Field> {
-	subscript(kind kind: Profile.Network.Persona.Field.Kind) -> String? {
-		first { $0.kind == kind }?.value.rawValue
 	}
 }

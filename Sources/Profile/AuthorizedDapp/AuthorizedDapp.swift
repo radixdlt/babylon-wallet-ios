@@ -62,6 +62,12 @@ extension Profile.Network.AuthorizedDapp {
 			Hashable,
 			Codable
 		{
+			// TODO: evolve this into an enum mirroring `SelectionRequirement` in `Selection.swift` to enable case switching.
+			//
+			// Things to keep in mind:
+			//
+			// - It will require a custom Codable implementation to make up for the move from struct(ured) to enum. Make sure implementation matches CAP-21's spec by writing some XCTAssertJSON tests beforehand.
+			// - Don't just typealias NumberOfAccounts = SelectionRequirement, as they're not the same conceptually and should be allowed to evolve independently!
 			public struct NumberOfAccounts: Sendable, Hashable, Codable {
 				public enum Quantifier: String, Sendable, Hashable, Codable {
 					case exactly

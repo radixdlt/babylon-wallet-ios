@@ -9,13 +9,13 @@ public struct TakeFromWorktop: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: ResourceAddress
+	public let resourceAddress: Address_
 	public let bucket: Bucket
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, bucket: Bucket) {
-		self.resourceAddress = resourceAddress
+		self.resourceAddress = resourceAddress.asGeneral
 		self.bucket = bucket
 	}
 }
@@ -45,9 +45,9 @@ extension TakeFromWorktop {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let resourceAddress = try container.decode(ResourceAddress.self, forKey: .resourceAddress)
-		let bucket = try container.decode(Bucket.self, forKey: .intoBucket)
-
-		self.init(resourceAddress: resourceAddress, bucket: bucket)
+		try self.init(
+			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			bucket: container.decode(Bucket.self, forKey: .intoBucket)
+		)
 	}
 }

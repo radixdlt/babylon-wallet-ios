@@ -70,12 +70,6 @@ public struct Main: Sendable, FeatureReducer {
 				await send(.delegate(.removedWallet))
 			}
 
-		// this should go away via network stream observation in the reducer (with .task)
-		case .destination(.presented(.settings(.child(.destination(.presented(.gatewaySettings(.delegate(.networkChanged)))))))):
-			state.destination = nil
-			state.home = .init()
-			return .send(.child(.home(.view(.pullToRefreshStarted))))
-
 		case .destination(.presented(.settings(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none

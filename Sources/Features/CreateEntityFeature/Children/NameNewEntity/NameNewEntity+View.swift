@@ -24,7 +24,9 @@ extension NameNewEntity {
 			titleText = {
 				switch entityKind {
 				case .account:
-					return state.isFirst ? L10n.CreateEntity.NameNewEntity.Account.Title.first : L10n.CreateEntity.NameNewEntity.Account.Title.notFirst
+					return state.isFirst ?
+						L10n.CreateEntity.NameNewEntity.Account.Title.first :
+						L10n.CreateEntity.NameNewEntity.Account.Title.notFirst
 				case .identity:
 					return L10n.CreateEntity.NameNewEntity.Persona.title
 				}
@@ -63,12 +65,14 @@ extension NameNewEntity {
 								AppTextField(
 									placeholder: viewStore.namePlaceholder,
 									text: nameBinding,
-									hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
-									focusState: $focusedField,
-									equals: .entityName,
-									first: viewStore.binding(
-										get: \.focusedField,
-										send: { .textFieldFocused($0) }
+									hint: .info(L10n.CreateEntity.NameNewEntity.Name.Field.explanation),
+									focus: .on(
+										.entityName,
+										binding: viewStore.binding(
+											get: \.focusedField,
+											send: { .textFieldFocused($0) }
+										),
+										to: $focusedField
 									)
 								)
 								#if os(iOS)
