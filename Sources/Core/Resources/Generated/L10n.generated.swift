@@ -621,10 +621,10 @@ public enum L10n {
     public static let editPersona = L10n.tr("Localizable", "personaDetails.editPersona", fallback: "Edit Persona")
     /// Email Address
     public static let emailAddressHeading = L10n.tr("Localizable", "personaDetails.emailAddressHeading", fallback: "Email Address")
-    /// Last Name
-    public static let familyNameHeading = L10n.tr("Localizable", "personaDetails.familyNameHeading", fallback: "Last Name")
-    /// First Name
-    public static let givenNameHeading = L10n.tr("Localizable", "personaDetails.givenNameHeading", fallback: "First Name")
+    /// Family Name
+    public static let familyNameHeading = L10n.tr("Localizable", "personaDetails.familyNameHeading", fallback: "Family Name")
+    /// Given Name
+    public static let givenNameHeading = L10n.tr("Localizable", "personaDetails.givenNameHeading", fallback: "Given Name")
     /// You are not sharing any personal data with %@
     public static func notSharingAnything(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")

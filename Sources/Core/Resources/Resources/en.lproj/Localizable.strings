@@ -155,8 +155,8 @@
 "personaDetails.personaLabelHeading" = "Persona Label";
 "personaDetails.personaDataSharingDescription" = "Here is the personal data that you are sharing with %@";
 "personaDetails.editPersona" = "Edit Persona";
-"personaDetails.givenNameHeading" = "First Name";
-"personaDetails.familyNameHeading" = "Last Name";
+"personaDetails.givenNameHeading" = "Given Name";
+"personaDetails.familyNameHeading" = "Family Name";
 "personaDetails.emailAddressHeading" = "Email Address";
 "personaDetails.phoneNumberHeading" = "Phone Number";
 "personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
