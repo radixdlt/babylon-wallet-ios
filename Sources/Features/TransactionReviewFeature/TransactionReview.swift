@@ -84,6 +84,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	public init() {}
 
@@ -190,14 +191,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .run { send in
 				let userAccounts = (try? await extractAccounts(reviewedManifest)) ?? []
 				let usedDapps = (try? await extractUsedDapps(reviewedManifest)) ?? []
-				let deposits = (try? await extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts)) ?? []
+				let deposits = try? await extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts)
 				let withdraws = (try? await extractWithdrawls(reviewedManifest.accountWithdraws, userAccounts: userAccounts)) ?? []
 				let badges = (try? await exctractBadges(reviewedManifest)) ?? []
 
 				let content = TransactionReviewContent(
 					withdrawing: .init(accounts: .init(uniqueElements: withdraws), showCustomizeGuarantees: false),
 					dAppsUsed: .init(isExpanded: false, dApps: .init(uniqueElements: usedDapps)),
-					depositing: .init(accounts: .init(uniqueElements: deposits), showCustomizeGuarantees: false),
+					depositing: deposits,
 					presenting: .init(dApps: badges),
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
@@ -259,39 +260,55 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		return dapps
 	}
 
-	private func extractDeposits(_ accountDeposits: [AccountDeposit], userAccounts: [Account]) async throws -> [TransactionReviewAccount.State] {
+	private func extractDeposits(_ accountDeposits: [AccountDeposit], userAccounts: [Account]) async throws -> TransactionReviewAccounts.State {
 		var deposits: [Account: [Transfer]] = [:]
+		var requiresGuarantees = false
 
 		for deposit in accountDeposits {
 			switch deposit {
 			case let .exact(componentAddress, resourceSpecifier):
-				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits)
-			case let .estimate(_, componentAddress, resourceSpecifier):
-				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits)
+				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, isEstimated: false)
+			case let .estimate(index, componentAddress, resourceSpecifier):
+				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, isEstimated: true)
+				requiresGuarantees = true
 			}
 		}
 
-		return .init(deposits.map {
+		let reviewAccounts = deposits.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
-		})
+		}
+
+		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func collectTransferInfo(componentAddress: ComponentAddress,
 	                         resourceSpecifier: ResourceSpecifier,
 	                         userAccounts: [Account],
-	                         container: inout [Account: [Transfer]]) async throws
+	                         container: inout [Account: [Transfer]],
+	                         isEstimated: Bool) async throws
 	{
 		switch resourceSpecifier {
 		case let .amount(resourceAddress, amount):
 			let account = userAccounts.first { $0.address.address == componentAddress.address }!
 			let metadata = try await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
+			let amount = try BigDecimal(fromString: amount.value)
+			let action = AccountAction(
+				componentAddress: componentAddress,
+				resourceAddress: resourceAddress,
+				amount: amount
+			)
+
+			let metdata = ResourceMetadata(
+				name: metadata.symbol,
+				thumbnail: nil,
+				type: addressKind.resourceType,
+				guaranteedAmount: isEstimated ? amount : nil
+			)
+
 			let transfer = TransactionReview.Transfer(
-				action: .init(
-					componentAddress: componentAddress,
-					resourceAddress: resourceAddress,
-					amount: try! .init(fromString: amount.value)
-				),
-				metadata: .init(name: metadata.symbol, thumbnail: nil, type: .fungible)
+				action: action,
+				metadata: metdata
 			)
 			container[account] = (container[account] ?? []) + [transfer]
 
@@ -305,7 +322,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		var withdraws: [Account: [Transfer]] = [:]
 
 		for withdraw in accountWithdraws {
-			try await collectTransferInfo(componentAddress: withdraw.componentAddress, resourceSpecifier: withdraw.resourceSpecifier, userAccounts: userAccounts, container: &withdraws)
+			try await collectTransferInfo(componentAddress: withdraw.componentAddress, resourceSpecifier: withdraw.resourceSpecifier, userAccounts: userAccounts, container: &withdraws, isEstimated: false)
 		}
 
 		return .init(withdraws.map {
@@ -761,5 +778,22 @@ extension GatewayAPI.EntityMetadataCollection {
 
 	subscript(key: String) -> String? {
 		items.first { $0.key == key }?.value.asString
+	}
+}
+
+extension EngineToolkitModels.AddressKind {
+	var resourceType: TransactionReview.ResourceType? {
+		switch self {
+		case .fungibleResource:
+			return .fungible
+		case .nonFungibleResource:
+			return .nonFungible
+		case .package:
+			return nil
+		case .accountComponent:
+			return nil
+		case .normalComponent:
+			return nil
+		}
 	}
 }
