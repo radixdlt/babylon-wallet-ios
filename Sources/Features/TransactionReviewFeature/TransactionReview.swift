@@ -27,8 +27,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
 
-		var isSigningTX: Bool = false
-		var transactionWithLockFee: TransactionManifest?
+		public var isSigningTX: Bool = false
+		public var transactionWithLockFee: TransactionManifest?
 
 		public let transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem
 
@@ -119,8 +119,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 		case .closeTapped:
 			return .none
+
 		case .showRawTransactionTapped:
-			return .none
+			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
+			let depositingAccounts = state.depositing?.accounts
+
+			return .fireAndForget {
+//				let manifest = try await addingGuarantees(to: transactionWithLockFee, accounts: depositingAccounts?.elements)
+//				print("MANIFEST:\n", manifest)
+			}
 
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
@@ -143,21 +150,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func addingGuarantees(to manifest: TransactionManifest, accounts: [TransactionReviewAccount.State]?) async throws -> TransactionManifest {
-		let guarantees = accounts?
-			.flatMap {
-				$0.transfers.compactMap(\.metadata.guarantee)
-			}
-			.map {
-				TransactionClient.Guarantee(amount: $0.amount, instructionIndex: $0.instructionIndex, resourceAddress: $0.resourceAddress)
-			}
-
-		if let guarantees, !guarantees.isEmpty {
-			return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
-		}
-		return manifest
-	}
-
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .withdrawing:
@@ -165,33 +157,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
 
-			let depositing = TransactionReviewAccounts.State(accounts: [.mockDeposit1, .mockDeposit2], showCustomizeGuarantees: true)
+//			let depositing = TransactionReviewAccounts.State(accounts: [.mockDeposit1, .mockDeposit2], showCustomizeGuarantees: true)
 
-//			guard let depositing = state.depositing else { return .none } // TODO: Handle?
+			guard let depositing = state.depositing else { return .none } // TODO: Handle?
 
 			let allTokens = depositing.accounts.flatMap { $0.transfers.map(\.action.resourceAddress) }
-
-			for account in depositing.accounts {
-				switch account.account {
-				case let .user(accountForDisplay):
-					print("=== USER ACCOUNT", accountForDisplay.label.rawValue)
-				case .external(let address, approved: _):
-					print("=== EXTERNAL ACCOUNT", address.address)
-				}
-
-				for transfer in account.transfers {
-					print("========", transfer.metadata.name ?? "nil", "==========")
-					print("    amount:", transfer.action.amount)
-					print("  resource:", transfer.action.resourceAddress.address)
-					print("   account:", transfer.action.componentAddress.address)
-				}
-			}
-
-			print("")
-
-			for token in Set(allTokens) {
-				print("   token: \(token.address): \(allTokens.count(of: token))")
-			}
 
 			let guarantees = depositing.accounts
 				.flatMap { account -> [TransactionReviewGuarantee.State] in
@@ -203,38 +173,32 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						}
 				}
 
-			print("")
-
-			for guarantee in guarantees {
-				print("========", guarantee.account.address, "==========")
-				print("    amount:", guarantee.transfer.action.amount)
-				print("  resource:", guarantee.transfer.action.resourceAddress.address)
-				print("   account:", guarantee.transfer.action.componentAddress.address)
-				print("   show:", guarantee.showAccount)
-			}
-
 			state.customizeGuarantees = .init(guarantees: .init(uniqueElements: guarantees))
 
 			return .none
 
 		case .depositing:
 			return .none
+
 		case .dAppsUsed:
 			return .none
+
 		case .presenting:
 			return .none
+
 		case .networkFee:
 			return .none
-                        //		case .customizeGuarantees(.presented(.delegate(.dismiss))):
-                        //
-                        //			return .none
 
 		case let .customizeGuarantees(.presented(.delegate(.dismiss(apply: apply)))):
 			if apply, let guarantees = state.customizeGuarantees?.guarantees {
-				for transfer in guarantees.map(\.transfer) {}
+				for transfer in guarantees.map(\.transfer) {
+					guard let guarantee = transfer.guarantee else { continue }
+					state.applyGuarantee(guarantee, transferID: transfer.id)
+				}
 			}
 			state.customizeGuarantees = nil
 			return .none
+
 		case .customizeGuarantees:
 			return .none
 		}
@@ -282,6 +246,18 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid))))
 		}
+	}
+
+	public func addingGuarantees(to manifest: TransactionManifest, accounts: [TransactionReviewAccount.State]?) async throws -> TransactionManifest {
+		let guarantees = accounts?
+			.flatMap { $0.transfers.compactMap(\.guarantee) }
+			.map {
+				TransactionClient.Guarantee(amount: $0.amount, instructionIndex: $0.instructionIndex, resourceAddress: $0.resourceAddress)
+			}
+
+		guard let guarantees, !guarantees.isEmpty else { return manifest }
+
+		return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
 	}
 }
 
@@ -349,12 +325,12 @@ extension TransactionReview {
 		}
 
 		let reviewAccounts = deposits.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
 		}
 
 		let requiresGuarantees = reviewAccounts.contains { state in
 			state.transfers.contains { transfer in
-				transfer.metadata.guarantee != nil
+				transfer.guarantee != nil
 			}
 		}
 
@@ -378,7 +354,7 @@ extension TransactionReview {
 				amount: amount
 			)
 
-			let guarantee: ResourceMetadata.Guarantee? = {
+			let guarantee: TransactionReview.Guarantee? = {
 				if case let .estimated(instructionIndex) = type, addressKind == .fungibleResource {
 					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 				}
@@ -387,12 +363,12 @@ extension TransactionReview {
 			let metdata = ResourceMetadata(
 				name: metadata.symbol ?? metadata.name,
 				thumbnail: nil,
-				type: addressKind.resourceType,
-				guarantee: guarantee
+				type: addressKind.resourceType
 			)
 
 			let transfer = TransactionReview.Transfer(
 				action: action,
+				guarantee: guarantee,
 				metadata: metdata
 			)
 			container[account] = (container[account] ?? []) + [transfer]
@@ -419,7 +395,7 @@ extension TransactionReview {
 		guard !withdraws.isEmpty else { return nil }
 
 		let accounts = withdraws.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
 		}
 		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
 	}
@@ -482,43 +458,64 @@ extension TransactionReview {
 		public var id: AccountAction { action }
 
 		public let action: AccountAction
+		public var guarantee: Guarantee?
 		public var metadata: ResourceMetadata
 
 		public init(
 			action: AccountAction,
+			guarantee: Guarantee? = nil,
 			metadata: ResourceMetadata
 		) {
 			self.action = action
+			self.guarantee = guarantee
 			self.metadata = metadata
 		}
 	}
 
-	public struct ResourceMetadata: Sendable, Hashable {
-		public struct Guarantee: Sendable, Hashable {
-			var amount: BigDecimal
-			var instructionIndex: UInt32
-			var resourceAddress: ResourceAddress
-		}
+	public struct Guarantee: Sendable, Hashable {
+		public var amount: BigDecimal
+		public var instructionIndex: UInt32
+		public var resourceAddress: ResourceAddress
+	}
 
+	public struct ResourceMetadata: Sendable, Hashable {
 		public let name: String?
 		public let thumbnail: URL?
 		public var type: ResourceType?
-		public var guarantee: Guarantee?
 		public var fiatAmount: BigDecimal?
 
 		public init(
 			name: String?,
 			thumbnail: URL?,
 			type: ResourceType? = nil,
-			guarantee: Guarantee? = nil,
 			fiatAmount: BigDecimal? = nil
 		) {
 			self.name = name
 			self.thumbnail = thumbnail
 			self.type = type
-			self.guarantee = guarantee
 			self.fiatAmount = fiatAmount
 		}
+	}
+}
+
+extension TransactionReview.State {
+	mutating func applyGuarantee(_ updated: TransactionReview.Guarantee, transferID: TransactionReview.Transfer.ID) {
+		guard let accountID = accountID(for: transferID) else { return }
+
+		depositing?
+			.accounts[id: accountID]?
+			.transfers[id: transferID]?.guarantee?.amount = updated.amount
+	}
+
+	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress.ID? {
+		for account in depositing?.accounts ?? [] {
+			for transfer in account.transfers {
+				if transfer.id == transferID {
+					return account.id
+				}
+			}
+		}
+		return nil
 	}
 }
 
@@ -529,6 +526,66 @@ extension Collection where Element: Equatable {
 			count += 1
 		}
 		return count
+	}
+}
+
+// MARK: - AccountAction
+public struct AccountAction: Codable, Sendable, Hashable {
+	public let componentAddress: ComponentAddress
+
+	public let resourceAddress: ResourceAddress
+
+	public let amount: BigDecimal
+
+	public enum CodingKeys: String, CodingKey {
+		case componentAddress = "component_address"
+		case resourceAddress = "resource_address"
+		case amount
+	}
+}
+
+extension Collection<AccountAction> {
+	public var groupedByAccount: [ComponentAddress: [AccountAction]] {
+		.init(grouping: self, by: \.componentAddress)
+	}
+}
+
+extension GatewayAPI.EntityMetadataCollection {
+	var description: String? {
+		self["description"]
+	}
+
+	var symbol: String? {
+		self["symbol"]
+	}
+
+	var name: String? {
+		self["name"]
+	}
+
+	var url: String? {
+		self["url"]
+	}
+
+	subscript(key: String) -> String? {
+		items.first { $0.key == key }?.value.asString
+	}
+}
+
+extension EngineToolkitModels.AddressKind {
+	var resourceType: TransactionReview.ResourceType? {
+		switch self {
+		case .fungibleResource:
+			return .fungible
+		case .nonFungibleResource:
+			return .nonFungible
+		case .package:
+			return nil
+		case .accountComponent:
+			return nil
+		case .normalComponent:
+			return nil
+		}
 	}
 }
 
@@ -608,10 +665,10 @@ extension URL {
 
 extension TransactionReview.Transfer {
 	public static let mock0 = Self(action: .mock0,
+	                               guarantee: .init(amount: 1.0188, instructionIndex: 1, resourceAddress: .mock0),
 	                               metadata: .init(name: "TSLA",
 	                                               thumbnail: .mock,
 	                                               type: .fungible,
-	                                               guarantee: .init(amount: 1.0188, instructionIndex: 1, resourceAddress: .mock0),
 	                                               fiatAmount: 301.91))
 
 	public static let mock1 = Self(action: .mock1,
@@ -621,10 +678,10 @@ extension TransactionReview.Transfer {
 	                                               fiatAmount: 301.91))
 
 	public static let mock2 = Self(action: .mock2,
+	                               guarantee: .init(amount: 5.10, instructionIndex: 1, resourceAddress: .mock1),
 	                               metadata: .init(name: "PXL",
 	                                               thumbnail: .mock,
-	                                               type: .fungible,
-	                                               guarantee: .init(amount: 5.10, instructionIndex: 1, resourceAddress: .mock1)))
+	                                               type: .fungible))
 
 	public static let mock3 = Self(action: .mock3,
 	                               metadata: .init(name: "PXL",
@@ -664,261 +721,5 @@ extension AccountAction {
 
 	public static var all: Set<Self> {
 		[.mock0, .mock1, .mock2, .mock3, .mock4]
-	}
-}
-
-public func decodeActions() {
-	guard let data = fullResponse.data(using: .utf8) else {
-		print("decodeActions failed data")
-		return
-	}
-
-	print("Data: \(String(data: data, encoding: .utf8) ?? "nil")")
-
-	let decoder = JSONDecoder()
-
-	guard let action = try? decoder.decode(TransactionPreviewResponse.self, from: data) else {
-		print("decodeActions failed decoder")
-		return
-	}
-
-	print("decodeActions success")
-	print(action)
-}
-
-// MARK: - TransactionPreviewResponse
-public struct TransactionPreviewResponse: Codable, Sendable, Hashable {
-	public let addressesEncountered: Addresses
-	public let proofs: [Proof]
-	public let accountActions: Actions
-
-	public enum CodingKeys: String, CodingKey {
-		case addressesEncountered = "addresses_encountered"
-		case proofs
-		case accountActions = "account_actions"
-	}
-
-	public struct Addresses: Codable, Sendable, Hashable {
-		public let packageAddresses: [PackageAddress]
-		public let componentAddresses: [ComponentAddress]
-		public let resourceAddresses: [ResourceAddress]
-
-		public enum CodingKeys: String, CodingKey {
-			case packageAddresses = "package_addresses"
-			case componentAddresses = "component_addresses"
-			case resourceAddresses = "resource_addresses"
-		}
-	}
-
-	public struct Proof: Codable, Sendable, Hashable {
-		public let origin: ComponentAddress
-		public let resourceAddress: ResourceAddress
-		public let quantity: TransactionQuantity
-
-		public enum CodingKeys: String, CodingKey {
-			case origin
-			case resourceAddress = "resource_address"
-			case quantity
-		}
-	}
-
-	public struct Actions: Codable, Sendable, Hashable {
-		public let withdraws: [AccountAction]
-		public let deposits: [AccountAction]
-	}
-}
-
-// MARK: - TransactionQuantity
-public struct TransactionQuantity: Codable, Sendable, Hashable {
-	public let type: QuantityType
-	public let amount: BigDecimal
-
-	public enum QuantityType: String, Codable, Sendable, Hashable {
-		case amount = "Amount"
-	}
-}
-
-// MARK: - AccountAction
-public struct AccountAction: Codable, Sendable, Hashable {
-	public let componentAddress: ComponentAddress
-
-	public let resourceAddress: ResourceAddress
-
-	public let amount: BigDecimal
-
-	public enum CodingKeys: String, CodingKey {
-		case componentAddress = "component_address"
-		case resourceAddress = "resource_address"
-		case amount
-	}
-}
-
-extension Collection<AccountAction> {
-	public var groupedByAccount: [ComponentAddress: [AccountAction]] {
-		.init(grouping: self, by: \.componentAddress)
-	}
-}
-
-// MARK: - TransactionAmount
-@propertyWrapper
-struct TransactionAmount: Sendable, Hashable {
-	let wrappedValue: BigDecimal
-}
-
-// MARK: Codable
-extension TransactionAmount: Codable {
-	init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		let string = try container.decode(String.self)
-		self.wrappedValue = try BigDecimal(fromString: string)
-	}
-
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(self.wrappedValue)
-	}
-}
-
-private let actionsResponse =
-	"""
-	{
-		"withdraws": [
-		  {
-			"component_address": {
-			  "type": "ComponentAddress",
-			  "address": "account_tdx_b_1pp3eaya2hehlxqgmva6vutzec68cv7vuaye5rl9nqunsutnvhm"
-			},
-			"resource_address": {
-			  "type": "ResourceAddress",
-			  "address": "resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp"
-			},
-			"amount": "100"
-		  }
-		],
-		"deposits": [
-		  {
-			"component_address": {
-			  "type": "ComponentAddress",
-			  "address": "account_tdx_b_1pp3eaya2hehlxqgmva6vutzec68cv7vuaye5rl9nqunsutnvhm"
-			},
-			"resource_address": {
-			  "type": "ResourceAddress",
-			  "address": "resource_tdx_b_1qre9sv98scqut4k9g3j6kxuvscczv0lzumefwgwhuf6qdu4c3r"
-			},
-			"amount": "0.760757908055004258"
-		  }
-		]
-	  }
-	"""
-
-private let fullResponse =
-	"""
-	{
-	  "addresses_encountered": {
-		"package_addresses": [],
-		"component_addresses": [
-		  {
-			"type": "ComponentAddress",
-			"address": "component_tdx_b_1qt7c7ws0a4f3wd3mwtcj4acvn87w4as9zyvkx3wwq8lskwe5zm"
-		  },
-		  {
-			"type": "ComponentAddress",
-			"address": "account_tdx_b_1pp3eaya2hehlxqgmva6vutzec68cv7vuaye5rl9nqunsutnvhm"
-		  }
-		],
-		"resource_addresses": [
-		  {
-			"type": "ResourceAddress",
-			"address": "resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp"
-		  },
-		  {
-			"type": "ResourceAddress",
-			"address": "resource_tdx_b_1qre9sv98scqut4k9g3j6kxuvscczv0lzumefwgwhuf6qdu4c3r"
-		  }
-		]
-	  },
-	  "proofs": [
-		{
-		  "origin": {
-			"type": "ComponentAddress",
-			"address": "account_tdx_b_1pp3eaya2hehlxqgmva6vutzec68cv7vuaye5rl9nqunsutnvhm"
-		  },
-		  "resource_address": {
-			"type": "ResourceAddress",
-			"address": "resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp"
-		  },
-		  "quantity": {
-			"type": "Amount",
-			"amount": "250"
-		  }
-		}
-	  ],
-	  "account_actions": {
-		"withdraws": [
-		  {
-			"component_address": {
-			  "type": "ComponentAddress",
-			  "address": "account_tdx_b_1pp3eaya2hehlxqgmva6vutzec68cv7vuaye5rl9nqunsutnvhm"
-			},
-			"resource_address": {
-			  "type": "ResourceAddress",
-			  "address": "resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp"
-			},
-			"amount": "100"
-		  }
-		],
-		"deposits": [
-		  {
-			"component_address": {
-			  "type": "ComponentAddress",
-			  "address": "account_tdx_b_1pp3eaya2hehlxqgmva6vutzec68cv7vuaye5rl9nqunsutnvhm"
-			},
-			"resource_address": {
-			  "type": "ResourceAddress",
-			  "address": "resource_tdx_b_1qre9sv98scqut4k9g3j6kxuvscczv0lzumefwgwhuf6qdu4c3r"
-			},
-			"amount": "0.760757908055004258"
-		  }
-		]
-	  }
-	}
-	"""
-
-extension GatewayAPI.EntityMetadataCollection {
-	var description: String? {
-		self["description"]
-	}
-
-	var symbol: String? {
-		self["symbol"]
-	}
-
-	var name: String? {
-		self["name"]
-	}
-
-	var url: String? {
-		self["url"]
-	}
-
-	subscript(key: String) -> String? {
-		items.first { $0.key == key }?.value.asString
-	}
-}
-
-extension EngineToolkitModels.AddressKind {
-	var resourceType: TransactionReview.ResourceType? {
-		switch self {
-		case .fungibleResource:
-			return .fungible
-		case .nonFungibleResource:
-			return .nonFungible
-		case .package:
-			return nil
-		case .accountComponent:
-			return nil
-		case .normalComponent:
-			return nil
-		}
 	}
 }

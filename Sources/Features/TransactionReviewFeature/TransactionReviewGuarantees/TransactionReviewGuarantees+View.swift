@@ -71,19 +71,19 @@ extension TransactionReviewGuarantees {
 extension TransactionReviewGuarantee.State {
 	var viewState: TransactionReviewGuarantee.ViewState {
 		.init(id: id,
-		      token: .init(amount: transfer.action.amount, metadata: transfer.metadata),
+		      token: .init(transfer: transfer),
 		      minimumPercentage: minimumPercentage,
 		      accountIfVisible: showAccount ? account : nil)
 	}
 }
 
 extension TransactionReviewTokenView.ViewState {
-	init(amount: BigDecimal, metadata: TransactionReview.ResourceMetadata) {
-		self.init(name: metadata.name,
-		          thumbnail: metadata.thumbnail,
-		          amount: amount,
-		          guaranteedAmount: metadata.guarantee?.amount,
-		          fiatAmount: metadata.fiatAmount)
+	init(transfer: TransactionReview.Transfer) {
+		self.init(name: transfer.metadata.name,
+		          thumbnail: transfer.metadata.thumbnail,
+		          amount: transfer.action.amount,
+		          guaranteedAmount: transfer.guarantee?.amount,
+		          fiatAmount: transfer.metadata.fiatAmount)
 	}
 }
 
@@ -134,7 +134,7 @@ extension TransactionReviewGuarantee {
 						Button(asset: AssetResource.minusCircle) {
 							viewStore.send(.decreaseTapped)
 						}
-						.opacity(viewStore.disableMinus ? 0.5 : 1)
+						.opacity(viewStore.disableMinus ? 0.2 : 1)
 						.disabled(viewStore.disableMinus)
 
 						Text("\(viewStore.minimumPercentage, specifier: "%.1f")")
@@ -144,7 +144,7 @@ extension TransactionReviewGuarantee {
 						Button(asset: AssetResource.plusCircle) {
 							viewStore.send(.increaseTapped)
 						}
-						.opacity(viewStore.disablePlus ? 0.5 : 1)
+						.opacity(viewStore.disablePlus ? 0.2 : 1)
 						.disabled(viewStore.disablePlus)
 					}
 					.padding(.medium3)

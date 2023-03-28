@@ -46,7 +46,7 @@ extension TransactionReviewAccounts {
 
 extension TransactionReviewAccount.State {
 	var viewState: TransactionReviewAccount.ViewState {
-		.init(account: account, details: transfers, showApprovedMark: account.isApproved)
+		.init(account: account, details: transfers.elements, showApprovedMark: account.isApproved)
 	}
 }
 
@@ -73,7 +73,7 @@ extension TransactionReviewAccount {
 						viewStore.send(.copyAddress)
 					}
 
-					ForEach(viewStore.details, id: \.self) { details in
+					ForEach(viewStore.details) { details in
 						TransactionDetailsView(viewState: details)
 					}
 					.background(.app.gray5)
@@ -99,7 +99,7 @@ public struct TransactionDetailsView: View {
 				name: viewState.metadata.name,
 				thumbnail: viewState.metadata.thumbnail,
 				amount: viewState.action.amount,
-				guaranteedAmount: viewState.metadata.guarantee?.amount,
+				guaranteedAmount: viewState.guarantee?.amount,
 				fiatAmount: viewState.metadata.fiatAmount
 			))
 		case .none:
