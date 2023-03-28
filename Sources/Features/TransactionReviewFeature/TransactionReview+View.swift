@@ -226,7 +226,7 @@ struct TransactionReviewTokenView: View {
 
 		let amount: BigDecimal
 		let guaranteedAmount: BigDecimal?
-		let dollarAmount: BigDecimal?
+		let fiatAmount: BigDecimal?
 	}
 
 	let viewState: ViewState
@@ -256,23 +256,21 @@ struct TransactionReviewTokenView: View {
 							.textStyle(.body2Regular) // TODO:  unknown textStyle
 							.foregroundColor(.app.gray1)
 					}
-					// Text(amount.formatted(.number))
-					Text(viewState.amount.description)
+					Text(viewState.amount.format(maxPlaces: 4))
 						.textStyle(.secondaryHeader)
 				}
 				.foregroundColor(.app.gray1)
 
-				if let dollarAmount = viewState.dollarAmount {
-					// Text(dollarAmount.formatted(.currency(code: "USD")))
-					Text(dollarAmount.description)
+				if let fiatAmount = viewState.fiatAmount {
+					// Text(fiatAmount.formatted(.currency(code: "USD")))
+					Text(fiatAmount.format(maxPlaces: 4))
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.padding(.top, .small2)
 				}
 
 				if let guaranteedAmount = viewState.guaranteedAmount {
-					//					Text("Guaranteed **\(guaranteedAmount.formatted(.number))**")
-					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.description)**")
+					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.format(maxPlaces: 4))**")
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.top, .small1)

@@ -50,16 +50,31 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 
 // MARK: - TransactionReviewGuarantee
 public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
+	@Dependency(\.pasteboardClient) var pasteboardClient
+
 	public struct State: Identifiable, Sendable, Hashable {
 		public var id: AccountAction { transfer.id }
 		public let account: TransactionReview.Account
-		public let accountIfVisible: TransactionReview.Account?
+		public let showAccount: Bool
 
 		public var transfer: TransactionReview.Transfer
 		public var minimumPercentage: Double
+
+		public init(
+			account: TransactionReview.Account,
+			showAccount: Bool,
+			transfer: TransactionReview.Transfer,
+			minimumPercentage: Double = 100
+		) {
+			self.account = account
+			self.showAccount = showAccount
+			self.transfer = transfer
+			self.minimumPercentage = minimumPercentage
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case copyAddressTapped
 		case increaseTapped
 		case decreaseTapped
 	}
@@ -72,24 +87,29 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .copyAddressTapped:
+			pasteboardClient.copyString(state.account.address.address)
+			return .none
+
 		case .increaseTapped:
 			state.updateMinimumPercentage(with: state.minimumPercentage + percentageDelta)
 			return .none
+
 		case .decreaseTapped:
 			state.updateMinimumPercentage(with: state.minimumPercentage - percentageDelta)
 			return .none
 		}
 	}
 
-	private let percentageDelta: Double = 5
+	private let percentageDelta: Double = 0.1
 }
 
 extension TransactionReviewGuarantee.State {
 	mutating func updateMinimumPercentage(with newPercentage: Double) {
-		let newMinimum = max(min(newPercentage * 0.01, 1), 0)
-		guard let newMinimumDecimal = BigDecimal(newMinimum) else { return } // TODO: Handle?
+		minimumPercentage = max(min(newPercentage, 100), 0)
+		guard let newMinimumDecimal = BigDecimal(minimumPercentage * 0.01) else { return } // TODO: Handle?
 
-		minimumPercentage = newPercentage
-		transfer.metadata.guarantee?.amount = newMinimumDecimal * transfer.action.amount
+		let newAmount = newMinimumDecimal * transfer.action.amount
+		transfer.metadata.guarantee?.amount = newAmount
 	}
 }
