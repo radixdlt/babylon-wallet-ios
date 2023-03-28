@@ -106,7 +106,9 @@ struct AccountPermission_Preview: PreviewProvider {
 					reducer: AccountPermission()
 				)
 			)
+			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
+			#endif
 		}
 	}
 }
