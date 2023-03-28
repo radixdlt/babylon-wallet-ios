@@ -61,6 +61,7 @@ extension NonFungibleLocalId {
 	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+		// let internal_value = try NonFungibleLocalIdInternal(from: decoder)
 		let kind: ManifestASTValueKind = try container.decode(ManifestASTValueKind.self, forKey: .type)
 		if kind != Self.kind {
 			throw InternalDecodingFailure.valueTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
@@ -72,7 +73,7 @@ extension NonFungibleLocalId {
 }
 
 // MARK: - NonFungibleLocalIdInternal
-private enum NonFungibleLocalIdInternal: Sendable, Codable, Hashable {
+public enum NonFungibleLocalIdInternal: Sendable, Codable, Hashable {
 	case integer(UInt64)
 	case uuid(String)
 	case string(String)
@@ -86,7 +87,7 @@ private enum NonFungibleLocalIdInternal: Sendable, Codable, Hashable {
 	}
 }
 
-extension NonFungibleLocalIdInternal {
+public extension NonFungibleLocalIdInternal {
 	// MARK: CodingKeys
 
 	enum CodingKeys: String, CodingKey {

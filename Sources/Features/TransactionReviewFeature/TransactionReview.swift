@@ -206,7 +206,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			let manifest = state.transaction.transactionManifest
 			return .run { send in
 				let userAccounts = (try? await extractAccounts(reviewedManifest)) ?? []
-				let json = try await transactionClient.convertManifestInstructionsToJSONIfItWasString(manifest) // .convertManifestInstructionsToJSONIfItWasString(reviewedManifest)
 				let usedDapps = (try? await extractUsedDapps(reviewedManifest)) ?? []
 				let deposits = try? await extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts)
 				let withdraws = (try? await extractWithdrawls(reviewedManifest.accountWithdraws, userAccounts: userAccounts)) ?? []
@@ -304,9 +303,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	                         container: inout [Account: [Transfer]],
 	                         type: TransferType) async throws
 	{
+		let account = userAccounts.first { $0.address.address == componentAddress.address }!
 		switch resourceSpecifier {
 		case let .amount(resourceAddress, amount):
-			let account = userAccounts.first { $0.address.address == componentAddress.address }!
 			let metadata = try await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
 			let amount = try BigDecimal(fromString: amount.value)
@@ -317,13 +316,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			)
 
 			let guarantee: ResourceMetadata.Guarantee? = {
-				if case let .estimated(instructionIndex) = type {
+				if case let .estimated(instructionIndex) = type, addressKind == .fungibleResource {
 					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 				}
 				return nil
 			}()
 			let metdata = ResourceMetadata(
-				name: metadata.symbol,
+				name: metadata.symbol ?? metadata.name,
 				thumbnail: nil,
 				type: addressKind.resourceType,
 				guarantee: guarantee
@@ -336,8 +335,21 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			container[account] = (container[account] ?? []) + [transfer]
 
 		case let .ids(resourceAddress, nfts):
-			// TODO: Add support for NFtS
-			break
+                        // TODO: How to handle nft ids
+			let metadata = try await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
+
+			let action = AccountAction(
+				componentAddress: componentAddress,
+				resourceAddress: resourceAddress,
+				amount: 1
+			)
+
+			let transfer = TransactionReview.Transfer(
+				action: action,
+				metadata: ResourceMetadata(name: metadata.symbol ?? metadata.name, thumbnail: nil, type: addressKind.resourceType)
+			)
+			container[account] = (container[account] ?? []) + [transfer]
 		}
 	}
 
