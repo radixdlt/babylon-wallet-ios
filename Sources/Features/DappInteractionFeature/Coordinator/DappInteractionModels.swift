@@ -42,6 +42,7 @@ extension P2P.FromDapp.WalletInteraction {
 		case ongoingAccounts(OngoingAccountsRequestItem)
 		case ongoingPersonaData(OngoingPersonaDataRequestItem)
 		case oneTimeAccounts(OneTimeAccountsRequestItem)
+		case oneTimePersonaData(OneTimePersonaDataRequestItem)
 
 		// transactions
 		case send(SendTransactionItem)
@@ -57,6 +58,8 @@ extension P2P.FromDapp.WalletInteraction {
 				return 2
 			case .oneTimeAccounts:
 				return 3
+			case .oneTimePersonaData:
+				return 4
 
 			// transactions
 			case .send:
@@ -76,11 +79,13 @@ extension P2P.FromDapp.WalletInteraction {
 				items.ongoingAccounts.map(AnyInteractionItem.ongoingAccounts),
 				items.ongoingPersonaData.map(AnyInteractionItem.ongoingPersonaData),
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
+				items.oneTimePersonaData.map(AnyInteractionItem.oneTimePersonaData),
 			]
 			.compactMap { $0 }
 		case let .request(.unauthorized(items)):
 			return [
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
+				items.oneTimePersonaData.map(AnyInteractionItem.oneTimePersonaData),
 			]
 			.compactMap { $0 }
 		case let .transaction(items):
@@ -100,6 +105,7 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		case ongoingAccounts(OngoingAccountsRequestResponseItem)
 		case ongoingPersonaData(OngoingPersonaDataRequestResponseItem)
 		case oneTimeAccounts(OneTimeAccountsRequestResponseItem)
+		case oneTimePersonaData(OneTimePersonaDataRequestResponseItem)
 
 		// transaction responses
 		case send(SendTransactionResponseItem)
@@ -116,6 +122,7 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 			var ongoingAccounts: OngoingAccountsRequestResponseItem? = nil
 			var ongoingPersonaData: OngoingPersonaDataRequestResponseItem? = nil
 			var oneTimeAccounts: OneTimeAccountsRequestResponseItem? = nil
+			var oneTimePersonaData: OneTimePersonaDataRequestResponseItem? = nil
 			for item in items {
 				switch item {
 				case let .auth(item):
@@ -126,6 +133,8 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 					ongoingPersonaData = item
 				case let .oneTimeAccounts(item):
 					oneTimeAccounts = item
+				case let .oneTimePersonaData(item):
+					oneTimePersonaData = item
 				case .send:
 					continue
 				}
@@ -139,7 +148,8 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 							auth: auth,
 							ongoingAccounts: ongoingAccounts,
 							ongoingPersonaData: ongoingPersonaData,
-							oneTimeAccounts: oneTimeAccounts
+							oneTimeAccounts: oneTimeAccounts,
+							oneTimePersonaData: oneTimePersonaData
 						))
 					)
 				)
@@ -148,7 +158,8 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 					interactionId: interaction.id,
 					items: .request(
 						.unauthorized(.init(
-							oneTimeAccounts: oneTimeAccounts
+							oneTimeAccounts: oneTimeAccounts,
+							oneTimePersonaData: oneTimePersonaData
 						))
 					)
 				)
@@ -165,6 +176,8 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 				case .ongoingPersonaData:
 					continue
 				case .oneTimeAccounts:
+					continue
+				case .oneTimePersonaData:
 					continue
 				case let .send(item):
 					send = item

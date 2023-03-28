@@ -110,12 +110,7 @@ struct Login: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .createPersonaCoordinator(.presented(.delegate(.dismiss))):
-			state.createPersonaCoordinator = nil
-			return .none
-
 		case .createPersonaCoordinator(.presented(.delegate(.completed))):
-			state.createPersonaCoordinator = nil
 			return loadPersonas(state: &state)
 
 		default:

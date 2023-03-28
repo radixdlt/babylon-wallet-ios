@@ -58,12 +58,13 @@ public struct CreateEntityCoordinator<
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
+		case dismissed
 		case completed
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -90,7 +91,10 @@ public struct CreateEntityCoordinator<
 		switch viewAction {
 		case .closeButtonTapped:
 			precondition(state.config.canBeDismissed)
-			return .send(.delegate(.dismiss))
+			return .run { send in
+				await send(.delegate(.dismissed))
+				await dismiss()
+			}
 		}
 	}
 
@@ -168,6 +172,7 @@ public struct CreateEntityCoordinator<
 		case .step3_completion(.delegate(.completed)):
 			return .run { send in
 				await send(.delegate(.completed))
+				await dismiss()
 			}
 
 		default:

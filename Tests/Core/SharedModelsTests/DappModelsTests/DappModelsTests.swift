@@ -15,10 +15,17 @@ final class ToDappResponseTests: TestCase {
 								appearanceId: .fromIndex(0)
 							),
 						]
-					))
+					)),
+					oneTimePersonaData: .init(fields: [
+						.init(field: .givenName, value: NonEmptyString(rawValue: "Percy")!),
+						.init(field: .familyName, value: NonEmptyString(rawValue: "Jackson")!),
+						.init(field: .emailAddress, value: NonEmptyString(rawValue: "lightningthief@olympus.lol")!),
+						.init(field: .phoneNumber, value: NonEmptyString(rawValue: "555 5555")!),
+					])
 				))
 			)
 		))
+		try print(JSON(of: sut))
 		try XCTAssertJSONEncoding(
 			sut,
 			[
@@ -33,6 +40,14 @@ final class ToDappResponseTests: TestCase {
 								"appearanceId": 0,
 								"label": "Label",
 							],
+						],
+					],
+					"oneTimePersonaData": [
+						"fields": [
+							["field": "givenName", "value": "Percy"],
+							["field": "familyName", "value": "Jackson"],
+							["field": "emailAddress", "value": "lightningthief@olympus.lol"],
+							["field": "phoneNumber", "value": "555 5555"],
 						],
 					],
 				],
@@ -52,6 +67,9 @@ final class ToDappResponseTests: TestCase {
 					],
 					"requiresProofOfOwnership": true,
 				],
+				"oneTimePersonaData": [
+					"fields": ["givenName", "familyName", "emailAddress", "phoneNumber"],
+				],
 			],
 			"metadata": [
 				"networkId": 34,
@@ -68,6 +86,9 @@ final class ToDappResponseTests: TestCase {
 						oneTimeAccounts: .init(
 							numberOfAccounts: .exactly(2),
 							requiresProofOfOwnership: true
+						),
+						oneTimePersonaData: .init(
+							fields: [.givenName, .familyName, .emailAddress, .phoneNumber]
 						)
 					))
 				),

@@ -89,10 +89,17 @@
 "dApp.personaDataPermission.subtitle.explanation.first" = " is requesting permission to ";
 "dApp.personaDataPermission.subtitle.always" = "always";
 "dApp.personaDataPermission.subtitle.explanation.second" = " be able to view the following personal data when you login with this Persona.";
-"dApp.personaDataPermission.requiredInformation" = "Required information:";
 "dApp.personaDataPermission.updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
-"dApp.personaDataPermission.button.edit" = "Edit";
 "dApp.personaDataPermission.button.continue" = "Continue";
+
+"dApp.oneTimePersonaData.title" = "One-Time Data Request";
+"dApp.oneTimePersonaData.subtitle.explanation.first" = " is requesting that you provide some pieces of personal data ";
+"dApp.oneTimePersonaData.subtitle.justOneTime" = "just one time.";
+"dApp.oneTimePersonaData.chooseDataToProvide" = "Choose the data to provide";
+"dApp.oneTimePersonaData.button.continue" = "Continue";
+
+"dApp.personaDataBox.requiredInformation" = "Required information:";
+"dApp.personaDataBox.button.edit" = "Edit";
 
 "dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";
 "dApp.request.malformedErrorAlert.okButtonTitle" = "OK";

@@ -4,7 +4,6 @@ import FeaturePrelude
 extension PersonaDataPermissionBox.State {
 	var viewState: PersonaDataPermissionBox.ViewState {
 		.init(
-			avatarURL: URL(string: "something")!,
 			personaLabel: persona.displayName.rawValue,
 			existingRequiredFields: {
 				var existingRequiredFields = persona.fields.filter { allRequiredFieldIDs.contains($0.id) }
@@ -31,7 +30,7 @@ extension PersonaDataPermissionBox.State {
 				if let missingRequiredFieldIDs {
 					return .error {
 						Text {
-							L10n.DApp.PersonaDataPermission.requiredInformation.text.bold()
+							L10n.DApp.PersonaDataBox.requiredInformation.text.bold()
 							" "
 							missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
 						}
@@ -46,7 +45,6 @@ extension PersonaDataPermissionBox.State {
 
 extension PersonaDataPermissionBox {
 	struct ViewState: Equatable {
-		let avatarURL: URL
 		let personaLabel: String
 		let existingRequiredFields: String?
 		let missingRequiredFields: Hint?
@@ -55,16 +53,37 @@ extension PersonaDataPermissionBox {
 	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<PersonaDataPermissionBox>
+		let action: () -> Void
+		let accessory: AnyView
+
+		init(
+			store: StoreOf<PersonaDataPermissionBox>,
+			action: @escaping () -> Void = {},
+			@ViewBuilder accessory: () -> some SwiftUI.View = { EmptyView() }
+		) {
+			self.store = store
+			self.action = action
+			self.accessory = AnyView(accessory())
+		}
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DappPermissionBox {
-					HStack(spacing: .medium2) {
-						PersonaThumbnail(viewStore.avatarURL, size: .small)
-						Text(viewStore.personaLabel)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+					Button(action: action) {
+						HStack(spacing: .medium2) {
+							Circle()
+								.strokeBorder(Color.app.gray3, lineWidth: 1)
+								.background(Circle().fill(Color.app.gray4))
+								.frame(.small)
+							Text(viewStore.personaLabel)
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
+							Spacer()
+							accessory
+						}
+						.padding(.medium2)
 					}
+					.buttonStyle(.inert)
 				} content: {
 					VStack(alignment: .leading, spacing: .small1) {
 						if let existingRequiredFields = viewStore.existingRequiredFields {
@@ -75,7 +94,7 @@ extension PersonaDataPermissionBox {
 
 						viewStore.missingRequiredFields
 
-						Button(L10n.DApp.PersonaDataPermission.Button.edit) {
+						Button(L10n.DApp.PersonaDataBox.Button.edit) {
 							viewStore.send(.editButtonTapped)
 						}
 						.modifier {
@@ -86,6 +105,7 @@ extension PersonaDataPermissionBox {
 							}
 						}
 					}
+					.padding(.medium2)
 				}
 			}
 		}
@@ -97,16 +117,24 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct PersonaDataPermissionBox_PreviewProvider: PreviewProvider {
 	static var previews: some View {
-		PersonaDataPermissionBox.View(
-			store: Store(
-				initialState: .init(
-					persona: .previewValue0,
-					requiredFieldIDs: [.givenName, .emailAddress]
+		WithState(initialValue: false) { $isSelected in
+			PersonaDataPermissionBox.View(
+				store: Store(
+					initialState: .init(
+						persona: .previewValue0,
+						requiredFieldIDs: [.givenName, .emailAddress]
+					),
+					reducer: PersonaDataPermissionBox()
 				),
-				reducer: PersonaDataPermissionBox()
-			)
-		)
-		.padding()
+				action: { isSelected.toggle() }
+			) {
+				RadioButton(
+					appearance: .dark,
+					state: isSelected ? .selected : .unselected
+				)
+			}
+			.padding()
+		}
 	}
 }
 #endif

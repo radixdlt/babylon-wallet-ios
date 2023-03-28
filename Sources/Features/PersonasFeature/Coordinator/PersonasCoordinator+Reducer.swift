@@ -77,12 +77,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .createPersonaCoordinator(.delegate(.completed)):
-			state.createPersonaCoordinator = nil
 			return loadPersonas()
-
-		case .createPersonaCoordinator(.delegate(.dismiss)):
-			state.createPersonaCoordinator = nil
-			return .none
 
 		default:
 			return .none

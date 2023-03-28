@@ -1,13 +1,14 @@
+import CreateEntityFeature
 import EditPersonaFeature
 import FeaturePrelude
 import PersonasClient
 
 // MARK: - AccountPermission
-struct PersonaDataPermission: Sendable, FeatureReducer {
+struct OneTimePersonaData: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
-		let personaID: Profile.Network.Persona.ID
-		var persona: PersonaDataPermissionBox.State?
+		var personas: IdentifiedArrayOf<PersonaDataPermissionBox.State> = []
+		var selectedPersona: PersonaDataPermissionBox.State?
 		let requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
 
 		@PresentationState
@@ -15,17 +16,17 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 		init(
 			dappMetadata: DappMetadata,
-			personaID: Profile.Network.Persona.ID,
 			requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
 		) {
 			self.dappMetadata = dappMetadata
-			self.personaID = personaID
 			self.requiredFieldIDs = requiredFieldIDs
 		}
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case selectedPersonaChanged(PersonaDataPermissionBox.State?)
+		case createNewPersonaButtonTapped
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
@@ -34,7 +35,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case persona(PersonaDataPermissionBox.Action)
+		case persona(id: PersonaDataPermissionBox.State.ID, action: PersonaDataPermissionBox.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -45,15 +46,20 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
+			case createPersona(CreatePersonaCoordinator.State)
 		}
 
 		enum Action: Sendable, Equatable {
 			case editPersona(EditPersona.Action)
+			case createPersona(CreatePersonaCoordinator.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
+			}
+			Scope(state: /State.createPersona, action: /Action.createPersona) {
+				CreatePersonaCoordinator()
 			}
 		}
 	}
@@ -63,7 +69,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.persona, action: /Action.child .. ChildAction.persona) {
+			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
 				PersonaDataPermissionBox()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
@@ -74,12 +80,17 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-				let personas = try await personasClient.getPersonas()
-				await send(.internal(.personasLoaded(personas)))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+			return loadPersonasEffect()
+
+		case let .selectedPersonaChanged(persona):
+			state.selectedPersona = persona
+			return .none
+
+		case .createNewPersonaButtonTapped:
+			state.destination = .createPersona(.init(config: .init(
+				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
+			)))
+			return .none
 
 		case let .continueButtonTapped(fields):
 			return .send(.delegate(.continueButtonTapped(fields)))
@@ -89,17 +100,19 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .personasLoaded(personas):
-			if let persona = personas[id: state.personaID] {
-				state.persona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
-			}
+			state.personas = IdentifiedArrayOf(
+				uncheckedUniqueElements: personas.map {
+					.init(persona: $0, requiredFieldIDs: state.requiredFieldIDs)
+				}
+			)
 			return .none
 		}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .persona(.delegate(.edit)):
-			if let persona = state.persona {
+		case let .persona(id, .delegate(.edit)):
+			if let persona = state.personas[id: id] {
 				state.destination = .editPersona(.init(
 					mode: .dapp(requiredFieldIDs: state.requiredFieldIDs),
 					persona: persona.persona
@@ -108,11 +121,26 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-			state.persona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
+			state.personas[id: persona.id] = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
+			if state.selectedPersona?.id == persona.id {
+				state.selectedPersona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
+			}
 			return .none
+
+		case .destination(.presented(.createPersona(.delegate(.completed)))):
+			return loadPersonasEffect()
 
 		default:
 			return .none
+		}
+	}
+
+	func loadPersonasEffect() -> EffectTask<Action> {
+		.run { send in
+			let personas = try await personasClient.getPersonas()
+			await send(.internal(.personasLoaded(personas)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }

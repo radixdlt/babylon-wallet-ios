@@ -130,7 +130,9 @@ struct Login_Preview: PreviewProvider {
 						.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
 				)
 			)
+			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
+			#endif
 		}
 	}
 }
