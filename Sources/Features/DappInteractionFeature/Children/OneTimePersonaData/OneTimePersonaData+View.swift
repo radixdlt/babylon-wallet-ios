@@ -1,3 +1,4 @@
+@_spi(Internals) import ComposableArchitecture
 import EditPersonaFeature
 import FeaturePrelude
 import PersonasClient
@@ -7,6 +8,8 @@ extension OneTimePersonaData {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
+		let availablePersonas: IdentifiedArrayOf<PersonaDataPermissionBox.State>
+		let selectedPersona: PersonaDataPermissionBox.State?
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: OneTimePersonaData.State) {
@@ -29,14 +32,18 @@ extension OneTimePersonaData {
 
 				return dappName + explanation
 			}()
+			availablePersonas = state.personas
+			selectedPersona = state.selectedPersona
 			output = {
-//				let fields = state.persona.persona.fields
-//					.filter { state.requiredFieldIDs.contains($0.id) }
-//				guard fields.count == state.requiredFieldIDs.count else {
-//					return nil
-//				}
-//				return fields
-				nil
+				guard let selectedPersona = state.selectedPersona else {
+					return nil
+				}
+				let fields = selectedPersona.persona.fields
+					.filter { state.requiredFieldIDs.contains($0.id) }
+				guard fields.count == state.requiredFieldIDs.count else {
+					return nil
+				}
+				return fields
 			}()
 		}
 	}
@@ -59,12 +66,27 @@ extension OneTimePersonaData {
 							subtitle: viewStore.subtitle
 						)
 
-//						PersonaDataPermissionBox.View(
-//							store: store.scope(
-//								state: \.persona,
-//								action: { .child(.persona($0)) }
-//							)
-//						)
+						Selection(
+							viewStore.binding(
+								get: \.selectedPersona,
+								send: { .selectedPersonaChanged($0) }
+							),
+							from: viewStore.availablePersonas
+						) { item in
+							PersonaDataPermissionBox.View(
+								store: store.scope(
+									state: { _ in item.value },
+									action: { .child(.persona(id: $0.id, action: $1)) }
+								),
+								action: item.action,
+								accessory: {
+									RadioButton(
+										appearance: .dark,
+										state: item.isSelected ? .selected : .unselected
+									)
+								}
+							)
+						}
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
@@ -84,6 +106,7 @@ extension OneTimePersonaData {
 					action: OneTimePersonaData.Destinations.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
 				)
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

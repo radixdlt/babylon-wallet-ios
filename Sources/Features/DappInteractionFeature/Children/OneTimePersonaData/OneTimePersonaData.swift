@@ -7,6 +7,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
 		var personas: IdentifiedArrayOf<PersonaDataPermissionBox.State> = []
+		var selectedPersona: PersonaDataPermissionBox.State?
 		let requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
 
 		@PresentationState
@@ -23,6 +24,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case selectedPersonaChanged(PersonaDataPermissionBox.State?)
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
@@ -78,6 +80,10 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
+		case let .selectedPersonaChanged(persona):
+			state.selectedPersona = persona
+			return .none
 
 		case let .continueButtonTapped(fields):
 			return .send(.delegate(.continueButtonTapped(fields)))

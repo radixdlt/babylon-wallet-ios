@@ -69,7 +69,7 @@ extension AccountPermission {
 							Text(viewStore.numberOfAccounts)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
-								.padding(.small3)
+								.padding(.medium1)
 						}
 						.padding(.horizontal, .medium2)
 
