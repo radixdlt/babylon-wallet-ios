@@ -296,6 +296,8 @@ public enum L10n {
       }
     }
     public enum OneTimePersonaData {
+      /// Choose the data to provide
+      public static let chooseDataToProvide = L10n.tr("Localizable", "dApp.oneTimePersonaData.chooseDataToProvide", fallback: "Choose the data to provide")
       /// One-Time Data Request
       public static let title = L10n.tr("Localizable", "dApp.oneTimePersonaData.title", fallback: "One-Time Data Request")
       public enum Button {

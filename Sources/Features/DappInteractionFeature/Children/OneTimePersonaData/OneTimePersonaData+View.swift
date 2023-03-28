@@ -66,6 +66,10 @@ extension OneTimePersonaData {
 							subtitle: viewStore.subtitle
 						)
 
+						Text(L10n.DApp.OneTimePersonaData.chooseDataToProvide)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Header)
+
 						Selection(
 							viewStore.binding(
 								get: \.selectedPersona,

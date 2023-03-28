@@ -95,6 +95,7 @@
 "dApp.oneTimePersonaData.title" = "One-Time Data Request";
 "dApp.oneTimePersonaData.subtitle.explanation.first" = " is requesting that you provide some pieces of personal data ";
 "dApp.oneTimePersonaData.subtitle.justOneTime" = "just one time.";
+"dApp.oneTimePersonaData.chooseDataToProvide" = "Choose the data to provide";
 "dApp.oneTimePersonaData.button.continue" = "Continue";
 
 "dApp.personaDataBox.requiredInformation" = "Required information:";
