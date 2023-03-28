@@ -580,7 +580,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 									authorizedPersona.sharedAccounts = sharedAccounts
 								}
 								if let sharedFieldIDs {
-									authorizedPersona.sharedFieldIDs = sharedFieldIDs
+									if let existingSharedFieldIDs = authorizedPersona.sharedFieldIDs {
+										authorizedPersona.sharedFieldIDs = existingSharedFieldIDs.union(sharedFieldIDs)
+									} else {
+										authorizedPersona.sharedFieldIDs = sharedFieldIDs
+									}
 								}
 								return authorizedPersona
 							} else {
