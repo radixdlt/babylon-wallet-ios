@@ -6,16 +6,14 @@ import PersonasClient
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var selectedPersona: Profile.Network.Persona? {
-			personas.first(where: { $0.isSelected })?.persona
-		}
-
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 
 		var personas: IdentifiedArrayOf<PersonaRow.State> = []
 		var authorizedDapp: Profile.Network.AuthorizedDapp?
 		var authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?
+
+		var selectedPersona: PersonaRow.State?
 
 		@PresentationState
 		var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
@@ -31,6 +29,7 @@ struct Login: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case selectedPersonaChanged(PersonaRow.State?)
 		case createNewPersonaButtonTapped
 		case continueButtonTapped(Profile.Network.Persona)
 	}
@@ -40,7 +39,6 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case persona(id: PersonaRow.State.ID, action: PersonaRow.Action)
 		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
 	}
 
@@ -54,9 +52,6 @@ struct Login: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
-				PersonaRow()
-			}
 			.ifLet(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
 				CreatePersonaCoordinator()
 			}
@@ -67,11 +62,16 @@ struct Login: Sendable, FeatureReducer {
 		case .appeared:
 			return loadPersonas(state: &state)
 
+		case let .selectedPersonaChanged(persona):
+			state.selectedPersona = persona
+			return .none
+
 		case .createNewPersonaButtonTapped:
 			state.createPersonaCoordinator = .init(config: .init(
 				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
 			))
 			return .none
+
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
 			return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona)))
@@ -81,22 +81,27 @@ struct Login: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .personasLoaded(personas, authorizedDapp, authorizedPersonaSimple):
+			let lastLoggedInPersona: Profile.Network.Persona? = {
+				if let authorizedPersonaSimple {
+					return personas[id: authorizedPersonaSimple.identityAddress]
+				} else {
+					return nil
+				}
+			}()
 			state.personas = .init(uniqueElements:
-				personas.map { (persona: Profile.Network.Persona) in
-					let lastLogin: Date? = {
-						guard let authorizedPersonaSimple else { return nil }
-						return persona.address == authorizedPersonaSimple.identityAddress
-							? authorizedPersonaSimple.lastLogin
-							: nil
-					}()
-					return PersonaRow.State(
+				personas.map { persona in
+					PersonaRow.State(
 						persona: persona,
-						isSelected: lastLogin != nil,
-						lastLogin: lastLogin
+						lastLogin: persona == lastLoggedInPersona ? authorizedPersonaSimple?.lastLogin : nil
 					)
 				}
-				.sorted(by: { $0.isSelected && !$1.isSelected })
 			)
+			if
+				let lastLoggedInPersona,
+				let extractedLastLoggedInPersona = state.personas.remove(id: lastLoggedInPersona.id)
+			{
+				state.personas.insert(extractedLastLoggedInPersona, at: 0)
+			}
 			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersonaSimple
 			return .none
@@ -105,12 +110,6 @@ struct Login: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .persona(id: id, action: .delegate(.didSelect)):
-			state.personas.forEach {
-				state.personas[id: $0.id]?.isSelected = $0.id == id
-			}
-			return .none
-
 		case .createPersonaCoordinator(.presented(.delegate(.dismiss))):
 			state.createPersonaCoordinator = nil
 			return .none

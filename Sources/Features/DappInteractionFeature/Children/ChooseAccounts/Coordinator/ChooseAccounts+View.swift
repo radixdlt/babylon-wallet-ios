@@ -6,7 +6,9 @@ extension ChooseAccounts {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
-		let canProceed: Bool
+		let availableAccounts: [ChooseAccountsRow.State]
+		let selectionRequirement: SelectionRequirement
+		let selectedAccounts: [ChooseAccountsRow.State]?
 
 		init(state: ChooseAccounts.State) {
 			switch state.accessKind {
@@ -60,16 +62,16 @@ extension ChooseAccounts {
 				}
 			}()
 
-			let quantifier = state.numberOfAccounts.quantifier
-			let quantity = state.numberOfAccounts.quantity
-			canProceed = {
-				switch quantifier {
-				case .atLeast:
-					return state.selectedAccounts.count >= quantity
-				case .exactly:
-					return state.selectedAccounts.count == quantity
-				}
-			}()
+			let selectionRequirement = SelectionRequirement(state.numberOfAccounts)
+
+			self.availableAccounts = state.availableAccounts.map { account in
+				ChooseAccountsRow.State(
+					account: account,
+					mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark
+				)
+			}
+			self.selectionRequirement = selectionRequirement
+			self.selectedAccounts = state.selectedAccounts
 		}
 	}
 
@@ -83,55 +85,50 @@ extension ChooseAccounts {
 				observe: ChooseAccounts.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				ForceFullScreen {
-					ScrollView {
-						VStack(spacing: .small1) {
-							VStack(spacing: .medium2) {
-								dappImage
-
-								Text(viewStore.title)
-									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								Text(viewStore.subtitle)
-									.textStyle(.secondaryHeader)
-									.multilineTextAlignment(.center)
-							}
-							.padding(.bottom, .medium2)
-
-							ForEachStore(
-								store.scope(
-									state: \.availableAccounts,
-									action: { .child(.account(id: $0, action: $1)) }
-								),
-								content: { ChooseAccountsRow.View(store: $0) }
-							)
-
-							Spacer()
-								.frame(height: .small3)
-
-							Button(L10n.DApp.ChooseAccounts.createNewAccount) {
-								viewStore.send(.createAccountButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular(
-								shouldExpand: false
-							))
-
-							Spacer()
-								.frame(height: .large1 * 1.5)
-						}
-						.padding(.horizontal, .medium1)
-					}
-					.safeAreaInset(edge: .bottom, spacing: .zero) {
-						ConfirmationFooter(
-							title: L10n.DApp.Login.continueButtonTitle,
-							isEnabled: viewStore.canProceed,
-							action: { viewStore.send(.continueButtonTapped) }
+				ScrollView {
+					VStack(spacing: .medium2) {
+						DappHeader(
+							icon: nil,
+							title: viewStore.title,
+							subtitle: viewStore.subtitle
 						)
+
+						VStack(spacing: .small1) {
+							Selection(
+								viewStore.binding(
+									get: \.selectedAccounts,
+									send: { .selectedAccountsChanged($0) }
+								),
+								from: viewStore.availableAccounts,
+								requiring: viewStore.selectionRequirement
+							) { item in
+								ChooseAccountsRow.View(
+									viewState: .init(state: item.value),
+									isSelected: item.isSelected,
+									action: item.action
+								)
+							}
+						}
+
+						Button(L10n.DApp.ChooseAccounts.createNewAccount) {
+							viewStore.send(.createAccountButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: false))
+					}
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .medium2)
+				}
+				.footer {
+					WithControlRequirements(
+						viewStore.selectedAccounts,
+						forAction: { viewStore.send(.continueButtonTapped($0)) }
+					) { action in
+						Button(L10n.DApp.Login.continueButtonTitle, action: action)
+							.buttonStyle(.primaryRectangular)
 					}
 				}
 				.onAppear {
-					viewStore.send(.didAppear)
+					viewStore.send(.appeared)
 				}
 				.sheet(
 					store: store.scope(
@@ -142,13 +139,6 @@ extension ChooseAccounts {
 				)
 			}
 		}
-
-		var dappImage: some SwiftUI.View {
-			// NOTE: using placeholder until API is available
-			Color.app.gray4
-				.frame(.medium)
-				.cornerRadius(.medium3)
-		}
 	}
 }
 
@@ -157,12 +147,15 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct ChooseAccounts_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		ChooseAccounts.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: ChooseAccounts()
+		NavigationStack {
+			ChooseAccounts.View(
+				store: .init(
+					initialState: .previewValue,
+					reducer: ChooseAccounts()
+				)
 			)
-		)
+			.toolbar(.visible, for: .navigationBar)
+		}
 	}
 }
 
@@ -171,12 +164,13 @@ extension ChooseAccounts.State {
 		accessKind: .ongoing,
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,
-		numberOfAccounts: .exactly(1),
 		availableAccounts: .init(
 			uniqueElements: [
-				.previewValueOne,
+				.previewValue0,
+				.previewValue1,
 			]
 		),
+		numberOfAccounts: .exactly(1),
 		createAccountCoordinator: nil
 	)
 }

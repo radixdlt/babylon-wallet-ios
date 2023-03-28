@@ -5,7 +5,6 @@ extension PersonaRow {
 	struct ViewState: Equatable {
 		let name: String
 		let lastLogin: String?
-		let selectionState: RadioButton.State
 
 		init(state: PersonaRow.State) {
 			name = state.persona.displayName.rawValue
@@ -18,21 +17,17 @@ extension PersonaRow {
 			} else {
 				self.lastLogin = nil
 			}
-
-			selectionState = state.isSelected ? .selected : .unselected
 		}
 	}
 
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<PersonaRow>
+		let viewState: ViewState
+		let isSelected: Bool
+		let action: () -> Void
 
 		var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: PersonaRow.ViewState.init,
-				send: { .view($0) }
-			) { viewStore in
+			Button(action: action) {
 				VStack(alignment: .leading, spacing: .zero) {
 					ZStack {
 						HStack(alignment: .center) {
@@ -43,7 +38,7 @@ extension PersonaRow {
 								.padding(.trailing, .small1)
 
 							VStack(alignment: .leading, spacing: 4) {
-								Text(viewStore.name)
+								Text(viewState.name)
 									.foregroundColor(.app.gray1)
 									.textStyle(.secondaryHeader)
 							}
@@ -55,13 +50,13 @@ extension PersonaRow {
 							Spacer()
 							RadioButton(
 								appearance: .dark,
-								state: viewStore.selectionState
+								state: isSelected ? .selected : .unselected
 							)
 						}
 					}
 					.padding(.medium2)
 
-					if let lastLogin = viewStore.lastLogin {
+					if let lastLogin = viewState.lastLogin {
 						Group {
 							Color.app.gray4
 								.frame(height: 1)
@@ -76,10 +71,8 @@ extension PersonaRow {
 				}
 				.background(Color.app.gray5)
 				.cornerRadius(.small1)
-				.onTapGesture {
-					viewStore.send(.didSelect)
-				}
 			}
+			.buttonStyle(.inert)
 		}
 	}
 }
@@ -90,19 +83,19 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - PersonaRow_Preview
 struct PersonaRow_Preview: PreviewProvider {
 	static var previews: some View {
-		PersonaRow.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: PersonaRow()
+		WithState(initialValue: false) { $isSelected in
+			PersonaRow.View(
+				viewState: .init(state: .previewValue),
+				isSelected: isSelected,
+				action: { isSelected = true }
 			)
-		)
+		}
 	}
 }
 
 extension PersonaRow.State {
 	static let previewValue: Self = .init(
 		persona: .previewValue0,
-		isSelected: true,
 		lastLogin: Date()
 	)
 }

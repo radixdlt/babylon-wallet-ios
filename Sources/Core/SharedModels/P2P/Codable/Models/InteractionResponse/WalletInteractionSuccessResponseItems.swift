@@ -44,17 +44,20 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	public struct AuthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.FromDapp.WalletInteraction.Items.Discriminator.authorizedRequest.rawValue
 		public let auth: AuthRequestResponseItem
-		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
 		public let ongoingAccounts: OngoingAccountsRequestResponseItem?
+		public let ongoingPersonaData: OngoingPersonaDataRequestResponseItem?
+		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
 
 		public init(
 			auth: AuthRequestResponseItem,
-			oneTimeAccounts: OneTimeAccountsRequestResponseItem?,
-			ongoingAccounts: OngoingAccountsRequestResponseItem?
+			ongoingAccounts: OngoingAccountsRequestResponseItem?,
+			ongoingPersonaData: OngoingPersonaDataRequestResponseItem?,
+			oneTimeAccounts: OneTimeAccountsRequestResponseItem?
 		) {
 			self.auth = auth
-			self.oneTimeAccounts = oneTimeAccounts
 			self.ongoingAccounts = ongoingAccounts
+			self.ongoingPersonaData = ongoingPersonaData
+			self.oneTimeAccounts = oneTimeAccounts
 		}
 	}
 }

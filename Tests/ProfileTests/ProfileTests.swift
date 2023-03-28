@@ -221,7 +221,6 @@ final class ProfileTests: TestCase {
 				.init(arrayLiteral:
 					.init(
 						identityAddress: firstPersona.address,
-						fieldIDs: .init(firstPersona.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
@@ -229,18 +228,19 @@ final class ProfileTests: TestCase {
 								thirdAccount.address,
 							],
 							forRequest: .exactly(2)
-						)
+						),
+						sharedFieldIDs: .init(firstPersona.fields.map(\.id))
 					),
 					.init(
 						identityAddress: secondPersona.address,
-						fieldIDs: .init(secondPersona.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
 							],
 							forRequest: .atLeast(1)
-						)
+						),
+						sharedFieldIDs: .init(secondPersona.fields.map(\.id))
 					))
 			)
 		)
@@ -375,7 +375,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(network.authorizedDapps.count, 1)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg", "account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"])

@@ -165,10 +165,6 @@
           "networkID" : 11,
           "referencesToAuthorizedPersonas" : [
             {
-              "fieldIDs" : [
-                "givenName",
-                "familyName"
-              ],
               "identityAddress" : "identity_tdx_b_1psauxn0kkttjn3xhw6lvjudnrx48mu0jaxt0crp09d4smx5gv5",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
@@ -180,13 +176,13 @@
                   "quantifier" : "exactly",
                   "quantity" : 2
                 }
-              }
-            },
-            {
-              "fieldIDs" : [
+              },
+              "sharedFieldIDs" : [
                 "givenName",
                 "familyName"
-              ],
+              ]
+            },
+            {
               "identityAddress" : "identity_tdx_b_1pnec3phquyel59q39v3kcyc6z3ljy9jv40mdwf4dgxps5y05k2",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
@@ -197,7 +193,11 @@
                   "quantifier" : "atLeast",
                   "quantity" : 1
                 }
-              }
+              },
+              "sharedFieldIDs" : [
+                "givenName",
+                "familyName"
+              ]
             }
           ]
         }
@@ -269,5 +269,5 @@
       ]
     }
   ],
-  "version" : 25
+  "version" : 26
 }

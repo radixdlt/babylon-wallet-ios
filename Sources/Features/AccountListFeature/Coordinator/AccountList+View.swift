@@ -11,7 +11,7 @@ extension AccountList {
 		}
 
 		public var body: some SwiftUI.View {
-			LazyVStack(spacing: .medium1) {
+			LazyVStack(spacing: .medium3) {
 				ForEachStore(
 					store.scope(
 						state: \.accounts,

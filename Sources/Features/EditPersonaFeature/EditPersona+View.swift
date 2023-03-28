@@ -4,7 +4,7 @@ import Profile
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
-			avatarURL: avatarURL,
+			avatarURL: URL(string: "something")!,
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
@@ -80,22 +80,23 @@ extension EditPersona {
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .medium1)
 					}
+					.scrollDismissesKeyboard(.interactively)
 					#if os(iOS)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							Button(L10n.EditPersona.Button.cancel, action: { viewStore.send(.cancelButtonTapped) })
-								.textStyle(.body1Link)
-								.foregroundColor(.app.blue2)
-						}
-						ToolbarItem(placement: .navigationBarTrailing) {
-							WithControlRequirements(viewStore.output, forAction: { viewStore.send(.saveButtonTapped($0)) }) { action in
-								Button(L10n.EditPersona.Button.save, action: action)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								Button(L10n.EditPersona.Button.cancel, action: { viewStore.send(.cancelButtonTapped) })
 									.textStyle(.body1Link)
 									.foregroundColor(.app.blue2)
-									.opacity(viewStore.output == nil ? 0.3 : 1)
+							}
+							ToolbarItem(placement: .navigationBarTrailing) {
+								WithControlRequirements(viewStore.output, forAction: { viewStore.send(.saveButtonTapped($0)) }) { action in
+									Button(L10n.EditPersona.Button.save, action: action)
+										.textStyle(.body1Link)
+										.foregroundColor(.app.blue2)
+										.opacity(viewStore.output == nil ? 0.3 : 1)
+								}
 							}
 						}
-					}
 					#endif
 				}
 				.sheet(
@@ -144,14 +145,7 @@ extension EditPersona.State {
 	public static func previewValue(mode: EditPersona.State.Mode) -> Self {
 		.init(
 			mode: mode,
-			avatarURL: URL(string: "something")!,
-			personaLabel: NonEmptyString(rawValue: "RadIpsum")!,
-			existingFields: [
-				.init(id: .givenName, value: "Lorem"),
-				.init(id: .familyName, value: "Ipsum"),
-				.init(id: .emailAddress, value: "lorem.ipsum@example.com"),
-				.init(id: .phoneNumber, value: "555-5555"),
-			]
+			persona: .previewValue0
 		)
 	}
 }

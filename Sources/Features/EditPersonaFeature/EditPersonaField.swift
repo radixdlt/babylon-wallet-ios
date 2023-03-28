@@ -170,21 +170,24 @@ extension EditPersonaDynamicField.State {
 		self.init(
 			kind: .dynamic(isRequiredByDapp: isRequiredByDapp),
 			id: id,
-			input: {
-				if isRequiredByDapp {
-					return .init(
-						wrappedValue: initial,
-						onNil: L10n.EditPersona.InputField.Error.General.requiredByDapp,
-						rules: [.if(\.isBlank, error: L10n.EditPersona.InputField.Error.General.requiredByDapp)]
-					)
-				} else {
-					return .init(
-						wrappedValue: initial,
-						onNil: nil,
-						rules: []
-					)
+			input: .init(
+				wrappedValue: initial,
+				onNil: {
+					if isRequiredByDapp {
+						return L10n.EditPersona.InputField.Error.General.requiredByDapp
+					} else {
+						return nil
+					}
+				}(),
+				rules: .build {
+					if isRequiredByDapp {
+						.if(\.isBlank, error: L10n.EditPersona.InputField.Error.General.requiredByDapp)
+					}
+					if id == .emailAddress {
+						.unless(\.isEmailAddress, error: L10n.EditPersona.InputField.Error.EmailAddress.invalid)
+					}
 				}
-			}()
+			)
 		)
 	}
 }

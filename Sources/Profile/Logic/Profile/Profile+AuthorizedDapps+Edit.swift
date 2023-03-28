@@ -14,6 +14,18 @@ struct DappWasNotConnected: Swift.Error {}
 struct AuthorizedDappAlreadyExists: Swift.Error {}
 
 extension Profile {
+	/// Updates a `Persona` in the profile
+	public mutating func updatePersona(
+		_ persona: Profile.Network.Persona
+	) throws {
+		let networkID = persona.networkID
+		var network = try network(id: networkID)
+		guard network.personas.updateOrAppend(persona) != nil else {
+			fatalError("Incorrect implementation, should have been an existing Persona")
+		}
+		try updateOnNetwork(network)
+	}
+
 	/// Saves a `AuthorizedDapp` into the profile
 	@discardableResult
 	public mutating func addAuthorizedDapp(
@@ -58,7 +70,7 @@ extension Profile {
 			guard let persona = network.personas.first(where: { $0.address == personaNeedle.identityAddress }) else {
 				throw AuthorizedDappReferencesUnknownPersonas()
 			}
-			let fieldIDNeedles = Set(personaNeedle.fieldIDs)
+			let fieldIDNeedles = personaNeedle.sharedFieldIDs ?? []
 			let fieldIDHaystack = Set(persona.fields.map(\.id))
 			guard fieldIDHaystack.isSuperset(of: fieldIDNeedles) else {
 				throw AuthorizedDappReferencesUnknownPersonaField()
