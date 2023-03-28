@@ -7,6 +7,29 @@ public struct FungibleTransfer__: Identifiable, Sendable, Hashable {
 	public let transfer: TransactionReview.Transfer
 }
 
+// MARK: - Transfer__
+public struct Transfer__: Sendable, Identifiable, Hashable {
+	public var id: AccountAction { action }
+
+	public let action: AccountAction
+	public var metadata: ResourceMetadata__
+}
+
+// MARK: - ResourceMetadata__
+public struct ResourceMetadata__: Sendable, Hashable {
+	public let name: String?
+	public let thumbnail: URL?
+	public var type: ResourceType__?
+	public var guaranteedAmount: BigDecimal?
+	public var dollarAmount: BigDecimal?
+}
+
+// MARK: - ResourceType__
+public enum ResourceType__: Sendable, Hashable {
+	case fungible
+	case nonFungible
+}
+
 /*
 
   to:
@@ -29,12 +52,18 @@ public struct FungibleTransfer__: Identifiable, Sendable, Hashable {
 extension TransactionReviewGuarantees.State {
 	var viewState: TransactionReviewGuarantees.ViewState {
 		let guarantees = transfers.map { transfer -> TransactionReviewGuarantees.View.GuaranteeView.ViewState in
-			.init(token: <#T##TransactionReviewTokenView.ViewState#>,
-			      minimumPercentage: 100,
-			      accountIfVisible: transfer.account)
+			let metadata = transfer.transfer.metadata
+			return .init(id: transfer.id,
+			             token: .init(name: metadata.name,
+			                          thumbnail: metadata.thumbnail,
+			                          amount: transfer.transfer.action.amount,
+			                          guaranteedAmount: metadata.guaranteedAmount,
+			                          dollarAmount: metadata.dollarAmount),
+			             minimumPercentage: 100,
+			             accountIfVisible: transfer.account)
 		}
 
-		return .init(guarantees: [])
+		return .init(guarantees: guarantees)
 	}
 }
 
@@ -73,6 +102,10 @@ extension TransactionReviewGuarantees {
 								.foregroundColor(.app.gray1)
 								.padding(.horizontal, .large2)
 								.padding(.bottom, .medium1)
+
+							ForEach(viewStore.guarantees) { viewState in
+								GuaranteeView(viewState: viewState) {} decreaseAction: {}
+							}
 						}
 					}
 					.padding(.bottom, .medium1)
@@ -89,7 +122,8 @@ extension TransactionReviewGuarantees {
 		}
 
 		struct GuaranteeView: SwiftUI.View {
-			struct ViewState: Equatable {
+			struct ViewState: Identifiable, Equatable {
+				let id: AccountAction
 				let token: TransactionReviewTokenView.ViewState
 				let minimumPercentage: Double
 				let accountIfVisible: TransactionReview.Account?
