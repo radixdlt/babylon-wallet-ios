@@ -18,9 +18,10 @@ extension TransactionReviewNetworkFee {
 						Text(L10n.TransactionReview.NetworkFee.heading)
 							.sectionHeading
 
-						TransactionReviewInfoButton {
-							viewStore.send(.infoTapped)
-						}
+						// TODO: Enable back
+//						TransactionReviewInfoButton {
+//							viewStore.send(.infoTapped)
+//						}
 
 						Spacer(minLength: 0)
 
@@ -35,11 +36,12 @@ extension TransactionReviewNetworkFee {
 							.foregroundColor(.app.alert)
 					}
 
-					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
-						viewStore.send(.customizeTapped)
-					}
-					.textStyle(.body1StandaloneLink)
-					.foregroundColor(.app.blue2)
+					// TODO: Enable back
+//					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
+//						viewStore.send(.customizeTapped)
+//					}
+//					.textStyle(.body1StandaloneLink)
+//					.foregroundColor(.app.blue2)
 				}
 			}
 			.padding(.horizontal, .medium3)
