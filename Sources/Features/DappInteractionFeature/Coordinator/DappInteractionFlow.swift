@@ -711,7 +711,7 @@ extension DappInteractionFlow.Destinations.State {
 			if let persona {
 				self = .relayed(anyItem, with: .personaDataPermission(.init(
 					dappMetadata: dappMetadata,
-					persona: persona,
+					personaID: persona.id,
 					requiredFieldIDs: item.fields
 				)))
 			} else {
