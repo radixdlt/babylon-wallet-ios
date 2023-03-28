@@ -38,6 +38,11 @@ extension ImportOlympiaWalletCoordinator {
 						action: { ImportOlympiaWalletCoordinator.Action.child(.importOlympiaMnemonic($0)) },
 						then: { ImportOlympiaFactorSource.View(store: $0) }
 					)
+					CaseLet(
+						state: /ImportOlympiaWalletCoordinator.State.Step.completion,
+						action: { ImportOlympiaWalletCoordinator.Action.child(.completion($0)) },
+						then: { CompletionMigrateOlympiaAccountsToBabylon.View(store: $0) }
+					)
 				}
 			}
 		}

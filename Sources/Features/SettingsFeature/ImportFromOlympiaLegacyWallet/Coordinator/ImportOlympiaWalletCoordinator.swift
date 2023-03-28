@@ -10,6 +10,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
+			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
 		public var expectedMnemonicWordCount: BIP39.WordCount?
@@ -30,6 +31,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
 		case selectAccountsToImport(SelectAccountsToImport.Action)
 		case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
+		case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -38,6 +40,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			privateHDFactorSource: PrivateHDFactorSource
 		)
 		case migratedAccounts(MigratedAccounts)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case finishedMigration
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -56,6 +62,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				}
 				.ifCaseLet(/State.Step.importOlympiaMnemonic, action: /Action.child .. ChildAction.importOlympiaMnemonic) {
 					ImportOlympiaFactorSource()
+				}
+				.ifCaseLet(/State.Step.completion, action: /Action.child .. ChildAction.completion) {
+					CompletionMigrateOlympiaAccountsToBabylon()
 				}
 		}
 
@@ -107,7 +116,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 		case let .migratedAccounts(migrated):
-			fatalError()
+			state.step = .completion(.init(migratedAccounts: migrated))
+			return .none
 		}
 	}
 }
