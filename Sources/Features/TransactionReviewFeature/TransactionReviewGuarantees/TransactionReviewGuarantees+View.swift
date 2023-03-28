@@ -1,8 +1,40 @@
 import FeaturePrelude
 
+// MARK: - FungibleTransfer__
+public struct FungibleTransfer__: Identifiable, Sendable, Hashable {
+	public var id: AccountAction { transfer.id }
+	public let account: TransactionReview.Account
+	public let transfer: TransactionReview.Transfer
+}
+
+/*
+
+  to:
+
+ let token: TransactionReviewTokenView.ViewState
+ let minimumPercentage: Double
+ let accountIfVisible: TransactionReview.Account?
+
+  token:
+ struct ViewState: Equatable {
+     let name: String?
+     let thumbnail: URL?
+
+     let amount: BigDecimal
+     let guaranteedAmount: BigDecimal?
+     let dollarAmount: BigDecimal?
+ }
+ */
+
 extension TransactionReviewGuarantees.State {
 	var viewState: TransactionReviewGuarantees.ViewState {
-		.init(guarantees: self)
+		let guarantees = transfers.map { transfer -> TransactionReviewGuarantees.View.GuaranteeView.ViewState in
+			.init(token: <#T##TransactionReviewTokenView.ViewState#>,
+			      minimumPercentage: 100,
+			      accountIfVisible: transfer.account)
+		}
+
+		return .init(guarantees: [])
 	}
 }
 
