@@ -1,3 +1,4 @@
+import CreateEntityFeature
 import EditPersonaFeature
 import FeaturePrelude
 import PersonasClient
@@ -25,6 +26,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case selectedPersonaChanged(PersonaDataPermissionBox.State?)
+		case createNewPersonaButtonTapped
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
@@ -45,15 +47,20 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
+			case createPersona(CreatePersonaCoordinator.State)
 		}
 
 		enum Action: Sendable, Equatable {
 			case editPersona(EditPersona.Action)
+			case createPersona(CreatePersonaCoordinator.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
+			}
+			Scope(state: /State.createPersona, action: /Action.createPersona) {
+				CreatePersonaCoordinator()
 			}
 		}
 	}
@@ -74,15 +81,16 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-				let personas = try await personasClient.getPersonas()
-				await send(.internal(.personasLoaded(personas)))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+			return loadPersonasEffect()
 
 		case let .selectedPersonaChanged(persona):
 			state.selectedPersona = persona
+			return .none
+
+		case .createNewPersonaButtonTapped:
+			state.destination = .createPersona(.init(config: .init(
+				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
+			)))
 			return .none
 
 		case let .continueButtonTapped(fields):
@@ -117,8 +125,20 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			state.personas[id: persona.id] = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
 			return .send(.delegate(.personaUpdated(persona)))
 
+		case .destination(.presented(.createPersona(.delegate(.completed)))):
+			return loadPersonasEffect()
+
 		default:
 			return .none
+		}
+	}
+
+	func loadPersonasEffect() -> EffectTask<Action> {
+		.run { send in
+			let personas = try await personasClient.getPersonas()
+			await send(.internal(.personasLoaded(personas)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 }

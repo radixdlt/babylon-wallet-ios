@@ -251,7 +251,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.createAccount(.delegate(.dismiss)))):
+		case .destination(.presented(.createAccount(.delegate(.dismissed)))):
 			return skipSwitching(&state)
 
 		case .destination(.presented(.createAccount(.delegate(.completed)))):

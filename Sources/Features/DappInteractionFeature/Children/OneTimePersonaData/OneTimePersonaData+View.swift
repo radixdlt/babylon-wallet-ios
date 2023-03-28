@@ -1,4 +1,5 @@
 @_spi(Internals) import ComposableArchitecture
+import CreateEntityFeature
 import EditPersonaFeature
 import FeaturePrelude
 import PersonasClient
@@ -91,6 +92,11 @@ extension OneTimePersonaData {
 								}
 							)
 						}
+
+						Button(L10n.Personas.createNewPersonaButtonTitle) {
+							viewStore.send(.createNewPersonaButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: false))
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
@@ -109,6 +115,12 @@ extension OneTimePersonaData {
 					state: /OneTimePersonaData.Destinations.State.editPersona,
 					action: OneTimePersonaData.Destinations.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /OneTimePersonaData.Destinations.State.createPersona,
+					action: OneTimePersonaData.Destinations.Action.createPersona,
+					content: { CreatePersonaCoordinator.View(store: $0) }
 				)
 				.onAppear { viewStore.send(.appeared) }
 			}

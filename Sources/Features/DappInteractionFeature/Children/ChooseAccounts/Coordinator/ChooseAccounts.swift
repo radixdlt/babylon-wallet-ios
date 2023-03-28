@@ -107,12 +107,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .createAccountCoordinator(.presented(.delegate(.dismiss))):
-			state.createAccountCoordinator = nil
-			return .none
-
 		case .createAccountCoordinator(.presented(.delegate(.completed))):
-			state.createAccountCoordinator = nil
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
 					try await accountsClient.getAccountsOnCurrentNetwork()
