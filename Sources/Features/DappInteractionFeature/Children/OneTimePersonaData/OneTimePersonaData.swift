@@ -1,5 +1,6 @@
 import EditPersonaFeature
 import FeaturePrelude
+import PersonasClient
 
 // MARK: - AccountPermission
 struct OneTimePersonaData: Sendable, FeatureReducer {
@@ -21,7 +22,12 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
+		case appeared
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
+	}
+
+	enum InternalAction: Sendable, Equatable {
+		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -50,6 +56,9 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.errorQueue) var errorQueue
+
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
@@ -62,8 +71,28 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .appeared:
+			return .run { send in
+				let personas = try await personasClient.getPersonas()
+				await send(.internal(.personasLoaded(personas)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
 		case let .continueButtonTapped(fields):
 			return .send(.delegate(.continueButtonTapped(fields)))
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .personasLoaded(personas):
+			state.personas = IdentifiedArrayOf(
+				uncheckedUniqueElements: personas.map {
+					.init(persona: $0, requiredFieldIDs: state.requiredFieldIDs)
+				}
+			)
+			return .none
 		}
 	}
 

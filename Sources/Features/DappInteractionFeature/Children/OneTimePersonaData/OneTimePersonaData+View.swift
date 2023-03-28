@@ -1,5 +1,6 @@
 import EditPersonaFeature
 import FeaturePrelude
+import PersonasClient
 
 // MARK: - Permission.View
 extension OneTimePersonaData {
@@ -109,7 +110,11 @@ struct OneTimePersonaData_Preview: PreviewProvider {
 				store: Store(
 					initialState: .previewValue,
 					reducer: OneTimePersonaData()
-				)
+				) {
+					$0.personasClient.getPersonas = { @Sendable in
+						[.previewValue0, .previewValue1]
+					}
+				}
 			)
 			.toolbar(.visible, for: .navigationBar)
 		}
