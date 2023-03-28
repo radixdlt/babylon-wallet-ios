@@ -64,7 +64,11 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		case .appeared:
 			return .run { send in
 				try await clock.sleep(for: .seconds(0.5))
+				#if DEBUG
+				await send(.internal(.focusTextField(.passphrase)))
+				#else
 				await send(.internal(.focusTextField(.mnemonic)))
+				#endif
 			}
 		case .importButtonTapped:
 			return .run { [mnemonicPhrase = state.mnemonic] send in

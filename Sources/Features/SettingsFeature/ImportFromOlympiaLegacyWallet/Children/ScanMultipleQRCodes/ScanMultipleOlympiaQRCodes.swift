@@ -189,7 +189,7 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 		let accountsPerPayload = 2
 		let numberOfAccounts = numberOfPayLoads * accountsPerPayload
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-		let passphrase = try Mnemonic().words[0]
+		let passphrase = try Mnemonic().words[0].capitalized
 		print("✅ Passhprase: \(passphrase)")
 		let hdRoot = try mnemonic.hdRoot(passphrase: passphrase)
 		let accounts: [AccountNonChecked] = try (0 ..< numberOfAccounts).map {
