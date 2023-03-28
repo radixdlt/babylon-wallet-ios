@@ -61,7 +61,24 @@ extension AccountsClient {
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
-	public typealias MigrateOlympiaAccountsToBabylon = @Sendable (Set<OlympiaAccountToMigrate>) async throws -> MigratedAccounts
+	public typealias MigrateOlympiaAccountsToBabylon = @Sendable (MigrateOlympiaAccountsToBabylonRequest) async throws -> MigratedAccounts
+}
+
+// MARK: - MigrateOlympiaAccountsToBabylonRequest
+public struct MigrateOlympiaAccountsToBabylonRequest: Sendable, Hashable {
+	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
+	public let olympiaFactorSource: PrivateHDFactorSource
+	public let nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
+
+	public init(
+		olympiaAccounts: Set<OlympiaAccountToMigrate>,
+		olympiaFactorSource: PrivateHDFactorSource,
+		nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
+	) {
+		self.olympiaAccounts = olympiaAccounts
+		self.olympiaFactorSource = olympiaFactorSource
+		self.nextDerivationAccountIndex = nextDerivationAccountIndex
+	}
 }
 
 // MARK: - MigratedAccounts
@@ -71,6 +88,10 @@ public struct MigratedAccounts: Sendable, Hashable {
 	public struct MigratedAccount: Sendable, Hashable {
 		public let olympia: OlympiaAccountToMigrate
 		public let babylon: Profile.Network.Account
+		public init(olympia: OlympiaAccountToMigrate, babylon: Profile.Network.Account) {
+			self.olympia = olympia
+			self.babylon = babylon
+		}
 	}
 
 	/// Ordered by Olympia `address_index` (as non hardened value)
@@ -79,20 +100,19 @@ public struct MigratedAccounts: Sendable, Hashable {
 		fatalError() // accounts.map(\.babylon)
 	}
 
-	/// This is the max value of `address_index` + 1.
-	public let nextDerivationIndexForAccountForOlympiaFactor: Int
+	public let nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
 
 	public init(
 		networkID: NetworkID,
 		accounts: NonEmpty<OrderedSet<MigratedAccount>>,
-		nextDerivationIndexForAccountForOlympiaFactor: Int
+		nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
 	) throws {
 		guard accounts.allSatisfy({ $0.babylon.networkID == networkID }) else {
 			throw NetworkIDDisrepancy()
 		}
 		self.networkID = networkID
 		self.accounts = accounts
-		self.nextDerivationIndexForAccountForOlympiaFactor = nextDerivationIndexForAccountForOlympiaFactor
+		self.nextDerivationAccountIndex = nextDerivationAccountIndex
 	}
 }
 
@@ -112,13 +132,22 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 
 	public let displayName: NonEmptyString?
 
+	/// the non hardened value of the path
+	public let addressIndex: HD.Path.Component.Child.Value
+
 	public init(
 		publicKey: K1.PublicKey,
 		path: LegacyOlympiaBIP44LikeDerivationPath,
 		xrd: BigDecimal,
 		address: LegacyOlympiaAccountAddress,
 		displayName: NonEmptyString?
-	) {
+	) throws {
+		/// the non hardened value of the path
+		guard let addressIndex = path.fullPath.components.last?.asChild?.nonHardenedValue else {
+			assertionFailure("bad path")
+			throw ExpectedBIP44LikeDerivationPathToAlwaysContainAddressIndex()
+		}
+		self.addressIndex = addressIndex
 		self.publicKey = publicKey
 		self.path = path
 		self.xrd = xrd
@@ -135,6 +164,9 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 		"""
 	}
 }
+
+// MARK: - ExpectedBIP44LikeDerivationPathToAlwaysContainAddressIndex
+struct ExpectedBIP44LikeDerivationPathToAlwaysContainAddressIndex: Swift.Error {}
 
 // MARK: - LegacyOlympiaAccountAddress
 public struct LegacyOlympiaAccountAddress: Sendable, Hashable {

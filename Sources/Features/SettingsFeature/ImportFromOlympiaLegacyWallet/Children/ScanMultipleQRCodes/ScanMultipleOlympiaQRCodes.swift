@@ -138,6 +138,12 @@ extension ScanMultipleOlympiaQRCodes {
 public struct ImportedOlympiaWallet: Sendable, Hashable {
 	public let mnemonicWordCount: BIP39.WordCount
 	public let accounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+
+	/// This is set to the `max(allScannedAccounts.map(\.addressIndexNonHardendValue)) + 1`,
+	/// N.B. max of all **scanned** accounts, **not** max of all selected accounts.
+	public var nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index {
+		.init(accounts.elements.sorted(by: \.addressIndex).last!.addressIndex + 1)
+	}
 }
 
 // MARK: - UncheckedImportedOlympiaWalletPayload

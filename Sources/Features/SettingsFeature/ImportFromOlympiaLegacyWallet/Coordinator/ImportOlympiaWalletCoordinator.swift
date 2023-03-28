@@ -15,6 +15,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		public var expectedMnemonicWordCount: BIP39.WordCount?
 		public var selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
 		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
+		public var nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index?
 		public var step: Step
 		public init() {
 			step = .scanMultipleOlympiaQRCodes(.init())
@@ -72,6 +73,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case let .scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet))):
 			state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
+			state.nextDerivationAccountIndex = olympiaWallet.nextDerivationAccountIndex
 			state.step = .selectAccountsToImport(.init(scannedAccounts: olympiaWallet.accounts))
 			return .none
 
@@ -94,7 +96,16 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .validated(accounts, privateHDFactorSource):
-			return convertToBabylon(olympiaAccounts: accounts, factorSource: privateHDFactorSource)
+			guard let nextDerivationAccountIndex = state.nextDerivationAccountIndex else {
+				assertionFailure("Expected 'nextDerivationAccountIndex'")
+				return .none
+			}
+			return convertToBabylon(
+				olympiaAccounts: accounts,
+				factorSource: privateHDFactorSource,
+				nextDerivationAccountIndex: nextDerivationAccountIndex
+			)
+
 		case let .migratedAccounts(migrated):
 			fatalError()
 		}
@@ -127,12 +138,17 @@ extension ImportOlympiaWalletCoordinator {
 
 	private func convertToBabylon(
 		olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-		factorSource: PrivateHDFactorSource
+		factorSource: PrivateHDFactorSource,
+		nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
 	) -> EffectTask<Action> {
 		.run { send in
 			// Factor source is not yet saved to profile
 			let unsavedMigratedAccounts = try await accountsClient.migrateOlympiaAccountsToBabylon(
-				Set(olympiaAccounts.elements)
+				.init(
+					olympiaAccounts: Set(olympiaAccounts.elements),
+					olympiaFactorSource: factorSource,
+					nextDerivationAccountIndex: nextDerivationAccountIndex
+				)
 			)
 			await send(.internal(.migratedAccounts(unsavedMigratedAccounts)))
 		} catch: { error, _ in
