@@ -1,3 +1,4 @@
+import AccountsClient
 import FeaturePrelude
 
 extension SelectAccountsToImport.State {
@@ -13,9 +14,9 @@ extension SelectAccountsToImport.State {
 // MARK: - SelectAccountsToImport.View
 extension SelectAccountsToImport {
 	public struct ViewState: Equatable {
-		let availableAccounts: [ImportedOlympiaWallet.Account]
+		let availableAccounts: [OlympiaAccountToMigrate]
 		let selectionRequirement: SelectionRequirement
-		let selectedAccounts: [ImportedOlympiaWallet.Account]?
+		let selectedAccounts: [OlympiaAccountToMigrate]?
 	}
 
 	@MainActor
@@ -78,7 +79,7 @@ enum SelectAccountsToImportRow {
 		let accountName: String
 		let accountAddress: AddressView.ViewState
 
-		init(state olympiaAccount: ImportedOlympiaWallet.Account) {
+		init(state olympiaAccount: OlympiaAccountToMigrate) {
 			accountName = olympiaAccount.displayName?.rawValue ?? "NOT NAMED"
 			accountAddress = AddressView.ViewState(address: olympiaAccount.address.address.rawValue)
 		}
@@ -138,6 +139,6 @@ struct SelectAccountsToImport_Preview: PreviewProvider {
 }
 
 extension SelectAccountsToImport.State {
-	public static let previewValue = Self(scannedAccounts: .init(rawValue: .init(uncheckedUniqueElements: [.previewValue]))!)
+	public static let previewValue = Self(scannedAccounts: .init(rawValue: .init(uncheckedUniqueElements: [OlympiaAccountToMigrate.previewValue]))!)
 }
 #endif

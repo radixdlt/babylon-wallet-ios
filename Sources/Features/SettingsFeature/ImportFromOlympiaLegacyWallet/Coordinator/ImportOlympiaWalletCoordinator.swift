@@ -1,3 +1,4 @@
+import AccountsClient
 import Cryptography
 import FeaturePrelude
 import Profile
@@ -12,7 +13,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var expectedMnemonicWordCount: BIP39.WordCount?
-		public var selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>?
+		public var selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
 		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
 		public var step: Step
 		public init() {
@@ -32,13 +33,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case validated(
-			olympiaAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>,
+			olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			privateHDFactorSource: PrivateHDFactorSource
 		)
+		case migratedAccounts(MigratedAccounts)
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.accountsClient) var accountsClient
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -91,6 +94,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .validated(accounts, privateHDFactorSource):
+			return convertToBabylon(olympiaAccounts: accounts, factorSource: privateHDFactorSource)
+		case let .migratedAccounts(migrated):
 			fatalError()
 		}
 	}
@@ -99,7 +104,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 extension ImportOlympiaWalletCoordinator {
 	private func validate(
 		_ mnemonicWithPassphrase: MnemonicWithPassphrase,
-		selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>
+		selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) -> EffectTask<Action> {
 		.run { send in
 			try mnemonicWithPassphrase.validatePublicKeysOf(
@@ -119,6 +124,21 @@ extension ImportOlympiaWalletCoordinator {
 			errorQueue.schedule(error)
 		}
 	}
+
+	private func convertToBabylon(
+		olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+		factorSource: PrivateHDFactorSource
+	) -> EffectTask<Action> {
+		.run { send in
+			// Factor source is not yet saved to profile
+			let unsavedMigratedAccounts = try await accountsClient.migrateOlympiaAccountsToBabylon(
+				Set(olympiaAccounts.elements)
+			)
+			await send(.internal(.migratedAccounts(unsavedMigratedAccounts)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
 }
 
 // MARK: - GotNoAccountsToImport
@@ -131,7 +151,7 @@ enum ValidateOlympiaAccountsFailure: LocalizedError {
 
 extension MnemonicWithPassphrase {
 	func validatePublicKeysOf(
-		selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>
+		selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws {
 		let hdRoot = try self.hdRoot()
 

@@ -16,7 +16,8 @@ extension AccountsClient: TestDependencyKey {
 		createUnsavedVirtualAccount: { _ in throw NoopError() },
 		saveVirtualAccount: { _ in },
 		getAccountByAddress: { _ in throw NoopError() },
-		hasAccountOnNetwork: { _ in false }
+		hasAccountOnNetwork: { _ in false },
+		migrateOlympiaAccountsToBabylon: { _ in throw NoopError() }
 	)
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
@@ -26,6 +27,7 @@ extension AccountsClient: TestDependencyKey {
 		createUnsavedVirtualAccount: unimplemented("\(Self.self).createUnsavedVirtualAccount"),
 		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),
-		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork")
+		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
+		migrateOlympiaAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaAccountsToBabylon")
 	)
 }

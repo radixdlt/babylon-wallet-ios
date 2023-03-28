@@ -1,3 +1,4 @@
+import AccountsClient // OlympiaAccountToMigrate
 import Cryptography
 import EngineToolkit
 import FeaturePrelude
@@ -123,7 +124,7 @@ extension ScanMultipleOlympiaQRCodes {
 		}
 		let accounts = try info.flatMap { try $0.accountsToImport() }
 		let accountSet = OrderedSet(uncheckedUniqueElements: accounts)
-		guard let nonEmpty = NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>(rawValue: accountSet) else {
+		guard let nonEmpty = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(rawValue: accountSet) else {
 			throw ImportedOlympiaWalletFailedToFindAnyAccounts()
 		}
 		return .init(
@@ -136,35 +137,7 @@ extension ScanMultipleOlympiaQRCodes {
 // MARK: - ImportedOlympiaWallet
 public struct ImportedOlympiaWallet: Sendable, Hashable {
 	public let mnemonicWordCount: BIP39.WordCount
-	public let accounts: NonEmpty<OrderedSet<Account>>
-
-	public struct Account: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {
-		public typealias ID = K1.PublicKey
-		public var id: ID { publicKey }
-		public let publicKey: K1.PublicKey
-		public let path: LegacyOlympiaBIP44LikeDerivationPath
-		public let xrd: BigDecimal
-
-		/// Legacy Olympia address
-		public let address: LegacyOlympiaAccountAddress
-
-		public let displayName: NonEmptyString?
-
-		public var debugDescription: String {
-			"""
-			name: \(displayName ?? "")
-			xrd: \(xrd.description)
-			path: \(path.derivationPath)
-			publicKey: \(publicKey.compressedRepresentation.hex)
-			"""
-		}
-	}
-}
-
-// MARK: - LegacyOlympiaAccountAddress
-public struct LegacyOlympiaAccountAddress: Sendable, Hashable {
-	/// Bech32, NOT Bech32m, encoded Olympia address
-	public let address: NonEmptyString
+	public let accounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 }
 
 // MARK: - UncheckedImportedOlympiaWalletPayload
@@ -219,7 +192,7 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 		let xrd: String
 		let name: String?
 
-		func checked() throws -> ImportedOlympiaWallet.Account {
+		func checked() throws -> OlympiaAccountToMigrate {
 			let publicKeyData = try Data(hex: pk)
 
 			// FIXME: Move to reducer and user a new EncodeOlympiaAddress endpoint we need from Omar (or impl Bech32 ourselves, N.B. Bech32, not Bech32m which we use for Babylon)
@@ -241,7 +214,7 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 		}
 	}
 
-	public func accountsToImport() throws -> [ImportedOlympiaWallet.Account] {
+	public func accountsToImport() throws -> [OlympiaAccountToMigrate] {
 		try self.accounts.map {
 			try $0.checked()
 		}
@@ -267,7 +240,7 @@ extension UncheckedImportedOlympiaWalletPayload.AccountNonChecked {
 	)
 }
 
-extension ImportedOlympiaWallet.Account {
+extension OlympiaAccountToMigrate {
 	public static let previewValue = try! UncheckedImportedOlympiaWalletPayload.AccountNonChecked.previewValue.checked()
 }
 

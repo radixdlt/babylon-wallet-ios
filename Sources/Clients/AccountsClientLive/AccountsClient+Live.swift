@@ -33,6 +33,9 @@ extension AccountsClient: DependencyKey {
 				} catch {
 					return false
 				}
+			},
+			migrateOlympiaAccountsToBabylon: { _ in
+				fatalError()
 			}
 		)
 	}

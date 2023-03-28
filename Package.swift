@@ -229,6 +229,7 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"AccountsClient",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
