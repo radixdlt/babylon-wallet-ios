@@ -136,6 +136,9 @@ extension TransactionReview {
 						.padding(.top, .medium2)
 				}
 
+				Separator()
+					.padding(.bottom, .medium1)
+
 				if showDepositingHeading {
 					TransactionHeading(L10n.TransactionReview.depositingHeading)
 						.padding(.bottom, .small2)
