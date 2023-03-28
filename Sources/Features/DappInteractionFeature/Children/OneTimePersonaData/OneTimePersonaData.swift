@@ -123,6 +123,9 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
 			state.personas[id: persona.id] = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
+			if state.selectedPersona?.id == persona.id {
+				state.selectedPersona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
+			}
 			return .send(.delegate(.personaUpdated(persona)))
 
 		case .destination(.presented(.createPersona(.delegate(.completed)))):
