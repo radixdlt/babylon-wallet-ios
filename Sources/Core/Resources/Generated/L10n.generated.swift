@@ -295,9 +295,31 @@ public enum L10n {
         public static let retryButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.retryButtonTitle", fallback: "Retry")
       }
     }
-    public enum PersonaDataPermission {
+    public enum OneTimePersonaData {
+      /// One-Time Data Request
+      public static let title = L10n.tr("Localizable", "dApp.oneTimePersonaData.title", fallback: "One-Time Data Request")
+      public enum Button {
+        /// Continue
+        public static let `continue` = L10n.tr("Localizable", "dApp.oneTimePersonaData.button.continue", fallback: "Continue")
+      }
+      public enum Subtitle {
+        /// just one time.
+        public static let justOneTime = L10n.tr("Localizable", "dApp.oneTimePersonaData.subtitle.justOneTime", fallback: "just one time.")
+        public enum Explanation {
+          ///  is requesting that you provide some pieces of personal data 
+          public static let first = L10n.tr("Localizable", "dApp.oneTimePersonaData.subtitle.explanation.first", fallback: " is requesting that you provide some pieces of personal data ")
+        }
+      }
+    }
+    public enum PersonaDataBox {
       /// Required information:
-      public static let requiredInformation = L10n.tr("Localizable", "dApp.personaDataPermission.requiredInformation", fallback: "Required information:")
+      public static let requiredInformation = L10n.tr("Localizable", "dApp.personaDataBox.requiredInformation", fallback: "Required information:")
+      public enum Button {
+        /// Edit
+        public static let edit = L10n.tr("Localizable", "dApp.personaDataBox.button.edit", fallback: "Edit")
+      }
+    }
+    public enum PersonaDataPermission {
       /// Personal Data Permission
       public static let title = L10n.tr("Localizable", "dApp.personaDataPermission.title", fallback: "Personal Data Permission")
       /// You can update this permission in your settings at any time.
@@ -305,8 +327,6 @@ public enum L10n {
       public enum Button {
         /// Continue
         public static let `continue` = L10n.tr("Localizable", "dApp.personaDataPermission.button.continue", fallback: "Continue")
-        /// Edit
-        public static let edit = L10n.tr("Localizable", "dApp.personaDataPermission.button.edit", fallback: "Edit")
       }
       public enum Subtitle {
         /// always

@@ -10,7 +10,7 @@ extension OneTimePersonaData {
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: OneTimePersonaData.State) {
-			title = L10n.DApp.PersonaDataPermission.title
+			title = L10n.DApp.OneTimePersonaData.title
 			subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
@@ -18,17 +18,13 @@ extension OneTimePersonaData {
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
 
 				let explanation: AttributedString = {
-					let always = AttributedString(L10n.DApp.PersonaDataPermission.Subtitle.always, foregroundColor: highlightColor)
+					let justOneTime = AttributedString(L10n.DApp.OneTimePersonaData.Subtitle.justOneTime, foregroundColor: highlightColor)
 
 					return AttributedString(
-						L10n.DApp.PersonaDataPermission.Subtitle.Explanation.first,
+						L10n.DApp.OneTimePersonaData.Subtitle.Explanation.first,
 						foregroundColor: normalColor
 					)
-						+ always
-						+ AttributedString(
-							L10n.DApp.PersonaDataPermission.Subtitle.Explanation.second,
-							foregroundColor: normalColor
-						)
+						+ justOneTime
 				}()
 
 				return dappName + explanation
@@ -69,12 +65,6 @@ extension OneTimePersonaData {
 //								action: { .child(.persona($0)) }
 //							)
 //						)
-
-						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1Regular)
-							.multilineTextAlignment(.center)
-							.padding(.horizontal, .medium2)
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
