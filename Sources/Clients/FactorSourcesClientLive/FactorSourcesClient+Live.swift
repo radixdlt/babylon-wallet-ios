@@ -17,32 +17,25 @@ extension FactorSourcesClient: DependencyKey {
 			factorSourcesAsyncSequence: {
 				await getProfileStore().factorSourcesValues()
 			},
-			importOlympiaFactorSource: { mnemonicWithPassphrase in
-				let factorSource = try FactorSource.olympia(
-					mnemonicWithPassphrase: mnemonicWithPassphrase
-				)
-				let privateFactorSource = try PrivateHDFactorSource(
-					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					hdOnDeviceFactorSource: factorSource
-				)
+			addPrivateHDFactorSource: { privateFactorSource in
 
 				try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
-
+				let factorSourceID = privateFactorSource.hdOnDeviceFactorSource.factorSource.id
 				do {
 					try await getProfileStore().updating { profile in
-						guard !profile.factorSources.contains(where: { $0.id == factorSource.id }) else {
+						guard !profile.factorSources.contains(where: { $0.id == factorSourceID }) else {
 							throw FactorSourceAlreadyPresent()
 						}
-						profile.factorSources.append(factorSource.factorSource)
+						profile.factorSources.append(privateFactorSource.hdOnDeviceFactorSource.factorSource)
 					}
 				} catch {
 					// We were unlucky, failed to update Profile, thus best to undo the saving of
 					// the mnemonic in keychain (if we can).
-					try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSource.id)
+					try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
 					throw error
 				}
 
-				return factorSource.id
+				return factorSourceID
 			}
 		)
 	}

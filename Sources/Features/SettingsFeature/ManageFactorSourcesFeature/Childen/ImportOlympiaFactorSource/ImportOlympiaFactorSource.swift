@@ -117,7 +117,7 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 				await send(.internal(.importOlympiaFactorSourceResult(
 					TaskResult {
 						try await factorSourcesClient.importOlympiaFactorSource(
-							mnemonicWithPassphrase
+							mnemonicWithPassphrase: mnemonicWithPassphrase
 						)
 					}
 				)))

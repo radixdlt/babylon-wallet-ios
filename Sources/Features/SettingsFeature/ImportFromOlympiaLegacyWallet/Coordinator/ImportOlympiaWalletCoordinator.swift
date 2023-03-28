@@ -152,15 +152,23 @@ extension ImportOlympiaWalletCoordinator {
 		nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
 	) -> EffectTask<Action> {
 		.run { send in
-			// Factor source is not yet saved to profile
-			let unsavedMigratedAccounts = try await accountsClient.migrateOlympiaAccountsToBabylon(
+			// Migrates and saved all accounts to Profile
+			let migrated = try await accountsClient.migrateOlympiaAccountsToBabylon(
 				.init(
 					olympiaAccounts: Set(olympiaAccounts.elements),
 					olympiaFactorSource: factorSource,
 					nextDerivationAccountIndex: nextDerivationAccountIndex
 				)
 			)
-			await send(.internal(.migratedAccounts(unsavedMigratedAccounts)))
+
+			// However, we have not yet saved the factorSource, so lets do that
+			let factorSourceToSave = migrated.factorSourceToSave
+			guard try factorSourceToSave.id == FactorSource.id(fromPrivateHDFactorSource: factorSource) else {
+				throw OlympiaFactorSourceToSaveIDDisrepancy()
+			}
+			_ = try await factorSourcesClient.addPrivateHDFactorSource(factorSource)
+
+			await send(.internal(.migratedAccounts(migrated)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -174,6 +182,9 @@ struct GotNoAccountsToImport: Swift.Error {}
 enum ValidateOlympiaAccountsFailure: LocalizedError {
 	case publicKeyMismatch
 }
+
+// MARK: - OlympiaFactorSourceToSaveIDDisrepancy
+struct OlympiaFactorSourceToSaveIDDisrepancy: Swift.Error {}
 
 extension MnemonicWithPassphrase {
 	func validatePublicKeysOf(

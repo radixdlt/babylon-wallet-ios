@@ -13,12 +13,12 @@ extension FactorSourcesClient: TestDependencyKey {
 	public static let testValue = Self(
 		getFactorSources: unimplemented("\(Self.self).getFactorSources"),
 		factorSourcesAsyncSequence: unimplemented("\(Self.self).factorSourcesAsyncSequence"),
-		importOlympiaFactorSource: unimplemented("\(Self.self).importOlympiaFactorSource")
+		addPrivateHDFactorSource: unimplemented("\(Self.self).addPrivateHDFactorSource")
 	)
 
 	public static let noop = Self(
 		getFactorSources: { throw NoopError() },
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		importOlympiaFactorSource: { _ in throw NoopError() }
+		addPrivateHDFactorSource: { _ in throw NoopError() }
 	)
 }
