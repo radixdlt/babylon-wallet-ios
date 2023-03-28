@@ -5,13 +5,27 @@ import EngineToolkitClient
 public struct TransactionClient: Sendable, DependencyKey {
 	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
 	public var addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest
+	public var addGuaranteesToManifest: AddGuaranteesToManifest
 	public var signAndSubmitTransaction: SignAndSubmitTransaction
 	public var getTransactionReview: GetTransactionReview
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
+	public struct Guarantee {
+		public var amount: BigDecimal
+		public var instructionIndex: UInt32
+		public var resourceAddress: ResourceAddress
+
+		public init(amount: BigDecimal, instructionIndex: UInt32, resourceAddress: ResourceAddress) {
+			self.amount = amount
+			self.instructionIndex = instructionIndex
+			self.resourceAddress = resourceAddress
+		}
+	}
+
 	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> (manifest: TransactionManifest, feeAdded: BigDecimal)
+	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
 	public typealias SignAndSubmitTransaction = @Sendable (SignManifestRequest) async -> TransactionResult
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview

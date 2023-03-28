@@ -118,7 +118,7 @@ public struct TransactionDetailsView: View {
 				name: viewState.metadata.name,
 				thumbnail: viewState.metadata.thumbnail,
 				amount: viewState.action.amount,
-				guaranteedAmount: viewState.metadata.guaranteedAmount,
+				guaranteedAmount: viewState.metadata.guarantee?.amount,
 				dollarAmount: viewState.metadata.dollarAmount
 			))
 		case .none:
