@@ -5,15 +5,9 @@ import TransactionClient
 
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
-	public struct TransactionReviewContent: Equatable {
-		public var withdrawing: TransactionReviewAccounts.State?
-		public var dAppsUsed: TransactionReviewDappsUsed.State?
-		public var depositing: TransactionReviewAccounts.State?
-		public var presenting: TransactionReviewPresenting.State?
-		public var networkFee: TransactionReviewNetworkFee.State?
-	}
-
 	public struct State: Sendable, Hashable {
+		public var content: TransactionContent
+
 		public var message: String? {
 			transaction.message
 		}
@@ -34,19 +28,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public init(
 			transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem,
-			withdrawing: TransactionReviewAccounts.State? = nil,
-			dAppsUsed: TransactionReviewDappsUsed.State? = nil,
-			depositing: TransactionReviewAccounts.State? = nil,
-			presenting: TransactionReviewPresenting.State? = nil,
-			networkFee: TransactionReviewNetworkFee.State? = nil,
+			content: TransactionContent = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
 			self.transaction = transaction
-			self.withdrawing = withdrawing
-			self.dAppsUsed = dAppsUsed
-			self.depositing = depositing
-			self.presenting = presenting
-			self.networkFee = networkFee
+			self.content = content
 			self.customizeGuarantees = customizeGuarantees
 		}
 	}
@@ -71,7 +57,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
-		case createTransactionReview(TransactionReviewContent)
+		case createTransactionReview(TransactionReview.TransactionContent)
 		case signTransactionResult(TransactionResult)
 	}
 
@@ -217,7 +203,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				let withdraws = try? await extractWithdraws(reviewedManifest.accountWithdraws, userAccounts: userAccounts)
 				let badges = try? await exctractBadges(reviewedManifest)
 
-				let content = TransactionReviewContent(
+				let content = TransactionReview.TransactionContent(
 					withdrawing: withdraws,
 					dAppsUsed: usedDapps,
 					depositing: deposits,
@@ -262,6 +248,28 @@ public struct TransactionReview: Sendable, FeatureReducer {
 }
 
 extension TransactionReview {
+	public struct TransactionContent: Sendable, Hashable {
+		public var withdrawing: TransactionReviewAccounts.State?
+		public var dAppsUsed: TransactionReviewDappsUsed.State?
+		public var depositing: TransactionReviewAccounts.State?
+		public var presenting: TransactionReviewPresenting.State?
+		public var networkFee: TransactionReviewNetworkFee.State?
+
+		public init(
+			withdrawing: TransactionReviewAccounts.State? = nil,
+			dAppsUsed: TransactionReviewDappsUsed.State? = nil,
+			depositing: TransactionReviewAccounts.State? = nil,
+			presenting: TransactionReviewPresenting.State? = nil,
+			networkFee: TransactionReviewNetworkFee.State? = nil
+		) {
+			self.withdrawing = withdrawing
+			self.dAppsUsed = dAppsUsed
+			self.depositing = depositing
+			self.presenting = presenting
+			self.networkFee = networkFee
+		}
+	}
+
 	// MARK: - TransferType
 	enum TransferType {
 		case exact
@@ -589,21 +597,21 @@ extension EngineToolkitModels.AddressKind {
 	}
 }
 
-extension TransactionReview.State {
-	public static let mock0 = Self(transaction: .previewValue,
-	                               withdrawing: .init(accounts: [.mockWithdraw0], showCustomizeGuarantees: false),
-	                               dAppsUsed: .init(isExpanded: false, dApps: []),
-	                               depositing: .init(accounts: [.mockDeposit1], showCustomizeGuarantees: true),
-	                               presenting: .init(dApps: [.mock1, .mock0]),
-	                               networkFee: .init(fee: 0.1, isCongested: false))
-
-	public static let mock1 = Self(transaction: .previewValue,
-	                               withdrawing: .init(accounts: [.mockWithdraw0, .mockWithdraw1], showCustomizeGuarantees: false),
-	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
-	                               depositing: .init(accounts: [.mockDeposit2], showCustomizeGuarantees: true),
-	                               presenting: .init(dApps: [.mock1, .mock0]),
-	                               networkFee: .init(fee: 0.2, isCongested: true))
-}
+// extension TransactionReview.State {
+//	public static let mock0 = Self(transaction: .previewValue,
+//	                               withdrawing: .init(accounts: [.mockWithdraw0], showCustomizeGuarantees: false),
+//	                               dAppsUsed: .init(isExpanded: false, dApps: []),
+//	                               depositing: .init(accounts: [.mockDeposit1], showCustomizeGuarantees: true),
+//	                               presenting: .init(dApps: [.mock1, .mock0]),
+//	                               networkFee: .init(fee: 0.1, isCongested: false))
+//
+//	public static let mock1 = Self(transaction: .previewValue,
+//	                               withdrawing: .init(accounts: [.mockWithdraw0, .mockWithdraw1], showCustomizeGuarantees: false),
+//	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
+//	                               depositing: .init(accounts: [.mockDeposit2], showCustomizeGuarantees: true),
+//	                               presenting: .init(dApps: [.mock1, .mock0]),
+//	                               networkFee: .init(fee: 0.2, isCongested: true))
+// }
 
 extension TransactionReview.Dapp {
 	public static let mock0 = Self(id: .deadbeef32Bytes,
