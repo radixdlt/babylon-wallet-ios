@@ -514,9 +514,31 @@ extension TransactionClient {
 			return xrdContainers.first(where: { $0.amount >= fee })?.owner
 		}
 
+		@Sendable
+		func addGuaranteesToManifest(_ manifestWithLockFee: TransactionManifest, guarantees: [Guarantee]) async throws -> TransactionManifest {
+			let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
+			do {
+				manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(manifestWithLockFee)
+			} catch {
+				loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
+				throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
+			}
+
+			var instructions = manifestWithJSONInstructions.instructions
+			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
+			var indexInc = 1 // LockFee was added, start from 1
+			for guarantee in guarantees {
+				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(amount: .init(value: guarantee.amount.format()), resourceAddress: guarantee.resourceAddress))
+				instructions.insert(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
+				indexInc += 1
+			}
+			return TransactionManifest(instructions: instructions, blobs: manifestWithLockFee.blobs)
+		}
+
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: addLockFeeInstructionToManifest,
+			addGuaranteesToManifest: addGuaranteesToManifest,
 			signAndSubmitTransaction: signAndSubmitTransaction,
 			getTransactionReview: getTransactionPreview
 		)

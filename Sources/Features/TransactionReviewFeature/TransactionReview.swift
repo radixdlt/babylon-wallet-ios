@@ -134,14 +134,29 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-			let signRequest = SignManifestRequest(
-				manifestToSign: transactionWithLockFee,
-				makeTransactionHeaderInput: .default
-			)
+			let guarantees = state.depositing?
+				.accounts
+				.compactMap {
+					$0.transfers.compactMap(\.metadata.guarantee)
+				}
+				.flatMap { $0 }
+				.map {
+					TransactionClient.Guarantee(amount: $0.amount, instructionIndex: $0.instructionIndex, resourceAddress: $0.resourceAddress)
+				}
 
 			state.isSigningTX = true
 
 			return .run { send in
+				var manifest = transactionWithLockFee
+				if let guarantees, !guarantees.isEmpty {
+					manifest = try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
+				}
+
+				let signRequest = SignManifestRequest(
+					manifestToSign: manifest,
+					makeTransactionHeaderInput: .default
+				)
+
 				await send(.internal(.signTransactionResult(
 					transactionClient.signAndSubmitTransaction(signRequest)
 				)))
@@ -188,18 +203,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(review)):
 			let reviewedManifest = review.analizedManifestToReview
 			state.transactionWithLockFee = review.manifestIncludingLockFee
+			let manifest = state.transaction.transactionManifest
 			return .run { send in
 				let userAccounts = (try? await extractAccounts(reviewedManifest)) ?? []
+				let json = try await transactionClient.convertManifestInstructionsToJSONIfItWasString(manifest) // .convertManifestInstructionsToJSONIfItWasString(reviewedManifest)
 				let usedDapps = (try? await extractUsedDapps(reviewedManifest)) ?? []
 				let deposits = try? await extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts)
 				let withdraws = (try? await extractWithdrawls(reviewedManifest.accountWithdraws, userAccounts: userAccounts)) ?? []
-				let badges = (try? await exctractBadges(reviewedManifest)) ?? []
+				let badges = try? await exctractBadges(reviewedManifest)
 
 				let content = TransactionReviewContent(
 					withdrawing: .init(accounts: .init(uniqueElements: withdraws), showCustomizeGuarantees: false),
 					dAppsUsed: .init(isExpanded: false, dApps: .init(uniqueElements: usedDapps)),
 					depositing: deposits,
-					presenting: .init(dApps: badges),
+					presenting: badges,
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
 				await send(.internal(.createTransactionReview(content)))
@@ -244,9 +261,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 	}
 
-	private func exctractBadges(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> IdentifiedArrayOf<TransactionReview.Dapp> {
+	private func exctractBadges(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewPresenting.State? {
 		// TODO: implement
-		[]
+		nil
 	}
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> [TransactionReview.Dapp] {
@@ -267,9 +284,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		for deposit in accountDeposits {
 			switch deposit {
 			case let .exact(componentAddress, resourceSpecifier):
-				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, isEstimated: false)
+				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, type: .exact)
 			case let .estimate(index, componentAddress, resourceSpecifier):
-				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, isEstimated: true)
+				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, type: .estimated(instructionIndex: index))
 				requiresGuarantees = true
 			}
 		}
@@ -285,7 +302,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	                         resourceSpecifier: ResourceSpecifier,
 	                         userAccounts: [Account],
 	                         container: inout [Account: [Transfer]],
-	                         isEstimated: Bool) async throws
+	                         type: TransferType) async throws
 	{
 		switch resourceSpecifier {
 		case let .amount(resourceAddress, amount):
@@ -299,11 +316,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				amount: amount
 			)
 
+			let guarantee: ResourceMetadata.Guarantee? = {
+				if case let .estimated(instructionIndex) = type {
+					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
+				}
+				return nil
+			}()
 			let metdata = ResourceMetadata(
 				name: metadata.symbol,
 				thumbnail: nil,
 				type: addressKind.resourceType,
-				guaranteedAmount: isEstimated ? amount : nil
+				guarantee: guarantee
 			)
 
 			let transfer = TransactionReview.Transfer(
@@ -322,13 +345,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		var withdraws: [Account: [Transfer]] = [:]
 
 		for withdraw in accountWithdraws {
-			try await collectTransferInfo(componentAddress: withdraw.componentAddress, resourceSpecifier: withdraw.resourceSpecifier, userAccounts: userAccounts, container: &withdraws, isEstimated: false)
+			try await collectTransferInfo(componentAddress: withdraw.componentAddress, resourceSpecifier: withdraw.resourceSpecifier, userAccounts: userAccounts, container: &withdraws, type: .exact)
 		}
 
 		return .init(withdraws.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
 		})
 	}
+}
+
+// MARK: - TransferType
+enum TransferType {
+	case exact
+	case estimated(instructionIndex: UInt32)
 }
 
 // MARK: Useful types
@@ -391,23 +420,29 @@ extension TransactionReview {
 	}
 
 	public struct ResourceMetadata: Sendable, Hashable {
+		public struct Guarantee: Sendable, Hashable {
+			var amount: BigDecimal
+			var instructionIndex: UInt32
+			var resourceAddress: ResourceAddress
+		}
+
 		public let name: String?
 		public let thumbnail: URL?
 		public var type: ResourceType?
-		public var guaranteedAmount: BigDecimal?
+		public var guarantee: Guarantee?
 		public var dollarAmount: BigDecimal?
 
 		public init(
 			name: String?,
 			thumbnail: URL?,
 			type: ResourceType? = nil,
-			guaranteedAmount: BigDecimal? = nil,
+			guarantee: Guarantee? = nil,
 			dollarAmount: BigDecimal? = nil
 		) {
 			self.name = name
 			self.thumbnail = thumbnail
 			self.type = type
-			self.guaranteedAmount = guaranteedAmount
+			self.guarantee = guarantee
 			self.dollarAmount = dollarAmount
 		}
 	}
@@ -494,7 +529,7 @@ extension TransactionReview.Transfer {
 	                               metadata: .init(name: "TSLA",
 	                                               thumbnail: .mock,
 	                                               type: .fungible,
-	                                               guaranteedAmount: 1.0188,
+	                                               guarantee: .init(amount: 1.0188, instructionIndex: 1, resourceAddress: .mock0),
 	                                               dollarAmount: 301.91))
 
 	public static let mock1 = Self(action: .mock1,
@@ -507,7 +542,7 @@ extension TransactionReview.Transfer {
 	                               metadata: .init(name: "PXL",
 	                                               thumbnail: .mock,
 	                                               type: .fungible,
-	                                               guaranteedAmount: 5.10))
+	                                               guarantee: .init(amount: 5.10, instructionIndex: 1, resourceAddress: .mock1)))
 
 	public static let mock3 = Self(action: .mock3,
 	                               metadata: .init(name: "PXL",
