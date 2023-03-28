@@ -1,78 +1,7 @@
 import FeaturePrelude
 
-// MARK: - FungibleTransfer__
-public struct FungibleTransfer__: Identifiable, Sendable, Hashable {
-	public var id: AccountAction { transfer.id }
-	public let account: TransactionReview.Account
-	public let transfer: TransactionReview.Transfer
-}
-
-// MARK: - Transfer__
-public struct Transfer__: Sendable, Identifiable, Hashable {
-	public var id: AccountAction { action }
-
-	public let action: AccountAction
-	public var metadata: ResourceMetadata__
-}
-
-// MARK: - ResourceMetadata__
-public struct ResourceMetadata__: Sendable, Hashable {
-	public let name: String?
-	public let thumbnail: URL?
-	public var type: ResourceType__?
-	public var guaranteedAmount: BigDecimal?
-	public var dollarAmount: BigDecimal?
-}
-
-// MARK: - ResourceType__
-public enum ResourceType__: Sendable, Hashable {
-	case fungible
-	case nonFungible
-}
-
-/*
-
-  to:
-
- let token: TransactionReviewTokenView.ViewState
- let minimumPercentage: Double
- let accountIfVisible: TransactionReview.Account?
-
-  token:
- struct ViewState: Equatable {
-     let name: String?
-     let thumbnail: URL?
-
-     let amount: BigDecimal
-     let guaranteedAmount: BigDecimal?
-     let dollarAmount: BigDecimal?
- }
- */
-
-extension TransactionReviewGuarantees.State {
-	var viewState: TransactionReviewGuarantees.ViewState {
-		let guarantees = transfers.map { transfer -> TransactionReviewGuarantees.View.GuaranteeView.ViewState in
-			let metadata = transfer.transfer.metadata
-			return .init(id: transfer.id,
-			             token: .init(name: metadata.name,
-			                          thumbnail: metadata.thumbnail,
-			                          amount: transfer.transfer.action.amount,
-			                          guaranteedAmount: metadata.guaranteedAmount,
-			                          dollarAmount: metadata.dollarAmount),
-			             minimumPercentage: 100,
-			             accountIfVisible: transfer.account)
-		}
-
-		return .init(guarantees: guarantees)
-	}
-}
-
-// MARK: - TransactionReviewPresenting.View
+// MARK: - TransactionReviewGuarantees.View
 extension TransactionReviewGuarantees {
-	public struct ViewState: Equatable {
-		let guarantees: [View.GuaranteeView.ViewState]
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewGuarantees>
@@ -82,7 +11,7 @@ extension TransactionReviewGuarantees {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store.stateless, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					ScrollView(showsIndicators: false) {
 						VStack(spacing: 0) {
@@ -103,6 +32,9 @@ extension TransactionReviewGuarantees {
 								.padding(.horizontal, .large2)
 								.padding(.bottom, .medium1)
 
+							ForEachStore(store.scope(state: \.guarantees) {},
+							             content: { TransactionReviewGuarantee.View })
+
 							ForEach(viewStore.guarantees) { viewState in
 								GuaranteeView(viewState: viewState) {} decreaseAction: {}
 							}
@@ -120,37 +52,68 @@ extension TransactionReviewGuarantees {
 				}
 			}
 		}
+	}
+}
 
-		struct GuaranteeView: SwiftUI.View {
-			struct ViewState: Identifiable, Equatable {
-				let id: AccountAction
-				let token: TransactionReviewTokenView.ViewState
-				let minimumPercentage: Double
-				let accountIfVisible: TransactionReview.Account?
-			}
+extension TransactionReviewTokenView.ViewState {
+	init(amount: BigDecimal, metadata: TransactionReview.ResourceMetadata) {
+		self.init(name: metadata.name,
+		          thumbnail: metadata.thumbnail,
+		          amount: amount,
+		          guaranteedAmount: metadata.guarantee?.amount,
+		          dollarAmount: metadata.dollarAmount)
+	}
+}
 
-			let viewState: ViewState
-			let increaseAction: () -> Void
-			let decreaseAction: () -> Void
+extension TransactionReviewGuarantees.State {
+	var viewState: TransactionReviewGuarantees.ViewState {
+		let guarantees = transfers.map { transfer -> TransactionReviewGuarantees.View.GuaranteeView.ViewState in
+			.init(id: transfer.id,
+			      token: .init(amount: transfer.transfer.action.amount,
+			                   metadata: transfer.transfer.metadata),
+			      minimumPercentage: 100,
+			      accountIfVisible: transfer.account)
+		}
 
-			public var body: some SwiftUI.View {
-				Card {
-					VStack(spacing: 0) {
-						TransactionReviewTokenView(viewState: viewState.token)
+		return .init(guarantees: guarantees)
+	}
+}
 
-						Rectangle()
-							.stroke(.pink)
-							.padding(.medium3)
-							.overlay {
-								Button(action: increaseAction) {
-									Image(systemName: "minus.circle")
-								}
-								Text(viewState.minimumPercentage.formatted(.number))
-								Button(action: increaseAction) {
-									Image(systemName: "plus.circle")
-								}
-							}
-					}
+extension TransactionReviewGuarantee {
+	public struct ViewState: Identifiable, Equatable {
+		public let id: AccountAction
+		let token: TransactionReviewTokenView.ViewState
+		let minimumPercentage: Double
+		let accountIfVisible: TransactionReview.Account?
+	}
+
+	public struct View: SwiftUI.View {
+		public let store: StoreOf<TransactionReviewGuarantee>
+
+		public init(store: StoreOf<TransactionReviewGuarantee>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			Card {
+				VStack(spacing: 0) {
+					WithViewStore(store, observe: <#T##(State) -> Equatable#>, send: <#T##(ViewAction) -> Action#>, content: <#T##(ViewStore<Equatable, ViewAction>) -> View#>)
+					//						TransactionReviewAccount.View(store: <#T##StoreOf<TransactionReviewAccount>#>)
+
+					TransactionReviewTokenView(viewState: viewState.token)
+
+					Rectangle()
+						.stroke(.pink)
+						.padding(.medium3)
+//						.overlay {
+//							Button(action: increaseAction) {
+//								Image(systemName: "minus.circle")
+//							}
+//							Text(viewState.minimumPercentage.formatted(.number))
+//							Button(action: increaseAction) {
+//								Image(systemName: "plus.circle")
+//							}
+//						}
 				}
 			}
 		}

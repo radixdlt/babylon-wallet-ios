@@ -211,7 +211,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
                         //
                         //			return .none
 
-		case .customizeGuarantees(.presented(.delegate(.dismiss))):
+		case let .customizeGuarantees(.presented(.delegate(.dismiss(apply: apply)))):
+			if apply {
+			} else {}
 			state.customizeGuarantees = nil
 			return .none
 		case .customizeGuarantees:
