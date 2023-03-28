@@ -12,7 +12,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 		)
 
 		await store.send(.view(.closeButtonTapped))
-		await store.receive(.delegate(.dismiss))
+		await store.receive(.delegate(.dismissed))
 	}
 
 	func test_completionFlow() async throws {
