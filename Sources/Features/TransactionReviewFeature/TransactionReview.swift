@@ -185,7 +185,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
 			let transfers = state
-				.depositing
+				.depositing?
 				.accounts
 				.flatMap { account -> [TransactionReviewGuarantees.State.FungibleTransfer] in
 					account.transfers
@@ -195,9 +195,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						}
 				}
 
-			state.customizeGuarantees = .init(transfers: .init(uniqueElements: transfers))
+			state.customizeGuarantees = .init(transfers: .init(uniqueElements: transfers ?? []))
 
-            return .none
+			return .none
 
 		case .depositing:
 			return .none
