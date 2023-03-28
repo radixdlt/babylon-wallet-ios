@@ -46,7 +46,7 @@ public struct DoScanQR: Sendable, FeatureReducer {
 			return .none
 
 		case .macConnectButtonTapped:
-			return .send(.delegate(.scanned(qrString)))
+			return .send(.delegate(.scanned(state.manualQRContent)))
 		#endif // macOS
 
 		case let .scanned(.success(qrString)):

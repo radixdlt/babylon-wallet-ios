@@ -20,7 +20,7 @@ extension DoScanQR {
 		init(state: DoScanQR.State) {
 			scanMode = state.scanMode
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-			connectionPassword = state.connectionPassword
+			connectionPassword = state.manualQRContent
 			#endif // macOS
 		}
 	}
@@ -118,7 +118,7 @@ extension DoScanQR.View {
 				"Connection password",
 				text: viewStore.binding(
 					get: \.connectionPassword,
-					send: { .macInputConnectionPasswordChanged($0) }
+					send: { .macInputQRContentChanged($0) }
 				)
 			)
 			.textFieldStyle(.roundedBorder)

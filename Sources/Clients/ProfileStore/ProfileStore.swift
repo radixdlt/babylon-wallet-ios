@@ -394,12 +394,12 @@ extension ProfileStore {
 			// profile, since it contains no network yet (no account).
 			try await secureStorageClient.saveMnemonicForFactorSource(PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hdOnDeviceFactorSource: .init(factorSource: factorSource)
+				hdOnDeviceFactorSource: factorSource
 			))
 
 			loggerGlobal.debug("Created new profile with factorSourceID: \(factorSource.id)")
 
-			return Profile(factorSource: factorSource, creatingDevice: deviceDescription)
+			return Profile(factorSource: factorSource.factorSource, creatingDevice: deviceDescription)
 
 		} catch {
 			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"

@@ -80,11 +80,7 @@ enum SelectAccountsToImportRow {
 
 		init(state olympiaAccount: ImportedOlympiaWallet.Account) {
 			accountName = olympiaAccount.displayName?.rawValue ?? "NOT NAMED"
-
-			// FIXME: Move to reducer and user a new EncodeOlympiaAddress endpoint we need from Omar (or impl Bech32 ourselves, N.B. Bech32, not Bech32m which we use for Babylon)
-			let addressBytes: [UInt8] = [0x04] + Array(olympiaAccount.publicKey.compressedRepresentation.prefix(26))
-			let bech32Address = try! EngineToolkit().encodeAddressRequest(request: .init(addressBytes: addressBytes, networkId: .adapanet)).get().address
-			accountAddress = AddressView.ViewState(address: bech32Address)
+			accountAddress = AddressView.ViewState(address: olympiaAccount.address.address.rawValue)
 		}
 	}
 

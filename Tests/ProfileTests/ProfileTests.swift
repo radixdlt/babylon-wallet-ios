@@ -68,7 +68,7 @@ final class ProfileTests: TestCase {
 				hint: creatingDevice
 			)
 			let profile = Profile(
-				factorSource: babylonFactorSource,
+				factorSource: babylonFactorSource.factorSource,
 				creatingDevice: creatingDevice,
 				appPreferences: .init(gateways: .init(current: gateway))
 			)
@@ -79,7 +79,7 @@ final class ProfileTests: TestCase {
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
 
-		profile.factorSources.append(olympiaFactorSource)
+		profile.factorSources.append(olympiaFactorSource.factorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
 			let index = profile.factorSources.babylonDevice.storage.nextForEntity(

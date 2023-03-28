@@ -1,5 +1,6 @@
 import Cryptography
 import FeaturePrelude
+import Profile
 
 // MARK: - ImportOlympiaWalletCoordinator
 public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
@@ -30,7 +31,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case createdUnsavedOlympiaAccounts(Profile.Network.Accounts)
+		case validated(
+			olympiaAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>,
+			privateHDFactorSource: PrivateHDFactorSource
+		)
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -86,7 +90,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .createdUnsavedOlympiaAccounts(accounts):
+		case let .validated(accounts, privateHDFactorSource):
 			fatalError()
 		}
 	}
@@ -98,8 +102,19 @@ extension ImportOlympiaWalletCoordinator {
 		selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>
 	) -> EffectTask<Action> {
 		.run { send in
-			let olympiaAccounts = try mnemonicWithPassphrase.createUnsavedAccountsFrom(selectedAccounts: selectedAccounts)
-			await send(.internal(.createdUnsavedOlympiaAccounts(olympiaAccounts)))
+			try mnemonicWithPassphrase.validatePublicKeysOf(
+				selectedAccounts: selectedAccounts
+			)
+
+			let privateHDFactorSource = try PrivateHDFactorSource(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				hdOnDeviceFactorSource: FactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+			)
+			await send(.internal(.validated(
+				olympiaAccounts: selectedAccounts,
+				privateHDFactorSource: privateHDFactorSource
+			))
+			)
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -111,13 +126,22 @@ struct GotNoAccountsToImport: Swift.Error {}
 
 // MARK: - ValidateOlympiaAccountsFailure
 enum ValidateOlympiaAccountsFailure: LocalizedError {
-	case foobar
+	case publicKeyMismatch
 }
 
 extension MnemonicWithPassphrase {
-	func createUnsavedAccountsFrom(
+	func validatePublicKeysOf(
 		selectedAccounts: NonEmpty<OrderedSet<ImportedOlympiaWallet.Account>>
-	) throws -> Profile.Network.Accounts {
-		fatalError()
+	) throws {
+		let hdRoot = try self.hdRoot()
+
+		for olympiaAccount in selectedAccounts {
+			let path = olympiaAccount.path.fullPath
+			let derivedPublicKey = try hdRoot.derivePrivateKey(path: path, curve: SECP256K1.self).publicKey
+			guard derivedPublicKey == olympiaAccount.publicKey else {
+				throw ValidateOlympiaAccountsFailure.publicKeyMismatch
+			}
+		}
+		// PublicKeys matches
 	}
 }

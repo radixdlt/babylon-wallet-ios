@@ -1,4 +1,5 @@
 import Cryptography
+import EngineToolkit
 import FeaturePrelude
 import ScanQRFeature
 
@@ -143,6 +144,10 @@ public struct ImportedOlympiaWallet: Sendable, Hashable {
 		public let publicKey: K1.PublicKey
 		public let path: LegacyOlympiaBIP44LikeDerivationPath
 		public let xrd: BigDecimal
+
+		/// Legacy Olympia address
+		public let address: LegacyOlympiaAccountAddress
+
 		public let displayName: NonEmptyString?
 
 		public var debugDescription: String {
@@ -154,6 +159,12 @@ public struct ImportedOlympiaWallet: Sendable, Hashable {
 			"""
 		}
 	}
+}
+
+// MARK: - LegacyOlympiaAccountAddress
+public struct LegacyOlympiaAccountAddress: Sendable, Hashable {
+	/// Bech32, NOT Bech32m, encoded Olympia address
+	public let address: NonEmptyString
 }
 
 // MARK: - UncheckedImportedOlympiaWalletPayload
@@ -207,10 +218,22 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 		let name: String?
 
 		func checked() throws -> ImportedOlympiaWallet.Account {
-			try .init(
-				publicKey: .init(compressedRepresentation: Data(hex: pk)),
+			let publicKeyData = try Data(hex: pk)
+
+			// FIXME: Move to reducer and user a new EncodeOlympiaAddress endpoint we need from Omar (or impl Bech32 ourselves, N.B. Bech32, not Bech32m which we use for Babylon)
+			let accountAddressPrefixByte: UInt8 = 0x04
+			let addressBytes: [UInt8] = [accountAddressPrefixByte] + Array(publicKeyData.prefix(26))
+			let bech32Address = try EngineToolkit().encodeAddressRequest(request: .init(addressBytes: addressBytes, networkId: .adapanet)).get().address
+			guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
+				fatalError()
+			}
+			let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
+
+			return try .init(
+				publicKey: .init(compressedRepresentation: publicKeyData),
 				path: .init(derivationPath: path),
 				xrd: .init(fromString: xrd),
+				address: address,
 				displayName: name.map { NonEmptyString(rawValue: $0) } ?? nil
 			)
 		}

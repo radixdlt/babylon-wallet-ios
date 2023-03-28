@@ -23,7 +23,7 @@ extension FactorSourcesClient: DependencyKey {
 				)
 				let privateFactorSource = try PrivateHDFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					hdOnDeviceFactorSource: .init(factorSource: factorSource)
+					hdOnDeviceFactorSource: factorSource
 				)
 
 				try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
@@ -33,7 +33,7 @@ extension FactorSourcesClient: DependencyKey {
 						guard !profile.factorSources.contains(where: { $0.id == factorSource.id }) else {
 							throw FactorSourceAlreadyPresent()
 						}
-						profile.factorSources.append(factorSource)
+						profile.factorSources.append(factorSource.factorSource)
 					}
 				} catch {
 					// We were unlucky, failed to update Profile, thus best to undo the saving of
