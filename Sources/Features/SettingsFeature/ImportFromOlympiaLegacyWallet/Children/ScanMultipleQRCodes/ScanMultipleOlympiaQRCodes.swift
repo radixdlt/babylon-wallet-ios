@@ -189,7 +189,9 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 		let accountsPerPayload = 2
 		let numberOfAccounts = numberOfPayLoads * accountsPerPayload
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-		let hdRoot = try mnemonic.hdRoot(passphrase: "")
+		let passphrase = try Mnemonic().words[0]
+		print("✅ Passhprase: \(passphrase)")
+		let hdRoot = try mnemonic.hdRoot(passphrase: passphrase)
 		let accounts: [AccountNonChecked] = try (0 ..< numberOfAccounts).map {
 			let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
 			let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
@@ -204,7 +206,7 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 			Self(
 				payloads: numberOfPayLoads,
 				index: $0,
-				words: 12,
+				words: mnemonic.wordCount.wordCount,
 				accounts: Array(accounts[($0 * accountsPerPayload) ..< (($0 + 1) * accountsPerPayload)])
 			)
 		}
