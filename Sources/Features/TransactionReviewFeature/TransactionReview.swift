@@ -111,15 +111,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .appeared:
 			let manifest = state.transaction.transactionManifest
 			return .run { send in
-				await send(.internal(.previewLoaded(
-					TaskResult(catching: {
-						try await transactionClient.getTransactionReview(
-							.init(
-								manifestToSign: manifest
-							)
-						)
-					})
-				)))
+				let result = await TaskResult {
+					try await transactionClient.getTransactionReview(.init(manifestToSign: manifest))
+				}
+
+				await send(.internal(.previewLoaded(result)))
 			}
 		case .closeTapped:
 			return .none
@@ -127,28 +123,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .approveTapped:
-			guard
-				let transactionWithLockFee = state.transactionWithLockFee
-			else {
-				return .none
-			}
-
-			let guarantees = state.depositing?
-				.accounts
-				.compactMap {
-					$0.transfers.compactMap(\.metadata.guarantee)
-				}
-				.flatMap { $0 }
-				.map {
-					TransactionClient.Guarantee(amount: $0.amount, instructionIndex: $0.instructionIndex, resourceAddress: $0.resourceAddress)
-				}
+			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 
 			state.isSigningTX = true
 
 			let depositingAccounts = state.depositing?.accounts
 			return .run { send in
-				var manifest = transactionWithLockFee
-				manifest = try await addGuarantees(to: manifest, accounts: depositingAccounts?.elements)
+				let manifest = try await addingGuarantees(to: transactionWithLockFee, accounts: depositingAccounts?.elements)
 
 				let signRequest = SignManifestRequest(
 					manifestToSign: manifest,
@@ -162,12 +143,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func addGuarantees(to manifest: TransactionManifest, accounts: [TransactionReviewAccount.State]?) async throws -> TransactionManifest {
+	public func addingGuarantees(to manifest: TransactionManifest, accounts: [TransactionReviewAccount.State]?) async throws -> TransactionManifest {
 		let guarantees = accounts?
-			.compactMap {
+			.flatMap {
 				$0.transfers.compactMap(\.metadata.guarantee)
 			}
-			.flatMap { $0 }
 			.map {
 				TransactionClient.Guarantee(amount: $0.amount, instructionIndex: $0.instructionIndex, resourceAddress: $0.resourceAddress)
 			}
@@ -184,18 +164,56 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
-			let transfers = state
-				.depositing?
-				.accounts
-				.flatMap { account -> [TransactionReviewGuarantees.State.FungibleTransfer] in
+
+			let depositing = TransactionReviewAccounts.State(accounts: [.mockDeposit1, .mockDeposit2], showCustomizeGuarantees: true)
+
+//			guard let depositing = state.depositing else { return .none } // TODO: Handle?
+
+			let allTokens = depositing.accounts.flatMap { $0.transfers.map(\.action.resourceAddress) }
+
+			for account in depositing.accounts {
+				switch account.account {
+				case let .user(accountForDisplay):
+					print("=== USER ACCOUNT", accountForDisplay.label.rawValue)
+				case .external(let address, approved: _):
+					print("=== EXTERNAL ACCOUNT", address.address)
+				}
+
+				for transfer in account.transfers {
+					print("========", transfer.metadata.name ?? "nil", "==========")
+					print("    amount:", transfer.action.amount)
+					print("  resource:", transfer.action.resourceAddress.address)
+					print("   account:", transfer.action.componentAddress.address)
+				}
+			}
+
+			print("")
+
+			for token in Set(allTokens) {
+				print("   token: \(token.address): \(allTokens.count(of: token))")
+			}
+
+			let guarantees = depositing.accounts
+				.flatMap { account -> [TransactionReviewGuarantee.State] in
 					account.transfers
 						.filter { $0.metadata.type == .fungible }
-						.map { transfer in
-							.init(account: account.account, transfer: transfer)
+						.map { .init(account: account.account,
+						             showAccount: allTokens.count(of: $0.action.resourceAddress) > 1,
+						             transfer: $0)
 						}
 				}
 
-			state.customizeGuarantees = .init(transfers: .init(uniqueElements: transfers ?? []))
+			print("")
+
+			for guarantee in guarantees {
+				print("========", guarantee.account.address, "==========")
+				print("    amount:", guarantee.transfer.action.amount)
+				print("  resource:", guarantee.transfer.action.resourceAddress.address)
+				print("   account:", guarantee.transfer.action.componentAddress.address)
+				print("   show:", guarantee.showAccount)
+			}
+
+			state.customizeGuarantees = .init(guarantees: .init(uniqueElements: guarantees))
 
 			return .none
 
@@ -212,8 +230,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
                         //			return .none
 
 		case let .customizeGuarantees(.presented(.delegate(.dismiss(apply: apply)))):
-			if apply {
-			} else {}
+			if apply, let guarantees = state.customizeGuarantees?.guarantees {
+				for transfer in guarantees.map(\.transfer) {}
+			}
 			state.customizeGuarantees = nil
 			return .none
 		case .customizeGuarantees:
@@ -242,6 +261,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
 				await send(.internal(.createTransactionReview(content)))
+			} catch: { _, _ in
+				// TODO: Handle error
 			}
 		case let .createTransactionReview(content):
 			state.depositing = content.depositing
@@ -278,9 +299,10 @@ extension TransactionReview {
 			.componentAddresses
 			.accounts
 			.map { encounteredAccount in
-				if let userAccount = userAccounts.first(where: { userAccount in
+				let userAccount = userAccounts.first { userAccount in
 					userAccount.address.address == encounteredAccount.address
-				}) {
+				}
+				if let userAccount {
 					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
 				} else {
 					return try .external(.init(componentAddress: encounteredAccount), approved: false)
@@ -339,13 +361,14 @@ extension TransactionReview {
 		return .init(accounts: .init(uniqueElements: reviewAccounts), showCustomizeGuarantees: requiresGuarantees)
 	}
 
-	func collectTransferInfo(componentAddress: ComponentAddress,
-	                         resourceSpecifier: ResourceSpecifier,
-	                         userAccounts: [Account],
-	                         container: inout [Account: [Transfer]],
-	                         type: TransferType) async throws
-	{
-		let account = userAccounts.first { $0.address.address == componentAddress.address }!
+	func collectTransferInfo(
+		componentAddress: ComponentAddress,
+		resourceSpecifier: ResourceSpecifier,
+		userAccounts: [Account],
+		container: inout [Account: [Transfer]],
+		type: TransferType
+	) async throws {
+		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
 		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
 			let metadata = try await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
@@ -383,7 +406,10 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractWithdraws(_ accountWithdraws: [AccountWithdraw], userAccounts: [Account]) async throws -> TransactionReviewAccounts.State? {
+	private func extractWithdraws(
+		_ accountWithdraws: [AccountWithdraw],
+		userAccounts: [Account]
+	) async throws -> TransactionReviewAccounts.State? {
 		var withdraws: [Account: [Transfer]] = [:]
 
 		for withdraw in accountWithdraws {
@@ -441,6 +467,15 @@ extension TransactionReview {
 				return address
 			}
 		}
+
+		var isApproved: Bool {
+			switch self {
+			case .user:
+				return false
+			case let .external(_, approved):
+				return approved
+			}
+		}
 	}
 
 	public struct Transfer: Sendable, Identifiable, Hashable {
@@ -469,21 +504,31 @@ extension TransactionReview {
 		public let thumbnail: URL?
 		public var type: ResourceType?
 		public var guarantee: Guarantee?
-		public var dollarAmount: BigDecimal?
+		public var fiatAmount: BigDecimal?
 
 		public init(
 			name: String?,
 			thumbnail: URL?,
 			type: ResourceType? = nil,
 			guarantee: Guarantee? = nil,
-			dollarAmount: BigDecimal? = nil
+			fiatAmount: BigDecimal? = nil
 		) {
 			self.name = name
 			self.thumbnail = thumbnail
 			self.type = type
 			self.guarantee = guarantee
-			self.dollarAmount = dollarAmount
+			self.fiatAmount = fiatAmount
 		}
+	}
+}
+
+extension Collection where Element: Equatable {
+	public func count(of element: Element) -> Int {
+		var count = 0
+		for e in self where e == element {
+			count += 1
+		}
+		return count
 	}
 }
 
@@ -522,9 +567,9 @@ extension TransactionReviewAccount.State {
 
 	public static let mockWithdraw2 = Self(account: .mockUser0, transfers: [.mock1, .mock3])
 
-	public static let mockDeposit1 = Self(account: .mockExternal0, transfers: [.mock1, .mock3, .mock4])
+	public static let mockDeposit1 = Self(account: .mockExternal0, transfers: [.mock0, .mock1, .mock2])
 
-	public static let mockDeposit2 = Self(account: .mockExternal1, transfers: [.mock1, .mock3])
+	public static let mockDeposit2 = Self(account: .mockUser0, transfers: [.mock3, .mock4])
 }
 
 extension TransactionReview.Account {
@@ -567,13 +612,13 @@ extension TransactionReview.Transfer {
 	                                               thumbnail: .mock,
 	                                               type: .fungible,
 	                                               guarantee: .init(amount: 1.0188, instructionIndex: 1, resourceAddress: .mock0),
-	                                               dollarAmount: 301.91))
+	                                               fiatAmount: 301.91))
 
 	public static let mock1 = Self(action: .mock1,
 	                               metadata: .init(name: "XRD",
 	                                               thumbnail: .mock,
 	                                               type: .fungible,
-	                                               dollarAmount: 301.91))
+	                                               fiatAmount: 301.91))
 
 	public static let mock2 = Self(action: .mock2,
 	                               metadata: .init(name: "PXL",
@@ -590,6 +635,10 @@ extension TransactionReview.Transfer {
 	                               metadata: .init(name: "Block 14F5",
 	                                               thumbnail: .mock,
 	                                               type: .nonFungible))
+
+	public static var all: Set<Self> {
+		[.mock0, .mock1, .mock2, .mock3, .mock4]
+	}
 }
 
 extension AccountAction {
@@ -606,12 +655,16 @@ extension AccountAction {
 	                               amount: 5.123)
 
 	public static let mock3 = Self(componentAddress: .mock1,
-	                               resourceAddress: .mock0,
-	                               amount: 500)
+	                               resourceAddress: .mock1,
+	                               amount: 300)
 
 	public static let mock4 = Self(componentAddress: .mock0,
-	                               resourceAddress: .mock0,
+	                               resourceAddress: .mock1,
 	                               amount: 1)
+
+	public static var all: Set<Self> {
+		[.mock0, .mock1, .mock2, .mock3, .mock4]
+	}
 }
 
 public func decodeActions() {

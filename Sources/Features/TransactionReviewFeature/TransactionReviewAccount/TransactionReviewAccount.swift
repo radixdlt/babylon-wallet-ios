@@ -69,7 +69,6 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 		case .appeared:
 			return .none
 		case .copyAddress:
-			print("Account copyAddress")
 			pasteboardClient.copyString(state.account.address.address)
 			return .none
 		}

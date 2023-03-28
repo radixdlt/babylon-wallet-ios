@@ -788,10 +788,14 @@ public enum L10n {
     /// Withdrawing
     public static let withdrawingHeading = L10n.tr("Localizable", "transactionReview.withdrawingHeading", fallback: "Withdrawing")
     public enum Guarantees {
+      /// Apply
+      public static let applyButtonText = L10n.tr("Localizable", "transactionReview.guarantees.applyButtonText", fallback: "Apply")
       /// Protect yourself by setting guaranteed minimums for estimated deposits
       public static let headerText = L10n.tr("Localizable", "transactionReview.guarantees.headerText", fallback: "Protect yourself by setting guaranteed minimums for estimated deposits")
       /// How do Guarantees work
       public static let infoButtonText = L10n.tr("Localizable", "transactionReview.guarantees.infoButtonText", fallback: "How do Guarantees work")
+      /// Set guaranteed minimum %%
+      public static let setText = L10n.tr("Localizable", "transactionReview.guarantees.setText", fallback: "Set guaranteed minimum %%")
       /// Customize Guarantees
       public static let title = L10n.tr("Localizable", "transactionReview.guarantees.title", fallback: "Customize Guarantees")
     }

@@ -11,47 +11,69 @@ extension TransactionReviewGuarantees {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store.stateless, send: { .view($0) }) { viewStore in
-				NavigationStack {
-					ScrollView(showsIndicators: false) {
-						VStack(spacing: 0) {
-							FixedSpacer(height: .medium3)
+			NavigationStack {
+				ScrollView(showsIndicators: false) {
+					VStack(spacing: 0) {
+						Text(L10n.TransactionReview.Guarantees.title)
+							.textStyle(.sheetTitle)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.center)
+							.padding(.vertical, .medium3)
 
-							Button(L10n.TransactionReview.Guarantees.infoButtonText, asset: AssetResource.info) {
-								viewStore.send(.infoTapped)
-							}
-							.textStyle(.body1Header)
-							.foregroundColor(.app.blue2)
+						Button(L10n.TransactionReview.Guarantees.infoButtonText, asset: AssetResource.info) {
+							ViewStore(store).send(.view(.infoTapped))
+						}
+						.textStyle(.body1Header)
+						.foregroundColor(.app.blue2)
+						.padding(.horizontal, .large2)
+						.padding(.bottom, .medium1)
+
+						Text(L10n.TransactionReview.Guarantees.headerText)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
+							.foregroundColor(.app.gray1)
 							.padding(.horizontal, .large2)
 							.padding(.bottom, .medium1)
-
-							Text(L10n.TransactionReview.Guarantees.headerText)
-								.textStyle(.body1Regular)
-								.multilineTextAlignment(.center)
-								.foregroundColor(.app.gray1)
-								.padding(.horizontal, .large2)
-								.padding(.bottom, .medium1)
-
-							ForEachStore(store.scope(state: \.guarantees) {},
-							             content: { TransactionReviewGuarantee.View })
-
-							ForEach(viewStore.guarantees) { viewState in
-								GuaranteeView(viewState: viewState) {} decreaseAction: {}
-							}
-						}
 					}
-					.padding(.bottom, .medium1)
-					.navigationTitle(L10n.TransactionReview.Guarantees.title)
-					.toolbar {
-						ToolbarItem(placement: .cancellationAction) {
-							CloseButton {
-								viewStore.send(.closeTapped)
-							}
+					.frame(maxWidth: .infinity)
+
+					VStack(spacing: .medium2) {
+						ForEachStore(
+							store.scope(
+								state: \.guarantees,
+								action: { .child(.guarantee(id: $0, action: $1)) }
+							),
+							content: { TransactionReviewGuarantee.View(store: $0) }
+						)
+					}
+					.padding(.medium1)
+					.background(.app.gray5)
+				}
+				.safeAreaInset(edge: .bottom, spacing: .zero) {
+					ConfirmationFooter(
+						title: L10n.TransactionReview.Guarantees.applyButtonText,
+						isEnabled: true,
+						action: { ViewStore(store).send(.view(.applyTapped)) }
+					)
+				}
+				.toolbar {
+					ToolbarItem(placement: .cancellationAction) {
+						CloseButton {
+							ViewStore(store).send(.view(.closeTapped))
 						}
 					}
 				}
 			}
 		}
+	}
+}
+
+extension TransactionReviewGuarantee.State {
+	var viewState: TransactionReviewGuarantee.ViewState {
+		.init(id: id,
+		      token: .init(amount: transfer.action.amount, metadata: transfer.metadata),
+		      minimumPercentage: minimumPercentage,
+		      accountIfVisible: showAccount ? account : nil)
 	}
 }
 
@@ -61,21 +83,7 @@ extension TransactionReviewTokenView.ViewState {
 		          thumbnail: metadata.thumbnail,
 		          amount: amount,
 		          guaranteedAmount: metadata.guarantee?.amount,
-		          dollarAmount: metadata.dollarAmount)
-	}
-}
-
-extension TransactionReviewGuarantees.State {
-	var viewState: TransactionReviewGuarantees.ViewState {
-		let guarantees = transfers.map { transfer -> TransactionReviewGuarantees.View.GuaranteeView.ViewState in
-			.init(id: transfer.id,
-			      token: .init(amount: transfer.transfer.action.amount,
-			                   metadata: transfer.transfer.metadata),
-			      minimumPercentage: 100,
-			      accountIfVisible: transfer.account)
-		}
-
-		return .init(guarantees: guarantees)
+		          fiatAmount: metadata.fiatAmount)
 	}
 }
 
@@ -85,6 +93,14 @@ extension TransactionReviewGuarantee {
 		let token: TransactionReviewTokenView.ViewState
 		let minimumPercentage: Double
 		let accountIfVisible: TransactionReview.Account?
+
+		var disablePlus: Bool {
+			minimumPercentage >= 100
+		}
+
+		var disableMinus: Bool {
+			minimumPercentage <= 0
+		}
 	}
 
 	public struct View: SwiftUI.View {
@@ -95,25 +111,43 @@ extension TransactionReviewGuarantee {
 		}
 
 		public var body: some SwiftUI.View {
-			Card {
-				VStack(spacing: 0) {
-					WithViewStore(store, observe: <#T##(State) -> Equatable#>, send: <#T##(ViewAction) -> Action#>, content: <#T##(ViewStore<Equatable, ViewAction>) -> View#>)
-					//						TransactionReviewAccount.View(store: <#T##StoreOf<TransactionReviewAccount>#>)
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				Card(verticalSpacing: 0) {
+					if let account = viewStore.accountIfVisible {
+						AccountLabel(account: account) {
+							viewStore.send(.copyAddressTapped)
+						}
+					}
 
-					TransactionReviewTokenView(viewState: viewState.token)
+					TransactionReviewTokenView(viewState: viewStore.token)
 
-					Rectangle()
-						.stroke(.pink)
-						.padding(.medium3)
-//						.overlay {
-//							Button(action: increaseAction) {
-//								Image(systemName: "minus.circle")
-//							}
-//							Text(viewState.minimumPercentage.formatted(.number))
-//							Button(action: increaseAction) {
-//								Image(systemName: "plus.circle")
-//							}
-//						}
+					Separator()
+
+					HStack(spacing: .medium3) {
+						Text(L10n.TransactionReview.Guarantees.setText)
+							.lineLimit(2)
+							.textStyle(.body2Header)
+							.foregroundColor(.app.gray1)
+
+						Spacer(minLength: 0)
+
+						Button(asset: AssetResource.minusCircle) {
+							viewStore.send(.decreaseTapped)
+						}
+						.opacity(viewStore.disableMinus ? 0.5 : 1)
+						.disabled(viewStore.disableMinus)
+
+						Text("\(viewStore.minimumPercentage, specifier: "%.1f")")
+							.textStyle(.body2Regular)
+							.foregroundColor(.app.gray1)
+
+						Button(asset: AssetResource.plusCircle) {
+							viewStore.send(.increaseTapped)
+						}
+						.opacity(viewStore.disablePlus ? 0.5 : 1)
+						.disabled(viewStore.disablePlus)
+					}
+					.padding(.medium3)
 				}
 			}
 		}

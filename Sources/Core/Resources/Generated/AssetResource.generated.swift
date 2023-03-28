@@ -39,6 +39,8 @@ public enum AssetResource {
   public static let iconUnknownResource = ImageAsset(name: "icon-unknown-resource")
   public static let info = ImageAsset(name: "info")
   public static let lock = ImageAsset(name: "lock")
+  public static let minusCircle = ImageAsset(name: "minus-circle")
+  public static let plusCircle = ImageAsset(name: "plus-circle")
   public static let radioButtonDarkDisabled = ImageAsset(name: "radioButton-dark-disabled")
   public static let radioButtonDarkSelected = ImageAsset(name: "radioButton-dark-selected")
   public static let radioButtonDarkUnselected = ImageAsset(name: "radioButton-dark-unselected")

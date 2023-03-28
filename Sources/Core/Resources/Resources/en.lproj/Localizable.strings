@@ -171,7 +171,9 @@
 
 "transactionReview.guarantees.title" = "Customize Guarantees";
 "transactionReview.guarantees.infoButtonText" = "How do Guarantees work";
+"transactionReview.guarantees.setText" = "Set guaranteed minimum %%";
 "transactionReview.guarantees.headerText" = "Protect yourself by setting guaranteed minimums for estimated deposits";
+"transactionReview.guarantees.applyButtonText" = "Apply";
 
 "authorizedDapps.title" = "Authorized dApps";
 "authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";

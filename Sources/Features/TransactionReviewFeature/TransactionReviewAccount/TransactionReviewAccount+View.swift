@@ -46,29 +46,14 @@ extension TransactionReviewAccounts {
 
 extension TransactionReviewAccount.State {
 	var viewState: TransactionReviewAccount.ViewState {
-		switch account {
-		case let .user(account):
-			return .init(label: account.label.rawValue,
-			             address: account.address.address,
-			             gradient: .init(account.appearanceID),
-			             details: transfers,
-			             showApprovedMark: false)
-		case let .external(accountAddress, approved):
-			return .init(label: L10n.TransactionReview.externalAccountName,
-			             address: accountAddress.address,
-			             gradient: .init(colors: [.app.gray2]),
-			             details: transfers,
-			             showApprovedMark: approved)
-		}
+		.init(account: account, details: transfers, showApprovedMark: account.isApproved)
 	}
 }
 
 // MARK: - TransactionReviewAccount.View
 extension TransactionReviewAccount {
 	public struct ViewState: Equatable {
-		let label: String
-		let address: String
-		let gradient: Gradient
+		let account: TransactionReview.Account
 		let details: [TransactionDetailsView.ViewState]
 		let showApprovedMark: Bool
 	}
@@ -84,11 +69,7 @@ extension TransactionReviewAccount {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				InnerCard {
-					AccountLabel(
-						viewStore.label,
-						address: viewStore.address,
-						gradient: viewStore.gradient
-					) {
+					AccountLabel(account: viewStore.account) {
 						viewStore.send(.copyAddress)
 					}
 
@@ -119,7 +100,7 @@ public struct TransactionDetailsView: View {
 				thumbnail: viewState.metadata.thumbnail,
 				amount: viewState.action.amount,
 				guaranteedAmount: viewState.metadata.guarantee?.amount,
-				dollarAmount: viewState.metadata.dollarAmount
+				fiatAmount: viewState.metadata.fiatAmount
 			))
 		case .none:
 			EmptyView()
@@ -150,5 +131,34 @@ public struct TransactionDetailsView: View {
 			}
 			.padding(.horizontal, .medium3)
 		}
+	}
+}
+
+extension AccountLabel {
+	public init(account: TransactionReview.Account, copyAction: (() -> Void)? = nil) {
+		switch account {
+		case let .user(account):
+			self.init(
+				account: account,
+				copyAction: copyAction
+			)
+
+		case let .external(accountAddress, _):
+			self.init(
+				L10n.TransactionReview.externalAccountName,
+				address: accountAddress.address,
+				gradient: .init(colors: [.app.gray2]),
+				copyAction: copyAction
+			)
+		}
+	}
+
+	public init(account: Profile.Network.AccountForDisplay, copyAction: (() -> Void)? = nil) {
+		self.init(
+			account.label.rawValue,
+			address: account.address.address,
+			gradient: .init(account.appearanceID),
+			copyAction: copyAction
+		)
 	}
 }
