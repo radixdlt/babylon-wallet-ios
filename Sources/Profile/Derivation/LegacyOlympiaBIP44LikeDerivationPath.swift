@@ -26,7 +26,7 @@ public struct LegacyOlympiaBIP44LikeDerivationPath:
 	public let fullPath: HD.Path.Full
 
 	public init(
-		index: UInt32
+		index: Profile.Network.NextDerivationIndices.Index
 	) throws {
 		let fullPath = try HD.Path.Full(
 			children: [

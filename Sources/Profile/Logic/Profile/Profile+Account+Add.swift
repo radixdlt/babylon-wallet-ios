@@ -24,7 +24,8 @@ extension Profile.Network.Accounts {
 extension Profile {
 	/// Saves an `Account` into the profile
 	public mutating func addAccount(
-		_ account: Profile.Network.Account
+		_ account: Profile.Network.Account,
+		shouldUpdateFactorSourceNextDerivationIndex: Bool = true
 	) throws {
 		let networkID = account.networkID
 		// can be nil if this is a new network
@@ -46,6 +47,9 @@ extension Profile {
 			try networks.add(network)
 		}
 
+		guard shouldUpdateFactorSourceNextDerivationIndex else {
+			return
+		}
 		switch account.securityState {
 		case let .unsecured(entityControl):
 			let factorSourceID = entityControl.genesisFactorInstance.factorSourceID

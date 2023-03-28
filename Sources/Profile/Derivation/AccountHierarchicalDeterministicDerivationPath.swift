@@ -49,7 +49,7 @@ extension HD.Path.Full {
 
 	public static func identity(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws -> Self {
 		try .defaultForEntity(
@@ -62,7 +62,7 @@ extension HD.Path.Full {
 
 	public static func account(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws -> Self {
 		try .defaultForEntity(
@@ -76,7 +76,7 @@ extension HD.Path.Full {
 	public static func defaultForEntity(
 		networkID: NetworkID,
 		entityKind: EntityKind,
-		index unboundIndex: Int,
+		index unboundIndex: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws -> Self {
 		guard
@@ -107,7 +107,7 @@ public protocol EntityDerivationPathProtocol: DerivationPathSchemeProtocol {
 	var fullPath: HD.Path.Full { get }
 	init(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws
 
@@ -175,7 +175,7 @@ public struct AccountHierarchicalDeterministicDerivationPath:
 
 	public init(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws {
 		try self.init(fullPath: HD.Path.Full.account(

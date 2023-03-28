@@ -4,7 +4,7 @@ import Prelude
 // MARK: - Profile.Network.NextDerivationIndices
 extension Profile.Network {
 	public struct NextDerivationIndices: Sendable, Hashable, Codable, Identifiable {
-		public typealias Index = Int
+		public typealias Index = UInt32
 
 		public typealias ID = NetworkID
 		public let networkID: NetworkID
@@ -15,12 +15,12 @@ extension Profile.Network {
 
 		public init(
 			networkID: NetworkID,
-			forAccount: UInt,
-			forIdentity: UInt
+			forAccount: Index,
+			forIdentity: Index
 		) {
 			self.networkID = networkID
-			self.forAccount = Index(forAccount)
-			self.forIdentity = Index(forIdentity)
+			self.forAccount = forAccount
+			self.forIdentity = forIdentity
 		}
 	}
 }
@@ -168,6 +168,24 @@ extension NextDerivationIndicesPerNetwork {
 		network.increaseNextDerivationIndex(for: entityKind)
 		self.networks[id: networkID] = network
 	}
+
+	public mutating func setNextDerivationIndex(
+		for entityKind: EntityKind,
+		to index: Profile.Network.NextDerivationIndices.Index,
+		networkID: NetworkID
+	) {
+		guard var network = self.networks[id: networkID] else {
+			// first on network
+			self.networks[id: networkID] = .init(
+				networkID: networkID,
+				forAccount: entityKind == .account ? index : 0,
+				forIdentity: entityKind == .identity ? index : 0
+			)
+			return
+		}
+		network.setNextDerivationIndex(for: entityKind, to: index)
+		self.networks[id: networkID] = network
+	}
 }
 
 extension Profile.Network.NextDerivationIndices {
@@ -175,6 +193,13 @@ extension Profile.Network.NextDerivationIndices {
 		switch entityKind {
 		case .account: self.forAccount += 1
 		case .identity: self.forIdentity += 1
+		}
+	}
+
+	public mutating func setNextDerivationIndex(for entityKind: EntityKind, to index: Index) {
+		switch entityKind {
+		case .account: self.forAccount = index
+		case .identity: self.forIdentity = index
 		}
 	}
 }

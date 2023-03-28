@@ -34,7 +34,7 @@ public struct IdentityHierarchicalDeterministicDerivationPath:
 
 	public init(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws {
 		try self.init(fullPath: HD.Path.Full.identity(

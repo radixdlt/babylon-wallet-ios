@@ -95,7 +95,7 @@ extension DerivationPath {
 	public static func forEntity(
 		kind entityKind: EntityKind,
 		networkID: Radix.Network.ID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind = .virtualEntity
 	) throws -> Self {
 		let path = try HD.Path.Full.defaultForEntity(

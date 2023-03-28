@@ -1,3 +1,4 @@
+import EngineToolkitModels
 import Prelude
 
 // MARK: - HDOnDeviceFactorSource
@@ -9,7 +10,7 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable {
 	public let id: FactorSourceID
 	public let hint: NonEmptyString
 	public let parameters: FactorSource.Parameters
-	public let storage: DeviceStorage
+	public private(set) var storage: DeviceStorage
 	public let addedOn: Date
 	public let lastUsedOn: Date
 
@@ -47,6 +48,25 @@ extension HDOnDeviceFactorSource {
 
 	public var supportsOlympia: Bool {
 		parameters.supportsOlympia
+	}
+
+	public func importedOlympiaFactorMarkingNextAccountIndex(
+		to nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index,
+		networkID: NetworkID
+	) -> FactorSource {
+		var storageCopy = storage
+
+		storageCopy.nextDerivationIndicesPerNetwork.setNextDerivationIndex(
+			for: .account,
+			to: nextDerivationAccountIndex,
+			networkID: networkID
+		)
+
+		var copy = self
+		copy.storage = storageCopy
+		let importedOlympiaFactorSource = copy.factorSource
+		assert(importedOlympiaFactorSource.storage?.forDevice?.nextForEntity(kind: .account, networkID: networkID) == nextDerivationAccountIndex)
+		return importedOlympiaFactorSource
 	}
 }
 

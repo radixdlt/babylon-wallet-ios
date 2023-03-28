@@ -10,7 +10,13 @@ extension AccountsClient: DependencyKey {
 	public static func live(
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
-		Self(
+		let saveVirtualAccount: SaveVirtualAccount = { account in
+			try await getProfileStore().updating {
+				try $0.addAccount(account)
+			}
+		}
+
+		return Self(
 			getAccountsOnCurrentNetwork: {
 				try await getProfileStore().network().accounts
 			},
@@ -19,11 +25,7 @@ extension AccountsClient: DependencyKey {
 			createUnsavedVirtualAccount: { request in
 				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},
-			saveVirtualAccount: { account in
-				try await getProfileStore().updating {
-					try $0.addAccount(account)
-				}
-			},
+			saveVirtualAccount: saveVirtualAccount,
 			getAccountByAddress: { address in
 				try await getProfileStore().network().entity(address: address)
 			},
@@ -64,12 +66,33 @@ extension AccountsClient: DependencyKey {
 					let migrated = MigratedAccounts.MigratedAccount(olympia: olympiaAccount, babylon: babylon)
 					accountsSet.append(migrated)
 				}
+
 				let accounts = NonEmpty<OrderedSet<MigratedAccounts.MigratedAccount>>(rawValue: accountsSet)!
-				return try MigratedAccounts(
+
+				try await getProfileStore().updating { profile in
+					// Save all accounts
+					for account in accounts {
+						try profile.addAccount(account.babylon, shouldUpdateFactorSourceNextDerivationIndex: false)
+					}
+				}
+
+				//                var hdOnDeviceFactorSource = olympiaFactorSource.hdOnDeviceFactorSource
+				//                var storage = hdOnDeviceFactorSource.storage
+				//                storage.nextDerivationIndicesPerNetwork.setNextDerivationIndex(for: .account, to: nextDerivationAccountIndex, networkID: networkID)
+				//                hdOnDeviceFactorSource.storage = storage
+//
+				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource.importedOlympiaFactorMarkingNextAccountIndex(
+					to: nextDerivationAccountIndex,
+					networkID: networkID
+				)
+
+				let migratedAccounts = try MigratedAccounts(
 					networkID: networkID,
 					accounts: accounts,
-					nextDerivationAccountIndex: nextDerivationAccountIndex
+					factorSourceToSave: factorSource
 				)
+
+				return migratedAccounts
 			}
 		)
 	}

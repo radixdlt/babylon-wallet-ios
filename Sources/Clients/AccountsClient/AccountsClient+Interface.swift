@@ -24,7 +24,6 @@ public struct AccountsClient: Sendable {
 
 	public var hasAccountOnNetwork: HasAccountOnNetwork
 
-	/// Does NOT save the account in Profile.
 	public var migrateOlympiaAccountsToBabylon: MigrateOlympiaAccountsToBabylon
 
 	public init(
@@ -94,25 +93,25 @@ public struct MigratedAccounts: Sendable, Hashable {
 		}
 	}
 
-	/// Ordered by Olympia `address_index` (as non hardened value)
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
 	public var babylonAccounts: Profile.Network.Accounts {
 		fatalError() // accounts.map(\.babylon)
 	}
 
-	public let nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
+	/// With the nextDerivation forAccount updated/
+	public let factorSourceToSave: FactorSource
 
 	public init(
 		networkID: NetworkID,
 		accounts: NonEmpty<OrderedSet<MigratedAccount>>,
-		nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
+		factorSourceToSave: FactorSource
 	) throws {
 		guard accounts.allSatisfy({ $0.babylon.networkID == networkID }) else {
 			throw NetworkIDDisrepancy()
 		}
 		self.networkID = networkID
 		self.accounts = accounts
-		self.nextDerivationAccountIndex = nextDerivationAccountIndex
+		self.factorSourceToSave = factorSourceToSave
 	}
 }
 
