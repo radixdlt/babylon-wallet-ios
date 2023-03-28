@@ -198,6 +198,7 @@ struct TransactionHeading: View {
 	var body: some View {
 		Text(heading)
 			.sectionHeading
+			.textCase(.uppercase)
 			.flushedLeft(padding: .medium3)
 	}
 }

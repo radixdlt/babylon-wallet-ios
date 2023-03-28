@@ -17,6 +17,7 @@ extension TransactionReviewNetworkFee {
 					HStack {
 						Text(L10n.TransactionReview.NetworkFee.heading)
 							.sectionHeading
+							.textCase(.uppercase)
 
 						// TODO: Enable back
 //						TransactionReviewInfoButton {

@@ -184,13 +184,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
-			var accounts = state.depositing!.accounts
-			for account in accounts {
-				let fungibleTransfers = account.transfers.filter { $0.metadata.type == .fungible }
-				accounts[id: account.id] = .init(account: account.account, transfers: fungibleTransfers)
-			}
-			state.customizeGuarantees = .init(transferAccounts: accounts)
-			return .none
+			let transfers = state
+				.depositing
+				.accounts
+				.flatMap { account -> [TransactionReviewGuarantees.State.FungibleTransfer] in
+					account.transfers
+						.filter { $0.metadata.type == .fungible }
+						.map { transfer in
+							.init(account: account.account, transfer: transfer)
+						}
+				}
+
+			state.customizeGuarantees = .init(transfers: .init(uniqueElements: transfers))
+
+            return .none
 
 		case .depositing:
 			return .none

@@ -1,5 +1,11 @@
 import FeaturePrelude
 
+extension TransactionReviewGuarantees.State {
+	var viewState: TransactionReviewGuarantees.ViewState {
+		.init(guarantees: self)
+	}
+}
+
 // MARK: - TransactionReviewPresenting.View
 extension TransactionReviewGuarantees {
 	public struct ViewState: Equatable {
@@ -15,31 +21,30 @@ extension TransactionReviewGuarantees {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					ScrollView(showsIndicators: false) {
 						VStack(spacing: 0) {
-							Text("Customize Guarantees")
-								.textStyle(.sheetTitle)
-								.foregroundColor(.app.gray1)
-								.padding(.top, .small3)
-								.padding(.bottom, .medium3)
+							FixedSpacer(height: .medium3)
 
-							Button("How do guarantees work", asset: AssetResource.info) {
+							Button(L10n.TransactionReview.Guarantees.infoButtonText, asset: AssetResource.info) {
 								viewStore.send(.infoTapped)
 							}
 							.textStyle(.body1Header)
 							.foregroundColor(.app.blue2)
+							.padding(.horizontal, .large2)
 							.padding(.bottom, .medium1)
 
-							Text("Protect yourself by setting guaranteed minimums for estimated deposits")
+							Text(L10n.TransactionReview.Guarantees.headerText)
 								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
 								.foregroundColor(.app.gray1)
+								.padding(.horizontal, .large2)
 								.padding(.bottom, .medium1)
 						}
 					}
-					.padding(.horizontal, .medium3)
 					.padding(.bottom, .medium1)
+					.navigationTitle(L10n.TransactionReview.Guarantees.title)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {
@@ -54,7 +59,8 @@ extension TransactionReviewGuarantees {
 		struct GuaranteeView: SwiftUI.View {
 			struct ViewState: Equatable {
 				let token: TransactionReviewTokenView.ViewState
-				let minimum: Double
+				let minimumPercentage: Double
+				let accountIfVisible: TransactionReview.Account?
 			}
 
 			let viewState: ViewState
@@ -73,7 +79,7 @@ extension TransactionReviewGuarantees {
 								Button(action: increaseAction) {
 									Image(systemName: "minus.circle")
 								}
-								Text(viewState.minimum.formatted(.number))
+								Text(viewState.minimumPercentage.formatted(.number))
 								Button(action: increaseAction) {
 									Image(systemName: "plus.circle")
 								}
