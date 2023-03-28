@@ -106,7 +106,7 @@ public enum AccountDeposit: Sendable, Codable, Equatable {
 // MARK: - ResourceSpecifier
 public enum ResourceSpecifier: Sendable, Codable, Equatable {
 	case amount(ResourceAddress, Decimal_)
-	case ids(ResourceAddress, Set<NonFungibleLocalId>)
+	case ids(ResourceAddress, Set<NonFungibleLocalIdInternal>)
 
 	enum CodingKeys: String, CodingKey {
 		case type
@@ -151,7 +151,7 @@ public extension ResourceSpecifier {
 		case .ids:
 			self = try .ids(
 				container.decode(ResourceAddress.self, forKey: .resourceAddress),
-				container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
+				container.decode(Set<NonFungibleLocalIdInternal>.self, forKey: .ids)
 			)
 		}
 	}
