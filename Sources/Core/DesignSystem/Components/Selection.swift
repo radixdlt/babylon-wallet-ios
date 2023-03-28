@@ -7,15 +7,18 @@ public struct SelectionItem<Value> {
 	public let value: Value
 	public var isSelected: Bool
 	public var isDisabled: Bool
-	public var action: () -> Void
+	public var action: @Sendable () -> Void
 }
 
+// MARK: Sendable
+extension SelectionItem: Sendable where Value: Sendable {}
+
 // MARK: - SelectionRequirement
-public enum SelectionRequirement: Hashable {
+public enum SelectionRequirement: Sendable, Hashable {
 	case exactly(Int)
 	case atLeast(Int)
 
-	public enum Quantifier: Hashable {
+	public enum Quantifier: Sendable, Hashable {
 		case exactly
 		case atLeast
 	}

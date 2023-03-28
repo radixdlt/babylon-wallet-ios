@@ -137,7 +137,9 @@ public struct ImportedOlympiaWallet: Sendable, Hashable {
 	public let mnemonicWordCount: BIP39.WordCount
 	public let accounts: NonEmpty<OrderedSet<Account>>
 
-	public struct Account: Sendable, Hashable, CustomDebugStringConvertible {
+	public struct Account: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {
+		public typealias ID = K1.PublicKey
+		public var id: ID { publicKey }
 		public let publicKey: K1.PublicKey
 		public let path: LegacyOlympiaBIP44LikeDerivationPath
 		public let xrd: BigDecimal
@@ -172,7 +174,7 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 	}
 
 	fileprivate static let mockMany: OrderedSet<Self> = try! {
-		let numberOfPayLoads = 3
+		let numberOfPayLoads = 2
 		let accountsPerPayload = 2
 		let numberOfAccounts = numberOfPayLoads * accountsPerPayload
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
