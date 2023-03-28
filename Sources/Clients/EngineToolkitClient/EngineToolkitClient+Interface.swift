@@ -20,6 +20,7 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var knownEntityAddresses: KnownEntityAddresses
 
 	public var generateTransactionReview: GenerateTransactionReview
+	public var decodeAddress: DecodeAddressRequest
 }
 
 // MARK: - JSONInstructionsTransactionManifest
@@ -61,6 +62,8 @@ extension EngineToolkitClient {
 	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 
 	public typealias GenerateTransactionReview = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
+
+	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
 }
 
 // MARK: - AccountAddressesInvolvedInTransactionRequest

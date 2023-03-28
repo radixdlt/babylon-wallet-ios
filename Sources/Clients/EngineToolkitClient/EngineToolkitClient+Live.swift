@@ -76,6 +76,9 @@ extension EngineToolkitClient {
 			},
 			generateTransactionReview: { manifestWithPreviewContext in
 				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
+			},
+			decodeAddress: { address in
+				try engineToolkit.decodeAddressRequest(request: .init(address: address)).get()
 			}
 		)
 	}()
