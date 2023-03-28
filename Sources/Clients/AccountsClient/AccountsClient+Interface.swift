@@ -66,7 +66,7 @@ extension AccountsClient {
 
 // MARK: - MigratedAccounts
 public struct MigratedAccounts: Sendable, Hashable {
-	public let network: NetworkID
+	public let networkID: NetworkID
 
 	public struct MigratedAccount: Sendable, Hashable {
 		public let olympia: OlympiaAccountToMigrate
@@ -74,11 +74,30 @@ public struct MigratedAccounts: Sendable, Hashable {
 	}
 
 	/// Ordered by Olympia `address_index` (as non hardened value)
-	public let accounts: OrderedSet<MigratedAccount>
+	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
+	public var babylonAccounts: Profile.Network.Accounts {
+		fatalError() // accounts.map(\.babylon)
+	}
 
 	/// This is the max value of `address_index` + 1.
 	public let nextDerivationIndexForAccountForOlympiaFactor: Int
+
+	public init(
+		networkID: NetworkID,
+		accounts: NonEmpty<OrderedSet<MigratedAccount>>,
+		nextDerivationIndexForAccountForOlympiaFactor: Int
+	) throws {
+		guard accounts.allSatisfy({ $0.babylon.networkID == networkID }) else {
+			throw NetworkIDDisrepancy()
+		}
+		self.networkID = networkID
+		self.accounts = accounts
+		self.nextDerivationIndexForAccountForOlympiaFactor = nextDerivationIndexForAccountForOlympiaFactor
+	}
 }
+
+// MARK: - NetworkIDDisrepancy
+struct NetworkIDDisrepancy: Swift.Error {}
 
 // MARK: - OlympiaAccountToMigrate
 public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {

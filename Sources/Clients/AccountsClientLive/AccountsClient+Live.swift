@@ -2,6 +2,7 @@ import AccountsClient
 import ClientPrelude
 import ProfileStore
 
+// MARK: - AccountsClient + DependencyKey
 extension AccountsClient: DependencyKey {
 	public typealias Value = AccountsClient
 
@@ -34,11 +35,40 @@ extension AccountsClient: DependencyKey {
 					return false
 				}
 			},
-			migrateOlympiaAccountsToBabylon: { _ in
-				fatalError()
+			migrateOlympiaAccountsToBabylon: { olympiaAccounts in
+				let sortedOlympia = olympiaAccounts.sorted(by: \.addressIndex)
+				let networkID = try await getProfileStore().network().networkID
+				var accountsSet = OrderedSet<MigratedAccounts.MigratedAccount>()
+				for olympiaAccount in olympiaAccounts {
+					fatalError() // do migration
+				}
+				let accounts = NonEmpty<OrderedSet<MigratedAccounts.MigratedAccount>>(rawValue: accountsSet)!
+				let nextIndex = sortedOlympia.last!.addressIndex + 1
+				return try MigratedAccounts(
+					networkID: networkID,
+					accounts: accounts,
+					nextDerivationIndexForAccountForOlympiaFactor: Int(nextIndex)
+				)
 			}
 		)
 	}
 
 	public static let liveValue: Self = .live()
+}
+
+extension OlympiaAccountToMigrate {
+	var addressIndex: UInt32 {
+		0
+	}
+}
+
+extension Collection {
+	func sorted<Value: Comparable>(
+		by keyPath: KeyPath<Element, Value>,
+		_ comparator: (Value, Value) -> Bool = (<)
+	) -> [Element] {
+		sorted {
+			comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
+		}
+	}
 }
