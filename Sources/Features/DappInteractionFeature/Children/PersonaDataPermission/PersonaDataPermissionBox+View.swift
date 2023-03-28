@@ -55,16 +55,32 @@ extension PersonaDataPermissionBox {
 	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<PersonaDataPermissionBox>
+		let action: () -> Void
+		let accessory: AnyView
+
+		init(
+			store: StoreOf<PersonaDataPermissionBox>,
+			action: @escaping () -> Void = {},
+			@ViewBuilder accessory: () -> some SwiftUI.View = { EmptyView() }
+		) {
+			self.store = store
+			self.action = action
+			self.accessory = AnyView(accessory())
+		}
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DappPermissionBox {
-					HStack(spacing: .medium2) {
-						PersonaThumbnail(viewStore.avatarURL, size: .small)
-						Text(viewStore.personaLabel)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+					Button(action: action) {
+						HStack(spacing: .medium2) {
+							PersonaThumbnail(viewStore.avatarURL, size: .small)
+							Text(viewStore.personaLabel)
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
+						}
+						.padding(.medium2)
 					}
+					.buttonStyle(.inert)
 				} content: {
 					VStack(alignment: .leading, spacing: .small1) {
 						if let existingRequiredFields = viewStore.existingRequiredFields {
@@ -86,6 +102,7 @@ extension PersonaDataPermissionBox {
 							}
 						}
 					}
+					.padding(.medium2)
 				}
 			}
 		}
