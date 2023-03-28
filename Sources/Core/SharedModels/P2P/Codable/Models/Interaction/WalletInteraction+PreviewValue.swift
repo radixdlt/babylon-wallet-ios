@@ -52,6 +52,12 @@ extension P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem {
 	)
 }
 
+extension P2P.FromDapp.WalletInteraction.OneTimePersonaDataRequestItem {
+	public static let previewValue: Self = .init(
+		fields: [.givenName, .familyName, .emailAddress]
+	)
+}
+
 extension P2P.FromDapp.WalletInteraction.SendTransactionItem {
 	public static let previewValue: Self = .init(version: .default, transactionManifest: .previewValue, message: nil)
 }
@@ -87,7 +93,8 @@ extension P2P.FromDapp.WalletInteraction {
 				ongoingPersonaData: .init(
 					fields: [.givenName, .familyName, .emailAddress]
 				),
-				oneTimeAccounts: .previewValue
+				oneTimeAccounts: .previewValue,
+				oneTimePersonaData: .previewValue
 			))),
 			metadata: .previewValue
 		)
@@ -101,7 +108,8 @@ extension P2P.FromDapp.WalletInteraction {
 			id: id,
 			items: .request(
 				.unauthorized(.init(
-					oneTimeAccounts: .previewValue
+					oneTimeAccounts: .previewValue,
+					oneTimePersonaData: .previewValue
 				))
 			),
 			metadata: .previewValue
@@ -125,7 +133,8 @@ extension P2P.FromDapp.WalletInteraction {
 	public static let previewValueNoRequestItems = Self(
 		id: .previewValue,
 		items: .request(.unauthorized(.init(
-			oneTimeAccounts: nil
+			oneTimeAccounts: nil,
+			oneTimePersonaData: nil
 		))),
 		metadata: .previewValue
 	)

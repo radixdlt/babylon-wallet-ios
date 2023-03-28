@@ -165,6 +165,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case accountPermission(AccountPermission.State)
 			case chooseAccounts(ChooseAccounts.State)
 			case personaDataPermission(PersonaDataPermission.State)
+			case oneTimePersonaData(OneTimePersonaData.State)
 			case signAndSubmitTransaction(TransactionSigning.State)
 		}
 
@@ -173,6 +174,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case accountPermission(AccountPermission.Action)
 			case chooseAccounts(ChooseAccounts.Action)
 			case personaDataPermission(PersonaDataPermission.Action)
+			case oneTimePersonaData(OneTimePersonaData.Action)
 			case signAndSubmitTransaction(TransactionSigning.Action)
 		}
 
@@ -190,6 +192,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					}
 					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
 						PersonaDataPermission()
+					}
+					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
+						OneTimePersonaData()
 					}
 					.ifCaseLet(/MainState.signAndSubmitTransaction, action: /MainAction.signAndSubmitTransaction) {
 						TransactionSigning()
@@ -358,6 +363,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return continueEffect(for: &state)
 		}
 
+		func handleOneTimePersonaData(
+			_ item: State.AnyInteractionItem,
+			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		) -> EffectTask<Action> {
+			let fields = fields.map { P2P.ToDapp.PersonaData(field: $0.id, value: $0.value) }
+			state.responseItems[item] = .remote(.oneTimePersonaData(.init(fields: fields)))
+			return continueEffect(for: &state)
+		}
+
 		func handleSignAndSubmitTX(
 			_ item: State.AnyInteractionItem,
 			_ txID: TransactionIntent.TXID
@@ -399,6 +413,19 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			let .root(.relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields))))),
 			let .path(.element(_, .relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields)))))):
 			return handleOngoingPersonaDataPermission(item, fields)
+
+		case
+			let .root(.relay(_, .oneTimePersonaData(.delegate(.personaUpdated(persona))))),
+			let .path(.element(_, .relay(_, .oneTimePersonaData(.delegate(.personaUpdated(persona)))))):
+			if state.persona?.id == persona.id {
+				state.persona = persona
+			}
+			return .none
+
+		case
+			let .root(.relay(item, .oneTimePersonaData(.delegate(.continueButtonTapped(fields))))),
+			let .path(.element(_, .relay(item, .oneTimePersonaData(.delegate(.continueButtonTapped(fields)))))):
+			return handleOneTimePersonaData(item, fields)
 
 		case
 			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),
@@ -643,6 +670,8 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 						items.append(.remote(currentItem))
 					case .oneTimeAccounts:
 						items.append(.remote(currentItem))
+					case .oneTimePersonaData:
+						items.append(.remote(currentItem))
 					case .send:
 						items.append(.remote(currentItem))
 					}
@@ -695,6 +724,11 @@ extension DappInteractionFlow.Destinations.State {
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
+			)))
+		case let .remote(.oneTimePersonaData(item)):
+			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
+				dappMetadata: dappMetadata,
+				requiredFieldIDs: item.fields
 			)))
 		case let .remote(.send(item)):
 			self = .relayed(anyItem, with: .signAndSubmitTransaction(.init(
