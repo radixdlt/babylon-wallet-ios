@@ -16,6 +16,7 @@ extension TransactionReviewPresenting {
 					HStack {
 						Text(L10n.TransactionReview.presentingHeading)
 							.sectionHeading
+							.textCase(.uppercase)
 
 						TransactionReviewInfoButton {
 							viewStore.send(.infoTapped)

@@ -3,10 +3,16 @@ import FeaturePrelude
 // MARK: - TransactionReviewGuarantees
 public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var transferAccounts: IdentifiedArrayOf<TransactionReviewAccount.State>
+		public var transfers: IdentifiedArrayOf<FungibleTransfer>
 
-		public init(transferAccounts: IdentifiedArrayOf<TransactionReviewAccount.State>) {
-			self.transferAccounts = transferAccounts
+		public init(transfers: IdentifiedArrayOf<FungibleTransfer>) {
+			self.transfers = transfers
+		}
+
+		public struct FungibleTransfer: Identifiable, Sendable, Hashable {
+			public var id: AccountAction { transfer.id }
+			public let account: TransactionReview.Account
+			public let transfer: TransactionReview.Transfer
 		}
 	}
 
