@@ -63,13 +63,18 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public init(
 			account: TransactionReview.Account,
 			showAccount: Bool,
-			transfer: TransactionReview.Transfer,
-			minimumPercentage: Double = 100
+			transfer: TransactionReview.Transfer
 		) {
 			self.account = account
 			self.showAccount = showAccount
 			self.transfer = transfer
-			self.minimumPercentage = minimumPercentage
+
+			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount {
+				let ratio = (guaranteed / transfer.action.amount).withScale(3)
+				self.minimumPercentage = 100
+			} else {
+				self.minimumPercentage = 100
+			}
 		}
 	}
 
@@ -110,6 +115,6 @@ extension TransactionReviewGuarantee.State {
 		guard let newMinimumDecimal = BigDecimal(minimumPercentage * 0.01) else { return } // TODO: Handle?
 
 		let newAmount = newMinimumDecimal * transfer.action.amount
-		transfer.metadata.guarantee?.amount = newAmount
+		transfer.guarantee?.amount = newAmount
 	}
 }
