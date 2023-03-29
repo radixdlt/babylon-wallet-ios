@@ -64,18 +64,15 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public struct State: Identifiable, Sendable, Hashable {
 		public var id: AccountAction { transfer.id }
 		public let account: TransactionReview.Account
-		public let showAccount: Bool
 
 		public var transfer: TransactionReview.Transfer
 		public var minimumPercentage: Double
 
 		public init(
 			account: TransactionReview.Account,
-			showAccount: Bool,
 			transfer: TransactionReview.Transfer
 		) {
 			self.account = account
-			self.showAccount = showAccount
 			self.transfer = transfer
 
 			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount,
