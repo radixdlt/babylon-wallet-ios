@@ -11,7 +11,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			self = .createAccountCoordinator(
 				.init(
 					config: .init(purpose: .firstAccountForNewProfile),
-					displayIntroduction: { _ in true }
+					displayIntroduction: { _ in false }
 				)
 			)
 		}
