@@ -372,11 +372,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						publicKey: item.publicKey,
 						signature: item.signature
 					)))))
-				case let .remote(.auth(.login(.withoutChallenge))):
+				case .remote(.auth(.login(.withoutChallenge))):
 					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
 						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
 					)))))
-				case let .remote(.auth(.usePersona)):
+				case .remote(.auth(.usePersona)):
 					state.responseItems[request] = .remote(.auth(.usePersona(.init(
 						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
 					))))
