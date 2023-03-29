@@ -148,6 +148,7 @@ extension AccountLabel {
 				L10n.TransactionReview.externalAccountName,
 				address: accountAddress.address,
 				gradient: .init(colors: [.app.gray2]),
+				height: .guaranteeAccountLabelHeight,
 				copyAction: copyAction
 			)
 		}
@@ -158,6 +159,7 @@ extension AccountLabel {
 			account.label.rawValue,
 			address: account.address.address,
 			gradient: .init(account.appearanceID),
+			height: .guaranteeAccountLabelHeight,
 			copyAction: copyAction
 		)
 	}
