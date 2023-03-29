@@ -142,12 +142,14 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			return .none
 
 		case .popoverButtonTapped:
-			state.destination = .slideUpPanel(
-				.init(
-					title: L10n.GatewaySettings.WhatIsAGateway.title,
-					explanation: L10n.GatewaySettings.WhatIsAGateway.explanation
-				)
-			)
+//			state.destination = .slideUpPanel(
+//				.init(
+//					title: L10n.GatewaySettings.WhatIsAGateway.title,
+//					explanation: L10n.GatewaySettings.WhatIsAGateway.explanation
+//				)
+//			)
+			// FIXME: display what is a gateway once we have copy
+			loggerGlobal.info("What is A gateway tutorial slide up panel skipped, since no copy.")
 			return .none
 
 		default:

@@ -7,6 +7,9 @@ extension Grid {
 }
 
 extension Grid {
+	/// 200
+	public static let huge = unit * 50
+
 	/// 40
 	public static let large1 = unit * 10
 

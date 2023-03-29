@@ -11,6 +11,7 @@ public struct IntroductionToEntity<Entity: EntityProtocol>: Sendable, FeatureRed
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case continueButtonTapped
+		case showTutorial
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -22,6 +23,9 @@ public struct IntroductionToEntity<Entity: EntityProtocol>: Sendable, FeatureRed
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
+			return .none
+		case .showTutorial:
+			loggerGlobal.info("Tutorial button ignore for now.")
 			return .none
 		case .continueButtonTapped:
 			return .send(.delegate(.done))
