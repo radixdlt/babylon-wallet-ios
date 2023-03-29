@@ -146,7 +146,7 @@ public struct MinimumPercentageStepper: ReducerProtocol {
 		}
 
 		public init(value: BigDecimal) {
-			self.value = value
+			self.value = value.clamped
 			self.string = value.toString()
 		}
 	}
@@ -236,8 +236,16 @@ public struct MinimumPercentageStepperView: View {
 
 				TextField("", text: viewStore.binding(get: \.string, send: MinimumPercentageStepper.Action.stringEntered))
 					.keyboardType(.decimalPad)
+					.multilineTextAlignment(.center)
 					.textStyle(.body2Regular)
-					.foregroundColor(viewStore.isValid ? .app.gray1 : .app.alert)
+					.foregroundColor(.app.gray1)
+					.frame(width: 68, height: 48)
+					.background {
+						RoundedRectangle(cornerRadius: 8)
+							.fill(.app.gray5)
+						RoundedRectangle(cornerRadius: 8)
+							.stroke(viewStore.isValid ? .app.gray4 : .app.red1.opacity(0.6))
+					}
 
 				Button(asset: AssetResource.plusCircle) {
 					viewStore.send(.increaseTapped)
