@@ -5,6 +5,13 @@ extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
 			avatarURL: URL(string: "something")!,
+			addAFieldButtonState: {
+				if dynamicFields.count < DynamicFieldID.allCases.count {
+					return .enabled
+				} else {
+					return .disabled
+				}
+			}(),
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
@@ -36,6 +43,7 @@ extension EditPersona.State {
 extension EditPersona {
 	public struct ViewState: Equatable {
 		let avatarURL: URL
+		let addAFieldButtonState: ControlState
 		let output: Output?
 	}
 
@@ -75,6 +83,7 @@ extension EditPersona {
 								Text(L10n.EditPersona.Button.addAField).padding(.horizontal, .medium2)
 							}
 							.buttonStyle(.secondaryRectangular)
+							.controlState(viewStore.addAFieldButtonState)
 							.padding(.top, .medium2)
 						}
 						.padding(.horizontal, .medium1)
