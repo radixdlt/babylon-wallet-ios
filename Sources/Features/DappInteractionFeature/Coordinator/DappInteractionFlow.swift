@@ -154,7 +154,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(P2P.ToDapp.WalletInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata)
-		case submit(P2P.ToDapp.WalletInteractionSuccessResponse)
+		case submit(P2P.ToDapp.WalletInteractionSuccessResponse, DappMetadata)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -663,7 +663,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 					}
 
-					await send(.delegate(.submit(response)))
+					await send(.delegate(.submit(response, state.dappMetadata)))
 				}
 			} else {
 				return .none // TODO: throw error (invalid response format)

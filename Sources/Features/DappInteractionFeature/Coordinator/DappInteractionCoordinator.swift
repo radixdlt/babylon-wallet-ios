@@ -37,7 +37,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(P2P.ToDapp.WalletInteractionResponse)
+		case submit(P2P.ToDapp.WalletInteractionResponse, DappMetadata? = nil)
 		case dismiss(DappMetadata? = nil)
 	}
 
@@ -102,11 +102,12 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			)))))
 		case let .flow(.delegate(.dismissWithFailure(error))):
 			return .send(.delegate(.submit(.failure(error))))
+                                // .concatenate(with: .send(.delegate(.dismiss())))
 
 		case let .flow(.delegate(.dismissWithSuccess(dappMetadata))):
 			return .send(.delegate(.dismiss(dappMetadata)))
 
-		case let .flow(.delegate(.submit(response))):
+		case let .flow(.delegate(.submit(response, dappMetadata))):
 			return .send(.delegate(.submit(.success(response))))
 		default:
 			return .none
