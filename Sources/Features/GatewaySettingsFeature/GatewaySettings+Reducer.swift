@@ -149,7 +149,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 //				)
 //			)
 			// FIXME: display what is a gateway once we have copy
-			loggerGlobal.info("What is A gateway tutorial slide up panel skipped, since no copy.")
+			loggerGlobal.warning("What is A gateway tutorial slide up panel skipped, since no copy.")
 			return .none
 
 		default:

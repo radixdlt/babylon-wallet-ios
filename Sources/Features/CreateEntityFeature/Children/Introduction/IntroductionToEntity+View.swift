@@ -5,19 +5,16 @@ extension IntroductionToEntity {
 	public struct ViewState: Equatable {
 		let kind: EntityKind
 		let titleText: String
-		let entityKindName: String
 		init(state: IntroductionToEntity.State) {
 			let entityKind = Entity.entityKind
-			let entityKindName = entityKind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
-			self.entityKindName = entityKindName
+
 			self.kind = entityKind
 			self.titleText = {
 				switch entityKind {
 				case .account:
-					return
-						L10n.CreateEntity.NameNewEntity.Account.Title.first
+					return "Create an Account"
 				case .identity:
-					return L10n.CreateEntity.NameNewEntity.Persona.title
+					return L10n.CreateEntity.Introduction.Persona.title
 				}
 			}()
 		}
@@ -39,7 +36,7 @@ extension IntroductionToEntity {
 					case .identity: introToPersona(with: viewStore)
 					}
 
-					Button("Continue") {
+					Button(L10n.CreateEntity.Introduction.Button.continue) {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -61,7 +58,7 @@ extension IntroductionToEntity {
 
 		@ViewBuilder
 		private func introToAccounts(with viewStore: ViewStoreOf<IntroductionToEntity>) -> some SwiftUI.View {
-			Text("Accounts are cool")
+			Text("Accounts on Radix are smart.")
 		}
 
 		@ViewBuilder
@@ -80,17 +77,17 @@ extension IntroductionToEntity {
 			} label: {
 				HStack {
 					Image(asset: AssetResource.info)
-					Text(L10n.GatewaySettings.WhatIsAGateway.buttonText)
+					Text(L10n.CreateEntity.Introduction.Persona.Button.tutorial)
 						.textStyle(.body1StandaloneLink)
 				}
 				.tint(.app.blue2)
 			}
 
-			Text("A Persona is an identity that you own and control. You can have as many as you like.")
+			Text(L10n.CreateEntity.Introduction.Persona.subtitle0)
 				.font(.app.body1Regular)
 				.foregroundColor(.app.gray1)
 
-			Text("You will choose Personas to login to dApps and dApps may request access to personal information associated with that Persona.")
+			Text(L10n.CreateEntity.Introduction.Persona.subtitle1)
 				.font(.app.body1Regular)
 				.foregroundColor(.app.gray1)
 		}

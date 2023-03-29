@@ -48,13 +48,13 @@ public struct IntroductionToEntity<Entity: EntityProtocol>: Sendable, FeatureRed
 		case .appeared:
 			return .none
 		case .showTutorial:
-			state.infoPanel = .init(
-				title: "Learn about Personas",
-				explanation: "Info about personas"
-			)
+//			state.infoPanel = .init(
+//				title: "Learn about Personas",
+//				explanation: "Info about personas"
+//			)
 
 			// FIXME: display what is a gateway once we have copy
-			loggerGlobal.info("Learn about Personas tutorial slide up panel skipped, since no copy.")
+			loggerGlobal.warning("Learn about Personas tutorial slide up panel skipped, since no copy.")
 			return .none
 		case .continueButtonTapped:
 			return .send(.delegate(.done))
