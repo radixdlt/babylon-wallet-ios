@@ -70,7 +70,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.transfer = transfer
 
 			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount {
-				let ratio = (guaranteed / transfer.action.amount).withScale(3)
+				let ratio = (guaranteed / transfer.action.amount).withScale(3) // TODO: fix
 				self.minimumPercentage = 100
 			} else {
 				self.minimumPercentage = 100

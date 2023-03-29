@@ -96,26 +96,26 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 				await send(.internal(.previewLoaded(result)))
 			}
+
 		case .closeTapped:
 			return .none
 
 		case .showRawTransactionTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
-			let depositingAccounts = state.depositing?.accounts
-
+			let guarantees = state.allGuarantees
 			return .fireAndForget {
-//				let manifest = try await addingGuarantees(to: transactionWithLockFee, accounts: depositingAccounts?.elements)
-//				print("MANIFEST:\n", manifest)
+				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
+				print("MANIFEST after:\n", manifest)
 			}
 
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 
 			state.isSigningTX = true
+			let guarantees = state.allGuarantees
 
-			let depositingAccounts = state.depositing?.accounts
 			return .run { send in
-				let manifest = try await addingGuarantees(to: transactionWithLockFee, accounts: depositingAccounts?.elements)
+				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
 
 				let signRequest = SignManifestRequest(
 					manifestToSign: manifest,
@@ -224,10 +224,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func addingGuarantees(to manifest: TransactionManifest, accounts: [TransactionReviewAccount.State]?) async throws -> TransactionManifest {
-		let guarantees = accounts?.flatMap { $0.transfers.compactMap(\.guarantee) }
-		guard let guarantees, !guarantees.isEmpty else { return manifest }
-
+	public func addingGuarantees(to manifest: TransactionManifest, guarantees: [TransactionClient.Guarantee]) async throws -> TransactionManifest {
+		guard !guarantees.isEmpty else { return manifest }
 		return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
 	}
 }
@@ -474,7 +472,11 @@ extension TransactionReview {
 }
 
 extension TransactionReview.State {
-	mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
+	public var allGuarantees: [TransactionClient.Guarantee] {
+		depositing?.accounts.flatMap { $0.transfers.compactMap(\.guarantee) } ?? []
+	}
+
+	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
 
 		depositing?
