@@ -162,6 +162,7 @@
 "transactionReview.externalAccountName" = "Account";
 "transactionReview.estimated" = "Estimated";
 "transactionReview.guaranteed" = "Guaranteed";
+"transactionReview.rawTransactionTitle" = "Raw Transaction";
 
 "transactionReview.networkFee.heading" = "Network Fee";
 "transactionReview.networkFee.congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";

@@ -19,6 +19,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
 
+		@PresentationState
+		public var rawTransaction: TransactionReviewRawTransaction.State? = nil
+
 		public var isSigningTX: Bool = false
 
 		public init(
@@ -46,12 +49,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case networkFee(TransactionReviewNetworkFee.Action)
 
 		case customizeGuarantees(PresentationAction<TransactionReviewGuarantees.Action>)
+		case rawTransaction(PresentationAction<TransactionReviewRawTransaction.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case signTransactionResult(TransactionResult)
+		case rawTransactionCreated(String)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -83,6 +88,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.$customizeGuarantees, action: /Action.child .. ChildAction.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
+			.ifLet(\.$rawTransaction, action: /Action.child .. ChildAction.rawTransaction) {
+				TransactionReviewRawTransaction()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -103,9 +111,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .showRawTransactionTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 			let guarantees = state.allGuarantees
-			return .fireAndForget {
+			return .run { send in
 				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
 				print("MANIFEST after:\n", manifest.description)
+				await send(.internal(.rawTransactionCreated(manifest.description)))
 			}
 
 		case .approveTapped:
@@ -180,6 +189,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .customizeGuarantees:
 			return .none
+
+		case let .rawTransaction(.presented(.delegate(.dismiss))):
+			state.rawTransaction = nil
+			return .none
+
+		case .rawTransaction:
+			return .none
 		}
 	}
 
@@ -221,6 +237,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid))))
+
+		case let .rawTransactionCreated(transaction):
+			state.rawTransaction = .init(transaction: transaction)
+			return .none
 		}
 	}
 
