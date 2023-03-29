@@ -6,13 +6,10 @@ extension BigDecimal {
 		fiatCurrency: FiatCurrency,
 		locale: Locale = .current
 	) -> String {
-		let formattedAmount = self.format(locale: locale)
-		return [
-			fiatCurrency.sign,
-			formattedAmount,
-		].joined(separator: "")
+		fiatCurrency.sign + format(locale: locale)
 	}
 
+	/// Formats the number for human consumtion
 	public func format(
 		maxPlaces maxPlacesNonNegative: UInt = 8,
 		locale: Locale = .current
@@ -76,5 +73,35 @@ extension BigDecimal {
 			integerPart,
 			String(componentsFromDecimal[1]),
 		].joined(separator: decimalSeparatorMaybeAccordingToLocal)
+	}
+
+	/// The number as a Double, with the given precision
+	public func toDouble(withPrecision precision: Int) throws -> Double {
+		let stringValue = toString(withPrecision: precision)
+		guard let doubleValue = Double(stringValue) else {
+			throw BigDecimal.ConversionError.failedToCreateDouble(stringValue)
+		}
+		return doubleValue
+	}
+
+	/// Computer readable string representaton with full precision
+	public func toString() -> String {
+		description
+	}
+
+	/// Computer readable string representaton with the given precision
+	public func toString(withPrecision precision: Int) -> String {
+		withPrecision(precision).description
+	}
+
+	public enum ConversionError: Error, CustomStringConvertible {
+		case failedToCreateDouble(String)
+
+		public var description: String {
+			switch self {
+			case let .failedToCreateDouble(stringValue):
+				return "Cannot create Double from \(stringValue)."
+			}
+		}
 	}
 }
