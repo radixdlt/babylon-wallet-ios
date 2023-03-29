@@ -307,8 +307,8 @@ extension TransactionReview {
 			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
 		}
 
-		let requiresGuarantees = reviewAccounts.contains { state in
-			state.transfers.contains { transfer in
+		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
+			reviewAccount.transfers.contains { transfer in
 				transfer.guarantee != nil
 			}
 		}
@@ -339,7 +339,8 @@ extension TransactionReview {
 				}
 				return nil
 			}()
-			let metdata = ResourceMetadata(
+
+			let resourceMetadata = ResourceMetadata(
 				name: metadata.symbol ?? metadata.name,
 				thumbnail: nil,
 				type: addressKind.resourceType
@@ -348,9 +349,10 @@ extension TransactionReview {
 			let transfer = TransactionReview.Transfer(
 				action: action,
 				guarantee: guarantee,
-				metadata: metdata
+				metadata: resourceMetadata
 			)
-			container[account] = (container[account] ?? []) + [transfer]
+
+			container[account, default: []].append(transfer)
 		}
 
 		switch resourceSpecifier {
