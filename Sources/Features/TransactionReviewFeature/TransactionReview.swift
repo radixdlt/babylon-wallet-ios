@@ -149,16 +149,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			guard let depositing = state.depositing else { return .none } // TODO: Handle?
 
-			let allTokens = depositing.accounts.flatMap { $0.transfers.map(\.action.resourceAddress) }
-
 			let guarantees = depositing.accounts
 				.flatMap { account -> [TransactionReviewGuarantee.State] in
 					account.transfers
 						.filter { $0.metadata.type == .fungible }
-						.map { .init(account: account.account,
-						             showAccount: allTokens.count(of: $0.action.resourceAddress) > 1,
-						             transfer: $0)
-						}
+						.map { .init(account: account.account, transfer: $0) }
 				}
 
 			state.customizeGuarantees = .init(guarantees: .init(uniqueElements: guarantees))

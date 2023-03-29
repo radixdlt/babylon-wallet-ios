@@ -80,9 +80,9 @@ extension TransactionReviewGuarantees {
 extension TransactionReviewGuarantee.State {
 	var viewState: TransactionReviewGuarantee.ViewState {
 		.init(id: id,
+		      account: account,
 		      token: .init(transfer: transfer),
-		      minimumPercentage: minimumPercentage,
-		      accountIfVisible: showAccount ? account : nil)
+		      minimumPercentage: minimumPercentage)
 	}
 }
 
@@ -99,9 +99,9 @@ extension TransactionReviewTokenView.ViewState {
 extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
 		public let id: AccountAction
+		let account: TransactionReview.Account
 		let token: TransactionReviewTokenView.ViewState
 		let minimumPercentage: Double
-		let accountIfVisible: TransactionReview.Account?
 
 		var disablePlus: Bool {
 			minimumPercentage >= 100
@@ -122,10 +122,8 @@ extension TransactionReviewGuarantee {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				Card(verticalSpacing: 0) {
-					if let account = viewStore.accountIfVisible {
-						AccountLabel(account: account) {
-							viewStore.send(.copyAddressTapped)
-						}
+					AccountLabel(account: viewStore.account) {
+						viewStore.send(.copyAddressTapped)
 					}
 
 					TransactionReviewTokenView(viewState: viewStore.token)
