@@ -135,6 +135,88 @@ extension TransactionReviewGuarantee {
 	}
 }
 
+// MARK: - MinimumPercentageStepper
+public struct MinimumPercentageStepper: ReducerProtocol {
+	public struct State: Sendable, Hashable {
+		public var value: BigDecimal
+		var string: String
+
+		var isValid: Bool {
+			BigDecimal(validated: string) != nil
+		}
+
+		public init(value: BigDecimal) {
+			self.value = value
+			self.string = value.toString()
+		}
+	}
+
+	public enum Action: Sendable, Equatable {
+		case increaseTapped
+		case decreaseTapped
+		case stringEntered(String)
+	}
+
+	public init() {}
+
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+		switch action {
+		case .increaseTapped:
+			let value = (state.value + percentageDelta).clamped.withScale(1)
+			state.value = value
+			state.string = value.toString()
+
+			return .none
+
+		case .decreaseTapped:
+			let value = (state.value - percentageDelta).clamped.withScale(1)
+			state.value = value
+			state.string = value.toString()
+
+			return .none
+
+		case let .stringEntered(string):
+			state.string = string
+			if let value = BigDecimal(validated: string) {
+				state.value = value
+			}
+			return .none
+		}
+
+		return .none
+	}
+
+	private let percentageDelta: BigDecimal = 0.1
+}
+
+extension BigDecimal {
+	var clamped: BigDecimal {
+		max(min(self, 100), 0)
+	}
+
+	init?(validated string: String) {
+		guard let value = try? BigDecimal(fromString: string) else { return nil }
+		guard value >= 0, value <= 100 else { return nil }
+		self = value
+	}
+}
+
+extension MinimumPercentageStepper.State {
+	var validatedFromString: BigDecimal? {
+		guard let value = try? BigDecimal(fromString: string) else { return nil }
+		guard value >= 0, value <= 100 else { return nil }
+		return value
+	}
+
+	var disablePlus: Bool {
+		value >= 100
+	}
+
+	var disableMinus: Bool {
+		value <= 0
+	}
+}
+
 // MARK: - MinimumPercentageStepperView
 public struct MinimumPercentageStepperView: View {
 	public let store: StoreOf<MinimumPercentageStepper>
@@ -152,9 +234,10 @@ public struct MinimumPercentageStepperView: View {
 				.opacity(viewStore.disableMinus ? 0.2 : 1)
 				.disabled(viewStore.disableMinus)
 
-				Text("\(viewStore.value, specifier: "%.1f")")
+				TextField("", text: viewStore.binding(get: \.string, send: MinimumPercentageStepper.Action.stringEntered))
+					.keyboardType(.decimalPad)
 					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray1)
+					.foregroundColor(viewStore.isValid ? .app.gray1 : .app.alert)
 
 				Button(asset: AssetResource.plusCircle) {
 					viewStore.send(.increaseTapped)
@@ -163,54 +246,5 @@ public struct MinimumPercentageStepperView: View {
 				.disabled(viewStore.disablePlus)
 			}
 		}
-	}
-}
-
-extension MinimumPercentageStepper.State {
-	var disablePlus: Bool {
-		value >= 100
-	}
-
-	var disableMinus: Bool {
-		value <= 0
-	}
-}
-
-// MARK: - MinimumPercentageStepper
-public struct MinimumPercentageStepper: ReducerProtocol {
-	public struct State: Sendable, Hashable {
-		public var value: Double
-		var precision: Int = 3
-
-		public init(value: Double) {
-			self.value = value
-		}
-	}
-
-	public enum Action: Sendable, Equatable {
-		case increaseTapped
-		case decreaseTapped
-	}
-
-	public init() {}
-
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .increaseTapped:
-			state.updateMinimumPercentage(with: state.value + percentageDelta)
-			return .none
-
-		case .decreaseTapped:
-			state.updateMinimumPercentage(with: state.value - percentageDelta)
-			return .none
-		}
-	}
-
-	private let percentageDelta: Double = 0.1
-}
-
-extension MinimumPercentageStepper.State {
-	mutating func updateMinimumPercentage(with newPercentage: Double) {
-		value = max(min(newPercentage, 100), 0)
 	}
 }

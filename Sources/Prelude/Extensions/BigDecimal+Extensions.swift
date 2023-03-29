@@ -75,7 +75,7 @@ extension BigDecimal {
 		].joined(separator: decimalSeparatorMaybeAccordingToLocal)
 	}
 
-	/// The number as a Double, with the given precision
+	/// The number as a Double, with the given `precision`
 	public func toDouble(withPrecision precision: Int) throws -> Double {
 		let stringValue = toString(withPrecision: precision)
 		guard let doubleValue = Double(stringValue) else {
@@ -89,9 +89,14 @@ extension BigDecimal {
 		description
 	}
 
-	/// Computer readable string representaton with the given precision
+	/// Computer readable string representaton with the given `precision`
 	public func toString(withPrecision precision: Int) -> String {
 		withPrecision(precision).description
+	}
+
+	/// Computer readable string representaton with the given `scale`
+	public func toString(withScale scale: Int) -> String {
+		withScale(scale).description
 	}
 
 	public enum ConversionError: Error, CustomStringConvertible {

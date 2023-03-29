@@ -74,10 +74,8 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.account = account
 			self.transfer = transfer
 
-			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount,
-			   let minimumPercentage = try? (100 * guaranteed / transfer.action.amount).toDouble(withPrecision: 6)
-			{
-				self.percentageStepper = .init(value: minimumPercentage)
+			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount {
+				self.percentageStepper = .init(value: 100 * guaranteed / transfer.action.amount)
 			} else {
 				self.percentageStepper = .init(value: 100)
 			}
@@ -98,6 +96,13 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.percentageStepper, action: /Action.child .. /ChildAction.percentageStepper) {
+			MinimumPercentageStepper()
+		}
+		Reduce(core)
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .copyAddressTapped:
@@ -109,7 +114,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .percentageStepper:
-			guard let newMinimumDecimal = BigDecimal(state.percentageStepper.value * 0.01) else { return .none } // TODO: Handle?
+			let newMinimumDecimal = state.percentageStepper.value * 0.01
 			let newAmount = newMinimumDecimal * state.transfer.action.amount
 
 			state.transfer.guarantee?.amount = newAmount
