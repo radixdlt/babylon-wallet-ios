@@ -35,7 +35,7 @@ extension IntroductionToEntity {
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
-					VStack(alignment: .center, spacing: 30) {
+					VStack(spacing: .large2) {
 						switch viewStore.kind {
 						case .account: introToAccounts(with: viewStore)
 						case .identity: introToPersona(with: viewStore)
