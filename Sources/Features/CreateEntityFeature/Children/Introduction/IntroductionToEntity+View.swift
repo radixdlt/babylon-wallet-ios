@@ -65,7 +65,7 @@ extension IntroductionToEntity {
 		private func introToPersona(with viewStore: ViewStoreOf<IntroductionToEntity>) -> some SwiftUI.View {
 			// PLACEHOLDER until we get the correct icon.
 			Color.app.gray4
-				.frame(.huge)
+				.frame(width: 200, height: 200)
 				.cornerRadius(.small2)
 
 			Text(viewStore.titleText)
