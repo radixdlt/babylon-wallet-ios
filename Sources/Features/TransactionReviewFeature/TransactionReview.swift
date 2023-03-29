@@ -105,7 +105,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			let guarantees = state.allGuarantees
 			return .fireAndForget {
 				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
-				print("MANIFEST after:\n", manifest)
+				print("MANIFEST after:\n", manifest.description)
 			}
 
 		case .approveTapped:
