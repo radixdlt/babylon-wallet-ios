@@ -1,4 +1,4 @@
-import FeaturePrelude
+import SwiftUI
 
 extension SlideUpPanel.State {
 	var viewState: SlideUpPanel.ViewState {
