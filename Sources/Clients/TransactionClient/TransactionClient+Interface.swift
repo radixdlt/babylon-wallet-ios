@@ -12,18 +12,6 @@ public struct TransactionClient: Sendable, DependencyKey {
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
-	public struct Guarantee: Sendable, Hashable {
-		public var amount: BigDecimal
-		public var instructionIndex: UInt32
-		public var resourceAddress: ResourceAddress
-
-		public init(amount: BigDecimal, instructionIndex: UInt32, resourceAddress: ResourceAddress) {
-			self.amount = amount
-			self.instructionIndex = instructionIndex
-			self.resourceAddress = resourceAddress
-		}
-	}
-
 	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> (manifest: TransactionManifest, feeAdded: BigDecimal)
 	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
@@ -41,6 +29,21 @@ extension DependencyValues {
 }
 
 public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<Profile.Network.Account>>) async -> Profile.Network.Account
+
+// MARK: - TransactionClient.Guarantee
+extension TransactionClient {
+	public struct Guarantee: Sendable, Hashable {
+		public var amount: BigDecimal
+		public var instructionIndex: UInt32
+		public var resourceAddress: ResourceAddress
+
+		public init(amount: BigDecimal, instructionIndex: UInt32, resourceAddress: ResourceAddress) {
+			self.amount = amount
+			self.instructionIndex = instructionIndex
+			self.resourceAddress = resourceAddress
+		}
+	}
+}
 
 // MARK: - SignManifestRequest
 public struct SignManifestRequest: Sendable {
