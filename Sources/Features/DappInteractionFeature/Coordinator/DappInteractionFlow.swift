@@ -358,6 +358,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ state: inout State,
 			_ persona: Profile.Network.Persona
 		) -> EffectTask<Action> {
+			guard state.persona?.id == persona.id else {
+				return .none
+			}
 			state.persona = persona
 			for (request, response) in state.responseItems {
 				// NB: native case paths should simplify this mutation logic a lot
