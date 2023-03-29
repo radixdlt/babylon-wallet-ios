@@ -1,4 +1,5 @@
 import FeaturePrelude
+import GatewaySettingsFeature
 
 // MARK: - TransactionReviewGuarantees.View
 extension TransactionReviewGuarantees {
@@ -55,6 +56,14 @@ extension TransactionReviewGuarantees {
 						isEnabled: true,
 						action: { ViewStore(store).send(.view(.applyTapped)) }
 					)
+				}
+				.sheet(store: store.scope(state: \.$info, action: { .child(.info($0)) })) {
+					SlideUpPanel.View(store: $0)
+						.presentationDetents([.medium])
+						.presentationDragIndicator(.visible)
+					#if os(iOS)
+						.presentationBackground(.blur)
+					#endif
 				}
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
