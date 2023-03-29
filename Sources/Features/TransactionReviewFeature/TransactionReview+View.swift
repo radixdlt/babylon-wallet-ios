@@ -114,6 +114,9 @@ extension TransactionReview {
 				.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
 					TransactionReviewGuarantees.View(store: childStore)
 				}
+				.sheet(store: store.scope(state: \.$rawTransaction) { .child(.rawTransaction($0)) }) { childStore in
+					TransactionReviewRawTransaction.View(store: childStore)
+				}
 				.safeAreaInset(edge: .bottom, spacing: .zero) {
 					ConfirmationFooter(
 						title: L10n.TransactionSigning.signTransactionButtonTitle,
