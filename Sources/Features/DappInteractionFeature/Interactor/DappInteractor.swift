@@ -24,7 +24,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
 			case cancelButtonTapped(P2P.RTCIncomingWalletInteraction)
-			case retryButtonTapped(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?)
+			case retryButtonTapped(P2P.RTCOutgoingMessage)
 		}
 	}
 
@@ -90,8 +90,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .presented(.cancelButtonTapped(request)):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return .send(.internal(.presentQueuedRequestIfNeeded))
-			case let .presented(.retryButtonTapped(response, request, dappMetadata)):
-				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
+			case let .presented(.retryButtonTapped(response)):
+				return sendResponseToDappEffect(response)
 			}
 		case .moveToBackground:
 			return .fireAndForget {
@@ -121,6 +121,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
+
 		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
 			dismissCurrentModalAndRequest(request, for: &state)
 			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
@@ -132,7 +133,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
 						TextState(L10n.DApp.Response.FailureAlert.cancelButtonTitle)
 					}
-					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
+					ButtonState(action: .retryButtonTapped(response)) {
 						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)
 					}
 				},
@@ -158,10 +159,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submitAndDismiss(responseToDapp, dappMetadata)))))):
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp)))))):
 			let response = request.toOutgoingMessage(responseToDapp)
-			return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
-
+			return sendResponseToDappEffect(response)
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
+			dismissCurrentModalAndRequest(request, for: &state)
+			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
@@ -182,15 +185,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func sendResponseToDappEffect(
-		_ response: P2P.RTCOutgoingMessage,
-		for request: P2P.RTCIncomingWalletInteraction,
-		dappMetadata: DappMetadata?
+		_ response: P2P.RTCOutgoingMessage
 	) -> EffectTask<Action> {
-		.run { send in
+		.run { _ in
 			_ = try await radixConnectClient.sendMessage(response)
-			await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
-		} catch: { error, send in
-			await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
+		} catch: { _, _ in
+			// await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
 		}
 	}
 

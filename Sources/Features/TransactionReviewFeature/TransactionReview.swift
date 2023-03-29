@@ -60,11 +60,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case signTransactionResult(TransactionResult)
 		case rawTransactionCreated(String)
+		case transactionPollingResult(TransactionResult)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
+		case transactionCompleted(TransactionIntent.TXID)
 	}
 
 	@Dependency(\.transactionClient) var transactionClient
@@ -219,8 +221,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .signTransactionResult(.success(txID)):
-			state.isSigningTX = false
-			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+			return .run { send in
+				await send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+
+				await send(.internal(.transactionPollingResult(
+					transactionClient.getTransactionResult(txID)
+				)))
+			}
 
 		case let .signTransactionResult(.failure(transactionFailure)):
 			state.isSigningTX = false
@@ -228,6 +235,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(error)))
+
+		case let .transactionPollingResult(.success(txID)):
+			state.isSigningTX = false
+			return .send(.delegate(.transactionCompleted(txID)))
+
+		case let .transactionPollingResult(.failure(error)):
+			return .send(.delegate(.failed(error)))
+
+//		case .previewLoaded(.failure):
+//			return .send(.delegate(.failed(.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid))))
 
 		case let .rawTransactionCreated(transaction):
 			state.rawTransaction = .init(transaction: transaction)

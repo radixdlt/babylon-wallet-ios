@@ -7,6 +7,7 @@ extension TransactionClient: TestDependencyKey {
 		addLockFeeInstructionToManifest: unimplemented("\(Self.self).addLockFeeInstructionToManifest"),
 		addGuaranteesToManifest: unimplemented("\(Self.self).addLockFeeInstructionToManifest"),
 		signAndSubmitTransaction: unimplemented("\(Self.self).signAndSubmitTransaction"),
+		getTransactionResult: unimplemented("\(Self.self).getTransactionResult"),
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview")
 	)
 }

@@ -152,8 +152,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dismiss(P2P.ToDapp.WalletInteractionFailureResponse)
-		case submit(P2P.ToDapp.WalletInteractionSuccessResponse, DappMetadata)
+		case dismissWithFailure(P2P.ToDapp.WalletInteractionFailureResponse)
+		case dismissWithSuccess(DappMetadata)
+		case submit(P2P.ToDapp.WalletInteractionSuccessResponse)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -462,6 +463,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return handleSignAndSubmitTX(item, txID)
 
 		case
+			.root(.relay(_, .reviewTransaction(.delegate(.transactionCompleted)))),
+			.path(.element(_, .relay(_, .reviewTransaction(.delegate(.transactionCompleted))))):
+
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata)))
+
+		case
 			let .root(.relay(_, .reviewTransaction(.delegate(.failed(error))))),
 			let .path(.element(_, .relay(_, .reviewTransaction(.delegate(.failed(error)))))):
 			return handleSignAndSubmitTXFailed(error)
@@ -656,7 +663,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 					}
 
-					await send(.delegate(.submit(response, state.dappMetadata)))
+					await send(.delegate(.submit(response)))
 				}
 			} else {
 				return .none // TODO: throw error (invalid response format)
@@ -675,7 +682,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType,
 		message: String?
 	) -> EffectTask<Action> {
-		.send(.delegate(.dismiss(.init(
+		.send(.delegate(.dismissWithFailure(.init(
 			interactionId: state.remoteInteraction.id,
 			errorType: errorKind,
 			message: message

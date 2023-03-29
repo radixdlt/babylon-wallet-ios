@@ -178,10 +178,6 @@ extension TransactionClient {
 		func submitNotarizedTX(
 			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
 		) async -> Result<TXID, SubmitTXFailure> {
-			@Dependency(\.continuousClock) var clock
-
-			// MARK: Submit TX
-
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 				notarizedTransactionHex: Data(compiledNotarizedTXIntent.compiledIntent).hex
 			)
@@ -198,8 +194,12 @@ extension TransactionClient {
 				return .failure(.invalidTXWasDuplicate(txID: txID))
 			}
 
-			// MARK: Poll Status
+			return .success(txID)
+		}
 
+		@Sendable
+		func getTransactionResult(_ txID: TXID) async -> TransactionResult {
+			@Dependency(\.continuousClock) var clock
 			var txStatus: GatewayAPI.TransactionStatus = .pending
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
@@ -219,15 +219,15 @@ extension TransactionClient {
 					txStatus = try await pollTransactionStatus()
 				} catch {
 					// FIXME: - mainnet: improve handling of polling failure, should probably not return failure..
-					return .failure(.failedToPollTX(txID: txID, error: .init(error: error)))
+					return .failure(.failedToPoll(.failedToPollTX(txID: txID, error: .init(error: error))))
 				}
 
 				if pollCount >= pollStrategy.maxPollTries {
-					return .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))
+					return .failure(.failedToPoll(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount))))
 				}
 			}
 			guard txStatus == .committedSuccess else {
-				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed))
+				return .failure(.failedToPoll(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed)))
 			}
 
 			return .success(txID)
@@ -570,6 +570,7 @@ extension TransactionClient {
 			addLockFeeInstructionToManifest: addLockFeeInstructionToManifest,
 			addGuaranteesToManifest: addGuaranteesToManifest,
 			signAndSubmitTransaction: signAndSubmitTransaction,
+			getTransactionResult: getTransactionResult,
 			getTransactionReview: getTransactionPreview
 		)
 	}
@@ -624,18 +625,9 @@ struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
 }
 
 // MARK: - SubmitTXFailure
-// FIXME: - mainnet: improve handling of polling failure
-/// This failure might be a false positive, due to i.e. POLLING of tx failed, but TX might have
-/// been submitted successfully. Or we might have successfully submitted the TX but failed to get details about it.
 public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 	case failedToSubmitTX
 	case invalidTXWasDuplicate(txID: TXID)
-
-	/// Failed to poll, maybe TX was submitted successfully?
-	case failedToPollTX(txID: TXID, error: FailedToPollError)
-
-	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
-	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: TXFailureStatus)
 
 	public var errorDescription: String? {
 		switch self {
@@ -643,6 +635,18 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 			return "Failed to submit transaction"
 		case let .invalidTXWasDuplicate(txID):
 			return "Duplicate TX id: \(txID)"
+		}
+	}
+}
+
+// MARK: - TransacitonPollingFailure
+public enum TransacitonPollingFailure: Sendable, LocalizedError, Equatable {
+	case failedToPollTX(txID: TXID, error: FailedToPollError)
+	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
+	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: TXFailureStatus)
+
+	public var errorDescription: String? {
+		switch self {
 		case let .failedToPollTX(txID, error):
 			return "\(error.localizedDescription) txID: \(txID)"
 		case let .failedToGetTransactionStatus(txID, error):

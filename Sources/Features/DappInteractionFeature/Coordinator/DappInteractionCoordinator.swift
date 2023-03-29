@@ -37,7 +37,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submitAndDismiss(P2P.ToDapp.WalletInteractionResponse, DappMetadata? = nil)
+		case submit(P2P.ToDapp.WalletInteractionResponse)
+		case dismiss(DappMetadata? = nil)
 	}
 
 	var body: some ReducerProtocolOf<Self> {
@@ -65,7 +66,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case let .malformedInteractionErrorAlert(.presented(action)):
 			switch action {
 			case .okButtonTapped:
-				return .send(.delegate(.submitAndDismiss(.failure(.init(
+				return .send(.delegate(.submit(.failure(.init(
 					interactionId: state.interaction.id,
 					errorType: .rejectedByUser,
 					message: nil
@@ -94,15 +95,19 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			}
 			return .none
 		case .loading(.delegate(.dismiss)):
-			return .send(.delegate(.submitAndDismiss(.failure(.init(
+			return .send(.delegate(.submit(.failure(.init(
 				interactionId: state.interaction.id,
 				errorType: .rejectedByUser,
 				message: nil
 			)))))
-		case let .flow(.delegate(.dismiss(error))):
-			return .send(.delegate(.submitAndDismiss(.failure(error))))
-		case let .flow(.delegate(.submit(response, dappMetadata))):
-			return .send(.delegate(.submitAndDismiss(.success(response), dappMetadata)))
+		case let .flow(.delegate(.dismissWithFailure(error))):
+			return .send(.delegate(.submit(.failure(error))))
+
+		case let .flow(.delegate(.dismissWithSuccess(dappMetadata))):
+			return .send(.delegate(.dismiss(dappMetadata)))
+
+		case let .flow(.delegate(.submit(response))):
+			return .send(.delegate(.submit(.success(response))))
 		default:
 			return .none
 		}
