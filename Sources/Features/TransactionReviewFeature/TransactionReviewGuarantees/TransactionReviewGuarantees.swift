@@ -65,7 +65,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public let account: TransactionReview.Account
 
 		public var transfer: TransactionReview.Transfer
-		public var minimumPercentage: Double
+		public var percentageStepper: MinimumPercentageStepper.State
 
 		public init(
 			account: TransactionReview.Account,
@@ -77,17 +77,19 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount,
 			   let minimumPercentage = try? (100 * guaranteed / transfer.action.amount).toDouble(withPrecision: 6)
 			{
-				self.minimumPercentage = minimumPercentage
+				self.percentageStepper = .init(value: minimumPercentage)
 			} else {
-				self.minimumPercentage = 100
+				self.percentageStepper = .init(value: 100)
 			}
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case copyAddressTapped
-		case increaseTapped
-		case decreaseTapped
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case percentageStepper(MinimumPercentageStepper.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -101,26 +103,18 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		case .copyAddressTapped:
 			pasteboardClient.copyString(state.account.address.address)
 			return .none
-
-		case .increaseTapped:
-			state.updateMinimumPercentage(with: state.minimumPercentage + percentageDelta)
-			return .none
-
-		case .decreaseTapped:
-			state.updateMinimumPercentage(with: state.minimumPercentage - percentageDelta)
-			return .none
 		}
 	}
 
-	private let percentageDelta: Double = 0.1
-}
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .percentageStepper:
+			guard let newMinimumDecimal = BigDecimal(state.percentageStepper.value * 0.01) else { return .none } // TODO: Handle?
+			let newAmount = newMinimumDecimal * state.transfer.action.amount
 
-extension TransactionReviewGuarantee.State {
-	mutating func updateMinimumPercentage(with newPercentage: Double) {
-		minimumPercentage = max(min(newPercentage, 100), 0)
-		guard let newMinimumDecimal = BigDecimal(minimumPercentage * 0.01) else { return } // TODO: Handle?
+			state.transfer.guarantee?.amount = newAmount
 
-		let newAmount = newMinimumDecimal * transfer.action.amount
-		transfer.guarantee?.amount = newAmount
+			return .none
+		}
 	}
 }

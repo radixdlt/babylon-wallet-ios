@@ -78,10 +78,7 @@ extension TransactionReviewGuarantees {
 
 extension TransactionReviewGuarantee.State {
 	var viewState: TransactionReviewGuarantee.ViewState {
-		.init(id: id,
-		      account: account,
-		      token: .init(transfer: transfer),
-		      minimumPercentage: minimumPercentage)
+		.init(id: id, account: account, token: .init(transfer: transfer))
 	}
 }
 
@@ -100,15 +97,6 @@ extension TransactionReviewGuarantee {
 		public let id: AccountAction
 		let account: TransactionReview.Account
 		let token: TransactionReviewTokenView.ViewState
-		let minimumPercentage: Double
-
-		var disablePlus: Bool {
-			minimumPercentage >= 100
-		}
-
-		var disableMinus: Bool {
-			minimumPercentage <= 0
-		}
 	}
 
 	public struct View: SwiftUI.View {
@@ -137,25 +125,92 @@ extension TransactionReviewGuarantee {
 
 						Spacer(minLength: 0)
 
-						Button(asset: AssetResource.minusCircle) {
-							viewStore.send(.decreaseTapped)
-						}
-						.opacity(viewStore.disableMinus ? 0.2 : 1)
-						.disabled(viewStore.disableMinus)
-
-						Text("\(viewStore.minimumPercentage, specifier: "%.1f")")
-							.textStyle(.body2Regular)
-							.foregroundColor(.app.gray1)
-
-						Button(asset: AssetResource.plusCircle) {
-							viewStore.send(.increaseTapped)
-						}
-						.opacity(viewStore.disablePlus ? 0.2 : 1)
-						.disabled(viewStore.disablePlus)
+						let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
+						MinimumPercentageStepperView(store: stepperStore)
 					}
 					.padding(.medium3)
 				}
 			}
 		}
+	}
+}
+
+// MARK: - MinimumPercentageStepperView
+public struct MinimumPercentageStepperView: View {
+	public let store: StoreOf<MinimumPercentageStepper>
+
+	public init(store: StoreOf<MinimumPercentageStepper>) {
+		self.store = store
+	}
+
+	public var body: some View {
+		WithViewStore(store, observe: { $0 }) { viewStore in
+			HStack(spacing: .medium3) {
+				Button(asset: AssetResource.minusCircle) {
+					viewStore.send(.decreaseTapped)
+				}
+				.opacity(viewStore.disableMinus ? 0.2 : 1)
+				.disabled(viewStore.disableMinus)
+
+				Text("\(viewStore.value, specifier: "%.1f")")
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray1)
+
+				Button(asset: AssetResource.plusCircle) {
+					viewStore.send(.increaseTapped)
+				}
+				.opacity(viewStore.disablePlus ? 0.2 : 1)
+				.disabled(viewStore.disablePlus)
+			}
+		}
+	}
+}
+
+extension MinimumPercentageStepper.State {
+	var disablePlus: Bool {
+		value >= 100
+	}
+
+	var disableMinus: Bool {
+		value <= 0
+	}
+}
+
+// MARK: - MinimumPercentageStepper
+public struct MinimumPercentageStepper: ReducerProtocol {
+	public struct State: Sendable, Hashable {
+		public var value: Double
+		var precision: Int = 3
+
+		public init(value: Double) {
+			self.value = value
+		}
+	}
+
+	public enum Action: Sendable, Equatable {
+		case increaseTapped
+		case decreaseTapped
+	}
+
+	public init() {}
+
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+		switch action {
+		case .increaseTapped:
+			state.updateMinimumPercentage(with: state.value + percentageDelta)
+			return .none
+
+		case .decreaseTapped:
+			state.updateMinimumPercentage(with: state.value - percentageDelta)
+			return .none
+		}
+	}
+
+	private let percentageDelta: Double = 0.1
+}
+
+extension MinimumPercentageStepper.State {
+	mutating func updateMinimumPercentage(with newPercentage: Double) {
+		value = max(min(newPercentage, 100), 0)
 	}
 }
