@@ -81,8 +81,8 @@ extension TransactionReviewDappsUsed {
 					Text(L10n.TransactionReview.usingDappsHeading)
 						.textStyle(.body1Header)
 						.foregroundColor(.app.gray2)
-					// Image(asset: viewStore.isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
-					Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+					Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
+						.renderingMode(.original)
 				}
 			}
 		}
