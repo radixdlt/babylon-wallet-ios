@@ -20,7 +20,6 @@ extension TransactionReview.State {
 			message: transaction.message,
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositingHeading: depositing != nil,
-			showCustomizeGuaranteesButton: true,
 			viewControlState: viewControlState
 		)
 	}
@@ -42,7 +41,6 @@ extension TransactionReview {
 		let message: String?
 		let isExpandedDappUsed: Bool
 		let showDepositingHeading: Bool
-		let showCustomizeGuaranteesButton: Bool
 		let viewControlState: ControlState
 	}
 
