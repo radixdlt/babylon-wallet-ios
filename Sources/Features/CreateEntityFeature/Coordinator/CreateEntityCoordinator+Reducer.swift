@@ -26,7 +26,7 @@ public struct CreateEntityCoordinator<
 		public init(
 			step: Step? = nil,
 			config: CreateEntityConfig,
-			displayIntroduction: (CreateEntityConfig) -> Bool
+			displayIntroduction: (CreateEntityConfig) -> Bool = { _ in false }
 		) {
 			self.config = config
 			if let step {
