@@ -1,5 +1,4 @@
 import FeaturePrelude
-import GatewaySettingsFeature
 
 // MARK: - TransactionReviewGuarantees
 public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
