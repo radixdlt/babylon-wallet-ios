@@ -23,7 +23,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var rawTransaction: TransactionReviewRawTransaction.State? = nil
 
-		public var isSigningTX: Bool = false
+		public var isProcessingTransaction: Bool = false
 
 		public init(
 			transactionManifest: TransactionManifest,
@@ -121,7 +121,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 
-			state.isSigningTX = true
+			state.isProcessingTransaction = true
 			let guarantees = state.allGuarantees
 
 			return .run { send in
@@ -230,21 +230,22 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 		case let .signTransactionResult(.failure(transactionFailure)):
-			state.isSigningTX = false
+			state.isProcessingTransaction = false
 			return .send(.delegate(.failed(transactionFailure)))
 
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(error)))
 
+//		case .previewLoaded(.failure):
+//			return .send(.delegate(.failed(.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid))))
+
 		case let .transactionPollingResult(.success(txID)):
-			state.isSigningTX = false
+			state.isProcessingTransaction = false
 			return .send(.delegate(.transactionCompleted(txID)))
 
 		case let .transactionPollingResult(.failure(error)):
+			state.isProcessingTransaction = false
 			return .send(.delegate(.failed(error)))
-
-//		case .previewLoaded(.failure):
-//			return .send(.delegate(.failed(.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid))))
 
 		case let .rawTransactionCreated(transaction):
 			state.rawTransaction = .init(transaction: transaction)

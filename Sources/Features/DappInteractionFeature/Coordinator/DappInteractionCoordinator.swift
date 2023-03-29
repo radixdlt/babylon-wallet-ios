@@ -102,13 +102,12 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			)))))
 		case let .flow(.delegate(.dismissWithFailure(error))):
 			return .send(.delegate(.submit(.failure(error))))
-                                // .concatenate(with: .send(.delegate(.dismiss())))
 
 		case let .flow(.delegate(.dismissWithSuccess(dappMetadata))):
 			return .send(.delegate(.dismiss(dappMetadata)))
 
 		case let .flow(.delegate(.submit(response, dappMetadata))):
-			return .send(.delegate(.submit(.success(response))))
+			return .send(.delegate(.submit(.success(response), dappMetadata)))
 		default:
 			return .none
 		}
