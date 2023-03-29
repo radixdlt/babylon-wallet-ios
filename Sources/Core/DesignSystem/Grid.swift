@@ -36,6 +36,9 @@ extension Grid {
 }
 
 extension CGFloat {
+	/// 40
+	public static let guaranteeAccountLabelHeight: Self = 40
+
 	/// 50
 	public static let navigationBarHeight: Self = 50
 

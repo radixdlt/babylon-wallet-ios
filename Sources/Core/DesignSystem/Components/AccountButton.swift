@@ -17,7 +17,7 @@ public struct AccountButton: View {
 
 	public var body: some View {
 		Button(action: action) {
-			AccountLabel(accountName, address: address, gradient: gradient)
+			AccountLabel(accountName, address: address, gradient: gradient, height: .standardButtonHeight)
 				.cornerRadius(.small2)
 		}
 		.buttonStyle(DarkenWhenPressed())
@@ -38,12 +38,14 @@ public struct AccountLabel: View {
 	let accountName: String
 	let address: String
 	let gradient: Gradient
+	let height: CGFloat
 	let copyAction: (() -> Void)?
 
-	public init(_ accountName: String, address: String, gradient: Gradient, copyAction: (() -> Void)? = nil) {
+	public init(_ accountName: String, address: String, gradient: Gradient, height: CGFloat, copyAction: (() -> Void)? = nil) {
 		self.accountName = accountName
 		self.address = address
 		self.gradient = gradient
+		self.height = height
 		self.copyAction = copyAction
 	}
 
@@ -57,7 +59,7 @@ public struct AccountLabel: View {
 				.foregroundColor(.app.whiteTransparent)
 		}
 		.padding(.horizontal, .medium3)
-		.frame(height: .standardButtonHeight)
+		.frame(height: height)
 		.background {
 			LinearGradient(gradient: gradient, startPoint: .leading, endPoint: .trailing)
 		}
