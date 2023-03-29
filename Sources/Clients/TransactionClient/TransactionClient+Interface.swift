@@ -12,7 +12,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
-	public struct Guarantee {
+	public struct Guarantee: Sendable, Hashable {
 		public var amount: BigDecimal
 		public var instructionIndex: UInt32
 		public var resourceAddress: ResourceAddress
