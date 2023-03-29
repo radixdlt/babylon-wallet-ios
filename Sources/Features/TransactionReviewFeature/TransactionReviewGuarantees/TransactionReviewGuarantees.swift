@@ -44,8 +44,8 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .infoTapped:
-			state.info = .init(title: L10n.TransactionReview.Guarantees.explanationTitle,
-			                   explanation: L10n.TransactionReview.Guarantees.explanationText)
+//			state.info = .init(title: L10n.TransactionReview.Guarantees.explanationTitle,
+//			                   explanation: L10n.TransactionReview.Guarantees.explanationText)
 			return .none
 
 		case .applyTapped:
