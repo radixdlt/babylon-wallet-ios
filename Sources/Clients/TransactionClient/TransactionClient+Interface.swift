@@ -79,7 +79,7 @@ public struct ManifestReviewRequest: Sendable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
-	public let analizedManifestToReview: AnalyzeManifestWithPreviewContextResponse
+	public let analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse
 	public let manifestIncludingLockFee: TransactionManifest
 	public let transactionFeeAdded: BigDecimal
 }

@@ -335,12 +335,12 @@ extension TransactionClient {
 				transactionReceipt: receiptBytes
 			)
 
-			let analizedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
+			let analyzedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
 
 			let (manifestIncludingLockFee, transactionFeeAdded) = try await addLockFeeInstructionToManifest(request.manifestToSign)
 
 			return TransactionToReview(
-				analizedManifestToReview: analizedManifestToReview,
+				analyzedManifestToReview: analyzedManifestToReview,
 				manifestIncludingLockFee: manifestIncludingLockFee,
 				transactionFeeAdded: transactionFeeAdded
 			)

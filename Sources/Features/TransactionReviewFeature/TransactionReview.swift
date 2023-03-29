@@ -113,7 +113,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			let guarantees = state.allGuarantees
 			return .run { send in
 				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
-				print("MANIFEST after:\n", manifest.description)
 				await send(.internal(.rawTransactionCreated(manifest.description)))
 			}
 
@@ -144,9 +143,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .depositing(.delegate(.showCustomizeGuarantees)):
-
-//			let depositing = TransactionReviewAccounts.State(accounts: [.mockDeposit1, .mockDeposit2], showCustomizeGuarantees: true)
-
 			guard let depositing = state.depositing else { return .none } // TODO: Handle?
 
 			let guarantees = depositing.accounts
@@ -197,7 +193,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .previewLoaded(.success(review)):
-			let reviewedManifest = review.analizedManifestToReview
+			let reviewedManifest = review.analyzedManifestToReview
 			state.transactionWithLockFee = review.manifestIncludingLockFee
 			return .run { send in
 				// TODO: Determine what is the minimal information required
