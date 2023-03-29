@@ -29,29 +29,35 @@ extension IntroductionToEntity {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
-				VStack(alignment: .center, spacing: 30) {
-					switch viewStore.kind {
-					case .account: introToAccounts(with: viewStore)
-					case .identity: introToPersona(with: viewStore)
+			WithViewStore(
+				store,
+				observe: IntroductionToEntity.ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				ScrollView {
+					VStack(alignment: .center, spacing: 30) {
+						switch viewStore.kind {
+						case .account: introToAccounts(with: viewStore)
+						case .identity: introToPersona(with: viewStore)
+						}
 					}
-
+					.multilineTextAlignment(.center)
+					.padding(.horizontal, .large1)
+					.padding(.bottom, .medium2)
+				}
+				.footer {
 					Button(L10n.CreateEntity.Introduction.Button.continue) {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.padding(.horizontal, .large1)
-				.multilineTextAlignment(.center)
 				.onAppear { viewStore.send(.appeared) }
 				.sheet(
 					store: store.scope(
 						state: \.$infoPanel,
 						action: { .child(.infoPanel($0)) }
 					),
-					content: {
-						SlideUpPanel.View(store: $0)
-					}
+					content: { SlideUpPanel.View(store: $0) }
 				)
 			}
 		}
@@ -100,12 +106,17 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - IntroductionToEntity_Preview
 struct IntroductionToEntity_Preview: PreviewProvider {
 	static var previews: some View {
-		IntroductionToEntity<Profile.Network.Persona>.View(
-			store: .init(
-				initialState: .init(),
-				reducer: IntroductionToEntity()
+		NavigationStack {
+			IntroductionToEntity<Profile.Network.Persona>.View(
+				store: .init(
+					initialState: .init(),
+					reducer: IntroductionToEntity()
+				)
 			)
-		)
+			#if os(iOS)
+			.toolbar(.visible, for: .navigationBar)
+			#endif
+		}
 	}
 }
 #endif
