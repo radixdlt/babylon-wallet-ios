@@ -76,7 +76,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			reducer: TransactionSigning()
 		) {
 			$0.gatewaysClient.getCurrentGateway = { .nebunet }
-			$0.transactionClient.addLockFeeInstructionToManifest = { [self] _ in mockManifestWithLockFee }
+			$0.transactionClient.addLockFeeInstructionToManifest = { [self] _ in (mockManifestWithLockFee, 10) }
 			$0.errorQueue.schedule = { _ in }
 		}
 
