@@ -93,6 +93,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .createPersonaCoordinator(.presented(.delegate(.completed))):
+			state.isFirstPersonaOnAnyNetwork = false
 			return loadPersonas()
 
 		default:

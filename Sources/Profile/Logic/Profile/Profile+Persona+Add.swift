@@ -32,7 +32,10 @@ extension Profile {
 	}
 
 	public func hasAnyPersonaOnAnyNetwork() -> Bool {
-		networks.values.map(\.personas.isEmpty).reduce(into: false) { $0 = $0 || $1 }
+		networks.values
+			.map(\.personas.isEmpty)
+			.map { !$0 } // NOT isEmpty <=> has persona on network
+			.reduce(into: false) { $0 = $0 || $1 }
 	}
 }
 

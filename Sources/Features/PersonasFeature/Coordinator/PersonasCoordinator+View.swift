@@ -19,19 +19,13 @@ extension PersonasCoordinator {
 				)
 			)
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
-			.sheet(store: store.scope(
-				state: \.$createPersonaCoordinator,
-				action: { .child(.createPersonaCoordinator($0)) }
-			),
-			content: { CreatePersonaCoordinator.View(store: $0) })
-
-			//                IfLetStore(
-			//                    store.scope(
-			//                        state: \.createPersonaCoordinator,
-			//                        action: { .child(.createPersonaCoordinator($0)) }
-			//                    ),
-			//                    then: { CreatePersonaCoordinator.View(store: $0) }
-			//                )
+			.sheet(
+				store: store.scope(
+					state: \.$createPersonaCoordinator,
+					action: { .child(.createPersonaCoordinator($0)) }
+				),
+				content: { CreatePersonaCoordinator.View(store: $0) }
+			)
 		}
 	}
 }

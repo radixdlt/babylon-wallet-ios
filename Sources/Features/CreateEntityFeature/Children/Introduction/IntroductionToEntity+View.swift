@@ -47,6 +47,15 @@ extension IntroductionToEntity {
 				.padding(.horizontal, .large1)
 				.multilineTextAlignment(.center)
 				.onAppear { viewStore.send(.appeared) }
+				.sheet(
+					store: store.scope(
+						state: \.$infoPanel,
+						action: { .child(.infoPanel($0)) }
+					),
+					content: {
+						SlideUpPanel.View(store: $0)
+					}
+				)
 			}
 		}
 

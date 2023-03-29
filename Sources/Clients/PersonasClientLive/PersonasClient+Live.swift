@@ -29,10 +29,7 @@ extension PersonasClient: DependencyKey {
 				}
 			},
 			hasAnyPersonaOnAnyNetwork: {
-				// FIXME: !!! stop using hard coding!
-				loggerGlobal.critical("BEFORE RELEASE STOP HARDCODING for 'isFirstPersonaOnAnyNetwork'")
-				return false
-//				await getProfileStore().profile.hasAnyPersonaOnAnyNetwork()
+				await getProfileStore().profile.hasAnyPersonaOnAnyNetwork()
 			}
 		)
 	}
