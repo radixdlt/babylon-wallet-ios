@@ -225,12 +225,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	public func addingGuarantees(to manifest: TransactionManifest, accounts: [TransactionReviewAccount.State]?) async throws -> TransactionManifest {
-		let guarantees = accounts?
-			.flatMap { $0.transfers.compactMap(\.guarantee) }
-			.map {
-				TransactionClient.Guarantee(amount: $0.amount, instructionIndex: $0.instructionIndex, resourceAddress: $0.resourceAddress)
-			}
-
+		let guarantees = accounts?.flatMap { $0.transfers.compactMap(\.guarantee) }
 		guard let guarantees, !guarantees.isEmpty else { return manifest }
 
 		return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
@@ -340,7 +335,7 @@ extension TransactionReview {
 				amount: amount
 			)
 
-			let guarantee: TransactionReview.Guarantee? = {
+			let guarantee: TransactionClient.Guarantee? = {
 				if case let .estimated(instructionIndex) = type, addressKind == .fungibleResource {
 					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 				}
@@ -444,24 +439,18 @@ extension TransactionReview {
 		public var id: AccountAction { action }
 
 		public let action: AccountAction
-		public var guarantee: Guarantee?
+		public var guarantee: TransactionClient.Guarantee?
 		public var metadata: ResourceMetadata
 
 		public init(
 			action: AccountAction,
-			guarantee: Guarantee? = nil,
+			guarantee: TransactionClient.Guarantee? = nil,
 			metadata: ResourceMetadata
 		) {
 			self.action = action
 			self.guarantee = guarantee
 			self.metadata = metadata
 		}
-	}
-
-	public struct Guarantee: Sendable, Hashable {
-		public var amount: BigDecimal
-		public var instructionIndex: UInt32
-		public var resourceAddress: ResourceAddress
 	}
 
 	public struct ResourceMetadata: Sendable, Hashable {
@@ -485,7 +474,7 @@ extension TransactionReview {
 }
 
 extension TransactionReview.State {
-	mutating func applyGuarantee(_ updated: TransactionReview.Guarantee, transferID: TransactionReview.Transfer.ID) {
+	mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
 
 		depositing?
