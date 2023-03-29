@@ -9,6 +9,7 @@ public struct PersonasClient: Sendable {
 	public var createUnsavedVirtualPersona: CreateUnsavedVirtualPersona
 	public var saveVirtualPersona: SaveVirtualPersona
 	public var hasAnyPersonaOnAnyNetwork: HasAnyPersonaOnAnyNetworks
+
 	public init(
 		getPersonas: @escaping GetPersonas,
 		updatePersona: @escaping UpdatePersona,
