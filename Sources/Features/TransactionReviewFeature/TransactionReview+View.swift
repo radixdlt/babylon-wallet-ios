@@ -139,9 +139,6 @@ extension TransactionReview {
 						.padding(.top, .medium2)
 				}
 
-				Separator()
-					.padding(.bottom, .medium1)
-
 				if showDepositingHeading {
 					TransactionHeading(L10n.TransactionReview.depositingHeading)
 						.padding(.bottom, .small2)
@@ -178,9 +175,14 @@ struct TransactionPresentingView: View {
 				Button {
 					tapPresenterAction(presenter.id)
 				} label: {
-					HStack(spacing: .small1) {
+					HStack(spacing: 0) {
 						DappPlaceholder(size: .smallest)
-//						Text(presenter.name)
+						if let name = presenter.metadata?.name {
+							Text(name)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.app.gray1)
+								.padding(.leading, .small1)
+						}
 						Spacer(minLength: 0)
 					}
 				}
