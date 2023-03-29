@@ -140,6 +140,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			return .none
 
 		case .destination(.presented(.createPersona(.delegate(.completed)))):
+			state.isFirstPersonaOnAnyNetwork = false
 			return loadPersonasEffect()
 
 		default:

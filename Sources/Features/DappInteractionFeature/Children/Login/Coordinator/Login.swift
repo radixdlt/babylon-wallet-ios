@@ -123,6 +123,7 @@ struct Login: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .createPersonaCoordinator(.presented(.delegate(.completed))):
+			state.isFirstPersonaOnAnyNetwork = false
 			return loadPersonas(state: &state)
 
 		default:
