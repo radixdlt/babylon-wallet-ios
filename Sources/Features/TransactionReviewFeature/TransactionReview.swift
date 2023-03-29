@@ -280,11 +280,11 @@ extension TransactionReview {
 	private func extractDappsInfo(_ addresses: [String]) async throws -> [Dapp] {
 		var dapps: [Dapp] = []
 		for address in addresses {
-			let metadata = try await gatewayAPIClient.getEntityMetadata(address)
+			let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
 			dapps.append(
 				Dapp(
 					id: address,
-					metadata: .init(name: metadata.name ?? "Unknown", thumbnail: nil, description: metadata.description)
+					metadata: .init(name: metadata?.name ?? "Unknown", thumbnail: nil, description: metadata?.description)
 				)
 			)
 		}
@@ -325,7 +325,7 @@ extension TransactionReview {
 	) async throws {
 		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
 		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
-			let metadata = try await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
 			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
 			let action = AccountAction(
 				componentAddress: componentAddress,
@@ -341,7 +341,7 @@ extension TransactionReview {
 			}()
 
 			let resourceMetadata = ResourceMetadata(
-				name: metadata.symbol ?? metadata.name,
+				name: metadata?.symbol ?? metadata?.name ?? "Unknown",
 				thumbnail: nil,
 				type: addressKind.resourceType
 			)
