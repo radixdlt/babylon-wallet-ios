@@ -9,6 +9,8 @@ struct Login: Sendable, FeatureReducer {
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 
+		var hasAnyPersonaOnAnyNetwork: Bool? = nil
+
 		var personas: IdentifiedArrayOf<PersonaRow.State> = []
 		var authorizedDapp: Profile.Network.AuthorizedDapp?
 		var authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?
@@ -20,10 +22,12 @@ struct Login: Sendable, FeatureReducer {
 
 		init(
 			dappDefinitionAddress: DappDefinitionAddress,
-			dappMetadata: DappMetadata
+			dappMetadata: DappMetadata,
+			hasAnyPersonaOnAnyNetwork: Bool? = nil
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
+			self.hasAnyPersonaOnAnyNetwork = hasAnyPersonaOnAnyNetwork
 		}
 	}
 
@@ -36,6 +40,7 @@ struct Login: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>, Profile.Network.AuthorizedDapp?, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?)
+		case hasAnyPersonaOnAnyNetwork(Bool)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -60,16 +65,19 @@ struct Login: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadPersonas(state: &state)
+			return loadPersonas(state: &state).concatenate(with: checkIfFirstPersonaByUserEver())
 
 		case let .selectedPersonaChanged(persona):
 			state.selectedPersona = persona
 			return .none
 
 		case .createNewPersonaButtonTapped:
+			assert(state.hasAnyPersonaOnAnyNetwork != nil, "Should have checked 'hasAnyPersonaOnAnyNetwork' already")
+			let isFirstOnAnyNetwork = state.hasAnyPersonaOnAnyNetwork ?? true
+
 			state.createPersonaCoordinator = .init(config: .init(
 				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
-			))
+			), displayIntroduction: { _ in isFirstOnAnyNetwork })
 			return .none
 
 		case let .continueButtonTapped(persona):
@@ -80,6 +88,10 @@ struct Login: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .hasAnyPersonaOnAnyNetwork(hasAnyPersonaOnAnyNetwork):
+			state.hasAnyPersonaOnAnyNetwork = hasAnyPersonaOnAnyNetwork
+			return .none
+
 		case let .personasLoaded(personas, authorizedDapp, authorizedPersonaSimple):
 			let lastLoggedInPersona: Profile.Network.Persona? = {
 				if let authorizedPersonaSimple {
@@ -141,6 +153,13 @@ struct Login: Sendable, FeatureReducer {
 				}
 			}()
 			await send(.internal(.personasLoaded(personas, authorizedDapp, authorizedPersona)))
+		}
+	}
+
+	func checkIfFirstPersonaByUserEver() -> EffectTask<Action> {
+		.task {
+			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetworks()
+			return .internal(.hasAnyPersonaOnAnyNetwork(hasAnyPersonaOnAnyNetwork))
 		}
 	}
 }

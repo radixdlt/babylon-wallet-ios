@@ -25,6 +25,11 @@ extension CreateEntityCoordinator {
 				NavigationStack {
 					SwitchStore(store.scope(state: \.step)) {
 						CaseLet(
+							state: /CreateEntityCoordinator.State.Step.step0_introduction,
+							action: { CreateEntityCoordinator.Action.child(.step0_introduction($0)) },
+							then: { IntroductionToEntity.View(store: $0) }
+						)
+						CaseLet(
 							state: /CreateEntityCoordinator.State.Step.step1_nameNewEntity,
 							action: { CreateEntityCoordinator.Action.child(.step1_nameNewEntity($0)) },
 							then: { NameNewEntity.View(store: $0) }

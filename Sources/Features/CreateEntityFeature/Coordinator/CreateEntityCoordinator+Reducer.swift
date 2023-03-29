@@ -13,6 +13,7 @@ public struct CreateEntityCoordinator<
 
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
+			case step0_introduction(IntroductionToEntity<Entity>.State)
 			case step1_nameNewEntity(NameNewEntity<Entity>.State)
 			case step2_selectGenesisFactorSource(SelectGenesisFactorSource.State)
 			case step3_creationOfEntity(CreationOfEntity<Entity>.State)
@@ -24,10 +25,19 @@ public struct CreateEntityCoordinator<
 
 		public init(
 			step: Step? = nil,
-			config: CreateEntityConfig
+			config: CreateEntityConfig,
+			displayIntroduction: (CreateEntityConfig) -> Bool
 		) {
 			self.config = config
-			self.step = step ?? .step1_nameNewEntity(.init(config: config))
+			if let step {
+				self.step = step
+			} else {
+				if displayIntroduction(config) {
+					self.step = .step0_introduction(.init())
+				} else {
+					self.step = .step1_nameNewEntity(.init(config: config))
+				}
+			}
 		}
 
 		var shouldDisplayNavBar: Bool {
@@ -35,7 +45,7 @@ public struct CreateEntityCoordinator<
 				config.canBeDismissed
 			else { return false }
 			switch step {
-			case .step1_nameNewEntity, .step2_selectGenesisFactorSource: return true
+			case .step0_introduction, .step1_nameNewEntity, .step2_selectGenesisFactorSource: return true
 			case .step3_creationOfEntity, .step4_completion: return false
 			}
 		}
@@ -51,6 +61,7 @@ public struct CreateEntityCoordinator<
 
 	public enum ChildAction: Sendable, Equatable {
 		public typealias Entity = CreateEntityCoordinator.Entity
+		case step0_introduction(IntroductionToEntity<Entity>.Action)
 		case step1_nameNewEntity(NameNewEntity<Entity>.Action)
 		case step2_selectGenesisFactorSource(SelectGenesisFactorSource.Action)
 		case step3_creationOfEntity(CreationOfEntity<Entity>.Action)
@@ -69,8 +80,16 @@ public struct CreateEntityCoordinator<
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		children
+		Reduce(core)
+	}
+
+	var children: some ReducerProtocolOf<Self> {
 		Scope(state: \.step, action: /Action.self) {
 			EmptyReducer()
+				.ifCaseLet(/State.Step.step0_introduction, action: /Action.child .. ChildAction.step0_introduction) {
+					IntroductionToEntity<Entity>()
+				}
 				.ifCaseLet(/State.Step.step1_nameNewEntity, action: /Action.child .. ChildAction.step1_nameNewEntity) {
 					NameNewEntity<Entity>()
 				}
@@ -84,9 +103,10 @@ public struct CreateEntityCoordinator<
 					NewEntityCompletion<Entity>()
 				}
 		}
-		Reduce(core)
 	}
+}
 
+extension CreateEntityCoordinator {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
@@ -131,6 +151,10 @@ public struct CreateEntityCoordinator<
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .step0_introduction(.delegate(.done)):
+			state.step = .step1_nameNewEntity(.init(config: state.config))
+			return .none
+
 		case let .step1_nameNewEntity(.delegate(.named(name))):
 			return .run { send in
 				await send(.internal(.loadFactorSourcesResult(TaskResult {

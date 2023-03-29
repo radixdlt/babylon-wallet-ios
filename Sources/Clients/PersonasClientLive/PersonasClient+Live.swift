@@ -27,6 +27,9 @@ extension PersonasClient: DependencyKey {
 				try await getProfileStore().updating {
 					try $0.addPersona(persona)
 				}
+			},
+			hasAnyPersonaOnAnyNetworks: {
+				await getProfileStore().profile.hasAnyPersonaOnAnyNetworks()
 			}
 		)
 	}

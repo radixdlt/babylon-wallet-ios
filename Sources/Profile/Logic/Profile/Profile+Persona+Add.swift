@@ -30,6 +30,10 @@ extension Profile {
 			}
 		}
 	}
+
+	public func hasAnyPersonaOnAnyNetworks() -> Bool {
+		networks.values.map(\.personas.isEmpty).reduce(into: false) { $0 = $0 || $1 }
+	}
 }
 
 // MARK: - Discrepancy
