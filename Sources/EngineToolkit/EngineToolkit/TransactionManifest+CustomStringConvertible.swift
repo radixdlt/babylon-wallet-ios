@@ -190,7 +190,7 @@ extension TransactionManifest {
 	public var description: String {
 		// Best we can do is default to the primary network given the roadmap.
 		do {
-			return try toString(networkID: .nebunet)
+			return try toString(networkID: .default)
 		} catch {
 			return "Can't create description of manifest: \(error)"
 		}
