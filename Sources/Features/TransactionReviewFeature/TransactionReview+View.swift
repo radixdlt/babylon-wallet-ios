@@ -17,20 +17,22 @@ extension View {
 extension TransactionReview.State {
 	var viewState: TransactionReview.ViewState {
 		.init(
-			message: message,
+			message: transaction.message,
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositingHeading: depositing != nil,
 			showCustomizeGuaranteesButton: true,
-			viewControlState: {
-				if transactionWithLockFee == nil {
-					return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
-				} else if isSigningTX {
-					return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
-				} else {
-					return .enabled
-				}
-			}()
+			viewControlState: viewControlState
 		)
+	}
+
+	private var viewControlState: ControlState {
+		if transactionWithLockFee == nil {
+			return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+		} else if isSigningTX {
+			return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+		} else {
+			return .enabled
+		}
 	}
 }
 

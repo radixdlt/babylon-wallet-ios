@@ -6,33 +6,26 @@ import TransactionClient
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var content: TransactionContent
+		public let transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem
 
-		public var message: String? {
-			transaction.message
-		}
+		public var transactionWithLockFee: TransactionManifest?
 
-		public var withdrawing: TransactionReviewAccounts.State?
-		public var dAppsUsed: TransactionReviewDappsUsed.State?
-		public var depositing: TransactionReviewAccounts.State?
-		public var presenting: TransactionReviewPresenting.State?
-		public var networkFee: TransactionReviewNetworkFee.State?
+		public var withdrawing: TransactionReviewAccounts.State? = nil
+		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
+		public var depositing: TransactionReviewAccounts.State? = nil
+		public var presenting: TransactionReviewPresenting.State? = nil
+		public var networkFee: TransactionReviewNetworkFee.State? = nil
 
 		@PresentationState
 		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
 
 		public var isSigningTX: Bool = false
-		public var transactionWithLockFee: TransactionManifest?
-
-		public let transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem
 
 		public init(
 			transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem,
-			content: TransactionContent = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
 			self.transaction = transaction
-			self.content = content
 			self.customizeGuarantees = customizeGuarantees
 		}
 	}
@@ -198,16 +191,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .run { send in
 				// TODO: Determine what is the minimal information required
 				let userAccounts = try await extractAccounts(reviewedManifest)
-				let usedDapps = try? await extractUsedDapps(reviewedManifest)
-				let deposits = try? await extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts)
-				let withdraws = try? await extractWithdraws(reviewedManifest.accountWithdraws, userAccounts: userAccounts)
-				let badges = try? await exctractBadges(reviewedManifest)
 
-				let content = TransactionReview.TransactionContent(
-					withdrawing: withdraws,
-					dAppsUsed: usedDapps,
-					depositing: deposits,
-					presenting: badges,
+				let content = await TransactionReview.TransactionContent(
+					withdrawing: try? extractWithdraws(reviewedManifest.accountWithdraws, userAccounts: userAccounts),
+					dAppsUsed: try? extractUsedDapps(reviewedManifest),
+					depositing: try? extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts),
+					presenting: try? exctractBadges(reviewedManifest),
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
 				await send(.internal(.createTransactionReview(content)))
@@ -229,6 +218,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .signTransactionResult(.failure(transactionFailure)):
 			state.isSigningTX = false
 			return .send(.delegate(.failed(transactionFailure)))
+
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid))))
 		}
@@ -249,25 +239,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 extension TransactionReview {
 	public struct TransactionContent: Sendable, Hashable {
-		public var withdrawing: TransactionReviewAccounts.State?
-		public var dAppsUsed: TransactionReviewDappsUsed.State?
-		public var depositing: TransactionReviewAccounts.State?
-		public var presenting: TransactionReviewPresenting.State?
-		public var networkFee: TransactionReviewNetworkFee.State?
-
-		public init(
-			withdrawing: TransactionReviewAccounts.State? = nil,
-			dAppsUsed: TransactionReviewDappsUsed.State? = nil,
-			depositing: TransactionReviewAccounts.State? = nil,
-			presenting: TransactionReviewPresenting.State? = nil,
-			networkFee: TransactionReviewNetworkFee.State? = nil
-		) {
-			self.withdrawing = withdrawing
-			self.dAppsUsed = dAppsUsed
-			self.depositing = depositing
-			self.presenting = presenting
-			self.networkFee = networkFee
-		}
+		let withdrawing: TransactionReviewAccounts.State?
+		let dAppsUsed: TransactionReviewDappsUsed.State?
+		let depositing: TransactionReviewAccounts.State?
+		let presenting: TransactionReviewPresenting.State?
+		let networkFee: TransactionReviewNetworkFee.State?
 	}
 
 	// MARK: - TransferType
@@ -297,12 +273,14 @@ extension TransactionReview {
 	private func exctractBadges(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewPresenting.State? {
 		let dapps = try await extractDappsInfo(manifest.accountProofResources.map(\.address))
 		guard !dapps.isEmpty else { return nil }
+
 		return TransactionReviewPresenting.State(dApps: .init(uniqueElements: dapps))
 	}
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
 		let dapps = try await extractDappsInfo(manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address))
 		guard !dapps.isEmpty else { return nil }
+
 		return TransactionReviewDappsUsed.State(isExpanded: false, dApps: .init(uniqueElements: dapps))
 	}
 
