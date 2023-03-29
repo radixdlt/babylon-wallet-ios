@@ -33,20 +33,18 @@ extension IntroductionToEntity {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
-				VStack(alignment: .center) {
-					VStack(alignment: .center) {
-						switch viewStore.kind {
-						case .account: introToAccounts(with: viewStore)
-						case .identity: introToPersona(with: viewStore)
-						}
+				VStack(alignment: .center, spacing: 30) {
+					switch viewStore.kind {
+					case .account: introToAccounts(with: viewStore)
+					case .identity: introToPersona(with: viewStore)
 					}
-					.padding(.horizontal, .large1)
 
 					Button("Continue") {
 						viewStore.send(.continueButtonTapped)
 					}
-					.buttonStyle(.secondaryRectangular(shouldExpand: false))
+					.buttonStyle(.primaryRectangular)
 				}
+				.padding(.horizontal, .large1)
 				.multilineTextAlignment(.center)
 				.onAppear { viewStore.send(.appeared) }
 			}
@@ -63,7 +61,6 @@ extension IntroductionToEntity {
 			Color.app.gray4
 				.frame(.huge)
 				.cornerRadius(.small2)
-				.padding(40)
 
 			Text(viewStore.titleText)
 				.foregroundColor(.app.gray1)
@@ -79,13 +76,10 @@ extension IntroductionToEntity {
 				}
 				.tint(.app.blue2)
 			}
-			.padding(.vertical, .medium2)
 
 			Text("A Persona is an identity that you own and control. You can have as many as you like.")
 				.font(.app.body1Regular)
 				.foregroundColor(.app.gray1)
-
-			Spacer()
 
 			Text("You will choose Personas to login to dApps and dApps may request access to personal information associated with that Persona.")
 				.font(.app.body1Regular)
