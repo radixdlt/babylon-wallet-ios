@@ -24,7 +24,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case selectedPersonaChanged(PersonaDataPermissionBox.State?)
 		case createNewPersonaButtonTapped
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
@@ -80,8 +80,17 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return loadPersonasEffect()
+		case .task:
+			return .run { send in
+				for try await personas in await personasClient.personas() {
+					guard !Task.isCancelled else {
+						return
+					}
+					await send(.internal(.personasLoaded(personas)))
+				}
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 
 		case let .selectedPersonaChanged(persona):
 			state.selectedPersona = persona
@@ -106,6 +115,12 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 					.init(persona: $0, requiredFieldIDs: state.requiredFieldIDs)
 				}
 			)
+			if
+				let selectedPersonaID = state.selectedPersona?.id,
+				let selectedPersona = personas[id: selectedPersonaID]
+			{
+				state.selectedPersona = .init(persona: selectedPersona, requiredFieldIDs: state.requiredFieldIDs)
+			}
 			return .none
 		}
 	}
@@ -122,26 +137,10 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-			state.personas[id: persona.id] = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
-			if state.selectedPersona?.id == persona.id {
-				state.selectedPersona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
-			}
 			return .send(.delegate(.personaUpdated(persona)))
-
-		case .destination(.presented(.createPersona(.delegate(.completed)))):
-			return loadPersonasEffect()
 
 		default:
 			return .none
-		}
-	}
-
-	func loadPersonasEffect() -> EffectTask<Action> {
-		.run { send in
-			let personas = try await personasClient.getPersonas()
-			await send(.internal(.personasLoaded(personas)))
-		} catch: { error, _ in
-			errorQueue.schedule(error)
 		}
 	}
 }
