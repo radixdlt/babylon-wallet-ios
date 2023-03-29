@@ -40,6 +40,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
+		case personaUpdated(Profile.Network.Persona)
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
@@ -125,7 +126,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			if state.selectedPersona?.id == persona.id {
 				state.selectedPersona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
 			}
-			return .none
+			return .send(.delegate(.personaUpdated(persona)))
 
 		case .destination(.presented(.createPersona(.delegate(.completed)))):
 			return loadPersonasEffect()

@@ -354,6 +354,36 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return continueEffect(for: &state)
 		}
 
+		func handlePersonaUpdated(
+			_ state: inout State,
+			_ persona: Profile.Network.Persona
+		) -> EffectTask<Action> {
+			state.persona = persona
+			for (request, response) in state.responseItems {
+				// NB: native case paths should simplify this mutation logic a lot
+				switch response {
+				case let .remote(.auth(.login(.withChallenge(item)))):
+					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
+						persona: .init(identityAddress: item.persona.identityAddress, label: persona.displayName.rawValue),
+						challenge: item.challenge,
+						publicKey: item.publicKey,
+						signature: item.signature
+					)))))
+				case let .remote(.auth(.login(.withoutChallenge(item)))):
+					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
+						persona: .init(identityAddress: item.persona.identityAddress, label: persona.displayName.rawValue)
+					)))))
+				case let .remote(.auth(.usePersona(item))):
+					state.responseItems[request] = .remote(.auth(.usePersona(.init(
+						persona: .init(identityAddress: item.persona.identityAddress, label: persona.displayName.rawValue)
+					))))
+				default:
+					continue
+				}
+			}
+			return .none
+		}
+
 		func handleOngoingPersonaDataPermission(
 			_ item: State.AnyInteractionItem,
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
@@ -404,9 +434,19 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return handleAccounts(item, accounts, accessKind)
 
 		case
+			let .root(.relay(_, .personaDataPermission(.delegate(.personaUpdated(persona))))),
+			let .path(.element(_, .relay(_, .personaDataPermission(.delegate(.personaUpdated(persona)))))):
+			return handlePersonaUpdated(&state, persona)
+
+		case
 			let .root(.relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields))))),
 			let .path(.element(_, .relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields)))))):
 			return handleOngoingPersonaDataPermission(item, fields)
+
+		case
+			let .root(.relay(_, .oneTimePersonaData(.delegate(.personaUpdated(persona))))),
+			let .path(.element(_, .relay(_, .oneTimePersonaData(.delegate(.personaUpdated(persona)))))):
+			return handlePersonaUpdated(&state, persona)
 
 		case
 			let .root(.relay(item, .oneTimePersonaData(.delegate(.continueButtonTapped(fields))))),
