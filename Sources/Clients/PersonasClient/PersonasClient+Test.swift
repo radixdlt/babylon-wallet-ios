@@ -15,13 +15,13 @@ extension PersonasClient: TestDependencyKey {
 		updatePersona: unimplemented("\(Self.self).updatePersona"),
 		createUnsavedVirtualPersona: unimplemented("\(Self.self).createUnsavedVirtualPersona"),
 		saveVirtualPersona: unimplemented("\(Self.self).saveVirtualPersona"),
-		hasAnyPersonaOnAnyNetworks: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetworks")
+		hasAnyPersonaOnAnyNetwork: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetwork")
 	)
 	public static let noop = Self(
 		getPersonas: { .init() },
 		updatePersona: { _ in throw NoopError() },
 		createUnsavedVirtualPersona: { _ in throw NoopError() },
 		saveVirtualPersona: { _ in },
-		hasAnyPersonaOnAnyNetworks: { true }
+		hasAnyPersonaOnAnyNetwork: { true }
 	)
 }

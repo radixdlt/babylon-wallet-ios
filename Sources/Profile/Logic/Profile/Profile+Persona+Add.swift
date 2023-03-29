@@ -31,7 +31,7 @@ extension Profile {
 		}
 	}
 
-	public func hasAnyPersonaOnAnyNetworks() -> Bool {
+	public func hasAnyPersonaOnAnyNetwork() -> Bool {
 		networks.values.map(\.personas.isEmpty).reduce(into: false) { $0 = $0 || $1 }
 	}
 }

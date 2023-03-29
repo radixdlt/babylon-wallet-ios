@@ -3,11 +3,14 @@ import FeaturePrelude
 // MARK: - IntroductionToEntity
 public struct IntroductionToEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		@PresentationState
+		public var infoPanel: SlideUpPanel.State?
 		public init() {}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case continueButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -20,6 +23,8 @@ public struct IntroductionToEntity<Entity: EntityProtocol>: Sendable, FeatureRed
 		switch viewAction {
 		case .appeared:
 			return .none
+		case .continueButtonTapped:
+			return .send(.delegate(.done))
 		}
 	}
 }

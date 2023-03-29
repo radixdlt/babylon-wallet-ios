@@ -8,19 +8,19 @@ public struct PersonasClient: Sendable {
 	public var updatePersona: UpdatePersona
 	public var createUnsavedVirtualPersona: CreateUnsavedVirtualPersona
 	public var saveVirtualPersona: SaveVirtualPersona
-	public var hasAnyPersonaOnAnyNetworks: HasAnyPersonaOnAnyNetworks
+	public var hasAnyPersonaOnAnyNetwork: HasAnyPersonaOnAnyNetworks
 	public init(
 		getPersonas: @escaping GetPersonas,
 		updatePersona: @escaping UpdatePersona,
 		createUnsavedVirtualPersona: @escaping CreateUnsavedVirtualPersona,
 		saveVirtualPersona: @escaping SaveVirtualPersona,
-		hasAnyPersonaOnAnyNetworks: @escaping HasAnyPersonaOnAnyNetworks
+		hasAnyPersonaOnAnyNetwork: @escaping HasAnyPersonaOnAnyNetworks
 	) {
 		self.getPersonas = getPersonas
 		self.updatePersona = updatePersona
 		self.createUnsavedVirtualPersona = createUnsavedVirtualPersona
 		self.saveVirtualPersona = saveVirtualPersona
-		self.hasAnyPersonaOnAnyNetworks = hasAnyPersonaOnAnyNetworks
+		self.hasAnyPersonaOnAnyNetwork = hasAnyPersonaOnAnyNetwork
 	}
 }
 

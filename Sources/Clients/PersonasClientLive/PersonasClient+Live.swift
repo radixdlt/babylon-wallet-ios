@@ -28,8 +28,11 @@ extension PersonasClient: DependencyKey {
 					try $0.addPersona(persona)
 				}
 			},
-			hasAnyPersonaOnAnyNetworks: {
-				await getProfileStore().profile.hasAnyPersonaOnAnyNetworks()
+			hasAnyPersonaOnAnyNetwork: {
+				// FIXME: !!! stop using hard coding!
+				loggerGlobal.critical("BEFORE RELEASE STOP HARDCODING for 'isFirstPersonaOnAnyNetwork'")
+				return false
+//				await getProfileStore().profile.hasAnyPersonaOnAnyNetwork()
 			}
 		)
 	}

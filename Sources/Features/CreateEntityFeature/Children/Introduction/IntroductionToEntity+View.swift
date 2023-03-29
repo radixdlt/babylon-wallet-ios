@@ -2,14 +2,14 @@ import FeaturePrelude
 
 extension IntroductionToEntity.State {
 	var viewState: IntroductionToEntity.ViewState {
-		.init()
+		.init(kind: Entity.entityKind)
 	}
 }
 
 // MARK: - IntroductionToEntity.View
 extension IntroductionToEntity {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let kind: EntityKind
 	}
 
 	@MainActor
@@ -22,12 +22,29 @@ extension IntroductionToEntity {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: Introduction to \(Entity.entityKind.rawValue)")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					switch viewStore.kind {
+					case .account: introToAccounts(with: viewStore)
+					case .identity: introToPersona(with: viewStore)
+					}
+
+					Button("Continue") {
+						viewStore.send(.continueButtonTapped)
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: false))
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
+		}
+
+		@ViewBuilder
+		private func introToAccounts(with viewStore: ViewStoreOf<IntroductionToEntity>) -> some SwiftUI.View {
+			Text("Accounts are cool")
+		}
+
+		@ViewBuilder
+		private func introToPersona(with viewStore: ViewStoreOf<IntroductionToEntity>) -> some SwiftUI.View {
+			Text("Personas are cool")
 		}
 	}
 }
