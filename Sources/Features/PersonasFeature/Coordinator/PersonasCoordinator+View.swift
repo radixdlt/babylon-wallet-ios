@@ -12,23 +12,20 @@ extension PersonasCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			ZStack {
-				PersonaList.View(
-					store: store.scope(
-						state: \.personaList,
-						action: { .child(.personaList($0)) }
-					)
+			PersonaList.View(
+				store: store.scope(
+					state: \.personaList,
+					action: { .child(.personaList($0)) }
 				)
-				.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
-
-				IfLetStore(
-					store.scope(
-						state: \.createPersonaCoordinator,
-						action: { .child(.createPersonaCoordinator($0)) }
-					),
-					then: { CreatePersonaCoordinator.View(store: $0) }
-				)
-			}
+			)
+			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+			.sheet(
+				store: store.scope(
+					state: \.$createPersonaCoordinator,
+					action: { .child(.createPersonaCoordinator($0)) }
+				),
+				content: { CreatePersonaCoordinator.View(store: $0) }
+			)
 		}
 	}
 }

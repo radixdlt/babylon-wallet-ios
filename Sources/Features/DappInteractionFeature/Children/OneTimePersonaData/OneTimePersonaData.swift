@@ -11,15 +11,19 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		var selectedPersona: PersonaDataPermissionBox.State?
 		let requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
 
+		var isFirstPersonaOnAnyNetwork: Bool? = nil
+
 		@PresentationState
 		var destination: Destinations.State?
 
 		init(
 			dappMetadata: DappMetadata,
-			requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
+			requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>,
+			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
 			self.dappMetadata = dappMetadata
 			self.requiredFieldIDs = requiredFieldIDs
+			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 		}
 	}
 
@@ -32,6 +36,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>)
+		case isFirstPersonaOnAnyNetwork(Bool)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -88,9 +93,12 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			return .none
 
 		case .createNewPersonaButtonTapped:
+			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
+			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
+
 			state.destination = .createPersona(.init(config: .init(
 				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
-			)))
+			), displayIntroduction: { _ in isFirstOnAnyNetwork }))
 			return .none
 
 		case let .continueButtonTapped(fields):
@@ -100,6 +108,10 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
+			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
+			return .none
+
 		case let .personasLoaded(personas):
 			state.personas = IdentifiedArrayOf(
 				uncheckedUniqueElements: personas.map {
@@ -129,6 +141,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			return .send(.delegate(.personaUpdated(persona)))
 
 		case .destination(.presented(.createPersona(.delegate(.completed)))):
+			state.isFirstPersonaOnAnyNetwork = false
 			return loadPersonasEffect()
 
 		default:
@@ -142,6 +155,14 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			await send(.internal(.personasLoaded(personas)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+
+	func checkIfFirstPersonaByUserEver() -> EffectTask<Action> {
+		.task {
+			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
+			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
+			return .internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork))
 		}
 	}
 }

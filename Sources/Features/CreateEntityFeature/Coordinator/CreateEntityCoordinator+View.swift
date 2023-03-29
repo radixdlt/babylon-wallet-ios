@@ -25,23 +25,28 @@ extension CreateEntityCoordinator {
 				NavigationStack {
 					SwitchStore(store.scope(state: \.step)) {
 						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step0_nameNewEntity,
-							action: { CreateEntityCoordinator.Action.child(.step0_nameNewEntity($0)) },
+							state: /CreateEntityCoordinator.State.Step.step0_introduction,
+							action: { CreateEntityCoordinator.Action.child(.step0_introduction($0)) },
+							then: { IntroductionToEntity.View(store: $0) }
+						)
+						CaseLet(
+							state: /CreateEntityCoordinator.State.Step.step1_nameNewEntity,
+							action: { CreateEntityCoordinator.Action.child(.step1_nameNewEntity($0)) },
 							then: { NameNewEntity.View(store: $0) }
 						)
 						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step1_selectGenesisFactorSource,
-							action: { CreateEntityCoordinator.Action.child(.step1_selectGenesisFactorSource($0)) },
+							state: /CreateEntityCoordinator.State.Step.step2_selectGenesisFactorSource,
+							action: { CreateEntityCoordinator.Action.child(.step2_selectGenesisFactorSource($0)) },
 							then: { SelectGenesisFactorSource.View(store: $0) }
 						)
 						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step2_creationOfEntity,
-							action: { CreateEntityCoordinator.Action.child(.step2_creationOfEntity($0)) },
+							state: /CreateEntityCoordinator.State.Step.step3_creationOfEntity,
+							action: { CreateEntityCoordinator.Action.child(.step3_creationOfEntity($0)) },
 							then: { CreationOfEntity.View(store: $0) }
 						)
 						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step3_completion,
-							action: { CreateEntityCoordinator.Action.child(.step3_completion($0)) },
+							state: /CreateEntityCoordinator.State.Step.step4_completion,
+							action: { CreateEntityCoordinator.Action.child(.step4_completion($0)) },
 							then: { NewEntityCompletion.View(store: $0) }
 						)
 					}

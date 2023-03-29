@@ -13,10 +13,11 @@ public struct CreateEntityCoordinator<
 
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
-			case step0_nameNewEntity(NameNewEntity<Entity>.State)
-			case step1_selectGenesisFactorSource(SelectGenesisFactorSource.State)
-			case step2_creationOfEntity(CreationOfEntity<Entity>.State)
-			case step3_completion(NewEntityCompletion<Entity>.State)
+			case step0_introduction(IntroductionToEntity<Entity>.State)
+			case step1_nameNewEntity(NameNewEntity<Entity>.State)
+			case step2_selectGenesisFactorSource(SelectGenesisFactorSource.State)
+			case step3_creationOfEntity(CreationOfEntity<Entity>.State)
+			case step4_completion(NewEntityCompletion<Entity>.State)
 		}
 
 		public var step: Step
@@ -24,10 +25,19 @@ public struct CreateEntityCoordinator<
 
 		public init(
 			step: Step? = nil,
-			config: CreateEntityConfig
+			config: CreateEntityConfig,
+			displayIntroduction: (CreateEntityConfig) -> Bool = { _ in false }
 		) {
 			self.config = config
-			self.step = step ?? .step0_nameNewEntity(.init(config: config))
+			if let step {
+				self.step = step
+			} else {
+				if displayIntroduction(config) {
+					self.step = .step0_introduction(.init())
+				} else {
+					self.step = .step1_nameNewEntity(.init(config: config))
+				}
+			}
 		}
 
 		var shouldDisplayNavBar: Bool {
@@ -35,8 +45,8 @@ public struct CreateEntityCoordinator<
 				config.canBeDismissed
 			else { return false }
 			switch step {
-			case .step0_nameNewEntity, .step1_selectGenesisFactorSource: return true
-			case .step2_creationOfEntity, .step3_completion: return false
+			case .step0_introduction, .step1_nameNewEntity, .step2_selectGenesisFactorSource: return true
+			case .step3_creationOfEntity, .step4_completion: return false
 			}
 		}
 	}
@@ -51,10 +61,11 @@ public struct CreateEntityCoordinator<
 
 	public enum ChildAction: Sendable, Equatable {
 		public typealias Entity = CreateEntityCoordinator.Entity
-		case step0_nameNewEntity(NameNewEntity<Entity>.Action)
-		case step1_selectGenesisFactorSource(SelectGenesisFactorSource.Action)
-		case step2_creationOfEntity(CreationOfEntity<Entity>.Action)
-		case step3_completion(NewEntityCompletion<Entity>.Action)
+		case step0_introduction(IntroductionToEntity<Entity>.Action)
+		case step1_nameNewEntity(NameNewEntity<Entity>.Action)
+		case step2_selectGenesisFactorSource(SelectGenesisFactorSource.Action)
+		case step3_creationOfEntity(CreationOfEntity<Entity>.Action)
+		case step4_completion(NewEntityCompletion<Entity>.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -69,24 +80,33 @@ public struct CreateEntityCoordinator<
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.step, action: /Action.self) {
-			EmptyReducer()
-				.ifCaseLet(/State.Step.step0_nameNewEntity, action: /Action.child .. ChildAction.step0_nameNewEntity) {
-					NameNewEntity<Entity>()
-				}
-				.ifCaseLet(/State.Step.step1_selectGenesisFactorSource, action: /Action.child .. ChildAction.step1_selectGenesisFactorSource) {
-					SelectGenesisFactorSource()
-				}
-				.ifCaseLet(/State.Step.step2_creationOfEntity, action: /Action.child .. ChildAction.step2_creationOfEntity) {
-					CreationOfEntity<Entity>()
-				}
-				.ifCaseLet(/State.Step.step3_completion, action: /Action.child .. ChildAction.step3_completion) {
-					NewEntityCompletion<Entity>()
-				}
-		}
+		children
 		Reduce(core)
 	}
 
+	var children: some ReducerProtocolOf<Self> {
+		Scope(state: \.step, action: /Action.self) {
+			EmptyReducer()
+				.ifCaseLet(/State.Step.step0_introduction, action: /Action.child .. ChildAction.step0_introduction) {
+					IntroductionToEntity<Entity>()
+				}
+				.ifCaseLet(/State.Step.step1_nameNewEntity, action: /Action.child .. ChildAction.step1_nameNewEntity) {
+					NameNewEntity<Entity>()
+				}
+				.ifCaseLet(/State.Step.step2_selectGenesisFactorSource, action: /Action.child .. ChildAction.step2_selectGenesisFactorSource) {
+					SelectGenesisFactorSource()
+				}
+				.ifCaseLet(/State.Step.step3_creationOfEntity, action: /Action.child .. ChildAction.step3_creationOfEntity) {
+					CreationOfEntity<Entity>()
+				}
+				.ifCaseLet(/State.Step.step4_completion, action: /Action.child .. ChildAction.step4_completion) {
+					NewEntityCompletion<Entity>()
+				}
+		}
+	}
+}
+
+extension CreateEntityCoordinator {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
@@ -131,14 +151,18 @@ public struct CreateEntityCoordinator<
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .step0_nameNewEntity(.delegate(.named(name))):
+		case .step0_introduction(.delegate(.done)):
+			state.step = .step1_nameNewEntity(.init(config: state.config))
+			return .none
+
+		case let .step1_nameNewEntity(.delegate(.named(name))):
 			return .run { send in
 				await send(.internal(.loadFactorSourcesResult(TaskResult {
 					try await factorSourcesClient.getFactorSources()
 				}, beforeCreatingEntityWithName: name)))
 			}
 
-		case let .step1_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate, curve))):
+		case let .step2_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate, curve))):
 			return goToStep2Creation(
 				curve: curve,
 				entityName: specifiedNameForNewEntityToCreate,
@@ -146,16 +170,16 @@ public struct CreateEntityCoordinator<
 				state: &state
 			)
 
-		case let .step2_creationOfEntity(.delegate(.createdEntity(newEntity))):
+		case let .step3_creationOfEntity(.delegate(.createdEntity(newEntity))):
 			return goToStep3Completion(
 				entity: newEntity,
 				state: &state
 			)
 
-		case .step2_creationOfEntity(.delegate(.createEntityFailed)):
+		case .step3_creationOfEntity(.delegate(.createEntityFailed)):
 			switch state.step {
-			case let .step2_creationOfEntity(createState):
-				state.step = .step0_nameNewEntity(
+			case let .step3_creationOfEntity(createState):
+				state.step = .step1_nameNewEntity(
 					.init(
 						isFirst: state.config.isFirstEntity,
 						inputtedEntityName: createState.name.rawValue, // preserve the name
@@ -164,12 +188,12 @@ public struct CreateEntityCoordinator<
 				)
 			default:
 				// Should not happen...
-				state.step = .step0_nameNewEntity(.init(config: state.config))
+				state.step = .step1_nameNewEntity(.init(config: state.config))
 			}
 
 			return .none
 
-		case .step3_completion(.delegate(.completed)):
+		case .step4_completion(.delegate(.completed)):
 			return .run { send in
 				await send(.delegate(.completed))
 				await dismiss()
@@ -185,7 +209,7 @@ public struct CreateEntityCoordinator<
 		hdOnDeviceFactorSources: NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = .step1_selectGenesisFactorSource(
+		state.step = .step2_selectGenesisFactorSource(
 			.init(
 				specifiedNameForNewEntityToCreate: entityName,
 				hdOnDeviceFactorSources: hdOnDeviceFactorSources
@@ -200,7 +224,7 @@ public struct CreateEntityCoordinator<
 		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = .step2_creationOfEntity(.init(
+		state.step = .step3_creationOfEntity(.init(
 			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
@@ -213,7 +237,7 @@ public struct CreateEntityCoordinator<
 		entity: Entity,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = .step3_completion(.init(
+		state.step = .step4_completion(.init(
 			entity: entity,
 			config: state.config
 		))

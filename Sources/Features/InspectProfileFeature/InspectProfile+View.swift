@@ -328,6 +328,7 @@ extension AppSecurityView {
 				.font(.title)
 			#endif // os(macOS)
 			Labeled("iCloudProfileSyncEnabled", value: String(describing: security.iCloudProfileSyncEnabled))
+			Labeled("isDeveloperModeEnabled", value: String(describing: security.isDeveloperModeEnabled))
 		}
 		.padding([.leading], leadingPadding)
 	}

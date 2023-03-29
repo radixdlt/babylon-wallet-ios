@@ -55,11 +55,6 @@ extension GatewaySettings {
 							action: Destinations.Action.slideUpPanel,
 							content: {
 								SlideUpPanel.View(store: $0)
-									.presentationDetents([.medium])
-									.presentationDragIndicator(.visible)
-								#if os(iOS)
-									.presentationBackground(.blur)
-								#endif
 							}
 						)
 				}
