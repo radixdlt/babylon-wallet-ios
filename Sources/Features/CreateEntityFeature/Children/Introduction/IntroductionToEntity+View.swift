@@ -81,10 +81,10 @@ extension IntroductionToEntity {
 			Button {
 				viewStore.send(.showTutorial)
 			} label: {
-				HStack {
+				Label {
+					Text(L10n.CreateEntity.Introduction.Persona.Button.tutorial).textStyle(.body1StandaloneLink)
+				} icon: {
 					Image(asset: AssetResource.info)
-					Text(L10n.CreateEntity.Introduction.Persona.Button.tutorial)
-						.textStyle(.body1StandaloneLink)
 				}
 				.tint(.app.blue2)
 			}
