@@ -1,9 +1,13 @@
 import FeaturePrelude
+import GatewaySettingsFeature
 
 // MARK: - TransactionReviewGuarantees
 public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
+
+		@PresentationState
+		public var info: SlideUpPanel.State?
 
 		public init(guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>) {
 			self.guarantees = guarantees
@@ -18,6 +22,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case guarantee(id: TransactionReviewGuarantee.State.ID, action: TransactionReviewGuarantee.Action)
+		case info(PresentationAction<SlideUpPanel.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -31,12 +36,16 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 			.forEach(\.guarantees, action: /Action.child .. /ChildAction.guarantee) {
 				TransactionReviewGuarantee()
 			}
+			.ifLet(\.$info, action: /Action.child .. /ChildAction.info) {
+				SlideUpPanel()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .infoTapped:
-			// TODO: Show some info
+			state.info = .init(title: L10n.TransactionReview.Guarantees.explanationTitle,
+			                   explanation: L10n.TransactionReview.Guarantees.explanationText)
 			return .none
 
 		case .applyTapped:
