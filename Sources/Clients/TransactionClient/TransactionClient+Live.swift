@@ -528,7 +528,7 @@ extension TransactionClient {
 			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 			var indexInc = 1 // LockFee was added, start from 1
 			for guarantee in guarantees {
-				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(amount: .init(value: guarantee.amount.description), resourceAddress: guarantee.resourceAddress))
+				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(amount: .init(value: guarantee.amount.toString()), resourceAddress: guarantee.resourceAddress))
 				instructions.insert(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
 				indexInc += 1
 			}
