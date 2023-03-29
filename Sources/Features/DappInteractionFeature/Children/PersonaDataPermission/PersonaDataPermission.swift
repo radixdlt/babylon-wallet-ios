@@ -39,6 +39,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
+		case personaUpdated(Profile.Network.Persona)
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
@@ -109,7 +110,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
 			state.persona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
-			return .none
+			return .send(.delegate(.personaUpdated(persona)))
 
 		default:
 			return .none
