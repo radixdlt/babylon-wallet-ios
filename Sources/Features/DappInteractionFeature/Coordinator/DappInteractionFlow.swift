@@ -367,18 +367,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				switch response {
 				case let .remote(.auth(.login(.withChallenge(item)))):
 					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
-						persona: .init(identityAddress: item.persona.identityAddress, label: persona.displayName.rawValue),
+						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue),
 						challenge: item.challenge,
 						publicKey: item.publicKey,
 						signature: item.signature
 					)))))
-				case let .remote(.auth(.login(.withoutChallenge(item)))):
+				case let .remote(.auth(.login(.withoutChallenge))):
 					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
-						persona: .init(identityAddress: item.persona.identityAddress, label: persona.displayName.rawValue)
+						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
 					)))))
-				case let .remote(.auth(.usePersona(item))):
+				case let .remote(.auth(.usePersona)):
 					state.responseItems[request] = .remote(.auth(.usePersona(.init(
-						persona: .init(identityAddress: item.persona.identityAddress, label: persona.displayName.rawValue)
+						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
 					))))
 				default:
 					continue
