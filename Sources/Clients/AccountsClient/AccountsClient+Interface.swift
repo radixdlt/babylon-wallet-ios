@@ -99,12 +99,12 @@ public struct MigratedAccounts: Sendable, Hashable {
 	}
 
 	/// With the nextDerivation forAccount updated/
-	public let factorSourceToSave: FactorSource
+	public let factorSourceToSave: HDOnDeviceFactorSource
 
 	public init(
 		networkID: NetworkID,
 		accounts: NonEmpty<OrderedSet<MigratedAccount>>,
-		factorSourceToSave: FactorSource
+		factorSourceToSave: HDOnDeviceFactorSource
 	) throws {
 		guard accounts.allSatisfy({ $0.babylon.networkID == networkID }) else {
 			throw NetworkIDDisrepancy()

@@ -53,7 +53,7 @@ extension HDOnDeviceFactorSource {
 	public func importedOlympiaFactorMarkingNextAccountIndex(
 		to nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index,
 		networkID: NetworkID
-	) -> FactorSource {
+	) -> Self {
 		var storageCopy = storage
 
 		storageCopy.nextDerivationIndicesPerNetwork.setNextDerivationIndex(
@@ -64,9 +64,8 @@ extension HDOnDeviceFactorSource {
 
 		var copy = self
 		copy.storage = storageCopy
-		let importedOlympiaFactorSource = copy.factorSource
-		assert(importedOlympiaFactorSource.storage?.forDevice?.nextForEntity(kind: .account, networkID: networkID) == nextDerivationAccountIndex)
-		return importedOlympiaFactorSource
+		assert(copy.storage.nextForEntity(kind: .account, networkID: networkID) == nextDerivationAccountIndex)
+		return copy
 	}
 }
 

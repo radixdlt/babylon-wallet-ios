@@ -166,8 +166,11 @@ extension ImportOlympiaWalletCoordinator {
 			guard try factorSourceToSave.id == FactorSource.id(fromPrivateHDFactorSource: factorSource) else {
 				throw OlympiaFactorSourceToSaveIDDisrepancy()
 			}
-			_ = try await factorSourcesClient.addPrivateHDFactorSource(factorSource)
-
+			do {
+				_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase, hdOnDeviceFactorSource: factorSourceToSave))
+			} catch {
+				fatalError("todo, handle terrible bad stuff if failed to save factor source (mnemonic) but have already created accounts....")
+			}
 			await send(.internal(.migratedAccounts(migrated)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
