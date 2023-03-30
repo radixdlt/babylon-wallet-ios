@@ -1,8 +1,6 @@
 import ClientPrelude
 import GatewayAPI
 
-private let tmpMaxRequestAmount = 999
-
 // MARK: - AccountPortfolioFetcherClient + DependencyKey
 extension AccountPortfolioFetcherClient: DependencyKey {
 	public static let liveValue: Self = {
@@ -12,6 +10,7 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 			let resourcesResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
 			var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
 
+			let tmpMaxRequestAmount = 999 // TODO: remove once pagination is implemented
 			let fungibleTokenAddresses = Array(accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress).prefix(tmpMaxRequestAmount))
 			let nonFungibleTokenAddresses = Array(accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress).prefix(tmpMaxRequestAmount))
 
