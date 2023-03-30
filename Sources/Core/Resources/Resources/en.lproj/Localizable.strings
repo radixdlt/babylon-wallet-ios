@@ -149,6 +149,35 @@
 "P2PLinks.newConnectionTitle" = "Link New Connector";
 "P2PLinks.sendTestMessageButtonTitle" = "Send Test Msg";
 
+"transactionReview.title" = "Review Transaction";
+
+"transactionReview.messageHeading" = "Message";
+"transactionReview.usingDappsHeading" = "Using dApps";
+"transactionReview.withdrawingHeading" = "Withdrawing";
+"transactionReview.depositingHeading" = "Depositing";
+"transactionReview.sendingToHeading" = "Sending to";
+"transactionReview.presentingHeading" = "Presenting";
+"transactionReview.customizeGuaranteesButtonTitle" = "Customize Guarantees";
+"transactionReview.approveButtonTitle" = "Approve";
+"transactionReview.externalAccountName" = "Account";
+"transactionReview.estimated" = "Estimated";
+"transactionReview.guaranteed" = "Guaranteed";
+"transactionReview.rawTransactionTitle" = "Raw Transaction";
+
+"transactionReview.networkFee.heading" = "Network Fee";
+"transactionReview.networkFee.congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
+"transactionReview.networkFee.customizeButtonTitle" = "Customize";
+
+"transactionReview.usingDapps.unknownComponents" = "%d Unknown Components";
+
+"transactionReview.guarantees.title" = "Customize Guarantees";
+"transactionReview.guarantees.infoButtonText" = "How do Guarantees work";
+"transactionReview.guarantees.setText" = "Set guaranteed minimum %%";
+"transactionReview.guarantees.headerText" = "Protect yourself by setting guaranteed minimums for estimated deposits";
+"transactionReview.guarantees.applyButtonText" = "Apply";
+"transactionReview.guarantees.explanationTitle" = " How do Guarantees work ";
+"transactionReview.guarantees.explanationText" = " Protect yourself by setting guaranteed minimums for estimated deposits";
+
 "authorizedDapps.title" = "Authorized dApps";
 "authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 

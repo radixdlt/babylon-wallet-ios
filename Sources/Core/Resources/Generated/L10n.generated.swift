@@ -762,6 +762,64 @@ public enum L10n {
       }
     }
   }
+  public enum TransactionReview {
+    /// Approve
+    public static let approveButtonTitle = L10n.tr("Localizable", "transactionReview.approveButtonTitle", fallback: "Approve")
+    /// Customize Guarantees
+    public static let customizeGuaranteesButtonTitle = L10n.tr("Localizable", "transactionReview.customizeGuaranteesButtonTitle", fallback: "Customize Guarantees")
+    /// Depositing
+    public static let depositingHeading = L10n.tr("Localizable", "transactionReview.depositingHeading", fallback: "Depositing")
+    /// Estimated
+    public static let estimated = L10n.tr("Localizable", "transactionReview.estimated", fallback: "Estimated")
+    /// Account
+    public static let externalAccountName = L10n.tr("Localizable", "transactionReview.externalAccountName", fallback: "Account")
+    /// Guaranteed
+    public static let guaranteed = L10n.tr("Localizable", "transactionReview.guaranteed", fallback: "Guaranteed")
+    /// Message
+    public static let messageHeading = L10n.tr("Localizable", "transactionReview.messageHeading", fallback: "Message")
+    /// Presenting
+    public static let presentingHeading = L10n.tr("Localizable", "transactionReview.presentingHeading", fallback: "Presenting")
+    /// Raw Transaction
+    public static let rawTransactionTitle = L10n.tr("Localizable", "transactionReview.rawTransactionTitle", fallback: "Raw Transaction")
+    /// Sending to
+    public static let sendingToHeading = L10n.tr("Localizable", "transactionReview.sendingToHeading", fallback: "Sending to")
+    /// Review Transaction
+    public static let title = L10n.tr("Localizable", "transactionReview.title", fallback: "Review Transaction")
+    /// Using dApps
+    public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview.usingDappsHeading", fallback: "Using dApps")
+    /// Withdrawing
+    public static let withdrawingHeading = L10n.tr("Localizable", "transactionReview.withdrawingHeading", fallback: "Withdrawing")
+    public enum Guarantees {
+      /// Apply
+      public static let applyButtonText = L10n.tr("Localizable", "transactionReview.guarantees.applyButtonText", fallback: "Apply")
+      ///  Protect yourself by setting guaranteed minimums for estimated deposits
+      public static let explanationText = L10n.tr("Localizable", "transactionReview.guarantees.explanationText", fallback: " Protect yourself by setting guaranteed minimums for estimated deposits")
+      ///  How do Guarantees work 
+      public static let explanationTitle = L10n.tr("Localizable", "transactionReview.guarantees.explanationTitle", fallback: " How do Guarantees work ")
+      /// Protect yourself by setting guaranteed minimums for estimated deposits
+      public static let headerText = L10n.tr("Localizable", "transactionReview.guarantees.headerText", fallback: "Protect yourself by setting guaranteed minimums for estimated deposits")
+      /// How do Guarantees work
+      public static let infoButtonText = L10n.tr("Localizable", "transactionReview.guarantees.infoButtonText", fallback: "How do Guarantees work")
+      /// Set guaranteed minimum %%
+      public static let setText = L10n.tr("Localizable", "transactionReview.guarantees.setText", fallback: "Set guaranteed minimum %%")
+      /// Customize Guarantees
+      public static let title = L10n.tr("Localizable", "transactionReview.guarantees.title", fallback: "Customize Guarantees")
+    }
+    public enum NetworkFee {
+      /// The network is currently congested. Add a tip to speed up your transfer.
+      public static let congestedText = L10n.tr("Localizable", "transactionReview.networkFee.congestedText", fallback: "The network is currently congested. Add a tip to speed up your transfer.")
+      /// Customize
+      public static let customizeButtonTitle = L10n.tr("Localizable", "transactionReview.networkFee.customizeButtonTitle", fallback: "Customize")
+      /// Network Fee
+      public static let heading = L10n.tr("Localizable", "transactionReview.networkFee.heading", fallback: "Network Fee")
+    }
+    public enum UsingDapps {
+      /// %d Unknown Components
+      public static func unknownComponents(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "transactionReview.usingDapps.unknownComponents", p1, fallback: "%d Unknown Components")
+      }
+    }
+  }
   public enum TransactionSigning {
     /// Preparing transaction...
     public static let preparingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.preparingTransactionLoadingText", fallback: "Preparing transaction...")
