@@ -54,61 +54,64 @@ extension TransactionReview {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ForceFullScreen {
-					ScrollView(showsIndicators: false) {
-						VStack(spacing: 0) {
-							FixedSpacer(height: .medium2)
+				ScrollView(showsIndicators: false) {
+					VStack(spacing: 0) {
+						FixedSpacer(height: .medium2)
 
-							if let message = viewStore.message {
-								TransactionHeading(L10n.TransactionReview.messageHeading)
-									.padding(.bottom, .small2)
-								TransactionMessageView(message: message)
-							}
+						if let message = viewStore.message {
+							TransactionHeading(L10n.TransactionReview.messageHeading)
+								.padding(.bottom, .small2)
+							TransactionMessageView(message: message)
+						}
 
-							let withdrawingStore = store.scope(state: \.withdrawing) { .child(.withdrawing($0)) }
-							IfLetStore(withdrawingStore) { withdrawingStore in
-								TransactionHeading(L10n.TransactionReview.withdrawingHeading)
-									.padding(.top, .medium2)
-									.padding(.bottom, .small2)
-								TransactionReviewAccounts.View(store: withdrawingStore)
-							}
+						let withdrawingStore = store.scope(state: \.withdrawing) { .child(.withdrawing($0)) }
+						IfLetStore(withdrawingStore) { withdrawingStore in
+							TransactionHeading(L10n.TransactionReview.withdrawingHeading)
+								.padding(.top, .medium2)
+								.padding(.bottom, .small2)
+							TransactionReviewAccounts.View(store: withdrawingStore)
+						}
 
-							usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositingHeading: viewStore.showDepositingHeading)
+						usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositingHeading: viewStore.showDepositingHeading)
 
-							let depositingStore = store.scope(state: \.depositing) { .child(.depositing($0)) }
-							IfLetStore(depositingStore) { depositingStore in
-								TransactionReviewAccounts.View(store: depositingStore)
-									.padding(.bottom, .medium1)
-							}
+						let depositingStore = store.scope(state: \.depositing) { .child(.depositing($0)) }
+						IfLetStore(depositingStore) { depositingStore in
+							TransactionReviewAccounts.View(store: depositingStore)
+								.padding(.bottom, .medium1)
+						}
+
+						Separator()
+							.padding(.bottom, .medium1)
+
+						let presentingStore = store.scope(state: \.presenting) { .child(.presenting($0)) }
+						IfLetStore(presentingStore) { childStore in
+							TransactionReviewPresenting.View(store: childStore)
 
 							Separator()
 								.padding(.bottom, .medium1)
-
-							let presentingStore = store.scope(state: \.presenting) { .child(.presenting($0)) }
-							IfLetStore(presentingStore) { childStore in
-								TransactionReviewPresenting.View(store: childStore)
-
-								Separator()
-									.padding(.bottom, .medium1)
-							}
-
-							let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
-							IfLetStore(feeStore) { feeStore in
-								TransactionReviewNetworkFee.View(store: feeStore)
-							}
 						}
-						.padding(.horizontal, .medium3)
+
+						let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
+						IfLetStore(feeStore) { feeStore in
+							TransactionReviewNetworkFee.View(store: feeStore)
+						}
+
+						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
+							viewStore.send(.approveTapped)
+						}
+						.buttonStyle(.primaryRectangular)
 					}
-					.background(.app.gray5)
-					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
-					.navigationTitle(L10n.TransactionReview.title)
-					.toolbar {
-						ToolbarItem(placement: .automatic) {
-							Button(asset: AssetResource.code) {
-								viewStore.send(.showRawTransactionTapped)
-							}
-							.buttonStyle(.secondaryRectangular(isInToolbar: true))
+					.padding(.horizontal, .medium3)
+				}
+				.background(.app.gray5)
+				.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
+				.navigationTitle(L10n.TransactionReview.title)
+				.toolbar {
+					ToolbarItem(placement: .automatic) {
+						Button(asset: AssetResource.code) {
+							viewStore.send(.showRawTransactionTapped)
 						}
+						.buttonStyle(.secondaryRectangular(isInToolbar: true))
 					}
 				}
 				.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
@@ -116,13 +119,6 @@ extension TransactionReview {
 				}
 				.sheet(store: store.scope(state: \.$rawTransaction) { .child(.rawTransaction($0)) }) { childStore in
 					TransactionReviewRawTransaction.View(store: childStore)
-				}
-				.safeAreaInset(edge: .bottom, spacing: .zero) {
-					ConfirmationFooter(
-						title: L10n.TransactionSigning.signTransactionButtonTitle,
-						isEnabled: viewStore.viewControlState.isEnabled,
-						action: { viewStore.send(.approveTapped) }
-					)
 				}
 				.controlState(viewStore.viewControlState)
 				.onAppear {
