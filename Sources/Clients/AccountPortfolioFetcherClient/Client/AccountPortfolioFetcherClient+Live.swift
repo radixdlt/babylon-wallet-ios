@@ -10,8 +10,9 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 			let resourcesResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
 			var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
 
-			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress)
-			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress)
+			let tmpMaxRequestAmount = 999 // TODO: remove once pagination is implemented
+			let fungibleTokenAddresses = Array(accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress).prefix(tmpMaxRequestAmount))
+			let nonFungibleTokenAddresses = Array(accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress).prefix(tmpMaxRequestAmount))
 
 			if fungibleTokenAddresses.isEmpty, nonFungibleTokenAddresses.isEmpty {
 				return .empty(owner: accountAddress)
