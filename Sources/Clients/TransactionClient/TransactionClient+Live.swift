@@ -321,29 +321,52 @@ extension TransactionClient {
 		let getTransactionPreview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			let transactionPreviewRequest = try await createTransactionPreviewRequest(
-				for: request,
-				networkID: networkID
-			).get()
-
-			let response = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
-			let receiptBytes = try [UInt8](hex: response.encodedReceipt)
-
-			let generateTransactionReviewRequest = AnalyzeManifestWithPreviewContextRequest(
-				networkId: networkID,
-				manifest: request.manifestToSign,
-				transactionReceipt: receiptBytes
-			)
-
-			let analyzedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
-
-			let (manifestIncludingLockFee, transactionFeeAdded) = try await addLockFeeInstructionToManifest(request.manifestToSign)
-
-			return TransactionToReview(
-				analyzedManifestToReview: analyzedManifestToReview,
-				manifestIncludingLockFee: manifestIncludingLockFee,
-				transactionFeeAdded: transactionFeeAdded
-			)
+			return await createTransactionPreviewRequest(for: request, networkID: networkID)
+				.mapError {
+					TransactionFailure.failedToPrepareTXReview(.failedSigning($0))
+				}
+				.asyncFlatMap { transactionPreviewRequest in
+					do {
+						let response = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
+						return .success(response)
+					} catch {
+						return .failure(TransactionFailure.failedToPrepareTXReview(.failedToRetrieveTXPreview(error)))
+					}
+				}
+				.flatMap { (response: GatewayAPI.TransactionPreviewResponse) in
+					do {
+						let bytes = try [UInt8](hex: response.encodedReceipt)
+						return .success(bytes)
+					} catch {
+						return .failure(TransactionFailure.failedToPrepareTXReview(.failedToExtractTXReceiptBytes(error)))
+					}
+				}
+				.flatMap { (receiptBytes: [UInt8]) in
+					let generateTransactionReviewRequest = AnalyzeManifestWithPreviewContextRequest(
+						networkId: networkID,
+						manifest: request.manifestToSign,
+						transactionReceipt: receiptBytes
+					)
+					do {
+						let analyzedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
+						return .success(analyzedManifestToReview)
+					} catch {
+						return .failure(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))
+					}
+				}
+				.asyncFlatMap { (analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse) in
+					do {
+						let (manifestIncludingLockFee, transactionFeeAdded) = try await addLockFeeInstructionToManifest(request.manifestToSign)
+						let review = TransactionToReview(
+							analyzedManifestToReview: analyzedManifestToReview,
+							manifestIncludingLockFee: manifestIncludingLockFee,
+							transactionFeeAdded: transactionFeeAdded
+						)
+						return .success(review)
+					} catch {
+						return .failure(.failedToPrepareTXReview(.failedToGenerateTXReview(error)))
+					}
+				}
 		}
 
 		@Sendable

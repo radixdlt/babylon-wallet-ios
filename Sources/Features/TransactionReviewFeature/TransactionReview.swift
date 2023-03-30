@@ -53,7 +53,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case previewLoaded(TaskResult<TransactionToReview>)
+		case previewLoaded(TransactionReviewResult)
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case signTransactionResult(TransactionResult)
 		case rawTransactionCreated(String)
@@ -98,10 +98,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .appeared:
 			let manifest = state.transaction.transactionManifest
 			return .run { send in
-				let result = await TaskResult {
-					try await transactionClient.getTransactionReview(.init(manifestToSign: manifest))
-				}
-
+				let result = await transactionClient.getTransactionReview(.init(manifestToSign: manifest))
 				await send(.internal(.previewLoaded(result)))
 			}
 
@@ -227,7 +224,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.failed(transactionFailure)))
 
 		case let .previewLoaded(.failure(error)):
-			return .send(.delegate(.failed(.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid))))
+			return .send(.delegate(.failed(error)))
 
 		case let .rawTransactionCreated(transaction):
 			state.rawTransaction = .init(transaction: transaction)
