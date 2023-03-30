@@ -96,9 +96,7 @@ extension EditPersona {
 							forAction: { viewStore.send(.saveButtonTapped($0)) }
 						) { action in
 							Button(L10n.EditPersona.Button.save, action: action)
-								.textStyle(.body1Link)
-								.foregroundColor(.app.blue2)
-								.opacity(viewStore.output == nil ? 0.3 : 1)
+								.buttonStyle(.primaryRectangular)
 						}
 					}
 					#if os(iOS)
