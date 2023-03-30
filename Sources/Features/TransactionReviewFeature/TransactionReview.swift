@@ -196,10 +196,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				let userAccounts = try await extractAccounts(reviewedManifest)
 
 				let content = await TransactionReview.TransactionContent(
-					withdrawing: try? extractWithdraws(reviewedManifest, userAccounts: userAccounts),
+					withdrawals: try? extractWithdrawals(reviewedManifest, userAccounts: userAccounts),
 					dAppsUsed: try? extractUsedDapps(reviewedManifest),
-					depositing: try? extractDeposits(reviewedManifest, userAccounts: userAccounts),
-					presenting: try? exctractBadges(reviewedManifest),
+					deposits: try? extractDeposits(reviewedManifest, userAccounts: userAccounts),
+					proofs: try? exctractProofs(reviewedManifest),
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
 				await send(.internal(.createTransactionReview(content)))
@@ -207,9 +207,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				// TODO: Handle error
 			}
 		case let .createTransactionReview(content):
-			state.deposits = content.deposits
-			state.dAppsUsed = content.dAppsUsed
 			state.withdrawals = content.withdrawals
+			state.dAppsUsed = content.dAppsUsed
+			state.deposits = content.deposits
 			state.proofs = content.proofs
 			state.networkFee = content.networkFee
 			return .none
@@ -283,7 +283,7 @@ extension TransactionReview {
 			}
 	}
 
-	private func exctractBadges(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
 		let dapps = try await extractDappsInfo(manifest.accountProofResources.map(\.address))
 		guard !dapps.isEmpty else { return nil }
 
@@ -406,19 +406,19 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractWithdraws(
+	private func extractWithdrawals(
 		_ manifest: AnalyzeManifestWithPreviewContextResponse,
 		userAccounts: [Account]
 	) async throws -> TransactionReviewAccounts.State? {
 		var withdrawals: [Account: [Transfer]] = [:]
 
-		for withdraw in manifest.accountWithdraws {
+		for withdrawal in manifest.accountWithdraws {
 			try await collectTransferInfo(
-				componentAddress: withdraw.componentAddress,
-				resourceSpecifier: withdraw.resourceSpecifier,
+				componentAddress: withdrawal.componentAddress,
+				resourceSpecifier: withdrawal.resourceSpecifier,
 				userAccounts: userAccounts,
 				createdEntities: manifest.createdEntities,
-				container: &withdraws,
+				container: &withdrawals,
 				type: .exact
 			)
 		}
@@ -621,10 +621,10 @@ extension EngineToolkitModels.AddressKind {
 #if DEBUG
 extension TransactionReview.Dapp {
 	public static let mock0 = Self(id: .deadbeef32Bytes,
-								   metadata: .init(name: "Collabofi User Badge", thumbnail: nil, description: nil))
+	                               metadata: .init(name: "Collabofi User Badge", thumbnail: nil, description: nil))
 
 	public static let mock1 = Self(id: .deadbeef64Bytes,
-								   metadata: .init(name: "Oh Babylon Founder NFT", thumbnail: nil, description: nil))
+	                               metadata: .init(name: "Oh Babylon Founder NFT", thumbnail: nil, description: nil))
 
 	public static let mock2 = Self(id: "deadbeef64Bytes", metadata: nil)
 
@@ -645,12 +645,12 @@ extension TransactionReviewAccount.State {
 
 extension TransactionReview.Account {
 	public static let mockUser0 = user(.init(address: .mock0,
-											 label: "My Main Account",
-											 appearanceID: ._1))
+	                                         label: "My Main Account",
+	                                         appearanceID: ._1))
 
 	public static let mockUser1 = user(.init(address: .mock1,
-											 label: "My Savings Account",
-											 appearanceID: ._2))
+	                                         label: "My Savings Account",
+	                                         appearanceID: ._2))
 
 	public static let mockExternal0 = external(.mock2, approved: true)
 	public static let mockExternal1 = external(.mock2, approved: false)
@@ -679,33 +679,33 @@ extension URL {
 
 extension TransactionReview.Transfer {
 	public static let mock0 = Self(action: .mock0,
-								   guarantee: .init(amount: 1.0188, instructionIndex: 1, resourceAddress: .mock0),
-								   metadata: .init(name: "TSLA",
-												   thumbnail: .mock,
-												   type: .fungible,
-												   fiatAmount: 301.91))
+	                               guarantee: .init(amount: 1.0188, instructionIndex: 1, resourceAddress: .mock0),
+	                               metadata: .init(name: "TSLA",
+	                                               thumbnail: .mock,
+	                                               type: .fungible,
+	                                               fiatAmount: 301.91))
 
 	public static let mock1 = Self(action: .mock1,
-								   metadata: .init(name: "XRD",
-												   thumbnail: .mock,
-												   type: .fungible,
-												   fiatAmount: 301.91))
+	                               metadata: .init(name: "XRD",
+	                                               thumbnail: .mock,
+	                                               type: .fungible,
+	                                               fiatAmount: 301.91))
 
 	public static let mock2 = Self(action: .mock2,
-								   guarantee: .init(amount: 5.10, instructionIndex: 1, resourceAddress: .mock1),
-								   metadata: .init(name: "PXL",
-												   thumbnail: .mock,
-												   type: .fungible))
+	                               guarantee: .init(amount: 5.10, instructionIndex: 1, resourceAddress: .mock1),
+	                               metadata: .init(name: "PXL",
+	                                               thumbnail: .mock,
+	                                               type: .fungible))
 
 	public static let mock3 = Self(action: .mock3,
-								   metadata: .init(name: "PXL",
-												   thumbnail: .mock,
-												   type: .fungible))
+	                               metadata: .init(name: "PXL",
+	                                               thumbnail: .mock,
+	                                               type: .fungible))
 
 	public static let mock4 = Self(action: .mock4,
-								   metadata: .init(name: "Block 14F5",
-												   thumbnail: .mock,
-												   type: .nonFungible))
+	                               metadata: .init(name: "Block 14F5",
+	                                               thumbnail: .mock,
+	                                               type: .nonFungible))
 
 	public static var all: Set<Self> {
 		[.mock0, .mock1, .mock2, .mock3, .mock4]
@@ -714,24 +714,24 @@ extension TransactionReview.Transfer {
 
 extension AccountAction {
 	public static let mock0 = Self(componentAddress: .mock0,
-								   resourceAddress: .mock0,
-								   amount: 1.0396)
+	                               resourceAddress: .mock0,
+	                               amount: 1.0396)
 
 	public static let mock1 = Self(componentAddress: .mock1,
-								   resourceAddress: .mock1,
-								   amount: 500)
+	                               resourceAddress: .mock1,
+	                               amount: 500)
 
 	public static let mock2 = Self(componentAddress: .mock0,
-								   resourceAddress: .mock1,
-								   amount: 5.123)
+	                               resourceAddress: .mock1,
+	                               amount: 5.123)
 
 	public static let mock3 = Self(componentAddress: .mock1,
-								   resourceAddress: .mock1,
-								   amount: 300)
+	                               resourceAddress: .mock1,
+	                               amount: 300)
 
 	public static let mock4 = Self(componentAddress: .mock0,
-								   resourceAddress: .mock1,
-								   amount: 1)
+	                               resourceAddress: .mock1,
+	                               amount: 1)
 
 	public static var all: Set<Self> {
 		[.mock0, .mock1, .mock2, .mock3, .mock4]
