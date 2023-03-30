@@ -164,7 +164,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		.task {
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
-			return .internal(.firstPersonaOnAnyNetworkResult(isFirstPersonaOnAnyNetwork))
+			return .internal(.isFirstPersonaOnAnyNetworkResult(isFirstPersonaOnAnyNetwork))
 		}
 	}
 }
