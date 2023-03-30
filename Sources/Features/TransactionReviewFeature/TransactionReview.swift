@@ -200,9 +200,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				let userAccounts = try await extractAccounts(reviewedManifest)
 
 				let content = await TransactionReview.TransactionContent(
-					withdrawing: try? extractWithdraws(reviewedManifest.accountWithdraws, userAccounts: userAccounts),
+					withdrawing: try? extractWithdraws(reviewedManifest, userAccounts: userAccounts),
 					dAppsUsed: try? extractUsedDapps(reviewedManifest),
-					depositing: try? extractDeposits(reviewedManifest.accountDeposits, userAccounts: userAccounts),
+					depositing: try? extractDeposits(reviewedManifest, userAccounts: userAccounts),
 					presenting: try? exctractBadges(reviewedManifest),
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
@@ -302,15 +302,32 @@ extension TransactionReview {
 		return dapps
 	}
 
-	private func extractDeposits(_ accountDeposits: [AccountDeposit], userAccounts: [Account]) async throws -> TransactionReviewAccounts.State {
+	private func extractDeposits(
+		_ manifest: AnalyzeManifestWithPreviewContextResponse,
+		userAccounts: [Account]
+	) async throws -> TransactionReviewAccounts.State {
 		var deposits: [Account: [Transfer]] = [:]
 
-		for deposit in accountDeposits {
+		for deposit in manifest.accountDeposits {
 			switch deposit {
 			case let .exact(componentAddress, resourceSpecifier):
-				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, type: .exact)
+				try await collectTransferInfo(
+					componentAddress: componentAddress,
+					resourceSpecifier: resourceSpecifier,
+					userAccounts: userAccounts,
+					createdEntities: manifest.createdEntities,
+					container: &deposits,
+					type: .exact
+				)
 			case let .estimate(index, componentAddress, resourceSpecifier):
-				try await collectTransferInfo(componentAddress: componentAddress, resourceSpecifier: resourceSpecifier, userAccounts: userAccounts, container: &deposits, type: .estimated(instructionIndex: index))
+				try await collectTransferInfo(
+					componentAddress: componentAddress,
+					resourceSpecifier: resourceSpecifier,
+					userAccounts: userAccounts,
+					createdEntities: manifest.createdEntities,
+					container: &deposits,
+					type: .estimated(instructionIndex: index)
+				)
 			}
 		}
 
@@ -331,12 +348,18 @@ extension TransactionReview {
 		componentAddress: ComponentAddress,
 		resourceSpecifier: ResourceSpecifier,
 		userAccounts: [Account],
+		createdEntities: CreatedEntitities?,
 		container: inout [Account: [Transfer]],
 		type: TransferType
 	) async throws {
 		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
 		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
-			let metadata = try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			let isNewResources = createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
+			let metadata: GatewayAPI.EntityMetadataCollection? = await {
+				guard !isNewResources else { return nil }
+				return try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
+			}()
+
 			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
 			let action = AccountAction(
 				componentAddress: componentAddress,
@@ -345,7 +368,7 @@ extension TransactionReview {
 			)
 
 			let guarantee: TransactionClient.Guarantee? = {
-				if case let .estimated(instructionIndex) = type, addressKind == .fungibleResource {
+				if case let .estimated(instructionIndex) = type, !isNewResources {
 					return .init(amount: amount, instructionIndex: instructionIndex, resourceAddress: resourceAddress)
 				}
 				return nil
@@ -375,13 +398,20 @@ extension TransactionReview {
 	}
 
 	private func extractWithdraws(
-		_ accountWithdraws: [AccountWithdraw],
+		_ manifest: AnalyzeManifestWithPreviewContextResponse,
 		userAccounts: [Account]
 	) async throws -> TransactionReviewAccounts.State? {
 		var withdraws: [Account: [Transfer]] = [:]
 
-		for withdraw in accountWithdraws {
-			try await collectTransferInfo(componentAddress: withdraw.componentAddress, resourceSpecifier: withdraw.resourceSpecifier, userAccounts: userAccounts, container: &withdraws, type: .exact)
+		for withdraw in manifest.accountWithdraws {
+			try await collectTransferInfo(
+				componentAddress: withdraw.componentAddress,
+				resourceSpecifier: withdraw.resourceSpecifier,
+				userAccounts: userAccounts,
+				createdEntities: manifest.createdEntities,
+				container: &withdraws,
+				type: .exact
+			)
 		}
 
 		guard !withdraws.isEmpty else { return nil }

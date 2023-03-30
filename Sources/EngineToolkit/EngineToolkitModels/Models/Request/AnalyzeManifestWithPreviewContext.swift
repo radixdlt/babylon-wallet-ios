@@ -28,6 +28,7 @@ public struct AnalyzeManifestWithPreviewContextResponse: Sendable, Codable, Equa
 	public let accountProofResources: Set<ResourceAddress>
 	public let accountWithdraws: [AccountWithdraw]
 	public let accountDeposits: [AccountDeposit]
+	public let createdEntities: CreatedEntitities?
 
 	enum CodingKeys: String, CodingKey {
 		case encounteredAddresses = "encountered_addresses"
@@ -35,6 +36,7 @@ public struct AnalyzeManifestWithPreviewContextResponse: Sendable, Codable, Equa
 		case accountProofResources = "account_proof_resources"
 		case accountWithdraws = "account_withdraws"
 		case accountDeposits = "account_deposits"
+		case createdEntities = "created_entities"
 	}
 }
 
@@ -100,6 +102,19 @@ public enum AccountDeposit: Sendable, Codable, Equatable {
 		case index = "instruction_index"
 		case componentAddress = "component_address"
 		case resourceSpecifier = "resource_specifier"
+	}
+}
+
+// MARK: - CreatedEntitities
+public struct CreatedEntitities: Sendable, Codable, Equatable {
+	public let componentAddresses: Set<ComponentAddress>
+	public let resourceAddresses: Set<ResourceAddress>
+	public let packageAddresses: Set<PackageAddress>
+
+	enum CodingKeys: String, CodingKey {
+		case componentAddresses = "component_addresses"
+		case resourceAddresses = "resource_addresses"
+		case packageAddresses = "package_addresses"
 	}
 }
 
