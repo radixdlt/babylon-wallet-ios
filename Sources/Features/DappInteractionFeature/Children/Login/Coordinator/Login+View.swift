@@ -6,6 +6,7 @@ extension Login {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
+		let shouldShowChooseAPersonaTitle: Bool
 		let availablePersonas: IdentifiedArrayOf<PersonaRow.State>
 		let selectedPersona: PersonaRow.State?
 		let continueButtonRequirements: ContinueButtonRequirements?
@@ -31,6 +32,8 @@ extension Login {
 
 				return dappName + explanation
 			}()
+
+			shouldShowChooseAPersonaTitle = !state.personas.isEmpty
 
 			availablePersonas = state.personas
 			selectedPersona = state.selectedPersona
@@ -61,9 +64,11 @@ extension Login {
 							subtitle: viewStore.subtitle
 						)
 
-						Text(L10n.DApp.Login.chooseAPersonaTitle)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1Header)
+						if viewStore.shouldShowChooseAPersonaTitle {
+							Text(L10n.DApp.Login.chooseAPersonaTitle)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body1Header)
+						}
 
 						VStack(spacing: .small1) {
 							Selection(
