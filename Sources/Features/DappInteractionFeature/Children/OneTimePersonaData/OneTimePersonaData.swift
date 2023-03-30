@@ -36,7 +36,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>)
-		case isFirstPersonaOnAnyNetworkResult(Bool)
+		case isFirstPersonaOnAnyNetwork(Bool)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -117,7 +117,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .isFirstPersonaOnAnyNetworkResult(isFirstPersonaOnAnyNetwork):
+		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
 			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 			return .none
 
@@ -164,7 +164,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		.task {
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
-			return .internal(.isFirstPersonaOnAnyNetworkResult(isFirstPersonaOnAnyNetwork))
+			return .internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork))
 		}
 	}
 }
