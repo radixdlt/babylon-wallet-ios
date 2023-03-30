@@ -1,4 +1,4 @@
-import FeaturePrelude
+import SwiftUI
 
 // MARK: - SlideUpPanel
 public struct SlideUpPanel: Sendable, FeatureReducer {

@@ -80,7 +80,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case .createAccountButtonTapped:
 			state.createAccountCoordinator = .init(config: .init(
 				purpose: .newAccountDuringDappInteraction
-			))
+			), displayIntroduction: { _ in false })
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):

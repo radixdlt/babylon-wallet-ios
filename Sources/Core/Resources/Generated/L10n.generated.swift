@@ -129,6 +129,24 @@ public enum L10n {
         }
       }
     }
+    public enum Introduction {
+      public enum Button {
+        /// Continue
+        public static let `continue` = L10n.tr("Localizable", "createEntity.introduction.button.continue", fallback: "Continue")
+      }
+      public enum Persona {
+        /// A Persona is an identity that you own and control. You can have as many as you like.
+        public static let subtitle0 = L10n.tr("Localizable", "createEntity.introduction.persona.subtitle0", fallback: "A Persona is an identity that you own and control. You can have as many as you like.")
+        /// You will chosose Peronas to login to dApps, and dApps may request access to personal information associated with that Persona.
+        public static let subtitle1 = L10n.tr("Localizable", "createEntity.introduction.persona.subtitle1", fallback: "You will chosose Peronas to login to dApps, and dApps may request access to personal information associated with that Persona.")
+        /// Create a Persona
+        public static let title = L10n.tr("Localizable", "createEntity.introduction.persona.title", fallback: "Create a Persona")
+        public enum Button {
+          /// Learn about Personas
+          public static let tutorial = L10n.tr("Localizable", "createEntity.introduction.persona.button.tutorial", fallback: "Learn about Personas")
+        }
+      }
+    }
     public enum NameNewEntity {
       /// What would you like to call your %s?
       public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {

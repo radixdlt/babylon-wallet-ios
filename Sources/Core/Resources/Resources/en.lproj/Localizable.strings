@@ -21,6 +21,12 @@
 "common.account.kind" = "Account";
 "common.persona.kind" = "Persona";
 
+"createEntity.introduction.button.continue" = "Continue";
+"createEntity.introduction.persona.title" = "Create a Persona";
+"createEntity.introduction.persona.button.tutorial" = "Learn about Personas";
+"createEntity.introduction.persona.subtitle0" = "A Persona is an identity that you own and control. You can have as many as you like.";
+"createEntity.introduction.persona.subtitle1" = "You will chosose Peronas to login to dApps, and dApps may request access to personal information associated with that Persona.";
+
 "createEntity.nameNewEntity.account.title.first" = "Create First Account";
 "createEntity.nameNewEntity.account.title.notFirst" = "Create New Account";
 "createEntity.nameNewEntity.persona.title" = "Create a Persona";

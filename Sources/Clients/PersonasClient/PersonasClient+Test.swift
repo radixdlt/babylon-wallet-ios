@@ -15,13 +15,15 @@ extension PersonasClient: TestDependencyKey {
 		getPersonas: unimplemented("\(Self.self).getPersonas"),
 		updatePersona: unimplemented("\(Self.self).updatePersona"),
 		createUnsavedVirtualPersona: unimplemented("\(Self.self).createUnsavedVirtualPersona"),
-		saveVirtualPersona: unimplemented("\(Self.self).saveVirtualPersona")
+		saveVirtualPersona: unimplemented("\(Self.self).saveVirtualPersona"),
+		hasAnyPersonaOnAnyNetwork: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetwork")
 	)
 	public static let noop = Self(
 		personas: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getPersonas: { .init() },
 		updatePersona: { _ in throw NoopError() },
 		createUnsavedVirtualPersona: { _ in throw NoopError() },
-		saveVirtualPersona: { _ in }
+		saveVirtualPersona: { _ in },
+		hasAnyPersonaOnAnyNetwork: { true }
 	)
 }

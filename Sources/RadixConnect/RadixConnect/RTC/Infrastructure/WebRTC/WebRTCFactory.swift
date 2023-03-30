@@ -19,12 +19,12 @@ struct WebRTCFactory: PeerConnectionFactory {
 		#if DEBUG
 		[
 			RTCIceServer(urlStrings: ["turn:turn-dev-udp.rdx-works-main.extratools.works:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-			RTCIceServer(urlStrings: ["turn:turn-betanet-udp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+			RTCIceServer(urlStrings: ["turn:turn-dev-tcp.rdx-works-main.extratools.works:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
 		]
 		#else
 		[
-			RTCIceServer(urlStrings: ["turn:turn-dev-udp.rdx-works-main.extratools.works:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-			RTCIceServer(urlStrings: ["turn:turn-betanet-udp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+			RTCIceServer(urlStrings: ["turn:turn-rcnet-udp.radixdlt.com:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+			RTCIceServer(urlStrings: ["turn:turn-rcnet-tcp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
 		]
 		#endif
 	}()
