@@ -132,10 +132,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 				.init(titleVisibility: .hidden) {
 					TextState("")
 				} actions: {
-					ButtonState.destructive(TextState("Discard Changes"), action: .send(.discardChanges))
-					ButtonState.cancel(TextState("Keep Editing"), action: .send(.keepEditing))
+					ButtonState(role: .destructive, action: .send(.discardChanges)) {
+						TextState(L10n.EditPersona.CloseConfirmationDialog.Button.discardChanges)
+					}
+					ButtonState(role: .cancel, action: .send(.keepEditing)) {
+						TextState(L10n.EditPersona.CloseConfirmationDialog.Button.keepEditing)
+					}
 				} message: {
-					TextState("Are you sure you want to discard changes to this persona?")
+					TextState(L10n.EditPersona.CloseConfirmationDialog.message)
 				}
 			)
 			return .none

@@ -428,10 +428,18 @@ public enum L10n {
     public enum Button {
       /// Add a Field
       public static let addAField = L10n.tr("Localizable", "editPersona.button.addAField", fallback: "Add a Field")
-      /// Cancel
-      public static let cancel = L10n.tr("Localizable", "editPersona.button.cancel", fallback: "Cancel")
       /// Save
       public static let save = L10n.tr("Localizable", "editPersona.button.save", fallback: "Save")
+    }
+    public enum CloseConfirmationDialog {
+      /// Are you sure you want to discard changes to this persona?
+      public static let message = L10n.tr("Localizable", "editPersona.closeConfirmationDialog.message", fallback: "Are you sure you want to discard changes to this persona?")
+      public enum Button {
+        /// Discard Changes
+        public static let discardChanges = L10n.tr("Localizable", "editPersona.closeConfirmationDialog.button.discardChanges", fallback: "Discard Changes")
+        /// Keep Editing
+        public static let keepEditing = L10n.tr("Localizable", "editPersona.closeConfirmationDialog.button.keepEditing", fallback: "Keep Editing")
+      }
     }
     public enum InputField {
       public enum Error {
