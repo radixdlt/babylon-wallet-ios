@@ -90,6 +90,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.withdrawals, action: /Action.child .. ChildAction.withdrawals) {
 				TransactionReviewAccounts()
 			}
+			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
+				TransactionReviewProofs()
+			}
 			.ifLet(\.$customizeGuarantees, action: /Action.child .. ChildAction.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
