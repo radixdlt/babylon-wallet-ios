@@ -15,6 +15,7 @@ public enum TextStyle {
 	case body2Regular
 	case body2Link
 	case button
+	case monospaced
 }
 
 extension View {
@@ -46,6 +47,8 @@ extension View {
 			modifier(TextStyle.Body2Link())
 		case .button:
 			modifier(TextStyle.Button())
+		case .monospaced:
+			modifier(TextStyle.Monospaced())
 		}
 	}
 }
@@ -151,6 +154,14 @@ extension TextStyle {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.button)
+				.lineSpacing(.lineSpacing(.𝟙𝟠))
+		}
+	}
+
+	fileprivate struct Monospaced: ViewModifier {
+		func body(content: Content) -> some View {
+			content
+				.font(.app.monospace)
 				.lineSpacing(.lineSpacing(.𝟙𝟠))
 		}
 	}

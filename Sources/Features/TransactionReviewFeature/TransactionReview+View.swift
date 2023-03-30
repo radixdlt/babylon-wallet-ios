@@ -228,7 +228,7 @@ struct TransactionReviewTokenView: View {
 				HStack(spacing: .small2) {
 					if viewState.guaranteedAmount != nil {
 						Text(L10n.TransactionReview.estimated)
-							.textStyle(.body2Regular) // TODO:  unknown textStyle
+							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)
 					}
 					Text(viewState.amount.format())
