@@ -63,6 +63,10 @@ extension SwiftUI.Font.App {
 	public var button: SwiftUI.Font {
 		.custom(FontFamily.IBMPlexSans.bold, size: 16)
 	}
+
+	public var monospace: SwiftUI.Font {
+		.system(size: 13, design: .monospaced)
+	}
 }
 
 /// UIFont/NSFont depending on platform.

@@ -16,7 +16,7 @@ extension MinimumPercentageStepper {
 					Button(asset: AssetResource.minusCircle) {
 						viewStore.send(.decreaseTapped)
 					}
-					.opacity(viewStore.disableMinus ? 0.2 : 1)
+					.opacity(viewStore.disableMinus ? disabledOpacity : 1)
 					.disabled(viewStore.disableMinus)
 
 					let text = viewStore.binding(get: \.string) { .stringEntered($0) }
@@ -26,21 +26,27 @@ extension MinimumPercentageStepper {
 						.lineLimit(1)
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray1)
-						.frame(width: 68, height: 48)
+						.frame(width: textFieldSize.width, height: textFieldSize.height)
 						.background {
 							RoundedRectangle(cornerRadius: 8)
 								.fill(.app.gray5)
 							RoundedRectangle(cornerRadius: 8)
-								.stroke(viewStore.isValid ? .app.gray4 : .app.red1.opacity(0.6))
+								.stroke(viewStore.isValid ? .app.gray4 : transparentErrorRed)
 						}
 
 					Button(asset: AssetResource.plusCircle) {
 						viewStore.send(.increaseTapped)
 					}
-					.opacity(viewStore.disablePlus ? 0.2 : 1)
+					.opacity(viewStore.disablePlus ? disabledOpacity : 1)
 					.disabled(viewStore.disablePlus)
 				}
 			}
 		}
+
+		private let disabledOpacity: CGFloat = 0.2
+
+		private let transparentErrorRed: Color = .app.red1.opacity(0.6)
+
+		private let textFieldSize: CGSize = .init(width: 68, height: 48)
 	}
 }
