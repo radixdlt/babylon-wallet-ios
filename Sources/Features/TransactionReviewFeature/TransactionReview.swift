@@ -297,7 +297,7 @@ extension TransactionReview {
 		let dapps = try await extractDappsInfo(manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address))
 		guard !dapps.isEmpty else { return nil }
 
-		return TransactionReviewDappsUsed.State(isExpanded: false, dApps: .init(uniqueElements: dapps))
+		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: dapps))
 	}
 
 	private func extractDappsInfo(_ addresses: [String]) async throws -> [Dapp] {

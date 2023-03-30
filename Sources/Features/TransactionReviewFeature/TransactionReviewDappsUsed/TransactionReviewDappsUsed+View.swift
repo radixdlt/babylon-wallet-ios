@@ -102,22 +102,18 @@ extension TransactionReviewDappsUsed {
 							DappPlaceholder(known: true, size: .smaller)
 						}
 
-						VStack(alignment: .leading, spacing: .small3) {
-							Text(name)
-								.lineLimit(description != nil ? 1 : 2)
-							if let description {
-								Text(description)
-									.lineLimit(1)
-							}
-						}
-						.padding(.leading, .small2)
+						Text(name)
+							.lineLimit(2)
+							.padding(.leading, .small2)
 
 					case let .unknown(count):
 						DappPlaceholder(known: false, size: .smaller)
 							.padding(.trailing, .small2)
+
 						Text(L10n.TransactionReview.UsingDapps.unknownComponents(count))
 							.lineLimit(2)
 					}
+
 					Spacer(minLength: 0)
 				}
 				.textStyle(.body2HighImportance)
