@@ -103,11 +103,11 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 		case .createNewPersonaButtonTapped:
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
-			let isFirstPersonaOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
+			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
 			state.destination = .createPersona(.init(config: .init(
 				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
-			), displayIntroduction: { _ in isFirstPersonaOnAnyNetwork }))
+			), displayIntroduction: { _ in isFirstOnAnyNetwork }))
 			return .none
 
 		case let .continueButtonTapped(fields):
