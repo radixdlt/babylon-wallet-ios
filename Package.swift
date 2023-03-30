@@ -53,7 +53,6 @@ package.addModules([
 			"MainFeature",
 			"OnboardingFeature",
 			"SplashFeature",
-			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),

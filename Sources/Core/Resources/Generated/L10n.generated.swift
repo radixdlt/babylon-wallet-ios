@@ -776,7 +776,7 @@ public enum L10n {
     /// Customize Guarantees
     public static let customizeGuaranteesButtonTitle = L10n.tr("Localizable", "transactionReview.customizeGuaranteesButtonTitle", fallback: "Customize Guarantees")
     /// Depositing
-    public static let depositingHeading = L10n.tr("Localizable", "transactionReview.depositingHeading", fallback: "Depositing")
+    public static let depositsHeading = L10n.tr("Localizable", "transactionReview.depositsHeading", fallback: "Depositing")
     /// Estimated
     public static let estimated = L10n.tr("Localizable", "transactionReview.estimated", fallback: "Estimated")
     /// Account
@@ -796,7 +796,7 @@ public enum L10n {
     /// Using dApps
     public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview.usingDappsHeading", fallback: "Using dApps")
     /// Withdrawing
-    public static let withdrawingHeading = L10n.tr("Localizable", "transactionReview.withdrawingHeading", fallback: "Withdrawing")
+    public static let withdrawalsHeading = L10n.tr("Localizable", "transactionReview.withdrawalsHeading", fallback: "Withdrawing")
     public enum Guarantees {
       /// Apply
       public static let applyButtonText = L10n.tr("Localizable", "transactionReview.guarantees.applyButtonText", fallback: "Apply")
