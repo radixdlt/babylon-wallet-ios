@@ -261,21 +261,21 @@ struct TransactionReviewTokenView: View {
 							.textStyle(.body2Regular) // TODO:  unknown textStyle
 							.foregroundColor(.app.gray1)
 					}
-					Text(viewState.amount.format(maxPlaces: 4))
+					Text(viewState.amount.format())
 						.textStyle(.secondaryHeader)
 				}
 				.foregroundColor(.app.gray1)
 
 				if let fiatAmount = viewState.fiatAmount {
 					// Text(fiatAmount.formatted(.currency(code: "USD")))
-					Text(fiatAmount.format(maxPlaces: 4))
+					Text(fiatAmount.format())
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.padding(.top, .small2)
 				}
 
 				if let guaranteedAmount = viewState.guaranteedAmount {
-					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.format(maxPlaces: 4))**")
+					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.format())**")
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 						.padding(.top, .small1)
