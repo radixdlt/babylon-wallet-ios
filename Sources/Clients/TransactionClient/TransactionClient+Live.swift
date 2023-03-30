@@ -328,6 +328,13 @@ extension TransactionClient {
 				.asyncFlatMap { transactionPreviewRequest in
 					do {
 						let response = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
+						guard response.receipt.status == .succeeded else {
+							return .failure(
+								TransactionFailure.failedToPrepareTXReview(
+									.failedToRetrieveTXReceipt(response.receipt.errorMessage ?? "Unknown reason")
+								)
+							)
+						}
 						return .success(response)
 					} catch {
 						return .failure(TransactionFailure.failedToPrepareTXReview(.failedToRetrieveTXPreview(error)))
