@@ -14,7 +14,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
-		public var presenting: TransactionReviewPresenting.State? = nil
+		public var proofs: TransactionReviewProofs.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 
 		@PresentationState
@@ -48,7 +48,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case withdrawals(TransactionReviewAccounts.Action)
 		case deposits(TransactionReviewAccounts.Action)
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
-		case presenting(TransactionReviewPresenting.Action)
+		case proofs(TransactionReviewProofs.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 
 		case customizeGuarantees(PresentationAction<TransactionReviewGuarantees.Action>)
@@ -164,7 +164,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .dAppsUsed:
 			return .none
 
-		case .presenting:
+		case .proofs:
 			return .none
 
 		case .networkFee:
@@ -216,7 +216,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.deposits = content.deposits
 			state.dAppsUsed = content.dAppsUsed
 			state.withdrawals = content.withdrawals
-			state.presenting = content.presenting
+			state.proofs = content.proofs
 			state.networkFee = content.networkFee
 			return .none
 
@@ -261,7 +261,7 @@ extension TransactionReview {
 		let withdrawals: TransactionReviewAccounts.State?
 		let dAppsUsed: TransactionReviewDappsUsed.State?
 		let deposits: TransactionReviewAccounts.State?
-		let presenting: TransactionReviewPresenting.State?
+		let proofs: TransactionReviewProofs.State?
 		let networkFee: TransactionReviewNetworkFee.State?
 	}
 
@@ -289,11 +289,11 @@ extension TransactionReview {
 			}
 	}
 
-	private func exctractBadges(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewPresenting.State? {
+	private func exctractBadges(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
 		let dapps = try await extractDappsInfo(manifest.accountProofResources.map(\.address))
 		guard !dapps.isEmpty else { return nil }
 
-		return TransactionReviewPresenting.State(dApps: .init(uniqueElements: dapps))
+		return TransactionReviewProofs.State(dApps: .init(uniqueElements: dapps))
 	}
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {

@@ -83,9 +83,9 @@ extension TransactionReview {
 						Separator()
 							.padding(.bottom, .medium1)
 
-						let presentingStore = store.scope(state: \.presenting) { .child(.presenting($0)) }
-						IfLetStore(presentingStore) { childStore in
-							TransactionReviewPresenting.View(store: childStore)
+						let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
+						IfLetStore(proofsStore) { childStore in
+							TransactionReviewProofs.View(store: childStore)
 
 							Separator()
 								.padding(.bottom, .medium1)
@@ -158,34 +158,6 @@ struct VLine: Shape {
 		SwiftUI.Path { path in
 			path.move(to: .init(x: rect.midX, y: rect.minY))
 			path.addLine(to: .init(x: rect.midX, y: rect.maxY))
-		}
-	}
-}
-
-// MARK: - TransactionPresentingView
-struct TransactionPresentingView: View {
-	let presenters: IdentifiedArrayOf<TransactionReview.Dapp>
-	let tapPresenterAction: (TransactionReview.Dapp.ID) -> Void
-
-	var body: some View {
-		Card {
-			List(presenters) { presenter in
-				Button {
-					tapPresenterAction(presenter.id)
-				} label: {
-					HStack(spacing: 0) {
-						DappPlaceholder(size: .smallest)
-						if let name = presenter.metadata?.name {
-							Text(name)
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray1)
-								.padding(.leading, .small1)
-						}
-						Spacer(minLength: 0)
-					}
-				}
-				.padding(.horizontal, .large2)
-			}
 		}
 	}
 }

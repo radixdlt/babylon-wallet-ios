@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 // MARK: - TransactionReviewPresenting
-public struct TransactionReviewPresenting: Sendable, FeatureReducer {
+public struct TransactionReviewProofs: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var dApps: IdentifiedArrayOf<TransactionReview.Dapp>
 

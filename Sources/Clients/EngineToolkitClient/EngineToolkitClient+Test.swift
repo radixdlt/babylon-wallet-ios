@@ -19,8 +19,8 @@ extension EngineToolkitClient: TestDependencyKey {
 		accountAddressesNeedingToSignTransaction: { _ in [] },
 		accountAddressesSuitableToPayTransactionFee: { _ in [] },
 		knownEntityAddresses: { _ in throw NoopError() },
-		generateTransactionReview: unimplemented("\(Self.self).generateTransactionReview"),
-		decodeAddress: unimplemented("\(Self.self).decodeAddress")
+		generateTransactionReview: { _ in throw NoopError() },
+		decodeAddress: { _ in throw NoopError() }
 	)
 
 	public static let testValue = Self(

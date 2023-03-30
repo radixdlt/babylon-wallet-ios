@@ -1,12 +1,12 @@
 import FeaturePrelude
 
-// MARK: - TransactionReviewPresenting.View
-extension TransactionReviewPresenting {
+// MARK: - TransactionReviewProofs.View
+extension TransactionReviewProofs {
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<TransactionReviewPresenting>
+		let store: StoreOf<TransactionReviewProofs>
 
-		public init(store: StoreOf<TransactionReviewPresenting>) {
+		public init(store: StoreOf<TransactionReviewProofs>) {
 			self.store = store
 		}
 
