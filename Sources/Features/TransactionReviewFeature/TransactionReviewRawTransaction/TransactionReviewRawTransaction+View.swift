@@ -34,7 +34,7 @@ extension TransactionReviewRawTransaction {
 
 			var body: some SwiftUI.View {
 				Text(transaction)
-					.textStyle(.monospaced)
+					.textStyle(.monospace)
 					.foregroundColor(.app.gray1)
 					.frame(
 						maxWidth: .infinity,
