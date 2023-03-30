@@ -113,12 +113,15 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .percentageStepper:
+		case .percentageStepper(.delegate(.valueChanged)):
 			let newMinimumDecimal = state.percentageStepper.value * 0.01
 			let newAmount = newMinimumDecimal * state.transfer.action.amount
 
 			state.transfer.guarantee?.amount = newAmount
 
+			return .none
+
+		case .percentageStepper:
 			return .none
 		}
 	}

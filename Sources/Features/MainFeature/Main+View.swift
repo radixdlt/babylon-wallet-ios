@@ -19,8 +19,6 @@ extension Main {
 
 		public var body: some SwiftUI.View {
 			NavigationStack {
-//				MinimumPercentageStepperView(store: stepperStore)
-
 				Home.View(
 					store: store.scope(
 						state: \.home,
