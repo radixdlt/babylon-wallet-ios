@@ -170,21 +170,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .networkFee:
 			return .none
 
-		case let .customizeGuarantees(.presented(.delegate(.dismiss(apply: apply)))):
-			if apply, let guarantees = state.customizeGuarantees?.guarantees {
-				for transfer in guarantees.map(\.transfer) {
-					guard let guarantee = transfer.guarantee else { continue }
-					state.applyGuarantee(guarantee, transferID: transfer.id)
-				}
+		case let .customizeGuarantees(.presented(.delegate(.applyGuarantees(guarantees)))):
+			for transfer in guarantees.map(\.transfer) {
+				guard let guarantee = transfer.guarantee else { continue }
+				state.applyGuarantee(guarantee, transferID: transfer.id)
 			}
-			state.customizeGuarantees = nil
+
 			return .none
 
 		case .customizeGuarantees:
-			return .none
-
-		case .rawTransaction(.presented(.delegate(.dismiss))):
-			state.rawTransaction = nil
 			return .none
 
 		case .rawTransaction:
