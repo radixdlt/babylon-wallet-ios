@@ -4,7 +4,7 @@
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
+"accountPreferences.faucetButtonTitle" = "Get RCnet XRD Test Tokens";
 "accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
 "accountPreferences.title" = "Account Preferences";
 
@@ -298,7 +298,7 @@
 "gatewaySettings.addNewGateway.textFieldPlaceholder" = "Enter full URL";
 "gatewaySettings.addNewGateway.title" = "Add New Gateway";
 "gatewaySettings.addNewGatewayButtonTitle" = "Add New Gateway";
-"gatewaySettings.radixBetanetGateway" = "Radix Betanet Gateway";
+"gatewaySettings.rcNetGateway" = "RCnet Gateway";
 "gatewaySettings.removeGatewayAlert.cancelButtonTitle" = "Cancel";
 "gatewaySettings.removeGatewayAlert.message" = "You will no longer be able to connect to this Gateway";
 "gatewaySettings.removeGatewayAlert.removeButtonTitle" = "Remove";

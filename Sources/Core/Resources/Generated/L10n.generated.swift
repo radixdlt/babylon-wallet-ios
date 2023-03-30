@@ -37,8 +37,8 @@ public enum L10n {
     }
   }
   public enum AccountPreferences {
-    /// Get Betanet XRD Test Tokens
-    public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get Betanet XRD Test Tokens")
+    /// Get RCnet XRD Test Tokens
+    public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get RCnet XRD Test Tokens")
     /// This may take several seconds, please wait for completion
     public static let loadingPrompt = L10n.tr("Localizable", "accountPreferences.loadingPrompt", fallback: "This may take several seconds, please wait for completion")
     /// Account Preferences
@@ -473,8 +473,8 @@ public enum L10n {
   public enum GatewaySettings {
     /// Add New Gateway
     public static let addNewGatewayButtonTitle = L10n.tr("Localizable", "gatewaySettings.addNewGatewayButtonTitle", fallback: "Add New Gateway")
-    /// Radix Betanet Gateway
-    public static let radixBetanetGateway = L10n.tr("Localizable", "gatewaySettings.radixBetanetGateway", fallback: "Radix Betanet Gateway")
+    /// RCnet Gateway
+    public static let rcNetGateway = L10n.tr("Localizable", "gatewaySettings.rcNetGateway", fallback: "RCnet Gateway")
     /// Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.
     public static let subtitle = L10n.tr("Localizable", "gatewaySettings.subtitle", fallback: "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.")
     /// Gateways
