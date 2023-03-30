@@ -218,9 +218,12 @@
 "editPersona.inputField.error.personaLabel.blank" = "Label cannot be blank";
 "editPersona.inputField.error.emailAddress.invalid" = "Invalid email address";
 
-"editPersona.button.cancel" = "Cancel";
-"editPersona.button.save" = "Save";
+"editPersona.closeConfirmationDialog.message" = "Are you sure you want to discard changes to this persona?";
+"editPersona.closeConfirmationDialog.button.discardChanges" = "Discard Changes";
+"editPersona.closeConfirmationDialog.button.keepEditing" = "Keep Editing";
+
 "editPersona.button.addAField" = "Add a Field";
+"editPersona.button.save" = "Save";
 
 "editPersona.addAField.title" = "Add a Field";
 "editPersona.addAField.explanation" = "Select from the following fields to add them to this persona.";
