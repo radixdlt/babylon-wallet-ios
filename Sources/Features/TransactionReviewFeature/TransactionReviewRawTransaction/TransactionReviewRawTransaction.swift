@@ -2,6 +2,8 @@ import FeaturePrelude
 
 // MARK: - TransactionReviewRawTransaction
 public struct TransactionReviewRawTransaction: Sendable, FeatureReducer {
+	@Dependency(\.dismiss) var dismiss
+
 	public struct State: Sendable, Hashable {
 		public var transaction: String
 
@@ -14,16 +16,14 @@ public struct TransactionReviewRawTransaction: Sendable, FeatureReducer {
 		case closeTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
-	}
-
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeTapped:
-			return .send(.delegate(.dismiss))
+			return .fireAndForget {
+				await dismiss()
+			}
 		}
 	}
 }

@@ -2,6 +2,8 @@ import FeaturePrelude
 
 // MARK: - TransactionReviewGuarantees
 public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
+	@Dependency(\.dismiss) var dismiss
+
 	public struct State: Sendable, Hashable {
 		public var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
 
@@ -25,7 +27,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss(apply: Bool)
+		case applyGuarantees(IdentifiedArrayOf<TransactionReviewGuarantee.State>)
 	}
 
 	public init() {}
@@ -49,10 +51,16 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 			return .none
 
 		case .applyTapped:
-			return .send(.delegate(.dismiss(apply: true)))
+			let guarantees = state.guarantees
+			return .run { send in
+				await send(.delegate(.applyGuarantees(guarantees)))
+				await dismiss()
+			}
 
 		case .closeTapped:
-			return .send(.delegate(.dismiss(apply: false)))
+			return .fireAndForget {
+				await dismiss()
+			}
 		}
 	}
 }
