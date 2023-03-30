@@ -235,7 +235,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(error)))
-                        
+
 		case let .transactionPollingResult(.success(txID)):
 			state.isProcessingTransaction = false
 			return .send(.delegate(.transactionCompleted(txID)))
@@ -243,7 +243,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .transactionPollingResult(.failure(error)):
 			state.isProcessingTransaction = false
 			return .send(.delegate(.failed(error)))
-
 
 		case let .rawTransactionCreated(transaction):
 			state.rawTransaction = .init(transaction: transaction)
