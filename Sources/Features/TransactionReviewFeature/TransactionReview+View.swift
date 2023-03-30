@@ -20,7 +20,8 @@ extension TransactionReview.State {
 			message: message,
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositsHeading: deposits != nil,
-			viewControlState: viewControlState
+			viewControlState: viewControlState,
+			showRawTransaction: false
 		)
 	}
 
@@ -42,6 +43,7 @@ extension TransactionReview {
 		let isExpandedDappUsed: Bool
 		let showDepositsHeading: Bool
 		let viewControlState: ControlState
+		let showRawTransaction: Bool
 	}
 
 	@MainActor
