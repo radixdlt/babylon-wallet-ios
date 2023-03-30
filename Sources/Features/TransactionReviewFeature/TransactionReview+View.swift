@@ -19,7 +19,7 @@ extension TransactionReview.State {
 		.init(
 			message: message,
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
-			showDepositingHeading: depositing != nil,
+			showDepositsHeading: deposits != nil,
 			viewControlState: viewControlState
 		)
 	}
@@ -40,7 +40,7 @@ extension TransactionReview {
 	public struct ViewState: Equatable {
 		let message: String?
 		let isExpandedDappUsed: Bool
-		let showDepositingHeading: Bool
+		let showDepositsHeading: Bool
 		let viewControlState: ControlState
 	}
 
@@ -64,19 +64,19 @@ extension TransactionReview {
 							TransactionMessageView(message: message)
 						}
 
-						let withdrawingStore = store.scope(state: \.withdrawing) { .child(.withdrawing($0)) }
-						IfLetStore(withdrawingStore) { withdrawingStore in
-							TransactionHeading(L10n.TransactionReview.withdrawingHeading)
+						let withdrawalsStore = store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }
+						IfLetStore(withdrawalsStore) { childStore in
+							TransactionHeading(L10n.TransactionReview.withdrawalsHeading)
 								.padding(.top, .medium2)
 								.padding(.bottom, .small2)
-							TransactionReviewAccounts.View(store: withdrawingStore)
+							TransactionReviewAccounts.View(store: childStore)
 						}
 
-						usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositingHeading: viewStore.showDepositingHeading)
+						usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositsHeading: viewStore.showDepositsHeading)
 
-						let depositingStore = store.scope(state: \.depositing) { .child(.depositing($0)) }
-						IfLetStore(depositingStore) { depositingStore in
-							TransactionReviewAccounts.View(store: depositingStore)
+						let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
+						IfLetStore(depositsStore) { childStore in
+							TransactionReviewAccounts.View(store: childStore)
 								.padding(.bottom, .medium1)
 						}
 
@@ -127,7 +127,7 @@ extension TransactionReview {
 			}
 		}
 
-		private func usingDappsSection(expanded: Bool, showDepositingHeading: Bool) -> some SwiftUI.View {
+		private func usingDappsSection(expanded: Bool, showDepositsHeading: Bool) -> some SwiftUI.View {
 			VStack(alignment: .trailing, spacing: .medium2) {
 				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 				IfLetStore(usedDappsStore) { childStore in
@@ -137,8 +137,8 @@ extension TransactionReview {
 					FixedSpacer(height: .medium2)
 				}
 
-				if showDepositingHeading {
-					TransactionHeading(L10n.TransactionReview.depositingHeading)
+				if showDepositsHeading {
+					TransactionHeading(L10n.TransactionReview.depositsHeading)
 						.padding(.bottom, .small2)
 				}
 			}

@@ -16,7 +16,7 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 			}
 			.foregroundColor(foregroundColor)
 			.font(.app.body1Header)
-			.frame(height: isInToolbar ? .toolbatButtonHeight : .standardButtonHeight)
+			.frame(height: isInToolbar ? .toolbarButtonHeight : .standardButtonHeight)
 			.frame(maxWidth: shouldExpand ? .infinity : nil)
 			.padding(.horizontal, isInToolbar ? .small1 : .medium1)
 			.background(.app.gray4)
