@@ -86,7 +86,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadPersonasEffect()
+			return loadPersonasEffect().concatenate(with: checkIfFirstPersonaByUserEver())
 
 		case let .selectedPersonaChanged(persona):
 			state.selectedPersona = persona
