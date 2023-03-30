@@ -4,7 +4,7 @@
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
+"accountPreferences.faucetButtonTitle" = "Get RCnet XRD Test Tokens";
 "accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
 "accountPreferences.title" = "Account Preferences";
 
@@ -149,6 +149,35 @@
 "P2PLinks.newConnectionTitle" = "Link New Connector";
 "P2PLinks.sendTestMessageButtonTitle" = "Send Test Msg";
 
+"transactionReview.title" = "Review Transaction";
+
+"transactionReview.messageHeading" = "Message";
+"transactionReview.usingDappsHeading" = "Using dApps";
+"transactionReview.withdrawingHeading" = "Withdrawing";
+"transactionReview.depositingHeading" = "Depositing";
+"transactionReview.sendingToHeading" = "Sending to";
+"transactionReview.presentingHeading" = "Presenting";
+"transactionReview.customizeGuaranteesButtonTitle" = "Customize Guarantees";
+"transactionReview.approveButtonTitle" = "Approve";
+"transactionReview.externalAccountName" = "Account";
+"transactionReview.estimated" = "Estimated";
+"transactionReview.guaranteed" = "Guaranteed";
+"transactionReview.rawTransactionTitle" = "Raw Transaction";
+
+"transactionReview.networkFee.heading" = "Network Fee";
+"transactionReview.networkFee.congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
+"transactionReview.networkFee.customizeButtonTitle" = "Customize";
+
+"transactionReview.usingDapps.unknownComponents" = "%d Unknown Components";
+
+"transactionReview.guarantees.title" = "Customize Guarantees";
+"transactionReview.guarantees.infoButtonText" = "How do Guarantees work";
+"transactionReview.guarantees.setText" = "Set guaranteed minimum %%";
+"transactionReview.guarantees.headerText" = "Protect yourself by setting guaranteed minimums for estimated deposits";
+"transactionReview.guarantees.applyButtonText" = "Apply";
+"transactionReview.guarantees.explanationTitle" = " How do Guarantees work ";
+"transactionReview.guarantees.explanationText" = " Protect yourself by setting guaranteed minimums for estimated deposits";
+
 "authorizedDapps.title" = "Authorized dApps";
 "authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 
@@ -189,9 +218,12 @@
 "editPersona.inputField.error.personaLabel.blank" = "Label cannot be blank";
 "editPersona.inputField.error.emailAddress.invalid" = "Invalid email address";
 
-"editPersona.button.cancel" = "Cancel";
-"editPersona.button.save" = "Save";
+"editPersona.closeConfirmationDialog.message" = "Are you sure you want to discard changes to this persona?";
+"editPersona.closeConfirmationDialog.button.discardChanges" = "Discard Changes";
+"editPersona.closeConfirmationDialog.button.keepEditing" = "Keep Editing";
+
 "editPersona.button.addAField" = "Add a Field";
+"editPersona.button.save" = "Save";
 
 "editPersona.addAField.title" = "Add a Field";
 "editPersona.addAField.explanation" = "Select from the following fields to add them to this persona.";
@@ -269,7 +301,7 @@
 "gatewaySettings.addNewGateway.textFieldPlaceholder" = "Enter full URL";
 "gatewaySettings.addNewGateway.title" = "Add New Gateway";
 "gatewaySettings.addNewGatewayButtonTitle" = "Add New Gateway";
-"gatewaySettings.radixBetanetGateway" = "Radix Betanet Gateway";
+"gatewaySettings.rcNetGateway" = "RCnet Gateway";
 "gatewaySettings.removeGatewayAlert.cancelButtonTitle" = "Cancel";
 "gatewaySettings.removeGatewayAlert.message" = "You will no longer be able to connect to this Gateway";
 "gatewaySettings.removeGatewayAlert.removeButtonTitle" = "Remove";

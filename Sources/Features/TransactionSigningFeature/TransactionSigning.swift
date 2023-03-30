@@ -54,19 +54,19 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 		case .appeared:
 			return .run { [manifest = state.transactionManifestWithoutLockFee] send in
 				do {
-					let networkID = await gatewaysClient.getCurrentNetworkID()
-					let manifestWithLockFee = try await transactionClient.addLockFeeInstructionToManifest(manifest)
-					let manifestWithLockFeeString = try manifestWithLockFee.toString(
-						preamble: "",
-						blobOutputFormat: .includeBlobsByByteCountOnly,
-						blobPreamble: "\n\nBLOBS:\n",
-						networkID: networkID
-					)
-					let result = InternalAction.AddLockInstructionToManifestSuccessValues(
-						manifestWithLockFee: manifestWithLockFee,
-						manifestWithLockFeeString: manifestWithLockFeeString
-					)
-					await send(.internal(.addLockFeeInstructionToManifestResult(.success(result))))
+//					let networkID = await gatewaysClient.getCurrentNetworkID()
+//					let manifestWithLockFee = try await transactionClient.addLockFeeInstructionToManifest(manifest)
+//					let manifestWithLockFeeString = try manifestWithLockFee.toString(
+//						preamble: "",
+//						blobOutputFormat: .includeBlobsByByteCountOnly,
+//						blobPreamble: "\n\nBLOBS:\n",
+//						networkID: networkID
+//					)
+//					let result = InternalAction.AddLockInstructionToManifestSuccessValues(
+//						manifestWithLockFee: manifestWithLockFee,
+//						manifestWithLockFeeString: manifestWithLockFeeString
+//					)
+//					await send(.internal(.addLockFeeInstructionToManifestResult(.success(result))))
 				} catch let error as TransactionFailure {
 					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(error))))
 				} catch TransactionManifest.ManifestConversionError.manifestGeneration {

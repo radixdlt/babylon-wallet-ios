@@ -18,6 +18,9 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var accountAddressesSuitableToPayTransactionFee: AccountAddressesSuitableToPayTransactionFee
 
 	public var knownEntityAddresses: KnownEntityAddresses
+
+	public var generateTransactionReview: GenerateTransactionReview
+	public var decodeAddress: DecodeAddressRequest
 }
 
 // MARK: - JSONInstructionsTransactionManifest
@@ -57,6 +60,10 @@ extension EngineToolkitClient {
 	public typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
 
 	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
+
+	public typealias GenerateTransactionReview = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
+
+	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
 }
 
 // MARK: - AccountAddressesInvolvedInTransactionRequest

@@ -9,6 +9,7 @@ extension OneTimePersonaData {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
+		let shouldShowChooseDataToProvideTitle: Bool
 		let availablePersonas: IdentifiedArrayOf<PersonaDataPermissionBox.State>
 		let selectedPersona: PersonaDataPermissionBox.State?
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
@@ -33,6 +34,7 @@ extension OneTimePersonaData {
 
 				return dappName + explanation
 			}()
+			shouldShowChooseDataToProvideTitle = !state.personas.isEmpty
 			availablePersonas = state.personas
 			selectedPersona = state.selectedPersona
 			output = {
@@ -67,9 +69,11 @@ extension OneTimePersonaData {
 							subtitle: viewStore.subtitle
 						)
 
-						Text(L10n.DApp.OneTimePersonaData.chooseDataToProvide)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1Header)
+						if viewStore.shouldShowChooseDataToProvideTitle {
+							Text(L10n.DApp.OneTimePersonaData.chooseDataToProvide)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body1Header)
+						}
 
 						Selection(
 							viewStore.binding(

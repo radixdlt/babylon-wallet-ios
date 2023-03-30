@@ -37,8 +37,8 @@ public enum L10n {
     }
   }
   public enum AccountPreferences {
-    /// Get Betanet XRD Test Tokens
-    public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get Betanet XRD Test Tokens")
+    /// Get RCnet XRD Test Tokens
+    public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get RCnet XRD Test Tokens")
     /// This may take several seconds, please wait for completion
     public static let loadingPrompt = L10n.tr("Localizable", "accountPreferences.loadingPrompt", fallback: "This may take several seconds, please wait for completion")
     /// Account Preferences
@@ -428,10 +428,18 @@ public enum L10n {
     public enum Button {
       /// Add a Field
       public static let addAField = L10n.tr("Localizable", "editPersona.button.addAField", fallback: "Add a Field")
-      /// Cancel
-      public static let cancel = L10n.tr("Localizable", "editPersona.button.cancel", fallback: "Cancel")
       /// Save
       public static let save = L10n.tr("Localizable", "editPersona.button.save", fallback: "Save")
+    }
+    public enum CloseConfirmationDialog {
+      /// Are you sure you want to discard changes to this persona?
+      public static let message = L10n.tr("Localizable", "editPersona.closeConfirmationDialog.message", fallback: "Are you sure you want to discard changes to this persona?")
+      public enum Button {
+        /// Discard Changes
+        public static let discardChanges = L10n.tr("Localizable", "editPersona.closeConfirmationDialog.button.discardChanges", fallback: "Discard Changes")
+        /// Keep Editing
+        public static let keepEditing = L10n.tr("Localizable", "editPersona.closeConfirmationDialog.button.keepEditing", fallback: "Keep Editing")
+      }
     }
     public enum InputField {
       public enum Error {
@@ -473,8 +481,8 @@ public enum L10n {
   public enum GatewaySettings {
     /// Add New Gateway
     public static let addNewGatewayButtonTitle = L10n.tr("Localizable", "gatewaySettings.addNewGatewayButtonTitle", fallback: "Add New Gateway")
-    /// Radix Betanet Gateway
-    public static let radixBetanetGateway = L10n.tr("Localizable", "gatewaySettings.radixBetanetGateway", fallback: "Radix Betanet Gateway")
+    /// RCnet Gateway
+    public static let rcNetGateway = L10n.tr("Localizable", "gatewaySettings.rcNetGateway", fallback: "RCnet Gateway")
     /// Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.
     public static let subtitle = L10n.tr("Localizable", "gatewaySettings.subtitle", fallback: "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.")
     /// Gateways
@@ -759,6 +767,64 @@ public enum L10n {
         public static let settingsButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.settingsButtonTitle", fallback: "Settings")
         /// Warning
         public static let title = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.title", fallback: "Warning")
+      }
+    }
+  }
+  public enum TransactionReview {
+    /// Approve
+    public static let approveButtonTitle = L10n.tr("Localizable", "transactionReview.approveButtonTitle", fallback: "Approve")
+    /// Customize Guarantees
+    public static let customizeGuaranteesButtonTitle = L10n.tr("Localizable", "transactionReview.customizeGuaranteesButtonTitle", fallback: "Customize Guarantees")
+    /// Depositing
+    public static let depositingHeading = L10n.tr("Localizable", "transactionReview.depositingHeading", fallback: "Depositing")
+    /// Estimated
+    public static let estimated = L10n.tr("Localizable", "transactionReview.estimated", fallback: "Estimated")
+    /// Account
+    public static let externalAccountName = L10n.tr("Localizable", "transactionReview.externalAccountName", fallback: "Account")
+    /// Guaranteed
+    public static let guaranteed = L10n.tr("Localizable", "transactionReview.guaranteed", fallback: "Guaranteed")
+    /// Message
+    public static let messageHeading = L10n.tr("Localizable", "transactionReview.messageHeading", fallback: "Message")
+    /// Presenting
+    public static let presentingHeading = L10n.tr("Localizable", "transactionReview.presentingHeading", fallback: "Presenting")
+    /// Raw Transaction
+    public static let rawTransactionTitle = L10n.tr("Localizable", "transactionReview.rawTransactionTitle", fallback: "Raw Transaction")
+    /// Sending to
+    public static let sendingToHeading = L10n.tr("Localizable", "transactionReview.sendingToHeading", fallback: "Sending to")
+    /// Review Transaction
+    public static let title = L10n.tr("Localizable", "transactionReview.title", fallback: "Review Transaction")
+    /// Using dApps
+    public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview.usingDappsHeading", fallback: "Using dApps")
+    /// Withdrawing
+    public static let withdrawingHeading = L10n.tr("Localizable", "transactionReview.withdrawingHeading", fallback: "Withdrawing")
+    public enum Guarantees {
+      /// Apply
+      public static let applyButtonText = L10n.tr("Localizable", "transactionReview.guarantees.applyButtonText", fallback: "Apply")
+      ///  Protect yourself by setting guaranteed minimums for estimated deposits
+      public static let explanationText = L10n.tr("Localizable", "transactionReview.guarantees.explanationText", fallback: " Protect yourself by setting guaranteed minimums for estimated deposits")
+      ///  How do Guarantees work 
+      public static let explanationTitle = L10n.tr("Localizable", "transactionReview.guarantees.explanationTitle", fallback: " How do Guarantees work ")
+      /// Protect yourself by setting guaranteed minimums for estimated deposits
+      public static let headerText = L10n.tr("Localizable", "transactionReview.guarantees.headerText", fallback: "Protect yourself by setting guaranteed minimums for estimated deposits")
+      /// How do Guarantees work
+      public static let infoButtonText = L10n.tr("Localizable", "transactionReview.guarantees.infoButtonText", fallback: "How do Guarantees work")
+      /// Set guaranteed minimum %%
+      public static let setText = L10n.tr("Localizable", "transactionReview.guarantees.setText", fallback: "Set guaranteed minimum %%")
+      /// Customize Guarantees
+      public static let title = L10n.tr("Localizable", "transactionReview.guarantees.title", fallback: "Customize Guarantees")
+    }
+    public enum NetworkFee {
+      /// The network is currently congested. Add a tip to speed up your transfer.
+      public static let congestedText = L10n.tr("Localizable", "transactionReview.networkFee.congestedText", fallback: "The network is currently congested. Add a tip to speed up your transfer.")
+      /// Customize
+      public static let customizeButtonTitle = L10n.tr("Localizable", "transactionReview.networkFee.customizeButtonTitle", fallback: "Customize")
+      /// Network Fee
+      public static let heading = L10n.tr("Localizable", "transactionReview.networkFee.heading", fallback: "Network Fee")
+    }
+    public enum UsingDapps {
+      /// %d Unknown Components
+      public static func unknownComponents(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "transactionReview.usingDapps.unknownComponents", p1, fallback: "%d Unknown Components")
       }
     }
   }
