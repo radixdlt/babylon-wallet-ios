@@ -6,6 +6,8 @@ import TransactionClient
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public var displayMode: DisplayMode = .review
+
 		public let transactionManifest: TransactionManifest
 		public let message: String?
 
@@ -20,9 +22,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
 
-		@PresentationState
-		public var rawTransaction: TransactionReviewRawTransaction.State? = nil
-
 		public var isProcessingTransaction: Bool = false
 
 		public init(
@@ -33,6 +32,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.transactionManifest = transactionManifest
 			self.message = message
 			self.customizeGuarantees = customizeGuarantees
+		}
+
+		public enum DisplayMode: Sendable, Hashable {
+			case review
+			case raw(String)
+
+			var rawTransaction: String? {
+				guard case let .raw(transaction) = self else { return nil }
+				return transaction
+			}
 		}
 	}
 
@@ -52,7 +61,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case networkFee(TransactionReviewNetworkFee.Action)
 
 		case customizeGuarantees(PresentationAction<TransactionReviewGuarantees.Action>)
-		case rawTransaction(PresentationAction<TransactionReviewRawTransaction.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -96,9 +104,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.$customizeGuarantees, action: /Action.child .. ChildAction.customizeGuarantees) {
 				TransactionReviewGuarantees()
 			}
-			.ifLet(\.$rawTransaction, action: /Action.child .. ChildAction.rawTransaction) {
-				TransactionReviewRawTransaction()
-			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -114,11 +119,18 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .showRawTransactionTapped:
-			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
-			let guarantees = state.allGuarantees
-			return .run { send in
-				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
-				await send(.internal(.rawTransactionCreated(manifest.description)))
+			switch state.displayMode {
+			case .review:
+				guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
+				let guarantees = state.allGuarantees
+				return .run { send in
+					let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
+					await send(.internal(.rawTransactionCreated(manifest.description)))
+				}
+
+			case .raw:
+				state.displayMode = .review
+				return .none
 			}
 
 		case .approveTapped:
@@ -183,9 +195,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .customizeGuarantees:
 			return .none
-
-		case .rawTransaction:
-			return .none
 		}
 	}
 
@@ -242,7 +251,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.failed(error)))
 
 		case let .rawTransactionCreated(transaction):
-			state.rawTransaction = .init(transaction: transaction)
+			state.displayMode = .raw(transaction)
 			return .none
 		}
 	}

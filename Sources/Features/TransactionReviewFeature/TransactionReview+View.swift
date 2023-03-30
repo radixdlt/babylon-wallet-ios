@@ -1,4 +1,3 @@
-import ComposableArchitecture
 import FeaturePrelude
 import Profile
 
@@ -21,7 +20,7 @@ extension TransactionReview.State {
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositsHeading: deposits != nil,
 			viewControlState: viewControlState,
-			showRawTransaction: false
+			rawTransaction: displayMode.rawTransaction
 		)
 	}
 
@@ -43,7 +42,7 @@ extension TransactionReview {
 		let isExpandedDappUsed: Bool
 		let showDepositsHeading: Bool
 		let viewControlState: ControlState
-		let showRawTransaction: Bool
+		let rawTransaction: String?
 	}
 
 	@MainActor
@@ -60,49 +59,35 @@ extension TransactionReview {
 					VStack(spacing: 0) {
 						FixedSpacer(height: .medium2)
 
-						if let message = viewStore.message {
-							TransactionHeading(L10n.TransactionReview.messageHeading)
-								.padding(.bottom, .small2)
-							TransactionMessageView(message: message)
-						}
+						if let rawTransaction = viewStore.rawTransaction {
+							RawTransactionView(transaction: rawTransaction)
+								.padding(.bottom, .medium3)
+						} else {
+							VStack(spacing: 0) {
+								messageSection(with: viewStore.message)
 
-						let withdrawalsStore = store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }
-						IfLetStore(withdrawalsStore) { childStore in
-							TransactionHeading(L10n.TransactionReview.withdrawalsHeading)
-								.padding(.top, .medium2)
-								.padding(.bottom, .small2)
-							TransactionReviewAccounts.View(store: childStore)
-						}
+								withdrawalsSection
 
-						usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositsHeading: viewStore.showDepositsHeading)
+								usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositsHeading: viewStore.showDepositsHeading)
 
-						let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
-						IfLetStore(depositsStore) { childStore in
-							TransactionReviewAccounts.View(store: childStore)
-								.padding(.bottom, .medium1)
-						}
+								depositsSection
 
-						Separator()
-							.padding(.bottom, .medium1)
+								Separator()
+									.padding(.bottom, .medium1)
 
-						let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
-						IfLetStore(proofsStore) { childStore in
-							TransactionReviewProofs.View(store: childStore)
+								proofsSection
 
-							Separator()
-								.padding(.bottom, .medium1)
-						}
-
-						let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
-						IfLetStore(feeStore) { feeStore in
-							TransactionReviewNetworkFee.View(store: feeStore)
+								feeSection
+							}
 						}
 
 						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
 							viewStore.send(.approveTapped)
 						}
 						.buttonStyle(.primaryRectangular)
+						.padding(.bottom, .medium1)
 					}
+					.animation(.easeInOut, value: viewStore.rawTransaction)
 					.padding(.horizontal, .medium3)
 				}
 				.background(.app.gray5)
@@ -114,13 +99,11 @@ extension TransactionReview {
 							viewStore.send(.showRawTransactionTapped)
 						}
 						.buttonStyle(.secondaryRectangular(isInToolbar: true))
+						.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
 					}
 				}
 				.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
 					TransactionReviewGuarantees.View(store: childStore)
-				}
-				.sheet(store: store.scope(state: \.$rawTransaction) { .child(.rawTransaction($0)) }) { childStore in
-					TransactionReviewRawTransaction.View(store: childStore)
 				}
 				.controlState(viewStore.viewControlState)
 				.onAppear {
@@ -129,6 +112,29 @@ extension TransactionReview {
 			}
 		}
 
+		@ViewBuilder
+		private func messageSection(with message: String?) -> some SwiftUI.View {
+			if let message {
+				TransactionHeading(L10n.TransactionReview.messageHeading)
+					.padding(.bottom, .small2)
+
+				TransactionMessageView(message: message)
+			}
+		}
+
+		@ViewBuilder
+		private var withdrawalsSection: some SwiftUI.View {
+			let withdrawalsStore = store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }
+			IfLetStore(withdrawalsStore) { childStore in
+				TransactionHeading(L10n.TransactionReview.withdrawalsHeading)
+					.padding(.top, .medium2)
+					.padding(.bottom, .small2)
+
+				TransactionReviewAccounts.View(store: childStore)
+			}
+		}
+
+		@ViewBuilder
 		private func usingDappsSection(expanded: Bool, showDepositsHeading: Bool) -> some SwiftUI.View {
 			VStack(alignment: .trailing, spacing: .medium2) {
 				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
@@ -149,6 +155,34 @@ extension TransactionReview {
 					.stroke(.app.gray3, style: .transactionReview)
 					.frame(width: 1)
 					.padding(.trailing, SpeechbubbleShape.triangleInset)
+			}
+		}
+
+		@ViewBuilder
+		private var depositsSection: some SwiftUI.View {
+			let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
+			IfLetStore(depositsStore) { childStore in
+				TransactionReviewAccounts.View(store: childStore)
+					.padding(.bottom, .medium1)
+			}
+		}
+
+		@ViewBuilder
+		private var proofsSection: some SwiftUI.View {
+			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
+			IfLetStore(proofsStore) { childStore in
+				TransactionReviewProofs.View(store: childStore)
+
+				Separator()
+					.padding(.bottom, .medium1)
+			}
+		}
+
+		@ViewBuilder
+		private var feeSection: some SwiftUI.View {
+			let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
+			IfLetStore(feeStore) { childStore in
+				TransactionReviewNetworkFee.View(store: childStore)
 			}
 		}
 	}
@@ -192,6 +226,24 @@ struct TransactionMessageView: View {
 				.padding(.horizontal, .medium3)
 				.padding(.vertical, .small1)
 		}
+	}
+}
+
+// MARK: - RawTransactionView
+struct RawTransactionView: SwiftUI.View {
+	let transaction: String
+
+	var body: some SwiftUI.View {
+		Text(transaction)
+			.textStyle(.monospace)
+			.foregroundColor(.app.gray1)
+			.frame(
+				maxWidth: .infinity,
+				maxHeight: .infinity,
+				alignment: .topLeading
+			)
+			.padding()
+			.multilineTextAlignment(.leading)
 	}
 }
 
