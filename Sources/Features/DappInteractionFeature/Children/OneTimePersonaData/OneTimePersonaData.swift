@@ -36,7 +36,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>)
-		case isFirstPersonaOnAnyNetwork(Bool)
+		case isFirstPersonaOnAnyNetworkResult(Bool)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -103,11 +103,11 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 		case .createNewPersonaButtonTapped:
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
-			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
+			let isFirstPersonaOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
 			state.destination = .createPersona(.init(config: .init(
 				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
-			), displayIntroduction: { _ in isFirstOnAnyNetwork }))
+			), displayIntroduction: { _ in isFirstPersonaOnAnyNetwork }))
 			return .none
 
 		case let .continueButtonTapped(fields):
@@ -117,7 +117,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
+		case let .isFirstPersonaOnAnyNetworkResult(isFirstPersonaOnAnyNetwork):
 			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 			return .none
 
@@ -164,7 +164,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		.task {
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
-			return .internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork))
+			return .internal(.firstPersonaOnAnyNetworkResult(isFirstPersonaOnAnyNetwork))
 		}
 	}
 }
