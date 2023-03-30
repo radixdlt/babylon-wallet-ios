@@ -300,11 +300,13 @@ extension TransactionReview {
 	private func extractDappsInfo(_ addresses: [String]) async throws -> [Dapp] {
 		var dapps: [Dapp] = []
 		for address in addresses {
-			let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
+			let metadata = try? await gatewayAPIClient.getDappDefinition(address: address)
 			dapps.append(
 				Dapp(
 					id: address,
-					metadata: .init(name: metadata?.name ?? "Unknown", thumbnail: nil, description: metadata?.description)
+					metadata: .init(name: metadata?.name ?? "Unknown",
+					                thumbnail: nil,
+					                description: metadata?.description)
 				)
 			)
 		}
@@ -533,7 +535,9 @@ extension TransactionReview.State {
 
 		deposits?
 			.accounts[id: accountID]?
-			.transfers[id: transferID]?.guarantee?.amount = updated.amount
+			.transfers[id: transferID]?
+			.guarantee?
+			.amount = updated.amount
 	}
 
 	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress.ID? {
