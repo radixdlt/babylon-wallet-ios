@@ -104,11 +104,16 @@ extension EditPersona {
 					#if os(iOS)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton { viewStore.send(.cancelButtonTapped) }
+								CloseButton { viewStore.send(.closeButtonTapped) }
 							}
 						}
 					#endif
 				}
+				.confirmationDialog(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /EditPersona.Destinations.State.closeConfirmationDialog,
+					action: EditPersona.Destinations.Action.closeConfirmationDialog
+				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /EditPersona.Destinations.State.addFields,

@@ -67,9 +67,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case cancelButtonTapped
+		case closeButtonTapped
 		case saveButtonTapped(Output)
 		case addAFieldButtonTapped
+
+		public enum CloseConfirmationDialogAction: Sendable, Hashable {
+			case discardChanges
+			case keepEditing
+		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -84,10 +89,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddFields.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case closeConfirmationDialog(ViewAction.CloseConfirmationDialogAction)
 			case addFields(EditPersonaAddFields.Action)
 		}
 
@@ -120,8 +127,18 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .cancelButtonTapped:
-			return .run { _ in await dismiss() }
+		case .closeButtonTapped:
+			state.destination = .closeConfirmationDialog(
+				.init(titleVisibility: .hidden) {
+					TextState("")
+				} actions: {
+					ButtonState.destructive(TextState("Discard Changes"), action: .send(.discardChanges))
+					ButtonState.cancel(TextState("Keep Editing"), action: .send(.keepEditing))
+				} message: {
+					TextState("Are you sure you want to discard changes to this persona?")
+				}
+			)
+			return .none
 
 		case let .saveButtonTapped(output):
 			return .run { [state] send in
@@ -143,6 +160,9 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
+			return .run { _ in await dismiss() }
+
 		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
 			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, initial: nil, isRequiredByDapp: false) })
 			state.destination = nil
