@@ -1,11 +1,11 @@
 /// Disabled tests, should be migrated to TransactionReviewFeatureTests
 
-//import FeatureTestingPrelude
-//import TransactionClient
-//@testable import TransactionSigningFeature
+// import FeatureTestingPrelude
+// import TransactionClient
+// @testable import TransactionSigningFeature
 //
-//@MainActor
-//final class TransactionSigningFeatureTests: TestCase {
+// @MainActor
+// final class TransactionSigningFeatureTests: TestCase {
 //	let mockManifestWithoutLockFee = TransactionManifest(instructions: .string(
 //		"""
 //		# Withdraw XRD from account
@@ -118,4 +118,4 @@
 //		}
 //		await store.receive(.delegate(.signedTXAndSubmittedToGateway("MOCKED_TX_ID")))
 //	}
-//}
+// }
