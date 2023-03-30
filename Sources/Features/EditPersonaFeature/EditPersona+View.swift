@@ -88,22 +88,23 @@ extension EditPersona {
 						}
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .medium1)
+						.footer {
+							WithControlRequirements(
+								viewStore.output,
+								forAction: { viewStore.send(.saveButtonTapped($0)) }
+							) { action in
+								Button(L10n.EditPersona.Button.save, action: action)
+									.textStyle(.body1Link)
+									.foregroundColor(.app.blue2)
+									.opacity(viewStore.output == nil ? 0.3 : 1)
+							}
+						}
 					}
 					.scrollDismissesKeyboard(.interactively)
 					#if os(iOS)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
-								Button(L10n.EditPersona.Button.cancel, action: { viewStore.send(.cancelButtonTapped) })
-									.textStyle(.body1Link)
-									.foregroundColor(.app.blue2)
-							}
-							ToolbarItem(placement: .navigationBarTrailing) {
-								WithControlRequirements(viewStore.output, forAction: { viewStore.send(.saveButtonTapped($0)) }) { action in
-									Button(L10n.EditPersona.Button.save, action: action)
-										.textStyle(.body1Link)
-										.foregroundColor(.app.blue2)
-										.opacity(viewStore.output == nil ? 0.3 : 1)
-								}
+								CloseButton { viewStore.send(.cancelButtonTapped) }
 							}
 						}
 					#endif
