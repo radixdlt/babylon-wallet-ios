@@ -709,7 +709,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 
 		self.init(
 			manifest: manifestString,
-			blobsHex: [],
+			blobsHex: rawManifest.blobs.map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
 			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
