@@ -133,6 +133,8 @@ extension TransactionReview {
 				IfLetStore(usedDappsStore) { childStore in
 					TransactionReviewDappsUsed.View(store: childStore, isExpanded: expanded)
 						.padding(.top, .medium2)
+				} else: {
+					FixedSpacer(height: .medium2)
 				}
 
 				if showDepositingHeading {
