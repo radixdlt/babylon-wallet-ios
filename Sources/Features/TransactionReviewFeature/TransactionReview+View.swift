@@ -17,7 +17,7 @@ extension View {
 extension TransactionReview.State {
 	var viewState: TransactionReview.ViewState {
 		.init(
-			message: transaction.message,
+			message: message,
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositingHeading: depositing != nil,
 			viewControlState: viewControlState

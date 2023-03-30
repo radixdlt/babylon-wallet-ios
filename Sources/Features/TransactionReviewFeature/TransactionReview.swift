@@ -6,7 +6,8 @@ import TransactionClient
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem
+		public let transactionManifest: TransactionManifest
+		public let message: String?
 
 		public var transactionWithLockFee: TransactionManifest?
 
@@ -25,10 +26,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var isSigningTX: Bool = false
 
 		public init(
-			transaction: P2P.FromDapp.WalletInteraction.SendTransactionItem,
+			transactionManifest: TransactionManifest,
+			message: String?,
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
-			self.transaction = transaction
+			self.transactionManifest = transactionManifest
+			self.message = message
 			self.customizeGuarantees = customizeGuarantees
 		}
 	}
@@ -96,7 +99,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			let manifest = state.transaction.transactionManifest
+			let manifest = state.transactionManifest
 			return .run { send in
 				let result = await transactionClient.getTransactionReview(.init(manifestToSign: manifest))
 				await send(.internal(.previewLoaded(result)))
