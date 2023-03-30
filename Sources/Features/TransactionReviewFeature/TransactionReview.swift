@@ -579,22 +579,7 @@ extension EngineToolkitModels.AddressKind {
 	}
 }
 
-// extension TransactionReview.State {
-//	public static let mock0 = Self(transaction: .previewValue,
-//	                               withdrawing: .init(accounts: [.mockWithdraw0], showCustomizeGuarantees: false),
-//	                               dAppsUsed: .init(isExpanded: false, dApps: []),
-//	                               depositing: .init(accounts: [.mockDeposit1], showCustomizeGuarantees: true),
-//	                               presenting: .init(dApps: [.mock1, .mock0]),
-//	                               networkFee: .init(fee: 0.1, isCongested: false))
-//
-//	public static let mock1 = Self(transaction: .previewValue,
-//	                               withdrawing: .init(accounts: [.mockWithdraw0, .mockWithdraw1], showCustomizeGuarantees: false),
-//	                               dAppsUsed: .init(isExpanded: true, dApps: [.mock3, .mock2, .mock1]),
-//	                               depositing: .init(accounts: [.mockDeposit2], showCustomizeGuarantees: true),
-//	                               presenting: .init(dApps: [.mock1, .mock0]),
-//	                               networkFee: .init(fee: 0.2, isCongested: true))
-// }
-
+#if DEBUG
 extension TransactionReview.Dapp {
 	public static let mock0 = Self(id: .deadbeef32Bytes,
 	                               metadata: .init(name: "Collabofi User Badge", thumbnail: nil, description: nil))
@@ -713,3 +698,4 @@ extension AccountAction {
 		[.mock0, .mock1, .mock2, .mock3, .mock4]
 	}
 }
+#endif
