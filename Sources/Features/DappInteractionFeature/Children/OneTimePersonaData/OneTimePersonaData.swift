@@ -153,19 +153,10 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 		case .destination(.presented(.createPersona(.delegate(.completed)))):
 			state.isFirstPersonaOnAnyNetwork = false
-			return loadPersonasEffect()
+			return .none
 
 		default:
 			return .none
-		}
-	}
-
-	func loadPersonasEffect() -> EffectTask<Action> {
-		.run { send in
-			let personas = try await personasClient.getPersonas()
-			await send(.internal(.personasLoaded(personas)))
-		} catch: { error, _ in
-			errorQueue.schedule(error)
 		}
 	}
 
