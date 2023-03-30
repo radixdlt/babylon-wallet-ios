@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-// MARK: - TransactionReviewPresenting
+// MARK: - TransactionReviewRawTransaction
 public struct TransactionReviewRawTransaction: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var transaction: String
