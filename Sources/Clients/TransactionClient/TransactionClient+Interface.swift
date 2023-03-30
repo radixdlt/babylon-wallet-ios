@@ -7,6 +7,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 	public var addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest
 	public var addGuaranteesToManifest: AddGuaranteesToManifest
 	public var signAndSubmitTransaction: SignAndSubmitTransaction
+	public var getTransactionResult: GetTransactionResult
 	public var getTransactionReview: GetTransactionReview
 }
 
@@ -17,6 +18,7 @@ extension TransactionClient {
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
 	public typealias SignAndSubmitTransaction = @Sendable (SignManifestRequest) async -> TransactionResult
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async -> TransactionReviewResult
+        public typealias GetTransactionResult = @Sendable (TXID) async -> TransactionResult
 }
 
 public typealias TransactionResult = Swift.Result<TXID, TransactionFailure>

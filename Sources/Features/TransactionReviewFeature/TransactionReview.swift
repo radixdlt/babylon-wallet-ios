@@ -23,7 +23,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var rawTransaction: TransactionReviewRawTransaction.State? = nil
 
-		public var isSigningTX: Bool = false
+		public var isProcessingTransaction: Bool = false
 
 		public init(
 			transactionManifest: TransactionManifest,
@@ -60,11 +60,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case signTransactionResult(TransactionResult)
 		case rawTransactionCreated(String)
+		case transactionPollingResult(TransactionResult)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
+		case transactionCompleted(TransactionIntent.TXID)
 	}
 
 	@Dependency(\.transactionClient) var transactionClient
@@ -119,7 +121,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 
-			state.isSigningTX = true
+			state.isProcessingTransaction = true
 			let guarantees = state.allGuarantees
 
 			return .run { send in
@@ -219,15 +221,29 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .signTransactionResult(.success(txID)):
-			state.isSigningTX = false
-			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+			return .run { send in
+				await send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+
+				await send(.internal(.transactionPollingResult(
+					transactionClient.getTransactionResult(txID)
+				)))
+			}
 
 		case let .signTransactionResult(.failure(transactionFailure)):
-			state.isSigningTX = false
+			state.isProcessingTransaction = false
 			return .send(.delegate(.failed(transactionFailure)))
 
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(error)))
+                        
+		case let .transactionPollingResult(.success(txID)):
+			state.isProcessingTransaction = false
+			return .send(.delegate(.transactionCompleted(txID)))
+
+		case let .transactionPollingResult(.failure(error)):
+			state.isProcessingTransaction = false
+			return .send(.delegate(.failed(error)))
+
 
 		case let .rawTransactionCreated(transaction):
 			state.rawTransaction = .init(transaction: transaction)

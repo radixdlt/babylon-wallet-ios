@@ -121,6 +121,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
+
 		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
 			dismissCurrentModalAndRequest(request, for: &state)
 			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
@@ -158,10 +159,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submitAndDismiss(responseToDapp, dappMetadata)))))):
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
 			let response = request.toOutgoingMessage(responseToDapp)
 			return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
-
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
+			dismissCurrentModalAndRequest(request, for: &state)
+			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
@@ -187,10 +190,27 @@ struct DappInteractor: Sendable, FeatureReducer {
 		dappMetadata: DappMetadata?
 	) -> EffectTask<Action> {
 		.run { send in
-			_ = try await radixConnectClient.sendMessage(response)
-			await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
-		} catch: { error, send in
-			await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
+			// In case of transaction response, sending it to the peer client is a silent operation.
+			// The success or failures is determined based on the transaction polling status.
+			let isTransactionResponse = {
+				if case let .success(response) = response.peerMessage.content,
+				   case .transaction = response.items
+				{
+					return true
+				}
+				return false
+			}()
+
+			do {
+				_ = try await radixConnectClient.sendMessage(response)
+				if !isTransactionResponse {
+					await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
+				}
+			} catch {
+				if !isTransactionResponse {
+					await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
+				}
+			}
 		}
 	}
 
