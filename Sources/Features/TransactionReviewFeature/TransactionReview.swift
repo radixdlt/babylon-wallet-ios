@@ -166,7 +166,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				.flatMap { account -> [TransactionReviewGuarantee.State] in
 					account.transfers
 						.filter { $0.metadata.type == .fungible }
-						.map { .init(account: account.account, transfer: $0) }
+						.compactMap { .init(account: account.account, transfer: $0) }
 				}
 
 			state.customizeGuarantees = .init(guarantees: .init(uniqueElements: guarantees))

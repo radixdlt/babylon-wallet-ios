@@ -76,18 +76,18 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public var transfer: TransactionReview.Transfer
 		public var percentageStepper: MinimumPercentageStepper.State
 
-		public init(
+		public init?(
 			account: TransactionReview.Account,
 			transfer: TransactionReview.Transfer
 		) {
 			self.account = account
 			self.transfer = transfer
 
-			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.amount {
-				self.percentageStepper = .init(value: 100 * guaranteed / transfer.amount)
-			} else {
-				self.percentageStepper = .init(value: 100)
+			guard let guaranteed = transfer.guarantee?.amount, guaranteed >= 0 else {
+				return nil
 			}
+
+			self.percentageStepper = .init(value: 100 * guaranteed / transfer.amount)
 		}
 	}
 
