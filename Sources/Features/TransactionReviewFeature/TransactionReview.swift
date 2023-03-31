@@ -205,7 +205,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.transactionWithLockFee = review.manifestIncludingLockFee
 			return .run { send in
 				// TODO: Determine what is the minimal information required
-				let userAccounts = try await extractAccounts(reviewedManifest)
+				let userAccounts = try await extractUserAccounts(reviewedManifest)
 
 				let content = await TransactionReview.TransactionContent(
 					withdrawals: try? extractWithdrawals(reviewedManifest, userAccounts: userAccounts),
@@ -277,7 +277,7 @@ extension TransactionReview {
 		case estimated(instructionIndex: UInt32)
 	}
 
-	private func extractAccounts(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> [Account] {
+	private func extractUserAccounts(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 		return try manifest
 			.encounteredAddresses
@@ -296,49 +296,63 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
-		let dapps = try await extractDappsInfo(manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address))
-		guard !dapps.isEmpty else { return nil }
+		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address)
+		let dApps = try await addresses.asyncMap(extractDappInfo)
+		guard !dApps.isEmpty else { return nil }
 
-		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: dapps))
+		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: dApps))
 	}
 
-	private func extractDappsInfo(_ addresses: [String]) async throws -> [Dapp] {
-		var dapps: [Dapp] = []
-		for address in addresses {
-			let metadata = try? await gatewayAPIClient.getDappDefinition(address)
-			dapps.append(
-				Dapp(
-					id: address,
-					metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-					                thumbnail: nil,
-					                description: metadata?.description)
-				)
-			)
-		}
-		return dapps
+	private func extractDappInfo(_ address: String) async throws -> LedgerEntity {
+		let metadata = try? await gatewayAPIClient.getDappDefinition(address)
+		return LedgerEntity(
+			id: address,
+			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
+			                thumbnail: nil,
+			                description: metadata?.description)
+		)
 	}
 
 	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
-		let proofs = try await extractProofInfo(manifest.accountProofResources.map(\.address))
+		let proofs = try await manifest.accountProofResources.map(\.address).asyncMap(extractProofInfo)
 		guard !proofs.isEmpty else { return nil }
 
 		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
 	}
 
-	private func extractProofInfo(_ addresses: [String]) async throws -> [Dapp] {
-		var dapps: [Dapp] = []
-		for address in addresses {
-			let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
-			dapps.append(
-				Dapp(
-					id: address,
-					metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-					                thumbnail: nil,
-					                description: metadata?.description)
-				)
+	private func extractProofInfo(_ address: String) async throws -> LedgerEntity {
+		let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
+		return LedgerEntity(
+			id: address,
+			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
+			                thumbnail: nil,
+			                description: metadata?.description)
+		)
+	}
+
+	private func extractWithdrawals(
+		_ manifest: AnalyzeManifestWithPreviewContextResponse,
+		userAccounts: [Account]
+	) async throws -> TransactionReviewAccounts.State? {
+		var withdrawals: [Account: [Transfer]] = [:]
+
+		for withdrawal in manifest.accountWithdraws {
+			try await collectTransferInfo(
+				componentAddress: withdrawal.componentAddress,
+				resourceSpecifier: withdrawal.resourceSpecifier,
+				userAccounts: userAccounts,
+				createdEntities: manifest.createdEntities,
+				container: &withdrawals,
+				type: .exact
 			)
 		}
-		return dapps
+
+		guard !withdrawals.isEmpty else { return nil }
+
+		let accounts = withdrawals.map {
+			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
+		}
+		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
@@ -396,17 +410,15 @@ extension TransactionReview {
 		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
 		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
 			let isNewResources = createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
-			let metadata: GatewayAPI.EntityMetadataCollection? = await {
+
+			func getMetadata(address: String) async throws -> GatewayAPI.EntityMetadataCollection? {
 				guard !isNewResources else { return nil }
-				return try? await gatewayAPIClient.getEntityMetadata(resourceAddress.address)
-			}()
+				return try await gatewayAPIClient.getEntityMetadata(address)
+			}
 
 			let addressKind = try engineToolkitClient.decodeAddress(resourceAddress.address).entityType
-			let action = AccountAction(
-				componentAddress: componentAddress,
-				resourceAddress: resourceAddress,
-				amount: amount
-			)
+
+			let metadata = try? await getMetadata(address: resourceAddress.address)
 
 			let guarantee: TransactionClient.Guarantee? = {
 				if case let .estimated(instructionIndex) = type, !isNewResources {
@@ -422,7 +434,8 @@ extension TransactionReview {
 			)
 
 			let transfer = TransactionReview.Transfer(
-				action: action,
+				amount: amount,
+				resourceAddress: resourceAddress,
 				guarantee: guarantee,
 				metadata: resourceMetadata
 			)
@@ -437,37 +450,12 @@ extension TransactionReview {
 			try await addTransfer(resourceAddress, amount: .init(fromString: "1"))
 		}
 	}
-
-	private func extractWithdrawals(
-		_ manifest: AnalyzeManifestWithPreviewContextResponse,
-		userAccounts: [Account]
-	) async throws -> TransactionReviewAccounts.State? {
-		var withdrawals: [Account: [Transfer]] = [:]
-
-		for withdrawal in manifest.accountWithdraws {
-			try await collectTransferInfo(
-				componentAddress: withdrawal.componentAddress,
-				resourceSpecifier: withdrawal.resourceSpecifier,
-				userAccounts: userAccounts,
-				createdEntities: manifest.createdEntities,
-				container: &withdrawals,
-				type: .exact
-			)
-		}
-
-		guard !withdrawals.isEmpty else { return nil }
-
-		let accounts = withdrawals.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
-		}
-		return .init(accounts: .init(uniqueElements: accounts), showCustomizeGuarantees: false)
-	}
 }
 
 // MARK: Useful types
 
 extension TransactionReview {
-	public struct Dapp: Sendable, Identifiable, Hashable {
+	public struct LedgerEntity: Sendable, Identifiable, Hashable {
 		public let id: AccountAddress.ID
 		public let metadata: Metadata?
 
@@ -518,18 +506,22 @@ extension TransactionReview {
 	}
 
 	public struct Transfer: Sendable, Identifiable, Hashable {
-		public var id: AccountAction { action }
+		public let id: UUID = .init()
 
-		public let action: AccountAction
+		public let amount: BigDecimal
+		public let resourceAddress: ResourceAddress
+
 		public var guarantee: TransactionClient.Guarantee?
 		public var metadata: ResourceMetadata
 
 		public init(
-			action: AccountAction,
+			amount: BigDecimal,
+			resourceAddress: ResourceAddress,
 			guarantee: TransactionClient.Guarantee? = nil,
 			metadata: ResourceMetadata
 		) {
-			self.action = action
+			self.amount = amount
+			self.resourceAddress = resourceAddress
 			self.guarantee = guarantee
 			self.metadata = metadata
 		}
@@ -592,27 +584,6 @@ extension Collection where Element: Equatable {
 	}
 }
 
-// MARK: - AccountAction
-public struct AccountAction: Codable, Sendable, Hashable {
-	public let componentAddress: ComponentAddress
-
-	public let resourceAddress: ResourceAddress
-
-	public let amount: BigDecimal
-
-	public enum CodingKeys: String, CodingKey {
-		case componentAddress = "component_address"
-		case resourceAddress = "resource_address"
-		case amount
-	}
-}
-
-extension Collection<AccountAction> {
-	public var groupedByAccount: [ComponentAddress: [AccountAction]] {
-		.init(grouping: self, by: \.componentAddress)
-	}
-}
-
 extension GatewayAPI.EntityMetadataCollection {
 	var description: String? {
 		self["description"]
@@ -651,124 +622,3 @@ extension EngineToolkitModels.AddressKind {
 		}
 	}
 }
-
-#if DEBUG
-extension TransactionReview.Dapp {
-	public static let mock0 = Self(id: .deadbeef32Bytes,
-	                               metadata: .init(name: "Collabofi User Badge", thumbnail: nil, description: nil))
-
-	public static let mock1 = Self(id: .deadbeef64Bytes,
-	                               metadata: .init(name: "Oh Babylon Founder NFT", thumbnail: nil, description: nil))
-
-	public static let mock2 = Self(id: "deadbeef64Bytes", metadata: nil)
-
-	public static let mock3 = Self(id: "deadbeef32Bytes", metadata: nil)
-}
-
-extension TransactionReviewAccount.State {
-	public static let mockWithdraw0 = Self(account: .mockUser0, transfers: [.mock0, .mock1])
-
-	public static let mockWithdraw1 = Self(account: .mockUser1, transfers: [.mock1, .mock3, .mock4])
-
-	public static let mockWithdraw2 = Self(account: .mockUser0, transfers: [.mock1, .mock3])
-
-	public static let mockDeposit1 = Self(account: .mockExternal0, transfers: [.mock0, .mock1, .mock2])
-
-	public static let mockDeposit2 = Self(account: .mockUser0, transfers: [.mock3, .mock4])
-}
-
-extension TransactionReview.Account {
-	public static let mockUser0 = user(.init(address: .mock0,
-	                                         label: "My Main Account",
-	                                         appearanceID: ._1))
-
-	public static let mockUser1 = user(.init(address: .mock1,
-	                                         label: "My Savings Account",
-	                                         appearanceID: ._2))
-
-	public static let mockExternal0 = external(.mock2, approved: true)
-	public static let mockExternal1 = external(.mock2, approved: false)
-}
-
-extension AccountAddress {
-	public static let mock0 = try! Self(address: "account_tdx_b_k591p8y440g69dlqnuzghu84e84ak088fah9u6ay440g6pzq8y4")
-	public static let mock1 = try! Self(address: "account_tdx_b_e84ak088fah9u6ad6j9dlqnuz84e84ak088fau6ad6j9dlqnuzk")
-	public static let mock2 = try! Self(address: "account_tdx_b_1pzq8y440g6nc4vuz0ghu84e84ak088fah9u6ad6j9dlqnuzk59")
-}
-
-extension ComponentAddress {
-	public static let mock0 = Self(address: "account_tdx_b_k591p8y440g69dlqnuzghu84e84ak088fah9u6ay440g6pzq8y4")
-	public static let mock1 = Self(address: "account_tdx_b_e84ak088fah9u6ad6j9dlqnuz84e84ak088fau6ad6j9dlqnuzk")
-	public static let mock2 = Self(address: "account_tdx_b_1pzq8y440g6nc4vuz0ghu84e84ak088fah9u6ad6j9dlqnuzk59")
-}
-
-extension ResourceAddress {
-	public static let mock0 = Self(address: "resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp")
-	public static let mock1 = Self(address: "resource_tdx_b_1qre9sv98scqut4k9g3j6kxuvscczv0lzumefwgwhuf6qdu4c3r")
-}
-
-extension URL {
-	static let mock = URL(string: "test")!
-}
-
-extension TransactionReview.Transfer {
-	public static let mock0 = Self(action: .mock0,
-	                               guarantee: .init(amount: 1.0188, instructionIndex: 1, resourceAddress: .mock0),
-	                               metadata: .init(name: "TSLA",
-	                                               thumbnail: .mock,
-	                                               type: .fungible,
-	                                               fiatAmount: 301.91))
-
-	public static let mock1 = Self(action: .mock1,
-	                               metadata: .init(name: "XRD",
-	                                               thumbnail: .mock,
-	                                               type: .fungible,
-	                                               fiatAmount: 301.91))
-
-	public static let mock2 = Self(action: .mock2,
-	                               guarantee: .init(amount: 5.10, instructionIndex: 1, resourceAddress: .mock1),
-	                               metadata: .init(name: "PXL",
-	                                               thumbnail: .mock,
-	                                               type: .fungible))
-
-	public static let mock3 = Self(action: .mock3,
-	                               metadata: .init(name: "PXL",
-	                                               thumbnail: .mock,
-	                                               type: .fungible))
-
-	public static let mock4 = Self(action: .mock4,
-	                               metadata: .init(name: "Block 14F5",
-	                                               thumbnail: .mock,
-	                                               type: .nonFungible))
-
-	public static var all: Set<Self> {
-		[.mock0, .mock1, .mock2, .mock3, .mock4]
-	}
-}
-
-extension AccountAction {
-	public static let mock0 = Self(componentAddress: .mock0,
-	                               resourceAddress: .mock0,
-	                               amount: 1.0396)
-
-	public static let mock1 = Self(componentAddress: .mock1,
-	                               resourceAddress: .mock1,
-	                               amount: 500)
-
-	public static let mock2 = Self(componentAddress: .mock0,
-	                               resourceAddress: .mock1,
-	                               amount: 5.123)
-
-	public static let mock3 = Self(componentAddress: .mock1,
-	                               resourceAddress: .mock1,
-	                               amount: 300)
-
-	public static let mock4 = Self(componentAddress: .mock0,
-	                               resourceAddress: .mock1,
-	                               amount: 1)
-
-	public static var all: Set<Self> {
-		[.mock0, .mock1, .mock2, .mock3, .mock4]
-	}
-}
-#endif

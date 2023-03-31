@@ -70,7 +70,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	public struct State: Identifiable, Sendable, Hashable {
-		public var id: AccountAction { transfer.id }
+		public var id: TransactionReview.Transfer.ID { transfer.id }
 		public let account: TransactionReview.Account
 
 		public var transfer: TransactionReview.Transfer
@@ -83,8 +83,8 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.account = account
 			self.transfer = transfer
 
-			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount {
-				self.percentageStepper = .init(value: 100 * guaranteed / transfer.action.amount)
+			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.amount {
+				self.percentageStepper = .init(value: 100 * guaranteed / transfer.amount)
 			} else {
 				self.percentageStepper = .init(value: 100)
 			}
@@ -124,8 +124,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
 			let newMinimumDecimal = state.percentageStepper.value * 0.01
-			let newAmount = newMinimumDecimal * state.transfer.action.amount
-
+			let newAmount = newMinimumDecimal * state.transfer.amount
 			state.transfer.guarantee?.amount = newAmount
 
 			return .none
