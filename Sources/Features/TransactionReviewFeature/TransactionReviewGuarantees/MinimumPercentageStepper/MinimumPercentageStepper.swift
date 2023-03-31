@@ -3,15 +3,11 @@ import FeaturePrelude
 // MARK: - MinimumPercentageStepper
 public struct MinimumPercentageStepper: FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var value: BigDecimal
+		public var value: BigDecimal?
 		var string: String
 
-		var isValid: Bool {
-			BigDecimal(validated: string) != nil
-		}
-
 		public init(value: BigDecimal) {
-			let clamped = value == 0 ? .zero : value.clamped.withScale(2).droppingTrailingZeros
+			let clamped = value.withScale(2).clamped.droppingTrailingZeros
 			self.value = clamped
 			self.string = clamped.formatWithoutRounding()
 		}
@@ -32,19 +28,27 @@ public struct MinimumPercentageStepper: FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .increaseTapped:
-			let value = (state.value + percentageDelta).clamped
-			state.value = value
-			state.string = value.formatWithoutRounding()
+			let value = state.value.map { $0 + percentageDelta } ?? 1
+			let clamped = value.clamped.droppingTrailingZeros
+			state.value = clamped
+			state.string = clamped.formatWithoutRounding()
 
 		case .decreaseTapped:
-			let value = (state.value - percentageDelta).clamped
-			state.value = value
-			state.string = value.formatWithoutRounding()
+			let value = state.value.map { $0 - percentageDelta } ?? 0
+			let clamped = value.clamped.droppingTrailingZeros
+			state.value = clamped
+			state.string = clamped.formatWithoutRounding()
 
 		case let .stringEntered(string):
 			state.string = string
-			guard let value = BigDecimal(validated: string) else { return .none }
-			state.value = value
+			if string.isEmpty {
+				state.value = 0
+			} else if let value = try? BigDecimal(localizedFromString: string), value >= 0 {
+				state.value = value.droppingTrailingZeros
+			} else {
+				state.value = nil
+				return .none
+			}
 		}
 
 		return .send(.delegate(.valueChanged))
@@ -54,23 +58,13 @@ public struct MinimumPercentageStepper: FeatureReducer {
 }
 
 extension BigDecimal {
-	var clamped: BigDecimal {
+	fileprivate var clamped: BigDecimal {
 		max(0, self)
-	}
-
-	init?(validated string: String) {
-		if string.isEmpty {
-			self = 0
-			return
-		}
-		guard let value = try? BigDecimal(localizedFromString: string) else { return nil }
-		guard value >= 0 else { return nil }
-		self = value
 	}
 }
 
 extension MinimumPercentageStepper.State {
 	var disableMinus: Bool {
-		value <= 0
+		value.map { $0 <= 0 } ?? false
 	}
 }

@@ -20,6 +20,7 @@ extension TransactionReview.State {
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositsHeading: deposits != nil,
 			viewControlState: viewControlState,
+			showDottedLine: (withdrawals != nil || message != nil) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
 			showApproveButton: transactionWithLockFee != nil
 		)
@@ -43,6 +44,7 @@ extension TransactionReview {
 		let isExpandedDappUsed: Bool
 		let showDepositsHeading: Bool
 		let viewControlState: ControlState
+		let showDottedLine: Bool
 		let rawTransaction: String?
 		let showApproveButton: Bool
 	}
