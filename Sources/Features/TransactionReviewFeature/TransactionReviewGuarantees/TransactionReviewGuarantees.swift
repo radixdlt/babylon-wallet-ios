@@ -2,6 +2,8 @@ import FeaturePrelude
 
 // MARK: - TransactionReviewGuarantees
 public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
+	@Dependency(\.dismiss) var dismiss
+
 	public struct State: Sendable, Hashable {
 		public var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
 
@@ -25,7 +27,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss(apply: Bool)
+		case applyGuarantees(IdentifiedArrayOf<TransactionReviewGuarantee.State>)
 	}
 
 	public init() {}
@@ -43,15 +45,22 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .infoTapped:
-//			state.info = .init(title: L10n.TransactionReview.Guarantees.explanationTitle,
-//			                   explanation: L10n.TransactionReview.Guarantees.explanationText)
+			// FIXME: For mainnet
+			//			state.info = .init(title: L10n.TransactionReview.Guarantees.explanationTitle,
+			//			                   explanation: L10n.TransactionReview.Guarantees.explanationText)
 			return .none
 
 		case .applyTapped:
-			return .send(.delegate(.dismiss(apply: true)))
+			let guarantees = state.guarantees
+			return .run { send in
+				await send(.delegate(.applyGuarantees(guarantees)))
+				await dismiss()
+			}
 
 		case .closeTapped:
-			return .send(.delegate(.dismiss(apply: false)))
+			return .fireAndForget {
+				await dismiss()
+			}
 		}
 	}
 }
@@ -61,7 +70,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	public struct State: Identifiable, Sendable, Hashable {
-		public var id: AccountAction { transfer.id }
+		public var id: TransactionReview.Transfer.ID { transfer.id }
 		public let account: TransactionReview.Account
 
 		public var transfer: TransactionReview.Transfer
@@ -74,8 +83,8 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.account = account
 			self.transfer = transfer
 
-			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.action.amount {
-				self.percentageStepper = .init(value: 100 * guaranteed / transfer.action.amount)
+			if let guaranteed = transfer.guarantee?.amount, guaranteed >= 0, guaranteed <= transfer.amount {
+				self.percentageStepper = .init(value: 100 * guaranteed / transfer.amount)
 			} else {
 				self.percentageStepper = .init(value: 100)
 			}
@@ -115,8 +124,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
 			let newMinimumDecimal = state.percentageStepper.value * 0.01
-			let newAmount = newMinimumDecimal * state.transfer.action.amount
-
+			let newAmount = newMinimumDecimal * state.transfer.amount
 			state.transfer.guarantee?.amount = newAmount
 
 			return .none
