@@ -165,7 +165,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			let guarantees = deposits.accounts
 				.flatMap { account -> [TransactionReviewGuarantee.State] in
 					account.transfers
-						.filter { $0.metadata.type == .fungible }
+						.filter { $0.metadata.type == .fungible && $0.guarantee != nil }
 						.compactMap { .init(account: account.account, transfer: $0) }
 				}
 
