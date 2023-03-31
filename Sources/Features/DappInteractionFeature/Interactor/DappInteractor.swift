@@ -232,6 +232,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				do {
 					let interactionMessage = try incomingMessageResult.unwrapResult()
 					let interaction = interactionMessage.peerMessage.content
+					try validate(interaction)
 					guard interaction.metadata.networkId == currentNetworkID else {
 						let incomingRequestNetwork = try Radix.Network.lookupBy(id: interaction.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
@@ -258,6 +259,26 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+
+	func validate(_ interaction: P2P.FromDapp.WalletInteraction) throws {
+		switch interaction.items {
+		case let .request(items):
+			switch items {
+			case let .unauthorized(unauthorized):
+				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
+					throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.invalidRequest
+				}
+			case let .authorized(authorized):
+				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false ||
+					authorized.oneTimeAccounts?.numberOfAccounts.isValid == false
+				{
+					throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.invalidRequest
+				}
+			}
+		case .transaction:
+			return
 		}
 	}
 

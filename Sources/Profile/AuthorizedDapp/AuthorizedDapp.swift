@@ -77,6 +77,17 @@ extension Profile.Network.AuthorizedDapp {
 				public let quantifier: Quantifier
 				public let quantity: Int
 
+				public var isValid: Bool {
+					switch (quantifier, quantity) {
+					case (.exactly, 0):
+						return false
+					case (_, ..<0):
+						return false
+					default:
+						return true
+					}
+				}
+
 				public static func exactly(_ quantity: Int) -> Self {
 					.init(quantifier: .exactly, quantity: quantity)
 				}
