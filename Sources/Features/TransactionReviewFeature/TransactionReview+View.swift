@@ -20,7 +20,8 @@ extension TransactionReview.State {
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositsHeading: deposits != nil,
 			viewControlState: viewControlState,
-			rawTransaction: displayMode.rawTransaction
+			rawTransaction: displayMode.rawTransaction,
+			showApproveButton: transactionWithLockFee != nil
 		)
 	}
 
@@ -43,6 +44,7 @@ extension TransactionReview {
 		let showDepositsHeading: Bool
 		let viewControlState: ControlState
 		let rawTransaction: String?
+		let showApproveButton: Bool
 	}
 
 	@MainActor
@@ -81,11 +83,13 @@ extension TransactionReview {
 							}
 						}
 
-						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
-							viewStore.send(.approveTapped)
+						if viewStore.showApproveButton {
+							Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
+								viewStore.send(.approveTapped)
+							}
+							.buttonStyle(.primaryRectangular)
+							.padding(.bottom, .medium1)
 						}
-						.buttonStyle(.primaryRectangular)
-						.padding(.bottom, .medium1)
 					}
 					.animation(.easeInOut, value: viewStore.rawTransaction)
 					.padding(.horizontal, .medium3)
