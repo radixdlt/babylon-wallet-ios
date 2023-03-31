@@ -157,6 +157,7 @@ final class FaucetClientTests: TestCase {
 		try await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
 			$0.transactionClient.signAndSubmitTransaction = { _ in .success("mocked_txid") }
+			$0.transactionClient.getTransactionResult = { _ in .success("mocked_txid") }
 			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 			$0.engineToolkitClient.knownEntityAddresses = { _ in KnownEntityAddressesResponse.previewValue }
 			$0.userDefaultsClient.dataForKey = { _ in json.data }
