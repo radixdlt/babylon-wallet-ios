@@ -11,7 +11,7 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		}
 
 		public init(value: BigDecimal) {
-			let clamped = value.clamped.withScale(2).droppingTrailingZeros
+			let clamped = value == 0 ? .zero : value.clamped.withScale(2).droppingTrailingZeros
 			self.value = clamped
 			self.string = clamped.formatWithoutRounding()
 		}
