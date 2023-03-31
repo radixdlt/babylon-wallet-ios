@@ -49,10 +49,10 @@ extension FaucetClient: DependencyKey {
 				makeTransactionHeaderInput: .default
 			)
 
-                        let _ = try await transactionClient
-                                .signAndSubmitTransaction(signSubmitTXRequest)
-                                .asyncFlatMap(transform: transactionClient.getTransactionResult)
-                                .get()
+			let _ = try await transactionClient
+				.signAndSubmitTransaction(signSubmitTXRequest)
+				.asyncFlatMap(transform: transactionClient.getTransactionResult)
+				.get()
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
