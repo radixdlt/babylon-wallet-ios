@@ -7,6 +7,10 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
 
+		public var isValid: Bool {
+			guarantees.allSatisfy(\.percentageStepper.isValid)
+		}
+
 		@PresentationState
 		public var info: SlideUpPanel.State?
 

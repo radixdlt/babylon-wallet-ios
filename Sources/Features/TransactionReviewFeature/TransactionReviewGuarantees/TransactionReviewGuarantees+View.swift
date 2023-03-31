@@ -1,7 +1,17 @@
 import FeaturePrelude
 
+extension TransactionReviewGuarantees.State {
+	var viewState: TransactionReviewGuarantees.ViewState {
+		.init(isValid: isValid)
+	}
+}
+
 // MARK: - TransactionReviewGuarantees.View
 extension TransactionReviewGuarantees {
+	public struct ViewState: Equatable {
+		let isValid: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewGuarantees>
@@ -50,11 +60,13 @@ extension TransactionReviewGuarantees {
 					.background(.app.gray5)
 				}
 				.safeAreaInset(edge: .bottom, spacing: .zero) {
-					ConfirmationFooter(
-						title: L10n.TransactionReview.Guarantees.applyButtonText,
-						isEnabled: true,
-						action: { ViewStore(store).send(.view(.applyTapped)) }
-					)
+					WithViewStore(store.actionless, observe: \.viewState) { viewStore in
+						ConfirmationFooter(
+							title: L10n.TransactionReview.Guarantees.applyButtonText,
+							isEnabled: viewStore.isValid,
+							action: { ViewStore(store).send(.view(.applyTapped)) }
+						)
+					}
 				}
 				.sheet(store: store.scope(state: \.$info, action: { .child(.info($0)) })) {
 					SlideUpPanel.View(store: $0)
