@@ -84,8 +84,8 @@ extension View {
 // MARK: - SpeechbubbleShape
 public struct SpeechbubbleShape: Shape {
 	let cornerRadius: CGFloat
-	public static let triangleSize: CGSize = .init(width: 20, height: 10) // TODO:  constant
-	public static let triangleInset: CGFloat = 50 // TODO:  constant
+	public static let triangleSize: CGSize = .init(width: 20, height: 10)
+	public static let triangleInset: CGFloat = 50
 
 	public init(cornerRadius: CGFloat) {
 		self.cornerRadius = cornerRadius

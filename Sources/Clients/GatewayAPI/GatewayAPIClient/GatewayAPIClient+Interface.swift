@@ -45,7 +45,7 @@ extension GatewayAPIClient {
 }
 
 extension GatewayAPIClient {
-	public func getDappDefinition(address: String) async throws -> GatewayAPI.EntityMetadataCollection {
+	public func getDappDefinition(_ address: String) async throws -> GatewayAPI.EntityMetadataCollection {
 		let entityMetadata = try await getEntityMetadata(address)
 
 		guard let dappDefinitionAddress = entityMetadata.dappDefinition else {

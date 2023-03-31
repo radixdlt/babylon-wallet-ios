@@ -793,6 +793,8 @@ public enum L10n {
     public static let sendingToHeading = L10n.tr("Localizable", "transactionReview.sendingToHeading", fallback: "Sending to")
     /// Review Transaction
     public static let title = L10n.tr("Localizable", "transactionReview.title", fallback: "Review Transaction")
+    /// Unknown
+    public static let unknown = L10n.tr("Localizable", "transactionReview.unknown", fallback: "Unknown")
     /// Using dApps
     public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview.usingDappsHeading", fallback: "Using dApps")
     /// Withdrawing

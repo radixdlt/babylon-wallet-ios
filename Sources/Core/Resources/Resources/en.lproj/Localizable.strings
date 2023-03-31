@@ -151,6 +151,7 @@
 
 "transactionReview.title" = "Review Transaction";
 
+"transactionReview.unknown" = "Unknown";
 "transactionReview.messageHeading" = "Message";
 "transactionReview.usingDappsHeading" = "Using dApps";
 "transactionReview.withdrawalsHeading" = "Withdrawing";

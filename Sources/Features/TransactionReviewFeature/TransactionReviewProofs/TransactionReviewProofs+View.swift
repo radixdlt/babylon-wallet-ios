@@ -26,15 +26,15 @@ extension TransactionReviewProofs {
 					}
 					.padding(.bottom, .medium2)
 
-					ForEach(viewStore.dApps) { dApp in
+					ForEach(viewStore.proofs) { proof in
 						VStack(spacing: 0) {
-							let metadata = dApp.metadata
-							DappView(thumbnail: metadata?.thumbnail, name: metadata?.name ?? "Unknown name") { // TODO: 
-								viewStore.send(.dAppTapped(id: dApp.id))
+							let metadata = proof.metadata
+							DappView(thumbnail: metadata?.thumbnail, name: metadata?.name ?? L10n.TransactionReview.unknown) {
+								viewStore.send(.proofTapped(id: proof.id))
 							}
 							.padding(.bottom, .medium3)
 
-							if dApp.id != viewStore.dApps.last?.id {
+							if proof.id != viewStore.proofs.last?.id {
 								Separator()
 									.padding(.bottom, .medium3)
 							}
