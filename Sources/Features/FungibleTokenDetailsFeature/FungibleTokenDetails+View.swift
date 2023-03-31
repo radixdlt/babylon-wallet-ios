@@ -47,8 +47,8 @@ extension FungibleTokenDetails {
 							}
 							.frame(width: 104, height: 104)
 							.clipShape(Circle())
-							if let amount = viewStore.amount, let symbol = viewStore.symbol {
-								Text(amount).font(.app.sheetTitle).kerning(-0.5) +
+							if let symbol = viewStore.symbol {
+								Text(viewStore.amount).font(.app.sheetTitle).kerning(-0.5) +
 									Text(" " + symbol).font(.app.sectionHeader)
 							}
 						}
