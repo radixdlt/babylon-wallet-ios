@@ -59,13 +59,13 @@ extension TransactionReviewGuarantees {
 					.padding(.medium1)
 					.background(.app.gray5)
 				}
-				.safeAreaInset(edge: .bottom, spacing: .zero) {
-					WithViewStore(store.actionless, observe: \.viewState) { viewStore in
-						ConfirmationFooter(
-							title: L10n.TransactionReview.Guarantees.applyButtonText,
-							isEnabled: viewStore.isValid,
-							action: { ViewStore(store).send(.view(.applyTapped)) }
-						)
+				.footer {
+					WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+						Button(L10n.TransactionReview.Guarantees.applyButtonText) {
+							viewStore.send(.applyTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.isValid ? .enabled : .disabled)
 					}
 				}
 				.sheet(store: store.scope(state: \.$info, action: { .child(.info($0)) })) {
