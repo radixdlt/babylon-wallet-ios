@@ -32,7 +32,7 @@ extension TransactionFailure {
 			switch error {
 			case .failedToFindAccountWithEnoughFundsToLockFee:
 				return (errorKind: .failedToFindAccountWithEnoughFundsToLockFee, message: error.errorDescription)
-			case .failedToGetEpoch, .failedToLoadNotaryAndSigners, .failedToLoadNotaryPublicKey, .failedToParseTXItIsProbablyInvalid:
+			case .failedToGetEpoch, .failedToLoadNotaryAndSigners, .failedToLoadNotaryPublicKey, .failedToLoadSignerPublicKeys, .failedToParseTXItIsProbablyInvalid:
 				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
 			}
 
@@ -106,6 +106,7 @@ extension TransactionFailure {
 		case failedToGetEpoch
 		case failedToLoadNotaryAndSigners
 		case failedToLoadNotaryPublicKey
+		case failedToLoadSignerPublicKeys
 		case failedToFindAccountWithEnoughFundsToLockFee
 
 		public var errorDescription: String? {
@@ -116,6 +117,8 @@ extension TransactionFailure {
 				return "Failed to get epoch"
 			case .failedToLoadNotaryPublicKey:
 				return "Failed to load notary public key"
+			case .failedToLoadSignerPublicKeys:
+				return "Failed to load signer public keys"
 			case .failedToLoadNotaryAndSigners:
 				return "Failed to load notary and signers"
 			case .failedToFindAccountWithEnoughFundsToLockFee:

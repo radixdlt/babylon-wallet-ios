@@ -382,7 +382,7 @@ extension TransactionClient {
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
 			getNotaryAndSigners: @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
-		) async -> Result<(intent: TransactionIntent, notaryAndSigners: NotaryAndSigners), TransactionFailure.FailedToPrepareForTXSigning> {
+		) async -> Result<(intent: TransactionIntent, notaryAndSigners: NotaryAndSigners, signerPublicKeys: [Engine.PublicKey]), TransactionFailure.FailedToPrepareForTXSigning> {
 			let nonce = engineToolkitClient.generateTXNonce()
 			let epoch: Epoch
 			do {
@@ -416,6 +416,19 @@ extension TransactionClient {
 				return .failure(.failedToLoadNotaryPublicKey)
 			}
 
+			var accountsToSignPublicKeys: [Engine.PublicKey] = []
+			do {
+				for account in notaryAndSigners.accountsNeededToSign {
+					switch account.securityState {
+					case let .unsecured(unsecuredControl):
+						let key = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
+						accountsToSignPublicKeys.append(key)
+					}
+				}
+			} catch {
+				return .failure(.failedToLoadSignerPublicKeys)
+			}
+
 			let header = TransactionHeader(
 				version: version,
 				networkId: networkID,
@@ -433,7 +446,7 @@ extension TransactionClient {
 				manifest: manifest
 			)
 
-			return .success((intent, notaryAndSigners))
+			return .success((intent, notaryAndSigners, accountsToSignPublicKeys))
 		}
 
 		@Sendable
@@ -481,7 +494,8 @@ extension TransactionClient {
 			).map {
 				GatewayAPI.TransactionPreviewRequest(
 					rawManifest: request.manifestToSign,
-					header: $0.intent.header
+					header: $0.intent.header,
+					signerPublicKeys: $0.signerPublicKeys
 				)
 			}
 		}
@@ -499,7 +513,7 @@ extension TransactionClient {
 				getNotaryAndSigners: getNotaryAndSigners
 			).mapError {
 				TransactionFailure.failedToPrepareForTXSigning($0)
-			}.asyncFlatMap { intent, notaryAndSigners in
+			}.asyncFlatMap { intent, notaryAndSigners, _ in
 				await signAndSubmit(transactionIntent: intent, notaryAndSigners: notaryAndSigners)
 			}
 		}
@@ -702,7 +716,8 @@ extension IdentifiedArrayOf {
 extension GatewayAPI.TransactionPreviewRequest {
 	init(
 		rawManifest: TransactionManifest,
-		header: TransactionHeader
+		header: TransactionHeader,
+		signerPublicKeys: [Engine.PublicKey]
 	) {
 		let manifestString = {
 			switch rawManifest.instructions {
@@ -728,7 +743,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 			costUnitLimit: .init(header.costUnitLimit),
 			tipPercentage: .init(header.tipPercentage),
 			nonce: .init(header.nonce.rawValue),
-			signerPublicKeys: [GatewayAPI.PublicKey(from: header.publicKey)],
+			signerPublicKeys: signerPublicKeys.map { GatewayAPI.PublicKey(from: $0) },
 			flags: flags
 		)
 	}
