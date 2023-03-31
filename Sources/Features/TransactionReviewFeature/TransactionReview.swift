@@ -295,13 +295,6 @@ extension TransactionReview {
 			}
 	}
 
-	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
-		let dapps = try await extractDappsInfo(manifest.accountProofResources.map(\.address))
-		guard !dapps.isEmpty else { return nil }
-
-		return TransactionReviewProofs.State(dApps: .init(uniqueElements: dapps))
-	}
-
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
 		let dapps = try await extractDappsInfo(manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address))
 		guard !dapps.isEmpty else { return nil }
@@ -312,11 +305,34 @@ extension TransactionReview {
 	private func extractDappsInfo(_ addresses: [String]) async throws -> [Dapp] {
 		var dapps: [Dapp] = []
 		for address in addresses {
-			let metadata = try? await gatewayAPIClient.getDappDefinition(address: address)
+			let metadata = try? await gatewayAPIClient.getDappDefinition(address)
 			dapps.append(
 				Dapp(
 					id: address,
-					metadata: .init(name: metadata?.name ?? "Unknown",
+					metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
+					                thumbnail: nil,
+					                description: metadata?.description)
+				)
+			)
+		}
+		return dapps
+	}
+
+	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
+		let proofs = try await extractProofInfo(manifest.accountProofResources.map(\.address))
+		guard !proofs.isEmpty else { return nil }
+
+		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
+	}
+
+	private func extractProofInfo(_ addresses: [String]) async throws -> [Dapp] {
+		var dapps: [Dapp] = []
+		for address in addresses {
+			let metadata = try? await gatewayAPIClient.getEntityMetadata(address)
+			dapps.append(
+				Dapp(
+					id: address,
+					metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
 					                thumbnail: nil,
 					                description: metadata?.description)
 				)
@@ -328,7 +344,7 @@ extension TransactionReview {
 	private func extractDeposits(
 		_ manifest: AnalyzeManifestWithPreviewContextResponse,
 		userAccounts: [Account]
-	) async throws -> TransactionReviewAccounts.State {
+	) async throws -> TransactionReviewAccounts.State? {
 		var deposits: [Account: [Transfer]] = [:]
 
 		for deposit in manifest.accountDeposits {
@@ -354,9 +370,11 @@ extension TransactionReview {
 			}
 		}
 
-		let reviewAccounts = deposits.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
-		}
+		let reviewAccounts = deposits
+			.filter { !$0.value.isEmpty }
+			.map { TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value)) }
+
+		guard !reviewAccounts.isEmpty else { return nil }
 
 		let requiresGuarantees = reviewAccounts.contains { reviewAccount in
 			reviewAccount.transfers.contains { transfer in
@@ -398,7 +416,7 @@ extension TransactionReview {
 			}()
 
 			let resourceMetadata = ResourceMetadata(
-				name: metadata?.symbol ?? metadata?.name ?? "Unknown",
+				name: metadata?.symbol ?? metadata?.name ?? L10n.TransactionReview.unknown,
 				thumbnail: nil,
 				type: addressKind.resourceType
 			)
