@@ -55,27 +55,21 @@ public struct MinimumPercentageStepper: FeatureReducer {
 
 extension BigDecimal {
 	var clamped: BigDecimal {
-		if self <= 0 {
-			return 0
-		} else if self >= 100 {
-			return 100
-		}
-
-		return self
+		max(0, self)
 	}
 
 	init?(validated string: String) {
+		if string.isEmpty {
+			self = 0
+			return
+		}
 		guard let value = try? BigDecimal(localizedFromString: string) else { return nil }
-		guard value >= 0, value <= 100 else { return nil }
+		guard value >= 0 else { return nil }
 		self = value
 	}
 }
 
 extension MinimumPercentageStepper.State {
-	var disablePlus: Bool {
-		value >= 100
-	}
-
 	var disableMinus: Bool {
 		value <= 0
 	}

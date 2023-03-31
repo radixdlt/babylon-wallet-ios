@@ -37,8 +37,6 @@ extension MinimumPercentageStepper {
 					Button(asset: AssetResource.plusCircle) {
 						viewStore.send(.increaseTapped)
 					}
-					.opacity(viewStore.disablePlus ? disabledOpacity : 1)
-					.disabled(viewStore.disablePlus)
 				}
 			}
 		}
