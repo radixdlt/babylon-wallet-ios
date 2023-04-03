@@ -4,12 +4,12 @@ import Profile
 
 // MARK: - PoolUnit
 public struct PoolUnit: Asset {
-	public let componentAddress: ComponentAddress
+	public let resourceAddress: ResourceAddress
 
 	public init(
-		componentAddress: ComponentAddress
+		resourceAddress: ResourceAddress
 	) {
-		self.componentAddress = componentAddress
+		self.resourceAddress = resourceAddress
 	}
 }
 

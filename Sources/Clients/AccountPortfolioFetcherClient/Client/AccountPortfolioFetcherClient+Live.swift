@@ -11,7 +11,7 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 			var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
 
 			let tmpMaxRequestAmount = 999 // TODO: remove once pagination is implemented
-			let fungibleTokenAddresses = Array(accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress).prefix(tmpMaxRequestAmount))
+			let fungibleTokenAddresses = Array(accountPortfolio.fungibleTokenContainers.map(\.asset.resourceAddress).prefix(tmpMaxRequestAmount))
 			let nonFungibleTokenAddresses = Array(accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress).prefix(tmpMaxRequestAmount))
 
 			if fungibleTokenAddresses.isEmpty, nonFungibleTokenAddresses.isEmpty {

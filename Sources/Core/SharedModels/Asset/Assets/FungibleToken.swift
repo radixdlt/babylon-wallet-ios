@@ -4,7 +4,7 @@ import Profile
 
 // MARK: - FungibleToken
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
-	public let componentAddress: ComponentAddress
+	public let resourceAddress: ResourceAddress
 	public let totalSupply: BigDecimal?
 	public let totalMinted: BigDecimal?
 	public let totalBurnt: BigDecimal?
@@ -35,7 +35,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let divisibility: Int?
 
 	public init(
-		componentAddress: ComponentAddress,
+		resourceAddress: ResourceAddress,
 		divisibility: Int? = nil,
 		totalSupply: BigDecimal? = nil,
 		totalMinted: BigDecimal? = nil,
@@ -47,7 +47,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		tokenInfoURL: String? = nil,
 		iconURL: URL? = nil
 	) {
-		self.componentAddress = componentAddress
+		self.resourceAddress = resourceAddress
 		self.divisibility = divisibility
 		self.totalSupply = totalSupply
 		self.totalMinted = totalMinted
@@ -87,7 +87,7 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable {
 extension FungibleToken {
 	/// The native token of the Radix Ledger
 	public static let xrd = Self(
-		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
+		resourceAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
 		divisibility: 18,
 		totalSupply: 24_000_000_000,
 		totalMinted: 0,
@@ -100,7 +100,7 @@ extension FungibleToken {
 	)
 
 	public static let btc = Self(
-		componentAddress: "btc-deadbeef",
+		resourceAddress: "btc-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
 		totalMinted: 0,
@@ -112,7 +112,7 @@ extension FungibleToken {
 	)
 
 	public static let dot = Self(
-		componentAddress: "dot-deadbeef",
+		resourceAddress: "dot-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
 		totalMinted: 0,
@@ -124,7 +124,7 @@ extension FungibleToken {
 	)
 
 	public static let eth = Self(
-		componentAddress: "eth-deadbeef",
+		resourceAddress: "eth-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
 		totalMinted: 0,
@@ -136,7 +136,7 @@ extension FungibleToken {
 	)
 
 	public static let ltc = Self(
-		componentAddress: "ltc-deadbeef",
+		resourceAddress: "ltc-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
 		totalMinted: 0,
@@ -148,7 +148,7 @@ extension FungibleToken {
 	)
 
 	public static let sol = Self(
-		componentAddress: "sol-deadbeef",
+		resourceAddress: "sol-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
 		totalMinted: 0,
@@ -160,7 +160,7 @@ extension FungibleToken {
 	)
 
 	public static let usdt = Self(
-		componentAddress: "usdt-deadbeef",
+		resourceAddress: "usdt-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
 		totalMinted: 0,
@@ -172,7 +172,7 @@ extension FungibleToken {
 	)
 
 	public static let xrp = Self(
-		componentAddress: "xrp-deadbeef",
+		resourceAddress: "xrp-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
 		totalMinted: 0,
