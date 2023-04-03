@@ -78,7 +78,7 @@ extension TransactionReviewGuarantees {
 
 extension TransactionReviewGuarantee.State {
 	var viewState: TransactionReviewGuarantee.ViewState {
-		.init(id: id, account: account, token: .init(transfer: transfer))
+		.init(id: transfer.id, account: account, token: .init(transfer: transfer))
 	}
 }
 
@@ -86,7 +86,7 @@ extension TransactionReviewTokenView.ViewState {
 	init(transfer: TransactionReview.Transfer) {
 		self.init(name: transfer.metadata.name,
 		          thumbnail: transfer.metadata.thumbnail,
-		          amount: transfer.action.amount,
+		          amount: transfer.amount,
 		          guaranteedAmount: transfer.guarantee?.amount,
 		          fiatAmount: transfer.metadata.fiatAmount)
 	}
@@ -94,7 +94,7 @@ extension TransactionReviewTokenView.ViewState {
 
 extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
-		public let id: AccountAction
+		public let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.Account
 		let token: TransactionReviewTokenView.ViewState
 	}

@@ -151,10 +151,11 @@
 
 "transactionReview.title" = "Review Transaction";
 
+"transactionReview.unknown" = "Unknown";
 "transactionReview.messageHeading" = "Message";
 "transactionReview.usingDappsHeading" = "Using dApps";
-"transactionReview.withdrawingHeading" = "Withdrawing";
-"transactionReview.depositingHeading" = "Depositing";
+"transactionReview.withdrawalsHeading" = "Withdrawing";
+"transactionReview.depositsHeading" = "Depositing";
 "transactionReview.sendingToHeading" = "Sending to";
 "transactionReview.presentingHeading" = "Presenting";
 "transactionReview.customizeGuaranteesButtonTitle" = "Customize Guarantees";

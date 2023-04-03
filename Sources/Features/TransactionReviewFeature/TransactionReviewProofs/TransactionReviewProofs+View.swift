@@ -1,12 +1,12 @@
 import FeaturePrelude
 
-// MARK: - TransactionReviewPresenting.View
-extension TransactionReviewPresenting {
+// MARK: - TransactionReviewProofs.View
+extension TransactionReviewProofs {
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<TransactionReviewPresenting>
+		let store: StoreOf<TransactionReviewProofs>
 
-		public init(store: StoreOf<TransactionReviewPresenting>) {
+		public init(store: StoreOf<TransactionReviewProofs>) {
 			self.store = store
 		}
 
@@ -26,15 +26,15 @@ extension TransactionReviewPresenting {
 					}
 					.padding(.bottom, .medium2)
 
-					ForEach(viewStore.dApps) { dApp in
+					ForEach(viewStore.proofs) { proof in
 						VStack(spacing: 0) {
-							let metadata = dApp.metadata
-							DappView(thumbnail: metadata?.thumbnail, name: metadata?.name ?? "Unknown name") { // TODO: 
-								viewStore.send(.dAppTapped(id: dApp.id))
+							let metadata = proof.metadata
+							DappView(thumbnail: metadata?.thumbnail, name: metadata?.name ?? L10n.TransactionReview.unknown) {
+								viewStore.send(.proofTapped(id: proof.id))
 							}
 							.padding(.bottom, .medium3)
 
-							if dApp.id != viewStore.dApps.last?.id {
+							if proof.id != viewStore.proofs.last?.id {
 								Separator()
 									.padding(.bottom, .medium3)
 							}

@@ -10,7 +10,7 @@ public struct SetMetadata: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let entityAddress: Address_ // TODO:  What should this actually be?
+	public let entityAddress: Address_
 	public let key: String
 	public let value: Enum
 

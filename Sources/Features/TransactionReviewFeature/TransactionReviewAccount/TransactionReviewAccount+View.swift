@@ -98,7 +98,7 @@ public struct TransactionDetailsView: View {
 			TransactionReviewTokenView(viewState: .init(
 				name: viewState.metadata.name,
 				thumbnail: viewState.metadata.thumbnail,
-				amount: viewState.action.amount,
+				amount: viewState.amount,
 				guaranteedAmount: viewState.guarantee?.amount,
 				fiatAmount: viewState.metadata.fiatAmount
 			))

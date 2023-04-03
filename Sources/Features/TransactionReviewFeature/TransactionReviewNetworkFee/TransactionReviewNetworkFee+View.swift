@@ -37,7 +37,7 @@ extension TransactionReviewNetworkFee {
 							.foregroundColor(.app.alert)
 					}
 
-					// TODO: Enable back
+					// FIXME: mainnet
 //					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
 //						viewStore.send(.customizeTapped)
 //					}

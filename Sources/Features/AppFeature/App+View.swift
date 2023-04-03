@@ -2,7 +2,6 @@ import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import SplashFeature
-import TransactionReviewFeature
 
 // MARK: - App.View
 extension App {

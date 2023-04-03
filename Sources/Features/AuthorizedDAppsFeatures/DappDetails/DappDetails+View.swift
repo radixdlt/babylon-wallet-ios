@@ -115,7 +115,7 @@ private extension DappDetails.State {
 		return .init(
 			title: dApp.displayName.rawValue,
 			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
-			domain: metadata?["domain"],
+			domain: metadata?.domain,
 			addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .default),
 			otherMetadata: otherMetadata,
 			fungibleTokens: [], // TODO: Populate when we have it
