@@ -138,7 +138,13 @@ struct SelectAccountsToImport_Preview: PreviewProvider {
 	}
 }
 
+extension [OlympiaAccountToMigrate] {
+	public static let previewValue: Self = OrderedSet<UncheckedImportedOlympiaWalletPayload>.previewValue.flatMap { try! $0.accountsToImport() }
+}
+
 extension SelectAccountsToImport.State {
-	public static let previewValue = Self(scannedAccounts: .init(rawValue: .init(uncheckedUniqueElements: [OlympiaAccountToMigrate.previewValue]))!)
+	public static let previewValue = Self(
+		scannedAccounts: .init(rawValue: .init(uncheckedUniqueElements: Array<OlympiaAccountToMigrate>.previewValue))!
+	)
 }
 #endif

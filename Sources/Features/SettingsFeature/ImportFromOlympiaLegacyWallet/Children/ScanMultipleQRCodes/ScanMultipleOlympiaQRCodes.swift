@@ -66,7 +66,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			return .run { [DelEteMeNoooWWw = state.DelEteMeNoooooooooooWwwWw] send in
 				loggerGlobal.critical("IGNORE SCANNED CONTENT. MOCKING RESPONSE!: \(qrString)")
 				await send(.internal(.legacyWalletInfoResult(TaskResult {
-					UncheckedImportedOlympiaWalletPayload.mockMany[DelEteMeNoooWWw]
+					OrderedSet<UncheckedImportedOlympiaWalletPayload>.previewValue[DelEteMeNoooWWw]
 				})))
 			}
 
@@ -146,6 +146,39 @@ public struct ImportedOlympiaWallet: Sendable, Hashable {
 	}
 }
 
+#if DEBUG
+extension OrderedSet<UncheckedImportedOlympiaWalletPayload> {
+	static let previewValue: Self = try! {
+		let numberOfPayLoads = 2
+		let accountsPerPayload = 2
+		let numberOfAccounts = numberOfPayLoads * accountsPerPayload
+		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+		let passphrase = try Mnemonic().words[0].capitalized
+		print("✅ Passhprase: \(passphrase)")
+		let hdRoot = try mnemonic.hdRoot(passphrase: passphrase)
+		let accounts: [UncheckedImportedOlympiaWalletPayload.AccountNonChecked] = try (0 ..< numberOfAccounts).map {
+			let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
+			let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
+			let accountNonChecked = UncheckedImportedOlympiaWalletPayload.AccountNonChecked(pk: publicKey.compressedData.hex, path: path.derivationPath, xrd: "1\($0)0", name: "Sajjon i=\($0)")
+
+			let accountChecked = try accountNonChecked.checked()
+			assert(accountChecked.path == path)
+			assert(accountChecked.publicKey.compressedRepresentation == publicKey.compressedRepresentation)
+			return accountNonChecked
+		}
+		let array = (0 ..< numberOfPayLoads).map {
+			UncheckedImportedOlympiaWalletPayload(
+				payloads: numberOfPayLoads,
+				index: $0,
+				words: mnemonic.wordCount.wordCount,
+				accounts: Array(accounts[($0 * accountsPerPayload) ..< (($0 + 1) * accountsPerPayload)])
+			)
+		}
+		return OrderedSet(uncheckedUniqueElements: array)
+	}()
+}
+#endif // DEBUG
+
 // MARK: - UncheckedImportedOlympiaWalletPayload
 public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashable {
 	/// number of payloads (might be 1)
@@ -159,38 +192,16 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 
 	private let accounts: [AccountNonChecked]
 
+	init(payloads: Int, index: Int, words: Int, accounts: [AccountNonChecked]) {
+		self.payloads = payloads
+		self.index = index
+		self.words = words
+		self.accounts = accounts
+	}
+
 	var isLast: Bool {
 		index >= (payloads - 1)
 	}
-
-	fileprivate static let mockMany: OrderedSet<Self> = try! {
-		let numberOfPayLoads = 2
-		let accountsPerPayload = 2
-		let numberOfAccounts = numberOfPayLoads * accountsPerPayload
-		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-		let passphrase = try Mnemonic().words[0].capitalized
-		print("✅ Passhprase: \(passphrase)")
-		let hdRoot = try mnemonic.hdRoot(passphrase: passphrase)
-		let accounts: [AccountNonChecked] = try (0 ..< numberOfAccounts).map {
-			let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
-			let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
-			let accountNonChecked = AccountNonChecked(pk: publicKey.compressedData.hex, path: path.derivationPath, xrd: "1\($0)0", name: "Sajjon i=\($0)")
-
-			let accountChecked = try accountNonChecked.checked()
-			assert(accountChecked.path == path)
-			assert(accountChecked.publicKey.compressedRepresentation == publicKey.compressedRepresentation)
-			return accountNonChecked
-		}
-		let array = (0 ..< numberOfPayLoads).map {
-			Self(
-				payloads: numberOfPayLoads,
-				index: $0,
-				words: mnemonic.wordCount.wordCount,
-				accounts: Array(accounts[($0 * accountsPerPayload) ..< (($0 + 1) * accountsPerPayload)])
-			)
-		}
-		return OrderedSet(uncheckedUniqueElements: array)
-	}()
 
 	struct AccountNonChecked: Decodable, Sendable, Hashable {
 		let pk: String
