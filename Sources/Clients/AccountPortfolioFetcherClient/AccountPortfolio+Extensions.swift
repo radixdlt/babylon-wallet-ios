@@ -19,12 +19,12 @@ extension AccountPortfolio {
 			.compactMap(\.global)
 			.map { item in
 				let balance = try BigDecimal(fromString: item.amount)
-				let componentAddress = ComponentAddress(address: item.resourceAddress)
-				let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
+				let resourceAddress = ResourceAddress(address: item.resourceAddress)
+				let isXRD = try engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)
 
 				return try FungibleTokenContainer(owner: .init(address: response.details.address),
 				                                  asset: .init(
-				                                  	componentAddress: componentAddress,
+				                                  	resourceAddress: resourceAddress,
 				                                  	isXRD: isXRD
 				                                  ),
 				                                  amount: balance,
@@ -111,7 +111,7 @@ extension FungibleToken {
 		let dict = metadataCollection.asDictionary
 
 		return Self(
-			componentAddress: componentAddress,
+			resourceAddress: resourceAddress,
 			divisibility: divisibility,
 			totalSupply: totalSupply,
 			totalMinted: totalMinted,

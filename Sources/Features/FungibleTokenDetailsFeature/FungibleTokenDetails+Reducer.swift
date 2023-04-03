@@ -22,7 +22,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .copyAddressButtonTapped:
-			return .run { [address = state.asset.componentAddress.address] _ in
+			return .run { [address = state.asset.resourceAddress.address] _ in
 				pasteboardClient.copyString(address)
 			}
 		}
