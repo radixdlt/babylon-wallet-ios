@@ -104,7 +104,7 @@ package.addModules([
 			"RadixConnectClient",
 			"PersonasClient",
 			"ROLAClient",
-			"TransactionSigningFeature",
+			"TransactionReviewFeature",
 		],
 		tests: .yes()
 	),
@@ -253,6 +253,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "TransactionReviewFeature",
+		dependencies: [
+			"GatewayAPI",
+			"TransactionClient",
+		],
+		tests: .yes()
+	),
+	.feature(
 		name: "TransactionSigningFeature",
 		dependencies: [
 			"GatewayAPI",
@@ -261,6 +269,7 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
 ])
 
 // MARK: - Clients

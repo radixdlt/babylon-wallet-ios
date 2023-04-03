@@ -2,7 +2,7 @@ import AccountsClient
 import AuthorizedDappsClient
 import FeaturePrelude
 import PersonasClient
-import TransactionSigningFeature
+import TransactionReviewFeature
 
 // MARK: - DappInteractionFlow.View
 extension DappInteractionFlow {
@@ -80,9 +80,14 @@ extension DappInteractionFlow {
 					then: { PersonaDataPermission.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.MainState.signAndSubmitTransaction,
-					action: DappInteractionFlow.Destinations.MainAction.signAndSubmitTransaction,
-					then: { TransactionSigning.View(store: $0) }
+					state: /DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
+					action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
+					then: { OneTimePersonaData.View(store: $0) }
+				)
+				CaseLet(
+					state: /DappInteractionFlow.Destinations.MainState.reviewTransaction,
+					action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
+					then: { TransactionReview.View(store: $0) }
 				)
 			}
 		}

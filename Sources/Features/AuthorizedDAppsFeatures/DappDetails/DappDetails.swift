@@ -184,18 +184,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - Extensions
-
-extension GatewayAPI.EntityMetadataCollection {
-	var description: String? {
-		self["description"]
-	}
-
-	subscript(key: String) -> String? {
-		items.first { $0.key == key }?.value.asString
-	}
-}
-
 extension AlertState<DappDetails.ViewAction.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
 		AlertState {

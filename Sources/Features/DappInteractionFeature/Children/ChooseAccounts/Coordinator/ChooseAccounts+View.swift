@@ -154,7 +154,9 @@ struct ChooseAccounts_Preview: PreviewProvider {
 					reducer: ChooseAccounts()
 				)
 			)
+			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
+			#endif
 		}
 	}
 }

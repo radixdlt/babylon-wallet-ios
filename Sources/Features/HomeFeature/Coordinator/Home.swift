@@ -140,7 +140,7 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = .createAccount(
 				.init(config: .init(
 					purpose: .newAccountFromHome
-				))
+				), displayIntroduction: { _ in false })
 			)
 			return .none
 		}
@@ -262,14 +262,6 @@ public struct Home: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
 			return refreshAccount(address)
-
-		case .destination(.presented(.createAccount(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-
-		case .destination(.presented(.createAccount(.delegate(.completed)))):
-			state.destination = nil
-			return .none
 
 		default:
 			return .none

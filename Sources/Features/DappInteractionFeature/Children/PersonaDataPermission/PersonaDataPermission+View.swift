@@ -33,7 +33,10 @@ extension PersonaDataPermission {
 				return dappName + explanation
 			}()
 			output = {
-				let fields = state.persona.persona.fields
+				guard let persona = state.persona else {
+					return nil
+				}
+				let fields = persona.persona.fields
 					.filter { state.requiredFieldIDs.contains($0.id) }
 				guard fields.count == state.requiredFieldIDs.count else {
 					return nil
@@ -61,11 +64,12 @@ extension PersonaDataPermission {
 							subtitle: viewStore.subtitle
 						)
 
-						PersonaDataPermissionBox.View(
-							store: store.scope(
+						IfLetStore(
+							store.scope(
 								state: \.persona,
 								action: { .child(.persona($0)) }
-							)
+							),
+							then: { PersonaDataPermissionBox.View(store: $0) }
 						)
 
 						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
@@ -92,6 +96,7 @@ extension PersonaDataPermission {
 					action: PersonaDataPermission.Destinations.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
 				)
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}
@@ -108,9 +113,15 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 				store: .init(
 					initialState: .previewValue,
 					reducer: PersonaDataPermission()
-				)
+				) {
+					$0.personasClient.getPersonas = { @Sendable in
+						[.previewValue0, .previewValue1]
+					}
+				}
 			)
+			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
+			#endif
 		}
 	}
 }
@@ -118,7 +129,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 extension PersonaDataPermission.State {
 	static let previewValue: Self = .init(
 		dappMetadata: .previewValue,
-		persona: .previewValue0,
+		personaID: Profile.Network.Persona.previewValue0.id,
 		requiredFieldIDs: [.givenName, .emailAddress]
 	)
 }

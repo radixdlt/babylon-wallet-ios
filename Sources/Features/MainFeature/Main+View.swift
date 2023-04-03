@@ -3,6 +3,10 @@ import FeaturePrelude
 import HomeFeature
 import SettingsFeature
 
+import TransactionReviewFeature
+
+let stepperStore: StoreOf<MinimumPercentageStepper> = .init(initialState: .init(value: 100), reducer: MinimumPercentageStepper())
+
 // MARK: - Main.View
 extension Main {
 	@MainActor

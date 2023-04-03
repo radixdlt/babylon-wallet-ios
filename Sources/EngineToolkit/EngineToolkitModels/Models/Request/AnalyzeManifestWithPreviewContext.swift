@@ -22,12 +22,13 @@ public struct AnalyzeManifestWithPreviewContextRequest: Codable {
 }
 
 // MARK: - AnalyzeManifestWithPreviewContextResponse
-public struct AnalyzeManifestWithPreviewContextResponse: Codable {
+public struct AnalyzeManifestWithPreviewContextResponse: Sendable, Codable, Equatable {
 	public let encounteredAddresses: EncounteredAddresses
 	public let accountsRequiringAuth: Set<ComponentAddress>
 	public let accountProofResources: Set<ResourceAddress>
 	public let accountWithdraws: [AccountWithdraw]
 	public let accountDeposits: [AccountDeposit]
+	public let createdEntities: CreatedEntitities?
 
 	enum CodingKeys: String, CodingKey {
 		case encounteredAddresses = "encountered_addresses"
@@ -35,11 +36,12 @@ public struct AnalyzeManifestWithPreviewContextResponse: Codable {
 		case accountProofResources = "account_proof_resources"
 		case accountWithdraws = "account_withdraws"
 		case accountDeposits = "account_deposits"
+		case createdEntities = "created_entities"
 	}
 }
 
 // MARK: - EncounteredAddresses
-public struct EncounteredAddresses: Codable {
+public struct EncounteredAddresses: Sendable, Codable, Equatable {
 	public let componentAddresses: EncounteredComponents
 	public let resourceAddresses: Set<ResourceAddress>
 	public let packageAddresses: Set<PackageAddress>
@@ -52,7 +54,7 @@ public struct EncounteredAddresses: Codable {
 }
 
 // MARK: - EncounteredComponents
-public struct EncounteredComponents: Codable {
+public struct EncounteredComponents: Sendable, Codable, Equatable {
 	public let userApplications: Set<ComponentAddress>
 	public let accounts: Set<ComponentAddress>
 	public let identities: Set<ComponentAddress>
@@ -73,7 +75,7 @@ public struct EncounteredComponents: Codable {
 }
 
 // MARK: - AccountWithdraw
-public struct AccountWithdraw: Codable {
+public struct AccountWithdraw: Sendable, Codable, Equatable {
 	public let componentAddress: ComponentAddress
 	public let resourceSpecifier: ResourceSpecifier
 
@@ -84,7 +86,7 @@ public struct AccountWithdraw: Codable {
 }
 
 // MARK: - AccountDeposit
-public enum AccountDeposit: Codable {
+public enum AccountDeposit: Sendable, Codable, Equatable {
 	case exact(
 		componentAddress: ComponentAddress,
 		resourceSpecifier: ResourceSpecifier
@@ -103,10 +105,23 @@ public enum AccountDeposit: Codable {
 	}
 }
 
+// MARK: - CreatedEntitities
+public struct CreatedEntitities: Sendable, Codable, Equatable {
+	public let componentAddresses: Set<ComponentAddress>
+	public let resourceAddresses: Set<ResourceAddress>
+	public let packageAddresses: Set<PackageAddress>
+
+	enum CodingKeys: String, CodingKey {
+		case componentAddresses = "component_addresses"
+		case resourceAddresses = "resource_addresses"
+		case packageAddresses = "package_addresses"
+	}
+}
+
 // MARK: - ResourceSpecifier
-public enum ResourceSpecifier: Codable {
+public enum ResourceSpecifier: Sendable, Codable, Equatable {
 	case amount(ResourceAddress, Decimal_)
-	case ids(ResourceAddress, Set<NonFungibleLocalId>)
+	case ids(ResourceAddress, Set<NonFungibleLocalIdInternal>)
 
 	enum CodingKeys: String, CodingKey {
 		case type
@@ -151,7 +166,7 @@ public extension ResourceSpecifier {
 		case .ids:
 			self = try .ids(
 				container.decode(ResourceAddress.self, forKey: .resourceAddress),
-				container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
+				container.decode(Set<NonFungibleLocalIdInternal>.self, forKey: .ids)
 			)
 		}
 	}

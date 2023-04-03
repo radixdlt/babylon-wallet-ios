@@ -132,6 +132,13 @@ public struct Selection<Value: Hashable, Content: View>: View {
 		.onChange(of: selectedValues) { selectedValues in
 			updateResult(with: selectedValues, in: values, requiring: requirement)
 		}
+		.onChange(of: selection) { selection in
+			if let selection {
+				selectedValues = Set(selection)
+			} else {
+				selectedValues = []
+			}
+		}
 	}
 
 	private func updateResult(

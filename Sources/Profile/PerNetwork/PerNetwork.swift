@@ -44,6 +44,10 @@ extension Profile.Networks {
 		dictionary.keys
 	}
 
+	public var values: some Collection<Profile.Network> {
+		dictionary.values
+	}
+
 	public func network(id needle: NetworkID) throws -> Profile.Network {
 		guard let network = dictionary[needle] else {
 			throw Error.unknownNetworkWithID(needle)

@@ -69,7 +69,7 @@ extension AccountPermission {
 							Text(viewStore.numberOfAccounts)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Regular)
-								.padding(.small3)
+								.padding(.medium1)
 						}
 						.padding(.horizontal, .medium2)
 
@@ -106,7 +106,9 @@ struct AccountPermission_Preview: PreviewProvider {
 					reducer: AccountPermission()
 				)
 			)
+			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
+			#endif
 		}
 	}
 }

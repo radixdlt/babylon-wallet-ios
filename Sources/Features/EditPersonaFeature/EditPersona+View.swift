@@ -5,6 +5,13 @@ extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
 			avatarURL: URL(string: "something")!,
+			addAFieldButtonState: {
+				if dynamicFields.count < DynamicFieldID.allCases.count {
+					return .enabled
+				} else {
+					return .disabled
+				}
+			}(),
 			output: { () -> EditPersona.Output? in
 				guard
 					let personaLabelInput = labelField.input,
@@ -36,6 +43,7 @@ extension EditPersona.State {
 extension EditPersona {
 	public struct ViewState: Equatable {
 		let avatarURL: URL
+		let addAFieldButtonState: ControlState
 		let output: Output?
 	}
 
@@ -75,30 +83,35 @@ extension EditPersona {
 								Text(L10n.EditPersona.Button.addAField).padding(.horizontal, .medium2)
 							}
 							.buttonStyle(.secondaryRectangular)
+							.controlState(viewStore.addAFieldButtonState)
 							.padding(.top, .medium2)
 						}
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .medium1)
 					}
 					.scrollDismissesKeyboard(.interactively)
-					#if os(iOS)
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								Button(L10n.EditPersona.Button.cancel, action: { viewStore.send(.cancelButtonTapped) })
-									.textStyle(.body1Link)
-									.foregroundColor(.app.blue2)
-							}
-							ToolbarItem(placement: .navigationBarTrailing) {
-								WithControlRequirements(viewStore.output, forAction: { viewStore.send(.saveButtonTapped($0)) }) { action in
-									Button(L10n.EditPersona.Button.save, action: action)
-										.textStyle(.body1Link)
-										.foregroundColor(.app.blue2)
-										.opacity(viewStore.output == nil ? 0.3 : 1)
-								}
-							}
+					.footer {
+						WithControlRequirements(
+							viewStore.output,
+							forAction: { viewStore.send(.saveButtonTapped($0)) }
+						) { action in
+							Button(L10n.EditPersona.Button.save, action: action)
+								.buttonStyle(.primaryRectangular)
 						}
+					}
+					#if os(iOS)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton { viewStore.send(.closeButtonTapped) }
+						}
+					}
 					#endif
 				}
+				.confirmationDialog(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /EditPersona.Destinations.State.closeConfirmationDialog,
+					action: EditPersona.Destinations.Action.closeConfirmationDialog
+				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /EditPersona.Destinations.State.addFields,

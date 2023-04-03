@@ -80,7 +80,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case .createAccountButtonTapped:
 			state.createAccountCoordinator = .init(config: .init(
 				purpose: .newAccountDuringDappInteraction
-			))
+			), displayIntroduction: { _ in false })
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):
@@ -107,12 +107,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .createAccountCoordinator(.presented(.delegate(.dismiss))):
-			state.createAccountCoordinator = nil
-			return .none
-
 		case .createAccountCoordinator(.presented(.delegate(.completed))):
-			state.createAccountCoordinator = nil
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
 					try await accountsClient.getAccountsOnCurrentNetwork()

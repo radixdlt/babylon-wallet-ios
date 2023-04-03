@@ -1,17 +1,22 @@
 import Prelude
+import Resources
 import SwiftUI
 
 // MARK: - DappPlaceholder
 public struct DappPlaceholder: View {
 	private let size: HitTargetSize
+	private let known: Bool
 
-	public init(size hitTargetSize: HitTargetSize = .small) {
+	public init(known: Bool = true, size hitTargetSize: HitTargetSize = .small) {
+		self.known = known
 		self.size = hitTargetSize
 	}
 
+	// TODO: Show different icon if known
 	public var body: some View {
-		RoundedRectangle(cornerRadius: size.cornerRadius)
-			.fill(.app.gray4)
+		Image(asset: AssetResource.iconUnknownComponent)
+			.resizable()
+			.cornerRadius(size.cornerRadius)
 			.frame(size)
 	}
 }
@@ -19,14 +24,18 @@ public struct DappPlaceholder: View {
 // MARK: - TokenPlaceholder
 public struct TokenPlaceholder: View {
 	private let size: HitTargetSize
+	private let known: Bool
 
-	public init(size hitTargetSize: HitTargetSize = .small) {
+	public init(known: Bool = true, size hitTargetSize: HitTargetSize = .small) {
+		self.known = known
 		self.size = hitTargetSize
 	}
 
+	// TODO: Show different icon if known
 	public var body: some View {
-		Circle()
-			.fill(.app.gray4)
+		Image(asset: AssetResource.iconUnknownResource)
+			.resizable()
+			.clipShape(Circle())
 			.frame(size)
 	}
 }
@@ -34,15 +43,16 @@ public struct TokenPlaceholder: View {
 // MARK: - NFTPlaceholder
 public struct NFTPlaceholder: View {
 	private let size: HitTargetSize
+	private let known: Bool
 
-	public init(size hitTargetSize: HitTargetSize = .small) {
+	public init(known: Bool = true, size hitTargetSize: HitTargetSize = .small) {
+		self.known = known
 		self.size = hitTargetSize
 	}
 
+	// TODO: Implement. Show different icon if known
 	public var body: some View {
-		Rectangle()
-			.fill(.app.green2)
-			.frame(size)
+		DappPlaceholder(known: known, size: size)
 	}
 }
 

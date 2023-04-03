@@ -1,4 +1,4 @@
-import FeaturePrelude
+import SwiftUI
 
 extension SlideUpPanel.State {
 	var viewState: SlideUpPanel.ViewState {
@@ -45,10 +45,13 @@ extension SlideUpPanel {
 						.padding(.medium3)
 					}
 				}
+				.presentationDetents([.medium])
+				.presentationDragIndicator(.visible)
 				#if os(iOS)
-				.onWillDisappear {
-					viewStore.send(.willDisappear)
-				}
+					.presentationBackground(.blur)
+					.onWillDisappear {
+						viewStore.send(.willDisappear)
+					}
 				#endif
 			}
 		}

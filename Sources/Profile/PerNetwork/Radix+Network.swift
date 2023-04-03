@@ -46,7 +46,7 @@ extension Radix.Network {
 	public static let kisharnet = Self(
 		name: "kisharnet",
 		id: .kisharnet,
-		displayDescription: "Radix RC Network"
+		displayDescription: "RCnet"
 	)
 	public static let hammunet = Self(
 		name: "hammunet",
