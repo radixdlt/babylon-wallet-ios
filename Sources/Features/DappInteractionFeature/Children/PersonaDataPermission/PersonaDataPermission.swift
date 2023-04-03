@@ -25,7 +25,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Persona.Field>)
 	}
 
@@ -74,10 +74,14 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			return .run { send in
-				let personas = try await personasClient.getPersonas()
-				await send(.internal(.personasLoaded(personas)))
+				for try await personas in await personasClient.personas() {
+					guard !Task.isCancelled else {
+						return
+					}
+					await send(.internal(.personasLoaded(personas)))
+				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
@@ -109,7 +113,6 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-			state.persona = .init(persona: persona, requiredFieldIDs: state.requiredFieldIDs)
 			return .send(.delegate(.personaUpdated(persona)))
 
 		default:

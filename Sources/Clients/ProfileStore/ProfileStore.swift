@@ -116,6 +116,13 @@ extension ProfileStore {
 		}
 	}
 
+	/// A multicasting replaying async sequence of distinct Personas for the currently selected network.
+	public func personaValues() async -> AnyAsyncSequence<Profile.Network.Personas> {
+		lens {
+			$0.profile.network?.personas
+		}
+	}
+
 	/// A multicasting replaying async sequence of distinct Gateways
 	public func gatewaysValues() async -> AnyAsyncSequence<Gateways> {
 		lens {
