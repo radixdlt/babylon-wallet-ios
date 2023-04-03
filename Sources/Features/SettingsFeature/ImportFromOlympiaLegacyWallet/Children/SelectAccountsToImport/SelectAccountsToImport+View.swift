@@ -77,11 +77,18 @@ import EngineToolkit
 enum SelectAccountsToImportRow {
 	struct ViewState: Equatable {
 		let accountName: String
-		let accountAddress: AddressView.ViewState
+		let olympiaAddress: String
+		let appearanceID: Profile.Network.Account.AppearanceID
+		let derivationPath: String
+		let xrdBalance: BigDecimal
 
 		init(state olympiaAccount: OlympiaAccountToMigrate) {
 			accountName = olympiaAccount.displayName?.rawValue ?? "NOT NAMED"
-			accountAddress = AddressView.ViewState(address: olympiaAccount.address.address.rawValue)
+//			olympiaAddress = AddressView.ViewState(address: olympiaAccount.address.address.rawValue)
+			olympiaAddress = olympiaAccount.address.address.rawValue
+			appearanceID = .fromIndex(Int(olympiaAccount.addressIndex))
+			derivationPath = olympiaAccount.path.derivationPath
+			xrdBalance = olympiaAccount.xrd
 		}
 	}
 
@@ -94,16 +101,23 @@ enum SelectAccountsToImportRow {
 		var body: some SwiftUI.View {
 			Button(action: action) {
 				HStack {
-					VStack(alignment: .leading, spacing: .medium3) {
-						Text(viewState.accountName)
+					VStack(alignment: .leading, spacing: .medium2) {
+						HPair(label: "Name", item: viewState.accountName)
+						//                        HPair(label: "Address", item: viewState.olympiaAddress)
+						VStack(alignment: .leading, spacing: .small3) {
+							Group {
+								Text("Olympia address")
+									.textStyle(.body2Header)
+
+								Text(viewState.olympiaAddress)
+									.textStyle(.monospace)
+									.frame(maxWidth: .infinity, alignment: .leading)
+							}
 							.foregroundColor(.app.white)
-							.textStyle(.body1Header)
-
-						AddressView(viewState.accountAddress, copyAddressAction: .none)
-							.foregroundColor(.app.white.opacity(0.8))
-							.textStyle(.body2HighImportance)
+						}
+						HPair(label: "XRD", item: viewState.xrdBalance.format())
+						HPair(label: "Path", item: viewState.derivationPath)
 					}
-
 					Spacer()
 
 					CheckmarkView(
@@ -113,7 +127,7 @@ enum SelectAccountsToImportRow {
 				}
 				.padding(.medium1)
 				.background(
-					Color.yellow
+					viewState.appearanceID.gradient
 						.brightness(isSelected ? -0.1 : 0)
 				)
 				.cornerRadius(.small1)

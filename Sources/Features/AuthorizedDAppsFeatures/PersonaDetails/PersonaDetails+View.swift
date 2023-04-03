@@ -86,7 +86,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					InfoPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaLabel)
+					VPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaLabel)
 
 					Separator()
 
@@ -99,19 +99,19 @@ extension PersonaDetails.View {
 					}
 
 					if let givenName = viewStore.givenName {
-						InfoPair(heading: L10n.PersonaDetails.givenNameHeading, item: givenName)
+						VPair(heading: L10n.PersonaDetails.givenNameHeading, item: givenName)
 					}
 
 					if let familyName = viewStore.familyName {
-						InfoPair(heading: L10n.PersonaDetails.familyNameHeading, item: familyName)
+						VPair(heading: L10n.PersonaDetails.familyNameHeading, item: familyName)
 					}
 
 					if let emailAddress = viewStore.emailAddress {
-						InfoPair(heading: L10n.PersonaDetails.emailAddressHeading, item: emailAddress)
+						VPair(heading: L10n.PersonaDetails.emailAddressHeading, item: emailAddress)
 					}
 
 					if let phoneNumber = viewStore.phoneNumber {
-						InfoPair(heading: L10n.PersonaDetails.phoneNumberHeading, item: phoneNumber)
+						VPair(heading: L10n.PersonaDetails.phoneNumberHeading, item: phoneNumber)
 					}
 				}
 				.padding(.horizontal, .medium1)

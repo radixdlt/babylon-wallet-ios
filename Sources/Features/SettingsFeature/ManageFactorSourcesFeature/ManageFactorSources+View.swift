@@ -62,10 +62,10 @@ struct FactorSourceView: SwiftUI.View {
 extension FactorSourceView {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 0) {
-			InfoPair(heading: "Kind", item: factorSource.kind)
-			InfoPair(heading: "Hint", item: factorSource.hint)
-			InfoPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
-			InfoPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
+			VPair(heading: "Kind", item: factorSource.kind)
+			VPair(heading: "Hint", item: factorSource.hint)
+			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
+			VPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 		}
 		.border(Color.app.gray1, width: 2)
 	}

@@ -186,7 +186,7 @@ extension DappDetails.View {
 					}
 
 					ForEach(viewStore.otherMetadata) { item in
-						InfoPair(heading: item.key, item: item.value)
+						VPair(heading: item.key, item: item.value)
 					}
 				}
 				.padding(.horizontal, .medium1)
