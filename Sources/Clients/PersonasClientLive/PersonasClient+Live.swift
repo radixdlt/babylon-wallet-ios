@@ -9,6 +9,9 @@ extension PersonasClient: DependencyKey {
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
 		Self(
+			personas: {
+				await getProfileStore().personaValues()
+			},
 			getPersonas: {
 				guard let network = await getProfileStore().network else {
 					return .init()

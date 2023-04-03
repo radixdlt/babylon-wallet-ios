@@ -96,7 +96,7 @@ extension PersonaDataPermission {
 					action: PersonaDataPermission.Destinations.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
 				)
-				.onAppear { viewStore.send(.appeared) }
+				.task { await viewStore.send(.task) }
 			}
 		}
 	}

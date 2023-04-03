@@ -127,6 +127,7 @@ extension OneTimePersonaData {
 					content: { CreatePersonaCoordinator.View(store: $0) }
 				)
 				.onAppear { viewStore.send(.appeared) }
+				.task { await viewStore.send(.task) }
 			}
 		}
 	}
