@@ -2,8 +2,8 @@ import ClientPrelude
 
 // MARK: - CacheClient
 public struct CacheClient: Sendable {
-	public var save: Save
-	public var load: Load
+	var save: Save
+	var load: Load
 	public var removeFile: RemoveFile
 	public var removeFolder: RemoveFolder
 	public var removeAll: RemoveAll
