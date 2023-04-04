@@ -48,6 +48,13 @@ extension EngineToolkitClient {
 			compileNotarizedTransactionIntent: {
 				try engineToolkit.compileNotarizedTransactionIntentRequest(request: $0).get()
 			},
+			deriveOlympiaAdressFromPublicKey: {
+				try engineToolkit.deriveOlympiaAddressFromPublicKeyRequest(
+					request: .init(network: .mainnet, publicKey: $0.intoEngine())
+				)
+				.get()
+				.olympiaAccountAddress
+			},
 			generateTXID: { transactionIntent in
 				let compiledTransactionIntent = try compileTransactionIntent(transactionIntent)
 				let hash = try blake2b(data: compiledTransactionIntent.compiledIntent)
