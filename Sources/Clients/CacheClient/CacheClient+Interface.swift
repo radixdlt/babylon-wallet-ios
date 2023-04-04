@@ -39,8 +39,8 @@ extension DependencyValues {
 }
 
 extension CacheClient {
-	public func withCaching<Model: Codable>(cacheEntry: Entry, request: () async throws -> Model) async throws -> Model {
-		if let model = try? load(Model.self, cacheEntry) as? Model {
+	public func withCaching<Model: Codable>(cacheEntry: Entry, forceRefresh: Bool = false, request: () async throws -> Model) async throws -> Model {
+		if !forceRefresh, let model = try? load(Model.self, cacheEntry) as? Model {
 			return model
 		} else {
 			let model = try await request()
