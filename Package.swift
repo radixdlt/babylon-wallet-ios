@@ -340,7 +340,7 @@ package.addModules([
 	.client(
 		name: "DiskPersistenceClient",
 		dependencies: [],
-		tests: .no
+		tests: .yes()
 	),
 	.client(
 		name: "EngineToolkitClient",
