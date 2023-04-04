@@ -39,6 +39,18 @@ extension DependencyValues {
 }
 
 extension CacheClient {
+	public func withCaching<Model: Codable>(cacheEntry: Entry, request: () async throws -> Model) async throws -> Model {
+		if let model = try? load(Model.self, cacheEntry) as? Model {
+			return model
+		} else {
+			let model = try await request()
+			save(model, cacheEntry)
+			return model
+		}
+	}
+}
+
+extension CacheClient {
 	public enum Entry: Equatable {
 		case accountPortfolio(AccountQuantifier)
 		case networkName(_ url: String)

@@ -8,14 +8,12 @@ extension ROLAClient {
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 			@Dependency(\.cacheClient) var cacheClient
 
-			let metadataCollection: GatewayAPI.EntityMetadataCollection
-			let cacheEntry: CacheClient.Entry = .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address)
-			if let data = try? cacheClient.load(GatewayAPI.EntityMetadataCollection.self, cacheEntry) as? GatewayAPI.EntityMetadataCollection {
-				metadataCollection = data
-			} else {
-				metadataCollection = try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address)
-				cacheClient.save(metadataCollection, cacheEntry)
-			}
+			let metadataCollection = try await cacheClient.withCaching(
+				cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
+				request: {
+					try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address)
+				}
+			)
 
 			let dict: [Metadata.Key: String] = .init(
 				uniqueKeysWithValues: metadataCollection.items.compactMap { item in

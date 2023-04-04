@@ -67,15 +67,12 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
 				do {
-					let dAppMetadata: DappMetadata
-					let cacheEntry: CacheClient.Entry = .dAppRequestMetadata(dappDefinitionAddress.address)
-					if let data = try? cacheClient.load(DappMetadata.self, cacheEntry) as? DappMetadata {
-						dAppMetadata = data
-					} else {
-						dAppMetadata = try await DappMetadata(gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items)
-						cacheClient.save(dAppMetadata, cacheEntry)
-					}
-					return dAppMetadata
+					return try await cacheClient.withCaching(
+						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
+						request: {
+							try await DappMetadata(gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items)
+						}
+					)
 				} catch is BadHTTPResponseCode {
 					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {

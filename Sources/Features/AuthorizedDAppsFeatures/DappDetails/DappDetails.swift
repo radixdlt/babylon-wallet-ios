@@ -91,14 +91,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
 				let result = await TaskResult {
-					let cacheEntry: CacheClient.Entry = .dAppMetadata(dAppID.address)
-					if let metadataCollection = try? cacheClient.load(GatewayAPI.EntityMetadataCollection.self, cacheEntry) as? GatewayAPI.EntityMetadataCollection {
-						return metadataCollection
-					} else {
-						let metadataCollection = try await gatewayAPIClient.getEntityMetadata(dAppID.address)
-						cacheClient.save(metadataCollection, cacheEntry)
-						return metadataCollection
-					}
+					try await cacheClient.withCaching(
+						cacheEntry: .dAppMetadata(dAppID.address),
+						request: {
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+						}
+					)
 				}
 				return .internal(.metadataLoaded(.init(result: result)))
 			}

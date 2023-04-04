@@ -33,14 +33,12 @@ extension NetworkSwitchingClient {
 				return nil
 			}
 
-			let name: Radix.Network.Name
-			let cacheEntry: CacheClient.Entry = .networkName(newURL.absoluteString)
-			if let data = try? cacheClient.load(Radix.Network.Name.self, cacheEntry) as? Radix.Network.Name {
-				name = data
-			} else {
-				name = try await gatewayAPIClient.getNetworkName(newURL)
-				cacheClient.save(name, cacheEntry)
-			}
+			let name = try await cacheClient.withCaching(
+				cacheEntry: .networkName(newURL.absoluteString),
+				request: {
+					try await gatewayAPIClient.getNetworkName(newURL)
+				}
+			)
 
 			// FIXME: mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
 			// once it returns networkID!
