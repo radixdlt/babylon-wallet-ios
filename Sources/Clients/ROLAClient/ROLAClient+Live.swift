@@ -45,32 +45,31 @@ extension ROLAClient {
 			}
 			let url = originURL.appending(path: Constants.wellKnownFilePath)
 
-			let response: WellKnownFileResponse
-			let cacheEntry: CacheClient.Entry = .rolaWellKnownFileVerification(url.absoluteString)
-			if let data = try? cacheClient.load(WellKnownFileResponse.self, cacheEntry) as? WellKnownFileResponse {
-				response = data
-			} else {
-				let (data, urlResponse) = try await urlSession.data(from: url)
+			let response = try await cacheClient.withCaching(
+				cacheEntry: .rolaWellKnownFileVerification(url.absoluteString),
+				request: {
+					let (data, urlResponse) = try await urlSession.data(from: url)
 
-				guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
-					throw ExpectedHTTPURLResponse()
-				}
+					guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
+						throw ExpectedHTTPURLResponse()
+					}
 
-				guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
-					throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
-				}
+					guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
+						throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
+					}
 
-				guard !data.isEmpty else {
-					throw ROLAFailure.radixJsonNotFound
-				}
+					guard !data.isEmpty else {
+						throw ROLAFailure.radixJsonNotFound
+					}
 
-				do {
-					response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
-					cacheClient.save(response, cacheEntry)
-				} catch {
-					throw ROLAFailure.radixJsonUnknownFileFormat
+					do {
+						let response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
+						return response
+					} catch {
+						throw ROLAFailure.radixJsonUnknownFileFormat
+					}
 				}
-			}
+			)
 
 			let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
 			guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {
