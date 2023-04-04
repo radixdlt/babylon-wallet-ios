@@ -8,7 +8,7 @@ import P2PLinksFeature
 import PersonasFeature
 
 // MARK: - AppSettings
-public struct AppSettings: FeatureReducer {
+public struct AppSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
@@ -52,6 +52,14 @@ public struct AppSettings: FeatureReducer {
 		case debugInspectProfileButtonTapped
 		case setDebugProfileSheet(isPresented: Bool)
 		#endif
+
+		public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
+			case deleteProfile
+			#if DEBUG
+			case deleteProfileLocalKeepiCloudIfPresent
+			#endif
+			case cancel
+		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -67,11 +75,12 @@ public struct AppSettings: FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when TCA tools are released
-		case deleteProfileAndFactorSources
+		case deleteProfileAndFactorSources(keepIcloudIfPresent: Bool)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case deleteProfileConfirmationDialog(ConfirmationDialogState<ViewAction.DeleteProfileConfirmationDialogAction>)
 			case manageFactorSources(ManageFactorSources.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
@@ -81,6 +90,7 @@ public struct AppSettings: FeatureReducer {
 		}
 
 		public enum Action: Sendable, Equatable {
+			case deleteProfileConfirmationDialog(ViewAction.DeleteProfileConfirmationDialogAction)
 			case manageFactorSources(ManageFactorSources.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
@@ -129,10 +139,26 @@ public struct AppSettings: FeatureReducer {
 			return .send(.delegate(.dismiss))
 
 		case .deleteProfileAndFactorSourcesButtonTapped:
-			return .task {
-				await radixConnectClient.disconnectAndRemoveAll()
-				return .delegate(.deleteProfileAndFactorSources)
-			}
+			state.destination = .deleteProfileConfirmationDialog(
+				.init(titleVisibility: .hidden) {
+					TextState("")
+				} actions: {
+					ButtonState(role: .destructive, action: .send(.deleteProfile)) {
+						TextState("Delete Wallet data")
+					}
+					#if DEBUG
+					ButtonState(role: .cancel, action: .send(.deleteProfileLocalKeepiCloudIfPresent)) {
+						TextState("Delete local Wallet data (keep iCloud)")
+					}
+					#endif // DEBUG
+					ButtonState(role: .cancel, action: .send(.cancel)) {
+						TextState("Cancel")
+					}
+				} message: {
+					TextState("Are REALLY you sure you wanna delete wallet data? If you have not backed up your seedphrase you will forever lose access to all your assets of all your accounts and also loose all of your personas.")
+				}
+			)
+			return .none
 
 		case .factorSourcesButtonTapped:
 			state.destination = .manageFactorSources(.init())
@@ -193,12 +219,20 @@ public struct AppSettings: FeatureReducer {
 		case let .profileToDebugLoaded(profile):
 			state.profileToInspect = profile
 			return .none
-		#endif
+		#endif // DEBUG
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfile))):
+			return deleteProfile(keepIcloudIfPresent: false)
+
+		#if DEBUG
+		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfileLocalKeepiCloudIfPresent))):
+			return deleteProfile(keepIcloudIfPresent: true)
+		#endif // DEBUG
+
 		case .destination(.dismiss):
 			switch state.destination {
 			case .manageP2PLinks:
@@ -219,9 +253,16 @@ extension AppSettings {
 		.task {
 			await .internal(.loadP2PLinksResult(
 				TaskResult {
-					try await p2pLinksClient.getP2PLinks()
+					await p2pLinksClient.getP2PLinks()
 				}
 			))
+		}
+	}
+
+	fileprivate func deleteProfile(keepIcloudIfPresent: Bool) -> EffectTask<Action> {
+		.task {
+			await radixConnectClient.disconnectAndRemoveAll()
+			return .delegate(.deleteProfileAndFactorSources(keepIcloudIfPresent: keepIcloudIfPresent))
 		}
 	}
 }

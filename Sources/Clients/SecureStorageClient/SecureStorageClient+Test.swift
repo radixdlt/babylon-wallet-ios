@@ -15,7 +15,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _, _ in nil },
 		deleteMnemonicByFactorSourceID: { _ in },
-		deleteProfileAndMnemonicsByFactorSourceIDs: {}
+		deleteProfileAndMnemonicsByFactorSourceIDs: { _ in }
 	)
 
 	public static let previewValue: Self = .noop

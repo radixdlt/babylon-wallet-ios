@@ -64,18 +64,28 @@ extension SecureStorageClient: DependencyKey {
 			try await keychainClient.removeDataForKey(key)
 		}
 
+		@Sendable func saveProfile(
+			snapshot profileSnapshot: ProfileSnapshot,
+			iCloudSyncEnabled: Bool
+		) async throws {
+			let data = try jsonEncoder().encode(profileSnapshot)
+			try await keychainClient.setDataWithoutAuthForKey(
+				KeychainClient.SetItemWithoutAuthRequest(
+					data: data,
+					key: profileSnapshotKeychainKey,
+					iCloudSyncEnabled: iCloudSyncEnabled,
+					accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
+					label: "Radix Wallet Data",
+					comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
+				)
+			)
+		}
+
 		return Self(
 			saveProfileSnapshot: { profileSnapshot in
-				let data = try jsonEncoder().encode(profileSnapshot)
-				try await keychainClient.setDataWithoutAuthForKey(
-					KeychainClient.SetItemWithoutAuthRequest(
-						data: data,
-						key: profileSnapshotKeychainKey,
-						iCloudSyncEnabled: profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled,
-						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
-						label: "Radix Wallet Data",
-						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
-					)
+				try await saveProfile(
+					snapshot: profileSnapshot,
+					iCloudSyncEnabled: profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled.rawValue
 				)
 			},
 			loadProfileSnapshotData: loadProfileSnapshotData,
@@ -117,11 +127,15 @@ extension SecureStorageClient: DependencyKey {
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: {
+			deleteProfileAndMnemonicsByFactorSourceIDs: { keepIcloudIfPresent in
 				guard let profileSnapshotData = try await loadProfileSnapshotData() else {
 					return
 				}
-				try await keychainClient.removeDataForKey(profileSnapshotKeychainKey)
+				if keepIcloudIfPresent {
+					fatalError("how to save in iCloud?")
+				} else {
+					try await keychainClient.removeDataForKey(profileSnapshotKeychainKey)
+				}
 				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
 					return
 				}

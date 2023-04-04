@@ -219,9 +219,9 @@ extension ProfileStore {
 		}
 	}
 
-	public func deleteProfile() async throws {
+	public func deleteProfile(keepIcloudIfPresent: Bool) async throws {
 		do {
-			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
+			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(keepIcloudIfPresent)
 		} catch {
 			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
 			loggerGlobal.error(.init(stringLiteral: errorMessage))

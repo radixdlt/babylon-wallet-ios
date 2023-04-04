@@ -246,7 +246,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						return
 					}
 
-					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled.rawValue
 					if !isDeveloperModeEnabled {
 						try await rolaClient.performDappDefinitionVerification(interaction.metadata)
 						try await rolaClient.performWellKnownFileCheck(interaction.metadata)

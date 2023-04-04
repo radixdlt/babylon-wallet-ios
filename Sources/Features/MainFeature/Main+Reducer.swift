@@ -64,9 +64,9 @@ public struct Main: Sendable, FeatureReducer {
 			state.destination = .settings(.init())
 			return .none
 
-		case .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources)))):
+		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepIcloudIfPresent))))):
 			return .run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources()
+				try await appPreferencesClient.deleteProfileAndFactorSources(keepIcloudIfPresent)
 				await send(.delegate(.removedWallet))
 			}
 

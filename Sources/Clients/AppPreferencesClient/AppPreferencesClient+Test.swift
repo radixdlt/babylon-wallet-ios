@@ -17,6 +17,6 @@ extension AppPreferencesClient {
 		getPreferences: { .default },
 		updatePreferences: { _ in },
 		extractProfileSnapshot: { fatalError() },
-		deleteProfileAndFactorSources: {}
+		deleteProfileAndFactorSources: { _ in }
 	)
 }

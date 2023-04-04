@@ -105,7 +105,7 @@ public struct App: Sendable, FeatureReducer {
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in
 				do {
-					try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
+					try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(true)
 				} catch {
 					errorQueue.schedule(error)
 				}

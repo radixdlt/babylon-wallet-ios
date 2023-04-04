@@ -3,7 +3,7 @@ import FeaturePrelude
 extension GeneralSettings.State {
 	var viewState: GeneralSettings.ViewState {
 		.init(
-			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false
+			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? .default
 		)
 	}
 }
@@ -11,7 +11,7 @@ extension GeneralSettings.State {
 // MARK: - GeneralSettings.View
 extension GeneralSettings {
 	public struct ViewState: Equatable {
-		let isDeveloperModeEnabled: Bool
+		let isDeveloperModeEnabled: AppPreferences.Security.IsDeveloperModeEnabled
 	}
 
 	@MainActor
@@ -56,8 +56,8 @@ extension GeneralSettings {
 				}
 
 				let isDeveloperModeBinding = viewStore.binding(
-					get: \.isDeveloperModeEnabled,
-					send: { .developerModeToggled($0) }
+					get: \.isDeveloperModeEnabled.rawValue,
+					send: { .developerModeToggled(.init($0)) }
 				)
 				Toggle(
 					isOn: isDeveloperModeBinding,

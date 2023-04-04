@@ -17,8 +17,8 @@ extension AppPreferencesClient: DependencyKey {
 			extractProfileSnapshot: {
 				await getProfileStore().profile.snapshot()
 			},
-			deleteProfileAndFactorSources: {
-				try await getProfileStore().deleteProfile()
+			deleteProfileAndFactorSources: { keepIcloudIfPresent in
+				try await getProfileStore().deleteProfile(keepIcloudIfPresent: keepIcloudIfPresent)
 			}
 		)
 	}

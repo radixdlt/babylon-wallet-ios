@@ -9,17 +9,33 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public var iCloudProfileSyncEnabled: Bool
-		public var isDeveloperModeEnabled: Bool
+		public var iCloudProfileSyncEnabled: IsIcloudProfileSyncEnabled
+		public var isDeveloperModeEnabled: IsDeveloperModeEnabled
 
 		public init(
-			iCloudProfileSyncEnabled: Bool = true,
-			isDeveloperModeEnabled: Bool = true
+			iCloudProfileSyncEnabled: IsIcloudProfileSyncEnabled = .default,
+			isDeveloperModeEnabled: IsDeveloperModeEnabled = .default
 		) {
 			self.iCloudProfileSyncEnabled = iCloudProfileSyncEnabled
 			self.isDeveloperModeEnabled = isDeveloperModeEnabled
 		}
 	}
+}
+
+extension AppPreferences.Security {
+	public enum IsIcloudProfileSyncEnabledTag {}
+	public typealias IsIcloudProfileSyncEnabled = Tagged<IsIcloudProfileSyncEnabledTag, Bool>
+	public enum IsDeveloperModeEnabledTag {}
+	public typealias IsDeveloperModeEnabled = Tagged<IsDeveloperModeEnabledTag, Bool>
+}
+
+extension AppPreferences.Security.IsDeveloperModeEnabled {
+	// FIXME: Mainnet: change to `false`
+	public static let `default`: Self = true
+}
+
+extension AppPreferences.Security.IsIcloudProfileSyncEnabled {
+	public static let `default`: Self = true
 }
 
 extension AppPreferences.Security {
@@ -31,8 +47,8 @@ extension AppPreferences.Security {
 		.init(
 			self,
 			children: [
-				"iCloudProfileSyncEnabled": iCloudProfileSyncEnabled,
-				"isDeveloperModeEnabled": isDeveloperModeEnabled,
+				"iCloudProfileSyncEnabled": iCloudProfileSyncEnabled.rawValue,
+				"isDeveloperModeEnabled": isDeveloperModeEnabled.rawValue,
 			],
 			displayStyle: .struct
 		)

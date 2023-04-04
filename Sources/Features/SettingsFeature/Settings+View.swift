@@ -50,6 +50,11 @@ extension AppSettings.View {
 				.navigationBarTitleDisplayMode(.inline)
 			#endif
 				.navigationDestinations(with: store, viewStore)
+				.confirmationDialog(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
+					action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
+				)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}

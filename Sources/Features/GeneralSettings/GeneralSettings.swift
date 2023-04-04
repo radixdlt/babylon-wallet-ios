@@ -11,7 +11,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case developerModeToggled(Bool)
+		case developerModeToggled(AppPreferences.Security.IsDeveloperModeEnabled)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
