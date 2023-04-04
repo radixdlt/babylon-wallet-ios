@@ -23,28 +23,21 @@ extension AppPreferencesClient: DependencyKey {
 			},
 			setIsIcloudProfileSyncEnabled: { isEnabled in
 				@Dependency(\.secureStorageClient) var secureStorageClient
-				enum Action {
-					case none
-					case removeProfileFromIcloudIfNeeded
-					case addProfileToIcloud
-				}
-				let action = try await getProfileStore().updating { profile -> Action in
+
+				guard let change = try await (getProfileStore().updating { profile -> IcloudProfileSyncActivation? in
 					let wasEnabled = profile.appPreferences.security.iCloudProfileSyncEnabled
 					profile.appPreferences.security.iCloudProfileSyncEnabled = isEnabled
 					switch (wasEnabled.rawValue, isEnabled.rawValue) {
-					case (false, false): return .none
-					case (true, true): return .none
-					case (true, false): return .removeProfileFromIcloudIfNeeded
-					case (false, true): return .addProfileToIcloud
+					case (false, false): return nil
+					case (true, true): return nil
+					case (true, false): return .disable
+					case (false, true): return .enable
 					}
+				}) else {
+					return
 				}
-				switch action {
-				case .none: return
-				case .addProfileToIcloud:
-					try await secureStorageClient.setIsIcloudProfileSyncEnabled(true)
-				case .removeProfileFromIcloudIfNeeded:
-					try await secureStorageClient.setIsIcloudProfileSyncEnabled(false)
-				}
+
+				try await secureStorageClient.updateIcloudProfileSync(change)
 			}
 		)
 	}

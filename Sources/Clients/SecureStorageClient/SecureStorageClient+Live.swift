@@ -144,7 +144,7 @@ extension SecureStorageClient: DependencyKey {
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
 			},
-			setIsIcloudProfileSyncEnabled: { _ in
+			updateIcloudProfileSync: { _ in
 				fatalError()
 			}
 		)

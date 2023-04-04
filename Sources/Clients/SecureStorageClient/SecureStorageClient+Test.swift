@@ -16,7 +16,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadMnemonicByFactorSourceID: { _, _ in nil },
 		deleteMnemonicByFactorSourceID: { _ in },
 		deleteProfileAndMnemonicsByFactorSourceIDs: { _ in },
-		setIsIcloudProfileSyncEnabled: { _ in }
+		updateIcloudProfileSync: { _ in }
 	)
 
 	public static let previewValue: Self = .noop
@@ -28,6 +28,6 @@ extension SecureStorageClient: TestDependencyKey {
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileAndMnemonicsByFactorSourceIDs"),
-		setIsIcloudProfileSyncEnabled: unimplemented("\(Self.self).setIsIcloudProfileSyncEnabled")
+		updateIcloudProfileSync: unimplemented("\(Self.self).updateIcloudProfileSync")
 	)
 }
