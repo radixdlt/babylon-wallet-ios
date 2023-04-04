@@ -88,6 +88,15 @@ extension EngineToolkit {
 		)
 	}
 
+	public func deriveOlympiaAddressFromPublicKeyRequest(
+		request: DeriveOlympiaAddressFromPublicKeyRequest
+	) -> Result<DeriveOlympiaAddressFromPublicKeyResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: derive_olympia_address_from_public_key
+		)
+	}
+
 	public func compileSignedTransactionIntentRequest(
 		request: CompileSignedTransactionIntentRequest
 	) -> Result<CompileSignedTransactionIntentResponse, Error> {
