@@ -30,6 +30,7 @@ package.addModules([
 		dependencies: [
 			"AccountPortfolioFetcherClient",
 			"FungibleTokenListFeature",
+			"AccountsClient",
 		],
 		tests: .yes()
 	),

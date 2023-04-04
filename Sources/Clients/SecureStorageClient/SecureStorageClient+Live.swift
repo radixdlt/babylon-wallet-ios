@@ -65,10 +65,9 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func saveProfile(
-			snapshot profileSnapshot: ProfileSnapshot,
+			snapshotData data: Data,
 			iCloudSyncEnabled: Bool
 		) async throws {
-			let data = try jsonEncoder().encode(profileSnapshot)
 			try await keychainClient.setDataWithoutAuthForKey(
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
@@ -79,6 +78,14 @@ extension SecureStorageClient: DependencyKey {
 					comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
 				)
 			)
+		}
+
+		@Sendable func saveProfile(
+			snapshot profileSnapshot: ProfileSnapshot,
+			iCloudSyncEnabled: Bool
+		) async throws {
+			let data = try jsonEncoder().encode(profileSnapshot)
+			try await saveProfile(snapshotData: data, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
 		return Self(
@@ -131,21 +138,40 @@ extension SecureStorageClient: DependencyKey {
 				guard let profileSnapshotData = try await loadProfileSnapshotData() else {
 					return
 				}
-				if keepIcloudIfPresent {
-					fatalError("how to save in iCloud?")
-				} else {
+				if !keepIcloudIfPresent {
 					try await keychainClient.removeDataForKey(profileSnapshotKeychainKey)
 				}
 				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
 					return
+				}
+				if keepIcloudIfPresent {
+					if profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled.rawValue {
+						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
+					} else {
+						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
+						try await keychainClient.removeDataForKey(profileSnapshotKeychainKey)
+					}
 				}
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
 			},
-			updateIcloudProfileSync: { _ in
-				fatalError()
+			updateIcloudProfileSync: { change in
+				guard
+					let profileSnapshotData = try await loadProfileSnapshotData()
+				else {
+					return
+				}
+
+				switch change {
+				case .disable:
+					loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
+					try await saveProfile(snapshotData: profileSnapshotData, iCloudSyncEnabled: false)
+				case .enable:
+					loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
+					try await saveProfile(snapshotData: profileSnapshotData, iCloudSyncEnabled: true)
+				}
 			}
 		)
 	}()

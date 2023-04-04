@@ -8,6 +8,7 @@ extension AccountList.Row.State {
 			name: account.displayName.rawValue,
 			address: .init(address: account.address.address, format: .default),
 			appearanceID: account.appearanceID,
+			needsAccountRecovery: needsAccountRecovery,
 			aggregatedValue: aggregatedValue,
 			currency: currency,
 			isCurrencyAmountVisible: isCurrencyAmountVisible,
@@ -22,6 +23,7 @@ extension AccountList.Row {
 		let name: String
 		let address: AddressView.ViewState
 		let appearanceID: Profile.Network.Account.AppearanceID
+		let needsAccountRecovery: Bool?
 		let aggregatedValue: BigDecimal?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
@@ -40,16 +42,7 @@ extension AccountList.Row {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					VStack(alignment: .leading, spacing: .zero) {
-						HeaderView(
-							name: viewStore.name,
-							value: formattedAmount(
-								viewStore.aggregatedValue,
-								isVisible: viewStore.isCurrencyAmountVisible,
-								currency: viewStore.currency
-							),
-							isValueVisible: viewStore.isCurrencyAmountVisible,
-							currency: viewStore.currency
-						)
+						headerView(with: viewStore)
 
 						AddressView(
 							viewStore.address,
@@ -68,6 +61,9 @@ extension AccountList.Row {
 				.padding(.vertical, .medium2)
 				.background(viewStore.appearanceID.gradient)
 				.cornerRadius(.small1)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 				.onTapGesture {
 					viewStore.send(.tapped)
 				}
@@ -97,21 +93,20 @@ extension AccountList.Row.View {
 }
 
 // MARK: - HeaderView
-private struct HeaderView: View {
-	let name: String?
-	let value: String
-	let isValueVisible: Bool
-	let currency: FiatCurrency
-
-	var body: some View {
+extension AccountList.Row.View {
+	@ViewBuilder
+	private func headerView(
+		with viewStore: ViewStoreOf<AccountList.Row>
+	) -> some SwiftUI.View {
 		HStack {
-			if let name {
-				Text(name)
-					.foregroundColor(.app.white)
-					.textStyle(.body1Header)
-					.fixedSize()
-			}
+			Text(viewStore.name)
+				.foregroundColor(.app.white)
+				.textStyle(.body1Header)
+				.fixedSize()
 			Spacer()
+			if viewStore.needsAccountRecovery == true {
+				Text("☢️")
+			}
 		}
 	}
 }

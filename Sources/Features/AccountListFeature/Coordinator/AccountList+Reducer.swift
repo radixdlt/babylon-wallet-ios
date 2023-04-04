@@ -57,11 +57,12 @@ public struct AccountList: Sendable, FeatureReducer {
 				return .none
 			}
 			switch action {
-			case .view(.copyAddressButtonTapped):
+			case .delegate(.copyAddress):
 				let address = row.account.address.address
 				return .fireAndForget { pasteboardClient.copyString(address) }
-			case .view(.tapped):
+			case .delegate(.selected):
 				return .send(.delegate(.displayAccountDetails(row)))
+			default: return .none
 			}
 		}
 	}
