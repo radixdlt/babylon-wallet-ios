@@ -122,11 +122,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .showRawTransactionTapped:
 			switch state.displayMode {
 			case .review:
-				guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
+				guard let transactionWithLockFee = state.transactionWithLockFee, let networkID = state.networkID else { return .none }
 				let guarantees = state.allGuarantees
 				return .run { send in
 					let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
-					await send(.internal(.rawTransactionCreated(manifest.description)))
+					let rawTransaction = try manifest.toString(preamble: "", networkID: networkID)
+					await send(.internal(.rawTransactionCreated(rawTransaction)))
+				} catch: { _, _ in
+					// TODO: Handle error?
 				}
 
 			case .raw:
