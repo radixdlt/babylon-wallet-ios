@@ -72,7 +72,9 @@ extension TransactionReview {
 
 								withdrawalsSection
 
-								usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositsHeading: viewStore.showDepositsHeading)
+								usingDappsSection(expanded: viewStore.isExpandedDappUsed,
+								                  showDepositsHeading: viewStore.showDepositsHeading,
+								                  showDottedLine: viewStore.showDottedLine)
 
 								depositsSection
 
@@ -141,7 +143,7 @@ extension TransactionReview {
 		}
 
 		@ViewBuilder
-		private func usingDappsSection(expanded: Bool, showDepositsHeading: Bool) -> some SwiftUI.View {
+		private func usingDappsSection(expanded: Bool, showDepositsHeading: Bool, showDottedLine: Bool) -> some SwiftUI.View {
 			VStack(alignment: .trailing, spacing: .medium2) {
 				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 				IfLetStore(usedDappsStore) { childStore in
@@ -157,10 +159,12 @@ extension TransactionReview {
 				}
 			}
 			.background(alignment: .trailing) {
-				VLine()
-					.stroke(.app.gray3, style: .transactionReview)
-					.frame(width: 1)
-					.padding(.trailing, SpeechbubbleShape.triangleInset)
+				if showDottedLine {
+					VLine()
+						.stroke(.app.gray3, style: .transactionReview)
+						.frame(width: 1)
+						.padding(.trailing, SpeechbubbleShape.triangleInset)
+				}
 			}
 		}
 
