@@ -3,14 +3,14 @@ import FeaturePrelude
 
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
 	var viewState: CompletionMigrateOlympiaAccountsToBabylon.ViewState {
-		.init()
+		.init(accounts: migratedAccounts.babylonAccounts)
 	}
 }
 
 // MARK: - CompletionMigrateOlympiaAccountsToBabylon.View
 extension CompletionMigrateOlympiaAccountsToBabylon {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let accounts: Profile.Network.Accounts
 	}
 
 	@MainActor
@@ -23,11 +23,21 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: CompletionMigrateOlympiaAccountsToBabylon")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				ScrollView {
+					LazyVStack {
+						ForEach(viewStore.accounts) { account in
+							//                            AddressView(
+							//                                viewStore.address,
+							//                                copyAddressAction: {
+							//                                    viewStore.send(.copyAddressButtonTapped)
+							//                                }
+							//                            )
+							//                            .foregroundColor(.app.whiteTransparent)
+							Text(account.address.address)
+						}
+					}
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

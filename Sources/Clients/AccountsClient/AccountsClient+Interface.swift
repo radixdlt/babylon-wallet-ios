@@ -95,7 +95,7 @@ public struct MigratedAccounts: Sendable, Hashable {
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
 	public var babylonAccounts: Profile.Network.Accounts {
-		fatalError() // accounts.map(\.babylon)
+		.init(rawValue: .init(uncheckedUniqueElements: self.accounts.rawValue.elements.map(\.babylon)))!
 	}
 
 	/// With the nextDerivation forAccount updated/
