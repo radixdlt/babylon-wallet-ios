@@ -261,6 +261,7 @@ struct RawTransactionView: SwiftUI.View {
 struct TransactionReviewTokenView: View {
 	struct ViewState: Equatable {
 		let name: String?
+		let isXRD: Bool
 		let thumbnail: URL?
 
 		let amount: BigDecimal
@@ -276,7 +277,7 @@ struct TransactionReviewTokenView: View {
 				TokenPlaceholder(size: .small) // TODO:  Actually use URL
 					.padding(.vertical, .small1)
 			} else {
-				TokenPlaceholder(size: .small)
+				TokenPlaceholder(isXRD: viewState.isXRD, size: .small)
 					.padding(.vertical, .small1)
 			}
 
