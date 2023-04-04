@@ -57,7 +57,7 @@ extension GeneralSettings {
 
 				let isDeveloperModeBinding = viewStore.binding(
 					get: \.isDeveloperModeEnabled.rawValue,
-					send: { .developerModeToggled(.init($0)) }
+					send: { .isDeveloperModeEnabledToggled(.init($0)) }
 				)
 				Toggle(
 					isOn: isDeveloperModeBinding,

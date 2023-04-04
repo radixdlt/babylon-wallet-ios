@@ -11,7 +11,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case developerModeToggled(AppPreferences.Security.IsDeveloperModeEnabled)
+		case isDeveloperModeEnabledToggled(AppPreferences.Security.IsDeveloperModeEnabled)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -30,8 +30,8 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 				await send(.internal(.loadPreferences(preferences)))
 			}
 
-		case let .developerModeToggled(value):
-			state.preferences?.security.isDeveloperModeEnabled = value
+		case let .isDeveloperModeEnabledToggled(isEnabled):
+			state.preferences?.security.isDeveloperModeEnabled = isEnabled
 			guard let preferences = state.preferences else { return .none }
 			return .fireAndForget {
 				try await appPreferencesClient.updatePreferences(preferences)
