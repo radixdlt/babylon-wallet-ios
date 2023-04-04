@@ -16,37 +16,39 @@ struct WebRTCFactory: PeerConnectionFactory {
 	}()
 
 	static let turnServers: [RTCIceServer] = {
-		#if DEBUG
 		[
-			RTCIceServer(urlStrings: ["turn:turn-dev-udp.rdx-works-main.extratools.works:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-			RTCIceServer(urlStrings: ["turn:turn-dev-tcp.rdx-works-main.extratools.works:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+			RTCIceServer(urlStrings: ["turn:turn-betanet-udp.radixdlt.com:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+			RTCIceServer(urlStrings: ["turn:turn-betanet-tcp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
 		]
-		#else
-		[
-			RTCIceServer(urlStrings: ["turn:turn-rcnet-udp.radixdlt.com:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-			RTCIceServer(urlStrings: ["turn:turn-rcnet-tcp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-		]
-		#endif
+//		#if DEBUG
+//		[
+//			RTCIceServer(urlStrings: ["turn:turn-dev-udp.rdx-works-main.extratools.works:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+//			RTCIceServer(urlStrings: ["turn:turn-dev-tcp.rdx-works-main.extratools.works:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+//		]
+//		#else
+//		[
+//
+//
+//			RTCIceServer(urlStrings: ["turn:turn-rcnet-udp.radixdlt.com:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+//			RTCIceServer(urlStrings: ["turn:turn-rcnet-tcp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+//		]
+//		#endif
 	}()
 
-//	static let ICEServers: [RTCIceServer] = [
-//		RTCIceServer(urlStrings: ["stun:stun.l.google.com:19302"]),
-//		RTCIceServer(urlStrings: ["stun:stun1.l.google.com:19302"]),
-//		RTCIceServer(urlStrings: ["stun:stun2.l.google.com:19302"]),
-//		RTCIceServer(urlStrings: ["stun:stun3.l.google.com:19302"]),
-//		RTCIceServer(urlStrings: ["stun:stun4.l.google.com:19302"]),
-//	] + turnServers
-
-        static let ICEServers: [RTCIceServer] = [
-                RTCIceServer(urlStrings: ["turn:turn-rcnet-udp.radixdlt.com:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-                RTCIceServer(urlStrings: ["turn:turn-rcnet-tcp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
-        ]
+	static let ICEServers: [RTCIceServer] = [
+		RTCIceServer(urlStrings: ["stun:stun.l.google.com:19302"]),
+		RTCIceServer(urlStrings: ["stun:stun1.l.google.com:19302"]),
+		RTCIceServer(urlStrings: ["stun:stun2.l.google.com:19302"]),
+		RTCIceServer(urlStrings: ["stun:stun3.l.google.com:19302"]),
+		RTCIceServer(urlStrings: ["stun:stun4.l.google.com:19302"]),
+	] + turnServers
 
 	static let peerConnectionConfig: RTCConfiguration = {
 		let config = RTCConfiguration()
 		config.sdpSemantics = .unifiedPlan
 		config.continualGatheringPolicy = .gatherContinually
 		config.iceServers = ICEServers
+		config.iceTransportPolicy = .relay
 
 		return config
 	}()
