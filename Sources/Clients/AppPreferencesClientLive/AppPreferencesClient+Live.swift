@@ -19,6 +19,9 @@ extension AppPreferencesClient: DependencyKey {
 			},
 			deleteProfileAndFactorSources: { keepIcloudIfPresent in
 				try await getProfileStore().deleteProfile(keepIcloudIfPresent: keepIcloudIfPresent)
+			},
+			setIsIcloudProfileSyncEnabled: { _ in
+				fatalError()
 			}
 		)
 	}

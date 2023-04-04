@@ -33,7 +33,9 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 
 		case let .isIcloudProfileSyncEnabledToggled(isEnabled):
 			state.preferences?.security.iCloudProfileSyncEnabled = isEnabled
-			fatalError()
+			return .fireAndForget {
+				try await appPreferencesClient.setIsIcloudProfileSyncEnabled(isEnabled)
+			}
 
 		case let .isDeveloperModeEnabledToggled(isEnabled):
 			state.preferences?.security.isDeveloperModeEnabled = isEnabled
