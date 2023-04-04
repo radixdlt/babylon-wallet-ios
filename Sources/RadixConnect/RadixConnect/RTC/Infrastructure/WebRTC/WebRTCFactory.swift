@@ -29,13 +29,18 @@ struct WebRTCFactory: PeerConnectionFactory {
 		#endif
 	}()
 
-	static let ICEServers: [RTCIceServer] = [
-		RTCIceServer(urlStrings: ["stun:stun.l.google.com:19302"]),
-		RTCIceServer(urlStrings: ["stun:stun1.l.google.com:19302"]),
-		RTCIceServer(urlStrings: ["stun:stun2.l.google.com:19302"]),
-		RTCIceServer(urlStrings: ["stun:stun3.l.google.com:19302"]),
-		RTCIceServer(urlStrings: ["stun:stun4.l.google.com:19302"]),
-	] + turnServers
+//	static let ICEServers: [RTCIceServer] = [
+//		RTCIceServer(urlStrings: ["stun:stun.l.google.com:19302"]),
+//		RTCIceServer(urlStrings: ["stun:stun1.l.google.com:19302"]),
+//		RTCIceServer(urlStrings: ["stun:stun2.l.google.com:19302"]),
+//		RTCIceServer(urlStrings: ["stun:stun3.l.google.com:19302"]),
+//		RTCIceServer(urlStrings: ["stun:stun4.l.google.com:19302"]),
+//	] + turnServers
+
+        static let ICEServers: [RTCIceServer] = [
+                RTCIceServer(urlStrings: ["turn:turn-rcnet-udp.radixdlt.com:80?transport=udp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+                RTCIceServer(urlStrings: ["turn:turn-rcnet-tcp.radixdlt.com:80?transport=tcp"], username: "username", credential: "password", tlsCertPolicy: .insecureNoCheck),
+        ]
 
 	static let peerConnectionConfig: RTCConfiguration = {
 		let config = RTCConfiguration()
