@@ -3,6 +3,7 @@ import FeaturePrelude
 extension GeneralSettings.State {
 	var viewState: GeneralSettings.ViewState {
 		.init(
+			iCloudProfileSyncEnabled: preferences?.security.iCloudProfileSyncEnabled ?? .default,
 			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? .default
 		)
 	}
@@ -11,6 +12,7 @@ extension GeneralSettings.State {
 // MARK: - GeneralSettings.View
 extension GeneralSettings {
 	public struct ViewState: Equatable {
+		let iCloudProfileSyncEnabled: AppPreferences.Security.IsIcloudProfileSyncEnabled
 		let isDeveloperModeEnabled: AppPreferences.Security.IsDeveloperModeEnabled
 	}
 
@@ -35,37 +37,56 @@ extension GeneralSettings {
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				VStack(spacing: .zero) {
-					developerModeRow(with: viewStore)
+					isIcloudProfileSyncEnabled(with: viewStore)
+					isDeveloperModeEnabled(with: viewStore)
 					Separator()
 				}
 				.padding(.medium3)
 			}
 		}
 
-		private func developerModeRow(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
-			HStack {
-				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.GeneralSettings.DeveloperMode.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1HighImportance)
+		private func isIcloudProfileSyncEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			toggle(
+				title: "Sync Wallet Data to iCloud",
+				subtitle: "Warning: If disabled you might lose access to accounts/personas.",
+				binding: viewStore.binding(
+					get: \.iCloudProfileSyncEnabled.rawValue,
+					send: { .isIcloudProfileSyncEnabledToggled(.init($0)) }
+				)
+			)
+		}
 
-					Text(L10n.GeneralSettings.DeveloperMode.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.fixedSize()
-				}
-
-				let isDeveloperModeBinding = viewStore.binding(
+		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			toggle(
+				title: L10n.GeneralSettings.DeveloperMode.title,
+				subtitle: L10n.GeneralSettings.DeveloperMode.subtitle,
+				binding: viewStore.binding(
 					get: \.isDeveloperModeEnabled.rawValue,
 					send: { .isDeveloperModeEnabledToggled(.init($0)) }
 				)
-				Toggle(
-					isOn: isDeveloperModeBinding,
-					label: {}
-				)
-				.flushedRight
-			}
-			.frame(height: .largeButtonHeight)
+			)
+		}
+
+		private func toggle(
+			title: String,
+			subtitle: String,
+			binding: Binding<Bool>
+		) -> some SwiftUI.View {
+			Toggle(
+				isOn: binding,
+				label: {
+					VStack(alignment: .leading, spacing: 0) {
+						Text(title)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1HighImportance)
+
+						Text(subtitle)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body2Regular)
+					}
+				}
+			)
+			.frame(maxWidth: .infinity, idealHeight: .largeButtonHeight)
 		}
 	}
 }
