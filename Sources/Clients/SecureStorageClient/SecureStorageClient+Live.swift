@@ -143,6 +143,9 @@ extension SecureStorageClient: DependencyKey {
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
+			},
+			setIsIcloudProfileSyncEnabled: { _ in
+				fatalError()
 			}
 		)
 	}()

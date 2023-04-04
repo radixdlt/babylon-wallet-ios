@@ -1,6 +1,7 @@
 import AppPreferencesClient
 import ClientPrelude
 import ProfileStore
+import SecureStorageClient
 
 // MARK: - AppPreferencesClient + DependencyKey
 extension AppPreferencesClient: DependencyKey {
@@ -20,8 +21,30 @@ extension AppPreferencesClient: DependencyKey {
 			deleteProfileAndFactorSources: { keepIcloudIfPresent in
 				try await getProfileStore().deleteProfile(keepIcloudIfPresent: keepIcloudIfPresent)
 			},
-			setIsIcloudProfileSyncEnabled: { _ in
-				fatalError()
+			setIsIcloudProfileSyncEnabled: { isEnabled in
+				@Dependency(\.secureStorageClient) var secureStorageClient
+				enum Action {
+					case none
+					case removeProfileFromIcloudIfNeeded
+					case addProfileToIcloud
+				}
+				let action = try await getProfileStore().updating { profile -> Action in
+					let wasEnabled = profile.appPreferences.security.iCloudProfileSyncEnabled
+					profile.appPreferences.security.iCloudProfileSyncEnabled = isEnabled
+					switch (wasEnabled.rawValue, isEnabled.rawValue) {
+					case (false, false): return .none
+					case (true, true): return .none
+					case (true, false): return .removeProfileFromIcloudIfNeeded
+					case (false, true): return .addProfileToIcloud
+					}
+				}
+				switch action {
+				case .none: return
+				case .addProfileToIcloud:
+					try await secureStorageClient.setIsIcloudProfileSyncEnabled(true)
+				case .removeProfileFromIcloudIfNeeded:
+					try await secureStorageClient.setIsIcloudProfileSyncEnabled(false)
+				}
 			}
 		)
 	}

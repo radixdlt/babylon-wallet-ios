@@ -302,6 +302,7 @@ package.addModules([
 		dependencies: [
 			"AppPreferencesClient",
 			"ProfileStore",
+			"SecureStorageClient",
 		],
 		tests: .yes()
 	),

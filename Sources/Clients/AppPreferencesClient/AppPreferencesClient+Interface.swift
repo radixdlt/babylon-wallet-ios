@@ -31,7 +31,7 @@ public struct AppPreferencesClient: Sendable {
 
 // MARK: - Typealias
 extension AppPreferencesClient {
-	public typealias SetIsIcloudProfileSyncEnabled = @Sendable (AppPreferences.Security.IsIcloudProfileSyncEnabled) async -> Void
+	public typealias SetIsIcloudProfileSyncEnabled = @Sendable (AppPreferences.Security.IsIcloudProfileSyncEnabled) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
 	public typealias ExtractProfileSnapshot = @Sendable () async -> ProfileSnapshot
