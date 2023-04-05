@@ -225,6 +225,7 @@ package.addModules([
 		dependencies: [
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
+			"EngineToolkit", // for debug builds we print RET commit hash
 			"GatewayAPI",
 			"P2PLinksFeature",
 			"GatewaySettingsFeature",

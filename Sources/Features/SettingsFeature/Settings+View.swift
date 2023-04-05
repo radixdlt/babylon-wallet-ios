@@ -6,7 +6,9 @@ import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
 #if DEBUG
+import EngineToolkit // read RET commit hash
 import InspectProfileFeature
+import RadixConnectModels // read signaling client url
 import SecureStorageClient
 #endif
 
@@ -25,18 +27,28 @@ extension AppSettings {
 		#if DEBUG
 		let isDebugProfileViewSheetPresented: Bool
 		let profileToInspect: Profile?
+		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
 		let appVersion: String
 
 		init(state: AppSettings.State) {
+			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
+
 			#if DEBUG
 			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			self.profileToInspect = state.profileToInspect
+			let retCommitHash: String = {
+				do {
+					return try EngineToolkit().information().get().lastCommitHash
+				} catch {
+					return "Unknown"
+				}
+			}()
+			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
 			#endif
-			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
-			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
+			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 		}
 	}
 }
@@ -279,6 +291,13 @@ extension AppSettings.View {
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.padding(.bottom, .medium1)
+					#if DEBUG
+
+					Text(viewStore.debugAppInfo)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.padding(.bottom, .medium1)
+					#endif // DEBUG
 				}
 			}
 			.onAppear {

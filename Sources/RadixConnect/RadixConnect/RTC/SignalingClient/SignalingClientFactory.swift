@@ -15,14 +15,10 @@ extension SignalingClient {
 
 /// Connection URL
 extension SignalingClient {
-	static let prodSignalingServer = URL(string: "wss://signaling-server-rcnet.radixdlt.com")!
-	static let devSignalingServer = URL(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
+	static let prodSignalingServer = RadixConnectConstants.prodSignalingServer
+	static let devSignalingServer = RadixConnectConstants.devSignalingServer
 
-	#if DEBUG
-	static let `default` = SignalingClient.devSignalingServer
-	#else
-	static let `default` = SignalingClient.prodSignalingServer
-	#endif
+	static let `default` = RadixConnectConstants.defaultSignalingServer
 }
 
 /// Signaling Server URL build
