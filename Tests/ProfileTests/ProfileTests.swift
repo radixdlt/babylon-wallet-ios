@@ -114,7 +114,7 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				appearanceID: .fromIndex(index),
+				appearanceID: .fromIndex(Int(index)),
 				displayName: name
 			)
 
