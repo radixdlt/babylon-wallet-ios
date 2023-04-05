@@ -43,7 +43,7 @@ public struct SelectAccountsToImport: Sendable, FeatureReducer {
 				let selectedAccounts = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(rawValue: selectedAccountsSet)
 			else {
 				if state.selectionRequirement >= 1 {
-					assertionFailure("Should not be possible to jave se;ected")
+					assertionFailure("Should not be possible to continue without having selected at least one account.")
 				}
 				return .none
 			}
