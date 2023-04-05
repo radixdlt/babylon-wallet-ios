@@ -14,7 +14,7 @@ final class DiskPersistenceClientTests: TestCase {
 		super.tearDown()
 	}
 
-	func test_SaveLoadAndRemoveData() throws {
+	func test_saveLoadAndRemoveData() throws {
 		// given
 		let dataForSaving = 123
 		let writeableTestPath = "writeableTestPath"

@@ -330,7 +330,7 @@ package.addModules([
 		dependencies: [
 			"DiskPersistenceClient",
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.client(
 		name: "CameraPermissionClient",

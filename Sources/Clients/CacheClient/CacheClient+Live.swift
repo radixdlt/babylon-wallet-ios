@@ -5,9 +5,10 @@ extension CacheClient: DependencyKey {
 	public static let liveValue = Self(
 		save: { encodable, entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
+			@Dependency(\.date) var date
 
 			do {
-				let expirationDate = Date().addingTimeInterval(entry.lifetime)
+				let expirationDate = date.now.addingTimeInterval(entry.lifetime)
 				try diskPersistenceClient.save(expirationDate, entry.expirationDateFilePath)
 				try diskPersistenceClient.save(encodable, entry.filesystemFilePath)
 				loggerGlobal.debug("💾 Data successfully saved to disk: \(entry)")
@@ -16,12 +17,13 @@ extension CacheClient: DependencyKey {
 			}
 		}, load: { decodable, entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
+			@Dependency(\.date) var date
 
 			do {
 				guard let expirationDate = try diskPersistenceClient.load(Date.self, entry.expirationDateFilePath) as? Date else {
 					throw Error.loadFailed
 				}
-				if Date() > expirationDate {
+				if date.now > expirationDate {
 					loggerGlobal.debug("💾 Entry lifetime expired. Removing from disk...")
 					try diskPersistenceClient.remove(entry.expirationDateFilePath)
 					try diskPersistenceClient.remove(entry.filesystemFilePath)
