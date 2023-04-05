@@ -13,14 +13,24 @@ public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReduce
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case copyAddress(AccountAddress)
+		case continueButtonTapped
 	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case finishedMigration
+	}
+
+	@Dependency(\.pasteboardClient) private var pasteboardClient
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .continueButtonTapped:
+			return .send(.delegate(.finishedMigration))
+		case let .copyAddress(address):
+			pasteboardClient.copyString(address.address)
 			return .none
 		}
 	}

@@ -4,19 +4,26 @@ import FeaturePrelude
 // MARK: - DoScanQR
 public struct DoScanQR: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public let scanInstructions: String
 		public let scanMode: QRScanMode
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var manualQRContent: String
 
 		public init(
+			scanInstructions: String,
 			scanMode: QRScanMode = .default,
 			manualQRContent: String = ""
 		) {
+			self.scanInstructions = scanInstructions
 			self.scanMode = scanMode
 			self.manualQRContent = manualQRContent
 		}
 		#else
-		public init(scanMode: QRScanMode = .default) {
+		public init(
+			scanInstructions: String,
+			scanMode: QRScanMode = .default
+		) {
+			self.scanInstructions = scanInstructions
 			self.scanMode = scanMode
 		}
 		#endif // macOS

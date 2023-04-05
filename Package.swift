@@ -232,6 +232,7 @@ package.addModules([
 			"AccountsClient",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
+			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"GeneralSettings",

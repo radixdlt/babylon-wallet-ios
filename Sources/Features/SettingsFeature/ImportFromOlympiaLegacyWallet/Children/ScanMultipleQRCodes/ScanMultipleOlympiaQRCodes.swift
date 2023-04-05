@@ -1,6 +1,6 @@
 import AccountsClient // OlympiaAccountToMigrate
 import Cryptography
-import EngineToolkit
+import EngineToolkitClient
 import FeaturePrelude
 import ScanQRFeature
 
@@ -11,7 +11,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			case scanQR(ScanQR.State)
 
 			public init() {
-				self = .scanQR(.init())
+				self = .scanQR(.init(scanInstructions: "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet."))
 			}
 		}
 
@@ -210,12 +210,12 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 		let name: String?
 
 		func checked() throws -> OlympiaAccountToMigrate {
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			let publicKeyData = try Data(hex: pk)
+			let publicKey = try K1.PublicKey(compressedRepresentation: publicKeyData)
 
-			// FIXME: Move to reducer and user a new EncodeOlympiaAddress endpoint we need from Omar (or impl Bech32 ourselves, N.B. Bech32, not Bech32m which we use for Babylon)
-			let accountAddressPrefixByte: UInt8 = 0x04
-			let addressBytes: [UInt8] = [accountAddressPrefixByte] + Array(publicKeyData.prefix(26))
-			let bech32Address = try EngineToolkit().encodeAddressRequest(request: .init(addressBytes: addressBytes, networkId: .adapanet)).get().address
+			let bech32Address = try engineToolkitClient.deriveOlympiaAdressFromPublicKey(publicKey)
+
 			guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
 				fatalError()
 			}

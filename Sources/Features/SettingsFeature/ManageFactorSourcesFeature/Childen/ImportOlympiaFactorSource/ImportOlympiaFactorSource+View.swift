@@ -61,7 +61,6 @@ extension ImportOlympiaFactorSource {
 					}
 					.padding([.horizontal, .bottom], .medium1)
 					.onAppear { viewStore.send(.appeared) }
-					.navigationTitle("Import Mnemonic")
 					#if os(iOS)
 						.navigationBarTitleColor(.app.gray1)
 						.navigationBarTitleDisplayMode(.inline)

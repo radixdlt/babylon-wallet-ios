@@ -23,23 +23,49 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ScrollView {
-					LazyVStack {
-						ForEach(viewStore.accounts) { account in
-							//                            AddressView(
-							//                                viewStore.address,
-							//                                copyAddressAction: {
-							//                                    viewStore.send(.copyAddressButtonTapped)
-							//                                }
-							//                            )
-							//                            .foregroundColor(.app.whiteTransparent)
-							Text(account.address.address)
+				VStack {
+					Text("Imported #\(viewStore.accounts.count) accounts")
+						.font(.app.body1Header)
+						.padding()
+
+					ScrollView {
+						LazyVStack {
+							ForEach(viewStore.accounts) { account in
+								InnerCard {
+									AccountLabel(account: account) {
+										viewStore.send(.copyAddress(account.address))
+									}
+								}
+							}
 						}
 					}
 				}
-				.onAppear { viewStore.send(.appeared) }
+				.padding(.horizontal, .medium1)
+				.padding(.bottom, .medium2)
+				.footer {
+					Button("Okay") {
+						viewStore.send(.continueButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+				}
 			}
+			.navigationBarBackButtonHidden()
 		}
+	}
+}
+
+extension AccountLabel {
+	public init(
+		account: Profile.Network.Account,
+		copyAction: (() -> Void)? = nil
+	) {
+		self.init(
+			account.displayName.rawValue,
+			address: account.address.address,
+			gradient: .init(account.appearanceID),
+			height: .guaranteeAccountLabelHeight,
+			copyAction: copyAction
+		)
 	}
 }
 

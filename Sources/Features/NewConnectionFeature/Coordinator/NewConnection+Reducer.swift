@@ -83,7 +83,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		switch childAction {
 		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				state = .scanQR(.init())
+				state = .scanQR(.init(scanInstructions: L10n.NewConnection.subtitle))
 				return .none
 			} else {
 				return .run { send in await send(.delegate(.dismiss)) }

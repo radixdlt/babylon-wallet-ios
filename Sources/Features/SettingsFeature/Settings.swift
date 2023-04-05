@@ -217,6 +217,10 @@ public struct AppSettings: FeatureReducer {
 				return .none
 			}
 
+		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration)))):
+			state.destination = nil
+			return .none
+
 		case .destination:
 			return .none
 		}

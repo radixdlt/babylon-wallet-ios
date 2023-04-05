@@ -17,8 +17,10 @@ extension DoScanQR {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 		#endif // macOS
+		public let instructions: String
 		init(state: DoScanQR.State) {
 			scanMode = state.scanMode
+			instructions = state.scanInstructions
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 			connectionPassword = state.manualQRContent
 			#endif // macOS
@@ -84,7 +86,7 @@ extension DoScanQR.View {
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
-		Text(L10n.NewConnection.subtitle)
+		Text(viewStore.instructions)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
 
@@ -147,6 +149,6 @@ struct ScanQR_Preview: PreviewProvider {
 }
 
 extension DoScanQR.State {
-	public static let previewValue: Self = .init()
+	public static let previewValue: Self = .init(scanInstructions: "Preview")
 }
 #endif

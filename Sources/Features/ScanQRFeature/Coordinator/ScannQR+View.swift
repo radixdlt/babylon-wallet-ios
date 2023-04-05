@@ -11,14 +11,14 @@ extension ScanQR {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store) {
+			SwitchStore(store.scope(state: \.step)) {
 				CaseLet(
-					state: /ScanQR.State.cameraPermission,
+					state: /ScanQR.State.Step.cameraPermission,
 					action: { ScanQR.Action.child(.cameraPermission($0)) },
 					then: { CameraPermission.View(store: $0) }
 				)
 				CaseLet(
-					state: /ScanQR.State.doScanQR,
+					state: /ScanQR.State.Step.doScanQR,
 					action: { ScanQR.Action.child(.doScanQR($0)) },
 					then: { DoScanQR.View(store: $0) }
 				)
@@ -42,6 +42,6 @@ struct ScannQR_Preview: PreviewProvider {
 }
 
 extension ScanQR.State {
-	public static let previewValue: Self = .init()
+	public static let previewValue: Self = .init(scanInstructions: "Preview")
 }
 #endif

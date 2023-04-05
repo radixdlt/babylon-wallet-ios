@@ -45,6 +45,7 @@ extension ImportOlympiaWalletCoordinator {
 					)
 				}
 			}
+			.navigationTitle("Import Legacy Wallet")
 		}
 	}
 }

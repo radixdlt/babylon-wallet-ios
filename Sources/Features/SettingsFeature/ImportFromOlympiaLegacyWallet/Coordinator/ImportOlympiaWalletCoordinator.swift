@@ -98,6 +98,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			return validate(mnemonicWithPassphrase, selectedAccounts: selectedAccounts)
 
+		case .completion(.delegate(.finishedMigration)):
+			return .send(.delegate(.finishedMigration))
+
 		default: return .none
 		}
 	}
