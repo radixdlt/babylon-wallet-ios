@@ -91,12 +91,6 @@ extension UseFactorSourceClient: DependencyKey {
 						}
 					}
 
-					//                    guard let mainNetwork = (try? profile.network(id: .default)), case let accounts = mainNetwork.accounts else {
-					//                        loggerGlobal.critical("Found no main network in profile, this is troublesome.")
-					//                        // strange, no network, then no recovery needed, but still critically bad!
-					//                        return false
-					//                    }
-
 					let hasControlOfAllAccounts = accounts.reduce(into: true) { $0 = $0 && hasControl(of: $1) }
 					return !hasControlOfAllAccounts
 
