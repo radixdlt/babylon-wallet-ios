@@ -763,6 +763,8 @@ public enum L10n {
     public static let gatewaysButtonTitle = L10n.tr("Localizable", "settings.gatewaysButtonTitle", fallback: "Gateways")
     /// App Settings
     public static let generalSettingsButtonTitle = L10n.tr("Localizable", "settings.generalSettingsButtonTitle", fallback: "App Settings")
+    /// Import from a Legacy Wallet
+    public static let importLegacyWallet = L10n.tr("Localizable", "settings.importLegacyWallet", fallback: "Import from a Legacy Wallet")
     /// Inspect Profile
     public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
     /// No Wallet Data Found
