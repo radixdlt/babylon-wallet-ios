@@ -11,7 +11,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			case scanQR(ScanQR.State)
 
 			public init() {
-				self = .scanQR(.init(scanInstructions: "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet."))
+				self = .scanQR(.init(scanInstructions: L10n.ImportLegacyWallet.ScanQRCodes.scanInstructions))
 			}
 		}
 

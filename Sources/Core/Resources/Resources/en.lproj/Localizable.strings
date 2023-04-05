@@ -316,3 +316,13 @@
 "generalSettings.title" = "App Settings";
 "generalSettings.developerMode.title" = "Developer Mode";
 "generalSettings.developerMode.subtitle" = "Warning: Disables website validity checks";
+
+"importLegacyWallet.flow.navigationTitle" = "Import Legacy Wallet";
+"importLegacyWallet.scanQRCodes.scanInstructions" = "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.";
+"importLegacyWallet.selectAccountsToImport.accountRow.value.nameFallback" = "Unnamned";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.name" = "Name";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.olympiaAddress" = "Olympia Address";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.xrdBalance" = "XRD";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath" = "Path";
+"importLegacyWallet.completion.title" = "Imported #%@ accounts.";
+"importLegacyWallet.completion.button.finish" = "Okay";

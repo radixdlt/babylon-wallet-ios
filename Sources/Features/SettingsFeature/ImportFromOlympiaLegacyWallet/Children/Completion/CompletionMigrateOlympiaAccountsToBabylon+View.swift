@@ -24,7 +24,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("Imported #\(viewStore.accounts.count) accounts")
+					Text(L10n.ImportLegacyWallet.Completion.title(viewStore.accounts.count))
 						.font(.app.body1Header)
 						.padding()
 
@@ -43,8 +43,8 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 				.padding(.horizontal, .medium1)
 				.padding(.bottom, .medium2)
 				.footer {
-					Button("Okay") {
-						viewStore.send(.continueButtonTapped)
+					Button(L10n.ImportLegacyWallet.Completion.Button.finish) {
+						viewStore.send(.finishButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 				}

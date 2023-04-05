@@ -45,7 +45,7 @@ extension ImportOlympiaWalletCoordinator {
 					)
 				}
 			}
-			.navigationTitle("Import Legacy Wallet")
+			.navigationTitle(L10n.ImportLegacyWallet.Flow.navigationTitle)
 		}
 	}
 }

@@ -14,7 +14,7 @@ public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReduce
 
 	public enum ViewAction: Sendable, Equatable {
 		case copyAddress(AccountAddress)
-		case continueButtonTapped
+		case finishButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -27,7 +27,7 @@ public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReduce
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .continueButtonTapped:
+		case .finishButtonTapped:
 			return .send(.delegate(.finishedMigration))
 		case let .copyAddress(address):
 			pasteboardClient.copyString(address.address)

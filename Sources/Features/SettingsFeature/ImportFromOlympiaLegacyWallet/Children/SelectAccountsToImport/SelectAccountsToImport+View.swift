@@ -83,8 +83,8 @@ enum SelectAccountsToImportRow {
 		let xrdBalance: BigDecimal
 
 		init(state olympiaAccount: OlympiaAccountToMigrate) {
-			accountName = olympiaAccount.displayName?.rawValue ?? "NOT NAMED"
-//			olympiaAddress = AddressView.ViewState(address: olympiaAccount.address.address.rawValue)
+			accountName = olympiaAccount.displayName?.rawValue ?? L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Value.nameFallback
+
 			olympiaAddress = olympiaAccount.address.address.rawValue
 			appearanceID = .fromIndex(Int(olympiaAccount.addressIndex))
 			derivationPath = olympiaAccount.path.derivationPath
@@ -102,11 +102,11 @@ enum SelectAccountsToImportRow {
 			Button(action: action) {
 				HStack {
 					VStack(alignment: .leading, spacing: .medium2) {
-						HPair(label: "Name", item: viewState.accountName)
-						//                        HPair(label: "Address", item: viewState.olympiaAddress)
+						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
+
 						VStack(alignment: .leading, spacing: .small3) {
 							Group {
-								Text("Olympia address")
+								Text(L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.olympiaAddress)
 									.textStyle(.body2Header)
 
 								Text(viewState.olympiaAddress)
@@ -115,8 +115,8 @@ enum SelectAccountsToImportRow {
 							}
 							.foregroundColor(.app.white)
 						}
-						HPair(label: "XRD", item: viewState.xrdBalance.format())
-						HPair(label: "Path", item: viewState.derivationPath)
+						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.xrdBalance, item: viewState.xrdBalance.format())
+						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
 					}
 					Spacer()
 
