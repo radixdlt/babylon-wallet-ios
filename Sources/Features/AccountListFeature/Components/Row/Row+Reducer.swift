@@ -16,11 +16,8 @@ extension AccountList {
 			public var currency: FiatCurrency
 			public var isCurrencyAmountVisible: Bool
 
-			public var needsAccountRecovery: Bool?
-
 			public init(
 				account: Profile.Network.Account,
-				needsAccountRecovery: Bool? = nil,
 				aggregatedValue: BigDecimal?,
 				portfolio: AccountPortfolio,
 				currency: FiatCurrency,
@@ -28,7 +25,6 @@ extension AccountList {
 			) {
 				precondition(account.address == portfolio.owner)
 				self.account = account
-				self.needsAccountRecovery = needsAccountRecovery
 				self.aggregatedValue = aggregatedValue
 				self.portfolio = portfolio
 				self.currency = currency
@@ -47,13 +43,8 @@ extension AccountList {
 		}
 
 		public enum ViewAction: Sendable, Equatable {
-			case appeared
 			case copyAddressButtonTapped
 			case tapped
-		}
-
-		public enum InternalAction: Sendable, Equatable {
-			case needsAccountRecovery(Bool)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -71,23 +62,10 @@ extension AccountList {
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
-			case .appeared:
-				return .run { [account = state.account] send in
-					let needsAccountRecovery = await accountsClient.checkIfNeedsAccountRecovery(account)
-					await send(.internal(.needsAccountRecovery(needsAccountRecovery)))
-				}
 			case .copyAddressButtonTapped:
 				return .send(.delegate(.copyAddress))
 			case .tapped:
 				return .send(.delegate(.selected))
-			}
-		}
-
-		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-			switch internalAction {
-			case let .needsAccountRecovery(needsAccountRecovery):
-				state.needsAccountRecovery = needsAccountRecovery
-				return .none
 			}
 		}
 	}

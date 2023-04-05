@@ -24,8 +24,6 @@ public struct AccountsClient: Sendable {
 
 	public var hasAccountOnNetwork: HasAccountOnNetwork
 
-	public var checkIfNeedsAccountRecovery: CheckIfNeedsAccountRecovery
-
 	public init(
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
@@ -33,8 +31,7 @@ public struct AccountsClient: Sendable {
 		createUnsavedVirtualAccount: @escaping CreateUnsavedVirtualAccount,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
 		getAccountByAddress: @escaping GetAccountByAddress,
-		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
-		checkIfNeedsAccountRecovery: @escaping CheckIfNeedsAccountRecovery
+		hasAccountOnNetwork: @escaping HasAccountOnNetwork
 	) {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
@@ -43,12 +40,10 @@ public struct AccountsClient: Sendable {
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
-		self.checkIfNeedsAccountRecovery = checkIfNeedsAccountRecovery
 	}
 }
 
 extension AccountsClient {
-	public typealias CheckIfNeedsAccountRecovery = @Sendable (Profile.Network.Account) async -> Bool
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Accounts
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Profile.Network.Accounts
 

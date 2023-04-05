@@ -98,7 +98,7 @@ struct HomeView_Previews: PreviewProvider {
 
 extension Home.State {
 	public static let previewValue = Home.State(
-		header: .init()
+		accountRecoveryIsNeeded: false
 	)
 }
 #endif

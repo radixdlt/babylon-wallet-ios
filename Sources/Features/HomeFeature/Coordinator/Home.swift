@@ -10,6 +10,7 @@ import FungibleTokenListFeature
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public var accountRecoveryIsNeeded: Bool
 		public var accountPortfolios: IdentifiedArrayOf<AccountPortfolio>
 
 		// MARK: - Components
@@ -24,13 +25,15 @@ public struct Home: Sendable, FeatureReducer {
 		public var destination: Destinations.State?
 
 		public init(
+			accountRecoveryIsNeeded: Bool = false,
 			accountPortfolios: IdentifiedArrayOf<AccountPortfolio> = .init(),
-			header: Header.State = .init(),
+//			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
 			destination: Destinations.State? = nil
 		) {
+			self.accountRecoveryIsNeeded = accountRecoveryIsNeeded
 			self.accountPortfolios = accountPortfolios
-			self.header = header
+			self.header = .init(hasNotification: accountRecoveryIsNeeded)
 			self.accountList = accountList
 			self.destination = destination
 		}
