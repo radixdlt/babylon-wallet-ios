@@ -6,32 +6,58 @@ import Profile
 // MARK: - ImportOlympiaWalletCoordinator
 public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum Step: Sendable, Hashable {
+		public var expectedMnemonicWordCount: BIP39.WordCount?
+		public var selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
+		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
+		public var nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index?
+
+		var root: Destinations.State?
+		var path: StackState<Destinations.State> = []
+
+		public init() {
+//			step = .scanMultipleOlympiaQRCodes(.init())
+			self.root = .scanMultipleOlympiaQRCodes(.init())
+		}
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
-		public var expectedMnemonicWordCount: BIP39.WordCount?
-		public var selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
-		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
-		public var nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index?
-		public var step: Step
-		public init() {
-			step = .scanMultipleOlympiaQRCodes(.init())
+		public enum Action: Sendable, Equatable {
+			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
+			case selectAccountsToImport(SelectAccountsToImport.Action)
+			case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
+			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.scanMultipleOlympiaQRCodes, action: /Action.scanMultipleOlympiaQRCodes) {
+				ScanMultipleOlympiaQRCodes()
+			}
+			Scope(state: /State.selectAccountsToImport, action: /Action.selectAccountsToImport) {
+				SelectAccountsToImport()
+			}
+			Scope(state: /State.importOlympiaMnemonic, action: /Action.importOlympiaMnemonic) {
+				ImportOlympiaFactorSource()
+			}
+			Scope(state: /State.completion, action: /Action.completion) {
+				CompletionMigrateOlympiaAccountsToBabylon()
+			}
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case closeButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
-		case selectAccountsToImport(SelectAccountsToImport.Action)
-		case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
-		case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
+		case root(Destinations.Action)
+		case path(StackAction<Destinations.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -44,6 +70,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case finishedMigration
+		case dismiss
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -52,55 +79,49 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.step, action: /Action.self) {
-			EmptyReducer()
-				.ifCaseLet(/State.Step.scanMultipleOlympiaQRCodes, action: /Action.child .. ChildAction.scanMultipleOlympiaQRCodes) {
-					ScanMultipleOlympiaQRCodes()
-				}
-				.ifCaseLet(/State.Step.selectAccountsToImport, action: /Action.child .. ChildAction.selectAccountsToImport) {
-					SelectAccountsToImport()
-				}
-				.ifCaseLet(/State.Step.importOlympiaMnemonic, action: /Action.child .. ChildAction.importOlympiaMnemonic) {
-					ImportOlympiaFactorSource()
-				}
-				.ifCaseLet(/State.Step.completion, action: /Action.child .. ChildAction.completion) {
-					CompletionMigrateOlympiaAccountsToBabylon()
-				}
-		}
-
 		Reduce(core)
+			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
+				Destinations()
+			}
+			.forEach(\.path, action: /Action.child .. ChildAction.path) {
+				Destinations()
+			}
+		//            .ifLet(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .none
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet))):
+		case let .root(Destinations.Action.scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet)))):
 			state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
 			state.nextDerivationAccountIndex = olympiaWallet.nextDerivationAccountIndex
-			state.step = .selectAccountsToImport(.init(scannedAccounts: olympiaWallet.accounts))
+			let destination = Destinations.State.selectAccountsToImport(.init(scannedAccounts: olympiaWallet.accounts))
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
 			return .none
-
-		case let .selectAccountsToImport(.delegate(.selectedAccounts(accounts))):
+		case let .path(.element(_, action: .selectAccountsToImport(.delegate(.selectedAccounts(accounts))))):
 			state.selectedAccounts = accounts
-			state.step = .importOlympiaMnemonic(.init(shouldPersist: false))
+			let destination = Destinations.State.importOlympiaMnemonic(.init(shouldPersist: false))
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
 			return .none
-
-		case let .importOlympiaMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))):
+		case let .path(.element(_, action: .importOlympiaMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))))):
 			state.mnemonicWithPassphrase = mnemonicWithPassphrase
 			guard let selectedAccounts = state.selectedAccounts else {
-				fatalError()
+				assertionFailure("Bad implementation, expected 'state.selectedAccounts' to have been set.")
+				return .none
 			}
 			return validate(mnemonicWithPassphrase, selectedAccounts: selectedAccounts)
-
-		case .completion(.delegate(.finishedMigration)):
+		case .path(.element(_, action: .completion(.delegate(.finishedMigration)))):
 			return .send(.delegate(.finishedMigration))
-
 		default: return .none
 		}
 	}
@@ -119,7 +140,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 		case let .migratedAccounts(migrated):
-			state.step = .completion(.init(migratedAccounts: migrated))
+			let destination = Destinations.State.completion(.init(migratedAccounts: migrated))
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
 			return .none
 		}
 	}

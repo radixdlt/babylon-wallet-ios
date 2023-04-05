@@ -110,11 +110,11 @@ extension View {
 		with store: StoreOf<AppSettings>,
 		_ viewStore: ViewStoreOf<AppSettings>
 	) -> some View {
-		self.navigationDestination(
+		self.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
 			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
-			destination: { ImportOlympiaWalletCoordinator.View(store: $0) }
+			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
 		)
 	}
 

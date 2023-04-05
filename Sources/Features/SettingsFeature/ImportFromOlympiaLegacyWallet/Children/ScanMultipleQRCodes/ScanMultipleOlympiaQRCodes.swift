@@ -66,7 +66,8 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			return .run { [DelEteMeNoooWWw = state.DelEteMeNoooooooooooWwwWw] send in
 				loggerGlobal.critical("IGNORE SCANNED CONTENT. MOCKING RESPONSE!: \(qrString)")
 				await send(.internal(.legacyWalletInfoResult(TaskResult {
-					OrderedSet<UncheckedImportedOlympiaWalletPayload>.previewValue[DelEteMeNoooWWw]
+					let mocks = OrderedSet<UncheckedImportedOlympiaWalletPayload>.previewValue
+					return mocks[DelEteMeNoooWWw % mocks.count]
 				})))
 			}
 
