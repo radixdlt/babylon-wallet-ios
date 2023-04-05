@@ -2,13 +2,13 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - Asset
-public protocol Asset: Sendable, Hashable, Identifiable where ID == ComponentAddress {
+public protocol Asset: Sendable, Hashable, Identifiable {
 	/// The Scrypto Component address of asset.
-	var componentAddress: ComponentAddress { get }
+	var resourceAddress: ResourceAddress { get }
 }
 
 extension Asset {
-	public var id: ID { componentAddress }
+	public var id: ResourceAddress { resourceAddress }
 }
 
 // MARK: - AssetMetadata

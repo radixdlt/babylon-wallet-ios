@@ -9,7 +9,7 @@ extension FungibleTokenDetails.State {
 			amount: amount.format(),
 			symbol: asset.symbol,
 			description: asset.tokenDescription,
-			address: .init(address: asset.componentAddress.address, format: .default),
+			address: .init(address: asset.resourceAddress.address, format: .default),
 			currentSupply: asset.totalMinted
 		)
 	}
