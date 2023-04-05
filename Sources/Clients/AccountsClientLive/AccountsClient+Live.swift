@@ -76,11 +76,6 @@ extension AccountsClient: DependencyKey {
 					}
 				}
 
-				//                var hdOnDeviceFactorSource = olympiaFactorSource.hdOnDeviceFactorSource
-				//                var storage = hdOnDeviceFactorSource.storage
-				//                storage.nextDerivationIndicesPerNetwork.setNextDerivationIndex(for: .account, to: nextDerivationAccountIndex, networkID: networkID)
-				//                hdOnDeviceFactorSource.storage = storage
-//
 				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource.importedOlympiaFactorMarkingNextAccountIndex(
 					to: nextDerivationAccountIndex,
 					networkID: networkID
