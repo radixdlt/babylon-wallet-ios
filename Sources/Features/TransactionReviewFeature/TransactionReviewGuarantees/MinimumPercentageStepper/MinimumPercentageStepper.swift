@@ -34,7 +34,7 @@ public struct MinimumPercentageStepper: FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .increaseTapped:
-			let value = state.value.map { $0 + percentageDelta } ?? 1
+			let value = state.value.map { $0 + percentageDelta } ?? 100
 			let clamped = value.clamped.droppingTrailingZeros
 			state.value = clamped
 			state.string = clamped.formatWithoutRounding()
@@ -53,7 +53,6 @@ public struct MinimumPercentageStepper: FeatureReducer {
 				state.value = value.droppingTrailingZeros
 			} else {
 				state.value = nil
-				return .none
 			}
 		}
 
