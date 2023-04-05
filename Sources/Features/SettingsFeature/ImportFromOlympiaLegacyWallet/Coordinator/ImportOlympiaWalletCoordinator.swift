@@ -85,7 +85,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Destinations()
 			}
-		//            .ifLet(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
