@@ -77,7 +77,7 @@ extension BigDecimal {
 
 	public var droppingTrailingZeros: BigDecimal {
 		var result = self
-		while result.integerValue.isMultiple(of: 10), result.scale >= 0 {
+		while result.integerValue.isMultiple(of: 10), result.scale > 0 {
 			result = result.withScale(result.scale - 1)
 		}
 

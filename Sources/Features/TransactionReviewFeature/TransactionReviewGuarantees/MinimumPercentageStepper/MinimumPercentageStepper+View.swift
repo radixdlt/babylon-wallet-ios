@@ -1,13 +1,5 @@
 import FeaturePrelude
 
-// MARK: - MinimumPercentageStepperView
-
-extension MinimumPercentageStepper.State {
-	var isValid: Bool {
-		value != nil
-	}
-}
-
 // MARK: - MinimumPercentageStepper.View
 extension MinimumPercentageStepper {
 	public struct View: SwiftUI.View {

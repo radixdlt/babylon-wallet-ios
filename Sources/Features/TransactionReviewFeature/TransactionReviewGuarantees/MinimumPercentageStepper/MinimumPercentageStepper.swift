@@ -1,5 +1,11 @@
 import FeaturePrelude
 
+extension MinimumPercentageStepper.State {
+	var isValid: Bool {
+		value != nil
+	}
+}
+
 // MARK: - MinimumPercentageStepper
 public struct MinimumPercentageStepper: FeatureReducer {
 	public struct State: Sendable, Hashable {
