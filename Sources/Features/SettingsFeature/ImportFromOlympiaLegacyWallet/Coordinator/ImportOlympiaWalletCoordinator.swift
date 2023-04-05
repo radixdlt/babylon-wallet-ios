@@ -15,7 +15,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		var path: StackState<Destinations.State> = []
 
 		public init() {
-//			step = .scanMultipleOlympiaQRCodes(.init())
 			self.root = .scanMultipleOlympiaQRCodes(.init())
 		}
 	}
