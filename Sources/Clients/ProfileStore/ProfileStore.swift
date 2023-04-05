@@ -140,33 +140,7 @@ extension ProfileStore {
 	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
 		switch self.profileStateSubject.value {
 		case let .persisted(profile):
-			let accountRecoveryNeeded: Bool = {
-				// FIXME: figure out a canonocal way to find the expected `device` factor source for this iPhone..?
-				let deviceFactorSource: FactorSource = profile.factorSources.sorted(by: { $0.lastUsedOn > $1.lastUsedOn }).first
-
-				/*
-				 : { account in
-				     @Dependency(\.secureStorageClient) var secureStorageClient
-				     do {
-				         switch account.securityState {
-				         case let .unsecured(unsecuredEntityControl):
-				             let factorInstance = unsecuredEntityControl.genesisFactorInstance
-				             let factorSourceID = factorInstance.factorSourceID
-				             let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .debugOnlyInspect)
-				             return mnemonic == nil
-				         }
-
-				     } catch {
-				         loggerGlobal.warning("Failed to load mnemonic or derive publickey: \(error)")
-				         return true // We consider this as 'needs account recovery'
-				     }
-				 }
-				 */
-
-				return true
-
-			}()
-			return .existingProfile(accountRecoveryNeeded: accountRecoveryNeeded)
+			return .existingProfile
 		case let .ephemeral(ephemeral):
 			if let error = ephemeral.loadFailure {
 				return .usersExistingProfileCouldNotBeLoaded(failure: error)

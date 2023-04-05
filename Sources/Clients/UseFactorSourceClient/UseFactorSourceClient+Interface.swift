@@ -6,12 +6,24 @@ import Profile
 public struct UseFactorSourceClient: Sendable {
 	public var publicKeyFromOnDeviceHD: PublicKeyFromOnDeviceHD
 	public var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
+	public var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
+
+	public init(
+		publicKeyFromOnDeviceHD: @escaping PublicKeyFromOnDeviceHD,
+		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
+		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded
+	) {
+		self.publicKeyFromOnDeviceHD = publicKeyFromOnDeviceHD
+		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
+		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
+	}
 }
 
 // MARK: UseFactorSourceClient.onDeviceHDPublicKey
 extension UseFactorSourceClient {
 	public typealias PublicKeyFromOnDeviceHD = @Sendable (PublicKeyFromOnDeviceHDRequest) async throws -> Engine.PublicKey
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
+	public typealias IsAccountRecoveryNeeded = @Sendable () async -> Bool
 }
 
 // MARK: - DiscrepancyUnsupportedCurve

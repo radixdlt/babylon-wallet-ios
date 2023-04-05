@@ -76,6 +76,8 @@ public enum L10n {
       public static let kind = L10n.tr("Localizable", "common.account.kind", fallback: "Account")
     }
     public enum BiometricsPrompt {
+      /// Checking accounts.
+      public static let checkingAccounts = L10n.tr("Localizable", "common.biometricsPrompt.checkingAccounts", fallback: "Checking accounts.")
       /// Authenticate to create new %s with this phone.
       public static func creationOfEntity(_ p1: UnsafePointer<CChar>) -> String {
         return L10n.tr("Localizable", "common.biometricsPrompt.creationOfEntity", p1, fallback: "Authenticate to create new %s with this phone.")

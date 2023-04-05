@@ -4,6 +4,7 @@ import OnboardingClient
 import OnboardingFeature
 import SecureStorageClient
 import SplashFeature
+import UseFactorSourceClient
 
 // MARK: - App
 public struct App: Sendable, FeatureReducer {
@@ -32,6 +33,7 @@ public struct App: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
 		case displayErrorAlert(App.UserFacingError)
+		case toMain(isAccountRecoveryNeeded: Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -66,6 +68,7 @@ public struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 	public init() {}
 
@@ -130,6 +133,8 @@ public struct App: Sendable, FeatureReducer {
 
 		case .incompatibleProfileDeleted:
 			return goToOnboarding(state: &state)
+		case let .toMain(isAccountRecoveryNeeded):
+			return goToMain(state: &state, accountRecoveryIsNeeded: isAccountRecoveryNeeded)
 		}
 	}
 
@@ -156,8 +161,11 @@ public struct App: Sendable, FeatureReducer {
 			case let .usersExistingProfileCouldNotBeLoaded(.profileVersionOutdated(_, version)):
 				return incompatibleSnapshotData(version: version, state: &state)
 
-			case let .existingProfile(accountRecoveryIsNeeded):
-				return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryIsNeeded)
+			case .existingProfile:
+				return .run { send in
+					let isAccountRecoveryNeeded = await useFactorSourceClient.isAccountRecoveryNeeded()
+					await send(.internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded)))
+				}
 			}
 
 		default:

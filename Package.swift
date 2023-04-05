@@ -525,7 +525,18 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+		],
+		tests: .no
+	),
+	.client(
+		name: "UseFactorSourceClientLive",
+		dependencies: [
+			"AccountsClientLive",
+			"Cryptography",
+			"FactorSourcesClient",
+			"Profile",
 			"SecureStorageClient",
+			"UseFactorSourceClient",
 		],
 		tests: .no
 	),

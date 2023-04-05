@@ -41,6 +41,7 @@
 "common.biometricsPrompt.signTransaction" = "Authenticate to sign transaction with this phone.";
 "common.biometricsPrompt.signAuthChallenge" = "Authenticate to sign auth chellenge with this phone.";
 "common.biometricsPrompt.creationOfEntity" = "Authenticate to create new %s with this phone.";
+"common.biometricsPrompt.checkingAccounts" = "Checking accounts.";
 
 "createEntity.completion.title" = "Congratulations";
 "createEntity.completion.subtitle.notFirst" = "Your %s has been created.";

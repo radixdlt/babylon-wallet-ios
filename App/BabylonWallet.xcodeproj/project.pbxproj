@@ -31,6 +31,7 @@
 		E6203E7229B1E96A000B8784 /* PersonasClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6203E7129B1E96A000B8784 /* PersonasClientLive */; };
 		E6805BCD286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BCE286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
+		E6A07C5929DD738A0082782B /* UseFactorSourceClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6A07C5829DD738A0082782B /* UseFactorSourceClientLive */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -71,6 +72,7 @@
 				E6203E3E29B1E939000B8784 /* AppFeature in Frameworks */,
 				E6203E4029B1E943000B8784 /* AccountsClientLive in Frameworks */,
 				E6203E4829B1E943000B8784 /* GatewaysClientLive in Frameworks */,
+				E6A07C5929DD738A0082782B /* UseFactorSourceClientLive in Frameworks */,
 				837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */,
 				E6203E4A29B1E943000B8784 /* OnboardingClientLive in Frameworks */,
 				E6203E4429B1E943000B8784 /* AuthorizedDappsClientLive in Frameworks */,
@@ -215,6 +217,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E6A07C5729DD73830082782B /* PBXTargetDependency */,
 				E6203E5229B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5429B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5629B1E957000B8784 /* PBXTargetDependency */,
@@ -236,6 +239,7 @@
 				E6203E4929B1E943000B8784 /* OnboardingClientLive */,
 				E6203E4D29B1E943000B8784 /* PersonasClientLive */,
 				837BC3C629BB28CF0082C363 /* P2PLinksClientLive */,
+				E6A07C5829DD738A0082782B /* UseFactorSourceClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -429,6 +433,10 @@
 		E6203E8429B1E97A000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = E6203E8329B1E97A000B8784 /* PersonasClientLive */;
+		};
+		E6A07C5729DD73830082782B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E6A07C5629DD73830082782B /* UseFactorSourceClientLive */;
 		};
 /* End PBXTargetDependency section */
 
@@ -714,6 +722,14 @@
 		E6203E8329B1E97A000B8784 /* PersonasClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PersonasClientLive;
+		};
+		E6A07C5629DD73830082782B /* UseFactorSourceClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UseFactorSourceClientLive;
+		};
+		E6A07C5829DD738A0082782B /* UseFactorSourceClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UseFactorSourceClientLive;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

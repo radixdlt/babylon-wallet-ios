@@ -13,11 +13,13 @@ extension UseFactorSourceClient: TestDependencyKey {
 
 	public static let noop = Self(
 		publicKeyFromOnDeviceHD: { _ in throw NoopError() },
-		signatureFromOnDeviceHD: { _ in throw NoopError() }
+		signatureFromOnDeviceHD: { _ in throw NoopError() },
+		isAccountRecoveryNeeded: { false }
 	)
 
 	public static let testValue = Self(
 		publicKeyFromOnDeviceHD: unimplemented("\(Self.self).publicKeyFromOnDeviceHD"),
-		signatureFromOnDeviceHD: unimplemented("\(Self.self).signatureFromOnDeviceHD")
+		signatureFromOnDeviceHD: unimplemented("\(Self.self).signatureFromOnDeviceHD"),
+		isAccountRecoveryNeeded: unimplemented("\(Self.self).isAccountRecoveryNeeded")
 	)
 }

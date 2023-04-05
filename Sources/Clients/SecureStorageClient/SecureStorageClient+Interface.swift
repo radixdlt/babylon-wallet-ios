@@ -30,6 +30,10 @@ extension SecureStorageClient {
 		case signTransaction
 		case signAuthChallenge
 		case createEntity(kind: EntityKind)
+
+		/// Check if account(/persona) recovery is needed
+		case checkingAccounts
+
 		#if DEBUG
 		case debugOnlyInspect
 		#endif
@@ -42,6 +46,8 @@ extension SecureStorageClient {
 				return "signAuthChallenge"
 			case .signTransaction:
 				return "signTransaction"
+			case .checkingAccounts:
+				return "checkingAccounts"
 			#if DEBUG
 			case .debugOnlyInspect:
 				return "debugOnlyInspect"
