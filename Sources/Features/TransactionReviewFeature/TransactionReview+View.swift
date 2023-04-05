@@ -366,6 +366,7 @@ extension Label where Title == Text, Icon == Image {
 			Text(titleKey)
 		} icon: {
 			Image(asset: asset)
+				.renderingMode(.template)
 		}
 	}
 
@@ -374,6 +375,7 @@ extension Label where Title == Text, Icon == Image {
 			Text(title)
 		} icon: {
 			Image(asset: asset)
+				.renderingMode(.template)
 		}
 	}
 }
