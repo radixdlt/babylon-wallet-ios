@@ -12,8 +12,6 @@ public typealias SECP256K1 = K1
 
 // MARK: - K1 + Slip10SupportedECCurve
 extension K1: Slip10SupportedECCurve {
-	public typealias PrivateKey = K1.PrivateKey
-	public typealias PublicKey = K1.PublicKey
 	public static let slip10Curve = Slip10CurveType.secp256k1
 }
 
