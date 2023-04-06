@@ -67,16 +67,13 @@ extension AccountsClient {
 public struct MigrateOlympiaAccountsToBabylonRequest: Sendable, Hashable {
 	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
 	public let olympiaFactorSource: PrivateHDFactorSource
-	public let nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
 
 	public init(
 		olympiaAccounts: Set<OlympiaAccountToMigrate>,
-		olympiaFactorSource: PrivateHDFactorSource,
-		nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
+		olympiaFactorSource: PrivateHDFactorSource
 	) {
 		self.olympiaAccounts = olympiaAccounts
 		self.olympiaFactorSource = olympiaFactorSource
-		self.nextDerivationAccountIndex = nextDerivationAccountIndex
 	}
 }
 

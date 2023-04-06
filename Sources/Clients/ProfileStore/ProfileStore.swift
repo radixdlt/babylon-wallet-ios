@@ -401,7 +401,7 @@ extension ProfileStore {
 			// profile, since it contains no network yet (no account).
 			try await secureStorageClient.saveMnemonicForFactorSource(PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hdOnDeviceFactorSource: factorSource
+				hdOnDeviceFactorSource: factorSource.hdOnDeviceFactorSource
 			))
 
 			loggerGlobal.debug("Created new profile with factorSourceID: \(factorSource.id)")

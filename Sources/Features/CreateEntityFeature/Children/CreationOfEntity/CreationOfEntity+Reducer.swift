@@ -19,13 +19,13 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			curve: Slip10Curve,
 			networkID: NetworkID?,
 			name: NonEmptyString,
-			hdOnDeviceFactorSource: HDOnDeviceFactorSource
+			babylonFactorSource: BabylonDeviceFactorSource
 		) {
 			self.init(
 				request: .init(
 					curve: curve,
 					networkID: networkID,
-					hdOnDeviceFactorSource: hdOnDeviceFactorSource,
+					babylonDeviceFactorSource: babylonFactorSource,
 					displayName: name
 				)
 			)

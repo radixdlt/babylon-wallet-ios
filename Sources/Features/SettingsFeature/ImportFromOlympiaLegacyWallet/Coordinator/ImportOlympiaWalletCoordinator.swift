@@ -9,7 +9,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		public var expectedMnemonicWordCount: BIP39.WordCount?
 		public var selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
 		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
-		public var nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index?
 
 		var root: Destinations.State?
 		var path: StackState<Destinations.State> = []
@@ -98,7 +97,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case let .root(Destinations.Action.scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet)))):
 			state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
-			state.nextDerivationAccountIndex = olympiaWallet.nextDerivationAccountIndex
 			let destination = Destinations.State.selectAccountsToImport(.init(scannedAccounts: olympiaWallet.accounts))
 			if state.path.last != destination {
 				state.path.append(destination)
@@ -127,14 +125,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .validated(accounts, privateHDFactorSource):
-			guard let nextDerivationAccountIndex = state.nextDerivationAccountIndex else {
-				assertionFailure("Expected 'nextDerivationAccountIndex'")
-				return .none
-			}
+
 			return convertToBabylon(
 				olympiaAccounts: accounts,
-				factorSource: privateHDFactorSource,
-				nextDerivationAccountIndex: nextDerivationAccountIndex
+				factorSource: privateHDFactorSource
 			)
 
 		case let .migratedAccounts(migrated):
@@ -173,16 +167,14 @@ extension ImportOlympiaWalletCoordinator {
 
 	private func convertToBabylon(
 		olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-		factorSource: PrivateHDFactorSource,
-		nextDerivationAccountIndex: Profile.Network.NextDerivationIndices.Index
+		factorSource: PrivateHDFactorSource
 	) -> EffectTask<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile
 			let migrated = try await accountsClient.migrateOlympiaAccountsToBabylon(
 				.init(
 					olympiaAccounts: Set(olympiaAccounts.elements),
-					olympiaFactorSource: factorSource,
-					nextDerivationAccountIndex: nextDerivationAccountIndex
+					olympiaFactorSource: factorSource
 				)
 			)
 

@@ -41,7 +41,6 @@ extension AccountsClient: DependencyKey {
 			migrateOlympiaAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
-				let nextDerivationAccountIndex = request.nextDerivationAccountIndex
 
 				let sortedOlympia = request.olympiaAccounts.sorted(by: \.addressIndex)
 
@@ -76,10 +75,7 @@ extension AccountsClient: DependencyKey {
 					}
 				}
 
-				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource.importedOlympiaFactorMarkingNextAccountIndex(
-					to: nextDerivationAccountIndex,
-					networkID: networkID
-				)
+				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource
 
 				let migratedAccounts = try MigratedAccounts(
 					networkID: networkID,

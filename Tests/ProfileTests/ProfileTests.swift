@@ -78,7 +78,7 @@ final class ProfileTests: TestCase {
 
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
-
+		XCTAssertNil(olympiaFactorSource.factorSource.storage)
 		profile.factorSources.append(olympiaFactorSource.factorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
@@ -265,8 +265,8 @@ final class ProfileTests: TestCase {
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		// Uncomment the lines below to generate a new test vector
-//		let data = try jsonEncoder.encode(snapshot)
-//		print(String(data: data, encoding: .utf8)!)
+		let data = try jsonEncoder.encode(snapshot)
+		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -280,6 +280,7 @@ final class ProfileTests: TestCase {
 			XCTAssertEqual(factorSource.hint, creatingDevice)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
+		XCTAssertNil(profile.factorSources.last.storage)
 		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
 		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 

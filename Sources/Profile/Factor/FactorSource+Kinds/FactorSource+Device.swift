@@ -7,47 +7,39 @@ extension FactorSource {
 		mnemonic: Mnemonic,
 		hint: NonEmptyString,
 		bip39Passphrase: String = "",
-		olympiaCompatible: Bool
+		olympiaCompatible: Bool,
+		storage: Storage?
 	) throws -> HDOnDeviceFactorSource {
 		let factorSource = try Self(
 			kind: .device,
 			id: id(fromRoot: mnemonic.hdRoot(passphrase: bip39Passphrase)),
 			hint: hint,
 			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
-			storage: .forDevice(.init())
+			storage: storage
 		)
 		return try HDOnDeviceFactorSource(factorSource: factorSource)
-	}
-
-	public static func babylon(
-		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		hint: NonEmptyString = "babylon"
-	) throws -> HDOnDeviceFactorSource {
-		try babylon(
-			mnemonic: mnemonicWithPassphrase.mnemonic,
-			bip39Passphrase: mnemonicWithPassphrase.passphrase,
-			hint: hint
-		)
 	}
 
 	public static func babylon(
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = "",
 		hint: NonEmptyString = "babylon"
-	) throws -> HDOnDeviceFactorSource {
-		try Self.device(
+	) throws -> BabylonDeviceFactorSource {
+		let hdOnDeviceFactorSource = try Self.device(
 			mnemonic: mnemonic,
 			hint: hint, // will be changed by ProfileStore to device model+name
 			bip39Passphrase: bip39Passphrase,
-			olympiaCompatible: false
+			olympiaCompatible: false,
+			storage: nil
 		)
+		return try BabylonDeviceFactorSource(hdOnDeviceFactorSource: hdOnDeviceFactorSource)
 	}
 
-	public static func olympia(
+	public static func babylon(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		hint: NonEmptyString = "olympia"
-	) throws -> HDOnDeviceFactorSource {
-		try olympia(
+		hint: NonEmptyString = "babylon"
+	) throws -> BabylonDeviceFactorSource {
+		try babylon(
 			mnemonic: mnemonicWithPassphrase.mnemonic,
 			bip39Passphrase: mnemonicWithPassphrase.passphrase,
 			hint: hint
@@ -63,7 +55,19 @@ extension FactorSource {
 			mnemonic: mnemonic,
 			hint: hint, // will be changed by ProfileStore to device model+name
 			bip39Passphrase: bip39Passphrase,
-			olympiaCompatible: true
+			olympiaCompatible: true,
+			storage: .forDevice(.init())
+		)
+	}
+
+	public static func olympia(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		hint: NonEmptyString = "olympia"
+	) throws -> HDOnDeviceFactorSource {
+		try olympia(
+			mnemonic: mnemonicWithPassphrase.mnemonic,
+			bip39Passphrase: mnemonicWithPassphrase.passphrase,
+			hint: hint
 		)
 	}
 

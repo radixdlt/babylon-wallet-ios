@@ -36,18 +36,13 @@ extension CreateEntityCoordinator {
 								then: { NameNewEntity.View(store: $0) }
 							)
 							CaseLet(
-								state: /CreateEntityCoordinator.State.Step.step2_selectGenesisFactorSource,
-								action: { CreateEntityCoordinator.Action.child(.step2_selectGenesisFactorSource($0)) },
-								then: { SelectGenesisFactorSource.View(store: $0) }
-							)
-							CaseLet(
-								state: /CreateEntityCoordinator.State.Step.step3_creationOfEntity,
-								action: { CreateEntityCoordinator.Action.child(.step3_creationOfEntity($0)) },
+								state: /CreateEntityCoordinator.State.Step.step2_creationOfEntity,
+								action: { CreateEntityCoordinator.Action.child(.step2_creationOfEntity($0)) },
 								then: { CreationOfEntity.View(store: $0) }
 							)
 							CaseLet(
-								state: /CreateEntityCoordinator.State.Step.step4_completion,
-								action: { CreateEntityCoordinator.Action.child(.step4_completion($0)) },
+								state: /CreateEntityCoordinator.State.Step.step3_completion,
+								action: { CreateEntityCoordinator.Action.child(.step3_completion($0)) },
 								then: { NewEntityCompletion.View(store: $0) }
 							)
 						}

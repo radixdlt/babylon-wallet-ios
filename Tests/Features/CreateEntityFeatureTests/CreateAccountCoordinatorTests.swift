@@ -28,7 +28,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 		let expectation = expectation(description: "dismiss() called")
 
 		let initialState = CreateAccountCoordinator.State(
-			step: .step3_creationOfEntity(.init(
+			step: .step2_creationOfEntity(.init(
 				curve: .curve25519,
 				networkID: nil,
 				name: "Main",
@@ -45,11 +45,11 @@ final class CreateAccountCoordinatorTests: TestCase {
 			$0.dismiss = .init { expectation.fulfill() }
 		}
 
-		await store.send(.child(.step3_creationOfEntity(.delegate(.createdEntity(account))))) {
-			$0.step = .step4_completion(.init(entity: account, config: initialState.config))
+		await store.send(.child(.step2_creationOfEntity(.delegate(.createdEntity(account))))) {
+			$0.step = .step3_completion(.init(entity: account, config: initialState.config))
 		}
-		await store.send(.child(.step4_completion(.view(.goToDestination))))
-		await store.receive(.child(.step4_completion(.delegate(.completed))))
+		await store.send(.child(.step3_completion(.view(.goToDestination))))
+		await store.receive(.child(.step3_completion(.delegate(.completed))))
 		await store.receive(.delegate(.completed))
 
 		wait(for: [expectation], timeout: 0)
