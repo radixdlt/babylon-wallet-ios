@@ -45,7 +45,7 @@ extension AccountsClient: DependencyKey {
 				let olympiaFactorSource = request.olympiaFactorSource
 				let sortedOlympia = request.olympiaAccounts.sorted(by: \.addressIndex)
 				let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
-				let accountIndexOffset = try await UInt32(getAccountsOnCurrentNetwork().count)
+				let accountIndexOffset = try await getAccountsOnCurrentNetwork().count
 
 				var accountsSet = OrderedSet<MigratedAccount>()
 				for olympiaAccount in sortedOlympia {
@@ -56,13 +56,13 @@ extension AccountsClient: DependencyKey {
 						publicKey: publicKey,
 						derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 					)
-					let accountIndex = accountIndexOffset + olympiaAccount.addressIndex
+					let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
 
 					let babylon = Profile.Network.Account(
 						networkID: networkID,
 						address: address,
 						securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-						appearanceID: .init(rawValue: UInt8(accountIndex)) ?? ._0,
+						appearanceID: .fromIndex(accountIndex),
 						displayName: olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
 					)
 					let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)

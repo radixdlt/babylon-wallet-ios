@@ -46,6 +46,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.importOlympiaMnemonic, action: /Action.importOlympiaMnemonic) {
 				ImportOlympiaFactorSource()
 			}
+			Scope(state: /State.addLedgerNanoFactorSource, action: /Action.addLedgerNanoFactorSource) {
+				AddLedgerNanoFactorSource()
+			}
 			Scope(state: /State.completion, action: /Action.completion) {
 				CompletionMigrateOlympiaAccountsToBabylon()
 			}

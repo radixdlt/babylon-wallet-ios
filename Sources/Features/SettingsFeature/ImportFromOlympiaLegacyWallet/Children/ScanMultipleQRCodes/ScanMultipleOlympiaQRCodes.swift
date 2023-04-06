@@ -157,12 +157,12 @@ extension OrderedSet<UncheckedImportedOlympiaWalletPayload> {
 		let accounts: [UncheckedImportedOlympiaWalletPayload.AccountNonChecked] = try (0 ..< numberOfAccounts).map {
 			let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
 			let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
-
+			let accountType = ($0 % 2 == 0) ? LegacyOlypiaAccountType.software.rawValue : LegacyOlypiaAccountType.hardware.rawValue
 			let accountNonChecked = UncheckedImportedOlympiaWalletPayload.AccountNonChecked(
-				accountType: ($0 % 2 == 0) ? LegacyOlypiaAccountType.software.rawValue : LegacyOlypiaAccountType.hardware.rawValue,
+				accountType: accountType,
 				pk: publicKey.compressedData.hex,
 				path: path.derivationPath,
-				name: "Olympia account i=\($0)"
+				name: "Olympia \(passphrase) \(String(describing: accountType)) i=\($0)"
 			)
 
 			let accountChecked = try accountNonChecked.checked()
