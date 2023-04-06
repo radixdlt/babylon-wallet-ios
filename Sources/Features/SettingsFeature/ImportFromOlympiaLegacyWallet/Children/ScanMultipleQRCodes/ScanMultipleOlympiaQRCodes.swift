@@ -66,7 +66,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			return .run { [DelEteMeNoooWWw = state.DelEteMeNoooooooooooWwwWw] send in
 				loggerGlobal.critical("IGNORE SCANNED CONTENT. MOCKING RESPONSE!: \(qrString)")
 				await send(.internal(.legacyWalletInfoResult(TaskResult {
-					let mocks = OrderedSet<UncheckedImportedOlympiaWalletPayload>.previewValue
+					let mocks = OrderedSet<UncheckedImportedOlympiaWalletPayload>.mocks
 					return mocks[DelEteMeNoooWWw % mocks.count]
 				})))
 			}
@@ -141,9 +141,8 @@ public struct ImportedOlympiaWallet: Sendable, Hashable {
 	public let accounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 }
 
-#if DEBUG
 extension OrderedSet<UncheckedImportedOlympiaWalletPayload> {
-	static let previewValue: Self = try! {
+	static let mocks: Self = try! {
 		let numberOfPayLoads = 2
 		let accountsPerPayload = 20
 		let numberOfAccounts = numberOfPayLoads * accountsPerPayload
@@ -183,7 +182,6 @@ extension OrderedSet<UncheckedImportedOlympiaWalletPayload> {
 		return OrderedSet(uncheckedUniqueElements: array)
 	}()
 }
-#endif // DEBUG
 
 // MARK: - UncheckedImportedOlympiaWalletPayload
 public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashable {
