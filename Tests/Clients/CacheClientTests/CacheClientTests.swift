@@ -51,11 +51,43 @@ final class CacheClientTests: TestCase {
 		}
 		// entry lifefime is 300 seconds
 		let entry: CacheClient.Entry = .networkName(dataToBeSaved.absoluteString)
-		let timeInterval: TimeInterval = 301
 
+		let validTimeInterval: TimeInterval = 299
 		try withDependencies {
 			$0.diskPersistenceClient = .liveValue
-			$0.date = .incrementing(by: timeInterval, from: .now)
+			$0.date = .incrementing(by: validTimeInterval, from: .now)
+		} operation: {
+			// when
+			sut.save(dataToBeSaved, entry)
+			// then
+			// then
+			guard let retrived = try sut.load(URL.self, entry) as? URL else {
+				XCTFail("Expected to decode URL")
+				return
+			}
+			XCTAssertEqual(dataToBeSaved, retrived)
+		}
+
+		let boundaryTimeInterval: TimeInterval = 300
+		try withDependencies {
+			$0.diskPersistenceClient = .liveValue
+			$0.date = .incrementing(by: boundaryTimeInterval, from: .now)
+		} operation: {
+			// when
+			sut.save(dataToBeSaved, entry)
+			// then
+			// then
+			guard let retrived = try sut.load(URL.self, entry) as? URL else {
+				XCTFail("Expected to decode URL")
+				return
+			}
+			XCTAssertEqual(dataToBeSaved, retrived)
+		}
+
+		let expiredTimeInterval: TimeInterval = 301
+		try withDependencies {
+			$0.diskPersistenceClient = .liveValue
+			$0.date = .incrementing(by: expiredTimeInterval, from: .now)
 		} operation: {
 			// when
 			sut.save(dataToBeSaved, entry)
