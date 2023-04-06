@@ -26,7 +26,7 @@ public struct SelectAccountsToImport: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedAccounts(NonEmpty<OrderedSet<OlympiaAccountToMigrate>>)
+		case selectedAccounts(OlympiaAccountsToImport)
 	}
 
 	public init() {}
@@ -58,7 +58,29 @@ public struct SelectAccountsToImport: Sendable, FeatureReducer {
 				}
 				return .none
 			}
-			return .send(.delegate(.selectedAccounts(selectedAccounts)))
+
+			return .send(.delegate(.selectedAccounts(
+				OlympiaAccountsToImport(selectedAccounts: selectedAccounts)
+			)))
+		}
+	}
+}
+
+// MARK: - OlympiaAccountsToImport
+public struct OlympiaAccountsToImport: Sendable, Hashable {
+	public let software: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
+	public let hardware: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
+
+	init(selectedAccounts all: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) {
+		let software = NonEmpty(rawValue: OrderedSet(all.filter { $0.accountType == .software }))
+		let hardware = NonEmpty(rawValue: OrderedSet(all.filter { $0.accountType == .hardware }))
+		self.software = software
+		self.hardware = hardware
+
+		if software == nil, hardware == nil {
+			let error = "Bad implementation, software AND hardware accounts cannot be both empty."
+			loggerGlobal.critical(.init(stringLiteral: error))
+			assertionFailure(error)
 		}
 	}
 }

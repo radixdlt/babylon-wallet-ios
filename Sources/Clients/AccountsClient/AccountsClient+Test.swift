@@ -17,7 +17,7 @@ extension AccountsClient: TestDependencyKey {
 		saveVirtualAccount: { _ in },
 		getAccountByAddress: { _ in throw NoopError() },
 		hasAccountOnNetwork: { _ in false },
-		migrateOlympiaAccountsToBabylon: { _ in throw NoopError() }
+		migrateOlympiaSoftwareAccountsToBabylon: { _ in throw NoopError() }
 	)
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
@@ -28,6 +28,6 @@ extension AccountsClient: TestDependencyKey {
 		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),
 		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
-		migrateOlympiaAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaAccountsToBabylon")
+		migrateOlympiaSoftwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaSoftwareAccountsToBabylon")
 	)
 }

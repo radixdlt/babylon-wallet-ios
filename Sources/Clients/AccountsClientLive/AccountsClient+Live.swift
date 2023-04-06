@@ -40,14 +40,14 @@ extension AccountsClient: DependencyKey {
 					return false
 				}
 			},
-			migrateOlympiaAccountsToBabylon: { request in
+			migrateOlympiaSoftwareAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
 				let sortedOlympia = request.olympiaAccounts.sorted(by: \.addressIndex)
 				let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
-				let accountIndexOffset = await try UInt32(getAccountsOnCurrentNetwork().count)
+				let accountIndexOffset = try await UInt32(getAccountsOnCurrentNetwork().count)
 
-				var accountsSet = OrderedSet<MigratedAccounts.MigratedAccount>()
+				var accountsSet = OrderedSet<MigratedAccount>()
 				for olympiaAccount in sortedOlympia {
 					let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
 					let address = try Profile.Network.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
@@ -65,11 +65,11 @@ extension AccountsClient: DependencyKey {
 						appearanceID: .init(rawValue: UInt8(accountIndex)) ?? ._0,
 						displayName: olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
 					)
-					let migrated = MigratedAccounts.MigratedAccount(olympia: olympiaAccount, babylon: babylon)
+					let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
 					accountsSet.append(migrated)
 				}
 
-				let accounts = NonEmpty<OrderedSet<MigratedAccounts.MigratedAccount>>(rawValue: accountsSet)!
+				let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet)!
 
 				try await getProfileStore().updating { profile in
 					// Save all accounts
@@ -80,7 +80,7 @@ extension AccountsClient: DependencyKey {
 
 				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource
 
-				let migratedAccounts = try MigratedAccounts(
+				let migratedAccounts = try MigratedSoftwareAccounts(
 					networkID: networkID,
 					accounts: accounts,
 					factorSourceToSave: factorSource

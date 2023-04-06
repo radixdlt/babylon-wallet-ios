@@ -24,7 +24,7 @@ public struct AccountsClient: Sendable {
 
 	public var hasAccountOnNetwork: HasAccountOnNetwork
 
-	public var migrateOlympiaAccountsToBabylon: MigrateOlympiaAccountsToBabylon
+	public var migrateOlympiaSoftwareAccountsToBabylon: MigrateOlympiaSoftwareAccountsToBabylon
 
 	public init(
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
@@ -34,7 +34,7 @@ public struct AccountsClient: Sendable {
 		saveVirtualAccount: @escaping SaveVirtualAccount,
 		getAccountByAddress: @escaping GetAccountByAddress,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
-		migrateOlympiaAccountsToBabylon: @escaping MigrateOlympiaAccountsToBabylon
+		migrateOlympiaSoftwareAccountsToBabylon: @escaping MigrateOlympiaSoftwareAccountsToBabylon
 	) {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
@@ -43,7 +43,7 @@ public struct AccountsClient: Sendable {
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
-		self.migrateOlympiaAccountsToBabylon = migrateOlympiaAccountsToBabylon
+		self.migrateOlympiaSoftwareAccountsToBabylon = migrateOlympiaSoftwareAccountsToBabylon
 	}
 }
 
@@ -60,7 +60,7 @@ extension AccountsClient {
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
-	public typealias MigrateOlympiaAccountsToBabylon = @Sendable (MigrateOlympiaAccountsToBabylonRequest) async throws -> MigratedAccounts
+	public typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
 }
 
 // MARK: - MigrateOlympiaAccountsToBabylonRequest
@@ -77,18 +77,19 @@ public struct MigrateOlympiaAccountsToBabylonRequest: Sendable, Hashable {
 	}
 }
 
-// MARK: - MigratedAccounts
-public struct MigratedAccounts: Sendable, Hashable {
-	public let networkID: NetworkID
-
-	public struct MigratedAccount: Sendable, Hashable {
-		public let olympia: OlympiaAccountToMigrate
-		public let babylon: Profile.Network.Account
-		public init(olympia: OlympiaAccountToMigrate, babylon: Profile.Network.Account) {
-			self.olympia = olympia
-			self.babylon = babylon
-		}
+// MARK: - MigratedAccount
+public struct MigratedAccount: Sendable, Hashable {
+	public let olympia: OlympiaAccountToMigrate
+	public let babylon: Profile.Network.Account
+	public init(olympia: OlympiaAccountToMigrate, babylon: Profile.Network.Account) {
+		self.olympia = olympia
+		self.babylon = babylon
 	}
+}
+
+// MARK: - MigratedSoftwareAccounts
+public struct MigratedSoftwareAccounts: Sendable, Hashable {
+	public let networkID: NetworkID
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
 	public var babylonAccounts: Profile.Network.Accounts {

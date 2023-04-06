@@ -3,7 +3,7 @@ import FeaturePrelude
 
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
 	var viewState: CompletionMigrateOlympiaAccountsToBabylon.ViewState {
-		.init(accounts: migratedAccounts.babylonAccounts)
+		.init(accounts: migratedAccounts)
 	}
 }
 
@@ -85,12 +85,9 @@ struct CompletionMigrateOlympiaAccountsToBabylon_Preview: PreviewProvider {
 }
 
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
-	public static let previewValue = Self(migratedAccounts: .previewValue)
+	public static let previewValue = Self(
+		migratedAccounts: .previewValue
+	)
 }
 
-extension MigratedAccounts {
-	public static let previewValue: Self = {
-		fatalError()
-	}()
-}
 #endif

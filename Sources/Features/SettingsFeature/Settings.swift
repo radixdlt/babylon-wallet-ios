@@ -94,7 +94,7 @@ public struct AppSettings: FeatureReducer {
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
-				ImportOlympiaWalletCoordinator()._printChanges()
+				ImportOlympiaWalletCoordinator()
 			}
 			Scope(state: /State.manageFactorSources, action: /Action.manageFactorSources) {
 				ManageFactorSources()

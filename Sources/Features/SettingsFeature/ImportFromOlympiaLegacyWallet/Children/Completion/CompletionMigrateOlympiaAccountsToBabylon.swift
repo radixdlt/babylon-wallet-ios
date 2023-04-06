@@ -4,9 +4,9 @@ import FeaturePrelude
 // MARK: - CompletionMigrateOlympiaAccountsToBabylon
 public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let migratedAccounts: MigratedAccounts
+		public let migratedAccounts: Profile.Network.Accounts
 		public init(
-			migratedAccounts: MigratedAccounts
+			migratedAccounts: Profile.Network.Accounts
 		) {
 			self.migratedAccounts = migratedAccounts
 		}
