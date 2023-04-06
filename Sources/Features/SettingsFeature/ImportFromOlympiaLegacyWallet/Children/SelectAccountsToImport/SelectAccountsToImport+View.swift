@@ -56,12 +56,12 @@ extension SelectAccountsToImport {
 				}
 				.footer {
 					HStack {
-						Button("Deselect all") {
+						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.deselectAll) {
 							viewStore.send(.deselectAll)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 
-						Button("Select all") {
+						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.selectAll) {
 							viewStore.send(.selectAll)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -72,7 +72,15 @@ extension SelectAccountsToImport {
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
 						let numberOfSelectedAccounts = viewStore.selectedAccounts?.count ?? 0
-						let title = numberOfSelectedAccounts > 1 ? "Import \(numberOfSelectedAccounts) accounts" : (numberOfSelectedAccounts == 1 ? "Import one account" : "Import accounts")
+						let title: String = {
+							if numberOfSelectedAccounts == 0 {
+								return L10n.ImportLegacyWallet.SelectAccountsToImport.Button.importZeroAccounts
+							} else if numberOfSelectedAccounts == 1 {
+								return L10n.ImportLegacyWallet.SelectAccountsToImport.Button.importOneAcccount
+							} else {
+								return L10n.ImportLegacyWallet.SelectAccountsToImport.Button.importManyAccounts(numberOfSelectedAccounts)
+							}
+						}()
 						Button(title, action: action)
 							.buttonStyle(.primaryRectangular)
 					}

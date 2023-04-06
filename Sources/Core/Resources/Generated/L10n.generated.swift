@@ -587,8 +587,18 @@ public enum L10n {
         }
       }
       public enum Button {
+        /// Deselect all
+        public static let deselectAll = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.deselectAll", fallback: "Deselect all")
+        /// Import %@ accounts
+        public static func importManyAccounts(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importManyAccounts", String(describing: p1), fallback: "Import %@ accounts")
+        }
+        /// Import one account
+        public static let importOneAcccount = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importOneAcccount", fallback: "Import one account")
         /// Import accounts
-        public static let `import` = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.import", fallback: "Import accounts")
+        public static let importZeroAccounts = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importZeroAccounts", fallback: "Import accounts")
+        /// Select all
+        public static let selectAll = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.selectAll", fallback: "Select all")
       }
     }
   }
