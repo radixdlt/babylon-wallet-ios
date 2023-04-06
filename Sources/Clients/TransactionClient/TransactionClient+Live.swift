@@ -367,7 +367,8 @@ extension TransactionClient {
 						let review = TransactionToReview(
 							analyzedManifestToReview: analyzedManifestToReview,
 							manifestIncludingLockFee: manifestIncludingLockFee,
-							transactionFeeAdded: transactionFeeAdded
+							transactionFeeAdded: transactionFeeAdded,
+							networkID: networkID
 						)
 						return .success(review)
 					} catch {

@@ -77,7 +77,7 @@ extension BigDecimal {
 
 	public var droppingTrailingZeros: BigDecimal {
 		var result = self
-		while result.integerValue.isMultiple(of: 10), result.scale >= 0 {
+		while result.integerValue.isMultiple(of: 10), result.scale > 0 {
 			result = result.withScale(result.scale - 1)
 		}
 
@@ -123,6 +123,10 @@ extension BigDecimal {
 		let stripped = strippingGroupingSeparator(string)
 
 		if let decimalSeparator = locale.decimalSeparator, decimalSeparator != ".", stripped.contains(decimalSeparator) {
+			guard stripped != decimalSeparator else {
+				throw ConversionError.onlyDecimalSeparator
+			}
+
 			let converted = stripped.replacingOccurrences(of: decimalSeparator, with: ".")
 			try self.init(fromString: converted)
 			return
@@ -157,11 +161,14 @@ extension BigDecimal {
 
 	public enum ConversionError: Error, CustomStringConvertible {
 		case failedToCreateDouble(String)
+		case onlyDecimalSeparator
 
 		public var description: String {
 			switch self {
 			case let .failedToCreateDouble(stringValue):
 				return "Cannot create Double from \(stringValue)."
+			case .onlyDecimalSeparator:
+				return "Cannot create BigDecimal from just the decimal separator."
 			}
 		}
 	}

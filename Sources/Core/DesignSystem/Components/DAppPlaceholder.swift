@@ -25,15 +25,17 @@ public struct DappPlaceholder: View {
 public struct TokenPlaceholder: View {
 	private let size: HitTargetSize
 	private let known: Bool
+	private let isXRD: Bool
 
-	public init(known: Bool = true, size hitTargetSize: HitTargetSize = .small) {
+	public init(known: Bool = true, isXRD: Bool = false, size hitTargetSize: HitTargetSize = .small) {
 		self.known = known
+		self.isXRD = isXRD
 		self.size = hitTargetSize
 	}
 
 	// TODO: Show different icon if known
 	public var body: some View {
-		Image(asset: AssetResource.iconUnknownResource)
+		Image(asset: isXRD ? AssetResource.xrd : AssetResource.fungibleToken)
 			.resizable()
 			.clipShape(Circle())
 			.frame(size)
