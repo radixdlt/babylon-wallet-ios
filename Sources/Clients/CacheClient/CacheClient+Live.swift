@@ -21,21 +21,21 @@ extension CacheClient: DependencyKey {
 
 			do {
 				guard let expirationDate = try diskPersistenceClient.load(Date.self, entry.expirationDateFilePath) as? Date else {
-					throw Error.loadFailed
+					throw Error.expirationDateLoadingFailed
 				}
 				if date.now > expirationDate {
 					loggerGlobal.debug("💾 Entry lifetime expired. Removing from disk...")
 					try diskPersistenceClient.remove(entry.expirationDateFilePath)
 					try diskPersistenceClient.remove(entry.filesystemFilePath)
 					loggerGlobal.debug("💾 Expired entry removed from disk: \(entry)")
-					throw Error.loadFailed
+					throw Error.entryLifetimeExpired
 				}
 				let data = try diskPersistenceClient.load(decodable, entry.filesystemFilePath)
 				loggerGlobal.debug("💾 Data successfully retrieved from disk: \(entry)")
 				return data
 			} catch {
 				loggerGlobal.error("💾 Could not retrieve data from disk: \(error.localizedDescription)")
-				throw Error.loadFailed
+				throw Error.dataLoadingFailed
 			}
 		}, removeFile: { entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient

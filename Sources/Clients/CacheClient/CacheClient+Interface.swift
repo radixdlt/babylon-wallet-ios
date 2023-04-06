@@ -113,6 +113,8 @@ extension CacheClient {
 	}
 
 	public enum Error: Swift.Error {
-		case loadFailed
+		case dataLoadingFailed
+		case expirationDateLoadingFailed
+		case entryLifetimeExpired
 	}
 }
