@@ -759,10 +759,10 @@ public enum L10n {
     public static let passcodeNotSetUpTitle = L10n.tr("Localizable", "splash.passcodeNotSetUpTitle", fallback: "Passcode not set up")
     public enum Alert {
       public enum PasscodeCheckFailed {
-        /// Cancel
-        public static let cancelButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.cancelButtonTitle", fallback: "Cancel")
         /// Passcode are not set up. Please update settings.
         public static let message = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.message", fallback: "Passcode are not set up. Please update settings.")
+        /// Retry
+        public static let retryButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.retryButtonTitle", fallback: "Retry")
         /// Settings
         public static let settingsButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.settingsButtonTitle", fallback: "Settings")
         /// Warning
