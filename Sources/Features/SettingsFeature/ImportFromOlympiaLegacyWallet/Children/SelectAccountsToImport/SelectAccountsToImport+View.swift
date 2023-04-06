@@ -59,7 +59,7 @@ extension SelectAccountsToImport {
 						viewStore.selectedAccounts,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button("Import Olympia Accounts", action: action)
+						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.import, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -80,7 +80,7 @@ enum SelectAccountsToImportRow {
 		let olympiaAddress: String
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let derivationPath: String
-		let xrdBalance: BigDecimal
+		let olympiaAccountType: LegacyOlypiaAccountType
 
 		init(state olympiaAccount: OlympiaAccountToMigrate) {
 			accountName = olympiaAccount.displayName?.rawValue ?? L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Value.nameFallback
@@ -88,7 +88,7 @@ enum SelectAccountsToImportRow {
 			olympiaAddress = olympiaAccount.address.address.rawValue
 			appearanceID = .fromIndex(Int(olympiaAccount.addressIndex))
 			derivationPath = olympiaAccount.path.derivationPath
-			xrdBalance = olympiaAccount.xrd
+			olympiaAccountType = olympiaAccount.accountType
 		}
 	}
 
@@ -115,7 +115,7 @@ enum SelectAccountsToImportRow {
 							}
 							.foregroundColor(.app.white)
 						}
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.xrdBalance, item: viewState.xrdBalance.format())
+						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
 						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
 					}
 					Spacer()

@@ -145,22 +145,32 @@ public struct ImportedOlympiaWallet: Sendable, Hashable {
 extension OrderedSet<UncheckedImportedOlympiaWalletPayload> {
 	static let previewValue: Self = try! {
 		let numberOfPayLoads = 2
-		let accountsPerPayload = 2
+		let accountsPerPayload = 20
 		let numberOfAccounts = numberOfPayLoads * accountsPerPayload
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let passphrase = try Mnemonic().words[0].capitalized
+
 		print("✅ Passhprase: \(passphrase)")
+
 		let hdRoot = try mnemonic.hdRoot(passphrase: passphrase)
+
 		let accounts: [UncheckedImportedOlympiaWalletPayload.AccountNonChecked] = try (0 ..< numberOfAccounts).map {
 			let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
 			let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
-			let accountNonChecked = UncheckedImportedOlympiaWalletPayload.AccountNonChecked(pk: publicKey.compressedData.hex, path: path.derivationPath, xrd: "1\($0)0", name: "Sajjon i=\($0)")
+
+			let accountNonChecked = UncheckedImportedOlympiaWalletPayload.AccountNonChecked(
+				accountType: ($0 % 2 == 0) ? LegacyOlypiaAccountType.software.rawValue : LegacyOlypiaAccountType.hardware.rawValue,
+				pk: publicKey.compressedData.hex,
+				path: path.derivationPath,
+				name: "Olympia account i=\($0)"
+			)
 
 			let accountChecked = try accountNonChecked.checked()
 			assert(accountChecked.path == path)
 			assert(accountChecked.publicKey.compressedRepresentation == publicKey.compressedRepresentation)
 			return accountNonChecked
 		}
+
 		let array = (0 ..< numberOfPayLoads).map {
 			UncheckedImportedOlympiaWalletPayload(
 				payloads: numberOfPayLoads,
@@ -169,6 +179,7 @@ extension OrderedSet<UncheckedImportedOlympiaWalletPayload> {
 				accounts: Array(accounts[($0 * accountsPerPayload) ..< (($0 + 1) * accountsPerPayload)])
 			)
 		}
+
 		return OrderedSet(uncheckedUniqueElements: array)
 	}()
 }
@@ -199,9 +210,9 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 	}
 
 	struct AccountNonChecked: Decodable, Sendable, Hashable {
+		let accountType: String
 		let pk: String
 		let path: String
-		let xrd: String
 		let name: String?
 
 		func checked() throws -> OlympiaAccountToMigrate {
@@ -216,10 +227,14 @@ public struct UncheckedImportedOlympiaWalletPayload: Decodable, Sendable, Hashab
 			}
 			let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
 
+			guard let accountType = LegacyOlypiaAccountType(rawValue: self.accountType) else {
+				fatalError()
+			}
+
 			return try .init(
+				accountType: accountType,
 				publicKey: .init(compressedRepresentation: publicKeyData),
 				path: .init(derivationPath: path),
-				xrd: .init(fromString: xrd),
 				address: address,
 				displayName: name.map { NonEmptyString(rawValue: $0) } ?? nil
 			)
@@ -245,9 +260,9 @@ extension UncheckedImportedOlympiaWalletPayload {
 
 extension UncheckedImportedOlympiaWalletPayload.AccountNonChecked {
 	public static let previewValue = Self(
+		accountType: "S",
 		pk: "022a471424da5e657499d1ff51cb43c47481a03b1e77f951fe64cec9f5a48f7011",
 		path: "m/44'/1022'/0'/0/1'",
-		xrd: "1337",
 		name: "PreviewValue"
 	)
 }

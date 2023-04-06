@@ -323,7 +323,8 @@
 "importLegacyWallet.selectAccountsToImport.accountRow.value.nameFallback" = "Unnamned";
 "importLegacyWallet.selectAccountsToImport.accountRow.label.name" = "Name";
 "importLegacyWallet.selectAccountsToImport.accountRow.label.olympiaAddress" = "Olympia Address";
-"importLegacyWallet.selectAccountsToImport.accountRow.label.xrdBalance" = "XRD";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.accountType" = "Type";
 "importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath" = "Path";
+"importLegacyWallet.selectAccountsToImport.button.import" = "Import accounts";
 "importLegacyWallet.completion.title" = "Imported #%@ accounts.";
 "importLegacyWallet.completion.button.finish" = "Okay";

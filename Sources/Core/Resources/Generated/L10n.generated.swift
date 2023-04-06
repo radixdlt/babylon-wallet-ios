@@ -572,19 +572,23 @@ public enum L10n {
     public enum SelectAccountsToImport {
       public enum AccountRow {
         public enum Label {
+          /// Type
+          public static let accountType = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.accountType", fallback: "Type")
           /// Path
           public static let derivationPath = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath", fallback: "Path")
           /// Name
           public static let name = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.name", fallback: "Name")
           /// Olympia Address
           public static let olympiaAddress = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.olympiaAddress", fallback: "Olympia Address")
-          /// XRD
-          public static let xrdBalance = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.xrdBalance", fallback: "XRD")
         }
         public enum Value {
           /// Unnamned
           public static let nameFallback = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.value.nameFallback", fallback: "Unnamned")
         }
+      }
+      public enum Button {
+        /// Import accounts
+        public static let `import` = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.import", fallback: "Import accounts")
       }
     }
   }

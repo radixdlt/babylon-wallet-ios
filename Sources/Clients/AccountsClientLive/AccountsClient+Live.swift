@@ -16,10 +16,12 @@ extension AccountsClient: DependencyKey {
 			}
 		}
 
+		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
+			try await getProfileStore().network().accounts
+		}
+
 		return Self(
-			getAccountsOnCurrentNetwork: {
-				try await getProfileStore().network().accounts
-			},
+			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
 			getAccountsOnNetwork: { try await getProfileStore().profile.network(id: $0).accounts },
 			createUnsavedVirtualAccount: { request in
@@ -41,10 +43,9 @@ extension AccountsClient: DependencyKey {
 			migrateOlympiaAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
-
 				let sortedOlympia = request.olympiaAccounts.sorted(by: \.addressIndex)
-
 				let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
+				let accountIndexOffset = await try UInt32(getAccountsOnCurrentNetwork().count)
 
 				var accountsSet = OrderedSet<MigratedAccounts.MigratedAccount>()
 				for olympiaAccount in sortedOlympia {
@@ -55,11 +56,13 @@ extension AccountsClient: DependencyKey {
 						publicKey: publicKey,
 						derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 					)
+					let accountIndex = accountIndexOffset + olympiaAccount.addressIndex
+
 					let babylon = Profile.Network.Account(
 						networkID: networkID,
 						address: address,
 						securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-						appearanceID: .init(rawValue: UInt8(olympiaAccount.addressIndex)) ?? ._0,
+						appearanceID: .init(rawValue: UInt8(accountIndex)) ?? ._0,
 						displayName: olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
 					)
 					let migrated = MigratedAccounts.MigratedAccount(olympia: olympiaAccount, babylon: babylon)

@@ -118,10 +118,13 @@ struct NetworkIDDisrepancy: Swift.Error {}
 // MARK: - OlympiaAccountToMigrate
 public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {
 	public typealias ID = K1.PublicKey
+
 	public var id: ID { publicKey }
+
+	public let accountType: LegacyOlypiaAccountType
+
 	public let publicKey: K1.PublicKey
 	public let path: LegacyOlympiaBIP44LikeDerivationPath
-	public let xrd: BigDecimal
 
 	/// Legacy Olympia address
 	public let address: LegacyOlympiaAccountAddress
@@ -132,9 +135,9 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 	public let addressIndex: HD.Path.Component.Child.Value
 
 	public init(
+		accountType: LegacyOlypiaAccountType,
 		publicKey: K1.PublicKey,
 		path: LegacyOlympiaBIP44LikeDerivationPath,
-		xrd: BigDecimal,
 		address: LegacyOlympiaAccountAddress,
 		displayName: NonEmptyString?
 	) throws {
@@ -146,15 +149,15 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 		self.addressIndex = addressIndex
 		self.publicKey = publicKey
 		self.path = path
-		self.xrd = xrd
 		self.address = address
 		self.displayName = displayName
+		self.accountType = accountType
 	}
 
 	public var debugDescription: String {
 		"""
+		accountType: \(accountType)
 		name: \(displayName ?? "")
-		xrd: \(xrd.description)
 		path: \(path.derivationPath)
 		publicKey: \(publicKey.compressedRepresentation.hex)
 		"""
@@ -170,5 +173,17 @@ public struct LegacyOlympiaAccountAddress: Sendable, Hashable {
 	public let address: NonEmptyString
 	public init(address: NonEmptyString) {
 		self.address = address
+	}
+}
+
+// MARK: - LegacyOlypiaAccountType
+public enum LegacyOlypiaAccountType: String, Sendable, Hashable, Codable, CustomStringConvertible {
+	case software = "S"
+	case hardware = "H"
+	public var description: String {
+		switch self {
+		case .software: return "software"
+		case .hardware: return "hardware"
+		}
 	}
 }
