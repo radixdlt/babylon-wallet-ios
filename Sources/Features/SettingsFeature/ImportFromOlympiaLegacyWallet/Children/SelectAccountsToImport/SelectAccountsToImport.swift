@@ -19,6 +19,8 @@ public struct SelectAccountsToImport: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case selectAll
+		case deselectAll
 		case selectedAccountsChanged([OlympiaAccountToMigrate]?)
 		case continueButtonTapped([OlympiaAccountToMigrate])
 	}
@@ -33,6 +35,15 @@ public struct SelectAccountsToImport: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
+
+		case .selectAll:
+			state.selectedAccounts = .init(state.availableAccounts)
+			return .none
+
+		case .deselectAll:
+			state.selectedAccounts = []
+			return .none
+
 		case let .selectedAccountsChanged(selectedAccounts):
 			state.selectedAccounts = selectedAccounts
 			return .none

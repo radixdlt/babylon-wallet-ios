@@ -55,11 +55,25 @@ extension SelectAccountsToImport {
 					.padding(.bottom, .medium2)
 				}
 				.footer {
+					HStack {
+						Button("Deselect all") {
+							viewStore.send(.deselectAll)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+
+						Button("Select all") {
+							viewStore.send(.selectAll)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: true))
+					}
+
 					WithControlRequirements(
 						viewStore.selectedAccounts,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.import, action: action)
+						let numberOfSelectedAccounts = viewStore.selectedAccounts?.count ?? 0
+						let title = numberOfSelectedAccounts > 1 ? "Import \(numberOfSelectedAccounts) accounts" : (numberOfSelectedAccounts == 1 ? "Import one account" : "Import accounts")
+						Button(title, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -102,6 +116,8 @@ enum SelectAccountsToImportRow {
 			Button(action: action) {
 				HStack {
 					VStack(alignment: .leading, spacing: .medium2) {
+						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
+
 						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
 
 						VStack(alignment: .leading, spacing: .small3) {
@@ -115,7 +131,6 @@ enum SelectAccountsToImportRow {
 							}
 							.foregroundColor(.app.white)
 						}
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
 						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
 					}
 					Spacer()
