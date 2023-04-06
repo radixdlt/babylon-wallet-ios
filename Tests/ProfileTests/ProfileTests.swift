@@ -82,7 +82,7 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(olympiaFactorSource.factorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-			let index = profile.factorSources.babylonDevice.storage.nextForEntity(
+			let index = profile.factorSources.babylonDevice.deviceStorage.nextForEntity(
 				kind: .account,
 				networkID: profile.networkID
 			)
@@ -127,7 +127,7 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-			let index = profile.factorSources.babylonDevice.storage.nextForEntity(kind: .identity, networkID: profile.networkID)
+			let index = profile.factorSources.babylonDevice.deviceStorage.nextForEntity(kind: .identity, networkID: profile.networkID)
 
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
@@ -281,8 +281,8 @@ final class ProfileTests: TestCase {
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
 		XCTAssertNil(profile.factorSources.last.storage)
-		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
-		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
+		XCTAssertEqual(deviceFactorSource.deviceStorage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(deviceFactorSource.deviceStorage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id

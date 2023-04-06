@@ -32,7 +32,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 				curve: .curve25519,
 				networkID: nil,
 				name: "Main",
-				hdOnDeviceFactorSource: .previewValue
+				babylonFactorSource: .previewValue
 			)),
 			config: config
 		)

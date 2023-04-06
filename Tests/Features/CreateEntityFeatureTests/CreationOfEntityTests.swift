@@ -10,7 +10,7 @@ final class CreationOfEntityTests: TestCase {
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: account.displayName,
-			hdOnDeviceFactorSource: .previewValue
+			babylonFactorSource: .previewValue
 		)
 		let store = TestStore(
 			initialState: initialState,
@@ -36,7 +36,7 @@ final class CreationOfEntityTests: TestCase {
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: "NeverCreated",
-			hdOnDeviceFactorSource: .previewValue
+			babylonFactorSource: .previewValue
 		)
 		let store = TestStore(
 			initialState: initialState,
