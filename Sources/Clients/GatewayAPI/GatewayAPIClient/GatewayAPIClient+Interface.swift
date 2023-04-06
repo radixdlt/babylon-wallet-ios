@@ -8,10 +8,14 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Request
 	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
+
 	public var getEntityDetails: GetEntityDetails
 	public var getAccountDetails: GetAccountDetails
 	public var getEntityMetadata: GetEntityMetdata
 	public var getNonFungibleIds: GetNonFungibleIds
+
+        public var getEntityMetadataPage: GetEntityMetadataPage
+        // MARK: Transaction
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 	public var transactionPreview: TransactionPreview
@@ -30,6 +34,8 @@ extension GatewayAPIClient {
 	public typealias GetAccountDetails = @Sendable (AccountAddress) async throws -> AccountDetailsResponse
 
 	public typealias GetEntityMetdata = @Sendable (_ address: String) async throws -> GatewayAPI.EntityMetadataCollection
+
+        public typealias GetEntityMetadataPage = @Sendable (_ request: GatewayAPI.StateEntityMetadataPageRequest) async throws -> GatewayAPI.StateEntityMetadataPageResponse
 
 	// MARK: - state/non-fungible
 

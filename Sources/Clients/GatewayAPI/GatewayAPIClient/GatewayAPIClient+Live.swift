@@ -178,6 +178,11 @@ extension GatewayAPIClient {
 					request: GatewayAPI.StateNonFungibleIdsRequest(resourceAddress: resourceAddress)
 				) { $0.appendingPathComponent("state/non-fungible/ids") }
 			},
+                        getEntityMetadataPage: { request in
+                                try await post(request: request) {
+                                        $0.appendingPathComponent("/state/entity/page/metadata")
+                                }
+                        },
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
 					request: transactionSubmitRequest
