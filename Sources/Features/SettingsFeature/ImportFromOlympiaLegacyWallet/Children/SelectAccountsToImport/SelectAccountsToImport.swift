@@ -41,7 +41,7 @@ public struct SelectAccountsToImport: Sendable, FeatureReducer {
 			return .none
 
 		case .deselectAll:
-			state.selectedAccounts = []
+			state.selectedAccounts = nil
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):
