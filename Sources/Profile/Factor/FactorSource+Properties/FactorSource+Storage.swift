@@ -60,7 +60,7 @@ extension FactorSource.Storage {
 	}
 
 	private enum CodingKeys: String, CodingKey {
-		case discriminator, properties
+		case discriminator
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -68,21 +68,20 @@ extension FactorSource.Storage {
 		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 		switch discriminator {
 		case .securityQuestions:
-			self = try .forSecurityQuestions(container.decode(SecurityQuestionsStorage.self, forKey: .properties))
+			self = try .forSecurityQuestions(SecurityQuestionsStorage(from: decoder))
 		case .device:
-			self = try .forDevice(container.decode(DeviceStorage.self, forKey: .properties))
+			self = try .forDevice(DeviceStorage(from: decoder))
 		}
 	}
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .discriminator)
-
 		switch self {
 		case let .forSecurityQuestions(properties):
-			try container.encode(properties, forKey: .properties)
+			try properties.encode(to: encoder)
 		case let .forDevice(properties):
-			try container.encode(properties, forKey: .properties)
+			try properties.encode(to: encoder)
 		}
 	}
 }

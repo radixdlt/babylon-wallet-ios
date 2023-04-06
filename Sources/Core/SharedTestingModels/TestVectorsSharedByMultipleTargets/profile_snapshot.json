@@ -50,15 +50,13 @@
       },
       "storage" : {
         "discriminator" : "device",
-        "properties" : {
-          "nextDerivationIndicesPerNetwork" : [
-            {
-              "forAccount" : 3,
-              "forIdentity" : 2,
-              "networkID" : 11
-            }
-          ]
-        }
+        "nextDerivationIndicesPerNetwork" : [
+          {
+            "forAccount" : 3,
+            "forIdentity" : 2,
+            "networkID" : 11
+          }
+        ]
       }
     },
     {
@@ -76,14 +74,6 @@
           "cap26",
           "bip44Olympia"
         ]
-      },
-      "storage" : {
-        "discriminator" : "device",
-        "properties" : {
-          "nextDerivationIndicesPerNetwork" : [
-
-          ]
-        }
       }
     }
   ],
@@ -178,8 +168,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "givenName",
-                "familyName"
+                "familyName",
+                "givenName"
               ]
             },
             {

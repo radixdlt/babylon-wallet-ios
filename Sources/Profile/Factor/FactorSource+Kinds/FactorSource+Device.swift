@@ -30,7 +30,7 @@ extension FactorSource {
 			hint: hint, // will be changed by ProfileStore to device model+name
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: false,
-			storage: nil
+			storage: .forDevice(.init())
 		)
 		return try BabylonDeviceFactorSource(hdOnDeviceFactorSource: hdOnDeviceFactorSource)
 	}
@@ -56,7 +56,7 @@ extension FactorSource {
 			hint: hint, // will be changed by ProfileStore to device model+name
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: true,
-			storage: .forDevice(.init())
+			storage: nil
 		)
 	}
 
