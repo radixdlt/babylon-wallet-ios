@@ -25,6 +25,7 @@ public struct AccountsClient: Sendable {
 	public var hasAccountOnNetwork: HasAccountOnNetwork
 
 	public var migrateOlympiaSoftwareAccountsToBabylon: MigrateOlympiaSoftwareAccountsToBabylon
+	public var migrateOlympiaHardwareAccountsToBabylon: MigrateOlympiaHardwareAccountsToBabylon
 
 	public init(
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
@@ -34,7 +35,8 @@ public struct AccountsClient: Sendable {
 		saveVirtualAccount: @escaping SaveVirtualAccount,
 		getAccountByAddress: @escaping GetAccountByAddress,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
-		migrateOlympiaSoftwareAccountsToBabylon: @escaping MigrateOlympiaSoftwareAccountsToBabylon
+		migrateOlympiaSoftwareAccountsToBabylon: @escaping MigrateOlympiaSoftwareAccountsToBabylon,
+		migrateOlympiaHardwareAccountsToBabylon: @escaping MigrateOlympiaHardwareAccountsToBabylon
 	) {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
@@ -44,6 +46,7 @@ public struct AccountsClient: Sendable {
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
 		self.migrateOlympiaSoftwareAccountsToBabylon = migrateOlympiaSoftwareAccountsToBabylon
+		self.migrateOlympiaHardwareAccountsToBabylon = migrateOlympiaHardwareAccountsToBabylon
 	}
 }
 
@@ -60,11 +63,12 @@ extension AccountsClient {
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
-	public typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
+	public typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaSoftwareAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
+	public typealias MigrateOlympiaHardwareAccountsToBabylon = @Sendable (MigrateOlympiaHardwareAccountsToBabylonRequest) async throws -> MigratedHardwareAccounts
 }
 
-// MARK: - MigrateOlympiaAccountsToBabylonRequest
-public struct MigrateOlympiaAccountsToBabylonRequest: Sendable, Hashable {
+// MARK: - MigrateOlympiaSoftwareAccountsToBabylonRequest
+public struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable {
 	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
 	public let olympiaFactorSource: PrivateHDFactorSource
 
@@ -74,6 +78,20 @@ public struct MigrateOlympiaAccountsToBabylonRequest: Sendable, Hashable {
 	) {
 		self.olympiaAccounts = olympiaAccounts
 		self.olympiaFactorSource = olympiaFactorSource
+	}
+}
+
+// MARK: - MigrateOlympiaHardwareAccountsToBabylonRequest
+public struct MigrateOlympiaHardwareAccountsToBabylonRequest: Sendable, Hashable {
+	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
+	public let ledgerFactorSourceID: FactorSourceID
+
+	public init(
+		olympiaAccounts: Set<OlympiaAccountToMigrate>,
+		ledgerFactorSourceID: FactorSourceID
+	) {
+		self.olympiaAccounts = olympiaAccounts
+		self.ledgerFactorSourceID = ledgerFactorSourceID
 	}
 }
 
@@ -87,6 +105,30 @@ public struct MigratedAccount: Sendable, Hashable {
 	}
 }
 
+// MARK: - MigratedHardwareAccounts
+public struct MigratedHardwareAccounts: Sendable, Hashable {
+	public let networkID: NetworkID
+
+	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
+	public var babylonAccounts: Profile.Network.Accounts {
+		.init(rawValue: .init(uncheckedUniqueElements: self.accounts.rawValue.elements.map(\.babylon)))!
+	}
+
+	public init(
+		networkID: NetworkID,
+		accounts: NonEmpty<OrderedSet<MigratedAccount>>
+	) throws {
+		guard accounts.allSatisfy({ $0.babylon.networkID == networkID }) else {
+			throw NetworkIDDisrepancy()
+		}
+		guard accounts.allSatisfy({ $0.olympia.accountType == .hardware }) else {
+			throw ExpectedHardwareAccount()
+		}
+		self.networkID = networkID
+		self.accounts = accounts
+	}
+}
+
 // MARK: - MigratedSoftwareAccounts
 public struct MigratedSoftwareAccounts: Sendable, Hashable {
 	public let networkID: NetworkID
@@ -96,7 +138,6 @@ public struct MigratedSoftwareAccounts: Sendable, Hashable {
 		.init(rawValue: .init(uncheckedUniqueElements: self.accounts.rawValue.elements.map(\.babylon)))!
 	}
 
-	/// With the nextDerivation forAccount updated/
 	public let factorSourceToSave: HDOnDeviceFactorSource
 
 	public init(
@@ -107,11 +148,20 @@ public struct MigratedSoftwareAccounts: Sendable, Hashable {
 		guard accounts.allSatisfy({ $0.babylon.networkID == networkID }) else {
 			throw NetworkIDDisrepancy()
 		}
+		guard accounts.allSatisfy({ $0.olympia.accountType == .software }) else {
+			throw ExpectedSoftwareAccount()
+		}
 		self.networkID = networkID
 		self.accounts = accounts
 		self.factorSourceToSave = factorSourceToSave
 	}
 }
+
+// MARK: - ExpectedSoftwareAccount
+struct ExpectedSoftwareAccount: Error {}
+
+// MARK: - ExpectedHardwareAccount
+struct ExpectedHardwareAccount: Error {}
 
 // MARK: - NetworkIDDisrepancy
 struct NetworkIDDisrepancy: Swift.Error {}

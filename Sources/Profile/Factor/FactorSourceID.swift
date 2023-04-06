@@ -24,3 +24,9 @@ extension FactorSourceID {
 		hexCodable.hex()
 	}
 }
+
+#if DEBUG
+extension FactorSourceID {
+	public static let previewValue = try! Self(hex: .deadbeef32Bytes)
+}
+#endif // DEBUG

@@ -10,6 +10,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		public var expectedMnemonicWordCount: BIP39.WordCount?
 		public var selectedAccounts: OlympiaAccountsToImport?
 		public var mnemonicWithPassphrase: MnemonicWithPassphrase?
+		public var migratedAccounts: IdentifiedArrayOf<Profile.Network.Account> = .init()
 
 		var root: Destinations.State?
 		var path: StackState<Destinations.State> = []
@@ -25,6 +26,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
 			case addLedgerNanoFactorSource(AddLedgerNanoFactorSource.State)
+			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
@@ -33,6 +35,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case selectAccountsToImport(SelectAccountsToImport.Action)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
 			case addLedgerNanoFactorSource(AddLedgerNanoFactorSource.Action)
+			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
 
@@ -48,6 +51,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.addLedgerNanoFactorSource, action: /Action.addLedgerNanoFactorSource) {
 				AddLedgerNanoFactorSource()
+			}
+			Scope(state: /State.validateOlympiaHardwareAccounts, action: /Action.validateOlympiaHardwareAccounts) {
+				ValidateOlympiaHardwareAccounts()
 			}
 			Scope(state: /State.completion, action: /Action.completion) {
 				CompletionMigrateOlympiaAccountsToBabylon()
@@ -69,10 +75,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			privateHDFactorSource: PrivateHDFactorSource
 		)
-		case validatedOlympiaHardwareAccounts(
-			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-		)
 		case migratedOlympiaSoftwareAccounts(MigratedSoftwareAccounts)
+		case migratedOlympiaHardwareAccounts(MigratedHardwareAccounts)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -135,12 +139,26 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
 
-		case .path(.element(_, action: .addLedgerNanoFactorSource(.delegate(.completed)))):
+		case let .path(.element(_, action: .addLedgerNanoFactorSource(.delegate(.completed(ledgerFactorSourceID))))):
 			guard let hardwareAccounts = state.selectedAccounts?.hardware else {
 				assertionFailure("Bad implementation, expected 'state.selectedAccounts.hardware' to have been set.")
 				return .none
 			}
-			return validateHardwareAccounts(hardwareAccounts)
+			let destination = Destinations.State.validateOlympiaHardwareAccounts(.init(
+				hardwareAccounts: hardwareAccounts,
+				ledgerNanoFactorSourceID: ledgerFactorSourceID
+			))
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
+			return .none
+
+		case let .path(.element(_, action: .validateOlympiaHardwareAccounts(.delegate(.finishedVerifyingAccounts(validatedHardwareAccounts, ledgerNanoFactorSourceID))))):
+
+			return convertToBabylon(
+				hardwareAccounts: validatedHardwareAccounts,
+				ledgerNanoFactorSourceID: ledgerNanoFactorSourceID
+			)
 
 		case .path(.element(_, action: .completion(.delegate(.finishedMigration)))):
 			return .send(.delegate(.finishedMigration))
@@ -158,8 +176,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 		case let .migratedOlympiaSoftwareAccounts(migratedSoftwareAccounts):
+
 			if state.selectedAccounts?.hardware != nil {
-				// also need to add ledger and then migrate hardware accounts
+				state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
+				// also need to add ledger and then migrate hardware account
 				let destination = Destinations.State.addLedgerNanoFactorSource(.init())
 				if state.path.last != destination {
 					state.path.append(destination)
@@ -173,21 +193,21 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				}
 			}
 			return .none
-
-		case let .validatedOlympiaHardwareAccounts(hardwareAccounts):
-			print("TODO validate hardware...")
+		case let .migratedOlympiaHardwareAccounts(migratedHardwareAccounts):
+			state.migratedAccounts.append(contentsOf: migratedHardwareAccounts.babylonAccounts.rawValue)
+			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
+				fatalError("bad!")
+			}
+			let destination = Destinations.State.completion(.init(migratedAccounts: migratedAccounts))
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
 			return .none
 		}
 	}
 }
 
 extension ImportOlympiaWalletCoordinator {
-	private func validateHardwareAccounts(
-		_ hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	) -> EffectTask<Action> {
-		.none
-	}
-
 	private func validateSoftwareAccounts(
 		_ mnemonicWithPassphrase: MnemonicWithPassphrase,
 		softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
@@ -201,11 +221,31 @@ extension ImportOlympiaWalletCoordinator {
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				hdOnDeviceFactorSource: FactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			)
-			await send(.internal(.validatedOlympiaSoftwareAccounts(
-				softwareAccounts: softwareAccounts,
-				privateHDFactorSource: privateHDFactorSource
-			))
+			await send(
+				.internal(.validatedOlympiaSoftwareAccounts(
+					softwareAccounts: softwareAccounts,
+					privateHDFactorSource: privateHDFactorSource
+				))
 			)
+
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
+	}
+
+	private func convertToBabylon(
+		hardwareAccounts olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+		ledgerNanoFactorSourceID: FactorSourceID
+	) -> EffectTask<Action> {
+		.run { send in
+			// Migrates and saved all accounts to Profile
+			let migrated = try await accountsClient.migrateOlympiaHardwareAccountsToBabylon(
+				.init(
+					olympiaAccounts: Set(olympiaAccounts.elements),
+					ledgerFactorSourceID: ledgerNanoFactorSourceID
+				)
+			)
+			await send(.internal(.migratedOlympiaHardwareAccounts(migrated)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}

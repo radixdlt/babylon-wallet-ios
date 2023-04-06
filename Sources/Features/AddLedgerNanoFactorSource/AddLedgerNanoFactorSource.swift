@@ -12,7 +12,7 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed
+		case completed(FactorSourceID)
 	}
 
 	public init() {}
@@ -22,7 +22,10 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 		case .appeared:
 			return .none
 		case .finishedButtonTapped:
-			return .send(.delegate(.completed))
+			let factorSourceIDMocked = try! FactorSourceID(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+			return .send(.delegate(.completed(
+				factorSourceIDMocked
+			)))
 		}
 	}
 }

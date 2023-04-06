@@ -23,11 +23,12 @@ extension AddLedgerNanoFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Button("MOCK Ledger added and accounts verified") {
+					Button("MOCK Ledger added") {
 						viewStore.send(.finishedButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 				}
+				.padding(.horizontal, .medium3)
 				.onAppear { viewStore.send(.appeared) }
 			}
 		}

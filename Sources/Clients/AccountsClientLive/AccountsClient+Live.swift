@@ -20,6 +20,48 @@ extension AccountsClient: DependencyKey {
 			try await getProfileStore().network().accounts
 		}
 
+		@Sendable func migrate(
+			accounts: Set<OlympiaAccountToMigrate>,
+			factorSouceID: FactorSourceID
+		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
+			let sortedOlympia = accounts.sorted(by: \.addressIndex)
+			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
+			let accountIndexOffset = try await getAccountsOnCurrentNetwork().count
+
+			var accountsSet = OrderedSet<MigratedAccount>()
+			for olympiaAccount in sortedOlympia {
+				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
+				let address = try Profile.Network.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
+				let factorInstance = FactorInstance(
+					factorSourceID: factorSouceID,
+					publicKey: publicKey,
+					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
+				)
+				let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
+
+				let babylon = Profile.Network.Account(
+					networkID: networkID,
+					address: address,
+					securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
+					appearanceID: .fromIndex(accountIndex),
+					displayName: olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
+				)
+				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
+				accountsSet.append(migrated)
+			}
+
+			let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet)!
+
+			try await getProfileStore().updating { profile in
+				// Save all accounts
+				for account in accounts {
+					try profile.addAccount(account.babylon, shouldUpdateFactorSourceNextDerivationIndex: false)
+				}
+			}
+
+			return (accounts: accounts, networkID: networkID)
+		}
+
 		return Self(
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
@@ -43,47 +85,31 @@ extension AccountsClient: DependencyKey {
 			migrateOlympiaSoftwareAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
-				let sortedOlympia = request.olympiaAccounts.sorted(by: \.addressIndex)
-				let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
-				let accountIndexOffset = try await getAccountsOnCurrentNetwork().count
-
-				var accountsSet = OrderedSet<MigratedAccount>()
-				for olympiaAccount in sortedOlympia {
-					let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
-					let address = try Profile.Network.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
-					let factorInstance = FactorInstance(
-						factorSourceID: olympiaFactorSource.hdOnDeviceFactorSource.id,
-						publicKey: publicKey,
-						derivationPath: olympiaAccount.path.wrapAsDerivationPath()
-					)
-					let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
-
-					let babylon = Profile.Network.Account(
-						networkID: networkID,
-						address: address,
-						securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-						appearanceID: .fromIndex(accountIndex),
-						displayName: olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
-					)
-					let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
-					accountsSet.append(migrated)
-				}
-
-				let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet)!
-
-				try await getProfileStore().updating { profile in
-					// Save all accounts
-					for account in accounts {
-						try profile.addAccount(account.babylon, shouldUpdateFactorSourceNextDerivationIndex: false)
-					}
-				}
-
 				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource
+
+				let (accounts, networkID) = try await migrate(
+					accounts: request.olympiaAccounts,
+					factorSouceID: factorSource.id
+				)
 
 				let migratedAccounts = try MigratedSoftwareAccounts(
 					networkID: networkID,
 					accounts: accounts,
 					factorSourceToSave: factorSource
+				)
+
+				return migratedAccounts
+			},
+			migrateOlympiaHardwareAccountsToBabylon: { request in
+
+				let (accounts, networkID) = try await migrate(
+					accounts: request.olympiaAccounts,
+					factorSouceID: request.ledgerFactorSourceID
+				)
+
+				let migratedAccounts = try MigratedHardwareAccounts(
+					networkID: networkID,
+					accounts: accounts
 				)
 
 				return migratedAccounts
