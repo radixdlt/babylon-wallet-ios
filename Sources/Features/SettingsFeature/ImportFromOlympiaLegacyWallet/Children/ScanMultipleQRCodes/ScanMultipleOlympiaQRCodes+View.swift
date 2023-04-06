@@ -49,6 +49,6 @@ struct ScanMultipleOlympiaQRCodes_Preview: PreviewProvider {
 }
 
 extension ScanMultipleOlympiaQRCodes.State {
-	public static let previewValue: Self = .init(importedWalletInfos: .previewValue)
+	public static let previewValue: Self = .init()
 }
 #endif

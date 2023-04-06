@@ -1,5 +1,6 @@
 import AccountsClient
 import FeaturePrelude
+import ImportLegacyWalletClient
 
 extension SelectAccountsToImport.State {
 	var viewState: SelectAccountsToImport.ViewState {
@@ -160,28 +161,28 @@ enum SelectAccountsToImportRow {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - SelectAccountsToImport_Preview
-struct SelectAccountsToImport_Preview: PreviewProvider {
-	static var previews: some View {
-		SelectAccountsToImport.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: SelectAccountsToImport()
-			)
-		)
-	}
-}
-
-extension [OlympiaAccountToMigrate] {
-	public static let previewValue: Self = OrderedSet<UncheckedImportedOlympiaWalletPayload>.previewValue.flatMap { try! $0.accountsToImport() }
-}
-
-extension SelectAccountsToImport.State {
-	public static let previewValue = Self(
-		scannedAccounts: .init(rawValue: .init(uncheckedUniqueElements: Array<OlympiaAccountToMigrate>.previewValue))!
-	)
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - SelectAccountsToImport_Preview
+// struct SelectAccountsToImport_Preview: PreviewProvider {
+//	static var previews: some View {
+//		SelectAccountsToImport.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: SelectAccountsToImport()
+//			)
+//		)
+//	}
+// }
+//
+////extension [OlympiaAccountToMigrate] {
+////	public static let previewValue: Self = OrderedSet<UncheckedImportedOlympiaWalletPayload>.mocks.flatMap { try! $0.accountsToImport() }
+////}
+//
+// extension SelectAccountsToImport.State {
+//	public static let previewValue = Self(
+//		scannedAccounts: .init(rawValue: .init(uncheckedUniqueElements: Array<OlympiaAccountToMigrate>.previewValue))!
+//	)
+// }
+// #endif

@@ -64,7 +64,8 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 					switch entityKind {
 					case .account:
 						let account = try await accountsClient.createUnsavedVirtualAccount(request)
-						try await accountsClient.saveVirtualAccount(account)
+						let shouldUpdateFactorSourceNextDerivationIndex = true
+						try await accountsClient.saveVirtualAccount(account, shouldUpdateFactorSourceNextDerivationIndex)
 						return try account.cast()
 					case .identity:
 						let persona = try await personasClient.createUnsavedVirtualPersona(request)

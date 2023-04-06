@@ -62,6 +62,20 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ImportLegacyWalletClientTests"
+               BuildableName = "ImportLegacyWalletClientTests"
+               BlueprintName = "ImportLegacyWalletClientTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -547,6 +561,26 @@
                BlueprintIdentifier = "FeaturePreludeTests"
                BuildableName = "FeaturePreludeTests"
                BlueprintName = "FeaturePreludeTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ImportLegacyWalletClientTests"
+               BuildableName = "ImportLegacyWalletClientTests"
+               BlueprintName = "ImportLegacyWalletClientTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TransactionReviewFeatureTests"
+               BuildableName = "TransactionReviewFeatureTests"
+               BlueprintName = "TransactionReviewFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

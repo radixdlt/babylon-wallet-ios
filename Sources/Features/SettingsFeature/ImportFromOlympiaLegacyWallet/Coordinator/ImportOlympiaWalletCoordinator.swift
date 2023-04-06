@@ -2,6 +2,7 @@ import AccountsClient
 import AddLedgerNanoFactorSourceFeature
 import Cryptography
 import FeaturePrelude
+import ImportLegacyWalletClient
 import Profile
 
 // MARK: - ImportOlympiaWalletCoordinator
@@ -86,7 +87,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -239,7 +240,7 @@ extension ImportOlympiaWalletCoordinator {
 	) -> EffectTask<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile
-			let migrated = try await accountsClient.migrateOlympiaHardwareAccountsToBabylon(
+			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 				.init(
 					olympiaAccounts: Set(olympiaAccounts.elements),
 					ledgerFactorSourceID: ledgerNanoFactorSourceID
@@ -257,7 +258,7 @@ extension ImportOlympiaWalletCoordinator {
 	) -> EffectTask<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile
-			let migrated = try await accountsClient.migrateOlympiaSoftwareAccountsToBabylon(
+			let migrated = try await importLegacyWalletClient.migrateOlympiaSoftwareAccountsToBabylon(
 				.init(
 					olympiaAccounts: Set(olympiaAccounts.elements),
 					olympiaFactorSource: factorSource

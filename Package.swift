@@ -245,6 +245,7 @@ package.addModules([
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"GeneralSettings",
+			"ImportLegacyWalletClient",
 			"InspectProfileFeature",
 			"MnemonicClient",
 			"P2PLinksFeature",
@@ -414,7 +415,17 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.client(
+		name: "ImportLegacyWalletClient",
+		dependencies: [
+			"AccountsClient",
+			"EngineToolkitClient",
+			.product(name: "Parsing", package: "swift-parsing") {
+				.package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.12.0")
+			},
+		],
+		tests: .yes()
+	),
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],

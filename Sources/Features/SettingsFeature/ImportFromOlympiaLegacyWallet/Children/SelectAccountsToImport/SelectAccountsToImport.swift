@@ -1,5 +1,6 @@
 import AccountsClient
 import FeaturePrelude
+import ImportLegacyWalletClient
 
 // MARK: - SelectAccountsToImport
 public struct SelectAccountsToImport: Sendable, FeatureReducer {

@@ -14,11 +14,9 @@ extension AccountsClient: TestDependencyKey {
 		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAccountsOnNetwork: { _ in throw NoopError() },
 		createUnsavedVirtualAccount: { _ in throw NoopError() },
-		saveVirtualAccount: { _ in },
+		saveVirtualAccount: { _, _ in },
 		getAccountByAddress: { _ in throw NoopError() },
-		hasAccountOnNetwork: { _ in false },
-		migrateOlympiaSoftwareAccountsToBabylon: { _ in throw NoopError() },
-		migrateOlympiaHardwareAccountsToBabylon: { _ in throw NoopError() }
+		hasAccountOnNetwork: { _ in false }
 	)
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
@@ -28,8 +26,6 @@ extension AccountsClient: TestDependencyKey {
 		createUnsavedVirtualAccount: unimplemented("\(Self.self).createUnsavedVirtualAccount"),
 		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),
-		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
-		migrateOlympiaSoftwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaSoftwareAccountsToBabylon"),
-		migrateOlympiaHardwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaHardwareAccountsToBabylon")
+		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork")
 	)
 }

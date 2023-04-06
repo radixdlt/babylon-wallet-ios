@@ -1,5 +1,6 @@
 import AccountsClient // FIXME: move `OlympiaAccountToMigrate` to shared models?
 import FeaturePrelude
+import ImportLegacyWalletClient
 
 // MARK: - ValidateOlympiaHardwareAccounts
 public struct ValidateOlympiaHardwareAccounts: Sendable, FeatureReducer {
