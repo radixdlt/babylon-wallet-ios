@@ -584,6 +584,26 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ImportLegacyWalletClientTests"
+               BuildableName = "ImportLegacyWalletClientTests"
+               BlueprintName = "ImportLegacyWalletClientTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TransactionReviewFeatureTests"
+               BuildableName = "TransactionReviewFeatureTests"
+               BlueprintName = "TransactionReviewFeatureTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
