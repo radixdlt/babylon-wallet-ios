@@ -7,15 +7,15 @@ public struct AccountPortfolio: Sendable, Hashable, Identifiable {
 	public var id: ID { owner }
 
 	public let owner: AccountAddress
-	public var fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>
-	public var nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>
+	public var fungibleTokenContainers: PaginatedResourceContainer<IdentifiedArrayOf<FungibleTokenContainer>>
+	public var nonFungibleTokenContainers: PaginatedResourceContainer<IdentifiedArrayOf<NonFungibleTokenContainer>>
 	public var poolUnitContainers: IdentifiedArrayOf<PoolUnitContainer>
 	public var badgeContainers: IdentifiedArrayOf<BadgeContainer>
 
 	public init(
 		owner: AccountAddress,
-		fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>,
-		nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>,
+		fungibleTokenContainers: PaginatedResourceContainer<IdentifiedArrayOf<FungibleTokenContainer>>,
+		nonFungibleTokenContainers: PaginatedResourceContainer<IdentifiedArrayOf<NonFungibleTokenContainer>>,
 		poolUnitContainers: IdentifiedArrayOf<PoolUnitContainer>,
 		badgeContainers: IdentifiedArrayOf<BadgeContainer>
 	) {
@@ -28,11 +28,6 @@ public struct AccountPortfolio: Sendable, Hashable, Identifiable {
 }
 
 // MARK: - Computed Properties
-extension AccountPortfolio {
-	public var worth: BigDecimal? {
-		fungibleTokenContainers.compactMap(\.worth).reduce(0, +)
-	}
-}
 
 extension AccountPortfolio {
 	public static func empty(
@@ -40,8 +35,8 @@ extension AccountPortfolio {
 	) -> AccountPortfolio {
 		.init(
 			owner: owner,
-			fungibleTokenContainers: [],
-			nonFungibleTokenContainers: [],
+                        fungibleTokenContainers: .init(loaded: []),
+			nonFungibleTokenContainers: .init(loaded: []),
 			poolUnitContainers: [],
 			badgeContainers: []
 		)

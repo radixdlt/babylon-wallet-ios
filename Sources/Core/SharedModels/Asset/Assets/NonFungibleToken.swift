@@ -18,10 +18,10 @@ public struct NonFungibleToken: Sendable, Token, Hashable {
 // MARK: - NonFungibleTokenContainer
 public struct NonFungibleTokenContainer: Sendable, Identifiable, Hashable {
 	public let owner: AccountAddress
-	public let resourceAddress: ComponentAddress
-	public var assets: [NonFungibleToken]
+	public let resourceAddress: ResourceAddress
+	public var assets: PaginatedResourceContainer<[NonFungibleToken]>
 
-	public typealias ID = ComponentAddress
+	public typealias ID = ResourceAddress
 	public var id: ID { resourceAddress }
 
 	public let name: String?
@@ -30,8 +30,8 @@ public struct NonFungibleTokenContainer: Sendable, Identifiable, Hashable {
 
 	public init(
 		owner: AccountAddress,
-		resourceAddress: ComponentAddress,
-		assets: [NonFungibleToken],
+		resourceAddress: ResourceAddress,
+		assets: PaginatedResourceContainer<[NonFungibleToken]>,
 		name: String?,
 		description: String?,
 		iconURL: URL?
@@ -50,7 +50,7 @@ extension NonFungibleTokenContainer {
 	public static let mock1 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-1"),
-		assets: [.mock1, .mock2, .mock3],
+                assets: .init(loaded: [.mock1, .mock2, .mock3]),
 		name: "Mock Resource 1",
 		description: "A description for Mock Resource 1",
 		iconURL: nil
@@ -59,7 +59,7 @@ extension NonFungibleTokenContainer {
 	public static let mock2 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-2"),
-		assets: [.mock1, .mock2, .mock3],
+		assets: .init(loaded: [.mock1, .mock2, .mock3]),
 		name: "Name",
 		description: nil,
 		iconURL: nil
@@ -68,7 +68,7 @@ extension NonFungibleTokenContainer {
 	public static let mock3 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-3"),
-		assets: [.mock1, .mock2, .mock3],
+		assets: .init(loaded: [.mock1, .mock2, .mock3]),
 		name: "Name",
 		description: nil,
 		iconURL: nil

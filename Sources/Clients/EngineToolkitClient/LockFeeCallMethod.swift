@@ -1,5 +1,6 @@
 import ClientPrelude
 import EngineToolkit
+import Cryptography
 
 extension EngineToolkitClient {
 	public func lockFeeCallMethod(
@@ -90,39 +91,43 @@ extension EngineToolkitClient {
 		tokenName: String = "Token Test",
 		tokenDescription: String = "A very innovative and important resource.",
 		tokenSymbol: String = "TEST",
-		initialSupply: String = "21000000"
-	) throws -> TransactionManifest {
-		let faucetAddress = try faucetAddress(for: networkID)
-		let instructions: [any InstructionProtocol] = [
-			lockFeeCallMethod(address: faucetAddress),
+		initialSupply: String = "21000000",
+                tokensCount: Int = 100
+        ) throws -> TransactionManifest {
+                let faucetAddress = try faucetAddress(for: networkID)
+                let tokens = stride(from: 0, to: tokensCount, by: 1).map { _ in
+                        CreateFungibleResourceWithInitialSupply(
+                                divisibility: tokenDivisivility,
+                                metadata: Map_(
+                                        keyValueKind: .string,
+                                        valueValueKind: .string,
+                                        entries: [
+                                                [.string("name"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
+                                                [.string("symbol"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
+                                                [.string("description"), .string(tokenDescription)],
+                                        ]
+                                ),
 
-			CreateFungibleResourceWithInitialSupply(
-				divisibility: tokenDivisivility,
-				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
-					entries: [
-						[.string("name"), .string(tokenName)],
-						[.string("symbol"), .string(tokenSymbol)],
-						[.string("description"), .string(tokenDescription)],
-					]
-				),
-
-				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
-					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-					]
-				),
-				initialSupply: .decimal(.init(value: initialSupply))
-			),
-
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
-			},
-		]
+                                accessRules: .init(
+                                        keyValueKind: .enum,
+                                        valueValueKind: .tuple,
+                                        entries: [
+                                                [.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+                                                [.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+                                        ]
+                                ),
+                                initialSupply: .decimal(.init(value: initialSupply))
+                        )
+                }
+                let instructions: [any InstructionProtocol] = [
+                        lockFeeCallMethod(address: faucetAddress)
+                ] +
+                tokens +
+                [
+                        CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+                                Expression(stringLiteral: "ENTIRE_WORKTOP")
+                        }
+                ]
 
 		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
@@ -131,52 +136,91 @@ extension EngineToolkitClient {
 		networkID: NetworkID,
 		accountAddress: AccountAddress,
 		nftName: String = "NFT Test",
-		nftDescription: String = "Artsy cool unique NFT"
+		nftDescription: String = "Artsy cool unique NFT",
+                tokensCount: Int = 10,
+                idsCount: Int = 300
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
-		let instructions: [any InstructionProtocol] = [
-			lockFeeCallMethod(address: faucetAddress),
+                let ids = stride(from: 0, to: idsCount, by: 1).map {
+                        [ManifestASTValue.nonFungibleLocalId(.integer(UInt64($0))), .tuple([.tuple(
+                                [.string("Hello World \($0)"), .decimal(.init(value: "\($0)"))]
+                        )])]
+                }
 
-			try CreateNonFungibleResourceWithInitialSupply(
-				idType: .init(.string("NonFungibleIdType::Integer")),
-				schema: [
-					.tuple([
-						.array(.init(elementKind: .enum, elements: [])),
-						.array(.init(elementKind: .tuple, elements: [])),
-						.array(.init(elementKind: .enum, elements: [])),
-					]),
-					.enum(.init(.u8(0), fields: [.u8(64)])),
-					.array(.init(elementKind: .string, elements: [])),
-				],
-				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
-					entries: [
-						[.string("name"), .string(nftName)],
-						[.string("description"), .string(nftDescription)],
-					]
-				),
-				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
-					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-					]
-				),
-				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
-						[.nonFungibleLocalId(.integer(1)), .tuple([.tuple(
-							[.string("Hello World"), .decimal(.init(value: "12"))]
-						)])],
-					])
-				)
-			),
+                let tokens = try stride(from: 0, to: tokensCount, by: 1).map { _ in
+                        try CreateNonFungibleResourceWithInitialSupply(
+                                idType: .init(.string("NonFungibleIdType::Integer")),
+                                schema: [
+                                        .tuple([
+                                                .array(.init(elementKind: .enum, elements: [])),
+                                                .array(.init(elementKind: .tuple, elements: [])),
+                                                .array(.init(elementKind: .enum, elements: [])),
+                                        ]),
+                                        .enum(.init(.u8(0), fields: [.u8(64)])),
+                                        .array(.init(elementKind: .string, elements: [])),
+                                ],
+                                metadata: Map_(
+                                        keyValueKind: .string,
+                                        valueValueKind: .string,
+                                        entries: [
+                                                [.string("name"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
+                                                [.string("description"), .string(nftDescription)],
+                                        ]
+                                ),
+                                accessRules: .init(
+                                        keyValueKind: .enum,
+                                        valueValueKind: .tuple,
+                                        entries: [
+                                                [.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+                                                [.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+                                        ]
+                                ),
+                                initialSupply: .map(
+                                        .init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: ids)
+                                )
+                        )
+                }
 
-			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-				Expression(stringLiteral: "ENTIRE_WORKTOP")
-			},
-		]
+		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+                        Expression(stringLiteral: "ENTIRE_WORKTOP")
+                }]
+
+//			try CreateNonFungibleResourceWithInitialSupply(
+//				idType: .init(.string("NonFungibleIdType::Integer")),
+//				schema: [
+//					.tuple([
+//						.array(.init(elementKind: .enum, elements: [])),
+//						.array(.init(elementKind: .tuple, elements: [])),
+//						.array(.init(elementKind: .enum, elements: [])),
+//					]),
+//					.enum(.init(.u8(0), fields: [.u8(64)])),
+//					.array(.init(elementKind: .string, elements: [])),
+//				],
+//				metadata: Map_(
+//					keyValueKind: .string,
+//					valueValueKind: .string,
+//					entries: [
+//						[.string("name"), .string(nftName)],
+//						[.string("description"), .string(nftDescription)],
+//					]
+//				),
+//				accessRules: .init(
+//					keyValueKind: .enum,
+//					valueValueKind: .tuple,
+//					entries: [
+//						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+//						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+//					]
+//				),
+//				initialSupply: .map(
+//					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: ids)
+//				)
+//			),
+//
+//			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+//				Expression(stringLiteral: "ENTIRE_WORKTOP")
+//			},
+//		]
 
 		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))
 	}

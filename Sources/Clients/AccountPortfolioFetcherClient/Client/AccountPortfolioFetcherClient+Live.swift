@@ -1,56 +1,92 @@
 import ClientPrelude
 import GatewayAPI
+import EngineToolkitClient
 
 // MARK: - AccountPortfolioFetcherClient + DependencyKey
 extension AccountPortfolioFetcherClient: DependencyKey {
 	public static let liveValue: Self = {
 		let fetchPortfolioForAccount: FetchPortfolioForAccount = { (accountAddress: AccountAddress) async throws -> AccountPortfolio in
-			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+                        @Dependency(\.gatewayAPIClient) var gatewayAPIClient
+                        @Dependency(\.engineToolkitClient) var engineToolkitClient
 
-			let resourcesResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
-			var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
+                        let response = try await gatewayAPIClient.getAccountDetails(accountAddress)
+                        let networkID = try Radix.Network.lookupBy(name: response.ledgerState.network).id
 
-			let tmpMaxRequestAmount = 999 // TODO: remove once pagination is implemented
-			let fungibleTokenAddresses = Array(accountPortfolio.fungibleTokenContainers.map(\.asset.resourceAddress).prefix(tmpMaxRequestAmount))
-			let nonFungibleTokenAddresses = Array(accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress).prefix(tmpMaxRequestAmount))
+                        let accountDetails = response.details
+                        let fungibleResources = accountDetails.fungibleResources
+                        let nonFungibleResources = accountDetails.nonFungibleResources
 
-			if fungibleTokenAddresses.isEmpty, nonFungibleTokenAddresses.isEmpty {
-				return .empty(owner: accountAddress)
-			}
+                        let pageSize = 20
+                        let fungibleResourceItems = fungibleResources?.items.compactMap(\.global) ?? []
+                        let nonFungibleResourceItems = nonFungibleResources?.items.compactMap(\.global) ?? []
 
-			if !fungibleTokenAddresses.isEmpty {
-				let response = try await gatewayAPIClient.getEntityDetails(fungibleTokenAddresses.map(\.address))
-				accountPortfolio.updateFungibleTokens(with: response)
-			}
+                        @Sendable
+                        func loadResourceDetails(_ addresses: [String]) async throws -> [GatewayAPI.StateEntityDetailsResponseItem] {
+                                try await addresses
+                                        .chunks(ofCount: pageSize)
+                                        .map(Array.init)
+                                        .parallelMap(gatewayAPIClient.getEntityDetails)
+                                        .flatMap(\.items)
+                        }
 
-			if !nonFungibleTokenAddresses.isEmpty {
-				let response = try await gatewayAPIClient.getEntityDetails(nonFungibleTokenAddresses.map(\.address))
-				accountPortfolio.updateNonFungibleTokens(with: response)
+                        @Sendable
+                        func createFungibleToken(_ response: GatewayAPI.StateEntityDetailsResponseItem) throws -> FungibleTokenContainer {
+                                let resourceAddress = ResourceAddress(address: response.address)
+                                let metadata = response.metadata
+                                let isXRD = (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false
 
-				try await withThrowingTaskGroup(
-					of: (ComponentAddress, [String]).self,
-					returning: Void.self,
-					body: { taskGroup in
-						for resourceAddress in nonFungibleTokenAddresses {
-							taskGroup.addTask {
-								try Task.checkCancellation()
-								let response = try await gatewayAPIClient.getNonFungibleIds(resourceAddress.address)
+                                let token = FungibleToken(
+                                        resourceAddress: resourceAddress,
+                                        divisibility: response.details?.fungible?.divisibility,
+                                        tokenDescription: metadata.description,
+                                        name: metadata.name,
+                                        symbol: metadata.symbol,
+                                        isXRD: isXRD
+                                )
 
-								let nonFungibleLocalIds = response.nonFungibleIds.items.map(\.nonFungibleId)
-								return (resourceAddress, nonFungibleLocalIds)
-							}
-						}
+                                let amount = fungibleResourceItems.first(where: { $0.resourceAddress == resourceAddress.address })?.amount ?? "0"
+                                return try FungibleTokenContainer(owner: accountAddress,
+                                                                  asset: token,
+                                                                  amount: BigDecimal(fromString: amount),
+                                                                  worth: nil)
+                        }
 
-						for try await result in taskGroup {
-							accountPortfolio.updateNonFungibleTokens(
-								idsResponse: result
-							)
-						}
-					}
-				)
-			}
+                        @Sendable
+                        func createNonFungibleToken(_ response: GatewayAPI.StateEntityDetailsResponseItem) async throws -> NonFungibleTokenContainer {
+                                let resourceAddress = ResourceAddress(address: response.address)
+                                let metadata = response.metadata
 
-			return accountPortfolio
+                                let idsResponse = try await gatewayAPIClient.getNonFungibleIds(resourceAddress.address).nonFungibleIds
+                                let idsCollection = PaginatedResourceContainer(
+                                        loaded: idsResponse.items.map { NonFungibleToken(nonFungibleLocalId: .string($0.nonFungibleId)) },
+                                        totalCount: idsResponse.totalCount.map(Int.init),
+                                        nextPageCursor: idsResponse.nextCursor
+                                )
+
+                                return NonFungibleTokenContainer(
+                                        owner: accountAddress,
+                                        resourceAddress: resourceAddress,
+                                        assets: idsCollection,
+                                        name: metadata.name,
+                                        description: metadata.description,
+                                        iconURL: nil)
+                        }
+
+                        async let loadFungibleResourceContainer = loadResourceDetails(fungibleResourceItems.map(\.resourceAddress)).map(createFungibleToken)
+                        async let loadNonFungibleResourceContainer = loadResourceDetails(nonFungibleResourceItems.map(\.resourceAddress)).asyncMap(createNonFungibleToken)
+
+                        let (fungibleResourceContainers, nonFungbileResourceContainers) = try await (loadFungibleResourceContainer, loadNonFungibleResourceContainer)
+
+
+                        return AccountPortfolio(owner: accountAddress,
+                                                fungibleTokenContainers: .init(loaded: .init(uniqueElements: fungibleResourceContainers),
+                                                                               totalCount: fungibleResources?.totalCount.map(Int.init),
+                                                                               nextPageCursor: fungibleResources?.nextCursor),
+                                                nonFungibleTokenContainers: .init(loaded: .init(uniqueElements: nonFungbileResourceContainers),
+                                                                                  totalCount: nonFungibleResources?.totalCount.map(Int.init),
+                                                                                  nextPageCursor: nonFungibleResources?.nextCursor),
+                                                poolUnitContainers: [],
+                                                badgeContainers: [])
 		}
 
 		return Self(
@@ -97,78 +133,6 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
         }
 }
 
-extension AccountPortfolioFetcherClient {
-        typealias FungibleResourceCollection = ResourceCollection<FungibleToken>
-        typealias NonFungibleResourceCollection = ResourceCollection<NonFungibleToken>
-        struct ResourceCollection<Resource> {
-                var totalCount: Int
-                var loaded: [Resource]
-
-                // The cursor for the next page to load if present
-                var nextPageCursor: String?
-        }
-
-        static func fetchPortfolioForAccount(_ accountAddress: AccountAddress) async throws {
-                @Dependency(\.gatewayAPIClient) var gatewayAPIClient
-                @Dependency(\.engineToolkitClient) var engineToolkitClient
-
-                var accountDetailsResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
-                let fungibleResources = accountDetailsResponse.details.fungibleResources
-                let nonFungibleResources = accountDetailsResponse.details.nonFungibleResources
-
-                let networkID = try Radix.Network.lookupBy(name: accountDetailsResponse.ledgerState.network).id
-
-                let pageSize = 19 // TODO: remove once pagination is implemented
-                let fungibleTokenAddresses = fungibleResources?.items.compactMap(\.global?.resourceAddress).chunks(ofCount: pageSize).map(Array.init)
-                let nonFungibleTokenAddresses = nonFungibleResources?.items.compactMap(\.global?.resourceAddress).chunks(ofCount: pageSize).map(Array.init)
-
-                let (fungibleTokenDetails, nonFungibleTokenDetails) = try await Task {
-                        async let fungibleTokenDetails = try fungibleTokenAddresses?
-                                .parallelMap(gatewayAPIClient.getEntityDetails)
-                                .compactMap(\.items.first)
-                                .map { response in
-                                let resourceAddress = ResourceAddress(address: response.address)
-                                let metadata = response.metadata
-                                let isXRD = (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false
-
-                                let token = FungibleToken(
-                                        resourceAddress: resourceAddress,
-                                              divisibility: response.details?.fungible?.divisibility,
-                                              tokenDescription: metadata.description,
-                                              name: metadata.name,
-                                              symbol: metadata.symbol,
-                                              isXRD: isXRD
-                                )
-
-                                return FungibleTokenContainer(owner: accountAddress, asset: token, amount: resp, worth: <#T##BigDecimal?#>)
-
-                        }
-                        async let nonFungibleTokenDetails = try nonFungibleTokenAddresses?
-                                .parallelMap(gatewayAPIClient.getEntityDetails)
-                                .compactMap(\.items.first)
-                                .map {
-
-                                        return NonFungibleTokenContainer(owner: <#T##AccountAddress#>, resourceAddress: <#T##ComponentAddress#>, assets: <#T##[NonFungibleToken]#>, name: <#T##String?#>, description: <#T##String?#>, iconURL: <#T##URL?#>)
-                                }
-
-                        return try await (fungibleTokenDetails, nonFungibleTokenDetails)
-                }.result.get()
-
-                // for each token detail download its details
-
-//                let fungibleResources = accountDetailsResponse.details.fungibleResources
-//                if let nextCursor = fungibleResources?.nextCursor {
-//                        // Load the rest of fungible resources info
-//
-//                }
-//
-//                let nonFungibleResources = accountDetailsResponse.details.nonFungibleResources
-//
-//                if let nextCursor = nonFungibleResources?.nextCursor {
-//                        // Load the rest of non fungible resources info
-//                }
-        }
-}
 
 extension GatewayAPI.StateEntityDetailsResponse: @unchecked Sendable {}
 
@@ -192,7 +156,9 @@ extension AccountPortfolioFetcherClient {
 		guard let portfolio = try? await fetchPortfolioForAccount(accountAddress) else {
 			return nil
 		}
-		return portfolio.fungibleTokenContainers
+                return portfolio
+                        .fungibleTokenContainers
+                        .loaded
 			.first(where: \.asset.isXRD)
 	}
 }

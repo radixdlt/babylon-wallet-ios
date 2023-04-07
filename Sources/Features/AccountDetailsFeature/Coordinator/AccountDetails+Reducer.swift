@@ -17,7 +17,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account
 
-			let fungibleTokenCategories = account.portfolio.fungibleTokenContainers.elements.sortedIntoCategories()
+                        let fungibleTokenCategories = account.portfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 			assets = .init(
 				fungibleTokenList: .init(
@@ -37,7 +37,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				),
 
 				nonFungibleTokenList: .init(
-					rows: .init(uniqueElements: account.portfolio.nonFungibleTokenContainers.elements.map {
+					rows: .init(uniqueElements: account.portfolio.nonFungibleTokenContainers.map {
 						.init(container: $0)
 					})
 				)

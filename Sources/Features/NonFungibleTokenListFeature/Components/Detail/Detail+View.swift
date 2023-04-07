@@ -161,7 +161,7 @@ extension NonFungibleTokenList.Detail.State {
 		container: NonFungibleTokenContainer(
 			owner: try! .init(address: "owner_address"),
 			resourceAddress: .init(address: "resource_address"),
-			assets: [.mock1, .mock2, .mock3],
+			assets: .init(loaded: [.mock1, .mock2, .mock3]),
 			name: "NFT Collection",
 			description: "A collection of NFTs",
 			iconURL: nil
