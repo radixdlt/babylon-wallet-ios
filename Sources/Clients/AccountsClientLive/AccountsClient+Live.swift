@@ -10,9 +10,9 @@ extension AccountsClient: DependencyKey {
 	public static func live(
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
-		let saveVirtualAccount: SaveVirtualAccount = { account, shouldUpdateFactorSourceNextDerivationIndex in
+		let saveVirtualAccount: SaveVirtualAccount = { request in
 			try await getProfileStore().updating {
-				try $0.addAccount(account, shouldUpdateFactorSourceNextDerivationIndex: shouldUpdateFactorSourceNextDerivationIndex)
+				try $0.addAccount(request.account, shouldUpdateFactorSourceNextDerivationIndex: request.shouldUpdateFactorSourceNextDerivationIndex)
 			}
 		}
 

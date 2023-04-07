@@ -45,10 +45,10 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 			// Save all accounts
 			for account in accounts {
-				try await accountsClient.saveVirtualAccount(
-					account.babylon,
-					false // shouldUpdateFactorSourceNextDerivationIndex
-				)
+				try await accountsClient.saveVirtualAccount(.init(
+					account: account.babylon,
+					shouldUpdateFactorSourceNextDerivationIndex: false
+				))
 			}
 
 			return (accounts: accounts, networkID: networkID)
