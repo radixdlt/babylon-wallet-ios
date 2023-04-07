@@ -10,7 +10,7 @@ final class NewConnectionTests: TestCase {
 		let store = TestStore(
 			// GIVEN
 			// initial state
-			initialState: NewConnection.State.scanQR(.init(scanInstructions: scanInstruction, step: .doScanQR(.init(scanInstructions: scanInstruction)))),
+			initialState: NewConnection.State.scanQR(.init(scanInstructions: scanInstruction, step: .scanQR(.init(scanInstructions: scanInstruction)))),
 			reducer: NewConnection()
 		)
 		let password = ConnectionPassword.placeholder
@@ -19,11 +19,11 @@ final class NewConnectionTests: TestCase {
 
 		// WHEN
 		// secrets are scanned
-		await store.send(.child(.scanQR(.child(.doScanQR(.view(.scanned(.success(
+		await store.send(.child(.scanQR(.child(.scanQR(.view(.scanned(.success(
 			qrString
 		))))))))
 
-		await store.receive(.child(.scanQR(.child(.doScanQR(.delegate(.scanned(qrString)))))))
+		await store.receive(.child(.scanQR(.child(.scanQR(.delegate(.scanned(qrString)))))))
 		await store.receive(.child(.scanQR(.delegate(.scanned(qrString)))))
 
 		// THEN

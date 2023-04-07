@@ -23,7 +23,7 @@ extension NewConnection {
 						CaseLet(
 							state: /NewConnection.State.scanQR,
 							action: { NewConnection.Action.child(.scanQR($0)) },
-							then: { ScanQR.View(store: $0) }
+							then: { ScanQRCoordinator.View(store: $0) }
 						)
 
 						CaseLet(

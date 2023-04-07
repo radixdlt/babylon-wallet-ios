@@ -26,7 +26,7 @@ extension ScanMultipleOlympiaQRCodes {
 				CaseLet(
 					state: /ScanMultipleOlympiaQRCodes.State.Step.scanQR,
 					action: { ScanMultipleOlympiaQRCodes.Action.child(.scanQR($0)) },
-					then: { ScanQR.View(store: $0) }
+					then: { ScanQRCoordinator.View(store: $0) }
 				)
 			}
 		}

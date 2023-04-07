@@ -1,26 +1,26 @@
 import FeaturePrelude
 
-// MARK: - ScanQR.View
-extension ScanQR {
+// MARK: - ScanQRCoordinator.View
+extension ScanQRCoordinator {
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ScanQR>
+		private let store: StoreOf<ScanQRCoordinator>
 
-		public init(store: StoreOf<ScanQR>) {
+		public init(store: StoreOf<ScanQRCoordinator>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
 			SwitchStore(store.scope(state: \.step)) {
 				CaseLet(
-					state: /ScanQR.State.Step.cameraPermission,
-					action: { ScanQR.Action.child(.cameraPermission($0)) },
+					state: /ScanQRCoordinator.State.Step.cameraPermission,
+					action: { ScanQRCoordinator.Action.child(.cameraPermission($0)) },
 					then: { CameraPermission.View(store: $0) }
 				)
 				CaseLet(
-					state: /ScanQR.State.Step.doScanQR,
-					action: { ScanQR.Action.child(.doScanQR($0)) },
-					then: { DoScanQR.View(store: $0) }
+					state: /ScanQRCoordinator.State.Step.scanQR,
+					action: { ScanQRCoordinator.Action.child(.scanQR($0)) },
+					then: { ScanQR.View(store: $0) }
 				)
 			}
 		}
@@ -32,16 +32,16 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct ScannQR_Preview: PreviewProvider {
 	static var previews: some View {
-		ScanQR.View(
+		ScanQRCoordinator.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: ScanQR()
+				reducer: ScanQRCoordinator()
 			)
 		)
 	}
 }
 
-extension ScanQR.State {
+extension ScanQRCoordinator.State {
 	public static let previewValue: Self = .init(scanInstructions: "Preview")
 }
 #endif

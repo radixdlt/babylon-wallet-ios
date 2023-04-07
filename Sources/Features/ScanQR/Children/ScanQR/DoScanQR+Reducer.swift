@@ -1,8 +1,8 @@
 import CameraPermissionClient
 import FeaturePrelude
 
-// MARK: - DoScanQR
-public struct DoScanQR: Sendable, FeatureReducer {
+// MARK: - ScanQR
+public struct ScanQR: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let scanInstructions: String
 		public let scanMode: QRScanMode

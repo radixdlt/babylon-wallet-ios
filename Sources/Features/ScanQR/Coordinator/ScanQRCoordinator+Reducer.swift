@@ -1,11 +1,11 @@
 import FeaturePrelude
 
-// MARK: - ScanQR
-public struct ScanQR: Sendable, FeatureReducer {
+// MARK: - ScanQRCoordinator
+public struct ScanQRCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
 			case cameraPermission(CameraPermission.State)
-			case doScanQR(DoScanQR.State)
+			case scanQR(ScanQR.State)
 
 			public init() {
 				self = .cameraPermission(.init())
@@ -29,7 +29,7 @@ public struct ScanQR: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case cameraPermission(CameraPermission.Action)
-		case doScanQR(DoScanQR.Action)
+		case scanQR(ScanQR.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -50,10 +50,10 @@ public struct ScanQR: Sendable, FeatureReducer {
 				CameraPermission()
 			}
 			Scope(
-				state: /State.Step.doScanQR,
-				action: /Action.child .. ChildAction.doScanQR
+				state: /State.Step.scanQR,
+				action: /Action.child .. ChildAction.scanQR
 			) {
-				DoScanQR()
+				ScanQR()
 			}
 		}
 	}
@@ -69,13 +69,13 @@ public struct ScanQR: Sendable, FeatureReducer {
 		switch childAction {
 		case let .cameraPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				state.step = .doScanQR(.init(scanInstructions: state.scanInstructions))
+				state.step = .scanQR(.init(scanInstructions: state.scanInstructions))
 				return .none
 			} else {
 				return .run { send in await send(.delegate(.dismiss)) }
 			}
 
-		case let .doScanQR(.delegate(.scanned(content))):
+		case let .scanQR(.delegate(.scanned(content))):
 			return .send(.delegate(.scanned(content)))
 
 		default:

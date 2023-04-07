@@ -4,21 +4,21 @@ import FeaturePrelude
 import CodeScanner
 #endif // iOS
 
-extension DoScanQR.State {
-	var viewState: DoScanQR.ViewState {
+extension ScanQR.State {
+	var viewState: ScanQR.ViewState {
 		.init(state: self)
 	}
 }
 
-// MARK: - DoScanQR.View
-extension DoScanQR {
+// MARK: - ScanQR.View
+extension ScanQR {
 	public struct ViewState: Equatable {
 		public let scanMode: QRScanMode
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 		#endif // macOS
 		public let instructions: String
-		init(state: DoScanQR.State) {
+		init(state: ScanQR.State) {
 			scanMode = state.scanMode
 			instructions = state.scanInstructions
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
@@ -29,9 +29,9 @@ extension DoScanQR {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<DoScanQR>
+		private let store: StoreOf<ScanQR>
 
-		public init(store: StoreOf<DoScanQR>) {
+		public init(store: StoreOf<ScanQR>) {
 			self.store = store
 		}
 
@@ -79,10 +79,10 @@ public enum QRScanMode: Sendable, Hashable {
 	#endif
 }
 
-extension DoScanQR.View {
+extension ScanQR.View {
 	@ViewBuilder
 	private func scanQRCode(
-		viewStore: ViewStoreOf<DoScanQR>
+		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
@@ -111,7 +111,7 @@ extension DoScanQR.View {
 
 	@ViewBuilder
 	private func macOSInputView(
-		viewStore: ViewStoreOf<DoScanQR>
+		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {
@@ -139,16 +139,16 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct ScanQR_Preview: PreviewProvider {
 	static var previews: some View {
-		DoScanQR.View(
+		ScanQR.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: DoScanQR()
+				reducer: ScanQR()
 			)
 		)
 	}
 }
 
-extension DoScanQR.State {
+extension ScanQR.State {
 	public static let previewValue: Self = .init(scanInstructions: "Preview")
 }
 #endif

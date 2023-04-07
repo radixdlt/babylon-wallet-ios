@@ -9,7 +9,7 @@ import ScanQRFeature
 public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
-			case scanQR(ScanQR.State)
+			case scanQR(ScanQRCoordinator.State)
 
 			public init() {
 				self = .scanQR(.init(scanInstructions: L10n.ImportLegacyWallet.ScanQRCodes.scanInstructions))
@@ -33,7 +33,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case scanQR(ScanQR.Action)
+		case scanQR(ScanQRCoordinator.Action)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -53,7 +53,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		Scope(state: \.step, action: /Action.self) {
 			EmptyReducer()
 				.ifCaseLet(/State.Step.scanQR, action: /Action.child .. ChildAction.scanQR) {
-					ScanQR()
+					ScanQRCoordinator()
 				}
 		}
 

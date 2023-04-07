@@ -6,7 +6,7 @@ import ScanQRFeature
 public struct NewConnection: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
 		case localNetworkPermission(LocalNetworkPermission.State)
-		case scanQR(ScanQR.State)
+		case scanQR(ScanQRCoordinator.State)
 		case connectUsingSecrets(ConnectUsingSecrets.State)
 
 		public init() {
@@ -20,7 +20,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case localNetworkPermission(LocalNetworkPermission.Action)
-		case scanQR(ScanQR.Action)
+		case scanQR(ScanQRCoordinator.Action)
 		case connectUsingSecrets(ConnectUsingSecrets.Action)
 	}
 
@@ -44,7 +44,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 			}
 
 			.ifCaseLet(/State.scanQR, action: /Action.child .. ChildAction.scanQR) {
-				ScanQR()
+				ScanQRCoordinator()
 			}
 			.ifCaseLet(/State.connectUsingSecrets, action: /Action.child .. ChildAction.connectUsingSecrets) {
 				ConnectUsingSecrets()
