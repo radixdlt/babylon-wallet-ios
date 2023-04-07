@@ -1,7 +1,5 @@
-import AccountsClient
 import ClientPrelude
-import Cryptography
-import EngineToolkitClient
+import Profile
 
 // MARK: - ImportLegacyWalletClient
 public struct ImportLegacyWalletClient: Sendable {
