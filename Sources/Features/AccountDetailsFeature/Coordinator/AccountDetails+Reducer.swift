@@ -62,7 +62,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case displayTransfer
-		case refresh(AccountAddress)
+		case refresh(_ accountAddress: AccountAddress, forceRefresh: Bool)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -104,7 +104,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .send(.delegate(.refresh(state.account.address)))
+			return .send(.delegate(.refresh(state.account.address, forceRefresh: false)))
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .preferencesButtonTapped:
@@ -115,7 +115,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				pasteboardClient.copyString(state.account.address.address)
 			}
 		case .pullToRefreshStarted:
-			return .send(.delegate(.refresh(state.account.address)))
+			return .send(.delegate(.refresh(state.account.address, forceRefresh: true)))
 		case .transferButtonTapped:
 			// FIXME: fix post betanet v2
 //			state.destination = .transfer(AssetTransfer.State(from: state.account))

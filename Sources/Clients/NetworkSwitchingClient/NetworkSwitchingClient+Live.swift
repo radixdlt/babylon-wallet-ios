@@ -1,4 +1,5 @@
 import AccountsClient
+import CacheClient
 import ClientPrelude
 import GatewayAPI
 import GatewaysClient
@@ -20,6 +21,7 @@ extension NetworkSwitchingClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.cacheClient) var cacheClient
 
 		let getCurrentGateway: GetCurrentGateway = {
 			await gatewaysClient.getCurrentGateway()
@@ -30,7 +32,14 @@ extension NetworkSwitchingClient {
 			guard newURL != currentURL else {
 				return nil
 			}
-			let name = try await gatewayAPIClient.getNetworkName(newURL)
+
+			let name = try await cacheClient.withCaching(
+				cacheEntry: .networkName(newURL.absoluteString),
+				request: {
+					try await gatewayAPIClient.getNetworkName(newURL)
+				}
+			)
+
 			// FIXME: mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
 			// once it returns networkID!
 			let network = try Radix.Network.lookupBy(name: name)

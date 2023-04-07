@@ -82,8 +82,9 @@ package.addModules([
 	.feature(
 		name: "AuthorizedDAppsFeatures",
 		dependencies: [
-			"GatewayAPI",
 			"AuthorizedDappsClient",
+			"CacheClient",
+			"GatewayAPI",
 		],
 		tests: .no
 	),
@@ -106,6 +107,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
 			"CreateEntityFeature",
+			"CacheClient",
 			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
@@ -242,6 +244,7 @@ package.addModules([
 			"AddLedgerNanoFactorSourceFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
+			"CacheClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
@@ -305,6 +308,7 @@ package.addModules([
 	.client(
 		name: "AccountPortfolioFetcherClient",
 		dependencies: [
+			"CacheClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
 		],
@@ -342,11 +346,22 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.client(
+		name: "CacheClient",
+		dependencies: [
+			"DiskPersistenceClient",
+		],
+		tests: .yes()
+	),
 	.client(
 		name: "CameraPermissionClient",
 		dependencies: [],
 		tests: .no
+	),
+	.client(
+		name: "DiskPersistenceClient",
+		dependencies: [],
+		tests: .yes()
 	),
 	.client(
 		name: "EngineToolkitClient",
@@ -443,9 +458,10 @@ package.addModules([
 		name: "NetworkSwitchingClient",
 		dependencies: [
 			"AccountsClient",
+			"CacheClient",
 			"GatewayAPI",
-			"ProfileStore",
 			"GatewaysClient",
+			"ProfileStore",
 		],
 		tests: .no
 	),
@@ -532,6 +548,7 @@ package.addModules([
 		name: "ROLAClient",
 		dependencies: [
 			"GatewayAPI",
+			"CacheClient",
 		],
 		tests: .yes()
 	),
@@ -540,6 +557,7 @@ package.addModules([
 		dependencies: [
 			"AccountPortfolioFetcherClient",
 			"AccountsClient",
+			"CacheClient",
 			"EngineToolkitClient",
 			"FactorSourcesClient",
 			"GatewayAPI",

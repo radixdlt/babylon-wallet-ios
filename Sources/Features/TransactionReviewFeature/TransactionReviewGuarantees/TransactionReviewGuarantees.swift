@@ -7,6 +7,10 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var guarantees: IdentifiedArrayOf<TransactionReviewGuarantee.State>
 
+		public var isValid: Bool {
+			guarantees.allSatisfy(\.percentageStepper.isValid)
+		}
+
 		@PresentationState
 		public var info: SlideUpPanel.State?
 
@@ -123,7 +127,12 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
-			let newMinimumDecimal = state.percentageStepper.value * 0.01
+			guard let value = state.percentageStepper.value else {
+				state.transfer.guarantee?.amount = 0
+				return .none
+			}
+
+			let newMinimumDecimal = value * 0.01
 			let newAmount = newMinimumDecimal * state.transfer.amount
 			state.transfer.guarantee?.amount = newAmount
 

@@ -7,20 +7,17 @@ public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
 		public var passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>?
-		public var loadProfileOutcome: LoadProfileOutcome?
 
 		public init(
-			passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>? = nil,
-			loadProfileOutcome: LoadProfileOutcome? = nil
+			passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>? = nil
 		) {
 			self.passcodeCheckFailedAlert = passcodeCheckFailedAlert
-			self.loadProfileOutcome = loadProfileOutcome
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		public enum PasscodeCheckFailedAlertAction: Sendable, Equatable {
-			case cancelButtonTapped
+			case retryButtonTapped
 			case openSettingsButtonTapped
 		}
 
@@ -30,7 +27,6 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadProfileOutcome(LoadProfileOutcome)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -53,14 +49,12 @@ public struct Splash: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-				await send(.internal(.loadProfileOutcome(loadProfile())))
-			}
+			return delay().concatenate(with: verifyPasscode())
 
 		case let .passcodeCheckFailedAlert(.presented(action)):
 			switch action {
-			case .cancelButtonTapped:
-				return notifyDelegate(loadProfileOutcome: state.loadProfileOutcome)
+			case .retryButtonTapped:
+				return verifyPasscode()
 			case .openSettingsButtonTapped:
 				#if os(iOS)
 				return .run { _ in
@@ -85,9 +79,9 @@ public struct Splash: Sendable, FeatureReducer {
 					title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
 					actions: {
 						ButtonState(
-							role: .cancel,
-							action: .send(.cancelButtonTapped),
-							label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.cancelButtonTitle) }
+							role: .none,
+							action: .send(.retryButtonTapped),
+							label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.retryButtonTitle) }
 						)
 						ButtonState(
 							role: .none,
@@ -101,11 +95,9 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return notifyDelegate(loadProfileOutcome: state.loadProfileOutcome)
-
-		case let .loadProfileOutcome(loadProfileOutcome):
-			state.loadProfileOutcome = loadProfileOutcome
-			return delay().concatenate(with: verifyPasscode())
+			return .run { send in
+				await send(.delegate(.loadProfileOutcome(loadProfile())))
+			}
 		}
 	}
 
@@ -118,14 +110,6 @@ public struct Splash: Sendable, FeatureReducer {
 			durationInMS = 800
 			#endif
 			try? await clock.sleep(for: .milliseconds(durationInMS))
-		}
-	}
-
-	private func notifyDelegate(loadProfileOutcome: LoadProfileOutcome?) -> EffectTask<Action> {
-		precondition(loadProfileOutcome != nil)
-
-		return .run { send in
-			await send(.delegate(.loadProfileOutcome(loadProfileOutcome!)))
 		}
 	}
 

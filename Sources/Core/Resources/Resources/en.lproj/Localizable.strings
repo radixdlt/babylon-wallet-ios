@@ -281,7 +281,7 @@
 "settings.versionInfo" = "Version: %@ build #%@";
 "settings.importLegacyWallet" = "Import from a Legacy Wallet";
 
-"splash.alert.passcodeCheckFailed.cancelButtonTitle" = "Cancel";
+"splash.alert.passcodeCheckFailed.retryButtonTitle" = "Retry";
 "splash.alert.passcodeCheckFailed.message" = "Passcode are not set up. Please update settings.";
 "splash.alert.passcodeCheckFailed.settingsButtonTitle" = "Settings";
 "splash.alert.passcodeCheckFailed.title" = "Warning";

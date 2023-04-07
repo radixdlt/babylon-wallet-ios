@@ -1,7 +1,7 @@
 import ClientPrelude
 
 // MARK: - AccountPortfolio
-public struct AccountPortfolio: Sendable, Hashable, Identifiable {
+public struct AccountPortfolio: Sendable, Hashable, Identifiable, Codable {
 	public typealias ID = AccountAddress
 	public var id: ID { owner }
 

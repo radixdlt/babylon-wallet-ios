@@ -3,7 +3,7 @@ import Prelude
 import Profile
 
 // MARK: - FungibleToken
-public struct FungibleToken: Sendable, Asset, Token, Hashable {
+public struct FungibleToken: Sendable, Asset, Token, Hashable, Codable {
 	public let resourceAddress: ResourceAddress
 	public let totalSupply: BigDecimal?
 	public let totalMinted: BigDecimal?
@@ -62,7 +62,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 }
 
 // MARK: - FungibleTokenContainer
-public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable {
+public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable, Codable {
 	public let owner: AccountAddress
 	public var asset: FungibleToken
 

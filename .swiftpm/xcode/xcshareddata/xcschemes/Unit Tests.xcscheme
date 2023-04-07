@@ -568,9 +568,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ImportLegacyWalletClientTests"
-               BuildableName = "ImportLegacyWalletClientTests"
-               BlueprintName = "ImportLegacyWalletClientTests"
+               BlueprintIdentifier = "DiskPersistenceClientTests"
+               BuildableName = "DiskPersistenceClientTests"
+               BlueprintName = "DiskPersistenceClientTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -578,9 +578,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "TransactionReviewFeatureTests"
-               BuildableName = "TransactionReviewFeatureTests"
-               BlueprintName = "TransactionReviewFeatureTests"
+               BlueprintIdentifier = "CacheClientTests"
+               BuildableName = "CacheClientTests"
+               BlueprintName = "CacheClientTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
