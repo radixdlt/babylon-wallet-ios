@@ -28,7 +28,7 @@
       }
     ],
     "security" : {
-      "iCloudProfileSyncEnabled" : true,
+      "isCloudProfileSyncEnabled" : true,
       "isDeveloperModeEnabled" : true
     }
   },
@@ -168,8 +168,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
+                "givenName",
+                "familyName"
               ]
             },
             {
@@ -259,5 +259,5 @@
       ]
     }
   ],
-  "version" : 26
+  "version" : 27
 }

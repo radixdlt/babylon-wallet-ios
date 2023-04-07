@@ -187,7 +187,7 @@ final class ProfileTests: TestCase {
 			.init(id: .familyName, value: "Publicson"),
 		])
 
-		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
 		let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
 		XCTAssertNotNil(profile.appendP2PLink(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
@@ -299,7 +299,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.personas.count, 2)
 		XCTAssertEqual(network.networkID, networkID)
 
-		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 		XCTAssertTrue(profile.appPreferences.security.isDeveloperModeEnabled, "Developer mode should default to on")
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(

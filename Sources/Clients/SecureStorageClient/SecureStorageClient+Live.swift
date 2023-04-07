@@ -71,7 +71,7 @@ extension SecureStorageClient: DependencyKey {
 					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
 						key: profileSnapshotKeychainKey,
-						iCloudSyncEnabled: profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled,
+						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled,
 						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
