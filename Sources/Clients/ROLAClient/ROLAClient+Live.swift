@@ -1,15 +1,22 @@
+import CacheClient
 import ClientPrelude
 import GatewayAPI
 
 extension ROLAClient {
 	public static let liveValue = Self(
 		performDappDefinitionVerification: { metadata async throws in
-			@Dependency(\.gatewayAPIClient) var gatewayAPI
+			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+			@Dependency(\.cacheClient) var cacheClient
 
-			let response = try await gatewayAPI.getEntityMetadata(metadata.dAppDefinitionAddress.address)
+			let metadataCollection = try await cacheClient.withCaching(
+				cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
+				request: {
+					try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address)
+				}
+			)
 
 			let dict: [Metadata.Key: String] = .init(
-				uniqueKeysWithValues: response.items.compactMap { item in
+				uniqueKeysWithValues: metadataCollection.items.compactMap { item in
 					guard let key = Metadata.Key(rawValue: item.key),
 					      let value = item.value.asString else { return nil }
 					return (key: key, value: value)
@@ -31,32 +38,40 @@ extension ROLAClient {
 		},
 		performWellKnownFileCheck: { metadata async throws in
 			@Dependency(\.urlSession) var urlSession
+			@Dependency(\.cacheClient) var cacheClient
 
 			guard let originURL = URL(string: metadata.origin.rawValue) else {
 				throw ROLAFailure.invalidOriginURL
 			}
 			let url = originURL.appending(path: Constants.wellKnownFilePath)
 
-			let (data, urlResponse) = try await urlSession.data(from: url)
+			let fetchWellKnownFile = {
+				let (data, urlResponse) = try await urlSession.data(from: url)
 
-			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
-				throw ExpectedHTTPURLResponse()
+				guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
+					throw ExpectedHTTPURLResponse()
+				}
+
+				guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
+					throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
+				}
+
+				guard !data.isEmpty else {
+					throw ROLAFailure.radixJsonNotFound
+				}
+
+				do {
+					let response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
+					return response
+				} catch {
+					throw ROLAFailure.radixJsonUnknownFileFormat
+				}
 			}
 
-			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
-				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
-			}
-
-			guard !data.isEmpty else {
-				throw ROLAFailure.radixJsonNotFound
-			}
-
-			let response: WellKnownFileResponse
-			do {
-				response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
-			} catch {
-				throw ROLAFailure.radixJsonUnknownFileFormat
-			}
+			let response = try await cacheClient.withCaching(
+				cacheEntry: .rolaWellKnownFileVerification(url.absoluteString),
+				request: fetchWellKnownFile
+			)
 
 			let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
 			guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {
@@ -65,10 +80,10 @@ extension ROLAClient {
 		}
 	)
 
-	struct WellKnownFileResponse: Decodable {
+	struct WellKnownFileResponse: Codable {
 		let dApps: [Item]
 
-		struct Item: Decodable {
+		struct Item: Codable {
 			let dAppDefinitionAddress: DappDefinitionAddress
 		}
 	}

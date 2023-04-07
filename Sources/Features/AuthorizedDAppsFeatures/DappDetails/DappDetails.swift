@@ -1,14 +1,16 @@
 import AuthorizedDappsClient
+import CacheClient
 import FeaturePrelude
 import GatewayAPI
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.gatewayAPIClient) var gatewayClient
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.cacheClient) var cacheClient
 
 	public struct FailedToLoadMetadata: Error, Hashable {}
 
@@ -89,7 +91,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
 				let result = await TaskResult {
-					try await gatewayClient.getEntityMetadata(dAppID.address)
+					try await cacheClient.withCaching(
+						cacheEntry: .dAppMetadata(dAppID.address),
+						request: {
+							try await gatewayAPIClient.getEntityMetadata(dAppID.address)
+						}
+					)
 				}
 				return .internal(.metadataLoaded(.init(result: result)))
 			}

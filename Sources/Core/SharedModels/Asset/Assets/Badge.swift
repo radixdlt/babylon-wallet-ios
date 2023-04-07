@@ -3,7 +3,7 @@ import Prelude
 import Profile
 
 // MARK: - Badge
-public struct Badge: Asset {
+public struct Badge: Asset, Codable {
 	public let resourceAddress: ResourceAddress
 
 	public init(
@@ -14,7 +14,7 @@ public struct Badge: Asset {
 }
 
 // MARK: - BadgeContainer
-public struct BadgeContainer: AssetContainer, Sendable, Hashable {
+public struct BadgeContainer: AssetContainer, Sendable, Hashable, Codable {
 	public var owner: AccountAddress
 	public typealias T = Badge
 	public var asset: Badge

@@ -15,13 +15,15 @@ public struct Home: Sendable, FeatureReducer {
 		// MARK: - Components
 		public var header: Header.State
 		public var accountList: AccountList.State
-		public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
-			.init(uniqueElements: accountList.accounts.map(\.account))
-		}
 
 		// MARK: - Destinations
 		@PresentationState
 		public var destination: Destinations.State?
+
+		// MARK: - Computed Properties
+		public var accountAddresses: IdentifiedArrayOf<AccountAddress> {
+			.init(uniqueElements: accountList.accounts.map(\.account.address))
+		}
 
 		public init(
 			accountPortfolios: IdentifiedArrayOf<AccountPortfolio> = .init(),
@@ -134,7 +136,7 @@ public struct Home: Sendable, FeatureReducer {
 			return getAppPreferences()
 
 		case .pullToRefreshStarted:
-			return getAppPreferences().concatenate(with: fetchPortfolio(state.accountList))
+			return getAppPreferences().concatenate(with: refreshAccounts(state.accountAddresses, forceRefresh: true))
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -150,7 +152,7 @@ public struct Home: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .accountsLoadedResult(.success(accounts)):
 			state.accountList = .init(accounts: accounts)
-			return fetchPortfolio(accounts)
+			return refreshAccounts(state.accountAddresses, forceRefresh: false)
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
@@ -235,9 +237,6 @@ public struct Home: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .accountList(.delegate(.fetchPortfolioForAccounts)):
-			return refreshAccounts(state.accounts)
-
 		case let .accountList(.delegate(.displayAccountDetails(account))):
 			state.destination = .accountDetails(.init(for: account))
 			return .none
@@ -248,39 +247,40 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 		// this whole case is just plain awful, but hopefully only temporary until we introduce account streams.
-		case let .destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.delegate(.refreshAccount(address))))))))):
-			return .run { send in
-				await send(.internal(.singleAccountPortfolioResult(TaskResult {
-					try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
-				})))
-				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.refreshAccountCompleted))))))))))
-			}
+		case let .destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.delegate(.refresh(address, forceRefresh))))))))):
+			return refreshAccount(address, forceRefresh: forceRefresh).concatenate(with: refreshAccountDetails())
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
-			return refreshAccount(address)
+		case let .destination(.presented(.accountDetails(.delegate(.refresh(address, forceRefresh))))):
+			return refreshAccount(address, forceRefresh: forceRefresh)
 
 		default:
 			return .none
 		}
 	}
 
-	private func refreshAccount(_ address: AccountAddress) -> EffectTask<Action> {
+	private func refreshAccount(_ address: AccountAddress, forceRefresh: Bool) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.singleAccountPortfolioResult(TaskResult {
-				try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
+				try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address, forceRefresh)
 			})))
 		}
 	}
 
-	private func refreshAccounts(_ accounts: IdentifiedArrayOf<Profile.Network.Account>) -> EffectTask<Action> {
+	private func refreshAccounts(_ addresses: IdentifiedArrayOf<AccountAddress>, forceRefresh: Bool) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.accountPortfoliosResult(TaskResult {
-				try await accountPortfolioFetcherClient.fetchPortfolioFor(accounts: accounts)
+				try await accountPortfolioFetcherClient.fetchPortfolioForAccounts(addresses, forceRefresh)
 			})))
+		}
+	}
+
+	private func refreshAccountDetails() -> EffectTask<Action> {
+		.run { send in
+			await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.refreshAccountCompleted))))))))))
 		}
 	}
 
@@ -297,18 +297,6 @@ public struct Home: Sendable, FeatureReducer {
 			await send(.internal(.gotAppPreferences(
 				appPreferencesClient.getPreferences()
 			)))
-		}
-	}
-
-	private func fetchPortfolio(_ accounts: AccountList.State) -> EffectTask<Action> {
-		fetchPortfolio(accounts.accounts.map(\.account))
-	}
-
-	private func fetchPortfolio(_ accounts: some Collection<Profile.Network.Account> & Sendable) -> EffectTask<Action> {
-		.run { send in
-			await send(.internal(.accountPortfoliosResult(TaskResult {
-				try await accountPortfolioFetcherClient.fetchPortfolioForAccounts(accounts.map(\.address))
-			})))
 		}
 	}
 }

@@ -1,5 +1,6 @@
 import AppPreferencesClient
 import AuthorizedDAppsFeatures
+import CacheClient
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
@@ -13,6 +14,7 @@ public struct AppSettings: FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.cacheClient) var cacheClient
 
 	public typealias Store = StoreOf<Self>
 
@@ -130,6 +132,7 @@ public struct AppSettings: FeatureReducer {
 
 		case .deleteProfileAndFactorSourcesButtonTapped:
 			return .task {
+				cacheClient.removeAll()
 				await radixConnectClient.disconnectAndRemoveAll()
 				return .delegate(.deleteProfileAndFactorSources)
 			}

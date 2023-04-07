@@ -137,7 +137,7 @@ struct Login_Preview: PreviewProvider {
 			)
 			#if os(iOS)
 			.toolbar(.visible, for: .navigationBar)
-			#endif
+			#endif // iOS
 		}
 	}
 }
