@@ -103,7 +103,7 @@ enum SelectAccountsToImportRow {
 		let olympiaAddress: String
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let derivationPath: String
-		let olympiaAccountType: LegacyOlypiaAccountType
+		let olympiaAccountType: LegacyOlympiaAccountType
 
 		init(state olympiaAccount: OlympiaAccountToMigrate) {
 			accountName = olympiaAccount.displayName?.rawValue ?? L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Value.nameFallback

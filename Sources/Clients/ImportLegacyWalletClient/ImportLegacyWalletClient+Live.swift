@@ -2,7 +2,9 @@ import AccountsClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
+import Profile
 
+// MARK: - ImportLegacyWalletClient + DependencyKey
 extension ImportLegacyWalletClient: DependencyKey {
 	public typealias Value = ImportLegacyWalletClient
 
@@ -89,4 +91,31 @@ extension ImportLegacyWalletClient: DependencyKey {
 			}
 		)
 	}()
+}
+
+func convertUncheckedAccount(
+	_ raw: AccountNonChecked,
+	engineToolkitClient: EngineToolkitClient
+) throws -> OlympiaAccountToMigrate {
+	let publicKeyData = try Data(hex: raw.pk)
+	let publicKey = try K1.PublicKey(compressedRepresentation: publicKeyData)
+
+	let bech32Address = try engineToolkitClient.deriveOlympiaAdressFromPublicKey(publicKey)
+
+	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
+		fatalError()
+	}
+	let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
+
+	guard let accountType = LegacyOlympiaAccountType(rawValue: raw.accountType) else {
+		fatalError()
+	}
+
+	return try .init(
+		accountType: accountType,
+		publicKey: .init(compressedRepresentation: publicKeyData),
+		path: .init(derivationPath: raw.path),
+		address: address,
+		displayName: raw.name.map { NonEmptyString(rawValue: $0) } ?? nil
+	)
 }

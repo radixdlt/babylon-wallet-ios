@@ -226,6 +226,7 @@ package.addModules([
 	),
 	.feature(
 		name: "ScanQRFeature",
+		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"CameraPermissionClient",
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
@@ -250,8 +251,8 @@ package.addModules([
 			"MnemonicClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
-			"RadixConnectClient", // deleting connections when wallet is deleted
-			"ScanQRFeature", // scan legacy wallet QR
+			"RadixConnectClient",
+			"ScanQRFeature",
 		],
 		tests: .yes()
 	),

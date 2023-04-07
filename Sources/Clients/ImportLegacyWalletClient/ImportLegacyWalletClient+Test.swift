@@ -21,15 +21,19 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 
 		let hdRoot = try! mnemonic.hdRoot(passphrase: passphrase)
 		let header = OlympiaExportHeader(payloadCount: numberOfPayLoads, mnemonicWordCount: mnemonic.wordCount.rawValue)
+
 		return Self(
 			parseHeaderFromQRCode: { _ in
 				header
 			},
 			parseLegacyWalletFromQRCodes: { _ in
-				let accounts: [AccountNonChecked] = try (0 ..< numberOfAccounts).map {
+
+				@Dependency(\.engineToolkitClient) var engineToolkitClient
+
+				let accounts: [OlympiaAccountToMigrate] = try (0 ..< numberOfAccounts).map {
 					let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
 					let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
-					let accountType = ($0 % 2 == 0) ? LegacyOlypiaAccountType.software.rawValue : LegacyOlypiaAccountType.hardware.rawValue
+					let accountType = ($0 % 2 == 0) ? LegacyOlympiaAccountType.software.rawValue : LegacyOlympiaAccountType.hardware.rawValue
 					let accountNonChecked = AccountNonChecked(
 						accountType: accountType,
 						pk: publicKey.compressedData.hex,
@@ -37,13 +41,17 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 						name: "Olympia \(passphrase) \(String(describing: accountType)) i=\($0)"
 					)
 
-					let accountChecked = try accountNonChecked.checked()
+					// FIXME: cleanup when implementing the Live instance of this.
+					let accountChecked = try convertUncheckedAccount(
+						accountNonChecked,
+						engineToolkitClient: engineToolkitClient
+					)
+
 					assert(accountChecked.path == path)
 					assert(accountChecked.publicKey.compressedRepresentation == publicKey.compressedRepresentation)
-					return accountNonChecked
+					return accountChecked
 				}
-				let accountSet = try OrderedSet(uncheckedUniqueElements: accounts.map { try $0.checked() })
-				guard let nonEmpty = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(rawValue: accountSet) else {
+				guard let nonEmpty = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(rawValue: .init(uncheckedUniqueElements: accounts)) else {
 					throw ImportedOlympiaWalletFailedToFindAnyAccounts()
 				}
 				return ScannedParsedOlympiaWalletToMigrate(
@@ -63,3 +71,6 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 		migrateOlympiaHardwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaHardwareAccountsToBabylon")
 	)
 }
+
+// MARK: - ImportedOlympiaWalletFailedToFindAnyAccounts
+struct ImportedOlympiaWalletFailedToFindAnyAccounts: Swift.Error {}
