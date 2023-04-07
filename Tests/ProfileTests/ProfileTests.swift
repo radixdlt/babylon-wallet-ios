@@ -68,7 +68,7 @@ final class ProfileTests: TestCase {
 				hint: creatingDevice
 			)
 			let profile = Profile(
-				factorSource: babylonFactorSource,
+				factorSource: babylonFactorSource.factorSource,
 				creatingDevice: creatingDevice,
 				appPreferences: .init(gateways: .init(current: gateway))
 			)
@@ -78,11 +78,11 @@ final class ProfileTests: TestCase {
 
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
-
-		profile.factorSources.append(olympiaFactorSource)
+		XCTAssertNil(olympiaFactorSource.factorSource.storage)
+		profile.factorSources.append(olympiaFactorSource.factorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-			let index = profile.factorSources.babylonDevice.storage.nextForEntity(
+			let index = profile.factorSources.babylonDevice.deviceStorage.nextForEntity(
 				kind: .account,
 				networkID: profile.networkID
 			)
@@ -114,7 +114,7 @@ final class ProfileTests: TestCase {
 				networkID: networkID,
 				address: address,
 				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				appearanceID: .fromIndex(index),
+				appearanceID: .fromIndex(Int(index)),
 				displayName: name
 			)
 
@@ -127,7 +127,7 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-			let index = profile.factorSources.babylonDevice.storage.nextForEntity(kind: .identity, networkID: profile.networkID)
+			let index = profile.factorSources.babylonDevice.deviceStorage.nextForEntity(kind: .identity, networkID: profile.networkID)
 
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
@@ -280,8 +280,9 @@ final class ProfileTests: TestCase {
 			XCTAssertEqual(factorSource.hint, creatingDevice)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
-		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
-		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
+		XCTAssertNil(profile.factorSources.last.storage)
+		XCTAssertEqual(deviceFactorSource.deviceStorage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(deviceFactorSource.deviceStorage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id

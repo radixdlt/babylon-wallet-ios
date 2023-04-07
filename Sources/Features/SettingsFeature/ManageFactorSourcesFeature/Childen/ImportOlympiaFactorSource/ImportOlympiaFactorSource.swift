@@ -9,19 +9,22 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 			case mnemonic, passphrase
 		}
 
+		public let shouldPersist: Bool
 		public var mnemonic: String
 		public var passphrase: String
 
 		@BindingState public var focusedField: Field?
 
 		public init(
+			shouldPersist: Bool = true,
 			mnemonic: String = "",
 			passphrase: String = ""
 		) {
+			self.shouldPersist = shouldPersist
 			self.mnemonic = mnemonic
 			self.passphrase = passphrase
 			#if DEBUG
-			if let new = (try? Mnemonic.generate(wordCount: .twelve))?.phrase {
+			if let new = (try? Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english))?.phrase {
 				self.mnemonic = new
 			}
 			#endif
@@ -39,13 +42,14 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case imported
+		case persisted(FactorSourceID)
+		case notPersisted(MnemonicWithPassphrase)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(ImportOlympiaFactorSource.State.Field?)
 		case mnemonicFromPhraseResult(TaskResult<Mnemonic>)
-		case importOlympiaFactorSourceResult(TaskResult<EquatableVoid>)
+		case importOlympiaFactorSourceResult(TaskResult<FactorSourceID>)
 	}
 
 	@Dependency(\.continuousClock) var clock
@@ -60,7 +64,11 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		case .appeared:
 			return .run { send in
 				try await clock.sleep(for: .seconds(0.5))
+				#if DEBUG
+				await send(.internal(.focusTextField(.passphrase)))
+				#else
 				await send(.internal(.focusTextField(.mnemonic)))
+				#endif
 			}
 		case .importButtonTapped:
 			return .run { [mnemonicPhrase = state.mnemonic] send in
@@ -95,11 +103,21 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		case let .mnemonicFromPhraseResult(.success(mnemonic)):
-			return .run { [passphrase = state.passphrase] send in
+
+			let mnemonicWithPassphrase = MnemonicWithPassphrase(
+				mnemonic: mnemonic,
+				passphrase: state.passphrase
+			)
+
+			guard state.shouldPersist else {
+				return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
+			}
+
+			return .run { send in
 				await send(.internal(.importOlympiaFactorSourceResult(
 					TaskResult {
 						try await factorSourcesClient.importOlympiaFactorSource(
-							MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
+							mnemonicWithPassphrase: mnemonicWithPassphrase
 						)
 					}
 				)))
@@ -107,8 +125,8 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		case let .importOlympiaFactorSourceResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
-		case .importOlympiaFactorSourceResult(.success):
-			return .send(.delegate(.imported))
+		case let .importOlympiaFactorSourceResult(.success(factorSourceID)):
+			return .send(.delegate(.persisted(factorSourceID)))
 		}
 	}
 }

@@ -49,6 +49,7 @@ public struct AppSettings: FeatureReducer {
 		case personasButtonTapped
 		case generalSettingsButtonTapped
 		case factorSourcesButtonTapped
+		case importFromOlympiaWalletButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -74,6 +75,7 @@ public struct AppSettings: FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 			case manageFactorSources(ManageFactorSources.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
@@ -83,6 +85,7 @@ public struct AppSettings: FeatureReducer {
 		}
 
 		public enum Action: Sendable, Equatable {
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 			case manageFactorSources(ManageFactorSources.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
@@ -92,6 +95,9 @@ public struct AppSettings: FeatureReducer {
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
+				ImportOlympiaWalletCoordinator()
+			}
 			Scope(state: /State.manageFactorSources, action: /Action.manageFactorSources) {
 				ManageFactorSources()
 			}
@@ -139,6 +145,10 @@ public struct AppSettings: FeatureReducer {
 
 		case .factorSourcesButtonTapped:
 			state.destination = .manageFactorSources(.init())
+			return .none
+
+		case .importFromOlympiaWalletButtonTapped:
+			state.destination = .importOlympiaWalletCoordinator(.init())
 			return .none
 
 		case .addP2PLinkButtonTapped:
@@ -209,6 +219,14 @@ public struct AppSettings: FeatureReducer {
 			default:
 				return .none
 			}
+
+		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.dismiss)))):
+			state.destination = nil
+			return .none
+
+		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration)))):
+			state.destination = nil
+			return .none
 
 		case .destination:
 			return .none

@@ -21,27 +21,19 @@ extension FactorSources {
 
 extension FactorSources {
 	/// Babylon `device` factor source
-	public var babylonDevice: HDOnDeviceFactorSource {
-		guard
-			let babylon = device(filter: { !$0.supportsOlympia }),
-			let hdFactorSource = try? HDOnDeviceFactorSource(factorSource: babylon)
-		else {
-			let errorMsg = "Critical failure, every single execution path of the babylon wallet should ALWAYS contain a 'babylon' device factorsource, did you do something weird in a test?"
-			loggerGlobal.critical(.init(stringLiteral: errorMsg))
-			fatalError(errorMsg)
-		}
-		return hdFactorSource
+	public var babylonDevice: BabylonDeviceFactorSource {
+		babylonDeviceFactorSources().first
 	}
 
-	public func hdOnDeviceFactorSource() -> NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>> {
+	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<BabylonDeviceFactorSource>> {
 		guard
 			case let array = self.compactMap({
-				try? HDOnDeviceFactorSource(factorSource: $0)
+				try? BabylonDeviceFactorSource(factorSource: $0)
 			}),
-			case let identifiedArray = IdentifiedArrayOf<HDOnDeviceFactorSource>(uncheckedUniqueElements: array),
-			let nonEmpty = NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>(rawValue: identifiedArray)
+			case let identifiedArray = IdentifiedArrayOf<BabylonDeviceFactorSource>(uncheckedUniqueElements: array),
+			let nonEmpty = NonEmpty<IdentifiedArrayOf<BabylonDeviceFactorSource>>(rawValue: identifiedArray)
 		else {
-			let errorMsg = "Critical failure, every single execution path of the babylon wallet should ALWAYS contain a device factorsource, did you do something weird in a test?"
+			let errorMsg = "Critical failure, every single execution path of the babylon wallet should ALWAYS contain a babylon device factorsource, did you do something weird in a test?"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))
 			fatalError(errorMsg)
 		}

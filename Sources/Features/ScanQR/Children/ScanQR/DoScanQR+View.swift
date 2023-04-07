@@ -13,12 +13,16 @@ extension ScanQR.State {
 // MARK: - ScanQR.View
 extension ScanQR {
 	public struct ViewState: Equatable {
+		public let scanMode: QRScanMode
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 		#endif // macOS
+		public let instructions: String
 		init(state: ScanQR.State) {
+			scanMode = state.scanMode
+			instructions = state.scanInstructions
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-			connectionPassword = state.connectionPassword
+			connectionPassword = state.manualQRContent
 			#endif // macOS
 		}
 	}
@@ -47,7 +51,33 @@ extension ScanQR {
 	}
 }
 
-// MARK: Private Views
+// MARK: - QRScanMode
+public enum QRScanMode: Sendable, Hashable {
+	/// Scan exactly one code, then stop.
+	case once
+
+	/// Scan each code no more than once.
+	case oncePerCode
+
+	/// Keep scanning all codes until dismissed.
+	case continuous
+
+	/// Scan only when capture button is tapped.
+	case manual
+
+	public static let `default`: Self = .oncePerCode
+
+	#if os(iOS)
+	func forCodeScannerView() -> ScanMode {
+		switch self {
+		case .continuous: return .continuous
+		case .manual: return .manual
+		case .oncePerCode: return .oncePerCode
+		case .once: return .once
+		}
+	}
+	#endif
+}
 
 extension ScanQR.View {
 	@ViewBuilder
@@ -56,12 +86,13 @@ extension ScanQR.View {
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
-		Text(L10n.NewConnection.subtitle)
+		Text(viewStore.instructions)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
 
 		CodeScannerView(
-			codeTypes: [.qr]
+			codeTypes: [.qr],
+			scanMode: viewStore.scanMode.forCodeScannerView()
 		) { response in
 			switch response {
 			case let .failure(error):
@@ -89,7 +120,7 @@ extension ScanQR.View {
 				"Connection password",
 				text: viewStore.binding(
 					get: \.connectionPassword,
-					send: { .macInputConnectionPasswordChanged($0) }
+					send: { .macInputQRContentChanged($0) }
 				)
 			)
 			.textFieldStyle(.roundedBorder)
@@ -118,6 +149,6 @@ struct ScanQR_Preview: PreviewProvider {
 }
 
 extension ScanQR.State {
-	public static let previewValue: Self = .init()
+	public static let previewValue: Self = .init(scanInstructions: "Preview")
 }
 #endif

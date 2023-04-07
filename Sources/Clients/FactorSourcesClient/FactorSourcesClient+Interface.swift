@@ -5,16 +5,16 @@ import Profile
 public struct FactorSourcesClient: Sendable {
 	public var getFactorSources: GetFactorSources
 	public var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
-	public var importOlympiaFactorSource: ImportOlympiaFactorSource
+	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
 
 	public init(
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
-		importOlympiaFactorSource: @escaping ImportOlympiaFactorSource
+		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource
 	) {
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
-		self.importOlympiaFactorSource = importOlympiaFactorSource
+		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 	}
 }
 
@@ -22,5 +22,20 @@ public struct FactorSourcesClient: Sendable {
 extension FactorSourcesClient {
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias ImportOlympiaFactorSource = @Sendable (MnemonicWithPassphrase) async throws -> Void
+	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
+}
+
+extension FactorSourcesClient {
+	public func importOlympiaFactorSource(
+		mnemonicWithPassphrase: MnemonicWithPassphrase
+	) async throws -> FactorSourceID {
+		let factorSource = try FactorSource.olympia(
+			mnemonicWithPassphrase: mnemonicWithPassphrase
+		)
+		let privateFactorSource = try PrivateHDFactorSource(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			hdOnDeviceFactorSource: factorSource
+		)
+		return try await self.addPrivateHDFactorSource(privateFactorSource)
+	}
 }

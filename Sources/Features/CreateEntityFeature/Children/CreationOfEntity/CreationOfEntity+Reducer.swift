@@ -19,13 +19,13 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			curve: Slip10Curve,
 			networkID: NetworkID?,
 			name: NonEmptyString,
-			hdOnDeviceFactorSource: HDOnDeviceFactorSource
+			babylonFactorSource: BabylonDeviceFactorSource
 		) {
 			self.init(
 				request: .init(
 					curve: curve,
 					networkID: networkID,
-					hdOnDeviceFactorSource: hdOnDeviceFactorSource,
+					babylonDeviceFactorSource: babylonFactorSource,
 					displayName: name
 				)
 			)
@@ -64,7 +64,8 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 					switch entityKind {
 					case .account:
 						let account = try await accountsClient.createUnsavedVirtualAccount(request)
-						try await accountsClient.saveVirtualAccount(account)
+						let shouldUpdateFactorSourceNextDerivationIndex = true
+						try await accountsClient.saveVirtualAccount(account, shouldUpdateFactorSourceNextDerivationIndex)
 						return try account.cast()
 					case .identity:
 						let persona = try await personasClient.createUnsavedVirtualPersona(request)

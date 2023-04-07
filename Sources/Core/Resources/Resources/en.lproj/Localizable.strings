@@ -279,6 +279,7 @@
 "settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
+"settings.importLegacyWallet" = "Import from a Legacy Wallet";
 
 "splash.alert.passcodeCheckFailed.retryButtonTitle" = "Retry";
 "splash.alert.passcodeCheckFailed.message" = "Passcode are not set up. Please update settings.";
@@ -316,3 +317,18 @@
 "generalSettings.title" = "App Settings";
 "generalSettings.developerMode.title" = "Developer Mode";
 "generalSettings.developerMode.subtitle" = "Warning: Disables website validity checks";
+
+"importLegacyWallet.flow.navigationTitle" = "Import Legacy Wallet";
+"importLegacyWallet.scanQRCodes.scanInstructions" = "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.";
+"importLegacyWallet.selectAccountsToImport.accountRow.value.nameFallback" = "Unnamned";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.name" = "Name";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.olympiaAddress" = "Olympia Address";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.accountType" = "Type";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath" = "Path";
+"importLegacyWallet.selectAccountsToImport.button.deselectAll" = "Deselect all";
+"importLegacyWallet.selectAccountsToImport.button.selectAll" = "Select all";
+"importLegacyWallet.selectAccountsToImport.button.importOneAcccount" = "Import one account";
+"importLegacyWallet.selectAccountsToImport.button.importZeroAccounts" = "Import accounts";
+"importLegacyWallet.selectAccountsToImport.button.importManyAccounts" = "Import %@ accounts";
+"importLegacyWallet.completion.title" = "Imported #%@ accounts.";
+"importLegacyWallet.completion.button.finish" = "Okay";

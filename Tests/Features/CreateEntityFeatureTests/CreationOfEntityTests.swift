@@ -10,7 +10,7 @@ final class CreationOfEntityTests: TestCase {
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: account.displayName,
-			hdOnDeviceFactorSource: .previewValue
+			babylonFactorSource: .previewValue
 		)
 		let store = TestStore(
 			initialState: initialState,
@@ -20,8 +20,8 @@ final class CreationOfEntityTests: TestCase {
 				XCTAssertEqual(request.displayName, account.displayName)
 				return account
 			}
-			$0.accountsClient.saveVirtualAccount = {
-				XCTAssertEqual($0, account)
+			$0.accountsClient.saveVirtualAccount = { account, _ in
+				XCTAssertEqual(account, account)
 			}
 		}
 		await store.send(.view(.appeared))
@@ -36,7 +36,7 @@ final class CreationOfEntityTests: TestCase {
 			curve: .curve25519,
 			networkID: .nebunet,
 			name: "NeverCreated",
-			hdOnDeviceFactorSource: .previewValue
+			babylonFactorSource: .previewValue
 		)
 		let store = TestStore(
 			initialState: initialState,

@@ -1,9 +1,21 @@
 import Cryptography
 import Prelude
 
+// MARK: - _FactorSourceProtocol
+protocol _FactorSourceProtocol {
+	var kind: FactorSourceKind { get }
+	var id: FactorSourceID { get }
+	var hint: NonEmptyString { get }
+	var parameters: FactorSource.Parameters { get }
+	var addedOn: Date { get }
+	var lastUsedOn: Date { get }
+	var storage: FactorSource.Storage? { get }
+}
+
 // MARK: - FactorSource
 /// A FactorSource is the source of FactorInstance(s).
 public struct FactorSource:
+	_FactorSourceProtocol,
 	Sendable,
 	Hashable,
 	Codable,

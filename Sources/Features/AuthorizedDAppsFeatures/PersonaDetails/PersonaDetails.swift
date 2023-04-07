@@ -65,7 +65,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .editPersonaTapped:
 			return .none
 
-		case let .accountTapped(address):
+		case .accountTapped:
 			return .none
 
 		case .editAccountSharingTapped:

@@ -550,6 +550,58 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "home.visitHub.title", fallback: "Ready to get started using the Radix Network and your Wallet?")
     }
   }
+  public enum ImportLegacyWallet {
+    public enum Completion {
+      /// Imported #%@ accounts.
+      public static func title(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "importLegacyWallet.completion.title", String(describing: p1), fallback: "Imported #%@ accounts.")
+      }
+      public enum Button {
+        /// Okay
+        public static let finish = L10n.tr("Localizable", "importLegacyWallet.completion.button.finish", fallback: "Okay")
+      }
+    }
+    public enum Flow {
+      /// Import Legacy Wallet
+      public static let navigationTitle = L10n.tr("Localizable", "importLegacyWallet.flow.navigationTitle", fallback: "Import Legacy Wallet")
+    }
+    public enum ScanQRCodes {
+      /// Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.
+      public static let scanInstructions = L10n.tr("Localizable", "importLegacyWallet.scanQRCodes.scanInstructions", fallback: "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.")
+    }
+    public enum SelectAccountsToImport {
+      public enum AccountRow {
+        public enum Label {
+          /// Type
+          public static let accountType = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.accountType", fallback: "Type")
+          /// Path
+          public static let derivationPath = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath", fallback: "Path")
+          /// Name
+          public static let name = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.name", fallback: "Name")
+          /// Olympia Address
+          public static let olympiaAddress = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.olympiaAddress", fallback: "Olympia Address")
+        }
+        public enum Value {
+          /// Unnamned
+          public static let nameFallback = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.value.nameFallback", fallback: "Unnamned")
+        }
+      }
+      public enum Button {
+        /// Deselect all
+        public static let deselectAll = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.deselectAll", fallback: "Deselect all")
+        /// Import %@ accounts
+        public static func importManyAccounts(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importManyAccounts", String(describing: p1), fallback: "Import %@ accounts")
+        }
+        /// Import one account
+        public static let importOneAcccount = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importOneAcccount", fallback: "Import one account")
+        /// Import accounts
+        public static let importZeroAccounts = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importZeroAccounts", fallback: "Import accounts")
+        /// Select all
+        public static let selectAll = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.selectAll", fallback: "Select all")
+      }
+    }
+  }
   public enum ImportProfile {
     /// Import mnemonic
     public static let importMnemonic = L10n.tr("Localizable", "importProfile.importMnemonic", fallback: "Import mnemonic")
@@ -725,6 +777,8 @@ public enum L10n {
     public static let gatewaysButtonTitle = L10n.tr("Localizable", "settings.gatewaysButtonTitle", fallback: "Gateways")
     /// App Settings
     public static let generalSettingsButtonTitle = L10n.tr("Localizable", "settings.generalSettingsButtonTitle", fallback: "App Settings")
+    /// Import from a Legacy Wallet
+    public static let importLegacyWallet = L10n.tr("Localizable", "settings.importLegacyWallet", fallback: "Import from a Legacy Wallet")
     /// Inspect Profile
     public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
     /// No Wallet Data Found

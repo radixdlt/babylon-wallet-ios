@@ -1,27 +1,33 @@
 import AccountsClient
 import ClientPrelude
+import Cryptography
 import ProfileStore
 
+// MARK: - AccountsClient + DependencyKey
 extension AccountsClient: DependencyKey {
 	public typealias Value = AccountsClient
 
 	public static func live(
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
-		Self(
-			getAccountsOnCurrentNetwork: {
-				try await getProfileStore().network().accounts
-			},
+		let saveVirtualAccount: SaveVirtualAccount = { account, shouldUpdateFactorSourceNextDerivationIndex in
+			try await getProfileStore().updating {
+				try $0.addAccount(account, shouldUpdateFactorSourceNextDerivationIndex: shouldUpdateFactorSourceNextDerivationIndex)
+			}
+		}
+
+		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
+			try await getProfileStore().network().accounts
+		}
+
+		return Self(
+			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
 			getAccountsOnNetwork: { try await getProfileStore().profile.network(id: $0).accounts },
 			createUnsavedVirtualAccount: { request in
 				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},
-			saveVirtualAccount: { account in
-				try await getProfileStore().updating {
-					try $0.addAccount(account)
-				}
-			},
+			saveVirtualAccount: saveVirtualAccount,
 			getAccountByAddress: { address in
 				try await getProfileStore().network().entity(address: address)
 			},
