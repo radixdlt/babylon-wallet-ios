@@ -72,26 +72,26 @@ extension GeneralSettings {
 		}
 
 		private func exportLogs(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
-                        HStack {
-                                VStack(alignment: .leading, spacing: 0) {
-                                        Text("Export Logs")
-                                                .foregroundColor(.app.gray1)
-                                                .textStyle(.body1HighImportance)
+			HStack {
+				VStack(alignment: .leading, spacing: 0) {
+					Text("Export Logs")
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1HighImportance)
 
-                                        Text("Export the Wallet development logs")
-                                                .foregroundColor(.app.gray2)
-                                                .textStyle(.body2Regular)
-                                                .fixedSize()
-                                }
+					Text("Export the Wallet development logs")
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.fixedSize()
+				}
 
-                                Button("Export") {
-                                        viewStore.send(.exportLogsTapped)
-                                }
-                                .buttonStyle(.secondaryRectangular)
-                                .flushedRight
-                        }
-                        .sheet(item:
-                                viewStore.binding(
+				Button("Export") {
+					viewStore.send(.exportLogsTapped)
+				}
+				.buttonStyle(.secondaryRectangular)
+				.flushedRight
+			}
+			.sheet(item:
+				viewStore.binding(
 					get: { $0.isExportingLogs },
 					send: { _ in .exportLogsDismissed }
 				)
