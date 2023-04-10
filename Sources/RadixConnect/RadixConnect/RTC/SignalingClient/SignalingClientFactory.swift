@@ -19,7 +19,7 @@ extension SignalingClient {
 	static let devSignalingServer = URL(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
 
 	#if DEBUG
-	static let `default` = SignalingClient.prodSignalingServer
+	static let `default` = SignalingClient.devSignalingServer
 	#else
 	static let `default` = SignalingClient.prodSignalingServer
 	#endif
