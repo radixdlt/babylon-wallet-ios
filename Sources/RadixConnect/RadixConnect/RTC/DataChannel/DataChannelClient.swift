@@ -77,6 +77,7 @@ actor DataChannelClient {
 			} logError: { error in
 				loggerGlobal.error("Critical: Could not decode the Incoming DataChannel message \(error)")
 			}
+			.logInfo("DataChannel: Received message %@")
 			.eraseToAnyAsyncSequence()
 			.share()
 			.eraseToAnyAsyncSequence()
@@ -95,6 +96,8 @@ actor DataChannelClient {
 		try assembledMessage.split().forEach {
 			try sendMessageOverDataChannel(.chunkedMessage($0))
 		}
+
+		loggerGlobal.info("DataChannel: Sent message \(assembledMessage)")
 
 		// TODO: Add timeout. What to do in case of timeout -> throw error? recend the message?
 		try await waitForMessageConfirmation(id)

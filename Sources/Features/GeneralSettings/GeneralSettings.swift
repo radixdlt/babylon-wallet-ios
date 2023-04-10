@@ -1,10 +1,12 @@
 import AppPreferencesClient
 import FeaturePrelude
+import Logging
 
 // MARK: - GeneralSettings
 public struct GeneralSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var preferences: AppPreferences?
+		var exportLogs: URL?
 
 		public init() {}
 	}
@@ -12,6 +14,8 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case developerModeToggled(Bool)
+		case exportLogsTapped
+		case exportLogsDismissed
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -36,6 +40,12 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			return .fireAndForget {
 				try await appPreferencesClient.updatePreferences(preferences)
 			}
+		case .exportLogsTapped:
+			state.exportLogs = Logger.logFilePath
+			return .none
+		case .exportLogsDismissed:
+			state.exportLogs = nil
+			return .none
 		}
 	}
 

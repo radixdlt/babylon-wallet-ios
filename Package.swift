@@ -779,9 +779,9 @@ package.addModules([
 			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
 				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
 			},
-                        .product(name: "FileLogging", package: "swift-log-file") {
-                                .package(url: "https://github.com/crspybits/swift-log-file", from: "0.1.0")
-                        },
+			.product(name: "FileLogging", package: "swift-log-file") {
+				.package(url: "https://github.com/crspybits/swift-log-file", from: "0.1.0")
+			},
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
 			},

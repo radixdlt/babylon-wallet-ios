@@ -3,7 +3,8 @@ import FeaturePrelude
 extension GeneralSettings.State {
 	var viewState: GeneralSettings.ViewState {
 		.init(
-			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false
+			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
+			isExportingLogs: exportLogs
 		)
 	}
 }
@@ -12,6 +13,7 @@ extension GeneralSettings.State {
 extension GeneralSettings {
 	public struct ViewState: Equatable {
 		let isDeveloperModeEnabled: Bool
+		let isExportingLogs: URL?
 	}
 
 	@MainActor
@@ -34,8 +36,9 @@ extension GeneralSettings {
 
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
-				VStack(spacing: .zero) {
+				VStack(alignment: .leading, spacing: .zero) {
 					developerModeRow(with: viewStore)
+					exportLogs(with: viewStore)
 					Separator()
 				}
 				.padding(.medium3)
@@ -67,7 +70,40 @@ extension GeneralSettings {
 			}
 			.frame(height: .largeButtonHeight)
 		}
+
+		private func exportLogs(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			Button("Export logs") {
+				viewStore.send(.exportLogsTapped)
+			}
+			.sheet(item:
+				viewStore.binding(
+					get: { $0.isExportingLogs },
+					send: { _ in .exportLogsDismissed }
+				)
+			) { logFilePath in
+				ShareView(items: [logFilePath])
+			}
+			.frame(height: .largeButtonHeight)
+		}
 	}
+}
+
+// MARK: - URL + Identifiable
+extension URL: Identifiable {
+	public var id: URL { self.absoluteURL }
+}
+
+// MARK: - ShareView
+struct ShareView: UIViewControllerRepresentable {
+	typealias UIViewControllerType = UIActivityViewController
+
+	let items: [Any]
+
+	func makeUIViewController(context: Context) -> UIActivityViewController {
+		UIActivityViewController(activityItems: items, applicationActivities: nil)
+	}
+
+	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #if DEBUG
