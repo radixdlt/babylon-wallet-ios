@@ -22,6 +22,7 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AssetsViewFeature",
 			"AssetTransferFeature",
+                        "AccountPortfolioFetcherClient"
 		],
 		tests: .yes()
 	),

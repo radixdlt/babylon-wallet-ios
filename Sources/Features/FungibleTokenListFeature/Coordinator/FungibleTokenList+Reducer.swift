@@ -15,12 +15,17 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case selectedTokenChanged(FungibleTokenContainer?)
+                case scrolledToLoadMore
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
+
+        public enum DelegateAction: Sendable, Equatable {
+                case loadMoreTokens
+        }
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
@@ -59,6 +64,8 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 				state.destination = nil
 			}
 			return .none
+                case .scrolledToLoadMore:
+                        return .send(.delegate(.loadMoreTokens))
 		}
 	}
 

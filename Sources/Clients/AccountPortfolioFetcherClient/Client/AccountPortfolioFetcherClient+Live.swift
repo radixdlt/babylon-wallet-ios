@@ -5,10 +5,67 @@ import EngineToolkitClient
 // MARK: - AccountPortfolioFetcherClient + DependencyKey
 extension AccountPortfolioFetcherClient: DependencyKey {
 	public static let liveValue: Self = {
-		let fetchPortfolioForAccount: FetchPortfolioForAccount = { (accountAddress: AccountAddress) async throws -> AccountPortfolio in
-                        @Dependency(\.gatewayAPIClient) var gatewayAPIClient
-                        @Dependency(\.engineToolkitClient) var engineToolkitClient
+                let pageSize = 20
 
+                @Dependency(\.gatewayAPIClient) var gatewayAPIClient
+                @Dependency(\.engineToolkitClient) var engineToolkitClient
+
+                @Sendable
+                func createNonFungibleToken(
+                        _ accountAddress: AccountAddress,
+                        _ response: GatewayAPI.StateEntityDetailsResponseItem
+                ) async throws -> NonFungibleTokenContainer {
+                        let resourceAddress = ResourceAddress(address: response.address)
+                        let metadata = response.metadata
+
+                        let idsResponse = try await gatewayAPIClient.getNonFungibleIds(resourceAddress.address).nonFungibleIds
+                        let idsCollection = PaginatedResourceContainer(
+                                loaded: idsResponse.items.map { NonFungibleToken(nonFungibleLocalId: .string($0.nonFungibleId)) },
+                                totalCount: idsResponse.totalCount.map(Int.init),
+                                nextPageCursor: idsResponse.nextCursor
+                        )
+
+                        return NonFungibleTokenContainer(
+                                owner: accountAddress,
+                                resourceAddress: resourceAddress,
+                                assets: idsCollection,
+                                name: metadata.name,
+                                description: metadata.description,
+                                iconURL: nil)
+                }
+
+                @Sendable
+                func createFungibleToken(_ response: GatewayAPI.StateEntityDetailsResponseItem) throws -> FungibleTokenContainer {
+                        let resourceAddress = ResourceAddress(address: response.address)
+                        let metadata = response.metadata
+                        let isXRD = (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false
+
+                        let token = FungibleToken(
+                                resourceAddress: resourceAddress,
+                                divisibility: response.details?.fungible?.divisibility,
+                                tokenDescription: metadata.description,
+                                name: metadata.name,
+                                symbol: metadata.symbol,
+                                isXRD: isXRD
+                        )
+
+                        let amount = fungibleResourceItems.first(where: { $0.resourceAddress == resourceAddress.address })?.amount ?? "0"
+                        return try FungibleTokenContainer(owner: accountAddress,
+                                                          asset: token,
+                                                          amount: BigDecimal(fromString: amount),
+                                                          worth: nil)
+                }
+
+                @Sendable
+                func loadResourceDetails(_ addresses: [String]) async throws -> [GatewayAPI.StateEntityDetailsResponseItem] {
+                        try await addresses
+                                .chunks(ofCount: pageSize)
+                                .map(Array.init)
+                                .parallelMap(gatewayAPIClient.getEntityDetails)
+                                .flatMap(\.items)
+                }
+
+		let fetchPortfolioForAccount: FetchPortfolioForAccount = { (accountAddress: AccountAddress) async throws -> AccountPortfolio in
                         let response = try await gatewayAPIClient.getAccountDetails(accountAddress)
                         let networkID = try Radix.Network.lookupBy(name: response.ledgerState.network).id
 
@@ -16,61 +73,10 @@ extension AccountPortfolioFetcherClient: DependencyKey {
                         let fungibleResources = accountDetails.fungibleResources
                         let nonFungibleResources = accountDetails.nonFungibleResources
 
-                        let pageSize = 20
+
                         let fungibleResourceItems = fungibleResources?.items.compactMap(\.global) ?? []
                         let nonFungibleResourceItems = nonFungibleResources?.items.compactMap(\.global) ?? []
 
-                        @Sendable
-                        func loadResourceDetails(_ addresses: [String]) async throws -> [GatewayAPI.StateEntityDetailsResponseItem] {
-                                try await addresses
-                                        .chunks(ofCount: pageSize)
-                                        .map(Array.init)
-                                        .parallelMap(gatewayAPIClient.getEntityDetails)
-                                        .flatMap(\.items)
-                        }
-
-                        @Sendable
-                        func createFungibleToken(_ response: GatewayAPI.StateEntityDetailsResponseItem) throws -> FungibleTokenContainer {
-                                let resourceAddress = ResourceAddress(address: response.address)
-                                let metadata = response.metadata
-                                let isXRD = (try? engineToolkitClient.isXRD(resource: resourceAddress, on: networkID)) ?? false
-
-                                let token = FungibleToken(
-                                        resourceAddress: resourceAddress,
-                                        divisibility: response.details?.fungible?.divisibility,
-                                        tokenDescription: metadata.description,
-                                        name: metadata.name,
-                                        symbol: metadata.symbol,
-                                        isXRD: isXRD
-                                )
-
-                                let amount = fungibleResourceItems.first(where: { $0.resourceAddress == resourceAddress.address })?.amount ?? "0"
-                                return try FungibleTokenContainer(owner: accountAddress,
-                                                                  asset: token,
-                                                                  amount: BigDecimal(fromString: amount),
-                                                                  worth: nil)
-                        }
-
-                        @Sendable
-                        func createNonFungibleToken(_ response: GatewayAPI.StateEntityDetailsResponseItem) async throws -> NonFungibleTokenContainer {
-                                let resourceAddress = ResourceAddress(address: response.address)
-                                let metadata = response.metadata
-
-                                let idsResponse = try await gatewayAPIClient.getNonFungibleIds(resourceAddress.address).nonFungibleIds
-                                let idsCollection = PaginatedResourceContainer(
-                                        loaded: idsResponse.items.map { NonFungibleToken(nonFungibleLocalId: .string($0.nonFungibleId)) },
-                                        totalCount: idsResponse.totalCount.map(Int.init),
-                                        nextPageCursor: idsResponse.nextCursor
-                                )
-
-                                return NonFungibleTokenContainer(
-                                        owner: accountAddress,
-                                        resourceAddress: resourceAddress,
-                                        assets: idsCollection,
-                                        name: metadata.name,
-                                        description: metadata.description,
-                                        iconURL: nil)
-                        }
 
                         async let loadFungibleResourceContainer = loadResourceDetails(fungibleResourceItems.map(\.resourceAddress)).map(createFungibleToken)
                         async let loadNonFungibleResourceContainer = loadResourceDetails(nonFungibleResourceItems.map(\.resourceAddress)).asyncMap(createNonFungibleToken)
@@ -88,6 +94,15 @@ extension AccountPortfolioFetcherClient: DependencyKey {
                                                 poolUnitContainers: [],
                                                 badgeContainers: [])
 		}
+
+                func fetchFungibleTokens(_ accountAddress: AccountAddress, _ nextPageCursor: String?) async throws -> FungibleTokensPageResponse {
+                        let response = try await gatewayAPIClient.getEntityFungibleTokensPage(.init(cursor: nextPageCursor, address: accountAddress.address))
+                        let items = response.items.compactMap(\.global)
+                        let itemDetails = try await loadResourceDetails(items.map(\.resourceAddress))
+
+                        response.items.asyncMap(createNonFungibleToken)
+                        return .init(tokens: <#T##[FungibleTokenContainer]#>, nextPageCursor: response.nextCursor)
+                }
 
 		return Self(
 			fetchPortfolioForAccount: fetchPortfolioForAccount,
@@ -112,7 +127,8 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 				)
 
 				return portfolios
-			}
+                        },
+                        fetchFungibleTokens: <#AccountPortfolioFetcherClient.FetchFungibleTokens#>
 		)
 	}()
 }

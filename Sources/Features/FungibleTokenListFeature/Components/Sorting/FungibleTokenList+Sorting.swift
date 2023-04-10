@@ -1,33 +1,33 @@
 import FeaturePrelude
 
-extension Array where Element == FungibleTokenContainer {
-	public func sortedIntoCategories() -> [FungibleTokenCategory] {
-		var xrdContainer: FungibleTokenContainer?
-		var noValueTokens = [FungibleTokenContainer]()
-		var tokensWithValues = [FungibleTokenContainer]()
+extension PaginatedResourceContainer where Container == IdentifiedArrayOf<FungibleTokenContainer> {
+        public func sortedIntoCategories() -> [FungibleTokenCategory] {
+                var xrdContainer: FungibleTokenContainer?
+                var noValueTokens = [FungibleTokenContainer]()
+                var tokensWithValues = [FungibleTokenContainer]()
 
-		forEach {
-			if $0.asset.isXRD {
-				xrdContainer = $0
-			} else if $0.worth == nil {
-				noValueTokens.append($0)
-			} else {
-				tokensWithValues.append($0)
-			}
-		}
+                forEach {
+                        if $0.asset.isXRD {
+                                xrdContainer = $0
+                        } else if $0.worth == nil {
+                                noValueTokens.append($0)
+                        } else {
+                                tokensWithValues.append($0)
+                        }
+                }
 
-		tokensWithValues.sort { $0.worth! > $1.worth! }
-		noValueTokens.sort { $0.asset.symbol ?? "" < $1.asset.symbol ?? "" }
+                tokensWithValues.sort { $0.worth! > $1.worth! }
+                noValueTokens.sort { $0.asset.symbol ?? "" < $1.asset.symbol ?? "" }
 
-		var result = [FungibleTokenCategory]()
+                var result = [FungibleTokenCategory]()
 
-		if let xrdContainer = xrdContainer {
-			result.append(FungibleTokenCategory(type: .xrd, tokenContainers: [xrdContainer]))
-		}
+                if let xrdContainer {
+                        result.append(.xrd(xrdContainer)) // (type: .xrd, tokenContainers: [xrdContainer]))
+                }
 
-		let otherAssets: [FungibleTokenContainer] = tokensWithValues + noValueTokens
-		result.append(FungibleTokenCategory(type: .nonXrd, tokenContainers: otherAssets))
+                let otherAssets: [FungibleTokenContainer] = tokensWithValues + noValueTokens
+                result.append(.nonXrd(.init(loaded: otherAssets, totalCount: totalCount, nextPageCursor: nextPageCursor)))
 
-		return result
-	}
+                return result
+        }
 }

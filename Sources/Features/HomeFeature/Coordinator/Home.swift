@@ -192,19 +192,19 @@ public struct Home: Sendable, FeatureReducer {
 
 			// account details
 			if let details = state.destination?.accountDetails {
-				let account = details.account
+                                let account = details.accountState.account
 				let address = account.address
 
 				// asset list
 				let accountPortfolio = accountPortfolios[id: address] ?? AccountPortfolio.empty(owner: address)
-				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
+				let categories = accountPortfolio.fungibleTokenContainers.sortedIntoCategories()
 
 				state.destination?.accountDetails?.assets = .init(
 					kind: details.assets.kind,
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
-							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
-							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+                                                        let rows = category.containers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
+                                                        return FungibleTokenList.Section.State(id: category.id, assets: .init(uniqueElements: rows))
 						})
 					),
 					nonFungibleTokenList: .init(

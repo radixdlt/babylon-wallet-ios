@@ -5,19 +5,28 @@ import struct Profile.AccountAddress // FIXME: should probably be in ProfileMode
 public struct AccountPortfolioFetcherClient: Sendable {
 	public var fetchPortfolioForAccount: FetchPortfolioForAccount
 	public var fetchPortfolioForAccounts: FetchPortfolioForAccounts
+        public var fetchFungibleTokens: FetchFungibleTokens
 
 	public init(
 		fetchPortfolioForAccount: @escaping FetchPortfolioForAccount,
-		fetchPortfolioForAccounts: @escaping FetchPortfolioForAccounts
+		fetchPortfolioForAccounts: @escaping FetchPortfolioForAccounts,
+                fetchFungibleTokens: @escaping FetchFungibleTokens
 	) {
 		self.fetchPortfolioForAccount = fetchPortfolioForAccount
 		self.fetchPortfolioForAccounts = fetchPortfolioForAccounts
+                self.fetchFungibleTokens = fetchFungibleTokens
 	}
 }
 
 extension AccountPortfolioFetcherClient {
+        public struct FungibleTokensPageResponse: Sendable, Equatable {
+                public let tokens: [FungibleTokenContainer]
+                public let nextPageCursor: String?
+        }
+
 	public typealias FetchPortfolioForAccounts = @Sendable ([AccountAddress]) async throws -> IdentifiedArrayOf<AccountPortfolio>
 	public typealias FetchPortfolioForAccount = @Sendable (AccountAddress) async throws -> AccountPortfolio
+        public typealias FetchFungibleTokens = @Sendable (_ nextPageCursor: String) async throws -> FungibleTokensPageResponse
 }
 
 extension DependencyValues {

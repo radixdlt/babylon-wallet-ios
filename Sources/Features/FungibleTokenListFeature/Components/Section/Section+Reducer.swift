@@ -23,7 +23,7 @@ extension FungibleTokenList {
 
 		public var body: some ReducerProtocolOf<Self> {
 			Reduce(core)
-				.forEach(\.assets, action: /Action.child .. ChildAction.asset) {
+                                .forEach(\.assets, action: /Action.child .. ChildAction.asset) {
 					FungibleTokenList.Row()
 				}
 		}

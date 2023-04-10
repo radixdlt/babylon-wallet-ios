@@ -11,21 +11,23 @@ extension FungibleTokenList.Section {
 		}
 
 		public var body: some SwiftUI.View {
-			LazyVStack(spacing: .zero) {
-				ForEachStore(
-					store.scope(
-						state: \.assets,
-						action: { .child(.asset(id: $0, action: $1)) }
-					),
-					content: { FungibleTokenList.Row.View(store: $0) }
-				)
-			}
-			.background(
-				RoundedRectangle(cornerRadius: .small1)
-					.fill(Color.white)
-					.tokenRowShadow()
-			)
-			.padding(.horizontal, .medium3)
+                        WithViewStore(store, observe: { $0 }) { viewStore in
+                                LazyVStack(spacing: .zero) {
+                                        ForEachStore(
+                                                store.scope(
+                                                        state: \.assets,
+                                                        action: { .child(.asset(id: $0, action: $1)) }
+                                                ),
+                                                content: { FungibleTokenList.Row.View(store: $0) }
+                                        )
+                                }
+                                .background(
+                                        RoundedRectangle(cornerRadius: .small1)
+                                                .fill(Color.white)
+                                                .tokenRowShadow()
+                                )
+                                .padding(.horizontal, .medium3)
+                        }
 		}
 	}
 }
@@ -38,7 +40,7 @@ struct Section_Preview: PreviewProvider {
 		FungibleTokenList.Section.View(
 			store: .init(
 				initialState: .init(
-					id: .nonXrd, assets: []
+                                        id: .nonXrd, assets: []
 				),
 				reducer: FungibleTokenList.Section()
 			)

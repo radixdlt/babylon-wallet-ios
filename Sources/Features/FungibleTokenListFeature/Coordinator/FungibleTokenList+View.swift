@@ -26,6 +26,10 @@ extension FungibleTokenList.View {
 				),
 				content: { FungibleTokenList.Section.View(store: $0) }
 			)
+
+                        ProgressView().onAppear {
+                                ViewStore(store).send(.view(.scrolledToLoadMore))
+                        }
 		}
 		.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
