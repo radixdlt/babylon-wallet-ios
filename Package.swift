@@ -440,7 +440,11 @@ package.addModules([
 				.package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.12.0")
 			},
 		],
-		tests: .yes()
+		tests: .yes(
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
 	),
 	.client(
 		name: "LocalAuthenticationClient",
