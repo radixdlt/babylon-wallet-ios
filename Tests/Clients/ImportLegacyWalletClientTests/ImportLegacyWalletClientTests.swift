@@ -489,26 +489,27 @@ final class ImportLegacyWalletClientTests: TestCase {
 	}
 
 	func test_vectors() throws {
+		func doTestDeserialize(_ vector: TestVector) throws {
+			let mnemonic = try Mnemonic(phrase: vector.olympiaWallet.mnemonic, language: .english)
+			let parsed = try CAP33.deserialize(payloads: vector.payloads)
+			XCTAssertEqual(parsed.mnemonicWordCount, mnemonic.wordCount)
+			XCTAssertEqual(parsed.accounts.elements.map { $0.toTestVectorAccount() }, vector.olympiaWallet.accounts)
+		}
+
+		func doSoundnessTestSerialize(_ vector: TestVector) throws {
+			let mnemonic = try Mnemonic(phrase: vector.olympiaWallet.mnemonic, language: .english)
+			let payloads = try CAP33.serialize(wordCount: mnemonic.wordCount.wordCount, accounts: vector.olympiaWallet.accounts, payloadSizeThreshold: vector.payloadSizeThreshold)
+			XCTAssertEqual(payloads, vector.payloads)
+		}
+
 		try testFixture(
 			bundle: .module,
 			jsonName: "import_olympia_wallet_parse_test"
 		) { (testVectors: [TestVector]) in
 
 			for vector in testVectors {
-				let mnemonic = try Mnemonic(phrase: vector.olympiaWallet.mnemonic, language: .english)
-				let parsed = try CAP33.deserialize(payloads: vector.payloads)
-				XCTAssertEqual(parsed.mnemonicWordCount, mnemonic.wordCount)
-
-				XCTAssertEqual(parsed.accounts.count, vector.olympiaWallet.accounts.count)
-
-				for accountIndex in 0 ..< vector.olympiaWallet.accounts.count {
-					let expected = vector.olympiaWallet.accounts[accountIndex]
-					let actual = parsed.accounts.elements[accountIndex]
-					XCTAssertEqual(
-						expected,
-						actual.toTestVectorAccount()
-					)
-				}
+				try doTestDeserialize(vector)
+				try doSoundnessTestSerialize(vector)
 			}
 		}
 	}
