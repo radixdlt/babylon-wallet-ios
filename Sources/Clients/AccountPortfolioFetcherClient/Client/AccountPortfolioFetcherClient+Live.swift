@@ -104,7 +104,8 @@ extension AccountPortfolioFetcherClient: DependencyKey {
                                                 badgeContainers: [])
 		}
 
-                func fetchFungibleTokens(_ accountAddress: AccountAddress, _ nextPageCursor: String?) async throws -> FungibleTokensPageResponse {
+                @Sendable
+                func fetchFungibleTokens(_ accountAddress: AccountAddress, _ nextPageCursor: String) async throws -> FungibleTokensPageResponse {
                         let response = try await gatewayAPIClient.getEntityFungibleTokensPage(
                                 .init(cursor: nextPageCursor, limitPerPage: 20, address: accountAddress.address)
                         )
@@ -141,7 +142,7 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 
 				return portfolios
                         },
-                        fetchFungibleTokens: <#AccountPortfolioFetcherClient.FetchFungibleTokens#>
+                        fetchFungibleTokens: fetchFungibleTokens
 		)
 	}()
 }

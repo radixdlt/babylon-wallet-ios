@@ -26,7 +26,7 @@ extension AccountPortfolioFetcherClient {
 
 	public typealias FetchPortfolioForAccounts = @Sendable ([AccountAddress]) async throws -> IdentifiedArrayOf<AccountPortfolio>
 	public typealias FetchPortfolioForAccount = @Sendable (AccountAddress) async throws -> AccountPortfolio
-        public typealias FetchFungibleTokens = @Sendable (_ nextPageCursor: String) async throws -> FungibleTokensPageResponse
+        public typealias FetchFungibleTokens = @Sendable (AccountAddress, _ nextPageCursor: String) async throws -> FungibleTokensPageResponse
 }
 
 extension DependencyValues {
