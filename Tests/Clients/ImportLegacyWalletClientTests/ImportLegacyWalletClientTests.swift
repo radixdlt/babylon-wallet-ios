@@ -35,12 +35,12 @@ extension Olympia {
 }
 
 extension Olympia.Export {
-	public static let accountNameForbiddenCharReplacement = " "
+	public static let accountNameForbiddenCharReplacement = "_"
 	public static let accountNameMaxLength = 30 // sync with profile!
 	public enum Separator: Sendable, Hashable, CaseIterable {
 		static let inter = "~"
-		static let intra = "|"
-		static let headerEnd = "^"
+		static let intra = "^"
+		static let headerEnd = "]"
 		static let accountNameEnd = "}"
 		public static let allCases: [String] = [
 			Self.inter, Self.intra, Self.headerEnd, Self.accountNameEnd,
@@ -376,8 +376,12 @@ extension K1.PublicKey {
 	}
 }
 
-private func generateTestVectors(numberOfTestVectors: Int = 6) throws -> [TestVector] {
-	let payloadSizes: [Int] = .init(stride(from: 300, to: 3000, by: 100))
+private func generateTestVector(
+	testID: Int,
+	payloadSizeThreshold: Int,
+	numberOfAccounts: Int,
+	mnemonic: Mnemonic
+) throws -> TestVector {
 	let accountNames: [String?] = [
 		String?.none,
 		"",
@@ -386,65 +390,70 @@ private func generateTestVectors(numberOfTestVectors: Int = 6) throws -> [TestVe
 		"Saving's account.",
 		"Olympia is a small town in Elis on the Peloponnese peninsula in Greece, famous for the nearby archaeological site of the same name",
 		"Alexandria is the second largest city in Egypt, and the largest city on the Mediterranean coast",
-		"Forbidden \(Olympia.Export.Separator.allCases.joined(separator: "-"))",
-		"OK +?-_,.\\)[]\\(!#$%}&/*<>=OK",
+		"Forbidden \(Olympia.Export.Separator.allCases.joined(separator: "|"))",
+		"OK +?-,.\\)[\\(!#$%{&/*<>=OK",
 		"Numbers are allowed 0123456789",
 	]
-	let numberOfAccounts = [1, 5, 10, 15, 30, 50, 100]
 
-	let testVectors: [TestVector] = try (0 ..< numberOfTestVectors).map { (testID: Int) -> TestVector in
-		let wordCount = BIP39.WordCount.allCases[testID % BIP39.WordCount.allCases.count]
-		let mnemonic = try Mnemonic.generate(wordCount: wordCount)
-		let hdRoot = try mnemonic.hdRoot()
-		let payloadSizeThreshold = payloadSizes[testID % payloadSizes.count]
-		let numberOfAccounts = numberOfAccounts[testID % numberOfAccounts.count]
+	let accounts: [TestVector.OlympiaWallet.Account] = try (0 ..< numberOfAccounts).map { (accountIndex: Int) -> TestVector.OlympiaWallet.Account in
 
-		let accounts: [TestVector.OlympiaWallet.Account] = try (0 ..< numberOfAccounts).map { (accountIndex: Int) -> TestVector.OlympiaWallet.Account in
+		let name: NonEmptyString? = accountNames[(accountIndex + testID) % accountNames.count].map {
+			NonEmptyString(rawValue: $0)
+		} ?? nil
+		let accountType: Olympia.AccountType = (testID % 2) == 0 ? .software : .hardware
+		let path = try LegacyOlympiaBIP44LikeDerivationPath(index: Profile.Network.NextDerivationIndices.Index(accountIndex))
+		let publicKey = try mnemonic.hdRoot().derivePrivateKey(path: path.fullPath, curve: SECP256K1.self).publicKey
 
-			let accountRND = testID * accountIndex
-			let name: NonEmptyString? = accountNames[accountIndex % accountNames.count].map {
-				NonEmptyString(rawValue: $0)
-			} ?? nil
-			let accountType: Olympia.AccountType = (accountRND % 2) == 0 ? .software : .hardware
-			let path = try LegacyOlympiaBIP44LikeDerivationPath(index: Profile.Network.NextDerivationIndices.Index(accountIndex))
-			let publicKey = try hdRoot.derivePrivateKey(path: path.fullPath, curve: SECP256K1.self).publicKey
-
-			return TestVector.OlympiaWallet.Account(
-				accountType: accountType,
-				publicKeyCompressedBase64: publicKey.base64Encoded,
-				addressIndex: accountIndex,
-				name: name
-			)
-		}
-
-		let payloads = try CAP33.serialize(
-			wordCount: wordCount.rawValue,
-			accounts: accounts,
-			payloadSizeThreshold: payloadSizeThreshold
-		)
-
-		let accountsWithSanitizedNames = accounts.map {
-			$0.sanitizedName()
-		}
-
-		// Soundness check!
-		let parsed = try CAP33.deserialize(payloads: payloads)
-		XCTAssertEqual(parsed.mnemonicWordCount, wordCount)
-		XCTAssertEqual(accounts.count, parsed.accounts.count)
-		XCTAssertEqual(parsed.accounts.elements.map {
-			$0.toTestVectorAccount()
-		}, accountsWithSanitizedNames)
-
-		return .init(
-			testID: testID, olympiaWallet: .init(
-				mnemonic: mnemonic.phrase,
-				accounts: accountsWithSanitizedNames
-			), payloadSizeThreshold: payloadSizeThreshold,
-			payloads: payloads
+		return TestVector.OlympiaWallet.Account(
+			accountType: accountType,
+			publicKeyCompressedBase64: publicKey.base64Encoded,
+			addressIndex: accountIndex,
+			name: name
 		)
 	}
 
-	assert(testVectors.count == numberOfTestVectors)
+	let payloads = try CAP33.serialize(
+		wordCount: mnemonic.wordCount.wordCount,
+		accounts: accounts,
+		payloadSizeThreshold: payloadSizeThreshold
+	)
+
+	let accountsWithSanitizedNames = accounts.map {
+		$0.sanitizedName()
+	}
+
+	// Soundness check!
+	let parsed = try CAP33.deserialize(payloads: payloads)
+	XCTAssertEqual(parsed.mnemonicWordCount, mnemonic.wordCount)
+	XCTAssertEqual(accounts.count, parsed.accounts.count)
+	XCTAssertEqual(parsed.accounts.elements.map {
+		$0.toTestVectorAccount()
+	}, accountsWithSanitizedNames)
+
+	return .init(
+		testID: testID, olympiaWallet: .init(
+			mnemonic: mnemonic.phrase,
+			accounts: accountsWithSanitizedNames
+		), payloadSizeThreshold: payloadSizeThreshold,
+		payloads: payloads
+	)
+}
+
+private func generateTestVectors() throws -> [TestVector] {
+	let payloadSizes: [Int] = [100, 500, 1000, 1500, 2000]
+	let numberOfAccountsPossible = [1, 2, 5, 10, 50]
+
+	var testID = 0
+
+	let testVectors: [TestVector] = try payloadSizes.flatMap { (payloadSizeThreshold: Int) -> [TestVector] in
+		try BIP39.WordCount.allCases.flatMap { wordCount in
+			let mnemonic = try Mnemonic.generate(wordCount: wordCount)
+			return try numberOfAccountsPossible.map { (numberOfAccounts: Int) -> TestVector in
+				defer { testID += 1 }
+				return try generateTestVector(testID: testID, payloadSizeThreshold: payloadSizeThreshold, numberOfAccounts: numberOfAccounts, mnemonic: mnemonic)
+			}
+		}
+	}
 
 	return testVectors
 }
@@ -474,9 +483,9 @@ extension Olympia.Parsed.Account {
 // MARK: - ImportLegacyWalletClientTests
 final class ImportLegacyWalletClientTests: TestCase {
 	func omit_test_generate_tests() throws {
-		let testVectors = try generateTestVectors(numberOfTestVectors: 100)
+		let testVectors = try generateTestVectors()
 		let jsonEncoder = JSONEncoder()
-		jsonEncoder.outputFormatting = .prettyPrinted
+		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
 		let testJSON = try jsonEncoder.encode(testVectors)
 //		print(String(data: testJSON, encoding: .utf8)!)
 	}
@@ -502,7 +511,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 
 			for vector in testVectors {
 				try doTestDeserialize(vector)
-				// By default imitt soundness check of serialize
+				// By default omit soundness check of serialize
 //				try doSoundnessTestSerialize(vector)
 			}
 		}
@@ -534,7 +543,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 					compressedRepresentation: Data(
 						hex: "0354938a7db217e2e610f5389996ab63a070fb4414664df9d15e275aea6fe497c6"
 					)),
-				displayName: .init(rawValue: "Third account"),
+				displayName: .init(rawValue: "Third|account_ok"),
 				addressIndex: 2
 			),
 		]
@@ -562,15 +571,15 @@ final class ImportLegacyWalletClientTests: TestCase {
 		}
 
 		try doTest(threshold: 125, payloadStrings: [
-			"2|0|12^S|AvZppDAk2Q/eaTUczFMCLC+GcI2bPEJpNkBzPFd4I12l|0|With forbidden char in name}~H|A/YzLtwqoPA1w8VNdKOs7HbZtZherdzamVuX1BF3Bdez|",
-			"2|1|12^1|}~H|A1STin2yF+LmEPU4mZarY6Bw+0QUZk350V4nWupv5JfG|2|Third account}",
+			"2^0^12]S^AvZppDAk2Q/eaTUczFMCLC+GcI2bPEJpNkBzPFd4I12l^0^With forbidden char in name}~H^A/YzLtwqoPA1w8VNdKOs7HbZtZherdzamVuX1BF3Bdez^",
+			"2^1^12]1^}~H^A1STin2yF+LmEPU4mZarY6Bw+0QUZk350V4nWupv5JfG^2^Third|account_ok}",
 		])
 
 		try doTest(threshold: 60, payloadStrings: [
-			"4|0|12^S|AvZppDAk2Q/eaTUczFMCLC+GcI2bPEJpNkBzPFd4I12l|0|With forbid",
-			"4|1|12^den char in name}~H|A/YzLtwqoPA1w8VNdKOs7HbZtZherdzamVuX1BF3",
-			"4|2|12^Bdez|1|}~H|A1STin2yF+LmEPU4mZarY6Bw+0QUZk350V4nWupv5JfG|2|Th",
-			"4|3|12^ird account}",
+			"4^0^12]S^AvZppDAk2Q/eaTUczFMCLC+GcI2bPEJpNkBzPFd4I12l^0^With forbid",
+			"4^1^12]den char in name}~H^A/YzLtwqoPA1w8VNdKOs7HbZtZherdzamVuX1BF3",
+			"4^2^12]Bdez^1^}~H^A1STin2yF+LmEPU4mZarY6Bw+0QUZk350V4nWupv5JfG^2^Th",
+			"4^3^12]ird|account_ok}",
 		])
 	}
 }
