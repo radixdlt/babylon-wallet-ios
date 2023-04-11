@@ -32,6 +32,15 @@ extension Olympia.Export {
 		public static let allCases: [String] = [
 			inter, intra, headerEnd, accountNameEnd,
 		]
+
+		public static var regex: some RegexComponent {
+			ChoiceOf {
+				inter
+				intra
+				headerEnd
+				accountNameEnd
+			}
+		}
 	}
 
 	public struct Payload: Sendable, Hashable {
@@ -231,9 +240,7 @@ extension CAP33 {
 		let result = String(name
 			.prefix(Olympia.Export.accountNameMaxLength))
 			.replacing(
-				Regex {
-					OneOrMore(.anyOf(Olympia.Export.Separator.allCases.map { Character($0) }))
-				},
+				Olympia.Export.Separator.regex,
 				with: Olympia.Export.accountNameForbiddenCharReplacement
 			)
 

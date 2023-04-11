@@ -33,7 +33,7 @@ extension ImportOlympiaFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("Input \(viewStore.expectedWordCount)")
+					Text("Input #\(viewStore.expectedWordCount) words")
 
 					let focusedFieldBinding = viewStore.binding(
 						get: \.focusedField,
