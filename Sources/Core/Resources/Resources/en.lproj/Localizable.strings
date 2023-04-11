@@ -11,6 +11,11 @@
 "accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
 "accountPreferences.title" = "Account Preferences";
 
+"addressAction.copyAddress" = "Copy Address";
+"addressAction.copyTransactionId" = "Copy Transaction ID";
+"addressAction.copyNftId" = "Copy NFT ID";
+"addressAction.viewOnDashboard" = "View on Radix Dashboard";
+
 "aggregatedValue.title" = "Total value";
 
 "app.developmentOnlyInfo" = "Development use only. Not usable on Radix mainnet.";

@@ -23,7 +23,6 @@ extension AccountList {
 		}
 
 		public enum ViewAction: Sendable, Equatable {
-			case copyAddressButtonTapped
 			case tapped
 			case task
 			case securityPromptTapped
@@ -35,7 +34,6 @@ extension AccountList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case copyAddressButtonTapped(Profile.Network.Account)
 			case tapped(Profile.Network.Account)
 			case securityPromptTapped(Profile.Network.Account)
 		}
@@ -58,8 +56,6 @@ extension AccountList {
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
 					}
 				}
-			case .copyAddressButtonTapped:
-				return .send(.delegate(.copyAddressButtonTapped(state.account)))
 			case .securityPromptTapped:
 				return .send(.delegate(.securityPromptTapped(state.account)))
 			case .tapped:

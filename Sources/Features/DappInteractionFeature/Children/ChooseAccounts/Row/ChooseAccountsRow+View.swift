@@ -4,14 +4,14 @@ import FeaturePrelude
 extension ChooseAccountsRow {
 	struct ViewState: Equatable {
 		let appearanceID: Profile.Network.Account.AppearanceID
-		let accountName: String
-		let accountAddress: AddressView.ViewState
+		let name: String
+		let address: AccountAddress
 		let mode: ChooseAccountsRow.State.Mode
 
 		init(state: ChooseAccountsRow.State) {
 			appearanceID = state.account.appearanceID
-			accountName = state.account.displayName.rawValue
-			accountAddress = AddressView.ViewState(address: state.account.address.address, format: .default)
+			name = state.account.displayName.rawValue
+			address = state.account.address
 			mode = state.mode
 		}
 	}
@@ -26,12 +26,12 @@ extension ChooseAccountsRow {
 			Button(action: action) {
 				HStack {
 					VStack(alignment: .leading, spacing: .medium3) {
-						Text(viewState.accountName)
+						Text(viewState.name)
 							.foregroundColor(.app.white)
 							.textStyle(.body1Header)
 
-						AddressView(viewState.accountAddress, copyAddressAction: .none)
-							.foregroundColor(.app.white.opacity(0.8))
+						AddressView(.address(.account(viewState.address)))
+							.foregroundColor(.app.whiteTransparent)
 							.textStyle(.body2HighImportance)
 					}
 

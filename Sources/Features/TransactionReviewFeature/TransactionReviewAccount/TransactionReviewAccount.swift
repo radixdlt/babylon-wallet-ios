@@ -44,8 +44,6 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 // MARK: - TransactionReviewAccount
 public struct TransactionReviewAccount: Sendable, FeatureReducer {
-	@Dependency(\.pasteboardClient) private var pasteboardClient
-
 	public struct State: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress.ID { account.address.id }
 		public let account: TransactionReview.Account
@@ -59,7 +57,6 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case copyAddress
 	}
 
 	public init() {}
@@ -67,9 +64,6 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none
-		case .copyAddress:
-			pasteboardClient.copyString(state.account.address.address)
 			return .none
 		}
 	}

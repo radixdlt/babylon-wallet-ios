@@ -50,6 +50,16 @@ public enum L10n {
     /// Account Preferences
     public static let title = L10n.tr("Localizable", "accountPreferences.title", fallback: "Account Preferences")
   }
+  public enum AddressAction {
+    /// Copy Address
+    public static let copyAddress = L10n.tr("Localizable", "addressAction.copyAddress", fallback: "Copy Address")
+    /// Copy NFT ID
+    public static let copyNftId = L10n.tr("Localizable", "addressAction.copyNftId", fallback: "Copy NFT ID")
+    /// Copy Transaction ID
+    public static let copyTransactionId = L10n.tr("Localizable", "addressAction.copyTransactionId", fallback: "Copy Transaction ID")
+    /// View on Radix Dashboard
+    public static let viewOnDashboard = L10n.tr("Localizable", "addressAction.viewOnDashboard", fallback: "View on Radix Dashboard")
+  }
   public enum AggregatedValue {
     /// Total value
     public static let title = L10n.tr("Localizable", "aggregatedValue.title", fallback: "Total value")

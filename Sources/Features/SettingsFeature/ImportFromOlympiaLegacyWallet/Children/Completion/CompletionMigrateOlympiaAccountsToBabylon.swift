@@ -16,7 +16,6 @@ public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReduce
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case copyAddress(AccountAddress)
 		case finishButtonTapped
 	}
 
@@ -24,17 +23,12 @@ public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReduce
 		case finishedMigration
 	}
 
-	@Dependency(\.pasteboardClient) private var pasteboardClient
-
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .finishButtonTapped:
 			return .send(.delegate(.finishedMigration))
-		case let .copyAddress(address):
-			pasteboardClient.copyString(address.address)
-			return .none
 		}
 	}
 }

@@ -17,7 +17,7 @@ extension NewEntityCompletion {
 
 		// Account only
 		struct WhenAccount: Equatable {
-			let accountAddress: AddressView.ViewState
+			let accountAddress: AccountAddress
 			let appearanceID: Profile.Network.Account.AppearanceID
 		}
 
@@ -45,7 +45,7 @@ extension NewEntityCompletion {
 
 			if let account = state.entity as? Profile.Network.Account {
 				self.whenAccount = WhenAccount(
-					accountAddress: .init(address: account.address.address, format: .default),
+					accountAddress: account.address,
 					appearanceID: account.appearanceID
 				)
 				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.account
@@ -129,8 +129,9 @@ private extension NewEntityCompletion.View {
 					.textStyle(.body1Header)
 					.multilineTextAlignment(.center)
 
-				AddressView(whenAccount.accountAddress)
+				AddressView(.address(.account(whenAccount.accountAddress)), isTappable: false)
 					.foregroundColor(.app.whiteTransparent)
+					.textStyle(.body2HighImportance)
 			}
 			.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
 			.background(whenAccount.appearanceID.gradient)
