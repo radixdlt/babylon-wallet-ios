@@ -1,6 +1,7 @@
 import AppPreferencesClient
 import FactorSourcesClient
 import FeaturePrelude
+import Logging
 
 // MARK: - GeneralSettings
 public struct GeneralSettings: Sendable, FeatureReducer {
@@ -9,6 +10,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		public var hasLedgerHardwareWalletFactorSources: Bool = false
 		@PresentationState
 		public var alert: Alerts.State?
+		var exportLogs: URL?
 
 		public init() {}
 	}
@@ -19,6 +21,8 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		case developerModeToggled(Bool)
 		case cloudProfileSyncToggled(Bool)
 		case alert(PresentationAction<Alerts.Action>)
+		case exportLogsTapped
+		case exportLogsDismissed
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -100,6 +104,12 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			state.alert = nil
 			return updateCloudSync(state: &state, isEnabled: false)
 		case .alert(.dismiss):
+                        return .none
+		case .exportLogsTapped:
+			state.exportLogs = Logger.logFilePath
+			return .none
+		case .exportLogsDismissed:
+			state.exportLogs = nil
 			return .none
 		}
 	}

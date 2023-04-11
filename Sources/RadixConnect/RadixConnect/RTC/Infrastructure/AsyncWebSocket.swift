@@ -120,7 +120,7 @@ extension AsyncWebSocket {
 		receiveMessagesTask = Task {
 			try? Task.checkCancellation()
 			guard !Task.isCancelled else {
-				loggerGlobal.debug("WebSocket: Aborting receive messages, task cancelled.")
+				loggerGlobal.info("WebSocket: Aborting receive messages, task cancelled.")
 				return
 			}
 
@@ -158,7 +158,7 @@ extension AsyncWebSocket {
 			try? await clock.sleep(for: .seconds(Config.default.pingInterval))
 			try? Task.checkCancellation()
 			guard !Task.isCancelled else {
-				loggerGlobal.debug("WebSocket: Aborting ping, task cancelled.")
+				loggerGlobal.info("WebSocket: Aborting ping, task cancelled.")
 				return
 			}
 
@@ -237,12 +237,12 @@ extension AsyncWebSocket {
 			Task {
 				await self.invalidateAndRestartSession()
 			}
-		}, onOpen: { [weak self] in
+		}, onOpen: { [weak self, url = self.url] in
 			guard let self else { return }
 			Task {
 				await self.receiveMessages()
 				await self.sendPingContinuously()
-				loggerGlobal.info("WebSocket: Session Started")
+				loggerGlobal.info("WebSocket: Session Started for URL \(url)")
 			}
 		})
 
@@ -271,21 +271,21 @@ extension AsyncWebSocket {
 			webSocketTask: URLSessionWebSocketTask,
 			didOpenWithProtocol protocol: String?
 		) {
-			loggerGlobal.debug("websocket task=\(webSocketTask.taskIdentifier) didOpenWithProtocol: \(String(describing: `protocol`))")
+			loggerGlobal.info("websocket task=\(webSocketTask.taskIdentifier) didOpenWithProtocol: \(String(describing: `protocol`))")
 			onOpen()
 		}
 
 		// MARK: - Close events
 
 		func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-			loggerGlobal.debug("WebSocket: Task failed with error \(String(describing: error))")
+			loggerGlobal.info("WebSocket: Task failed with error \(String(describing: error))")
 			onClose()
 		}
 
 		// MARK: - Connectivity
 
 		func urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask) {
-			loggerGlobal.debug("WebSocket: Internet connection seems to be down, waiting for connectivity")
+			loggerGlobal.info("WebSocket: Internet connection seems to be down, waiting for connectivity")
 		}
 	}
 }
