@@ -126,10 +126,7 @@ enum SelectAccountsToImportRow {
 
 		var body: some SwiftUI.View {
 			if isAlreadyImported {
-				HStack {
-					Text("ALREADY IMPORTED")
-					label
-				}
+				label
 			} else {
 				Button(action: action) {
 					label
@@ -141,6 +138,11 @@ enum SelectAccountsToImportRow {
 		private var label: some SwiftUI.View {
 			HStack {
 				VStack(alignment: .leading, spacing: .medium2) {
+					if isAlreadyImported {
+						Text("Already imported")
+							.textStyle(.body1HighImportance)
+					}
+
 					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
 
 					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
@@ -169,10 +171,19 @@ enum SelectAccountsToImportRow {
 			}
 			.padding(.medium1)
 			.background(
-				viewState.appearanceID.gradient
-					.brightness(isSelected ? -0.1 : 0)
+				labelBackground
 			)
 			.cornerRadius(.small1)
+		}
+
+		@ViewBuilder
+		private var labelBackground: some SwiftUI.View {
+			if !isAlreadyImported {
+				viewState.appearanceID.gradient
+					.brightness(isSelected ? -0.1 : 0)
+			} else {
+				Color.app.gray3
+			}
 		}
 	}
 }

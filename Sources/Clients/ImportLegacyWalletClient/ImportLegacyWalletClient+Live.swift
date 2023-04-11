@@ -111,16 +111,15 @@ extension ImportLegacyWalletClient: DependencyKey {
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					let babylonAddresses = Set<AccountAddress>(accounts.map(\.address))
+					let payloadByteCount = 26
 					let setOfExistingData = try Set(babylonAddresses.map {
-						let data = try engineToolkitClient.decodeAddress($0.address).data
-						print("🧵 data: \(data.hex)")
+						let data = try Data(engineToolkitClient.decodeAddress($0.address).data.suffix(payloadByteCount))
 						return data
 					})
 					var alreadyImported = Set<OlympiaAccountToMigrate.ID>()
 					for scannedAccount in scannedAccounts {
 						let hash = try Blake2b.hash(data: scannedAccount.publicKey.compressedRepresentation)
-						let data = Array(hash.suffix(26))
-						print("🔮 data: \(data.hex)")
+						let data = Data(hash.suffix(payloadByteCount))
 						if setOfExistingData.contains(data) {
 							alreadyImported.insert(scannedAccount.id)
 						}
