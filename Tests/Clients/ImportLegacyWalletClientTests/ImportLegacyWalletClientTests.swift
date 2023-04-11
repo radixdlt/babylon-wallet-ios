@@ -47,22 +47,23 @@ extension CAP33 {
 		payloadSizeThreshold: Int
 	) throws -> NonEmpty<OrderedSet<NonEmptyString>> {
 		// 1. First serialize each account
-		let serializedAccounts: [String] = accounts.map { (account: TestVector.OlympiaWallet.Account) -> String in
-
+		let serializedAccounts: [String] = accounts.map { account -> String in
 			[
 				account.accountType.rawValue,
 				account.publicKeyCompressedBase64,
 				"\(account.addressIndex)",
-				Self._sanitize(name: account.name) + Olympia.Export.Separator.accountNameEnd, // mark end of account name (that might be empty)
-
-			].joined(separator: Olympia.Export.Separator.intra)
+				// Replace all characters matching RESERVED characters with `ACCOUNT_NAME_REPLACEMENT` character
+				// Take first 30 characters of name only. Name can be empty. ALWAYS append `END_OF_ACCOUNT_NAME`.
+				Self._sanitize(name: account.name) + Olympia.Export.Separator.accountNameEnd,
+			].joined(separator: Olympia.Export.Separator.intra) // Join accounts with `INTRA_SEPARATOR` char
 		}
 
 		// 2. Join serialized accounts into a single big string, using `INTER_SEPARATOR`
 		let accountsJoined = serializedAccounts.joined(
 			separator: Olympia.Export.Separator.inter
 		)
-		// 3. Split big string into 'contentsOfPayloads' with bytecount 'payloadSizeThreshold'
+
+		// 3. Split `accountsJoined` into 'contentsOfPayloads' with bytecount 'payloadSizeThreshold'
 		let contentsOfPayloads: [String] = accountsJoined.chunks(ofCount: payloadSizeThreshold).map { String($0) }
 
 		// 4. Now we know payloadCount
@@ -70,8 +71,12 @@ extension CAP33 {
 
 		// 5. Prepend each "contentOfPayload| with a header, with a unique header specifying the index of the resulting payload
 		let payloadsArray: [NonEmptyString] = contentsOfPayloads.enumerated().map { payloadIndex, payloadContent in
-			// Construct header, end it with `headerEnd` seperator
-			let header: String = [payloadCount, payloadIndex, wordCount].map { "\($0)" }.joined(separator: Olympia.Export.Separator.intra) + Olympia.Export.Separator.headerEnd
+
+			// Construct header, being the tripple (payloadCount, payloadIndex, mnemonicWordCount)
+			let header: String = [payloadCount, payloadIndex, wordCount]
+				.map { "\($0)" } // stringify the three integers (base 10)
+				.joined(separator: Olympia.Export.Separator.intra) // join with `INTRA_SEPARATOR` char
+				+ Olympia.Export.Separator.headerEnd // end it with `headerEnd` seperator
 
 			guard let payload = NonEmptyString(rawValue: header + payloadContent) else {
 				fatalError("Failed to serialize payload")
