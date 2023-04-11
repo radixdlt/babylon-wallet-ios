@@ -248,15 +248,7 @@ extension CAP33 {
 		rest maybeRest: NonEmptyString?
 	) throws -> Olympia.Export.Payload {
 		let (header, contentNonEmpty) = try deserializeHeaderAndContent(payload: payload)
-		let contentSuffix = contentNonEmpty.rawValue
-		let content: String = {
-			if let rest = maybeRest {
-				// Prepend rest from last payload if any
-				return rest + contentSuffix
-			} else {
-				return contentSuffix
-			}
-		}()
+		let content = (maybeRest?.rawValue ?? "") + contentNonEmpty.rawValue
 
 		guard
 			case let accountComponentsAndMaybeRest = content.split(
