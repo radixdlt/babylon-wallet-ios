@@ -33,7 +33,7 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 				let accounts: [OlympiaAccountToMigrate] = try (0 ..< numberOfAccounts).map {
 					let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
 					let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
-					let accountType = ($0 % 2 == 0) ? LegacyOlympiaAccountType.software.rawValue : LegacyOlympiaAccountType.hardware.rawValue
+					let accountType = ($0 % 2 == 0) ? Olympia.AccountType.software.rawValue : Olympia.AccountType.hardware.rawValue
 					let accountNonChecked = AccountNonChecked(
 						accountType: accountType,
 						pk: publicKey.compressedData.hex,

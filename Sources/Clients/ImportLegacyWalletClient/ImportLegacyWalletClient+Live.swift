@@ -107,7 +107,7 @@ func convertUncheckedAccount(
 	}
 	let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
 
-	guard let accountType = LegacyOlympiaAccountType(rawValue: raw.accountType) else {
+	guard let accountType = Olympia.AccountType(rawValue: raw.accountType) else {
 		fatalError()
 	}
 

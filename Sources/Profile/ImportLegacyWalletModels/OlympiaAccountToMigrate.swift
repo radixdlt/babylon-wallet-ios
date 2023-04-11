@@ -7,7 +7,7 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 
 	public var id: ID { publicKey }
 
-	public let accountType: LegacyOlympiaAccountType
+	public let accountType: Olympia.AccountType
 
 	public let publicKey: K1.PublicKey
 	public let path: LegacyOlympiaBIP44LikeDerivationPath
@@ -21,7 +21,7 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 	public let addressIndex: HD.Path.Component.Child.Value
 
 	public init(
-		accountType: LegacyOlympiaAccountType,
+		accountType: Olympia.AccountType,
 		publicKey: K1.PublicKey,
 		path: LegacyOlympiaBIP44LikeDerivationPath,
 		address: LegacyOlympiaAccountAddress,
