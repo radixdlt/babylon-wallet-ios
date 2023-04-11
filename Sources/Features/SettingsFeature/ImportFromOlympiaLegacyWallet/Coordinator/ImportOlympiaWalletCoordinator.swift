@@ -119,7 +119,19 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			state.selectedAccounts = accounts
 
 			if accounts.software != nil {
-				let destination = Destinations.State.importOlympiaMnemonic(.init(shouldPersist: false))
+				let expectedWordCount: BIP39.WordCount = {
+					if let expectedMnemonicWordCount = state.expectedMnemonicWordCount {
+						return expectedMnemonicWordCount
+					}
+					assertionFailure("Expected to have set 'expectedMnemonicWordCount'")
+					return .twelve
+				}()
+
+				let destination = Destinations.State.importOlympiaMnemonic(.init(
+					shouldPersist: false,
+					expectedWordCount: expectedWordCount
+				))
+
 				if state.path.last != destination {
 					state.path.append(destination)
 				}

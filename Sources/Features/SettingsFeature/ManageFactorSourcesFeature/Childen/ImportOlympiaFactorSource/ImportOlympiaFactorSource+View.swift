@@ -1,8 +1,14 @@
+import Cryptography
 import FeaturePrelude
 
 extension ImportOlympiaFactorSource.State {
 	var viewState: ImportOlympiaFactorSource.ViewState {
-		.init(mnemonic: mnemonic, passphrase: passphrase, focusedField: focusedField)
+		.init(
+			mnemonic: mnemonic,
+			passphrase: passphrase,
+			expectedWordCount: expectedWordCount.wordCount,
+			focusedField: focusedField
+		)
 	}
 }
 
@@ -11,6 +17,7 @@ extension ImportOlympiaFactorSource {
 	public struct ViewState: Equatable {
 		let mnemonic: String
 		let passphrase: String
+		let expectedWordCount: Int
 		@BindingState public var focusedField: ImportOlympiaFactorSource.State.Field?
 	}
 
@@ -26,6 +33,8 @@ extension ImportOlympiaFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
+					Text("Input \(viewStore.expectedWordCount)")
+
 					let focusedFieldBinding = viewStore.binding(
 						get: \.focusedField,
 						send: { .textFieldFocused($0) }
@@ -37,6 +46,7 @@ extension ImportOlympiaFactorSource {
 							get: \.mnemonic,
 							send: { .mnemonicChanged($0) }
 						),
+						axis: .vertical,
 						hint: .info("Seed phrase"),
 						focus: .on(.mnemonic, binding: focusedFieldBinding, to: $focusedField)
 					)

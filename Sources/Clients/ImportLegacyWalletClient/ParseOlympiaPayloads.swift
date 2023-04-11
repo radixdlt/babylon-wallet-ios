@@ -21,13 +21,15 @@ extension Olympia {
 extension Olympia.Export {
 	public static let accountNameForbiddenCharReplacement = "_"
 	public static let accountNameMaxLength = Profile.Network.Account.nameMaxLength
+
 	public enum Separator: Sendable, Hashable, CaseIterable {
 		static let inter = "~"
 		static let intra = "^"
 		static let headerEnd = "]"
 		static let accountNameEnd = "}"
+
 		public static let allCases: [String] = [
-			Self.inter, Self.intra, Self.headerEnd, Self.accountNameEnd,
+			inter, intra, headerEnd, accountNameEnd,
 		]
 	}
 
@@ -40,7 +42,7 @@ extension Olympia.Export {
 			public let payloadIndex: Int
 			public let mnemonicWordCount: Int
 			public var isLast: Bool {
-				payloadIndex >= (payloadCount - 1)
+				payloadIndex >= payloadCount - 1
 			}
 		}
 
@@ -65,7 +67,7 @@ public enum CAP33 {
 
 		var rest: NonEmptyString?
 		for payloadString in payloadStrings.rawValue.elements {
-			let payload = try Self._deserialize(payload: payloadString, rest: rest)
+			let payload = try _deserialize(payload: payloadString, rest: rest)
 			if mnemonicWordCount == nil {
 				mnemonicWordCount = BIP39.WordCount(wordCount: payload.header.mnemonicWordCount)!
 			}
@@ -233,7 +235,7 @@ extension CAP33 {
 	}
 
 	internal static func _deserialize(payloadsStrings: [String]) throws -> Olympia.Parsed {
-		try Self.deserialize(
+		try deserialize(
 			payloads: .init(rawValue: OrderedSet(
 				uncheckedUniqueElements: payloadsStrings.compactMap { NonEmptyString(rawValue: $0) }
 			))!

@@ -11,21 +11,25 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 
 		public let shouldPersist: Bool
 		public var mnemonic: String
+		public var expectedWordCount: BIP39.WordCount
 		public var passphrase: String
 
 		@BindingState public var focusedField: Field?
 
 		public init(
 			shouldPersist: Bool = true,
+			expectedWordCount: BIP39.WordCount = .twelve,
 			mnemonic: String = "",
 			passphrase: String = ""
 		) {
 			self.shouldPersist = shouldPersist
 			self.mnemonic = mnemonic
+			self.expectedWordCount = expectedWordCount
 			self.passphrase = passphrase
 			#if DEBUG
 			if let new = (try? Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english))?.phrase {
 				self.mnemonic = new
+				self.expectedWordCount = .twentyFour
 			}
 			#endif
 		}
@@ -99,9 +103,11 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		case let .focusTextField(field):
 			state.focusedField = field
 			return .none
+
 		case let .mnemonicFromPhraseResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
 		case let .mnemonicFromPhraseResult(.success(mnemonic)):
 
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(
@@ -122,9 +128,11 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 					}
 				)))
 			}
+
 		case let .importOlympiaFactorSourceResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
 		case let .importOlympiaFactorSourceResult(.success(factorSourceID)):
 			return .send(.delegate(.persisted(factorSourceID)))
 		}
