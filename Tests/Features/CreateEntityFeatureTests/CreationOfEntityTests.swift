@@ -20,8 +20,8 @@ final class CreationOfEntityTests: TestCase {
 				XCTAssertEqual(request.displayName, account.displayName)
 				return account
 			}
-			$0.accountsClient.saveVirtualAccount = { account, _ in
-				XCTAssertEqual(account, account)
+			$0.accountsClient.saveVirtualAccount = { request in
+				XCTAssertEqual(request.account, account)
 			}
 		}
 		await store.send(.view(.appeared))

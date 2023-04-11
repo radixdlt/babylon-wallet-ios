@@ -9,12 +9,12 @@ extension ImportLegacyWalletClient: DependencyKey {
 	public typealias Value = ImportLegacyWalletClient
 
 	public static let liveValue: Self = {
+		@Dependency(\.accountsClient) var accountsClient
+
 		@Sendable func migrate(
 			accounts: Set<OlympiaAccountToMigrate>,
 			factorSouceID: FactorSourceID
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
-			@Dependency(\.accountsClient) var accountsClient
-
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
 			let accountIndexOffset = try await accountsClient.getAccountsOnCurrentNetwork().count
@@ -45,26 +45,43 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 			// Save all accounts
 			for account in accounts {
-				try await accountsClient.saveVirtualAccount(
-					account.babylon,
-					false // shouldUpdateFactorSourceNextDerivationIndex
-				)
+				try await accountsClient.saveVirtualAccount(.init(
+					account: account.babylon,
+					shouldUpdateFactorSourceNextDerivationIndex: false
+				))
 			}
 
 			return (accounts: accounts, networkID: networkID)
 		}
 
 		return Self(
-			parseHeaderFromQRCode: { try Self.previewValue.parseHeaderFromQRCode($0) },
-			parseLegacyWalletFromQRCodes: { try Self.previewValue.parseLegacyWalletFromQRCodes($0) },
+			parseHeaderFromQRCode: {
+				try CAP33.deserializeHeader(payload: $0)
+			},
+			parseLegacyWalletFromQRCodes: {
+				let parsed = try CAP33.deserialize(payloads: $0)
+				let accountsArray = try parsed.accounts.rawValue.map(convert)
+				guard
+					!accountsArray.isEmpty,
+					case let accountsSet = OrderedSet<OlympiaAccountToMigrate>(accountsArray),
+					let nonEmpty = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(rawValue: accountsSet)
+				else {
+					struct FailedToConvertedParsedAccount: Swift.Error {}
+					throw FailedToConvertedParsedAccount()
+				}
+				return .init(
+					mnemonicWordCount: parsed.mnemonicWordCount,
+					accounts: nonEmpty
+				)
+			},
 			migrateOlympiaSoftwareAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
-				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource
+				let factorSource = olympiaFactorSource?.hdOnDeviceFactorSource
 
 				let (accounts, networkID) = try await migrate(
 					accounts: request.olympiaAccounts,
-					factorSouceID: factorSource.id
+					factorSouceID: request.olympiaFactorSouceID
 				)
 
 				let migratedAccounts = try MigratedSoftwareAccounts(
@@ -88,34 +105,54 @@ extension ImportLegacyWalletClient: DependencyKey {
 				)
 
 				return migratedAccounts
+			},
+			findAlreadyImportedIfAny: { scannedAccounts in
+				@Dependency(\.engineToolkitClient) var engineToolkitClient
+				do {
+					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+					let babylonAddresses = Set<AccountAddress>(accounts.map(\.address))
+					let payloadByteCount = 26
+					let setOfExistingData = try Set(babylonAddresses.map {
+						let data = try Data(engineToolkitClient.decodeAddress($0.address).data.suffix(payloadByteCount))
+						return data
+					})
+					var alreadyImported = Set<OlympiaAccountToMigrate.ID>()
+					for scannedAccount in scannedAccounts {
+						let hash = try Blake2b.hash(data: scannedAccount.publicKey.compressedRepresentation)
+						let data = Data(hash.suffix(payloadByteCount))
+						if setOfExistingData.contains(data) {
+							alreadyImported.insert(scannedAccount.id)
+						}
+					}
+					return alreadyImported
+				} catch {
+					loggerGlobal.error("Failed to find existing accounts, error: \(error)")
+					return []
+				}
 			}
 		)
 	}()
 }
 
-func convertUncheckedAccount(
-	_ raw: AccountNonChecked,
-	engineToolkitClient: EngineToolkitClient
+func convert(
+	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
-	let publicKeyData = try Data(hex: raw.pk)
-	let publicKey = try K1.PublicKey(compressedRepresentation: publicKeyData)
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
-	let bech32Address = try engineToolkitClient.deriveOlympiaAdressFromPublicKey(publicKey)
+	let bech32Address = try engineToolkitClient.deriveOlympiaAdressFromPublicKey(raw.publicKey)
 
 	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
-		fatalError()
+		struct FailedToCreateNonEmptyOlympiaAddress: Swift.Error {}
+		throw FailedToCreateNonEmptyOlympiaAddress()
 	}
 	let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
-
-	guard let accountType = LegacyOlympiaAccountType(rawValue: raw.accountType) else {
-		fatalError()
-	}
+	let derivationPath = try LegacyOlympiaBIP44LikeDerivationPath(index: raw.addressIndex)
 
 	return try .init(
-		accountType: accountType,
-		publicKey: .init(compressedRepresentation: publicKeyData),
-		path: .init(derivationPath: raw.path),
+		accountType: raw.accountType,
+		publicKey: raw.publicKey,
+		path: derivationPath,
 		address: address,
-		displayName: raw.name.map { NonEmptyString(rawValue: $0) } ?? nil
+		displayName: raw.displayName
 	)
 }

@@ -1,6 +1,6 @@
-import AccountsClient
 import AddLedgerNanoFactorSourceFeature
 import Cryptography
+import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
 import Profile
@@ -72,6 +72,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case findAlreadyImportedOlympiaSoftwareAccounts(
+			scanned: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+			alreadyImported: Set<OlympiaAccountToMigrate.ID>
+		)
+
 		case validatedOlympiaSoftwareAccounts(
 			softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			privateHDFactorSource: PrivateHDFactorSource
@@ -109,18 +114,36 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .root(Destinations.Action.scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet)))):
+		case let .root(.scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet)))):
 			state.expectedMnemonicWordCount = olympiaWallet.mnemonicWordCount
-			let destination = Destinations.State.selectAccountsToImport(.init(scannedAccounts: olympiaWallet.accounts))
-			if state.path.last != destination {
-				state.path.append(destination)
+			let scanned = olympiaWallet.accounts
+			return .run { send in
+
+				let alreadyImported = await importLegacyWalletClient.findAlreadyImportedIfAny(scanned)
+
+				await send(.internal(.findAlreadyImportedOlympiaSoftwareAccounts(
+					scanned: scanned,
+					alreadyImported: alreadyImported
+				)))
 			}
-			return .none
+
 		case let .path(.element(_, action: .selectAccountsToImport(.delegate(.selectedAccounts(accounts))))):
 			state.selectedAccounts = accounts
 
 			if accounts.software != nil {
-				let destination = Destinations.State.importOlympiaMnemonic(.init(shouldPersist: false))
+				let expectedWordCount: BIP39.WordCount = {
+					if let expectedMnemonicWordCount = state.expectedMnemonicWordCount {
+						return expectedMnemonicWordCount
+					}
+					assertionFailure("Expected to have set 'expectedMnemonicWordCount'")
+					return .twelve
+				}()
+
+				let destination = Destinations.State.importOlympiaMnemonic(.init(
+					shouldPersist: false,
+					expectedWordCount: expectedWordCount
+				))
+
 				if state.path.last != destination {
 					state.path.append(destination)
 				}
@@ -132,6 +155,18 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 
 			return .none
+
+		case let .path(.element(_, action: .importOlympiaMnemonic(.delegate(.alreadyExists(factorSourceID))))):
+			guard let softwareAccounts = state.selectedAccounts?.software else {
+				assertionFailure("Bad implementation, expected 'state.selectedAccounts.software' to have been set.")
+				return .none
+			}
+			return convertToBabylon(
+				softwareAccounts: softwareAccounts,
+				factorSourceID: factorSourceID,
+				factorSource: nil
+			)
+
 		case let .path(.element(_, action: .importOlympiaMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))))):
 			state.mnemonicWithPassphrase = mnemonicWithPassphrase
 			guard let softwareAccounts = state.selectedAccounts?.software else {
@@ -169,10 +204,22 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .findAlreadyImportedOlympiaSoftwareAccounts(scanned, alreadyImported):
+			let destination = Destinations.State.selectAccountsToImport(.init(
+				scannedAccounts: scanned,
+				alreadyImported: alreadyImported
+			))
+
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
+			return .none
+
 		case let .validatedOlympiaSoftwareAccounts(softwareAccounts, privateHDFactorSource):
 
 			return convertToBabylon(
 				softwareAccounts: softwareAccounts,
+				factorSourceID: privateHDFactorSource.id,
 				factorSource: privateHDFactorSource
 			)
 
@@ -254,27 +301,37 @@ extension ImportOlympiaWalletCoordinator {
 
 	private func convertToBabylon(
 		softwareAccounts olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-		factorSource: PrivateHDFactorSource
+		factorSourceID: FactorSourceID,
+		factorSource: PrivateHDFactorSource?
 	) -> EffectTask<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile
 			let migrated = try await importLegacyWalletClient.migrateOlympiaSoftwareAccountsToBabylon(
 				.init(
 					olympiaAccounts: Set(olympiaAccounts.elements),
+					olympiaFactorSouceID: factorSourceID,
 					olympiaFactorSource: factorSource
 				)
 			)
 
-			// However, we have not yet saved the factorSource, so lets do that
-			let factorSourceToSave = migrated.factorSourceToSave
-			guard try factorSourceToSave.id == FactorSource.id(fromPrivateHDFactorSource: factorSource) else {
-				throw OlympiaFactorSourceToSaveIDDisrepancy()
+			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
+				// We have not yet saved the factorSource, so lets do that
+				guard try factorSourceToSave.id == FactorSource.id(fromPrivateHDFactorSource: factorSource) else {
+					throw OlympiaFactorSourceToSaveIDDisrepancy()
+				}
+
+				do {
+					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
+						mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
+						hdOnDeviceFactorSource: factorSourceToSave
+					)
+					)
+
+				} catch {
+					fatalError("todo, handle terrible bad stuff if failed to save factor source (mnemonic) but have already created accounts....")
+				}
 			}
-			do {
-				_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase, hdOnDeviceFactorSource: factorSourceToSave))
-			} catch {
-				fatalError("todo, handle terrible bad stuff if failed to save factor source (mnemonic) but have already created accounts....")
-			}
+
 			await send(.internal(.migratedOlympiaSoftwareAccounts(migrated)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
@@ -285,27 +342,5 @@ extension ImportOlympiaWalletCoordinator {
 // MARK: - GotNoAccountsToImport
 struct GotNoAccountsToImport: Swift.Error {}
 
-// MARK: - ValidateOlympiaAccountsFailure
-enum ValidateOlympiaAccountsFailure: LocalizedError {
-	case publicKeyMismatch
-}
-
 // MARK: - OlympiaFactorSourceToSaveIDDisrepancy
 struct OlympiaFactorSourceToSaveIDDisrepancy: Swift.Error {}
-
-extension MnemonicWithPassphrase {
-	func validatePublicKeysOf(
-		softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	) throws {
-		let hdRoot = try self.hdRoot()
-
-		for olympiaAccount in softwareAccounts {
-			let path = olympiaAccount.path.fullPath
-			let derivedPublicKey = try hdRoot.derivePrivateKey(path: path, curve: SECP256K1.self).publicKey
-			guard derivedPublicKey == olympiaAccount.publicKey else {
-				throw ValidateOlympiaAccountsFailure.publicKeyMismatch
-			}
-		}
-		// PublicKeys matches
-	}
-}

@@ -436,11 +436,13 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"EngineToolkitClient",
-			.product(name: "Parsing", package: "swift-parsing") {
-				.package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.12.0")
-			},
+			"Profile", // Olympia models
 		],
-		tests: .yes()
+		tests: .yes(
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
 	),
 	.client(
 		name: "LocalAuthenticationClient",

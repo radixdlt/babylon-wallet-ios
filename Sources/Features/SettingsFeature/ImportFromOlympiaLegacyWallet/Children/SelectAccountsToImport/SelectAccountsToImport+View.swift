@@ -1,4 +1,3 @@
-import AccountsClient
 import FeaturePrelude
 import ImportLegacyWalletClient
 
@@ -6,6 +5,7 @@ extension SelectAccountsToImport.State {
 	var viewState: SelectAccountsToImport.ViewState {
 		.init(
 			availableAccounts: availableAccounts.elements,
+			alreadyImported: alreadyImported,
 			selectionRequirement: selectionRequirement,
 			selectedAccounts: selectedAccounts
 		)
@@ -16,6 +16,7 @@ extension SelectAccountsToImport.State {
 extension SelectAccountsToImport {
 	public struct ViewState: Equatable {
 		let availableAccounts: [OlympiaAccountToMigrate]
+		let alreadyImported: Set<OlympiaAccountToMigrate.ID>
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [OlympiaAccountToMigrate]?
 	}
@@ -46,6 +47,7 @@ extension SelectAccountsToImport {
 						) { item in
 							SelectAccountsToImportRow.View(
 								viewState: .init(state: item.value),
+								isAlreadyImported: viewStore.alreadyImported.contains(item.value.id),
 								isSelected: item.isSelected,
 								action: item.action
 							)
@@ -103,7 +105,7 @@ enum SelectAccountsToImportRow {
 		let olympiaAddress: String
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let derivationPath: String
-		let olympiaAccountType: LegacyOlympiaAccountType
+		let olympiaAccountType: Olympia.AccountType
 
 		init(state olympiaAccount: OlympiaAccountToMigrate) {
 			accountName = olympiaAccount.displayName?.rawValue ?? L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Value.nameFallback
@@ -118,45 +120,70 @@ enum SelectAccountsToImportRow {
 	@MainActor
 	struct View: SwiftUI.View {
 		let viewState: ViewState
+		let isAlreadyImported: Bool
 		let isSelected: Bool
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
-			Button(action: action) {
-				HStack {
-					VStack(alignment: .leading, spacing: .medium2) {
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
+			if isAlreadyImported {
+				label
+			} else {
+				Button(action: action) {
+					label
+				}
+				.buttonStyle(.inert)
+			}
+		}
 
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
-
-						VStack(alignment: .leading, spacing: .small3) {
-							Group {
-								Text(L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.olympiaAddress)
-									.textStyle(.body2Header)
-
-								Text(viewState.olympiaAddress)
-									.textStyle(.monospace)
-									.frame(maxWidth: .infinity, alignment: .leading)
-							}
-							.foregroundColor(.app.white)
-						}
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
+		private var label: some SwiftUI.View {
+			HStack {
+				VStack(alignment: .leading, spacing: .medium2) {
+					if isAlreadyImported {
+						Text("Already imported")
+							.textStyle(.body1HighImportance)
 					}
-					Spacer()
 
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
+
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
+
+					VStack(alignment: .leading, spacing: .small3) {
+						Group {
+							Text(L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.olympiaAddress)
+								.textStyle(.body2Header)
+
+							Text(viewState.olympiaAddress)
+								.textStyle(.monospace)
+								.frame(maxWidth: .infinity, alignment: .leading)
+						}
+						.foregroundColor(.app.white)
+					}
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
+				}
+				Spacer()
+
+				if !isAlreadyImported {
 					CheckmarkView(
 						appearance: .light,
 						isChecked: isSelected
 					)
 				}
-				.padding(.medium1)
-				.background(
-					viewState.appearanceID.gradient
-						.brightness(isSelected ? -0.1 : 0)
-				)
-				.cornerRadius(.small1)
 			}
-			.buttonStyle(.inert)
+			.padding(.medium1)
+			.background(
+				labelBackground
+			)
+			.cornerRadius(.small1)
+		}
+
+		@ViewBuilder
+		private var labelBackground: some SwiftUI.View {
+			if !isAlreadyImported {
+				viewState.appearanceID.gradient
+					.brightness(isSelected ? -0.1 : 0)
+			} else {
+				Color.app.gray3
+			}
 		}
 	}
 }

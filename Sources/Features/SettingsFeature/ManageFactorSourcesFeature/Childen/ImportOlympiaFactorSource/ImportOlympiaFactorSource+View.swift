@@ -1,8 +1,15 @@
+import Cryptography
 import FeaturePrelude
 
 extension ImportOlympiaFactorSource.State {
 	var viewState: ImportOlympiaFactorSource.ViewState {
-		.init(mnemonic: mnemonic, passphrase: passphrase, focusedField: focusedField)
+		.init(
+			mnemonic: mnemonic,
+			passphrase: passphrase,
+			expectedWordCount: expectedWordCount.wordCount,
+			canTapAlreadyImportedButton: canTapAlreadyImportedButton,
+			focusedField: focusedField
+		)
 	}
 }
 
@@ -11,6 +18,8 @@ extension ImportOlympiaFactorSource {
 	public struct ViewState: Equatable {
 		let mnemonic: String
 		let passphrase: String
+		let expectedWordCount: Int
+		let canTapAlreadyImportedButton: Bool
 		@BindingState public var focusedField: ImportOlympiaFactorSource.State.Field?
 	}
 
@@ -26,6 +35,8 @@ extension ImportOlympiaFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
+					Text("Input #\(viewStore.expectedWordCount) words")
+
 					let focusedFieldBinding = viewStore.binding(
 						get: \.focusedField,
 						send: { .textFieldFocused($0) }
@@ -57,8 +68,20 @@ extension ImportOlympiaFactorSource {
 						viewStore.send(.importButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
+
+					Button("Already imported") {
+						viewStore.send(.alreadyImportedButtonTapped)
+					}
+					.controlState(viewStore.canTapAlreadyImportedButton ? .enabled : .disabled)
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
 				}
 				.padding([.horizontal, .bottom], .medium1)
+				.alert(
+					store: store.scope(
+						state: \.$foundNoExistFactorSourceAlert,
+						action: { .view(.foundNoExistFactorSourceAlert($0)) }
+					)
+				)
 				.onAppear { viewStore.send(.appeared) }
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)

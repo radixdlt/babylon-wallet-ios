@@ -1,5 +1,5 @@
-import AccountsClient
 import FeaturePrelude
+import Profile
 
 // MARK: - CompletionMigrateOlympiaAccountsToBabylon
 public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {

@@ -10,10 +10,13 @@ extension FactorSourcesClient: DependencyKey {
 		profileStore getProfileStore: @escaping @Sendable () async -> ProfileStore = { await .shared }
 	) -> Self {
 		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		let getFactorSources: GetFactorSources = {
+			await getProfileStore().profile.factorSources
+		}
+
 		return Self(
-			getFactorSources: {
-				await getProfileStore().profile.factorSources
-			},
+			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await getProfileStore().factorSourcesValues()
 			},
@@ -36,6 +39,34 @@ extension FactorSourcesClient: DependencyKey {
 				}
 
 				return factorSourceID
+			},
+			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts in
+				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
+					assertionFailure("Unexpectedly received hardware account, unable to verify.")
+					return nil
+				}
+				do {
+					let factorSourceIDs = try await getFactorSources()
+						.filter { $0.kind == .device && $0.supportsOlympia }
+						.map(\.id)
+
+					for factorSourceID in factorSourceIDs {
+						guard let mnemonic = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .importOlympiaAccounts) else {
+							continue
+						}
+						guard try mnemonic.validatePublicKeysOf(softwareAccounts: softwareAccounts) else {
+							continue
+						}
+						// YES Managed to validate all software accounts against existing factor source
+						loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
+						return factorSourceID
+					}
+
+					return nil // failed to find any factor source
+				} catch {
+					loggerGlobal.warning("Failed to check if olympia factor source exists, error: \(error)")
+					return nil // failure
+				}
 			}
 		)
 	}

@@ -1,7 +1,5 @@
-import AccountsClient
 import ClientPrelude
-import Cryptography
-import EngineToolkitClient
+import Profile
 
 // MARK: - ImportLegacyWalletClient
 public struct ImportLegacyWalletClient: Sendable {
@@ -10,14 +8,18 @@ public struct ImportLegacyWalletClient: Sendable {
 
 	public var migrateOlympiaSoftwareAccountsToBabylon: MigrateOlympiaSoftwareAccountsToBabylon
 	public var migrateOlympiaHardwareAccountsToBabylon: MigrateOlympiaHardwareAccountsToBabylon
+
+	public var findAlreadyImportedIfAny: FindAlreadyImportedIfAny
 }
 
 extension ImportLegacyWalletClient {
-	public typealias ParseHeaderFromQRCode = @Sendable (String) throws -> OlympiaExportHeader
+	public typealias ParseHeaderFromQRCode = @Sendable (NonEmptyString) throws -> Olympia.Export.Payload.Header
 
-	public typealias ParseLegacyWalletFromQRCodes = @Sendable (_ qrCodes: OrderedSet<String>) throws -> ScannedParsedOlympiaWalletToMigrate
+	public typealias ParseLegacyWalletFromQRCodes = @Sendable (_ qrCodes: NonEmpty<OrderedSet<NonEmptyString>>) throws -> ScannedParsedOlympiaWalletToMigrate
 
 	public typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaSoftwareAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
 
 	public typealias MigrateOlympiaHardwareAccountsToBabylon = @Sendable (MigrateOlympiaHardwareAccountsToBabylonRequest) async throws -> MigratedHardwareAccounts
+
+	public typealias FindAlreadyImportedIfAny = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> Set<OlympiaAccountToMigrate.ID>
 }

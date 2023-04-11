@@ -25,7 +25,8 @@ extension ProfileSnapshot.Version {
 	/// - 24: Add `isDeveloperModeEnabled` to AppPreferences.
 	/// - 25: Merge two conflicting Profile versions together.
 	/// - 26: Change Factor Source Storage codable (remove key "properties"). Remove `storage` for "olympia" `.device` factor sources
-	public static let minimum: Self = 26
+	/// - 27: Rename `iCloudProfileSyncEnabled` -> `isCloudProfileSyncEnabled` to be platform agnostic.
+	public static let minimum: Self = 27
 }
 
 // MARK: - Profile

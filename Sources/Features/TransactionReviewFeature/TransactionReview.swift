@@ -634,6 +634,24 @@ extension EngineToolkitModels.AddressKind {
 			return nil
 		case .normalComponent:
 			return nil
+		case .secp256k1VirtualAccountComponent:
+			return nil
+		case .ed25519VirtualAccountComponent:
+			return nil
+		case .secp256k1VirtualIdentityComponent:
+			return nil
+		case .ed25519VirtualIdentityComponent:
+			return nil
+		case .identityComponent:
+			return nil
+		case .epochManager:
+			return nil
+		case .validator:
+			return nil
+		case .clock:
+			return nil
+		case .accessControllerComponent:
+			return nil
 		}
 	}
 }

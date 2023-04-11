@@ -76,7 +76,7 @@ extension NameNewEntity {
 									)
 								)
 								#if os(iOS)
-								.textFieldCharacterLimit(30, forText: nameBinding)
+								.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
 								#endif
 								.autocorrectionDisabled()
 							}
