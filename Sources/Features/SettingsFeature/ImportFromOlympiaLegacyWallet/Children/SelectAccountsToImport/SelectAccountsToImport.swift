@@ -1,4 +1,3 @@
-import AccountsClient
 import FeaturePrelude
 import ImportLegacyWalletClient
 

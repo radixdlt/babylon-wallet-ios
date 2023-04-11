@@ -1,11 +1,9 @@
-import AccountsClient // OlympiaAccountToMigrate
 import Cryptography
-import EngineToolkitClient
 import FeaturePrelude
 import ImportLegacyWalletClient
 import ScanQRFeature
 
-// MARK: - ScanMultipleOlyœmpiaQRCodes
+// MARK: - ScanMultipleOlympiaQRCodes
 public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public struct ScannedPayload: Sendable, Hashable, Identifiable {

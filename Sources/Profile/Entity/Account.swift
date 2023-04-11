@@ -54,6 +54,7 @@ extension Profile.Network {
 }
 
 extension Profile.Network.Account {
+	public static let nameMaxLength = 30
 	public static func deriveAddress(
 		networkID: NetworkID,
 		publicKey: SLIP10.PublicKey
