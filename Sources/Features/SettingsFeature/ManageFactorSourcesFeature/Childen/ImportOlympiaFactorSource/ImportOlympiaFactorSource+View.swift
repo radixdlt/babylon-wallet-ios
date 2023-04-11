@@ -7,6 +7,7 @@ extension ImportOlympiaFactorSource.State {
 			mnemonic: mnemonic,
 			passphrase: passphrase,
 			expectedWordCount: expectedWordCount.wordCount,
+			canTapAlreadyImportedButton: canTapAlreadyImportedButton,
 			focusedField: focusedField
 		)
 	}
@@ -18,6 +19,7 @@ extension ImportOlympiaFactorSource {
 		let mnemonic: String
 		let passphrase: String
 		let expectedWordCount: Int
+		let canTapAlreadyImportedButton: Bool
 		@BindingState public var focusedField: ImportOlympiaFactorSource.State.Field?
 	}
 
@@ -46,7 +48,6 @@ extension ImportOlympiaFactorSource {
 							get: \.mnemonic,
 							send: { .mnemonicChanged($0) }
 						),
-						axis: .vertical,
 						hint: .info("Seed phrase"),
 						focus: .on(.mnemonic, binding: focusedFieldBinding, to: $focusedField)
 					)
@@ -71,9 +72,16 @@ extension ImportOlympiaFactorSource {
 					Button("Already imported") {
 						viewStore.send(.alreadyImportedButtonTapped)
 					}
-					.buttonStyle(.secondaryRectangular)
+					.controlState(viewStore.canTapAlreadyImportedButton ? .enabled : .disabled)
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
 				}
 				.padding([.horizontal, .bottom], .medium1)
+				.alert(
+					store: store.scope(
+						state: \.$foundNoExistFactorSourceAlert,
+						action: { .view(.foundNoExistFactorSourceAlert($0)) }
+					)
+				)
 				.onAppear { viewStore.send(.appeared) }
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)

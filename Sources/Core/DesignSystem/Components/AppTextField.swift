@@ -22,8 +22,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 	let secondaryHeading: String?
 	let placeholder: String
 	let text: Binding<String>
-	let axis: Axis
-	static var defaultAxis: Axis { .horizontal }
 	let hint: Hint?
 	let focus: Focus?
 	let accessory: Accessory
@@ -33,7 +31,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		axis: Axis? = nil,
 		hint: Hint? = nil,
 		focus: Focus,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() }
@@ -42,7 +39,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		self.secondaryHeading = secondaryHeading
 		self.placeholder = placeholder
 		self.text = text
-		self.axis = axis ?? Self.defaultAxis
 		self.hint = hint
 		self.focus = focus
 		self.accessory = accessory()
@@ -53,7 +49,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
-		axis: Axis? = nil,
 		hint: Hint? = nil,
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() }
 	) where FocusValue == Never {
@@ -61,7 +56,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		self.secondaryHeading = secondaryHeading
 		self.placeholder = placeholder
 		self.text = text
-		self.axis = axis ?? Self.defaultAxis
 		self.hint = hint
 		self.focus = nil
 		self.accessory = accessory()
@@ -92,8 +86,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 
 				TextField(
 					placeholder,
-					text: text.removeDuplicates(),
-					axis: axis
+					text: text.removeDuplicates()
 				)
 				.modifier { view in
 					if let focus {

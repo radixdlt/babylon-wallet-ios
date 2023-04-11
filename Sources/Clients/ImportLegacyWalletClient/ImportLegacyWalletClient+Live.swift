@@ -9,12 +9,12 @@ extension ImportLegacyWalletClient: DependencyKey {
 	public typealias Value = ImportLegacyWalletClient
 
 	public static let liveValue: Self = {
+		@Dependency(\.accountsClient) var accountsClient
+
 		@Sendable func migrate(
 			accounts: Set<OlympiaAccountToMigrate>,
 			factorSouceID: FactorSourceID
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
-			@Dependency(\.accountsClient) var accountsClient
-
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 			let networkID = Radix.Gateway.default.network.id // we import to the default network, not the current.
 			let accountIndexOffset = try await accountsClient.getAccountsOnCurrentNetwork().count
@@ -77,11 +77,11 @@ extension ImportLegacyWalletClient: DependencyKey {
 			migrateOlympiaSoftwareAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
-				let factorSource = olympiaFactorSource.hdOnDeviceFactorSource
+				let factorSource = olympiaFactorSource?.hdOnDeviceFactorSource
 
 				let (accounts, networkID) = try await migrate(
 					accounts: request.olympiaAccounts,
-					factorSouceID: factorSource.id
+					factorSouceID: request.olympiaFactorSouceID
 				)
 
 				let migratedAccounts = try MigratedSoftwareAccounts(
@@ -105,6 +105,31 @@ extension ImportLegacyWalletClient: DependencyKey {
 				)
 
 				return migratedAccounts
+			},
+			findAlreadyImportedIfAny: { scannedAccounts in
+				@Dependency(\.engineToolkitClient) var engineToolkitClient
+				do {
+					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+					let babylonAddresses = Set<AccountAddress>(accounts.map(\.address))
+					let setOfExistingData = try Set(babylonAddresses.map {
+						let data = try engineToolkitClient.decodeAddress($0.address).data
+						print("🧵 data: \(data.hex)")
+						return data
+					})
+					var alreadyImported = Set<OlympiaAccountToMigrate.ID>()
+					for scannedAccount in scannedAccounts {
+						let hash = try Blake2b.hash(data: scannedAccount.publicKey.compressedRepresentation)
+						let data = Array(hash.suffix(26))
+						print("🔮 data: \(data.hex)")
+						if setOfExistingData.contains(data) {
+							alreadyImported.insert(scannedAccount.id)
+						}
+					}
+					return alreadyImported
+				} catch {
+					loggerGlobal.error("Failed to find existing accounts, error: \(error)")
+					return []
+				}
 			}
 		)
 	}()

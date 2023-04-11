@@ -15,14 +15,16 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 		parseHeaderFromQRCode: { _ in throw NoopError() },
 		parseLegacyWalletFromQRCodes: { _ in throw NoopError() },
 		migrateOlympiaSoftwareAccountsToBabylon: { _ in throw NoopError() },
-		migrateOlympiaHardwareAccountsToBabylon: { _ in throw NoopError() }
+		migrateOlympiaHardwareAccountsToBabylon: { _ in throw NoopError() },
+		findAlreadyImportedIfAny: { _ in [] }
 	)
 
 	public static let testValue = Self(
 		parseHeaderFromQRCode: unimplemented("\(Self.self).parseHeaderFromQRCode"),
 		parseLegacyWalletFromQRCodes: unimplemented("\(Self.self).parseLegacyWalletFromQRCodes"),
 		migrateOlympiaSoftwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaSoftwareAccountsToBabylon"),
-		migrateOlympiaHardwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaHardwareAccountsToBabylon")
+		migrateOlympiaHardwareAccountsToBabylon: unimplemented("\(Self.self).migrateOlympiaHardwareAccountsToBabylon"),
+		findAlreadyImportedIfAny: unimplemented("\(Self.self).findAlreadyImportedIfAny")
 	)
 }
 

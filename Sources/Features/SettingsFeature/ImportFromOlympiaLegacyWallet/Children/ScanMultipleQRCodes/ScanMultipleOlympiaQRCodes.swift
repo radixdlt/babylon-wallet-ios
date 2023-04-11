@@ -84,7 +84,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 
 				state.scannedPayloads.append(scannedPayload)
 
-				if parsedScannedHeader.isLast {
+				if state.scannedPayloads.count == parsedScannedHeader.payloadCount {
 					let payloads = state.scannedPayloads.sorted(by: \.payloadIndex).map(\.unparsedPayload)
 
 					guard

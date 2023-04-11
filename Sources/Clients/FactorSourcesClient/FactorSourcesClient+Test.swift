@@ -21,6 +21,6 @@ extension FactorSourcesClient: TestDependencyKey {
 		getFactorSources: { throw NoopError() },
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		addPrivateHDFactorSource: { _ in throw NoopError() },
-		checkIfHasOlympiaFactorSourceForAccounts: { _ in false }
+		checkIfHasOlympiaFactorSourceForAccounts: { _ in nil }
 	)
 }

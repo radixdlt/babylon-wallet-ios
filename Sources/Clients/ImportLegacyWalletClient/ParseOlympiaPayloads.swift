@@ -51,9 +51,6 @@ extension Olympia.Export {
 			public let payloadCount: Int
 			public let payloadIndex: Int
 			public let mnemonicWordCount: Int
-			public var isLast: Bool {
-				payloadIndex >= payloadCount - 1
-			}
 		}
 
 		public struct Contents: Sendable, Hashable {

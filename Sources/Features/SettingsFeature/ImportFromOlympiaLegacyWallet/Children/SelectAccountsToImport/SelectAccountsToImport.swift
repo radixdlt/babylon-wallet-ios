@@ -7,11 +7,14 @@ public struct SelectAccountsToImport: Sendable, FeatureReducer {
 		public let availableAccounts: IdentifiedArrayOf<OlympiaAccountToMigrate>
 		var selectedAccounts: [OlympiaAccountToMigrate]?
 		public let selectionRequirement: SelectionRequirement = .atLeast(1)
+		public let alreadyImported: Set<OlympiaAccountToMigrate.ID>
 
 		public init(
 			scannedAccounts availableAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+			alreadyImported: Set<OlympiaAccountToMigrate.ID> = [],
 			selectedAccounts: [OlympiaAccountToMigrate]? = nil
 		) {
+			self.alreadyImported = alreadyImported
 			self.availableAccounts = IdentifiedArrayOf(uniqueElements: availableAccounts.rawValue.elements, id: \.id)
 			self.selectedAccounts = selectedAccounts
 		}

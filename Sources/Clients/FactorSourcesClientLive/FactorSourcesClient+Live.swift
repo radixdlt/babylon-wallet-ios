@@ -43,7 +43,7 @@ extension FactorSourcesClient: DependencyKey {
 			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
-					return false
+					return nil
 				}
 				do {
 					let factorSourceIDs = try await getFactorSources()
@@ -59,13 +59,13 @@ extension FactorSourcesClient: DependencyKey {
 						}
 						// YES Managed to validate all software accounts against existing factor source
 						loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
-						return true
+						return factorSourceID
 					}
 
-					return false // failed to find any factor source
+					return nil // failed to find any factor source
 				} catch {
 					loggerGlobal.warning("Failed to check if olympia factor source exists, error: \(error)")
-					return false // faulure
+					return nil // failure
 				}
 			}
 		)

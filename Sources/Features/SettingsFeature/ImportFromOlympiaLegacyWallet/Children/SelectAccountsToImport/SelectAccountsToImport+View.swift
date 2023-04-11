@@ -5,6 +5,7 @@ extension SelectAccountsToImport.State {
 	var viewState: SelectAccountsToImport.ViewState {
 		.init(
 			availableAccounts: availableAccounts.elements,
+			alreadyImported: alreadyImported,
 			selectionRequirement: selectionRequirement,
 			selectedAccounts: selectedAccounts
 		)
@@ -15,6 +16,7 @@ extension SelectAccountsToImport.State {
 extension SelectAccountsToImport {
 	public struct ViewState: Equatable {
 		let availableAccounts: [OlympiaAccountToMigrate]
+		let alreadyImported: Set<OlympiaAccountToMigrate.ID>
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [OlympiaAccountToMigrate]?
 	}
@@ -45,6 +47,7 @@ extension SelectAccountsToImport {
 						) { item in
 							SelectAccountsToImportRow.View(
 								viewState: .init(state: item.value),
+								isAlreadyImported: viewStore.alreadyImported.contains(item.value.id),
 								isSelected: item.isSelected,
 								action: item.action
 							)
@@ -117,45 +120,59 @@ enum SelectAccountsToImportRow {
 	@MainActor
 	struct View: SwiftUI.View {
 		let viewState: ViewState
+		let isAlreadyImported: Bool
 		let isSelected: Bool
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
-			Button(action: action) {
+			if isAlreadyImported {
 				HStack {
-					VStack(alignment: .leading, spacing: .medium2) {
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
+					Text("ALREADY IMPORTED")
+					label
+				}
+			} else {
+				Button(action: action) {
+					label
+				}
+				.buttonStyle(.inert)
+			}
+		}
 
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
+		private var label: some SwiftUI.View {
+			HStack {
+				VStack(alignment: .leading, spacing: .medium2) {
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
 
-						VStack(alignment: .leading, spacing: .small3) {
-							Group {
-								Text(L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.olympiaAddress)
-									.textStyle(.body2Header)
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
 
-								Text(viewState.olympiaAddress)
-									.textStyle(.monospace)
-									.frame(maxWidth: .infinity, alignment: .leading)
-							}
-							.foregroundColor(.app.white)
+					VStack(alignment: .leading, spacing: .small3) {
+						Group {
+							Text(L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.olympiaAddress)
+								.textStyle(.body2Header)
+
+							Text(viewState.olympiaAddress)
+								.textStyle(.monospace)
+								.frame(maxWidth: .infinity, alignment: .leading)
 						}
-						HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
+						.foregroundColor(.app.white)
 					}
-					Spacer()
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
+				}
+				Spacer()
 
+				if !isAlreadyImported {
 					CheckmarkView(
 						appearance: .light,
 						isChecked: isSelected
 					)
 				}
-				.padding(.medium1)
-				.background(
-					viewState.appearanceID.gradient
-						.brightness(isSelected ? -0.1 : 0)
-				)
-				.cornerRadius(.small1)
 			}
-			.buttonStyle(.inert)
+			.padding(.medium1)
+			.background(
+				viewState.appearanceID.gradient
+					.brightness(isSelected ? -0.1 : 0)
+			)
+			.cornerRadius(.small1)
 		}
 	}
 }

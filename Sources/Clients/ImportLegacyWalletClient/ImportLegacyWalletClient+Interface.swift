@@ -8,6 +8,8 @@ public struct ImportLegacyWalletClient: Sendable {
 
 	public var migrateOlympiaSoftwareAccountsToBabylon: MigrateOlympiaSoftwareAccountsToBabylon
 	public var migrateOlympiaHardwareAccountsToBabylon: MigrateOlympiaHardwareAccountsToBabylon
+
+	public var findAlreadyImportedIfAny: FindAlreadyImportedIfAny
 }
 
 extension ImportLegacyWalletClient {
@@ -18,4 +20,6 @@ extension ImportLegacyWalletClient {
 	public typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaSoftwareAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
 
 	public typealias MigrateOlympiaHardwareAccountsToBabylon = @Sendable (MigrateOlympiaHardwareAccountsToBabylonRequest) async throws -> MigratedHardwareAccounts
+
+	public typealias FindAlreadyImportedIfAny = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> Set<OlympiaAccountToMigrate.ID>
 }
