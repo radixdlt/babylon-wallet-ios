@@ -237,7 +237,7 @@ extension CAP33 {
 	static func _deserialize(payloadsStrings: [String]) throws -> Olympia.Parsed {
 		try deserialize(
 			payloads: .init(rawValue: OrderedSet(
-				uncheckedUniqueElements: payloadsStrings.compactMap { NonEmptyString(rawValue: $0) }
+				uncheckedUniqueElements: payloadsStrings.compactMap(NonEmptyString.init(rawValue:))
 			))!
 		)
 	}
