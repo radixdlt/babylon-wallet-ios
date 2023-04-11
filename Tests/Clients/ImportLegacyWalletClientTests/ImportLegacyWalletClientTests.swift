@@ -147,17 +147,32 @@ private func generateTestVector(
 }
 
 private func generateTestVectors() throws -> [TestVector] {
-	let payloadSizes: [Int] = [100, 700, 1600, 2000]
-	let numberOfAccountsPossible = [1, 7, 10, 50]
+	// 8 chars per header
+	// 73 chars per account excl account name, ~9 chars per name -> 82 chars per account
+	// 8+82 = ~90 chars per payload
+	//
+	// Excluding error correction level, which will lower these estimates:
+	let payloadAndNumberOfAccounts: OrderedDictionary<Int, [Int]> = [
+		60: [1, 2, 3], // 0.66 accounts per payload
+		1200: [13, 30], // 13  accounts
+		1600: [17, 35], // 17  accounts
+		2000: [22, 45], // 22 accounts
+		2600: [28, 60, 100], // 28 accounts
+	]
 
 	var testID = 0
 
-	let testVectors: [TestVector] = try payloadSizes.flatMap { (payloadSizeThreshold: Int) -> [TestVector] in
-		try BIP39.WordCount.allCases.flatMap { wordCount in
+	let testVectors: [TestVector] = try payloadAndNumberOfAccounts.flatMap { payloadSizeThreshold, numberOfAccountsPossible in
+		try [BIP39.WordCount.twelve, BIP39.WordCount.twentyFour].flatMap { wordCount in
 			let mnemonic = try Mnemonic.generate(wordCount: wordCount)
-			return try numberOfAccountsPossible.map { (numberOfAccounts: Int) -> TestVector in
+			return try numberOfAccountsPossible.flatMap { numberOfAccounts in
 				defer { testID += 1 }
-				return try generateTestVector(testID: testID, payloadSizeThreshold: payloadSizeThreshold, numberOfAccounts: numberOfAccounts, mnemonic: mnemonic)
+				return try generateTestVector(
+					testID: testID,
+					payloadSizeThreshold: payloadSizeThreshold,
+					numberOfAccounts: numberOfAccounts,
+					mnemonic: mnemonic
+				)
 			}
 		}
 	}
@@ -192,7 +207,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 	func omit_test_generate_tests() throws {
 		let testVectors = try generateTestVectors()
 		let jsonEncoder = JSONEncoder()
-		jsonEncoder.outputFormatting = [.withoutEscapingSlashes]
+		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
 		let testJSON = try jsonEncoder.encode(testVectors)
 		print(String(data: testJSON, encoding: .utf8)!)
 	}
