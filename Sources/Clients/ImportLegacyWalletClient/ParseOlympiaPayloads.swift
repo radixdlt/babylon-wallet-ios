@@ -76,7 +76,7 @@ public enum CAP33 {
 		}
 
 		guard let nonEmpty = NonEmpty<OrderedSet<Olympia.Parsed.Account>>(rawValue: accounts) else {
-			throw Error.failedToParseAnyAccount
+			throw ParseFailure.anyAccount
 		}
 
 		return .init(
@@ -97,7 +97,7 @@ extension CAP33 {
 		let payload = payloadNonEmpty.rawValue
 
 		guard payload.contains(Olympia.Export.Separator.headerEnd) else {
-			throw Error.failedToParseHeaderDoesNotContainEndSeparator
+			throw ParseFailure.headerDoesNotContainEndSeparator
 		}
 
 		guard
@@ -110,14 +110,14 @@ extension CAP33 {
 			case let headerComponent = components[0],
 			let content = NonEmptyString(rawValue: String(components[1]))
 		else {
-			throw Error.failedToParsePayloadDidNotContainHeaderAndContent
+			throw ParseFailure.payloadDidNotContainHeaderAndContent
 		}
 		guard !headerComponent.isEmpty else {
-			throw Error.failedToParseHeaderCannotBeEmpty
+			throw ParseFailure.headerCannotBeEmpty
 		}
 
 		guard !components[1].isEmpty else {
-			throw Error.failedToParseHeaderContentCannotBeEmpty
+			throw ParseFailure.headerContentCannotBeEmpty
 		}
 
 		guard
@@ -128,19 +128,19 @@ extension CAP33 {
 			headerComponents.count == 3,
 			headerComponents.allSatisfy({ !$0.isEmpty })
 		else {
-			throw Error.failedToParseHeaderDoesNotContainThreeComponents
+			throw ParseFailure.headerDoesNotContainThreeComponents
 		}
 
 		guard let payloadCount = Int(headerComponents[0]) else {
-			throw Error.failedToParseHeaderDoesNotContainPayloadCount
+			throw ParseFailure.headerDoesNotContainPayloadCount
 		}
 
 		guard let payloadIndex = Int(headerComponents[1]) else {
-			throw Error.failedToParseHeaderDoesNotContainPayloadIndex
+			throw ParseFailure.headerDoesNotContainPayloadIndex
 		}
 
 		guard let mnemonicWordCount = Int(headerComponents[2]) else {
-			throw Error.failedToParseHeaderDoesNotContainMnemonicWordCount
+			throw ParseFailure.headerDoesNotContainMnemonicWordCount
 		}
 
 		let header = Olympia.Export.Payload.Header(
@@ -160,7 +160,7 @@ extension CAP33 {
 	// MARK: Parse Account
 	private static func _deserializeAccount(
 		accountComponent: String
-	) throws -> AccountOrRest? {
+	) throws -> AccountOrRest {
 		let components = accountComponent.split(
 			separator: Olympia.Export.Separator.intra,
 			omittingEmptySubsequences: true // account name is always suffix with an `accountNameEnd`
@@ -170,8 +170,8 @@ extension CAP33 {
 			if let rest = NonEmptyString(rawValue: accountComponent) {
 				return .rest(rest)
 			} else {
-				debugPrint("Empty rest found in account component")
-				return nil
+				assertionFailure("Empty rest found in account component")
+				throw ParseFailure.accountNameDidNotEndWithExpectedSeparator
 			}
 		}
 
@@ -179,35 +179,35 @@ extension CAP33 {
 			components[0].count == 1,
 			let accountType = Olympia.AccountType(rawValue: String(components[0]))
 		else {
-			throw Error.failedToParseAccountBadAccountTypeValue
+			throw ParseFailure.accountBadAccountTypeValue
 		}
 		guard
 			case let publicKeyCompressedBase64 = String(components[1]),
 			let publicKeyData = Data(base64Encoded: publicKeyCompressedBase64)
 		else {
-			throw Error.failedToParseAccountPublicKeyInvalidBase64String
+			throw ParseFailure.accountPublicKeyInvalidBase64String
 		}
 
 		guard publicKeyData.count == 33 else {
-			throw Error.failedToParseAccountPublicKeyInvalidByteCount
+			throw ParseFailure.accountPublicKeyInvalidByteCount
 		}
 
 		let publicKey: K1.PublicKey
 		do {
 			publicKey = try K1.PublicKey(compressedRepresentation: publicKeyData)
 		} catch {
-			throw Error.failedToParseAccountPublicKeyInvalidSecp256k1PublicKey
+			throw ParseFailure.accountPublicKeyInvalidSecp256k1PublicKey
 		}
 
 		guard let bip44LikeAddressIndex = HD.Path.Component.Child.Value(components[2]) else {
-			throw Error.failedToParseAccountAddressIndex
+			throw ParseFailure.accountAddressIndex
 		}
 
 		guard
 			case var accountName = String(components[3]),
 			accountName.hasSuffix(Olympia.Export.Separator.accountNameEnd)
 		else {
-			throw Error.failedToParseAccountNameDidNotEndWithExpectedSeparatorfailedToParseAccountNameDidNotEndWithExpectedSeparator
+			throw ParseFailure.accountNameDidNotEndWithExpectedSeparator
 		}
 
 		accountName.removeLast()
@@ -257,44 +257,62 @@ extension CAP33 {
 			),
 			accountComponentsAndMaybeRest.allSatisfy({ !$0.isEmpty })
 		else {
-			throw Error.failedToParsePayloadDidNotContainHeaderAndContent
+			throw ParseFailure.payloadDidNotContainHeaderAndContent
 		}
 
 		var accounts: OrderedSet<Olympia.Parsed.Account> = .init()
-		var rest: NonEmptyString?
-		for accountComponent in accountComponentsAndMaybeRest {
-			guard let accountOrRest = try _deserializeAccount(accountComponent: String(accountComponent)) else {
-				continue
-			}
+
+		for (index, accountComponent) in accountComponentsAndMaybeRest.enumerated() {
+			let accountOrRest = try _deserializeAccount(
+				accountComponent: String(accountComponent)
+			)
 			switch accountOrRest {
 			case let .account(account):
 				accounts.append(account)
-			case let .rest(_rest):
-				rest = _rest
+
+			case let .rest(rest):
+				guard index == accountComponentsAndMaybeRest.count - 1 else {
+					throw ParseFailure.payloadFoundPartialAccount
+				}
+				return .init(
+					header: header,
+					contents: .init(
+						accounts: accounts,
+						rest: rest
+					)
+				)
 			}
 		}
-		return .init(header: header, contents: .init(accounts: accounts, rest: rest))
+
+		return .init(
+			header: header,
+			contents: .init(
+				accounts: accounts,
+				rest: nil
+			)
+		)
 	}
 }
 
-// MARK: CAP33.Error
+// MARK: CAP33.ParseFailure
 extension CAP33 {
-	public enum Error: String, Swift.Error, Sendable, Hashable {
-		case failedToParseHeaderDoesNotContainEndSeparator
-		case failedToParsePayloadDidNotContainHeaderAndContent
-		case failedToParseAnyAccount
-		case failedToParseHeaderCannotBeEmpty
-		case failedToParseHeaderContentCannotBeEmpty
-		case failedToParseHeaderDoesNotContainThreeComponents
-		case failedToParseHeaderDoesNotContainPayloadCount
-		case failedToParseHeaderDoesNotContainPayloadIndex
-		case failedToParseHeaderDoesNotContainMnemonicWordCount
-		case failedToParsePayloadsFoundDuplicates
-		case failedToParseAccountBadAccountTypeValue
-		case failedToParseAccountPublicKeyInvalidBase64String
-		case failedToParseAccountPublicKeyInvalidByteCount
-		case failedToParseAccountPublicKeyInvalidSecp256k1PublicKey
-		case failedToParseAccountAddressIndex
-		case failedToParseAccountNameDidNotEndWithExpectedSeparatorfailedToParseAccountNameDidNotEndWithExpectedSeparator
+	public enum ParseFailure: String, Swift.Error, Sendable, Hashable {
+		case headerDoesNotContainEndSeparator
+		case payloadDidNotContainHeaderAndContent
+		case anyAccount
+		case headerCannotBeEmpty
+		case headerContentCannotBeEmpty
+		case headerDoesNotContainThreeComponents
+		case headerDoesNotContainPayloadCount
+		case headerDoesNotContainPayloadIndex
+		case headerDoesNotContainMnemonicWordCount
+		case payloadsFoundDuplicates
+		case accountBadAccountTypeValue
+		case accountPublicKeyInvalidBase64String
+		case accountPublicKeyInvalidByteCount
+		case accountPublicKeyInvalidSecp256k1PublicKey
+		case accountAddressIndex
+		case accountNameDidNotEndWithExpectedSeparator
+		case payloadFoundPartialAccount
 	}
 }
