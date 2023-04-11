@@ -301,9 +301,9 @@ final class ImportLegacyWalletClientTests: TestCase {
 			XCTAssertEqual(parsed.mnemonicWordCount, .twelve)
 			let accounts = parsed.accounts
 			XCTAssertEqual(accounts.count, expectedAccounts.count)
-			for accountIndex in 0 ..< expectedAccounts.count {
+
+			for (accountIndex, rhs) in expectedAccounts.enumerated() {
 				let lhs = accounts.elements[accountIndex]
-				let rhs = expectedAccounts[accountIndex]
 				XCTAssertEqual(lhs, rhs)
 			}
 
