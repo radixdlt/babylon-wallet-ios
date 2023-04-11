@@ -180,7 +180,7 @@ private func generateTestVectors() throws -> [TestVector] {
 	let testVectors: [TestVector] = try payloadAndNumberOfAccounts.flatMap { payloadSizeThreshold, numberOfAccountsPossible in
 		try [BIP39.WordCount.twelve, BIP39.WordCount.twentyFour].flatMap { wordCount in
 			let mnemonic = try Mnemonic.generate(wordCount: wordCount)
-			return try numberOfAccountsPossible.flatMap { numberOfAccounts in
+			return try numberOfAccountsPossible.map { numberOfAccounts in
 				defer { testID += 1 }
 				return try generateTestVector(
 					testID: testID,
@@ -219,7 +219,7 @@ extension Olympia.Parsed.Account {
 
 // MARK: - ImportLegacyWalletClientTests
 final class ImportLegacyWalletClientTests: TestCase {
-	func test_generate_tests() throws {
+	func omit_test_generate_tests() throws {
 		let testVectors = try generateTestVectors()
 		let jsonEncoder = JSONEncoder()
 		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
