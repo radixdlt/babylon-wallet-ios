@@ -28,7 +28,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 		public init(
 			step: Step = .init(),
 			numberOfPayloadsToScan: Int? = nil,
-			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = .init()
+			scannedPayloads: IdentifiedArrayOf<ScannedPayload> = []
 		) {
 			self.step = step
 			self.numberOfPayloadsToScan = numberOfPayloadsToScan

@@ -3,7 +3,10 @@ import ScanQRFeature
 
 extension ScanMultipleOlympiaQRCodes.State {
 	var viewState: ScanMultipleOlympiaQRCodes.ViewState {
-		.init(numberOfPayloadsToScan: numberOfPayloadsToScan, numberOfPayloadsScanned: self.scannedPayloads.count)
+		.init(
+			numberOfPayloadsToScan: numberOfPayloadsToScan,
+			numberOfPayloadsScanned: scannedPayloads.count
+		)
 	}
 }
 

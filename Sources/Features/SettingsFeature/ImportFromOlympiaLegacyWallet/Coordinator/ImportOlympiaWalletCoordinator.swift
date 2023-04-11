@@ -1,5 +1,6 @@
 import AddLedgerNanoFactorSourceFeature
 import Cryptography
+import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
 import Profile
@@ -143,6 +144,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 
 			return .none
+
+		case .path(.element(_, action: .importOlympiaMnemonic(.delegate(.alreadyExists)))):
+			fatalError("hmm should have got private factor source?")
+
 		case let .path(.element(_, action: .importOlympiaMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))))):
 			state.mnemonicWithPassphrase = mnemonicWithPassphrase
 			guard let softwareAccounts = state.selectedAccounts?.software else {
@@ -296,27 +301,5 @@ extension ImportOlympiaWalletCoordinator {
 // MARK: - GotNoAccountsToImport
 struct GotNoAccountsToImport: Swift.Error {}
 
-// MARK: - ValidateOlympiaAccountsFailure
-enum ValidateOlympiaAccountsFailure: LocalizedError {
-	case publicKeyMismatch
-}
-
 // MARK: - OlympiaFactorSourceToSaveIDDisrepancy
 struct OlympiaFactorSourceToSaveIDDisrepancy: Swift.Error {}
-
-extension MnemonicWithPassphrase {
-	func validatePublicKeysOf(
-		softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	) throws {
-		let hdRoot = try self.hdRoot()
-
-		for olympiaAccount in softwareAccounts {
-			let path = olympiaAccount.path.fullPath
-			let derivedPublicKey = try hdRoot.derivePrivateKey(path: path, curve: SECP256K1.self).publicKey
-			guard derivedPublicKey == olympiaAccount.publicKey else {
-				throw ValidateOlympiaAccountsFailure.publicKeyMismatch
-			}
-		}
-		// PublicKeys matches
-	}
-}

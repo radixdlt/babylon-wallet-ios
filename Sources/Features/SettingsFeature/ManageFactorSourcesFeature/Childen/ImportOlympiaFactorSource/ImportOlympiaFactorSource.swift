@@ -14,18 +14,21 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		public var expectedWordCount: BIP39.WordCount
 		public var passphrase: String
 
+		public var selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
 		@BindingState public var focusedField: Field?
 
 		public init(
 			shouldPersist: Bool = true,
 			expectedWordCount: BIP39.WordCount = .twelve,
 			mnemonic: String = "",
-			passphrase: String = ""
+			passphrase: String = "",
+			selectedAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>? = nil
 		) {
 			self.shouldPersist = shouldPersist
 			self.mnemonic = mnemonic
 			self.expectedWordCount = expectedWordCount
 			self.passphrase = passphrase
+			self.selectedAccounts = selectedAccounts
 			#if DEBUG
 			if let new = (try? Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english))?.phrase {
 				self.mnemonic = new
@@ -39,6 +42,7 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 		case appeared
 		case closeButtonTapped
 		case importButtonTapped
+		case alreadyImportedButtonTapped
 		case mnemonicChanged(String)
 		case passphraseChanged(String)
 		case textFieldFocused(ImportOlympiaFactorSource.State.Field?)
@@ -46,6 +50,7 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
+		case alreadyExists
 		case persisted(FactorSourceID)
 		case notPersisted(MnemonicWithPassphrase)
 	}
@@ -53,6 +58,7 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(ImportOlympiaFactorSource.State.Field?)
 		case mnemonicFromPhraseResult(TaskResult<Mnemonic>)
+		case checkedIfOlympiaFactorSourceAlreadyExists(Bool)
 		case importOlympiaFactorSourceResult(TaskResult<FactorSourceID>)
 	}
 
@@ -81,6 +87,15 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 				})))
 			}
 
+		case .alreadyImportedButtonTapped:
+			guard let selectedAccounts = state.selectedAccounts else {
+				return .none
+			}
+			return .run { send in
+				let factorSourceAlreadyExists = await factorSourcesClient.checkIfHasOlympiaFactorSourceForAccounts(selectedAccounts)
+				await send(.internal(.checkedIfOlympiaFactorSourceAlreadyExists(factorSourceAlreadyExists)))
+			}
+
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 
@@ -100,6 +115,8 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .checkedIfOlympiaFactorSourceAlreadyExists(alreadyExists):
+			return .send(.delegate(.alreadyExists))
 		case let .focusTextField(field):
 			state.focusedField = field
 			return .none

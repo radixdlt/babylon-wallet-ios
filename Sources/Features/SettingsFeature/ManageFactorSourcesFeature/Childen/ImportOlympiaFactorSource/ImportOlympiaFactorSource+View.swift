@@ -67,6 +67,11 @@ extension ImportOlympiaFactorSource {
 						viewStore.send(.importButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
+
+					Button("Already imported") {
+						viewStore.send(.alreadyImportedButtonTapped)
+					}
+					.buttonStyle(.secondaryRectangular)
 				}
 				.padding([.horizontal, .bottom], .medium1)
 				.onAppear { viewStore.send(.appeared) }

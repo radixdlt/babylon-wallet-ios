@@ -108,6 +108,8 @@ extension SecureStorageClient: DependencyKey {
 					#if DEBUG
 					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
 					#endif
+					case .importOlympiaAccounts:
+						return L10n.Common.BiometricsPrompt.importOlympiaAccounts
 					}
 				}()
 				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."

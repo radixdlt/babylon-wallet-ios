@@ -62,10 +62,10 @@ public enum CAP33 {
 	public static func deserialize(
 		payloads payloadStrings: NonEmpty<OrderedSet<NonEmptyString>>
 	) throws -> Olympia.Parsed {
-		var accounts: OrderedSet<Olympia.Parsed.Account> = .init()
-		var mnemonicWordCount: BIP39.WordCount?
+		var accounts: OrderedSet<Olympia.Parsed.Account> = []
+		var mnemonicWordCount: BIP39.WordCount? = nil
+		var rest: NonEmptyString? = nil
 
-		var rest: NonEmptyString?
 		for payloadString in payloadStrings.rawValue.elements {
 			let payload = try _deserialize(payload: payloadString, rest: rest)
 			if mnemonicWordCount == nil {
@@ -91,7 +91,7 @@ public enum CAP33 {
 // MARK: -
 extension CAP33 {
 	// MARK: Parse Header & Content
-	internal static func deserializeHeaderAndContent(
+	static func deserializeHeaderAndContent(
 		payload payloadNonEmpty: NonEmptyString
 	) throws -> (header: Olympia.Export.Payload.Header, content: NonEmptyString) {
 		let payload = payloadNonEmpty.rawValue
@@ -112,15 +112,11 @@ extension CAP33 {
 		else {
 			throw Error.failedToParsePayloadDidNotContainHeaderAndContent
 		}
-		guard
-			!headerComponent.isEmpty
-		else {
+		guard !headerComponent.isEmpty else {
 			throw Error.failedToParseHeaderCannotBeEmpty
 		}
 
-		guard
-			!components[1].isEmpty
-		else {
+		guard !components[1].isEmpty else {
 			throw Error.failedToParseHeaderContentCannotBeEmpty
 		}
 
@@ -134,15 +130,19 @@ extension CAP33 {
 		else {
 			throw Error.failedToParseHeaderDoesNotContainThreeComponents
 		}
+
 		guard let payloadCount = Int(headerComponents[0]) else {
 			throw Error.failedToParseHeaderDoesNotContainPayloadCount
 		}
+
 		guard let payloadIndex = Int(headerComponents[1]) else {
 			throw Error.failedToParseHeaderDoesNotContainPayloadIndex
 		}
+
 		guard let mnemonicWordCount = Int(headerComponents[2]) else {
 			throw Error.failedToParseHeaderDoesNotContainMnemonicWordCount
 		}
+
 		let header = Olympia.Export.Payload.Header(
 			payloadCount: payloadCount,
 			payloadIndex: payloadIndex,
@@ -152,7 +152,7 @@ extension CAP33 {
 		return (header: header, content: content)
 	}
 
-	internal enum AccountOrRest {
+	enum AccountOrRest {
 		case account(Olympia.Parsed.Account)
 		case rest(NonEmptyString)
 	}
@@ -226,7 +226,7 @@ extension CAP33 {
 
 	public static func _sanitize(name: NonEmptyString?) -> String {
 		guard let name = name else { return "" }
-		var truncated = String(name.rawValue.prefix(30))
+		var truncated = String(name.rawValue.prefix(Olympia.Export.accountNameMaxLength))
 		let forbiddenCharacters: [String] = Olympia.Export.Separator.allCases
 		for forbiddenChar in forbiddenCharacters {
 			truncated = truncated.replacingOccurrences(of: forbiddenChar, with: Olympia.Export.accountNameForbiddenCharReplacement)
@@ -234,7 +234,7 @@ extension CAP33 {
 		return truncated
 	}
 
-	internal static func _deserialize(payloadsStrings: [String]) throws -> Olympia.Parsed {
+	static func _deserialize(payloadsStrings: [String]) throws -> Olympia.Parsed {
 		try deserialize(
 			payloads: .init(rawValue: OrderedSet(
 				uncheckedUniqueElements: payloadsStrings.compactMap { NonEmptyString(rawValue: $0) }
