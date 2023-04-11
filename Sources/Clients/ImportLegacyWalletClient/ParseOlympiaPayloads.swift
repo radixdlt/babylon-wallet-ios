@@ -1,6 +1,7 @@
 import ClientPrelude
 import Cryptography
 import Profile
+import RegexBuilder
 
 extension Olympia {
 	public enum Export {}
@@ -225,13 +226,18 @@ extension CAP33 {
 	}
 
 	public static func _sanitize(name: NonEmptyString?) -> String {
-		guard let name = name else { return "" }
-		var truncated = String(name.rawValue.prefix(Olympia.Export.accountNameMaxLength))
-		let forbiddenCharacters: [String] = Olympia.Export.Separator.allCases
-		for forbiddenChar in forbiddenCharacters {
-			truncated = truncated.replacingOccurrences(of: forbiddenChar, with: Olympia.Export.accountNameForbiddenCharReplacement)
-		}
-		return truncated
+		guard let name else { return "" }
+
+		let result = String(name
+			.prefix(Olympia.Export.accountNameMaxLength))
+			.replacing(
+				Regex {
+					OneOrMore(.anyOf(Olympia.Export.Separator.allCases.map { Character($0) }))
+				},
+				with: Olympia.Export.accountNameForbiddenCharReplacement
+			)
+
+		return String(result)
 	}
 
 	static func _deserialize(payloadsStrings: [String]) throws -> Olympia.Parsed {
