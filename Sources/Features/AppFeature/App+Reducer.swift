@@ -21,6 +21,8 @@ public struct App: Sendable, FeatureReducer {
 
 		public init(root: Root = .splash(.init())) {
 			self.root = root
+
+			loggerGlobal.info("App started")
 		}
 	}
 

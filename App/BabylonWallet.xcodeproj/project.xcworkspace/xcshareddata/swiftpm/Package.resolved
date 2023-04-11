@@ -235,6 +235,15 @@
       }
     },
     {
+      "identity" : "swift-log-file",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/crspybits/swift-log-file",
+      "state" : {
+        "revision" : "aa94b38bf88c7d9cbc87ceafcdffadaffbc2bffa",
+        "version" : "0.1.0"
+      }
+    },
+    {
       "identity" : "swift-nonempty",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-nonempty",
@@ -322,6 +331,15 @@
       "state" : {
         "revision" : "28dd8570a3482d46b90ce4e924e8ff1d17614e78",
         "version" : "110.0.0"
+      }
+    },
+    {
+      "identity" : "xcglogger",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DaveWoodCom/XCGLogger.git",
+      "state" : {
+        "revision" : "a9c4667b247928a29bdd41be2ec2c8d304215a54",
+        "version" : "7.0.1"
       }
     },
     {

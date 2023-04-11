@@ -3,7 +3,8 @@ import FeaturePrelude
 extension GeneralSettings.State {
 	var viewState: GeneralSettings.ViewState {
 		.init(
-			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false
+			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
+			isExportingLogs: exportLogs
 		)
 	}
 }
@@ -12,6 +13,7 @@ extension GeneralSettings.State {
 extension GeneralSettings {
 	public struct ViewState: Equatable {
 		let isDeveloperModeEnabled: Bool
+		let isExportingLogs: URL?
 	}
 
 	@MainActor
@@ -34,8 +36,9 @@ extension GeneralSettings {
 
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
-				VStack(spacing: .zero) {
+				VStack(alignment: .leading, spacing: .zero) {
 					developerModeRow(with: viewStore)
+					exportLogs(with: viewStore)
 					Separator()
 				}
 				.padding(.medium3)
@@ -67,7 +70,56 @@ extension GeneralSettings {
 			}
 			.frame(height: .largeButtonHeight)
 		}
+
+		private func exportLogs(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			HStack {
+				VStack(alignment: .leading, spacing: 0) {
+					Text("Export Logs")
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1HighImportance)
+
+					Text("Export the Wallet development logs")
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.fixedSize()
+				}
+
+				Button("Export") {
+					viewStore.send(.exportLogsTapped)
+				}
+				.buttonStyle(.secondaryRectangular)
+				.flushedRight
+			}
+			.sheet(item:
+				viewStore.binding(
+					get: { $0.isExportingLogs },
+					send: { _ in .exportLogsDismissed }
+				)
+			) { logFilePath in
+				ShareView(items: [logFilePath])
+			}
+			.frame(height: .largeButtonHeight)
+		}
 	}
+}
+
+// MARK: - URL + Identifiable
+extension URL: Identifiable {
+	public var id: URL { self.absoluteURL }
+}
+
+// MARK: - ShareView
+// TODO: This is alternative to `ShareLink`, which does not seem to work properly. Eventually we should make use of it instead of this wrapper.
+struct ShareView: UIViewControllerRepresentable {
+	typealias UIViewControllerType = UIActivityViewController
+
+	let items: [Any]
+
+	func makeUIViewController(context: Context) -> UIActivityViewController {
+		UIActivityViewController(activityItems: items, applicationActivities: nil)
+	}
+
+	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #if DEBUG
