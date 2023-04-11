@@ -436,6 +436,7 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"EngineToolkitClient",
+			"Profile", // Olympia models
 		],
 		tests: .yes(
 			resources: [

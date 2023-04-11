@@ -55,8 +55,25 @@ extension ImportLegacyWalletClient: DependencyKey {
 		}
 
 		return Self(
-			parseHeaderFromQRCode: { try Self.previewValue.parseHeaderFromQRCode($0) },
-			parseLegacyWalletFromQRCodes: { try Self.previewValue.parseLegacyWalletFromQRCodes($0) },
+			parseHeaderFromQRCode: {
+				try CAP33.deserializeHeader(payload: $0)
+			},
+			parseLegacyWalletFromQRCodes: {
+				let parsed = try CAP33.deserialize(payloads: $0)
+				let accountsArray = try parsed.accounts.rawValue.map(convert)
+				guard
+					!accountsArray.isEmpty,
+					case let accountsSet = OrderedSet<OlympiaAccountToMigrate>(accountsArray),
+					let nonEmpty = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(rawValue: accountsSet)
+				else {
+					struct FailedToConvertedParsedAccount: Swift.Error {}
+					throw FailedToConvertedParsedAccount()
+				}
+				return .init(
+					mnemonicWordCount: parsed.mnemonicWordCount,
+					accounts: nonEmpty
+				)
+			},
 			migrateOlympiaSoftwareAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
@@ -93,29 +110,25 @@ extension ImportLegacyWalletClient: DependencyKey {
 	}()
 }
 
-func convertUncheckedAccount(
-	_ raw: AccountNonChecked,
-	engineToolkitClient: EngineToolkitClient
+func convert(
+	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
-	let publicKeyData = try Data(hex: raw.pk)
-	let publicKey = try K1.PublicKey(compressedRepresentation: publicKeyData)
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
-	let bech32Address = try engineToolkitClient.deriveOlympiaAdressFromPublicKey(publicKey)
+	let bech32Address = try engineToolkitClient.deriveOlympiaAdressFromPublicKey(raw.publicKey)
 
 	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
-		fatalError()
+		struct FailedToCreateNonEmptyOlympiaAddress: Swift.Error {}
+		throw FailedToCreateNonEmptyOlympiaAddress()
 	}
 	let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
-
-	guard let accountType = Olympia.AccountType(rawValue: raw.accountType) else {
-		fatalError()
-	}
+	let derivationPath = try LegacyOlympiaBIP44LikeDerivationPath(index: raw.addressIndex)
 
 	return try .init(
-		accountType: accountType,
-		publicKey: .init(compressedRepresentation: publicKeyData),
-		path: .init(derivationPath: raw.path),
+		accountType: raw.accountType,
+		publicKey: raw.publicKey,
+		path: derivationPath,
 		address: address,
-		displayName: raw.name.map { NonEmptyString(rawValue: $0) } ?? nil
+		displayName: raw.displayName
 	)
 }

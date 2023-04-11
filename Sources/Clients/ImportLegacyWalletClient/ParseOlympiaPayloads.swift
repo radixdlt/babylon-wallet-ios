@@ -4,8 +4,9 @@ import Cryptography
 extension Olympia {
 	public enum Export {}
 	public struct Parsed: Sendable, Hashable {
-		let mnemonicWordCount: BIP39.WordCount
-		let accounts: OrderedSet<Olympia.Parsed.Account>
+		public let mnemonicWordCount: BIP39.WordCount
+		public let accounts: NonEmpty<OrderedSet<Olympia.Parsed.Account>>
+
 		public struct Account: Sendable, Hashable {
 			public let accountType: Olympia.AccountType
 			public let publicKey: K1.PublicKey
@@ -37,6 +38,9 @@ extension Olympia.Export {
 			public let payloadCount: Int
 			public let payloadIndex: Int
 			public let mnemonicWordCount: Int
+			public var isLast: Bool {
+				payloadIndex >= (payloadCount - 1)
+			}
 		}
 
 		public struct Contents: Sendable, Hashable {
@@ -51,6 +55,7 @@ public enum CAP33 {
 	public enum Error: String, Swift.Error, Sendable, Hashable {
 		case failedToParseHeaderDoesNotContainEndSeparator
 		case failedToParsePayloadDidNotContainHeaderAndContent
+		case failedToParseAnyAccount
 		case failedToParseHeaderCannotBeEmpty
 		case failedToParseHeaderContentCannotBeEmpty
 		case failedToParseHeaderDoesNotContainThreeComponents
@@ -263,9 +268,13 @@ public enum CAP33 {
 			rest = payload.contents.rest
 		}
 
+		guard let nonEmpty = NonEmpty<OrderedSet<Olympia.Parsed.Account>>(rawValue: accounts) else {
+			throw Error.failedToParseAnyAccount
+		}
+
 		return .init(
 			mnemonicWordCount: mnemonicWordCount!,
-			accounts: accounts
+			accounts: nonEmpty
 		)
 	}
 

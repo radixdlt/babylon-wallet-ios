@@ -2,14 +2,6 @@ import ClientPrelude
 import Cryptography
 import Profile
 
-// MARK: - OlympiaExportHeader
-public struct OlympiaExportHeader: Sendable, Hashable {
-	/// number of payloads (might be 1)
-	public let payloadCount: Int
-	/// The word count of the mnemonic to import seperately.
-	public let mnemonicWordCount: Int
-}
-
 // MARK: - ScannedParsedOlympiaWalletToMigrate
 public struct ScannedParsedOlympiaWalletToMigrate: Sendable, Hashable {
 	public let mnemonicWordCount: BIP39.WordCount

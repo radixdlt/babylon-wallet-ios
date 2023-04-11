@@ -3,14 +3,15 @@ import ScanQRFeature
 
 extension ScanMultipleOlympiaQRCodes.State {
 	var viewState: ScanMultipleOlympiaQRCodes.ViewState {
-		.init()
+		.init(numberOfPayloadsToScan: numberOfPayloadsToScan, numberOfPayloadsScanned: self.scannedPayloads.count)
 	}
 }
 
 // MARK: - ScanMultipleOlympiaQRCodes.View
 extension ScanMultipleOlympiaQRCodes {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		public let numberOfPayloadsToScan: Int?
+		public let numberOfPayloadsScanned: Int
 	}
 
 	@MainActor
@@ -22,12 +23,19 @@ extension ScanMultipleOlympiaQRCodes {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store.scope(state: \.step)) {
-				CaseLet(
-					state: /ScanMultipleOlympiaQRCodes.State.Step.scanQR,
-					action: { ScanMultipleOlympiaQRCodes.Action.child(.scanQR($0)) },
-					then: { ScanQRCoordinator.View(store: $0) }
-				)
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack {
+					if let numberOfPayloadsToScan = viewStore.numberOfPayloadsToScan {
+						Text("Scanned: \(viewStore.numberOfPayloadsScanned)/\(numberOfPayloadsToScan)")
+					}
+					SwitchStore(store.scope(state: \.step)) {
+						CaseLet(
+							state: /ScanMultipleOlympiaQRCodes.State.Step.scanQR,
+							action: { ScanMultipleOlympiaQRCodes.Action.child(.scanQR($0)) },
+							then: { ScanQRCoordinator.View(store: $0) }
+						)
+					}
+				}
 			}
 		}
 	}

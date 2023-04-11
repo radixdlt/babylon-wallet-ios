@@ -11,9 +11,9 @@ public struct ImportLegacyWalletClient: Sendable {
 }
 
 extension ImportLegacyWalletClient {
-	public typealias ParseHeaderFromQRCode = @Sendable (String) throws -> OlympiaExportHeader
+	public typealias ParseHeaderFromQRCode = @Sendable (NonEmptyString) throws -> Olympia.Export.Payload.Header
 
-	public typealias ParseLegacyWalletFromQRCodes = @Sendable (_ qrCodes: OrderedSet<String>) throws -> ScannedParsedOlympiaWalletToMigrate
+	public typealias ParseLegacyWalletFromQRCodes = @Sendable (_ qrCodes: NonEmpty<OrderedSet<NonEmptyString>>) throws -> ScannedParsedOlympiaWalletToMigrate
 
 	public typealias MigrateOlympiaSoftwareAccountsToBabylon = @Sendable (MigrateOlympiaSoftwareAccountsToBabylonRequest) async throws -> MigratedSoftwareAccounts
 

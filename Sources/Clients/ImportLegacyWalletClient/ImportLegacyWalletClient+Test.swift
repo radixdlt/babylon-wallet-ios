@@ -1,5 +1,6 @@
 import ClientPrelude
 import Cryptography
+import Profile
 
 extension DependencyValues {
 	public var importLegacyWalletClient: ImportLegacyWalletClient {
@@ -20,7 +21,7 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 		print("✅ Passhprase: \(passphrase)")
 
 		let hdRoot = try! mnemonic.hdRoot(passphrase: passphrase)
-		let header = OlympiaExportHeader(payloadCount: numberOfPayLoads, mnemonicWordCount: mnemonic.wordCount.rawValue)
+		let header = Olympia.Export.Payload.Header(payloadCount: numberOfPayLoads, payloadIndex: 0, mnemonicWordCount: mnemonic.wordCount.wordCount)
 
 		return Self(
 			parseHeaderFromQRCode: { _ in
@@ -28,23 +29,23 @@ extension ImportLegacyWalletClient: TestDependencyKey {
 			},
 			parseLegacyWalletFromQRCodes: { _ in
 
-				@Dependency(\.engineToolkitClient) var engineToolkitClient
-
 				let accounts: [OlympiaAccountToMigrate] = try (0 ..< numberOfAccounts).map {
-					let path = try LegacyOlympiaBIP44LikeDerivationPath(index: UInt32($0))
-					let publicKey = try hdRoot.derivePublicKey(path: path.wrapAsDerivationPath(), curve: .secp256k1)
-					let accountType = ($0 % 2 == 0) ? Olympia.AccountType.software.rawValue : Olympia.AccountType.hardware.rawValue
-					let accountNonChecked = AccountNonChecked(
+					let addressIndex = UInt32($0)
+					let path = try LegacyOlympiaBIP44LikeDerivationPath(index: addressIndex)
+					let publicKey = try hdRoot.derivePrivateKey(path: path.fullPath, curve: K1.self).publicKey
+					let accountType = ($0 % 2 == 0) ? Olympia.AccountType.software : Olympia.AccountType.hardware
+
+					let name = "Olympia \(passphrase) \(String(describing: accountType)) i=\($0)"
+
+					let parsedOlympiaAccount = Olympia.Parsed.Account(
 						accountType: accountType,
-						pk: publicKey.compressedData.hex,
-						path: path.derivationPath,
-						name: "Olympia \(passphrase) \(String(describing: accountType)) i=\($0)"
+						publicKey: publicKey,
+						displayName: .init(rawValue: name),
+						addressIndex: addressIndex
 					)
 
-					// FIXME: cleanup when implementing the Live instance of this.
-					let accountChecked = try convertUncheckedAccount(
-						accountNonChecked,
-						engineToolkitClient: engineToolkitClient
+					let accountChecked = try convert(
+						parsedOlympiaAccount: parsedOlympiaAccount
 					)
 
 					assert(accountChecked.path == path)
