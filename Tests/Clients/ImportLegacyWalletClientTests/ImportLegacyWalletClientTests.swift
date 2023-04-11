@@ -11,7 +11,15 @@ struct TestVector: Codable, Sendable, Hashable {
 	let testID: Int
 	let olympiaWallet: OlympiaWallet
 	let payloadSizeThreshold: Int
+	let numberOfPayloads: Int
 	let payloads: NonEmpty<OrderedSet<NonEmptyString>>
+	init(testID: Int, olympiaWallet: OlympiaWallet, payloadSizeThreshold: Int, payloads: NonEmpty<OrderedSet<NonEmptyString>>) {
+		self.testID = testID
+		self.olympiaWallet = olympiaWallet
+		self.payloadSizeThreshold = payloadSizeThreshold
+		self.numberOfPayloads = payloads.count
+		self.payloads = payloads
+	}
 
 	struct OlympiaWallet: Codable, Hashable {
 		let mnemonic: String
@@ -19,6 +27,13 @@ struct TestVector: Codable, Sendable, Hashable {
 		struct Account: Sendable, Hashable, Codable {
 			public let accountType: Olympia.AccountType
 			public let publicKeyCompressedBase64: String
+			enum CodingKeys: String, CodingKey {
+				case accountType
+				case name
+				case addressIndex
+				case publicKeyCompressedBase64 = "pubKey"
+			}
+
 			public let addressIndex: Int
 			public let name: NonEmptyString?
 		}
@@ -156,8 +171,8 @@ private func generateTestVectors() throws -> [TestVector] {
 		60: [1, 2, 3], // 0.66 accounts per payload
 		1200: [13, 30], // 13  accounts
 		1600: [17, 35], // 17  accounts
-		2000: [22, 45], // 22 accounts
-		2600: [28, 60, 100], // 28 accounts
+		1800: [30, 45], // 20 accounts
+		2000: [25, 50, 100], // 22 accounts
 	]
 
 	var testID = 0
@@ -204,7 +219,7 @@ extension Olympia.Parsed.Account {
 
 // MARK: - ImportLegacyWalletClientTests
 final class ImportLegacyWalletClientTests: TestCase {
-	func omit_test_generate_tests() throws {
+	func test_generate_tests() throws {
 		let testVectors = try generateTestVectors()
 		let jsonEncoder = JSONEncoder()
 		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
