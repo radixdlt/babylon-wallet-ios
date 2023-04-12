@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 import Prelude
 import RadixConnectModels
@@ -44,7 +43,7 @@ extension SignalingClient {
 	) throws -> URL {
 		let target: ClientSource = source == .wallet ? .extension : .wallet
 
-		let connectionID = try HexCodable32Bytes(.init(data: connectionPassword.hash))
+		let connectionID = try HexCodable32Bytes(.init(data: connectionPassword.hash()))
 
 		let url = baseURL.appendingPathComponent(
 			connectionID.data.hex()

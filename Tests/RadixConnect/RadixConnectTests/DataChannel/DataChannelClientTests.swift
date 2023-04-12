@@ -1,4 +1,3 @@
-import CryptoKit
 @testable import RadixConnect
 import TestingPrelude
 
@@ -9,8 +8,8 @@ final class DataChannelClientTests: TestCase {
 
 	let messageID = DataChannelClient.Message.ID(rawValue: UUID().uuidString)
 	let testChunksData = try! Data.random(length: DataChannelClient.AssembledMessage.chunkSize * DataChannelClientTests.numberOfChunks)
-	lazy var chunkedMessages = DataChannelClient.AssembledMessage(message: testChunksData, id: messageID).split()
-	lazy var assembledMesage = DataChannelClient.AssembledMessage(message: testChunksData, id: messageID)
+	lazy var chunkedMessages = try! DataChannelClient.AssembledMessage(message: testChunksData, id: messageID).split()
+	lazy var assembledMesage = try! DataChannelClient.AssembledMessage(message: testChunksData, id: messageID)
 	lazy var receiveError = DataChannelClient.Message.Receipt.ReceiveError(messageId: messageID, error: .messageHashesMismatch)
 
 	var packagesMetaData: DataChannelClient.Message.ChunkedMessage.MetaDataPackage {
