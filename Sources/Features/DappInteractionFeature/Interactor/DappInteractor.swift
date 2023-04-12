@@ -160,7 +160,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
-			let response = request.toOutgoingMessage(responseToDapp)
+			let response = request.toDapp(response: responseToDapp)
 			return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
@@ -189,12 +189,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 		for request: P2P.RTCIncomingWalletInteraction,
 		dappMetadata: DappMetadata?
 	) -> EffectTask<Action> {
-		.run { send in
+		guard let toDapp = response.peerMessage.content.dapp else {
+			loggerGlobal.warning("Found non Dapp related message, probablt incorrect implementation somewhere.")
+			return .none
+		}
+
+		return .run { send in
+
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
 			let isTransactionResponse = {
-				if case let .success(response) = response.peerMessage.content,
-				   case .transaction = response.items
+				if case let .success(responseToDapp) = toDapp,
+				   case .transaction = responseToDapp.items
 				{
 					return true
 				}
@@ -204,11 +210,24 @@ struct DappInteractor: Sendable, FeatureReducer {
 			do {
 				_ = try await radixConnectClient.sendMessage(response)
 				if !isTransactionResponse {
-					await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
+					await send(.internal(
+						.sentResponseToDapp(
+							toDapp,
+							for: request,
+							dappMetadata
+						)
+					))
 				}
 			} catch {
 				if !isTransactionResponse {
-					await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
+					await send(.internal(
+						.failedToSendResponseToDapp(
+							response,
+							for: request,
+							dappMetadata,
+							reason: error.localizedDescription
+						)
+					))
 				}
 			}
 		}
@@ -236,7 +255,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					guard interaction.metadata.networkId == currentNetworkID else {
 						let incomingRequestNetwork = try Radix.Network.lookupBy(id: interaction.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
-						let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
+						let outMessage = interactionMessage.toDapp(response: .failure(.init(
 							interactionId: interaction.id,
 							errorType: .wrongNetwork,
 							message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
