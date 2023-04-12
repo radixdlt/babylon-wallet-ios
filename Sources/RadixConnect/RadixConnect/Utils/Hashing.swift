@@ -1,4 +1,3 @@
-import CryptoKit
 import EngineToolkit
 import Foundation
 import RadixConnectModels
