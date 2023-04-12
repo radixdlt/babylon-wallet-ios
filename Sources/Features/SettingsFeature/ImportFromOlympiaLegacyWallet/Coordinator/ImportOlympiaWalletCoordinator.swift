@@ -141,7 +141,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 				let destination = Destinations.State.importOlympiaMnemonic(.init(
 					shouldPersist: false,
-					expectedWordCount: expectedWordCount
+					expectedWordCount: expectedWordCount,
+					selectedAccounts: accounts.software
 				))
 
 				if state.path.last != destination {
@@ -328,7 +329,10 @@ extension ImportOlympiaWalletCoordinator {
 					)
 
 				} catch {
-					fatalError("todo, handle terrible bad stuff if failed to save factor source (mnemonic) but have already created accounts....")
+					let msg = "Failed to save factor source (mnemonic) but have already created accounts, error: \(error)"
+					loggerGlobal.critical(.init(stringLiteral: msg))
+					assertionFailure(msg)
+					errorQueue.schedule(error)
 				}
 			}
 
