@@ -16,8 +16,8 @@ public actor RTCClients {
 	// MARK: - Streams
 
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
-	public let incomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
-	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
+	public let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
+	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -47,7 +47,10 @@ extension RTCClients {
 extension RTCClients {
 	// MARK: - Public API
 
-	public func connect(_ linkPassword: ConnectionPassword, waitsForConnectionToBeEstablished: Bool = false) async throws {
+	public func connect(
+		_ linkPassword: ConnectionPassword,
+		waitsForConnectionToBeEstablished: Bool = false
+	) async throws {
 		let client = try makeRTCClient(linkPassword)
 		if waitsForConnectionToBeEstablished {
 			try await client.waitForFirstConnection()
@@ -108,9 +111,9 @@ extension RTCClients {
 actor RTCClient {
 	let id: ID
 	/// Incoming peer messages. This is the single channel for the received messages from all PeerConnections.
-	let incomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
+	let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
 
-	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
+	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
 	private let peerConnectionNegotiator: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
@@ -205,13 +208,22 @@ extension RTCClient {
 		await connection
 			.receivedMessagesStream()
 			.map { messageResult in
-				let interaction = messageResult.flatMap { message in
-					.init { try JSONDecoder().decode(P2P.FromDapp.WalletInteraction.self, from: message.messageContent) }
+
+				let contentResult = messageResult.flatMap { message in
+					Result {
+						try JSONDecoder()
+							.decode(
+								P2P.RTCIncomingMessage.PeerConnectionMessage.Content.self,
+								from: message.messageContent
+							)
+					}
 				}
-				return P2P.RTCIncomingMessage.PeerConnectionMessage(peerConnectionId: connection.id,
-				                                                    content: interaction)
-			}.map {
-				P2P.RTCIncomingMessageResult(connectionId: self.id, content: $0)
+
+				let peerConnectionMessage = P2P.RTCIncomingMessage.PeerConnectionMessage(
+					peerConnectionId: connection.id,
+					result: contentResult
+				)
+				return P2P.RTCIncomingMessage(connectionId: self.id, peerMessage: peerConnectionMessage)
 			}
 			.susbscribe(incomingMessagesContinuation)
 

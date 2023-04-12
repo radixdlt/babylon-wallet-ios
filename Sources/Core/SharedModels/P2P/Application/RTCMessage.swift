@@ -1,29 +1,70 @@
 import RadixConnectModels
 
+// MARK: - P2P.RTCIncomingMessage
 extension P2P {
-	public typealias RTCIncomingMessageResult = RTCIncomingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
-	public typealias RTCIncomingWalletInteraction = RTCIncomingMessage<P2P.FromDapp.WalletInteraction>
-
-	public struct RTCIncomingMessage<PeerConnectionContent: Sendable>: Sendable {
+	public struct RTCIncomingMessage: Sendable {
 		public let connectionId: ConnectionPassword
 		public let peerMessage: PeerConnectionMessage
 
 		public struct PeerConnectionMessage: Sendable {
 			public let peerConnectionId: PeerConnectionID
-			public let content: PeerConnectionContent
+			public let result: Result<Content, Swift.Error>
 
-			public init(peerConnectionId: PeerConnectionID, content: PeerConnectionContent) {
+			public enum Content: Sendable, Hashable, Decodable {
+				struct WrongContentType: Swift.Error {}
+				/// All Dapp interactions
+				case dapp(P2P.FromDapp.WalletInteraction)
+
+				/// e.g. for Ledger Nano interaction
+				case connectorExtension(P2P.FromConnectorExtension)
+
+				public var dapp: P2P.FromDapp.WalletInteraction? {
+					guard case let .dapp(fromDapp) = self else { return nil }
+					return fromDapp
+				}
+
+				public func asDapp() throws -> P2P.FromDapp.WalletInteraction {
+					guard let dapp else {
+						throw WrongContentType()
+					}
+					return dapp
+				}
+
+				public init(from decoder: Decoder) throws {
+					do {
+						self = try .dapp(.init(from: decoder))
+					} catch let dappError {
+						do {
+							self = try .connectorExtension(.init(from: decoder))
+						} catch {
+							debugPrint("Unable to parse incoming RTC message, failed to parse as dapp and failed to parse as connectorExtension message. dapp decode error: \(dappError)")
+							throw error
+						}
+					}
+				}
+			}
+
+			public init(
+				peerConnectionId: PeerConnectionID,
+				result: Result<Content, Swift.Error>
+			) {
 				self.peerConnectionId = peerConnectionId
-				self.content = content
+				self.result = result
 			}
 		}
 
-		public init(connectionId: ConnectionPassword, content: PeerConnectionMessage) {
+		public init(
+			connectionId: ConnectionPassword,
+			peerMessage: PeerConnectionMessage
+		) {
 			self.connectionId = connectionId
-			self.peerMessage = content
+			self.peerMessage = peerMessage
 		}
 	}
+}
 
+// MARK: - P2P.RTCOutgoingMessage
+extension P2P {
 	public struct RTCOutgoingMessage: Sendable, Hashable {
 		public let connectionId: ConnectionPassword
 		public let peerMessage: PeerConnectionMessage
@@ -96,34 +137,8 @@ extension P2P.RTCOutgoingMessage.PeerConnectionMessage.Content {
 	}
 }
 
-extension P2P.RTCIncomingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
-	public func unwrapResult() throws -> P2P.RTCIncomingWalletInteraction {
-		try .init(
-			connectionId: connectionId,
-			content: .init(
-				peerConnectionId: peerMessage.peerConnectionId,
-				content: peerMessage.content.get()
-			)
-		)
-	}
-}
-
-extension P2P.RTCIncomingMessage {
-	/// Transforms an incoming message FromDapp to an OutgoingMessage to Dapp
-	/// by preserving the RTCClient and PeerConnection IDs
-	public func toDapp(response: P2P.ToDapp.WalletInteractionResponse) -> P2P.RTCOutgoingMessage {
-		.init(
-			connectionId: connectionId,
-			content: .toDapp(
-				response: response,
-				peerConnectionId: peerMessage.peerConnectionId
-			)
-		)
-	}
-}
-
-// MARK: - P2P.RTCIncomingMessage.PeerConnectionMessage + Hashable, Equatable
-extension P2P.RTCIncomingMessage.PeerConnectionMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
-
-// MARK: - P2P.RTCIncomingMessage + Hashable, Equatable
-extension P2P.RTCIncomingMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
+//// MARK: - P2P.RTCIncomingMessage.PeerConnectionMessage + Hashable, Equatable
+// extension P2P.RTCIncomingMessage.PeerConnectionMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
+//
+//// MARK: - P2P.RTCIncomingMessage + Hashable, Equatable
+// extension P2P.RTCIncomingMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}

@@ -17,6 +17,11 @@ extension P2P.ToConnectorExtension {
 		public let interactionID: P2P.LedgerHardwareWallet.InteractionId
 		public let request: Request
 
+		public init(interactionID: P2P.LedgerHardwareWallet.InteractionId, request: Request) {
+			self.interactionID = interactionID
+			self.request = request
+		}
+
 		public enum Request: Sendable, Hashable, Encodable {
 			case getDeviceInfo
 			case derivePublicKey(DerivePublicKey)
@@ -186,5 +191,15 @@ extension P2P {
 				case secp256k1
 			}
 		}
+	}
+}
+
+extension P2P.LedgerHardwareWallet.InteractionId {
+	/// Creates a new random interactionID using UUID
+	public static func random() -> Self { .uuid() }
+
+	/// Creates a new random interactionID using UUID
+	public static func uuid() -> Self {
+		.init(rawValue: UUID().uuidString)
 	}
 }
