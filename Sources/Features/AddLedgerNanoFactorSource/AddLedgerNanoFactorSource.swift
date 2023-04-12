@@ -1,4 +1,5 @@
 import FeaturePrelude
+import RadixConnectClient
 
 // MARK: - AddLedgerNanoFactorSource
 public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
@@ -15,6 +16,8 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 		case completed(FactorSourceID)
 	}
 
+	@Dependency(\.radixConnectClient) var radixConnectClient
+
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -26,6 +29,18 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 			return .send(.delegate(.completed(
 				factorSourceIDMocked
 			)))
+
+			//            do {
+			//                let response: P2P.RTCOutgoingMessage =
+			//                _ = try await radixConnectClient.sendMessage(response)
+			//                if !isTransactionResponse {
+			//                    await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
+			//                }
+			//            } catch {
+			//                if !isTransactionResponse {
+			//                    await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
+			//                }
+			//            }
 		}
 	}
 }

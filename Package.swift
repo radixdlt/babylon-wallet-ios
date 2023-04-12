@@ -45,6 +45,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
+			"RadixConnectClient",
 		],
 		tests: .no
 	),

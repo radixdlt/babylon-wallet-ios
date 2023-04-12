@@ -37,7 +37,7 @@ extension P2P {
 				case dapp(P2P.ToDapp.WalletInteractionResponse)
 
 				/// e.g. for Ledger Nano interaction
-				case connectorExtension
+				case connectorExtension(P2P.ToConnectorExtension)
 
 				public var dapp: P2P.ToDapp.WalletInteractionResponse? {
 					guard case let .dapp(toDapp) = self else { return nil }
