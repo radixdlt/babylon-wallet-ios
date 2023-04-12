@@ -125,6 +125,7 @@ package.addModules([
 		name: "FungibleTokenListFeature",
 		dependencies: [
 			"FungibleTokenDetailsFeature",
+                        "AccountPortfoliosClient"
 		],
 		tests: .yes()
 	),

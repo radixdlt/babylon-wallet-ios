@@ -6,6 +6,7 @@ import FeaturePrelude
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 import AccountPortfoliosClient
+import SharedModels
 
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -134,29 +135,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
         public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
                 switch internalAction {
                 case let .portfolioUpdated(portfolio):
-                        let fungibleTokenCategories = accountState.portfolio.fungibleTokenContainers.sortedIntoCategories()
-
-                        state.assets = .init(
-                                fungibleTokenList: .init(
-                                        sections: .init(uniqueElements: fungibleTokenCategories.map { category in
-                                                let rows = category.containers.map { container in
-                                                        FungibleTokenList.Row.State(
-                                                                container: container,
-                                                        )
-                                                }
-                                                return FungibleTokenList.Section.State(
-                                                        id: category.id,
-                                                        assets: .init(uniqueElements: rows)
-                                                )
-                                        })
-                                ),
-
-                                nonFungibleTokenList: .init(
-                                        rows: .init(uniqueElements: accountState.portfolio.nonFungibleTokenContainers.map {
-                                                .init(container: $0)
-                                        })
-                                )
-                        )
+                        let xrd = portfolio.fungibleResources.loaded.first!
+                        let nonXrd = Array(portfolio.fungibleResources.loaded.suffix(from: 1))
+                        state.assets = .init(fungibleTokenList: .init(xrdToken: xrd, nonXrdTokens: nonXrd), nonFungibleTokenList: .init(rows: []))
                         return .none
                 }
 

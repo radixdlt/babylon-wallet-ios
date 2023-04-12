@@ -19,17 +19,16 @@ extension FungibleTokenList {
 extension FungibleTokenList.View {
 	public var body: some View {
 		LazyVStack(spacing: .medium2) {
-                        IfLetStore(store.scope(state: \.xrdToken)) { <#Store<State, Action>#> in
-                                FungibleTokenList.Row.View(store: <#T##StoreOf<FungibleTokenList.Row>#>)
-                        }
-                        store.scope(state: \.xrdToken)
+                        IfLetStore(
+                                store.scope(state: \.xrdToken, action: { .child(.row($0))}),
+                                then: { FungibleTokenList.Row.View(store: $0) })
 
 			ForEachStore(
 				store.scope(
-					state: \.sections,
-					action: { .child(.section(id: $0, action: $1)) }
+                                        state: \.nonXrdTokens,
+                                        action: { .child(.row($0)) }
 				),
-				content: { FungibleTokenList.Section.View(store: $0) }
+				content: { FungibleTokenList.Row.View(store: $0) }
 			)
 
                         ProgressView().onAppear {

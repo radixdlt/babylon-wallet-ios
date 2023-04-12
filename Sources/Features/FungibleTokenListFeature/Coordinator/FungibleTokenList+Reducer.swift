@@ -24,6 +24,7 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+                case row(FungibleTokenList.Row.Action)
 	}
 
         public enum DelegateAction: Sendable, Equatable {
@@ -50,9 +51,11 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-                        .ifLet(\.xrdToken, action: /Action.child .. ChildAction)
-			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
-				FungibleTokenList.Section()
+                        .ifLet(\.xrdToken, action: /Action.child .. ChildAction.row) {
+                                FungibleTokenList.Row()
+                        }
+			.forEach(\.nonXrdTokens, action: /Action.child .. ChildAction.row) {
+                                FungibleTokenList.Row()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

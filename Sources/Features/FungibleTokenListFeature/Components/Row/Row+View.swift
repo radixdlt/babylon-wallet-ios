@@ -3,17 +3,10 @@ import FeaturePrelude
 extension FungibleTokenList.Row.State {
 	var viewState: FungibleTokenList.Row.ViewState {
 		.init(
-			isXRD: container.asset.isXRD,
-			iconURL: container.asset.iconURL,
-			symbol: container.asset.symbol ?? "",
-			tokenAmount: container.amount.format(),
-			tokenValue: {
-                                if let value = container.worth {
-                                        return "\(value.format()) \(currency.symbol)"
-                                } else {
-                                        return "\(currency.sign) -"
-                                }
-			}()
+			isXRD: isXRD,
+                        iconURL: token.iconURL,
+			symbol: token.symbol ?? "",
+                        tokenAmount: token..format()
 		)
 	}
 }
@@ -25,7 +18,6 @@ extension FungibleTokenList.Row {
 		let iconURL: URL?
 		let symbol: String
 		let tokenAmount: String
-		let tokenValue: String
 	}
 
 	@MainActor
@@ -58,13 +50,6 @@ extension FungibleTokenList.Row {
 							Text(viewStore.tokenAmount)
 								.foregroundColor(.app.gray1)
 								.textStyle(.secondaryHeader)
-
-							// TODO: uncomment when fiat value ready for implementation
-							/*
-							 Text(viewStore.tokenValue)
-							 .foregroundColor(.app.gray2)
-							 .textStyle(.body2Regular)
-							 */
 						}
 					}
 

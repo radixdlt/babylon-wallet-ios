@@ -3,14 +3,17 @@ import FeaturePrelude
 extension FungibleTokenList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
-                        public var id: FungibleToken.ID { token.id }
+                        public var id: ResourceAddress { token.resourceAddress}
 
-			public var token: FungibleToken
+                        public var token: AccountPortfolio.FungibleToken
+                        public var isXRD: Bool
 
 			public init(
-                                token: FungibleToken
+                                token: AccountPortfolio.FungibleToken,
+                                isXRD: Bool
 			) {
 				self.token = token
+                                self.isXRD = isXRD
 			}
 		}
 
@@ -19,7 +22,7 @@ extension FungibleTokenList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case selected(FungibleToken)
+                        case selected(AccountPortfolio.FungibleToken)
 		}
 
 		public init() {}

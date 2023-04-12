@@ -3,14 +3,13 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-			displayName: asset.name ?? "",
-			iconURL: asset.iconURL,
-			placeholderAsset: .placeholderImage(isXRD: asset.isXRD),
+                        displayName: .name ?? "",
+                        iconURL: self.icon,
+			placeholderAsset: .placeholderImage(isXRD: false),
 			amount: amount.format(),
-			symbol: asset.symbol,
-			description: asset.tokenDescription,
-			address: .init(address: asset.resourceAddress.address, format: .default),
-			currentSupply: asset.totalMinted
+                        symbol: .symbol,
+                        description: .description,
+			address: .init(address: .resourceAddress.address, format: .default)
 		)
 	}
 }
@@ -25,7 +24,6 @@ extension FungibleTokenDetails {
 		let symbol: String?
 		let description: String?
 		let address: AddressView.ViewState
-		let currentSupply: BigDecimal?
 	}
 
 	@MainActor
@@ -106,16 +104,6 @@ extension FungibleTokenDetails {
 						.frame(maxWidth: .infinity, alignment: .trailing)
 						.multilineTextAlignment(.trailing)
 					}
-					if let currentSupply = viewStore.currentSupply {
-						HStack {
-							Text(L10n.FungibleTokenList.Detail.currentSupply)
-								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray2)
-							Text(currentSupply.description)
-								.frame(maxWidth: .infinity, alignment: .trailing)
-								.multilineTextAlignment(.trailing)
-						}
-					}
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.padding(.horizontal, .large2)
@@ -126,26 +114,26 @@ extension FungibleTokenDetails {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct FungibleTokenDetails_Preview: PreviewProvider {
-	static var previews: some View {
-		FungibleTokenDetails.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: FungibleTokenDetails()
-			)
-		)
-	}
-}
-
-extension FungibleTokenDetails.State {
-	public static let previewValue = FungibleTokenContainer(
-		owner: try! .init(address: "owner_address"),
-		asset: .xrd,
-		amount: 30.0,
-		worth: 500
-	)
-}
+//#if DEBUG
+//import SwiftUI // NB: necessary for previews to appear
+//
+//struct FungibleTokenDetails_Preview: PreviewProvider {
+//	static var previews: some View {
+//		FungibleTokenDetails.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: FungibleTokenDetails()
+//			)
+//		)
+//	}
+//}
+//
+//extension FungibleTokenDetails.State {
+//        public static let previewValue = AccountPortfolio.FungibleToken(
+//		owner: try! .init(address: "owner_address"),
+//		asset: .xrd,
+//		amount: 30.0,
+//		worth: 500
+//	)
+//}
 #endif
