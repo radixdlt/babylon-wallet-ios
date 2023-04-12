@@ -1,25 +1,28 @@
 import FeaturePrelude
 import FungibleTokenDetailsFeature
+import AccountPortfoliosClient
 
 public struct FungibleTokenList: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public var sections: IdentifiedArrayOf<FungibleTokenList.Section.State>
+        public struct State: Sendable, Hashable {
+                public var xrdToken: FungibleToken
+                public var nonXrdTokens: [FungibleToken]
 
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(sections: IdentifiedArrayOf<FungibleTokenList.Section.State>) {
-			self.sections = sections
-		}
+                public init(xrdToken: FungibleToken, nonXrdTokens: [FungibleToken], destination: FungibleTokenList.Destinations.State? = nil) {
+                        self.xrdToken = xrdToken
+                        self.nonXrdTokens = nonXrdTokens
+                        self.destination = destination
+                }
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case selectedTokenChanged(FungibleTokenContainer?)
+		case selectedTokenChanged(FungibleToken?)
                 case scrolledToLoadMore
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -47,6 +50,7 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
+                        .ifLet(\.xrdToken, action: /Action.child .. ChildAction)
 			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
 				FungibleTokenList.Section()
 			}

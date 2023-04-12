@@ -43,6 +43,7 @@ extension GatewayAPIClient {
 	public typealias GetNonFungibleIds = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.StateNonFungibleIdsResponse
 
         public typealias GetFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityFungiblesPageRequest) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
+        //public typealias GetNonFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityNonF) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
 
 	// MARK: - transaction
 

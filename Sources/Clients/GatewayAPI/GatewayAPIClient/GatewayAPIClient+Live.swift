@@ -181,7 +181,7 @@ extension GatewayAPIClient {
                         getEntityFungibleTokensPage: { request in
                                 try await post(
                                         request: request
-                                ) { $0.appendingPathComponent("/state/entity/page/fungibles/") }
+                                ) { $0.appendingPathComponent("state/entity/page/fungibles/") }
                         },
                         getEntityMetadataPage: { request in
                                 try await post(request: request) {

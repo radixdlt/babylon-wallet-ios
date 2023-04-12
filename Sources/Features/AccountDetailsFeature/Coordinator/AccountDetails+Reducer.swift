@@ -5,49 +5,27 @@ import AssetTransferFeature
 import FeaturePrelude
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
-import AccountPortfolioFetcherClient
+import AccountPortfoliosClient
 
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let accountState: AccountList.Row.State
+                var account: Profile.Network.Account {
+                        accountState.account
+                }
 		public var assets: AssetsView.State
-                //public var portfolio: AccountPortofolo
 
 		@PresentationState
 		public var destination: Destinations.State?
 
 		public init(for accountState: AccountList.Row.State) {
 			self.accountState = accountState
-
-                        let fungibleTokenCategories = accountState.portfolio.fungibleTokenContainers.sortedIntoCategories()
-
-			assets = .init(
-				fungibleTokenList: .init(
-					sections: .init(uniqueElements: fungibleTokenCategories.map { category in
-						let rows = category.containers.map { container in
-							FungibleTokenList.Row.State(
-								container: container,
-								currency: accountState.currency,
-								isCurrencyAmountVisible: accountState.isCurrencyAmountVisible
-							)
-						}
-						return FungibleTokenList.Section.State(
-                                                        id: category.id,
-                                                        assets: .init(uniqueElements: rows)
-						)
-					})
-				),
-
-				nonFungibleTokenList: .init(
-					rows: .init(uniqueElements: accountState.portfolio.nonFungibleTokenContainers.map {
-						.init(container: $0)
-					})
-				)
-			)
+                        self.assets = AssetsView.State(fungibleTokenList: .init(sections: []), nonFungibleTokenList: .init(rows: []))
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+                case task
 		case appeared
 		case backButtonTapped
 		case preferencesButtonTapped
@@ -67,8 +45,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case refresh(AccountAddress)
 	}
 
-        public enum InternAction: Sendable, Equatable {
-                case loadMoreFungibleTokensResult(TaskResult<FungibleTokensPageResponse>)
+        public enum InternalAction: Sendable, Equatable {
+                case portfolioUpdated(AccountPortfolio)
         }
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -93,7 +71,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
-        @Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+        @Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 	public init() {}
 
@@ -110,8 +88,19 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+                case .task:
+                        return .run { [address = state.account.address] send in
+                                for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address) {
+                                        guard !Task.isCancelled else {
+                                                return
+                                        }
+                                        await send(.internal(.portfolioUpdated(portfolio)))
+                                }
+                        }
 		case .appeared:
-                        return .send(.delegate(.refresh(state.accountState.account.address)))
+                        return .run { [address = state.account.address] _ in
+                                try await accountPortfoliosClient.fetchAccountPortfolio(address)
+                        }
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .preferencesButtonTapped:
@@ -136,14 +125,40 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
                 case .assets(.child(.fungibleTokenList(.delegate(.loadMoreTokens)))):
-                        guard let nextPageCursor = state.accountState.portfolio.fungibleTokenContainers.nextPageCursor else {
-                                return .none
-                        }
-
-                        accountPortfolioFetcherClient.fetchFungibleTokens(nextPageCursor)
                         return .none
 		default:
 			return .none
 		}
 	}
+
+        public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+                switch internalAction {
+                case let .portfolioUpdated(portfolio):
+                        let fungibleTokenCategories = accountState.portfolio.fungibleTokenContainers.sortedIntoCategories()
+
+                        state.assets = .init(
+                                fungibleTokenList: .init(
+                                        sections: .init(uniqueElements: fungibleTokenCategories.map { category in
+                                                let rows = category.containers.map { container in
+                                                        FungibleTokenList.Row.State(
+                                                                container: container,
+                                                        )
+                                                }
+                                                return FungibleTokenList.Section.State(
+                                                        id: category.id,
+                                                        assets: .init(uniqueElements: rows)
+                                                )
+                                        })
+                                ),
+
+                                nonFungibleTokenList: .init(
+                                        rows: .init(uniqueElements: accountState.portfolio.nonFungibleTokenContainers.map {
+                                                .init(container: $0)
+                                        })
+                                )
+                        )
+                        return .none
+                }
+
+        }
 }

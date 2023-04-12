@@ -3,22 +3,14 @@ import FeaturePrelude
 extension FungibleTokenList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
-			public var id: FungibleTokenContainer.ID { container.id }
+                        public var id: FungibleToken.ID { token.id }
 
-			public var container: FungibleTokenContainer
-
-			// MARK: - AppSettings properties
-			public let currency: FiatCurrency
-			public var isCurrencyAmountVisible: Bool
+			public var token: FungibleToken
 
 			public init(
-				container: FungibleTokenContainer,
-				currency: FiatCurrency,
-				isCurrencyAmountVisible: Bool
+                                token: FungibleToken
 			) {
-				self.container = container
-				self.currency = currency
-				self.isCurrencyAmountVisible = isCurrencyAmountVisible
+				self.token = token
 			}
 		}
 
@@ -27,7 +19,7 @@ extension FungibleTokenList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case selected(FungibleTokenContainer)
+			case selected(FungibleToken)
 		}
 
 		public init() {}
@@ -35,7 +27,7 @@ extension FungibleTokenList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case .tapped:
-				return .send(.delegate(.selected(state.container)))
+                                return .send(.delegate(.selected(state.token)))
 			}
 		}
 	}

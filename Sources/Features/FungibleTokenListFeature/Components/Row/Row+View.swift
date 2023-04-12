@@ -6,23 +6,13 @@ extension FungibleTokenList.Row.State {
 			isXRD: container.asset.isXRD,
 			iconURL: container.asset.iconURL,
 			symbol: container.asset.symbol ?? "",
-			tokenAmount: {
-				if isCurrencyAmountVisible {
-					return container.amount.format()
-				} else {
-					return "••••"
-				}
-			}(),
+			tokenAmount: container.amount.format(),
 			tokenValue: {
-				if isCurrencyAmountVisible {
-					if let value = container.worth {
-						return "\(value.format()) \(currency.symbol)"
-					} else {
-						return "\(currency.sign) -"
-					}
-				} else {
-					return "\(currency.sign) ••••"
-				}
+                                if let value = container.worth {
+                                        return "\(value.format()) \(currency.symbol)"
+                                } else {
+                                        return "\(currency.sign) -"
+                                }
 			}()
 		)
 	}

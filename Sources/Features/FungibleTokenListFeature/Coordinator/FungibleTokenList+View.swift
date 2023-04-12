@@ -19,6 +19,11 @@ extension FungibleTokenList {
 extension FungibleTokenList.View {
 	public var body: some View {
 		LazyVStack(spacing: .medium2) {
+                        IfLetStore(store.scope(state: \.xrdToken)) { <#Store<State, Action>#> in
+                                FungibleTokenList.Row.View(store: <#T##StoreOf<FungibleTokenList.Row>#>)
+                        }
+                        store.scope(state: \.xrdToken)
+
 			ForEachStore(
 				store.scope(
 					state: \.sections,

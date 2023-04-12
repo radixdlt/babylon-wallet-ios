@@ -22,14 +22,14 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AssetsViewFeature",
 			"AssetTransferFeature",
-                        "AccountPortfolioFetcherClient"
+                        "AccountPortfolioFetcherClient",
+                        "AccountPortfoliosClient"
 		],
 		tests: .yes()
 	),
 	.feature(
 		name: "AccountListFeature",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
 			"FungibleTokenListFeature",
 		],
 		tests: .yes()
@@ -49,7 +49,6 @@ package.addModules([
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
@@ -151,6 +150,7 @@ package.addModules([
 			"AccountDetailsFeature",
 			"AccountListFeature",
 			"AccountPortfolioFetcherClient",
+                        "AccountPortfoliosClient",
 			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateEntityFeature",
@@ -173,7 +173,6 @@ package.addModules([
 		name: "MainFeature",
 		dependencies: [
 			"AppPreferencesClient",
-			"AccountPortfolioFetcherClient",
 			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
@@ -290,7 +289,14 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+        .client(
+                name: "AccountPortfoliosClient",
+                dependencies: [
+                        "EngineToolkitClient",
+                        "GatewayAPI",
+                ],
+                tests: .yes()
+        ),
 	.client(
 		name: "AppPreferencesClient",
 		dependencies: [

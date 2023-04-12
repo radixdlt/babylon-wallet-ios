@@ -1,4 +1,3 @@
-import struct AccountPortfolioFetcherClient.AccountPortfolio // TODO: move to some new model package
 import FeaturePrelude
 import FungibleTokenListFeature
 
@@ -7,11 +6,7 @@ extension AccountList.Row.State {
 		.init(
 			name: account.displayName.rawValue,
 			address: .init(address: account.address.address, format: .default),
-			appearanceID: account.appearanceID,
-			aggregatedValue: aggregatedValue,
-			currency: currency,
-			isCurrencyAmountVisible: isCurrencyAmountVisible,
-			portfolio: portfolio
+			appearanceID: account.appearanceID
 		)
 	}
 }
@@ -22,10 +17,6 @@ extension AccountList.Row {
 		let name: String
 		let address: AddressView.ViewState
 		let appearanceID: Profile.Network.Account.AppearanceID
-		let aggregatedValue: BigDecimal?
-		let currency: FiatCurrency
-		let isCurrencyAmountVisible: Bool
-		let portfolio: AccountPortfolio
 	}
 
 	@MainActor
@@ -40,17 +31,6 @@ extension AccountList.Row {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					VStack(alignment: .leading, spacing: .zero) {
-						HeaderView(
-							name: viewStore.name,
-							value: formattedAmount(
-								viewStore.aggregatedValue,
-								isVisible: viewStore.isCurrencyAmountVisible,
-								currency: viewStore.currency
-							),
-							isValueVisible: viewStore.isCurrencyAmountVisible,
-							currency: viewStore.currency
-						)
-
 						AddressView(
 							viewStore.address,
 							copyAddressAction: {
