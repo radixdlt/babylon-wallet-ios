@@ -94,22 +94,19 @@ extension View {
 				}
 			}
 		#endif
-			.importFromOlympiaLegacyWallet(with: store, viewStore)
-			.factorSources(with: store, viewStore)
-			.manageP2PLinks(with: store, viewStore)
-			.gatewaySettings(with: store, viewStore)
-			.authorizedDapps(with: store, viewStore)
-			.personas(with: store, viewStore)
-			.generalSettings(with: store, viewStore)
+			.importFromOlympiaLegacyWallet(with: store)
+			.factorSources(with: store)
+			.manageP2PLinks(with: store)
+			.gatewaySettings(with: store)
+			.authorizedDapps(with: store)
+			.personas(with: store)
+			.generalSettings(with: store)
 	}
 }
 
 extension View {
 	@MainActor
-	private func importFromOlympiaLegacyWallet(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func importFromOlympiaLegacyWallet(with store: StoreOf<AppSettings>) -> some View {
 		self.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
@@ -119,10 +116,7 @@ extension View {
 	}
 
 	@MainActor
-	private func factorSources(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func factorSources(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.manageFactorSources,
@@ -132,10 +126,7 @@ extension View {
 	}
 
 	@MainActor
-	private func manageP2PLinks(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func manageP2PLinks(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.manageP2PLinks,
@@ -145,10 +136,7 @@ extension View {
 	}
 
 	@MainActor
-	private func gatewaySettings(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func gatewaySettings(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.gatewaySettings,
@@ -158,10 +146,7 @@ extension View {
 	}
 
 	@MainActor
-	fileprivate func authorizedDapps(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	fileprivate func authorizedDapps(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.authorizedDapps,
@@ -171,10 +156,7 @@ extension View {
 	}
 
 	@MainActor
-	fileprivate func personas(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	fileprivate func personas(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.personas,
@@ -184,10 +166,7 @@ extension View {
 	}
 
 	@MainActor
-	private func generalSettings(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func generalSettings(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.generalSettings,
