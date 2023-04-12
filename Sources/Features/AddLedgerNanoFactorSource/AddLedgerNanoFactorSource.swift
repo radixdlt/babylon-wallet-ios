@@ -20,6 +20,7 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case task
+		case mockLedgerNanoAdded
 		case sendAddLedgerRequestButtonTapped
 		case selectedLink(P2PLink)
 	}
@@ -40,6 +41,12 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .mockLedgerNanoAdded:
+			let factorSourceIDMocked = try! FactorSourceID(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+			return .send(.delegate(.completed(
+				factorSourceIDMocked
+			)))
+
 		case .appeared:
 			return .run { send in
 				try await send(.internal(.loadLinksResult(
