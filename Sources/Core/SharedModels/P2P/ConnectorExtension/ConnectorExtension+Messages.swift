@@ -47,23 +47,23 @@ struct WrongRequestType: Swift.Error {}
 
 extension P2P.FromConnectorExtension.LedgerHardwareWallet.Success {
 	public var getDeviceInfo: GetDeviceInfo? {
-		guard case let .getDeviceInfo(wrapped) = self else {
+		guard case let .getDeviceInfo(payload) = self else {
 			return nil
 		}
-		return wrapped
+		return payload
 	}
 
 	public var signTransaction: SignTransaction? {
-		guard case let .signTransaction(wrapped) = self else {
+		guard case let .signTransaction(payload) = self else {
 			return nil
 		}
-		return wrapped
+		return payload
 	}
 
 	public var derivePublicKey: DerivePublicKey? {
-		guard case let .derivePublicKey(wrapped) = self else {
+		guard case let .derivePublicKey(payload) = self else {
 			return nil
 		}
-		return wrapped
+		return payload
 	}
 }
