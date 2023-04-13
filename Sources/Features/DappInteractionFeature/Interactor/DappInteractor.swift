@@ -244,7 +244,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			await radixConnectClient.loadFromProfileAndConnectAll()
 			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
-			for try await incomingRequest in await radixConnectClient.receiveRequest2(/P2P.RTCMessageFromPeer.Request.dapp) {
+			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
 				guard !Task.isCancelled else {
 					return
 				}

@@ -53,10 +53,10 @@ extension RadixConnectClient {
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
 			receiveMessages: { await rtcClients.incomingMessages() },
-			receiveResponses: {
-				await rtcClients.incoming(/P2P.RTCMessageFromPeer.response)
-			},
-			receiveRequests: { await rtcClients.incoming(/P2P.RTCMessageFromPeer.request) },
+//			receiveResponses: {
+//				await rtcClients.incoming(/P2P.RTCMessageFromPeer.response)
+//			},
+//			receiveRequests: { await rtcClients.incoming(/P2P.RTCMessageFromPeer.request) },
 			sendResponse: { response, route in
 				try await rtcClients.sendResponse(response, to: route)
 			},
@@ -67,9 +67,11 @@ extension RadixConnectClient {
 	}()
 }
 
-extension RTCClients {
-	func incoming<Case>(_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
-		await incomingMessages().compactMap { incomingMessage -> P2P.RTCIncomingMessageContainer<Case>? in
+extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomingMessage {
+	func filter<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		compactMap { incomingMessage -> P2P.RTCIncomingMessageContainer<Case>? in
 			guard let incomingRequestOrResponse = incomingMessage.flatMap({ (success: P2P.RTCMessageFromPeer) -> Case? in
 				casePath.extract(from: success)
 			}) else {
@@ -83,17 +85,18 @@ extension RTCClients {
 }
 
 extension RadixConnectClient {
-	public func receiveRequest2<Case>(
+	public func receiveRequests<Case>(
 		_ casePath: CasePath<P2P.RTCMessageFromPeer.Request, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
-		await receiveRequests().compactMap { (incomingRequest: P2P.RTCIncomingRequest) -> P2P.RTCIncomingMessageContainer<Case>? in
-			//            casePath.extract(from: incomingRequest)
-			incomingRequest.flatMap {
-				casePath.extract(from: $0)
+		await receiveMessages()
+			.filter(/P2P.RTCMessageFromPeer.request)
+			.compactMap { (incomingRequest: P2P.RTCIncomingRequest) -> P2P.RTCIncomingMessageContainer<Case>? in
+				incomingRequest.flatMap {
+					casePath.extract(from: $0)
+				}
 			}
-		}
-		.share()
-		.eraseToAnyAsyncSequence()
+			.share()
+			.eraseToAnyAsyncSequence()
 	}
 }
 
