@@ -51,7 +51,23 @@ extension RadixConnectClient {
 			addP2PWithPassword: { password in
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
-			receiveMessages: { await rtcClients.incomingMessages },
+			receiveMessages: { await rtcClients.incomingMessages() },
+			receiveResponses: {
+				await rtcClients.incomingMessages().compactMap { incomingMessage -> P2P.RTCIncomingResponse? in
+					guard let incomingResponse = incomingMessage.flatMap({ (success: P2P.RTCMessageFromPeer) -> P2P.RTCMessageFromPeer.Response? in
+						switch success {
+						case let .response(response):
+							return response
+						case .request:
+							return nil
+						}
+					}) else {
+						return nil
+					}
+					return incomingResponse
+				}.eraseToAnyAsyncSequence()
+			},
+			receiveRequests: { fatalError() },
 			sendResponse: { response, route in
 				try await rtcClients.sendResponse(response, to: route)
 			},
@@ -63,6 +79,25 @@ extension RadixConnectClient {
 }
 
 // MARK: - LocalNetworkAuthorization
+// extension RTCClients {
+//
+//    /// A Multicasted async sequence of RTCIncoming messages transformed using
+//    /// `transform`
+//    func incomingMessageLens<M>(
+//        _ transform: @escaping @Sendable (P2P.RTCMessageFromPeer) throws -> M?
+//    ) async -> AnyAsyncSequence<M> {
+//        await incomingMessages() // P2P.RTCIncomingMessage
+//            .compactMap {
+//                switch $0.result {
+//                case let .success(messageFromPeer): return transform(messageFromPeer)
+//                case .failure(<#T##Error#>)
+//                }
+//            }
+//            .share()
+//            .eraseToAnyAsyncSequence()
+//    }
+// }
+
 /// Source: https://stackoverflow.com/a/67758105/705761
 private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 	private var browser: NWBrowser?

@@ -15,9 +15,13 @@ public actor RTCClients {
 
 	// MARK: - Streams
 
+	/// A **multicasted** async sequence for received messeage from ALL RTCClients.
+	public func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
+		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
+	}
+
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
-	public let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
-	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
+	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -33,7 +37,6 @@ public actor RTCClients {
 	{
 		self.peerConnectionFactory = peerConnectionFactory
 		self.signalingServerBaseURL = signalingServerBaseURL
-		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 	}
 }
 
@@ -127,7 +130,7 @@ extension RTCClients {
 	// MARK: - Private
 
 	func add(_ client: RTCClient) {
-		client.incomingMessages.susbscribe(incomingMessagesContinuation)
+		client.incomingMessages.subscribe(incomingMessagesSubject)
 		self.clients[client.id] = client
 	}
 
@@ -150,10 +153,15 @@ extension RTCClients {
 // MARK: - RTCClient
 actor RTCClient {
 	let id: ID
-	/// Incoming peer messages. This is the single channel for the received messages from all PeerConnections.
-	let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
 
+	//    /// A multicasted Incoming peer messages. This is the single channel for the received messages from all PeerConnections.
+	//    func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
+	//        incomingMessagesSubject.share().eraseToAnyAsyncSequence()
+	//    }
+
+	let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
 	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
+	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 	private let peerConnectionNegotiator: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
@@ -169,6 +177,7 @@ actor RTCClient {
 		self.id = id
 		self.peerConnectionNegotiator = peerConnectionNegotiator
 		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+
 		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.streamWithContinuation()
 
 		Task {
@@ -199,6 +208,7 @@ extension RTCClient {
 		peerConnections.removeAll()
 		peerConnectionNegotiator.cancel()
 		incomingMessagesContinuation.finish()
+		//        incomingMessagesSubject.send(.finished)
 		disconnectedPeerConnectionContinuation.finish()
 		connectionsTask?.cancel()
 		disconnectTask?.cancel()
@@ -277,7 +287,7 @@ extension RTCClient {
 					route: route
 				)
 			}
-			.susbscribe(incomingMessagesContinuation)
+			.subscribe(self.incomingMessagesSubject)
 
 		connection
 			.iceConnectionStates
@@ -285,7 +295,7 @@ extension RTCClient {
 				$0 == .disconnected
 			}
 			.map { _ in connection.id }
-			.susbscribe(disconnectedPeerConnectionContinuation)
+			.subscribeContinuation(disconnectedPeerConnectionContinuation)
 
 		self.peerConnections[connection.id] = connection
 	}
