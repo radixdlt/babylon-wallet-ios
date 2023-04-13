@@ -1,3 +1,4 @@
+import CasePaths
 import ClientPrelude
 import Network
 import P2PLinksClient
@@ -53,21 +54,9 @@ extension RadixConnectClient {
 			},
 			receiveMessages: { await rtcClients.incomingMessages() },
 			receiveResponses: {
-				await rtcClients.incomingMessages().compactMap { incomingMessage -> P2P.RTCIncomingResponse? in
-					guard let incomingResponse = incomingMessage.flatMap({ (success: P2P.RTCMessageFromPeer) -> P2P.RTCMessageFromPeer.Response? in
-						switch success {
-						case let .response(response):
-							return response
-						case .request:
-							return nil
-						}
-					}) else {
-						return nil
-					}
-					return incomingResponse
-				}.eraseToAnyAsyncSequence()
+				await rtcClients.incoming(/P2P.RTCMessageFromPeer.response)
 			},
-			receiveRequests: { fatalError() },
+			receiveRequests: { await rtcClients.incoming(/P2P.RTCMessageFromPeer.request) },
 			sendResponse: { response, route in
 				try await rtcClients.sendResponse(response, to: route)
 			},
@@ -78,26 +67,22 @@ extension RadixConnectClient {
 	}()
 }
 
-// MARK: - LocalNetworkAuthorization
-// extension RTCClients {
-//
-//    /// A Multicasted async sequence of RTCIncoming messages transformed using
-//    /// `transform`
-//    func incomingMessageLens<M>(
-//        _ transform: @escaping @Sendable (P2P.RTCMessageFromPeer) throws -> M?
-//    ) async -> AnyAsyncSequence<M> {
-//        await incomingMessages() // P2P.RTCIncomingMessage
-//            .compactMap {
-//                switch $0.result {
-//                case let .success(messageFromPeer): return transform(messageFromPeer)
-//                case .failure(<#T##Error#>)
-//                }
-//            }
-//            .share()
-//            .eraseToAnyAsyncSequence()
-//    }
-// }
+extension RTCClients {
+	public func incoming<Case>(_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		await incomingMessages().compactMap { incomingMessage -> P2P.RTCIncomingMessageContainer<Case>? in
+			guard let incomingRequestOrResponse = incomingMessage.flatMap({ (success: P2P.RTCMessageFromPeer) -> Case? in
+				casePath.extract(from: success)
+			}) else {
+				return nil
+			}
+			return incomingRequestOrResponse
+		}
+		.share()
+		.eraseToAnyAsyncSequence()
+	}
+}
 
+// MARK: - LocalNetworkAuthorization
 /// Source: https://stackoverflow.com/a/67758105/705761
 private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 	private var browser: NWBrowser?
