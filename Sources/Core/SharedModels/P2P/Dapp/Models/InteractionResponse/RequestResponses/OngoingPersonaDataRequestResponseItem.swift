@@ -1,11 +1,11 @@
 import Prelude
 
-// MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.OngoingPersonaDataRequestResponseItem
-extension P2P.ToDapp.WalletInteractionSuccessResponse {
+// MARK: - P2P.Dapp.Response.WalletInteractionSuccessResponse.OngoingPersonaDataRequestResponseItem
+extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct OngoingPersonaDataRequestResponseItem: Sendable, Hashable, Encodable {
-		public let fields: [P2P.ToDapp.PersonaData]
+		public let fields: [P2P.Dapp.Response.PersonaData]
 
-		public init(fields: [P2P.ToDapp.PersonaData]) {
+		public init(fields: [P2P.Dapp.Response.PersonaData]) {
 			self.fields = fields
 		}
 	}

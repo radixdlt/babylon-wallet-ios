@@ -2,15 +2,9 @@ import EngineToolkitModels
 import Prelude
 import Profile
 
-// MARK: - P2P.FromDapp
-extension P2P {
-	/// Just a namespace
-	public enum FromDapp {}
-}
-
-// MARK: - P2P.FromDapp.WalletInteraction
-extension P2P.FromDapp {
-	public struct WalletInteraction: Sendable, Hashable, Decodable, Identifiable {
+// MARK: - P2P.Dapp.Request
+extension P2P.Dapp {
+	public struct Request: Sendable, Hashable, Decodable, Identifiable {
 		private enum CodingKeys: String, CodingKey {
 			case id = "interactionId"
 			case items
@@ -35,8 +29,8 @@ extension P2P.FromDapp {
 	}
 }
 
-// MARK: - P2P.FromDapp.WalletInteraction.Metadata
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.Metadata
+extension P2P.Dapp.Request {
 	public struct Metadata: Sendable, Hashable, Decodable {
 		public typealias Origin = Tagged<(Self, origin: ()), String>
 
@@ -44,7 +38,11 @@ extension P2P.FromDapp.WalletInteraction {
 		public let origin: Origin
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
-		public init(networkId: NetworkID, origin: Origin, dAppDefinitionAddress: DappDefinitionAddress) {
+		public init(
+			networkId: NetworkID,
+			origin: Origin,
+			dAppDefinitionAddress: DappDefinitionAddress
+		) {
 			self.networkId = networkId
 			self.origin = origin
 			self.dAppDefinitionAddress = dAppDefinitionAddress

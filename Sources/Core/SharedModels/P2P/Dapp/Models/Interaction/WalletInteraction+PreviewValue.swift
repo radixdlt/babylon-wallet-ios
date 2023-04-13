@@ -45,24 +45,24 @@ DROP_ALL_PROOFS;
 CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "complicated_method" Decimal("1") PreciseDecimal("2");
 """
 
-extension P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem {
+extension P2P.Dapp.Request.OneTimeAccountsRequestItem {
 	public static let previewValue: Self = .init(
 		numberOfAccounts: .exactly(1),
 		requiresProofOfOwnership: false
 	)
 }
 
-extension P2P.FromDapp.WalletInteraction.OneTimePersonaDataRequestItem {
+extension P2P.Dapp.Request.OneTimePersonaDataRequestItem {
 	public static let previewValue: Self = .init(
 		fields: [.givenName, .familyName, .emailAddress]
 	)
 }
 
-extension P2P.FromDapp.WalletInteraction.SendTransactionItem {
+extension P2P.Dapp.Request.SendTransactionItem {
 	public static let previewValue: Self = .init(version: .default, transactionManifest: .previewValue, message: nil)
 }
 
-extension P2P.FromDapp.WalletInteraction.ID {
+extension P2P.Dapp.Request.ID {
 	public static let previewValue = Self.previewValue0
 	public static let previewValue0: Self = "E621E1F8-C36C-495A-93FC-0C247A3E6E5F"
 	public static let previewValue1: Self = "D621E1F8-C36C-495A-93FC-0C247A3E6E5F"
@@ -71,7 +71,7 @@ extension P2P.FromDapp.WalletInteraction.ID {
 	public static let previewValue4: Self = "A621E1F8-C36C-495A-93FC-0C247A3E6E5F"
 }
 
-extension P2P.FromDapp.WalletInteraction.Metadata {
+extension P2P.Dapp.Request.Metadata {
 	public static let previewValue = Self(
 		networkId: .simulator,
 		origin: "Placeholder",
@@ -79,8 +79,8 @@ extension P2P.FromDapp.WalletInteraction.Metadata {
 	)
 }
 
-extension P2P.FromDapp.WalletInteraction {
-	public static func previewValueAllRequests(auth: P2P.FromDapp.WalletInteraction.AuthRequestItem) -> Self {
+extension P2P.Dapp.Request {
+	public static func previewValueAllRequests(auth: P2P.Dapp.Request.AuthRequestItem) -> Self {
 		.init(
 			id: .previewValue0,
 			items: .request(.authorized(.init(

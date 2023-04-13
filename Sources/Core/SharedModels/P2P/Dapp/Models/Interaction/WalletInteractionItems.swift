@@ -1,7 +1,7 @@
 import Prelude
 
-// MARK: - P2P.FromDapp.WalletInteraction.Items
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.Items
+extension P2P.Dapp.Request {
 	public enum Items: Sendable, Hashable, Decodable {
 		private enum CodingKeys: String, CodingKey {
 			case discriminator
@@ -31,7 +31,7 @@ extension P2P.FromDapp.WalletInteraction {
 	}
 }
 
-extension P2P.FromDapp.WalletInteraction {
+extension P2P.Dapp.Request {
 	public enum RequestItems: Sendable, Hashable {
 		case unauthorized(UnauthorizedRequestItems)
 		case authorized(AuthorizedRequestItems)
@@ -76,8 +76,8 @@ extension P2P.FromDapp.WalletInteraction {
 	}
 }
 
-// MARK: - P2P.FromDapp.WalletInteraction.TransactionItems
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.TransactionItems
+extension P2P.Dapp.Request {
 	public struct TransactionItems: Sendable, Hashable, Decodable {
 		public let send: SendTransactionItem
 	}

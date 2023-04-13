@@ -31,7 +31,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(P2P.RTCIncomingWalletInteraction)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: P2P.RTCIncomingWalletInteraction, DappMetadata?)
+		case sentResponseToDapp(P2P.Dapp.Response, for: P2P.RTCIncomingWalletInteraction, DappMetadata?)
 		case failedToSendResponseToDapp(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseFailureAlert(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
@@ -282,19 +282,19 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func validate(_ interaction: P2P.FromDapp.WalletInteraction) throws {
+	func validate(_ interaction: P2P.Dapp.Request) throws {
 		switch interaction.items {
 		case let .request(items):
 			switch items {
 			case let .unauthorized(unauthorized):
 				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-					throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.invalidRequest
+					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
 				}
 			case let .authorized(authorized):
 				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false ||
 					authorized.oneTimeAccounts?.numberOfAccounts.isValid == false
 				{
-					throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.invalidRequest
+					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
 				}
 			}
 		case .transaction:

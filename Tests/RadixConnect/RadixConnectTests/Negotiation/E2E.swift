@@ -50,7 +50,7 @@
 //        }
 //
 //        private func assertCommunicationWorks(with webPage: PeerConnectionClient, _ rtcClients: RTCClients) async throws {
-//                let request = P2P.FromDapp.WalletInteraction.testValue
+//                let request = P2P.Dapp.Request.testValue
 //                try await webPage.sendData(JSONEncoder().encode(request))
 //
 //                let receivedMessage = try await rtcClients.IncomingMessages.first()
@@ -71,7 +71,7 @@
 //        }
 // }
 //
-// extension P2P.FromDapp.WalletInteraction {
+// extension P2P.Dapp.Request {
 //        static var testValue: Self {
 //                .init(id: .previewValue, items: .request(.unauthorized(.init(oneTimeAccounts: .previewValue))), metadata: .previewValue)
 //        }

@@ -1,7 +1,7 @@
 import Prelude
 
-// MARK: - P2P.FromDapp.WalletInteraction.AuthRequestItem
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.AuthRequestItem
+extension P2P.Dapp.Request {
 	public enum AuthRequestItem: Sendable, Hashable, Decodable {
 		private enum CodingKeys: String, CodingKey {
 			case discriminator
@@ -28,8 +28,8 @@ extension P2P.FromDapp.WalletInteraction {
 	}
 }
 
-// MARK: - P2P.FromDapp.WalletInteraction.AuthLoginRequestItem
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.AuthLoginRequestItem
+extension P2P.Dapp.Request {
 	public struct AuthLoginRequestItem: Sendable, Hashable, Decodable {
 		public let challenge: String?
 
@@ -39,8 +39,8 @@ extension P2P.FromDapp.WalletInteraction {
 	}
 }
 
-// MARK: - P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.AuthUsePersonaRequestItem
+extension P2P.Dapp.Request {
 	public struct AuthUsePersonaRequestItem: Sendable, Hashable, Decodable {
 		public let identityAddress: String
 

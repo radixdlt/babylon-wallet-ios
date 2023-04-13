@@ -9,15 +9,15 @@ extension P2P {
 //
 //		public struct PeerConnectionMessage: Sendable, Hashable {
 //			public let peerConnectionId: PeerConnectionID
-//			public let content: P2P.FromDapp.WalletInteraction
+//			public let content: P2P.Dapp.Request
 //		}
 		public let origin: RTCRoute
-		public let request: P2P.FromDapp.WalletInteraction
+		public let request: P2P.Dapp.Request
 	}
 }
 
 extension P2P.RTCMessageFromPeer {
-	public func asDappRequest() throws -> P2P.FromDapp.WalletInteraction {
+	public func asDappRequest() throws -> P2P.Dapp.Request {
 		guard case let .request(.dapp(requestFromDapp), _) = self else {
 			throw WrongRequestType()
 		}
@@ -39,14 +39,14 @@ extension P2P.RTCIncomingWalletInteraction {
 	/// Transforms an incoming message FromDapp to an OutgoingMessage to Dapp
 	/// by preserving the RTCClient and PeerConnection IDs
 	public func toDapp(
-		response: P2P.ToDapp.WalletInteractionResponse
+		response: P2P.Dapp.Response
 	) -> P2P.RTCOutgoingMessage {
 		.response(.dapp(response), origin: origin)
 	}
 }
 
 extension P2P.RTCOutgoingMessage {
-	public func toDapp() throws -> P2P.ToDapp.WalletInteractionResponse {
+	public func toDapp() throws -> P2P.Dapp.Response {
 		guard case let .response(.dapp(response), _) = self else {
 			throw WrongResponseType()
 		}

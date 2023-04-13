@@ -1,11 +1,11 @@
 import Prelude
 
-// MARK: - P2P.FromDapp.WalletInteraction.OngoingPersonaDataRequestItem
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.OngoingPersonaDataRequestItem
+extension P2P.Dapp.Request {
 	public struct OngoingPersonaDataRequestItem: Sendable, Hashable, Decodable {
-		public let fields: Set<P2P.FromDapp.PersonaDataField>
+		public let fields: Set<P2P.Dapp.Request.PersonaDataField>
 
-		public init(fields: Set<P2P.FromDapp.PersonaDataField>) {
+		public init(fields: Set<P2P.Dapp.Request.PersonaDataField>) {
 			self.fields = fields
 		}
 	}

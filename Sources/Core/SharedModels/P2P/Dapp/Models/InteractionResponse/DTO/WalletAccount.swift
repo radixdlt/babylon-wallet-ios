@@ -2,8 +2,8 @@ import Cryptography
 import Prelude
 import Profile
 
-// MARK: - P2P.ToDapp.WalletAccount
-extension P2P.ToDapp {
+// MARK: - P2P.Dapp.Response.WalletAccount
+extension P2P.Dapp.Response {
 	/// Response to Dapp from wallet, info about a users account.
 	///
 	/// Called `AccountAddress` in [CAP21][cap]
@@ -44,7 +44,7 @@ extension P2P.ToDapp {
 	}
 }
 
-extension P2P.ToDapp.WalletAccount {
+extension P2P.Dapp.Response.WalletAccount {
 	public init(account: Profile.Network.Account) {
 		self.init(
 			accountAddress: account.address,

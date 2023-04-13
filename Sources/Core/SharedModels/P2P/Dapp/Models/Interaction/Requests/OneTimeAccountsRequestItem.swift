@@ -1,7 +1,7 @@
 import Prelude
 
-// MARK: - P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.OneTimeAccountsRequestItem
+extension P2P.Dapp.Request {
 	public struct OneTimeAccountsRequestItem: Sendable, Hashable, Decodable {
 		public let numberOfAccounts: NumberOfAccounts
 		public let requiresProofOfOwnership: Bool

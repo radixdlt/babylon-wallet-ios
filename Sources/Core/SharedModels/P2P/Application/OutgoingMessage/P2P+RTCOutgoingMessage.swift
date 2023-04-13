@@ -18,7 +18,7 @@ extension P2P {
 		/// we will use `origin` to identify the RTC channel to send over.
 		public enum Response: Sendable, Hashable, Encodable {
 			/// Response back to Dapps
-			case dapp(P2P.ToDapp.WalletInteractionResponse)
+			case dapp(P2P.Dapp.Response)
 		}
 
 		/// A request initiated by us, sent over RTC using `SendStrategy`.

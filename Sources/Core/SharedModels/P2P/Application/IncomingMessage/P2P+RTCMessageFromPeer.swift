@@ -18,7 +18,7 @@ extension P2P {
 		}
 
 		public enum Request: Sendable, Hashable, Equatable, Decodable {
-			case dapp(P2P.FromDapp.WalletInteraction)
+			case dapp(P2P.Dapp.Request)
 		}
 	}
 }

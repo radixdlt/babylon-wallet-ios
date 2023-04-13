@@ -1,8 +1,8 @@
 import EngineToolkitModels
 import Prelude
 
-// MARK: - P2P.FromDapp.SendTransactionWriteRequestItem
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.SendTransactionWriteRequestItem
+extension P2P.Dapp.Request {
 	public struct SendTransactionItem: Sendable, Hashable, Decodable {
 		public let transactionManifest: TransactionManifest
 		public let version: TXVersion

@@ -1,7 +1,7 @@
 import Prelude
 
-// MARK: - P2P.ToDapp.WalletInteractionFailureResponse
-extension P2P.ToDapp {
+// MARK: - P2P.Dapp.Response.WalletInteractionFailureResponse
+extension P2P.Dapp.Response {
 	public struct WalletInteractionFailureResponse: Sendable, Hashable, Encodable {
 		private enum CodingKeys: String, CodingKey {
 			case interactionId
@@ -10,12 +10,12 @@ extension P2P.ToDapp {
 		}
 
 		/// *MUST* match an ID from an incoming request from Dapp.
-		public let interactionId: P2P.FromDapp.WalletInteraction.ID
+		public let interactionId: P2P.Dapp.Request.ID
 		public let errorType: ErrorType
 		public let message: String?
 
 		public init(
-			interactionId: P2P.FromDapp.WalletInteraction.ID,
+			interactionId: P2P.Dapp.Request.ID,
 			errorType: ErrorType,
 			message: String?
 		) {
@@ -26,8 +26,8 @@ extension P2P.ToDapp {
 	}
 }
 
-// MARK: - P2P.ToDapp.WalletInteractionFailureResponse.ErrorType
-extension P2P.ToDapp.WalletInteractionFailureResponse {
+// MARK: - P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType
+extension P2P.Dapp.Response.WalletInteractionFailureResponse {
 	// TODO: ask if we should do associated values here for `message` construction,
 	// in which case we'll need to declare discriminators
 	public enum ErrorType: String, Sendable, LocalizedError, Hashable, Encodable {
