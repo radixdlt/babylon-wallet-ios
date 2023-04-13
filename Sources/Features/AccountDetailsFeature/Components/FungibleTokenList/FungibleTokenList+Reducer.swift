@@ -1,28 +1,28 @@
-import FeaturePrelude
 import AccountPortfoliosClient
+import FeaturePrelude
 import SharedModels
 
 public struct FungibleTokenList: Sendable, FeatureReducer {
-        public struct State: Sendable, Hashable {
-                public var xrdToken: Row.State?
-                public var nonXrdTokens: IdentifiedArrayOf<Row.State>
+	public struct State: Sendable, Hashable {
+		public var xrdToken: Row.State?
+		public var nonXrdTokens: IdentifiedArrayOf<Row.State>
 
 		@PresentationState
 		public var destination: Destinations.State?
 
-                public init(
-                        xrdToken: Row.State? = nil,
-                        nonXrdTokens: IdentifiedArrayOf<Row.State> = []
-                ) {
-                        self.xrdToken = xrdToken
-                        self.nonXrdTokens = nonXrdTokens
-                }
+		public init(
+			xrdToken: Row.State? = nil,
+			nonXrdTokens: IdentifiedArrayOf<Row.State> = []
+		) {
+			self.xrdToken = xrdToken
+			self.nonXrdTokens = nonXrdTokens
+		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
-                case xrdRow(FungibleTokenList.Row.Action)
-                case nonXRDRow(FungibleTokenList.Row.State.ID, FungibleTokenList.Row.Action)
+		case xrdRow(FungibleTokenList.Row.Action)
+		case nonXRDRow(FungibleTokenList.Row.State.ID, FungibleTokenList.Row.Action)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -45,11 +45,11 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-                        .ifLet(\.xrdToken, action: /Action.child .. ChildAction.xrdRow) {
-                                FungibleTokenList.Row()
-                        }
-                        .forEach(\.nonXrdTokens, action: /Action.child .. ChildAction.nonXRDRow, element: {
-                                FungibleTokenList.Row()
+			.ifLet(\.xrdToken, action: /Action.child .. ChildAction.xrdRow) {
+				FungibleTokenList.Row()
+			}
+			.forEach(\.nonXrdTokens, action: /Action.child .. ChildAction.nonXRDRow, element: {
+				FungibleTokenList.Row()
 			})
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -58,12 +58,12 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-                case let .xrdRow(.delegate(.selected(token))):
-                        state.destination = .details(token)
-                        return .none
-                case let .nonXRDRow(_, .delegate(.selected(token))):
-                        state.destination = .details(token)
-                        return .none
+		case let .xrdRow(.delegate(.selected(token))):
+			state.destination = .details(token)
+			return .none
+		case let .nonXRDRow(_, .delegate(.selected(token))):
+			state.destination = .details(token)
+			return .none
 		default:
 			return .none
 		}

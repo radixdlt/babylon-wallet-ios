@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - FungibleTokenDetails
 public struct FungibleTokenDetails: Sendable, FeatureReducer {
-        public typealias State = AccountPortfolio.FungibleToken
+	public typealias State = AccountPortfolio.FungibleToken
 
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
@@ -17,7 +17,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 
 	public init() {}
 
-        public func reduce(into state: inout AccountPortfolio.FungibleToken, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout AccountPortfolio.FungibleToken, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))

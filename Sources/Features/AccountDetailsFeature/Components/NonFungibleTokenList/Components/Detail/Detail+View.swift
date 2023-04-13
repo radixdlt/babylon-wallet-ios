@@ -1,7 +1,7 @@
-//import FeaturePrelude
+// import FeaturePrelude
 //
 //// MARK: - NonFungibleTokenList.Detail.View
-//extension NonFungibleTokenList.Detail {
+// extension NonFungibleTokenList.Detail {
 //	public struct ViewState: Equatable {
 //		var nftID: AddressView.ViewState
 //		var fullNFTAddress: String
@@ -133,19 +133,19 @@
 //			AssetResource.nft
 //		}
 //	}
-//}
+// }
 //
-//extension NonFungibleTokenContainer {
+// extension NonFungibleTokenContainer {
 //	// TODO: unit test
 //	func nftAddress(for asset: NonFungibleToken) -> String {
 //		resourceAddress.address + ":" + asset.id.stringRepresentation
 //	}
-//}
+// }
 //
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct NonFungibleTokenListDetail_Preview: PreviewProvider {
+// struct NonFungibleTokenListDetail_Preview: PreviewProvider {
 //	static var previews: some View {
 //		NonFungibleTokenList.Detail.View(
 //			store: .init(
@@ -154,9 +154,9 @@
 //			)
 //		)
 //	}
-//}
+// }
 //
-//extension NonFungibleTokenList.Detail.State {
+// extension NonFungibleTokenList.Detail.State {
 //	public static let previewValue = Self(
 //		container: NonFungibleTokenContainer(
 //			owner: try! .init(address: "owner_address"),
@@ -168,5 +168,5 @@
 //		),
 //		asset: .mock1
 //	)
-//}
-//#endif
+// }
+// #endif

@@ -3,11 +3,11 @@ import FeaturePrelude
 // MARK: - NonFungibleTokenList.Row.View
 extension NonFungibleTokenList.Row {
 	public struct ViewState: Equatable {
-                let token: AccountPortfolio.NonFungibleToken
+		let token: AccountPortfolio.NonFungibleToken
 		var isExpanded: Bool
 
 		init(state: NonFungibleTokenList.Row.State) {
-                        token = state.token
+			token = state.token
 			isExpanded = state.isExpanded
 		}
 	}
@@ -34,7 +34,7 @@ extension NonFungibleTokenList.Row {
 				send: { .view($0) }
 			) { viewStore in
 				VStack(spacing: .small3 / 2) {
-                                        if viewStore.token.ids.isEmpty {
+					if viewStore.token.ids.isEmpty {
 						EmptyView()
 					} else {
 						ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
@@ -106,7 +106,7 @@ extension NonFungibleTokenList.Row.View {
 	fileprivate func componentView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
 		let asset = viewStore.token.ids[index]
 		NFTIDView(
-                        id: asset,
+			id: asset,
 			isLast: index == nftCount(with: viewStore) - 1,
 			isExpanded: viewStore.isExpanded
 		)
@@ -115,7 +115,7 @@ extension NonFungibleTokenList.Row.View {
 		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
 		.transition(.move(edge: .bottom))
 		.contentShape(Rectangle())
-		//.onTapGesture { viewStore.send(.selected(.init(container: viewStore.container, asset: asset))) }
+		// .onTapGesture { viewStore.send(.selected(.init(container: viewStore.container, asset: asset))) }
 	}
 
 	fileprivate func collapsedHeight(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> CGFloat {
@@ -150,7 +150,7 @@ extension NonFungibleTokenList.Row.View {
 	}
 
 	fileprivate func nftCount(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> Int {
-                viewStore.token.ids.count
+		viewStore.token.ids.count
 	}
 }
 
@@ -183,10 +183,10 @@ extension NonFungibleTokenList.Row.View {
 	}
 }
 
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct Row_Preview: PreviewProvider {
+// struct Row_Preview: PreviewProvider {
 //	static var previews: some View {
 //		NonFungibleTokenList.Row.View(
 //			store: .init(
@@ -195,11 +195,11 @@ extension NonFungibleTokenList.Row.View {
 //			)
 //		)
 //	}
-//}
+// }
 //
-//extension NonFungibleTokenList.Row.State {
+// extension NonFungibleTokenList.Row.State {
 //	public static let previewValue = Self(
 //		container: .mock1
 //	)
-//}
-//#endif
+// }
+// #endif

@@ -3,13 +3,13 @@ import FeaturePrelude
 extension NonFungibleTokenList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
-                        public var id: ResourceAddress { token.resourceAddress }
+			public var id: ResourceAddress { token.resourceAddress }
 
-                        public var token: AccountPortfolio.NonFungibleToken
+			public var token: AccountPortfolio.NonFungibleToken
 			public var isExpanded = false
 
 			public init(
-                                token: AccountPortfolio.NonFungibleToken
+				token: AccountPortfolio.NonFungibleToken
 			) {
 				self.token = token
 			}
@@ -17,11 +17,11 @@ extension NonFungibleTokenList {
 
 		public enum ViewAction: Sendable, Equatable {
 			case isExpandedToggled
-			//case selected(NonFungibleTokenList.Detail.State)
+			// case selected(NonFungibleTokenList.Detail.State)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			//case selected(NonFungibleTokenList.Detail.State)
+			// case selected(NonFungibleTokenList.Detail.State)
 		}
 
 		public init() {}

@@ -1,7 +1,7 @@
-//import FeaturePrelude
+// import FeaturePrelude
 //
 //// MARK: - NonFungibleTokenList.Detail
-//extension NonFungibleTokenList {
+// extension NonFungibleTokenList {
 //	// MARK: - NonFungibleTokenDetails
 //	public struct Detail: Sendable, FeatureReducer {
 //		public struct State: Sendable, Hashable {
@@ -32,4 +32,4 @@
 //			}
 //		}
 //	}
-//}
+// }

@@ -1,3 +1,4 @@
+import AccountPreferencesFeature
 import FeaturePrelude
 
 extension AccountDetails.State {
@@ -98,15 +99,15 @@ extension AccountDetails {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
-                                        .task {
-                                                viewStore.send(.task)
-                                        }
-//					.sheet(
-//						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//						state: /AccountDetails.Destinations.State.preferences,
-//						action: AccountDetails.Destinations.Action.preferences,
-//						content: { AccountPreferences.View(store: $0) }
-//					)
+					.task {
+						viewStore.send(.task)
+					}
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /AccountDetails.Destinations.State.preferences,
+						action: AccountDetails.Destinations.Action.preferences,
+						content: { AccountPreferences.View(store: $0) }
+					)
 //					.sheet(
 //						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 //						state: /AccountDetails.Destinations.State.transfer,
@@ -118,10 +119,10 @@ extension AccountDetails {
 	}
 }
 
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct AccountDetails_Preview: PreviewProvider {
+// struct AccountDetails_Preview: PreviewProvider {
 //	static var previews: some View {
 //		NavigationStack {
 //			AccountDetails.View(
@@ -135,5 +136,5 @@ extension AccountDetails {
 //			#endif
 //		}
 //	}
-//}
-//#endif
+// }
+// #endif

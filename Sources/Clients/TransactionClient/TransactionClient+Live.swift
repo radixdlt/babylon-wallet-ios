@@ -18,7 +18,7 @@ extension TransactionClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
-		//@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+		// @Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 		@Dependency(\.cacheClient) var cacheClient
 
@@ -559,7 +559,7 @@ extension TransactionClient {
 
 		@Sendable
 		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
-                        return nil
+			nil
 //			let xrdContainers = await addresses.concurrentMap {
 //				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
 //			}.compactMap { $0 }

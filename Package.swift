@@ -18,9 +18,9 @@ package.addModules([
 	.feature(
 		name: "AccountDetailsFeature",
 		dependencies: [
-			//"AccountPreferencesFeature",
-			//"AssetTransferFeature",
-                        "AccountPortfoliosClient"
+			"AccountPreferencesFeature",
+			// "AssetTransferFeature",
+			"AccountPortfoliosClient",
 		],
 		tests: .yes()
 	),
@@ -33,6 +33,7 @@ package.addModules([
 		name: "AccountPreferencesFeature",
 		dependencies: [
 			"FaucetClient",
+			"AccountPortfoliosClient",
 		],
 		tests: .yes()
 	),
@@ -129,15 +130,15 @@ package.addModules([
 		dependencies: [
 			"AccountDetailsFeature",
 			"AccountListFeature",
-                        "AccountPortfoliosClient",
+			"AccountPortfoliosClient",
 			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateEntityFeature",
 		],
 		tests: .yes(
 			dependencies: [
-				//"FungibleTokenListFeature",
-				//"NonFungibleTokenListFeature",
+				// "FungibleTokenListFeature",
+				// "NonFungibleTokenListFeature",
 			]
 		)
 	),
@@ -269,14 +270,15 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-        .client(
-                name: "AccountPortfoliosClient",
-                dependencies: [
-                        "EngineToolkitClient",
-                        "GatewayAPI",
-                ],
-                tests: .yes()
-        ),
+	.client(
+		name: "AccountPortfoliosClient",
+		dependencies: [
+			"EngineToolkitClient",
+			"GatewayAPI",
+			"CacheClient",
+		],
+		tests: .yes()
+	),
 	.client(
 		name: "AppPreferencesClient",
 		dependencies: [

@@ -17,8 +17,8 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 //	}
 
 	public enum ChildAction: Sendable, Equatable {
-                case asset(NonFungibleTokenList.Row.State.ID, NonFungibleTokenList.Row.Action)
-		//case destination(PresentationAction<Destinations.Action>)
+		case asset(NonFungibleTokenList.Row.State.ID, NonFungibleTokenList.Row.Action)
+		// case destination(PresentationAction<Destinations.Action>)
 	}
 
 //	public struct Destinations: Sendable, ReducerProtocol {
@@ -51,8 +51,8 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-                case let .asset(_, .delegate):
-			//state.destination = .details(detailsState)
+		case let .asset(_, .delegate):
+			// state.destination = .details(detailsState)
 			return .none
 
 //		case .destination(.presented(.details(.delegate(.dismiss)))):

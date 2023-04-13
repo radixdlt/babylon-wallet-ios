@@ -15,7 +15,7 @@ extension NonFungibleTokenList {
 				ForEachStore(
 					store.scope(
 						state: \.rows,
-                                                action: { .child(.asset($0, $1)) }
+						action: { .child(.asset($0, $1)) }
 					),
 					content: { NonFungibleTokenList.Row.View(store: $0) }
 				)
@@ -30,10 +30,10 @@ extension NonFungibleTokenList {
 	}
 }
 
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct NonFungibleTokenList_Preview: PreviewProvider {
+// struct NonFungibleTokenList_Preview: PreviewProvider {
 //	static var previews: some View {
 //		NonFungibleTokenList.View(
 //			store: .init(
@@ -42,5 +42,5 @@ extension NonFungibleTokenList {
 //			)
 //		)
 //	}
-//}
-//#endif
+// }
+// #endif

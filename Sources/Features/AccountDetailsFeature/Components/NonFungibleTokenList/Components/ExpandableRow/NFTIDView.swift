@@ -1,9 +1,9 @@
 import FeaturePrelude
 import SharedModels
 
-// MARK: - Component
+// MARK: - NFTIDView
 struct NFTIDView: View {
-        let id: String
+	let id: String
 	let isLast: Bool
 	let isExpanded: Bool
 
@@ -30,7 +30,7 @@ extension NFTIDView {
 				.hidden()
 
 			VStack(alignment: .leading, spacing: .small2) {
-                                Text(id)
+				Text(id)
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 					.offset(y: -.small2)
@@ -85,7 +85,8 @@ extension NFTIDView {
 	}
 }
 
-//extension NonFungibleToken.ID {
+// MARK: ExpandableRow
+// extension NonFungibleToken.ID {
 //	var stringRepresentation: String {
 //		switch self {
 //		case let .integer(value):
@@ -98,9 +99,8 @@ extension NFTIDView {
 //			return "\(value.description)"
 //		}
 //	}
-//}
+// }
 
-// MARK: - Component + ExpandableRow
 extension NFTIDView: ExpandableRow {
 	var edge: Edge.Set {
 		if isLast {
@@ -119,7 +119,7 @@ extension NFTIDView: ExpandableRow {
 	}
 }
 
-// MARK: - Component.Constants
+// MARK: NFTIDView.Constants
 extension NFTIDView {
 	fileprivate enum Constants {
 		static let radius: CGFloat = .small1

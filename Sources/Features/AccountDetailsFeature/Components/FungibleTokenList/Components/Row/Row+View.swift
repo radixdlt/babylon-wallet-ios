@@ -4,9 +4,9 @@ extension FungibleTokenList.Row.State {
 	var viewState: FungibleTokenList.Row.ViewState {
 		.init(
 			isXRD: isXRD,
-                        iconURL: nil,
+			iconURL: nil,
 			symbol: token.symbol ?? "",
-                        tokenAmount: token.amount.format()
+			tokenAmount: token.amount.format()
 		)
 	}
 }
@@ -67,10 +67,10 @@ extension FungibleTokenList.Row {
 	}
 }
 
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct Row_Preview: PreviewProvider {
+// struct Row_Preview: PreviewProvider {
 //	static var previews: some View {
 //		FungibleTokenList.Row.View(
 //			store: .init(
@@ -83,5 +83,5 @@ extension FungibleTokenList.Row {
 //			)
 //		)
 //	}
-//}
-//#endif
+// }
+// #endif

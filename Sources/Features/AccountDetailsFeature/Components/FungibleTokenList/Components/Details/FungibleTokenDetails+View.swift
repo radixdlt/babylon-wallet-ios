@@ -3,12 +3,12 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-                        displayName: name ?? "",
-                        iconURL: nil,
+			displayName: name ?? "",
+			iconURL: nil,
 			placeholderAsset: .placeholderImage(isXRD: false),
 			amount: amount.format(),
-                        symbol: symbol,
-                        description: tokenDescription,
+			symbol: symbol,
+			description: tokenDescription,
 			address: .init(address: resourceAddress.address, format: .default)
 		)
 	}
@@ -114,10 +114,10 @@ extension FungibleTokenDetails {
 	}
 }
 
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct FungibleTokenDetails_Preview: PreviewProvider {
+// struct FungibleTokenDetails_Preview: PreviewProvider {
 //	static var previews: some View {
 //		FungibleTokenDetails.View(
 //			store: .init(
@@ -126,14 +126,14 @@ extension FungibleTokenDetails {
 //			)
 //		)
 //	}
-//}
+// }
 //
-//extension FungibleTokenDetails.State {
+// extension FungibleTokenDetails.State {
 //        public static let previewValue = AccountPortfolio.FungibleToken(
 //		owner: try! .init(address: "owner_address"),
 //		asset: .xrd,
 //		amount: 30.0,
 //		worth: 500
 //	)
-//}
-//#endif
+// }
+// #endif

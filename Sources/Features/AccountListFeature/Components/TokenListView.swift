@@ -1,16 +1,16 @@
 import FeaturePrelude
 
 // MARK: - TokenListView
-//public struct TokenListView: View {
+// public struct TokenListView: View {
 //	private let sortedTokens: [FungibleTokenContainer]
 //	private let limit = 5
 //
 //	init(containers: [FungibleTokenContainer]) {
 //		sortedTokens = containers.sortedIntoCategories().map(\.tokenContainers).flatMap { $0 }
 //	}
-//}
+// }
 //
-//extension TokenListView {
+// extension TokenListView {
 //	public var body: some View {
 //		HStack(spacing: -10) {
 //			if sortedTokens.count > limit {
@@ -25,14 +25,14 @@ import FeaturePrelude
 //			}
 //		}
 //	}
-//}
+// }
 //
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct TokenListView_Previews: PreviewProvider {
+// struct TokenListView_Previews: PreviewProvider {
 //	static var previews: some View {
 //		TokenListView(containers: [])
 //	}
-//}
-//#endif
+// }
+// #endif

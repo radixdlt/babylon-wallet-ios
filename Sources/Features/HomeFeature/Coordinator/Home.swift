@@ -125,28 +125,27 @@ public struct Home: Sendable, FeatureReducer {
 				), displayIntroduction: { _ in false })
 			)
 			return .none
-                default:
-                        return .none
+		default:
+			return .none
 		}
-
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-                switch internalAction {
-                case let .accountsLoadedResult(.success(accounts)):
-                        state.accountList = .init(accounts: accounts)
-                        return .none
+		switch internalAction {
+		case let .accountsLoadedResult(.success(accounts)):
+			state.accountList = .init(accounts: accounts)
+			return .none
 
-                case let .accountsLoadedResult(.failure(error)):
-                        errorQueue.schedule(error)
-                        return .none
-                }
+		case let .accountsLoadedResult(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .accountList(.delegate(.displayAccountDetails(account))):
-                        state.destination = .accountDetails(.init(for: account.account))
+			state.destination = .accountDetails(.init(for: account.account))
 			return .none
 
 		case .header(.delegate(.displaySettings)):

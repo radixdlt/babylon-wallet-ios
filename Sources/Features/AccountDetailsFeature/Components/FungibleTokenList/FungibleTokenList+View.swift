@@ -16,18 +16,18 @@ extension FungibleTokenList {
 extension FungibleTokenList.View {
 	public var body: some View {
 		LazyVStack(spacing: .medium2) {
-                        IfLetStore(
-                                store.scope(
-                                        state: \.xrdToken,
-                                        action: { .child(.xrdRow($0)) }
-                                ),
-                                then: { FungibleTokenList.Row.View(store: $0) }
-                        )
+			IfLetStore(
+				store.scope(
+					state: \.xrdToken,
+					action: { .child(.xrdRow($0)) }
+				),
+				then: { FungibleTokenList.Row.View(store: $0) }
+			)
 
 			ForEachStore(
 				store.scope(
-                                        state: \.nonXrdTokens,
-                                        action: {.child(.nonXRDRow($0, $1)) }
+					state: \.nonXrdTokens,
+					action: { .child(.nonXRDRow($0, $1)) }
 				),
 				content: { FungibleTokenList.Row.View(store: $0) }
 			)
@@ -41,10 +41,10 @@ extension FungibleTokenList.View {
 	}
 }
 
-//#if DEBUG
-//import SwiftUI // NB: necessary for previews to appear
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
 //
-//struct FungibleTokenList_Preview: PreviewProvider {
+// struct FungibleTokenList_Preview: PreviewProvider {
 //	static var previews: some View {
 //		FungibleTokenList.View(
 //			store: .init(
@@ -55,5 +55,5 @@ extension FungibleTokenList.View {
 //			)
 //		)
 //	}
-//}
-//#endif
+// }
+// #endif
