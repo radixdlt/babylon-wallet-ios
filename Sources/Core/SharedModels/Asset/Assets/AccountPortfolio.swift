@@ -17,19 +17,20 @@ public struct AccountPortfolio: Sendable, Hashable {
 }
 
 extension AccountPortfolio {
-        public struct FungibleResources: Sendable, Hashable {
-                public init(
-                        xrdToken: FungibleToken?,
-                        tokens: PaginatedResourceContainer<[AccountPortfolio.FungibleToken]>
-                ) {
-                        self.xrdToken = xrdToken
-                        self.tokens = tokens
-                }
+//        public struct FungibleResources: Sendable, Hashable {
+//                public init(
+//                        xrdToken: FungibleToken?,
+//                        tokens: PaginatedResourceContainer<[AccountPortfolio.FungibleToken]>
+//                ) {
+//                        self.xrdToken = xrdToken
+//                        self.tokens = tokens
+//                }
+//
+//                public let xrdToken: FungibleToken?
+//                public let tokens: PaginatedResourceContainer<[FungibleToken]>
+//        }
 
-                public let xrdToken: FungibleToken?
-                public let tokens: PaginatedResourceContainer<[FungibleToken]>
-        }
-        
+        public typealias FungibleResources =  PaginatedResourceContainer<[FungibleToken]>
         public typealias NonFungibleResources = PaginatedResourceContainer<[NonFungibleToken]>
 
         public struct FungibleToken: Sendable, Hashable {

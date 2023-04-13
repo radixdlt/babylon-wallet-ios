@@ -8,7 +8,7 @@ public struct AssetsView: Sendable, FeatureReducer {
                         }
 
                         case fungibleTokens(FungibleTokenList.State)
-                        case nonFungibleTokens
+                        case nonFungibleTokens(NonFungibleTokenList.State)
 
                         var displayName: String {
                                 switch self {
@@ -35,7 +35,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 
                 static func empty() -> Self {
                         .init(assets: .init(rawValue: [
-                                .fungibleTokens(.init())
+                                .fungibleTokens(.init()),
+                                .nonFungibleTokens(.init(rows: []))
                         ])!)
                 }
 	}
@@ -46,6 +47,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleTokenList.Action)
+                case nonFungibleTokenList(NonFungibleTokenList.Action)
 	}
 
 	public init() {}
@@ -55,6 +57,9 @@ public struct AssetsView: Sendable, FeatureReducer {
                        EmptyReducer()
                                 .ifCaseLet(/State.AssetList.fungibleTokens, action: /Action.child .. ChildAction.fungibleTokenList) {
                                         FungibleTokenList()
+                                }
+                                .ifCaseLet(/State.AssetList.nonFungibleTokens, action: /Action.child .. ChildAction.nonFungibleTokenList) {
+                                        NonFungibleTokenList()
                                 }
                 }
 		Reduce(self.core)

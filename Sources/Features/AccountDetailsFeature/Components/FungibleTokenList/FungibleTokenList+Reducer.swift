@@ -7,8 +7,8 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
                 public var xrdToken: Row.State?
                 public var nonXrdTokens: IdentifiedArrayOf<Row.State>
 
-//		@PresentationState
-//		public var destination: Destinations.State?
+		@PresentationState
+		public var destination: Destinations.State?
 
                 public init(
                         xrdToken: Row.State? = nil,
@@ -19,36 +19,27 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
                 }
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-                case selectedTokenChanged(AccountPortfolio.FungibleToken?)
-                case scrolledToLoadMore
-	}
-
 	public enum ChildAction: Sendable, Equatable {
-		//case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destinations.Action>)
                 case xrdRow(FungibleTokenList.Row.Action)
                 case nonXRDRow(FungibleTokenList.Row.State.ID, FungibleTokenList.Row.Action)
 	}
 
-        public enum DelegateAction: Sendable, Equatable {
-                case loadMoreTokens
-        }
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case details(FungibleTokenDetails.State)
+		}
 
-//	public struct Destinations: Sendable, ReducerProtocol {
-//		public enum State: Sendable, Hashable {
-//			case details(FungibleTokenDetails.State)
-//		}
-//
-//		public enum Action: Sendable, Equatable {
-//			case details(FungibleTokenDetails.Action)
-//		}
-//
-//		public var body: some ReducerProtocolOf<Self> {
-//			Scope(state: /State.details, action: /Action.details) {
-//				FungibleTokenDetails()
-//			}
-//		}
-//	}
+		public enum Action: Sendable, Equatable {
+			case details(FungibleTokenDetails.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.details, action: /Action.details) {
+				FungibleTokenDetails()
+			}
+		}
+	}
 
 	public init() {}
 
@@ -60,30 +51,18 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
                         .forEach(\.nonXrdTokens, action: /Action.child .. ChildAction.nonXRDRow, element: {
                                 FungibleTokenList.Row()
 			})
-//			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-//				Destinations()
-//			}
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case let .selectedTokenChanged(token):
-//			if let token {
-//				state.destination = .details(token)
-//			} else {
-//				state.destination = nil
-//			}
-			return .none
-                case .scrolledToLoadMore:
-                        return .send(.delegate(.loadMoreTokens))
-		}
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
                 case let .xrdRow(.delegate(.selected(token))):
+                        state.destination = .details(token)
                         return .none
                 case let .nonXRDRow(_, .delegate(.selected(token))):
+                        state.destination = .details(token)
                         return .none
 		default:
 			return .none

@@ -12,8 +12,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
                 public init(for account: Profile.Network.Account) {
 			self.account = account
-                        let assets: OrderedSet<AssetsView.State.AssetList> = [.fungibleTokens(.init(xrdToken: nil, nonXrdTokens: [])), .nonFungibleTokens]
-                        self.assets = AssetsView.State(assets: .init(rawValue: assets)!)
+                        self.assets = AssetsView.State.empty()
 		}
 	}
 
@@ -117,7 +116,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 //		case .destination(.presented(.preferences(.delegate(.dismiss)))):
 //			state.destination = nil
 //			return .none
-                case .assets(.child(.fungibleTokenList(.delegate(.loadMoreTokens)))):
+                case .assets(.child(.fungibleTokenList(.delegate))):
                         return .none
 		default:
 			return .none
@@ -128,16 +127,19 @@ public struct AccountDetails: Sendable, FeatureReducer {
                 switch internalAction {
                 case let .portfolioUpdated(portfolio):
 
-                        let nonXrdTokens = portfolio.fungibleRes
+
 //                        if portfolio.fungibleResources.loaded.isEmpty {
 //                                state.assets = .empty()
 //                                return .none
 //                        }
-//                        let xrd = portfolio.fungibleResources.loaded.first.map(FungibleTokenList.Row.State.init(xrdToken:))
-//                        let nonXrd = Array(portfolio.fungibleResources.loaded.suffix(from: 1)).map(FungibleTokenList.Row.State.init(nonXRDToken:))
-//                        state.assets = .init(assets: .init(rawValue: [
-//                                .fungibleTokens(.init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd)))
-//                        ])!)
+                        let xrd = portfolio.fungibleResources.loaded.first.map(FungibleTokenList.Row.State.init(xrdToken:))
+                        let nonXrd = Array(portfolio.fungibleResources.loaded.suffix(from: 1)).map(FungibleTokenList.Row.State.init(nonXRDToken:))
+
+                        let nfts = portfolio.nonFungibleResources.loaded.map(NonFungibleTokenList.Row.State.init(token:))
+                        state.assets = .init(assets: .init(rawValue: [
+                                .fungibleTokens(.init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))),
+                                .nonFungibleTokens(.init(rows: .init(uniqueElements: nfts)))
+                        ])!)
                         return .none
                 }
 

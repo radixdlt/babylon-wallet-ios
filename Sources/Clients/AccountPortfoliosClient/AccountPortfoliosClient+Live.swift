@@ -75,6 +75,7 @@ extension AccountPortfoliosClient: TestDependencyKey {
                 portfolios: .init([])
         )
 }
+
 extension AccountPortfoliosClient {
         static let fetchAccountPortfolios: FetchAccountPortfolios = { addresses in
                 @Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -101,15 +102,11 @@ extension AccountPortfoliosClient {
 
                 let (fungibleTokens, nonFungibleTokens) = try await (createFungibleTokens, createNonFungibleTokens)
 
-                let portfolio = try AccountPortfolio.init(
+                return try AccountPortfolio.init(
                         owner: AccountAddress(address: accountDetails.address),
-                        fungibleResources: AccountPortfolio.FungibleResources(
-                                xrdToken: fungibleTokens.first,
-                                tokens: .init(loaded: Array(fungibleTokens.dropFirst()))
-                        ),
+                        fungibleResources: .init(loaded: fungibleTokens),
                         nonFungibleResources: nonFungibleTokens
                 )
-                return portfolio
         }
 }
 

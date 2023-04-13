@@ -7,9 +7,7 @@ extension FungibleTokenList {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		public init(
-			store: Store
-		) {
+		public init(store: Store) {
 			self.store = store
 		}
 	}
@@ -19,8 +17,12 @@ extension FungibleTokenList.View {
 	public var body: some View {
 		LazyVStack(spacing: .medium2) {
                         IfLetStore(
-                                store.scope(state: \.xrdToken, action: { .child(.xrdRow($0))}),
-                                then: { FungibleTokenList.Row.View(store: $0) })
+                                store.scope(
+                                        state: \.xrdToken,
+                                        action: { .child(.xrdRow($0)) }
+                                ),
+                                then: { FungibleTokenList.Row.View(store: $0) }
+                        )
 
 			ForEachStore(
 				store.scope(
@@ -29,17 +31,13 @@ extension FungibleTokenList.View {
 				),
 				content: { FungibleTokenList.Row.View(store: $0) }
 			)
-
-                        ProgressView().onAppear {
-                                ViewStore(store).send(.view(.scrolledToLoadMore))
-                        }
 		}
-//		.sheet(
-//			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//			state: /FungibleTokenList.Destinations.State.details,
-//			action: FungibleTokenList.Destinations.Action.details,
-//			content: { FungibleTokenDetails.View(store: $0) }
-//		)
+		.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /FungibleTokenList.Destinations.State.details,
+			action: FungibleTokenList.Destinations.Action.details,
+			content: { FungibleTokenDetails.View(store: $0) }
+		)
 	}
 }
 

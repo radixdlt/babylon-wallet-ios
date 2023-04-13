@@ -43,6 +43,11 @@ extension AssetsView {
                                                         action: { Action.child(.fungibleTokenList($0)) },
                                                         then: { FungibleTokenList.View(store: $0)}
                                                 )
+                                                CaseLet(
+                                                        state: /State.AssetList.nonFungibleTokens,
+                                                        action: { Action.child(.nonFungibleTokenList($0)) },
+                                                        then: { NonFungibleTokenList.View(store: $0)}
+                                                )
                                         }
 				}
 			}
