@@ -73,10 +73,10 @@ extension PersonaDetails.View {
 	struct InfoSection: View {
 		struct ViewState: Equatable {
 			let dAppName: String
-			let personaLabel: String
+			let personaName: String
 			let isSharingAnything: Bool
-			let givenName: String?
-			let familyName: String?
+			let firstName: String?
+			let lastName: String?
 			let emailAddress: String?
 			let phoneNumber: String?
 		}
@@ -86,7 +86,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					VPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaLabel)
+					VPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
 
 					Separator()
 
@@ -98,12 +98,12 @@ extension PersonaDetails.View {
 							.textBlock
 					}
 
-					if let givenName = viewStore.givenName {
-						VPair(heading: L10n.PersonaDetails.givenNameHeading, item: givenName)
+					if let firstName = viewStore.firstName {
+						VPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)
 					}
 
-					if let familyName = viewStore.familyName {
-						VPair(heading: L10n.PersonaDetails.familyNameHeading, item: familyName)
+					if let lastName = viewStore.lastName {
+						VPair(heading: L10n.PersonaDetails.lastNameHeading, item: lastName)
 					}
 
 					if let emailAddress = viewStore.emailAddress {
@@ -124,10 +124,10 @@ private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
 		.init(
 			dAppName: dAppName,
-			personaLabel: persona.displayName.rawValue,
+			personaName: persona.displayName.rawValue,
 			isSharingAnything: persona.sharedFields?.isEmpty == false,
-			givenName: persona.sharedFields?[id: .givenName]?.value.rawValue,
-			familyName: persona.sharedFields?[id: .familyName]?.value.rawValue,
+			firstName: persona.sharedFields?[id: .givenName]?.value.rawValue,
+			lastName: persona.sharedFields?[id: .familyName]?.value.rawValue,
 			emailAddress: persona.sharedFields?[id: .emailAddress]?.value.rawValue,
 			phoneNumber: persona.sharedFields?[id: .phoneNumber]?.value.rawValue
 		)
