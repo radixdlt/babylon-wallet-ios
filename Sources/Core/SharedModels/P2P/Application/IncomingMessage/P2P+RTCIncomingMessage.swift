@@ -19,20 +19,15 @@ extension P2P {
 	/// `result` and not an `P2P.RTCMessageFromPeer` directly.
 	public typealias RTCIncomingMessage = RTCIncomingMessageContainer<P2P.RTCMessageFromPeer>
 
-	/// An incoming response over RTC from some `route`, might have failed
+	/// An incoming Dapp Request over RTC from some `route`, might have failed
 	/// or succeeded to receive and decode, which is why this contains a
-	/// `result` and not an `P2P.RTCMessageFromPeer.Response` directly.
-	public typealias RTCIncomingResponse = RTCIncomingMessageContainer<P2P.RTCMessageFromPeer.Response>
-
-	/// An incoming request over RTC from some `route`, might have failed
-	/// or succeeded to receive and decode, which is why this contains a
-	/// `result` and not an `P2P.RTCMessageFromPeer.Request` directly.
-	public typealias RTCIncomingRequest = RTCIncomingMessageContainer<P2P.RTCMessageFromPeer.Request>
+	/// `result` and not an `P2P.Dapp.Request` directly.
+	public typealias RTCIncomingDappRequest = RTCIncomingMessageContainer<P2P.Dapp.Request>
 
 	/// An incoming message over RTC from some `route`, might have failed
 	/// or succeeded to receive and decode, which is why this contains a
 	/// `result` and not an `P2P.RTCMessageFromPeer` directly.
-	public struct RTCIncomingMessageContainer<Success: Sendable>: Sendable {
+	public struct RTCIncomingMessageContainer<Success: Sendable & Hashable>: Sendable, Hashable {
 		public let result: Result<Success, Error>
 		public let route: RTCRoute
 		public init(result: Result<Success, Error>, route: RTCRoute) {
@@ -43,6 +38,31 @@ extension P2P {
 }
 
 extension P2P.RTCIncomingMessageContainer {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		guard lhs.route == rhs.route else {
+			return false
+		}
+		switch (lhs.result, rhs.result) {
+		case let (.failure(lhsFailure), .failure(rhsFailure)):
+			// FIXME: strongly type messages? to an Error type which is Hashable?
+			return String(describing: lhsFailure) == String(describing: rhsFailure)
+		case let (.success(lhsSuccess), .success(rhsSuccess)):
+			return lhsSuccess == rhsSuccess
+
+		default: return false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(route)
+		switch result {
+		case let .failure(error):
+			hasher.combine(String(describing: error))
+		case let .success(success):
+			hasher.combine(success)
+		}
+	}
+
 	public func flatMap<NewSuccess>(
 		_ transform: (Success) -> NewSuccess?
 	) -> P2P.RTCIncomingMessageContainer<NewSuccess>? {

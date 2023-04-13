@@ -86,7 +86,7 @@ extension RadixConnectClient {
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		await receiveMessages()
 			.filter(/P2P.RTCMessageFromPeer.request)
-			.compactMap { (incomingRequest: P2P.RTCIncomingRequest) -> P2P.RTCIncomingMessageContainer<Case>? in
+			.compactMap { (incomingRequest: P2P.RTCIncomingMessageContainer<P2P.RTCMessageFromPeer.Request>) -> P2P.RTCIncomingMessageContainer<Case>? in
 				incomingRequest.flatMap {
 					casePath.extract(from: $0)
 				}
