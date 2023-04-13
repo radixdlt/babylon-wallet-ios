@@ -45,7 +45,7 @@ extension AsyncSequence where Element == Void {
 }
 
 extension AsyncSequence {
-	func subscribeContinuation(
+	func subscribe(
 		_ continuation: AsyncStream<Element>.Continuation
 	) where Self: Sendable {
 		Task {

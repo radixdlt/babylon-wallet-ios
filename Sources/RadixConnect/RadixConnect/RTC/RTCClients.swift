@@ -280,7 +280,7 @@ extension RTCClient {
 					route: route
 				)
 			}
-			.subscribeContinuation(self.incomingMessagesContinuation)
+			.subscribe(self.incomingMessagesContinuation)
 
 		connection
 			.iceConnectionStates
@@ -288,7 +288,7 @@ extension RTCClient {
 				$0 == .disconnected
 			}
 			.map { _ in connection.id }
-			.subscribeContinuation(disconnectedPeerConnectionContinuation)
+			.subscribe(disconnectedPeerConnectionContinuation)
 
 		self.peerConnections[connection.id] = connection
 	}
