@@ -2,16 +2,13 @@ import FeaturePrelude
 
 extension AddLedgerNanoFactorSource.State {
 	var viewState: AddLedgerNanoFactorSource.ViewState {
-		.init(links: links, selectedLink: selectedLink)
+		.init()
 	}
 }
 
 // MARK: - AddLedgerNanoFactorSource.View
 extension AddLedgerNanoFactorSource {
-	public struct ViewState: Equatable {
-		let links: IdentifiedArrayOf<P2PLink>
-		let selectedLink: P2PLink?
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -24,33 +21,14 @@ extension AddLedgerNanoFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					//
-					//                    Picker(
-					//                        "Link",
-					//                        selection: viewStore.binding(
-					//                            get: \.selectedLink,
-					//                            send: { .selectedLink($0) }
-					//                        )
-					//                    ) {
-					//                        ForEach(viewStore.supportedCurves, id: \.self) { curve in
-					//                            Text("\(String(describing: curve))").tag(curve.rawValue)
-					//                        }
-					//                    }
-					//
-					//					Button("Send Add Ledger Request") {
-					//						viewStore.send(.sendAddLedgerRequestButtonTapped)
-					//					}
-					//					.buttonStyle(.primaryRectangular)
-					//				}
-					//                .onAppear { viewStore.send(.appeared) }
-					//				.padding(.horizontal, .medium3)
-					//                .task {
-					//                    await ViewStore(store.stateless).send(.view(.task)).finish()
-					//                }
 					Button("MOCK LEDGER ADDED") {
 						viewStore.send(.mockLedgerNanoAdded)
 					}
 					.buttonStyle(.primaryRectangular)
+				}
+				.padding(.horizontal, .medium3)
+				.task {
+					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
 			}
 		}

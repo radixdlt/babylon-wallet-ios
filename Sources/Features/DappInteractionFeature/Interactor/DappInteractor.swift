@@ -82,7 +82,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return handleIncommingRequests()
+			return handleIncomingRequests()
 		case let .responseFailureAlert(action):
 			switch action {
 			case .dismiss:
@@ -180,7 +180,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 		}
 
-		state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.peerMessage.content)))
+		state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.request)))
 		return .none
 	}
 
@@ -189,8 +189,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 		for request: P2P.RTCIncomingWalletInteraction,
 		dappMetadata: DappMetadata?
 	) -> EffectTask<Action> {
-		guard let toDapp = response.peerMessage.content.dapp else {
-			loggerGlobal.warning("Found non Dapp related message, probablt incorrect implementation somewhere.")
+//		guard let toDapp = try? response.toDapp() else {
+		guard case let .response(.dapp(responseToDapp), route) = response else {
+			loggerGlobal.warning("Found non Dapp related message, probably incorrect implementation somewhere.")
 			return .none
 		}
 
@@ -199,8 +200,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
 			let isTransactionResponse = {
-				if case let .success(responseToDapp) = toDapp,
-				   case .transaction = responseToDapp.items
+				if case let .success(successResponse) = responseToDapp,
+				   case .transaction = successResponse.items
 				{
 					return true
 				}
@@ -208,11 +209,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}()
 
 			do {
-				_ = try await radixConnectClient.sendMessage(response)
+				_ = try await radixConnectClient.sendResponse(.dapp(responseToDapp), route)
 				if !isTransactionResponse {
 					await send(.internal(
 						.sentResponseToDapp(
-							toDapp,
+							responseToDapp,
 							for: request,
 							dappMetadata
 						)
@@ -238,7 +239,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		state.currentModal = nil
 	}
 
-	func handleIncommingRequests() -> EffectTask<Action> {
+	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
 			await radixConnectClient.loadFromProfileAndConnectAll()
 			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
@@ -250,18 +251,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 				do {
 					let interactionMessage = try incomingMessageResult.unwrapResult()
-					let interaction = interactionMessage.peerMessage.content
+					let interaction = interactionMessage.request
 					try validate(interaction)
+
 					guard interaction.metadata.networkId == currentNetworkID else {
 						let incomingRequestNetwork = try Radix.Network.lookupBy(id: interaction.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
-						let outMessage = interactionMessage.toDapp(response: .failure(.init(
+
+						try await radixConnectClient.sendResponse(.dapp(.failure(.init(
 							interactionId: interaction.id,
 							errorType: .wrongNetwork,
 							message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
-						)))
-
-						try await radixConnectClient.sendMessage(outMessage)
+						))), incomingMessageResult.route)
 						return
 					}
 

@@ -52,8 +52,11 @@ extension RadixConnectClient {
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
 			receiveMessages: { await rtcClients.incomingMessages },
-			sendMessage: { outgoingMsg in
-				try await rtcClients.sendMessage(outgoingMsg)
+			sendResponse: { response, route in
+				try await rtcClients.sendResponse(response, to: route)
+			},
+			sendRequest: { request, strategy in
+				try await rtcClients.sendRequest(request, strategy: strategy)
 			}
 		)
 	}()

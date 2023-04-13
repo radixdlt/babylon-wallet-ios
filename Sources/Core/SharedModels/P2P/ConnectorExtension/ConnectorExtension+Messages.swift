@@ -1,17 +1,21 @@
 import Foundation
 
-extension P2P.RTCIncomingMessage {
-	public func ledgerNanoSuccess() throws -> P2P.FromConnectorExtension.LedgerHardwareWallet.Success {
-		let result = try self.peerMessage.result.get()
-		switch result {
-		case let .connectorExtension(.ledgerHardwareWallet(ledgerNanoResult)):
-			return try ledgerNanoResult.response.get()
-		default: throw WrongResponseType()
+extension P2P.RTCMessageFromPeer {
+	public func responseLedgerHardwareWallet() throws -> P2P.FromConnectorExtension.LedgerHardwareWallet {
+		guard case let .response(.connectorExtension(.ledgerHardwareWallet(response)), _) = self else {
+			throw WrongResponseType()
 		}
+
+		return response
+	}
+
+	public func ledgerHardwareWalletSuccess() throws -> P2P.FromConnectorExtension.LedgerHardwareWallet.Success {
+		let ledgerHardwareWallet = try responseLedgerHardwareWallet()
+		return try ledgerHardwareWallet.response.get()
 	}
 
 	public func getDeviceInfoResponse() throws -> P2P.FromConnectorExtension.LedgerHardwareWallet.Success.GetDeviceInfo {
-		let success = try ledgerNanoSuccess()
+		let success = try ledgerHardwareWalletSuccess()
 		guard let deviceInfo = success.getDeviceInfo else {
 			throw WrongResponseType()
 		}
@@ -19,7 +23,7 @@ extension P2P.RTCIncomingMessage {
 	}
 
 	public func signTransactionResponse() throws -> P2P.FromConnectorExtension.LedgerHardwareWallet.Success.SignTransaction {
-		let success = try ledgerNanoSuccess()
+		let success = try ledgerHardwareWalletSuccess()
 		guard let signTransaction = success.signTransaction else {
 			throw WrongResponseType()
 		}
@@ -27,7 +31,7 @@ extension P2P.RTCIncomingMessage {
 	}
 
 	public func derivePublicKeyResponse() throws -> P2P.FromConnectorExtension.LedgerHardwareWallet.Success.DerivePublicKey {
-		let success = try ledgerNanoSuccess()
+		let success = try ledgerHardwareWalletSuccess()
 		guard let derivePublicKey = success.derivePublicKey else {
 			throw WrongResponseType()
 		}
@@ -37,6 +41,9 @@ extension P2P.RTCIncomingMessage {
 
 // MARK: - WrongResponseType
 struct WrongResponseType: Swift.Error {}
+
+// MARK: - WrongRequestType
+struct WrongRequestType: Swift.Error {}
 
 extension P2P.FromConnectorExtension.LedgerHardwareWallet.Success {
 	public var getDeviceInfo: GetDeviceInfo? {
