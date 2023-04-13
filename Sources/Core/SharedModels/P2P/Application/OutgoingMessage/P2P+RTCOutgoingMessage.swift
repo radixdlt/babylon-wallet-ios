@@ -30,7 +30,7 @@ extension P2P {
 			}
 
 			/// e.g. for Ledger Nano interaction, `PeerConnectionID` is not known
-			case connectorExtension(P2P.ToConnectorExtension)
+			case connectorExtension(P2P.ConnectorExtension.Request)
 		}
 	}
 }

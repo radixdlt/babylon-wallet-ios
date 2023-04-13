@@ -19,7 +19,7 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case gotDeviceInfoResponse(
-			info: P2P.FromConnectorExtension.LedgerHardwareWallet.Success.GetDeviceInfo,
+			info: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo,
 			interactionID: P2P.LedgerHardwareWallet.InteractionId
 		)
 	}

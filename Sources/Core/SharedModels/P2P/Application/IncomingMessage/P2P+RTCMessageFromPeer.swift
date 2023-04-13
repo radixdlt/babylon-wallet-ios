@@ -14,7 +14,7 @@ extension P2P {
 
 		/// A response from a peer to some request we have sent.
 		public enum Response: Sendable, Hashable, Equatable, Decodable {
-			case connectorExtension(P2P.FromConnectorExtension)
+			case connectorExtension(P2P.ConnectorExtension.Response)
 		}
 
 		public enum Request: Sendable, Hashable, Equatable, Decodable {
