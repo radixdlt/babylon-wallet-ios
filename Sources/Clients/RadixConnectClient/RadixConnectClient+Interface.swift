@@ -40,7 +40,7 @@ extension RadixConnectClient {
 	public typealias AddP2PWithPassword = @Sendable (ConnectionPassword) async throws -> Void
 	public typealias DeleteP2PLinkByPassword = @Sendable (ConnectionPassword) async throws -> Void
 
-	public typealias ReceiveMessages = @Sendable () async -> AsyncStream<P2P.RTCIncoXYZmingMessage>
+	public typealias ReceiveMessages = @Sendable () async -> AsyncStream<P2P.RTCIncomingMessage>
 
 	public typealias SendRequest = @Sendable (_ request: P2P.RTCOutgoingMessage.Request, _ sendStrategy: P2P.RTCOutgoingMessage.Request.SendStrategy) async throws -> Void
 

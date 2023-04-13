@@ -17,7 +17,7 @@ extension P2P {
 	/// An incoming message over RTC from some `route`, might have failed
 	/// or succeeded to receive and decode, which is why this contains a
 	/// `result` and not an `P2P.RTCMessageFromPeer` directly.
-	public struct RTCIncoXYZmingMessage: Sendable {
+	public struct RTCIncomingMessage: Sendable {
 		public let result: Result<P2P.RTCMessageFromPeer, Error>
 		public let route: RTCRoute
 		public init(result: Result<P2P.RTCMessageFromPeer, Error>, route: RTCRoute) {

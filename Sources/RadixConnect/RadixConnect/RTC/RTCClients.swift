@@ -16,8 +16,8 @@ public actor RTCClients {
 	// MARK: - Streams
 
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
-	public let incomingMessages: AsyncStream<P2P.RTCIncoXYZmingMessage>
-	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncoXYZmingMessage>.Continuation
+	public let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
+	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -151,9 +151,9 @@ extension RTCClients {
 actor RTCClient {
 	let id: ID
 	/// Incoming peer messages. This is the single channel for the received messages from all PeerConnections.
-	let incomingMessages: AsyncStream<P2P.RTCIncoXYZmingMessage>
+	let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
 
-	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncoXYZmingMessage>.Continuation
+	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
 	private let peerConnectionNegotiator: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
@@ -268,46 +268,12 @@ extension RTCClient {
 	}
 
 	private func onPeerConnectionCreated(_ connection: PeerConnectionClient) async {
-		let jsonDecoder = JSONDecoder()
-
 		await connection
 			.receivedMessagesStream()
 			.map { (messageResult: Result<DataChannelClient.AssembledMessage, Error>) in
-
 				let route = P2P.RTCRoute(connectionId: self.id, peerConnectionId: connection.id)
-
-				let messageFromPeerResult = messageResult.flatMap { (message: DataChannelClient.AssembledMessage) -> Result<P2P.RTCMessageFromPeer, Error> in
-
-					let jsonData = message.messageContent
-
-					do {
-						let request = try jsonDecoder.decode(
-							P2P.RTCMessageFromPeer.Request.self,
-							from: jsonData
-						)
-						return .success(.request(request, from: route))
-					} catch let decodeRequestError {
-						do {
-							let response = try jsonDecoder.decode(
-								P2P.RTCMessageFromPeer.Response.self,
-								from: jsonData
-							)
-							return .success(
-								.response(
-									response,
-									origin: route
-								)
-							)
-
-						} catch let decodeResponseError {
-							loggerGlobal.error("Failed to decode as RTC request & response, request decoding failure: \(decodeRequestError)\n\nresponse decoding failure: \(decodeResponseError)")
-							return .failure(decodeRequestError)
-						}
-					}
-				}
-
-				return P2P.RTCIncoXYZmingMessage(
-					result: messageFromPeerResult,
+				return P2P.RTCIncomingMessage(
+					result: decode(messageResult, route: route),
 					route: route
 				)
 			}
@@ -322,5 +288,44 @@ extension RTCClient {
 			.susbscribe(disconnectedPeerConnectionContinuation)
 
 		self.peerConnections[connection.id] = connection
+	}
+}
+
+// FIXME: once we have merge together the separated message formats `Dapp` and `Ledger` in CAP21
+// this ugliness will become less ugly!
+func decode(
+	_ messageResult: Result<DataChannelClient.AssembledMessage, Error>,
+	route: P2P.RTCRoute
+) -> Result<P2P.RTCMessageFromPeer, Error> {
+	let jsonDecoder = JSONDecoder()
+
+	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
+
+		let jsonData = message.messageContent
+
+		do {
+			let request = try jsonDecoder.decode(
+				P2P.RTCMessageFromPeer.Request.self,
+				from: jsonData
+			)
+			return .success(.request(request, from: route))
+		} catch let decodeRequestError {
+			do {
+				let response = try jsonDecoder.decode(
+					P2P.RTCMessageFromPeer.Response.self,
+					from: jsonData
+				)
+				return .success(
+					.response(
+						response,
+						origin: route
+					)
+				)
+
+			} catch let decodeResponseError {
+				loggerGlobal.error("Failed to decode as RTC request & response, request decoding failure: \(decodeRequestError)\n\nresponse decoding failure: \(decodeResponseError)")
+				return .failure(decodeRequestError)
+			}
+		}
 	}
 }

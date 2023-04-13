@@ -26,7 +26,7 @@ extension P2P.RTCMessageFromPeer {
 	}
 }
 
-extension P2P.RTCIncoXYZmingMessage {
+extension P2P.RTCIncomingMessage {
 	public func unwrapResult() throws -> P2P.RTCIncomingWalletInteraction {
 		try .init(
 			origin: route,

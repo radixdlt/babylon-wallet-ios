@@ -29,7 +29,7 @@ extension RadixConnectClient {
 		storeP2PLink: { _ in },
 		deleteP2PLinkByPassword: { _ in },
 		addP2PWithPassword: { _ in },
-		receiveMessages: { AsyncStream<P2P.RTCIncoXYZmingMessage>(unfolding: { nil }) },
+		receiveMessages: { AsyncStream<P2P.RTCIncomingMessage>(unfolding: { nil }) },
 		sendResponse: { _, _ in },
 		sendRequest: { _, _ in }
 	)
