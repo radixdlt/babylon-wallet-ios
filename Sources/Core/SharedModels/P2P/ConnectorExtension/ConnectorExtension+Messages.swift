@@ -2,7 +2,7 @@ import Foundation
 
 extension P2P.RTCMessageFromPeer {
 	public func responseLedgerHardwareWallet() throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet {
-		guard case let .response(.connectorExtension(.ledgerHardwareWallet(response)), _) = self else {
+		guard case let .response(.connectorExtension(.ledgerHardwareWallet(response))) = self else {
 			throw WrongResponseType()
 		}
 

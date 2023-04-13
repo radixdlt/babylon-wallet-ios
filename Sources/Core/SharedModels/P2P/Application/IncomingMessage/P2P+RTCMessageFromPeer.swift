@@ -6,11 +6,10 @@ extension P2P {
 	/// either a `response` or a `request`.
 	public enum RTCMessageFromPeer: Sendable, Hashable {
 		/// A response from a peer to some request we have sent over RTC
-		/// route `origin`.
-		case response(Response, origin: P2P.RTCRoute)
+		case response(Response)
 
-		/// A request coming from some peer over RTC route `from`.
-		case request(Request, from: P2P.RTCRoute)
+		/// A request coming from some peer over RTC
+		case request(Request)
 
 		/// A response from a peer to some request we have sent.
 		public enum Response: Sendable, Hashable, Equatable, Decodable {
