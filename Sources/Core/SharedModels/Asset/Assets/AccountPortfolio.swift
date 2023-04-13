@@ -1,6 +1,6 @@
 import Prelude
 
-public struct AccountPortfolio: Sendable, Hashable {
+public struct AccountPortfolio: Sendable, Hashable, Codable {
         public let owner: AccountAddress
         public var fungibleResources: FungibleResources
         public var nonFungibleResources: NonFungibleResources
@@ -33,7 +33,7 @@ extension AccountPortfolio {
         public typealias FungibleResources =  PaginatedResourceContainer<[FungibleToken]>
         public typealias NonFungibleResources = PaginatedResourceContainer<[NonFungibleToken]>
 
-        public struct FungibleToken: Sendable, Hashable {
+        public struct FungibleToken: Sendable, Hashable, Codable {
                 public let resourceAddress: ResourceAddress
                 public let amount: BigDecimal
                 public let divisibility: Int?
@@ -58,7 +58,7 @@ extension AccountPortfolio {
                 }
         }
 
-        public struct NonFungibleToken: Sendable, Hashable {
+        public struct NonFungibleToken: Sendable, Hashable, Codable {
                 public let resourceAddress: ResourceAddress
                 public let name: String?
                 public let description: String?

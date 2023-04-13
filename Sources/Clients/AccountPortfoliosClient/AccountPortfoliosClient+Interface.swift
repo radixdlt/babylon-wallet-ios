@@ -28,7 +28,7 @@ public actor AccountPortfoliosClient {
 
 extension AccountPortfoliosClient {
         public typealias FetchAccountPortfolios = @Sendable (_ addresses: [AccountAddress]) async throws -> [AccountPortfolio]
-        public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress) async throws -> AccountPortfolio
+        public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ refresh: Bool) async throws -> AccountPortfolio
 
         public typealias FetchMoreFungibleTokens = @Sendable (_ address: AccountAddress) async throws -> AccountPortfolio
         public typealias FetchMoreNonFungibleTokens = @Sendable (_ address: AccountAddress) async throws -> AccountPortfolio

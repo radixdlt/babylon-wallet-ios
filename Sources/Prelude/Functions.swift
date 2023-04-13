@@ -77,3 +77,4 @@ extension PaginatedResourceContainer {
 extension PaginatedResourceContainer: Sendable where Container: Sendable {}
 extension PaginatedResourceContainer: Equatable where Container: Equatable {}
 extension PaginatedResourceContainer: Hashable where Container: Hashable {}
+extension PaginatedResourceContainer: Codable where Container: Codable {}

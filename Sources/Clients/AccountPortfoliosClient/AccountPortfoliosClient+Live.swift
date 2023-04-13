@@ -1,6 +1,7 @@
 import ClientPrelude
 import GatewayAPI
 import SharedModels
+import CacheClient
 
 extension AccountPortfoliosClient: DependencyKey {
         public static let liveValue: AccountPortfoliosClient = {
@@ -12,8 +13,8 @@ extension AccountPortfoliosClient: DependencyKey {
                                 portfolios.value = Set(loadedPortfolios)
                                 return loadedPortfolios
                         },
-                        fetchAccountPortfolio: { address in
-                                let portfolio = try await fetchAccountPortfolio(address)
+                        fetchAccountPortfolio: { address, refresh in
+                                let portfolio = try await fetchAccountPortfolio(address, refresh)
                                 portfolios.value.update(with: portfolio)
                                 return portfolio
                         },
@@ -68,7 +69,7 @@ extension AccountPortfoliosClient: TestDependencyKey {
 
         public static let noop = AccountPortfoliosClient(
                 fetchAccountPortfolios: { _ in throw NoopError() },
-                fetchAccountPortfolio: { _ in throw NoopError() },
+                fetchAccountPortfolio: { _, _ in throw NoopError() },
                 fetchMoreFungibleTokens: { _ in throw NoopError() },
                 fetchMoreNonFungibleTokens: { _ in throw NoopError() },
                 portfolioForAccount: { _ in fatalError() },
@@ -85,11 +86,17 @@ extension AccountPortfoliosClient {
 }
 
 extension AccountPortfoliosClient {
-        static let fetchAccountPortfolio: FetchAccountPortfolio = { accountAddress in
+        static let fetchAccountPortfolio: FetchAccountPortfolio = { accountAddress, refresh in
                 @Dependency(\.gatewayAPIClient) var gatewayAPIClient
+                @Dependency(\.cacheClient) var cacheClient
 
-                let response = try await gatewayAPIClient.getAccountDetails(accountAddress)
-                return try await createAccountPortfolio(response.details)
+                return try await cacheClient.withCaching(
+                        cacheEntry: .accountPortfolio(.single(accountAddress.address)),
+                        forceRefresh: refresh
+                ) {
+                        let response = try await gatewayAPIClient.getAccountDetails(accountAddress)
+                        return try await createAccountPortfolio(response.details)
+                }
         }
 
         @Sendable

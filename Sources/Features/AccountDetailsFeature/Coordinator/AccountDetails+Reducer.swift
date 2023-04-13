@@ -91,7 +91,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
                         }
 		case .appeared:
                         return .run { [address = state.account.address] _ in
-                                _ = try await accountPortfoliosClient.fetchAccountPortfolio(address)
+                                _ = try await accountPortfoliosClient.fetchAccountPortfolio(address, false)
                         }
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -103,7 +103,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
                                 pasteboardClient.copyString(state.account.address.address)
 			}
 		case .pullToRefreshStarted:
-                        return .send(.delegate(.refresh(state.account.address)))
+                        return .run { [address = state.account.address] _ in
+                                _ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+                        }
 		case .transferButtonTapped:
 			// FIXME: fix post betanet v2
 //			state.destination = .transfer(AssetTransfer.State(from: state.account))
@@ -126,12 +128,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
         public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
                 switch internalAction {
                 case let .portfolioUpdated(portfolio):
-
-
-//                        if portfolio.fungibleResources.loaded.isEmpty {
-//                                state.assets = .empty()
-//                                return .none
-//                        }
                         let xrd = portfolio.fungibleResources.loaded.first.map(FungibleTokenList.Row.State.init(xrdToken:))
                         let nonXrd = Array(portfolio.fungibleResources.loaded.suffix(from: 1)).map(FungibleTokenList.Row.State.init(nonXRDToken:))
 
@@ -142,6 +138,5 @@ public struct AccountDetails: Sendable, FeatureReducer {
                         ])!)
                         return .none
                 }
-
         }
 }
