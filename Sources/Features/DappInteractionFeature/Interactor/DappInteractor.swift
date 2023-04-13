@@ -244,34 +244,34 @@ struct DappInteractor: Sendable, FeatureReducer {
 			await radixConnectClient.loadFromProfileAndConnectAll()
 			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
-			for try await incomingMessageResult in await radixConnectClient.receiveMessages() {
+			for try await incomingRequest in await radixConnectClient.receiveRequest2(/P2P.RTCMessageFromPeer.Request.dapp) {
 				guard !Task.isCancelled else {
 					return
 				}
 
 				do {
-					let interactionMessage = try incomingMessageResult.unwrapResult()
-					let interaction = interactionMessage.request
-					try validate(interaction)
+					let interactionMessage = try incomingRequest.result.get()
+//					let interaction = interactionMessage.request
+					try validate(interactionMessage)
 
-					guard interaction.metadata.networkId == currentNetworkID else {
-						let incomingRequestNetwork = try Radix.Network.lookupBy(id: interaction.metadata.networkId)
+					guard interactionMessage.metadata.networkId == currentNetworkID else {
+						let incomingRequestNetwork = try Radix.Network.lookupBy(id: interactionMessage.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
 
 						try await radixConnectClient.sendResponse(.dapp(.failure(.init(
-							interactionId: interaction.id,
+							interactionId: interactionMessage.id,
 							errorType: .wrongNetwork,
 							message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
-						))), incomingMessageResult.route)
+						))), incomingRequest.route)
 						return
 					}
 
 					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 					if !isDeveloperModeEnabled {
-						try await rolaClient.performDappDefinitionVerification(interaction.metadata)
-						try await rolaClient.performWellKnownFileCheck(interaction.metadata)
+						try await rolaClient.performDappDefinitionVerification(interactionMessage.metadata)
+						try await rolaClient.performWellKnownFileCheck(interactionMessage.metadata)
 					}
-					await send(.internal(.receivedRequestFromDapp(interactionMessage)))
+					await send(.internal(.receivedRequestFromDapp(P2P.RTCIncomingWalletInteraction(origin: incomingRequest.route, request: interactionMessage))))
 				} catch {
 					loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
 					errorQueue.schedule(error)

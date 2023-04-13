@@ -68,7 +68,7 @@ extension RadixConnectClient {
 }
 
 extension RTCClients {
-	public func incoming<Case>(_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+	func incoming<Case>(_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		await incomingMessages().compactMap { incomingMessage -> P2P.RTCIncomingMessageContainer<Case>? in
 			guard let incomingRequestOrResponse = incomingMessage.flatMap({ (success: P2P.RTCMessageFromPeer) -> Case? in
 				casePath.extract(from: success)
@@ -76,6 +76,21 @@ extension RTCClients {
 				return nil
 			}
 			return incomingRequestOrResponse
+		}
+		.share()
+		.eraseToAnyAsyncSequence()
+	}
+}
+
+extension RadixConnectClient {
+	public func receiveRequest2<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer.Request, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		await receiveRequests().compactMap { (incomingRequest: P2P.RTCIncomingRequest) -> P2P.RTCIncomingMessageContainer<Case>? in
+			//            casePath.extract(from: incomingRequest)
+			incomingRequest.flatMap {
+				casePath.extract(from: $0)
+			}
 		}
 		.share()
 		.eraseToAnyAsyncSequence()

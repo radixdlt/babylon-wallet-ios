@@ -5,6 +5,10 @@ extension P2P {
 	public struct RTCIncomingWalletInteraction: Sendable, Hashable {
 		public let origin: RTCRoute
 		public let request: P2P.Dapp.Request
+		public init(origin: RTCRoute, request: P2P.Dapp.Request) {
+			self.origin = origin
+			self.request = request
+		}
 	}
 }
 
