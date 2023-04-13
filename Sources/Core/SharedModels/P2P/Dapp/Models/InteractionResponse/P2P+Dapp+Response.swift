@@ -1,14 +1,14 @@
 import Prelude
 
-// MARK: - P2P.ToDapp
+// MARK: - P2P.Dapp
 extension P2P {
 	/// Just a namespace
-	public enum ToDapp {}
+	public enum Dapp {}
 }
 
-// MARK: - P2P.ToDapp.WalletInteractionResponse
-extension P2P.ToDapp {
-	public enum WalletInteractionResponse: Sendable, Hashable, Encodable {
+// MARK: - P2P.Dapp.Response
+extension P2P.Dapp {
+	public enum Response: Sendable, Hashable, Encodable {
 		private enum CodingKeys: String, CodingKey {
 			case discriminator
 		}
