@@ -20,7 +20,9 @@ extension TransactionReview.State {
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			showDepositsHeading: deposits != nil,
 			viewControlState: viewControlState,
-			rawTransaction: displayMode.rawTransaction
+			showDottedLine: (withdrawals != nil || message != nil) && deposits != nil,
+			rawTransaction: displayMode.rawTransaction,
+			showApproveButton: transactionWithLockFee != nil
 		)
 	}
 
@@ -42,7 +44,9 @@ extension TransactionReview {
 		let isExpandedDappUsed: Bool
 		let showDepositsHeading: Bool
 		let viewControlState: ControlState
+		let showDottedLine: Bool
 		let rawTransaction: String?
+		let showApproveButton: Bool
 	}
 
 	@MainActor
@@ -68,7 +72,9 @@ extension TransactionReview {
 
 								withdrawalsSection
 
-								usingDappsSection(expanded: viewStore.isExpandedDappUsed, showDepositsHeading: viewStore.showDepositsHeading)
+								usingDappsSection(expanded: viewStore.isExpandedDappUsed,
+								                  showDepositsHeading: viewStore.showDepositsHeading,
+								                  showDottedLine: viewStore.showDottedLine)
 
 								depositsSection
 
@@ -81,11 +87,13 @@ extension TransactionReview {
 							}
 						}
 
-						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
-							viewStore.send(.approveTapped)
+						if viewStore.showApproveButton {
+							Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
+								viewStore.send(.approveTapped)
+							}
+							.buttonStyle(.primaryRectangular)
+							.padding(.bottom, .medium1)
 						}
-						.buttonStyle(.primaryRectangular)
-						.padding(.bottom, .medium1)
 					}
 					.animation(.easeInOut, value: viewStore.rawTransaction)
 					.padding(.horizontal, .medium3)
@@ -135,7 +143,7 @@ extension TransactionReview {
 		}
 
 		@ViewBuilder
-		private func usingDappsSection(expanded: Bool, showDepositsHeading: Bool) -> some SwiftUI.View {
+		private func usingDappsSection(expanded: Bool, showDepositsHeading: Bool, showDottedLine: Bool) -> some SwiftUI.View {
 			VStack(alignment: .trailing, spacing: .medium2) {
 				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 				IfLetStore(usedDappsStore) { childStore in
@@ -151,10 +159,12 @@ extension TransactionReview {
 				}
 			}
 			.background(alignment: .trailing) {
-				VLine()
-					.stroke(.app.gray3, style: .transactionReview)
-					.frame(width: 1)
-					.padding(.trailing, SpeechbubbleShape.triangleInset)
+				if showDottedLine {
+					VLine()
+						.stroke(.app.gray3, style: .transactionReview)
+						.frame(width: 1)
+						.padding(.trailing, SpeechbubbleShape.triangleInset)
+				}
 			}
 		}
 
@@ -251,6 +261,7 @@ struct RawTransactionView: SwiftUI.View {
 struct TransactionReviewTokenView: View {
 	struct ViewState: Equatable {
 		let name: String?
+		let isXRD: Bool
 		let thumbnail: URL?
 
 		let amount: BigDecimal
@@ -266,7 +277,7 @@ struct TransactionReviewTokenView: View {
 				TokenPlaceholder(size: .small) // TODO:  Actually use URL
 					.padding(.vertical, .small1)
 			} else {
-				TokenPlaceholder(size: .small)
+				TokenPlaceholder(isXRD: viewState.isXRD, size: .small)
 					.padding(.vertical, .small1)
 			}
 
@@ -355,6 +366,7 @@ extension Label where Title == Text, Icon == Image {
 			Text(titleKey)
 		} icon: {
 			Image(asset: asset)
+				.renderingMode(.template)
 		}
 	}
 
@@ -363,6 +375,7 @@ extension Label where Title == Text, Icon == Image {
 			Text(title)
 		} icon: {
 			Image(asset: asset)
+				.renderingMode(.template)
 		}
 	}
 }

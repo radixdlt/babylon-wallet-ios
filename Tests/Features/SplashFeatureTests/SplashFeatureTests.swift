@@ -28,19 +28,15 @@ final class SplashFeatureTests: TestCase {
 		// when
 		await store.send(.view(.appeared))
 
-		// then
-		await store.receive(.internal(.loadProfileOutcome(.newUser))) {
-			$0.loadProfileOutcome = .newUser
-		}
 		await clock.advance(by: .seconds(0.2))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.passcodeCheckFailedAlert = .init(
 				title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
 				actions: {
 					ButtonState(
-						role: .cancel,
-						action: .send(.cancelButtonTapped),
-						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.cancelButtonTitle) }
+						role: .none,
+						action: .send(.retryButtonTapped),
+						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.retryButtonTitle) }
 					)
 					ButtonState(
 						role: .none,
@@ -90,9 +86,6 @@ final class SplashFeatureTests: TestCase {
 		await store.send(.view(.appeared))
 
 		// then
-		await store.receive(.internal(.loadProfileOutcome(outcome))) {
-			$0.loadProfileOutcome = outcome
-		}
 		await clock.advance(by: .seconds(0.2))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig))))
 		await store.receive(.delegate(.loadProfileOutcome(outcome)))

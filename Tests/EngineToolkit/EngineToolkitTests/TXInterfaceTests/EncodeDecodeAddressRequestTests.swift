@@ -12,6 +12,25 @@ final class EncodeDecodeAddressRequestTests: TestCase {
 	func test__encodeDecodeAddressRequest() throws {
 		try TestSuite.vectors.forEach { try doTest(vector: $0) }
 	}
+
+	func test_decode1() throws {
+		let decodeRequest = DecodeAddressRequest(
+			address: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"
+		)
+		let decodeResponse = try sut.decodeAddressRequest(request: decodeRequest).get()
+		XCTAssertEqual(decodeResponse.hrp, "account_sim")
+		XCTAssertEqual(decodeResponse.data.hex, "04032fcdc6aa1b8e8ae3effd51c9024120387d279a069d8479c0c7")
+	}
+
+	func test_decode2() throws {
+		let decodeRequest = DecodeAddressRequest(
+			address: "account_tdx_b_1p85v6mt035ny0j35jp8l6sy49gj0c3seda4tsuqvpstqrc6egy"
+		)
+		let decodeResponse = try sut.decodeAddressRequest(request: decodeRequest).get()
+		let pubkeyData = "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c"
+		let hash = try Data(hex: sut.hashRequest(request: .init(payload: pubkeyData)).get().value).suffix(26)
+		XCTAssertEqual(decodeResponse.data.suffix(26).hex, hash.hex)
+	}
 }
 
 extension EncodeDecodeAddressRequestTests {

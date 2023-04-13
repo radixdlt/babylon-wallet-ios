@@ -1,12 +1,12 @@
 import FeaturePrelude
 import RadixConnectClient
+import ScanQRFeature
 
 // MARK: - NewConnection
 public struct NewConnection: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
 		case localNetworkPermission(LocalNetworkPermission.State)
-		case cameraPermission(CameraPermission.State)
-		case scanQR(ScanQR.State)
+		case scanQR(ScanQRCoordinator.State)
 		case connectUsingSecrets(ConnectUsingSecrets.State)
 
 		public init() {
@@ -19,9 +19,8 @@ public struct NewConnection: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case cameraPermission(CameraPermission.Action)
 		case localNetworkPermission(LocalNetworkPermission.Action)
-		case scanQR(ScanQR.Action)
+		case scanQR(ScanQRCoordinator.Action)
 		case connectUsingSecrets(ConnectUsingSecrets.Action)
 	}
 
@@ -30,6 +29,12 @@ public struct NewConnection: Sendable, FeatureReducer {
 		case newConnection(P2PLink)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case connectionPasswordFromStringResult(TaskResult<ConnectionPassword>)
+	}
+
+	@Dependency(\.errorQueue) var errorQueue
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -37,11 +42,9 @@ public struct NewConnection: Sendable, FeatureReducer {
 			.ifCaseLet(/State.localNetworkPermission, action: /Action.child .. ChildAction.localNetworkPermission) {
 				LocalNetworkPermission()
 			}
-			.ifCaseLet(/State.cameraPermission, action: /Action.child .. ChildAction.cameraPermission) {
-				CameraPermission()
-			}
+
 			.ifCaseLet(/State.scanQR, action: /Action.child .. ChildAction.scanQR) {
-				ScanQR()
+				ScanQRCoordinator()
 			}
 			.ifCaseLet(/State.connectUsingSecrets, action: /Action.child .. ChildAction.connectUsingSecrets) {
 				ConnectUsingSecrets()
@@ -52,7 +55,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		switch viewAction {
 		case .closeButtonTapped:
 			switch state {
-			case .localNetworkPermission, .cameraPermission, .scanQR:
+			case .localNetworkPermission, .scanQR:
 				return .send(.delegate(.dismiss))
 			case let .connectUsingSecrets(connectUsingSecrets):
 				return .send(
@@ -65,31 +68,33 @@ public struct NewConnection: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .connectionPasswordFromStringResult(.success(ConnectionPassword)):
+			state = .connectUsingSecrets(.init(connectionPassword: ConnectionPassword))
+			return .none
+		case let .connectionPasswordFromStringResult(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				#if os(iOS)
-				state = .cameraPermission(.init())
-				#elseif os(macOS)
-				state = .scanQR(.init())
-				#endif
+				state = .scanQR(.init(scanInstructions: L10n.NewConnection.subtitle))
 				return .none
 			} else {
 				return .run { send in await send(.delegate(.dismiss)) }
 			}
 
-		case let .cameraPermission(.delegate(.permissionResponse(allowed))):
-			if allowed {
-				state = .scanQR(.init())
-				return .none
-			} else {
-				return .run { send in await send(.delegate(.dismiss)) }
+		case let .scanQR(.delegate(.scanned(qrString))):
+			return .run { send in
+				await send(.internal(.connectionPasswordFromStringResult(TaskResult {
+					try ConnectionPassword(.init(hex: qrString))
+				})))
 			}
-
-		case let .scanQR(.delegate(.connectionSecretsFromScannedQR(connectionSecrets))):
-			state = .connectUsingSecrets(.init(connectionPassword: connectionSecrets))
-			return .none
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):
 			return .send(.delegate(.newConnection(connection)))

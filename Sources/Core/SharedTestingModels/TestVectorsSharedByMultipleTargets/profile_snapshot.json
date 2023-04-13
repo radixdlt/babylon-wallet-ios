@@ -28,7 +28,7 @@
       }
     ],
     "security" : {
-      "iCloudProfileSyncEnabled" : true,
+      "isCloudProfileSyncEnabled" : true,
       "isDeveloperModeEnabled" : true
     }
   },
@@ -50,15 +50,13 @@
       },
       "storage" : {
         "discriminator" : "device",
-        "properties" : {
-          "nextDerivationIndicesPerNetwork" : [
-            {
-              "forAccount" : 3,
-              "forIdentity" : 2,
-              "networkID" : 11
-            }
-          ]
-        }
+        "nextDerivationIndicesPerNetwork" : [
+          {
+            "forAccount" : 3,
+            "forIdentity" : 2,
+            "networkID" : 11
+          }
+        ]
       }
     },
     {
@@ -76,14 +74,6 @@
           "cap26",
           "bip44Olympia"
         ]
-      },
-      "storage" : {
-        "discriminator" : "device",
-        "properties" : {
-          "nextDerivationIndicesPerNetwork" : [
-
-          ]
-        }
       }
     }
   ],
@@ -269,5 +259,5 @@
       ]
     }
   ],
-  "version" : 26
+  "version" : 27
 }

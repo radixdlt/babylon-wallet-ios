@@ -97,6 +97,7 @@ public struct TransactionDetailsView: View {
 		case .fungible:
 			TransactionReviewTokenView(viewState: .init(
 				name: viewState.metadata.name,
+				isXRD: viewState.isXRD,
 				thumbnail: viewState.metadata.thumbnail,
 				amount: viewState.amount,
 				guaranteedAmount: viewState.guarantee?.amount,

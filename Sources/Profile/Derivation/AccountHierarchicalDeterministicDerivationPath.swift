@@ -49,7 +49,7 @@ extension HD.Path.Full {
 
 	public static func identity(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws -> Self {
 		try .defaultForEntity(
@@ -62,7 +62,7 @@ extension HD.Path.Full {
 
 	public static func account(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws -> Self {
 		try .defaultForEntity(
@@ -76,7 +76,7 @@ extension HD.Path.Full {
 	public static func defaultForEntity(
 		networkID: NetworkID,
 		entityKind: EntityKind,
-		index unboundIndex: Int,
+		index unboundIndex: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws -> Self {
 		guard
@@ -107,7 +107,7 @@ public protocol EntityDerivationPathProtocol: DerivationPathSchemeProtocol {
 	var fullPath: HD.Path.Full { get }
 	init(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws
 
@@ -175,7 +175,7 @@ public struct AccountHierarchicalDeterministicDerivationPath:
 
 	public init(
 		networkID: NetworkID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind
 	) throws {
 		try self.init(fullPath: HD.Path.Full.account(
@@ -196,7 +196,7 @@ extension EntityDerivationPathProtocol {
 	static func validate(hdPath: HD.Path.Full) throws -> HD.Path.Full {
 		let components = hdPath.components
 		guard components.count == Self.expectedComponentCount else {
-			throw InvalidDerivationPathForEntity.invalidComponentCount(expected: expectedComponentCount, gotGot: components.count)
+			throw InvalidDerivationPathForEntity.invalidComponentCount(got: components.count, expected: expectedComponentCount)
 		}
 
 		guard components.first!.isRoot else {
@@ -230,7 +230,7 @@ extension EntityDerivationPathProtocol {
 		// No validation needed for `index`
 		let validKeyTypeValues = KeyKind.allCases.map(\.rawValue)
 		guard validKeyTypeValues.contains(children[5].nonHardenedValue) else {
-			throw InvalidDerivationPathForEntity.invalidKeyType(expectedAnyOf: validKeyTypeValues, butGot: children[5].nonHardenedValue)
+			throw InvalidDerivationPathForEntity.invalidKeyType(got: children[5].nonHardenedValue, expectedAnyOf: validKeyTypeValues)
 		}
 
 		// Valid!
@@ -247,7 +247,7 @@ public enum InvalidDerivationPathForEntity:
 	CustomStringConvertible,
 	CustomDumpStringConvertible
 {
-	case invalidComponentCount(expected: Int, gotGot: Int)
+	case invalidComponentCount(got: Int, expected: Int)
 	case invalidFirstComponentNotRoot
 	case foundNonHardenedComponent(atDepth: HD.Path.Component.Child.Depth.Value?)
 	case multipleRootsFound
@@ -255,7 +255,7 @@ public enum InvalidDerivationPathForEntity:
 	case invalidNetworkIDValueTooLarge
 	case invalidCoinType(got: HD.Path.Component.Child.Value)
 	case invalidEntityType(got: HD.Path.Component.Child.Value)
-	case invalidKeyType(expectedAnyOf: [HD.Path.Component.Child.Value], butGot: HD.Path.Component.Child.Value)
+	case invalidKeyType(got: HD.Path.Component.Child.Value, expectedAnyOf: [HD.Path.Component.Child.Value])
 }
 
 extension HD.Path.Component.Child.Depth {

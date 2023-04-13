@@ -40,19 +40,10 @@ final class AppFeatureTests: TestCase {
 			$0.continuousClock = clock
 		}
 
-		// WHEN: existing profile is loaded
-		await store.send(.child(.splash(.internal(.loadProfileOutcome(.existingProfileLoaded))))) {
-			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .existingProfileLoaded))
-		}
-
-		await clock.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
-
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.existingProfileLoaded)))))
-			{
-				$0.root = .main(.init())
-			}
+		await store.send(.child(.splash(.delegate(.loadProfileOutcome(.existingProfileLoaded))))) {
+			$0.root = .main(.init())
+		}
 
 		await clock.run() // fast-forward clock to the end of time
 	}
@@ -70,16 +61,8 @@ final class AppFeatureTests: TestCase {
 
 		let viewTask = await store.send(.view(.task))
 
-		// when
-		await store.send(.child(.splash(.internal(.loadProfileOutcome(.newUser))))) {
-			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: .newUser))
-		}
-
-		await clock.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
-
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(.newUser))))) {
+		await store.send(.child(.splash(.delegate(.loadProfileOutcome(.newUser))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
@@ -107,15 +90,9 @@ final class AppFeatureTests: TestCase {
 		let failure: Profile.LoadingFailure = .decodingFailure(json: Data(), foobar)
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: failure)
-		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
-			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
-		}
-
-		await clock.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
+		await store.send(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
@@ -164,14 +141,8 @@ final class AppFeatureTests: TestCase {
 		let failedToCreateProfileFromSnapshot = Profile.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: Profile.LoadingFailure.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
-		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
-			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
-		}
 
-		await clock.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
-
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
+		await store.send(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
 					title: { TextState("Wallet Data is Incompatible") },
@@ -220,14 +191,7 @@ final class AppFeatureTests: TestCase {
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
-		await store.send(.child(.splash(.internal(.loadProfileOutcome(outcome))))) {
-			$0.root = .splash(.init(passcodeCheckFailedAlert: nil, loadProfileOutcome: outcome))
-		}
-
-		await clock.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.passcodeConfigResult(.success(.biometricsAndPasscodeSetUp))))))
-
-		await store.receive(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
+		await store.send(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
 					title: { TextState("Wallet Data is Incompatible") },

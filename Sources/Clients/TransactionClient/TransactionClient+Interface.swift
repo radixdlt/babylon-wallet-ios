@@ -88,4 +88,5 @@ public struct TransactionToReview: Sendable, Equatable {
 	public let analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse
 	public let manifestIncludingLockFee: TransactionManifest
 	public let transactionFeeAdded: BigDecimal
+	public let networkID: NetworkID
 }

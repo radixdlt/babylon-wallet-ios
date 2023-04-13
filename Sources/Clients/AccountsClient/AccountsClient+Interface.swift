@@ -50,9 +50,19 @@ extension AccountsClient {
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
 
 	public typealias CreateUnsavedVirtualAccount = @Sendable (CreateVirtualEntityRequest) async throws -> Profile.Network.Account
-	public typealias SaveVirtualAccount = @Sendable (Profile.Network.Account) async throws -> Void
+	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
+}
+
+// MARK: - SaveAccountRequest
+public struct SaveAccountRequest: Sendable, Hashable {
+	public let account: Profile.Network.Account
+	public let shouldUpdateFactorSourceNextDerivationIndex: Bool
+	public init(account: Profile.Network.Account, shouldUpdateFactorSourceNextDerivationIndex: Bool) {
+		self.account = account
+		self.shouldUpdateFactorSourceNextDerivationIndex = shouldUpdateFactorSourceNextDerivationIndex
+	}
 }

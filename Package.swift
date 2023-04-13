@@ -37,6 +37,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "AddLedgerNanoFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -56,8 +64,9 @@ package.addModules([
 	.feature(
 		name: "AuthorizedDAppsFeatures",
 		dependencies: [
-			"GatewayAPI",
 			"AuthorizedDappsClient",
+			"CacheClient",
+			"GatewayAPI",
 		],
 		tests: .no
 	),
@@ -80,6 +89,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
 			"CreateEntityFeature",
+			"CacheClient",
 			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
@@ -159,11 +169,8 @@ package.addModules([
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
-			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
-			},
 			"RadixConnectClient",
+			"ScanQRFeature",
 		],
 		tests: .yes()
 	),
@@ -184,18 +191,35 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "ScanQRFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"CameraPermissionClient",
+			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
+			},
+		],
+		tests: .no
+	),
+	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"AccountsClient",
+			"AddLedgerNanoFactorSourceFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
+			"CacheClient",
+			"EngineToolkitClient",
 			"GatewayAPI",
-			"P2PLinksFeature",
 			"GatewaySettingsFeature",
 			"GeneralSettings",
-			"MnemonicClient",
-			"PersonasFeature",
-			"RadixConnectClient", // deleting connections when wallet is deleted
+			"ImportLegacyWalletClient",
 			"InspectProfileFeature",
+			"MnemonicClient",
+			"P2PLinksFeature",
+			"PersonasFeature",
+			"RadixConnectClient",
+			"ScanQRFeature",
 		],
 		tests: .yes()
 	),
@@ -284,11 +308,22 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.client(
+		name: "CacheClient",
+		dependencies: [
+			"DiskPersistenceClient",
+		],
+		tests: .yes()
+	),
 	.client(
 		name: "CameraPermissionClient",
 		dependencies: [],
 		tests: .no
+	),
+	.client(
+		name: "DiskPersistenceClient",
+		dependencies: [],
+		tests: .yes()
 	),
 	.client(
 		name: "EngineToolkitClient",
@@ -358,7 +393,19 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.client(
+		name: "ImportLegacyWalletClient",
+		dependencies: [
+			"AccountsClient",
+			"EngineToolkitClient",
+			"Profile", // Olympia models
+		],
+		tests: .yes(
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
+	),
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
@@ -375,9 +422,10 @@ package.addModules([
 		name: "NetworkSwitchingClient",
 		dependencies: [
 			"AccountsClient",
+			"CacheClient",
 			"GatewayAPI",
-			"ProfileStore",
 			"GatewaysClient",
+			"ProfileStore",
 		],
 		tests: .no
 	),
@@ -464,6 +512,7 @@ package.addModules([
 		name: "ROLAClient",
 		dependencies: [
 			"GatewayAPI",
+			"CacheClient",
 		],
 		tests: .yes()
 	),
@@ -471,6 +520,7 @@ package.addModules([
 		name: "TransactionClient",
 		dependencies: [
 			"AccountsClient",
+			"CacheClient",
 			"EngineToolkitClient",
 			"FactorSourcesClient",
 			"GatewayAPI",
@@ -780,7 +830,7 @@ extension Package {
 
 		enum Category {
 			case client
-			case feature
+			case feature(featureSuffixDroppedFromFolderName: Bool)
 			case core
 			case module(name: String)
 			static let testing: Self = .module(name: "Testing")
@@ -809,6 +859,7 @@ extension Package {
 
 		static func feature(
 			name: String,
+			featureSuffixDroppedFromFolderName: Bool = false,
 			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
@@ -819,7 +870,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: .feature,
+				category: .feature(featureSuffixDroppedFromFolderName: featureSuffixDroppedFromFolderName),
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["FeaturePrelude"],
 				exclude: exclude,
@@ -912,12 +963,21 @@ extension Package {
 			package.dependencies.append(contentsOf: remoteDependencies)
 		}
 
-		let targetName = module.name
+		let nameOfTarget = module.name
+		var nameOfTargetInPath = nameOfTarget
+		switch module.category {
+		case let .feature(featureSuffixDroppedFromFolderName):
+			let needle = "Feature"
+			if featureSuffixDroppedFromFolderName, nameOfTargetInPath.hasSuffix(needle) {
+				nameOfTargetInPath.removeLast(needle.count)
+			}
+		default: break
+		}
 		let targetPath = {
 			if let category = module.category {
-				return "Sources/\(category.pathComponent)/\(targetName)"
+				return "Sources/\(category.pathComponent)/\(nameOfTargetInPath)"
 			} else {
-				return "Sources/\(targetName)"
+				return "Sources/\(nameOfTargetInPath)"
 			}
 		}()
 		let dependencies = {
@@ -930,7 +990,7 @@ extension Package {
 
 		package.targets += [
 			.target(
-				name: targetName,
+				name: nameOfTarget,
 				dependencies: dependencies,
 				path: targetPath,
 				exclude: module.exclude,
@@ -949,7 +1009,7 @@ extension Package {
 		case .no:
 			break
 		case let .yes(nameSuffix, customAdditionalTestDependencies, resources):
-			let testTargetName = targetName + nameSuffix
+			let testTargetName = nameOfTarget + nameSuffix
 			let testTargetPath = {
 				if let category = module.category {
 					return "Tests/\(category.pathComponent)/\(testTargetName)"
@@ -958,7 +1018,7 @@ extension Package {
 				}
 			}()
 
-			let testTargetDependencies = [.target(name: targetName)] + customAdditionalTestDependencies + {
+			let testTargetDependencies = [.target(name: nameOfTarget)] + customAdditionalTestDependencies + {
 				switch module.category {
 				case .some(.feature):
 					return ["FeatureTestingPrelude"]
@@ -987,7 +1047,7 @@ extension Package {
 
 		if module.isProduct {
 			package.products += [
-				.library(name: targetName, targets: [targetName]),
+				.library(name: nameOfTarget, targets: [nameOfTarget]),
 			]
 		}
 	}

@@ -71,7 +71,7 @@ extension SecureStorageClient: DependencyKey {
 					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
 						key: profileSnapshotKeychainKey,
-						iCloudSyncEnabled: profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled,
+						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled,
 						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
@@ -108,6 +108,8 @@ extension SecureStorageClient: DependencyKey {
 					#if DEBUG
 					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
 					#endif
+					case .importOlympiaAccounts:
+						return L10n.Common.BiometricsPrompt.importOlympiaAccounts
 					}
 				}()
 				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."

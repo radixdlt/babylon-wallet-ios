@@ -1,5 +1,4 @@
 import AsyncExtensions
-import CryptoKit
 import Foundation
 import Prelude
 
@@ -87,7 +86,7 @@ actor DataChannelClient {
 
 	func sendMessage(_ data: Data) async throws {
 		let id = messageIDBuilder()
-		let assembledMessage = AssembledMessage(
+		let assembledMessage = try AssembledMessage(
 			message: data,
 			id: id
 		)

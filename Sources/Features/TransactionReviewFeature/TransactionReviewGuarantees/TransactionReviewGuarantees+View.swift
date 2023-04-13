@@ -1,7 +1,17 @@
 import FeaturePrelude
 
+extension TransactionReviewGuarantees.State {
+	var viewState: TransactionReviewGuarantees.ViewState {
+		.init(isValid: isValid)
+	}
+}
+
 // MARK: - TransactionReviewGuarantees.View
 extension TransactionReviewGuarantees {
+	public struct ViewState: Equatable {
+		let isValid: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<TransactionReviewGuarantees>
@@ -49,12 +59,14 @@ extension TransactionReviewGuarantees {
 					.padding(.medium1)
 					.background(.app.gray5)
 				}
-				.safeAreaInset(edge: .bottom, spacing: .zero) {
-					ConfirmationFooter(
-						title: L10n.TransactionReview.Guarantees.applyButtonText,
-						isEnabled: true,
-						action: { ViewStore(store).send(.view(.applyTapped)) }
-					)
+				.footer {
+					WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+						Button(L10n.TransactionReview.Guarantees.applyButtonText) {
+							viewStore.send(.applyTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.isValid ? .enabled : .disabled)
+					}
 				}
 				.sheet(store: store.scope(state: \.$info, action: { .child(.info($0)) })) {
 					SlideUpPanel.View(store: $0)
@@ -85,6 +97,7 @@ extension TransactionReviewGuarantee.State {
 extension TransactionReviewTokenView.ViewState {
 	init(transfer: TransactionReview.Transfer) {
 		self.init(name: transfer.metadata.name,
+		          isXRD: transfer.isXRD,
 		          thumbnail: transfer.metadata.thumbnail,
 		          amount: transfer.amount,
 		          guaranteedAmount: transfer.guarantee?.amount,

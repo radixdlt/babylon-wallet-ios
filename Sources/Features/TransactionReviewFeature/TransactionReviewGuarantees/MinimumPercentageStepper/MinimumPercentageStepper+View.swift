@@ -1,7 +1,6 @@
 import FeaturePrelude
 
-// MARK: - MinimumPercentageStepperView
-
+// MARK: - MinimumPercentageStepper.View
 extension MinimumPercentageStepper {
 	public struct View: SwiftUI.View {
 		public let store: StoreOf<MinimumPercentageStepper>
@@ -37,8 +36,6 @@ extension MinimumPercentageStepper {
 					Button(asset: AssetResource.plusCircle) {
 						viewStore.send(.increaseTapped)
 					}
-					.opacity(viewStore.disablePlus ? disabledOpacity : 1)
-					.disabled(viewStore.disablePlus)
 				}
 			}
 		}

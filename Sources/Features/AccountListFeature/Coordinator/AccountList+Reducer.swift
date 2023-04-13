@@ -16,17 +16,12 @@ public struct AccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
-	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case account(id: AccountList.Row.State.ID, action: AccountList.Row.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displayAccountDetails(AccountList.Row.State)
-		case fetchPortfolioForAccounts
 	}
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
@@ -38,15 +33,6 @@ public struct AccountList: Sendable, FeatureReducer {
 			.forEach(\.accounts, action: /Action.child .. ChildAction.account) {
 				AccountList.Row()
 			}
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
-			return .run { send in
-				await send(.delegate(.fetchPortfolioForAccounts))
-			}
-		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {

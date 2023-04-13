@@ -21,34 +21,36 @@ extension ManageFactorSources {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			NavigationStack {
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 
-				VStack(alignment: .leading) {
-					if let factorSources = viewStore.factorSources {
-						ScrollView(showsIndicators: false) {
-							VStack(alignment: .leading, spacing: .medium2) {
-								ForEach(factorSources) {
-									FactorSourceView(factorSource: $0)
+					VStack(alignment: .leading) {
+						if let factorSources = viewStore.factorSources {
+							ScrollView(showsIndicators: false) {
+								VStack(alignment: .leading, spacing: .medium2) {
+									ForEach(factorSources) {
+										FactorSourceView(factorSource: $0)
+									}
 								}
 							}
 						}
+						Button("Import Olympia factor source") {
+							viewStore.send(.importOlympiaFactorSourceButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
 					}
-					Button("Import Olympia factor source") {
-						viewStore.send(.importOlympiaFactorSourceButtonTapped)
+					.padding([.horizontal, .bottom], .medium1)
+					.task { @MainActor in
+						await ViewStore(store.stateless).send(.view(.task)).finish()
 					}
-					.buttonStyle(.primaryRectangular)
+					.navigationTitle("Factor Sources")
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /ManageFactorSources.Destinations.State.importOlympiaFactorSource,
+						action: ManageFactorSources.Destinations.Action.importOlympiaFactorSource,
+						content: { ImportOlympiaFactorSource.View(store: $0) }
+					)
 				}
-				.padding([.horizontal, .bottom], .medium1)
-				.task { @MainActor in
-					await ViewStore(store.stateless).send(.view(.task)).finish()
-				}
-				.navigationTitle("Factor Sources")
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageFactorSources.Destinations.State.importOlympiaFactorSource,
-					action: ManageFactorSources.Destinations.Action.importOlympiaFactorSource,
-					content: { ImportOlympiaFactorSource.View(store: $0) }
-				)
 			}
 		}
 	}
@@ -62,10 +64,10 @@ struct FactorSourceView: SwiftUI.View {
 extension FactorSourceView {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 0) {
-			InfoPair(heading: "Kind", item: factorSource.kind)
-			InfoPair(heading: "Hint", item: factorSource.hint)
-			InfoPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
-			InfoPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
+			VPair(heading: "Kind", item: factorSource.kind)
+			VPair(heading: "Hint", item: factorSource.hint)
+			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
+			VPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 		}
 		.border(Color.app.gray1, width: 2)
 	}

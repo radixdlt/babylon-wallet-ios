@@ -13,6 +13,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public var transactionWithLockFee: TransactionManifest?
 
+		public var networkID: NetworkID? = nil
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
@@ -121,11 +122,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .showRawTransactionTapped:
 			switch state.displayMode {
 			case .review:
-				guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
+				guard let transactionWithLockFee = state.transactionWithLockFee, let networkID = state.networkID else { return .none }
 				let guarantees = state.allGuarantees
 				return .run { send in
 					let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
-					await send(.internal(.rawTransactionCreated(manifest.description)))
+					let rawTransaction = try manifest.toString(preamble: "", networkID: networkID)
+					await send(.internal(.rawTransactionCreated(rawTransaction)))
+				} catch: { _, _ in
+					// TODO: Handle error?
 				}
 
 			case .raw:
@@ -203,14 +207,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(review)):
 			let reviewedManifest = review.analyzedManifestToReview
 			state.transactionWithLockFee = review.manifestIncludingLockFee
+			state.networkID = review.networkID
 			return .run { send in
 				// TODO: Determine what is the minimal information required
 				let userAccounts = try await extractUserAccounts(reviewedManifest)
 
 				let content = await TransactionReview.TransactionContent(
-					withdrawals: try? extractWithdrawals(reviewedManifest, userAccounts: userAccounts),
+					withdrawals: try? extractWithdrawals(reviewedManifest, userAccounts: userAccounts, networkID: review.networkID),
 					dAppsUsed: try? extractUsedDapps(reviewedManifest),
-					deposits: try? extractDeposits(reviewedManifest, userAccounts: userAccounts),
+					deposits: try? extractDeposits(reviewedManifest, userAccounts: userAccounts, networkID: review.networkID),
 					proofs: try? exctractProofs(reviewedManifest),
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
@@ -332,7 +337,8 @@ extension TransactionReview {
 
 	private func extractWithdrawals(
 		_ manifest: AnalyzeManifestWithPreviewContextResponse,
-		userAccounts: [Account]
+		userAccounts: [Account],
+		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
 		var withdrawals: [Account: [Transfer]] = [:]
 
@@ -343,6 +349,7 @@ extension TransactionReview {
 				userAccounts: userAccounts,
 				createdEntities: manifest.createdEntities,
 				container: &withdrawals,
+				networkID: networkID,
 				type: .exact
 			)
 		}
@@ -357,7 +364,8 @@ extension TransactionReview {
 
 	private func extractDeposits(
 		_ manifest: AnalyzeManifestWithPreviewContextResponse,
-		userAccounts: [Account]
+		userAccounts: [Account],
+		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
 		var deposits: [Account: [Transfer]] = [:]
 
@@ -370,6 +378,7 @@ extension TransactionReview {
 					userAccounts: userAccounts,
 					createdEntities: manifest.createdEntities,
 					container: &deposits,
+					networkID: networkID,
 					type: .exact
 				)
 			case let .estimate(index, componentAddress, resourceSpecifier):
@@ -379,6 +388,7 @@ extension TransactionReview {
 					userAccounts: userAccounts,
 					createdEntities: manifest.createdEntities,
 					container: &deposits,
+					networkID: networkID,
 					type: .estimated(instructionIndex: index)
 				)
 			}
@@ -405,6 +415,7 @@ extension TransactionReview {
 		userAccounts: [Account],
 		createdEntities: CreatedEntitities?,
 		container: inout [Account: [Transfer]],
+		networkID: NetworkID,
 		type: TransferType
 	) async throws {
 		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
@@ -433,9 +444,10 @@ extension TransactionReview {
 				type: addressKind.resourceType
 			)
 
-			let transfer = TransactionReview.Transfer(
+			let transfer = try TransactionReview.Transfer(
 				amount: amount,
 				resourceAddress: resourceAddress,
+				isXRD: engineToolkitClient.isXRD(resource: resourceAddress, on: networkID),
 				guarantee: guarantee,
 				metadata: resourceMetadata
 			)
@@ -510,6 +522,7 @@ extension TransactionReview {
 
 		public let amount: BigDecimal
 		public let resourceAddress: ResourceAddress
+		public let isXRD: Bool
 
 		public var guarantee: TransactionClient.Guarantee?
 		public var metadata: ResourceMetadata
@@ -517,11 +530,13 @@ extension TransactionReview {
 		public init(
 			amount: BigDecimal,
 			resourceAddress: ResourceAddress,
+			isXRD: Bool,
 			guarantee: TransactionClient.Guarantee? = nil,
 			metadata: ResourceMetadata
 		) {
 			self.amount = amount
 			self.resourceAddress = resourceAddress
+			self.isXRD = isXRD
 			self.guarantee = guarantee
 			self.metadata = metadata
 		}
@@ -618,6 +633,24 @@ extension EngineToolkitModels.AddressKind {
 		case .accountComponent:
 			return nil
 		case .normalComponent:
+			return nil
+		case .secp256k1VirtualAccountComponent:
+			return nil
+		case .ed25519VirtualAccountComponent:
+			return nil
+		case .secp256k1VirtualIdentityComponent:
+			return nil
+		case .ed25519VirtualIdentityComponent:
+			return nil
+		case .identityComponent:
+			return nil
+		case .epochManager:
+			return nil
+		case .validator:
+			return nil
+		case .clock:
+			return nil
+		case .accessControllerComponent:
 			return nil
 		}
 	}

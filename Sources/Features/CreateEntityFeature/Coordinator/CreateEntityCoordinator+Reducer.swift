@@ -15,9 +15,8 @@ public struct CreateEntityCoordinator<
 		public enum Step: Sendable, Hashable {
 			case step0_introduction(IntroductionToEntity<Entity>.State)
 			case step1_nameNewEntity(NameNewEntity<Entity>.State)
-			case step2_selectGenesisFactorSource(SelectGenesisFactorSource.State)
-			case step3_creationOfEntity(CreationOfEntity<Entity>.State)
-			case step4_completion(NewEntityCompletion<Entity>.State)
+			case step2_creationOfEntity(CreationOfEntity<Entity>.State)
+			case step3_completion(NewEntityCompletion<Entity>.State)
 		}
 
 		public var step: Step
@@ -45,8 +44,8 @@ public struct CreateEntityCoordinator<
 				config.canBeDismissed
 			else { return false }
 			switch step {
-			case .step0_introduction, .step1_nameNewEntity, .step2_selectGenesisFactorSource: return true
-			case .step3_creationOfEntity, .step4_completion: return false
+			case .step0_introduction, .step1_nameNewEntity: return true
+			case .step2_creationOfEntity, .step3_completion: return false
 			}
 		}
 	}
@@ -63,9 +62,8 @@ public struct CreateEntityCoordinator<
 		public typealias Entity = CreateEntityCoordinator.Entity
 		case step0_introduction(IntroductionToEntity<Entity>.Action)
 		case step1_nameNewEntity(NameNewEntity<Entity>.Action)
-		case step2_selectGenesisFactorSource(SelectGenesisFactorSource.Action)
-		case step3_creationOfEntity(CreationOfEntity<Entity>.Action)
-		case step4_completion(NewEntityCompletion<Entity>.Action)
+		case step2_creationOfEntity(CreationOfEntity<Entity>.Action)
+		case step3_completion(NewEntityCompletion<Entity>.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -93,13 +91,10 @@ public struct CreateEntityCoordinator<
 				.ifCaseLet(/State.Step.step1_nameNewEntity, action: /Action.child .. ChildAction.step1_nameNewEntity) {
 					NameNewEntity<Entity>()
 				}
-				.ifCaseLet(/State.Step.step2_selectGenesisFactorSource, action: /Action.child .. ChildAction.step2_selectGenesisFactorSource) {
-					SelectGenesisFactorSource()
-				}
-				.ifCaseLet(/State.Step.step3_creationOfEntity, action: /Action.child .. ChildAction.step3_creationOfEntity) {
+				.ifCaseLet(/State.Step.step2_creationOfEntity, action: /Action.child .. ChildAction.step2_creationOfEntity) {
 					CreationOfEntity<Entity>()
 				}
-				.ifCaseLet(/State.Step.step4_completion, action: /Action.child .. ChildAction.step4_completion) {
+				.ifCaseLet(/State.Step.step3_completion, action: /Action.child .. ChildAction.step3_completion) {
 					NewEntityCompletion<Entity>()
 				}
 		}
@@ -126,26 +121,14 @@ extension CreateEntityCoordinator {
 
 		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate):
 			precondition(!factorSources.isEmpty)
-			let hdOnDeviceFactorSources = factorSources.hdOnDeviceFactorSource()
+			let babylonDeviceFactorSources = factorSources.babylonDeviceFactorSources()
 
-			// We ALWAYS use "babylon" `device` factor source and `Curve25519` for Personas.
-			// However, when creating accounts if we have multiple `device` factors sources, or
-			// in general if we have an "olympia" `devive` factor source, we let user choose.
-			if Entity.entityKind == .account, hdOnDeviceFactorSources.count > 1 || factorSources.contains(where: \.supportsOlympia)
-			{
-				return goToStep1SelectGenesisFactorSource(
-					entityName: specifiedNameForNewEntityToCreate,
-					hdOnDeviceFactorSources: hdOnDeviceFactorSources,
-					state: &state
-				)
-			} else {
-				return goToStep2Creation(
-					curve: .curve25519, // The babylon execution path, safe to default to curve25519
-					entityName: specifiedNameForNewEntityToCreate,
-					hdOnDeviceFactorSource: hdOnDeviceFactorSources.first,
-					state: &state
-				)
-			}
+			return goToStep2Creation(
+				curve: .curve25519, // The babylon execution path, safe to default to curve25519
+				entityName: specifiedNameForNewEntityToCreate,
+				babylonDeviceFactorSource: babylonDeviceFactorSources.first,
+				state: &state
+			)
 		}
 	}
 
@@ -162,23 +145,15 @@ extension CreateEntityCoordinator {
 				}, beforeCreatingEntityWithName: name)))
 			}
 
-		case let .step2_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate, curve))):
-			return goToStep2Creation(
-				curve: curve,
-				entityName: specifiedNameForNewEntityToCreate,
-				hdOnDeviceFactorSource: factorSource,
-				state: &state
-			)
-
-		case let .step3_creationOfEntity(.delegate(.createdEntity(newEntity))):
+		case let .step2_creationOfEntity(.delegate(.createdEntity(newEntity))):
 			return goToStep3Completion(
 				entity: newEntity,
 				state: &state
 			)
 
-		case .step3_creationOfEntity(.delegate(.createEntityFailed)):
+		case .step2_creationOfEntity(.delegate(.createEntityFailed)):
 			switch state.step {
-			case let .step3_creationOfEntity(createState):
+			case let .step2_creationOfEntity(createState):
 				state.step = .step1_nameNewEntity(
 					.init(
 						isFirst: state.config.isFirstEntity,
@@ -193,7 +168,7 @@ extension CreateEntityCoordinator {
 
 			return .none
 
-		case .step4_completion(.delegate(.completed)):
+		case .step3_completion(.delegate(.completed)):
 			return .run { send in
 				await send(.delegate(.completed))
 				await dismiss()
@@ -204,31 +179,17 @@ extension CreateEntityCoordinator {
 		}
 	}
 
-	private func goToStep1SelectGenesisFactorSource(
-		entityName: NonEmpty<String>,
-		hdOnDeviceFactorSources: NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>,
-		state: inout State
-	) -> EffectTask<Action> {
-		state.step = .step2_selectGenesisFactorSource(
-			.init(
-				specifiedNameForNewEntityToCreate: entityName,
-				hdOnDeviceFactorSources: hdOnDeviceFactorSources
-			)
-		)
-		return .none
-	}
-
 	private func goToStep2Creation(
 		curve: Slip10Curve,
 		entityName: NonEmpty<String>,
-		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
+		babylonDeviceFactorSource: BabylonDeviceFactorSource,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = .step3_creationOfEntity(.init(
+		state.step = .step2_creationOfEntity(.init(
 			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
-			hdOnDeviceFactorSource: hdOnDeviceFactorSource
+			babylonFactorSource: babylonDeviceFactorSource
 		))
 		return .none
 	}
@@ -237,7 +198,7 @@ extension CreateEntityCoordinator {
 		entity: Entity,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.step = .step4_completion(.init(
+		state.step = .step3_completion(.init(
 			entity: entity,
 			config: state.config
 		))

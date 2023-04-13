@@ -95,7 +95,7 @@ extension DerivationPath {
 	public static func forEntity(
 		kind entityKind: EntityKind,
 		networkID: Radix.Network.ID,
-		index: Int,
+		index: Profile.Network.NextDerivationIndices.Index,
 		keyKind: KeyKind = .virtualEntity
 	) throws -> Self {
 		let path = try HD.Path.Full.defaultForEntity(
@@ -125,6 +125,10 @@ extension DerivationPath {
 
 	public func asCustomPath() throws -> CustomHierarchicalDeterministicDerivationPath {
 		try CustomHierarchicalDeterministicDerivationPath(derivationPath: path)
+	}
+
+	public func asLegacyOlympiaBIP44LikePath() throws -> LegacyOlympiaBIP44LikeDerivationPath {
+		try LegacyOlympiaBIP44LikeDerivationPath(derivationPath: path)
 	}
 }
 

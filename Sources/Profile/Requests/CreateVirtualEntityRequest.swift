@@ -6,17 +6,17 @@ import Prelude
 public struct CreateVirtualEntityRequest: Sendable, Hashable {
 	// if `nil` we will use current networkID
 	public let networkID: NetworkID?
-	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
+	public let babylonDeviceFactorSource: BabylonDeviceFactorSource
 	public let curve: Slip10Curve
 	public let displayName: NonEmptyString
 
 	public init(
 		curve: Slip10Curve,
 		networkID: NetworkID?,
-		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
+		babylonDeviceFactorSource: BabylonDeviceFactorSource,
 		displayName: NonEmpty<String>
 	) {
-		self.hdOnDeviceFactorSource = hdOnDeviceFactorSource
+		self.babylonDeviceFactorSource = babylonDeviceFactorSource
 		self.curve = curve
 		self.networkID = networkID
 		self.displayName = displayName

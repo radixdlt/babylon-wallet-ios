@@ -4,7 +4,7 @@ import Prelude
 // MARK: - Profile.Network.NextDerivationIndices
 extension Profile.Network {
 	public struct NextDerivationIndices: Sendable, Hashable, Codable, Identifiable {
-		public typealias Index = Int
+		public typealias Index = UInt32
 
 		public typealias ID = NetworkID
 		public let networkID: NetworkID
@@ -15,12 +15,12 @@ extension Profile.Network {
 
 		public init(
 			networkID: NetworkID,
-			forAccount: UInt,
-			forIdentity: UInt
+			forAccount: Index,
+			forIdentity: Index
 		) {
 			self.networkID = networkID
-			self.forAccount = Index(forAccount)
-			self.forIdentity = Index(forIdentity)
+			self.forAccount = forAccount
+			self.forIdentity = forIdentity
 		}
 	}
 }

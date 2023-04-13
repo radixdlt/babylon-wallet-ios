@@ -5,14 +5,30 @@ import RadixConnectModels
 // MARK: - NewConnectionTests
 @MainActor
 final class NewConnectionTests: TestCase {
+	let scanInstruction = "instruction"
 	func test__GIVEN__scanQR_screen__WHEN__secrets_are_scanned__THEN__we_start_connect_using_secrets() async throws {
 		let store = TestStore(
-			// GIVEN initial state
-			initialState: NewConnection.State.scanQR(.init()),
+			// GIVEN
+			// initial state
+			initialState: NewConnection.State.scanQR(.init(scanInstructions: scanInstruction, step: .scanQR(.init(scanInstructions: scanInstruction)))),
 			reducer: NewConnection()
 		)
 		let password = ConnectionPassword.placeholder
-		await store.send(.child(.scanQR(.delegate(.connectionSecretsFromScannedQR(password))))) {
+
+		let qrString = password.rawValue.data.hex()
+
+		// WHEN
+		// secrets are scanned
+		await store.send(.child(.scanQR(.child(.scanQR(.view(.scanned(.success(
+			qrString
+		))))))))
+
+		await store.receive(.child(.scanQR(.child(.scanQR(.delegate(.scanned(qrString)))))))
+		await store.receive(.child(.scanQR(.delegate(.scanned(qrString)))))
+
+		// THEN
+		// we start connect
+		await store.receive(.internal(.connectionPasswordFromStringResult(.success(password)))) {
 			$0 = .connectUsingSecrets(.init(connectionPassword: password))
 		}
 	}

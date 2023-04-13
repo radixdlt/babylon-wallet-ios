@@ -1,4 +1,5 @@
 import AccountsClient
+import CacheClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
@@ -19,8 +20,10 @@ extension TransactionClient {
 		@Dependency(\.accountsClient) var accountsClient
 		//@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+		@Dependency(\.cacheClient) var cacheClient
 
 		let pollStrategy: PollStrategy = .default
+		let accountsInvolvedInTransaction = ActorIsolated<Set<AccountAddress>>([])
 
 		@Sendable
 		func compileAndSign(
@@ -226,9 +229,11 @@ extension TransactionClient {
 				}
 			}
 			guard txStatus == .committedSuccess else {
+				await clearCacheForAccounts(accountsInvolvedInTransaction.value)
 				return .failure(.failedToPoll(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed)))
 			}
 
+			await clearCacheForAccounts(accountsInvolvedInTransaction.value)
 			return .success(txID)
 		}
 
@@ -284,6 +289,8 @@ extension TransactionClient {
 			let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
 				let accountAddressesSuitableToPayTransactionFeeRef =
 					try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
+
+				await accountsInvolvedInTransaction.setValue(accountAddressesSuitableToPayTransactionFeeRef)
 
 				if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
 					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
@@ -366,7 +373,8 @@ extension TransactionClient {
 						let review = TransactionToReview(
 							analyzedManifestToReview: analyzedManifestToReview,
 							manifestIncludingLockFee: manifestIncludingLockFee,
-							transactionFeeAdded: transactionFeeAdded
+							transactionFeeAdded: transactionFeeAdded,
+							networkID: networkID
 						)
 						return .success(review)
 					} catch {
@@ -577,6 +585,15 @@ extension TransactionClient {
 				indexInc += 1
 			}
 			return TransactionManifest(instructions: instructions, blobs: manifestWithLockFee.blobs)
+		}
+
+		@Sendable
+		func clearCacheForAccounts(_ accounts: Set<AccountAddress>) {
+			if !accounts.isEmpty {
+				accounts.forEach { cacheClient.removeFile(.accountPortfolio(.single($0.address))) }
+			} else {
+				cacheClient.removeFolder(.accountPortfolio(.all))
+			}
 		}
 
 		return Self(
