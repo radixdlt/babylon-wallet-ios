@@ -53,10 +53,6 @@ extension RadixConnectClient {
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
 			receiveMessages: { await rtcClients.incomingMessages() },
-//			receiveResponses: {
-//				await rtcClients.incoming(/P2P.RTCMessageFromPeer.response)
-//			},
-//			receiveRequests: { await rtcClients.incoming(/P2P.RTCMessageFromPeer.request) },
 			sendResponse: { response, route in
 				try await rtcClients.sendResponse(response, to: route)
 			},
