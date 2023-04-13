@@ -22,6 +22,7 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 			info: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo,
 			interactionID: P2P.LedgerHardwareWallet.InteractionId
 		)
+		case broadcasted(interactionID: P2P.LedgerHardwareWallet.InteractionId)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -46,39 +47,25 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 			return listenForResponses()
 
 		case .sendAddLedgerRequestButtonTapped:
-			//            return .fireAndForget {
-			//                for link in try await radixConnectClient.getP2PLinks() {
-			//                    let interactionID = P2P.LedgerHardwareWallet.InteractionId.random()
-			//                    let connectionId = link.id
-//
-			//                    let peerConnectionId: PeerConnectionID = link.
-			//                    let request: P2P.ToConnectorExtension.LedgerHardwareWallet = .init(
-			//                        interactionID: interactionID,
-			//                        request: .getDeviceInfo
-			//                    )
-//
-			//                    let message = P2P.RTCOutgoingMessage(
-			//                        connectionId: connectionId,
-			//                        content: P2P.RTCOutgoingMessage.PeerConnectionMessage(
-			//                            peerConnectionId: peerConnectionId,
-			//                            content: .connectorExtension(.ledgerHardwareWallet(request))
-			//                        )
-			//                    )
-//
-			//                    try await radixConnectClient.sendMessage(message)
-//
-			//                }
-//
-//			} catch: { error, _ in
-//				loggerGlobal.error("Failed to send message to Connector Extension, error: \(error)")
-//			}
-			return .none
+			return .run { send in
+				let interactionID = P2P.LedgerHardwareWallet.InteractionId.random()
+				try await radixConnectClient.sendRequest(.connectorExtension(.ledgerHardwareWallet(.init(
+					interactionID: interactionID,
+					request: .getDeviceInfo
+				))), .broadcastToAllPeers)
+
+				await send(.internal(.broadcasted(interactionID: interactionID)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to send message to Connector Extension, error: \(error)")
+			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .gotDeviceInfoResponse(info, interactionID):
+			return .none
+		case let .broadcasted(interactionID):
 			return .none
 		}
 	}
@@ -87,15 +74,28 @@ public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
 		.run { send in
 			await radixConnectClient.loadFromProfileAndConnectAll()
 
-			for try await incomingMessage in await radixConnectClient.receiveMessages() {
+			for try await incomingResponse in await radixConnectClient.receiveResponses(/P2P.RTCMessageFromPeer.Response.connectorExtension .. /P2P.ConnectorExtension.Response.ledgerHardwareWallet) {
 				guard !Task.isCancelled else {
 					return
 				}
-				guard let info = try? incomingMessage.result.get().getDeviceInfoResponse() else {
-					return
+
+				guard
+					// ignore receive/decode errors for now
+					let response = try? incomingResponse.result.get()
+				else { continue }
+
+				switch response.response {
+				case let .success(.getDeviceInfo(info)):
+					await send(.internal(
+						.gotDeviceInfoResponse(
+							info: info,
+							interactionID: response.interactionID
+						)
+					))
+				case let .failure(errorFromConnectorExtension):
+					throw errorFromConnectorExtension
+				default: break
 				}
-				let ledgerHardwareWalletMessage = try incomingMessage.result.get().responseLedgerHardwareWallet()
-				await send(.internal(.gotDeviceInfoResponse(info: info, interactionID: ledgerHardwareWalletMessage.interactionID)))
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)

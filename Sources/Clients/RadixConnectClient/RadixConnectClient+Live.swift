@@ -64,7 +64,7 @@ extension RadixConnectClient {
 }
 
 extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomingMessage {
-	func filter<Case>(
+	func compactMap<Case>(
 		_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
 		compactMap { incomingMessage -> P2P.RTCIncomingMessageContainer<Case>? in
@@ -84,15 +84,13 @@ extension RadixConnectClient {
 	public func receiveRequests<Case>(
 		_ casePath: CasePath<P2P.RTCMessageFromPeer.Request, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
-		await receiveMessages()
-			.filter(/P2P.RTCMessageFromPeer.request)
-			.compactMap { (incomingRequest: P2P.RTCIncomingMessageContainer<P2P.RTCMessageFromPeer.Request>) -> P2P.RTCIncomingMessageContainer<Case>? in
-				incomingRequest.flatMap {
-					casePath.extract(from: $0)
-				}
-			}
-			.share()
-			.eraseToAnyAsyncSequence()
+		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.request .. casePath)
+	}
+
+	public func receiveResponses<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer.Response, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.response .. casePath)
 	}
 }
 
