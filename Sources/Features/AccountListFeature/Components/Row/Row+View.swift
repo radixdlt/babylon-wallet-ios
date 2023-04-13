@@ -1,5 +1,4 @@
 import FeaturePrelude
-import FungibleTokenListFeature
 
 extension AccountList.Row.State {
 	var viewState: AccountList.Row.ViewState {

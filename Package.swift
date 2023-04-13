@@ -18,20 +18,15 @@ package.addModules([
 	.feature(
 		name: "AccountDetailsFeature",
 		dependencies: [
-			"AccountListFeature",
-			"AccountPreferencesFeature",
-			"AssetsViewFeature",
-			"AssetTransferFeature",
-                        "AccountPortfolioFetcherClient",
+			//"AccountPreferencesFeature",
+			//"AssetTransferFeature",
                         "AccountPortfoliosClient"
 		],
 		tests: .yes()
 	),
 	.feature(
 		name: "AccountListFeature",
-		dependencies: [
-			"FungibleTokenListFeature",
-		],
+		dependencies: [],
 		tests: .yes()
 	),
 	.feature(
@@ -42,25 +37,12 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AggregatedValueFeature",
-		dependencies: [],
-		tests: .yes()
-	),
-	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
 			"SplashFeature",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "AssetsViewFeature",
-		dependencies: [
-			"FungibleTokenListFeature",
-			"NonFungibleTokenListFeature",
 		],
 		tests: .yes()
 	),
@@ -117,19 +99,6 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "FungibleTokenDetailsFeature",
-		dependencies: [],
-		tests: .no
-	),
-	.feature(
-		name: "FungibleTokenListFeature",
-		dependencies: [
-			"FungibleTokenDetailsFeature",
-                        "AccountPortfoliosClient"
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "GatewaySettingsFeature",
 		dependencies: [
 			"CreateEntityFeature",
@@ -150,7 +119,6 @@ package.addModules([
 		dependencies: [
 			"AccountDetailsFeature",
 			"AccountListFeature",
-			"AccountPortfolioFetcherClient",
                         "AccountPortfoliosClient",
 			"AccountsClient",
 			"AppPreferencesClient",
@@ -158,8 +126,8 @@ package.addModules([
 		],
 		tests: .yes(
 			dependencies: [
-				"FungibleTokenListFeature",
-				"NonFungibleTokenListFeature",
+				//"FungibleTokenListFeature",
+				//"NonFungibleTokenListFeature",
 			]
 		)
 	),
@@ -197,11 +165,6 @@ package.addModules([
 			},
 			"RadixConnectClient",
 		],
-		tests: .yes()
-	),
-	.feature(
-		name: "NonFungibleTokenListFeature",
-		dependencies: [],
 		tests: .yes()
 	),
 	.feature(
@@ -279,14 +242,6 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"ProfileStore",
-		],
-		tests: .yes()
-	),
-	.client(
-		name: "AccountPortfolioFetcherClient",
-		dependencies: [
-			"EngineToolkitClient",
-			"GatewayAPI",
 		],
 		tests: .yes()
 	),
@@ -515,7 +470,6 @@ package.addModules([
 	.client(
 		name: "TransactionClient",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
 			"AccountsClient",
 			"EngineToolkitClient",
 			"FactorSourcesClient",

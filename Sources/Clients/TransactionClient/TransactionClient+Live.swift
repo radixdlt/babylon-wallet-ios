@@ -1,4 +1,3 @@
-import AccountPortfolioFetcherClient
 import AccountsClient
 import ClientPrelude
 import Cryptography
@@ -18,7 +17,7 @@ extension TransactionClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+		//@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let pollStrategy: PollStrategy = .default
@@ -552,10 +551,11 @@ extension TransactionClient {
 
 		@Sendable
 		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
-			let xrdContainers = await addresses.concurrentMap {
-				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
-			}.compactMap { $0 }
-			return xrdContainers.first(where: { $0.amount >= fee })?.owner
+                        return nil
+//			let xrdContainers = await addresses.concurrentMap {
+//				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
+//			}.compactMap { $0 }
+//			return xrdContainers.first(where: { $0.amount >= fee })?.owner
 		}
 
 		@Sendable

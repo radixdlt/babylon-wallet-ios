@@ -1,5 +1,6 @@
 import Foundation
 import ClientPrelude
+import SharedModels
 
 public actor AccountPortfoliosClient {
         public var fetchAccountPortfolios: FetchAccountPortfolios

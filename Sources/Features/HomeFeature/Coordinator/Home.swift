@@ -4,7 +4,6 @@ import AccountsClient
 import AppPreferencesClient
 import CreateEntityFeature
 import FeaturePrelude
-import FungibleTokenListFeature
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
@@ -147,7 +146,7 @@ public struct Home: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .accountList(.delegate(.displayAccountDetails(account))):
-			state.destination = .accountDetails(.init(for: account))
+                        state.destination = .accountDetails(.init(for: account.account))
 			return .none
 
 		case .header(.delegate(.displaySettings)):

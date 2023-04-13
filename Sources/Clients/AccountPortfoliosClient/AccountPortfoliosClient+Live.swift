@@ -1,9 +1,11 @@
 import ClientPrelude
 import GatewayAPI
+import SharedModels
 
 extension AccountPortfoliosClient: DependencyKey {
         public static let liveValue: AccountPortfoliosClient = {
                 let portfolios: AsyncCurrentValueSubject<Set<AccountPortfolio>> = .init([])
+                
                 return AccountPortfoliosClient(
                         fetchAccountPortfolios: { accountAddresses in
                                 let loadedPortfolios = try await fetchAccountPortfolios(accountAddresses)
@@ -101,7 +103,10 @@ extension AccountPortfoliosClient {
 
                 let portfolio = try AccountPortfolio.init(
                         owner: AccountAddress(address: accountDetails.address),
-                        fungibleResources: .init(loaded: fungibleTokens, totalCount: fungibleResources?.totalCount.map(Int.init), nextPageCursor: fungibleResources?.nextCursor),
+                        fungibleResources: AccountPortfolio.FungibleResources(
+                                xrdToken: fungibleTokens.first,
+                                tokens: .init(loaded: Array(fungibleTokens.dropFirst()))
+                        ),
                         nonFungibleResources: nonFungibleTokens
                 )
                 return portfolio

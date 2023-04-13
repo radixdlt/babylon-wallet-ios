@@ -1,6 +1,3 @@
-import AccountPreferencesFeature
-import AssetsViewFeature
-import AssetTransferFeature
 import FeaturePrelude
 
 extension AccountDetails.State {
@@ -101,39 +98,42 @@ extension AccountDetails {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /AccountDetails.Destinations.State.preferences,
-						action: AccountDetails.Destinations.Action.preferences,
-						content: { AccountPreferences.View(store: $0) }
-					)
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /AccountDetails.Destinations.State.transfer,
-						action: AccountDetails.Destinations.Action.transfer,
-						content: { AssetTransfer.View(store: $0) }
-					)
+                                        .task {
+                                                viewStore.send(.task)
+                                        }
+//					.sheet(
+//						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+//						state: /AccountDetails.Destinations.State.preferences,
+//						action: AccountDetails.Destinations.Action.preferences,
+//						content: { AccountPreferences.View(store: $0) }
+//					)
+//					.sheet(
+//						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+//						state: /AccountDetails.Destinations.State.transfer,
+//						action: AccountDetails.Destinations.Action.transfer,
+//						content: { AssetTransfer.View(store: $0) }
+//					)
 			}
 		}
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct AccountDetails_Preview: PreviewProvider {
-	static var previews: some View {
-		NavigationStack {
-			AccountDetails.View(
-				store: .init(
-					initialState: .init(for: .previewValue),
-					reducer: AccountDetails()
-				)
-			)
-			#if os(iOS)
-			.navigationBarTitleDisplayMode(.inline)
-			#endif
-		}
-	}
-}
-#endif
+//#if DEBUG
+//import SwiftUI // NB: necessary for previews to appear
+//
+//struct AccountDetails_Preview: PreviewProvider {
+//	static var previews: some View {
+//		NavigationStack {
+//			AccountDetails.View(
+//				store: .init(
+//					initialState: .init(for: .previewValue),
+//					reducer: AccountDetails()
+//				)
+//			)
+//			#if os(iOS)
+//			.navigationBarTitleDisplayMode(.inline)
+//			#endif
+//		}
+//	}
+//}
+//#endif

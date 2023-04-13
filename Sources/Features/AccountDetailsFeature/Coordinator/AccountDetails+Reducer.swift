@@ -1,27 +1,19 @@
-import AccountListFeature
-import AccountPreferencesFeature
-import AssetsViewFeature
-import AssetTransferFeature
 import FeaturePrelude
-import FungibleTokenListFeature
-import NonFungibleTokenListFeature
 import AccountPortfoliosClient
 import SharedModels
 
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let accountState: AccountList.Row.State
-                var account: Profile.Network.Account {
-                        accountState.account
-                }
+                var account: Profile.Network.Account
 		public var assets: AssetsView.State
 
-		@PresentationState
-		public var destination: Destinations.State?
+//		@PresentationState
+//		public var destination: Destinations.State?
 
-		public init(for accountState: AccountList.Row.State) {
-			self.accountState = accountState
-                        self.assets = AssetsView.State(fungibleTokenList: .init(sections: []), nonFungibleTokenList: .init(rows: []))
+                public init(for account: Profile.Network.Account) {
+			self.account = account
+                        let assets: OrderedSet<AssetsView.State.AssetList> = [.fungibleTokens(.init(xrdToken: nil, nonXrdTokens: [])), .nonFungibleTokens]
+                        self.assets = AssetsView.State(assets: .init(rawValue: assets)!)
 		}
 	}
 
@@ -37,7 +29,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		//case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -50,26 +42,26 @@ public struct AccountDetails: Sendable, FeatureReducer {
                 case portfolioUpdated(AccountPortfolio)
         }
 
-	public struct Destinations: Sendable, ReducerProtocol {
-		public enum State: Sendable, Hashable {
-			case preferences(AccountPreferences.State)
-			case transfer(AssetTransfer.State)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case preferences(AccountPreferences.Action)
-			case transfer(AssetTransfer.Action)
-		}
-
-		public var body: some ReducerProtocol<State, Action> {
-			Scope(state: /State.preferences, action: /Action.preferences) {
-				AccountPreferences()
-			}
-			Scope(state: /State.transfer, action: /Action.transfer) {
-				AssetTransfer()
-			}
-		}
-	}
+//	public struct Destinations: Sendable, ReducerProtocol {
+//		public enum State: Sendable, Hashable {
+//			//case preferences(AccountPreferences.State)
+//			case transfer(AssetTransfer.State)
+//		}
+//
+//		public enum Action: Sendable, Equatable {
+//			//case preferences(AccountPreferences.Action)
+//			case transfer(AssetTransfer.Action)
+//		}
+//
+//		public var body: some ReducerProtocol<State, Action> {
+////			Scope(state: /State.preferences, action: /Action.preferences) {
+////				AccountPreferences()
+////			}
+//			Scope(state: /State.transfer, action: /Action.transfer) {
+//				AssetTransfer()
+//			}
+//		}
+//	}
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
         @Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -82,9 +74,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
-			}
+//			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+//				Destinations()
+//			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -100,19 +92,19 @@ public struct AccountDetails: Sendable, FeatureReducer {
                         }
 		case .appeared:
                         return .run { [address = state.account.address] _ in
-                                try await accountPortfoliosClient.fetchAccountPortfolio(address)
+                                _ = try await accountPortfoliosClient.fetchAccountPortfolio(address)
                         }
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .preferencesButtonTapped:
-                        state.destination = .preferences(.init(address: state.accountState.account.address))
+                       // state.destination = .preferences(.init(address: state.accountState.account.address))
 			return .none
 		case .copyAddressButtonTapped:
 			return .fireAndForget { [state] in
-                                pasteboardClient.copyString(state.accountState.account.address.address)
+                                pasteboardClient.copyString(state.account.address.address)
 			}
 		case .pullToRefreshStarted:
-                        return .send(.delegate(.refresh(state.accountState.account.address)))
+                        return .send(.delegate(.refresh(state.account.address)))
 		case .transferButtonTapped:
 			// FIXME: fix post betanet v2
 //			state.destination = .transfer(AssetTransfer.State(from: state.account))
@@ -122,9 +114,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.preferences(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
+//		case .destination(.presented(.preferences(.delegate(.dismiss)))):
+//			state.destination = nil
+//			return .none
                 case .assets(.child(.fungibleTokenList(.delegate(.loadMoreTokens)))):
                         return .none
 		default:
@@ -135,9 +127,17 @@ public struct AccountDetails: Sendable, FeatureReducer {
         public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
                 switch internalAction {
                 case let .portfolioUpdated(portfolio):
-                        let xrd = portfolio.fungibleResources.loaded.first!
-                        let nonXrd = Array(portfolio.fungibleResources.loaded.suffix(from: 1))
-                        state.assets = .init(fungibleTokenList: .init(xrdToken: xrd, nonXrdTokens: nonXrd), nonFungibleTokenList: .init(rows: []))
+
+                        let nonXrdTokens = portfolio.fungibleRes
+//                        if portfolio.fungibleResources.loaded.isEmpty {
+//                                state.assets = .empty()
+//                                return .none
+//                        }
+//                        let xrd = portfolio.fungibleResources.loaded.first.map(FungibleTokenList.Row.State.init(xrdToken:))
+//                        let nonXrd = Array(portfolio.fungibleResources.loaded.suffix(from: 1)).map(FungibleTokenList.Row.State.init(nonXRDToken:))
+//                        state.assets = .init(assets: .init(rawValue: [
+//                                .fungibleTokens(.init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd)))
+//                        ])!)
                         return .none
                 }
 

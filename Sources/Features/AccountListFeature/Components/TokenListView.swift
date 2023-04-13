@@ -1,5 +1,4 @@
 import FeaturePrelude
-import FungibleTokenListFeature
 
 // MARK: - TokenListView
 //public struct TokenListView: View {
