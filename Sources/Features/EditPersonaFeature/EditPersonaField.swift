@@ -18,8 +18,7 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 			case dynamic(isRequiredByDapp: Bool)
 
 			var isStatic: Bool {
-				guard case .static = self else { return false }
-				return true
+				self == .static
 			}
 
 			var isDynamic: Bool {
