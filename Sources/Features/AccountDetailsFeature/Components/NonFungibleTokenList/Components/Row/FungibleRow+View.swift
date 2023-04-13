@@ -91,12 +91,11 @@ extension NonFungibleTokenList.Row.View {
 // MARK: - Private Computed Properties
 extension NonFungibleTokenList.Row.View {
 	fileprivate func headerView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
-//		Header(
-//			name: viewStore.container.name ?? "",
-//			iconAsset: headerIconAsset,
-//			isExpanded: viewStore.isExpanded
-//		)
-                Text(viewStore.token.resourceAddress.address)
+		Header(
+			name: viewStore.token.name ?? "",
+			iconAsset: headerIconAsset,
+			isExpanded: viewStore.isExpanded
+		)
 		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
 		.onTapGesture {
 			viewStore.send(.isExpandedToggled, animation: Animation.easeInOut)
@@ -106,12 +105,11 @@ extension NonFungibleTokenList.Row.View {
 	@ViewBuilder
 	fileprivate func componentView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
 		let asset = viewStore.token.ids[index]
-//		NFTIDView(
-//			token: asset,
-//			isLast: index == nftCount(with: viewStore) - 1,
-//			isExpanded: viewStore.isExpanded
-//		)
-                Text(asset)
+		NFTIDView(
+                        id: asset,
+			isLast: index == nftCount(with: viewStore) - 1,
+			isExpanded: viewStore.isExpanded
+		)
 		.scaleEffect(scale(with: viewStore, index: index))
 		.offset(y: offset(with: viewStore, index: index))
 		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
