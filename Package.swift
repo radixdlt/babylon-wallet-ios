@@ -507,6 +507,9 @@ package.addModules([
 		dependencies: [
 			"RadixConnect",
 			"P2PLinksClient",
+			.product(name: "CasePaths", package: "swift-case-paths") {
+				.package(url: "https://github.com/pointfreeco/swift-case-paths", from: "0.14.0")
+			},
 		],
 		tests: .yes()
 	),

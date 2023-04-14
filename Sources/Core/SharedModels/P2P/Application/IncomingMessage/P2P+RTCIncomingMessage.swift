@@ -63,7 +63,7 @@ extension P2P.RTCIncomingMessageContainer {
 		}
 	}
 
-	public func flatMap<NewSuccess>(
+	public func unpackMap<NewSuccess>(
 		_ transform: (Success) -> NewSuccess?
 	) -> P2P.RTCIncomingMessageContainer<NewSuccess>? {
 		switch result {

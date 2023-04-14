@@ -12,7 +12,7 @@ extension P2P {
 			case failure
 		}
 
-		public typealias InteractionId = Tagged<(Self, id: ()), String>
+		public typealias InteractionId = Tagged<Self, String>
 
 		public enum Discriminator: String, Sendable, Hashable, Codable {
 			case getDeviceInfo

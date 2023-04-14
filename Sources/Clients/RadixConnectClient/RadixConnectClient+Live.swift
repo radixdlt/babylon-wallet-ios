@@ -67,16 +67,9 @@ extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomin
 	func compactMap<Case>(
 		_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>
 	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
-		compactMap { incomingMessage -> P2P.RTCIncomingMessageContainer<Case>? in
-			guard let incomingRequestOrResponse = incomingMessage.flatMap({ (success: P2P.RTCMessageFromPeer) -> Case? in
-				casePath.extract(from: success)
-			}) else {
-				return nil
-			}
-			return incomingRequestOrResponse
-		}
-		.share()
-		.eraseToAnyAsyncSequence()
+		compactMap { $0.unpackMap(casePath.extract) }
+			.share()
+			.eraseToAnyAsyncSequence()
 	}
 }
 
