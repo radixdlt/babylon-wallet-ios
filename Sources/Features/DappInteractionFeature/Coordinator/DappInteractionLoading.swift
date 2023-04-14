@@ -5,13 +5,13 @@ import GatewayAPI
 // MARK: - DappInteractionLoading
 struct DappInteractionLoading: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let interaction: P2P.FromDapp.WalletInteraction
+		let interaction: P2P.Dapp.Request
 		var isLoading: Bool = false
 
 		@PresentationState
 		var errorAlert: AlertState<ViewAction.ErrorAlertAction>?
 
-		init(interaction: P2P.FromDapp.WalletInteraction) {
+		init(interaction: P2P.Dapp.Request) {
 			self.interaction = interaction
 		}
 	}

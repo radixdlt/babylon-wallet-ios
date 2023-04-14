@@ -14,7 +14,8 @@ extension RadixConnectClient: TestDependencyKey {
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
 		addP2PWithPassword: unimplemented("\(Self.self).addP2PWithPassword"),
 		receiveMessages: unimplemented("\(Self.self).receiveMessages"),
-		sendMessage: unimplemented("\(Self.self).sendMessage")
+		sendResponse: unimplemented("\(Self.self).sendResponse"),
+		sendRequest: unimplemented("\(Self.self).sendRequest")
 	)
 }
 
@@ -28,8 +29,9 @@ extension RadixConnectClient {
 		storeP2PLink: { _ in },
 		deleteP2PLinkByPassword: { _ in },
 		addP2PWithPassword: { _ in },
-		receiveMessages: { AsyncStream<P2P.RTCIncomingMessageResult>(unfolding: { nil }) },
-		sendMessage: { _ in }
+		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		sendResponse: { _, _ in },
+		sendRequest: { _, _ in }
 	)
 }
 #endif // DEBUG

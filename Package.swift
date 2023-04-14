@@ -45,6 +45,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
+			"RadixConnectClient",
 		],
 		tests: .no
 	),
@@ -506,6 +507,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnect",
 			"P2PLinksClient",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
 		],
 		tests: .yes()
 	),
@@ -610,14 +612,14 @@ package.addModules([
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
 			},
 			.product(name: "NavigationTransitions", package: "swiftui-navigation-transitions", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.1.0")
+				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", exact: "0.9.0")
 			},
 			.product(name: "NukeUI", package: "Nuke") {
 				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")
 			},
 			"Resources",
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
-				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
+				.package(url: "https://github.com/pointfreeco/swiftui-navigation", exact: "0.7.1")
 			},
 			.product(name: "TextBuilder", package: "TextBuilder") {
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
@@ -804,19 +806,19 @@ package.addModules([
 				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
 			},
 			.product(name: "CustomDump", package: "swift-custom-dump") {
-				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1")
+				.package(url: "https://github.com/pointfreeco/swift-custom-dump", exact: "0.9.1")
 			},
 			.product(name: "Dependencies", package: "swift-dependencies") {
-				.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.1.1")
+				.package(url: "https://github.com/pointfreeco/swift-dependencies", exact: "0.2.0")
 			},
 			.product(name: "DependenciesAdditions", package: "swift-dependencies-additions") {
-				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "0.2.0")
+				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", exact: "0.3.0")
 			},
 			.product(name: "Either", package: "swift-either") {
 				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
 			},
 			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
-				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0")
+				.package(url: "https://github.com/pointfreeco/swift-identified-collections", exact: "0.7.0")
 			},
 			.product(name: "KeychainAccess", package: "KeychainAccess") {
 				.package(url: "https://github.com/kishikawakatsumi/KeychainAccess", from: "4.2.2")
@@ -825,16 +827,16 @@ package.addModules([
 				.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6")
 			},
 			.product(name: "NonEmpty", package: "swift-nonempty") {
-				.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0")
+				.package(url: "https://github.com/pointfreeco/swift-nonempty", exact: "0.4.0")
 			},
 			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
 				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
 			},
 			.product(name: "Tagged", package: "swift-tagged") {
-				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
+				.package(url: "https://github.com/pointfreeco/swift-tagged", exact: "0.10.0")
 			},
 			.product(name: "Validated", package: "swift-validated") {
-				.package(url: "https://github.com/pointfreeco/swift-validated", from: "0.2.1")
+				.package(url: "https://github.com/pointfreeco/swift-validated", exact: "0.2.1")
 			},
 		],
 		tests: .yes(dependencies: [])

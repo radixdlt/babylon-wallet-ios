@@ -8,9 +8,7 @@ extension AddLedgerNanoFactorSource.State {
 
 // MARK: - AddLedgerNanoFactorSource.View
 extension AddLedgerNanoFactorSource {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -23,13 +21,15 @@ extension AddLedgerNanoFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Button("MOCK Ledger added") {
-						viewStore.send(.finishedButtonTapped)
+					Button("MOCK LEDGER ADDED") {
+						viewStore.send(.mockLedgerNanoAdded)
 					}
 					.buttonStyle(.primaryRectangular)
 				}
 				.padding(.horizontal, .medium3)
-				.onAppear { viewStore.send(.appeared) }
+				.task {
+					await ViewStore(store.stateless).send(.view(.task)).finish()
+				}
 			}
 		}
 	}

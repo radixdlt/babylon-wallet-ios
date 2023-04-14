@@ -17,7 +17,7 @@ final class ROLAClientTests: TestCase {
 	private func metadata(
 		origin: String,
 		dAppDefinitionAddress: DappDefinitionAddress
-	) -> P2P.FromDapp.WalletInteraction.Metadata {
+	) -> P2P.Dapp.Request.Metadata {
 		.init(
 			networkId: 0,
 			origin: .init(rawValue: origin),

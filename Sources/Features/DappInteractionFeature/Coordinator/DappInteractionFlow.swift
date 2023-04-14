@@ -19,9 +19,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case local(LocalInteractionResponseItem)
 		}
 
-		typealias RemoteInteraction = P2P.FromDapp.WalletInteraction
-		typealias RemoteInteractionItem = P2P.FromDapp.WalletInteraction.AnyInteractionItem
-		typealias RemoteInteractionResponseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
+		typealias RemoteInteraction = P2P.Dapp.Request
+		typealias RemoteInteractionItem = P2P.Dapp.Request.AnyInteractionItem
+		typealias RemoteInteractionResponseItem = P2P.Dapp.Response.WalletInteractionSuccessResponse.AnyInteractionResponseItem
 
 		enum LocalInteractionItem: Sendable, Hashable {
 			case accountPermissionRequested(DappInteraction.NumberOfAccounts)
@@ -40,7 +40,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
-		var usePersonaRequestItem: P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? {
+		var usePersonaRequestItem: P2P.Dapp.Request.AuthUsePersonaRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
 			guard
@@ -52,7 +52,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return item
 		}
 
-		var resetRequestItem: P2P.FromDapp.WalletInteraction.ResetRequestItem? {
+		var resetRequestItem: P2P.Dapp.Request.ResetRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.reset]
 			guard
@@ -63,7 +63,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return item.reset
 		}
 
-		var ongoingAccountsRequestItem: P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? {
+		var ongoingAccountsRequestItem: P2P.Dapp.Request.OngoingAccountsRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingAccounts]
 			guard
@@ -74,7 +74,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return item.ongoingAccounts
 		}
 
-		var ongoingPersonaDataRequestItem: P2P.FromDapp.WalletInteraction.OngoingPersonaDataRequestItem? {
+		var ongoingPersonaDataRequestItem: P2P.Dapp.Request.OngoingPersonaDataRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingPersonaData]
 			guard
@@ -120,7 +120,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case usePersona(
-			P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem,
+			P2P.Dapp.Request.AuthUsePersonaRequestItem,
 			Profile.Network.Persona,
 			Profile.Network.AuthorizedDapp,
 			Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple
@@ -152,9 +152,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dismissWithFailure(P2P.ToDapp.WalletInteractionFailureResponse)
+		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata)
-		case submit(P2P.ToDapp.WalletInteractionSuccessResponse, DappMetadata)
+		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -287,7 +287,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			}
 			if let personaDataPayload = payload.personaDataPayload {
-				let fields = personaDataPayload.fields.map { P2P.ToDapp.PersonaData(field: $0.id, value: $0.value) }
+				let fields = personaDataPayload.fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
 				state.responseItems[.remote(.ongoingPersonaData(.init(fields: personaDataPayload.fieldsRequested)))] = .remote(.ongoingPersonaData(.init(fields: fields)))
 			}
 			return continueEffect(for: &state)
@@ -392,7 +392,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ item: State.AnyInteractionItem,
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
-			let fields = fields.map { P2P.ToDapp.PersonaData(field: $0.id, value: $0.value) }
+			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
 			state.responseItems[item] = .remote(.ongoingPersonaData(.init(fields: fields)))
 			return continueEffect(for: &state)
 		}
@@ -401,7 +401,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ item: State.AnyInteractionItem,
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
-			let fields = fields.map { P2P.ToDapp.PersonaData(field: $0.id, value: $0.value) }
+			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
 			state.responseItems[item] = .remote(.oneTimePersonaData(.init(fields: fields)))
 			return continueEffect(for: &state)
 		}
@@ -559,9 +559,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let responseItem: State.AnyInteractionResponseItem = {
 			switch accessKind {
 			case .ongoing:
-				return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
+				return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
 			case .oneTime:
-				return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
+				return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
 			}
 		}()
 		state.responseItems[item] = responseItem
@@ -579,7 +579,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 			return .none
 		} else {
-			if let response = P2P.ToDapp.WalletInteractionSuccessResponse(
+			if let response = P2P.Dapp.Response.WalletInteractionSuccessResponse(
 				for: state.remoteInteraction,
 				with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
 			) {
@@ -593,7 +593,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							displayName: state.dappMetadata.name
 						)
 						// This extraction is really verbose right now, but it should become a lot simpler with native case paths
-						let sharedAccountsInfo: (P2P.FromDapp.WalletInteraction.NumberOfAccounts, [P2P.ToDapp.WalletAccount])? = unwrap(
+						let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
 							{
 								switch state.remoteInteraction.items {
 								case let .request(.authorized(items)):
@@ -679,7 +679,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	func dismissEffect(
 		for state: State,
-		errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType,
+		errorKind: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType,
 		message: String?
 	) -> EffectTask<Action> {
 		.send(.delegate(.dismissWithFailure(.init(

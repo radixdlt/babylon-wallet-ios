@@ -15,9 +15,13 @@ public actor RTCClients {
 
 	// MARK: - Streams
 
+	/// A **multicasted** async sequence for received messeage from ALL RTCClients.
+	public func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
+		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
+	}
+
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
-	public let incomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
-	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
+	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -33,7 +37,6 @@ public actor RTCClients {
 	{
 		self.peerConnectionFactory = peerConnectionFactory
 		self.signalingServerBaseURL = signalingServerBaseURL
-		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
 	}
 }
 
@@ -47,7 +50,10 @@ extension RTCClients {
 extension RTCClients {
 	// MARK: - Public API
 
-	public func connect(_ linkPassword: ConnectionPassword, waitsForConnectionToBeEstablished: Bool = false) async throws {
+	public func connect(
+		_ linkPassword: ConnectionPassword,
+		waitsForConnectionToBeEstablished: Bool = false
+	) async throws {
 		let client = try makeRTCClient(linkPassword)
 		if waitsForConnectionToBeEstablished {
 			try await client.waitForFirstConnection()
@@ -69,22 +75,62 @@ extension RTCClients {
 		}
 	}
 
-	/// Sends the given message using the specific RTCClient.
+	/// Sends a response back to `origin`.
 	/// If the target RTCClient did close, an error will be thrown
-	///
-	/// - Parameter message: The message to be sent
-	public func sendMessage(_ message: P2P.RTCOutgoingMessage) async throws {
-		guard let rtcClient = clients[message.connectionId] else {
+	/// - Parameters:
+	///   - response: response to send
+	///   - origin: the sender of the original request we are responding to.
+	public func sendResponse(
+		_ response: P2P.RTCOutgoingMessage.Response,
+		to origin: P2P.RTCRoute
+	) async throws {
+		guard let rtcClient = clients[origin.connectionId] else {
 			throw RTCClientDidCloseError()
 		}
 
-		try await rtcClient.sendMessage(message.peerMessage)
+		try await rtcClient.send(
+			response: response,
+			to: origin.peerConnectionId
+		)
+	}
+
+	/// Sends a `request` using `strategy` to find suitable recipients or recipient.
+	/// If no suitable recipient can be found, an error will be thrown.
+	/// - Parameters:
+	///   - request: request to send
+	///   - strategy: strategy used to find suitable recipients or recipient.
+	public func sendRequest(
+		_ request: P2P.RTCOutgoingMessage.Request,
+		strategy sendStrategy: P2P.RTCOutgoingMessage.Request.SendStrategy
+	) async throws {
+		switch sendStrategy {
+		case .broadcastToAllPeers:
+			try await broadcastRequest(request)
+		}
+	}
+
+	private func broadcastRequest(
+		_ request: P2P.RTCOutgoingMessage.Request
+	) async throws {
+		try await withThrowingTaskGroup(of: Void.self) { group in
+			for client in clients.values {
+				guard !Task.isCancelled else {
+					// We do not throw if cancelled, it is good we
+					// manage to broadcast to SOME client (i.e. not ALL is required.)
+					return
+				}
+				_ = group.addTaskUnlessCancelled {
+					try await client.broadcast(request: request)
+				}
+			}
+			try await group.waitForAll()
+		}
 	}
 
 	// MARK: - Private
 
 	func add(_ client: RTCClient) {
-		client.incomingMessages.susbscribe(incomingMessagesContinuation)
+		client.incomingMessages.subscribe(incomingMessagesSubject)
 		self.clients[client.id] = client
 	}
 
@@ -107,10 +153,9 @@ extension RTCClients {
 // MARK: - RTCClient
 actor RTCClient {
 	let id: ID
-	/// Incoming peer messages. This is the single channel for the received messages from all PeerConnections.
-	let incomingMessages: AsyncStream<P2P.RTCIncomingMessageResult>
 
-	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessageResult>.Continuation
+	let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
+	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
 	private let peerConnectionNegotiator: PeerConnectionNegotiator
 	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
 	private var connectionsTask: Task<Void, Error>?
@@ -126,6 +171,7 @@ actor RTCClient {
 		self.id = id
 		self.peerConnectionNegotiator = peerConnectionNegotiator
 		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+
 		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.streamWithContinuation()
 
 		Task {
@@ -172,11 +218,34 @@ extension RTCClient {
 		peerConnections.removeValue(forKey: id)
 	}
 
-	func sendMessage(_ message: P2P.RTCOutgoingMessage.PeerConnectionMessage) async throws {
-		guard let client = peerConnections[message.peerConnectionId] else {
+	func broadcast(
+		request: P2P.RTCOutgoingMessage.Request
+	) async throws {
+		let data = try JSONEncoder().encode(request)
+
+		try await withThrowingTaskGroup(of: Void.self) { group in
+			for client in peerConnections.values {
+				guard !Task.isCancelled else {
+					// We do not throw if cancelled, it is good we
+					// manage to broadcast to SOME client (i.e. not ALL is required.)
+					return
+				}
+				_ = group.addTaskUnlessCancelled {
+					try await client.sendData(data)
+				}
+			}
+			try await group.waitForAll()
+		}
+	}
+
+	func send(
+		response: P2P.RTCOutgoingMessage.Response,
+		to connectionIdOfOrigin: PeerConnectionID
+	) async throws {
+		guard let client = peerConnections[connectionIdOfOrigin] else {
 			throw PeerConnectionDidCloseError()
 		}
-		let data = try JSONEncoder().encode(message.content)
+		let data = try JSONEncoder().encode(response)
 		try await client.sendData(data)
 	}
 
@@ -204,16 +273,14 @@ extension RTCClient {
 	private func onPeerConnectionCreated(_ connection: PeerConnectionClient) async {
 		await connection
 			.receivedMessagesStream()
-			.map { messageResult in
-				let interaction = messageResult.flatMap { message in
-					.init { try JSONDecoder().decode(P2P.FromDapp.WalletInteraction.self, from: message.messageContent) }
-				}
-				return P2P.RTCIncomingMessage.PeerConnectionMessage(peerConnectionId: connection.id,
-				                                                    content: interaction)
-			}.map {
-				P2P.RTCIncomingMessageResult(connectionId: self.id, content: $0)
+			.map { (messageResult: Result<DataChannelClient.AssembledMessage, Error>) in
+				let route = P2P.RTCRoute(connectionId: self.id, peerConnectionId: connection.id)
+				return P2P.RTCIncomingMessage(
+					result: decode(messageResult),
+					route: route
+				)
 			}
-			.susbscribe(incomingMessagesContinuation)
+			.subscribe(self.incomingMessagesContinuation)
 
 		connection
 			.iceConnectionStates
@@ -221,8 +288,45 @@ extension RTCClient {
 				$0 == .disconnected
 			}
 			.map { _ in connection.id }
-			.susbscribe(disconnectedPeerConnectionContinuation)
+			.subscribe(disconnectedPeerConnectionContinuation)
 
 		self.peerConnections[connection.id] = connection
+	}
+}
+
+// FIXME: once we have merge together the separated message formats `Dapp` and `Ledger` in CAP21
+// this ugliness will become less ugly!
+func decode(
+	_ messageResult: Result<DataChannelClient.AssembledMessage, Error>
+) -> Result<P2P.RTCMessageFromPeer, Error> {
+	let jsonDecoder = JSONDecoder()
+
+	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
+
+		let jsonData = message.messageContent
+
+		do {
+			let request = try jsonDecoder.decode(
+				P2P.RTCMessageFromPeer.Request.self,
+				from: jsonData
+			)
+			return .success(.request(request))
+		} catch let decodeRequestError {
+			do {
+				let response = try jsonDecoder.decode(
+					P2P.RTCMessageFromPeer.Response.self,
+					from: jsonData
+				)
+				return .success(
+					.response(
+						response
+					)
+				)
+
+			} catch let decodeResponseError {
+				loggerGlobal.error("Failed to decode as RTC request & response, request decoding failure: \(decodeRequestError)\n\nresponse decoding failure: \(decodeResponseError)")
+				return .failure(decodeRequestError)
+			}
+		}
 	}
 }

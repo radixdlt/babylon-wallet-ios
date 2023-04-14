@@ -1,4 +1,5 @@
 import ClientPrelude
+import ComposableArchitecture // actually CasePaths... but CI if we do `import CasePaths` 🤷‍♂️
 import Network
 import P2PLinksClient
 import RadixConnect
@@ -51,12 +52,39 @@ extension RadixConnectClient {
 			addP2PWithPassword: { password in
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
-			receiveMessages: { await rtcClients.incomingMessages },
-			sendMessage: { outgoingMsg in
-				try await rtcClients.sendMessage(outgoingMsg)
+			receiveMessages: { await rtcClients.incomingMessages() },
+			sendResponse: { response, route in
+				try await rtcClients.sendResponse(response, to: route)
+			},
+			sendRequest: { request, strategy in
+				try await rtcClients.sendRequest(request, strategy: strategy)
 			}
 		)
 	}()
+}
+
+extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomingMessage {
+	func compactMap<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		compactMap { $0.unpackMap(casePath.extract) }
+			.share()
+			.eraseToAnyAsyncSequence()
+	}
+}
+
+extension RadixConnectClient {
+	public func receiveRequests<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer.Request, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.request .. casePath)
+	}
+
+	public func receiveResponses<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer.Response, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.response .. casePath)
+	}
 }
 
 // MARK: - LocalNetworkAuthorization

@@ -25,7 +25,7 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 		}
 	}
 
-	public var errorKindAndMessage: (errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, message: String?) {
+	public var errorKindAndMessage: (errorKind: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType, message: String?) {
 		switch self {
 		case .wrongAccountType:
 			return (errorKind: .wrongAccountType, message: errorDescription)

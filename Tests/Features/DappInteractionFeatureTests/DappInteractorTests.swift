@@ -111,10 +111,10 @@
 //			client: .previewValue
 //		)
 //
-//		let error = P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.wrongNetwork
+//		let error = P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.wrongNetwork
 //		let errorMsg = "Request received from dApp for network nebunet, but you are currently connected to mardunet."
 //
-//		let response = P2P.ToDapp.WalletInteractionFailureResponse(
+//		let response = P2P.Dapp.Response.WalletInteractionFailureResponse(
 //			interactionId: request.interaction.id,
 //			errorType: error,
 //			message: errorMsg
@@ -128,7 +128,7 @@
 //		) {
 //			$0.gatewaysClient.getCurrentGateway = { currentGateway }
 //			$0.errorQueue.schedule = {
-//				guard let error = $0 as? P2P.ToDapp.WalletInteractionFailureResponse.ErrorType else {
+//				guard let error = $0 as? P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType else {
 //					return XCTFail("wrong error type")
 //				}
 //				XCTAssertEqual(error, .wrongNetwork)

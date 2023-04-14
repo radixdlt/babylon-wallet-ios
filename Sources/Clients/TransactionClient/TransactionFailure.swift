@@ -26,7 +26,7 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 }
 
 extension TransactionFailure {
-	public var errorKindAndMessage: (errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, message: String?) {
+	public var errorKindAndMessage: (errorKind: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType, message: String?) {
 		switch self {
 		case let .failedToPrepareForTXSigning(error), let .failedToPrepareTXReview(.failedSigning(error)):
 			switch error {
