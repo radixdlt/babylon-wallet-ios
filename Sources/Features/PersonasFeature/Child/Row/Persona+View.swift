@@ -21,29 +21,25 @@ extension Persona {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Button {
-					viewStore.send(.editButtonTapped)
-				} label: {
-					HStack(alignment: .center) {
-						Circle()
-							.strokeBorder(Color.app.gray3, lineWidth: 1)
-							.background(Circle().fill(Color.app.gray4))
-							.frame(.small)
-							.padding(.trailing, .small1)
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				HStack(alignment: .center) {
+					Circle()
+						.strokeBorder(Color.app.gray3, lineWidth: 1)
+						.background(Circle().fill(Color.app.gray4))
+						.frame(.small)
+						.padding(.trailing, .small1)
 
-						VStack(alignment: .leading, spacing: 4) {
-							Text(viewStore.displayName)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-						}
-
-						Spacer()
+					VStack(alignment: .leading, spacing: 4) {
+						Text(viewStore.displayName)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
 					}
-					.padding(.medium2)
-					.background(Color.app.gray5)
-					.cornerRadius(.small1)
+
+					Spacer()
 				}
+				.padding(.medium2)
+				.background(Color.app.gray5)
+				.cornerRadius(.small1)
 			}
 		}
 	}
@@ -60,7 +56,7 @@ struct Persona_Preview: PreviewProvider {
 		Persona.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: Persona()
+				reducer: EmptyReducer()
 			)
 		)
 	}
