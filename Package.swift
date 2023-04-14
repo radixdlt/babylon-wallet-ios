@@ -507,9 +507,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnect",
 			"P2PLinksClient",
-			.product(name: "CasePaths", package: "swift-case-paths") {
-				.package(url: "https://github.com/pointfreeco/swift-case-paths", from: "0.14.0")
-			},
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // CasePaths only actually, but got nasty error in CI: "Multiple targets named '_CAsyncSupport' in: 'swift-composable-architecture', 'swift-dependencies'; consider using the `moduleAliases` parameter in manifest to provide unique names" when I added the CasePaths package
 		],
 		tests: .yes()
 	),
