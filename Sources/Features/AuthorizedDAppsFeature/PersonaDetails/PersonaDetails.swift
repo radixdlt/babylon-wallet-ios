@@ -1,8 +1,10 @@
 import AuthorizedDappsClient
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
+	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
@@ -20,6 +22,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var confirmForgetAlert: AlertState<ViewAction.ConfirmForgetAlert>? = nil
+
+		@PresentationState
+		public var editPersona: EditPersona.State? = nil
 
 		public init(
 			dAppName: String,
@@ -49,6 +54,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case editPersona(PresentationAction<EditPersona.Action>)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case editablePersonaFetched(Profile.Network.Persona)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
 	}
@@ -57,13 +70,31 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
+			.ifLet(\.$editPersona, action: /Action.child .. ChildAction.editPersona) {
+				EditPersona()
+			}
 			.ifLet(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert)
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .editablePersonaFetched(persona):
+			let fields = Set(state.persona.sharedFields?.ids ?? [])
+			state.editPersona = .init(mode: .dapp(requiredFieldIDs: fields), persona: persona)
+		}
+
+		return .none
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .editPersonaTapped:
-			return .none
+			return .run { [id = state.persona.id] send in
+				guard let personas = try? await personasClient.getPersonas(), let persona = personas[id: id] else {
+					return
+				}
+				await send(.internal(.editablePersonaFetched(persona)))
+			}
 
 		case .accountTapped:
 			return .none
