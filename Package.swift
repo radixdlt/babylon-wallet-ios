@@ -507,7 +507,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnect",
 			"P2PLinksClient",
-			"FeaturePrelude", // CasePaths
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
 		],
 		tests: .yes()
 	),
