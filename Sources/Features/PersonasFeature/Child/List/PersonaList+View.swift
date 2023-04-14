@@ -1,3 +1,4 @@
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - PersonaList.View
@@ -52,6 +53,9 @@ extension PersonaList {
 					.padding(.vertical, .large1)
 				}
 				.navigationTitle(L10n.PersonaList.title)
+				.sheet(store: store.scope(state: \.$editPersona) { .child(.editPersona($0)) }) {
+					EditPersona.View(store: $0)
+				}
 			}
 		}
 	}
