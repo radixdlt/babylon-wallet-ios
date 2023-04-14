@@ -1,4 +1,4 @@
-import AuthorizedDAppsFeatures
+import AuthorizedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature

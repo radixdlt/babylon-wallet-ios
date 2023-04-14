@@ -13,8 +13,7 @@ extension PersonaDetails {
 	}
 
 	public struct ViewState: Equatable {
-		let url: URL
-		let personaLabel: String
+		let personaName: String
 	}
 }
 
@@ -25,16 +24,8 @@ extension PersonaDetails.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
-					PersonaThumbnail(viewStore.url, size: .veryLarge)
-						.padding(.vertical, .large2)
-
-					InfoSection(store: store.actionless)
-
-					Button(L10n.PersonaDetails.editPersona) {
-						viewStore.send(.editPersonaTapped)
-					}
-					.buttonStyle(.secondaryRectangular)
-					.padding(.vertical, .large3)
+					let metadataStore = store.scope(state: \.metadata) { .child(.metadata($0)) }
+					PersonaMetadata.View(store: metadataStore)
 
 					AccountSection(store: store)
 						.background(.app.gray5)
@@ -47,7 +38,7 @@ extension PersonaDetails.View {
 					.padding(.bottom, .large2)
 				}
 			}
-			.navigationTitle(viewStore.personaLabel)
+			.navigationTitle(viewStore.personaName)
 			.alert(store: store.confirmForgetAlert)
 		}
 	}
@@ -57,80 +48,13 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(url: .init(string: "placeholder")!, personaLabel: persona.displayName.rawValue)
+		.init(personaName: persona.displayName.rawValue)
 	}
 }
 
 private extension PersonaDetails.Store {
 	var confirmForgetAlert: AlertPresentationStore<PersonaDetails.ViewAction.ConfirmForgetAlert> {
 		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
-	}
-}
-
-// MARK: - PersonaDetails.View.InfoSection
-extension PersonaDetails.View {
-	@MainActor
-	struct InfoSection: View {
-		struct ViewState: Equatable {
-			let dAppName: String
-			let personaName: String
-			let isSharingAnything: Bool
-			let firstName: String?
-			let lastName: String?
-			let emailAddress: String?
-			let phoneNumber: String?
-		}
-
-		let store: Store<PersonaDetails.State, Never>
-
-		var body: some View {
-			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
-				VStack(alignment: .leading, spacing: .medium1) {
-					VPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
-
-					Separator()
-
-					if viewStore.isSharingAnything {
-						Text(L10n.PersonaDetails.personaDataSharingDescription(viewStore.dAppName))
-							.textBlock
-					} else {
-						Text(L10n.PersonaDetails.notSharingAnything(viewStore.dAppName))
-							.textBlock
-					}
-
-					if let firstName = viewStore.firstName {
-						VPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)
-					}
-
-					if let lastName = viewStore.lastName {
-						VPair(heading: L10n.PersonaDetails.lastNameHeading, item: lastName)
-					}
-
-					if let emailAddress = viewStore.emailAddress {
-						VPair(heading: L10n.PersonaDetails.emailAddressHeading, item: emailAddress)
-					}
-
-					if let phoneNumber = viewStore.phoneNumber {
-						VPair(heading: L10n.PersonaDetails.phoneNumberHeading, item: phoneNumber)
-					}
-				}
-				.padding(.horizontal, .medium1)
-			}
-		}
-	}
-}
-
-private extension PersonaDetails.State {
-	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
-		.init(
-			dAppName: dAppName,
-			personaName: persona.displayName.rawValue,
-			isSharingAnything: persona.sharedFields?.isEmpty == false,
-			firstName: persona.sharedFields?[id: .givenName]?.value.rawValue,
-			lastName: persona.sharedFields?[id: .familyName]?.value.rawValue,
-			emailAddress: persona.sharedFields?[id: .emailAddress]?.value.rawValue,
-			phoneNumber: persona.sharedFields?[id: .phoneNumber]?.value.rawValue
-		)
 	}
 }
 
@@ -181,5 +105,132 @@ extension PersonaDetails.View {
 private extension PersonaDetails.State {
 	var accountSectionViewState: PersonaDetails.View.AccountSection.ViewState {
 		.init(dAppName: dAppName, sharingAccounts: persona.simpleAccounts ?? [])
+	}
+}
+
+// MARK: PersonaMetadata
+
+private extension PersonaMetadata.State {
+	var viewState: PersonaMetadata.ViewState {
+		.init(thumbnail: thumbnail, name: name)
+	}
+}
+
+extension PersonaMetadata {
+	@MainActor
+	public struct View: SwiftUI.View {
+		let store: Store
+
+		public init(store: Store) {
+			self.store = store
+		}
+	}
+
+	public struct ViewState: Equatable {
+		let thumbnail: URL?
+		let name: String
+	}
+}
+
+// MARK: - Body
+
+extension PersonaMetadata.View {
+	public var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			VStack(spacing: 0) {
+				if let thumbnail = viewStore.thumbnail {
+					PersonaThumbnail(thumbnail, size: .veryLarge)
+						.padding(.vertical, .large2)
+				} else {
+					PersonaPlaceholder(size: .veryLarge)
+						.padding(.vertical, .large2)
+				}
+
+				InfoSection(store: store.actionless)
+
+				Button(L10n.PersonaDetails.editPersona) {
+					viewStore.send(.editPersonaTapped)
+				}
+				.buttonStyle(.secondaryRectangular)
+				.padding(.vertical, .large3)
+			}
+		}
+	}
+}
+
+private extension PersonaMetadata.State {
+	var infoSectionViewState: PersonaMetadata.View.InfoSection.ViewState {
+		.init(
+			dAppInfo: dAppInfo,
+			personaName: name,
+			firstName: fields[id: .givenName]?.value.rawValue,
+			lastName: fields[id: .familyName]?.value.rawValue,
+			emailAddress: fields[id: .emailAddress]?.value.rawValue,
+			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
+		)
+	}
+
+	var dAppInfo: PersonaMetadata.View.InfoSection.ViewState.DappInfo? {
+		guard case let .dApp(name, _) = mode else { return nil }
+		return .init(name: name, isSharingNothing: fields.isEmpty)
+	}
+}
+
+// MARK: - PersonaMetadata.View.InfoSection
+extension PersonaMetadata.View {
+	@MainActor
+	struct InfoSection: View {
+		struct ViewState: Equatable {
+			let dAppInfo: DappInfo?
+			let personaName: String
+			let firstName: String?
+			let lastName: String?
+			let emailAddress: String?
+			let phoneNumber: String?
+
+			struct DappInfo: Equatable {
+				let name: String
+				let isSharingNothing: Bool
+			}
+		}
+
+		let store: Store<PersonaMetadata.State, Never>
+
+		var body: some View {
+			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
+				VStack(alignment: .leading, spacing: .medium1) {
+					VPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
+
+					Separator()
+
+					if let dAppInfo = viewStore.dAppInfo {
+						if dAppInfo.isSharingNothing {
+							Text(L10n.PersonaDetails.notSharingAnything(dAppInfo.name))
+								.textBlock
+						} else {
+							Text(L10n.PersonaDetails.personaDataSharingDescription(dAppInfo.name))
+								.textBlock
+						}
+					}
+
+					if let firstName = viewStore.firstName {
+						VPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)
+					}
+
+					if let lastName = viewStore.lastName {
+						VPair(heading: L10n.PersonaDetails.lastNameHeading, item: lastName)
+					}
+
+					if let emailAddress = viewStore.emailAddress {
+						VPair(heading: L10n.PersonaDetails.emailAddressHeading, item: emailAddress)
+					}
+
+					if let phoneNumber = viewStore.phoneNumber {
+						VPair(heading: L10n.PersonaDetails.phoneNumberHeading, item: phoneNumber)
+					}
+				}
+				.padding(.horizontal, .medium1)
+			}
+		}
 	}
 }
