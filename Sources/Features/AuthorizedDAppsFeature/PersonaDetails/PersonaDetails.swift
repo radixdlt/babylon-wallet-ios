@@ -131,9 +131,9 @@ public struct PersonaMetadata: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public let id: Profile.Network.Persona.ID
-		public let thumbnail: URL?
-		public let name: String
-		public let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		public var thumbnail: URL?
+		public var name: String
+		public var fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		public let mode: Mode
 
 		public enum Mode: Sendable, Hashable {
@@ -181,6 +181,10 @@ public struct PersonaMetadata: Sendable, FeatureReducer {
 		case editPersona(PresentationAction<EditPersona.Action>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case personaChanged(Profile.Network.Persona)
+	}
+
 	// MARK: - Reducer
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -200,6 +204,18 @@ public struct PersonaMetadata: Sendable, FeatureReducer {
 				}
 				await send(.internal(.editablePersonaFetched(persona)))
 			}
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .editPersona(.presented(.delegate(.personaSaved(persona)))):
+			state.fields = persona.fields
+			state.name = persona.displayName.rawValue
+
+			return .send(.delegate(.personaChanged(persona)))
+		case .editPersona:
+			return .none
 		}
 	}
 

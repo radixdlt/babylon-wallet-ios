@@ -103,6 +103,9 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.personaDetails = .init(persona: persona)
 			return .none
 
+		case .personaDetails(.presented(.delegate(.personaChanged))):
+			return loadPersonas()
+
 		case .createPersonaCoordinator(.presented(.delegate(.dismissed))):
 			state.createPersonaCoordinator = nil
 			return .none
