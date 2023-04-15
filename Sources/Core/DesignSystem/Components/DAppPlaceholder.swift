@@ -74,13 +74,9 @@ public struct PersonaPlaceholder: View {
 	}
 
 	public var body: some View {
-		ZStack {
-			Rectangle()
-				.fill(.blue)
-				.clipShape(Circle())
-			Circle()
-				.stroke(.app.gray3, lineWidth: 1)
-		}
-		.frame(size)
+		Circle()
+			.strokeBorder(Color.app.gray3, lineWidth: 1)
+			.background(Circle().fill(Color.app.gray4))
+			.frame(size)
 	}
 }

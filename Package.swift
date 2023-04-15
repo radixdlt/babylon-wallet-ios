@@ -224,6 +224,7 @@ package.addModules([
 	.feature(
 		name: "PersonasFeature",
 		dependencies: [
+			"AuthorizedDAppsFeature",
 			"CreateEntityFeature",
 			"PersonasClient",
 		],

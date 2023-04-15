@@ -36,12 +36,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			self.networkID = networkID
 			self.persona = persona
 
-			let fields = persona.sharedFields ?? []
-			self.metadata = .init(id: persona.id,
-			                      thumbnail: nil,
-			                      name: persona.displayName.rawValue,
-			                      fields: fields,
-			                      mode: .dApp(name: dAppName, requiredFields: Set(fields.ids)))
+			self.metadata = .init(persona: persona,
+			                      dAppName: dAppName,
+			                      requiredFields: [.givenName])
 		}
 	}
 
@@ -148,17 +145,25 @@ public struct PersonaMetadata: Sendable, FeatureReducer {
 		public var editPersona: EditPersona.State? = nil
 
 		public init(
-			id: Profile.Network.Persona.ID,
-			thumbnail: URL?,
-			name: String,
-			fields: IdentifiedArrayOf<Profile.Network.Persona.Field>,
-			mode: Mode
+			persona: Profile.Network.Persona
 		) {
-			self.id = id
-			self.thumbnail = thumbnail
-			self.name = name
-			self.fields = fields
-			self.mode = mode
+			self.id = persona.id
+			self.thumbnail = nil
+			self.name = persona.displayName.rawValue
+			self.fields = persona.fields
+			self.mode = .general
+		}
+
+		public init(
+			persona: Profile.Network.AuthorizedPersonaDetailed,
+			dAppName: String,
+			requiredFields: Set<Profile.Network.Persona.Field.ID>
+		) {
+			self.id = persona.id
+			self.thumbnail = nil
+			self.name = persona.displayName.rawValue
+			self.fields = persona.sharedFields ?? []
+			self.mode = .dApp(name: dAppName, requiredFields: requiredFields)
 		}
 	}
 

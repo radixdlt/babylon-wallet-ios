@@ -1,17 +1,7 @@
 import FeaturePrelude
 
-extension Persona.State {
-	var viewState: Persona.ViewState {
-		.init(displayName: persona.displayName.rawValue)
-	}
-}
-
 // MARK: - Persona.View
 extension Persona {
-	public struct ViewState: Equatable {
-		public let displayName: String
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Persona>
@@ -21,25 +11,30 @@ extension Persona {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState) { viewStore in
-				HStack(alignment: .center) {
-					Circle()
-						.strokeBorder(Color.app.gray3, lineWidth: 1)
-						.background(Circle().fill(Color.app.gray4))
-						.frame(.small)
-						.padding(.trailing, .small1)
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				Button {
+					viewStore.send(.tapped)
+				} label: {
+					HStack(alignment: .center, spacing: 0) {
+						if let thumbnail = viewStore.thumbnail {
+							PersonaThumbnail(thumbnail, size: .small)
+						} else {
+							PersonaPlaceholder(size: .small)
+						}
 
-					VStack(alignment: .leading, spacing: 4) {
-						Text(viewStore.displayName)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+						VStack(alignment: .leading, spacing: 4) {
+							Text(viewStore.displayName)
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
+						}
+						.padding(.leading, .medium3)
+
+						Spacer(minLength: 0)
 					}
-
-					Spacer()
+					.padding(.medium2)
+					.background(Color.app.gray5)
+					.cornerRadius(.small1)
 				}
-				.padding(.medium2)
-				.background(Color.app.gray5)
-				.cornerRadius(.small1)
 			}
 		}
 	}
@@ -56,7 +51,7 @@ struct Persona_Preview: PreviewProvider {
 		Persona.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: EmptyReducer()
+				reducer: Persona()
 			)
 		)
 	}

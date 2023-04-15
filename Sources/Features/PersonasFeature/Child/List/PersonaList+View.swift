@@ -12,11 +12,7 @@ extension PersonaList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: { $0 },
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack {
 					ScrollView {
 						Text(L10n.PersonaList.subtitle)
@@ -43,14 +39,16 @@ extension PersonaList {
 						.padding(.horizontal, .small1)
 					}
 
-					Button(L10n.PersonaList.createNewPersonaButtonTitle) {
-						viewStore.send(.createNewPersonaButtonTapped)
+					if viewStore.showCreateButton {
+						Button(L10n.PersonaList.createNewPersonaButtonTitle) {
+							viewStore.send(.createNewPersonaButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(
+							shouldExpand: true
+						))
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .large1)
 					}
-					.buttonStyle(.secondaryRectangular(
-						shouldExpand: true
-					))
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .large1)
 				}
 				.navigationTitle(L10n.PersonaList.title)
 			}
@@ -74,6 +72,6 @@ struct Personas_Preview: PreviewProvider {
 }
 
 extension PersonaList.State {
-	public static let previewValue: Self = .init()
+	public static let previewValue: Self = .init(showCreateButton: true)
 }
 #endif
