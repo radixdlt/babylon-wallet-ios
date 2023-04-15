@@ -70,8 +70,8 @@ extension ImportOlympiaWalletCoordinator {
 						then: { ImportOlympiaFactorSource.View(store: $0) }
 					)
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.addLedgerNanoFactorSource,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.addLedgerNanoFactorSource,
+						state: /ImportOlympiaWalletCoordinator.Destinations.State.importOlympiaLedgerAccountsAndFactorSource,
+						action: ImportOlympiaWalletCoordinator.Destinations.Action.importOlympiaLedgerAccountsAndFactorSource,
 						then: { ImportOlympiaLedgerAccountsAndFactorSource.View(store: $0) }
 					)
 					CaseLet(

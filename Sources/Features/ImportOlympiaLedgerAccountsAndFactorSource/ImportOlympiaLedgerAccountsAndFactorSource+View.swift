@@ -21,36 +21,37 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Button("MOCK LEDGER ADDED") {
-						viewStore.send(.mockLedgerNanoAdded)
+					Button("Send Add Ledger Request") {
+						viewStore.send(.sendAddLedgerRequestButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 				}
 				.padding(.horizontal, .medium3)
-				.task {
-					await ViewStore(store.stateless).send(.view(.task)).finish()
-				}
+				.onAppear { viewStore.send(.appeared) }
+//				.task {
+//					await ViewStore(store.stateless).send(.view(.task)).finish()
+//				}
 			}
 		}
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - AddLedgerNanoFactorSource_Preview
-struct AddLedgerNanoFactorSource_Preview: PreviewProvider {
-	static var previews: some View {
-		ImportOlympiaLedgerAccountsAndFactorSource.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: ImportOlympiaLedgerAccountsAndFactorSource()
-			)
-		)
-	}
-}
-
-extension ImportOlympiaLedgerAccountsAndFactorSource.State {
-	public static let previewValue = Self()
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - ImportOlympiaLedgerAccountsAndFactorSource_Preview
+// struct ImportOlympiaLedgerAccountsAndFactorSource_Preview: PreviewProvider {
+//	static var previews: some View {
+//		ImportOlympiaLedgerAccountsAndFactorSource.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: ImportOlympiaLedgerAccountsAndFactorSource()
+//			)
+//		)
+//	}
+// }
+//
+// extension ImportOlympiaLedgerAccountsAndFactorSource.State {
+//    public static let previewValue = Self(hardwareAccounts: <#NonEmpty<OrderedSet<OlympiaAccountToMigrate>>#>)
+// }
+// #endif

@@ -26,7 +26,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
-			case addLedgerNanoFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.State)
+			case importOlympiaLedgerAccountsAndFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.State)
 			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
@@ -35,7 +35,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
 			case selectAccountsToImport(SelectAccountsToImport.Action)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
-			case addLedgerNanoFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.Action)
+			case importOlympiaLedgerAccountsAndFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.Action)
 			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
@@ -50,7 +50,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.importOlympiaMnemonic, action: /Action.importOlympiaMnemonic) {
 				ImportOlympiaFactorSource()
 			}
-			Scope(state: /State.addLedgerNanoFactorSource, action: /Action.addLedgerNanoFactorSource) {
+			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSource, action: /Action.importOlympiaLedgerAccountsAndFactorSource) {
 				ImportOlympiaLedgerAccountsAndFactorSource()
 			}
 			Scope(state: /State.validateOlympiaHardwareAccounts, action: /Action.validateOlympiaHardwareAccounts) {
@@ -148,8 +148,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				if state.path.last != destination {
 					state.path.append(destination)
 				}
-			} else if accounts.hardware != nil {
-				let destination = Destinations.State.addLedgerNanoFactorSource(.init())
+			} else if let hardwareAccounts = accounts.hardware {
+				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSource(.init(
+					hardwareAccounts: hardwareAccounts
+				))
 				if state.path.last != destination {
 					state.path.append(destination)
 				}
@@ -176,7 +178,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
 
-		case let .path(.element(_, action: .addLedgerNanoFactorSource(.delegate(.completed(ledgerFactorSourceID))))):
+		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSource(.delegate(.completed(ledgerFactorSourceID))))):
 			guard let hardwareAccounts = state.selectedAccounts?.hardware else {
 				assertionFailure("Bad implementation, expected 'state.selectedAccounts.hardware' to have been set.")
 				return .none
@@ -226,10 +228,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		case let .migratedOlympiaSoftwareAccounts(migratedSoftwareAccounts):
 
-			if state.selectedAccounts?.hardware != nil {
+			if let hardwareAccounts = state.selectedAccounts?.hardware {
 				state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
 				// also need to add ledger and then migrate hardware account
-				let destination = Destinations.State.addLedgerNanoFactorSource(.init())
+				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSource(.init(
+					hardwareAccounts: hardwareAccounts
+				))
 				if state.path.last != destination {
 					state.path.append(destination)
 				}

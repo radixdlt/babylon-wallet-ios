@@ -35,6 +35,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKey(DerivePublicKey)
 		case signTransaction(SignTransaction)
+		case importOlympiaDevice(ImportOlympiaDevice)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
 			public let id: FactorSource.LedgerHardwareWallet.DeviceID
