@@ -41,7 +41,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AddLedgerNanoFactorSourceFeature",
+		name: "ImportOlympiaLedgerAccountsAndFactorSourceFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
@@ -242,7 +242,7 @@ package.addModules([
 		name: "SettingsFeature",
 		dependencies: [
 			"AccountsClient",
-			"AddLedgerNanoFactorSourceFeature",
+			"ImportOlympiaLedgerAccountsAndFactorSourceFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"CacheClient",

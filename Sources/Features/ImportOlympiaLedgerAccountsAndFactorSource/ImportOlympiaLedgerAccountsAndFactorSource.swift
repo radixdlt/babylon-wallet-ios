@@ -2,8 +2,8 @@ import FactorSourcesClient
 import FeaturePrelude
 import RadixConnectClient
 
-// MARK: - AddLedgerNanoFactorSource
-public struct AddLedgerNanoFactorSource: Sendable, FeatureReducer {
+// MARK: - ImportOlympiaLedgerAccountsAndFactorSource
+public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var outgoingInteractionIDs: Set<P2P.LedgerHardwareWallet.InteractionId>?
 

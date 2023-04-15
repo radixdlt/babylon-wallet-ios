@@ -1,20 +1,20 @@
 import FeaturePrelude
 
-extension AddLedgerNanoFactorSource.State {
-	var viewState: AddLedgerNanoFactorSource.ViewState {
+extension ImportOlympiaLedgerAccountsAndFactorSource.State {
+	var viewState: ImportOlympiaLedgerAccountsAndFactorSource.ViewState {
 		.init()
 	}
 }
 
-// MARK: - AddLedgerNanoFactorSource.View
-extension AddLedgerNanoFactorSource {
+// MARK: - ImportOlympiaLedgerAccountsAndFactorSource.View
+extension ImportOlympiaLedgerAccountsAndFactorSource {
 	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<AddLedgerNanoFactorSource>
+		private let store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSource>
 
-		public init(store: StoreOf<AddLedgerNanoFactorSource>) {
+		public init(store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSource>) {
 			self.store = store
 		}
 
@@ -41,16 +41,16 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - AddLedgerNanoFactorSource_Preview
 struct AddLedgerNanoFactorSource_Preview: PreviewProvider {
 	static var previews: some View {
-		AddLedgerNanoFactorSource.View(
+		ImportOlympiaLedgerAccountsAndFactorSource.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AddLedgerNanoFactorSource()
+				reducer: ImportOlympiaLedgerAccountsAndFactorSource()
 			)
 		)
 	}
 }
 
-extension AddLedgerNanoFactorSource.State {
+extension ImportOlympiaLedgerAccountsAndFactorSource.State {
 	public static let previewValue = Self()
 }
 #endif

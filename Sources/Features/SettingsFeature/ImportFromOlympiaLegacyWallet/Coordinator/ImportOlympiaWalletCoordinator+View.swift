@@ -1,5 +1,5 @@
-import AddLedgerNanoFactorSourceFeature
 import FeaturePrelude
+import ImportOlympiaLedgerAccountsAndFactorSourceFeature
 
 extension ImportOlympiaWalletCoordinator.State {
 	var viewState: ImportOlympiaWalletCoordinator.ViewState {
@@ -72,7 +72,7 @@ extension ImportOlympiaWalletCoordinator {
 					CaseLet(
 						state: /ImportOlympiaWalletCoordinator.Destinations.State.addLedgerNanoFactorSource,
 						action: ImportOlympiaWalletCoordinator.Destinations.Action.addLedgerNanoFactorSource,
-						then: { AddLedgerNanoFactorSource.View(store: $0) }
+						then: { ImportOlympiaLedgerAccountsAndFactorSource.View(store: $0) }
 					)
 					CaseLet(
 						state: /ImportOlympiaWalletCoordinator.Destinations.State.validateOlympiaHardwareAccounts,

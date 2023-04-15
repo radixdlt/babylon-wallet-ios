@@ -1,8 +1,8 @@
-import AddLedgerNanoFactorSourceFeature
 import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
+import ImportOlympiaLedgerAccountsAndFactorSourceFeature
 import Profile
 
 // MARK: - ImportOlympiaWalletCoordinator
@@ -26,7 +26,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
-			case addLedgerNanoFactorSource(AddLedgerNanoFactorSource.State)
+			case addLedgerNanoFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.State)
 			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
@@ -35,7 +35,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
 			case selectAccountsToImport(SelectAccountsToImport.Action)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
-			case addLedgerNanoFactorSource(AddLedgerNanoFactorSource.Action)
+			case addLedgerNanoFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.Action)
 			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
@@ -51,7 +51,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				ImportOlympiaFactorSource()
 			}
 			Scope(state: /State.addLedgerNanoFactorSource, action: /Action.addLedgerNanoFactorSource) {
-				AddLedgerNanoFactorSource()
+				ImportOlympiaLedgerAccountsAndFactorSource()
 			}
 			Scope(state: /State.validateOlympiaHardwareAccounts, action: /Action.validateOlympiaHardwareAccounts) {
 				ValidateOlympiaHardwareAccounts()

@@ -33,10 +33,22 @@ extension P2P.ConnectorExtension.Request {
 			case getDeviceInfo
 			case derivePublicKey(DerivePublicKey)
 			case signTransaction(SignTransaction)
+			case importOlympiaDevice(ImportOlympiaDevice)
+
+			public struct ImportOlympiaDevice: Sendable, Hashable, Encodable {
+				public let derivationPaths: [String]
+				public init(derivationPaths: [String]) {
+					self.derivationPaths = derivationPaths
+				}
+			}
 
 			public struct DerivePublicKey: Sendable, Hashable, Encodable {
 				public let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				public init(keyParameters: P2P.LedgerHardwareWallet.KeyParameters, ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice) {
+					self.keyParameters = keyParameters
+					self.ledgerDevice = ledgerDevice
+				}
 			}
 
 			public struct SignTransaction: Sendable, Hashable, Encodable {
@@ -47,6 +59,13 @@ extension P2P.ConnectorExtension.Request {
 				public enum Mode: String, Sendable, Hashable, Encodable {
 					case verbose
 					case summary
+				}
+
+				public init(keyParameters: P2P.LedgerHardwareWallet.KeyParameters, ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice, compiledTransactionIntent: HexCodable, mode: Mode) {
+					self.keyParameters = keyParameters
+					self.ledgerDevice = ledgerDevice
+					self.compiledTransactionIntent = compiledTransactionIntent
+					self.mode = mode
 				}
 			}
 		}
@@ -61,18 +80,24 @@ extension P2P.ConnectorExtension.Request {
 					P2P.LedgerHardwareWallet.Discriminator.getDeviceInfo,
 					forKey: .discriminator
 				)
-			case let .derivePublicKey(derivePublicKey):
+			case let .importOlympiaDevice(request):
+				try container.encode(
+					P2P.LedgerHardwareWallet.Discriminator.importOlympiaDevice,
+					forKey: .discriminator
+				)
+				try request.encode(to: encoder)
+			case let .derivePublicKey(request):
 				try container.encode(
 					P2P.LedgerHardwareWallet.Discriminator.derivePublicKey,
 					forKey: .discriminator
 				)
-				try derivePublicKey.encode(to: encoder)
-			case let .signTransaction(signTransaction):
+				try request.encode(to: encoder)
+			case let .signTransaction(request):
 				try container.encode(
 					P2P.LedgerHardwareWallet.Discriminator.signTransaction,
 					forKey: .discriminator
 				)
-				try signTransaction.encode(to: encoder)
+				try request.encode(to: encoder)
 			}
 		}
 	}
