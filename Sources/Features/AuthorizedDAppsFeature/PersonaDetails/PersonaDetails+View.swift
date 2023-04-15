@@ -1,3 +1,4 @@
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - View
@@ -154,6 +155,9 @@ extension PersonaMetadata.View {
 				.buttonStyle(.secondaryRectangular)
 				.padding(.vertical, .large3)
 			}
+		}
+		.sheet(store: store.scope(state: \.$editPersona, action: { .child(.editPersona($0)) })) {
+			EditPersona.View(store: $0)
 		}
 	}
 }

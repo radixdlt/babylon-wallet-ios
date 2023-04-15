@@ -1,3 +1,4 @@
+import AuthorizedDAppsFeature
 import CreateEntityFeature
 import FeaturePrelude
 
@@ -25,6 +26,13 @@ extension PersonasCoordinator {
 					action: { .child(.createPersonaCoordinator($0)) }
 				),
 				content: { CreatePersonaCoordinator.View(store: $0) }
+			)
+			.sheet(
+				store: store.scope(
+					state: \.$personaDetails,
+					action: { .child(.personaDetails($0)) }
+				),
+				content: { PersonaMetadata.View(store: $0) }
 			)
 		}
 	}

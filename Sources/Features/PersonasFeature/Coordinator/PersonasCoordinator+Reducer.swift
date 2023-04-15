@@ -1,3 +1,4 @@
+import AuthorizedDAppsFeature
 import CreateEntityFeature
 import FeaturePrelude
 import PersonasClient
@@ -10,10 +11,13 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		@PresentationState
 		public var createPersonaCoordinator: CreatePersonaCoordinator.State?
 
+		@PresentationState
+		public var personaDetails: PersonaMetadata.State? = nil
+
 		public var isFirstPersonaOnAnyNetwork: Bool? = nil
 
 		public init(
-			personaList: PersonaList.State = .init(),
+			personaList: PersonaList.State = .init(showCreateButton: true),
 			createPersonaCoordinator: CreatePersonaCoordinator.State? = nil,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
@@ -36,6 +40,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case personaList(PersonaList.Action)
 
 		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
+		case personaDetails(PresentationAction<PersonaMetadata.Action>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -47,11 +52,13 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {
 			PersonaList()
 		}
-		.ifLet(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
-			CreatePersonaCoordinator()
-		}
-
-		Reduce(self.core)
+		Reduce(core)
+			.ifLet(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
+				CreatePersonaCoordinator()
+			}
+			.ifLet(\.$personaDetails, action: /Action.child .. ChildAction.personaDetails) {
+				PersonaMetadata()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -90,6 +97,10 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 					isFirstOnAnyNetwork
 				}
 			)
+			return .none
+
+		case let .personaList(.delegate(.openDetails(persona))):
+			state.personaDetails = .init(persona: persona)
 			return .none
 
 		case .createPersonaCoordinator(.presented(.delegate(.dismissed))):
