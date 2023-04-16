@@ -587,9 +587,7 @@ public struct EntityView<Entity: EntityProtocol>: IndentedView {
 extension EntityView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			if let displayName = entity.displayName {
-				Labeled("DisplayName", value: displayName.rawValue)
-			}
+			Labeled("DisplayName", value: entity.displayName.rawValue)
 
 			Labeled("Address", value: entity.address.address)
 			switch entity.securityState {
