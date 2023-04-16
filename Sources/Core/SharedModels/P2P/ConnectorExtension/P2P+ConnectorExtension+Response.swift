@@ -10,6 +10,10 @@ extension P2P.ConnectorExtension {
 		/// from an interaction with a Ledger hardware wallet by LedgerHQ,
 		/// e.g. Ledger Nano S
 		case ledgerHardwareWallet(LedgerHardwareWallet)
+
+		public init(from decoder: Decoder) throws {
+			self = try .ledgerHardwareWallet(.init(from: decoder))
+		}
 	}
 }
 
