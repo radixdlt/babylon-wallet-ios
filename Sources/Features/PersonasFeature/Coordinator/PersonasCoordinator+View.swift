@@ -1,6 +1,6 @@
-import AuthorizedDAppsFeature
 import CreateEntityFeature
 import FeaturePrelude
+import PersonaDetailsFeature
 
 // MARK: - PersonasCoordinator.View
 extension PersonasCoordinator {

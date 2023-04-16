@@ -1,7 +1,10 @@
 import FeaturePrelude
+import PersonasClient
 
 // MARK: - PersonaList
 public struct PersonaList: Sendable, FeatureReducer {
+	@Dependency(\.personasClient) var personasClient
+
 	public struct State: Sendable, Hashable {
 		public var showCreateButton: Bool
 		public var personas: IdentifiedArrayOf<Persona.State>
@@ -46,8 +49,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .persona(id: _, action: .delegate(.openDetails(let persona))):
-			return .send(.delegate(.openDetails(persona)))
+		case .persona(id: let id, action: .delegate(.openDetails)):
+			return .task {
+				let persona = try await personasClient.getPersona(id: id)
+				return .delegate(.openDetails(persona))
+			}
 
 		case .persona:
 			return .none

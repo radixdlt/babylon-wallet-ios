@@ -1,4 +1,6 @@
 import FeaturePrelude
+import PersonaDetailsFeature
+import PersonasFeature
 
 // MARK: - View
 
@@ -61,7 +63,10 @@ extension DappDetails.View {
 
 					NFTList(store: store)
 
-					PersonaList(store: store)
+					LocalPersonaList(store: store).border(.red)
+
+					let personasStore = store.scope(state: \.personas) { .child(.personas($0)) }
+					PersonaList.View(store: personasStore)
 
 					Button(L10n.DAppDetails.forgetDapp) {
 						viewStore.send(.forgetThisDappTapped)
@@ -257,7 +262,7 @@ extension DappDetails.View {
 	}
 
 	@MainActor
-	struct PersonaList: View {
+	struct LocalPersonaList: View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
