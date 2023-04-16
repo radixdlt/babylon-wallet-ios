@@ -304,7 +304,9 @@ func decode(
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
 
 		let jsonData = message.messageContent
-
+		#if DEBUG
+		loggerGlobal.critical("Decoding RadixConnect message, json:\n\n\(String(describing: jsonData.prettyPrintedJSONString))\n\n")
+		#endif // DEBUG
 		do {
 			let request = try jsonDecoder.decode(
 				P2P.RTCMessageFromPeer.Request.self,
