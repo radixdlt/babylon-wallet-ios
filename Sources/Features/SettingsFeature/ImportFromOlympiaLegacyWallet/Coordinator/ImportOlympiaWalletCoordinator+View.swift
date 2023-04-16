@@ -75,11 +75,6 @@ extension ImportOlympiaWalletCoordinator {
 						then: { ImportOlympiaLedgerAccountsAndFactorSource.View(store: $0) }
 					)
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.validateOlympiaHardwareAccounts,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.validateOlympiaHardwareAccounts,
-						then: { ValidateOlympiaHardwareAccounts.View(store: $0) }
-					)
-					CaseLet(
 						state: /ImportOlympiaWalletCoordinator.Destinations.State.completion,
 						action: ImportOlympiaWalletCoordinator.Destinations.Action.completion,
 						then: { CompletionMigrateOlympiaAccountsToBabylon.View(store: $0) }

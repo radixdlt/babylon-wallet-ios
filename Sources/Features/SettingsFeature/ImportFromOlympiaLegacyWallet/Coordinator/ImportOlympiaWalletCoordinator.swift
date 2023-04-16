@@ -27,7 +27,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
 			case importOlympiaLedgerAccountsAndFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.State)
-			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
@@ -36,7 +35,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case selectAccountsToImport(SelectAccountsToImport.Action)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
 			case importOlympiaLedgerAccountsAndFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.Action)
-			case validateOlympiaHardwareAccounts(ValidateOlympiaHardwareAccounts.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
 
@@ -52,9 +50,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSource, action: /Action.importOlympiaLedgerAccountsAndFactorSource) {
 				ImportOlympiaLedgerAccountsAndFactorSource()
-			}
-			Scope(state: /State.validateOlympiaHardwareAccounts, action: /Action.validateOlympiaHardwareAccounts) {
-				ValidateOlympiaHardwareAccounts()
 			}
 			Scope(state: /State.completion, action: /Action.completion) {
 				CompletionMigrateOlympiaAccountsToBabylon()
@@ -82,7 +77,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			privateHDFactorSource: PrivateHDFactorSource
 		)
 		case migratedOlympiaSoftwareAccounts(MigratedSoftwareAccounts)
-		case migratedOlympiaHardwareAccounts(MigratedHardwareAccounts)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -164,8 +158,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				assertionFailure("Bad implementation, expected 'state.selectedAccounts.software' to have been set.")
 				return .none
 			}
-			return convertToBabylon(
-				softwareAccounts: softwareAccounts,
+			return convertSoftwareAccountsToBabylon(
+				softwareAccounts,
 				factorSourceID: factorSourceID,
 				factorSource: nil
 			)
@@ -178,26 +172,17 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
 
-		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSource(.delegate(.completed(ledgerFactorSourceID))))):
-			guard let hardwareAccounts = state.selectedAccounts?.hardware else {
-				assertionFailure("Bad implementation, expected 'state.selectedAccounts.hardware' to have been set.")
-				return .none
+		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSource(.delegate(.completed(migratedBabylonAccounts, unvalidatedOlympiaAccounts))))):
+
+			state.migratedAccounts.append(contentsOf: migratedBabylonAccounts)
+			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
+				fatalError("bad!")
 			}
-			let destination = Destinations.State.validateOlympiaHardwareAccounts(.init(
-				hardwareAccounts: hardwareAccounts,
-				ledgerNanoFactorSourceID: ledgerFactorSourceID
-			))
+			let destination = Destinations.State.completion(.init(migratedAccounts: migratedAccounts, unvalidatedOlympiaHardwareAccounts: unvalidatedOlympiaAccounts))
 			if state.path.last != destination {
 				state.path.append(destination)
 			}
 			return .none
-
-		case let .path(.element(_, action: .validateOlympiaHardwareAccounts(.delegate(.finishedVerifyingAccounts(validatedHardwareAccounts, ledgerNanoFactorSourceID))))):
-
-			return convertToBabylon(
-				hardwareAccounts: validatedHardwareAccounts,
-				ledgerNanoFactorSourceID: ledgerNanoFactorSourceID
-			)
 
 		case .path(.element(_, action: .completion(.delegate(.finishedMigration)))):
 			return .send(.delegate(.finishedMigration))
@@ -240,20 +225,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			} else {
 				assert(state.selectedAccounts?.hardware == nil)
 				// no hardware accounts to migrate...
-				let destination = Destinations.State.completion(.init(migratedAccounts: migratedSoftwareAccounts.babylonAccounts))
+				let destination = Destinations.State.completion(.init(migratedAccounts: migratedSoftwareAccounts.babylonAccounts, unvalidatedOlympiaHardwareAccounts: nil))
 				if state.path.last != destination {
 					state.path.append(destination)
 				}
-			}
-			return .none
-		case let .migratedOlympiaHardwareAccounts(migratedHardwareAccounts):
-			state.migratedAccounts.append(contentsOf: migratedHardwareAccounts.babylonAccounts.rawValue)
-			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
-				fatalError("bad!")
-			}
-			let destination = Destinations.State.completion(.init(migratedAccounts: migratedAccounts))
-			if state.path.last != destination {
-				state.path.append(destination)
 			}
 			return .none
 		}
@@ -286,26 +261,8 @@ extension ImportOlympiaWalletCoordinator {
 		}
 	}
 
-	private func convertToBabylon(
-		hardwareAccounts olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-		ledgerNanoFactorSourceID: FactorSourceID
-	) -> EffectTask<Action> {
-		.run { send in
-			// Migrates and saved all accounts to Profile
-			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
-				.init(
-					olympiaAccounts: Set(olympiaAccounts.elements),
-					ledgerFactorSourceID: ledgerNanoFactorSourceID
-				)
-			)
-			await send(.internal(.migratedOlympiaHardwareAccounts(migrated)))
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-		}
-	}
-
-	private func convertToBabylon(
-		softwareAccounts olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+	private func convertSoftwareAccountsToBabylon(
+		_ olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 		factorSourceID: FactorSourceID,
 		factorSource: PrivateHDFactorSource?
 	) -> EffectTask<Action> {

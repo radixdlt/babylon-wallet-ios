@@ -28,11 +28,18 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 				}
 				.padding(.horizontal, .medium3)
 				.onAppear { viewStore.send(.appeared) }
+				.alert(store: store.nameLedgerAlert)
 //				.task {
 //					await ViewStore(store.stateless).send(.view(.task)).finish()
 //				}
 			}
 		}
+	}
+}
+
+private extension ImportOlympiaLedgerAccountsAndFactorSource.Store {
+	var nameLedgerAlert: AlertPresentationStore<ImportOlympiaLedgerAccountsAndFactorSource.ViewAction.ConfirmDisconnectAlert> {
+		scope(state: \.$confirmDisconnectAlert) { .view(.confirmDisconnectAlert($0)) }
 	}
 }
 

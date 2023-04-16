@@ -41,15 +41,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ImportOlympiaLedgerAccountsAndFactorSourceFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"FactorSourcesClient",
-			"RadixConnectClient",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "AggregatedValueFeature",
 		dependencies: [],
 		tests: .yes()
@@ -171,6 +162,16 @@ package.addModules([
 				"NonFungibleTokenListFeature",
 			]
 		)
+	),
+	.feature(
+		name: "ImportOlympiaLedgerAccountsAndFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"RadixConnectClient",
+			"ImportLegacyWalletClient",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "InspectProfileFeature",
