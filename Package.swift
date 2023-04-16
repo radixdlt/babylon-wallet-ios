@@ -77,6 +77,7 @@ package.addModules([
 			"AuthorizedDappsClient",
 			"CacheClient",
 			"EditPersonaFeature",
+			"PersonasFeature",
 			"GatewayAPI",
 		],
 		tests: .no
@@ -116,6 +117,14 @@ package.addModules([
 		dependencies: [
 			"PersonasClient",
 			"Profile",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "PersonaDetailsFeature",
+		dependencies: [
+			"AuthorizedDappsClient",
+			"EditPersonaFeature",
 		],
 		tests: .no
 	),
@@ -224,7 +233,7 @@ package.addModules([
 	.feature(
 		name: "PersonasFeature",
 		dependencies: [
-			"AuthorizedDAppsFeature",
+			"PersonaDetailsFeature",
 			"CreateEntityFeature",
 			"PersonasClient",
 		],

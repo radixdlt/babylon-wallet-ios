@@ -2,6 +2,8 @@ import AuthorizedDappsClient
 import CacheClient
 import FeaturePrelude
 import GatewayAPI
+import PersonaDetailsFeature
+import PersonasFeature
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
@@ -30,12 +32,16 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@PresentationState
 		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
 
+		public var personas: PersonaList.State
+
 		// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 		public var isDismissed: Bool = false
 
 		public init(dApp: Profile.Network.AuthorizedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
+			let personas = dApp.detailedAuthorizedPersonas.map(Persona.State.init)
+			self.personas = .init(showCreateButton: false, personas: .init(uniqueElements: personas))
 		}
 	}
 
@@ -70,6 +76,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case presentedPersona(PresentationAction<PersonaDetails.Action>)
+		case personas(PersonaList.Action)
 	}
 
 	// MARK: Reducer
@@ -77,6 +84,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.personas, action: /Action.child .. ChildAction.personas) {
+			PersonaList()
+		}
 		Reduce(core)
 			.ifLet(\.$presentedPersona, action: /Action.child .. ChildAction.presentedPersona) {
 				PersonaDetails()
@@ -154,8 +164,18 @@ public struct DappDetails: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+		case .presentedPersona:
+			return .none
 
-		default:
+		case let .personas(.delegate(.openDetails(persona))):
+			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
+			state.presentedPersona = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue,
+			                                              dAppID: state.dApp.dAppDefinitionAddress,
+			                                              networkID: state.dApp.networkID,
+			                                              persona: detailedPersona)
+			return .none
+
+		case .personas:
 			return .none
 		}
 	}

@@ -1,6 +1,6 @@
-import AuthorizedDAppsFeature
 import CreateEntityFeature
 import FeaturePrelude
+import PersonaDetailsFeature
 import PersonasClient
 
 // MARK: - PersonasCoordinator
