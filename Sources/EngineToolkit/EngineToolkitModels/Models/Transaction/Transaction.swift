@@ -73,9 +73,11 @@ extension SpecificInstructionsBuilder {
 }
 
 extension TransactionManifest {
+	#if swift(<5.8)
 	public init(@InstructionsBuilder buildInstructions: () throws -> [Instruction]) rethrows {
 		try self.init(instructions: buildInstructions())
 	}
+	#endif
 
 	public init(@SpecificInstructionsBuilder buildInstructions: () throws -> [any InstructionProtocol]) rethrows {
 		try self.init(instructions: buildInstructions())
