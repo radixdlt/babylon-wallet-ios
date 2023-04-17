@@ -28,6 +28,7 @@ extension AuthorizedDapps.View {
 						.padding(.vertical, .medium3)
 
 					Separator()
+						.padding(.vertical, .medium3)
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.dApps) { dApp in
@@ -42,7 +43,7 @@ extension AuthorizedDapps.View {
 					}
 					.animation(.easeInOut, value: viewStore.dApps)
 
-					Spacer()
+					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium3)
 				.onAppear {

@@ -41,11 +41,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
 			let personas = dApp.detailedAuthorizedPersonas.map(Persona.State.init)
-			self.personas = .init(
-				subtitle: L10n.DAppDetails.personaHeading,
-				showCreateButton: false,
-				personas: .init(uniqueElements: personas)
-			)
+			self.personas = .init(personas: .init(uniqueElements: personas))
 		}
 	}
 

@@ -23,19 +23,13 @@ extension DappDetails {
 		let otherMetadata: [MetadataItem]
 		let fungibleTokens: [Token]
 		let nonFungibleTokens: [Token]
-		let personas: [Persona]
+		let hasPersonas: Bool
 		let isDismissed: Bool
 
 		struct MetadataItem: Identifiable, Hashable, Sendable {
 			var id: Self { self }
 			let key: String
 			let value: String
-		}
-
-		struct Persona: Identifiable, Hashable, Sendable {
-			let id: Profile.Network.Persona.ID
-			let name: String
-			let thumbnail: URL
 		}
 
 		struct Token: Identifiable, Hashable, Sendable {
@@ -63,11 +57,8 @@ extension DappDetails.View {
 
 					NFTList(store: store)
 
-//					LocalPersonaList(store: store)
-//						.border(.red)
-
-//					let personasStore = store.scope(state: \.personas) { .child(.personas($0)) }
-//					PersonaList.View(store: personasStore)
+					Personas(store: store, hasPersonas: viewStore.hasPersonas)
+						.background(.app.gray5)
 
 					Button(L10n.DAppDetails.forgetDapp) {
 						viewStore.send(.forgetThisDappTapped)
@@ -126,18 +117,8 @@ private extension DappDetails.State {
 			otherMetadata: otherMetadata,
 			fungibleTokens: [], // TODO: Populate when we have it
 			nonFungibleTokens: [], // TODO: Populate when we have it
-			personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init),
+			hasPersonas: !personas.personas.isEmpty,
 			isDismissed: isDismissed
-		)
-	}
-}
-
-private extension DappDetails.ViewState.Persona {
-	init(persona: Profile.Network.AuthorizedPersonaDetailed) {
-		self.init(
-			id: persona.id,
-			name: persona.displayName.rawValue,
-			thumbnail: URL(string: "placeholder")!
 		)
 	}
 }
@@ -263,40 +244,30 @@ extension DappDetails.View {
 	}
 
 	@MainActor
-	struct LocalPersonaList: View {
+	struct Personas: View {
 		let store: StoreOf<DappDetails>
+		let hasPersonas: Bool
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				if viewStore.personas.isEmpty {
-					Text(L10n.DAppDetails.noPersonasHeading)
-						.sectionHeading
-						.padding(.horizontal, .medium1)
-						.padding(.vertical, .large3)
-				} else {
-					VStack(alignment: .leading, spacing: 0) {
-						Text(L10n.DAppDetails.personaHeading)
-							.sectionHeading
-							.padding(.horizontal, .medium1)
-							.padding(.vertical, .large3)
+			if hasPersonas {
+				Text(L10n.DAppDetails.personaHeading)
+					.sectionHeading
+					.flushedLeft
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .small2)
 
-						VStack(spacing: .medium3) {
-							ForEach(viewStore.personas) { persona in
-								Card {
-									PlainListRow(title: persona.name) {
-										viewStore.send(.personaTapped(persona.id))
-									} icon: {
-										PersonaThumbnail(persona.thumbnail)
-									}
-								}
-								.padding(.horizontal, .medium3)
-							}
-						}
-					}
-					.padding(.bottom, .large2)
-				}
+				Separator()
+					.padding(.bottom, .small2)
+
+				let personasStore = store.scope(state: \.personas) { .child(.personas($0)) }
+				PersonaListCoreView(store: personasStore)
+			} else {
+				Text(L10n.DAppDetails.noPersonasHeading)
+					.sectionHeading
+					.flushedLeft
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .small2)
 			}
-			.background(.app.gray5)
 		}
 	}
 }
