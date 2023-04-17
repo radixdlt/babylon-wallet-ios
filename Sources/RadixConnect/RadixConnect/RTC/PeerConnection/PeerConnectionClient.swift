@@ -22,7 +22,6 @@ public struct PeerConnectionClient: Sendable {
 		self.iceConnectionStates = delegate
 			.onIceConnectionState
 			.logInfo("Ice connection state: %@")
-			.eraseToAnyAsyncSequence()
 			.share()
 			.eraseToAnyAsyncSequence()
 	}

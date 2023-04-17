@@ -245,7 +245,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
-			await radixConnectClient.loadFromProfileAndConnectAll()
+			_ = await radixConnectClient.loadFromProfileAndConnectAll()
 			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
 			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {

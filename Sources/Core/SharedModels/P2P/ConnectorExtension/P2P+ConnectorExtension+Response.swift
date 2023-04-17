@@ -90,16 +90,18 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			self.response = try decodeResponse {
 				Success.derivePublicKey($0)
 			}
-		default: fatalError()
+		case .getDeviceInfo:
+			self.response = try decodeResponse {
+				Success.getDeviceInfo($0)
+			}
+		case .importOlympiaDevice:
+			self.response = try decodeResponse {
+				Success.importOlympiaDevice($0)
+			}
+		case .signTransaction:
+			self.response = try decodeResponse {
+				Success.signTransaction($0)
+			}
 		}
-
-//		if let successPayload = try container.decodeIfPresent(Success.self, forKey: .success) {
-//			self.response = .success(successPayload)
-//		} else if let failurePayload = try container.decodeIfPresent(Failure.self, forKey: .failure) {
-//			self.response = .failure(failurePayload)
-//		} else {
-//			struct NeitherSuccessNorFailureJSONKeysFound: Swift.Error {}
-//			throw NeitherSuccessNorFailureJSONKeysFound()
-//		}
 	}
 }

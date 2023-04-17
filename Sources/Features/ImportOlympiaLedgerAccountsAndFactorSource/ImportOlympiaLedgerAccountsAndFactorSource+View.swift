@@ -2,13 +2,18 @@ import FeaturePrelude
 
 extension ImportOlympiaLedgerAccountsAndFactorSource.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSource.ViewState {
-		.init(ledgerName: ledgerName, isLedgerNameInputVisible: isLedgerNameInputVisible)
+		.init(
+			failedToFindAnyLinks: failedToFindAnyLinks,
+			ledgerName: ledgerName,
+			isLedgerNameInputVisible: isLedgerNameInputVisible
+		)
 	}
 }
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSource.View
 extension ImportOlympiaLedgerAccountsAndFactorSource {
 	public struct ViewState: Equatable {
+		public let failedToFindAnyLinks: Bool
 		public let ledgerName: String
 		public let isLedgerNameInputVisible: Bool
 	}
@@ -24,6 +29,10 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
+					if viewStore.failedToFindAnyLinks {
+						Text("⚠️ Found no RadixConnect linked browsers, go to settings and link first")
+					}
+
 					Button("Send Add Ledger Request") {
 						viewStore.send(.sendAddLedgerRequestButtonTapped)
 					}
@@ -46,10 +55,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 					}
 				}
 				.padding(.horizontal, .medium3)
-				.onAppear { viewStore.send(.appeared) }
-//				.task {
-//					await ViewStore(store.stateless).send(.view(.task)).finish()
-//				}
+//				.onAppear { viewStore.send(.appeared) }
+				.task { @MainActor in await ViewStore(store.stateless).send(.view(.task)).finish()
+				}
 			}
 		}
 	}

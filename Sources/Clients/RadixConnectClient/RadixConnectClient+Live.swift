@@ -11,6 +11,18 @@ extension RadixConnectClient {
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
+		let getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates = {
+			let links = await p2pLinksClient.getP2PLinks()
+			return await rtcClients.connectionStatuses().map { updatesForClients in
+				updatesForClients.compactMap { clientUpdate in
+					guard let link = links.first(where: { $0.id == clientUpdate.clientID }) else {
+						return nil
+					}
+					return P2P.LinkConnectionUpdate(link: link, peerConnectionStatuses: clientUpdate.peerConnectionStatuses)
+				}
+			}.share().eraseToAnyAsyncSequence()
+		}
+
 		return Self(
 			loadFromProfileAndConnectAll: {
 				Task {
@@ -21,6 +33,7 @@ extension RadixConnectClient {
 						)
 					}
 				}
+				return await getP2PLinksWithConnectionStatusUpdates()
 			},
 			disconnectAndRemoveAll: {
 				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
@@ -41,6 +54,7 @@ extension RadixConnectClient {
 			getP2PLinks: {
 				await OrderedSet(p2pLinksClient.getP2PLinks())
 			},
+			getP2PLinksWithConnectionStatusUpdates: getP2PLinksWithConnectionStatusUpdates,
 			storeP2PLink: { client in
 				try await p2pLinksClient.addP2PLink(client)
 			},

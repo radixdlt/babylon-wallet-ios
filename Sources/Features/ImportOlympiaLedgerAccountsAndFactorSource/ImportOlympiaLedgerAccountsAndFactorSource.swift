@@ -4,6 +4,7 @@ import FeaturePrelude
 import ImportLegacyWalletClient
 import Profile
 import RadixConnectClient
+import RadixConnectModels
 import SharedModels
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSource
@@ -27,6 +28,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		/// verified and migrated
 		public var addedLedgersWithAccounts: OrderedSet<AddedLedgerWithAccounts> = []
 
+		public var failedToFindAnyLinks = false
 		public var ledgerName = ""
 		public var isLedgerNameInputVisible = false
 		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice?
@@ -40,7 +42,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case sendAddLedgerRequestButtonTapped
 		case skipRestOfTheAccounts
 		case ledgerNameChanged(String)
@@ -49,6 +51,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case gotLinksConnectionStatusUpdate([P2P.LinkConnectionUpdate])
 		case response(
 			olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice,
 			interactionID: P2P.LedgerHardwareWallet.InteractionId
@@ -80,11 +83,28 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .fireAndForget {
-				await radixConnectClient.loadFromProfileAndConnectAll()
+		case .task:
+//			return .run { send in
+			//                let links = await radixConnectClient.getP2PLinksWithConnectionStatusUpdates()
+			////                if links.isEmpty {
+			////                    await send(.internal(.foundNoLinks))
+			////                } else {
+			////                    await radixConnectClient.loadFromProfileAndConnectAll()
+			////                }
+			//            }
+			//            gotLinksConnectionStatusUpdate
+			return .run { send in
+				for try await linksConnectionUpdate in await radixConnectClient.getP2PLinksWithConnectionStatusUpdates() {
+					guard !Task.isCancelled else {
+						return
+					}
+					await send(.internal(.gotLinksConnectionStatusUpdate(linksConnectionUpdate)))
+				}
+			} catch: { error, _ in
+				loggerGlobal.error("failed to get links updates, error: \(error)")
 			}
 		case .sendAddLedgerRequestButtonTapped:
+			loggerGlobal.debug("SEND ADD LEDGER REQUEST BUTTON TAPPED")
 			return continueWithRestOfAccountsIfNeeded(state: state)
 
 		case .skipRestOfTheAccounts:
@@ -121,7 +141,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .gotLinksConnectionStatusUpdate(linksConnectionStatusUpdate):
+			loggerGlobal.notice("links connection status update: \(linksConnectionStatusUpdate)")
+			let connectedLinks = linksConnectionStatusUpdate.filter(\.hasAnyConnectedPeers)
+			state.failedToFindAnyLinks = connectedLinks.isEmpty
+			return .none
+
 		case let .response(olympiaDevice, interactionID):
+			loggerGlobal.notice("Successfully received importOlympiaDevice response from CE! \(olympiaDevice) ✅")
 			return validate(olympiaDevice, againstUnverifiedOf: &state)
 		case let .broadcasted(interactionID):
 			return .none
@@ -159,6 +186,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 	) -> EffectTask<Action> {
 		.run { send in
 			for try await incomingResponse in await radixConnectClient.receiveResponses(/P2P.RTCMessageFromPeer.Response.connectorExtension .. /P2P.ConnectorExtension.Response.ledgerHardwareWallet) {
+				loggerGlobal.notice("Received response from CE: \(String(describing: incomingResponse))")
 				guard !Task.isCancelled else {
 					return
 				}
@@ -195,10 +223,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 				derivationPaths: olympiaHardwareAccounts.map(\.path.derivationPath)
 			)
 
+			loggerGlobal.debug("About to broadcast importOlympiaDevice request with interactionID: \(interactionID)..")
 			try await radixConnectClient.sendRequest(.connectorExtension(.ledgerHardwareWallet(.init(
 				interactionID: interactionID,
 				request: .importOlympiaDevice(request)
 			))), .broadcastToAllPeers)
+			loggerGlobal.debug("Broadcasted importOlympiaDevice request with interactionID: \(interactionID) ✅ waiting for response")
 
 			await send(.internal(.broadcasted(interactionID: interactionID)))
 		} catch: { error, _ in
@@ -284,11 +314,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 
 	private func continueWithRestOfAccountsIfNeeded(state: State) -> EffectTask<Action> {
 		if state.unverified.isEmpty {
+			loggerGlobal.debug("state.unverified.isEmpty skipping sending importOlympiaDevice request")
 			return .send(.delegate(.completed(
 				addedLedgersWithAccounts: state.addedLedgersWithAccounts,
 				unvalidatedAccounts: []
 			)))
 		} else {
+			loggerGlobal.debug("state.unverified not empty, preparing to send importOlympiaDevice request...")
 			let interactionId: P2P.LedgerHardwareWallet.InteractionId = .random()
 			return importOlympiaDevice(
 				interactionID: interactionId,
