@@ -4,8 +4,6 @@ extension FactorSource {
 	/// Just a namespace for Ledger Hardware wallet
 	/// related types
 	public enum LedgerHardwareWallet {
-		public typealias DeviceID = Tagged<Self, HexCodable32Bytes>
-
 		public enum DeviceModel: String, Sendable, Hashable, Codable {
 			case nanoS
 			case nanoSPlus
@@ -14,7 +12,7 @@ extension FactorSource {
 	}
 
 	public static func ledger(
-		deviceID: LedgerHardwareWallet.DeviceID,
+		id: FactorSource.ID,
 		model: LedgerHardwareWallet.DeviceModel,
 		name: NonEmptyString?,
 		olympiaCompatible: Bool
@@ -29,7 +27,7 @@ extension FactorSource {
 
 		return try Self(
 			kind: .ledgerHQHardwareWallet,
-			id: .init(hexCodable: deviceID.rawValue.data),
+			id: id,
 			hint: hint,
 			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
 			storage: nil,

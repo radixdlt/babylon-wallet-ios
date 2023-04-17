@@ -20,8 +20,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		/// verified and migrated
 		public var migrated: OrderedSet<MigratedAccount> = []
 
-		@PresentationState
-		public var nameLedgerAlert: AlertState<ViewAction.NameLedgerAlert>? = nil
+		public var ledgerName = ""
+		public var isLedgerNameInputVisible = false
+		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice?
 
 		public init(
 			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
@@ -34,12 +35,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case sendAddLedgerRequestButtonTapped
-		case nameLedgerAlert(PresentationAction<NameLedgerAlert>)
-
-		public enum NameLedgerAlert: Sendable, Equatable {
-			case confirmNameButtonTapped
-			case skipNameButtonTapped
-		}
+		case ledgerNameChanged(String)
+		case confirmNameButtonTapped
+		case skipNamingLedgerButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -54,9 +52,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 			verifiedAccountsToMigrate: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		)
 
+		case addedFactorSource(FactorSource)
+
 		case migratedOlympiaHardwareAccounts(
 			NonEmpty<OrderedSet<MigratedAccount>>,
-			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
+			FactorSource
 		)
 	}
 
@@ -74,12 +74,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-
-			.ifLet(\.$nameLedgerAlert, action: /Action.view .. ViewAction.nameLedgerAlert)
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
@@ -93,12 +87,29 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 				olympiaHardwareAccounts: state.unverified
 			).concatenate(with: listenForResponses(interactionID: interactionId))
 
-		case .nameLedgerAlert(.presented(.confirmNameButtonTapped)):
-//			return disconnectDappEffect(state: state)
-			fatalError()
-
-		case .nameLedgerAlert:
+		case let .ledgerNameChanged(name):
+			state.ledgerName = name
 			return .none
+
+		case .confirmNameButtonTapped:
+			guard let device = state.unnamedDeviceToAdd else {
+				assertionFailure("Expected device to name")
+				return .none
+			}
+			return addFactorSource(
+				name: nil,
+				unnamedDeviceToAdd: device
+			)
+
+		case .skipNamingLedgerButtonTapped:
+			guard let device = state.unnamedDeviceToAdd else {
+				assertionFailure("Expected device to name")
+				return .none
+			}
+			return addFactorSource(
+				name: nil,
+				unnamedDeviceToAdd: device
+			)
 		}
 	}
 
@@ -110,7 +121,15 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 			return .none
 
 		case let .nameLedgerDeviceBeforeSavingIt(device, verifiedOlympiaAccounts):
-			state.nameLedgerAlert = .nameLedger(device, verifiedOlympiaAccounts)
+			state.unnamedDeviceToAdd = device
+			state.isLedgerNameInputVisible = true
+			return .none
+
+		case let .addedFactorSource(factorSource):
+			state.unnamedDeviceToAdd = nil
+			state.isLedgerNameInputVisible = false
+			state.ledgerName = ""
+			return convertHardwareAccountsToBabylon(state.verified, factorSource: factorSource)
 
 		case let .migratedOlympiaHardwareAccounts(migratedAccounts, olympiaDevice):
 			state.migrated.append(contentsOf: migratedAccounts.rawValue)
@@ -176,66 +195,63 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		againstUnverifiedOf state: inout State
 	) -> EffectTask<Action> {
 		do {
-			let derivedKeys = try Set(olympiaDevice.derivedPublicKeys.map { try K1.PublicKey(compressedRepresentation: $0.publicKey.data) })
+			let derivedKeys = try Set(
+				olympiaDevice
+					.derivedPublicKeys
+					.map { try K1.PublicKey(compressedRepresentation: $0.publicKey.data) }
+			)
+
 			let olympiaAccountsToMigrate = state.unverified.filter {
 				derivedKeys.contains($0.publicKey)
 			}
-			var verifiedAccountsToMigrate = OrderedSet<OlympiaAccountToMigrate>()
+
 			olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
-//				let verifiedAccountToMigrate: OlympiaAccountToMigrate = {
-//					state.unverified.first(where: { $0.publicKey == verifiedKey })!
-//				}()
-				verifiedAccountsToMigrate.append(verifiedAccountToMigrate)
 				state.verified.insert(verifiedAccountToMigrate)
 				state.unverified.remove(verifiedAccountToMigrate)
 			}
 
-			let nonEmpty = NonEmpty(rawValue: verifiedAccountsToMigrate)!
-//			return send(.internal(.nameLedgerDeviceBeforeSavingIt(olympiaDevice, verifiedAccountsToMigrate: nonEmpty)))
-			return EffectTask<Action>.send(.internal(.nameLedgerDeviceBeforeSavingIt(olympiaDevice, verifiedAccountsToMigrate: nonEmpty)))
+			return .send(.internal(
+				.nameLedgerDeviceBeforeSavingIt(olympiaDevice)
+			))
+
 		} catch {
 			fatalError()
 		}
-//		return convertHardwareAccountsToBabylon(olympiaAccountsToMigrate, device: olympiaDevice)
+	}
+
+	private func addFactorSource(
+		name: String?,
+		unnamedDeviceToAdd device: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
+	) -> EffectTask<Action> {
+		let factorSource = FactorSource.ledger(
+			id: device.id,
+			model: device.model,
+			name: name.map { NonEmpty(rawValue: $0) },
+			olympiaCompatible: true
+		)
+		return .run { send in
+			try await factorSourcesClient.addOffDeviceFactorSource(factorSource)
+			await send(.internal(.addedFactorSource(factorSource)))
+		} catch: { _, _ in
+			fatalError()
+		}
 	}
 
 	private func convertHardwareAccountsToBabylon(
 		_ olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-		device: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
+		factorSource: FactorSource
 	) -> EffectTask<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile
 			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 				.init(
 					olympiaAccounts: Set(olympiaAccounts.elements),
-					ledgerFactorSourceID: ledgerNanoFactorSourceID
+					ledgerFactorSourceID: factorSource.id
 				)
 			)
-			await send(.internal(.migratedOlympiaHardwareAccounts(migrated, olympiaDevice)))
+			await send(.internal(.migratedOlympiaHardwareAccounts(migrated.accounts, factorSource)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
-		}
-	}
-}
-
-extension AlertState<ImportOlympiaLedgerAccountsAndFactorSource.ViewAction.NameLedgerAlert> {
-	static func nameLedger(
-		_ device: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice,
-		verifiedAccountsToMigrate: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	)
-		-> AlertState
-	{
-		AlertState {
-			TextState(L10n.DAppDetails.forgetDappAlertTitle)
-		} actions: {
-			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState(L10n.DAppDetails.forgetDappAlertConfirm)
-			}
-			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.DAppDetails.forgetDappAlertCancel)
-			}
-		} message: {
-			TextState(L10n.DAppDetails.forgetDappAlertMessage)
 		}
 	}
 }

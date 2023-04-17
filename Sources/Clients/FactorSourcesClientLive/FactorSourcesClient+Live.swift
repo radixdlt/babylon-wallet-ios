@@ -15,6 +15,15 @@ extension FactorSourcesClient: DependencyKey {
 			await getProfileStore().profile.factorSources
 		}
 
+		let addOffDeviceFactorSource: AddOffDeviceFactorSource = { source in
+			try await getProfileStore().updating { profile in
+				guard !profile.factorSources.contains(where: { $0.id == factorSourceID }) else {
+					throw FactorSourceAlreadyPresent()
+				}
+				profile.factorSources.append(source)
+			}
+		}
+
 		return Self(
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
@@ -25,12 +34,13 @@ extension FactorSourcesClient: DependencyKey {
 				try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
 				let factorSourceID = privateFactorSource.hdOnDeviceFactorSource.factorSource.id
 				do {
-					try await getProfileStore().updating { profile in
-						guard !profile.factorSources.contains(where: { $0.id == factorSourceID }) else {
-							throw FactorSourceAlreadyPresent()
-						}
-						profile.factorSources.append(privateFactorSource.hdOnDeviceFactorSource.factorSource)
-					}
+//					try await getProfileStore().updating { profile in
+//						guard !profile.factorSources.contains(where: { $0.id == factorSourceID }) else {
+//							throw FactorSourceAlreadyPresent()
+//						}
+//						profile.factorSources.append(privateFactorSource.hdOnDeviceFactorSource.factorSource)
+//					}
+					try await addOffDeviceFactorSource(privateFactorSource.hdOnDeviceFactorSource.factorSource)
 				} catch {
 					// We were unlucky, failed to update Profile, thus best to undo the saving of
 					// the mnemonic in keychain (if we can).
@@ -67,7 +77,8 @@ extension FactorSourcesClient: DependencyKey {
 					loggerGlobal.warning("Failed to check if olympia factor source exists, error: \(error)")
 					return nil // failure
 				}
-			}
+			},
+			addOffDeviceFactorSource: addOffDeviceFactorSource
 		)
 	}
 

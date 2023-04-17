@@ -42,7 +42,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case importOlympiaDevice(ImportOlympiaDevice)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
-			public let id: FactorSource.LedgerHardwareWallet.DeviceID
+			public let id: FactorSource.ID
 			public let model: P2P.LedgerHardwareWallet.Model
 		}
 
@@ -56,7 +56,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		}
 
 		public struct ImportOlympiaDevice: Sendable, Hashable, Decodable {
-			public let id: FactorSource.LedgerHardwareWallet.DeviceID
+			public let id: FactorSource.ID
 			public let model: P2P.LedgerHardwareWallet.Model
 			public let derivedPublicKeys: [DerivedPublicKey]
 			public struct DerivedPublicKey: Sendable, Hashable, Decodable {
