@@ -224,6 +224,94 @@ extension Olympia.Parsed.Account {
 
 // MARK: - ImportLegacyWalletClientTests
 final class ImportLegacyWalletClientTests: TestCase {
+	func test_generate_hardwarewallet_vector() throws {
+		let accountNames: [String?] = [
+			String?.none,
+			"",
+			Olympia.Export.accountNameForbiddenCharReplacement,
+			"Main account.",
+			"Saving's account.",
+			"Olympia is a small town in Elis on the Peloponnese peninsula in Greece, famous for the nearby archaeological site of the same name",
+			"Alexandria is the second largest city in Egypt, and the largest city on the Mediterranean coast",
+			"Forbidden \(Olympia.Export.Separator.allCases.joined(separator: "|"))",
+			"OK +?-,.\\)[\\(!#$%{&/*<>=OK",
+			"Numbers are allowed 0123456789",
+		]
+		let payloadSizeThreshold = 1800
+		struct HDWallet {
+			let mnemonic: Mnemonic
+			let isHardware: Bool
+			let accountsCount: Int
+		}
+		let softwareWallet = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: false, accountsCount: 4)
+		let hardwareWallet0 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 6)
+		let hardwareWallet1 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 5)
+		let hardwareWallet2 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 3)
+
+		var accountNameIndex = 0
+		let accountsSorted: [TestVector.OlympiaWallet.Account] = try [softwareWallet, hardwareWallet0, hardwareWallet1, hardwareWallet2].flatMap { hdWallet -> [TestVector.OlympiaWallet.Account] in
+			print("🔮 hardware? \(hdWallet.isHardware), mnemonic: \(hdWallet.mnemonic.phrase)")
+			let hdRoot = try hdWallet.mnemonic.hdRoot()
+			return try (0 ..< hdWallet.accountsCount).map { (accountIndex: Int) -> TestVector.OlympiaWallet.Account in
+				defer { accountNameIndex += 1 }
+
+				let name: NonEmptyString? = accountNames[accountNameIndex % accountNames.count].map {
+					NonEmptyString(rawValue: $0)
+				} ?? nil
+
+				let accountType: Olympia.AccountType = hdWallet.isHardware ? .hardware : .software
+
+				let path = try LegacyOlympiaBIP44LikeDerivationPath(index: Profile.Network.NextDerivationIndices.Index(accountIndex))
+
+				let publicKey = try hdRoot.derivePrivateKey(
+					path: path.fullPath,
+					curve: SECP256K1.self
+				).publicKey
+
+				return TestVector.OlympiaWallet.Account(
+					accountType: accountType,
+					publicKeyCompressedBase64: publicKey.base64Encoded,
+					addressIndex: accountIndex,
+					name: name
+				)
+			}
+		}
+		let accounts = accountsSorted.shuffled()
+
+		let payloads = try CAP33.serialize(
+			wordCount: softwareWallet.mnemonic.wordCount.wordCount,
+			accounts: accounts,
+			payloadSizeThreshold: payloadSizeThreshold
+		)
+
+		let accountsWithSanitizedNames = accounts.map {
+			$0.sanitizedName()
+		}
+
+		// Soundness check!
+		let parsed = try CAP33.deserialize(payloads: payloads)
+		XCTAssertEqual(parsed.mnemonicWordCount, softwareWallet.mnemonic.wordCount)
+		XCTAssertEqual(accounts.count, parsed.accounts.count)
+		XCTAssertEqual(parsed.accounts.elements.map {
+			$0.toTestVectorAccount()
+		}, accountsWithSanitizedNames)
+
+		//        print(payloads)
+
+		let testVector = TestVector(
+			testID: 0,
+			olympiaWallet: .init(
+				mnemonic: softwareWallet.mnemonic.phrase,
+				accounts: accountsWithSanitizedNames
+			), payloadSizeThreshold: payloadSizeThreshold,
+			payloads: payloads
+		)
+		let jsonEncoder = JSONEncoder()
+		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
+		let testJSON = try jsonEncoder.encode(testVector)
+		print(String(data: testJSON, encoding: .utf8)!)
+	}
+
 	func omit_test_generate_tests() throws {
 		let testVectors = try generateTestVectors()
 		let jsonEncoder = JSONEncoder()
