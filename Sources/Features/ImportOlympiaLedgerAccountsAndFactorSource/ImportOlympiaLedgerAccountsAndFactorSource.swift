@@ -84,17 +84,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-//			return .run { send in
-			//                let links = await radixConnectClient.getP2PLinksWithConnectionStatusUpdates()
-			////                if links.isEmpty {
-			////                    await send(.internal(.foundNoLinks))
-			////                } else {
-			////                    await radixConnectClient.loadFromProfileAndConnectAll()
-			////                }
-			//            }
-			//            gotLinksConnectionStatusUpdate
+
 			return .run { send in
-				for try await linksConnectionUpdate in await radixConnectClient.getP2PLinksWithConnectionStatusUpdates() {
+				for try await linksConnectionUpdate in await radixConnectClient.loadFromProfileAndConnectAll() {
 					guard !Task.isCancelled else {
 						return
 					}

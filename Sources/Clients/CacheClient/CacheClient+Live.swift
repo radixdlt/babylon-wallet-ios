@@ -34,7 +34,7 @@ extension CacheClient: DependencyKey {
 				loggerGlobal.trace("💾 Data successfully retrieved from disk: \(entry)")
 				return data
 			} catch {
-				loggerGlobal.warning("💾 Could not retrieve data from disk: \(error.localizedDescription)")
+				loggerGlobal.trace("💾 Could not retrieve data from disk: \(error.localizedDescription)")
 				throw Error.dataLoadingFailed
 			}
 		}, removeFile: { entry in

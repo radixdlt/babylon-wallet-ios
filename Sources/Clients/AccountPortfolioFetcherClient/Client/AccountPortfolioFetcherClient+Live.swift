@@ -10,7 +10,7 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 			@Dependency(\.cacheClient) var cacheClient
 
 			let fetchPortfolioForAccount = {
-				loggerGlobal.debug("📡 fetching new data from gateway: \(accountAddress.address)")
+				loggerGlobal.trace("📡 fetching new data from gateway: \(accountAddress.address)")
 
 				let resourcesResponse = try await gatewayAPIClient.getAccountDetails(accountAddress)
 				var accountPortfolio = try AccountPortfolio(owner: accountAddress, response: resourcesResponse)
