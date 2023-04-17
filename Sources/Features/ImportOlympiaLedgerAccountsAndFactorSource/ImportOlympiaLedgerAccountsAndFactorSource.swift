@@ -14,7 +14,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
 		public var displayName: String {
 			if let name {
-				return "\(name) (\(name))"
+				return "\(name) (\(model.rawValue))"
 			} else {
 				return model.rawValue
 			}
