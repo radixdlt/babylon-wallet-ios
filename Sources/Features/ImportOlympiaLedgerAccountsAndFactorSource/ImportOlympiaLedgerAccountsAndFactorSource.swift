@@ -12,6 +12,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 	public struct AddedLedgerWithAccounts: Sendable, Hashable {
 		public let name: String?
 		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
+		public var displayName: String {
+			if let name {
+				return "\(name) (\(name))"
+			} else {
+				return model.rawValue
+			}
+		}
+
 		public let id: FactorSource.ID
 		public let migratedAccounts: NonEmpty<OrderedSet<MigratedAccount>>
 	}
@@ -31,6 +39,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		public var failedToFindAnyLinks = false
 		public var ledgerName = ""
 		public var isLedgerNameInputVisible = false
+		public var isWaitingForResponseFromLedger = false
 		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice?
 
 		public init(
@@ -110,12 +119,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 			return .none
 
 		case .confirmNameButtonTapped:
+			let name = state.ledgerName
+			loggerGlobal.notice("Confirmed ledger name: '\(name)' => adding factor source")
 			guard let device = state.unnamedDeviceToAdd else {
 				assertionFailure("Expected device to name")
 				return .none
 			}
 			return addFactorSource(
-				name: nil,
+				name: name,
 				unnamedDeviceToAdd: device
 			)
 
@@ -139,10 +150,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 			state.failedToFindAnyLinks = connectedLinks.isEmpty
 			return .none
 
-		case let .response(olympiaDevice, interactionID):
+		case let .response(olympiaDevice, _):
 			loggerGlobal.notice("Successfully received importOlympiaDevice response from CE! \(olympiaDevice) ✅")
 			return validate(olympiaDevice, againstUnverifiedOf: &state)
-		case let .broadcasted(interactionID):
+		case .broadcasted:
+			state.isWaitingForResponseFromLedger = true
 			return .none
 
 		case let .nameLedgerDeviceBeforeSavingIt(device):
@@ -158,6 +170,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 				assertionFailure("Expected verified accounts to migrated")
 				return .none
 			}
+			loggerGlobal.notice("Converting hardware accounts to babylon...")
 			return convertHardwareAccountsToBabylon(
 				verifiedToMigrate,
 				factorSource: factorSource,
@@ -166,6 +179,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 			)
 
 		case let .migratedOlympiaHardwareAccounts(addedLedgerWithAccounts):
+			loggerGlobal.notice("Adding Ledger with accounts...")
 			state.addedLedgersWithAccounts.append(addedLedgerWithAccounts)
 			state.verifiedToBeMigrated = nil
 
@@ -232,6 +246,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		_ olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice,
 		againstUnverifiedOf state: inout State
 	) -> EffectTask<Action> {
+		guard !olympiaDevice.derivedPublicKeys.isEmpty else {
+			loggerGlobal.warning("Response contained no public keys at all.")
+			return .none
+		}
 		do {
 			let derivedKeys = try Set(
 				olympiaDevice
@@ -247,14 +265,20 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 				state.unverified.remove(verifiedAccountToMigrate)
 			}
 
-			state.verifiedToBeMigrated = .init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex)))
+			guard let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>.init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))) else {
+				loggerGlobal.warning("No accounts to migrated.")
+				return .none
+			}
+			loggerGlobal.notice("Prompting to name ledger with ID=\(olympiaDevice.id) before migrating #\(verifiedToBeMigrated.count) accounts.")
+			state.verifiedToBeMigrated = verifiedToBeMigrated
 
 			return .send(.internal(
 				.nameLedgerDeviceBeforeSavingIt(olympiaDevice)
 			))
 
 		} catch {
-			fatalError()
+			loggerGlobal.error("got error: \(error)")
+			return .none
 		}
 	}
 
@@ -263,14 +287,17 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		unnamedDeviceToAdd device: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 	) -> EffectTask<Action> {
 		let model = FactorSource.LedgerHardwareWallet.DeviceModel(model: device.model)
+		loggerGlobal.notice("Creating factor source for Ledger...")
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
 			name: name.map { NonEmpty(rawValue: $0) } ?? nil,
 			olympiaCompatible: true
 		)
+		loggerGlobal.notice("Created factor source for Ledger! adding it now")
 		return .run { send in
 			try await factorSourcesClient.addOffDeviceFactorSource(factorSource)
+			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.internal(.addedFactorSource(factorSource, model, name: name)))
 		} catch: { _, _ in
 			fatalError()
@@ -291,6 +318,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 					ledgerFactorSourceID: factorSource.id
 				)
 			)
+			loggerGlobal.notice("Converted #\(migrated.babylonAccounts.count) accounts to babylon! ✅")
 			let addedLedgerWithAccounts = AddedLedgerWithAccounts(
 				name: ledgerName,
 				model: model,
@@ -306,13 +334,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 
 	private func continueWithRestOfAccountsIfNeeded(state: State) -> EffectTask<Action> {
 		if state.unverified.isEmpty {
-			loggerGlobal.debug("state.unverified.isEmpty skipping sending importOlympiaDevice request")
+			loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
 			return .send(.delegate(.completed(
 				addedLedgersWithAccounts: state.addedLedgersWithAccounts,
 				unvalidatedAccounts: []
 			)))
 		} else {
-			loggerGlobal.debug("state.unverified not empty, preparing to send importOlympiaDevice request...")
+			loggerGlobal.notice("state.unverified not empty #\(state.unverified.count) unverfied remain, preparing to send importOlympiaDevice request...")
 			let interactionId: P2P.LedgerHardwareWallet.InteractionId = .random()
 			return importOlympiaDevice(
 				interactionID: interactionId,
