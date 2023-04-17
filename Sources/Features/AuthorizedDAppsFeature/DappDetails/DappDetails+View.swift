@@ -63,10 +63,11 @@ extension DappDetails.View {
 
 					NFTList(store: store)
 
-					LocalPersonaList(store: store).border(.red)
+//					LocalPersonaList(store: store)
+//						.border(.red)
 
-					let personasStore = store.scope(state: \.personas) { .child(.personas($0)) }
-					PersonaList.View(store: personasStore)
+//					let personasStore = store.scope(state: \.personas) { .child(.personas($0)) }
+//					PersonaList.View(store: personasStore)
 
 					Button(L10n.DAppDetails.forgetDapp) {
 						viewStore.send(.forgetThisDappTapped)

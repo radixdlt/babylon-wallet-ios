@@ -15,7 +15,7 @@ extension PersonaList {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack {
 					ScrollView {
-						Text(L10n.PersonaList.subtitle)
+						Text(viewStore.subtitle)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1HighImportance)
 							.flushedLeft
@@ -33,10 +33,10 @@ extension PersonaList {
 								content: {
 									Persona.View(store: $0)
 										.padding(.vertical, .small3)
+										.padding(.horizontal, .medium3)
 								}
 							)
 						}
-						.padding(.horizontal, .small1)
 					}
 
 					if viewStore.showCreateButton {
@@ -72,6 +72,6 @@ struct Personas_Preview: PreviewProvider {
 }
 
 extension PersonaList.State {
-	public static let previewValue: Self = .init(showCreateButton: true)
+	public static let previewValue: Self = .init(subtitle: L10n.PersonaList.subtitle, showCreateButton: true)
 }
 #endif

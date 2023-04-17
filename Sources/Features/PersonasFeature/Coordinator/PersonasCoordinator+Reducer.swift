@@ -17,7 +17,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		public var isFirstPersonaOnAnyNetwork: Bool? = nil
 
 		public init(
-			personaList: PersonaList.State = .init(showCreateButton: true),
+			personaList: PersonaList.State = .init(subtitle: L10n.PersonaList.subtitle, showCreateButton: true),
 			createPersonaCoordinator: CreatePersonaCoordinator.State? = nil,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {

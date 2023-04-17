@@ -257,10 +257,13 @@ extension AppSettings.View {
 
 					ForEach(settingsRows()) { row in
 						PlainListRow(title: row.title, asset: row.asset) {
+							print(" Will send", row.action)
 							viewStore.send(row.action)
+							print(" Did send", row.action)
 						}
 						.withSeparator
 						.buttonStyle(.tappableRowStyle)
+						.border(.blue)
 					}
 				}
 				.padding(.bottom, .large3)
