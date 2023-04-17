@@ -172,9 +172,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
 
-		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSource(.delegate(.completed(migratedBabylonAccounts, unvalidatedOlympiaAccounts))))):
+		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSource(.delegate(
+			.completed(addedLedgersWithAccounts, unvalidatedOlympiaAccounts)
+		)))):
 
-			state.migratedAccounts.append(contentsOf: migratedBabylonAccounts)
+			state.migratedAccounts.append(contentsOf: addedLedgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
+
 			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
 				fatalError("bad!")
 			}
@@ -205,8 +208,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		case let .validatedOlympiaSoftwareAccounts(softwareAccounts, privateHDFactorSource):
 
-			return convertToBabylon(
-				softwareAccounts: softwareAccounts,
+			return convertSoftwareAccountsToBabylon(
+				softwareAccounts,
 				factorSourceID: privateHDFactorSource.id,
 				factorSource: privateHDFactorSource
 			)

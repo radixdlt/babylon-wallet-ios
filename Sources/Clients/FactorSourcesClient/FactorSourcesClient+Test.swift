@@ -15,7 +15,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		factorSourcesAsyncSequence: unimplemented("\(Self.self).factorSourcesAsyncSequence"),
 		addPrivateHDFactorSource: unimplemented("\(Self.self).addPrivateHDFactorSource"),
 		checkIfHasOlympiaFactorSourceForAccounts: unimplemented("\(Self.self).checkIfHasOlympiaFactorSourceForAccounts"),
-		addOffDeviceFactorSource: unimplemented("\(Self.self).addOffDeviceFactorSource"),
+		addOffDeviceFactorSource: unimplemented("\(Self.self).addOffDeviceFactorSource")
 	)
 
 	public static let noop = Self(

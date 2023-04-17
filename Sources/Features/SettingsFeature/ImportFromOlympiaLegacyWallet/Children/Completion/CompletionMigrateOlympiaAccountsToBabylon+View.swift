@@ -70,24 +70,24 @@ extension AccountLabel {
 }
 
 #if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - CompletionMigrateOlympiaAccountsToBabylon_Preview
-struct CompletionMigrateOlympiaAccountsToBabylon_Preview: PreviewProvider {
-	static var previews: some View {
-		CompletionMigrateOlympiaAccountsToBabylon.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: CompletionMigrateOlympiaAccountsToBabylon()
-			)
-		)
-	}
-}
-
-extension CompletionMigrateOlympiaAccountsToBabylon.State {
-	public static let previewValue = Self(
-		migratedAccounts: .previewValue
-	)
-}
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - CompletionMigrateOlympiaAccountsToBabylon_Preview
+// struct CompletionMigrateOlympiaAccountsToBabylon_Preview: PreviewProvider {
+//	static var previews: some View {
+//		CompletionMigrateOlympiaAccountsToBabylon.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: CompletionMigrateOlympiaAccountsToBabylon()
+//			)
+//		)
+//	}
+// }
+//
+// extension CompletionMigrateOlympiaAccountsToBabylon.State {
+//	public static let previewValue = Self(
+//		migratedAccounts: .previewValue
+//	)
+// }
 
 #endif

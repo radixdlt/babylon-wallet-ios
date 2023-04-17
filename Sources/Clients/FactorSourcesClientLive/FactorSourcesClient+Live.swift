@@ -17,7 +17,7 @@ extension FactorSourcesClient: DependencyKey {
 
 		let addOffDeviceFactorSource: AddOffDeviceFactorSource = { source in
 			try await getProfileStore().updating { profile in
-				guard !profile.factorSources.contains(where: { $0.id == factorSourceID }) else {
+				guard !profile.factorSources.contains(where: { $0.id == source.id }) else {
 					throw FactorSourceAlreadyPresent()
 				}
 				profile.factorSources.append(source)
@@ -34,12 +34,6 @@ extension FactorSourcesClient: DependencyKey {
 				try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
 				let factorSourceID = privateFactorSource.hdOnDeviceFactorSource.factorSource.id
 				do {
-//					try await getProfileStore().updating { profile in
-//						guard !profile.factorSources.contains(where: { $0.id == factorSourceID }) else {
-//							throw FactorSourceAlreadyPresent()
-//						}
-//						profile.factorSources.append(privateFactorSource.hdOnDeviceFactorSource.factorSource)
-//					}
 					try await addOffDeviceFactorSource(privateFactorSource.hdOnDeviceFactorSource.factorSource)
 				} catch {
 					// We were unlucky, failed to update Profile, thus best to undo the saving of
