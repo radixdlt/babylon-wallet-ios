@@ -53,7 +53,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case copyAddressButtonTapped
 		case fungibleTokenTapped(ComponentAddress)
 		case nonFungibleTokenTapped(ComponentAddress)
-		case personaTapped(Profile.Network.Persona.ID)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
 		case confirmDisconnectAlert(PresentationAction<ConfirmDisconnectAlert>)
@@ -128,14 +127,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		case let .nonFungibleTokenTapped(nft):
 			// TODO: Handle this
-			return .none
-
-		case let .personaTapped(id):
-			guard let persona = state.dApp.detailedAuthorizedPersonas[id: id] else { return .none }
-			state.presentedPersona = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue,
-			                                              dAppID: state.dApp.dAppDefinitionAddress,
-			                                              networkID: state.dApp.networkID,
-			                                              persona: persona)
 			return .none
 
 		case .dismissPersonaTapped:
