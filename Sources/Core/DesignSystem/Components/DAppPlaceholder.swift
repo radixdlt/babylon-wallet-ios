@@ -64,19 +64,3 @@ struct DappPlaceholder_Previews: PreviewProvider {
 		DappPlaceholder()
 	}
 }
-
-// MARK: - PersonaPlaceholder
-public struct PersonaPlaceholder: View {
-	let size: HitTargetSize
-
-	public init(size: HitTargetSize = .small) {
-		self.size = size
-	}
-
-	public var body: some View {
-		Circle()
-			.strokeBorder(Color.app.gray3, lineWidth: 1)
-			.background(Circle().fill(Color.app.gray4))
-			.frame(size)
-	}
-}

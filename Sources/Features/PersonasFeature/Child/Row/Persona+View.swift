@@ -12,28 +12,12 @@ extension Persona {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				Button {
-					viewStore.send(.tapped)
-				} label: {
-					HStack(alignment: .center, spacing: 0) {
-						if let thumbnail = viewStore.thumbnail {
-							PersonaThumbnail(thumbnail, size: .small)
-						} else {
-							PersonaPlaceholder(size: .small)
-						}
-
-						VStack(alignment: .leading, spacing: 4) {
-							Text(viewStore.displayName)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-						}
-						.padding(.leading, .medium3)
-
-						Spacer(minLength: 0)
+				Card {
+					PlainListRow(title: viewStore.displayName) {
+						viewStore.send(.tapped)
+					} icon: {
+						PersonaThumbnail(viewStore.thumbnail)
 					}
-					.padding(.medium2)
-					.background(Color.app.gray5)
-					.cornerRadius(.small1)
 				}
 			}
 		}
