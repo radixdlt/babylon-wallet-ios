@@ -6,17 +6,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 
 	public struct State: Sendable, Hashable {
-		public let subtitle: String
-		public var showCreateButton: Bool
 		public var personas: IdentifiedArrayOf<Persona.State>
 
 		public init(
-			subtitle: String,
-			showCreateButton: Bool,
 			personas: IdentifiedArrayOf<Persona.State> = []
 		) {
-			self.subtitle = subtitle
-			self.showCreateButton = showCreateButton
 			self.personas = personas
 		}
 	}

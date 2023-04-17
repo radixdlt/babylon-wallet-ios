@@ -15,43 +15,53 @@ extension PersonaList {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack {
 					ScrollView {
-						Text(viewStore.subtitle)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1HighImportance)
+						Text(L10n.PersonaList.subtitle)
+							.sectionHeading
 							.flushedLeft
 							.padding([.horizontal, .top], .medium3)
 							.padding(.bottom, .small2)
 
 						Separator()
 
-						VStack(alignment: .leading) {
-							ForEachStore(
-								store.scope(
-									state: \.personas,
-									action: { .child(.persona(id: $0, action: $1)) }
-								),
-								content: {
-									Persona.View(store: $0)
-										.padding(.vertical, .small3)
-										.padding(.horizontal, .medium3)
-								}
-							)
-						}
+						PersonaListCoreView(store: store)
 					}
 
-					if viewStore.showCreateButton {
-						Button(L10n.PersonaList.createNewPersonaButtonTitle) {
-							viewStore.send(.createNewPersonaButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular(
-							shouldExpand: true
-						))
-						.padding(.horizontal, .medium3)
-						.padding(.vertical, .large1)
+					Button(L10n.PersonaList.createNewPersonaButtonTitle) {
+						viewStore.send(.createNewPersonaButtonTapped)
 					}
+					.buttonStyle(.secondaryRectangular(
+						shouldExpand: true
+					))
+					.padding(.horizontal, .medium3)
+					.padding(.vertical, .large1)
 				}
 				.navigationTitle(L10n.PersonaList.title)
 			}
+		}
+	}
+}
+
+// MARK: - PersonaListCoreView
+public struct PersonaListCoreView: View {
+	private let store: StoreOf<PersonaList>
+
+	public init(store: StoreOf<PersonaList>) {
+		self.store = store
+	}
+
+	public var body: some View {
+		VStack(alignment: .leading) {
+			ForEachStore(
+				store.scope(
+					state: \.personas,
+					action: { .child(.persona(id: $0, action: $1)) }
+				),
+				content: {
+					Persona.View(store: $0)
+						.padding(.vertical, .small3)
+						.padding(.horizontal, .medium3)
+				}
+			)
 		}
 	}
 }
@@ -72,6 +82,6 @@ struct Personas_Preview: PreviewProvider {
 }
 
 extension PersonaList.State {
-	public static let previewValue: Self = .init(subtitle: L10n.PersonaList.subtitle, showCreateButton: true)
+	public static let previewValue: Self = .init()
 }
 #endif
