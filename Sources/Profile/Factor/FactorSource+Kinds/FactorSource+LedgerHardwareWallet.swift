@@ -16,7 +16,7 @@ extension FactorSource {
 		model: LedgerHardwareWallet.DeviceModel,
 		name: NonEmptyString?,
 		olympiaCompatible: Bool
-	) throws -> Self {
+	) -> Self {
 		let hint: NonEmptyString = {
 			if let name {
 				return .init(rawValue: name.rawValue + " (\(model.rawValue))")!
@@ -25,7 +25,7 @@ extension FactorSource {
 			}
 		}()
 
-		return try Self(
+		return Self(
 			kind: .ledgerHQHardwareWallet,
 			id: id,
 			hint: hint,
