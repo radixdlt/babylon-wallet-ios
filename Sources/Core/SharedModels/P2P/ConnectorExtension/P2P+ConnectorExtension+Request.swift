@@ -13,6 +13,13 @@ extension P2P.ConnectorExtension {
 		/// Messages sent to Connector Extension for interaction with
 		/// Ledger hardware wallets by LedgerHQ, e.g. Ledger Nano S
 		case ledgerHardwareWallet(LedgerHardwareWallet)
+
+		public func encode(to encoder: Encoder) throws {
+			switch self {
+			case let .ledgerHardwareWallet(request):
+				try request.encode(to: encoder)
+			}
+		}
 	}
 }
 

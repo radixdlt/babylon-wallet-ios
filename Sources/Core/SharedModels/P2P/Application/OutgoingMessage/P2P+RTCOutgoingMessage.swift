@@ -43,3 +43,12 @@ extension P2P.RTCOutgoingMessage.Response {
 		}
 	}
 }
+
+extension P2P.RTCOutgoingMessage.Request {
+	public func encode(to encoder: Encoder) throws {
+		switch self {
+		case let .connectorExtension(request):
+			try request.encode(to: encoder)
+		}
+	}
+}

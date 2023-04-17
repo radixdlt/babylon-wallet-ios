@@ -1,5 +1,5 @@
 import AsyncExtensions
-import Foundation
+import Prelude
 import RadixConnectModels
 
 // MARK: - PeerConnectionClient
@@ -7,7 +7,11 @@ import RadixConnectModels
 public struct PeerConnectionClient: Sendable {
 	typealias ID = PeerConnectionID
 	let id: ID
-	let iceConnectionStates: AnyAsyncSequence<ICEConnectionState>
+	private let iceConnectionStateSubject: AsyncCurrentValueSubject<ICEConnectionState>
+
+	var iceConnectionStates: AnyAsyncSequence<ICEConnectionState> {
+		iceConnectionStateSubject.share().eraseToAnyAsyncSequence()
+	}
 
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
@@ -18,12 +22,17 @@ public struct PeerConnectionClient: Sendable {
 		self.peerConnection = peerConnection
 		self.delegate = delegate
 		self.dataChannelClient = try peerConnection.createDataChannel()
-
-		self.iceConnectionStates = delegate
-			.onIceConnectionState
-			.logInfo("Ice connection state: %@")
-			.share()
-			.eraseToAnyAsyncSequence()
+		let iceConnectionStateSubject = AsyncCurrentValueSubject<ICEConnectionState>(.new)
+		self.iceConnectionStateSubject = iceConnectionStateSubject
+		Task {
+			for try await connectionUpdate in delegate.onIceConnectionState {
+				loggerGlobal.info("Ice connection state: \(connectionUpdate)")
+				iceConnectionStateSubject.send(connectionUpdate)
+			}
+			//            .logInfo("Ice connection state: %@")
+			//            .share()
+			//            .eraseToAnyAsyncSequence()
+		}
 	}
 }
 
@@ -61,6 +70,9 @@ extension PeerConnectionClient {
 
 extension PeerConnectionClient {
 	func sendData(_ data: Data) async throws {
+		#if DEBUG
+		loggerGlobal.critical("Sending data, json:\n\n\(String(describing: data.prettyPrintedJSONString))\n\n")
+		#endif // DEBUG
 		try await dataChannelClient.sendMessage(data)
 	}
 

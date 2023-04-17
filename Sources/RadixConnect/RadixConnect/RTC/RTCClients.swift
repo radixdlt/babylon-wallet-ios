@@ -74,19 +74,14 @@ extension RTCClients {
 		_ linkPassword: ConnectionPassword,
 		waitsForConnectionToBeEstablished: Bool = false
 	) async throws {
+		guard !clients.contains(where: { $0.key == linkPassword }) else {
+			loggerGlobal.notice("Ignored connecting RTCClient with connectionPassword/id: \(linkPassword), since it is already in RTCClients.clients")
+			return
+		}
 		let client = try makeRTCClient(linkPassword)
 		if waitsForConnectionToBeEstablished {
 			try await client.waitForFirstConnection()
 		}
-
-		var cur = iceConnectionStatusesSubject.value
-		if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
-			cur[index].peerConnectionStatuses = []
-		} else {
-			cur.append(.init(clientID: client.id, peerConnectionStatuses: []))
-		}
-		iceConnectionStatusesSubject.send(cur)
-
 		add(client)
 	}
 
@@ -184,19 +179,6 @@ extension RTCClients {
 
 	func add(_ client: RTCClient) {
 		client.incomingMessages.subscribe(incomingMessagesSubject)
-		Task {
-			for await update in client.connectionStatuses {
-				loggerGlobal.notice("RTCClients got iceConnectionUpdate: \(update)")
-				var cur = iceConnectionStatusesSubject.value
-				if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
-					cur[index].peerConnectionStatuses = update
-				} else {
-					cur.append(.init(clientID: client.id, peerConnectionStatuses: update))
-				}
-
-				iceConnectionStatusesSubject.send(cur)
-			}
-		}
 		self.clients[client.id] = client
 	}
 
@@ -209,10 +191,27 @@ extension RTCClients {
 			signalingClient: signalingClient,
 			factory: peerConnectionFactory
 		)
-		return RTCClient(
+		let client = RTCClient(
 			id: password,
 			peerConnectionNegotiator: negotiator
 		)
+
+		Task {
+			for await update in client.connectionStatuses {
+				loggerGlobal.notice("RTCClients got iceConnectionUpdate: \(update)")
+				var cur = iceConnectionStatusesSubject.value
+				if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
+					cur[index].peerConnectionStatuses = update
+				} else {
+					cur.append(.init(clientID: client.id, peerConnectionStatuses: update))
+				}
+
+				iceConnectionStatusesSubject.send(cur)
+			}
+			loggerGlobal.warning("Stopped receiveing updates")
+		}
+
+		return client
 	}
 }
 
@@ -295,8 +294,10 @@ extension RTCClient {
 	func broadcast(
 		request: P2P.RTCOutgoingMessage.Request
 	) async throws {
-		if peerConnections.isEmpty {
-			loggerGlobal.critical("No peerConnections")
+		guard await hasAnyActiveConnections() else {
+			// FIXME: @Ghenadie impl support for iOS to initiate conn
+			loggerGlobal.critical("FIXME has no connected connections - @Ghenadie impl support for iOS to initiate connectino!")
+			return
 		}
 
 		let data = try JSONEncoder().encode(request)

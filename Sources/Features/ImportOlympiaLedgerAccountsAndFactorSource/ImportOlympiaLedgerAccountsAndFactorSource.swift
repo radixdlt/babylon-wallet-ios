@@ -86,7 +86,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		case .task:
 
 			return .run { send in
-				for try await linksConnectionUpdate in await radixConnectClient.loadFromProfileAndConnectAll() {
+				for try await linksConnectionUpdate in await radixConnectClient.getP2PLinksWithConnectionStatusUpdates() {
 					guard !Task.isCancelled else {
 						return
 					}

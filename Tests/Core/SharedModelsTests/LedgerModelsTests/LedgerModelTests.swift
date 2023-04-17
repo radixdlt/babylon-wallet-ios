@@ -33,4 +33,33 @@ final class LedgerModelTests: TestCase {
 			P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
 		)
 	}
+
+	func test_encode_importOlympiaDevice() throws {
+		let request = P2P.ConnectorExtension.Request.ledgerHardwareWallet(
+			.init(
+				interactionID: .init("testID"),
+				request: .importOlympiaDevice(.init(
+					derivationPaths: [
+						"testPath",
+					]))
+			)
+		)
+		let expectedJSON: JSON = [
+			"interactionId": "testID",
+			"discriminator": "importOlympiaDevice",
+			"derivationPaths": [
+				"testPath",
+			],
+		]
+		try XCTAssertJSONEncoding(
+			request,
+			expectedJSON
+		)
+
+		let connectorExtensionRequest = P2P.RTCOutgoingMessage.Request.connectorExtension(request)
+		try XCTAssertJSONEncoding(
+			connectorExtensionRequest,
+			expectedJSON
+		)
+	}
 }
