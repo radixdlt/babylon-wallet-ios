@@ -25,8 +25,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public struct State: Sendable, Hashable {
-		public var outgoingInteractionIDs: Set<P2P.LedgerHardwareWallet.InteractionId>?
-
 		/// unverified, to verify and migrate
 		public var unverified: Set<OlympiaAccountToMigrate>
 
