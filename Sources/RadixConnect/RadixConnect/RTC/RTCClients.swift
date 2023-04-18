@@ -365,7 +365,7 @@ extension RTCClient {
 
 		Task {
 			for try await update in connection.iceConnectionStates {
-				loggerGlobal.notice("Got iceConnectionUpdate: \(update)")
+				loggerGlobal.trace("Got iceConnectionUpdate: \(update)")
 				var cur = connectionStatuses.value
 				if let index = cur.firstIndex(where: { $0.peerConnectionID == connection.id }) {
 					cur[index].iceConnectionState = update
@@ -374,7 +374,7 @@ extension RTCClient {
 				}
 				connectionStatuses.send(cur)
 			}
-			loggerGlobal.critical("Stopped receiving iceConnectionstates updates")
+			loggerGlobal.notice("Stopped receiving iceConnectionstates updates")
 		}
 
 		connection
