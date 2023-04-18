@@ -10,6 +10,8 @@ final class RTCPeerConnectionAsyncDelegate:
 {
 	let onNegotiationNeeded: AsyncStream<Void>
 	let onIceConnectionStateSubject: AsyncCurrentValueSubject<ICEConnectionState> = .init(.new)
+
+	/// A multicasting async sequence of ICE Connection state updates which *replays* the last value.
 	var onIceConnectionState: AnyAsyncSequence<ICEConnectionState> {
 		onIceConnectionStateSubject.share().eraseToAnyAsyncSequence()
 	}

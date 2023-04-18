@@ -29,9 +29,6 @@ public struct PeerConnectionClient: Sendable {
 				loggerGlobal.info("Ice connection state: \(connectionUpdate)")
 				iceConnectionStateSubject.send(connectionUpdate)
 			}
-			//            .logInfo("Ice connection state: %@")
-			//            .share()
-			//            .eraseToAnyAsyncSequence()
 		}
 	}
 }
