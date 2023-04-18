@@ -12,7 +12,6 @@ extension P2P {
 
 	public struct PeerConnectionUpdate: Sendable, Hashable {
 		public let peerConnectionID: PeerConnectionID
-		//        public let connectionID: ConnectionPassword
 		public fileprivate(set) var iceConnectionState: ICEConnectionState
 	}
 }
@@ -152,7 +151,6 @@ extension RTCClients {
 		_ request: P2P.RTCOutgoingMessage.Request
 	) async throws {
 		guard let connectedClients = await connectedClients() else {
-			struct NoConnectedClients: Swift.Error {}
 			throw NoConnectedClients()
 		}
 		try await withThrowingTaskGroup(of: Void.self) { group in
@@ -214,6 +212,9 @@ extension RTCClients {
 		return client
 	}
 }
+
+// MARK: - NoConnectedClients
+struct NoConnectedClients: Swift.Error {}
 
 // MARK: - RTCClient
 actor RTCClient {
@@ -295,9 +296,8 @@ extension RTCClient {
 		request: P2P.RTCOutgoingMessage.Request
 	) async throws {
 		guard await hasAnyActiveConnections() else {
-			// FIXME: @Ghenadie impl support for iOS to initiate conn
-			loggerGlobal.critical("FIXME has no connected connections - @Ghenadie impl support for iOS to initiate connectino!")
-			return
+			loggerGlobal.warning("Unable to broadcast, no connected PeerConnections.")
+			throw NoConnectedClients()
 		}
 
 		let data = try JSONEncoder().encode(request)
