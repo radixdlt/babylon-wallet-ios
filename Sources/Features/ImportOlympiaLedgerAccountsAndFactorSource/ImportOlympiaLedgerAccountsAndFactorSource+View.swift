@@ -19,7 +19,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 		public let failedToFindAnyLinks: Bool
 		public let ledgerName: String
 		public let isLedgerNameInputVisible: Bool
-		//        public let isWaitingForResponseFromLedger: Bool
 		public let numberOfUnverifiedAccounts: Int
 		public let addedLedgersWithAccounts: OrderedSet<AddedLedgerWithAccounts>
 		public let viewControlState: ControlState
@@ -86,7 +85,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 				}
 				//                .controlState(viewStore.viewControlState)
 				.padding(.horizontal, .medium3)
-//				.onAppear { viewStore.send(.appeared) }
 				.task { @MainActor in await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
 			}

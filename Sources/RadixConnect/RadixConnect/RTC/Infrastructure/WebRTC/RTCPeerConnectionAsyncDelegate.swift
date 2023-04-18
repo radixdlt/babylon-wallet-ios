@@ -18,13 +18,13 @@ final class RTCPeerConnectionAsyncDelegate:
 	let onGeneratedICECandidate: AsyncStream<RTCPrimitive.ICECandidate>
 
 	private let onNegotiationNeededContinuation: AsyncStream<Void>.Continuation
-//	private let onIceConnectionStateContinuation: AsyncStream<ICEConnectionState>.Continuation
+
 	private let onSignalingStateContinuation: AsyncStream<SignalingState>.Continuation
 	private let onGeneratedICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
 
 	override internal init() {
 		(onNegotiationNeeded, onNegotiationNeededContinuation) = AsyncStream.streamWithContinuation()
-//		(onIceConnectionState, onIceConnectionStateContinuation) = AsyncStream.streamWithContinuation()
+
 		(onSignalingState, onSignalingStateContinuation) = AsyncStream.streamWithContinuation()
 		(onGeneratedICECandidate, onGeneratedICECandidateContinuation) = AsyncStream.streamWithContinuation()
 
@@ -33,7 +33,6 @@ final class RTCPeerConnectionAsyncDelegate:
 
 	func cancel() {
 		onNegotiationNeededContinuation.finish()
-//		onIceConnectionStateContinuation.finish()
 		onIceConnectionStateSubject.send(.finished)
 		onSignalingStateContinuation.finish()
 		onGeneratedICECandidateContinuation.finish()
@@ -51,7 +50,6 @@ extension RTCPeerConnectionAsyncDelegate: RTCPeerConnectionDelegate {
 	}
 
 	func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
-//		onIceConnectionStateContinuation.yield(.init(from: newState))
 		onIceConnectionStateSubject.send(.init(from: newState))
 	}
 
