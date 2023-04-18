@@ -27,7 +27,7 @@ public actor RTCClients {
 
 	// MARK: - Streams
 
-	/// A **multicasted** async sequence for received messeage from ALL RTCClients.
+	/// A **multicasted** async sequence for received message from ALL RTCClients.
 	public func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
@@ -49,7 +49,7 @@ public actor RTCClients {
 	// MARK: - Internal state
 	private var clients: [RTCClient.ID: RTCClient] = [:]
 
-	// MARK: - Initialisers
+	// MARK: - Initializers
 
 	init(peerConnectionFactory: PeerConnectionFactory,
 	     signalingServerBaseURL: URL = SignalingClient.default)
@@ -166,7 +166,7 @@ extension RTCClients {
 			}
 
 			if group.isEmpty {
-				loggerGlobal.critical("FAILED TO BROADCAST TO ANY RTCCLIENT")
+				loggerGlobal.error("Failed to broadcast to any RTCClient")
 			}
 
 			try await group.waitForAll()
@@ -206,7 +206,7 @@ extension RTCClients {
 
 				iceConnectionStatusesSubject.send(cur)
 			}
-			loggerGlobal.warning("Stopped receiveing updates")
+			loggerGlobal.notice("Stopped receiving ICEConnection states updates")
 		}
 
 		return client
@@ -374,7 +374,7 @@ extension RTCClient {
 				}
 				connectionStatuses.send(cur)
 			}
-			loggerGlobal.notice("Stopped receiving iceConnectionstates updates")
+			loggerGlobal.notice("Stopped receiving iceConnectionState updates")
 		}
 
 		connection
