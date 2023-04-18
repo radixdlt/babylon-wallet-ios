@@ -38,7 +38,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 			self.metadata = .init(persona: persona,
 			                      dAppName: dAppName,
-			                      requiredFields: [.givenName])
+			                      requiredFields: [])
 		}
 	}
 
