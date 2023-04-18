@@ -5,10 +5,13 @@ import Profile
 public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let migratedAccounts: Profile.Network.Accounts
+		public let unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
 		public init(
-			migratedAccounts: Profile.Network.Accounts
+			migratedAccounts: Profile.Network.Accounts,
+			unvalidatedOlympiaHardwareAccounts: Set<OlympiaAccountToMigrate>?
 		) {
 			self.migratedAccounts = migratedAccounts
+			self.unvalidatedOlympiaHardwareAccounts = unvalidatedOlympiaHardwareAccounts
 		}
 	}
 

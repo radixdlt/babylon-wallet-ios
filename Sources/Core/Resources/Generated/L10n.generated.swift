@@ -599,8 +599,8 @@ public enum L10n {
         public static let importOneAcccount = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importOneAcccount", fallback: "Import one account")
         /// Import accounts
         public static let importZeroAccounts = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importZeroAccounts", fallback: "Import accounts")
-        /// Select all
-        public static let selectAll = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.selectAll", fallback: "Select all")
+        /// Select all non imported
+        public static let selectAllNonImported = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.selectAllNonImported", fallback: "Select all non imported")
       }
     }
   }

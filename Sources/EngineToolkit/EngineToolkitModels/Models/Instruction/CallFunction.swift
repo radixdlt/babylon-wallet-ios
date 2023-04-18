@@ -42,6 +42,7 @@ public struct CallFunction: InstructionProtocol {
 		)
 	}
 
+	#if swift(<5.8)
 	public init(
 		packageAddress: PackageAddress,
 		blueprintName: String,
@@ -69,6 +70,7 @@ public struct CallFunction: InstructionProtocol {
 			arguments: [buildValue()]
 		)
 	}
+	#endif
 }
 
 extension CallFunction {

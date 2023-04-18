@@ -18,6 +18,7 @@ extension P2P {
 			case getDeviceInfo
 			case derivePublicKey
 			case signTransaction
+			case importOlympiaDevice
 		}
 
 		// N.B. these *might* have the exact same JSON representation as

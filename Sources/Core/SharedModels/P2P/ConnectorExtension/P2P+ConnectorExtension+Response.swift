@@ -10,6 +10,10 @@ extension P2P.ConnectorExtension {
 		/// from an interaction with a Ledger hardware wallet by LedgerHQ,
 		/// e.g. Ledger Nano S
 		case ledgerHardwareWallet(LedgerHardwareWallet)
+
+		public init(from decoder: Decoder) throws {
+			self = try .ledgerHardwareWallet(.init(from: decoder))
+		}
 	}
 }
 
@@ -31,14 +35,15 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		public let message: String
 	}
 
-	public enum Success: Sendable, Hashable, Decodable {
+	public enum Success: Sendable, Hashable {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKey(DerivePublicKey)
 		case signTransaction(SignTransaction)
+		case importOlympiaDevice(ImportOlympiaDevice)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
-			public let id: FactorSource.LedgerHardwareWallet.DeviceID
-			public let model: Int // P2P.LedgerHardwareWallet.Model
+			public let id: FactorSource.ID
+			public let model: P2P.LedgerHardwareWallet.Model
 		}
 
 		public struct DerivePublicKey: Sendable, Hashable, Decodable {
@@ -48,6 +53,16 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		public struct SignTransaction: Sendable, Hashable, Decodable {
 			public let signature: HexCodable
 			public let publicKey: HexCodable
+		}
+
+		public struct ImportOlympiaDevice: Sendable, Hashable, Decodable {
+			public let id: FactorSource.ID
+			public let model: P2P.LedgerHardwareWallet.Model
+			public let derivedPublicKeys: [DerivedPublicKey]
+			public struct DerivedPublicKey: Sendable, Hashable, Decodable {
+				public let publicKey: HexCodable
+				public let path: String
+			}
 		}
 	}
 
@@ -62,13 +77,31 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		self.discriminator = discriminator
 		self.interactionID = try container.decode(P2P.LedgerHardwareWallet.InteractionId.self, forKey: .interactionID)
 
-		if let successPayload = try container.decodeIfPresent(Success.self, forKey: .success) {
-			self.response = .success(successPayload)
-		} else if let failurePayload = try container.decodeIfPresent(Failure.self, forKey: .failure) {
-			self.response = .failure(failurePayload)
-		} else {
-			struct NeitherSuccessNorFailureJSONKeysFound: Swift.Error {}
-			throw NeitherSuccessNorFailureJSONKeysFound()
+		func decodeResponse<T: Decodable>(embed: (T) -> Success) throws -> Result<Success, Failure> {
+			do {
+				let success = try container.decode(T.self, forKey: .success)
+				return .success(embed(success))
+			} catch {
+				return try .failure(container.decode(Failure.self, forKey: .failure))
+			}
+		}
+		switch discriminator {
+		case .derivePublicKey:
+			self.response = try decodeResponse {
+				Success.derivePublicKey($0)
+			}
+		case .getDeviceInfo:
+			self.response = try decodeResponse {
+				Success.getDeviceInfo($0)
+			}
+		case .importOlympiaDevice:
+			self.response = try decodeResponse {
+				Success.importOlympiaDevice($0)
+			}
+		case .signTransaction:
+			self.response = try decodeResponse {
+				Success.signTransaction($0)
+			}
 		}
 	}
 }

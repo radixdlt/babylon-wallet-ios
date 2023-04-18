@@ -58,14 +58,14 @@ extension SelectAccountsToImport {
 					.padding(.bottom, .medium2)
 				}
 				.footer {
-					HStack {
+					VStack {
 						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.deselectAll) {
 							viewStore.send(.deselectAll)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 
-						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.selectAll) {
-							viewStore.send(.selectAll)
+						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.selectAllNonImported) {
+							viewStore.send(.selectAllNonImported)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					}

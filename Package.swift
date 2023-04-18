@@ -41,15 +41,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AddLedgerNanoFactorSourceFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"FactorSourcesClient",
-			"RadixConnectClient",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "AggregatedValueFeature",
 		dependencies: [],
 		tests: .yes()
@@ -173,6 +164,16 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"RadixConnectClient",
+			"ImportLegacyWalletClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "InspectProfileFeature",
 		dependencies: [
 			"SecureStorageClient",
@@ -242,7 +243,7 @@ package.addModules([
 		name: "SettingsFeature",
 		dependencies: [
 			"AccountsClient",
-			"AddLedgerNanoFactorSourceFeature",
+			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"CacheClient",

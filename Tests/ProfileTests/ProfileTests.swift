@@ -42,6 +42,29 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(factorSourceID.hex(), "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
+	func test_factor_source_id_cap33() async throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "surprise jaguar gloom bring cage obey rotate fiber agree castle rich tomorrow",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
+		let key = try root.derivePublicKey(
+			path: .init(
+				children: [
+					.bip44Purpose,
+					.coinType,
+					.getID,
+				],
+				onlyPublic: false
+			),
+			curve: Curve25519.self
+		)
+
+		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "156220ef37c5cd3e6da10cdfdba8a0d87ddc4411b4829f60155db3f6bbafc9f8")
+		let factorSourceID = try FactorSource.id(fromRoot: root)
+		XCTAssertEqual(factorSourceID.hex(), "56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
+	}
+
 	func test_new_profile() async throws {
 		continueAfterFailure = false
 

@@ -4,6 +4,14 @@ import Foundation
 import Prelude
 import SharedModels
 
+// MARK: - P2P.ClientConnectionsUpdate
+extension P2P {
+	public struct ClientConnectionsUpdate: Sendable, Hashable {
+		public let clientID: ConnectionPassword
+		public fileprivate(set) var idsOfConnectedPeerConnections: [PeerConnectionID]
+	}
+}
+
 // MARK: - RTCClients
 /// Holds and manages all of added RTCClients
 public actor RTCClients {
@@ -15,13 +23,20 @@ public actor RTCClients {
 
 	// MARK: - Streams
 
-	/// A **multicasted** async sequence for received messeage from ALL RTCClients.
+	/// A **multicasted** async sequence for received message from ALL RTCClients.
 	public func incomingMessages() async -> AnyAsyncSequence<P2P.RTCIncomingMessage> {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
 
+	public func connectClients() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
+		clientConnectionsUpdateSubject.share().eraseToAnyAsyncSequence()
+	}
+
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
+
+	/// ICEConnectionStatus updates. This is the single channel for the status updates from all RTCClients
+	private let clientConnectionsUpdateSubject: AsyncCurrentValueSubject<[P2P.ClientConnectionsUpdate]> = .init([])
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -30,7 +45,7 @@ public actor RTCClients {
 	// MARK: - Internal state
 	private var clients: [RTCClient.ID: RTCClient] = [:]
 
-	// MARK: - Initialisers
+	// MARK: - Initializers
 
 	init(peerConnectionFactory: PeerConnectionFactory,
 	     signalingServerBaseURL: URL = SignalingClient.default)
@@ -54,6 +69,10 @@ extension RTCClients {
 		_ linkPassword: ConnectionPassword,
 		waitsForConnectionToBeEstablished: Bool = false
 	) async throws {
+		guard !clients.contains(where: { $0.key == linkPassword }) else {
+			loggerGlobal.notice("Ignored connecting RTCClient with connectionPassword/id: \(linkPassword), since it is already in RTCClients.clients")
+			return
+		}
 		let client = try makeRTCClient(linkPassword)
 		if waitsForConnectionToBeEstablished {
 			try await client.waitForFirstConnection()
@@ -66,6 +85,12 @@ extension RTCClients {
 	public func disconnectAndRemoveClient(_ password: ConnectionPassword) async {
 		await clients[password]?.cancel()
 		clients.removeValue(forKey: password)
+
+		var cur = clientConnectionsUpdateSubject.value
+		if let index = cur.firstIndex(where: { $0.clientID == password }) {
+			cur.remove(at: index)
+			clientConnectionsUpdateSubject.send(cur)
+		}
 	}
 
 	/// Disconnect and remove all RTCClients
@@ -109,11 +134,23 @@ extension RTCClients {
 		}
 	}
 
+	private func connectedClients() async -> NonEmpty<[RTCClient]>? {
+		var connectedClient = [RTCClient]()
+		for client in clients.values {
+			guard await client.hasAnyActiveConnections() else { continue }
+			connectedClient.append(client)
+		}
+		return NonEmpty(rawValue: connectedClient)
+	}
+
 	private func broadcastRequest(
 		_ request: P2P.RTCOutgoingMessage.Request
 	) async throws {
+		guard let connectedClients = await connectedClients() else {
+			throw NoConnectedClients()
+		}
 		try await withThrowingTaskGroup(of: Void.self) { group in
-			for client in clients.values {
+			for client in connectedClients {
 				guard !Task.isCancelled else {
 					// We do not throw if cancelled, it is good we
 					// manage to broadcast to SOME client (i.e. not ALL is required.)
@@ -123,6 +160,11 @@ extension RTCClients {
 					try await client.broadcast(request: request)
 				}
 			}
+
+			if group.isEmpty {
+				loggerGlobal.error("Failed to broadcast to any RTCClient")
+			}
+
 			try await group.waitForAll()
 		}
 	}
@@ -130,6 +172,21 @@ extension RTCClients {
 	// MARK: - Private
 
 	func add(_ client: RTCClient) {
+		Task {
+			for await update in client.idsOfConnectPeerConnectionsSubject {
+				loggerGlobal.debug("RTCClients got iceConnectionUpdate: \(update)")
+				var cur = clientConnectionsUpdateSubject.value
+				if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
+					cur[index].idsOfConnectedPeerConnections = update
+				} else {
+					cur.append(.init(clientID: client.id, idsOfConnectedPeerConnections: update))
+				}
+
+				clientConnectionsUpdateSubject.send(cur)
+			}
+			loggerGlobal.notice("Stopped receiving ICEConnection states updates")
+		}
+
 		client.incomingMessages.subscribe(incomingMessagesSubject)
 		self.clients[client.id] = client
 	}
@@ -143,12 +200,17 @@ extension RTCClients {
 			signalingClient: signalingClient,
 			factory: peerConnectionFactory
 		)
-		return RTCClient(
+		let client = RTCClient(
 			id: password,
 			peerConnectionNegotiator: negotiator
 		)
+
+		return client
 	}
 }
+
+// MARK: - NoConnectedClients
+struct NoConnectedClients: Swift.Error {}
 
 // MARK: - RTCClient
 actor RTCClient {
@@ -156,9 +218,21 @@ actor RTCClient {
 
 	let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
 	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
+
 	private let peerConnectionNegotiator: PeerConnectionNegotiator
-	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
+	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:] {
+		didSet {
+			self.idsOfConnectPeerConnectionsSubject.send(Array(peerConnections.keys))
+		}
+	}
+
 	private var connectionsTask: Task<Void, Error>?
+
+	public func hasAnyActiveConnections() async -> Bool {
+		!peerConnections.isEmpty
+	}
+
+	let idsOfConnectPeerConnectionsSubject: AsyncCurrentValueSubject<[PeerConnectionID]> = .init([])
 
 	private let disconnectedPeerConnection: AsyncStream<PeerConnectionID>
 	private let disconnectedPeerConnectionContinuation: AsyncStream<PeerConnectionID>.Continuation
@@ -202,6 +276,7 @@ extension RTCClient {
 		peerConnections.removeAll()
 		peerConnectionNegotiator.cancel()
 		incomingMessagesContinuation.finish()
+		idsOfConnectPeerConnectionsSubject.send(.finished)
 		disconnectedPeerConnectionContinuation.finish()
 		connectionsTask?.cancel()
 		disconnectTask?.cancel()
@@ -221,7 +296,18 @@ extension RTCClient {
 	func broadcast(
 		request: P2P.RTCOutgoingMessage.Request
 	) async throws {
-		let data = try JSONEncoder().encode(request)
+		guard await hasAnyActiveConnections() else {
+			loggerGlobal.warning("Unable to broadcast, no connected PeerConnections.")
+			throw NoConnectedClients()
+		}
+
+		let encoder = JSONEncoder()
+
+		/// Important to not escape slashes for derivation paths, which otherwise will look:
+		/// `m\/44H\/1022H\/0H\/0\/4H` but should be `m/44H/1022H/0H/0/4H` ofc.
+		encoder.outputFormatting = [.withoutEscapingSlashes]
+
+		let data = try encoder.encode(request)
 
 		try await withThrowingTaskGroup(of: Void.self) { group in
 			for client in peerConnections.values {
@@ -233,6 +319,9 @@ extension RTCClient {
 				_ = group.addTaskUnlessCancelled {
 					try await client.sendData(data)
 				}
+			}
+			if group.isEmpty {
+				loggerGlobal.error("Did not find any RTCClient to broadcast to?")
 			}
 			try await group.waitForAll()
 		}
@@ -304,7 +393,6 @@ func decode(
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
 
 		let jsonData = message.messageContent
-
 		do {
 			let request = try jsonDecoder.decode(
 				P2P.RTCMessageFromPeer.Request.self,
@@ -325,6 +413,9 @@ func decode(
 
 			} catch let decodeResponseError {
 				loggerGlobal.error("Failed to decode as RTC request & response, request decoding failure: \(decodeRequestError)\n\nresponse decoding failure: \(decodeResponseError)")
+				#if DEBUG
+				loggerGlobal.critical("Decoding RadixConnect message, json:\n\n\(String(describing: jsonData.prettyPrintedJSONString))\n\n")
+				#endif // DEBUG
 				return .failure(decodeRequestError)
 			}
 		}

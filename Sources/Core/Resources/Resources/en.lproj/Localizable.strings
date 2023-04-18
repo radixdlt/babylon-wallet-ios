@@ -327,7 +327,7 @@
 "importLegacyWallet.selectAccountsToImport.accountRow.label.accountType" = "Type";
 "importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath" = "Path";
 "importLegacyWallet.selectAccountsToImport.button.deselectAll" = "Deselect all";
-"importLegacyWallet.selectAccountsToImport.button.selectAll" = "Select all";
+"importLegacyWallet.selectAccountsToImport.button.selectAllNonImported" = "Select all non imported";
 "importLegacyWallet.selectAccountsToImport.button.importOneAcccount" = "Import one account";
 "importLegacyWallet.selectAccountsToImport.button.importZeroAccounts" = "Import accounts";
 "importLegacyWallet.selectAccountsToImport.button.importManyAccounts" = "Import %@ accounts";

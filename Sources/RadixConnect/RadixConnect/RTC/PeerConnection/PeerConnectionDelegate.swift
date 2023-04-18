@@ -14,7 +14,9 @@ protocol PeerConnection: Sendable {
 // MARK: - PeerConnectionDelegate
 protocol PeerConnectionDelegate: Sendable {
 	var onNegotiationNeeded: AsyncStream<Void> { get }
-	var onIceConnectionState: AsyncStream<ICEConnectionState> { get }
+
+	var onIceConnectionState: AnyAsyncSequence<ICEConnectionState> { get }
+
 	var onSignalingState: AsyncStream<SignalingState> { get }
 	var onGeneratedICECandidate: AsyncStream<RTCPrimitive.ICECandidate> { get }
 

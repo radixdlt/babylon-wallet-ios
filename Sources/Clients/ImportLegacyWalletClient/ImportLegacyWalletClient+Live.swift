@@ -56,7 +56,9 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 		return Self(
 			parseHeaderFromQRCode: {
-				try CAP33.deserializeHeader(payload: $0)
+				let header = try CAP33.deserializeHeader(payload: $0)
+				loggerGlobal.notice("Scanned Olympia QR found header: \(header)")
+				return header
 			},
 			parseLegacyWalletFromQRCodes: {
 				let parsed = try CAP33.deserialize(payloads: $0)

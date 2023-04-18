@@ -32,7 +32,7 @@ struct PeerConnectionNegotiator {
 	private let negotiationTask: Task<Void, Error>
 
 	// MARK: - Config
-	private let singlaingClient: SignalingClient
+	private let signalingClient: SignalingClient
 	private let factory: PeerConnectionFactory
 
 	init(
@@ -40,7 +40,7 @@ struct PeerConnectionNegotiator {
 		factory: PeerConnectionFactory,
 		isOfferer: Bool = false
 	) {
-		self.singlaingClient = signalingClient
+		self.signalingClient = signalingClient
 		self.factory = factory
 
 		let (negotiationResultsStream, negotiationResultsContinuation) = AsyncStream<NegotiationResult>.streamWithContinuation()
@@ -59,7 +59,7 @@ extension PeerConnectionNegotiator {
 	func cancel() {
 		negotiationResultsContinuation.finish()
 		negotiationTask.cancel()
-		singlaingClient.cancel()
+		signalingClient.cancel()
 	}
 
 	private static func listenForNegotiationTriggers(
