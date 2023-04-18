@@ -128,6 +128,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
+			guard state.hasChanges() else {
+				return .fireAndForget {
+					await dismiss()
+				}
+			}
+
 			state.destination = .closeConfirmationDialog(
 				.init(titleVisibility: .hidden) {
 					TextState("")
@@ -179,5 +185,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+}
+
+extension EditPersona.State {
+	func hasChanges() -> Bool {
+		guard let output = viewState.output else { return false }
+		return output.personaLabel != persona.displayName || persona.fields != output.fields
 	}
 }

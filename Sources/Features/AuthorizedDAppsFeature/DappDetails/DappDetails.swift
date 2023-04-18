@@ -171,18 +171,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
-		.run { send in
-			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
-			await send(.internal(.dAppUpdated(updatedDapp)))
-			if dismissPersonaDetails {
-				await send(.child(.personaDetails(.dismiss)))
-			}
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
@@ -198,12 +186,22 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .dAppForgotten:
-//			 TODO: This is part of a workaround to make SwiftUI actually dismiss the view
-//			state.isDismissed = true
 			return .task {
 				await dismiss()
 				return .delegate(.dAppForgotten)
 			}
+		}
+	}
+
+	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
+		.run { send in
+			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
+			await send(.internal(.dAppUpdated(updatedDapp)))
+			if dismissPersonaDetails {
+				await send(.child(.personaDetails(.dismiss)))
+			}
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 
