@@ -7,7 +7,7 @@ import PersonasFeature
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
-//	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
@@ -34,9 +34,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
 
 		public var personas: PersonaList.State
-
-		// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
-		public var isDismissed: Bool = false
 
 		public init(dApp: Profile.Network.AuthorizedDappDetailed, personaDetails: PersonaDetails.State? = nil) {
 			self.dApp = dApp
@@ -201,9 +198,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .dAppForgotten:
-			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
-			state.isDismissed = true
-			return .send(.delegate(.dAppForgotten))
+//			 TODO: This is part of a workaround to make SwiftUI actually dismiss the view
+//			state.isDismissed = true
+			return .task {
+				await dismiss()
+				return .delegate(.dAppForgotten)
+			}
 		}
 	}
 

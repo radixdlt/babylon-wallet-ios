@@ -7,7 +7,6 @@ import PersonasFeature
 extension DappDetails {
 	@MainActor
 	public struct View: SwiftUI.View {
-		@Environment(\.dismiss) private var dismiss
 		let store: Store
 
 		public init(store: Store) {
@@ -24,7 +23,6 @@ extension DappDetails {
 		let fungibleTokens: [Token]
 		let nonFungibleTokens: [Token]
 		let hasPersonas: Bool
-		let isDismissed: Bool
 
 		struct MetadataItem: Identifiable, Hashable, Sendable {
 			var id: Self { self }
@@ -88,9 +86,6 @@ extension DappDetails.View {
 				}
 				.alert(store: store.confirmDisconnectAlert)
 			}
-			.onChange(of: viewStore.isDismissed) { _ in
-				dismiss()
-			}
 		}
 	}
 }
@@ -117,8 +112,7 @@ private extension DappDetails.State {
 			otherMetadata: otherMetadata,
 			fungibleTokens: [], // TODO: Populate when we have it
 			nonFungibleTokens: [], // TODO: Populate when we have it
-			hasPersonas: !personas.personas.isEmpty,
-			isDismissed: isDismissed
+			hasPersonas: !personas.personas.isEmpty
 		)
 	}
 }
