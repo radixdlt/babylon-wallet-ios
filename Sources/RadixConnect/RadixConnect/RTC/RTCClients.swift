@@ -309,13 +309,11 @@ extension RTCClient {
 					return
 				}
 				_ = group.addTaskUnlessCancelled {
-					loggerGlobal.notice("Sending data...?")
 					try await client.sendData(data)
-					loggerGlobal.notice("Data set?")
 				}
 			}
 			if group.isEmpty {
-				loggerGlobal.critical("FAILED TO BROADCAST TO ANY PEERCONNECTION")
+				loggerGlobal.error("Did not find any RTCClient to broadcast to?")
 			}
 			try await group.waitForAll()
 		}
