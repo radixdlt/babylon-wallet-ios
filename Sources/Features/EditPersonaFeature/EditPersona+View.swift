@@ -101,7 +101,7 @@ extension EditPersona {
 					}
 					#if os(iOS)
 					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
+						ToolbarItem(placement: .primaryAction) {
 							CloseButton { viewStore.send(.closeButtonTapped) }
 						}
 					}

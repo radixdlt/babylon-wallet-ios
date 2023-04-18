@@ -16,8 +16,9 @@ public struct PersonaThumbnail: View {
 				.strokeBorder(Color.app.gray3, lineWidth: 1)
 				.background(Circle().fill(Color.app.gray4))
 				.frame(size)
+		} else {
+			PersonaPlaceholder(size: size)
 		}
-		PersonaPlaceholder(size: .small)
 	}
 }
 

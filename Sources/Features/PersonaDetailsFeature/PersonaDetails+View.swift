@@ -14,7 +14,9 @@ extension PersonaDetails {
 	}
 
 	public struct ViewState: Equatable {
+		let thumbnail: URL?
 		let personaName: String
+		let isDappPersona: Bool
 	}
 }
 
@@ -22,26 +24,41 @@ extension PersonaDetails {
 
 extension PersonaDetails.View {
 	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			ScrollView(showsIndicators: false) {
+		ScrollView(showsIndicators: false) {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
-					let metadataStore = store.scope(state: \.metadata) { .child(.metadata($0)) }
-					PersonaMetadata.View(store: metadataStore)
+					PersonaThumbnail(viewStore.thumbnail, size: .veryLarge)
+						.padding(.vertical, .large2)
 
-					AccountSection(store: store)
-						.background(.app.gray5)
+					InfoSection(store: store.actionless)
 
-					Button(L10n.PersonaDetails.deauthorizePersona) {
-						viewStore.send(.deauthorizePersonaTapped)
+					Button(L10n.PersonaDetails.editPersona) {
+						viewStore.send(.editPersonaTapped)
 					}
-					.buttonStyle(.primaryRectangular(isDestructive: true))
-					.padding([.horizontal, .top], .medium3)
-					.padding(.bottom, .large2)
+					.buttonStyle(.secondaryRectangular)
+					.padding(.vertical, .large3)
+
+					if viewStore.isDappPersona {
+						IfLetStore(store.scope(state: \.accountSection, action: PersonaDetails.Action.view)) {
+							AccountSection(store: $0)
+								.background(.app.gray5)
+						}
+
+						Button(L10n.PersonaDetails.deauthorizePersona) {
+							viewStore.send(.deauthorizePersonaTapped)
+						}
+						.buttonStyle(.primaryRectangular(isDestructive: true))
+						.padding([.horizontal, .top], .medium3)
+						.padding(.bottom, .large2)
+					}
 				}
+				.navigationTitle(viewStore.personaName)
 			}
-			.navigationTitle(viewStore.personaName)
-			.alert(store: store.confirmForgetAlert)
 		}
+		.sheet(store: store.scope(state: \.$editPersona, action: { .child(.editPersona($0)) })) {
+			EditPersona.View(store: $0)
+		}
+		.alert(store: store.confirmForgetAlert)
 	}
 }
 
@@ -49,7 +66,25 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(personaName: persona.displayName.rawValue)
+		.init(thumbnail: nil, personaName: personaName, isDappPersona: isDappPersona)
+	}
+
+	var personaName: String {
+		switch mode {
+		case let .general(persona):
+			return persona.displayName.rawValue
+		case let .dApp(_, persona):
+			return persona.displayName.rawValue
+		}
+	}
+
+	var isDappPersona: Bool {
+		switch mode {
+		case .general:
+			return false
+		case .dApp:
+			return true
+		}
 	}
 }
 
@@ -59,19 +94,30 @@ private extension PersonaDetails.Store {
 	}
 }
 
+extension PersonaDetails.State {
+	var accountSection: AccountSection? {
+		switch mode {
+		case .general:
+			return nil
+		case let .dApp(dApp, persona):
+			return .init(dAppName: dApp.displayName.rawValue, sharingAccounts: persona.simpleAccounts ?? [])
+		}
+	}
+
+	struct AccountSection: Equatable {
+		let dAppName: String
+		let sharingAccounts: OrderedSet<Profile.Network.AccountForDisplay>
+	}
+}
+
 // MARK: - PersonaDetails.View.AccountSection
 extension PersonaDetails.View {
 	@MainActor
 	struct AccountSection: View {
-		struct ViewState: Equatable {
-			let dAppName: String
-			let sharingAccounts: OrderedSet<Profile.Network.AccountForDisplay>
-		}
-
-		let store: StoreOf<PersonaDetails>
+		let store: Store<PersonaDetails.State.AccountSection, PersonaDetails.ViewAction>
 
 		var body: some View {
-			WithViewStore(store, observe: \.accountSectionViewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: { $0 }) { viewStore in
 				VStack(spacing: 0) {
 					Text(L10n.PersonaDetails.accountSharingDescription(viewStore.dAppName))
 						.textBlock
@@ -103,85 +149,50 @@ extension PersonaDetails.View {
 	}
 }
 
-private extension PersonaDetails.State {
-	var accountSectionViewState: PersonaDetails.View.AccountSection.ViewState {
-		.init(dAppName: dAppName, sharingAccounts: persona.simpleAccounts ?? [])
-	}
-}
-
-// MARK: PersonaMetadata
-
-private extension PersonaMetadata.State {
-	var viewState: PersonaMetadata.ViewState {
-		.init(thumbnail: thumbnail, name: name)
-	}
-}
-
-extension PersonaMetadata {
-	@MainActor
-	public struct View: SwiftUI.View {
-		let store: Store
-
-		public init(store: Store) {
-			self.store = store
-		}
-	}
-
-	public struct ViewState: Equatable {
-		let thumbnail: URL?
-		let name: String
-	}
-}
-
 // MARK: - Body
 
-extension PersonaMetadata.View {
-	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			VStack(spacing: 0) {
-				if let thumbnail = viewStore.thumbnail {
-					PersonaThumbnail(thumbnail, size: .veryLarge)
-						.padding(.vertical, .large2)
-				} else {
-					PersonaPlaceholder(size: .veryLarge)
-						.padding(.vertical, .large2)
-				}
-
-				InfoSection(store: store.actionless)
-
-				Button(L10n.PersonaDetails.editPersona) {
-					viewStore.send(.editPersonaTapped)
-				}
-				.buttonStyle(.secondaryRectangular)
-				.padding(.vertical, .large3)
-			}
+private extension PersonaDetails.State {
+	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
+		switch mode {
+		case let .dApp(_, persona: persona):
+			return .init(
+				dAppInfo: dAppInfo,
+				personaName: personaName,
+				fields: persona.sharedFields ?? []
+			)
+		case let .general(persona):
+			return .init(
+				dAppInfo: nil,
+				personaName: personaName,
+				fields: persona.fields
+			)
 		}
-		.sheet(store: store.scope(state: \.$editPersona, action: { .child(.editPersona($0)) })) {
-			EditPersona.View(store: $0)
-		}
+	}
+
+	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
+		guard case let .dApp(dApp, persona) = mode else { return nil }
+		return .init(
+			name: dApp.displayName.rawValue,
+			isSharingNothing: persona.sharedFields.isNilOrEmpty
+		)
 	}
 }
 
-private extension PersonaMetadata.State {
-	var infoSectionViewState: PersonaMetadata.View.InfoSection.ViewState {
-		.init(
+private extension PersonaDetails.View.InfoSection.ViewState {
+	init(dAppInfo: DappInfo?, personaName: String, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) {
+		self.init(
 			dAppInfo: dAppInfo,
-			personaName: name,
+			personaName: personaName,
 			firstName: fields[id: .givenName]?.value.rawValue,
 			lastName: fields[id: .familyName]?.value.rawValue,
 			emailAddress: fields[id: .emailAddress]?.value.rawValue,
 			phoneNumber: fields[id: .phoneNumber]?.value.rawValue
 		)
 	}
-
-	var dAppInfo: PersonaMetadata.View.InfoSection.ViewState.DappInfo? {
-		guard case let .dApp(name, _) = mode else { return nil }
-		return .init(name: name, isSharingNothing: fields.isEmpty)
-	}
 }
 
-// MARK: - PersonaMetadata.View.InfoSection
-extension PersonaMetadata.View {
+// MARK: - PersonaDetails.View.InfoSection
+extension PersonaDetails.View {
 	@MainActor
 	struct InfoSection: View {
 		struct ViewState: Equatable {
@@ -198,7 +209,7 @@ extension PersonaMetadata.View {
 			}
 		}
 
-		let store: Store<PersonaMetadata.State, Never>
+		let store: Store<PersonaDetails.State, Never>
 
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in

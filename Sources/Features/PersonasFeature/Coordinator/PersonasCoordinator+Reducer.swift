@@ -12,7 +12,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		public var createPersonaCoordinator: CreatePersonaCoordinator.State?
 
 		@PresentationState
-		public var personaDetails: PersonaMetadata.State? = nil
+		public var personaDetails: PersonaDetails.State? = nil
 
 		public var isFirstPersonaOnAnyNetwork: Bool? = nil
 
@@ -40,7 +40,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case personaList(PersonaList.Action)
 
 		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
-		case personaDetails(PresentationAction<PersonaMetadata.Action>)
+		case personaDetails(PresentationAction<PersonaDetails.Action>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -57,7 +57,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 				CreatePersonaCoordinator()
 			}
 			.ifLet(\.$personaDetails, action: /Action.child .. ChildAction.personaDetails) {
-				PersonaMetadata()
+				PersonaDetails()
 			}
 	}
 
@@ -100,7 +100,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .personaList(.delegate(.openDetails(persona))):
-			state.personaDetails = .init(persona: persona)
+			state.personaDetails = PersonaDetails.State(.general(persona))
 			return .none
 
 		case .personaDetails(.presented(.delegate(.personaChanged))):
