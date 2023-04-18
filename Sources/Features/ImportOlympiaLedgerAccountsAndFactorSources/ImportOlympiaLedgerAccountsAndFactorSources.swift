@@ -212,7 +212,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
-			//            await send(.internal(.failure(interactionID: interactionID)))
 			loggerGlobal.error("Fail interactionID: \(interactionID), error: \(error)")
 		}
 	}
