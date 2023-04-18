@@ -26,7 +26,7 @@ extension P2P {
 			/// Describes the strategy used to find a RTC peer to send a request to.
 			public enum SendStrategy: Sendable, Hashable, Equatable {
 				/// Sends a request to ALL P2PLinks
-				case broadcastToAllPeers()
+				case broadcastToAllPeers
 			}
 
 			/// e.g. for Ledger Nano interaction, `PeerConnectionID` is not known
