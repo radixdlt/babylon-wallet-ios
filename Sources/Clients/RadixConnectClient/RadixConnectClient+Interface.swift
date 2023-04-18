@@ -13,9 +13,9 @@ extension DependencyValues {
 extension P2P {
 	public struct LinkConnectionUpdate: Sendable, Hashable {
 		public let link: P2PLink
-		public let peerConnectionStatuses: [P2P.PeerConnectionUpdate]
+		public let idsOfConnectedPeerConnections: [PeerConnectionID]
 		public var hasAnyConnectedPeers: Bool {
-			peerConnectionStatuses.contains(where: { $0.iceConnectionState == .connected })
+			!idsOfConnectedPeerConnections.isEmpty
 		}
 	}
 }

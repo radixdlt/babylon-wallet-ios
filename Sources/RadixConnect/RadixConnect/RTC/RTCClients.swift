@@ -4,15 +4,11 @@ import Foundation
 import Prelude
 import SharedModels
 
+// MARK: - P2P.ClientConnectionsUpdate
 extension P2P {
 	public struct ClientConnectionsUpdate: Sendable, Hashable {
 		public let clientID: ConnectionPassword
-		public fileprivate(set) var peerConnectionStatuses: [P2P.PeerConnectionUpdate]
-	}
-
-	public struct PeerConnectionUpdate: Sendable, Hashable {
-		public let peerConnectionID: PeerConnectionID
-		public fileprivate(set) var iceConnectionState: ICEConnectionState
+		public fileprivate(set) var idsOfConnectedPeerConnections: [PeerConnectionID]
 	}
 }
 
@@ -32,7 +28,7 @@ public actor RTCClients {
 		incomingMessagesSubject.share().eraseToAnyAsyncSequence()
 	}
 
-	public func connectionStatuses() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
+	public func connectClients() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
 		iceConnectionStatusesSubject.share().eraseToAnyAsyncSequence()
 	}
 
@@ -195,13 +191,13 @@ extension RTCClients {
 		)
 
 		Task {
-			for await update in client.connectionStatuses {
-				loggerGlobal.notice("RTCClients got iceConnectionUpdate: \(update)")
+			for await update in client.idsOfConnectPeerConnectionsSubject {
+				loggerGlobal.debug("RTCClients got iceConnectionUpdate: \(update)")
 				var cur = iceConnectionStatusesSubject.value
 				if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
-					cur[index].peerConnectionStatuses = update
+					cur[index].idsOfConnectedPeerConnections = update // clientA
 				} else {
-					cur.append(.init(clientID: client.id, peerConnectionStatuses: update))
+					cur.append(.init(clientID: client.id, idsOfConnectedPeerConnections: update))
 				}
 
 				iceConnectionStatusesSubject.send(cur)
@@ -224,14 +220,19 @@ actor RTCClient {
 	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
 
 	private let peerConnectionNegotiator: PeerConnectionNegotiator
-	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:]
+	private var peerConnections: [PeerConnectionClient.ID: PeerConnectionClient] = [:] {
+		didSet {
+			self.idsOfConnectPeerConnectionsSubject.send(Array(peerConnections.keys))
+		}
+	}
+
 	private var connectionsTask: Task<Void, Error>?
 
 	public func hasAnyActiveConnections() async -> Bool {
-		!connectionStatuses.value.filter { $0.iceConnectionState == .connected }.isEmpty
+		!peerConnections.isEmpty
 	}
 
-	let connectionStatuses: AsyncCurrentValueSubject<[P2P.PeerConnectionUpdate]> = .init([])
+	let idsOfConnectPeerConnectionsSubject: AsyncCurrentValueSubject<[PeerConnectionID]> = .init([])
 
 	private let disconnectedPeerConnection: AsyncStream<PeerConnectionID>
 	private let disconnectedPeerConnectionContinuation: AsyncStream<PeerConnectionID>.Continuation
@@ -275,7 +276,7 @@ extension RTCClient {
 		peerConnections.removeAll()
 		peerConnectionNegotiator.cancel()
 		incomingMessagesContinuation.finish()
-		connectionStatuses.send(.finished)
+		idsOfConnectPeerConnectionsSubject.send(.finished)
 		disconnectedPeerConnectionContinuation.finish()
 		connectionsTask?.cancel()
 		disconnectTask?.cancel()
@@ -362,20 +363,6 @@ extension RTCClient {
 				)
 			}
 			.subscribe(self.incomingMessagesContinuation)
-
-		Task {
-			for try await update in connection.iceConnectionStates {
-				loggerGlobal.trace("Got iceConnectionUpdate: \(update)")
-				var cur = connectionStatuses.value
-				if let index = cur.firstIndex(where: { $0.peerConnectionID == connection.id }) {
-					cur[index].iceConnectionState = update
-				} else {
-					cur.append(.init(peerConnectionID: connection.id, iceConnectionState: update))
-				}
-				connectionStatuses.send(cur)
-			}
-			loggerGlobal.notice("Stopped receiving iceConnectionState updates")
-		}
 
 		connection
 			.iceConnectionStates

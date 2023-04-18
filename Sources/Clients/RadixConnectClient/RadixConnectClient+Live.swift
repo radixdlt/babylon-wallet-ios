@@ -13,14 +13,20 @@ extension RadixConnectClient {
 
 		let getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates = {
 			let links = await p2pLinksClient.getP2PLinks()
-			return await rtcClients.connectionStatuses().map { updatesForClients in
-				updatesForClients.compactMap { clientUpdate in
+
+			return await rtcClients.connectClients().map { connectedClients in
+				connectedClients.compactMap { (clientUpdate: P2P.ClientConnectionsUpdate) -> P2P.LinkConnectionUpdate? in
 					guard let link = links.first(where: { $0.id == clientUpdate.clientID }) else {
 						return nil
 					}
-					return P2P.LinkConnectionUpdate(link: link, peerConnectionStatuses: clientUpdate.peerConnectionStatuses)
+					return P2P.LinkConnectionUpdate(
+						link: link,
+						idsOfConnectedPeerConnections: clientUpdate.idsOfConnectedPeerConnections
+					)
 				}
-			}.share().eraseToAnyAsyncSequence()
+			}
+			.share()
+			.eraseToAnyAsyncSequence()
 		}
 
 		return Self(
