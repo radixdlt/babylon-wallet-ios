@@ -71,7 +71,7 @@ extension DappDetails.View {
 					viewStore.send(.appeared)
 				}
 				.navigationTitle(viewStore.title)
-				.sheet(store: store.presentedPersona) { store in
+				.sheet(store: store.personaDetails) { store in
 					NavigationStack {
 						PersonaDetails.View(store: store)
 						#if os(iOS)
@@ -124,8 +124,8 @@ private extension DappDetails.State {
 }
 
 private extension DappDetails.Store {
-	var presentedPersona: PresentationStoreOf<PersonaDetails> {
-		scope(state: \.$presentedPersona) { .child(.presentedPersona($0)) }
+	var personaDetails: PresentationStoreOf<PersonaDetails> {
+		scope(state: \.$personaDetails) { .child(.personaDetails($0)) }
 	}
 
 	var confirmDisconnectAlert: AlertPresentationStore<DappDetails.ViewAction.ConfirmDisconnectAlert> {
@@ -254,7 +254,7 @@ extension DappDetails.View {
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)
-					.padding(.bottom, .small2)
+					.padding(.vertical, .small2)
 
 				Separator()
 					.padding(.bottom, .small2)
@@ -266,7 +266,7 @@ extension DappDetails.View {
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)
-					.padding(.bottom, .small2)
+					.padding(.vertical, .small2)
 			}
 		}
 	}

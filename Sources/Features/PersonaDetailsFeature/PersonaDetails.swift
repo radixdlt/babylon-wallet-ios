@@ -62,6 +62,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
+		case personaChanged(Profile.Network.Persona)
 	}
 
 	// MARK: - Reducer
@@ -72,6 +73,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 		Reduce(core)
 			.ifLet(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert)
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .metadata(.delegate(.personaChanged(persona))):
+			return .send(.delegate(.personaChanged(persona)))
+
+		case .metadata:
+			return .none
+		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
