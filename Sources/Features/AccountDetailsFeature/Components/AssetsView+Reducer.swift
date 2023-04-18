@@ -13,9 +13,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			var displayName: String {
 				switch self {
 				case .fungibleTokens:
-					return "Tokens"
+					return L10n.AssetsView.tokens
 				case .nonFungibleTokens:
-					return "NFTs"
+					return L10n.AssetsView.nfts
 				}
 			}
 		}
@@ -33,11 +33,15 @@ public struct AssetsView: Sendable, FeatureReducer {
 			self.activeList = assets.first
 		}
 
-		static func empty() -> Self {
-			.init(assets: .init(rawValue: [
-				.fungibleTokens(.init()),
-				.nonFungibleTokens(.init(rows: [])),
-			])!)
+		public static func empty() -> Self {
+			.init(assets:
+				.init(rawValue:
+					[
+						.fungibleTokens(.init()),
+						.nonFungibleTokens(.init(rows: [])),
+					]
+				)!
+			)
 		}
 	}
 
@@ -55,10 +59,16 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.activeList, action: /Action.self) {
 			EmptyReducer()
-				.ifCaseLet(/State.AssetList.fungibleTokens, action: /Action.child .. ChildAction.fungibleTokenList) {
+				.ifCaseLet(
+					/State.AssetList.fungibleTokens,
+					action: /Action.child .. ChildAction.fungibleTokenList
+				) {
 					FungibleTokenList()
 				}
-				.ifCaseLet(/State.AssetList.nonFungibleTokens, action: /Action.child .. ChildAction.nonFungibleTokenList) {
+				.ifCaseLet(
+					/State.AssetList.nonFungibleTokens,
+					action: /Action.child .. ChildAction.nonFungibleTokenList
+				) {
 					NonFungibleTokenList()
 				}
 		}

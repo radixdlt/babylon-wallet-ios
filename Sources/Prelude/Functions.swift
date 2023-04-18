@@ -13,15 +13,11 @@ public func with<T>(
 @dynamicMemberLookup
 public struct PaginatedResourceContainer<Container: RandomAccessCollection> {
 	public var loaded: Container
-
 	public var totalCount: Int?
-	public var nextPageCursor: String?
 
-	public init(loaded: Container, totalCount: Int? = nil, nextPageCursor: String? = nil) {
+	public init(loaded: Container, totalCount: Int? = nil) {
 		self.loaded = loaded
-
-		self.totalCount = totalCount
-		self.nextPageCursor = nextPageCursor
+                self.totalCount = totalCount ?? loaded.count
 	}
 }
 

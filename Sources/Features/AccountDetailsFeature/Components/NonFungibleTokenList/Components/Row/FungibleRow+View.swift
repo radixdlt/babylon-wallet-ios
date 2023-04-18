@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - NonFungibleTokenList.Row.View
 extension NonFungibleTokenList.Row {
 	public struct ViewState: Equatable {
-		let token: AccountPortfolio.NonFungibleToken
+		let token: AccountPortfolio.NonFungibleResource
 		var isExpanded: Bool
 
 		init(state: NonFungibleTokenList.Row.State) {

@@ -14,6 +14,8 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getEntityMetadata: GetEntityMetdata
 	public var getNonFungibleIds: GetNonFungibleIds
 	public var getEntityFungibleTokensPage: GetFungibleTokensPageRequest
+        public var getEntityNonFungibleTokensPage: GetNonFungibleTokensPageRequest
+        public var getEntityNonFungibleResourceVaultPage: GetEntityNonFungibleResourceVaultPage
 
 	public var getEntityMetadataPage: GetEntityMetadataPage
 
@@ -44,7 +46,8 @@ extension GatewayAPIClient {
 	public typealias GetNonFungibleIds = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.StateNonFungibleIdsResponse
 
 	public typealias GetFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityFungiblesPageRequest) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
-	// public typealias GetNonFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityNonF) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
+        public typealias GetNonFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityNonFungiblesPageRequest) async throws -> GatewayAPI.StateEntityNonFungiblesPageResponse
+        public typealias GetEntityNonFungibleResourceVaultPage = @Sendable (GatewayAPI.StateEntityNonFungibleResourceVaultsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse
 
 	// MARK: - transaction
 

@@ -18,23 +18,11 @@ public struct AccountPortfolio: Sendable, Hashable, Codable {
 }
 
 extension AccountPortfolio {
-	//        public struct FungibleResources: Sendable, Hashable {
-	//                public init(
-	//                        xrdToken: FungibleToken?,
-	//                        tokens: PaginatedResourceContainer<[AccountPortfolio.FungibleToken]>
-	//                ) {
-	//                        self.xrdToken = xrdToken
-	//                        self.tokens = tokens
-	//                }
-//
-	//                public let xrdToken: FungibleToken?
-	//                public let tokens: PaginatedResourceContainer<[FungibleToken]>
-	//        }
+	public typealias FungibleResources = [FungibleResource]
+	public typealias NonFungibleResources = [NonFungibleResource]
 
-	public typealias FungibleResources = PaginatedResourceContainer<[FungibleToken]>
-	public typealias NonFungibleResources = PaginatedResourceContainer<[NonFungibleToken]>
-
-	public struct FungibleToken: Sendable, Hashable, Codable {
+	public struct FungibleResource: Sendable, Hashable, Codable, Identifiable {
+                public var id: ResourceAddress { self.resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let amount: BigDecimal
 		public let divisibility: Int?
@@ -59,28 +47,24 @@ extension AccountPortfolio {
 		}
 	}
 
-	public struct NonFungibleToken: Sendable, Hashable, Codable {
+	public struct NonFungibleResource: Sendable, Hashable, Codable, Identifiable {
+                public var id: ResourceAddress { self.resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
 		public let description: String?
 		// The number of tokens owned by the Account
 		public let amount: Int
 
-		// TODO: Should not be just string
-		public let ids: PaginatedResourceContainer<[String]>
-
 		public init(
 			resourceAddress: ResourceAddress,
 			name: String? = nil,
 			description: String? = nil,
-			amount: Int,
-			ids: PaginatedResourceContainer<[String]>
+			amount: Int
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
 			self.description = description
 			self.amount = amount
-			self.ids = ids
 		}
 	}
 }

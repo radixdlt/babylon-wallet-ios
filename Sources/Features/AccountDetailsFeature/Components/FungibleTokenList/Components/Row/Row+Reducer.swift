@@ -6,19 +6,19 @@ extension FungibleTokenList {
 			public typealias ID = ResourceAddress
 			public var id: ID { token.resourceAddress }
 
-			public var token: AccountPortfolio.FungibleToken
+			public var token: AccountPortfolio.FungibleResource
 			public var isXRD: Bool
 
-			public init(xrdToken: AccountPortfolio.FungibleToken) {
+			public init(xrdToken: AccountPortfolio.FungibleResource) {
 				self.init(token: xrdToken, isXRD: true)
 			}
 
-			public init(nonXRDToken: AccountPortfolio.FungibleToken) {
+			public init(nonXRDToken: AccountPortfolio.FungibleResource) {
 				self.init(token: nonXRDToken, isXRD: false)
 			}
 
 			init(
-				token: AccountPortfolio.FungibleToken,
+				token: AccountPortfolio.FungibleResource,
 				isXRD: Bool
 			) {
 				self.token = token
@@ -31,7 +31,7 @@ extension FungibleTokenList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case selected(AccountPortfolio.FungibleToken)
+			case selected(AccountPortfolio.FungibleResource)
 		}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

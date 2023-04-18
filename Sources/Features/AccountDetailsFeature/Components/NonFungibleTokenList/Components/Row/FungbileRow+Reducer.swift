@@ -5,11 +5,11 @@ extension NonFungibleTokenList {
 		public struct State: Sendable, Hashable, Identifiable {
 			public var id: ResourceAddress { token.resourceAddress }
 
-			public var token: AccountPortfolio.NonFungibleToken
+			public var token: AccountPortfolio.NonFungibleResource
 			public var isExpanded = false
 
 			public init(
-				token: AccountPortfolio.NonFungibleToken
+				token: AccountPortfolio.NonFungibleResource
 			) {
 				self.token = token
 			}
