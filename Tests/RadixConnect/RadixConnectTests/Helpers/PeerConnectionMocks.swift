@@ -29,7 +29,6 @@ final class MockPeerConnectionDelegate: PeerConnectionDelegate {
 	let onGeneratedICECandidate: AsyncStream<RTCPrimitive.ICECandidate>
 
 	private let onNegotiationNeededContinuation: AsyncStream<Void>.Continuation
-	private let onIceConnectionStateContinuation: AsyncStream<ICEConnectionState>.Continuation
 	private let onSignalingStateContinuation: AsyncStream<SignalingState>.Continuation
 	private let onGeneratedICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
 
@@ -46,7 +45,7 @@ final class MockPeerConnectionDelegate: PeerConnectionDelegate {
 	}
 
 	func sendICEConnectionStateEvent(_ state: ICEConnectionState) {
-		onIceConnectionStateContinuation.yield(state)
+		onIceConnectionStateSubject.send(state)
 	}
 
 	func generateICECandiddate(_ candidate: RTCPrimitive.ICECandidate) {
