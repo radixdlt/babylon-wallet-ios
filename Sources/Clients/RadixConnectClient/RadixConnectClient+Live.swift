@@ -12,10 +12,9 @@ extension RadixConnectClient {
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		let getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates = {
-			let links = await p2pLinksClient.getP2PLinks()
-
-			return await rtcClients.connectClients().map { connectedClients in
-				connectedClients.compactMap { (clientUpdate: P2P.ClientConnectionsUpdate) -> P2P.LinkConnectionUpdate? in
+			await rtcClients.connectClients().map { connectedClients in
+				let links = await p2pLinksClient.getP2PLinks()
+				return connectedClients.compactMap { (clientUpdate: P2P.ClientConnectionsUpdate) -> P2P.LinkConnectionUpdate? in
 					guard let link = links.first(where: { $0.id == clientUpdate.clientID }) else {
 						return nil
 					}

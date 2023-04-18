@@ -164,7 +164,7 @@ package.addModules([
 		)
 	),
 	.feature(
-		name: "ImportOlympiaLedgerAccountsAndFactorSourceFeature",
+		name: "ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
@@ -243,7 +243,7 @@ package.addModules([
 		name: "SettingsFeature",
 		dependencies: [
 			"AccountsClient",
-			"ImportOlympiaLedgerAccountsAndFactorSourceFeature",
+			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
 			"CacheClient",

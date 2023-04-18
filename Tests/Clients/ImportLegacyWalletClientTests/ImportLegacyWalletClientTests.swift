@@ -224,7 +224,7 @@ extension Olympia.Parsed.Account {
 
 // MARK: - ImportLegacyWalletClientTests
 final class ImportLegacyWalletClientTests: TestCase {
-	func test_generate_hardwarewallet_vector() throws {
+	func omit_test_ledger_dev_mnemonic_generate_hardwarewallet_vector() throws {
 		let accountNames: [String?] = [
 			String?.none,
 			"",
@@ -244,7 +244,10 @@ final class ImportLegacyWalletClientTests: TestCase {
 			let accountsCount: Int
 		}
 		let softwareWallet = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: false, accountsCount: 4)
-		let hardwareWallet0 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 6)
+
+		// the Ledger app dev Mnemonic
+		let hardwareWallet0 = try HDWallet(mnemonic: .init(phrase: "equip will roof matter pink blind book anxiety banner elbow sun young", language: .english), isHardware: true, accountsCount: 6)
+
 		let hardwareWallet1 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 5)
 		let hardwareWallet2 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 3)
 

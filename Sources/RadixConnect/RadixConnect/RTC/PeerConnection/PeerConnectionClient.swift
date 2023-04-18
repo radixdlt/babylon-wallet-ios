@@ -68,7 +68,7 @@ extension PeerConnectionClient {
 extension PeerConnectionClient {
 	func sendData(_ data: Data) async throws {
 		#if DEBUG
-		loggerGlobal.trace("Sending data, json:\n\n\(String(describing: data.prettyPrintedJSONString))\n\n")
+		loggerGlobal.debug("Sending data, json:\n\n\(String(describing: data.prettyPrintedJSONString))\n\n")
 		#endif // DEBUG
 		try await dataChannelClient.sendMessage(data)
 	}

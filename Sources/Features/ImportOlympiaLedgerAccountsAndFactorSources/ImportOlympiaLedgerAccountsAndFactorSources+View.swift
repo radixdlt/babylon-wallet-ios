@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-extension ImportOlympiaLedgerAccountsAndFactorSource.State {
-	var viewState: ImportOlympiaLedgerAccountsAndFactorSource.ViewState {
+extension ImportOlympiaLedgerAccountsAndFactorSources.State {
+	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
 		.init(
 			failedToFindAnyLinks: failedToFindAnyLinks,
 			ledgerName: ledgerName,
@@ -13,8 +13,8 @@ extension ImportOlympiaLedgerAccountsAndFactorSource.State {
 	}
 }
 
-// MARK: - ImportOlympiaLedgerAccountsAndFactorSource.View
-extension ImportOlympiaLedgerAccountsAndFactorSource {
+// MARK: - ImportOlympiaLedgerAccountsAndFactorSources.View
+extension ImportOlympiaLedgerAccountsAndFactorSources {
 	public struct ViewState: Equatable {
 		public let failedToFindAnyLinks: Bool
 		public let ledgerName: String
@@ -26,9 +26,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSource>
+		private let store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>
 
-		public init(store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSource>) {
+		public init(store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) {
 			self.store = store
 		}
 
@@ -39,7 +39,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 						.textStyle(.body1Header)
 
 					if viewStore.failedToFindAnyLinks {
-						Text("⚠️ Found no RadixConnect linked browsers, go to settings and link first")
+						Text("⚠️ Found no open RadixConnect connections. Either open your previously linked browser or Go to settings and link to a new browser.")
 					}
 
 					Spacer()
@@ -75,6 +75,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 						Button("Send Add Ledger Request") {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
+						.controlState(viewStore.viewControlState)
 						.buttonStyle(.primaryRectangular)
 
 						Button("Skip remaining accounts") {
@@ -83,7 +84,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					}
 				}
-				//                .controlState(viewStore.viewControlState)
 				.padding(.horizontal, .medium3)
 				.task { @MainActor in await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
@@ -91,7 +91,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 		}
 
 		@ViewBuilder
-		private func nameLedgerField(with viewStore: ViewStoreOf<ImportOlympiaLedgerAccountsAndFactorSource>) -> some SwiftUI.View {
+		private func nameLedgerField(with viewStore: ViewStoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) -> some SwiftUI.View {
 			AppTextField(
 				primaryHeading: "Name this Ledger",
 				secondaryHeading: "e.g. 'scratch'",
@@ -113,16 +113,16 @@ extension ImportOlympiaLedgerAccountsAndFactorSource {
 //// MARK: - ImportOlympiaLedgerAccountsAndFactorSource_Preview
 // struct ImportOlympiaLedgerAccountsAndFactorSource_Preview: PreviewProvider {
 //	static var previews: some View {
-//		ImportOlympiaLedgerAccountsAndFactorSource.View(
+//		ImportOlympiaLedgerAccountsAndFactorSources.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: ImportOlympiaLedgerAccountsAndFactorSource()
+//				reducer: ImportOlympiaLedgerAccountsAndFactorSources()
 //			)
 //		)
 //	}
 // }
 //
-// extension ImportOlympiaLedgerAccountsAndFactorSource.State {
+// extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 //    public static let previewValue = Self(hardwareAccounts: <#NonEmpty<OrderedSet<OlympiaAccountToMigrate>>#>)
 // }
 // #endif

@@ -1,5 +1,5 @@
 import FeaturePrelude
-import ImportOlympiaLedgerAccountsAndFactorSourceFeature
+import ImportOlympiaLedgerAccountsAndFactorSourcesFeature
 
 extension ImportOlympiaWalletCoordinator.State {
 	var viewState: ImportOlympiaWalletCoordinator.ViewState {
@@ -70,9 +70,9 @@ extension ImportOlympiaWalletCoordinator {
 						then: { ImportOlympiaFactorSource.View(store: $0) }
 					)
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.importOlympiaLedgerAccountsAndFactorSource,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.importOlympiaLedgerAccountsAndFactorSource,
-						then: { ImportOlympiaLedgerAccountsAndFactorSource.View(store: $0) }
+						state: /ImportOlympiaWalletCoordinator.Destinations.State.importOlympiaLedgerAccountsAndFactorSources,
+						action: ImportOlympiaWalletCoordinator.Destinations.Action.importOlympiaLedgerAccountsAndFactorSources,
+						then: { ImportOlympiaLedgerAccountsAndFactorSources.View(store: $0) }
 					)
 					CaseLet(
 						state: /ImportOlympiaWalletCoordinator.Destinations.State.completion,

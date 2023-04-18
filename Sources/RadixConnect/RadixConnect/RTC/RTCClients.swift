@@ -29,14 +29,14 @@ public actor RTCClients {
 	}
 
 	public func connectClients() async -> AnyAsyncSequence<[P2P.ClientConnectionsUpdate]> {
-		iceConnectionStatusesSubject.share().eraseToAnyAsyncSequence()
+		clientConnectionsUpdateSubject.share().eraseToAnyAsyncSequence()
 	}
 
 	/// Incoming peer messages. This is the single channel for the received messages from all RTCClients
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 
 	/// ICEConnectionStatus updates. This is the single channel for the status updates from all RTCClients
-	private let iceConnectionStatusesSubject: AsyncCurrentValueSubject<[P2P.ClientConnectionsUpdate]> = .init([])
+	private let clientConnectionsUpdateSubject: AsyncCurrentValueSubject<[P2P.ClientConnectionsUpdate]> = .init([])
 
 	// MARK: - Config
 	private let peerConnectionFactory: PeerConnectionFactory
@@ -86,10 +86,10 @@ extension RTCClients {
 		await clients[password]?.cancel()
 		clients.removeValue(forKey: password)
 
-		var cur = iceConnectionStatusesSubject.value
+		var cur = clientConnectionsUpdateSubject.value
 		if let index = cur.firstIndex(where: { $0.clientID == password }) {
 			cur.remove(at: index)
-			iceConnectionStatusesSubject.send(cur)
+			clientConnectionsUpdateSubject.send(cur)
 		}
 	}
 
@@ -172,6 +172,21 @@ extension RTCClients {
 	// MARK: - Private
 
 	func add(_ client: RTCClient) {
+		Task {
+			for await update in client.idsOfConnectPeerConnectionsSubject {
+				loggerGlobal.debug("RTCClients got iceConnectionUpdate: \(update)")
+				var cur = clientConnectionsUpdateSubject.value
+				if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
+					cur[index].idsOfConnectedPeerConnections = update
+				} else {
+					cur.append(.init(clientID: client.id, idsOfConnectedPeerConnections: update))
+				}
+
+				clientConnectionsUpdateSubject.send(cur)
+			}
+			loggerGlobal.notice("Stopped receiving ICEConnection states updates")
+		}
+
 		client.incomingMessages.subscribe(incomingMessagesSubject)
 		self.clients[client.id] = client
 	}
@@ -189,21 +204,6 @@ extension RTCClients {
 			id: password,
 			peerConnectionNegotiator: negotiator
 		)
-
-		Task {
-			for await update in client.idsOfConnectPeerConnectionsSubject {
-				loggerGlobal.debug("RTCClients got iceConnectionUpdate: \(update)")
-				var cur = iceConnectionStatusesSubject.value
-				if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
-					cur[index].idsOfConnectedPeerConnections = update // clientA
-				} else {
-					cur.append(.init(clientID: client.id, idsOfConnectedPeerConnections: update))
-				}
-
-				iceConnectionStatusesSubject.send(cur)
-			}
-			loggerGlobal.notice("Stopped receiving ICEConnection states updates")
-		}
 
 		return client
 	}
@@ -301,7 +301,14 @@ extension RTCClient {
 			throw NoConnectedClients()
 		}
 
-		let data = try JSONEncoder().encode(request)
+		let encoder = JSONEncoder()
+
+		/// Important to not escape slashes for derivation paths, which otherwise will look:
+		/// `m\/44H\/1022H\/0H\/0\/4H` but should be `m/44H/1022H/0H/0/4H` ofc.
+		encoder.outputFormatting = [.withoutEscapingSlashes]
+
+		let data = try encoder.encode(request)
+
 		try await withThrowingTaskGroup(of: Void.self) { group in
 			for client in peerConnections.values {
 				guard !Task.isCancelled else {

@@ -52,7 +52,11 @@ extension P2P.ConnectorExtension.Request {
 			public struct DerivePublicKey: Sendable, Hashable, Encodable {
 				public let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
-				public init(keyParameters: P2P.LedgerHardwareWallet.KeyParameters, ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice) {
+
+				public init(
+					keyParameters: P2P.LedgerHardwareWallet.KeyParameters,
+					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				) {
 					self.keyParameters = keyParameters
 					self.ledgerDevice = ledgerDevice
 				}
@@ -68,7 +72,12 @@ extension P2P.ConnectorExtension.Request {
 					case summary
 				}
 
-				public init(keyParameters: P2P.LedgerHardwareWallet.KeyParameters, ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice, compiledTransactionIntent: HexCodable, mode: Mode) {
+				public init(
+					keyParameters: P2P.LedgerHardwareWallet.KeyParameters,
+					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
+					compiledTransactionIntent: HexCodable,
+					mode: Mode
+				) {
 					self.keyParameters = keyParameters
 					self.ledgerDevice = ledgerDevice
 					self.compiledTransactionIntent = compiledTransactionIntent

@@ -2,7 +2,7 @@ import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
-import ImportOlympiaLedgerAccountsAndFactorSourceFeature
+import ImportOlympiaLedgerAccountsAndFactorSourcesFeature
 import Profile
 
 // MARK: - ImportOlympiaWalletCoordinator
@@ -26,7 +26,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.State)
 			case selectAccountsToImport(SelectAccountsToImport.State)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.State)
-			case importOlympiaLedgerAccountsAndFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.State)
+			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.State)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.State)
 		}
 
@@ -34,7 +34,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			case scanMultipleOlympiaQRCodes(ScanMultipleOlympiaQRCodes.Action)
 			case selectAccountsToImport(SelectAccountsToImport.Action)
 			case importOlympiaMnemonic(ImportOlympiaFactorSource.Action)
-			case importOlympiaLedgerAccountsAndFactorSource(ImportOlympiaLedgerAccountsAndFactorSource.Action)
+			case importOlympiaLedgerAccountsAndFactorSources(ImportOlympiaLedgerAccountsAndFactorSources.Action)
 			case completion(CompletionMigrateOlympiaAccountsToBabylon.Action)
 		}
 
@@ -48,8 +48,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.importOlympiaMnemonic, action: /Action.importOlympiaMnemonic) {
 				ImportOlympiaFactorSource()
 			}
-			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSource, action: /Action.importOlympiaLedgerAccountsAndFactorSource) {
-				ImportOlympiaLedgerAccountsAndFactorSource()
+			Scope(state: /State.importOlympiaLedgerAccountsAndFactorSources, action: /Action.importOlympiaLedgerAccountsAndFactorSources) {
+				ImportOlympiaLedgerAccountsAndFactorSources()
 			}
 			Scope(state: /State.completion, action: /Action.completion) {
 				CompletionMigrateOlympiaAccountsToBabylon()
@@ -143,7 +143,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					state.path.append(destination)
 				}
 			} else if let hardwareAccounts = accounts.hardware {
-				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSource(.init(
+				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
 					hardwareAccounts: hardwareAccounts
 				))
 				if state.path.last != destination {
@@ -172,7 +172,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 			return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
 
-		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSource(.delegate(
+		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSources(.delegate(
 			.completed(addedLedgersWithAccounts, unvalidatedOlympiaAccounts)
 		)))):
 
@@ -219,7 +219,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			if let hardwareAccounts = state.selectedAccounts?.hardware {
 				state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
 				// also need to add ledger and then migrate hardware account
-				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSource(.init(
+				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
 					hardwareAccounts: hardwareAccounts
 				))
 				if state.path.last != destination {

@@ -7,8 +7,8 @@ import RadixConnectClient
 import RadixConnectModels
 import SharedModels
 
-// MARK: - ImportOlympiaLedgerAccountsAndFactorSource
-public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReducer {
+// MARK: - ImportOlympiaLedgerAccountsAndFactorSources
+public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	public struct AddedLedgerWithAccounts: Sendable, Hashable {
 		public let name: String?
 		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
@@ -261,16 +261,16 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 				derivedKeys.contains($0.publicKey)
 			}
 
-			olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
-				state.unverified.remove(verifiedAccountToMigrate)
-			}
-
 			guard let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>.init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))) else {
 				loggerGlobal.warning("No accounts to migrated.")
 				return .none
 			}
 			loggerGlobal.notice("Prompting to name ledger with ID=\(olympiaDevice.id) before migrating #\(verifiedToBeMigrated.count) accounts.")
 			state.verifiedToBeMigrated = verifiedToBeMigrated
+
+			olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
+				state.unverified.remove(verifiedAccountToMigrate)
+			}
 
 			return .send(.internal(
 				.nameLedgerDeviceBeforeSavingIt(olympiaDevice)
@@ -287,20 +287,25 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 		unnamedDeviceToAdd device: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 	) -> EffectTask<Action> {
 		let model = FactorSource.LedgerHardwareWallet.DeviceModel(model: device.model)
+
 		loggerGlobal.notice("Creating factor source for Ledger...")
+
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
 			name: name.map { NonEmpty(rawValue: $0) } ?? nil,
 			olympiaCompatible: true
 		)
+
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
+
 		return .run { send in
 			try await factorSourcesClient.addOffDeviceFactorSource(factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.internal(.addedFactorSource(factorSource, model, name: name)))
-		} catch: { _, _ in
-			fatalError()
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
+			errorQueue.schedule(error)
 		}
 	}
 
@@ -328,6 +333,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSource: Sendable, FeatureReduc
 
 			await send(.internal(.migratedOlympiaHardwareAccounts(addedLedgerWithAccounts)))
 		} catch: { error, _ in
+			loggerGlobal.error("Failed to migrate accounts to babylon, error: \(error)")
 			errorQueue.schedule(error)
 		}
 	}
