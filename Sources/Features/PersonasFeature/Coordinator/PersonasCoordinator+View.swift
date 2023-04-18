@@ -32,7 +32,7 @@ extension PersonasCoordinator {
 					state: \.$personaDetails,
 					action: { .child(.personaDetails($0)) }
 				),
-				content: { PersonaMetadata.View(store: $0) }
+				content: { PersonaDetails.View(store: $0) }
 			)
 		}
 	}

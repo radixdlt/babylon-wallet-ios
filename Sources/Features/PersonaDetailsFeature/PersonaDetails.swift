@@ -15,30 +15,35 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public let dAppName: String
-		public let dAppID: Profile.Network.AuthorizedDapp.ID
-		public let networkID: NetworkID
-		public let persona: Profile.Network.AuthorizedPersonaDetailed
+		public var mode: Mode
 
-		public var metadata: PersonaMetadata.State
+		public enum Mode: Sendable, Hashable {
+			case general(Profile.Network.Persona)
+			case dApp(Profile.Network.AuthorizedDappDetailed, persona: Profile.Network.AuthorizedPersonaDetailed)
+
+			var id: Profile.Network.Persona.ID {
+				switch self {
+				case let .general(persona): return persona.id
+				case let .dApp(_, persona: persona): return persona.id
+				}
+			}
+
+			var networkID: NetworkID {
+				switch self {
+				case let .general(persona): return persona.networkID
+				case let .dApp(dApp, _): return dApp.networkID
+				}
+			}
+		}
 
 		@PresentationState
 		public var confirmForgetAlert: AlertState<ViewAction.ConfirmForgetAlert>? = nil
 
-		public init(
-			dAppName: String,
-			dAppID: Profile.Network.AuthorizedDapp.ID,
-			networkID: NetworkID,
-			persona: Profile.Network.AuthorizedPersonaDetailed
-		) {
-			self.dAppName = dAppName
-			self.dAppID = dAppID
-			self.networkID = networkID
-			self.persona = persona
+		@PresentationState
+		public var editPersona: EditPersona.State? = nil
 
-			self.metadata = .init(persona: persona,
-			                      dAppName: dAppName,
-			                      requiredFields: [])
+		public init(_ mode: Mode) {
+			self.mode = mode
 		}
 	}
 
@@ -46,6 +51,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case accountTapped(AccountAddress)
+		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
 		case confirmForgetAlert(PresentationAction<ConfirmForgetAlert>)
@@ -57,30 +63,42 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case metadata(PersonaMetadata.Action)
+		case editPersona(PresentationAction<EditPersona.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
-		case personaChanged(Profile.Network.Persona)
+		case personaChanged(Profile.Network.Persona.ID)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case editablePersonaFetched(Profile.Network.Persona)
+		case reloaded(State.Mode)
 	}
 
 	// MARK: - Reducer
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.metadata, action: /Action.child .. ChildAction.metadata) {
-			PersonaMetadata()
-		}
 		Reduce(core)
+			.ifLet(\.$editPersona, action: /Action.child .. ChildAction.editPersona) {
+				EditPersona()
+			}
 			.ifLet(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert)
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .metadata(.delegate(.personaChanged(persona))):
-			return .send(.delegate(.personaChanged(persona)))
+		case let .editPersona(.presented(.delegate(.personaSaved(persona)))):
+			guard persona.id == state.mode.id else { return .none }
+			return .run { [mode = state.mode] send in
+				let updated = try await reload(in: mode)
+				await send(.internal(.reloaded(updated)))
+				await send(.delegate(.personaChanged(persona.id)))
+			} catch: { _, _ in
+				// FIXME: Log/show error?
+			}
 
-		case .metadata:
+		case .editPersona:
 			return .none
 		}
 	}
@@ -90,6 +108,20 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .accountTapped:
 			return .none
 
+		case .editPersonaTapped:
+			switch state.mode {
+			case let .general(persona):
+				return .send(.internal(.editablePersonaFetched(persona)))
+
+			case let .dApp(_, persona: persona):
+				return .run { send in
+					let persona = try await personasClient.getPersona(id: persona.id)
+					await send(.internal(.editablePersonaFetched(persona)))
+				} catch: { _, _ in
+					// FIXME: Log/show error?
+				}
+			}
+
 		case .editAccountSharingTapped:
 			return .none
 
@@ -98,7 +130,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmForgetAlert(.presented(.confirmTapped)):
-			let (personaID, dAppID, networkID) = (state.persona.id, state.dAppID, state.networkID)
+			guard case let .dApp(dApp, persona: persona) = state.mode else {
+				return .none
+			}
+			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
 			return .run { send in
 				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
 				await send(.delegate(.personaDeauthorized))
@@ -108,6 +143,40 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		case .confirmForgetAlert:
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .editablePersonaFetched(persona):
+			switch state.mode {
+			case .general:
+				state.editPersona = .init(mode: .edit, persona: persona)
+			case let .dApp(_, detailedPersona):
+				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
+				state.editPersona = .init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona)
+			}
+
+			return .none
+
+		case let .reloaded(mode):
+			state.mode = mode
+			return .none
+		}
+	}
+
+	private func reload(in mode: State.Mode) async throws -> State.Mode {
+		switch mode {
+		case let .dApp(dApp, persona: persona):
+			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dApp.dAppDefinitionAddress)
+			guard let updatedPersona = updatedDapp.detailedAuthorizedPersonas[id: persona.id] else {
+				// FIXME: Throw some error?
+				return mode
+			}
+			return .dApp(updatedDapp, persona: updatedPersona)
+		case let .general(persona):
+			let updatedPersona = try await personasClient.getPersona(id: persona.id)
+			return .general(updatedPersona)
 		}
 	}
 }
@@ -125,122 +194,6 @@ extension AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert> {
 			}
 		} message: {
 			TextState(L10n.PersonaDetails.deauthorizePersonaAlertMessage)
-		}
-	}
-}
-
-// MARK: - PersonaMetadata
-public struct PersonaMetadata: Sendable, FeatureReducer {
-	@Dependency(\.personasClient) var personasClient
-	@Dependency(\.errorQueue) var errorQueue
-
-	public typealias Store = StoreOf<Self>
-
-	public init() {}
-
-	// MARK: - State
-
-	public struct State: Sendable, Hashable {
-		public let id: Profile.Network.Persona.ID
-		public var thumbnail: URL?
-		public var name: String
-		public var fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
-		public let mode: Mode
-
-		public enum Mode: Sendable, Hashable {
-			case general
-			case dApp(name: String, requiredFields: Set<Profile.Network.Persona.Field.ID>)
-		}
-
-		@PresentationState
-		public var editPersona: EditPersona.State? = nil
-
-		public init(
-			persona: Profile.Network.Persona
-		) {
-			self.id = persona.id
-			self.thumbnail = nil
-			self.name = persona.displayName.rawValue
-			self.fields = persona.fields
-			self.mode = .general
-		}
-
-		public init(
-			persona: Profile.Network.AuthorizedPersonaDetailed,
-			dAppName: String,
-			requiredFields: Set<Profile.Network.Persona.Field.ID>
-		) {
-			self.id = persona.id
-			self.thumbnail = nil
-			self.name = persona.displayName.rawValue
-			self.fields = persona.sharedFields ?? []
-			self.mode = .dApp(name: dAppName, requiredFields: requiredFields)
-		}
-	}
-
-	// MARK: - Action
-
-	public enum ViewAction: Sendable, Equatable {
-		case editPersonaTapped
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case editablePersonaFetched(Profile.Network.Persona)
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case editPersona(PresentationAction<EditPersona.Action>)
-	}
-
-	public enum DelegateAction: Sendable, Equatable {
-		case personaChanged(Profile.Network.Persona)
-	}
-
-	// MARK: - Reducer
-
-	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-			.ifLet(\.$editPersona, action: /Action.child .. ChildAction.editPersona) {
-				EditPersona()
-			}
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .editPersonaTapped:
-			return .run { [id = state.id] send in
-				guard let persona = try? await personasClient.getPersonas()[id: id] else {
-					// FIXME: Log/show error?
-					return
-				}
-				await send(.internal(.editablePersonaFetched(persona)))
-			}
-		}
-	}
-
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case let .editPersona(.presented(.delegate(.personaSaved(persona)))):
-			state.fields = persona.fields
-			state.name = persona.displayName.rawValue
-
-			return .send(.delegate(.personaChanged(persona)))
-		case .editPersona:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .editablePersonaFetched(persona):
-			switch state.mode {
-			case .general:
-				state.editPersona = .init(mode: .edit, persona: persona)
-			case let .dApp(_, fields):
-				state.editPersona = .init(mode: .dapp(requiredFieldIDs: fields), persona: persona)
-			}
-
-			return .none
 		}
 	}
 }

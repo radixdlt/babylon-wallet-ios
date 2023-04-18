@@ -171,7 +171,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
-			return .run { _ in await dismiss() }
+			return .fireAndForget { await dismiss() }
 
 		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
 			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, initial: nil, isRequiredByDapp: false) })
