@@ -7,15 +7,38 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public var personas: IdentifiedArrayOf<Persona.State>
+		public let strategy: ReloadingStrategy
+
+		/// Load all personas from the profile
+		public init() {
+			self.personas = []
+			self.strategy = .all
+		}
 
 		public init(
-			personas: IdentifiedArrayOf<Persona.State> = []
+			personas: IdentifiedArrayOf<Persona.State> = [],
+			strategy: ReloadingStrategy = .all
 		) {
 			self.personas = personas
+			self.strategy = strategy
+		}
+
+		public init(
+			dApp: Profile.Network.AuthorizedDappDetailed
+		) {
+			self.personas = .init(uniqueElements: dApp.detailedAuthorizedPersonas.map(Persona.State.init))
+			self.strategy = .dApp(dApp.dAppDefinitionAddress)
+		}
+
+		public enum ReloadingStrategy: Sendable, Hashable {
+			case all
+			case dApp(Profile.Network.AuthorizedDapp.ID)
+			case personas(OrderedSet<Profile.Network.Persona.ID>)
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case task
 		case createNewPersonaButtonTapped
 	}
 
@@ -39,6 +62,8 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .task:
+
 		case .createNewPersonaButtonTapped:
 			return .send(.delegate(.createNewPersona))
 		}

@@ -112,7 +112,7 @@ private extension DappDetails.State {
 			otherMetadata: otherMetadata,
 			fungibleTokens: [], // TODO: Populate when we have it
 			nonFungibleTokens: [], // TODO: Populate when we have it
-			hasPersonas: !personas.personas.isEmpty
+			hasPersonas: !personaList.personas.isEmpty
 		)
 	}
 }
@@ -253,7 +253,7 @@ extension DappDetails.View {
 				Separator()
 					.padding(.bottom, .small2)
 
-				let personasStore = store.scope(state: \.personas) { .child(.personas($0)) }
+				let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
 				PersonaListCoreView(store: personasStore)
 			} else {
 				Text(L10n.DAppDetails.noPersonasHeading)

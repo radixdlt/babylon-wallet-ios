@@ -33,13 +33,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@PresentationState
 		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
 
-		public var personas: PersonaList.State
+		public var personaList: PersonaList.State
 
 		public init(dApp: Profile.Network.AuthorizedDappDetailed, personaDetails: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.personaDetails = personaDetails
-			let personas = dApp.detailedAuthorizedPersonas.map(Persona.State.init)
-			self.personas = .init(personas: .init(uniqueElements: personas))
+			self.personaList = .init(dApp: dApp)
 		}
 	}
 
@@ -81,7 +80,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.personas, action: /Action.child .. ChildAction.personas) {
+		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
 			PersonaList()
 		}
 		Reduce(core)
