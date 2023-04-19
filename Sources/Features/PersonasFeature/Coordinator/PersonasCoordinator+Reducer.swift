@@ -9,7 +9,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		public var personaList: PersonaList.State
 
 		@PresentationState
-		public var createPersonaCoordinator: CreatePersonaCoordinator.State?
+		public var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
 
 		@PresentationState
 		public var personaDetails: PersonaDetails.State? = nil
@@ -28,12 +28,10 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
 		case appeared
 	}
 
 	public enum InternalAction: Sendable & Equatable {
-		case loadPersonasResult(TaskResult<IdentifiedArrayOf<Profile.Network.Persona>>)
 		case isFirstPersonaOnAnyNetwork(Bool)
 	}
 
@@ -43,8 +41,6 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
 		case personaDetails(PresentationAction<PersonaDetails.Action>)
 	}
-
-	// PersonasFeature Coordinator State personaList createPersona isFirst OnAnyNetwork CreateEntity no Profile
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
@@ -66,42 +62,24 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .task:
-			return .run { send in
-				for try await personas in await personasClient.personas() {
-					guard !Task.isCancelled else {
-						return
-					}
-					print("•• personasClient.personas()")
-					await send(.internal(.loadPersonasResult(.success(personas))))
-				}
-			} catch: { error, send in
-				await send(.internal(.loadPersonasResult(.failure(error))))
-			}
-
 		case .appeared:
-			print("•REMOVED• appeared")
 			return checkIfFirstPersonaByUserEver()
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadPersonasResult(.success(personas)):
-			print("•• loadPersonasResult success")
-//			state.personaList.personas = .init(uniqueElements: personas.map(Persona.State.init))
-			return .none
 		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
 			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
-			return .none
-		case let .loadPersonasResult(.failure(error)):
-			errorQueue.schedule(error)
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .personaDetails:
+			return .none
+
 		case .personaList(.delegate(.createNewPersona)):
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
 			let isFirstOnThisNetwork = state.personaList.personas.count == 0
@@ -121,17 +99,19 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.personaDetails = PersonaDetails.State(.general(persona))
 			return .none
 
+		case .personaList:
+			return .none
+
 		case .createPersonaCoordinator(.presented(.delegate(.dismissed))):
 			state.createPersonaCoordinator = nil
 			return .none
 
 		case .createPersonaCoordinator(.presented(.delegate(.completed))):
-			print("•REMAINS• createPersonaCoordinator(.presented(.delegate(.completed)))")
 			state.createPersonaCoordinator = nil
 			state.isFirstPersonaOnAnyNetwork = false
 			return .none
 
-		default:
+		case .createPersonaCoordinator:
 			return .none
 		}
 	}

@@ -61,6 +61,9 @@ public struct PersonaListCoreView: View {
 				}
 			)
 		}
+		.task {
+			ViewStore(store).send(.view(.task))
+		}
 	}
 }
 
