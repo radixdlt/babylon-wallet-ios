@@ -126,13 +126,12 @@ extension CreateEntityCoordinator {
 
 		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate, useLedgerAsFactorSource):
 			precondition(!factorSources.isEmpty)
-			fatalError("impl me")
 			let babylonDeviceFactorSources = factorSources.babylonDeviceFactorSources()
 
 			return goToStep2Creation(
 				curve: .curve25519, // The babylon execution path, safe to default to curve25519
 				entityName: specifiedNameForNewEntityToCreate,
-				babylonDeviceFactorSource: babylonDeviceFactorSources.first,
+				genesisFactorSourceSelection: useLedgerAsFactorSource ? .ledger : .device(babylonDeviceFactorSources.first)
 				state: &state
 			)
 		}
@@ -195,14 +194,14 @@ extension CreateEntityCoordinator {
 	private func goToStep2Creation(
 		curve: Slip10Curve,
 		entityName: NonEmpty<String>,
-		babylonDeviceFactorSource: BabylonDeviceFactorSource,
+		genesisFactorSourceSelection: GenesisFactorSourceSelection,
 		state: inout State
 	) -> EffectTask<Action> {
 		state.step = .step2_creationOfEntity(.init(
 			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
-			babylonFactorSource: babylonDeviceFactorSource
+			genesisFactorSourceSelection: genesisFactorSourceSelection
 		))
 		return .none
 	}

@@ -3,6 +3,12 @@ import Cryptography
 import FeaturePrelude
 import PersonasClient
 
+// MARK: - GenesisFactorSourceSelection
+public enum GenesisFactorSourceSelection: Sendable, Hashable {
+	case device(BabylonDeviceFactorSource)
+	case ledger
+}
+
 // MARK: - CreationOfEntity
 public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -19,16 +25,17 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			curve: Slip10Curve,
 			networkID: NetworkID?,
 			name: NonEmptyString,
-			babylonFactorSource: BabylonDeviceFactorSource
+			genesisFactorSourceSelection: GenesisFactorSourceSelection
 		) {
-			self.init(
-				request: .init(
-					curve: curve,
-					networkID: networkID,
-					babylonDeviceFactorSource: babylonFactorSource,
-					displayName: name
-				)
-			)
+//			self.init(
+//				request: .init(
+//					curve: curve,
+//					networkID: networkID,
+//					babylonDeviceFactorSource: babylonFactorSource,
+//					displayName: name
+//				)
+//			)
+			fatalError()
 		}
 	}
 
@@ -63,14 +70,14 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 				await send(.internal(.createEntityResult(TaskResult {
 					switch entityKind {
 					case .account:
-						let account = try await accountsClient.createUnsavedVirtualAccount(request)
+						let account = try await accountsClient.newUnsavedVirtualAccountControlledByDeviceFactorSource(request)
 						try await accountsClient.saveVirtualAccount(.init(
 							account: account,
 							shouldUpdateFactorSourceNextDerivationIndex: true
 						))
 						return try account.cast()
 					case .identity:
-						let persona = try await personasClient.createUnsavedVirtualPersona(request)
+						let persona = try await personasClient.newUnsavedVirtualPersonaControlledByDeviceFactorSource(request)
 						try await personasClient.saveVirtualPersona(persona)
 						return try persona.cast()
 					}

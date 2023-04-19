@@ -12,7 +12,7 @@ public struct AccountsClient: Sendable {
 	public var accountsOnCurrentNetwork: AccountsOnCurrentNetwork
 
 	/// Creates a new virtual account without saving it into the profile
-	public var createUnsavedVirtualAccount: CreateUnsavedVirtualAccount
+	public var newUnsavedVirtualAccountControlledByDeviceFactorSource: NewUnsavedVirtualAccountControlledByDeviceFactorSource
 
 	/// Saves a virtual account into the profile.
 	public var saveVirtualAccount: SaveVirtualAccount
@@ -28,7 +28,7 @@ public struct AccountsClient: Sendable {
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
-		createUnsavedVirtualAccount: @escaping CreateUnsavedVirtualAccount,
+		newUnsavedVirtualAccountControlledByDeviceFactorSource: @escaping NewUnsavedVirtualAccountControlledByDeviceFactorSource,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
 		getAccountByAddress: @escaping GetAccountByAddress,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork
@@ -36,7 +36,7 @@ public struct AccountsClient: Sendable {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
-		self.createUnsavedVirtualAccount = createUnsavedVirtualAccount
+		self.newUnsavedVirtualAccountControlledByDeviceFactorSource = newUnsavedVirtualAccountControlledByDeviceFactorSource
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
@@ -49,7 +49,7 @@ extension AccountsClient {
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
 
-	public typealias CreateUnsavedVirtualAccount = @Sendable (CreateVirtualEntityRequest) async throws -> Profile.Network.Account
+	public typealias NewUnsavedVirtualAccountControlledByDeviceFactorSource = @Sendable (CreateVirtualEntityRequest) async throws -> Profile.Network.Account
 	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account

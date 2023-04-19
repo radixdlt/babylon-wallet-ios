@@ -16,7 +16,7 @@ final class CreationOfEntityTests: TestCase {
 			initialState: initialState,
 			reducer: CreationOfEntity<Profile.Network.Account>()
 		) {
-			$0.accountsClient.createUnsavedVirtualAccount = { request in
+			$0.accountsClient.newUnsavedVirtualAccountControlledByDeviceFactorSource = { request in
 				XCTAssertEqual(request.displayName, account.displayName)
 				return account
 			}
@@ -42,7 +42,7 @@ final class CreationOfEntityTests: TestCase {
 			initialState: initialState,
 			reducer: CreationOfEntity<Profile.Network.Account>()
 		) {
-			$0.accountsClient.createUnsavedVirtualAccount = { request in
+			$0.accountsClient.newUnsavedVirtualAccountControlledByDeviceFactorSource = { request in
 				XCTAssertEqual(request.displayName, "NeverCreated")
 				throw createNewAccountError
 			}

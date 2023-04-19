@@ -23,7 +23,7 @@ extension PersonasClient: DependencyKey {
 					try $0.updatePersona(persona)
 				}
 			},
-			createUnsavedVirtualPersona: { request in
+			newUnsavedVirtualPersonaControlledByDeviceFactorSource: { request in
 				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},
 			saveVirtualPersona: { persona in

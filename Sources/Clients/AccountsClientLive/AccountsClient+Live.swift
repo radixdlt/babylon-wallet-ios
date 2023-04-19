@@ -24,7 +24,7 @@ extension AccountsClient: DependencyKey {
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
 			getAccountsOnNetwork: { try await getProfileStore().profile.network(id: $0).accounts },
-			createUnsavedVirtualAccount: { request in
+			newUnsavedVirtualAccountControlledByDeviceFactorSource: { request in
 				try await getProfileStore().profile.createNewUnsavedVirtualEntity(request: request)
 			},
 			saveVirtualAccount: saveVirtualAccount,
