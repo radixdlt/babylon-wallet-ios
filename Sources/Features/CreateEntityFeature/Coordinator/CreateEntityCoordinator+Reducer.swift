@@ -55,7 +55,11 @@ public struct CreateEntityCoordinator<
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadFactorSourcesResult(TaskResult<FactorSources>, beforeCreatingEntityWithName: NonEmptyString)
+		case loadFactorSourcesResult(
+			TaskResult<FactorSources>,
+			beforeCreatingEntityWithName: NonEmptyString,
+			useLedgerAsFactorSource: Bool
+		)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -115,12 +119,14 @@ extension CreateEntityCoordinator {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadFactorSourcesResult(.failure(error), _):
+		case let .loadFactorSourcesResult(.failure(error), _, _):
+			loggerGlobal.error("Failed to load factor sources: \(error)")
 			errorQueue.schedule(error)
 			return .none
 
-		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate):
+		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate, useLedgerAsFactorSource):
 			precondition(!factorSources.isEmpty)
+			fatalError("impl me")
 			let babylonDeviceFactorSources = factorSources.babylonDeviceFactorSources()
 
 			return goToStep2Creation(
@@ -138,11 +144,18 @@ extension CreateEntityCoordinator {
 			state.step = .step1_nameNewEntity(.init(config: state.config))
 			return .none
 
-		case let .step1_nameNewEntity(.delegate(.named(name))):
+		case let .step1_nameNewEntity(.delegate(.proceed(name, useLedgerAsFactorSource))):
+
 			return .run { send in
-				await send(.internal(.loadFactorSourcesResult(TaskResult {
-					try await factorSourcesClient.getFactorSources()
-				}, beforeCreatingEntityWithName: name)))
+				await send(.internal(
+					.loadFactorSourcesResult(
+						TaskResult {
+							try await factorSourcesClient.getFactorSources()
+						},
+						beforeCreatingEntityWithName: name,
+						useLedgerAsFactorSource: useLedgerAsFactorSource
+					)
+				))
 			}
 
 		case let .step2_creationOfEntity(.delegate(.createdEntity(newEntity))):
