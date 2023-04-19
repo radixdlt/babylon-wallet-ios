@@ -126,6 +126,11 @@ public struct Home: Sendable, FeatureReducer {
 				), displayIntroduction: { _ in false })
 			)
 			return .none
+		case .pullToRefreshStarted:
+			let accountAddresses = state.accounts.map(\.address)
+			return .run { _ in
+				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+			}
 		default:
 			return .none
 		}
@@ -135,7 +140,10 @@ public struct Home: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .accountsLoadedResult(.success(accounts)):
 			state.accountList = .init(accounts: accounts)
-			return .none
+			let accountAddresses = state.accounts.map(\.address)
+			return .run { _ in
+				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, false)
+			}
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)

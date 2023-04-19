@@ -22,18 +22,26 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		@Dependency(\.cacheClient) var cacheClient
 
+		@Sendable
+		func fetchAccountPortfolio(_ accountAddress: AccountAddress, refresh: Bool) async throws -> AccountPortfolio {
+			let portfolio = try await cacheClient.withCaching(
+				cacheEntry: .accountPortfolio(.single(accountAddress.address)),
+				forceRefresh: refresh,
+				request: { try await AccountPortfoliosClient.fetchAccountPortfolio(accountAddress) }
+			)
+
+			await state.setAccountPortfolio(portfolio)
+
+			return portfolio
+		}
+
 		return AccountPortfoliosClient(
-			fetchAccountPortfolio: { address, refresh in
-				let portfolio = try await cacheClient.withCaching(
-					cacheEntry: .accountPortfolio(.single(address.address)),
-					forceRefresh: refresh,
-					request: { try await fetchAccountPortfolio(address) }
-				)
-
-				await state.setAccountPortfolio(portfolio)
-
-				return portfolio
+			fetchAccountPortfolios: { addresses, refresh in
+				try await addresses.parallelMap {
+					try await fetchAccountPortfolio($0, refresh: refresh)
+				}
 			},
+			fetchAccountPortfolio: fetchAccountPortfolio,
 			portfolioForAccount: { address in
 				await state.portfolioForAccount(address)
 			}
@@ -301,11 +309,13 @@ extension AccountPortfoliosClient: TestDependencyKey {
 	public static let previewValue = AccountPortfoliosClient.noop
 
 	public static let testValue = AccountPortfoliosClient(
+		fetchAccountPortfolios: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolios"),
 		fetchAccountPortfolio: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
 		portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount")
 	)
 
 	public static let noop = AccountPortfoliosClient(
+		fetchAccountPortfolios: { _, _ in throw NoopError() },
 		fetchAccountPortfolio: { _, _ in throw NoopError() },
 		portfolioForAccount: { _ in fatalError() }
 	)
