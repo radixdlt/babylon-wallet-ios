@@ -126,11 +126,14 @@ extension CreateEntityCoordinator {
 
 		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate, useLedgerAsFactorSource):
 			precondition(!factorSources.isEmpty)
+
 			let babylonDeviceFactorSources = factorSources.babylonDeviceFactorSources()
+			let ledgerFactorSources: [FactorSource] = factorSources.filter { $0.kind == .ledgerHQHardwareWallet }
+			let source: GenesisFactorSourceSelection = useLedgerAsFactorSource ? .ledger(ledgerFactorSources: ledgerFactorSources) : .device(babylonDeviceFactorSources.first)
 
 			return goToStep2Creation(
 				entityName: specifiedNameForNewEntityToCreate,
-				genesisFactorSourceSelection: useLedgerAsFactorSource ? .ledger : .device(babylonDeviceFactorSources.first),
+				genesisFactorSourceSelection: source,
 				state: &state
 			)
 		}

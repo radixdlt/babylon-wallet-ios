@@ -6,7 +6,11 @@ import PersonasClient
 // MARK: - GenesisFactorSourceSelection
 public enum GenesisFactorSourceSelection: Sendable, Hashable {
 	case device(BabylonDeviceFactorSource)
-	case ledger
+	case ledger(ledgerFactorSources: [FactorSource])
+}
+
+extension FactorSourceID {
+	static let dummy = try! Self(hexCodable: .init(data: Data(repeating: 0x00, count: 32)))
 }
 
 // MARK: - CreationOfEntity
@@ -15,6 +19,15 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 		public let networkID: NetworkID?
 		public let name: NonEmptyString
 		public let genesisFactorSourceSelection: GenesisFactorSourceSelection
+		public var selectedLedgerID: FactorSource.ID = .dummy
+		public var useLedgerAsFactorSource: Bool {
+			switch genesisFactorSourceSelection {
+			case .ledger: return true
+			case .device: return false
+			}
+		}
+
+		public var ledgers: IdentifiedArrayOf<FactorSource> = []
 
 		public init(
 			networkID: NetworkID?,
@@ -29,6 +42,9 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case selectedLedger(id: FactorSource.ID)
+		case addNewLedgerButtonTapped
+		case confirmedLedger(FactorSource)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -56,9 +72,22 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			switch state.genesisFactorSourceSelection {
 			case let .device(babylonDeviceFactorSource):
 				return createEntityControlledByDeviceFactorSource(babylonDeviceFactorSource, state: state)
-			case .ledger:
-				fatalError("impl me")
+			case let .ledger(ledgers):
+				precondition(ledgers.allSatisfy { $0.kind == .ledgerHQHardwareWallet })
+				state.ledgers = IdentifiedArrayOf<FactorSource>.init(uniqueElements: ledgers, id: \.id)
+				return .none
 			}
+		case let .selectedLedger(selectedID):
+			state.selectedLedgerID = selectedID
+			return .none
+
+		case .addNewLedgerButtonTapped:
+			loggerGlobal.critical(" addNewLedgerButtonTapped IGNORED")
+			return .none
+
+		case let .confirmedLedger(ledger):
+			loggerGlobal.critical(" confirmedLedger IGNORED")
+			return .none
 		}
 	}
 
