@@ -30,27 +30,64 @@ extension Profile.Network {
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public var displayName: NonEmpty<String>
 
-		/// Fields containing personal information you have inputted.
-		public var fields: IdentifiedArrayOf<Field>
+		/// Additional persona specific properties
+		public struct ExtraProperties: Sendable, Hashable, Codable {
+			/// Fields containing personal information you have inputted.
+			public var fields: IdentifiedArrayOf<Field>
+			public init(fields: IdentifiedArrayOf<Field> = []) {
+				self.fields = fields
+			}
+		}
+
+		/// Additional persona specific properties
+		public var extraProperties: ExtraProperties
 
 		public init(
 			networkID: NetworkID,
 			address: EntityAddress,
 			securityState: EntitySecurityState,
 			displayName: NonEmpty<String>,
-			fields: IdentifiedArrayOf<Field>
+			extraProperties: ExtraProperties
 		) {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.fields = fields
+			self.extraProperties = extraProperties
 			self.displayName = displayName
+		}
+
+		public init(
+			networkID: NetworkID,
+			address: EntityAddress,
+			securityState: EntitySecurityState,
+			displayName: NonEmpty<String>
+		) {
+			self.init(networkID: networkID, address: address, securityState: securityState, displayName: displayName, fields: [])
 		}
 	}
 }
 
 extension Profile.Network.Persona {
+	/// Fields containing personal information you have inputted.
+	public var fields: IdentifiedArrayOf<Field> {
+		get { extraProperties.fields }
+		set { extraProperties.fields = newValue }
+	}
+
+	public init(
+		networkID: NetworkID,
+		address: EntityAddress,
+		securityState: EntitySecurityState,
+		displayName: NonEmpty<String>,
+		fields: IdentifiedArrayOf<Field>
+	) {
+		self.init(networkID: networkID, address: address, securityState: securityState, displayName: displayName, extraProperties: .init(fields: fields))
+	}
+
 	public static var entityKind: EntityKind { .identity }
+
+	/// Noop
+	public mutating func updateAppearanceIDIfAble(_: Profile.Network.Account.AppearanceID) {}
 
 	public typealias EntityAddress = IdentityAddress
 

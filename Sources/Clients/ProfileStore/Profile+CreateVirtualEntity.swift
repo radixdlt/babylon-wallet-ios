@@ -3,21 +3,31 @@ import Profile
 import UseFactorSourceClient
 
 extension Profile {
-	public func createNewUnsavedVirtualEntity<Entity: EntityProtocol>(
-		request: CreateVirtualEntityRequest
+	public func createNewUnsavedVirtualEntityControlledByDeviceFactorSource<Entity: EntityProtocol>(
+		request: CreateVirtualEntityControlledByDeviceFactorSourceRequest
 	) async throws -> Entity {
-		try await self.createNewUnsavedVirtualEntity(
+		try await self.createNewUnsavedVirtualEntityControlledByDeviceFactorSource(
 			request: request,
 			entityKind: Entity.entityKind
 		).cast()
 	}
 
-	public func createNewUnsavedVirtualEntity(
-		request: CreateVirtualEntityRequest,
+	public func createNewUnsavedVirtualEntityControlledByDeviceFactorSource(
+		request: CreateVirtualEntityControlledByDeviceFactorSourceRequest,
 		entityKind: EntityKind
 	) async throws -> any EntityProtocol {
-		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+		try await newUnsavedVirtualEntityControlledByDeviceFactorSource(
+			request: request,
+			entityType: entityKind.entityType
+		)
+	}
 
+	public func newUnsavedVirtualEntityControlledByDeviceFactorSource<Entity: EntityProtocol>(
+		request: CreateVirtualEntityControlledByDeviceFactorSourceRequest,
+		entityType: Entity.Type
+	) async throws -> Entity {
+		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+		let entityKind = Entity.entityKind
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
 		let babylonDeviceFactorSource = request.babylonDeviceFactorSource
 		let deviceFactorSourceStorage = babylonDeviceFactorSource.deviceStorage
@@ -29,7 +39,7 @@ extension Profile {
 				.init(
 					hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
 					derivationPath: derivationPath,
-					curve: request.curve,
+					curve: .curve25519, // we always use Curve25519 for new accounts
 					creationOfEntity: entityKind
 				)
 			)
@@ -41,41 +51,21 @@ extension Profile {
 			)
 		}()
 
-		let displayName = request.displayName
-		let unsecuredControl = UnsecuredEntityControl(
-			genesisFactorInstance: genesisFactorInstance
+		let numberOfExistingEntities = {
+			guard let network = (try? self.network(id: networkID)) else {
+				return 0
+			}
+			switch entityKind {
+			case .account: return network.accounts.count
+			case .identity: return network.personas.count
+			}
+		}()
+
+		return try Entity(
+			networkID: networkID,
+			factorInstance: genesisFactorInstance,
+			displayName: request.displayName,
+			extraProperties: request.extraProperties(numberOfExistingEntities).get(entityType: Entity.self)
 		)
-
-		switch entityKind {
-		case .identity:
-			let identityAddress = try Profile.Network.Persona.deriveAddress(
-				networkID: networkID,
-				publicKey: genesisFactorInstance.publicKey
-			)
-
-			let persona = Profile.Network.Persona(
-				networkID: networkID,
-				address: identityAddress,
-				securityState: .unsecured(unsecuredControl),
-				displayName: displayName,
-				fields: .init()
-			)
-			return persona
-		case .account:
-			let accountAddress = try Profile.Network.Account.deriveAddress(
-				networkID: networkID,
-				publicKey: genesisFactorInstance.publicKey
-			)
-			let index = (try? self.network(id: networkID))?.accounts.count ?? 0
-			let appearanceID = Profile.Network.Account.AppearanceID.fromIndex(index)
-			let account = Profile.Network.Account(
-				networkID: networkID,
-				address: accountAddress,
-				securityState: .unsecured(unsecuredControl),
-				appearanceID: appearanceID,
-				displayName: displayName
-			)
-			return account
-		}
 	}
 }

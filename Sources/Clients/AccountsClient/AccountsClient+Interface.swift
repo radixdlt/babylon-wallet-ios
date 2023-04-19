@@ -49,7 +49,7 @@ extension AccountsClient {
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
 
-	public typealias NewUnsavedVirtualAccountControlledByDeviceFactorSource = @Sendable (CreateVirtualEntityRequest) async throws -> Profile.Network.Account
+	public typealias NewUnsavedVirtualAccountControlledByDeviceFactorSource = @Sendable (CreateVirtualEntityControlledByDeviceFactorSourceRequest) async throws -> Profile.Network.Account
 	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account

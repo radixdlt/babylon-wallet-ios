@@ -35,5 +35,5 @@ extension PersonasClient {
 	public typealias HasAnyPersonaOnAnyNetworks = @Sendable () async -> Bool
 	public typealias UpdatePersona = @Sendable (Profile.Network.Persona) async throws -> Void
 	public typealias SaveVirtualPersona = @Sendable (Profile.Network.Persona) async throws -> Void
-	public typealias NewUnsavedVirtualPersonaControlledByDeviceFactorSource = @Sendable (CreateVirtualEntityRequest) async throws -> Profile.Network.Persona
+	public typealias NewUnsavedVirtualPersonaControlledByDeviceFactorSource = @Sendable (CreateVirtualEntityControlledByDeviceFactorSourceRequest) async throws -> Profile.Network.Persona
 }

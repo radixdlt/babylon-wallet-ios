@@ -17,6 +17,13 @@ public enum EntityKind:
 
 	/// Used by Persona
 	case identity = 618
+
+	public var entityType: any EntityProtocol.Type {
+		switch self {
+		case .account: return Profile.Network.Account.self
+		case .identity: return Profile.Network.Persona.self
+		}
+	}
 }
 
 extension EntityKind {
