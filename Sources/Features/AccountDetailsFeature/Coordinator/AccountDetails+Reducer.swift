@@ -129,10 +129,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .portfolioUpdated(portfolio):
-			let xrd = portfolio.fungibleResources.loaded.first.map(FungibleTokenList.Row.State.init(xrdToken:))
-			let nonXrd = Array(portfolio.fungibleResources.loaded.dropFirst()).map(FungibleTokenList.Row.State.init(nonXRDToken:))
+			let xrd = portfolio.fungibleResources.first.map(FungibleTokenList.Row.State.init(xrdToken:))
+			let nonXrd = Array(portfolio.fungibleResources.dropFirst()).map(FungibleTokenList.Row.State.init(nonXRDToken:))
 
-			let nfts = portfolio.nonFungibleResources.loaded.map(NonFungibleTokenList.Row.State.init(token:))
+			let nfts = portfolio.nonFungibleResources.map(NonFungibleTokenList.Row.State.init(token:))
 			state.assets = .init(assets: .init(rawValue: [
 				.fungibleTokens(.init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))),
 				.nonFungibleTokens(.init(rows: .init(uniqueElements: nfts))),

@@ -5,47 +5,86 @@ import SharedModels
 
 // MARK: - AccountPortfoliosClient + DependencyKey
 extension AccountPortfoliosClient: DependencyKey {
+        actor State {
+                struct PaginatedResource<Item: Hashable>: Hashable, Sendable {
+                        internal init(cursor: PageCursor? = nil, totalCount: Int64?, items: [Item]) {
+                                self.cursor = cursor
+                                self.totalCount = totalCount.map(Int.init) ?? items.count
+                                self.items = items
+                        }
+
+                        let cursor: PageCursor?
+                        let totalCount: Int
+                        let items: [Item]
+                }
+
+                struct NonFungibleResource: Hashable, Sendable {
+                        typealias Vaults = PaginatedResource<GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem>
+                        typealias OwnedIds = PaginatedResource<GatewayAPI.NonFungibleIdsCollectionItem>
+                        struct Details: Hashable, Sendable {
+                                let metadata: GatewayAPI.EntityMetadataCollection?
+                                let resourceDetails: GatewayAPI.StateEntityDetailsResponseNonFungibleResourceDetails?
+                        }
+
+                        let address: String
+                        let vaults: Vaults
+
+                        // Optional when not loaded
+                        let details: Details?
+                        let ownedIds: OwnedIds?
+                }
+
+                struct FungibleResource: Hashable, Sendable {
+                        struct Details: Hashable, Sendable {
+                                let metadata: GatewayAPI.EntityMetadataCollection
+                                let resourceDetails: GatewayAPI.StateEntityDetailsResponseFungibleResourceDetails?
+                        }
+                        typealias Vaults = PaginatedResource<GatewayAPI.FungibleResourcesCollectionItemVaultAggregatedVaultItem>
+
+                        let address: String
+                        let vaults: Vaults
+
+                        // Optional when not loaded
+                        let details: Details?
+                }
+
+                struct AccountResources: Hashable, Sendable {
+                        typealias FungibleResources = PaginatedResource<FungibleResource>
+                        typealias NonFungibleResources = PaginatedResource<NonFungibleResource>
+
+                        let owner: AccountAddress
+                        let fungibleResources: FungibleResources?
+                        let nonFungibleResources: NonFungibleResources?
+                }
+
+                private var accountResources: Set<AccountResources>
+
+                init(accountResources: Set<AccountResources>) {
+                        self.accountResources = accountResources
+                }
+
+                func setAccountResources(_ resources: Set<AccountResources>) {
+                        self.accountResources = resources
+                }
+        }
+
         public static let liveValue: AccountPortfoliosClient = {
                 let portfolios: AsyncCurrentValueSubject<Set<AccountPortfolio>> = .init([])
-
-                // Internal state
+                let state = State(accountResources: [])
 
                 return AccountPortfoliosClient(
                         fetchAccountPortfolios: { accountAddresses in
-                                let loadedPortfolios = try await fetchAccountPortfolios(accountAddresses)
-                                portfolios.value = Set(loadedPortfolios)
-                                return loadedPortfolios
+                                let loadedResources = try await fetchAccountResources(accountAddresses)
+                                await state.setAccountResources(Set(loadedResources))
+                                let accountPortfolios = try await state.accountPortfolio()
+                                portfolios.value = Set(accountPortfolios)
+                                return accountPortfolios
                         },
                         fetchAccountPortfolio: { address, refresh in
-                                let portfolio = try await fetchAccountPortfolio(address, refresh)
+                                let portfolio = try await fetchAccountPortfolio(address)
                                 portfolios.value.update(with: portfolio)
                                 return portfolio
                         },
-//                        fetchMoreFungibleTokens: { accountAddress in
-//                                resourcePageCursor.
-//                                guard var portfolio = portfolios.value.first(where: { $0.owner == accountAddress }),
-//                                      let nextPageCursor = portfolio.fungibleResources.nextPageCursor
-//                                else {
-//                                        fatalError()
-//                                }
-//
-//                                let (tokens, pageCursor) = try await fetchMoreFungibleTokens(accountAddress, nextPageCursor: nextPageCursor)
-//                                portfolio.fungibleResources.nextPageCursor = pageCursor
-//                                portfolio.fungibleResources.loaded.append(contentsOf: tokens)
-//                                portfolios.value.update(with: portfolio)
-//                                return portfolio
-//                        },
-//                        fetchMoreNonFungibleTokens: { accounAddress in
-//                                guard var portfolio = portfolios.value.first(where: { $0.owner == accounAddress }),
-//                                      let nextPageCursor = portfolio.nonFungibleResources.nextPageCursor
-//                                else {
-//                                        fatalError()
-//                                }
-//
-//                                let (tokens, pageCursor) = try await fetchMoreNonFungibleTokens(accounAddress, nextPageCursor: nextPageCursor)
-//
-//                                return portfolio
-//                        },
                         portfolioForAccount: { address in
                                 portfolios.compactMap { portfolios in
                                         portfolios.first { portfolio in
@@ -61,34 +100,210 @@ extension AccountPortfoliosClient: DependencyKey {
         }()
 }
 
-extension AccountPortfoliosClient {
-        static func fetchAccountFungibleResources(_ accountAddress: AccountAddress) async throws -> AccountPortfolio.FungibleResources {
-                let allResources = try await fetchAllPaginatedItems(fetchAccountFungibleResourcePage(accountAddress)).compactMap(\.global)
+extension AccountPortfoliosClient.State {
+        func accountPortfolio() throws -> [AccountPortfolio] {
+                try self.accountResources.map {
+                        let fungibleResources = try $0.fungibleResources?.items.map { resource in
+                                let details = resource.details
+                                let amount = try BigDecimal(fromString: "0")
 
-                le
-                // fetch all details
-                let details = try await loadResourceDetails(allResources.map(\.resourceAddress))
+                                return AccountPortfolio.FungibleResource(
+                                        resourceAddress: .init(address: resource.address),
+                                        amount: amount,
+                                        divisibility: details?.resourceDetails?.divisibility,
+                                        name: details?.metadata.name,
+                                        symbol: details?.metadata.symbol,
+                                        description: details?.metadata.description
+                                )
+                        }
 
-                details.map { item in
-                        AccountPortfolio.FungibleResource(resourceAddress: .init(address: item.address),
-                                                          amount: .init(fromString: item),
-                                                          tokenDescription: item.metadata.description)
+                        let nonFungibleResources = $0.nonFungibleResources?.items.map { resource in
+                                return AccountPortfolio.NonFungibleResource(
+                                        resourceAddress: .init(address: resource.address),
+                                        name: resource.details?.metadata?.name,
+                                        ids: .init(totalCount: 10)
+                                )
+                        }
+
+
+                        return AccountPortfolio(owner: $0.owner,
+                              fungibleResources: .init(totalCount: $0.fungibleResources?.totalCount ?? 0, items: fungibleResources),
+                              nonFungibleResources: .init(totalCount: $0.nonFungibleResources?.totalCount ?? 0, items: nonFungibleResources))
                 }
         }
 }
 
-struct PageCursor: Hashable, Sendable {
-        let ledgerState: GatewayAPI.LedgerState
-        let nextPagCursor: String
+
+extension AccountPortfoliosClient {
+        static func fetchAccountResources(_ accountAddresses: [AccountAddress]) async throws -> [State.AccountResources] {
+                let allDetails = try await loadResourceDetails(accountAddresses.map(\.address))
+                return try allDetails.items.map(createBaseAccountResources(allDetails.ledgerState))
+        }
+
+        static func createBaseAccountResources(
+                _ ledgerState: GatewayAPI.LedgerState
+        ) -> (GatewayAPI.StateEntityDetailsResponseItem) throws -> State.AccountResources {
+                return { details in
+                        let nonFungibleResources = details.nonFungibleResources.map(createBaseNonFungibleResources(ledgerState))
+                        let fungibleResources = details.fungibleResources.map(createBaseFungibleResources(ledgerState))
+
+                        return try .init(
+                                owner: .init(address: details.address),
+                                fungibleResources: fungibleResources,
+                                nonFungibleResources: nonFungibleResources
+                        )
+                }
+        }
+
+        static func createBaseNonFungibleResources(
+                _ ledgerState: GatewayAPI.LedgerState
+        ) -> (GatewayAPI.NonFungibleResourcesCollection) -> State.AccountResources.NonFungibleResources {
+                return { collection in
+                        let items = collection.items
+                                .compactMap(\.vault)
+                                .map { item in
+                                        State.NonFungibleResource(
+                                                address: item.resourceAddress,
+                                                vaults: .init(totalCount: item.vaults.totalCount, items: item.vaults.items),
+                                                metadata: nil,
+                                                details: nil,
+                                                ownedIds: nil
+                                        )
+                                }
+
+                        return .init(
+                                cursor: collection.nextCursor.map { PageCursor(ledgerState: ledgerState, nextPagCursor: $0 )},
+                                totalCount: collection.totalCount,
+                                items: items
+                        )
+                }
+        }
+
+        static func createBaseFungibleResources(
+                _ ledgerState: GatewayAPI.LedgerState
+        ) -> (GatewayAPI.FungibleResourcesCollection) -> State.AccountResources.FungibleResources {
+                return { collection in
+                        let items = collection.items
+                                .compactMap(\.vault)
+                                .map { item in
+                                        State.FungibleResource(
+                                                address: item.resourceAddress,
+                                                vaults: .init(totalCount: nil, items: item.vaults.items),
+                                                metadata: nil,
+                                                details: nil
+                                        )
+                                }
+
+                        return .init(
+                                cursor: collection.nextCursor.map { PageCursor(ledgerState: ledgerState, nextPagCursor: $0 )},
+                                totalCount: collection.totalCount,
+                                items: items
+                        )
+                }
+        }
+
+        // Load single account portfolio preview
+        static func fetchAccountPortfolio(_ accountAddress: AccountAddress) async throws -> AccountPortfolio {
+                // Use entity details endpoint actually
+                async let fetchFungibleResources = fetchAccountFungibleResources(accountAddress)
+                async let fetchNonFungibleResources = fetchAccountNonFungibleResources(accountAddress)
+
+                let (fungibleResources, nonFungiblResources) = try await (fetchFungibleResources, fetchNonFungibleResources)
+
+                return .init(
+                        owner: accountAddress,
+                        fungibleResources: fungibleResources,
+                        nonFungibleResources: nonFungiblResources
+                )
+        }
+
+//        let allFungibleResourceItems: [GatewayAPI.FungibleResourcesCollectionItem]? = details.fungibleResources.map { fungibleResources in
+//                var items = fungibleResources.items
+//                if let nextPageCursor = fungibleResources.nextPagCursor {
+//                        let additionalItems = try await fetchAllPaginatedItems(
+//                                cursor: PageCursor(ledgerState: ledgerState, nextPagCursor: nextPageCursor),
+//                                fetchNonFungibleResourcePage(accountAddress)
+//                        )
+//                        items.append(contentsOf: additionalItems)
+//                }
+//                return items
+//        }()
 }
 
-struct PaginatedResource<Resource> {
-        let loadedItems: [Resource]
-        let cursor: PageCursor?
+extension Optional {
+        func asyncMap<T>(_ transform: @Sendable (Wrapped) async throws -> T) async throws -> Optional<T> {
+                guard case let .some(value) = self else {
+                        return nil
+                }
+
+                return try await transform(value)
+        }
+}
+
+extension AccountPortfoliosClient {
+//        static func fetchAccountFungibleResources(_ accountAddress: AccountAddress) async throws -> AccountPortfolio.FungibleResources {
+//                let allResources = try await fetchAllPaginatedItems(fetchAccountFungibleResourcePage(accountAddress)).compactMap(\.global)
+//                let allDetails = try await loadResourceDetails(allResources.map(\.resourceAddress))
+//
+//                return try allDetails.map { item in
+//                        let amount = allResources.first { $0.resourceAddress == item.address }?.amount ?? "0"
+//                        return try AccountPortfolio.FungibleResource(
+//                                resourceAddress: .init(address: item.address),
+//                                amount: .init(fromString: amount),
+//                                divisibility: item.details?.fungible?.divisibility,
+//                                name: item.metadata.name,
+//                                symbol: item.metadata.symbol,
+//                                tokenDescription: item.metadata.description
+//                        )
+//                }
+//        }
+//
+//        static func fetchAccountNonFungibleResources(_ accountAddress: AccountAddress) async throws -> AccountPortfolio.NonFungibleResources {
+//                let allResources = try await fetchAllPaginatedItems(fetchNonFungibleResourcePage(accountAddress)).compactMap(\.vault)
+//                let allDetails = try await loadResourceDetails(allResources.map(\.resourceAddress))
+//
+//                return try await allResources.map(\.resourceAddress)
+//                        .parallelMap { resourceAddress in
+//                               try await createAccountNonFungibleResource(
+//                                        accountAddress,
+//                                        resourceAddress: resourceAddress,
+//                                        metadata: allDetails.first(where: { $0.address == resourceAddress })?.metadata
+//                                )
+//                        }
+//        }
+//
+//        static func createAccountNonFungibleResource(
+//                _ accountAddress: AccountAddress,
+//                resourceAddress: String,
+//                metadata: GatewayAPI.EntityMetadataCollection?
+//        ) async throws -> AccountPortfolio.NonFungibleResource {
+//                let vaults = try await fetchAllPaginatedItems(fetchEntityNonFungibleResourceVaultPage(accountAddress, resourceAddress: resourceAddress))
+//                let ids = try await vaults.map(\.vaultAddress)
+//                        .parallelMap { vaultAddress in
+//                                try await fetchAllPaginatedItems(fetchEntityNonFungibleResourceIdsPage(
+//                                        accountAddress,
+//                                        resourceAddress: resourceAddress,
+//                                        vaultAddress: vaultAddress
+//                                ))
+//                        }
+//                        .flatMap { $0 }
+//                        .map(\.nonFungibleId)
+//
+//                return .init(resourceAddress: .init(address: resourceAddress),
+//                             name: metadata?.name,
+//                             description: metadata?.description,
+//                             ids: ids
+//                )
+//        }
 }
 
 // MARK: - Pagination
 extension AccountPortfoliosClient {
+        struct PageCursor: Hashable, Sendable {
+                let ledgerState: GatewayAPI.LedgerState
+                let nextPagCursor: String
+        }
+        
         struct PaginatedResourceResponse<Resource: Sendable>: Sendable {
                 let loadedItems: [Resource]
                 let totalCount: Int64?
@@ -97,6 +312,7 @@ extension AccountPortfoliosClient {
 
         @Sendable
         static func fetchAllPaginatedItems<Item>(
+                cursor: PageCursor,
                 _ paginatedRequest: @Sendable @escaping (_ cursor: PageCursor?) async throws -> PaginatedResourceResponse<Item>
         ) async throws -> [Item] {
                 func fetchAllPaginatedItems(
@@ -120,7 +336,7 @@ extension AccountPortfoliosClient {
                         return try await fetchAllPaginatedItems(collectedResources: result)
                 }
 
-                return try await fetchAllPaginatedItems(collectedResources: nil)
+                return try await fetchAllPaginatedItems(collectedResources: .init(loadedItems: [], totalCount: nil, cursor: cursor))
         }
 }
 
@@ -146,55 +362,102 @@ extension AccountPortfoliosClient {
                         return .init(
                                 loadedItems: response.items,
                                 totalCount: response.totalCount,
-                                cursor: response.nextCursor.map {PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)})
+                                cursor: response.nextCursor.map {PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)}
+                        )
                 }
         }
 
         @Sendable
         static func fetchNonFungibleResourcePage(
-                _ accountAddress: AccountAddress,
-                pageCursor: PageCursor?
-        ) async throws -> GatewayAPI.StateEntityNonFungiblesPageResponse {
+                _ accountAddress: AccountAddress
+        ) -> (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleResourcesCollectionItem> {
                 @Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-                let request = GatewayAPI.StateEntityNonFungiblesPageRequest(
-                        atLedgerState: pageCursor?.ledgerState.selector,
-                        cursor: pageCursor?.nextPagCursor,
-                        limitPerPage: 20,
-                        address: accountAddress.address,
-                        aggregationLevel: .vault
-                )
-                return try await gatewayAPIClient.getEntityNonFungibleTokensPage(request)
+                return { pageCursor in
+                        let request = GatewayAPI.StateEntityNonFungiblesPageRequest(
+                                atLedgerState: pageCursor?.ledgerState.selector,
+                                cursor: pageCursor?.nextPagCursor,
+                                limitPerPage: 20,
+                                address: accountAddress.address,
+                                aggregationLevel: .vault
+                        )
+                        let response = try await gatewayAPIClient.getEntityNonFungibleTokensPage(request)
+
+                        return .init(
+                                loadedItems: response.items,
+                                totalCount: response.totalCount,
+                                cursor: response.nextCursor.map { PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)}
+                        )
+                }
         }
 
         @Sendable
-        static func loadEntityNonFungibleResourceVaultPage(
+        static func fetchEntityNonFungibleResourceVaultPage(
                 _ accountAddress: AccountAddress,
-                resourceAddress: String,
-                pageCursor: PageCursor?
-        ) async throws -> GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse {
+                resourceAddress: String
+        ) -> (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregatedVaultItem> {
                 @Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-                let request = GatewayAPI.StateEntityNonFungibleResourceVaultsPageRequest(
-                        atLedgerState: pageCursor?.ledgerState.selector,
-                        cursor: pageCursor?.nextPagCursor,
-                        limitPerPage: 20,
-                        address: accountAddress.address,
-                        resourceAddress: resourceAddress
-                )
-                return try await gatewayAPIClient.getEntityNonFungibleResourceVaultPage(request)
+                return { pageCursor in
+                        let request = GatewayAPI.StateEntityNonFungibleResourceVaultsPageRequest(
+                                atLedgerState: pageCursor?.ledgerState.selector,
+                                cursor: pageCursor?.nextPagCursor,
+                                address: accountAddress.address,
+                                resourceAddress: resourceAddress
+                        )
+                        let response = try await gatewayAPIClient.getEntityNonFungibleResourceVaultPage(request)
+
+                        return .init(
+                                loadedItems: response.items,
+                                totalCount: response.totalCount,
+                                cursor: response.nextCursor.map { PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)}
+                        )
+                }
         }
+
+        static func fetchEntityNonFungibleResourceIdsPage(
+                _ accountAddress: AccountAddress,
+                resourceAddress: String,
+                vaultAddress: String
+        ) -> (PageCursor?) async throws -> PaginatedResourceResponse<GatewayAPI.NonFungibleIdsCollectionItem> {
+                @Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
+                return { pageCursor in
+                        let request = GatewayAPI.StateEntityNonFungibleIdsPageRequest(
+                                atLedgerState: pageCursor?.ledgerState.selector,
+                                cursor: pageCursor?.nextPagCursor,
+                                address: accountAddress.address,
+                                vaultAddress: vaultAddress,
+                                resourceAddress: resourceAddress
+                        )
+                        let response = try await gatewayAPIClient.getAccountNonFungibleIdsPageRequest(request)
+
+                        return .init(
+                                loadedItems: response.items,
+                                totalCount: response.totalCount,
+                                cursor: response.nextCursor.map { PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)}
+                        )
+                }
+        }
+
+        struct EmptyDetailsResponses: Error {}
 
         static let entityDetailsPageSize = 20
         @Sendable
-        static func loadResourceDetails(_ addresses: [String]) async throws -> [GatewayAPI.StateEntityDetailsResponseItem] {
+        static func loadResourceDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
                 @Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-                return try await addresses
+                let responses = try await addresses
                         .chunks(ofCount: entityDetailsPageSize)
                         .map(Array.init)
                         .parallelMap(gatewayAPIClient.getEntityDetails)
-                        .flatMap(\.items)
+
+                let allItems = responses.flatMap(\.items)
+                guard let ledgerState = responses.first?.ledgerState else {
+                        throw EmptyDetailsResponses()
+                }
+
+                return .init(ledgerState: ledgerState, items: allItems)
         }
 }
 
@@ -205,9 +468,6 @@ extension AccountPortfoliosClient: TestDependencyKey {
         public static let testValue = AccountPortfoliosClient(
                 fetchAccountPortfolios: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolios"),
                 fetchAccountPortfolio: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
-                fetchAccountNonFungibleResourceIds: unimplemented("\(AccountPortfoliosClient.self).fetchAccountNonFungibleResourceIds"),
-//                fetchMoreFungibleTokens: unimplemented("\(AccountPortfoliosClient.self).fetchMoreFungibleTokens"),
-//                fetchMoreNonFungibleTokens: unimplemented("\(AccountPortfoliosClient.self).fetchMoreNonFungibleTokens"),
                 portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount"),
                 portfolios: .init([])
         )
@@ -215,9 +475,6 @@ extension AccountPortfoliosClient: TestDependencyKey {
         public static let noop = AccountPortfoliosClient(
                 fetchAccountPortfolios: { _ in throw NoopError() },
                 fetchAccountPortfolio: { _, _ in throw NoopError() },
-                fetchAccountNonFungibleResourceIds: {_,_ in throw NoopError() },
-//                fetchMoreFungibleTokens: { _ in throw NoopError() },
-//                fetchMoreNonFungibleTokens: { _ in throw NoopError() },
                 portfolioForAccount: { _ in fatalError() },
                 portfolios: .init([])
         )

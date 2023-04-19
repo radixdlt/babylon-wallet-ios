@@ -8,7 +8,7 @@ extension FungibleTokenDetails.State {
 			placeholderAsset: .placeholderImage(isXRD: false),
 			amount: amount.format(),
 			symbol: symbol,
-			description: tokenDescription,
+			description: description,
 			address: .init(address: resourceAddress.address, format: .default)
 		)
 	}

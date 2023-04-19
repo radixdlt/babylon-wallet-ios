@@ -150,7 +150,7 @@ extension NonFungibleTokenList.Row.View {
 	}
 
 	fileprivate func nftCount(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> Int {
-		viewStore.token.ids.count
+		20
 	}
 }
 

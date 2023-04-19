@@ -1,7 +1,18 @@
 import Prelude
 
+public struct PaginatedResource<Resource: Hashable & Sendable>: Hashable, Sendable {
+        public let totalCount: Int
+        // Optional when not loaded
+        public let items: [Resource]?
+
+        public init(totalCount: Int, items: [Resource]? = nil) {
+                self.totalCount = totalCount
+                self.items = items
+        }
+}
+
 // MARK: - AccountPortfolio
-public struct AccountPortfolio: Sendable, Hashable, Codable {
+public struct AccountPortfolio: Sendable, Hashable {
 	public let owner: AccountAddress
 	public var fungibleResources: FungibleResources
 	public var nonFungibleResources: NonFungibleResources
@@ -18,17 +29,17 @@ public struct AccountPortfolio: Sendable, Hashable, Codable {
 }
 
 extension AccountPortfolio {
-	public typealias FungibleResources = [FungibleResource]
-	public typealias NonFungibleResources = [NonFungibleResource]
+	public typealias FungibleResources = PaginatedResource<FungibleResource>
+	public typealias NonFungibleResources = PaginatedResource<NonFungibleResource>
 
-	public struct FungibleResource: Sendable, Hashable, Codable, Identifiable {
+	public struct FungibleResource: Sendable, Hashable, Identifiable {
                 public var id: ResourceAddress { self.resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let amount: BigDecimal
 		public let divisibility: Int?
 		public let name: String?
 		public let symbol: String?
-		public let tokenDescription: String?
+		public let description: String?
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -36,35 +47,34 @@ extension AccountPortfolio {
 			divisibility: Int? = nil,
 			name: String? = nil,
 			symbol: String? = nil,
-			tokenDescription: String? = nil
+			description: String? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.amount = amount
 			self.divisibility = divisibility
 			self.name = name
 			self.symbol = symbol
-			self.tokenDescription = tokenDescription
+			self.description = description
 		}
 	}
 
-	public struct NonFungibleResource: Sendable, Hashable, Codable, Identifiable {
+	public struct NonFungibleResource: Sendable, Hashable, Identifiable {
                 public var id: ResourceAddress { self.resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
 		public let description: String?
-		// The number of tokens owned by the Account
-		public let amount: Int
+                public let ids: PaginatedResource<String>
 
 		public init(
 			resourceAddress: ResourceAddress,
 			name: String? = nil,
 			description: String? = nil,
-			amount: Int
+                        ids: PaginatedResource<String>
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
 			self.description = description
-			self.amount = amount
+                        self.ids = ids
 		}
 	}
 }

@@ -131,7 +131,7 @@ extension GatewayAPIClient {
 		@Sendable
 		func getEntityDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
 			try await post(
-				request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses)
+                                request: GatewayAPI.StateEntityDetailsRequest(addresses: addresses, aggregationLevel: .vault)
 			) { @Sendable base in base.appendingPathComponent("state/entity/details") }
 		}
 
@@ -193,9 +193,14 @@ extension GatewayAPIClient {
                                         request: request
                                 ) { $0.appendingPathComponent("state/entity/page/non-fungible-vaults/") }
                         },
+                        getAccountNonFungibleIdsPageRequest: { request in
+                                try await post(
+                                        request: request
+                                ) { $0.appendingPathComponent("state/entity/page/non-fungible-vault/ids") }
+                        },
 			getEntityMetadataPage: { request in
 				try await post(request: request) {
-					$0.appendingPathComponent("/state/entity/page/metadata")
+					$0.appendingPathComponent("state/entity/page/metadata")
 				}
 			},
 			submitTransaction: { transactionSubmitRequest in

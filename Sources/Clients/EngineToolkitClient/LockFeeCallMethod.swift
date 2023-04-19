@@ -89,7 +89,7 @@ extension EngineToolkitClient {
 		accountAddress: AccountAddress,
 		tokenDivisivility: UInt8 = 18,
 		tokenName: String = "Token Test",
-		tokenDescription: String = "A very innovative and important resource.",
+		description: String = "A very innovative and important resource.",
 		tokenSymbol: String = "TEST",
 		initialSupply: String = "21000000",
 		tokensCount: Int = 100
@@ -104,7 +104,7 @@ extension EngineToolkitClient {
 					entries: [
 						[.string("name"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
 						[.string("symbol"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
-						[.string("description"), .string(tokenDescription)],
+						[.string("description"), .string(description)],
 					]
 				),
 
