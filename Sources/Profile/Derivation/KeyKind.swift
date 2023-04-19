@@ -32,10 +32,16 @@ public enum KeyKind:
 	CustomDumpRepresentable
 {
 	/// For a key to be used for signing transactions.
-	case transactionSigningKey = 1238
+	/// The value is the ascii sum of `"TRANSACTION_SIGNING"`
+	case transactionSigningKey = 1460
 
-	/// For a key to be used for signing authentication.
-	case authenticationSigningKey = 706
+	/// For a key to be used for signing authentication..
+	/// The value is the ascii sum of `"AUTHENTICATION_SIGNING"`
+	case authenticationSigningKey = 1678
+
+	/// For a key to be used for encrypting messages.
+	/// The value is the ascii sum of `"MESSAGE_ENCRYPTION"`
+	case messageEncryptionKey = 1391
 }
 
 extension KeyKind {
@@ -48,6 +54,17 @@ extension KeyKind {
 		switch self {
 		case .transactionSigningKey: return "transactionSigningKey"
 		case .authenticationSigningKey: return "authenticationSigningKey"
+		case .messageEncryptionKey: return "messageEncryptionKey"
 		}
 	}
+
+	#if DEBUG
+	public var asciiSource: String {
+		switch self {
+		case .transactionSigningKey: return "TRANSACTION_SIGNING"
+		case .authenticationSigningKey: return "AUTHENTICATION_SIGNING"
+		case .messageEncryptionKey: return "MESSAGE_ENCRYPTION"
+		}
+	}
+	#endif // DEBUG
 }

@@ -72,20 +72,18 @@ extension TestVector {
 
 // MARK: - SLIP10TestVectorsTests
 final class SLIP10TestVectorsTests: TestCase {
-	func test_same_as_ledger() throws {
-		let mnemonicPhrase = "equip will roof matter pink blind book anxiety banner elbow sun young"
-		let mnemonic = try Mnemonic(phrase: mnemonicPhrase, language: .english)
-		let pathRaw = "m/44H/1022H/10H/525H/0H/1238H"
-		let hdRoot = try mnemonic.hdRoot()
-		let path = try HD.Path.Full(string: pathRaw)
+	func test_slip_10_component_constants() {
+		func ascii(_ string: String, reduceInit: Int = 0, reduceOp: (Int, Int) -> Int = { $0 + $1 }) -> Int {
+			string.map { Int($0.asciiValue!) }.reduce(reduceInit, reduceOp)
+		}
 
-		let expectedPubKeySecp256k1Raw = "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8"
-		let expectedPubKeyCurve25519Raw = "191a2f9a10b2370ae612efbce92725164a9e3c16907c8eb93b6ded49f69aaf14"
-		let secp256K1PublicKey = try hdRoot.derivePrivateKey(path: path, curve: SECP256K1.self).publicKey
-		let curve25519PublicKey = try hdRoot.derivePrivateKey(path: path, curve: Curve25519.self).publicKey
+		XCTAssertEqual(ascii("GETID"), 365)
+		XCTAssertEqual(ascii("ACCOUNT"), 525)
+		XCTAssertEqual(ascii("IDENTITY"), 618)
 
-		XCTAssertEqual(secp256K1PublicKey.compressedRepresentation.hex, expectedPubKeySecp256k1Raw)
-		XCTAssertEqual(curve25519PublicKey.compressedRepresentation.hex, expectedPubKeyCurve25519Raw)
+		XCTAssertEqual(ascii("TRANSACTION_SIGNING"), 1460)
+		XCTAssertEqual(ascii("AUTHENTICATION_SIGNING"), 1678)
+		XCTAssertEqual(ascii("MESSAGE_ENCRYPTION"), 1391)
 	}
 
 	func testPath_m() throws {

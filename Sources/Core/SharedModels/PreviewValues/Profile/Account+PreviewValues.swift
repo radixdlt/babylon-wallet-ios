@@ -15,7 +15,7 @@ extension Profile.Network.Account {
 					compressedRepresentation: Data(
 						hex: "7bf9f97c0cac8c6c112d716069ccc169283b9838fa2f951c625b3d4ca0a8f05b")
 				)),
-				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/0H/1238H"))
+				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/1238H/0H"))
 			)
 		)),
 		appearanceID: ._0,
@@ -34,7 +34,7 @@ extension Profile.Network.Account {
 					compressedRepresentation: Data(
 						hex: "b862c4ef84a4a97c37760636f6b94d1fba7b4881ac15a073f6c57e2996bbeca8")
 				)),
-				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/1H/1238H"))
+				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/1238H/1H"))
 			))),
 		appearanceID: ._1,
 		displayName: "Secondary"

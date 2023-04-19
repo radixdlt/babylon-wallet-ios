@@ -93,8 +93,8 @@ extension HD.Path.Full {
 				.coinType,
 				.init(nonHardenedValue: networkID.derivationPathComponentNonHardenedValue, isHardened: isHardened),
 				.init(nonHardenedValue: entityKind.derivationPathComponentNonHardenedValue, isHardened: isHardened),
-				.init(nonHardenedValue: index, isHardened: isHardened),
 				.init(nonHardenedValue: keyKind.derivationPathComponentNonHardenedValue, isHardened: isHardened),
+				.init(nonHardenedValue: index, isHardened: isHardened),
 			],
 			onlyPublic: false
 		)
@@ -120,6 +120,31 @@ extension EntityDerivationPathProtocol {
 	public var derivationPath: String { fullPath.toString() }
 	public static var derivationScheme: DerivationScheme { .slip10 }
 	public static var purpose: DerivationPurpose { .publicKeyForAddressOfEntity(type: Entity.self) }
+
+	public var networkID: NetworkID {
+		guard let networkID = NetworkID(exactly: fullPath.children[Self.networkIndex].nonHardenedValue) else {
+			fatalError("Expected to always have a valid networkID")
+		}
+		return networkID
+	}
+
+	public var entityKind: EntityKind {
+		guard let entityKind = EntityKind(rawValue: fullPath.children[Self.entityKindIndex].nonHardenedValue) else {
+			fatalError("Expected to always have a valid entityKind")
+		}
+		return entityKind
+	}
+
+	public var keyKind: KeyKind {
+		guard let keyKind = KeyKind(rawValue: fullPath.children[Self.keyKindIndex].nonHardenedValue) else {
+			fatalError("Expected to always have a valid keyKind")
+		}
+		return keyKind
+	}
+
+	public var index: HD.Path.Component.Child.Value {
+		fullPath.children[Self.entityIndexIndex].nonHardenedValue
+	}
 }
 
 extension DerivationPathProtocol where Self: Encodable {
@@ -190,8 +215,29 @@ public struct AccountHierarchicalDeterministicDerivationPath:
 	}
 }
 
+extension HD.Path.Full {
+	var children: [HD.Path.Component.Child] {
+		components.dropFirst().compactMap(\.asChild)
+	}
+}
+
 extension EntityDerivationPathProtocol {
+	/// includes counting `m` as a path component
 	static var expectedComponentCount: Int { 7 }
+
+	/// index after having removed `m` as path component, i.e. letting `purpose` have index 0.
+	static var purposeIndex: Int { 0 }
+	/// index after having removed `m` as path component, i.e. letting `purpose` have index 0.
+	static var coinTypeIndex: Int { 1 }
+	/// index after having removed `m` as path component, i.e. letting `purpose` have index 0.
+	static var networkIndex: Int { 2 }
+	/// index after having removed `m` as path component, i.e. letting `purpose` have index 0.
+	static var entityKindIndex: Int { 3 }
+	/// index after having removed `m` as path component, i.e. letting `purpose` have index 0.
+	static var keyKindIndex: Int { 4 }
+	/// index after having removed `m` as path component, i.e. letting `purpose` have index 0.
+	static var entityIndexIndex: Int { 5 }
+
 	@discardableResult
 	static func validate(hdPath: HD.Path.Full) throws -> HD.Path.Full {
 		let components = hdPath.components
@@ -202,7 +248,7 @@ extension EntityDerivationPathProtocol {
 		guard components.first!.isRoot else {
 			throw InvalidDerivationPathForEntity.invalidFirstComponentNotRoot
 		}
-		let children = components.dropFirst().compactMap(\.asChild)
+		let children = hdPath.children
 		guard children.count == (Self.expectedComponentCount - 1) else {
 			throw InvalidDerivationPathForEntity.multipleRootsFound
 		}
@@ -213,25 +259,27 @@ extension EntityDerivationPathProtocol {
 		}
 		assert(children.allSatisfy(\.isHardened))
 
-		guard children[0] == .bip44Purpose else {
+		guard children[purposeIndex] == .bip44Purpose else {
 			throw InvalidDerivationPathForEntity.secondComponentIsNotBIP44
 		}
-		guard children[1] == .coinType else {
-			throw InvalidDerivationPathForEntity.invalidCoinType(got: children[1].nonHardenedValue)
+		guard children[coinTypeIndex] == .coinType else {
+			throw InvalidDerivationPathForEntity.invalidCoinType(got: children[coinTypeIndex].nonHardenedValue)
 		}
 
-		guard children[2].nonHardenedValue <= UInt8.max else {
+		guard children[networkIndex].nonHardenedValue <= UInt8.max else {
 			throw InvalidDerivationPathForEntity.invalidNetworkIDValueTooLarge
 		}
 
-		guard children[3].nonHardenedValue == Entity.entityKind.derivationPathComponentNonHardenedValue else {
-			throw InvalidDerivationPathForEntity.invalidEntityType(got: children[3].nonHardenedValue)
+		guard children[entityKindIndex].nonHardenedValue == Entity.entityKind.derivationPathComponentNonHardenedValue else {
+			throw InvalidDerivationPathForEntity.invalidEntityType(got: children[entityKindIndex].nonHardenedValue)
 		}
-		// No validation needed for `index`
+
 		let validKeyTypeValues = KeyKind.allCases.map(\.rawValue)
-		guard validKeyTypeValues.contains(children[5].nonHardenedValue) else {
-			throw InvalidDerivationPathForEntity.invalidKeyType(got: children[5].nonHardenedValue, expectedAnyOf: validKeyTypeValues)
+		guard validKeyTypeValues.contains(children[keyKindIndex].nonHardenedValue) else {
+			throw InvalidDerivationPathForEntity.invalidKeyType(got: children[keyKindIndex].nonHardenedValue, expectedAnyOf: validKeyTypeValues)
 		}
+
+		// no validation for entity index... index.
 
 		// Valid!
 		return hdPath

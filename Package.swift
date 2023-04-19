@@ -680,6 +680,9 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"SharedTestingModels",
+			],
+			resources: [
+				.process("TestVectors/"),
 			]
 		)
 	),
