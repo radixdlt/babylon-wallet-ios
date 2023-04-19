@@ -14,9 +14,10 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getEntityMetadata: GetEntityMetdata
 	public var getNonFungibleIds: GetNonFungibleIds
 	public var getEntityFungibleTokensPage: GetFungibleTokensPageRequest
-        public var getEntityNonFungibleTokensPage: GetNonFungibleTokensPageRequest
-        public var getEntityNonFungibleResourceVaultPage: GetEntityNonFungibleResourceVaultPage
-        public var getAccountNonFungibleIdsPageRequest: GetAccountNonFungibleIdsPageRequest
+	public var getEntityNonFungibleTokensPage: GetNonFungibleTokensPageRequest
+	public var getEntityNonFungibleResourceVaultPage: GetEntityNonFungibleResourceVaultPage
+	public var getEntityFungibleResourceVaultPage: GetEntityFungibleResourceVaultPage
+	public var getAccountNonFungibleIdsPageRequest: GetAccountNonFungibleIdsPageRequest
 
 	public var getEntityMetadataPage: GetEntityMetadataPage
 
@@ -47,11 +48,12 @@ extension GatewayAPIClient {
 	public typealias GetNonFungibleIds = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.StateNonFungibleIdsResponse
 
 	public typealias GetFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityFungiblesPageRequest) async throws -> GatewayAPI.StateEntityFungiblesPageResponse
-        public typealias GetNonFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityNonFungiblesPageRequest) async throws -> GatewayAPI.StateEntityNonFungiblesPageResponse
+	public typealias GetNonFungibleTokensPageRequest = @Sendable (GatewayAPI.StateEntityNonFungiblesPageRequest) async throws -> GatewayAPI.StateEntityNonFungiblesPageResponse
 
-        public typealias GetEntityNonFungibleResourceVaultPage = @Sendable (GatewayAPI.StateEntityNonFungibleResourceVaultsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse
+	public typealias GetEntityNonFungibleResourceVaultPage = @Sendable (GatewayAPI.StateEntityNonFungibleResourceVaultsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleResourceVaultsPageResponse
+	public typealias GetEntityFungibleResourceVaultPage = @Sendable (GatewayAPI.StateEntityFungibleResourceVaultsPageRequest) async throws -> GatewayAPI.StateEntityFungibleResourceVaultsPageResponse
 
-        public typealias GetAccountNonFungibleIdsPageRequest = @Sendable (GatewayAPI.StateEntityNonFungibleIdsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleIdsPageResponse
+	public typealias GetAccountNonFungibleIdsPageRequest = @Sendable (GatewayAPI.StateEntityNonFungibleIdsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleIdsPageResponse
 
 	// MARK: - transaction
 

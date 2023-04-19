@@ -1,7 +1,7 @@
-//import FeaturePrelude
-//import TransactionSigningFeature
+// import FeaturePrelude
+// import TransactionSigningFeature
 //
-//extension AssetTransfer.State {
+// extension AssetTransfer.State {
 //	var viewState: AssetTransfer.ViewState {
 //		.init(
 //			input: .init(
@@ -24,10 +24,10 @@
 //			}()
 //		)
 //	}
-//}
+// }
 //
 //// MARK: - AssetTransfer.View
-//extension AssetTransfer {
+// extension AssetTransfer {
 //	public struct ViewState: Equatable {
 //		struct Input: Equatable {
 //			let fromAddress: AddressView.ViewState
@@ -52,9 +52,9 @@
 //			self.store = store
 //		}
 //	}
-//}
+// }
 //
-//extension AssetTransfer.View {
+// extension AssetTransfer.View {
 //	public var body: some View {
 //		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 //			NavigationStack {
@@ -116,7 +116,7 @@
 //			}
 //		}
 //	}
-//}
+// }
 //
 //// FIXME: fix post betanet v2 release
 //// #if DEBUG

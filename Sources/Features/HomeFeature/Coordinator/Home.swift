@@ -87,6 +87,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 	public init() {}
 

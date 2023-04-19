@@ -6,7 +6,8 @@ extension AccountDetails.State {
 		.init(
 			appearanceID: account.appearanceID,
 			address: .init(address: account.address.address, format: .default),
-			displayName: account.displayName.rawValue
+			displayName: account.displayName.rawValue,
+			isLoadingResources: isLoadingResources
 		)
 	}
 }
@@ -17,6 +18,7 @@ extension AccountDetails {
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let address: AddressView.ViewState
 		let displayName: String
+		let isLoadingResources: Bool
 	}
 
 	@MainActor
@@ -51,6 +53,9 @@ extension AccountDetails {
 //						.padding(.bottom)
 //						#endif
 
+						if viewStore.isLoadingResources {
+							ProgressView()
+						}
 						ScrollView {
 							VStack(spacing: .medium3) {
 								AssetsView.View(

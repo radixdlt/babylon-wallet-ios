@@ -161,5 +161,52 @@ extension Loadable: Hashable where Value: Hashable {
 	}
 }
 
+extension Loadable {
+	public func map<NewValue>(_ map: (Value) throws -> NewValue) rethrows -> Loadable<NewValue> {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			return .success(try map(value))
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
+	public func map<NewValue>(_ map: (Value) throws -> NewValue?) rethrows -> Loadable<NewValue>? {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			guard let newValue = try map(value) else {
+				return nil
+			}
+			return .success(newValue)
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+
+	public func asyncMap<NewValue>(_ map: @Sendable (Value) async throws -> NewValue?) async rethrows -> Loadable<NewValue>? {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			guard let newValue = try await map(value) else {
+				return nil
+			}
+			return .success(newValue)
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+}
+
 // MARK: - Loadable + Sendable
 extension Loadable: Sendable where Value: Sendable {}

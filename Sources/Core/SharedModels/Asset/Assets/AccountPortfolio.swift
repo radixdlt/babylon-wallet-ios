@@ -1,18 +1,19 @@
 import Prelude
 
+// MARK: - PaginatedResource
 public struct PaginatedResource<Resource: Hashable & Sendable>: Hashable, Sendable {
-        public let totalCount: Int
-        // Optional when not loaded
-        public let items: [Resource]?
+	public let totalCount: Int
+	// Optional when not loaded
+	public let items: [Resource]?
 
-        public init(totalCount: Int, items: [Resource]? = nil) {
-                self.totalCount = totalCount
-                self.items = items
-        }
+	public init(totalCount: Int, items: [Resource]? = nil) {
+		self.totalCount = totalCount
+		self.items = items
+	}
 }
 
 // MARK: - AccountPortfolio
-public struct AccountPortfolio: Sendable, Hashable {
+public struct AccountPortfolio: Sendable, Hashable, Codable {
 	public let owner: AccountAddress
 	public var fungibleResources: FungibleResources
 	public var nonFungibleResources: NonFungibleResources
@@ -29,11 +30,11 @@ public struct AccountPortfolio: Sendable, Hashable {
 }
 
 extension AccountPortfolio {
-	public typealias FungibleResources = PaginatedResource<FungibleResource>
-	public typealias NonFungibleResources = PaginatedResource<NonFungibleResource>
+	public typealias FungibleResources = [FungibleResource]
+	public typealias NonFungibleResources = [NonFungibleResource]
 
-	public struct FungibleResource: Sendable, Hashable, Identifiable {
-                public var id: ResourceAddress { self.resourceAddress }
+	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
+		public var id: ResourceAddress { self.resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let amount: BigDecimal
 		public let divisibility: Int?
@@ -58,23 +59,23 @@ extension AccountPortfolio {
 		}
 	}
 
-	public struct NonFungibleResource: Sendable, Hashable, Identifiable {
-                public var id: ResourceAddress { self.resourceAddress }
+	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
+		public var id: ResourceAddress { self.resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
 		public let description: String?
-                public let ids: PaginatedResource<String>
+		public let ids: [String]
 
 		public init(
 			resourceAddress: ResourceAddress,
 			name: String? = nil,
 			description: String? = nil,
-                        ids: PaginatedResource<String>
+			ids: [String]
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
 			self.description = description
-                        self.ids = ids
+			self.ids = ids
 		}
 	}
 }

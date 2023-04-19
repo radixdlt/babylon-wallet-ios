@@ -34,30 +34,30 @@ extension NonFungibleTokenList.Row {
 				send: { .view($0) }
 			) { viewStore in
 				VStack(spacing: .small3 / 2) {
-					if viewStore.token.ids.isEmpty {
-						EmptyView()
-					} else {
-						ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
-							Group {
-								switch index {
-								case -1:
-									headerView(with: viewStore, index: index)
-								default:
-									componentView(with: viewStore, index: index)
-								}
-							}
-							.onSizeChanged { size in
-								if rowHeights[index] == nil {
-									rowHeights[index] = size.height
-								} else {
-									withAnimation {
-										rowHeights[index] = size.height
-									}
-								}
-							}
-						}
-						.padding(.horizontal, .medium3)
-					}
+//					if viewStore.token.ids.isEmpty {
+//						EmptyView()
+//					} else {
+//						ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
+//							Group {
+//								switch index {
+//								case -1:
+//									headerView(with: viewStore, index: index)
+//								default:
+//									componentView(with: viewStore, index: index)
+//								}
+//							}
+//							.onSizeChanged { size in
+//								if rowHeights[index] == nil {
+//									rowHeights[index] = size.height
+//								} else {
+//									withAnimation {
+//										rowHeights[index] = size.height
+//									}
+//								}
+//							}
+//						}
+//						.padding(.horizontal, .medium3)
+//					}
 				}
 				.frame(height: viewStore.isExpanded ? expandedHeight : collapsedHeight(with: viewStore), alignment: .top)
 			}
@@ -104,17 +104,18 @@ extension NonFungibleTokenList.Row.View {
 
 	@ViewBuilder
 	fileprivate func componentView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
-		let asset = viewStore.token.ids[index]
-		NFTIDView(
-			id: asset,
-			isLast: index == nftCount(with: viewStore) - 1,
-			isExpanded: viewStore.isExpanded
-		)
-		.scaleEffect(scale(with: viewStore, index: index))
-		.offset(y: offset(with: viewStore, index: index))
-		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
-		.transition(.move(edge: .bottom))
-		.contentShape(Rectangle())
+		fatalError()
+//		let asset = viewStore.token.ids[index]
+//		NFTIDView(
+//			id: asset,
+//			isLast: index == nftCount(with: viewStore) - 1,
+//			isExpanded: viewStore.isExpanded
+//		)
+//		.scaleEffect(scale(with: viewStore, index: index))
+//		.offset(y: offset(with: viewStore, index: index))
+//		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
+//		.transition(.move(edge: .bottom))
+//		.contentShape(Rectangle())
 		// .onTapGesture { viewStore.send(.selected(.init(container: viewStore.container, asset: asset))) }
 	}
 

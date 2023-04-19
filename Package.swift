@@ -26,7 +26,9 @@ package.addModules([
 	),
 	.feature(
 		name: "AccountListFeature",
-		dependencies: [],
+		dependencies: [
+			"AccountPortfoliosClient",
+		],
 		tests: .yes()
 	),
 	.feature(

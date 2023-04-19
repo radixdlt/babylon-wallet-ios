@@ -7,6 +7,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var account: Profile.Network.Account
 		public var assets: AssetsView.State
+		public var isLoadingResources: Bool = false
 
 		@PresentationState
 		public var destination: Destinations.State?
@@ -91,9 +92,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				}
 			}
 		case .appeared:
-			return .run { [address = state.account.address] _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, false)
-			}
+			return .none
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .preferencesButtonTapped:
@@ -129,6 +128,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .portfolioUpdated(portfolio):
+			// Sorting/reordering should be done in AccountPortfolios actually
 			let xrd = portfolio.fungibleResources.first.map(FungibleTokenList.Row.State.init(xrdToken:))
 			let nonXrd = Array(portfolio.fungibleResources.dropFirst()).map(FungibleTokenList.Row.State.init(nonXRDToken:))
 

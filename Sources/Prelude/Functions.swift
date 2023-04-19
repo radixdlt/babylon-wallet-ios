@@ -17,7 +17,7 @@ public struct PaginatedResourceContainer<Container: RandomAccessCollection> {
 
 	public init(loaded: Container, totalCount: Int? = nil) {
 		self.loaded = loaded
-                self.totalCount = totalCount ?? loaded.count
+		self.totalCount = totalCount ?? loaded.count
 	}
 }
 

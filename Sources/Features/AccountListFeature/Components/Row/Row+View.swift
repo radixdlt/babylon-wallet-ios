@@ -50,6 +50,7 @@ extension AccountList.Row {
 				.onTapGesture {
 					viewStore.send(.tapped)
 				}
+				.task {}
 			}
 		}
 	}
