@@ -1,18 +1,23 @@
+import AuthorizedDappsClient
 import FeaturePrelude
 import PersonasClient
 
 // MARK: - PersonaList
 public struct PersonaList: Sendable, FeatureReducer {
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.personasClient) var personasClient
 
 	public struct State: Sendable, Hashable {
 		public var personas: IdentifiedArrayOf<Persona.State>
 		public let strategy: ReloadingStrategy
 
-		/// Load all personas from the profile
-		public init() {
-			self.personas = []
-			self.strategy = .all
+		public init(
+			dApp: Profile.Network.AuthorizedDappDetailed
+		) {
+			self.init(
+				personas: .init(uniqueElements: dApp.detailedAuthorizedPersonas.map(Persona.State.init)),
+				strategy: .dApp(dApp.dAppDefinitionAddress)
+			)
 		}
 
 		public init(
@@ -23,17 +28,10 @@ public struct PersonaList: Sendable, FeatureReducer {
 			self.strategy = strategy
 		}
 
-		public init(
-			dApp: Profile.Network.AuthorizedDappDetailed
-		) {
-			self.personas = .init(uniqueElements: dApp.detailedAuthorizedPersonas.map(Persona.State.init))
-			self.strategy = .dApp(dApp.dAppDefinitionAddress)
-		}
-
 		public enum ReloadingStrategy: Sendable, Hashable {
 			case all
+			case ids(OrderedSet<Profile.Network.Persona.ID>)
 			case dApp(Profile.Network.AuthorizedDapp.ID)
-			case personas(OrderedSet<Profile.Network.Persona.ID>)
 		}
 	}
 
@@ -51,6 +49,10 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case openDetails(Profile.Network.Persona)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case personasLoaded(IdentifiedArrayOf<Persona.State>)
+	}
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -63,9 +65,40 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
+			return .run { [strategy = state.strategy] send in
+				for try await personas in await personasClient.personas() {
+					print("•• Personas \(Task.isCancelled):", personas.map(\.displayName.rawValue))
+
+					let ids = try await personaIDs(strategy) ?? personas.ids
+					let result = ids.compactMap { personas[id: $0] }.map(Persona.State.init)
+					await send(.internal(.personasLoaded(.init(uniqueElements: result))))
+				}
+				print("•• Personas \(Task.isCancelled): DONE")
+			} catch: { _, _ in
+			}
 
 		case .createNewPersonaButtonTapped:
 			return .send(.delegate(.createNewPersona))
+		}
+	}
+
+	/// Returns the ids of personas to include under the given strategy. nil means that all ids should be included
+	private func personaIDs(_ strategy: State.ReloadingStrategy) async throws -> OrderedSet<Profile.Network.Persona.ID>? {
+		switch strategy {
+		case .all:
+			return nil
+		case let .ids(ids):
+			return ids
+		case let .dApp(dAppID):
+			return try await authorizedDappsClient.getDetailedDapp(dAppID).detailedAuthorizedPersonas.ids
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .personasLoaded(personas):
+			state.personas = personas
+			return .none
 		}
 	}
 
