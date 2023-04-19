@@ -19,6 +19,9 @@ extension PersonasCoordinator {
 					action: { .child(.personaList($0)) }
 				)
 			)
+			.task {
+				await ViewStore(store).send(.view(.task)).finish()
+			}
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 			.sheet(
 				store: store.scope(
