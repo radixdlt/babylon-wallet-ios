@@ -40,6 +40,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case broadcasted(interactionID: P2P.LedgerHardwareWallet.InteractionId)
 
 		case addedFactorSource(FactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
+		case saveNewConnection(P2PLink)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -85,8 +86,10 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case .sendAddLedgerRequestButtonTapped:
-			loggerGlobal.debug("SEND ADD LEDGER REQUEST BUTTON TAPPED")
-			return .none
+			let interactionId: P2P.LedgerHardwareWallet.InteractionId = .random()
+			return getDeviceInfoOfAnyConnectedLedger(
+				interactionID: interactionId
+			).concatenate(with: listenForResponses(interactionID: interactionId))
 
 		case let .ledgerNameChanged(name):
 			state.ledgerName = name
@@ -118,21 +121,21 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-//        case let .addNewP2PLink(.delegate(.newConnection(connectedClient))):
-//            state.addNewP2PLink = nil
-//            return .run { send in
-//                await send(.internal(.saveNewConnectionResult(
-//                    TaskResult {
-//                        try await radixConnectClient.storeP2PLink(
-//                            connectedClient
-//                        )
-//                    }.map { connectedClient }
-//                )))
-//            }
-//
-//        case .addNewP2PLink(.delegate(.dismiss)):
-//            state.addNewP2PLink = nil
-//            return .none
+		case let .addNewP2PLink(.presented(.delegate(.newConnection(connectedClient)))):
+
+			state.addNewP2PLink = nil
+			return .run { send in
+				try await radixConnectClient.storeP2PLink(
+					connectedClient
+				)
+				await send(.internal(.saveNewConnection(connectedClient)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed P2PLink, error \(error)")
+				errorQueue.schedule(error)
+			}
+		case .addNewP2PLink(.presented(.delegate(.dismiss))):
+			state.addNewP2PLink = nil
+			return .none
 
 		default:
 			return .none
@@ -153,12 +156,36 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			state.isLedgerNameInputVisible = true
 			return .none
 
+		case .saveNewConnection:
+			state.failedToFindAnyLinks = false
+			return .none
+
 		case .broadcasted:
 			state.isWaitingForResponseFromLedger = true
 			return .none
 
 		case let .addedFactorSource(factorSource, _, _):
 			return .send(.delegate(.completed(ledger: factorSource)))
+		}
+	}
+
+	private func getDeviceInfoOfAnyConnectedLedger(
+		interactionID: P2P.LedgerHardwareWallet.InteractionId
+	) -> EffectTask<Action> {
+		.run { send in
+
+			loggerGlobal.debug("About to broadcast getDeviceInfo request with interactionID: \(interactionID)..")
+
+			try await radixConnectClient.sendRequest(.connectorExtension(.ledgerHardwareWallet(.init(
+				interactionID: interactionID,
+				request: .getDeviceInfo
+			))), .broadcastToAllPeers)
+
+			loggerGlobal.debug("Broadcasted getDeviceInfo request with interactionID: \(interactionID) ✅ waiting for response")
+
+			await send(.internal(.broadcasted(interactionID: interactionID)))
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to send message to Connector Extension, error: \(error)")
 		}
 	}
 

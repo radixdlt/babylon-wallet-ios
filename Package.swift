@@ -41,6 +41,16 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "AddLedgerFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"RadixConnectClient",
+			"NewConnectionFeature",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AggregatedValueFeature",
 		dependencies: [],
 		tests: .yes()
@@ -83,6 +93,7 @@ package.addModules([
 	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
+			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
 			"Cryptography",
 			"FactorSourcesClient",

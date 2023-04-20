@@ -1,4 +1,5 @@
 import AccountsClient
+import AddLedgerFactorSourceFeature
 import Cryptography
 import FeaturePrelude
 import PersonasClient
@@ -29,6 +30,9 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 
 		public var ledgers: IdentifiedArrayOf<FactorSource> = []
 
+		@PresentationState
+		public var addNewLedger: AddLedgerFactorSource.State?
+
 		public init(
 			networkID: NetworkID?,
 			name: NonEmptyString,
@@ -45,6 +49,10 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 		case selectedLedger(id: FactorSource.ID)
 		case addNewLedgerButtonTapped
 		case confirmedLedger(FactorSource)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case addNewLedger(PresentationAction<AddLedgerFactorSource.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -64,6 +72,9 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
+			.ifLet(\.$addNewLedger, action: /Action.child .. ChildAction.addNewLedger) {
+				AddLedgerFactorSource()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -82,7 +93,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			return .none
 
 		case .addNewLedgerButtonTapped:
-			loggerGlobal.critical(" addNewLedgerButtonTapped IGNORED")
+			state.addNewLedger = .init()
 			return .none
 
 		case let .confirmedLedger(ledger):
@@ -98,6 +109,19 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 
 		case let .createEntityResult(.success(entity)):
 			return .send(.delegate(.createdEntity(entity)))
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .addNewLedger(.presented(.delegate(.completed(ledger)))):
+			state.addNewLedger = nil
+			state.selectedLedgerID = ledger.id
+			state.ledgers[id: ledger.id] = ledger
+			return .none
+
+		default:
+			return .none
 		}
 	}
 }

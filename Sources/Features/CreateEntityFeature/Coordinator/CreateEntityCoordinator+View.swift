@@ -20,44 +20,78 @@ extension CreateEntityCoordinator {
 			self.store = store
 		}
 
+//		public var body: some SwiftUI.View {
+//			WithViewStore(store, observe: \.viewState) { viewStore in
+//				NavigationStack {
+//
+//					#if os(iOS)
+//					.toolbar {
+//						if viewStore.shouldDisplayNavBar {
+//							ToolbarItem(placement: .navigationBarLeading) {
+//								CloseButton {
+//									viewStore.send(.view(.closeButtonTapped))
+//								}
+//							}
+//						}
+//					}
+//					#endif
+//				}
+//			}
+//		}
+
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState) { viewStore in
-				NavigationStack {
-					ZStack {
-						SwitchStore(store.scope(state: \.step)) {
-							CaseLet(
-								state: /CreateEntityCoordinator.State.Step.step0_introduction,
-								action: { CreateEntityCoordinator.Action.child(.step0_introduction($0)) },
-								then: { IntroductionToEntity.View(store: $0) }
-							)
-							CaseLet(
-								state: /CreateEntityCoordinator.State.Step.step1_nameNewEntity,
-								action: { CreateEntityCoordinator.Action.child(.step1_nameNewEntity($0)) },
-								then: { NameNewEntity.View(store: $0) }
-							)
-							CaseLet(
-								state: /CreateEntityCoordinator.State.Step.step2_creationOfEntity,
-								action: { CreateEntityCoordinator.Action.child(.step2_creationOfEntity($0)) },
-								then: { CreationOfEntity.View(store: $0) }
-							)
-							CaseLet(
-								state: /CreateEntityCoordinator.State.Step.step3_completion,
-								action: { CreateEntityCoordinator.Action.child(.step3_completion($0)) },
-								then: { NewEntityCompletion.View(store: $0) }
-							)
-						}
-					}
+			NavigationStackStore(
+				store.scope(state: \.path, action: { .child(.path($0)) })
+			) {
+				IfLetStore(
+					store.scope(state: \.root, action: { .child(.root($0)) })
+				) {
+					destination(for: $0)
 					#if os(iOS)
-					.toolbar {
-						if viewStore.shouldDisplayNavBar {
+						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
-									viewStore.send(.view(.closeButtonTapped))
+									ViewStore(store.stateless).send(.view(.closeButtonTapped))
 								}
 							}
 						}
-					}
 					#endif
+				}
+				// This is required to disable the animation of internal components during transition
+				.transaction { $0.animation = nil }
+			} destination: {
+				destination(for: $0)
+			}
+			#if os(iOS)
+			.navigationTransition(.slide, interactivity: .disabled)
+			#endif
+		}
+
+		private func destination(
+			for store: StoreOf<CreateEntityCoordinator.Destinations>
+		) -> some SwiftUI.View {
+			ZStack {
+				SwitchStore(store) {
+					CaseLet(
+						state: /CreateEntityCoordinator.Destinations.State.step0_introduction,
+						action: CreateEntityCoordinator.Destinations.Action.step0_introduction,
+						then: { IntroductionToEntity.View(store: $0) }
+					)
+					CaseLet(
+						state: /CreateEntityCoordinator.Destinations.State.step1_nameNewEntity,
+						action: CreateEntityCoordinator.Destinations.Action.step1_nameNewEntity,
+						then: { NameNewEntity.View(store: $0) }
+					)
+					CaseLet(
+						state: /CreateEntityCoordinator.Destinations.State.step2_creationOfEntity,
+						action: CreateEntityCoordinator.Destinations.Action.step2_creationOfEntity,
+						then: { CreationOfEntity.View(store: $0) }
+					)
+					CaseLet(
+						state: /CreateEntityCoordinator.Destinations.State.step3_completion,
+						action: CreateEntityCoordinator.Destinations.Action.step3_completion,
+						then: { NewEntityCompletion.View(store: $0) }
+					)
 				}
 			}
 		}

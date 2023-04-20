@@ -1,3 +1,4 @@
+import AddLedgerFactorSourceFeature
 import FeaturePrelude
 
 // MARK: - CreationOfEntity.View
@@ -99,6 +100,13 @@ extension CreationOfEntity.View {
 					.buttonStyle(.primaryRectangular)
 			}
 		}
+		.sheet(
+			store: store.scope(
+				state: \.$addNewLedger,
+				action: { .child(.addNewLedger($0)) }
+			),
+			content: { AddLedgerFactorSource.View(store: $0) }
+		)
 	}
 
 	private func createWithDevice() -> some SwiftUI.View {

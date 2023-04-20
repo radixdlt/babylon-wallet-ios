@@ -103,7 +103,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				loggerGlobal.error("failed to get links updates, error: \(error)")
 			}
 		case .sendAddLedgerRequestButtonTapped:
-			loggerGlobal.debug("SEND ADD LEDGER REQUEST BUTTON TAPPED")
 			return continueWithRestOfAccountsIfNeeded(state: state)
 
 		case .skipRestOfTheAccounts:
