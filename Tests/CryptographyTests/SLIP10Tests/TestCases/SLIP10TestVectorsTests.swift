@@ -72,20 +72,6 @@ extension TestVector {
 
 // MARK: - SLIP10TestVectorsTests
 final class SLIP10TestVectorsTests: TestCase {
-	func test_slip_10_component_constants() {
-		func ascii(_ string: String, reduceInit: Int = 0, reduceOp: (Int, Int) -> Int = { $0 + $1 }) -> Int {
-			string.map { Int($0.asciiValue!) }.reduce(reduceInit, reduceOp)
-		}
-
-		XCTAssertEqual(ascii("GETID"), 365)
-		XCTAssertEqual(ascii("ACCOUNT"), 525)
-		XCTAssertEqual(ascii("IDENTITY"), 618)
-
-		XCTAssertEqual(ascii("TRANSACTION_SIGNING"), 1460)
-		XCTAssertEqual(ascii("AUTHENTICATION_SIGNING"), 1678)
-		XCTAssertEqual(ascii("MESSAGE_ENCRYPTION"), 1391)
-	}
-
 	func testPath_m() throws {
 		let path: HD.Path.Full = "m"
 		XCTAssertEqual(path.components, [.root(onlyPublic: false)])

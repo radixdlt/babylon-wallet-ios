@@ -13,6 +13,20 @@ extension SLIP10CurveProtocol {
 
 // MARK: - CAP26Tests
 final class CAP26Tests: TestCase {
+	func test_slip_10_component_constants() {
+		func ascii(_ string: String, reduceInit: Int = 0, reduceOp: (Int, Int) -> Int = { $0 + $1 }) -> HD.Path.Component.Child.Value {
+			.init(string.map { Int($0.asciiValue!) }.reduce(reduceInit, reduceOp))
+		}
+
+		XCTAssertEqual(ascii("GETID"), 365)
+		XCTAssertEqual(ascii("ACCOUNT"), EntityKind.account.rawValue)
+		XCTAssertEqual(ascii("IDENTITY"), EntityKind.identity.rawValue)
+
+		XCTAssertEqual(ascii("TRANSACTION_SIGNING"), KeyKind.transactionSigningKey.rawValue)
+		XCTAssertEqual(ascii("AUTHENTICATION_SIGNING"), KeyKind.authenticationSigningKey.rawValue)
+		XCTAssertEqual(ascii("MESSAGE_ENCRYPTION"), KeyKind.messageEncryptionKey.rawValue)
+	}
+
 	func test_curve25519_vectors() throws {
 		try testFixture(
 			bundle: .module,
