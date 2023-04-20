@@ -154,6 +154,6 @@ extension DerivationPath {
 
 #if DEBUG
 extension DerivationPath {
-	public static let previewValueAccount = try! Self.accountPath(.init(networkID: .nebunet, index: 0, keyKind: .transactionSigningKey))
+	public static let previewValueAccount = try! Self.accountPath(.init(networkID: .nebunet, index: 0, keyKind: .transactionSigning))
 }
 #endif // DEBUG

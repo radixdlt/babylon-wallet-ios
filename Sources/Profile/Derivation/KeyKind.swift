@@ -33,37 +33,37 @@ public enum KeyKind:
 {
 	/// For a key to be used for signing transactions.
 	/// The value is the ascii sum of `"TRANSACTION_SIGNING"`
-	case transactionSigningKey = 1460
+	case transactionSigning = 1460
 
 	/// For a key to be used for signing authentication..
 	/// The value is the ascii sum of `"AUTHENTICATION_SIGNING"`
-	case authenticationSigningKey = 1678
+	case authenticationSigning = 1678
 
 	/// For a key to be used for encrypting messages.
 	/// The value is the ascii sum of `"MESSAGE_ENCRYPTION"`
-	case messageEncryptionKey = 1391
+	case messageEncryption = 1391
 }
 
 extension KeyKind {
 	// https://rdxworks.slack.com/archives/C031A0V1A1W/p1665751090101519?thread_ts=1665750717.513349&cid=C031A0V1A1W
-	public static let virtualEntity = Self.transactionSigningKey
+	public static let virtualEntity = Self.transactionSigning
 }
 
 extension KeyKind {
 	public var description: String {
 		switch self {
-		case .transactionSigningKey: return "transactionSigningKey"
-		case .authenticationSigningKey: return "authenticationSigningKey"
-		case .messageEncryptionKey: return "messageEncryptionKey"
+		case .transactionSigning: return "transactionSigning"
+		case .authenticationSigning: return "authenticationSigning"
+		case .messageEncryption: return "messageEncryption"
 		}
 	}
 
 	#if DEBUG
 	public var asciiSource: String {
 		switch self {
-		case .transactionSigningKey: return "TRANSACTION_SIGNING"
-		case .authenticationSigningKey: return "AUTHENTICATION_SIGNING"
-		case .messageEncryptionKey: return "MESSAGE_ENCRYPTION"
+		case .transactionSigning: return "TRANSACTION_SIGNING"
+		case .authenticationSigning: return "AUTHENTICATION_SIGNING"
+		case .messageEncryption: return "MESSAGE_ENCRYPTION"
 		}
 	}
 	#endif // DEBUG

@@ -36,16 +36,14 @@ extension HD.Path.Full {
 	/// [cap26]: https://radixdlt.atlassian.net/l/cp/UNaBAGUC
 	/// [slip10]: https://github.com/satoshilabs/slips/blob/master/slip-0010.md
 	///
-	public static let getID: Self = {
-		try! Self(
-			children: [
-				.bip44Purpose,
-				.coinType,
-				.getID,
-			],
-			onlyPublic: false
-		)
-	}()
+	public static let getID = try! Self(
+		children: [
+			.bip44Purpose,
+			.coinType,
+			.getID,
+		],
+		onlyPublic: false
+	)
 
 	public static func identity(
 		networkID: NetworkID,

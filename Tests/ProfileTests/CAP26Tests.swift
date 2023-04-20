@@ -22,9 +22,9 @@ final class CAP26Tests: TestCase {
 		XCTAssertEqual(ascii("ACCOUNT"), EntityKind.account.rawValue)
 		XCTAssertEqual(ascii("IDENTITY"), EntityKind.identity.rawValue)
 
-		XCTAssertEqual(ascii("TRANSACTION_SIGNING"), KeyKind.transactionSigningKey.rawValue)
-		XCTAssertEqual(ascii("AUTHENTICATION_SIGNING"), KeyKind.authenticationSigningKey.rawValue)
-		XCTAssertEqual(ascii("MESSAGE_ENCRYPTION"), KeyKind.messageEncryptionKey.rawValue)
+		XCTAssertEqual(ascii("TRANSACTION_SIGNING"), KeyKind.transactionSigning.rawValue)
+		XCTAssertEqual(ascii("AUTHENTICATION_SIGNING"), KeyKind.authenticationSigning.rawValue)
+		XCTAssertEqual(ascii("MESSAGE_ENCRYPTION"), KeyKind.messageEncryption.rawValue)
 	}
 
 	func test_curve25519_vectors() throws {
@@ -227,9 +227,9 @@ extension EntityKind {
 extension KeyKind {
 	var emoji: String {
 		switch self {
-		case .transactionSigningKey: return "✍️"
-		case .authenticationSigningKey: return "🛂"
-		case .messageEncryptionKey: return "📨"
+		case .transactionSigning: return "✍️"
+		case .authenticationSigning: return "🛂"
+		case .messageEncryption: return "📨"
 		}
 	}
 }

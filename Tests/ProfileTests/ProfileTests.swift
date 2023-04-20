@@ -113,7 +113,7 @@ final class ProfileTests: TestCase {
 			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
-				keyKind: .transactionSigningKey
+				keyKind: .transactionSigning
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
@@ -155,7 +155,7 @@ final class ProfileTests: TestCase {
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
-				keyKind: .transactionSigningKey
+				keyKind: .transactionSigning
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
