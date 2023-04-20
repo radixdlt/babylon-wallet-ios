@@ -35,7 +35,13 @@ public struct CreateEntityCoordinator<
 		}
 
 		var shouldDisplayNavBar: Bool {
-			config.canBeDismissed
+			guard config.canBeDismissed else {
+				return false
+			}
+			if let last = path.last, case .step3_completion = last {
+				return false
+			}
+			return true
 		}
 	}
 

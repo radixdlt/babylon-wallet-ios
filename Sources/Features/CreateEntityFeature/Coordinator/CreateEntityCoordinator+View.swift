@@ -48,6 +48,7 @@ extension CreateEntityCoordinator {
 				}
 				#if os(iOS)
 				.navigationTransition(.slide, interactivity: .disabled)
+				.navigationBarHidden(!viewStore.shouldDisplayNavBar)
 				#endif
 			}
 		}
