@@ -75,7 +75,12 @@ extension TestVectorsTests {
 		}
 
 		for (testScenarioIndex, testScenario) in group.testScenarios.enumerated() {
-			try doTestScenario(root: root, testScenario: testScenario, groupId: group.groupId, testScenarioIndex: testScenarioIndex)
+			try doTestScenario(
+				root: root,
+				testScenario: testScenario,
+				groupId: group.groupId,
+				testScenarioIndex: testScenarioIndex
+			)
 		}
 	}
 
@@ -162,8 +167,8 @@ extension HD.Path.Full: CustomStringConvertible {
 	}
 }
 
-// MARK: - Slip10Curve
-enum Slip10Curve: String, Decodable, Hashable {
+// MARK: - CurveToTest
+enum CurveToTest: String, Decodable, Hashable {
 	case secp256k1
 
 	/// nist256p1
@@ -172,26 +177,26 @@ enum Slip10Curve: String, Decodable, Hashable {
 	/// ed25519
 	case curve25519 = "ed25519"
 
-	init(curveType: Slip10CurveType) {
-		switch curveType {
-		case .secp256k1: self = .secp256k1
-		case .p256: self = .p256
-		case .curve25519: self = .curve25519
-		default: fatalError("Unsupported curve")
+	init(curveType: any SLIP10CurveProtocol.Type) {
+		switch curveType.curveSeed {
+		case P256.curveSeed: self = .p256
+		case Curve25519.curveSeed: self = .curve25519
+		case SECP256K1.curveSeed: self = .secp256k1
+		default: fatalError("unrecognized curve")
 		}
 	}
 
-	var curveType: Slip10CurveType {
+	var curveType: any SLIP10CurveProtocol.Type {
 		switch self {
-		case .secp256k1: return .secp256k1
-		case .curve25519: return .curve25519
-		case .p256: return .p256
+		case .secp256k1: return SECP256K1.self
+		case .curve25519: return Curve25519.self
+		case .p256: return P256.self
 		}
 	}
 }
 
 extension HD.Root {
-	func deriveMasterKey(curve: Slip10Curve) throws -> ExtendedKey {
+	func deriveMasterKey(curve: CurveToTest) throws -> ExtendedKey {
 		try deriveAnyPrivateKey(
 			path: HD.Path.Full(string: "m"),
 			curve: curve
@@ -200,7 +205,7 @@ extension HD.Root {
 
 	func deriveAnyPrivateKey(
 		path: HD.Path.Full,
-		curve: Slip10Curve
+		curve: CurveToTest
 	) throws -> ExtendedKey {
 		switch curve {
 		case .curve25519:
@@ -232,7 +237,7 @@ extension HD.Root {
 
 // MARK: - ExtendedKey
 struct ExtendedKey: Decodable, Equatable {
-	let curve: Slip10Curve
+	let curve: CurveToTest
 
 	let chainCode: ChainCode
 	let privateKey: Data
@@ -247,7 +252,7 @@ extension ExtendedKey {
 		guard let privateKey = key.privateKey else {
 			throw Error.expectedPrivateKey
 		}
-		let curve = Slip10Curve(curveType: C.slip10Curve)
+		let curve = CurveToTest(curveType: C.self)
 		self.curve = curve
 		self.chainCode = key.chainCode
 		self.privateKey = privateKey.rawRepresentation
@@ -276,7 +281,7 @@ extension ExtendedKey {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
 		let curveRaw = try container.decode(String.self, forKey: .curve)
-		guard let curve = Slip10Curve(rawValue: curveRaw) else {
+		guard let curve = CurveToTest(rawValue: curveRaw) else {
 			throw Error.unrecognizedCurveName(curveRaw)
 		}
 		self.curve = curve

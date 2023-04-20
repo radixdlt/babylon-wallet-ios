@@ -113,7 +113,7 @@ final class ProfileTests: TestCase {
 			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
-				keyKind: .transactionSigningKey
+				keyKind: .transactionSigning
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
@@ -155,7 +155,7 @@ final class ProfileTests: TestCase {
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
-				keyKind: .transactionSigningKey
+				keyKind: .transactionSigning
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
@@ -346,51 +346,51 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[0].publicKey()?.compressedData.hex(),
-			"b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c"
+			"7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3"
 		)
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_b_1p85v6mt035ny0j35jp8l6sy49gj0c3seda4tsuqvpstqrc6egy"
+			"account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"
 		)
 
 		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
-			"7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86"
+			"216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719"
 		)
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg"
+			"account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"
 		)
 
 		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
-			"3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6"
+			"a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3"
 		)
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"
+			"account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"
 		)
 
 		XCTAssertEqual(
 			network.personas[0].publicKey()?.compressedData.hex(),
-			"f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b"
+			"573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"
 		)
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_b_1psauxn0kkttjn3xhw6lvjudnrx48mu0jaxt0crp09d4smx5gv5"
+			"identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8"
 		)
 
 		XCTAssertEqual(
 			network.personas[1].publicKey()?.compressedData.hex(),
-			"772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51"
+			"6b33fec79f1535ac566b3d840f753942af6447efbe5c50dc343f8ec2122af9b3"
 		)
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_b_1pnec3phquyel59q39v3kcyc6z3ljy9jv40mdwf4dgxps5y05k2"
+			"identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -402,7 +402,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg", "account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa", "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {

@@ -13,4 +13,4 @@
 --header strip
 
 # file options
---exclude .build,**/*.generated.swift
+--exclude .build,**/*.generated.swift,Sources/Clients/GatewayAPI/CodeGen

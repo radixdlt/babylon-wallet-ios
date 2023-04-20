@@ -7,11 +7,11 @@ public struct CreateVirtualEntityRequest: Sendable, Hashable {
 	// if `nil` we will use current networkID
 	public let networkID: NetworkID?
 	public let babylonDeviceFactorSource: BabylonDeviceFactorSource
-	public let curve: Slip10Curve
+	public let curve: SLIP10.Curve
 	public let displayName: NonEmptyString
 
 	public init(
-		curve: Slip10Curve,
+		curve: SLIP10.Curve,
 		networkID: NetworkID?,
 		babylonDeviceFactorSource: BabylonDeviceFactorSource,
 		displayName: NonEmpty<String>

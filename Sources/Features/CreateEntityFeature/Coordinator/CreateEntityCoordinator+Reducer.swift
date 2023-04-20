@@ -180,7 +180,7 @@ extension CreateEntityCoordinator {
 	}
 
 	private func goToStep2Creation(
-		curve: Slip10Curve,
+		curve: SLIP10.Curve,
 		entityName: NonEmpty<String>,
 		babylonDeviceFactorSource: BabylonDeviceFactorSource,
 		state: inout State
