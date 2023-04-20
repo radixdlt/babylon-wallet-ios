@@ -170,15 +170,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$metadata = metadata
 			return .none
 		case let .dAppUpdated(dApp):
-			guard dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress else {
-				fatalError("Wrong dApp!") // FIXME: Throw error
-			}
+			assert(dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
 				return disconnectDappEffect(state: state)
 			}
-//			let previousPersonaDetails = state.personaDetails
-//			state = .init(dApp: dApp, personaDetails: previousPersonaDetails)
-
 			state.dApp = dApp
 
 			return .none

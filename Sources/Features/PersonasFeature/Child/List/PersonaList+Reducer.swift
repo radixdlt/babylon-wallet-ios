@@ -6,6 +6,7 @@ import PersonasClient
 public struct PersonaList: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public struct State: Sendable, Hashable {
 		public var personas: IdentifiedArrayOf<Persona.State>
@@ -67,14 +68,12 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case .task:
 			return .run { [strategy = state.strategy] send in
 				for try await personas in await personasClient.personas() {
-					print("•• Personas \(Task.isCancelled):", personas.map(\.displayName.rawValue))
-
 					let ids = try await personaIDs(strategy) ?? personas.ids
 					let result = ids.compactMap { personas[id: $0] }.map(Persona.State.init)
 					await send(.internal(.personasLoaded(.init(uniqueElements: result))))
 				}
-				print("•• Personas \(Task.isCancelled): DONE")
-			} catch: { _, _ in
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		case .createNewPersonaButtonTapped:
