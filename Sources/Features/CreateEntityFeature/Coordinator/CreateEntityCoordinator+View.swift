@@ -20,51 +20,36 @@ extension CreateEntityCoordinator {
 			self.store = store
 		}
 
-//		public var body: some SwiftUI.View {
-//			WithViewStore(store, observe: \.viewState) { viewStore in
-//				NavigationStack {
-//
-//					#if os(iOS)
-//					.toolbar {
-//						if viewStore.shouldDisplayNavBar {
-//							ToolbarItem(placement: .navigationBarLeading) {
-//								CloseButton {
-//									viewStore.send(.view(.closeButtonTapped))
-//								}
-//							}
-//						}
-//					}
-//					#endif
-//				}
-//			}
-//		}
-
 		public var body: some SwiftUI.View {
-			NavigationStackStore(
-				store.scope(state: \.path, action: { .child(.path($0)) })
-			) {
-				IfLetStore(
-					store.scope(state: \.root, action: { .child(.root($0)) })
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				NavigationStackStore(
+					store.scope(state: \.path, action: { .child(.path($0)) })
 				) {
-					destination(for: $0)
-					#if os(iOS)
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton {
-									ViewStore(store.stateless).send(.view(.closeButtonTapped))
+					IfLetStore(
+						store.scope(state: \.root, action: { .child(.root($0)) })
+					) {
+						destination(for: $0)
+						#if os(iOS)
+							.toolbar {
+								if viewStore.shouldDisplayNavBar {
+									ToolbarItem(placement: .navigationBarLeading) {
+										CloseButton {
+											ViewStore(store.stateless).send(.view(.closeButtonTapped))
+										}
+									}
 								}
 							}
-						}
-					#endif
+						#endif
+					}
+					// This is required to disable the animation of internal components during transition
+					.transaction { $0.animation = nil }
+				} destination: {
+					destination(for: $0)
 				}
-				// This is required to disable the animation of internal components during transition
-				.transaction { $0.animation = nil }
-			} destination: {
-				destination(for: $0)
+				#if os(iOS)
+				.navigationTransition(.slide, interactivity: .disabled)
+				#endif
 			}
-			#if os(iOS)
-			.navigationTransition(.slide, interactivity: .disabled)
-			#endif
 		}
 
 		private func destination(
