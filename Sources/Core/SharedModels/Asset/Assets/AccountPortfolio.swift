@@ -25,7 +25,10 @@ extension AccountPortfolio {
 		public let xrdResource: FungibleResource?
 		public let nonXrdResources: [FungibleResource]
 
-		public init(xrdResource: AccountPortfolio.FungibleResource? = nil, nonXrdResources: [AccountPortfolio.FungibleResource]) {
+		public init(
+			xrdResource: AccountPortfolio.FungibleResource? = nil,
+			nonXrdResources: [AccountPortfolio.FungibleResource] = []
+		) {
 			self.xrdResource = xrdResource
 			self.nonXrdResources = nonXrdResources
 		}

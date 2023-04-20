@@ -24,6 +24,12 @@ extension GatewayAPI.LedgerState: @unchecked Sendable {}
 // MARK: - GatewayAPI.StateEntityDetailsResponseItem + Sendable
 extension GatewayAPI.StateEntityDetailsResponseItem: @unchecked Sendable {}
 
+// MARK: - GatewayAPI.FungibleResourcesCollectionItemVaultAggregated + Sendable
+extension GatewayAPI.FungibleResourcesCollectionItemVaultAggregated: @unchecked Sendable {}
+
+// MARK: - GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated + Sendable
+extension GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated: @unchecked Sendable {}
+
 extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 	public var fungible: GatewayAPI.StateEntityDetailsResponseFungibleResourceDetails? {
 		if case let .fungibleResource(details) = self {

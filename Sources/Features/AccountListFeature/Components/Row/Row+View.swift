@@ -30,6 +30,7 @@ extension AccountList.Row {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					VStack(alignment: .leading, spacing: .zero) {
+						HeaderView(name: viewStore.name)
 						AddressView(
 							viewStore.address,
 							copyAddressAction: {
@@ -79,10 +80,6 @@ extension AccountList.Row.View {
 // MARK: - HeaderView
 private struct HeaderView: View {
 	let name: String?
-	let value: String
-	let isValueVisible: Bool
-	let currency: FiatCurrency
-
 	var body: some View {
 		HStack {
 			if let name {

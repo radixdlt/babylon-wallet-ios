@@ -1,5 +1,7 @@
 import FeaturePrelude
 
+// TODO: Display the TokenListView in AccountList
+
 // MARK: - TokenListView
 // public struct TokenListView: View {
 //	private let sortedTokens: [FungibleTokenContainer]

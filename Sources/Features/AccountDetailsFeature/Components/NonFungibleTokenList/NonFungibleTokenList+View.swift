@@ -20,12 +20,12 @@ extension NonFungibleTokenList {
 					content: { NonFungibleTokenList.Row.View(store: $0) }
 				)
 			}
-//			.sheet(
-//				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-//				state: /NonFungibleTokenList.Destinations.State.details,
-//				action: NonFungibleTokenList.Destinations.Action.details,
-//				content: { NonFungibleTokenList.Detail.View(store: $0) }
-//			)
+			.sheet(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /NonFungibleTokenList.Destinations.State.details,
+				action: NonFungibleTokenList.Destinations.Action.details,
+				content: { NonFungibleTokenList.Detail.View(store: $0) }
+			)
 		}
 	}
 }
