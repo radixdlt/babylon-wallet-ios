@@ -1,18 +1,7 @@
 import Prelude
 
-// MARK: - PaginatedResource
-public struct PaginatedResource<Resource: Hashable & Sendable>: Hashable, Sendable {
-	public let totalCount: Int
-	// Optional when not loaded
-	public let items: [Resource]?
-
-	public init(totalCount: Int, items: [Resource]? = nil) {
-		self.totalCount = totalCount
-		self.items = items
-	}
-}
-
 // MARK: - AccountPortfolio
+/// Describes all of the owned resources by a given account
 public struct AccountPortfolio: Sendable, Hashable, Codable {
 	public let owner: AccountAddress
 	public var fungibleResources: FungibleResources
@@ -30,17 +19,28 @@ public struct AccountPortfolio: Sendable, Hashable, Codable {
 }
 
 extension AccountPortfolio {
-	public typealias FungibleResources = [FungibleResource]
 	public typealias NonFungibleResources = [NonFungibleResource]
+
+	public struct FungibleResources: Sendable, Hashable, Codable {
+		public let xrdResource: FungibleResource?
+		public let nonXrdResources: [FungibleResource]
+
+		public init(xrdResource: AccountPortfolio.FungibleResource? = nil, nonXrdResources: [AccountPortfolio.FungibleResource]) {
+			self.xrdResource = xrdResource
+			self.nonXrdResources = nonXrdResources
+		}
+	}
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
 		public var id: ResourceAddress { self.resourceAddress }
+
 		public let resourceAddress: ResourceAddress
 		public let amount: BigDecimal
 		public let divisibility: Int?
 		public let name: String?
 		public let symbol: String?
 		public let description: String?
+		// TBD: Add the rest of required metadata fields
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -61,9 +61,11 @@ extension AccountPortfolio {
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
 		public var id: ResourceAddress { self.resourceAddress }
+
 		public let resourceAddress: ResourceAddress
 		public let name: String?
 		public let description: String?
+		// TBA: Should contain rather the actual info of the owned ids - name, description, image
 		public let ids: [String]
 
 		public init(

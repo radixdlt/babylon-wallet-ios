@@ -1,3 +1,4 @@
+import AccountPortfoliosClient
 import AccountsClient
 import CacheClient
 import ClientPrelude
@@ -18,7 +19,7 @@ extension TransactionClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
-		// @Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 		@Dependency(\.cacheClient) var cacheClient
 
@@ -294,8 +295,7 @@ extension TransactionClient {
 
 				if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
 					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
-					toPay: feeAdded,
-					on: networkID
+					toPay: feeAdded
 				) {
 					return accountInvolvedInTransaction
 				} else {
@@ -303,8 +303,7 @@ extension TransactionClient {
 
 					if let anyAccount = await firstAccountAddressWithEnoughFunds(
 						from: allAccountAddresses.rawValue,
-						toPay: feeAdded,
-						on: networkID
+						toPay: feeAdded
 					) {
 						return anyAccount
 					} else {
@@ -558,12 +557,21 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
-			nil
-//			let xrdContainers = await addresses.concurrentMap {
-//				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID)
-//			}.compactMap { $0 }
-//			return xrdContainers.first(where: { $0.amount >= fee })?.owner
+		func firstAccountAddressWithEnoughFunds(
+			from addresses: [AccountAddress],
+			toPay fee: BigDecimal
+		) async -> AccountAddress? {
+			try? await addresses.parallelMap {
+				// Load the account portfolios with a force refresh, to get the latest state.
+				// TODO: As an optimization, only the fungible resources can be loaded.
+				try await accountPortfoliosClient.fetchAccountPortfolio($0, true)
+			}
+			.first {
+				guard let amount = $0.fungibleResources.xrdResource?.amount else {
+					return false
+				}
+				return amount >= fee
+			}?.owner
 		}
 
 		@Sendable

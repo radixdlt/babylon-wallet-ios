@@ -1,5 +1,6 @@
 import CacheClient
 import ClientPrelude
+import EngineToolkitClient
 import GatewayAPI
 import SharedModels
 
@@ -45,7 +46,8 @@ extension AccountPortfoliosClient: DependencyKey {
 			fetchAccountPortfolio: fetchAccountPortfolio,
 			portfolioForAccount: { address in
 				await state.portfolioForAccount(address)
-			}
+			},
+			portfolios: { state.portfolios.value.map(\.value) }
 		)
 	}()
 }
@@ -71,23 +73,43 @@ extension AccountPortfoliosClient {
 	static func fetchAccountFungibleResources(
 		_ accountAddress: AccountAddress
 	) async throws -> AccountPortfolio.FungibleResources {
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
+
 		// Fetch all fungible resources associated with the account.
 		let allResources = try await fetchAllPaginatedItems(fetchAccountFungibleResourcePage(accountAddress)).compactMap(\.global)
 
 		// Fetch all the detailed information for the loaded resources.
 		let allDetails = try await fetchResourceDetails(allResources.map(\.resourceAddress))
 
-		return try allDetails.map { item in
-			let amount = allResources.first { $0.resourceAddress == item.address }?.amount ?? "0"
-			return try AccountPortfolio.FungibleResource(
-				resourceAddress: .init(address: item.address),
-				amount: .init(fromString: amount),
-				divisibility: item.details?.fungible?.divisibility,
-				name: item.metadata.name,
-				symbol: item.metadata.symbol,
-				description: item.metadata.description
+		var xrdResource: AccountPortfolio.FungibleResource?
+		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
+		for item in allResources {
+			let resourceAddress = ResourceAddress(address: item.resourceAddress)
+			let isXRD = try engineToolkitClient.isXRD(resource: resourceAddress, on: Radix.Network.default.id)
+			let resourceDetails = allDetails.first { $0.address == item.resourceAddress }
+			let metadata = resourceDetails?.metadata
+
+			let resource = try AccountPortfolio.FungibleResource(
+				resourceAddress: resourceAddress,
+				amount: .init(fromString: item.amount),
+				divisibility: resourceDetails?.details?.fungible?.divisibility,
+				name: metadata?.name,
+				symbol: metadata?.symbol,
+				description: metadata?.description
 			)
+
+			if isXRD {
+				xrdResource = resource
+			} else {
+				nonXrdResources.append(resource)
+			}
 		}
+
+		// TODO: Follow the sorting loggic for nonXRDResources
+		return .init(
+			xrdResource: xrdResource,
+			nonXrdResources: nonXrdResources
+		)
 	}
 
 	@Sendable
@@ -102,6 +124,7 @@ extension AccountPortfoliosClient {
 		// Fetch all the detailed information for the loaded resources.
 		let allDetails = try await fetchResourceDetails(allResources.map(\.resourceAddress))
 
+		// TODO: Follow the sorting loggic for NFTS
 		return try await allResources
 			.map(\.resourceAddress)
 			.parallelMap { resourceAddress in

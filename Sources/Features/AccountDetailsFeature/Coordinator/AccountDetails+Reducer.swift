@@ -14,7 +14,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		public init(for account: Profile.Network.Account) {
 			self.account = account
-			self.assets = AssetsView.State.empty()
+			self.assets = AssetsView.State.defaultEmpty()
 		}
 	}
 
@@ -129,8 +129,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .portfolioUpdated(portfolio):
 			// Sorting/reordering should be done in AccountPortfolios actually
-			let xrd = portfolio.fungibleResources.first.map(FungibleTokenList.Row.State.init(xrdToken:))
-			let nonXrd = Array(portfolio.fungibleResources.dropFirst()).map(FungibleTokenList.Row.State.init(nonXRDToken:))
+			let xrd = portfolio.fungibleResources.xrdResource.map(FungibleTokenList.Row.State.init(xrdToken:))
+			let nonXrd = portfolio.fungibleResources.nonXrdResources.map(FungibleTokenList.Row.State.init(nonXRDToken:))
 
 			let nfts = portfolio.nonFungibleResources.map(NonFungibleTokenList.Row.State.init(token:))
 			state.assets = .init(assets: .init(rawValue: [

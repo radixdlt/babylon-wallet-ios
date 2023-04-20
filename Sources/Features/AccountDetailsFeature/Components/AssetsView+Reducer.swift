@@ -2,6 +2,7 @@ import FeaturePrelude
 
 public struct AssetsView: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		/// All of the possible asset list
 		public enum AssetList: Sendable, Hashable, Identifiable {
 			public var id: Self {
 				self
@@ -20,7 +21,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		}
 
-		// The list of Assets to can be shown
+		/// The list of Assets to can be shown.
 		public var assets: NonEmpty<OrderedSet<AssetList>>
 
 		// Currently active list that is being shown
@@ -33,7 +34,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			self.activeList = assets.first
 		}
 
-		public static func empty() -> Self {
+		public static func defaultEmpty() -> Self {
 			.init(assets:
 				.init(rawValue:
 					[
