@@ -117,8 +117,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				return .run { send in
 					let persona = try await personasClient.getPersona(id: persona.id)
 					await send(.internal(.editablePersonaFetched(persona)))
-				} catch: { _, _ in
-					// FIXME: Log/show error?
+				} catch: { error, _ in
+					errorQueue.schedule(error)
 				}
 			}
 
