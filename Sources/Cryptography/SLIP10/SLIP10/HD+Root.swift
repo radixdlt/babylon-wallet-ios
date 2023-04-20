@@ -47,7 +47,11 @@ extension HD.Root {
 		keyToDerive: KeyToDerive
 	) throws -> HD.ExtendedKey<Curve> {
 		// 1. Calculate I = HMAC-SHA512(Key = Curve, Data = S)
-		let hmacKeyData = Curve.slip10Curve.slip10CurveID.data(using: .utf8)!
+		let hmacKeyData = Curve.curveSeed.data(using: .utf8)!
+		if Curve.curveSeed.contains("r1") {
+			print(Curve.curveSeed)
+			print(Curve.curveSeed)
+		}
 		let hmacDataS = self.seed
 
 		let (secretKey, chainCode) = try keyAndChainCode(

@@ -5,17 +5,9 @@ import RadixConnectModels
 import SharedTestingModels
 import TestingPrelude
 
-extension Slip10SupportedECCurve {
+extension SLIP10CurveProtocol {
 	static var curveName: String {
-		if Self.self == Curve25519.self {
-			return "ed25519"
-		} else if Self.self == SECP256K1.self {
-			return "secp256k1"
-		} else if Self.self == P256.self {
-			return "nist256p1"
-		} else {
-			fatalError("")
-		}
+		Self.curve.rawValue
 	}
 }
 
@@ -48,7 +40,7 @@ final class CAP26Tests: TestCase {
 	private func doTestCAP26<Curve>(
 		group testGroup: TestGroup,
 		curve: Curve.Type
-	) throws where Curve: Slip10SupportedECCurve {
+	) throws where Curve: SLIP10CurveProtocol {
 		guard curve.curveName == testGroup.curve else {
 			XCTFail("Wrong curve specified as generic argument.")
 			return
@@ -103,7 +95,7 @@ final class CAP26Tests: TestCase {
 		print("📚 mnemonic: \(mnemonicPhrase)")
 		print("🛰️ network: \(network.name) (\(network.id.rawValue))")
 
-		func doTest<P: EntityDerivationPathProtocol & Equatable, Curve: Slip10SupportedECCurve>(
+		func doTest<P: EntityDerivationPathProtocol & Equatable, Curve: SLIP10CurveProtocol>(
 			keyKind: KeyKind,
 			entityKind: EntityKind,
 			index: HD.Path.Component.Child.Value,
@@ -140,7 +132,7 @@ final class CAP26Tests: TestCase {
 			return test
 		}
 
-		func doDoTest<P: EntityDerivationPathProtocol & Equatable, Curve: Slip10SupportedECCurve>(
+		func doDoTest<P: EntityDerivationPathProtocol & Equatable, Curve: SLIP10CurveProtocol>(
 			hdPathType: P.Type,
 			curve: Curve.Type
 		) throws -> TestGroup {

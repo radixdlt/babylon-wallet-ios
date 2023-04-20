@@ -3,7 +3,7 @@ import Prelude
 
 // MARK: - HD.ExtendedKey
 extension HD {
-	public struct ExtendedKey<Curve>: Equatable where Curve: Slip10SupportedECCurve {
+	public struct ExtendedKey<Curve>: Equatable where Curve: SLIP10CurveProtocol {
 		internal let key: Key
 
 		public let derivationPath: HD.Path
@@ -160,7 +160,7 @@ extension HD.ExtendedKey {
 
 		let ser32i = component.value.data
 
-		let n = Curve.slip10Curve.curveOrder
+		let n = Curve.curveOrder
 
 		let (secretKey, chainCode) = try keyAndChainCode(
 			curve: Curve.self,
@@ -262,14 +262,14 @@ extension HD.ExtendedKey {
 	}
 }
 
-internal func keyAndChainCode<Curve: Slip10SupportedECCurve>(
+internal func keyAndChainCode<Curve: SLIP10CurveProtocol>(
 	curve: Curve.Type,
 	hmacKeyData: Data,
 	s: @autoclosure () throws -> Data,
 	formKey: (BigUInt) -> BigUInt,
 	updateS: (_ s: inout Data, _ i: Data, _ iL: BigUInt, _ iR: Data) -> Void
 ) throws -> (secretKey: BigUInt, chainCode: ChainCode) {
-	let n = Curve.slip10Curve.curveOrder
+	let n = Curve.curveOrder
 	let hmacKey = SymmetricKey(data: hmacKeyData)
 	var secretKey: BigUInt!
 	var chainCode = Data()

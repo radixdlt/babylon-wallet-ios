@@ -21,13 +21,13 @@ struct DiscrepancyUnsupportedCurve: Swift.Error {}
 public struct PublicKeyFromOnDeviceHDRequest: Sendable, Hashable {
 	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
 	public let derivationPath: DerivationPath
-	public let curve: Slip10Curve
+	public let curve: SLIP10.Curve
 	public let entityKind: EntityKind
 
 	public init(
 		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
 		derivationPath: DerivationPath,
-		curve: Slip10Curve,
+		curve: SLIP10.Curve,
 		creationOfEntity entityKind: EntityKind
 	) throws {
 		guard hdOnDeviceFactorSource.parameters.supportedCurves.contains(curve) else {
@@ -44,7 +44,7 @@ public struct PublicKeyFromOnDeviceHDRequest: Sendable, Hashable {
 public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	public let hdRoot: HD.Root
 	public let derivationPath: DerivationPath
-	public let curve: Slip10Curve
+	public let curve: SLIP10.Curve
 
 	/// The data to hash and sign
 	public let unhashedData: Data
@@ -52,7 +52,7 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 	public init(
 		hdRoot: HD.Root,
 		derivationPath: DerivationPath,
-		curve: Slip10Curve,
+		curve: SLIP10.Curve,
 		unhashedData: Data
 	) {
 		self.hdRoot = hdRoot
