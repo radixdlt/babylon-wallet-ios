@@ -97,8 +97,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			return .none
 
 		case let .confirmedLedger(ledger):
-			loggerGlobal.critical(" confirmedLedger IGNORED")
-			return .none
+			return sendDerivePublicKeyRequest(ledger, state: state)
 		}
 	}
 
@@ -127,6 +126,45 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 }
 
 extension CreationOfEntity {
+	private func sendDerivePublicKeyRequest(
+		_ ledger: FactorSource,
+		state: State
+	) -> EffectTask<Action> {
+		let entityKind = Entity.entityKind
+
+		let request = try! CreateVirtualEntityControlledByLedgerFactorSourceRequest(
+			networkID: state.networkID,
+			ledger: ledger,
+			displayName: state.name,
+			extraProperties: { numberOfEntities in
+				switch entityKind {
+				case .identity: return .forPersona(.init(fields: []))
+				case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
+				}
+			}
+		)
+
+		return .run { send in
+			await send(.internal(.createEntityResult(TaskResult {
+				switch entityKind {
+				case .account:
+					let account = try await accountsClient.newUnsavedVirtualAccountControlledByLedgerFactorSource(request)
+					try await accountsClient.saveVirtualAccount(.init(
+						account: account,
+						shouldUpdateFactorSourceNextDerivationIndex: true
+					))
+					return try account.cast()
+				case .identity:
+					//                    let persona = try await personasClient.newUnsavedVirtualPersonaControlledByDeviceFactorSource(request)
+					//                    try await personasClient.saveVirtualPersona(persona)
+					//                    return try persona.cast()
+					fatalError()
+				}
+			}
+			)))
+		}
+	}
+
 	private func createEntityControlledByDeviceFactorSource(
 		_ babylonFactorSource: BabylonDeviceFactorSource,
 		state: State

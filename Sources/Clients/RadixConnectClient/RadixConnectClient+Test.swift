@@ -33,7 +33,7 @@ extension RadixConnectClient {
 		addP2PWithPassword: { _ in },
 		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		sendResponse: { _, _ in },
-		sendRequest: { _, _ in }
+		sendRequest: { _, _ in 0 }
 	)
 }
 #endif // DEBUG

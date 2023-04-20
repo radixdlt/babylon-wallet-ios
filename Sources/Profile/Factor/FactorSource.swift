@@ -157,7 +157,7 @@ extension FactorSource {
 			id: id(fromRoot: mnemonic.hdRoot(passphrase: "")),
 			hint: "previewValue",
 			parameters: .default,
-			storage: .forDevice(.init()),
+			storage: .entityCreating(.init()),
 			addedOn: .init(timeIntervalSince1970: 0),
 			lastUsedOn: .init(timeIntervalSince1970: 0)
 		)

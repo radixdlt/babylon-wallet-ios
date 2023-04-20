@@ -98,6 +98,7 @@ package.addModules([
 			"Cryptography",
 			"FactorSourcesClient",
 			"GatewayAPI",
+			"LedgerHardwareWalletClient",
 			"LocalAuthenticationClient",
 			"PersonasClient",
 		],
@@ -449,6 +450,7 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"EngineToolkitClient",
+			"LedgerHardwareWalletClient",
 			"Profile", // Olympia models
 		],
 		tests: .yes(
@@ -456,6 +458,16 @@ package.addModules([
 				.process("TestVectors/"),
 			]
 		)
+	),
+	.client(
+		name: "LedgerHardwareWalletClient",
+		dependencies: [
+			"RadixConnectClient",
+			"AccountsClient",
+			"PersonasClient",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
+		],
+		tests: .no
 	),
 	.client(
 		name: "LocalAuthenticationClient",
@@ -519,7 +531,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnect",
 			"P2PLinksClient",
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes()
 	),

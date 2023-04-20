@@ -30,7 +30,7 @@ extension FactorSource {
 			id: id,
 			hint: hint,
 			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
-			storage: nil,
+			storage: .entityCreating(.init()), // FIXME: Remove once we have multifactor
 			addedOn: .now,
 			lastUsedOn: .now
 		)

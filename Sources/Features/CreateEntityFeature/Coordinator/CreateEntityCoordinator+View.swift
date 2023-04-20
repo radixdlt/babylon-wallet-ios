@@ -28,7 +28,7 @@ extension CreateEntityCoordinator {
 					IfLetStore(
 						store.scope(state: \.root, action: { .child(.root($0)) })
 					) {
-						destination(for: $0)
+						destination(for: $0, with: viewStore)
 						#if os(iOS)
 							.toolbar {
 								if viewStore.shouldDisplayNavBar {
@@ -44,17 +44,17 @@ extension CreateEntityCoordinator {
 					// This is required to disable the animation of internal components during transition
 					.transaction { $0.animation = nil }
 				} destination: {
-					destination(for: $0)
+					destination(for: $0, with: viewStore)
 				}
 				#if os(iOS)
 				.navigationTransition(.slide, interactivity: .disabled)
-				.navigationBarHidden(!viewStore.shouldDisplayNavBar)
-				#endif
+				#endif // iOS
 			}
 		}
 
 		private func destination(
-			for store: StoreOf<CreateEntityCoordinator.Destinations>
+			for store: StoreOf<CreateEntityCoordinator.Destinations>,
+			with viewStore: ViewStoreOf<CreateEntityCoordinator>
 		) -> some SwiftUI.View {
 			ZStack {
 				SwitchStore(store) {
@@ -80,6 +80,10 @@ extension CreateEntityCoordinator {
 					)
 				}
 			}
+			#if os(iOS)
+			.navigationBarBackButtonHidden(!viewStore.shouldDisplayNavBar)
+			.navigationBarHidden(!viewStore.shouldDisplayNavBar)
+			#endif // iOS
 		}
 	}
 }

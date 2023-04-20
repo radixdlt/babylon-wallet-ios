@@ -42,7 +42,7 @@ extension PrivateHDFactorSource {
 			id: FactorSource.id(fromRoot: mnemonicWithPassphrase.hdRoot()),
 			hint: hint,
 			parameters: .babylon,
-			storage: .forDevice(.init()),
+			storage: .entityCreating(.init()),
 			addedOn: .init(timeIntervalSince1970: 0),
 			lastUsedOn: .init(timeIntervalSince1970: 0)
 		)

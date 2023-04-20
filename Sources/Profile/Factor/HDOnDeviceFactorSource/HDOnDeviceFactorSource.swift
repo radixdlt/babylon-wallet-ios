@@ -10,7 +10,7 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 	public let id: FactorSourceID
 	public let hint: NonEmptyString
 	public let parameters: FactorSource.Parameters
-	public var deviceStorage: DeviceStorage?
+	public var entityCreatingStorage: FactorSource.Storage.EntityCreating?
 	public let addedOn: Date
 	public let lastUsedOn: Date
 
@@ -19,7 +19,7 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 		id: FactorSourceID,
 		hint: NonEmptyString,
 		parameters: FactorSource.Parameters,
-		deviceStorage: DeviceStorage?,
+		entityCreatingStorage: FactorSource.Storage.EntityCreating?,
 		addedOn: Date,
 		lastUsedOn: Date
 	) {
@@ -27,7 +27,7 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 		self.id = id
 		self.hint = hint
 		self.parameters = parameters
-		self.deviceStorage = deviceStorage
+		self.entityCreatingStorage = entityCreatingStorage
 		self.addedOn = addedOn
 		self.lastUsedOn = lastUsedOn
 	}
@@ -42,7 +42,7 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 		if let anyStorage = factorSource.storage {
 			// Fail if we get the wrong kind of storage,
 			// but OK if nil, which it will be for "olympia" device factor sources.
-			self.deviceStorage = try anyStorage.asDevice()
+			self.entityCreatingStorage = try anyStorage.asEntityCreating()
 		}
 		self.kind = factorSource.kind
 		self.addedOn = factorSource.addedOn
@@ -74,8 +74,8 @@ extension HDOnDeviceFactorSource {
 	}
 
 	public var storage: FactorSource.Storage? {
-		guard let deviceStorage else { return nil }
-		return .forDevice(deviceStorage)
+		guard let entityCreatingStorage else { return nil }
+		return .entityCreating(entityCreatingStorage)
 	}
 }
 

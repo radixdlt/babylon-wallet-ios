@@ -158,8 +158,8 @@ extension FactorSourceView {
 				.border(Color.green, width: 2)
 			}
 
-			if let deviceStore = factorSource.storage?.forDevice {
-				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: deviceStore.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
+			if let entityCreatingStorage = factorSource.storage?.entityCreating {
+				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: entityCreatingStorage.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
 			}
 		}
 		.padding([.leading], leadingPadding)

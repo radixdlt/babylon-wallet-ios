@@ -3,14 +3,14 @@ import Prelude
 // MARK: - BabylonDeviceFactorSource
 /// This is NOT a `Codable` factor source, this never saved any where, just in memory.
 /// It acts a a convenience in code to not have to assert that `kind == .device` and
-/// try to access `deviceStorage` which is optional also asserting `parameters` to
+/// try to access `entityCreatingStorage` which is optional also asserting `parameters` to
 /// only declare `curve25519` and `cap26` derivation path.
 public struct BabylonDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorSourceProtocol {
 	public let kind: FactorSourceKind
 	public let id: FactorSourceID
 	public let hint: NonEmptyString
 	public let parameters: FactorSource.Parameters
-	public let deviceStorage: DeviceStorage
+	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
 	public let addedOn: Date
 	public let lastUsedOn: Date
 
@@ -24,7 +24,7 @@ public struct BabylonDeviceFactorSource: Sendable, Hashable, Identifiable, _Fact
 			throw CriticalDisrepancyFactorSourceParametersNotBabylon()
 		}
 
-		self.deviceStorage = try factorSource.deviceStorage()
+		self.entityCreatingStorage = try factorSource.entityCreatingStorage()
 		self.kind = factorSource.kind
 		self.addedOn = factorSource.addedOn
 		self.lastUsedOn = factorSource.lastUsedOn
@@ -42,7 +42,7 @@ public struct BabylonDeviceFactorSource: Sendable, Hashable, Identifiable, _Fact
 
 extension BabylonDeviceFactorSource {
 	public var storage: FactorSource.Storage? {
-		.forDevice(deviceStorage)
+		.entityCreating(entityCreatingStorage)
 	}
 
 	public var hdOnDeviceFactorSource: HDOnDeviceFactorSource {
@@ -51,7 +51,7 @@ extension BabylonDeviceFactorSource {
 			id: id,
 			hint: hint,
 			parameters: parameters,
-			deviceStorage: deviceStorage,
+			entityCreatingStorage: entityCreatingStorage,
 			addedOn: addedOn,
 			lastUsedOn: lastUsedOn
 		)

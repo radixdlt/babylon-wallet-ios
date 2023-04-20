@@ -22,3 +22,32 @@ public struct CreateVirtualEntityControlledByDeviceFactorSourceRequest: Sendable
 		self.extraProperties = extraProperties
 	}
 }
+
+// MARK: - CreateVirtualEntityControlledByLedgerFactorSourceRequest
+public struct CreateVirtualEntityControlledByLedgerFactorSourceRequest: Sendable {
+	// if `nil` we will use current networkID
+	public let networkID: NetworkID?
+	public let ledger: FactorSource
+	public let displayName: NonEmptyString
+	public let extraProperties: @Sendable (Int) -> EntityExtraProperties
+	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
+
+	public init(
+		networkID: NetworkID?,
+		ledger: FactorSource,
+		displayName: NonEmpty<String>,
+		extraProperties: @escaping @Sendable (Int) -> EntityExtraProperties
+	) throws {
+		guard ledger.kind == .ledgerHQHardwareWallet else {
+			throw ExpectedLedgerFactorSource()
+		}
+		self.entityCreatingStorage = try ledger.entityCreatingStorage()
+		self.ledger = ledger
+		self.networkID = networkID
+		self.displayName = displayName
+		self.extraProperties = extraProperties
+	}
+}
+
+// MARK: - ExpectedLedgerFactorSource
+struct ExpectedLedgerFactorSource: Swift.Error {}
