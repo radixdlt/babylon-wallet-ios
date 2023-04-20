@@ -421,56 +421,36 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
 
-		switch childAction {
-		case
-			let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))))),
-			let .path(.element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona)))))):
+		guard let (item, action) = childAction.itemAndAction else { return .none }
+		switch action {
+		case let .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))):
 			return handleLogin(item, persona, authorizedDapp, authorizedPersona)
 
-		case
-			let .root(.relay(item, .accountPermission(.delegate(.continueButtonTapped)))),
-			let .path(.element(_, .relay(item, .accountPermission(.delegate(.continueButtonTapped))))):
+		case .accountPermission(.delegate(.continueButtonTapped)):
 			return handleAccountPermission(item)
 
-		case
-			let .root(.relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))))),
-			let .path(.element(_, .relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind)))))):
+		case let .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))):
 			return handleAccounts(item, accounts, accessKind)
 
-		case
-			let .root(.relay(_, .personaDataPermission(.delegate(.personaUpdated(persona))))),
-			let .path(.element(_, .relay(_, .personaDataPermission(.delegate(.personaUpdated(persona)))))):
+		case let .personaDataPermission(.delegate(.personaUpdated(persona))):
 			return handlePersonaUpdated(&state, persona)
 
-		case
-			let .root(.relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields))))),
-			let .path(.element(_, .relay(item, .personaDataPermission(.delegate(.continueButtonTapped(fields)))))):
+		case let .personaDataPermission(.delegate(.continueButtonTapped(fields))):
 			return handleOngoingPersonaDataPermission(item, fields)
 
-		case
-			let .root(.relay(_, .oneTimePersonaData(.delegate(.personaUpdated(persona))))),
-			let .path(.element(_, .relay(_, .oneTimePersonaData(.delegate(.personaUpdated(persona)))))):
+		case let .oneTimePersonaData(.delegate(.personaUpdated(persona))):
 			return handlePersonaUpdated(&state, persona)
 
-		case
-			let .root(.relay(item, .oneTimePersonaData(.delegate(.continueButtonTapped(fields))))),
-			let .path(.element(_, .relay(item, .oneTimePersonaData(.delegate(.continueButtonTapped(fields)))))):
+		case let .oneTimePersonaData(.delegate(.continueButtonTapped(fields))):
 			return handleOneTimePersonaData(item, fields)
 
-		case
-			let .root(.relay(item, .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),
-			let .path(.element(_, .relay(item, .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID)))))):
+		case let .reviewTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))):
 			return handleSignAndSubmitTX(item, txID)
 
-		case
-			.root(.relay(_, .reviewTransaction(.delegate(.transactionCompleted)))),
-			.path(.element(_, .relay(_, .reviewTransaction(.delegate(.transactionCompleted))))):
-
+		case .reviewTransaction(.delegate(.transactionCompleted)):
 			return .send(.delegate(.dismissWithSuccess(state.dappMetadata)))
 
-		case
-			let .root(.relay(_, .reviewTransaction(.delegate(.failed(error))))),
-			let .path(.element(_, .relay(_, .reviewTransaction(.delegate(.failed(error)))))):
+		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
 
 		default:
@@ -713,6 +693,18 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 					}
 				}
 		)
+	}
+}
+
+extension DappInteractionFlow.ChildAction {
+	var itemAndAction: (DappInteractionFlow.State.AnyInteractionItem, DappInteractionFlow.Destinations.MainAction)? {
+		switch self {
+		case let .root(.relay(item, action)), let .path(.element(_, .relay(item, action))):
+			return (item, action)
+
+		case .path(.popFrom):
+			return nil
+		}
 	}
 }
 
