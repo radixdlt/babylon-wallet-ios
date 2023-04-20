@@ -145,7 +145,7 @@ extension GatewayAPIClient {
 			return (response.ledgerState, item)
 		}
 
-		return Self(
+		return GatewayAPIClient(
 			getNetworkName: { baseURL in
 				let response = try await makeRequest(
 					responseType: GatewayAPI.GatewayStatusResponse.self,
@@ -167,46 +167,33 @@ extension GatewayAPIClient {
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
 			getEntityDetails: getEntityDetails,
-			getAccountDetails: { accountAddress in
-				try await getSingleEntityDetails(accountAddress.address)
-			},
 			getEntityMetadata: { address in
 				try await getSingleEntityDetails(address).details.metadata
 			},
-			getNonFungibleIds: { resourceAddress in
-				try await post(
-					request: GatewayAPI.StateNonFungibleIdsRequest(resourceAddress: resourceAddress)
-				) { $0.appendingPathComponent("state/non-fungible/ids") }
-			},
-			getEntityFungibleTokensPage: { request in
+			getEntityFungiblesPage: { request in
 				try await post(
 					request: request
 				) { $0.appendingPathComponent("state/entity/page/fungibles/") }
 			},
-			getEntityNonFungibleTokensPage: { request in
-				try await post(
-					request: request
-				) { $0.appendingPathComponent("state/entity/page/non-fungibles/") }
-			},
-			getEntityNonFungibleResourceVaultPage: { request in
-				try await post(
-					request: request
-				) { $0.appendingPathComponent("state/entity/page/non-fungible-vaults/") }
-			},
-			getEntityFungibleResourceVaultPage: { request in
+			getEntityFungibleResourceVaultsPage: { request in
 				try await post(
 					request: request
 				) { $0.appendingPathComponent("state/entity/page/fungible-vaults/") }
 			},
-			getAccountNonFungibleIdsPageRequest: { request in
+			getEntityNonFungiblesPage: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("state/entity/page/non-fungibles/") }
+			},
+			getEntityNonFungibleResourceVaultsPage: { request in
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("state/entity/page/non-fungible-vaults/") }
+			},
+			getEntityNonFungibleIdsPage: { request in
 				try await post(
 					request: request
 				) { $0.appendingPathComponent("state/entity/page/non-fungible-vault/ids") }
-			},
-			getEntityMetadataPage: { request in
-				try await post(request: request) {
-					$0.appendingPathComponent("state/entity/page/metadata")
-				}
 			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(

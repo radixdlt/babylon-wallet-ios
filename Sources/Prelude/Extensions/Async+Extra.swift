@@ -31,5 +31,18 @@ public func doAsync<Result: Sendable>(
 	}
 }
 
+extension Array where Element: Sendable {
+	public func parallelMap<T: Sendable>(_ map: @Sendable @escaping (Element) async throws -> T) async throws -> [T] {
+		try await withThrowingTaskGroup(of: T.self) { group in
+			for element in self {
+				_ = group.addTaskUnlessCancelled {
+					try await map(element)
+				}
+			}
+			return try await group.collect()
+		}
+	}
+}
+
 // MARK: - TimeoutError
 public struct TimeoutError: Error {}
