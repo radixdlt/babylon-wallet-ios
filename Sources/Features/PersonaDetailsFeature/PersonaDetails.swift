@@ -94,8 +94,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				let updated = try await reload(in: mode)
 				await send(.internal(.reloaded(updated)))
 				await send(.delegate(.personaChanged(persona.id)))
-			} catch: { _, _ in
-				// FIXME: Log/show error?
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to reload, error: \(error)")
 			}
 
 		case .editPersona:
@@ -118,6 +118,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 					let persona = try await personasClient.getPersona(id: persona.id)
 					await send(.internal(.editablePersonaFetched(persona)))
 				} catch: { error, _ in
+					loggerGlobal.error("Could not get persona \(persona.id), error: \(error)")
 					errorQueue.schedule(error)
 				}
 			}
@@ -138,6 +139,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
 				await send(.delegate(.personaDeauthorized))
 			} catch: { error, _ in
+				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
 				errorQueue.schedule(error)
 			}
 
@@ -170,14 +172,17 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case let .dApp(dApp, persona: persona):
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dApp.dAppDefinitionAddress)
 			guard let updatedPersona = updatedDapp.detailedAuthorizedPersonas[id: persona.id] else {
-				// FIXME: Throw some error?
-				return mode
+				throw ReloadError.personaNotPresentInDapp(persona.id, updatedDapp.dAppDefinitionAddress)
 			}
 			return .dApp(updatedDapp, persona: updatedPersona)
 		case let .general(persona):
 			let updatedPersona = try await personasClient.getPersona(id: persona.id)
 			return .general(updatedPersona)
 		}
+	}
+
+	enum ReloadError: Error {
+		case personaNotPresentInDapp(Profile.Network.Persona.ID, Profile.Network.AuthorizedDapp.ID)
 	}
 }
 

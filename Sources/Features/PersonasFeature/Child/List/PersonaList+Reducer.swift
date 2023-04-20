@@ -70,15 +70,23 @@ public struct PersonaList: Sendable, FeatureReducer {
 				for try await personas in await personasClient.personas() {
 					let ids = try await personaIDs(strategy) ?? personas.ids
 					let result = ids.compactMap { personas[id: $0] }.map(Persona.State.init)
+					guard result.count == ids.count else {
+						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
+					}
 					await send(.internal(.personasLoaded(.init(uniqueElements: result))))
 				}
 			} catch: { error, _ in
+				loggerGlobal.error("Failed to update personas from client, error: \(error)")
 				errorQueue.schedule(error)
 			}
 
 		case .createNewPersonaButtonTapped:
 			return .send(.delegate(.createNewPersona))
 		}
+	}
+
+	enum UpdatePersonaError: Error {
+		case personasMissingFromClient(OrderedSet<Profile.Network.Persona.ID>)
 	}
 
 	/// Returns the ids of personas to include under the given strategy. nil means that all ids should be included
