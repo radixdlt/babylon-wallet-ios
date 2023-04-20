@@ -114,7 +114,7 @@ extension CreateEntityCoordinator {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			precondition(state.config.canBeDismissed)
+			assert(state.config.canBeDismissed)
 			return .run { send in
 				await send(.delegate(.dismissed))
 				await dismiss()
