@@ -118,8 +118,8 @@ final class CAP26Tests: TestCase {
 			let publicKey = privateKey.publicKey
 
 			print("🔮 Derivation Path: \(path.toString())")
-			print("🔑 🔐  Private Key (\(curve.slip10Curve.slip10CurveID)): \(privateKey.rawRepresentation.hex)")
-			print("🔑 🔓  Public Key (\(curve.slip10Curve.slip10CurveID)): \(publicKey.compressedRepresentation.hex)")
+			print("🔑 🔐  Private Key (\(curve.curveName)): \(privateKey.rawRepresentation.hex)")
+			print("🔑 🔓  Public Key (\(curve.curveName)): \(publicKey.compressedRepresentation.hex)")
 			print("")
 			let test = TestGroup.Test(
 				path: path.toString(),
@@ -138,7 +138,7 @@ final class CAP26Tests: TestCase {
 		) throws -> TestGroup {
 			let entityKind = hdPathType.Entity.entityKind
 
-			print("\n\n~~~~~ \(entityKind.emoji) ENTITY_TYPE: \(entityKind.name) (\(entityKind.rawValue) \(entityKind.emoji) ~~~~~")
+			print("\n\n~~~~~ \(entityKind.emoji) ENTITY_TYPE: \(entityKind.name) (\(entityKind.rawValue)) \(entityKind.emoji) ~~~~~")
 			let tests = try KeyKind.allCases.flatMap { keyKind in
 				print("\n🗝️ \(keyKind.emoji) KEY_TYPE: \(keyKind.asciiSource) (\(keyKind.rawValue))")
 				return try (HD.Path.Component.Child.Value(0) ..< 4).map { index in
@@ -188,7 +188,7 @@ final class CAP26Tests: TestCase {
 		let jsonEncoder = JSONEncoder()
 		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
 		try print(String(data: jsonEncoder.encode(curve25519TestGroup), encoding: .utf8)!)
-		try print(String(data: jsonEncoder.encode(secp256k1TestGroup), encoding: .utf8)!)
+//		try print(String(data: jsonEncoder.encode(secp256k1TestGroup), encoding: .utf8)!)
 
 		print(String(repeating: "#", count: 100))
 	}
@@ -197,8 +197,8 @@ final class CAP26Tests: TestCase {
 extension EntityKind {
 	var name: String {
 		switch self {
-		case .account: return "ACCOUNTS"
-		case .identity: return "IDENTITIES"
+		case .account: return "ACCOUNT"
+		case .identity: return "IDENTITY"
 		}
 	}
 

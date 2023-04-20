@@ -194,7 +194,7 @@
       "keyKind" : 1391
     }
   ],
-  "curve" : "ed25519",
+  "curve" : "curve25519",
   "network" : {
     "name" : "kisharnet",
     "networkIDDecimal" : 12
