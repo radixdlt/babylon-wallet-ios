@@ -23,9 +23,9 @@ final class CreationOfEntityTests: TestCase {
 				XCTAssertEqual(request.account, account)
 			}
 		}
-//		await store.send(.view(.appeared))
-//		await store.receive(.internal(.createEntityResult(.success(account))))
-//		await store.receive(.delegate(.createdEntity(account)))
+		await store.send(.view(.appeared))
+		await store.receive(.internal(.createEntityResult(.success(account))))
+		await store.receive(.delegate(.createdEntity(account)))
 	}
 
 	func test__WHEN__creation_fails__THEN__error_is_propagated() async throws {
@@ -53,8 +53,8 @@ final class CreationOfEntityTests: TestCase {
 			}
 		}
 
-//		await store.send(.view(.appeared))
-//		await store.receive(.internal(.createEntityResult(.failure(createNewAccountError))))
-//		await store.receive(.delegate(.createEntityFailed))
+		await store.send(.view(.appeared))
+		await store.receive(.internal(.createEntityResult(.failure(createNewAccountError))))
+		await store.receive(.delegate(.createEntityFailed))
 	}
 }
