@@ -85,10 +85,8 @@
       "accounts" : [
         {
           "address" : "account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3",
+          "appearanceID" : 0,
           "displayName" : "First",
-          "extraProperties" : {
-            "appearanceID" : 0
-          },
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -109,10 +107,8 @@
         },
         {
           "address" : "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa",
+          "appearanceID" : 1,
           "displayName" : "Second",
-          "extraProperties" : {
-            "appearanceID" : 1
-          },
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -133,10 +129,8 @@
         },
         {
           "address" : "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p",
+          "appearanceID" : 2,
           "displayName" : "Third",
-          "extraProperties" : {
-            "appearanceID" : 2
-          },
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -205,18 +199,16 @@
         {
           "address" : "identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8",
           "displayName" : "Mrs Incognito",
-          "extraProperties" : {
-            "fields" : [
-              {
-                "id" : "givenName",
-                "value" : "Jane"
-              },
-              {
-                "id" : "familyName",
-                "value" : "Incognitoson"
-              }
-            ]
-          },
+          "fields" : [
+            {
+              "id" : "givenName",
+              "value" : "Jane"
+            },
+            {
+              "id" : "familyName",
+              "value" : "Incognitoson"
+            }
+          ],
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",
@@ -238,18 +230,16 @@
         {
           "address" : "identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw",
           "displayName" : "Mrs Public",
-          "extraProperties" : {
-            "fields" : [
-              {
-                "id" : "givenName",
-                "value" : "Maria"
-              },
-              {
-                "id" : "familyName",
-                "value" : "Publicson"
-              }
-            ]
-          },
+          "fields" : [
+            {
+              "id" : "givenName",
+              "value" : "Maria"
+            },
+            {
+              "id" : "familyName",
+              "value" : "Publicson"
+            }
+          ],
           "networkID" : 11,
           "securityState" : {
             "discriminator" : "unsecured",

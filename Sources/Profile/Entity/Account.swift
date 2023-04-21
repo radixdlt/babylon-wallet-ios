@@ -57,22 +57,9 @@ extension Profile.Network {
 		/// Security of this account
 		public var securityState: EntitySecurityState
 
-		/// Additional account specific properties
-		public struct ExtraProperties: Sendable, Hashable, Codable {
-			/// An indentifier for the gradient for this account, to be displayed in wallet
-			/// and possibly by dApps.
-			public var appearanceID: AppearanceID
-			public init(appearanceID: AppearanceID) {
-				self.appearanceID = appearanceID
-			}
-
-			public init(numberOfAccountsOnNetwork: Int) {
-				self.init(appearanceID: .fromIndex(numberOfAccountsOnNetwork))
-			}
-		}
-
-		/// Additional account specific properties
-		public var extraProperties: ExtraProperties
+		/// An indentifier for the gradient for this account, to be displayed in wallet
+		/// and possibly by dApps.
+		public var appearanceID: AppearanceID
 
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public let displayName: NonEmpty<String>
@@ -87,13 +74,26 @@ extension Profile.Network {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.extraProperties = extraProperties
+			self.appearanceID = extraProperties.appearanceID
 			self.displayName = displayName
 		}
 	}
 }
 
 extension Profile.Network.Account {
+	/// Ephemeral, only used as arg passed to init.
+	public struct ExtraProperties: Sendable {
+		public var appearanceID: AppearanceID
+
+		public init(appearanceID: AppearanceID) {
+			self.appearanceID = appearanceID
+		}
+
+		public init(numberOfAccountsOnNetwork: Int) {
+			self.init(appearanceID: .fromIndex(numberOfAccountsOnNetwork))
+		}
+	}
+
 	public init(
 		networkID: NetworkID,
 		address: EntityAddress,
@@ -108,11 +108,6 @@ extension Profile.Network.Account {
 			displayName: displayName,
 			extraProperties: .init(appearanceID: appearanceID)
 		)
-	}
-
-	public var appearanceID: AppearanceID {
-		get { extraProperties.appearanceID }
-		set { extraProperties.appearanceID = newValue }
 	}
 
 	public static let nameMaxLength = 30

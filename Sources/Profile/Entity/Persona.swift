@@ -30,17 +30,8 @@ extension Profile.Network {
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public var displayName: NonEmpty<String>
 
-		/// Additional persona specific properties
-		public struct ExtraProperties: Sendable, Hashable, Codable {
-			/// Fields containing personal information you have inputted.
-			public var fields: IdentifiedArrayOf<Field>
-			public init(fields: IdentifiedArrayOf<Field> = []) {
-				self.fields = fields
-			}
-		}
-
-		/// Additional persona specific properties
-		public var extraProperties: ExtraProperties
+		/// Fields containing personal information you have inputted.
+		public var fields: IdentifiedArrayOf<Field>
 
 		public init(
 			networkID: NetworkID,
@@ -52,7 +43,7 @@ extension Profile.Network {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.extraProperties = extraProperties
+			self.fields = extraProperties.fields
 			self.displayName = displayName
 		}
 
@@ -68,10 +59,12 @@ extension Profile.Network {
 }
 
 extension Profile.Network.Persona {
-	/// Fields containing personal information you have inputted.
-	public var fields: IdentifiedArrayOf<Field> {
-		get { extraProperties.fields }
-		set { extraProperties.fields = newValue }
+	/// Ephemeral, only used as arg passed to init.
+	public struct ExtraProperties: Sendable, Hashable, Codable {
+		public var fields: IdentifiedArrayOf<Field>
+		public init(fields: IdentifiedArrayOf<Field> = []) {
+			self.fields = fields
+		}
 	}
 
 	public init(

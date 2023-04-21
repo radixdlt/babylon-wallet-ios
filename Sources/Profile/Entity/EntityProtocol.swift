@@ -7,7 +7,7 @@ import Prelude
 public protocol EntityProtocol: Sendable, Equatable {
 	/// The type of address of entity.
 	associatedtype EntityAddress: AddressKindProtocol & Hashable
-	associatedtype ExtraProperties: Sendable & Hashable
+	associatedtype ExtraProperties: Sendable
 
 	static var entityKind: EntityKind { get }
 
@@ -29,8 +29,6 @@ public protocol EntityProtocol: Sendable, Equatable {
 
 	/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 	var displayName: NonEmpty<String> { get }
-
-	var extraProperties: ExtraProperties { get set }
 
 	func cast<Entity: EntityProtocol>() throws -> Entity
 
