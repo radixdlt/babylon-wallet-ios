@@ -17,6 +17,7 @@ public struct AccountPortfoliosClient: Sendable {
 	/// Subscribe to portfolio changes for a given account address
 	public var portfolioForAccount: PortfolioForAccount
 
+	/// Currently loaded portfolios
 	public var portfolios: Portfolios
 }
 

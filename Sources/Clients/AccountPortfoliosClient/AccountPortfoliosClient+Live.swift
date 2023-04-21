@@ -8,20 +8,18 @@ import SharedModels
 extension AccountPortfoliosClient: DependencyKey {
 	/// Internal state that holds all o the loaded portfolios.
 	actor State {
-		let portfolios: AsyncCurrentValueSubject<[AccountAddress: AccountPortfolio]> = .init([:])
+		let portfoliosSubject: AsyncCurrentValueSubject<[AccountAddress: AccountPortfolio]> = .init([:])
 
 		func setAccountPortfolio(_ portfolio: AccountPortfolio) {
-			portfolios.value.updateValue(portfolio, forKey: portfolio.owner)
+			portfoliosSubject.value.updateValue(portfolio, forKey: portfolio.owner)
 		}
 
-		func setAccountPortfolios(_ portfolio: [AccountPortfolio]) {
-			portfolios.value = portfolio.reduce(into: [AccountAddress: AccountPortfolio]()) { partialResult, portfolio in
-				partialResult[portfolio.owner] = portfolio
-			}
+		func setAccountPortfolios(_ portfolios: [AccountPortfolio]) {
+			portfolios.forEach(setAccountPortfolio)
 		}
 
 		func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<AccountPortfolio> {
-			portfolios.compactMap { $0[address] }.eraseToAnyAsyncSequence()
+			portfoliosSubject.compactMap { $0[address] }.eraseToAnyAsyncSequence()
 		}
 	}
 
@@ -45,12 +43,41 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, refresh in
-				let portfolios = try await cacheClient.withCaching(
-					cacheEntry: .accountPortfolio(.all),
-					forceRefresh: refresh,
-					request: { try await AccountPortfoliosClient.fetchAccountPortfolios(accountAddresses) }
-				)
+				let portfolios = try await {
+					// TODO: This logic might be a good candidate for shared logic in cacheClient. When it is wanted to load multiple models as bulk and save independently.
+
+					// Refresh all accounts
+					if refresh {
+						let allPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(accountAddresses)
+						allPortfolios.forEach {
+							cacheClient.save($0, .accountPortfolio(.single($0.owner.address)))
+						}
+						return allPortfolios
+					}
+
+					// Otherwise, load the valid portfolios from the cache
+					let cachedPortfolios = accountAddresses.compactMap {
+						try? cacheClient.load(AccountPortfolio.self, .accountPortfolio(.single($0.address))) as? AccountPortfolio
+					}
+
+					let notCachedPortfolios = Set(accountAddresses).subtracting(Set(cachedPortfolios.map(\.owner)))
+
+					guard !notCachedPortfolios.isEmpty else {
+						return cachedPortfolios
+					}
+
+					// Fetch the remaining portfolios from the GW. Either the portfolios were expired in the cache, or missing
+					let freshPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(accountAddresses)
+					freshPortfolios.forEach {
+						cacheClient.save($0, .accountPortfolio(.single($0.owner.address)))
+					}
+
+					return cachedPortfolios + freshPortfolios
+				}()
+
+				// Update the current account portfolios
 				await state.setAccountPortfolios(portfolios)
+
 				return portfolios
 			},
 			fetchAccountPortfolio: { accountAddress, refresh in
@@ -67,7 +94,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			portfolioForAccount: { address in
 				await state.portfolioForAccount(address)
 			},
-			portfolios: { state.portfolios.value.map(\.value) }
+			portfolios: { state.portfoliosSubject.value.map(\.value) }
 		)
 	}()
 }
@@ -98,6 +125,7 @@ extension AccountPortfoliosClient {
 		_ rawAccountDetails: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio {
+		// Fetch all fungible resources by requesting additional pages if available
 		async let fetchAllFungibleResources = {
 			guard let firstPage = rawAccountDetails.fungibleResources else {
 				return [GatewayAPI.FungibleResourcesCollectionItem]()
@@ -115,6 +143,7 @@ extension AccountPortfoliosClient {
 			return firstPage.items + additionalItems
 		}
 
+		// Fetch all non-fungible resources by requesting additional pages if available
 		async let fetchAllNonFungibleResources = {
 			guard let firstPage = rawAccountDetails.nonFungibleResources else {
 				return [GatewayAPI.NonFungibleResourcesCollectionItem]()
@@ -134,6 +163,7 @@ extension AccountPortfoliosClient {
 
 		let (rawFungibleResources, rawNonFungibleResources) = try await (fetchAllFungibleResources(), fetchAllNonFungibleResources())
 
+		// Build up the resources from the raw items.
 		async let fungibleResources = createFungibleResources(rawItems: rawFungibleResources)
 		async let nonFungibleResources = createNonFungibleResources(rawAccountDetails.address, rawItems: rawNonFungibleResources)
 
@@ -150,13 +180,14 @@ extension AccountPortfoliosClient {
 	) async throws -> AccountPortfolio.FungibleResources {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
+		// We are interested in vault aggregated items
 		let rawItems = rawItems.compactMap(\.vault)
 		guard !rawItems.isEmpty else {
 			return .init()
 		}
 
 		// Fetch all the detailed information for the loaded resources.
-		// TODO: This will become obsolete with next version of GW, the details would be embeded in FungibleResourcesCollection
+		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.FungibleResourcesCollectionItem itself.
 		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
 		var xrdResource: AccountPortfolio.FungibleResource?
@@ -164,6 +195,7 @@ extension AccountPortfoliosClient {
 
 		for resource in rawItems {
 			let amount: BigDecimal = {
+				// Resources of an account always have one single vault which stores the value.
 				guard let resourceVault = resource.vaults.items.first else {
 					loggerGlobal.warning("Account Portfolio: \(resource.resourceAddress) does not have any vaults")
 					return .zero
@@ -180,19 +212,19 @@ extension AccountPortfoliosClient {
 			}()
 
 			let resourceAddress = ResourceAddress(address: resource.resourceAddress)
-			let isXRD = try engineToolkitClient.isXRD(resource: resourceAddress, on: Radix.Network.default.id)
-			let resourceDetails = allResourceDetails.first { $0.address == resource.resourceAddress }
-			let metadata = resourceDetails?.metadata
+
+			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.FungibleResourcesCollectionItem
+			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
 
 			let resource = AccountPortfolio.FungibleResource(
 				resourceAddress: resourceAddress,
 				amount: amount,
-				divisibility: resourceDetails?.details?.fungible?.divisibility,
 				name: metadata?.name,
 				symbol: metadata?.symbol,
 				description: metadata?.description
 			)
 
+			let isXRD = try engineToolkitClient.isXRD(resource: resourceAddress, on: Radix.Network.default.id)
 			if isXRD {
 				xrdResource = resource
 			} else {
@@ -211,22 +243,24 @@ extension AccountPortfoliosClient {
 		_ accountAddress: String,
 		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem]
 	) async throws -> AccountPortfolio.NonFungibleResources {
+		// We are interested in vault aggregated items
 		let rawItems = rawItems.compactMap(\.vault)
-
 		guard !rawItems.isEmpty else {
 			return []
 		}
 
-		// TODO: This will become obsolete with next version of GW, the details would be embeded in FungibleResourcesCollection
+		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.NonFungibleResourcesCollectionItem
 		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
 		return try await rawItems.parallelMap { resource in
-			let vault = resource.vaults.items.first
+			// Load the nftIds from the resource vault
 			let nftIds: [String] = try await {
+				// Resources of an account always have one single vault which stores the value.
 				guard let vault = resource.vaults.items.first else {
 					return []
 				}
 
+				// Fetch all nft ids pages from the vault
 				return try await fetchAllPaginatedItems(
 					cursor: nil,
 					fetchEntityNonFungibleResourceIdsPage(
@@ -238,12 +272,13 @@ extension AccountPortfoliosClient {
 				.map(\.nonFungibleId)
 			}()
 
-			let details = allResourceDetails.first { $0.address == resource.resourceAddress }
+			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.NonFungibleResourcesCollectionItem
+			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
 
 			return AccountPortfolio.NonFungibleResource(
 				resourceAddress: .init(address: resource.resourceAddress),
-				name: details?.metadata.name,
-				description: details?.metadata.description,
+				name: metadata?.name,
+				description: metadata?.description,
 				ids: nftIds
 			)
 		}
@@ -330,21 +365,27 @@ extension AccountPortfoliosClient {
 
 // MARK: - Resource details endpoint
 extension AccountPortfoliosClient {
+	// This needs to be synchronized with the actuall value on the GW side
 	static let entityDetailsPageSize = 20
 	struct EmptyEntityDetailsResponse: Error {}
 
+	/// Loads the details for all the addresses provided.
 	@Sendable
 	static func fetchResourceDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
+		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
+		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
 		let allResponses = try await addresses
 			.chunks(ofCount: entityDetailsPageSize)
 			.map(Array.init)
 			.parallelMap(gatewayAPIClient.getEntityDetails)
+
 		guard !allResponses.isEmpty else {
 			throw EmptyEntityDetailsResponse()
 		}
 
+		// Group multiple GatewayAPI.StateEntityDetailsResponse in one response.
 		let allItems = allResponses.flatMap(\.items)
 		let ledgerState = allResponses.first!.ledgerState
 
@@ -354,6 +395,7 @@ extension AccountPortfoliosClient {
 
 // MARK: - Pagination
 extension AccountPortfoliosClient {
+	/// A page cursor is required to have the `nextPageCurosr` itself, as well the `ledgerState` of the previous page.
 	struct PageCursor: Hashable, Sendable {
 		let ledgerState: GatewayAPI.LedgerState
 		let nextPagCursor: String
@@ -366,6 +408,8 @@ extension AccountPortfoliosClient {
 	}
 
 	/// Recursively fetches all of the pages for a given paginated request.
+	///
+	/// Provide an initial page cursor if needed to load the all the items starting with a given page
 	@Sendable
 	static func fetchAllPaginatedItems<Item>(
 		cursor: PageCursor?,
@@ -375,10 +419,12 @@ extension AccountPortfoliosClient {
 		func fetchAllPaginatedItems(
 			collectedResources: PaginatedResourceResponse<Item>?
 		) async throws -> [Item] {
-			/// Finish when no next page cursor is available
+			/// Finish when some items where loaded and the nextPageCursor is nil.
 			if let collectedResources, collectedResources.cursor == nil {
 				return collectedResources.loadedItems
 			}
+
+			/// We can request here with nil nextPageCursor, as the first page will not have a cursor.
 			let response = try await paginatedRequest(collectedResources?.cursor)
 			let oldItems = collectedResources?.loadedItems ?? []
 			let allItems = oldItems + response.loadedItems
