@@ -43,8 +43,13 @@ extension NonFungibleTokenList.Row {
 								switch index {
 								case -1:
 									headerView(with: viewStore, index: index)
+                                                                case 0..<Constants.cardLimit:
+                                                                        componentView(with: viewStore, index: index)
 								default:
-									componentView(with: viewStore, index: index)
+                                                                        if viewStore.isExpanded {
+                                                                                componentView(with: viewStore, index: index)
+                                                                        }
+
 								}
 							}
 							.onSizeChanged { size in
