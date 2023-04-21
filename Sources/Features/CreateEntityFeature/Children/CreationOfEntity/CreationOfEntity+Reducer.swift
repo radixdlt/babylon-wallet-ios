@@ -131,53 +131,6 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 }
 
 extension CreationOfEntity {
-	private func sendDerivePublicKeyRequest(
-		_ ledger: FactorSource,
-		state: State
-	) -> EffectTask<Action> {
-		let entityKind = Entity.entityKind
-
-		let request = try! CreateVirtualEntityControlledByLedgerFactorSourceRequest(
-			networkID: state.networkID,
-			ledger: ledger,
-			displayName: state.name,
-			extraProperties: { numberOfEntities in
-				switch entityKind {
-				case .identity: return .forPersona(.init(fields: []))
-				case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
-				}
-			},
-			derivePublicKey: { derivationPath in
-				try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
-			}
-		)
-
-		return .run { send in
-			await send(.internal(
-				.createEntityResult(
-					TaskResult {
-						let entity: Entity = try await {
-							switch entityKind {
-							case .account:
-								let account = try await accountsClient.newUnsavedVirtualAccountControlledByLedgerFactorSource(request)
-								try await accountsClient.saveVirtualAccount(.init(
-									account: account,
-									shouldUpdateFactorSourceNextDerivationIndex: true
-								))
-								return try account.cast()
-							case .identity:
-								let persona = try await personasClient.newUnsavedVirtualPersonaControlledByLedgerFactorSource(request)
-								try await personasClient.saveVirtualPersona(persona)
-								return try persona.cast()
-							}
-						}()
-						return entity
-					}
-				)
-			))
-		}
-	}
-
 	private func createEntityControlledByDeviceFactorSource(
 		_ babylonFactorSource: BabylonDeviceFactorSource,
 		state: State
@@ -213,6 +166,51 @@ extension CreationOfEntity {
 				}
 			}
 			)))
+		}
+	}
+
+	// FIXME: Delete this when we have Multifactor support
+	private func sendDerivePublicKeyRequest(
+		_ ledger: FactorSource,
+		state: State
+	) -> EffectTask<Action> {
+		let entityKind = Entity.entityKind
+
+		let request = try! CreateVirtualEntityControlledByLedgerFactorSourceRequest(
+			networkID: state.networkID,
+			ledger: ledger,
+			displayName: state.name,
+			extraProperties: { numberOfEntities in
+				switch entityKind {
+				case .identity: return .forPersona(.init(fields: []))
+				case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
+				}
+			},
+			derivePublicKey: { derivationPath in
+				try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
+			}
+		)
+
+		return .run { send in
+			await send(.internal(
+				.createEntityResult(
+					TaskResult {
+						switch entityKind {
+						case .account:
+							let account = try await accountsClient.newUnsavedVirtualAccountControlledByLedgerFactorSource(request)
+							try await accountsClient.saveVirtualAccount(.init(
+								account: account,
+								shouldUpdateFactorSourceNextDerivationIndex: true
+							))
+							return try account.cast()
+						case .identity:
+							let persona = try await personasClient.newUnsavedVirtualPersonaControlledByLedgerFactorSource(request)
+							try await personasClient.saveVirtualPersona(persona)
+							return try persona.cast()
+						}
+					}
+				)
+			))
 		}
 	}
 }
