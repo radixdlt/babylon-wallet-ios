@@ -34,7 +34,7 @@ extension NonFungibleTokenList.Row {
 				send: { .view($0) }
 			) { viewStore in
 				VStack(spacing: .small3 / 2) {
-					if viewStore.token.ids.isEmpty {
+					if viewStore.token.nftIds.isEmpty {
 						EmptyView()
 					} else {
 						// TODO: There is a performance issue when multiple items are involved, all fo the expanded views seems to be actually loaded from the begining.
@@ -105,9 +105,9 @@ extension NonFungibleTokenList.Row.View {
 
 	@ViewBuilder
 	fileprivate func componentView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
-		let asset = viewStore.token.ids[index]
+		let asset = viewStore.token.nftIds[index]
 		NFTIDView(
-			id: asset,
+			id: asset.toUserFacingString,
 			isLast: index == nftCount(with: viewStore) - 1,
 			isExpanded: viewStore.isExpanded
 		)
@@ -151,7 +151,7 @@ extension NonFungibleTokenList.Row.View {
 	}
 
 	fileprivate func nftCount(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> Int {
-		viewStore.token.ids.count
+		viewStore.token.nftIds.count
 	}
 }
 
@@ -181,6 +181,18 @@ extension NonFungibleTokenList.Row.View {
 
 		/// offset used in collapsed view for non visible cards
 		static let nonVisibleCardOffset = -70
+	}
+}
+
+extension AccountPortfolio.NonFungibleResource.NonFungibleTokenId {
+	var toUserFacingString: String {
+		// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
+		guard self.rawValue.count >= 3 else {
+			loggerGlobal.warning("Invalid nft id: \(self.rawValue)")
+			return self.rawValue
+		}
+		// Nothing fancy, just remove the prefix and suffix.
+		return String(self.rawValue.dropLast(1).dropFirst())
 	}
 }
 

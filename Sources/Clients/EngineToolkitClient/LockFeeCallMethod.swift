@@ -264,7 +264,7 @@ extension EngineToolkitClient {
 				[.string("description"), .string(BIP39.randomPhrase(maxSize: 20))]
 			)
 
-			let ids = stride(from: 0, to: idsCount, by: 1).map {
+			let nftIds = stride(from: 0, to: idsCount, by: 1).map {
 				[ManifestASTValue.nonFungibleLocalId(.integer(UInt64($0))), .tuple([.tuple(
 					[.string("Hello World \($0)"), .decimal(.init(value: "\($0)"))]
 				)])]
@@ -295,7 +295,7 @@ extension EngineToolkitClient {
 					]
 				),
 				initialSupply: .map(
-					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: ids)
+					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: nftIds)
 				)
 			)
 		}

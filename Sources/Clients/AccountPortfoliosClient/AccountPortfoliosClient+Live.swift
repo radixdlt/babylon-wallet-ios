@@ -239,10 +239,10 @@ extension AccountPortfoliosClient {
 
 		let nonFungibleResources = try await rawItems.parallelMap { resource in
 			// Load the nftIds from the resource vault
-			let nftIds: [String] = try await {
+			let nftIds = try await {
 				// Resources of an account always have one single vault which stores the value.
 				guard let vault = resource.vaults.items.first else {
-					return []
+					return [AccountPortfolio.NonFungibleResource.NonFungibleTokenId]()
 				}
 
 				// Fetch all nft ids pages from the vault
@@ -254,7 +254,10 @@ extension AccountPortfoliosClient {
 						vaultAddress: vault.vaultAddress
 					)
 				)
-				.map(\.nonFungibleId)
+				.map {
+					AccountPortfolio.NonFungibleResource.NonFungibleTokenId($0.nonFungibleId)
+				}
+
 			}()
 
 			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.NonFungibleResourcesCollectionItem
@@ -264,7 +267,7 @@ extension AccountPortfoliosClient {
 				resourceAddress: .init(address: resource.resourceAddress),
 				name: metadata?.name,
 				description: metadata?.description,
-				ids: nftIds
+				nftIds: nftIds
 			)
 		}
 

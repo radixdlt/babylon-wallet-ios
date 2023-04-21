@@ -11,7 +11,7 @@ extension NonFungibleTokenList.Detail {
 		var resourceName: String?
 
 		init(state: NonFungibleTokenList.Detail.State) {
-			nftID = .init(address: state.nftID)
+			nftID = .init(address: state.nftID.toUserFacingString)
 			fullNFTAddress = state.resource.nftAddress(for: state.nftID)
 			description = state.resource.description
 			resourceAddress = .init(
@@ -137,8 +137,8 @@ extension NonFungibleTokenList.Detail {
 
 extension AccountPortfolio.NonFungibleResource {
 	// TODO: unit test
-	func nftAddress(for id: String) -> String {
-		resourceAddress.address + ":" + id
+	func nftAddress(for id: NonFungibleTokenId) -> String {
+		resourceAddress.address + ":" + id.rawValue
 	}
 }
 

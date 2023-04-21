@@ -86,23 +86,6 @@ extension NFTIDView {
 }
 
 // MARK: ExpandableRow
-// TODO: Current GW always returns the ID as string, to be clarified
-
-// extension NonFungibleToken.ID {
-//	var stringRepresentation: String {
-//		switch self {
-//		case let .integer(value):
-//			return "\(value)"
-//		case let .uuid(value):
-//			return "\(value)"
-//		case let .string(value):
-//			return value
-//		case let .bytes(value):
-//			return "\(value.description)"
-//		}
-//	}
-// }
-
 extension NFTIDView: ExpandableRow {
 	var edge: Edge.Set {
 		if isLast {

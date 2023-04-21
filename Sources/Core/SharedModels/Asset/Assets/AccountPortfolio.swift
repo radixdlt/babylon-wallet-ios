@@ -63,24 +63,24 @@ extension AccountPortfolio {
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { self.resourceAddress }
+		public typealias NonFungibleTokenId = Tagged<Self, String>
 
+		public var id: ResourceAddress { self.resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
 		public let description: String?
-		// TBA: Should contain rather the actual info of the owned ids - name, description, image
-		public let ids: [String]
+		public let nftIds: [NonFungibleTokenId]
 
 		public init(
 			resourceAddress: ResourceAddress,
 			name: String? = nil,
 			description: String? = nil,
-			ids: [String]
+			nftIds: [NonFungibleTokenId]
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
 			self.description = description
-			self.ids = ids
+			self.nftIds = nftIds
 		}
 	}
 }
