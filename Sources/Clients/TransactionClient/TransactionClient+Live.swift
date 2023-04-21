@@ -230,11 +230,10 @@ extension TransactionClient {
 				}
 			}
 			guard txStatus == .committedSuccess else {
-				await clearCacheForAccounts(accountsInvolvedInTransaction.value)
 				return .failure(.failedToPoll(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed)))
 			}
 
-			await clearCacheForAccounts(accountsInvolvedInTransaction.value)
+			await reloadAccountsInvolvedInTransaction(accountsInvolvedInTransaction.value)
 			return .success(txID)
 		}
 
@@ -561,17 +560,14 @@ extension TransactionClient {
 			from addresses: [AccountAddress],
 			toPay fee: BigDecimal
 		) async -> AccountAddress? {
-			try? await addresses.parallelMap {
-				// Load the account portfolios with a force refresh, to get the latest state.
-				// TODO: As an optimization, only the fungible resources can be loaded.
-				try await accountPortfoliosClient.fetchAccountPortfolio($0, true)
-			}
-			.first {
-				guard let amount = $0.fungibleResources.xrdResource?.amount else {
-					return false
-				}
-				return amount >= fee
-			}?.owner
+			try? await accountPortfoliosClient
+				.fetchAccountPortfolios(addresses, true) // Be sure to load the freshest data
+				.first {
+					guard let amount = $0.fungibleResources.xrdResource?.amount else {
+						return false
+					}
+					return amount >= fee
+				}?.owner
 		}
 
 		@Sendable
@@ -596,11 +592,12 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func clearCacheForAccounts(_ accounts: Set<AccountAddress>) {
-			if !accounts.isEmpty {
-				accounts.forEach { cacheClient.removeFile(.accountPortfolio(.single($0.address))) }
-			} else {
-				cacheClient.removeFolder(.accountPortfolio(.all))
+		func reloadAccountsInvolvedInTransaction(_ accounts: Set<AccountAddress>) {
+			guard !accounts.isEmpty else {
+				return
+			}
+			Task {
+				try await accountPortfoliosClient.fetchAccountPortfolios(Array(accounts), true)
 			}
 		}
 
