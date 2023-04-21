@@ -136,7 +136,7 @@ extension AccountPortfoliosClient {
 			}
 
 			let additionalItems = try await fetchAllPaginatedItems(
-				cursor: PageCursor(ledgerState: ledgerState, nextPagCursor: nextPageCursor),
+				cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
 				fetchAccountFungibleResourcePage(rawAccountDetails.address)
 			)
 
@@ -154,7 +154,7 @@ extension AccountPortfoliosClient {
 			}
 
 			let additionalItems = try await fetchAllPaginatedItems(
-				cursor: PageCursor(ledgerState: ledgerState, nextPagCursor: nextPageCursor),
+				cursor: PageCursor(ledgerState: ledgerState, nextPageCursor: nextPageCursor),
 				fetchNonFungibleResourcePage(rawAccountDetails.address)
 			)
 
@@ -285,7 +285,7 @@ extension AccountPortfoliosClient {
 		return { pageCursor in
 			let request = GatewayAPI.StateEntityFungiblesPageRequest(
 				atLedgerState: pageCursor?.ledgerState.selector,
-				cursor: pageCursor?.nextPagCursor,
+				cursor: pageCursor?.nextPageCursor,
 				address: accountAddress,
 				aggregationLevel: .global
 			)
@@ -295,7 +295,7 @@ extension AccountPortfoliosClient {
 				loadedItems: response.items,
 				totalCount: response.totalCount,
 				cursor: response.nextCursor.map {
-					PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)
+					PageCursor(ledgerState: response.ledgerState, nextPageCursor: $0)
 				}
 			)
 		}
@@ -309,7 +309,7 @@ extension AccountPortfoliosClient {
 		return { pageCursor in
 			let request = GatewayAPI.StateEntityNonFungiblesPageRequest(
 				atLedgerState: pageCursor?.ledgerState.selector,
-				cursor: pageCursor?.nextPagCursor,
+				cursor: pageCursor?.nextPageCursor,
 				address: accountAddress,
 				aggregationLevel: .vault
 			)
@@ -319,7 +319,7 @@ extension AccountPortfoliosClient {
 				loadedItems: response.items,
 				totalCount: response.totalCount,
 				cursor: response.nextCursor.map {
-					PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)
+					PageCursor(ledgerState: response.ledgerState, nextPageCursor: $0)
 				}
 			)
 		}
@@ -335,7 +335,7 @@ extension AccountPortfoliosClient {
 		return { pageCursor in
 			let request = GatewayAPI.StateEntityNonFungibleIdsPageRequest(
 				atLedgerState: pageCursor?.ledgerState.selector,
-				cursor: pageCursor?.nextPagCursor,
+				cursor: pageCursor?.nextPageCursor,
 				address: accountAddress,
 				vaultAddress: vaultAddress,
 				resourceAddress: resourceAddress
@@ -346,7 +346,7 @@ extension AccountPortfoliosClient {
 				loadedItems: response.items,
 				totalCount: response.totalCount,
 				cursor: response.nextCursor.map {
-					PageCursor(ledgerState: response.ledgerState, nextPagCursor: $0)
+					PageCursor(ledgerState: response.ledgerState, nextPageCursor: $0)
 				}
 			)
 		}
@@ -388,7 +388,7 @@ extension AccountPortfoliosClient {
 	/// A page cursor is required to have the `nextPageCurosr` itself, as well the `ledgerState` of the previous page.
 	struct PageCursor: Hashable, Sendable {
 		let ledgerState: GatewayAPI.LedgerState
-		let nextPagCursor: String
+		let nextPageCursor: String
 	}
 
 	struct PaginatedResourceResponse<Resource: Sendable>: Sendable {
