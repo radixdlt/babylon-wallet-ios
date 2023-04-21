@@ -61,7 +61,7 @@ extension CacheClient {
 
 		public enum AccountQuantifier: Equatable {
 			case single(_ address: String)
-			case all(_ addresses: [String])
+			case all
 		}
 
 		var filesystemFilePath: String {

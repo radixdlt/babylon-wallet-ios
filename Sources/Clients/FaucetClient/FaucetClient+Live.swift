@@ -90,25 +90,46 @@ extension FaucetClient: DependencyKey {
 		#if DEBUG
 		let createFungibleToken: CreateFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			try await signSubmitTX(
-				manifest: engineToolkitClient.manifestForCreateFungibleToken(
-					networkID: networkID,
-					accountAddress: request.recipientAccountAddress,
-					tokenName: request.name,
-					tokenSymbol: request.symbol
-				)
-			)
+			let manifest = try {
+				if request.numberOfTokens == 1 {
+					return try engineToolkitClient.manifestForCreateFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						tokenName: request.name,
+						tokenSymbol: request.symbol
+					)
+				} else {
+					return try engineToolkitClient.manifestForMultipleCreateFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						tokensCount: request.numberOfTokens
+					)
+				}
+			}()
+
+			try await signSubmitTX(manifest: manifest)
 		}
 
 		let createNonFungibleToken: CreateNonFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			try await signSubmitTX(
-				manifest: engineToolkitClient.manifestForCreateNonFungibleToken(
-					networkID: networkID,
-					accountAddress: request.recipientAccountAddress,
-					nftName: request.name
-				)
-			)
+			let manifest = try {
+				if request.numberOfTokens == 1 {
+					return try engineToolkitClient.manifestForCreateNonFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						nftName: request.name
+					)
+				} else {
+					return try engineToolkitClient.manifestForCreateMultipleNonFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						tokensCount: request.numberOfTokens,
+						idsCount: request.numberOfIds
+					)
+				}
+			}()
+
+			try await signSubmitTX(manifest: manifest)
 		}
 
 		return Self(

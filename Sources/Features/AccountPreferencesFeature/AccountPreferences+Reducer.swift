@@ -11,6 +11,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
+		public var createMultipleFungibleTokenButtonState: ControlState
+		public var createMultipleNonFungibleTokenButtonState: ControlState
 		#endif
 
 		public init(
@@ -23,6 +25,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			#if DEBUG
 			self.createFungibleTokenButtonState = .enabled
 			self.createNonFungibleTokenButtonState = .enabled
+			self.createMultipleFungibleTokenButtonState = .enabled
+			self.createMultipleNonFungibleTokenButtonState = .enabled
 			#endif
 		}
 	}
@@ -35,6 +39,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case createFungibleTokenButtonTapped
 		case createNonFungibleTokenButtonTapped
+		case createMultipleFungibleTokenButtonTapped
+		case createMultipleNonFungibleTokenButtonTapped
 		#endif
 	}
 
@@ -81,6 +87,21 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return call(buttonState: \.createNonFungibleTokenButtonState, into: &state) {
 				try await faucetClient.createNonFungibleToken(.init(
 					recipientAccountAddress: $0
+				))
+			}
+		case .createMultipleFungibleTokenButtonTapped:
+			return call(buttonState: \.createMultipleFungibleTokenButtonState, into: &state) {
+				try await faucetClient.createFungibleToken(.init(
+					recipientAccountAddress: $0,
+					numberOfTokens: 50
+				))
+			}
+		case .createMultipleNonFungibleTokenButtonTapped:
+			return call(buttonState: \.createMultipleNonFungibleTokenButtonState, into: &state) {
+				try await faucetClient.createNonFungibleToken(.init(
+					recipientAccountAddress: $0,
+					numberOfTokens: 10,
+					numberOfIds: 100
 				))
 			}
 		#endif

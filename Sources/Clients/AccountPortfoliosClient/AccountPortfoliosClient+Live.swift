@@ -178,8 +178,6 @@ extension AccountPortfoliosClient {
 	static func createFungibleResources(
 		rawItems: [GatewayAPI.FungibleResourcesCollectionItem]
 	) async throws -> AccountPortfolio.FungibleResources {
-		@Dependency(\.engineToolkitClient) var engineToolkitClient
-
 		// We are interested in vault aggregated items
 		let rawItems = rawItems.compactMap(\.vault)
 		guard !rawItems.isEmpty else {
@@ -191,9 +189,10 @@ extension AccountPortfoliosClient {
 		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
 		var xrdResource: AccountPortfolio.FungibleResource?
-		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
+		var resourcesWithValue: [AccountPortfolio.FungibleResource] = []
+		var resourcesWithoutValue: [AccountPortfolio.FungibleResource] = []
 
-		for resource in rawItems {
+		let fungibleresources = rawItems.map { resource in
 			let amount: BigDecimal = {
 				// Resources of an account always have one single vault which stores the value.
 				guard let resourceVault = resource.vaults.items.first else {
@@ -216,26 +215,16 @@ extension AccountPortfoliosClient {
 			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.FungibleResourcesCollectionItem
 			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
 
-			let resource = AccountPortfolio.FungibleResource(
+			return AccountPortfolio.FungibleResource(
 				resourceAddress: resourceAddress,
 				amount: amount,
 				name: metadata?.name,
 				symbol: metadata?.symbol,
 				description: metadata?.description
 			)
-
-			let isXRD = try engineToolkitClient.isXRD(resource: resourceAddress, on: Radix.Network.default.id)
-			if isXRD {
-				xrdResource = resource
-			} else {
-				nonXrdResources.append(resource)
-			}
 		}
 
-		return .init(
-			xrdResource: xrdResource,
-			nonXrdResources: nonXrdResources
-		)
+		return fungibleresources.sorted()
 	}
 
 	@Sendable
@@ -448,5 +437,41 @@ extension AccountPortfoliosClient {
 				PaginatedResourceResponse(loadedItems: [], totalCount: nil, cursor: $0)
 			}
 		)
+	}
+}
+
+extension Array where Element == AccountPortfolio.FungibleResource {
+	func sorted() -> AccountPortfolio.FungibleResources {
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
+
+		var xrdResource: AccountPortfolio.FungibleResource?
+		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
+
+		for resource in self {
+			let isXRD = try? engineToolkitClient.isXRD(resource: resource.resourceAddress, on: Radix.Network.default.id)
+			if isXRD == true {
+				xrdResource = resource
+			} else {
+				nonXrdResources.append(resource)
+			}
+		}
+
+		let sortedNonXrdresources = nonXrdResources.sorted { lhs, rhs in
+			if lhs.amount == rhs.amount, lhs.amount == .zero {
+				if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
+					return lhsSymbol < rhsSymbol
+				}
+
+				if let lhsName = lhs.name, let rhsName = rhs.name {
+					return lhsName < rhsName
+				}
+
+				return lhs.id.address > rhs.id.address
+			}
+
+			return lhs.amount > rhs.amount
+		}
+
+		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdresources)
 	}
 }

@@ -84,28 +84,42 @@ extension EngineToolkitClient {
 
 #if DEBUG
 extension EngineToolkitClient {
-	public func manifestForCreateFungibleToken(
+	public func manifestForMultipleCreateFungibleToken(
 		networkID: NetworkID,
 		accountAddress: AccountAddress,
-		tokenDivisivility: UInt8 = 18,
-		tokenName: String = "Token Test",
-		description: String = "A very innovative and important resource.",
-		tokenSymbol: String = "TEST",
-		initialSupply: String = "21000000",
-		tokensCount: Int = 100
+		tokensCount: Int = 20
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
 		let tokens = stride(from: 0, to: tokensCount, by: 1).map { _ in
-			CreateFungibleResourceWithInitialSupply(
-				divisibility: tokenDivisivility,
+			var metdataEntries: [[ManifestASTValue]] = []
+
+			let addName = Bool.random()
+			let addSymbol = Bool.random()
+			let hasSupply = Bool.random()
+			let initialSupply = String(Int.random(in: 0 ..< 100_000))
+			let description = BIP39.randomPhrase(maxSize: 20)
+			if addName {
+				// compose name from two strings
+				let name = [BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown", BIP39.WordList.english.randomElement() ?? "Unknown"].joined(separator: " ")
+				// add Name
+				metdataEntries.append([.string("name"), .string(name)])
+			}
+
+			if addSymbol {
+				// add symbol
+				metdataEntries.append([.string("symbol"), .string(BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown")])
+			}
+
+			metdataEntries.append(
+				[.string("description"), .string(description)]
+			)
+
+			return CreateFungibleResourceWithInitialSupply(
+				divisibility: 18,
 				metadata: Map_(
 					keyValueKind: .string,
 					valueValueKind: .string,
-					entries: [
-						[.string("name"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
-						[.string("symbol"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
-						[.string("description"), .string(description)],
-					]
+					entries: metdataEntries
 				),
 
 				accessRules: .init(
@@ -119,10 +133,10 @@ extension EngineToolkitClient {
 				initialSupply: .decimal(.init(value: initialSupply))
 			)
 		}
+
 		let instructions: [any InstructionProtocol] = [
 			lockFeeCallMethod(address: faucetAddress),
-		] +
-			tokens +
+		] + tokens +
 			[
 				CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
 					Expression(stringLiteral: "ENTIRE_WORKTOP")
@@ -132,22 +146,60 @@ extension EngineToolkitClient {
 		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
 
+	public func manifestForCreateFungibleToken(
+		networkID: NetworkID,
+		accountAddress: AccountAddress,
+		tokenDivisivility: UInt8 = 18,
+		tokenName: String = "Token Test",
+		description: String = "A very innovative and important resource.",
+		tokenSymbol: String = "TEST",
+		initialSupply: String = "21000000"
+	) throws -> TransactionManifest {
+		let faucetAddress = try faucetAddress(for: networkID)
+		let instructions: [any InstructionProtocol] = [
+			lockFeeCallMethod(address: faucetAddress),
+
+			CreateFungibleResourceWithInitialSupply(
+				divisibility: tokenDivisivility,
+				metadata: Map_(
+					keyValueKind: .string,
+					valueValueKind: .string,
+					entries: [
+						//   [.string("name"), .string(tokenName)],
+						// [.string("symbol"), .string(tokenSymbol)],
+						[.string("description"), .string(description)],
+					]
+				),
+
+				accessRules: .init(
+					keyValueKind: .enum,
+					valueValueKind: .tuple,
+					entries: [
+						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					]
+				),
+				initialSupply: .decimal(.init(value: initialSupply))
+			),
+
+			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			},
+		]
+
+		return .init(instructions: .parsed(instructions.map { $0.embed() }))
+	}
+
 	public func manifestForCreateNonFungibleToken(
 		networkID: NetworkID,
 		accountAddress: AccountAddress,
 		nftName: String = "NFT Test",
-		nftDescription: String = "Artsy cool unique NFT",
-		tokensCount: Int = 10,
-		idsCount: Int = 300
+		nftDescription: String = "Artsy cool unique NFT"
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
-		let ids = stride(from: 0, to: idsCount, by: 1).map {
-			[ManifestASTValue.nonFungibleLocalId(.integer(UInt64($0))), .tuple([.tuple(
-				[.string("Hello World \($0)"), .decimal(.init(value: "\($0)"))]
-			)])]
-		}
+		let instructions: [any InstructionProtocol] = [
+			lockFeeCallMethod(address: faucetAddress),
 
-		let tokens = try stride(from: 0, to: tokensCount, by: 1).map { _ in
 			try CreateNonFungibleResourceWithInitialSupply(
 				idType: .init(.string("NonFungibleIdType::Integer")),
 				schema: [
@@ -163,9 +215,76 @@ extension EngineToolkitClient {
 					keyValueKind: .string,
 					valueValueKind: .string,
 					entries: [
-						[.string("name"), .string(BIP39.WordList.english.randomElement() ?? "Unknown")],
+						[.string("name"), .string(nftName)],
 						[.string("description"), .string(nftDescription)],
 					]
+				),
+				accessRules: .init(
+					keyValueKind: .enum,
+					valueValueKind: .tuple,
+					entries: [
+						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					]
+				),
+				initialSupply: .map(
+					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
+						[.nonFungibleLocalId(.integer(1)), .tuple([.tuple(
+							[.string("Hello World"), .decimal(.init(value: "12"))]
+						)])],
+					])
+				)
+			),
+
+			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+				Expression(stringLiteral: "ENTIRE_WORKTOP")
+			},
+		]
+
+		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))
+	}
+
+	public func manifestForCreateMultipleNonFungibleToken(
+		networkID: NetworkID,
+		accountAddress: AccountAddress,
+		tokensCount: Int = 10,
+		idsCount: Int = 100
+	) throws -> TransactionManifest {
+		let faucetAddress = try faucetAddress(for: networkID)
+		let tokens = try stride(from: 0, to: tokensCount, by: 1).map { _ in
+			var metadataEntries: [[ManifestASTValue]] = []
+			let shouldAddName = Bool.random()
+			if shouldAddName {
+				metadataEntries.append(
+					[.string("name"), .string(BIP39.randomPhrase(maxSize: 5))]
+				)
+			}
+
+			metadataEntries.append(
+				[.string("description"), .string(BIP39.randomPhrase(maxSize: 20))]
+			)
+
+			let ids = stride(from: 0, to: idsCount, by: 1).map {
+				[ManifestASTValue.nonFungibleLocalId(.integer(UInt64($0))), .tuple([.tuple(
+					[.string("Hello World \($0)"), .decimal(.init(value: "\($0)"))]
+				)])]
+			}
+
+			return try CreateNonFungibleResourceWithInitialSupply(
+				idType: .init(.string("NonFungibleIdType::Integer")),
+				schema: [
+					.tuple([
+						.array(.init(elementKind: .enum, elements: [])),
+						.array(.init(elementKind: .tuple, elements: [])),
+						.array(.init(elementKind: .enum, elements: [])),
+					]),
+					.enum(.init(.u8(0), fields: [.u8(64)])),
+					.array(.init(elementKind: .string, elements: [])),
+				],
+				metadata: Map_(
+					keyValueKind: .string,
+					valueValueKind: .string,
+					entries: metadataEntries
 				),
 				accessRules: .init(
 					keyValueKind: .enum,
@@ -185,44 +304,15 @@ extension EngineToolkitClient {
 			Expression(stringLiteral: "ENTIRE_WORKTOP")
 		}]
 
-//			try CreateNonFungibleResourceWithInitialSupply(
-//				idType: .init(.string("NonFungibleIdType::Integer")),
-//				schema: [
-//					.tuple([
-//						.array(.init(elementKind: .enum, elements: [])),
-//						.array(.init(elementKind: .tuple, elements: [])),
-//						.array(.init(elementKind: .enum, elements: [])),
-//					]),
-//					.enum(.init(.u8(0), fields: [.u8(64)])),
-//					.array(.init(elementKind: .string, elements: [])),
-//				],
-//				metadata: Map_(
-//					keyValueKind: .string,
-//					valueValueKind: .string,
-//					entries: [
-//						[.string("name"), .string(nftName)],
-//						[.string("description"), .string(nftDescription)],
-//					]
-//				),
-//				accessRules: .init(
-//					keyValueKind: .enum,
-//					valueValueKind: .tuple,
-//					entries: [
-//						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-//						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-//					]
-//				),
-//				initialSupply: .map(
-//					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: ids)
-//				)
-//			),
-//
-//			CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
-//				Expression(stringLiteral: "ENTIRE_WORKTOP")
-//			},
-//		]
-
 		return TransactionManifest(instructions: .parsed(instructions.map { $0.embed() }))
+	}
+}
+
+extension BIP39 {
+	static func randomPhrase(maxSize: Int) -> String {
+		stride(from: 0, to: Int.random(in: 1 ..< maxSize), by: 1)
+			.compactMap { _ in BIP39.WordList.english.randomElement() }
+			.joined(separator: " ")
 	}
 }
 #endif // DEBUG
