@@ -78,7 +78,7 @@ package.addModules([
 	.feature(
 		name: "AssetTransferFeature",
 		dependencies: [
-			"TransactionSigningFeature",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
 		],
 		tests: .yes()
 	),
@@ -291,16 +291,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-	.feature(
-		name: "TransactionSigningFeature",
-		dependencies: [
-			"GatewayAPI",
-			"GatewaysClient",
-			"TransactionClient",
-		],
-		tests: .yes()
-	),
-
 ])
 
 // MARK: - Clients

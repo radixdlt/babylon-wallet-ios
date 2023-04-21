@@ -6,8 +6,6 @@ public struct TransactionClient: Sendable, DependencyKey {
 	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
 	public var addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest
 	public var addGuaranteesToManifest: AddGuaranteesToManifest
-	public var signAndSubmitTransaction: SignAndSubmitTransaction
-	public var getTransactionResult: GetTransactionResult
 	public var getTransactionReview: GetTransactionReview
 }
 
@@ -16,12 +14,9 @@ extension TransactionClient {
 	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> (manifest: TransactionManifest, feeAdded: BigDecimal)
 	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
-	public typealias SignAndSubmitTransaction = @Sendable (SignManifestRequest) async -> TransactionResult
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async -> TransactionReviewResult
-	public typealias GetTransactionResult = @Sendable (TXID) async -> TransactionResult
 }
 
-public typealias TransactionResult = Swift.Result<TXID, TransactionFailure>
 public typealias TransactionReviewResult = Swift.Result<TransactionToReview, TransactionFailure>
 
 extension DependencyValues {
@@ -45,23 +40,6 @@ extension TransactionClient {
 			self.instructionIndex = instructionIndex
 			self.resourceAddress = resourceAddress
 		}
-	}
-}
-
-// MARK: - SignManifestRequest
-public struct SignManifestRequest: Sendable {
-	public let manifestToSign: TransactionManifest
-	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let selectNotary: SelectNotary
-
-	public init(
-		manifestToSign: TransactionManifest,
-		makeTransactionHeaderInput: MakeTransactionHeaderInput,
-		selectNotary: @escaping SelectNotary = { $0.first }
-	) {
-		self.manifestToSign = manifestToSign
-		self.makeTransactionHeaderInput = makeTransactionHeaderInput
-		self.selectNotary = selectNotary
 	}
 }
 

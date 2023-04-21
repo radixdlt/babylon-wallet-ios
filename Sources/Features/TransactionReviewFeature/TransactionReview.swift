@@ -67,9 +67,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TransactionReviewResult)
 		case createTransactionReview(TransactionReview.TransactionContent)
-		case signTransactionResult(TransactionResult)
+//		case signTransactionResult(TransactionResult)
 		case rawTransactionCreated(String)
-		case transactionPollingResult(TransactionResult)
+//		case transactionPollingResult(TransactionResult)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -143,17 +143,18 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.isProcessingTransaction = true
 			let guarantees = state.allGuarantees
 
-			return .run { send in
+			return .run { _ in
 				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
 
-				let signRequest = SignManifestRequest(
-					manifestToSign: manifest,
-					makeTransactionHeaderInput: .default
-				)
-
-				await send(.internal(.signTransactionResult(
-					transactionClient.signAndSubmitTransaction(signRequest)
-				)))
+//				let signRequest = SignManifestRequest(
+//					manifestToSign: manifest,
+//					makeTransactionHeaderInput: .default
+//				)
+//
+//				await send(.internal(.signTransactionResult(
+//					transactionClient.signAndSubmitTransaction(signRequest)
+//				)))
+				fatalError()
 			}
 		}
 	}
@@ -231,29 +232,29 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.networkFee = content.networkFee
 			return .none
 
-		case let .signTransactionResult(.success(txID)):
-			return .run { send in
-				await send(.delegate(.signedTXAndSubmittedToGateway(txID)))
-
-				await send(.internal(.transactionPollingResult(
-					transactionClient.getTransactionResult(txID)
-				)))
-			}
-
-		case let .signTransactionResult(.failure(transactionFailure)):
-			state.isProcessingTransaction = false
-			return .send(.delegate(.failed(transactionFailure)))
-
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(error)))
 
-		case let .transactionPollingResult(.success(txID)):
-			state.isProcessingTransaction = false
-			return .send(.delegate(.transactionCompleted(txID)))
-
-		case let .transactionPollingResult(.failure(error)):
-			state.isProcessingTransaction = false
-			return .send(.delegate(.failed(error)))
+//		case let .signTransactionResult(.success(txID)):
+//			return .run { send in
+//				await send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+//
+//				await send(.internal(.transactionPollingResult(
+//					transactionClient.getTransactionResult(txID)
+//				)))
+//			}
+//
+//		case let .signTransactionResult(.failure(transactionFailure)):
+//			state.isProcessingTransaction = false
+//			return .send(.delegate(.failed(transactionFailure)))
+//
+//		case let .transactionPollingResult(.success(txID)):
+//			state.isProcessingTransaction = false
+//			return .send(.delegate(.transactionCompleted(txID)))
+//
+//		case let .transactionPollingResult(.failure(error)):
+//			state.isProcessingTransaction = false
+//			return .send(.delegate(.failed(error)))
 
 		case let .rawTransactionCreated(transaction):
 			state.displayMode = .raw(transaction)

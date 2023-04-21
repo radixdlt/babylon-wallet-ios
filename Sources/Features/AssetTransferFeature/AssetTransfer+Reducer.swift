@@ -1,5 +1,5 @@
+import ComposableArchitecture
 import FeaturePrelude
-import TransactionSigningFeature
 
 // MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, FeatureReducer {
@@ -29,8 +29,8 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public var amount: Decimal_?
 		public var to: To?
 
-		@PresentationState
-		public var destination: Destinations.State?
+//		@PresentationState
+//		public var destination: Destinations.State?
 
 		public init(
 			from: From,
@@ -51,33 +51,33 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case nextButtonTapped(amount: Decimal_, toAddress: AccountAddress)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
+//	public enum ChildAction: Sendable, Equatable {
+//		case destination(PresentationAction<Destinations.Action>)
+//	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
-		public enum State: Hashable {
-			case transactionSigning(TransactionSigning.State)
-		}
-
-		public enum Action: Equatable {
-			case transactionSigning(TransactionSigning.Action)
-		}
-
-		public var body: some ReducerProtocol<State, Action> {
-			Scope(state: /State.transactionSigning, action: /Action.transactionSigning) {
-				TransactionSigning()
-			}
-		}
-	}
+//	public struct Destinations: Sendable, ReducerProtocol {
+//		public enum State: Hashable {
+//			case transactionSigning(TransactionSigning.State)
+//		}
+//
+//		public enum Action: Equatable {
+//			case transactionSigning(TransactionSigning.Action)
+//		}
+//
+//		public var body: some ReducerProtocol<State, Action> {
+//			Scope(state: /State.transactionSigning, action: /Action.transactionSigning) {
+//				TransactionSigning()
+//			}
+//		}
+//	}
 
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
-			}
+//			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+//				Destinations()
+//			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

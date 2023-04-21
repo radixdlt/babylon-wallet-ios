@@ -42,17 +42,18 @@ extension FaucetClient: DependencyKey {
 		}
 
 		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
-			@Dependency(\.transactionClient) var transactionClient
+//			@Dependency(\.transactionClient) var transactionClient
 
-			let signSubmitTXRequest = SignManifestRequest(
-				manifestToSign: manifest,
-				makeTransactionHeaderInput: .default
-			)
-
-			let _ = try await transactionClient
-				.signAndSubmitTransaction(signSubmitTXRequest)
-				.asyncFlatMap(transform: transactionClient.getTransactionResult)
-				.get()
+//			let signSubmitTXRequest = SignManifestRequest(
+//				manifestToSign: manifest,
+//				makeTransactionHeaderInput: .default
+//			)
+//
+//			let _ = try await transactionClient
+//				.signAndSubmitTransaction(signSubmitTXRequest)
+//				.asyncFlatMap(transform: transactionClient.getTransactionResult)
+//				.get()
+			fatalError()
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in

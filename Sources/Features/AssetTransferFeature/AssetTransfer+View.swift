@@ -1,5 +1,4 @@
 import FeaturePrelude
-import TransactionSigningFeature
 
 extension AssetTransfer.State {
 	var viewState: AssetTransfer.ViewState {
@@ -107,12 +106,12 @@ extension AssetTransfer.View {
 								.padding()
 						}
 					}
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /AssetTransfer.Destinations.State.transactionSigning,
-						action: AssetTransfer.Destinations.Action.transactionSigning,
-						content: { TransactionSigning.View(store: $0) }
-					)
+//					.sheet(
+//						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+//						state: /AssetTransfer.Destinations.State.transactionSigning,
+//						action: AssetTransfer.Destinations.Action.transactionSigning,
+//						content: { TransactionSigning.View(store: $0) }
+//					)
 			}
 		}
 	}
