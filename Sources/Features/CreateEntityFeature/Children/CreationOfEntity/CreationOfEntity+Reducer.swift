@@ -11,24 +11,13 @@ public enum GenesisFactorSourceSelection: Sendable, Hashable {
 	case ledger(ledgerFactorSources: [FactorSource])
 }
 
-extension FactorSourceID {
-	static let dummy = try! Self(hexCodable: .init(data: Data(repeating: 0x00, count: 32)))
-}
-
 // MARK: - CreationOfEntity
 public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let networkID: NetworkID?
 		public let name: NonEmptyString
 		public let genesisFactorSourceSelection: GenesisFactorSourceSelection
-		public var selectedLedgerID: FactorSource.ID = .dummy
-		public var useLedgerAsFactorSource: Bool {
-			switch genesisFactorSourceSelection {
-			case .ledger: return true
-			case .device: return false
-			}
-		}
-
+		public var selectedLedgerID: FactorSource.ID? = nil
 		public var ledgers: IdentifiedArrayOf<FactorSource> = []
 
 		@PresentationState
@@ -47,7 +36,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case selectedLedger(id: FactorSource.ID)
+		case selectedLedger(id: FactorSource.ID?)
 		case addNewLedgerButtonTapped
 		case confirmedLedger(FactorSource)
 	}
@@ -126,6 +115,15 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 
 		default:
 			return .none
+		}
+	}
+}
+
+extension CreationOfEntity.State {
+	public var useLedgerAsFactorSource: Bool {
+		switch genesisFactorSourceSelection {
+		case .ledger: return true
+		case .device: return false
 		}
 	}
 }

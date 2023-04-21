@@ -8,7 +8,7 @@ extension CreationOfEntity {
 		let entityKindName: String
 		let useLedgerAsFactorSource: Bool
 		let ledgers: IdentifiedArrayOf<FactorSource>
-		let selectedLedgerID: FactorSourceID
+		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 
 		struct SelectedLedgerControlRequirements: Hashable {
@@ -25,7 +25,7 @@ extension CreationOfEntity {
 			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
 			self.ledgers = state.ledgers
 			self.selectedLedgerID = state.selectedLedgerID
-			if let selectedLedger = state.ledgers[id: state.selectedLedgerID] {
+			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers[id: id] {
 				self.selectedLedgerControlRequirements = .init(selectedLedger: selectedLedger)
 			} else {
 				self.selectedLedgerControlRequirements = nil
