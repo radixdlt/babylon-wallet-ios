@@ -1,3 +1,4 @@
+import AddLedgerFactorSourceFeature
 import FeaturePrelude
 
 // MARK: - ManageFactorSources
@@ -15,15 +16,20 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case importOlympiaFactorSource(ImportOlympiaFactorSource.State)
+			case addLedger(AddLedgerFactorSource.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case importOlympiaFactorSource(ImportOlympiaFactorSource.Action)
+			case addLedger(AddLedgerFactorSource.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.importOlympiaFactorSource, action: /Action.importOlympiaFactorSource) {
 				ImportOlympiaFactorSource()
+			}
+			Scope(state: /State.addLedger, action: /Action.addLedger) {
+				AddLedgerFactorSource()
 			}
 		}
 	}
@@ -32,6 +38,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case importOlympiaFactorSourceButtonTapped
+		case addLedgerButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -70,6 +77,9 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 		case .importOlympiaFactorSourceButtonTapped:
 			state.destination = .importOlympiaFactorSource(.init(shouldPersist: true))
 			return .none
+		case .addLedgerButtonTapped:
+			state.destination = .addLedger(.init())
+			return .none
 		}
 	}
 
@@ -92,6 +102,11 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 		case .destination(.presented(.importOlympiaFactorSource(.delegate(.persisted)))):
 			state.destination = nil
 			return .none
+
+		case let .destination(.presented(.addLedger(.delegate(.completed(ledger))))):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}

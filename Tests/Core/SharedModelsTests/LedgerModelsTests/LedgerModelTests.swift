@@ -62,4 +62,38 @@ final class LedgerModelTests: TestCase {
 			expectedJSON
 		)
 	}
+
+	func test_decode_getDeviceInfo() throws {
+		let json: JSON = [
+			"success": [
+				"id": "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0",
+				"model": "nanoS",
+			],
+			"interactionId": "5B2803A9-0EBC-4056-A724-4A0F95C8827C",
+			"discriminator": "getDeviceInfo",
+		]
+
+		let expected = try P2P.ConnectorExtension.Response.LedgerHardwareWallet(
+			interactionID: "5B2803A9-0EBC-4056-A724-4A0F95C8827C",
+			discriminator: .getDeviceInfo,
+			response: .success(
+				.getDeviceInfo(.init(
+					id: .init(hex: "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0"),
+					model: .nanoS
+				))
+			)
+		)
+
+		// Decode assocated value
+		try XCTAssertJSONDecoding(
+			json,
+			expected
+		)
+
+		// Decode enum
+		try XCTAssertJSONDecoding(
+			json,
+			P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
+		)
+	}
 }

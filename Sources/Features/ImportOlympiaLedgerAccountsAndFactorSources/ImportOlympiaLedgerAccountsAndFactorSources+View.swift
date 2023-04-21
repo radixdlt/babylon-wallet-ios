@@ -5,7 +5,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 		.init(
 			failedToFindAnyLinks: failedToFindAnyLinks,
 			ledgerName: ledgerName,
-			isLedgerNameInputVisible: isLedgerNameInputVisible,
+			modelOfLedgerToName: unnamedDeviceToAdd?.model,
 			numberOfUnverifiedAccounts: unverified.count,
 			addedLedgersWithAccounts: addedLedgersWithAccounts,
 			viewControlState: isWaitingForResponseFromLedger ? .loading(.global(text: "Waiting for ledger response")) : .enabled
@@ -18,7 +18,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	public struct ViewState: Equatable {
 		public let failedToFindAnyLinks: Bool
 		public let ledgerName: String
-		public let isLedgerNameInputVisible: Bool
+		public let modelOfLedgerToName: P2P.LedgerHardwareWallet.Model?
 		public let numberOfUnverifiedAccounts: Int
 		public let addedLedgersWithAccounts: OrderedSet<AddedLedgerWithAccounts>
 		public let viewControlState: ControlState
@@ -57,9 +57,9 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 					Spacer()
 
-					if viewStore.isLedgerNameInputVisible {
+					if let model = viewStore.modelOfLedgerToName {
 						VStack {
-							nameLedgerField(with: viewStore)
+							nameLedgerField(with: viewStore, model: model)
 
 							Button("Confirm name") {
 								viewStore.send(.confirmNameButtonTapped)
@@ -91,18 +91,24 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		}
 
 		@ViewBuilder
-		private func nameLedgerField(with viewStore: ViewStoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) -> some SwiftUI.View {
-			AppTextField(
-				primaryHeading: "Name this Ledger",
-				secondaryHeading: "e.g. 'scratch'",
-				placeholder: "scratched",
-				text: .init(
-					get: { viewStore.ledgerName },
-					set: { viewStore.send(.ledgerNameChanged($0)) }
-				),
-				hint: .info("Displayed when you are prompted to sign with this.")
-			)
-			.padding()
+		private func nameLedgerField(
+			with viewStore: ViewStoreOf<ImportOlympiaLedgerAccountsAndFactorSources>,
+			model: P2P.LedgerHardwareWallet.Model
+		) -> some SwiftUI.View {
+			VStack {
+				Text("Found ledger model: '\(model.rawValue)'")
+				AppTextField(
+					primaryHeading: "Name your Ledger",
+					secondaryHeading: "e.g. 'scratch'",
+					placeholder: "scratched",
+					text: .init(
+						get: { viewStore.ledgerName },
+						set: { viewStore.send(.ledgerNameChanged($0)) }
+					),
+					hint: .info("Displayed when you are prompted to sign with this.")
+				)
+				.padding()
+			}
 		}
 	}
 }

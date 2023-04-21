@@ -86,7 +86,7 @@ extension TransactionClient {
 					let curve = privateHDFactorSource.hdOnDeviceFactorSource.parameters.supportedCurves.last
 					let unhashedData = Data(unhashed_)
 
-					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.hdOnDeviceFactorSource.kind), factorSourceHint=\(privateHDFactorSource.hdOnDeviceFactorSource.hint)")
+					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.hdOnDeviceFactorSource.kind), factorSourceLabel=\(privateHDFactorSource.hdOnDeviceFactorSource.label), factorSourceDescription=\(privateHDFactorSource.hdOnDeviceFactorSource.description)")
 
 					return try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,

@@ -38,19 +38,49 @@ extension Profile.Network {
 			address: EntityAddress,
 			securityState: EntitySecurityState,
 			displayName: NonEmpty<String>,
-			fields: IdentifiedArrayOf<Field>
+			extraProperties: ExtraProperties
 		) {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.fields = fields
+			self.fields = extraProperties.fields
 			self.displayName = displayName
+		}
+
+		public init(
+			networkID: NetworkID,
+			address: EntityAddress,
+			securityState: EntitySecurityState,
+			displayName: NonEmpty<String>
+		) {
+			self.init(networkID: networkID, address: address, securityState: securityState, displayName: displayName, fields: [])
 		}
 	}
 }
 
 extension Profile.Network.Persona {
+	/// Ephemeral, only used as arg passed to init.
+	public struct ExtraProperties: Sendable, Hashable, Codable {
+		public var fields: IdentifiedArrayOf<Field>
+		public init(fields: IdentifiedArrayOf<Field> = []) {
+			self.fields = fields
+		}
+	}
+
+	public init(
+		networkID: NetworkID,
+		address: EntityAddress,
+		securityState: EntitySecurityState,
+		displayName: NonEmpty<String>,
+		fields: IdentifiedArrayOf<Field>
+	) {
+		self.init(networkID: networkID, address: address, securityState: securityState, displayName: displayName, extraProperties: .init(fields: fields))
+	}
+
 	public static var entityKind: EntityKind { .identity }
+
+	/// Noop
+	public mutating func updateAppearanceIDIfAble(_: Profile.Network.Account.AppearanceID) {}
 
 	public typealias EntityAddress = IdentityAddress
 

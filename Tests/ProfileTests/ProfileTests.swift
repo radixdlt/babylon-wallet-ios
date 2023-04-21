@@ -42,6 +42,28 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(factorSourceID.hex(), "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
+	func test_blake_hash() throws {
+		// https://github.com/radixdlt/radixdlt-scrypto/blob/2cdf297f6c7d8e52fd96bb964217a4833306e1ec/radix-engine-common/src/crypto/blake2b.rs#L15-L22
+		let digest = try blake2b(data: "Hello Radix".data(using: .utf8)!)
+		XCTAssertEqual(digest.hex, "48f1bd08444b5e713db9e14caac2faae71836786ac94d645b00679728202a935")
+	}
+
+	func test_factor_source_id_ledger() throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "equip will roof matter pink blind book anxiety banner elbow sun young",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
+		let key = try root.derivePublicKey(
+			path: .getID,
+			curve: Curve25519.self
+		)
+
+		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "e358493920c6f967dc16eff9943fcd5765ab8f42b338ee6769d8ba7f1b9e097f")
+		let factorSourceID = try FactorSource.id(fromRoot: root)
+		XCTAssertEqual(factorSourceID.hex(), "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
+	}
+
 	func test_factor_source_id_cap33() async throws {
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "surprise jaguar gloom bring cage obey rotate fiber agree castle rich tomorrow",
@@ -84,11 +106,13 @@ final class ProfileTests: TestCase {
 		} operation: {
 			let babylonFactorSource = try FactorSource.babylon(
 				mnemonic: curve25519FactorSourceMnemonic,
-				hint: creatingDevice
+				label: factorSourceLabel,
+				description: factorSourceDescription
 			)
 			let olympiaFactorSource = try FactorSource.olympia(
 				mnemonic: secp256K1FactorMnemonic,
-				hint: creatingDevice
+				label: factorSourceLabel,
+				description: factorSourceDescription
 			)
 			let profile = Profile(
 				factorSource: babylonFactorSource.factorSource,
@@ -105,7 +129,7 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(olympiaFactorSource.factorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-			let index = profile.factorSources.babylonDevice.deviceStorage.nextForEntity(
+			let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(
 				kind: .account,
 				networkID: profile.networkID
 			)
@@ -150,7 +174,7 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-			let index = profile.factorSources.babylonDevice.deviceStorage.nextForEntity(kind: .identity, networkID: profile.networkID)
+			let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID)
 
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
@@ -267,7 +291,6 @@ final class ProfileTests: TestCase {
 					))
 			)
 		)
-
 		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
 		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
@@ -300,12 +323,13 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(profile.factorSources.count, 2)
 		for factorSource in profile.factorSources {
-			XCTAssertEqual(factorSource.hint, creatingDevice)
+			XCTAssertEqual(factorSource.label, factorSourceLabel)
+			XCTAssertEqual(factorSource.description, factorSourceDescription)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
 		XCTAssertNil(profile.factorSources.last.storage)
-		XCTAssertEqual(deviceFactorSource.deviceStorage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
-		XCTAssertEqual(deviceFactorSource.deviceStorage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
+		XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id
@@ -432,7 +456,9 @@ final class ProfileTests: TestCase {
 	}
 }
 
-private let creatingDevice: NonEmptyString = "computerRunningUnitTest"
+private let factorSourceLabel: FactorSource.Label = "computer"
+private let factorSourceDescription: FactorSource.Description = "unit test"
+private let creatingDevice: NonEmptyString = "\(factorSourceLabel) \(factorSourceDescription)"
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {

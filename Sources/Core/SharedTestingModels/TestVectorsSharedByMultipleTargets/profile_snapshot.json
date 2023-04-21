@@ -32,13 +32,14 @@
       "isDeveloperModeEnabled" : true
     }
   },
-  "creatingDevice" : "computerRunningUnitTest",
+  "creatingDevice" : "computer unit test",
   "factorSources" : [
     {
       "addedOn" : "1970-01-01T00:00:00Z",
-      "hint" : "computerRunningUnitTest",
+      "description" : "unit test",
       "id" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033",
       "kind" : "device",
+      "label" : "computer",
       "lastUsedOn" : "1970-01-01T00:00:00Z",
       "parameters" : {
         "supportedCurves" : [
@@ -49,7 +50,7 @@
         ]
       },
       "storage" : {
-        "discriminator" : "device",
+        "discriminator" : "entityCreating",
         "nextDerivationIndicesPerNetwork" : [
           {
             "forAccount" : 3,
@@ -61,9 +62,10 @@
     },
     {
       "addedOn" : "1970-01-01T00:00:00Z",
-      "hint" : "computerRunningUnitTest",
+      "description" : "unit test",
       "id" : "c23c47a8a37b79298878506692e42f3a1a11967ff1239bb344ad6ab0c21ddda8",
       "kind" : "device",
+      "label" : "computer",
       "lastUsedOn" : "1970-01-01T00:00:00Z",
       "parameters" : {
         "supportedCurves" : [
@@ -168,8 +170,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
+                "givenName",
+                "familyName"
               ]
             },
             {
@@ -259,5 +261,5 @@
       ]
     }
   ],
-  "version" : 28
+  "version" : 29
 }

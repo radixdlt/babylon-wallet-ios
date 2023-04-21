@@ -76,11 +76,13 @@ extension NextDerivationIndicesPerNetwork {
 	}
 }
 
-// MARK: - DeviceStorage
-public struct DeviceStorage: Sendable, Hashable, Codable {
-	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
-	public init(nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork = .init()) {
-		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
+// MARK: - FactorSource.Storage.EntityCreating
+extension FactorSource.Storage {
+	public struct EntityCreating: Sendable, Hashable, Codable {
+		public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
+		public init(nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork = .init()) {
+			self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
+		}
 	}
 }
 
@@ -107,7 +109,7 @@ extension NextDerivationIndicesPerNetwork {
 	}
 }
 
-extension DeviceStorage {
+extension FactorSource.Storage.EntityCreating {
 	public func nextForEntity(
 		kind entityKind: EntityKind,
 		networkID: Radix.Network.ID
@@ -134,15 +136,15 @@ extension FactorSource.Storage {
 		networkID: NetworkID
 	) throws {
 		switch self {
-		case .forSecurityQuestions: throw Discrepancy()
-		case var .forDevice(deviceStorage):
-			deviceStorage.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
-			self = .forDevice(deviceStorage)
+		case .securityQuestions: throw Discrepancy()
+		case var .entityCreating(entityCreatingStorage):
+			entityCreatingStorage.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
+			self = .entityCreating(entityCreatingStorage)
 		}
 	}
 }
 
-extension DeviceStorage {
+extension FactorSource.Storage.EntityCreating {
 	public mutating func increaseNextDerivationIndex(
 		for entityKind: EntityKind,
 		networkID: NetworkID

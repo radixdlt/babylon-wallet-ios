@@ -13,8 +13,13 @@ extension NameNewEntity {
 		public let titleText: String
 		public let entityName: String
 		public let entityKindName: String
-		public let createEntityButtonState: ControlState
+		public let sanitizedNameRequirement: SanitizedNameRequirement?
+		public struct SanitizedNameRequirement: Equatable {
+			public let sanitizedName: NonEmptyString
+		}
+
 		public let focusedField: State.Field?
+		public let useLedgerAsFactorSource: Bool
 
 		init(state: State) {
 			let entityKind = Entity.entityKind
@@ -31,9 +36,13 @@ extension NameNewEntity {
 					return L10n.CreateEntity.NameNewEntity.Persona.title
 				}
 			}()
+			useLedgerAsFactorSource = state.useLedgerAsFactorSource
 			entityName = state.inputtedName
-			let isNameValid = state.sanitizedName != nil
-			createEntityButtonState = isNameValid ? .enabled : .disabled
+			if let sanitizedName = state.sanitizedName {
+				sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
+			} else {
+				sanitizedNameRequirement = nil
+			}
 			focusedField = state.focusedField
 		}
 	}
@@ -56,6 +65,8 @@ extension NameNewEntity {
 
 							VStack(spacing: .large1) {
 								subtitle(with: viewStore)
+
+								useLedgerAsFactorSource(with: viewStore)
 
 								let nameBinding = viewStore.binding(
 									get: \.entityName,
@@ -86,13 +97,14 @@ extension NameNewEntity {
 					#if os(iOS)
 					.toolbar(.visible, for: .navigationBar)
 					#endif
-					.safeAreaInset(edge: .bottom, spacing: 0) {
-						Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
-							viewStore.send(.confirmNameButtonTapped)
+					.footer {
+						WithControlRequirements(
+							viewStore.sanitizedNameRequirement,
+							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
+						) { action in
+							Button(L10n.CreateEntity.NameNewEntity.Name.Button.title, action: action)
+								.buttonStyle(.primaryRectangular)
 						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.createEntityButtonState)
-						.padding([.horizontal, .bottom], .medium1)
 					}
 					.onAppear {
 						viewStore.send(.appeared)
@@ -117,6 +129,19 @@ extension NameNewEntity.View {
 			.multilineTextAlignment(.center)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
+	}
+
+	private func useLedgerAsFactorSource(
+		with viewStore: ViewStoreOf<NameNewEntity>
+	) -> some SwiftUI.View {
+		ToggleView(
+			title: "Create with Ledger hardware wallet",
+			subtitle: "Requires you to sign transactions using your Ledger",
+			isOn: viewStore.binding(
+				get: \.useLedgerAsFactorSource,
+				send: { .useLedgerAsFactorSourceToggled($0) }
+			)
+		)
 	}
 }
 

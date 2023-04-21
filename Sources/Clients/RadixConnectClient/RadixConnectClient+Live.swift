@@ -1,5 +1,5 @@
 import ClientPrelude
-import ComposableArchitecture // actually CasePaths... but CI if we do `import CasePaths` 🤷‍♂️
+import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Network
 import P2PLinksClient
 import RadixConnect

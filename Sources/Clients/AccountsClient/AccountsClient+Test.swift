@@ -13,7 +13,8 @@ extension AccountsClient: TestDependencyKey {
 		getAccountsOnCurrentNetwork: { throw NoopError() },
 		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAccountsOnNetwork: { _ in throw NoopError() },
-		createUnsavedVirtualAccount: { _ in throw NoopError() },
+		newUnsavedVirtualAccountControlledByDeviceFactorSource: { _ in throw NoopError() },
+		newUnsavedVirtualAccountControlledByLedgerFactorSource: { _ in throw NoopError() },
 		saveVirtualAccount: { _ in },
 		getAccountByAddress: { _ in throw NoopError() },
 		hasAccountOnNetwork: { _ in false }
@@ -23,7 +24,8 @@ extension AccountsClient: TestDependencyKey {
 		getAccountsOnCurrentNetwork: unimplemented("\(Self.self).getAccountsOnCurrentNetwork"),
 		accountsOnCurrentNetwork: unimplemented("\(Self.self).accountsOnCurrentNetwork"),
 		getAccountsOnNetwork: unimplemented("\(Self.self).getAccountsOnNetwork"),
-		createUnsavedVirtualAccount: unimplemented("\(Self.self).createUnsavedVirtualAccount"),
+		newUnsavedVirtualAccountControlledByDeviceFactorSource: unimplemented("\(Self.self).newUnsavedVirtualAccountControlledByDeviceFactorSource"),
+		newUnsavedVirtualAccountControlledByLedgerFactorSource: unimplemented("\(Self.self).newUnsavedVirtualAccountControlledByLedgerFactorSource"),
 		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),
 		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork")

@@ -35,37 +35,22 @@ extension GeneralSettings {
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				VStack(spacing: .zero) {
-					developerModeRow(with: viewStore)
+					isDeveloperModeEnabled(with: viewStore)
 					Separator()
 				}
 				.padding(.medium3)
 			}
 		}
 
-		private func developerModeRow(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
-			HStack {
-				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.GeneralSettings.DeveloperMode.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1HighImportance)
-
-					Text(L10n.GeneralSettings.DeveloperMode.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.fixedSize()
-				}
-
-				let isDeveloperModeBinding = viewStore.binding(
+		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			ToggleView(
+				title: L10n.GeneralSettings.DeveloperMode.title,
+				subtitle: L10n.GeneralSettings.DeveloperMode.subtitle,
+				isOn: viewStore.binding(
 					get: \.isDeveloperModeEnabled,
 					send: { .developerModeToggled($0) }
 				)
-				Toggle(
-					isOn: isDeveloperModeBinding,
-					label: {}
-				)
-				.flushedRight
-			}
-			.frame(height: .largeButtonHeight)
+			)
 		}
 	}
 }

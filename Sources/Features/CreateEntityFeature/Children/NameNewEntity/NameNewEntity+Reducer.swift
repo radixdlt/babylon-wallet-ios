@@ -12,17 +12,20 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 		public var inputtedName: String
 		public var sanitizedName: NonEmptyString?
 		public var focusedField: Field?
+		public var useLedgerAsFactorSource: Bool
 
 		public init(
 			isFirst: Bool,
 			inputtedEntityName: String = "",
 			sanitizedName: NonEmptyString? = nil,
-			focusedField: Field? = nil
+			focusedField: Field? = nil,
+			useLedgerAsFactorSource: Bool = false
 		) {
 			self.inputtedName = inputtedEntityName
 			self.focusedField = focusedField
 			self.sanitizedName = sanitizedName
 			self.isFirst = isFirst
+			self.useLedgerAsFactorSource = useLedgerAsFactorSource
 		}
 
 		public init(config: CreateEntityConfig) {
@@ -32,9 +35,10 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case confirmNameButtonTapped
+		case confirmNameButtonTapped(NonEmptyString)
 		case textFieldFocused(State.Field?)
 		case textFieldChanged(String)
+		case useLedgerAsFactorSourceToggled(Bool)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -42,7 +46,7 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case named(NonEmpty<String>)
+		case proceed(nameOfEntity: NonEmpty<String>, useLedgerAsFactorSource: Bool)
 	}
 
 	@Dependency(\.continuousClock) var clock
@@ -58,13 +62,17 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 				await send(.internal(.focusTextField(.entityName)))
 			}
 
-		case .confirmNameButtonTapped:
-			guard let sanitizedName = state.sanitizedName else {
-				return .none
-			}
+		case let .useLedgerAsFactorSourceToggled(useLedgerAsFactorSource):
+			state.useLedgerAsFactorSource = useLedgerAsFactorSource
+			return .none
+
+		case let .confirmNameButtonTapped(sanitizedName):
 			state.focusedField = nil
-			return .run { send in
-				await send(.delegate(.named(sanitizedName)))
+			return .run { [useLedgerAsFactorSource = state.useLedgerAsFactorSource] send in
+				await send(.delegate(.proceed(
+					nameOfEntity: sanitizedName,
+					useLedgerAsFactorSource: useLedgerAsFactorSource
+				)))
 			}
 
 		case let .textFieldFocused(focus):

@@ -23,6 +23,11 @@ extension FactorSource {
 			supportedDerivationPathSchemes: [.cap26]
 		)
 
+		public static let trustedEntity = Self(
+			supportedCurves: .init(rawValue: [.curve25519])!, // keys are Curve25519 but we do not derive anything..
+			supportedDerivationPathSchemes: [] // no derivation
+		)
+
 		public static let olympiaBackwardsCompatible = Self(
 			supportedCurves: .init(rawValue: [.curve25519, .secp256k1])!,
 			supportedDerivationPathSchemes: [.cap26, .bip44Olympia]
