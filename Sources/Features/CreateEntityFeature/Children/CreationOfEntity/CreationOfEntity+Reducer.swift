@@ -88,6 +88,9 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 			case let .ledger(ledgers):
 				precondition(ledgers.allSatisfy { $0.kind == .ledgerHQHardwareWallet })
 				state.ledgers = IdentifiedArrayOf<FactorSource>.init(uniqueElements: ledgers, id: \.id)
+				if let first = ledgers.first {
+					state.selectedLedgerID = first.id
+				}
 				return .none
 			}
 		case let .selectedLedger(selectedID):

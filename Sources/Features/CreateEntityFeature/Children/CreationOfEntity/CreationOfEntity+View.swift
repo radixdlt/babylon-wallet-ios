@@ -114,16 +114,3 @@ extension CreationOfEntity.View {
 		Color.white
 	}
 }
-
-//// MARK: - LedgerView
-// struct LedgerView: SwiftUI.View {
-//    let ledger: FactorSource
-//    var body: some View {
-//        VStack {
-//            Text(ledger.label.rawValue)
-//            Text(ledger.description.rawValue)
-//            Text("Added: \(ledger.addedOn.ISO8601Format())")
-//            Text("Last used on: \(ledger.lastUsedOn.ISO8601Format())")
-//        }
-//    }
-// }
