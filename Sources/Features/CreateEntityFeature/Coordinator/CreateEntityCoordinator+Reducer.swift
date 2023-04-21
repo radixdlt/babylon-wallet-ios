@@ -38,8 +38,15 @@ public struct CreateEntityCoordinator<
 			guard config.canBeDismissed else {
 				return false
 			}
-			if let last = path.last, case .step3_completion = last {
-				return false
+			if let last = path.last {
+				if case .step3_completion = last {
+					return false
+				} else if case let .step2_creationOfEntity(creationOfEntity) = last {
+					// do not show back button when using `device` factor source
+					return creationOfEntity.useLedgerAsFactorSource
+				} else {
+					return true
+				}
 			}
 			return true
 		}

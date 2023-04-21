@@ -153,23 +153,28 @@ extension CreationOfEntity {
 		)
 
 		return .run { send in
-			await send(.internal(.createEntityResult(TaskResult {
-				switch entityKind {
-				case .account:
-					let account = try await accountsClient.newUnsavedVirtualAccountControlledByLedgerFactorSource(request)
-					try await accountsClient.saveVirtualAccount(.init(
-						account: account,
-						shouldUpdateFactorSourceNextDerivationIndex: true
-					))
-					return try account.cast()
-				case .identity:
-					//                    let persona = try await personasClient.newUnsavedVirtualPersonaControlledByDeviceFactorSource(request)
-					//                    try await personasClient.saveVirtualPersona(persona)
-					//                    return try persona.cast()
-					fatalError()
-				}
-			}
-			)))
+			await send(.internal(
+				.createEntityResult(
+					TaskResult {
+						let entity: Entity = try await {
+							switch entityKind {
+							case .account:
+								let account = try await accountsClient.newUnsavedVirtualAccountControlledByLedgerFactorSource(request)
+								try await accountsClient.saveVirtualAccount(.init(
+									account: account,
+									shouldUpdateFactorSourceNextDerivationIndex: true
+								))
+								return try account.cast()
+							case .identity:
+								let persona = try await personasClient.newUnsavedVirtualPersonaControlledByLedgerFactorSource(request)
+								try await personasClient.saveVirtualPersona(persona)
+								return try persona.cast()
+							}
+						}()
+						return entity
+					}
+				)
+			))
 		}
 	}
 

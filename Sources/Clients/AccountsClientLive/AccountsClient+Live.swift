@@ -28,7 +28,6 @@ extension AccountsClient: DependencyKey {
 				try await getProfileStore().profile.createNewUnsavedVirtualEntityControlledByDeviceFactorSource(request: request)
 			},
 			newUnsavedVirtualAccountControlledByLedgerFactorSource: { request in
-
 				try await getProfileStore().profile.createNewUnsavedVirtualEntityControlledByLedgerFactorSource(request: request)
 			},
 			saveVirtualAccount: saveVirtualAccount,

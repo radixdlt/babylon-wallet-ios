@@ -26,6 +26,9 @@ extension PersonasClient: DependencyKey {
 			newUnsavedVirtualPersonaControlledByDeviceFactorSource: { request in
 				try await getProfileStore().profile.createNewUnsavedVirtualEntityControlledByDeviceFactorSource(request: request)
 			},
+			newUnsavedVirtualPersonaControlledByLedgerFactorSource: { request in
+				try await getProfileStore().profile.createNewUnsavedVirtualEntityControlledByLedgerFactorSource(request: request)
+			},
 			saveVirtualPersona: { persona in
 				try await getProfileStore().updating {
 					try $0.addPersona(persona)
