@@ -31,9 +31,16 @@ extension Profile {
 		let entityKind = Entity.entityKind
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
 		let babylonDeviceFactorSource = request.babylonDeviceFactorSource
-		let deviceFactorSourceStorage = babylonDeviceFactorSource.entityCreatingStorage
-		let index = deviceFactorSourceStorage.nextForEntity(kind: entityKind, networkID: networkID)
-		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
+
+		let index = babylonDeviceFactorSource
+			.entityCreatingStorage
+			.nextForEntity(kind: entityKind, networkID: networkID)
+
+		let derivationPath = try DerivationPath.forEntity(
+			kind: entityKind,
+			networkID: networkID,
+			index: index
+		)
 
 		let genesisFactorInstance: FactorInstance = try await {
 			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(
