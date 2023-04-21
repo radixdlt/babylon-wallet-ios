@@ -19,6 +19,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
+		isConnectedToAnyConnectorExtension: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getDeviceInfo: {
 			.init(
 				id: .mocked,
@@ -38,6 +39,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 	)
 
 	public static let testValue = Self(
+		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		importOlympiaDevice: unimplemented("\(Self.self).importOlympiaDevice"),
 		deriveCurve25519PublicKey: unimplemented("\(Self.self).deriveCurve25519PublicKey")
@@ -49,12 +51,12 @@ extension LedgerHardwareWalletClient: DependencyKey {
 	public typealias Value = LedgerHardwareWalletClient
 
 	public static let liveValue: Self = {
+		@Dependency(\.radixConnectClient) var radixConnectClient
+
 		@Sendable func makeRequest<Response: Sendable>(
 			_ request: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request,
 			responseCasePath: CasePath<P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success, Response>
 		) async throws -> Response {
-			@Dependency(\.radixConnectClient) var radixConnectClient
-
 			let interactionID = P2P.LedgerHardwareWallet.InteractionId.random()
 
 			loggerGlobal.debug("About to broadcast importOlympiaDevice request with interactionID: \(interactionID)..")
@@ -97,7 +99,18 @@ extension LedgerHardwareWalletClient: DependencyKey {
 		}
 
 		return Self(
-			getDeviceInfo: { throw NoopError() },
+			isConnectedToAnyConnectorExtension: {
+				await radixConnectClient.getP2PLinksWithConnectionStatusUpdates()
+					.map { !$0.filter(\.hasAnyConnectedPeers).isEmpty }
+					.share()
+					.eraseToAnyAsyncSequence()
+			},
+			getDeviceInfo: {
+				try await makeRequest(
+					.getDeviceInfo,
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.getDeviceInfo
+				)
+			},
 			importOlympiaDevice: { olympiaHardwareAccounts in
 
 				try await makeRequest(

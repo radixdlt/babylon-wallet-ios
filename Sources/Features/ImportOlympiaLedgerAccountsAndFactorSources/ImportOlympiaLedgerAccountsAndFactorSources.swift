@@ -235,7 +235,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		loggerGlobal.notice("Creating factor source for Ledger...")
 
-		let factorSource = FactorSource.ledger(id: device.id, model: model, olympiaCompatible: true)
+		let factorSource = FactorSource.ledger(
+			id: device.id,
+			model: model,
+			name: name,
+			olympiaCompatible: true
+		)
 
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
 

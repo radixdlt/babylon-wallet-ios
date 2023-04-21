@@ -4,9 +4,10 @@ import NewConnectionFeature
 extension AddLedgerFactorSource.State {
 	var viewState: AddLedgerFactorSource.ViewState {
 		.init(
-			failedToFindAnyLinks: failedToFindAnyLinks,
+			failedToFindAnyLinks: !isConnectedToAnyCE,
 			ledgerName: ledgerName,
 			isLedgerNameInputVisible: isLedgerNameInputVisible,
+			sendAddLedgerRequestControlState: isConnectedToAnyCE ? .enabled : .disabled,
 			viewControlState: isWaitingForResponseFromLedger ? .loading(.global(text: "Waiting for ledger response")) : .enabled
 		)
 	}
@@ -18,6 +19,7 @@ extension AddLedgerFactorSource {
 		public let failedToFindAnyLinks: Bool
 		public let ledgerName: String
 		public let isLedgerNameInputVisible: Bool
+		public let sendAddLedgerRequestControlState: ControlState
 		public let viewControlState: ControlState
 	}
 
@@ -58,13 +60,16 @@ extension AddLedgerFactorSource {
 							.buttonStyle(.secondaryRectangular(shouldExpand: true))
 						}
 					} else {
+						Text("Connect the Ledger device you wanna add to a computer on which you have a Browser you have RadixConnect linked to. Unlock your Ledger and open the Radix Babylon Ledger App on your ledger. Look for a new tab in your linked Browser and follow the instructions on the screen.")
+
 						Button("Send Add Ledger Request") {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
-						.controlState(viewStore.viewControlState)
+						.controlState(viewStore.sendAddLedgerRequestControlState)
 						.buttonStyle(.primaryRectangular)
 					}
 				}
+				.controlState(viewStore.viewControlState)
 				.padding(.horizontal, .medium3)
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()

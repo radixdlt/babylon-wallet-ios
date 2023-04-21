@@ -68,6 +68,7 @@ extension CreationOfEntity.View {
 			if viewStore.ledgers.isEmpty {
 				Text("You have no Ledgers added, add a ledger to get started...")
 			} else {
+				Text("Select Ledger to Use")
 				Picker(
 					"Ledger Device",
 					selection: viewStore.binding(
@@ -76,7 +77,7 @@ extension CreationOfEntity.View {
 					)
 				) {
 					ForEach(viewStore.ledgers, id: \.self) { ledger in
-						LedgerView(ledger: ledger)
+						Text("Ledger \(ledger.description.rawValue) | \(ledger.label.rawValue) (added: \(ledger.addedOn.ISO8601Format())")
 							.tag(ledger.id)
 					}
 				}
@@ -114,15 +115,15 @@ extension CreationOfEntity.View {
 	}
 }
 
-// MARK: - LedgerView
-struct LedgerView: SwiftUI.View {
-	let ledger: FactorSource
-	var body: some View {
-		VStack {
-			Text(ledger.label.rawValue)
-			Text(ledger.description.rawValue)
-			Text("Added: \(ledger.addedOn.ISO8601Format())")
-			Text("Last used on: \(ledger.lastUsedOn.ISO8601Format())")
-		}
-	}
-}
+//// MARK: - LedgerView
+// struct LedgerView: SwiftUI.View {
+//    let ledger: FactorSource
+//    var body: some View {
+//        VStack {
+//            Text(ledger.label.rawValue)
+//            Text(ledger.description.rawValue)
+//            Text("Added: \(ledger.addedOn.ISO8601Format())")
+//            Text("Last used on: \(ledger.lastUsedOn.ISO8601Format())")
+//        }
+//    }
+// }

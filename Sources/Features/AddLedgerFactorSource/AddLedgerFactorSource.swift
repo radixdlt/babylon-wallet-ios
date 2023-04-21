@@ -1,16 +1,16 @@
 import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
+import LedgerHardwareWalletClient
 import NewConnectionFeature
 import Profile
 import RadixConnectClient
-import RadixConnectModels
 import SharedModels
 
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var failedToFindAnyLinks = false
+		public var isConnectedToAnyCE = false
 		public var ledgerName = ""
 		public var isLedgerNameInputVisible = false
 		public var isWaitingForResponseFromLedger = false
@@ -32,12 +32,10 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case gotLinksConnectionStatusUpdate([P2P.LinkConnectionUpdate])
-		case response(
-			ledgerDeviceInfo: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo,
-			interactionID: P2P.LedgerHardwareWallet.InteractionId
+		case isConnectedToAnyConnectorExtension(Bool)
+		case getDeviceInfoResult(
+			TaskResult<P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo>
 		)
-		case broadcasted(interactionID: P2P.LedgerHardwareWallet.InteractionId)
 
 		case addedFactorSource(FactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
 		case saveNewConnection(P2PLink)
@@ -56,6 +54,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareClient
 
 	public init() {}
 
@@ -71,11 +70,11 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case .task:
 
 			return .run { send in
-				for try await linksConnectionUpdate in await radixConnectClient.getP2PLinksWithConnectionStatusUpdates() {
+				for try await isConnected in await ledgerHardwareClient.isConnectedToAnyConnectorExtension() {
 					guard !Task.isCancelled else {
 						return
 					}
-					await send(.internal(.gotLinksConnectionStatusUpdate(linksConnectionUpdate)))
+					await send(.internal(.isConnectedToAnyConnectorExtension(isConnected)))
 				}
 			} catch: { error, _ in
 				loggerGlobal.error("failed to get links updates, error: \(error)")
@@ -86,10 +85,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case .sendAddLedgerRequestButtonTapped:
-			let interactionId: P2P.LedgerHardwareWallet.InteractionId = .random()
-			return getDeviceInfoOfAnyConnectedLedger(
-				interactionID: interactionId
-			).concatenate(with: listenForResponses(interactionID: interactionId))
+			state.isWaitingForResponseFromLedger = true
+			return .run { send in
+				await send(.internal(.getDeviceInfoResult(TaskResult {
+					try await ledgerHardwareClient.getDeviceInfo()
+				})))
+			}
 
 		case let .ledgerNameChanged(name):
 			state.ledgerName = name
@@ -144,79 +145,30 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .gotLinksConnectionStatusUpdate(linksConnectionStatusUpdate):
-			loggerGlobal.notice("links connection status update: \(linksConnectionStatusUpdate)")
-			let connectedLinks = linksConnectionStatusUpdate.filter(\.hasAnyConnectedPeers)
-			state.failedToFindAnyLinks = connectedLinks.isEmpty
+		case let .isConnectedToAnyConnectorExtension(isConnectedToAnyCE):
+			loggerGlobal.notice("Is connected to any CE?: \(isConnectedToAnyCE)")
+			state.isConnectedToAnyCE = isConnectedToAnyCE
 			return .none
 
-		case let .response(ledgerDeviceInfo, _):
+		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
+			state.isWaitingForResponseFromLedger = false
 			loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 			state.unnamedDeviceToAdd = ledgerDeviceInfo
 			state.isLedgerNameInputVisible = true
 			return .none
 
-		case .saveNewConnection:
-			state.failedToFindAnyLinks = false
+		case let .getDeviceInfoResult(.failure(error)):
+			state.isWaitingForResponseFromLedger = false
+			loggerGlobal.error("Failed to get ledger device info: \(error)")
+			errorQueue.schedule(error)
 			return .none
 
-		case .broadcasted:
-			state.isWaitingForResponseFromLedger = true
+		case .saveNewConnection:
+			state.isConnectedToAnyCE = true
 			return .none
 
 		case let .addedFactorSource(factorSource, _, _):
 			return .send(.delegate(.completed(ledger: factorSource)))
-		}
-	}
-
-	private func getDeviceInfoOfAnyConnectedLedger(
-		interactionID: P2P.LedgerHardwareWallet.InteractionId
-	) -> EffectTask<Action> {
-		.run { send in
-
-			loggerGlobal.debug("About to broadcast getDeviceInfo request with interactionID: \(interactionID)..")
-
-			try await radixConnectClient.sendRequest(.connectorExtension(.ledgerHardwareWallet(.init(
-				interactionID: interactionID,
-				request: .getDeviceInfo
-			))), .broadcastToAllPeers)
-
-			loggerGlobal.debug("Broadcasted getDeviceInfo request with interactionID: \(interactionID) ✅ waiting for response")
-
-			await send(.internal(.broadcasted(interactionID: interactionID)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to send message to Connector Extension, error: \(error)")
-		}
-	}
-
-	private func listenForResponses(
-		interactionID: P2P.LedgerHardwareWallet.InteractionId
-	) -> EffectTask<Action> {
-		.run { send in
-			for try await incomingResponse in await radixConnectClient.receiveResponses(/P2P.RTCMessageFromPeer.Response.connectorExtension .. /P2P.ConnectorExtension.Response.ledgerHardwareWallet) {
-				loggerGlobal.notice("Received response from CE: \(String(describing: incomingResponse))")
-				guard !Task.isCancelled else {
-					return
-				}
-
-				let response = try incomingResponse.result.get()
-
-				switch response.response {
-				case let .success(.getDeviceInfo(ledgerDeviceInfo)):
-					await send(.internal(
-						.response(
-							ledgerDeviceInfo: ledgerDeviceInfo,
-							interactionID: response.interactionID
-						)
-					))
-				case let .failure(errorFromConnectorExtension):
-					throw errorFromConnectorExtension
-				default: break
-				}
-			}
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-			loggerGlobal.error("Fail interactionID: \(interactionID), error: \(error)")
 		}
 	}
 
@@ -231,7 +183,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
-			label: .init(name ?? "Unnamed"),
+			name: name,
 			olympiaCompatible: false
 		)
 
