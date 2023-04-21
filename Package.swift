@@ -255,6 +255,7 @@ package.addModules([
 		name: "SettingsFeature",
 		dependencies: [
 			"AccountsClient",
+			"AddLedgerFactorSourceFeature",
 			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
