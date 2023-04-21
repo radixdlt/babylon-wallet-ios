@@ -106,11 +106,13 @@ final class ProfileTests: TestCase {
 		} operation: {
 			let babylonFactorSource = try FactorSource.babylon(
 				mnemonic: curve25519FactorSourceMnemonic,
-				hint: creatingDevice
+				label: factorSourceLabel,
+				description: factorSourceDescription
 			)
 			let olympiaFactorSource = try FactorSource.olympia(
 				mnemonic: secp256K1FactorMnemonic,
-				hint: creatingDevice
+				label: factorSourceLabel,
+				description: factorSourceDescription
 			)
 			let profile = Profile(
 				factorSource: babylonFactorSource.factorSource,
@@ -289,7 +291,6 @@ final class ProfileTests: TestCase {
 					))
 			)
 		)
-
 		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
 		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
@@ -322,7 +323,8 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(profile.factorSources.count, 2)
 		for factorSource in profile.factorSources {
-			XCTAssertEqual(factorSource.hint, creatingDevice)
+			XCTAssertEqual(factorSource.label, factorSourceLabel)
+			XCTAssertEqual(factorSource.description, factorSourceDescription)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
 		XCTAssertNil(profile.factorSources.last.storage)
@@ -454,7 +456,9 @@ final class ProfileTests: TestCase {
 	}
 }
 
-private let creatingDevice: NonEmptyString = "computerRunningUnitTest"
+private let factorSourceLabel: FactorSource.Label = "computer"
+private let factorSourceDescription: FactorSource.Description = "unit test"
+private let creatingDevice: NonEmptyString = "\(factorSourceLabel) \(factorSourceDescription)"
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
