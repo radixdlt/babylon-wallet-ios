@@ -70,9 +70,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TransactionReviewResult)
 		case createTransactionReview(TransactionReview.TransactionContent)
-		//        case signTransactionResult(TransactionResult)
 		case rawTransactionCreated(String)
-		//        case transactionPollingResult(TransactionResult)
+		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -167,21 +166,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.isProcessingTransaction = true
 			let guarantees = state.allGuarantees
 
-			return .run { _ in
-				let manifest = try await addingGuarantees(
-					to: transactionWithLockFee,
-					guarantees: guarantees
-				)
-
-//				let signRequest = SignManifestRequest(
-//					manifestToSign: manifest,
-//					makeTransactionHeaderInput: .default
-//				)
-//
-//				await send(.internal(.signTransactionResult(
-//					transactionClient.signAndSubmitTransaction(signRequest)
-//				)))
-				fatalError()
+			return .run { send in
+				await send(.internal(.addGuaranteeToManifestResult(
+					TaskResult {
+						try await addingGuarantees(
+							to: transactionWithLockFee,
+							guarantees: guarantees
+						)
+					}
+				)))
 			}
 		}
 	}
@@ -233,8 +226,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
 				)
 				await send(.internal(.createTransactionReview(content)))
-			} catch: { _, _ in
-				// TODO: Handle error
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to extract user accounts, error: \(error)")
+				// FIXME: propagate/display error?
 			}
 		case let .createTransactionReview(content):
 			state.withdrawals = content.withdrawals
@@ -246,6 +240,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.failure(error)):
 			return .send(.delegate(.failed(error)))
+
+		case let .addGuaranteeToManifestResult(.success(manifest)):
+			state.destination = .signing(.init(manifest: manifest))
+			return .none
+
+		case let .addGuaranteeToManifestResult(.failure(error)):
+			loggerGlobal.error("Failed to add guarantees to manifest, error: \(error)")
+			// FIXME: propagate/display error?
+			return .none
 
 //		case let .signTransactionResult(.success(txID)):
 //			return .run { send in
