@@ -21,7 +21,6 @@ final class CreateAccountCoordinatorTests: TestCase {
 	}
 
 	func test_completionFlow() async throws {
-		let isFirstAccount = false
 		let config = CreateEntityConfig(
 			purpose: .newAccountFromHome
 		)
