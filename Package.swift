@@ -19,7 +19,7 @@ package.addModules([
 		name: "AccountDetailsFeature",
 		dependencies: [
 			"AccountPreferencesFeature",
-			// "AssetTransferFeature",
+			"AssetTransferFeature",
 			"AccountPortfoliosClient",
 		],
 		tests: .yes()
@@ -137,12 +137,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"CreateEntityFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				// "FungibleTokenListFeature",
-				// "NonFungibleTokenListFeature",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "InspectProfileFeature",
