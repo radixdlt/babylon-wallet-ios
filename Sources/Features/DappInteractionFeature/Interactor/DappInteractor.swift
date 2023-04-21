@@ -266,7 +266,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 							errorType: .wrongNetwork,
 							message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
 						))), incomingRequest.route)
-						return
+						continue
 					}
 
 					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
