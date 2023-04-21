@@ -15,22 +15,32 @@ extension FungibleTokenList {
 
 extension FungibleTokenList.View {
 	public var body: some View {
-		LazyVStack(spacing: .medium2) {
+		VStack(spacing: .medium1) {
 			IfLetStore(
 				store.scope(
 					state: \.xrdToken,
 					action: { .child(.xrdRow($0)) }
 				),
 				then: { FungibleTokenList.Row.View(store: $0) }
-			)
+			).background(
+				RoundedRectangle(cornerRadius: .small1)
+					.fill(Color.white)
+					.tokenRowShadow()
+			).padding(.horizontal, .medium3)
 
-			ForEachStore(
-				store.scope(
-					state: \.nonXrdTokens,
-					action: { .child(.nonXRDRow($0, $1)) }
-				),
-				content: { FungibleTokenList.Row.View(store: $0) }
-			)
+			LazyVStack(spacing: .medium2) {
+				ForEachStore(
+					store.scope(
+						state: \.nonXrdTokens,
+						action: { .child(.nonXRDRow($0, $1)) }
+					),
+					content: { FungibleTokenList.Row.View(store: $0) }
+				)
+			}.background(
+				RoundedRectangle(cornerRadius: .small1)
+					.fill(Color.white)
+					.tokenRowShadow()
+			).padding(.horizontal, .medium3)
 		}
 		.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),

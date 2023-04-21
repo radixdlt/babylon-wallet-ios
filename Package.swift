@@ -40,14 +40,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AddLedgerNanoFactorSourceFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"FactorSourcesClient",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",

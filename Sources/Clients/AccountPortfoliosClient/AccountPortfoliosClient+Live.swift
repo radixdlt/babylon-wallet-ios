@@ -188,10 +188,6 @@ extension AccountPortfoliosClient {
 		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.FungibleResourcesCollectionItem itself.
 		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
-		var xrdResource: AccountPortfolio.FungibleResource?
-		var resourcesWithValue: [AccountPortfolio.FungibleResource] = []
-		var resourcesWithoutValue: [AccountPortfolio.FungibleResource] = []
-
 		let fungibleresources = rawItems.map { resource in
 			let amount: BigDecimal = {
 				// Resources of an account always have one single vault which stores the value.
@@ -241,7 +237,7 @@ extension AccountPortfoliosClient {
 		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.NonFungibleResourcesCollectionItem
 		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
-		return try await rawItems.parallelMap { resource in
+		let nonFungibleResources = try await rawItems.parallelMap { resource in
 			// Load the nftIds from the resource vault
 			let nftIds: [String] = try await {
 				// Resources of an account always have one single vault which stores the value.
@@ -271,6 +267,8 @@ extension AccountPortfoliosClient {
 				ids: nftIds
 			)
 		}
+
+		return nonFungibleResources.sorted()
 	}
 }
 
@@ -456,22 +454,66 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 			}
 		}
 
-		let sortedNonXrdresources = nonXrdResources.sorted { lhs, rhs in
-			if lhs.amount == rhs.amount, lhs.amount == .zero {
-				if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
-					return lhsSymbol < rhsSymbol
-				}
+		func sortByAddress(_ lhs: AccountPortfolio.FungibleResource, _ rhs: AccountPortfolio.FungibleResource) -> Bool {
+			lhs.resourceAddress.address < rhs.resourceAddress.address
+		}
 
-				if let lhsName = lhs.name, let rhsName = rhs.name {
-					return lhsName < rhsName
-				}
-
-				return lhs.id.address > rhs.id.address
+		func sortByName(_ lhs: AccountPortfolio.FungibleResource, _ rhs: AccountPortfolio.FungibleResource) -> Bool {
+			switch (lhs.name, rhs.name) {
+			case (.none, .none):
+				return sortByAddress(lhs, rhs)
+			case (.none, .some):
+				return false
+			case (.some, .none):
+				return true
+			case let (.some(lhsName), .some(rhsName)):
+				return lhsName < rhsName
 			}
+		}
 
-			return lhs.amount > rhs.amount
+		func sortBySymbol(_ lhs: AccountPortfolio.FungibleResource, _ rhs: AccountPortfolio.FungibleResource) -> Bool {
+			switch (lhs.symbol, rhs.symbol) {
+			case (.none, .none):
+				return sortByName(lhs, rhs)
+			case (.none, .some):
+				return false
+			case (.some, .none):
+				return true
+			case let (.some(lhsSymbol), .some(rhsSymbol)):
+				return lhsSymbol < rhsSymbol
+			}
+		}
+
+		let sortedNonXrdresources = nonXrdResources.sorted { lhs, rhs in
+			switch (lhs.amount, rhs.amount) {
+			case (.zero, .zero):
+				return sortBySymbol(lhs, rhs)
+			case (.zero, _):
+				return false
+			case (_, .zero):
+				return true
+			case let (lhsAmount, rhsAmount):
+				return lhsAmount > rhsAmount
+			}
 		}
 
 		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdresources)
+	}
+}
+
+extension Array where Element == AccountPortfolio.NonFungibleResource {
+	func sorted() -> AccountPortfolio.NonFungibleResources {
+		sorted { lhs, rhs in
+			switch (lhs.name, rhs.name) {
+			case let (.some(lhsName), .some(rhsName)):
+				return lhsName < rhsName
+			case (nil, .some):
+				return false
+			case (.some, nil):
+				return true
+			default:
+				return lhs.resourceAddress.address < rhs.resourceAddress.address
+			}
+		}
 	}
 }
