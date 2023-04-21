@@ -5,13 +5,13 @@ import Prelude
 extension FactorSource {
 	public struct Parameters: Sendable, Hashable, Codable {
 		/// either Curve25519 or secp256k1 (or P256?)
-		public let supportedCurves: NonEmpty<OrderedSet<Slip10Curve>>
+		public let supportedCurves: NonEmpty<OrderedSet<SLIP10.Curve>>
 
 		/// either BIP44 or CAP26 (SLIP10), empty if this factor source does not support HD derivation.
 		public let supportedDerivationPathSchemes: OrderedSet<DerivationPathScheme>
 
 		public init(
-			supportedCurves: NonEmpty<OrderedSet<Slip10Curve>>,
+			supportedCurves: NonEmpty<OrderedSet<SLIP10.Curve>>,
 			supportedDerivationPathSchemes: OrderedSet<DerivationPathScheme>
 		) {
 			self.supportedCurves = supportedCurves

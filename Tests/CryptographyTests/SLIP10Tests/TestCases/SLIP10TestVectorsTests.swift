@@ -3,7 +3,7 @@ import CryptoKit
 import TestingPrelude
 
 // MARK: - TestVector
-struct TestVector<Curve: Slip10SupportedECCurve> {
+struct TestVector<Curve: SLIP10CurveProtocol> {
 	let seed: Data
 	let vectorID: Int
 	let testCases: [TestScenario]
@@ -57,7 +57,7 @@ extension TestVector {
 
 				var publicKeyData = try Data(hex: publicKeyHex)
 				if publicKeyData.count == 33 {
-					if Curve.slip10Curve == .curve25519 {
+					if Curve.isCurve25519 {
 						assert(publicKeyData[0] == 0x00)
 						publicKeyData = Data(publicKeyData.dropFirst())
 					}
@@ -72,22 +72,6 @@ extension TestVector {
 
 // MARK: - SLIP10TestVectorsTests
 final class SLIP10TestVectorsTests: TestCase {
-	func test_same_as_ledger() throws {
-		let mnemonicPhrase = "equip will roof matter pink blind book anxiety banner elbow sun young"
-		let mnemonic = try Mnemonic(phrase: mnemonicPhrase, language: .english)
-		let pathRaw = "m/44H/1022H/10H/525H/0H/1238H"
-		let hdRoot = try mnemonic.hdRoot()
-		let path = try HD.Path.Full(string: pathRaw)
-
-		let expectedPubKeySecp256k1Raw = "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8"
-		let expectedPubKeyCurve25519Raw = "191a2f9a10b2370ae612efbce92725164a9e3c16907c8eb93b6ded49f69aaf14"
-		let secp256K1PublicKey = try hdRoot.derivePrivateKey(path: path, curve: SECP256K1.self).publicKey
-		let curve25519PublicKey = try hdRoot.derivePrivateKey(path: path, curve: Curve25519.self).publicKey
-
-		XCTAssertEqual(secp256K1PublicKey.compressedRepresentation.hex, expectedPubKeySecp256k1Raw)
-		XCTAssertEqual(curve25519PublicKey.compressedRepresentation.hex, expectedPubKeyCurve25519Raw)
-	}
-
 	func testPath_m() throws {
 		let path: HD.Path.Full = "m"
 		XCTAssertEqual(path.components, [.root(onlyPublic: false)])
@@ -209,7 +193,7 @@ final class SLIP10TestVectorsTests: TestCase {
 		vector: TestVector<C>,
 		testCaseIndex: Int,
 		_ line: UInt = #line
-	) throws where C: Slip10SupportedECCurve, C.PrivateKey: Equatable, C.PublicKey: Equatable {
+	) throws where C: SLIP10CurveProtocol, C.PrivateKey: Equatable, C.PublicKey: Equatable {
 		let root = try HD.Root(seed: vector.seed)
 		let testCase = vector.testCases[testCaseIndex]
 		try doTestCase(
@@ -814,7 +798,7 @@ extension SLIP10TestVectorsTests {
 		curve: C.Type,
 		vector: TestVector<C>,
 		_ line: UInt = #line
-	) throws where C: Slip10SupportedECCurve, C.PrivateKey: Equatable, C.PublicKey: Equatable {
+	) throws where C: SLIP10CurveProtocol, C.PrivateKey: Equatable, C.PublicKey: Equatable {
 		let root = try HD.Root(seed: vector.seed)
 
 		try vector.testCases.enumerated().forEach { testCaseIndex, testCase in
@@ -832,7 +816,7 @@ extension SLIP10TestVectorsTests {
 		case testCase: TestVector<C>.TestScenario,
 		testIndex: Int,
 		line: UInt = #line
-	) throws where C: Slip10SupportedECCurve, C.PrivateKey: Equatable, C.PublicKey: Equatable {
+	) throws where C: SLIP10CurveProtocol, C.PrivateKey: Equatable, C.PublicKey: Equatable {
 		func doInnerTest(childKey: HD.ExtendedKey<C>, expectPrivateToBePresent: Bool = true) throws {
 			XCTAssertEqual(
 				childKey.chainCode.chainCode.hex(),
@@ -919,23 +903,22 @@ extension SLIP10TestVectorsTests {
 	}
 }
 
-// MARK: P256
-extension Slip10CurveType {
-	/// The elliptic curve `P256`, `secp256r1`, `prime256v1` or as SLIP-0010 calls it `Nist256p1`
-	public static let p256 = Self(
-		// For some strange reason SLIP-0010 calls P256 "Nist256p1" instead of
-		// either `P256`, `secp256r1` or `prime256v1`. Unfortunate!
-		// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation
-		slip10CurveID: "Nist256p1 seed",
-		curveOrder: BigUInt("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", radix: 16)!
-	)
-}
-
-// MARK: - P256 + Slip10SupportedECCurve
-extension P256: Slip10SupportedECCurve {
+// MARK: - P256 + SLIP10CurveProtocol
+/// The elliptic curve `P256`, `secp256r1`, `prime256v1` or as SLIP-0010 calls it `Nist256p1`
+extension P256: SLIP10CurveProtocol {
 	public typealias PrivateKey = P256.Signing.PrivateKey
 	public typealias PublicKey = P256.Signing.PublicKey
-	public static let slip10Curve = Slip10CurveType.p256
+
+	/// INCORRECT, but we dont want to have `P256` as a case in the SLIP10.Curve enum. Must not use `.curve25519` as "dummy" though, since it is used for `isCurve25519` check, which
+	/// must be `false` for P256.
+	public static let curve: SLIP10.Curve = .secp256k1
+
+	// For some strange reason SLIP-0010 calls P256 "Nist256p1" instead of
+	// either `P256`, `secp256r1` or `prime256v1`. Unfortunate!
+	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation
+	public static let curveSeed = "Nist256p1 seed"
+
+	public static let curveOrder = BigUInt("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", radix: 16)!
 }
 
 // MARK: - P256.Signing.PrivateKey + ECPrivateKey

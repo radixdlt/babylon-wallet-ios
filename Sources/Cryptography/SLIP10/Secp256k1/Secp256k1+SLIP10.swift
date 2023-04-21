@@ -1,18 +1,11 @@
 import K1
 import Prelude
 
-extension Slip10CurveType {
-	public static let secp256k1 = Self(
-		slip10CurveID: "Bitcoin seed",
-		curveOrder: BigUInt("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", radix: 16)!
-	)
-}
-
 public typealias SECP256K1 = K1
 
-// MARK: - K1 + Slip10SupportedECCurve
-extension K1: Slip10SupportedECCurve {
-	public static let slip10Curve = Slip10CurveType.secp256k1
+// MARK: - K1 + SLIP10CurveProtocol
+extension K1: SLIP10CurveProtocol {
+	public static let curve: SLIP10.Curve = .secp256k1
 }
 
 // MARK: - K1.PublicKey + ECPublicKey
