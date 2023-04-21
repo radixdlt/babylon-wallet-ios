@@ -176,20 +176,27 @@ extension CreationOfEntity {
 	) -> EffectTask<Action> {
 		let entityKind = Entity.entityKind
 
-		let request = try! CreateVirtualEntityControlledByLedgerFactorSourceRequest(
-			networkID: state.networkID,
-			ledger: ledger,
-			displayName: state.name,
-			extraProperties: { numberOfEntities in
-				switch entityKind {
-				case .identity: return .forPersona(.init(fields: []))
-				case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
+		let request: CreateVirtualEntityControlledByLedgerFactorSourceRequest
+
+		do {
+			request = try CreateVirtualEntityControlledByLedgerFactorSourceRequest(
+				networkID: state.networkID,
+				ledger: ledger,
+				displayName: state.name,
+				extraProperties: { numberOfEntities in
+					switch entityKind {
+					case .identity: return .forPersona(.init(fields: []))
+					case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
+					}
+				},
+				derivePublicKey: { derivationPath in
+					try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
 				}
-			},
-			derivePublicKey: { derivationPath in
-				try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
-			}
-		)
+			)
+		} catch {
+			loggerGlobal.error("Failed to create CreateVirtualEntityControlledByLedgerFactorSourceRequest, error: \(error)")
+			return .none
+		}
 
 		return .run { send in
 			await send(.internal(
