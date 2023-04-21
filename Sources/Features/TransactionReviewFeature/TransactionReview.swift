@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import FeaturePrelude
 import GatewayAPI
+import SigningFeature
 import TransactionClient
 
 // MARK: - TransactionReview
@@ -21,7 +22,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 
 		@PresentationState
-		public var customizeGuarantees: TransactionReviewGuarantees.State? = nil
+		public var destination: Destinations.State? = nil
 
 		public var isProcessingTransaction: Bool = false
 
@@ -32,7 +33,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		) {
 			self.transactionManifest = transactionManifest
 			self.message = message
-			self.customizeGuarantees = customizeGuarantees
+			if let customizeGuarantees {
+				self.destination = .customizeGuarantees(customizeGuarantees)
+			}
 		}
 
 		public enum DisplayMode: Sendable, Hashable {
@@ -61,21 +64,42 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case proofs(TransactionReviewProofs.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 
-		case customizeGuarantees(PresentationAction<TransactionReviewGuarantees.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TransactionReviewResult)
 		case createTransactionReview(TransactionReview.TransactionContent)
-//		case signTransactionResult(TransactionResult)
+		//        case signTransactionResult(TransactionResult)
 		case rawTransactionCreated(String)
-//		case transactionPollingResult(TransactionResult)
+		//        case transactionPollingResult(TransactionResult)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
 		case transactionCompleted(TransactionIntent.TXID)
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case customizeGuarantees(TransactionReviewGuarantees.State)
+			case signing(Signing.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case customizeGuarantees(TransactionReviewGuarantees.Action)
+			case signing(Signing.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
+				TransactionReviewGuarantees()
+			}
+			Scope(state: /State.signing, action: /Action.signing) {
+				Signing()
+			}
+		}
 	}
 
 	@Dependency(\.transactionClient) var transactionClient
@@ -102,8 +126,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
 				TransactionReviewProofs()
 			}
-			.ifLet(\.$customizeGuarantees, action: /Action.child .. ChildAction.customizeGuarantees) {
-				TransactionReviewGuarantees()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -144,7 +168,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			let guarantees = state.allGuarantees
 
 			return .run { _ in
-				let manifest = try await addingGuarantees(to: transactionWithLockFee, guarantees: guarantees)
+				let manifest = try await addingGuarantees(
+					to: transactionWithLockFee,
+					guarantees: guarantees
+				)
 
 //				let signRequest = SignManifestRequest(
 //					manifestToSign: manifest,
@@ -161,9 +188,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .withdrawals:
-			return .none
-
 		case .deposits(.delegate(.showCustomizeGuarantees)):
 			guard let deposits = state.deposits else { return .none } // TODO: Handle?
 
@@ -174,23 +198,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						.compactMap { .init(account: account.account, transfer: $0) }
 				}
 
-			state.customizeGuarantees = .init(guarantees: .init(uniqueElements: guarantees))
+			state.destination = .customizeGuarantees(.init(guarantees: .init(uniqueElements: guarantees)))
 
 			return .none
 
-		case .deposits:
-			return .none
-
-		case .dAppsUsed:
-			return .none
-
-		case .proofs:
-			return .none
-
-		case .networkFee:
-			return .none
-
-		case let .customizeGuarantees(.presented(.delegate(.applyGuarantees(guarantees)))):
+		case let .destination(.presented(.customizeGuarantees(.delegate(.applyGuarantees(guarantees))))):
 			for transfer in guarantees.map(\.transfer) {
 				guard let guarantee = transfer.guarantee else { continue }
 				state.applyGuarantee(guarantee, transferID: transfer.id)
@@ -198,7 +210,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case .customizeGuarantees:
+		default:
 			return .none
 		}
 	}
@@ -262,7 +274,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func addingGuarantees(to manifest: TransactionManifest, guarantees: [TransactionClient.Guarantee]) async throws -> TransactionManifest {
+	public func addingGuarantees(
+		to manifest: TransactionManifest,
+		guarantees: [TransactionClient.Guarantee]
+	) async throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
 		return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
 	}

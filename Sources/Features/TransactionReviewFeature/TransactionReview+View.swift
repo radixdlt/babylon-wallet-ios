@@ -1,5 +1,6 @@
 import FeaturePrelude
 import Profile
+import SigningFeature
 
 extension View {
 	var sectionHeading: some View {
@@ -59,64 +60,70 @@ extension TransactionReview {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ScrollView(showsIndicators: false) {
-					VStack(spacing: 0) {
-						FixedSpacer(height: .medium2)
-
-						if let rawTransaction = viewStore.rawTransaction {
-							RawTransactionView(transaction: rawTransaction)
-								.padding(.bottom, .medium3)
-						} else {
-							VStack(spacing: 0) {
-								messageSection(with: viewStore.message)
-
-								withdrawalsSection
-
-								usingDappsSection(expanded: viewStore.isExpandedDappUsed,
-								                  showDepositsHeading: viewStore.showDepositsHeading,
-								                  showDottedLine: viewStore.showDottedLine)
-
-								depositsSection
-
-								Separator()
-									.padding(.bottom, .medium1)
-
-								proofsSection
-
-								feeSection
+				coreView(with: viewStore)
+					.background(.app.gray5)
+					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
+					.navigationTitle(L10n.TransactionReview.title)
+					.toolbar {
+						ToolbarItem(placement: .automatic) {
+							Button(asset: AssetResource.code) {
+								viewStore.send(.showRawTransactionTapped)
 							}
-						}
-
-						if viewStore.showApproveButton {
-							Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
-								viewStore.send(.approveTapped)
-							}
-							.buttonStyle(.primaryRectangular)
-							.padding(.bottom, .medium1)
+							.buttonStyle(.secondaryRectangular(isInToolbar: true))
+							.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
 						}
 					}
-					.animation(.easeInOut, value: viewStore.rawTransaction)
-					.padding(.horizontal, .medium3)
-				}
-				.background(.app.gray5)
-				.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
-				.navigationTitle(L10n.TransactionReview.title)
-				.toolbar {
-					ToolbarItem(placement: .automatic) {
-						Button(asset: AssetResource.code) {
-							viewStore.send(.showRawTransactionTapped)
+					.customizeGuarantees(with: store, viewStore)
+					.signing(with: store, viewStore)
+					.controlState(viewStore.viewControlState)
+					.onAppear {
+						viewStore.send(.appeared)
+					}
+			}
+		}
+
+		@ViewBuilder
+		private func coreView(with viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
+			ScrollView(showsIndicators: false) {
+				VStack(spacing: 0) {
+					FixedSpacer(height: .medium2)
+
+					if let rawTransaction = viewStore.rawTransaction {
+						RawTransactionView(transaction: rawTransaction)
+							.padding(.bottom, .medium3)
+					} else {
+						VStack(spacing: 0) {
+							messageSection(with: viewStore.message)
+
+							withdrawalsSection
+
+							usingDappsSection(
+								expanded: viewStore.isExpandedDappUsed,
+								showDepositsHeading: viewStore.showDepositsHeading,
+								showDottedLine: viewStore.showDottedLine
+							)
+
+							depositsSection
+
+							Separator()
+								.padding(.bottom, .medium1)
+
+							proofsSection
+
+							feeSection
 						}
-						.buttonStyle(.secondaryRectangular(isInToolbar: true))
-						.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
+					}
+
+					if viewStore.showApproveButton {
+						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
+							viewStore.send(.approveTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+						.padding(.bottom, .medium1)
 					}
 				}
-				.sheet(store: store.scope(state: \.$customizeGuarantees) { .child(.customizeGuarantees($0)) }) { childStore in
-					TransactionReviewGuarantees.View(store: childStore)
-				}
-				.controlState(viewStore.viewControlState)
-				.onAppear {
-					viewStore.send(.appeared)
-				}
+				.animation(.easeInOut, value: viewStore.rawTransaction)
+				.padding(.horizontal, .medium3)
 			}
 		}
 
@@ -143,7 +150,11 @@ extension TransactionReview {
 		}
 
 		@ViewBuilder
-		private func usingDappsSection(expanded: Bool, showDepositsHeading: Bool, showDottedLine: Bool) -> some SwiftUI.View {
+		private func usingDappsSection(
+			expanded: Bool,
+			showDepositsHeading: Bool,
+			showDottedLine: Bool
+		) -> some SwiftUI.View {
 			VStack(alignment: .trailing, spacing: .medium2) {
 				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 				IfLetStore(usedDappsStore) { childStore in
@@ -195,6 +206,34 @@ extension TransactionReview {
 				TransactionReviewNetworkFee.View(store: childStore)
 			}
 		}
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func customizeGuarantees(
+		with store: StoreOf<TransactionReview>,
+		_ viewStore: ViewStoreOf<TransactionReview>
+	) -> some View {
+		self.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /TransactionReview.Destinations.State.customizeGuarantees,
+			action: TransactionReview.Destinations.Action.customizeGuarantees,
+			content: { TransactionReviewGuarantees.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	fileprivate func signing(
+		with store: StoreOf<TransactionReview>,
+		_ viewStore: ViewStoreOf<TransactionReview>
+	) -> some View {
+		self.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /TransactionReview.Destinations.State.signing,
+			action: TransactionReview.Destinations.Action.signing,
+			content: { Signing.View(store: $0) }
+		)
 	}
 }
 

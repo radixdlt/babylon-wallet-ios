@@ -276,6 +276,13 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "SigningFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+		],
+		tests: .no
+	),
+	.feature(
 		name: "SplashFeature",
 		dependencies: [
 			"LocalAuthenticationClient",
@@ -288,6 +295,7 @@ package.addModules([
 		dependencies: [
 			"GatewayAPI",
 			"TransactionClient",
+			"SigningFeature",
 		],
 		tests: .yes()
 	),
