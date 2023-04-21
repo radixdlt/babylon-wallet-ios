@@ -67,7 +67,7 @@ extension AccountPortfoliosClient: DependencyKey {
 					}
 
 					// Fetch the remaining portfolios from the GW. Either the portfolios were expired in the cache, or missing
-					let freshPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(accountAddresses)
+					let freshPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(Array(notCachedPortfolios))
 					freshPortfolios.forEach {
 						cacheClient.save($0, .accountPortfolio(.single($0.owner.address)))
 					}
