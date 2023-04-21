@@ -7,8 +7,7 @@ extension AddLedgerFactorSource.State {
 			failedToFindAnyLinks: !isConnectedToAnyCE,
 			ledgerName: ledgerName,
 			isLedgerNameInputVisible: isLedgerNameInputVisible,
-			sendAddLedgerRequestControlState: isConnectedToAnyCE ? .enabled : .disabled,
-			viewControlState: isWaitingForResponseFromLedger ? .loading(.global(text: "Waiting for ledger response")) : .enabled
+			sendAddLedgerRequestControlState: isConnectedToAnyCE ? (isWaitingForResponseFromLedger ? .loading(.local) : .enabled) : .disabled
 		)
 	}
 }
@@ -20,7 +19,6 @@ extension AddLedgerFactorSource {
 		public let ledgerName: String
 		public let isLedgerNameInputVisible: Bool
 		public let sendAddLedgerRequestControlState: ControlState
-		public let viewControlState: ControlState
 	}
 
 	@MainActor
@@ -42,8 +40,6 @@ extension AddLedgerFactorSource {
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					}
-
-					Spacer()
 
 					if viewStore.isLedgerNameInputVisible {
 						VStack {
@@ -69,7 +65,6 @@ extension AddLedgerFactorSource {
 						.buttonStyle(.primaryRectangular)
 					}
 				}
-				.controlState(viewStore.viewControlState)
 				.padding(.horizontal, .medium3)
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()
