@@ -42,13 +42,6 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// * Hardware (directly readable by wallet)
 	case yubiKey
 
-	/// A user known single key which the user has to produce (input) in order to user.
-	///
-	/// Attributes:
-	/// * Mine
-	/// * Off device
-	case offDeviceSingleKey
-
 	/// A user known mnemonic which the user has to produce (input) in order to user.
 	///
 	/// Attributes:
@@ -66,21 +59,14 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// * Hierarchical deterministic
 	case offDeviceInputKeyMaterialForMnemonic
 
-	/// Some individual the user knows and trust, e.g. a friend or family member,
+	/// Some individual or company/organisation the user knows and trust,
+	/// e.g. a friend or family member or InstaBridge
 	/// typically used as a factor source for the recovery role.
 	///
 	/// Attributes:
 	/// * **Not** mine
 	/// * Off device
-	case trustedContact
-
-	/// Some entity the user knows and trust, e.g. a company.
-	/// typically used as a factor source for the recovery role.
-	///
-	/// Attributes:
-	/// * **Not** mine
-	/// * Off device
-	case trustedEnterprise
+	case trustedEntity
 }
 
 extension FactorSourceKind {
@@ -91,22 +77,22 @@ extension FactorSourceKind {
 	public var isHD: Bool {
 		switch self {
 		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic, .securityQuestions, .offDeviceInputKeyMaterialForMnemonic: return true
-		case .offDeviceSingleKey, .yubiKey, .trustedContact, .trustedEnterprise: return false
+		case .yubiKey, .trustedEntity: return false
 		}
 	}
 
 	public var isOnDevice: Bool {
 		switch self {
 		case .device, .securityQuestions: return true
-		case .offDeviceSingleKey, .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic, .ledgerHQHardwareWallet, .yubiKey, .trustedContact, .trustedEnterprise:
+		case .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic, .ledgerHQHardwareWallet, .yubiKey, .trustedEntity:
 			return false
 		}
 	}
 
 	public var isMine: Bool {
 		switch self {
-		case .trustedEnterprise, .trustedContact: return false
-		case .device, .securityQuestions, .yubiKey, .ledgerHQHardwareWallet, .offDeviceMnemonic, .offDeviceSingleKey, .offDeviceInputKeyMaterialForMnemonic: return true
+		case .trustedEntity: return false
+		case .device, .securityQuestions, .yubiKey, .ledgerHQHardwareWallet, .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic: return true
 		}
 	}
 
@@ -119,7 +105,7 @@ extension FactorSourceKind {
 		switch self {
 		case .ledgerHQHardwareWallet: return .requiresBrowserConnectorExtensionForCommunication
 		case .yubiKey: return .canCommunicatedDirectlyWithWallet
-		case .device, .securityQuestions, .trustedContact, .trustedEnterprise, .offDeviceMnemonic, .offDeviceSingleKey, .offDeviceInputKeyMaterialForMnemonic: return nil
+		case .device, .securityQuestions, .trustedEntity, .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic: return nil
 		}
 	}
 }

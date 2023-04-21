@@ -140,7 +140,8 @@ extension FactorSourceView {
 			#endif // os(macOS)
 
 			Labeled("Kind", value: factorSource.kind.rawValue)
-			Labeled("Hint", value: factorSource.hint.rawValue)
+			Labeled("Label", value: factorSource.label.rawValue)
+			Labeled("Description", value: factorSource.description.rawValue)
 			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
 			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 

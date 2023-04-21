@@ -65,7 +65,8 @@ extension FactorSourceView {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 0) {
 			VPair(heading: "Kind", item: factorSource.kind)
-			VPair(heading: "Hint", item: factorSource.hint)
+			VPair(heading: "Label", item: factorSource.label)
+			VPair(heading: "Description", item: factorSource.description)
 			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
 			VPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 		}

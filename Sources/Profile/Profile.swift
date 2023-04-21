@@ -27,7 +27,8 @@ extension ProfileSnapshot.Version {
 	/// - 26: Change Factor Source Storage codable (remove key "properties"). Remove `storage` for "olympia" `.device` factor sources
 	/// - 27: Rename `iCloudProfileSyncEnabled` -> `isCloudProfileSyncEnabled` to be platform agnostic.
 	/// - 28: CAP26 update (new KeyType values)
-	public static let minimum: Self = 28
+	/// - 29: Change FactorSource, split `hint` into (`label`, `description`) tuple.
+	public static let minimum: Self = 29
 }
 
 // MARK: - Profile

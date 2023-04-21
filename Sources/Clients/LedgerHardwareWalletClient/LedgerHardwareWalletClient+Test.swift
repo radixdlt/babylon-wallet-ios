@@ -106,6 +106,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				)
 			},
 			deriveCurve25519PublicKey: { _ in
+				fatalError()
 			}
 		)
 	}()

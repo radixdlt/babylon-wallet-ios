@@ -8,7 +8,8 @@ import Prelude
 public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorSourceProtocol {
 	public let kind: FactorSourceKind
 	public let id: FactorSourceID
-	public let hint: NonEmptyString
+	public let label: FactorSource.Label
+	public let description: FactorSource.Description
 	public let parameters: FactorSource.Parameters
 	public var entityCreatingStorage: FactorSource.Storage.EntityCreating?
 	public let addedOn: Date
@@ -17,7 +18,8 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 	public init(
 		kind: FactorSourceKind,
 		id: FactorSourceID,
-		hint: NonEmptyString,
+		label: FactorSource.Label,
+		description: FactorSource.Description,
 		parameters: FactorSource.Parameters,
 		entityCreatingStorage: FactorSource.Storage.EntityCreating?,
 		addedOn: Date,
@@ -25,7 +27,8 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 	) {
 		self.kind = kind
 		self.id = id
-		self.hint = hint
+		self.label = label
+		self.description = description
 		self.parameters = parameters
 		self.entityCreatingStorage = entityCreatingStorage
 		self.addedOn = addedOn
@@ -47,7 +50,8 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 		self.kind = factorSource.kind
 		self.addedOn = factorSource.addedOn
 		self.lastUsedOn = factorSource.lastUsedOn
-		self.hint = factorSource.hint
+		self.label = factorSource.label
+		self.description = factorSource.description
 		self.id = factorSource.id
 		self.parameters = factorSource.parameters
 	}
@@ -61,7 +65,8 @@ extension HDOnDeviceFactorSource {
 		.init(
 			kind: kind,
 			id: id,
-			hint: hint,
+			label: label,
+			description: description,
 			parameters: parameters,
 			storage: storage,
 			addedOn: addedOn,
@@ -90,7 +95,7 @@ extension HDOnDeviceFactorSource {
 #if DEBUG
 extension HDOnDeviceFactorSources {
 	public static let previewValues: Self = {
-		try! .init(rawValue: .init(uniqueElements: [.previewValue]))!
+		.init(rawValue: .init(uniqueElements: [.previewValue]))!
 	}()
 }
 #endif // DEBUG

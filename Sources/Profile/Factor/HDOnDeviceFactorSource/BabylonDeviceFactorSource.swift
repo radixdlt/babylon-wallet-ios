@@ -8,7 +8,8 @@ import Prelude
 public struct BabylonDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorSourceProtocol {
 	public let kind: FactorSourceKind
 	public let id: FactorSourceID
-	public let hint: NonEmptyString
+	public let label: FactorSource.Label
+	public let description: FactorSource.Description
 	public let parameters: FactorSource.Parameters
 	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
 	public let addedOn: Date
@@ -28,7 +29,8 @@ public struct BabylonDeviceFactorSource: Sendable, Hashable, Identifiable, _Fact
 		self.kind = factorSource.kind
 		self.addedOn = factorSource.addedOn
 		self.lastUsedOn = factorSource.lastUsedOn
-		self.hint = factorSource.hint
+		self.label = factorSource.label
+		self.description = factorSource.description
 		self.id = factorSource.id
 		self.parameters = factorSource.parameters
 	}
@@ -49,7 +51,8 @@ extension BabylonDeviceFactorSource {
 		.init(
 			kind: kind,
 			id: id,
-			hint: hint,
+			label: label,
+			description: description,
 			parameters: parameters,
 			entityCreatingStorage: entityCreatingStorage,
 			addedOn: addedOn,
@@ -61,7 +64,8 @@ extension BabylonDeviceFactorSource {
 		.init(
 			kind: kind,
 			id: id,
-			hint: hint,
+			label: label,
+			description: description,
 			parameters: parameters,
 			storage: storage,
 			addedOn: addedOn,
