@@ -32,22 +32,22 @@ extension Signing {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - Signing_Preview
-struct Signing_Preview: PreviewProvider {
-	static var previews: some View {
-		Signing.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: Signing()
-			)
-		)
-	}
-}
-
-extension Signing.State {
-	public static let previewValue = Self()
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - Signing_Preview
+// struct Signing_Preview: PreviewProvider {
+//	static var previews: some View {
+//		Signing.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: Signing()
+//			)
+//		)
+//	}
+// }
+//
+// extension Signing.State {
+//	public static let previewValue = Self()
+// }
+// #endif
