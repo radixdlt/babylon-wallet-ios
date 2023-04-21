@@ -93,7 +93,7 @@ extension SecureStorageClient: DependencyKey {
 					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
 					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy, // can be nil
 					label: "Radix Wallet Factor Secret",
-					comment: .init("Factor hint: \(factorSource.description.rawValue)")
+					comment: .init("Created on \(factorSource.description.rawValue) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
 				)
 			},
 			loadMnemonicByFactorSourceID: { factorSourceID, purpose in

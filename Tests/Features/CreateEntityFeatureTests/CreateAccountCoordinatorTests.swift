@@ -43,13 +43,13 @@ final class CreateAccountCoordinatorTests: TestCase {
 		) {
 			$0.dismiss = .init { expectation.fulfill() }
 		}
+		await store.send(.child(.path(.element(id: 2, action: .step2_creationOfEntity(.delegate(.createdEntity(account))))))) {
+			$0.path.append(.step3_completion(.init(entity: account, config: initialState.config)))
+		}
 
-//		await store.send(.child(.step2_creationOfEntity(.delegate(.createdEntity(account))))) {
-//			$0.step = .step3_completion(.init(entity: account, config: initialState.config))
-//		}
-//		await store.send(.child(.step3_completion(.view(.goToDestination))))
-//		await store.receive(.child(.step3_completion(.delegate(.completed))))
-//		await store.receive(.delegate(.completed))
+		await store.send(.child(.path(.element(id: 3, action: .step3_completion(.view(.goToDestination))))))
+		await store.receive(.child(.path(.element(id: 3, action: .step3_completion(.delegate(.completed))))))
+		await store.receive(.delegate(.completed))
 
 		wait(for: [expectation], timeout: 0)
 	}

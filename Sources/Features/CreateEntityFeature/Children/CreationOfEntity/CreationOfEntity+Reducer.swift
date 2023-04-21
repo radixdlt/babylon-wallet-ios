@@ -145,7 +145,7 @@ extension CreationOfEntity {
 				}
 			},
 			derivePublicKey: { derivationPath in
-				try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath)
+				try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
 			}
 		)
 

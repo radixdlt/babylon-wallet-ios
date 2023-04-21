@@ -10,8 +10,8 @@ final class ProfileStoreTests: TestCase {
 	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {
 		await withDependencies {
 			#if canImport(UIKit)
-			$0.device.$model = deviceModel
-			$0.device.$name = deviceName
+			$0.device.$name = deviceLabel.rawValue
+			$0.device.$model = deviceDescription.rawValue
 			#endif
 			$0.uuid = .incrementing
 			$0.mnemonicClient.generate = {
@@ -48,7 +48,8 @@ final class ProfileStoreTests: TestCase {
 			assertFactorSourceSaved: { factorSource in
 				XCTAssertNoDifference(factorSource.kind, .device)
 				XCTAssertFalse(factorSource.supportsOlympia)
-				XCTAssertNoDifference(factorSource.hint, expectedDeviceDescription)
+				XCTAssertNoDifference(factorSource.label, deviceLabel)
+				XCTAssertNoDifference(factorSource.description, deviceDescription)
 			}
 		)
 	}
@@ -91,8 +92,8 @@ private extension ProfileStoreTests {
 			$0.uuid = .constant(profileID)
 			$0.mnemonicClient.generate = { _, _ in privateFactor.mnemonicWithPassphrase.mnemonic }
 			#if canImport(UIKit)
-			$0.device.$model = deviceModel
-			$0.device.$name = deviceName
+			$0.device.$name = deviceLabel.rawValue
+			$0.device.$model = deviceDescription.rawValue
 			#endif
 			$0.secureStorageClient.loadProfileSnapshotData = {
 				provideProfileSnapshotLoaded
