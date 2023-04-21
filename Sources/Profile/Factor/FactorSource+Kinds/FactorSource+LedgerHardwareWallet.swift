@@ -14,7 +14,7 @@ extension FactorSource {
 	public static func ledger(
 		id: FactorSource.ID,
 		model: LedgerHardwareWallet.DeviceModel,
-		label: FactorSource.Label = "Unnamed Ledger",
+		label: FactorSource.Label,
 		olympiaCompatible: Bool
 	) -> Self {
 		Self(

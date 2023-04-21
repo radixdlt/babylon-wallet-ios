@@ -231,6 +231,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
+			label: .init(name ?? "Unnamed"),
 			olympiaCompatible: false
 		)
 
