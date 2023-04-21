@@ -9,18 +9,24 @@ final class RTCPeerConnectionAsyncDelegate:
 	PeerConnectionDelegate
 {
 	let onNegotiationNeeded: AsyncStream<Void>
-	let onIceConnectionState: AsyncStream<ICEConnectionState>
+	let onIceConnectionStateSubject: AsyncCurrentValueSubject<ICEConnectionState> = .init(.new)
+
+	/// A multicasting async sequence of ICE Connection state updates which *replays* the last value.
+	var onIceConnectionState: AnyAsyncSequence<ICEConnectionState> {
+		onIceConnectionStateSubject.share().eraseToAnyAsyncSequence()
+	}
+
 	let onSignalingState: AsyncStream<SignalingState>
 	let onGeneratedICECandidate: AsyncStream<RTCPrimitive.ICECandidate>
 
 	private let onNegotiationNeededContinuation: AsyncStream<Void>.Continuation
-	private let onIceConnectionStateContinuation: AsyncStream<ICEConnectionState>.Continuation
+
 	private let onSignalingStateContinuation: AsyncStream<SignalingState>.Continuation
 	private let onGeneratedICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
 
 	override internal init() {
 		(onNegotiationNeeded, onNegotiationNeededContinuation) = AsyncStream.streamWithContinuation()
-		(onIceConnectionState, onIceConnectionStateContinuation) = AsyncStream.streamWithContinuation()
+
 		(onSignalingState, onSignalingStateContinuation) = AsyncStream.streamWithContinuation()
 		(onGeneratedICECandidate, onGeneratedICECandidateContinuation) = AsyncStream.streamWithContinuation()
 
@@ -29,7 +35,7 @@ final class RTCPeerConnectionAsyncDelegate:
 
 	func cancel() {
 		onNegotiationNeededContinuation.finish()
-		onIceConnectionStateContinuation.finish()
+		onIceConnectionStateSubject.send(.finished)
 		onSignalingStateContinuation.finish()
 		onGeneratedICECandidateContinuation.finish()
 	}
@@ -46,7 +52,7 @@ extension RTCPeerConnectionAsyncDelegate: RTCPeerConnectionDelegate {
 	}
 
 	func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
-		onIceConnectionStateContinuation.yield(.init(from: newState))
+		onIceConnectionStateSubject.send(.init(from: newState))
 	}
 
 	func peerConnection(_ peerConnection: RTCPeerConnection, didGenerate candidate: RTCIceCandidate) {

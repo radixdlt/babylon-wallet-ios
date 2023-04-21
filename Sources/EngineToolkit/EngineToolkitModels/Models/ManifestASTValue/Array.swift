@@ -33,6 +33,7 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 		)
 	}
 
+	#if swift(<5.8)
 	public init(
 		elementKind: ManifestASTValueKind,
 		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
@@ -42,6 +43,7 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 			elements: buildValues()
 		)
 	}
+	#endif
 }
 
 // MARK: Array_.Error

@@ -16,7 +16,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 		}
 
 		public init(
-			curve: Slip10Curve,
+			curve: SLIP10.Curve,
 			networkID: NetworkID?,
 			name: NonEmptyString,
 			babylonFactorSource: BabylonDeviceFactorSource

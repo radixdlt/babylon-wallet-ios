@@ -20,18 +20,20 @@ final class MockPeerConnectionDelegate: PeerConnectionDelegate {
 	func cancel() {}
 
 	let onNegotiationNeeded: AsyncStream<Void>
-	let onIceConnectionState: AsyncStream<ICEConnectionState>
+	var onIceConnectionState: AnyAsyncSequence<ICEConnectionState> {
+		onIceConnectionStateSubject.share().eraseToAnyAsyncSequence()
+	}
+
+	let onIceConnectionStateSubject: AsyncCurrentValueSubject<ICEConnectionState> = .init(.new)
 	let onSignalingState: AsyncStream<SignalingState>
 	let onGeneratedICECandidate: AsyncStream<RTCPrimitive.ICECandidate>
 
 	private let onNegotiationNeededContinuation: AsyncStream<Void>.Continuation
-	private let onIceConnectionStateContinuation: AsyncStream<ICEConnectionState>.Continuation
 	private let onSignalingStateContinuation: AsyncStream<SignalingState>.Continuation
 	private let onGeneratedICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
 
 	init() {
 		(onNegotiationNeeded, onNegotiationNeededContinuation) = AsyncStream<Void>.streamWithContinuation()
-		(onIceConnectionState, onIceConnectionStateContinuation) = AsyncStream<ICEConnectionState>.streamWithContinuation()
 		(onSignalingState, onSignalingStateContinuation) = AsyncStream<SignalingState>.streamWithContinuation()
 		(onGeneratedICECandidate, onGeneratedICECandidateContinuation) = AsyncStream<RTCPrimitive.ICECandidate>.streamWithContinuation()
 	}
@@ -43,7 +45,7 @@ final class MockPeerConnectionDelegate: PeerConnectionDelegate {
 	}
 
 	func sendICEConnectionStateEvent(_ state: ICEConnectionState) {
-		onIceConnectionStateContinuation.yield(state)
+		onIceConnectionStateSubject.send(state)
 	}
 
 	func generateICECandiddate(_ candidate: RTCPrimitive.ICECandidate) {

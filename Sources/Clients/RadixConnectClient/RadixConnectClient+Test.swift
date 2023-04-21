@@ -10,26 +10,30 @@ extension RadixConnectClient: TestDependencyKey {
 		disconnectAll: unimplemented("\(Self.self).disconnectAll"),
 		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
+		getP2PLinksWithConnectionStatusUpdates: unimplemented("\(Self.self).getP2PLinksWithConnectionStatusUpdates"),
 		storeP2PLink: unimplemented("\(Self.self).storeP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
 		addP2PWithPassword: unimplemented("\(Self.self).addP2PWithPassword"),
 		receiveMessages: unimplemented("\(Self.self).receiveMessages"),
-		sendMessage: unimplemented("\(Self.self).sendMessage")
+		sendResponse: unimplemented("\(Self.self).sendResponse"),
+		sendRequest: unimplemented("\(Self.self).sendRequest")
 	)
 }
 
 extension RadixConnectClient {
 	static let noop = Self(
-		loadFromProfileAndConnectAll: {},
+		loadFromProfileAndConnectAll: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		disconnectAndRemoveAll: {},
 		disconnectAll: {},
 		getLocalNetworkAccess: { false },
 		getP2PLinks: { [] },
+		getP2PLinksWithConnectionStatusUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		storeP2PLink: { _ in },
 		deleteP2PLinkByPassword: { _ in },
 		addP2PWithPassword: { _ in },
-		receiveMessages: { AsyncStream<P2P.RTCIncomingMessageResult>(unfolding: { nil }) },
-		sendMessage: { _ in }
+		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		sendResponse: { _, _ in },
+		sendRequest: { _, _ in }
 	)
 }
 #endif // DEBUG

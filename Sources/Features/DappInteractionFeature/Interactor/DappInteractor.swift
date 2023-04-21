@@ -8,7 +8,7 @@ import ROLAClient
 // MARK: - DappInteractionHook
 struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var requestQueue: OrderedSet<P2P.RTCIncomingWalletInteraction> = []
+		var requestQueue: OrderedSet<P2P.RTCIncomingDappRequest> = []
 
 		@PresentationState
 		var currentModal: Destinations.State?
@@ -23,17 +23,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case responseFailureAlert(PresentationAction<ResponseFailureAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
-			case cancelButtonTapped(P2P.RTCIncomingWalletInteraction)
-			case retryButtonTapped(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?)
+			case cancelButtonTapped(P2P.RTCIncomingDappRequest)
+			case retryButtonTapped(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?)
 		}
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case receivedRequestFromDapp(P2P.RTCIncomingWalletInteraction)
+		case receivedRequestFromDapp(P2P.RTCIncomingDappRequest)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: P2P.RTCIncomingWalletInteraction, DappMetadata?)
-		case failedToSendResponseToDapp(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?, reason: String)
-		case presentResponseFailureAlert(P2P.RTCOutgoingMessage, for: P2P.RTCIncomingWalletInteraction, DappMetadata?, reason: String)
+		case sentResponseToDapp(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?)
+		case failedToSendResponseToDapp(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?, reason: String)
+		case presentResponseFailureAlert(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
 	}
 
@@ -43,12 +43,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
-			case dappInteraction(RelayState<P2P.RTCIncomingWalletInteraction, DappInteractionCoordinator.State>)
+			case dappInteraction(RelayState<P2P.RTCIncomingDappRequest, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
-			case dappInteraction(RelayAction<P2P.RTCIncomingWalletInteraction, DappInteractionCoordinator.Action>)
+			case dappInteraction(RelayAction<P2P.RTCIncomingDappRequest, DappInteractionCoordinator.Action>)
 			case dappInteractionCompletion(Completion.Action)
 		}
 
@@ -82,7 +82,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
-			return handleIncommingRequests()
+			return handleIncomingRequests()
 		case let .responseFailureAlert(action):
 			switch action {
 			case .dismiss:
@@ -160,8 +160,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
-			let response = request.toOutgoingMessage(responseToDapp)
-			return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
+			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
 			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
@@ -176,25 +175,37 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func presentQueuedRequestIfNeededEffect(
 		for state: inout State
 	) -> EffectTask<Action> {
-		guard let next = state.requestQueue.first, state.currentModal == nil else {
+		guard
+			let next = state.requestQueue.first,
+			state.currentModal == nil
+		else {
 			return .none
 		}
 
-		state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.peerMessage.content)))
+		do {
+			let nextRequest = try next.result.get()
+			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: nextRequest)))
+		} catch {
+			let errorMsg = "Unexpectedly unwrapped error when handling next wallet interaction."
+			loggerGlobal.error(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+		}
+
 		return .none
 	}
 
 	func sendResponseToDappEffect(
-		_ response: P2P.RTCOutgoingMessage,
-		for request: P2P.RTCIncomingWalletInteraction,
+		_ responseToDapp: P2P.Dapp.Response,
+		for request: P2P.RTCIncomingDappRequest,
 		dappMetadata: DappMetadata?
 	) -> EffectTask<Action> {
 		.run { send in
+
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
 			let isTransactionResponse = {
-				if case let .success(response) = response.peerMessage.content,
-				   case .transaction = response.items
+				if case let .success(successResponse) = responseToDapp,
+				   case .transaction = successResponse.items
 				{
 					return true
 				}
@@ -202,56 +213,68 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}()
 
 			do {
-				_ = try await radixConnectClient.sendMessage(response)
+				_ = try await radixConnectClient.sendResponse(.dapp(responseToDapp), request.route)
 				if !isTransactionResponse {
-					await send(.internal(.sentResponseToDapp(response.peerMessage.content, for: request, dappMetadata)))
+					await send(.internal(
+						.sentResponseToDapp(
+							responseToDapp,
+							for: request,
+							dappMetadata
+						)
+					))
 				}
 			} catch {
 				if !isTransactionResponse {
-					await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
+					await send(.internal(
+						.failedToSendResponseToDapp(
+							responseToDapp,
+							for: request,
+							dappMetadata,
+							reason: error.localizedDescription
+						)
+					))
 				}
 			}
 		}
 	}
 
-	func dismissCurrentModalAndRequest(_ request: P2P.RTCIncomingWalletInteraction, for state: inout State) {
+	func dismissCurrentModalAndRequest(_ request: P2P.RTCIncomingDappRequest, for state: inout State) {
 		state.requestQueue.remove(request)
 		state.currentModal = nil
 	}
 
-	func handleIncommingRequests() -> EffectTask<Action> {
+	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
-			await radixConnectClient.loadFromProfileAndConnectAll()
+			_ = await radixConnectClient.loadFromProfileAndConnectAll()
 			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
-			for try await incomingMessageResult in await radixConnectClient.receiveMessages() {
+			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
 				guard !Task.isCancelled else {
 					return
 				}
 
 				do {
-					let interactionMessage = try incomingMessageResult.unwrapResult()
-					let interaction = interactionMessage.peerMessage.content
-					try validate(interaction)
-					guard interaction.metadata.networkId == currentNetworkID else {
-						let incomingRequestNetwork = try Radix.Network.lookupBy(id: interaction.metadata.networkId)
+					let request = try incomingRequest.result.get()
+					try validate(request)
+
+					guard request.metadata.networkId == currentNetworkID else {
+						let incomingRequestNetwork = try Radix.Network.lookupBy(id: request.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
-						let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
-							interactionId: interaction.id,
+
+						try await radixConnectClient.sendResponse(.dapp(.failure(.init(
+							interactionId: request.id,
 							errorType: .wrongNetwork,
 							message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
-						)))
-
-						try await radixConnectClient.sendMessage(outMessage)
+						))), incomingRequest.route)
 						return
 					}
 
 					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 					if !isDeveloperModeEnabled {
-						try await rolaClient.performDappDefinitionVerification(interaction.metadata)
-						try await rolaClient.performWellKnownFileCheck(interaction.metadata)
+						try await rolaClient.performDappDefinitionVerification(request.metadata)
+						try await rolaClient.performWellKnownFileCheck(request.metadata)
 					}
-					await send(.internal(.receivedRequestFromDapp(interactionMessage)))
+					await send(.internal(.receivedRequestFromDapp(incomingRequest)))
 				} catch {
 					loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
 					errorQueue.schedule(error)
@@ -262,19 +285,19 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func validate(_ interaction: P2P.FromDapp.WalletInteraction) throws {
+	func validate(_ interaction: P2P.Dapp.Request) throws {
 		switch interaction.items {
 		case let .request(items):
 			switch items {
 			case let .unauthorized(unauthorized):
 				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-					throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.invalidRequest
+					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
 				}
 			case let .authorized(authorized):
 				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false ||
 					authorized.oneTimeAccounts?.numberOfAccounts.isValid == false
 				{
-					throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.invalidRequest
+					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
 				}
 			}
 		case .transaction:

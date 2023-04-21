@@ -7,13 +7,13 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			case flow(DappInteractionFlow.State)
 		}
 
-		let interaction: P2P.FromDapp.WalletInteraction
+		let interaction: P2P.Dapp.Request
 		var childState: ChildState
 
 		@PresentationState
 		var errorAlert: AlertState<ViewAction.MalformedInteractionErrorAlertAction>? = nil
 
-		init(interaction: P2P.FromDapp.WalletInteraction) {
+		init(interaction: P2P.Dapp.Request) {
 			self.interaction = interaction
 			self.childState = .loading(.init(interaction: interaction))
 		}
@@ -37,7 +37,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(P2P.ToDapp.WalletInteractionResponse, DappMetadata? = nil)
+		case submit(P2P.Dapp.Response, DappMetadata? = nil)
 		case dismiss(DappMetadata? = nil)
 	}
 

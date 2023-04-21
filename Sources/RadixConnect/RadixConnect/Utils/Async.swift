@@ -45,10 +45,22 @@ extension AsyncSequence where Element == Void {
 }
 
 extension AsyncSequence {
-	func susbscribe(_ continuation: AsyncStream<Element>.Continuation) where Self: Sendable {
+	func subscribe(
+		_ continuation: AsyncStream<Element>.Continuation
+	) where Self: Sendable {
 		Task {
 			for try await value in self {
 				continuation.yield(value)
+			}
+		}
+	}
+}
+
+extension AsyncSequence {
+	func subscribe(_ listener: some AsyncSubject<Element, Never>) where Self: Sendable {
+		Task {
+			for try await value in self {
+				listener.send(value)
 			}
 		}
 	}
