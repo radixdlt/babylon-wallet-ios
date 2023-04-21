@@ -12,5 +12,5 @@ public struct LedgerHardwareWalletClient: Sendable {
 extension LedgerHardwareWalletClient {
 	public typealias ImportOlympiaDevice = @Sendable (Set<OlympiaAccountToMigrate>) async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 	public typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
-	public typealias DeriveCurve25519PublicKey = @Sendable (DerivationPath) async throws -> Curve25519.Signing.PublicKey
+	public typealias DeriveCurve25519PublicKey = @Sendable (DerivationPath, FactorSource) async throws -> Curve25519.Signing.PublicKey
 }

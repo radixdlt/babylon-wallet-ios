@@ -32,7 +32,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 				derivedPublicKeys: []
 			)
 		},
-		deriveCurve25519PublicKey: { _ in
+		deriveCurve25519PublicKey: { _, _ in
 			Curve25519.Signing.PrivateKey().publicKey
 		}
 	)
@@ -105,8 +105,24 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.importOlympiaDevice
 				)
 			},
-			deriveCurve25519PublicKey: { _ in
-				fatalError()
+			deriveCurve25519PublicKey: { derivationPath, ledger in
+				let ledgerModel = P2P.LedgerHardwareWallet.Model(rawValue: ledger.description.rawValue) ?? .nanoSPlus // FIXME: handle optional better.
+				let response = try await makeRequest(
+					.derivePublicKey(.init(
+						keyParameters: .init(
+							curve: .curve25519,
+							derivationPath: derivationPath.path
+						),
+						ledgerDevice: .init(
+							name: .init(rawValue: ledger.label.rawValue),
+							id: ledger.id.description,
+							model: ledgerModel
+						)
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
+				)
+
+				return try .init(compressedRepresentation: response.publicKey.data)
 			}
 		)
 	}()
