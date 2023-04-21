@@ -2,6 +2,37 @@ import Prelude
 import Resources
 import SwiftUI
 
+// MARK: - DappThumbnail
+public struct DappThumbnail: View {
+	private let content: Content
+	private let size: HitTargetSize
+
+	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
+		self.content = content
+		self.size = hitTargetSize
+	}
+
+	// TODO: Show different icon if known
+	public var body: some View {
+		switch content {
+		case let .known(url?):
+			Image(asset: AssetResource.iconUnknownComponent)
+				.resizable()
+				.cornerRadius(size.cornerRadius)
+				.frame(size)
+		case .known(nil):
+			DappPlaceholder(known: true, size: size)
+		case .unknown:
+			DappPlaceholder(known: false, size: size)
+		}
+	}
+
+	public enum Content {
+		case unknown
+		case known(URL?)
+	}
+}
+
 // MARK: - DappPlaceholder
 public struct DappPlaceholder: View {
 	private let size: HitTargetSize
