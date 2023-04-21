@@ -149,9 +149,12 @@ private extension ProfileStoreTests {
 }
 
 #if canImport(UIKit)
-private let deviceName = "NAME"
-private let deviceModel = "MODEL"
-private let expectedDeviceDescription = ProfileStore.deviceDescription(deviceGivenName: deviceName, deviceModel: deviceModel)
+private let deviceLabel: FactorSource.Label = "NAME"
+private let deviceDescription: FactorSource.Description = "MODEL"
+private let expectedDeviceDescription = ProfileStore.deviceDescription(
+	label: deviceLabel,
+	description: deviceDescription
+)
 #else
 private let expectedDeviceDescription = ProfileStore.macOSDeviceDescriptionFallback
 #endif
@@ -160,6 +163,6 @@ extension PrivateHDFactorSource {
 	static let testValue: Self = withDependencies {
 		$0.date = .constant(Date(timeIntervalSince1970: 0))
 	} operation: {
-		Self.testValue(hint: expectedDeviceDescription)
+		Self.testValue(label: deviceLabel, description: deviceDescription)
 	}
 }
