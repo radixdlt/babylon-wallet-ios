@@ -6,7 +6,7 @@ extension AddLedgerFactorSource.State {
 		.init(
 			failedToFindAnyLinks: !isConnectedToAnyCE,
 			ledgerName: ledgerName,
-			isLedgerNameInputVisible: isLedgerNameInputVisible,
+			modelOfLedgerToName: unnamedDeviceToAdd?.model,
 			sendAddLedgerRequestControlState: isConnectedToAnyCE ? (isWaitingForResponseFromLedger ? .loading(.local) : .enabled) : .disabled
 		)
 	}
@@ -17,7 +17,7 @@ extension AddLedgerFactorSource {
 	public struct ViewState: Equatable {
 		public let failedToFindAnyLinks: Bool
 		public let ledgerName: String
-		public let isLedgerNameInputVisible: Bool
+		public let modelOfLedgerToName: P2P.LedgerHardwareWallet.Model?
 		public let sendAddLedgerRequestControlState: ControlState
 	}
 
@@ -41,9 +41,9 @@ extension AddLedgerFactorSource {
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					}
 
-					if viewStore.isLedgerNameInputVisible {
+					if let model = viewStore.modelOfLedgerToName {
 						VStack {
-							nameLedgerField(with: viewStore)
+							nameLedgerField(with: viewStore, model: model)
 
 							Button("Confirm name") {
 								viewStore.send(.confirmNameButtonTapped)
@@ -80,18 +80,24 @@ extension AddLedgerFactorSource {
 		}
 
 		@ViewBuilder
-		private func nameLedgerField(with viewStore: ViewStoreOf<AddLedgerFactorSource>) -> some SwiftUI.View {
-			AppTextField(
-				primaryHeading: "Name this Ledger",
-				secondaryHeading: "e.g. 'scratch'",
-				placeholder: "scratched",
-				text: .init(
-					get: { viewStore.ledgerName },
-					set: { viewStore.send(.ledgerNameChanged($0)) }
-				),
-				hint: .info("Displayed when you are prompted to sign with this.")
-			)
-			.padding()
+		private func nameLedgerField(
+			with viewStore: ViewStoreOf<AddLedgerFactorSource>,
+			model: P2P.LedgerHardwareWallet.Model
+		) -> some SwiftUI.View {
+			VStack {
+				Text("Found ledger model: '\(model.rawValue)'")
+				AppTextField(
+					primaryHeading: "Name your Ledger",
+					secondaryHeading: "e.g. 'scratch'",
+					placeholder: "scratched",
+					text: .init(
+						get: { viewStore.ledgerName },
+						set: { viewStore.send(.ledgerNameChanged($0)) }
+					),
+					hint: .info("Displayed when you are prompted to sign with this.")
+				)
+				.padding()
+			}
 		}
 	}
 }

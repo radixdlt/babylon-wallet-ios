@@ -37,7 +37,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		public var failedToFindAnyLinks = false
 		public var ledgerName = ""
-		public var isLedgerNameInputVisible = false
 		public var isWaitingForResponseFromLedger = false
 		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice?
 
@@ -155,7 +154,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .nameLedgerDeviceBeforeSavingIt(device):
 			state.unnamedDeviceToAdd = device
-			state.isLedgerNameInputVisible = true
 			return .none
 
 		case .failedToImportOlympiaLedger:
@@ -164,7 +162,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .addedFactorSource(factorSource, model, name):
 			state.unnamedDeviceToAdd = nil
-			state.isLedgerNameInputVisible = false
 			state.ledgerName = ""
 			guard let verifiedToMigrate = state.verifiedToBeMigrated else {
 				assertionFailure("Expected verified accounts to migrated")

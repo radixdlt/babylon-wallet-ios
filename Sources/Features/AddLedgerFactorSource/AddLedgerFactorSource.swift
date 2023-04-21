@@ -12,7 +12,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var isConnectedToAnyCE = false
 		public var ledgerName = ""
-		public var isLedgerNameInputVisible = false
 		public var isWaitingForResponseFromLedger = false
 		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo?
 
@@ -154,7 +153,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			state.isWaitingForResponseFromLedger = false
 			loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 			state.unnamedDeviceToAdd = ledgerDeviceInfo
-			state.isLedgerNameInputVisible = true
 			return .none
 
 		case let .getDeviceInfoResult(.failure(error)):
