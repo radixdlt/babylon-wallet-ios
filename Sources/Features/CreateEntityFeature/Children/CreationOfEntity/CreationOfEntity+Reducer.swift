@@ -75,7 +75,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.$addNewLedger, action: /Action.child .. ChildAction.addNewLedger) {
-				AddLedgerFactorSource()._printChanges()
+				AddLedgerFactorSource()
 			}
 	}
 
