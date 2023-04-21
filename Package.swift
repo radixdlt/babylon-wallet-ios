@@ -46,6 +46,7 @@ package.addModules([
 		dependencies: [
 			"FactorSourcesClient",
 			"RadixConnectClient",
+			"LedgerHardwareWalletClient",
 			"NewConnectionFeature",
 		],
 		tests: .no
