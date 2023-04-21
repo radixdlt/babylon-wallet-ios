@@ -1,5 +1,6 @@
 import ClientPrelude
 import ComposableArchitecture // actually CasePaths... but CI if we do `import CasePaths` 🤷‍♂️
+import Cryptography
 import RadixConnectClient
 
 extension DependencyValues {
@@ -30,12 +31,16 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 				model: .nanoS,
 				derivedPublicKeys: []
 			)
+		},
+		deriveCurve25519PublicKey: { _ in
+			Curve25519.Signing.PrivateKey().publicKey
 		}
 	)
 
 	public static let testValue = Self(
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
-		importOlympiaDevice: unimplemented("\(Self.self).importOlympiaDevice")
+		importOlympiaDevice: unimplemented("\(Self.self).importOlympiaDevice"),
+		deriveCurve25519PublicKey: unimplemented("\(Self.self).deriveCurve25519PublicKey")
 	)
 }
 
@@ -99,6 +104,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					.importOlympiaDevice(.init(derivationPaths: olympiaHardwareAccounts.map(\.path.derivationPath))),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.importOlympiaDevice
 				)
+			},
+			deriveCurve25519PublicKey: { _ in
 			}
 		)
 	}()

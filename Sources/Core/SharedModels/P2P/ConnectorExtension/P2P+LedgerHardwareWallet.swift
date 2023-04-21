@@ -37,8 +37,10 @@ extension P2P {
 		// to be **decoupled**.
 		public struct LedgerDevice: Sendable, Hashable, Codable {
 			public let name: NonEmptyString?
+
+			/// `FactorSource.ID`
 			public let id: String
-			public let model: Int // Model
+			public let model: Model
 		}
 
 		public struct KeyParameters: Sendable, Hashable, Codable {

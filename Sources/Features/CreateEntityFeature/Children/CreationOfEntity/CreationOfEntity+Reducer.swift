@@ -2,6 +2,7 @@ import AccountsClient
 import AddLedgerFactorSourceFeature
 import Cryptography
 import FeaturePrelude
+import LedgerHardwareWalletClient
 import PersonasClient
 
 // MARK: - GenesisFactorSourceSelection
@@ -67,6 +68,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	public init() {}
 
@@ -141,6 +143,9 @@ extension CreationOfEntity {
 				case .identity: return .forPersona(.init(fields: []))
 				case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
 				}
+			},
+			derivePublicKey: { derivationPath in
+				try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath)
 			}
 		)
 

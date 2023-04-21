@@ -29,18 +29,21 @@ public struct CreateVirtualEntityControlledByLedgerFactorSourceRequest: Sendable
 	public let networkID: NetworkID?
 	public let ledger: FactorSource
 	public let displayName: NonEmptyString
-	public let extraProperties: @Sendable (Int) -> EntityExtraProperties
 	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
+	public let extraProperties: @Sendable (Int) -> EntityExtraProperties
+	public let derivePublicKey: @Sendable (DerivationPath) async throws -> Curve25519.Signing.PublicKey
 
 	public init(
 		networkID: NetworkID?,
 		ledger: FactorSource,
 		displayName: NonEmpty<String>,
-		extraProperties: @escaping @Sendable (Int) -> EntityExtraProperties
+		extraProperties: @escaping @Sendable (Int) -> EntityExtraProperties,
+		derivePublicKey: @escaping @Sendable (DerivationPath) async throws -> Curve25519.Signing.PublicKey
 	) throws {
 		guard ledger.kind == .ledgerHQHardwareWallet else {
 			throw ExpectedLedgerFactorSource()
 		}
+		self.derivePublicKey = derivePublicKey
 		self.entityCreatingStorage = try ledger.entityCreatingStorage()
 		self.ledger = ledger
 		self.networkID = networkID

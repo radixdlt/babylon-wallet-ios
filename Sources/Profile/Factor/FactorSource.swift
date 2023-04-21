@@ -5,7 +5,8 @@ import Prelude
 protocol _FactorSourceProtocol {
 	var kind: FactorSourceKind { get }
 	var id: FactorSourceID { get }
-	var hint: NonEmptyString { get }
+	var label: FactorSource.Label { get }
+	var description: FactorSource.Description { get }
 	var parameters: FactorSource.Parameters { get }
 	var addedOn: Date { get }
 	var lastUsedOn: Date { get }
@@ -20,7 +21,7 @@ public struct FactorSource:
 	Hashable,
 	Codable,
 	Identifiable,
-	CustomStringConvertible,
+	CustomDebugStringConvertible,
 	CustomDumpReflectable
 {
 	/// Kind of factor source
@@ -29,24 +30,43 @@ public struct FactorSource:
 	/// Canonical identifier which uniquely identifies this factor source
 	public let id: FactorSourceID
 
-	/// A user facing hint about this FactorSource which is displayed
+	/// A user facing **label** about this FactorSource which is displayed
 	/// to the user when she is prompted for this FactorSource during
-	/// for example transaction signing. Here are some examples.
+	/// for example transaction signing. For most FactorSource kinds
+	/// this value will be a *name*, here are some examples:
 	///
-	/// * "iPhone 14 Pro Max",
-	/// * "Google Pixel 6",
-	/// * "Ledger Nano Model X",
-	/// * "My friend Lisa"
-	/// * "YubiKey 5C NFC"
-	/// * "Just a private key put in my standard secure storage."
-	/// * "Mnemonic that describes a saga about a crazy horse",
+	/// * `.device`: "iPhone RED"
+	/// * `.ledgerHQHardwareWallet`: "Ledger MOON Edition"
+	/// * `.trustedEntity`: "Sarah"
+	/// * `.offDeviceMnemonic`: "Story about a horse and a battery"
+	/// * `.securityQuestion`: ""
 	///
 	/// The reason why this is mutable (`var`) instead of immutable `let` is
 	/// an implementation detailed on iOS, where reading the device name
 	/// and model is `async` but we want to be able to `sync` create the
-	/// profile, thus tis property at a later point in time where an async
+	/// profile, thus this property at a later point in time where an async
 	/// context is available.
-	public var hint: NonEmptyString
+	///
+	public var label: Label; public typealias Label = Tagged<(Self, label: ()), String>
+
+	/// A user facing **description** about this FactorSource which is displayed
+	/// to the user when she is prompted for this FactorSource during
+	/// for example transaction signing. For most FactorSource kinds
+	/// this value will be a *model*, here are some examples:
+	///
+	/// * `.device`: "iPhone SE 2nd gen"
+	/// * `.ledgerHQHardwareWallet`: "nanoS+"
+	/// * `.trustedEntity`: "Friend"
+	/// * `.offDeviceMnemonic`: "Stored in the place where I played often with my friend A***"
+	/// * `.securityQuestion`: ""
+	///
+	/// The reason why this is mutable (`var`) instead of immutable `let` is
+	/// an implementation detailed on iOS, where reading the device name
+	/// and model is `async` but we want to be able to `sync` create the
+	/// profile, thus this property at a later point in time where an async
+	/// context is available.
+	///
+	public var description: Description; public typealias Description = Tagged<(Self, description: ()), String>
 
 	/// Curve/Derivation scheme
 	public let parameters: Parameters
@@ -76,7 +96,8 @@ public struct FactorSource:
 	init(
 		kind: FactorSourceKind,
 		id: ID,
-		hint: NonEmptyString,
+		label: Label,
+		description: Description,
 		parameters: Parameters,
 		storage: Storage?,
 		addedOn: Date,
@@ -84,7 +105,8 @@ public struct FactorSource:
 	) {
 		self.id = id
 		self.kind = kind
-		self.hint = hint
+		self.label = label
+		self.description = description
 		self.parameters = parameters
 		self.storage = storage
 		self.addedOn = addedOn
@@ -94,7 +116,8 @@ public struct FactorSource:
 	public init(
 		kind: FactorSourceKind,
 		id: ID,
-		hint: NonEmptyString,
+		label: Label,
+		description: Description,
 		parameters: Parameters,
 		storage: Storage? = nil
 	) {
@@ -103,7 +126,8 @@ public struct FactorSource:
 		self.init(
 			kind: kind,
 			id: id,
-			hint: hint,
+			label: label,
+			description: description,
 			parameters: parameters,
 			storage: storage,
 			addedOn: date(),
@@ -125,7 +149,8 @@ extension FactorSource {
 			children: [
 				"id": String(describing: id),
 				"kind": kind,
-				"hint": hint,
+				"label": label,
+				"description": description,
 				"parameters": parameters,
 				"addedOn": addedOn,
 				"lastUsedOn": lastUsedOn,
@@ -135,11 +160,12 @@ extension FactorSource {
 		)
 	}
 
-	public var description: String {
+	public var debugDescription: String {
 		"""
 		"id": \(String(describing: id)),
 		"kind": \(kind),
-		"hint": \(hint),
+		"label": \(label),
+		"description": \(description),
 		"parameters": \(parameters),
 		"addedOn": \(addedOn.ISO8601Format()),
 		"lastUsedOn": \(lastUsedOn.ISO8601Format()),
@@ -155,7 +181,8 @@ extension FactorSource {
 		return try! Self(
 			kind: .device,
 			id: id(fromRoot: mnemonic.hdRoot(passphrase: "")),
-			hint: "previewValue",
+			label: "previewValue",
+			description: "preview description",
 			parameters: .default,
 			storage: .entityCreating(.init()),
 			addedOn: .init(timeIntervalSince1970: 0),
