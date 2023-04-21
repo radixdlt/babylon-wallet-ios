@@ -37,23 +37,22 @@ extension NonFungibleTokenList.Row {
 					if viewStore.token.ids.isEmpty {
 						EmptyView()
 					} else {
-						LazyVStack {
-							ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
-								Group {
-									switch index {
-									case -1:
-										headerView(with: viewStore, index: index)
-									default:
-										componentView(with: viewStore, index: index)
-									}
+						// TODO: There is a performance issue when multiple items are involved, all fo the expanded views seems to be actually loaded from the begining.
+						ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
+							Group {
+								switch index {
+								case -1:
+									headerView(with: viewStore, index: index)
+								default:
+									componentView(with: viewStore, index: index)
 								}
-								.onSizeChanged { size in
-									if rowHeights[index] == nil {
+							}
+							.onSizeChanged { size in
+								if rowHeights[index] == nil {
+									rowHeights[index] = size.height
+								} else {
+									withAnimation {
 										rowHeights[index] = size.height
-									} else {
-										withAnimation {
-											rowHeights[index] = size.height
-										}
 									}
 								}
 							}

@@ -12,10 +12,6 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 		}
 	}
 
-//	public enum ViewAction: Sendable, Equatable {
-//		//case selectedTokenChanged(NonFungibleTokenList.Detail.State?)
-//	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case asset(NonFungibleTokenList.Row.State.ID, NonFungibleTokenList.Row.Action)
 		case destination(PresentationAction<Destinations.Action>)
@@ -55,9 +51,9 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 			state.destination = .details(detailState)
 			return .none
 
-//		case .destination(.presented(.details(.delegate(.dismiss)))):
-//			//state.destination = nil
-//			return .none
+		case .destination(.presented(.details(.delegate(.dismiss)))):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none
