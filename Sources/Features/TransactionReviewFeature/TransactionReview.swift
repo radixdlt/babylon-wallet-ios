@@ -20,7 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse? = nil
 
 		public var fee: BigDecimal
-		public var feePayer: Profile.Network.Account?
+		public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates?
 
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
@@ -36,7 +36,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public init(
 			transactionManifest: TransactionManifest,
 			message: String?,
-			feeToAdd: BigDecimal = 10,
+			feeToAdd: BigDecimal = 10, // fix me use estimate from `analyze`
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
 			self.transactionManifest = transactionManifest
@@ -218,18 +218,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .destination(.presented(.selectFeePayer(.delegate(.selectedFeePayer(selectedFeePayer, fee))))):
-			state.feePayer = selectedFeePayer.account
+		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selected))))):
+			state.feePayerSelectionAmongstCandidates = selected
 			state.destination = nil
-			state.fee = fee
 			return .run { [transactionManifest = state.transactionManifest] send in
 
 				await send(.internal(.addedTransactionFeeToSelectedPayerResult(
 					TaskResult {
 						try await transactionClient.lockFeeWithSelectedPayer(
 							transactionManifest,
-							fee,
-							selectedFeePayer.account.address
+							selected.fee,
+							selected.selected.account.address
 						)
 					}
 				)))
@@ -291,12 +290,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
 			switch preview.addFeeToManifestOutcome {
-			case let .includesLockFee(manifestWithLockFee, feeAdded, payer):
-				state.feePayer = payer.account
+			case let .includesLockFee(manifestWithLockFee, feePayerSelectionAmongstCandidates):
+				state.feePayerSelectionAmongstCandidates = feePayerSelectionAmongstCandidates
 				state.transactionWithLockFee = manifestWithLockFee
 				return self.review(
 					manifestPreview: preview.analyzedManifestToReview,
-					feeAdded: feeAdded,
+					feeAdded: feePayerSelectionAmongstCandidates.fee,
 					networkID: preview.networkID
 				)
 			case let .excludesLockFee(_, feePayerCandidates, feeNotYetAdded):

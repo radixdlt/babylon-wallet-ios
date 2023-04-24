@@ -1,4 +1,5 @@
 import FeaturePrelude
+import SigningFeature
 import TransactionClient
 
 // MARK: - SelectFeePayer
@@ -23,7 +24,7 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedFeePayer(FeePayerCandiate, fee: BigDecimal)
+		case selected(FeePayerSelectionAmongstCandidates)
 	}
 
 	public init() {}
@@ -34,7 +35,13 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 			state.selectedPayerID = payerID
 			return .none
 		case let .confirmedFeePayer(payer):
-			return .send(.delegate(.selectedFeePayer(payer, fee: state.fee)))
+			let selected = FeePayerSelectionAmongstCandidates(
+				selected: payer,
+				candidates: state.feePayerCandidates,
+				fee: state.fee,
+				selection: .selectedByUser
+			)
+			return .send(.delegate(.selected(selected)))
 		}
 	}
 }

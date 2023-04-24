@@ -35,13 +35,13 @@ extension TransactionClient {
 			return Set(xrdContainers.filter { $0.amount >= fee })
 		}
 
-		@Sendable
-		func firstAccountAddressWithEnoughFunds(
-			from addresses: [AccountAddress],
-			toPay fee: BigDecimal
-		) async -> FungibleTokenContainer? {
-			await accountsWithEnoughFunds(from: addresses, toPay: fee).first
-		}
+//		@Sendable
+//		func firstAccountAddressWithEnoughFunds(
+//			from addresses: [AccountAddress],
+//			toPay fee: BigDecimal
+//		) async -> FungibleTokenContainer? {
+//			await accountsWithEnoughFunds(from: addresses, toPay: fee).first
+//		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
 			let version = engineToolkitClient.getTransactionVersion()
@@ -92,6 +92,32 @@ extension TransactionClient {
 
 			let version = engineToolkitClient.getTransactionVersion()
 
+			let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+			let allCandidates = await accountsWithEnoughFunds(
+				from: allAccounts.map(\.address),
+				toPay: feeToAdd
+			).compactMap { tokenBalance -> FeePayerCandiate? in
+				guard
+					let account = allAccounts.first(where: { account in account.address == tokenBalance.owner })
+				else {
+					assertionFailure("Failed to find account, this should never happen.")
+					return nil
+				}
+				return FeePayerCandiate(
+					account: account,
+					xrdBalance: tokenBalance.amount
+				)
+			}
+
+			guard let allCandidatesNonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(
+				rawValue: .init(
+					uniqueElements: allCandidates,
+					id: \.account.address
+				)
+			) else {
+				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+			}
+
 			let accountsSuitableToPayForTXFeeRequest = AccountAddressesInvolvedInTransactionRequest(
 				version: version,
 				manifest: maybeStringManifest,
@@ -101,59 +127,25 @@ extension TransactionClient {
 			let accountAddressesSuitableToPayTransactionFeeRef = try engineToolkitClient
 				.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-			let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-
-			let maybeFeePayer: FeePayerCandiate? = try await { () async throws -> FeePayerCandiate? in
-
-				guard let accountInvolvedInTransactionWithEnoughBalance = await firstAccountAddressWithEnoughFunds(
-					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
-					toPay: feeToAdd
-				) else {
-					return nil
-				}
-
-				guard let account = allAccounts.first(where: { $0.address == accountInvolvedInTransactionWithEnoughBalance.owner }) else {
-					assertionFailure("Failed to find account, this should never happen.")
-					throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
-				}
-				return FeePayerCandiate(account: account, xrdBalance: accountInvolvedInTransactionWithEnoughBalance.amount)
-			}()
-
-			guard let feePayer = maybeFeePayer else {
-				// The transaction manifest does not reference any accounts that also has enough balance.
-				// let us find some candidates accounts that user can select from
-				let allAccountAddresses = allAccounts.map(\.address)
-				let allAddressSet = Set(allAccountAddresses)
-				let accountsNotAlreadyChecked = allAddressSet.subtracting(accountAddressesSuitableToPayTransactionFeeRef)
-
-				let candidates = await accountsWithEnoughFunds(
-					from: .init(accountsNotAlreadyChecked),
-					toPay: feeToAdd
-				)
-
-				guard let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>.init(
-					rawValue: .init(
-						uniqueElements: candidates.compactMap { element in
-							guard let account = allAccounts.first(where: { $0.address == element.owner }) else {
-								return nil
-							}
-							return FeePayerCandiate(account: account, xrdBalance: element.amount)
-						},
-						id: \.id
-					)
-				) else {
-					throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
-				}
-
-				return .excludesLockFee(
-					maybeStringManifest,
-					feePayerCandidates: nonEmpty,
-					feeNotYetAdded: feeToAdd
-				)
+			guard
+				let feePayerInvolvedInTransaction = allCandidates.first(where: { candidate in accountAddressesSuitableToPayTransactionFeeRef.contains(where: { involved in
+					involved == candidate.account.address
+				})
+				})
+			else {
+				return .excludesLockFee(maybeStringManifest, feePayerCandidates: allCandidatesNonEmpty, feeNotYetAdded: feeToAdd)
 			}
+			let manifestWithLockFee = try await lockFeeWithSelectedPayer(maybeStringManifest, feeToAdd, feePayerInvolvedInTransaction.account.address)
 
-			let manifestWithLockFee = try await lockFeeWithSelectedPayer(maybeStringManifest, feeToAdd, feePayer.account.address)
-			return .includesLockFee(manifestWithLockFee, feeAdded: feeToAdd, feePayer: feePayer)
+			return .includesLockFee(
+				manifestWithLockFee,
+				feePayer: .init(
+					selected: feePayerInvolvedInTransaction,
+					candidates: allCandidatesNonEmpty,
+					fee: feeToAdd,
+					selection: .auto
+				)
+			)
 		}
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in

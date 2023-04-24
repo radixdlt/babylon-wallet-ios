@@ -107,7 +107,7 @@ public struct FeePayerCandiate: Sendable, Hashable, Identifiable {
 
 // MARK: - AddFeeToManifestOutcome
 public enum AddFeeToManifestOutcome: Sendable, Equatable {
-	case includesLockFee(TransactionManifest, feeAdded: BigDecimal, feePayer: FeePayerCandiate)
+	case includesLockFee(TransactionManifest, feePayer: FeePayerSelectionAmongstCandidates)
 	case excludesLockFee(TransactionManifest, feePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>, feeNotYetAdded: BigDecimal)
 }
 
@@ -116,4 +116,32 @@ public struct TransactionToReview: Sendable, Equatable {
 	public let analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse
 	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
+}
+
+// MARK: - FeePayerSelectionAmongstCandidates
+public struct FeePayerSelectionAmongstCandidates: Sendable, Hashable {
+	public enum Selection: Sendable, Hashable {
+		case selectedByUser
+		case auto
+	}
+
+	public let selected: FeePayerCandiate
+	/// contains `selected`
+	public let candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>
+
+	public let fee: BigDecimal
+
+	public let selection: Selection
+
+	public init(
+		selected: FeePayerCandiate,
+		candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>,
+		fee: BigDecimal,
+		selection: Selection
+	) {
+		self.selected = selected
+		self.candidates = candidates
+		self.fee = fee
+		self.selection = selection
+	}
 }
