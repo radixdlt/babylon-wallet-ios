@@ -96,18 +96,14 @@ extension TransactionReviewDappsUsed {
 				HStack(spacing: 0) {
 					switch type {
 					case let .known(name, url, description):
-						if let url {
-							DappPlaceholder(size: .smaller)
-						} else {
-							DappPlaceholder(known: true, size: .smaller)
-						}
+						DappThumbnail(.known(url), size: .smaller)
 
 						Text(name)
 							.lineLimit(2)
 							.padding(.leading, .small2)
 
 					case let .unknown(count):
-						DappPlaceholder(known: false, size: .smaller)
+						DappThumbnail(.unknown, size: .smaller)
 							.padding(.trailing, .small2)
 
 						Text(L10n.TransactionReview.UsingDapps.unknownComponents(count))

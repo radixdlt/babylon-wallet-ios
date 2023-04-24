@@ -261,8 +261,7 @@ struct RawTransactionView: SwiftUI.View {
 struct TransactionReviewTokenView: View {
 	struct ViewState: Equatable {
 		let name: String?
-		let isXRD: Bool
-		let thumbnail: URL?
+		let thumbnail: TokenThumbnail.Content
 
 		let amount: BigDecimal
 		let guaranteedAmount: BigDecimal?
@@ -273,13 +272,8 @@ struct TransactionReviewTokenView: View {
 
 	var body: some View {
 		HStack(spacing: .small1) {
-			if let thumbnail = viewState.thumbnail {
-				TokenPlaceholder(size: .small) // TODO:  Actually use URL
-					.padding(.vertical, .small1)
-			} else {
-				TokenPlaceholder(isXRD: viewState.isXRD, size: .small)
-					.padding(.vertical, .small1)
-			}
+			TokenThumbnail(viewState.thumbnail, size: .small)
+				.padding(.vertical, .small1)
 
 			if let name = viewState.name {
 				Text(name)

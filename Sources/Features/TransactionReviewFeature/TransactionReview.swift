@@ -313,7 +313,7 @@ extension TransactionReview {
 		return LedgerEntity(
 			id: address,
 			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-			                thumbnail: nil,
+			                thumbnail: metadata?.iconURL,
 			                description: metadata?.description)
 		)
 	}
@@ -526,6 +526,10 @@ extension TransactionReview {
 
 		public var guarantee: TransactionClient.Guarantee?
 		public var metadata: ResourceMetadata
+
+		public var thumbnail: TokenThumbnail.Content {
+			isXRD ? .xrd : .known(metadata.thumbnail)
+		}
 
 		public init(
 			amount: BigDecimal,

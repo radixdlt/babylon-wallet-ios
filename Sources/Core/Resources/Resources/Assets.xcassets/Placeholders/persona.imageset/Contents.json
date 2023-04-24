@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "persona.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
