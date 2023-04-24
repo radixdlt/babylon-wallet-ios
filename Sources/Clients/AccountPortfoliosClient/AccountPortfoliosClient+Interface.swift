@@ -22,8 +22,8 @@ public struct AccountPortfoliosClient: Sendable {
 }
 
 extension AccountPortfoliosClient {
-	public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ refresh: Bool) async throws -> AccountPortfolio
-	public typealias FetchAccountPortfolios = @Sendable (_ address: [AccountAddress], _ refresh: Bool) async throws -> [AccountPortfolio]
+	public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ forceResfresh: Bool) async throws -> AccountPortfolio
+	public typealias FetchAccountPortfolios = @Sendable (_ addresses: [AccountAddress], _ forceResfresh: Bool) async throws -> [AccountPortfolio]
 	public typealias PortfolioForAccount = @Sendable (_ address: AccountAddress) async -> AnyAsyncSequence<AccountPortfolio>
 	public typealias Portfolios = @Sendable () -> [AccountPortfolio]
 }

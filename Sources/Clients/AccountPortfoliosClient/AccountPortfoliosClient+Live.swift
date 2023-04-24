@@ -42,12 +42,12 @@ extension AccountPortfoliosClient: DependencyKey {
 		}
 
 		return AccountPortfoliosClient(
-			fetchAccountPortfolios: { accountAddresses, refresh in
+			fetchAccountPortfolios: { accountAddresses, forceRefresh in
 				let portfolios = try await {
 					// TODO: This logic might be a good candidate for shared logic in cacheClient. When it is wanted to load multiple models as bulk and save independently.
 
 					// Refresh all accounts
-					if refresh {
+					if forceRefresh {
 						let allPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(accountAddresses)
 						allPortfolios.forEach {
 							cacheClient.save($0, .accountPortfolio(.single($0.owner.address)))
@@ -80,10 +80,10 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				return portfolios
 			},
-			fetchAccountPortfolio: { accountAddress, refresh in
+			fetchAccountPortfolio: { accountAddress, forceRefresh in
 				let portfolio = try await cacheClient.withCaching(
 					cacheEntry: .accountPortfolio(.single(accountAddress.address)),
-					forceRefresh: refresh,
+					forceRefresh: forceRefresh,
 					request: { try await AccountPortfoliosClient.fetchAccountPortfolio(accountAddress) }
 				)
 
@@ -100,6 +100,8 @@ extension AccountPortfoliosClient: DependencyKey {
 }
 
 extension AccountPortfoliosClient {
+        struct EmptyAccountDetails: Error {}
+
 	@Sendable
 	static func fetchAccountPortfolios(
 		_ addresses: [AccountAddress]
@@ -115,7 +117,10 @@ extension AccountPortfoliosClient {
 		_ accountAddress: AccountAddress
 	) async throws -> AccountPortfolio {
 		let accountDetails = try await fetchResourceDetails([accountAddress.address])
-		return try await createAccountPortfolio(accountDetails.items.first!, ledgerState: accountDetails.ledgerState)
+                guard let accountItem =  accountDetails.items.first else {
+                        throw EmptyAccountDetails()
+                }
+		return try await createAccountPortfolio(accountItem, ledgerState: accountDetails.ledgerState)
 	}
 }
 
@@ -355,7 +360,8 @@ extension AccountPortfoliosClient {
 
 // MARK: - Resource details endpoint
 extension AccountPortfoliosClient {
-	// This needs to be synchronized with the actuall value on the GW side
+	// The maximum number of addresses the `getEntityDetails` can accept
+        // This needs to be synchronized with the actuall value on the GW side
 	static let entityDetailsPageSize = 20
 	struct EmptyEntityDetailsResponse: Error {}
 
@@ -457,48 +463,26 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 			}
 		}
 
-		func sortByAddress(_ lhs: AccountPortfolio.FungibleResource, _ rhs: AccountPortfolio.FungibleResource) -> Bool {
-			lhs.resourceAddress.address < rhs.resourceAddress.address
-		}
-
-		func sortByName(_ lhs: AccountPortfolio.FungibleResource, _ rhs: AccountPortfolio.FungibleResource) -> Bool {
-			switch (lhs.name, rhs.name) {
-			case (.none, .none):
-				return sortByAddress(lhs, rhs)
-			case (.none, .some):
-				return false
-			case (.some, .none):
-				return true
-			case let (.some(lhsName), .some(rhsName)):
-				return lhsName < rhsName
-			}
-		}
-
-		func sortBySymbol(_ lhs: AccountPortfolio.FungibleResource, _ rhs: AccountPortfolio.FungibleResource) -> Bool {
-			switch (lhs.symbol, rhs.symbol) {
-			case (.none, .none):
-				return sortByName(lhs, rhs)
-			case (.none, .some):
-				return false
-			case (.some, .none):
-				return true
-			case let (.some(lhsSymbol), .some(rhsSymbol)):
-				return lhsSymbol < rhsSymbol
-			}
-		}
-
 		let sortedNonXrdresources = nonXrdResources.sorted { lhs, rhs in
-			switch (lhs.amount, rhs.amount) {
-			case (.zero, .zero):
-				return sortBySymbol(lhs, rhs)
-			case (.zero, _):
-				return false
-			case (_, .zero):
-				return true
-			case let (lhsAmount, rhsAmount):
-				return lhsAmount > rhsAmount
-			}
-		}
+                        if lhs.amount > .zero && rhs.amount > .zero {
+                                return lhs.amount > rhs.amount // Sort descending by amount
+                        }
+                        if lhs.amount != .zero || rhs.amount != .zero {
+                                return lhs.amount != .zero
+                        }
+
+                        if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
+                                return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+                        }
+                        if lhs.symbol != nil || rhs.symbol != nil {
+                                return lhs.symbol != nil
+                        }
+                        
+                        if let lhsName = lhs.name, let rhsName = rhs.name {
+                                return lhsName < rhsName // Sort alphabetically by name
+                        }
+                        return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
+                }
 
 		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdresources)
 	}
