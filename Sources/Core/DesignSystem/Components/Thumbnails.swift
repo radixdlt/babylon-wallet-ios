@@ -25,16 +25,22 @@ public struct DappThumbnail: View {
 	}
 
 	@ViewBuilder
+	@MainActor
 	private var image: some View {
 		switch content {
 		case let .known(url?):
-			Image(asset: AssetResource.unknownComponent)
-				.resizable()
+			LazyImage(url: url) { _ in
+				placeholder.border(.red)
+			}
 		case .known(nil), .unknown:
 			// TODO: Show different icon if known
-			Image(asset: AssetResource.unknownComponent)
-				.resizable()
+			placeholder.border(.yellow)
 		}
+	}
+
+	private var placeholder: some View {
+		Image(asset: AssetResource.unknownComponent)
+			.resizable()
 	}
 }
 
@@ -61,20 +67,26 @@ public struct TokenThumbnail: View {
 	}
 
 	@ViewBuilder
+	@MainActor
 	private var image: some View {
 		switch content {
 		case .xrd:
 			Image(asset: AssetResource.xrd)
 				.resizable()
 		case let .known(url?):
-			Image(asset: AssetResource.token)
-				.resizable()
+			LazyImage(url: url) { _ in
+				placeholder.border(.red)
+			}
 
 		// TODO: Show different icon if known
 		case .known(nil), .unknown:
-			Image(asset: AssetResource.token)
-				.resizable()
+			placeholder.border(.yellow)
 		}
+	}
+
+	private var placeholder: some View {
+		Image(asset: AssetResource.token)
+			.resizable()
 	}
 }
 
@@ -100,16 +112,22 @@ public struct NFTThumbnail: View {
 	}
 
 	@ViewBuilder
+	@MainActor
 	private var image: some View {
 		switch content {
 		case let .known(url?):
-			Image(asset: AssetResource.nft)
-				.resizable()
+			LazyImage(url: url) { _ in
+				placeholder.border(.red)
+			}
 		case .known(nil), .unknown:
 			// TODO: Show different icon if known
-			Image(asset: AssetResource.nft)
-				.resizable()
+			placeholder.border(.yellow)
 		}
+	}
+
+	private var placeholder: some View {
+		Image(asset: AssetResource.nft)
+			.resizable()
 	}
 }
 
