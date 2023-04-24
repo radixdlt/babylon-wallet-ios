@@ -172,10 +172,10 @@ extension AccountPortfoliosClient {
 		async let fungibleResources = createFungibleResources(rawItems: rawFungibleResources)
 		async let nonFungibleResources = createNonFungibleResources(rawAccountDetails.address, rawItems: rawNonFungibleResources)
 
-		return try AccountPortfolio(
+		return try await AccountPortfolio(
 			owner: .init(address: rawAccountDetails.address),
-			fungibleResources: try await fungibleResources,
-			nonFungibleResources: try await nonFungibleResources
+			fungibleResources: fungibleResources,
+			nonFungibleResources: nonFungibleResources
 		)
 	}
 
