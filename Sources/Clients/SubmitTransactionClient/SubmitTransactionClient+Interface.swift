@@ -45,6 +45,10 @@ extension SubmitTransactionClient {
 public struct SubmitTXRequest: Sendable, Hashable {
 	public let txID: TXID
 	public let compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
+	public init(txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse) {
+		self.txID = txID
+		self.compiledNotarizedTXIntent = compiledNotarizedTXIntent
+	}
 }
 
 // MARK: - TransactionStatusUpdate

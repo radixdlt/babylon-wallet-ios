@@ -111,8 +111,40 @@ extension FaucetClient: DependencyKey {
 					))
 				}
 			}
+			let notaryAndSigners = builtTransactionIntentWithSigners.notaryAndSigners
+			let intentSignatures_ = try await notaryAndSigners.accountsNeededToSign.asyncMap {
+				try await sign(
+					unhashed: compiledTransactionIntent.compiledIntent,
+					with: $0,
+					debugOrigin: "Intent Signers"
+				)
+			}
 
-			fatalError()
+			let intentSignatures = try intentSignatures_.map { try $0.intoEngine() }
+
+			let signedTransactionIntent = SignedTransactionIntent(
+				intent: transactionIntent,
+				intentSignatures: intentSignatures
+			)
+			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
+
+			let notarySignatureWithPublicKey = try await sign(
+				unhashed: compiledSignedIntent.compiledIntent,
+				with: notaryAndSigners.notarySigner,
+				debugOrigin: "Notary signer"
+			)
+
+			let notarySignature = try notarySignatureWithPublicKey.intoEngine().signature
+
+			let uncompiledNotarized = NotarizedTransaction(
+				signedIntent: signedTransactionIntent,
+				notarySignature: notarySignature
+			)
+			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
+
+			try await submitTXClient.submitTransaction(.init(txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
+
+			let resu = try await submitTXClient.awaitCompleted(txID: txID)
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
