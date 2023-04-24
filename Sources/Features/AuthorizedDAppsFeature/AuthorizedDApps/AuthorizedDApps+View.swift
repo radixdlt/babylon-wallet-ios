@@ -12,7 +12,13 @@ extension AuthorizedDapps {
 	}
 
 	public struct ViewState: Equatable {
-		let dApps: Profile.Network.AuthorizedDapps
+		let dApps: IdentifiedArrayOf<Dapp>
+
+		struct Dapp: Equatable, Identifiable {
+			let id: Profile.Network.AuthorizedDapp.ID
+			let name: String
+			let thumbnail: URL?
+		}
 	}
 }
 
@@ -33,10 +39,10 @@ extension AuthorizedDapps.View {
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.dApps) { dApp in
 							Card {
-								PlainListRow(title: dApp.displayName.rawValue) {
+								PlainListRow(title: dApp.name) {
 									viewStore.send(.didSelectDapp(dApp.id))
 								} icon: {
-									DappPlaceholder()
+									DappThumbnail(.known(dApp.thumbnail))
 								}
 							}
 						}
@@ -62,7 +68,11 @@ extension AuthorizedDapps.View {
 
 extension AuthorizedDapps.State {
 	var viewState: AuthorizedDapps.ViewState {
-		.init(dApps: dApps)
+		let dAppViewStates = dApps.map {
+			AuthorizedDapps.ViewState.Dapp(id: $0.id, name: $0.displayName.rawValue, thumbnail: thumbnails[$0.id])
+		}
+
+		return .init(dApps: .init(uniqueElements: dAppViewStates))
 	}
 }
 

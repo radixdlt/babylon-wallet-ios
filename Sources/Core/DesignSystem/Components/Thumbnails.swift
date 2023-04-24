@@ -1,3 +1,4 @@
+import NukeUI
 import Prelude
 import Resources
 import SwiftUI
@@ -7,91 +8,135 @@ public struct DappThumbnail: View {
 	private let content: Content
 	private let size: HitTargetSize
 
+	public enum Content: Sendable, Hashable {
+		case known(URL?)
+		case unknown
+	}
+
 	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
 		self.content = content
 		self.size = hitTargetSize
 	}
 
-	// TODO: Show different icon if known
 	public var body: some View {
-		switch content {
-		case let .known(url?):
-			Image(asset: AssetResource.iconUnknownComponent)
-				.resizable()
-				.cornerRadius(size.cornerRadius)
-				.frame(size)
-		case .known(nil):
-			DappPlaceholder(known: true, size: size)
-		case .unknown:
-			DappPlaceholder(known: false, size: size)
-		}
-	}
-
-	public enum Content {
-		case unknown
-		case known(URL?)
-	}
-}
-
-// MARK: - DappPlaceholder
-public struct DappPlaceholder: View {
-	private let size: HitTargetSize
-	private let known: Bool
-
-	public init(known: Bool = true, size hitTargetSize: HitTargetSize = .small) {
-		self.known = known
-		self.size = hitTargetSize
-	}
-
-	// TODO: Show different icon if known
-	public var body: some View {
-		Image(asset: AssetResource.iconUnknownComponent)
-			.resizable()
+		image
 			.cornerRadius(size.cornerRadius)
 			.frame(size)
 	}
+
+	@ViewBuilder
+	private var image: some View {
+		switch content {
+		case let .known(url?):
+			Image(asset: AssetResource.unknownComponent)
+				.resizable()
+		case .known(nil), .unknown:
+			// TODO: Show different icon if known
+			Image(asset: AssetResource.unknownComponent)
+				.resizable()
+		}
+	}
 }
 
-// MARK: - TokenPlaceholder
-public struct TokenPlaceholder: View {
+// MARK: - TokenThumbnail
+public struct TokenThumbnail: View {
+	private let content: Content
 	private let size: HitTargetSize
-	private let known: Bool
-	private let isXRD: Bool
 
-	public init(known: Bool = true, isXRD: Bool = false, size hitTargetSize: HitTargetSize = .small) {
-		self.known = known
-		self.isXRD = isXRD
+	public enum Content: Sendable, Hashable {
+		case xrd
+		case known(URL?)
+		case unknown
+	}
+
+	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
+		self.content = content
 		self.size = hitTargetSize
 	}
 
-	// TODO: Show different icon if known
 	public var body: some View {
-		Image(asset: isXRD ? AssetResource.xrd : AssetResource.fungibleToken)
-			.resizable()
+		image
 			.clipShape(Circle())
 			.frame(size)
 	}
+
+	@ViewBuilder
+	private var image: some View {
+		switch content {
+		case .xrd:
+			Image(asset: AssetResource.xrd)
+				.resizable()
+		case let .known(url?):
+			Image(asset: AssetResource.token)
+				.resizable()
+
+		// TODO: Show different icon if known
+		case .known(nil), .unknown:
+			Image(asset: AssetResource.token)
+				.resizable()
+		}
+	}
 }
 
-// MARK: - NFTPlaceholder
-public struct NFTPlaceholder: View {
+// MARK: - NFTThumbnail
+public struct NFTThumbnail: View {
+	private let content: Content
 	private let size: HitTargetSize
-	private let known: Bool
 
-	public init(known: Bool = true, size hitTargetSize: HitTargetSize = .small) {
-		self.known = known
+	public enum Content: Sendable, Hashable {
+		case known(URL?)
+		case unknown
+	}
+
+	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
+		self.content = content
 		self.size = hitTargetSize
 	}
 
-	// TODO: Implement. Show different icon if known
 	public var body: some View {
-		DappPlaceholder(known: known, size: size)
+		image
+			.cornerRadius(size.cornerRadius)
+			.frame(size)
+	}
+
+	@ViewBuilder
+	private var image: some View {
+		switch content {
+		case let .known(url?):
+			Image(asset: AssetResource.nft)
+				.resizable()
+		case .known(nil), .unknown:
+			// TODO: Show different icon if known
+			Image(asset: AssetResource.nft)
+				.resizable()
+		}
 	}
 }
 
-// MARK: - DappPlaceholder_Previews
-struct DappPlaceholder_Previews: PreviewProvider {
-	static var previews: some View {
-		DappPlaceholder()
+// MARK: - PersonaThumbnail
+public struct PersonaThumbnail: View {
+	private let content: URL?
+	private let size: HitTargetSize
+
+	public init(_ content: URL?, size hitTargetSize: HitTargetSize = .small) {
+		self.content = content
+		self.size = hitTargetSize
+	}
+
+	public var body: some View {
+		image
+			.clipShape(Circle())
+			.frame(size)
+	}
+
+	@ViewBuilder
+	private var image: some View {
+		if let content {
+			Image(asset: AssetResource.persona)
+				.resizable()
+		} else {
+			Image(asset: AssetResource.persona)
+				.resizable()
+		}
 	}
 }
