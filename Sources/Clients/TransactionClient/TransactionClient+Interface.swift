@@ -8,6 +8,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 	public var lockFeeWithSelectedPayer: LockFeeWithSelectedPayer
 	public var addGuaranteesToManifest: AddGuaranteesToManifest
 	public var getTransactionReview: GetTransactionReview
+	public var buildTransactionIntent: BuildTransactionIntent
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
@@ -17,6 +18,36 @@ extension TransactionClient {
 	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async -> TransactionReviewResult
+	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async -> BuildTransactionIntentResult
+}
+
+// MARK: - BuildTransactionIntentRequest
+public struct BuildTransactionIntentRequest: Sendable {
+	public let networkID: NetworkID
+	public let manifest: TransactionManifest
+	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
+	public let selectNotary: SelectNotary
+
+	public init(
+		networkID: NetworkID,
+		manifest: TransactionManifest,
+		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
+		selectNotary: @escaping SelectNotary = { $0.first }
+	) {
+		self.networkID = networkID
+		self.manifest = manifest
+		self.makeTransactionHeaderInput = makeTransactionHeaderInput
+		self.selectNotary = selectNotary
+	}
+}
+
+public typealias BuildTransactionIntentResult = Result<TransactionIntentWithSigners, TransactionFailure.FailedToPrepareForTXSigning>
+
+// MARK: - TransactionIntentWithSigners
+public struct TransactionIntentWithSigners: Sendable, Hashable {
+	public let intent: TransactionIntent
+	public let notaryAndSigners: NotaryAndSigners
+	public let signerPublicKeys: [Engine.PublicKey]
 }
 
 public typealias TransactionReviewResult = Swift.Result<TransactionToReview, TransactionFailure>

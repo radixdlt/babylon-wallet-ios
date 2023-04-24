@@ -408,9 +408,12 @@ package.addModules([
 		name: "FaucetClient",
 		dependencies: [
 			"EngineToolkitClient",
+			"FactorSourcesClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
+			"SubmitTransactionClient",
 			"TransactionClient",
+			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),
@@ -596,11 +599,7 @@ package.addModules([
 			"AccountsClient",
 			"CacheClient",
 			"EngineToolkitClient",
-			"FactorSourcesClient",
 			"GatewayAPI",
-			"GatewaysClient",
-			"SecureStorageClient",
-			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),

@@ -1,8 +1,13 @@
 import ClientPrelude
+import Cryptography
 import EngineToolkitClient
+import EngineToolkitModels
+import FactorSourcesClient
 import GatewayAPI
 import GatewaysClient
+import SubmitTransactionClient
 import TransactionClient
+import UseFactorSourceClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
 // internal for tests
@@ -42,17 +47,71 @@ extension FaucetClient: DependencyKey {
 		}
 
 		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
-//			@Dependency(\.transactionClient) var transactionClient
+			@Dependency(\.transactionClient) var transactionClient
+			@Dependency(\.secureStorageClient) var secureStorageClient
+			@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+			@Dependency(\.factorSourcesClient) var factorSourcesClient
+			@Dependency(\.submitTXClient) var submitTXClient
 
-//			let signSubmitTXRequest = SignManifestRequest(
-//				manifestToSign: manifest,
-//				makeTransactionHeaderInput: .default
-//			)
-//
-//			let _ = try await transactionClient
-//				.signAndSubmitTransaction(signSubmitTXRequest)
-//				.asyncFlatMap(transform: transactionClient.getTransactionResult)
-//				.get()
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+
+			let builtTransactionIntentWithSigners = try await transactionClient.buildTransactionIntent(.init(networkID: networkID, manifest: manifest)).get()
+			let transactionIntent = builtTransactionIntentWithSigners.intent
+			let compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
+			let txID = try engineToolkitClient.generateTXID(transactionIntent)
+
+			// Enables us to only read from keychain once per mnemonic
+			let cachedPrivateHDFactorSources = ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>>([])
+
+			@Sendable func sign(
+				unhashed unhashed_: some DataProtocol,
+				with account: Profile.Network.Account,
+				debugOrigin origin: String
+			) async throws -> SignatureWithPublicKey {
+				switch account.securityState {
+				case let .unsecured(unsecuredControl):
+					let factorInstance = unsecuredControl.genesisFactorInstance
+					let factorSources = try await factorSourcesClient.getFactorSources()
+
+					let privateHDFactorSource: PrivateHDFactorSource = try await { @Sendable () async throws -> PrivateHDFactorSource in
+
+						let cache = await cachedPrivateHDFactorSources.value
+						if let cached = cache[id: factorInstance.factorSourceID] {
+							return cached
+						}
+
+						guard
+							let factorSource = factorSources[id: factorInstance.factorSourceID],
+							let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorInstance.factorSourceID, .signTransaction)
+						else {
+							throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
+						}
+
+						let privateHDFactorSource = try PrivateHDFactorSource(
+							mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
+							hdOnDeviceFactorSource: .init(factorSource: factorSource)
+						)
+
+						await cachedPrivateHDFactorSources.setValue(cache.appending(privateHDFactorSource))
+
+						return privateHDFactorSource
+					}()
+
+					let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
+					let curve = privateHDFactorSource.hdOnDeviceFactorSource.parameters.supportedCurves.last
+					let unhashedData = Data(unhashed_)
+
+					loggerGlobal.debug("🔏 Signing data, origin=\(origin), with account=\(account.displayName), curve=\(curve), factorSourceKind=\(privateHDFactorSource.hdOnDeviceFactorSource.kind), factorSourceLabel=\(privateHDFactorSource.hdOnDeviceFactorSource.label), factorSourceDescription=\(privateHDFactorSource.hdOnDeviceFactorSource.description)")
+
+					return try await useFactorSourceClient.signatureFromOnDeviceHD(.init(
+						hdRoot: hdRoot,
+						derivationPath: factorInstance.derivationPath!,
+						curve: curve,
+						unhashedData: unhashedData
+					))
+				}
+			}
+
 			fatalError()
 		}
 
