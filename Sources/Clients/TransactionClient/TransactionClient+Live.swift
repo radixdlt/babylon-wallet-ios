@@ -26,12 +26,11 @@ extension TransactionClient {
 		@Sendable
 		func accountsWithEnoughFunds(
 			from addresses: [AccountAddress],
-			toPay fee: BigDecimal,
-			on networkID: NetworkID
+			toPay fee: BigDecimal
 		) async -> Set<FungibleTokenContainer> {
 			guard !addresses.isEmpty else { return Set() }
 			let xrdContainers = await addresses.concurrentMap {
-				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID, forceRefresh: true)
+				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, forceRefresh: true)
 			}.compactMap { $0 }
 			return Set(xrdContainers.filter { $0.amount >= fee })
 		}
@@ -39,10 +38,9 @@ extension TransactionClient {
 		@Sendable
 		func firstAccountAddressWithEnoughFunds(
 			from addresses: [AccountAddress],
-			toPay fee: BigDecimal,
-			on networkID: NetworkID
+			toPay fee: BigDecimal
 		) async -> AccountAddress? {
-			try await accountsWithEnoughFunds(from: addresses, toPay: fee, on: networkID).first?.owner
+			await accountsWithEnoughFunds(from: addresses, toPay: fee).first?.owner
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
@@ -58,7 +56,18 @@ extension TransactionClient {
 			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
 		}
 
-		let addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest = { maybeStringManifest, feeToAdd in
+		let lockFeeWithSelectedPayer: LockFeeWithSelectedPayer = { maybeStringManifest, feeToAdd, addressOfPayer in
+			// assert account still has enough funds to pay
+			guard
+				let balance = await accountPortfolioFetcherClient.fetchXRDBalance(
+					of: addressOfPayer,
+					forceRefresh: true
+				)?.amount,
+				balance >= feeToAdd
+			else {
+				fatalError()
+			}
+
 			let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
 			do {
 				manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
@@ -66,15 +75,26 @@ extension TransactionClient {
 				loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
 			}
-
 			var instructions = manifestWithJSONInstructions.instructions
+
+			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
+				address: ComponentAddress(address: addressOfPayer.address),
+				fee: feeToAdd.description
+			).embed()
+
+			instructions.insert(lockFeeCallMethodInstruction, at: 0)
+			return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
+		}
+
+		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { maybeStringManifest, feeToAdd in
+
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
 			let version = engineToolkitClient.getTransactionVersion()
 
 			let accountsSuitableToPayForTXFeeRequest = AccountAddressesInvolvedInTransactionRequest(
 				version: version,
-				manifest: manifestWithJSONInstructions.convertedManifestThatContainsThem,
+				manifest: maybeStringManifest,
 				networkID: networkID
 			)
 
@@ -85,8 +105,7 @@ extension TransactionClient {
 
 				guard let accountInvolvedInTransactionWithEnoughBalance = await firstAccountAddressWithEnoughFunds(
 					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
-					toPay: feeToAdd,
-					on: networkID
+					toPay: feeToAdd
 				) else {
 					return nil
 				}
@@ -104,7 +123,7 @@ extension TransactionClient {
 
 				let candidates = await accountsWithEnoughFunds(
 					from: .init(accountsNotAlreadyChecked),
-					toPay: feeToAdd, on: networkID
+					toPay: feeToAdd
 				)
 
 				guard let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>.init(
@@ -122,20 +141,15 @@ extension TransactionClient {
 				}
 
 				return .excludesLockFee(
-					TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs),
+					maybeStringManifest,
 					feePayerCandidates: nonEmpty,
 					feeNotYetAdded: feeToAdd
 				)
 			}
 
-			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
-				address: ComponentAddress(address: accountAddress.address),
-				fee: feeToAdd.description
-			).embed()
+			let manifestWithLockFee = try await lockFeeWithSelectedPayer(maybeStringManifest, feeToAdd, accountAddress)
 
-			instructions.insert(lockFeeCallMethodInstruction, at: 0)
-			let manifest = TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
-			return .includesLockFee(manifest, feeAdded: feeToAdd)
+			return .includesLockFee(manifestWithLockFee, feeAdded: feeToAdd)
 		}
 
 		// TODO: Should the request manifest have lockFee?
@@ -184,7 +198,7 @@ extension TransactionClient {
 				}
 				.asyncFlatMap { (analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse) in
 					do {
-						let addFeeToManifestOutcome = try await addLockFeeInstructionToManifest(request.manifestToSign, request.feeToAdd)
+						let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(request.manifestToSign, request.feeToAdd)
 						let review = TransactionToReview(
 							analyzedManifestToReview: analyzedManifestToReview,
 							addFeeToManifestOutcome: addFeeToManifestOutcome,
@@ -353,7 +367,8 @@ extension TransactionClient {
 
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
-			addLockFeeInstructionToManifest: addLockFeeInstructionToManifest,
+			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
+			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
 			addGuaranteesToManifest: addGuaranteesToManifest,
 			getTransactionReview: getTransactionPreview
 		)

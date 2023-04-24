@@ -97,7 +97,6 @@ extension AccountPortfolioFetcherClient: DependencyKey {
 extension AccountPortfolioFetcherClient {
 	public func fetchXRDBalance(
 		of accountAddress: AccountAddress,
-		on networkID: NetworkID,
 		forceRefresh: Bool
 	) async -> FungibleTokenContainer? {
 		guard let portfolio = try? await fetchPortfolioForAccount(accountAddress, forceRefresh) else {

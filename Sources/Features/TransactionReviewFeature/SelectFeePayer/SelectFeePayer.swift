@@ -22,6 +22,10 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 		case confirmedFeePayer(FeePayerCandiate)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case selectedFeePayer(FeePayerCandiate, fee: BigDecimal)
+	}
+
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -31,7 +35,7 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 			return .none
 		case let .confirmedFeePayer(payer):
 			loggerGlobal.feature("Implement me")
-			return .none
+			return .send(.delegate(.selectedFeePayer(payer, fee: state.fee)))
 		}
 	}
 }

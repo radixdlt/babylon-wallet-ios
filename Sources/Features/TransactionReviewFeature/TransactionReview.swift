@@ -19,6 +19,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		/// does not include lock fee?
 		public var analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse? = nil
 
+		public var fee: BigDecimal
+
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
@@ -33,10 +35,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public init(
 			transactionManifest: TransactionManifest,
 			message: String?,
+			feeToAdd: BigDecimal = 10,
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
 			self.transactionManifest = transactionManifest
 			self.message = message
+			self.fee = feeToAdd
 			if let customizeGuarantees {
 				self.destination = .customizeGuarantees(customizeGuarantees)
 			}
@@ -73,6 +77,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TransactionReviewResult)
+		case addedTransactionFeeToSelectedPayerResult(TaskResult<TransactionManifest>)
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case rawTransactionCreated(String)
 		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
@@ -143,8 +148,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .run { send in
-				let result = await transactionClient.getTransactionReview(.init(manifestToSign: manifest))
+			return .run { [feeToAdd = state.fee] send in
+				let result = await transactionClient.getTransactionReview(.init(manifestToSign: manifest, feeToAdd: feeToAdd))
 				await send(.internal(.previewLoaded(result)))
 			}
 
@@ -212,6 +217,22 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
+		case let .destination(.presented(.selectFeePayer(.delegate(.selectedFeePayer(selectedFeePayer, fee))))):
+			state.destination = nil
+			state.fee = fee
+			return .run { [transactionManifest = state.transactionManifest] send in
+
+				await send(.internal(.addedTransactionFeeToSelectedPayerResult(
+					TaskResult {
+						try await transactionClient.lockFeeWithSelectedPayer(
+							transactionManifest,
+							fee,
+							selectedFeePayer.account.address
+						)
+					}
+				)))
+			}
+
 		default:
 			return .none
 		}
@@ -222,8 +243,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
 			return .none
 		}
-		//        return review(manifestPreview: manifestPreviewToReview)
-		fatalError()
+		guard let networkID = state.networkID else {
+			assertionFailure("Bad implementation, expected `networkID`")
+			return .none
+		}
+		return review(manifestPreview: manifestPreviewToReview, feeAdded: state.fee, networkID: networkID)
 	}
 
 	private func review(
@@ -272,11 +296,21 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					feeAdded: feeAdded,
 					networkID: preview.networkID
 				)
-			case let .excludesLockFee(manifestWithoutLockFee, feePayerCandidates, feeNotYetAdded):
+			case let .excludesLockFee(_, feePayerCandidates, feeNotYetAdded):
 				state.analyzedManifestToReview = preview.analyzedManifestToReview
 				state.destination = .selectFeePayer(.init(candidates: feePayerCandidates, fee: feeNotYetAdded))
 				return .none
 			}
+
+		case let .addedTransactionFeeToSelectedPayerResult(.success(manifestWithLockFee)):
+			state.transactionWithLockFee = manifestWithLockFee
+			return review(state)
+
+		case let .addedTransactionFeeToSelectedPayerResult(.failure(error)):
+			loggerGlobal.error("Failed to add fee for selected payer to manifest, error: \(error)")
+			// FIXME: propagate/display error?
+			return .none
+
 		case let .createTransactionReview(content):
 			state.withdrawals = content.withdrawals
 			state.dAppsUsed = content.dAppsUsed
