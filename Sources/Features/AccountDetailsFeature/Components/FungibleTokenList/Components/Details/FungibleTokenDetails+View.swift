@@ -3,13 +3,13 @@ import FeaturePrelude
 extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
-			displayName: name ?? "",
+			displayName: resource.name ?? "",
 			iconURL: nil, // TODO: Properly determine the icon URL
-			placeholderAsset: .placeholderImage(isXRD: false),
-			amount: amount.format(),
-			symbol: symbol,
-			description: description,
-			address: .init(address: resourceAddress.address, format: .default)
+			placeholderAsset: .placeholderImage(isXRD: isXRD),
+			amount: resource.amount.format(),
+			symbol: resource.symbol,
+			description: resource.description,
+			address: .init(address: resource.resourceAddress.address, format: .default)
 		)
 	}
 }
@@ -121,14 +121,10 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenDetails.View(
 			store: .init(
-				initialState: .previewValue,
+				initialState: .init(resource: .init(resourceAddress: .init(address: "some"), amount: .zero), isXRD: true),
 				reducer: FungibleTokenDetails()
 			)
 		)
 	}
-}
-
-extension FungibleTokenDetails.State {
-	public static let previewValue = AccountPortfolio.FungibleResource(resourceAddress: .init(address: "some"), amount: .zero)
 }
 #endif

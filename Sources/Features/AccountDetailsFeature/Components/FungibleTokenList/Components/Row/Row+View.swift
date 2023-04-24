@@ -74,7 +74,7 @@ struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenList.Row.View(
 			store: .init(
-				initialState: .init(xrdToken: .previewValue),
+				initialState: .init(xrdToken: .init(resourceAddress: .init(address: "some"), amount: .zero)),
 				reducer: FungibleTokenList.Row()
 			)
 		)
