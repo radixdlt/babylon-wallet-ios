@@ -4,7 +4,7 @@ extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
 			displayName: resource.name ?? "",
-			iconURL: nil, // TODO: Properly determine the icon URL
+			iconURL: resource.iconURL,
 			placeholderAsset: .placeholderImage(isXRD: isXRD),
 			amount: resource.amount.format(),
 			symbol: resource.symbol,

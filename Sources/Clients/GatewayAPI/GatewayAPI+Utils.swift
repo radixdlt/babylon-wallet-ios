@@ -83,6 +83,10 @@ extension GatewayAPI.EntityMetadataCollection {
 		self["account_type"]?.asString.flatMap(AccountType.init)
 	}
 
+	public var iconURL: URL? {
+		self["icon_url"]?.asString.flatMap(URL.init)
+	}
+
 	public subscript(key: String) -> GatewayAPI.EntityMetadataItemValue? {
 		items.first { $0.key == key }?.value
 	}

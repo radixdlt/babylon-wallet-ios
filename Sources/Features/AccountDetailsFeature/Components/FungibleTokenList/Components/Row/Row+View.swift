@@ -4,7 +4,7 @@ extension FungibleTokenList.Row.State {
 	var viewState: FungibleTokenList.Row.ViewState {
 		.init(
 			isXRD: isXRD,
-			iconURL: nil,
+			iconURL: token.iconURL,
 			symbol: token.symbol ?? token.name ?? "",
 			tokenAmount: token.amount.format()
 		)

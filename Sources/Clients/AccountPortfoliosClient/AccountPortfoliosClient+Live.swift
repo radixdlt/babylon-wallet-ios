@@ -221,7 +221,8 @@ extension AccountPortfoliosClient {
 				amount: amount,
 				name: metadata?.name,
 				symbol: metadata?.symbol,
-				description: metadata?.description
+				description: metadata?.description,
+				iconURL: metadata?.iconURL
 			)
 		}
 

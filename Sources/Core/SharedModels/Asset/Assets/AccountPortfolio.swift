@@ -43,6 +43,7 @@ extension AccountPortfolio {
 		public let name: String?
 		public let symbol: String?
 		public let description: String?
+		public let iconURL: URL?
 		// TBD: Add the rest of required metadata fields
 
 		public init(
@@ -51,7 +52,8 @@ extension AccountPortfolio {
 			divisibility: Int? = nil,
 			name: String? = nil,
 			symbol: String? = nil,
-			description: String? = nil
+			description: String? = nil,
+			iconURL: URL? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.amount = amount
@@ -59,6 +61,7 @@ extension AccountPortfolio {
 			self.name = name
 			self.symbol = symbol
 			self.description = description
+			self.iconURL = iconURL
 		}
 	}
 
