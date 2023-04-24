@@ -4,6 +4,8 @@ import FeaturePrelude
 // MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
+	@UIApplicationDelegateAdaptor var delegate: AppDelegate
+
 	var body: some SwiftUI.Scene {
 		WindowGroup {
 			App.View(
