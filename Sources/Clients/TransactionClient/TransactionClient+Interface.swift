@@ -11,7 +11,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 extension TransactionClient {
-	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> (manifest: TransactionManifest, feeAdded: BigDecimal)
+	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest, _ fee: BigDecimal) async throws -> AddFeeToManifestOutcome
 	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async -> TransactionReviewResult
@@ -47,24 +47,38 @@ extension TransactionClient {
 // Duplicated for now, very similar to SignManifestRequest
 public struct ManifestReviewRequest: Sendable {
 	public let manifestToSign: TransactionManifest
+	public let feeToAdd: BigDecimal
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let selectNotary: SelectNotary
 
 	public init(
 		manifestToSign: TransactionManifest,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
+		feeToAdd: BigDecimal,
 		selectNotary: @escaping SelectNotary = { $0.first }
 	) {
 		self.manifestToSign = manifestToSign
+		self.feeToAdd = feeToAdd
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.selectNotary = selectNotary
 	}
 }
 
+// MARK: - FeePayerCandiate
+public struct FeePayerCandiate: Sendable, Hashable {
+	public let account: Profile.Network.Account
+	public let xrdBalance: BigDecimal
+}
+
+// MARK: - AddFeeToManifestOutcome
+public enum AddFeeToManifestOutcome: Sendable, Equatable {
+	case includesLockFee(TransactionManifest, feeAdded: BigDecimal)
+	case excludesLockFee(TransactionManifest, feePayerCandidates: Set<FeePayerCandiate>, feeNotYetAdded: BigDecimal)
+}
+
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
 	public let analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse
-	public let manifestIncludingLockFee: TransactionManifest
-	public let transactionFeeAdded: BigDecimal
+	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
 }

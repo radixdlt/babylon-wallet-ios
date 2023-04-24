@@ -15,6 +15,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var transactionWithLockFee: TransactionManifest?
 
 		public var networkID: NetworkID? = nil
+
+		/// does not include lock fee?
+		public var analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse? = nil
+
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
@@ -83,17 +87,22 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
+			case selectFeePayer(SelectFeePayer.State)
 			case signing(Signing.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
+			case selectFeePayer(SelectFeePayer.Action)
 			case signing(Signing.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.customizeGuarantees, action: /Action.customizeGuarantees) {
 				TransactionReviewGuarantees()
+			}
+			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
+				SelectFeePayer()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
@@ -208,27 +217,64 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
+	private func review(_ state: State) -> EffectTask<Action> {
+		guard let manifestPreviewToReview = state.analyzedManifestToReview else {
+			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
+			return .none
+		}
+		//        return review(manifestPreview: manifestPreviewToReview)
+		fatalError()
+	}
+
+	private func review(
+		manifestPreview manifestPreviewToReview: AnalyzeManifestWithPreviewContextResponse,
+		feeAdded: BigDecimal,
+		networkID: NetworkID
+	) -> EffectTask<Action> {
+		.run { send in
+			// TODO: Determine what is the minimal information required
+			let userAccounts = try await extractUserAccounts(manifestPreviewToReview)
+
+			let content = await TransactionReview.TransactionContent(
+				withdrawals: try? extractWithdrawals(
+					manifestPreviewToReview,
+					userAccounts: userAccounts,
+					networkID: networkID
+				),
+				dAppsUsed: try? extractUsedDapps(manifestPreviewToReview),
+				deposits: try? extractDeposits(
+					manifestPreviewToReview,
+					userAccounts: userAccounts,
+					networkID: networkID
+				),
+				proofs: try? exctractProofs(manifestPreviewToReview),
+				networkFee: .init(fee: feeAdded, isCongested: false)
+			)
+			await send(.internal(.createTransactionReview(content)))
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to extract user accounts, error: \(error)")
+			// FIXME: propagate/display error?
+		}
+	}
+
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .previewLoaded(.success(review)):
-			let reviewedManifest = review.analyzedManifestToReview
-			state.transactionWithLockFee = review.manifestIncludingLockFee
-			state.networkID = review.networkID
-			return .run { send in
-				// TODO: Determine what is the minimal information required
-				let userAccounts = try await extractUserAccounts(reviewedManifest)
+		case let .previewLoaded(.failure(error)):
+			return .send(.delegate(.failed(error)))
 
-				let content = await TransactionReview.TransactionContent(
-					withdrawals: try? extractWithdrawals(reviewedManifest, userAccounts: userAccounts, networkID: review.networkID),
-					dAppsUsed: try? extractUsedDapps(reviewedManifest),
-					deposits: try? extractDeposits(reviewedManifest, userAccounts: userAccounts, networkID: review.networkID),
-					proofs: try? exctractProofs(reviewedManifest),
-					networkFee: .init(fee: review.transactionFeeAdded, isCongested: false)
+		case let .previewLoaded(.success(preview)):
+			state.networkID = preview.networkID
+			switch preview.addFeeToManifestOutcome {
+			case let .includesLockFee(manifestWithLockFee, feeAdded):
+				state.transactionWithLockFee = manifestWithLockFee
+				return self.review(
+					manifestPreview: preview.analyzedManifestToReview,
+					feeAdded: feeAdded,
+					networkID: preview.networkID
 				)
-				await send(.internal(.createTransactionReview(content)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to extract user accounts, error: \(error)")
-				// FIXME: propagate/display error?
+			case let .excludesLockFee(manifestWithoutLockFee, feePayerCandidates, feeNotYetAdded):
+				state.analyzedManifestToReview = preview.analyzedManifestToReview
+				state.destination = .selectFeePayer(.init())
 			}
 		case let .createTransactionReview(content):
 			state.withdrawals = content.withdrawals
@@ -238,10 +284,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.networkFee = content.networkFee
 			return .none
 
-		case let .previewLoaded(.failure(error)):
-			return .send(.delegate(.failed(error)))
-
 		case let .addGuaranteeToManifestResult(.success(manifest)):
+
 			state.destination = .signing(.init(manifest: manifest))
 			return .none
 

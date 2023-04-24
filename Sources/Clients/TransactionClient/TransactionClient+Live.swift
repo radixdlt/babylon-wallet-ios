@@ -23,14 +23,26 @@ extension TransactionClient {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 		@Dependency(\.cacheClient) var cacheClient
 
-		let accountsInvolvedInTransaction = ActorIsolated<Set<AccountAddress>>([])
-
 		@Sendable
-		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
+		func accountsWithEnoughFunds(
+			from addresses: [AccountAddress],
+			toPay fee: BigDecimal,
+			on networkID: NetworkID
+		) async -> Set<FungibleTokenContainer> {
+			guard !addresses.isEmpty else { return Set() }
 			let xrdContainers = await addresses.concurrentMap {
 				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID, forceRefresh: true)
 			}.compactMap { $0 }
-			return xrdContainers.first(where: { $0.amount >= fee })?.owner
+			return Set(xrdContainers.filter { $0.amount >= fee })
+		}
+
+		@Sendable
+		func firstAccountAddressWithEnoughFunds(
+			from addresses: [AccountAddress],
+			toPay fee: BigDecimal,
+			on networkID: NetworkID
+		) async -> AccountAddress? {
+			try await accountsWithEnoughFunds(from: addresses, toPay: fee, on: networkID).first?.owner
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
@@ -46,7 +58,7 @@ extension TransactionClient {
 			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
 		}
 
-		let addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest = { maybeStringManifest in
+		let addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest = { maybeStringManifest, feeToAdd in
 			let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
 			do {
 				manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
@@ -66,43 +78,59 @@ extension TransactionClient {
 				networkID: networkID
 			)
 
-			let feeAdded: BigDecimal = 10
+			let accountAddressesSuitableToPayTransactionFeeRef = try engineToolkitClient
+				.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-			let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
-				let accountAddressesSuitableToPayTransactionFeeRef =
-					try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
+			let maybeAccountAddress: AccountAddress? = try await { () async throws -> AccountAddress? in
 
-				await accountsInvolvedInTransaction.setValue(accountAddressesSuitableToPayTransactionFeeRef)
-
-				if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
+				guard let accountInvolvedInTransactionWithEnoughBalance = await firstAccountAddressWithEnoughFunds(
 					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
-					toPay: feeAdded,
+					toPay: feeToAdd,
 					on: networkID
-				) {
-					return accountInvolvedInTransaction
-				} else {
-					let allAccountAddresses = try await accountsClient.getAccountsOnCurrentNetwork().map(\.address)
-
-					if let anyAccount = await firstAccountAddressWithEnoughFunds(
-						from: allAccountAddresses.rawValue,
-						toPay: feeAdded,
-						on: networkID
-					) {
-						return anyAccount
-					} else {
-						throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
-					}
+				) else {
+					return nil
 				}
+
+				return accountInvolvedInTransactionWithEnoughBalance
 			}()
+
+			guard let accountAddress = maybeAccountAddress else {
+				// The transaction manifest does not reference any accounts that also has enough balance.
+				// let us find some candidates accounts that user can select from
+				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				let allAccountAddresses = allAccounts.map(\.address)
+				let allAddressSet = Set(allAccountAddresses)
+				let accountsNotAlreadyChecked = allAddressSet.subtracting(accountAddressesSuitableToPayTransactionFeeRef)
+
+				let candidates = await accountsWithEnoughFunds(
+					from: .init(accountsNotAlreadyChecked),
+					toPay: feeToAdd, on: networkID
+				)
+
+				guard !candidates.isEmpty else {
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+				}
+
+				return .excludesLockFee(
+					TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs),
+					feePayerCandidates: Set(candidates.compactMap { element in
+						guard let account = allAccounts.first(where: { $0.address == element.owner }) else {
+							return nil
+						}
+						return FeePayerCandiate(account: account, xrdBalance: element.amount)
+					}),
+					feeNotYetAdded: feeToAdd
+				)
+			}
 
 			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
 				address: ComponentAddress(address: accountAddress.address),
-				fee: feeAdded.description
+				fee: feeToAdd.description
 			).embed()
 
 			instructions.insert(lockFeeCallMethodInstruction, at: 0)
 			let manifest = TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
-			return (manifest, feeAdded)
+			return .includesLockFee(manifest, feeAdded: feeToAdd)
 		}
 
 		// TODO: Should the request manifest have lockFee?
@@ -151,11 +179,10 @@ extension TransactionClient {
 				}
 				.asyncFlatMap { (analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse) in
 					do {
-						let (manifestIncludingLockFee, transactionFeeAdded) = try await addLockFeeInstructionToManifest(request.manifestToSign)
+						let addFeeToManifestOutcome = try await addLockFeeInstructionToManifest(request.manifestToSign, request.feeToAdd)
 						let review = TransactionToReview(
 							analyzedManifestToReview: analyzedManifestToReview,
-							manifestIncludingLockFee: manifestIncludingLockFee,
-							transactionFeeAdded: transactionFeeAdded,
+							addFeeToManifestOutcome: addFeeToManifestOutcome,
 							networkID: networkID
 						)
 						return .success(review)

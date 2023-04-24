@@ -74,6 +74,7 @@ extension TransactionReview {
 						}
 					}
 					.customizeGuarantees(with: store, viewStore)
+					.selectFeePayer(with: store, viewStore)
 					.signing(with: store, viewStore)
 					.controlState(viewStore.viewControlState)
 					.onAppear {
@@ -220,6 +221,19 @@ extension View {
 			state: /TransactionReview.Destinations.State.customizeGuarantees,
 			action: TransactionReview.Destinations.Action.customizeGuarantees,
 			content: { TransactionReviewGuarantees.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	fileprivate func selectFeePayer(
+		with store: StoreOf<TransactionReview>,
+		_ viewStore: ViewStoreOf<TransactionReview>
+	) -> some View {
+		self.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /TransactionReview.Destinations.State.selectFeePayer,
+			action: TransactionReview.Destinations.Action.selectFeePayer,
+			content: { SelectFeePayer.View(store: $0) }
 		)
 	}
 
