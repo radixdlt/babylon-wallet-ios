@@ -20,6 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse? = nil
 
 		public var fee: BigDecimal
+		public var feePayer: Profile.Network.Account?
 
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
@@ -218,6 +219,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.selectFeePayer(.delegate(.selectedFeePayer(selectedFeePayer, fee))))):
+			state.feePayer = selectedFeePayer.account
 			state.destination = nil
 			state.fee = fee
 			return .run { [transactionManifest = state.transactionManifest] send in
@@ -289,7 +291,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
 			switch preview.addFeeToManifestOutcome {
-			case let .includesLockFee(manifestWithLockFee, feeAdded):
+			case let .includesLockFee(manifestWithLockFee, feeAdded, payer):
+				state.feePayer = payer.account
 				state.transactionWithLockFee = manifestWithLockFee
 				return self.review(
 					manifestPreview: preview.analyzedManifestToReview,

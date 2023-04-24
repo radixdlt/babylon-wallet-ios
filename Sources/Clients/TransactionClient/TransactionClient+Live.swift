@@ -39,8 +39,8 @@ extension TransactionClient {
 		func firstAccountAddressWithEnoughFunds(
 			from addresses: [AccountAddress],
 			toPay fee: BigDecimal
-		) async -> AccountAddress? {
-			await accountsWithEnoughFunds(from: addresses, toPay: fee).first?.owner
+		) async -> FungibleTokenContainer? {
+			await accountsWithEnoughFunds(from: addresses, toPay: fee).first
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
@@ -101,7 +101,9 @@ extension TransactionClient {
 			let accountAddressesSuitableToPayTransactionFeeRef = try engineToolkitClient
 				.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-			let maybeAccountAddress: AccountAddress? = try await { () async throws -> AccountAddress? in
+			let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+
+			let maybeFeePayer: FeePayerCandiate? = try await { () async throws -> FeePayerCandiate? in
 
 				guard let accountInvolvedInTransactionWithEnoughBalance = await firstAccountAddressWithEnoughFunds(
 					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
@@ -110,13 +112,16 @@ extension TransactionClient {
 					return nil
 				}
 
-				return accountInvolvedInTransactionWithEnoughBalance
+				guard let account = allAccounts.first(where: { $0.address == accountInvolvedInTransactionWithEnoughBalance.owner }) else {
+					assertionFailure("Failed to find account, this should never happen.")
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
+				}
+				return FeePayerCandiate(account: account, xrdBalance: accountInvolvedInTransactionWithEnoughBalance.amount)
 			}()
 
-			guard let accountAddress = maybeAccountAddress else {
+			guard let feePayer = maybeFeePayer else {
 				// The transaction manifest does not reference any accounts that also has enough balance.
 				// let us find some candidates accounts that user can select from
-				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 				let allAccountAddresses = allAccounts.map(\.address)
 				let allAddressSet = Set(allAccountAddresses)
 				let accountsNotAlreadyChecked = allAddressSet.subtracting(accountAddressesSuitableToPayTransactionFeeRef)
@@ -147,9 +152,8 @@ extension TransactionClient {
 				)
 			}
 
-			let manifestWithLockFee = try await lockFeeWithSelectedPayer(maybeStringManifest, feeToAdd, accountAddress)
-
-			return .includesLockFee(manifestWithLockFee, feeAdded: feeToAdd)
+			let manifestWithLockFee = try await lockFeeWithSelectedPayer(maybeStringManifest, feeToAdd, feePayer.account.address)
+			return .includesLockFee(manifestWithLockFee, feeAdded: feeToAdd, feePayer: feePayer)
 		}
 
 		// TODO: Should the request manifest have lockFee?

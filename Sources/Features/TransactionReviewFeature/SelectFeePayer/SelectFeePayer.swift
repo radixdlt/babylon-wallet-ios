@@ -34,7 +34,6 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 			state.selectedPayerID = payerID
 			return .none
 		case let .confirmedFeePayer(payer):
-			loggerGlobal.feature("Implement me")
 			return .send(.delegate(.selectedFeePayer(payer, fee: state.fee)))
 		}
 	}

@@ -76,7 +76,7 @@ public struct FeePayerCandiate: Sendable, Hashable, Identifiable {
 
 // MARK: - AddFeeToManifestOutcome
 public enum AddFeeToManifestOutcome: Sendable, Equatable {
-	case includesLockFee(TransactionManifest, feeAdded: BigDecimal)
+	case includesLockFee(TransactionManifest, feeAdded: BigDecimal, feePayer: FeePayerCandiate)
 	case excludesLockFee(TransactionManifest, feePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>, feeNotYetAdded: BigDecimal)
 }
 
