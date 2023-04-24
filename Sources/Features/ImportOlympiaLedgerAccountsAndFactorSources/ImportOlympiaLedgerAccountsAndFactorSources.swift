@@ -2,6 +2,7 @@ import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
+import LedgerHardwareWalletClient
 import Profile
 import RadixConnectClient
 import RadixConnectModels
@@ -36,7 +37,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		public var failedToFindAnyLinks = false
 		public var ledgerName = ""
-		public var isLedgerNameInputVisible = false
 		public var isWaitingForResponseFromLedger = false
 		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice?
 
@@ -59,16 +59,16 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum InternalAction: Sendable, Equatable {
 		case gotLinksConnectionStatusUpdate([P2P.LinkConnectionUpdate])
+
 		case response(
-			olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice,
-			interactionID: P2P.LedgerHardwareWallet.InteractionId
+			olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 		)
-		case broadcasted(interactionID: P2P.LedgerHardwareWallet.InteractionId)
 
 		case nameLedgerDeviceBeforeSavingIt(
 			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 		)
 
+		case failedToImportOlympiaLedger
 		case addedFactorSource(FactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
 
 		case migratedOlympiaHardwareAccounts(AddedLedgerWithAccounts)
@@ -85,6 +85,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	public init() {}
 
@@ -103,8 +104,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				loggerGlobal.error("failed to get links updates, error: \(error)")
 			}
 		case .sendAddLedgerRequestButtonTapped:
-			loggerGlobal.debug("SEND ADD LEDGER REQUEST BUTTON TAPPED")
-			return continueWithRestOfAccountsIfNeeded(state: state)
+			return continueWithRestOfAccountsIfNeeded(state: &state)
 
 		case .skipRestOfTheAccounts:
 			return .send(.delegate(.completed(
@@ -148,21 +148,20 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			state.failedToFindAnyLinks = connectedLinks.isEmpty
 			return .none
 
-		case let .response(olympiaDevice, _):
+		case let .response(olympiaDevice):
 			loggerGlobal.notice("Successfully received importOlympiaDevice response from CE! \(olympiaDevice) ✅")
 			return validate(olympiaDevice, againstUnverifiedOf: &state)
-		case .broadcasted:
-			state.isWaitingForResponseFromLedger = true
-			return .none
 
 		case let .nameLedgerDeviceBeforeSavingIt(device):
 			state.unnamedDeviceToAdd = device
-			state.isLedgerNameInputVisible = true
+			return .none
+
+		case .failedToImportOlympiaLedger:
+			state.isWaitingForResponseFromLedger = false
 			return .none
 
 		case let .addedFactorSource(factorSource, model, name):
 			state.unnamedDeviceToAdd = nil
-			state.isLedgerNameInputVisible = false
 			state.ledgerName = ""
 			guard let verifiedToMigrate = state.verifiedToBeMigrated else {
 				assertionFailure("Expected verified accounts to migrated")
@@ -181,61 +180,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			state.addedLedgersWithAccounts.append(addedLedgerWithAccounts)
 			state.verifiedToBeMigrated = nil
 
-			return continueWithRestOfAccountsIfNeeded(state: state)
-		}
-	}
-
-	private func listenForResponses(
-		interactionID: P2P.LedgerHardwareWallet.InteractionId
-	) -> EffectTask<Action> {
-		.run { send in
-			for try await incomingResponse in await radixConnectClient.receiveResponses(/P2P.RTCMessageFromPeer.Response.connectorExtension .. /P2P.ConnectorExtension.Response.ledgerHardwareWallet) {
-				loggerGlobal.notice("Received response from CE: \(String(describing: incomingResponse))")
-				guard !Task.isCancelled else {
-					return
-				}
-
-				let response = try incomingResponse.result.get()
-
-				switch response.response {
-				case let .success(.importOlympiaDevice(olympiaDevice)):
-					await send(.internal(
-						.response(
-							olympiaDevice: olympiaDevice,
-							interactionID: response.interactionID
-						)
-					))
-				case let .failure(errorFromConnectorExtension):
-					throw errorFromConnectorExtension
-				default: break
-				}
-			}
-		} catch: { error, _ in
-			errorQueue.schedule(error)
-			loggerGlobal.error("Fail interactionID: \(interactionID), error: \(error)")
-		}
-	}
-
-	private func importOlympiaDevice(
-		interactionID: P2P.LedgerHardwareWallet.InteractionId,
-		olympiaHardwareAccounts: Set<OlympiaAccountToMigrate>
-	) -> EffectTask<Action> {
-		.run { send in
-
-			let request: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.ImportOlympiaDevice = .init(
-				derivationPaths: olympiaHardwareAccounts.map(\.path.derivationPath)
-			)
-
-			loggerGlobal.debug("About to broadcast importOlympiaDevice request with interactionID: \(interactionID)..")
-			try await radixConnectClient.sendRequest(.connectorExtension(.ledgerHardwareWallet(.init(
-				interactionID: interactionID,
-				request: .importOlympiaDevice(request)
-			))), .broadcastToAllPeers)
-			loggerGlobal.debug("Broadcasted importOlympiaDevice request with interactionID: \(interactionID) ✅ waiting for response")
-
-			await send(.internal(.broadcasted(interactionID: interactionID)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to send message to Connector Extension, error: \(error)")
+			return continueWithRestOfAccountsIfNeeded(state: &state)
 		}
 	}
 
@@ -290,7 +235,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
-			name: name.map { NonEmpty(rawValue: $0) } ?? nil,
+			name: name,
 			olympiaCompatible: true
 		)
 
@@ -335,20 +280,24 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	private func continueWithRestOfAccountsIfNeeded(state: State) -> EffectTask<Action> {
+	private func continueWithRestOfAccountsIfNeeded(state: inout State) -> EffectTask<Action> {
 		if state.unverified.isEmpty {
 			loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
+
 			return .send(.delegate(.completed(
 				addedLedgersWithAccounts: state.addedLedgersWithAccounts,
 				unvalidatedAccounts: []
 			)))
 		} else {
 			loggerGlobal.notice("state.unverified not empty #\(state.unverified.count) unverfied remain, preparing to send importOlympiaDevice request...")
-			let interactionId: P2P.LedgerHardwareWallet.InteractionId = .random()
-			return importOlympiaDevice(
-				interactionID: interactionId,
-				olympiaHardwareAccounts: state.unverified
-			).concatenate(with: listenForResponses(interactionID: interactionId))
+			state.isWaitingForResponseFromLedger = true
+			return .run { [olympiaAccounts = state.unverified] send in
+				let device = try await ledgerHardwareWalletClient.importOlympiaDevice(olympiaAccounts)
+				await send(.internal(.nameLedgerDeviceBeforeSavingIt(device)))
+			} catch: { error, send in
+				loggerGlobal.error("Failed to import olympia ledger device, error: \(error)")
+				await send(.internal(.failedToImportOlympiaLedger))
+			}
 		}
 	}
 }

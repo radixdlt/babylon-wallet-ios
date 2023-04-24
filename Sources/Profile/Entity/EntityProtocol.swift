@@ -7,6 +7,7 @@ import Prelude
 public protocol EntityProtocol: Sendable, Equatable {
 	/// The type of address of entity.
 	associatedtype EntityAddress: AddressKindProtocol & Hashable
+	associatedtype ExtraProperties: Sendable
 
 	static var entityKind: EntityKind { get }
 
@@ -30,10 +31,50 @@ public protocol EntityProtocol: Sendable, Equatable {
 	var displayName: NonEmpty<String> { get }
 
 	func cast<Entity: EntityProtocol>() throws -> Entity
+
+	init(
+		networkID: NetworkID,
+		address: EntityAddress,
+		securityState: EntitySecurityState,
+		displayName: NonEmpty<String>,
+		extraProperties: ExtraProperties
+	)
 }
 
 extension EntityProtocol {
 	public var kind: EntityKind { Self.entityKind }
+
+	public init(
+		networkID: NetworkID,
+		address: EntityAddress,
+		factorInstance: FactorInstance,
+		displayName: NonEmpty<String>,
+		extraProperties: ExtraProperties
+	) {
+		self.init(
+			networkID: networkID,
+			address: address,
+			securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
+			displayName: displayName,
+			extraProperties: extraProperties
+		)
+	}
+
+	public init(
+		networkID: NetworkID,
+		factorInstance: FactorInstance,
+		displayName: NonEmpty<String>,
+		extraProperties: ExtraProperties
+	) throws {
+		let address = try Self.deriveAddress(networkID: networkID, publicKey: factorInstance.publicKey)
+		self.init(
+			networkID: networkID,
+			address: address,
+			factorInstance: factorInstance,
+			displayName: displayName,
+			extraProperties: extraProperties
+		)
+	}
 }
 
 // MARK: - EntityKindMismatchDiscrepancy

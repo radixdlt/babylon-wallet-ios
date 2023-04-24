@@ -40,6 +40,17 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "AddLedgerFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"RadixConnectClient",
+			"LedgerHardwareWalletClient",
+			"NewConnectionFeature",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -68,10 +79,12 @@ package.addModules([
 	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
+			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
 			"Cryptography",
 			"FactorSourcesClient",
 			"GatewayAPI",
+			"LedgerHardwareWalletClient",
 			"LocalAuthenticationClient",
 			"PersonasClient",
 		],
@@ -205,6 +218,7 @@ package.addModules([
 		name: "SettingsFeature",
 		dependencies: [
 			"AccountsClient",
+			"AddLedgerFactorSourceFeature",
 			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeatures",
@@ -399,6 +413,7 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"EngineToolkitClient",
+			"LedgerHardwareWalletClient",
 			"Profile", // Olympia models
 		],
 		tests: .yes(
@@ -406,6 +421,16 @@ package.addModules([
 				.process("TestVectors/"),
 			]
 		)
+	),
+	.client(
+		name: "LedgerHardwareWalletClient",
+		dependencies: [
+			"RadixConnectClient",
+			"AccountsClient",
+			"PersonasClient",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
+		],
+		tests: .no
 	),
 	.client(
 		name: "LocalAuthenticationClient",
@@ -469,7 +494,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnect",
 			"P2PLinksClient",
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes()
 	),

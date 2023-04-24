@@ -100,7 +100,7 @@ extension AccountPortfoliosClient: DependencyKey {
 }
 
 extension AccountPortfoliosClient {
-        struct EmptyAccountDetails: Error {}
+	struct EmptyAccountDetails: Error {}
 
 	@Sendable
 	static func fetchAccountPortfolios(
@@ -117,9 +117,9 @@ extension AccountPortfoliosClient {
 		_ accountAddress: AccountAddress
 	) async throws -> AccountPortfolio {
 		let accountDetails = try await fetchResourceDetails([accountAddress.address])
-                guard let accountItem =  accountDetails.items.first else {
-                        throw EmptyAccountDetails()
-                }
+		guard let accountItem = accountDetails.items.first else {
+			throw EmptyAccountDetails()
+		}
 		return try await createAccountPortfolio(accountItem, ledgerState: accountDetails.ledgerState)
 	}
 }
@@ -361,7 +361,7 @@ extension AccountPortfoliosClient {
 // MARK: - Resource details endpoint
 extension AccountPortfoliosClient {
 	// The maximum number of addresses the `getEntityDetails` can accept
-        // This needs to be synchronized with the actuall value on the GW side
+	// This needs to be synchronized with the actuall value on the GW side
 	static let entityDetailsPageSize = 20
 	struct EmptyEntityDetailsResponse: Error {}
 
@@ -464,25 +464,25 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 		}
 
 		let sortedNonXrdresources = nonXrdResources.sorted { lhs, rhs in
-                        if lhs.amount > .zero && rhs.amount > .zero {
-                                return lhs.amount > rhs.amount // Sort descending by amount
-                        }
-                        if lhs.amount != .zero || rhs.amount != .zero {
-                                return lhs.amount != .zero
-                        }
+			if lhs.amount > .zero && rhs.amount > .zero {
+				return lhs.amount > rhs.amount // Sort descending by amount
+			}
+			if lhs.amount != .zero || rhs.amount != .zero {
+				return lhs.amount != .zero
+			}
 
-                        if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
-                                return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
-                        }
-                        if lhs.symbol != nil || rhs.symbol != nil {
-                                return lhs.symbol != nil
-                        }
-                        
-                        if let lhsName = lhs.name, let rhsName = rhs.name {
-                                return lhsName < rhsName // Sort alphabetically by name
-                        }
-                        return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
-                }
+			if let lhsSymbol = lhs.symbol, let rhsSymbol = rhs.symbol {
+				return lhsSymbol < rhsSymbol // Sort alphabetically by symbol
+			}
+			if lhs.symbol != nil || rhs.symbol != nil {
+				return lhs.symbol != nil
+			}
+
+			if let lhsName = lhs.name, let rhsName = rhs.name {
+				return lhsName < rhsName // Sort alphabetically by name
+			}
+			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
+		}
 
 		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdresources)
 	}

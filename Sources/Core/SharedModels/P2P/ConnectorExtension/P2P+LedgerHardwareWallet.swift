@@ -2,8 +2,7 @@ import Prelude
 
 // MARK: - P2P.LedgerHardwareWallet
 extension P2P {
-	/// Just a namespace for types shared between `P2P.FromConnectorExtension.LedgerHardwareWallet`
-	/// and `P2P.ToConnectorExtension.LedgerHardwareWallet`
+	/// Just a namespace
 	public enum LedgerHardwareWallet {
 		enum CodingKeys: String, CodingKey {
 			case interactionID = "interactionId"
@@ -37,8 +36,16 @@ extension P2P {
 		// to be **decoupled**.
 		public struct LedgerDevice: Sendable, Hashable, Codable {
 			public let name: NonEmptyString?
+
+			/// `FactorSource.ID`
 			public let id: String
-			public let model: Int // Model
+			public let model: Model
+
+			public init(name: NonEmptyString?, id: String, model: Model) {
+				self.name = name
+				self.id = id
+				self.model = model
+			}
 		}
 
 		public struct KeyParameters: Sendable, Hashable, Codable {
@@ -47,6 +54,11 @@ extension P2P {
 			public enum Curve: String, Sendable, Hashable, Codable {
 				case curve25519
 				case secp256k1
+			}
+
+			public init(curve: Curve, derivationPath: String) {
+				self.curve = curve
+				self.derivationPath = derivationPath
 			}
 		}
 	}

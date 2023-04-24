@@ -140,7 +140,8 @@ extension FactorSourceView {
 			#endif // os(macOS)
 
 			Labeled("Kind", value: factorSource.kind.rawValue)
-			Labeled("Hint", value: factorSource.hint.rawValue)
+			Labeled("Label", value: factorSource.label.rawValue)
+			Labeled("Description", value: factorSource.description.rawValue)
 			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
 			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 
@@ -158,8 +159,8 @@ extension FactorSourceView {
 				.border(Color.green, width: 2)
 			}
 
-			if let deviceStore = factorSource.storage?.forDevice {
-				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: deviceStore.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
+			if let entityCreatingStorage = factorSource.storage?.entityCreating {
+				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: entityCreatingStorage.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
 			}
 		}
 		.padding([.leading], leadingPadding)

@@ -8,26 +8,29 @@ import Prelude
 public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorSourceProtocol {
 	public let kind: FactorSourceKind
 	public let id: FactorSourceID
-	public let hint: NonEmptyString
+	public let label: FactorSource.Label
+	public let description: FactorSource.Description
 	public let parameters: FactorSource.Parameters
-	public var deviceStorage: DeviceStorage?
+	public var entityCreatingStorage: FactorSource.Storage.EntityCreating?
 	public let addedOn: Date
 	public let lastUsedOn: Date
 
 	public init(
 		kind: FactorSourceKind,
 		id: FactorSourceID,
-		hint: NonEmptyString,
+		label: FactorSource.Label,
+		description: FactorSource.Description,
 		parameters: FactorSource.Parameters,
-		deviceStorage: DeviceStorage?,
+		entityCreatingStorage: FactorSource.Storage.EntityCreating?,
 		addedOn: Date,
 		lastUsedOn: Date
 	) {
 		self.kind = kind
 		self.id = id
-		self.hint = hint
+		self.label = label
+		self.description = description
 		self.parameters = parameters
-		self.deviceStorage = deviceStorage
+		self.entityCreatingStorage = entityCreatingStorage
 		self.addedOn = addedOn
 		self.lastUsedOn = lastUsedOn
 	}
@@ -42,12 +45,13 @@ public struct HDOnDeviceFactorSource: Sendable, Hashable, Identifiable, _FactorS
 		if let anyStorage = factorSource.storage {
 			// Fail if we get the wrong kind of storage,
 			// but OK if nil, which it will be for "olympia" device factor sources.
-			self.deviceStorage = try anyStorage.asDevice()
+			self.entityCreatingStorage = try anyStorage.asEntityCreating()
 		}
 		self.kind = factorSource.kind
 		self.addedOn = factorSource.addedOn
 		self.lastUsedOn = factorSource.lastUsedOn
-		self.hint = factorSource.hint
+		self.label = factorSource.label
+		self.description = factorSource.description
 		self.id = factorSource.id
 		self.parameters = factorSource.parameters
 	}
@@ -61,7 +65,8 @@ extension HDOnDeviceFactorSource {
 		.init(
 			kind: kind,
 			id: id,
-			hint: hint,
+			label: label,
+			description: description,
 			parameters: parameters,
 			storage: storage,
 			addedOn: addedOn,
@@ -74,8 +79,8 @@ extension HDOnDeviceFactorSource {
 	}
 
 	public var storage: FactorSource.Storage? {
-		guard let deviceStorage else { return nil }
-		return .forDevice(deviceStorage)
+		guard let entityCreatingStorage else { return nil }
+		return .entityCreating(entityCreatingStorage)
 	}
 }
 
@@ -90,7 +95,7 @@ extension HDOnDeviceFactorSource {
 #if DEBUG
 extension HDOnDeviceFactorSources {
 	public static let previewValues: Self = {
-		try! .init(rawValue: .init(uniqueElements: [.previewValue]))!
+		.init(rawValue: .init(uniqueElements: [.previewValue]))!
 	}()
 }
 #endif // DEBUG

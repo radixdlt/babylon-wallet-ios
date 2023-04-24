@@ -27,6 +27,10 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case proceedWithScan
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case cameraPermission(CameraPermission.Action)
 		case scanQR(ScanQR.Action)
@@ -37,11 +41,10 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		case scanned(String)
 	}
 
+	@Dependency(\.continuousClock) var clock
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-
 		Scope(state: \.step, action: /.self) {
 			Scope(
 				state: /State.Step.cameraPermission,
@@ -56,6 +59,8 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 				ScanQR()
 			}
 		}
+
+		Reduce(core)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -65,12 +70,23 @@ public struct ScanQRCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case .proceedWithScan:
+			state.step = .scanQR(.init(scanInstructions: state.scanInstructions))
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .cameraPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				state.step = .scanQR(.init(scanInstructions: state.scanInstructions))
-				return .none
+				return .run { send in
+					// FIXME: temporary hack to try to solve some navigation issues
+					try await clock.sleep(for: .milliseconds(900))
+					await send(.internal(.proceedWithScan))
+				}
 			} else {
 				return .run { send in await send(.delegate(.dismiss)) }
 			}

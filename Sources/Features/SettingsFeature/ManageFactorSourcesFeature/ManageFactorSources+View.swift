@@ -1,3 +1,4 @@
+import AddLedgerFactorSourceFeature
 import FeaturePrelude
 
 extension ManageFactorSources.State {
@@ -38,6 +39,11 @@ extension ManageFactorSources {
 							viewStore.send(.importOlympiaFactorSourceButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
+
+						Button("Add Ledger factor source") {
+							viewStore.send(.addLedgerButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
 					}
 					.padding([.horizontal, .bottom], .medium1)
 					.task { @MainActor in
@@ -49,6 +55,12 @@ extension ManageFactorSources {
 						state: /ManageFactorSources.Destinations.State.importOlympiaFactorSource,
 						action: ManageFactorSources.Destinations.Action.importOlympiaFactorSource,
 						content: { ImportOlympiaFactorSource.View(store: $0) }
+					)
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /ManageFactorSources.Destinations.State.addLedger,
+						action: ManageFactorSources.Destinations.Action.addLedger,
+						content: { AddLedgerFactorSource.View(store: $0) }
 					)
 				}
 			}
@@ -65,7 +77,8 @@ extension FactorSourceView {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 0) {
 			VPair(heading: "Kind", item: factorSource.kind)
-			VPair(heading: "Hint", item: factorSource.hint)
+			VPair(heading: "Label", item: factorSource.label)
+			VPair(heading: "Description", item: factorSource.description)
 			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
 			VPair(heading: "ID", item: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 		}

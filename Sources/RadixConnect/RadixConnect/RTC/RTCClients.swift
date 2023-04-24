@@ -124,13 +124,14 @@ extension RTCClients {
 	/// - Parameters:
 	///   - request: request to send
 	///   - strategy: strategy used to find suitable recipients or recipient.
+	/// - Returns: Number of peers we sent the message to
 	public func sendRequest(
 		_ request: P2P.RTCOutgoingMessage.Request,
 		strategy sendStrategy: P2P.RTCOutgoingMessage.Request.SendStrategy
-	) async throws {
+	) async throws -> Int {
 		switch sendStrategy {
 		case .broadcastToAllPeers:
-			try await broadcastRequest(request)
+			return try await broadcastRequest(request)
 		}
 	}
 
@@ -143,21 +144,26 @@ extension RTCClients {
 		return NonEmpty(rawValue: connectedClient)
 	}
 
+	/// Broadcasts a request to all peers
+	/// - Parameters:
+	///   - request: request to send
+	/// - Returns: Number of peers we sent the message to
 	private func broadcastRequest(
 		_ request: P2P.RTCOutgoingMessage.Request
-	) async throws {
+	) async throws -> Int {
 		guard let connectedClients = await connectedClients() else {
 			throw NoConnectedClients()
 		}
-		try await withThrowingTaskGroup(of: Void.self) { group in
+		return try await withThrowingTaskGroup(of: Int.self, returning: Int.self) { group in
 			for client in connectedClients {
 				guard !Task.isCancelled else {
 					// We do not throw if cancelled, it is good we
 					// manage to broadcast to SOME client (i.e. not ALL is required.)
-					return
+					continue
 				}
 				_ = group.addTaskUnlessCancelled {
 					try await client.broadcast(request: request)
+					return 1
 				}
 			}
 
@@ -166,6 +172,7 @@ extension RTCClients {
 			}
 
 			try await group.waitForAll()
+			return try await group.reduce(0, +)
 		}
 	}
 

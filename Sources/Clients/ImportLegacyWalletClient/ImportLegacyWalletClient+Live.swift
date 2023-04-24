@@ -22,21 +22,21 @@ extension ImportLegacyWalletClient: DependencyKey {
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
-				let address = try Profile.Network.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
 				let factorInstance = FactorInstance(
 					factorSourceID: factorSouceID,
 					publicKey: publicKey,
 					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
 				)
+				let displayName = olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
 				let accountIndex = accountIndexOffset + Int(olympiaAccount.addressIndex)
 
-				let babylon = Profile.Network.Account(
+				let babylon = try Profile.Network.Account(
 					networkID: networkID,
-					address: address,
-					securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-					appearanceID: .fromIndex(accountIndex),
-					displayName: olympiaAccount.displayName ?? "Unnamned olympia account \(olympiaAccount.addressIndex)"
+					factorInstance: factorInstance,
+					displayName: displayName,
+					extraProperties: .init(appearanceID: .fromIndex(accountIndex))
 				)
+
 				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
 				accountsSet.append(migrated)
 			}

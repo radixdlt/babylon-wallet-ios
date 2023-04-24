@@ -44,24 +44,63 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
 			public let id: FactorSource.ID
 			public let model: P2P.LedgerHardwareWallet.Model
+
+			public init(
+				id: FactorSource.ID,
+				model: P2P.LedgerHardwareWallet.Model
+			) {
+				self.id = id
+				self.model = model
+			}
 		}
 
 		public struct DerivePublicKey: Sendable, Hashable, Decodable {
 			public let publicKey: HexCodable
+
+			public init(publicKey: HexCodable) {
+				self.publicKey = publicKey
+			}
 		}
 
 		public struct SignTransaction: Sendable, Hashable, Decodable {
 			public let signature: HexCodable
 			public let publicKey: HexCodable
+
+			public init(
+				signature: HexCodable,
+				publicKey: HexCodable
+			) {
+				self.signature = signature
+				self.publicKey = publicKey
+			}
 		}
 
 		public struct ImportOlympiaDevice: Sendable, Hashable, Decodable {
 			public let id: FactorSource.ID
 			public let model: P2P.LedgerHardwareWallet.Model
 			public let derivedPublicKeys: [DerivedPublicKey]
+
 			public struct DerivedPublicKey: Sendable, Hashable, Decodable {
 				public let publicKey: HexCodable
 				public let path: String
+
+				public init(
+					publicKey: HexCodable,
+					path: String
+				) {
+					self.publicKey = publicKey
+					self.path = path
+				}
+			}
+
+			public init(
+				id: FactorSource.ID,
+				model: P2P.LedgerHardwareWallet.Model,
+				derivedPublicKeys: [DerivedPublicKey]
+			) {
+				self.id = id
+				self.model = model
+				self.derivedPublicKeys = derivedPublicKeys
 			}
 		}
 	}
