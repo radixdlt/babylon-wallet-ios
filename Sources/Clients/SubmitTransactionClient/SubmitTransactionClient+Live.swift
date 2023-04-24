@@ -1,0 +1,144 @@
+import ClientPrelude
+import EngineToolkitModels
+import GatewayAPI
+
+// MARK: - TXFailureStatus
+// case failedToSubmit(SubmitTXFailure)
+// case failedToPoll(TransactionPollingFailure)
+
+public enum TXFailureStatus: String, LocalizedError, Sendable, Hashable {
+	case rejected
+	case failed
+	public var errorDescription: String? {
+		switch self {
+		case .rejected: return "Rejected"
+		case .failed: return "Failed"
+		}
+	}
+}
+
+// MARK: - FailedToPollError
+public struct FailedToPollError: Sendable, LocalizedError, Equatable {
+	public let error: Swift.Error
+	public var errorDescription: String? {
+		"Poll failed: \(String(describing: error))"
+	}
+}
+
+// MARK: - FailedToGetTransactionStatus
+public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable {
+	public let pollAttempts: Int
+	public var errorDescription: String? {
+		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
+	}
+}
+
+// MARK: - SubmitTransactionClient + DependencyKey
+extension SubmitTransactionClient: DependencyKey {
+	public typealias Value = SubmitTransactionClient
+
+	public static let liveValue: Self = {
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
+		return Self(
+			submitTransaction: { request in
+				let txID = request.txID
+
+				let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
+					notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex
+				)
+
+				let response: GatewayAPI.TransactionSubmitResponse
+				do {
+					response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
+				} catch {
+					fatalError()
+				}
+
+				guard !response.duplicate else {
+					fatalError()
+				}
+				return .success(txID)
+			},
+			transactionStatusUpdates: { txID, pollStrategy in
+				@Dependency(\.continuousClock) var clock
+
+				let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>.init(.init(txID: txID, result: .success(.pending)))
+
+				@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
+					let txStatusRequest = GatewayAPI.TransactionStatusRequest(
+						intentHashHex: txID.rawValue
+					)
+					let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
+					return txStatusResponse.status
+				}
+				let pollCountHolder = ActorIsolated<Int>(0)
+				Task {
+					while !statusSubject.value.result.isComplete {
+						await pollCountHolder.withValue { pollCount in
+							if pollCount >= pollStrategy.maxPollTries {
+								statusSubject.send(.init(txID: txID, result: .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))))
+							} else {
+								pollCount += 1
+							}
+						}
+						try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
+						let status = try await pollTransactionStatus()
+						statusSubject.send(.init(txID: txID, result: .success(status)))
+					}
+				}
+
+				return statusSubject.eraseToAnyAsyncSequence()
+			}
+		)
+	}()
+}
+
+extension Result where Success == GatewayAPI.TransactionStatus {
+	var isComplete: Bool {
+		switch self {
+		case .failure: return true
+		case let .success(status): return status.isComplete
+		}
+	}
+}
+
+extension GatewayAPI.TransactionStatus {
+	var isComplete: Bool {
+		switch self {
+		case .committedSuccess, .committedFailure, .rejected:
+			return true
+		case .pending, .unknown:
+			return false
+		}
+	}
+}
+
+// MARK: - GatewayAPI.TransactionCommittedDetailsResponse + Sendable
+extension GatewayAPI.TransactionCommittedDetailsResponse: @unchecked Sendable {}
+
+// MARK: - GatewayAPI.TransactionStatus + Sendable
+extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
+
+// MARK: - FailedToGetDetailsOfSuccessfullySubmittedTX
+struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
+	public let txID: TXID
+	var errorDescription: String? {
+		"Successfully submitted TX with txID: \(txID) but failed to get transaction details for it."
+	}
+}
+
+// MARK: - SubmitTXFailure
+public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
+	case failedToSubmitTX
+	case invalidTXWasDuplicate(txID: TXID)
+
+	public var errorDescription: String? {
+		switch self {
+		case .failedToSubmitTX:
+			return "Failed to submit transaction"
+		case let .invalidTXWasDuplicate(txID):
+			return "Duplicate TX id: \(txID)"
+		}
+	}
+}

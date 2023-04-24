@@ -6,8 +6,6 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 	case failedToPrepareTXReview(FailedToPreviewTXReview)
 	case failedToPrepareForTXSigning(FailedToPrepareForTXSigning)
 	case failedToCompileOrSign(CompileOrSignFailure)
-	case failedToSubmit(SubmitTXFailure)
-	case failedToPoll(TransacitonPollingFailure)
 
 	public var errorDescription: String? {
 		switch self {
@@ -17,10 +15,10 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 			return error.localizedDescription
 		case let .failedToCompileOrSign(error):
 			return error.localizedDescription
-		case let .failedToSubmit(error):
-			return error.localizedDescription
-		case let .failedToPoll(error):
-			return error.localizedDescription
+//		case let .failedToSubmit(error):
+//			return error.localizedDescription
+//		case let .failedToPoll(error):
+//			return error.localizedDescription
 		}
 	}
 }
@@ -50,25 +48,25 @@ extension TransactionFailure {
 				return (errorKind: .failedToSignTransaction, message: nil)
 			}
 
-		case let .failedToSubmit(error):
-			switch error {
-			case .failedToSubmitTX:
-				return (errorKind: .failedToSubmitTransaction, message: nil)
-			case let .invalidTXWasDuplicate(txID):
-				return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
-			}
-
-		case let .failedToPoll(error):
-			switch error {
-			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
-				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
-			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
-				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
-			case let .failedToPollTX(txID, _):
-				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
-			case let .failedToGetTransactionStatus(txID, _):
-				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
-			}
+//		case let .failedToSubmit(error):
+//			switch error {
+//			case .failedToSubmitTX:
+//				return (errorKind: .failedToSubmitTransaction, message: nil)
+//			case let .invalidTXWasDuplicate(txID):
+//				return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
+//			}
+//
+//		case let .failedToPoll(error):
+//			switch error {
+//			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
+//				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
+//			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
+//				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
+//			case let .failedToPollTX(txID, _):
+//				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+//			case let .failedToGetTransactionStatus(txID, _):
+//				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+//			}
 		}
 	}
 }

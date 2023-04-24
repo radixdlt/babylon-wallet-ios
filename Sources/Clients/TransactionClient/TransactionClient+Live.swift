@@ -360,15 +360,6 @@ extension TransactionClient {
 			return TransactionManifest(instructions: instructions, blobs: manifestWithLockFee.blobs)
 		}
 
-		@Sendable
-		func clearCacheForAccounts(_ accounts: Set<AccountAddress>) {
-			if !accounts.isEmpty {
-				accounts.forEach { cacheClient.removeFile(.accountPortfolio(.single($0.address))) }
-			} else {
-				cacheClient.removeFolder(.accountPortfolio(.all))
-			}
-		}
-
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
@@ -385,113 +376,6 @@ struct NotaryAndSigners: Sendable, Hashable {
 	public let notarySigner: Profile.Network.Account
 	/// Never empty, since this also contains the notary signer.
 	public let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>
-}
-
-// MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities
-struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swift.Error {}
-
-extension GatewayAPI.TransactionStatus {
-	var isComplete: Bool {
-		switch self {
-		case .committedSuccess, .committedFailure, .rejected:
-			return true
-		case .pending, .unknown:
-			return false
-		}
-	}
-}
-
-// MARK: - PollStrategy
-public struct PollStrategy {
-	public let maxPollTries: Int
-	public let sleepDuration: TimeInterval
-	public init(maxPollTries: Int, sleepDuration: TimeInterval) {
-		self.maxPollTries = maxPollTries
-		self.sleepDuration = sleepDuration
-	}
-
-	public static let `default` = Self(maxPollTries: 20, sleepDuration: 2)
-}
-
-// MARK: - GatewayAPI.TransactionCommittedDetailsResponse + Sendable
-extension GatewayAPI.TransactionCommittedDetailsResponse: @unchecked Sendable {}
-
-// MARK: - GatewayAPI.TransactionStatus + Sendable
-extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
-
-// MARK: - FailedToGetDetailsOfSuccessfullySubmittedTX
-struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
-	public let txID: TXID
-	var errorDescription: String? {
-		"Successfully submitted TX with txID: \(txID) but failed to get transaction details for it."
-	}
-}
-
-// MARK: - SubmitTXFailure
-public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
-	case failedToSubmitTX
-	case invalidTXWasDuplicate(txID: TXID)
-
-	public var errorDescription: String? {
-		switch self {
-		case .failedToSubmitTX:
-			return "Failed to submit transaction"
-		case let .invalidTXWasDuplicate(txID):
-			return "Duplicate TX id: \(txID)"
-		}
-	}
-}
-
-// MARK: - TransacitonPollingFailure
-public enum TransacitonPollingFailure: Sendable, LocalizedError, Equatable {
-	case failedToPollTX(txID: TXID, error: FailedToPollError)
-	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
-	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: TXFailureStatus)
-
-	public var errorDescription: String? {
-		switch self {
-		case let .failedToPollTX(txID, error):
-			return "\(error.localizedDescription) txID: \(txID)"
-		case let .failedToGetTransactionStatus(txID, error):
-			return "\(error.localizedDescription) txID: \(txID)"
-		case let .invalidTXWasSubmittedButNotSuccessful(txID, status):
-			return "Invalid TX submitted but not successful, status: \(status.localizedDescription) txID: \(txID)"
-		}
-	}
-}
-
-// MARK: - TXFailureStatus
-public enum TXFailureStatus: String, LocalizedError, Sendable, Hashable {
-	case rejected
-	case failed
-	public var errorDescription: String? {
-		switch self {
-		case .rejected: return "Rejected"
-		case .failed: return "Failed"
-		}
-	}
-}
-
-// MARK: - FailedToPollError
-public struct FailedToPollError: Sendable, LocalizedError, Equatable {
-	public let error: Swift.Error
-	public var errorDescription: String? {
-		"Poll failed: \(String(describing: error))"
-	}
-}
-
-// MARK: - FailedToGetTransactionStatus
-public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable {
-	public let pollAttempts: Int
-	public var errorDescription: String? {
-		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
-	}
-}
-
-extension LocalizedError where Self: Equatable {
-	public static func == (lhs: Self, rhs: Self) -> Bool {
-		lhs.errorDescription == rhs.errorDescription
-	}
 }
 
 extension IdentifiedArrayOf {

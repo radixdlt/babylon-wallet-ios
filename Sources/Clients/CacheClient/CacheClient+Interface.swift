@@ -118,3 +118,14 @@ extension CacheClient {
 		case entryLifetimeExpired
 	}
 }
+
+extension CacheClient {
+	@Sendable
+	public func clearCacheForAccounts(_ accounts: Set<AccountAddress>) {
+		if !accounts.isEmpty {
+			accounts.forEach { self.removeFile(.accountPortfolio(.single($0.address))) }
+		} else {
+			self.removeFolder(.accountPortfolio(.all))
+		}
+	}
+}

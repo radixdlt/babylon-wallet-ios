@@ -296,6 +296,7 @@ package.addModules([
 			"GatewayAPI",
 			"TransactionClient",
 			"SigningFeature",
+			"SubmitTransactionClient",
 		],
 		tests: .yes()
 	),
@@ -579,6 +580,14 @@ package.addModules([
 			"CacheClient",
 		],
 		tests: .yes()
+	),
+	.client(
+		name: "SubmitTransactionClient",
+		dependencies: [
+			"EngineToolkitClient",
+			"GatewayAPI",
+		],
+		tests: .no
 	),
 	.client(
 		name: "TransactionClient",
