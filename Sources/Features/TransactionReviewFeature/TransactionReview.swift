@@ -322,8 +322,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .addGuaranteeToManifestResult(.success(manifest)):
-
-			state.destination = .signing(.init(manifest: manifest))
+			guard let feePayerSelectionAmongstCandidates = state.feePayerSelectionAmongstCandidates else {
+				assertionFailure("Expected feePayerSelectionAmongstCandidates")
+				return .none
+			}
+			guard let networkID = state.networkID else {
+				assertionFailure("Expected feePayerSelectionAmongstCandidates")
+				return .none
+			}
+			state.destination = .signing(.init(
+				networkID: networkID,
+				manifest: manifest,
+				feePayerSelectionAmongstCandidates: feePayerSelectionAmongstCandidates
+			))
 			return .none
 
 		case let .addGuaranteeToManifestResult(.failure(error)):

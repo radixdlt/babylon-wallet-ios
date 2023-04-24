@@ -8,19 +8,22 @@ public struct FactorSourcesClient: Sendable {
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
 	public var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
 	public var addOffDeviceFactorSource: AddOffDeviceFactorSource
+	public var getFactorsOfSigners: GetFactorsOfSigners
 
 	public init(
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
-		addOffDeviceFactorSource: @escaping AddOffDeviceFactorSource
+		addOffDeviceFactorSource: @escaping AddOffDeviceFactorSource,
+		getFactorsOfSigners: @escaping GetFactorsOfSigners
 	) {
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.addOffDeviceFactorSource = addOffDeviceFactorSource
+		self.getFactorsOfSigners = getFactorsOfSigners
 	}
 }
 
@@ -31,6 +34,31 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
+	public typealias GetFactorsOfSigners = @Sendable (Set<AccountAddress>) async throws -> FactorsOfSigners
+}
+
+// MARK: - FactorsOfSigners
+public struct FactorsOfSigners: Sendable, Hashable {
+	public let factorsOfSigners: Set<FactorsOfSigner>
+
+	/// All factor sources references by all `requiredFactorInstances` of all `factorsOfSigners`.
+	public let factorSources: Set<FactorSource>
+
+	public init(
+		factorsOfSigners: Set<FactorsOfSigner>,
+		factorSources: Set<FactorSource>
+	) {
+		self.factorsOfSigners = factorsOfSigners
+		self.factorSources = factorSources
+	}
+}
+
+// MARK: - FactorsOfSigner
+public struct FactorsOfSigner: Sendable, Hashable {
+	/// signer
+	public let signer: Profile.Network.Account
+	/// required signing factors of `signer`
+	public let requiredFactorInstances: Set<FactorInstance>
 }
 
 extension FactorSourcesClient {

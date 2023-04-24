@@ -72,7 +72,20 @@ extension FactorSourcesClient: DependencyKey {
 					return nil // failure
 				}
 			},
-			addOffDeviceFactorSource: addOffDeviceFactorSource
+			addOffDeviceFactorSource: addOffDeviceFactorSource,
+			getFactorsOfSigners: { accountAddresses in
+				var factorsOfSigners: Set<FactorsOfSigner> = []
+				var factorSources: Set<FactorSource> = []
+
+				for address in accountAddresses {
+					fatalError()
+				}
+
+				return FactorsOfSigners(
+					factorsOfSigners: factorsOfSigners,
+					factorSources: factorSources
+				)
+			}
 		)
 	}
 
