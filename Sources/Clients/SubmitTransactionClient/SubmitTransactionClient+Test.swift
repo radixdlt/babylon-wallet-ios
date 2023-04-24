@@ -15,13 +15,13 @@ extension SubmitTransactionClient: TestDependencyKey {
 		submitTransaction: { _ in
 			throw NoopError()
 		},
-		transactionStatusUpdates: { _, _ in
-			throw NoopError()
-		}
+		transactionStatusUpdates: { _, _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		hasTXBeenCommittedSuccessfully: { _ in }
 	)
 
 	public static let testValue = Self(
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		transactionStatusUpdates: unimplemented("\(Self.self).transactionStatusUpdates")
+		transactionStatusUpdates: unimplemented("\(Self.self).transactionStatusUpdates"),
+		hasTXBeenCommittedSuccessfully: unimplemented("\(Self.self).hasTXBeenCommittedSuccessfully")
 	)
 }

@@ -40,6 +40,58 @@ extension SubmitTransactionClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
+		let transactionStatusUpdates: TransactionStatusUpdates = { txID, pollStrategy in
+			@Dependency(\.continuousClock) var clock
+
+			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>.init(.init(txID: txID, result: .success(.pending)))
+
+			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
+				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
+					intentHashHex: txID.rawValue
+				)
+				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
+				return txStatusResponse.status
+			}
+			let pollCountHolder = ActorIsolated<Int>(0)
+			Task {
+				while !statusSubject.value.result.isComplete {
+					await pollCountHolder.withValue { pollCount in
+						if pollCount >= pollStrategy.maxPollTries {
+							statusSubject.send(.init(txID: txID, result: .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))))
+						} else {
+							pollCount += 1
+						}
+					}
+					try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
+					let status = try await pollTransactionStatus()
+					statusSubject.send(.init(txID: txID, result: .success(status)))
+				}
+			}
+
+			return statusSubject.eraseToAnyAsyncSequence()
+		}
+
+		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { txID in
+			for try await update in try await transactionStatusUpdates(txID, .default) {
+				guard update.txID == txID else { continue }
+				switch update.result {
+				case .success(.committedFailure):
+					throw TXFailureStatus.failed
+				case .success(.rejected):
+					throw TXFailureStatus.rejected
+				case .success(.committedSuccess):
+					return
+				case let .failure(error):
+					throw error
+				case .success(.unknown):
+					continue
+				case .success(.pending):
+					continue
+				}
+			}
+			throw CancellationError()
+		}
+
 		return Self(
 			submitTransaction: { request in
 				let txID = request.txID
@@ -60,36 +112,8 @@ extension SubmitTransactionClient: DependencyKey {
 				}
 				return .success(txID)
 			},
-			transactionStatusUpdates: { txID, pollStrategy in
-				@Dependency(\.continuousClock) var clock
-
-				let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>.init(.init(txID: txID, result: .success(.pending)))
-
-				@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
-					let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-						intentHashHex: txID.rawValue
-					)
-					let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
-					return txStatusResponse.status
-				}
-				let pollCountHolder = ActorIsolated<Int>(0)
-				Task {
-					while !statusSubject.value.result.isComplete {
-						await pollCountHolder.withValue { pollCount in
-							if pollCount >= pollStrategy.maxPollTries {
-								statusSubject.send(.init(txID: txID, result: .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))))
-							} else {
-								pollCount += 1
-							}
-						}
-						try? await clock.sleep(for: .seconds(pollStrategy.sleepDuration))
-						let status = try await pollTransactionStatus()
-						statusSubject.send(.init(txID: txID, result: .success(status)))
-					}
-				}
-
-				return statusSubject.eraseToAnyAsyncSequence()
-			}
+			transactionStatusUpdates: transactionStatusUpdates,
+			hasTXBeenCommittedSuccessfully: hasTXBeenCommittedSuccessfully
 		)
 	}()
 }

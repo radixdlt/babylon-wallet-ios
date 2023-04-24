@@ -32,6 +32,7 @@ public enum TransactionPollingFailure: Sendable, LocalizedError, Hashable {
 public struct SubmitTransactionClient: Sendable {
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatusUpdates: TransactionStatusUpdates
+	public var hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully
 }
 
 public typealias SubmitTransactionResult = Swift.Result<TXID, SubmitTransactionFailure>
@@ -39,6 +40,7 @@ public typealias SubmitTransactionResult = Swift.Result<TXID, SubmitTransactionF
 extension SubmitTransactionClient {
 	public typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> SubmitTransactionResult
 	public typealias TransactionStatusUpdates = @Sendable (TXID, PollStrategy) async throws -> AnyAsyncSequence<TransactionStatusUpdate>
+	public typealias HasTXBeenCommittedSuccessfully = @Sendable (TXID) async throws -> Void
 }
 
 // MARK: - SubmitTXRequest

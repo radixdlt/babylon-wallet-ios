@@ -144,7 +144,7 @@ extension FaucetClient: DependencyKey {
 
 			try await submitTXClient.submitTransaction(.init(txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
 
-			let resu = try await submitTXClient.awaitCompleted(txID: txID)
+			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
