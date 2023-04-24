@@ -65,15 +65,17 @@ public struct ManifestReviewRequest: Sendable {
 }
 
 // MARK: - FeePayerCandiate
-public struct FeePayerCandiate: Sendable, Hashable {
+public struct FeePayerCandiate: Sendable, Hashable, Identifiable {
 	public let account: Profile.Network.Account
 	public let xrdBalance: BigDecimal
+	public typealias ID = Profile.Network.Account.ID
+	public var id: ID { account.id }
 }
 
 // MARK: - AddFeeToManifestOutcome
 public enum AddFeeToManifestOutcome: Sendable, Equatable {
 	case includesLockFee(TransactionManifest, feeAdded: BigDecimal)
-	case excludesLockFee(TransactionManifest, feePayerCandidates: Set<FeePayerCandiate>, feeNotYetAdded: BigDecimal)
+	case excludesLockFee(TransactionManifest, feePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>, feeNotYetAdded: BigDecimal)
 }
 
 // MARK: - TransactionToReview

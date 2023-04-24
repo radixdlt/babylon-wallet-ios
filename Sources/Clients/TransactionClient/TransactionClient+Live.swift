@@ -107,18 +107,23 @@ extension TransactionClient {
 					toPay: feeToAdd, on: networkID
 				)
 
-				guard !candidates.isEmpty else {
+				guard let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>.init(
+					rawValue: .init(
+						uniqueElements: candidates.compactMap { element in
+							guard let account = allAccounts.first(where: { $0.address == element.owner }) else {
+								return nil
+							}
+							return FeePayerCandiate(account: account, xrdBalance: element.amount)
+						},
+						id: \.id
+					)
+				) else {
 					throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 				}
 
 				return .excludesLockFee(
 					TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs),
-					feePayerCandidates: Set(candidates.compactMap { element in
-						guard let account = allAccounts.first(where: { $0.address == element.owner }) else {
-							return nil
-						}
-						return FeePayerCandiate(account: account, xrdBalance: element.amount)
-					}),
+					feePayerCandidates: nonEmpty,
 					feeNotYetAdded: feeToAdd
 				)
 			}

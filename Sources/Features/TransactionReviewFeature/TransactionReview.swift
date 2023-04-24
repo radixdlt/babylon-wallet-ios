@@ -274,7 +274,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				)
 			case let .excludesLockFee(manifestWithoutLockFee, feePayerCandidates, feeNotYetAdded):
 				state.analyzedManifestToReview = preview.analyzedManifestToReview
-				state.destination = .selectFeePayer(.init())
+				state.destination = .selectFeePayer(.init(candidates: feePayerCandidates, fee: feeNotYetAdded))
+				return .none
 			}
 		case let .createTransactionReview(content):
 			state.withdrawals = content.withdrawals

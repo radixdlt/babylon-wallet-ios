@@ -4,11 +4,12 @@ import TransactionClient
 // MARK: - SelectFeePayer
 public struct SelectFeePayer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let feePayerCandidates: Set<FeePayerCandiate>
+		public let feePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>
+		public var selectedPayerID: FeePayerCandiate.ID?
 		public let fee: BigDecimal
 
 		public init(
-			candidates: Set<FeePayerCandiate>,
+			candidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>,
 			fee: BigDecimal
 		) {
 			self.feePayerCandidates = candidates
@@ -17,14 +18,19 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case selectedPayer(id: FeePayerCandiate.ID?)
+		case confirmedFeePayer(FeePayerCandiate)
 	}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case let .selectedPayer(payerID):
+			state.selectedPayerID = payerID
+			return .none
+		case let .confirmedFeePayer(payer):
+			loggerGlobal.feature("Implement me")
 			return .none
 		}
 	}
