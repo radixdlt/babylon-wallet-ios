@@ -200,23 +200,24 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleTokenId {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct Row_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NonFungibleTokenList.Row.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: NonFungibleTokenList.Row()
-//			)
-//		)
-//	}
-// }
-//
-// extension NonFungibleTokenList.Row.State {
-//	public static let previewValue = Self(
-//		container: .mock1
-//	)
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct NonFungibleRow_Preview: PreviewProvider {
+	static var previews: some View {
+		NonFungibleTokenList.Row.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: NonFungibleTokenList.Row()
+			)
+		)
+	}
+}
+
+extension NonFungibleTokenList.Row.State {
+	public static let previewValue = Self(
+		token: .init(resourceAddress: .init(address: "some"),
+		             nftIds: [])
+	)
+}
+#endif

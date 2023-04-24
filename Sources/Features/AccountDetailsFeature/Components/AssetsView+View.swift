@@ -62,18 +62,17 @@ extension AssetsView {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct AssetsView_Preview: PreviewProvider {
-//	static var previews: some View {
-//		let assets: OrderedSet<AssetsView.State.AssetList> = [.fungibleTokens(.init(xrdToken: nil, nonXrdTokens: []))]
-//		AssetsView.View(
-//			store: .init(
-//				initialState: .init(assets: .init(rawValue: assets)!),
-//				reducer: AssetsView()
-//			)
-//		)
-//	}
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct AssetsView_Preview: PreviewProvider {
+	static var previews: some View {
+		AssetsView.View(
+			store: .init(
+				initialState: .init(fungibleTokenList: .init(), nonFungibleTokenList: .init(rows: [])),
+				reducer: AssetsView()
+			)
+		)
+	}
+}
+#endif

@@ -1,3 +1,5 @@
+// TODO: Adjust when UX is ready
+
 // import FeaturePrelude
 // import TransactionSigningFeature
 //

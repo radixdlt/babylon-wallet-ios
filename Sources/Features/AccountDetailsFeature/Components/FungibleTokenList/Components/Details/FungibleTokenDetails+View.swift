@@ -114,26 +114,21 @@ extension FungibleTokenDetails {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct FungibleTokenDetails_Preview: PreviewProvider {
-//	static var previews: some View {
-//		FungibleTokenDetails.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: FungibleTokenDetails()
-//			)
-//		)
-//	}
-// }
-//
-// extension FungibleTokenDetails.State {
-//        public static let previewValue = AccountPortfolio.FungibleToken(
-//		owner: try! .init(address: "owner_address"),
-//		asset: .xrd,
-//		amount: 30.0,
-//		worth: 500
-//	)
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct FungibleTokenDetails_Preview: PreviewProvider {
+	static var previews: some View {
+		FungibleTokenDetails.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: FungibleTokenDetails()
+			)
+		)
+	}
+}
+
+extension FungibleTokenDetails.State {
+	public static let previewValue = AccountPortfolio.FungibleResource(resourceAddress: .init(address: "some"), amount: .zero)
+}
+#endif

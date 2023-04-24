@@ -51,19 +51,17 @@ extension FungibleTokenList.View {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct FungibleTokenList_Preview: PreviewProvider {
-//	static var previews: some View {
-//		FungibleTokenList.View(
-//			store: .init(
-//				initialState: .init(
-//					sections: []
-//				),
-//				reducer: FungibleTokenList()
-//			)
-//		)
-//	}
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct FungibleTokenList_Preview: PreviewProvider {
+	static var previews: some View {
+		FungibleTokenList.View(
+			store: .init(
+				initialState: .init(),
+				reducer: FungibleTokenList()
+			)
+		)
+	}
+}
+#endif

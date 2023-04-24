@@ -67,21 +67,17 @@ extension FungibleTokenList.Row {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct Row_Preview: PreviewProvider {
-//	static var previews: some View {
-//		FungibleTokenList.Row.View(
-//			store: .init(
-//				initialState: .init(
-//					container: .init(owner: try! .init(address: "owner_address"), asset: .xrd, amount: 100.0, worth: 200),
-//					currency: .usd,
-//					isCurrencyAmountVisible: true
-//				),
-//				reducer: FungibleTokenList.Row()
-//			)
-//		)
-//	}
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct Row_Preview: PreviewProvider {
+	static var previews: some View {
+		FungibleTokenList.Row.View(
+			store: .init(
+				initialState: .init(xrdToken: .previewValue),
+				reducer: FungibleTokenList.Row()
+			)
+		)
+	}
+}
+#endif

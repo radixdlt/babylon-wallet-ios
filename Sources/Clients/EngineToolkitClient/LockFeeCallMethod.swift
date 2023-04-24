@@ -90,7 +90,7 @@ extension EngineToolkitClient {
 		tokensCount: Int = 20
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
-		let tokens = stride(from: 0, to: tokensCount, by: 1).map { _ in
+		let tokens: [any InstructionProtocol] = stride(from: 0, to: tokensCount, by: 1).map { _ in
 			var metdataEntries: [[ManifestASTValue]] = []
 
 			let addName = Bool.random()
@@ -114,24 +114,35 @@ extension EngineToolkitClient {
 				[.string("description"), .string(description)]
 			)
 
-			return CreateFungibleResourceWithInitialSupply(
-				divisibility: 18,
-				metadata: Map_(
-					keyValueKind: .string,
-					valueValueKind: .string,
-					entries: metdataEntries
-				),
-
-				accessRules: .init(
-					keyValueKind: .enum,
-					valueValueKind: .tuple,
-					entries: [
-						[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-						[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
-					]
-				),
-				initialSupply: .decimal(.init(value: initialSupply))
+			let metdata = Map_(
+				keyValueKind: .string,
+				valueValueKind: .string,
+				entries: metdataEntries
 			)
+
+			let accessRules = Map_(
+				keyValueKind: .enum,
+				valueValueKind: .tuple,
+				entries: [
+					[.enum(.init(.string("ResourceMethodAuthKey::Withdraw"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+					[.enum(.init(.string("ResourceMethodAuthKey::Deposit"))), .tuple(.init(arrayLiteral: .enum(.init(.string("AccessRule::AllowAll"))), .enum(.init(.string("AccessRule::DenyAll")))))],
+				]
+			)
+
+			if hasSupply {
+				return CreateFungibleResourceWithInitialSupply(
+					divisibility: 18,
+					metadata: metdata,
+					accessRules: accessRules,
+					initialSupply: .decimal(.init(value: initialSupply))
+				)
+			} else {
+				return CreateFungibleResource(
+					divisibility: 18,
+					metadata: metdata,
+					accessRules: accessRules
+				)
+			}
 		}
 
 		let instructions: [any InstructionProtocol] = [

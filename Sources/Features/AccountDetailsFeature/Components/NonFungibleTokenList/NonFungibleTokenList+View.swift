@@ -30,17 +30,17 @@ extension NonFungibleTokenList {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct NonFungibleTokenList_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NonFungibleTokenList.View(
-//			store: .init(
-//				initialState: .init(rows: [.init(container: .mock1)]),
-//				reducer: NonFungibleTokenList()
-//			)
-//		)
-//	}
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct NonFungibleTokenList_Preview: PreviewProvider {
+	static var previews: some View {
+		NonFungibleTokenList.View(
+			store: .init(
+				initialState: .init(rows: []),
+				reducer: NonFungibleTokenList()
+			)
+		)
+	}
+}
+#endif

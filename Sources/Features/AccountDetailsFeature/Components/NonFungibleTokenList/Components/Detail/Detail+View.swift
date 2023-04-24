@@ -142,31 +142,24 @@ extension AccountPortfolio.NonFungibleResource {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct NonFungibleTokenListDetail_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NonFungibleTokenList.Detail.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: NonFungibleTokenList.Detail()
-//			)
-//		)
-//	}
-// }
-//
-// extension NonFungibleTokenList.Detail.State {
-//	public static let previewValue = Self(
-//		container: NonFungibleTokenContainer(
-//			owner: try! .init(address: "owner_address"),
-//			resourceAddress: .init(address: "resource_address"),
-//			assets: .init(loaded: [.mock1, .mock2, .mock3]),
-//			name: "NFT Collection",
-//			description: "A collection of NFTs",
-//			iconURL: nil
-//		),
-//		asset: .mock1
-//	)
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct NonFungibleTokenListDetail_Preview: PreviewProvider {
+	static var previews: some View {
+		NonFungibleTokenList.Detail.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: NonFungibleTokenList.Detail()
+			)
+		)
+	}
+}
+
+extension NonFungibleTokenList.Detail.State {
+	public static let previewValue = Self(
+		resource: .init(resourceAddress: .init(address: "some"), nftIds: []),
+		nftID: .init("#1#")
+	)
+}
+#endif

@@ -124,22 +124,22 @@ extension AccountDetails {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct AccountDetails_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NavigationStack {
-//			AccountDetails.View(
-//				store: .init(
-//					initialState: .init(for: .previewValue),
-//					reducer: AccountDetails()
-//				)
-//			)
-//			#if os(iOS)
-//			.navigationBarTitleDisplayMode(.inline)
-//			#endif
-//		}
-//	}
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct AccountDetails_Preview: PreviewProvider {
+	static var previews: some View {
+		NavigationStack {
+			AccountDetails.View(
+				store: .init(
+					initialState: .init(for: .previewValue0),
+					reducer: AccountDetails()
+				)
+			)
+			#if os(iOS)
+			.navigationBarTitleDisplayMode(.inline)
+			#endif
+		}
+	}
+}
+#endif
