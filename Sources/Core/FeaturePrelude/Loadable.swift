@@ -130,6 +130,10 @@ extension Loadable: Equatable where Value: Equatable {
 			return lhs == rhs
 		case let (.failure(lhs), .failure(rhs)):
 			return _isEqual(lhs, rhs) ?? false
+		case (.idle, .idle):
+			return true
+		case (.loading, .loading):
+			return true
 		default:
 			return false
 		}
