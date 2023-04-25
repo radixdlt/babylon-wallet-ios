@@ -56,13 +56,27 @@ extension GatewayAPIClient {
 
 extension GatewayAPIClient {
 	public func getDappDefinition(_ address: String) async throws -> GatewayAPI.EntityMetadataCollection {
+		print("•• getDappDefinition: \(address)")
+
 		let entityMetadata = try await getEntityMetadata(address)
+
+		print("•• entityMetadata \(address)")
+
+		for item in entityMetadata.items {
+			print("\(item.key): \(item.value)")
+		}
 
 		guard let dappDefinitionAddress = entityMetadata.dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
 		}
 
 		let dappDefinition = try await getEntityMetadata(dappDefinitionAddress)
+
+		print("•• getDappDefinition \(dappDefinitionAddress)")
+
+		for item in dappDefinition.items {
+			print("\(item.key): \(item.value)")
+		}
 
 		guard dappDefinition.accountType == .dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
