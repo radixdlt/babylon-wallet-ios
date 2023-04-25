@@ -6,7 +6,7 @@ import SharedModels
 
 // MARK: - AccountPortfoliosClient + DependencyKey
 extension AccountPortfoliosClient: DependencyKey {
-	/// Internal state that holds all o the loaded portfolios.
+	/// Internal state that holds all loaded portfolios.
 	actor State {
 		let portfoliosSubject: AsyncCurrentValueSubject<[AccountAddress: AccountPortfolio]> = .init([:])
 
@@ -362,7 +362,7 @@ extension AccountPortfoliosClient {
 // MARK: - Resource details endpoint
 extension AccountPortfoliosClient {
 	// The maximum number of addresses the `getEntityDetails` can accept
-	// This needs to be synchronized with the actuall value on the GW side
+	// This needs to be synchronized with the actual value on the GW side
 	static let entityDetailsPageSize = 20
 	struct EmptyEntityDetailsResponse: Error {}
 
@@ -464,7 +464,7 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 			}
 		}
 
-		let sortedNonXrdresources = nonXrdResources.sorted { lhs, rhs in
+		let sortedNonXrdResources = nonXrdResources.sorted { lhs, rhs in
 			if lhs.amount > .zero && rhs.amount > .zero {
 				return lhs.amount > rhs.amount // Sort descending by amount
 			}
