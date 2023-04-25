@@ -487,7 +487,7 @@ extension Array where Element == AccountPortfolio.FungibleResource {
 			return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
 		}
 
-		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdresources)
+		return .init(xrdResource: xrdResource, nonXrdResources: sortedNonXrdResources)
 	}
 }
 
