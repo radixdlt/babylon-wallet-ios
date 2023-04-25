@@ -1,3 +1,4 @@
+import AnyCodable
 import Foundation
 
 // MARK: - GatewayAPI.StateEntityDetailsResponse + Sendable
@@ -47,24 +48,28 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
+	public var name: String? {
+		self["name"]?.asString
+	}
+
 	public var description: String? {
 		self["description"]?.asString
 	}
 
-	public var symbol: String? {
-		self["symbol"]?.asString
-	}
-
-	public var name: String? {
-		self["name"]?.asString
+	public var iconURL: URL? {
+		self["icon_url"]?.asString.flatMap(URL.init)
 	}
 
 	public var domain: String? {
 		self["domain"]?.asString
 	}
 
-	public var url: String? {
-		self["url"]?.asString
+	public var url: URL? {
+		self["url"]?.asString.flatMap(URL.init)
+	}
+
+	public var symbol: String? {
+		self["symbol"]?.asString
 	}
 
 	public var dappDefinition: String? {
@@ -81,10 +86,6 @@ extension GatewayAPI.EntityMetadataCollection {
 
 	public var accountType: AccountType? {
 		self["account_type"]?.asString.flatMap(AccountType.init)
-	}
-
-	public var iconURL: URL? {
-		self["icon_url"]?.asString.flatMap(URL.init)
 	}
 
 	public subscript(key: String) -> GatewayAPI.EntityMetadataItemValue? {
@@ -113,6 +114,12 @@ extension GatewayAPI.EntityMetadataCollection {
 				return "The entity is not claimed by the dapp definition"
 			}
 		}
+	}
+}
+
+extension GatewayAPI.StateNonFungibleDataResponse {
+	public func nonFungibleData(for nonFungibleId: String) -> AnyCodable? {
+		nonFungibleIds.first { $0.nonFungibleId == nonFungibleId }?.mutableData.rawJson
 	}
 }
 
