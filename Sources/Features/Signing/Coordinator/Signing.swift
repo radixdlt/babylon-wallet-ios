@@ -4,12 +4,16 @@ import FeaturePrelude
 import Profile
 import TransactionClient
 
-// MARK: - Signature
-public struct Signature: Sendable, Hashable {
-	public let curve: SLIP10.Curve
-	public let derivationPath: DerivationPath
-	public let publicKey: SLIP10.PublicKey
-	public let signature: SLIP10.Signature
+// MARK: - PrivateHDFactorSourceCache
+final class PrivateHDFactorSourceCache: @unchecked Sendable, Hashable {
+	static func == (lhs: PrivateHDFactorSourceCache, rhs: PrivateHDFactorSourceCache) -> Bool {
+		true
+	}
+
+	func hash(into hasher: inout Hasher) {}
+
+	fileprivate let cache: ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>> = .init([])
+	fileprivate init() {}
 }
 
 // MARK: - Signing
@@ -28,6 +32,7 @@ public struct Signing: Sendable, FeatureReducer {
 		public var factorsLeftToSignWith: OrderedSet<SigningFactor> = []
 		public var expectedSignatureCount = -1
 		public var signatures: OrderedSet<Signature> = []
+		internal let cachedPrivateHDFactorSources = PrivateHDFactorSourceCache()
 
 		public init(
 			networkID: NetworkID,
