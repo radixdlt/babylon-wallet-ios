@@ -574,7 +574,10 @@ package.addModules([
 			"AccountsClient",
 			"AccountPortfoliosClient",
 			"CacheClient",
+			"FactorSourcesClient",
+			"SecureStorageClient",
 			"EngineToolkitClient",
+			"UseFactorSourceClient",
 			"GatewayAPI",
 		],
 		tests: .yes()

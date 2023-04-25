@@ -1,4 +1,4 @@
-import AccountPortfolioFetcherClient
+import AccountPortfoliosClient
 import AccountsClient
 import CacheClient
 import ClientPrelude
@@ -19,7 +19,7 @@ extension TransactionClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 		@Dependency(\.cacheClient) var cacheClient
 
@@ -27,12 +27,15 @@ extension TransactionClient {
 		func accountsWithEnoughFunds(
 			from addresses: [AccountAddress],
 			toPay fee: BigDecimal
-		) async -> Set<FungibleTokenContainer> {
+		) async -> Set<AccountPortfolio> {
 			guard !addresses.isEmpty else { return Set() }
-			let xrdContainers = await addresses.concurrentMap {
-				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, forceRefresh: true)
-			}.compactMap { $0 }
-			return Set(xrdContainers.filter { $0.amount >= fee })
+			guard let portfolios = try? await accountPortfoliosClient.fetchAccountPortfolios(addresses, true) else {
+				return Set()
+			}
+			return Set(portfolios.filter {
+				guard let xrdBalance = $0.fungibleResources.xrdResource?.amount else { return false }
+				return xrdBalance >= fee
+			})
 		}
 
 //		@Sendable
@@ -58,14 +61,9 @@ extension TransactionClient {
 
 		let lockFeeWithSelectedPayer: LockFeeWithSelectedPayer = { maybeStringManifest, feeToAdd, addressOfPayer in
 			// assert account still has enough funds to pay
-			guard
-				let balance = await accountPortfolioFetcherClient.fetchXRDBalance(
-					of: addressOfPayer,
-					forceRefresh: true
-				)?.amount,
-				balance >= feeToAdd
-			else {
-				fatalError()
+			guard await accountsWithEnoughFunds(from: [addressOfPayer], toPay: feeToAdd).first?.owner == addressOfPayer else {
+				assertionFailure("did you JUST spend funds? unlucky...")
+				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
 			let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
@@ -98,14 +96,15 @@ extension TransactionClient {
 				toPay: feeToAdd
 			).compactMap { tokenBalance -> FeePayerCandiate? in
 				guard
-					let account = allAccounts.first(where: { account in account.address == tokenBalance.owner })
+					let account = allAccounts.first(where: { account in account.address == tokenBalance.owner }),
+					let xrdBalance = tokenBalance.fungibleResources.xrdResource?.amount
 				else {
-					assertionFailure("Failed to find account, this should never happen.")
+					assertionFailure("Failed to find account or no balance, this should never happen.")
 					return nil
 				}
 				return FeePayerCandiate(
 					account: account,
-					xrdBalance: tokenBalance.amount
+					xrdBalance: xrdBalance
 				)
 			}
 
