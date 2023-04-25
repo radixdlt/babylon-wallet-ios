@@ -1,3 +1,4 @@
+import EditPersonaFeature
 import FeaturePrelude
 
 // MARK: - PersonaList.View
@@ -11,48 +12,57 @@ extension PersonaList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: { $0 },
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack {
 					ScrollView {
 						Text(L10n.PersonaList.subtitle)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1HighImportance)
+							.sectionHeading
 							.flushedLeft
 							.padding([.horizontal, .top], .medium3)
 							.padding(.bottom, .small2)
 
 						Separator()
 
-						VStack(alignment: .leading) {
-							ForEachStore(
-								store.scope(
-									state: \.personas,
-									action: { .child(.persona(id: $0, action: $1)) }
-								),
-								content: {
-									Persona.View(store: $0)
-										.padding(.vertical, .small3)
-								}
-							)
-						}
-						.padding(.horizontal, .small1)
+						PersonaListCoreView(store: store)
 					}
 
 					Button(L10n.PersonaList.createNewPersonaButtonTitle) {
 						viewStore.send(.createNewPersonaButtonTapped)
 					}
-					.buttonStyle(.secondaryRectangular(
-						shouldExpand: true
-					))
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
 				.navigationTitle(L10n.PersonaList.title)
 			}
+		}
+	}
+}
+
+// MARK: - PersonaListCoreView
+public struct PersonaListCoreView: View {
+	private let store: StoreOf<PersonaList>
+
+	public init(store: StoreOf<PersonaList>) {
+		self.store = store
+	}
+
+	public var body: some View {
+		VStack(alignment: .leading) {
+			ForEachStore(
+				store.scope(
+					state: \.personas,
+					action: { .child(.persona(id: $0, action: $1)) }
+				),
+				content: {
+					Persona.View(store: $0)
+						.padding(.vertical, .small3)
+						.padding(.horizontal, .medium3)
+				}
+			)
+		}
+		.task {
+			ViewStore(store).send(.view(.task))
 		}
 	}
 }

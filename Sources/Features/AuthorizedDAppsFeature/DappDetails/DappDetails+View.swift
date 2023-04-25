@@ -1,11 +1,12 @@
 import FeaturePrelude
+import PersonaDetailsFeature
+import PersonasFeature
 
 // MARK: - View
 
 extension DappDetails {
 	@MainActor
 	public struct View: SwiftUI.View {
-		@Environment(\.dismiss) private var dismiss
 		let store: Store
 
 		public init(store: Store) {
@@ -21,19 +22,12 @@ extension DappDetails {
 		let otherMetadata: [MetadataItem]
 		let fungibleTokens: [Token]
 		let nonFungibleTokens: [Token]
-		let personas: [Persona]
-		let isDismissed: Bool
+		let hasPersonas: Bool
 
 		struct MetadataItem: Identifiable, Hashable, Sendable {
 			var id: Self { self }
 			let key: String
 			let value: String
-		}
-
-		struct Persona: Identifiable, Hashable, Sendable {
-			let id: Profile.Network.Persona.ID
-			let name: String
-			let thumbnail: URL
 		}
 
 		struct Token: Identifiable, Hashable, Sendable {
@@ -61,7 +55,8 @@ extension DappDetails.View {
 
 					NFTList(store: store)
 
-					PersonaList(store: store)
+					Personas(store: store, hasPersonas: viewStore.hasPersonas)
+						.background(.app.gray5)
 
 					Button(L10n.DAppDetails.forgetDapp) {
 						viewStore.send(.forgetThisDappTapped)
@@ -74,7 +69,7 @@ extension DappDetails.View {
 					viewStore.send(.appeared)
 				}
 				.navigationTitle(viewStore.title)
-				.sheet(store: store.presentedPersona) { store in
+				.sheet(store: store.personaDetails) { store in
 					NavigationStack {
 						PersonaDetails.View(store: store)
 						#if os(iOS)
@@ -90,9 +85,6 @@ extension DappDetails.View {
 					}
 				}
 				.alert(store: store.confirmDisconnectAlert)
-			}
-			.onChange(of: viewStore.isDismissed) { _ in
-				dismiss()
 			}
 		}
 	}
@@ -120,25 +112,14 @@ private extension DappDetails.State {
 			otherMetadata: otherMetadata,
 			fungibleTokens: [], // TODO: Populate when we have it
 			nonFungibleTokens: [], // TODO: Populate when we have it
-			personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init),
-			isDismissed: isDismissed
-		)
-	}
-}
-
-private extension DappDetails.ViewState.Persona {
-	init(persona: Profile.Network.AuthorizedPersonaDetailed) {
-		self.init(
-			id: persona.id,
-			name: persona.displayName.rawValue,
-			thumbnail: URL(string: "placeholder")!
+			hasPersonas: !personaList.personas.isEmpty
 		)
 	}
 }
 
 private extension DappDetails.Store {
-	var presentedPersona: PresentationStoreOf<PersonaDetails> {
-		scope(state: \.$presentedPersona) { .child(.presentedPersona($0)) }
+	var personaDetails: PresentationStoreOf<PersonaDetails> {
+		scope(state: \.$personaDetails) { .child(.personaDetails($0)) }
 	}
 
 	var confirmDisconnectAlert: AlertPresentationStore<DappDetails.ViewAction.ConfirmDisconnectAlert> {
@@ -257,40 +238,30 @@ extension DappDetails.View {
 	}
 
 	@MainActor
-	struct PersonaList: View {
+	struct Personas: View {
 		let store: StoreOf<DappDetails>
+		let hasPersonas: Bool
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				if viewStore.personas.isEmpty {
-					Text(L10n.DAppDetails.noPersonasHeading)
-						.sectionHeading
-						.padding(.horizontal, .medium1)
-						.padding(.vertical, .large3)
-				} else {
-					VStack(alignment: .leading, spacing: 0) {
-						Text(L10n.DAppDetails.personaHeading)
-							.sectionHeading
-							.padding(.horizontal, .medium1)
-							.padding(.vertical, .large3)
+			if hasPersonas {
+				Text(L10n.DAppDetails.personaHeading)
+					.sectionHeading
+					.flushedLeft
+					.padding(.horizontal, .medium1)
+					.padding(.vertical, .small2)
 
-						VStack(spacing: .medium3) {
-							ForEach(viewStore.personas) { persona in
-								Card {
-									PlainListRow(title: persona.name) {
-										viewStore.send(.personaTapped(persona.id))
-									} icon: {
-										PersonaThumbnail(persona.thumbnail)
-									}
-								}
-								.padding(.horizontal, .medium3)
-							}
-						}
-					}
-					.padding(.bottom, .large2)
-				}
+				Separator()
+					.padding(.bottom, .small2)
+
+				let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
+				PersonaListCoreView(store: personasStore)
+			} else {
+				Text(L10n.DAppDetails.noPersonasHeading)
+					.sectionHeading
+					.flushedLeft
+					.padding(.horizontal, .medium1)
+					.padding(.vertical, .small2)
 			}
-			.background(.app.gray5)
 		}
 	}
 }
