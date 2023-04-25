@@ -48,6 +48,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 					// Refresh all accounts
 					if forceRefresh {
+						cacheClient.removeFolder(.accountPortfolio(.all))
 						let allPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(accountAddresses)
 						allPortfolios.forEach {
 							cacheClient.save($0, .accountPortfolio(.single($0.owner.address)))
@@ -81,6 +82,7 @@ extension AccountPortfoliosClient: DependencyKey {
 				return portfolios
 			},
 			fetchAccountPortfolio: { accountAddress, forceRefresh in
+				cacheClient.removeFile(.accountPortfolio(.single(accountAddress.address)))
 				let portfolio = try await cacheClient.withCaching(
 					cacheEntry: .accountPortfolio(.single(accountAddress.address)),
 					forceRefresh: forceRefresh,

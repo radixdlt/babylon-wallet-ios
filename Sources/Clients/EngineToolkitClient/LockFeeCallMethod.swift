@@ -176,8 +176,8 @@ extension EngineToolkitClient {
 					keyValueKind: .string,
 					valueValueKind: .string,
 					entries: [
-						//   [.string("name"), .string(tokenName)],
-						// [.string("symbol"), .string(tokenSymbol)],
+						[.string("name"), .string(tokenName)],
+						[.string("symbol"), .string(tokenSymbol)],
 						[.string("description"), .string(description)],
 					]
 				),
