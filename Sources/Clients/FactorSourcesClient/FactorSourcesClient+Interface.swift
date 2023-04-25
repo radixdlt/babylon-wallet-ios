@@ -37,19 +37,31 @@ extension FactorSourcesClient {
 	public typealias GetFactorsOfSigners = @Sendable (Set<AccountAddress>) async throws -> FactorsOfSigners
 }
 
+extension FactorSourceKind {
+	fileprivate var signingOrder: Int {
+		switch self {
+		case .ledgerHQHardwareWallet: return 0
+		case .device: return 1
+		default: return 1000
+		}
+	}
+}
+
 // MARK: - FactorsOfSigners
 public struct FactorsOfSigners: Sendable, Hashable {
 	public let factorsOfSigners: Set<FactorsOfSigner>
 
 	/// All factor sources references by all `requiredFactorInstances` of all `factorsOfSigners`.
-	public let factorSources: Set<FactorSource>
+	public let factorSources: OrderedDictionary<FactorSourceKind, IdentifiedArrayOf<FactorSource>>
 
 	public init(
 		factorsOfSigners: Set<FactorsOfSigner>,
-		factorSources: Set<FactorSource>
+		factorSources: IdentifiedArrayOf<FactorSource>
 	) {
 		self.factorsOfSigners = factorsOfSigners
-		self.factorSources = factorSources
+		self.factorSources = .init(
+			uniqueKeysWithValues: OrderedDictionary<FactorSourceKind, IdentifiedArrayOf<FactorSource>>(grouping: factorSources, by: \.kind).sorted(by: { $0.key.signingOrder < $1.key.signingOrder })
+		)
 	}
 }
 

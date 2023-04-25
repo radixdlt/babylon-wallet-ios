@@ -75,7 +75,7 @@ extension FactorSourcesClient: DependencyKey {
 			addOffDeviceFactorSource: addOffDeviceFactorSource,
 			getFactorsOfSigners: { accountAddresses in
 				var factorsOfSigners: Set<FactorsOfSigner> = []
-				var factorSources: Set<FactorSource> = []
+				var factorSources: IdentifiedArrayOf<FactorSource> = []
 
 				for address in accountAddresses {
 					fatalError()

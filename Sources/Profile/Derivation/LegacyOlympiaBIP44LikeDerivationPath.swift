@@ -26,7 +26,8 @@ public struct LegacyOlympiaBIP44LikeDerivationPath:
 	public let fullPath: HD.Path.Full
 
 	public init(
-		index: Profile.Network.NextDerivationIndices.Index
+		index: Profile.Network.NextDerivationIndices.Index,
+		shouldHardenLastPathComponent: Bool = true
 	) throws {
 		let fullPath = try HD.Path.Full(
 			children: [
@@ -35,7 +36,7 @@ public struct LegacyOlympiaBIP44LikeDerivationPath:
 				.init(nonHardenedValue: 0, isHardened: true),
 				.init(nonHardenedValue: 0, isHardened: false),
 				// Mistake by me, Alexander Cyon, in Olympia wallet I accidentally hardened the last path component, it should NOT be haredned as per BIP44. Why we call this type "BIP44 like".
-				.init(nonHardenedValue: index, isHardened: true),
+				.init(nonHardenedValue: index, isHardened: shouldHardenLastPathComponent),
 			],
 			onlyPublic: false
 		)
@@ -87,9 +88,9 @@ extension LegacyOlympiaBIP44LikeDerivationPath {
 			throw InvalidBIP44LikeDerivationPath.fourthComponentWasHardenedButExpectedItNotToBe
 		}
 
-		guard children[4].isHardened else {
-			throw InvalidBIP44LikeDerivationPath.fifthComponentIsNotHardened
-		}
+//		guard children[4].isHardened else {
+//			throw InvalidBIP44LikeDerivationPath.fifthComponentIsNotHardened
+//		}
 
 		// Valid!
 		return hdPath
@@ -103,7 +104,7 @@ extension LegacyOlympiaBIP44LikeDerivationPath {
 		case secondComponentIsNotBIP44
 		case invalidCoinType(got: UInt32)
 		case thirdComponentIsNotHardened
-		case fifthComponentIsNotHardened
+//		case fifthComponentIsNotHardened
 	}
 }
 
