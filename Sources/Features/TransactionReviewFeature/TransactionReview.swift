@@ -432,8 +432,6 @@ extension TransactionReview {
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
 		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address)
 
-		print("• dApps used: \(addresses)")
-
 		let dApps = try await addresses.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
 
