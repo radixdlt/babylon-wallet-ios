@@ -148,7 +148,10 @@ func convert(
 		throw FailedToCreateNonEmptyOlympiaAddress()
 	}
 	let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
-	let derivationPath = try LegacyOlympiaBIP44LikeDerivationPath(index: raw.addressIndex)
+	let derivationPath = try LegacyOlympiaBIP44LikeDerivationPath(
+		index: raw.addressIndex,
+		shouldHardenAddressIndex: raw.accountType == .software
+	)
 
 	return try .init(
 		accountType: raw.accountType,

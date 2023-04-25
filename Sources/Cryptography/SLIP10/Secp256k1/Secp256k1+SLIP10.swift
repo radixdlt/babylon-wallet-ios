@@ -38,3 +38,10 @@ extension K1.PrivateKey: ECPrivateKey {
 		self = try K1.PrivateKey.import(rawRepresentation: data)
 	}
 }
+
+// MARK: - K1.PublicKey + CustomDebugStringConvertible
+extension K1.PublicKey: CustomDebugStringConvertible {
+	public var debugDescription: String {
+		compressedRepresentation.hex
+	}
+}

@@ -26,13 +26,8 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 		path: LegacyOlympiaBIP44LikeDerivationPath,
 		address: LegacyOlympiaAccountAddress,
 		displayName: NonEmptyString?
-	) throws {
-		/// the non hardened value of the path
-		guard let addressIndex = path.fullPath.components.last?.asChild?.nonHardenedValue else {
-			assertionFailure("bad path")
-			throw ExpectedBIP44LikeDerivationPathToAlwaysContainAddressIndex()
-		}
-		self.addressIndex = addressIndex
+	) {
+		self.addressIndex = path.addressIndex
 		self.publicKey = publicKey
 		self.path = path
 		self.address = address

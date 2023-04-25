@@ -60,10 +60,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public enum InternalAction: Sendable, Equatable {
 		case gotLinksConnectionStatusUpdate([P2P.LinkConnectionUpdate])
 
-		case response(
-			olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
-		)
-
+		case validateLedgerBeforeNamingIt(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice)
 		case nameLedgerDeviceBeforeSavingIt(
 			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 		)
@@ -148,10 +145,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			state.failedToFindAnyLinks = connectedLinks.isEmpty
 			return .none
 
-		case let .response(olympiaDevice):
-			loggerGlobal.notice("Successfully received importOlympiaDevice response from CE! \(olympiaDevice) ✅")
-			return validate(olympiaDevice, againstUnverifiedOf: &state)
-
 		case let .nameLedgerDeviceBeforeSavingIt(device):
 			state.unnamedDeviceToAdd = device
 			return .none
@@ -159,6 +152,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case .failedToImportOlympiaLedger:
 			state.isWaitingForResponseFromLedger = false
 			return .none
+
+		case let .validateLedgerBeforeNamingIt(ledger):
+			return validate(ledger, againstUnverifiedOf: &state)
 
 		case let .addedFactorSource(factorSource, model, name):
 			state.unnamedDeviceToAdd = nil
@@ -201,6 +197,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 			let olympiaAccountsToMigrate = state.unverified.filter {
 				derivedKeys.contains($0.publicKey)
+			}
+
+			if olympiaAccountsToMigrate.isEmpty, !state.unverified.isEmpty, !olympiaDevice.derivedPublicKeys.isEmpty {
+				loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map(\.compressedRepresentation.hex))\nstate.unverified:\(state.unverified.map(\.publicKey.compressedRepresentation.hex))")
 			}
 
 			guard let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>.init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))) else {
@@ -293,7 +293,19 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			state.isWaitingForResponseFromLedger = true
 			return .run { [olympiaAccounts = state.unverified] send in
 				let device = try await ledgerHardwareWalletClient.importOlympiaDevice(olympiaAccounts)
-				await send(.internal(.nameLedgerDeviceBeforeSavingIt(device)))
+				//                loggerGlobal.critical("IGNORED OLYMPIA ACCOUNTS!!!! MOCKING!!!")
+				//                let hardcodedTestAccount = try! OlympiaAccountToMigrate(
+				//                    accountType: .hardware,
+				//                    publicKey: .init(compressedRepresentation: Data(hex: "03d79039c428a6b835e136fbb582e9259df23f8660f928367c3f0d6912728a8444")),
+				//                    path: .init(path: .init(string: "m/44H/1022H/2H/1/3")),
+				//                    address: .init(address: "olympia"),
+				//                    displayName: "Javascript Ledger integration test"
+				//                )
+				//                let device = try await ledgerHardwareWalletClient.importOlympiaDevice([
+				//                    hardcodedTestAccount
+				//                ])
+				//                print("device: \(device), expected: \(hardcodedTestAccount)")
+				await send(.internal(.validateLedgerBeforeNamingIt(device)))
 			} catch: { error, send in
 				loggerGlobal.error("Failed to import olympia ledger device, error: \(error)")
 				await send(.internal(.failedToImportOlympiaLedger))
