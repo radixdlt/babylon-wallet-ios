@@ -4,6 +4,14 @@ import FeaturePrelude
 import Profile
 import TransactionClient
 
+// MARK: - Signature
+public struct Signature: Sendable, Hashable {
+	public let curve: SLIP10.Curve
+	public let derivationPath: DerivationPath
+	public let publicKey: SLIP10.PublicKey
+	public let signature: SLIP10.Signature
+}
+
 // MARK: - Signing
 public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -14,8 +22,12 @@ public struct Signing: Sendable, FeatureReducer {
 		public var step: Step?
 		public let networkID: NetworkID
 		public let manifest: TransactionManifest
+		public var compiledIntent: CompileTransactionIntentResponse
+		public var factorsLeftToSignWith: OrderedSet<SigningFactor> = []
+		public var expectedSignatureCount = -1
+		public var signatures: OrderedSet<Signature>
 		public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
-		public var factorsOfSigners: FactorsOfSigners?
+
 		public init(
 			networkID: NetworkID,
 			manifest: TransactionManifest,
@@ -28,8 +40,9 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadRequiredSigners(TaskResult<Set<AccountAddress>>)
-		case loadFactorsOfSigners(TaskResult<FactorsOfSigners>)
+		case builtTransaction(TaskResult<TransactionIntentWithSigners>)
+		case loadSigningFactors(TaskResult<SigningFactors>)
+		case finishedSigningWithAllFactors
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -38,6 +51,10 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case signWithLedger(SignWithLedgerFactorSource.Action)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case notarized(CompileNotarizedTransactionIntentResponse)
 	}
 
 	@Dependency(\.transactionClient) var transactionClient
@@ -59,44 +76,84 @@ public struct Signing: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { [manifest = state.manifest, networkID = state.networkID] send in
-				await send(.internal(.loadRequiredSigners(TaskResult {
-					try engineToolkitClient.accountAddressesNeedingToSignTransaction(.init(
-						version: .default,
-						manifest: manifest,
-						networkID: networkID
-					))
-				})))
-			}
+			return buildTransaction(state)
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadRequiredSigners(.failure(error)):
+		case let .builtTransaction(.failure(error)):
 			errorQueue.schedule(error)
-			loggerGlobal.error("Failed to load required signers, error: \(error)")
+			loggerGlobal.error("Failed to build transaction, error: \(error)")
 			return .none
 
-		case let .loadRequiredSigners(.success(accountAddresses)):
-			let addresses = Set(accountAddresses + [state.feePayerSelectionAmongstCandidates.selected.account.address])
-			return .run { send in
-				await send(.internal(.loadFactorsOfSigners(
-					TaskResult {
-						try await factorSourcesClient.getFactorsOfSigners(addresses)
-					}
-				)))
+		case let .builtTransaction(.success(transactionIntentWithSigners)):
+			let accounts = NonEmpty(
+				rawValue: Set(transactionIntentWithSigners.notaryAndSigners.accountsNeededToSign + [state.feePayerSelectionAmongstCandidates.selected.account])
+			)!
+			do {
+				state.compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
+				return loadSigningFactors(networkID: state.networkID, accounts: accounts)
+			} catch {
+				fatalError()
 			}
 
-		case let .loadFactorsOfSigners(.failure(error)):
+		case let .loadSigningFactors(.failure(error)):
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to load factors of signers, error: \(error)")
 			return .none
 
-		case let .loadFactorsOfSigners(.success(factorsOfSigners)):
-			state.factorsOfSigners = factorsOfSigners
+		case let .loadSigningFactors(.success(signingFactors)):
+			state.factorsLeftToSignWith = signingFactors.rawValue
+			state.expectedSignatureCount = signingFactors.flatMap { sf in
+				sf.signers.map(\.factorInstancesRequiredToSign.count)
+			}.reduce(0, +)
 
+		case .finishedSigningWithAllFactors:
+			loggerGlobal.critical("Notarize!")
 			return .none
 		}
+	}
+
+	private func buildTransaction(_ state: State) -> EffectTask<Action> {
+		.run { [networkID = state.networkID, manifest = state.manifest] send in
+			await send(.internal(.builtTransaction(
+				TaskResult {
+					try await transactionClient.buildTransactionIntent(.init(
+						networkID: networkID,
+						manifest: manifest
+					)).get()
+				}
+			)))
+		}
+	}
+
+	private func loadSigningFactors(networkID: NetworkID, accounts: NonEmpty<Set<Profile.Network.Account>>) -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.loadSigningFactors(
+				TaskResult {
+					try await factorSourcesClient.getSigningFactors(networkID, accounts)
+				}
+			)))
+		}
+	}
+
+	private func proceedWithNextFactorSource(_ state: State) -> EffectTask<Action> {
+		if let next = state.factorsLeftToSignWith.first {
+			return signWithFactor(next)
+		} else {
+			assert(state.signatures.count == state.expectedSignatureCount)
+			return .send(.internal(.finishedSigningWithAllFactors))
+		}
+	}
+
+	private func signWithFactor(_ signingFactor: SigningFactor) -> EffectTask<Action> {
+		switch signingFactor.factorSource.kind {
+		case .device:
+			return .run { _ in
+			}
+		case .ledgerHQHardwareWallet:
+		}
+		fatalError()
 	}
 }

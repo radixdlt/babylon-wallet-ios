@@ -16,7 +16,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		addPrivateHDFactorSource: unimplemented("\(Self.self).addPrivateHDFactorSource"),
 		checkIfHasOlympiaFactorSourceForAccounts: unimplemented("\(Self.self).checkIfHasOlympiaFactorSourceForAccounts"),
 		addOffDeviceFactorSource: unimplemented("\(Self.self).addOffDeviceFactorSource"),
-		getFactorsOfSigners: unimplemented("\(Self.self).getFactorsOfSigners")
+		getSigningFactors: unimplemented("\(Self.self).getSigningFactors")
 	)
 
 	public static let noop = Self(
@@ -25,6 +25,6 @@ extension FactorSourcesClient: TestDependencyKey {
 		addPrivateHDFactorSource: { _ in throw NoopError() },
 		checkIfHasOlympiaFactorSourceForAccounts: { _ in nil },
 		addOffDeviceFactorSource: { _ in },
-		getFactorsOfSigners: { _ in throw NoopError() }
+		getSigningFactors: { _, _ in throw NoopError() }
 	)
 }

@@ -8,7 +8,7 @@ public struct FactorSourcesClient: Sendable {
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
 	public var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
 	public var addOffDeviceFactorSource: AddOffDeviceFactorSource
-	public var getFactorsOfSigners: GetFactorsOfSigners
+	public var getSigningFactors: GetSigningFactors
 
 	public init(
 		getFactorSources: @escaping GetFactorSources,
@@ -16,14 +16,14 @@ public struct FactorSourcesClient: Sendable {
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
 		addOffDeviceFactorSource: @escaping AddOffDeviceFactorSource,
-		getFactorsOfSigners: @escaping GetFactorsOfSigners
+		getSigningFactors: @escaping GetSigningFactors
 	) {
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.addOffDeviceFactorSource = addOffDeviceFactorSource
-		self.getFactorsOfSigners = getFactorsOfSigners
+		self.getSigningFactors = getSigningFactors
 	}
 }
 
@@ -34,43 +34,28 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
-	public typealias GetFactorsOfSigners = @Sendable (Set<AccountAddress>) async throws -> FactorsOfSigners
+	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Profile.Network.Account>>) async throws -> SigningFactors
 }
 
-extension FactorSourceKind {
-	fileprivate var signingOrder: Int {
-		switch self {
-		case .ledgerHQHardwareWallet: return 0
-		case .device: return 1
-		default: return 1000
+public typealias SigningFactors = NonEmpty<OrderedSet<SigningFactor>>
+
+// MARK: - SigningFactor
+public struct SigningFactor: Sendable, Hashable {
+	public let factorSource: FactorSource
+	public let signers: NonEmpty<Set<Signer>>
+	public init(factorSource: FactorSource, signers: NonEmpty<Set<Signer>>) {
+		self.factorSource = factorSource
+		self.signers = signers
+	}
+
+	public struct Signer: Sendable, Hashable {
+		public let account: Profile.Network.Account
+		public let factorInstancesRequiredToSign: Set<FactorInstance>
+		public init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance>) {
+			self.account = account
+			self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
 		}
 	}
-}
-
-// MARK: - FactorsOfSigners
-public struct FactorsOfSigners: Sendable, Hashable {
-	public let factorsOfSigners: Set<FactorsOfSigner>
-
-	/// All factor sources references by all `requiredFactorInstances` of all `factorsOfSigners`.
-	public let factorSources: OrderedDictionary<FactorSourceKind, IdentifiedArrayOf<FactorSource>>
-
-	public init(
-		factorsOfSigners: Set<FactorsOfSigner>,
-		factorSources: IdentifiedArrayOf<FactorSource>
-	) {
-		self.factorsOfSigners = factorsOfSigners
-		self.factorSources = .init(
-			uniqueKeysWithValues: OrderedDictionary<FactorSourceKind, IdentifiedArrayOf<FactorSource>>(grouping: factorSources, by: \.kind).sorted(by: { $0.key.signingOrder < $1.key.signingOrder })
-		)
-	}
-}
-
-// MARK: - FactorsOfSigner
-public struct FactorsOfSigner: Sendable, Hashable {
-	/// signer
-	public let signer: Profile.Network.Account
-	/// required signing factors of `signer`
-	public let requiredFactorInstances: Set<FactorInstance>
 }
 
 extension FactorSourcesClient {

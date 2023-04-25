@@ -376,6 +376,7 @@ package.addModules([
 		dependencies: [
 			"FactorSourcesClient",
 			"ProfileStore",
+			"AccountsClient",
 		],
 		tests: .yes()
 	),

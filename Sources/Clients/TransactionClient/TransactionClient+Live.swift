@@ -38,14 +38,6 @@ extension TransactionClient {
 			})
 		}
 
-//		@Sendable
-//		func firstAccountAddressWithEnoughFunds(
-//			from addresses: [AccountAddress],
-//			toPay fee: BigDecimal
-//		) async -> FungibleTokenContainer? {
-//			await accountsWithEnoughFunds(from: addresses, toPay: fee).first
-//		}
-
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
 			let version = engineToolkitClient.getTransactionVersion()
 			let networkID = await gatewaysClient.getCurrentNetworkID()

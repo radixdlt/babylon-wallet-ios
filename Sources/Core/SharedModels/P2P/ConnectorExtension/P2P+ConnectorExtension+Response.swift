@@ -38,7 +38,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 	public enum Success: Sendable, Hashable {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKey(DerivePublicKey)
-		case signTransaction(SignTransaction)
+		case signTransaction([SignatureOfSigner])
 		case importOlympiaDevice(ImportOlympiaDevice)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
@@ -62,7 +62,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 
-		public struct SignTransaction: Sendable, Hashable, Decodable {
+		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
+			public let curve: String
+			public let derivatoinPath: String
 			public let signature: HexCodable
 			public let publicKey: HexCodable
 

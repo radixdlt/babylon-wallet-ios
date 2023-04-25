@@ -63,7 +63,7 @@ extension P2P.ConnectorExtension.Request {
 			}
 
 			public struct SignTransaction: Sendable, Hashable, Encodable {
-				public let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
+				public let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				public let compiledTransactionIntent: HexCodable
 				public let mode: Mode
@@ -73,12 +73,12 @@ extension P2P.ConnectorExtension.Request {
 				}
 
 				public init(
-					keyParameters: P2P.LedgerHardwareWallet.KeyParameters,
+					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
 					compiledTransactionIntent: HexCodable,
 					mode: Mode
 				) {
-					self.keyParameters = keyParameters
+					self.signers = signers
 					self.ledgerDevice = ledgerDevice
 					self.compiledTransactionIntent = compiledTransactionIntent
 					self.mode = mode
