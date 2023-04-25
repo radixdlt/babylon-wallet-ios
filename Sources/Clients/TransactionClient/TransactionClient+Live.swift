@@ -1,4 +1,4 @@
-import AccountPortfolioFetcherClient
+import AccountPortfoliosClient
 import AccountsClient
 import CacheClient
 import ClientPrelude
@@ -19,7 +19,7 @@ extension TransactionClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 		@Dependency(\.cacheClient) var cacheClient
 
@@ -230,11 +230,10 @@ extension TransactionClient {
 				}
 			}
 			guard txStatus == .committedSuccess else {
-				await clearCacheForAccounts(accountsInvolvedInTransaction.value)
 				return .failure(.failedToPoll(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed)))
 			}
 
-			await clearCacheForAccounts(accountsInvolvedInTransaction.value)
+			await reloadAccountsInvolvedInTransaction(accountsInvolvedInTransaction.value)
 			return .success(txID)
 		}
 
@@ -295,8 +294,7 @@ extension TransactionClient {
 
 				if let accountInvolvedInTransaction = await firstAccountAddressWithEnoughFunds(
 					from: Array(accountAddressesSuitableToPayTransactionFeeRef),
-					toPay: feeAdded,
-					on: networkID
+					toPay: feeAdded
 				) {
 					return accountInvolvedInTransaction
 				} else {
@@ -304,8 +302,7 @@ extension TransactionClient {
 
 					if let anyAccount = await firstAccountAddressWithEnoughFunds(
 						from: allAccountAddresses.rawValue,
-						toPay: feeAdded,
-						on: networkID
+						toPay: feeAdded
 					) {
 						return anyAccount
 					} else {
@@ -559,11 +556,18 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func firstAccountAddressWithEnoughFunds(from addresses: [AccountAddress], toPay fee: BigDecimal, on networkID: NetworkID) async -> AccountAddress? {
-			let xrdContainers = await addresses.concurrentMap {
-				await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID, forceRefresh: true)
-			}.compactMap { $0 }
-			return xrdContainers.first(where: { $0.amount >= fee })?.owner
+		func firstAccountAddressWithEnoughFunds(
+			from addresses: [AccountAddress],
+			toPay fee: BigDecimal
+		) async -> AccountAddress? {
+			try? await accountPortfoliosClient
+				.fetchAccountPortfolios(addresses, true) // Be sure to load the freshest data
+				.first {
+					guard let amount = $0.fungibleResources.xrdResource?.amount else {
+						return false
+					}
+					return amount >= fee
+				}?.owner
 		}
 
 		@Sendable
@@ -588,11 +592,15 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func clearCacheForAccounts(_ accounts: Set<AccountAddress>) {
-			if !accounts.isEmpty {
-				accounts.forEach { cacheClient.removeFile(.accountPortfolio(.single($0.address))) }
-			} else {
-				cacheClient.removeFolder(.accountPortfolio(.all))
+		func reloadAccountsInvolvedInTransaction(_ accounts: Set<AccountAddress>) {
+			guard !accounts.isEmpty else {
+				return
+			}
+			accounts.forEach {
+				cacheClient.removeFile(.accountPortfolio(.single($0.address)))
+			}
+			Task {
+				try await accountPortfoliosClient.fetchAccountPortfolios(Array(accounts), true)
 			}
 		}
 

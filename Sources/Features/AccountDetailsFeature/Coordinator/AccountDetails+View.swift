@@ -1,6 +1,4 @@
 import AccountPreferencesFeature
-import AssetsViewFeature
-import AssetTransferFeature
 import FeaturePrelude
 
 extension AccountDetails.State {
@@ -8,7 +6,8 @@ extension AccountDetails.State {
 		.init(
 			appearanceID: account.appearanceID,
 			address: .init(address: account.address.address, format: .default),
-			displayName: account.displayName.rawValue
+			displayName: account.displayName.rawValue,
+			isLoadingResources: isLoadingResources
 		)
 	}
 }
@@ -19,6 +18,7 @@ extension AccountDetails {
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let address: AddressView.ViewState
 		let displayName: String
+		let isLoadingResources: Bool
 	}
 
 	@MainActor
@@ -53,6 +53,9 @@ extension AccountDetails {
 //						.padding(.bottom)
 //						#endif
 
+						if viewStore.isLoadingResources {
+							ProgressView()
+						}
 						ScrollView {
 							VStack(spacing: .medium3) {
 								AssetsView.View(
@@ -101,18 +104,21 @@ extension AccountDetails {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
+					.task {
+						viewStore.send(.task)
+					}
 					.sheet(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /AccountDetails.Destinations.State.preferences,
 						action: AccountDetails.Destinations.Action.preferences,
 						content: { AccountPreferences.View(store: $0) }
 					)
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /AccountDetails.Destinations.State.transfer,
-						action: AccountDetails.Destinations.Action.transfer,
-						content: { AssetTransfer.View(store: $0) }
-					)
+//					.sheet(
+//						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+//						state: /AccountDetails.Destinations.State.transfer,
+//						action: AccountDetails.Destinations.Action.transfer,
+//						content: { AssetTransfer.View(store: $0) }
+//					)
 			}
 		}
 	}
@@ -126,7 +132,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		NavigationStack {
 			AccountDetails.View(
 				store: .init(
-					initialState: .init(for: .previewValue),
+					initialState: .init(for: .previewValue0),
 					reducer: AccountDetails()
 				)
 			)

@@ -1,3 +1,4 @@
+import AccountPortfoliosClient
 import FaucetClient
 import FeaturePrelude
 
@@ -10,6 +11,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
+		public var createMultipleFungibleTokenButtonState: ControlState
+		public var createMultipleNonFungibleTokenButtonState: ControlState
 		#endif
 
 		public init(
@@ -22,6 +25,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			#if DEBUG
 			self.createFungibleTokenButtonState = .enabled
 			self.createNonFungibleTokenButtonState = .enabled
+			self.createMultipleFungibleTokenButtonState = .enabled
+			self.createMultipleNonFungibleTokenButtonState = .enabled
 			#endif
 		}
 	}
@@ -34,23 +39,25 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case createFungibleTokenButtonTapped
 		case createNonFungibleTokenButtonTapped
+		case createMultipleFungibleTokenButtonTapped
+		case createMultipleNonFungibleTokenButtonTapped
 		#endif
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>)
-		case refreshAccountCompleted
+		case refreshAccountCompleted(TaskResult<AccountPortfolio>)
 		case hideLoader
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case refresh(_ accountAddress: AccountAddress, forceRefresh: Bool)
 	}
 
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 	public init() {}
 
@@ -60,8 +67,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return loadIsAllowedToUseFaucet(&state)
 
 		case .closeButtonTapped:
-			return .run { [address = state.address] send in
-				await send(.delegate(.refresh(address, forceRefresh: false)))
+			return .run { send in
 				await send(.delegate(.dismiss))
 			}
 
@@ -81,6 +87,21 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return call(buttonState: \.createNonFungibleTokenButtonState, into: &state) {
 				try await faucetClient.createNonFungibleToken(.init(
 					recipientAccountAddress: $0
+				))
+			}
+		case .createMultipleFungibleTokenButtonTapped:
+			return call(buttonState: \.createMultipleFungibleTokenButtonState, into: &state) {
+				try await faucetClient.createFungibleToken(.init(
+					recipientAccountAddress: $0,
+					numberOfTokens: 50
+				))
+			}
+		case .createMultipleNonFungibleTokenButtonTapped:
+			return call(buttonState: \.createMultipleNonFungibleTokenButtonState, into: &state) {
+				try await faucetClient.createNonFungibleToken(.init(
+					recipientAccountAddress: $0,
+					numberOfTokens: 10,
+					numberOfIds: 100
 				))
 			}
 		#endif
@@ -125,16 +146,24 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		case let .callDone(controlStateKeyPath):
 			if controlStateKeyPath == \State.faucetButtonState {
-				return .send(.delegate(.refresh(state.address, forceRefresh: true))).concatenate(with: loadIsAllowedToUseFaucet(&state))
+				return updateAccountPortfolio(state).concatenate(with: loadIsAllowedToUseFaucet(&state))
 			} else {
 				state[keyPath: controlStateKeyPath] = .enabled
-				return .send(.delegate(.refresh(state.address, forceRefresh: true)))
+				return updateAccountPortfolio(state)
 			}
 		}
 	}
 }
 
 extension AccountPreferences {
+	private func updateAccountPortfolio(_ state: State) -> EffectTask<Action> {
+		.run { [address = state.address] send in
+			await send(.internal(.refreshAccountCompleted(
+				TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true) }
+			)))
+		}
+	}
+
 	private func loadIsAllowedToUseFaucet(_ state: inout State) -> EffectTask<Action> {
 		state.faucetButtonState = .loading(.local)
 		return .run { [address = state.address] send in

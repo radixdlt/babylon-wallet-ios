@@ -37,26 +37,31 @@ public struct CreateFungibleTokenRequest: Sendable {
 	public let recipientAccountAddress: AccountAddress
 	public let name: String
 	public let symbol: String
+	public let numberOfTokens: Int
 
 	public init(
 		recipientAccountAddress: AccountAddress,
 		name: String,
-		symbol: String
+		symbol: String,
+		numberOfTokens: Int = 1
 	) {
 		self.recipientAccountAddress = recipientAccountAddress
 		self.name = name
 		self.symbol = symbol
+		self.numberOfTokens = numberOfTokens
 	}
 
 	public init(
-		recipientAccountAddress: AccountAddress
+		recipientAccountAddress: AccountAddress,
+		numberOfTokens: Int = 1
 	) {
 		let randomName = BIP39.WordList.english.randomElement() ?? "Unnamed"
 
 		self.init(
 			recipientAccountAddress: recipientAccountAddress,
 			name: randomName.lowercased(),
-			symbol: randomName.uppercased()
+			symbol: randomName.uppercased(),
+			numberOfTokens: numberOfTokens
 		)
 	}
 }
@@ -64,23 +69,33 @@ public struct CreateFungibleTokenRequest: Sendable {
 public struct CreateNonFungibleTokenRequest: Sendable {
 	public let recipientAccountAddress: AccountAddress
 	public let name: String
+	public let numberOfTokens: Int
+	public let numberOfIds: Int
 
 	public init(
 		recipientAccountAddress: AccountAddress,
-		name: String
+		name: String,
+		numberOfTokens: Int = 1,
+		numberOfIds: Int = 10
 	) {
 		self.recipientAccountAddress = recipientAccountAddress
 		self.name = name
+		self.numberOfTokens = numberOfTokens
+		self.numberOfIds = numberOfIds
 	}
 
 	public init(
-		recipientAccountAddress: AccountAddress
+		recipientAccountAddress: AccountAddress,
+		numberOfTokens: Int = 1,
+		numberOfIds: Int = 10
 	) {
 		let randomName = BIP39.WordList.english.randomElement() ?? "Unnamed"
 
 		self.init(
 			recipientAccountAddress: recipientAccountAddress,
-			name: randomName.lowercased()
+			name: randomName.lowercased(),
+			numberOfTokens: numberOfTokens,
+			numberOfIds: numberOfIds
 		)
 	}
 }
