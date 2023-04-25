@@ -124,6 +124,17 @@ extension Profile.Network.Account {
 
 		return try EntityAddress(address: response.virtualAccountAddress.address)
 	}
+
+	public var isOlympiaAccount: Bool {
+		// Not the cleanest way, but it is guaranteed to be deterministic
+		switch self.securityState {
+		case let .unsecured(control):
+			if case .ecdsaSecp256k1 = control.genesisFactorInstance.publicKey {
+				return true
+			}
+		}
+		return false
+	}
 }
 
 extension Profile.Network.Account {

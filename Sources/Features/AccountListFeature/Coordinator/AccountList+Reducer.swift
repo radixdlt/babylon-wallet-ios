@@ -21,7 +21,8 @@ public struct AccountList: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case displayAccountDetails(AccountList.Row.State)
+		case displayAccountDetails(Profile.Network.Account)
+		case displayAccountSecurity(Profile.Network.Account)
 	}
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
@@ -36,22 +37,20 @@ public struct AccountList: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		// TODO: Should be handled here? maybe in Row child instead
 		switch childAction {
-		case let .account(id: id, action: action):
-			guard let row = state.accounts[id: id] else {
-				assertionFailure("Account value should not be nil.")
-				return .none
-			}
+		case let .account(_, action: .delegate(action)):
 			switch action {
-			case .view(.copyAddressButtonTapped):
-				let address = row.account.address.address
+			case let .tapped(account):
+				return .send(.delegate(.displayAccountDetails(account)))
+			case let .securityPrompTaped(account):
+				return .send(.delegate(.displayAccountSecurity(account)))
+			case let .copyAddressButtonTapped(account):
+				let address = account.address.address
 				return .fireAndForget { pasteboardClient.copyString(address) }
-			case .view(.tapped):
-				return .send(.delegate(.displayAccountDetails(row)))
-			default:
-				return .none
 			}
+
+		default:
+			return .none
 		}
 	}
 }

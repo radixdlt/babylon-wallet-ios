@@ -55,6 +55,7 @@ public struct Home: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
+			case accountSecurity(Profile.Network.Account) // TODO: Use the proper state
 
 			// NB: native case paths should deem this obsolete.
 			// e.g. `state.destination?[keyPath: \.accountDetails] = ...` or even conciser via `@dynamicMemberLookup`
@@ -73,6 +74,7 @@ public struct Home: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
+			case accountSecurity(Int) // TODO: Use the proper action
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -81,6 +83,9 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
+			}
+			Scope(state: /State.accountSecurity, action: /Action.accountSecurity) {
+				EmptyReducer()
 			}
 		}
 	}
@@ -154,7 +159,11 @@ public struct Home: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .accountList(.delegate(.displayAccountDetails(account))):
-			state.destination = .accountDetails(.init(for: account.account))
+			state.destination = .accountDetails(.init(for: account))
+			return .none
+
+		case let .accountList(.delegate(.displayAccountSecurity(account))):
+			state.destination = .accountSecurity(account)
 			return .none
 
 		case .header(.delegate(.displaySettings)):

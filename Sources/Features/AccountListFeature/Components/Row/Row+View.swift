@@ -19,14 +19,24 @@ extension AccountList.Row {
 		let address: AddressView.ViewState
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
-		let fungbielResourceIcons: FungibleResources
+		let isLegacyAccount: Bool
+		let shouldShowSecurityPrompt: Bool
 		let nonFungibleResourcesCount: Int
+		let fungbielResourceIcons: FungibleResources
 
 		init(state: State) {
 			self.name = state.account.displayName.rawValue
 			self.address = .init(address: state.account.address.address, format: .default)
 			self.appearanceID = state.account.appearanceID
 			self.isLoadingResources = state.portfolio.isLoading
+
+			// Olympia accounts are legacy
+			self.isLegacyAccount = state.account.isOlympiaAccount
+
+			// Show the prompt if the account has any XRD
+			self.shouldShowSecurityPrompt = state.portfolio.wrappedValue?.fungibleResources.xrdResource != nil
+
+			// Resources
 			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
 			self.fungbielResourceIcons = {
 				guard let portfolio = state.portfolio.wrappedValue else {
@@ -65,19 +75,28 @@ extension AccountList.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading) {
+				VStack(alignment: .leading, spacing: 16) {
 					VStack(alignment: .leading, spacing: .zero) {
 						HeaderView(name: viewStore.name)
-						AddressView(
-							viewStore.address,
-							copyAddressAction: {
-								viewStore.send(.copyAddressButtonTapped)
+						HStack {
+							AddressView(
+								viewStore.address,
+								copyAddressAction: {
+									viewStore.send(.copyAddressButtonTapped)
+								}
+							)
+							.foregroundColor(.app.whiteTransparent)
+							if viewStore.isLegacyAccount {
+								Text("• Legacy Account")
+									.foregroundColor(.app.whiteTransparent)
 							}
-						)
-						.foregroundColor(.app.whiteTransparent)
+						}
 					}
 
 					ownedResourcesList(viewStore)
+					if viewStore.shouldShowSecurityPrompt {
+						securityPromptView(viewStore)
+					}
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -179,6 +198,26 @@ extension AccountList.Row.View {
 		image.resizable()
 			.frame(Constants.iconSize)
 			.clipShape(Circle())
+	}
+}
+
+extension AccountList.Row.View {
+	func securityPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+		HStack {
+			Image(asset: AssetResource.homeAccountSecurity)
+			Text("Apply Security Settings").foregroundColor(.white)
+			Spacer()
+			Circle()
+				.fill()
+				.foregroundColor(.red)
+				.frame(width: 8, height: 8)
+		}
+		.padding(8)
+		.background(Color.white.opacity(0.3))
+		.cornerRadius(8)
+		.onTapGesture {
+			viewStore.send(.securityPromptTapped)
+		}
 	}
 }
 

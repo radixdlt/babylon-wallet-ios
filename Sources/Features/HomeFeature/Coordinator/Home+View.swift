@@ -73,6 +73,14 @@ extension Home {
 						action: Home.Destinations.Action.createAccount,
 						content: { CreateAccountCoordinator.View(store: $0) }
 					)
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /Home.Destinations.State.accountSecurity,
+						action: Home.Destinations.Action.accountSecurity,
+						content: { _ in
+							Text("TODO: ACCOUNT SECURIFY")
+						}
+					)
 				}
 				#if os(iOS)
 				.navigationTransition(.default, interactivity: .pan)

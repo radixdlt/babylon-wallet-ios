@@ -49,6 +49,7 @@ public enum AssetResource {
   public static let radioButtonLightSelected = ImageAsset(name: "radioButton-light-selected")
   public static let radioButtonLightUnselected = ImageAsset(name: "radioButton-light-unselected")
   public static let trash = ImageAsset(name: "trash")
+  public static let homeAccountSecurity = ImageAsset(name: "home-account-security")
   public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
   public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
