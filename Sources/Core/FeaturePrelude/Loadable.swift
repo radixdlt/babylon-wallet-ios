@@ -102,6 +102,13 @@ public enum Loadable<Value> {
 			self = .init(newValue)
 		}
 	}
+
+	public var isLoading: Bool {
+		if case .loading = self {
+			return true
+		}
+		return false
+	}
 }
 
 extension Loadable {
