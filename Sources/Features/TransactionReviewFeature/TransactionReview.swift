@@ -331,7 +331,7 @@ extension TransactionReview {
 		return LedgerEntity(
 			id: address,
 			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-			                thumbnail: nil,
+			                thumbnail: metadata?.iconURL,
 			                description: metadata?.description)
 		)
 	}
@@ -459,8 +459,8 @@ extension TransactionReview {
 		switch resourceSpecifier {
 		case let .amount(resourceAddress, amount):
 			try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
-		case let .ids(resourceAddress, _):
-			try await addTransfer(resourceAddress, amount: .init(fromString: "1"))
+		case let .ids(resourceAddress, ids):
+			try await addTransfer(resourceAddress, amount: BigDecimal(ids.count))
 		}
 	}
 }
