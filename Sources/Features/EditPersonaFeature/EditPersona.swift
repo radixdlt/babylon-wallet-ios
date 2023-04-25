@@ -128,6 +128,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
+			guard state.hasChanges() else {
+				return .fireAndForget {
+					await dismiss()
+				}
+			}
+
 			state.destination = .closeConfirmationDialog(
 				.init(titleVisibility: .hidden) {
 					TextState("")
@@ -165,7 +171,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
-			return .run { _ in await dismiss() }
+			return .fireAndForget { await dismiss() }
 
 		case let .destination(.presented(.addFields(.delegate(.addFields(fieldsToAdd))))):
 			state.dynamicFields.append(contentsOf: fieldsToAdd.map { .init(id: $0, initial: nil, isRequiredByDapp: false) })
@@ -179,5 +185,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+}
+
+extension EditPersona.State {
+	func hasChanges() -> Bool {
+		guard let output = viewState.output else { return false }
+		return output.personaLabel != persona.displayName || persona.fields != output.fields
 	}
 }

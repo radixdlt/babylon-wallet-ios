@@ -45,3 +45,18 @@ extension PersonasClient {
 
 	public typealias NewUnsavedVirtualPersonaControlledByLedgerFactorSource = @Sendable (CreateVirtualEntityControlledByLedgerFactorSourceRequest) async throws -> Profile.Network.Persona
 }
+
+extension PersonasClient {
+	public func getPersona(id: Profile.Network.Persona.ID) async throws -> Profile.Network.Persona {
+		let personas = try await getPersonas()
+		guard let persona = personas[id: id] else {
+			throw PersonaNotFoundError(id: id)
+		}
+
+		return persona
+	}
+
+	public struct PersonaNotFoundError: Error {
+		let id: Profile.Network.Persona.ID
+	}
+}

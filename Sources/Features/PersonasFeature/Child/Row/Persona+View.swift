@@ -1,17 +1,7 @@
 import FeaturePrelude
 
-extension Persona.State {
-	var viewState: Persona.ViewState {
-		.init(displayName: persona.displayName.rawValue)
-	}
-}
-
 // MARK: - Persona.View
 extension Persona {
-	public struct ViewState: Equatable {
-		public let displayName: String
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Persona>
@@ -21,25 +11,14 @@ extension Persona {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				HStack(alignment: .center) {
-					Circle()
-						.strokeBorder(Color.app.gray3, lineWidth: 1)
-						.background(Circle().fill(Color.app.gray4))
-						.frame(.small)
-						.padding(.trailing, .small1)
-
-					VStack(alignment: .leading, spacing: 4) {
-						Text(viewStore.displayName)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				Card {
+					PlainListRow(title: viewStore.displayName) {
+						viewStore.send(.tapped)
+					} icon: {
+						PersonaThumbnail(viewStore.thumbnail)
 					}
-
-					Spacer()
 				}
-				.padding(.medium2)
-				.background(Color.app.gray5)
-				.cornerRadius(.small1)
 			}
 		}
 	}

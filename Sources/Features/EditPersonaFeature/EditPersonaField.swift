@@ -18,8 +18,7 @@ public struct EditPersonaField<ID: EditPersonaFieldID>: Sendable, FeatureReducer
 			case dynamic(isRequiredByDapp: Bool)
 
 			var isStatic: Bool {
-				guard case .static = self else { return false }
-				return true
+				self == .static
 			}
 
 			var isDynamic: Bool {
@@ -74,7 +73,7 @@ public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.Sta
 extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
-		case .personaLabel: return L10n.PersonaDetails.personaLabelHeading
+		case .personaLabel: return L10n.PersonaDetails.personaNameHeading
 		}
 	}
 
@@ -124,8 +123,8 @@ public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.Dy
 extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
-		case .givenName: return L10n.PersonaDetails.givenNameHeading
-		case .familyName: return L10n.PersonaDetails.familyNameHeading
+		case .givenName: return L10n.PersonaDetails.firstNameHeading
+		case .familyName: return L10n.PersonaDetails.lastNameHeading
 		case .emailAddress: return L10n.PersonaDetails.emailAddressHeading
 		case .phoneNumber: return L10n.PersonaDetails.phoneNumberHeading
 		}

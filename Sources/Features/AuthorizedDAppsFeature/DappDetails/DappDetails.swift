@@ -2,9 +2,12 @@ import AuthorizedDappsClient
 import CacheClient
 import FeaturePrelude
 import GatewayAPI
+import PersonaDetailsFeature
+import PersonasFeature
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
@@ -25,17 +28,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
 
 		@PresentationState
-		public var presentedPersona: PersonaDetails.State? = nil
+		public var personaDetails: PersonaDetails.State? = nil
 
 		@PresentationState
 		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
 
-		// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
-		public var isDismissed: Bool = false
+		public var personaList: PersonaList.State
 
-		public init(dApp: Profile.Network.AuthorizedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
+		public init(dApp: Profile.Network.AuthorizedDappDetailed, personaDetails: PersonaDetails.State? = nil) {
 			self.dApp = dApp
-			self.presentedPersona = presentedPersona
+			self.personaDetails = personaDetails
+			self.personaList = .init(dApp: dApp)
 		}
 	}
 
@@ -47,7 +50,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case copyAddressButtonTapped
 		case fungibleTokenTapped(ComponentAddress)
 		case nonFungibleTokenTapped(ComponentAddress)
-		case personaTapped(Profile.Network.Persona.ID)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
 		case confirmDisconnectAlert(PresentationAction<ConfirmDisconnectAlert>)
@@ -69,7 +71,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedPersona(PresentationAction<PersonaDetails.Action>)
+		case personaDetails(PresentationAction<PersonaDetails.Action>)
+		case personas(PersonaList.Action)
 	}
 
 	// MARK: Reducer
@@ -77,8 +80,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
+			PersonaList()
+		}
 		Reduce(core)
-			.ifLet(\.$presentedPersona, action: /Action.child .. ChildAction.presentedPersona) {
+			.ifLet(\.$personaDetails, action: /Action.child .. ChildAction.personaDetails) {
 				PersonaDetails()
 			}
 			.ifLet(\.$confirmDisconnectAlert, action: /Action.view .. ViewAction.confirmDisconnectAlert)
@@ -120,16 +126,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 			// TODO: Handle this
 			return .none
 
-		case let .personaTapped(id):
-			guard let persona = state.dApp.detailedAuthorizedPersonas[id: id] else { return .none }
-			state.presentedPersona = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue,
-			                                              dAppID: state.dApp.dAppDefinitionAddress,
-			                                              networkID: state.dApp.networkID,
-			                                              persona: persona)
-			return .none
-
 		case .dismissPersonaTapped:
-			return .send(.child(.presentedPersona(.dismiss)))
+			return .send(.child(.personaDetails(.dismiss)))
 
 		case .forgetThisDappTapped:
 			state.confirmDisconnectAlert = .confirmDisconnect
@@ -145,17 +143,23 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .presentedPersona(.presented(.delegate(.personaDeauthorized))):
+		case .personaDetails(.presented(.delegate(.personaDeauthorized))):
 			let dAppID = state.dApp.dAppDefinitionAddress
-			return .run { send in
-				let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
-				await send(.internal(.dAppUpdated(updatedDapp)))
-				await send(.child(.presentedPersona(.dismiss)))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+			return update(dAppID: dAppID, dismissPersonaDetails: true)
 
-		default:
+		case .personaDetails(.presented(.delegate(.personaChanged))):
+			let dAppID = state.dApp.dAppDefinitionAddress
+			return update(dAppID: dAppID, dismissPersonaDetails: false)
+
+		case .personaDetails:
+			return .none
+
+		case let .personas(.delegate(.openDetails(persona))):
+			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
+			state.personaDetails = PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona))
+			return .none
+
+		case .personas:
 			return .none
 		}
 	}
@@ -166,17 +170,31 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$metadata = metadata
 			return .none
 		case let .dAppUpdated(dApp):
+			assert(dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
 				return disconnectDappEffect(state: state)
 			}
-
 			state.dApp = dApp
+
 			return .none
 
 		case .dAppForgotten:
-			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
-			state.isDismissed = true
-			return .send(.delegate(.dAppForgotten))
+			return .task {
+				await dismiss()
+				return .delegate(.dAppForgotten)
+			}
+		}
+	}
+
+	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
+		.run { send in
+			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
+			await send(.internal(.dAppUpdated(updatedDapp)))
+			if dismissPersonaDetails {
+				await send(.child(.personaDetails(.dismiss)))
+			}
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
 	}
 

@@ -68,10 +68,12 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AuthorizedDAppsFeatures",
+		name: "AuthorizedDAppsFeature",
 		dependencies: [
 			"AuthorizedDappsClient",
 			"CacheClient",
+			"EditPersonaFeature",
+			"PersonasFeature",
 			"GatewayAPI",
 		],
 		tests: .no
@@ -113,6 +115,14 @@ package.addModules([
 		dependencies: [
 			"PersonasClient",
 			"Profile",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "PersonaDetailsFeature",
+		dependencies: [
+			"AuthorizedDappsClient",
+			"EditPersonaFeature",
 		],
 		tests: .no
 	),
@@ -198,6 +208,7 @@ package.addModules([
 	.feature(
 		name: "PersonasFeature",
 		dependencies: [
+			"PersonaDetailsFeature",
 			"CreateEntityFeature",
 			"PersonasClient",
 		],
@@ -221,7 +232,7 @@ package.addModules([
 			"AddLedgerFactorSourceFeature",
 			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
-			"AuthorizedDAppsFeatures",
+			"AuthorizedDAppsFeature",
 			"CacheClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
@@ -234,6 +245,7 @@ package.addModules([
 			"PersonasFeature",
 			"RadixConnectClient",
 			"ScanQRFeature",
+			"EditPersonaFeature",
 		],
 		tests: .yes()
 	),
