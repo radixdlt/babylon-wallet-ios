@@ -596,6 +596,9 @@ extension TransactionClient {
 			guard !accounts.isEmpty else {
 				return
 			}
+			accounts.forEach {
+				cacheClient.removeFile(.accountPortfolio(.single($0.address)))
+			}
 			Task {
 				try await accountPortfoliosClient.fetchAccountPortfolios(Array(accounts), true)
 			}
