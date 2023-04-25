@@ -135,6 +135,8 @@ public struct Home: Sendable, FeatureReducer {
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, true)
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		default:
 			return .none
@@ -148,6 +150,8 @@ public struct Home: Sendable, FeatureReducer {
 			let accountAddresses = state.accounts.map(\.address)
 			return .run { _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, false)
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		case let .accountsLoadedResult(.failure(error)):
