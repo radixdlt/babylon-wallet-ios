@@ -1,17 +1,11 @@
-import struct AccountPortfolioFetcherClient.AccountPortfolio // TODO: move to some new model package
 import FeaturePrelude
-import FungibleTokenListFeature
 
 extension AccountList.Row.State {
 	var viewState: AccountList.Row.ViewState {
 		.init(
 			name: account.displayName.rawValue,
 			address: .init(address: account.address.address, format: .default),
-			appearanceID: account.appearanceID,
-			aggregatedValue: aggregatedValue,
-			currency: currency,
-			isCurrencyAmountVisible: isCurrencyAmountVisible,
-			portfolio: portfolio
+			appearanceID: account.appearanceID
 		)
 	}
 }
@@ -22,10 +16,6 @@ extension AccountList.Row {
 		let name: String
 		let address: AddressView.ViewState
 		let appearanceID: Profile.Network.Account.AppearanceID
-		let aggregatedValue: BigDecimal?
-		let currency: FiatCurrency
-		let isCurrencyAmountVisible: Bool
-		let portfolio: AccountPortfolio
 	}
 
 	@MainActor
@@ -40,17 +30,7 @@ extension AccountList.Row {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					VStack(alignment: .leading, spacing: .zero) {
-						HeaderView(
-							name: viewStore.name,
-							value: formattedAmount(
-								viewStore.aggregatedValue,
-								isVisible: viewStore.isCurrencyAmountVisible,
-								currency: viewStore.currency
-							),
-							isValueVisible: viewStore.isCurrencyAmountVisible,
-							currency: viewStore.currency
-						)
-
+						HeaderView(name: viewStore.name)
 						AddressView(
 							viewStore.address,
 							copyAddressAction: {
@@ -71,6 +51,7 @@ extension AccountList.Row {
 				.onTapGesture {
 					viewStore.send(.tapped)
 				}
+				.task {}
 			}
 		}
 	}
@@ -99,10 +80,6 @@ extension AccountList.Row.View {
 // MARK: - HeaderView
 private struct HeaderView: View {
 	let name: String?
-	let value: String
-	let isValueVisible: Bool
-	let currency: FiatCurrency
-
 	var body: some View {
 		HStack {
 			if let name {

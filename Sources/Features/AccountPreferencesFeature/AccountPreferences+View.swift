@@ -6,7 +6,9 @@ extension AccountPreferences.State {
 		return .init(
 			faucetButtonState: faucetButtonState,
 			createFungibleTokenButtonState: createFungibleTokenButtonState,
-			createNonFungibleTokenButtonState: createNonFungibleTokenButtonState
+			createNonFungibleTokenButtonState: createNonFungibleTokenButtonState,
+			createMultipleFungibleTokenButtonState: createMultipleFungibleTokenButtonState,
+			createMultipleNonFungibleTokenButtonState: createMultipleNonFungibleTokenButtonState
 		)
 		#else
 		return .init(faucetButtonState: faucetButtonState)
@@ -22,17 +24,23 @@ extension AccountPreferences {
 		#if DEBUG
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
+		public var createMultipleFungibleTokenButtonState: ControlState
+		public var createMultipleNonFungibleTokenButtonState: ControlState
 		#endif // DEBUG
 
 		#if DEBUG
 		public init(
 			faucetButtonState: ControlState,
 			createFungibleTokenButtonState: ControlState,
-			createNonFungibleTokenButtonState: ControlState
+			createNonFungibleTokenButtonState: ControlState,
+			createMultipleFungibleTokenButtonState: ControlState,
+			createMultipleNonFungibleTokenButtonState: ControlState
 		) {
 			self.faucetButtonState = faucetButtonState
 			self.createFungibleTokenButtonState = createFungibleTokenButtonState
 			self.createNonFungibleTokenButtonState = createNonFungibleTokenButtonState
+			self.createMultipleFungibleTokenButtonState = createMultipleFungibleTokenButtonState
+			self.createMultipleNonFungibleTokenButtonState = createMultipleNonFungibleTokenButtonState
 		}
 		#else
 		public init(faucetButtonState: ControlState) {
@@ -57,6 +65,8 @@ extension AccountPreferences {
 						#if DEBUG
 						createFungibleTokenButton(with: viewStore)
 						createNonFungibleTokenButton(with: viewStore)
+						createMultipleFungibleTokenButton(with: viewStore)
+						createMultipleNonFungibleTokenButton(with: viewStore)
 						#endif // DEBUG
 					}
 					.frame(maxHeight: .infinity, alignment: .top)
@@ -127,6 +137,36 @@ extension AccountPreferences.View {
 
 		if viewStore.createNonFungibleTokenButtonState.isLoading {
 			Text("Creating NFT")
+				.font(.app.body2Regular)
+				.foregroundColor(.app.gray1)
+		}
+	}
+
+	@ViewBuilder
+	private func createMultipleFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Create Multiple Fungible Tokens") {
+			viewStore.send(.createMultipleFungibleTokenButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.createMultipleFungibleTokenButtonState)
+
+		if viewStore.createMultipleFungibleTokenButtonState.isLoading {
+			Text("Creating Tokens")
+				.font(.app.body2Regular)
+				.foregroundColor(.app.gray1)
+		}
+	}
+
+	@ViewBuilder
+	private func createMultipleNonFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Create Multiple NFTs") {
+			viewStore.send(.createMultipleNonFungibleTokenButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.createMultipleNonFungibleTokenButtonState)
+
+		if viewStore.createMultipleNonFungibleTokenButtonState.isLoading {
+			Text("Creating NFTs")
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}

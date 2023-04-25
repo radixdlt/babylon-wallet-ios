@@ -18,18 +18,16 @@ package.addModules([
 	.feature(
 		name: "AccountDetailsFeature",
 		dependencies: [
-			"AccountListFeature",
 			"AccountPreferencesFeature",
-			"AssetsViewFeature",
 			"AssetTransferFeature",
+			"AccountPortfoliosClient",
 		],
 		tests: .yes()
 	),
 	.feature(
 		name: "AccountListFeature",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
-			"FungibleTokenListFeature",
+			"AccountPortfoliosClient",
 		],
 		tests: .yes()
 	),
@@ -37,6 +35,7 @@ package.addModules([
 		name: "AccountPreferencesFeature",
 		dependencies: [
 			"FaucetClient",
+			"AccountPortfoliosClient",
 		],
 		tests: .yes()
 	),
@@ -52,26 +51,12 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "AggregatedValueFeature",
-		dependencies: [],
-		tests: .yes()
-	),
-	.feature(
 		name: "AppFeature",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
 			"SplashFeature",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "AssetsViewFeature",
-		dependencies: [
-			"FungibleTokenListFeature",
-			"NonFungibleTokenListFeature",
 		],
 		tests: .yes()
 	),
@@ -142,18 +127,6 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "FungibleTokenDetailsFeature",
-		dependencies: [],
-		tests: .no
-	),
-	.feature(
-		name: "FungibleTokenListFeature",
-		dependencies: [
-			"FungibleTokenDetailsFeature",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "GatewaySettingsFeature",
 		dependencies: [
 			"CreateEntityFeature",
@@ -174,17 +147,12 @@ package.addModules([
 		dependencies: [
 			"AccountDetailsFeature",
 			"AccountListFeature",
-			"AccountPortfolioFetcherClient",
+			"AccountPortfoliosClient",
 			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateEntityFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"FungibleTokenListFeature",
-				"NonFungibleTokenListFeature",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
@@ -207,7 +175,6 @@ package.addModules([
 		name: "MainFeature",
 		dependencies: [
 			"AppPreferencesClient",
-			"AccountPortfolioFetcherClient",
 			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
@@ -228,11 +195,6 @@ package.addModules([
 			"RadixConnectClient",
 			"ScanQRFeature",
 		],
-		tests: .yes()
-	),
-	.feature(
-		name: "NonFungibleTokenListFeature",
-		dependencies: [],
 		tests: .yes()
 	),
 	.feature(
@@ -336,15 +298,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "AccountPortfolioFetcherClient",
+		name: "AccountPortfoliosClient",
 		dependencies: [
-			"CacheClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
+			"CacheClient",
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "AppPreferencesClient",
 		dependencies: [
@@ -610,8 +571,8 @@ package.addModules([
 	.client(
 		name: "TransactionClient",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
 			"AccountsClient",
+			"AccountPortfoliosClient",
 			"CacheClient",
 			"EngineToolkitClient",
 			"GatewayAPI",

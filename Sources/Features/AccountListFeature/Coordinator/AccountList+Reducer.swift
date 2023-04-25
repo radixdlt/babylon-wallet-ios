@@ -36,6 +36,7 @@ public struct AccountList: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		// TODO: Should be handled here? maybe in Row child instead
 		switch childAction {
 		case let .account(id: id, action: action):
 			guard let row = state.accounts[id: id] else {
@@ -48,6 +49,8 @@ public struct AccountList: Sendable, FeatureReducer {
 				return .fireAndForget { pasteboardClient.copyString(address) }
 			case .view(.tapped):
 				return .send(.delegate(.displayAccountDetails(row)))
+			default:
+				return .none
 			}
 		}
 	}
