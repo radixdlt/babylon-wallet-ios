@@ -64,14 +64,18 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 
 		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
 			public let curve: String
-			public let derivatoinPath: String
+			public let derivationPath: String
 			public let signature: HexCodable
 			public let publicKey: HexCodable
 
 			public init(
+				curve: String,
+				derivationPath: String,
 				signature: HexCodable,
 				publicKey: HexCodable
 			) {
+				self.curve = curve
+				self.derivationPath = derivationPath
 				self.signature = signature
 				self.publicKey = publicKey
 			}

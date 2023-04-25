@@ -74,7 +74,7 @@ extension FactorSourcesClient: DependencyKey {
 				}
 			},
 			addOffDeviceFactorSource: addOffDeviceFactorSource,
-			getSigningFactors: { networkID, accounts in
+			getSigningFactors: { _, accounts in
 				@Dependency(\.accountsClient) var accountsClient
 
 				let allFactorSources = try await getFactorSources()
@@ -112,13 +112,13 @@ extension FactorSourcesClient: DependencyKey {
 
 				var signingFactors: [FactorSourceID: SigningFactorRef] = [:]
 
-				let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-				let accounts: [Profile.Network.Account] = accountAddresses.compactMap { address in
-					guard let account = allAccounts.first(where: { $0.address == address }) else {
-						return nil
-					}
-					return account
-				}
+//				let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+//				let accounts: [Profile.Network.Account] = accountAddresses.compactMap { address in
+//					guard let account = allAccounts.first(where: { $0.address == address }) else {
+//						return nil
+//					}
+//					return account
+//				}
 				for account in accounts {
 					switch account.securityState {
 					case let .unsecured(unsecuredEntityControl):

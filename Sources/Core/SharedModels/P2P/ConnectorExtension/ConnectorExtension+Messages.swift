@@ -8,7 +8,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success {
 		return payload
 	}
 
-	public var signTransaction: SignTransaction? {
+	public var signTransaction: [SignatureOfSigner]? {
 		guard case let .signTransaction(payload) = self else {
 			return nil
 		}

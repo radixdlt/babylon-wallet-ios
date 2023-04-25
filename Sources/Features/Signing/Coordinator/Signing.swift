@@ -19,14 +19,15 @@ public struct Signing: Sendable, FeatureReducer {
 			case signWithLedger(SignWithLedgerFactorSource.State)
 		}
 
-		public var step: Step?
 		public let networkID: NetworkID
 		public let manifest: TransactionManifest
-		public var compiledIntent: CompileTransactionIntentResponse
+		public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+
+		public var step: Step?
+		public var compiledIntent: CompileTransactionIntentResponse? = nil
 		public var factorsLeftToSignWith: OrderedSet<SigningFactor> = []
 		public var expectedSignatureCount = -1
-		public var signatures: OrderedSet<Signature>
-		public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+		public var signatures: OrderedSet<Signature> = []
 
 		public init(
 			networkID: NetworkID,
@@ -95,7 +96,9 @@ public struct Signing: Sendable, FeatureReducer {
 				state.compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
 				return loadSigningFactors(networkID: state.networkID, accounts: accounts)
 			} catch {
-				fatalError()
+				loggerGlobal.error("Failed to compile manifest: \(error)")
+				errorQueue.schedule(error)
+				return .none
 			}
 
 		case let .loadSigningFactors(.failure(error)):
@@ -108,6 +111,7 @@ public struct Signing: Sendable, FeatureReducer {
 			state.expectedSignatureCount = signingFactors.flatMap { sf in
 				sf.signers.map(\.factorInstancesRequiredToSign.count)
 			}.reduce(0, +)
+			return proceedWithNextFactorSource(state)
 
 		case .finishedSigningWithAllFactors:
 			loggerGlobal.critical("Notarize!")
@@ -153,7 +157,8 @@ public struct Signing: Sendable, FeatureReducer {
 			return .run { _ in
 			}
 		case .ledgerHQHardwareWallet:
+			return .run { _ in
+			}
 		}
-		fatalError()
 	}
 }

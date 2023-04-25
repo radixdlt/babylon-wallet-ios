@@ -12,16 +12,6 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// * Hierarchical deterministic (Mnemonic)
 	case device
 
-	/// A user owned factor source which is encrypted by security questions and stored
-	/// on device that supports hierarchical deterministic derivation when decrypted.
-	///
-	/// Attributes:
-	/// * Mine
-	/// * On device
-	/// * Hierarchical deterministic (Mnemonic)
-	/// * Encrypted by Security Questions
-	case securityQuestions
-
 	/// A user owned hardware wallet by vendor Ledger HQ, most commonly
 	/// a Ledger Nano S or Ledger Nano X. Less common models are Ledger Nano S Plus
 	/// Ledger Stax.
@@ -33,6 +23,16 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// * Hierarchical deterministic
 	case ledgerHQHardwareWallet
 
+	/// A user owned factor source which is encrypted by security questions and stored
+	/// on device that supports hierarchical deterministic derivation when decrypted.
+	///
+	/// Attributes:
+	/// * Mine
+	/// * On device
+	/// * Hierarchical deterministic (Mnemonic)
+	/// * Encrypted by Security Questions
+//	case securityQuestions
+
 	/// A user owned hardware wallet by vendor YubiCo, whic the uesr has to produce (connect)
 	/// in order to use. Most common model might beYubiKey 5C NFC.
 	///
@@ -40,7 +40,7 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// * Mine
 	/// * Off device
 	/// * Hardware (directly readable by wallet)
-	case yubiKey
+//	case yubiKey
 
 	/// A user known mnemonic which the user has to produce (input) in order to user.
 	///
@@ -48,7 +48,7 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// * Mine
 	/// * Off device
 	/// * Hierarchical deterministic
-	case offDeviceMnemonic
+//	case offDeviceMnemonic
 
 	/// A user known secret acting as input key material (`IKM`) for some
 	/// function which maps it to Entropy for a Mnemonic.
@@ -57,7 +57,7 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// * Mine
 	/// * Off device
 	/// * Hierarchical deterministic
-	case offDeviceInputKeyMaterialForMnemonic
+//	case offDeviceInputKeyMaterialForMnemonic
 
 	/// Some individual or company/organisation the user knows and trust,
 	/// e.g. a friend or family member or InstaBridge
@@ -66,7 +66,7 @@ public enum FactorSourceKind: String, Sendable, Hashable, Codable, CustomStringC
 	/// Attributes:
 	/// * **Not** mine
 	/// * Off device
-	case trustedEntity
+//	case trustedEntity
 }
 
 extension FactorSourceKind {
@@ -76,23 +76,31 @@ extension FactorSourceKind {
 
 	public var isHD: Bool {
 		switch self {
-		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic, .securityQuestions, .offDeviceInputKeyMaterialForMnemonic: return true
-		case .yubiKey, .trustedEntity: return false
+		case .device, .ledgerHQHardwareWallet
+		     //            , .offDeviceMnemonic, .securityQuestions, .offDeviceInputKeyMaterialForMnemonic
+		     : return true
+//		case .yubiKey, .trustedEntity: return false
 		}
 	}
 
 	public var isOnDevice: Bool {
 		switch self {
-		case .device, .securityQuestions: return true
-		case .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic, .ledgerHQHardwareWallet, .yubiKey, .trustedEntity:
+		case .device
+		     //            , .securityQuestions
+		     : return true
+		case .ledgerHQHardwareWallet
+		     //                , .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic, .yubiKey, .trustedEntity
+		     :
 			return false
 		}
 	}
 
 	public var isMine: Bool {
 		switch self {
-		case .trustedEntity: return false
-		case .device, .securityQuestions, .yubiKey, .ledgerHQHardwareWallet, .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic: return true
+//		case .trustedEntity: return false
+		case .device, .ledgerHQHardwareWallet
+		     //                .securityQuestions, .yubiKey, , .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic
+		     : return true
 		}
 	}
 
@@ -104,8 +112,10 @@ extension FactorSourceKind {
 	public var hardwareKind: HardwareKind? {
 		switch self {
 		case .ledgerHQHardwareWallet: return .requiresBrowserConnectorExtensionForCommunication
-		case .yubiKey: return .canCommunicatedDirectlyWithWallet
-		case .device, .securityQuestions, .trustedEntity, .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic: return nil
+//		case .yubiKey: return .canCommunicatedDirectlyWithWallet
+		case .device
+		     //            , .securityQuestions, .trustedEntity, .offDeviceMnemonic, .offDeviceInputKeyMaterialForMnemonic
+		     : return nil
 		}
 	}
 }
