@@ -1,5 +1,6 @@
 import CreateEntityFeature
 import FeaturePrelude
+import PersonaDetailsFeature
 
 // MARK: - PersonasCoordinator.View
 extension PersonasCoordinator {
@@ -25,6 +26,13 @@ extension PersonasCoordinator {
 					action: { .child(.createPersonaCoordinator($0)) }
 				),
 				content: { CreatePersonaCoordinator.View(store: $0) }
+			)
+			.sheet(
+				store: store.scope(
+					state: \.$personaDetails,
+					action: { .child(.personaDetails($0)) }
+				),
+				content: { PersonaDetails.View(store: $0) }
 			)
 		}
 	}

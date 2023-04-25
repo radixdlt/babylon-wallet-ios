@@ -196,11 +196,11 @@
 "dAppDetails.forgetDappAlertConfirm" = "Forget";
 "dAppDetails.forgetDappAlertCancel" = "Cancel";
 
-"personaDetails.personaLabelHeading" = "Persona Label";
+"personaDetails.personaNameHeading" = "Persona Name";
 "personaDetails.personaDataSharingDescription" = "Here is the personal data that you are sharing with %@";
 "personaDetails.editPersona" = "Edit Persona";
-"personaDetails.givenNameHeading" = "Given Name";
-"personaDetails.familyNameHeading" = "Family Name";
+"personaDetails.firstNameHeading" = "First Name";
+"personaDetails.lastNameHeading" = "Last Name";
 "personaDetails.emailAddressHeading" = "Email Address";
 "personaDetails.phoneNumberHeading" = "Phone Number";
 "personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";

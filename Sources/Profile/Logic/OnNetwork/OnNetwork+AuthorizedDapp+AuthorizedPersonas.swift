@@ -84,19 +84,11 @@ extension Profile.Network {
 					}
 				}(),
 				sharedFields: {
-					if let sharedFieldIDs = simple.sharedFieldIDs {
-						return try .init(uniqueElements: sharedFieldIDs.map { fieldID in
-							guard
-								let field = persona.fields.first(where: { $0.id == fieldID })
-							else {
-								// FIXME: Should we maybe just skip this field instead of throwing an error? Probably?!
-								throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
-							}
-							return field
-						})
-					} else {
-						return nil
+					guard let sharedFieldIDs = simple.sharedFieldIDs else { return nil }
+					let presentFields = sharedFieldIDs.compactMap { fieldID in
+						persona.fields.first { $0.id == fieldID }
 					}
+					return .init(uniqueElements: presentFields)
 				}()
 			)
 		})
