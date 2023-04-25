@@ -7,6 +7,11 @@ import TransactionClient
 // MARK: - Signing
 public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Step: Sendable, Hashable {
+			case signWithLedger(SignWithLedgerFactorSource.State)
+		}
+
+		public var step: Step?
 		public let networkID: NetworkID
 		public let manifest: TransactionManifest
 		public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
@@ -31,12 +36,25 @@ public struct Signing: Sendable, FeatureReducer {
 		case appeared
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case signWithLedger(SignWithLedgerFactorSource.Action)
+	}
+
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(self.core)
+			.ifLet(\.step, action: /Action.child) {
+				Scope(state: /Signing.State.Step.signWithLedger, action: /ChildAction.signWithLedger) {
+					SignWithLedgerFactorSource()
+				}
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {

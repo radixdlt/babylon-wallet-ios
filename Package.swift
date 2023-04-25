@@ -279,6 +279,9 @@ package.addModules([
 		name: "SigningFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
+			"TransactionClient",
+			"FactorSourcesClient",
+			"Profile",
 		],
 		tests: .no
 	),
