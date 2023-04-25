@@ -195,7 +195,7 @@ extension GatewayAPIClient {
 					request: request
 				) { $0.appendingPathComponent("state/entity/page/non-fungible-vault/ids") }
 			},
-			getEntityNonFungibleData: { request in
+			getNonFungibleData: { request in
 				try await post(
 					request: request
 				) { $0.appendingPathComponent("state/non-fungible/data") }
