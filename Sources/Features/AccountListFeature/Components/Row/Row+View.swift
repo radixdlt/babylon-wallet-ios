@@ -49,19 +49,18 @@ extension AccountList.Row {
 					icons.append(.xrd)
 				}
 
-				portfolio.fungibleResources
-					.nonXrdResources
-					.forEach {
-						icons.append(.known($0.iconURL))
+				var hiddenItemCount = 0
+				for resource in portfolio.fungibleResources.nonXrdResources {
+					guard icons.count < FungibleResources.maxNumberOfIcons else {
+						hiddenItemCount += 1
+						continue
 					}
+					icons.append(.known(resource.iconURL))
+				}
 
-				let additionalItemsCount = icons.count - FungibleResources.maxNumberOfIcons
-				let additionalItems = additionalItemsCount > 0 ? "+\(additionalItemsCount)" : nil
+				let additionalItems = hiddenItemCount > 0 ? "+\(hiddenItemCount)" : nil
 
-				return .init(
-					icons: Array(icons.prefix(FungibleResources.maxNumberOfIcons)),
-					additionalItemsText: additionalItems
-				)
+				return .init(icons: icons, additionalItemsText: additionalItems)
 			}()
 		}
 	}

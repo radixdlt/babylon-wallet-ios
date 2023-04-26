@@ -33,7 +33,6 @@ extension AssetsView {
 									viewStore.send(.view(.didSelectList(kind)))
 								}
 						}
-						.padding([.top, .horizontal], .medium1)
 
 						Spacer()
 					}
