@@ -120,28 +120,42 @@ extension EntityDerivationPathProtocol {
 	public static var purpose: DerivationPurpose { .publicKeyForAddressOfEntity(type: Entity.self) }
 
 	public var networkID: NetworkID {
-		guard let networkID = NetworkID(exactly: fullPath.children[EntityDerivationPathComponentIndex.networkIndex.rawValue].nonHardenedValue) else {
+		guard let networkID = NetworkID(exactly: self[.networkIndex]) else {
 			fatalError("Expected to always have a valid networkID")
 		}
 		return networkID
 	}
 
 	public var entityKind: EntityKind {
-		guard let entityKind = EntityKind(rawValue: fullPath.children[EntityDerivationPathComponentIndex.entityKindIndex.rawValue].nonHardenedValue) else {
+		guard let entityKind = EntityKind(rawValue: self[.entityKindIndex]) else {
 			fatalError("Expected to always have a valid entityKind")
 		}
 		return entityKind
 	}
 
 	public var keyKind: KeyKind {
-		guard let keyKind = KeyKind(rawValue: fullPath.children[EntityDerivationPathComponentIndex.keyKindIndex.rawValue].nonHardenedValue) else {
+		guard let keyKind = KeyKind(rawValue: self[.keyKindIndex]) else {
 			fatalError("Expected to always have a valid keyKind")
 		}
 		return keyKind
 	}
 
 	public var index: HD.Path.Component.Child.Value {
-		fullPath.children[EntityDerivationPathComponentIndex.entityIndexIndex.rawValue].nonHardenedValue
+		self[.entityIndexIndex]
+	}
+
+	subscript(index: EntityDerivationPathComponentIndex) -> HD.Path.Component.Child.Value {
+		fullPath[index]
+	}
+}
+
+extension HD.Path.Full {
+	fileprivate subscript(index: EntityDerivationPathComponentIndex) -> HD.Path.Component.Child {
+		children[index.rawValue]
+	}
+
+	fileprivate subscript(index: EntityDerivationPathComponentIndex) -> HD.Path.Component.Child.Value {
+		self[index].nonHardenedValue
 	}
 }
 
@@ -167,8 +181,12 @@ extension EntityDerivationPathProtocol {
 }
 
 extension HD.Path.Full {
-	var children: [HD.Path.Component.Child] {
+	public var children: [HD.Path.Component.Child] {
 		components.dropFirst().compactMap(\.asChild)
+	}
+
+	public subscript(index: Int) -> HD.Path.Component.Child {
+		children[index]
 	}
 }
 
@@ -211,23 +229,23 @@ extension EntityDerivationPathProtocol {
 		}
 		assert(children.allSatisfy(\.isHardened))
 
-		guard children[EntityDerivationPathComponentIndex.purposeIndex.rawValue] == .bip44Purpose else {
+		guard hdPath[.purposeIndex] == .bip44Purpose else {
 			throw InvalidDerivationPathForEntity.secondComponentIsNotBIP44
 		}
-		guard children[EntityDerivationPathComponentIndex.coinTypeIndex.rawValue] == .coinType else {
+		guard hdPath[.coinTypeIndex] == .coinType else {
 			throw InvalidDerivationPathForEntity.invalidCoinType(got: children[EntityDerivationPathComponentIndex.coinTypeIndex.rawValue].nonHardenedValue)
 		}
 
-		guard children[EntityDerivationPathComponentIndex.networkIndex.rawValue].nonHardenedValue <= UInt8.max else {
+		guard hdPath[.networkIndex] <= UInt8.max else {
 			throw InvalidDerivationPathForEntity.invalidNetworkIDValueTooLarge
 		}
 
-		guard children[EntityDerivationPathComponentIndex.entityKindIndex.rawValue].nonHardenedValue == Entity.entityKind.derivationPathComponentNonHardenedValue else {
+		guard hdPath[.entityKindIndex] == Entity.entityKind.derivationPathComponentNonHardenedValue else {
 			throw InvalidDerivationPathForEntity.invalidEntityType(got: children[EntityDerivationPathComponentIndex.entityKindIndex.rawValue].nonHardenedValue)
 		}
 
 		let validKeyTypeValues = KeyKind.allCases.map(\.rawValue)
-		guard validKeyTypeValues.contains(children[EntityDerivationPathComponentIndex.keyKindIndex.rawValue].nonHardenedValue) else {
+		guard validKeyTypeValues.contains(hdPath[.keyKindIndex]) else {
 			throw InvalidDerivationPathForEntity.invalidKeyType(got: children[EntityDerivationPathComponentIndex.keyKindIndex.rawValue].nonHardenedValue, expectedAnyOf: validKeyTypeValues)
 		}
 

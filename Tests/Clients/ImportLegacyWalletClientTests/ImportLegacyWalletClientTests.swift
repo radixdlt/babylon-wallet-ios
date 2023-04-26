@@ -423,13 +423,6 @@ final class ImportLegacyWalletClientTests: TestCase {
 	}
 }
 
-// MARK: - K1.PublicKey + CustomDebugStringConvertible
-extension K1.PublicKey: CustomDebugStringConvertible {
-	public var debugDescription: String {
-		compressedRepresentation.hex
-	}
-}
-
 // MARK: - Olympia.AccountType + CustomDebugStringConvertible
 extension Olympia.AccountType: CustomDebugStringConvertible {
 	public var debugDescription: String {
