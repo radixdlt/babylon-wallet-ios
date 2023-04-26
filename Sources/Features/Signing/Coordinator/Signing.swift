@@ -33,18 +33,12 @@ public struct Signing: Sendable, FeatureReducer {
 				networkID: networkID,
 				feePayer: feePayerSelectionAmongstCandidates.selected.account
 			))
-//			self.networkID = networkID
-//			self.manifest = manifest
 			self.feePayerSelectionAmongstCandidates = feePayerSelectionAmongstCandidates
 		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case finishedSigningWithAllFactors
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-//		case appeared
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -57,9 +51,6 @@ public struct Signing: Sendable, FeatureReducer {
 		case notarized(CompileNotarizedTransactionIntentResponse)
 	}
 
-//	@Dependency(\.transactionClient) var transactionClient
-//	@Dependency(\.factorSourcesClient) var factorSourcesClient
-//	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
