@@ -74,7 +74,7 @@ public struct TokenThumbnail: View {
 			Image(asset: AssetResource.xrd)
 				.resizable()
 		case let .known(url):
-			LoadableImage(url: url, mode: .aspectFit) {
+			LoadableImage(url: url, mode: .aspectFill) {
 				placeholder
 			}
 		case .unknown:

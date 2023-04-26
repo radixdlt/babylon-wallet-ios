@@ -88,19 +88,27 @@ extension AccountPortfolio {
 		}
 
 		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
-			public typealias ID = Tagged<Self, String>
+			public typealias LocalID = Tagged<Self, String>
 
-			public let id: ID
+			public let id: LocalID
 			public let name: String?
 			public let description: String?
 			public let keyImageURL: URL?
+			public let metadata: [Metadata]
 
-			public init(id: ID, name: String?, description: String?, keyImageURL: URL?) {
+			public init(id: ID, name: String?, description: String?, keyImageURL: URL?, metadata: [Metadata]) {
 				self.id = id
 				self.name = name
 				self.description = description
 				self.keyImageURL = keyImageURL
+				self.metadata = metadata
 			}
 		}
+	}
+
+	public struct Metadata: Sendable, Hashable, Identifiable, Codable {
+		public var id: String { key }
+		public let key: String
+		public let value: String
 	}
 }
