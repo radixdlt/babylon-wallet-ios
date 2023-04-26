@@ -74,7 +74,7 @@ public struct TokenThumbnail: View {
 			Image(asset: AssetResource.xrd)
 				.resizable()
 		case let .known(url):
-			LazyThumbnail(url: url, mode: .aspectFit) {
+			LoadableImage(url: url, mode: .aspectFit) {
 				placeholder
 			}
 		case .unknown:
@@ -100,7 +100,7 @@ public struct NFTThumbnail: View {
 	}
 
 	public var body: some View {
-		LazyThumbnail(url: url) {
+		LoadableImage(url: url) {
 			Image(asset: AssetResource.nft)
 				.resizable()
 		}
@@ -120,7 +120,7 @@ public struct PersonaThumbnail: View {
 	}
 
 	public var body: some View {
-		LazyThumbnail(url: content) {
+		LoadableImage(url: content) {
 			Image(asset: AssetResource.persona)
 				.resizable()
 		}
@@ -129,28 +129,31 @@ public struct PersonaThumbnail: View {
 	}
 }
 
-// MARK: - LazyThumbnail
+// MARK: - LoadableImage
 /// A helper view that handles the loading state, and potentially the error state
-struct LazyThumbnail<Placeholder: View>: View {
+public struct LoadableImage<Placeholder: View>: View {
 	let url: URL?
 	let mode: ImageResizingMode
 	let placeholder: Placeholder
 
-	init(url: URL?, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
+	public init(url: URL?, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
 		self.url = url
 		self.mode = mode
 		self.placeholder = placeholder()
 	}
 
-	var body: some View {
+	public var body: some View {
 		if let url {
 			LazyImage(url: url) { state in
 				if let image = state.image {
+					if let size = state.imageContainer?.image.size {
+						let _ = print("SIZE: \(size)")
+					}
 					image.resizingMode(mode)
 				} else if state.isLoading {
 					Color.yellow
 				} else if let error = state.error {
-					let _ = loggerGlobal.warning("Could not load thumbnail: \(error)")
+					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
 					Color.red
 				} else {
 					placeholder

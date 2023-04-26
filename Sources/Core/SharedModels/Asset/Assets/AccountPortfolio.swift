@@ -35,7 +35,7 @@ extension AccountPortfolio {
 	}
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { self.resourceAddress }
+		public var id: ResourceAddress { resourceAddress }
 
 		public let resourceAddress: ResourceAddress
 		public let amount: BigDecimal
@@ -66,7 +66,7 @@ extension AccountPortfolio {
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { self.resourceAddress }
+		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
 		public let description: String?

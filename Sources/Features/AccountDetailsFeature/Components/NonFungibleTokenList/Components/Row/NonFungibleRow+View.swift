@@ -84,9 +84,10 @@ extension NonFungibleTokenList.Row.View {
 
 	@ViewBuilder
 	fileprivate func componentView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
-		let asset = viewStore.resource.tokens[index].id
+		let asset = viewStore.resource.tokens[index]
 		NFTIDView(
-			id: asset.toUserFacingString,
+			id: asset.id.toUserFacingString,
+			thumbnail: asset.keyImageURL,
 			isLast: index == viewStore.nftCount - 1,
 			isExpanded: viewStore.isExpanded
 		)
@@ -95,7 +96,7 @@ extension NonFungibleTokenList.Row.View {
 		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))
 		.transition(.move(edge: .bottom))
 		.contentShape(Rectangle())
-		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.resource, nftID: asset))) }
+		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.resource, nftID: asset.id))) }
 	}
 
 	fileprivate func collapsedHeight(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> CGFloat {
@@ -192,7 +193,7 @@ extension NonFungibleTokenList.Row.View {
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken.ID {
 	var toUserFacingString: String {
 		// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
-		guard rawValue.count >= 3, rawValue.hasSuffix("#"), rawValue.hasPrefix("#") else {
+		guard rawValue.count >= 3 else {
 			loggerGlobal.warning("Invalid nft id: \(rawValue)")
 			return rawValue
 		}
