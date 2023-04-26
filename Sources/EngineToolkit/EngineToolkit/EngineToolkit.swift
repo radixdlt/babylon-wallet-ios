@@ -18,8 +18,10 @@ public struct EngineToolkit {
 
 	private let jsonStringFromJSONData: JSONStringFromJSONData
 	private let jsonDataFromJSONString: JSONDataFromJSONString
+        
+        public static let instance = EngineToolkit()
 
-	public init() {
+	private init() {
 		self.init(
 			jsonEncoder: JSONEncoder(),
 			jsonDecoder: JSONDecoder()
@@ -195,6 +197,15 @@ extension EngineToolkit {
 			function: known_entity_addresses
 		)
 	}
+
+        public func _knownEntityAddresses(
+                request: KnownEntityAddressesRequest
+        ) -> Result<_KnownEntityAddressesResponse, Error> {
+                callLibraryFunction(
+                        request: request,
+                        function: known_entity_addresses
+                )
+        }
 
 	public func analyzeManifestWithPreviewContext(
 		request: AnalyzeManifestWithPreviewContextRequest
@@ -428,7 +439,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 /// using old Cocoa APIs
 func prettyPrint(jsonString: String, label: String?) {
 	guard
-		EngineToolkit._debugPrint,
+		//EngineToolkit._debugPrint,
 		let data = jsonString.data(using: .utf8),
 		let pretty = data.prettyPrintedJSONString
 	else {

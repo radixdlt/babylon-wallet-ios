@@ -19,7 +19,8 @@ extension EngineToolkitClient: TestDependencyKey {
 		generateTXID: { _ in "deadbeef" },
 		accountAddressesNeedingToSignTransaction: { _ in [] },
 		accountAddressesSuitableToPayTransactionFee: { _ in [] },
-		knownEntityAddresses: { _ in throw NoopError() },
+                knownEntityAddresses: { _ in throw NoopError() },
+                _knownEntityAddresses:  { _ in throw NoopError() },
 		generateTransactionReview: { _ in throw NoopError() },
 		decodeAddress: { _ in throw NoopError() }
 	)
@@ -36,6 +37,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction"),
 		accountAddressesSuitableToPayTransactionFee: unimplemented("\(Self.self).accountAddressesSuitableToPayTransactionFee"),
 		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses"),
+                _knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses"),
 		generateTransactionReview: unimplemented("\(Self.self).generateTransactionReview"),
 		decodeAddress: unimplemented("\(Self.self).decodeAddress")
 	)

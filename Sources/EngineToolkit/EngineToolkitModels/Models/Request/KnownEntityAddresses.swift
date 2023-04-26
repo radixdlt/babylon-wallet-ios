@@ -90,3 +90,120 @@ extension KnownEntityAddressesResponse {
 	)
 }
 #endif // DEBUG
+
+public struct InvalidAddressTypeError: Error {
+        public let message: String
+}
+
+public struct _ResourceAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: String = "resource"
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
+}
+
+public struct _PackageAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: String = "package"
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
+}
+
+public struct _ComponentAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: String = "component"
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
+}
+
+public struct _ClockAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: String = "clock"
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
+}
+
+public struct _EpochManagerAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: String = "epochmanager"
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
+}
+
+public protocol EntityAddress: Codable {
+        static var prefix: String { get }
+        var address: String { get set}
+
+        init(address: String)
+}
+
+extension EntityAddress {
+        public init(validatingAddress address: String) throws {
+                guard address.hasPrefix(Self.prefix) else {
+                        throw InvalidAddressTypeError(message: "Failed to decode \(address), expected prefix: \(Self.prefix)")
+                }
+                self.init(address: address)
+        }
+
+        public init(from decoder: Decoder) throws {
+                let container = try decoder.singleValueContainer()
+                try self.init(validatingAddress: container.decode(String.self))
+        }
+}
+
+// MARK: - KnownEntityAddressesResponse
+public struct _KnownEntityAddressesResponse: Sendable, Codable, Hashable {
+        public let faucetPackageAddress: _PackageAddress
+        public let accountPackageAddress: _PackageAddress
+        public let xrdResourceAddress: _ResourceAddress
+        public let systemTokenResourceAddress: _ResourceAddress
+        public let ecdsaSecp256k1TokenResourceAddress: _ResourceAddress
+        public let eddsaEd25519TokenResourceAddress: _ResourceAddress
+        public let packageTokenResourceAddress: _ResourceAddress
+        public let epochManagerSystemAddress: _EpochManagerAddress
+        public let clockSystemAddress: _ClockAddress
+
+        public init(
+                faucetPackageAddress: _PackageAddress,
+                accountPackageAddress: _PackageAddress,
+                xrdResourceAddress: _ResourceAddress,
+                systemTokenResourceAddress: _ResourceAddress,
+                ecdsaSecp256k1TokenResourceAddress: _ResourceAddress,
+                eddsaEd25519TokenResourceAddress: _ResourceAddress,
+                packageTokenResourceAddress: _ResourceAddress,
+                epochManagerSystemAddress: _EpochManagerAddress,
+                clockSystemAddress: _ClockAddress
+        ) {
+                self.faucetPackageAddress = faucetPackageAddress
+                self.accountPackageAddress = accountPackageAddress
+                self.xrdResourceAddress = xrdResourceAddress
+                self.systemTokenResourceAddress = systemTokenResourceAddress
+                self.ecdsaSecp256k1TokenResourceAddress = ecdsaSecp256k1TokenResourceAddress
+                self.eddsaEd25519TokenResourceAddress = eddsaEd25519TokenResourceAddress
+                self.packageTokenResourceAddress = packageTokenResourceAddress
+                self.epochManagerSystemAddress = epochManagerSystemAddress
+                self.clockSystemAddress = clockSystemAddress
+        }
+
+        private enum CodingKeys: String, CodingKey {
+                case faucetPackageAddress = "faucet_package_address"
+                case accountPackageAddress = "account_package_address"
+                case xrdResourceAddress = "xrd_resource_address"
+                case systemTokenResourceAddress = "system_token_resource_address"
+                case ecdsaSecp256k1TokenResourceAddress = "ecdsa_secp256k1_token_resource_address"
+                case eddsaEd25519TokenResourceAddress = "eddsa_ed25519_token_resource_address"
+                case packageTokenResourceAddress = "package_token_resource_address"
+                case epochManagerSystemAddress = "epoch_manager_system_address"
+                case clockSystemAddress = "clock_system_address"
+        }
+}

@@ -5,7 +5,7 @@ import struct Profile.AccountAddress
 
 extension EngineToolkitClient {
 	public static let liveValue: Self = {
-		let engineToolkit = EngineToolkit()
+                let engineToolkit = EngineToolkit.instance
 
 		let generateTXNonce: GenerateTXNonce = { Nonce.secureRandom() }
 
@@ -81,6 +81,9 @@ extension EngineToolkitClient {
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
+                        _knownEntityAddresses: { networkID throws -> _KnownEntityAddressesResponse in
+                                try engineToolkit._knownEntityAddresses(request: .init(networkId: networkID)).get()
+                        },
 			generateTransactionReview: { manifestWithPreviewContext in
 				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
 			},
