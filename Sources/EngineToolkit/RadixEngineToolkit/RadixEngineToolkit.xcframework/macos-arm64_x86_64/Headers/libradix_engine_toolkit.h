@@ -37,8 +37,6 @@ Pointer derive_virtual_account_address(Pointer string_pointer);
 
 Pointer derive_virtual_identity_address(Pointer string_pointer);
 
-Pointer derive_non_fungible_global_id_from_public_key(Pointer string_pointer);
-
 Pointer encode_address(Pointer string_pointer);
 
 Pointer decode_address(Pointer string_pointer);
