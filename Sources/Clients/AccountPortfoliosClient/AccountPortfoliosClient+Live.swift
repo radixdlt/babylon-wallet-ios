@@ -272,7 +272,8 @@ extension AccountPortfoliosClient {
 						id: .init($0.nonFungibleId),
 						name: nil,
 						description: nil,
-						keyImageURL: $0.keyImageURL
+						keyImageURL: $0.keyImageURL,
+						metadata: []
 					)
 				}
 

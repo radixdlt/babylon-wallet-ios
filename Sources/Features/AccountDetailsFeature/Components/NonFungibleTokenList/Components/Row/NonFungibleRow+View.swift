@@ -87,7 +87,10 @@ extension NonFungibleTokenList.Row.View {
 		let asset = viewStore.resource.tokens[index]
 		NFTIDView(
 			id: asset.id.toUserFacingString,
+			name: asset.name,
+			description: asset.description,
 			thumbnail: asset.keyImageURL,
+			metadata: asset.metadata,
 			isLast: index == viewStore.nftCount - 1,
 			isExpanded: viewStore.isExpanded
 		)

@@ -18,7 +18,10 @@ struct NFTView: View {
 // MARK: - NFTIDView
 struct NFTIDView: View {
 	let id: String
+	let name: String?
+	let description: String?
 	let thumbnail: URL?
+	let metadata: [AccountPortfolio.Metadata]
 	let isLast: Bool
 	let isExpanded: Bool
 
@@ -34,23 +37,17 @@ struct NFTIDView: View {
 					.textStyle(.body2Regular)
 					.offset(y: -.small2)
 
-				ForEach(metadata, id: \.self) { element in
+				ForEach(metadata) { pair in
 					HStack(alignment: .top) {
-						Text(element.keys.first ?? "")
+						Text(pair.key)
 							.foregroundColor(.app.buttonTextBlack)
 							.textStyle(.body1Regular)
 
-						Spacer()
+						Spacer(minLength: 0)
 
-						Text(element.values.first ?? "")
+						Text(pair.value)
 							.foregroundColor(.app.buttonTextBlack)
 							.textStyle(.body1Header)
-					}
-				}
-
-				if metadata.isEmpty {
-					HStack {
-						Spacer()
 					}
 				}
 			}
@@ -65,16 +62,6 @@ struct NFTIDView: View {
 			)
 			.tokenRowShadow(condition: isExpanded && !isLast)
 		)
-	}
-}
-
-// MARK: - Private Computed Properties
-
-extension NFTIDView {
-	private var metadata: [[String: String]] {
-		// TODO: refactor when API returns NFT metadata
-		//		token.metadata ?? []
-		[]
 	}
 }
 
