@@ -3,21 +3,21 @@ import FeaturePrelude
 // MARK: - Header
 struct Header: View {
 	let name: String
-	let iconAsset: ImageAsset
+	let thumbnail: URL?
 	let isExpanded: Bool
 
 	var body: some View {
-		HStack(spacing: 18) {
-			Image(asset: iconAsset)
-				.cornerRadius(.small3)
+		HStack(spacing: .zero) {
+			NFTThumbnail(.known(thumbnail), size: .small)
+				.padding(.trailing, .medium3)
 
-			VStack(alignment: .leading, spacing: 6) {
+			VStack(alignment: .leading, spacing: .small2) {
 				Text(name)
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
 			}
 
-			Spacer()
+			Spacer(minLength: 0)
 		}
 		.padding(.horizontal, .medium1)
 		.padding(.vertical, .large3)

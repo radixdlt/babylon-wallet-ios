@@ -3,12 +3,12 @@ import FeaturePrelude
 // MARK: - NonFungibleTokenList.Row.View
 extension NonFungibleTokenList.Row {
 	public struct ViewState: Equatable {
-		let token: AccountPortfolio.NonFungibleResource
-		var isExpanded: Bool
+		let resource: AccountPortfolio.NonFungibleResource
+		let isExpanded: Bool
 
 		init(state: NonFungibleTokenList.Row.State) {
-			token = state.token
-			isExpanded = state.isExpanded
+			self.resource = state.token
+			self.isExpanded = state.isExpanded
 		}
 	}
 
@@ -28,17 +28,13 @@ extension NonFungibleTokenList.Row {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				VStack(spacing: .small3 / 2) {
-					if viewStore.token.nftIds.isEmpty {
+					if viewStore.resource.tokens.isEmpty {
 						EmptyView()
 					} else {
-						// TODO: There is a performance issue when multiple items are involved, all fo the expanded views seems to be actually loaded from the begining.
-						ForEach(Constants.headerIndex ..< nftCount(with: viewStore), id: \.self) { index in
+						// TODO: There is a performance issue when multiple items are involved, all of the expanded views seems to be actually loaded from the begining.
+						ForEach(Constants.headerIndex ..< viewStore.nftCount, id: \.self) { index in
 							Group {
 								switch index {
 								case -1:
@@ -70,63 +66,41 @@ extension NonFungibleTokenList.Row {
 	}
 }
 
-// MARK: - Private Methods
-extension NonFungibleTokenList.Row.View {
-	fileprivate func scale(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> CGFloat {
-		if index >= Constants.cardLimit {
-			return viewStore.isExpanded ? 1 : 1 - (CGFloat(Constants.cardLimit) * Constants.scale)
-		} else {
-			return viewStore.isExpanded ? 1 : 1 - (CGFloat(index + 1) * Constants.scale)
-		}
-	}
-
-	fileprivate func offset(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> CGFloat {
-		if index >= Constants.cardLimit {
-			return viewStore.isExpanded ? 0 : CGFloat((index + 1) * Constants.nonVisibleCardOffset)
-		} else {
-			return viewStore.isExpanded ? 0 : CGFloat((index + 1) * Constants.visibleCardOffset)
-		}
-	}
-
-	fileprivate func reversedZIndex(count: Int, index: Int) -> Double {
-		Double(count - index)
-	}
-}
-
 // MARK: - Private Computed Properties
 extension NonFungibleTokenList.Row.View {
 	fileprivate func headerView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
 		Header(
-			name: viewStore.token.name ?? "",
-			iconAsset: headerIconAsset,
+			name: viewStore.resource.name ?? "",
+			thumbnail: viewStore.resource.iconURL,
 			isExpanded: viewStore.isExpanded
 		)
-		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
+		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))
 		.onTapGesture {
-			viewStore.send(.isExpandedToggled, animation: Animation.easeInOut)
+			viewStore.send(.isExpandedToggled, animation: .easeInOut)
 		}
 	}
 
 	@ViewBuilder
 	fileprivate func componentView(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>, index: Int) -> some View {
-		let asset = viewStore.token.nftIds[index]
+		let asset = viewStore.resource.tokens[index].id
 		NFTIDView(
 			id: asset.toUserFacingString,
-			isLast: index == nftCount(with: viewStore) - 1,
+			isLast: index == viewStore.nftCount - 1,
 			isExpanded: viewStore.isExpanded
 		)
-		.scaleEffect(scale(with: viewStore, index: index))
-		.offset(y: offset(with: viewStore, index: index))
-		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
+		.scaleEffect(scale(isExpanded: viewStore.isExpanded, index: index))
+		.offset(y: offset(isExpanded: viewStore.isExpanded, index: index))
+		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))
 		.transition(.move(edge: .bottom))
 		.contentShape(Rectangle())
-		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.token, nftID: asset))) }
+		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.resource, nftID: asset))) }
 	}
 
 	fileprivate func collapsedHeight(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> CGFloat {
-		let headerHeight = rowHeights[Constants.headerIndex] ?? 0
-		let collapsedRowsCount = nftCount(with: viewStore)
-		let visibleCollapsedRowsHeight: CGFloat = collapsedRowsCount > 1 ? Constants.twoOrMoreCollapsedCardsHeight : Constants.oneCollapsedCardHeight
+		let headerHeight = rowHeights[Constants.headerIndex, default: 0]
+		let collapsedRowsCount = viewStore.nftCount
+		let visibleCollapsedRowsHeight = collapsedRowsCount > 1 ? Constants.twoOrMoreCollapsedCardsHeight : Constants.oneCollapsedCardHeight
+
 		return headerHeight + visibleCollapsedRowsHeight
 	}
 
@@ -148,14 +122,38 @@ extension NonFungibleTokenList.Row.View {
 		 }
 		 */
 	}
+}
 
-	fileprivate var headerIconAsset: ImageAsset {
-		// TODO: implement depending on the API design
-		AssetResource.nft
+private extension NonFungibleTokenList.Row.ViewState {
+	var nftCount: Int {
+		resource.tokens.count
 	}
 
-	fileprivate func nftCount(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> Int {
-		viewStore.token.nftIds.count
+	func reversedZIndex(index: Int) -> Double {
+		Double(nftCount - index)
+	}
+}
+
+private extension NonFungibleTokenList.Row.View {
+	func reversedZIndex(count: Int, index: Int) -> Double {
+		Double(count - index)
+	}
+
+	func scale(isExpanded: Bool, index: Int) -> CGFloat {
+		if isExpanded {
+			return 1
+		} else {
+			return 1 - CGFloat(min(index + 1, Constants.cardLimit)) * Constants.scale
+		}
+	}
+
+	func offset(isExpanded: Bool, index: Int) -> CGFloat {
+		if isExpanded {
+			return 0
+		} else {
+			let offset = index >= Constants.cardLimit ? Constants.nonVisibleCardOffset : Constants.visibleCardOffset
+			return CGFloat((index + 1) * offset)
+		}
 	}
 }
 
@@ -188,15 +186,15 @@ extension NonFungibleTokenList.Row.View {
 	}
 }
 
-extension AccountPortfolio.NonFungibleResource.NonFungibleTokenId {
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken.ID {
 	var toUserFacingString: String {
 		// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
-		guard self.rawValue.count >= 3 else {
-			loggerGlobal.warning("Invalid nft id: \(self.rawValue)")
-			return self.rawValue
+		guard rawValue.count >= 3, rawValue.hasSuffix("#"), rawValue.hasPrefix("#") else {
+			loggerGlobal.warning("Invalid nft id: \(rawValue)")
+			return rawValue
 		}
 		// Nothing fancy, just remove the prefix and suffix.
-		return String(self.rawValue.dropLast(1).dropFirst())
+		return String(rawValue.dropLast(1).dropFirst())
 	}
 }
 
@@ -216,8 +214,7 @@ struct NonFungibleRow_Preview: PreviewProvider {
 
 extension NonFungibleTokenList.Row.State {
 	public static let previewValue = Self(
-		token: .init(resourceAddress: .init(address: "some"),
-		             nftIds: [])
+		token: .init(resourceAddress: .init(address: "some"), tokens: [])
 	)
 }
 #endif

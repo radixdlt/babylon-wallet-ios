@@ -73,14 +73,13 @@ public struct TokenThumbnail: View {
 		case .xrd:
 			Image(asset: AssetResource.xrd)
 				.resizable()
-		case let .known(url?):
-			LazyImage(url: url) { _ in
-				placeholder.border(.red)
+		case let .known(url):
+			LazyThumbnail(url: url, mode: .aspectFit) {
+				placeholder
 			}
-
-		// TODO: Show different icon if known
-		case .known(nil), .unknown:
-			placeholder.border(.yellow)
+		case .unknown:
+			// TODO: Show different icon if unknown?
+			placeholder
 		}
 	}
 
@@ -92,42 +91,21 @@ public struct TokenThumbnail: View {
 
 // MARK: - NFTThumbnail
 public struct NFTThumbnail: View {
-	private let content: Content
+	private let url: URL?
 	private let size: HitTargetSize
 
-	public enum Content: Sendable, Hashable {
-		case known(URL?)
-		case unknown
-	}
-
-	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
-		self.content = content
+	public init(_ url: URL?, size hitTargetSize: HitTargetSize = .small) {
+		self.url = url
 		self.size = hitTargetSize
 	}
 
 	public var body: some View {
-		image
-			.cornerRadius(size.cornerRadius)
-			.frame(size)
-	}
-
-	@ViewBuilder
-	@MainActor
-	private var image: some View {
-		switch content {
-		case let .known(url?):
-			LazyImage(url: url) { _ in
-				placeholder.border(.red)
-			}
-		case .known(nil), .unknown:
-			// TODO: Show different icon if known
-			placeholder.border(.yellow)
+		LazyThumbnail(url: url) {
+			Image(asset: AssetResource.nft)
+				.resizable()
 		}
-	}
-
-	private var placeholder: some View {
-		Image(asset: AssetResource.nft)
-			.resizable()
+		.cornerRadius(size.cornerRadius)
+		.frame(size)
 	}
 }
 
@@ -142,19 +120,44 @@ public struct PersonaThumbnail: View {
 	}
 
 	public var body: some View {
-		image
-			.clipShape(Circle())
-			.frame(size)
+		LazyThumbnail(url: content) {
+			Image(asset: AssetResource.persona)
+				.resizable()
+		}
+		.clipShape(Circle())
+		.frame(size)
+	}
+}
+
+// MARK: - LazyThumbnail
+/// A helper view that handles the loading state, and potentially the error state
+struct LazyThumbnail<Placeholder: View>: View {
+	let url: URL?
+	let mode: ImageResizingMode
+	let placeholder: Placeholder
+
+	init(url: URL?, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
+		self.url = url
+		self.mode = mode
+		self.placeholder = placeholder()
 	}
 
-	@ViewBuilder
-	private var image: some View {
-		if let content {
-			Image(asset: AssetResource.persona)
-				.resizable()
+	var body: some View {
+		if let url {
+			LazyImage(url: url) { state in
+				if let image = state.image {
+					image.resizingMode(mode)
+				} else if state.isLoading {
+					Color.yellow
+				} else if let error = state.error {
+					let _ = print("THUMB ERROR: \(error)")
+					Color.red
+				} else {
+					placeholder
+				}
+			}
 		} else {
-			Image(asset: AssetResource.persona)
-				.resizable()
+			placeholder
 		}
 	}
 }
