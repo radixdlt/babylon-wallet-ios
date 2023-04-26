@@ -45,7 +45,7 @@ extension FungibleTokenDetails {
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
+						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
 								viewStore.send(.closeButtonTapped)
 							}

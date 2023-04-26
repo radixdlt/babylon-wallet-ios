@@ -58,13 +58,20 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .destination(.presented(.details(.delegate(.dismiss)))):
+			state.destination = nil
+			return .none
+		case .destination:
+			return .none
 		case let .xrdRow(.delegate(.selected(token))):
 			state.destination = .details(.init(resource: token, isXRD: true))
+			return .none
+		case .xrdRow:
 			return .none
 		case let .nonXRDRow(_, .delegate(.selected(token))):
 			state.destination = .details(.init(resource: token, isXRD: false))
 			return .none
-		default:
+		case .nonXRDRow:
 			return .none
 		}
 	}
