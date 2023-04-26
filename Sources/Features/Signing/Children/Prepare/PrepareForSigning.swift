@@ -1,3 +1,4 @@
+import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 import TransactionClient
@@ -10,15 +11,17 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 		public let networkID: NetworkID
 
 		public var compiledIntent: CompileTransactionIntentResponse? = nil
-
+		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey?
 		public init(
 			manifest: TransactionManifest,
 			networkID: NetworkID,
-			feePayer: Profile.Network.Account
+			feePayer: Profile.Network.Account,
+			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey?
 		) {
 			self.manifest = manifest
 			self.networkID = networkID
 			self.feePayer = feePayer
+			self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 		}
 	}
 
@@ -86,12 +89,19 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 	}
 
 	private func buildTransaction(_ state: State) -> EffectTask<Action> {
-		.run { [networkID = state.networkID, manifest = state.manifest] send in
+		.run { send in
 			await send(.internal(.builtTransaction(
 				TaskResult {
 					try await transactionClient.buildTransactionIntent(.init(
-						networkID: networkID,
-						manifest: manifest
+						networkID: state.networkID,
+						manifest: state.manifest,
+						selectNotary: { involvedAccounts in
+							if let ephemeralNotaryPublicKey = state.ephemeralNotaryPublicKey {
+								return .init(notary: .ephemeralPublicKey(.eddsaEd25519(ephemeralNotaryPublicKey)), notaryAsSignatory: false)
+							} else {
+								return .init(notary: .account(involvedAccounts.first))
+							}
+						}
 					)).get()
 				}
 			)))

@@ -22,17 +22,21 @@ public struct Signing: Sendable, FeatureReducer {
 		public var factorsLeftToSignWith: OrderedSet<SigningFactor> = []
 		public var expectedSignatureCount = -1
 		public var signatures: OrderedSet<Signature> = []
+		private let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 
 		public init(
 			networkID: NetworkID,
 			manifest: TransactionManifest,
 			feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
 		) {
+			let ephemeralNotaryPrivateKey = Curve25519.Signing.PrivateKey()
 			self.step = .prepare(.init(
 				manifest: manifest,
 				networkID: networkID,
-				feePayer: feePayerSelectionAmongstCandidates.selected.account
+				feePayer: feePayerSelectionAmongstCandidates.selected.account,
+				ephemeralNotaryPublicKey: ephemeralNotaryPrivateKey.publicKey
 			))
+			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
 			self.feePayerSelectionAmongstCandidates = feePayerSelectionAmongstCandidates
 		}
 	}
