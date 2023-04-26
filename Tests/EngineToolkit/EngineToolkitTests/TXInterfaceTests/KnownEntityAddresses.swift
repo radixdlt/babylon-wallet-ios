@@ -11,7 +11,7 @@ final class KnownEntityAddresses: TestCase {
 	}
 
 	func test__knownEntityAddressRequestDoesntFail() throws {
-                let response = try sut._knownEntityAddresses(request: KnownEntityAddressesRequest(networkId: 0x02))
+		let response = try sut._knownEntityAddresses(request: KnownEntityAddressesRequest(networkId: 0x02))
 		XCTAssertNoThrow(try sut.knownEntityAddresses(request: KnownEntityAddressesRequest(networkId: 0x02)).get())
 	}
 }

@@ -5,7 +5,7 @@ import struct Profile.AccountAddress
 
 extension EngineToolkitClient {
 	public static let liveValue: Self = {
-                let engineToolkit = EngineToolkit()
+		let engineToolkit = EngineToolkit()
 
 		let generateTXNonce: GenerateTXNonce = { Nonce.secureRandom() }
 

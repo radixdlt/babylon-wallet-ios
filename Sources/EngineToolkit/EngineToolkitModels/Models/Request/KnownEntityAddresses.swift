@@ -29,47 +29,47 @@ extension KnownEntityAddressesRequest {
 
 // MARK: - KnownEntityAddressesResponse
 public struct KnownEntityAddressesResponse: Sendable, Decodable, Hashable {
-        public let faucetPackageAddress: PackageAddress
-        public let accountPackageAddress: PackageAddress
-        public let xrdResourceAddress: ResourceAddress
-        public let systemTokenResourceAddress: ResourceAddress
-        public let ecdsaSecp256k1TokenResourceAddress: ResourceAddress
-        public let eddsaEd25519TokenResourceAddress: ResourceAddress
-        public let packageTokenResourceAddress: ResourceAddress
-        public let epochManagerSystemAddress: EpochManagerAddress
-        public let clockSystemAddress: ClockAddress
+	public let faucetPackageAddress: PackageAddress
+	public let accountPackageAddress: PackageAddress
+	public let xrdResourceAddress: ResourceAddress
+	public let systemTokenResourceAddress: ResourceAddress
+	public let ecdsaSecp256k1TokenResourceAddress: ResourceAddress
+	public let eddsaEd25519TokenResourceAddress: ResourceAddress
+	public let packageTokenResourceAddress: ResourceAddress
+	public let epochManagerSystemAddress: EpochManagerAddress
+	public let clockSystemAddress: ClockAddress
 
-        public init(
-                faucetPackageAddress: PackageAddress,
-                accountPackageAddress: PackageAddress,
-                xrdResourceAddress: ResourceAddress,
-                systemTokenResourceAddress: ResourceAddress,
-                ecdsaSecp256k1TokenResourceAddress: ResourceAddress,
-                eddsaEd25519TokenResourceAddress: ResourceAddress,
-                packageTokenResourceAddress: ResourceAddress,
-                epochManagerSystemAddress: EpochManagerAddress,
-                clockSystemAddress: ClockAddress
-        ) {
-                self.faucetPackageAddress = faucetPackageAddress
-                self.accountPackageAddress = accountPackageAddress
-                self.xrdResourceAddress = xrdResourceAddress
-                self.systemTokenResourceAddress = systemTokenResourceAddress
-                self.ecdsaSecp256k1TokenResourceAddress = ecdsaSecp256k1TokenResourceAddress
-                self.eddsaEd25519TokenResourceAddress = eddsaEd25519TokenResourceAddress
-                self.packageTokenResourceAddress = packageTokenResourceAddress
-                self.epochManagerSystemAddress = epochManagerSystemAddress
-                self.clockSystemAddress = clockSystemAddress
-        }
+	public init(
+		faucetPackageAddress: PackageAddress,
+		accountPackageAddress: PackageAddress,
+		xrdResourceAddress: ResourceAddress,
+		systemTokenResourceAddress: ResourceAddress,
+		ecdsaSecp256k1TokenResourceAddress: ResourceAddress,
+		eddsaEd25519TokenResourceAddress: ResourceAddress,
+		packageTokenResourceAddress: ResourceAddress,
+		epochManagerSystemAddress: EpochManagerAddress,
+		clockSystemAddress: ClockAddress
+	) {
+		self.faucetPackageAddress = faucetPackageAddress
+		self.accountPackageAddress = accountPackageAddress
+		self.xrdResourceAddress = xrdResourceAddress
+		self.systemTokenResourceAddress = systemTokenResourceAddress
+		self.ecdsaSecp256k1TokenResourceAddress = ecdsaSecp256k1TokenResourceAddress
+		self.eddsaEd25519TokenResourceAddress = eddsaEd25519TokenResourceAddress
+		self.packageTokenResourceAddress = packageTokenResourceAddress
+		self.epochManagerSystemAddress = epochManagerSystemAddress
+		self.clockSystemAddress = clockSystemAddress
+	}
 
-        private enum CodingKeys: String, CodingKey {
-                case faucetPackageAddress = "faucet_package_address"
-                case accountPackageAddress = "account_package_address"
-                case xrdResourceAddress = "xrd_resource_address"
-                case systemTokenResourceAddress = "system_token_resource_address"
-                case ecdsaSecp256k1TokenResourceAddress = "ecdsa_secp256k1_token_resource_address"
-                case eddsaEd25519TokenResourceAddress = "eddsa_ed25519_token_resource_address"
-                case packageTokenResourceAddress = "package_token_resource_address"
-                case epochManagerSystemAddress = "epoch_manager_system_address"
-                case clockSystemAddress = "clock_system_address"
-        }
+	private enum CodingKeys: String, CodingKey {
+		case faucetPackageAddress = "faucet_package_address"
+		case accountPackageAddress = "account_package_address"
+		case xrdResourceAddress = "xrd_resource_address"
+		case systemTokenResourceAddress = "system_token_resource_address"
+		case ecdsaSecp256k1TokenResourceAddress = "ecdsa_secp256k1_token_resource_address"
+		case eddsaEd25519TokenResourceAddress = "eddsa_ed25519_token_resource_address"
+		case packageTokenResourceAddress = "package_token_resource_address"
+		case epochManagerSystemAddress = "epoch_manager_system_address"
+		case clockSystemAddress = "clock_system_address"
+	}
 }

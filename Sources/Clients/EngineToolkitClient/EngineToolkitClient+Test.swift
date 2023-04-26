@@ -19,7 +19,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		generateTXID: { _ in "deadbeef" },
 		accountAddressesNeedingToSignTransaction: { _ in [] },
 		accountAddressesSuitableToPayTransactionFee: { _ in [] },
-                knownEntityAddresses: { _ in throw NoopError() },
+		knownEntityAddresses: { _ in throw NoopError() },
 		generateTransactionReview: { _ in throw NoopError() },
 		decodeAddress: { _ in throw NoopError() }
 	)
