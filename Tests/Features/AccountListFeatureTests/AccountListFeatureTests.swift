@@ -18,6 +18,7 @@ final class AccountListFeatureTests: TestCase {
 
 		// when
 		await store.send(.child(.account(id: initialState.accounts.first!.id, action: .view(.copyAddressButtonTapped))))
+		await store.receive(.child(.account(id: initialState.accounts.first!.id, action: .delegate(.copyAddressButtonTapped(account)))))
 		wait(for: [expectation], timeout: 0)
 	}
 }
