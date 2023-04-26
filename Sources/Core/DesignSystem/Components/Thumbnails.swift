@@ -150,7 +150,7 @@ struct LazyThumbnail<Placeholder: View>: View {
 				} else if state.isLoading {
 					Color.yellow
 				} else if let error = state.error {
-					let _ = print("THUMB ERROR: \(error)")
+					let _ = loggerGlobal.warning("Could not load thumbnail: \(error)")
 					Color.red
 				} else {
 					placeholder

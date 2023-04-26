@@ -113,7 +113,7 @@ public struct TransactionDetailsView: View {
 
 		var body: some View {
 			HStack(spacing: .small1) {
-				NFTThumbnail(.known(thumbnail), size: .small)
+				NFTThumbnail(thumbnail, size: .small)
 					.padding(.vertical, .small1)
 
 				if let name {

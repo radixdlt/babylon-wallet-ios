@@ -8,7 +8,7 @@ struct Header: View {
 
 	var body: some View {
 		HStack(spacing: .zero) {
-			NFTThumbnail(.known(thumbnail), size: .small)
+			NFTThumbnail(thumbnail, size: .small)
 				.padding(.trailing, .medium3)
 
 			VStack(alignment: .leading, spacing: .small2) {
@@ -42,7 +42,7 @@ extension Header {
 // MARK: ExpandableRow
 extension Header: ExpandableRow {
 	var edge: Edge.Set {
-		[.bottom]
+		.bottom
 	}
 
 	var value: CGFloat {
