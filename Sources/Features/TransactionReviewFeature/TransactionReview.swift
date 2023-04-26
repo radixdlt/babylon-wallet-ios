@@ -624,33 +624,11 @@ extension GatewayAPI.EntityMetadataCollection {
 extension EngineToolkitModels.AddressKind {
 	var resourceType: TransactionReview.ResourceType? {
 		switch self {
-		case .fungibleResource:
+		case .globalFungibleResource:
 			return .fungible
-		case .nonFungibleResource:
+		case .globalNonFungibleResource:
 			return .nonFungible
-		case .package:
-			return nil
-		case .accountComponent:
-			return nil
-		case .normalComponent:
-			return nil
-		case .secp256k1VirtualAccountComponent:
-			return nil
-		case .ed25519VirtualAccountComponent:
-			return nil
-		case .secp256k1VirtualIdentityComponent:
-			return nil
-		case .ed25519VirtualIdentityComponent:
-			return nil
-		case .identityComponent:
-			return nil
-		case .epochManager:
-			return nil
-		case .validator:
-			return nil
-		case .clock:
-			return nil
-		case .accessControllerComponent:
+		default:
 			return nil
 		}
 	}

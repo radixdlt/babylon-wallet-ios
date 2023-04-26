@@ -1,21 +1,25 @@
 import Foundation
 
 public enum AddressKind: String, Codable, Sendable, Hashable {
-	case fungibleResource = "FungibleResource"
-	case nonFungibleResource = "NonFungibleResource"
+	case globalPackage = "GlobalPackage"
+	case globalFungibleResource = "GlobalFungibleResource"
+	case globalNonFungibleResource = "GlobalNonFungibleResource"
+	case globalEpochManager = "GlobalEpochManager"
+	case globalValidator = "GlobalValidator"
+	case globalClock = "GlobalClock"
+	case globalAccessController = "GlobalAccessController"
+	case globalAccount = "GlobalAccount"
+	case globalIdentity = "GlobalIdentity"
+	case globalGenericComponent = "GlobalGenericComponent"
 
-	case package = "Package"
+	case globalVirtualEcdsaAccount = "GlobalVirtualEcdsaAccount"
+	case globalVirtualEddsaAccount = "GlobalVirtualEddsaAccount"
+	case globalVirtualEcdsaIdentity = "GlobalVirtualEcdsaIdentity"
+	case globalVirtualEddsaIdentity = "GlobalVirtualEddsaIdentity"
 
-	case accountComponent = "AccountComponent"
-	case normalComponent = "NormalComponent"
-	case secp256k1VirtualAccountComponent = "EcdsaSecp256k1VirtualAccountComponent"
-	case ed25519VirtualAccountComponent = "EddsaEd25519VirtualAccountComponent"
-	case secp256k1VirtualIdentityComponent = "EcdsaSecp256k1VirtualIdentityComponent"
-	case ed25519VirtualIdentityComponent = "EddsaEd25519VirtualIdentityComponent"
-
-	case identityComponent = "IdentityComponent"
-	case epochManager = "EpochManager"
-	case validator = "Validator"
-	case clock = "Clock"
-	case accessControllerComponent = "AccessControllerComponent"
+	case internalFungibleVault = "InternalFungibleVault"
+	case internalNonFungibleVault = "InternalNonFungibleVault"
+	case internalAccount = "InternalAccount"
+	case internalKeyValueStore = "InternalKeyValueStore"
+	case internalGenericComponent = "InternalGenericComponent"
 }
