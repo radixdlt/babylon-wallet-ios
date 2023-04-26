@@ -33,7 +33,7 @@ extension AccountList {
 		public enum DelegateAction: Sendable, Equatable {
 			case copyAddressButtonTapped(Profile.Network.Account)
 			case tapped(Profile.Network.Account)
-			case securityPrompTaped(Profile.Network.Account)
+			case securityPromptTapped(Profile.Network.Account)
 		}
 
 		public init() {}
@@ -56,7 +56,7 @@ extension AccountList {
 			case .copyAddressButtonTapped:
 				return .send(.delegate(.copyAddressButtonTapped(state.account)))
 			case .securityPromptTapped:
-				return .send(.delegate(.securityPrompTaped(state.account)))
+				return .send(.delegate(.securityPromptTapped(state.account)))
 			case .tapped:
 				return .send(.delegate(.tapped(state.account)))
 			}

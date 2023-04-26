@@ -22,7 +22,7 @@ extension AccountList.Row {
 		let isLegacyAccount: Bool
 		let shouldShowSecurityPrompt: Bool
 		let nonFungibleResourcesCount: Int
-		let fungbielResourceIcons: FungibleResources
+		let fungibleResourceIcons: FungibleResources
 
 		init(state: State) {
 			self.name = state.account.displayName.rawValue
@@ -31,14 +31,20 @@ extension AccountList.Row {
 			self.isLoadingResources = state.portfolio.isLoading
 
 			// Olympia accounts are legacy
-			self.isLegacyAccount = state.account.isOlympiaAccount
+			self.isLegacyAccount = true // state.account.isOlympiaAccount
 
 			// Show the prompt if the account has any XRD
-			self.shouldShowSecurityPrompt = state.portfolio.wrappedValue?.fungibleResources.xrdResource != nil
+			self.shouldShowSecurityPrompt = {
+				guard let xrdResource = state.portfolio.wrappedValue?.fungibleResources.xrdResource else {
+					return false
+				}
+
+				return xrdResource.amount > .zero
+			}()
 
 			// Resources
 			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
-			self.fungbielResourceIcons = {
+			self.fungibleResourceIcons = {
 				guard let portfolio = state.portfolio.wrappedValue else {
 					return .init(icons: [], additionalItemsText: nil)
 				}
@@ -75,7 +81,7 @@ extension AccountList.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: 16) {
+				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
 						HeaderView(name: viewStore.name)
 						HStack {
@@ -85,12 +91,12 @@ extension AccountList.Row {
 									viewStore.send(.copyAddressButtonTapped)
 								}
 							)
-							.foregroundColor(.app.whiteTransparent)
 							if viewStore.isLegacyAccount {
-								Text("• \(L10n.AccountList.Row.legacyAccount)")
-									.foregroundColor(.app.whiteTransparent)
+								Text("•")
+								Text("\(L10n.AccountList.Row.legacyAccount)")
 							}
 						}
+						.foregroundColor(.app.whiteTransparent)
 					}
 
 					ownedResourcesList(viewStore)
@@ -117,15 +123,14 @@ extension AccountList.Row {
 extension AccountList.Row.View {
 	private enum Constants {
 		static let iconSize = HitTargetSize.smaller
-		static let resourcesNumberContainerOpacity = 0.3
 	}
 
 	// Crates the view of the account owned resources
 	func ownedResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
 		HStack(spacing: .medium1) {
-			if !viewStore.fungbielResourceIcons.icons.isEmpty {
+			if !viewStore.fungibleResourceIcons.icons.isEmpty {
 				resourcesContainer(
-					text: viewStore.fungbielResourceIcons.additionalItemsText
+					text: viewStore.fungibleResourceIcons.additionalItemsText
 				) {
 					fungibleResourcesList(viewStore)
 				}
@@ -169,7 +174,7 @@ extension AccountList.Row.View {
 				minWidth: Constants.iconSize.rawValue * 2,
 				minHeight: Constants.iconSize.rawValue
 			)
-			.background(Color.white.opacity(Constants.resourcesNumberContainerOpacity))
+			.background(Color.app.whiteTransparent2)
 			.cornerRadius(Constants.iconSize.rawValue / 2)
 	}
 
@@ -177,7 +182,7 @@ extension AccountList.Row.View {
 	private func fungibleResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
 		HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
 			ForEach(
-				Array(viewStore.fungbielResourceIcons.icons.enumerated()),
+				Array(viewStore.fungibleResourceIcons.icons.enumerated()),
 				id: \.offset
 			) { offset, item in
 				ZStack {
@@ -205,16 +210,17 @@ extension AccountList.Row.View {
 	func securityPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
 		HStack {
 			Image(asset: AssetResource.homeAccountSecurity)
-			Text(L10n.AccountList.Row.securityPrompt).foregroundColor(.white)
+			Text(L10n.AccountList.Row.securityPrompt)
+				.foregroundColor(.white)
 			Spacer()
 			Circle()
 				.fill()
 				.foregroundColor(.red)
-				.frame(width: 8, height: 8)
+				.frame(width: .small2, height: .small2)
 		}
-		.padding(8)
-		.background(Color.white.opacity(0.3))
-		.cornerRadius(8)
+		.padding(.small2)
+		.background(Color.app.whiteTransparent2)
+		.cornerRadius(.small2)
 		.onTapGesture {
 			viewStore.send(.securityPromptTapped)
 		}

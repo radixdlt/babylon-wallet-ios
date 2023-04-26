@@ -42,7 +42,7 @@ public struct AccountList: Sendable, FeatureReducer {
 			switch action {
 			case let .tapped(account):
 				return .send(.delegate(.displayAccountDetails(account)))
-			case let .securityPrompTaped(account):
+			case let .securityPromptTapped(account):
 				return .send(.delegate(.displayAccountSecurity(account)))
 			case let .copyAddressButtonTapped(account):
 				let address = account.address.address
