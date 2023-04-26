@@ -131,7 +131,7 @@ extension AccountPortfoliosClient {
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio {
 		// Fetch all fungible resources by requesting additional pages if available
-		async let fetchAllFungibleResources = {
+		async let fetchAllFungibleResources = { // FIXME: WHY ARE THESE ASYNC LET?
 			guard let firstPage = rawAccountDetails.fungibleResources else {
 				return [GatewayAPI.FungibleResourcesCollectionItem]()
 			}
@@ -149,7 +149,7 @@ extension AccountPortfoliosClient {
 		}
 
 		// Fetch all non-fungible resources by requesting additional pages if available
-		async let fetchAllNonFungibleResources = {
+		async let fetchAllNonFungibleResources = { // FIXME: WHY ARE THESE ASYNC LET?
 			guard let firstPage = rawAccountDetails.nonFungibleResources else {
 				return [GatewayAPI.NonFungibleResourcesCollectionItem]()
 			}

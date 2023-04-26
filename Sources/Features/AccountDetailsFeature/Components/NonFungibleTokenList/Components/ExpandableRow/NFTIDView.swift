@@ -1,33 +1,32 @@
 import FeaturePrelude
 import SharedModels
 
+// MARK: - NFTView
+struct NFTView: View {
+	let url: URL?
+
+	var body: some View {
+		LoadableImage(url: url, mode: .aspectFill) {
+			Rectangle()
+				.fill(.yellow)
+				.frame(height: 150)
+		}
+		.cornerRadius(.small3)
+	}
+}
+
 // MARK: - NFTIDView
 struct NFTIDView: View {
 	let id: String
+	let thumbnail: URL?
 	let isLast: Bool
 	let isExpanded: Bool
 
-	@State private var imageHeight: CGFloat?
-	private let collapsedImageHeight: CGFloat = 0
-
-	@State private var height: CGFloat?
-	private let collapsedHeight: CGFloat = 0
-}
-
-extension NFTIDView {
 	var body: some View {
 		VStack(spacing: .medium2) {
-			// TODO: refactor when API returns individual NFT image
-			AsyncImage(url: URL(string: ""))
-				.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
-				.cornerRadius(.small3)
-				.onSizeChanged { size in
-					if imageHeight == nil, size.height != collapsedImageHeight {
-						imageHeight = size.height
-					}
-				}
-				// TODO: remove when API returns individual NFT image
-				.hidden()
+			if isExpanded {
+				NFTView(url: thumbnail)
+			}
 
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(id)
@@ -56,12 +55,6 @@ extension NFTIDView {
 				}
 			}
 			.opacity(isExpanded ? 1 : 0)
-			.frame(height: isExpanded ? height : collapsedHeight)
-			.onSizeChanged { size in
-				if height == nil, size.height != collapsedHeight {
-					height = size.height
-				}
-			}
 		}
 		.padding(.medium1)
 		.background(
@@ -88,11 +81,7 @@ extension NFTIDView {
 // MARK: ExpandableRow
 extension NFTIDView: ExpandableRow {
 	var edge: Edge.Set {
-		if isLast {
-			return [.top]
-		} else {
-			return [.all]
-		}
+		isLast ? .top : .all
 	}
 
 	var value: CGFloat {
