@@ -21,13 +21,14 @@ public struct LegacyOlympiaBIP44LikeDerivationPath:
 	Codable,
 	Identifiable,
 	CustomStringConvertible,
+	CustomDebugStringConvertible,
 	CustomDumpStringConvertible
 {
 	public let fullPath: HD.Path.Full
 
 	public init(
 		index: Profile.Network.NextDerivationIndices.Index,
-		shouldHardenLastPathComponent: Bool = true
+		shouldHardenAddressIndex: Bool = true
 	) throws {
 		let fullPath = try HD.Path.Full(
 			children: [
@@ -35,8 +36,12 @@ public struct LegacyOlympiaBIP44LikeDerivationPath:
 				.coinType,
 				.init(nonHardenedValue: 0, isHardened: true),
 				.init(nonHardenedValue: 0, isHardened: false),
-				// Mistake by me, Alexander Cyon, in Olympia wallet I accidentally hardened the last path component, it should NOT be haredned as per BIP44. Why we call this type "BIP44 like".
-				.init(nonHardenedValue: index, isHardened: shouldHardenLastPathComponent),
+				// Mistake by me, Alexander Cyon, in Olympia wallet I accidentally hardened the last
+				// path component, it should NOT be haredned as per BIP44. Why we call this type
+				// "BIP44 like". N.B. to make it extra confusing we only this last path component
+				// for software wallets, since the Olympia Ledger app automatically unhardened
+				// the path component (but that does not seem to be the case of the Babylon Ledger app).
+				.init(nonHardenedValue: index, isHardened: shouldHardenAddressIndex),
 			],
 			onlyPublic: false
 		)
@@ -55,8 +60,44 @@ public struct LegacyOlympiaBIP44LikeDerivationPath:
 	public var derivationPath: String { fullPath.toString() }
 }
 
+extension HD.Path.Full {
+	fileprivate subscript(index: BIP44LikePathComponentIndex) -> HD.Path.Component.Child {
+		children[index.rawValue]
+	}
+
+	fileprivate subscript(index: BIP44LikePathComponentIndex) -> HD.Path.Component.Child.Value {
+		self[index].nonHardenedValue
+	}
+}
+
+// MARK: - BIP44LikePathComponentIndex
+/// index after having removed `m` as path component, i.e. letting `purpose` have index 0.
+private enum BIP44LikePathComponentIndex: Int, Sendable, Hashable, CaseIterable {
+	case purpose
+	case coinType
+	case account
+	case change
+	case addressIndex
+}
+
 extension LegacyOlympiaBIP44LikeDerivationPath {
-	static let expectedComponentCount = 5 + 1 // +1 counting `m`
+	fileprivate subscript(index: BIP44LikePathComponentIndex) -> HD.Path.Component.Child.Value {
+		fullPath[index]
+	}
+
+	public var addressIndex: HD.Path.Component.Child.Value {
+		self[.addressIndex]
+	}
+
+	public var debugDescription: String {
+		derivationPath
+	}
+
+	/// includes counting `m` as a path component
+	static var expectedComponentCount: Int {
+		// children + component: `m`
+		BIP44LikePathComponentIndex.allCases.count + 1
+	}
 
 	@discardableResult
 	static func validate(hdPath: HD.Path.Full) throws -> HD.Path.Full {
@@ -73,24 +114,20 @@ extension LegacyOlympiaBIP44LikeDerivationPath {
 			throw InvalidBIP44LikeDerivationPath.multipleRootsFound
 		}
 
-		guard children[0] == .bip44Purpose else {
+		guard hdPath[.purpose] == .bip44Purpose else {
 			throw InvalidBIP44LikeDerivationPath.secondComponentIsNotBIP44
 		}
-		guard children[1] == .coinType else {
+		guard hdPath[.coinType] == .coinType else {
 			throw InvalidBIP44LikeDerivationPath.invalidCoinType(got: children[1].nonHardenedValue)
 		}
 
-		guard children[2].isHardened else {
+		guard hdPath[.account].isHardened else {
 			throw InvalidBIP44LikeDerivationPath.thirdComponentIsNotHardened
 		}
 
-		guard !children[3].isHardened else {
+		guard !hdPath[.change].isHardened else {
 			throw InvalidBIP44LikeDerivationPath.fourthComponentWasHardenedButExpectedItNotToBe
 		}
-
-//		guard children[4].isHardened else {
-//			throw InvalidBIP44LikeDerivationPath.fifthComponentIsNotHardened
-//		}
 
 		// Valid!
 		return hdPath
@@ -104,7 +141,6 @@ extension LegacyOlympiaBIP44LikeDerivationPath {
 		case secondComponentIsNotBIP44
 		case invalidCoinType(got: UInt32)
 		case thirdComponentIsNotHardened
-//		case fifthComponentIsNotHardened
 	}
 }
 
