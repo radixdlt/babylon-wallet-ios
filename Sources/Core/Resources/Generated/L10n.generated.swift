@@ -34,6 +34,10 @@ public enum L10n {
     public enum Row {
       /// Copy
       public static let copyTitle = L10n.tr("Localizable", "accountList.row.copyTitle", fallback: "Copy")
+      /// Legacy
+      public static let legacyAccount = L10n.tr("Localizable", "accountList.row.legacyAccount", fallback: "Legacy")
+      /// Apply Security Settings
+      public static let securityPrompt = L10n.tr("Localizable", "accountList.row.securityPrompt", fallback: "Apply Security Settings")
     }
   }
   public enum AccountPreferences {

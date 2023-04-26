@@ -3,6 +3,8 @@
 "accountDetails.transferButtonTitle" = "Transfer";
 
 "accountList.row.copyTitle" = "Copy";
+"accountList.row.securityPrompt" = "Apply Security Settings";
+"accountList.row.legacyAccount" = "Legacy";
 
 "accountPreferences.faucetButtonTitle" = "Get RCnet XRD Test Tokens";
 "accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";

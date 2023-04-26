@@ -87,7 +87,7 @@ extension AccountList.Row {
 							)
 							.foregroundColor(.app.whiteTransparent)
 							if viewStore.isLegacyAccount {
-								Text("• Legacy Account")
+								Text("• \(L10n.AccountList.Row.legacyAccount)")
 									.foregroundColor(.app.whiteTransparent)
 							}
 						}
@@ -205,7 +205,7 @@ extension AccountList.Row.View {
 	func securityPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
 		HStack {
 			Image(asset: AssetResource.homeAccountSecurity)
-			Text("Apply Security Settings").foregroundColor(.white)
+			Text(L10n.AccountList.Row.securityPrompt).foregroundColor(.white)
 			Spacer()
 			Circle()
 				.fill()
