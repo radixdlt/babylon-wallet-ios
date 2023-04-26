@@ -54,6 +54,7 @@ struct NFTIDView: View {
 			.opacity(isExpanded ? 1 : 0)
 		}
 		.padding(.medium1)
+		.frame(maxWidth: .infinity)
 		.background(
 			ExpandableRowBackgroundView(
 				paddingEdge: edge,
