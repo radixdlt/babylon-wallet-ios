@@ -18,8 +18,24 @@ extension TransactionClient {
 	public typealias LockFeeWithSelectedPayer = @Sendable (TransactionManifest, _ fee: BigDecimal, _ payer: AccountAddress) async throws -> TransactionManifest
 	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
-	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async -> TransactionReviewResult
-	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async -> BuildTransactionIntentResult
+	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
+	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntentWithSigners
+	public typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
+}
+
+// MARK: - NotarizeTransactionRequest
+public struct NotarizeTransactionRequest: Sendable, Hashable {
+	public let intentSignatures: Set<Engine.Signature>
+	public let compileTransactionIntent: CompileTransactionIntentResponse
+	public let txID: TXID
+	public let notary: SLIP10.PrivateKey
+}
+
+// MARK: - NotarizeTransactionResponse
+public struct NotarizeTransactionResponse: Sendable, Hashable {
+	public let notarized: CompileNotarizedTransactionIntentResponse
+	public let txID: TXID
+	public let notary: SLIP10.PrivateKey
 }
 
 // MARK: - BuildTransactionIntentRequest
@@ -42,16 +58,12 @@ public struct BuildTransactionIntentRequest: Sendable {
 	}
 }
 
-public typealias BuildTransactionIntentResult = Result<TransactionIntentWithSigners, TransactionFailure.FailedToPrepareForTXSigning>
-
 // MARK: - TransactionIntentWithSigners
 public struct TransactionIntentWithSigners: Sendable, Hashable {
 	public let intent: TransactionIntent
 	public let notaryAndSigners: NotaryAndSigners
 	public let signerPublicKeys: [Engine.PublicKey]
 }
-
-public typealias TransactionReviewResult = Swift.Result<TransactionToReview, TransactionFailure>
 
 extension DependencyValues {
 	public var transactionClient: TransactionClient {

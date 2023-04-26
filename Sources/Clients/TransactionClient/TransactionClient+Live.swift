@@ -141,15 +141,8 @@ extension TransactionClient {
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in
 			let nonce = engineToolkitClient.generateTXNonce()
-			let epoch: Epoch
-			do {
-				epoch = try await gatewayAPIClient.getEpoch()
-			} catch {
-				return .failure(.failedToGetEpoch)
-			}
-
+			let epoch = try await gatewayAPIClient.getEpoch()
 			let version = engineToolkitClient.getTransactionVersion()
-
 			let networkID = request.networkID
 			let manifest = request.manifest
 			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
@@ -158,51 +151,38 @@ extension TransactionClient {
 				networkID: networkID
 			)
 
-			let notaryAndSigners: NotaryAndSigners
-			do {
-				// Might be empty
-				let addressesNeededToSign = try OrderedSet(
-					engineToolkitClient
-						.accountAddressesNeedingToSignTransaction(
-							accountAddressesNeedingToSignTransactionRequest
-						)
-				)
+			// Might be empty
+			let addressesNeededToSign = try OrderedSet(
+				engineToolkitClient
+					.accountAddressesNeedingToSignTransaction(
+						accountAddressesNeedingToSignTransactionRequest
+					)
+			)
 
-				let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>> = try await {
-					let accounts = try await addressesNeededToSign.asyncMap {
-						try await accountsClient.getAccountByAddress($0)
-					}
-					guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
-						// TransactionManifest does not reference any accounts => use any account!
-						let first = try await accountsClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
-						return NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [first]))!
-					}
-					return accounts
-				}()
+			let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>> = try await {
+				let accounts = try await addressesNeededToSign.asyncMap {
+					try await accountsClient.getAccountByAddress($0)
+				}
+				guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
+					// TransactionManifest does not reference any accounts => use any account!
+					let first = try await accountsClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
+					return NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [first]))!
+				}
+				return accounts
+			}()
 
-				let notary = await request.selectNotary(accountsNeededToSign)
-				notaryAndSigners = .init(notary: notary, accountsNeededToSign: accountsNeededToSign)
-			} catch {
-				return .failure(.failedToLoadNotaryAndSigners)
-			}
-			let notaryPublicKey: Engine.PublicKey
-			do {
-				notaryPublicKey = try notaryAndSigners.notary.notaryPublicKey.intoEngine()
-			} catch {
-				return .failure(.failedToLoadNotaryPublicKey)
-			}
+			let notary = await request.selectNotary(accountsNeededToSign)
+			let notaryAndSigners = NotaryAndSigners(notary: notary, accountsNeededToSign: accountsNeededToSign)
+
+			let notaryPublicKey = try notaryAndSigners.notary.notaryPublicKey.intoEngine()
 
 			var accountsToSignPublicKeys: [Engine.PublicKey] = []
-			do {
-				for account in notaryAndSigners.accountsNeededToSign {
-					switch account.securityState {
-					case let .unsecured(unsecuredControl):
-						let key = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
-						accountsToSignPublicKeys.append(key)
-					}
+			for account in notaryAndSigners.accountsNeededToSign {
+				switch account.securityState {
+				case let .unsecured(unsecuredControl):
+					let key = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
+					accountsToSignPublicKeys.append(key)
 				}
-			} catch {
-				return .failure(.failedToLoadSignerPublicKeys)
 			}
 
 			let makeTransactionHeaderInput = request.makeTransactionHeaderInput
@@ -224,85 +204,57 @@ extension TransactionClient {
 				manifest: manifest
 			)
 
-			return .success(.init(intent: intent, notaryAndSigners: notaryAndSigners, signerPublicKeys: accountsToSignPublicKeys))
+			return .init(intent: intent, notaryAndSigners: notaryAndSigners, signerPublicKeys: accountsToSignPublicKeys)
+		}
+
+		let notarizeTransaction: NotarizeTransaction = { _ in
+			fatalError()
 		}
 
 		// TODO: Should the request manifest have lockFee?
 		let getTransactionPreview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			return await createTransactionPreviewRequest(for: request, networkID: networkID)
-				.mapError {
-					TransactionFailure.failedToPrepareTXReview(.failedSigning($0))
-				}
-				.asyncFlatMap { transactionPreviewRequest in
-					do {
-						let response = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
-						guard response.receipt.status == .succeeded else {
-							return .failure(
-								TransactionFailure.failedToPrepareTXReview(
-									.failedToRetrieveTXReceipt(response.receipt.errorMessage ?? "Unknown reason")
-								)
-							)
-						}
-						return .success(response)
-					} catch {
-						return .failure(TransactionFailure.failedToPrepareTXReview(.failedToRetrieveTXPreview(error)))
-					}
-				}
-				.flatMap { (response: GatewayAPI.TransactionPreviewResponse) in
-					do {
-						let bytes = try [UInt8](hex: response.encodedReceipt)
-						return .success(bytes)
-					} catch {
-						return .failure(TransactionFailure.failedToPrepareTXReview(.failedToExtractTXReceiptBytes(error)))
-					}
-				}
-				.flatMap { (receiptBytes: [UInt8]) in
-					let generateTransactionReviewRequest = AnalyzeManifestWithPreviewContextRequest(
-						networkId: networkID,
-						manifest: request.manifestToSign,
-						transactionReceipt: receiptBytes
-					)
-					do {
-						let analyzedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
-						return .success(analyzedManifestToReview)
-					} catch {
-						return .failure(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))
-					}
-				}
-				.asyncFlatMap { (analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse) in
-					do {
-						let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(request.manifestToSign, request.feeToAdd)
-						let review = TransactionToReview(
-							analyzedManifestToReview: analyzedManifestToReview,
-							addFeeToManifestOutcome: addFeeToManifestOutcome,
-							networkID: networkID
-						)
-						return .success(review)
-					} catch {
-						return .failure(.failedToPrepareTXReview(.failedToGenerateTXReview(error)))
-					}
-				}
+			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
+			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
+			guard transactionPreviewResponse.receipt.status == .succeeded else {
+				throw TransactionFailure.failedToPrepareTXReview(
+					.failedToRetrieveTXReceipt(transactionPreviewResponse.receipt.errorMessage ?? "Unknown reason")
+				)
+			}
+			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
+			let generateTransactionReviewRequest = AnalyzeManifestWithPreviewContextRequest(
+				networkId: networkID,
+				manifest: request.manifestToSign,
+				transactionReceipt: receiptBytes
+			)
+			let analyzedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
+			//                .asyncMap { (analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse) in
+			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(request.manifestToSign, request.feeToAdd)
+			return TransactionToReview(
+				analyzedManifestToReview: analyzedManifestToReview,
+				addFeeToManifestOutcome: addFeeToManifestOutcome,
+				networkID: networkID
+			)
 		}
 
 		@Sendable
 		func createTransactionPreviewRequest(
 			for request: ManifestReviewRequest,
 			networkID: NetworkID
-		) async -> Result<GatewayAPI.TransactionPreviewRequest, TransactionFailure.FailedToPrepareForTXSigning> {
-			await buildTransactionIntent(.init(
+		) async throws -> GatewayAPI.TransactionPreviewRequest {
+			let intent = try await buildTransactionIntent(.init(
 				networkID: gatewaysClient.getCurrentNetworkID(),
 				manifest: request.manifestToSign,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
 				selectNotary: request.selectNotary
-			)).map {
-				GatewayAPI.TransactionPreviewRequest(
-					rawManifest: request.manifestToSign,
-					header: $0.intent.header,
-					signerPublicKeys: $0.signerPublicKeys
-				)
-			}
+			))
+
+			return GatewayAPI.TransactionPreviewRequest(
+				rawManifest: request.manifestToSign,
+				header: intent.intent.header,
+				signerPublicKeys: intent.signerPublicKeys
+			)
 		}
 
 		@Sendable

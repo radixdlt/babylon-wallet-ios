@@ -77,7 +77,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case previewLoaded(TransactionReviewResult)
+		case previewLoaded(TaskResult<TransactionToReview>)
 		case addedTransactionFeeToSelectedPayerResult(TaskResult<TransactionManifest>)
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case rawTransactionCreated(String)
@@ -150,8 +150,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .appeared:
 			let manifest = state.transactionManifest
 			return .run { [feeToAdd = state.fee] send in
-				let result = await transactionClient.getTransactionReview(.init(manifestToSign: manifest, feeToAdd: feeToAdd))
-				await send(.internal(.previewLoaded(result)))
+				await send(.internal(.previewLoaded(TaskResult {
+					try await transactionClient.getTransactionReview(.init(
+						manifestToSign: manifest,
+						feeToAdd: feeToAdd
+					))
+				})))
 			}
 
 		case .closeTapped:
@@ -285,7 +289,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .previewLoaded(.failure(error)):
-			return .send(.delegate(.failed(error)))
+			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
 
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID

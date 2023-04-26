@@ -102,7 +102,7 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 								return .init(notary: .account(involvedAccounts.first))
 							}
 						}
-					)).get()
+					))
 				}
 			)))
 		}

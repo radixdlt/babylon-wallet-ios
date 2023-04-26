@@ -68,7 +68,6 @@ extension FaucetClient: DependencyKey {
 					}
 				)
 			)
-			.get()
 
 			let transactionIntent = builtTransactionIntentWithSigners.intent
 			let compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
