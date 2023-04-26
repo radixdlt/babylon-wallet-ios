@@ -1,21 +1,58 @@
 import FeaturePrelude
 
-extension AccountList.Row.State {
-	var viewState: AccountList.Row.ViewState {
-		.init(
-			name: account.displayName.rawValue,
-			address: .init(address: account.address.address, format: .default),
-			appearanceID: account.appearanceID
-		)
-	}
-}
-
 // MARK: - AccountList.Row.View
 extension AccountList.Row {
 	public struct ViewState: Equatable {
+		struct FungibleResources: Equatable {
+			struct Icon: Equatable {
+				let url: URL?
+				let placeholder: ImageAsset
+			}
+
+			static let maxNumberOfIcons = 5
+
+			let icons: [Icon]
+			let additionalItemsText: String?
+		}
+
 		let name: String
 		let address: AddressView.ViewState
 		let appearanceID: Profile.Network.Account.AppearanceID
+		let isLoadingResources: Bool
+		let fungbielResourceIcons: FungibleResources
+		let nonFungibleResourcesCount: Int
+
+		init(state: State) {
+			self.name = state.account.displayName.rawValue
+			self.address = .init(address: state.account.address.address, format: .default)
+			self.appearanceID = state.account.appearanceID
+			self.isLoadingResources = state.portfolio.isLoading
+			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
+			self.fungbielResourceIcons = {
+				guard let portfolio = state.portfolio.wrappedValue else {
+					return .init(icons: [], additionalItemsText: nil)
+				}
+
+				var icons: [FungibleResources.Icon] = []
+				if let xrdToken = portfolio.fungibleResources.xrdResource {
+					icons.append(.init(url: xrdToken.iconURL, placeholder: .placeholderImage(isXRD: true)))
+				}
+
+				portfolio.fungibleResources
+					.nonXrdResources
+					.forEach {
+						icons.append(.init(url: $0.iconURL, placeholder: .placeholderImage(isXRD: false)))
+					}
+
+				let additionalItemsCount = icons.count - FungibleResources.maxNumberOfIcons
+				let additionalItems = additionalItemsCount > 0 ? "+\(additionalItemsCount)" : nil
+
+				return .init(
+					icons: Array(icons.prefix(FungibleResources.maxNumberOfIcons)),
+					additionalItemsText: additionalItems
+				)
+			}()
+		}
 	}
 
 	@MainActor
@@ -27,7 +64,7 @@ extension AccountList.Row {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					VStack(alignment: .leading, spacing: .zero) {
 						HeaderView(name: viewStore.name)
@@ -38,11 +75,9 @@ extension AccountList.Row {
 							}
 						)
 						.foregroundColor(.app.whiteTransparent)
-
-						// TODO: replace spacer with token list when API is available
-						Spacer()
-							.frame(height: 64)
 					}
+
+					ownedResourcesList(viewStore)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -51,29 +86,99 @@ extension AccountList.Row {
 				.onTapGesture {
 					viewStore.send(.tapped)
 				}
-				.task {}
+				.task { @MainActor in
+					await ViewStore(store.stateless).send(.view(.task)).finish()
+				}
 			}
 		}
 	}
 }
 
-// MARK: - Private Methods
+// MARK: - Account resources view
 extension AccountList.Row.View {
-	fileprivate func formattedAmount(
-		_ value: BigDecimal?,
-		isVisible: Bool,
-		currency: FiatCurrency
-	) -> String {
-		if isVisible {
-			if let value {
-				// FIXME: Fix formatting of BigDecimal with symbol
-				return "\(currency.symbol) \(value.format())"
-			} else {
-				return "\(currency.sign) -"
+	private enum Constants {
+		static let iconSize = HitTargetSize.smaller
+		static let resourcesNumberContainerOpacity = 0.3
+	}
+
+	// Crates the view of the account owned resources
+	func ownedResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+		HStack(spacing: .medium1) {
+			if !viewStore.fungbielResourceIcons.icons.isEmpty {
+				resourcesContainer(
+					text: viewStore.fungbielResourceIcons.additionalItemsText
+				) {
+					fungibleResourcesList(viewStore)
+				}
 			}
-		} else {
-			return "\(currency.sign) ••••"
+
+			if viewStore.nonFungibleResourcesCount > 0 {
+				resourcesContainer(text: "\(viewStore.nonFungibleResourcesCount)") {
+					Image(asset: AssetResource.nft)
+						.resizable()
+						.frame(Constants.iconSize)
+				}
+			}
+
+			// TODO: Add PoolUnits when available
 		}
+		.frame(height: Constants.iconSize.rawValue)
+		.shimmer(active: viewStore.isLoadingResources, config: .accountResourcesLoading)
+		.cornerRadius(Constants.iconSize.rawValue / 4)
+	}
+
+	// Resources container to display a combination of any View + additional text (aka +10)
+	private func resourcesContainer(text: String?, @ViewBuilder content: () -> some View) -> some View {
+		// Negative spacing, so that the text number starts from the last icon.
+		// Need to be sure that the background of the text is properly displayed.
+		HStack(spacing: -Constants.iconSize.rawValue) {
+			content()
+			if let text {
+				// The text background needs to go behind the `content`
+				textContainer(text).zIndex(-1)
+			}
+		}
+	}
+
+	// The container displaying the resources number
+	private func textContainer(_ text: String) -> some View {
+		Text(text)
+			.foregroundColor(.white)
+			.padding(.leading, Constants.iconSize.rawValue + 4) // Padding so that the text is visible
+			.padding(.trailing, 4)
+			.frame(
+				minWidth: Constants.iconSize.rawValue * 2,
+				minHeight: Constants.iconSize.rawValue
+			)
+			.background(Color.white.opacity(Constants.resourcesNumberContainerOpacity))
+			.cornerRadius(Constants.iconSize.rawValue / 2)
+	}
+
+	// The list of fungible resources
+	private func fungibleResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+		HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
+			ForEach(
+				Array(viewStore.fungbielResourceIcons.icons.enumerated()),
+				id: \.offset
+			) { offset, item in
+				ZStack {
+					AsyncImage(url: item.url) {
+						fungibleResourceIcon($0)
+					} placeholder: {
+						fungibleResourceIcon(
+							Image(asset: item.placeholder)
+						)
+					}
+				}
+				.zIndex(Double(-offset))
+			}
+		}
+	}
+
+	private func fungibleResourceIcon(_ image: Image) -> some View {
+		image.resizable()
+			.frame(Constants.iconSize)
+			.clipShape(Circle())
 	}
 }
 

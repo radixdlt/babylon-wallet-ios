@@ -95,9 +95,11 @@ extension EngineToolkitClient {
 
 			let addName = Bool.random()
 			let addSymbol = Bool.random()
+			let addIcon = Bool.random()
 			let hasSupply = Bool.random()
 			let initialSupply = String(Int.random(in: 0 ..< 100_000))
 			let description = BIP39.randomPhrase(maxSize: 20)
+
 			if addName {
 				// compose name from two strings
 				let name = [BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown", BIP39.WordList.english.randomElement() ?? "Unknown"].joined(separator: " ")
@@ -108,6 +110,13 @@ extension EngineToolkitClient {
 			if addSymbol {
 				// add symbol
 				metdataEntries.append([.string("symbol"), .string(BIP39.WordList.english.randomElement()?.capitalized ?? "Unknown")])
+			}
+
+			if addIcon {
+				metdataEntries.append([
+					.string("icon_url"),
+					.string("https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg"),
+				])
 			}
 
 			metdataEntries.append(
@@ -179,6 +188,7 @@ extension EngineToolkitClient {
 						[.string("name"), .string(tokenName)],
 						[.string("symbol"), .string(tokenSymbol)],
 						[.string("description"), .string(description)],
+						[.string("icon_url"), .string("https://c4.wallpaperflare.com/wallpaper/817/534/563/ave-bosque-fantasia-fenix-wallpaper-preview.jpg")],
 					]
 				),
 
