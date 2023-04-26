@@ -256,6 +256,7 @@ package.addModules([
 			"TransactionClient",
 			"FactorSourcesClient",
 			"Profile",
+			"UseFactorSourceClient",
 		],
 		tests: .no
 	),

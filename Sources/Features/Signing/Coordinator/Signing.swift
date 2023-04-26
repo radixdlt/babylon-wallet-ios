@@ -3,6 +3,7 @@ import FactorSourcesClient
 import FeaturePrelude
 import Profile
 import TransactionClient
+import UseFactorSourceClient
 
 // MARK: - PrivateHDFactorSourceCache
 final class PrivateHDFactorSourceCache: @unchecked Sendable, Hashable {
@@ -65,6 +66,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -148,18 +150,28 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	private func proceedWithNextFactorSource(_ state: State) -> EffectTask<Action> {
+		guard let intent = state.compiledIntent else {
+			assertionFailure("expected intent")
+			return .none
+		}
 		if let next = state.factorsLeftToSignWith.first {
-			return signWithFactor(next)
+			return signWithFactor(next, unhashedDataToSign: Data(intent.compiledIntent))
 		} else {
 			assert(state.signatures.count == state.expectedSignatureCount)
 			return .send(.internal(.finishedSigningWithAllFactors))
 		}
 	}
 
-	private func signWithFactor(_ signingFactor: SigningFactor) -> EffectTask<Action> {
+	private func signWithFactor(_ signingFactor: SigningFactor, unhashedDataToSign: Data) -> EffectTask<Action> {
 		switch signingFactor.factorSource.kind {
 		case .device:
 			return .run { _ in
+				let signatures = try await useFactorSourceClient.signUsingDeviceFactorSource(
+					of: Set(signingFactor.signers.map(\.account)),
+					unhashedDataToSign: unhashedDataToSign
+				)
+			} catch: { _, _ in
+				loggerGlobal.error("Failed to device sign")
 			}
 		case .ledgerHQHardwareWallet:
 			return .run { _ in
