@@ -200,7 +200,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			}
 
 			if olympiaAccountsToMigrate.isEmpty, !state.unverified.isEmpty, !olympiaDevice.derivedPublicKeys.isEmpty {
-				loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map(\.compressedRepresentation.hex))\nstate.unverified:\(state.unverified.map(\.publicKey.compressedRepresentation.hex))")
+				loggerGlobal.critical("Invalid keys from export format?\nolympiaDevice.derivedPublicKeys: \(olympiaDevice.derivedPublicKeys.map(\.publicKey.hex))\nstate.unverified:\(state.unverified.map(\.publicKey.compressedRepresentation.hex))")
 			}
 
 			guard let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>.init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))) else {
@@ -293,18 +293,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			state.isWaitingForResponseFromLedger = true
 			return .run { [olympiaAccounts = state.unverified] send in
 				let device = try await ledgerHardwareWalletClient.importOlympiaDevice(olympiaAccounts)
-				//                loggerGlobal.critical("IGNORED OLYMPIA ACCOUNTS!!!! MOCKING!!!")
-				//                let hardcodedTestAccount = try! OlympiaAccountToMigrate(
-				//                    accountType: .hardware,
-				//                    publicKey: .init(compressedRepresentation: Data(hex: "03d79039c428a6b835e136fbb582e9259df23f8660f928367c3f0d6912728a8444")),
-				//                    path: .init(path: .init(string: "m/44H/1022H/2H/1/3")),
-				//                    address: .init(address: "olympia"),
-				//                    displayName: "Javascript Ledger integration test"
-				//                )
-				//                let device = try await ledgerHardwareWalletClient.importOlympiaDevice([
-				//                    hardcodedTestAccount
-				//                ])
-				//                print("device: \(device), expected: \(hardcodedTestAccount)")
 				await send(.internal(.validateLedgerBeforeNamingIt(device)))
 			} catch: { error, send in
 				loggerGlobal.error("Failed to import olympia ledger device, error: \(error)")
