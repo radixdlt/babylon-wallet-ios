@@ -11,10 +11,7 @@ extension AssetsView {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: { $0 }
-			) { viewStore in
+			WithViewStore(store, observe: { $0 }) { viewStore in
 				VStack(spacing: .large3) {
 					HStack(spacing: .zero) {
 						Spacer()
@@ -28,7 +25,7 @@ extension AssetsView {
 								.padding(.horizontal, .medium2)
 								.background(
 									isSelected
-										? RoundedRectangle(cornerRadius: .medium2).fill(Color.app.gray1)
+										? RoundedRectangle(cornerRadius: .medium2).fill(.app.gray1)
 										: nil
 								)
 								.id(kind)
@@ -36,9 +33,11 @@ extension AssetsView {
 									viewStore.send(.view(.didSelectList(kind)))
 								}
 						}
+						.padding([.top, .horizontal], .medium1)
 
 						Spacer()
-					}.padding([.top, .horizontal], .medium1)
+					}
+					.padding([.top, .horizontal], .medium1)
 
 					switch viewStore.activeAssetKind {
 					case .tokens:
@@ -58,6 +57,7 @@ extension AssetsView {
 					}
 				}
 			}
+			.padding(.bottom, .medium1)
 		}
 	}
 }
