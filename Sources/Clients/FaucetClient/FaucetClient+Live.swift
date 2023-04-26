@@ -107,7 +107,7 @@ extension FaucetClient: DependencyKey {
 				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
-			debugPrintTX()
+//			debugPrintTX()
 
 			_ = try await submitTXClient.submitTransaction(.init(txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
 

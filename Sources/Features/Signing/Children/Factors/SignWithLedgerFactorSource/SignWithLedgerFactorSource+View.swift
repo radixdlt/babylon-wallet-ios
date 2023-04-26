@@ -32,22 +32,22 @@ extension SignWithLedgerFactorSource {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - SignWithLedgerFactorSource_Preview
-struct SignWithLedgerFactorSource_Preview: PreviewProvider {
-	static var previews: some View {
-		SignWithLedgerFactorSource.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: SignWithLedgerFactorSource()
-			)
-		)
-	}
-}
-
-extension SignWithLedgerFactorSource.State {
-	public static let previewValue = Self()
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - SignWithLedgerFactorSource_Preview
+// struct SignWithLedgerFactorSource_Preview: PreviewProvider {
+//	static var previews: some View {
+//		SignWithLedgerFactorSource.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: SignWithLedgerFactorSource()
+//			)
+//		)
+//	}
+// }
+//
+// extension SignWithLedgerFactorSource.State {
+//	public static let previewValue = Self()
+// }
+// #endif

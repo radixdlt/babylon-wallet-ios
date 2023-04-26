@@ -21,12 +21,22 @@ extension Signing {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: Signing")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			SwitchStore(store.scope(state: \.step)) {
+				CaseLet(
+					state: /Signing.State.Step.prepare,
+					action: { Signing.Action.child(.prepare($0)) },
+					then: { PrepareForSigning.View(store: $0) }
+				)
+				CaseLet(
+					state: /Signing.State.Step.signWithDevice,
+					action: { Signing.Action.child(.signWithDevice($0)) },
+					then: { SignWithDeviceFactorSource.View(store: $0) }
+				)
+				CaseLet(
+					state: /Signing.State.Step.signWithLedger,
+					action: { Signing.Action.child(.signWithLedger($0)) },
+					then: { SignWithLedgerFactorSource.View(store: $0) }
+				)
 			}
 		}
 	}

@@ -111,7 +111,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				SelectFeePayer()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
-				Signing()
+				Signing()._printChanges()
 			}
 		}
 	}
