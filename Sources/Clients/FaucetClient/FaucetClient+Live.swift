@@ -46,6 +46,8 @@ extension FaucetClient: DependencyKey {
 			await isAllowedToUseFaucetIfSoGetEpochs(accountAddress: accountAddress) != nil
 		}
 
+		/// This function can ONLY sign transaction which does not spend funds or otherwise require
+		/// auth, since we use an ephemeral key pair
 		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
 			@Dependency(\.transactionClient) var transactionClient
 			@Dependency(\.secureStorageClient) var secureStorageClient
@@ -54,47 +56,58 @@ extension FaucetClient: DependencyKey {
 			@Dependency(\.submitTXClient) var submitTXClient
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let cachedPrivateHDFactorSources: ActorIsolated<IdentifiedArrayOf<PrivateHDFactorSource>> = .init([])
-			let builtTransactionIntentWithSigners = try await transactionClient.buildTransactionIntent(.init(networkID: networkID, manifest: manifest)).get()
+
+			let ephemeralNotary = Curve25519.Signing.PrivateKey()
+
+			let builtTransactionIntentWithSigners = try await transactionClient.buildTransactionIntent(
+				.init(
+					networkID: networkID,
+					manifest: manifest,
+					selectNotary: { _ in
+						.init(notary: .ephemeralPublicKey(.eddsaEd25519(ephemeralNotary.publicKey)), notaryAsSignatory: true)
+					}
+				)
+			)
+			.get()
+
 			let transactionIntent = builtTransactionIntentWithSigners.intent
 			let compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 			let txID = try engineToolkitClient.generateTXID(transactionIntent)
 
 			let notaryAndSigners = builtTransactionIntentWithSigners.notaryAndSigners
-//			let intentSignatures_ = try await notaryAndSigners.accountsNeededToSign.asyncMap {
-//				try await sign(
-//					unhashed: compiledTransactionIntent.compiledIntent,
-//					with: $0,
-//					debugOrigin: "Intent Signers"
-//				)
-//			}
-			let intentSignatures_ = try await useFactorSourceClient.signUsingDeviceFactorSource(
-				of: Set(notaryAndSigners.accountsNeededToSign),
-				unhashedDataToSign: compiledTransactionIntent.compiledIntent,
-				cache: cachedPrivateHDFactorSources
-			)
-
-			let intentSignatures = try intentSignatures_.map { try $0.signature.signatureWithPublicKey.intoEngine() }
 
 			let signedTransactionIntent = SignedTransactionIntent(
 				intent: transactionIntent,
-				intentSignatures: intentSignatures
+				intentSignatures: []
 			)
+
 			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
 
-			let notarySignatureWithPublicKey = try await useFactorSourceClient.signUsingDeviceFactorSource(
-				of: Set([notaryAndSigners.notarySigner]),
-				unhashedDataToSign: compiledSignedIntent.compiledIntent,
-				cache: cachedPrivateHDFactorSources
-			).first!.signature.signatureWithPublicKey
-
-			let notarySignature = try notarySignatureWithPublicKey.intoEngine().signature
+			let hashToSign = try blake2b(data: compiledSignedIntent.compiledIntent)
+			let notarySignatureRaw = try ephemeralNotary.signature(for: hashToSign)
+			let notarySignature = Engine.Signature.eddsaEd25519(.init(bytes: Array(notarySignatureRaw)))
 
 			let uncompiledNotarized = NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
 				notarySignature: notarySignature
 			)
 			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
+
+			func debugPrintTX() {
+				// RET prints when convertManifest is called, when it is removed, this can be moved down
+				// inline inside `print`.
+				let txIntentString = transactionIntent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
+				print("TXID: \(txID.rawValue)")
+				print("TransactionIntent: \(txIntentString)")
+				print("intentSignatures: \(signedTransactionIntent.intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
+				print("NotarySignature: \(notarySignatureRaw.hex)")
+				print("Compiled Transaction Intent:\n\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
+				print("Compiled Notarized Intent:\n\n\(compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
+				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
+			}
+
+			debugPrintTX()
 
 			_ = try await submitTXClient.submitTransaction(.init(txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
 

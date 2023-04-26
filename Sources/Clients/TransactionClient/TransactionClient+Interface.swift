@@ -1,4 +1,5 @@
 import ClientPrelude
+import Cryptography
 import EngineToolkitClient
 
 // MARK: - TransactionClient
@@ -32,7 +33,7 @@ public struct BuildTransactionIntentRequest: Sendable {
 		networkID: NetworkID,
 		manifest: TransactionManifest,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
-		selectNotary: @escaping SelectNotary = { $0.first }
+		selectNotary: @escaping SelectNotary = { .init(notary: .account($0.first)) }
 	) {
 		self.networkID = networkID
 		self.manifest = manifest
@@ -59,7 +60,40 @@ extension DependencyValues {
 	}
 }
 
-public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<Profile.Network.Account>>) async -> Profile.Network.Account
+// MARK: - NotarySelection
+public struct NotarySelection: Sendable, Hashable {
+	public let notary: Notary
+	public let notaryAsSignatory: Bool
+
+	public enum Notary: Sendable, Hashable {
+		case ephemeralPublicKey(SLIP10.PublicKey)
+		case account(Profile.Network.Account)
+
+		public var notaryPublicKey: SLIP10.PublicKey {
+			switch self {
+			case let .ephemeralPublicKey(publicKey): return publicKey
+			case let .account(account):
+				switch account.securityState {
+				case let .unsecured(entityControl): return entityControl.genesisFactorInstance.publicKey
+				}
+			}
+		}
+	}
+
+	public var notaryPublicKey: SLIP10.PublicKey {
+		notary.notaryPublicKey
+	}
+
+	public init(
+		notary: Notary,
+		notaryAsSignatory: Bool = false
+	) {
+		self.notary = notary
+		self.notaryAsSignatory = notaryAsSignatory
+	}
+}
+
+public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<Profile.Network.Account>>) async -> NotarySelection
 
 // MARK: - TransactionClient.Guarantee
 extension TransactionClient {
@@ -88,7 +122,7 @@ public struct ManifestReviewRequest: Sendable {
 		manifestToSign: TransactionManifest,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		feeToAdd: BigDecimal,
-		selectNotary: @escaping SelectNotary = { $0.first }
+		selectNotary: @escaping SelectNotary = { .init(notary: .account($0.first)) }
 	) {
 		self.manifestToSign = manifestToSign
 		self.feeToAdd = feeToAdd

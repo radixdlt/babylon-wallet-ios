@@ -181,17 +181,13 @@ extension TransactionClient {
 				}()
 
 				let notary = await request.selectNotary(accountsNeededToSign)
-				notaryAndSigners = .init(notarySigner: notary, accountsNeededToSign: accountsNeededToSign)
+				notaryAndSigners = .init(notary: notary, accountsNeededToSign: accountsNeededToSign)
 			} catch {
 				return .failure(.failedToLoadNotaryAndSigners)
 			}
 			let notaryPublicKey: Engine.PublicKey
 			do {
-				let notarySigner = notaryAndSigners.notarySigner
-				switch notarySigner.securityState {
-				case let .unsecured(unsecuredControl):
-					notaryPublicKey = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
-				}
+				notaryPublicKey = try notaryAndSigners.notary.notaryPublicKey.intoEngine()
 			} catch {
 				return .failure(.failedToLoadNotaryPublicKey)
 			}
@@ -218,7 +214,7 @@ extension TransactionClient {
 				endEpochExclusive: epoch + makeTransactionHeaderInput.epochWindow,
 				nonce: nonce,
 				publicKey: notaryPublicKey,
-				notaryAsSignatory: false,
+				notaryAsSignatory: notaryAndSigners.notary.notaryAsSignatory,
 				costUnitLimit: makeTransactionHeaderInput.costUnitLimit,
 				tipPercentage: makeTransactionHeaderInput.tipPercentage
 			)
@@ -344,7 +340,7 @@ extension TransactionClient {
 // MARK: - NotaryAndSigners
 public struct NotaryAndSigners: Sendable, Hashable {
 	/// Notary signer
-	public let notarySigner: Profile.Network.Account
+	public let notary: NotarySelection
 	/// Never empty, since this also contains the notary signer.
 	public let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>
 }
