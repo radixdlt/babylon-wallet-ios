@@ -40,27 +40,17 @@ extension AccountList.Row {
 			// Resources
 			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
 			self.fungibleResourceIcons = {
-				guard let portfolio = state.portfolio.wrappedValue else {
+				guard let fungibleResources = state.portfolio.wrappedValue?.fungibleResources else {
 					return .init(icons: [], additionalItemsText: nil)
 				}
 
-				var icons: [TokenThumbnail.Content] = []
-				if portfolio.fungibleResources.xrdResource != nil {
-					icons.append(.xrd)
-				}
+				let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource.map { _ in [.xrd] } ?? []
+				let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.iconURL) }
+				let icons = xrdIcon + otherIcons
+				let hiddenCount = icons.count - FungibleResources.maxNumberOfIcons
+				let additionalItems = hiddenCount > 0 ? "+\(hiddenCount)" : nil
 
-				var hiddenItemCount = 0
-				for resource in portfolio.fungibleResources.nonXrdResources {
-					guard icons.count < FungibleResources.maxNumberOfIcons else {
-						hiddenItemCount += 1
-						continue
-					}
-					icons.append(.known(resource.iconURL))
-				}
-
-				let additionalItems = hiddenItemCount > 0 ? "+\(hiddenItemCount)" : nil
-
-				return .init(icons: icons, additionalItemsText: additionalItems)
+				return .init(icons: icons.dropLast(hiddenCount), additionalItemsText: additionalItems)
 			}()
 		}
 	}
