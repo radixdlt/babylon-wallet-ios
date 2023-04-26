@@ -137,7 +137,7 @@ extension NonFungibleTokenList.Detail {
 
 extension AccountPortfolio.NonFungibleResource {
 	// TODO: unit test
-	func nftAddress(for id: NonFungibleTokenId) -> String {
+	func nftAddress(for id: NonFungibleToken.ID) -> String {
 		resourceAddress.address + ":" + id.rawValue
 	}
 }
@@ -158,7 +158,7 @@ struct NonFungibleTokenListDetail_Preview: PreviewProvider {
 
 extension NonFungibleTokenList.Detail.State {
 	public static let previewValue = Self(
-		resource: .init(resourceAddress: .init(address: "some"), nftIds: []),
+		resource: .init(resourceAddress: .init(address: "some"), tokens: []),
 		nftID: .init("#1#")
 	)
 }

@@ -235,49 +235,92 @@ extension AccountPortfoliosClient {
 		rawItems: [GatewayAPI.NonFungibleResourcesCollectionItem]
 	) async throws -> AccountPortfolio.NonFungibleResources {
 		// We are interested in vault aggregated items
-		let rawItems = rawItems.compactMap(\.vault)
-		guard !rawItems.isEmpty else {
+		let vaultItems = rawItems.compactMap(\.vault)
+		guard !vaultItems.isEmpty else {
 			return []
 		}
+
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.NonFungibleResourcesCollectionItem
 		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
-		let nonFungibleResources = try await rawItems.parallelMap { resource in
-			// Load the nftIds from the resource vault
-			let nftIds = try await {
-				// Resources of an account always have one single vault which stores the value.
-				guard let vault = resource.vaults.items.first else {
-					return [AccountPortfolio.NonFungibleResource.NonFungibleTokenId]()
-				}
+		@Sendable
+		func tokens(resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated) async throws -> [AccountPortfolio.NonFungibleResource.NonFungibleToken] {
+			guard let vault = resource.vaults.items.first else { return [] }
 
-				// Fetch all nft ids pages from the vault
-				return try await fetchAllPaginatedItems(
-					cursor: nil,
-					fetchEntityNonFungibleResourceIdsPage(
-						accountAddress,
-						resourceAddress: resource.resourceAddress,
-						vaultAddress: vault.vaultAddress
-					)
+			let nftIDs = try await fetchAllPaginatedItems(
+				cursor: nil,
+				fetchEntityNonFungibleResourceIdsPage(
+					accountAddress,
+					resourceAddress: resource.resourceAddress,
+					vaultAddress: vault.vaultAddress
 				)
+			)
+			.map(\.nonFungibleId)
+
+			var result: [AccountPortfolio.NonFungibleResource.NonFungibleToken] = []
+			for nftIDChunk in nftIDs.chunks(ofCount: 30) { // FIXME: Where does this limitation come from?
+				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
+					resourceAddress: resource.resourceAddress,
+					nonFungibleIds: Array(nftIDChunk)
+				)
+				)
+				.nonFungibleIds
 				.map {
-					AccountPortfolio.NonFungibleResource.NonFungibleTokenId($0.nonFungibleId)
+					AccountPortfolio.NonFungibleResource.NonFungibleToken(
+						id: .init($0.nonFungibleId),
+						name: nil,
+						description: nil,
+						keyImageURL: $0.keyImageURL
+					)
 				}
 
-			}()
+				result.append(contentsOf: tokens)
+			}
+
+			print("\(result.count) tokens: \(result.map(\.keyImageURL))")
+
+			return result
+		}
+
+		let nonFungibleResources = try await vaultItems.parallelMap { resource in
+			// Load the nftIds from the resource vault
+			let tokens = try await tokens(resource: resource)
 
 			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.NonFungibleResourcesCollectionItem
 			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
+
+			print("NAME: \(metadata?.name), iconURL: \(metadata?.iconURL)")
 
 			return AccountPortfolio.NonFungibleResource(
 				resourceAddress: .init(address: resource.resourceAddress),
 				name: metadata?.name,
 				description: metadata?.description,
-				nftIds: nftIds
+				iconURL: metadata?.iconURL,
+				tokens: tokens
 			)
 		}
 
 		return nonFungibleResources.sorted()
+	}
+}
+
+// Temporary hack to extract the key_image_url, until we have a proper schema
+private extension GatewayAPI.StateNonFungibleDetailsResponseItem {
+	var keyImageURL: URL? {
+		guard let dictionary = mutableData.rawJson.value as? [String: Any] else { return nil }
+		guard let elements = dictionary["elements"] as? [[String: Any]] else { return nil }
+		let values = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
+		let extensions = ["jpg", "jpeg", "png", "pdf", "svg"]
+		for value in values {
+			for ext in extensions {
+				if value.lowercased().hasSuffix(ext) {
+					return .init(string: value)
+				}
+			}
+		}
+		return nil
 	}
 }
 
