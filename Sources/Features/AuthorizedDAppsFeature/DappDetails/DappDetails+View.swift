@@ -200,7 +200,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.nonFungibleTokens, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { token in
-					NFTThumbnail(.known(token.thumbnail), size: .small)
+					NFTThumbnail(token.thumbnail, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTokenTapped(id))
 				}

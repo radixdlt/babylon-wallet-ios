@@ -14,12 +14,14 @@ extension NonFungibleTokenList.Row {
 
 	@MainActor
 	public struct View: SwiftUI.View {
+		private let spacing: CGFloat = .small3 / 2
+
 		private let store: StoreOf<NonFungibleTokenList.Row>
 
 		@SwiftUI.State private var expandedHeight: CGFloat = .zero
 		@SwiftUI.State private var rowHeights: [Int: CGFloat] = [:] {
 			didSet {
-				expandedHeight = rowHeights.map(\.value).reduce(0, +)
+				expandedHeight = rowHeights.map(\.value).reduce(0, +) + CGFloat(max(rowHeights.count - 1, 0)) * spacing
 			}
 		}
 
@@ -29,7 +31,7 @@ extension NonFungibleTokenList.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
-				VStack(spacing: .small3 / 2) {
+				VStack(spacing: spacing) {
 					if viewStore.resource.tokens.isEmpty {
 						EmptyView()
 					} else {
@@ -100,8 +102,9 @@ extension NonFungibleTokenList.Row.View {
 		let headerHeight = rowHeights[Constants.headerIndex, default: 0]
 		let collapsedRowsCount = viewStore.nftCount
 		let visibleCollapsedRowsHeight = collapsedRowsCount > 1 ? Constants.twoOrMoreCollapsedCardsHeight : Constants.oneCollapsedCardHeight
+		let totalSpacing = CGFloat(max(min(rowHeights.count - 1, Constants.cardLimit), 0)) * spacing
 
-		return headerHeight + visibleCollapsedRowsHeight
+		return headerHeight + visibleCollapsedRowsHeight + totalSpacing
 	}
 
 	fileprivate func headerSupplyText(with _: ViewStoreOf<NonFungibleTokenList.Row>) -> String {
