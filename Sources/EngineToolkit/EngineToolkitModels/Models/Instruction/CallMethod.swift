@@ -16,17 +16,17 @@ public struct CallMethod: InstructionProtocol {
 	// MARK: Init
 
 	public init(
-		receiver: ComponentAddress,
+		receiver: Address_,
 		methodName: String,
 		arguments: [ManifestASTValue] = []
 	) {
-		self.receiver = receiver.asGeneral
+		self.receiver = receiver
 		self.methodName = methodName
 		self.arguments = arguments
 	}
 
 	public init(
-		receiver: ComponentAddress,
+		receiver: Address_,
 		methodName: String,
 		@ValuesBuilder buildValues: () throws -> [any ValueProtocol]
 	) rethrows {
@@ -39,7 +39,7 @@ public struct CallMethod: InstructionProtocol {
 
 	#if swift(<5.8)
 	public init(
-		receiver: ComponentAddress,
+		receiver: Address_,
 		methodName: String,
 		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
 	) rethrows {
@@ -51,7 +51,7 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	public init(
-		receiver: ComponentAddress,
+		receiver: Address_,
 		methodName: String,
 		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
 	) rethrows {
@@ -93,7 +93,7 @@ extension CallMethod {
 		}
 
 		try self.init(
-			receiver: container.decode(Address_.self, forKey: .receiver).asSpecific(),
+			receiver: container.decode(Address_.self, forKey: .receiver),
 			methodName: container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded,
 			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
 		)

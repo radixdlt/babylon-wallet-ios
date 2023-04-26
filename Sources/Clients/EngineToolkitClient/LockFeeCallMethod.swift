@@ -4,16 +4,28 @@ import EngineToolkit
 
 extension EngineToolkitClient {
 	public func lockFeeCallMethod(
-		address: ComponentAddress,
+		address: PackageAddress,
 		fee: String = "10"
 	) -> CallMethod {
 		CallMethod(
-			receiver: address,
+                        receiver: address.asGeneral,
 			methodName: "lock_fee"
 		) {
 			Decimal_(value: fee)
 		}
 	}
+
+        public func lockFeeCallMethod(
+                address: ComponentAddress,
+                fee: String = "10"
+        ) -> CallMethod {
+                CallMethod(
+                        receiver: address.asGeneral,
+                        methodName: "lock_fee"
+                ) {
+                        Decimal_(value: fee)
+                }
+        }
 
 	public func lockFeeCallMethod(
 		faucetForNetwork networkID: NetworkID,
@@ -56,12 +68,12 @@ extension EngineToolkitClient {
 		let faucetAddress = try faucetAddress(for: networkID)
 		var instructions: [any InstructionProtocol] = [
 			CallMethod(
-				receiver: faucetAddress,
+                                receiver: faucetAddress.asGeneral,
 				methodName: "free"
 			),
 
 			CallMethod(
-				receiver: componentAddress,
+                                receiver: componentAddress.asGeneral,
 				methodName: "deposit_batch"
 			) {
 				Expression("ENTIRE_WORKTOP")
@@ -77,8 +89,8 @@ extension EngineToolkitClient {
 		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
 
-	private func faucetAddress(for networkID: NetworkID) throws -> ComponentAddress {
-		try knownEntityAddresses(networkID).faucetComponentAddress
+	private func faucetAddress(for networkID: NetworkID) throws -> PackageAddress {
+		try knownEntityAddresses(networkID).faucetPackageAddress
 	}
 }
 

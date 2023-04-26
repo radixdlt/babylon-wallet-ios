@@ -1,109 +1,94 @@
 import Foundation
 
-public typealias PackageAddress = SpecificAddress<PackageAddressKind>
-public typealias ResourceAddress = SpecificAddress<ResourceAddressKind>
-public typealias ComponentAddress = SpecificAddress<ComponentAddressKind>
-
-// MARK: - SpecificAddressKind
-public protocol SpecificAddressKind: Sendable {
-	static func validate(address: String) throws
-	static var type: AddressDiscriminator { get }
+public enum AddressKindPrefix: String {
+        case resource = "resource"
+        case package = "package"
+        case component = "component"
+        case clock = "clock"
+        case epochManager = "epochmanager"
 }
 
-// MARK: - AddressDiscriminator
-public enum AddressDiscriminator: String, Sendable, Hashable, Codable {
-	case packageAddress = "PackageAddress"
-	case resourceAddress = "ResourceAddress"
-	case componentAddress = "ComponentAddress"
+public struct ResourceAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: AddressKindPrefix = .resource
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
 }
 
-// MARK: - PackageAddressKind
-public enum PackageAddressKind: SpecificAddressKind {
-	public static func validate(address: String) throws {}
-	public static let type: AddressDiscriminator = .packageAddress
+public struct PackageAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: AddressKindPrefix = .package
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
 }
 
-// MARK: - ResourceAddressKind
-public enum ResourceAddressKind: SpecificAddressKind {
-	public static func validate(address: String) throws {}
-	public static let type: AddressDiscriminator = .resourceAddress
+public struct ComponentAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: AddressKindPrefix = .component
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
 }
 
-// MARK: - ComponentAddressKind
-public enum ComponentAddressKind: SpecificAddressKind {
-	public static func validate(address: String) throws {}
-	public static let type: AddressDiscriminator = .componentAddress
+public struct ClockAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: AddressKindPrefix = .clock
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
 }
 
-extension SpecificAddress {
-	public init(validatingAddress address: String) throws {
-		try Kind.validate(address: address)
-		self.init(address: address)
-	}
+public struct EpochManagerAddress: Codable, Hashable, Sendable, EntityAddress {
+        public static let prefix: AddressKindPrefix = .epochManager
+        public var address: String
+
+        public init(address: String) {
+                self.address = address
+        }
 }
 
-// MARK: - SpecificAddress
-public struct SpecificAddress<Kind: SpecificAddressKind>: AddressProtocol, Sendable, Codable, Hashable {
-	// MARK: Stored properties
-	public let type: AddressDiscriminator = Kind.type
-	public let address: String
+public protocol EntityAddress: AddressProtocol, Codable {
+        static var prefix: AddressKindPrefix { get }
+        var address: String { get set}
 
-	// MARK: Init
-
-	public init(address: String) {
-		// TODO: Perform some simple Bech32m validation.
-		self.address = address
-	}
-
-	// MARK: CodingKeys
-	private enum CodingKeys: String, CodingKey {
-		case address, type
-	}
-
-	// MARK: Codable
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Kind.type, forKey: .type)
-		try container.encode(address, forKey: .address)
-	}
-
-	public init(from decoder: Decoder) throws {
-		// Checking for type discriminator
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let type = try container.decode(AddressDiscriminator.self, forKey: .type)
-		if type != Kind.type {
-			throw InternalDecodingFailure.addressDiscriminatorMismatch(expected: Kind.type, butGot: type)
-		}
-
-		try self.init(
-			address: container.decode(String.self, forKey: .address)
-		)
-	}
+        init(address: String)
 }
 
-extension SpecificAddress {
+public struct InvalidAddressTypeError: Error {
+        public let message: String
+}
+
+extension EntityAddress {
+        public init(validatingAddress address: String) throws {
+                guard address.hasPrefix(Self.prefix.rawValue) else {
+                        throw InvalidAddressTypeError(message: "Failed to decode \(address), expected prefix: \(Self.prefix)")
+                }
+                self.init(address: address)
+        }
+
+        public init(from decoder: Decoder) throws {
+                let container = try decoder.singleValueContainer()
+                try self.init(validatingAddress: container.decode(String.self))
+        }
+}
+
+
+extension EntityAddress {
 	public var asGeneral: Address_ {
 		.init(address: address)
 	}
 }
 
 extension Address_ {
-	public func asSpecific<Kind: SpecificAddressKind>() throws -> SpecificAddress<Kind> {
-		do {
-			return try .init(validatingAddress: address)
-		} catch {
-			throw ConversionError.failedCreating(kind: Kind.self)
-		}
-	}
-
-	public func isKind(_ kind: SpecificAddressKind.Type) -> Bool {
-		(try? kind.validate(address: address)) != nil
-	}
-
-	public enum ConversionError: Error {
-		case failedCreating(kind: SpecificAddressKind.Type)
-		case addressKindMismatch(desired: SpecificAddressKind.Type, actual: SpecificAddressKind.Type)
-	}
+        public func asSpecific<Address: EntityAddress>() throws -> Address {
+                try .init(validatingAddress: address)
+        }
 }
 
 // MARK: - AddressStringConvertible
@@ -111,55 +96,51 @@ public protocol AddressStringConvertible {
 	var address: String { get }
 }
 
-// MARK: - AddressProtocol
 public protocol AddressProtocol: AddressStringConvertible, ExpressibleByStringLiteral {
-	init(address: String)
+        init(address: String)
 }
 
 extension AddressProtocol {
-	public init(stringLiteral value: String) {
-		self.init(address: value)
-	}
+        public init(stringLiteral value: String) {
+                self.init(address: value)
+        }
 }
 
 // MARK: - PolymorphicAddress
-public enum PolymorphicAddress: Sendable, Codable, Hashable, AddressStringConvertible {
+public enum PolymorphicAddress: Sendable, Decodable, Hashable, AddressStringConvertible {
 	case packageAddress(PackageAddress)
 	case componentAddress(ComponentAddress)
 	case resourceAddress(ResourceAddress)
+        case clockAddress(ClockAddress)
+        case epochManagerAddress(EpochManagerAddress)
 }
 
 // MARK: Codable
 extension PolymorphicAddress {
-	private enum CodingKeys: String, CodingKey {
-		case type
-	}
+        struct UnknownAddressKindPrefix: Error {}
 
 	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try container.decode(AddressDiscriminator.self, forKey: .type)
+                let container = try decoder.singleValueContainer()
 
-		let singleValueContainer = try decoder.singleValueContainer()
-		switch discriminator {
-		case .packageAddress:
-			self = try .packageAddress(singleValueContainer.decode(PackageAddress.self))
-		case .componentAddress:
-			self = try .componentAddress(singleValueContainer.decode(ComponentAddress.self))
-		case .resourceAddress:
-			self = try .resourceAddress(singleValueContainer.decode(ResourceAddress.self))
-		}
-	}
+                let address = try container.decode(String.self)
+                // Prefix until first `_`. E.g package_tdx_....
+                let rawPrefix = String(address.prefix(while: { $0 != "_"}))
+                guard let prefix = AddressKindPrefix(rawValue: rawPrefix) else {
+                        throw UnknownAddressKindPrefix()
+                }
 
-	public func encode(to encoder: Encoder) throws {
-		var singleValueContainer = encoder.singleValueContainer()
-		switch self {
-		case let .packageAddress(encodable):
-			try singleValueContainer.encode(encodable)
-		case let .componentAddress(encodable):
-			try singleValueContainer.encode(encodable)
-		case let .resourceAddress(encodable):
-			try singleValueContainer.encode(encodable)
-		}
+                switch prefix {
+                case .resource:
+                        self = .resourceAddress(ResourceAddress(address: address))
+                case .package:
+                        self = .packageAddress(PackageAddress(address: address))
+                case .component:
+                        self = .componentAddress(ComponentAddress(address: address))
+                case .clock:
+                        self = .clockAddress(ClockAddress(address: address))
+                case .epochManager:
+                        self = .epochManagerAddress(EpochManagerAddress(address: address))
+                }
 	}
 }
 
@@ -169,6 +150,8 @@ extension PolymorphicAddress {
 		case let .packageAddress(address): return address.address
 		case let .componentAddress(address): return address.address
 		case let .resourceAddress(address): return address.address
-		}
+                case let .clockAddress(address): return address.address
+                case let .epochManagerAddress(address): return address.address
+                }
 	}
 }

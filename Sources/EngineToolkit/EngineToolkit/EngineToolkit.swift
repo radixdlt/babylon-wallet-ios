@@ -18,10 +18,8 @@ public struct EngineToolkit {
 
 	private let jsonStringFromJSONData: JSONStringFromJSONData
 	private let jsonDataFromJSONString: JSONDataFromJSONString
-        
-        public static let instance = EngineToolkit()
 
-	private init() {
+	public init() {
 		self.init(
 			jsonEncoder: JSONEncoder(),
 			jsonDecoder: JSONDecoder()
@@ -197,15 +195,6 @@ extension EngineToolkit {
 			function: known_entity_addresses
 		)
 	}
-
-        public func _knownEntityAddresses(
-                request: KnownEntityAddressesRequest
-        ) -> Result<_KnownEntityAddressesResponse, Error> {
-                callLibraryFunction(
-                        request: request,
-                        function: known_entity_addresses
-                )
-        }
 
 	public func analyzeManifestWithPreviewContext(
 		request: AnalyzeManifestWithPreviewContextRequest
