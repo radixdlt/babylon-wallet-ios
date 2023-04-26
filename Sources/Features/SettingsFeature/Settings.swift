@@ -1,5 +1,5 @@
 import AppPreferencesClient
-import AuthorizedDAppsFeatures
+import AuthorizedDAppsFeature
 import CacheClient
 import FeaturePrelude
 import GatewayAPI

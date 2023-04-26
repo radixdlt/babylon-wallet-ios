@@ -2,23 +2,39 @@ import SwiftUI
 
 // MARK: - PersonaThumbnail
 public struct PersonaThumbnail: View {
-	let url: URL
+	let url: URL?
 	let size: HitTargetSize
 
-	public init(_ url: URL, size: HitTargetSize = .small) {
+	public init(_ url: URL?, size: HitTargetSize = .small) {
 		self.url = url
 		self.size = size
 	}
 
 	public var body: some View {
-		ZStack {
-			Rectangle()
-				.fill(.blue)
-				.clipShape(Circle())
+		if let url {
 			Circle()
-				.stroke(.app.gray3, lineWidth: 1)
+				.strokeBorder(Color.app.gray3, lineWidth: 1)
+				.background(Circle().fill(Color.app.gray4))
+				.frame(size)
+		} else {
+			PersonaPlaceholder(size: size)
 		}
-		.frame(size)
+	}
+}
+
+// MARK: - PersonaPlaceholder
+public struct PersonaPlaceholder: View {
+	let size: HitTargetSize
+
+	public init(size: HitTargetSize = .small) {
+		self.size = size
+	}
+
+	public var body: some View {
+		Circle()
+			.strokeBorder(Color.app.gray3, lineWidth: 1)
+			.background(Circle().fill(Color.app.gray4))
+			.frame(size)
 	}
 }
 

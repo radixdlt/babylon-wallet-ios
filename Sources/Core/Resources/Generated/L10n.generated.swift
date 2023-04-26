@@ -723,10 +723,10 @@ public enum L10n {
     public static let editPersona = L10n.tr("Localizable", "personaDetails.editPersona", fallback: "Edit Persona")
     /// Email Address
     public static let emailAddressHeading = L10n.tr("Localizable", "personaDetails.emailAddressHeading", fallback: "Email Address")
-    /// Family Name
-    public static let familyNameHeading = L10n.tr("Localizable", "personaDetails.familyNameHeading", fallback: "Family Name")
-    /// Given Name
-    public static let givenNameHeading = L10n.tr("Localizable", "personaDetails.givenNameHeading", fallback: "Given Name")
+    /// First Name
+    public static let firstNameHeading = L10n.tr("Localizable", "personaDetails.firstNameHeading", fallback: "First Name")
+    /// Last Name
+    public static let lastNameHeading = L10n.tr("Localizable", "personaDetails.lastNameHeading", fallback: "Last Name")
     /// You are not sharing any personal data with %@
     public static func notSharingAnything(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
@@ -735,8 +735,8 @@ public enum L10n {
     public static func personaDataSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.personaDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
     }
-    /// Persona Label
-    public static let personaLabelHeading = L10n.tr("Localizable", "personaDetails.personaLabelHeading", fallback: "Persona Label")
+    /// Persona Name
+    public static let personaNameHeading = L10n.tr("Localizable", "personaDetails.personaNameHeading", fallback: "Persona Name")
     /// Phone Number
     public static let phoneNumberHeading = L10n.tr("Localizable", "personaDetails.phoneNumberHeading", fallback: "Phone Number")
   }
