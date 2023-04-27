@@ -48,7 +48,6 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.continuousClock) var clock
 
 	public init() {}
 
@@ -82,10 +81,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 						loggerGlobal.warning("Received update for wrong txID, incorrect impl of `submitTXClient`?")
 						continue
 					}
-					Task {
-						try? await clock.sleep(for: .milliseconds(700))
-						try await send(.internal(.statusUpdate(update.result.get())))
-					}
+					try await send(.internal(.statusUpdate(update.result.get())))
 				}
 			} catch: { error, send in
 				errorQueue.schedule(error)
