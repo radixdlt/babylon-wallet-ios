@@ -6,10 +6,10 @@ struct NFTView: View {
 	let url: URL?
 
 	var body: some View {
-		LoadableImage(url: url, mode: .aspectFill) {
+		LoadableImage(url: url, size: .flexibleHeight, mode: .aspectFill) {
 			Rectangle()
-				.fill(.yellow)
-				.frame(height: 150)
+				.fill(.gray)
+				.frame(height: 100)
 		}
 		.cornerRadius(.small3)
 	}
@@ -26,32 +26,22 @@ struct NFTIDView: View {
 	let isExpanded: Bool
 
 	var body: some View {
-		VStack(spacing: .medium2) {
+		VStack(spacing: .small1) {
 			if isExpanded {
 				NFTView(url: thumbnail)
-			}
+					.padding(.bottom, .small1)
 
-			VStack(alignment: .leading, spacing: .small2) {
-				Text(id)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.offset(y: -.small2)
+				KeyValueView(key: L10n.AccountDetails.id, value: id, isID: true)
 
 				ForEach(metadata) { pair in
-					HStack(alignment: .top) {
-						Text(pair.key)
-							.foregroundColor(.app.buttonTextBlack)
-							.textStyle(.body1Regular)
-
-						Spacer(minLength: 0)
-
-						Text(pair.value)
-							.foregroundColor(.app.buttonTextBlack)
-							.textStyle(.body1Header)
-					}
+					KeyValueView(key: pair.key, value: pair.value, isID: false)
 				}
+			} else {
+				// This is apparently needed, else the card disappears when not expanded
+				Rectangle()
+					.fill(.clear)
+					.frame(height: 20)
 			}
-			.opacity(isExpanded ? 1 : 0)
 		}
 		.padding(.medium1)
 		.frame(maxWidth: .infinity)
@@ -66,7 +56,26 @@ struct NFTIDView: View {
 	}
 }
 
-// MARK: ExpandableRow
+// MARK: - KeyValueView
+struct KeyValueView: View {
+	let key: String
+	let value: String
+	let isID: Bool
+
+	var body: some View {
+		HStack(alignment: .top, spacing: 0) {
+			Text(key)
+				.textStyle(.body1Regular)
+			Spacer(minLength: 0)
+			Text(value)
+				.foregroundColor(isID ? .app.gray2 : .app.gray1)
+				.textStyle(.body1HighImportance)
+		}
+		.foregroundColor(.app.gray2)
+	}
+}
+
+// MARK: - NFTIDView + ExpandableRow
 extension NFTIDView: ExpandableRow {
 	var edge: Edge.Set {
 		isLast ? .top : .all
@@ -81,7 +90,7 @@ extension NFTIDView: ExpandableRow {
 	}
 }
 
-// MARK: NFTIDView.Constants
+// MARK: - NFTIDView.Constants
 extension NFTIDView {
 	fileprivate enum Constants {
 		static let radius: CGFloat = .small1
