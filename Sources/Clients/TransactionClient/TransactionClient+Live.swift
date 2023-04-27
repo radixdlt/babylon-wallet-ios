@@ -31,22 +31,12 @@ extension TransactionClient {
 				networkID: request.networkID
 			)
 
-			// For faucet usage this will be empty, for non-faucet this will never be empty, since
-			// faucet locks fee against... faucet, but all actual transaction must contain a fee
-			// locked against an account
 			let addressesNeededToSign = try OrderedSet(
 				engineToolkitClient
 					.accountAddressesNeedingToSignTransaction(
 						accountAddressesNeedingToSignTransactionRequest
 					)
 			)
-
-			if addressesNeededToSign.isEmpty {
-				guard request.isFaucetTransaction else {
-					assertionFailure("Should always finc accounts involved in TX for non faucet tx.")
-					throw TransactionFailure.failedToPrepareForTXSigning(.failedToLoadNotaryAndSigners)
-				}
-			}
 
 			let accounts = try await OrderedSet(addressesNeededToSign.asyncMap {
 				try await accountsClient.getAccountByAddress($0)
