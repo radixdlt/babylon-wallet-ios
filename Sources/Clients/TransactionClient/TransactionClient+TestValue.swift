@@ -8,7 +8,8 @@ extension TransactionClient: TestDependencyKey {
 		lockFeeWithSelectedPayer: unimplemented("\(Self.self).lockFeeWithSelectedPayer"),
 		addGuaranteesToManifest: unimplemented("\(Self.self).addGuaranteesToManifest"),
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview"),
-		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent")
+		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent"),
+		notarizeTransaction: unimplemented("\(Self.self).notarizeTransaction")
 	)
 }
 #endif // DEBUG

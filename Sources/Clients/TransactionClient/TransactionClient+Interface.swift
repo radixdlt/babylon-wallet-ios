@@ -10,6 +10,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 	public var addGuaranteesToManifest: AddGuaranteesToManifest
 	public var getTransactionReview: GetTransactionReview
 	public var buildTransactionIntent: BuildTransactionIntent
+	public var notarizeTransaction: NotarizeTransaction
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
@@ -25,17 +26,24 @@ extension TransactionClient {
 
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
-	public let intentSignatures: Set<Engine.Signature>
+	public let intentSignatures: Set<Engine.SignatureWithPublicKey>
 	public let compileTransactionIntent: CompileTransactionIntentResponse
-	public let txID: TXID
 	public let notary: SLIP10.PrivateKey
+	public init(
+		intentSignatures: Set<Engine.SignatureWithPublicKey>,
+		compileTransactionIntent: CompileTransactionIntentResponse,
+		notary: SLIP10.PrivateKey
+	) {
+		self.intentSignatures = intentSignatures
+		self.compileTransactionIntent = compileTransactionIntent
+		self.notary = notary
+	}
 }
 
 // MARK: - NotarizeTransactionResponse
 public struct NotarizeTransactionResponse: Sendable, Hashable {
 	public let notarized: CompileNotarizedTransactionIntentResponse
 	public let txID: TXID
-	public let notary: SLIP10.PrivateKey
 }
 
 // MARK: - BuildTransactionIntentRequest

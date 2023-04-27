@@ -207,8 +207,41 @@ extension TransactionClient {
 			return .init(intent: intent, notaryAndSigners: notaryAndSigners, signerPublicKeys: accountsToSignPublicKeys)
 		}
 
-		let notarizeTransaction: NotarizeTransaction = { _ in
-			fatalError()
+		let notarizeTransaction: NotarizeTransaction = { request in
+
+			let intent = try engineToolkitClient.decompileTransactionIntentRequest(DecompileTransactionIntentRequest(compiledIntent: request.compileTransactionIntent.compiledIntent, instructionsOutputKind: .parsed))
+
+			let signedTransactionIntent = SignedTransactionIntent(
+				intent: intent,
+				intentSignatures: Array(request.intentSignatures)
+			)
+			let txID = try engineToolkitClient.generateTXID(intent)
+			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
+
+			let notarySignature = try request.notary.sign(hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent))
+
+			let uncompiledNotarized = NotarizedTransaction(
+				signedIntent: signedTransactionIntent,
+				notarySignature: notarySignature
+			)
+			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
+
+			func debugPrintTX() {
+				// RET prints when convertManifest is called, when it is removed, this can be moved down
+				// inline inside `print`.
+				let txIntentString = transactionIntent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
+				print("TXID: \(txID.rawValue)")
+				print("TransactionIntent: \(txIntentString)")
+				print("intentSignatures: \(signedTransactionIntent.intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
+				print("NotarySignature: \(notarySignatureRaw.hex)")
+				print("Compiled Transaction Intent:\n\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
+				print("Compiled Notarized Intent:\n\n\(compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
+				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
+			}
+
+			//            debugPrintTX()
+			return .init(notarized: compiledNotarizedTXIntent, txID: request.txID)
 		}
 
 		// TODO: Should the request manifest have lockFee?
@@ -284,7 +317,8 @@ extension TransactionClient {
 			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
 			addGuaranteesToManifest: addGuaranteesToManifest,
 			getTransactionReview: getTransactionPreview,
-			buildTransactionIntent: buildTransactionIntent
+			buildTransactionIntent: buildTransactionIntent,
+			notarizeTransaction: notarizeTransaction
 		)
 	}
 }

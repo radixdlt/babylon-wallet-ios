@@ -52,6 +52,7 @@ extension FaucetClient: DependencyKey {
 			@Dependency(\.transactionClient) var transactionClient
 			@Dependency(\.secureStorageClient) var secureStorageClient
 			@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			@Dependency(\.factorSourcesClient) var factorSourcesClient
 			@Dependency(\.submitTXClient) var submitTXClient
 
@@ -70,45 +71,12 @@ extension FaucetClient: DependencyKey {
 			)
 
 			let transactionIntent = builtTransactionIntentWithSigners.intent
-			let compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
-			let txID = try engineToolkitClient.generateTXID(transactionIntent)
+			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 
-			let notaryAndSigners = builtTransactionIntentWithSigners.notaryAndSigners
+			let notarized = try await transactionClient.notarizeTransaction(.init(intentSignatures: [], compileTransactionIntent: compiledIntent, notary: .curve25519(ephemeralNotary)))
 
-			let signedTransactionIntent = SignedTransactionIntent(
-				intent: transactionIntent,
-				intentSignatures: []
-			)
-
-			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
-
-			let hashToSign = try blake2b(data: compiledSignedIntent.compiledIntent)
-			let notarySignatureRaw = try ephemeralNotary.signature(for: hashToSign)
-			let notarySignature = Engine.Signature.eddsaEd25519(.init(bytes: Array(notarySignatureRaw)))
-
-			let uncompiledNotarized = NotarizedTransaction(
-				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature
-			)
-			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
-
-			func debugPrintTX() {
-				// RET prints when convertManifest is called, when it is removed, this can be moved down
-				// inline inside `print`.
-				let txIntentString = transactionIntent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
-				print("TXID: \(txID.rawValue)")
-				print("TransactionIntent: \(txIntentString)")
-				print("intentSignatures: \(signedTransactionIntent.intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
-				print("NotarySignature: \(notarySignatureRaw.hex)")
-				print("Compiled Transaction Intent:\n\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
-				print("Compiled Notarized Intent:\n\n\(compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
-				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
-			}
-
-//			debugPrintTX()
-
-			_ = try await submitTXClient.submitTransaction(.init(txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
+			let txID = notarized.txID
+			_ = try await submitTXClient.submitTransaction(.init(txID: txID, compiledNotarizedTXIntent: notarized.notarized))
 
 			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}

@@ -12,6 +12,7 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var compileTransactionIntent: CompileTransactionIntent
 	public var compileSignedTransactionIntent: CompileSignedTransactionIntent
 	public var compileNotarizedTransactionIntent: CompileNotarizedTransactionIntent
+	public var decompileTransactionIntentRequest: DecompileTransactionIntentRequest
 
 	public var deriveOlympiaAdressFromPublicKey: DeriveOlympiaAdressFromPublicKey
 
@@ -68,6 +69,8 @@ extension EngineToolkitClient {
 	public typealias GenerateTransactionReview = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
 
 	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
+
+	public typealias DecompileTransactionIntentRequest = @Sendable (DecompileTransactionIntentRequest) throws -> DecompileTransactionIntentResponse
 }
 
 // MARK: - AccountAddressesInvolvedInTransactionRequest
