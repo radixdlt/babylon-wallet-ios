@@ -198,7 +198,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						OneTimePersonaData()
 					}
 					.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
-						TransactionReview()._printChanges()
+						TransactionReview()
 					}
 			}
 		}

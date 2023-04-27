@@ -11,6 +11,7 @@ extension SelectFeePayer.State {
 extension SelectFeePayer {
 	public struct ViewState: Equatable {
 		let candidates: IdentifiedArrayOf<FeePayerCandiate>
+		var candidatesArray: [FeePayerCandiate]? { .init(candidates) }
 		let selectedPayerID: FeePayerCandiate.ID?
 		let fee: BigDecimal
 		var selectedPayer: FeePayerCandiate? {
@@ -37,17 +38,26 @@ extension SelectFeePayer {
 						Spacer()
 						Text("Select account to pay \(viewStore.fee.format()) tx fee.")
 
-						Picker(
-							"Fee payer",
-							selection: viewStore.binding(
-								get: \.selectedPayerID,
-								send: { .selectedPayer(id: $0) }
-							)
-						) {
-							ForEach(viewStore.candidates, id: \.self) { candidate in
-								Text("\(candidate.account.address.address.formatted(AddressFormat.default))")
-									.tag(candidate.id)
+						ScrollView {
+							VStack(spacing: .small1) {
+								Selection(
+									viewStore.binding(
+										get: \.candidatesArray,
+										send: { .selectedPayer(id: $0?.first?.id) }
+									),
+									from: viewStore.candidates,
+									requiring: .exactly(1)
+								) { item in
+									SelectAccountToPayForFeeRow.View(
+										viewState: .init(candidate: item.value),
+										isSelected: item.isSelected,
+										action: item.action
+									)
+								}
 							}
+
+							.padding(.horizontal, .medium1)
+							.padding(.bottom, .medium2)
 						}
 					}
 					.padding(.horizontal, .small1)
@@ -63,6 +73,60 @@ extension SelectFeePayer {
 					}
 				}
 			}
+		}
+	}
+}
+
+// MARK: - SelectAccountToPayForFeeRow
+enum SelectAccountToPayForFeeRow {
+	struct ViewState: Equatable {
+		let appearanceID: Profile.Network.Account.AppearanceID
+		let accountName: String
+		let accountAddress: AddressView.ViewState
+		let xrdBalance: BigDecimal
+
+		init(candidate: FeePayerCandiate) {
+			appearanceID = candidate.account.appearanceID
+			accountName = candidate.account.displayName.rawValue
+			accountAddress = AddressView.ViewState(address: candidate.account.address.address, format: .default)
+			xrdBalance = candidate.xrdBalance
+		}
+	}
+
+	@MainActor
+	struct View: SwiftUI.View {
+		let viewState: ViewState
+		let isSelected: Bool
+		let action: () -> Void
+
+		var body: some SwiftUI.View {
+			Button(action: action) {
+				HStack {
+					VStack(alignment: .leading, spacing: .medium3) {
+						Text(viewState.accountName)
+							.foregroundColor(.app.white)
+							.textStyle(.body1Header)
+
+						AddressView(viewState.accountAddress, copyAddressAction: .none)
+							.foregroundColor(.app.white.opacity(0.8))
+							.textStyle(.body2HighImportance)
+					}
+
+					Spacer()
+
+					RadioButton(
+						appearance: .light,
+						state: isSelected ? .selected : .unselected
+					)
+				}
+				.padding(.medium1)
+				.background(
+					viewState.appearanceID.gradient
+						.brightness(isSelected ? -0.1 : 0)
+				)
+				.cornerRadius(.small1)
+			}
+			.buttonStyle(.inert)
 		}
 	}
 }

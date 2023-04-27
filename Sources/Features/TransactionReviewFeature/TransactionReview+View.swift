@@ -61,6 +61,7 @@ extension TransactionReview {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				coreView(with: viewStore)
+					.controlState(viewStore.viewControlState)
 					.background(.app.gray5)
 					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
 					.navigationTitle(L10n.TransactionReview.title)
@@ -77,7 +78,6 @@ extension TransactionReview {
 					.selectFeePayer(with: store, viewStore)
 					.signing(with: store, viewStore)
 					.submitting(with: store, viewStore)
-					.controlState(viewStore.viewControlState)
 					.onAppear {
 						viewStore.send(.appeared)
 					}
