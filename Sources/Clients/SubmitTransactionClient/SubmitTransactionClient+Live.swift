@@ -26,7 +26,14 @@ extension SubmitTransactionClient: DependencyKey {
 				while !statusSubject.value.result.isComplete {
 					await pollCountHolder.withValue { pollCount in
 						if pollCount >= pollStrategy.maxPollTries {
-							statusSubject.send(.init(txID: txID, result: .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))))
+							statusSubject.send(.init(
+								txID: txID,
+								result: .failure(.failedToGetTransactionStatus(
+									txID: txID,
+									error: .init(pollAttempts: pollCount)
+								))
+							)
+							)
 						} else {
 							pollCount += 1
 						}
