@@ -228,7 +228,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selected))))):
 			state.feePayerSelectionAmongstCandidates = selected
 			state.destination = nil
-			loggerGlobal.critical("🔮 locking fee with: \(selected.selected.account.address)")
 			return .run { [transactionManifest = state.transactionManifest] send in
 
 				await send(.internal(.addedTransactionFeeToSelectedPayerResult(

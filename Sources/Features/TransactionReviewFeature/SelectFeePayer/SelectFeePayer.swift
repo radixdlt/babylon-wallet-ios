@@ -34,11 +34,9 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .selectedPayer(payerID):
 			state.selectedPayerID = payerID
-			loggerGlobal.critical("🔮 selected fee payer id: \(payerID)")
 			return .none
 
 		case let .confirmedFeePayer(payer):
-			loggerGlobal.critical("🔮 confirmed fee payer: \(payer.account.address)")
 
 			let selected = FeePayerSelectionAmongstCandidates(
 				selected: payer,

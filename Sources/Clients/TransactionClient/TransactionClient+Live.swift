@@ -67,7 +67,7 @@ extension TransactionClient {
 			}
 			var instructions = manifestWithJSONInstructions.instructions
 
-			loggerGlobal.critical("🔮 adding lock_fee: \(addressOfPayer.address)")
+			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
 			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
 				address: ComponentAddress(address: addressOfPayer.address),
 				fee: feeToAdd.description
