@@ -96,13 +96,6 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 						networkID: state.networkID,
 						manifest: state.manifest,
 						ephemeralNotaryPublicKey: state.ephemeralNotaryPublicKey
-//						selectNotary: { involvedAccounts in
-//							if let ephemeralNotaryPublicKey = state.ephemeralNotaryPublicKey {
-//								return .init(notary: .ephemeralPublicKey(.eddsaEd25519(ephemeralNotaryPublicKey)), notaryAsSignatory: false)
-//							} else {
-//								return .init(notary: .account(involvedAccounts.first))
-//							}
-//						}
 					))
 				}
 			)))

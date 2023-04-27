@@ -21,7 +21,9 @@ extension SubmitTransactionClient: DependencyKey {
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
 				return txStatusResponse.status
 			}
+
 			let pollCountHolder = ActorIsolated<Int>(0)
+
 			Task {
 				while !statusSubject.value.result.isComplete {
 					await pollCountHolder.withValue { pollCount in
@@ -32,8 +34,8 @@ extension SubmitTransactionClient: DependencyKey {
 									txID: txID,
 									error: .init(pollAttempts: pollCount)
 								))
-							)
-							)
+							))
+
 						} else {
 							pollCount += 1
 						}
