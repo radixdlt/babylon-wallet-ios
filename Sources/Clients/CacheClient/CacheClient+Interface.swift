@@ -121,11 +121,13 @@ extension CacheClient {
 
 extension CacheClient {
 	@Sendable
-	public func clearCacheForAccounts(_ accounts: Set<AccountAddress>) {
+	public func clearCacheForAccounts(
+		_ accounts: Set<AccountAddress> = .init()
+	) {
 		if !accounts.isEmpty {
-			accounts.forEach { self.removeFile(.accountPortfolio(.single($0.address))) }
+			accounts.forEach { removeFile(.accountPortfolio(.single($0.address))) }
 		} else {
-			self.removeFolder(.accountPortfolio(.all))
+			removeFolder(.accountPortfolio(.all))
 		}
 	}
 }
