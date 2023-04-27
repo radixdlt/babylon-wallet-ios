@@ -78,10 +78,8 @@ extension FactorSourcesClient: DependencyKey {
 				@Dependency(\.accountsClient) var accountsClient
 
 				let allFactorSources = try await getFactorSources()
-//				var factorsOfSigners: Set<FactorsOfSigner> = []
-//				var factorSources: IdentifiedArrayOf<FactorSource> = []
 
-				final class SigningFactorRef: Sendable {
+				final class SigningFactorRef {
 					let factorSource: FactorSource
 					var signers: [Profile.Network.Account.ID: SignerRef] = [:]
 					init(factorSource: FactorSource, signers: [Profile.Network.Account.ID: SignerRef] = [:]) {
@@ -89,7 +87,7 @@ extension FactorSourcesClient: DependencyKey {
 						self.signers = signers
 					}
 
-					final class SignerRef: Sendable {
+					final class SignerRef {
 						let account: Profile.Network.Account
 						var factorInstancesRequiredToSign: Set<FactorInstance>
 						init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance> = .init()) {
@@ -112,13 +110,6 @@ extension FactorSourcesClient: DependencyKey {
 
 				var signingFactors: [FactorSourceID: SigningFactorRef] = [:]
 
-//				let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-//				let accounts: [Profile.Network.Account] = accountAddresses.compactMap { address in
-//					guard let account = allAccounts.first(where: { $0.address == address }) else {
-//						return nil
-//					}
-//					return account
-//				}
 				for account in accounts {
 					switch account.securityState {
 					case let .unsecured(unsecuredEntityControl):

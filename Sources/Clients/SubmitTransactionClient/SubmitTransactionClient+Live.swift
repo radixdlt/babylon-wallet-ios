@@ -2,37 +2,6 @@ import ClientPrelude
 import EngineToolkitModels
 import GatewayAPI
 
-// MARK: - TXFailureStatus
-// case failedToSubmit(SubmitTXFailure)
-// case failedToPoll(TransactionPollingFailure)
-
-public enum TXFailureStatus: String, LocalizedError, Sendable, Hashable {
-	case rejected
-	case failed
-	public var errorDescription: String? {
-		switch self {
-		case .rejected: return "Rejected"
-		case .failed: return "Failed"
-		}
-	}
-}
-
-// MARK: - FailedToPollError
-public struct FailedToPollError: Sendable, LocalizedError, Equatable {
-	public let error: Swift.Error
-	public var errorDescription: String? {
-		"Poll failed: \(String(describing: error))"
-	}
-}
-
-// MARK: - FailedToGetTransactionStatus
-public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable {
-	public let pollAttempts: Int
-	public var errorDescription: String? {
-		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
-	}
-}
-
 // MARK: - SubmitTransactionClient + DependencyKey
 extension SubmitTransactionClient: DependencyKey {
 	public typealias Value = SubmitTransactionClient
@@ -103,7 +72,7 @@ extension SubmitTransactionClient: DependencyKey {
 				let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
 
 				guard !response.duplicate else {
-					fatalError()
+					throw SubmitTXFailure.invalidTXWasDuplicate(txID: txID)
 				}
 				return txID
 			},
@@ -159,5 +128,33 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 		case let .invalidTXWasDuplicate(txID):
 			return "Duplicate TX id: \(txID)"
 		}
+	}
+}
+
+// MARK: - TXFailureStatus
+public enum TXFailureStatus: String, LocalizedError, Sendable, Hashable {
+	case rejected
+	case failed
+	public var errorDescription: String? {
+		switch self {
+		case .rejected: return "Rejected"
+		case .failed: return "Failed"
+		}
+	}
+}
+
+// MARK: - FailedToPollError
+public struct FailedToPollError: Sendable, LocalizedError, Equatable {
+	public let error: Swift.Error
+	public var errorDescription: String? {
+		"Poll failed: \(String(describing: error))"
+	}
+}
+
+// MARK: - FailedToGetTransactionStatus
+public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable {
+	public let pollAttempts: Int
+	public var errorDescription: String? {
+		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
 	}
 }
