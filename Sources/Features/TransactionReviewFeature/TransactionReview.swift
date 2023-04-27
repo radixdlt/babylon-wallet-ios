@@ -95,12 +95,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case selectFeePayer(SelectFeePayer.State)
 			case signing(Signing.State)
+			case submitting(SubmitTransaction.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case selectFeePayer(SelectFeePayer.Action)
 			case signing(Signing.Action)
+			case submitting(SubmitTransaction.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -111,7 +113,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				SelectFeePayer()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
-				Signing()._printChanges()
+				Signing()
+			}
+			Scope(state: /State.submitting, action: /Action.submitting) {
+				SubmitTransaction()
 			}
 		}
 	}

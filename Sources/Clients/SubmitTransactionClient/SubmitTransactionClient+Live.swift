@@ -100,17 +100,12 @@ extension SubmitTransactionClient: DependencyKey {
 					notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex
 				)
 
-				let response: GatewayAPI.TransactionSubmitResponse
-				do {
-					response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
-				} catch {
-					fatalError()
-				}
+				let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
 
 				guard !response.duplicate else {
 					fatalError()
 				}
-				return .success(txID)
+				return txID
 			},
 			transactionStatusUpdates: transactionStatusUpdates,
 			hasTXBeenCommittedSuccessfully: hasTXBeenCommittedSuccessfully

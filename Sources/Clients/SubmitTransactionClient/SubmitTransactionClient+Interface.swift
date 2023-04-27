@@ -35,10 +35,8 @@ public struct SubmitTransactionClient: Sendable {
 	public var hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully
 }
 
-public typealias SubmitTransactionResult = Swift.Result<TXID, SubmitTransactionFailure>
-
 extension SubmitTransactionClient {
-	public typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> SubmitTransactionResult
+	public typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> TXID
 	public typealias TransactionStatusUpdates = @Sendable (TXID, PollStrategy) async throws -> AnyAsyncSequence<TransactionStatusUpdate>
 	public typealias HasTXBeenCommittedSuccessfully = @Sendable (TXID) async throws -> Void
 }
