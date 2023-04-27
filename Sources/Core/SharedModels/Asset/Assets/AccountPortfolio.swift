@@ -101,7 +101,7 @@ extension AccountPortfolio {
 				self.name = name
 				self.description = description
 				self.keyImageURL = keyImageURL
-				self.metadata = metadata
+				self.metadata = metadata + [.init(key: "Type", value: "Devin Booker - Dunk")]
 			}
 		}
 	}
@@ -110,5 +110,10 @@ extension AccountPortfolio {
 		public var id: String { key }
 		public let key: String
 		public let value: String
+
+		public init(key: String, value: String) {
+			self.key = key
+			self.value = value
+		}
 	}
 }

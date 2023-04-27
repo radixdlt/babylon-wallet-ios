@@ -28,13 +28,13 @@ public struct DappThumbnail: View {
 	@MainActor
 	private var image: some View {
 		switch content {
-		case let .known(url?):
-			LazyImage(url: url) { _ in
-				placeholder.border(.red)
+		case let .known(url):
+			LoadableImage(url: url, size: .fixed(size)) {
+				placeholder
 			}
-		case .known(nil), .unknown:
+		case .unknown:
 			// TODO: Show different icon if known
-			placeholder.border(.yellow)
+			placeholder
 		}
 	}
 
@@ -74,7 +74,7 @@ public struct TokenThumbnail: View {
 			Image(asset: AssetResource.xrd)
 				.resizable()
 		case let .known(url):
-			LoadableImage(url: url, mode: .aspectFill) {
+			LoadableImage(url: url, size: .fixed(size), mode: .aspectFill) {
 				placeholder
 			}
 		case .unknown:
@@ -100,7 +100,7 @@ public struct NFTThumbnail: View {
 	}
 
 	public var body: some View {
-		LoadableImage(url: url) {
+		LoadableImage(url: url, size: .fixed(size)) {
 			Image(asset: AssetResource.nft)
 				.resizable()
 		}
@@ -120,7 +120,7 @@ public struct PersonaThumbnail: View {
 	}
 
 	public var body: some View {
-		LoadableImage(url: content) {
+		LoadableImage(url: content, size: .fixed(size)) {
 			Image(asset: AssetResource.persona)
 				.resizable()
 		}
@@ -133,11 +133,13 @@ public struct PersonaThumbnail: View {
 /// A helper view that handles the loading state, and potentially the error state
 public struct LoadableImage<Placeholder: View>: View {
 	let url: URL?
+	let size: LoadableImageSize
 	let mode: ImageResizingMode
 	let placeholder: Placeholder
 
-	public init(url: URL?, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
+	public init(url: URL?, size: LoadableImageSize, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
 		self.url = url
+		self.size = size
 		self.mode = mode
 		self.placeholder = placeholder()
 	}
@@ -146,21 +148,28 @@ public struct LoadableImage<Placeholder: View>: View {
 		if let url {
 			LazyImage(url: url) { state in
 				if let image = state.image {
-					if let size = state.imageContainer?.image.size {
-						let _ = print("SIZE: \(size)")
-					}
+//					if flexHeight, let size = state.imageContainer?.image.size {
+//						image.resizingMode(mode)
+//							.aspectRatio(size.height / size.width, contentMode: .fill)
+//					} else {
 					image.resizingMode(mode)
-				} else if state.isLoading {
-					Color.yellow
-				} else if let error = state.error {
-					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
-					Color.red
+//					}
 				} else {
+					if let error = state.error {
+						let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
+					}
 					placeholder
+						.shimmer(active: state.isLoading, config: .accountResourcesLoading)
 				}
 			}
 		} else {
 			placeholder
 		}
 	}
+}
+
+// MARK: - LoadableImageSize
+public enum LoadableImageSize {
+	case fixed(HitTargetSize)
+	case flexibleHeight
 }

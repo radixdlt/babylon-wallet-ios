@@ -27,6 +27,8 @@ public enum L10n {
     public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "P2PLinks.sendTestMessageButtonTitle", fallback: "Send Test Msg")
   }
   public enum AccountDetails {
+    /// ID
+    public static let id = L10n.tr("Localizable", "accountDetails.ID", fallback: "ID")
     /// Transfer
     public static let transferButtonTitle = L10n.tr("Localizable", "accountDetails.transferButtonTitle", fallback: "Transfer")
   }

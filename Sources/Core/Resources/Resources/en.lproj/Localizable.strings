@@ -1,6 +1,7 @@
 "factorSource.device.iPhoneModelFallback" = "Unknown iPhone";
 
 "accountDetails.transferButtonTitle" = "Transfer";
+"accountDetails.ID" = "ID";
 
 "accountList.row.copyTitle" = "Copy";
 
