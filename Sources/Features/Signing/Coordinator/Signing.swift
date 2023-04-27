@@ -44,7 +44,7 @@ public struct Signing: Sendable, FeatureReducer {
 		public var factorsLeftToSignWith: OrderedSet<SigningFactor> = []
 		public var expectedSignatureCount = -1
 		public var signatures: OrderedSet<Signature> = []
-		private let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 
 		public init(
 			networkID: NetworkID,
@@ -116,7 +116,7 @@ public struct Signing: Sendable, FeatureReducer {
 				assertionFailure("Expected compiledIntent")
 				return .none
 			}
-			let notaryKey: SLIP10.PrivateKey = .curve25519(.init())
+			let notaryKey: SLIP10.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
 
 			return .run { [signatures = state.signatures] send in
 				await send(.internal(.notarizeResult(TaskResult {

@@ -95,6 +95,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 		case let .statusUpdate(update):
 			let status = update.stateStatus
+			loggerGlobal.notice("Got TX status update: \(String(describing: status))")
 			state.status = status
 			if status.isCompletedSuccessfully {
 				return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
