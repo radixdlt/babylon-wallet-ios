@@ -59,19 +59,26 @@ extension FaucetClient: DependencyKey {
 				.init(
 					networkID: networkID,
 					manifest: manifest,
-					selectNotary: { _ in
-						.init(notary: .ephemeralPublicKey(.eddsaEd25519(ephemeralNotary.publicKey)), notaryAsSignatory: true)
-					}
+					isFaucetTransaction: true,
+					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
 				)
 			)
 
 			let transactionIntent = builtTransactionIntentWithSigners.intent
 			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 
-			let notarized = try await transactionClient.notarizeTransaction(.init(intentSignatures: [], compileTransactionIntent: compiledIntent, notary: .curve25519(ephemeralNotary)))
+			let notarized = try await transactionClient.notarizeTransaction(.init(
+				intentSignatures: [],
+				compileTransactionIntent: compiledIntent,
+				notary: .curve25519(ephemeralNotary)
+			)
+			)
 
 			let txID = notarized.txID
-			_ = try await submitTXClient.submitTransaction(.init(txID: txID, compiledNotarizedTXIntent: notarized.notarized))
+			_ = try await submitTXClient.submitTransaction(.init(
+				txID: txID,
+				compiledNotarizedTXIntent: notarized.notarized
+			))
 
 			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}

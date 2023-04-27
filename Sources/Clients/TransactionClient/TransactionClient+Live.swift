@@ -24,6 +24,49 @@ extension TransactionClient {
 		@Dependency(\.cacheClient) var cacheClient
 
 		@Sendable
+		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
+			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
+				version: engineToolkitClient.getTransactionVersion(),
+				manifest: request.manifest,
+				networkID: request.networkID
+			)
+
+			// For faucet usage this will be empty, for non-faucet this will never be empty, since
+			// faucet locks fee against... faucet, but all actual transaction must contain a fee
+			// locked against an account
+			let addressesNeededToSign = try OrderedSet(
+				engineToolkitClient
+					.accountAddressesNeedingToSignTransaction(
+						accountAddressesNeedingToSignTransactionRequest
+					)
+			)
+
+			if addressesNeededToSign.isEmpty {
+				guard request.isFaucetTransaction else {
+					assertionFailure("Should always finc accounts involved in TX for non faucet tx.")
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToLoadNotaryAndSigners)
+				}
+			}
+
+			let accounts = try await OrderedSet(addressesNeededToSign.asyncMap {
+				try await accountsClient.getAccountByAddress($0)
+			})
+
+			let intentSigning: TransactionSigners.IntentSigning = {
+				if let nonEmpty = NonEmpty(rawValue: accounts) {
+					return .intentSigners(nonEmpty)
+				} else {
+					return .notaryAsSignatory
+				}
+			}()
+
+			return .init(
+				notaryPublicKey: request.ephemeralNotaryPublicKey,
+				intentSigning: intentSigning
+			)
+		}
+
+		@Sendable
 		func accountsWithEnoughFunds(
 			from addresses: [AccountAddress],
 			toPay fee: BigDecimal
@@ -148,79 +191,30 @@ extension TransactionClient {
 		}
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in
-			let nonce = engineToolkitClient.generateTXNonce()
 			let epoch = try await gatewayAPIClient.getEpoch()
-			let version = engineToolkitClient.getTransactionVersion()
-			let networkID = request.networkID
-			let manifest = request.manifest
+			let transactionSigners = try await getTransactionSigners(request)
 
-			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
-				version: version,
-				manifest: manifest,
-				networkID: networkID
-			)
-
-			// Should in fact never be empty, since we should already have added the fee payer, so
-			// at least she needs to sign!
-			guard let addressesNeededToSign = try NonEmpty(rawValue: OrderedSet(
-				engineToolkitClient
-					.accountAddressesNeedingToSignTransaction(
-						accountAddressesNeedingToSignTransactionRequest
-					)
-			)) else {
-				assertionFailure("addressesNeededToSign was empty, but it shoud never be empty, since we should have added the fee payer already.")
-				throw TransactionFailure.failedToPrepareForTXSigning(.failedToLoadNotaryAndSigners)
-			}
-
-			let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>> = try await {
-				let accounts = try await addressesNeededToSign.asyncMap {
-					try await accountsClient.getAccountByAddress($0)
-				}
-				guard let accountsNonEmpty = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
-					assertionFailure("Should never fail to read accounts")
-					throw TransactionFailure.failedToPrepareForTXSigning(.failedToLoadNotaryAndSigners)
-				}
-				return accountsNonEmpty
-			}()
-
-			let notary = await request.selectNotary(accountsNeededToSign)
-
-			let notaryAndSigners = NotaryAndSigners(
-				notary: notary,
-				accountsNeededToSign: accountsNeededToSign
-			)
-
-			let notaryPublicKey = try notaryAndSigners.notary.notaryPublicKey.intoEngine()
-
-			var accountsToSignPublicKeys: [Engine.PublicKey] = []
-			for account in notaryAndSigners.accountsNeededToSign {
-				switch account.securityState {
-				case let .unsecured(unsecuredControl):
-					let key = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
-					accountsToSignPublicKeys.append(key)
-				}
-			}
-
-			let makeTransactionHeaderInput = request.makeTransactionHeaderInput
-
-			let header = TransactionHeader(
-				version: version,
-				networkId: networkID,
+			let header = try TransactionHeader(
+				version: engineToolkitClient.getTransactionVersion(),
+				networkId: request.networkID,
 				startEpochInclusive: epoch,
-				endEpochExclusive: epoch + makeTransactionHeaderInput.epochWindow,
-				nonce: nonce,
-				publicKey: notaryPublicKey,
-				notaryAsSignatory: notaryAndSigners.notary.notaryAsSignatory,
-				costUnitLimit: makeTransactionHeaderInput.costUnitLimit,
-				tipPercentage: makeTransactionHeaderInput.tipPercentage
+				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
+				nonce: engineToolkitClient.generateTXNonce(),
+				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
+				notaryAsSignatory: transactionSigners.notaryAsSignatory, // notaryAndSigners.notary.notaryAsSignatory,
+				costUnitLimit: request.makeTransactionHeaderInput.costUnitLimit,
+				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
 			let intent = TransactionIntent(
 				header: header,
-				manifest: manifest
+				manifest: request.manifest
 			)
 
-			return .init(intent: intent, notaryAndSigners: notaryAndSigners, signerPublicKeys: accountsToSignPublicKeys)
+			return .init(
+				intent: intent,
+				transactionSigners: transactionSigners
+			)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
@@ -260,7 +254,6 @@ extension TransactionClient {
 			return .init(notarized: compiledNotarizedTXIntent, txID: txID)
 		}
 
-		// TODO: Should the request manifest have lockFee?
 		let getTransactionPreview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
@@ -278,8 +271,10 @@ extension TransactionClient {
 				transactionReceipt: receiptBytes
 			)
 			let analyzedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
-			//                .asyncMap { (analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse) in
-			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(request.manifestToSign, request.feeToAdd)
+			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
+				request.manifestToSign,
+				request.feeToAdd
+			)
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				addFeeToManifestOutcome: addFeeToManifestOutcome,
@@ -296,13 +291,13 @@ extension TransactionClient {
 				networkID: gatewaysClient.getCurrentNetworkID(),
 				manifest: request.manifestToSign,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
-				selectNotary: request.selectNotary
+				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
-			return GatewayAPI.TransactionPreviewRequest(
+			return try .init(
 				rawManifest: request.manifestToSign,
 				header: intent.intent.header,
-				signerPublicKeys: intent.signerPublicKeys
+				transactionSigners: intent.transactionSigners
 			)
 		}
 
@@ -339,16 +334,22 @@ extension TransactionClient {
 	}
 }
 
-// MARK: - NotaryAndSigners
-public struct NotaryAndSigners: Sendable, Hashable {
-	/// Notary signer
-	public let notary: NotarySelection
-	/// Never empty, since this also contains the notary signer.
-	public let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>
+// MARK: - TransactionSigners
+public struct TransactionSigners: Sendable, Hashable {
+	public let notaryPublicKey: Curve25519.Signing.PublicKey
+	public let intentSigning: IntentSigning
 
-	public init(notary: NotarySelection, accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>) {
-		self.notary = notary
-		self.accountsNeededToSign = accountsNeededToSign
+	public enum IntentSigning: Sendable, Hashable {
+		case notaryAsSignatory
+		case intentSigners(NonEmpty<OrderedSet<Profile.Network.Account>>)
+	}
+
+	public init(
+		notaryPublicKey: Curve25519.Signing.PublicKey,
+		intentSigning: IntentSigning
+	) {
+		self.notaryPublicKey = notaryPublicKey
+		self.intentSigning = intentSigning
 	}
 }
 
@@ -356,8 +357,9 @@ extension GatewayAPI.TransactionPreviewRequest {
 	init(
 		rawManifest: TransactionManifest,
 		header: TransactionHeader,
-		signerPublicKeys: [Engine.PublicKey]
-	) {
+		//        signerPublicKeys: [Engine.PublicKey]
+		transactionSigners: TransactionSigners
+	) throws {
 		let manifestString = {
 			switch rawManifest.instructions {
 			case let .string(manifestString): return manifestString
@@ -372,19 +374,53 @@ extension GatewayAPI.TransactionPreviewRequest {
 			permitInvalidHeaderEpoch: false
 		)
 
+		struct NotaryAsSignatoryDiscrepancy: Swift.Error {}
+		guard transactionSigners.notaryAsSignatory == header.notaryAsSignatory else {
+			assertionFailure("discrepancy")
+			throw NotaryAsSignatoryDiscrepancy()
+		}
+		let notaryAsSignatory = transactionSigners.notaryAsSignatory
+
 		self.init(
 			manifest: manifestString,
 			blobsHex: rawManifest.blobs.map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
 			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
-			notaryAsSignatory: false,
+			notaryAsSignatory: notaryAsSignatory,
 			costUnitLimit: .init(header.costUnitLimit),
 			tipPercentage: .init(header.tipPercentage),
 			nonce: .init(header.nonce.rawValue),
-			signerPublicKeys: signerPublicKeys.map { GatewayAPI.PublicKey(from: $0) },
+			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
 			flags: flags
 		)
+	}
+}
+
+extension TransactionSigners {
+	public var notaryAsSignatory: Bool {
+		switch self.intentSigning {
+		case .intentSigners: return false
+		case .notaryAsSignatory: return true
+		}
+	}
+
+	public var signerPublicKeys: Set<SLIP10.PublicKey> {
+		switch intentSigning {
+		case let .intentSigners(accounts):
+			return Set(accounts.flatMap { account in
+				account.publicKeysOfRequiredSigningKeys()
+			})
+		case .notaryAsSignatory:
+			return []
+		}
+	}
+
+	public func intentSignerAccountsOrEmpty() -> OrderedSet<Profile.Network.Account> {
+		switch intentSigning {
+		case .notaryAsSignatory: return .init()
+		case let .intentSigners(accounts): return accounts.rawValue
+		}
 	}
 }
 
@@ -395,6 +431,26 @@ extension GatewayAPI.PublicKey {
 			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex))
 		case let .eddsaEd25519(key):
 			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex))
+		}
+	}
+}
+
+extension GatewayAPI.PublicKey {
+	init(from slip10: SLIP10.PublicKey) {
+		switch slip10 {
+		case let .eddsaEd25519(pubKey):
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
+		case let .ecdsaSecp256k1(pubKey):
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
+		}
+	}
+}
+
+extension Profile.Network.Account {
+	public func publicKeysOfRequiredSigningKeys() -> Set<SLIP10.PublicKey> {
+		switch securityState {
+		case let .unsecured(control):
+			return Set([control.genesisFactorInstance.publicKey])
 		}
 	}
 }

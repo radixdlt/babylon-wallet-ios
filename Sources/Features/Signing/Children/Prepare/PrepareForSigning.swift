@@ -11,12 +11,12 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 		public let networkID: NetworkID
 
 		public var compiledIntent: CompileTransactionIntentResponse? = nil
-		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey?
+		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 		public init(
 			manifest: TransactionManifest,
 			networkID: NetworkID,
 			feePayer: Profile.Network.Account,
-			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey?
+			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 		) {
 			self.manifest = manifest
 			self.networkID = networkID
@@ -63,7 +63,7 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 
 		case let .builtTransaction(.success(transactionIntentWithSigners)):
 			let accounts = NonEmpty(
-				rawValue: Set(transactionIntentWithSigners.notaryAndSigners.accountsNeededToSign + [state.feePayer])
+				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerAccountsOrEmpty()) + [state.feePayer])
 			)!
 			do {
 				state.compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
@@ -95,13 +95,14 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 					try await transactionClient.buildTransactionIntent(.init(
 						networkID: state.networkID,
 						manifest: state.manifest,
-						selectNotary: { involvedAccounts in
-							if let ephemeralNotaryPublicKey = state.ephemeralNotaryPublicKey {
-								return .init(notary: .ephemeralPublicKey(.eddsaEd25519(ephemeralNotaryPublicKey)), notaryAsSignatory: false)
-							} else {
-								return .init(notary: .account(involvedAccounts.first))
-							}
-						}
+						ephemeralNotaryPublicKey: state.ephemeralNotaryPublicKey
+//						selectNotary: { involvedAccounts in
+//							if let ephemeralNotaryPublicKey = state.ephemeralNotaryPublicKey {
+//								return .init(notary: .ephemeralPublicKey(.eddsaEd25519(ephemeralNotaryPublicKey)), notaryAsSignatory: false)
+//							} else {
+//								return .init(notary: .account(involvedAccounts.first))
+//							}
+//						}
 					))
 				}
 			)))

@@ -55,30 +55,35 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public let networkID: NetworkID
 	public let manifest: TransactionManifest
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let selectNotary: SelectNotary
+	public let isFaucetTransaction: Bool
+	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
 	public init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
-		selectNotary: @escaping SelectNotary = { .init(notary: .account($0.first)) }
+		isFaucetTransaction: Bool = false,
+		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 	) {
 		self.networkID = networkID
 		self.manifest = manifest
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
-		self.selectNotary = selectNotary
+		self.isFaucetTransaction = isFaucetTransaction
+		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 	}
 }
 
 // MARK: - TransactionIntentWithSigners
 public struct TransactionIntentWithSigners: Sendable, Hashable {
 	public let intent: TransactionIntent
-	public let notaryAndSigners: NotaryAndSigners
-	public let signerPublicKeys: [Engine.PublicKey]
-	public init(intent: TransactionIntent, notaryAndSigners: NotaryAndSigners, signerPublicKeys: [Engine.PublicKey]) {
+	public let transactionSigners: TransactionSigners
+
+	public init(
+		intent: TransactionIntent,
+		transactionSigners: TransactionSigners
+	) {
 		self.intent = intent
-		self.notaryAndSigners = notaryAndSigners
-		self.signerPublicKeys = signerPublicKeys
+		self.transactionSigners = transactionSigners
 	}
 }
 
@@ -89,41 +94,6 @@ extension DependencyValues {
 	}
 }
 
-// MARK: - NotarySelection
-public struct NotarySelection: Sendable, Hashable {
-	public let notary: Notary
-	public let notaryAsSignatory: Bool
-
-	public enum Notary: Sendable, Hashable {
-		case ephemeralPublicKey(SLIP10.PublicKey)
-		case account(Profile.Network.Account)
-
-		public var notaryPublicKey: SLIP10.PublicKey {
-			switch self {
-			case let .ephemeralPublicKey(publicKey): return publicKey
-			case let .account(account):
-				switch account.securityState {
-				case let .unsecured(entityControl): return entityControl.genesisFactorInstance.publicKey
-				}
-			}
-		}
-	}
-
-	public var notaryPublicKey: SLIP10.PublicKey {
-		notary.notaryPublicKey
-	}
-
-	public init(
-		notary: Notary,
-		notaryAsSignatory: Bool = false
-	) {
-		self.notary = notary
-		self.notaryAsSignatory = notaryAsSignatory
-	}
-}
-
-public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<Profile.Network.Account>>) async -> NotarySelection
-
 // MARK: - TransactionClient.Guarantee
 extension TransactionClient {
 	public struct Guarantee: Sendable, Hashable {
@@ -131,7 +101,11 @@ extension TransactionClient {
 		public var instructionIndex: UInt32
 		public var resourceAddress: ResourceAddress
 
-		public init(amount: BigDecimal, instructionIndex: UInt32, resourceAddress: ResourceAddress) {
+		public init(
+			amount: BigDecimal,
+			instructionIndex: UInt32,
+			resourceAddress: ResourceAddress
+		) {
 			self.amount = amount
 			self.instructionIndex = instructionIndex
 			self.resourceAddress = resourceAddress
@@ -140,23 +114,22 @@ extension TransactionClient {
 }
 
 // MARK: - ManifestReviewRequest
-// Duplicated for now, very similar to SignManifestRequest
 public struct ManifestReviewRequest: Sendable {
 	public let manifestToSign: TransactionManifest
 	public let feeToAdd: BigDecimal
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let selectNotary: SelectNotary
+	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
 	public init(
 		manifestToSign: TransactionManifest,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		feeToAdd: BigDecimal,
-		selectNotary: @escaping SelectNotary = { .init(notary: .account($0.first)) }
+		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey = Curve25519.Signing.PrivateKey().publicKey
 	) {
 		self.manifestToSign = manifestToSign
 		self.feeToAdd = feeToAdd
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
-		self.selectNotary = selectNotary
+		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 	}
 }
 
