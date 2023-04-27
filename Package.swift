@@ -579,6 +579,18 @@ package.addModules([
 		],
 		tests: .no
 	),
+	.client(
+		name: "ImageServiceClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "ImageServiceClientLive",
+		dependencies: [
+			"ImageServiceClient",
+		],
+		tests: .no
+	),
 ])
 
 // MARK: - Core
@@ -607,6 +619,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			"ImageServiceClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
 			},

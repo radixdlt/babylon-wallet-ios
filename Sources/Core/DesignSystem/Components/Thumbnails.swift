@@ -1,3 +1,4 @@
+import ImageServiceClient
 import NukeUI
 import Prelude
 import Resources
@@ -138,7 +139,19 @@ public struct LoadableImage<Placeholder: View>: View {
 	let placeholder: Placeholder
 
 	public init(url: URL?, size: LoadableImageSize, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
-		self.url = url
+		if let url {
+			@Dependency(\.imageServiceClient) var imageServiceClient
+			switch size {
+			case let .fixed(hitTargetSize):
+				self.url = imageServiceClient.fixedSize(url, hitTargetSize.frame)
+				print(self.url)
+			case .flexibleHeight:
+				self.url = url
+			}
+		} else {
+			self.url = nil
+		}
+
 		self.size = size
 		self.mode = mode
 		self.placeholder = placeholder()
