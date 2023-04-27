@@ -70,7 +70,7 @@ extension EngineToolkitClient {
 
 	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
 
-	public typealias DecompileTransactionIntentRequest = @Sendable (DecompileTransactionIntentRequest) throws -> DecompileTransactionIntentResponse
+	public typealias DecompileTransactionIntentRequest = @Sendable (EngineToolkitModels.DecompileTransactionIntentRequest) throws -> DecompileTransactionIntentResponse
 }
 
 // MARK: - AccountAddressesInvolvedInTransactionRequest

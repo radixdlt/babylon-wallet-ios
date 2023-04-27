@@ -97,8 +97,8 @@ public struct Signing: Sendable, FeatureReducer {
 
 			return .run { [signatures = state.signatures] send in
 				await send(.internal(.notarizeResult(TaskResult {
-					let intentSignatures: try Set<Engine.SignatureWithPublicKey> = Set(signatures.map {
-						$0.signatureWithPublicKey.intoEngine()
+					let intentSignatures: Set<Engine.SignatureWithPublicKey> = try Set(signatures.map {
+						try $0.signatureWithPublicKey.intoEngine()
 					})
 					return try await transactionClient.notarizeTransaction(.init(
 						intentSignatures: intentSignatures,

@@ -82,11 +82,11 @@ extension UseFactorSourceClient {
 		else {
 			throw FailedToDeviceFactorSourceForSigning()
 		}
-		let hdRoot = try privateHDFactorSource.mnemonicWithPassphrase.hdRoot()
+		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 
 		var signatures = Set<AccountSignature>()
 
-		loggerGlobal.debug("🔏 Signing data with device factor source label=\(privateHDFactorSource.hdOnDeviceFactorSource.label), description=\(privateHDFactorSource.hdOnDeviceFactorSource.description)")
+		loggerGlobal.debug("🔏 Signing data with device factor source label=\(deviceFactorSource.label), description=\(deviceFactorSource.description)")
 
 		for account in accounts {
 			switch account.securityState {
@@ -96,6 +96,7 @@ extension UseFactorSourceClient {
 					let errMsg = "Expected derivation path on unsecured factorInstance"
 					loggerGlobal.critical(.init(stringLiteral: errMsg))
 					assertionFailure(errMsg)
+					throw FactorInstanceDoesNotHaveADerivationPathUnableToSign()
 				}
 
 				if factorInstance.factorSourceID != factorSourceID {
@@ -115,10 +116,13 @@ extension UseFactorSourceClient {
 				))
 				let sigatureWithDerivationPath = Signature(signatureWithPublicKey: signatureWithPublicKey, derivationPath: factorInstance.derivationPath)
 				let accountSignature = try AccountSignature(entity: account, factorInstance: factorInstance, signature: sigatureWithDerivationPath)
-				sigs.insert(accountSignature)
+				signatures.insert(accountSignature)
 			}
 		}
 
 		return signatures
 	}
 }
+
+// MARK: - FactorInstanceDoesNotHaveADerivationPathUnableToSign
+struct FactorInstanceDoesNotHaveADerivationPathUnableToSign: Swift.Error {}

@@ -220,28 +220,28 @@ extension TransactionClient {
 
 			let notarySignature = try request.notary.sign(hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent))
 
-			let uncompiledNotarized = NotarizedTransaction(
+			let uncompiledNotarized = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature
+				notarySignature: notarySignature.intoEngine().signature
 			)
 			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
 
 			func debugPrintTX() {
 				// RET prints when convertManifest is called, when it is removed, this can be moved down
 				// inline inside `print`.
-				let txIntentString = transactionIntent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
 				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
 				print("TXID: \(txID.rawValue)")
 				print("TransactionIntent: \(txIntentString)")
 				print("intentSignatures: \(signedTransactionIntent.intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
-				print("NotarySignature: \(notarySignatureRaw.hex)")
-				print("Compiled Transaction Intent:\n\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
+				print("NotarySignature: \(notarySignature)")
+				print("Compiled Transaction Intent:\n\n\(request.compileTransactionIntent.compiledIntent.hex)\n\n")
 				print("Compiled Notarized Intent:\n\n\(compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
 				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
 			}
 
 			//            debugPrintTX()
-			return .init(notarized: compiledNotarizedTXIntent, txID: request.txID)
+			return .init(notarized: compiledNotarizedTXIntent, txID: txID)
 		}
 
 		// TODO: Should the request manifest have lockFee?

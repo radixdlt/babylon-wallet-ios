@@ -2,12 +2,6 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-// MARK: - ECCurve
-public enum ECCurve: String, Codable {
-	case curve25519
-	case secp256k1
-}
-
 // MARK: - SLIP10.PublicKey + Codable
 extension SLIP10.PublicKey: Codable {}
 extension SLIP10.PublicKey {
@@ -15,7 +9,7 @@ extension SLIP10.PublicKey {
 		case curve, compressedData
 	}
 
-	public var curve: ECCurve {
+	public var curve: SLIP10.Curve {
 		switch self {
 		case .eddsaEd25519: return .curve25519
 		case .ecdsaSecp256k1: return .secp256k1
@@ -31,7 +25,7 @@ extension SLIP10.PublicKey {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
-		let curve = try container.decode(ECCurve.self, forKey: .curve)
+		let curve = try container.decode(SLIP10.Curve.self, forKey: .curve)
 		let hexCodable = try container.decode(HexCodable.self, forKey: .compressedData)
 
 		switch curve {
