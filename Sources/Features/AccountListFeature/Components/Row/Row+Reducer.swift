@@ -23,10 +23,17 @@ extension AccountList {
 			case copyAddressButtonTapped
 			case tapped
 			case task
+			case securityPromptTapped
 		}
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
+		}
+
+		public enum DelegateAction: Sendable, Equatable {
+			case copyAddressButtonTapped(Profile.Network.Account)
+			case tapped(Profile.Network.Account)
+			case securityPromptTapped(Profile.Network.Account)
 		}
 
 		public init() {}
@@ -46,8 +53,12 @@ extension AccountList {
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
 					}
 				}
-			default:
-				return .none
+			case .copyAddressButtonTapped:
+				return .send(.delegate(.copyAddressButtonTapped(state.account)))
+			case .securityPromptTapped:
+				return .send(.delegate(.securityPromptTapped(state.account)))
+			case .tapped:
+				return .send(.delegate(.tapped(state.account)))
 			}
 		}
 
