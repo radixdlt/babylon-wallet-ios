@@ -31,6 +31,7 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 	case dropAllProofs = "DROP_ALL_PROOFS"
 
 	case publishPackage = "PUBLISH_PACKAGE"
+	case publishPackageAdvanced = "PUBLISH_PACKAGE_ADVANCED"
 
 	case burnResource = "BURN_RESOURCE"
 	case recallResource = "RECALL_RESOURCE"
@@ -56,9 +57,10 @@ public enum InstructionKind: String, Codable, Sendable, Hashable {
 
 	case createAccessController = "CREATE_ACCESS_CONTROLLER"
 	case createIdentity = "CREATE_IDENTITY"
-	case assertAccessRule = "ASSERT_ACCESS_RULE"
+	case createIdentityAdvanced = "CREATE_IDENTITY_ADVANCED"
 
 	case createAccount = "CREATE_ACCOUNT"
+	case createAccountAdvanced = "CREATE_ACCOUNT_ADVANCED"
 
 	case createValidator = "CREATE_VALIDATOR"
 }

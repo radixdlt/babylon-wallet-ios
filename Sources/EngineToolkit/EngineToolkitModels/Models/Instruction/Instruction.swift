@@ -39,6 +39,7 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case dropAllProofs(DropAllProofs)
 
 	case publishPackage(PublishPackage)
+	case publishPackageAdvanced(PublishPackageAdvanced)
 
 	case burnResource(BurnResource)
 	case recallResource(RecallResource)
@@ -64,9 +65,10 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 
 	case createAccessController(CreateAccessController)
 	case createIdentity(CreateIdentity)
-	case assertAccessRule(AssertAccessRule)
+	case createIdentityAdvanced(CreateIdentityAdvanced)
 
 	case createAccount(CreateAccount)
+	case createAccountAdvanced(CreateAccountAdvanced)
 	case createValidator(CreateValidator)
 }
 
@@ -170,8 +172,6 @@ extension Instruction {
 			return .createAccessController
 		case .createIdentity:
 			return .createIdentity
-		case .assertAccessRule:
-			return .assertAccessRule
 
 		case .createAccount:
 			return .createAccount
@@ -400,8 +400,6 @@ extension Instruction {
 			self = try .createAccessController(.init(from: decoder))
 		case .createIdentity:
 			self = try .createIdentity(.init(from: decoder))
-		case .assertAccessRule:
-			self = try .assertAccessRule(.init(from: decoder))
 
 		case .createAccount:
 			self = try .createAccount(.init(from: decoder))

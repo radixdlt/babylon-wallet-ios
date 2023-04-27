@@ -7,16 +7,6 @@ public struct CreateAccount: InstructionProtocol {
 	public func embed() -> Instruction {
 		.createAccount(self)
 	}
-
-	// MARK: Stored properties
-
-	public let withdrawRule: Enum
-
-	// MARK: Init
-
-	public init(withdrawRule: Enum) {
-		self.withdrawRule = withdrawRule
-	}
 }
 
 extension CreateAccount {
@@ -24,7 +14,6 @@ extension CreateAccount {
 
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case withdrawRule = "withdraw_rule"
 	}
 
 	// MARK: Codable
@@ -32,8 +21,6 @@ extension CreateAccount {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
-
-		try container.encode(withdrawRule, forKey: .withdrawRule)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -43,9 +30,5 @@ extension CreateAccount {
 		if kind != Self.kind {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
-
-		try self.init(
-			withdrawRule: container.decode(Enum.self, forKey: .withdrawRule)
-		)
 	}
 }

@@ -1,32 +1,32 @@
 import Foundation
 
-// MARK: - AssertAccessRule
-public struct AssertAccessRule: InstructionProtocol {
+// MARK: - CreateAccountAdvanced
+public struct CreateAccountAdvanced: InstructionProtocol {
 	// Type name, used as a discriminator
-	public static let kind: InstructionKind = .assertAccessRule
+	public static let kind: InstructionKind = .createAccountAdvanced
 	public func embed() -> Instruction {
-		.assertAccessRule(self)
+		.createAccountAdvanced(self)
 	}
 
 	// MARK: Stored properties
 
-	public let accessRule: Enum
+	public let config: Tuple
 
 	// MARK: Init
 
 	public init(
-		accessRule: Enum
+		config: Tuple
 	) {
-		self.accessRule = accessRule
+		self.config = config
 	}
 }
 
-extension AssertAccessRule {
+extension CreateAccountAdvanced {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
-		case accessRule = "access_rule"
+		case config
 	}
 
 	// MARK: Codable
@@ -35,7 +35,7 @@ extension AssertAccessRule {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
-		try container.encode(accessRule, forKey: .accessRule)
+		try container.encode(config, forKey: .config)
 	}
 
 	public init(from decoder: Decoder) throws {
@@ -46,10 +46,8 @@ extension AssertAccessRule {
 			throw InternalDecodingFailure.instructionTypeDiscriminatorMismatch(expected: Self.kind, butGot: kind)
 		}
 
-		let accessRule = try container.decode(Enum.self, forKey: .accessRule)
-
-		self.init(
-			accessRule: accessRule
+		try self.init(
+			config: container.decode(Tuple.self, forKey: .config)
 		)
 	}
 }
