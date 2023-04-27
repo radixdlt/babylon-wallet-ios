@@ -60,7 +60,7 @@ extension PublishPackage {
 			code: container.decode(Blob.self, forKey: .code),
 			schema: container.decode(Blob.self, forKey: .schema),
 			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig),
-			metadata: container.decode(Map_.self, forKey: .metadata),
+			metadata: container.decode(Map_.self, forKey: .metadata)
 		)
 	}
 }

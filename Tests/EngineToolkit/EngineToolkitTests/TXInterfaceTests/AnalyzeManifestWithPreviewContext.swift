@@ -15,23 +15,23 @@ final class AnalyzeManifestWithPreviewContextTests: TestCase {
 			networkId: .simulator,
 			manifest: .init(instructions: .string("""
 			CALL_METHOD
-				Address("account_sim1qnm629yc2jzkff5aql6xaldyxzvh3dt4zxrxzrfuakvsv7w7ue")
+				Address("account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3")
 				"lock_fee"
 				Decimal("10");
 			CALL_METHOD
-				Address("account_sim1qnm629yc2jzkff5aql6xaldyxzvh3dt4zxrxzrfuakvsv7w7ue")
+				Address("account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3")
 				"withdraw"
-				Address("resource_sim1q9qprrnqrjqd9m8ukah02v8hanhyh2gg5sjxtqadccgqqtvdrj")
+				Address("resource_sim1q88e5v6nynxjnn2hr6pjm4ttvgwfctuall7yhnty7mrq30ccxs")
 				Decimal("2000");
 			TAKE_FROM_WORKTOP
-				Address("resource_sim1q9qprrnqrjqd9m8ukah02v8hanhyh2gg5sjxtqadccgqqtvdrj")
+				Address("resource_sim1q88e5v6nynxjnn2hr6pjm4ttvgwfctuall7yhnty7mrq30ccxs")
 				Bucket("bucket1");
 			CALL_METHOD
-				Address("component_sim1qvrw4q2rn9npn5y08e6ltx4g0vqhu8dxuptl42apdeyq4t8dg2")
+				Address("component_sim1pyh6hkm4emes653c38qgllau47rufnsj0qumeez85zyskzs0y9")
 				"swap"
 				Bucket("bucket1");
 			CALL_METHOD
-				Address("account_sim1qnm629yc2jzkff5aql6xaldyxzvh3dt4zxrxzrfuakvsv7w7ue")
+				Address("account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3")
 				"deposit_batch"
 				Expression("ENTIRE_WORKTOP");
 			""")),

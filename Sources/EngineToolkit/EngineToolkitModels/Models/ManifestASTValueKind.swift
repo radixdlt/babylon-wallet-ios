@@ -33,8 +33,6 @@ public enum ManifestASTValueKind: String, Codable, Sendable, Hashable {
 	case decimal = "Decimal"
 	case preciseDecimal = "PreciseDecimal"
 
-	// case own = "Own" // Commented out since the manifest doesn't support this too well right now.
-
 	case address = "Address"
 
 	case bucket = "Bucket"

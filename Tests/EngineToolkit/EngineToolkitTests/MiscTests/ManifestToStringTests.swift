@@ -48,11 +48,11 @@ final class ManifestToStringTests: TestCase {
 		for package in packages {
 			let manifestInstructions = try TransactionManifest {
 				CallMethod(
-					receiver: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md",
+					receiver: "account_sim1quxmes4pxzvw8mnz5zgsjmv0atudekp9gr2tmf7evlqsp82e9v",
 					methodName: "lock_fee"
 				) { Decimal_(value: "100") }
 
-				try PublishPackage(
+				try PublishPackageAdvanced(
 					code: Blob(data: blake2b(data: package.code)),
 					schema: Blob(data: blake2b(data: package.schema)),
 					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),

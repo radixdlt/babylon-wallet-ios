@@ -7,6 +7,8 @@ public struct CreateIdentity: InstructionProtocol {
 	public func embed() -> Instruction {
 		.createIdentity(self)
 	}
+
+        public init() {}
 }
 
 extension CreateIdentity {

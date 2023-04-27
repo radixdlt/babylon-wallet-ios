@@ -15,11 +15,11 @@ final class EncodeDecodeAddressRequestTests: TestCase {
 
 	func test_decode1() throws {
 		let decodeRequest = DecodeAddressRequest(
-			address: "account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"
+			address: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
 		)
 		let decodeResponse = try sut.decodeAddressRequest(request: decodeRequest).get()
 		XCTAssertEqual(decodeResponse.hrp, "account_sim")
-		XCTAssertEqual(decodeResponse.data.hex, "04032fcdc6aa1b8e8ae3effd51c9024120387d279a069d8479c0c7")
+		XCTAssertEqual(decodeResponse.data.hex, "0780139ed00fcf9af48a93006fcca37d811912a5edb71ef331963a")
 	}
 
 	func test_decode2() throws {

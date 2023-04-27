@@ -301,7 +301,7 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			try (
-				value: .publishPackage(.init(
+				value: .publishPackageAdvanced(.init(
 					code: Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
 					schema: Blob(hex: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"),
 					royaltyConfig: Map_(keyValueKind: .string, valueValueKind: .tuple, entries: []),
@@ -309,16 +309,16 @@ final class InstructionEncodingTests: TestCase {
 					accessRules: accessRules
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"elements":[{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Tuple"},"code":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"},"instruction":"PUBLISH_PACKAGE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"},"schema":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"}}
+				{"access_rules":{"elements":[{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Tuple"},"code":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"},"instruction":"PUBLISH_PACKAGE_ADVANCED","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"},"schema":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"}}
 				"""
 			),
-			try (
+                        (
 				value: .recallResource(.init(
-					vault_id: .init(hex: "a9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"),
+                                        vault_id: .init(address: "internal_vault_sim1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsdm5dfg"),
 					amount: .init(value: "1")
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"RECALL_RESOURCE","vault_id":{"type":"Bytes","value":"a9d55474c4fe9b04a5f39dc8164b9a9c22dae66a34e1417162c327912cc492"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"RECALL_RESOURCE","vault_id":{"address":"internal_vault_sim1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsdm5dfg","type":"Address"}}
 				"""
 			),
 			(
@@ -485,32 +485,23 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .createIdentity(.init(accessRule: .init(.u8(0), fields: []))),
+				value: .createIdentity(.init()),
 				jsonRepresentation: """
-				{"access_rule":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"CREATE_IDENTITY"}
-				"""
-			),
-			(
-				value: .assertAccessRule(.init(accessRule: .init(.u8(0), fields: []))),
-				jsonRepresentation: """
-				{"access_rule":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"instruction":"ASSERT_ACCESS_RULE"}
+				{"instruction":"CREATE_IDENTITY"}
 				"""
 			),
 			try (
 				value: .createValidator(.init(
-					key: Bytes(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"),
-					ownerAccessRule: Enum(.u8(0))
+					key: Bytes(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")
 				)),
 				jsonRepresentation: """
-				{"instruction":"CREATE_VALIDATOR","key":{"type":"Bytes","value":"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"},"owner_access_rule":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
+				{"instruction":"CREATE_VALIDATOR","key":{"type":"Bytes","value":"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"}}
 				"""
 			),
 			(
-				value: .createAccount(.init(
-					withdrawRule: Enum(.u8(0))
-				)),
+                                value: .createAccount(.init()),
 				jsonRepresentation: """
-				{"instruction":"CREATE_ACCOUNT","withdraw_rule":{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
+				{"instruction":"CREATE_ACCOUNT"}
 				"""
 			),
 			(

@@ -10,12 +10,12 @@ public struct RecallResource: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let vault_id: Bytes
+	public let vault_id: Address_
 	public let amount: Decimal_
 
 	// MARK: Init
 
-	public init(vault_id: Bytes, amount: Decimal_) {
+	public init(vault_id: Address_, amount: Decimal_) {
 		self.vault_id = vault_id
 		self.amount = amount
 	}
@@ -49,7 +49,7 @@ extension RecallResource {
 		}
 
 		try self.init(
-			vault_id: container.decode(Bytes.self, forKey: .vaultId),
+			vault_id: container.decode(Address_.self, forKey: .vaultId),
 			amount: container.decode(Decimal_.self, forKey: .amount)
 		)
 	}
