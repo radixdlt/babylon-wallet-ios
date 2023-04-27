@@ -22,10 +22,7 @@ extension SignWithDeviceFactorSource {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: SignWithDeviceFactorSource")
-					.background(Color.yellow)
-					.foregroundColor(.red)
+				Color.white
 					.onAppear { viewStore.send(.appeared) }
 			}
 		}

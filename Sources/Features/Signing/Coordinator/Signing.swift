@@ -1,9 +1,31 @@
 import Cryptography
+import CustomDump
 import FactorSourcesClient
 import FeaturePrelude
 import Profile
 import TransactionClient
 import UseFactorSourceClient
+
+// MARK: - CompileTransactionIntentResponse + CustomDumpStringConvertible
+extension CompileTransactionIntentResponse: CustomDumpStringConvertible {
+	public var customDumpDescription: String {
+		compiledIntent.hex
+	}
+}
+
+// MARK: - CompileNotarizedTransactionIntentResponse + CustomDumpStringConvertible
+extension CompileNotarizedTransactionIntentResponse: CustomDumpStringConvertible {
+	public var customDumpDescription: String {
+		compiledIntent.hex
+	}
+}
+
+// MARK: - Curve25519.Signing.PublicKey + CustomDumpStringConvertible
+extension Curve25519.Signing.PublicKey: CustomDumpStringConvertible {
+	public var customDumpDescription: String {
+		rawRepresentation.hex
+	}
+}
 
 // MARK: - Signing
 public struct Signing: Sendable, FeatureReducer {
