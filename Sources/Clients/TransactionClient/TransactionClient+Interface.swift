@@ -44,6 +44,10 @@ public struct NotarizeTransactionRequest: Sendable, Hashable {
 public struct NotarizeTransactionResponse: Sendable, Hashable {
 	public let notarized: CompileNotarizedTransactionIntentResponse
 	public let txID: TXID
+	public init(notarized: CompileNotarizedTransactionIntentResponse, txID: TXID) {
+		self.notarized = notarized
+		self.txID = txID
+	}
 }
 
 // MARK: - BuildTransactionIntentRequest
@@ -71,6 +75,11 @@ public struct TransactionIntentWithSigners: Sendable, Hashable {
 	public let intent: TransactionIntent
 	public let notaryAndSigners: NotaryAndSigners
 	public let signerPublicKeys: [Engine.PublicKey]
+	public init(intent: TransactionIntent, notaryAndSigners: NotaryAndSigners, signerPublicKeys: [Engine.PublicKey]) {
+		self.intent = intent
+		self.notaryAndSigners = notaryAndSigners
+		self.signerPublicKeys = signerPublicKeys
+	}
 }
 
 extension DependencyValues {

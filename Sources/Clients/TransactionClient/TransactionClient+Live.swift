@@ -330,6 +330,11 @@ public struct NotaryAndSigners: Sendable, Hashable {
 	public let notary: NotarySelection
 	/// Never empty, since this also contains the notary signer.
 	public let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>
+
+	public init(notary: NotarySelection, accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>>) {
+		self.notary = notary
+		self.accountsNeededToSign = accountsNeededToSign
+	}
 }
 
 extension GatewayAPI.TransactionPreviewRequest {
