@@ -10,7 +10,7 @@
 		837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 837BC3C629BB28CF0082C363 /* P2PLinksClientLive */; };
 		83B9D894294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
-		A4431A3029FA907D008B1A06 /* ImageServiceClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A4431A2F29FA907D008B1A06 /* ImageServiceClientLive */; };
+		A4DD048329FABBC20052FCB0 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5B176A029267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5D0A22529CB50A100772231 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = D5D0A22429CB50A100772231 /* P2PLinksClientLive */; };
@@ -73,8 +73,8 @@
 				E6203E4029B1E943000B8784 /* AccountsClientLive in Frameworks */,
 				E6203E4829B1E943000B8784 /* GatewaysClientLive in Frameworks */,
 				837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */,
+				A4DD048329FABBC20052FCB0 /* URLFormatterClientLive in Frameworks */,
 				E6203E4A29B1E943000B8784 /* OnboardingClientLive in Frameworks */,
-				A4431A3029FA907D008B1A06 /* ImageServiceClientLive in Frameworks */,
 				E6203E4429B1E943000B8784 /* AuthorizedDappsClientLive in Frameworks */,
 				E6203E4E29B1E943000B8784 /* PersonasClientLive in Frameworks */,
 			);
@@ -217,7 +217,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				A4431A2C29FA9064008B1A06 /* PBXTargetDependency */,
+				A4DD048129FABBB70052FCB0 /* PBXTargetDependency */,
 				E6203E5229B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5429B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5629B1E957000B8784 /* PBXTargetDependency */,
@@ -239,7 +239,7 @@
 				E6203E4929B1E943000B8784 /* OnboardingClientLive */,
 				E6203E4D29B1E943000B8784 /* PersonasClientLive */,
 				837BC3C629BB28CF0082C363 /* P2PLinksClientLive */,
-				A4431A2F29FA907D008B1A06 /* ImageServiceClientLive */,
+				A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -362,9 +362,9 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A4431A2C29FA9064008B1A06 /* PBXTargetDependency */ = {
+		A4DD048129FABBB70052FCB0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = A4431A2B29FA9064008B1A06 /* ImageServiceClientLive */;
+			productRef = A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */;
 		};
 		E6203E5029B1E951000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -583,13 +583,13 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = P2PLinksClientLive;
 		};
-		A4431A2B29FA9064008B1A06 /* ImageServiceClientLive */ = {
+		A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ImageServiceClientLive;
+			productName = URLFormatterClientLive;
 		};
-		A4431A2F29FA907D008B1A06 /* ImageServiceClientLive */ = {
+		A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = ImageServiceClientLive;
+			productName = URLFormatterClientLive;
 		};
 		D5D0A22429CB50A100772231 /* P2PLinksClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
