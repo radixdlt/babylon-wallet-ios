@@ -76,6 +76,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case notarized(NotarizeTransactionResponse)
+		case failedToSign
 	}
 
 	@Dependency(\.errorQueue) var errorQueue

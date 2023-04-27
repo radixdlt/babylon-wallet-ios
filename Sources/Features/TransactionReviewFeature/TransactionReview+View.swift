@@ -30,8 +30,8 @@ extension TransactionReview.State {
 	private var viewControlState: ControlState {
 		if transactionWithLockFee == nil {
 			return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
-		} else if isProcessingTransaction {
-			return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+//		} else if isProcessingTransaction {
+//			return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
 		} else {
 			return .enabled
 		}
@@ -76,6 +76,7 @@ extension TransactionReview {
 					.customizeGuarantees(with: store, viewStore)
 					.selectFeePayer(with: store, viewStore)
 					.signing(with: store, viewStore)
+					.submitting(with: store, viewStore)
 					.controlState(viewStore.viewControlState)
 					.onAppear {
 						viewStore.send(.appeared)
@@ -247,6 +248,19 @@ extension View {
 			state: /TransactionReview.Destinations.State.signing,
 			action: TransactionReview.Destinations.Action.signing,
 			content: { Signing.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	fileprivate func submitting(
+		with store: StoreOf<TransactionReview>,
+		_ viewStore: ViewStoreOf<TransactionReview>
+	) -> some View {
+		self.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /TransactionReview.Destinations.State.submitting,
+			action: TransactionReview.Destinations.Action.submitting,
+			content: { SubmitTransaction.View(store: $0) }
 		)
 	}
 }

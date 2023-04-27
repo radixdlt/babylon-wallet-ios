@@ -2,7 +2,19 @@ import FeaturePrelude
 
 extension SubmitTransaction.State {
 	var viewState: SubmitTransaction.ViewState {
-		.init()
+		.init(txID: notarizedTX.txID, status: status)
+	}
+}
+
+extension SubmitTransaction.State.TXStatus {
+	var display: String {
+		switch self {
+		case .notYetSubmitted, .submitting: return "Submitting"
+		case .submittedUnknown, .submittedPending: return "Submitted but not confirmed"
+		case .rejected: return "Rejected"
+		case .committedFailure: return "Failed"
+		case .committedSuccessfully: return "Successfully commited"
+		}
 	}
 }
 
@@ -10,6 +22,8 @@ extension SubmitTransaction.State {
 extension SubmitTransaction {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
+		let txID: TXID
+		let status: SubmitTransaction.State.TXStatus
 	}
 
 	@MainActor
@@ -22,8 +36,11 @@ extension SubmitTransaction {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Text("Submitting transaction")
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					VPair(heading: "TXID", item: viewStore.txID)
+					VPair(heading: "Status", item: viewStore.status.display)
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

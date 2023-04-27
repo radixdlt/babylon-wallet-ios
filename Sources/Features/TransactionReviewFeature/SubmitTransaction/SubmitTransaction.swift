@@ -18,6 +18,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 		public let notarizedTX: NotarizeTransactionResponse
 		public var status: TXStatus
+		public var hasDelegatedThatTXHasBeenSubmitted = false
 
 		public init(
 			notarizedTX: NotarizeTransactionResponse,
@@ -40,12 +41,14 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case failedToSubmit
 		case failedToReceiveStatusUpdate
+		case submittedButNotCompleted(TXID)
 		case submittedTransactionFailed
-		case committedSuccessfully
+		case committedSuccessfully(TXID)
 	}
 
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.continuousClock) var clock
 
 	public init() {}
 
@@ -72,13 +75,17 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to submit TX, error \(error)")
 			return .send(.delegate(.failedToSubmit))
 		case let .submitTXResult(.success(txID)):
+			state.status = .submitting
 			return .run { send in
 				for try await update in try await submitTXClient.transactionStatusUpdates(txID, PollStrategy.default) {
 					guard update.txID == txID else {
 						loggerGlobal.warning("Received update for wrong txID, incorrect impl of `submitTXClient`?")
 						continue
 					}
-					try await send(.internal(.statusUpdate(update.result.get())))
+					Task {
+						try? await clock.sleep(for: .milliseconds(700))
+						try await send(.internal(.statusUpdate(update.result.get())))
+					}
 				}
 			} catch: { error, send in
 				errorQueue.schedule(error)
@@ -90,12 +97,16 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			let status = update.stateStatus
 			state.status = status
 			if status.isCompletedSuccessfully {
-				return .send(.delegate(.committedSuccessfully))
+				return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 			} else if status.isCompletedWithFailure {
 				return .send(.delegate(.submittedTransactionFailed))
-			} else {
-				return .none
+			} else if status.isSubmitted {
+				if !state.hasDelegatedThatTXHasBeenSubmitted {
+					defer { state.hasDelegatedThatTXHasBeenSubmitted = true }
+					return .send(.delegate(.submittedButNotCompleted(state.notarizedTX.txID)))
+				}
 			}
+			return .none
 		}
 	}
 }
@@ -115,6 +126,13 @@ extension GatewayAPI.TransactionStatus {
 extension SubmitTransaction.State.TXStatus {
 	var isComplete: Bool {
 		isCompletedWithFailure || isCompletedSuccessfully
+	}
+
+	var isSubmitted: Bool {
+		switch self {
+		case .rejected, .committedFailure, .submittedUnknown, .submittedPending, .committedSuccessfully: return true
+		case .submitting, .notYetSubmitted: return false
+		}
 	}
 
 	var isCompletedWithFailure: Bool {

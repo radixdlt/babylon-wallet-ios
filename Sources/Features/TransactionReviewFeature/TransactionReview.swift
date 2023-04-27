@@ -31,8 +31,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		public var isProcessingTransaction: Bool = false
-
 		public init(
 			transactionManifest: TransactionManifest,
 			message: String?,
@@ -187,7 +185,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
 
-			state.isProcessingTransaction = true
 			let guarantees = state.allGuarantees
 
 			return .run { send in
@@ -242,6 +239,33 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					}
 				)))
 			}
+
+		case .destination(.presented(.signing(.delegate(.failedToSign)))):
+			loggerGlobal.error("Failed sign tx")
+			state.destination = nil
+			return .none
+
+		case let .destination(.presented(.signing(.delegate(.notarized(notarizedTX))))):
+			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			return .none
+
+		case let .destination(.presented(.submitting(.delegate(.submittedButNotCompleted(txID))))):
+			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+
+		case
+			.destination(.presented(.submitting(.delegate(.failedToSubmit)))),
+			.destination(.presented(.submitting(.delegate(.failedToReceiveStatusUpdate)))):
+			state.destination = nil
+			loggerGlobal.error("Failed to submit tx")
+			return .none
+
+		case .destination(.presented(.submitting(.delegate(.submittedTransactionFailed)))):
+			state.destination = nil
+			loggerGlobal.error("Submitted TX failed")
+			return .send(.delegate(.failed(.failedToSubmit)))
+
+		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
+			return .send(.delegate(.transactionCompleted(txID)))
 
 		default:
 			return .none
@@ -350,27 +374,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to add guarantees to manifest, error: \(error)")
 			// FIXME: propagate/display error?
 			return .none
-
-//		case let .signTransactionResult(.success(txID)):
-//			return .run { send in
-//				await send(.delegate(.signedTXAndSubmittedToGateway(txID)))
-//
-//				await send(.internal(.transactionPollingResult(
-//					transactionClient.getTransactionResult(txID)
-//				)))
-//			}
-//
-//		case let .signTransactionResult(.failure(transactionFailure)):
-//			state.isProcessingTransaction = false
-//			return .send(.delegate(.failed(transactionFailure)))
-//
-//		case let .transactionPollingResult(.success(txID)):
-//			state.isProcessingTransaction = false
-//			return .send(.delegate(.transactionCompleted(txID)))
-//
-//		case let .transactionPollingResult(.failure(error)):
-//			state.isProcessingTransaction = false
-//			return .send(.delegate(.failed(error)))
 
 		case let .rawTransactionCreated(transaction):
 			state.displayMode = .raw(transaction)

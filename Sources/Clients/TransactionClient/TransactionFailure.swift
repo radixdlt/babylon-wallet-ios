@@ -6,6 +6,7 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 	case failedToPrepareTXReview(FailedToPreviewTXReview)
 	case failedToPrepareForTXSigning(FailedToPrepareForTXSigning)
 	case failedToCompileOrSign(CompileOrSignFailure)
+	case failedToSubmit
 
 	public var errorDescription: String? {
 		switch self {
@@ -15,6 +16,8 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 			return error.localizedDescription
 		case let .failedToCompileOrSign(error):
 			return error.localizedDescription
+		case .failedToSubmit:
+			return "Failed to submit tx"
 //		case let .failedToSubmit(error):
 //			return error.localizedDescription
 //		case let .failedToPoll(error):
@@ -47,6 +50,8 @@ extension TransactionFailure {
 			case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
 				return (errorKind: .failedToSignTransaction, message: nil)
 			}
+		case .failedToSubmit:
+			return (errorKind: .failedToSubmitTransaction, message: nil)
 
 //		case let .failedToSubmit(error):
 //			switch error {
