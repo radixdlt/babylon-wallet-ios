@@ -48,8 +48,7 @@ public struct AccountList: Sendable, FeatureReducer {
 				let address = account.address.address
 				return .fireAndForget { pasteboardClient.copyString(address) }
 			}
-
-		default:
+		case .account:
 			return .none
 		}
 	}
