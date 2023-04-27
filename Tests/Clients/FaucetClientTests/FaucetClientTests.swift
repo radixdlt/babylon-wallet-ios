@@ -162,13 +162,10 @@ final class FaucetClientTests: TestCase {
 			$0.transactionClient.buildTransactionIntent = { _ in
 				TransactionIntentWithSigners(
 					intent: .previewValue,
-					notaryAndSigners: .init(
-						notary: .init(
-							notary: .ephemeralPublicKey(.eddsaEd25519(.previewValue))
-						),
-						accountsNeededToSign: NonEmpty(rawValue: [Profile.Network.Account.previewValue0])!
-					),
-					signerPublicKeys: []
+					transactionSigners: .init(
+						notaryPublicKey: .previewValue,
+						intentSigning: .notaryAsSignatory
+					)
 				)
 			}
 			$0.engineToolkitClient.compileTransactionIntent = { _ in try .init(compiledIntentHex: "") }
