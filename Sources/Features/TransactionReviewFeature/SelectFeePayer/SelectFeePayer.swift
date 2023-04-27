@@ -15,6 +15,7 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 		) {
 			self.feePayerCandidates = candidates
 			self.fee = fee
+			self.selectedPayerID = candidates.first.id
 		}
 	}
 

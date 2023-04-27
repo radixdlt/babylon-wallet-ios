@@ -22,11 +22,10 @@ extension SignWithLedgerFactorSource {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: SignWithLedgerFactorSource")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					Text("Sign transaction with Ledger")
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

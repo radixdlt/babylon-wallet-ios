@@ -22,8 +22,10 @@ extension SignWithDeviceFactorSource {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Color.white
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					Text("Sign transaction with phone")
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

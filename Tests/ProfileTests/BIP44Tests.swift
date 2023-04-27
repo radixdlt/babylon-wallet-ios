@@ -37,7 +37,7 @@ final class BIP44Tests: TestCase {
 				try (0 ..< 10).map { addressIndex -> BIP44TestSuite.TestGroup.Test in
 					let path = try LegacyOlympiaBIP44LikeDerivationPath(
 						index: .init(addressIndex),
-						shouldHardenLastPathComponent: shouldHardenLastPathComponent
+						shouldHardenAddressIndex: shouldHardenLastPathComponent
 					)
 					let keyPair = try hdRoot.derivePrivateKey(path: path.fullPath, curve: SECP256K1.self)
 					let privateKey = try XCTUnwrap(keyPair.privateKey)
