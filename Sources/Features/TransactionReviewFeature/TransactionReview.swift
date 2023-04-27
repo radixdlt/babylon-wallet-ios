@@ -123,6 +123,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
+	@Dependency(\.continuousClock) var clock
 
 	public init() {}
 
@@ -265,7 +266,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.failed(.failedToSubmit)))
 
 		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
-			return .send(.delegate(.transactionCompleted(txID)))
+			state.destination = nil
+
+			return .run { send in
+				try? await clock.sleep(for: .milliseconds(700)) // bah, we need to to dismiss `state.destination` before proceeding with completion
+				await send(.delegate(.transactionCompleted(txID)))
+			}
 
 		default:
 			return .none
