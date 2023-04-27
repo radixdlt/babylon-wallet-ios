@@ -43,6 +43,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case finishedSigningWithAllFactors
+		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -52,10 +53,11 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case notarized(CompileNotarizedTransactionIntentResponse)
+		case notarized(NotarizeTransactionResponse)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.transactionClient) var transactionClient
 
 	public init() {}
 
@@ -87,8 +89,30 @@ public struct Signing: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .finishedSigningWithAllFactors:
-			loggerGlobal.critical("Notarize!")
+			guard let compiledIntent = state.compiledIntent else {
+				assertionFailure("Expected compiledIntent")
+				return .none
+			}
+			let notaryKey: SLIP10.PrivateKey = .curve25519(.init())
+
+			return .run { [signatures = state.signatures] send in
+				await send(.internal(.notarizeResult(TaskResult {
+					let intentSignatures: try Set<Engine.SignatureWithPublicKey> = Set(signatures.map {
+						$0.signatureWithPublicKey.intoEngine()
+					})
+					return try await transactionClient.notarizeTransaction(.init(
+						intentSignatures: intentSignatures,
+						compileTransactionIntent: compiledIntent,
+						notary: notaryKey
+					))
+				})))
+			}
+		case let .notarizeResult(.failure(error)):
+			loggerGlobal.error("Failed to notarize transaction, error: \(error)")
+			errorQueue.schedule(error)
 			return .none
+		case let .notarizeResult(.success(notarized)):
+			return .send(.delegate(.notarized(notarized)))
 		}
 	}
 
