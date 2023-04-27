@@ -174,7 +174,7 @@ extension AccountList.Row.View {
 				minWidth: Constants.iconSize.rawValue * 2,
 				minHeight: Constants.iconSize.rawValue
 			)
-			.background(Color.app.whiteTransparent2)
+			.background(.app.whiteTransparent2)
 			.cornerRadius(Constants.iconSize.rawValue / 2)
 	}
 
@@ -219,7 +219,7 @@ extension AccountList.Row.View {
 				.frame(width: .small2, height: .small2)
 		}
 		.padding(.small2)
-		.background(Color.app.whiteTransparent2)
+		.background(.app.whiteTransparent2)
 		.cornerRadius(.small2)
 		.onTapGesture {
 			viewStore.send(.securityPromptTapped)
