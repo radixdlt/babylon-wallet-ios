@@ -2,12 +2,10 @@ import ClientPrelude
 import Cryptography
 import EngineToolkitClient
 import EngineToolkitModels
-import FactorSourcesClient
 import GatewayAPI
 import GatewaysClient
 import SubmitTransactionClient
 import TransactionClient
-import UseFactorSourceClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
 // internal for tests
@@ -50,10 +48,7 @@ extension FaucetClient: DependencyKey {
 		/// auth, since we use an ephemeral key pair
 		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
 			@Dependency(\.transactionClient) var transactionClient
-			@Dependency(\.secureStorageClient) var secureStorageClient
-			@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
-			@Dependency(\.factorSourcesClient) var factorSourcesClient
 			@Dependency(\.submitTXClient) var submitTXClient
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()

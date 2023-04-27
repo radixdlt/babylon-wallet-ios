@@ -386,12 +386,10 @@ package.addModules([
 		name: "FaucetClient",
 		dependencies: [
 			"EngineToolkitClient",
-			"FactorSourcesClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
 			"SubmitTransactionClient",
 			"TransactionClient",
-			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),

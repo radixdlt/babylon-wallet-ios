@@ -130,24 +130,3 @@ enum SelectAccountToPayForFeeRow {
 		}
 	}
 }
-
-//
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - SelectFeePayer_Preview
-// struct SelectFeePayer_Preview: PreviewProvider {
-//    static var previews: some View {
-//        SelectFeePayer.View(
-//            store: .init(
-//                initialState: .previewValue,
-//                reducer: SelectFeePayer()
-//            )
-//        )
-//    }
-// }
-//
-// extension SelectFeePayer.State {
-//    public static let previewValue = Self()
-// }
-// #endif

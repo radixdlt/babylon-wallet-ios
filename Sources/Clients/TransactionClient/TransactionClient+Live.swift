@@ -58,13 +58,7 @@ extension TransactionClient {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
-			let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
-			do {
-				manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
-			} catch {
-				loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
-				throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
-			}
+			let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
 			var instructions = manifestWithJSONInstructions.instructions
 
 			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
@@ -120,14 +114,27 @@ extension TransactionClient {
 				.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
 			guard
-				let feePayerInvolvedInTransaction = allCandidates.first(where: { candidate in accountAddressesSuitableToPayTransactionFeeRef.contains(where: { involved in
-					involved == candidate.account.address
-				})
-				})
+				let feePayerInvolvedInTransaction = allCandidates.first(
+					where: { candidate in
+						accountAddressesSuitableToPayTransactionFeeRef.contains(
+							where: { involved in
+								involved == candidate.account.address
+							}
+						)
+					}
+				)
 			else {
-				return .excludesLockFee(maybeStringManifest, feePayerCandidates: allCandidatesNonEmpty, feeNotYetAdded: feeToAdd)
+				return .excludesLockFee(
+					maybeStringManifest,
+					feePayerCandidates: allCandidatesNonEmpty,
+					feeNotYetAdded: feeToAdd
+				)
 			}
-			let manifestWithLockFee = try await lockFeeWithSelectedPayer(maybeStringManifest, feeToAdd, feePayerInvolvedInTransaction.account.address)
+
+			let manifestWithLockFee = try await lockFeeWithSelectedPayer(
+				maybeStringManifest,
+				feeToAdd, feePayerInvolvedInTransaction.account.address
+			)
 
 			return .includesLockFee(
 				manifestWithLockFee,
@@ -146,34 +153,42 @@ extension TransactionClient {
 			let version = engineToolkitClient.getTransactionVersion()
 			let networkID = request.networkID
 			let manifest = request.manifest
+
 			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
 				version: version,
 				manifest: manifest,
 				networkID: networkID
 			)
 
-			// Might be empty
-			let addressesNeededToSign = try OrderedSet(
+			// Should in fact never be empty, since we should already have added the fee payer, so
+			// at least she needs to sign!
+			guard let addressesNeededToSign = try NonEmpty(rawValue: OrderedSet(
 				engineToolkitClient
 					.accountAddressesNeedingToSignTransaction(
 						accountAddressesNeedingToSignTransactionRequest
 					)
-			)
+			)) else {
+				assertionFailure("addressesNeededToSign was empty, but it shoud never be empty, since we should have added the fee payer already.")
+				throw TransactionFailure.failedToPrepareForTXSigning(.failedToLoadNotaryAndSigners)
+			}
 
 			let accountsNeededToSign: NonEmpty<OrderedSet<Profile.Network.Account>> = try await {
 				let accounts = try await addressesNeededToSign.asyncMap {
 					try await accountsClient.getAccountByAddress($0)
 				}
-				guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
-					// TransactionManifest does not reference any accounts => use any account!
-					let first = try await accountsClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
-					return NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [first]))!
+				guard let accountsNonEmpty = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
+					assertionFailure("Should never fail to read accounts")
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToLoadNotaryAndSigners)
 				}
-				return accounts
+				return accountsNonEmpty
 			}()
 
 			let notary = await request.selectNotary(accountsNeededToSign)
-			let notaryAndSigners = NotaryAndSigners(notary: notary, accountsNeededToSign: accountsNeededToSign)
+
+			let notaryAndSigners = NotaryAndSigners(
+				notary: notary,
+				accountsNeededToSign: accountsNeededToSign
+			)
 
 			let notaryPublicKey = try notaryAndSigners.notary.notaryPublicKey.intoEngine()
 

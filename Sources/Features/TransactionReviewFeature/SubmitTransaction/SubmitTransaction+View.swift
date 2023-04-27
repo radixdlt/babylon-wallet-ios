@@ -47,23 +47,3 @@ extension SubmitTransaction {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - SubmitTransaction_Preview
-// struct SubmitTransaction_Preview: PreviewProvider {
-//	static var previews: some View {
-//		SubmitTransaction.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: SubmitTransaction()
-//			)
-//		)
-//	}
-// }
-//
-// extension SubmitTransaction.State {
-//	public static let previewValue = Self()
-// }
-// #endif

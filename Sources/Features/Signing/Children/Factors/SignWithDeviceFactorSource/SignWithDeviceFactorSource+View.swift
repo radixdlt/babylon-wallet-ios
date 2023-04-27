@@ -30,23 +30,3 @@ extension SignWithDeviceFactorSource {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - SignWithDeviceFactorSource_Preview
-// struct SignWithDeviceFactorSource_Preview: PreviewProvider {
-//	static var previews: some View {
-//		SignWithDeviceFactorSource.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: SignWithDeviceFactorSource()
-//			)
-//		)
-//	}
-// }
-//
-// extension SignWithDeviceFactorSource.State {
-//	public static let previewValue = Self()
-// }
-// #endif

@@ -32,23 +32,3 @@ extension PrepareForSigning {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - PrepareForSigning_Preview
-// struct PrepareForSigning_Preview: PreviewProvider {
-//	static var previews: some View {
-//		PrepareForSigning.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: PrepareForSigning()
-//			)
-//		)
-//	}
-// }
-//
-// extension PrepareForSigning.State {
-//	public static let previewValue = Self()
-// }
-// #endif
