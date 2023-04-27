@@ -16,10 +16,7 @@ extension SpecificAddress: Codable {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
                 let address = try container.decode(String.self, forKey: .address)
                 
-                let decodedType = try EngineToolkit().decodeAddressRequest(request: .init(address: address)).get().entityType
-                if decodedType != Kind.type {
-                        throw InternalDecodingFailure.addressDiscriminatorMismatch(expected: Kind.type, butGot: decodedType)
-                }
+
 
                 try self.init(
                         address: container.decode(String.self, forKey: .address)
@@ -29,5 +26,15 @@ extension SpecificAddress: Codable {
         public enum ConversionError: Error {
                 case failedCreating(kind: SpecificAddressKind.Type)
                 case addressKindMismatch(desired: SpecificAddressKind.Type, actual: SpecificAddressKind.Type)
+        }
+}
+
+extension SpecificAddress {
+        init(validatingAddress address: String) throws {
+                let decodedType = try EngineToolkit().decodeAddressRequest(request: .init(address: address)).get().entityType
+                if Kind.type.contains(decodedType) {
+                        throw InternalDecodingFailure.addressDiscriminatorMismatch(expected: Kind.type, butGot: decodedType)
+                }
+                self.init(address: address)
         }
 }
