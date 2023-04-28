@@ -56,19 +56,6 @@ public struct Home: Sendable, FeatureReducer {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
 			case accountSecurity(Profile.Network.Account) // TODO: Use the proper state
-
-			// NB: native case paths should deem this obsolete.
-			// e.g. `state.destination?[keyPath: \.accountDetails] = ...` or even conciser via `@dynamicMemberLookup`
-			var accountDetails: AccountDetails.State? {
-				get {
-					guard case let .accountDetails(state) = self else { return nil }
-					return state
-				}
-				set {
-					guard case .accountDetails = self, let state = newValue else { return }
-					self = .accountDetails(state)
-				}
-			}
 		}
 
 		public enum Action: Sendable, Equatable {
