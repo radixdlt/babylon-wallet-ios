@@ -42,11 +42,9 @@ public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<O
 extension SigningFactors {
 	public var signerCount: Int {
 		var count = 0
-		for setOfSigningFactorsNonEmpty in self.values {
-			var innerCount = 0
-			defer { count += innerCount }
-			for signingFactor in setOfSigningFactorsNonEmpty {
-				innerCount += signingFactor.signers.count
+		for signingFactors in values {
+			for signingFactor in signingFactors {
+				count += signingFactor.signers.count
 			}
 		}
 		return count
@@ -55,9 +53,11 @@ extension SigningFactors {
 
 // MARK: - SigningFactor
 public struct SigningFactor: Sendable, Hashable {
+	public typealias SignersPerAccount = NonEmpty<[Profile.Network.Account.ID: Signer]>
+
 	public let factorSource: FactorSource
-	public let signers: NonEmpty<Set<Signer>>
-	public init(factorSource: FactorSource, signers: NonEmpty<Set<Signer>>) {
+	public let signers: SignersPerAccount
+	public init(factorSource: FactorSource, signers: SignersPerAccount) {
 		self.factorSource = factorSource
 		self.signers = signers
 	}
@@ -69,6 +69,19 @@ public struct SigningFactor: Sendable, Hashable {
 			self.account = account
 			self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
 		}
+
+		public func addingFactorInstance(_ factorInstance: FactorInstance) -> Self {
+			var factorInstances = factorInstancesRequiredToSign
+			factorInstances.insert(factorInstance)
+			return .init(account: account, factorInstancesRequiredToSign: factorInstances)
+		}
+	}
+
+	public func addingFactorInstance(_ factorInstance: FactorInstance, for account: Profile.Network.Account) -> Self {
+		var signers = signers
+		let signer = signers[account.id] ?? .init(account: account, factorInstancesRequiredToSign: [])
+		signers.updateValue(signer.addingFactorInstance(factorInstance), forKey: account.id)
+		return .init(factorSource: factorSource, signers: signers)
 	}
 }
 

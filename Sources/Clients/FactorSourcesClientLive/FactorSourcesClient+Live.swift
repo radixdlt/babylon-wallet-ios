@@ -79,7 +79,7 @@ extension FactorSourcesClient: DependencyKey {
 
 				let allFactorSources = try await getFactorSources()
 
-				var signingFactors: [FactorSource: SigningFactorRef] = [:]
+				var signingFactors: [FactorSource: SigningFactor] = [:]
 
 				for account in accounts {
 					switch account.securityState {
@@ -90,99 +90,28 @@ extension FactorSourcesClient: DependencyKey {
 							assertionFailure("Bad! factor source not found")
 							throw FactorSourceNotFound()
 						}
-						let outerRef = signingFactors[factorSource, default: SigningFactorRef(factorSource: factorSource)]
-						let innerRef = outerRef.signers[account.id, default: .init(account: account)]
-						innerRef.factorInstancesRequiredToSign.insert(factorInstance)
-						outerRef.signers[account.id] = innerRef
-						signingFactors[factorSource] = outerRef
-					}
-				}
 
-				final class SigningFactorsOfKindRef {
-					private var factors: OrderedSet<SigningFactorRef>
-					func valueType() throws -> NonEmpty<OrderedSet<SigningFactor>> {
-						let valuesTypes = try factors.map { try $0.valueType() }
-						guard let nonEmpty = NonEmpty<OrderedSet<SigningFactor>>(rawValue: OrderedSet(valuesTypes.sorted())) else {
-							throw SignersUnexpectedlyEmpty()
-						}
-						return nonEmpty
-					}
-
-					init(signingFactor: SigningFactorRef) {
-						factors = [signingFactor]
-					}
-
-					func add(_ signingFactorRef: SigningFactorRef) throws {
-						let (insert, _) = self.factors.append(signingFactorRef)
-						guard insert else {
-							struct SigningFactorRefUnexpectedelyAlreadyPresent: Error {}
-							throw SigningFactorRefUnexpectedelyAlreadyPresent()
+						if let signingFactor = signingFactors[factorSource] {
+							signingFactors[factorSource] = signingFactor.addingFactorInstance(factorInstance, for: account)
+						} else {
+							let signer = SigningFactor.Signer(account: account, factorInstancesRequiredToSign: [factorInstance])
+							let signers = SigningFactor.SignersPerAccount((key: account.id, value: signer), [:])
+							signingFactors[factorSource] = .init(factorSource: factorSource, signers: signers)
 						}
 					}
 				}
 
-				var signingFactorsRefsByKind = OrderedDictionary<FactorSourceKind, SigningFactorsOfKindRef>()
-
-				for (factorSource, signingFactorRef) in signingFactors {
-					if let ref = signingFactorsRefsByKind[factorSource.kind] {
-						try ref.add(signingFactorRef)
-					} else {
-						signingFactorsRefsByKind[factorSource.kind] = .init(signingFactor: signingFactorRef)
-					}
+				var result: OrderedDictionary<FactorSourceKind, OrderedSet<SigningFactor>> = [:]
+				for (factorSource, signingFactor) in signingFactors {
+					result[factorSource.kind, default: []].append(signingFactor)
 				}
 
-				var signingFactorsOfKind = OrderedDictionary<FactorSourceKind, NonEmpty<OrderedSet<SigningFactor>>>()
-
-				for (factorSourceKind, signingFactorsOfKindRef) in signingFactorsRefsByKind {
-					signingFactorsOfKind[factorSourceKind] = try signingFactorsOfKindRef.valueType()
-				}
-
-				return signingFactorsOfKind
+				return result.compactMapValues { .init(rawValue: $0) }
 			}
 		)
 	}
 
 	public static let liveValue = Self.live()
-}
-
-// MARK: - SigningFactorRef
-final class SigningFactorRef: Equatable, Hashable {
-	static func == (lhs: SigningFactorRef, rhs: SigningFactorRef) -> Bool {
-		lhs.uuid == rhs.uuid
-	}
-
-	let uuid = UUID()
-	func hash(into hasher: inout Hasher) {
-		hasher.combine(uuid)
-	}
-
-	let factorSource: FactorSource
-	var signers: [Profile.Network.Account.ID: SignerRef] = [:]
-	init(factorSource: FactorSource, signers: [Profile.Network.Account.ID: SignerRef] = [:]) {
-		self.factorSource = factorSource
-		self.signers = signers
-	}
-
-	func valueType() throws -> SigningFactor {
-		guard let signersNonEmpty = NonEmpty<Set<SigningFactor.Signer>>(rawValue: Set(self.signers.values.map { $0.valueType() })) else {
-			throw SignersUnexpectedlyEmpty()
-		}
-		return .init(factorSource: factorSource, signers: signersNonEmpty)
-	}
-}
-
-// MARK: - SignerRef
-final class SignerRef {
-	let account: Profile.Network.Account
-	var factorInstancesRequiredToSign: Set<FactorInstance>
-	init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance> = .init()) {
-		self.account = account
-		self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
-	}
-
-	func valueType() -> SigningFactor.Signer {
-		.init(account: account, factorInstancesRequiredToSign: factorInstancesRequiredToSign)
-	}
 }
 
 // MARK: - MixedFactorSourceKind
@@ -212,7 +141,6 @@ extension FactorSourceKind {
 		switch self {
 		case .ledgerHQHardwareWallet: return 0
 		case .device: return 1
-		default: return 1000
 		}
 	}
 }
