@@ -131,7 +131,7 @@ extension FactorSourcesClient: DependencyKey {
 					}
 				}
 
-				var signingFactorsOfKind = OrderedDictionary<FactorSourceKind, NonEmpty<OrderedSet<SigningFactor>>>()
+				var signingFactorsOfKind: OrderedDictionary<FactorSourceKind, NonEmpty<OrderedSet<SigningFactor>>> = [:]
 
 				for (factorSourceKind, signingFactorsOfKindRef) in signingFactorsRefsByKind {
 					signingFactorsOfKind[factorSourceKind] = try signingFactorsOfKindRef.valueType()

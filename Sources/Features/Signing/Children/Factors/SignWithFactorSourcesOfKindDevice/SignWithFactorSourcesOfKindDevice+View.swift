@@ -10,7 +10,6 @@ extension SignWithFactorSourcesOfKindDevice.State {
 // MARK: - SignWithFactorSourcesOfKindDevice.View
 extension SignWithFactorSourcesOfKindDevice {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
 		let currentSigningFactor: SigningFactor?
 	}
 

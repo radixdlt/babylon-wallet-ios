@@ -41,15 +41,7 @@ public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<O
 
 extension SigningFactors {
 	public var signerCount: Int {
-		var count = 0
-		for setOfSigningFactorsNonEmpty in self.values {
-			var innerCount = 0
-			defer { count += innerCount }
-			for signingFactor in setOfSigningFactorsNonEmpty {
-				innerCount += signingFactor.signers.count
-			}
-		}
-		return count
+		values.flatMap { $0.map(\.signers.count) }.reduce(0, +)
 	}
 }
 
