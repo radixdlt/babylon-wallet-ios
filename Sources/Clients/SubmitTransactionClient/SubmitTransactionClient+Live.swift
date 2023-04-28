@@ -1,4 +1,5 @@
 import ClientPrelude
+import EngineToolkitClient
 import EngineToolkitModels
 import GatewayAPI
 
@@ -73,6 +74,33 @@ extension SubmitTransactionClient: DependencyKey {
 		return Self(
 			submitTransaction: { request in
 				let txID = request.txID
+
+				func debugPrintTX() {
+					@Dependency(\.engineToolkitClient) var engineToolkitClient
+
+					do {
+						let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
+							compiledNotarizedIntent: Array(request.compiledNotarizedTXIntent.compiledIntent),
+							instructionsOutputKind: .parsed
+						))
+						let signedIntent = decompiledNotarized.signedIntent
+						let notarySignature = decompiledNotarized.notarySignature
+						let intent = signedIntent.intent
+						let intentSignatures = signedIntent.intentSignatures
+						// RET prints when convertManifest is called, when it is removed, this can be moved down
+						// inline inside `print`.
+						let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+						print("\n\n🔮 DEBUG TRANSACTION START 🔮")
+						print("TXID: \(txID.rawValue)")
+						print("TransactionIntent: \(txIntentString)")
+						print("intentSignatures: \(intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
+						print("NotarySignature: \(notarySignature)")
+						print("Compiled Transaction Intent:\n\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
+						print("Compiled Notarized Intent:\n\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
+						print("🔮 DEBUG TRANSACTION END 🔮\n\n")
+					} catch {}
+				}
+				//                debugPrintTX()
 
 				let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 					notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex

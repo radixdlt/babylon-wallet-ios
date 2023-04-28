@@ -48,8 +48,11 @@ extension EngineToolkitClient {
 			compileNotarizedTransactionIntent: {
 				try engineToolkit.compileNotarizedTransactionIntentRequest(request: $0).get()
 			},
-			decompileTransactionIntentRequest: {
+			decompileTransactionIntent: {
 				try engineToolkit.decompileTransactionIntentRequest(request: $0).get()
+			},
+			decompileNotarizedTransactionIntent: {
+				try engineToolkit.decompileNotarizedTransactionIntentRequest(request: $0).get()
 			},
 			deriveOlympiaAdressFromPublicKey: {
 				try engineToolkit.deriveOlympiaAddressFromPublicKeyRequest(

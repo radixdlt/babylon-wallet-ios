@@ -64,16 +64,13 @@ extension TransactionClient {
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
-			let version = engineToolkitClient.getTransactionVersion()
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-
-			let conversionRequest = ConvertManifestInstructionsToJSONIfItWasStringRequest(
-				version: version,
-				networkID: networkID,
-				manifest: manifest
+			try await engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(
+				.init(
+					version: engineToolkitClient.getTransactionVersion(),
+					networkID: gatewaysClient.getCurrentNetworkID(),
+					manifest: manifest
+				)
 			)
-
-			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
 		}
 
 		let lockFeeWithSelectedPayer: LockFeeWithSelectedPayer = { maybeStringManifest, feeToAdd, addressOfPayer in
@@ -87,22 +84,24 @@ extension TransactionClient {
 			var instructions = manifestWithJSONInstructions.instructions
 
 			loggerGlobal.debug("Setting fee payer to: \(addressOfPayer.address)")
+
 			let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
 				address: ComponentAddress(address: addressOfPayer.address),
 				fee: feeToAdd.description
 			).embed()
 
 			instructions.insert(lockFeeCallMethodInstruction, at: 0)
-			return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
+
+			return TransactionManifest(
+				instructions: instructions,
+				blobs: maybeStringManifest.blobs
+			)
 		}
 
 		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { maybeStringManifest, feeToAdd in
 
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-
-			let version = engineToolkitClient.getTransactionVersion()
-
 			let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+
 			let allCandidates = await accountsWithEnoughFunds(
 				from: allAccounts.map(\.address),
 				toPay: feeToAdd
@@ -129,10 +128,10 @@ extension TransactionClient {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
-			let accountsSuitableToPayForTXFeeRequest = AccountAddressesInvolvedInTransactionRequest(
-				version: version,
+			let accountsSuitableToPayForTXFeeRequest = await AccountAddressesInvolvedInTransactionRequest(
+				version: engineToolkitClient.getTransactionVersion(),
 				manifest: maybeStringManifest,
-				networkID: networkID
+				networkID: gatewaysClient.getCurrentNetworkID()
 			)
 
 			let accountAddressesSuitableToPayTransactionFeeRef = try engineToolkitClient
@@ -188,20 +187,18 @@ extension TransactionClient {
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
-			let intent = TransactionIntent(
-				header: header,
-				manifest: request.manifest
-			)
-
 			return .init(
-				intent: intent,
+				intent: .init(
+					header: header,
+					manifest: request.manifest
+				),
 				transactionSigners: transactionSigners
 			)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
 
-			let intent = try engineToolkitClient.decompileTransactionIntentRequest(.init(
+			let intent = try engineToolkitClient.decompileTransactionIntent(.init(
 				compiledIntent: request.compileTransactionIntent.compiledIntent,
 				instructionsOutputKind: .parsed
 			))
@@ -211,7 +208,9 @@ extension TransactionClient {
 				intentSignatures: Array(request.intentSignatures)
 			)
 			let txID = try engineToolkitClient.generateTXID(intent)
-			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
+			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(
+				signedTransactionIntent
+			)
 
 			let notarySignature = try request.notary.sign(
 				hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent)
@@ -221,24 +220,15 @@ extension TransactionClient {
 				signedIntent: signedTransactionIntent,
 				notarySignature: notarySignature.intoEngine().signature
 			)
-			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
 
-			func debugPrintTX() {
-				// RET prints when convertManifest is called, when it is removed, this can be moved down
-				// inline inside `print`.
-				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-				print("\n\n🔮 DEBUG TRANSACTION START 🔮")
-				print("TXID: \(txID.rawValue)")
-				print("TransactionIntent: \(txIntentString)")
-				print("intentSignatures: \(signedTransactionIntent.intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
-				print("NotarySignature: \(notarySignature)")
-				print("Compiled Transaction Intent:\n\n\(request.compileTransactionIntent.compiledIntent.hex)\n\n")
-				print("Compiled Notarized Intent:\n\n\(compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
-				print("🔮 DEBUG TRANSACTION END 🔮\n\n")
-			}
+			let compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(
+				uncompiledNotarized
+			)
 
-			//            debugPrintTX()
-			return .init(notarized: compiledNotarizedTXIntent, txID: txID)
+			return .init(
+				notarized: compiledNotarizedTXIntent,
+				txID: txID
+			)
 		}
 
 		let getTransactionPreview: GetTransactionReview = { request in
