@@ -135,10 +135,6 @@ private extension NonFungibleTokenList.Row.ViewState {
 	var nftCount: Int {
 		resource.tokens.count
 	}
-
-	func reversedZIndex(index: Int) -> Double {
-		Double(nftCount - index)
-	}
 }
 
 private extension NonFungibleTokenList.Row.View {

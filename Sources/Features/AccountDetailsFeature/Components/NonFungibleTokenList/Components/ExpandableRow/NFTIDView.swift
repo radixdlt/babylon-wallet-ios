@@ -6,10 +6,10 @@ struct NFTView: View {
 	let url: URL?
 
 	var body: some View {
-		LoadableImage(url: url, size: .flexibleHeight, mode: .aspectFill) {
+		LoadableImage(url: url, size: .flexibleHeight, loading: .shimmer) {
 			Rectangle()
 				.fill(.gray)
-				.frame(height: 100)
+				.frame(height: .large1)
 		}
 		.cornerRadius(.small3)
 	}

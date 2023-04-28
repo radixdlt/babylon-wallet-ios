@@ -30,7 +30,7 @@ public struct DappThumbnail: View {
 	private var image: some View {
 		switch content {
 		case let .known(url):
-			LoadableImage(url: url, size: .fixed(size)) {
+			LoadableImage(url: url, size: .fixedSize(size)) {
 				placeholder
 			}
 		case .unknown:
@@ -75,7 +75,7 @@ public struct TokenThumbnail: View {
 			Image(asset: AssetResource.xrd)
 				.resizable()
 		case let .known(url):
-			LoadableImage(url: url, size: .fixed(size), mode: .aspectFill) {
+			LoadableImage(url: url, size: .fixedSize(size)) {
 				placeholder
 			}
 		case .unknown:
@@ -101,7 +101,7 @@ public struct NFTThumbnail: View {
 	}
 
 	public var body: some View {
-		LoadableImage(url: url, size: .fixed(size)) {
+		LoadableImage(url: url, size: .fixedSize(size), loading: .color(.app.gray1)) {
 			Image(asset: AssetResource.nft)
 				.resizable()
 		}
@@ -121,7 +121,7 @@ public struct PersonaThumbnail: View {
 	}
 
 	public var body: some View {
-		LoadableImage(url: content, size: .fixed(size)) {
+		LoadableImage(url: content, size: .fixedSize(size)) {
 			Image(asset: AssetResource.persona)
 				.resizable()
 		}
@@ -134,19 +134,21 @@ public struct PersonaThumbnail: View {
 /// A helper view that handles the loading state, and potentially the error state
 public struct LoadableImage<Placeholder: View>: View {
 	let url: URL?
-	let size: LoadableImageSize
-	let mode: ImageResizingMode
+	let sizingBehaviour: LoadableImageSize
+	let loadingBehaviour: LoadableImageLoadingBehaviour
 	let placeholder: Placeholder
 
-	@MainActor
-	public init(url: URL?, size: LoadableImageSize, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
+	public init(
+		url: URL?,
+		size sizingBehaviour: LoadableImageSize,
+		loading loadingBehaviour: LoadableImageLoadingBehaviour = .placeholder,
+		placeholder: () -> Placeholder
+	) {
 		if let url {
 			@Dependency(\.urlFormatterClient) var urlFormatterClient
-			switch size {
-			case let .fixed(hitTargetSize):
-				let scale = UIScreen.pixelScale
-				self.url = urlFormatterClient.fixedSizeImage(url, scale * hitTargetSize.frame)
-				print(self.url)
+			switch sizingBehaviour {
+			case let .fixedSize(hitTargetSize, _):
+				self.url = urlFormatterClient.fixedSizeImage(url, UIScreen.pixelScale * hitTargetSize.frame)
 			case .flexibleHeight:
 				self.url = url
 			}
@@ -154,30 +156,64 @@ public struct LoadableImage<Placeholder: View>: View {
 			self.url = nil
 		}
 
-		self.size = size
-		self.mode = mode
+		self.sizingBehaviour = sizingBehaviour
+		self.loadingBehaviour = loadingBehaviour
 		self.placeholder = placeholder()
 	}
 
 	public var body: some View {
 		if let url {
 			LazyImage(url: url) { state in
-				if let image = state.image {
-//					if flexHeight, let size = state.imageContainer?.image.size {
-//						image.resizingMode(mode)
-//							.aspectRatio(size.height / size.width, contentMode: .fill)
-//					} else {
-					image.resizingMode(mode)
-//					}
+				if state.isLoading {
+					loadingView
+				} else if let image = state.image {
+					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else {
 					if let error = state.error {
 						let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
 					}
 					placeholder
-						.shimmer(active: state.isLoading, config: .accountResourcesLoading)
 				}
 			}
 		} else {
+			placeholder
+		}
+	}
+
+	@MainActor
+	@ViewBuilder
+	private func imageView(image: NukeUI.Image, imageSize: CGSize?) -> some View {
+		switch sizingBehaviour {
+		case let .fixedSize(size, mode):
+			image
+				.resizingMode(mode)
+				.frame(width: size.frame.width, height: size.frame.height)
+		case .flexibleHeight:
+			if let imageSize {
+				let minAspect: CGFloat = 9 / 16
+				let aspect: CGFloat = imageSize.width / imageSize.height
+				image
+					.resizingMode(.aspectFill)
+					.aspectRatio(max(aspect, minAspect), contentMode: .fill)
+			} else {
+				image
+					.scaledToFill()
+			}
+		}
+	}
+
+	@ViewBuilder
+	private var loadingView: some View {
+		switch loadingBehaviour {
+		case .shimmer:
+			Color.gray
+				.shimmer(active: true, config: .accountResourcesLoading)
+		case let .color(color):
+			color
+		case let .asset(imageAsset):
+			Image(asset: imageAsset)
+				.resizable()
+		case .placeholder:
 			placeholder
 		}
 	}
@@ -185,6 +221,14 @@ public struct LoadableImage<Placeholder: View>: View {
 
 // MARK: - LoadableImageSize
 public enum LoadableImageSize {
-	case fixed(HitTargetSize)
+	case fixedSize(HitTargetSize, mode: ImageResizingMode = .aspectFill)
 	case flexibleHeight
+}
+
+// MARK: - LoadableImageLoadingBehaviour
+public enum LoadableImageLoadingBehaviour {
+	case shimmer
+	case color(Color)
+	case asset(ImageAsset)
+	case placeholder
 }
