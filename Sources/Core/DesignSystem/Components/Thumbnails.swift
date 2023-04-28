@@ -1,8 +1,8 @@
-import ImageServiceClient
 import NukeUI
 import Prelude
 import Resources
 import SwiftUI
+import URLFormatterClient
 
 // MARK: - DappThumbnail
 public struct DappThumbnail: View {
@@ -138,12 +138,14 @@ public struct LoadableImage<Placeholder: View>: View {
 	let mode: ImageResizingMode
 	let placeholder: Placeholder
 
+	@MainActor
 	public init(url: URL?, size: LoadableImageSize, mode: ImageResizingMode = .aspectFill, placeholder: () -> Placeholder) {
 		if let url {
-			@Dependency(\.imageServiceClient) var imageServiceClient
+			@Dependency(\.urlFormatterClient) var urlFormatterClient
 			switch size {
 			case let .fixed(hitTargetSize):
-				self.url = imageServiceClient.fixedSize(url, hitTargetSize.frame)
+				let scale = UIScreen.pixelScale
+				self.url = urlFormatterClient.fixedSizeImage(url, scale * hitTargetSize.frame)
 				print(self.url)
 			case .flexibleHeight:
 				self.url = url

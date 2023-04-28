@@ -54,8 +54,3 @@ extension CGFloat {
 	/// 75
 	public static let largeButtonHeight: Self = 75
 }
-
-extension CGSize {
-	/// 38 x 4
-	public static let sheetDragHandleSize: Self = .init(width: 38, height: 4)
-}

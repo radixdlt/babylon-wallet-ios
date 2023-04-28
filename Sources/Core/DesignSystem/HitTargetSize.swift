@@ -48,3 +48,17 @@ extension View {
 		frame(width: size.frame.width, height: size.frame.height, alignment: alignment)
 	}
 }
+
+extension UIScreen {
+	public static let pixelScale: CGFloat = {
+		let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+		guard let screen = scene?.windows.first?.screen else { return 2 }
+		return screen.scale
+	}()
+}
+
+public extension CGSize {
+	static func * (lhs: CGFloat, rhs: CGSize) -> CGSize {
+		.init(width: lhs * rhs.width, height: lhs * rhs.height)
+	}
+}
