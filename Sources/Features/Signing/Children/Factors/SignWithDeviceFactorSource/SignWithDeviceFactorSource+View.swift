@@ -1,8 +1,9 @@
+import struct FactorSourcesClient.SigningFactor
 import FeaturePrelude
 
 extension SignWithDeviceFactorSource.State {
 	var viewState: SignWithDeviceFactorSource.ViewState {
-		.init()
+		.init(currentSigningFactor: currentSigningFactor)
 	}
 }
 
@@ -10,6 +11,7 @@ extension SignWithDeviceFactorSource.State {
 extension SignWithDeviceFactorSource {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
+		let currentSigningFactor: SigningFactor?
 	}
 
 	@MainActor
@@ -24,6 +26,9 @@ extension SignWithDeviceFactorSource {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					Text("Sign transaction with phone")
+					if let currentSigningFactor = viewStore.currentSigningFactor {
+						Text("Factor Source ID: \(currentSigningFactor.factorSource.id.hex())")
+					}
 				}
 				.onAppear { viewStore.send(.appeared) }
 			}

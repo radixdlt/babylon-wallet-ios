@@ -37,7 +37,21 @@ extension FactorSourcesClient {
 	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Profile.Network.Account>>) async throws -> SigningFactors
 }
 
-public typealias SigningFactors = NonEmpty<OrderedSet<SigningFactor>>
+public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<OrderedSet<SigningFactor>>>
+
+extension SigningFactors {
+	public var signerCount: Int {
+		var count = 0
+		for setOfSigningFactorsNonEmpty in self.values {
+			var innerCount = 0
+			defer { count += innerCount }
+			for signingFactor in setOfSigningFactorsNonEmpty {
+				innerCount += signingFactor.signers.count
+			}
+		}
+		return count
+	}
+}
 
 // MARK: - SigningFactor
 public struct SigningFactor: Sendable, Hashable {

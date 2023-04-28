@@ -3,7 +3,10 @@ import FeaturePrelude
 
 // MARK: - SignWithFactorReducerActionProtocol
 protocol SignWithFactorReducerActionProtocol: Sendable, Equatable {
-	static func done(signingFactor: SigningFactor, signatures: Set<AccountSignature>) -> Self
+	static func done(
+		signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
+		signatures: Set<AccountSignature>
+	) -> Self
 }
 
 // MARK: - FactorSourceKindSpecifierProtocol
@@ -13,12 +16,18 @@ public protocol FactorSourceKindSpecifierProtocol {
 
 // MARK: - SignWithFactorState
 public struct SignWithFactorState<FactorSourceKindSpecifier: FactorSourceKindSpecifierProtocol>: Sendable, Hashable {
-	public let signingFactor: SigningFactor
+	public let signingFactors: NonEmpty<OrderedSet<SigningFactor>>
 	public let dataToSign: Data
-	public init(signingFactor: SigningFactor, dataToSign: Data) {
-		assert(signingFactor.factorSource.kind == FactorSourceKindSpecifier.factorSourceKind)
-		self.signingFactor = signingFactor
+	public var currentSigningFactor: SigningFactor?
+	public init(
+		signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
+		dataToSign: Data,
+		currentSigningFactor: SigningFactor? = nil
+	) {
+		assert(signingFactors.allSatisfy { $0.factorSource.kind == FactorSourceKindSpecifier.factorSourceKind })
+		self.signingFactors = signingFactors
 		self.dataToSign = dataToSign
+		self.currentSigningFactor = currentSigningFactor
 	}
 }
 

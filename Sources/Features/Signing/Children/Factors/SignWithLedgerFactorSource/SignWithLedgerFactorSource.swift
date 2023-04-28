@@ -11,7 +11,7 @@ public struct SignWithLedgerFactorSource: SignWithFactorReducerProtocol {
 	}
 
 	public enum DelegateAction: SignWithFactorReducerActionProtocol {
-		case done(signingFactor: SigningFactor, signatures: Set<AccountSignature>)
+		case done(signingFactors: NonEmpty<OrderedSet<SigningFactor>>, signatures: Set<AccountSignature>)
 	}
 
 	public init() {}
