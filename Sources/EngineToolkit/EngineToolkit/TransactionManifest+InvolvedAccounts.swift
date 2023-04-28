@@ -8,7 +8,7 @@ extension TransactionManifest {
 		callMethodFilter: (CallMethod) -> Bool = { _ in true }
 	) throws -> Set<AccountAddress_> {
 		let analysis = try EngineToolkit()
-			.analyzeManifest(request: .init(manifest: self, networkId: networkId))
+			.extractAddressesFromManifest(request: .init(manifest: self, networkId: networkId))
 			.get()
 		return Set(analysis.accountAddresses)
 	}
@@ -17,7 +17,7 @@ extension TransactionManifest {
 		networkId: NetworkID
 	) throws -> Set<AccountAddress_> {
 		let analysis = try EngineToolkit()
-			.analyzeManifest(request: .init(manifest: self, networkId: networkId))
+			.extractAddressesFromManifest(request: .init(manifest: self, networkId: networkId))
 			.get()
 		return Set(analysis.accountsRequiringAuth)
 	}

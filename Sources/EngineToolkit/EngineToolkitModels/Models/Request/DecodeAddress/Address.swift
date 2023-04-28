@@ -1,6 +1,12 @@
 import Foundation
 
 // MARK: - AddressKindPrefix
+// TODO: Find a solution to to use EngineToolkit.decodeAddress to determine the kind of an Address.
+// Currently it is not possible to do due to potential circular dependency between EngineToolkit and EngineToolkitModels
+
+/// RET removed the information about what kind of Address we do receive.
+/// We try to determine the kind of Address by a given prefix.
+///
 public enum AddressKindPrefix: String, CaseIterable {
 	case account
 	case resource
@@ -12,25 +18,32 @@ public enum AddressKindPrefix: String, CaseIterable {
 	case validator
 	case identity
 
+	/// Group together all component addresses, so we can treat any of the sub-address as a component address
 	static let componentAddressSet: Set<AddressKindPrefix> = [.account, .component, .clock, .epochManager, .accesscontroller, .validator, .identity]
+	/// Group together all of the addresses under entity address set, so any address can be an EntityAddress
+	static let entityAddressSet: Set<AddressKindPrefix> = Set(AddressKindPrefix.allCases)
 }
 
-public typealias PackageAddress = SpecificAddress<PackageAddressKind>
-public typealias ComponentAddress = SpecificAddress<ComponentAddressKind>
-public typealias ResourceAddress = SpecificAddress<ResourceAddressKind>
-public typealias AccountAddress_ = SpecificAddress<AccountAddressKind>
+/// Any Entity Address
 public typealias EntityAddress = SpecificAddress<EntityAddressKind>
+
+/// Describes a package address, i.e `package_tdx_....`
+public typealias PackageAddress = SpecificAddress<PackageAddressKind>
+/// Describes a resource address, i.e `resource_tdx_....`
+public typealias ResourceAddress = SpecificAddress<ResourceAddressKind>
+
+/// A component specific address, can be any of `AddressKindPrefix.componentAddressSet`
+public typealias ComponentAddress = SpecificAddress<ComponentAddressKind>
+/// Account specific address
+public typealias AccountAddress_ = SpecificAddress<AccountAddressKind>
+/// Identity specific address
 public typealias IdentityAddress_ = SpecificAddress<IdentityAddressKind>
+/// Access Controller specific address
 public typealias AccessControllerAddress = SpecificAddress<AccessControllerAddressKind>
 
 // MARK: - EntityAddressKind
 public enum EntityAddressKind: SpecificAddressKind {
-	public static let addressSpace: Set<AddressKindPrefix> = Set(AddressKindPrefix.allCases)
-}
-
-// MARK: - ComponentAddressKind
-public enum ComponentAddressKind: SpecificAddressKind {
-	public static let addressSpace: Set<AddressKindPrefix> = AddressKindPrefix.componentAddressSet
+	public static let addressSpace: Set<AddressKindPrefix> = AddressKindPrefix.entityAddressSet
 }
 
 // MARK: - ResourceAddressKind
@@ -41,6 +54,11 @@ public enum ResourceAddressKind: SpecificAddressKind {
 // MARK: - PackageAddressKind
 public enum PackageAddressKind: SpecificAddressKind {
 	public static let addressSpace: Set<AddressKindPrefix> = [.package]
+}
+
+// MARK: - ComponentAddressKind
+public enum ComponentAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKindPrefix> = AddressKindPrefix.componentAddressSet
 }
 
 // MARK: - AccountAddressKind
@@ -60,13 +78,8 @@ public enum AccessControllerAddressKind: SpecificAddressKind {
 
 // MARK: - SpecificAddressKind
 public protocol SpecificAddressKind: Sendable {
+	/// The valid address space that can match a given kind of addresses
 	static var addressSpace: Set<AddressKindPrefix> { get }
-}
-
-extension SpecificAddress {
-	public func converted<Kind: SpecificAddressKind>() throws -> SpecificAddress<Kind> {
-		try .init(validatingAddress: self.address)
-	}
 }
 
 // MARK: - SpecificAddress
@@ -99,6 +112,13 @@ public struct SpecificAddress<Kind: SpecificAddressKind>: Sendable, Hashable, Co
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(self.address, forKey: .address)
+	}
+}
+
+extension SpecificAddress {
+	/// Convert the address to a given kind, by validating the conversion
+	public func converted<Kind: SpecificAddressKind>() throws -> SpecificAddress<Kind> {
+		try .init(validatingAddress: self.address)
 	}
 }
 
