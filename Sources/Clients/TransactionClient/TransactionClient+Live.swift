@@ -1,27 +1,19 @@
 import AccountPortfoliosClient
 import AccountsClient
-import CacheClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
-import FactorSourcesClient
 import GatewayAPI
 import GatewaysClient
 import Resources
-import SecureStorageClient
-import UseFactorSourceClient
 
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
-		@Dependency(\.cacheClient) var cacheClient
 
 		@Sendable
 		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
@@ -334,126 +326,5 @@ extension TransactionClient {
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction
 		)
-	}
-}
-
-// MARK: - TransactionSigners
-public struct TransactionSigners: Sendable, Hashable {
-	public let notaryPublicKey: Curve25519.Signing.PublicKey
-	public let intentSigning: IntentSigning
-
-	public enum IntentSigning: Sendable, Hashable {
-		case notaryAsSignatory
-		case intentSigners(NonEmpty<OrderedSet<Profile.Network.Account>>)
-	}
-
-	public init(
-		notaryPublicKey: Curve25519.Signing.PublicKey,
-		intentSigning: IntentSigning
-	) {
-		self.notaryPublicKey = notaryPublicKey
-		self.intentSigning = intentSigning
-	}
-}
-
-extension GatewayAPI.TransactionPreviewRequest {
-	init(
-		rawManifest: TransactionManifest,
-		header: TransactionHeader,
-		transactionSigners: TransactionSigners
-	) throws {
-		let manifestString = {
-			switch rawManifest.instructions {
-			case let .string(manifestString): return manifestString
-			case .parsed: fatalError("you should have converted manifest to string first")
-			}
-		}()
-
-		let flags = GatewayAPI.TransactionPreviewRequestFlags(
-			unlimitedLoan: true, // True since no lock fee is added
-			assumeAllSignatureProofs: false,
-			permitDuplicateIntentHash: false,
-			permitInvalidHeaderEpoch: false
-		)
-
-		struct NotaryAsSignatoryDiscrepancy: Swift.Error {}
-		guard transactionSigners.notaryAsSignatory == header.notaryAsSignatory else {
-			loggerGlobal.error("Preview incorrectly implemented, found discrepancy in `notaryAsSignatory` and `transactionSigners`.")
-			assertionFailure("discrepancy")
-			throw NotaryAsSignatoryDiscrepancy()
-		}
-		let notaryAsSignatory = transactionSigners.notaryAsSignatory
-
-		self.init(
-			manifest: manifestString,
-			blobsHex: rawManifest.blobs.map(\.hex),
-			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
-			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
-			notaryPublicKey: GatewayAPI.PublicKey(from: header.publicKey),
-			notaryAsSignatory: notaryAsSignatory,
-			costUnitLimit: .init(header.costUnitLimit),
-			tipPercentage: .init(header.tipPercentage),
-			nonce: .init(header.nonce.rawValue),
-			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
-			flags: flags
-		)
-	}
-}
-
-extension TransactionSigners {
-	public var notaryAsSignatory: Bool {
-		switch self.intentSigning {
-		case .intentSigners: return false
-		case .notaryAsSignatory: return true
-		}
-	}
-
-	public var signerPublicKeys: Set<SLIP10.PublicKey> {
-		switch intentSigning {
-		case let .intentSigners(accounts):
-			return Set(accounts.flatMap { account in
-				account.publicKeysOfRequiredSigningKeys()
-			})
-		case .notaryAsSignatory:
-			return []
-		}
-	}
-
-	public func intentSignerAccountsOrEmpty() -> OrderedSet<Profile.Network.Account> {
-		switch intentSigning {
-		case .notaryAsSignatory: return .init()
-		case let .intentSigners(accounts): return accounts.rawValue
-		}
-	}
-}
-
-extension GatewayAPI.PublicKey {
-	init(from engine: Engine.PublicKey) {
-		switch engine {
-		case let .ecdsaSecp256k1(key):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: key.bytes.hex))
-		case let .eddsaEd25519(key):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: key.bytes.hex))
-		}
-	}
-}
-
-extension GatewayAPI.PublicKey {
-	init(from slip10: SLIP10.PublicKey) {
-		switch slip10 {
-		case let .eddsaEd25519(pubKey):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
-		case let .ecdsaSecp256k1(pubKey):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
-		}
-	}
-}
-
-extension Profile.Network.Account {
-	public func publicKeysOfRequiredSigningKeys() -> Set<SLIP10.PublicKey> {
-		switch securityState {
-		case let .unsecured(control):
-			return Set([control.genesisFactorInstance.publicKey])
-		}
 	}
 }
