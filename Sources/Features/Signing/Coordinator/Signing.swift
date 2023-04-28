@@ -159,8 +159,8 @@ public struct Signing: Sendable, FeatureReducer {
 			return proceedWithNextFactorSource(&state)
 
 		case
-			let .signWithDevice(.delegate(.done(factors, signatures))),
-			let .signWithLedger(.delegate(.done(factors, signatures))):
+			let .signWithDeviceFactors(.delegate(.done(factors, signatures))),
+			let .signWithLedgerFactors(.delegate(.done(factors, signatures))):
 			return handleSignatures(signingFactors: factors, signatures: signatures, &state)
 		default:
 			return .none
@@ -191,9 +191,9 @@ public struct Signing: Sendable, FeatureReducer {
 			let dataToSign = Data(intent.compiledIntent)
 			switch nextKind {
 			case .device:
-				state.step = .signWithDevice(.init(signingFactors: nextFactors, dataToSign: dataToSign))
+				state.step = .signWithDeviceFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
 			case .ledgerHQHardwareWallet:
-				state.step = .signWithLedger(.init(signingFactors: nextFactors, dataToSign: dataToSign))
+				state.step = .signWithLedgerFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
 			}
 			return .none
 		} else {
