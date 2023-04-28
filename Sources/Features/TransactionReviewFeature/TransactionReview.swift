@@ -112,7 +112,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
-					._printChanges()
 			}
 			Scope(state: /State.submitting, action: /Action.submitting) {
 				SubmitTransaction()
