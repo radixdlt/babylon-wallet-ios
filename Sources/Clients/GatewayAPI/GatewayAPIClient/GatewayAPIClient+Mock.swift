@@ -8,6 +8,7 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let testValue = Self(
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
+		getNetworkConfiguration: unimplemented("\(Self.self).getNetworkConfiguration"),
 		getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
 		getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
 		getEntityFungiblesPage: unimplemented("\(Self.self).getEntityFungiblesPage"),
@@ -30,6 +31,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		.init(
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
+			getNetworkConfiguration: unimplemented("\(Self.self).getNetworkConfiguration"),
 			getEntityDetails: unimplemented("\(Self.self).getEntityDetails"),
 			getEntityMetadata: unimplemented("\(Self.self).getEntityMetadata"),
 			getEntityFungiblesPage: unimplemented("\(Self.self).getEntityFungiblesPage"),

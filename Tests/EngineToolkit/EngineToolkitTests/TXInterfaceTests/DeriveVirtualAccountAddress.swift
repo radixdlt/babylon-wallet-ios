@@ -38,7 +38,7 @@ extension DeriveVirtualAccountAddressRequestTests {
 
 // MARK: - DeriveVirtualAccountAddressTestVectors
 enum DeriveVirtualAccountAddressTestVectors {
-	typealias Vector = (publicKey: Engine.PublicKey, virtualAccountComponentAddress: AccountAddress)
+	typealias Vector = (publicKey: Engine.PublicKey, virtualAccountComponentAddress: AccountAddress_)
 	static let vectors: [Vector] = [
 		(
 			publicKey: try! .eddsaEd25519(.init(hex: "1262bc6d5408a3c4e025aa0c15e64f69197cdb38911be5ad344a949779df3da6")),

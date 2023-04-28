@@ -206,8 +206,8 @@ extension EngineToolkit {
 	}
 
 	public func analyzeManifest(
-		request: AnalyzeManifestRequest
-	) -> Result<AnalyzeManifestResponse, Error> {
+		request: ExtractAddressesFromManifestRequest
+	) -> Result<ExtractAddressesFromManifestResponse, Error> {
 		callLibraryFunction(
 			request: request,
 			function: extract_addresses_from_manifest

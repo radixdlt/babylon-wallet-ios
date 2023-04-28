@@ -166,6 +166,11 @@ extension GatewayAPIClient {
 				}
 				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
+			getNetworkConfiguration: {
+				try await makeRequest(responseType: GatewayAPI.NetworkConfigurationResponse.self, baseURL: getCurrentBaseURL(), urlFromBase: {
+					$0.appendingPathComponent("status/network-configuration")
+				})
+			},
 			getEntityDetails: getEntityDetails,
 			getEntityMetadata: { address in
 				try await getSingleEntityDetails(address).details.metadata

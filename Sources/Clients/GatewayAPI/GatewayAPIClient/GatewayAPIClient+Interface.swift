@@ -8,6 +8,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Request
 	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
+	public var getNetworkConfiguration: GetNetworkConfiguration
 
 	// MARK: Entity
 	public var getEntityDetails: GetEntityDetails
@@ -31,6 +32,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 extension GatewayAPIClient {
 	public typealias GetNetworkName = @Sendable (URL) async throws -> Radix.Network.Name
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
+	public typealias GetNetworkConfiguration = @Sendable () async throws -> GatewayAPI.NetworkConfigurationResponse
 
 	// MARK: - Entity
 	public typealias GetEntityDetails = @Sendable (_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse

@@ -38,7 +38,7 @@ extension DeriveVirtualIdentityAddressRequestTests {
 
 // MARK: - DeriveVirtualIdentityAddressTestVectors
 enum DeriveVirtualIdentityAddressTestVectors {
-	typealias Vector = (publicKey: Engine.PublicKey, virtualIdentityComponentAddress: IdentityAddress)
+	typealias Vector = (publicKey: Engine.PublicKey, virtualIdentityComponentAddress: IdentityAddress_)
 	static let vectors: [Vector] = [
 		(
 			publicKey: try! .eddsaEd25519(.init(hex: "1262bc6d5408a3c4e025aa0c15e64f69197cdb38911be5ad344a949779df3da6")),

@@ -22,7 +22,8 @@ final class AccountsRequiredToSignTests: TestCase {
 		}
 		let networkID: NetworkID = .simulator
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
-		let expected: Set<AccountAddress> = ["account_sim1ql02qtc2tm73h5dyl8grh2p8xfncgrfltagjm7adlg3edr0ejjmpvt"]
+		let expected: Set<AccountAddress_> = ["account_sim1ql02qtc2tm73h5dyl8grh2p8xfncgrfltagjm7adlg3edr0ejjmpvt"]
+		let result = sut.decodeAddressRequest(request: .init(address: "account_tdx_21_1pdphpkkaafrzzuywsp49cwahuxx05k3ul9suawvmpxylelec3d9ytf"))
 		XCTAssertNoDifference(expected, accountsRequiredToSign)
 
 		// Accounts suitable to pay TX fee is ought to be a superset of accountsRequiredToSign

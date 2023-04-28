@@ -1,5 +1,5 @@
-// MARK: - AnalyzeManifestRequest
-public struct AnalyzeManifestRequest: Sendable, Codable, Hashable {
+// MARK: - ExtractAddressesFromManifestRequest
+public struct ExtractAddressesFromManifestRequest: Sendable, Codable, Hashable {
 	public let networkId: NetworkID
 	public let manifest: TransactionManifest
 
@@ -12,7 +12,7 @@ public struct AnalyzeManifestRequest: Sendable, Codable, Hashable {
 	}
 }
 
-extension AnalyzeManifestRequest {
+extension ExtractAddressesFromManifestRequest {
 	private enum CodingKeys: String, CodingKey {
 		case networkId = "network_id"
 		case manifest
@@ -34,8 +34,8 @@ extension AnalyzeManifestRequest {
 	}
 }
 
-// MARK: - AnalyzeManifestResponse
-public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
+// MARK: - ExtractAddressesFromManifestResponse
+public struct ExtractAddressesFromManifestResponse: Sendable, Codable, Hashable {
 	// MARK: Stored properties
 
 	public let packageAddresses: [PackageAddress]

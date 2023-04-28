@@ -13,6 +13,7 @@ extension FaucetClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 		// Return `nil` for `not allowed to use` else: return `some` for `is alllowed to use`
@@ -65,10 +66,10 @@ extension FaucetClient: DependencyKey {
 				return
 			}
 
-			let networkID = await gatewaysClient.getCurrentNetworkID()
+			let faucetAddress = try await ComponentAddress(validatingAddress: gatewayAPIClient.getNetworkConfiguration().wellKnownAddresses.faucet)
 			let manifest = try engineToolkitClient.manifestForFaucet(
 				includeLockFeeInstruction: true,
-				networkID: networkID,
+				faucetAddress: faucetAddress,
 				accountAddress: accountAddress
 			)
 
@@ -88,19 +89,20 @@ extension FaucetClient: DependencyKey {
 		}
 
 		#if DEBUG
+
 		let createFungibleToken: CreateFungibleToken = { request in
-			let networkID = await gatewaysClient.getCurrentNetworkID()
+			let faucetAddress = try await ComponentAddress(validatingAddress: gatewayAPIClient.getNetworkConfiguration().wellKnownAddresses.faucet)
 			let manifest = try {
 				if request.numberOfTokens == 1 {
 					return try engineToolkitClient.manifestForCreateFungibleToken(
-						networkID: networkID,
+						faucetAddress: faucetAddress,
 						accountAddress: request.recipientAccountAddress,
 						tokenName: request.name,
 						tokenSymbol: request.symbol
 					)
 				} else {
 					return try engineToolkitClient.manifestForMultipleCreateFungibleToken(
-						networkID: networkID,
+						faucetAddress: faucetAddress,
 						accountAddress: request.recipientAccountAddress,
 						tokensCount: request.numberOfTokens
 					)
@@ -111,17 +113,18 @@ extension FaucetClient: DependencyKey {
 		}
 
 		let createNonFungibleToken: CreateNonFungibleToken = { request in
+			let faucetAddress = try await ComponentAddress(validatingAddress: gatewayAPIClient.getNetworkConfiguration().wellKnownAddresses.faucet)
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let manifest = try {
 				if request.numberOfTokens == 1 {
 					return try engineToolkitClient.manifestForCreateNonFungibleToken(
-						networkID: networkID,
+						faucetAddress: faucetAddress,
 						accountAddress: request.recipientAccountAddress,
 						nftName: request.name
 					)
 				} else {
 					return try engineToolkitClient.manifestForCreateMultipleNonFungibleToken(
-						networkID: networkID,
+						faucetAddress: faucetAddress,
 						accountAddress: request.recipientAccountAddress,
 						tokensCount: request.numberOfTokens,
 						idsCount: request.numberOfIds

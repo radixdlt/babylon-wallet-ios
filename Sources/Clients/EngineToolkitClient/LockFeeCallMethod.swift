@@ -28,21 +28,20 @@ extension EngineToolkitClient {
 	}
 
 	public func lockFeeCallMethod(
-		faucetForNetwork networkID: NetworkID,
+		faucetAddress: ComponentAddress,
 		fee: String = "10"
 	) throws -> CallMethod {
-		let faucetAddress = try faucetAddress(for: networkID)
-		return lockFeeCallMethod(address: faucetAddress, fee: fee)
+		lockFeeCallMethod(address: faucetAddress, fee: fee)
 	}
 
 	public func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
-		networkID: NetworkID,
+		faucetAddress: ComponentAddress,
 		accountAddress: AccountAddress
 	) throws -> TransactionManifest {
 		try manifestForFaucet(
 			includeLockFeeInstruction: includeLockFeeInstruction,
-			networkID: networkID,
+			faucetAddress: faucetAddress,
 			componentAddress: .init(address: accountAddress.address)
 		)
 	}
@@ -62,10 +61,9 @@ extension EngineToolkitClient {
 	///     Expression("ENTIRE_WORKTOP");
 	public func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
-		networkID: NetworkID,
+		faucetAddress: ComponentAddress,
 		componentAddress: ComponentAddress
 	) throws -> TransactionManifest {
-		let faucetAddress = try faucetAddress(for: networkID)
 		var instructions: [any InstructionProtocol] = [
 			CallMethod(
 				receiver: faucetAddress.asGeneral,
@@ -88,20 +86,15 @@ extension EngineToolkitClient {
 		}
 		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
-
-	private func faucetAddress(for networkID: NetworkID) throws -> PackageAddress {
-		try knownEntityAddresses(networkID).faucetPackageAddress
-	}
 }
 
 #if DEBUG
 extension EngineToolkitClient {
 	public func manifestForMultipleCreateFungibleToken(
-		networkID: NetworkID,
+		faucetAddress: ComponentAddress,
 		accountAddress: AccountAddress,
 		tokensCount: Int = 20
 	) throws -> TransactionManifest {
-		let faucetAddress = try faucetAddress(for: networkID)
 		let tokens: [any InstructionProtocol] = stride(from: 0, to: tokensCount, by: 1).map { _ in
 			var metdataEntries: [[ManifestASTValue]] = []
 
@@ -179,7 +172,7 @@ extension EngineToolkitClient {
 	}
 
 	public func manifestForCreateFungibleToken(
-		networkID: NetworkID,
+		faucetAddress: ComponentAddress,
 		accountAddress: AccountAddress,
 		tokenDivisivility: UInt8 = 18,
 		tokenName: String = "Token Test",
@@ -187,7 +180,6 @@ extension EngineToolkitClient {
 		tokenSymbol: String = "TEST",
 		initialSupply: String = "21000000"
 	) throws -> TransactionManifest {
-		let faucetAddress = try faucetAddress(for: networkID)
 		let instructions: [any InstructionProtocol] = [
 			lockFeeCallMethod(address: faucetAddress),
 
@@ -224,12 +216,11 @@ extension EngineToolkitClient {
 	}
 
 	public func manifestForCreateNonFungibleToken(
-		networkID: NetworkID,
+		faucetAddress: ComponentAddress,
 		accountAddress: AccountAddress,
 		nftName: String = "NFT Test",
 		nftDescription: String = "Artsy cool unique NFT"
 	) throws -> TransactionManifest {
-		let faucetAddress = try faucetAddress(for: networkID)
 		let instructions: [any InstructionProtocol] = [
 			lockFeeCallMethod(address: faucetAddress),
 
@@ -278,12 +269,11 @@ extension EngineToolkitClient {
 	}
 
 	public func manifestForCreateMultipleNonFungibleToken(
-		networkID: NetworkID,
+		faucetAddress: ComponentAddress,
 		accountAddress: AccountAddress,
 		tokensCount: Int = 10,
 		idsCount: Int = 100
 	) throws -> TransactionManifest {
-		let faucetAddress = try faucetAddress(for: networkID)
 		let tokens = try stride(from: 0, to: tokensCount, by: 1).map { _ in
 			var metadataEntries: [[ManifestASTValue]] = []
 			let shouldAddName = Bool.random()
