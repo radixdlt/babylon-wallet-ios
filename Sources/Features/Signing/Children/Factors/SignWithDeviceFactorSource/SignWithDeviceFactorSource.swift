@@ -20,7 +20,6 @@ public struct SignWithDeviceFactorSource: SignWithFactorReducerProtocol {
 		switch viewAction {
 		case .appeared:
 			return .run { [signingFactor = state.signingFactor, data = state.dataToSign] send in
-
 				let signatures = try await useFactorSourceClient.signUsingDeviceFactorSource(deviceFactorSource: signingFactor.factorSource, of: Set(signingFactor.signers.map(\.account)), unhashedDataToSign: data)
 				await send(.delegate(.done(signingFactor: signingFactor, signatures: signatures)))
 			} catch: { _, _ in

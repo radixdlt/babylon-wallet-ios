@@ -75,27 +75,158 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.importOlympiaDevice
 				)
 			},
-			deriveCurve25519PublicKey: { derivationPath, ledger in
-				let ledgerModel = P2P.LedgerHardwareWallet.Model(rawValue: ledger.description.rawValue) ?? .nanoSPlus // FIXME: handle optional better.
+			deriveCurve25519PublicKey: { derivationPath, factorSource in
 				let response = try await makeRequest(
 					.derivePublicKey(.init(
 						keyParameters: .init(
 							curve: .curve25519,
 							derivationPath: derivationPath.path
 						),
-						ledgerDevice: .init(
-							name: .init(rawValue: ledger.label.rawValue),
-							id: ledger.id.description,
-							model: ledgerModel
-						)
+						//                        ledgerDevice: .init(
+						//                            name: .init(rawValue: ledger.label.rawValue),
+						//                            id: ledger.id.description,
+						//                            model: ledgerModel
+						//                        )
+						ledgerDevice: .init(from: factorSource)
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
 				)
 
 				return try .init(compressedRepresentation: response.publicKey.data)
+			},
+			sign: { request in
+				let signers = request.accounts.flatMap(\.keyParams)
+				let signaturesRaw = try await makeRequest(
+					.signTransaction(.init(
+						signers: signers,
+						ledgerDevice: .init(from: request.ledger),
+						compiledTransactionIntent: .init(data: request.unhashedDataToSign),
+						mode: .summary
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
+				)
+				//                for sig in response {
+				//                    guard request.accounts.contains(where: { account in
+//
+				//                    })
+				//                }
+				let signatures = try signaturesRaw.map { $0.parsed() }
+				for signer in signers {
+					guard signatures.contains(where: {
+						$0.derivationPath.path == signer.derivationPath
+
+					}) else {
+						throw MissingSignature()
+					}
+					continue
+				}
 			}
 		)
 	}()
+}
+
+// MARK: - MissingSignature
+struct MissingSignature: Swift.Error {}
+
+// extension Profile.Network.Account {
+//    func derivationPath() throws -> DerivationPath {
+//        switch securityState {
+//        case .unsecured(.)
+//        }
+//    }
+// }
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
+	struct Parsed: Sendable, Hashable {
+		public let signature: SignatureWithPublicKey
+		public let derivationPath: DerivationPath
+	}
+
+	func parsed() throws -> Parsed {
+		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
+			struct BadCurve: Swift.Error {}
+			throw BadCurve()
+		}
+		let signatureWithPublicKey: SignatureWithPublicKey
+		switch curve {
+		case .secp256k1:
+			signatureWithPublicKey = try .ecdsaSecp256k1(
+				signature: .init(radixFormat: self.signature.data),
+				publicKey: .init(compressedRepresentation: self.publicKey.data)
+			)
+		case .curve25519:
+			signatureWithPublicKey = try .eddsaEd25519(
+				signature: self.signature.data,
+				publicKey: .init(compressedRepresentation: self.publicKey.data)
+			)
+		}
+		let derivationPath: DerivationPath
+		do {
+			derivationPath = try .init(
+				scheme: .cap26,
+				path: AccountHierarchicalDeterministicDerivationPath(
+					derivationPath: self.derivationPath
+				)
+				.derivationPath
+			)
+		} catch {
+			derivationPath = try .init(
+				scheme: .bip44Olympia,
+				path: LegacyOlympiaBIP44LikeDerivationPath(
+					derivationPath: self.derivationPath
+				)
+				.derivationPath
+			)
+		}
+
+		return Parsed(signature: signatureWithPublicKey, derivationPath: derivationPath)
+	}
+}
+
+extension Profile.Network.Account {
+	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
+		switch securityState {
+		case let .unsecured(control):
+			let factorInstance = control.genesisFactorInstance
+			guard let derivationPath = factorInstance.derivationPath else {
+				return []
+			}
+			return [
+				.init(
+					curve: factorInstance.publicKey.curve.cast(),
+					derivationPath: derivationPath.path
+				),
+			]
+		}
+	}
+}
+
+extension SLIP10.Curve {
+	fileprivate func cast() -> P2P.LedgerHardwareWallet.KeyParameters.Curve {
+		switch self {
+		case .curve25519: return .curve25519
+		case .secp256k1: return .secp256k1
+		}
+	}
+}
+
+extension P2P.LedgerHardwareWallet.LedgerDevice {
+	init(from factorSource: FactorSource) {
+		self.init(
+			name: .init(rawValue: factorSource.label.rawValue),
+			id: factorSource.id.description,
+			model: .init(from: factorSource)
+		)
+	}
+}
+
+extension P2P.LedgerHardwareWallet.Model {
+	init(from factorSource: FactorSource) {
+		precondition(factorSource.kind == .ledgerHQHardwareWallet)
+		self = Self(
+			rawValue: factorSource.description.rawValue
+		) ?? .nanoSPlus // FIXME: handle optional better.
+	}
 }
 
 // MARK: - FailedToReceiveAnyResponseFromAnyClient

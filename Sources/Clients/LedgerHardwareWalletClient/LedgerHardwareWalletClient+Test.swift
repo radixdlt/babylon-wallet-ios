@@ -33,13 +33,15 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		},
 		deriveCurve25519PublicKey: { _, _ in
 			Curve25519.Signing.PrivateKey().publicKey
-		}
+		},
+		sign: { _ in [] }
 	)
 
 	public static let testValue = Self(
 		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		importOlympiaDevice: unimplemented("\(Self.self).importOlympiaDevice"),
-		deriveCurve25519PublicKey: unimplemented("\(Self.self).deriveCurve25519PublicKey")
+		deriveCurve25519PublicKey: unimplemented("\(Self.self).deriveCurve25519PublicKey"),
+		sign: unimplemented("\(Self.self).sign")
 	)
 }
