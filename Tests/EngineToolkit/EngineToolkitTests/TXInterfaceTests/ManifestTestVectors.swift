@@ -7,8 +7,8 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 		(
 			manifest: String(decoding: resource(named: "access_rule", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
-		)
-                ,
+		),
+
 		(
 			manifest: String(decoding: resource(named: "auth_zone", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
@@ -85,100 +85,100 @@ public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]]
 			manifest: String(decoding: resource(named: "values", extension: ".rtm"), as: UTF8.self),
 			blobs: [[10]]
 		),
-//		(
-//			manifest: String(decoding: resource(named: "worktop", extension: ".rtm"), as: UTF8.self),
-//			blobs: [[10]]
-//		),
+		(
+			manifest: String(decoding: resource(named: "worktop", extension: ".rtm"), as: UTF8.self),
+			blobs: [[10]]
+		),
 	]
 
-        for (index, _) in testVectors.enumerated() {
-                testVectors[index].manifest = try testVectors[index]
-                        .manifest
-                        .replacingOccurrences(
-                                of: "${",
-                                with: "{"
-                        )
-                        .replacingOccurrences(
-                                of: "{xrd_resource_address}",
-                                with: "resource_sim1q88e5v6nynxjnn2hr6pjm4ttvgwfctuall7yhnty7mrq30ccxs"
-                        )
-                        .replacingOccurrences(
-                                of: "{faucet_component_address}",
-                                with: "component_sim1pyh6hkm4emes653c38qgllau47rufnsj0qumeez85zyskzs0y9"
-                        )
-                        .replacingOccurrences(
-                                of: "{account_address}",
-                                with: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
-                        )
-                        .replacingOccurrences(
-                                of: "{this_account_address}",
-                                with: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
-                        )
-                        .replacingOccurrences(
-                                of: "{account_component_address}",
-                                with: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
-                        )
-                        .replacingOccurrences(
-                                of: "{other_account_address}",
-                                with: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
-                        )
-                        .replacingOccurrences(
-                                of: "{account_a_component_address}",
-                                with: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
-                        )
-                        .replacingOccurrences(
-                                of: "{account_b_component_address}",
-                                with: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
-                        )
-                        .replacingOccurrences(
-                                of: "{account_c_component_address}",
-                                with: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"
-                        )
-                        .replacingOccurrences(
-                                of: "{owner_badge_resource_address}",
-                                with: "resource_sim1q88e5v6nynxjnn2hr6pjm4ttvgwfctuall7yhnty7mrq30ccxs"
-                        )
-                        .replacingOccurrences(
-                                of: "{minter_badge_resource_address}",
-                                with: "resource_sim1q88e5v6nynxjnn2hr6pjm4ttvgwfctuall7yhnty7mrq30ccxs"
-                        )
-                        .replacingOccurrences(
-                                of: "{auth_badge_resource_address}",
-                                with: "resource_sim1q88e5v6nynxjnn2hr6pjm4ttvgwfctuall7yhnty7mrq30ccxs"
-                        )
-                        .replacingOccurrences(
-                                of: "{mintable_resource_address}",
-                                with: "resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k"
-                        )
-                        .replacingOccurrences(
-                                of: "{owner_badge_non_fungible_local_id}",
-                                with: "#1#"
-                        )
-                        .replacingOccurrences(
-                                of: "{auth_badge_non_fungible_local_id}",
-                                with: "#1#"
-                        )
-                        .replacingOccurrences(
-                                of: "{code_blob_hash}",
-                                with: blake2b(data: Data([10])).hex
-                        )
-                        .replacingOccurrences(
-                                of: "{schema_blob_hash}",
-                                with: blake2b(data: Data([10])).hex
-                        )
-                        .replacingOccurrences(
-                                of: "{initial_supply}",
-                                with: "12"
-                        )
-                        .replacingOccurrences(
-                                of: "{mint_amount}",
-                                with: "12"
-                        )
-                        .replacingOccurrences(
-                                of: "{non_fungible_local_id}",
-                                with: "#1#"
-                        )
-        }
+	for (index, _) in testVectors.enumerated() {
+		testVectors[index].manifest = try testVectors[index]
+			.manifest
+			.replacingOccurrences(
+				of: "${",
+				with: "{"
+			)
+			.replacingOccurrences(
+				of: "{xrd_resource_address}",
+				with: "resource_sim1q2k2fa4x7rjy9e57wff58dr3uydvypdgf2m3kvec2uv5uxwhjta2dm"
+			)
+			.replacingOccurrences(
+				of: "{faucet_component_address}",
+				with: "component_sim1pyakxvzls3cwkfp25xz7dufp9jnw6wzxe3cxaku2ju7tlyuvusk6y9"
+			)
+			.replacingOccurrences(
+				of: "{account_address}",
+				with: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl"
+			)
+			.replacingOccurrences(
+				of: "{this_account_address}",
+				with: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl"
+			)
+			.replacingOccurrences(
+				of: "{account_component_address}",
+				with: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl"
+			)
+			.replacingOccurrences(
+				of: "{other_account_address}",
+				with: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl"
+			)
+			.replacingOccurrences(
+				of: "{account_a_component_address}",
+				with: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl"
+			)
+			.replacingOccurrences(
+				of: "{account_b_component_address}",
+				with: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl"
+			)
+			.replacingOccurrences(
+				of: "{account_c_component_address}",
+				with: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl"
+			)
+			.replacingOccurrences(
+				of: "{owner_badge_resource_address}",
+				with: "resource_sim1q2k2fa4x7rjy9e57wff58dr3uydvypdgf2m3kvec2uv5uxwhjta2dm"
+			)
+			.replacingOccurrences(
+				of: "{minter_badge_resource_address}",
+				with: "resource_sim1q2k2fa4x7rjy9e57wff58dr3uydvypdgf2m3kvec2uv5uxwhjta2dm"
+			)
+			.replacingOccurrences(
+				of: "{auth_badge_resource_address}",
+				with: "resource_sim1q2k2fa4x7rjy9e57wff58dr3uydvypdgf2m3kvec2uv5uxwhjta2dm"
+			)
+			.replacingOccurrences(
+				of: "{mintable_resource_address}",
+				with: "resource_sim1q2k2fa4x7rjy9e57wff58dr3uydvypdgf2m3kvec2uv5uxwhjta2dm"
+			)
+			.replacingOccurrences(
+				of: "{owner_badge_non_fungible_local_id}",
+				with: "#1#"
+			)
+			.replacingOccurrences(
+				of: "{auth_badge_non_fungible_local_id}",
+				with: "#1#"
+			)
+			.replacingOccurrences(
+				of: "{code_blob_hash}",
+				with: blake2b(data: Data([10])).hex
+			)
+			.replacingOccurrences(
+				of: "{schema_blob_hash}",
+				with: blake2b(data: Data([10])).hex
+			)
+			.replacingOccurrences(
+				of: "{initial_supply}",
+				with: "12"
+			)
+			.replacingOccurrences(
+				of: "{mint_amount}",
+				with: "12"
+			)
+			.replacingOccurrences(
+				of: "{non_fungible_local_id}",
+				with: "#1#"
+			)
+	}
 
 	return testVectors
 }

@@ -36,8 +36,8 @@ public struct KnownEntityAddressesResponse: Sendable, Decodable, Hashable {
 	public let ecdsaSecp256k1TokenResourceAddress: ResourceAddress
 	public let eddsaEd25519TokenResourceAddress: ResourceAddress
 	public let packageTokenResourceAddress: ResourceAddress
-	public let epochManagerSystemAddress: EpochManagerAddress
-	public let clockSystemAddress: ClockAddress
+	public let epochManagerSystemAddress: ComponentAddress
+	public let clockSystemAddress: ComponentAddress
 
 	public init(
 		faucetPackageAddress: PackageAddress,
@@ -47,8 +47,8 @@ public struct KnownEntityAddressesResponse: Sendable, Decodable, Hashable {
 		ecdsaSecp256k1TokenResourceAddress: ResourceAddress,
 		eddsaEd25519TokenResourceAddress: ResourceAddress,
 		packageTokenResourceAddress: ResourceAddress,
-		epochManagerSystemAddress: EpochManagerAddress,
-		clockSystemAddress: ClockAddress
+		epochManagerSystemAddress: ComponentAddress,
+		clockSystemAddress: ComponentAddress
 	) {
 		self.faucetPackageAddress = faucetPackageAddress
 		self.accountPackageAddress = accountPackageAddress

@@ -10,20 +10,19 @@ final class AccountsRequiredToSignTests: TestCase {
 	func test_setMetaData() throws {
 		let transactionManifest = TransactionManifest {
 			SetMetadata(
-				entityAddress: "account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3",
+				entityAddress: "account_sim1ql02qtc2tm73h5dyl8grh2p8xfncgrfltagjm7adlg3edr0ejjmpvt",
 				key: "name",
-				value: Enum(.string("Radix Dashboard"))
-			)
-
-			SetMetadata(
-				entityAddress: "component_sim1pyh6hkm4emes653c38qgllau47rufnsj0qumeez85zyskzs0y9",
-				key: "name",
-				value: Enum(.string("Radix Dashboard"))
+				value: Enum(
+					.u8(0),
+					fields: [
+						.enum(.init(.u8(0), fields: [.string("Radix Dashboard")])),
+					]
+				)
 			)
 		}
 		let networkID: NetworkID = .simulator
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
-		let expected: Set<ComponentAddress> = ["account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"]
+		let expected: Set<AccountAddress> = ["account_sim1ql02qtc2tm73h5dyl8grh2p8xfncgrfltagjm7adlg3edr0ejjmpvt"]
 		XCTAssertNoDifference(expected, accountsRequiredToSign)
 
 		// Accounts suitable to pay TX fee is ought to be a superset of accountsRequiredToSign
@@ -51,7 +50,7 @@ final class AccountsRequiredToSignTests: TestCase {
 
 
 			CALL_METHOD
-			    Address("account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3")
+			    Address("account_sim1ql02qtc2tm73h5dyl8grh2p8xfncgrfltagjm7adlg3edr0ejjmpvt")
 			    "deposit_batch"
 			    Expression("ENTIRE_WORKTOP");
 			"""
@@ -62,23 +61,23 @@ final class AccountsRequiredToSignTests: TestCase {
 		XCTAssertNoDifference([], accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be empty, but not the 'accountsSuitableToPayTXFee'")
 
 		let accountsSuitableToPayTXFee = try transactionManifest.accountsSuitableToPayTXFee(networkId: networkID)
-		XCTAssertNoDifference(accountsSuitableToPayTXFee, ["account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3"])
+		XCTAssertNoDifference(accountsSuitableToPayTXFee, ["account_sim1ql02qtc2tm73h5dyl8grh2p8xfncgrfltagjm7adlg3edr0ejjmpvt"])
 	}
 
 	func test_faucet() throws {
 		let transactionManifest = TransactionManifest(instructions: .string(
 			"""
 			CALL_METHOD
-				Address("component_sim1pyh6hkm4emes653c38qgllau47rufnsj0qumeez85zyskzs0y9")
+				Address("component_sim1pyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqdxh44")
 				"lock_fee"
 				Decimal("10");
 
 			CALL_METHOD
-				Address("component_sim1pyh6hkm4emes653c38qgllau47rufnsj0qumeez85zyskzs0y9")
+				Address("component_sim1pyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqdxh44")
 				"free";
 
 			CALL_METHOD
-				Address("account_sim1q7qp88kspl8e4ay2jvqxln9r0kq3jy49akm3aue3jcaqnth6t3")
+				Address("account_sim1ql02qtc2tm73h5dyl8grh2p8xfncgrfltagjm7adlg3edr0ejjmpvt")
 				"deposit_batch"
 				Expression("ENTIRE_WORKTOP");
 			"""

@@ -11,9 +11,9 @@ Pointer information(Pointer string_pointer);
 
 Pointer convert_manifest(Pointer string_pointer);
 
-Pointer analyze_manifest(Pointer string_pointer);
+Pointer extract_addresses_from_manifest(Pointer string_pointer);
 
-Pointer analyze_manifest_with_preview_context(Pointer string_pointer);
+Pointer analyze_transaction_execution(Pointer string_pointer);
 
 Pointer compile_transaction_intent(Pointer string_pointer);
 

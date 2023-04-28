@@ -41,11 +41,11 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 	public let packageAddresses: [PackageAddress]
 	public let resourceAddresses: [ResourceAddress]
 	public let componentAddresses: [ComponentAddress]
-	public let accountAddresses: [ComponentAddress]
+	public let accountAddresses: [AccountAddress_]
 
-	public let accountsRequiringAuth: [ComponentAddress]
-	public let accountsDepositedInto: [ComponentAddress]
-	public let accountsWithdrawnFrom: [ComponentAddress]
+	public let accountsRequiringAuth: [AccountAddress_]
+	public let accountsDepositedInto: [AccountAddress_]
+	public let accountsWithdrawnFrom: [AccountAddress_]
 
 	// MARK: CodingKeys
 

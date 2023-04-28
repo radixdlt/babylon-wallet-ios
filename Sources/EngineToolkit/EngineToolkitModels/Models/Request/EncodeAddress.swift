@@ -47,4 +47,7 @@ extension EncodeAddressRequest {
 	}
 }
 
-public typealias EncodeAddressResponse = PolymorphicAddress
+// MARK: - EncodeAddressResponse
+public struct EncodeAddressResponse: Sendable, Decodable, Hashable {
+	public let address: EntityAddress
+}

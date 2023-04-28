@@ -6,7 +6,7 @@ extension TransactionManifest {
 	private func involvedAccounts(
 		networkId: NetworkID,
 		callMethodFilter: (CallMethod) -> Bool = { _ in true }
-	) throws -> Set<ComponentAddress> {
+	) throws -> Set<AccountAddress_> {
 		let analysis = try EngineToolkit()
 			.analyzeManifest(request: .init(manifest: self, networkId: networkId))
 			.get()
@@ -15,14 +15,14 @@ extension TransactionManifest {
 
 	public func accountsRequiredToSign(
 		networkId: NetworkID
-	) throws -> Set<ComponentAddress> {
+	) throws -> Set<AccountAddress_> {
 		let analysis = try EngineToolkit()
 			.analyzeManifest(request: .init(manifest: self, networkId: networkId))
 			.get()
 		return Set(analysis.accountsRequiringAuth)
 	}
 
-	public func accountsSuitableToPayTXFee(networkId: NetworkID) throws -> Set<ComponentAddress> {
+	public func accountsSuitableToPayTXFee(networkId: NetworkID) throws -> Set<AccountAddress_> {
 		try involvedAccounts(
 			networkId: networkId
 		)

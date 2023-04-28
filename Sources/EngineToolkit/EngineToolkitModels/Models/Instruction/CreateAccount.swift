@@ -8,7 +8,7 @@ public struct CreateAccount: InstructionProtocol {
 		.createAccount(self)
 	}
 
-        public init() {}
+	public init() {}
 }
 
 extension CreateAccount {

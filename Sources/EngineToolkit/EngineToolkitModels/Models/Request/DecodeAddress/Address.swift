@@ -1,84 +1,105 @@
 import Foundation
 
-public struct AddressType: OptionSet, Decodable, Sendable, Hashable {
-        public var rawValue: Int
+// MARK: - AddressKindPrefix
+public enum AddressKindPrefix: String, CaseIterable {
+	case account
+	case resource
+	case package
+	case component
+	case clock
+	case epochManager = "epochmanager"
+	case accesscontroller
+	case validator
+	case identity
 
-        public static let globalPackage = AddressType(rawValue: 1 << 0)
-        public static let globalFungibleResource = AddressType(rawValue: 1 << 1)
-        public static let globalNonFungibleResource = AddressType(rawValue: 1 << 2)
-        public static let globalEpochManager = AddressType(rawValue: 1 << 3)
-        public static let globalValidator = AddressType(rawValue: 1 << 4)
-        public static let globalClock = AddressType(rawValue: 1 << 5)
-        public static let globalAccessController = AddressType(rawValue: 1 << 6)
-        public static let globalAccount = AddressType(rawValue: 1 << 7)
-        public static let globalIdentity = AddressType(rawValue: 1 << 8)
-        public static let globalGenericComponent = AddressType(rawValue: 1 << 9)
-
-        public static let globalVirtualEcdsaAccount = AddressType(rawValue: 1 << 10)
-        public static let globalVirtualEddsaAccount = AddressType(rawValue: 1 << 11)
-        public static let globalVirtualEcdsaIdentity = AddressType(rawValue: 1 << 12)
-        public static let globalVirtualEddsaIdentity = AddressType(rawValue: 1 << 13)
-
-        public static let internalFungibleVault = AddressType(rawValue: 1 << 14)
-        public static let internalNonFungibleVault = AddressType(rawValue: 1 << 15)
-        public static let internalAccount = AddressType(rawValue: 1 << 16)
-        public static let internalKeyValueStore = AddressType(rawValue: 1 << 17)
-        public static let internalGenericComponent = AddressType(rawValue: 1 << 18)
-
-        public static let resource: AddressType = [.globalFungibleResource, .globalNonFungibleResource]
-        public static let component: AddressType = [.account, .identity, .genericComponent, .globalEpochManager, .globalClock, .globalAccessController, .internalFungibleVault, .internalNonFungibleVault, .internalKeyValueStore]
-        public static let package: AddressType = [.globalPackage]
-
-        public static let account: AddressType = [.globalAccount, .internalAccount, .globalVirtualEddsaAccount, .globalVirtualEcdsaAccount]
-        public static let identity: AddressType = [.globalIdentity, .globalVirtualEddsaIdentity, .globalVirtualEcdsaIdentity]
-        public static let genericComponent: AddressType = [.globalGenericComponent, .internalGenericComponent]
-
-        public static let general: AddressType = [.resource, .component, .package]
-
-        public init(rawValue: Int) {
-                self.rawValue = rawValue
-        }
+	static let componentAddressSet: Set<AddressKindPrefix> = [.account, .component, .clock, .epochManager, .accesscontroller, .validator, .identity]
 }
 
 public typealias PackageAddress = SpecificAddress<PackageAddressKind>
 public typealias ComponentAddress = SpecificAddress<ComponentAddressKind>
 public typealias ResourceAddress = SpecificAddress<ResourceAddressKind>
-public typealias AccountAddress = SpecificAddress<AccountAddressKind>
-public typealias GeneralAddress = SpecificAddress<GeneralAddressKind>
+public typealias AccountAddress_ = SpecificAddress<AccountAddressKind>
+public typealias EntityAddress = SpecificAddress<EntityAddressKind>
+public typealias IdentityAddress_ = SpecificAddress<IdentityAddressKind>
+public typealias AccessControllerAddress = SpecificAddress<AccessControllerAddressKind>
 
-public enum GeneralAddressKind: SpecificAddressKind {
-        public static let type: AddressType = .general
+// MARK: - EntityAddressKind
+public enum EntityAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKindPrefix> = Set(AddressKindPrefix.allCases)
 }
 
+// MARK: - ComponentAddressKind
 public enum ComponentAddressKind: SpecificAddressKind {
-        public static let type: AddressType = .component
+	public static let addressSpace: Set<AddressKindPrefix> = AddressKindPrefix.componentAddressSet
 }
 
+// MARK: - ResourceAddressKind
 public enum ResourceAddressKind: SpecificAddressKind {
-        public static let type: AddressType = .resource
+	public static let addressSpace: Set<AddressKindPrefix> = [.resource]
 }
 
+// MARK: - PackageAddressKind
 public enum PackageAddressKind: SpecificAddressKind {
-        public static let type: AddressType = .package
+	public static let addressSpace: Set<AddressKindPrefix> = [.package]
 }
 
+// MARK: - AccountAddressKind
 public enum AccountAddressKind: SpecificAddressKind {
-        public static let type: AddressType = .account
+	public static let addressSpace: Set<AddressKindPrefix> = [.account]
 }
 
+// MARK: - IdentityAddressKind
+public enum IdentityAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKindPrefix> = [.identity]
+}
+
+// MARK: - AccessControllerAddressKind
+public enum AccessControllerAddressKind: SpecificAddressKind {
+	public static let addressSpace: Set<AddressKindPrefix> = [.accesscontroller]
+}
+
+// MARK: - SpecificAddressKind
 public protocol SpecificAddressKind: Sendable {
-        static var type: AddressType { get }
+	static var addressSpace: Set<AddressKindPrefix> { get }
 }
 
-public struct SpecificAddress<Kind: SpecificAddressKind>: AddressProtocol, Sendable , Hashable {
-        public let type: AddressType = Kind.type
-        public let address: String
-        
-        // MARK: Init
-        
-        public init(address: String) {
-                self.address = address
-        }
+extension SpecificAddress {
+	public func converted<Kind: SpecificAddressKind>() throws -> SpecificAddress<Kind> {
+		try .init(validatingAddress: self.address)
+	}
+}
+
+// MARK: - SpecificAddress
+public struct SpecificAddress<Kind: SpecificAddressKind>: Sendable, Hashable, Codable, AddressProtocol {
+	public let address: String
+
+	enum CodingKeys: CodingKey {
+		case address
+	}
+
+	public init(address: String) {
+		self.address = address
+	}
+
+	// MARK: Init
+
+	public init(validatingAddress address: String) throws {
+		guard Kind.addressSpace.contains(where: { address.contains($0.rawValue) }) else {
+			throw NSError(domain: "", code: 1)
+		}
+		self.init(address: address)
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		let address = try container.decode(String.self)
+		try self.init(validatingAddress: address)
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(self.address, forKey: .address)
+	}
 }
 
 // MARK: - AddressStringConvertible
@@ -94,5 +115,17 @@ public protocol AddressProtocol: AddressStringConvertible, ExpressibleByStringLi
 extension AddressProtocol {
 	public init(stringLiteral value: String) {
 		self.init(address: value)
+	}
+}
+
+extension SpecificAddress {
+	public var asGeneral: Address_ {
+		.init(address: address)
+	}
+}
+
+extension Address_ {
+	public func asSpecific<Kind: SpecificAddressKind>() throws -> SpecificAddress<Kind> {
+		try .init(validatingAddress: address)
 	}
 }

@@ -8,7 +8,7 @@ public struct CreateIdentity: InstructionProtocol {
 		.createIdentity(self)
 	}
 
-        public init() {}
+	public init() {}
 }
 
 extension CreateIdentity {

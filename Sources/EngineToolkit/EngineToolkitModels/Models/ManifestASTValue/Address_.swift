@@ -48,15 +48,5 @@ extension Address_ {
 	}
 }
 
-extension Address_ {
-	public var asAccountComponentAddress: ComponentAddress? {
-		isAccountAddress ? .init(address: address) : nil
-	}
-
-	public var isAccountAddress: Bool {
-		address.starts(with: "account")
-	}
-}
-
 // MARK: AddressProtocol
 extension Address_: AddressProtocol {}

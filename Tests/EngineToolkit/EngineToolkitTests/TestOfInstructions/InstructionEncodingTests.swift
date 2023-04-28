@@ -312,9 +312,9 @@ final class InstructionEncodingTests: TestCase {
 				{"access_rules":{"elements":[{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}},{"entries":[],"key_value_kind":"Tuple","type":"Map","value_value_kind":"Enum"},{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},{"type":"Enum","variant":{"discriminator":"0","type":"U8"}}],"type":"Tuple"},"code":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"},"instruction":"PUBLISH_PACKAGE_ADVANCED","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"},"royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"},"schema":{"hash":"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b","type":"Blob"}}
 				"""
 			),
-                        (
+			(
 				value: .recallResource(.init(
-                                        vault_id: .init(address: "internal_vault_sim1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsdm5dfg"),
+					vault_id: .init(address: "internal_vault_sim1pcqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqsdm5dfg"),
 					amount: .init(value: "1")
 				)),
 				jsonRepresentation: """
@@ -499,7 +499,7 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-                                value: .createAccount(.init()),
+				value: .createAccount(.init()),
 				jsonRepresentation: """
 				{"instruction":"CREATE_ACCOUNT"}
 				"""

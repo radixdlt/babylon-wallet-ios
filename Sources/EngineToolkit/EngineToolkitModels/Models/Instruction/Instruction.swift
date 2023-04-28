@@ -129,8 +129,8 @@ extension Instruction {
 
 		case .publishPackage:
 			return .publishPackage
-                case .publishPackageAdvanced:
-                        return .publishPackageAdvanced
+		case .publishPackageAdvanced:
+			return .publishPackageAdvanced
 
 		case .burnResource:
 			return .burnResource
@@ -174,13 +174,13 @@ extension Instruction {
 			return .createAccessController
 		case .createIdentity:
 			return .createIdentity
-                case .createIdentityAdvanced:
-                        return .createIdentityAdvanced
+		case .createIdentityAdvanced:
+			return .createIdentityAdvanced
 
 		case .createAccount:
 			return .createAccount
-                case .createAccountAdvanced:
-                        return .createAccountAdvanced
+		case .createAccountAdvanced:
+			return .createAccountAdvanced
 
 		case .createValidator:
 			return .createValidator
@@ -251,8 +251,8 @@ extension Instruction {
 
 		case let .publishPackage(instruction):
 			try instruction.encode(to: encoder)
-                case let .publishPackageAdvanced(instruction):
-                        try instruction.encode(to: encoder)
+		case let .publishPackageAdvanced(instruction):
+			try instruction.encode(to: encoder)
 
 		case let .burnResource(instruction):
 			try instruction.encode(to: encoder)
@@ -296,13 +296,13 @@ extension Instruction {
 			try instruction.encode(to: encoder)
 		case let .createIdentity(instruction):
 			try instruction.encode(to: encoder)
-                case let .createIdentityAdvanced(instruction):
-                        try instruction.encode(to: encoder)
+		case let .createIdentityAdvanced(instruction):
+			try instruction.encode(to: encoder)
 
 		case let .createAccount(instruction):
 			try instruction.encode(to: encoder)
-                case let .createAccountAdvanced(instruction):
-                        try instruction.encode(to: encoder)
+		case let .createAccountAdvanced(instruction):
+			try instruction.encode(to: encoder)
 
 		case let .createValidator(instruction):
 			try instruction.encode(to: encoder)
@@ -367,8 +367,8 @@ extension Instruction {
 
 		case .publishPackage:
 			self = try .publishPackage(.init(from: decoder))
-                case .publishPackageAdvanced:
-                        self = try .publishPackageAdvanced(.init(from: decoder))
+		case .publishPackageAdvanced:
+			self = try .publishPackageAdvanced(.init(from: decoder))
 
 		case .burnResource:
 			self = try .burnResource(.init(from: decoder))
@@ -412,13 +412,13 @@ extension Instruction {
 			self = try .createAccessController(.init(from: decoder))
 		case .createIdentity:
 			self = try .createIdentity(.init(from: decoder))
-                case .createIdentityAdvanced:
-                        self = try .createIdentityAdvanced(.init(from: decoder))
+		case .createIdentityAdvanced:
+			self = try .createIdentityAdvanced(.init(from: decoder))
 
 		case .createAccount:
 			self = try .createAccount(.init(from: decoder))
-                case .createAccountAdvanced:
-                        self = try .createAccountAdvanced(.init(from: decoder))
+		case .createAccountAdvanced:
+			self = try .createAccountAdvanced(.init(from: decoder))
 
 		case .createValidator:
 			self = try .createValidator(.init(from: decoder))

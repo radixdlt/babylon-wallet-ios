@@ -65,7 +65,7 @@ extension EngineToolkitClient {
 					request.manifest.accountsRequiredToSign(
 						networkId: request.networkID
 					).map {
-						try AccountAddress(componentAddress: $0)
+						try AccountAddress(retAddress: $0)
 					}
 				)
 			},
@@ -74,7 +74,7 @@ extension EngineToolkitClient {
 					request.manifest.accountsSuitableToPayTXFee(
 						networkId: request.networkID
 					).map {
-						try AccountAddress(componentAddress: $0)
+						try AccountAddress(retAddress: $0)
 					}
 				)
 			},
@@ -95,7 +95,7 @@ extension EngineToolkitClient {
 struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
 
 extension AccountAddress {
-	public init(componentAddress: ComponentAddress) throws {
-		try self.init(address: componentAddress.address)
+	public init(retAddress: AccountAddress_) throws {
+		try self.init(address: retAddress.address)
 	}
 }

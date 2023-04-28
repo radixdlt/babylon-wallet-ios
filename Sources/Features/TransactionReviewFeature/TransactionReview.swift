@@ -295,7 +295,7 @@ extension TransactionReview {
 				if let userAccount {
 					return .user(.init(address: userAccount.address, label: userAccount.displayName, appearanceID: userAccount.appearanceID))
 				} else {
-					return try .external(.init(componentAddress: encounteredAccount), approved: false)
+					return try .external(.init(retAddress: encounteredAccount), approved: false)
 				}
 			}
 	}
@@ -347,7 +347,7 @@ extension TransactionReview {
 				componentAddress: withdrawal.componentAddress,
 				resourceSpecifier: withdrawal.resourceSpecifier,
 				userAccounts: userAccounts,
-				createdEntities: manifest.createdEntities,
+				createdEntities: manifest.newlyCreatedEntities,
 				container: &withdrawals,
 				networkID: networkID,
 				type: .exact
@@ -376,7 +376,7 @@ extension TransactionReview {
 					componentAddress: componentAddress,
 					resourceSpecifier: resourceSpecifier,
 					userAccounts: userAccounts,
-					createdEntities: manifest.createdEntities,
+					createdEntities: manifest.newlyCreatedEntities,
 					container: &deposits,
 					networkID: networkID,
 					type: .exact
@@ -386,7 +386,7 @@ extension TransactionReview {
 					componentAddress: componentAddress,
 					resourceSpecifier: resourceSpecifier,
 					userAccounts: userAccounts,
-					createdEntities: manifest.createdEntities,
+					createdEntities: manifest.newlyCreatedEntities,
 					container: &deposits,
 					networkID: networkID,
 					type: .estimated(instructionIndex: index)
@@ -413,14 +413,14 @@ extension TransactionReview {
 		componentAddress: ComponentAddress,
 		resourceSpecifier: ResourceSpecifier,
 		userAccounts: [Account],
-		createdEntities: CreatedEntitities?,
+		createdEntities: NewlyCreatedEntities?,
 		container: inout [Account: [Transfer]],
 		networkID: NetworkID,
 		type: TransferType
 	) async throws {
 		let account = userAccounts.first { $0.address.address == componentAddress.address }! // TODO: Handle
 		func addTransfer(_ resourceAddress: ResourceAddress, amount: BigDecimal) async throws {
-			let isNewResources = createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
+			let isNewResources = false // createdEntities?.resourceAddresses.contains(resourceAddress) ?? false
 
 			func getMetadata(address: String) async throws -> GatewayAPI.EntityMetadataCollection? {
 				guard !isNewResources else { return nil }

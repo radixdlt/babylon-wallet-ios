@@ -48,7 +48,7 @@ final class ManifestToStringTests: TestCase {
 		for package in packages {
 			let manifestInstructions = try TransactionManifest {
 				CallMethod(
-					receiver: "account_sim1quxmes4pxzvw8mnz5zgsjmv0atudekp9gr2tmf7evlqsp82e9v",
+					receiver: "account_sim1quft09whj3nzlsd80n28fasr92pup8z4hkflrkqtagelu3g4ywxhjl",
 					methodName: "lock_fee"
 				) { Decimal_(value: "100") }
 
