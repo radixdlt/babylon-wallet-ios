@@ -6,6 +6,13 @@ import Profile
 import TransactionClient
 import UseFactorSourceClient
 
+// MARK: - K1.PublicKey + CustomDumpStringConvertible
+extension K1.PublicKey: CustomDumpStringConvertible {
+	public var customDumpDescription: String {
+		self.compressedRepresentation.hex
+	}
+}
+
 // MARK: - CompileTransactionIntentResponse + CustomDumpStringConvertible
 extension CompileTransactionIntentResponse: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
@@ -32,8 +39,8 @@ public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
 			case prepare(PrepareForSigning.State)
-			case signWithDevice(SignWithDeviceFactorSource.State)
-			case signWithLedger(SignWithLedgerFactorSource.State)
+			case signWithDeviceFactors(SignWithFactorSourcesOfKindDevice.State)
+			case signWithLedgerFactors(SignWithFactorSourcesOfKindLedger.State)
 		}
 
 		public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
@@ -41,7 +48,7 @@ public struct Signing: Sendable, FeatureReducer {
 		public var step: Step
 
 		public var compiledIntent: CompileTransactionIntentResponse? = nil
-		public var factorsLeftToSignWith: OrderedSet<SigningFactor> = []
+		public var factorsLeftToSignWith: OrderedDictionary<FactorSourceKind, NonEmpty<OrderedSet<SigningFactor>>> = [:]
 		public var expectedSignatureCount = -1
 		public var signatures: OrderedSet<Signature> = []
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
@@ -70,8 +77,8 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case prepare(PrepareForSigning.Action)
-		case signWithDevice(SignWithDeviceFactorSource.Action)
-		case signWithLedger(SignWithLedgerFactorSource.Action)
+		case signWithDeviceFactors(SignWithFactorSourcesOfKindDevice.Action)
+		case signWithLedgerFactors(SignWithFactorSourcesOfKindLedger.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -93,16 +100,16 @@ public struct Signing: Sendable, FeatureReducer {
 				PrepareForSigning()
 			}
 			Scope(
-				state: /State.Step.signWithDevice,
-				action: /Action.child .. ChildAction.signWithDevice
+				state: /State.Step.signWithDeviceFactors,
+				action: /Action.child .. ChildAction.signWithDeviceFactors
 			) {
-				SignWithDeviceFactorSource()
+				SignWithFactorSourcesOfKindDevice()
 			}
 			Scope(
-				state: /State.Step.signWithLedger,
-				action: /Action.child .. ChildAction.signWithLedger
+				state: /State.Step.signWithLedgerFactors,
+				action: /Action.child .. ChildAction.signWithLedgerFactors
 			) {
-				SignWithLedgerFactorSource()
+				SignWithFactorSourcesOfKindLedger()
 			}
 		}
 
@@ -147,29 +154,28 @@ public struct Signing: Sendable, FeatureReducer {
 			return .none
 		case let .prepare(.delegate(.done(compiledIntent, signingFactors))):
 			state.compiledIntent = compiledIntent
-			state.factorsLeftToSignWith = signingFactors.rawValue
-			state.expectedSignatureCount = signingFactors.flatMap { sf in
-				sf.signers.map(\.factorInstancesRequiredToSign.count)
-			}.reduce(0, +)
+			state.factorsLeftToSignWith = signingFactors
+			state.expectedSignatureCount = signingFactors.signerCount
 			return proceedWithNextFactorSource(&state)
 
 		case
-			let .signWithDevice(.delegate(.done(f, s))),
-			let .signWithLedger(.delegate(.done(f, s))):
-			return handleSignatures(signingFactor: f, signatures: s, &state)
+			let .signWithDevice(.delegate(.done(factors, signatures))),
+			let .signWithLedger(.delegate(.done(factors, signatures))):
+			return handleSignatures(signingFactors: factors, signatures: signatures, &state)
 		default:
 			return .none
 		}
 	}
 
 	private func handleSignatures(
-		signingFactor: SigningFactor,
+		signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
 		signatures: Set<AccountSignature>,
 		_ state: inout State
 	) -> EffectTask<Action> {
-		let factorSource = signingFactor.factorSource
 		state.signatures.append(contentsOf: signatures.map(\.signature))
-		state.factorsLeftToSignWith.removeAll(where: { $0.factorSource == factorSource })
+		let kind = signingFactors.first.factorSource.kind
+		precondition(signingFactors.allSatisfy { $0.factorSource.kind == kind })
+		state.factorsLeftToSignWith.removeValue(forKey: kind)
 		return proceedWithNextFactorSource(&state)
 	}
 
@@ -178,13 +184,16 @@ public struct Signing: Sendable, FeatureReducer {
 			assertionFailure("expected intent")
 			return .none
 		}
-		if let next = state.factorsLeftToSignWith.first {
+		if
+			let nextKind = state.factorsLeftToSignWith.keys.first,
+			let nextFactors = state.factorsLeftToSignWith[nextKind]
+		{
 			let dataToSign = Data(intent.compiledIntent)
-			switch next.factorSource.kind {
+			switch nextKind {
 			case .device:
-				state.step = .signWithDevice(.init(signingFactor: next, dataToSign: dataToSign))
+				state.step = .signWithDevice(.init(signingFactors: nextFactors, dataToSign: dataToSign))
 			case .ledgerHQHardwareWallet:
-				state.step = .signWithLedger(.init(signingFactor: next, dataToSign: dataToSign))
+				state.step = .signWithLedger(.init(signingFactors: nextFactors, dataToSign: dataToSign))
 			}
 			return .none
 		} else {

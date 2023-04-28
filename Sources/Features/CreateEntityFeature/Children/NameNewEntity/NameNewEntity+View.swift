@@ -20,6 +20,7 @@ extension NameNewEntity {
 
 		public let focusedField: State.Field?
 		public let useLedgerAsFactorSource: Bool
+		public let canUseLedgerAsFactorSource: Bool
 
 		init(state: State) {
 			let entityKind = Entity.entityKind
@@ -44,6 +45,7 @@ extension NameNewEntity {
 				sanitizedNameRequirement = nil
 			}
 			focusedField = state.focusedField
+			canUseLedgerAsFactorSource = state.canUseLedgerAsFactorSource
 		}
 	}
 
@@ -66,7 +68,9 @@ extension NameNewEntity {
 							VStack(spacing: .large1) {
 								subtitle(with: viewStore)
 
-								useLedgerAsFactorSource(with: viewStore)
+								if viewStore.canUseLedgerAsFactorSource {
+									useLedgerAsFactorSource(with: viewStore)
+								}
 
 								let nameBinding = viewStore.binding(
 									get: \.entityName,

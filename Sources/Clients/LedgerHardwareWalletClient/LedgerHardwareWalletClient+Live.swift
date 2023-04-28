@@ -1,3 +1,4 @@
+import AccountsClient
 import ClientPrelude
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Cryptography
@@ -82,11 +83,6 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							curve: .curve25519,
 							derivationPath: derivationPath.path
 						),
-						//                        ledgerDevice: .init(
-						//                            name: .init(rawValue: ledger.label.rawValue),
-						//                            id: ledger.id.description,
-						//                            model: ledgerModel
-						//                        )
 						ledgerDevice: .init(from: factorSource)
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
@@ -95,6 +91,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				return try .init(compressedRepresentation: response.publicKey.data)
 			},
 			sign: { request in
+				@Dependency(\.accountsClient) var accountsClient
 				let signers = request.accounts.flatMap(\.keyParams)
 				let signaturesRaw = try await makeRequest(
 					.signTransaction(.init(
@@ -105,12 +102,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
 				)
-				//                for sig in response {
-				//                    guard request.accounts.contains(where: { account in
-//
-				//                    })
-				//                }
-				let signatures = try signaturesRaw.map { $0.parsed() }
+
+				let signatures = try signaturesRaw.map { try $0.parsed() }
 				for signer in signers {
 					guard signatures.contains(where: {
 						$0.derivationPath.path == signer.derivationPath
@@ -120,13 +113,62 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					}
 					continue
 				}
+				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				var accountSignatures = Set<AccountSignature>()
+				//                for signature in signatures {
+				//                    guard let accountSignature = allAccounts.compactMap({ account in
+				//                        switch account.securityState {
+				//                        case let .unsecured(control):
+				//                            let factorInstance = control.genesisFactorInstance
+				//                            return factorInstance.derivationPath == signature.derivationPath &&
+				//                            factorInstance.publicKey == signature.signature.publicKey
+				//                        }
+//
+				//                    }) else {
+				//                        throw MissingAccountFromSignatures()
+				//                    }
+				//                    accountSignatures.insert(accountSignatures)
+				//                }
+				allAccounts.compactMap { account in
+
+					guard signatures.contains(where: { signature in
+						try signature.derivationPath == account.derivationPath()
+					}) else {
+						return nil
+					}
+				}
 			}
 		)
 	}()
 }
 
+// MARK: - NoDerivationPath
+struct NoDerivationPath: Error {}
+extension Profile.Network.Account {
+	func factorInstance() -> FactorInstance {
+		switch securityState {
+		case let .unsecured(control):
+			return control.genesisFactorInstance
+		}
+	}
+
+	func derivationPath() throws -> DerivationPath {
+		guard let path = factorInstance().derivationPath else {
+			throw NoDerivationPath()
+		}
+		return path
+	}
+
+	func publicKey() -> SLIP10.PublicKey {
+		factorInstance().publicKey
+	}
+}
+
 // MARK: - MissingSignature
 struct MissingSignature: Swift.Error {}
+
+// MARK: - MissingAccountFromSignatures
+struct MissingAccountFromSignatures: Swift.Error {}
 
 // extension Profile.Network.Account {
 //    func derivationPath() throws -> DerivationPath {

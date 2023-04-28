@@ -257,6 +257,7 @@ package.addModules([
 			"FactorSourcesClient",
 			"Profile",
 			"UseFactorSourceClient",
+			"LedgerHardwareWalletClient",
 		],
 		tests: .no
 	),

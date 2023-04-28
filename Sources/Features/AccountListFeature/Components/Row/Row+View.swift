@@ -31,7 +31,7 @@ extension AccountList.Row {
 			self.isLoadingResources = state.portfolio.isLoading
 
 			// Olympia accounts are legacy
-			self.isLegacyAccount = true // state.account.isOlympiaAccount
+			self.isLegacyAccount = state.account.isOlympiaAccount
 
 			// Show the prompt if the account has any XRD
 			self.shouldShowSecurityPrompt = {
