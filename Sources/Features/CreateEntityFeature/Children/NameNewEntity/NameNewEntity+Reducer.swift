@@ -13,6 +13,7 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 		public var sanitizedName: NonEmptyString?
 		public var focusedField: Field?
 		public var useLedgerAsFactorSource: Bool
+		public let canUseLedgerAsFactorSource: Bool
 
 		public init(
 			isFirst: Bool,
@@ -26,6 +27,9 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 			self.sanitizedName = sanitizedName
 			self.isFirst = isFirst
 			self.useLedgerAsFactorSource = useLedgerAsFactorSource
+
+			// Personas should never be controlled with Ledger Hardware wallets.
+			self.canUseLedgerAsFactorSource = Entity.entityKind == .account
 		}
 
 		public init(config: CreateEntityConfig) {
@@ -63,6 +67,7 @@ public struct NameNewEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 			}
 
 		case let .useLedgerAsFactorSourceToggled(useLedgerAsFactorSource):
+			assert(state.canUseLedgerAsFactorSource)
 			state.useLedgerAsFactorSource = useLedgerAsFactorSource
 			return .none
 
