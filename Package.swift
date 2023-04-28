@@ -444,8 +444,6 @@ package.addModules([
 		name: "LedgerHardwareWalletClient",
 		dependencies: [
 			"RadixConnectClient",
-			"AccountsClient",
-			"PersonasClient",
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .no

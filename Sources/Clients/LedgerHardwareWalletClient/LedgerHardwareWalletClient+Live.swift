@@ -1,4 +1,3 @@
-import AccountsClient
 import ClientPrelude
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Cryptography
@@ -91,11 +90,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				return try .init(compressedRepresentation: response.publicKey.data)
 			},
 			sign: { request in
-				@Dependency(\.accountsClient) var accountsClient
-				let signers = request.accounts.flatMap(\.keyParams)
+
 				let signaturesRaw = try await makeRequest(
 					.signTransaction(.init(
-						signers: signers,
+						signers: request.accounts.flatMap(\.keyParams),
 						ledgerDevice: .init(from: request.ledger),
 						compiledTransactionIntent: .init(data: request.unhashedDataToSign),
 						mode: .summary
@@ -104,42 +102,38 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				)
 
 				let signatures = try signaturesRaw.map { try $0.parsed() }
-				for signer in signers {
-					guard signatures.contains(where: {
-						$0.derivationPath.path == signer.derivationPath
-
-					}) else {
-						throw MissingSignature()
-					}
-					continue
-				}
-				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 				var accountSignatures = Set<AccountSignature>()
-				//                for signature in signatures {
-				//                    guard let accountSignature = allAccounts.compactMap({ account in
-				//                        switch account.securityState {
-				//                        case let .unsecured(control):
-				//                            let factorInstance = control.genesisFactorInstance
-				//                            return factorInstance.derivationPath == signature.derivationPath &&
-				//                            factorInstance.publicKey == signature.signature.publicKey
-				//                        }
-//
-				//                    }) else {
-				//                        throw MissingAccountFromSignatures()
-				//                    }
-				//                    accountSignatures.insert(accountSignatures)
-				//                }
-				allAccounts.compactMap { account in
-
-					guard signatures.contains(where: { signature in
-						try signature.derivationPath == account.derivationPath()
-					}) else {
-						return nil
+				for signature in signatures {
+					guard
+						let account = try request.accounts.first(where: { try $0.derivationPath() == signature.derivationPath })
+					else {
+						throw MissingAccountFromSignatures()
 					}
+					let accountSignature = try AccountSignature(account: account, signature: signature)
+					accountSignatures.insert(accountSignature)
 				}
+
+				return accountSignatures
 			}
 		)
 	}()
+}
+
+extension AccountSignature {
+	init(
+		account: Profile.Network.Account,
+		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Parsed
+	) throws {
+		let signature = try Signature(
+			signatureWithPublicKey: signatureParsed.signature,
+			derivationPath: account.derivationPath()
+		)
+		try self.init(
+			entity: account,
+			factorInstance: account.factorInstance(),
+			signature: signature
+		)
+	}
 }
 
 // MARK: - NoDerivationPath
