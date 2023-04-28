@@ -78,11 +78,11 @@ public struct EncounteredComponents: Sendable, Decodable, Equatable {
 public struct AccountWithdraw: Sendable, Decodable, Equatable {
 	// Should be AccountAddress?
 	public let componentAddress: ComponentAddress
-	public let resourceSpecifier: ResourceSpecifier
+	public let resourceQuantifier: ResourceQuantifier
 
 	enum CodingKeys: String, CodingKey {
 		case componentAddress = "component_address"
-		case resourceSpecifier = "resource_specifier"
+		case resourceQuantifier = "resource_quantifier"
 	}
 }
 
@@ -90,12 +90,12 @@ public struct AccountWithdraw: Sendable, Decodable, Equatable {
 public enum AccountDeposit: Sendable, Decodable, Equatable {
 	case exact(
 		componentAddress: ComponentAddress, // Should be AccountAddress?
-		resourceSpecifier: ResourceSpecifier
+		resourceQuantifier: ResourceQuantifier
 	)
 	case estimate(
 		index: UInt32,
 		componentAddress: ComponentAddress, // Should be AccountAddress?
-		resourceSpecifier: ResourceSpecifier
+		resourceQuantifier: ResourceQuantifier
 	)
 
 	enum CodingKeys: String, CodingKey {
@@ -123,6 +123,7 @@ public struct MetadataKeyValue: Sendable, Decodable, Equatable {
 }
 
 // MARK: - MetadataValueType
+// TODO: Validate the implementation against RET, this was just quickly implemented
 enum MetadataValueType: String, Decodable {
 	case bool = "Bool"
 	case u8 = "U8"
@@ -162,33 +163,6 @@ public enum MetadataValue: Sendable, Decodable, Equatable {
 	case nonFungibleGlobalId(String)
 	case instant(String)
 	case url(String)
-
-	public enum PublicKey: Decodable, Equatable, Sendable {
-		private enum CodingKeys: String, CodingKey {
-			case curve, public_key
-		}
-
-		case ecdsaSecp256k1(String)
-		case eddsaEd25519(String)
-
-		enum CurveType: String, Decodable {
-			case ecdsaSecp256k1 = "EcdsaSecp256k1"
-			case eddsaEd25519 = "EddsaEd25519"
-		}
-
-		public init(from decoder: Decoder) throws {
-			let container = try decoder.container(keyedBy: CodingKeys.self)
-			let curve = try container.decode(CurveType.self, forKey: .curve)
-			let publicKey = try container.decode(String.self, forKey: .public_key)
-
-			switch curve {
-			case .ecdsaSecp256k1:
-				self = .ecdsaSecp256k1(publicKey)
-			case .eddsaEd25519:
-				self = .eddsaEd25519(publicKey)
-			}
-		}
-	}
 
 	enum CodingKeys: CodingKey {
 		case type, value
@@ -231,20 +205,51 @@ public enum MetadataValue: Sendable, Decodable, Equatable {
 
 		case .nonFungibleGlobalId:
 			self = try .nonFungibleGlobalId(container.decode(String.self, forKey: .value))
+
 		case .publicKey:
 			self = try .publickKey(container.decode(PublicKey.self, forKey: .value))
+
 		case .instant:
 			self = try .instant(container.decode(String.self, forKey: .value))
+
 		case .url:
 			self = try .instant(container.decode(String.self, forKey: .value))
 		}
 	}
+
+	public enum PublicKey: Decodable, Equatable, Sendable {
+		private enum CodingKeys: String, CodingKey {
+			case curve, public_key
+		}
+
+		case ecdsaSecp256k1(String)
+		case eddsaEd25519(String)
+
+		enum CurveType: String, Decodable {
+			case ecdsaSecp256k1 = "EcdsaSecp256k1"
+			case eddsaEd25519 = "EddsaEd25519"
+		}
+
+		public init(from decoder: Decoder) throws {
+			let container = try decoder.container(keyedBy: CodingKeys.self)
+			let curve = try container.decode(CurveType.self, forKey: .curve)
+			let publicKey = try container.decode(String.self, forKey: .public_key)
+
+			switch curve {
+			case .ecdsaSecp256k1:
+				self = .ecdsaSecp256k1(publicKey)
+			case .eddsaEd25519:
+				self = .eddsaEd25519(publicKey)
+			}
+		}
+	}
 }
 
-// MARK: - ResourceSpecifier
-public enum ResourceSpecifier: Sendable, Decodable, Equatable {
-	case amount(ResourceAddress, Decimal_)
-	case ids(ResourceAddress, Set<NonFungibleLocalIdInternal>)
+// MARK: - ResourceQuantifier
+// TODO: Validate the new format against RET, this was just quickly implemented
+public enum ResourceQuantifier: Sendable, Decodable, Equatable {
+	case amount(Resource, Decimal_)
+	case ids(Resource, Set<NonFungibleLocalIdInternal>)
 
 	enum CodingKeys: String, CodingKey {
 		case type
@@ -253,7 +258,7 @@ public enum ResourceSpecifier: Sendable, Decodable, Equatable {
 		case resourceAddress = "resource_address"
 	}
 
-	enum Resource: Decodable, Equatable, Sendable {
+	public enum Resource: Decodable, Equatable, Sendable {
 		enum CodingKeys: CodingKey {
 			case type, address, index
 		}
@@ -266,7 +271,7 @@ public enum ResourceSpecifier: Sendable, Decodable, Equatable {
 		case existing(ResourceAddress)
 		case newlyCreated(index: String)
 
-		init(from decoder: Decoder) throws {
+		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let type = try container.decode(ResourceType.self, forKey: .type)
 
@@ -282,25 +287,10 @@ public enum ResourceSpecifier: Sendable, Decodable, Equatable {
 
 // MARK: Codable stuff
 
-public extension ResourceSpecifier {
+public extension ResourceQuantifier {
 	internal enum Kind: String, Codable {
 		case amount = "Amount"
 		case ids = "Ids"
-	}
-
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-
-		switch self {
-		case let .amount(resourceAddress, amount):
-			try container.encode(Kind.amount, forKey: .type)
-			try container.encode(resourceAddress, forKey: .resourceAddress)
-			try container.encode(amount.value, forKey: .amount)
-		case let .ids(resourceAddress, ids):
-			try container.encode(Kind.ids, forKey: .type)
-			try container.encode(resourceAddress, forKey: .resourceAddress)
-			try container.encode(ids, forKey: .ids)
-		}
 	}
 
 	init(from decoder: Decoder) throws {
@@ -309,12 +299,12 @@ public extension ResourceSpecifier {
 		switch kind {
 		case .amount:
 			self = try .amount(
-				container.decode(ResourceAddress.self, forKey: .resourceAddress),
+				container.decode(Resource.self, forKey: .resourceAddress),
 				Decimal_(value: container.decode(String.self, forKey: .amount))
 			)
 		case .ids:
 			self = try .ids(
-				container.decode(ResourceAddress.self, forKey: .resourceAddress),
+				container.decode(Resource.self, forKey: .resourceAddress),
 				container.decode(Set<NonFungibleLocalIdInternal>.self, forKey: .ids)
 			)
 		}
@@ -327,22 +317,6 @@ public extension AccountDeposit {
 		case estimate = "Estimate"
 	}
 
-//	func encode(to encoder: Encoder) throws {
-//		var container = encoder.container(keyedBy: CodingKeys.self)
-//
-//		switch self {
-//		case let .exact(componentAddress, resourceSpecifier):
-//			try container.encode(Kind.exact, forKey: .type)
-//			try container.encode(componentAddress, forKey: .componentAddress)
-//			try container.encode(resourceSpecifier, forKey: .resourceSpecifier)
-//		case let .estimate(index, componentAddress, resourceSpecifier):
-//			try container.encode(Kind.estimate, forKey: .type)
-//			try container.encode(String(index), forKey: .index)
-//			try container.encode(componentAddress, forKey: .componentAddress)
-//			try container.encode(resourceSpecifier, forKey: .resourceSpecifier)
-//		}
-//	}
-
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(Kind.self, forKey: .type)
@@ -350,13 +324,13 @@ public extension AccountDeposit {
 		case .exact:
 			self = try .exact(
 				componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress),
-				resourceSpecifier: container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
+				resourceQuantifier: container.decode(ResourceQuantifier.self, forKey: .resourceSpecifier)
 			)
 		case .estimate:
 			self = try .estimate(
 				index: decodeAndConvertToNumericType(container: container, key: .index),
 				componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress),
-				resourceSpecifier: container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
+				resourceQuantifier: container.decode(ResourceQuantifier.self, forKey: .resourceSpecifier)
 			)
 		}
 	}

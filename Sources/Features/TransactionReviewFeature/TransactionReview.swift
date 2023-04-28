@@ -345,7 +345,7 @@ extension TransactionReview {
 		for withdrawal in manifest.accountWithdraws {
 			try await collectTransferInfo(
 				componentAddress: withdrawal.componentAddress,
-				resourceSpecifier: withdrawal.resourceSpecifier,
+				resourceSpecifier: withdrawal.resourceQuantifier,
 				userAccounts: userAccounts,
 				createdEntities: manifest.newlyCreatedEntities,
 				container: &withdrawals,
@@ -411,7 +411,7 @@ extension TransactionReview {
 
 	func collectTransferInfo(
 		componentAddress: ComponentAddress,
-		resourceSpecifier: ResourceSpecifier,
+		resourceSpecifier: ResourceQuantifier,
 		userAccounts: [Account],
 		createdEntities: NewlyCreatedEntities?,
 		container: inout [Account: [Transfer]],
@@ -456,10 +456,16 @@ extension TransactionReview {
 		}
 
 		switch resourceSpecifier {
-		case let .amount(resourceAddress, amount):
+		case let .amount(.existing(resourceAddress), amount):
 			try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
-		case let .ids(resourceAddress, _):
+		case let .ids(.existing(resourceAddress), _):
 			try await addTransfer(resourceAddress, amount: .init(fromString: "1"))
+		case .amount(.newlyCreated(_), _):
+			// TODO: Handle
+			break
+		case .ids(.newlyCreated(_), _):
+			// TODO: Handle
+			break
 		}
 	}
 }
