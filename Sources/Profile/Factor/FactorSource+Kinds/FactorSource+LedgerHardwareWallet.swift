@@ -6,7 +6,7 @@ extension FactorSource {
 	public enum LedgerHardwareWallet {
 		public enum DeviceModel: String, Sendable, Hashable, Codable {
 			case nanoS
-			case nanoSPlus
+			case nanoSPlus = "nanoS+"
 			case nanoX
 		}
 	}
