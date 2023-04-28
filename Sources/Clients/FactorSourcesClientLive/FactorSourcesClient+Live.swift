@@ -98,29 +98,6 @@ extension FactorSourcesClient: DependencyKey {
 					}
 				}
 
-				final class SigningFactorsOfKindRef {
-					private var factors: OrderedSet<SigningFactorRef>
-					func valueType() throws -> NonEmpty<OrderedSet<SigningFactor>> {
-						let valuesTypes = try factors.map { try $0.valueType() }
-						guard let nonEmpty = NonEmpty<OrderedSet<SigningFactor>>(rawValue: OrderedSet(valuesTypes.sorted())) else {
-							throw SignersUnexpectedlyEmpty()
-						}
-						return nonEmpty
-					}
-
-					init(signingFactor: SigningFactorRef) {
-						factors = [signingFactor]
-					}
-
-					func add(_ signingFactorRef: SigningFactorRef) throws {
-						let (insert, _) = self.factors.append(signingFactorRef)
-						guard insert else {
-							struct SigningFactorRefUnexpectedelyAlreadyPresent: Error {}
-							throw SigningFactorRefUnexpectedelyAlreadyPresent()
-						}
-					}
-				}
-
 				var signingFactorsRefsByKind = OrderedDictionary<FactorSourceKind, SigningFactorsOfKindRef>()
 
 				for (factorSource, signingFactorRef) in signingFactors {
@@ -182,6 +159,30 @@ final class SignerRef {
 
 	func valueType() -> SigningFactor.Signer {
 		.init(account: account, factorInstancesRequiredToSign: factorInstancesRequiredToSign)
+	}
+}
+
+// MARK: - SigningFactorsOfKindRef
+final class SigningFactorsOfKindRef {
+	private var factors: OrderedSet<SigningFactorRef>
+	func valueType() throws -> NonEmpty<OrderedSet<SigningFactor>> {
+		let valuesTypes = try factors.map { try $0.valueType() }
+		guard let nonEmpty = NonEmpty<OrderedSet<SigningFactor>>(rawValue: OrderedSet(valuesTypes.sorted())) else {
+			throw SignersUnexpectedlyEmpty()
+		}
+		return nonEmpty
+	}
+
+	init(signingFactor: SigningFactorRef) {
+		factors = [signingFactor]
+	}
+
+	func add(_ signingFactorRef: SigningFactorRef) throws {
+		let (insert, _) = self.factors.append(signingFactorRef)
+		guard insert else {
+			struct SigningFactorRefUnexpectedelyAlreadyPresent: Error {}
+			throw SigningFactorRefUnexpectedelyAlreadyPresent()
+		}
 	}
 }
 
