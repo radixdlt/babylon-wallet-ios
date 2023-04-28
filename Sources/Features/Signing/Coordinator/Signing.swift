@@ -48,7 +48,7 @@ public struct Signing: Sendable, FeatureReducer {
 		public var step: Step
 
 		public var compiledIntent: CompileTransactionIntentResponse? = nil
-		public var factorsLeftToSignWith: OrderedDictionary<FactorSourceKind, NonEmpty<OrderedSet<SigningFactor>>> = [:]
+		public var factorsLeftToSignWith: SigningFactors = [:]
 		public var expectedSignatureCount = -1
 		public var signatures: OrderedSet<Signature> = []
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
@@ -168,7 +168,7 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	private func handleSignatures(
-		signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
+		signingFactors: NonEmpty<Set<SigningFactor>>,
 		signatures: Set<AccountSignature>,
 		_ state: inout State
 	) -> EffectTask<Action> {

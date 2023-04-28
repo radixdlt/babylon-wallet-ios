@@ -15,7 +15,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 
 	public enum DelegateAction: SignWithFactorSourcesOfKindActionProtocol {
 		case done(
-			signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
+			signingFactors: NonEmpty<Set<SigningFactor>>,
 			signatures: Set<AccountSignature>
 		)
 	}
@@ -30,12 +30,21 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 				var signaturesFromAllFactorSources = Set<AccountSignature>()
 				for signingFactor in signingFactors {
 					await send(.internal(.signingWithFactor(signingFactor)))
-					let signatures = try await useFactorSourceClient.signUsingDeviceFactorSource(deviceFactorSource: signingFactor.factorSource, of: Set(signingFactor.signers.map(\.account)), unhashedDataToSign: data)
+
+					let signatures = try await useFactorSourceClient.signUsingDeviceFactorSource(
+						deviceFactorSource: signingFactor.factorSource,
+						of: Set(signingFactor.signers.map(\.account)),
+						unhashedDataToSign: data
+					)
+
 					for signature in signatures {
 						signaturesFromAllFactorSources.insert(signature)
 					}
 				}
-				await send(.delegate(.done(signingFactors: signingFactors, signatures: signaturesFromAllFactorSources)))
+				await send(.delegate(.done(
+					signingFactors: signingFactors,
+					signatures: signaturesFromAllFactorSources
+				)))
 
 			} catch: { _, _ in
 				loggerGlobal.error("Failed to device sign")
