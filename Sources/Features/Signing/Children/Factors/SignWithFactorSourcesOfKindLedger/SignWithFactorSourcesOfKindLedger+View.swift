@@ -1,22 +1,22 @@
 import FeaturePrelude
 
-extension SignWithLedgerFactorSource.State {
-	var viewState: SignWithLedgerFactorSource.ViewState {
+extension SignWithFactorSourcesOfKindLedger.State {
+	var viewState: SignWithFactorSourcesOfKindLedger.ViewState {
 		.init()
 	}
 }
 
-// MARK: - SignWithLedgerFactorSource.View
-extension SignWithLedgerFactorSource {
+// MARK: - SignWithFactorSourcesOfKindLedger.View
+extension SignWithFactorSourcesOfKindLedger {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<SignWithLedgerFactorSource>
+		private let store: StoreOf<SignWithFactorSourcesOfKindLedger>
 
-		public init(store: StoreOf<SignWithLedgerFactorSource>) {
+		public init(store: StoreOf<SignWithFactorSourcesOfKindLedger>) {
 			self.store = store
 		}
 

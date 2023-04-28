@@ -39,8 +39,8 @@ public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
 			case prepare(PrepareForSigning.State)
-			case signWithDevice(SignWithDeviceFactorSource.State)
-			case signWithLedger(SignWithLedgerFactorSource.State)
+			case signWithDevice(SignWithFactorSourcesOfKindDevice.State)
+			case signWithLedger(SignWithFactorSourcesOfKindLedger.State)
 		}
 
 		public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
@@ -77,8 +77,8 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case prepare(PrepareForSigning.Action)
-		case signWithDevice(SignWithDeviceFactorSource.Action)
-		case signWithLedger(SignWithLedgerFactorSource.Action)
+		case signWithDevice(SignWithFactorSourcesOfKindDevice.Action)
+		case signWithLedger(SignWithFactorSourcesOfKindLedger.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -103,13 +103,13 @@ public struct Signing: Sendable, FeatureReducer {
 				state: /State.Step.signWithDevice,
 				action: /Action.child .. ChildAction.signWithDevice
 			) {
-				SignWithDeviceFactorSource()
+				SignWithFactorSourcesOfKindDevice()
 			}
 			Scope(
 				state: /State.Step.signWithLedger,
 				action: /Action.child .. ChildAction.signWithLedger
 			) {
-				SignWithLedgerFactorSource()
+				SignWithFactorSourcesOfKindLedger()
 			}
 		}
 

@@ -1,8 +1,8 @@
 import FactorSourcesClient
 import FeaturePrelude
 
-// MARK: - SignWithFactorReducerActionProtocol
-protocol SignWithFactorReducerActionProtocol: Sendable, Equatable {
+// MARK: - SignWithFactorSourcesOfKindActionProtocol
+protocol SignWithFactorSourcesOfKindActionProtocol: Sendable, Equatable {
 	static func done(
 		signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
 		signatures: Set<AccountSignature>
@@ -14,8 +14,8 @@ public protocol FactorSourceKindSpecifierProtocol {
 	static var factorSourceKind: FactorSourceKind { get }
 }
 
-// MARK: - SignWithFactorState
-public struct SignWithFactorState<FactorSourceKindSpecifier: FactorSourceKindSpecifierProtocol>: Sendable, Hashable {
+// MARK: - SignWithFactorSourcesOfKindState
+public struct SignWithFactorSourcesOfKindState<FactorSourceKindSpecifier: FactorSourceKindSpecifierProtocol>: Sendable, Hashable {
 	public let signingFactors: NonEmpty<OrderedSet<SigningFactor>>
 	public let dataToSign: Data
 	public var currentSigningFactor: SigningFactor?
@@ -31,8 +31,8 @@ public struct SignWithFactorState<FactorSourceKindSpecifier: FactorSourceKindSpe
 	}
 }
 
-// MARK: - SignWithFactorReducerProtocol
-protocol SignWithFactorReducerProtocol: Sendable, FeatureReducer, FactorSourceKindSpecifierProtocol where
-	DelegateAction: SignWithFactorReducerActionProtocol,
-	State == SignWithFactorState<Self>
+// MARK: - SignWithFactorSourcesOfKindReducerProtocol
+protocol SignWithFactorSourcesOfKindReducerProtocol: Sendable, FeatureReducer, FactorSourceKindSpecifierProtocol where
+	DelegateAction: SignWithFactorSourcesOfKindActionProtocol,
+	State == SignWithFactorSourcesOfKindState<Self>
 {}

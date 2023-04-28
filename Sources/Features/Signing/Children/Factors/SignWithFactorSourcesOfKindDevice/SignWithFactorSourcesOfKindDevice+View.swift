@@ -1,14 +1,14 @@
 import struct FactorSourcesClient.SigningFactor
 import FeaturePrelude
 
-extension SignWithDeviceFactorSource.State {
-	var viewState: SignWithDeviceFactorSource.ViewState {
+extension SignWithFactorSourcesOfKindDevice.State {
+	var viewState: SignWithFactorSourcesOfKindDevice.ViewState {
 		.init(currentSigningFactor: currentSigningFactor)
 	}
 }
 
-// MARK: - SignWithDeviceFactorSource.View
-extension SignWithDeviceFactorSource {
+// MARK: - SignWithFactorSourcesOfKindDevice.View
+extension SignWithFactorSourcesOfKindDevice {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
 		let currentSigningFactor: SigningFactor?
@@ -16,9 +16,9 @@ extension SignWithDeviceFactorSource {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<SignWithDeviceFactorSource>
+		private let store: StoreOf<SignWithFactorSourcesOfKindDevice>
 
-		public init(store: StoreOf<SignWithDeviceFactorSource>) {
+		public init(store: StoreOf<SignWithFactorSourcesOfKindDevice>) {
 			self.store = store
 		}
 

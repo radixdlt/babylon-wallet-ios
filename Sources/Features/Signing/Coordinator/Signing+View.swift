@@ -30,12 +30,12 @@ extension Signing {
 				CaseLet(
 					state: /Signing.State.Step.signWithDevice,
 					action: { Signing.Action.child(.signWithDevice($0)) },
-					then: { SignWithDeviceFactorSource.View(store: $0) }
+					then: { SignWithFactorSourcesOfKindDevice.View(store: $0) }
 				)
 				CaseLet(
 					state: /Signing.State.Step.signWithLedger,
 					action: { Signing.Action.child(.signWithLedger($0)) },
-					then: { SignWithLedgerFactorSource.View(store: $0) }
+					then: { SignWithFactorSourcesOfKindLedger.View(store: $0) }
 				)
 			}
 		}

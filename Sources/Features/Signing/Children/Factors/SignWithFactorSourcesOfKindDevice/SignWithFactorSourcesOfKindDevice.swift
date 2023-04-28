@@ -2,9 +2,9 @@ import FactorSourcesClient
 import FeaturePrelude
 import UseFactorSourceClient
 
-public struct SignWithDeviceFactorSource: SignWithFactorReducerProtocol {
+public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducerProtocol {
 	public static let factorSourceKind = FactorSourceKind.device
-	public typealias State = SignWithFactorState<Self>
+	public typealias State = SignWithFactorSourcesOfKindState<Self>
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
@@ -13,7 +13,7 @@ public struct SignWithDeviceFactorSource: SignWithFactorReducerProtocol {
 		case signingWithFactor(SigningFactor)
 	}
 
-	public enum DelegateAction: SignWithFactorReducerActionProtocol {
+	public enum DelegateAction: SignWithFactorSourcesOfKindActionProtocol {
 		case done(
 			signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
 			signatures: Set<AccountSignature>
@@ -44,7 +44,7 @@ public struct SignWithDeviceFactorSource: SignWithFactorReducerProtocol {
 	}
 
 	public func reduce(
-		into state: inout SignWithFactorState<SignWithDeviceFactorSource>,
+		into state: inout SignWithFactorSourcesOfKindState<SignWithFactorSourcesOfKindDevice>,
 		internalAction: InternalAction
 	) -> EffectTask<Action> {
 		switch internalAction {
