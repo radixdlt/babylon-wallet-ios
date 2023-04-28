@@ -280,8 +280,6 @@ extension AccountPortfoliosClient {
 				result.append(contentsOf: tokens)
 			}
 
-			print("\(result.count) tokens: \(result.map(\.keyImageURL))")
-
 			return result
 		}
 
@@ -291,8 +289,6 @@ extension AccountPortfoliosClient {
 
 			// TODO: This lookup will be obsolete once the metadata is present in GatewayAPI.NonFungibleResourcesCollectionItem
 			let metadata = allResourceDetails.first { $0.address == resource.resourceAddress }?.metadata
-
-			print("NAME: \(metadata?.name), iconURL: \(metadata?.iconURL)")
 
 			return AccountPortfolio.NonFungibleResource(
 				resourceAddress: .init(address: resource.resourceAddress),
