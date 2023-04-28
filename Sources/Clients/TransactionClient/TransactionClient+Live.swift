@@ -191,7 +191,7 @@ extension TransactionClient {
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: engineToolkitClient.generateTXNonce(),
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
-				notaryAsSignatory: transactionSigners.notaryAsSignatory, // notaryAndSigners.notary.notaryAsSignatory,
+				notaryAsSignatory: transactionSigners.notaryAsSignatory,
 				costUnitLimit: request.makeTransactionHeaderInput.costUnitLimit,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
@@ -209,7 +209,10 @@ extension TransactionClient {
 
 		let notarizeTransaction: NotarizeTransaction = { request in
 
-			let intent = try engineToolkitClient.decompileTransactionIntentRequest(DecompileTransactionIntentRequest(compiledIntent: request.compileTransactionIntent.compiledIntent, instructionsOutputKind: .parsed))
+			let intent = try engineToolkitClient.decompileTransactionIntentRequest(.init(
+				compiledIntent: request.compileTransactionIntent.compiledIntent,
+				instructionsOutputKind: .parsed
+			))
 
 			let signedTransactionIntent = SignedTransactionIntent(
 				intent: intent,
@@ -218,7 +221,9 @@ extension TransactionClient {
 			let txID = try engineToolkitClient.generateTXID(intent)
 			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
 
-			let notarySignature = try request.notary.sign(hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent))
+			let notarySignature = try request.notary.sign(
+				hashOfMessage: blake2b(data: compiledSignedIntent.compiledIntent)
+			)
 
 			let uncompiledNotarized = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
@@ -292,24 +297,32 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func addGuaranteesToManifest(_ manifestWithLockFee: TransactionManifest, guarantees: [Guarantee]) async throws -> TransactionManifest {
-			let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
-			do {
-				manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(manifestWithLockFee)
-			} catch {
-				loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
-				throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
-			}
-
+		func addGuaranteesToManifest(
+			_ manifestWithLockFee: TransactionManifest,
+			guarantees: [Guarantee]
+		) async throws -> TransactionManifest {
+			let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(manifestWithLockFee)
 			var instructions = manifestWithJSONInstructions.instructions
+
 			/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
 			var indexInc = 1 // LockFee was added, start from 1
 			for guarantee in guarantees {
-				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(amount: .init(value: guarantee.amount.toString()), resourceAddress: guarantee.resourceAddress))
-				instructions.insert(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
+				let guaranteeInstruction: Instruction = .assertWorktopContainsByAmount(.init(
+					amount: .init(
+						value: guarantee.amount.toString()
+					),
+					resourceAddress: guarantee.resourceAddress
+				))
+				instructions.insert(
+					guaranteeInstruction,
+					at: Int(guarantee.instructionIndex) + indexInc
+				)
 				indexInc += 1
 			}
-			return TransactionManifest(instructions: instructions, blobs: manifestWithLockFee.blobs)
+			return TransactionManifest(
+				instructions: instructions,
+				blobs: manifestWithLockFee.blobs
+			)
 		}
 
 		return Self(
@@ -347,7 +360,6 @@ extension GatewayAPI.TransactionPreviewRequest {
 	init(
 		rawManifest: TransactionManifest,
 		header: TransactionHeader,
-		//        signerPublicKeys: [Engine.PublicKey]
 		transactionSigners: TransactionSigners
 	) throws {
 		let manifestString = {
@@ -366,6 +378,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 
 		struct NotaryAsSignatoryDiscrepancy: Swift.Error {}
 		guard transactionSigners.notaryAsSignatory == header.notaryAsSignatory else {
+			loggerGlobal.error("Preview incorrectly implemented, found discrepancy in `notaryAsSignatory` and `transactionSigners`.")
 			assertionFailure("discrepancy")
 			throw NotaryAsSignatoryDiscrepancy()
 		}
