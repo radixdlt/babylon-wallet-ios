@@ -54,7 +54,7 @@ public struct SubmitTXRequest: Sendable, Hashable {
 // MARK: - TransactionStatusUpdate
 public struct TransactionStatusUpdate: Sendable, Hashable {
 	public let txID: TXID
-	public let result: Result<TransactionStatus, TransactionPollingFailure>
+	public let result: Result<GatewayAPI.TransactionStatus, TransactionPollingFailure>
 }
 
 // MARK: - PollStrategy
