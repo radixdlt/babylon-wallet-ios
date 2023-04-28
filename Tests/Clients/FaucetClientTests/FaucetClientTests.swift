@@ -1,5 +1,7 @@
 import ClientTestingPrelude
+import CryptoKit
 @testable import FaucetClient
+import TransactionClient
 
 // MARK: - FaucetClientTests
 final class FaucetClientTests: TestCase {
@@ -156,8 +158,19 @@ final class FaucetClientTests: TestCase {
 		])
 		try await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
-			$0.transactionClient.signAndSubmitTransaction = { _ in .success("mocked_txid") }
-			$0.transactionClient.getTransactionResult = { _ in .success("mocked_txid") }
+			$0.submitTXClient.submitTransaction = { _ in .init("mocked_txid") }
+			$0.transactionClient.buildTransactionIntent = { _ in
+				TransactionIntentWithSigners(
+					intent: .previewValue,
+					transactionSigners: .init(
+						notaryPublicKey: .previewValue,
+						intentSigning: .notaryAsSignatory
+					)
+				)
+			}
+			$0.engineToolkitClient.compileTransactionIntent = { _ in try .init(compiledIntentHex: "") }
+			$0.transactionClient.notarizeTransaction = { _ in NotarizeTransactionResponse(notarized: .init(compiledIntent: []), txID: .init("mocked_txid")) }
+			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
 			$0.gatewaysClient.getCurrentGateway = { .nebunet }
 			$0.engineToolkitClient.knownEntityAddresses = { _ in KnownEntityAddressesResponse.previewValue }
 			$0.userDefaultsClient.dataForKey = { _ in json.data }
@@ -179,4 +192,30 @@ final class FaucetClientTests: TestCase {
 
 extension Epoch {
 	static let irrelevant: Self = .init(0)
+}
+
+extension Curve25519.Signing.PublicKey {
+	static let previewValue = try! Self(rawRepresentation: Data(hex: "573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"))
+}
+
+extension Engine.EddsaEd25519PublicKey {
+	static let previewValue = Self(bytes: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation))
+}
+
+extension TransactionHeader {
+	static let previewValue = Self(
+		version: .default,
+		networkId: .kisharnet,
+		startEpochInclusive: 0,
+		endEpochExclusive: 1,
+		nonce: 0,
+		publicKey: .eddsaEd25519(.previewValue),
+		notaryAsSignatory: true,
+		costUnitLimit: 0,
+		tipPercentage: 0
+	)
+}
+
+extension TransactionIntent {
+	static let previewValue = Self(header: .previewValue, manifest: TransactionManifest(instructions: ManifestInstructions.parsed([])))
 }

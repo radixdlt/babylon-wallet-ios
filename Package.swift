@@ -63,7 +63,7 @@ package.addModules([
 	.feature(
 		name: "AssetTransferFeature",
 		dependencies: [
-			"TransactionSigningFeature",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
 		],
 		tests: .yes()
 	),
@@ -250,6 +250,17 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "SigningFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"TransactionClient",
+			"FactorSourcesClient",
+			"Profile",
+			"UseFactorSourceClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "SplashFeature",
 		dependencies: [
 			"LocalAuthenticationClient",
@@ -262,19 +273,11 @@ package.addModules([
 		dependencies: [
 			"GatewayAPI",
 			"TransactionClient",
+			"SigningFeature",
+			"SubmitTransactionClient",
 		],
 		tests: .yes()
 	),
-	.feature(
-		name: "TransactionSigningFeature",
-		dependencies: [
-			"GatewayAPI",
-			"GatewaysClient",
-			"TransactionClient",
-		],
-		tests: .yes()
-	),
-
 ])
 
 // MARK: - Clients
@@ -374,6 +377,7 @@ package.addModules([
 		dependencies: [
 			"FactorSourcesClient",
 			"ProfileStore",
+			"AccountsClient",
 		],
 		tests: .yes()
 	),
@@ -384,6 +388,7 @@ package.addModules([
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
+			"SubmitTransactionClient",
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -556,17 +561,20 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
+		name: "SubmitTransactionClient",
+		dependencies: [
+			"EngineToolkitClient",
+			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.client(
 		name: "TransactionClient",
 		dependencies: [
 			"AccountsClient",
 			"AccountPortfoliosClient",
-			"CacheClient",
 			"EngineToolkitClient",
-			"FactorSourcesClient",
 			"GatewayAPI",
-			"GatewaysClient",
-			"SecureStorageClient",
-			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),
@@ -575,6 +583,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+			"FactorSourcesClient",
 			"SecureStorageClient",
 		],
 		tests: .no

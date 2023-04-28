@@ -81,20 +81,4 @@ extension FactorSource {
 			description: description
 		)
 	}
-
-	public static func trustedEntity(
-		accountAddress: AccountAddress,
-		label: FactorSource.Label,
-		description: FactorSource.Description
-	) throws -> Self {
-		let hashInput = try Data(EngineToolkit().decodeAddressRequest(request: .init(address: accountAddress.address)).get().data)
-		let factorSourceID = try ID(data: hashInput)
-		return Self(
-			kind: .trustedEntity,
-			id: factorSourceID,
-			label: label,
-			description: description,
-			parameters: .trustedEntity
-		)
-	}
 }

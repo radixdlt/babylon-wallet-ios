@@ -1,3 +1,4 @@
+import AccountsClient
 import ClientPrelude
 import FactorSourcesClient
 import ProfileStore
@@ -72,12 +73,98 @@ extension FactorSourcesClient: DependencyKey {
 					return nil // failure
 				}
 			},
-			addOffDeviceFactorSource: addOffDeviceFactorSource
+			addOffDeviceFactorSource: addOffDeviceFactorSource,
+			getSigningFactors: { _, accounts in
+				@Dependency(\.accountsClient) var accountsClient
+
+				let allFactorSources = try await getFactorSources()
+
+				final class SigningFactorRef {
+					let factorSource: FactorSource
+					var signers: [Profile.Network.Account.ID: SignerRef] = [:]
+					init(factorSource: FactorSource, signers: [Profile.Network.Account.ID: SignerRef] = [:]) {
+						self.factorSource = factorSource
+						self.signers = signers
+					}
+
+					final class SignerRef {
+						let account: Profile.Network.Account
+						var factorInstancesRequiredToSign: Set<FactorInstance>
+						init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance> = .init()) {
+							self.account = account
+							self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
+						}
+
+						func valueType() -> SigningFactor.Signer {
+							.init(account: account, factorInstancesRequiredToSign: factorInstancesRequiredToSign)
+						}
+					}
+
+					func valueType() throws -> SigningFactor {
+						guard let signersNonEmpty = NonEmpty<Set<SigningFactor.Signer>>(rawValue: Set(self.signers.values.map { $0.valueType() })) else {
+							throw SignersUnexpectedlyEmpty()
+						}
+						return .init(factorSource: factorSource, signers: signersNonEmpty)
+					}
+				}
+
+				var signingFactors: [FactorSourceID: SigningFactorRef] = [:]
+
+				for account in accounts {
+					switch account.securityState {
+					case let .unsecured(unsecuredEntityControl):
+						let factorInstance = unsecuredEntityControl.genesisFactorInstance
+						let id = factorInstance.factorSourceID
+						guard let factorSource = allFactorSources[id: id] else {
+							assertionFailure("Bad! factor source not found")
+							throw FactorSourceNotFound()
+						}
+						let outerRef = signingFactors[id, default: SigningFactorRef(factorSource: factorSource)]
+						let innerRef = outerRef.signers[account.id, default: .init(account: account)]
+						innerRef.factorInstancesRequiredToSign.insert(factorInstance)
+						outerRef.signers[account.id] = innerRef
+						signingFactors[id] = outerRef
+					}
+				}
+
+				guard let signersNonEmpty = try SigningFactors(
+					rawValue: OrderedSet(uncheckedUniqueElements: signingFactors.values.map { try $0.valueType() }.sorted())
+				) else {
+					throw FailedToFindSigners()
+				}
+				return signersNonEmpty
+			}
 		)
 	}
 
 	public static let liveValue = Self.live()
 }
 
+// MARK: - SignersUnexpectedlyEmpty
+struct SignersUnexpectedlyEmpty: Error {}
+
+// MARK: - FailedToFindSigners
+struct FailedToFindSigners: Error {}
+
 // MARK: - FactorSourceAlreadyPresent
 struct FactorSourceAlreadyPresent: Swift.Error {}
+
+// MARK: - FactorSourceNotFound
+struct FactorSourceNotFound: Swift.Error {}
+
+// MARK: - SigningFactor + Comparable
+extension SigningFactor: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.factorSource.kind.signingOrder < rhs.factorSource.kind.signingOrder
+	}
+}
+
+extension FactorSourceKind {
+	fileprivate var signingOrder: Int {
+		switch self {
+		case .ledgerHQHardwareWallet: return 0
+		case .device: return 1
+		default: return 1000
+		}
+	}
+}

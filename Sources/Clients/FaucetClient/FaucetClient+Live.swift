@@ -1,7 +1,10 @@
 import ClientPrelude
+import Cryptography
 import EngineToolkitClient
+import EngineToolkitModels
 import GatewayAPI
 import GatewaysClient
+import SubmitTransactionClient
 import TransactionClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
@@ -41,18 +44,43 @@ extension FaucetClient: DependencyKey {
 			await isAllowedToUseFaucetIfSoGetEpochs(accountAddress: accountAddress) != nil
 		}
 
+		/// This function can ONLY sign transaction which does not spend funds or otherwise require
+		/// auth, since we use an ephemeral key pair
 		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
 			@Dependency(\.transactionClient) var transactionClient
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
+			@Dependency(\.submitTXClient) var submitTXClient
 
-			let signSubmitTXRequest = SignManifestRequest(
-				manifestToSign: manifest,
-				makeTransactionHeaderInput: .default
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+
+			let ephemeralNotary = Curve25519.Signing.PrivateKey()
+
+			let builtTransactionIntentWithSigners = try await transactionClient.buildTransactionIntent(
+				.init(
+					networkID: networkID,
+					manifest: manifest,
+					isFaucetTransaction: true,
+					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
+				)
 			)
 
-			let _ = try await transactionClient
-				.signAndSubmitTransaction(signSubmitTXRequest)
-				.asyncFlatMap(transform: transactionClient.getTransactionResult)
-				.get()
+			let transactionIntent = builtTransactionIntentWithSigners.intent
+			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
+
+			let notarized = try await transactionClient.notarizeTransaction(.init(
+				intentSignatures: [],
+				compileTransactionIntent: compiledIntent,
+				notary: .curve25519(ephemeralNotary)
+			)
+			)
+
+			let txID = notarized.txID
+			_ = try await submitTXClient.submitTransaction(.init(
+				txID: txID,
+				compiledNotarizedTXIntent: notarized.notarized
+			))
+
+			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in

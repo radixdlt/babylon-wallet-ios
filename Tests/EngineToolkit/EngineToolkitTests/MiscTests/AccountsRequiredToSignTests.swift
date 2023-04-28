@@ -88,4 +88,19 @@ final class AccountsRequiredToSignTests: TestCase {
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
 		XCTAssertNoDifference(Set(), accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be empty")
 	}
+
+	func test_lockFee_account() throws {
+		let transactionManifest = TransactionManifest(instructions: .string(
+			"""
+			CALL_METHOD
+			    Address("account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md")
+			    "lock_fee"
+			    Decimal("10");
+			"""
+		))
+		let networkID: NetworkID = .simulator
+
+		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: networkID)
+		XCTAssertNoDifference(Set(["account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"]), accountsRequiredToSign, "We expect the 'accountsRequiredToSign' to be contain the fee payer")
+	}
 }
