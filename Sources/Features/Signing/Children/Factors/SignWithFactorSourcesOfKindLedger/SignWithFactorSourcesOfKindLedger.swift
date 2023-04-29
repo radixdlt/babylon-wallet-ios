@@ -7,11 +7,15 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	public static let factorSourceKind = FactorSourceKind.ledgerHQHardwareWallet
 	public typealias State = SignWithFactorSourcesOfKindState<Self>
 
-	public enum ViewAction: Sendable, Equatable {
+	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
 		case appeared
 	}
 
-	public enum DelegateAction: SignWithFactorSourcesOfKindActionProtocol {
+	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
+		case signingWithFactor(SigningFactor)
+	}
+
+	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
 		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<AccountSignature>)
 	}
 
@@ -21,19 +25,24 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { [signingFactors = state.signingFactors, data = state.dataToSign] send in
-				var allSignatures = Set<AccountSignature>()
-				for signingFactor in signingFactors {
-					let signatures = try await ledgerHardwareWalletClient.sign(
-						signingFactor: signingFactor,
-						unhashedDataToSign: data
-					)
-					allSignatures.append(contentsOf: signatures)
-				}
-				await send(.delegate(.done(signingFactors: signingFactors, signatures: allSignatures)))
-			} catch: { _, _ in
-				loggerGlobal.error("Failed to device sign")
-			}
+			return signWithSigningFactors(of: state)
 		}
+	}
+
+	public func reduce(
+		into state: inout State,
+		internalAction: InternalAction
+	) -> EffectTask<Action> {
+		switch internalAction {
+		case .signingWithFactor:
+			return .none
+		}
+	}
+
+	public func sign(signingFactor: SigningFactor, state: State) async throws -> Set<AccountSignature> {
+		try await ledgerHardwareWalletClient.sign(
+			signingFactor: signingFactor,
+			unhashedDataToSign: state.dataToSign
+		)
 	}
 }
