@@ -1,5 +1,6 @@
 import ClientPrelude
 import Cryptography
+import FactorSourcesClient
 import Profile
 
 // MARK: - LedgerHardwareWalletClient
@@ -21,28 +22,24 @@ extension LedgerHardwareWalletClient {
 
 // MARK: - SignWithLedgerRequest
 public struct SignWithLedgerRequest: Sendable, Hashable {
-	public let ledger: FactorSource
-	public let accounts: Set<Profile.Network.Account>
+	public let signingFactor: SigningFactor
 	public let unhashedDataToSign: Data
 
-	public init(ledger: FactorSource, accounts: Set<Profile.Network.Account>, unhashedDataToSign: Data) {
-		precondition(ledger.kind == .ledgerHQHardwareWallet)
-		self.ledger = ledger
-		self.accounts = accounts
+	public init(signingFactor: SigningFactor, unhashedDataToSign: Data) {
+		precondition(signingFactor.factorSource.kind == .ledgerHQHardwareWallet)
+		self.signingFactor = signingFactor
 		self.unhashedDataToSign = unhashedDataToSign
 	}
 }
 
 extension LedgerHardwareWalletClient {
 	public func sign(
-		ledger: FactorSource,
-		signers: Set<Profile.Network.Account>,
+		signingFactor: SigningFactor,
 		unhashedDataToSign: Data
 	) async throws -> Set<AccountSignature> {
-		precondition(ledger.kind == .ledgerHQHardwareWallet)
+		precondition(signingFactor.factorSource.kind == .ledgerHQHardwareWallet)
 		return try await sign(.init(
-			ledger: ledger,
-			accounts: signers,
+			signingFactor: signingFactor,
 			unhashedDataToSign: unhashedDataToSign
 		))
 	}

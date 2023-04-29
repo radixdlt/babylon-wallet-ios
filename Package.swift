@@ -443,6 +443,7 @@ package.addModules([
 		name: "LedgerHardwareWalletClient",
 		dependencies: [
 			"RadixConnectClient",
+			"FactorSourcesClient", // FIXME: move models to lower level package
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .no

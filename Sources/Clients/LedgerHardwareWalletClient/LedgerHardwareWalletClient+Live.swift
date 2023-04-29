@@ -1,6 +1,7 @@
 import ClientPrelude
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Cryptography
+import FactorSourcesClient
 import RadixConnectClient
 
 // MARK: - LedgerHardwareWalletClient + DependencyKey
@@ -93,8 +94,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 
 				let signaturesRaw = try await makeRequest(
 					.signTransaction(.init(
-						signers: request.accounts.flatMap(\.keyParams),
-						ledgerDevice: .init(from: request.ledger),
+						signers: request.signingFactor.signers.flatMap(\.keyParams),
+						ledgerDevice: .init(from: request.signingFactor.factorSource),
 						compiledTransactionIntent: .init(data: request.unhashedDataToSign),
 						mode: .summary
 					)),
@@ -105,11 +106,14 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				var accountSignatures = Set<AccountSignature>()
 				for signature in signatures {
 					guard
-						let account = try request.accounts.first(where: { try $0.derivationPath() == signature.derivationPath })
+						let signer = try request.signingFactor.signers.first(where: { try $0.account.derivationPath() == signature.derivationPath })
 					else {
 						throw MissingAccountFromSignatures()
 					}
-					let accountSignature = try AccountSignature(account: account, signature: signature)
+					let accountSignature = try AccountSignature(
+						account: signer.account,
+						signature: signature
+					)
 					accountSignatures.insert(accountSignature)
 				}
 
@@ -130,31 +134,9 @@ extension AccountSignature {
 		)
 		try self.init(
 			entity: account,
-			factorInstance: account.factorInstance(),
+			factorInstance: account.factorInstance,
 			signature: signature
 		)
-	}
-}
-
-// MARK: - NoDerivationPath
-struct NoDerivationPath: Error {}
-extension Profile.Network.Account {
-	func factorInstance() -> FactorInstance {
-		switch securityState {
-		case let .unsecured(control):
-			return control.genesisFactorInstance
-		}
-	}
-
-	func derivationPath() throws -> DerivationPath {
-		guard let path = factorInstance().derivationPath else {
-			throw NoDerivationPath()
-		}
-		return path
-	}
-
-	func publicKey() -> SLIP10.PublicKey {
-		factorInstance().publicKey
 	}
 }
 
@@ -163,14 +145,6 @@ struct MissingSignature: Swift.Error {}
 
 // MARK: - MissingAccountFromSignatures
 struct MissingAccountFromSignatures: Swift.Error {}
-
-// extension Profile.Network.Account {
-//    func derivationPath() throws -> DerivationPath {
-//        switch securityState {
-//        case .unsecured(.)
-//        }
-//    }
-// }
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Parsed: Sendable, Hashable {
@@ -216,6 +190,12 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 		}
 
 		return Parsed(signature: signatureWithPublicKey, derivationPath: derivationPath)
+	}
+}
+
+extension SigningFactor.Signer {
+	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
+		account.keyParams
 	}
 }
 
