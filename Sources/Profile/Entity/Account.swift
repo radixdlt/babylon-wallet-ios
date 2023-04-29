@@ -147,6 +147,14 @@ extension Profile.Network.Account {
 }
 
 extension Profile.Network.Account {
+	public var factorInstance: FactorInstance {
+		switch securityState {
+		case let .unsecured(unsecured): return unsecured.genesisFactorInstance
+		}
+	}
+}
+
+extension Profile.Network.Account {
 	public static var entityKind: EntityKind { .account }
 
 	public typealias EntityAddress = AccountAddress

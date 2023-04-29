@@ -37,37 +37,56 @@ extension FactorSourcesClient {
 	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Profile.Network.Account>>) async throws -> SigningFactors
 }
 
-public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<OrderedSet<SigningFactor>>>
+public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<Set<SigningFactor>>>
 
 extension SigningFactors {
 	public var signerCount: Int {
-		var count = 0
-		for setOfSigningFactorsNonEmpty in self.values {
-			var innerCount = 0
-			defer { count += innerCount }
-			for signingFactor in setOfSigningFactorsNonEmpty {
-				innerCount += signingFactor.signers.count
-			}
-		}
-		return count
+		values.flatMap { $0.map(\.signers.count) }.reduce(0, +)
 	}
 }
 
 // MARK: - SigningFactor
-public struct SigningFactor: Sendable, Hashable {
+public struct SigningFactor: Sendable, Hashable, Identifiable {
+	public typealias ID = FactorSource.ID
+	public var id: ID { factorSource.id }
 	public let factorSource: FactorSource
-	public let signers: NonEmpty<Set<Signer>>
-	public init(factorSource: FactorSource, signers: NonEmpty<Set<Signer>>) {
+	public var signers: NonEmpty<IdentifiedArrayOf<Signer>>
+
+	public init(
+		factorSource: FactorSource,
+		signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	) {
 		self.factorSource = factorSource
 		self.signers = signers
 	}
 
-	public struct Signer: Sendable, Hashable {
+	public init(
+		factorSource: FactorSource,
+		signer: Signer
+	) {
+		self.init(
+			factorSource: factorSource,
+			signers: .init(rawValue: .init(uniqueElements: [signer]))! // ok to force unwrap since we know we have one element.
+		)
+	}
+
+	public struct Signer: Sendable, Hashable, Identifiable {
+		public typealias ID = Profile.Network.Account.ID
+		public var id: ID { account.id }
 		public let account: Profile.Network.Account
+
 		public let factorInstancesRequiredToSign: Set<FactorInstance>
-		public init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance>) {
+
+		init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance>) {
 			self.account = account
 			self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
+		}
+
+		// Now, before MultiFactor, this is the only public init, but once we have MultiFactor we
+		// will remove this init and always use the `, factorInstancesRequiredToSign: Set<FactorInstance>` one.
+		public init(account: Profile.Network.Account, factorInstanceRequiredToSign: FactorInstance) {
+			precondition(account.factorInstance == factorInstanceRequiredToSign) // technically we can remove `factorInstanceRequiredToSign` but that makes logic in FactorSourceClientLive hide to much complexity that we will get once we have MultiFactor, better be prepared for MultiFactor a bit more
+			self.init(account: account, factorInstancesRequiredToSign: [factorInstanceRequiredToSign])
 		}
 	}
 }

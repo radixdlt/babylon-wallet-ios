@@ -12,7 +12,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 
 	public enum DelegateAction: SignWithFactorSourcesOfKindActionProtocol {
-		case done(signingFactors: NonEmpty<OrderedSet<SigningFactor>>, signatures: Set<AccountSignature>)
+		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<AccountSignature>)
 	}
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient

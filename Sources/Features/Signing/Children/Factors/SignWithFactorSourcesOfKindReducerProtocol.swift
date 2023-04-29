@@ -4,7 +4,7 @@ import FeaturePrelude
 // MARK: - SignWithFactorSourcesOfKindActionProtocol
 protocol SignWithFactorSourcesOfKindActionProtocol: Sendable, Equatable {
 	static func done(
-		signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
+		signingFactors: NonEmpty<Set<SigningFactor>>,
 		signatures: Set<AccountSignature>
 	) -> Self
 }
@@ -16,11 +16,11 @@ public protocol FactorSourceKindSpecifierProtocol {
 
 // MARK: - SignWithFactorSourcesOfKindState
 public struct SignWithFactorSourcesOfKindState<FactorSourceKindSpecifier: FactorSourceKindSpecifierProtocol>: Sendable, Hashable {
-	public let signingFactors: NonEmpty<OrderedSet<SigningFactor>>
+	public let signingFactors: NonEmpty<Set<SigningFactor>>
 	public let dataToSign: Data
 	public var currentSigningFactor: SigningFactor?
 	public init(
-		signingFactors: NonEmpty<OrderedSet<SigningFactor>>,
+		signingFactors: NonEmpty<Set<SigningFactor>>,
 		dataToSign: Data,
 		currentSigningFactor: SigningFactor? = nil
 	) {
