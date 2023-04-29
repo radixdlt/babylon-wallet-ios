@@ -24,16 +24,9 @@ struct Header: View {
 		.background(
 			RoundedCornerBackground(
 				exclude: isExpanded ? .bottom : [],
-				cornerRadius: Constants.radius
+				cornerRadius: .small1
 			)
 			.tokenRowShadow(!isExpanded)
 		)
-	}
-}
-
-// MARK: Header.Constants
-extension Header {
-	fileprivate enum Constants {
-		static let radius: CGFloat = .small1
 	}
 }

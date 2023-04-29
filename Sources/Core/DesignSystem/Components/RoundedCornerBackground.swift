@@ -1,5 +1,3 @@
-import FeaturePrelude
-
 struct RoundedCornerBackground: View {
 	let excludedEdges: Edge.Set
 	let cornerRadius: CGFloat

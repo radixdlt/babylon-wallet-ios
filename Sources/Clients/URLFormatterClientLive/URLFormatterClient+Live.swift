@@ -1,5 +1,4 @@
 import ClientPrelude
-import UIKit
 import URLFormatterClient
 
 // MARK: - URLFormatterClient + DependencyKey

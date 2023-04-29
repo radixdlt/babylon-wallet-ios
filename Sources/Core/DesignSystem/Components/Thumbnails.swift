@@ -148,7 +148,7 @@ public struct LoadableImage<Placeholder: View>: View {
 			@Dependency(\.urlFormatterClient) var urlFormatterClient
 			switch sizingBehaviour {
 			case let .fixedSize(hitTargetSize, _):
-				self.url = urlFormatterClient.fixedSizeImage(url, UIScreen.pixelScale * hitTargetSize.frame)
+				self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
 			case .flexibleHeight:
 				self.url = url
 			}

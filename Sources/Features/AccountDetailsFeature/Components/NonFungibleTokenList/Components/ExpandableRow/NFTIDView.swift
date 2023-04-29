@@ -48,7 +48,7 @@ struct NFTIDView: View {
 		.background(
 			RoundedCornerBackground(
 				exclude: isExpanded ? (isLast ? .top : .vertical) : [],
-				cornerRadius: Constants.radius
+				cornerRadius: .small1
 			)
 			.tokenRowShadow(isLast || !isExpanded)
 		)
@@ -71,12 +71,5 @@ struct KeyValueView: View {
 				.textStyle(.body1HighImportance)
 		}
 		.foregroundColor(.app.gray2)
-	}
-}
-
-// MARK: - NFTIDView.Constants
-extension NFTIDView {
-	fileprivate enum Constants {
-		static let radius: CGFloat = .small1
 	}
 }

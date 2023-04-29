@@ -49,12 +49,18 @@ extension View {
 	}
 }
 
-extension UIScreen {
+// MARK: - Screen
+@MainActor
+public enum Screen {
+	#if os(iOS)
 	public static let pixelScale: CGFloat = {
 		let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene
 		guard let screen = scene?.windows.first?.screen else { return 2 }
 		return screen.scale
 	}()
+	#else
+	public static let pixelScale: CGFloat = 2
+	#endif
 }
 
 public extension CGSize {
