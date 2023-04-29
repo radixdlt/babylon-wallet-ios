@@ -46,20 +46,47 @@ extension SigningFactors {
 }
 
 // MARK: - SigningFactor
-public struct SigningFactor: Sendable, Hashable {
+public struct SigningFactor: Sendable, Hashable, Identifiable {
+	public typealias ID = FactorSource.ID
+	public var id: ID { factorSource.id }
 	public let factorSource: FactorSource
-	public var signers: NonEmpty<Set<Signer>>
-	public init(factorSource: FactorSource, signers: NonEmpty<Set<Signer>>) {
+	public var signers: NonEmpty<IdentifiedArrayOf<Signer>>
+
+	public init(
+		factorSource: FactorSource,
+		signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	) {
 		self.factorSource = factorSource
 		self.signers = signers
 	}
 
-	public struct Signer: Sendable, Hashable {
+	public init(
+		factorSource: FactorSource,
+		signer: Signer
+	) {
+		self.init(
+			factorSource: factorSource,
+			signers: .init(rawValue: .init(uniqueElements: [signer]))! // ok to force unwrap since we know we have one element.
+		)
+	}
+
+	public struct Signer: Sendable, Hashable, Identifiable {
+		public typealias ID = Profile.Network.Account.ID
+		public var id: ID { account.id }
 		public let account: Profile.Network.Account
+
 		public let factorInstancesRequiredToSign: Set<FactorInstance>
-		public init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance>) {
+
+		init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance>) {
 			self.account = account
 			self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
+		}
+
+		// Now, before MultiFactor, this is the only public init, but once we have MultiFactor we
+		// will remove this init and always use the `, factorInstancesRequiredToSign: Set<FactorInstance>` one.
+		public init(account: Profile.Network.Account, factorInstanceRequiredToSign: FactorInstance) {
+			precondition(account.factorInstance == factorInstanceRequiredToSign) // technically we can remove `factorInstanceRequiredToSign` but that makes logic in FactorSourceClientLive hide to much complexity that we will get once we have MultiFactor, better be prepared for MultiFactor a bit more
+			self.init(account: account, factorInstancesRequiredToSign: [factorInstanceRequiredToSign])
 		}
 	}
 }

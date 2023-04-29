@@ -89,7 +89,7 @@ internal func signingFactors(
 	for accounts: some Collection<Profile.Network.Account>,
 	from allFactorSources: IdentifiedArrayOf<FactorSource>
 ) throws -> SigningFactors {
-	var signingFactors: [FactorSourceKind: NonEmpty<Set<SigningFactor>>] = [:]
+	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
 	for account in accounts {
 		switch account.securityState {
@@ -100,34 +100,33 @@ internal func signingFactors(
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}
-			let signer = SigningFactor.Signer(account: account, factorInstancesRequiredToSign: [factorInstance])
-			let sigingFactor = SigningFactor(factorSource: factorSource, signers: .init(rawValue: [signer])!)
-			if let existing = signingFactors[factorSource.kind] {
-				// Complex case, this factor source kind already present in the dictionary => update `NonEmpty<Set<SigningFactor>>`
+			let signer = SigningFactor.Signer(account: account, factorInstanceRequiredToSign: factorInstance)
+			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
-				// we cannot mutate `rawValue` of `NonEmpty` :/ thus this complex dance
-				var unorderedSet = existing.rawValue // read out `Set<SigningFactor>` (which is non empty)
-				if var existingSigningFactorForThisFactorSource = unorderedSet.first(where: { $0.factorSource == factorSource }) {
-					// The most complex case, set `unorderedSet` contains this factor source... must update the `SigningFactor`
-					unorderedSet.remove(existingSigningFactorForThisFactorSource) // remove and dont forget to readd
-					var signers = existingSigningFactorForThisFactorSource.signers.rawValue
-					signers.insert(signer)
-					existingSigningFactorForThisFactorSource.signers = .init(rawValue: signers)!
-					unorderedSet.insert(existingSigningFactorForThisFactorSource) // dont forget to re-add the updated
+			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactorsNotNonEmpty[factorSource.kind] {
+				if var existingSigningFactor = existingArray[id: factorSource.id] {
+					var signers = existingSigningFactor.signers.rawValue
+					signers[id: signer.id] = signer // update copy of `signers`
+					existingSigningFactor.signers = .init(rawValue: signers)! // write back `signers`
+					existingArray[id: factorSource.id] = existingSigningFactor // write back to IdentifiedArray
 				} else {
-					// easy case
-					unorderedSet.insert(sigingFactor)
+					existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
 				}
-
-				// Dont forget to update the dictionary!
-				signingFactors[factorSource.kind] = .init(rawValue: unorderedSet)!
+				signingFactorsNotNonEmpty[factorSource.kind] = existingArray // write back to Dictionary
 			} else {
 				// trivial case,
-				signingFactors[factorSource.kind] = .init(rawValue: [sigingFactor])!
+				signingFactorsNotNonEmpty[factorSource.kind] = .init(uniqueElements: [sigingFactor])
 			}
 		}
 	}
-	return .init(uniqueKeysWithValues: signingFactors.sorted(by: \.key))
+
+	return SigningFactors(
+		uniqueKeysWithValues: signingFactorsNotNonEmpty.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
+			assert(!keyValuePair.value.isEmpty, "Incorrect implementation, IdentifiedArrayOf<SigningFactor> should never be empty.")
+			let value: NonEmpty<Set<SigningFactor>> = .init(rawValue: Set(keyValuePair.value))!
+			return (key: keyValuePair.key, value: value)
+		}.sorted(by: \.key)
+	)
 }
 
 // MARK: - FactorSourceNotFound
