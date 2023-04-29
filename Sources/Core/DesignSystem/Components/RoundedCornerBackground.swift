@@ -1,13 +1,13 @@
-struct RoundedCornerBackground: View {
+public struct RoundedCornerBackground: View {
 	let excludedEdges: Edge.Set
 	let cornerRadius: CGFloat
 
-	init(exclude excludedEdges: Edge.Set, cornerRadius: CGFloat) {
+	public init(exclude excludedEdges: Edge.Set, cornerRadius: CGFloat) {
 		self.excludedEdges = excludedEdges
 		self.cornerRadius = cornerRadius
 	}
 
-	var body: some View {
+	public var body: some View {
 		Rectangle()
 			.fill(.app.white)
 			.padding(excludedEdges, cornerRadius)
