@@ -1,17 +1,17 @@
 import FactorSourcesClient
 import FeaturePrelude
 
-// MARK: - SignWithLedgerFactorSource
-public struct SignWithLedgerFactorSource: SignWithFactorReducerProtocol {
+// MARK: - SignWithFactorSourcesOfKindLedger
+public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindReducerProtocol {
 	public static let factorSourceKind = FactorSourceKind.ledgerHQHardwareWallet
-	public typealias State = SignWithFactorState<Self>
+	public typealias State = SignWithFactorSourcesOfKindState<Self>
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 
-	public enum DelegateAction: SignWithFactorReducerActionProtocol {
-		case done(signingFactor: SigningFactor, signatures: Set<AccountSignature>)
+	public enum DelegateAction: SignWithFactorSourcesOfKindActionProtocol {
+		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<AccountSignature>)
 	}
 
 	public init() {}

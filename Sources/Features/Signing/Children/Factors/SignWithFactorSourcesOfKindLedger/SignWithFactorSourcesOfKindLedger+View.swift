@@ -1,29 +1,29 @@
 import FeaturePrelude
 
-extension SignWithDeviceFactorSource.State {
-	var viewState: SignWithDeviceFactorSource.ViewState {
+extension SignWithFactorSourcesOfKindLedger.State {
+	var viewState: SignWithFactorSourcesOfKindLedger.ViewState {
 		.init()
 	}
 }
 
-// MARK: - SignWithDeviceFactorSource.View
-extension SignWithDeviceFactorSource {
+// MARK: - SignWithFactorSourcesOfKindLedger.View
+extension SignWithFactorSourcesOfKindLedger {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<SignWithDeviceFactorSource>
+		private let store: StoreOf<SignWithFactorSourcesOfKindLedger>
 
-		public init(store: StoreOf<SignWithDeviceFactorSource>) {
+		public init(store: StoreOf<SignWithFactorSourcesOfKindLedger>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("Sign transaction with phone")
+					Text("Sign transaction with Ledger")
 				}
 				.onAppear { viewStore.send(.appeared) }
 			}

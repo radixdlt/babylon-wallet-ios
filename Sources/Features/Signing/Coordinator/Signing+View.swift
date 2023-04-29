@@ -28,14 +28,14 @@ extension Signing {
 					then: { PrepareForSigning.View(store: $0) }
 				)
 				CaseLet(
-					state: /Signing.State.Step.signWithDevice,
-					action: { Signing.Action.child(.signWithDevice($0)) },
-					then: { SignWithDeviceFactorSource.View(store: $0) }
+					state: /Signing.State.Step.signWithDeviceFactors,
+					action: { Signing.Action.child(.signWithDeviceFactors($0)) },
+					then: { SignWithFactorSourcesOfKindDevice.View(store: $0) }
 				)
 				CaseLet(
-					state: /Signing.State.Step.signWithLedger,
-					action: { Signing.Action.child(.signWithLedger($0)) },
-					then: { SignWithLedgerFactorSource.View(store: $0) }
+					state: /Signing.State.Step.signWithLedgerFactors,
+					action: { Signing.Action.child(.signWithLedgerFactors($0)) },
+					then: { SignWithFactorSourcesOfKindLedger.View(store: $0) }
 				)
 			}
 		}

@@ -1,4 +1,3 @@
-import AccountsClient
 import ClientPrelude
 import FactorSourcesClient
 import ProfileStore
@@ -75,64 +74,10 @@ extension FactorSourcesClient: DependencyKey {
 			},
 			addOffDeviceFactorSource: addOffDeviceFactorSource,
 			getSigningFactors: { _, accounts in
-				@Dependency(\.accountsClient) var accountsClient
-
-				let allFactorSources = try await getFactorSources()
-
-				final class SigningFactorRef {
-					let factorSource: FactorSource
-					var signers: [Profile.Network.Account.ID: SignerRef] = [:]
-					init(factorSource: FactorSource, signers: [Profile.Network.Account.ID: SignerRef] = [:]) {
-						self.factorSource = factorSource
-						self.signers = signers
-					}
-
-					final class SignerRef {
-						let account: Profile.Network.Account
-						var factorInstancesRequiredToSign: Set<FactorInstance>
-						init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance> = .init()) {
-							self.account = account
-							self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
-						}
-
-						func valueType() -> SigningFactor.Signer {
-							.init(account: account, factorInstancesRequiredToSign: factorInstancesRequiredToSign)
-						}
-					}
-
-					func valueType() throws -> SigningFactor {
-						guard let signersNonEmpty = NonEmpty<Set<SigningFactor.Signer>>(rawValue: Set(self.signers.values.map { $0.valueType() })) else {
-							throw SignersUnexpectedlyEmpty()
-						}
-						return .init(factorSource: factorSource, signers: signersNonEmpty)
-					}
-				}
-
-				var signingFactors: [FactorSourceID: SigningFactorRef] = [:]
-
-				for account in accounts {
-					switch account.securityState {
-					case let .unsecured(unsecuredEntityControl):
-						let factorInstance = unsecuredEntityControl.genesisFactorInstance
-						let id = factorInstance.factorSourceID
-						guard let factorSource = allFactorSources[id: id] else {
-							assertionFailure("Bad! factor source not found")
-							throw FactorSourceNotFound()
-						}
-						let outerRef = signingFactors[id, default: SigningFactorRef(factorSource: factorSource)]
-						let innerRef = outerRef.signers[account.id, default: .init(account: account)]
-						innerRef.factorInstancesRequiredToSign.insert(factorInstance)
-						outerRef.signers[account.id] = innerRef
-						signingFactors[id] = outerRef
-					}
-				}
-
-				guard let signersNonEmpty = try SigningFactors(
-					rawValue: OrderedSet(uncheckedUniqueElements: signingFactors.values.map { try $0.valueType() }.sorted())
-				) else {
-					throw FailedToFindSigners()
-				}
-				return signersNonEmpty
+				try await signingFactors(
+					for: accounts,
+					from: getFactorSources().rawValue
+				)
 			}
 		)
 	}
@@ -140,31 +85,70 @@ extension FactorSourcesClient: DependencyKey {
 	public static let liveValue = Self.live()
 }
 
-// MARK: - SignersUnexpectedlyEmpty
-struct SignersUnexpectedlyEmpty: Error {}
+internal func signingFactors(
+	for accounts: some Collection<Profile.Network.Account>,
+	from allFactorSources: IdentifiedArrayOf<FactorSource>
+) throws -> SigningFactors {
+	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
-// MARK: - FailedToFindSigners
-struct FailedToFindSigners: Error {}
+	for account in accounts {
+		switch account.securityState {
+		case let .unsecured(unsecuredEntityControl):
+			let factorInstance = unsecuredEntityControl.genesisFactorInstance
+			let id = factorInstance.factorSourceID
+			guard let factorSource = allFactorSources[id: id] else {
+				assertionFailure("Bad! factor source not found")
+				throw FactorSourceNotFound()
+			}
+			let signer = SigningFactor.Signer(account: account, factorInstanceRequiredToSign: factorInstance)
+			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
-// MARK: - FactorSourceAlreadyPresent
-struct FactorSourceAlreadyPresent: Swift.Error {}
+			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactorsNotNonEmpty[factorSource.kind] {
+				if var existingSigningFactor = existingArray[id: factorSource.id] {
+					var signers = existingSigningFactor.signers.rawValue
+					signers[id: signer.id] = signer // update copy of `signers`
+					existingSigningFactor.signers = .init(rawValue: signers)! // write back `signers`
+					existingArray[id: factorSource.id] = existingSigningFactor // write back to IdentifiedArray
+				} else {
+					existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
+				}
+				signingFactorsNotNonEmpty[factorSource.kind] = existingArray // write back to Dictionary
+			} else {
+				// trivial case,
+				signingFactorsNotNonEmpty[factorSource.kind] = .init(uniqueElements: [sigingFactor])
+			}
+		}
+	}
+
+	return SigningFactors(
+		uniqueKeysWithValues: signingFactorsNotNonEmpty.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
+			assert(!keyValuePair.value.isEmpty, "Incorrect implementation, IdentifiedArrayOf<SigningFactor> should never be empty.")
+			let value: NonEmpty<Set<SigningFactor>> = .init(rawValue: Set(keyValuePair.value))!
+			return (key: keyValuePair.key, value: value)
+		}.sorted(by: \.key)
+	)
+}
 
 // MARK: - FactorSourceNotFound
 struct FactorSourceNotFound: Swift.Error {}
 
-// MARK: - SigningFactor + Comparable
-extension SigningFactor: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.factorSource.kind.signingOrder < rhs.factorSource.kind.signingOrder
-	}
-}
+// MARK: - FactorSourceAlreadyPresent
+struct FactorSourceAlreadyPresent: Swift.Error {}
 
-extension FactorSourceKind {
+// MARK: - FactorSourceKind + Comparable
+extension FactorSourceKind: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.signingOrder < rhs.signingOrder
+	}
+
 	fileprivate var signingOrder: Int {
 		switch self {
 		case .ledgerHQHardwareWallet: return 0
-		case .device: return 1
-		default: return 1000
+		case .device:
+			// we want to sign with device last, since it would allow for us to stop using
+			// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
+			// deletes items after 1 sec, thus `device` must come last.
+			return 1
 		}
 	}
 }

@@ -26,7 +26,7 @@ extension P2P {
 		// to be **decoupled**.
 		public enum Model: String, Sendable, Hashable, Codable {
 			case nanoS
-			case nanoSPlus
+			case nanoSPlus = "nanoS+"
 			case nanoX
 		}
 
