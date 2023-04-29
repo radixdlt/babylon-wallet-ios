@@ -67,13 +67,6 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case let .didSelectDapp(dAppID):
 			return .run { send in
 				let details = try await authorizedDappsClient.getDetailedDapp(dAppID)
-
-				let entityMetadata = try await gatewayAPIClient.getEntityMetadata(dAppID.address)
-				print("•• didSelectDapp entityMetadata \(dAppID.address)")
-				for item in entityMetadata.items {
-					print("\(item.key): \(item.value)")
-				}
-
 				let presentedDappState = DappDetails.State(dApp: details)
 				await send(.internal(.presentDappDetails(presentedDappState)))
 			} catch: { error, _ in

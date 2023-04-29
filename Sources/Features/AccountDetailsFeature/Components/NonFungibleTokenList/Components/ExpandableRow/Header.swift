@@ -27,7 +27,7 @@ struct Header: View {
 				paddingValue: value,
 				cornerRadius: oppositeValue
 			)
-			.tokenRowShadow(condition: isExpanded)
+			.tokenRowShadow(!isExpanded)
 		)
 	}
 }

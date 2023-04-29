@@ -51,7 +51,7 @@ struct NFTIDView: View {
 				paddingValue: value,
 				cornerRadius: oppositeValue
 			)
-			.tokenRowShadow(condition: isExpanded && !isLast)
+			.tokenRowShadow(isLast || !isExpanded)
 		)
 	}
 }
