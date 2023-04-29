@@ -22,10 +22,9 @@ struct Header: View {
 		.padding(.horizontal, .medium1)
 		.padding(.vertical, .large3)
 		.background(
-			ExpandableRowBackgroundView(
-				paddingEdge: edge,
-				paddingValue: value,
-				cornerRadius: oppositeValue
+			RoundedCornerBackground(
+				exclude: isExpanded ? .bottom : [],
+				cornerRadius: Constants.radius
 			)
 			.tokenRowShadow(!isExpanded)
 		)
@@ -36,20 +35,5 @@ struct Header: View {
 extension Header {
 	fileprivate enum Constants {
 		static let radius: CGFloat = .small1
-	}
-}
-
-// MARK: ExpandableRow
-extension Header: ExpandableRow {
-	var edge: Edge.Set {
-		.bottom
-	}
-
-	var value: CGFloat {
-		isExpanded ? Constants.radius : .zero
-	}
-
-	var oppositeValue: CGFloat {
-		isExpanded ? .zero : Constants.radius
 	}
 }

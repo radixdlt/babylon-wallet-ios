@@ -46,10 +46,9 @@ struct NFTIDView: View {
 		.padding(.medium1)
 		.frame(maxWidth: .infinity)
 		.background(
-			ExpandableRowBackgroundView(
-				paddingEdge: edge,
-				paddingValue: value,
-				cornerRadius: oppositeValue
+			RoundedCornerBackground(
+				exclude: isExpanded ? (isLast ? .top : .vertical) : [],
+				cornerRadius: Constants.radius
 			)
 			.tokenRowShadow(isLast || !isExpanded)
 		)
@@ -72,21 +71,6 @@ struct KeyValueView: View {
 				.textStyle(.body1HighImportance)
 		}
 		.foregroundColor(.app.gray2)
-	}
-}
-
-// MARK: - NFTIDView + ExpandableRow
-extension NFTIDView: ExpandableRow {
-	var edge: Edge.Set {
-		isLast ? .top : .all
-	}
-
-	var value: CGFloat {
-		isExpanded ? Constants.radius : 0
-	}
-
-	var oppositeValue: CGFloat {
-		isExpanded ? 0 : Constants.radius
 	}
 }
 
