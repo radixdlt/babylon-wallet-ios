@@ -17,18 +17,9 @@ extension TransactionClient {
 
 		@Sendable
 		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
-			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
-				version: engineToolkitClient.getTransactionVersion(),
-				manifest: request.manifest,
-				networkID: request.networkID
-			)
-
-			let addressesNeededToSign = try OrderedSet(
-				engineToolkitClient
-					.accountAddressesNeedingToSignTransaction(
-						accountAddressesNeedingToSignTransactionRequest
-					)
-			)
+			let addressesNeededToSign = try request.manifest.accountsRequiredToSign(networkId: request.networkID).map {
+				try AccountAddress(address: $0.address)
+			}
 
 			let accounts = try await OrderedSet(addressesNeededToSign.asyncMap {
 				try await accountsClient.getAccountByAddress($0)

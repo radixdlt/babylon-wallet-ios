@@ -101,22 +101,25 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
 				)
-
+				loggerGlobal.notice("1️⃣ signaturesRaw: \(signaturesRaw)")
 				let signatures = try signaturesRaw.map { try $0.parsed() }
+				loggerGlobal.notice("2️⃣ signatures: \(signatures)")
 				var accountSignatures = Set<AccountSignature>()
 				for signature in signatures {
 					guard
-						let signer = try request.signingFactor.signers.first(where: { try $0.account.derivationPath() == signature.derivationPath })
+						let signer = request.signingFactor.signers.first(where: { $0.account.publicKey == signature.signature.publicKey })
 					else {
+						loggerGlobal.notice("❌ signature.signature.publicKey: \(signature.signature.publicKey) not found in request.signingFactor.signers  \(request.signingFactor.signers.map(\.account.publicKey))")
 						throw MissingAccountFromSignatures()
 					}
+					assert(signer.factorInstancesRequiredToSign.contains(where: { $0.derivationPath == signature.derivationPath }))
 					let accountSignature = try AccountSignature(
 						account: signer.account,
 						signature: signature
 					)
+					loggerGlobal.notice("3️⃣ accountSignature: \(accountSignature)")
 					accountSignatures.insert(accountSignature)
 				}
-
 				return accountSignatures
 			}
 		)
