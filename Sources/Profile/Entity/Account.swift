@@ -152,21 +152,7 @@ extension Profile.Network.Account {
 		case let .unsecured(unsecured): return unsecured.genesisFactorInstance
 		}
 	}
-
-	public func derivationPath() throws -> DerivationPath {
-		guard let path = factorInstance.derivationPath else {
-			throw NoDerivationPath()
-		}
-		return path
-	}
-
-	public var publicKey: SLIP10.PublicKey {
-		factorInstance.publicKey
-	}
 }
-
-// MARK: - NoDerivationPath
-struct NoDerivationPath: Error {}
 
 extension Profile.Network.Account {
 	public static var entityKind: EntityKind { .account }
