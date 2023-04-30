@@ -1,3 +1,4 @@
+import EngineToolkit
 import FactorSourcesClient
 import FeaturePrelude
 import LedgerHardwareWalletClient
@@ -40,7 +41,9 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 
 	public func sign(signingFactor: SigningFactor, state: State) async throws -> Set<AccountSignature> {
-		try await ledgerHardwareWalletClient.sign(
+		let expectedHash = try! blake2b(data: state.dataToSign)
+		print("🔮 Expected hash: \(expectedHash.hex)")
+		return try await ledgerHardwareWalletClient.sign(
 			signingFactor: signingFactor,
 			unhashedDataToSign: state.dataToSign
 		)

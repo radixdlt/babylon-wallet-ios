@@ -253,11 +253,12 @@ package.addModules([
 		name: "SigningFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
-			"TransactionClient",
+			"EngineToolkit",
 			"FactorSourcesClient",
-			"Profile",
-			"UseFactorSourceClient",
 			"LedgerHardwareWalletClient",
+			"Profile",
+			"TransactionClient",
+			"UseFactorSourceClient",
 		],
 		tests: .no
 	),
