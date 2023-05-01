@@ -31,6 +31,10 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 public struct JSONInstructionsTransactionManifest: Sendable, Hashable {
 	public let instructions: [Instruction]
 	public let convertedManifestThatContainsThem: TransactionManifest
+	public init(instructions: [Instruction], convertedManifestThatContainsThem: TransactionManifest) {
+		self.instructions = instructions
+		self.convertedManifestThatContainsThem = convertedManifestThatContainsThem
+	}
 }
 
 // MARK: - ConvertManifestInstructionsToJSONIfItWasStringRequest
