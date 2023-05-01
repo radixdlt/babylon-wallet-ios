@@ -8,6 +8,7 @@ extension CreationOfEntity {
 		let entityKindName: String
 		let useLedgerAsFactorSource: Bool
 		let ledgers: IdentifiedArrayOf<FactorSource>
+		var ledgersArray: [FactorSource]? { .init(ledgers) }
 		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 
@@ -69,17 +70,27 @@ extension CreationOfEntity.View {
 				Text("You have no Ledgers added, add a ledger to get started...")
 			} else {
 				Text("Select Ledger to Use")
-				Picker(
-					"Ledger Device",
-					selection: viewStore.binding(
-						get: \.selectedLedgerID,
-						send: { .selectedLedger(id: $0) }
-					)
-				) {
-					ForEach(viewStore.ledgers, id: \.self) { ledger in
-						Text("Ledger \(ledger.description.rawValue) | \(ledger.label.rawValue) (added: \(ledger.addedOn.ISO8601Format())")
-							.tag(ledger.id)
+
+				ScrollView {
+					VStack(spacing: .small1) {
+						Selection(
+							viewStore.binding(
+								get: \.ledgersArray,
+								send: { .selectedLedger(id: $0?.first?.id) }
+							),
+							from: viewStore.ledgers,
+							requiring: .exactly(1)
+						) { item in
+							SelectLedgerRow.View(
+								viewState: .init(factorSource: item.value),
+								isSelected: item.isSelected,
+								action: item.action
+							)
+						}
 					}
+
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .medium2)
 				}
 			}
 
@@ -112,5 +123,56 @@ extension CreationOfEntity.View {
 
 	private func createWithDevice() -> some SwiftUI.View {
 		Color.white
+	}
+}
+
+// MARK: - SelectLedgerRow
+enum SelectLedgerRow {
+	struct ViewState: Equatable {
+		let description: String
+		let addedOn: String
+		let lastUsedOn: String
+
+		init(factorSource: FactorSource) {
+			description = "\(factorSource.label.rawValue) (\(factorSource.description.rawValue))"
+			addedOn = factorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current))
+			lastUsedOn = factorSource.lastUsedOn.ISO8601Format(.iso8601Date(timeZone: .current))
+		}
+	}
+
+	@MainActor
+	struct View: SwiftUI.View {
+		let viewState: ViewState
+		let isSelected: Bool
+		let action: () -> Void
+
+		var body: some SwiftUI.View {
+			Button(action: action) {
+				HStack {
+					VStack(alignment: .leading, spacing: 0) {
+						Text(viewState.description)
+							.textStyle(.body1Header)
+
+						HPair(label: "Used", item: viewState.lastUsedOn)
+						HPair(label: "Added", item: viewState.addedOn)
+					}
+
+					Spacer()
+
+					RadioButton(
+						appearance: .light,
+						state: isSelected ? .selected : .unselected
+					)
+				}
+				.foregroundColor(.app.white)
+				.padding(.medium1)
+				.background(
+					Color.black
+				)
+				.brightness(isSelected ? -0.1 : 0)
+				.cornerRadius(.small1)
+			}
+			.buttonStyle(.inert)
+		}
 	}
 }
