@@ -190,11 +190,12 @@ public struct LoadableImage<Placeholder: View>: View {
 				.frame(width: size.frame.width, height: size.frame.height)
 		case .flexibleHeight:
 			if let imageSize {
-				let minAspect: CGFloat = 9 / 16
-				let aspect: CGFloat = imageSize.width / imageSize.height
+				let minAspect: CGFloat = 1
+				let maxAspect: CGFloat = 16 / 9
+				let aspect = min(maxAspect, max(imageSize.width / imageSize.height, minAspect))
 				image
 					.resizingMode(.aspectFill)
-					.aspectRatio(max(aspect, minAspect), contentMode: .fill)
+					.aspectRatio(aspect, contentMode: .fill)
 			} else {
 				image
 					.scaledToFill()

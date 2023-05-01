@@ -32,10 +32,6 @@ struct NFTIDView: View {
 					.padding(.bottom, .small1)
 
 				KeyValueView(key: L10n.AccountDetails.id, value: id, isID: true)
-
-				ForEach(metadata) { pair in
-					KeyValueView(key: pair.key, value: pair.value, isID: false)
-				}
 			} else {
 				// This is apparently needed, else the card disappears when not expanded
 				Rectangle()
