@@ -87,6 +87,7 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.transactionClient) var transactionClient
 
 	public init() {}
@@ -190,7 +191,14 @@ public struct Signing: Sendable, FeatureReducer {
 		let kind = signingFactors.first.factorSource.kind
 		precondition(signingFactors.allSatisfy { $0.factorSource.kind == kind })
 		state.factorsLeftToSignWith.removeValue(forKey: kind)
-		return proceedWithNextFactorSource(&state)
+		let lastUsedOn = Date()
+		return .fireAndForget {
+			try? await factorSourcesClient.updateLastUsed(.init(
+				factorSourceIDs: signingFactors.map(\.factorSource.id),
+				usagePurpose: .transactionSigning,
+				lastUsedOn: lastUsedOn
+			))
+		}.concatenate(with: proceedWithNextFactorSource(&state))
 	}
 
 	private func proceedWithNextFactorSource(_ state: inout State) -> EffectTask<Action> {

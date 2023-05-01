@@ -9,6 +9,7 @@ public struct FactorSourcesClient: Sendable {
 	public var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
 	public var addOffDeviceFactorSource: AddOffDeviceFactorSource
 	public var getSigningFactors: GetSigningFactors
+	public var updateLastUsed: UpdateLastUsed
 
 	public init(
 		getFactorSources: @escaping GetFactorSources,
@@ -16,7 +17,8 @@ public struct FactorSourcesClient: Sendable {
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
 		addOffDeviceFactorSource: @escaping AddOffDeviceFactorSource,
-		getSigningFactors: @escaping GetSigningFactors
+		getSigningFactors: @escaping GetSigningFactors,
+		updateLastUsed: @escaping UpdateLastUsed
 	) {
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
@@ -24,6 +26,7 @@ public struct FactorSourcesClient: Sendable {
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.addOffDeviceFactorSource = addOffDeviceFactorSource
 		self.getSigningFactors = getSigningFactors
+		self.updateLastUsed = updateLastUsed
 	}
 }
 
@@ -35,6 +38,7 @@ extension FactorSourcesClient {
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Profile.Network.Account>>) async throws -> SigningFactors
+	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
 }
 
 public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<Set<SigningFactor>>>
@@ -42,6 +46,22 @@ public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<S
 extension SigningFactors {
 	public var signerCount: Int {
 		values.flatMap { $0.map(\.signers.count) }.reduce(0, +)
+	}
+}
+
+// MARK: - UpdateFactorSourceLastUsedRequest
+public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
+	public let factorSourceIDs: [FactorSource.ID]
+	public let lastUsedOn: Date
+	public let usagePurpose: FactorSource.UsagePurpose
+	public init(
+		factorSourceIDs: [FactorSource.ID],
+		usagePurpose: FactorSource.UsagePurpose,
+		lastUsedOn: Date = .init()
+	) {
+		self.factorSourceIDs = factorSourceIDs
+		self.usagePurpose = usagePurpose
+		self.lastUsedOn = lastUsedOn
 	}
 }
 

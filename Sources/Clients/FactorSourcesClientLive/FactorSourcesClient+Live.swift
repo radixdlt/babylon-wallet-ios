@@ -78,6 +78,21 @@ extension FactorSourcesClient: DependencyKey {
 					for: accounts,
 					from: getFactorSources().rawValue
 				)
+			},
+			updateLastUsed: { request in
+
+				_ = try await getProfileStore().updating { profile in
+					var factorSources = profile.factorSources.rawValue
+					for id in request.factorSourceIDs {
+						guard var factorSource = factorSources[id: id] else {
+							throw FactorSourceNotFound()
+						}
+
+						factorSource.lastUsedOn = request.lastUsedOn
+						factorSources[id: id] = factorSource
+					}
+					profile.factorSources = .init(rawValue: factorSources)!
+				}
 			}
 		)
 	}

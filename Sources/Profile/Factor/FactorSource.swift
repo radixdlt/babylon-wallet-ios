@@ -136,6 +136,14 @@ public struct FactorSource:
 	}
 }
 
+// MARK: FactorSource.UsagePurpose
+extension FactorSource {
+	public enum UsagePurpose: Sendable, Hashable {
+		case transactionSigning
+		case authSigning
+	}
+}
+
 extension FactorSource {
 	public var supportsOlympia: Bool {
 		parameters.supportsOlympia
