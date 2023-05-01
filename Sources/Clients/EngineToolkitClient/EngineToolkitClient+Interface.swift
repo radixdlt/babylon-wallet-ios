@@ -71,8 +71,6 @@ extension EngineToolkitClient {
 
 	public typealias DecompileTransactionIntent = @Sendable (DecompileTransactionIntentRequest) throws -> DecompileTransactionIntentResponse
 	public typealias DecompileNotarizedTransactionIntent = @Sendable (DecompileNotarizedTransactionIntentRequest) throws -> DecompileNotarizedTransactionIntentResponse
-
-	public typealias AnalyzedManifest = AnalyzedManifestOf<AccountAddress>
 }
 
 // MARK: - AnalyzeManifestRequest
@@ -98,8 +96,8 @@ extension TransactionManifest: CustomDumpStringConvertible {
 
 import Profile
 
-// MARK: - AnalyzedManifestOf
-public struct AnalyzedManifestOf<Account: Sendable & Hashable>: Sendable, Hashable {
+// MARK: - AnalyzedManifest
+public struct AnalyzedManifest: Sendable, Hashable {
 	public let packageAddresses: OrderedSet<PackageAddress>
 	public let resourceAddresses: OrderedSet<ResourceAddress>
 	public let componentAddresses: OrderedSet<ComponentAddress>
@@ -108,7 +106,7 @@ public struct AnalyzedManifestOf<Account: Sendable & Hashable>: Sendable, Hashab
 	public let accountAddresses: OrderedSet<AccountAddress>
 
 	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let accountsRequiringAuth: OrderedSet<Account>
+	public let accountsRequiringAuth: OrderedSet<AccountAddress>
 
 	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountAddresses`.
 	public let accountsWithdrawnFrom: OrderedSet<AccountAddress>
@@ -121,7 +119,7 @@ public struct AnalyzedManifestOf<Account: Sendable & Hashable>: Sendable, Hashab
 		resourceAddresses: OrderedSet<ResourceAddress>,
 		componentAddresses: OrderedSet<ComponentAddress>,
 		accountAddresses: OrderedSet<AccountAddress>,
-		accountsRequiringAuth: OrderedSet<Account>,
+		accountsRequiringAuth: OrderedSet<AccountAddress>,
 		accountsDepositedInto: OrderedSet<AccountAddress>,
 		accountsWithdrawnFrom: OrderedSet<AccountAddress>
 	) {
@@ -135,31 +133,16 @@ public struct AnalyzedManifestOf<Account: Sendable & Hashable>: Sendable, Hashab
 	}
 
 	public init(
-		response: AnalyzeManifestResponse,
-		map intoAccount: (ComponentAddress) throws -> Account
+		response: AnalyzeManifestResponse
 	) throws {
 		try self.init(
 			packageAddresses: .init(validating: response.packageAddresses),
 			resourceAddresses: .init(validating: response.resourceAddresses),
 			componentAddresses: .init(validating: response.componentAddresses),
 			accountAddresses: .init(validating: response.accountAddresses.map { try AccountAddress(componentAddress: $0) }),
-			accountsRequiringAuth: .init(validating: response.accountsRequiringAuth.map(intoAccount)),
+			accountsRequiringAuth: .init(validating: response.accountsRequiringAuth.map { try AccountAddress(componentAddress: $0) }),
 			accountsDepositedInto: .init(validating: response.accountsDepositedInto.map { try AccountAddress(componentAddress: $0) }),
 			accountsWithdrawnFrom: .init(validating: response.accountsWithdrawnFrom.map { try AccountAddress(componentAddress: $0) })
-		)
-	}
-
-	public func mapAccountsRequiringAuth<NewAccount: Sendable & Hashable>(
-		_ intoAccount: (Account) throws -> NewAccount
-	) throws -> AnalyzedManifestOf<NewAccount> {
-		try AnalyzedManifestOf<NewAccount>(
-			packageAddresses: packageAddresses,
-			resourceAddresses: resourceAddresses,
-			componentAddresses: componentAddresses,
-			accountAddresses: accountAddresses,
-			accountsRequiringAuth: .init(validating: accountsRequiringAuth.map(intoAccount)),
-			accountsDepositedInto: accountsDepositedInto,
-			accountsWithdrawnFrom: accountsWithdrawnFrom
 		)
 	}
 }

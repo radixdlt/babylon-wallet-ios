@@ -10,6 +10,56 @@ import Resources
 // MARK: - FailedToFindReferencedAccount
 struct FailedToFindReferencedAccount: Swift.Error {}
 
+// MARK: - AccountNotFoundHandlingStrategy
+enum AccountNotFoundHandlingStrategy {
+	case throwError
+	case skip
+	case regardAsNotMine
+}
+
+// MARK: - AccountsInvolvedInTransaction
+public struct AccountsInvolvedInTransaction: Sendable, Hashable {
+	public enum AccountType: Sendable, Hashable {
+		case mine(Profile.Network.Account)
+		case notMine(AccountAddress)
+		func getMine() throws -> Profile.Network.Account {
+			guard case let .mine(mine) = self else {
+				throw FailedToFindReferencedAccount()
+			}
+			return mine
+		}
+	}
+
+	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public let accountsRequiringAuth: OrderedSet<AccountType>
+
+	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
+	public let accountsWithdrawnFrom: OrderedSet<AccountType>
+
+	/// A set of all of the account component addresses in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
+	public let accountsDepositedInto: OrderedSet<AccountType>
+
+	func getMine() throws -> MyAccountsInvolvedInTransaction {
+		try .init(
+			accountsRequiringAuth: .init(validating: accountsRequiringAuth.map { try $0.getMine() }), // for now assume we must have this
+			accountsWithdrawnFrom: .init(validating: accountsRequiringAuth.compactMap { try? $0.getMine() }),
+			accountsDepositedInto: .init(validating: accountsRequiringAuth.compactMap { try? $0.getMine() })
+		)
+	}
+}
+
+// MARK: - MyAccountsInvolvedInTransaction
+public struct MyAccountsInvolvedInTransaction: Sendable, Hashable {
+	/// A set of all MY accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public let accountsRequiringAuth: OrderedSet<Profile.Network.Account>
+
+	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
+	public let accountsWithdrawnFrom: OrderedSet<Profile.Network.Account>
+
+	/// A set of all MY accounts in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
+	public let accountsDepositedInto: OrderedSet<Profile.Network.Account>
+}
+
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
@@ -19,26 +69,53 @@ extension TransactionClient {
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 		@Sendable
-		func analyzeManifestMyAccounts(
+		func accountsInvolvedInTransaction(
 			networkID: NetworkID,
-			manifesT: TransactionManifest
-		) async throws -> AnalyzedManifestOf<Profile.Network.Account> {
-			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifesT, networkID: networkID))
+			manifest: TransactionManifest,
+			accountNotFoundHandlingStrategy: AccountNotFoundHandlingStrategy = .regardAsNotMine
+		) async throws -> AccountsInvolvedInTransaction {
+			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifest, networkID: networkID))
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-			return try analyzed.mapAccountsRequiringAuth { address in
-				guard let account = allAccounts.first(where: { $0.address == address }) else {
-					throw FailedToFindReferencedAccount()
+
+			func toAccount(
+				_ address: AccountAddress,
+				strategy maybeOverridingStrategy: AccountNotFoundHandlingStrategy? = nil
+			) throws -> AccountsInvolvedInTransaction.AccountType? {
+				let strategy = maybeOverridingStrategy ?? accountNotFoundHandlingStrategy
+
+				if let account = allAccounts.first(where: { $0.address == address }) {
+					return .mine(account)
+				} else {
+					switch strategy {
+					case .throwError:
+						throw FailedToFindReferencedAccount()
+					case .skip:
+						return nil
+					case .regardAsNotMine:
+						return .notMine(address)
+					}
 				}
-				return account
 			}
+
+			return try AccountsInvolvedInTransaction(
+				accountsRequiringAuth: .init(validating: analyzed.accountsRequiringAuth.compactMap { try toAccount($0) }),
+				accountsWithdrawnFrom: .init(validating: analyzed.accountsWithdrawnFrom.compactMap { try toAccount($0) }),
+				accountsDepositedInto: .init(validating: analyzed.accountsDepositedInto.compactMap { try toAccount($0) })
+			)
 		}
 
 		@Sendable
 		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
-			let accountsRequiringAuth = try await analyzeManifestMyAccounts(networkID: request.networkID, manifesT: request.manifest).accountsRequiringAuth
+			let involvedAccounts = try await accountsInvolvedInTransaction(
+				networkID: request.networkID,
+				manifest: request.manifest,
+				accountNotFoundHandlingStrategy: .regardAsNotMine
+			)
+
+			let myInvolvedAccounts = try involvedAccounts.getMine()
 
 			let intentSigning: TransactionSigners.IntentSigning = {
-				if let nonEmpty = NonEmpty(rawValue: accountsRequiringAuth) {
+				if let nonEmpty = NonEmpty(rawValue: myInvolvedAccounts.accountsRequiringAuth) {
 					return .intentSigners(nonEmpty)
 				} else {
 					return .notaryAsSignatory
@@ -63,6 +140,27 @@ extension TransactionClient {
 			return Set(portfolios.filter {
 				guard let xrdBalance = $0.fungibleResources.xrdResource?.amount else { return false }
 				return xrdBalance >= fee
+			})
+		}
+
+		@Sendable
+		func feePayerCandiates(
+			accounts: OrderedSet<Profile.Network.Account>,
+			fee: BigDecimal
+		) async throws -> OrderedSet<FeePayerCandiate> {
+			let portfolios = await accountsWithEnoughFunds(from: accounts.map(\.address), toPay: fee)
+			return try .init(validating: portfolios.compactMap { tokenBalance in
+				guard
+					let account = accounts.first(where: { account in account.address == tokenBalance.owner }),
+					let xrdBalance = tokenBalance.fungibleResources.xrdResource?.amount
+				else {
+					assertionFailure("Failed to find account or no balance, this should never happen.")
+					return nil
+				}
+				return FeePayerCandiate(
+					account: account,
+					xrdBalance: xrdBalance
+				)
 			})
 		}
 
@@ -101,82 +199,45 @@ extension TransactionClient {
 			)
 		}
 
-		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { maybeStringManifest, feeToAdd in
+		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+			let involvedAccounts = try await accountsInvolvedInTransaction(
+				networkID: networkID,
+				manifest: manifest,
+				accountNotFoundHandlingStrategy: .regardAsNotMine
+			)
 
-			let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+			let myInvolvedAccounts = try involvedAccounts.getMine().accountsRequiringAuth
+			let involvedFeePayerCandidates = try await feePayerCandiates(accounts: myInvolvedAccounts, fee: feeToAdd)
 
-			let allCandidates = await accountsWithEnoughFunds(
-				from: allAccounts.map(\.address),
-				toPay: feeToAdd
-			).compactMap { tokenBalance -> FeePayerCandiate? in
-				guard
-					let account = allAccounts.first(where: { account in account.address == tokenBalance.owner }),
-					let xrdBalance = tokenBalance.fungibleResources.xrdResource?.amount
-				else {
-					assertionFailure("Failed to find account or no balance, this should never happen.")
-					return nil
-				}
-				return FeePayerCandiate(
-					account: account,
-					xrdBalance: xrdBalance
+			if let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates)) {
+				let feePayer = nonEmpty.first
+				let manifestWithLockFee = try await lockFeeWithSelectedPayer(
+					manifest,
+					feeToAdd, feePayer.account.address
+				)
+
+				return .includesLockFee(
+					manifestWithLockFee,
+					feePayer: .init(
+						selected: feePayer,
+						candidates: nonEmpty,
+						fee: feeToAdd,
+						selection: .auto
+					)
 				)
 			}
 
-			guard let allCandidatesNonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(
-				rawValue: .init(
-					uniqueElements: allCandidates,
-					id: \.account.address
-				)
-			) else {
+			// None of the accounts in `myInvolvedAccounts` had any XRD, skip them all and fallback to fetching XRD for all other accounts on this
+			// network that not part of `myInvolvedAccounts`.
+			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+			let remainingAccounts = Set(allAccounts.rawValue.elements).subtracting(Set(myInvolvedAccounts.elements))
+			let remainingCandidates = try await feePayerCandiates(accounts: .init(remainingAccounts), fee: feeToAdd)
+			guard let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates)) else {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
-//			let accountsSuitableToPayForTXFeeRequest = await AccountAddressesInvolvedInTransactionRequest(
-//				version: engineToolkitClient.getTransactionVersion(),
-//				manifest: maybeStringManifest,
-//				networkID: gatewaysClient.getCurrentNetworkID()
-//			)
-
-//			let accountAddressesSuitableToPayTransactionFeeRef = try engineToolkitClient
-//				.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
-
-			let accountsRequiringAuth = try await analyzeManifestMyAccounts(
-				networkID: gatewaysClient.getCurrentNetworkID(),
-				manifesT: maybeStringManifest
-			).accountsRequiringAuth
-
-			guard
-				let feePayerInvolvedInTransaction = allCandidates.first(
-					where: { candidate in
-						accountsRequiringAuth.contains(
-							where: { involved in
-								involved == candidate.account
-							}
-						)
-					}
-				)
-			else {
-				return .excludesLockFee(
-					maybeStringManifest,
-					feePayerCandidates: allCandidatesNonEmpty,
-					feeNotYetAdded: feeToAdd
-				)
-			}
-
-			let manifestWithLockFee = try await lockFeeWithSelectedPayer(
-				maybeStringManifest,
-				feeToAdd, feePayerInvolvedInTransaction.account.address
-			)
-
-			return .includesLockFee(
-				manifestWithLockFee,
-				feePayer: .init(
-					selected: feePayerInvolvedInTransaction,
-					candidates: allCandidatesNonEmpty,
-					fee: feeToAdd,
-					selection: .auto
-				)
-			)
+			return .excludesLockFee(manifest, feePayerCandidates: nonEmpty, feeNotYetAdded: feeToAdd)
 		}
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in
