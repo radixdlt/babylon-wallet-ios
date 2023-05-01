@@ -7,6 +7,9 @@ import GatewayAPI
 import GatewaysClient
 import Resources
 
+// MARK: - FailedToFindReferencedAccount
+struct FailedToFindReferencedAccount: Swift.Error {}
+
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
@@ -16,26 +19,26 @@ extension TransactionClient {
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 		@Sendable
+		func analyzeManifestMyAccounts(
+			networkID: NetworkID,
+			manifesT: TransactionManifest
+		) async throws -> AnalyzedManifestOf<Profile.Network.Account> {
+			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifesT, networkID: networkID))
+			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+			return try analyzed.mapAccountsRequiringAuth { address in
+				guard let account = allAccounts.first(where: { $0.address == address }) else {
+					throw FailedToFindReferencedAccount()
+				}
+				return account
+			}
+		}
+
+		@Sendable
 		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
-			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
-				version: engineToolkitClient.getTransactionVersion(),
-				manifest: request.manifest,
-				networkID: request.networkID
-			)
-
-			let addressesNeededToSign = try OrderedSet(
-				engineToolkitClient
-					.accountAddressesNeedingToSignTransaction(
-						accountAddressesNeedingToSignTransactionRequest
-					)
-			)
-
-			let accounts = try await OrderedSet(addressesNeededToSign.asyncMap {
-				try await accountsClient.getAccountByAddress($0)
-			})
+			let accountsRequiringAuth = try await analyzeManifestMyAccounts(networkID: request.networkID, manifesT: request.manifest).accountsRequiringAuth
 
 			let intentSigning: TransactionSigners.IntentSigning = {
-				if let nonEmpty = NonEmpty(rawValue: accounts) {
+				if let nonEmpty = NonEmpty(rawValue: accountsRequiringAuth) {
 					return .intentSigners(nonEmpty)
 				} else {
 					return .notaryAsSignatory
@@ -128,21 +131,26 @@ extension TransactionClient {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
-			let accountsSuitableToPayForTXFeeRequest = await AccountAddressesInvolvedInTransactionRequest(
-				version: engineToolkitClient.getTransactionVersion(),
-				manifest: maybeStringManifest,
-				networkID: gatewaysClient.getCurrentNetworkID()
-			)
+//			let accountsSuitableToPayForTXFeeRequest = await AccountAddressesInvolvedInTransactionRequest(
+//				version: engineToolkitClient.getTransactionVersion(),
+//				manifest: maybeStringManifest,
+//				networkID: gatewaysClient.getCurrentNetworkID()
+//			)
 
-			let accountAddressesSuitableToPayTransactionFeeRef = try engineToolkitClient
-				.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
+//			let accountAddressesSuitableToPayTransactionFeeRef = try engineToolkitClient
+//				.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
+
+			let accountsRequiringAuth = try await analyzeManifestMyAccounts(
+				networkID: gatewaysClient.getCurrentNetworkID(),
+				manifesT: maybeStringManifest
+			).accountsRequiringAuth
 
 			guard
 				let feePayerInvolvedInTransaction = allCandidates.first(
 					where: { candidate in
-						accountAddressesSuitableToPayTransactionFeeRef.contains(
+						accountsRequiringAuth.contains(
 							where: { involved in
-								involved == candidate.account.address
+								involved == candidate.account
 							}
 						)
 					}
@@ -242,12 +250,13 @@ extension TransactionClient {
 				)
 			}
 			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
-			let generateTransactionReviewRequest = AnalyzeManifestWithPreviewContextRequest(
+
+			let analyzedManifestToReview = try engineToolkitClient.analyzeManifestWithPreviewContext(.init(
 				networkId: networkID,
 				manifest: request.manifestToSign,
 				transactionReceipt: receiptBytes
-			)
-			let analyzedManifestToReview = try engineToolkitClient.generateTransactionReview(generateTransactionReviewRequest)
+			))
+
 			let addFeeToManifestOutcome = try await lockFeeBySearchingForSuitablePayer(
 				request.manifestToSign,
 				request.feeToAdd

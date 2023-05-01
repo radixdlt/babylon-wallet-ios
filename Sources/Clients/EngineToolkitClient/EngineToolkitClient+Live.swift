@@ -66,28 +66,32 @@ extension EngineToolkitClient {
 				let hash = try blake2b(data: compiledTransactionIntent.compiledIntent)
 				return TXID(rawValue: hash.hex)
 			},
-			accountAddressesNeedingToSignTransaction: { request throws -> Set<AccountAddress> in
-				try Set(
-					request.manifest.accountsRequiredToSign(
-						networkId: request.networkID
-					).map {
-						try AccountAddress(componentAddress: $0)
-					}
-				)
-			},
-			accountAddressesSuitableToPayTransactionFee: { request throws -> Set<AccountAddress> in
-				try Set(
-					request.manifest.accountsSuitableToPayTXFee(
-						networkId: request.networkID
-					).map {
-						try AccountAddress(componentAddress: $0)
-					}
-				)
-			},
+//			accountAddressesNeedingToSignTransaction: { request throws -> Set<AccountAddress> in
+//				try Set(
+//					request.manifest.accountsRequiredToSign(
+//						networkId: request.networkID
+//					).map {
+//						try AccountAddress(componentAddress: $0)
+//					}
+//				)
+//			},
+//			accountAddressesSuitableToPayTransactionFee: { request throws -> Set<AccountAddress> in
+//				try Set(
+//					request.manifest.accountsSuitableToPayTXFee(
+//						networkId: request.networkID
+//					).map {
+//						try AccountAddress(componentAddress: $0)
+//					}
+//				)
+//			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
-			generateTransactionReview: { manifestWithPreviewContext in
+			analyzeManifest: { request in
+				let response = try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
+				return try .init(response: response) { try AccountAddress(componentAddress: $0) }
+			},
+			analyzeManifestWithPreviewContext: { manifestWithPreviewContext in
 				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
 			},
 			decodeAddress: { address in
@@ -99,9 +103,3 @@ extension EngineToolkitClient {
 
 // MARK: - FailedToConvertManifestToFormatWhereInstructionsAreJSON
 struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
-
-extension AccountAddress {
-	public init(componentAddress: ComponentAddress) throws {
-		try self.init(address: componentAddress.address)
-	}
-}

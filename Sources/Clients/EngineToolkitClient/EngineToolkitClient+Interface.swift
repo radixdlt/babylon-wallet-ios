@@ -18,12 +18,12 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var deriveOlympiaAdressFromPublicKey: DeriveOlympiaAdressFromPublicKey
 
 	public var generateTXID: GenerateTXID
-	public var accountAddressesNeedingToSignTransaction: AccountAddressesNeedingToSignTransaction
-	public var accountAddressesSuitableToPayTransactionFee: AccountAddressesSuitableToPayTransactionFee
 
 	public var knownEntityAddresses: KnownEntityAddresses
 
-	public var generateTransactionReview: GenerateTransactionReview
+	public var analyzeManifest: AnalyzeManifest
+	public var analyzeManifestWithPreviewContext: AnalyzeManifestWithPreviewContext
+
 	public var decodeAddress: DecodeAddressRequest
 }
 
@@ -52,9 +52,6 @@ extension EngineToolkitClient {
 
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (ConvertManifestInstructionsToJSONIfItWasStringRequest) throws -> JSONInstructionsTransactionManifest
 
-	public typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
-	public typealias AccountAddressesSuitableToPayTransactionFee = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
-
 	public typealias CompileTransactionIntent = @Sendable (TransactionIntent) throws -> CompileTransactionIntentResponse
 
 	public typealias CompileSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> CompileSignedTransactionIntentResponse
@@ -67,26 +64,26 @@ extension EngineToolkitClient {
 
 	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 
-	public typealias GenerateTransactionReview = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
+	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> AnalyzedManifest
+	public typealias AnalyzeManifestWithPreviewContext = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
 
 	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
 
 	public typealias DecompileTransactionIntent = @Sendable (DecompileTransactionIntentRequest) throws -> DecompileTransactionIntentResponse
 	public typealias DecompileNotarizedTransactionIntent = @Sendable (DecompileNotarizedTransactionIntentRequest) throws -> DecompileNotarizedTransactionIntentResponse
+
+	public typealias AnalyzedManifest = AnalyzedManifestOf<AccountAddress>
 }
 
-// MARK: - AccountAddressesInvolvedInTransactionRequest
-public struct AccountAddressesInvolvedInTransactionRequest: Sendable, Hashable {
-	public let version: TXVersion
+// MARK: - AnalyzeManifestRequest
+public struct AnalyzeManifestRequest: Sendable, Hashable {
 	public let manifest: TransactionManifest
 	public let networkID: NetworkID
 
 	public init(
-		version: TXVersion,
 		manifest: TransactionManifest,
 		networkID: NetworkID
 	) {
-		self.version = version
 		self.manifest = manifest
 		self.networkID = networkID
 	}
@@ -96,5 +93,91 @@ public struct AccountAddressesInvolvedInTransactionRequest: Sendable, Hashable {
 extension TransactionManifest: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
 		description
+	}
+}
+
+import Profile
+
+// MARK: - AnalyzedManifestOf
+public struct AnalyzedManifestOf<Account: Sendable & Hashable>: Sendable, Hashable {
+	public let packageAddresses: OrderedSet<PackageAddress>
+	public let resourceAddresses: OrderedSet<ResourceAddress>
+	public let componentAddresses: OrderedSet<ComponentAddress>
+
+	/// A set of all of the account component addresses seen in the manifest.
+	public let accountAddresses: OrderedSet<AccountAddress>
+
+	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public let accountsRequiringAuth: OrderedSet<Account>
+
+	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountAddresses`.
+	public let accountsWithdrawnFrom: OrderedSet<AccountAddress>
+
+	/// A set of all of the account component addresses in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
+	public let accountsDepositedInto: OrderedSet<AccountAddress>
+
+	public init(
+		packageAddresses: OrderedSet<PackageAddress>,
+		resourceAddresses: OrderedSet<ResourceAddress>,
+		componentAddresses: OrderedSet<ComponentAddress>,
+		accountAddresses: OrderedSet<AccountAddress>,
+		accountsRequiringAuth: OrderedSet<Account>,
+		accountsDepositedInto: OrderedSet<AccountAddress>,
+		accountsWithdrawnFrom: OrderedSet<AccountAddress>
+	) {
+		self.packageAddresses = packageAddresses
+		self.resourceAddresses = resourceAddresses
+		self.componentAddresses = componentAddresses
+		self.accountAddresses = accountAddresses
+		self.accountsRequiringAuth = accountsRequiringAuth
+		self.accountsDepositedInto = accountsDepositedInto
+		self.accountsWithdrawnFrom = accountsWithdrawnFrom
+	}
+
+	public init(
+		response: AnalyzeManifestResponse,
+		map intoAccount: (ComponentAddress) throws -> Account
+	) throws {
+		try self.init(
+			packageAddresses: .init(validating: response.packageAddresses),
+			resourceAddresses: .init(validating: response.resourceAddresses),
+			componentAddresses: .init(validating: response.componentAddresses),
+			accountAddresses: .init(validating: response.accountAddresses.map { try AccountAddress(componentAddress: $0) }),
+			accountsRequiringAuth: .init(validating: response.accountsRequiringAuth.map(intoAccount)),
+			accountsDepositedInto: .init(validating: response.accountsDepositedInto.map { try AccountAddress(componentAddress: $0) }),
+			accountsWithdrawnFrom: .init(validating: response.accountsWithdrawnFrom.map { try AccountAddress(componentAddress: $0) })
+		)
+	}
+
+	public func mapAccountsRequiringAuth<NewAccount: Sendable & Hashable>(
+		_ intoAccount: (Account) throws -> NewAccount
+	) throws -> AnalyzedManifestOf<NewAccount> {
+		try AnalyzedManifestOf<NewAccount>(
+			packageAddresses: packageAddresses,
+			resourceAddresses: resourceAddresses,
+			componentAddresses: componentAddresses,
+			accountAddresses: accountAddresses,
+			accountsRequiringAuth: .init(validating: accountsRequiringAuth.map(intoAccount)),
+			accountsDepositedInto: accountsDepositedInto,
+			accountsWithdrawnFrom: accountsWithdrawnFrom
+		)
+	}
+}
+
+extension OrderedSet {
+	/// Validates that `unchecked` collection contains unique elements.
+	public init(validating unchecked: some Collection<Element>) throws {
+		self.init(unchecked)
+		guard self.count == unchecked.count else {
+			throw UnexpectedDuplicatesFound()
+		}
+	}
+
+	struct UnexpectedDuplicatesFound: Swift.Error {}
+}
+
+extension AccountAddress {
+	public init(componentAddress: ComponentAddress) throws {
+		try self.init(address: componentAddress.address)
 	}
 }
