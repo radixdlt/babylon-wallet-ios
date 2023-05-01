@@ -47,7 +47,7 @@ extension AccountList.Row {
 				let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource.map { _ in [.xrd] } ?? []
 				let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.iconURL) }
 				let icons = xrdIcon + otherIcons
-				let hiddenCount = icons.count - FungibleResources.maxNumberOfIcons
+				let hiddenCount = max(icons.count - FungibleResources.maxNumberOfIcons, 0)
 				let additionalItems = hiddenCount > 0 ? "+\(hiddenCount)" : nil
 
 				return .init(icons: icons.dropLast(hiddenCount), additionalItemsText: additionalItems)
