@@ -19,10 +19,9 @@ extension EngineToolkitClient: TestDependencyKey {
 		decompileNotarizedTransactionIntent: { _ in throw NoopError() },
 		deriveOlympiaAdressFromPublicKey: { _ in throw NoopError() },
 		generateTXID: { _ in "deadbeef" },
-		accountAddressesNeedingToSignTransaction: { _ in [] },
-		accountAddressesSuitableToPayTransactionFee: { _ in [] },
 		knownEntityAddresses: { _ in throw NoopError() },
-		generateTransactionReview: { _ in throw NoopError() },
+		analyzeManifest: { _ in throw NoopError() },
+		analyzeManifestWithPreviewContext: { _ in throw NoopError() },
 		decodeAddress: { _ in throw NoopError() }
 	)
 
@@ -37,10 +36,9 @@ extension EngineToolkitClient: TestDependencyKey {
 		decompileNotarizedTransactionIntent: unimplemented("\(Self.self).decompileNotarizedTransactionIntent"),
 		deriveOlympiaAdressFromPublicKey: unimplemented("\(Self.self).deriveOlympiaAdressFromPublicKey"),
 		generateTXID: unimplemented("\(Self.self).generateTXID"),
-		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction"),
-		accountAddressesSuitableToPayTransactionFee: unimplemented("\(Self.self).accountAddressesSuitableToPayTransactionFee"),
 		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses"),
-		generateTransactionReview: unimplemented("\(Self.self).generateTransactionReview"),
+		analyzeManifest: unimplemented("\(Self.self).analyzeManifest"),
+		analyzeManifestWithPreviewContext: unimplemented("\(Self.self).analyzeManifestWithPreviewContext"),
 		decodeAddress: unimplemented("\(Self.self).decodeAddress")
 	)
 }

@@ -41,7 +41,9 @@ extension SubmitTransaction {
 					VPair(heading: "Status", item: viewStore.status.display)
 				}
 				.padding(.medium1)
-				.onAppear { viewStore.send(.appeared) }
+				.onFirstTask { @MainActor in
+					viewStore.send(.appeared)
+				}
 				.navigationTitle("Submitting Transaction")
 			}
 		}
