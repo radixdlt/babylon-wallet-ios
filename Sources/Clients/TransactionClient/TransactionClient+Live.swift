@@ -78,15 +78,12 @@ extension TransactionClient {
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
 			func toAccount(
-				_ address: AccountAddress,
-				strategy maybeOverridingStrategy: AccountNotFoundHandlingStrategy? = nil
+				_ address: AccountAddress
 			) throws -> AccountsInvolvedInTransaction.AccountType? {
-				let strategy = maybeOverridingStrategy ?? accountNotFoundHandlingStrategy
-
 				if let account = allAccounts.first(where: { $0.address == address }) {
 					return .mine(account)
 				} else {
-					switch strategy {
+					switch accountNotFoundHandlingStrategy {
 					case .throwError:
 						throw FailedToFindReferencedAccount()
 					case .skip:
@@ -207,18 +204,31 @@ extension TransactionClient {
 				accountNotFoundHandlingStrategy: .regardAsNotMine
 			)
 
-			let myInvolvedAccounts = try involvedAccounts.getMine().accountsRequiringAuth
-			let involvedFeePayerCandidates = try await feePayerCandiates(accounts: myInvolvedAccounts, fee: feeToAdd)
+			let myInvolvedAccounts = try involvedAccounts.getMine()
+			var triedAccounts: Set<Profile.Network.Account> = []
+			func findFeePayer(
+				amongst keyPath: KeyPath<MyAccountsInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
+			) async throws -> AddFeeToManifestOutcomeIncludesLockFee? {
+				let accountsToCheck = myInvolvedAccounts[keyPath: keyPath]
+				let involvedFeePayerCandidates = try await feePayerCandiates(
+					accounts: accountsToCheck,
+					fee: feeToAdd
+				)
+				triedAccounts.append(contentsOf: accountsToCheck)
+				guard
+					let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates))
+				else {
+					return nil
+				}
 
-			if let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: involvedFeePayerCandidates)) {
 				let feePayer = nonEmpty.first
 				let manifestWithLockFee = try await lockFeeWithSelectedPayer(
 					manifest,
 					feeToAdd, feePayer.account.address
 				)
 
-				return .includesLockFee(
-					manifestWithLockFee,
+				return .init(
+					manifestWithLockFee: manifestWithLockFee,
 					feePayer: .init(
 						selected: feePayer,
 						candidates: nonEmpty,
@@ -228,17 +238,31 @@ extension TransactionClient {
 				)
 			}
 
+			// First try amonst `accountsWithdrawnFrom`
+			if let withLockFee = try await findFeePayer(amongst: \.accountsWithdrawnFrom) {
+				return .includesLockFee(withLockFee)
+			}
+			// no candiates amonst `accountsWithdrawnFrom` => fallback to `accountsRequiringAuth`
+			if let withLockFee = try await findFeePayer(amongst: \.accountsRequiringAuth) {
+				return .includesLockFee(withLockFee)
+			}
+			// no candiates amonst `accountsRequiringAuth` => fallback to `accountsDepositedInto`
+			if let withLockFee = try await findFeePayer(amongst: \.accountsDepositedInto) {
+				return .includesLockFee(withLockFee)
+			}
+
 			// None of the accounts in `myInvolvedAccounts` had any XRD, skip them all and fallback to fetching XRD for all other accounts on this
 			// network that not part of `myInvolvedAccounts`.
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-			let remainingAccounts = Set(allAccounts.rawValue.elements).subtracting(Set(myInvolvedAccounts.elements))
+
+			let remainingAccounts = Set(allAccounts.rawValue.elements).subtracting(triedAccounts)
 			let remainingCandidates = try await feePayerCandiates(accounts: .init(remainingAccounts), fee: feeToAdd)
 
 			guard let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: remainingCandidates)) else {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
 
-			return .excludesLockFee(manifest, feePayerCandidates: nonEmpty, feeNotYetAdded: feeToAdd)
+			return .excludesLockFee(.init(manifestExcludingLockFee: manifest, feePayerCandidates: nonEmpty, feeNotYetAdded: feeToAdd))
 		}
 
 		let buildTransactionIntent: BuildTransactionIntent = { request in

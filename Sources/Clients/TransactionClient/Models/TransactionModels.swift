@@ -237,8 +237,21 @@ public struct FeePayerCandiate: Sendable, Hashable, Identifiable {
 
 // MARK: - AddFeeToManifestOutcome
 public enum AddFeeToManifestOutcome: Sendable, Equatable {
-	case includesLockFee(TransactionManifest, feePayer: FeePayerSelectionAmongstCandidates)
-	case excludesLockFee(TransactionManifest, feePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>, feeNotYetAdded: BigDecimal)
+	case includesLockFee(AddFeeToManifestOutcomeIncludesLockFee)
+	case excludesLockFee(AddFeeToManifestOutcomeExcludesLockFee)
+}
+
+// MARK: - AddFeeToManifestOutcomeIncludesLockFee
+public struct AddFeeToManifestOutcomeIncludesLockFee: Sendable, Equatable {
+	public let manifestWithLockFee: TransactionManifest
+	public let feePayer: FeePayerSelectionAmongstCandidates
+}
+
+// MARK: - AddFeeToManifestOutcomeExcludesLockFee
+public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
+	public let manifestExcludingLockFee: TransactionManifest
+	public let feePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>
+	public let feeNotYetAdded: BigDecimal
 }
 
 // MARK: - TransactionToReview
