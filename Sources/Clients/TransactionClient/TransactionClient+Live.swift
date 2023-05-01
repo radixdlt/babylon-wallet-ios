@@ -7,47 +7,6 @@ import GatewayAPI
 import GatewaysClient
 import Resources
 
-// MARK: - FailedToFindReferencedAccount
-struct FailedToFindReferencedAccount: Swift.Error {}
-
-// MARK: - AccountNotFoundHandlingStrategy
-enum AccountNotFoundHandlingStrategy {
-	case throwError
-	case skip
-	case regardAsNotMine
-}
-
-// MARK: - AccountsInvolvedInTransaction
-public struct AccountsInvolvedInTransaction: Sendable, Hashable {
-	public enum AccountType: Sendable, Hashable {
-		case mine(Profile.Network.Account)
-		case notMine(AccountAddress)
-		func getMine() throws -> Profile.Network.Account {
-			guard case let .mine(mine) = self else {
-				throw FailedToFindReferencedAccount()
-			}
-			return mine
-		}
-	}
-
-	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let accountsRequiringAuth: OrderedSet<AccountType>
-
-	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
-	public let accountsWithdrawnFrom: OrderedSet<AccountType>
-
-	/// A set of all of the account component addresses in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	public let accountsDepositedInto: OrderedSet<AccountType>
-
-	func getMine() throws -> MyAccountsInvolvedInTransaction {
-		try .init(
-			accountsRequiringAuth: .init(validating: accountsRequiringAuth.map { try $0.getMine() }), // for now assume we must have this
-			accountsWithdrawnFrom: .init(validating: accountsWithdrawnFrom.compactMap { try? $0.getMine() }),
-			accountsDepositedInto: .init(validating: accountsDepositedInto.compactMap { try? $0.getMine() })
-		)
-	}
-}
-
 // MARK: - MyAccountsInvolvedInTransaction
 public struct MyAccountsInvolvedInTransaction: Sendable, Hashable {
 	/// A set of all MY accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
@@ -69,47 +28,33 @@ extension TransactionClient {
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 		@Sendable
-		func accountsInvolvedInTransaction(
+		func myAccountsInvolvedInTransaction(
 			networkID: NetworkID,
-			manifest: TransactionManifest,
-			accountNotFoundHandlingStrategy: AccountNotFoundHandlingStrategy = .regardAsNotMine
-		) async throws -> AccountsInvolvedInTransaction {
+			manifest: TransactionManifest
+		) async throws -> MyAccountsInvolvedInTransaction {
 			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifest, networkID: networkID))
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
-			func toAccount(
-				_ address: AccountAddress
-			) throws -> AccountsInvolvedInTransaction.AccountType? {
-				if let account = allAccounts.first(where: { $0.address == address }) {
-					return .mine(account)
-				} else {
-					switch accountNotFoundHandlingStrategy {
-					case .throwError:
-						throw FailedToFindReferencedAccount()
-					case .skip:
-						return nil
-					case .regardAsNotMine:
-						return .notMine(address)
-					}
-				}
+			func accountFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Account? {
+				allAccounts.first(where: { $0.address.address == componentAddress.address })
+			}
+			func map(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
+				try .init(validating: analyzed[keyPath: keyPath].compactMap(accountFromComponentAddress))
 			}
 
-			return try AccountsInvolvedInTransaction(
-				accountsRequiringAuth: .init(validating: analyzed.accountsRequiringAuth.compactMap { try toAccount($0) }),
-				accountsWithdrawnFrom: .init(validating: analyzed.accountsWithdrawnFrom.compactMap { try toAccount($0) }),
-				accountsDepositedInto: .init(validating: analyzed.accountsDepositedInto.compactMap { try toAccount($0) })
+			return try MyAccountsInvolvedInTransaction(
+				accountsRequiringAuth: map(\.accountsRequiringAuth),
+				accountsWithdrawnFrom: map(\.accountsWithdrawnFrom),
+				accountsDepositedInto: map(\.accountsDepositedInto)
 			)
 		}
 
 		@Sendable
 		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
-			let involvedAccounts = try await accountsInvolvedInTransaction(
+			let myInvolvedAccounts = try await myAccountsInvolvedInTransaction(
 				networkID: request.networkID,
-				manifest: request.manifest,
-				accountNotFoundHandlingStrategy: .regardAsNotMine
+				manifest: request.manifest
 			)
-
-			let myInvolvedAccounts = try involvedAccounts.getMine()
 
 			let intentSigning: TransactionSigners.IntentSigning = {
 				if let nonEmpty = NonEmpty(rawValue: myInvolvedAccounts.accountsRequiringAuth) {
@@ -197,15 +142,12 @@ extension TransactionClient {
 		}
 
 		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in
-			loggerGlobal.debug("Finding suitable fee payer for manifest: \(manifest)")
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let involvedAccounts = try await accountsInvolvedInTransaction(
+			let myInvolvedAccounts = try await myAccountsInvolvedInTransaction(
 				networkID: networkID,
-				manifest: manifest,
-				accountNotFoundHandlingStrategy: .regardAsNotMine
+				manifest: manifest
 			)
 
-			let myInvolvedAccounts = try involvedAccounts.getMine()
 			loggerGlobal.debug("My involved accounts: \(myInvolvedAccounts)")
 			var triedAccounts: Set<Profile.Network.Account> = []
 			func findFeePayer(

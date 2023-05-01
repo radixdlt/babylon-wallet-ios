@@ -68,7 +68,7 @@ extension EngineToolkitClient {
 
 	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 
-	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> AnalyzedManifest
+	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> AnalyzeManifestResponse
 	public typealias AnalyzeManifestWithPreviewContext = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
 
 	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
@@ -95,59 +95,6 @@ public struct AnalyzeManifestRequest: Sendable, Hashable {
 extension TransactionManifest: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
 		description
-	}
-}
-
-import Profile
-
-// MARK: - AnalyzedManifest
-public struct AnalyzedManifest: Sendable, Hashable {
-	public let packageAddresses: OrderedSet<PackageAddress>
-	public let resourceAddresses: OrderedSet<ResourceAddress>
-	public let componentAddresses: OrderedSet<ComponentAddress>
-
-	/// A set of all of the account component addresses seen in the manifest.
-	public let accountAddresses: OrderedSet<AccountAddress>
-
-	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let accountsRequiringAuth: OrderedSet<AccountAddress>
-
-	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountAddresses`.
-	public let accountsWithdrawnFrom: OrderedSet<AccountAddress>
-
-	/// A set of all of the account component addresses in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	public let accountsDepositedInto: OrderedSet<AccountAddress>
-
-	public init(
-		packageAddresses: OrderedSet<PackageAddress>,
-		resourceAddresses: OrderedSet<ResourceAddress>,
-		componentAddresses: OrderedSet<ComponentAddress>,
-		accountAddresses: OrderedSet<AccountAddress>,
-		accountsRequiringAuth: OrderedSet<AccountAddress>,
-		accountsDepositedInto: OrderedSet<AccountAddress>,
-		accountsWithdrawnFrom: OrderedSet<AccountAddress>
-	) {
-		self.packageAddresses = packageAddresses
-		self.resourceAddresses = resourceAddresses
-		self.componentAddresses = componentAddresses
-		self.accountAddresses = accountAddresses
-		self.accountsRequiringAuth = accountsRequiringAuth
-		self.accountsDepositedInto = accountsDepositedInto
-		self.accountsWithdrawnFrom = accountsWithdrawnFrom
-	}
-
-	public init(
-		response: AnalyzeManifestResponse
-	) throws {
-		try self.init(
-			packageAddresses: .init(validating: response.packageAddresses),
-			resourceAddresses: .init(validating: response.resourceAddresses),
-			componentAddresses: .init(validating: response.componentAddresses),
-			accountAddresses: .init(validating: response.accountAddresses.map { try AccountAddress(componentAddress: $0) }),
-			accountsRequiringAuth: .init(validating: response.accountsRequiringAuth.map { try AccountAddress(componentAddress: $0) }),
-			accountsDepositedInto: .init(validating: response.accountsDepositedInto.map { try AccountAddress(componentAddress: $0) }),
-			accountsWithdrawnFrom: .init(validating: response.accountsWithdrawnFrom.map { try AccountAddress(componentAddress: $0) })
-		)
 	}
 }
 

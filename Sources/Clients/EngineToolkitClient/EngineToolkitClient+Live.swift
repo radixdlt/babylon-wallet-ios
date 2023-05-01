@@ -70,8 +70,7 @@ extension EngineToolkitClient {
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
 			analyzeManifest: { request in
-				let response = try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
-				return try .init(response: response)
+				try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
 			},
 			analyzeManifestWithPreviewContext: { manifestWithPreviewContext in
 				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
