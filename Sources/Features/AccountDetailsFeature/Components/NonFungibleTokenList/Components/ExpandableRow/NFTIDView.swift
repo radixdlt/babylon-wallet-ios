@@ -1,112 +1,71 @@
 import FeaturePrelude
 import SharedModels
 
+// MARK: - NFTView
+struct NFTView: View {
+	let url: URL?
+
+	var body: some View {
+		LoadableImage(url: url, size: .flexibleHeight, loading: .shimmer) {
+			Rectangle()
+				.fill(.app.gray4)
+				.frame(height: .large2)
+		}
+		.cornerRadius(.small3)
+	}
+}
+
 // MARK: - NFTIDView
 struct NFTIDView: View {
 	let id: String
+	let name: String?
+	let description: String?
+	let thumbnail: URL?
+	let metadata: [AccountPortfolio.Metadata]
 	let isLast: Bool
 	let isExpanded: Bool
 
-	@State private var imageHeight: CGFloat?
-	private let collapsedImageHeight: CGFloat = 0
-
-	@State private var height: CGFloat?
-	private let collapsedHeight: CGFloat = 0
-}
-
-extension NFTIDView {
 	var body: some View {
-		VStack(spacing: .medium2) {
-			// TODO: refactor when API returns individual NFT image
-			AsyncImage(url: URL(string: ""))
-				.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
-				.cornerRadius(.small3)
-				.onSizeChanged { size in
-					if imageHeight == nil, size.height != collapsedImageHeight {
-						imageHeight = size.height
-					}
-				}
-				// TODO: remove when API returns individual NFT image
-				.hidden()
+		VStack(spacing: .small1) {
+			if isExpanded {
+				NFTView(url: thumbnail)
+					.padding(.bottom, .small1)
 
-			VStack(alignment: .leading, spacing: .small2) {
-				Text(id)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.offset(y: -.small2)
-
-				ForEach(metadata, id: \.self) { element in
-					HStack(alignment: .top) {
-						Text(element.keys.first ?? "")
-							.foregroundColor(.app.buttonTextBlack)
-							.textStyle(.body1Regular)
-
-						Spacer()
-
-						Text(element.values.first ?? "")
-							.foregroundColor(.app.buttonTextBlack)
-							.textStyle(.body1Header)
-					}
-				}
-
-				if metadata.isEmpty {
-					HStack {
-						Spacer()
-					}
-				}
-			}
-			.opacity(isExpanded ? 1 : 0)
-			.frame(height: isExpanded ? height : collapsedHeight)
-			.onSizeChanged { size in
-				if height == nil, size.height != collapsedHeight {
-					height = size.height
-				}
+				KeyValueView(key: L10n.AccountDetails.id, value: id, isID: true)
+			} else {
+				// This is apparently needed, else the card disappears when not expanded
+				Rectangle()
+					.fill(.clear)
+					.frame(height: 20)
 			}
 		}
 		.padding(.medium1)
+		.frame(maxWidth: .infinity)
 		.background(
-			ExpandableRowBackgroundView(
-				paddingEdge: edge,
-				paddingValue: value,
-				cornerRadius: oppositeValue
+			RoundedCornerBackground(
+				exclude: isExpanded ? (isLast ? .top : .vertical) : [],
+				cornerRadius: .small1
 			)
-			.tokenRowShadow(condition: isExpanded && !isLast)
+			.tokenRowShadow(isLast || !isExpanded)
 		)
 	}
 }
 
-// MARK: - Private Computed Properties
+// MARK: - KeyValueView
+struct KeyValueView: View {
+	let key: String
+	let value: String
+	let isID: Bool
 
-extension NFTIDView {
-	private var metadata: [[String: String]] {
-		// TODO: refactor when API returns NFT metadata
-		//		token.metadata ?? []
-		[]
-	}
-}
-
-// MARK: ExpandableRow
-extension NFTIDView: ExpandableRow {
-	var edge: Edge.Set {
-		if isLast {
-			return [.top]
-		} else {
-			return [.all]
+	var body: some View {
+		HStack(alignment: .top, spacing: 0) {
+			Text(key)
+				.textStyle(.body1Regular)
+			Spacer(minLength: 0)
+			Text(value)
+				.foregroundColor(isID ? .app.gray2 : .app.gray1)
+				.textStyle(.body1HighImportance)
 		}
-	}
-
-	var value: CGFloat {
-		isExpanded ? Constants.radius : 0
-	}
-
-	var oppositeValue: CGFloat {
-		isExpanded ? 0 : Constants.radius
-	}
-}
-
-// MARK: NFTIDView.Constants
-extension NFTIDView {
-	fileprivate enum Constants {
-		static let radius: CGFloat = .small1
+		.foregroundColor(.app.gray2)
 	}
 }

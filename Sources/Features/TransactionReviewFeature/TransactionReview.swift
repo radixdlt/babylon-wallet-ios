@@ -268,9 +268,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
 			state.destination = nil
 
-			return .run { send in
+			return .task {
 				try? await clock.sleep(for: .milliseconds(700)) // bah, we need to to dismiss `state.destination` before proceeding with completion
-				await send(.delegate(.transactionCompleted(txID)))
+				return .delegate(.transactionCompleted(txID))
 			}
 
 		default:
@@ -431,6 +431,7 @@ extension TransactionReview {
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
 		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address)
+
 		let dApps = try await addresses.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
 
@@ -442,7 +443,7 @@ extension TransactionReview {
 		return LedgerEntity(
 			id: address,
 			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-			                thumbnail: nil,
+			                thumbnail: metadata?.iconURL,
 			                description: metadata?.description)
 		)
 	}
@@ -459,7 +460,7 @@ extension TransactionReview {
 		return LedgerEntity(
 			id: address,
 			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
-			                thumbnail: nil,
+			                thumbnail: metadata?.iconURL,
 			                description: metadata?.description)
 		)
 	}
@@ -587,8 +588,8 @@ extension TransactionReview {
 		switch resourceSpecifier {
 		case let .amount(resourceAddress, amount):
 			try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
-		case let .ids(resourceAddress, _):
-			try await addTransfer(resourceAddress, amount: .init(fromString: "1"))
+		case let .ids(resourceAddress, ids):
+			try await addTransfer(resourceAddress, amount: BigDecimal(ids.count))
 		}
 	}
 }
@@ -655,6 +656,10 @@ extension TransactionReview {
 
 		public var guarantee: TransactionClient.Guarantee?
 		public var metadata: ResourceMetadata
+
+		public var thumbnail: TokenThumbnail.Content {
+			isXRD ? .xrd : .known(metadata.thumbnail)
+		}
 
 		public init(
 			amount: BigDecimal,

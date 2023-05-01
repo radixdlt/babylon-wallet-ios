@@ -18,6 +18,7 @@ extension DappDetails {
 		let title: String
 		let description: String
 		let domain: String?
+		let thumbnail: URL?
 		let addressViewState: AddressView.ViewState
 		let otherMetadata: [MetadataItem]
 		let fungibleTokens: [Token]
@@ -33,7 +34,7 @@ extension DappDetails {
 		struct Token: Identifiable, Hashable, Sendable {
 			var id: ComponentAddress { address }
 			let name: String
-			let thumbnail: URL
+			let thumbnail: URL?
 			let address: ComponentAddress
 		}
 	}
@@ -46,7 +47,7 @@ extension DappDetails.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					DappPlaceholder(size: .veryLarge)
+					DappThumbnail(.known(viewStore.thumbnail), size: .veryLarge)
 						.padding(.vertical, .large2)
 
 					InfoBlock(store: store)
@@ -108,6 +109,7 @@ private extension DappDetails.State {
 			title: dApp.displayName.rawValue,
 			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
 			domain: metadata?.domain,
+			thumbnail: metadata?.iconURL,
 			addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .default),
 			otherMetadata: otherMetadata,
 			fungibleTokens: [], // TODO: Populate when we have it
@@ -182,8 +184,8 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.fungibleTokens, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { _ in
-					TokenPlaceholder(size: .small)
+				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { token in
+					TokenThumbnail(.known(token.thumbnail), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTokenTapped(id))
 				}
@@ -197,8 +199,8 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.nonFungibleTokens, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { _ in
-					NFTPlaceholder(size: .small)
+				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { token in
+					NFTThumbnail(token.thumbnail, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTokenTapped(id))
 				}

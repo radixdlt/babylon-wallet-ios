@@ -35,7 +35,7 @@ extension AccountPortfolio {
 	}
 
 	public struct FungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public var id: ResourceAddress { self.resourceAddress }
+		public var id: ResourceAddress { resourceAddress }
 
 		public let resourceAddress: ResourceAddress
 		public let amount: BigDecimal
@@ -66,24 +66,54 @@ extension AccountPortfolio {
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
-		public typealias NonFungibleTokenId = Tagged<Self, String>
-
-		public var id: ResourceAddress { self.resourceAddress }
+		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
 		public let description: String?
-		public let nftIds: [NonFungibleTokenId]
+		public let iconURL: URL?
+		public let tokens: [NonFungibleToken]
 
 		public init(
 			resourceAddress: ResourceAddress,
 			name: String? = nil,
 			description: String? = nil,
-			nftIds: [NonFungibleTokenId]
+			iconURL: URL? = nil,
+			tokens: [NonFungibleToken] = []
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
 			self.description = description
-			self.nftIds = nftIds
+			self.iconURL = iconURL
+			self.tokens = tokens
+		}
+
+		public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
+			public typealias LocalID = Tagged<Self, String>
+
+			public let id: LocalID
+			public let name: String?
+			public let description: String?
+			public let keyImageURL: URL?
+			public let metadata: [Metadata]
+
+			public init(id: ID, name: String?, description: String?, keyImageURL: URL?, metadata: [Metadata]) {
+				self.id = id
+				self.name = name
+				self.description = description
+				self.keyImageURL = keyImageURL
+				self.metadata = metadata + [.init(key: "Type", value: "Devin Booker - Dunk")]
+			}
+		}
+	}
+
+	public struct Metadata: Sendable, Hashable, Identifiable, Codable {
+		public var id: String { key }
+		public let key: String
+		public let value: String
+
+		public init(key: String, value: String) {
+			self.key = key
+			self.value = value
 		}
 	}
 }

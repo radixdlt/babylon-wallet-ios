@@ -587,6 +587,18 @@ package.addModules([
 		],
 		tests: .no
 	),
+	.client(
+		name: "URLFormatterClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "URLFormatterClientLive",
+		dependencies: [
+			"URLFormatterClient",
+		],
+		tests: .no
+	),
 ])
 
 // MARK: - Core
@@ -615,6 +627,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			"URLFormatterClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
 			},

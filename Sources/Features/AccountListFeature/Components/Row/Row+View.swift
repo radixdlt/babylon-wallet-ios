@@ -4,14 +4,9 @@ import FeaturePrelude
 extension AccountList.Row {
 	public struct ViewState: Equatable {
 		struct FungibleResources: Equatable {
-			struct Icon: Equatable {
-				let url: URL?
-				let placeholder: ImageAsset
-			}
-
 			static let maxNumberOfIcons = 5
 
-			let icons: [Icon]
+			let icons: [TokenThumbnail.Content]
 			let additionalItemsText: String?
 		}
 
@@ -45,28 +40,17 @@ extension AccountList.Row {
 			// Resources
 			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
 			self.fungibleResourceIcons = {
-				guard let portfolio = state.portfolio.wrappedValue else {
+				guard let fungibleResources = state.portfolio.wrappedValue?.fungibleResources else {
 					return .init(icons: [], additionalItemsText: nil)
 				}
 
-				var icons: [FungibleResources.Icon] = []
-				if let xrdToken = portfolio.fungibleResources.xrdResource {
-					icons.append(.init(url: xrdToken.iconURL, placeholder: .placeholderImage(isXRD: true)))
-				}
+				let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource.map { _ in [.xrd] } ?? []
+				let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.iconURL) }
+				let icons = xrdIcon + otherIcons
+				let hiddenCount = max(icons.count - FungibleResources.maxNumberOfIcons, 0)
+				let additionalItems = hiddenCount > 0 ? "+\(hiddenCount)" : nil
 
-				portfolio.fungibleResources
-					.nonXrdResources
-					.forEach {
-						icons.append(.init(url: $0.iconURL, placeholder: .placeholderImage(isXRD: false)))
-					}
-
-				let additionalItemsCount = icons.count - FungibleResources.maxNumberOfIcons
-				let additionalItems = additionalItemsCount > 0 ? "+\(additionalItemsCount)" : nil
-
-				return .init(
-					icons: Array(icons.prefix(FungibleResources.maxNumberOfIcons)),
-					additionalItemsText: additionalItems
-				)
+				return .init(icons: icons.dropLast(hiddenCount), additionalItemsText: additionalItems)
 			}()
 		}
 	}
@@ -181,28 +165,11 @@ extension AccountList.Row.View {
 	// The list of fungible resources
 	private func fungibleResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
 		HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
-			ForEach(
-				Array(viewStore.fungibleResourceIcons.icons.enumerated()),
-				id: \.offset
-			) { offset, item in
-				ZStack {
-					AsyncImage(url: item.url) {
-						fungibleResourceIcon($0)
-					} placeholder: {
-						fungibleResourceIcon(
-							Image(asset: item.placeholder)
-						)
-					}
-				}
-				.zIndex(Double(-offset))
+			ForEach(viewStore.fungibleResourceIcons.icons.identifiablyEnumerated()) { item in
+				TokenThumbnail(item.element, size: Constants.iconSize)
+					.zIndex(Double(-item.offset))
 			}
 		}
-	}
-
-	private func fungibleResourceIcon(_ image: Image) -> some View {
-		image.resizable()
-			.frame(Constants.iconSize)
-			.clipShape(Circle())
 	}
 }
 
@@ -225,6 +192,38 @@ extension AccountList.Row.View {
 			viewStore.send(.securityPromptTapped)
 		}
 	}
+}
+
+extension Collection {
+	public func identifiablyEnumerated() -> [OffsetIdentified<Element>] {
+		enumerated().map(OffsetIdentified.init)
+	}
+}
+
+extension Collection where Element: Identifiable {
+	public func identified() throws -> IdentifiedArrayOf<Element> {
+		guard Set(map(\.id)).count == count else {
+			throw IdentifiedArrayError.clashingIDs
+		}
+		return .init(uniqueElements: self)
+	}
+
+	public func uniqueIdentified() -> IdentifiedArrayOf<Element> {
+		.init(uncheckedUniqueElements: self)
+	}
+}
+
+// MARK: - IdentifiedArrayError
+public enum IdentifiedArrayError: Error {
+	case clashingIDs
+}
+
+// MARK: - OffsetIdentified
+public struct OffsetIdentified<Element>: Identifiable {
+	public var id: Int { offset }
+
+	public let offset: Int
+	public let element: Element
 }
 
 // MARK: - HeaderView

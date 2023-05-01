@@ -3,8 +3,7 @@ import FeaturePrelude
 extension FungibleTokenList.Row.State {
 	var viewState: FungibleTokenList.Row.ViewState {
 		.init(
-			isXRD: isXRD,
-			iconURL: token.iconURL,
+			thumbnail: isXRD ? .xrd : .known(token.iconURL),
 			symbol: token.symbol ?? token.name ?? "",
 			tokenAmount: token.amount.format()
 		)
@@ -14,8 +13,7 @@ extension FungibleTokenList.Row.State {
 // MARK: - FungibleTokenList.Row.View
 extension FungibleTokenList.Row {
 	public struct ViewState: Equatable {
-		let isXRD: Bool
-		let iconURL: URL?
+		let thumbnail: TokenThumbnail.Content
 		let symbol: String
 		let tokenAmount: String
 	}
@@ -33,11 +31,7 @@ extension FungibleTokenList.Row {
 				ZStack {
 					HStack(alignment: .center) {
 						HStack(spacing: .small1) {
-							LazyImage(url: viewStore.iconURL) { _ in
-								Image(asset: .placeholderImage(isXRD: viewStore.isXRD))
-									.resizable()
-									.frame(.small)
-							}
+							TokenThumbnail(viewStore.thumbnail, size: .small)
 
 							Text(viewStore.symbol)
 								.foregroundColor(.app.gray1)

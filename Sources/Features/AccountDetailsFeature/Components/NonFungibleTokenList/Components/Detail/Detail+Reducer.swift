@@ -6,7 +6,7 @@ extension NonFungibleTokenList {
 	public struct Detail: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable {
 			var resource: AccountPortfolio.NonFungibleResource
-			var nftID: AccountPortfolio.NonFungibleResource.NonFungibleTokenId
+			var nftID: AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
 		}
 
 		public enum ViewAction: Sendable, Equatable {
