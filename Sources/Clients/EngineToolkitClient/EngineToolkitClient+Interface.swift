@@ -151,18 +151,6 @@ public struct AnalyzedManifest: Sendable, Hashable {
 	}
 }
 
-extension OrderedSet {
-	/// Validates that `unchecked` collection contains unique elements.
-	public init(validating unchecked: some Collection<Element>) throws {
-		self.init(unchecked)
-		guard self.count == unchecked.count else {
-			throw UnexpectedDuplicatesFound()
-		}
-	}
-
-	struct UnexpectedDuplicatesFound: Swift.Error {}
-}
-
 extension AccountAddress {
 	public init(componentAddress: ComponentAddress) throws {
 		try self.init(address: componentAddress.address)
