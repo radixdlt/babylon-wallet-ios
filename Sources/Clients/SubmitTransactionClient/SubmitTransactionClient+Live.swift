@@ -100,7 +100,7 @@ extension SubmitTransactionClient: DependencyKey {
 						print("🔮 DEBUG TRANSACTION END 🔮\n\n")
 					} catch {}
 				}
-				debugPrintTX()
+//				debugPrintTX()
 
 				let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 					notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex

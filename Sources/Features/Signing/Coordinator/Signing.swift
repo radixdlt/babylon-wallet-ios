@@ -166,13 +166,13 @@ public struct Signing: Sendable, FeatureReducer {
 							let account = signer.account
 							print("\t\t🔮 * Account: \(account.displayName) \(account.address): *")
 							for factorInstance in signer.factorInstancesRequiredToSign {
-								print("\t\t\t🔮 * FactorInstance: \(factorInstance.derivationPath) \(factorInstance.publicKey)")
+								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
 							}
 						}
 					}
 				}
 			}
-			printSigners()
+//			printSigners()
 			return proceedWithNextFactorSource(&state)
 
 		case
