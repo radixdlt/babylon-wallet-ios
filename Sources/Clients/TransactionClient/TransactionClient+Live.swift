@@ -42,8 +42,8 @@ public struct AccountsInvolvedInTransaction: Sendable, Hashable {
 	func getMine() throws -> MyAccountsInvolvedInTransaction {
 		try .init(
 			accountsRequiringAuth: .init(validating: accountsRequiringAuth.map { try $0.getMine() }), // for now assume we must have this
-			accountsWithdrawnFrom: .init(validating: accountsRequiringAuth.compactMap { try? $0.getMine() }),
-			accountsDepositedInto: .init(validating: accountsRequiringAuth.compactMap { try? $0.getMine() })
+			accountsWithdrawnFrom: .init(validating: accountsWithdrawnFrom.compactMap { try? $0.getMine() }),
+			accountsDepositedInto: .init(validating: accountsDepositedInto.compactMap { try? $0.getMine() })
 		)
 	}
 }
@@ -197,6 +197,7 @@ extension TransactionClient {
 		}
 
 		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in
+			loggerGlobal.debug("Finding suitable fee payer for manifest: \(manifest)")
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let involvedAccounts = try await accountsInvolvedInTransaction(
 				networkID: networkID,
@@ -205,6 +206,7 @@ extension TransactionClient {
 			)
 
 			let myInvolvedAccounts = try involvedAccounts.getMine()
+			loggerGlobal.debug("My involved accounts: \(myInvolvedAccounts)")
 			var triedAccounts: Set<Profile.Network.Account> = []
 			func findFeePayer(
 				amongst keyPath: KeyPath<MyAccountsInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
@@ -229,7 +231,7 @@ extension TransactionClient {
 
 				return .init(
 					manifestWithLockFee: manifestWithLockFee,
-					feePayer: .init(
+					feePayerSelectionAmongstCandidates: .init(
 						selected: feePayer,
 						candidates: nonEmpty,
 						fee: feeToAdd,
@@ -240,16 +242,20 @@ extension TransactionClient {
 
 			// First try amonst `accountsWithdrawnFrom`
 			if let withLockFee = try await findFeePayer(amongst: \.accountsWithdrawnFrom) {
+				loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
 				return .includesLockFee(withLockFee)
 			}
 			// no candiates amonst `accountsWithdrawnFrom` => fallback to `accountsRequiringAuth`
 			if let withLockFee = try await findFeePayer(amongst: \.accountsRequiringAuth) {
+				loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
 				return .includesLockFee(withLockFee)
 			}
 			// no candiates amonst `accountsRequiringAuth` => fallback to `accountsDepositedInto`
 			if let withLockFee = try await findFeePayer(amongst: \.accountsDepositedInto) {
+				loggerGlobal.debug("Find suitable fee payer in: 'accountsDepositedInto', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
 				return .includesLockFee(withLockFee)
 			}
+			loggerGlobal.debug("Did not find any suitable fee payer, retrieving candidates for user selection....")
 
 			// None of the accounts in `myInvolvedAccounts` had any XRD, skip them all and fallback to fetching XRD for all other accounts on this
 			// network that not part of `myInvolvedAccounts`.

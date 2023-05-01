@@ -244,7 +244,7 @@ public enum AddFeeToManifestOutcome: Sendable, Equatable {
 // MARK: - AddFeeToManifestOutcomeIncludesLockFee
 public struct AddFeeToManifestOutcomeIncludesLockFee: Sendable, Equatable {
 	public let manifestWithLockFee: TransactionManifest
-	public let feePayer: FeePayerSelectionAmongstCandidates
+	public let feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
 }
 
 // MARK: - AddFeeToManifestOutcomeExcludesLockFee
