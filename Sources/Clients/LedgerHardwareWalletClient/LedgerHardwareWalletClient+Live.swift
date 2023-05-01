@@ -83,7 +83,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							curve: .curve25519,
 							derivationPath: derivationPath.path
 						),
-						ledgerDevice: .init(from: factorSource)
+						ledgerDevice: .init(factorSource: factorSource)
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
 				)
@@ -95,7 +95,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let signaturesRaw = try await makeRequest(
 					.signTransaction(.init(
 						signers: request.signingFactor.signers.flatMap(\.keyParams),
-						ledgerDevice: .init(from: request.signingFactor.factorSource),
+						ledgerDevice: .init(factorSource: request.signingFactor.factorSource),
 						compiledTransactionIntent: .init(data: request.unhashedDataToSign),
 						mode: .summary
 					)),
@@ -230,7 +230,7 @@ extension SLIP10.Curve {
 }
 
 extension P2P.LedgerHardwareWallet.LedgerDevice {
-	init(from factorSource: FactorSource) {
+	public init(factorSource: FactorSource) {
 		self.init(
 			name: .init(rawValue: factorSource.label.rawValue),
 			id: factorSource.id.description,
@@ -240,7 +240,7 @@ extension P2P.LedgerHardwareWallet.LedgerDevice {
 }
 
 extension P2P.LedgerHardwareWallet.Model {
-	init(from factorSource: FactorSource) {
+	public init(from factorSource: FactorSource) {
 		precondition(factorSource.kind == .ledgerHQHardwareWallet)
 		self = Self(
 			rawValue: factorSource.description.rawValue
