@@ -233,6 +233,7 @@ extension TransactionClient {
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 			let remainingAccounts = Set(allAccounts.rawValue.elements).subtracting(Set(myInvolvedAccounts.elements))
 			let remainingCandidates = try await feePayerCandiates(accounts: .init(remainingAccounts), fee: feeToAdd)
+
 			guard let nonEmpty = NonEmpty<IdentifiedArrayOf<FeePayerCandiate>>(rawValue: .init(uncheckedUniqueElements: remainingCandidates)) else {
 				throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 			}
