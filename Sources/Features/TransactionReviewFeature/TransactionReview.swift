@@ -268,9 +268,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
 			state.destination = nil
 
-			return .run { send in
+			return .task {
 				try? await clock.sleep(for: .milliseconds(700)) // bah, we need to to dismiss `state.destination` before proceeding with completion
-				await send(.delegate(.transactionCompleted(txID)))
+				return .delegate(.transactionCompleted(txID))
 			}
 
 		default:
