@@ -8,8 +8,8 @@ struct NFTView: View {
 	var body: some View {
 		LoadableImage(url: url, size: .flexibleHeight, loading: .shimmer) {
 			Rectangle()
-				.fill(.gray)
-				.frame(height: .large1)
+				.fill(.app.gray4)
+				.frame(height: .large2)
 		}
 		.cornerRadius(.small3)
 	}

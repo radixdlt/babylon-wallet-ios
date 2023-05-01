@@ -134,6 +134,7 @@ public struct PersonaThumbnail: View {
 /// A helper view that handles the loading state, and potentially the error state
 public struct LoadableImage<Placeholder: View>: View {
 	let url: URL?
+	let isVectorImage: Bool
 	let sizingBehaviour: LoadableImageSize
 	let loadingBehaviour: LoadableImageLoadingBehaviour
 	let placeholder: Placeholder
@@ -144,16 +145,12 @@ public struct LoadableImage<Placeholder: View>: View {
 		loading loadingBehaviour: LoadableImageLoadingBehaviour = .placeholder,
 		placeholder: () -> Placeholder
 	) {
-		if let url {
+		self.isVectorImage = url?.isVectorImage ?? false
+		if let url, !isVectorImage, case let .fixedSize(hitTargetSize, _) = sizingBehaviour {
 			@Dependency(\.urlFormatterClient) var urlFormatterClient
-			switch sizingBehaviour {
-			case let .fixedSize(hitTargetSize, _):
-				self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
-			case .flexibleHeight:
-				self.url = url
-			}
+			self.url = urlFormatterClient.fixedSizeImage(url, Screen.pixelScale * hitTargetSize.frame)
 		} else {
-			self.url = nil
+			self.url = url
 		}
 
 		self.sizingBehaviour = sizingBehaviour
@@ -168,10 +165,14 @@ public struct LoadableImage<Placeholder: View>: View {
 					loadingView
 				} else if let image = state.image {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
+				} else if let error = state.error {
+					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
+					// FIXME: Show some image or officially sanctioned copy
+					let text = isVectorImage ? "Can't load image of vector type" : "Can't load image"
+					Text(text)
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.app.alert)
 				} else {
-					if let error = state.error {
-						let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
-					}
 					placeholder
 				}
 			}
@@ -232,4 +233,19 @@ public enum LoadableImageLoadingBehaviour {
 	case color(Color)
 	case asset(ImageAsset)
 	case placeholder
+}
+
+extension URL {
+	public var isVectorImage: Bool {
+		let pathComponent = lastPathComponent.lowercased()
+		for ignoredType in URL.vectorImageTypes {
+			if pathComponent.hasSuffix("." + ignoredType) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	private static let vectorImageTypes: [String] = ["svg", "pdf"]
 }

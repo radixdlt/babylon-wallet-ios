@@ -28,6 +28,8 @@ extension URLFormatterClient: DependencyKey {
 		"\(max(minSize, Int(round(size.width))))x\(max(minSize, Int(round(size.height))))"
 	}
 
+	// MARK: Helpers for fixedSizeImage
+
 	/// The minimum length of the sides, in pixels, of a requested image
-	private static var minSize: Int { 64 }
+	private static let minSize: Int = 64
 }
