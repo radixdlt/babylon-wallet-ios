@@ -329,17 +329,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			state.networkID = preview.networkID
 			switch preview.addFeeToManifestOutcome {
-			case let .includesLockFee(manifestWithLockFee, feePayerSelectionAmongstCandidates):
-				state.feePayerSelectionAmongstCandidates = feePayerSelectionAmongstCandidates
-				state.transactionWithLockFee = manifestWithLockFee
+			case let .includesLockFee(manifestInclLockFee):
+				state.feePayerSelectionAmongstCandidates = manifestInclLockFee.feePayerSelectionAmongstCandidates
+				state.transactionWithLockFee = manifestInclLockFee.manifestWithLockFee
 				return self.review(
 					manifestPreview: preview.analyzedManifestToReview,
-					feeAdded: feePayerSelectionAmongstCandidates.fee,
+					feeAdded: manifestInclLockFee.feePayerSelectionAmongstCandidates.fee,
 					networkID: preview.networkID
 				)
-			case let .excludesLockFee(_, feePayerCandidates, feeNotYetAdded):
+			case let .excludesLockFee(excludingLockFee):
 				state.analyzedManifestToReview = preview.analyzedManifestToReview
-				state.destination = .selectFeePayer(.init(candidates: feePayerCandidates, fee: feeNotYetAdded))
+				state.destination = .selectFeePayer(.init(candidates: excludingLockFee.feePayerCandidates, fee: excludingLockFee.feeNotYetAdded))
 				return .none
 			}
 

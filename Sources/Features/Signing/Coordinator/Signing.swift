@@ -156,6 +156,23 @@ public struct Signing: Sendable, FeatureReducer {
 			state.compiledIntent = compiledIntent
 			state.factorsLeftToSignWith = signingFactors
 			state.expectedSignatureCount = signingFactors.signerCount
+			func printSigners() {
+				for (factorSourceKind, signingFactorsOfKind) in signingFactors {
+					print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
+					for signingFactor in signingFactorsOfKind {
+						let factorSource = signingFactor.factorSource
+						print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
+						for signer in signingFactor.signers {
+							let account = signer.account
+							print("\t\t🔮 * Account: \(account.displayName) \(account.address): *")
+							for factorInstance in signer.factorInstancesRequiredToSign {
+								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
+							}
+						}
+					}
+				}
+			}
+//			printSigners()
 			return proceedWithNextFactorSource(&state)
 
 		case
