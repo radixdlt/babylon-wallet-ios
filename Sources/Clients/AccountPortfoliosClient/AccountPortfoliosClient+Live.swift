@@ -258,10 +258,11 @@ extension AccountPortfoliosClient {
 				)
 			)
 			.map(\.nonFungibleId)
+			// TODO: Where does this limitation come from?
 			let maximumNFTIDChunkSize = 29
 
 			var result: [AccountPortfolio.NonFungibleResource.NonFungibleToken] = []
-			for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) { // FIXME: Where does this limitation come from?
+			for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
 				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
 					resourceAddress: resource.resourceAddress,
 					nonFungibleIds: Array(nftIDChunk)

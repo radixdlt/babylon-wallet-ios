@@ -56,25 +56,68 @@ extension GatewayAPIClient {
 
 extension GatewayAPIClient {
 	public func getDappDefinition(_ address: String) async throws -> GatewayAPI.EntityMetadataCollection {
+		print("••• getDappDefinition for --\(address)--")
+
 		let entityMetadata = try await getEntityMetadata(address)
+
+		print("    got entityMetadata:")
+		for item in entityMetadata.items {
+			print("        \(item.key): \(item.value.asString)")
+		}
 
 		guard let dappDefinitionAddress = entityMetadata.dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
 		}
 
+		print("    dappDefinitionAddress:", dappDefinitionAddress)
+
 		let dappDefinition = try await getEntityMetadata(dappDefinitionAddress)
+
+		print("    got dappDefinition:", dappDefinition.name, dappDefinition.iconURL)
 
 		guard dappDefinition.accountType == .dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
 		}
 
+		print("    dappDefinition.accountType OK")
+
 		guard let claimedEntities = dappDefinition.claimedEntities else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
 		}
 
+		print("    claimedEntities OK")
+
 		guard claimedEntities.contains(address) else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
 		}
+
+		print("    claimedEntities.contains(address) OK")
+
+		return dappDefinition
+	}
+
+	public func getDappMetadata(_ dappDefinition: DappDefinitionAddress) async throws -> GatewayAPI.EntityMetadataCollection {
+		let dappDefinition = try await getEntityMetadata(dappDefinition.address)
+
+		print("    got dappDefinition:", dappDefinition.name, dappDefinition.iconURL)
+
+		guard dappDefinition.accountType == .dappDefinition else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
+		}
+
+		print("    dappDefinition.accountType OK")
+
+		guard let claimedEntities = dappDefinition.claimedEntities else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
+		}
+
+		print("    claimedEntities OK")
+
+		guard claimedEntities.contains(address) else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
+		}
+
+		print("    claimedEntities.contains(address) OK")
 
 		return dappDefinition
 	}
