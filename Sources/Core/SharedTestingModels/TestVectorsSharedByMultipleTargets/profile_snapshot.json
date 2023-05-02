@@ -187,8 +187,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
+                "givenName",
+                "familyName"
               ]
             }
           ]
@@ -261,5 +261,5 @@
       ]
     }
   ],
-  "version" : 29
+  "version" : 30
 }
