@@ -9,22 +9,22 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public var isIcloudProfileSyncEnabled: IsIcloudProfileSyncEnabled
+		public var isCloudProfileSyncEnabled: IsCloudProfileSyncEnabled
 		public var isDeveloperModeEnabled: IsDeveloperModeEnabled
 
 		public init(
-			isIcloudProfileSyncEnabled: IsIcloudProfileSyncEnabled = .default,
+			isCloudProfileSyncEnabled: IsCloudProfileSyncEnabled = .default,
 			isDeveloperModeEnabled: IsDeveloperModeEnabled = .default
 		) {
-			self.isIcloudProfileSyncEnabled = isIcloudProfileSyncEnabled
+			self.isCloudProfileSyncEnabled = isCloudProfileSyncEnabled
 			self.isDeveloperModeEnabled = isDeveloperModeEnabled
 		}
 	}
 }
 
 extension AppPreferences.Security {
-	public enum IsIcloudProfileSyncEnabledTag {}
-	public typealias IsIcloudProfileSyncEnabled = Tagged<IsIcloudProfileSyncEnabledTag, Bool>
+	public enum IsCloudProfileSyncEnabledTag {}
+	public typealias IsCloudProfileSyncEnabled = Tagged<IsCloudProfileSyncEnabledTag, Bool>
 	public enum IsDeveloperModeEnabledTag {}
 	public typealias IsDeveloperModeEnabled = Tagged<IsDeveloperModeEnabledTag, Bool>
 }
@@ -34,7 +34,7 @@ extension AppPreferences.Security.IsDeveloperModeEnabled {
 	public static let `default`: Self = true
 }
 
-extension AppPreferences.Security.IsIcloudProfileSyncEnabled {
+extension AppPreferences.Security.IsCloudProfileSyncEnabled {
 	public static let `default`: Self = true
 }
 
@@ -47,7 +47,7 @@ extension AppPreferences.Security {
 		.init(
 			self,
 			children: [
-				"isIcloudProfileSyncEnabled": isIcloudProfileSyncEnabled.rawValue,
+				"isCloudProfileSyncEnabled": isCloudProfileSyncEnabled.rawValue,
 				"isDeveloperModeEnabled": isDeveloperModeEnabled.rawValue,
 			],
 			displayStyle: .struct
@@ -56,7 +56,7 @@ extension AppPreferences.Security {
 
 	public var description: String {
 		"""
-		isIcloudProfileSyncEnabled: \(isIcloudProfileSyncEnabled),
+		isCloudProfileSyncEnabled: \(isCloudProfileSyncEnabled),
 		isDeveloperModeEnabled: \(isDeveloperModeEnabled)
 		"""
 	}
