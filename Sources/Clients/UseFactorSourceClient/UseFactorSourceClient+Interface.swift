@@ -2,6 +2,7 @@ import ClientPrelude
 import Cryptography
 import FactorSourcesClient
 import Profile
+import SecureStorageClient
 
 // MARK: - UseFactorSourceClient
 public struct UseFactorSourceClient: Sendable {
