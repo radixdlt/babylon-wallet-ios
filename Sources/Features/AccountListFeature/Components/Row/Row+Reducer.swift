@@ -40,17 +40,10 @@ extension AccountList {
 			case securityPromptTapped(Profile.Network.Account)
 		}
 
-		public enum DelegateAction: Sendable, Equatable {
-			case copyAddress
-			case selected
-		}
-
-		@Dependency(\.accountsClient) var accountsClient
-
-		public init() {}
-
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+		public init() {}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
