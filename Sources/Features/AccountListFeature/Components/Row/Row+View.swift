@@ -61,7 +61,7 @@ extension AccountList.Row {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
-						HeaderView(name: viewStore.name)
+						headerView(with: viewStore)
 						HStack {
 							AddressView(
 								viewStore.address,
@@ -220,7 +220,6 @@ public struct OffsetIdentified<Element>: Identifiable {
 	public let element: Element
 }
 
-// MARK: - HeaderView
 extension AccountList.Row.View {
 	@ViewBuilder
 	private func headerView(

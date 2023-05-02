@@ -54,8 +54,8 @@ extension UseFactorSourceClient: DependencyKey {
 				@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 				do {
-					// FIXME: figure out a canonocal way to find the expected `device` factor source for this iPhone..?
-					let deviceFactorSource: HDOnDeviceFactorSource = try await factorSourcesClient.getFactorSources().hdOnDeviceFactorSource().sorted(by: { $0.lastUsedOn > $1.lastUsedOn }).first!
+					// FIXME: figure out a canonical way to find the expected `device` factor source for this iPhone..?
+					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first!
 
 					let accounts = try await accountsClient.getAccountsOnNetwork(NetworkID.default)
 
@@ -81,7 +81,7 @@ extension UseFactorSourceClient: DependencyKey {
 								let hdRoot = try mnemonicWithPassphrase.hdRoot()
 								let privateKey = try hdRoot.derivePrivateKey(
 									path: derivationPath,
-									curve: factorInstance.publicKey.curve.slip10
+									curve: factorInstance.publicKey.curve
 								)
 
 								return privateKey.publicKey() == factorInstance.publicKey
@@ -101,15 +101,6 @@ extension UseFactorSourceClient: DependencyKey {
 			}
 		)
 	}()
-}
-
-extension ECCurve {
-	var slip10: Slip10Curve {
-		switch self {
-		case .curve25519: return .curve25519
-		case .secp256k1: return .secp256k1
-		}
-	}
 }
 
 // MARK: - UseFactorSourceClient.Purpose
