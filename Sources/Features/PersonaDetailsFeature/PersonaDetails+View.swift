@@ -50,9 +50,17 @@ extension PersonaDetails.View {
 						.buttonStyle(.primaryRectangular(isDestructive: true))
 						.padding([.horizontal, .top], .medium3)
 						.padding(.bottom, .large2)
+					} else {
+						IfLetStore(store.scope(state: \.dAppsSection, action: PersonaDetails.Action.view)) {
+							DappsSection(store: $0)
+								.background(.app.gray5)
+						}
 					}
 				}
 				.navigationTitle(viewStore.personaName)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 		}
 		.sheet(store: store.scope(state: \.$editPersona, action: { .child(.editPersona($0)) })) {
@@ -71,7 +79,7 @@ private extension PersonaDetails.State {
 
 	var personaName: String {
 		switch mode {
-		case let .general(persona):
+		case let .general(persona, _):
 			return persona.displayName.rawValue
 		case let .dApp(_, persona):
 			return persona.displayName.rawValue
@@ -93,6 +101,8 @@ private extension PersonaDetails.Store {
 		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
 	}
 }
+
+// MARK: - AccountSection
 
 extension PersonaDetails.State {
 	var accountSection: AccountSection? {
@@ -148,7 +158,46 @@ extension PersonaDetails.View {
 	}
 }
 
-// MARK: - Body
+// MARK: - DappsSection
+
+extension PersonaDetails.State {
+	var dAppsSection: DappsSection? {
+		switch mode {
+		case let .general(_, dApps):
+			return dApps
+		case .dApp:
+			return nil
+		}
+	}
+
+	typealias DappsSection = IdentifiedArrayOf<PersonaDetails.State.DappInfo>
+}
+
+// MARK: - PersonaDetails.View.DappsSection
+extension PersonaDetails.View {
+	@MainActor
+	struct DappsSection: View {
+		let store: Store<PersonaDetails.State.DappsSection, PersonaDetails.ViewAction>
+
+		var body: some View {
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				VStack(alignment: .leading, spacing: .medium1) {
+					ForEach(viewStore.state) { dApp in
+						Card {
+							PlainListRow(title: dApp.displayName) {
+								viewStore.send(.dAppTapped(dApp.id))
+							} icon: {
+								DappThumbnail(.known(dApp.thumbnail))
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// MARK: - InfoSection
 
 private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
@@ -159,7 +208,7 @@ private extension PersonaDetails.State {
 				personaName: personaName,
 				fields: persona.sharedFields ?? []
 			)
-		case let .general(persona):
+		case let .general(persona, _):
 			return .init(
 				dAppInfo: nil,
 				personaName: personaName,

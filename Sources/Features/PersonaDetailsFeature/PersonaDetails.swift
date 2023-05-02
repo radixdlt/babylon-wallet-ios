@@ -1,9 +1,11 @@
 import AuthorizedDappsClient
 import EditPersonaFeature
 import FeaturePrelude
+import GatewayAPI
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
@@ -18,21 +20,26 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		public enum Mode: Sendable, Hashable {
-			case general(Profile.Network.Persona)
+			case general(Profile.Network.Persona, dApps: IdentifiedArrayOf<DappInfo>)
 			case dApp(Profile.Network.AuthorizedDappDetailed, persona: Profile.Network.AuthorizedPersonaDetailed)
 
 			var id: Profile.Network.Persona.ID {
 				switch self {
-				case let .general(persona): return persona.id
+				case let .general(persona, _): return persona.id
 				case let .dApp(_, persona: persona): return persona.id
 				}
 			}
+		}
 
-			var networkID: NetworkID {
-				switch self {
-				case let .general(persona): return persona.networkID
-				case let .dApp(dApp, _): return dApp.networkID
-				}
+		public struct DappInfo: Sendable, Hashable, Identifiable {
+			public let id: Profile.Network.AuthorizedDapp.ID
+			public var thumbnail: URL?
+			public let displayName: String
+
+			public init(dApp: Profile.Network.AuthorizedDapp) {
+				self.id = dApp.id
+				self.thumbnail = nil
+				self.displayName = dApp.displayName.rawValue
 			}
 		}
 
@@ -50,7 +57,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	// MARK: - Action
 
 	public enum ViewAction: Sendable, Equatable {
+		case appeared
 		case accountTapped(AccountAddress)
+		case dAppTapped(Profile.Network.AuthorizedDapp.ID)
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
@@ -74,6 +83,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case editablePersonaFetched(Profile.Network.Persona)
 		case reloaded(State.Mode)
+		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 	}
 
 	// MARK: - Reducer
@@ -105,12 +115,21 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .accountTapped:
+		case .appeared:
+			guard case let .general(_, dApps) = state.mode else { return .none }
+			return .task {
+				await .internal(.dAppsUpdated(addingDappMetadata(to: dApps)))
+			}
+
+		case let .accountTapped(address):
+			return .none
+
+		case let .dAppTapped(dAppID):
 			return .none
 
 		case .editPersonaTapped:
 			switch state.mode {
-			case let .general(persona):
+			case let .general(persona, _):
 				return .send(.internal(.editablePersonaFetched(persona)))
 
 			case let .dApp(_, persona: persona):
@@ -161,6 +180,11 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 			return .none
 
+		case let .dAppsUpdated(dApps):
+			guard case let .general(persona, _) = state.mode else { return .none }
+			state.mode = .general(persona, dApps: dApps)
+			return .none
+
 		case let .reloaded(mode):
 			state.mode = mode
 			return .none
@@ -175,10 +199,29 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				throw ReloadError.personaNotPresentInDapp(persona.id, updatedDapp.dAppDefinitionAddress)
 			}
 			return .dApp(updatedDapp, persona: updatedPersona)
-		case let .general(persona):
-			let updatedPersona = try await personasClient.getPersona(id: persona.id)
-			return .general(updatedPersona)
+		case let .general(oldPersona, _):
+			let persona = try await personasClient.getPersona(id: oldPersona.id)
+			let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(oldPersona.id)
+				.map(State.DappInfo.init)
+
+			return await .general(persona, dApps: addingDappMetadata(to: .init(uniqueElements: dApps)))
 		}
+	}
+
+	private func addingDappMetadata(to dApps: State.DappsSection) async -> State.DappsSection {
+		var dApps = dApps
+		for dApp in dApps {
+			do {
+				print("Loading metadata for \(dApp.id)")
+
+				let metadata = try await gatewayAPIClient.getDappDefinition(dApp.id.address)
+				dApps[id: dApp.id]?.thumbnail = metadata.iconURL
+				print("Loaded metadata for \(metadata.name)")
+			} catch {
+				loggerGlobal.error("Failed to load dApp metadata, error: \(error)")
+			}
+		}
+		return dApps
 	}
 
 	enum ReloadError: Error {
