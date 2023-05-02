@@ -99,7 +99,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		case .moveToForeground:
 			return .fireAndForget {
-				await radixConnectClient.loadFromProfileAndConnectAll()
+				_ = await radixConnectClient.loadFromProfileAndConnectAll()
 			}
 		}
 	}
@@ -246,7 +246,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
 			_ = await radixConnectClient.loadFromProfileAndConnectAll()
-			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
 			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
 				guard !Task.isCancelled else {
@@ -257,6 +256,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					let request = try incomingRequest.result.get()
 					try validate(request)
 
+					let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 					guard request.metadata.networkId == currentNetworkID else {
 						let incomingRequestNetwork = try Radix.Network.lookupBy(id: request.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
