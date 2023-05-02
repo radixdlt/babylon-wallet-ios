@@ -103,7 +103,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
 				)
 				loggerGlobal.notice("1️⃣ signaturesRaw: \(signaturesRaw)")
+				loggerGlobal.debug("Hashing....")
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
+				loggerGlobal.debug("Expected hash: \(hashedMsg.hex)")
+				loggerGlobal.debug("Validating signatures....")
 				let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: hashedMsg) }
 				loggerGlobal.notice("2️⃣ signaturesValidated: \(signaturesValidated)")
 				var accountSignatures = Set<AccountSignature>()
@@ -158,51 +161,59 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 	}
 
 	func validate(hashed: Data) throws -> Validated {
-		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
-			struct BadCurve: Swift.Error {}
-			throw BadCurve()
-		}
-		let signatureWithPublicKey: SignatureWithPublicKey
-		switch curve {
-		case .secp256k1:
-			signatureWithPublicKey = try .ecdsaSecp256k1(
-				signature: .init(radixFormat: self.signature.data),
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
-			)
-		case .curve25519:
-			signatureWithPublicKey = try .eddsaEd25519(
-				signature: self.signature.data,
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
-			)
-		}
-		let derivationPath: DerivationPath
+		loggerGlobal.debug("Validating signature: \(String(describing: self))")
 		do {
-			derivationPath = try .init(
-				scheme: .cap26,
-				path: AccountHierarchicalDeterministicDerivationPath(
-					derivationPath: self.derivationPath
+			guard let curve = SLIP10.Curve(rawValue: self.curve) else {
+				struct BadCurve: Swift.Error {}
+				loggerGlobal.error("Bad curve")
+				throw BadCurve()
+			}
+			let signatureWithPublicKey: SignatureWithPublicKey
+			switch curve {
+			case .secp256k1:
+				signatureWithPublicKey = try .ecdsaSecp256k1(
+					signature: .init(radixFormat: self.signature.data),
+					publicKey: .init(compressedRepresentation: self.publicKey.data)
 				)
-				.derivationPath
+			case .curve25519:
+				signatureWithPublicKey = try .eddsaEd25519(
+					signature: self.signature.data,
+					publicKey: .init(compressedRepresentation: self.publicKey.data)
+				)
+			}
+			let derivationPath: DerivationPath
+			do {
+				derivationPath = try .init(
+					scheme: .cap26,
+					path: AccountHierarchicalDeterministicDerivationPath(
+						derivationPath: self.derivationPath
+					)
+					.derivationPath
+				)
+			} catch {
+				loggerGlobal.critical("Failed to create AccountDerivationPath: \(String(describing: error))")
+				derivationPath = try .init(
+					scheme: .bip44Olympia,
+					path: LegacyOlympiaBIP44LikeDerivationPath(
+						derivationPath: self.derivationPath
+					)
+					.derivationPath
+				)
+			}
+
+			guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+				loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+				throw InvalidSignature()
+			}
+
+			return Validated(
+				signature: signatureWithPublicKey,
+				derivationPath: derivationPath
 			)
 		} catch {
-			derivationPath = try .init(
-				scheme: .bip44Olympia,
-				path: LegacyOlympiaBIP44LikeDerivationPath(
-					derivationPath: self.derivationPath
-				)
-				.derivationPath
-			)
+			loggerGlobal.error("Validation failed, error: \(String(describing: error))")
+			throw error
 		}
-
-		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
-			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
-			throw InvalidSignature()
-		}
-
-		return Validated(
-			signature: signatureWithPublicKey,
-			derivationPath: derivationPath
-		)
 	}
 }
 

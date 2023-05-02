@@ -100,7 +100,7 @@ extension DerivationPath {
 	) throws -> Self {
 		let path = try HD.Path.Full.defaultForEntity(
 			networkID: networkID,
-			entityKind: .identity,
+			entityKind: entityKind,
 			index: index,
 			keyKind: keyKind
 		)

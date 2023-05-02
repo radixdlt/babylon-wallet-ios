@@ -122,11 +122,17 @@ extension Profile.Network.Account {
 	public static let nameMaxLength = 30
 	public static func deriveAddress(
 		networkID: NetworkID,
-		publicKey: SLIP10.PublicKey
+		factorInstance: FactorInstance
 	) throws -> EntityAddress {
+		if let derivationPath = factorInstance.derivationPath {
+			let path = try derivationPath.asAccountPath()
+			guard path.entityKind == .account else {
+				throw WrongEntityInDerivationPath()
+			}
+		}
 		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
 			request: .init(
-				publicKey: publicKey.intoEngine(),
+				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID
 			)
 		).get()
@@ -145,6 +151,9 @@ extension Profile.Network.Account {
 		return false
 	}
 }
+
+// MARK: - WrongEntityInDerivationPath
+struct WrongEntityInDerivationPath: Swift.Error {}
 
 extension Profile.Network.Account {
 	public var factorInstance: FactorInstance {

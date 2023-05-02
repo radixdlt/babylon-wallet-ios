@@ -653,6 +653,10 @@ extension FactorInstanceView {
 				.font(.title)
 			#endif // os(macOS)
 
+			if let path = factorInstance.derivationPath {
+				Labeled("Derivation Path", value: path.description)
+			}
+			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
 			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))
 		}
 		.padding([.leading], leadingPadding)
