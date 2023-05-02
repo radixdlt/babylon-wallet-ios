@@ -28,6 +28,7 @@ package.addModules([
 		name: "AccountListFeature",
 		dependencies: [
 			"AccountPortfoliosClient",
+			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
 		],
 		tests: .yes()
 	),

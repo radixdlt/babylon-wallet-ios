@@ -34,13 +34,7 @@ extension AccountList.Row {
 			self.isLegacyAccount = state.account.isOlympiaAccount
 
 			// Show the prompt if the account has any XRD
-			self.shouldShowSecurityPrompt = {
-				guard let xrdResource = state.portfolio.wrappedValue?.fungibleResources.xrdResource else {
-					return false
-				}
-
-				return xrdResource.amount > .zero
-			}()
+			self.shouldShowSecurityPrompt = state.shouldShowSecurityPrompt
 
 			// Resources
 			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0

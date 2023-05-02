@@ -1,4 +1,5 @@
 import AccountPortfoliosClient
+import FactorSourcesClient
 import FeaturePrelude
 
 // MARK: - AccountList.Row
@@ -10,6 +11,8 @@ extension AccountList {
 			public let account: Profile.Network.Account
 
 			public var portfolio: Loadable<AccountPortfolio>
+
+			public var shouldShowSecurityPrompt = false
 
 			public init(
 				account: Profile.Network.Account
@@ -28,6 +31,7 @@ extension AccountList {
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
+			case displaySecurityPrompting
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -39,6 +43,7 @@ extension AccountList {
 		public init() {}
 
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
@@ -64,9 +69,36 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
-			case let .accountPortfolioUpdate(portfolio):
-				state.portfolio = .success(portfolio)
+			case .displaySecurityPrompting:
+				state.shouldShowSecurityPrompt = true
 				return .none
+			case let .accountPortfolioUpdate(portfolio):
+				assert(portfolio.owner == state.account.address)
+				state.portfolio = .success(portfolio)
+
+				guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
+					state.shouldShowSecurityPrompt = false
+					return .none
+				}
+
+				return checkIfDeviceFactorSourceControls(factorInstance: state.account.factorInstance)
+			}
+		}
+
+		private func checkIfDeviceFactorSourceControls(factorInstance: FactorInstance) -> EffectTask<Action> {
+			.run { send in
+				let allFactorSources = try await factorSourcesClient.getFactorSources()
+				guard
+					let factorSource = allFactorSources[id: factorInstance.factorSourceID]
+				else {
+					loggerGlobal.warning("Did not find factor source for factor instance.")
+					return
+				}
+				guard factorSource.kind == .device else {
+					// probably ledger account
+					return
+				}
+				await send(.internal(.displaySecurityPrompting))
 			}
 		}
 	}
