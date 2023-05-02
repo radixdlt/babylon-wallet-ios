@@ -12,7 +12,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case isDeveloperModeEnabledToggled(AppPreferences.Security.IsDeveloperModeEnabled)
-		case isIcloudProfileSyncEnabledToggled(AppPreferences.Security.IsIcloudProfileSyncEnabled)
+		case isCloudProfileSyncEnabledToggled(AppPreferences.Security.IsCloudProfileSyncEnabled)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -31,8 +31,8 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 				await send(.internal(.loadPreferences(preferences)))
 			}
 
-		case let .isIcloudProfileSyncEnabledToggled(isEnabled):
-			state.preferences?.security.iCloudProfileSyncEnabled = isEnabled
+		case let .isCloudProfileSyncEnabledToggled(isEnabled):
+			state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
 			return .fireAndForget {
 				try await appPreferencesClient.setIsIcloudProfileSyncEnabled(isEnabled)
 			}

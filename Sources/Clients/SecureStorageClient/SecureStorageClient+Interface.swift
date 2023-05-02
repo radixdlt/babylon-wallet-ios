@@ -12,11 +12,11 @@ public struct SecureStorageClient: Sendable {
 	public var deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID
 	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
 
-	public var updateIcloudProfileSync: UpdateIcloudProfileSync
+	public var updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled
 }
 
 extension SecureStorageClient {
-	public typealias UpdateIcloudProfileSync = @Sendable (IcloudProfileSyncActivation) async throws -> Void
+	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (CloudProfileSyncActivation) async throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable () async throws -> Data?
 
@@ -60,8 +60,8 @@ extension SecureStorageClient {
 	}
 }
 
-// MARK: - IcloudProfileSyncActivation
-public enum IcloudProfileSyncActivation: Sendable, Hashable {
+// MARK: - CloudProfileSyncActivation
+public enum CloudProfileSyncActivation: Sendable, Hashable {
 	/// iCloud sync was enabled, user request to disable it.
 	case disable
 

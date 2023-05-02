@@ -95,7 +95,7 @@ extension SecureStorageClient: DependencyKey {
 					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
 						key: profileSnapshotKeychainKey,
-						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isIcloudProfileSyncEnabled,
+						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled.rawValue,
 						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
@@ -155,7 +155,7 @@ extension SecureStorageClient: DependencyKey {
 					return
 				}
 				if keepIcloudIfPresent {
-					if profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled.rawValue {
+					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled.rawValue {
 						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
 					} else {
 						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
@@ -167,7 +167,7 @@ extension SecureStorageClient: DependencyKey {
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
 			},
-			updateIcloudProfileSync: { change in
+			updateIsCloudProfileSyncEnabled: { change in
 				guard
 					let profileSnapshotData = try await loadProfileSnapshotData()
 				else {

@@ -21,12 +21,12 @@ extension AppPreferencesClient: DependencyKey {
 			deleteProfileAndFactorSources: { keepIcloudIfPresent in
 				try await getProfileStore().deleteProfile(keepIcloudIfPresent: keepIcloudIfPresent)
 			},
-			setIsIcloudProfileSyncEnabled: { isEnabled in
+			setIsCloudProfileSyncEnabled: { isEnabled in
 				@Dependency(\.secureStorageClient) var secureStorageClient
 
-				guard let change = try await (getProfileStore().updating { profile -> IcloudProfileSyncActivation? in
-					let wasEnabled = profile.appPreferences.security.iCloudProfileSyncEnabled
-					profile.appPreferences.security.iCloudProfileSyncEnabled = isEnabled
+				guard let change = try await (getProfileStore().updating { profile -> CloudProfileSyncActivation? in
+					let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
 					switch (wasEnabled.rawValue, isEnabled.rawValue) {
 					case (false, false): return nil
 					case (true, true): return nil

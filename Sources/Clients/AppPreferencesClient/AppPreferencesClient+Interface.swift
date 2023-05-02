@@ -7,7 +7,7 @@ public struct AppPreferencesClient: Sendable {
 	public var updatePreferences: UpdatePreferences
 
 	/// Needs special treatment since this setting involves Keychain and iCloud
-	public var setIsIcloudProfileSyncEnabled: SetIsIcloudProfileSyncEnabled
+	public var setIsCloudProfileSyncEnabled: SetIsCloudProfileSyncEnabled
 
 	// FIXME: find a better home for this...? Should we have some actual `ProfileSnapshotClient`
 	// for this and `delete` method?
@@ -19,19 +19,19 @@ public struct AppPreferencesClient: Sendable {
 		updatePreferences: @escaping UpdatePreferences,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
-		setIsIcloudProfileSyncEnabled: @escaping SetIsIcloudProfileSyncEnabled
+		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled
 	) {
 		self.getPreferences = getPreferences
 		self.updatePreferences = updatePreferences
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
-		self.setIsIcloudProfileSyncEnabled = setIsIcloudProfileSyncEnabled
+		self.setIsCloudProfileSyncEnabled = setIsCloudProfileSyncEnabled
 	}
 }
 
 // MARK: - Typealias
 extension AppPreferencesClient {
-	public typealias SetIsIcloudProfileSyncEnabled = @Sendable (AppPreferences.Security.IsIcloudProfileSyncEnabled) async throws -> Void
+	public typealias SetIsCloudProfileSyncEnabled = @Sendable (AppPreferences.Security.IsCloudProfileSyncEnabled) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
 	public typealias ExtractProfileSnapshot = @Sendable () async -> ProfileSnapshot
