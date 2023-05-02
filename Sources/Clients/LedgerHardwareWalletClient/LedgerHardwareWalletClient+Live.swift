@@ -180,7 +180,6 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 				.derivationPath
 			)
 		} catch {
-			loggerGlobal.critical("Failed to create AccountBabylonDerivationPath: \(String(describing: error))")
 			derivationPath = try .init(
 				scheme: .bip44Olympia,
 				path: LegacyOlympiaBIP44LikeDerivationPath(

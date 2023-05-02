@@ -39,13 +39,17 @@ extension SignWithFactorSourcesOfKindLedger.View {
 	private func signing(
 		with signingFactor: SigningFactor
 	) -> some SwiftUI.View {
-		let factorSource = signingFactor.factorSource
-		let ledger = P2P.LedgerHardwareWallet.LedgerDevice(factorSource: factorSource)
-		let maybeName: String? = ledger.name?.rawValue
-		let nameOrEmpty = maybeName.map { "'\($0)'" } ?? ""
-		let display = "\(ledger.model.rawValue) - \(nameOrEmpty)"
-		VPair(heading: "Ledger", item: display)
-		VPair(heading: "Last used", item: factorSource.lastUsedOn.ISO8601Format())
-		VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
+		VStack {
+			Text("Signing with ledger").textStyle(.body1HighImportance)
+
+			let factorSource = signingFactor.factorSource
+			let ledger = P2P.LedgerHardwareWallet.LedgerDevice(factorSource: factorSource)
+			let maybeName: String? = ledger.name?.rawValue
+			let nameOrEmpty = maybeName.map { "'\($0)'" } ?? ""
+			let display = "\(ledger.model.rawValue) - \(nameOrEmpty)"
+			VPair(heading: "Ledger", item: display)
+			VPair(heading: "Last used", item: factorSource.lastUsedOn.ISO8601Format())
+			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
+		}.padding()
 	}
 }
