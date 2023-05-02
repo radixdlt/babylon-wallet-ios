@@ -267,9 +267,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		isLedgerNew: Bool,
 		factorSource: FactorSource,
 		_ state: State
-		//        _ olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
-//		model: FactorSource.LedgerHardwareWallet.DeviceModel,
-//		ledgerName: String?
 	) -> EffectTask<Action> {
 		guard let olympiaAccounts = state.verifiedToBeMigrated else {
 			assertionFailure("Expected verified accounts to migrated")

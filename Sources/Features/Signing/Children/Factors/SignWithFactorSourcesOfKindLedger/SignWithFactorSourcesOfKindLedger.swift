@@ -35,14 +35,19 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		internalAction: InternalAction
 	) -> EffectTask<Action> {
 		switch internalAction {
-		case .signingWithFactor:
+		case let .signingWithFactor(currentLedger):
+			state.currentSigningFactor = currentLedger
 			return .none
 		}
 	}
 
 	public func sign(signingFactor: SigningFactor, state: State) async throws -> Set<AccountSignature> {
-		let expectedHash = try! blake2b(data: state.dataToSign)
-		print("🔮 Expected hash: \(expectedHash.hex)")
+		do {
+			let expectedHash = try blake2b(data: state.dataToSign)
+			loggerGlobal.notice("\n\nExpected hash: \(expectedHash.hex)\n\n")
+		} catch {
+			loggerGlobal.critical("Failed to hash: \(error)")
+		}
 		return try await ledgerHardwareWalletClient.sign(
 			signingFactor: signingFactor,
 			unhashedDataToSign: state.dataToSign
