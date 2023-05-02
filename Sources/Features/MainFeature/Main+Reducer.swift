@@ -12,7 +12,7 @@ public struct Main: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(home: Home.State = .init()) {
+		public init(home: Home.State) {
 			self.home = home
 		}
 	}
