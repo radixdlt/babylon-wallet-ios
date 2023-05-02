@@ -37,7 +37,7 @@ extension AppPreferencesClient: DependencyKey {
 					return
 				}
 
-				try await secureStorageClient.updateIcloudProfileSync(change)
+				try await secureStorageClient.updateIsCloudProfileSyncEnabled(change)
 			}
 		)
 	}
