@@ -1,6 +1,7 @@
 import ClientPrelude
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Cryptography
+import EngineToolkit
 import FactorSourcesClient
 import RadixConnectClient
 
@@ -102,10 +103,11 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
 				)
 				loggerGlobal.notice("1️⃣ signaturesRaw: \(signaturesRaw)")
-				let signatures = try signaturesRaw.map { try $0.parsed() }
-				loggerGlobal.notice("2️⃣ signatures: \(signatures)")
+				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
+				let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: hashedMsg) }
+				loggerGlobal.notice("2️⃣ signaturesValidated: \(signaturesValidated)")
 				var accountSignatures = Set<AccountSignature>()
-				for signature in signatures {
+				for signature in signaturesValidated {
 					guard
 						let signer = request.signingFactor.signers.first(where: { $0.account.publicKey == signature.signature.publicKey })
 					else {
@@ -129,7 +131,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 extension AccountSignature {
 	init(
 		account: Profile.Network.Account,
-		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Parsed
+		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Validated
 	) throws {
 		let signature = try Signature(
 			signatureWithPublicKey: signatureParsed.signature,
@@ -150,12 +152,12 @@ struct MissingSignature: Swift.Error {}
 struct MissingAccountFromSignatures: Swift.Error {}
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
-	struct Parsed: Sendable, Hashable {
+	struct Validated: Sendable, Hashable {
 		public let signature: SignatureWithPublicKey
 		public let derivationPath: DerivationPath
 	}
 
-	func parsed() throws -> Parsed {
+	func validate(hashed: Data) throws -> Validated {
 		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
 			struct BadCurve: Swift.Error {}
 			throw BadCurve()
@@ -192,9 +194,20 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 			)
 		}
 
-		return Parsed(signature: signatureWithPublicKey, derivationPath: derivationPath)
+		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+			throw InvalidSignature()
+		}
+
+		return Validated(
+			signature: signatureWithPublicKey,
+			derivationPath: derivationPath
+		)
 	}
 }
+
+// MARK: - InvalidSignature
+struct InvalidSignature: Swift.Error {}
 
 extension SigningFactor.Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
