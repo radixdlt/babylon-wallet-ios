@@ -77,7 +77,7 @@ final class CAP26Tests: TestCase {
 			let entityPath: any EntityDerivationPathProtocol = try {
 				switch entityKind {
 				case .account:
-					return try AccountHierarchicalDeterministicDerivationPath(
+					return try AccountBabylonDerivationPath(
 						networkID: networkID,
 						index: index,
 						keyKind: keyKind
@@ -173,13 +173,13 @@ final class CAP26Tests: TestCase {
 			)
 		}
 
-		let curve25519Accounts = try doDoTest(hdPathType: AccountHierarchicalDeterministicDerivationPath.self, curve: Curve25519.self)
+		let curve25519Accounts = try doDoTest(hdPathType: AccountBabylonDerivationPath.self, curve: Curve25519.self)
 		print(String(repeating: "*", count: 80))
 		let curve25519Identities = try doDoTest(hdPathType: IdentityHierarchicalDeterministicDerivationPath.self, curve: Curve25519.self)
 		print(String(repeating: "*", count: 80))
 		print(String(repeating: "*", count: 80))
 		print(String(repeating: "*", count: 80))
-		let secp256k1Accounts = try doDoTest(hdPathType: AccountHierarchicalDeterministicDerivationPath.self, curve: SECP256K1.self)
+		let secp256k1Accounts = try doDoTest(hdPathType: AccountBabylonDerivationPath.self, curve: SECP256K1.self)
 		print(String(repeating: "*", count: 80))
 		let secp256k1Identities = try doDoTest(hdPathType: IdentityHierarchicalDeterministicDerivationPath.self, curve: SECP256K1.self)
 

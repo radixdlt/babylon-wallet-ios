@@ -134,7 +134,7 @@ final class ProfileTests: TestCase {
 				networkID: profile.networkID
 			)
 
-			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
+			let derivationPath = try AccountBabylonDerivationPath(
 				networkID: networkID,
 				index: index,
 				keyKind: .transactionSigning

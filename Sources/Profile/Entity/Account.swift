@@ -125,10 +125,7 @@ extension Profile.Network.Account {
 		factorInstance: FactorInstance
 	) throws -> EntityAddress {
 		if let derivationPath = factorInstance.derivationPath {
-			let path = try derivationPath.asAccountPath()
-			guard path.entityKind == .account else {
-				throw WrongEntityInDerivationPath()
-			}
+			_ = try derivationPath.asAccountPath()
 		}
 		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
 			request: .init(

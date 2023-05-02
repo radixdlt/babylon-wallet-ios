@@ -78,7 +78,7 @@ extension DerivationPath {
 	public static let getID: Self = try! .customPath(.init(path: .getID))
 
 	/// The **default** derivation path for `Account`s.
-	public static func accountPath(_ path: AccountHierarchicalDeterministicDerivationPath) -> Self {
+	public static func accountPath(_ path: AccountDerivationPath) -> Self {
 		Self(scheme: .cap26, path: path.derivationPath)
 	}
 
@@ -119,8 +119,8 @@ extension DerivationPath {
 		try IdentityHierarchicalDeterministicDerivationPath(derivationPath: path)
 	}
 
-	public func asAccountPath() throws -> AccountHierarchicalDeterministicDerivationPath {
-		try AccountHierarchicalDeterministicDerivationPath(derivationPath: path)
+	public func asAccountPath() throws -> AccountDerivationPath {
+		try AccountDerivationPath(derivationPath: path)
 	}
 
 	public func asCustomPath() throws -> CustomHierarchicalDeterministicDerivationPath {
@@ -154,6 +154,6 @@ extension DerivationPath {
 
 #if DEBUG
 extension DerivationPath {
-	public static let previewValueAccount = try! Self.accountPath(.init(networkID: .nebunet, index: 0, keyKind: .transactionSigning))
+	public static let previewValueAccount = try! Self.accountPath(.babylon(.init(networkID: .nebunet, index: 0, keyKind: .transactionSigning)))
 }
 #endif // DEBUG

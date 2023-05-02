@@ -185,7 +185,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 			do {
 				derivationPath = try .init(
 					scheme: .cap26,
-					path: AccountHierarchicalDeterministicDerivationPath(
+					path: AccountDerivationPath(
 						derivationPath: self.derivationPath
 					)
 					.derivationPath

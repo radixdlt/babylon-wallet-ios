@@ -655,6 +655,7 @@ extension FactorInstanceView {
 
 			if let path = factorInstance.derivationPath {
 				Labeled("Derivation Path", value: path.description)
+				Labeled("Derivation Scheme", value: path.scheme.rawValue)
 			}
 			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
 			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)

@@ -173,10 +173,10 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			return validateSoftwareAccounts(mnemonicWithPassphrase, softwareAccounts: softwareAccounts)
 
 		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSources(.delegate(
-			.completed(addedLedgersWithAccounts, unvalidatedOlympiaAccounts)
+			.completed(ledgersWithAccounts, unvalidatedOlympiaAccounts)
 		)))):
 
-			state.migratedAccounts.append(contentsOf: addedLedgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
+			state.migratedAccounts.append(contentsOf: ledgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
 
 			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
 				fatalError("bad!")
