@@ -69,13 +69,6 @@ extension AddLedgerFactorSource {
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
-//				.sheet(
-//					store: store.scope(
-//						state: \.$addNewP2PLink,
-//						action: { .child(.addNewP2PLink($0)) }
-//					),
-//					content: { NewConnection.View(store: $0) }
-//				)
 				.confirmationDialog(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /AddLedgerFactorSource.Destinations.State.closeLedgerAlreadyExistsConfirmationDialog,

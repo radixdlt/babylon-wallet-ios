@@ -15,9 +15,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		public var isWaitingForResponseFromLedger = false
 		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo?
 
-//		@PresentationState
-//		public var addNewP2PLink: NewConnection.State?
-
 		@PresentationState
 		var destination: Destinations.State? = nil
 
@@ -43,14 +40,13 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case getDeviceInfoResult(
 			TaskResult<P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo>
 		)
-		case alreadyExists(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo, FactorSource)
+		case alreadyExists(FactorSource)
 		case nameLedgerBeforeAddingIt(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo)
 		case addedFactorSource(FactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
 		case saveNewConnection(P2PLink)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-//		case addNewP2PLink(PresentationAction<NewConnection.Action>)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
@@ -109,7 +105,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			}
 
 		case .addNewP2PLinkButtonTapped:
-//			state.addNewP2PLink = .init()
 			state.destination = .addNewP2PLink(.init())
 			return .none
 
@@ -159,7 +154,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 		case .destination(.presented(.addNewP2PLink(.delegate(.dismiss)))):
-//			state.addNewP2PLink = nil
 			state.destination = nil
 			return .none
 
@@ -187,7 +181,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			return .run { send in
 				let allFactorSources = try await factorSourcesClient.getFactorSources()
 				if let existing = allFactorSources.first(where: { $0.id == ledgerDeviceInfo.id }) {
-					await send(.internal(.alreadyExists(ledgerDeviceInfo, existing)))
+					await send(.internal(.alreadyExists(existing)))
 				} else {
 					// new!
 					await send(.internal(.nameLedgerBeforeAddingIt(
@@ -198,7 +192,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 				await send(.internal(.nameLedgerBeforeAddingIt(ledgerDeviceInfo)))
 			}
 
-		case let .alreadyExists(deviceFromConnectorExtension, existingFactorSource):
+		case let .alreadyExists(existingFactorSource):
 
 			state.destination = .closeLedgerAlreadyExistsConfirmationDialog(
 				.init(titleVisibility: .hidden) {
