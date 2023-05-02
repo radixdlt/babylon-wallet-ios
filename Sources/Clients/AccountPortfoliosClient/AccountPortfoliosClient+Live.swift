@@ -258,6 +258,7 @@ extension AccountPortfoliosClient {
 				)
 			)
 			.map(\.nonFungibleId)
+
 			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29
 
