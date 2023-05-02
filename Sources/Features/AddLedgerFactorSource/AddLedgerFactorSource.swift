@@ -246,8 +246,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
-			name: name,
-			olympiaCompatible: false
+			name: name
 		)
 
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")

@@ -10,8 +10,9 @@ import SharedModels
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
-	public struct AddedLedgerWithAccounts: Sendable, Hashable {
+	public struct LedgerWithAccounts: Sendable, Hashable {
 		public let name: String?
+		public let isLedgerNew: Bool
 		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
 		public var displayName: String {
 			if let name {
@@ -33,7 +34,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		public var verifiedToBeMigrated: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
 
 		/// verified and migrated
-		public var addedLedgersWithAccounts: OrderedSet<AddedLedgerWithAccounts> = []
+		public var ledgersWithAccounts: OrderedSet<LedgerWithAccounts> = []
 
 		public var failedToFindAnyLinks = false
 		public var ledgerName = ""
@@ -66,14 +67,15 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		)
 
 		case failedToImportOlympiaLedger
-		case addedFactorSource(FactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
+		case alreadyExists(FactorSource)
+		case addedFactorSource(FactorSource)
 
-		case migratedOlympiaHardwareAccounts(AddedLedgerWithAccounts)
+		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case completed(
-			addedLedgersWithAccounts: OrderedSet<AddedLedgerWithAccounts>,
+			ledgersWithAccounts: OrderedSet<LedgerWithAccounts>,
 			unvalidatedAccounts: Set<OlympiaAccountToMigrate>
 		)
 	}
@@ -105,7 +107,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case .skipRestOfTheAccounts:
 			return .send(.delegate(.completed(
-				addedLedgersWithAccounts: state.addedLedgersWithAccounts,
+				ledgersWithAccounts: state.ledgersWithAccounts,
 				unvalidatedAccounts: state.unverified
 			)))
 
@@ -156,24 +158,27 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case let .validateLedgerBeforeNamingIt(ledger):
 			return validate(ledger, againstUnverifiedOf: &state)
 
-		case let .addedFactorSource(factorSource, model, name):
+		case let .addedFactorSource(factorSource):
 			state.unnamedDeviceToAdd = nil
 			state.ledgerName = ""
-			guard let verifiedToMigrate = state.verifiedToBeMigrated else {
-				assertionFailure("Expected verified accounts to migrated")
-				return .none
-			}
-			loggerGlobal.notice("Converting hardware accounts to babylon...")
+
 			return convertHardwareAccountsToBabylon(
-				verifiedToMigrate,
+				isLedgerNew: true,
 				factorSource: factorSource,
-				model: model,
-				ledgerName: name
+				state
 			)
 
-		case let .migratedOlympiaHardwareAccounts(addedLedgerWithAccounts):
+		case let .alreadyExists(factorSource):
+
+			return convertHardwareAccountsToBabylon(
+				isLedgerNew: false,
+				factorSource: factorSource,
+				state
+			)
+
+		case let .migratedOlympiaHardwareAccounts(ledgerWithAccounts):
 			loggerGlobal.notice("Adding Ledger with accounts...")
-			state.addedLedgersWithAccounts.append(addedLedgerWithAccounts)
+			state.ledgersWithAccounts.append(ledgerWithAccounts)
 			state.verifiedToBeMigrated = nil
 
 			return continueWithRestOfAccountsIfNeeded(state: &state)
@@ -214,9 +219,17 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				state.unverified.remove(verifiedAccountToMigrate)
 			}
 
-			return .send(.internal(
-				.nameLedgerDeviceBeforeSavingIt(olympiaDevice)
-			))
+			return .run { send in
+				let allFactorSources = try await factorSourcesClient.getFactorSources()
+				if let existing = allFactorSources.first(where: { $0.id == olympiaDevice.id }) {
+					await send(.internal(.alreadyExists(existing)))
+				} else {
+					// new!
+					await send(.internal(
+						.nameLedgerDeviceBeforeSavingIt(olympiaDevice)
+					))
+				}
+			}
 
 		} catch {
 			loggerGlobal.error("got error: \(error)")
@@ -235,8 +248,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
-			name: name,
-			olympiaCompatible: true
+			name: name
 		)
 
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
@@ -244,7 +256,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		return .run { send in
 			try await factorSourcesClient.addOffDeviceFactorSource(factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.internal(.addedFactorSource(factorSource, model, name: name)))
+			await send(.internal(.addedFactorSource(factorSource)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
 			errorQueue.schedule(error)
@@ -252,12 +264,22 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	private func convertHardwareAccountsToBabylon(
-		_ olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+		isLedgerNew: Bool,
 		factorSource: FactorSource,
-		model: FactorSource.LedgerHardwareWallet.DeviceModel,
-		ledgerName: String?
+		_ state: State
+		//        _ olympiaAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+//		model: FactorSource.LedgerHardwareWallet.DeviceModel,
+//		ledgerName: String?
 	) -> EffectTask<Action> {
-		.run { send in
+		guard let olympiaAccounts = state.verifiedToBeMigrated else {
+			assertionFailure("Expected verified accounts to migrated")
+			return .none
+		}
+		loggerGlobal.notice("Converting hardware accounts to babylon...")
+		let ledgerName = factorSource.label.rawValue
+		let model = FactorSource.LedgerHardwareWallet.DeviceModel(rawValue: factorSource.debugDescription) ?? .nanoSPlus // FIXME: better fallback
+
+		return .run { send in
 			// Migrates and saved all accounts to Profile
 			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 				.init(
@@ -266,8 +288,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				)
 			)
 			loggerGlobal.notice("Converted #\(migrated.babylonAccounts.count) accounts to babylon! ✅")
-			let addedLedgerWithAccounts = AddedLedgerWithAccounts(
+			let addedLedgerWithAccounts = LedgerWithAccounts(
 				name: ledgerName,
+				isLedgerNew: isLedgerNew,
 				model: model,
 				id: factorSource.id,
 				migratedAccounts: migrated.accounts
@@ -285,7 +308,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
 
 			return .send(.delegate(.completed(
-				addedLedgersWithAccounts: state.addedLedgersWithAccounts,
+				ledgersWithAccounts: state.ledgersWithAccounts,
 				unvalidatedAccounts: []
 			)))
 		} else {
