@@ -1,8 +1,11 @@
 "factorSource.device.iPhoneModelFallback" = "Unknown iPhone";
 
 "accountDetails.transferButtonTitle" = "Transfer";
+"accountDetails.ID" = "ID";
 
 "accountList.row.copyTitle" = "Copy";
+"accountList.row.securityPrompt" = "Apply Security Settings";
+"accountList.row.legacyAccount" = "Legacy";
 
 "accountPreferences.faucetButtonTitle" = "Get RCnet XRD Test Tokens";
 "accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
@@ -42,6 +45,7 @@
 "common.biometricsPrompt.signAuthChallenge" = "Authenticate to sign auth chellenge with this phone.";
 "common.biometricsPrompt.creationOfEntity" = "Authenticate to create new %s with this phone.";
 "common.biometricsPrompt.checkingAccounts" = "Checking accounts.";
+"common.biometricsPrompt.importOlympiaAccounts" = "Validate seed phrase exists.";
 
 "createEntity.completion.title" = "Congratulations";
 "createEntity.completion.subtitle.notFirst" = "Your %s has been created.";
@@ -196,11 +200,11 @@
 "dAppDetails.forgetDappAlertConfirm" = "Forget";
 "dAppDetails.forgetDappAlertCancel" = "Cancel";
 
-"personaDetails.personaLabelHeading" = "Persona Label";
+"personaDetails.personaNameHeading" = "Persona Name";
 "personaDetails.personaDataSharingDescription" = "Here is the personal data that you are sharing with %@";
 "personaDetails.editPersona" = "Edit Persona";
-"personaDetails.givenNameHeading" = "Given Name";
-"personaDetails.familyNameHeading" = "Family Name";
+"personaDetails.firstNameHeading" = "First Name";
+"personaDetails.lastNameHeading" = "Last Name";
 "personaDetails.emailAddressHeading" = "Email Address";
 "personaDetails.phoneNumberHeading" = "Phone Number";
 "personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
@@ -280,8 +284,9 @@
 "settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
+"settings.importLegacyWallet" = "Import from a Legacy Wallet";
 
-"splash.alert.passcodeCheckFailed.cancelButtonTitle" = "Cancel";
+"splash.alert.passcodeCheckFailed.retryButtonTitle" = "Retry";
 "splash.alert.passcodeCheckFailed.message" = "Passcode are not set up. Please update settings.";
 "splash.alert.passcodeCheckFailed.settingsButtonTitle" = "Settings";
 "splash.alert.passcodeCheckFailed.title" = "Warning";
@@ -317,3 +322,18 @@
 "generalSettings.title" = "App Settings";
 "generalSettings.developerMode.title" = "Developer Mode";
 "generalSettings.developerMode.subtitle" = "Warning: Disables website validity checks";
+
+"importLegacyWallet.flow.navigationTitle" = "Import Legacy Wallet";
+"importLegacyWallet.scanQRCodes.scanInstructions" = "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.";
+"importLegacyWallet.selectAccountsToImport.accountRow.value.nameFallback" = "Unnamned";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.name" = "Name";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.olympiaAddress" = "Olympia Address";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.accountType" = "Type";
+"importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath" = "Path";
+"importLegacyWallet.selectAccountsToImport.button.deselectAll" = "Deselect all";
+"importLegacyWallet.selectAccountsToImport.button.selectAllNonImported" = "Select all non imported";
+"importLegacyWallet.selectAccountsToImport.button.importOneAcccount" = "Import one account";
+"importLegacyWallet.selectAccountsToImport.button.importZeroAccounts" = "Import accounts";
+"importLegacyWallet.selectAccountsToImport.button.importManyAccounts" = "Import %@ accounts";
+"importLegacyWallet.completion.title" = "Imported #%@ accounts.";
+"importLegacyWallet.completion.button.finish" = "Okay";

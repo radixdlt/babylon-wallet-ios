@@ -18,19 +18,17 @@ package.addModules([
 	.feature(
 		name: "AccountDetailsFeature",
 		dependencies: [
-			"AccountListFeature",
 			"AccountPreferencesFeature",
-			"AssetsViewFeature",
 			"AssetTransferFeature",
+			"AccountPortfoliosClient",
 		],
 		tests: .yes()
 	),
 	.feature(
 		name: "AccountListFeature",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
-			"FungibleTokenListFeature",
-			"AccountsClient",
+			"AccountPortfoliosClient",
+			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
 		],
 		tests: .yes()
 	),
@@ -38,18 +36,24 @@ package.addModules([
 		name: "AccountPreferencesFeature",
 		dependencies: [
 			"FaucetClient",
+			"AccountPortfoliosClient",
 		],
 		tests: .yes()
 	),
 	.feature(
-		name: "AggregatedValueFeature",
-		dependencies: [],
-		tests: .yes()
+		name: "AddLedgerFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"RadixConnectClient",
+			"LedgerHardwareWalletClient",
+			"NewConnectionFeature",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
 			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
@@ -58,35 +62,32 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "AssetsViewFeature",
-		dependencies: [
-			"FungibleTokenListFeature",
-			"NonFungibleTokenListFeature",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "AssetTransferFeature",
 		dependencies: [
-			"TransactionSigningFeature",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
 		],
 		tests: .yes()
 	),
 	.feature(
-		name: "AuthorizedDAppsFeatures",
+		name: "AuthorizedDAppsFeature",
 		dependencies: [
-			"GatewayAPI",
 			"AuthorizedDappsClient",
+			"CacheClient",
+			"EditPersonaFeature",
+			"PersonasFeature",
+			"GatewayAPI",
 		],
 		tests: .no
 	),
 	.feature(
 		name: "CreateEntityFeature",
 		dependencies: [
+			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
 			"Cryptography",
 			"FactorSourcesClient",
 			"GatewayAPI",
+			"LedgerHardwareWalletClient",
 			"LocalAuthenticationClient",
 			"PersonasClient",
 		],
@@ -99,6 +100,7 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
 			"CreateEntityFeature",
+			"CacheClient",
 			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
@@ -118,16 +120,12 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "FungibleTokenDetailsFeature",
-		dependencies: [],
-		tests: .no
-	),
-	.feature(
-		name: "FungibleTokenListFeature",
+		name: "PersonaDetailsFeature",
 		dependencies: [
-			"FungibleTokenDetailsFeature",
+			"AuthorizedDappsClient",
+			"EditPersonaFeature",
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.feature(
 		name: "GatewaySettingsFeature",
@@ -150,17 +148,22 @@ package.addModules([
 		dependencies: [
 			"AccountDetailsFeature",
 			"AccountListFeature",
-			"AccountPortfolioFetcherClient",
+			"AccountPortfoliosClient",
 			"AccountsClient",
 			"AppPreferencesClient",
 			"CreateEntityFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"FungibleTokenListFeature",
-				"NonFungibleTokenListFeature",
-			]
-		)
+		tests: .yes()
+	),
+	.feature(
+		name: "ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"RadixConnectClient",
+			"ImportLegacyWalletClient",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "InspectProfileFeature",
@@ -173,7 +176,6 @@ package.addModules([
 		name: "MainFeature",
 		dependencies: [
 			"AppPreferencesClient",
-			"AccountPortfolioFetcherClient",
 			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
@@ -191,17 +193,9 @@ package.addModules([
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
-			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
-			},
 			"RadixConnectClient",
+			"ScanQRFeature",
 		],
-		tests: .yes()
-	),
-	.feature(
-		name: "NonFungibleTokenListFeature",
-		dependencies: [],
 		tests: .yes()
 	),
 	.feature(
@@ -215,27 +209,59 @@ package.addModules([
 	.feature(
 		name: "PersonasFeature",
 		dependencies: [
+			"PersonaDetailsFeature",
 			"CreateEntityFeature",
 			"PersonasClient",
 		],
 		tests: .yes()
 	),
 	.feature(
+		name: "ScanQRFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"CameraPermissionClient",
+			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
+			},
+		],
+		tests: .no
+	),
+	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"AccountsClient",
+			"AddLedgerFactorSourceFeature",
+			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
-			"AuthorizedDAppsFeatures",
-			"EngineToolkit", // for debug builds we print RET commit hash
+			"AuthorizedDAppsFeature",
+			"CacheClient",
+			"EngineToolkitClient",
 			"GatewayAPI",
-			"P2PLinksFeature",
 			"GatewaySettingsFeature",
 			"GeneralSettings",
-			"MnemonicClient",
-			"PersonasFeature",
-			"RadixConnectClient", // deleting connections when wallet is deleted
+			"ImportLegacyWalletClient",
 			"InspectProfileFeature",
+			"MnemonicClient",
+			"P2PLinksFeature",
+			"PersonasFeature",
+			"RadixConnectClient",
+			"ScanQRFeature",
+			"EditPersonaFeature",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "SigningFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"EngineToolkit",
+			"FactorSourcesClient",
+			"LedgerHardwareWalletClient",
+			"Profile",
+			"TransactionClient",
+			"UseFactorSourceClient",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "SplashFeature",
@@ -250,19 +276,11 @@ package.addModules([
 		dependencies: [
 			"GatewayAPI",
 			"TransactionClient",
+			"SigningFeature",
+			"SubmitTransactionClient",
 		],
 		tests: .yes()
 	),
-	.feature(
-		name: "TransactionSigningFeature",
-		dependencies: [
-			"GatewayAPI",
-			"GatewaysClient",
-			"TransactionClient",
-		],
-		tests: .yes()
-	),
-
 ])
 
 // MARK: - Clients
@@ -284,14 +302,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "AccountPortfolioFetcherClient",
+		name: "AccountPortfoliosClient",
 		dependencies: [
 			"EngineToolkitClient",
 			"GatewayAPI",
+			"CacheClient",
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "AppPreferencesClient",
 		dependencies: [
@@ -324,11 +342,22 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.client(
+		name: "CacheClient",
+		dependencies: [
+			"DiskPersistenceClient",
+		],
+		tests: .yes()
+	),
 	.client(
 		name: "CameraPermissionClient",
 		dependencies: [],
 		tests: .no
+	),
+	.client(
+		name: "DiskPersistenceClient",
+		dependencies: [],
+		tests: .yes()
 	),
 	.client(
 		name: "EngineToolkitClient",
@@ -362,6 +391,7 @@ package.addModules([
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
+			"SubmitTransactionClient",
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -398,7 +428,29 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
+	.client(
+		name: "ImportLegacyWalletClient",
+		dependencies: [
+			"AccountsClient",
+			"EngineToolkitClient",
+			"LedgerHardwareWalletClient",
+			"Profile", // Olympia models
+		],
+		tests: .yes(
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
+	),
+	.client(
+		name: "LedgerHardwareWalletClient",
+		dependencies: [
+			"RadixConnectClient",
+			"FactorSourcesClient", // FIXME: move models to lower level package
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
+		],
+		tests: .no
+	),
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
@@ -415,9 +467,10 @@ package.addModules([
 		name: "NetworkSwitchingClient",
 		dependencies: [
 			"AccountsClient",
+			"CacheClient",
 			"GatewayAPI",
-			"ProfileStore",
 			"GatewaysClient",
+			"ProfileStore",
 		],
 		tests: .no
 	),
@@ -460,6 +513,7 @@ package.addModules([
 		dependencies: [
 			"RadixConnect",
 			"P2PLinksClient",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes()
 	),
@@ -504,20 +558,25 @@ package.addModules([
 		name: "ROLAClient",
 		dependencies: [
 			"GatewayAPI",
+			"CacheClient",
 		],
 		tests: .yes()
 	),
 	.client(
+		name: "SubmitTransactionClient",
+		dependencies: [
+			"EngineToolkitClient",
+			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.client(
 		name: "TransactionClient",
 		dependencies: [
-			"AccountPortfolioFetcherClient",
 			"AccountsClient",
+			"AccountPortfoliosClient",
 			"EngineToolkitClient",
-			"FactorSourcesClient",
 			"GatewayAPI",
-			"GatewaysClient",
-			"SecureStorageClient",
-			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),
@@ -538,6 +597,18 @@ package.addModules([
 			"Profile",
 			"SecureStorageClient",
 			"UseFactorSourceClient",
+		],
+		tests: .no
+	),
+	.client(
+		name: "URLFormatterClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "URLFormatterClientLive",
+		dependencies: [
+			"URLFormatterClient",
 		],
 		tests: .no
 	),
@@ -569,18 +640,19 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			"URLFormatterClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
 			},
 			.product(name: "NavigationTransitions", package: "swiftui-navigation-transitions", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.1.0")
+				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", exact: "0.9.0")
 			},
 			.product(name: "NukeUI", package: "Nuke") {
 				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")
 			},
 			"Resources",
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
-				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
+				.package(url: "https://github.com/pointfreeco/swiftui-navigation", exact: "0.7.1")
 			},
 			.product(name: "TextBuilder", package: "TextBuilder") {
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
@@ -640,6 +712,9 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"SharedTestingModels",
+			],
+			resources: [
+				.process("TestVectors/"),
 			]
 		)
 	),
@@ -767,19 +842,19 @@ package.addModules([
 				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
 			},
 			.product(name: "CustomDump", package: "swift-custom-dump") {
-				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1")
+				.package(url: "https://github.com/pointfreeco/swift-custom-dump", exact: "0.9.1")
 			},
 			.product(name: "Dependencies", package: "swift-dependencies") {
-				.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.1.1")
+				.package(url: "https://github.com/pointfreeco/swift-dependencies", exact: "0.2.0")
 			},
 			.product(name: "DependenciesAdditions", package: "swift-dependencies-additions") {
-				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "0.2.0")
+				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", exact: "0.3.0")
 			},
 			.product(name: "Either", package: "swift-either") {
 				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")
 			},
 			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
-				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0")
+				.package(url: "https://github.com/pointfreeco/swift-identified-collections", exact: "0.7.0")
 			},
 			.product(name: "KeychainAccess", package: "KeychainAccess") {
 				.package(url: "https://github.com/kishikawakatsumi/KeychainAccess", from: "4.2.2")
@@ -788,16 +863,16 @@ package.addModules([
 				.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6")
 			},
 			.product(name: "NonEmpty", package: "swift-nonempty") {
-				.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0")
+				.package(url: "https://github.com/pointfreeco/swift-nonempty", exact: "0.4.0")
 			},
 			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
 				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
 			},
 			.product(name: "Tagged", package: "swift-tagged") {
-				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
+				.package(url: "https://github.com/pointfreeco/swift-tagged", exact: "0.10.0")
 			},
 			.product(name: "Validated", package: "swift-validated") {
-				.package(url: "https://github.com/pointfreeco/swift-validated", from: "0.2.1")
+				.package(url: "https://github.com/pointfreeco/swift-validated", exact: "0.2.1")
 			},
 		],
 		tests: .yes(dependencies: [])
@@ -832,7 +907,7 @@ extension Package {
 
 		enum Category {
 			case client
-			case feature
+			case feature(featureSuffixDroppedFromFolderName: Bool)
 			case core
 			case module(name: String)
 			static let testing: Self = .module(name: "Testing")
@@ -861,6 +936,7 @@ extension Package {
 
 		static func feature(
 			name: String,
+			featureSuffixDroppedFromFolderName: Bool = false,
 			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
@@ -871,7 +947,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: .feature,
+				category: .feature(featureSuffixDroppedFromFolderName: featureSuffixDroppedFromFolderName),
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["FeaturePrelude"],
 				exclude: exclude,
@@ -964,12 +1040,21 @@ extension Package {
 			package.dependencies.append(contentsOf: remoteDependencies)
 		}
 
-		let targetName = module.name
+		let nameOfTarget = module.name
+		var nameOfTargetInPath = nameOfTarget
+		switch module.category {
+		case let .feature(featureSuffixDroppedFromFolderName):
+			let needle = "Feature"
+			if featureSuffixDroppedFromFolderName, nameOfTargetInPath.hasSuffix(needle) {
+				nameOfTargetInPath.removeLast(needle.count)
+			}
+		default: break
+		}
 		let targetPath = {
 			if let category = module.category {
-				return "Sources/\(category.pathComponent)/\(targetName)"
+				return "Sources/\(category.pathComponent)/\(nameOfTargetInPath)"
 			} else {
-				return "Sources/\(targetName)"
+				return "Sources/\(nameOfTargetInPath)"
 			}
 		}()
 		let dependencies = {
@@ -982,7 +1067,7 @@ extension Package {
 
 		package.targets += [
 			.target(
-				name: targetName,
+				name: nameOfTarget,
 				dependencies: dependencies,
 				path: targetPath,
 				exclude: module.exclude,
@@ -1001,7 +1086,7 @@ extension Package {
 		case .no:
 			break
 		case let .yes(nameSuffix, customAdditionalTestDependencies, resources):
-			let testTargetName = targetName + nameSuffix
+			let testTargetName = nameOfTarget + nameSuffix
 			let testTargetPath = {
 				if let category = module.category {
 					return "Tests/\(category.pathComponent)/\(testTargetName)"
@@ -1010,7 +1095,7 @@ extension Package {
 				}
 			}()
 
-			let testTargetDependencies = [.target(name: targetName)] + customAdditionalTestDependencies + {
+			let testTargetDependencies = [.target(name: nameOfTarget)] + customAdditionalTestDependencies + {
 				switch module.category {
 				case .some(.feature):
 					return ["FeatureTestingPrelude"]
@@ -1039,7 +1124,7 @@ extension Package {
 
 		if module.isProduct {
 			package.products += [
-				.library(name: targetName, targets: [targetName]),
+				.library(name: nameOfTarget, targets: [nameOfTarget]),
 			]
 		}
 	}

@@ -42,6 +42,51 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(factorSourceID.hex(), "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
+	func test_blake_hash() throws {
+		// https://github.com/radixdlt/radixdlt-scrypto/blob/2cdf297f6c7d8e52fd96bb964217a4833306e1ec/radix-engine-common/src/crypto/blake2b.rs#L15-L22
+		let digest = try blake2b(data: "Hello Radix".data(using: .utf8)!)
+		XCTAssertEqual(digest.hex, "48f1bd08444b5e713db9e14caac2faae71836786ac94d645b00679728202a935")
+	}
+
+	func test_factor_source_id_ledger() throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "equip will roof matter pink blind book anxiety banner elbow sun young",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
+		let key = try root.derivePublicKey(
+			path: .getID,
+			curve: Curve25519.self
+		)
+
+		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "e358493920c6f967dc16eff9943fcd5765ab8f42b338ee6769d8ba7f1b9e097f")
+		let factorSourceID = try FactorSource.id(fromRoot: root)
+		XCTAssertEqual(factorSourceID.hex(), "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
+	}
+
+	func test_factor_source_id_cap33() async throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "surprise jaguar gloom bring cage obey rotate fiber agree castle rich tomorrow",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
+		let key = try root.derivePublicKey(
+			path: .init(
+				children: [
+					.bip44Purpose,
+					.coinType,
+					.getID,
+				],
+				onlyPublic: false
+			),
+			curve: Curve25519.self
+		)
+
+		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "156220ef37c5cd3e6da10cdfdba8a0d87ddc4411b4829f60155db3f6bbafc9f8")
+		let factorSourceID = try FactorSource.id(fromRoot: root)
+		XCTAssertEqual(factorSourceID.hex(), "56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
+	}
+
 	func test_new_profile() async throws {
 		continueAfterFailure = false
 
@@ -61,14 +106,16 @@ final class ProfileTests: TestCase {
 		} operation: {
 			let babylonFactorSource = try FactorSource.babylon(
 				mnemonic: curve25519FactorSourceMnemonic,
-				hint: creatingDevice
+				label: factorSourceLabel,
+				description: factorSourceDescription
 			)
 			let olympiaFactorSource = try FactorSource.olympia(
 				mnemonic: secp256K1FactorMnemonic,
-				hint: creatingDevice
+				label: factorSourceLabel,
+				description: factorSourceDescription
 			)
 			let profile = Profile(
-				factorSource: babylonFactorSource,
+				factorSource: babylonFactorSource.factorSource,
 				creatingDevice: creatingDevice,
 				appPreferences: .init(gateways: .init(current: gateway))
 			)
@@ -78,19 +125,19 @@ final class ProfileTests: TestCase {
 
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
-
-		profile.factorSources.append(olympiaFactorSource)
+		XCTAssertNil(olympiaFactorSource.factorSource.storage)
+		profile.factorSources.append(olympiaFactorSource.factorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-			let index = profile.factorSources.babylonDevice.storage.nextForEntity(
+			let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(
 				kind: .account,
 				networkID: profile.networkID
 			)
 
-			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
+			let derivationPath = try AccountBabylonDerivationPath(
 				networkID: networkID,
 				index: index,
-				keyKind: .transactionSigningKey
+				keyKind: .transactionSigning
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
@@ -102,20 +149,17 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let address = try Profile.Network.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
-
 			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let account = Profile.Network.Account(
+			let account = try Profile.Network.Account(
 				networkID: networkID,
-				address: address,
-				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				appearanceID: .fromIndex(index),
-				displayName: name
+				factorInstance: factorInstance,
+				displayName: name,
+				extraProperties: .init(appearanceID: .fromIndex(Int(index)))
 			)
 
 			try profile.addAccount(account)
@@ -127,12 +171,12 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-			let index = profile.factorSources.babylonDevice.storage.nextForEntity(kind: .identity, networkID: profile.networkID)
+			let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID)
 
 			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
 				networkID: networkID,
 				index: index,
-				keyKind: .transactionSigningKey
+				keyKind: .transactionSigning
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
@@ -144,21 +188,13 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let address = try Profile.Network.Persona.deriveAddress(networkID: networkID, publicKey: publicKey)
-
 			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let persona = Profile.Network.Persona(
-				networkID: networkID,
-				address: address,
-				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				displayName: name,
-				fields: fields
-			)
+			let persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
 
 			try profile.addPersona(persona)
 
@@ -187,7 +223,7 @@ final class ProfileTests: TestCase {
 			.init(id: .familyName, value: "Publicson"),
 		])
 
-		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 
 		let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
 		XCTAssertNotNil(profile.appendP2PLink(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
@@ -244,7 +280,6 @@ final class ProfileTests: TestCase {
 					))
 			)
 		)
-
 		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
 		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
@@ -277,11 +312,13 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(profile.factorSources.count, 2)
 		for factorSource in profile.factorSources {
-			XCTAssertEqual(factorSource.hint, creatingDevice)
+			XCTAssertEqual(factorSource.label, factorSourceLabel)
+			XCTAssertEqual(factorSource.description, factorSourceDescription)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
-		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
-		XCTAssertEqual(deviceFactorSource.storage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
+		XCTAssertNil(profile.factorSources.last.storage)
+		XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id
@@ -298,7 +335,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.personas.count, 2)
 		XCTAssertEqual(network.networkID, networkID)
 
-		XCTAssertTrue(profile.appPreferences.security.iCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
 		XCTAssertTrue(profile.appPreferences.security.isDeveloperModeEnabled, "Developer mode should default to on")
 
 		let curve25519FactorSourceMnemonic = try Mnemonic(
@@ -322,51 +359,51 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			network.accounts[0].publicKey()?.compressedData.hex(),
-			"b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c"
+			"7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3"
 		)
 
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_b_1p85v6mt035ny0j35jp8l6sy49gj0c3seda4tsuqvpstqrc6egy"
+			"account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"
 		)
 
 		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
-			"7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86"
+			"216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719"
 		)
 
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg"
+			"account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"
 		)
 
 		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
-			"3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6"
+			"a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3"
 		)
 
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"
+			"account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"
 		)
 
 		XCTAssertEqual(
 			network.personas[0].publicKey()?.compressedData.hex(),
-			"f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b"
+			"573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"
 		)
 		XCTAssertEqual(
 			network.personas[0].address.address,
-			"identity_tdx_b_1psauxn0kkttjn3xhw6lvjudnrx48mu0jaxt0crp09d4smx5gv5"
+			"identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8"
 		)
 
 		XCTAssertEqual(
 			network.personas[1].publicKey()?.compressedData.hex(),
-			"772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51"
+			"6b33fec79f1535ac566b3d840f753942af6447efbe5c50dc343f8ec2122af9b3"
 		)
 
 		XCTAssertEqual(
 			network.personas[1].address.address,
-			"identity_tdx_b_1pnec3phquyel59q39v3kcyc6z3ljy9jv40mdwf4dgxps5y05k2"
+			"identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -378,7 +415,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p93amtza2ys6xrq7saycsrh97pdwm0atuf7xthpxyexsjnczsg", "account_tdx_b_1p8afjm9e5exmj0sxltq4my53rtzm6e4vqskj2znx27qq6xnnxf"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa", "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {
@@ -408,7 +445,9 @@ final class ProfileTests: TestCase {
 	}
 }
 
-private let creatingDevice: NonEmptyString = "computerRunningUnitTest"
+private let factorSourceLabel: FactorSource.Label = "computer"
+private let factorSourceDescription: FactorSource.Description = "unit test"
+private let creatingDevice: NonEmptyString = "\(factorSourceLabel) \(factorSourceDescription)"
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {

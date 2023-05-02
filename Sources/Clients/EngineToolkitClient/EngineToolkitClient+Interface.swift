@@ -12,14 +12,18 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var compileTransactionIntent: CompileTransactionIntent
 	public var compileSignedTransactionIntent: CompileSignedTransactionIntent
 	public var compileNotarizedTransactionIntent: CompileNotarizedTransactionIntent
+	public var decompileTransactionIntent: DecompileTransactionIntent
+	public var decompileNotarizedTransactionIntent: DecompileNotarizedTransactionIntent
+
+	public var deriveOlympiaAdressFromPublicKey: DeriveOlympiaAdressFromPublicKey
 
 	public var generateTXID: GenerateTXID
-	public var accountAddressesNeedingToSignTransaction: AccountAddressesNeedingToSignTransaction
-	public var accountAddressesSuitableToPayTransactionFee: AccountAddressesSuitableToPayTransactionFee
 
 	public var knownEntityAddresses: KnownEntityAddresses
 
-	public var generateTransactionReview: GenerateTransactionReview
+	public var analyzeManifest: AnalyzeManifest
+	public var analyzeManifestWithPreviewContext: AnalyzeManifestWithPreviewContext
+
 	public var decodeAddress: DecodeAddressRequest
 }
 
@@ -27,6 +31,10 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 public struct JSONInstructionsTransactionManifest: Sendable, Hashable {
 	public let instructions: [Instruction]
 	public let convertedManifestThatContainsThem: TransactionManifest
+	public init(instructions: [Instruction], convertedManifestThatContainsThem: TransactionManifest) {
+		self.instructions = instructions
+		self.convertedManifestThatContainsThem = convertedManifestThatContainsThem
+	}
 }
 
 // MARK: - ConvertManifestInstructionsToJSONIfItWasStringRequest
@@ -48,36 +56,36 @@ extension EngineToolkitClient {
 
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (ConvertManifestInstructionsToJSONIfItWasStringRequest) throws -> JSONInstructionsTransactionManifest
 
-	public typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
-	public typealias AccountAddressesSuitableToPayTransactionFee = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
-
 	public typealias CompileTransactionIntent = @Sendable (TransactionIntent) throws -> CompileTransactionIntentResponse
 
 	public typealias CompileSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> CompileSignedTransactionIntentResponse
 
 	public typealias CompileNotarizedTransactionIntent = @Sendable (NotarizedTransaction) throws -> CompileNotarizedTransactionIntentResponse
 
+	public typealias DeriveOlympiaAdressFromPublicKey = @Sendable (K1.PublicKey) throws -> String
+
 	public typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
 
 	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 
-	public typealias GenerateTransactionReview = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
+	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> AnalyzeManifestResponse
+	public typealias AnalyzeManifestWithPreviewContext = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
 
 	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
+
+	public typealias DecompileTransactionIntent = @Sendable (DecompileTransactionIntentRequest) throws -> DecompileTransactionIntentResponse
+	public typealias DecompileNotarizedTransactionIntent = @Sendable (DecompileNotarizedTransactionIntentRequest) throws -> DecompileNotarizedTransactionIntentResponse
 }
 
-// MARK: - AccountAddressesInvolvedInTransactionRequest
-public struct AccountAddressesInvolvedInTransactionRequest: Sendable, Hashable {
-	public let version: TXVersion
+// MARK: - AnalyzeManifestRequest
+public struct AnalyzeManifestRequest: Sendable, Hashable {
 	public let manifest: TransactionManifest
 	public let networkID: NetworkID
 
 	public init(
-		version: TXVersion,
 		manifest: TransactionManifest,
 		networkID: NetworkID
 	) {
-		self.version = version
 		self.manifest = manifest
 		self.networkID = networkID
 	}
@@ -87,5 +95,11 @@ public struct AccountAddressesInvolvedInTransactionRequest: Sendable, Hashable {
 extension TransactionManifest: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
 		description
+	}
+}
+
+extension AccountAddress {
+	public init(componentAddress: ComponentAddress) throws {
+		try self.init(address: componentAddress.address)
 	}
 }

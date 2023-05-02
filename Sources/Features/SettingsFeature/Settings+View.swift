@@ -1,4 +1,4 @@
-import AuthorizedDAppsFeatures
+import AuthorizedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
@@ -111,21 +111,29 @@ extension View {
 				}
 			}
 		#endif
-			.factorSources(with: store, viewStore)
-			.manageP2PLinks(with: store, viewStore)
-			.gatewaySettings(with: store, viewStore)
-			.authorizedDapps(with: store, viewStore)
-			.personas(with: store, viewStore)
-			.generalSettings(with: store, viewStore)
+			.importFromOlympiaLegacyWallet(with: store)
+			.factorSources(with: store)
+			.manageP2PLinks(with: store)
+			.gatewaySettings(with: store)
+			.authorizedDapps(with: store)
+			.personas(with: store)
+			.generalSettings(with: store)
 	}
 }
 
 extension View {
 	@MainActor
-	private func factorSources(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func importFromOlympiaLegacyWallet(with store: StoreOf<AppSettings>) -> some View {
+		self.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
+			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
+			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func factorSources(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.manageFactorSources,
@@ -135,10 +143,7 @@ extension View {
 	}
 
 	@MainActor
-	private func manageP2PLinks(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func manageP2PLinks(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.manageP2PLinks,
@@ -148,10 +153,7 @@ extension View {
 	}
 
 	@MainActor
-	private func gatewaySettings(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func gatewaySettings(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.gatewaySettings,
@@ -161,10 +163,7 @@ extension View {
 	}
 
 	@MainActor
-	fileprivate func authorizedDapps(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	fileprivate func authorizedDapps(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.authorizedDapps,
@@ -174,10 +173,7 @@ extension View {
 	}
 
 	@MainActor
-	fileprivate func personas(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	fileprivate func personas(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.personas,
@@ -187,10 +183,7 @@ extension View {
 	}
 
 	@MainActor
-	private func generalSettings(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	private func generalSettings(with store: StoreOf<AppSettings>) -> some View {
 		self.navigationDestination(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 			state: /AppSettings.Destinations.State.generalSettings,
@@ -266,6 +259,14 @@ extension AppSettings.View {
 					} icon: {
 						Image(systemName: "person.badge.key")
 							.frame(.verySmall)
+					}
+					.withSeparator
+					.buttonStyle(.tappableRowStyle)
+
+					PlainListRow(title: L10n.Settings.importLegacyWallet) {
+						viewStore.send(.importFromOlympiaWalletButtonTapped)
+					} icon: {
+						Image(asset: AssetResource.generalSettings)
 					}
 					.withSeparator
 					.buttonStyle(.tappableRowStyle)

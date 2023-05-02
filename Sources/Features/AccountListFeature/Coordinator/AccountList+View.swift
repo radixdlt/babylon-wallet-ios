@@ -20,9 +20,6 @@ extension AccountList {
 					content: { AccountList.Row.View(store: $0) }
 				)
 			}
-			.onAppear {
-				ViewStore(store.stateless).send(.view(.appeared))
-			}
 		}
 	}
 }

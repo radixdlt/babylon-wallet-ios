@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 import Prelude
 
@@ -18,8 +17,8 @@ extension DataChannelClient {
 			self.messageHash = messageHash
 		}
 
-		public init(message: Data, id: Message.ID) {
-			self.init(message: message, id: id, messageHash: message.hash)
+		public init(message: Data, id: Message.ID) throws {
+			try self.init(message: message, id: id, messageHash: message.hash())
 		}
 	}
 }
@@ -68,7 +67,7 @@ extension DataChannelClient.AssembledMessage {
 			throw error()
 		}
 
-		let hash = message.hash
+		let hash = try message.hash()
 		guard hash == expectedHash else {
 			let hashHex = hash.hex()
 			let expectedHashHex = expectedHash.hex()

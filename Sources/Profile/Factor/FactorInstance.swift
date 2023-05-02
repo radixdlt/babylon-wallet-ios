@@ -3,7 +3,6 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - FactorInstance
-
 public struct FactorInstance: Sendable, Hashable, Codable {
 	/// The ID of the `FactorSource` that was used to produce this
 	/// factor instance. We will lookup the `FactorSource` in the
@@ -32,3 +31,47 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 		self.derivationPath = derivationPath
 	}
 }
+
+// MARK: - Signature
+public struct Signature: Sendable, Hashable {
+	public let signatureWithPublicKey: SignatureWithPublicKey
+	public let derivationPath: DerivationPath?
+	public init(
+		signatureWithPublicKey: SignatureWithPublicKey,
+		derivationPath: DerivationPath?
+	) {
+		self.signatureWithPublicKey = signatureWithPublicKey
+		self.derivationPath = derivationPath
+	}
+}
+
+// MARK: - SignatureOf
+public struct SignatureOf<Entity: EntityProtocol & Hashable>: Sendable, Hashable {
+	public let entity: Entity
+	public let factorInstance: FactorInstance
+	public let signature: Signature
+
+	public init(
+		entity: Entity,
+		factorInstance: FactorInstance,
+		signature: Signature
+	) throws {
+		guard factorInstance.derivationPath == signature.derivationPath else {
+			throw Error.derivationPathDiscrepancy
+		}
+		guard factorInstance.publicKey == signature.signatureWithPublicKey.publicKey else {
+			throw Error.publicKeyDiscrepancy
+		}
+		self.entity = entity
+		self.factorInstance = factorInstance
+		self.signature = signature
+	}
+
+	enum Error: Swift.Error {
+		case derivationPathDiscrepancy
+		case publicKeyDiscrepancy
+	}
+}
+
+public typealias AccountSignature = SignatureOf<Profile.Network.Account>
+public typealias PersonaSignature = SignatureOf<Profile.Network.Persona>

@@ -5,11 +5,11 @@ enum DappInteraction {}
 
 // MARK: DappInteraction.NumberOfAccounts
 extension DappInteraction {
-	typealias NumberOfAccounts = P2P.FromDapp.WalletInteraction.NumberOfAccounts
+	typealias NumberOfAccounts = P2P.Dapp.Request.NumberOfAccounts
 }
 
 // MARK: - DappMetadata
-struct DappMetadata: Sendable, Hashable {
+struct DappMetadata: Sendable, Hashable, Codable {
 	static let defaultName = NonEmptyString(rawValue: L10n.DApp.Metadata.unknownName)!
 
 	let name: NonEmpty<String>
@@ -33,8 +33,8 @@ extension DappMetadata {
 }
 #endif
 
-// MARK: - P2P.FromDapp.WalletRequestItem
-extension P2P.FromDapp.WalletInteraction {
+// MARK: - P2P.Dapp.Request.WalletRequestItem
+extension P2P.Dapp.Request {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
 	enum AnyInteractionItem: Sendable, Hashable {
 		// requests
@@ -97,8 +97,8 @@ extension P2P.FromDapp.WalletInteraction {
 	}
 }
 
-// MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
-extension P2P.ToDapp.WalletInteractionSuccessResponse {
+// MARK: - P2P.Dapp.Response.WalletInteractionSuccessResponse.AnyInteractionResponseItem
+extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	enum AnyInteractionResponseItem: Sendable, Hashable {
 		// request responses
 		case auth(AuthRequestResponseItem)
@@ -112,8 +112,8 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	}
 
 	init?(
-		for interaction: P2P.FromDapp.WalletInteraction,
-		with items: some Collection<P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem>
+		for interaction: P2P.Dapp.Request,
+		with items: some Collection<P2P.Dapp.Response.WalletInteractionSuccessResponse.AnyInteractionResponseItem>
 	) {
 		switch interaction.items {
 		case .request:

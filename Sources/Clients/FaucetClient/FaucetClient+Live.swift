@@ -1,7 +1,10 @@
 import ClientPrelude
+import Cryptography
 import EngineToolkitClient
+import EngineToolkitModels
 import GatewayAPI
 import GatewaysClient
+import SubmitTransactionClient
 import TransactionClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
@@ -41,18 +44,43 @@ extension FaucetClient: DependencyKey {
 			await isAllowedToUseFaucetIfSoGetEpochs(accountAddress: accountAddress) != nil
 		}
 
+		/// This function can ONLY sign transaction which does not spend funds or otherwise require
+		/// auth, since we use an ephemeral key pair
 		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
 			@Dependency(\.transactionClient) var transactionClient
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
+			@Dependency(\.submitTXClient) var submitTXClient
 
-			let signSubmitTXRequest = SignManifestRequest(
-				manifestToSign: manifest,
-				makeTransactionHeaderInput: .default
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+
+			let ephemeralNotary = Curve25519.Signing.PrivateKey()
+
+			let builtTransactionIntentWithSigners = try await transactionClient.buildTransactionIntent(
+				.init(
+					networkID: networkID,
+					manifest: manifest,
+					isFaucetTransaction: true,
+					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
+				)
 			)
 
-			let _ = try await transactionClient
-				.signAndSubmitTransaction(signSubmitTXRequest)
-				.asyncFlatMap(transform: transactionClient.getTransactionResult)
-				.get()
+			let transactionIntent = builtTransactionIntentWithSigners.intent
+			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
+
+			let notarized = try await transactionClient.notarizeTransaction(.init(
+				intentSignatures: [],
+				compileTransactionIntent: compiledIntent,
+				notary: .curve25519(ephemeralNotary)
+			)
+			)
+
+			let txID = notarized.txID
+			_ = try await submitTXClient.submitTransaction(.init(
+				txID: txID,
+				compiledNotarizedTXIntent: notarized.notarized
+			))
+
+			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
@@ -90,25 +118,46 @@ extension FaucetClient: DependencyKey {
 		#if DEBUG
 		let createFungibleToken: CreateFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			try await signSubmitTX(
-				manifest: engineToolkitClient.manifestForCreateFungibleToken(
-					networkID: networkID,
-					accountAddress: request.recipientAccountAddress,
-					tokenName: request.name,
-					tokenSymbol: request.symbol
-				)
-			)
+			let manifest = try {
+				if request.numberOfTokens == 1 {
+					return try engineToolkitClient.manifestForCreateFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						tokenName: request.name,
+						tokenSymbol: request.symbol
+					)
+				} else {
+					return try engineToolkitClient.manifestForMultipleCreateFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						tokensCount: request.numberOfTokens
+					)
+				}
+			}()
+
+			try await signSubmitTX(manifest: manifest)
 		}
 
 		let createNonFungibleToken: CreateNonFungibleToken = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			try await signSubmitTX(
-				manifest: engineToolkitClient.manifestForCreateNonFungibleToken(
-					networkID: networkID,
-					accountAddress: request.recipientAccountAddress,
-					nftName: request.name
-				)
-			)
+			let manifest = try {
+				if request.numberOfTokens == 1 {
+					return try engineToolkitClient.manifestForCreateNonFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						nftName: request.name
+					)
+				} else {
+					return try engineToolkitClient.manifestForCreateMultipleNonFungibleToken(
+						networkID: networkID,
+						accountAddress: request.recipientAccountAddress,
+						tokensCount: request.numberOfTokens,
+						idsCount: request.numberOfIds
+					)
+				}
+			}()
+
+			try await signSubmitTX(manifest: manifest)
 		}
 
 		return Self(

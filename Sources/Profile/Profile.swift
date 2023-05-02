@@ -24,7 +24,12 @@ extension ProfileSnapshot.Version {
 	/// - 23: Replace `SHA256` hash for FactorSource with `Blake2`
 	/// - 24: Add `isDeveloperModeEnabled` to AppPreferences.
 	/// - 25: Merge two conflicting Profile versions together.
-	public static let minimum: Self = 25
+	/// - 26: Change Factor Source Storage codable (remove key "properties"). Remove `storage` for "olympia" `.device` factor sources
+	/// - 27: Rename `iCloudProfileSyncEnabled` -> `isCloudProfileSyncEnabled` to be platform agnostic.
+	/// - 28: CAP26 update (new KeyType values)
+	/// - 29: Change FactorSource, split `hint` into (`label`, `description`) tuple.
+	/// - 30: Fix critical bug where identity derivation path was used for account
+	public static let minimum: Self = 30
 }
 
 // MARK: - Profile

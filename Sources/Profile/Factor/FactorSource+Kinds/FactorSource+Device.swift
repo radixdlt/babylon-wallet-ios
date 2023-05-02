@@ -1,80 +1,84 @@
 import Cryptography
+import EngineToolkit
 import Prelude
 
 // MARK: FactorSources
 extension FactorSource {
 	public static func device(
 		mnemonic: Mnemonic,
-		hint: NonEmptyString,
+		label: FactorSource.Label,
+		description: FactorSource.Description,
 		bip39Passphrase: String = "",
-		olympiaCompatible: Bool
-	) throws -> Self {
-		try Self(
+		olympiaCompatible: Bool,
+		storage: Storage?
+	) throws -> HDOnDeviceFactorSource {
+		let factorSource = try Self(
 			kind: .device,
 			id: id(fromRoot: mnemonic.hdRoot(passphrase: bip39Passphrase)),
-			hint: hint,
+			label: label,
+			description: description,
 			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
-			storage: .forDevice(.init())
+			storage: storage
 		)
+		return try HDOnDeviceFactorSource(factorSource: factorSource)
+	}
+
+	public static func babylon(
+		mnemonic: Mnemonic,
+		bip39Passphrase: String = "",
+		label: FactorSource.Label = "iPhone",
+		description: FactorSource.Description = "babylon"
+	) throws -> BabylonDeviceFactorSource {
+		let hdOnDeviceFactorSource = try Self.device(
+			mnemonic: mnemonic,
+			label: label, // will be changed by ProfileStore to *device* **name**
+			description: description, // will be changed by ProfileStore to *device* **model**
+			bip39Passphrase: bip39Passphrase,
+			olympiaCompatible: false,
+			storage: .entityCreating(.init())
+		)
+		return try BabylonDeviceFactorSource(hdOnDeviceFactorSource: hdOnDeviceFactorSource)
 	}
 
 	public static func babylon(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		hint: NonEmptyString = "babylon"
-	) throws -> Self {
+		label: FactorSource.Label = "iPhone",
+		description: FactorSource.Description = "babylon"
+	) throws -> BabylonDeviceFactorSource {
 		try babylon(
 			mnemonic: mnemonicWithPassphrase.mnemonic,
 			bip39Passphrase: mnemonicWithPassphrase.passphrase,
-			hint: hint
+			label: label,
+			description: description
 		)
 	}
 
-	public static func babylon(
+	public static func olympia(
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = "",
-		hint: NonEmptyString = "babylon"
-	) throws -> Self {
-		try .device(
+		label: FactorSource.Label = "iPhone",
+		description: FactorSource.Description = "olympia"
+	) throws -> HDOnDeviceFactorSource {
+		try device(
 			mnemonic: mnemonic,
-			hint: hint, // will be changed by ProfileStore to device model+name
+			label: label, // will be changed by ProfileStore to *device* **name**
+			description: description, // will be changed by ProfileStore to *device* **model**
 			bip39Passphrase: bip39Passphrase,
-			olympiaCompatible: false
+			olympiaCompatible: true,
+			storage: nil
 		)
 	}
 
 	public static func olympia(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		hint: NonEmptyString = "olympia"
-	) throws -> Self {
+		label: FactorSource.Label = "iPhone",
+		description: FactorSource.Description = "olympia"
+	) throws -> HDOnDeviceFactorSource {
 		try olympia(
 			mnemonic: mnemonicWithPassphrase.mnemonic,
 			bip39Passphrase: mnemonicWithPassphrase.passphrase,
-			hint: hint
-		)
-	}
-
-	public static func olympia(
-		mnemonic: Mnemonic,
-		bip39Passphrase: String = "",
-		hint: NonEmptyString = "olympia"
-	) throws -> Self {
-		try device(
-			mnemonic: mnemonic,
-			hint: hint, // will be changed by ProfileStore to device model+name
-			bip39Passphrase: bip39Passphrase,
-			olympiaCompatible: true
-		)
-	}
-
-	public static func trustedContact(
-		publicKey: SLIP10.PublicKey,
-		nameOfContact: NonEmpty<String>
-	) throws -> Self {
-		try Self(
-			kind: .trustedContact,
-			id: id(publicKey: publicKey),
-			hint: nameOfContact,
-			parameters: .default // unsure about this, should we pass `nil`?
+			label: label,
+			description: description
 		)
 	}
 }

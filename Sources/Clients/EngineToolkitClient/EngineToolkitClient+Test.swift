@@ -15,11 +15,13 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		compileSignedTransactionIntent: { _ in .init(bytes: [0xDE, 0xAD]) },
 		compileNotarizedTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
+		decompileTransactionIntent: { _ in throw NoopError() },
+		decompileNotarizedTransactionIntent: { _ in throw NoopError() },
+		deriveOlympiaAdressFromPublicKey: { _ in throw NoopError() },
 		generateTXID: { _ in "deadbeef" },
-		accountAddressesNeedingToSignTransaction: { _ in [] },
-		accountAddressesSuitableToPayTransactionFee: { _ in [] },
 		knownEntityAddresses: { _ in throw NoopError() },
-		generateTransactionReview: { _ in throw NoopError() },
+		analyzeManifest: { _ in throw NoopError() },
+		analyzeManifestWithPreviewContext: { _ in throw NoopError() },
 		decodeAddress: { _ in throw NoopError() }
 	)
 
@@ -30,11 +32,13 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileTransactionIntent: unimplemented("\(Self.self).compileTransactionIntent"),
 		compileSignedTransactionIntent: unimplemented("\(Self.self).compileSignedTransactionIntent"),
 		compileNotarizedTransactionIntent: unimplemented("\(Self.self).compileNotarizedTransactionIntent"),
+		decompileTransactionIntent: unimplemented("\(Self.self).decompileTransactionIntent"),
+		decompileNotarizedTransactionIntent: unimplemented("\(Self.self).decompileNotarizedTransactionIntent"),
+		deriveOlympiaAdressFromPublicKey: unimplemented("\(Self.self).deriveOlympiaAdressFromPublicKey"),
 		generateTXID: unimplemented("\(Self.self).generateTXID"),
-		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction"),
-		accountAddressesSuitableToPayTransactionFee: unimplemented("\(Self.self).accountAddressesSuitableToPayTransactionFee"),
 		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses"),
-		generateTransactionReview: unimplemented("\(Self.self).generateTransactionReview"),
+		analyzeManifest: unimplemented("\(Self.self).analyzeManifest"),
+		analyzeManifestWithPreviewContext: unimplemented("\(Self.self).analyzeManifestWithPreviewContext"),
 		decodeAddress: unimplemented("\(Self.self).decodeAddress")
 	)
 }

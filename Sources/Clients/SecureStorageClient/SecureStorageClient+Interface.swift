@@ -29,6 +29,7 @@ extension SecureStorageClient {
 	public enum LoadMnemonicPurpose: Sendable, Equatable, CustomStringConvertible {
 		case signTransaction
 		case signAuthChallenge
+		case importOlympiaAccounts
 		case createEntity(kind: EntityKind)
 
 		/// Check if account(/persona) recovery is needed
@@ -40,6 +41,8 @@ extension SecureStorageClient {
 
 		public var description: String {
 			switch self {
+			case .importOlympiaAccounts:
+				return "importOlympiaAccounts"
 			case let .createEntity(kind):
 				return "createEntity.\(kind)"
 			case .signAuthChallenge:

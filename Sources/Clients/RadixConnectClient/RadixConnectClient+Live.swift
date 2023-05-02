@@ -1,4 +1,5 @@
 import ClientPrelude
+import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Network
 import P2PLinksClient
 import RadixConnect
@@ -10,6 +11,23 @@ extension RadixConnectClient {
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
+		let getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates = {
+			await rtcClients.connectClients().map { connectedClients in
+				let links = await p2pLinksClient.getP2PLinks()
+				return connectedClients.compactMap { (clientUpdate: P2P.ClientConnectionsUpdate) -> P2P.LinkConnectionUpdate? in
+					guard let link = links.first(where: { $0.id == clientUpdate.clientID }) else {
+						return nil
+					}
+					return P2P.LinkConnectionUpdate(
+						link: link,
+						idsOfConnectedPeerConnections: clientUpdate.idsOfConnectedPeerConnections
+					)
+				}
+			}
+			.share()
+			.eraseToAnyAsyncSequence()
+		}
+
 		return Self(
 			loadFromProfileAndConnectAll: {
 				Task {
@@ -20,6 +38,7 @@ extension RadixConnectClient {
 						)
 					}
 				}
+				return await getP2PLinksWithConnectionStatusUpdates()
 			},
 			disconnectAndRemoveAll: {
 				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
@@ -40,6 +59,7 @@ extension RadixConnectClient {
 			getP2PLinks: {
 				await OrderedSet(p2pLinksClient.getP2PLinks())
 			},
+			getP2PLinksWithConnectionStatusUpdates: getP2PLinksWithConnectionStatusUpdates,
 			storeP2PLink: { client in
 				try await p2pLinksClient.addP2PLink(client)
 			},
@@ -51,12 +71,39 @@ extension RadixConnectClient {
 			addP2PWithPassword: { password in
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
-			receiveMessages: { await rtcClients.incomingMessages },
-			sendMessage: { outgoingMsg in
-				try await rtcClients.sendMessage(outgoingMsg)
+			receiveMessages: { await rtcClients.incomingMessages() },
+			sendResponse: { response, route in
+				try await rtcClients.sendResponse(response, to: route)
+			},
+			sendRequest: { request, strategy in
+				try await rtcClients.sendRequest(request, strategy: strategy)
 			}
 		)
 	}()
+}
+
+extension AsyncSequence where AsyncIterator: Sendable, Element == P2P.RTCIncomingMessage {
+	func compactMap<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		compactMap { $0.unpackMap(casePath.extract) }
+			.share()
+			.eraseToAnyAsyncSequence()
+	}
+}
+
+extension RadixConnectClient {
+	public func receiveRequests<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer.Request, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.request .. casePath)
+	}
+
+	public func receiveResponses<Case>(
+		_ casePath: CasePath<P2P.RTCMessageFromPeer.Response, Case>
+	) async -> AnyAsyncSequence<P2P.RTCIncomingMessageContainer<Case>> {
+		await receiveMessages().compactMap(/P2P.RTCMessageFromPeer.response .. casePath)
+	}
 }
 
 // MARK: - LocalNetworkAuthorization

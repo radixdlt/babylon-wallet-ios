@@ -38,19 +38,55 @@ extension Profile.Network {
 			address: EntityAddress,
 			securityState: EntitySecurityState,
 			displayName: NonEmpty<String>,
-			fields: IdentifiedArrayOf<Field>
+			extraProperties: ExtraProperties
 		) {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
-			self.fields = fields
+			self.fields = extraProperties.fields
 			self.displayName = displayName
+		}
+
+		public init(
+			networkID: NetworkID,
+			address: EntityAddress,
+			securityState: EntitySecurityState,
+			displayName: NonEmpty<String>
+		) {
+			self.init(
+				networkID: networkID,
+				address: address,
+				securityState: securityState,
+				displayName: displayName,
+				fields: []
+			)
 		}
 	}
 }
 
 extension Profile.Network.Persona {
+	/// Ephemeral, only used as arg passed to init.
+	public struct ExtraProperties: Sendable, Hashable, Codable {
+		public var fields: IdentifiedArrayOf<Field>
+		public init(fields: IdentifiedArrayOf<Field> = []) {
+			self.fields = fields
+		}
+	}
+
+	public init(
+		networkID: NetworkID,
+		address: EntityAddress,
+		securityState: EntitySecurityState,
+		displayName: NonEmpty<String>,
+		fields: IdentifiedArrayOf<Field>
+	) {
+		self.init(networkID: networkID, address: address, securityState: securityState, displayName: displayName, extraProperties: .init(fields: fields))
+	}
+
 	public static var entityKind: EntityKind { .identity }
+
+	/// Noop
+	public mutating func updateAppearanceIDIfAble(_: Profile.Network.Account.AppearanceID) {}
 
 	public typealias EntityAddress = IdentityAddress
 
@@ -132,11 +168,18 @@ import EngineToolkit
 extension Profile.Network.Persona {
 	public static func deriveAddress(
 		networkID: NetworkID,
-		publicKey: SLIP10.PublicKey
+		factorInstance: FactorInstance
 	) throws -> EntityAddress {
+		if let derivationPath = factorInstance.derivationPath {
+			let path = try derivationPath.asIdentityPath()
+			guard path.entityKind == .identity else {
+				throw WrongEntityInDerivationPath()
+			}
+		}
+
 		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(
 			request: .init(
-				publicKey: publicKey.intoEngine(),
+				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID
 			)
 		).get()

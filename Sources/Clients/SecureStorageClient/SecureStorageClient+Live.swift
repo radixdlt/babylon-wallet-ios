@@ -90,9 +90,16 @@ extension SecureStorageClient: DependencyKey {
 
 		return Self(
 			saveProfileSnapshot: { profileSnapshot in
-				try await saveProfile(
-					snapshot: profileSnapshot,
-					iCloudSyncEnabled: profileSnapshot.appPreferences.security.iCloudProfileSyncEnabled.rawValue
+				let data = try jsonEncoder().encode(profileSnapshot)
+				try await keychainClient.setDataWithoutAuthForKey(
+					KeychainClient.SetItemWithoutAuthRequest(
+						data: data,
+						key: profileSnapshotKeychainKey,
+						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled,
+						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
+						label: "Radix Wallet Data",
+						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
+					)
 				)
 			},
 			loadProfileSnapshotData: loadProfileSnapshotData,
@@ -110,7 +117,7 @@ extension SecureStorageClient: DependencyKey {
 					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
 					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy, // can be nil
 					label: "Radix Wallet Factor Secret",
-					comment: .init("Factor hint: \(factorSource.hint)")
+					comment: .init("Created on \(factorSource.description.rawValue) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
 				)
 			},
 			loadMnemonicByFactorSourceID: { factorSourceID, purpose in
@@ -126,6 +133,8 @@ extension SecureStorageClient: DependencyKey {
 					#if DEBUG
 					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
 					#endif
+					case .importOlympiaAccounts:
+						return L10n.Common.BiometricsPrompt.importOlympiaAccounts
 					}
 				}()
 				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."

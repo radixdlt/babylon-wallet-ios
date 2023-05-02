@@ -1,5 +1,5 @@
-import struct AccountPortfolioFetcherClient.AccountPortfolio // TODO: move to some new model package
-import AccountsClient
+import AccountPortfoliosClient
+import FactorSourcesClient
 import FeaturePrelude
 
 // MARK: - AccountList.Row
@@ -9,42 +9,35 @@ extension AccountList {
 			public var id: AccountAddress { account.address }
 
 			public let account: Profile.Network.Account
-			public var aggregatedValue: BigDecimal?
-			public var portfolio: AccountPortfolio
 
-			// MARK: - AppSettings properties
-			public var currency: FiatCurrency
-			public var isCurrencyAmountVisible: Bool
+			public var portfolio: Loadable<AccountPortfolio>
+
+			public var shouldShowSecurityPrompt = false
 
 			public init(
-				account: Profile.Network.Account,
-				aggregatedValue: BigDecimal?,
-				portfolio: AccountPortfolio,
-				currency: FiatCurrency,
-				isCurrencyAmountVisible: Bool
+				account: Profile.Network.Account
 			) {
-				precondition(account.address == portfolio.owner)
 				self.account = account
-				self.aggregatedValue = aggregatedValue
-				self.portfolio = portfolio
-				self.currency = currency
-				self.isCurrencyAmountVisible = isCurrencyAmountVisible
-			}
-
-			public init(account: Profile.Network.Account) {
-				self.init(
-					account: account,
-					aggregatedValue: nil,
-					portfolio: .empty(owner: account.address),
-					currency: .usd,
-					isCurrencyAmountVisible: false
-				)
+				self.portfolio = .loading
 			}
 		}
 
 		public enum ViewAction: Sendable, Equatable {
 			case copyAddressButtonTapped
 			case tapped
+			case task
+			case securityPromptTapped
+		}
+
+		public enum InternalAction: Sendable, Equatable {
+			case accountPortfolioUpdate(AccountPortfolio)
+			case displaySecurityPrompting
+		}
+
+		public enum DelegateAction: Sendable, Equatable {
+			case copyAddressButtonTapped(Profile.Network.Account)
+			case tapped(Profile.Network.Account)
+			case securityPromptTapped(Profile.Network.Account)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -56,16 +49,63 @@ extension AccountList {
 
 		public init() {}
 
-		public var body: some ReducerProtocolOf<Self> {
-			Reduce(core)
-		}
+		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
+			case .task:
+				let accountAddress = state.account.address
+				state.portfolio = .loading
+				return .run { send in
+					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
+						guard !Task.isCancelled else {
+							return
+						}
+						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
+					}
+				}
 			case .copyAddressButtonTapped:
-				return .send(.delegate(.copyAddress))
+				return .send(.delegate(.copyAddressButtonTapped(state.account)))
+			case .securityPromptTapped:
+				return .send(.delegate(.securityPromptTapped(state.account)))
 			case .tapped:
-				return .send(.delegate(.selected))
+				return .send(.delegate(.tapped(state.account)))
+			}
+		}
+
+		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+			switch internalAction {
+			case .displaySecurityPrompting:
+				state.shouldShowSecurityPrompt = true
+				return .none
+			case let .accountPortfolioUpdate(portfolio):
+				assert(portfolio.owner == state.account.address)
+				state.portfolio = .success(portfolio)
+
+				guard let xrdResource = portfolio.fungibleResources.xrdResource, xrdResource.amount > .zero else {
+					state.shouldShowSecurityPrompt = false
+					return .none
+				}
+
+				return checkIfDeviceFactorSourceControls(factorInstance: state.account.factorInstance)
+			}
+		}
+
+		private func checkIfDeviceFactorSourceControls(factorInstance: FactorInstance) -> EffectTask<Action> {
+			.run { send in
+				let allFactorSources = try await factorSourcesClient.getFactorSources()
+				guard
+					let factorSource = allFactorSources[id: factorInstance.factorSourceID]
+				else {
+					loggerGlobal.warning("Did not find factor source for factor instance.")
+					return
+				}
+				guard factorSource.kind == .device else {
+					// probably ledger account
+					return
+				}
+				await send(.internal(.displaySecurityPrompting))
 			}
 		}
 	}

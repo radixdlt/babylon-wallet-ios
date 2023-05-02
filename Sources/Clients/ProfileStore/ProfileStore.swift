@@ -117,7 +117,7 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying async sequence of distinct Personas for the currently selected network.
-	public func personaValues() async -> AnyAsyncSequence<Profile.Network.Personas> {
+	public func personaValues() -> AnyAsyncSequence<Profile.Network.Personas> {
 		lens {
 			$0.profile.network?.personas
 		}
@@ -282,14 +282,15 @@ extension ProfileStore.ProfileState {
 extension ProfileStore {
 	#if !canImport(UIKit)
 	/// used by tests
-	internal static let macOSDeviceDescriptionFallback: NonEmptyString = "macOS"
+	internal static let macOSDeviceDescriptionFallback: FactorSource.Description = "macOS"
+	internal static let macOSDeviceLabelFallback: FactorSource.Label = "macOS"
 	#endif
 
 	internal static func deviceDescription(
-		deviceGivenName: String,
-		deviceModel: String
+		label: FactorSource.Label,
+		description: FactorSource.Description
 	) -> NonEmptyString {
-		"\(deviceGivenName) (\(deviceModel))"
+		"\(label.rawValue) (\(description.rawValue))"
 	}
 }
 
@@ -379,21 +380,26 @@ extension ProfileStore {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		do {
-			let deviceDescription: NonEmptyString
+			let label: FactorSource.Label
+			let description: FactorSource.Description
 			#if canImport(UIKit)
 			@Dependency(\.device) var device
-			let deviceGivenName = await device.name
+			/// we use name as label and model as description
+			let deviceName = await device.name
 			let deviceModel = await device.model
-			deviceDescription = Self.deviceDescription(deviceGivenName: deviceGivenName, deviceModel: deviceModel)
+			label = .init(rawValue: deviceName)
+			description = .init(rawValue: deviceModel)
 			#else
-			deviceDescription = macOSDeviceDescriptionFallback
+			label = macOSDeviceLabelFallback
+			description = macOSDeviceDescriptionFallback
 			#endif
 
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic)
 			let factorSource = try FactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hint: deviceDescription
+				label: label,
+				description: description
 			)
 
 			// We eagerly save the factor source here because we wanna use the same flow for
@@ -402,12 +408,12 @@ extension ProfileStore {
 			// profile, since it contains no network yet (no account).
 			try await secureStorageClient.saveMnemonicForFactorSource(PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hdOnDeviceFactorSource: .init(factorSource: factorSource)
+				hdOnDeviceFactorSource: factorSource.hdOnDeviceFactorSource
 			))
 
 			loggerGlobal.debug("Created new profile with factorSourceID: \(factorSource.id)")
 
-			return Profile(factorSource: factorSource, creatingDevice: deviceDescription)
+			return Profile(factorSource: factorSource.factorSource, creatingDevice: deviceDescription(label: label, description: description))
 
 		} catch {
 			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"

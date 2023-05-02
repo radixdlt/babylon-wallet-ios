@@ -15,7 +15,11 @@ public struct CallMethod: InstructionProtocol {
 
 	// MARK: Init
 
-	public init(receiver: ComponentAddress, methodName: String, arguments: [ManifestASTValue] = []) {
+	public init(
+		receiver: ComponentAddress,
+		methodName: String,
+		arguments: [ManifestASTValue] = []
+	) {
 		self.receiver = receiver.asGeneral
 		self.methodName = methodName
 		self.arguments = arguments
@@ -33,6 +37,7 @@ public struct CallMethod: InstructionProtocol {
 		)
 	}
 
+	#if swift(<5.8)
 	public init(
 		receiver: ComponentAddress,
 		methodName: String,
@@ -56,6 +61,8 @@ public struct CallMethod: InstructionProtocol {
 			arguments: [try buildValue()]
 		)
 	}
+
+	#endif
 }
 
 extension CallMethod {

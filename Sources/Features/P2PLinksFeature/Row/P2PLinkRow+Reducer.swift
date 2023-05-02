@@ -23,9 +23,6 @@ public struct P2PLinkRow: Sendable, FeatureReducer {
 		case deleteConnection
 	}
 
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.radixConnectClient) var radixConnectClient
-
 	public init() {}
 
 	private enum ConnectionUpdateTasksID {}

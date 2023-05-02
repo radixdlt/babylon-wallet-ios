@@ -3,7 +3,7 @@ import TestingPrelude
 
 final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {
-		let sut = P2P.ToDapp.WalletInteractionResponse.success(.init(
+		let sut = P2P.Dapp.Response.success(.init(
 			interactionId: "an_id",
 			items: .request(
 				.unauthorized(.init(
@@ -79,7 +79,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.FromDapp.WalletInteraction(
+			P2P.Dapp.Request(
 				id: "791638de-cefa-43a8-9319-aa31c582fc7d",
 				items: .request(
 					.unauthorized(.init(
@@ -120,7 +120,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.FromDapp.WalletInteraction(
+			P2P.Dapp.Request(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .transaction(.init(
 					send: .init(

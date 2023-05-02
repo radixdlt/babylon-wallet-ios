@@ -1,15 +1,15 @@
-import CryptoKit
+import EngineToolkit
 import Foundation
 import RadixConnectModels
 
 extension Data {
-	var hash: Data {
-		Data(SHA256.hash(data: self))
+	func hash() throws -> Data {
+		try blake2b(data: self)
 	}
 }
 
 extension ConnectionPassword {
-	var hash: Data {
-		self.data.data.hash
+	func hash() throws -> Data {
+		try self.data.data.hash()
 	}
 }

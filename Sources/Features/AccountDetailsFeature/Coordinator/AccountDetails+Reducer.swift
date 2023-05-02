@@ -1,51 +1,25 @@
-import AccountListFeature
+import AccountPortfoliosClient
 import AccountPreferencesFeature
-import AssetsViewFeature
-import AssetTransferFeature
 import FeaturePrelude
-import FungibleTokenListFeature
-import NonFungibleTokenListFeature
+import SharedModels
 
 public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let account: Profile.Network.Account
+		var account: Profile.Network.Account
 		public var assets: AssetsView.State
+		public var isLoadingResources: Bool = false
 
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(for account: AccountList.Row.State) {
-			self.account = account.account
-
-			let fungibleTokenCategories = account.portfolio.fungibleTokenContainers.elements.sortedIntoCategories()
-
-			assets = .init(
-				fungibleTokenList: .init(
-					sections: .init(uniqueElements: fungibleTokenCategories.map { category in
-						let rows = category.tokenContainers.map { container in
-							FungibleTokenList.Row.State(
-								container: container,
-								currency: account.currency,
-								isCurrencyAmountVisible: account.isCurrencyAmountVisible
-							)
-						}
-						return FungibleTokenList.Section.State(
-							id: category.type,
-							assets: .init(uniqueElements: rows)
-						)
-					})
-				),
-
-				nonFungibleTokenList: .init(
-					rows: .init(uniqueElements: account.portfolio.nonFungibleTokenContainers.elements.map {
-						.init(container: $0)
-					})
-				)
-			)
+		public init(for account: Profile.Network.Account) {
+			self.account = account
+			self.assets = AssetsView.State.defaultEmpty()
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case task
 		case appeared
 		case backButtonTapped
 		case preferencesButtonTapped
@@ -65,28 +39,33 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case refresh(AccountAddress)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case portfolioUpdated(AccountPortfolio)
+	}
+
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
-			case transfer(AssetTransfer.State)
+			// case transfer(AssetTransfer.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case preferences(AccountPreferences.Action)
-			case transfer(AssetTransfer.Action)
+			// case transfer(AssetTransfer.Action)
 		}
 
 		public var body: some ReducerProtocol<State, Action> {
 			Scope(state: /State.preferences, action: /Action.preferences) {
 				AccountPreferences()
 			}
-			Scope(state: /State.transfer, action: /Action.transfer) {
-				AssetTransfer()
-			}
+//			Scope(state: /State.transfer, action: /Action.transfer) {
+//				AssetTransfer()
+//			}
 		}
 	}
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 	public init() {}
 
@@ -103,8 +82,17 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
+		case .task:
+			return .run { [address = state.account.address] send in
+				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address) {
+					guard !Task.isCancelled else {
+						return
+					}
+					await send(.internal(.portfolioUpdated(portfolio)))
+				}
+			}
 		case .appeared:
-			return .send(.delegate(.refresh(state.account.address)))
+			return .none
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .preferencesButtonTapped:
@@ -115,7 +103,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				pasteboardClient.copyString(state.account.address.address)
 			}
 		case .pullToRefreshStarted:
-			return .send(.delegate(.refresh(state.account.address)))
+			return .run { [address = state.account.address] _ in
+				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
+			}
 		case .transferButtonTapped:
 			// FIXME: fix post betanet v2
 //			state.destination = .transfer(AssetTransfer.State(from: state.account))
@@ -128,7 +118,24 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .destination(.presented(.preferences(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
+		case .assets(.child(.fungibleTokenList(.delegate))):
+			return .none
 		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .portfolioUpdated(portfolio):
+			let xrd = portfolio.fungibleResources.xrdResource.map(FungibleTokenList.Row.State.init(xrdToken:))
+			let nonXrd = portfolio.fungibleResources.nonXrdResources.map(FungibleTokenList.Row.State.init(nonXRDToken:))
+			let nfts = portfolio.nonFungibleResources.map(NonFungibleTokenList.Row.State.init(token:))
+
+			state.assets = .init(
+				fungibleTokenList: .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd)),
+				nonFungibleTokenList: .init(rows: .init(uniqueElements: nfts))
+			)
 			return .none
 		}
 	}

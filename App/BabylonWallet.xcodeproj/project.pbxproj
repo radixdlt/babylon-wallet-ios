@@ -10,6 +10,8 @@
 		837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 837BC3C629BB28CF0082C363 /* P2PLinksClientLive */; };
 		83B9D894294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
+		A45AB03129FD96530097F5E1 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A45AB03029FD96530097F5E1 /* URLFormatterClientLive */; };
+		A4DD048329FABBC20052FCB0 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5B176A029267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5D0A22529CB50A100772231 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = D5D0A22429CB50A100772231 /* P2PLinksClientLive */; };
@@ -74,6 +76,7 @@
 				E6203E4829B1E943000B8784 /* GatewaysClientLive in Frameworks */,
 				E6A07C5929DD738A0082782B /* UseFactorSourceClientLive in Frameworks */,
 				837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */,
+				A4DD048329FABBC20052FCB0 /* URLFormatterClientLive in Frameworks */,
 				E6203E4A29B1E943000B8784 /* OnboardingClientLive in Frameworks */,
 				E6203E4429B1E943000B8784 /* AuthorizedDappsClientLive in Frameworks */,
 				E6203E4E29B1E943000B8784 /* PersonasClientLive in Frameworks */,
@@ -90,6 +93,7 @@
 				E6203E6429B1E96A000B8784 /* AccountsClientLive in Frameworks */,
 				E6203E6C29B1E96A000B8784 /* GatewaysClientLive in Frameworks */,
 				D5D0A22529CB50A100772231 /* P2PLinksClientLive in Frameworks */,
+				A45AB03129FD96530097F5E1 /* URLFormatterClientLive in Frameworks */,
 				E6203E6E29B1E96A000B8784 /* OnboardingClientLive in Frameworks */,
 				E6203E6829B1E96A000B8784 /* AuthorizedDappsClientLive in Frameworks */,
 				E6203E7229B1E96A000B8784 /* PersonasClientLive in Frameworks */,
@@ -217,7 +221,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				E6A07C5729DD73830082782B /* PBXTargetDependency */,
+				A4DD048129FABBB70052FCB0 /* PBXTargetDependency */,
 				E6203E5229B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5429B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5629B1E957000B8784 /* PBXTargetDependency */,
@@ -239,7 +243,7 @@
 				E6203E4929B1E943000B8784 /* OnboardingClientLive */,
 				E6203E4D29B1E943000B8784 /* PersonasClientLive */,
 				837BC3C629BB28CF0082C363 /* P2PLinksClientLive */,
-				E6A07C5829DD738A0082782B /* UseFactorSourceClientLive */,
+				A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -256,6 +260,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				A45AB02F29FD964B0097F5E1 /* PBXTargetDependency */,
 				E6203E7629B1E97A000B8784 /* PBXTargetDependency */,
 				E6203E7829B1E97A000B8784 /* PBXTargetDependency */,
 				E6203E7A29B1E97A000B8784 /* PBXTargetDependency */,
@@ -277,6 +282,7 @@
 				E6203E6D29B1E96A000B8784 /* OnboardingClientLive */,
 				E6203E7129B1E96A000B8784 /* PersonasClientLive */,
 				D5D0A22429CB50A100772231 /* P2PLinksClientLive */,
+				A45AB03029FD96530097F5E1 /* URLFormatterClientLive */,
 			);
 			productName = "Wallet (macOS)";
 			productReference = E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -362,6 +368,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		A45AB02F29FD964B0097F5E1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A45AB02E29FD964B0097F5E1 /* URLFormatterClientLive */;
+		};
+		A4DD048129FABBB70052FCB0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */;
+		};
 		E6203E5029B1E951000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = E6203E4F29B1E951000B8784 /* AppFeature */;
@@ -582,6 +596,22 @@
 		837BC3C629BB28CF0082C363 /* P2PLinksClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = P2PLinksClientLive;
+		};
+		A45AB02E29FD964B0097F5E1 /* URLFormatterClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = URLFormatterClientLive;
+		};
+		A45AB03029FD96530097F5E1 /* URLFormatterClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = URLFormatterClientLive;
+		};
+		A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = URLFormatterClientLive;
+		};
+		A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = URLFormatterClientLive;
 		};
 		D5D0A22429CB50A100772231 /* P2PLinksClientLive */ = {
 			isa = XCSwiftPackageProductDependency;

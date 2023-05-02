@@ -4,7 +4,7 @@ import Prelude
 extension HD.Root {
 	public func derivePrivateKey(
 		path: DerivationPath,
-		curve: Slip10Curve
+		curve: SLIP10.Curve
 	) throws -> SLIP10.PrivateKey {
 		// FIXME: CLEAN THIS UP!
 		let path = try HD.Path.Full(string: path.path)
@@ -20,7 +20,7 @@ extension HD.Root {
 
 	public func derivePublicKey(
 		path: DerivationPath,
-		curve: Slip10Curve
+		curve: SLIP10.Curve
 	) throws -> SLIP10.PublicKey {
 		try derivePrivateKey(path: path, curve: curve).publicKey()
 	}

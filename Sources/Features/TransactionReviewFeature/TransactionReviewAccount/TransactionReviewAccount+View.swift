@@ -97,7 +97,7 @@ public struct TransactionDetailsView: View {
 		case .fungible:
 			TransactionReviewTokenView(viewState: .init(
 				name: viewState.metadata.name,
-				thumbnail: viewState.metadata.thumbnail,
+				thumbnail: viewState.thumbnail,
 				amount: viewState.amount,
 				guaranteedAmount: viewState.guarantee?.amount,
 				fiatAmount: viewState.metadata.fiatAmount
@@ -113,13 +113,8 @@ public struct TransactionDetailsView: View {
 
 		var body: some View {
 			HStack(spacing: .small1) {
-				if let thumbnail {
-					NFTPlaceholder(size: .small) // TODO:  Actually use URL
-						.padding(.vertical, .small1)
-				} else {
-					NFTPlaceholder(size: .small)
-						.padding(.vertical, .small1)
-				}
+				NFTThumbnail(thumbnail, size: .small)
+					.padding(.vertical, .small1)
 
 				if let name {
 					Text(name)

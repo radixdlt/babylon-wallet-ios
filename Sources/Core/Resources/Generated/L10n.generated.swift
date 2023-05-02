@@ -27,6 +27,8 @@ public enum L10n {
     public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "P2PLinks.sendTestMessageButtonTitle", fallback: "Send Test Msg")
   }
   public enum AccountDetails {
+    /// ID
+    public static let id = L10n.tr("Localizable", "accountDetails.ID", fallback: "ID")
     /// Transfer
     public static let transferButtonTitle = L10n.tr("Localizable", "accountDetails.transferButtonTitle", fallback: "Transfer")
   }
@@ -34,6 +36,10 @@ public enum L10n {
     public enum Row {
       /// Copy
       public static let copyTitle = L10n.tr("Localizable", "accountList.row.copyTitle", fallback: "Copy")
+      /// Legacy
+      public static let legacyAccount = L10n.tr("Localizable", "accountList.row.legacyAccount", fallback: "Legacy")
+      /// Apply Security Settings
+      public static let securityPrompt = L10n.tr("Localizable", "accountList.row.securityPrompt", fallback: "Apply Security Settings")
     }
   }
   public enum AccountPreferences {
@@ -82,6 +88,8 @@ public enum L10n {
       public static func creationOfEntity(_ p1: UnsafePointer<CChar>) -> String {
         return L10n.tr("Localizable", "common.biometricsPrompt.creationOfEntity", p1, fallback: "Authenticate to create new %s with this phone.")
       }
+      /// Validate seed phrase exists.
+      public static let importOlympiaAccounts = L10n.tr("Localizable", "common.biometricsPrompt.importOlympiaAccounts", fallback: "Validate seed phrase exists.")
       /// Authenticate to sign auth chellenge with this phone.
       public static let signAuthChallenge = L10n.tr("Localizable", "common.biometricsPrompt.signAuthChallenge", fallback: "Authenticate to sign auth chellenge with this phone.")
       /// Authenticate to sign transaction with this phone.
@@ -552,6 +560,58 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "home.visitHub.title", fallback: "Ready to get started using the Radix Network and your Wallet?")
     }
   }
+  public enum ImportLegacyWallet {
+    public enum Completion {
+      /// Imported #%@ accounts.
+      public static func title(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "importLegacyWallet.completion.title", String(describing: p1), fallback: "Imported #%@ accounts.")
+      }
+      public enum Button {
+        /// Okay
+        public static let finish = L10n.tr("Localizable", "importLegacyWallet.completion.button.finish", fallback: "Okay")
+      }
+    }
+    public enum Flow {
+      /// Import Legacy Wallet
+      public static let navigationTitle = L10n.tr("Localizable", "importLegacyWallet.flow.navigationTitle", fallback: "Import Legacy Wallet")
+    }
+    public enum ScanQRCodes {
+      /// Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.
+      public static let scanInstructions = L10n.tr("Localizable", "importLegacyWallet.scanQRCodes.scanInstructions", fallback: "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.")
+    }
+    public enum SelectAccountsToImport {
+      public enum AccountRow {
+        public enum Label {
+          /// Type
+          public static let accountType = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.accountType", fallback: "Type")
+          /// Path
+          public static let derivationPath = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.derivationPath", fallback: "Path")
+          /// Name
+          public static let name = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.name", fallback: "Name")
+          /// Olympia Address
+          public static let olympiaAddress = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.label.olympiaAddress", fallback: "Olympia Address")
+        }
+        public enum Value {
+          /// Unnamned
+          public static let nameFallback = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.accountRow.value.nameFallback", fallback: "Unnamned")
+        }
+      }
+      public enum Button {
+        /// Deselect all
+        public static let deselectAll = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.deselectAll", fallback: "Deselect all")
+        /// Import %@ accounts
+        public static func importManyAccounts(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importManyAccounts", String(describing: p1), fallback: "Import %@ accounts")
+        }
+        /// Import one account
+        public static let importOneAcccount = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importOneAcccount", fallback: "Import one account")
+        /// Import accounts
+        public static let importZeroAccounts = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.importZeroAccounts", fallback: "Import accounts")
+        /// Select all non imported
+        public static let selectAllNonImported = L10n.tr("Localizable", "importLegacyWallet.selectAccountsToImport.button.selectAllNonImported", fallback: "Select all non imported")
+      }
+    }
+  }
   public enum ImportProfile {
     /// Import mnemonic
     public static let importMnemonic = L10n.tr("Localizable", "importProfile.importMnemonic", fallback: "Import mnemonic")
@@ -671,10 +731,10 @@ public enum L10n {
     public static let editPersona = L10n.tr("Localizable", "personaDetails.editPersona", fallback: "Edit Persona")
     /// Email Address
     public static let emailAddressHeading = L10n.tr("Localizable", "personaDetails.emailAddressHeading", fallback: "Email Address")
-    /// Family Name
-    public static let familyNameHeading = L10n.tr("Localizable", "personaDetails.familyNameHeading", fallback: "Family Name")
-    /// Given Name
-    public static let givenNameHeading = L10n.tr("Localizable", "personaDetails.givenNameHeading", fallback: "Given Name")
+    /// First Name
+    public static let firstNameHeading = L10n.tr("Localizable", "personaDetails.firstNameHeading", fallback: "First Name")
+    /// Last Name
+    public static let lastNameHeading = L10n.tr("Localizable", "personaDetails.lastNameHeading", fallback: "Last Name")
     /// You are not sharing any personal data with %@
     public static func notSharingAnything(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
@@ -683,8 +743,8 @@ public enum L10n {
     public static func personaDataSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.personaDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
     }
-    /// Persona Label
-    public static let personaLabelHeading = L10n.tr("Localizable", "personaDetails.personaLabelHeading", fallback: "Persona Label")
+    /// Persona Name
+    public static let personaNameHeading = L10n.tr("Localizable", "personaDetails.personaNameHeading", fallback: "Persona Name")
     /// Phone Number
     public static let phoneNumberHeading = L10n.tr("Localizable", "personaDetails.phoneNumberHeading", fallback: "Phone Number")
   }
@@ -727,6 +787,8 @@ public enum L10n {
     public static let gatewaysButtonTitle = L10n.tr("Localizable", "settings.gatewaysButtonTitle", fallback: "Gateways")
     /// App Settings
     public static let generalSettingsButtonTitle = L10n.tr("Localizable", "settings.generalSettingsButtonTitle", fallback: "App Settings")
+    /// Import from a Legacy Wallet
+    public static let importLegacyWallet = L10n.tr("Localizable", "settings.importLegacyWallet", fallback: "Import from a Legacy Wallet")
     /// Inspect Profile
     public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
     /// No Wallet Data Found
@@ -761,10 +823,10 @@ public enum L10n {
     public static let passcodeNotSetUpTitle = L10n.tr("Localizable", "splash.passcodeNotSetUpTitle", fallback: "Passcode not set up")
     public enum Alert {
       public enum PasscodeCheckFailed {
-        /// Cancel
-        public static let cancelButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.cancelButtonTitle", fallback: "Cancel")
         /// Passcode are not set up. Please update settings.
         public static let message = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.message", fallback: "Passcode are not set up. Please update settings.")
+        /// Retry
+        public static let retryButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.retryButtonTitle", fallback: "Retry")
         /// Settings
         public static let settingsButtonTitle = L10n.tr("Localizable", "splash.alert.passcodeCheckFailed.settingsButtonTitle", fallback: "Settings")
         /// Warning

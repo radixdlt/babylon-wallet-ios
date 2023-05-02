@@ -1,16 +1,17 @@
+import CacheClient
 import FeaturePrelude
 import GatewayAPI
 
 // MARK: - DappInteractionLoading
 struct DappInteractionLoading: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let interaction: P2P.FromDapp.WalletInteraction
+		let interaction: P2P.Dapp.Request
 		var isLoading: Bool = false
 
 		@PresentationState
 		var errorAlert: AlertState<ViewAction.ErrorAlertAction>?
 
-		init(interaction: P2P.FromDapp.WalletInteraction) {
+		init(interaction: P2P.Dapp.Request) {
 			self.interaction = interaction
 		}
 	}
@@ -35,7 +36,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	@Dependency(\.gatewayAPIClient) var gatewayAPI
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.cacheClient) var cacheClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -65,7 +67,12 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
 				do {
-					return try await DappMetadata(gatewayAPI.getEntityMetadata(dappDefinitionAddress.address).items)
+					return try await cacheClient.withCaching(
+						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
+						request: {
+							try await DappMetadata(gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items)
+						}
+					)
 				} catch is BadHTTPResponseCode {
 					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {

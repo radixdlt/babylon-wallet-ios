@@ -107,6 +107,7 @@ extension NewEntityCompletion {
 }
 
 private extension NewEntityCompletion.View {
+	@MainActor
 	@ViewBuilder
 	func accountsStackView(
 		with viewStore: ViewStoreOf<NewEntityCompletion>,

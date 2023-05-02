@@ -16,7 +16,7 @@ extension AppPreferences {
 			iCloudProfileSyncEnabled: IsIcloudProfileSyncEnabled = .default,
 			isDeveloperModeEnabled: IsDeveloperModeEnabled = .default
 		) {
-			self.iCloudProfileSyncEnabled = iCloudProfileSyncEnabled
+			self.isCloudProfileSyncEnabled = isCloudProfileSyncEnabled
 			self.isDeveloperModeEnabled = isDeveloperModeEnabled
 		}
 	}
@@ -56,7 +56,7 @@ extension AppPreferences.Security {
 
 	public var description: String {
 		"""
-		iCloudProfileSyncEnabled: \(iCloudProfileSyncEnabled),
+		isCloudProfileSyncEnabled: \(isCloudProfileSyncEnabled),
 		  isDeveloperModeEnabled: \(isDeveloperModeEnabled)
 		"""
 	}

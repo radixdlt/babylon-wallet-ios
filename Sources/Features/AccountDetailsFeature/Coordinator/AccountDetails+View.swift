@@ -1,6 +1,4 @@
 import AccountPreferencesFeature
-import AssetsViewFeature
-import AssetTransferFeature
 import FeaturePrelude
 
 extension AccountDetails.State {
@@ -8,7 +6,8 @@ extension AccountDetails.State {
 		.init(
 			appearanceID: account.appearanceID,
 			address: .init(address: account.address.address, format: .default),
-			displayName: account.displayName.rawValue
+			displayName: account.displayName.rawValue,
+			isLoadingResources: isLoadingResources
 		)
 	}
 }
@@ -19,6 +18,7 @@ extension AccountDetails {
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let address: AddressView.ViewState
 		let displayName: String
+		let isLoadingResources: Bool
 	}
 
 	@MainActor
@@ -31,19 +31,18 @@ extension AccountDetails {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ForceFullScreen {
-					VStack(spacing: .zero) {
-						AddressView(
-							viewStore.address,
-							copyAddressAction: {
-								viewStore.send(.copyAddressButtonTapped)
-							}
-						)
-						.foregroundColor(.app.whiteTransparent)
-						.padding(.bottom, .medium1)
+				VStack(spacing: .zero) {
+					AddressView(
+						viewStore.address,
+						copyAddressAction: {
+							viewStore.send(.copyAddressButtonTapped)
+						}
+					)
+					.foregroundColor(.app.whiteTransparent)
+					.padding(.bottom, .medium1)
 
-						// TODO: @davdroman take care of proper Asset Transfer implementation
-						// when we have the proper spec and designs
+					// TODO: @davdroman take care of proper Asset Transfer implementation
+					// when we have the proper spec and designs
 //						#if DEBUG // FF
 //						Button(
 //							"Transfer",
@@ -53,27 +52,29 @@ extension AccountDetails {
 //						.padding(.bottom)
 //						#endif
 
-						ScrollView {
-							VStack(spacing: .medium3) {
-								AssetsView.View(
-									store: store.scope(
-										state: \.assets,
-										action: { .child(.assets($0)) }
-									)
-								)
-							}
-							.padding(.bottom, .medium1)
-						}
-						.refreshable {
-							await viewStore.send(.pullToRefreshStarted).finish()
-						}
-						.background(Color.app.gray5)
-						.padding(.bottom, .medium2)
-						.cornerRadius(.medium2)
-						.padding(.bottom, .medium2 * -2)
+					if viewStore.isLoadingResources {
+						ProgressView()
 					}
-					.background(viewStore.appearanceID.gradient)
+					ScrollView {
+						VStack(spacing: .medium3) {
+							AssetsView.View(
+								store: store.scope(
+									state: \.assets,
+									action: { .child(.assets($0)) }
+								)
+							)
+						}
+						.padding(.bottom, .medium1)
+					}
+					.refreshable {
+						await viewStore.send(.pullToRefreshStarted).finish()
+					}
+					.background(Color.app.gray5)
+					.padding(.bottom, .medium2)
+					.cornerRadius(.medium2)
+					.padding(.bottom, .medium2 * -2)
 				}
+				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()
 				#if os(iOS)
 					.navigationBarTitleDisplayMode(.inline)
@@ -101,18 +102,21 @@ extension AccountDetails {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
+					.task {
+						viewStore.send(.task)
+					}
 					.sheet(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /AccountDetails.Destinations.State.preferences,
 						action: AccountDetails.Destinations.Action.preferences,
 						content: { AccountPreferences.View(store: $0) }
 					)
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /AccountDetails.Destinations.State.transfer,
-						action: AccountDetails.Destinations.Action.transfer,
-						content: { AssetTransfer.View(store: $0) }
-					)
+				//					.sheet(
+				//						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				//						state: /AccountDetails.Destinations.State.transfer,
+				//						action: AccountDetails.Destinations.Action.transfer,
+				//						content: { AssetTransfer.View(store: $0) }
+				//					)
 			}
 		}
 	}
@@ -126,7 +130,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		NavigationStack {
 			AccountDetails.View(
 				store: .init(
-					initialState: .init(for: .previewValue),
+					initialState: .init(for: .previewValue0),
 					reducer: AccountDetails()
 				)
 			)

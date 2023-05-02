@@ -48,33 +48,31 @@ extension EngineToolkitClient {
 			compileNotarizedTransactionIntent: {
 				try engineToolkit.compileNotarizedTransactionIntentRequest(request: $0).get()
 			},
+			decompileTransactionIntent: {
+				try engineToolkit.decompileTransactionIntentRequest(request: $0).get()
+			},
+			decompileNotarizedTransactionIntent: {
+				try engineToolkit.decompileNotarizedTransactionIntentRequest(request: $0).get()
+			},
+			deriveOlympiaAdressFromPublicKey: {
+				try engineToolkit.deriveOlympiaAddressFromPublicKeyRequest(
+					request: .init(network: .mainnet, publicKey: $0.intoEngine())
+				)
+				.get()
+				.olympiaAccountAddress
+			},
 			generateTXID: { transactionIntent in
 				let compiledTransactionIntent = try compileTransactionIntent(transactionIntent)
 				let hash = try blake2b(data: compiledTransactionIntent.compiledIntent)
 				return TXID(rawValue: hash.hex)
 			},
-			accountAddressesNeedingToSignTransaction: { request throws -> Set<AccountAddress> in
-				try Set(
-					request.manifest.accountsRequiredToSign(
-						networkId: request.networkID
-					).map {
-						try AccountAddress(componentAddress: $0)
-					}
-				)
-			},
-			accountAddressesSuitableToPayTransactionFee: { request throws -> Set<AccountAddress> in
-				try Set(
-					request.manifest.accountsSuitableToPayTXFee(
-						networkId: request.networkID
-					).map {
-						try AccountAddress(componentAddress: $0)
-					}
-				)
-			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
-			generateTransactionReview: { manifestWithPreviewContext in
+			analyzeManifest: { request in
+				try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
+			},
+			analyzeManifestWithPreviewContext: { manifestWithPreviewContext in
 				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
 			},
 			decodeAddress: { address in
@@ -86,9 +84,3 @@ extension EngineToolkitClient {
 
 // MARK: - FailedToConvertManifestToFormatWhereInstructionsAreJSON
 struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
-
-extension AccountAddress {
-	public init(componentAddress: ComponentAddress) throws {
-		try self.init(address: componentAddress.address)
-	}
-}

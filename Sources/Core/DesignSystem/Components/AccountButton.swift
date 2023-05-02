@@ -41,7 +41,13 @@ public struct AccountLabel: View {
 	let height: CGFloat
 	let copyAction: (() -> Void)?
 
-	public init(_ accountName: String, address: String, gradient: Gradient, height: CGFloat, copyAction: (() -> Void)? = nil) {
+	public init(
+		_ accountName: String,
+		address: String,
+		gradient: Gradient,
+		height: CGFloat,
+		copyAction: (() -> Void)? = nil
+	) {
 		self.accountName = accountName
 		self.address = address
 		self.gradient = gradient

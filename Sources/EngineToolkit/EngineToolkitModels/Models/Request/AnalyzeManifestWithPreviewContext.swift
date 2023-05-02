@@ -22,7 +22,7 @@ public struct AnalyzeManifestWithPreviewContextRequest: Codable {
 }
 
 // MARK: - AnalyzeManifestWithPreviewContextResponse
-public struct AnalyzeManifestWithPreviewContextResponse: Sendable, Codable, Equatable {
+public struct AnalyzeManifestWithPreviewContextResponse: Sendable, Codable, Hashable {
 	public let encounteredAddresses: EncounteredAddresses
 	public let accountsRequiringAuth: Set<ComponentAddress>
 	public let accountProofResources: Set<ResourceAddress>
@@ -41,7 +41,7 @@ public struct AnalyzeManifestWithPreviewContextResponse: Sendable, Codable, Equa
 }
 
 // MARK: - EncounteredAddresses
-public struct EncounteredAddresses: Sendable, Codable, Equatable {
+public struct EncounteredAddresses: Sendable, Codable, Hashable {
 	public let componentAddresses: EncounteredComponents
 	public let resourceAddresses: Set<ResourceAddress>
 	public let packageAddresses: Set<PackageAddress>
@@ -54,7 +54,7 @@ public struct EncounteredAddresses: Sendable, Codable, Equatable {
 }
 
 // MARK: - EncounteredComponents
-public struct EncounteredComponents: Sendable, Codable, Equatable {
+public struct EncounteredComponents: Sendable, Codable, Hashable {
 	public let userApplications: Set<ComponentAddress>
 	public let accounts: Set<ComponentAddress>
 	public let identities: Set<ComponentAddress>
@@ -75,7 +75,7 @@ public struct EncounteredComponents: Sendable, Codable, Equatable {
 }
 
 // MARK: - AccountWithdraw
-public struct AccountWithdraw: Sendable, Codable, Equatable {
+public struct AccountWithdraw: Sendable, Codable, Hashable {
 	public let componentAddress: ComponentAddress
 	public let resourceSpecifier: ResourceSpecifier
 
@@ -86,7 +86,7 @@ public struct AccountWithdraw: Sendable, Codable, Equatable {
 }
 
 // MARK: - AccountDeposit
-public enum AccountDeposit: Sendable, Codable, Equatable {
+public enum AccountDeposit: Sendable, Codable, Hashable {
 	case exact(
 		componentAddress: ComponentAddress,
 		resourceSpecifier: ResourceSpecifier
@@ -106,7 +106,7 @@ public enum AccountDeposit: Sendable, Codable, Equatable {
 }
 
 // MARK: - CreatedEntitities
-public struct CreatedEntitities: Sendable, Codable, Equatable {
+public struct CreatedEntitities: Sendable, Codable, Hashable {
 	public let componentAddresses: Set<ComponentAddress>
 	public let resourceAddresses: Set<ResourceAddress>
 	public let packageAddresses: Set<PackageAddress>
@@ -119,7 +119,7 @@ public struct CreatedEntitities: Sendable, Codable, Equatable {
 }
 
 // MARK: - ResourceSpecifier
-public enum ResourceSpecifier: Sendable, Codable, Equatable {
+public enum ResourceSpecifier: Sendable, Codable, Hashable {
 	case amount(ResourceAddress, Decimal_)
 	case ids(ResourceAddress, Set<NonFungibleLocalIdInternal>)
 

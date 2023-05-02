@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ScanQRFeature
 
 // MARK: - NewConnection.View
 extension NewConnection {
@@ -20,15 +21,11 @@ extension NewConnection {
 							then: { LocalNetworkPermission.View(store: $0) }
 						)
 						CaseLet(
-							state: /NewConnection.State.cameraPermission,
-							action: { NewConnection.Action.child(.cameraPermission($0)) },
-							then: { CameraPermission.View(store: $0) }
-						)
-						CaseLet(
 							state: /NewConnection.State.scanQR,
 							action: { NewConnection.Action.child(.scanQR($0)) },
-							then: { ScanQR.View(store: $0) }
+							then: { ScanQRCoordinator.View(store: $0) }
 						)
+
 						CaseLet(
 							state: /NewConnection.State.connectUsingSecrets,
 							action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
