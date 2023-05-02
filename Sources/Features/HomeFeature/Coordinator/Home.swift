@@ -15,22 +15,16 @@ public struct Home: Sendable, FeatureReducer {
 			.init(uniqueElements: accountList.accounts.map(\.account))
 		}
 
-		public var accountRecoveryIsNeeded: Bool
-
 		// MARK: - Destinations
 		@PresentationState
 		public var destination: Destinations.State?
 
 		public init(
-			accountRecoveryIsNeeded: Bool,
-			header: Header.State = .init(),
-			accountList: AccountList.State = .init(accounts: []),
-			destination: Destinations.State? = nil
+			accountRecoveryIsNeeded: Bool
 		) {
-			self.accountRecoveryIsNeeded = accountRecoveryIsNeeded
-			self.header = header
-			self.accountList = accountList
-			self.destination = destination
+			self.header = .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)
+			self.accountList = .init(accounts: [])
+			self.destination = nil
 		}
 	}
 

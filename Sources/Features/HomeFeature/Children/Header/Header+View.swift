@@ -2,7 +2,7 @@ import FeaturePrelude
 
 extension Header.State {
 	var viewState: Header.ViewState {
-		.init(hasNotification: hasNotification)
+		.init(hasNotification: accountRecoveryIsNeeded)
 	}
 }
 
@@ -96,6 +96,6 @@ struct Header_Preview: PreviewProvider {
 }
 
 extension Header.State {
-	static let previewValue = Self()
+	static let previewValue = Self(accountRecoveryIsNeeded: true)
 }
 #endif
