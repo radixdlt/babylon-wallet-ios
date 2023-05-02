@@ -1,10 +1,13 @@
 import AuthorizedDappsClient
 import FeaturePrelude
+import GatewayAPI
 
 // MARK: - AuthorizedDapps
 public struct AuthorizedDapps: Sendable, FeatureReducer {
-	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.cacheClient) var cacheClient
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 	public typealias Store = StoreOf<Self>
 
@@ -12,6 +15,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public var dApps: Profile.Network.AuthorizedDapps
+		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
 		public var presentedDapp: DappDetails.State?
@@ -34,6 +38,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedDapps(TaskResult<Profile.Network.AuthorizedDapps>)
+		case loadedThumbnail(URL, dApp: Profile.Network.AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
 	}
 
@@ -74,12 +79,25 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadedDapps(.success(dApps)):
 			state.dApps = dApps
-			return .none
+			return .run { send in
+				for dApp in dApps {
+					let iconURL = try? await cacheClient.withCaching(
+						cacheEntry: .dAppMetadata(dApp.id.address),
+						request: { try await gatewayAPIClient.getEntityMetadata(dApp.id.address) }
+					).iconURL
+					if let iconURL {
+						await send(.internal(.loadedThumbnail(iconURL, dApp: dApp.id)))
+					}
+				}
+			}
 		case let .loadedDapps(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 		case let .presentDappDetails(presentedDappState):
 			state.presentedDapp = presentedDappState
+			return .none
+		case let .loadedThumbnail(thumbnail, dApp: id):
+			state.thumbnails[id] = thumbnail
 			return .none
 		}
 	}

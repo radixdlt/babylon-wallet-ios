@@ -502,10 +502,11 @@ paths:
                 $ref: "#/components/schemas/StateNonFungibleIdsResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
-  /state/non-fungible/details:
+
+  /state/non-fungible/data:
     post:
-      operationId: NonFungibleDetails
-      summary: Get Non-Fungible Details
+      operationId: NonFungibleData
+      summary: Get Non-Fungible Data
       description: |
         Returns data associated with a given non-fungible ID of a given non-fungible resource.
       tags:
@@ -515,14 +516,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StateNonFungibleDetailsRequest"
+              $ref: "#/components/schemas/StateNonFungibleDataRequest"
       responses:
         "200":
           description: Non-Fungible ID Data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StateNonFungibleDetailsResponse"
+                $ref: "#/components/schemas/StateNonFungibleDataResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
@@ -1806,7 +1807,7 @@ components:
             non_fungible_ids:
               $ref: "#/components/schemas/NonFungibleIdsCollection"
 
-    StateNonFungibleDetailsRequest:
+    StateNonFungibleDataRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
         - $ref: "#/components/schemas/CursorLimitMixin"
@@ -1823,8 +1824,8 @@ components:
                 $ref: "#/components/schemas/NonFungibleId"
       example:
         resource_address: "<non-fungible-entity-address>"
-        non_fungible_ids: ["0a0100000000"]
-    StateNonFungibleDetailsResponse:
+        non_fungible_ids: ["#1#"]
+    StateNonFungibleDataResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
@@ -1846,18 +1847,14 @@ components:
       required:
         - non_fungible_id
         - mutable_data
-        - immutable_data
         - last_updated_at_state_version
       properties:
         non_fungible_id:
           $ref: "#/components/schemas/NonFungibleId"
-        mutable_data:
-          $ref: "#/components/schemas/ScryptoSborValue"
-        immutable_data:
+        data:
           $ref: "#/components/schemas/ScryptoSborValue"
         last_updated_at_state_version:
           $ref: "#/components/schemas/LastUpdatedAtStateVersion"
-
 
     #
     # /state/validators/* Request & Response Types

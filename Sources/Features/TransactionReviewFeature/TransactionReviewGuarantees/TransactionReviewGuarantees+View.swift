@@ -97,8 +97,7 @@ extension TransactionReviewGuarantee.State {
 extension TransactionReviewTokenView.ViewState {
 	init(transfer: TransactionReview.Transfer) {
 		self.init(name: transfer.metadata.name,
-		          isXRD: transfer.isXRD,
-		          thumbnail: transfer.metadata.thumbnail,
+		          thumbnail: transfer.thumbnail,
 		          amount: transfer.amount,
 		          guaranteedAmount: transfer.guarantee?.amount,
 		          fiatAmount: transfer.metadata.fiatAmount)

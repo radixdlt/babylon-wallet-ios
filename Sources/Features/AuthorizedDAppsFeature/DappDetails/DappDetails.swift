@@ -35,10 +35,15 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		public var personaList: PersonaList.State
 
-		public init(dApp: Profile.Network.AuthorizedDappDetailed, personaDetails: PersonaDetails.State? = nil) {
+		public init(
+			dApp: Profile.Network.AuthorizedDappDetailed,
+			personaDetails: PersonaDetails.State? = nil,
+			metadata: GatewayAPI.EntityMetadataCollection? = nil
+		) {
 			self.dApp = dApp
 			self.personaDetails = personaDetails
 			self.personaList = .init(dApp: dApp)
+			self.metadata = metadata
 		}
 	}
 

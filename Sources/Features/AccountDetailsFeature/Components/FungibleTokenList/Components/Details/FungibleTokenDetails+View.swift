@@ -4,8 +4,7 @@ extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
 			displayName: resource.name ?? "",
-			iconURL: resource.iconURL,
-			placeholderAsset: .placeholderImage(isXRD: isXRD),
+			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			amount: resource.amount.format(),
 			symbol: resource.symbol,
 			description: resource.description,
@@ -18,8 +17,7 @@ extension FungibleTokenDetails.State {
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let displayName: String
-		let iconURL: URL?
-		let placeholderAsset: ImageAsset
+		let thumbnail: TokenThumbnail.Content
 		let amount: String
 		let symbol: String?
 		let description: String?
@@ -47,7 +45,7 @@ extension FungibleTokenDetails {
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
+						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
 								viewStore.send(.closeButtonTapped)
 							}
@@ -63,12 +61,7 @@ extension FungibleTokenDetails {
 		@ViewBuilder
 		private func header(with viewStore: ViewStoreOf<FungibleTokenDetails>) -> some SwiftUI.View {
 			VStack(spacing: .medium3) {
-				LazyImage(url: viewStore.iconURL) { _ in
-					Image(asset: viewStore.placeholderAsset)
-						.resizable()
-				}
-				.frame(width: 104, height: 104)
-				.clipShape(Circle())
+				TokenThumbnail(viewStore.thumbnail, size: .veryLarge)
 				if let symbol = viewStore.symbol {
 					Text(viewStore.amount).font(.app.sheetTitle).kerning(-0.5) +
 						Text(" " + symbol).font(.app.sectionHeader)

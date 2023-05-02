@@ -54,15 +54,15 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { [txID = state.notarizedTX.txID, notarized = state.notarizedTX.notarized] send in
-				await send(.internal(.submitTXResult(
+			return .task { [txID = state.notarizedTX.txID, notarized = state.notarizedTX.notarized] in
+				await .internal(.submitTXResult(
 					TaskResult {
 						try await submitTXClient.submitTransaction(.init(
 							txID: txID,
 							compiledNotarizedTXIntent: notarized
 						))
 					}
-				)))
+				))
 			}
 		}
 	}
