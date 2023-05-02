@@ -186,6 +186,7 @@ extension AppSettings.View {
 		let action: AppSettings.ViewAction
 	}
 
+	@MainActor
 	private func settingsRows() -> [RowModel] {
 		[
 			.init(
@@ -216,6 +217,7 @@ extension AppSettings.View {
 		]
 	}
 
+	@MainActor
 	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
 		VStack(spacing: 0) {
 			ScrollView {

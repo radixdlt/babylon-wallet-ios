@@ -114,6 +114,15 @@ private extension NewEntityCompletion.View {
 		for whenAccount: NewEntityCompletion.ViewState.WhenAccount
 	) -> some View {
 		ZStack {
+			ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
+				Profile.Network.Account.AppearanceID.fromIndex(Int(whenAccount.appearanceID.rawValue) + index).gradient.opacity(0.2)
+					.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
+					.cornerRadius(.small1)
+					.scaleEffect(scale(index: index))
+					.zIndex(reversedZIndex(count: Constants.transparentCardsCount, index: index))
+					.offset(y: Constants.transparentCardOffset * CGFloat(index + 1))
+			}
+
 			VStack(spacing: .small2) {
 				Text(viewStore.entityName)
 					.foregroundColor(.app.white)
@@ -127,30 +136,20 @@ private extension NewEntityCompletion.View {
 			.background(whenAccount.appearanceID.gradient)
 			.cornerRadius(.small1)
 			.padding(.horizontal, .medium1)
-			.zIndex(4)
-
-			Group {
-				ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
-					Profile.Network.Account.AppearanceID.fromIndex(Int(whenAccount.appearanceID.rawValue) + index).gradient.opacity(0.2)
-						.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
-						.cornerRadius(.small1)
-						.scaleEffect(scale(index: index))
-						.zIndex(reversedZIndex(count: Constants.transparentCardsCount, index: index))
-						.offset(y: Constants.transparentCardOffset * CGFloat(index))
-				}
-			}
-			.offset(y: Constants.transparentCardOffset)
 		}
 	}
 
+	@MainActor
 	func scale(index: Int) -> CGFloat {
 		1 - (CGFloat(index + 1) * 0.05)
 	}
 
+	@MainActor
 	func reversedZIndex(count: Int, index: Int) -> Double {
 		Double(count - index)
 	}
 
+	@MainActor
 	func subtitleText(with viewStore: ViewStoreOf<NewEntityCompletion>) -> String {
 		if viewStore.isFirstOnNetwork {
 			return L10n.CreateEntity.Completion.Subtitle.first(viewStore.entityKind)
