@@ -75,7 +75,7 @@ public struct DerivationPath:
 }
 
 extension DerivationPath {
-	public static let getID: Self = try! .customPath(.init(path: .getID))
+	public static let getID: Self = try! .customPath(.init(path: .getID), scheme: .cap26)
 
 	/// The **default** derivation path for `Account`s.
 	public static func accountPath(_ path: AccountDerivationPath) -> Self {
@@ -88,8 +88,8 @@ extension DerivationPath {
 	}
 
 	/// A **custom** derivation path use to derive some keys.
-	public static func customPath(_ path: CustomHierarchicalDeterministicDerivationPath) -> Self {
-		Self(scheme: .cap26, path: path.derivationPath)
+	public static func customPath(_ path: CustomHierarchicalDeterministicDerivationPath, scheme: DerivationPathScheme) -> Self {
+		Self(scheme: scheme, path: path.derivationPath)
 	}
 
 	public static func forEntity(

@@ -112,6 +112,14 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						loggerGlobal.notice("❌ signature.signature.publicKey: \(signature.signature.publicKey) not found in request.signingFactor.signers  \(request.signingFactor.signers.map(\.account.publicKey))")
 						throw MissingAccountFromSignatures()
 					}
+					loggerGlobal.debug("signature.derivationPath: \(String(describing: signature.derivationPath))")
+					loggerGlobal.debug("signature.pubkey: \(signature.signature.publicKey.compressedRepresentation.hex)")
+					for requiredFI in signer.factorInstancesRequiredToSign {
+						if let derivationPath = requiredFI.derivationPath {
+							loggerGlobal.debug("Requiring factor instance to sign PATH: \(String(describing: derivationPath))")
+						}
+						loggerGlobal.debug("Requiring factor instance to sign PUBKEY: \(requiredFI.publicKey.compressedRepresentation.hex)")
+					}
 					assert(signer.factorInstancesRequiredToSign.contains(where: { $0.derivationPath == signature.derivationPath }))
 					let accountSignature = try AccountSignature(
 						account: signer.account,

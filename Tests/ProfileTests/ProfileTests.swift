@@ -9,6 +9,17 @@ import TestingPrelude
 final class ProfileTests: TestCase {
 	let gateway = Radix.Gateway.nebunet
 
+	func test_sign() throws {
+		// recid: 01
+		let signature = try ECDSASignatureNonRecoverable(rawRepresentation: Data(hex: "90ff7035a1783e604daa527e9753ba85ccdff6b8d43f6771c748be2f52ce27073707714db59bdab0995998c1648f579ea035e4074f44625e097dd6c4862365e4"))
+
+		let hash = try Data(hex: "3942966bc5060b22c4f1b46cb53dd767513b7e5eb70366358037f04c4bcb59b4")
+
+		let publicKey = try K1.PublicKey(compressedRepresentation: Data(hex: "03f43fba6541031ef2195f5ba96677354d28147e45b40cde4662bec9162c361f55"))
+
+		XCTAssertTrue(try publicKey.isValid(signature: signature, hashed: hash))
+	}
+
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
 		let first = P2PLink(connectionPassword: pw, displayName: "first")
