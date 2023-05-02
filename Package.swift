@@ -585,6 +585,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+			"FactorSourcesClient",
 		],
 		tests: .no
 	),
