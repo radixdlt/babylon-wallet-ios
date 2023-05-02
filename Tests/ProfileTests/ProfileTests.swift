@@ -149,20 +149,17 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let address = try Profile.Network.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
-
 			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let account = Profile.Network.Account(
+			let account = try Profile.Network.Account(
 				networkID: networkID,
-				address: address,
-				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				appearanceID: .fromIndex(Int(index)),
-				displayName: name
+				factorInstance: factorInstance,
+				displayName: name,
+				extraProperties: .init(appearanceID: .fromIndex(Int(index)))
 			)
 
 			try profile.addAccount(account)
@@ -191,21 +188,13 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let address = try Profile.Network.Persona.deriveAddress(networkID: networkID, publicKey: publicKey)
-
 			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let persona = Profile.Network.Persona(
-				networkID: networkID,
-				address: address,
-				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
-				displayName: name,
-				fields: fields
-			)
+			let persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
 
 			try profile.addPersona(persona)
 

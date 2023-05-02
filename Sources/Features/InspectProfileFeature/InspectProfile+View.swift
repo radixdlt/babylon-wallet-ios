@@ -657,6 +657,7 @@ extension FactorInstanceView {
 				Labeled("Derivation Path", value: path.description)
 			}
 			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
+			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
 			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))
 		}
 		.padding([.leading], leadingPadding)
