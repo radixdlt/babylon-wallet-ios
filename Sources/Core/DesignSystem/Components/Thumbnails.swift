@@ -167,7 +167,6 @@ public struct LoadableImage<Placeholder: View>: View {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else if let error = state.error {
 					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
-					let _ = print("Could not load thumbnail \(url): \(error)")
 					// FIXME: Show some image or officially sanctioned copy
 					if sizingBehaviour == .flexibleHeight {
 						let text = isVectorImage ? "Can't load image of vector type" : "Can't load image"
