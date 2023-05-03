@@ -447,8 +447,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		guard let (item, action) = childAction.itemAndAction else { return .none }
 		switch action {
-		case let .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))):
-			return handleLogin(item, persona, authorizedDapp, authorizedPersona)
+		case .login(.delegate(.failedToSignAuthChallenge)):
+			return dismissEffect(
+				for: state,
+				errorKind: .failedToSignAuthChallenge,
+				message: nil
+			)
+
+		case let .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthChallenge))):
+			return handleLogin(item, persona, authorizedDapp, authorizedPersona, signedAuthChallenge)
 
 		case .accountPermission(.delegate(.continueButtonTapped)):
 			return handleAccountPermission(item)

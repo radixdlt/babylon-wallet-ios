@@ -50,6 +50,7 @@ extension P2P.Dapp.Response.WalletInteractionFailureResponse {
 		case unknownDappDefinitionAddress
 		case invalidPersona
 		case invalidRequest
+		case failedToSignAuthChallenge
 
 		public var errorDescription: String? {
 			switch self {
@@ -91,6 +92,8 @@ extension P2P.Dapp.Response.WalletInteractionFailureResponse {
 				return "Invalid persona specified by dApp"
 			case .invalidRequest:
 				return "Invalid request"
+			case .failedToSignAuthChallenge:
+				return "Failed to sign auth challenge"
 			}
 		}
 	}

@@ -3,6 +3,7 @@ import CreateEntityFeature
 import EngineToolkit
 import FeaturePrelude
 import PersonasClient
+import UseFactorSourceClient
 
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
@@ -58,11 +59,13 @@ struct Login: Sendable, FeatureReducer {
 			Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?,
 			SignedAuthChallenge?
 		)
+		case failedToSignAuthChallenge
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -90,12 +93,34 @@ struct Login: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(persona):
+			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
 			if let challenge = state.loginRequest.challenge {
-				let payloadToHash: String = challenge.rawValue.data.hex() + state.dappDefinitionAddress.address + state.dappMetadata.origin
-				let hashToSign = try! blake2b(payloadToHash)
-				fatalError("impl sign auth, where")
+				let payloadToHashString: String = challenge.rawValue.data.hex() + state.dappDefinitionAddress.address + state.dappMetadata.origin
+				return .run { [authorizedDapp = state.authorizedDapp] send in
+					// FIXME: change to use SBOR encoding rather than utf8?
+					let payloadToHash = payloadToHashString.data(using: .utf8)!
+
+					let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
+						of: persona,
+						unhashedDataToSign: payloadToHash
+					)
+					let signedAuthChallenge = SignedAuthChallenge(
+						challenge: challenge,
+						signatureWithPublicKey: signature.signature.signatureWithPublicKey
+					)
+					await send(.delegate(.continueButtonTapped(
+						persona,
+						authorizedDapp,
+						authorizedPersona,
+						signedAuthChallenge
+					)))
+
+				} catch: { error, send in
+					loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
+					errorQueue.schedule(error)
+					await send(.delegate(.failedToSignAuthChallenge))
+				}
 			} else {
-				let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
 		}
