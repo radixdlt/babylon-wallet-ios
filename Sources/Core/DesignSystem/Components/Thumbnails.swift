@@ -168,10 +168,14 @@ public struct LoadableImage<Placeholder: View>: View {
 				} else if let error = state.error {
 					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
 					// FIXME: Show some image or officially sanctioned copy
-					let text = isVectorImage ? "Can't load image of vector type" : "Can't load image"
-					Text(text)
-						.textStyle(.body1HighImportance)
-						.foregroundColor(.app.alert)
+					if sizingBehaviour == .flexibleHeight {
+						let text = isVectorImage ? "Can't load image of vector type" : "Can't load image"
+						Text(text)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.alert)
+					} else {
+						placeholder
+					}
 				} else {
 					placeholder
 				}
@@ -222,7 +226,7 @@ public struct LoadableImage<Placeholder: View>: View {
 }
 
 // MARK: - LoadableImageSize
-public enum LoadableImageSize {
+public enum LoadableImageSize: Equatable {
 	case fixedSize(HitTargetSize, mode: ImageResizingMode = .aspectFill)
 	case flexibleHeight
 }
