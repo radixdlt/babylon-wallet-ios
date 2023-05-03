@@ -8,6 +8,7 @@ struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
+		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
 
 		var isFirstPersonaOnAnyNetwork: Bool? = nil
 
@@ -23,10 +24,12 @@ struct Login: Sendable, FeatureReducer {
 		init(
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
+			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
+			self.loginRequest = loginRequest
 			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 		}
 	}
@@ -48,7 +51,12 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(Profile.Network.Persona, Profile.Network.AuthorizedDapp?, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?)
+		case continueButtonTapped(
+			Profile.Network.Persona,
+			Profile.Network.AuthorizedDapp?,
+			Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?,
+			SignedAuthChallenge?
+		)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -81,8 +89,12 @@ struct Login: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(persona):
-			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
-			return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona)))
+			if let challenge = state.loginRequest.challenge {
+				fatalError("impl sign auth")
+			} else {
+				let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
+				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
+			}
 		}
 	}
 

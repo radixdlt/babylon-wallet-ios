@@ -45,18 +45,21 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct AuthLoginWithChallengeRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = "loginWithChallenge"
 		public let persona: P2P.Dapp.Response.Persona
-		public let challenge: String
+		public let challenge: P2P.Dapp.AuthChallengeNonce
 		public let publicKey: String
+		public let curve: String
 		public let signature: String
 
 		public init(
 			persona: P2P.Dapp.Response.Persona,
-			challenge: String,
+			challenge: P2P.Dapp.AuthChallengeNonce,
+			curve: String,
 			publicKey: String,
 			signature: String
 		) {
 			self.persona = persona
 			self.challenge = challenge
+			self.curve = curve
 			self.publicKey = publicKey
 			self.signature = signature
 		}

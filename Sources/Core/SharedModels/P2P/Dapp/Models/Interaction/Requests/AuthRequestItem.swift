@@ -31,9 +31,10 @@ extension P2P.Dapp.Request {
 // MARK: - P2P.Dapp.Request.AuthLoginRequestItem
 extension P2P.Dapp.Request {
 	public struct AuthLoginRequestItem: Sendable, Hashable, Decodable {
-		public let challenge: String?
+		/// A 32 bytes nonce used as a challenge
+		public let challenge: P2P.Dapp.AuthChallengeNonce?
 
-		public init(challenge: String?) {
+		public init(challenge: P2P.Dapp.AuthChallengeNonce?) {
 			self.challenge = challenge
 		}
 	}

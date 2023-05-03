@@ -8,6 +8,9 @@ extension P2P {
 
 // MARK: - P2P.Dapp.Response
 extension P2P.Dapp {
+	/// A 32 bytes nonce used as a challenge
+	public typealias AuthChallengeNonce = Tagged<(Self, nonce: ()), HexCodable32Bytes>
+
 	public enum Response: Sendable, Hashable, Encodable {
 		private enum CodingKeys: String, CodingKey {
 			case discriminator
