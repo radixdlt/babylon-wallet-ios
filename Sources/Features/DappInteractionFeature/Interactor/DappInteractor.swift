@@ -117,7 +117,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
+				// FIXME: cleanup DappMetaData
+				return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil, origin: .init("")))))
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -163,7 +164,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
+			// FIXME: cleanup DappMetaData
+			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil, origin: .init("")))))
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))

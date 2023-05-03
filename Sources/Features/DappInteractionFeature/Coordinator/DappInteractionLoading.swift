@@ -77,7 +77,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 						}
 					)
 				} catch is BadHTTPResponseCode {
-					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
+					// FIXME: cleanup DappMetaData
+					return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {
 					throw error
 				}
