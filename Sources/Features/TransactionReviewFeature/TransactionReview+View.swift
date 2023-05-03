@@ -419,40 +419,6 @@ extension StrokeStyle {
 	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
 }
 
-extension Label where Title == Text, Icon == Image {
-	public init(_ titleKey: LocalizedStringKey, asset: ImageAsset) {
-		self.init {
-			Text(titleKey)
-		} icon: {
-			Image(asset: asset)
-				.renderingMode(.template)
-		}
-	}
-
-	public init<S>(_ title: S, asset: ImageAsset) where S: StringProtocol {
-		self.init {
-			Text(title)
-		} icon: {
-			Image(asset: asset)
-				.renderingMode(.template)
-		}
-	}
-}
-
-extension Button where Label == SwiftUI.Label<Text, Image> {
-	public init(_ titleKey: LocalizedStringKey, asset: ImageAsset, action: @escaping () -> Void) {
-		self.init(action: action) {
-			SwiftUI.Label(titleKey, asset: asset)
-		}
-	}
-
-	public init<S>(_ title: S, asset: ImageAsset, action: @escaping () -> Void) where S: StringProtocol {
-		self.init(action: action) {
-			SwiftUI.Label(title, asset: asset)
-		}
-	}
-}
-
 extension Button where Label == Image {
 	public init(asset: ImageAsset, action: @escaping () -> Void) {
 		self.init(action: action) {

@@ -19,7 +19,7 @@ extension DappDetails {
 		let description: String
 		let domain: String?
 		let thumbnail: URL?
-		let addressViewState: AddressView.ViewState
+		let address: DappDefinitionAddress
 		let otherMetadata: [MetadataItem]
 		let fungibleTokens: [Token]
 		let nonFungibleTokens: [Token]
@@ -110,7 +110,7 @@ private extension DappDetails.State {
 			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
 			domain: metadata?.domain,
 			thumbnail: metadata?.iconURL,
-			addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .default),
+			address: dApp.dAppDefinitionAddress,
 			otherMetadata: otherMetadata,
 			fungibleTokens: [], // TODO: Populate when we have it
 			nonFungibleTokens: [], // TODO: Populate when we have it
@@ -150,11 +150,12 @@ extension DappDetails.View {
 					HStack(spacing: 0) {
 						Text(L10n.DAppDetails.definition)
 							.sectionHeading
+
 						Spacer(minLength: 0)
-						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
-							viewStore.send(.copyAddressButtonTapped)
-						}
-						.foregroundColor(.app.gray1)
+
+						AddressView(.address(.account(viewStore.address)))
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1HighImportance)
 					}
 
 					if let domain = viewStore.domain {

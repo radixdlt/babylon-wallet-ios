@@ -11,7 +11,7 @@ extension AccountList.Row {
 		}
 
 		let name: String
-		let address: AddressView.ViewState
+		let address: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
 		let isLegacyAccount: Bool
@@ -21,7 +21,7 @@ extension AccountList.Row {
 
 		init(state: State) {
 			self.name = state.account.displayName.rawValue
-			self.address = .init(address: state.account.address.address, format: .default)
+			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
 			self.isLoadingResources = state.portfolio.isLoading
 
@@ -63,12 +63,10 @@ extension AccountList.Row {
 					VStack(alignment: .leading, spacing: .zero) {
 						HeaderView(name: viewStore.name)
 						HStack {
-							AddressView(
-								viewStore.address,
-								copyAddressAction: {
-									viewStore.send(.copyAddressButtonTapped)
-								}
-							)
+							AddressView(.address(.account(viewStore.address)))
+								.foregroundColor(.app.whiteTransparent)
+								.textStyle(.body2HighImportance)
+
 							if viewStore.isLegacyAccount {
 								Text("•")
 								Text("\(L10n.AccountList.Row.legacyAccount)")
@@ -171,9 +169,13 @@ extension AccountList.Row.View {
 	func securityPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
 		HStack {
 			Image(asset: AssetResource.homeAccountSecurity)
+
 			Text(L10n.AccountList.Row.securityPrompt)
 				.foregroundColor(.white)
+				.textStyle(.body2HighImportance)
+
 			Spacer()
+
 			Circle()
 				.fill()
 				.foregroundColor(.red)

@@ -69,9 +69,7 @@ extension TransactionReviewAccount {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				InnerCard {
-					AccountLabel(account: viewStore.account) {
-						viewStore.send(.copyAddress)
-					}
+					SmallAccountCard(account: viewStore.account)
 
 					ForEach(viewStore.details) { details in
 						TransactionDetailsView(viewState: details)
@@ -129,33 +127,30 @@ public struct TransactionDetailsView: View {
 	}
 }
 
-extension AccountLabel {
-	public init(account: TransactionReview.Account, copyAction: (() -> Void)? = nil) {
+extension SmallAccountCard {
+	public init(account: TransactionReview.Account) {
 		switch account {
 		case let .user(account):
 			self.init(
-				account: account,
-				copyAction: copyAction
+				account: account
 			)
 
 		case let .external(accountAddress, _):
 			self.init(
 				L10n.TransactionReview.externalAccountName,
-				address: accountAddress.address,
+				identifiable: .address(.account(accountAddress)),
 				gradient: .init(colors: [.app.gray2]),
-				height: .guaranteeAccountLabelHeight,
-				copyAction: copyAction
+				height: .guaranteeAccountLabelHeight
 			)
 		}
 	}
 
-	public init(account: Profile.Network.AccountForDisplay, copyAction: (() -> Void)? = nil) {
+	public init(account: Profile.Network.AccountForDisplay) {
 		self.init(
 			account.label.rawValue,
-			address: account.address.address,
+			identifiable: .address(.account(account.address)),
 			gradient: .init(account.appearanceID),
-			height: .guaranteeAccountLabelHeight,
-			copyAction: copyAction
+			height: .guaranteeAccountLabelHeight
 		)
 	}
 }

@@ -66,6 +66,7 @@ extension AccountPortfolio {
 	}
 
 	public struct NonFungibleResource: Sendable, Hashable, Identifiable, Codable {
+		public typealias GlobalID = String
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let name: String?
@@ -115,5 +116,11 @@ extension AccountPortfolio {
 			self.key = key
 			self.value = value
 		}
+	}
+}
+
+extension AccountPortfolio.NonFungibleResource {
+	public func nftGlobalID(for id: NonFungibleToken.LocalID) -> GlobalID {
+		resourceAddress.address + ":" + id.rawValue
 	}
 }

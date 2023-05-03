@@ -4,11 +4,11 @@ extension FungibleTokenDetails.State {
 	var viewState: FungibleTokenDetails.ViewState {
 		.init(
 			displayName: resource.name ?? "",
+			resourceAddress: resource.resourceAddress,
 			thumbnail: isXRD ? .xrd : .known(resource.iconURL),
 			amount: resource.amount.format(),
 			symbol: resource.symbol,
-			description: resource.description,
-			address: .init(address: resource.resourceAddress.address, format: .default)
+			description: resource.description
 		)
 	}
 }
@@ -17,11 +17,11 @@ extension FungibleTokenDetails.State {
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let displayName: String
+		let resourceAddress: ResourceAddress
 		let thumbnail: TokenThumbnail.Content
 		let amount: String
 		let symbol: String?
 		let description: String?
-		let address: AddressView.ViewState
 	}
 
 	@MainActor
@@ -76,26 +76,25 @@ extension FungibleTokenDetails {
 				let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
 				if let description = viewStore.description {
 					divider
+
 					Text(description)
 						.textStyle(.body1Regular)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.horizontal, .large2)
 				}
+
 				divider
+
 				VStack(spacing: .medium3) {
 					HStack {
 						Text(L10n.FungibleTokenList.Detail.resourceAddress)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray2)
-						AddressView(
-							viewStore.address,
-							textStyle: .body1Regular,
-							copyAddressAction: {
-								viewStore.send(.copyAddressButtonTapped)
-							}
-						)
-						.frame(maxWidth: .infinity, alignment: .trailing)
-						.multilineTextAlignment(.trailing)
+
+						Spacer(minLength: .zero)
+
+						AddressView(.address(.resource(viewStore.resourceAddress)))
+							.textStyle(.body1HighImportance)
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)

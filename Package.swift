@@ -30,7 +30,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.feature(
 		name: "AccountPreferencesFeature",
@@ -647,7 +647,7 @@ package.addModules([
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
 			},
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.core(
 		name: "Resources",

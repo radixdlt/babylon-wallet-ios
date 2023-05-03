@@ -88,12 +88,6 @@ extension TransactionReviewGuarantees {
 	}
 }
 
-extension TransactionReviewGuarantee.State {
-	var viewState: TransactionReviewGuarantee.ViewState {
-		.init(id: transfer.id, account: account, token: .init(transfer: transfer))
-	}
-}
-
 extension TransactionReviewTokenView.ViewState {
 	init(transfer: TransactionReview.Transfer) {
 		self.init(name: transfer.metadata.name,
@@ -101,6 +95,16 @@ extension TransactionReviewTokenView.ViewState {
 		          amount: transfer.amount,
 		          guaranteedAmount: transfer.guarantee?.amount,
 		          fiatAmount: transfer.metadata.fiatAmount)
+	}
+}
+
+extension TransactionReviewGuarantee.State {
+	var viewState: TransactionReviewGuarantee.ViewState {
+		.init(
+			id: transfer.id,
+			account: account,
+			token: .init(transfer: transfer)
+		)
 	}
 }
 
@@ -119,11 +123,9 @@ extension TransactionReviewGuarantee {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState) { viewStore in
 				Card(verticalSpacing: 0) {
-					AccountLabel(account: viewStore.account) {
-						viewStore.send(.copyAddressTapped)
-					}
+					SmallAccountCard(account: viewStore.account)
 
 					TransactionReviewTokenView(viewState: viewStore.token)
 

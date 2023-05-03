@@ -4,8 +4,8 @@ import FeaturePrelude
 extension AccountDetails.State {
 	var viewState: AccountDetails.ViewState {
 		.init(
+			accountAddress: account.address,
 			appearanceID: account.appearanceID,
-			address: .init(address: account.address.address, format: .default),
 			displayName: account.displayName.rawValue,
 			isLoadingResources: isLoadingResources
 		)
@@ -15,8 +15,8 @@ extension AccountDetails.State {
 // MARK: - AccountDetails.View
 extension AccountDetails {
 	public struct ViewState: Equatable {
+		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
-		let address: AddressView.ViewState
 		let displayName: String
 		let isLoadingResources: Bool
 	}
@@ -32,14 +32,10 @@ extension AccountDetails {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-					AddressView(
-						viewStore.address,
-						copyAddressAction: {
-							viewStore.send(.copyAddressButtonTapped)
-						}
-					)
-					.foregroundColor(.app.whiteTransparent)
-					.padding(.bottom, .medium1)
+					AddressView(.address(.account(viewStore.accountAddress)))
+						.foregroundColor(.app.whiteTransparent)
+						.textStyle(.body2HighImportance)
+						.padding(.bottom, .medium1)
 
 					// TODO: @davdroman take care of proper Asset Transfer implementation
 					// when we have the proper spec and designs
