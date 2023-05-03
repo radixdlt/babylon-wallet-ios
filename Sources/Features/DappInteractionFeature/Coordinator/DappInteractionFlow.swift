@@ -345,9 +345,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				let responseItem: State.AnyInteractionResponseItem = try! .remote(.auth(.login(.withChallenge(.init(
 					persona: responsePersona,
 					challenge: signedAuthChallenge.challenge,
-					curve: signedAuthChallenge.signatureWithPublicKey.publicKey.curve.rawValue,
-					publicKey: signedAuthChallenge.signatureWithPublicKey.publicKey.compressedRepresentation.hex,
-					signature: signedAuthChallenge.signatureWithPublicKey.signature.serialize().hex
+					proof: .init(
+						publicKey: signedAuthChallenge.signatureWithPublicKey.publicKey.compressedRepresentation.hex,
+						curve: signedAuthChallenge.signatureWithPublicKey.publicKey.curve.rawValue,
+						signature: signedAuthChallenge.signatureWithPublicKey.signature.serialize().hex
+					)
 				)))))
 
 				state.responseItems[item] = responseItem
@@ -393,9 +395,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
 						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue),
 						challenge: item.challenge,
-						curve: item.curve,
-						publicKey: item.publicKey,
-						signature: item.signature
+						proof: item.proof
 					)))))
 				case .remote(.auth(.login(.withoutChallenge))):
 					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(

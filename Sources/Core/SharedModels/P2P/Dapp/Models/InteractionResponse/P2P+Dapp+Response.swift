@@ -10,6 +10,16 @@ extension P2P {
 extension P2P.Dapp {
 	/// A 32 bytes nonce used as a challenge
 	public typealias AuthChallengeNonce = Tagged<(Self, nonce: ()), HexCodable32Bytes>
+	public struct AuthProof: Sendable, Hashable, Codable {
+		public let publicKey: String
+		public let curve: String
+		public let signature: String
+		public init(publicKey: String, curve: String, signature: String) {
+			self.publicKey = publicKey
+			self.curve = curve
+			self.signature = signature
+		}
+	}
 
 	public enum Response: Sendable, Hashable, Encodable {
 		private enum CodingKeys: String, CodingKey {

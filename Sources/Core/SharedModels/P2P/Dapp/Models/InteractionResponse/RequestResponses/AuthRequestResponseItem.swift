@@ -46,22 +46,16 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		public let discriminator = "loginWithChallenge"
 		public let persona: P2P.Dapp.Response.Persona
 		public let challenge: P2P.Dapp.AuthChallengeNonce
-		public let publicKey: String
-		public let curve: String
-		public let signature: String
+		public let proof: P2P.Dapp.AuthProof
 
 		public init(
 			persona: P2P.Dapp.Response.Persona,
 			challenge: P2P.Dapp.AuthChallengeNonce,
-			curve: String,
-			publicKey: String,
-			signature: String
+			proof: P2P.Dapp.AuthProof
 		) {
 			self.persona = persona
 			self.challenge = challenge
-			self.curve = curve
-			self.publicKey = publicKey
-			self.signature = signature
+			self.proof = proof
 		}
 	}
 }
