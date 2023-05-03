@@ -105,28 +105,26 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
 				let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: hashedMsg) }
 				var accountSignatures = Set<AccountSignature>()
-				for signature in signaturesValidated {
-					guard
-						let signer = request.signingFactor.signers.first(where: { $0.account.publicKey == signature.signature.publicKey })
-					else {
-						loggerGlobal.notice("❌ signature.signature.publicKey: \(signature.signature.publicKey) not found in request.signingFactor.signers  \(request.signingFactor.signers.map(\.account.publicKey))")
-						throw MissingAccountFromSignatures()
-					}
-					loggerGlobal.debug("signature.derivationPath: \(String(describing: signature.derivationPath))")
-					loggerGlobal.debug("signature.pubkey: \(signature.signature.publicKey.compressedRepresentation.hex)")
-					for requiredFI in signer.factorInstancesRequiredToSign {
-						if let derivationPath = requiredFI.derivationPath {
-							loggerGlobal.debug("Requiring factor instance to sign PATH: \(String(describing: derivationPath))")
+
+				for requiredSigner in request.signingFactor.signers {
+					for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
+						guard
+							let signature = signaturesValidated.first(where: {
+								$0.signature.publicKey == requiredSigningFactor.publicKey
+							})
+						else {
+							loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.compressedRepresentation.hex)")
+							throw MissingAccountFromSignatures()
 						}
-						loggerGlobal.debug("Requiring factor instance to sign PUBKEY: \(requiredFI.publicKey.compressedRepresentation.hex)")
+						assert(requiredSigningFactor.derivationPath == signature.derivationPath)
+						let accountSignature = try AccountSignature(
+							account: requiredSigner.account,
+							signature: signature
+						)
+						accountSignatures.insert(accountSignature)
 					}
-					assert(signer.factorInstancesRequiredToSign.contains(where: { $0.derivationPath == signature.derivationPath }))
-					let accountSignature = try AccountSignature(
-						account: signer.account,
-						signature: signature
-					)
-					accountSignatures.insert(accountSignature)
 				}
+
 				return accountSignatures
 			}
 		)
@@ -214,24 +212,15 @@ struct InvalidSignature: Swift.Error {}
 
 extension SigningFactor.Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
-		account.keyParams
-	}
-}
-
-extension Profile.Network.Account {
-	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
-		switch securityState {
-		case let .unsecured(control):
-			let factorInstance = control.genesisFactorInstance
-			guard let derivationPath = factorInstance.derivationPath else {
-				return []
+		factorInstancesRequiredToSign.compactMap {
+			guard let derivationPath = $0.derivationPath else {
+				loggerGlobal.warning("Found factor instance without derivation path to be used as signer with Ledger, this is not supported, ignoring it. Probably something wrong somewhere.")
+				return nil
 			}
-			return [
-				.init(
-					curve: factorInstance.publicKey.curve.cast(),
-					derivationPath: derivationPath.path
-				),
-			]
+			return P2P.LedgerHardwareWallet.KeyParameters(
+				curve: $0.publicKey.curve.cast(),
+				derivationPath: derivationPath.path
+			)
 		}
 	}
 }

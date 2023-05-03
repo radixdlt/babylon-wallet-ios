@@ -31,16 +31,3 @@ public struct SignWithLedgerRequest: Sendable, Hashable {
 		self.unhashedDataToSign = unhashedDataToSign
 	}
 }
-
-extension LedgerHardwareWalletClient {
-	public func sign(
-		signingFactor: SigningFactor,
-		unhashedDataToSign: Data
-	) async throws -> Set<AccountSignature> {
-		precondition(signingFactor.factorSource.kind == .ledgerHQHardwareWallet)
-		return try await sign(.init(
-			signingFactor: signingFactor,
-			unhashedDataToSign: unhashedDataToSign
-		))
-	}
-}

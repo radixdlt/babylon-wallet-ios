@@ -48,9 +48,9 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		} catch {
 			loggerGlobal.critical("Failed to hash: \(error)")
 		}
-		return try await ledgerHardwareWalletClient.sign(
+		return try await ledgerHardwareWalletClient.sign(.init(
 			signingFactor: signingFactor,
 			unhashedDataToSign: state.dataToSign
-		)
+		))
 	}
 }
