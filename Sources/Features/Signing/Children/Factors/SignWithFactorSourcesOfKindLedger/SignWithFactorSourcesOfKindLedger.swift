@@ -50,7 +50,9 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		}
 		return try await ledgerHardwareWalletClient.sign(.init(
 			signingFactor: signingFactor,
-			unhashedDataToSign: state.dataToSign
+			unhashedDataToSign: state.dataToSign,
+			ledgerTXDisplayMode: .verbose,
+			displayHashOnLedgerDisplay: true
 		))
 	}
 }
