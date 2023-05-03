@@ -51,8 +51,8 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		return try await ledgerHardwareWalletClient.sign(.init(
 			signingFactor: signingFactor,
 			unhashedDataToSign: state.dataToSign,
-			ledgerTXDisplayMode: .verbose,
-			displayHashOnLedgerDisplay: true
+			ledgerTXDisplayMode: .summary,
+			displayHashOnLedgerDisplay: false
 		))
 	}
 }
