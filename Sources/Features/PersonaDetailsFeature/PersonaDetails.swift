@@ -44,10 +44,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var confirmForgetAlert: AlertState<ViewAction.ConfirmForgetAlert>? = nil
-
-		@PresentationState
-		public var editPersona: EditPersona.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(_ mode: Mode) {
 			self.mode = mode
@@ -63,16 +60,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
-		case confirmForgetAlert(PresentationAction<ConfirmForgetAlert>)
-
-		public enum ConfirmForgetAlert: Sendable, Equatable {
-			case confirmTapped
-			case cancelTapped
-		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case editPersona(PresentationAction<EditPersona.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -86,19 +77,43 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 	}
 
+	// MARK: - Destination
+
+	public struct Destination: ReducerProtocol {
+		public enum State: Equatable, Hashable {
+			case editPersona(EditPersona.State)
+			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
+		}
+
+		public enum Action: Equatable {
+			case editPersona(EditPersona.Action)
+			case confirmForgetAlert(ConfirmForgetAlert)
+
+			public enum ConfirmForgetAlert: Sendable, Equatable {
+				case confirmTapped
+				case cancelTapped
+			}
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.editPersona, action: /Action.editPersona) {
+				EditPersona()
+			}
+		}
+	}
+
 	// MARK: - Reducer
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$editPersona, action: /Action.child .. ChildAction.editPersona) {
-				EditPersona()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
-			.ifLet(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert)
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .editPersona(.presented(.delegate(.personaSaved(persona)))):
+		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
 			guard persona.id == state.mode.id else { return .none }
 			return .run { [mode = state.mode] send in
 				let updated = try await reload(in: mode)
@@ -108,7 +123,20 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to reload, error: \(error)")
 			}
 
-		case .editPersona:
+		case .destination(.presented(.confirmForgetAlert(.confirmTapped))):
+			guard case let .dApp(dApp, persona: persona) = state.mode else {
+				return .none
+			}
+			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
+			return .run { send in
+				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
+				await send(.delegate(.personaDeauthorized))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
+				errorQueue.schedule(error)
+			}
+
+		case .destination:
 			return .none
 		}
 	}
@@ -146,23 +174,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .deauthorizePersonaTapped:
-			state.confirmForgetAlert = .confirmForget
-			return .none
-
-		case .confirmForgetAlert(.presented(.confirmTapped)):
-			guard case let .dApp(dApp, persona: persona) = state.mode else {
-				return .none
-			}
-			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
-			return .run { send in
-				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
-				await send(.delegate(.personaDeauthorized))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
-				errorQueue.schedule(error)
-			}
-
-		case .confirmForgetAlert:
+			state.destination = .confirmForgetAlert(.confirmForget)
 			return .none
 		}
 	}
@@ -172,10 +184,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
 			case .general:
-				state.editPersona = .init(mode: .edit, persona: persona)
+				state.destination = .editPersona(.init(mode: .edit, persona: persona))
 			case let .dApp(_, detailedPersona):
 				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
-				state.editPersona = .init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona)
+				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
 			}
 
 			return .none
@@ -226,7 +238,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert> {
+extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 	static var confirmForget: AlertState {
 		AlertState {
 			TextState(L10n.PersonaDetails.deauthorizePersonaAlertTitle)

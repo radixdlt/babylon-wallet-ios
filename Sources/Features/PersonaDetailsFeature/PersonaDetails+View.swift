@@ -63,10 +63,24 @@ extension PersonaDetails.View {
 				}
 			}
 		}
-		.sheet(store: store.scope(state: \.$editPersona, action: { .child(.editPersona($0)) })) {
-			EditPersona.View(store: $0)
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.editPersona,
+			action: PersonaDetails.Destination.Action.editPersona
+		) { store in
+			EditPersona.View(store: store)
 		}
-		.alert(store: store.confirmForgetAlert)
+		.alert(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.confirmForgetAlert,
+			action: PersonaDetails.Destination.Action.confirmForgetAlert
+		)
+	}
+}
+
+private extension StoreOf<PersonaDetails> {
+	var destination: PresentationStoreOf<PersonaDetails.Destination> {
+		scope(state: \.$destination, action: { .child(.destination($0)) })
 	}
 }
 
@@ -93,12 +107,6 @@ private extension PersonaDetails.State {
 		case .dApp:
 			return true
 		}
-	}
-}
-
-private extension PersonaDetails.Store {
-	var confirmForgetAlert: AlertPresentationStore<PersonaDetails.ViewAction.ConfirmForgetAlert> {
-		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
 	}
 }
 
