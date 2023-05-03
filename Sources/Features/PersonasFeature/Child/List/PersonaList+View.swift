@@ -13,7 +13,7 @@ extension PersonaList {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack {
+				VStack(spacing: 0) {
 					ScrollView {
 						Text(L10n.PersonaList.subtitle)
 							.sectionHeading
@@ -22,11 +22,12 @@ extension PersonaList {
 							.padding(.bottom, .small2)
 
 						Separator()
+							.padding(.bottom, .small2)
 
 						PersonaListCoreView(store: store)
 					}
 
-					Button(L10n.PersonaList.createNewPersonaButtonTitle) {
+					Button(L10n.Personas.createNewPersonaButtonTitle) {
 						viewStore.send(.createNewPersonaButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -48,18 +49,16 @@ public struct PersonaListCoreView: View {
 	}
 
 	public var body: some View {
-		VStack(alignment: .leading) {
+		VStack(spacing: .medium3) {
 			ForEachStore(
 				store.scope(
 					state: \.personas,
 					action: { .child(.persona(id: $0, action: $1)) }
-				),
-				content: {
-					Persona.View(store: $0)
-						.padding(.vertical, .small3)
-						.padding(.horizontal, .medium3)
-				}
-			)
+				)
+			) {
+				Persona.View(store: $0)
+					.padding(.horizontal, .medium3)
+			}
 		}
 		.task {
 			ViewStore(store).send(.view(.task))

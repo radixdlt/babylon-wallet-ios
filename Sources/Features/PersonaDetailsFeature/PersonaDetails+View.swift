@@ -164,7 +164,7 @@ extension PersonaDetails.State {
 	var dAppsSection: DappsSection? {
 		switch mode {
 		case let .general(_, dApps):
-			return dApps
+			return dApps.isEmpty ? nil : dApps
 		case .dApp:
 			return nil
 		}
@@ -181,7 +181,12 @@ extension PersonaDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
-				VStack(alignment: .leading, spacing: .medium1) {
+				VStack(spacing: .medium1) {
+					Text(L10n.PersonaDetails.authorizedDappsDescription)
+						.textBlock
+						.flushedLeft
+						.padding(.horizontal, .medium1)
+
 					ForEach(viewStore.state) { dApp in
 						Card {
 							PlainListRow(title: dApp.displayName) {
@@ -190,9 +195,11 @@ extension PersonaDetails.View {
 								DappThumbnail(.known(dApp.thumbnail))
 							}
 						}
+						.padding(.horizontal, .medium3)
 					}
 				}
 			}
+			.padding(.vertical, .medium2)
 		}
 	}
 }
