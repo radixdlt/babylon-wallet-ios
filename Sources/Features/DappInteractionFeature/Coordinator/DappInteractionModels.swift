@@ -14,13 +14,16 @@ struct DappMetadata: Sendable, Hashable, Codable {
 
 	let name: NonEmpty<String>
 	let description: String?
+	let origin: P2P.Dapp.Request.Metadata.Origin
 
 	init(
 		name: String?,
-		description: String? = nil
+		description: String? = nil,
+		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
 		self.name = name.flatMap(NonEmptyString.init(rawValue:)) ?? Self.defaultName
 		self.description = description
+		self.origin = origin
 	}
 }
 
@@ -28,7 +31,8 @@ struct DappMetadata: Sendable, Hashable, Codable {
 extension DappMetadata {
 	static let previewValue: Self = .init(
 		name: "Collabo.Fi",
-		description: "A very collaby finance dapp"
+		description: "A very collaby finance dapp",
+		origin: .init(rawValue: "https://radfi.com")
 	)
 }
 #endif

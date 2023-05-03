@@ -1,5 +1,6 @@
 import AuthorizedDappsClient
 import CreateEntityFeature
+import EngineToolkit
 import FeaturePrelude
 import PersonasClient
 
@@ -90,7 +91,9 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			if let challenge = state.loginRequest.challenge {
-				fatalError("impl sign auth")
+				let payloadToHash: String = challenge.rawValue.data.hex() + state.dappDefinitionAddress.address + state.dappMetadata.origin
+				let hashToSign = try! blake2b(payloadToHash)
+				fatalError("impl sign auth, where")
 			} else {
 				let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
