@@ -2,7 +2,13 @@ import Prelude
 
 // MARK: - ProfileSnapshot.Header
 extension ProfileSnapshot {
-	public struct Header: Codable {
+	public struct Header:
+		Sendable,
+		Hashable,
+		Codable, // Snapshot IS Codable, but `Profile` is not.
+		CustomStringConvertible,
+		CustomDumpReflectable
+	{
 		public typealias Version = Tagged<Self, UInt32>
 
 		/// A description of the device the Profile was first generated on,
@@ -16,7 +22,7 @@ extension ProfileSnapshot {
 		/// A locally generated stable identfier of this Profile. Useful for checking if
 		/// to Profiles which are inequal based on `Equatable` (content) might be the
 		/// semantically the same, based on the ID.
-		public let id: ID; public typealias ID = Profile.ID
+		public let id: ID; public typealias ID = UUID
 
 		/// When this profile was first created
 		public let creationDate: Date
@@ -96,5 +102,31 @@ extension ProfileSnapshot.Header {
 				minimumRequiredVersion: minimumRequiredVersion
 			)
 		}
+	}
+}
+
+extension ProfileSnapshot.Header {
+	public var customDumpMirror: Mirror {
+		.init(
+			self,
+			children: [
+				"version": snapshotVersion,
+				"creatingDevice": creatingDevice,
+				"creationDate": creationDate,
+				"lastModified": lastModified,
+				"id": id,
+			],
+			displayStyle: .struct
+		)
+	}
+
+	public var description: String {
+		"""
+		version: \(snapshotVersion),
+		creatingDevice: \(creatingDevice),
+		creationDate: \(creationDate),
+		lastModified: \(lastModified),
+		id: \(id),
+		"""
 	}
 }

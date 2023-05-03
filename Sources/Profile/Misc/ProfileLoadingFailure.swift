@@ -6,7 +6,7 @@ extension Profile {
 	public enum LoadingFailure: Sendable, Swift.Error, Hashable {
 		case profileVersionOutdated(
 			json: Data,
-			version: ProfileSnapshot.Version
+                        version: ProfileSnapshot.Header.Version
 		)
 
 		case decodingFailure(json: Data, JSONDecodingError)
@@ -20,9 +20,9 @@ extension Profile {
 
 extension Profile {
 	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Hashable {
-		public let version: ProfileSnapshot.Version
+                public let version: ProfileSnapshot.Header.Version
 		public let error: Swift.Error
-		public init(version: ProfileSnapshot.Version, error: Error) {
+                public init(version: ProfileSnapshot.Header.Version, error: Error) {
 			self.version = version
 			self.error = error
 		}
