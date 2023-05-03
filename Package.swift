@@ -28,6 +28,7 @@ package.addModules([
 		name: "AccountListFeature",
 		dependencies: [
 			"AccountPortfoliosClient",
+			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
 		],
 		tests: .yes()
 	),
@@ -253,9 +254,11 @@ package.addModules([
 		name: "SigningFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
-			"TransactionClient",
+			"EngineToolkit",
 			"FactorSourcesClient",
+			"LedgerHardwareWalletClient",
 			"Profile",
+			"TransactionClient",
 			"UseFactorSourceClient",
 		],
 		tests: .no
@@ -442,8 +445,7 @@ package.addModules([
 		name: "LedgerHardwareWalletClient",
 		dependencies: [
 			"RadixConnectClient",
-			"AccountsClient",
-			"PersonasClient",
+			"FactorSourcesClient", // FIXME: move models to lower level package
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .no

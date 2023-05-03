@@ -113,11 +113,14 @@ extension ImportLegacyWalletClient: DependencyKey {
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					let babylonAddresses = Set<AccountAddress>(accounts.map(\.address))
-					let payloadByteCount = 26
 					let setOfExistingData = try Set(babylonAddresses.map {
-						let data = try Data(engineToolkitClient.decodeAddress($0.address).data.suffix(payloadByteCount))
-						return data
+						// the first byte is an address type discriminator byte, which differs between Babylon and Olympia,
+						// so we must remove it.
+						try Data(engineToolkitClient.decodeAddress($0.address).data.dropFirst())
 					})
+					guard let payloadByteCount = setOfExistingData.first?.count else {
+						return []
+					}
 					var alreadyImported = Set<OlympiaAccountToMigrate.ID>()
 					for scannedAccount in scannedAccounts {
 						let hash = try Blake2b.hash(data: scannedAccount.publicKey.compressedRepresentation)
@@ -152,7 +155,7 @@ func convert(
 		index: raw.addressIndex
 	)
 
-	return try .init(
+	return .init(
 		accountType: raw.accountType,
 		publicKey: raw.publicKey,
 		path: derivationPath,

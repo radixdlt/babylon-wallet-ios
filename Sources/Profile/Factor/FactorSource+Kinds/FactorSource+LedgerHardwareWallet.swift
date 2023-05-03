@@ -14,15 +14,14 @@ extension FactorSource {
 	public static func ledger(
 		id: FactorSource.ID,
 		model: LedgerHardwareWallet.DeviceModel,
-		name: String?,
-		olympiaCompatible: Bool
+		name: String?
 	) -> Self {
 		Self(
 			kind: .ledgerHQHardwareWallet,
 			id: id,
 			label: .init(name ?? "Unnamed"),
 			description: .init(model.rawValue),
-			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
+			parameters: .olympiaBackwardsCompatible,
 			storage: .entityCreating(.init()), // FIXME: Remove once we have multifactor
 			addedOn: .now,
 			lastUsedOn: .now

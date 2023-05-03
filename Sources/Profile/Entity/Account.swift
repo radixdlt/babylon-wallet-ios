@@ -81,6 +81,15 @@ extension Profile.Network {
 }
 
 extension Profile.Network.Account {
+	public func publicKeysOfRequiredSigningKeys() -> Set<SLIP10.PublicKey> {
+		switch securityState {
+		case let .unsecured(control):
+			return Set([control.genesisFactorInstance.publicKey])
+		}
+	}
+}
+
+extension Profile.Network.Account {
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable {
 		public var appearanceID: AppearanceID
@@ -113,11 +122,14 @@ extension Profile.Network.Account {
 	public static let nameMaxLength = 30
 	public static func deriveAddress(
 		networkID: NetworkID,
-		publicKey: SLIP10.PublicKey
+		factorInstance: FactorInstance
 	) throws -> EntityAddress {
+		if let derivationPath = factorInstance.derivationPath {
+			_ = try derivationPath.asAccountPath()
+		}
 		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
 			request: .init(
-				publicKey: publicKey.intoEngine(),
+				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID
 			)
 		).get()
@@ -137,13 +149,30 @@ extension Profile.Network.Account {
 	}
 }
 
+// MARK: - WrongEntityInDerivationPath
+struct WrongEntityInDerivationPath: Swift.Error {}
+
 extension Profile.Network.Account {
 	public var factorInstance: FactorInstance {
 		switch securityState {
 		case let .unsecured(unsecured): return unsecured.genesisFactorInstance
 		}
 	}
+
+	public func derivationPath() throws -> DerivationPath {
+		guard let path = factorInstance.derivationPath else {
+			throw NoDerivationPath()
+		}
+		return path
+	}
+
+	public var publicKey: SLIP10.PublicKey {
+		factorInstance.publicKey
+	}
 }
+
+// MARK: - NoDerivationPath
+struct NoDerivationPath: Error {}
 
 extension Profile.Network.Account {
 	public static var entityKind: EntityKind { .account }

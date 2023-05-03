@@ -53,7 +53,13 @@ extension Profile.Network {
 			securityState: EntitySecurityState,
 			displayName: NonEmpty<String>
 		) {
-			self.init(networkID: networkID, address: address, securityState: securityState, displayName: displayName, fields: [])
+			self.init(
+				networkID: networkID,
+				address: address,
+				securityState: securityState,
+				displayName: displayName,
+				fields: []
+			)
 		}
 	}
 }
@@ -162,11 +168,18 @@ import EngineToolkit
 extension Profile.Network.Persona {
 	public static func deriveAddress(
 		networkID: NetworkID,
-		publicKey: SLIP10.PublicKey
+		factorInstance: FactorInstance
 	) throws -> EntityAddress {
+		if let derivationPath = factorInstance.derivationPath {
+			let path = try derivationPath.asIdentityPath()
+			guard path.entityKind == .identity else {
+				throw WrongEntityInDerivationPath()
+			}
+		}
+
 		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(
 			request: .init(
-				publicKey: publicKey.intoEngine(),
+				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID
 			)
 		).get()

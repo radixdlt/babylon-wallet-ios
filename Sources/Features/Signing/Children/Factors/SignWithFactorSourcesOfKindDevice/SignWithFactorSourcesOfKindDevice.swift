@@ -5,15 +5,15 @@ import UseFactorSourceClient
 public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducerProtocol {
 	public static let factorSourceKind = FactorSourceKind.device
 	public typealias State = SignWithFactorSourcesOfKindState<Self>
-	public enum ViewAction: Sendable, Equatable {
+	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
 		case appeared
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
 		case signingWithFactor(SigningFactor)
 	}
 
-	public enum DelegateAction: SignWithFactorSourcesOfKindActionProtocol {
+	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
 		case done(
 			signingFactors: NonEmpty<Set<SigningFactor>>,
 			signatures: Set<AccountSignature>
@@ -26,34 +26,12 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { [signingFactors = state.signingFactors, data = state.dataToSign] send in
-				var signaturesFromAllFactorSources = Set<AccountSignature>()
-				for signingFactor in signingFactors {
-					await send(.internal(.signingWithFactor(signingFactor)))
-
-					let signatures = try await useFactorSourceClient.signUsingDeviceFactorSource(
-						deviceFactorSource: signingFactor.factorSource,
-						of: Set(signingFactor.signers.map(\.account)),
-						unhashedDataToSign: data
-					)
-
-					for signature in signatures {
-						signaturesFromAllFactorSources.insert(signature)
-					}
-				}
-				await send(.delegate(.done(
-					signingFactors: signingFactors,
-					signatures: signaturesFromAllFactorSources
-				)))
-
-			} catch: { _, _ in
-				loggerGlobal.error("Failed to device sign")
-			}
+			return signWithSigningFactors(of: state)
 		}
 	}
 
 	public func reduce(
-		into state: inout SignWithFactorSourcesOfKindState<SignWithFactorSourcesOfKindDevice>,
+		into state: inout State,
 		internalAction: InternalAction
 	) -> EffectTask<Action> {
 		switch internalAction {
@@ -61,5 +39,16 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 			state.currentSigningFactor = factor
 			return .none
 		}
+	}
+
+	func sign(
+		signingFactor: SigningFactor,
+		state: State
+	) async throws -> Set<AccountSignature> {
+		try await useFactorSourceClient.signUsingDeviceFactorSource(
+			deviceFactorSource: signingFactor.factorSource,
+			of: Set(signingFactor.signers.map(\.account)),
+			unhashedDataToSign: state.dataToSign
+		)
 	}
 }

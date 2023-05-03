@@ -44,7 +44,7 @@ extension CustomHierarchicalDeterministicDerivationPath {
 
 extension CustomHierarchicalDeterministicDerivationPath {
 	public func wrapAsDerivationPath() -> DerivationPath {
-		.customPath(self)
+		.customPath(self, scheme: .cap26)
 	}
 
 	/// Tries to unwraps the nominal type `DerivationPath` (enum)

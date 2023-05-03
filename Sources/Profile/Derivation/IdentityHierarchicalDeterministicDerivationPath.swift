@@ -12,7 +12,7 @@ import Prelude
 ///
 /// The format is:
 ///
-///     `m/44'/1022'/<NETWORK_ID>'/618'/<ENTITY_INDEX>'/<KEY_TYPE>'`
+///     `m/44'/1022'/<NETWORK_ID>'/618'/<KEY_TYPE>'/<ENTITY_INDEX>'`
 ///
 /// Where `'` denotes hardened path, which is **required** as per [SLIP-10][slip10],
 /// where `618` is ASCII sum of `"IDENTITY"`, i.e. `"IDENTITY".map{ $0.asciiValue! }.reduce(0, +)`

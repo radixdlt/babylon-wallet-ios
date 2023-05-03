@@ -96,11 +96,11 @@ extension Profile.Network.Account {
 			factorInstance: .init(
 				factorSourceID: factorSource.id,
 				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
-				derivationPath: AccountHierarchicalDeterministicDerivationPath(
+				derivationPath: AccountDerivationPath.babylon(.init(
 					networkID: .simulator,
 					index: index,
 					keyKind: .transactionSigning
-				).wrapAsDerivationPath()
+				)).wrapAsDerivationPath()
 			),
 			displayName: "\(index)",
 			extraProperties: .init(

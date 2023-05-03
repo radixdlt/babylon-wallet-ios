@@ -28,7 +28,8 @@ extension ProfileSnapshot.Version {
 	/// - 27: Rename `iCloudProfileSyncEnabled` -> `isCloudProfileSyncEnabled` to be platform agnostic.
 	/// - 28: CAP26 update (new KeyType values)
 	/// - 29: Change FactorSource, split `hint` into (`label`, `description`) tuple.
-	public static let minimum: Self = 29
+	/// - 30: Fix critical bug where identity derivation path was used for account
+	public static let minimum: Self = 30
 }
 
 // MARK: - Profile

@@ -69,11 +69,15 @@ extension AddLedgerFactorSource {
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}
+				.confirmationDialog(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AddLedgerFactorSource.Destinations.State.closeLedgerAlreadyExistsConfirmationDialog,
+					action: AddLedgerFactorSource.Destinations.Action.closeLedgerAlreadyExistsConfirmationDialog
+				)
 				.sheet(
-					store: store.scope(
-						state: \.$addNewP2PLink,
-						action: { .child(.addNewP2PLink($0)) }
-					),
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AddLedgerFactorSource.Destinations.State.addNewP2PLink,
+					action: AddLedgerFactorSource.Destinations.Action.addNewP2PLink,
 					content: { NewConnection.View(store: $0) }
 				)
 			}

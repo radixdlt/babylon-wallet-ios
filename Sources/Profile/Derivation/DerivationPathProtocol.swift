@@ -75,10 +75,10 @@ public struct DerivationPath:
 }
 
 extension DerivationPath {
-	public static let getID: Self = try! .customPath(.init(path: .getID))
+	public static let getID: Self = try! .customPath(.init(path: .getID), scheme: .cap26)
 
 	/// The **default** derivation path for `Account`s.
-	public static func accountPath(_ path: AccountHierarchicalDeterministicDerivationPath) -> Self {
+	public static func accountPath(_ path: AccountDerivationPath) -> Self {
 		Self(scheme: .cap26, path: path.derivationPath)
 	}
 
@@ -88,8 +88,8 @@ extension DerivationPath {
 	}
 
 	/// A **custom** derivation path use to derive some keys.
-	public static func customPath(_ path: CustomHierarchicalDeterministicDerivationPath) -> Self {
-		Self(scheme: .cap26, path: path.derivationPath)
+	public static func customPath(_ path: CustomHierarchicalDeterministicDerivationPath, scheme: DerivationPathScheme) -> Self {
+		Self(scheme: scheme, path: path.derivationPath)
 	}
 
 	public static func forEntity(
@@ -100,7 +100,7 @@ extension DerivationPath {
 	) throws -> Self {
 		let path = try HD.Path.Full.defaultForEntity(
 			networkID: networkID,
-			entityKind: .identity,
+			entityKind: entityKind,
 			index: index,
 			keyKind: keyKind
 		)
@@ -119,8 +119,8 @@ extension DerivationPath {
 		try IdentityHierarchicalDeterministicDerivationPath(derivationPath: path)
 	}
 
-	public func asAccountPath() throws -> AccountHierarchicalDeterministicDerivationPath {
-		try AccountHierarchicalDeterministicDerivationPath(derivationPath: path)
+	public func asAccountPath() throws -> AccountDerivationPath {
+		try AccountDerivationPath(derivationPath: path)
 	}
 
 	public func asCustomPath() throws -> CustomHierarchicalDeterministicDerivationPath {
@@ -154,6 +154,6 @@ extension DerivationPath {
 
 #if DEBUG
 extension DerivationPath {
-	public static let previewValueAccount = try! Self.accountPath(.init(networkID: .nebunet, index: 0, keyKind: .transactionSigning))
+	public static let previewValueAccount = try! Self.accountPath(.babylon(.init(networkID: .nebunet, index: 0, keyKind: .transactionSigning)))
 }
 #endif // DEBUG

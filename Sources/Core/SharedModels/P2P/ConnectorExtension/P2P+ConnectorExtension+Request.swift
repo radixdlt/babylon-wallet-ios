@@ -66,6 +66,7 @@ extension P2P.ConnectorExtension.Request {
 				public let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				public let compiledTransactionIntent: HexCodable
+				public let displayHash: Bool
 				public let mode: Mode
 				public enum Mode: String, Sendable, Hashable, Encodable {
 					case verbose
@@ -76,12 +77,14 @@ extension P2P.ConnectorExtension.Request {
 					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
 					compiledTransactionIntent: HexCodable,
+					displayHash: Bool,
 					mode: Mode
 				) {
 					self.signers = signers
 					self.ledgerDevice = ledgerDevice
 					self.compiledTransactionIntent = compiledTransactionIntent
 					self.mode = mode
+					self.displayHash = displayHash
 				}
 			}
 		}

@@ -16,7 +16,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo?
 
 		@PresentationState
-		public var addNewP2PLink: NewConnection.State?
+		var destination: Destinations.State? = nil
 
 		public init() {}
 	}
@@ -28,6 +28,11 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case ledgerNameChanged(String)
 		case confirmNameButtonTapped
 		case skipNamingLedgerButtonTapped
+
+		public enum CloseLedgerAlreadyExistsDialogAction: Sendable, Hashable {
+			case tryAnotherLedger
+			case finish
+		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -35,13 +40,14 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case getDeviceInfoResult(
 			TaskResult<P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo>
 		)
-
+		case alreadyExists(FactorSource)
+		case nameLedgerBeforeAddingIt(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo)
 		case addedFactorSource(FactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
 		case saveNewConnection(P2PLink)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case addNewP2PLink(PresentationAction<NewConnection.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -50,6 +56,25 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		)
 	}
 
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case addNewP2PLink(NewConnection.State)
+			case closeLedgerAlreadyExistsConfirmationDialog(ConfirmationDialogState<ViewAction.CloseLedgerAlreadyExistsDialogAction>)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case addNewP2PLink(NewConnection.Action)
+			case closeLedgerAlreadyExistsConfirmationDialog(ViewAction.CloseLedgerAlreadyExistsDialogAction)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
+				NewConnection()
+			}
+		}
+	}
+
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -59,8 +84,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$addNewP2PLink, action: /Action.child .. ChildAction.addNewP2PLink) {
-				NewConnection()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -80,16 +105,11 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			}
 
 		case .addNewP2PLinkButtonTapped:
-			state.addNewP2PLink = .init()
+			state.destination = .addNewP2PLink(.init())
 			return .none
 
 		case .sendAddLedgerRequestButtonTapped:
-			state.isWaitingForResponseFromLedger = true
-			return .run { send in
-				await send(.internal(.getDeviceInfoResult(TaskResult {
-					try await ledgerHardwareClient.getDeviceInfo()
-				})))
-			}
+			return sendAddLedgerRequest(&state)
 
 		case let .ledgerNameChanged(name):
 			state.ledgerName = name
@@ -121,9 +141,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .addNewP2PLink(.presented(.delegate(.newConnection(connectedClient)))):
+		case let .destination(.presented(.addNewP2PLink(.delegate(.newConnection(connectedClient))))):
 
-			state.addNewP2PLink = nil
+			state.destination = nil
 			return .run { send in
 				try await radixConnectClient.storeP2PLink(
 					connectedClient
@@ -133,9 +153,15 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed P2PLink, error \(error)")
 				errorQueue.schedule(error)
 			}
-		case .addNewP2PLink(.presented(.delegate(.dismiss))):
-			state.addNewP2PLink = nil
+		case .destination(.presented(.addNewP2PLink(.delegate(.dismiss)))):
+			state.destination = nil
 			return .none
+
+		case .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.finish))):
+			return .fireAndForget { await dismiss() }
+
+		case .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.tryAnotherLedger))):
+			return sendAddLedgerRequest(&state)
 
 		default:
 			return .none
@@ -152,7 +178,40 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
 			state.isWaitingForResponseFromLedger = false
 			loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
-			state.unnamedDeviceToAdd = ledgerDeviceInfo
+			return .run { send in
+				let allFactorSources = try await factorSourcesClient.getFactorSources()
+				if let existing = allFactorSources.first(where: { $0.id == ledgerDeviceInfo.id }) {
+					await send(.internal(.alreadyExists(existing)))
+				} else {
+					// new!
+					await send(.internal(.nameLedgerBeforeAddingIt(
+						ledgerDeviceInfo
+					)))
+				}
+			} catch: { _, send in
+				await send(.internal(.nameLedgerBeforeAddingIt(ledgerDeviceInfo)))
+			}
+
+		case let .alreadyExists(existingFactorSource):
+
+			state.destination = .closeLedgerAlreadyExistsConfirmationDialog(
+				.init(titleVisibility: .hidden) {
+					TextState("")
+				} actions: {
+					ButtonState(role: .destructive, action: .send(.finish)) {
+						TextState("Finish adding ledgers..")
+					}
+					ButtonState(role: .cancel, action: .send(.tryAnotherLedger)) {
+						TextState("Connect a different Ledger to computer")
+					}
+				} message: {
+					TextState("You have already added this ledger \(existingFactorSource.label.rawValue) \(existingFactorSource.description.rawValue) on \(existingFactorSource.addedOn.ISO8601Format())")
+				}
+			)
+			return .none
+
+		case let .nameLedgerBeforeAddingIt(unnamedDevice):
+			state.unnamedDeviceToAdd = unnamedDevice
 			return .none
 
 		case let .getDeviceInfoResult(.failure(error)):
@@ -181,8 +240,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		let factorSource = FactorSource.ledger(
 			id: device.id,
 			model: model,
-			name: name,
-			olympiaCompatible: false
+			name: name
 		)
 
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
@@ -194,6 +252,15 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
 			errorQueue.schedule(error)
+		}
+	}
+
+	private func sendAddLedgerRequest(_ state: inout State) -> EffectTask<Action> {
+		state.isWaitingForResponseFromLedger = true
+		return .run { send in
+			await send(.internal(.getDeviceInfoResult(TaskResult {
+				try await ledgerHardwareClient.getDeviceInfo()
+			})))
 		}
 	}
 }

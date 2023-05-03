@@ -12,10 +12,10 @@ extension Profile.Network.Accounts {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult
 	public mutating func appendAccount(_ account: Profile.Network.Account) -> Profile.Network.Account {
-		var orderedSet = self.rawValue
-		let (wasInserted, _) = orderedSet.append(account)
+		var identifiedArrayOf = self.rawValue
+		let (wasInserted, _) = identifiedArrayOf.append(account)
 		assert(wasInserted, "We expected this to be a new, unique, Account, thus we expected it to be have been inserted, but it was not. Maybe all properties except the AccountAddress was unique, and the reason why address was not unique is probably due to the fact that the wrong 'index' in the derivation path was use (same reused), due to bad logic in `storage` of the factor.")
-		self = .init(rawValue: orderedSet)!
+		self = .init(rawValue: identifiedArrayOf)!
 		return account
 	}
 }

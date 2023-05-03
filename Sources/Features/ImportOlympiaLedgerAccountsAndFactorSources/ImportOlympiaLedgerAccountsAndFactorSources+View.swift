@@ -7,7 +7,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 			ledgerName: ledgerName,
 			modelOfLedgerToName: unnamedDeviceToAdd?.model,
 			numberOfUnverifiedAccounts: unverified.count,
-			addedLedgersWithAccounts: addedLedgersWithAccounts,
+			ledgersWithAccounts: ledgersWithAccounts,
 			viewControlState: isWaitingForResponseFromLedger ? .loading(.global(text: "Waiting for ledger response")) : .enabled
 		)
 	}
@@ -20,7 +20,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		public let ledgerName: String
 		public let modelOfLedgerToName: P2P.LedgerHardwareWallet.Model?
 		public let numberOfUnverifiedAccounts: Int
-		public let addedLedgersWithAccounts: OrderedSet<AddedLedgerWithAccounts>
+		public let ledgersWithAccounts: OrderedSet<LedgerWithAccounts>
 		public let viewControlState: ControlState
 	}
 
@@ -44,12 +44,12 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 					Spacer()
 
-					if !viewStore.addedLedgersWithAccounts.isEmpty {
+					if !viewStore.ledgersWithAccounts.isEmpty {
 						Text("Imported ledgers and accounts")
 						ScrollView {
-							ForEach(viewStore.addedLedgersWithAccounts, id: \.self) { addedLedgerWithAccounts in
+							ForEach(viewStore.ledgersWithAccounts, id: \.self) { ledgerWithAccounts in
 								LazyVStack {
-									Text("\(addedLedgerWithAccounts.displayName) - #\(addedLedgerWithAccounts.migratedAccounts.count) accounts")
+									Text("\(ledgerWithAccounts.displayName) (new? \(ledgerWithAccounts.isLedgerNew ? "yes" : "no")) - #\(ledgerWithAccounts.migratedAccounts.count) accounts")
 								}
 							}
 						}

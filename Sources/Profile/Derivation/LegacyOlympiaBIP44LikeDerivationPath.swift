@@ -167,7 +167,7 @@ extension LegacyOlympiaBIP44LikeDerivationPath {
 	/// Wraps this specific type of derivation path to the shared
 	/// nominal type `DerivationPath` (enum)
 	public func wrapAsDerivationPath() -> DerivationPath {
-		try! .customPath(.init(path: fullPath))
+		try! .customPath(.init(path: fullPath), scheme: .bip44Olympia)
 	}
 
 	/// Tries to unwraps the nominal type `DerivationPath` (enum)

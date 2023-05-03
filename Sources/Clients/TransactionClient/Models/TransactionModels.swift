@@ -116,15 +116,6 @@ extension GatewayAPI.PublicKey {
 	}
 }
 
-extension Profile.Network.Account {
-	public func publicKeysOfRequiredSigningKeys() -> Set<SLIP10.PublicKey> {
-		switch securityState {
-		case let .unsecured(control):
-			return Set([control.genesisFactorInstance.publicKey])
-		}
-	}
-}
-
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
 	public let intentSignatures: Set<Engine.SignatureWithPublicKey>

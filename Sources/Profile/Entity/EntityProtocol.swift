@@ -13,7 +13,7 @@ public protocol EntityProtocol: Sendable, Equatable {
 
 	static func deriveAddress(
 		networkID: NetworkID,
-		publicKey: SLIP10.PublicKey
+		factorInstance: FactorInstance
 	) throws -> EntityAddress
 
 	/// The ID of the network this entity exists on.
@@ -66,7 +66,7 @@ extension EntityProtocol {
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) throws {
-		let address = try Self.deriveAddress(networkID: networkID, publicKey: factorInstance.publicKey)
+		let address = try Self.deriveAddress(networkID: networkID, factorInstance: factorInstance)
 		self.init(
 			networkID: networkID,
 			address: address,
