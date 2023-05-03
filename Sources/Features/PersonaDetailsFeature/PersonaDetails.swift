@@ -212,11 +212,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		var dApps = dApps
 		for dApp in dApps {
 			do {
-				print("Loading metadata for \(dApp.id)")
-
-				let metadata = try await gatewayAPIClient.getDappDefinition(dApp.id.address)
+				let metadata = try await gatewayAPIClient.getDappMetadata(dApp.id)
 				dApps[id: dApp.id]?.thumbnail = metadata.iconURL
-				print("Loaded metadata for \(metadata.name)")
 			} catch {
 				loggerGlobal.error("Failed to load dApp metadata, error: \(error)")
 			}

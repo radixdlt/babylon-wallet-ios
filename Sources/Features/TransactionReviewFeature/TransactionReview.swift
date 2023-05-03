@@ -430,7 +430,7 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
-		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address)
+		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications
 
 		let dApps = try await addresses.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
@@ -438,10 +438,10 @@ extension TransactionReview {
 		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: dApps))
 	}
 
-	private func extractDappInfo(_ address: String) async throws -> LedgerEntity {
+	private func extractDappInfo(_ address: ComponentAddress) async throws -> LedgerEntity {
 		let metadata = try? await gatewayAPIClient.getDappDefinition(address)
 		return LedgerEntity(
-			id: address,
+			id: address.address,
 			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
 			                thumbnail: metadata?.iconURL,
 			                description: metadata?.description)
