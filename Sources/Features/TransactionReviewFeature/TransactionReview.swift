@@ -432,6 +432,54 @@ extension TransactionReview {
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
 		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications
 
+		func debug(addresses: Set<ComponentAddress>, label: String) async {
+			print("------ \(label)")
+			for address in addresses {
+				print("    ---- ", address.address)
+				if let metadata = try? await gatewayAPIClient.getEntityMetadata(address.address) {
+					if metadata.items.isEmpty {
+					} else {
+						print("        Empty metadata")
+						for item in metadata.items {
+							print("        \(item.key): \(item.value.asString)")
+						}
+					}
+				} else {
+					print("        No metadata")
+				}
+			}
+		}
+
+		let comps = manifest.encounteredAddresses.componentAddresses
+		await debug(addresses: comps.userApplications, label: "userApplications")
+		await debug(addresses: comps.accounts, label: "accounts")
+		await debug(addresses: comps.identities, label: "identities")
+		await debug(addresses: comps.clocks, label: "clocks")
+		await debug(addresses: comps.epochManagers, label: "epochManagers")
+		await debug(addresses: comps.validators, label: "validators")
+		await debug(addresses: comps.accessController, label: "accessController")
+		await debug(addresses: comps.userApplications, label: "userApplications")
+
+		func debug(addresses: Set<ResourceAddress>) async {
+			print("------ Resources")
+			for address in addresses {
+				print("    ---- ", address.address)
+				if let metadata = try? await gatewayAPIClient.getEntityMetadata(address.address) {
+					if metadata.items.isEmpty {
+					} else {
+						print("        Empty metadata")
+						for item in metadata.items {
+							print("        \(item.key): \(item.value.asString)")
+						}
+					}
+				} else {
+					print("        No metadata")
+				}
+			}
+		}
+
+		await debug(addresses: manifest.encounteredAddresses.resourceAddresses)
+
 		let dApps = try await addresses.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
 
