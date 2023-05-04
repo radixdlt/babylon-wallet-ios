@@ -45,10 +45,10 @@
 "createAccount_completion_explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
 "createAccount_completion_subtitleFirst" = "You’ve created your first Account.";
 "createAccount_completion_subtitleNotFirst" = "Your Account has been created.";
+"createAccount_introduction_title" = "Create an Account";
 "createAccount_nameNewAccount_explanation" = "This can be changed any time";
 "createAccount_nameNewAccount_placeholder" = "e.g. My Main Account";
 "createAccount_nameNewAccount_subtitle" = "What would you like to call your Account?";
-"createAccount_title" = "Create an Account";
 "createAccount_titleFirst" = "Create First Account";
 "createAccount_titleNotFirst" = "Create New Account";
 "createEntity_completion_destinationChooseAccounts" = "Choose Accounts";
