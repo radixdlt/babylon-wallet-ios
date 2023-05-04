@@ -11,6 +11,7 @@ public struct FaucetClient: Sendable {
 	public var createFungibleToken: CreateFungibleToken
 	public var createNonFungibleToken: CreateNonFungibleToken
 
+	// FIXME: move `signSubmitSimpleTX` to some other client! but which?
 	/// A "simple TX" is a transaction which cannot require signing of any factor source except
 	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
 	public var signSubmitSimpleTX: SignSubmitSimpleTX
