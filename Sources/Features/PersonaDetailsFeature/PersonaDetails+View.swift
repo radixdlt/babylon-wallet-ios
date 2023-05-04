@@ -199,7 +199,7 @@ extension PersonaDetails.View {
 						Card {
 							viewStore.send(.dAppTapped(dApp.id))
 						} contents: {
-							PlainListRow_(title: dApp.displayName) {
+							PlainListRow(title: dApp.displayName) {
 								DappThumbnail(.known(dApp.thumbnail))
 							}
 						}

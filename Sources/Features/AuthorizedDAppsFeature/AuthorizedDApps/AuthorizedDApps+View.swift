@@ -41,7 +41,7 @@ extension AuthorizedDapps.View {
 							Card {
 								viewStore.send(.didSelectDapp(dApp.id))
 							} contents: {
-								PlainListRow_(title: dApp.name) {
+								PlainListRow(title: dApp.name) {
 									DappThumbnail(.known(dApp.thumbnail))
 								}
 							}

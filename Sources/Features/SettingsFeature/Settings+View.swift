@@ -230,31 +230,26 @@ extension AppSettings.View {
 					}
 
 					#if DEBUG
-					PlainListRow(title: L10n.Settings.inspectProfileButtonTitle) {
+					TappableListRow(title: L10n.Settings.inspectProfileButtonTitle) {
 						viewStore.send(.debugInspectProfileButtonTapped)
 					} icon: {
 						Image(systemName: "wallet.pass")
 							.frame(.verySmall)
 					}
 					.withSeparator
-					.buttonStyle(.tappableRowStyle)
 
-					PlainListRow(title: "Factor Sources") {
-						viewStore.send(.factorSourcesButtonTapped)
+					TappableListRow(title: "Factor Sources") {
+						viewStore.send(.debugInspectProfileButtonTapped)
 					} icon: {
 						Image(systemName: "person.badge.key")
 							.frame(.verySmall)
 					}
 					.withSeparator
-					.buttonStyle(.tappableRowStyle)
 
-					PlainListRow(title: L10n.Settings.importLegacyWallet) {
+					TappableListRow(title: L10n.Settings.importLegacyWallet, asset: AssetResource.generalSettings) {
 						viewStore.send(.importFromOlympiaWalletButtonTapped)
-					} icon: {
-						Image(asset: AssetResource.generalSettings)
 					}
 					.withSeparator
-					.buttonStyle(.tappableRowStyle)
 					#endif
 
 					ForEach(settingsRows()) { row in
@@ -262,20 +257,6 @@ extension AppSettings.View {
 							viewStore.send(row.action)
 						}
 						.withSeparator
-
-//						Button {
-//							viewStore.send(row.action)
-//						} label: {
-//							PlainListRow_(title: row.title, asset: row.asset)
-//						}
-//						.withSeparator
-//						.buttonStyle(.tappableRowStyle)
-
-//						PlainListRow(title: row.title, asset: row.asset) {
-//							viewStore.send(row.action)
-//						}
-//						.withSeparator
-//						.buttonStyle(.tappableRowStyle)
 					}
 				}
 				.padding(.bottom, .large3)

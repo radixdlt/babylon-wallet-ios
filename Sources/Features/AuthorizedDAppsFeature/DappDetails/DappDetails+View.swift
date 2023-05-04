@@ -221,7 +221,7 @@ extension DappDetails.View {
 						Card {
 							action(element.id)
 						} contents: {
-							PlainListRow_(showChevron: false, title: title(element)) {
+							PlainListRow(showChevron: false, title: title(element)) {
 								icon(element)
 							}
 						}

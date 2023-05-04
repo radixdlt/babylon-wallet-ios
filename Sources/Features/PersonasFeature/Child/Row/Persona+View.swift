@@ -15,7 +15,7 @@ extension Persona {
 				Card {
 					viewStore.send(.tapped)
 				} contents: {
-					PlainListRow_(title: viewStore.displayName) {
+					PlainListRow(title: viewStore.displayName) {
 						PersonaThumbnail(viewStore.thumbnail)
 					}
 				}
