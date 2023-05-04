@@ -77,6 +77,9 @@ extension ROLAClient {
 			guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {
 				throw ROLAFailure.unknownDappDefinitionAddress
 			}
+		},
+		createAuthSigningKeyForEntityIfNeeded: { _ in
+			// noop
 		}
 	)
 

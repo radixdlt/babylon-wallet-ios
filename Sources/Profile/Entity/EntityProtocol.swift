@@ -2,9 +2,15 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
+// MARK: - WrappedEntityID
+public enum WrappedEntityID: Sendable, Hashable {
+	case accountID(Profile.Network.Account.ID)
+	case personaID(Profile.Network.Persona.ID)
+}
+
 // MARK: - EntityProtocol
 /// An `Account` or a `Persona`
-public protocol EntityProtocol: Sendable, Equatable {
+public protocol EntityProtocol: Sendable, Equatable, Identifiable where ID == EntityAddress {
 	/// The type of address of entity.
 	associatedtype EntityAddress: AddressKindProtocol & Hashable
 	associatedtype ExtraProperties: Sendable
@@ -32,6 +38,8 @@ public protocol EntityProtocol: Sendable, Equatable {
 
 	func cast<Entity: EntityProtocol>() throws -> Entity
 
+	var wrappedID: WrappedEntityID { get }
+
 	init(
 		networkID: NetworkID,
 		address: EntityAddress,
@@ -42,6 +50,9 @@ public protocol EntityProtocol: Sendable, Equatable {
 }
 
 extension EntityProtocol {
+	/// A stable and globally unique identifier for this account.
+	public var id: ID { address }
+
 	public var kind: EntityKind { Self.entityKind }
 
 	public init(

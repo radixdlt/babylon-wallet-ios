@@ -179,11 +179,7 @@ extension Profile.Network.Account {
 
 	public typealias EntityAddress = AccountAddress
 
-	/// A stable and globally unique identifier of an account.
-	public typealias ID = EntityAddress
-
-	/// A stable and globally unique identifier for this account.
-	public var id: ID { address }
+	public var wrappedID: WrappedEntityID { .accountID(id) }
 }
 
 extension Profile.Network.Account {

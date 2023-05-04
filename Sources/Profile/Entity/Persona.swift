@@ -65,6 +65,8 @@ extension Profile.Network {
 }
 
 extension Profile.Network.Persona {
+	public var wrappedID: WrappedEntityID { .personaID(id) }
+
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable, Hashable, Codable {
 		public var fields: IdentifiedArrayOf<Field>
@@ -89,12 +91,6 @@ extension Profile.Network.Persona {
 	public mutating func updateAppearanceIDIfAble(_: Profile.Network.Account.AppearanceID) {}
 
 	public typealias EntityAddress = IdentityAddress
-
-	/// A stable and globally unique identifier of an account.
-	public typealias ID = EntityAddress
-
-	/// A stable and globally unique identifier for this persona.
-	public var id: ID { address }
 }
 
 extension Profile.Network.Persona {
