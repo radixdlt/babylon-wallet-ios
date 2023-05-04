@@ -193,7 +193,7 @@ extension ProfileStore {
 			// prevent duplicates
 			return
 		}
-                guard self.profile.header.id == profile.header.id else {
+		guard self.profile.header.id == profile.header.id else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called with a Profile which UUID does not match the current one. This should never happen."
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
@@ -308,10 +308,10 @@ extension ProfileStore {
 				return .success(nil)
 			}
 
-                        let decodedVersion: ProfileSnapshot.Header.Version
+			let decodedHeader: ProfileSnapshot.Header
 			do {
-                                // Implement decode version
-                                decodedVersion = try ProfileSnapshot.Header.Version.fromJSON(
+				// Implement decode version
+				decodedHeader = try ProfileSnapshot.Header.fromJSON(
 					data: profileSnapshotData,
 					jsonDecoder: jsonDecoder()
 				)
@@ -326,12 +326,12 @@ extension ProfileStore {
 			}
 
 			do {
-				try ProfileSnapshot.validateCompatibility(version: decodedVersion)
+				try decodedHeader.validateCompatibility()
 			} catch {
 				// Incompatible Versions
 				return .failure(.profileVersionOutdated(
 					json: profileSnapshotData,
-					version: decodedVersion
+					version: decodedHeader.snapshotVersion
 				))
 			}
 

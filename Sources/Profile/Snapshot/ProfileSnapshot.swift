@@ -10,6 +10,10 @@ public struct ProfileSnapshot:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
+	public var version: Header.Version {
+		header.snapshotVersion
+	}
+
 	public let header: Header
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
@@ -44,9 +48,9 @@ extension Profile {
 	public init(
 		snapshot: ProfileSnapshot
 	) throws {
-                // TODO: Validate compatibility
+		// TODO: Validate compatibility
 		self.init(
-                        header: snapshot.header,
+			header: snapshot.header,
 			factorSources: snapshot.factorSources,
 			appPreferences: snapshot.appPreferences,
 			networks: snapshot.networks
@@ -62,18 +66,18 @@ extension ProfileSnapshot {
 				"factorSources": factorSources,
 				"appPreferences": appPreferences,
 				"networks": networks,
-                                "header": header.customDumpMirror
+				"header": header.customDumpMirror,
 			],
 			displayStyle: .struct
 		)
 	}
 
-        public var description: String {
-  """
-  factorSources: \(factorSources),
-                header: \(header.description),
-  appPreferences: \(appPreferences),
-  networks: \(networks),
-  """
-        }
+	public var description: String {
+		"""
+		factorSources: \(factorSources),
+		              header: \(header.description),
+		appPreferences: \(appPreferences),
+		networks: \(networks),
+		"""
+	}
 }

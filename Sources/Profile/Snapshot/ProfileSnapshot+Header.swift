@@ -91,14 +91,12 @@ extension ProfileSnapshot.Header {
 		}
 	}
 
-	public static func validateCompatibility(
-		version: Version
-	) throws {
+	public func validateCompatibility() throws {
 		let minimumRequiredVersion: Version = .minimum
 
-		guard version >= minimumRequiredVersion else {
+		guard snapshotVersion >= minimumRequiredVersion else {
 			throw IncompatibleProfileVersion(
-				decodedVersion: version,
+				decodedVersion: snapshotVersion,
 				minimumRequiredVersion: minimumRequiredVersion
 			)
 		}
@@ -128,5 +126,19 @@ extension ProfileSnapshot.Header {
 		lastModified: \(lastModified),
 		id: \(id),
 		"""
+	}
+}
+
+extension ProfileSnapshot.Header {
+	struct HeaderHolder: Decodable {
+		let header: ProfileSnapshot.Header
+	}
+
+	public static func fromJSON(
+		data: Data,
+		jsonDecoder: JSONDecoder = .iso8601
+	) throws -> Self {
+		let versionHolder = try jsonDecoder.decode(HeaderHolder.self, from: data)
+		return versionHolder.header
 	}
 }

@@ -7,6 +7,10 @@ public struct Profile:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
+	public var version: ProfileSnapshot.Header.Version {
+		header.snapshotVersion
+	}
+
 	public let header: ProfileSnapshot.Header
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
@@ -56,25 +60,25 @@ extension Profile: Codable {
 }
 
 extension Profile {
-        public var customDumpMirror: Mirror {
-                .init(
-                        self,
-                        children: [
-                                "factorSources": factorSources,
-                                "appPreferences": appPreferences,
-                                "networks": networks,
-                                "header": header.customDumpMirror
-                        ],
-                        displayStyle: .struct
-                )
-        }
+	public var customDumpMirror: Mirror {
+		.init(
+			self,
+			children: [
+				"factorSources": factorSources,
+				"appPreferences": appPreferences,
+				"networks": networks,
+				"header": header.customDumpMirror,
+			],
+			displayStyle: .struct
+		)
+	}
 
-        public var description: String {
-  """
-  factorSources: \(factorSources),
-                header: \(header.description),
-  appPreferences: \(appPreferences),
-  networks: \(networks),
-  """
-        }
+	public var description: String {
+		"""
+		factorSources: \(factorSources),
+		              header: \(header.description),
+		appPreferences: \(appPreferences),
+		networks: \(networks),
+		"""
+	}
 }

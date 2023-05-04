@@ -174,7 +174,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func incompatibleSnapshotData(
-		version: ProfileSnapshot.Version,
+		version: ProfileSnapshot.Header.Version,
 		state: inout State
 	) -> EffectTask<Action> {
 		state.alert = .incompatibleProfileErrorAlert(
