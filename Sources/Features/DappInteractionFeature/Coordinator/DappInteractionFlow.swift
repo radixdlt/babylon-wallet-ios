@@ -341,18 +341,21 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)
 
 			if let signedAuthChallenge {
-				// FIXME: do not force unwrap.
-				let responseItem: State.AnyInteractionResponseItem = try! .remote(.auth(.login(.withChallenge(.init(
-					persona: responsePersona,
-					challenge: signedAuthChallenge.challenge,
-					proof: .init(
-						publicKey: signedAuthChallenge.signatureWithPublicKey.publicKey.compressedRepresentation.hex,
-						curve: signedAuthChallenge.signatureWithPublicKey.publicKey.curve.rawValue,
-						signature: signedAuthChallenge.signatureWithPublicKey.signature.serialize().hex
-					)
-				)))))
+				if let proof = try? P2P.Dapp.AuthProof(
+					publicKey: signedAuthChallenge.signatureWithPublicKey.publicKey.compressedRepresentation.hex,
+					curve: signedAuthChallenge.signatureWithPublicKey.publicKey.curve.rawValue,
+					signature: signedAuthChallenge.signatureWithPublicKey.signature.serialize().hex
+				) {
+					let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withChallenge(.init(
+						persona: responsePersona,
+						challenge: signedAuthChallenge.challenge,
+						proof: proof
+					)))))
 
-				state.responseItems[item] = responseItem
+					state.responseItems[item] = responseItem
+				} else {
+					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+				}
 			} else {
 				let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
 					persona: responsePersona
