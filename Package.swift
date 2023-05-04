@@ -559,7 +559,12 @@ package.addModules([
 			"GatewayAPI",
 			"CacheClient",
 		],
-		tests: .yes()
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
 	),
 	.client(
 		name: "SubmitTransactionClient",

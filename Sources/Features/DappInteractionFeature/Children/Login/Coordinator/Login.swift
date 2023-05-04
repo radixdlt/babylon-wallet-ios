@@ -97,8 +97,8 @@ struct Login: Sendable, FeatureReducer {
 			if let challenge = state.loginRequest.challenge {
 				let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
 					challenge: challenge,
-					origin: state.dappDefinitionAddress.address,
-					dAppDefinitionAddress: state.dappMetadata.origin.rawValue
+					dAppDefinitionAddress: state.dappMetadata.origin.rawValue,
+					origin: state.dappDefinitionAddress.address
 				)
 				return .run { [authorizedDapp = state.authorizedDapp] send in
 					// FIXME: change to use SBOR encoding rather than utf8?

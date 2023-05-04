@@ -48,13 +48,16 @@ extension P2P.Dapp.Request {
 			self.challenge = challenge
 		}
 
+		/// `challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
 		public static func payloadToHash(
 			challenge: P2P.Dapp.AuthChallengeNonce,
-			origin: String,
-			dAppDefinitionAddress: String
+			dAppDefinitionAddress: String,
+			origin: String
 		) -> Data {
-			let payloadToHashString: String = challenge.rawValue.data.hex() + dAppDefinitionAddress + origin
-			return payloadToHashString.data(using: .utf8)!
+			precondition(dAppDefinitionAddress.count <= 255)
+			let challengeBytes = [UInt8](challenge.data.data)
+			let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
+			return Data(challengeBytes + [lengthDappDefinitionAddress] + [UInt8](dAppDefinitionAddress.utf8) + [UInt8](origin.utf8))
 		}
 	}
 }
