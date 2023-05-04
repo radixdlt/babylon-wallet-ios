@@ -32,6 +32,16 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 	}
 }
 
+extension FactorInstance {
+	public func derivationPathOrThrow() throws -> DerivationPath {
+		guard let derivationPath else {
+			struct FactorInstanceHasNoDerivationPath: Swift.Error {}
+			throw FactorInstanceHasNoDerivationPath()
+		}
+		return derivationPath
+	}
+}
+
 // MARK: - Signature
 public struct Signature: Sendable, Hashable {
 	public let signatureWithPublicKey: SignatureWithPublicKey

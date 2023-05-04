@@ -137,15 +137,18 @@ extension AccountSignature {
 		account: Profile.Network.Account,
 		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Validated
 	) throws {
-		let signature = try Signature(
-			signatureWithPublicKey: signatureParsed.signature,
-			derivationPath: account.derivationPath()
-		)
-		try self.init(
-			entity: account,
-			factorInstance: account.factorInstance,
-			signature: signature
-		)
+		switch account.securityState {
+		case let .unsecured(unsecuredEntityControl):
+			let signature = try Signature(
+				signatureWithPublicKey: signatureParsed.signature,
+				derivationPath: unsecuredEntityControl.transactionSigning.derivationPathOrThrow()
+			)
+			try self.init(
+				entity: account,
+				factorInstance: unsecuredEntityControl.transactionSigning,
+				signature: signature
+			)
+		}
 	}
 }
 
