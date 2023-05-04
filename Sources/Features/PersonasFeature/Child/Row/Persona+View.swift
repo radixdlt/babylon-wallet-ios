@@ -12,10 +12,10 @@ extension Persona {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				Card {
-					PlainListRow(title: viewStore.displayName) {
-						viewStore.send(.tapped)
-					} icon: {
+				Card_ {
+					viewStore.send(.tapped)
+				} contents: {
+					PlainListRow_(title: viewStore.displayName) {
 						PersonaThumbnail(viewStore.thumbnail)
 					}
 				}

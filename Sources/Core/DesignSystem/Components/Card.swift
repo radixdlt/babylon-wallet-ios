@@ -1,23 +1,80 @@
 import SwiftUI
 
-// MARK: - Card
-public struct Card<Contents: View>: View {
+// MARK: - Card_
+public struct Card_<Contents: View>: View {
 	let insetContents: Bool
 	let verticalSpacing: CGFloat
 	let contents: Contents
+	let action: () -> Void
+	let disabled: Bool
 
-	public init(insetContents: Bool = false, verticalSpacing: CGFloat = .small1, @ViewBuilder contents: () -> Contents) {
+	public init(
+		insetContents: Bool = false,
+		verticalSpacing: CGFloat = .small1,
+		@ViewBuilder contents: () -> Contents
+	) {
 		self.insetContents = insetContents
 		self.verticalSpacing = verticalSpacing
+		self.action = {}
 		self.contents = contents()
+		self.disabled = true
+	}
+
+	public init(
+		insetContents: Bool = false,
+		verticalSpacing: CGFloat = .small1,
+		action: @escaping () -> Void,
+		@ViewBuilder contents: () -> Contents
+	) {
+		self.insetContents = insetContents
+		self.verticalSpacing = verticalSpacing
+		self.action = action
+		self.contents = contents()
+		self.disabled = false
 	}
 
 	public var body: some View {
-		VStack(spacing: verticalSpacing) {
+		Button(action: action) {
 			contents
 		}
+		.buttonStyle(.cardButtonStyle(
+			insetContents: insetContents,
+			verticalSpacing: verticalSpacing
+		))
+		.disabled(disabled)
+	}
+}
+
+public extension ButtonStyle where Self == CardButtonStyle {
+	static var cardButtonStyle: CardButtonStyle { CardButtonStyle() }
+
+	static func cardButtonStyle(
+		insetContents: Bool = false,
+		verticalSpacing: CGFloat = .small1
+	) -> CardButtonStyle {
+		CardButtonStyle(insetContents: insetContents, verticalSpacing: verticalSpacing)
+	}
+}
+
+// MARK: - CardButtonStyle
+public struct CardButtonStyle: ButtonStyle {
+	let insetContents: Bool
+	let verticalSpacing: CGFloat
+
+	init(
+		insetContents: Bool = false,
+		verticalSpacing: CGFloat = .small1
+	) {
+		self.insetContents = insetContents
+		self.verticalSpacing = verticalSpacing
+	}
+
+	public func makeBody(configuration: Configuration) -> some View {
+		VStack(spacing: verticalSpacing) {
+			configuration.label
+		}
 		.padding(insetContents ? .small1 : 0)
-		.inCard
+		.inCard(isPressed: configuration.isPressed)
 	}
 }
 
@@ -59,7 +116,11 @@ public struct InnerCard<Contents: View>: View {
 extension View {
 	/// Gives the view a white background, rounded corners (16 px), and a shadow, useful for root level cards
 	public var inCard: some View {
-		background(.app.white)
+		inCard(isPressed: false)
+	}
+
+	fileprivate func inCard(isPressed: Bool) -> some View {
+		background(isPressed ? .app.gray4 : .app.white)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 			.cardShadow
 	}

@@ -21,7 +21,7 @@ extension TransactionReviewAccounts {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Card(insetContents: true) {
+				Card_(insetContents: true) {
 					ForEachStore(
 						store.scope(
 							state: \.accounts,

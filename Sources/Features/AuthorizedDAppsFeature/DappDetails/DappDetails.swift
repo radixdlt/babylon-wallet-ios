@@ -194,9 +194,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
-
-			let dappDefinitionAddress = state.dApp.dAppDefinitionAddress
 			if let claimedEntities = state.metadata?.claimedEntities, !claimedEntities.isEmpty {
+				let dappDefinitionAddress = state.dApp.dAppDefinitionAddress
 				return .task {
 					let result = await TaskResult {
 						try await tokens(addresses: claimedEntities)

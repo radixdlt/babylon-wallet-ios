@@ -196,10 +196,10 @@ extension PersonaDetails.View {
 						.padding(.horizontal, .medium1)
 
 					ForEach(viewStore.state) { dApp in
-						Card {
-							PlainListRow(title: dApp.displayName) {
-								viewStore.send(.dAppTapped(dApp.id))
-							} icon: {
+						Card_ {
+							viewStore.send(.dAppTapped(dApp.id))
+						} contents: {
+							PlainListRow_(title: dApp.displayName) {
 								DappThumbnail(.known(dApp.thumbnail))
 							}
 						}

@@ -38,10 +38,10 @@ extension AuthorizedDapps.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.dApps) { dApp in
-							Card {
-								PlainListRow(title: dApp.name) {
-									viewStore.send(.didSelectDapp(dApp.id))
-								} icon: {
+							Card_ {
+								viewStore.send(.didSelectDapp(dApp.id))
+							} contents: {
+								PlainListRow_(title: dApp.name) {
 									DappThumbnail(.known(dApp.thumbnail))
 								}
 							}

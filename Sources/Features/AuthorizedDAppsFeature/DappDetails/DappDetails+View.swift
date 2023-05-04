@@ -218,10 +218,10 @@ extension DappDetails.View {
 						.padding(.horizontal, .medium1)
 
 					ForEach(elements) { element in
-						Card {
-							PlainListRow(showChevron: false, title: title(element)) {
-								action(element.id)
-							} icon: {
+						Card_ {
+							action(element.id)
+						} contents: {
+							PlainListRow_(showChevron: false, title: title(element)) {
 								icon(element)
 							}
 						}

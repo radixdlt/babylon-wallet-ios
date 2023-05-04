@@ -1,6 +1,49 @@
 import Resources
 import SwiftUI
 
+// MARK: - PlainListRow_
+public struct PlainListRow_<Icon: View>: View {
+	let isShowingChevron: Bool
+	let title: String
+	let icon: Icon
+
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		@ViewBuilder icon: () -> Icon
+	) {
+		self.isShowingChevron = showChevron
+		self.title = title
+		self.icon = icon()
+	}
+
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		asset: ImageAsset
+	) where Icon == AssetIcon {
+		self.isShowingChevron = showChevron
+		self.title = title
+		self.icon = AssetIcon(asset: asset)
+	}
+
+	public var body: some View {
+		HStack(spacing: .zero) {
+			icon
+				.padding(.trailing, .medium3)
+			Text(title)
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.app.gray1)
+			Spacer(minLength: 0)
+			if isShowingChevron {
+				Image(asset: AssetResource.chevronRight)
+			}
+		}
+		.frame(height: .largeButtonHeight)
+		.padding(.horizontal, .medium3)
+	}
+}
+
 // MARK: - PlainListRow
 public struct PlainListRow<Icon: View>: View {
 	let isShowingChevron: Bool
