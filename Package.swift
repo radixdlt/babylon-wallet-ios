@@ -255,6 +255,7 @@ package.addModules([
 		name: "SigningFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
+			"AppPreferencesClient",
 			"EngineToolkit",
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
