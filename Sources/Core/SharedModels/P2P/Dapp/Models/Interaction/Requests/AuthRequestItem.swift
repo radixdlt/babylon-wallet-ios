@@ -54,7 +54,7 @@ extension P2P.Dapp.Request {
 			dAppDefinitionAddress: String,
 			origin: String
 		) -> Data {
-			precondition(dAppDefinitionAddress.count <= 255)
+			precondition(dAppDefinitionAddress.count <= UInt8.max)
 			let challengeBytes = [UInt8](challenge.data.data)
 			let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
 			return Data(challengeBytes + [lengthDappDefinitionAddress] + [UInt8](dAppDefinitionAddress.utf8) + [UInt8](origin.utf8))
