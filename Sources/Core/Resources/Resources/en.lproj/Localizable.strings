@@ -48,6 +48,7 @@
 "createAccount_nameNewAccount_explanation" = "This can be changed any time";
 "createAccount_nameNewAccount_placeholder" = "e.g. My Main Account";
 "createAccount_nameNewAccount_subtitle" = "What would you like to call your Account?";
+"createAccount_title" = "Create an Account";
 "createAccount_titleFirst" = "Create First Account";
 "createAccount_titleNotFirst" = "Create New Account";
 "createEntity_completion_destinationChooseAccounts" = "Choose Accounts";
