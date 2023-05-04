@@ -27,6 +27,8 @@ public struct AccountsClient: Sendable {
 
 	public var hasAccountOnNetwork: HasAccountOnNetwork
 
+	public var updateAccount: UpdateAccount
+
 	public init(
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
@@ -35,7 +37,8 @@ public struct AccountsClient: Sendable {
 		newUnsavedVirtualAccountControlledByLedgerFactorSource: @escaping NewUnsavedVirtualAccountControlledByLedgerFactorSource,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
 		getAccountByAddress: @escaping GetAccountByAddress,
-		hasAccountOnNetwork: @escaping HasAccountOnNetwork
+		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
+		updateAccount: @escaping UpdateAccount
 	) {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
@@ -45,6 +48,7 @@ public struct AccountsClient: Sendable {
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
+		self.updateAccount = updateAccount
 	}
 }
 
@@ -63,6 +67,8 @@ extension AccountsClient {
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
+
+	public typealias UpdateAccount = @Sendable (Profile.Network.Account) async throws -> Void
 }
 
 // MARK: - SaveAccountRequest

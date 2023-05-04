@@ -42,7 +42,7 @@ extension Profile {
 			index: index
 		)
 
-		let genesisFactorInstance: FactorInstance = try await {
+		let transactionSigning: FactorInstance = try await {
 			let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
 				.init(
 					hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
@@ -71,7 +71,7 @@ extension Profile {
 
 		return try Entity(
 			networkID: networkID,
-			factorInstance: genesisFactorInstance,
+			factorInstance: transactionSigning,
 			displayName: request.displayName,
 			extraProperties: request.extraProperties(numberOfExistingEntities).get(entityType: Entity.self)
 		)
@@ -89,7 +89,7 @@ extension Profile {
 		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let publicKey = try await request.derivePublicKey(derivationPath)
-		let genesisFactorInstance = FactorInstance(factorSourceID: ledger.id, publicKey: .eddsaEd25519(publicKey), derivationPath: derivationPath)
+		let transactionSigning = FactorInstance(factorSourceID: ledger.id, publicKey: .eddsaEd25519(publicKey), derivationPath: derivationPath)
 
 		let numberOfExistingEntities = {
 			guard let network = (try? self.network(id: networkID)) else {
@@ -103,7 +103,7 @@ extension Profile {
 
 		return try Entity(
 			networkID: networkID,
-			factorInstance: genesisFactorInstance,
+			factorInstance: transactionSigning,
 			displayName: request.displayName,
 			extraProperties: request.extraProperties(numberOfExistingEntities).get(entityType: Entity.self)
 		)

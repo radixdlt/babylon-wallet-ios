@@ -18,10 +18,32 @@ extension Profile.Network.Accounts {
 		self = .init(rawValue: identifiedArrayOf)!
 		return account
 	}
+
+	// FIXME: uh terrible, please fix this.
+	public mutating func updateAccount(_ account: Profile.Network.Account) throws {
+		var identifiedArrayOf = self.rawValue
+		guard identifiedArrayOf.updateOrAppend(account) == nil else {
+			assertionFailure("We expected this account to already exist, but it did not.")
+			throw TryingToUpdateAnAccountWhichIsNotAlreadySaved()
+		}
+
+		self = .init(rawValue: identifiedArrayOf)!
+	}
 }
 
-// MARK: Add Virtual Account
+// MARK: - TryingToUpdateAnAccountWhichIsNotAlreadySaved
+struct TryingToUpdateAnAccountWhichIsNotAlreadySaved: Swift.Error {}
+
 extension Profile {
+	/// Updates an `Account` in the profile
+	public mutating func updateAccount(
+		_ account: Profile.Network.Account
+	) throws {
+		var network = try network(id: account.networkID)
+		try network.accounts.updateAccount(account)
+		try updateOnNetwork(network)
+	}
+
 	/// Saves an `Account` into the profile
 	public mutating func addAccount(
 		_ account: Profile.Network.Account,
@@ -52,7 +74,7 @@ extension Profile {
 		}
 		switch account.securityState {
 		case let .unsecured(entityControl):
-			let factorSourceID = entityControl.genesisFactorInstance.factorSourceID
+			let factorSourceID = entityControl.transactionSigning.factorSourceID
 			try self.factorSources.updateFactorSource(id: factorSourceID) {
 				try $0.increaseNextDerivationIndex(for: account.kind, networkID: account.networkID)
 			}

@@ -9,7 +9,7 @@ extension Profile.Network.Account {
 			address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
 		),
 		securityState: .unsecured(.init(
-			genesisFactorInstance: .init(
+			transactionSigning: .init(
 				factorSourceID: .init(hex: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
 					compressedRepresentation: Data(
@@ -28,7 +28,7 @@ extension Profile.Network.Account {
 			address: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
 		),
 		securityState: .unsecured(.init(
-			genesisFactorInstance: .init(
+			transactionSigning: .init(
 				factorSourceID: .init(hex: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
 					compressedRepresentation: Data(

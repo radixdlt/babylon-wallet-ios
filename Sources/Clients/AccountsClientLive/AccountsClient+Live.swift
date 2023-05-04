@@ -42,6 +42,11 @@ extension AccountsClient: DependencyKey {
 				} catch {
 					return false
 				}
+			},
+			updateAccount: { updatedAccount in
+				try await getProfileStore().updating {
+					try $0.updateAccount(updatedAccount)
+				}
 			}
 		)
 	}

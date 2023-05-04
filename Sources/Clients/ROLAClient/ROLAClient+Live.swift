@@ -2,7 +2,9 @@ import AccountsClient
 import CacheClient
 import ClientPrelude
 import Cryptography
+import DeviceFactorSourceClient
 import EngineToolkit
+import FaucetClient // Actually just `SignSubmitSimpleTX`
 import GatewayAPI
 import PersonasClient
 
@@ -17,9 +19,10 @@ extension ROLAClient {
 		/// if it is already present, no change is done
 		@Sendable func addOwnerKey<Entity: EntityProtocol>(
 			hashing newPublicKeyToHash: SLIP10.PublicKey,
-			for entity: Entity,
-			buildSignAndSubmitTransactionManifest: (TransactionManifest, Entity) async throws -> Void
+			for entity: Entity
 		) async throws {
+			@Dependency(\.faucetClient) var faucetClient
+
 			let entityAddress = entity.address.address
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
 			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
@@ -50,9 +53,8 @@ extension ROLAClient {
 					.setMetadata(setMetadataInstruction),
 				]
 			)
-			try await buildSignAndSubmitTransactionManifest(manifest, entity)
-			// TODO: caller of this function should update profile with new FactorInstance and update indices of
-			// FactorSource if needed.
+
+			try await faucetClient.signSubmitSimpleTX(manifest)
 		}
 
 		return Self(
@@ -126,8 +128,64 @@ extension ROLAClient {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
-			createAuthSigningKeyForAccountIfNeeded: { _ in
+			createAuthSigningKeyForAccountIfNeeded: { request in
+				var account = request.account
 				@Dependency(\.accountsClient) var accountsClient
+				@Dependency(\.factorSourcesClient) var factorSourcesClient
+				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+
+				let factorSourceID: FactorSourceID
+				let signingKeyDerivationPath: AccountBabylonDerivationPath
+				var unsecuredEntityControl: UnsecuredEntityControl
+				switch account.securityState {
+				case let .unsecured(unsecuredEntityControl_):
+					unsecuredEntityControl = unsecuredEntityControl_
+					guard unsecuredEntityControl.authenticationSigning == nil else {
+						return
+					}
+
+					factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
+					guard let hdPath = unsecuredEntityControl.transactionSigning.derivationPath else {
+						fatalError()
+					}
+					signingKeyDerivationPath = try hdPath.asAccountPath().asBabylonAccountPath()
+				}
+				let factorSources = try await factorSourcesClient.getFactorSources()
+				guard
+					let factorSource = factorSources[id: factorSourceID]
+				else {
+					fatalError()
+				}
+
+				let babylonDeviceFactorSource = try BabylonDeviceFactorSource(factorSource: factorSource)
+				let authKeyDerivationPath = try signingKeyDerivationPath.switching(keyKind: .authenticationSigning)
+				let derivationPath = authKeyDerivationPath.wrapAsDerivationPath()
+//				let index = babylonDeviceFactorSource
+//					.entityCreatingStorage
+//					.nextForEntity(kind: entityKind, networkID: networkID)
+
+				let authenticationSigning: FactorInstance = try await {
+					let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
+						.init(
+							hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
+							derivationPath: derivationPath,
+							curve: .curve25519, // we always use Curve25519 for new accounts
+							loadMnemonicPurpose: .createSignAuthKey
+						)
+					)
+
+					return try FactorInstance(
+						factorSourceID: babylonDeviceFactorSource.id,
+						publicKey: .init(engine: publicKey),
+						derivationPath: derivationPath
+					)
+				}()
+
+				try await addOwnerKey(hashing: authenticationSigning.publicKey, for: account)
+				unsecuredEntityControl.authenticationSigning = authenticationSigning
+				account.securityState = .unsecured(unsecuredEntityControl)
+
+				accountsClient
 
 			},
 			createAuthSigningKeyForPersonaIfNeeded: { _ in }

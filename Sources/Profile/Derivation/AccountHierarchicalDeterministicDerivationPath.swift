@@ -46,7 +46,18 @@ public enum AccountDerivationPath: DerivationPathProtocol, Sendable, Hashable, C
 
 	case babylon(AccountBabylonDerivationPath)
 	case olympia(LegacyOlympiaBIP44LikeDerivationPath)
+
+	public func asBabylonAccountPath() throws -> AccountBabylonDerivationPath {
+		switch self {
+		case let .babylon(babylon): return babylon
+		case .olympia:
+			throw WrongAccountHDPathTypeExpectedBabylon()
+		}
+	}
 }
+
+// MARK: - WrongAccountHDPathTypeExpectedBabylon
+struct WrongAccountHDPathTypeExpectedBabylon: Swift.Error {}
 
 // MARK: - AccountBabylonDerivationPath
 /// The **default** derivation path used to derive `Account` keys for signing of

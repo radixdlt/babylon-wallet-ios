@@ -109,7 +109,7 @@ internal func signingFactors(
 	for account in accounts {
 		switch account.securityState {
 		case let .unsecured(unsecuredEntityControl):
-			let factorInstance = unsecuredEntityControl.genesisFactorInstance
+			let factorInstance = unsecuredEntityControl.transactionSigning
 			let id = factorInstance.factorSourceID
 			guard let factorSource = allFactorSources[id: id] else {
 				assertionFailure("Bad! factor source not found")

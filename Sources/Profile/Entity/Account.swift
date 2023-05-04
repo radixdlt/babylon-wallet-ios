@@ -84,7 +84,7 @@ extension Profile.Network.Account {
 	public func publicKeysOfRequiredSigningKeys() -> Set<SLIP10.PublicKey> {
 		switch securityState {
 		case let .unsecured(control):
-			return Set([control.genesisFactorInstance.publicKey])
+			return Set([control.transactionSigning.publicKey])
 		}
 	}
 }
@@ -141,7 +141,7 @@ extension Profile.Network.Account {
 		// Not the cleanest way, but it is guaranteed to be deterministic
 		switch self.securityState {
 		case let .unsecured(control):
-			if case .ecdsaSecp256k1 = control.genesisFactorInstance.publicKey {
+			if case .ecdsaSecp256k1 = control.transactionSigning.publicKey {
 				return true
 			}
 		}
@@ -151,25 +151,6 @@ extension Profile.Network.Account {
 
 // MARK: - WrongEntityInDerivationPath
 struct WrongEntityInDerivationPath: Swift.Error {}
-
-extension Profile.Network.Account {
-	public var factorInstance: FactorInstance {
-		switch securityState {
-		case let .unsecured(unsecured): return unsecured.genesisFactorInstance
-		}
-	}
-
-	public func derivationPath() throws -> DerivationPath {
-		guard let path = factorInstance.derivationPath else {
-			throw NoDerivationPath()
-		}
-		return path
-	}
-
-	public var publicKey: SLIP10.PublicKey {
-		factorInstance.publicKey
-	}
-}
 
 // MARK: - NoDerivationPath
 struct NoDerivationPath: Error {}

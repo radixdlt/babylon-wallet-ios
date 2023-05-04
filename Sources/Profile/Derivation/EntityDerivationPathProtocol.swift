@@ -112,9 +112,15 @@ public protocol EntityDerivationPathProtocol: DerivationPathSchemeProtocol {
 	init(
 		fullPath: HD.Path.Full
 	) throws
+
+	func switching(keyKind: KeyKind) -> Self
 }
 
 extension EntityDerivationPathProtocol {
+	public func switching(keyKind newKeyKind: KeyKind) throws -> Self {
+		try Self(networkID: networkID, index: index, keyKind: newKeyKind)
+	}
+
 	public var derivationPath: String { fullPath.toString() }
 	public static var derivationScheme: DerivationScheme { .slip10 }
 	public static var purpose: DerivationPurpose { .publicKeyForAddressOfEntity(type: Entity.self) }

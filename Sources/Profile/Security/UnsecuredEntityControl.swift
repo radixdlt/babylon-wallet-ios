@@ -12,10 +12,19 @@ public struct UnsecuredEntityControl:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
-	/// The factor instance which was used to create this unsecured entity.
-	public let genesisFactorInstance: FactorInstance
-	public init(genesisFactorInstance: FactorInstance) {
-		self.genesisFactorInstance = genesisFactorInstance
+	/// The factor instance which was used to create this unsecured entity, which
+	/// also controls this entity and is used for signign transactions.
+	public let transactionSigning: FactorInstance
+
+	/// The factor instance which can be used for ROLA.
+	public var authenticationSigning: FactorInstance?
+
+	public init(
+		transactionSigning: FactorInstance,
+		authenticationSigning: FactorInstance?
+	) {
+		self.transactionSigning = transactionSigning
+		self.authenticationSigning = authenticationSigning
 	}
 }
 
@@ -24,7 +33,8 @@ extension UnsecuredEntityControl {
 		.init(
 			self,
 			children: [
-				"genesisFactorInstance": genesisFactorInstance,
+				"transactionSigning": transactionSigning,
+				"authenticationSigning": authenticationSigning,
 			],
 			displayStyle: .struct
 		)
@@ -32,7 +42,8 @@ extension UnsecuredEntityControl {
 
 	public var description: String {
 		"""
-		genesisFactorInstance: \(genesisFactorInstance)
+		transactionSigning: \(transactionSigning)
+		authenticationSigning: \(authenticationSigning)
 		"""
 	}
 }

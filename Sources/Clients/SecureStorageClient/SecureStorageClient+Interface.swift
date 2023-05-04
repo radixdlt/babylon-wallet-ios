@@ -23,11 +23,12 @@ extension SecureStorageClient {
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSource.ID) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable () async throws -> Void
 
-	public enum LoadMnemonicPurpose: Sendable, Equatable, CustomStringConvertible {
+	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
 		case signAuthChallenge
 		case importOlympiaAccounts
 		case createEntity(kind: EntityKind)
+		case createSignAuthKey
 		#if DEBUG
 		case debugOnlyInspect
 		#endif
@@ -42,6 +43,8 @@ extension SecureStorageClient {
 				return "signAuthChallenge"
 			case .signTransaction:
 				return "signTransaction"
+			case .createSignAuthKey:
+				return "createSignAuthKey"
 			#if DEBUG
 			case .debugOnlyInspect:
 				return "debugOnlyInspect"

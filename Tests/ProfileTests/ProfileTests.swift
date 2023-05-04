@@ -453,7 +453,7 @@ extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
 		switch securityState {
 		case let .unsecured(control):
-			return control.genesisFactorInstance.publicKey
+			return control.transactionSigning.publicKey
 		}
 	}
 }

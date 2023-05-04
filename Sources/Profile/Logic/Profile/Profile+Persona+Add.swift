@@ -24,7 +24,7 @@ extension Profile {
 
 		switch persona.securityState {
 		case let .unsecured(entityControl):
-			let factorSourceID = entityControl.genesisFactorInstance.factorSourceID
+			let factorSourceID = entityControl.transactionSigning.factorSourceID
 			try self.factorSources.updateFactorSource(id: factorSourceID) {
 				try $0.increaseNextDerivationIndex(for: persona.kind, networkID: persona.networkID)
 			}

@@ -631,7 +631,7 @@ extension UnsecuredEntityControlView {
 			#endif // os(macOS)
 
 			FactorInstanceView(
-				factorInstance: unsecuredControl.genesisFactorInstance,
+				factorInstance: unsecuredControl.transactionSigning,
 				indentation: inOneLevel
 			)
 		}

@@ -57,7 +57,7 @@ extension EntityProtocol {
 		self.init(
 			networkID: networkID,
 			address: address,
-			securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
+			securityState: .unsecured(.init(transactionSigning: factorInstance)),
 			displayName: displayName,
 			extraProperties: extraProperties
 		)

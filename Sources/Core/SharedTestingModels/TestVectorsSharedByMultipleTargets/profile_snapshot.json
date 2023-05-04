@@ -91,7 +91,7 @@
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
-              "genesisFactorInstance" : {
+              "transactionSigning" : {
                 "derivationPath" : {
                   "path" : "m/44H/1022H/11H/525H/1460H/0H",
                   "scheme" : "cap26"
@@ -113,7 +113,7 @@
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
-              "genesisFactorInstance" : {
+              "transactionSigning" : {
                 "derivationPath" : {
                   "path" : "m/44H/1022H/11H/525H/1460H/1H",
                   "scheme" : "cap26"
@@ -135,7 +135,7 @@
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
-              "genesisFactorInstance" : {
+              "transactionSigning" : {
                 "derivationPath" : {
                   "path" : "m/44H/1022H/11H/525H/1460H/2H",
                   "scheme" : "cap26"
@@ -213,7 +213,7 @@
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
-              "genesisFactorInstance" : {
+              "transactionSigning" : {
                 "derivationPath" : {
                   "path" : "m/44H/1022H/11H/618H/1460H/0H",
                   "scheme" : "cap26"
@@ -244,7 +244,7 @@
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
-              "genesisFactorInstance" : {
+              "transactionSigning" : {
                 "derivationPath" : {
                   "path" : "m/44H/1022H/11H/618H/1460H/1H",
                   "scheme" : "cap26"
