@@ -226,9 +226,9 @@ extension DappDetails.View {
 
 					ForEach(elements) { element in
 						Card {
+							action(element.id)
+						} contents: {
 							PlainListRow(showChevron: false, title: title(element)) {
-								action(element.id)
-							} icon: {
 								icon(element)
 							}
 						}
