@@ -8,7 +8,8 @@ extension P2P.Dapp.Request {
 		}
 
 		enum Discriminator: String, Decodable {
-			case login
+			case login // withou
+			case loginWithChallenge
 			case usePersona
 		}
 
@@ -21,12 +22,21 @@ extension P2P.Dapp.Request {
 			switch discriminator {
 			case .login:
 				self = try .login(.init(from: decoder))
+			case .loginWithChallenge:
+				let auth = try AuthLoginRequestItem(from: decoder)
+				guard auth.challenge != nil else {
+					throw ExpectedAuthChallengeForLoginWithChallengeButGotNone()
+				}
+				self = .login(auth)
 			case .usePersona:
 				self = try .usePersona(.init(from: decoder))
 			}
 		}
 	}
 }
+
+// MARK: - ExpectedAuthChallengeForLoginWithChallengeButGotNone
+struct ExpectedAuthChallengeForLoginWithChallengeButGotNone: Swift.Error {}
 
 // MARK: - P2P.Dapp.Request.AuthLoginRequestItem
 extension P2P.Dapp.Request {
