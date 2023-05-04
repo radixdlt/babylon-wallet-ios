@@ -35,6 +35,7 @@
 "biometrics_prompt_title" = "Use your biometric to continue";
 "common_account" = "Account";
 "common_cancel" = "Cancel";
+"common_continue" = "Continue";
 "common_developerDisclaimerText" = "Development use only. Not usable on Radix mainnet.";
 "common_errorAlertTitle" = "An Error Occurred";
 "common_none" = "None";
