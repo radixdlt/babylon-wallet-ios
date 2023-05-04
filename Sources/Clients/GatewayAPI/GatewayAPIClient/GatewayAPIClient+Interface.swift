@@ -66,7 +66,10 @@ extension GatewayAPIClient {
 	}
 
 	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
-	public func getDappMetadata(_ dappDefinition: DappDefinitionAddress, validating component: ComponentAddress? = nil) async throws -> GatewayAPI.EntityMetadataCollection {
+	public func getDappMetadata(
+		_ dappDefinition: DappDefinitionAddress,
+		validating component: ComponentAddress? = nil
+	) async throws -> GatewayAPI.EntityMetadataCollection {
 		let dappDefinition = try await getEntityMetadata(dappDefinition.address)
 
 		guard dappDefinition.accountType == .dappDefinition else {

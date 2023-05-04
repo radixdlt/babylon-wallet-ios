@@ -258,7 +258,7 @@ extension AccountPortfoliosClient {
 				)
 			)
 			.map(\.nonFungibleId)
-			// TODO: Where does this limitation come from?
+			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29
 
 			var result: [AccountPortfolio.NonFungibleResource.NonFungibleToken] = []
