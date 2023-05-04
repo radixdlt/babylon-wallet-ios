@@ -308,6 +308,7 @@ extension DisplayView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
+			Labeled("Ledger Signing Display Mode", value: display.ledgerHQHardwareWalletSigningDisplayMode.rawValue)
 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
 		}
 		.padding([.leading], leadingPadding)
@@ -678,8 +679,10 @@ public struct Labeled: SwiftUI.View {
 		HStack(alignment: .top) {
 			Text(label)
 				.fontWeight(.light)
+				.textSelection(.enabled)
 			Text(value)
 				.fontWeight(.bold)
+				.textSelection(.enabled)
 		}
 	}
 }

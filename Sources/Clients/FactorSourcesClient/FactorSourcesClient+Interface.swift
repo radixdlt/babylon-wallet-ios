@@ -49,6 +49,12 @@ extension SigningFactors {
 	}
 }
 
+extension FactorSourcesClient {
+	public func getFactorSources(ofKind kind: FactorSourceKind) async throws -> Set<FactorSource> {
+		try await Set(getFactorSources().filter { $0.kind == kind })
+	}
+}
+
 // MARK: - UpdateFactorSourceLastUsedRequest
 public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	public let factorSourceIDs: [FactorSource.ID]

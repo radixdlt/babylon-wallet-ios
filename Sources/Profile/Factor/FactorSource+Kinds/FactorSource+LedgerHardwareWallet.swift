@@ -9,6 +9,12 @@ extension FactorSource {
 			case nanoSPlus = "nanoS+"
 			case nanoX
 		}
+
+		public enum SigningDisplayMode: String, Sendable, Hashable, Codable {
+			case verbose
+			case summary
+			public static let `default`: Self = .verbose
+		}
 	}
 
 	public static func ledger(

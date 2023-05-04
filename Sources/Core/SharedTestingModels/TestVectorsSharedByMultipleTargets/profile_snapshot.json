@@ -2,7 +2,8 @@
   "appPreferences" : {
     "display" : {
       "fiatCurrencyPriceTarget" : "usd",
-      "isCurrencyAmountVisible" : true
+      "isCurrencyAmountVisible" : true,
+      "ledgerHQHardwareWalletSigningDisplayMode" : "verbose"
     },
     "gateways" : {
       "current" : "https://betanet.radixdlt.com",
@@ -261,5 +262,5 @@
       ]
     }
   ],
-  "version" : 30
+  "version" : 31
 }

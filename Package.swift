@@ -140,6 +140,7 @@ package.addModules([
 		name: "GeneralSettings",
 		dependencies: [
 			"AppPreferencesClient",
+			"FactorSourcesClient", // check if has any ledgers
 		],
 		tests: .no
 	),
