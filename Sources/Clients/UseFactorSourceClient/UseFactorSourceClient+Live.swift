@@ -45,17 +45,3 @@ extension UseFactorSourceClient: DependencyKey {
 }
 
 import Cryptography
-
-// MARK: - UseFactorSourceClient.Purpose
-extension UseFactorSourceClient {
-	public enum Purpose: Sendable, Equatable {
-		case signData(Data, isTransaction: Bool)
-		case createEntity(kind: EntityKind)
-		fileprivate var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
-			switch self {
-			case let .signData(_, isTransaction): return isTransaction ? .signTransaction : .signAuthChallenge
-			case let .createEntity(kind): return .createEntity(kind: kind)
-			}
-		}
-	}
-}

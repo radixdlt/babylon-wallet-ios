@@ -1,5 +1,6 @@
 import CacheClient
 import ClientTestingPrelude
+import EngineToolkit
 import GatewayAPI
 @testable import ROLAClient
 
@@ -43,6 +44,63 @@ final class ROLAClientTests: TestCase {
 	override func tearDown() async throws {
 		sut = nil
 		try await super.tearDown()
+	}
+
+	struct TestVector: Sendable, Hashable, Codable {
+		let origin: String
+		let challenge: String
+		let dAppDefinitionAddress: String
+		let payloadToHash: String
+		let blakeHashOfPayload: String
+	}
+
+	func test_rola_payload_hash_vectors() throws {
+		try testFixture(bundle: .module, jsonName: "rola_challenge_payload_hash_vectors") { (vectors: [TestVector]) in
+			for vector in vectors {
+				let payloadToHash = try P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+					challenge: .init(rawValue: .init(hex: vector.challenge)),
+					dAppDefinitionAddress: vector.dAppDefinitionAddress,
+					origin: vector.origin
+				)
+				XCTAssertEqual(payloadToHash.hex, vector.payloadToHash)
+				let blakeHashOfPayload = try blake2b(data: payloadToHash)
+				XCTAssertEqual(blakeHashOfPayload.hex, vector.blakeHashOfPayload)
+			}
+		}
+	}
+
+	func omit_test_generate_rola_payload_hash_vectors() throws {
+		let origins = ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"]
+		let accounts = [
+			"account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3",
+			"account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa",
+			"account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p",
+		]
+		let vectors: [TestVector] = try origins.flatMap { origin -> [TestVector] in
+			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
+				try (UInt8.zero ..< 10).map { seed -> TestVector in
+					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
+					let challenge = try blake2b(data: Data((origin + dAppDefinitionAddress).utf8) + [seed])
+					let payloadToHash = try P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+						challenge: .init(rawValue: .init(data: challenge)),
+						dAppDefinitionAddress: dAppDefinitionAddress,
+						origin: origin
+					)
+					let blakeHashOfPayload = try blake2b(data: payloadToHash)
+					return TestVector(
+						origin: origin,
+						challenge: challenge.hex,
+						dAppDefinitionAddress: dAppDefinitionAddress,
+						payloadToHash: payloadToHash.hex,
+						blakeHashOfPayload: blakeHashOfPayload.hex
+					)
+				}
+			}
+		}
+		let jsonEncoder = JSONEncoder()
+		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
+		let json = try jsonEncoder.encode(vectors)
+		print(String(data: json, encoding: .utf8)!)
 	}
 
 	func testHappyPath_performWellKnownFileCheck() async throws {

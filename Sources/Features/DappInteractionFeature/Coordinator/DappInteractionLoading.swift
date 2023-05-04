@@ -64,17 +64,21 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
 		state.isLoading = true
-		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
+		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress, origin = state.interaction.metadata.origin] send in
 			let metadata = await TaskResult {
 				do {
 					return try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
 						request: {
-							try await DappMetadata(gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items)
+							try await DappMetadata(
+								gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items,
+								origin: origin
+							)
 						}
 					)
 				} catch is BadHTTPResponseCode {
-					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
+					// FIXME: cleanup DappMetaData
+					return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {
 					throw error
 				}
@@ -117,10 +121,14 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 }
 
 extension DappMetadata {
-	init(_ items: [GatewayAPI.EntityMetadataItem]) {
+	init(
+		_ items: [GatewayAPI.EntityMetadataItem],
+		origin: P2P.Dapp.Request.Metadata.Origin
+	) {
 		self.init(
 			name: items.first(where: { $0.key == "name" })?.value.asString,
-			description: items.first(where: { $0.key == "description" })?.value.asString
+			description: items.first(where: { $0.key == "description" })?.value.asString,
+			origin: origin
 		)
 	}
 }

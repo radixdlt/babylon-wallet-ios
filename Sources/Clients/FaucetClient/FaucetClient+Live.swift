@@ -161,14 +161,14 @@ extension FaucetClient: DependencyKey {
 		}
 
 		return Self(
-			getFreeXRD: getFreeXRD,
+		getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet,
 			createFungibleToken: createFungibleToken,
 			createNonFungibleToken: createNonFungibleToken
 		)
 		#else
 		return Self(
-			getFreeXRD: getFreeXRD,
+		getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet
 		)
 		#endif // DEBUG

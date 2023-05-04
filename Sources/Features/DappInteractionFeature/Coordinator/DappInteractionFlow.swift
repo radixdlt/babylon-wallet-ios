@@ -1,10 +1,17 @@
 import AccountsClient
 import AuthorizedDappsClient
+import Cryptography
 import FeaturePrelude
 import GatewaysClient
 import PersonasClient
 import TransactionClient
 import TransactionReviewFeature
+
+// MARK: - SignedAuthChallenge
+public struct SignedAuthChallenge: Sendable, Hashable {
+	public let challenge: P2P.Dapp.AuthChallengeNonce
+	public let signatureWithPublicKey: SignatureWithPublicKey
+}
 
 // MARK: - DappInteractionFlow
 struct DappInteractionFlow: Sendable, FeatureReducer {
@@ -321,19 +328,40 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ item: State.AnyInteractionItem,
 			_ persona: Profile.Network.Persona,
 			_ authorizedDapp: Profile.Network.AuthorizedDapp?,
-			_ authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?
+			_ authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?,
+			_ signedAuthChallenge: SignedAuthChallenge?
 		) -> EffectTask<Action> {
 			state.persona = persona
 			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersona
 
-			let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
-				persona: .init(
-					identityAddress: persona.address.address,
-					label: persona.displayName.rawValue
-				)
-			)))))
-			state.responseItems[item] = responseItem
+			let responsePersona = P2P.Dapp.Response.Persona(
+				identityAddress: persona.address.address,
+				label: persona.displayName.rawValue
+			)
+
+			if let signedAuthChallenge {
+				if let proof = try? P2P.Dapp.AuthProof(
+					publicKey: signedAuthChallenge.signatureWithPublicKey.publicKey.compressedRepresentation.hex,
+					curve: signedAuthChallenge.signatureWithPublicKey.publicKey.curve.rawValue,
+					signature: signedAuthChallenge.signatureWithPublicKey.signature.serialize().hex
+				) {
+					let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withChallenge(.init(
+						persona: responsePersona,
+						challenge: signedAuthChallenge.challenge,
+						proof: proof
+					)))))
+
+					state.responseItems[item] = responseItem
+				} else {
+					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+				}
+			} else {
+				let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
+					persona: responsePersona
+				)))))
+				state.responseItems[item] = responseItem
+			}
 
 			resetOngoingResponseItemsIfNeeded(for: &state)
 
@@ -370,8 +398,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
 						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue),
 						challenge: item.challenge,
-						publicKey: item.publicKey,
-						signature: item.signature
+						proof: item.proof
 					)))))
 				case .remote(.auth(.login(.withoutChallenge))):
 					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
@@ -423,8 +450,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		guard let (item, action) = childAction.itemAndAction else { return .none }
 		switch action {
-		case let .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona))):
-			return handleLogin(item, persona, authorizedDapp, authorizedPersona)
+		case .login(.delegate(.failedToSignAuthChallenge)):
+			return dismissEffect(
+				for: state,
+				errorKind: .failedToSignAuthChallenge,
+				message: nil
+			)
+
+		case let .login(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthChallenge))):
+			return handleLogin(item, persona, authorizedDapp, authorizedPersona, signedAuthChallenge)
 
 		case .accountPermission(.delegate(.continueButtonTapped)):
 			return handleAccountPermission(item)
@@ -718,10 +752,11 @@ extension DappInteractionFlow.Destinations.State {
 		switch anyItem {
 		case .remote(.auth(.usePersona)):
 			return nil
-		case .remote(.auth(.login(_))): // TODO: bind to item when implementing auth challenge
+		case let .remote(.auth(.login(loginRequest))):
 			self = .relayed(anyItem, with: .login(.init(
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
-				dappMetadata: dappMetadata
+				dappMetadata: dappMetadata,
+				loginRequest: loginRequest
 			)))
 		case let .local(.accountPermissionRequested(numberOfAccounts)):
 			self = .relayed(anyItem, with: .accountPermission(.init(

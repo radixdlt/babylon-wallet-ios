@@ -98,8 +98,8 @@ public enum L10n {
       }
       /// Validate seed phrase exists.
       public static let importOlympiaAccounts = L10n.tr("Localizable", "common.biometricsPrompt.importOlympiaAccounts", fallback: "Validate seed phrase exists.")
-      /// Authenticate to sign auth chellenge with this phone.
-      public static let signAuthChallenge = L10n.tr("Localizable", "common.biometricsPrompt.signAuthChallenge", fallback: "Authenticate to sign auth chellenge with this phone.")
+      /// Authenticate to sign auth challenge with this phone.
+      public static let signAuthChallenge = L10n.tr("Localizable", "common.biometricsPrompt.signAuthChallenge", fallback: "Authenticate to sign auth challenge with this phone.")
       /// Authenticate to sign transaction with this phone.
       public static let signTransaction = L10n.tr("Localizable", "common.biometricsPrompt.signTransaction", fallback: "Authenticate to sign transaction with this phone.")
     }

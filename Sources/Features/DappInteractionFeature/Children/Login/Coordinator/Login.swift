@@ -1,13 +1,16 @@
 import AuthorizedDappsClient
 import CreateEntityFeature
+import EngineToolkit
 import FeaturePrelude
 import PersonasClient
+import UseFactorSourceClient
 
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
+		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
 
 		var isFirstPersonaOnAnyNetwork: Bool? = nil
 
@@ -23,10 +26,12 @@ struct Login: Sendable, FeatureReducer {
 		init(
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
+			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
+			self.loginRequest = loginRequest
 			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 		}
 	}
@@ -48,12 +53,19 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(Profile.Network.Persona, Profile.Network.AuthorizedDapp?, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?)
+		case continueButtonTapped(
+			Profile.Network.Persona,
+			Profile.Network.AuthorizedDapp?,
+			Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?,
+			SignedAuthChallenge?
+		)
+		case failedToSignAuthChallenge
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -82,7 +94,36 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
-			return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona)))
+			guard let challenge = state.loginRequest.challenge else {
+				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
+			}
+			let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+				challenge: challenge,
+				dAppDefinitionAddress: state.dappMetadata.origin.rawValue,
+				origin: state.dappDefinitionAddress.address
+			)
+			return .run { [authorizedDapp = state.authorizedDapp] send in
+				let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
+					of: persona,
+					unhashedDataToSign: payloadToHash,
+					purpose: .signData(isTransaction: false)
+				)
+				let signedAuthChallenge = SignedAuthChallenge(
+					challenge: challenge,
+					signatureWithPublicKey: signature.signature.signatureWithPublicKey
+				)
+				await send(.delegate(.continueButtonTapped(
+					persona,
+					authorizedDapp,
+					authorizedPersona,
+					signedAuthChallenge
+				)))
+
+			} catch: { error, send in
+				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
+				errorQueue.schedule(error)
+				await send(.delegate(.failedToSignAuthChallenge))
+			}
 		}
 	}
 
