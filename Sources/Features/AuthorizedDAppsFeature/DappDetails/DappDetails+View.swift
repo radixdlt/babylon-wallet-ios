@@ -88,7 +88,7 @@ extension DappDetails.View {
 
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
-		let ignoredKeys: Set<String> = ["description", "domain", "name"]
+		let ignoredKeys: Set<String> = ["description", "domain", "name", "account_type"]
 
 		let otherMetadata = metadata?.items
 			.filter { !ignoredKeys.contains($0.key) }
