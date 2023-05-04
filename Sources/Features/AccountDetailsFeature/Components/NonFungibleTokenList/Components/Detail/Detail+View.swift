@@ -1,26 +1,23 @@
 import FeaturePrelude
 
+extension NonFungibleTokenList.Detail.State {
+	var viewState: NonFungibleTokenList.Detail.ViewState {
+		.init(
+			nonFungibleGlobalID: resource.nftGlobalID(for: localId),
+			resourceAddress: resource.resourceAddress,
+			description: resource.description,
+			resourceName: resource.name
+		)
+	}
+}
+
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenList.Detail {
 	public struct ViewState: Equatable {
-		var nftID: AddressView.ViewState
-		var fullNFTAddress: String
-		var description: String?
-		var resourceAddress: AddressView.ViewState
-		var fullResourceAddress: String
-		var resourceName: String?
-
-		init(state: NonFungibleTokenList.Detail.State) {
-			nftID = .init(address: state.nftID.toUserFacingString)
-			fullNFTAddress = state.resource.nftAddress(for: state.nftID)
-			description = state.resource.description
-			resourceAddress = .init(
-				address: state.resource.resourceAddress.address,
-				format: .default
-			)
-			fullResourceAddress = state.resource.resourceAddress.address
-			resourceName = state.resource.name
-		}
+		let nonFungibleGlobalID: AccountPortfolio.NonFungibleResource.GlobalID
+		let resourceAddress: ResourceAddress
+		let description: String?
+		let resourceName: String?
 	}
 
 	@MainActor
@@ -32,11 +29,7 @@ extension NonFungibleTokenList.Detail {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					ScrollView {
 						VStack(spacing: .medium1) {
@@ -45,15 +38,10 @@ extension NonFungibleTokenList.Detail {
 									Text(L10n.NftList.Detail.nftID)
 										.textStyle(.body1Regular)
 										.foregroundColor(.app.gray2)
-									AddressView(
-										viewStore.nftID,
-										textStyle: .body1Regular,
-										copyAddressAction: {
-											viewStore.send(.copyAddressButtonTapped(viewStore.state.fullNFTAddress))
-										}
-									)
-									.frame(maxWidth: .infinity, alignment: .trailing)
-									.multilineTextAlignment(.trailing)
+
+									Spacer()
+
+									AddressView(.identifier(.nonFungibleGlobalID(viewStore.nonFungibleGlobalID)))
 								}
 							}
 							.frame(maxWidth: .infinity, alignment: .leading)
@@ -86,15 +74,10 @@ extension NonFungibleTokenList.Detail {
 											Text(L10n.NftList.Detail.resourceAddress)
 												.textStyle(.body1Regular)
 												.foregroundColor(.app.gray2)
-											AddressView(
-												viewStore.resourceAddress,
-												textStyle: .body1Regular,
-												copyAddressAction: {
-													viewStore.send(.copyAddressButtonTapped(viewStore.state.fullResourceAddress))
-												}
-											)
-											.frame(maxWidth: .infinity, alignment: .trailing)
-											.multilineTextAlignment(.trailing)
+
+											Spacer()
+
+											AddressView(.address(.resource(viewStore.resourceAddress)))
 										}
 										if let name = viewStore.resourceName {
 											HStack {
@@ -159,7 +142,7 @@ struct NonFungibleTokenListDetail_Preview: PreviewProvider {
 extension NonFungibleTokenList.Detail.State {
 	public static let previewValue = Self(
 		resource: .init(resourceAddress: .init(address: "some"), tokens: []),
-		nftID: .init("#1#")
+		localId: .init("#1#")
 	)
 }
 #endif

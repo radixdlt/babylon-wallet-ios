@@ -127,13 +127,12 @@ extension PersonaDetails.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.sharingAccounts) { account in
-							AccountButton(
+							SmallAccountCard(
 								account.label.rawValue,
-								address: account.address.address,
+								identifiable: .address(.account(account.address)),
 								gradient: .init(account.appearanceID)
-							) {
-								viewStore.send(.accountTapped(account.address))
-							}
+							)
+							.cornerRadius(.small1)
 						}
 					}
 					.padding(.horizontal, .medium3)

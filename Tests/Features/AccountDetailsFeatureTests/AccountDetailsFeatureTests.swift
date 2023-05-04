@@ -37,27 +37,6 @@ final class AccountDetailsFeatureTests: TestCase {
 //		}
 //	}
 
-	func test_copyAddress_whenTappedOnCopyAddress_thenCopyToPasteboard() async {
-		// given
-		let account = Profile.Network.Account.previewValue0
-		let initialState = AccountDetails.State(for: account)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: AccountDetails()
-		)
-
-		let expectation = expectation(description: "Address copied")
-		store.dependencies.pasteboardClient.copyString = { copyString in
-			// assert
-			XCTAssertEqual(copyString, account.address.address)
-			expectation.fulfill()
-		}
-
-		// when
-		await store.send(.view(.copyAddressButtonTapped))
-		wait(for: [expectation], timeout: 0)
-	}
-
 	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
 		// given
 		let account = Profile.Network.Account.previewValue0

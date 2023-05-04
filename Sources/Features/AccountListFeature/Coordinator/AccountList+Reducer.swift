@@ -25,8 +25,6 @@ public struct AccountList: Sendable, FeatureReducer {
 		case displayAccountSecurity(Profile.Network.Account)
 	}
 
-	@Dependency(\.pasteboardClient) var pasteboardClient
-
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -44,9 +42,6 @@ public struct AccountList: Sendable, FeatureReducer {
 				return .send(.delegate(.displayAccountDetails(account)))
 			case let .securityPromptTapped(account):
 				return .send(.delegate(.displayAccountSecurity(account)))
-			case let .copyAddressButtonTapped(account):
-				let address = account.address.address
-				return .fireAndForget { pasteboardClient.copyString(address) }
 			}
 		case .account:
 			return .none
