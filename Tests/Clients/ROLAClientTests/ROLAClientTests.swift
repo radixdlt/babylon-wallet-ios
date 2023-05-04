@@ -103,22 +103,6 @@ final class ROLAClientTests: TestCase {
 		print(String(data: json, encoding: .utf8)!)
 	}
 
-	//    func test_simple_rola() throws {
-	//        let challenge: P2P.Dapp.AuthChallengeNonce = try .init(rawValue: .init(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"))
-	//        let dAppDefinitionAddress = "account_tdx_c_1p93mejt0tl4vgsrafgyjqqx2mflsnhyutzs8ywre8zds7kgal0"
-	//        let origin = "https://radix.swap"
-//
-	//        let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
-	//            challenge: challenge,
-	//            dAppDefinitionAddress: dAppDefinitionAddress,
-	//            origin: origin
-	//        )
-//
-	//        XCTAssertEqual(payloadToHash.hex, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef416163636f756e745f7464785f635f317039336d656a7430746c3476677372616667796a717178326d666c736e687975747a733879777265387a6473376b67616c3068747470733a2f2f72616469782e73776170")
-//
-//
-	//    }
-
 	func testHappyPath_performWellKnownFileCheck() async throws {
 		// given
 		let origin = "https://origin.com"
