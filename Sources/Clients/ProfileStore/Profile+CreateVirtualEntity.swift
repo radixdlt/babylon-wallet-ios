@@ -48,7 +48,7 @@ extension Profile {
 					hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
 					derivationPath: derivationPath,
 					curve: .curve25519, // we always use Curve25519 for new accounts
-					creationOfEntity: entityKind
+					loadMnemonicPurpose: .createEntity(kind: entityKind)
 				)
 			)
 
