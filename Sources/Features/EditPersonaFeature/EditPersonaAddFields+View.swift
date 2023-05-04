@@ -26,7 +26,7 @@ extension EditPersonaAddFields {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					VStack(spacing: .medium3) {
-						Text(L10n.EditPersona.AddAField.explanation)
+						Text(L10n.EditPersona.AddAField.subtitle)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray2)
 							.frame(maxWidth: .infinity, alignment: .leading)
@@ -59,7 +59,7 @@ extension EditPersonaAddFields {
 								viewStore.selectedFields,
 								forAction: { viewStore.send(.addButtonTapped($0)) }
 							) { action in
-								Button(L10n.EditPersona.AddAField.Button.add, action: action)
+								Button(L10n.EditPersona.AddAField.add, action: action)
 									.buttonStyle(.primaryRectangular)
 							}
 						}

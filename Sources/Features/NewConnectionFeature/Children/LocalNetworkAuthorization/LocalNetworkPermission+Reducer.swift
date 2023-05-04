@@ -73,20 +73,20 @@ public struct LocalNetworkPermission: Sendable, FeatureReducer {
 		switch internalAction {
 		case .displayPermissionDeniedAlert:
 			state.permissionDeniedAlert = .init(
-				title: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.title) },
+				title: { TextState(L10n.NewConnection.LocalNetworkPermissionDeniedAlert.title) },
 				actions: {
 					ButtonState(
 						role: .cancel,
 						action: .send(.cancelButtonTapped),
-						label: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.cancelButtonTitle) }
+						label: { TextState(L10n.Common.cancel) }
 					)
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.settingsButtonTitle) }
+						label: { TextState(L10n.NewConnection.LocalNetworkPermissionDeniedAlert.settings) }
 					)
 				},
-				message: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.message) }
+				message: { TextState(L10n.NewConnection.LocalNetworkPermissionDeniedAlert.message) }
 			)
 			return .none
 		}

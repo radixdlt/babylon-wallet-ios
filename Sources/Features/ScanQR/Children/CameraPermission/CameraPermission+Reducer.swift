@@ -73,20 +73,20 @@ public struct CameraPermission: Sendable, FeatureReducer {
 		switch internalAction {
 		case .displayPermissionDeniedAlert:
 			state.permissionDeniedAlert = .init(
-				title: { TextState(L10n.NewConnection.CameraPermission.DeniedAlert.title) },
+				title: { TextState(L10n.NewConnection.CameraPermissionDeniedAlert.title) },
 				actions: {
 					ButtonState(
 						role: .cancel,
 						action: .send(.cancelButtonTapped),
-						label: { TextState(L10n.NewConnection.CameraPermission.DeniedAlert.cancelButtonTitle) }
+						label: { TextState(L10n.Common.cancel) }
 					)
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.NewConnection.CameraPermission.DeniedAlert.settingsButtonTitle) }
+						label: { TextState(L10n.NewConnection.CameraPermissionDeniedAlert.settings) }
 					)
 				},
-				message: { TextState(L10n.NewConnection.CameraPermission.DeniedAlert.message) }
+				message: { TextState(L10n.NewConnection.CameraPermissionDeniedAlert.message) }
 			)
 			return .none
 		}

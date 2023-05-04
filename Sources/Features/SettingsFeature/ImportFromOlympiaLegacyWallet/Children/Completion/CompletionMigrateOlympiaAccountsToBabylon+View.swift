@@ -3,7 +3,21 @@ import FeaturePrelude
 
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
 	var viewState: CompletionMigrateOlympiaAccountsToBabylon.ViewState {
-		.init(accounts: migratedAccounts)
+		let title: String = {
+			switch migratedAccounts.count {
+			case 0:
+				return L10n.ImportLegacyWallet.Completion.titleNoAccounts
+			case 1:
+				return L10n.ImportLegacyWallet.Completion.titleOneAccount
+			default:
+				return L10n.ImportLegacyWallet.Completion.titleManyAccounts(migratedAccounts.count)
+			}
+		}()
+
+		return .init(
+			accounts: migratedAccounts,
+			title: title
+		)
 	}
 }
 
@@ -11,6 +25,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon.State {
 extension CompletionMigrateOlympiaAccountsToBabylon {
 	public struct ViewState: Equatable {
 		let accounts: Profile.Network.Accounts
+		let title: String
 	}
 
 	@MainActor
@@ -24,7 +39,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text(L10n.ImportLegacyWallet.Completion.title(viewStore.accounts.count))
+					Text(viewStore.title)
 						.font(.app.body1Header)
 						.padding()
 
@@ -41,7 +56,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 				.padding(.horizontal, .medium1)
 				.padding(.bottom, .medium2)
 				.footer {
-					Button(L10n.ImportLegacyWallet.Completion.Button.finish) {
+					Button(L10n.Common.ok) {
 						viewStore.send(.finishButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)

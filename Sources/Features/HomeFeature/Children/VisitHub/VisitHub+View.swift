@@ -35,7 +35,7 @@ extension VisitHub {
 		}
 
 		fileprivate var title: some SwiftUI.View {
-			Text(L10n.Home.VisitHub.title)
+			Text(L10n.Home.VisitDashboard.subtitle)
 				.foregroundColor(.app.gray1)
 				.textStyle(.body1Regular)
 				.multilineTextAlignment(.center)
@@ -46,7 +46,7 @@ extension VisitHub {
 			Button(
 				action: action,
 				label: {
-					Text(L10n.Home.VisitHub.buttonTitle)
+					Text(L10n.Home.visitDashboard)
 						.foregroundColor(.app.buttonTextBlack)
 						.textStyle(.body1Regular)
 						.padding()

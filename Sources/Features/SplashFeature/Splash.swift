@@ -76,20 +76,20 @@ public struct Splash: Sendable, FeatureReducer {
 
 			guard config?.isPasscodeSetUp == true else {
 				state.passcodeCheckFailedAlert = .init(
-					title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
+					title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 					actions: {
 						ButtonState(
 							role: .none,
 							action: .send(.retryButtonTapped),
-							label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.retryButtonTitle) }
+							label: { TextState(L10n.Splash.PasscodeCheckFailedAlert.retry) }
 						)
 						ButtonState(
 							role: .none,
 							action: .send(.openSettingsButtonTapped),
-							label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.settingsButtonTitle) }
+							label: { TextState(L10n.Splash.PasscodeCheckFailedAlert.settings) }
 						)
 					},
-					message: { .init(L10n.Splash.Alert.PasscodeCheckFailed.message) }
+					message: { .init(L10n.Splash.PasscodeCheckFailedAlert.message) }
 				)
 
 				return .none

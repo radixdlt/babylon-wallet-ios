@@ -26,12 +26,12 @@ extension Header {
 				send: { .view($0) }
 			) { viewStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					Text(L10n.Home.Header.title)
+					Text(L10n.Home.title)
 						.foregroundColor(.app.gray1)
 						.textStyle(.sheetTitle)
 
 					HStack {
-						Text(L10n.Home.Header.subtitle)
+						Text(L10n.Home.subtitle)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1HighImportance)
 
