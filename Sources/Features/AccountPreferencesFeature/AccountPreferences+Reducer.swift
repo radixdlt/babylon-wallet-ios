@@ -9,6 +9,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public var faucetButtonState: ControlState
 
 		#if DEBUG
+		public var createAndUploadAuthKeyButtonState: ControlState
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
 		public var createMultipleFungibleTokenButtonState: ControlState
@@ -23,6 +24,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
+			self.createAndUploadAuthKeyButtonState = .enabled
 			self.createFungibleTokenButtonState = .enabled
 			self.createNonFungibleTokenButtonState = .enabled
 			self.createMultipleFungibleTokenButtonState = .enabled
@@ -37,6 +39,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case faucetButtonTapped
 
 		#if DEBUG
+		case createAndUploadAuthKeyButtonTapped
 		case createFungibleTokenButtonTapped
 		case createNonFungibleTokenButtonTapped
 		case createMultipleFungibleTokenButtonTapped
@@ -76,6 +79,13 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
 		#if DEBUG
+		case .createAndUploadAuthKeyButtonTapped:
+			return call(buttonState: \.createAndUploadAuthKeyButtonState, into: &state) {
+				print("mocking creating auth key for: \($0.address)")
+				try? await Task.sleep(for: .seconds(2))
+				print("mocked creating auth key DONE")
+			}
+
 		case .createFungibleTokenButtonTapped:
 			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
 				try await faucetClient.createFungibleToken(.init(
