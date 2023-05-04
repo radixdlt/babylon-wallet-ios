@@ -196,7 +196,7 @@ extension PersonaDetails.View {
 						.padding(.horizontal, .medium1)
 
 					ForEach(viewStore.state) { dApp in
-						Card_ {
+						Card {
 							viewStore.send(.dAppTapped(dApp.id))
 						} contents: {
 							PlainListRow_(title: dApp.displayName) {

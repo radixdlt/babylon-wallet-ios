@@ -1,6 +1,33 @@
 import Resources
 import SwiftUI
 
+// MARK: - TappableListRow
+public struct TappableListRow<Icon: View>: View {
+	public let body: Button<PlainListRow_<Icon>>
+
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		action: @escaping () -> Void,
+		@ViewBuilder icon: () -> Icon
+	) {
+		self.body = Button(action: action) {
+			PlainListRow_(showChevron: showChevron, title: title, icon: icon)
+		}
+	}
+
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		asset: ImageAsset,
+		action: @escaping () -> Void
+	) where Icon == AssetIcon {
+		self.body = Button(action: action) {
+			PlainListRow_(showChevron: showChevron, title: title, asset: asset)
+		}
+	}
+}
+
 // MARK: - PlainListRow_
 public struct PlainListRow_<Icon: View>: View {
 	let isShowingChevron: Bool
@@ -100,6 +127,16 @@ public struct PlainListRow<Icon: View>: View {
 			}
 			.frame(height: .largeButtonHeight)
 			.padding(.horizontal, .medium3)
+		}
+	}
+}
+
+extension Button {
+	public var withSeparator: some View {
+		VStack(spacing: .zero) {
+			self
+			Separator()
+				.padding(.horizontal, .medium3)
 		}
 	}
 }

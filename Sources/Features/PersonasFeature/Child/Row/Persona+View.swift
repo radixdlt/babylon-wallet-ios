@@ -12,7 +12,7 @@ extension Persona {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				Card_ {
+				Card {
 					viewStore.send(.tapped)
 				} contents: {
 					PlainListRow_(title: viewStore.displayName) {

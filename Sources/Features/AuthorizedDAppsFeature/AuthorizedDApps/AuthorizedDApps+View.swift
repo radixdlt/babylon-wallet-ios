@@ -38,7 +38,7 @@ extension AuthorizedDapps.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.dApps) { dApp in
-							Card_ {
+							Card {
 								viewStore.send(.didSelectDapp(dApp.id))
 							} contents: {
 								PlainListRow_(title: dApp.name) {

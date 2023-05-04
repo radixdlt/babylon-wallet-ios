@@ -1,33 +1,23 @@
 import SwiftUI
 
-// MARK: - Card_
-public struct Card_<Contents: View>: View {
-	let insetContents: Bool
-	let verticalSpacing: CGFloat
+// MARK: - Card
+public struct Card<Contents: View>: View {
 	let contents: Contents
 	let action: () -> Void
 	let disabled: Bool
 
 	public init(
-		insetContents: Bool = false,
-		verticalSpacing: CGFloat = .small1,
 		@ViewBuilder contents: () -> Contents
 	) {
-		self.insetContents = insetContents
-		self.verticalSpacing = verticalSpacing
 		self.action = {}
 		self.contents = contents()
 		self.disabled = true
 	}
 
 	public init(
-		insetContents: Bool = false,
-		verticalSpacing: CGFloat = .small1,
 		action: @escaping () -> Void,
 		@ViewBuilder contents: () -> Contents
 	) {
-		self.insetContents = insetContents
-		self.verticalSpacing = verticalSpacing
 		self.action = action
 		self.contents = contents()
 		self.disabled = false
@@ -37,44 +27,20 @@ public struct Card_<Contents: View>: View {
 		Button(action: action) {
 			contents
 		}
-		.buttonStyle(.cardButtonStyle(
-			insetContents: insetContents,
-			verticalSpacing: verticalSpacing
-		))
+		.buttonStyle(.cardButtonStyle)
 		.disabled(disabled)
 	}
 }
 
 public extension ButtonStyle where Self == CardButtonStyle {
 	static var cardButtonStyle: CardButtonStyle { CardButtonStyle() }
-
-	static func cardButtonStyle(
-		insetContents: Bool = false,
-		verticalSpacing: CGFloat = .small1
-	) -> CardButtonStyle {
-		CardButtonStyle(insetContents: insetContents, verticalSpacing: verticalSpacing)
-	}
 }
 
 // MARK: - CardButtonStyle
 public struct CardButtonStyle: ButtonStyle {
-	let insetContents: Bool
-	let verticalSpacing: CGFloat
-
-	init(
-		insetContents: Bool = false,
-		verticalSpacing: CGFloat = .small1
-	) {
-		self.insetContents = insetContents
-		self.verticalSpacing = verticalSpacing
-	}
-
 	public func makeBody(configuration: Configuration) -> some View {
-		VStack(spacing: verticalSpacing) {
-			configuration.label
-		}
-		.padding(insetContents ? .small1 : 0)
-		.inCard(isPressed: configuration.isPressed)
+		configuration.label
+			.inCard(isPressed: configuration.isPressed)
 	}
 }
 

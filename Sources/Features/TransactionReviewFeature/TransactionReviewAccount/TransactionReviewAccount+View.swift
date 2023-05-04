@@ -21,23 +21,26 @@ extension TransactionReviewAccounts {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Card_(insetContents: true) {
-					ForEachStore(
-						store.scope(
-							state: \.accounts,
-							action: { .child(.account(id: $0, action: $1)) }
-						),
-						content: { TransactionReviewAccount.View(store: $0) }
-					)
+				Card {
+					VStack(spacing: .small1) {
+						ForEachStore(
+							store.scope(
+								state: \.accounts,
+								action: { .child(.account(id: $0, action: $1)) }
+							),
+							content: { TransactionReviewAccount.View(store: $0) }
+						)
 
-					if viewStore.showCustomizeGuarantees {
-						Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
-							viewStore.send(.customizeGuaranteesTapped)
+						if viewStore.showCustomizeGuarantees {
+							Button(L10n.TransactionReview.customizeGuaranteesButtonTitle) {
+								viewStore.send(.customizeGuaranteesTapped)
+							}
+							.textStyle(.body1Header)
+							.foregroundColor(.app.blue2)
+							.padding(.vertical, .small3)
 						}
-						.textStyle(.body1Header)
-						.foregroundColor(.app.blue2)
-						.padding(.vertical, .small3)
 					}
+					.padding(.small1)
 				}
 			}
 		}

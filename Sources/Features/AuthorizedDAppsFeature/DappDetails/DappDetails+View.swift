@@ -218,7 +218,7 @@ extension DappDetails.View {
 						.padding(.horizontal, .medium1)
 
 					ForEach(elements) { element in
-						Card_ {
+						Card {
 							action(element.id)
 						} contents: {
 							PlainListRow_(showChevron: false, title: title(element)) {

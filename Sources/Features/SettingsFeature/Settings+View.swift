@@ -258,11 +258,24 @@ extension AppSettings.View {
 					#endif
 
 					ForEach(settingsRows()) { row in
-						PlainListRow(title: row.title, asset: row.asset) {
+						TappableListRow(title: row.title, asset: row.asset) {
 							viewStore.send(row.action)
 						}
 						.withSeparator
-						.buttonStyle(.tappableRowStyle)
+
+//						Button {
+//							viewStore.send(row.action)
+//						} label: {
+//							PlainListRow_(title: row.title, asset: row.asset)
+//						}
+//						.withSeparator
+//						.buttonStyle(.tappableRowStyle)
+
+//						PlainListRow(title: row.title, asset: row.asset) {
+//							viewStore.send(row.action)
+//						}
+//						.withSeparator
+//						.buttonStyle(.tappableRowStyle)
 					}
 				}
 				.padding(.bottom, .large3)
