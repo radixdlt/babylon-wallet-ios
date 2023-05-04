@@ -160,9 +160,6 @@ extension ROLAClient {
 				let babylonDeviceFactorSource = try BabylonDeviceFactorSource(factorSource: factorSource)
 				let authKeyDerivationPath = try signingKeyDerivationPath.switching(keyKind: .authenticationSigning)
 				let derivationPath = authKeyDerivationPath.wrapAsDerivationPath()
-//				let index = babylonDeviceFactorSource
-//					.entityCreatingStorage
-//					.nextForEntity(kind: entityKind, networkID: networkID)
 
 				let authenticationSigning: FactorInstance = try await {
 					let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(

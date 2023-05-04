@@ -113,7 +113,7 @@ public protocol EntityDerivationPathProtocol: DerivationPathSchemeProtocol {
 		fullPath: HD.Path.Full
 	) throws
 
-	func switching(keyKind: KeyKind) -> Self
+	func switching(keyKind newKeyKind: KeyKind) throws -> Self
 }
 
 extension EntityDerivationPathProtocol {

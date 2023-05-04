@@ -104,9 +104,15 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 
 		// Now, before MultiFactor, this is the only public init, but once we have MultiFactor we
 		// will remove this init and always use the `, factorInstancesRequiredToSign: Set<FactorInstance>` one.
-		public init(account: Profile.Network.Account, factorInstanceRequiredToSign: FactorInstance) {
-			precondition(account.factorInstance == factorInstanceRequiredToSign) // technically we can remove `factorInstanceRequiredToSign` but that makes logic in FactorSourceClientLive hide to much complexity that we will get once we have MultiFactor, better be prepared for MultiFactor a bit more
-			self.init(account: account, factorInstancesRequiredToSign: [factorInstanceRequiredToSign])
+		public init(
+			account: Profile.Network.Account,
+			factorInstanceRequiredToSign: FactorInstance
+		) {
+			switch account.securityState {
+			case let .unsecured(unsecuredEntityControl):
+				precondition(unsecuredEntityControl.transactionSigning == factorInstanceRequiredToSign)
+				self.init(account: account, factorInstancesRequiredToSign: [factorInstanceRequiredToSign])
+			}
 		}
 	}
 }

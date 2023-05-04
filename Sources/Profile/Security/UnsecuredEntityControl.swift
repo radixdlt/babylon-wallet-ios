@@ -21,7 +21,7 @@ public struct UnsecuredEntityControl:
 
 	public init(
 		transactionSigning: FactorInstance,
-		authenticationSigning: FactorInstance?
+		authenticationSigning: FactorInstance? = nil
 	) {
 		self.transactionSigning = transactionSigning
 		self.authenticationSigning = authenticationSigning
