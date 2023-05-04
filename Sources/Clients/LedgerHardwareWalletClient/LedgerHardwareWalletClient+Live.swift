@@ -98,8 +98,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						signers: request.signingFactor.signers.flatMap(\.keyParams),
 						ledgerDevice: .init(factorSource: request.signingFactor.factorSource),
 						compiledTransactionIntent: .init(data: request.unhashedDataToSign),
-						displayHash: true,
-						mode: .summary
+						displayHash: request.displayHashOnLedgerDisplay,
+						mode: request.ledgerTXDisplayMode
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.signTransaction
 				)
