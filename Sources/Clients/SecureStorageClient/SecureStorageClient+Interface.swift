@@ -16,14 +16,14 @@ public struct SecureStorageClient: Sendable {
 }
 
 extension SecureStorageClient {
-	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (CloudProfileSyncActivation) async throws -> Void
+	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileSnapshot.Header.ID, CloudProfileSyncActivation) async throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	public typealias LoadProfileSnapshotData = @Sendable () async throws -> Data?
+	public typealias LoadProfileSnapshotData = @Sendable (ProfileSnapshot.Header.ID) async throws -> Data?
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) async throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSource.ID, LoadMnemonicPurpose) async throws -> MnemonicWithPassphrase?
 
-	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSource.ID) async throws -> Void
+	public typealias DeleteMnemonicByFactorSourceID = @Sendable (ProfileSnapshot.Header.ID, FactorSource.ID) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (_ keepIcloudIfPresent: Bool) async throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Equatable, CustomStringConvertible {

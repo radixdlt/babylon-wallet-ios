@@ -11,12 +11,12 @@ extension DependencyValues {
 extension SecureStorageClient: TestDependencyKey {
 	public static let noop: Self = .init(
 		saveProfileSnapshot: { _ in },
-		loadProfileSnapshotData: { nil },
+		loadProfileSnapshotData: { _ in nil },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _, _ in nil },
-		deleteMnemonicByFactorSourceID: { _ in },
+		deleteMnemonicByFactorSourceID: { _, _ in },
 		deleteProfileAndMnemonicsByFactorSourceIDs: { _ in },
-		updateIsCloudProfileSyncEnabled: { _ in }
+		updateIsCloudProfileSyncEnabled: { _, _ in }
 	)
 
 	public static let previewValue: Self = .noop

@@ -55,8 +55,8 @@ extension SecureStorageClient: DependencyKey {
 			return .init(accessibility: .whenPasscodeSetThisDeviceOnly, authenticationPolicy: .userPresence)
 		}
 
-		let loadProfileSnapshotData: LoadProfileSnapshotData = {
-			try await keychainClient.getDataWithoutAuthForKey(profileSnapshotKeychainKey)
+		let loadProfileSnapshotData: LoadProfileSnapshotData = { id in
+			try await keychainClient.getDataWithoutAuthForKey(id.keychainKey)
 		}
 
 		let deleteMnemonicByFactorSourceID: DeleteMnemonicByFactorSourceID = { factorSourceID in
@@ -66,12 +66,13 @@ extension SecureStorageClient: DependencyKey {
 
 		@Sendable func saveProfile(
 			snapshotData data: Data,
+			key: KeychainClient.Key,
 			iCloudSyncEnabled: Bool
 		) async throws {
 			try await keychainClient.setDataWithoutAuthForKey(
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
-					key: profileSnapshotKeychainKey,
+					key: key,
 					iCloudSyncEnabled: iCloudSyncEnabled,
 					accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 					label: "Radix Wallet Data",
@@ -85,7 +86,7 @@ extension SecureStorageClient: DependencyKey {
 			iCloudSyncEnabled: Bool
 		) async throws {
 			let data = try jsonEncoder().encode(profileSnapshot)
-			try await saveProfile(snapshotData: data, iCloudSyncEnabled: iCloudSyncEnabled)
+			try await saveProfile(snapshotData: data, key: profileSnapshot.header.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
 		return Self(
@@ -94,7 +95,7 @@ extension SecureStorageClient: DependencyKey {
 				try await keychainClient.setDataWithoutAuthForKey(
 					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
-						key: profileSnapshotKeychainKey,
+						key: profileSnapshot.header.keychainKey,
 						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled.rawValue,
 						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
@@ -144,12 +145,12 @@ extension SecureStorageClient: DependencyKey {
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: { keepIcloudIfPresent in
+			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepIcloudIfPresent in
 				guard let profileSnapshotData = try await loadProfileSnapshotData() else {
 					return
 				}
 				if !keepIcloudIfPresent {
-					try await keychainClient.removeDataForKey(profileSnapshotKeychainKey)
+					try await keychainClient.removeDataForKey(profileID.keychainKey)
 				}
 				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
 					return
@@ -159,7 +160,7 @@ extension SecureStorageClient: DependencyKey {
 						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
 					} else {
 						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
-						try await keychainClient.removeDataForKey(profileSnapshotKeychainKey)
+						try await keychainClient.removeDataForKey(profileID.keychainKey)
 					}
 				}
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
@@ -167,9 +168,9 @@ extension SecureStorageClient: DependencyKey {
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
 			},
-			updateIsCloudProfileSyncEnabled: { change in
+			updateIsCloudProfileSyncEnabled: { profileId, change in
 				guard
-					let profileSnapshotData = try await loadProfileSnapshotData()
+					let profileSnapshotData = try await loadProfileSnapshotData(profileId)
 				else {
 					return
 				}
@@ -177,10 +178,10 @@ extension SecureStorageClient: DependencyKey {
 				switch change {
 				case .disable:
 					loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
-					try await saveProfile(snapshotData: profileSnapshotData, iCloudSyncEnabled: false)
+					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: false)
 				case .enable:
 					loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
-					try await saveProfile(snapshotData: profileSnapshotData, iCloudSyncEnabled: true)
+					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: true)
 				}
 			}
 		)
@@ -188,20 +189,20 @@ extension SecureStorageClient: DependencyKey {
 }
 
 extension SecureStorageClient {
-	public func loadProfileSnapshot() async throws -> ProfileSnapshot? {
+	public func loadProfileSnapshot(_ id: ProfileSnapshot.Header.ID) async throws -> ProfileSnapshot? {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		guard
-			let existingSnapshotData = try await loadProfileSnapshotData()
+			let existingSnapshotData = try await loadProfileSnapshotData(id)
 		else {
 			return nil
 		}
 		return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
 	}
 
-	public func loadProfile() async throws -> Profile? {
+	public func loadProfile(_ id: ProfileSnapshot.Header.ID) async throws -> Profile? {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		guard
-			let existingSnapshot = try await loadProfileSnapshot()
+			let existingSnapshot = try await loadProfileSnapshot(id)
 		else {
 			return nil
 		}
@@ -209,7 +210,14 @@ extension SecureStorageClient {
 	}
 }
 
-private let profileSnapshotKeychainKey: KeychainClient.Key = "profileSnapshotKeychainKey"
+extension ProfileSnapshot.Header.ID {
+	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshotKeychain"
+
+	var keychainKey: KeychainClient.Key {
+		"\(Self.profileSnapshotKeychainKeyPrefix) - \(uuidString)"
+	}
+}
+
 private func key(factorSourceID: FactorSource.ID) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.hexCodable.hex())!)
 }
