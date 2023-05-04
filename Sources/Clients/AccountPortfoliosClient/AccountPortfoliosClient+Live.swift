@@ -106,7 +106,8 @@ extension AccountPortfoliosClient {
 	static func fetchAccountPortfolios(
 		_ addresses: [AccountAddress]
 	) async throws -> [AccountPortfolio] {
-		let details = try await fetchResourceDetails(addresses.map(\.address))
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		let details = try await gatewayAPIClient.fetchResourceDetails(addresses.map(\.address))
 		return try await details.items.parallelMap {
 			try await createAccountPortfolio($0, ledgerState: details.ledgerState)
 		}
@@ -116,7 +117,8 @@ extension AccountPortfoliosClient {
 	static func fetchAccountPortfolio(
 		_ accountAddress: AccountAddress
 	) async throws -> AccountPortfolio {
-		let accountDetails = try await fetchResourceDetails([accountAddress.address])
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		let accountDetails = try await gatewayAPIClient.fetchResourceDetails([accountAddress.address])
 		guard let accountItem = accountDetails.items.first else {
 			throw EmptyAccountDetails()
 		}
@@ -131,7 +133,7 @@ extension AccountPortfoliosClient {
 		ledgerState: GatewayAPI.LedgerState
 	) async throws -> AccountPortfolio {
 		// Fetch all fungible resources by requesting additional pages if available
-		async let fetchAllFungibleResources = { // FIXME: WHY ARE THESE ASYNC LET?
+		let fetchAllFungibleResources = {
 			guard let firstPage = rawAccountDetails.fungibleResources else {
 				return [GatewayAPI.FungibleResourcesCollectionItem]()
 			}
@@ -149,7 +151,7 @@ extension AccountPortfoliosClient {
 		}
 
 		// Fetch all non-fungible resources by requesting additional pages if available
-		async let fetchAllNonFungibleResources = { // FIXME: WHY ARE THESE ASYNC LET?
+		let fetchAllNonFungibleResources = {
 			guard let firstPage = rawAccountDetails.nonFungibleResources else {
 				return [GatewayAPI.NonFungibleResourcesCollectionItem]()
 			}
@@ -188,10 +190,10 @@ extension AccountPortfoliosClient {
 		guard !rawItems.isEmpty else {
 			return .init()
 		}
-
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		// Fetch all the detailed information for the loaded resources.
 		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.FungibleResourcesCollectionItem itself.
-		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
+		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
 		let fungibleresources = rawItems.map { resource in
 			let amount: BigDecimal = {
@@ -243,7 +245,7 @@ extension AccountPortfoliosClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		// TODO: This will become obsolete with next version of GW, the details would be embeded in GatewayAPI.NonFungibleResourcesCollectionItem
-		let allResourceDetails = try await fetchResourceDetails(rawItems.map(\.resourceAddress)).items
+		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
 		@Sendable
 		func tokens(resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated) async throws -> [AccountPortfolio.NonFungibleResource.NonFungibleToken] {
@@ -398,37 +400,6 @@ extension AccountPortfoliosClient {
 				}
 			)
 		}
-	}
-}
-
-// MARK: - Resource details endpoint
-extension AccountPortfoliosClient {
-	// The maximum number of addresses the `getEntityDetails` can accept
-	// This needs to be synchronized with the actual value on the GW side
-	static let entityDetailsPageSize = 20
-	struct EmptyEntityDetailsResponse: Error {}
-
-	/// Loads the details for all the addresses provided.
-	@Sendable
-	static func fetchResourceDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-
-		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
-		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
-		let allResponses = try await addresses
-			.chunks(ofCount: entityDetailsPageSize)
-			.map(Array.init)
-			.parallelMap(gatewayAPIClient.getEntityDetails)
-
-		guard !allResponses.isEmpty else {
-			throw EmptyEntityDetailsResponse()
-		}
-
-		// Group multiple GatewayAPI.StateEntityDetailsResponse in one response.
-		let allItems = allResponses.flatMap(\.items)
-		let ledgerState = allResponses.first!.ledgerState
-
-		return .init(ledgerState: ledgerState, items: allItems)
 	}
 }
 

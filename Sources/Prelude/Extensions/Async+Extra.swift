@@ -31,15 +31,26 @@ public func doAsync<Result: Sendable>(
 	}
 }
 
-extension Array where Element: Sendable {
-	public func parallelMap<T: Sendable>(_ map: @Sendable @escaping (Element) async throws -> T) async throws -> [T] {
+extension Collection where Element: Sendable {
+	public func parallelMap<T: Sendable>(_ transform: @Sendable @escaping (Element) async throws -> T) async throws -> [T] {
 		try await withThrowingTaskGroup(of: T.self) { group in
 			for element in self {
 				_ = group.addTaskUnlessCancelled {
-					try await map(element)
+					try await transform(element)
 				}
 			}
 			return try await group.collect()
+		}
+	}
+
+	public func parallelCompactMap<T: Sendable>(_ transform: @Sendable @escaping (Element) async throws -> T?) async rethrows -> [T] {
+		try await withThrowingTaskGroup(of: T?.self) { group in
+			for element in self {
+				_ = group.addTaskUnlessCancelled {
+					try await transform(element)
+				}
+			}
+			return try await group.collect().compactMap { $0 }
 		}
 	}
 }

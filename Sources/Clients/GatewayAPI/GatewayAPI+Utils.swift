@@ -45,6 +45,17 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 		}
 		return nil
 	}
+
+	public var type: GatewayAPI.StateEntityDetailsResponseItemDetailsType {
+		switch self {
+		case .fungibleResource: return .fungibleResource
+		case .nonFungibleResource: return .nonFungibleResource
+		case .fungibleVault: return .fungibleVault
+		case .nonFungibleVault: return .nonFungibleVault
+		case .package: return .package
+		case .component: return .component
+		}
+	}
 }
 
 extension GatewayAPI.EntityMetadataCollection {

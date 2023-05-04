@@ -21,8 +21,8 @@ extension DappDetails {
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
 		let otherMetadata: [MetadataItem]
-		let fungibleTokens: [State.Tokens.TokenDetails]?
-		let nonFungibleTokens: [State.Tokens.TokenDetails]?
+		let fungibleTokens: [State.Tokens.ResourceDetails]?
+		let nonFungibleTokens: [State.Tokens.ResourceDetails]?
 		let hasPersonas: Bool
 
 		struct MetadataItem: Identifiable, Hashable, Sendable {

@@ -87,4 +87,29 @@ extension GatewayAPIClient {
 
 		return dappDefinition
 	}
+
+	// The maximum number of addresses the `getEntityDetails` can accept
+	// This needs to be synchronized with the actual value on the GW side
+	static let entityDetailsPageSize = 20
+
+	/// Loads the details for all the addresses provided.
+	@Sendable
+	public func fetchResourceDetails(_ addresses: [String]) async throws -> GatewayAPI.StateEntityDetailsResponse {
+		/// gatewayAPIClient.getEntityDetails accepts only `entityDetailsPageSize` addresses for one request.
+		/// Thus, chunk the addresses in chunks of `entityDetailsPageSize` and load the details in separate, parallel requests.
+		let allResponses = try await addresses
+			.chunks(ofCount: GatewayAPIClient.entityDetailsPageSize)
+			.map(Array.init)
+			.parallelMap(getEntityDetails)
+
+		guard !allResponses.isEmpty else {
+			throw EmptyEntityDetailsResponse()
+		}
+
+		// Group multiple GatewayAPI.StateEntityDetailsResponse in one response.
+		let allItems = allResponses.flatMap(\.items)
+		let ledgerState = allResponses.first!.ledgerState
+
+		return .init(ledgerState: ledgerState, items: allItems)
+	}
 }
