@@ -101,8 +101,6 @@ struct Login: Sendable, FeatureReducer {
 					origin: state.dappDefinitionAddress.address
 				)
 				return .run { [authorizedDapp = state.authorizedDapp] send in
-					// FIXME: change to use SBOR encoding rather than utf8?
-
 					let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
 						of: persona,
 						unhashedDataToSign: payloadToHash,
