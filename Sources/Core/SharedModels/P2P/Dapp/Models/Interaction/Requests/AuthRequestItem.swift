@@ -8,7 +8,7 @@ extension P2P.Dapp.Request {
 		}
 
 		enum Discriminator: String, Decodable {
-			case login // withou
+			case loginWithoutChallenge
 			case loginWithChallenge
 			case usePersona
 		}
@@ -20,7 +20,7 @@ extension P2P.Dapp.Request {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 			let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 			switch discriminator {
-			case .login:
+			case .loginWithoutChallenge:
 				self = try .login(.init(from: decoder))
 			case .loginWithChallenge:
 				let auth = try AuthLoginRequestItem(from: decoder)
