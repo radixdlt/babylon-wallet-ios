@@ -30,7 +30,7 @@ extension TransactionReviewGuarantees {
 							.multilineTextAlignment(.center)
 							.padding(.vertical, .medium3)
 
-						Button(L10n.TransactionReview.Guarantees.infoButtonText, asset: AssetResource.info) {
+						Button(L10n.TransactionReview.Guarantees.howDoGuaranteesWork, asset: AssetResource.info) {
 							ViewStore(store).send(.view(.infoTapped))
 						}
 						.textStyle(.body1Header)
@@ -38,7 +38,7 @@ extension TransactionReviewGuarantees {
 						.padding(.horizontal, .large2)
 						.padding(.bottom, .medium1)
 
-						Text(L10n.TransactionReview.Guarantees.headerText)
+						Text(L10n.TransactionReview.Guarantees.subtitle)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
 							.foregroundColor(.app.gray1)
@@ -132,7 +132,7 @@ extension TransactionReviewGuarantee {
 					Separator()
 
 					HStack(spacing: .medium3) {
-						Text(L10n.TransactionReview.Guarantees.setText)
+						Text(L10n.TransactionReview.Guarantees.setGuaranteedMinimum)
 							.lineLimit(2)
 							.textStyle(.body2Header)
 							.foregroundColor(.app.gray1)

@@ -29,7 +29,7 @@ extension TransactionReview.State {
 
 	private var viewControlState: ControlState {
 		if transactionWithLockFee == nil {
-			return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+			return .loading(.global(text: L10n.TransactionSigning.preparingTransaction))
 		} else {
 			return .enabled
 		}

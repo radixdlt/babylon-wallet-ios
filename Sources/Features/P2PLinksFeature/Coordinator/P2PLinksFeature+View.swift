@@ -27,7 +27,7 @@ extension P2PLinksFeature {
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
-					Text(L10n.P2PLinks.p2PConnectionsSubtitle)
+					Text(L10n.LinkedConnectors.subtitle)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body1HighImportance)
 						.flushedLeft
@@ -50,7 +50,7 @@ extension P2PLinksFeature {
 							}
 						)
 					}
-					Button(L10n.P2PLinks.newConnectionButtonTitle) {
+					Button(L10n.LinkedConnectors.linkNewConnector) {
 						viewStore.send(.addNewConnectionButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular(
@@ -60,7 +60,7 @@ extension P2PLinksFeature {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
-				.navigationTitle(L10n.P2PLinks.p2PConnectionsTitle)
+				.navigationTitle(L10n.LinkedConnectors.title)
 				.task { @MainActor in
 					await ViewStore(store.stateless).send(.view(.task)).finish()
 				}

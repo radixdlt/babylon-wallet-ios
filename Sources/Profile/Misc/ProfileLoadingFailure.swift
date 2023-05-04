@@ -44,7 +44,7 @@ extension Profile.FailedToCreateProfileFromSnapshot {
 		hasher.combine(String(describing: error))
 	}
 
-	public var errorDescription: String? { L10n.ProfileLoad.failedToCreateProfileFromSnapshotError(error, version) }
+	public var errorDescription: String? { L10n.Error.ProfileLoad.failedToCreateProfileFromSnapshot(error, version) }
 }
 
 // MARK: - Profile.JSONDecodingError + Hashable
@@ -69,7 +69,7 @@ extension Profile.JSONDecodingError: Hashable {
 		public var errorDescription: String? {
 			switch self {
 			case .noProfileSnapshotVersionFoundInJSON:
-				return L10n.ProfileLoad.decodingError("Unknown version")
+				return L10n.Error.ProfileLoad.decodingError("Unknown version")
 			case let .decodingError(error):
 				return error.localizedDescription
 			}
@@ -83,7 +83,7 @@ extension Profile.JSONDecodingError: Hashable {
 			self.decodingError = decodingError
 		}
 
-		public var errorDescription: String? { L10n.ProfileLoad.decodingError(decodingError) }
+		public var errorDescription: String? { L10n.Error.ProfileLoad.decodingError(decodingError) }
 	}
 
 	public struct UnknownDecodingError: Sendable, LocalizedError, Hashable {
@@ -96,7 +96,7 @@ extension Profile.JSONDecodingError: Hashable {
 		}
 
 		public let error: Swift.Error
-		public var errorDescription: String? { L10n.ProfileLoad.decodingError(error) }
+		public var errorDescription: String? { L10n.Error.ProfileLoad.decodingError(error) }
 
 		public init(error: Error) {
 			self.error = error

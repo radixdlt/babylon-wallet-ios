@@ -26,7 +26,7 @@ extension GeneralSettings {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					coreView(with: viewStore)
-						.navigationTitle(L10n.GeneralSettings.title)
+						.navigationTitle(L10n.AppSettings.title)
 						.onAppear { viewStore.send(.appeared) }
 				}
 			}
@@ -44,8 +44,8 @@ extension GeneralSettings {
 
 		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			ToggleView(
-				title: L10n.GeneralSettings.DeveloperMode.title,
-				subtitle: L10n.GeneralSettings.DeveloperMode.subtitle,
+				title: L10n.AppSettings.DeveloperMode.title,
+				subtitle: L10n.AppSettings.DeveloperMode.subtitle,
 				isOn: viewStore.binding(
 					get: \.isDeveloperModeEnabled,
 					send: { .developerModeToggled($0) }

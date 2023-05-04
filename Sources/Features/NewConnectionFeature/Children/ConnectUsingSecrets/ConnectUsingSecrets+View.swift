@@ -17,7 +17,7 @@ extension ConnectUsingSecrets {
 
 		init(state: ConnectUsingSecrets.State) {
 			nameOfConnection = state.nameOfConnection
-			screenState = state.isConnecting ? .loading(.global(text: L10n.NewConnection.connecting)) : .enabled
+			screenState = state.isConnecting ? .loading(.global(text: L10n.NewConnection.linking)) : .enabled
 			focusedField = state.focusedField
 			saveButtonControlState = {
 				if state.isConnecting {
@@ -65,7 +65,7 @@ extension ConnectUsingSecrets {
 
 					Spacer()
 
-					Button(L10n.NewConnection.saveNamedConnectionButton) {
+					Button(L10n.NewConnection.saveLinkButtonTitle) {
 						viewStore.send(.confirmNameButtonTapped)
 					}
 					.controlState(viewStore.saveButtonControlState)

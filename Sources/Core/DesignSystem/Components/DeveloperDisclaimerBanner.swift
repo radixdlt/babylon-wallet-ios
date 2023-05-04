@@ -13,7 +13,7 @@ extension View {
 // MARK: - DeveloperDisclaimerBanner
 struct DeveloperDisclaimerBanner: View {
 	var body: some View {
-		Text(L10n.App.developmentOnlyInfo)
+		Text(L10n.Common.developerDisclaimerText)
 			.frame(maxWidth: .infinity, alignment: .center)
 			.padding(.small3)
 			.background(Color.app.orange2)

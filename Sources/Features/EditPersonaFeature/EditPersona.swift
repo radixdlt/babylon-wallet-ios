@@ -139,10 +139,10 @@ public struct EditPersona: Sendable, FeatureReducer {
 					TextState("")
 				} actions: {
 					ButtonState(role: .destructive, action: .send(.discardChanges)) {
-						TextState(L10n.EditPersona.CloseConfirmationDialog.Button.discardChanges)
+						TextState(L10n.EditPersona.CloseConfirmationDialog.discardChanges)
 					}
 					ButtonState(role: .cancel, action: .send(.keepEditing)) {
-						TextState(L10n.EditPersona.CloseConfirmationDialog.Button.keepEditing)
+						TextState(L10n.EditPersona.CloseConfirmationDialog.keepEditing)
 					}
 				} message: {
 					TextState(L10n.EditPersona.CloseConfirmationDialog.message)

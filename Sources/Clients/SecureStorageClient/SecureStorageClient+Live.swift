@@ -101,15 +101,15 @@ extension SecureStorageClient: DependencyKey {
 				let authPromptValue: String = {
 					switch purpose {
 					case let .createEntity(kind):
-						let entityKindName = kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
-						return L10n.Common.BiometricsPrompt.creationOfEntity(entityKindName)
-					case .signTransaction: return L10n.Common.BiometricsPrompt.signTransaction
-					case .signAuthChallenge: return L10n.Common.BiometricsPrompt.signAuthChallenge
+						let entityKindName = kind == .account ? L10n.Common.account : L10n.Common.persona
+						return L10n.Biometrics.Prompt.creationOfEntity(entityKindName)
+					case .signTransaction: return L10n.Biometrics.Prompt.signTransaction
+					case .signAuthChallenge: return L10n.Biometrics.Prompt.signAuthChallenge
 					#if DEBUG
 					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
 					#endif
 					case .importOlympiaAccounts:
-						return L10n.Common.BiometricsPrompt.importOlympiaAccounts
+						return L10n.Biometrics.Prompt.importOlympiaAccounts
 					}
 				}()
 				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."

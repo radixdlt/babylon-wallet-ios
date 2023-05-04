@@ -44,7 +44,7 @@ extension PersonaDetails.View {
 								.background(.app.gray5)
 						}
 
-						Button(L10n.PersonaDetails.deauthorizePersona) {
+						Button(L10n.PersonaDetails.removeAuthorization) {
 							viewStore.send(.deauthorizePersonaTapped)
 						}
 						.buttonStyle(.primaryRectangular(isDestructive: true))
@@ -213,7 +213,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					VPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
+					VPair(heading: L10n.PersonaDetails.personaName, item: viewStore.personaName)
 
 					Separator()
 
@@ -222,25 +222,25 @@ extension PersonaDetails.View {
 							Text(L10n.PersonaDetails.notSharingAnything(dAppInfo.name))
 								.textBlock
 						} else {
-							Text(L10n.PersonaDetails.personaDataSharingDescription(dAppInfo.name))
+							Text(L10n.PersonaDetails.personalDataSharingDescription(dAppInfo.name))
 								.textBlock
 						}
 					}
 
 					if let firstName = viewStore.firstName {
-						VPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)
+						VPair(heading: L10n.PersonaDetails.firstName, item: firstName)
 					}
 
 					if let lastName = viewStore.lastName {
-						VPair(heading: L10n.PersonaDetails.lastNameHeading, item: lastName)
+						VPair(heading: L10n.PersonaDetails.lastName, item: lastName)
 					}
 
 					if let emailAddress = viewStore.emailAddress {
-						VPair(heading: L10n.PersonaDetails.emailAddressHeading, item: emailAddress)
+						VPair(heading: L10n.PersonaDetails.emailAddress, item: emailAddress)
 					}
 
 					if let phoneNumber = viewStore.phoneNumber {
-						VPair(heading: L10n.PersonaDetails.phoneNumberHeading, item: phoneNumber)
+						VPair(heading: L10n.PersonaDetails.phoneNumber, item: phoneNumber)
 					}
 				}
 				.padding(.horizontal, .medium1)

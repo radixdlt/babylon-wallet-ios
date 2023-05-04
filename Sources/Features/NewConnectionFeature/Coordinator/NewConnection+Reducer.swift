@@ -61,7 +61,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 				return .send(
 					.child(.connectUsingSecrets(.delegate(.connected(
 						.init(connectionPassword: connectUsingSecrets.connectionPassword,
-						      displayName: L10n.NewConnection.defaultNameOfConnection)
+						      displayName: L10n.NewConnection.connectionDefaultName)
 					))))
 				)
 			}

@@ -19,7 +19,7 @@ extension EditPersonaField {
 			self.primaryHeading = state.id.title
 			self.secondaryHeading = {
 				if state.kind == .dynamic(isRequiredByDapp: true) {
-					return L10n.EditPersona.InputField.Heading.General.requiredByDapp
+					return L10n.EditPersona.requiredByDapp
 				} else {
 					return nil
 				}

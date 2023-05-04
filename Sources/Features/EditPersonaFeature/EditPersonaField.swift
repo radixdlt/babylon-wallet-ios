@@ -73,7 +73,7 @@ public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.Sta
 extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
-		case .personaLabel: return L10n.PersonaDetails.personaNameHeading
+		case .personaLabel: return L10n.PersonaDetails.personaName
 		}
 	}
 
@@ -108,8 +108,8 @@ extension EditPersonaStaticField.State {
 			id: id,
 			input: .init(
 				wrappedValue: initial,
-				onNil: L10n.EditPersona.InputField.Error.PersonaLabel.blank,
-				rules: [.if(\.isBlank, error: L10n.EditPersona.InputField.Error.PersonaLabel.blank)]
+				onNil: L10n.EditPersona.Error.blank,
+				rules: [.if(\.isBlank, error: L10n.EditPersona.Error.blank)]
 			)
 		)
 	}
@@ -123,10 +123,10 @@ public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.Dy
 extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
-		case .givenName: return L10n.PersonaDetails.firstNameHeading
-		case .familyName: return L10n.PersonaDetails.lastNameHeading
-		case .emailAddress: return L10n.PersonaDetails.emailAddressHeading
-		case .phoneNumber: return L10n.PersonaDetails.phoneNumberHeading
+		case .givenName: return L10n.PersonaDetails.firstName
+		case .familyName: return L10n.PersonaDetails.lastName
+		case .emailAddress: return L10n.PersonaDetails.emailAddress
+		case .phoneNumber: return L10n.PersonaDetails.phoneNumber
 		}
 	}
 
@@ -173,17 +173,17 @@ extension EditPersonaDynamicField.State {
 				wrappedValue: initial,
 				onNil: {
 					if isRequiredByDapp {
-						return L10n.EditPersona.InputField.Error.General.requiredByDapp
+						return L10n.EditPersona.Error.requiredByDapp
 					} else {
 						return nil
 					}
 				}(),
 				rules: .build {
 					if isRequiredByDapp {
-						.if(\.isBlank, error: L10n.EditPersona.InputField.Error.General.requiredByDapp)
+						.if(\.isBlank, error: L10n.EditPersona.Error.requiredByDapp)
 					}
 					if id == .emailAddress {
-						.unless(\.isEmailAddress, error: L10n.EditPersona.InputField.Error.EmailAddress.invalid)
+						.unless(\.isEmailAddress, error: L10n.EditPersona.Error.invalidEmailAddress)
 					}
 				}
 			)

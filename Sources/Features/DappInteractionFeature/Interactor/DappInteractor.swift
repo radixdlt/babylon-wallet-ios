@@ -128,10 +128,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
 			state.responseFailureAlert = .init(
-				title: { TextState(L10n.App.errorOccurredTitle) },
+				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
-						TextState(L10n.DApp.Response.FailureAlert.cancelButtonTitle)
+						TextState(L10n.Common.cancel)
 					}
 					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
 						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)

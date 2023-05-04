@@ -14,6 +14,7 @@ extension NewEntityCompletion {
 		let destinationDisplayText: String
 		let isFirstOnNetwork: Bool
 		let explaination: String
+		let subtitle: String
 
 		// Account only
 		struct WhenAccount: Equatable {
@@ -24,20 +25,25 @@ extension NewEntityCompletion {
 		let whenAccount: WhenAccount?
 
 		init(state: NewEntityCompletion.State) {
-			let entityKind = state.entity.kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
+			let entityKind = state.entity.kind == .account ? L10n.Common.account : L10n.Common.persona
 			self.entityKind = entityKind
 			entityName = state.entity.displayName.rawValue
 
 			destinationDisplayText = {
 				switch state.navigationButtonCTA {
 				case .goHome:
-					return L10n.CreateEntity.Completion.Destination.home
+					return L10n.CreateEntity.Completion.destinationHome
 				case .goBackToChooseEntities:
-					return L10n.CreateEntity.Completion.Destination.chooseEntities(entityKind)
+					switch state.entity.kind {
+					case .account:
+						return L10n.CreateEntity.Completion.destinationChooseAccounts
+					case .identity:
+						return L10n.CreateEntity.Completion.destinationChoosePersonas
+					}
 				case .goBackToPersonaList:
-					return L10n.CreateEntity.Completion.Destination.settingsPersonaList
+					return L10n.CreateEntity.Completion.destinationPersonaList
 				case .goBackToGateways:
-					return L10n.CreateEntity.Completion.Destination.gateways
+					return L10n.CreateEntity.Completion.destinationGateways
 				}
 			}()
 
@@ -48,11 +54,24 @@ extension NewEntityCompletion {
 					accountAddress: account.address,
 					appearanceID: account.appearanceID
 				)
-				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.account
+				self.explaination = L10n.CreateAccount.Completion.explanation
 			} else {
-				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.persona
+				self.explaination = L10n.CreatePersona.Completion.explanation
 				self.whenAccount = nil
 			}
+
+			subtitle = {
+				switch (state.isFirstOnNetwork, state.entity.kind) {
+				case (true, .account):
+					return L10n.CreateAccount.Completion.subtitleFirst
+				case (false, .account):
+					return L10n.CreateAccount.Completion.subtitleNotFirst
+				case (true, .identity):
+					return L10n.CreatePersona.Completion.subtitleFirst
+				case (false, .identity):
+					return L10n.CreatePersona.Completion.subtitleNotFirst
+				}
+			}()
 		}
 	}
 
@@ -80,7 +99,7 @@ extension NewEntityCompletion {
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
 
-						Text(subtitleText(with: viewStore))
+						Text(viewStore.subtitle)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 
@@ -148,15 +167,6 @@ private extension NewEntityCompletion.View {
 	@MainActor
 	func reversedZIndex(count: Int, index: Int) -> Double {
 		Double(count - index)
-	}
-
-	@MainActor
-	func subtitleText(with viewStore: ViewStoreOf<NewEntityCompletion>) -> String {
-		if viewStore.isFirstOnNetwork {
-			return L10n.CreateEntity.Completion.Subtitle.first(viewStore.entityKind)
-		} else {
-			return L10n.CreateEntity.Completion.Subtitle.notFirst(viewStore.entityKind)
-		}
 	}
 }
 
