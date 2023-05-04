@@ -95,10 +95,13 @@ struct Login: Sendable, FeatureReducer {
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
 			if let challenge = state.loginRequest.challenge {
-				let payloadToHashString: String = challenge.rawValue.data.hex() + state.dappDefinitionAddress.address + state.dappMetadata.origin
+				let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+					challenge: challenge,
+					origin: state.dappDefinitionAddress.address,
+					dAppDefinitionAddress: state.dappMetadata.origin.rawValue
+				)
 				return .run { [authorizedDapp = state.authorizedDapp] send in
 					// FIXME: change to use SBOR encoding rather than utf8?
-					let payloadToHash = payloadToHashString.data(using: .utf8)!
 
 					let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
 						of: persona,

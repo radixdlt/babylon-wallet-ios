@@ -2,6 +2,24 @@
 import TestingPrelude
 
 final class ToDappResponseTests: TestCase {
+	func test_simple_rola() throws {
+		let challenge: P2P.Dapp.AuthChallengeNonce = try .init(rawValue: .init(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"))
+		let dAppDefinitionAddress = "account_tdx_c_1p93mejt0tl4vgsrafgyjqqx2mflsnhyutzs8ywre8zds7kgal0"
+		let origin = "https://radix.swap"
+
+		let usedButInaccurate = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+			challenge: challenge,
+			origin: origin,
+			dAppDefinitionAddress: dAppDefinitionAddress
+		)
+
+		XCTAssertEqual(usedButInaccurate.hex, "646561646265656664656164626565666465616462656566646561646265656664656164626565666465616462656566646561646265656664656164626565666163636f756e745f7464785f635f317039336d656a7430746c3476677372616667796a717178326d666c736e687975747a733879777265387a6473376b67616c3068747470733a2f2f72616469782e73776170")
+
+		let notUsedButIshouldHAve = challenge.data.data + dAppDefinitionAddress.data(using: .utf8)! + origin.data(using: .utf8)!
+
+		XCTAssertEqual(notUsedButIshouldHAve.hex, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef6163636f756e745f7464785f635f317039336d656a7430746c3476677372616667796a717178326d666c736e687975747a733879777265387a6473376b67616c3068747470733a2f2f72616469782e73776170")
+	}
+
 	func test_encode_response() throws {
 		let sut = P2P.Dapp.Response.success(.init(
 			interactionId: "an_id",
