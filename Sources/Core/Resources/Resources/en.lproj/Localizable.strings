@@ -41,7 +41,9 @@
 "common_none" = "None";
 "common_ok" = "OK";
 "common_persona" = "Persona";
+"common_retry" = "Retry";
 "common_somethingWentWrong" = "Something went wrong";
+"common_systemSettings" = "Settings";
 "createAccount_completion_explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
 "createAccount_completion_subtitleFirst" = "You’ve created your first Account.";
 "createAccount_completion_subtitleNotFirst" = "Your Account has been created.";
@@ -134,12 +136,10 @@
 "linkedConnectors_subtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
 "linkedConnectors_title" = "Linked Connectors";
 "newConnection_cameraPermissionDeniedAlert_message" = "Camera access is required to link to connector.";
-"newConnection_cameraPermissionDeniedAlert_settings" = "Settings";
 "newConnection_cameraPermissionDeniedAlert_title" = "Access Required";
 "newConnection_connectionDefaultName" = "Unnamed";
 "newConnection_linking" = "Linking...";
 "newConnection_localNetworkPermissionDeniedAlert_message" = "Local Network access is required to link to connector.";
-"newConnection_localNetworkPermissionDeniedAlert_settings" = "Settings";
 "newConnection_localNetworkPermissionDeniedAlert_title" = "Access Required";
 "newConnection_saveLinkButtonTitle" = "Save Link";
 "newConnection_subtitle" = "Scan your QR code to link your wallet with a browser extension";
@@ -158,8 +158,6 @@
 "splash_incompatibleProfileVersionAlert_message" = "For this Preview wallet version, you must delete your wallet data to continue.";
 "splash_incompatibleProfileVersionAlert_title" = "Wallet Data is Incompatible";
 "splash_passcodeCheckFailedAlert_message" = "Passcode are not set up. Please update settings.";
-"splash_passcodeCheckFailedAlert_retry" = "Retry";
-"splash_passcodeCheckFailedAlert_settings" = "Settings";
 "splash_passcodeCheckFailedAlert_title" = "Warning";
 "splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
 "splash_passcodeNotSetTitle" = "Passcode not set up";
@@ -234,7 +232,6 @@
 "dappRequest_login_newDappSubtitle" = " is requesting you login for the first time with a Persona.";
 "dappRequest_login_newDappTitle" = "New Login Request";
 "dappRequest_metadataLoadingAlert_message" = "Danger! Bad dApp config or you\'re being spoofed!";
-"dappRequest_metadataLoadingAlert_retryButtonTitle" = "Retry";
 "dappRequest_metadataLoadingPrompt" = "Loading...";
 "dappRequest_metadata_unknownName" = "Unknown dApp";
 "dappRequest_oneTimePersonalData_chooseDataToProvide" = "Choose the data to provide";
@@ -252,7 +249,6 @@
 "dappRequest_requestPersonaNotFoundAlert_message" = "Persona specified by dApp does not exist.";
 "dappRequest_requestWrongNetworkAlert_message" = "Request received from dApp for network %@, but you are currently connected to %@.";
 "dappRequest_responseFailureAlert_message" = "Failed to send response payload back to dApp.";
-"dappRequest_responseFailureAlert_retry" = "Retry";
 "error_dappRequest_invalidPersonaId" = "Invalid persona id specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to create Wallet from backup: %@";
