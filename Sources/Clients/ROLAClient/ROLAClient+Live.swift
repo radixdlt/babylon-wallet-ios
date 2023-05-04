@@ -26,8 +26,9 @@ extension ROLAClient {
 			let entityAddress = entity.address.address
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
 			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
-			let hashOfNewPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
-			ownerKeyHashes.append(hashOfNewPublicKey)
+			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
+			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
+			ownerKeyHashes.append(hashBytesOfPublicKey)
 
 			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeyHashes.map {
 				ManifestASTValue.bytes(Bytes(bytes: Array($0)))
@@ -182,7 +183,8 @@ extension ROLAClient {
 				unsecuredEntityControl.authenticationSigning = authenticationSigning
 				account.securityState = .unsecured(unsecuredEntityControl)
 
-				accountsClient
+				try await accountsClient.updateAccount(account)
+				// DONE
 
 			},
 			createAuthSigningKeyForPersonaIfNeeded: { _ in }
