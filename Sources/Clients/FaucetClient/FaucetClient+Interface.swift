@@ -7,14 +7,14 @@ public struct FaucetClient: Sendable {
 	public var getFreeXRD: GetFreeXRD
 	public var isAllowedToUseFaucet: IsAllowedToUseFaucet
 
-	#if DEBUG
-	public var createFungibleToken: CreateFungibleToken
-	public var createNonFungibleToken: CreateNonFungibleToken
-
 	// FIXME: move `signSubmitSimpleTX` to some other client! but which?
 	/// A "simple TX" is a transaction which cannot require signing of any factor source except
 	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
 	public var signSubmitSimpleTX: SignSubmitSimpleTX
+
+	#if DEBUG
+	public var createFungibleToken: CreateFungibleToken
+	public var createNonFungibleToken: CreateNonFungibleToken
 
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
@@ -32,10 +32,12 @@ public struct FaucetClient: Sendable {
 	#else
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
-		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet
+		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
+		signSubmitSimpleTX: @escaping SignSubmitSimpleTX
 	) {
 		self.getFreeXRD = getFreeXRD
 		self.isAllowedToUseFaucet = isAllowedToUseFaucet
+		self.signSubmitSimpleTX = signSubmitSimpleTX
 	}
 	#endif // DEBUG
 }

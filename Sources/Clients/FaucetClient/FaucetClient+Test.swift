@@ -14,7 +14,8 @@ extension FaucetClient: TestDependencyKey {
 	#else
 	public static let testValue: FaucetClient = Self(
 		getFreeXRD: unimplemented("\(Self.self).getFreeXRD"),
-		isAllowedToUseFaucet: unimplemented("\(Self.self).isAllowedToUseFaucet")
+		isAllowedToUseFaucet: unimplemented("\(Self.self).isAllowedToUseFaucet"),
+		signSubmitSimpleTX: unimplemented("\(Self.self).signSubmitSimpleTX")
 	)
 	#endif
 }
@@ -31,7 +32,8 @@ extension FaucetClient {
 	#else
 	public static let noop = Self(
 		getFreeXRD: { _ in },
-		isAllowedToUseFaucet: { _ in true }
+		isAllowedToUseFaucet: { _ in true },
+		signSubmitSimpleTX: { _ in }
 	)
 	#endif
 }

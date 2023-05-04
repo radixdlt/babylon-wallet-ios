@@ -85,6 +85,29 @@ extension FaucetClient: DependencyKey {
 			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
 
+		let signSubmitSimpleTX: SignSubmitSimpleTX = { manifest in
+
+			try await signSubmitTX(manifest: manifest) { data, signers in
+				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+				guard case let .intentSigners(signingEntities) = signers.intentSigning else {
+					return []
+				}
+
+				var signatures = Set<Engine.SignatureWithPublicKey>()
+
+				for signer in signingEntities {
+					let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+						of: signer,
+						unhashedDataToSign: data,
+						purpose: .signData(isTransaction: true)
+					)
+					try signatures.insert(signature.signature.signatureWithPublicKey.intoEngine())
+				}
+
+				return signatures
+			}
+		}
+
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
 
 			let accountAddress = faucetRequest.recipientAccountAddress
@@ -167,33 +190,13 @@ extension FaucetClient: DependencyKey {
 			isAllowedToUseFaucet: isAllowedToUseFaucet,
 			createFungibleToken: createFungibleToken,
 			createNonFungibleToken: createNonFungibleToken,
-			signSubmitSimpleTX: { manifest in
-
-				try await signSubmitTX(manifest: manifest) { data, signers in
-					@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
-					guard case let .intentSigners(signingEntities) = signers.intentSigning else {
-						return []
-					}
-
-					var signatures = Set<Engine.SignatureWithPublicKey>()
-
-					for signer in signingEntities {
-						let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-							of: signer,
-							unhashedDataToSign: data,
-							purpose: .signData(isTransaction: true)
-						)
-						try signatures.insert(signature.signature.signatureWithPublicKey.intoEngine())
-					}
-
-					return signatures
-				}
-			}
+			signSubmitSimpleTX: signSubmitSimpleTX
 		)
 		#else
 		return Self(
 			getFreeXRD: getFreeXRD,
-			isAllowedToUseFaucet: isAllowedToUseFaucet
+			isAllowedToUseFaucet: isAllowedToUseFaucet,
+			signSubmitSimpleTX: signSubmitSimpleTX
 		)
 		#endif // DEBUG
 	}()
