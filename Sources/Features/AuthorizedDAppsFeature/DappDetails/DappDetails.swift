@@ -26,23 +26,40 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
 
+		@Loadable
+		public var tokens: Tokens? = nil
+
+		public var personaList: PersonaList.State
+
 		@PresentationState
 		public var personaDetails: PersonaDetails.State? = nil
 
 		@PresentationState
 		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
 
-		public var personaList: PersonaList.State
-
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
-			personaDetails: PersonaDetails.State? = nil,
-			metadata: GatewayAPI.EntityMetadataCollection? = nil
+			metadata: GatewayAPI.EntityMetadataCollection? = nil,
+			tokens: Tokens? = nil,
+			personaDetails: PersonaDetails.State? = nil
 		) {
 			self.dApp = dApp
+			self.metadata = metadata
+			self.tokens = tokens
 			self.personaDetails = personaDetails
 			self.personaList = .init(dApp: dApp)
-			self.metadata = metadata
+		}
+
+		public struct Tokens: Hashable, Sendable {
+			public var fungible: [TokenDetails]
+			public var nonFungible: [TokenDetails]
+
+			public struct TokenDetails: Identifiable, Hashable, Sendable {
+				public var id: ComponentAddress { address }
+				public let name: String
+				public let thumbnail: URL?
+				public let address: ComponentAddress
+			}
 		}
 	}
 
@@ -69,6 +86,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
+		case tokensLoaded(Loadable<State.Tokens>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 		case dAppForgotten
 	}
@@ -97,6 +115,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			state.$metadata = .loading
+			state.$tokens = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
 				let result = await TaskResult {
@@ -165,7 +184,25 @@ public struct DappDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
+
+			if let claimedEntities = state.metadata?.claimedEntities, !claimedEntities.isEmpty {
+				return .task {
+					let ggg = try await claimedEntities.parallelMap { entity in
+						let metadata = try await gatewayAPIClient.getEntityMetadata(entity)
+						return metadata
+					}
+
+					return .internal(.tokensLoaded(.success(.init(fungible: [], nonFungible: []))))
+				}
+			} else {
+				state.$tokens = metadata.flatMap { _ in .idle }
+				return .none
+			}
+
+		case let .tokensLoaded(tokens):
+			state.$tokens = tokens
 			return .none
+
 		case let .dAppUpdated(dApp):
 			assert(dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
@@ -182,6 +219,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+//	private func loadTokenDetails(from metadata: GatewayAPI.EntityMetadataCollection) -> EffectTask<Action> {
+//
+//	}
 
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
 		.run { send in

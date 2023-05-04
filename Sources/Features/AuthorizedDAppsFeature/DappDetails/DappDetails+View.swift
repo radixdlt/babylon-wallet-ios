@@ -21,21 +21,14 @@ extension DappDetails {
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
 		let otherMetadata: [MetadataItem]
-		let fungibleTokens: [Token]
-		let nonFungibleTokens: [Token]
+		let fungibleTokens: [State.Tokens.TokenDetails]?
+		let nonFungibleTokens: [State.Tokens.TokenDetails]?
 		let hasPersonas: Bool
 
 		struct MetadataItem: Identifiable, Hashable, Sendable {
 			var id: Self { self }
 			let key: String
 			let value: String
-		}
-
-		struct Token: Identifiable, Hashable, Sendable {
-			var id: ComponentAddress { address }
-			let name: String
-			let thumbnail: URL?
-			let address: ComponentAddress
 		}
 	}
 }
@@ -112,8 +105,8 @@ private extension DappDetails.State {
 			thumbnail: metadata?.iconURL,
 			address: dApp.dAppDefinitionAddress,
 			otherMetadata: otherMetadata,
-			fungibleTokens: [], // TODO: Populate when we have it
-			nonFungibleTokens: [], // TODO: Populate when we have it
+			fungibleTokens: tokens?.fungible,
+			nonFungibleTokens: tokens?.nonFungible,
 			hasPersonas: !personaList.personas.isEmpty
 		)
 	}
@@ -212,13 +205,13 @@ extension DappDetails.View {
 	@MainActor
 	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
 		let heading: String
-		let elements: [Element]
+		let elements: [Element]?
 		let title: (Element) -> String
 		let icon: (Element) -> Icon
 		let action: (Element.ID) -> Void
 
 		var body: some View {
-			if !elements.isEmpty {
+			if let elements, !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
 						.sectionHeading

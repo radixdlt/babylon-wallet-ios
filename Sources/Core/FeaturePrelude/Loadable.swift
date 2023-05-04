@@ -25,10 +25,10 @@ import Foundation
              // Shimmer
          case .loading:
              // Animated shimmer or spinner
- case .success(let value):
- content(value)
- case .failure:
- // Error message or error color
+         case .success(let value):
+             content(value)
+         case .failure:
+             // Error message or error color
          }
      }
  }
@@ -60,16 +60,7 @@ public enum Loadable<Value> {
 	case failure(Error)
 
 	public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Loadable<T> {
-		switch self {
-		case .idle:
-			return .idle
-		case .loading:
-			return .loading
-		case let .success(value):
-			return .success(value[keyPath: keyPath])
-		case let .failure(error):
-			return .failure(error)
-		}
+		map { $0[keyPath: keyPath] }
 	}
 
 	public init(wrappedValue: Value?) {
@@ -174,3 +165,22 @@ extension Loadable: Hashable where Value: Hashable {
 
 // MARK: - Loadable + Sendable
 extension Loadable: Sendable where Value: Sendable {}
+
+extension Loadable {
+	public func map<NewValue>(_ transform: (Value) -> NewValue) -> Loadable<NewValue> {
+		flatMap { .success(transform($0)) }
+	}
+
+	public func flatMap<NewValue>(_ transform: (Value) -> Loadable<NewValue>) -> Loadable<NewValue> {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			return transform(value)
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
+}

@@ -76,6 +76,10 @@ extension GatewayAPI.EntityMetadataCollection {
 		self["dapp_definition"]?.asString
 	}
 
+	public var dappDefinitions: [String]? {
+		self["dapp_definitions"]?.asStringCollection
+	}
+
 	public var claimedEntities: [String]? {
 		self["claimed_entities"]?.asStringCollection
 	}
