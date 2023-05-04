@@ -57,6 +57,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			// TODO: This should be consolidated with other types that represent resources
 			public struct ResourceDetails: Identifiable, Hashable, Sendable {
 				public var id: ResourceAddress { resourceAddress }
+
 				public let resourceAddress: ResourceAddress
 				public let fungibility: Fungibility
 				public let name: String
@@ -77,8 +78,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case openURLTapped(URL)
-		case fungibleTokenTapped(ComponentAddress)
-		case nonFungibleTokenTapped(ComponentAddress)
+		case fungibleTokenTapped(ResourceAddress)
+		case nonFungibleTokenTapped(ResourceAddress)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
 		case confirmDisconnectAlert(PresentationAction<ConfirmDisconnectAlert>)
@@ -194,10 +195,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
 
+			let dappDefinitionAddress = state.dApp.dAppDefinitionAddress
 			if let claimedEntities = state.metadata?.claimedEntities, !claimedEntities.isEmpty {
 				return .task {
 					let result = await TaskResult {
 						try await tokens(addresses: claimedEntities)
+//						try await tokens(addresses: claimedEntities, validated: dappDefinitionAddress)
 					}
 					return .internal(.tokensLoaded(.init(result: result)))
 				}
@@ -228,32 +231,22 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	private func tokens(addresses: [String]) async throws -> State.Tokens {
-		func resourceFungibility(itemDetails: GatewayAPI.StateEntityDetailsResponseItemDetails) -> State.Tokens.ResourceDetails.Fungibility? {
-			switch itemDetails.type {
-			case .fungibleResource:
-				return .fungible
-			case .nonFungibleResource:
-				return .nonFungible
-			case .fungibleVault, .nonFungibleVault, .package, .component:
-				return nil
-			}
-		}
+		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
+			.items
+			.compactMap(\.resourceDetails)
 
-		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses).items
+		return .init(fungible: allResourceItems.filter { $0.fungibility == .fungible },
+		             nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+	}
 
-		let allResources = allResourceItems.compactMap { item -> State.Tokens.ResourceDetails? in
-			guard let details = item.details, let fungibility = resourceFungibility(itemDetails: details) else { return nil }
+	private func tokens(addresses: [String], validated dAppDefinitionAddress: DappDefinitionAddress) async throws -> State.Tokens {
+		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
+			.items
+			.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+			.compactMap(\.resourceDetails)
 
-			return .init(resourceAddress: .init(address: item.address),
-			             fungibility: fungibility,
-			             name: item.metadata.name ?? L10n.DAppDetails.unknownTokenName,
-			             symbol: item.metadata.symbol,
-			             description: item.metadata.description,
-			             iconURL: item.metadata.iconURL)
-		}
-		let grouped = Dictionary(grouping: allResources, by: \.fungibility)
-
-		return .init(fungible: grouped[.fungible] ?? [], nonFungible: grouped[.nonFungible] ?? [])
+		return .init(fungible: allResourceItems.filter { $0.fungibility == .fungible },
+		             nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
 	}
 
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
@@ -275,6 +268,30 @@ public struct DappDetails: Sendable, FeatureReducer {
 			await send(.internal(.dAppForgotten))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+}
+
+extension GatewayAPI.StateEntityDetailsResponseItem {
+	var resourceDetails: DappDetails.State.Tokens.ResourceDetails? {
+		guard let fungibility else { return nil }
+		return .init(resourceAddress: .init(address: address),
+		             fungibility: fungibility,
+		             name: metadata.name ?? L10n.DAppDetails.unknownTokenName,
+		             symbol: metadata.symbol,
+		             description: metadata.description,
+		             iconURL: metadata.iconURL)
+	}
+
+	private var fungibility: DappDetails.State.Tokens.ResourceDetails.Fungibility? {
+		guard let details else { return nil }
+		switch details {
+		case .fungibleResource:
+			return .fungible
+		case .nonFungibleResource:
+			return .nonFungible
+		case .fungibleVault, .nonFungibleVault, .package, .component:
+			return nil
 		}
 	}
 }

@@ -179,7 +179,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.fungibleTokens, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { token in
-					TokenThumbnail(.known(token.thumbnail), size: .small)
+					TokenThumbnail(.known(token.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTokenTapped(id))
 				}
@@ -194,7 +194,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.nonFungibleTokens, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { token in
-					NFTThumbnail(token.thumbnail, size: .small)
+					NFTThumbnail(token.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTokenTapped(id))
 				}

@@ -8,22 +8,34 @@ public struct PlainListRow<Icon: View>: View {
 	let icon: Icon
 	let action: () -> Void
 
-	public init(showChevron: Bool = true,
-	            title: String,
-	            action: @escaping () -> Void,
-	            @ViewBuilder icon: () -> Icon)
-	{
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		action: @escaping () -> Void,
+		@ViewBuilder icon: () -> Icon
+	) {
 		self.isShowingChevron = showChevron
 		self.title = title
 		self.icon = icon()
 		self.action = action
 	}
 
-	public init(showChevron: Bool = true,
-	            title: String,
-	            asset: ImageAsset,
-	            action: @escaping () -> Void) where Icon == AssetIcon
-	{
+	public init(
+		title: String,
+		@ViewBuilder icon: () -> Icon
+	) {
+		self.isShowingChevron = false
+		self.title = title
+		self.icon = icon()
+		self.action = {}
+	}
+
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		asset: ImageAsset,
+		action: @escaping () -> Void
+	) where Icon == AssetIcon {
 		self.isShowingChevron = showChevron
 		self.title = title
 		self.icon = AssetIcon(asset: asset)
