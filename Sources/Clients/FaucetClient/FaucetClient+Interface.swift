@@ -10,16 +10,23 @@ public struct FaucetClient: Sendable {
 	#if DEBUG
 	public var createFungibleToken: CreateFungibleToken
 	public var createNonFungibleToken: CreateNonFungibleToken
+
+	/// A "simple TX" is a transaction which cannot require signing of any factor source except
+	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
+	public var signSubmitSimpleTX: SignSubmitSimpleTX
+
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
 		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
 		createFungibleToken: @escaping CreateFungibleToken,
-		createNonFungibleToken: @escaping CreateNonFungibleToken
+		createNonFungibleToken: @escaping CreateNonFungibleToken,
+		signSubmitSimpleTX: @escaping SignSubmitSimpleTX
 	) {
 		self.getFreeXRD = getFreeXRD
 		self.isAllowedToUseFaucet = isAllowedToUseFaucet
 		self.createFungibleToken = createFungibleToken
 		self.createNonFungibleToken = createNonFungibleToken
+		self.signSubmitSimpleTX = signSubmitSimpleTX
 	}
 	#else
 	public init(
@@ -105,6 +112,11 @@ extension FaucetClient {
 	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> Void
 	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async -> Bool
 	#if DEBUG
+
+	/// A "simple TX" is a transaction which cannot require signing of any factor source except
+	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
+	public typealias SignSubmitSimpleTX = @Sendable (TransactionManifest) async throws -> Void
+
 	public typealias CreateFungibleToken = @Sendable (CreateFungibleTokenRequest) async throws -> Void
 	public typealias CreateNonFungibleToken = @Sendable (CreateNonFungibleTokenRequest) async throws -> Void
 	#endif // DEBUG

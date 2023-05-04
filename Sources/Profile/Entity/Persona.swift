@@ -65,8 +65,6 @@ extension Profile.Network {
 }
 
 extension Profile.Network.Persona {
-	public var wrappedID: WrappedEntityID { .personaID(id) }
-
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable, Hashable, Codable {
 		public var fields: IdentifiedArrayOf<Field>

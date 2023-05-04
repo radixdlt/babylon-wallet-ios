@@ -2,12 +2,6 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-// MARK: - WrappedEntityID
-public enum WrappedEntityID: Sendable, Hashable {
-	case accountID(Profile.Network.Account.ID)
-	case personaID(Profile.Network.Persona.ID)
-}
-
 // MARK: - EntityProtocol
 /// An `Account` or a `Persona`
 public protocol EntityProtocol: Sendable, Equatable, Identifiable where ID == EntityAddress {
@@ -37,8 +31,6 @@ public protocol EntityProtocol: Sendable, Equatable, Identifiable where ID == En
 	var displayName: NonEmpty<String> { get }
 
 	func cast<Entity: EntityProtocol>() throws -> Entity
-
-	var wrappedID: WrappedEntityID { get }
 
 	init(
 		networkID: NetworkID,

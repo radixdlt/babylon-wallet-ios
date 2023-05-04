@@ -259,7 +259,7 @@ package.addModules([
 			"LedgerHardwareWalletClient",
 			"Profile",
 			"TransactionClient",
-			"UseFactorSourceClient",
+			"DeviceFactorSourceClient",
 		],
 		tests: .no
 	),
@@ -387,6 +387,7 @@ package.addModules([
 	.client(
 		name: "FaucetClient",
 		dependencies: [
+			"DeviceFactorSourceClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
@@ -539,7 +540,7 @@ package.addModules([
 			"Profile",
 			"SecureStorageClient",
 			"MnemonicClient",
-			"UseFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
+			"DeviceFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
 		],
 		tests: .yes()
 	),
@@ -556,8 +557,10 @@ package.addModules([
 	.client(
 		name: "ROLAClient",
 		dependencies: [
+			"AccountsClient",
 			"GatewayAPI",
 			"CacheClient",
+			"PersonasClient",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -585,7 +588,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "UseFactorSourceClient",
+		name: "DeviceFactorSourceClient",
 		dependencies: [
 			"Profile",
 			"Cryptography",
@@ -685,7 +688,7 @@ package.addModules([
 			"Profile",
 		],
 		exclude: [
-			"P2P/Codable/README.md",
+			"P2P/Dapp/README.md",
 			"P2P/Application/README.md",
 		],
 		tests: .yes()

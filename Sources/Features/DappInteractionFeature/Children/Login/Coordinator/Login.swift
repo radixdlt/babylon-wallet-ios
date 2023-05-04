@@ -1,9 +1,9 @@
 import AuthorizedDappsClient
 import CreateEntityFeature
+import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
 import PersonasClient
-import UseFactorSourceClient
 
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
@@ -65,7 +65,7 @@ struct Login: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -103,7 +103,7 @@ struct Login: Sendable, FeatureReducer {
 				origin: state.dappDefinitionAddress.address
 			)
 			return .run { [authorizedDapp = state.authorizedDapp] send in
-				let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
+				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					of: persona,
 					unhashedDataToSign: payloadToHash,
 					purpose: .signData(isTransaction: false)

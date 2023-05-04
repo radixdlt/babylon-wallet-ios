@@ -1,6 +1,6 @@
+import DeviceFactorSourceClient
 import FactorSourcesClient
 import FeaturePrelude
-import UseFactorSourceClient
 
 public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducerProtocol {
 	public static let factorSourceKind = FactorSourceKind.device
@@ -20,7 +20,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		)
 	}
 
-	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -45,7 +45,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		signingFactor: SigningFactor,
 		state: State
 	) async throws -> Set<AccountSignature> {
-		try await useFactorSourceClient.signUsingDeviceFactorSource(
+		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: signingFactor.factorSource,
 			of: Set(signingFactor.signers.map(\.account)),
 			unhashedDataToSign: state.dataToSign,

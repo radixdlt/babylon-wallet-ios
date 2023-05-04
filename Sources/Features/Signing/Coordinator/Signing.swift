@@ -1,10 +1,10 @@
 import Cryptography
 import CustomDump
+import DeviceFactorSourceClient
 import FactorSourcesClient
 import FeaturePrelude
 import Profile
 import TransactionClient
-import UseFactorSourceClient
 
 // MARK: - K1.PublicKey + CustomDumpStringConvertible
 extension K1.PublicKey: CustomDumpStringConvertible {

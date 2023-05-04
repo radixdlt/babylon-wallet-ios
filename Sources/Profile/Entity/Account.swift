@@ -178,8 +178,6 @@ extension Profile.Network.Account {
 	public static var entityKind: EntityKind { .account }
 
 	public typealias EntityAddress = AccountAddress
-
-	public var wrappedID: WrappedEntityID { .accountID(id) }
 }
 
 extension Profile.Network.Account {

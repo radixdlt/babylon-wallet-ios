@@ -1,7 +1,7 @@
 import ClientPrelude
 import Cryptography
+import DeviceFactorSourceClient
 import Profile
-import UseFactorSourceClient
 
 extension Profile {
 	public func createNewUnsavedVirtualEntityControlledByDeviceFactorSource<Entity: EntityProtocol>(
@@ -27,7 +27,7 @@ extension Profile {
 		request: CreateVirtualEntityControlledByDeviceFactorSourceRequest,
 		entityType: Entity.Type
 	) async throws -> Entity {
-		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 		let entityKind = Entity.entityKind
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
 		let babylonDeviceFactorSource = request.babylonDeviceFactorSource
@@ -43,7 +43,7 @@ extension Profile {
 		)
 
 		let genesisFactorInstance: FactorInstance = try await {
-			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(
+			let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
 				.init(
 					hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
 					derivationPath: derivationPath,

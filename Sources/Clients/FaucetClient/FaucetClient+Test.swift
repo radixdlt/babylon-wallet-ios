@@ -8,7 +8,8 @@ extension FaucetClient: TestDependencyKey {
 		getFreeXRD: unimplemented("\(Self.self).getFreeXRD"),
 		isAllowedToUseFaucet: unimplemented("\(Self.self).isAllowedToUseFaucet"),
 		createFungibleToken: unimplemented("\(Self.self).createFungibleToken"),
-		createNonFungibleToken: unimplemented("\(Self.self).createNonFungibleToken")
+		createNonFungibleToken: unimplemented("\(Self.self).createNonFungibleToken"),
+		signSubmitSimpleTX: unimplemented("\(Self.self).signSubmitSimpleTX")
 	)
 	#else
 	public static let testValue: FaucetClient = Self(
@@ -24,7 +25,8 @@ extension FaucetClient {
 		getFreeXRD: { _ in },
 		isAllowedToUseFaucet: { _ in true },
 		createFungibleToken: { _ in },
-		createNonFungibleToken: { _ in }
+		createNonFungibleToken: { _ in },
+		signSubmitSimpleTX: { _ in }
 	)
 	#else
 	public static let noop = Self(

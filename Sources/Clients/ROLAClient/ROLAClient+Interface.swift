@@ -5,14 +5,16 @@ import Profile
 public struct ROLAClient: Sendable, DependencyKey {
 	public var performDappDefinitionVerification: PerformDappDefinitionVerification
 	public var performWellKnownFileCheck: PerformWellKnownFileCheck
-	public var createAuthSigningKeyForEntityIfNeeded: CreateAuthSigningKeyForEntityIfNeeded
+	public var createAuthSigningKeyForAccountIfNeeded: CreateAuthSigningKeyForAccountIfNeeded
+	public var createAuthSigningKeyForPersonaIfNeeded: CreateAuthSigningKeyForPersonaIfNeeded
 }
 
 // MARK: ROLAClient.PerformWellKnownFileCheck
 extension ROLAClient {
 	public typealias PerformDappDefinitionVerification = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
-	public typealias CreateAuthSigningKeyForEntityIfNeeded = @Sendable (CreateAuthSigningKeyForEntityIfNeededRequest) async throws -> Void
+	public typealias CreateAuthSigningKeyForAccountIfNeeded = @Sendable (CreateAuthSigningKeyForAccountIfNeededRequest) async throws -> Void
+	public typealias CreateAuthSigningKeyForPersonaIfNeeded = @Sendable (CreateAuthSigningKeyForPersonaIfNeededRequest) async throws -> Void
 }
 
 extension DependencyValues {
@@ -22,16 +24,12 @@ extension DependencyValues {
 	}
 }
 
-// MARK: - CreateAuthSigningKeyForEntityIfNeededRequest
-public struct CreateAuthSigningKeyForEntityIfNeededRequest: Sendable, Hashable {
-	public let entityID: WrappedEntityID
-	public let networkID: NetworkID
-	public init(entityID: WrappedEntityID, networkID: NetworkID) {
-		self.entityID = entityID
-		self.networkID = networkID
-	}
+// MARK: - CreateAuthSigningKeyForAccountIfNeededRequest
+public struct CreateAuthSigningKeyForAccountIfNeededRequest: Sendable, Hashable {
+	public let account: Profile.Network.Account
+}
 
-	public init<Entity>(entity: Entity) where Entity: EntityProtocol {
-		self.init(entityID: entity.wrappedID, networkID: entity.networkID)
-	}
+// MARK: - CreateAuthSigningKeyForPersonaIfNeededRequest
+public struct CreateAuthSigningKeyForPersonaIfNeededRequest: Sendable, Hashable {
+	public let persona: Profile.Network.Persona
 }
