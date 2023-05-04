@@ -94,36 +94,35 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
-			if let challenge = state.loginRequest.challenge {
-				let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
-					challenge: challenge,
-					dAppDefinitionAddress: state.dappMetadata.origin.rawValue,
-					origin: state.dappDefinitionAddress.address
-				)
-				return .run { [authorizedDapp = state.authorizedDapp] send in
-					let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
-						of: persona,
-						unhashedDataToSign: payloadToHash,
-						purpose: .signData(isTransaction: false)
-					)
-					let signedAuthChallenge = SignedAuthChallenge(
-						challenge: challenge,
-						signatureWithPublicKey: signature.signature.signatureWithPublicKey
-					)
-					await send(.delegate(.continueButtonTapped(
-						persona,
-						authorizedDapp,
-						authorizedPersona,
-						signedAuthChallenge
-					)))
-
-				} catch: { error, send in
-					loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
-					errorQueue.schedule(error)
-					await send(.delegate(.failedToSignAuthChallenge))
-				}
-			} else {
+			guard let challenge = state.loginRequest.challenge else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
+			}
+			let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+				challenge: challenge,
+				dAppDefinitionAddress: state.dappMetadata.origin.rawValue,
+				origin: state.dappDefinitionAddress.address
+			)
+			return .run { [authorizedDapp = state.authorizedDapp] send in
+				let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
+					of: persona,
+					unhashedDataToSign: payloadToHash,
+					purpose: .signData(isTransaction: false)
+				)
+				let signedAuthChallenge = SignedAuthChallenge(
+					challenge: challenge,
+					signatureWithPublicKey: signature.signature.signatureWithPublicKey
+				)
+				await send(.delegate(.continueButtonTapped(
+					persona,
+					authorizedDapp,
+					authorizedPersona,
+					signedAuthChallenge
+				)))
+
+			} catch: { error, send in
+				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
+				errorQueue.schedule(error)
+				await send(.delegate(.failedToSignAuthChallenge))
 			}
 		}
 	}
