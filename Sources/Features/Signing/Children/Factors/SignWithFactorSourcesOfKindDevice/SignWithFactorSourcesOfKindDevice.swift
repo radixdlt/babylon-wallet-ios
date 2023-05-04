@@ -48,7 +48,8 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		try await useFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: signingFactor.factorSource,
 			of: Set(signingFactor.signers.map(\.account)),
-			unhashedDataToSign: state.dataToSign
+			unhashedDataToSign: state.dataToSign,
+			purpose: .signData(isTransaction: true)
 		)
 	}
 }
