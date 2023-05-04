@@ -2,6 +2,7 @@ import FeaturePrelude
 import MainFeature
 import OnboardingClient
 import OnboardingFeature
+import ProfileStore
 import SecureStorageClient
 import SplashFeature
 import UseFactorSourceClient
@@ -108,7 +109,7 @@ public struct App: Sendable, FeatureReducer {
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in
 				do {
-					try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(true)
+					try await ProfileStore.shared.deleteProfile(keepIcloudIfPresent: true)
 				} catch {
 					errorQueue.schedule(error)
 				}
@@ -166,6 +167,8 @@ public struct App: Sendable, FeatureReducer {
 					let isAccountRecoveryNeeded = await useFactorSourceClient.isAccountRecoveryNeeded()
 					await send(.internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded)))
 				}
+			case .usersExistingProfileCouldNotBeLoaded(failure: .failedToRetrieveActiveProfileId):
+				return goToOnboarding(state: &state)
 			}
 
 		default:

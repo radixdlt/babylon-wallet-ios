@@ -153,7 +153,7 @@ extension ProfileStore {
 	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
 		try assertProfileStateIsEphemeral()
 
-		guard await (try? secureStorageClient.loadProfileSnapshotData()) == Data?.none else {
+		guard await (try? secureStorageClient.loadProfileSnapshotData(profile.header.id)) == Data?.none else {
 			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
 			throw ExistingProfileSnapshotFoundAbortingImport()
 		}
@@ -171,8 +171,10 @@ extension ProfileStore {
 
 	public func commitEphemeral() async throws {
 		let ephemeral = try assertProfileStateIsEphemeral()
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		do {
+			await userDefaultsClient.setActiveProfileId(ephemeral.profile.header.id)
 			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
@@ -221,8 +223,11 @@ extension ProfileStore {
 	}
 
 	public func deleteProfile(keepIcloudIfPresent: Bool) async throws {
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		do {
-			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(keepIcloudIfPresent)
+			let profileId = try userDefaultsClient.activeProfileId()
+			await userDefaultsClient.removeActiveProfileId()
+			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profileId, keepIcloudIfPresent)
 		} catch {
 			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
@@ -300,10 +305,18 @@ extension ProfileStore {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.errorQueue) var errorQueue
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let loadResult: Swift.Result<Profile?, Profile.LoadingFailure> = await {
+			let profileId: ProfileSnapshot.Header.ID
+			do {
+				profileId = try userDefaultsClient.activeProfileId()
+			} catch {
+				return .failure(.failedToRetrieveActiveProfileId)
+			}
+
 			guard
-				let profileSnapshotData = try? await secureStorageClient.loadProfileSnapshotData()
+				let profileSnapshotData = try? await secureStorageClient.loadProfileSnapshotData(profileId)
 			else {
 				return .success(nil)
 			}
@@ -473,4 +486,33 @@ struct EphemeralProfile: Sendable, Hashable {
 	var profile: Profile
 	/// If this during startup an earlier Profile was found but we failed to load it.
 	let loadFailure: Profile.LoadingFailure?
+}
+
+extension UserDefaultsClient {
+	static let activeProfileId = "profile.activeProfileID"
+
+	enum ActiveProfileIdErrors: Error {
+		case noActiveProfileId
+		case invalidActiveProfileId
+	}
+
+	func activeProfileId() throws -> ProfileSnapshot.Header.ID {
+		guard let rawValue = stringForKey(Self.activeProfileId) else {
+			throw ActiveProfileIdErrors.noActiveProfileId
+		}
+
+		guard let id = ProfileSnapshot.Header.ID(uuidString: rawValue) else {
+			throw ActiveProfileIdErrors.invalidActiveProfileId
+		}
+
+		return id
+	}
+
+	func setActiveProfileId(_ id: ProfileSnapshot.Header.ID) async {
+		await setString(id.uuidString, Self.activeProfileId)
+	}
+
+	func removeActiveProfileId() async {
+		await remove(Self.activeProfileId)
+	}
 }

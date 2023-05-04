@@ -86,7 +86,7 @@ extension SecureStorageClient: DependencyKey {
 			iCloudSyncEnabled: Bool
 		) async throws {
 			let data = try jsonEncoder().encode(profileSnapshot)
-			try await saveProfile(snapshotData: data, key: profileSnapshot.header.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
+			try await saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
 		return Self(
@@ -95,7 +95,7 @@ extension SecureStorageClient: DependencyKey {
 				try await keychainClient.setDataWithoutAuthForKey(
 					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
-						key: profileSnapshot.header.keychainKey,
+						key: profileSnapshot.header.id.keychainKey,
 						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled.rawValue,
 						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
@@ -145,24 +145,24 @@ extension SecureStorageClient: DependencyKey {
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepIcloudIfPresent in
-				guard let profileSnapshotData = try await loadProfileSnapshotData() else {
+			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, _ in
+				guard let profileSnapshotData = try await loadProfileSnapshotData(profileID) else {
 					return
 				}
-				if !keepIcloudIfPresent {
-					try await keychainClient.removeDataForKey(profileID.keychainKey)
-				}
+//				if !keepIcloudIfPresent {
+//					try await keychainClient.removeDataForKey(profileID.keychainKey)
+//				}
 				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
 					return
 				}
-				if keepIcloudIfPresent {
-					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled.rawValue {
-						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
-					} else {
-						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
-						try await keychainClient.removeDataForKey(profileID.keychainKey)
-					}
-				}
+//				if keepIcloudIfPresent {
+//					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled.rawValue {
+//						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
+//					} else {
+//						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
+//						try await keychainClient.removeDataForKey(profileID.keychainKey)
+//					}
+//				}
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try await deleteMnemonicByFactorSourceID(factorSourceID)

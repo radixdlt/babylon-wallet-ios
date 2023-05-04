@@ -37,7 +37,8 @@ extension AppPreferencesClient: DependencyKey {
 					return
 				}
 
-				try await secureStorageClient.updateIsCloudProfileSyncEnabled(change)
+				let profileId = await getProfileStore().profile.header.id
+				try await secureStorageClient.updateIsCloudProfileSyncEnabled(profileId, change)
 			}
 		)
 	}
