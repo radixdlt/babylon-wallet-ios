@@ -13,6 +13,10 @@ public struct SecureStorageClient: Sendable {
 	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
 
 	public var updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled
+
+	public var loadProfileHeaderList: LoadProfileHeaderList
+	public var saveProfileHeaderList: SaveProfileHeaderList
+	public var deleteProfileHeaderList: DeleteProfileHeaderList
 }
 
 extension SecureStorageClient {
@@ -25,6 +29,10 @@ extension SecureStorageClient {
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSource.ID) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepIcloudIfPresent: Bool) async throws -> Void
+
+	public typealias LoadProfileHeaderList = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>?
+	public typealias SaveProfileHeaderList = @Sendable (NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>) async throws -> Void
+	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Equatable, CustomStringConvertible {
 		case signTransaction

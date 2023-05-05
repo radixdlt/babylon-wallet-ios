@@ -2,12 +2,15 @@ import Prelude
 
 // MARK: - ProfileSnapshot.Header
 extension ProfileSnapshot {
+	public typealias HeaderList = NonEmpty<IdentifiedArrayOf<Header>>
+
 	public struct Header:
 		Sendable,
 		Hashable,
 		Codable, // Snapshot IS Codable, but `Profile` is not.
 		CustomStringConvertible,
-		CustomDumpReflectable
+		CustomDumpReflectable,
+		Identifiable
 	{
 		public typealias Version = Tagged<Self, UInt32>
 

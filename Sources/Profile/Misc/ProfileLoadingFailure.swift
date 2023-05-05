@@ -15,8 +15,6 @@ extension Profile {
 		// potential discrepancy in version check, or due to some internal
 		// error when creating a profile from a snapshot.
 		case failedToCreateProfileFromSnapshot(FailedToCreateProfileFromSnapshot)
-
-		case failedToRetrieveActiveProfileId
 	}
 }
 

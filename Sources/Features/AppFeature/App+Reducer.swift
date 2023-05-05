@@ -167,8 +167,6 @@ public struct App: Sendable, FeatureReducer {
 					let isAccountRecoveryNeeded = await useFactorSourceClient.isAccountRecoveryNeeded()
 					await send(.internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded)))
 				}
-			case .usersExistingProfileCouldNotBeLoaded(failure: .failedToRetrieveActiveProfileId):
-				return goToOnboarding(state: &state)
 			}
 
 		default:

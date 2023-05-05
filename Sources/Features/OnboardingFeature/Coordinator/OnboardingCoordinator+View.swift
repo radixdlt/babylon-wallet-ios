@@ -14,6 +14,11 @@ extension OnboardingCoordinator {
 		public var body: some SwiftUI.View {
 			SwitchStore(store) {
 				CaseLet(
+					state: /OnboardingCoordinator.State.startup,
+					action: { OnboardingCoordinator.Action.child(.startup($0)) },
+					then: { Startup.View(store: $0) }
+				)
+				CaseLet(
 					state: /OnboardingCoordinator.State.importProfile,
 					action: { OnboardingCoordinator.Action.child(.importProfile($0)) },
 					then: { ImportProfile.View(store: $0) }
@@ -22,6 +27,11 @@ extension OnboardingCoordinator {
 					state: /OnboardingCoordinator.State.createAccountCoordinator,
 					action: { OnboardingCoordinator.Action.child(.createAccountCoordinator($0)) },
 					then: { CreateAccountCoordinator.View(store: $0) }
+				)
+				CaseLet(
+					state: /OnboardingCoordinator.State.restoreFromBackup,
+					action: { OnboardingCoordinator.Action.child(.restoreFromBackup($0)) },
+					then: { RestoreFromBackup.View(store: $0) }
 				)
 			}
 		}

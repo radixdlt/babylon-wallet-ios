@@ -5,8 +5,13 @@ public struct Profile:
 	Sendable,
 	Hashable,
 	CustomStringConvertible,
-	CustomDumpReflectable
+	CustomDumpReflectable,
+	Identifiable
 {
+	public var id: ProfileSnapshot.Header.ID {
+		header.id
+	}
+
 	public var version: ProfileSnapshot.Header.Version {
 		header.snapshotVersion
 	}

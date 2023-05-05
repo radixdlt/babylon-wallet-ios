@@ -157,8 +157,11 @@ extension ProfileStore {
 			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
 			throw ExistingProfileSnapshotFoundAbortingImport()
 		}
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+
 		let profile = try Profile(snapshot: profileSnapshot)
 		do {
+			await userDefaultsClient.setActiveProfileId(profileSnapshot.header.id)
 			try await secureStorageClient.saveProfileSnapshot(profileSnapshot)
 		} catch {
 			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
@@ -175,6 +178,13 @@ extension ProfileStore {
 
 		do {
 			await userDefaultsClient.setActiveProfileId(ephemeral.profile.header.id)
+			if var profileHeaders = try await secureStorageClient.loadProfileHeaderList() {
+				profileHeaders.append(ephemeral.profile.header)
+				try await secureStorageClient.saveProfileHeaderList(profileHeaders)
+			} else {
+				try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [ephemeral.profile.header])!)
+			}
+
 			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
@@ -225,9 +235,8 @@ extension ProfileStore {
 	public func deleteProfile(keepIcloudIfPresent: Bool) async throws {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		do {
-			let profileId = try userDefaultsClient.activeProfileId()
 			await userDefaultsClient.removeActiveProfileId()
-			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profileId, keepIcloudIfPresent)
+			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, true)
 		} catch {
 			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
@@ -308,11 +317,8 @@ extension ProfileStore {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let loadResult: Swift.Result<Profile?, Profile.LoadingFailure> = await {
-			let profileId: ProfileSnapshot.Header.ID
-			do {
-				profileId = try userDefaultsClient.activeProfileId()
-			} catch {
-				return .failure(.failedToRetrieveActiveProfileId)
+			guard let profileId = userDefaultsClient.activeProfileId() else {
+				return .success(nil)
 			}
 
 			guard
@@ -496,16 +502,11 @@ extension UserDefaultsClient {
 		case invalidActiveProfileId
 	}
 
-	func activeProfileId() throws -> ProfileSnapshot.Header.ID {
-		guard let rawValue = stringForKey(Self.activeProfileId) else {
-			throw ActiveProfileIdErrors.noActiveProfileId
-		}
-
-		guard let id = ProfileSnapshot.Header.ID(uuidString: rawValue) else {
-			throw ActiveProfileIdErrors.invalidActiveProfileId
-		}
-
-		return id
+	func activeProfileId() -> ProfileSnapshot.Header.ID? {
+		stringForKey(Self.activeProfileId)
+			.flatMap {
+				.init(uuidString: $0)
+			}
 	}
 
 	func setActiveProfileId(_ id: ProfileSnapshot.Header.ID) async {

@@ -145,24 +145,24 @@ extension SecureStorageClient: DependencyKey {
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, _ in
+			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepIcloudIfPresent in
 				guard let profileSnapshotData = try await loadProfileSnapshotData(profileID) else {
 					return
 				}
-//				if !keepIcloudIfPresent {
-//					try await keychainClient.removeDataForKey(profileID.keychainKey)
-//				}
+				if !keepIcloudIfPresent {
+					try await keychainClient.removeDataForKey(profileID.keychainKey)
+				}
 				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
 					return
 				}
-//				if keepIcloudIfPresent {
-//					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled.rawValue {
-//						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
-//					} else {
-//						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
-//						try await keychainClient.removeDataForKey(profileID.keychainKey)
-//					}
-//				}
+				if keepIcloudIfPresent {
+					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled.rawValue {
+						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
+					} else {
+						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
+						try await keychainClient.removeDataForKey(profileID.keychainKey)
+					}
+				}
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
@@ -183,6 +183,31 @@ extension SecureStorageClient: DependencyKey {
 					loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
 					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: true)
 				}
+			},
+			loadProfileHeaderList: {
+				try await keychainClient
+					.getDataWithoutAuthForKey(profileHeaderListKeychainKey)
+					.map {
+						try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
+					}.flatMap {
+						.init($0)
+					}
+			},
+			saveProfileHeaderList: { list in
+				let data = try jsonEncoder().encode(list)
+				try await keychainClient.setDataWithoutAuthForKey(
+					KeychainClient.SetItemWithoutAuthRequest(
+						data: data,
+						key: profileHeaderListKeychainKey,
+						iCloudSyncEnabled: true,
+						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
+						label: "Radix Wallet Metadata",
+						comment: "Contains the metadata about Radix Wallet Data."
+					)
+				)
+			},
+			deleteProfileHeaderList: {
+				try await keychainClient.removeDataForKey(profileHeaderListKeychainKey)
 			}
 		)
 	}()
@@ -210,8 +235,10 @@ extension SecureStorageClient {
 	}
 }
 
+private let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
+
 extension ProfileSnapshot.Header.ID {
-	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshotKeychain"
+	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
 
 	var keychainKey: KeychainClient.Key {
 		"\(Self.profileSnapshotKeychainKeyPrefix) - \(uuidString)"
