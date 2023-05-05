@@ -7,6 +7,14 @@ extension SLIP10 {
 	public enum PublicKey: Sendable, Hashable {
 		case ecdsaSecp256k1(K1.PublicKey)
 		case eddsaEd25519(Curve25519.Signing.PublicKey)
+
+		public init(data: Data) throws {
+			do {
+				self = try .eddsaEd25519(.init(compressedRepresentation: data))
+			} catch {
+				self = try .ecdsaSecp256k1(.init(compressedRepresentation: data))
+			}
+		}
 	}
 }
 

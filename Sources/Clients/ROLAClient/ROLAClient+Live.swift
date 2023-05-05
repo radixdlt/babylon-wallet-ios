@@ -25,13 +25,23 @@ extension ROLAClient {
 
 			let entityAddress = entity.address.address
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
-			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
+			var ownerKeys = try metadata.ownerKeys() ?? []
 //			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
 //			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
 //			ownerKeyHashes.append(hashBytesOfPublicKey)
 
-			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeyHashes.map {
-				ManifestASTValue.bytes(Bytes(bytes: Array($0)))
+			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeys.map { pubKey in
+				ManifestASTValue.enum(
+					.init(
+						.publicKey,
+						fields: [
+							.enum(.init(
+								pubKey.curveKindScryptoDiscriminatorByte,
+								fields: [.bytes(pubKey.bytes)]
+							)),
+						]
+					)
+				)
 			}
 
 			// # Set List Metadata on Resource
@@ -40,9 +50,9 @@ extension ROLAClient {
 				entityAddress: .init(address: entityAddress),
 				key: GatewayAPI.EntityMetadataCollection.ownerKeysKey,
 				value: Enum(
-					.u8(1),
+					.metadataEntry,
 					fields: [.array(.init(
-						elementKind: .bytes,
+						elementKind: .enum,
 						elements: arrayOfEngineToolkitBytesValues
 					)
 					)]
@@ -220,12 +230,34 @@ extension ROLAClient {
 extension GatewayAPI.EntityMetadataCollection {
 	public static let ownerKeysKey = "owner_keys"
 
-	public func ownerKeyHashes() throws -> OrderedSet<Data>? {
-		guard let ownerKeyHashesAsStringCollection = self[Self.ownerKeysKey]?.asStringCollection else {
+	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
+		guard let ownerKeysAsStringCollection = self[Self.ownerKeysKey]?.asStringCollection else {
 			return nil
 		}
 		return try .init(
-			validating: ownerKeyHashesAsStringCollection.map { try Data(hex: $0) }
+			validating: ownerKeysAsStringCollection.map { try Data(hex: $0) }.map { try SLIP10.PublicKey(data: $0) }
 		)
 	}
+}
+
+extension SLIP10.PublicKey {
+	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
+	var curveKindScryptoDiscriminatorByte: EnumDiscriminator {
+		switch self {
+		case .ecdsaSecp256k1: return .u8(0x00)
+		case .eddsaEd25519: return .u8(0x01)
+		}
+	}
+
+	var bytes: EngineToolkitModels.Bytes {
+		.init(bytes: Array(self.compressedRepresentation))
+	}
+}
+
+extension EnumDiscriminator {
+	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
+	public static let metadataEntry: Self = .u8(0x01)
+
+	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
+	public static let publicKey: Self = .u8(0x09)
 }
