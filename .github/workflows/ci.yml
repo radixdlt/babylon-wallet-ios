@@ -46,6 +46,10 @@ jobs:
             ${{ secrets.BITE_SSH_KEY }}
             ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
 
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "14.3"
+
       - name: "Set up ruby"
         uses: ruby/setup-ruby@v1
         with:
