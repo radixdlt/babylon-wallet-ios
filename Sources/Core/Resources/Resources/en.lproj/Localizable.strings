@@ -48,7 +48,6 @@
 "createAccount_completion_subtitleFirst" = "You’ve created your first Account.";
 "createAccount_completion_subtitleNotFirst" = "Your Account has been created.";
 "createAccount_introduction_title" = "Create an Account";
-"createAccount_nameNewAccount_explanation" = "This can be changed any time";
 "createAccount_nameNewAccount_placeholder" = "e.g. My Main Account";
 "createAccount_nameNewAccount_subtitle" = "What would you like to call your Account?";
 "createAccount_titleFirst" = "Create First Account";
@@ -60,6 +59,7 @@
 "createEntity_completion_destinationPersonaList" = "Persona List";
 "createEntity_completion_goToDestination" = "Go to %@";
 "createEntity_completion_title" = "Congratulations";
+"createEntity_nameNewEntity_explanation" = "This can be changed any time";
 "createPersona_completion_explanation" = "Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.";
 "createPersona_completion_subtitleFirst" = "You’ve created your first Persona.";
 "createPersona_completion_subtitleNotFirst" = "Your Persona has been created.";
@@ -70,7 +70,6 @@
 "createPersona_introduction_subtitle1" = "A Persona is an identity that you own and control. You can have as many as you like.";
 "createPersona_introduction_subtitle2" = "You will chosose Peronas to login to dApps, and dApps may request access to personal information associated with that Persona.";
 "createPersona_introduction_title" = "Create a Persona";
-"createPersona_nameNewPersona_explanation" = "This can be changed any time";
 "createPersona_nameNewPersona_placeholder" = "e.g. My Main Persona";
 "createPersona_nameNewPersona_subtitle" = "What would you like to call your Persona?";
 "createPersona_requiredField" = "Required field";
