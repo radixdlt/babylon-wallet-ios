@@ -38,7 +38,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(!ledgers.isEmpty)))
 				} catch {
 					loggerGlobal.warning("Failed to load ledgers, error: \(error)")
-					// ok to display it...
+					// OK to display it...
 					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(true)))
 				}
 			}
