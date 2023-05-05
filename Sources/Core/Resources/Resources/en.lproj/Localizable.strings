@@ -205,6 +205,7 @@
 "dAppDetails_tokens" = "Associated Tokens";
 "dAppDetails_website" = "Website";
 "dappDetails_dappDefinition" = "dApp Definition";
+"dappDetails_missingDescription" = "Missing description";
 "dappRequest_accountPermission_numberOfAccountsAtLeast" = "%d or more accounts";
 "dappRequest_accountPermission_numberOfAccountsAtLeastZero" = "Any number of accounts";
 "dappRequest_accountPermission_numberOfAccountsExactly" = "%d accounts";
