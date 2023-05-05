@@ -49,7 +49,7 @@
 "createAccount_completion_subtitleNotFirst" = "Your Account has been created.";
 "createAccount_introduction_title" = "Create an Account";
 "createAccount_nameNewAccount_placeholder" = "e.g. My Main Account";
-"createAccount_nameNewAccount_subtitle" = "What would you like to call your Account?";
+"createAccount_nameNewAccount_subtitle" = "What would you like to call your account?";
 "createAccount_titleFirst" = "Create First Account";
 "createAccount_titleNotFirst" = "Create New Account";
 "createEntity_completion_destinationChooseAccounts" = "Choose Accounts";
@@ -59,6 +59,14 @@
 "createEntity_completion_destinationPersonaList" = "Persona List";
 "createEntity_completion_goToDestination" = "Go to %@";
 "createEntity_completion_title" = "Congratulations";
+"createEntity_ledger_addNewLedger" = "Add New Ledger";
+"createEntity_ledger_addedHeading" = "Added";
+"createEntity_ledger_createAccount" = "Create Ledger Account";
+"createEntity_ledger_createPersona" = "Create Ledger Persona";
+"createEntity_ledger_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
+"createEntity_ledger_subtitleSelectLedger" = "Select Ledger to use";
+"createEntity_ledger_useLedger" = "Use Ledger";
+"createEntity_ledger_usedHeading" = "Used";
 "createEntity_nameNewEntity_explanation" = "This can be changed any time";
 "createPersona_completion_explanation" = "Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.";
 "createPersona_completion_subtitleFirst" = "You’ve created your first Persona.";
@@ -71,7 +79,7 @@
 "createPersona_introduction_subtitle2" = "You will chosose Peronas to login to dApps, and dApps may request access to personal information associated with that Persona.";
 "createPersona_introduction_title" = "Create a Persona";
 "createPersona_nameNewPersona_placeholder" = "e.g. My Main Persona";
-"createPersona_nameNewPersona_subtitle" = "What would you like to call your Persona?";
+"createPersona_nameNewPersona_subtitle" = "What would you like to call your persona?";
 "createPersona_requiredField" = "Required field";
 "createPersona_saveAndContinueButtonTitle" = "Save and Continue";
 "editPersona_addAField" = "Add a Field";
