@@ -214,6 +214,7 @@
 "personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
 
 "personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
+"personaDetails.authorizedDappsDescription" = "Here are the dApps you have logged into with this persona.";
 
 "personaDetails.editAccountSharing" = "Edit Account Sharing";
 "personaDetails.deauthorizePersona" = "Remove Authorization";
@@ -265,11 +266,9 @@
 "onboarding.newAccountButtonTitle" = "New Account";
 
 "personas.createNewPersonaButtonTitle" = "Create a New Persona";
-"personas.subtitle" = "Here are all of your current Personas in your Wallet";
-"personas.title" = "Personas";
-"personaList.createNewPersonaButtonTitle" = "Create new persona";
-"personaList.subtitle" = "Here are all of your current Personas in your Wallet";
+
 "personaList.title" = "Personas";
+"personaList.subtitle" = "Here are all of your current Personas in your Wallet";
 
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";

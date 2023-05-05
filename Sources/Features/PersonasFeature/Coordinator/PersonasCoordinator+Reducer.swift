@@ -33,6 +33,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable & Equatable {
 		case isFirstPersonaOnAnyNetwork(Bool)
+		case loadedPersonaDetails(PersonaDetails.State)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -44,6 +45,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	public init() {}
 
@@ -72,6 +74,9 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
 			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 			return .none
+		case let .loadedPersonaDetails(personaDetails):
+			state.personaDetails = personaDetails
+			return .none
 		}
 	}
 
@@ -96,8 +101,12 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .personaList(.delegate(.openDetails(persona))):
-			state.personaDetails = PersonaDetails.State(.general(persona))
-			return .none
+			return .task {
+				let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(persona.id)
+					.map(PersonaDetails.State.DappInfo.init)
+				let personaDetails = PersonaDetails.State(.general(persona, dApps: .init(uniqueElements: dApps)))
+				return .internal(.loadedPersonaDetails(personaDetails))
+			}
 
 		case .personaList:
 			return .none
