@@ -78,11 +78,13 @@ extension UseFactorSourceClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		let allFactorSources = try await factorSourcesClient.getFactorSources()
 		switch entity.securityState {
 		case let .unsecured(control):
 			let factorInstance = control.genesisFactorInstance
-			guard let deviceFactorSource = allFactorSources[id: factorInstance.factorSourceID], deviceFactorSource.kind == .device else {
+
+			guard
+				let deviceFactorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
+			else {
 				throw FailedToDeviceFactorSourceForSigning()
 			}
 
@@ -92,6 +94,7 @@ extension UseFactorSourceClient {
 				unhashedDataToSign: unhashedDataToSign,
 				purpose: purpose
 			)
+
 			guard let signature = signatures.first, signatures.count == 1 else {
 				throw IncorrectSignatureCountExpectedExactlyOne()
 			}

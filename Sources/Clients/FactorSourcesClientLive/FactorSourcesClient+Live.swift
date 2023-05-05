@@ -50,8 +50,8 @@ extension FactorSourcesClient: DependencyKey {
 					return nil
 				}
 				do {
-					let factorSourceIDs = try await getFactorSources()
-						.filter { $0.kind == .device && $0.supportsOlympia }
+					let factorSourceIDs = try await getFactorSources(ofKind: .device)
+						.filter(\.supportsOlympia)
 						.map(\.id)
 
 					for factorSourceID in factorSourceIDs {

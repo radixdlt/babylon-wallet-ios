@@ -220,8 +220,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			}
 
 			return .run { send in
-				let allFactorSources = try await factorSourcesClient.getFactorSources()
-				if let existing = allFactorSources.first(where: { $0.id == olympiaDevice.id }) {
+				if let existing = try await factorSourcesClient.getFactorSource(id: olympiaDevice.id) {
 					await send(.internal(.alreadyExists(existing)))
 				} else {
 					// new!
