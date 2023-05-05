@@ -3,7 +3,7 @@ import FeaturePrelude
 extension GeneralSettings.State {
 	var viewState: GeneralSettings.ViewState {
 		.init(
-			hasAnyLedgerHardwareWalletFactorSources: hasAnyLedgerHardwareWalletFactorSources,
+			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
 			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
 			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false
 		)
@@ -13,9 +13,9 @@ extension GeneralSettings.State {
 // MARK: - GeneralSettings.View
 extension GeneralSettings {
 	public struct ViewState: Equatable {
-		let hasAnyLedgerHardwareWalletFactorSources: Bool
+		let hasLedgerHardwareWalletFactorSources: Bool
 
-		/// only to be displayed if `hasAnyLedgerHardwareWalletFactorSources` is true
+		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
 		let useVerboseLedgerDisplayMode: Bool
 
 		let isDeveloperModeEnabled: Bool
@@ -43,7 +43,7 @@ extension GeneralSettings {
 			VStack(spacing: .zero) {
 				VStack(spacing: .zero) {
 					isDeveloperModeEnabled(with: viewStore)
-					if viewStore.hasAnyLedgerHardwareWalletFactorSources {
+					if viewStore.hasLedgerHardwareWalletFactorSources {
 						isUsingVerboseLedgerMode(with: viewStore)
 					}
 					Separator()

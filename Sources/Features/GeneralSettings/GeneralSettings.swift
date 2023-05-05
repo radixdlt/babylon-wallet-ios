@@ -6,7 +6,7 @@ import FeaturePrelude
 public struct GeneralSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var preferences: AppPreferences?
-		var hasAnyLedgerHardwareWalletFactorSources: Bool = false
+		var hasLedgerHardwareWalletFactorSources: Bool = false
 		public init() {}
 	}
 
@@ -18,7 +18,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadPreferences(AppPreferences)
-		case hasAnyLedgerHardwareWalletFactorSourcesLoaded(Bool)
+		case hasLedgerHardwareWalletFactorSourcesLoaded(Bool)
 	}
 
 	public init() {}
@@ -35,11 +35,11 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 
 				do {
 					let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
-					await send(.internal(.hasAnyLedgerHardwareWalletFactorSourcesLoaded(!ledgers.isEmpty)))
+					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(!ledgers.isEmpty)))
 				} catch {
 					loggerGlobal.warning("Failed to load ledgers, error: \(error)")
 					// ok to display it...
-					await send(.internal(.hasAnyLedgerHardwareWalletFactorSourcesLoaded(true)))
+					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(true)))
 				}
 			}
 
@@ -64,8 +64,8 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		case let .loadPreferences(preferences):
 			state.preferences = preferences
 			return .none
-		case let .hasAnyLedgerHardwareWalletFactorSourcesLoaded(hasAnyLedgerHardwareWalletFactorSources):
-			state.hasAnyLedgerHardwareWalletFactorSources = hasAnyLedgerHardwareWalletFactorSources
+		case let .hasLedgerHardwareWalletFactorSourcesLoaded(hasLedgerHardwareWalletFactorSources):
+			state.hasLedgerHardwareWalletFactorSources = hasLedgerHardwareWalletFactorSources
 			return .none
 		}
 	}

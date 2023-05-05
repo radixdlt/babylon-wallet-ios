@@ -135,7 +135,7 @@ extension Profile {
 	) throws {
 		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
 		let networkID = dapp.networkID
-		var network = try network(id: networkID)
+		let network = try network(id: networkID)
 		if network.authorizedDapps.contains(dapp: dapp) {
 			try updateAuthorizedDapp(dapp)
 		} else {
