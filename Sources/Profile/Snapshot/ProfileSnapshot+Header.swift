@@ -12,6 +12,21 @@ extension ProfileSnapshot {
 		CustomDumpReflectable,
 		Identifiable
 	{
+                public struct UsedDeviceInfo: Sendable,
+                                              Hashable, Codable {
+                        /// `"My private phone (iPhone SE (2nd generation))"`
+                        let description: String
+
+                        /// To detect if the same Profile is used on two different phones
+                        let potentiallyUnstableDeviceIdentifier: String
+
+                        /// Date when the Profile was tied to this device
+                        /// For a new Profile the `header.creatingDevice.date` and `header.lastUsedOnDevice.date`
+                        /// will be the same, but for a restored profile it will be the date of when the restore
+                        /// took place on a new phone.
+                        let date: Date
+                }
+
 		public typealias Version = Tagged<Self, UInt32>
 
 		/// A description of the device the Profile was first generated on,
@@ -20,7 +35,9 @@ extension ProfileSnapshot {
 		/// `"My private phone (iPhone SE (2nd generation))"`
 		/// This string can be presented to the user during a recovery flow,
 		/// when the profile is restored from backup.
-		public let creatingDevice: NonEmptyString
+		public let creatingDevice: UsedDeviceInfo
+
+                public var lastUsedOnDevice: UsedDeviceInfo
 
 		/// A locally generated stable identfier of this Profile. Useful for checking if
 		/// to Profiles which are inequal based on `Equatable` (content) might be the
@@ -37,7 +54,8 @@ extension ProfileSnapshot {
 		public let snapshotVersion: Version
 
 		public init(
-			creatingDevice: NonEmptyString,
+			creatingDevice: UsedDeviceInfo,
+                        lastUsedOnDevice: UsedDeviceInfo,
 			id: ProfileSnapshot.Header.ID,
 			creationDate: Date,
 			lastModified: Date,
