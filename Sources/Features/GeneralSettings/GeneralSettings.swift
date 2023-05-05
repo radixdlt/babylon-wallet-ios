@@ -5,8 +5,8 @@ import FeaturePrelude
 // MARK: - GeneralSettings
 public struct GeneralSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var preferences: AppPreferences?
-		var hasLedgerHardwareWalletFactorSources: Bool = false
+		public var preferences: AppPreferences?
+		public var hasLedgerHardwareWalletFactorSources: Bool = false
 		public init() {}
 	}
 
