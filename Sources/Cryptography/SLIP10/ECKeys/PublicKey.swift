@@ -1,4 +1,5 @@
 import CryptoKit
+import CustomDump
 import Foundation
 import K1
 
@@ -44,7 +45,8 @@ extension SLIP10.PublicKey {
 	}
 }
 
-extension SLIP10.PublicKey {
+// MARK: - SLIP10.PublicKey + CustomDebugStringConvertible, CustomDumpStringConvertible, CustomStringConvertible
+extension SLIP10.PublicKey: CustomDebugStringConvertible, CustomDumpStringConvertible, CustomStringConvertible {
 	/// For ECDSA secp256k1 public keys this will use the compressed representation
 	/// For EdDSA Curve25519 there is no difference between compressed and uncompressed.
 	public var compressedRepresentation: Data {
@@ -65,5 +67,22 @@ extension SLIP10.PublicKey {
 		case let .ecdsaSecp256k1(publicKey):
 			return try! Data(publicKey.rawRepresentation(format: .uncompressed))
 		}
+	}
+
+	public var debugDescription: String {
+		switch self {
+		case let .eddsaEd25519(key):
+			return "Curve25519(\(key.compressedRepresentation.hex))"
+		case let .ecdsaSecp256k1(key):
+			return "K1(\(key.compressedRepresentation.hex))"
+		}
+	}
+
+	public var description: String {
+		debugDescription
+	}
+
+	public var customDumpDescription: String {
+		debugDescription
 	}
 }

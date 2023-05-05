@@ -27,13 +27,6 @@ extension CompileNotarizedTransactionIntentResponse: CustomDumpStringConvertible
 	}
 }
 
-// MARK: - Curve25519.Signing.PublicKey + CustomDumpStringConvertible
-extension Curve25519.Signing.PublicKey: CustomDumpStringConvertible {
-	public var customDumpDescription: String {
-		rawRepresentation.hex
-	}
-}
-
 // MARK: - Signing
 public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {

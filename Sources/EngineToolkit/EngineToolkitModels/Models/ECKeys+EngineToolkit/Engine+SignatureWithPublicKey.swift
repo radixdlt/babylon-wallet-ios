@@ -1,8 +1,9 @@
+import CustomDump
 import Foundation
 
 // MARK: - Engine.SignatureWithPublicKey
 extension Engine {
-	public enum SignatureWithPublicKey: Sendable, Codable, Hashable {
+	public enum SignatureWithPublicKey: Sendable, Codable, Hashable, CustomDebugStringConvertible, CustomStringConvertible, CustomDumpStringConvertible {
 		// ==============
 		// Enum Variants
 		// ==============
@@ -35,6 +36,23 @@ extension Engine.SignatureWithPublicKey {
 		case .ecdsaSecp256k1:
 			return nil
 		}
+	}
+
+	public var description: String {
+		switch self {
+		case let .ecdsaSecp256k1(signature):
+			return "K1(signature: \(signature.bytes.hex))"
+		case let .eddsaEd25519(signature, publicKey):
+			return "Curve25519(signature: \(signature.bytes.hex), pubKey: \(publicKey.bytes.hex))"
+		}
+	}
+
+	public var debugDescription: String {
+		description
+	}
+
+	public var customDumpDescription: String {
+		description
 	}
 }
 

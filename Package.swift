@@ -37,6 +37,7 @@ package.addModules([
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
+			"ROLAClient",
 		],
 		tests: .yes()
 	),

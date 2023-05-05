@@ -18,7 +18,7 @@ extension ROLAClient {
 		/// https://radixdlt.atlassian.net/wiki/spaces/DevEcosystem/pages/3055026344/Metadata+Standards+for+Provable+Ownership+Encrypted+Messaging
 		/// if it is already present, no change is done
 		@Sendable func addOwnerKey<Entity: EntityProtocol>(
-			hashing newPublicKeyToHas: SLIP10.PublicKey,
+			newPublicKey: SLIP10.PublicKey,
 			for entity: Entity
 		) async throws {
 			@Dependency(\.faucetClient) var faucetClient
@@ -29,6 +29,7 @@ extension ROLAClient {
 //			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
 //			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
 //			ownerKeyHashes.append(hashBytesOfPublicKey)
+			ownerKeys.append(newPublicKey)
 
 			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeys.map { pubKey in
 				ManifestASTValue.enum(
@@ -140,10 +141,12 @@ extension ROLAClient {
 				}
 			},
 			createAuthSigningKeyForAccountIfNeeded: { request in
-				var account = request.account
+
 				@Dependency(\.accountsClient) var accountsClient
 				@Dependency(\.factorSourcesClient) var factorSourcesClient
 				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+
+				var account = try await accountsClient.getAccountByAddress(request.accountAddress)
 
 				let factorSourceID: FactorSourceID
 				let signingKeyDerivationPath: AccountBabylonDerivationPath
@@ -152,9 +155,11 @@ extension ROLAClient {
 				case let .unsecured(unsecuredEntityControl_):
 					unsecuredEntityControl = unsecuredEntityControl_
 					guard unsecuredEntityControl.authenticationSigning == nil else {
+						loggerGlobal.notice("Entity: \(request.accountAddress) already has an authenticationSigning")
 						return
 					}
 
+					loggerGlobal.notice("Entity: \(request.accountAddress) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
 					factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
 					guard let hdPath = unsecuredEntityControl.transactionSigning.derivationPath else {
 						fatalError()
@@ -188,8 +193,8 @@ extension ROLAClient {
 						derivationPath: derivationPath
 					)
 				}()
-
-				try await addOwnerKey(hashing: authenticationSigning.publicKey, for: account)
+				loggerGlobal.notice("Entity: \(request.accountAddress) created and is about to upload authenticationSigning key: \(authenticationSigning.publicKey)")
+				try await addOwnerKey(newPublicKey: authenticationSigning.publicKey, for: account)
 				unsecuredEntityControl.authenticationSigning = authenticationSigning
 				account.securityState = .unsecured(unsecuredEntityControl)
 

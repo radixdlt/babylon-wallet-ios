@@ -119,8 +119,6 @@ extension DeviceFactorSourceClient {
 
 		var signatures = Set<SignatureOf<Entity>>()
 
-		loggerGlobal.debug("🔏 Signing data with device factor source label=\(deviceFactorSource.label), description=\(deviceFactorSource.description)")
-
 		for entity in entities {
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
@@ -141,7 +139,7 @@ extension DeviceFactorSourceClient {
 				}
 				let curve = factorInstance.publicKey.curve
 
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve)")
+				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source label=\(deviceFactorSource.label), description=\(deviceFactorSource.description)")
 
 				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
 					hdRoot: hdRoot,

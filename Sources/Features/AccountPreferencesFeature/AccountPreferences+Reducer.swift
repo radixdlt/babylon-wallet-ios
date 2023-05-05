@@ -1,6 +1,7 @@
 import AccountPortfoliosClient
 import FaucetClient
 import FeaturePrelude
+import ROLAClient
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
@@ -58,6 +59,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case dismiss
 	}
 
+	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -81,9 +83,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
 			return call(buttonState: \.createAndUploadAuthKeyButtonState, into: &state) {
-				print("mocking creating auth key for: \($0.address)")
-				try? await Task.sleep(for: .seconds(2))
-				print("mocked creating auth key DONE")
+				try await rolaClient.createAuthSigningKeyForAccountIfNeeded(.init(accountAddress: $0))
 			}
 
 		case .createFungibleTokenButtonTapped:

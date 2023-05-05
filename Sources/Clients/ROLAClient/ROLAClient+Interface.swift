@@ -26,10 +26,16 @@ extension DependencyValues {
 
 // MARK: - CreateAuthSigningKeyForAccountIfNeededRequest
 public struct CreateAuthSigningKeyForAccountIfNeededRequest: Sendable, Hashable {
-	public let account: Profile.Network.Account
+	public let accountAddress: AccountAddress
+	public init(accountAddress: AccountAddress) {
+		self.accountAddress = accountAddress
+	}
 }
 
 // MARK: - CreateAuthSigningKeyForPersonaIfNeededRequest
 public struct CreateAuthSigningKeyForPersonaIfNeededRequest: Sendable, Hashable {
-	public let persona: Profile.Network.Persona
+	public let identityAddress: IdentityAddress
+	public init(identityAddress: IdentityAddress) {
+		self.identityAddress = identityAddress
+	}
 }
