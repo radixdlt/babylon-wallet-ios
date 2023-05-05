@@ -21,8 +21,17 @@ extension OnboardingClient: DependencyKey {
 				do {
 					let backupProfiles = try await secureStorageClient
 						.loadProfileHeaderList()?
-						.asyncCompactMap { header in
-							try? await secureStorageClient.loadProfile(header.id)
+						.asyncCompactMap { header -> Profile? in
+							guard let profile = try? await secureStorageClient.loadProfile(header.id) else {
+								return nil
+							}
+							do {
+								try profile.header.validateCompatibility()
+								return profile
+							} catch {
+								// delete obsolete profile
+								return nil
+							}
 						}
 
 					return backupProfiles.flatMap {
