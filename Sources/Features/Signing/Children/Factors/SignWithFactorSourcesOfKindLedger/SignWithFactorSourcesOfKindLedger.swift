@@ -1,3 +1,4 @@
+import AppPreferencesClient
 import EngineToolkit
 import FactorSourcesClient
 import FeaturePrelude
@@ -21,6 +22,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -48,11 +50,22 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		} catch {
 			loggerGlobal.critical("Failed to hash: \(error)")
 		}
+		let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 		return try await ledgerHardwareWalletClient.sign(.init(
 			signingFactor: signingFactor,
 			unhashedDataToSign: state.dataToSign,
-			ledgerTXDisplayMode: .verbose,
+			ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
 			displayHashOnLedgerDisplay: true
 		))
+	}
+}
+
+extension FactorSource.LedgerHardwareWallet.SigningDisplayMode {
+	// seperation so that we do not accidentally break profile or RadixConnect
+	var mode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode {
+		switch self {
+		case .verbose: return .verbose
+		case .summary: return .summary
+		}
 	}
 }

@@ -39,7 +39,7 @@ public struct CallMethod: InstructionProtocol {
 
 	#if swift(<5.8)
 	public init(
-	receiver: ComponentAddress,
+		receiver: ComponentAddress,
 		methodName: String,
 		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
 	) rethrows {
@@ -51,7 +51,7 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	public init(
-	receiver: ComponentAddress,
+		receiver: ComponentAddress,
 		methodName: String,
 		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
 	) rethrows {

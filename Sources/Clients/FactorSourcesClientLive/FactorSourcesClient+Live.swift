@@ -44,14 +44,16 @@ extension FactorSourcesClient: DependencyKey {
 
 				return factorSourceID
 			},
-			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts in
+			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts -> FactorSourceID? in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
 				}
 				do {
+					// cannot use `getFactorSources:ofKind`
 					let factorSourceIDs = try await getFactorSources()
-						.filter { $0.kind == .device && $0.supportsOlympia }
+						.filter(\.supportsOlympia)
+						.filter { $0.kind == .device }
 						.map(\.id)
 
 					for factorSourceID in factorSourceIDs {
