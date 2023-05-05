@@ -233,11 +233,11 @@
 "dappRequest_completion_subtitle" = "Request from %@ complete";
 "dappRequest_completion_title" = "Success";
 "dappRequest_login_choosePersona" = "Choose a Persona";
-"dappRequest_login_knownDappSubtitle" = " is requesting you login with a Persona.";
-"dappRequest_login_knownDappTitle" = "Login Request";
 "dappRequest_login_lastLoginWasOn" = "Your last login was on %@";
-"dappRequest_login_newDappSubtitle" = " is requesting you login for the first time with a Persona.";
-"dappRequest_login_newDappTitle" = "New Login Request";
+"dappRequest_login_subtitleKnownDapp" = " is requesting you login with a Persona.";
+"dappRequest_login_subtitleNewDapp" = " is requesting you login for the first time with a Persona.";
+"dappRequest_login_titleKnownDapp" = "Login Request";
+"dappRequest_login_titleNewDapp" = "New Login Request";
 "dappRequest_metadataLoadingAlert_message" = "Danger! Bad dApp config or you\'re being spoofed!";
 "dappRequest_metadataLoadingPrompt" = "Loading...";
 "dappRequest_metadata_unknownName" = "Unknown dApp";
