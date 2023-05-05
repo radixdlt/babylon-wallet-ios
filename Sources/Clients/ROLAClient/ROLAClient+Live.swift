@@ -13,12 +13,12 @@ extension ROLAClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.cacheClient) var cacheClient
 
-		/// Tries to append the hash of a new Publickey to owner_keys
+		/// Tries to append a new Publickey to owner_keys
 		// see Russ confluence page:
 		/// https://radixdlt.atlassian.net/wiki/spaces/DevEcosystem/pages/3055026344/Metadata+Standards+for+Provable+Ownership+Encrypted+Messaging
 		/// if it is already present, no change is done
 		@Sendable func addOwnerKey<Entity: EntityProtocol>(
-			hashing newPublicKeyToHash: SLIP10.PublicKey,
+			hashing newPublicKeyToHas: SLIP10.PublicKey,
 			for entity: Entity
 		) async throws {
 			@Dependency(\.faucetClient) var faucetClient
@@ -26,9 +26,9 @@ extension ROLAClient {
 			let entityAddress = entity.address.address
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
 			var ownerKeyHashes = try metadata.ownerKeyHashes() ?? []
-			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
-			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
-			ownerKeyHashes.append(hashBytesOfPublicKey)
+//			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
+//			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
+//			ownerKeyHashes.append(hashBytesOfPublicKey)
 
 			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeyHashes.map {
 				ManifestASTValue.bytes(Bytes(bytes: Array($0)))

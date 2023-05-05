@@ -29,7 +29,9 @@ extension ProfileSnapshot.Version {
 	/// - 28: CAP26 update (new KeyType values)
 	/// - 29: Change FactorSource, split `hint` into (`label`, `description`) tuple.
 	/// - 30: Fix critical bug where identity derivation path was used for account
-	public static let minimum: Self = 30
+	/// - 31: placeholder
+	/// - 32: rename `genesisFactorInstance` -> `transactionSigning` and add `authSigning`
+	public static let minimum: Self = 32
 }
 
 // MARK: - Profile

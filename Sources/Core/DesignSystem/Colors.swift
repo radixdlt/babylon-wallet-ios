@@ -204,14 +204,79 @@ extension Color {
 			opacity: opacity
 		)
 	}
-}
 
-extension Color.App {
-	public static var random: Color {
-		Color(
-			red: .random(in: 0 ... 1),
-			green: .random(in: 0 ... 1),
-			blue: .random(in: 0 ... 1)
+	public init(
+		red: UInt8,
+		green: UInt8,
+		blue: UInt8,
+		opacity: Double = 1
+	) {
+		func value(_ byte: UInt8) -> Double {
+			Double(byte) / Double(UInt8.max)
+		}
+		self.init(
+			red: value(red),
+			green: value(green),
+			blue: value(blue),
+			opacity: opacity
+		)
+	}
+
+	public static func randomDark(seed: Data?) -> Self {
+		random(range: 10 ... 128, seed: seed)
+	}
+
+	public static func randomLight(seed: Data?) -> Self {
+		random(range: 128 ... 240, seed: seed)
+	}
+
+	private static func random(
+		range: ClosedRange<UInt8> = 0 ... UInt8.max,
+		seed: Data? = nil
+	) -> Self {
+		if let seed {
+			return randomSeeded(by: seed, range: range)
+		} else {
+			return random(range: range)
+		}
+	}
+
+	private static func random(
+		range: ClosedRange<UInt8> = 0 ... UInt8.max
+	) -> Self {
+		Self(
+			red: .random(in: range),
+			green: .random(in: range),
+			blue: .random(in: range),
+			opacity: 1
+		)
+	}
+
+	private static func randomSeeded(
+		by seed: Data,
+		range: ClosedRange<UInt8> = 0 ... UInt8.max
+	) -> Self {
+		var insecureRNG = InsecureRandomNumberGeneratorWithSeed(data: seed)
+		func random() -> UInt8 {
+			let val = UInt8.random(in: range, using: &insecureRNG)
+			print("val: \(val)")
+			return val
+		}
+		return Self(
+			red: random(),
+			green: random(),
+			blue: random(),
+			opacity: 1
 		)
 	}
 }
+
+// extension Color.App {
+//	public static var random: Color {
+//		Color(
+//			red: .random(in: 0 ... 1),
+//			green: .random(in: 0 ... 1),
+//			blue: .random(in: 0 ... 1)
+//		)
+//	}
+// }
