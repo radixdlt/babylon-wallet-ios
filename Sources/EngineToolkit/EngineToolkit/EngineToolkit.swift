@@ -414,7 +414,7 @@ func prettyPrintResponse(jsonString: String) {
 }
 
 func prettyPrint<FailedDecodable: Decodable>(
-responseJSONString: String,
+	responseJSONString: String,
 	error: Swift.Error,
 	failedToDecodeInto: FailedDecodable.Type
 ) {

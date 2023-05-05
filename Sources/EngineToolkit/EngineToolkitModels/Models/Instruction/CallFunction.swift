@@ -44,7 +44,7 @@ public struct CallFunction: InstructionProtocol {
 
 	#if swift(<5.8)
 	public init(
-	packageAddress: PackageAddress,
+		packageAddress: PackageAddress,
 		blueprintName: String,
 		functionName: String,
 		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
@@ -58,7 +58,7 @@ public struct CallFunction: InstructionProtocol {
 	}
 
 	public init(
-	packageAddress: PackageAddress,
+		packageAddress: PackageAddress,
 		blueprintName: String,
 		functionName: String,
 		@SpecificValuesBuilder buildValue: () throws -> ManifestASTValue
