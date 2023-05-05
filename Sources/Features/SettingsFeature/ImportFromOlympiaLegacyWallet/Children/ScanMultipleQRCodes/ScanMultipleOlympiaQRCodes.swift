@@ -17,7 +17,7 @@ public struct ScanMultipleOlympiaQRCodes: Sendable, FeatureReducer {
 			case scanQR(ScanQRCoordinator.State)
 
 			public init() {
-				self = .scanQR(.init(scanInstructions: L10n.ImportLegacyWallet.ScanQRCodes.scanInstructions))
+				self = .scanQR(.init(scanInstructions: L10n.ImportLegacyWallet.scanQRCodeInstructions))
 			}
 		}
 
