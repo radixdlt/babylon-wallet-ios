@@ -80,7 +80,14 @@ extension DeviceFactorSourceClient {
 
 		switch entity.securityState {
 		case let .unsecured(control):
-			let factorInstance = control.genesisFactorInstance
+			let factorInstance = {
+				switch purpose {
+				case let .signData(isTransaction):
+					return isTransaction ? (control.authenticationSigning ?? control.transactionSigning) : control.transactionSigning
+				case .createEntity:
+					return control.transactionSigning
+				}
+			}()
 
 			guard
 				let deviceFactorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
