@@ -27,17 +27,17 @@ extension ROLAClient {
 			let entityAddress = entity.address.address
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
 			var ownerKeys = try metadata.ownerKeys() ?? []
-			loggerGlobal.notice("ownerKeys: \(ownerKeys)")
+			loggerGlobal.debug("ownerKeys: \(ownerKeys)")
 //			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
 //			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
 //			ownerKeyHashes.append(hashBytesOfPublicKey)
 			ownerKeys.append(newPublicKey)
 			if !ownerKeys.contains(transactionSigningKey) {
-				loggerGlobal.notice("Did not contain transactionSigningKey, re-adding it: \(transactionSigningKey)")
+				loggerGlobal.debug("Did not contain transactionSigningKey, re-adding it: \(transactionSigningKey)")
 				ownerKeys.append(transactionSigningKey)
 			}
 
-			loggerGlobal.notice("new ownerKeys: \(ownerKeys)")
+			loggerGlobal.notice("Setting ownerKeys to: \(ownerKeys)")
 
 			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeys.map { pubKey in
 				ManifestASTValue.enum(
@@ -74,15 +74,8 @@ extension ROLAClient {
 				]
 			)
 
-			loggerGlobal.notice("Signing and submitting TX updating ownerKeys...")
 			try await faucetClient.signSubmitSimpleTX(manifest)
-			loggerGlobal.notice("Submimtted TX updating ownerKeys! ✅")
-			loggerGlobal.debug("Fetching owner keys yet again, confirming they have changed...")
-			let hopefullyUpdatedKeys = try await gatewayAPIClient.getEntityMetadata(entityAddress).ownerKeys() ?? []
-			let containsNew = hopefullyUpdatedKeys.contains(newPublicKey)
-			let stillContainsTXSigningKey = hopefullyUpdatedKeys.contains(transactionSigningKey)
-			let successStatus = containsNew && stillContainsTXSigningKey ? "✅✅" : containsNew ? "✅❌" : "❌"
-			loggerGlobal.notice("\(successStatus) containsNew: \(containsNew), stillContainsTXSigningKey: \(stillContainsTXSigningKey)")
+			loggerGlobal.debug("Submimtted TX updating ownerKeys!")
 		}
 
 		return Self(
