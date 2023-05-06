@@ -6,6 +6,7 @@ extension TransactionClient: TestDependencyKey {
 		convertManifestInstructionsToJSONIfItWasString: unimplemented("\(Self.self).convertManifestInstructionsToJSONIfItWasString"),
 		lockFeeBySearchingForSuitablePayer: unimplemented("\(Self.self).lockFeeBySearchingForSuitablePayer"),
 		lockFeeWithSelectedPayer: unimplemented("\(Self.self).lockFeeWithSelectedPayer"),
+		addInstructionToManifest: unimplemented("\(Self.self).addInstructionToManifest"),
 		addGuaranteesToManifest: unimplemented("\(Self.self).addGuaranteesToManifest"),
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview"),
 		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent"),

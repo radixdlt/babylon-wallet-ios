@@ -85,7 +85,11 @@ extension FaucetClient: DependencyKey {
 			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
 
-		let signSubmitSimpleTX: SignSubmitSimpleTX = { manifest in
+		let signSubmitSimpleTX: SignSubmitSimpleTX = { manifestWithoutLockFee in
+			@Dependency(\.transactionClient) var transactionClient
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+			let lockFeeInstr = engineToolkitClient.lockFeeCallMethod(faucetForNetwork: networkID, fee: "10")
+			let manifest = try await engineToolkitClient.addInstructionToManifest(.init(instruction: lockFeeInstr, to: manifestWithoutLockFee, at: .lockFee))
 
 			try await signSubmitTX(manifest: manifest) { data, signers in
 				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -186,7 +190,7 @@ extension FaucetClient: DependencyKey {
 		}
 
 		return Self(
-			getFreeXRD: getFreeXRD,
+		getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet,
 			createFungibleToken: createFungibleToken,
 			createNonFungibleToken: createNonFungibleToken,
@@ -194,7 +198,7 @@ extension FaucetClient: DependencyKey {
 		)
 		#else
 		return Self(
-			getFreeXRD: getFreeXRD,
+		getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet,
 			signSubmitSimpleTX: signSubmitSimpleTX
 		)

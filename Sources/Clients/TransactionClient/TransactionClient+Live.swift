@@ -321,6 +321,20 @@ extension TransactionClient {
 			)
 		}
 
+		let addInstructionToManifest: AddInstructionToManifest = { request in
+			let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(request.manifest)
+			var instructions = manifestWithJSONInstructions.instructions
+			let new = request.instruction
+			switch request.location {
+			case .first:
+				instructions.insert(new, at: 0)
+			}
+			return TransactionManifest(
+				instructions: instructions,
+				blobs: request.manifest.blobs
+			)
+		}
+
 		@Sendable
 		func addGuaranteesToManifest(
 			_ manifestWithLockFee: TransactionManifest,
@@ -354,6 +368,7 @@ extension TransactionClient {
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
 			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
+			addInstructionToManifest: addInstructionToManifest,
 			addGuaranteesToManifest: addGuaranteesToManifest,
 			getTransactionReview: getTransactionPreview,
 			buildTransactionIntent: buildTransactionIntent,
