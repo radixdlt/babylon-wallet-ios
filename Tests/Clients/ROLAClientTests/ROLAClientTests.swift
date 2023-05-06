@@ -57,41 +57,41 @@ final class ROLAClientTests: TestCase {
 	func test_rola_payload_hash_vectors() throws {
 		try testFixture(bundle: .module, jsonName: "rola_challenge_payload_hash_vectors") { (vectors: [TestVector]) in
 			for vector in vectors {
-				let payloadToHash = try P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+				let payload = try payloadToHash(
 					challenge: .init(rawValue: .init(hex: vector.challenge)),
-					dAppDefinitionAddress: vector.dAppDefinitionAddress,
-					origin: vector.origin
+					dAppDefinitionAddress: .init(address: vector.dAppDefinitionAddress),
+					origin: .init(rawValue: vector.origin)
 				)
-				XCTAssertEqual(payloadToHash.hex, vector.payloadToHash)
-				let blakeHashOfPayload = try blake2b(data: payloadToHash)
+				XCTAssertEqual(payload.hex, vector.payloadToHash)
+				let blakeHashOfPayload = try blake2b(data: payload)
 				XCTAssertEqual(blakeHashOfPayload.hex, vector.blakeHashOfPayload)
 			}
 		}
 	}
 
 	func omit_test_generate_rola_payload_hash_vectors() throws {
-		let origins = ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"]
-		let accounts = [
-			"account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3",
-			"account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa",
-			"account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p",
+		let origins: [P2P.Dapp.Request.Metadata.Origin] = ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"]
+		let accounts: [DappDefinitionAddress] = try [
+			.init(address: "account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"),
+			.init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
+			.init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
 		]
 		let vectors: [TestVector] = try origins.flatMap { origin -> [TestVector] in
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
 					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
-					let challenge = try blake2b(data: Data((origin + dAppDefinitionAddress).utf8) + [seed])
-					let payloadToHash = try P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+					let challenge = try blake2b(data: Data((origin.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
+					let payload = try payloadToHash(
 						challenge: .init(rawValue: .init(data: challenge)),
 						dAppDefinitionAddress: dAppDefinitionAddress,
 						origin: origin
 					)
-					let blakeHashOfPayload = try blake2b(data: payloadToHash)
+					let blakeHashOfPayload = try blake2b(data: payload)
 					return TestVector(
-						origin: origin,
+						origin: origin.rawValue,
 						challenge: challenge.hex,
-						dAppDefinitionAddress: dAppDefinitionAddress,
-						payloadToHash: payloadToHash.hex,
+						dAppDefinitionAddress: dAppDefinitionAddress.address,
+						payloadToHash: payload.hex,
 						blakeHashOfPayload: blakeHashOfPayload.hex
 					)
 				}

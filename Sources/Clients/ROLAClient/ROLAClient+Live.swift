@@ -223,14 +223,14 @@ extension ROLAClient {
 			signAuthChallenge: { request in
 				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
-				let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+				let payload = payloadToHash(
 					challenge: request.challenge,
-					dAppDefinitionAddress: request.dAppDefinitionAddress.address,
-					origin: request.origin.rawValue
+					dAppDefinitionAddress: request.dAppDefinitionAddress,
+					origin: request.origin
 				)
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					of: request.persona,
-					unhashedDataToSign: payloadToHash,
+					unhashedDataToSign: payload,
 					purpose: .signData(isTransaction: false)
 				)
 				let signedAuthChallenge = SignedAuthChallenge(
@@ -267,6 +267,20 @@ extension ROLAClient {
 		static let wellKnownFilePath = ".well-known/radix.json"
 		static let dAppDefinitionAccountType = "dapp definition"
 	}
+}
+
+/// `challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
+func payloadToHash(
+	challenge: P2P.Dapp.AuthChallengeNonce,
+	dAppDefinitionAddress accountAddress: AccountAddress,
+	origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
+) -> Data {
+	let dAppDefinitionAddress = accountAddress.address
+	let origin = metadataOrigin.rawValue
+	precondition(dAppDefinitionAddress.count <= UInt8.max)
+	let challengeBytes = [UInt8](challenge.data.data)
+	let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
+	return Data(challengeBytes + [lengthDappDefinitionAddress] + [UInt8](dAppDefinitionAddress.utf8) + [UInt8](origin.utf8))
 }
 
 extension GatewayAPI.EntityMetadataCollection {
