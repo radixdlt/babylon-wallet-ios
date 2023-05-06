@@ -49,7 +49,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 			deviceFactorSource: signingFactor.factorSource,
 			of: Set(signingFactor.signers.map(\.account)),
 			unhashedDataToSign: state.dataToSign,
-			purpose: .signData(isTransaction: true)
+			purpose: .signTransaction(.manifestFromDapp)
 		)
 	}
 }

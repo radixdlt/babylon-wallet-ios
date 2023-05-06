@@ -13,6 +13,8 @@ extension ROLAClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.cacheClient) var cacheClient
 
+		// FIXME: change to using hashes, which will happen... soon. Post Enkinet upgrade and once support in the
+		// whole ecosystem.
 		/// Tries to append a new Publickey to owner_keys
 		// see Russ confluence page:
 		/// https://radixdlt.atlassian.net/wiki/spaces/DevEcosystem/pages/3055026344/Metadata+Standards+for+Provable+Ownership+Encrypted+Messaging
@@ -28,9 +30,6 @@ extension ROLAClient {
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
 			var ownerKeys = try metadata.ownerKeys() ?? []
 			loggerGlobal.debug("ownerKeys: \(ownerKeys)")
-//			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
-//			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
-//			ownerKeyHashes.append(hashBytesOfPublicKey)
 			ownerKeys.append(newPublicKey)
 			if !ownerKeys.contains(transactionSigningKey) {
 				loggerGlobal.debug("Did not contain transactionSigningKey, re-adding it: \(transactionSigningKey)")
@@ -74,7 +73,7 @@ extension ROLAClient {
 				]
 			)
 
-			try await faucetClient.signSubmitSimpleTX(manifest)
+			try await faucetClient.signSubmitSimpleTX(manifest, .signTransaction(.internalManifest(.uploadAuthKey)))
 			loggerGlobal.debug("Submimtted TX updating ownerKeys!")
 		}
 
@@ -231,7 +230,7 @@ extension ROLAClient {
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					of: request.persona,
 					unhashedDataToSign: payload,
-					purpose: .signData(isTransaction: false)
+					purpose: .signAuth
 				)
 				let signedAuthChallenge = SignedAuthChallenge(
 					challenge: request.challenge,
@@ -286,6 +285,8 @@ func payloadToHash(
 extension GatewayAPI.EntityMetadataCollection {
 	public static let ownerKeysKey = "owner_keys"
 
+	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
+	// terrible parsing mess.
 	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
 		guard let response: GatewayAPI.EntityMetadataItemValue = self[Self.ownerKeysKey] else {
 			return nil

@@ -82,9 +82,9 @@ extension DeviceFactorSourceClient {
 		case let .unsecured(control):
 			let factorInstance = {
 				switch purpose {
-				case let .signData(isTransaction):
-					return isTransaction ? control.transactionSigning : (control.authenticationSigning ?? control.transactionSigning)
-				case .createEntity:
+				case .signAuth:
+					return control.authenticationSigning ?? control.transactionSigning
+				case .signTransaction:
 					return control.transactionSigning
 				}
 			}()
@@ -179,18 +179,29 @@ extension DeviceFactorSourceClient {
 // MARK: - DeviceFactorSourceClient.Purpose
 extension DeviceFactorSourceClient {
 	public enum Purpose: Sendable, Equatable {
-		case signData(isTransaction: Bool)
-		case createEntity(kind: EntityKind)
+		case signAuth
+		case signTransaction(SignTransactionPurpose)
+		public enum SignTransactionPurpose: Sendable, Equatable {
+			case manifestFromDapp
+			case internalManifest(InternalTXSignPurpose)
+			public enum InternalTXSignPurpose: Sendable, Equatable {
+				case transfer
+				case uploadAuthKey
+			}
+		}
 	}
 }
 
 extension DeviceFactorSourceClient.Purpose {
 	public var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
 		switch self {
-		case let .createEntity(kind):
-			return .createEntity(kind: kind)
-		case let .signData(isTransaction):
-			return isTransaction ? .signTransaction : .signAuthChallenge
+		case .signAuth: return .signAuthChallenge
+		case .signTransaction(.manifestFromDapp):
+			return .signTransaction
+		case .signTransaction(.internalManifest(.transfer)):
+			return .signTransaction
+		case .signTransaction(.internalManifest(.uploadAuthKey)):
+			return .createSignAuthKey
 		}
 	}
 }

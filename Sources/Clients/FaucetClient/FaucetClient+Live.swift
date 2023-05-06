@@ -85,7 +85,7 @@ extension FaucetClient: DependencyKey {
 			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
 
-		let signSubmitSimpleTX: SignSubmitSimpleTX = { manifestWithoutLockFee in
+		let signSubmitSimpleTX: SignSubmitSimpleTX = { manifestWithoutLockFee, purpose in
 			@Dependency(\.transactionClient) var transactionClient
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let lockFeeInstr = try engineToolkitClient.lockFeeCallMethod(faucetForNetwork: networkID, fee: "10")
@@ -107,7 +107,7 @@ extension FaucetClient: DependencyKey {
 					let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 						of: signer,
 						unhashedDataToSign: data,
-						purpose: .signData(isTransaction: true)
+						purpose: purpose
 					)
 					try signatures.insert(signature.signature.signatureWithPublicKey.intoEngine())
 				}

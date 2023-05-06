@@ -27,7 +27,7 @@ extension FaucetClient {
 		isAllowedToUseFaucet: { _ in true },
 		createFungibleToken: { _ in },
 		createNonFungibleToken: { _ in },
-		signSubmitSimpleTX: { _ in }
+		signSubmitSimpleTX: { _, _ in }
 	)
 	#else
 	public static let noop = Self(
