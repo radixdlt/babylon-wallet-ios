@@ -155,12 +155,30 @@ final class ProfileTests: TestCase {
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let account = try Profile.Network.Account(
+			var account = try Profile.Network.Account(
 				networkID: networkID,
 				factorInstance: factorInstance,
 				displayName: name,
 				extraProperties: .init(appearanceID: .fromIndex(Int(index)))
 			)
+
+			if case var .unsecured(control) = account.securityState {
+				let path = try derivationPath.switching(keyKind: .authenticationSigning)
+				let authPublicKey = try hdRoot.derivePublicKey(
+					path: .init(
+						scheme: .cap26,
+						path: path.derivationPath
+					),
+					curve: .curve25519
+				)
+
+				control.authenticationSigning = FactorInstance(
+					factorSourceID: babylonFactorSource.id,
+					publicKey: authPublicKey,
+					derivationPath: path.wrapAsDerivationPath()
+				)
+				account.securityState = .unsecured(control)
+			}
 
 			try profile.addAccount(account)
 
@@ -194,7 +212,25 @@ final class ProfileTests: TestCase {
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
-			let persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
+			var persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
+
+			if case var .unsecured(control) = persona.securityState {
+				let path = try derivationPath.switching(keyKind: .authenticationSigning)
+				let authPublicKey = try hdRoot.derivePublicKey(
+					path: .init(
+						scheme: .cap26,
+						path: path.derivationPath
+					),
+					curve: .curve25519
+				)
+
+				control.authenticationSigning = FactorInstance(
+					factorSourceID: babylonFactorSource.id,
+					publicKey: authPublicKey,
+					derivationPath: path.wrapAsDerivationPath()
+				)
+				persona.securityState = .unsecured(control)
+			}
 
 			try profile.addPersona(persona)
 
@@ -300,8 +336,8 @@ final class ProfileTests: TestCase {
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		// Uncomment the lines below to generate a new test vector
-//		let data = try jsonEncoder.encode(snapshot)
-//		print(String(data: data, encoding: .utf8)!)
+		let data = try jsonEncoder.encode(snapshot)
+		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -357,53 +393,74 @@ final class ProfileTests: TestCase {
 			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot())
 		)
 
-		XCTAssertEqual(
-			network.accounts[0].publicKey()?.compressedData.hex(),
-			"7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3"
-		)
-
+		// Account 0
 		XCTAssertEqual(
 			network.accounts[0].address.address,
 			"account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"
 		)
-
 		XCTAssertEqual(
-			network.accounts[1].publicKey()?.compressedData.hex(),
-			"216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719"
+			network.accounts[0].publicKey()?.compressedData.hex(),
+			"7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3"
+		)
+		XCTAssertEqual(
+			network.accounts[0].authPublicKey()?.compressedData.hex(),
+			"03c834335f40429223db22a3cc91f7ca354050081692bd1054b5eb4e379b5a6d"
 		)
 
+		// Account 1
 		XCTAssertEqual(
 			network.accounts[1].address.address,
 			"account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"
 		)
-
 		XCTAssertEqual(
-			network.accounts[2].publicKey()?.compressedData.hex(),
-			"a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3"
+			network.accounts[1].publicKey()?.compressedData.hex(),
+			"216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719"
+		)
+		XCTAssertEqual(
+			network.accounts[1].authPublicKey()?.compressedData.hex(),
+			"11bef8496426d98e053cf7ce3a85a1a7504fe7ceb1ebbc6f7c14dd7b7071de2e"
 		)
 
+		// Account 2
 		XCTAssertEqual(
 			network.accounts[2].address.address,
 			"account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"
 		)
+		XCTAssertEqual(
+			network.accounts[2].publicKey()?.compressedData.hex(),
+			"a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3"
+		)
+		XCTAssertEqual(
+			network.accounts[2].authPublicKey()?.compressedData.hex(),
+			"5edbfbc93b7cea2e948c6dc85a61e306064a13328a8fed0ffa2843d184c39ac9"
+		)
 
+		// Persona 0
+		XCTAssertEqual(
+			network.personas[0].address.address,
+			"identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8"
+		)
 		XCTAssertEqual(
 			network.personas[0].publicKey()?.compressedData.hex(),
 			"573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"
 		)
 		XCTAssertEqual(
-			network.personas[0].address.address,
-			"identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8"
+			network.personas[0].authPublicKey()?.compressedData.hex(),
+			"83426e4c587553bd3a949a490683a16fdd77e400a05615e5734daac139c7afb7"
 		)
 
+		// Persona 1
+		XCTAssertEqual(
+			network.personas[1].address.address,
+			"identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw"
+		)
 		XCTAssertEqual(
 			network.personas[1].publicKey()?.compressedData.hex(),
 			"6b33fec79f1535ac566b3d840f753942af6447efbe5c50dc343f8ec2122af9b3"
 		)
-
 		XCTAssertEqual(
-			network.personas[1].address.address,
-			"identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw"
+			network.personas[1].authPublicKey()?.compressedData.hex(),
+			"44547fabd1e1fd642d96103eb71d80216abf0dc87f0e17ed4a9f5dbc91d2c856"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -454,6 +511,13 @@ extension EntityProtocol {
 		switch securityState {
 		case let .unsecured(control):
 			return control.transactionSigning.publicKey
+		}
+	}
+
+	func authPublicKey() -> SLIP10.PublicKey? {
+		switch securityState {
+		case let .unsecured(control):
+			return control.authenticationSigning?.publicKey
 		}
 	}
 }
