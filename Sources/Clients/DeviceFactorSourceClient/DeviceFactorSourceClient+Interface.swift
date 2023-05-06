@@ -78,11 +78,18 @@ extension DeviceFactorSourceClient {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		let allFactorSources = try await factorSourcesClient.getFactorSources()
 		switch entity.securityState {
 		case let .unsecured(control):
-			let factorInstance = control.transactionSigning
-			guard let deviceFactorSource = allFactorSources[id: factorInstance.factorSourceID], deviceFactorSource.kind == .device else {
+			let factorInstance = {
+				switch purpose {
+				case let .signData(isTransaction) where !isTransaction:
+					return control.authenticationSigning ?? control.transactionSigning
+				default:
+					return control.transactionSigning
+				}
+			}()
+//			guard let deviceFactorSource = allFactorSources[id: factorInstance.factorSourceID], deviceFactorSource.kind == .device else {
+			guard let deviceFactorSource = try await factorSourcesClient.getFactorSources() {
 				throw FailedToDeviceFactorSourceForSigning()
 			}
 
