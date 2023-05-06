@@ -19,17 +19,25 @@ extension ROLAClient {
 		/// if it is already present, no change is done
 		@Sendable func addOwnerKey<Entity: EntityProtocol>(
 			newPublicKey: SLIP10.PublicKey,
-			for entity: Entity
+			for entity: Entity,
+			assertingTransactionSigningKeyIsNotRemoved transactionSigningKey: SLIP10.PublicKey
 		) async throws {
 			@Dependency(\.faucetClient) var faucetClient
 
 			let entityAddress = entity.address.address
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
 			var ownerKeys = try metadata.ownerKeys() ?? []
+			loggerGlobal.notice("ownerKeys: \(ownerKeys)")
 //			let hashOfPublicKey = try blake2b(data: newPublicKeyToHash.compressedRepresentation)
 //			let hashBytesOfPublicKey = Data(hashOfPublicKey.suffix(29))
 //			ownerKeyHashes.append(hashBytesOfPublicKey)
 			ownerKeys.append(newPublicKey)
+			if !ownerKeys.contains(transactionSigningKey) {
+				loggerGlobal.notice("Did not contain transactionSigningKey, re-adding it: \(transactionSigningKey)")
+				ownerKeys.append(transactionSigningKey)
+			}
+
+			loggerGlobal.notice("new ownerKeys: \(ownerKeys)")
 
 			let arrayOfEngineToolkitBytesValues: [ManifestASTValue] = ownerKeys.map { pubKey in
 				ManifestASTValue.enum(
@@ -66,7 +74,15 @@ extension ROLAClient {
 				]
 			)
 
+			loggerGlobal.notice("Signing and submitting TX updating ownerKeys...")
 			try await faucetClient.signSubmitSimpleTX(manifest)
+			loggerGlobal.notice("Submimtted TX updating ownerKeys! ✅")
+			loggerGlobal.debug("Fetching owner keys yet again, confirming they have changed...")
+			let hopefullyUpdatedKeys = try await gatewayAPIClient.getEntityMetadata(entityAddress).ownerKeys() ?? []
+			let containsNew = hopefullyUpdatedKeys.contains(newPublicKey)
+			let stillContainsTXSigningKey = hopefullyUpdatedKeys.contains(transactionSigningKey)
+			let successStatus = containsNew && stillContainsTXSigningKey ? "✅✅" : containsNew ? "✅❌" : "❌"
+			loggerGlobal.notice("\(successStatus) containsNew: \(containsNew), stillContainsTXSigningKey: \(stillContainsTXSigningKey)")
 		}
 
 		return Self(
@@ -150,10 +166,12 @@ extension ROLAClient {
 
 				let factorSourceID: FactorSourceID
 				let signingKeyDerivationPath: AccountBabylonDerivationPath
+				let transactionSigning: FactorInstance
 				var unsecuredEntityControl: UnsecuredEntityControl
 				switch account.securityState {
 				case let .unsecured(unsecuredEntityControl_):
 					unsecuredEntityControl = unsecuredEntityControl_
+					transactionSigning = unsecuredEntityControl.transactionSigning
 					guard unsecuredEntityControl.authenticationSigning == nil else {
 						loggerGlobal.notice("Entity: \(request.accountAddress) already has an authenticationSigning")
 						return
@@ -194,7 +212,13 @@ extension ROLAClient {
 					)
 				}()
 				loggerGlobal.notice("Entity: \(request.accountAddress) created and is about to upload authenticationSigning key: \(authenticationSigning.publicKey)")
-				try await addOwnerKey(newPublicKey: authenticationSigning.publicKey, for: account)
+
+				try await addOwnerKey(
+					newPublicKey: authenticationSigning.publicKey,
+					for: account,
+					assertingTransactionSigningKeyIsNotRemoved: transactionSigning.publicKey
+				)
+
 				unsecuredEntityControl.authenticationSigning = authenticationSigning
 				account.securityState = .unsecured(unsecuredEntityControl)
 
@@ -236,11 +260,39 @@ extension GatewayAPI.EntityMetadataCollection {
 	public static let ownerKeysKey = "owner_keys"
 
 	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
-		guard let ownerKeysAsStringCollection = self[Self.ownerKeysKey]?.asStringCollection else {
+		guard let response: GatewayAPI.EntityMetadataItemValue = self[Self.ownerKeysKey] else {
 			return nil
 		}
+
+		guard let asStringCollection = response.asStringCollection else {
+			return nil
+		}
+		// Element is String `"EddsaEd25519PublicKey("56d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
+		let keys = asStringCollection.compactMap { elem -> Engine.PublicKey? in
+			if elem.starts(with: "EddsaEd25519PublicKey"), elem.count == 89 {
+				var key = elem
+				key.removeFirst(23)
+				key.removeLast(2)
+				guard key.count == 64 else {
+					return nil
+				}
+				return try? .eddsaEd25519(.init(hex: key))
+			} else if elem.starts(with: "EcdsaSecp256k1PublicKey"), elem.count == 93 {
+				var key = elem
+				key.removeFirst(25)
+				key.removeLast(2)
+				guard key.count == 66 else {
+					return nil
+				}
+				return try? .ecdsaSecp256k1(.init(hex: key))
+			} else {
+				return nil
+			}
+		}
+		let slip10Keys = try keys.map { try SLIP10.PublicKey(engine: $0) }
+
 		return try .init(
-			validating: ownerKeysAsStringCollection.map { try Data(hex: $0) }.map { try SLIP10.PublicKey(data: $0) }
+			validating: slip10Keys
 		)
 	}
 }

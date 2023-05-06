@@ -22,7 +22,7 @@ extension Profile.Network.Accounts {
 	// FIXME: uh terrible, please fix this.
 	public mutating func updateAccount(_ account: Profile.Network.Account) throws {
 		var identifiedArrayOf = self.rawValue
-		guard identifiedArrayOf.updateOrAppend(account) == nil else {
+		guard identifiedArrayOf.updateOrAppend(account) != nil else {
 			assertionFailure("We expected this account to already exist, but it did not.")
 			throw TryingToUpdateAnAccountWhichIsNotAlreadySaved()
 		}
