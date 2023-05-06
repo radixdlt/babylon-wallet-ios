@@ -7,6 +7,7 @@ public struct ROLAClient: Sendable, DependencyKey {
 	public var performWellKnownFileCheck: PerformWellKnownFileCheck
 	public var createAuthSigningKeyForAccountIfNeeded: CreateAuthSigningKeyForAccountIfNeeded
 	public var createAuthSigningKeyForPersonaIfNeeded: CreateAuthSigningKeyForPersonaIfNeeded
+	public var signAuthChallenge: SignAuthChallenge
 }
 
 // MARK: ROLAClient.PerformWellKnownFileCheck
@@ -15,6 +16,7 @@ extension ROLAClient {
 	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias CreateAuthSigningKeyForAccountIfNeeded = @Sendable (CreateAuthSigningKeyForAccountIfNeededRequest) async throws -> Void
 	public typealias CreateAuthSigningKeyForPersonaIfNeeded = @Sendable (CreateAuthSigningKeyForPersonaIfNeededRequest) async throws -> Void
+	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeRequest) async throws -> SignedAuthChallenge
 }
 
 extension DependencyValues {
@@ -38,4 +40,34 @@ public struct CreateAuthSigningKeyForPersonaIfNeededRequest: Sendable, Hashable 
 	public init(identityAddress: IdentityAddress) {
 		self.identityAddress = identityAddress
 	}
+}
+
+import Cryptography
+import DeviceFactorSourceClient
+import SharedModels
+
+// MARK: - SignAuthChallengeRequest
+public struct SignAuthChallengeRequest: Sendable, Hashable {
+	public let challenge: P2P.Dapp.AuthChallengeNonce
+	public let origin: P2P.Dapp.Request.Metadata.Origin
+	public let dAppDefinitionAddress: DappDefinitionAddress
+	public let persona: Profile.Network.Persona
+
+	public init(
+		challenge: P2P.Dapp.AuthChallengeNonce,
+		origin: P2P.Dapp.Request.Metadata.Origin,
+		dAppDefinitionAddress: DappDefinitionAddress,
+		persona: Profile.Network.Persona
+	) {
+		self.challenge = challenge
+		self.origin = origin
+		self.dAppDefinitionAddress = dAppDefinitionAddress
+		self.persona = persona
+	}
+}
+
+// MARK: - SignedAuthChallenge
+public struct SignedAuthChallenge: Sendable, Hashable {
+	public let challenge: P2P.Dapp.AuthChallengeNonce
+	public let signatureWithPublicKey: SignatureWithPublicKey
 }

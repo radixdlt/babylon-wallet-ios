@@ -219,7 +219,27 @@ extension ROLAClient {
 				// DONE
 
 			},
-			createAuthSigningKeyForPersonaIfNeeded: { _ in }
+			createAuthSigningKeyForPersonaIfNeeded: { _ in },
+			signAuthChallenge: { request in
+				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+
+				let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+					challenge: request.challenge,
+					dAppDefinitionAddress: request.dAppDefinitionAddress.address,
+					origin: request.origin.rawValue
+				)
+				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+					of: request.persona,
+					unhashedDataToSign: payloadToHash,
+					purpose: .signData(isTransaction: false)
+				)
+				let signedAuthChallenge = SignedAuthChallenge(
+					challenge: request.challenge,
+					signatureWithPublicKey: signature.signature.signatureWithPublicKey
+				)
+
+				return signedAuthChallenge
+			}
 		)
 	}()
 

@@ -4,14 +4,9 @@ import Cryptography
 import FeaturePrelude
 import GatewaysClient
 import PersonasClient
+import ROLAClient
 import TransactionClient
 import TransactionReviewFeature
-
-// MARK: - SignedAuthChallenge
-public struct SignedAuthChallenge: Sendable, Hashable {
-	public let challenge: P2P.Dapp.AuthChallengeNonce
-	public let signatureWithPublicKey: SignatureWithPublicKey
-}
 
 // MARK: - DappInteractionFlow
 struct DappInteractionFlow: Sendable, FeatureReducer {
