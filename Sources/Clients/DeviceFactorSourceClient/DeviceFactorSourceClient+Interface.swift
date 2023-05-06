@@ -83,7 +83,7 @@ extension DeviceFactorSourceClient {
 			let factorInstance = {
 				switch purpose {
 				case let .signData(isTransaction):
-					return isTransaction ? (control.authenticationSigning ?? control.transactionSigning) : control.transactionSigning
+					return isTransaction ? control.transactionSigning : (control.authenticationSigning ?? control.transactionSigning)
 				case .createEntity:
 					return control.transactionSigning
 				}
