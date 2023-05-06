@@ -44,9 +44,21 @@ public struct AddInstructionToManifestRequest: Sendable, Hashable {
 	public let instruction: Instruction
 	public let manifest: TransactionManifest
 	public let location: AddInstructionToManifestLocation
-	public init(instruction: Instruction, to manifest: TransactionManifest, at location: AddInstructionToManifestLocation) {
+	public init(
+		instruction: Instruction,
+		to manifest: TransactionManifest,
+		at location: AddInstructionToManifestLocation
+	) {
 		self.instruction = instruction
 		self.manifest = manifest
 		self.location = location
+	}
+
+	public init(
+		_ instruction: any InstructionProtocol,
+		to manifest: TransactionManifest,
+		at location: AddInstructionToManifestLocation
+	) {
+		self.init(instruction: instruction.embed(), to: manifest, at: location)
 	}
 }
