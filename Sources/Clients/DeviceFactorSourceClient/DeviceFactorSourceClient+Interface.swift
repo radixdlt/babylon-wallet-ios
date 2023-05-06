@@ -80,16 +80,11 @@ extension DeviceFactorSourceClient {
 
 		switch entity.securityState {
 		case let .unsecured(control):
-			let factorInstance = {
-				switch purpose {
-				case let .signData(isTransaction) where !isTransaction:
-					return control.authenticationSigning ?? control.transactionSigning
-				default:
-					return control.transactionSigning
-				}
-			}()
-//			guard let deviceFactorSource = allFactorSources[id: factorInstance.factorSourceID], deviceFactorSource.kind == .device else {
-			guard let deviceFactorSource = try await factorSourcesClient.getFactorSources() {
+			let factorInstance = control.genesisFactorInstance
+
+			guard
+				let deviceFactorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
+			else {
 				throw FailedToDeviceFactorSourceForSigning()
 			}
 
@@ -99,6 +94,7 @@ extension DeviceFactorSourceClient {
 				unhashedDataToSign: unhashedDataToSign,
 				purpose: purpose
 			)
+
 			guard let signature = signatures.first, signatures.count == 1 else {
 				throw IncorrectSignatureCountExpectedExactlyOne()
 			}

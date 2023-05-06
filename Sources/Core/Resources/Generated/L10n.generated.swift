@@ -723,6 +723,8 @@ public enum L10n {
     public static func accountSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
     }
+    /// Here are the dApps you have logged into with this persona.
+    public static let authorizedDappsDescription = L10n.tr("Localizable", "personaDetails.authorizedDappsDescription", fallback: "Here are the dApps you have logged into with this persona.")
     /// Remove Authorization
     public static let deauthorizePersona = L10n.tr("Localizable", "personaDetails.deauthorizePersona", fallback: "Remove Authorization")
     /// Cancel
@@ -757,8 +759,6 @@ public enum L10n {
     public static let phoneNumberHeading = L10n.tr("Localizable", "personaDetails.phoneNumberHeading", fallback: "Phone Number")
   }
   public enum PersonaList {
-    /// Create new persona
-    public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personaList.createNewPersonaButtonTitle", fallback: "Create new persona")
     /// Here are all of your current Personas in your Wallet
     public static let subtitle = L10n.tr("Localizable", "personaList.subtitle", fallback: "Here are all of your current Personas in your Wallet")
     /// Personas
@@ -767,10 +767,6 @@ public enum L10n {
   public enum Personas {
     /// Create a New Persona
     public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personas.createNewPersonaButtonTitle", fallback: "Create a New Persona")
-    /// Here are all of your current Personas in your Wallet
-    public static let subtitle = L10n.tr("Localizable", "personas.subtitle", fallback: "Here are all of your current Personas in your Wallet")
-    /// Personas
-    public static let title = L10n.tr("Localizable", "personas.title", fallback: "Personas")
   }
   public enum ProfileLoad {
     /// Failed to create Wallet from backup: %@

@@ -50,4 +50,10 @@ extension AuthorizedDappsClient {
 		}
 		return try await detailsForAuthorizedDapp(dApp)
 	}
+
+	public func getDappsAuthorizedByPersona(
+		_ id: Profile.Network.Persona.ID
+	) async throws -> IdentifiedArrayOf<Profile.Network.AuthorizedDapp> {
+		try await getAuthorizedDapps().filter { $0.referencesToAuthorizedPersonas.ids.contains(id) }
+	}
 }

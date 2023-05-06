@@ -35,7 +35,7 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 
 	#if swift(<5.8)
 	public init(
-	elementKind: ManifestASTValueKind,
+		elementKind: ManifestASTValueKind,
 		@SpecificValuesBuilder buildValues: () throws -> [ManifestASTValue]
 	) throws {
 		try self.init(

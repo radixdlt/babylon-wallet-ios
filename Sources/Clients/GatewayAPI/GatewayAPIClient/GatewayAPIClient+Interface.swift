@@ -47,7 +47,7 @@ extension GatewayAPIClient {
 	public typealias GetEntityNonFungibleIdsPage = @Sendable (GatewayAPI.StateEntityNonFungibleIdsPageRequest) async throws -> GatewayAPI.StateEntityNonFungibleIdsPageResponse
 	public typealias GetNonFungibleData = @Sendable (GatewayAPI.StateNonFungibleDataRequest) async throws -> GatewayAPI.StateNonFungibleDataResponse
 
-	// MARK: - transaction
+	// MARK: - Transaction
 
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
@@ -55,25 +55,34 @@ extension GatewayAPIClient {
 }
 
 extension GatewayAPIClient {
-	public func getDappDefinition(_ address: String) async throws -> GatewayAPI.EntityMetadataCollection {
-		let entityMetadata = try await getEntityMetadata(address)
+	public func getDappDefinition(_ address: ComponentAddress) async throws -> GatewayAPI.EntityMetadataCollection {
+		let entityMetadata = try await getEntityMetadata(address.address)
 
-		guard let dappDefinitionAddress = entityMetadata.dappDefinition else {
+		guard let dappDefinitionAddressString = entityMetadata.dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
 		}
 
-		let dappDefinition = try await getEntityMetadata(dappDefinitionAddress)
+		return try await getDappMetadata(.init(address: dappDefinitionAddressString), validating: address)
+	}
+
+	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
+	public func getDappMetadata(
+		_ dappDefinition: DappDefinitionAddress,
+		validating component: ComponentAddress? = nil
+	) async throws -> GatewayAPI.EntityMetadataCollection {
+		let dappDefinition = try await getEntityMetadata(dappDefinition.address)
 
 		guard dappDefinition.accountType == .dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
 		}
 
-		guard let claimedEntities = dappDefinition.claimedEntities else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
-		}
-
-		guard claimedEntities.contains(address) else {
-			throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
+		if let component {
+			guard let claimedEntities = dappDefinition.claimedEntities else {
+				throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
+			}
+			guard claimedEntities.contains(component.address) else {
+				throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
+			}
 		}
 
 		return dappDefinition

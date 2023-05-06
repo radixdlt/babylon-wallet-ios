@@ -3,6 +3,8 @@ import FeaturePrelude
 extension GeneralSettings.State {
 	var viewState: GeneralSettings.ViewState {
 		.init(
+			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
+			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
 			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false
 		)
 	}
@@ -11,6 +13,11 @@ extension GeneralSettings.State {
 // MARK: - GeneralSettings.View
 extension GeneralSettings {
 	public struct ViewState: Equatable {
+		let hasLedgerHardwareWalletFactorSources: Bool
+
+		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
+		let useVerboseLedgerDisplayMode: Bool
+
 		let isDeveloperModeEnabled: Bool
 	}
 
@@ -36,10 +43,24 @@ extension GeneralSettings {
 			VStack(spacing: .zero) {
 				VStack(spacing: .zero) {
 					isDeveloperModeEnabled(with: viewStore)
+					if viewStore.hasLedgerHardwareWalletFactorSources {
+						isUsingVerboseLedgerMode(with: viewStore)
+					}
 					Separator()
 				}
 				.padding(.medium3)
 			}
+		}
+
+		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			ToggleView(
+				title: "Verbose Ledger transaction signing",
+				subtitle: "When signing with your Ledger hardware wallet, should all instructions be displayed?",
+				isOn: viewStore.binding(
+					get: \.useVerboseLedgerDisplayMode,
+					send: { .useVerboseModeToggled($0) }
+				)
+			)
 		}
 
 		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {

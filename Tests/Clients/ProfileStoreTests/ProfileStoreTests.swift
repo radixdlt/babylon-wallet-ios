@@ -153,7 +153,7 @@ private extension ProfileStoreTests {
 private let deviceLabel: FactorSource.Label = "NAME"
 private let deviceDescription: FactorSource.Description = "MODEL"
 private let expectedDeviceDescription = ProfileStore.deviceDescription(
-label: deviceLabel,
+	label: deviceLabel,
 	description: deviceDescription
 )
 #else

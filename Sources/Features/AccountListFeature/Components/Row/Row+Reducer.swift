@@ -86,9 +86,8 @@ extension AccountList {
 
 		private func checkIfDeviceFactorSourceControls(factorInstance: FactorInstance) -> EffectTask<Action> {
 			.run { send in
-				let allFactorSources = try await factorSourcesClient.getFactorSources()
 				guard
-					let factorSource = allFactorSources[id: factorInstance.factorSourceID]
+					let factorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
 				else {
 					loggerGlobal.warning("Did not find factor source for factor instance.")
 					return

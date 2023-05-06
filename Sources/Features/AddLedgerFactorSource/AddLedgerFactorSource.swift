@@ -179,8 +179,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			state.isWaitingForResponseFromLedger = false
 			loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 			return .run { send in
-				let allFactorSources = try await factorSourcesClient.getFactorSources()
-				if let existing = allFactorSources.first(where: { $0.id == ledgerDeviceInfo.id }) {
+				if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
 					await send(.internal(.alreadyExists(existing)))
 				} else {
 					// new!

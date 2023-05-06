@@ -49,6 +49,40 @@ extension SigningFactors {
 	}
 }
 
+extension FactorSourcesClient {
+	public func getFactorSource(
+		id: FactorSourceID,
+		matching filter: @escaping (FactorSource) -> Bool = { _ in true }
+	) async throws -> FactorSource? {
+		try await getFactorSources(matching: filter)[id: id]
+	}
+
+	public func getFactorSource(
+		id: FactorSourceID,
+		ensureKind kind: FactorSourceKind
+	) async throws -> FactorSource? {
+		try await getFactorSource(id: id) { $0.kind == kind }
+	}
+
+	public func getFactorSource(
+		of factorInstance: FactorInstance
+	) async throws -> FactorSource? {
+		try await getFactorSource(id: factorInstance.factorSourceID)
+	}
+
+	public func getFactorSources(
+		matching filter: (FactorSource) -> Bool
+	) async throws -> IdentifiedArrayOf<FactorSource> {
+		try await IdentifiedArrayOf(uniqueElements: getFactorSources().filter(filter))
+	}
+
+	public func getFactorSources(
+		ofKind kind: FactorSourceKind
+	) async throws -> IdentifiedArrayOf<FactorSource> {
+		try await getFactorSources(matching: { $0.kind == kind })
+	}
+}
+
 // MARK: - UpdateFactorSourceLastUsedRequest
 public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	public let factorSourceIDs: [FactorSource.ID]
