@@ -114,12 +114,12 @@ public struct CreateNonFungibleTokenRequest: Sendable {
 extension FaucetClient {
 	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> Void
 	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async -> Bool
-	#if DEBUG
 
 	/// A "simple TX" is a transaction which cannot require signing of any factor source except
 	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
 	public typealias SignSubmitSimpleTX = @Sendable (TransactionManifest) async throws -> Void
 
+	#if DEBUG
 	public typealias CreateFungibleToken = @Sendable (CreateFungibleTokenRequest) async throws -> Void
 	public typealias CreateNonFungibleToken = @Sendable (CreateNonFungibleTokenRequest) async throws -> Void
 	#endif // DEBUG
