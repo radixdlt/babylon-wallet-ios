@@ -260,21 +260,31 @@ extension GatewayAPI.EntityMetadataCollection {
 		guard let asStringCollection = response.asStringCollection else {
 			return nil
 		}
+
 		// Element is String `"EddsaEd25519PublicKey("56d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
+		// or String `"EcdsaSecp256k1PublicKey("0256d656000d5f67f5308951a394c7891c54b54dd633b42d1d21af372f80e6bc43")"`
+		let curve25519Prefix = "EddsaEd25519PublicKey"
+		let secp256k1Prefix = "EcdsaSecp256k1PublicKey"
+		let lengthCurve25519Prefix = curve25519Prefix.count
+		let lengthSecp256k1Prefix = secp256k1Prefix.count
+		let lengthQuoteAndParenthesis = 2
+		let lengthQuotesAndTwoParenthesis = 2 * lengthQuoteAndParenthesis
+		let lengthCurve25519PubKeyHex = 32 * 2
+		let lengthSecp256K1PubKeyHex = 33 * 2
 		let keys = asStringCollection.compactMap { elem -> Engine.PublicKey? in
-			if elem.starts(with: "EddsaEd25519PublicKey"), elem.count == 89 {
+			if elem.starts(with: curve25519Prefix), elem.count == lengthQuotesAndTwoParenthesis + lengthCurve25519Prefix + lengthCurve25519PubKeyHex {
 				var key = elem
-				key.removeFirst(23)
-				key.removeLast(2)
-				guard key.count == 64 else {
+				key.removeFirst(curve25519Prefix.count + lengthQuoteAndParenthesis)
+				key.removeLast(lengthQuoteAndParenthesis)
+				guard key.count == lengthCurve25519PubKeyHex else {
 					return nil
 				}
 				return try? .eddsaEd25519(.init(hex: key))
-			} else if elem.starts(with: "EcdsaSecp256k1PublicKey"), elem.count == 93 {
+			} else if elem.starts(with: secp256k1Prefix), elem.count == lengthQuotesAndTwoParenthesis + lengthSecp256k1Prefix + lengthSecp256K1PubKeyHex {
 				var key = elem
-				key.removeFirst(25)
-				key.removeLast(2)
-				guard key.count == 66 else {
+				key.removeFirst(secp256k1Prefix.count + lengthQuoteAndParenthesis)
+				key.removeLast(lengthQuoteAndParenthesis)
+				guard key.count == lengthSecp256K1PubKeyHex else {
 					return nil
 				}
 				return try? .ecdsaSecp256k1(.init(hex: key))
