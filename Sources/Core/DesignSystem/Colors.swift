@@ -258,9 +258,7 @@ extension Color {
 	) -> Self {
 		var insecureRNG = InsecureRandomNumberGeneratorWithSeed(data: seed)
 		func random() -> UInt8 {
-			let val = UInt8.random(in: range, using: &insecureRNG)
-			print("val: \(val)")
-			return val
+			UInt8.random(in: range, using: &insecureRNG)
 		}
 		return Self(
 			red: random(),
@@ -270,13 +268,3 @@ extension Color {
 		)
 	}
 }
-
-// extension Color.App {
-//	public static var random: Color {
-//		Color(
-//			red: .random(in: 0 ... 1),
-//			green: .random(in: 0 ... 1),
-//			blue: .random(in: 0 ... 1)
-//		)
-//	}
-// }
