@@ -27,7 +27,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		}
 		let analyzed = try analyze(manifest: transactionManifest)
 		let expected: [ComponentAddress] = ["account_sim1qspjlnwx4gdcazhral74rjgzgysrslf8ngrfmprecrrss3p9md"]
-		XCTAssertNoDifference(expected, analyzed.accountsRequiringAuth)
+		XCTAssertNoDifference(expected, analyzed.entitiesRequiringAuth)
 		XCTAssertNoDifference(expected, analyzed.accountAddresses)
 	}
 }

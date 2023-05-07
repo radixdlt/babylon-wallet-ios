@@ -17,7 +17,7 @@ final class FactorSourcesClientLiveTests: TestCase {
 		]
 
 		let signingFactors = try signingFactors(
-			for: Set(accounts),
+			for: Set(accounts.map { Signer.Entity.account($0) }),
 			from: [
 				FactorSource.deviceOne,
 				FactorSource.deviceTwo,
@@ -30,15 +30,21 @@ final class FactorSourcesClientLiveTests: TestCase {
 		XCTAssertEqual(devices.count, 2)
 		let devicesSorted = Array(devices.rawValue).sorted(by: { $0.factorSource < $1.factorSource })
 		let device0 = devicesSorted[0]
-		XCTAssertEqual(Array(device0.signers.rawValue).map(\.account).sorted(by: \.appearanceID.rawValue), [accounts[0], accounts[1]])
+		func accountsOf(signingFactor: SigningFactor) -> [Profile.Network.Account] {
+			signingFactor.signers.map(\.entity).compactMap { try? $0.asAccount() }
+		}
+		let device0Accounts = accountsOf(signingFactor: device0)
+		XCTAssertEqual(device0Accounts.sorted(), [accounts[0], accounts[1]])
 		let device1 = devicesSorted[1]
-		XCTAssertEqual(Array(device1.signers.rawValue).map(\.account).sorted(by: \.appearanceID.rawValue), [accounts[2]])
+		let device1Accounts = accountsOf(signingFactor: device1)
+
+		XCTAssertEqual(device1Accounts.sorted(), [accounts[2]])
 
 		let ledgers = try XCTUnwrap(signingFactors[.ledgerHQHardwareWallet])
 		XCTAssertEqual(Array(ledgers.rawValue).map(\.factorSource).sorted(), [.ledgerTwo])
 		XCTAssertEqual(ledgers.count, 1)
 		let ledger = ledgers.first
-		XCTAssertEqual(Array(ledger.signers.rawValue).map(\.account).sorted(by: \.appearanceID.rawValue), [accounts[3], accounts[4], accounts[5]])
+		XCTAssertEqual(accountsOf(signingFactor: ledger).sorted(), [accounts[3], accounts[4], accounts[5]])
 	}
 }
 
@@ -46,6 +52,13 @@ final class FactorSourcesClientLiveTests: TestCase {
 extension SigningFactor: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.factorSource < rhs.factorSource
+	}
+}
+
+// MARK: - Profile.Network.Account + Comparable
+extension Profile.Network.Account: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.appearanceID.rawValue < rhs.appearanceID.rawValue
 	}
 }
 
