@@ -141,7 +141,7 @@ struct NonFungibleTokenListDetail_Preview: PreviewProvider {
 
 extension NonFungibleTokenList.Detail.State {
 	public static let previewValue = Self(
-		resource: .init(resourceAddress: .init(address: "some"), tokens: []),
+		resource: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: []),
 		localId: .init("#1#")
 	)
 }

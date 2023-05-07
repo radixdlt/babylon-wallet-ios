@@ -113,7 +113,7 @@ struct FungibleTokenDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenDetails.View(
 			store: .init(
-				initialState: .init(resource: .init(resourceAddress: .init(address: "some"), amount: .zero), isXRD: true),
+				initialState: .init(resource: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero), isXRD: true),
 				reducer: FungibleTokenDetails()
 			)
 		)

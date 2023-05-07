@@ -217,7 +217,7 @@ struct NonFungibleRow_Preview: PreviewProvider {
 
 extension NonFungibleTokenList.Row.State {
 	public static let previewValue = Self(
-		token: .init(resourceAddress: .init(address: "some"), tokens: [])
+		token: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: [])
 	)
 }
 #endif
