@@ -115,7 +115,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							})
 						else {
 							loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.compressedRepresentation.hex)")
-							throw MissingAccountFromSignatures()
+							throw MissingSignatureFromRequiredSigner()
 						}
 						assert(requiredSigningFactor.derivationPath == signature.derivationPath)
 						let accountSignature = try SignatureOfEntity(
@@ -137,23 +137,27 @@ extension SignatureOfEntity {
 		account: Profile.Network.Account,
 		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Validated
 	) throws {
-		switch account.securityState {
-		case let .unsecured(unsecuredEntityControl):
-			let signature = try Signature(
-				signatureWithPublicKey: signatureParsed.signature,
-				derivationPath: unsecuredEntityControl.transactionSigning.derivationPathOrThrow()
-			)
-			try self.init(
-				signerEntity: .account(account),
-				factorInstance: unsecuredEntityControl.transactionSigning,
-				signature: signature
-			)
+		guard let factorInstance = account.factorInstances.first(where: { $0.publicKey == signatureParsed.signature.publicKey }) else {
+			throw FailedToFindFactorInstanceMatchingDerivationPathInSignature()
 		}
+
+		let signature = try Signature(
+			signatureWithPublicKey: signatureParsed.signature,
+			derivationPath: factorInstance.derivationPathOrThrow()
+		)
+		try self.init(
+			signerEntity: .account(account),
+			factorInstance: factorInstance,
+			signature: signature
+		)
 	}
 }
 
-// MARK: - MissingAccountFromSignatures
-struct MissingAccountFromSignatures: Swift.Error {}
+// MARK: - MissingSignatureFromRequiredSigner
+public struct MissingSignatureFromRequiredSigner: Swift.Error {}
+
+// MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
+public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
