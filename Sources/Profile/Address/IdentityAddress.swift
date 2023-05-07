@@ -13,9 +13,15 @@ public struct IdentityAddress:
 {
 	public let address: String
 	public init(address: String) throws {
+		guard address.starts(with: "identity_") else {
+			throw NotAnIdentityAddress()
+		}
 		self.address = address
 	}
 }
+
+// MARK: - NotAnIdentityAddress
+struct NotAnIdentityAddress: Swift.Error {}
 
 extension IdentityAddress {
 	public static let kind: AddressKind = .identity
