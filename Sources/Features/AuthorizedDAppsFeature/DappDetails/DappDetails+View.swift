@@ -45,9 +45,9 @@ extension DappDetails.View {
 
 					InfoBlock(store: store)
 
-					TokenList(store: store)
+					FungiblesList(store: store)
 
-					NFTList(store: store)
+					NonFungiblesListList(store: store)
 
 					Personas(store: store, hasPersonas: viewStore.hasPersonas)
 						.background(.app.gray5)
@@ -63,7 +63,11 @@ extension DappDetails.View {
 					viewStore.send(.appeared)
 				}
 				.navigationTitle(viewStore.title)
-				.sheet(store: store.personaDetails) { store in
+				.sheet(
+					store: store.destination,
+					state: /DappDetails.Destination.State.personaDetails,
+					action: DappDetails.Destination.Action.personaDetails
+				) { store in
 					NavigationStack {
 						PersonaDetails.View(store: store)
 						#if os(iOS)
@@ -78,7 +82,11 @@ extension DappDetails.View {
 							}
 					}
 				}
-				.alert(store: store.confirmDisconnectAlert)
+				.alert(
+					store: store.destination,
+					state: /DappDetails.Destination.State.confirmDisconnectAlert,
+					action: DappDetails.Destination.Action.confirmDisconnectAlert
+				)
 			}
 		}
 	}
@@ -112,13 +120,9 @@ private extension DappDetails.State {
 	}
 }
 
-private extension DappDetails.Store {
-	var personaDetails: PresentationStoreOf<PersonaDetails> {
-		scope(state: \.$personaDetails) { .child(.personaDetails($0)) }
-	}
-
-	var confirmDisconnectAlert: AlertPresentationStore<DappDetails.ViewAction.ConfirmDisconnectAlert> {
-		scope(state: \.$confirmDisconnectAlert) { .view(.confirmDisconnectAlert($0)) }
+private extension StoreOf<DappDetails> {
+	var destination: PresentationStoreOf<DappDetails.Destination> {
+		scope(state: \.$destination, action: { .child(.destination($0)) })
 	}
 }
 
@@ -173,30 +177,30 @@ extension DappDetails.View {
 	}
 
 	@MainActor
-	struct TokenList: View {
+	struct FungiblesList: View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { token in
-					TokenThumbnail(.known(token.iconURL), size: .small)
+				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { resource in
+					TokenThumbnail(.known(resource.iconURL), size: .small)
 				} action: { id in
-					viewStore.send(.fungibleTokenTapped(id))
+					viewStore.send(.fungibleTapped(id))
 				}
 			}
 		}
 	}
 
 	@MainActor
-	struct NFTList: View {
+	struct NonFungiblesListList: View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { token in
-					NFTThumbnail(token.iconURL, size: .small)
+				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { resource in
+					NFTThumbnail(resource.iconURL, size: .small)
 				} action: { id in
-					viewStore.send(.nonFungibleTokenTapped(id))
+					viewStore.send(.nonFungibleTapped(id))
 				}
 			}
 		}

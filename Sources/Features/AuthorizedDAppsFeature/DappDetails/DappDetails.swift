@@ -32,22 +32,20 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var personaList: PersonaList.State
 
 		@PresentationState
-		public var personaDetails: PersonaDetails.State? = nil
-
-		@PresentationState
-		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
+		public var destination: Destination.State? = nil
 
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
-			personaDetails: PersonaDetails.State? = nil
+			personaDetails: PersonaDetails.State? = nil,
+			destination: Destination.State? = nil
 		) {
 			self.dApp = dApp
 			self.metadata = metadata
-			self.personaDetails = personaDetails
 			self.resources = resources
 			self.personaList = .init(dApp: dApp)
+			self.destination = destination
 		}
 
 		public struct Resources: Hashable, Sendable {
@@ -78,16 +76,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case openURLTapped(URL)
-		case fungibleTokenTapped(ResourceAddress)
-		case nonFungibleTokenTapped(ResourceAddress)
+		case fungibleTapped(ResourceAddress)
+		case nonFungibleTapped(ResourceAddress)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
-		case confirmDisconnectAlert(PresentationAction<ConfirmDisconnectAlert>)
-
-		public enum ConfirmDisconnectAlert: Sendable, Equatable {
-			case confirmTapped
-			case cancelTapped
-		}
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -96,14 +88,39 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
-		case tokensLoaded(Loadable<State.Resources>)
+		case resourcesLoaded(Loadable<State.Resources>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 		case dAppForgotten
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case personaDetails(PresentationAction<PersonaDetails.Action>)
 		case personas(PersonaList.Action)
+		case destination(PresentationAction<Destination.Action>)
+	}
+
+	// MARK: - Destination
+
+	public struct Destination: ReducerProtocol {
+		public enum State: Equatable, Hashable {
+			case personaDetails(PersonaDetails.State)
+			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
+		}
+
+		public enum Action: Equatable {
+			case personaDetails(PersonaDetails.Action)
+			case confirmDisconnectAlert(ConfirmDisconnectAlert)
+
+			public enum ConfirmDisconnectAlert: Sendable, Equatable {
+				case confirmTapped
+				case cancelTapped
+			}
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
+				PersonaDetails()
+			}
+		}
 	}
 
 	// MARK: Reducer
@@ -115,10 +132,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 			PersonaList()
 		}
 		Reduce(core)
-			.ifLet(\.$personaDetails, action: /Action.child .. ChildAction.personaDetails) {
-				PersonaDetails()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
-			.ifLet(\.$confirmDisconnectAlert, action: /Action.view .. ViewAction.confirmDisconnectAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -144,45 +160,49 @@ public struct DappDetails: Sendable, FeatureReducer {
 				await openURL(url)
 			}
 
-		case let .fungibleTokenTapped(token):
+		case let .fungibleTapped(token):
 			// TODO: Handle this
 			return .none
 
-		case let .nonFungibleTokenTapped(nft):
+		case let .nonFungibleTapped(nft):
 			// TODO: Handle this
 			return .none
 
 		case .dismissPersonaTapped:
-			return .send(.child(.personaDetails(.dismiss)))
+			guard case .personaDetails = state.destination else { return .none }
+			return .send(.child(.destination(.dismiss)))
 
 		case .forgetThisDappTapped:
-			state.confirmDisconnectAlert = .confirmDisconnect
-			return .none
-
-		case .confirmDisconnectAlert(.presented(.confirmTapped)):
-			return disconnectDappEffect(state: state)
-
-		case .confirmDisconnectAlert:
+			state.destination = .confirmDisconnectAlert(.confirmDisconnect)
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .personaDetails(.presented(.delegate(.personaDeauthorized))):
-			let dAppID = state.dApp.dAppDefinitionAddress
-			return update(dAppID: dAppID, dismissPersonaDetails: true)
+		case let .destination(.presented(destinationAction)):
+			switch destinationAction {
+			case .personaDetails(.delegate(.personaDeauthorized)):
+				let dAppID = state.dApp.dAppDefinitionAddress
+				return update(dAppID: dAppID, dismissPersonaDetails: true)
 
-		case .personaDetails(.presented(.delegate(.personaChanged))):
-			let dAppID = state.dApp.dAppDefinitionAddress
-			return update(dAppID: dAppID, dismissPersonaDetails: false)
+			case .personaDetails(.delegate(.personaChanged)):
+				let dAppID = state.dApp.dAppDefinitionAddress
+				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
-		case .personaDetails:
+			case .confirmDisconnectAlert(.confirmTapped):
+				return disconnectDappEffect(state: state)
+
+			default:
+				return .none
+			}
+
+		case .destination:
 			return .none
 
 		case let .personas(.delegate(.openDetails(persona))):
 			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
-			state.personaDetails = PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona))
+			state.destination = .personaDetails(PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona)))
 			return .none
 
 		case .personas:
@@ -199,18 +219,18 @@ public struct DappDetails: Sendable, FeatureReducer {
 			if let claimedEntities = state.metadata?.claimedEntities, !claimedEntities.isEmpty {
 				return .task {
 					let result = await TaskResult {
-						try await tokens(addresses: claimedEntities)
-//						try await tokens(addresses: claimedEntities, validated: dappDefinitionAddress)
+						try await resources(addresses: claimedEntities)
+//						try await resources(addresses: claimedEntities, validated: dappDefinitionAddress)
 					}
-					return .internal(.tokensLoaded(.init(result: result)))
+					return .internal(.resourcesLoaded(.init(result: result)))
 				}
 			} else {
 				state.$resources = metadata.flatMap { _ in .idle }
 				return .none
 			}
 
-		case let .tokensLoaded(tokens):
-			state.$resources = tokens
+		case let .resourcesLoaded(resources):
+			state.$resources = resources
 			return .none
 
 		case let .dAppUpdated(dApp):
@@ -230,7 +250,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func tokens(addresses: [String]) async throws -> State.Resources {
+	private func resources(addresses: [String]) async throws -> State.Resources {
 		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
 			.items
 			.compactMap(\.resourceDetails)
@@ -239,7 +259,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		             nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
 	}
 
-	private func tokens(addresses: [String], validated dAppDefinitionAddress: DappDefinitionAddress) async throws -> State.Resources {
+	private func resources(addresses: [String], validated dAppDefinitionAddress: DappDefinitionAddress) async throws -> State.Resources {
 		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
 			.items
 			.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
@@ -254,7 +274,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
 			await send(.internal(.dAppUpdated(updatedDapp)))
 			if dismissPersonaDetails {
-				await send(.child(.personaDetails(.dismiss)))
+				await send(.child(.destination(.dismiss)))
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
@@ -296,7 +316,7 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 	}
 }
 
-extension AlertState<DappDetails.ViewAction.ConfirmDisconnectAlert> {
+extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
 		AlertState {
 			TextState(L10n.DAppDetails.forgetDappAlertTitle)
