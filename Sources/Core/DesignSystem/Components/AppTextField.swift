@@ -64,7 +64,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
 			VStack(alignment: .leading, spacing: .small2) {
-				HStack {
+				HStack(spacing: 0) {
 					if let primaryHeading {
 						Text(primaryHeading)
 							.textStyle(.body1HighImportance)
@@ -72,9 +72,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 							.multilineTextAlignment(.leading)
 					}
 
-					if primaryHeading != nil || secondaryHeading != nil {
-						Spacer(minLength: 0)
-					}
+					Spacer(minLength: 0)
 
 					if let secondaryHeading {
 						Text(secondaryHeading)
