@@ -17,19 +17,12 @@ extension DappDetails {
 	public struct ViewState: Equatable {
 		let title: String
 		let description: String
-		let domain: String?
+		let domain: URL?
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
-		let otherMetadata: [MetadataItem]
 		let fungibles: [State.Resources.ResourceDetails]?
 		let nonFungibles: [State.Resources.ResourceDetails]?
 		let hasPersonas: Bool
-
-		struct MetadataItem: Identifiable, Hashable, Sendable {
-			var id: Self { self }
-			let key: String
-			let value: String
-		}
 	}
 }
 
@@ -96,23 +89,12 @@ extension DappDetails.View {
 
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
-		let ignoredKeys: Set<String> = ["description", "domain", "name", "account_type"]
-
-		let otherMetadata = metadata?.items
-			.filter { !ignoredKeys.contains($0.key) }
-			.compactMap { item in
-				item.value.asString.map {
-					DappDetails.ViewState.MetadataItem(key: item.key, value: $0)
-				}
-			} ?? []
-
-		return .init(
+		.init(
 			title: dApp.displayName.rawValue,
 			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
-			domain: metadata?.domain,
+			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
 			address: dApp.dAppDefinitionAddress,
-			otherMetadata: otherMetadata,
 			fungibles: resources?.fungible,
 			nonFungibles: resources?.nonFungible,
 			hasPersonas: !personaList.personas.isEmpty
@@ -158,16 +140,10 @@ extension DappDetails.View {
 					if let domain = viewStore.domain {
 						Text(L10n.DAppDetails.website)
 							.sectionHeading
-						Button(domain) {
-							if let url = URL(string: domain) {
-								viewStore.send(.openURLTapped(url))
-							}
-						}
-						.buttonStyle(.url)
-					}
-
-					ForEach(viewStore.otherMetadata) { item in
-						VPair(heading: item.key, item: item.value)
+//						Button(domain.stringValue) {
+//							viewStore.send(.openURLTapped(domain))
+//						}
+//						.buttonStyle(.url)
 					}
 				}
 				.padding(.horizontal, .medium1)

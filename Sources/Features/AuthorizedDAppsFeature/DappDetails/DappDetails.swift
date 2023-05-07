@@ -219,6 +219,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			if let claimedEntities = state.metadata?.claimedEntities, !claimedEntities.isEmpty {
 				return .task {
 					let result = await TaskResult {
+						// FIXME: When we can be sure that resources point back to the dapp definition we should switch to the validating version
 						try await resources(addresses: claimedEntities)
 //						try await resources(addresses: claimedEntities, validated: dappDefinitionAddress)
 					}
