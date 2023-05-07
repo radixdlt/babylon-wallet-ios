@@ -105,7 +105,7 @@ extension FaucetClient: DependencyKey {
 
 				for signer in signingEntities {
 					let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-						of: signer,
+						signerEntity: signer,
 						unhashedDataToSign: data,
 						purpose: purpose
 					)

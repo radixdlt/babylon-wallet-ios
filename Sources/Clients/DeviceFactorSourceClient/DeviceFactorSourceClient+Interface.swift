@@ -70,15 +70,15 @@ struct FailedToDeviceFactorSourceForSigning: Swift.Error {}
 // MARK: - IncorrectSignatureCountExpectedExactlyOne
 struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
-	public func signUsingDeviceFactorSource<Entity: EntityProtocol>(
-		of entity: Entity,
+	public func signUsingDeviceFactorSource(
+		signerEntity: Signer.Entity,
 		unhashedDataToSign: some DataProtocol,
 		purpose: Purpose
-	) async throws -> SignatureOf<Entity> {
+	) async throws -> SignatureOfEntity {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		switch entity.securityState {
+		switch signerEntity.securityState {
 		case let .unsecured(control):
 			let factorInstance = {
 				switch purpose {
@@ -97,7 +97,7 @@ extension DeviceFactorSourceClient {
 
 			let signatures = try await signUsingDeviceFactorSource(
 				deviceFactorSource: deviceFactorSource,
-				of: [entity],
+				signerEntities: [signerEntity],
 				unhashedDataToSign: unhashedDataToSign,
 				purpose: purpose
 			)
@@ -109,12 +109,12 @@ extension DeviceFactorSourceClient {
 		}
 	}
 
-	public func signUsingDeviceFactorSource<Entity: EntityProtocol>(
+	public func signUsingDeviceFactorSource(
 		deviceFactorSource: FactorSource,
-		of entities: Set<Entity>,
+		signerEntities: Set<Signer.Entity>,
 		unhashedDataToSign: some DataProtocol,
 		purpose: Purpose
-	) async throws -> Set<SignatureOf<Entity>> {
+	) async throws -> Set<SignatureOfEntity> {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
@@ -127,9 +127,9 @@ extension DeviceFactorSourceClient {
 		}
 		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 
-		var signatures = Set<SignatureOf<Entity>>()
+		var signatures = Set<SignatureOfEntity>()
 
-		for entity in entities {
+		for entity in signerEntities {
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 
@@ -162,8 +162,8 @@ extension DeviceFactorSourceClient {
 					derivationPath: factorInstance.derivationPath
 				)
 
-				let entitySignature = try SignatureOf(
-					entity: entity,
+				let entitySignature = try SignatureOfEntity(
+					signerEntity: entity,
 					factorInstance: factorInstance,
 					signature: sigatureWithDerivationPath
 				)

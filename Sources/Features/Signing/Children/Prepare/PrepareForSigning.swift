@@ -62,12 +62,12 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 			return .send(.delegate(.failedToBuildTX))
 
 		case let .builtTransaction(.success(transactionIntentWithSigners)):
-			let accounts = NonEmpty(
-				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerAccountsOrEmpty()) + [state.feePayer])
+			let entities = NonEmpty(
+				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()) + [.account(state.feePayer)])
 			)!
 			do {
 				state.compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
-				return loadSigningFactors(networkID: state.networkID, accounts: accounts)
+				return loadSigningFactors(networkID: state.networkID, entities: entities)
 			} catch {
 				loggerGlobal.error("Failed to compile manifest: \(error)")
 				errorQueue.schedule(error)
@@ -102,11 +102,11 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadSigningFactors(networkID: NetworkID, accounts: NonEmpty<Set<Profile.Network.Account>>) -> EffectTask<Action> {
+	private func loadSigningFactors(networkID: NetworkID, entities: NonEmpty<Set<Signer.Entity>>) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.loadSigningFactors(
 				TaskResult {
-					try await factorSourcesClient.getSigningFactors(networkID, accounts)
+					try await factorSourcesClient.getSigningFactors(networkID, entities)
 				}
 			)))
 		}

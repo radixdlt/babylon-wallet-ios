@@ -45,8 +45,8 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 	/// A set of all of the account component addresses seen in the manifest.
 	public let accountAddresses: [ComponentAddress]
 
-	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let accountsRequiringAuth: [ComponentAddress]
+	/// A set of all of the personas and account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public let entitiesRequiringAuth: [ComponentAddress]
 
 	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
 	public let accountsWithdrawnFrom: [ComponentAddress]
@@ -63,7 +63,7 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 		case componentAddresses = "component_addresses"
 
 		case accountsDepositedInto = "accounts_deposited_into"
-		case accountsRequiringAuth = "accounts_requiring_auth"
+		case entitiesRequiringAuth = "accounts_requiring_auth"
 		case accountsWithdrawnFrom = "accounts_withdrawn_from"
 	}
 }

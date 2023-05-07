@@ -11,7 +11,7 @@ public struct TransactionSigners: Sendable, Hashable {
 
 	public enum IntentSigning: Sendable, Hashable {
 		case notaryAsSignatory
-		case intentSigners(NonEmpty<OrderedSet<Profile.Network.Account>>)
+		case intentSigners(NonEmpty<OrderedSet<Signer.Entity>>)
 	}
 
 	public init(
@@ -77,19 +77,17 @@ extension TransactionSigners {
 
 	public var signerPublicKeys: Set<SLIP10.PublicKey> {
 		switch intentSigning {
-		case let .intentSigners(accounts):
-			return Set(accounts.flatMap { account in
-				account.publicKeysOfRequiredSigningKeys()
-			})
+		case let .intentSigners(signers):
+			return Set(signers.flatMap { $0.factorInstances.map(\.publicKey) })
 		case .notaryAsSignatory:
 			return []
 		}
 	}
 
-	public func intentSignerAccountsOrEmpty() -> OrderedSet<Profile.Network.Account> {
+	public func intentSignerEntitiesOrEmpty() -> OrderedSet<Signer.Entity> {
 		switch intentSigning {
 		case .notaryAsSignatory: return .init()
-		case let .intentSigners(accounts): return accounts.rawValue
+		case let .intentSigners(signers): return OrderedSet(signers)
 		}
 	}
 }

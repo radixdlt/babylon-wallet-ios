@@ -18,7 +18,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 
 	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
-		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<AccountSignature>)
+		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<SignatureOfEntity>)
 	}
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
@@ -43,7 +43,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		}
 	}
 
-	public func sign(signingFactor: SigningFactor, state: State) async throws -> Set<AccountSignature> {
+	public func sign(signingFactor: SigningFactor, state: State) async throws -> Set<SignatureOfEntity> {
 		do {
 			let expectedHash = try blake2b(data: state.dataToSign)
 			loggerGlobal.notice("\n\nExpected hash: \(expectedHash.hex)\n\n")

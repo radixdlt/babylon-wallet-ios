@@ -2,9 +2,35 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
+// MARK: - EntityBaseProtocol
+public protocol EntityBaseProtocol {
+	/// The ID of the network this entity exists on.
+	var networkID: NetworkID { get }
+
+	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
+	var securityState: EntitySecurityState { get }
+
+	/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
+	var displayName: NonEmpty<String> { get }
+}
+
+extension EntityBaseProtocol {
+	public var factorInstances: Set<FactorInstance> {
+		var factorInstances = Set<FactorInstance>()
+		switch securityState {
+		case let .unsecured(unsecuredEntityControl):
+			factorInstances.insert(unsecuredEntityControl.transactionSigning)
+			if let authSigning = unsecuredEntityControl.authenticationSigning {
+				factorInstances.insert(authSigning)
+			}
+			return factorInstances
+		}
+	}
+}
+
 // MARK: - EntityProtocol
 /// An `Account` or a `Persona`
-public protocol EntityProtocol: Sendable, Equatable, Identifiable where ID == EntityAddress {
+public protocol EntityProtocol: EntityBaseProtocol, Sendable, Equatable, Identifiable where ID == EntityAddress {
 	/// The type of address of entity.
 	associatedtype EntityAddress: AddressKindProtocol & Hashable
 	associatedtype ExtraProperties: Sendable
@@ -16,19 +42,13 @@ public protocol EntityProtocol: Sendable, Equatable, Identifiable where ID == En
 		factorInstance: FactorInstance
 	) throws -> EntityAddress
 
-	/// The ID of the network this entity exists on.
-	var networkID: NetworkID { get }
+	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
+	var securityState: EntitySecurityState { get set }
 
 	/// The globally unique and identifiable Radix component address of this entity. Can be used as
 	/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
 	/// the `DeviceFactorSource`
 	var address: EntityAddress { get }
-
-	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
-	var securityState: EntitySecurityState { get set }
-
-	/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
-	var displayName: NonEmpty<String> { get }
 
 	func cast<Entity: EntityProtocol>() throws -> Entity
 

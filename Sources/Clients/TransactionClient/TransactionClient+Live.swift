@@ -5,12 +5,18 @@ import Cryptography
 import EngineToolkitClient
 import GatewayAPI
 import GatewaysClient
+import PersonasClient
 import Resources
 
-// MARK: - MyAccountsInvolvedInTransaction
-public struct MyAccountsInvolvedInTransaction: Sendable, Hashable {
-	/// A set of all MY accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let accountsRequiringAuth: OrderedSet<Profile.Network.Account>
+// MARK: - MyEntitiesInvolvedInTransaction
+public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
+	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public let entitiesRequiringAuth: OrderedSet<Signer.Entity>
+	public var entitiesThatAreAccountsRequiringAuth: OrderedSet<Profile.Network.Account> {
+		OrderedSet(entitiesRequiringAuth.compactMap {
+			try? $0.asAccount()
+		})
+	}
 
 	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
 	public let accountsWithdrawnFrom: OrderedSet<Profile.Network.Account>
@@ -25,13 +31,14 @@ extension TransactionClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 		@Sendable
-		func myAccountsInvolvedInTransaction(
+		func myEntitiesInvolvedInTransaction(
 			networkID: NetworkID,
 			manifest: TransactionManifest
-		) async throws -> MyAccountsInvolvedInTransaction {
+		) async throws -> MyEntitiesInvolvedInTransaction {
 			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifest, networkID: networkID))
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
@@ -42,8 +49,17 @@ extension TransactionClient {
 				try .init(validating: analyzed[keyPath: keyPath].compactMap(accountFromComponentAddress))
 			}
 
-			return try MyAccountsInvolvedInTransaction(
-				accountsRequiringAuth: map(\.accountsRequiringAuth),
+			return try await MyEntitiesInvolvedInTransaction(
+				entitiesRequiringAuth: OrderedSet(validating: analyzed.entitiesRequiringAuth.asyncCompactMap { component -> Signer.Entity? in
+					if let identityAddress = try? IdentityAddress(address: component.address) {
+						let persona = try await personasClient.getPersona(id: identityAddress)
+						return Signer.Entity.persona(persona)
+					} else if let account = accountFromComponentAddress(component) {
+						return Signer.Entity.account(account)
+					} else {
+						return nil
+					}
+				}),
 				accountsWithdrawnFrom: map(\.accountsWithdrawnFrom),
 				accountsDepositedInto: map(\.accountsDepositedInto)
 			)
@@ -51,13 +67,13 @@ extension TransactionClient {
 
 		@Sendable
 		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
-			let myInvolvedAccounts = try await myAccountsInvolvedInTransaction(
+			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
 				networkID: request.networkID,
 				manifest: request.manifest
 			)
 
 			let intentSigning: TransactionSigners.IntentSigning = {
-				if let nonEmpty = NonEmpty(rawValue: myInvolvedAccounts.accountsRequiringAuth) {
+				if let nonEmpty = NonEmpty(rawValue: myInvolvedEntities.entitiesRequiringAuth) {
 					return .intentSigners(nonEmpty)
 				} else {
 					return .notaryAsSignatory
@@ -143,17 +159,18 @@ extension TransactionClient {
 
 		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let myInvolvedAccounts = try await myAccountsInvolvedInTransaction(
+			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
 				networkID: networkID,
 				manifest: manifest
 			)
 
-			loggerGlobal.debug("My involved accounts: \(myInvolvedAccounts)")
+			loggerGlobal.debug("My involved entities: \(myInvolvedEntities)")
 			var triedAccounts: Set<Profile.Network.Account> = []
+
 			func findFeePayer(
-				amongst keyPath: KeyPath<MyAccountsInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
+				amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
 			) async throws -> AddFeeToManifestOutcomeIncludesLockFee? {
-				let accountsToCheck = myInvolvedAccounts[keyPath: keyPath]
+				let accountsToCheck = myInvolvedEntities[keyPath: keyPath]
 				let involvedFeePayerCandidates = try await feePayerCandiates(
 					accounts: accountsToCheck,
 					fee: feeToAdd
@@ -187,8 +204,8 @@ extension TransactionClient {
 				loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
 				return .includesLockFee(withLockFee)
 			}
-			// no candiates amonst `accountsWithdrawnFrom` => fallback to `accountsRequiringAuth`
-			if let withLockFee = try await findFeePayer(amongst: \.accountsRequiringAuth) {
+			// no candiates amonst `accountsWithdrawnFrom` => fallback to `entitiesThatAreAccountsRequiringAuth`
+			if let withLockFee = try await findFeePayer(amongst: \.entitiesThatAreAccountsRequiringAuth) {
 				loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
 				return .includesLockFee(withLockFee)
 			}

@@ -5,7 +5,7 @@ import FeaturePrelude
 protocol SignWithFactorSourcesOfKindDelegateActionProtocol: Sendable, Equatable {
 	static func done(
 		signingFactors: NonEmpty<Set<SigningFactor>>,
-		signatures: Set<AccountSignature>
+		signatures: Set<SignatureOfEntity>
 	) -> Self
 }
 
@@ -48,13 +48,13 @@ protocol SignWithFactorSourcesOfKindReducerProtocol: Sendable, FeatureReducer, F
 	InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol,
 	ViewAction: SignWithFactorSourcesOfKindViewActionProtocol
 {
-	func sign(signingFactor: SigningFactor, state: State) async throws -> Set<AccountSignature>
+	func sign(signingFactor: SigningFactor, state: State) async throws -> Set<SignatureOfEntity>
 }
 
 extension SignWithFactorSourcesOfKindReducerProtocol {
 	func signWithSigningFactors(of state: State) -> EffectTask<Action> {
 		.run { [signingFactors = state.signingFactors] send in
-			var allSignatures = Set<AccountSignature>()
+			var allSignatures = Set<SignatureOfEntity>()
 			for signingFactor in signingFactors {
 				await send(.internal(.signingWithFactor(signingFactor)))
 				let signatures = try await sign(signingFactor: signingFactor, state: state)

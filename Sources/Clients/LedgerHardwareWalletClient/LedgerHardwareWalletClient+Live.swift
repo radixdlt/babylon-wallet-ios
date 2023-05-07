@@ -105,7 +105,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				)
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
 				let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: hashedMsg) }
-				var accountSignatures = Set<AccountSignature>()
+				var accountSignatures = Set<SignatureOfEntity>()
 
 				for requiredSigner in request.signingFactor.signers {
 					for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
@@ -118,8 +118,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							throw MissingAccountFromSignatures()
 						}
 						assert(requiredSigningFactor.derivationPath == signature.derivationPath)
-						let accountSignature = try AccountSignature(
-							account: requiredSigner.account,
+						let accountSignature = try SignatureOfEntity(
+							account: requiredSigner.entity.asAccount(),
 							signature: signature
 						)
 						accountSignatures.insert(accountSignature)
@@ -132,7 +132,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 	}()
 }
 
-extension AccountSignature {
+extension SignatureOfEntity {
 	init(
 		account: Profile.Network.Account,
 		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Validated
@@ -144,7 +144,7 @@ extension AccountSignature {
 				derivationPath: unsecuredEntityControl.transactionSigning.derivationPathOrThrow()
 			)
 			try self.init(
-				entity: account,
+				signerEntity: .account(account),
 				factorInstance: unsecuredEntityControl.transactionSigning,
 				signature: signature
 			)
@@ -214,7 +214,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 // MARK: - InvalidSignature
 struct InvalidSignature: Swift.Error {}
 
-extension SigningFactor.Signer {
+extension Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
 		factorInstancesRequiredToSign.compactMap {
 			guard let derivationPath = $0.derivationPath else {

@@ -586,6 +586,7 @@ package.addModules([
 		name: "TransactionClient",
 		dependencies: [
 			"AccountsClient",
+			"PersonasClient",
 			"AccountPortfoliosClient",
 			"EngineToolkitClient",
 			"GatewayAPI",

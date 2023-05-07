@@ -75,9 +75,10 @@ extension FactorSourcesClient: DependencyKey {
 				}
 			},
 			addOffDeviceFactorSource: addOffDeviceFactorSource,
-			getSigningFactors: { _, accounts in
-				try await signingFactors(
-					for: accounts,
+			getSigningFactors: { networkID, entities in
+				assert(entities.allSatisfy { $0.networkID == networkID })
+				return try await signingFactors(
+					for: entities,
 					from: getFactorSources().rawValue
 				)
 			},
@@ -103,13 +104,13 @@ extension FactorSourcesClient: DependencyKey {
 }
 
 internal func signingFactors(
-	for accounts: some Collection<Profile.Network.Account>,
+	for entities: some Collection<Signer.Entity>,
 	from allFactorSources: IdentifiedArrayOf<FactorSource>
 ) throws -> SigningFactors {
 	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
-	for account in accounts {
-		switch account.securityState {
+	for entity in entities {
+		switch entity.securityState {
 		case let .unsecured(unsecuredEntityControl):
 			let factorInstance = unsecuredEntityControl.transactionSigning
 			let id = factorInstance.factorSourceID
@@ -117,7 +118,7 @@ internal func signingFactors(
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}
-			let signer = SigningFactor.Signer(account: account, factorInstanceRequiredToSign: factorInstance)
+			let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
 			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
 			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactorsNotNonEmpty[factorSource.kind] {

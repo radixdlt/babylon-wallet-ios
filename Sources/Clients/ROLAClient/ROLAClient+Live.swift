@@ -233,7 +233,7 @@ extension ROLAClient {
 					origin: request.origin
 				)
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-					of: request.persona,
+					signerEntity: .persona(request.persona),
 					unhashedDataToSign: payload,
 					purpose: .signAuth
 				)

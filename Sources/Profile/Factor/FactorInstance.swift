@@ -55,14 +55,14 @@ public struct Signature: Sendable, Hashable {
 	}
 }
 
-// MARK: - SignatureOf
-public struct SignatureOf<Entity: EntityProtocol & Hashable>: Sendable, Hashable {
-	public let entity: Entity
+// MARK: - SignatureOfEntity
+public struct SignatureOfEntity: Sendable, Hashable {
+	public let signerEntity: Signer.Entity
 	public let factorInstance: FactorInstance
 	public let signature: Signature
 
 	public init(
-		entity: Entity,
+		signerEntity: Signer.Entity,
 		factorInstance: FactorInstance,
 		signature: Signature
 	) throws {
@@ -72,7 +72,7 @@ public struct SignatureOf<Entity: EntityProtocol & Hashable>: Sendable, Hashable
 		guard factorInstance.publicKey == signature.signatureWithPublicKey.publicKey else {
 			throw Error.publicKeyDiscrepancy
 		}
-		self.entity = entity
+		self.signerEntity = signerEntity
 		self.factorInstance = factorInstance
 		self.signature = signature
 	}
@@ -82,6 +82,3 @@ public struct SignatureOf<Entity: EntityProtocol & Hashable>: Sendable, Hashable
 		case publicKeyDiscrepancy
 	}
 }
-
-public typealias AccountSignature = SignatureOf<Profile.Network.Account>
-public typealias PersonaSignature = SignatureOf<Profile.Network.Persona>

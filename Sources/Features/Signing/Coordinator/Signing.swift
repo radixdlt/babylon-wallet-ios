@@ -157,8 +157,8 @@ public struct Signing: Sendable, FeatureReducer {
 						let factorSource = signingFactor.factorSource
 						print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
 						for signer in signingFactor.signers {
-							let account = signer.account
-							print("\t\t🔮 * Account: \(account.displayName) \(account.address): *")
+							let entity = signer.entity
+							print("\t\t🔮 * Entity: \(entity.displayName): *")
 							for factorInstance in signer.factorInstancesRequiredToSign {
 								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
 							}
@@ -180,7 +180,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 	private func handleSignatures(
 		signingFactors: NonEmpty<Set<SigningFactor>>,
-		signatures: Set<AccountSignature>,
+		signatures: Set<SignatureOfEntity>,
 		_ state: inout State
 	) -> EffectTask<Action> {
 		state.signatures.append(contentsOf: signatures.map(\.signature))

@@ -81,15 +81,6 @@ extension Profile.Network {
 }
 
 extension Profile.Network.Account {
-	public func publicKeysOfRequiredSigningKeys() -> Set<SLIP10.PublicKey> {
-		switch securityState {
-		case let .unsecured(control):
-			return Set([control.transactionSigning.publicKey])
-		}
-	}
-}
-
-extension Profile.Network.Account {
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable {
 		public var appearanceID: AppearanceID

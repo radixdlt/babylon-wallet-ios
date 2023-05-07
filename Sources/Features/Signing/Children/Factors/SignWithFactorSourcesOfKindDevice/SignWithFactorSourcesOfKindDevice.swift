@@ -16,7 +16,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
 		case done(
 			signingFactors: NonEmpty<Set<SigningFactor>>,
-			signatures: Set<AccountSignature>
+			signatures: Set<SignatureOfEntity>
 		)
 	}
 
@@ -44,10 +44,10 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	func sign(
 		signingFactor: SigningFactor,
 		state: State
-	) async throws -> Set<AccountSignature> {
+	) async throws -> Set<SignatureOfEntity> {
 		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: signingFactor.factorSource,
-			of: Set(signingFactor.signers.map(\.account)),
+			signerEntities: Set(signingFactor.signers.map(\.entity)),
 			unhashedDataToSign: state.dataToSign,
 			purpose: .signTransaction(.manifestFromDapp)
 		)

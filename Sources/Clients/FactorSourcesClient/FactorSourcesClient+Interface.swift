@@ -37,7 +37,7 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
-	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Profile.Network.Account>>) async throws -> SigningFactors
+	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Signer.Entity>>) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
 }
 
@@ -122,32 +122,6 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 			factorSource: factorSource,
 			signers: .init(rawValue: .init(uniqueElements: [signer]))! // ok to force unwrap since we know we have one element.
 		)
-	}
-
-	public struct Signer: Sendable, Hashable, Identifiable {
-		public typealias ID = Profile.Network.Account.ID
-		public var id: ID { account.id }
-		public let account: Profile.Network.Account
-
-		public let factorInstancesRequiredToSign: Set<FactorInstance>
-
-		init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance>) {
-			self.account = account
-			self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
-		}
-
-		// Now, before MultiFactor, this is the only public init, but once we have MultiFactor we
-		// will remove this init and always use the `, factorInstancesRequiredToSign: Set<FactorInstance>` one.
-		public init(
-			account: Profile.Network.Account,
-			factorInstanceRequiredToSign: FactorInstance
-		) {
-			switch account.securityState {
-			case let .unsecured(unsecuredEntityControl):
-				precondition(unsecuredEntityControl.transactionSigning == factorInstanceRequiredToSign)
-				self.init(account: account, factorInstancesRequiredToSign: [factorInstanceRequiredToSign])
-			}
-		}
 	}
 }
 
