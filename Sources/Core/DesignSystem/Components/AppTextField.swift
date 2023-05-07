@@ -68,7 +68,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 					if let primaryHeading {
 						Text(primaryHeading)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(accentColor)
 							.multilineTextAlignment(.leading)
 					}
 
@@ -104,7 +104,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(borderColor, lineWidth: 1)
+						.stroke(accentColor, lineWidth: 1)
 				)
 				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
@@ -116,7 +116,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		}
 	}
 
-	private var borderColor: Color {
+	private var accentColor: Color {
 		switch hint?.kind {
 		case .none:
 			return .app.gray1
