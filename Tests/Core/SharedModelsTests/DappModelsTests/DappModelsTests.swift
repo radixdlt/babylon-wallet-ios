@@ -74,7 +74,7 @@ final class ToDappResponseTests: TestCase {
 			"metadata": [
 				"networkId": 34,
 				"origin": "radixdlt.dashboard.com",
-				"dAppDefinitionAddress": "account_deadbeef",
+				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -115,7 +115,7 @@ final class ToDappResponseTests: TestCase {
 			"metadata": [
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
-				"dAppDefinitionAddress": "account_deadbeef",
+				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
 			],
 		]
 		try XCTAssertJSONDecoding(
