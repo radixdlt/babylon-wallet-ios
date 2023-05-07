@@ -21,8 +21,8 @@ extension DappDetails {
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
 		let otherMetadata: [MetadataItem]
-		let fungibleTokens: [State.Tokens.ResourceDetails]?
-		let nonFungibleTokens: [State.Tokens.ResourceDetails]?
+		let fungibles: [State.Resources.ResourceDetails]?
+		let nonFungibles: [State.Resources.ResourceDetails]?
 		let hasPersonas: Bool
 
 		struct MetadataItem: Identifiable, Hashable, Sendable {
@@ -105,8 +105,8 @@ private extension DappDetails.State {
 			thumbnail: metadata?.iconURL,
 			address: dApp.dAppDefinitionAddress,
 			otherMetadata: otherMetadata,
-			fungibleTokens: tokens?.fungible,
-			nonFungibleTokens: tokens?.nonFungible,
+			fungibles: resources?.fungible,
+			nonFungibles: resources?.nonFungible,
 			hasPersonas: !personaList.personas.isEmpty
 		)
 	}
@@ -177,7 +177,7 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.fungibleTokens, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { token in
 					TokenThumbnail(.known(token.iconURL), size: .small)
 				} action: { id in
@@ -192,7 +192,7 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.nonFungibleTokens, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { token in
 					NFTThumbnail(token.iconURL, size: .small)
 				} action: { id in

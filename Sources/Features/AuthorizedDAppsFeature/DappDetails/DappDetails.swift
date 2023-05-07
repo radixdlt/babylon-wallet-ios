@@ -27,7 +27,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
 
 		@Loadable
-		public var tokens: Tokens? = nil
+		public var resources: Resources? = nil
 
 		public var personaList: PersonaList.State
 
@@ -40,17 +40,17 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
-			tokens: Tokens? = nil,
+			resources: Resources? = nil,
 			personaDetails: PersonaDetails.State? = nil
 		) {
 			self.dApp = dApp
 			self.metadata = metadata
-			self.tokens = tokens
 			self.personaDetails = personaDetails
+			self.resources = resources
 			self.personaList = .init(dApp: dApp)
 		}
 
-		public struct Tokens: Hashable, Sendable {
+		public struct Resources: Hashable, Sendable {
 			public var fungible: [ResourceDetails]
 			public var nonFungible: [ResourceDetails]
 
@@ -96,7 +96,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
-		case tokensLoaded(Loadable<State.Tokens>)
+		case tokensLoaded(Loadable<State.Resources>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 		case dAppForgotten
 	}
@@ -125,7 +125,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			state.$metadata = .loading
-			state.$tokens = .loading
+			state.$resources = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
 				let result = await TaskResult {
@@ -205,12 +205,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 					return .internal(.tokensLoaded(.init(result: result)))
 				}
 			} else {
-				state.$tokens = metadata.flatMap { _ in .idle }
+				state.$resources = metadata.flatMap { _ in .idle }
 				return .none
 			}
 
 		case let .tokensLoaded(tokens):
-			state.$tokens = tokens
+			state.$resources = tokens
 			return .none
 
 		case let .dAppUpdated(dApp):
@@ -230,7 +230,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func tokens(addresses: [String]) async throws -> State.Tokens {
+	private func tokens(addresses: [String]) async throws -> State.Resources {
 		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
 			.items
 			.compactMap(\.resourceDetails)
@@ -239,7 +239,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		             nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
 	}
 
-	private func tokens(addresses: [String], validated dAppDefinitionAddress: DappDefinitionAddress) async throws -> State.Tokens {
+	private func tokens(addresses: [String], validated dAppDefinitionAddress: DappDefinitionAddress) async throws -> State.Resources {
 		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
 			.items
 			.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
@@ -273,7 +273,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 }
 
 extension GatewayAPI.StateEntityDetailsResponseItem {
-	var resourceDetails: DappDetails.State.Tokens.ResourceDetails? {
+	var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
 		guard let fungibility else { return nil }
 		return .init(resourceAddress: .init(address: address),
 		             fungibility: fungibility,
@@ -283,7 +283,7 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 		             iconURL: metadata.iconURL)
 	}
 
-	private var fungibility: DappDetails.State.Tokens.ResourceDetails.Fungibility? {
+	private var fungibility: DappDetails.State.Resources.ResourceDetails.Fungibility? {
 		guard let details else { return nil }
 		switch details {
 		case .fungibleResource:
