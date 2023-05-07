@@ -49,8 +49,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State? = nil
 
+		#if DEBUG
+		public var createAndUploadAuthKeyButtonState: ControlState
+		#endif
+
 		public init(_ mode: Mode) {
 			self.mode = mode
+
+			#if DEBUG
+			self.createAndUploadAuthKeyButtonState = .enabled
+			#endif
 		}
 	}
 
@@ -81,6 +89,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editablePersonaFetched(Profile.Network.Persona)
 		case reloaded(State.Mode)
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
+		case callDone(updateControlState: WritableKeyPath<State, ControlState>)
+		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 	}
 
 	// MARK: - Destination
@@ -157,8 +167,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-			return .run { [identityAddress = state.mode.id] _ in
-				try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: identityAddress))
+			return call(buttonState: \.createAndUploadAuthKeyButtonState, into: &state) {
+				try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: $0))
 			}
 		#endif
 
@@ -213,6 +223,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case let .reloaded(mode):
 			state.mode = mode
 			return .none
+
+		case let .hideLoader(controlStateKeyPath):
+			state[keyPath: controlStateKeyPath] = .enabled
+			return .none
+
+		case let .callDone(controlStateKeyPath):
+			state[keyPath: controlStateKeyPath] = .enabled
+			return .none
 		}
 	}
 
@@ -244,6 +262,23 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			}
 		}
 		return dApps
+	}
+
+	private func call(
+		buttonState: WritableKeyPath<State, ControlState>,
+		into state: inout State,
+		call: @escaping @Sendable (IdentityAddress) async throws -> Void
+	) -> EffectTask<Action> {
+		state[keyPath: buttonState] = .loading(.local)
+		return .run { [address = state.mode.id] send in
+			try await call(address)
+			await send(.internal(.callDone(updateControlState: buttonState)))
+		} catch: { error, send in
+			await send(.internal(.hideLoader(updateControlState: buttonState)))
+			if !Task.isCancelled {
+				errorQueue.schedule(error)
+			}
+		}
 	}
 
 	enum ReloadError: Error {

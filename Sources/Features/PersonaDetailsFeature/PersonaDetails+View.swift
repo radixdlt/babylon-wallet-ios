@@ -17,6 +17,10 @@ extension PersonaDetails {
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
+
+		#if DEBUG
+		public var createAndUploadAuthKeyButtonState: ControlState
+		#endif // DEBUG
 	}
 }
 
@@ -33,10 +37,19 @@ extension PersonaDetails.View {
 					InfoSection(store: store.actionless)
 
 					#if DEBUG
-					Button("Create & Upload Auth Key") {
-						viewStore.send(.createAndUploadAuthKeyButtonTapped)
+					VStack {
+						Button("Create & Upload Auth Key") {
+							viewStore.send(.createAndUploadAuthKeyButtonTapped)
+						}
+						.controlState(viewStore.createAndUploadAuthKeyButtonState)
+						.buttonStyle(.secondaryRectangular)
+
+						if viewStore.createAndUploadAuthKeyButtonState.isLoading {
+							Text("Creating and uploading auth Key")
+								.font(.app.body2Regular)
+								.foregroundColor(.app.gray1)
+						}
 					}
-					.buttonStyle(.secondaryRectangular)
 					#endif
 
 					Button(L10n.PersonaDetails.editPersona) {
@@ -95,7 +108,20 @@ private extension StoreOf<PersonaDetails> {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(thumbnail: nil, personaName: personaName, isDappPersona: isDappPersona)
+		#if DEBUG
+		.init(
+			thumbnail: nil,
+			personaName: personaName,
+			isDappPersona: isDappPersona,
+			createAndUploadAuthKeyButtonState: createAndUploadAuthKeyButtonState
+		)
+		#else
+		.init(
+				thumbnail: nil,
+				personaName: personaName,
+				isDappPersona: isDappPersona
+			)
+		#endif
 	}
 
 	var personaName: String {
