@@ -10,7 +10,7 @@ final class ToDappResponseTests: TestCase {
 					oneTimeAccounts: .withoutProof(.init(
 						accounts: [
 							.init(
-								accountAddress: try! .init(address: "address"),
+								accountAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
 								label: "Label",
 								appearanceId: .fromIndex(0)
 							),
