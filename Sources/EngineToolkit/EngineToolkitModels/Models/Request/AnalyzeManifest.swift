@@ -46,7 +46,7 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 	public let accountAddresses: [ComponentAddress]
 
 	/// A set of all of the personas and account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let entitiesRequiringAuth: [ComponentAddress]
+	public var entitiesRequiringAuth: [ComponentAddress] // mutable for now, since we need to insert Identities manually until ET support them
 
 	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
 	public let accountsWithdrawnFrom: [ComponentAddress]

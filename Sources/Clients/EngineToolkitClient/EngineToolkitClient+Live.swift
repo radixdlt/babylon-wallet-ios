@@ -15,30 +15,31 @@ extension EngineToolkitClient {
 			).get()
 		}
 
+		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { request in
+
+			let converted = try engineToolkit.convertManifest(
+				request: .init(
+					manifest: request.manifest,
+					outputFormat: .parsed,
+					networkId: request.networkID
+				)
+			)
+			.get()
+
+			guard case let .parsed(instructions) = converted.instructions else {
+				throw FailedToConvertManifestToFormatWhereInstructionsAreJSON()
+			}
+
+			return JSONInstructionsTransactionManifest(
+				instructions: instructions,
+				convertedManifestThatContainsThem: converted
+			)
+		}
+
 		return Self(
 			getTransactionVersion: { TXVersion.default },
 			generateTXNonce: generateTXNonce,
-			convertManifestInstructionsToJSONIfItWasString: { request in
-
-				let converted = try engineToolkit.convertManifest(
-					request: .init(
-						manifest: request.manifest,
-						outputFormat: .parsed,
-						networkId: request.networkID
-					)
-				)
-				.get()
-
-				guard case let .parsed(instructions) = converted.instructions else {
-					throw FailedToConvertManifestToFormatWhereInstructionsAreJSON()
-				}
-
-				return JSONInstructionsTransactionManifest(
-					instructions: instructions,
-					convertedManifestThatContainsThem: converted
-				)
-
-			},
+			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			compileTransactionIntent: compileTransactionIntent,
 			compileSignedTransactionIntent: {
 				try engineToolkit
@@ -70,7 +71,33 @@ extension EngineToolkitClient {
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
 			analyzeManifest: { request in
-				try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
+				var res = try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
+
+				let identityAddresses = res.componentAddresses.compactMap { try? IdentityAddress(address: $0.address) }
+
+				guard
+					!identityAddresses.isEmpty,
+					let manifestWithJSONInstr = try? convertManifestInstructionsToJSONIfItWasString(.init(
+						version: .default,
+						networkID: request.networkID,
+						manifest: request.manifest
+					))
+				else {
+					return res
+				}
+
+				for instruction in manifestWithJSONInstr.instructions {
+					if
+						case let .setMetadata(setMetadataInstruction) = instruction,
+						setMetadataInstruction.key == SetMetadata.ownerKeysKey,
+						let toAdd = identityAddresses.first(where: { $0.address == setMetadataInstruction.entityAddress.address })
+					{
+						loggerGlobal.notice("'Manually' inserting Identity for SetMetadata instruction into 'entitiesRequiringAuth': \(toAdd)")
+						res.entitiesRequiringAuth.append(.init(address: toAdd.address))
+					}
+				}
+
+				return res
 			},
 			analyzeManifestWithPreviewContext: { manifestWithPreviewContext in
 				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
@@ -84,3 +111,7 @@ extension EngineToolkitClient {
 
 // MARK: - FailedToConvertManifestToFormatWhereInstructionsAreJSON
 struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
+
+extension SetMetadata {
+	public static let ownerKeysKey = "owner_keys"
+}

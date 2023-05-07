@@ -56,7 +56,7 @@ extension ROLAClient {
 			// https://github.com/radixdlt/radixdlt-scrypto/blob/main/transaction/examples/metadata/metadata.rtm#L97-L101
 			let setMetadataInstruction = try SetMetadata(
 				entityAddress: .init(address: entityAddress),
-				key: GatewayAPI.EntityMetadataCollection.ownerKeysKey,
+				key: SetMetadata.ownerKeysKey,
 				value: Enum(
 					.metadataEntry,
 					fields: [.array(.init(
@@ -288,12 +288,10 @@ func payloadToHash(
 }
 
 extension GatewayAPI.EntityMetadataCollection {
-	public static let ownerKeysKey = "owner_keys"
-
 	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
 	// terrible parsing mess.
 	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
-		guard let response: GatewayAPI.EntityMetadataItemValue = self[Self.ownerKeysKey] else {
+		guard let response: GatewayAPI.EntityMetadataItemValue = self[SetMetadata.ownerKeysKey] else {
 			return nil
 		}
 
