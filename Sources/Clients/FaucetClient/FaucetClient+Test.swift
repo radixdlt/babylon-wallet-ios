@@ -33,7 +33,7 @@ extension FaucetClient {
 	public static let noop = Self(
 		getFreeXRD: { _ in },
 		isAllowedToUseFaucet: { _ in true },
-		signSubmitSimpleTX: { _ in }
+		signSubmitSimpleTX: { _, _ in }
 	)
 	#endif
 }
