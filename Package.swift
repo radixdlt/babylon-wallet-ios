@@ -125,6 +125,7 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"EditPersonaFeature",
+			"ROLAClient",
 		],
 		tests: .no
 	),

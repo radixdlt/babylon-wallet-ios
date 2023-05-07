@@ -32,6 +32,13 @@ extension PersonaDetails.View {
 
 					InfoSection(store: store.actionless)
 
+					#if DEBUG
+					Button("Create & Upload Auth Key") {
+						viewStore.send(.createAndUploadAuthKeyButtonTapped)
+					}
+					.buttonStyle(.secondaryRectangular)
+					#endif
+
 					Button(L10n.PersonaDetails.editPersona) {
 						viewStore.send(.editPersonaTapped)
 					}

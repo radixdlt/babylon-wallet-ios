@@ -77,6 +77,70 @@ extension ROLAClient {
 			loggerGlobal.debug("Submimtted TX updating ownerKeys!")
 		}
 
+		@Sendable func createAndUploadNewAuth<Entity: EntityProtocol>(
+			for entity: inout Entity,
+			authSignDerivationPath makeAuthSignDerivationPath: (DerivationPath) throws -> DerivationPath
+		) async throws {
+			@Dependency(\.factorSourcesClient) var factorSourcesClient
+			@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+
+			let factorSourceID: FactorSourceID
+			let authSignDerivationPath: DerivationPath
+			let transactionSigning: FactorInstance
+			var unsecuredEntityControl: UnsecuredEntityControl
+			switch entity.securityState {
+			case let .unsecured(unsecuredEntityControl_):
+				unsecuredEntityControl = unsecuredEntityControl_
+				transactionSigning = unsecuredEntityControl.transactionSigning
+				guard unsecuredEntityControl.authenticationSigning == nil else {
+					loggerGlobal.notice("Entity: \(entity.id) already has an authenticationSigning")
+					return
+				}
+
+				loggerGlobal.notice("Entity: \(entity.id) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
+				factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
+				guard let hdPath = unsecuredEntityControl.transactionSigning.derivationPath else {
+					fatalError()
+				}
+				authSignDerivationPath = try makeAuthSignDerivationPath(hdPath)
+			}
+			let factorSources = try await factorSourcesClient.getFactorSources()
+			guard
+				let factorSource = factorSources[id: factorSourceID]
+			else {
+				fatalError()
+			}
+
+			let babylonDeviceFactorSource = try BabylonDeviceFactorSource(factorSource: factorSource)
+
+			let authenticationSigning: FactorInstance = try await {
+				let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
+					.init(
+						hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
+						derivationPath: authSignDerivationPath,
+						curve: .curve25519, // we always use Curve25519 for new accounts
+						loadMnemonicPurpose: .createSignAuthKey
+					)
+				)
+
+				return try FactorInstance(
+					factorSourceID: babylonDeviceFactorSource.id,
+					publicKey: .init(engine: publicKey),
+					derivationPath: authSignDerivationPath
+				)
+			}()
+			loggerGlobal.notice("Entity: \(entity.id) created and is about to upload authenticationSigning key: \(authenticationSigning.publicKey)")
+
+			try await addOwnerKey(
+				newPublicKey: authenticationSigning.publicKey,
+				for: entity,
+				assertingTransactionSigningKeyIsNotRemoved: transactionSigning.publicKey
+			)
+
+			unsecuredEntityControl.authenticationSigning = authenticationSigning
+			entity.securityState = .unsecured(unsecuredEntityControl)
+		}
+
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
 				let metadataCollection = try await cacheClient.withCaching(
@@ -149,76 +213,17 @@ extension ROLAClient {
 				}
 			},
 			createAuthSigningKeyForAccountIfNeeded: { request in
-
 				@Dependency(\.accountsClient) var accountsClient
-				@Dependency(\.factorSourcesClient) var factorSourcesClient
-				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
-
 				var account = try await accountsClient.getAccountByAddress(request.accountAddress)
-
-				let factorSourceID: FactorSourceID
-				let signingKeyDerivationPath: AccountBabylonDerivationPath
-				let transactionSigning: FactorInstance
-				var unsecuredEntityControl: UnsecuredEntityControl
-				switch account.securityState {
-				case let .unsecured(unsecuredEntityControl_):
-					unsecuredEntityControl = unsecuredEntityControl_
-					transactionSigning = unsecuredEntityControl.transactionSigning
-					guard unsecuredEntityControl.authenticationSigning == nil else {
-						loggerGlobal.notice("Entity: \(request.accountAddress) already has an authenticationSigning")
-						return
-					}
-
-					loggerGlobal.notice("Entity: \(request.accountAddress) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
-					factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
-					guard let hdPath = unsecuredEntityControl.transactionSigning.derivationPath else {
-						fatalError()
-					}
-					signingKeyDerivationPath = try hdPath.asAccountPath().asBabylonAccountPath()
-				}
-				let factorSources = try await factorSourcesClient.getFactorSources()
-				guard
-					let factorSource = factorSources[id: factorSourceID]
-				else {
-					fatalError()
-				}
-
-				let babylonDeviceFactorSource = try BabylonDeviceFactorSource(factorSource: factorSource)
-				let authKeyDerivationPath = try signingKeyDerivationPath.switching(keyKind: .authenticationSigning)
-				let derivationPath = authKeyDerivationPath.wrapAsDerivationPath()
-
-				let authenticationSigning: FactorInstance = try await {
-					let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
-						.init(
-							hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
-							derivationPath: derivationPath,
-							curve: .curve25519, // we always use Curve25519 for new accounts
-							loadMnemonicPurpose: .createSignAuthKey
-						)
-					)
-
-					return try FactorInstance(
-						factorSourceID: babylonDeviceFactorSource.id,
-						publicKey: .init(engine: publicKey),
-						derivationPath: derivationPath
-					)
-				}()
-				loggerGlobal.notice("Entity: \(request.accountAddress) created and is about to upload authenticationSigning key: \(authenticationSigning.publicKey)")
-
-				try await addOwnerKey(
-					newPublicKey: authenticationSigning.publicKey,
-					for: account,
-					assertingTransactionSigningKeyIsNotRemoved: transactionSigning.publicKey
-				)
-
-				unsecuredEntityControl.authenticationSigning = authenticationSigning
-				account.securityState = .unsecured(unsecuredEntityControl)
-
+				try await createAndUploadNewAuth(for: &account) { try $0.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
 				try await accountsClient.updateAccount(account)
-				// DONE
-
 			},
-			createAuthSigningKeyForPersonaIfNeeded: { _ in },
+			createAuthSigningKeyForPersonaIfNeeded: { request in
+				@Dependency(\.personasClient) var personasClient
+				var persona = try await personasClient.getPersona(id: request.identityAddress)
+				try await createAndUploadNewAuth(for: &persona) { try $0.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
+				try await personasClient.updatePersona(persona)
+			},
 			signAuthChallenge: { request in
 				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 

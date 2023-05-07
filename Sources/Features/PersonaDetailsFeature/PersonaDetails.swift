@@ -2,6 +2,7 @@ import AuthorizedDappsClient
 import EditPersonaFeature
 import FeaturePrelude
 import GatewayAPI
+import ROLAClient
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
@@ -11,6 +12,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	public typealias Store = StoreOf<Self>
+
+	@Dependency(\.rolaClient) var rolaClient
 
 	public init() {}
 
@@ -60,6 +63,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
+		#if DEBUG
+		case createAndUploadAuthKeyButtonTapped
+		#endif
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -148,6 +154,13 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .task {
 				await .internal(.dAppsUpdated(addingDappMetadata(to: dApps)))
 			}
+
+		#if DEBUG
+		case .createAndUploadAuthKeyButtonTapped:
+			return .run { [identityAddress = state.mode.id] _ in
+				try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: identityAddress))
+			}
+		#endif
 
 		case let .accountTapped(address):
 			return .none
