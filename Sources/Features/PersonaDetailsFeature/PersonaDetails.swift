@@ -57,7 +57,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			self.mode = mode
 
 			#if DEBUG
-			self.createAndUploadAuthKeyButtonState = .enabled
+			let hasAuthenticationSigningKey: Bool
+			switch mode {
+			case let .general(persona, _):
+				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
+			case let .dApp(_, persona):
+				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
+			}
+			self.createAndUploadAuthKeyButtonState = hasAuthenticationSigningKey ? .disabled : .enabled
 			#endif
 		}
 	}
@@ -89,7 +96,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editablePersonaFetched(Profile.Network.Persona)
 		case reloaded(State.Mode)
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
-		case callDone(updateControlState: WritableKeyPath<State, ControlState>)
+		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 	}
 
@@ -167,7 +174,11 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-			return call(buttonState: \.createAndUploadAuthKeyButtonState, into: &state) {
+			return call(
+				buttonState: \.createAndUploadAuthKeyButtonState,
+				into: &state,
+				onSuccess: .disabled // should not be able to create another auth key
+			) {
 				try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: $0))
 			}
 		#endif
@@ -228,8 +239,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			state[keyPath: controlStateKeyPath] = .enabled
 			return .none
 
-		case let .callDone(controlStateKeyPath):
-			state[keyPath: controlStateKeyPath] = .enabled
+		case let .callDone(controlStateKeyPath, newState):
+			state[keyPath: controlStateKeyPath] = newState
 			return .none
 		}
 	}
@@ -267,12 +278,13 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	private func call(
 		buttonState: WritableKeyPath<State, ControlState>,
 		into state: inout State,
+		onSuccess: ControlState,
 		call: @escaping @Sendable (IdentityAddress) async throws -> Void
 	) -> EffectTask<Action> {
 		state[keyPath: buttonState] = .loading(.local)
 		return .run { [address = state.mode.id] send in
 			try await call(address)
-			await send(.internal(.callDone(updateControlState: buttonState)))
+			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
 		} catch: { error, send in
 			await send(.internal(.hideLoader(updateControlState: buttonState)))
 			if !Task.isCancelled {

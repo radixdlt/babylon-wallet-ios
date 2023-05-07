@@ -26,6 +26,13 @@ extension EntityBaseProtocol {
 			return factorInstances
 		}
 	}
+
+	public var hasAuthenticationSigningKey: Bool {
+		switch securityState {
+		case let .unsecured(unsecuredEntityControl):
+			return unsecuredEntityControl.authenticationSigning != nil
+		}
+	}
 }
 
 // MARK: - EntityProtocol

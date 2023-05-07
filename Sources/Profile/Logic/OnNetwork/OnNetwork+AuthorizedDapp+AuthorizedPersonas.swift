@@ -37,6 +37,9 @@ extension Profile.Network {
 		/// The persona data that the user has given the Dapp access to,
 		/// being the trippple: `(id, kind, value)`
 		public let sharedFields: IdentifiedArrayOf<Profile.Network.Persona.Field>?
+
+		/// If this persona has an auth sign key created
+		public let hasAuthenticationSigningKey: Bool
 	}
 
 	public struct AuthorizedDappDetailed: Sendable, Hashable {
@@ -89,7 +92,7 @@ extension Profile.Network {
 						persona.fields.first { $0.id == fieldID }
 					}
 					return .init(uniqueElements: presentFields)
-				}()
+				}(), hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
 			)
 		})
 
