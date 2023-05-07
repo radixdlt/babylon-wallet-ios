@@ -73,7 +73,7 @@ public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.Sta
 extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
-		case .personaLabel: return L10n.PersonaDetails.personaNameHeading
+		case .personaLabel: return L10n.PersonaDetails.personaLabelHeading
 		}
 	}
 
