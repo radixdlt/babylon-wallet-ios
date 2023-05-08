@@ -7,6 +7,8 @@ extension RestoreFromBackup {
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<RestoreFromBackup>
+		let formatter = DateFormatter()
+
 		public init(store: StoreOf<RestoreFromBackup>) {
 			self.store = store
 		}
@@ -18,6 +20,7 @@ extension RestoreFromBackup.View {
 		ForceFullScreen {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
+					// TODO: This is speculative design, needs to be updated once we have the proper design
 					VStack(spacing: .medium1) {
 						Button("Import Backup data") {
 							viewStore.send(.tappedImportProfile)
@@ -32,7 +35,6 @@ extension RestoreFromBackup.View {
 							Spacer()
 						}
 
-						// TODO: Display the loading
 						if let backupProfiles = viewStore.backupProfiles {
 							Selection(
 								viewStore.binding(
@@ -43,7 +45,7 @@ extension RestoreFromBackup.View {
 								),
 								from: backupProfiles
 							) { item in
-								backupDataCard(item)
+								iCloudBackupDataCard(item)
 									.onTapGesture {
 										item.action()
 									}
@@ -57,7 +59,8 @@ extension RestoreFromBackup.View {
 						} else {
 							Text("No iCloud Backup Data")
 						}
-					}.padding([.horizontal, .bottom], .medium1)
+					}
+					.padding([.horizontal, .bottom], .medium1)
 				}
 				.fileImporter(
 					isPresented: viewStore.binding(
@@ -76,12 +79,13 @@ extension RestoreFromBackup.View {
 		}
 	}
 
-	func backupDataCard(_ item: SelectionItem<Profile>) -> some View {
+	private func iCloudBackupDataCard(_ item: SelectionItem<Profile>) -> some View {
 		let profile = item.value
 
 		return Card {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
+					// TODO: Proper fields to be updated based on the final UX
 					Text("Creating Device: \(profile.header.creatingDevice.description)")
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
@@ -102,7 +106,6 @@ extension RestoreFromBackup.View {
 	}
 
 	func formatDate(_ date: Date) -> String {
-		let formatter = DateFormatter()
 		formatter.dateFormat = "d MMM YYY"
 		return formatter.string(from: date)
 	}

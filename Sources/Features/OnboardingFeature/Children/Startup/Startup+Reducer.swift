@@ -3,7 +3,6 @@ import OnboardingClient
 
 public struct Startup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		// MARK: - Destinations
 		@PresentationState
 		public var destination: Destinations.State?
 
@@ -16,7 +15,7 @@ public struct Startup: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case createNewUser
+		case setupNewUser
 		case completed
 	}
 
@@ -50,7 +49,7 @@ public struct Startup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .selectedNewWalletUser:
-			return .send(.delegate(.createNewUser))
+			return .send(.delegate(.setupNewUser))
 		case .selectedRestoreFromBackup:
 			state.destination = .restoreFromBackup(.init())
 			return .none

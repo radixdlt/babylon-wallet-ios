@@ -56,7 +56,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .startup(.delegate(.createNewUser)):
+		case .startup(.delegate(.setupNewUser)):
 			state = .createAccountCoordinator(
 				.init(
 					config: .init(purpose: .firstAccountForNewProfile),
@@ -64,6 +64,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 				)
 			)
 			return .none
+
 		case .startup(.delegate(.completed)):
 			return .send(.delegate(.completed))
 
