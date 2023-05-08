@@ -277,7 +277,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					VPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
+					VPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
 
 					Separator()
 
