@@ -169,7 +169,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			}
 
 		case let .destination(.presented(.createAuthKey(.delegate(.done(wasSuccessful))))):
+			#if DEBUG
 			state.canCreateAuthKey = false
+			#endif
 			state.destination = nil
 			return .none
 
