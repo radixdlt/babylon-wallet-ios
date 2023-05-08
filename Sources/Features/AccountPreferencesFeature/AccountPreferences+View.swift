@@ -6,7 +6,7 @@ extension AccountPreferences.State {
 		#if DEBUG
 		return .init(
 			faucetButtonState: faucetButtonState,
-			createAndUploadAuthKeyButtonState: createAndUploadAuthKeyButtonState,
+			canCreateAuthSigningKey: canCreateAuthSigningKey,
 			createFungibleTokenButtonState: createFungibleTokenButtonState,
 			createNonFungibleTokenButtonState: createNonFungibleTokenButtonState,
 			createMultipleFungibleTokenButtonState: createMultipleFungibleTokenButtonState,
@@ -24,7 +24,7 @@ extension AccountPreferences {
 		public var faucetButtonState: ControlState
 
 		#if DEBUG
-		public var createAndUploadAuthKeyButtonState: ControlState
+		public var canCreateAuthSigningKey: Bool
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
 		public var createMultipleFungibleTokenButtonState: ControlState
@@ -34,14 +34,14 @@ extension AccountPreferences {
 		#if DEBUG
 		public init(
 			faucetButtonState: ControlState,
-			createAndUploadAuthKeyButtonState: ControlState,
+			canCreateAuthSigningKey: Bool,
 			createFungibleTokenButtonState: ControlState,
 			createNonFungibleTokenButtonState: ControlState,
 			createMultipleFungibleTokenButtonState: ControlState,
 			createMultipleNonFungibleTokenButtonState: ControlState
 		) {
 			self.faucetButtonState = faucetButtonState
-			self.createAndUploadAuthKeyButtonState = createAndUploadAuthKeyButtonState
+			self.canCreateAuthSigningKey = canCreateAuthSigningKey
 			self.createFungibleTokenButtonState = createFungibleTokenButtonState
 			self.createNonFungibleTokenButtonState = createNonFungibleTokenButtonState
 			self.createMultipleFungibleTokenButtonState = createMultipleFungibleTokenButtonState
@@ -124,13 +124,7 @@ extension AccountPreferences.View {
 			viewStore.send(.createAndUploadAuthKeyButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
-		.controlState(viewStore.createAndUploadAuthKeyButtonState)
-
-		if viewStore.createAndUploadAuthKeyButtonState.isLoading {
-			Text("Creating and uploading auth Key")
-				.font(.app.body2Regular)
-				.foregroundColor(.app.gray1)
-		}
+		.controlState(viewStore.canCreateAuthSigningKey ? .enabled : .disabled)
 	}
 
 	@ViewBuilder

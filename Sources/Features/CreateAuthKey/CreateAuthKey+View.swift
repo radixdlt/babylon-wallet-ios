@@ -48,6 +48,6 @@ struct CreateAuthKey_Preview: PreviewProvider {
 }
 
 extension CreateAuthKey.State {
-	public static let previewValue = Self()
+	public static let previewValue = Self(entity: .account(.previewValue0))
 }
 #endif
