@@ -52,7 +52,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		#if DEBUG
-		public var createAndUploadAuthKeyButtonState: ControlState
+		public var canCreateAuthKey: Bool
 		#endif
 
 		public init(_ mode: Mode) {
@@ -66,7 +66,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case let .dApp(_, persona):
 				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
 			}
-			self.createAndUploadAuthKeyButtonState = hasAuthenticationSigningKey ? .disabled : .enabled
+			self.canCreateAuthKey = !hasAuthenticationSigningKey
 			#endif
 		}
 	}
@@ -169,6 +169,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			}
 
 		case let .destination(.presented(.createAuthKey(.delegate(.done(wasSuccessful))))):
+			state.canCreateAuthKey = false
 			state.destination = nil
 			return .none
 
