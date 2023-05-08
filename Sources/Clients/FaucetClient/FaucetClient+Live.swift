@@ -85,37 +85,6 @@ extension FaucetClient: DependencyKey {
 			try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 		}
 
-		let signSubmitSimpleTX: SignSubmitSimpleTX = { manifestWithoutLockFee, purpose in
-			@Dependency(\.transactionClient) var transactionClient
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let lockFeeInstr = try engineToolkitClient.lockFeeCallMethod(faucetForNetwork: networkID, fee: "10")
-			let manifest = try await transactionClient.addInstructionToManifest(.init(
-				lockFeeInstr,
-				to: manifestWithoutLockFee,
-				at: .lockFee
-			))
-
-			try await signSubmitTX(manifest: manifest) { data, signers in
-				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
-				guard case let .intentSigners(signingEntities) = signers.intentSigning else {
-					return []
-				}
-
-				var signatures = Set<Engine.SignatureWithPublicKey>()
-
-				for signer in signingEntities {
-					let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-						signerEntity: signer,
-						unhashedDataToSign: data,
-						purpose: purpose
-					)
-					try signatures.insert(signature.signature.signatureWithPublicKey.intoEngine())
-				}
-
-				return signatures
-			}
-		}
-
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
 
 			let accountAddress = faucetRequest.recipientAccountAddress
@@ -194,17 +163,15 @@ extension FaucetClient: DependencyKey {
 		}
 
 		return Self(
-			getFreeXRD: getFreeXRD,
+		getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet,
 			createFungibleToken: createFungibleToken,
-			createNonFungibleToken: createNonFungibleToken,
-			signSubmitSimpleTX: signSubmitSimpleTX
+			createNonFungibleToken: createNonFungibleToken
 		)
 		#else
 		return Self(
-			getFreeXRD: getFreeXRD,
-			isAllowedToUseFaucet: isAllowedToUseFaucet,
-			signSubmitSimpleTX: signSubmitSimpleTX
+		getFreeXRD: getFreeXRD,
+			isAllowedToUseFaucet: isAllowedToUseFaucet
 		)
 		#endif // DEBUG
 	}()

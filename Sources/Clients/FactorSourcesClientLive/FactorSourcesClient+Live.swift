@@ -104,7 +104,7 @@ extension FactorSourcesClient: DependencyKey {
 }
 
 internal func signingFactors(
-	for entities: some Collection<Signer.Entity>,
+	for entities: some Collection<EntityPotentiallyVirtual>,
 	from allFactorSources: IdentifiedArrayOf<FactorSource>
 ) throws -> SigningFactors {
 	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]

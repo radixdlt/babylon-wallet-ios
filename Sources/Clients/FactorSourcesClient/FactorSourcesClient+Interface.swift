@@ -37,7 +37,7 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
-	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Signer.Entity>>) async throws -> SigningFactors
+	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<EntityPotentiallyVirtual>>) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
 }
 

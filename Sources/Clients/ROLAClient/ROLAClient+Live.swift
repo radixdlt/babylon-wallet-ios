@@ -73,8 +73,6 @@ extension ROLAClient {
 				]
 			)
 
-//			try await faucetClient.signSubmitSimpleTX(manifest, .signTransaction(.internalManifest(.uploadAuthKey)))
-//			loggerGlobal.debug("Submimtted TX updating ownerKeys!")
 			return manifest
 		}
 
@@ -213,17 +211,20 @@ extension ROLAClient {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
-			createAuthSigningKeyForAccountIfNeeded: { request in
-				@Dependency(\.accountsClient) var accountsClient
-				var account = try await accountsClient.getAccountByAddress(request.accountAddress)
-				try await createAndUploadNewAuth(for: &account) { try $0.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
-				try await accountsClient.updateAccount(account)
-			},
-			createAuthSigningKeyForPersonaIfNeeded: { request in
-				@Dependency(\.personasClient) var personasClient
-				var persona = try await personasClient.getPersona(id: request.identityAddress)
-				try await createAndUploadNewAuth(for: &persona) { try $0.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
-				try await personasClient.updatePersona(persona)
+//			createAuthSigningKeyForAccountIfNeeded: { request in
+//				@Dependency(\.accountsClient) var accountsClient
+//				var account = try await accountsClient.getAccountByAddress(request.accountAddress)
+//				try await createAndUploadNewAuth(for: &account) { try $0.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
+//				try await accountsClient.updateAccount(account)
+//			},
+//			createAuthSigningKeyForPersonaIfNeeded: { request in
+//				@Dependency(\.personasClient) var personasClient
+//				var persona = try await personasClient.getPersona(id: request.identityAddress)
+//				try await createAndUploadNewAuth(for: &persona) { try $0.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
+//				try await personasClient.updatePersona(persona)
+//			},
+			manifestForAuthKeyCreationRequest: { _ in
+				fatalError()
 			},
 			signAuthChallenge: { request in
 				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient

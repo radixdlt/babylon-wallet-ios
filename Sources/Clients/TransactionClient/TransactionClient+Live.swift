@@ -11,7 +11,7 @@ import Resources
 // MARK: - MyEntitiesInvolvedInTransaction
 public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let entitiesRequiringAuth: OrderedSet<Signer.Entity>
+	public let entitiesRequiringAuth: OrderedSet<EntityPotentiallyVirtual>
 	public var entitiesThatAreAccountsRequiringAuth: OrderedSet<Profile.Network.Account> {
 		OrderedSet(entitiesRequiringAuth.compactMap {
 			try? $0.asAccount()
@@ -50,12 +50,12 @@ extension TransactionClient {
 			}
 
 			return try await MyEntitiesInvolvedInTransaction(
-				entitiesRequiringAuth: OrderedSet(validating: analyzed.entitiesRequiringAuth.asyncCompactMap { component -> Signer.Entity? in
+				entitiesRequiringAuth: OrderedSet(validating: analyzed.entitiesRequiringAuth.asyncCompactMap { component -> EntityPotentiallyVirtual? in
 					if let identityAddress = try? IdentityAddress(address: component.address) {
 						let persona = try await personasClient.getPersona(id: identityAddress)
-						return Signer.Entity.persona(persona)
+						return EntityPotentiallyVirtual.persona(persona)
 					} else if let account = accountFromComponentAddress(component) {
-						return Signer.Entity.account(account)
+						return EntityPotentiallyVirtual.account(account)
 					} else {
 						return nil
 					}

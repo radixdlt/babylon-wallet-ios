@@ -37,7 +37,7 @@ package.addModules([
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
-			"ROLAClient",
+			"CreateAuthKeyFeature",
 		],
 		tests: .yes()
 	),
@@ -77,6 +77,15 @@ package.addModules([
 			"EditPersonaFeature",
 			"PersonasFeature",
 			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "CreateAuthKeyFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"TransactionReviewFeature",
+			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -125,8 +134,7 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"EditPersonaFeature",
-			"ROLAClient",
-			"TransactionReviewFeature",
+			"CreateAuthKeyFeature",
 		],
 		tests: .no
 	),

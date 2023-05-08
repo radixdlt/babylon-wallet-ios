@@ -8,11 +8,6 @@ public struct FaucetClient: Sendable {
 	public var getFreeXRD: GetFreeXRD
 	public var isAllowedToUseFaucet: IsAllowedToUseFaucet
 
-	// FIXME: move `signSubmitSimpleTX` to some other client! but which?
-	/// A "simple TX" is a transaction which cannot require signing of any factor source except
-	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
-	public var signSubmitSimpleTX: SignSubmitSimpleTX
-
 	#if DEBUG
 	public var createFungibleToken: CreateFungibleToken
 	public var createNonFungibleToken: CreateNonFungibleToken
@@ -21,24 +16,20 @@ public struct FaucetClient: Sendable {
 		getFreeXRD: @escaping GetFreeXRD,
 		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
 		createFungibleToken: @escaping CreateFungibleToken,
-		createNonFungibleToken: @escaping CreateNonFungibleToken,
-		signSubmitSimpleTX: @escaping SignSubmitSimpleTX
+		createNonFungibleToken: @escaping CreateNonFungibleToken
 	) {
 		self.getFreeXRD = getFreeXRD
 		self.isAllowedToUseFaucet = isAllowedToUseFaucet
 		self.createFungibleToken = createFungibleToken
 		self.createNonFungibleToken = createNonFungibleToken
-		self.signSubmitSimpleTX = signSubmitSimpleTX
 	}
 	#else
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
-		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
-		signSubmitSimpleTX: @escaping SignSubmitSimpleTX
+		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet
 	) {
 		self.getFreeXRD = getFreeXRD
 		self.isAllowedToUseFaucet = isAllowedToUseFaucet
-		self.signSubmitSimpleTX = signSubmitSimpleTX
 	}
 	#endif // DEBUG
 }
@@ -115,10 +106,6 @@ public struct CreateNonFungibleTokenRequest: Sendable {
 extension FaucetClient {
 	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> Void
 	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async -> Bool
-
-	/// A "simple TX" is a transaction which cannot require signing of any factor source except
-	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
-	public typealias SignSubmitSimpleTX = @Sendable (TransactionManifest, DeviceFactorSourceClient.Purpose) async throws -> Void
 
 	#if DEBUG
 	public typealias CreateFungibleToken = @Sendable (CreateFungibleTokenRequest) async throws -> Void

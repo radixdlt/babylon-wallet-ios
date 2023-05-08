@@ -5,8 +5,7 @@ import Profile
 public struct ROLAClient: Sendable, DependencyKey {
 	public var performDappDefinitionVerification: PerformDappDefinitionVerification
 	public var performWellKnownFileCheck: PerformWellKnownFileCheck
-	public var createAuthSigningKeyForAccountIfNeeded: CreateAuthSigningKeyForAccountIfNeeded
-	public var createAuthSigningKeyForPersonaIfNeeded: CreateAuthSigningKeyForPersonaIfNeeded
+	public var manifestForAuthKeyCreationRequest: ManifestForAuthKeyCreationRequest
 	public var signAuthChallenge: SignAuthChallenge
 }
 
@@ -14,8 +13,7 @@ public struct ROLAClient: Sendable, DependencyKey {
 extension ROLAClient {
 	public typealias PerformDappDefinitionVerification = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
-	public typealias CreateAuthSigningKeyForAccountIfNeeded = @Sendable (CreateAuthSigningKeyForAccountIfNeededRequest) async throws -> TransactionManifest
-	public typealias CreateAuthSigningKeyForPersonaIfNeeded = @Sendable (CreateAuthSigningKeyForPersonaIfNeededRequest) async throws -> TransactionManifest
+	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> TransactionManifest
 	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeRequest) async throws -> SignedAuthChallenge
 }
 
@@ -26,21 +24,19 @@ extension DependencyValues {
 	}
 }
 
-// MARK: - CreateAuthSigningKeyForAccountIfNeededRequest
-public struct CreateAuthSigningKeyForAccountIfNeededRequest: Sendable, Hashable {
-	public let accountAddress: AccountAddress
-	public init(accountAddress: AccountAddress) {
-		self.accountAddress = accountAddress
+// MARK: - ManifestForAuthKeyCreationRequest
+public struct ManifestForAuthKeyCreationRequest: Sendable, Hashable {
+	public let entity: EntityPotentiallyVirtual
+	public init(entity: EntityPotentiallyVirtual) throws {
+		guard !entity.hasAuthenticationSigningKey else {
+			throw EntityHasAuthSigningKeyAlready()
+		}
+		self.entity = entity
 	}
 }
 
-// MARK: - CreateAuthSigningKeyForPersonaIfNeededRequest
-public struct CreateAuthSigningKeyForPersonaIfNeededRequest: Sendable, Hashable {
-	public let identityAddress: IdentityAddress
-	public init(identityAddress: IdentityAddress) {
-		self.identityAddress = identityAddress
-	}
-}
+// MARK: - EntityHasAuthSigningKeyAlready
+struct EntityHasAuthSigningKeyAlready: Swift.Error {}
 
 import Cryptography
 import DeviceFactorSourceClient

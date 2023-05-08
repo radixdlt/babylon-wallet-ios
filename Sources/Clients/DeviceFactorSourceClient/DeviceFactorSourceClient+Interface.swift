@@ -71,7 +71,7 @@ struct FailedToDeviceFactorSourceForSigning: Swift.Error {}
 struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
-		signerEntity: Signer.Entity,
+		signerEntity: EntityPotentiallyVirtual,
 		unhashedDataToSign: some DataProtocol,
 		purpose: Purpose
 	) async throws -> SignatureOfEntity {
@@ -111,7 +111,7 @@ extension DeviceFactorSourceClient {
 
 	public func signUsingDeviceFactorSource(
 		deviceFactorSource: FactorSource,
-		signerEntities: Set<Signer.Entity>,
+		signerEntities: Set<EntityPotentiallyVirtual>,
 		unhashedDataToSign: some DataProtocol,
 		purpose: Purpose
 	) async throws -> Set<SignatureOfEntity> {

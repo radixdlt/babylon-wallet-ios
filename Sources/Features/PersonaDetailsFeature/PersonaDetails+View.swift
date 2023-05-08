@@ -1,3 +1,4 @@
+import CreateAuthKeyFeature
 import EditPersonaFeature
 import FeaturePrelude
 
@@ -92,10 +93,10 @@ extension PersonaDetails.View {
 		}
 		.sheet(
 			store: store.destination,
-			state: /PersonaDetails.Destination.State.createAuthKeyTransaction,
-			action: PersonaDetails.Destination.Action.createAuthKeyTransaction
+			state: /PersonaDetails.Destination.State.createAuthKey,
+			action: PersonaDetails.Destination.Action.createAuthKey
 		) { store in
-			TransactionReview.View(store: store)
+			CreateAuthKey.View(store: store)
 		}
 		.alert(
 			store: store.destination,
@@ -123,7 +124,7 @@ private extension PersonaDetails.State {
 			createAndUploadAuthKeyButtonState: createAndUploadAuthKeyButtonState
 		)
 		#else
-		.init(
+			.init(
 				thumbnail: nil,
 				personaName: personaName,
 				isDappPersona: isDappPersona

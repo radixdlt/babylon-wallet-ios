@@ -7,8 +7,7 @@ extension ROLAClient: TestDependencyKey {
 	public static let testValue = Self(
 		performDappDefinitionVerification: unimplemented("\(Self.self).performDappDefinitionVerification"),
 		performWellKnownFileCheck: unimplemented("\(Self.self).performWellKnownFileCheck"),
-		createAuthSigningKeyForAccountIfNeeded: unimplemented("\(Self.self).createAuthSigningKeyForAccountIfNeeded"),
-		createAuthSigningKeyForPersonaIfNeeded: unimplemented("\(Self.self).createAuthSigningKeyForPersonaIfNeeded"),
+		manifestForAuthKeyCreationRequest: unimplemented("\(Self.self).manifestForAuthKeyCreationRequest"),
 		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge")
 	)
 }
@@ -17,8 +16,7 @@ extension ROLAClient {
 	public static let noop = Self(
 		performDappDefinitionVerification: { _ in },
 		performWellKnownFileCheck: { _ in },
-		createAuthSigningKeyForAccountIfNeeded: { _ in },
-		createAuthSigningKeyForPersonaIfNeeded: { _ in },
+		manifestForAuthKeyCreationRequest: { _ in throw NoopError() },
 		signAuthChallenge: { _ in throw NoopError() }
 	)
 }

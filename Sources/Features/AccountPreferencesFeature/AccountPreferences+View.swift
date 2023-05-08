@@ -1,3 +1,4 @@
+import CreateAuthKeyFeature
 import FeaturePrelude
 
 extension AccountPreferences.State {

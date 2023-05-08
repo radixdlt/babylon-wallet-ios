@@ -11,7 +11,7 @@ public struct TransactionSigners: Sendable, Hashable {
 
 	public enum IntentSigning: Sendable, Hashable {
 		case notaryAsSignatory
-		case intentSigners(NonEmpty<OrderedSet<Signer.Entity>>)
+		case intentSigners(NonEmpty<OrderedSet<EntityPotentiallyVirtual>>)
 	}
 
 	public init(
@@ -84,7 +84,7 @@ extension TransactionSigners {
 		}
 	}
 
-	public func intentSignerEntitiesOrEmpty() -> OrderedSet<Signer.Entity> {
+	public func intentSignerEntitiesOrEmpty() -> OrderedSet<EntityPotentiallyVirtual> {
 		switch intentSigning {
 		case .notaryAsSignatory: return .init()
 		case let .intentSigners(signers): return OrderedSet(signers)

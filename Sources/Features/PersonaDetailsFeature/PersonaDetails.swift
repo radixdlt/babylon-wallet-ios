@@ -1,9 +1,8 @@
 import AuthorizedDappsClient
+import CreateAuthKeyFeature
 import EditPersonaFeature
 import FeaturePrelude
 import GatewayAPI
-import ROLAClient
-import TransactionReviewFeature
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
@@ -13,8 +12,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	public typealias Store = StoreOf<Self>
-
-	@Dependency(\.rolaClient) var rolaClient
 
 	public init() {}
 
@@ -112,14 +109,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public struct Destination: ReducerProtocol {
 		public enum State: Equatable, Hashable {
 			case editPersona(EditPersona.State)
-			case createAuthKeyTransaction(TransactionReview.State)
+			case createAuthKey(CreateAuthKey.State)
 
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
 		}
 
 		public enum Action: Equatable {
 			case editPersona(EditPersona.Action)
-			case createAuthKeyTransaction(TransactionReview.Action)
+			case createAuthKey(CreateAuthKey.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
 			public enum ConfirmForgetAlert: Sendable, Equatable {
@@ -132,8 +129,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
 			}
-			Scope(state: /State.createAuthKeyTransaction, action: /Action.createAuthKeyTransaction) {
-				TransactionReview()
+			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
+				CreateAuthKey()
 			}
 		}
 	}

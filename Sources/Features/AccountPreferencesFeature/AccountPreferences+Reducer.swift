@@ -1,8 +1,8 @@
 import AccountPortfoliosClient
 import AccountsClient
+import CreateAuthKeyFeature
 import FaucetClient
 import FeaturePrelude
-import ROLAClient
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
@@ -10,8 +10,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 
+		@PresentationState
+		var createAuthKey: CreateAuthKey.State? = nil
+
 		#if DEBUG
-		public var createAndUploadAuthKeyButtonState: ControlState
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
 		public var createMultipleFungibleTokenButtonState: ControlState
@@ -26,7 +28,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
-			self.createAndUploadAuthKeyButtonState = .disabled // will load from account from accountsClient and check...
 			self.createFungibleTokenButtonState = .enabled
 			self.createNonFungibleTokenButtonState = .enabled
 			self.createMultipleFungibleTokenButtonState = .enabled
@@ -57,12 +58,15 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case canCreateAuthSigningKey(Bool)
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case createAuthKey(PresentationAction<CreateAuthKey.Action>)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -85,13 +89,15 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-			return call(
-				buttonState: \.createAndUploadAuthKeyButtonState,
-				into: &state,
-				onSuccess: .disabled // should not be able to create another authSigning key
-			) {
-				try await rolaClient.createAuthSigningKeyForAccountIfNeeded(.init(accountAddress: $0))
-			}
+//			return call(
+//				buttonState: \.createAndUploadAuthKeyButtonState,
+//				into: &state,
+//				onSuccess: .disabled // should not be able to create another authSigning key
+//			) {
+//				try await rolaClient.createAuthSigningKeyForAccountIfNeeded(.init(accountAddress: $0))
+//			}
+			state.createAuthKey = .init()
+			return .none
 
 		case .createFungibleTokenButtonTapped:
 			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
@@ -122,6 +128,16 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				))
 			}
 		#endif
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .createAuthKey(.dismiss):
+			state.createAuthKey = nil
+			return .none
+		//        case .createAuthKey(.presented(.delegate(.)))
+		default: return .none
 		}
 	}
 

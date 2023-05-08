@@ -17,7 +17,7 @@ final class FactorSourcesClientLiveTests: TestCase {
 		]
 
 		let signingFactors = try signingFactors(
-			for: Set(accounts.map { Signer.Entity.account($0) }),
+			for: Set(accounts.map { EntityPotentiallyVirtual.account($0) }),
 			from: [
 				FactorSource.deviceOne,
 				FactorSource.deviceTwo,
