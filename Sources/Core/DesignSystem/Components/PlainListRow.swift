@@ -1,56 +1,6 @@
 import Resources
 import SwiftUI
 
-// MARK: - TappableListRow
-public struct TappableListRow<Icon: View>: View {
-	let isShowingChevron: Bool
-	let title: String
-	let action: () -> Void
-	let icon: Icon
-
-	public init(
-		showChevron: Bool = true,
-		title: String,
-		action: @escaping () -> Void,
-		@ViewBuilder icon: () -> Icon
-	) {
-		self.isShowingChevron = showChevron
-		self.title = title
-		self.action = action
-		self.icon = icon()
-	}
-
-	public init(
-		showChevron: Bool = true,
-		title: String,
-		asset: ImageAsset,
-		action: @escaping () -> Void
-	) where Icon == AssetIcon {
-		self.isShowingChevron = showChevron
-		self.title = title
-		self.icon = AssetIcon(asset: asset)
-		self.action = action
-	}
-
-	public var body: some View {
-		Button(action: action) {
-			PlainListRow(showChevron: isShowingChevron, title: title) {
-				icon
-			}
-		}
-	}
-}
-
-extension TappableListRow {
-	public var withSeparator: some View {
-		VStack(spacing: .zero) {
-			self
-			Separator()
-				.padding(.horizontal, .medium3)
-		}
-	}
-}
-
 // MARK: - PlainListRow
 public struct PlainListRow<Icon: View>: View {
 	let isShowingChevron: Bool
@@ -91,6 +41,31 @@ public struct PlainListRow<Icon: View>: View {
 		}
 		.frame(height: .largeButtonHeight)
 		.padding(.horizontal, .medium3)
+	}
+}
+
+extension PlainListRow {
+	public func tappable(_ action: @escaping () -> Void) -> some View {
+		Button(action: action) {
+			self
+		}
+		.buttonStyle(.tappableRowStyle)
+	}
+}
+
+extension View {
+	/// Adds a separator below the view, without padding. The separator has horizontal padding of default size.
+	public var withSeparator: some View {
+		withSeparator()
+	}
+
+	/// Adds a separator below the view, without padding. The separator has horizontal padding of of the provided size.
+	public func withSeparator(horizontalPadding: CGFloat = .medium3) -> some View {
+		VStack(spacing: .zero) {
+			self
+			Separator()
+				.padding(.horizontal, horizontalPadding)
+		}
 	}
 }
 

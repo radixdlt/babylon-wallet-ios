@@ -230,33 +230,37 @@ extension AppSettings.View {
 					}
 
 					#if DEBUG
-					TappableListRow(title: L10n.Settings.inspectProfileButtonTitle) {
-						viewStore.send(.debugInspectProfileButtonTapped)
-					} icon: {
+					PlainListRow(title: L10n.Settings.inspectProfileButtonTitle) {
 						Image(systemName: "wallet.pass")
 							.frame(.verySmall)
 					}
+					.tappable {
+						viewStore.send(.debugInspectProfileButtonTapped)
+					}
 					.withSeparator
 
-					TappableListRow(title: "Factor Sources") {
-						viewStore.send(.debugInspectProfileButtonTapped)
-					} icon: {
+					PlainListRow(title: "Factor Sources") {
 						Image(systemName: "person.badge.key")
 							.frame(.verySmall)
 					}
-					.withSeparator
-
-					TappableListRow(title: L10n.Settings.importLegacyWallet, asset: AssetResource.generalSettings) {
-						viewStore.send(.importFromOlympiaWalletButtonTapped)
+					.tappable {
+						viewStore.send(.debugInspectProfileButtonTapped)
 					}
 					.withSeparator
+
+					PlainListRow(title: L10n.Settings.importLegacyWallet, asset: AssetResource.generalSettings)
+						.tappable {
+							viewStore.send(.importFromOlympiaWalletButtonTapped)
+						}
+						.withSeparator
 					#endif
 
 					ForEach(settingsRows()) { row in
-						TappableListRow(title: row.title, asset: row.asset) {
-							viewStore.send(row.action)
-						}
-						.withSeparator
+						PlainListRow(title: row.title, asset: row.asset)
+							.tappable {
+								viewStore.send(row.action)
+							}
+							.withSeparator
 					}
 				}
 				.padding(.bottom, .large3)
