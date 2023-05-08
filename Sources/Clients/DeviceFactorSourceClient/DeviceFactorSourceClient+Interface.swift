@@ -133,7 +133,14 @@ extension DeviceFactorSourceClient {
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 
-				let factorInstance = unsecuredControl.transactionSigning
+				let factorInstance = {
+					switch purpose {
+					case .signAuth:
+						return unsecuredControl.authenticationSigning ?? unsecuredControl.transactionSigning
+					case .signTransaction:
+						return unsecuredControl.transactionSigning
+					}
+				}()
 
 				guard let derivationPath = factorInstance.derivationPath else {
 					let errMsg = "Expected derivation path on unsecured factorInstance"

@@ -11,7 +11,7 @@ import Resources
 // MARK: - MyEntitiesInvolvedInTransaction
 public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public var entitiesRequiringAuth: OrderedSet<Signer.Entity> {
+	public var entitiesRequiringAuth: OrderedSet<EntityPotentiallyVirtual> {
 		OrderedSet(accountsRequiringAuth.map { .account($0) } + identitiesRequiringAuth.map { .persona($0) })
 	}
 
