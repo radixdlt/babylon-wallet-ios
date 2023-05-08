@@ -33,7 +33,7 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 }
 
 extension FactorInstance {
-	public func derivationPathOrThrow() throws -> DerivationPath {
+	public func getDerivationPath() throws -> DerivationPath {
 		guard let derivationPath else {
 			struct FactorInstanceHasNoDerivationPath: Swift.Error {}
 			throw FactorInstanceHasNoDerivationPath()

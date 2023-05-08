@@ -43,7 +43,10 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		}
 	}
 
-	public func sign(signingFactor: SigningFactor, state: State) async throws -> Set<SignatureOfEntity> {
+	public func sign(
+		signingFactor: SigningFactor,
+		state: State
+	) async throws -> Set<SignatureOfEntity> {
 		do {
 			let expectedHash = try blake2b(data: state.dataToSign)
 			loggerGlobal.notice("\n\nExpected hash: \(expectedHash.hex)\n\n")
@@ -51,6 +54,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 			loggerGlobal.critical("Failed to hash: \(error)")
 		}
 		let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
+
 		return try await ledgerHardwareWalletClient.sign(.init(
 			signingFactor: signingFactor,
 			unhashedDataToSign: state.dataToSign,
