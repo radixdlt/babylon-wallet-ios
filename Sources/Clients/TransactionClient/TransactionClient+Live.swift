@@ -45,14 +45,14 @@ extension TransactionClient {
 			func accountFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Account? {
 				allAccounts.first(where: { $0.address.address == componentAddress.address })
 			}
-			func identityFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Persona {
+			func identityFromComponentAddress(_ componentAddress: ComponentAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: IdentityAddress(address: componentAddress.address))
 			}
 			func mapAccount(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
 				try .init(validating: analyzed[keyPath: keyPath].compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Persona> {
-				try .init(validating: analyzed[keyPath: keyPath].map(identityFromComponentAddress))
+			func mapIdentity(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) async throws -> OrderedSet<Profile.Network.Persona> {
+				try await .init(validating: analyzed[keyPath: keyPath].asyncMap(identityFromComponentAddress))
 			}
 
 			return try await MyEntitiesInvolvedInTransaction(
