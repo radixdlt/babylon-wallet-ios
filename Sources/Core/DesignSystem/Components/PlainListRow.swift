@@ -6,55 +6,65 @@ public struct PlainListRow<Icon: View>: View {
 	let isShowingChevron: Bool
 	let title: String
 	let icon: Icon
-	let action: () -> Void
 
-	public init(showChevron: Bool = true,
-	            title: String,
-	            action: @escaping () -> Void,
-	            @ViewBuilder icon: () -> Icon)
-	{
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		@ViewBuilder icon: () -> Icon
+	) {
 		self.isShowingChevron = showChevron
 		self.title = title
 		self.icon = icon()
-		self.action = action
 	}
 
-	public init(showChevron: Bool = true,
-	            title: String,
-	            asset: ImageAsset,
-	            action: @escaping () -> Void) where Icon == AssetIcon
-	{
+	public init(
+		showChevron: Bool = true,
+		title: String,
+		asset: ImageAsset
+	) where Icon == AssetIcon {
 		self.isShowingChevron = showChevron
 		self.title = title
 		self.icon = AssetIcon(asset: asset)
-		self.action = action
 	}
 
 	public var body: some View {
-		Button(action: action) {
-			HStack(spacing: .zero) {
-				icon
-					.padding(.trailing, .medium3)
-				Text(title)
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
-				Spacer(minLength: 0)
-				if isShowingChevron {
-					Image(asset: AssetResource.chevronRight)
-				}
+		HStack(spacing: .zero) {
+			icon
+				.padding(.trailing, .medium3)
+			Text(title)
+				.textStyle(.secondaryHeader)
+				.foregroundColor(.app.gray1)
+			Spacer(minLength: 0)
+			if isShowingChevron {
+				Image(asset: AssetResource.chevronRight)
 			}
-			.frame(height: .largeButtonHeight)
-			.padding(.horizontal, .medium3)
 		}
+		.frame(height: .largeButtonHeight)
+		.padding(.horizontal, .medium3)
 	}
 }
 
 extension PlainListRow {
+	public func tappable(_ action: @escaping () -> Void) -> some View {
+		Button(action: action) {
+			self
+		}
+		.buttonStyle(.tappableRowStyle)
+	}
+}
+
+extension View {
+	/// Adds a separator below the view, without padding. The separator has horizontal padding of default size.
 	public var withSeparator: some View {
+		withSeparator()
+	}
+
+	/// Adds a separator below the view, without padding. The separator has horizontal padding of of the provided size.
+	public func withSeparator(horizontalPadding: CGFloat = .medium3) -> some View {
 		VStack(spacing: .zero) {
 			self
 			Separator()
-				.padding(.horizontal, .medium3)
+				.padding(.horizontal, horizontalPadding)
 		}
 	}
 }
@@ -65,8 +75,7 @@ struct PlainListRow_Previews: PreviewProvider {
 		PlainListRow(
 			showChevron: true,
 			title: "A title",
-			asset: AssetResource.generalSettings,
-			action: {}
+			asset: AssetResource.generalSettings
 		)
 	}
 }
