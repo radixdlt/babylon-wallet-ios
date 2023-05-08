@@ -14,6 +14,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		var createAuthKey: CreateAuthKey.State? = nil
 
 		#if DEBUG
+		public var canCreateAuthSigningKey: Bool
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
 		public var createMultipleFungibleTokenButtonState: ControlState
@@ -28,6 +29,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
+			self.canCreateAuthSigningKey = false
 			self.createFungibleTokenButtonState = .enabled
 			self.createNonFungibleTokenButtonState = .enabled
 			self.createMultipleFungibleTokenButtonState = .enabled
@@ -56,6 +58,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case refreshAccountCompleted(TaskResult<AccountPortfolio>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		case canCreateAuthSigningKey(Bool)
+		case createAuthKeyWithAccount(Profile.Network.Account)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -89,15 +92,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-//			return call(
-//				buttonState: \.createAndUploadAuthKeyButtonState,
-//				into: &state,
-//				onSuccess: .disabled // should not be able to create another authSigning key
-//			) {
-//				try await rolaClient.createAuthSigningKeyForAccountIfNeeded(.init(accountAddress: $0))
-//			}
-			state.createAuthKey = .init()
-			return .none
+			return .run { [accountAddress = state.address] send in
+				let account = try await accountsClient.getAccountByAddress(accountAddress)
+				await send(.internal(.createAuthKeyWithAccount(account)))
+			}
 
 		case .createFungibleTokenButtonTapped:
 			return call(buttonState: \.createFungibleTokenButtonState, into: &state) {
@@ -136,31 +134,23 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case .createAuthKey(.dismiss):
 			state.createAuthKey = nil
 			return .none
-		//        case .createAuthKey(.presented(.delegate(.)))
-		default: return .none
-		}
-	}
+		case let .createAuthKey(.presented(.delegate(.done(wasSuccessful)))):
+			state.createAuthKey = nil
+			return .none
 
-	private func call(
-		buttonState: WritableKeyPath<State, ControlState>,
-		into state: inout State,
-		onSuccess: ControlState = .enabled,
-		call: @escaping @Sendable (AccountAddress) async throws -> Void
-	) -> EffectTask<Action> {
-		state[keyPath: buttonState] = .loading(.local)
-		return .run { [address = state.address] send in
-			try await call(address)
-			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
-		} catch: { error, send in
-			await send(.internal(.hideLoader(updateControlState: buttonState)))
-			if !Task.isCancelled {
-				errorQueue.schedule(error)
-			}
+		default: return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .createAuthKeyWithAccount(account):
+			guard !account.hasAuthenticationSigningKey else {
+				return .none
+			}
+			state.createAuthKey = .init(entity: .account(account))
+			return .none
+
 		case let .isAllowedToUseFaucet(.success(value)):
 			state.faucetButtonState = value ? .enabled : .disabled
 			return .none
@@ -188,9 +178,27 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		case let .canCreateAuthSigningKey(canCreateAuthSigningKey):
 			#if DEBUG
-			state.createAndUploadAuthKeyButtonState = canCreateAuthSigningKey ? .enabled : .disabled
+			state.canCreateAuthSigningKey = canCreateAuthSigningKey
 			#endif
 			return .none
+		}
+	}
+
+	private func call(
+		buttonState: WritableKeyPath<State, ControlState>,
+		into state: inout State,
+		onSuccess: ControlState = .enabled,
+		call: @escaping @Sendable (AccountAddress) async throws -> Void
+	) -> EffectTask<Action> {
+		state[keyPath: buttonState] = .loading(.local)
+		return .run { [address = state.address] send in
+			try await call(address)
+			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
+		} catch: { error, send in
+			await send(.internal(.hideLoader(updateControlState: buttonState)))
+			if !Task.isCancelled {
+				errorQueue.schedule(error)
+			}
 		}
 	}
 }

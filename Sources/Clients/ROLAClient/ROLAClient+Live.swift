@@ -223,8 +223,8 @@ extension ROLAClient {
 //				try await createAndUploadNewAuth(for: &persona) { try $0.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
 //				try await personasClient.updatePersona(persona)
 //			},
-			manifestForAuthKeyCreationRequest: { _ in
-				fatalError()
+			manifestForAuthKeyCreation: { _ in
+				throw NoopError()
 			},
 			signAuthChallenge: { request in
 				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient

@@ -100,8 +100,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-
-		case reviewCreateAuthKeyTransaction(TransactionManifest)
+		case personaToCreateAuthKeyForFetched(Profile.Network.Persona)
 	}
 
 	// MARK: - Destination
@@ -169,6 +168,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
+		case let .destination(.presented(.createAuthKey(.delegate(.done(wasSuccessful))))):
+			state.destination = nil
+			return .none
+
 		case .destination:
 			return .none
 		}
@@ -184,13 +187,15 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-			return .run { [identityAddress = state.identityAddress] send in
-				let manifest = try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: identityAddress))
-				await send(.internal(.reviewCreateAuthKeyTransaction(manifest)))
+			let identityAddress = state.identityAddress
+			return .run { send in
+				let persona = try await personasClient.getPersona(id: identityAddress)
+				await send(.internal(.personaToCreateAuthKeyForFetched(persona)))
 			} catch: { error, _ in
-				loggerGlobal.error("Failed to create transaction for auth key creation, error: \(error)")
+				loggerGlobal.error("Could not get persona with address: \(identityAddress), error: \(error)")
 				errorQueue.schedule(error)
 			}
+			return .none
 		#endif
 
 		case let .accountTapped(address):
@@ -225,6 +230,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .personaToCreateAuthKeyForFetched(persona):
+			state.destination = .createAuthKey(.init(entity: .persona(persona)))
+			return .none
+
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
 			case .general:
@@ -234,10 +243,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
 			}
 
-			return .none
-
-		case let .reviewCreateAuthKeyTransaction(manifest):
-			state.destination = .createAuthKeyTransaction(.init(transactionManifest: manifest, message: nil))
 			return .none
 
 		case let .dAppsUpdated(dApps):

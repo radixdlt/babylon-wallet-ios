@@ -5,7 +5,7 @@ import Profile
 public struct ROLAClient: Sendable, DependencyKey {
 	public var performDappDefinitionVerification: PerformDappDefinitionVerification
 	public var performWellKnownFileCheck: PerformWellKnownFileCheck
-	public var manifestForAuthKeyCreationRequest: ManifestForAuthKeyCreationRequest
+	public var manifestForAuthKeyCreation: ManifestForAuthKeyCreation
 	public var signAuthChallenge: SignAuthChallenge
 }
 
