@@ -81,17 +81,24 @@ extension AccountPreferences {
 						viewStore.send(.appeared)
 					}
 					.navigationTitle(L10n.AccountPreferences.title)
+					.sheet(
+						store: store.scope(
+							state: \.$createAuthKey,
+							action: { .child(.createAuthKey($0)) }
+						),
+						content: { CreateAuthKey.View(store: $0) }
+					)
 					#if os(iOS)
-						.navigationBarTitleColor(.app.gray1)
-						.navigationBarTitleDisplayMode(.inline)
-						.navigationBarInlineTitleFont(.app.secondaryHeader)
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton {
-									viewStore.send(.closeButtonTapped)
-								}
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
 							}
 						}
+					}
 					#endif // os(iOS)
 				}
 			}

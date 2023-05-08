@@ -76,6 +76,13 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public init() {}
 
+	var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$createAuthKey, action: /Action.child .. ChildAction.createAuthKey) {
+				CreateAuthKey()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
