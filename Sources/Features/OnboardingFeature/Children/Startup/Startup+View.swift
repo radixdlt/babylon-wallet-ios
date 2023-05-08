@@ -15,20 +15,44 @@ extension Startup {
 extension Startup.View {
 	public var body: some View {
 		ForceFullScreen {
-			WithViewStore(store, observe: { $0 }) { viewStore in
-				VStack(spacing: .medium1) {
-					Button("Create First Account") {
-						viewStore.send(.view(.selectedCreateFirstAccount))
-					}.buttonStyle(.primaryRectangular)
+			NavigationStack {
+				WithViewStore(store, observe: { $0 }) { viewStore in
+					VStack(spacing: .medium1) {
+						Text("A World of Possibilities")
+							.foregroundColor(.app.gray1)
+							.textStyle(.sheetTitle)
+							.multilineTextAlignment(.center)
+						Text("Let's get started")
+							.foregroundColor(.app.gray2)
+							.textStyle(.secondaryHeader)
 
-					Button("Load backup") {
-						viewStore.send(.view(.selectedLoadBackup))
-					}.buttonStyle(.primaryRectangular)
+						Spacer()
 
-					Button("Import Profile") {
-						viewStore.send(.view(.selectedImportProfile))
-					}.buttonStyle(.primaryRectangular)
-				}.padding([.horizontal, .bottom], .medium1)
+						Button("I'am new Radix Wallet user") {
+							viewStore.send(.view(.selectedNewWalletUser))
+						}.buttonStyle(.primaryRectangular)
+
+						Button("Restore Wallet from backup") {
+							viewStore.send(.view(.selectedRestoreFromBackup))
+						}
+						.buttonStyle(.primaryText())
+					}.padding([.horizontal, .bottom], .medium1)
+				}
+				.navigationDestination(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Startup.Destinations.State.restoreFromBackup,
+					action: Startup.Destinations.Action.restoreFromBackup,
+					destination: {
+						RestoreFromBackup.View(store: $0)
+					}
+				)
+
+				//                                .navigationDestination(
+				//                                        store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				//                                        state: /Home.Destinations.State.accountDetails,
+				//                                        action: Home.Destinations.Action.accountDetails,
+				//                                        destination: { AccountDetails.View(store: $0) }
+				//                                )
 			}
 		}
 	}

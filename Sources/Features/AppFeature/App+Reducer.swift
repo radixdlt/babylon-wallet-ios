@@ -145,7 +145,7 @@ public struct App: Sendable, FeatureReducer {
 			return goToOnboarding(state: &state)
 
 		case .onboardingCoordinator(.delegate(.completed)):
-			return goToMain(state: &state, accountRecoveryIsNeeded: false)
+			return checkAccountRecoveryNeeded()
 
 		case let .splash(.delegate(.loadProfileOutcome(loadProfileOutcome))):
 			switch loadProfileOutcome {
@@ -163,10 +163,7 @@ public struct App: Sendable, FeatureReducer {
 				return incompatibleSnapshotData(version: version, state: &state)
 
 			case .existingProfile:
-				return .run { send in
-					let isAccountRecoveryNeeded = await useFactorSourceClient.isAccountRecoveryNeeded()
-					await send(.internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded)))
-				}
+				return checkAccountRecoveryNeeded()
 			}
 
 		default:
@@ -190,6 +187,13 @@ public struct App: Sendable, FeatureReducer {
 			)
 		)
 		return .none
+	}
+
+	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
+		.run { send in
+			let isAccountRecoveryNeeded = await useFactorSourceClient.isAccountRecoveryNeeded()
+			await send(.internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded)))
+		}
 	}
 
 	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> EffectTask<Action> {

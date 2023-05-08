@@ -19,19 +19,9 @@ extension OnboardingCoordinator {
 					then: { Startup.View(store: $0) }
 				)
 				CaseLet(
-					state: /OnboardingCoordinator.State.importProfile,
-					action: { OnboardingCoordinator.Action.child(.importProfile($0)) },
-					then: { ImportProfile.View(store: $0) }
-				)
-				CaseLet(
 					state: /OnboardingCoordinator.State.createAccountCoordinator,
 					action: { OnboardingCoordinator.Action.child(.createAccountCoordinator($0)) },
 					then: { CreateAccountCoordinator.View(store: $0) }
-				)
-				CaseLet(
-					state: /OnboardingCoordinator.State.restoreFromBackup,
-					action: { OnboardingCoordinator.Action.child(.restoreFromBackup($0)) },
-					then: { RestoreFromBackup.View(store: $0) }
 				)
 			}
 		}

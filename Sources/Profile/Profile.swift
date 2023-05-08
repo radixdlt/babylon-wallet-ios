@@ -49,8 +49,10 @@ public struct Profile:
 		@Dependency(\.uuid) var uuid
 
 		let date = Date()
+		let creatingDevice_ = ProfileSnapshot.Header.UsedDeviceInfo(description: creatingDevice.rawValue, deviceIdentifier: UUID().uuidString, date: date)
+		let lastUsedOnDevice = ProfileSnapshot.Header.UsedDeviceInfo(description: creatingDevice.rawValue, deviceIdentifier: UUID().uuidString, date: date)
 		self.init(
-			header: .init(creatingDevice: creatingDevice, id: uuid(), creationDate: date, lastModified: date),
+			header: .init(creatingDevice: creatingDevice_, lastUsedOnDevice: lastUsedOnDevice, id: uuid(), creationDate: date, lastModified: date),
 			factorSources: .init(factorSource),
 			appPreferences: appPreferences,
 			networks: .init()

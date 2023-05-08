@@ -5,8 +5,6 @@ import FeaturePrelude
 public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
 		case startup(Startup.State)
-		case importProfile(ImportProfile.State)
-		case restoreFromBackup(RestoreFromBackup.State)
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
 		public init() {
@@ -16,8 +14,6 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case startup(Startup.Action)
-		case importProfile(ImportProfile.Action)
-		case restoreFromBackup(RestoreFromBackup.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 
@@ -42,19 +38,6 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 				Startup()
 			}
 			.ifCaseLet(
-				/OnboardingCoordinator.State.importProfile,
-				action: /Action.child .. ChildAction.importProfile
-			) {
-				ImportProfile()
-			}
-			.ifCaseLet(
-				/OnboardingCoordinator.State.restoreFromBackup,
-				action: /Action.child .. ChildAction.restoreFromBackup,
-				then: {
-					RestoreFromBackup()
-				}
-			)
-			.ifCaseLet(
 				/OnboardingCoordinator.State.createAccountCoordinator,
 				action: /Action.child .. ChildAction.createAccountCoordinator
 			) {
@@ -73,10 +56,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .startup(.delegate(.importProfile)):
-			state = .importProfile(.init())
-			return .none
-		case .startup(.delegate(.createFirstAccount)):
+		case .startup(.delegate(.createNewUser)):
 			state = .createAccountCoordinator(
 				.init(
 					config: .init(purpose: .firstAccountForNewProfile),
@@ -84,19 +64,15 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 				)
 			)
 			return .none
-		case .startup(.delegate(.loadFromBackup)):
-			state = .restoreFromBackup(.init())
-			return .none
+		case .startup(.delegate(.completed)):
+			return .send(.delegate(.completed))
+
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .run { send in
 				await send(.internal(.commitEphemeralResult(TaskResult {
 					try await onboardingClient.commitEphemeral()
 				})))
 			}
-		case .importProfile(.delegate(.imported)):
-			return .send(.delegate(.completed))
-		case .restoreFromBackup(.delegate(.completed)):
-			return .send(.delegate(.completed))
 		default:
 			return .none
 		}

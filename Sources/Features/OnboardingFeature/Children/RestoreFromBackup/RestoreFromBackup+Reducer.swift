@@ -7,6 +7,8 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		var backupProfiles: BackupProfiles?
 		var selectedProfile: Profile?
 
+		public var isDisplayingFileImporter = false
+
 		public init(backupProfiles: BackupProfiles? = nil) {
 			self.backupProfiles = backupProfiles
 		}
@@ -14,9 +16,11 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case selectedProfile(Profile)
-		case dismissedSelectedProfile
-		case importProfile(Profile)
+		case tappedImportProfile
+		case tappedUseICloudBackup
+		case selectedProfile(Profile?)
+		case dismissFileImporter
+		case profileImported(Result<URL, NSError>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -25,9 +29,11 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadBackupProfilesResult(State.BackupProfiles?)
-		case didImportProfile
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.dataReader) var dataReader
+	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.onboardingClient) var onboardingClient
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -38,17 +44,43 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 					await onboardingClient.loadProfileBackups()
 				)))
 			}
+
+		case .tappedImportProfile:
+			state.isDisplayingFileImporter = true
+			return .none
+
 		case let .selectedProfile(profile):
 			state.selectedProfile = profile
 			return .none
-		case let .importProfile(profile):
-			return .run { send in
-				try await onboardingClient.importProfileSnapshot(profile.snapshot())
-				await send(.internal(.didImportProfile))
+
+		case .tappedUseICloudBackup:
+			guard let selectedProfile = state.selectedProfile else {
+				return .none
 			}
-		case .dismissedSelectedProfile:
-			state.selectedProfile = nil
+
+			return .run { send in
+				try await onboardingClient.importICloudProfile(selectedProfile.id)
+				await send(.delegate(.completed))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
+		case .dismissFileImporter:
+			state.isDisplayingFileImporter = false
 			return .none
+		case let .profileImported(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .profileImported(.success(profileURL)):
+			return .run { send in
+				let data = try dataReader.contentsOf(profileURL, options: .uncached)
+				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
+				try await onboardingClient.importProfileSnapshot(snapshot)
+				await send(.delegate(.completed))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
 		}
 	}
 
@@ -57,8 +89,6 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		case let .loadBackupProfilesResult(profiles):
 			state.backupProfiles = profiles
 			return .none
-		case .didImportProfile:
-			return .send(.delegate(.completed))
 		}
 	}
 }

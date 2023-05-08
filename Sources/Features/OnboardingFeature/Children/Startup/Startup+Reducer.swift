@@ -2,28 +2,67 @@ import FeaturePrelude
 import OnboardingClient
 
 public struct Startup: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {}
+	public struct State: Sendable, Hashable {
+		// MARK: - Destinations
+		@PresentationState
+		public var destination: Destinations.State?
+
+		public init() {}
+	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case selectedCreateFirstAccount
-		case selectedLoadBackup
-		case selectedImportProfile
+		case selectedNewWalletUser
+		case selectedRestoreFromBackup
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case createFirstAccount
-		case loadFromBackup
-		case importProfile
+		case createNewUser
+		case completed
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case restoreFromBackup(RestoreFromBackup.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case restoreFromBackup(RestoreFromBackup.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
+				RestoreFromBackup()
+			}
+		}
+	}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .selectedCreateFirstAccount:
-			return .send(.delegate(.createFirstAccount))
-		case .selectedLoadBackup:
-			return .send(.delegate(.loadFromBackup))
-		case .selectedImportProfile:
-			return .send(.delegate(.importProfile))
+		case .selectedNewWalletUser:
+			return .send(.delegate(.createNewUser))
+		case .selectedRestoreFromBackup:
+			state.destination = .restoreFromBackup(.init())
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .destination(.presented(.restoreFromBackup(.delegate(.completed)))):
+			return .send(.delegate(.completed))
+		default:
+			return .none
 		}
 	}
 }

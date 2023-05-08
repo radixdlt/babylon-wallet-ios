@@ -14,6 +14,7 @@ extension OnboardingClient: TestDependencyKey {
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		loadProfileBackups: unimplemented("\(Self.self).loadProfile"),
 		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot"),
+		importICloudProfile: unimplemented("\(Self.self).importICloudProfile"),
 		commitEphemeral: unimplemented("\(Self.self).commitEphemeral")
 	)
 
@@ -21,6 +22,7 @@ extension OnboardingClient: TestDependencyKey {
 		loadProfile: { .newUser },
 		loadProfileBackups: { nil },
 		importProfileSnapshot: { _ in throw NoopError() },
+		importICloudProfile: { _ in throw NoopError() },
 		commitEphemeral: {}
 	)
 }

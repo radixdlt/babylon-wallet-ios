@@ -172,6 +172,27 @@ extension ProfileStore {
 		changeState(to: .persisted(profile))
 	}
 
+	public func importICloudProfileSnapshot(_ id: ProfileSnapshot.Header.ID) async throws {
+		try assertProfileStateIsEphemeral()
+
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+
+		do {
+			let profile = try await secureStorageClient.loadProfile(id)
+			guard let profile else {
+				struct FailedToLoadProfile: Swift.Error {}
+				throw FailedToLoadProfile()
+			}
+			await userDefaultsClient.setActiveProfileId(id)
+			changeState(to: .persisted(profile))
+		} catch {
+			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
+			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage) // for DEBUG builds we want to crash
+			throw error
+		}
+	}
+
 	public func commitEphemeral() async throws {
 		let ephemeral = try assertProfileStateIsEphemeral()
 		@Dependency(\.userDefaultsClient) var userDefaultsClient

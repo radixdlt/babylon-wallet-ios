@@ -1,5 +1,4 @@
 import FeaturePrelude
-import InspectProfileFeature
 import SecureStorageClient
 import SwiftUI
 
@@ -20,65 +19,85 @@ extension RestoreFromBackup.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium1) {
-						Text("Select Backup Profile")
-							.foregroundColor(.app.gray1)
-							.textStyle(.sheetTitle)
+						Button("Import Backup data") {
+							viewStore.send(.tappedImportProfile)
+						}
+						.buttonStyle(.primaryRectangular)
+
+						Separator()
+
+						HStack {
+							Text("iCloud Backup data: ")
+								.textStyle(.body1Header)
+							Spacer()
+						}
 
 						// TODO: Display the loading
 						if let backupProfiles = viewStore.backupProfiles {
-							ForEach(backupProfiles) { profile in
-								Card {
-									HStack {
-										VStack(alignment: .leading, spacing: 0) {
-											Text("Creating Device: \(profile.header.creatingDevice.rawValue)")
-												.foregroundColor(.app.gray1)
-												.textStyle(.secondaryHeader)
-											Text("Creation Date: \(formatDate(profile.header.creationDate))")
-												.foregroundColor(.app.gray2)
-												.textStyle(.body2Regular)
-											Text("Last Modified Date: \(formatDate(profile.header.lastModified))")
-												.foregroundColor(.app.gray2)
-												.textStyle(.body2Regular)
-										}
-										Spacer(minLength: 0)
-										Image(asset: AssetResource.chevronRight)
+							Selection(
+								viewStore.binding(
+									get: \.selectedProfile,
+									send: {
+										.selectedProfile($0)
 									}
-									.padding(.medium2)
-									//   .background(Color.app.gray5)
-									// .cornerRadius(.small1)
-								}
-								.onTapGesture {
-									viewStore.send(.selectedProfile(profile))
-								}
+								),
+								from: backupProfiles
+							) { item in
+								backupDataCard(item)
+									.onTapGesture {
+										item.action()
+									}
 							}
+
+							Button("Use iCloud Backup Data") {
+								viewStore.send(.tappedUseICloudBackup)
+							}
+							.controlState(viewStore.selectedProfile != nil ? .enabled : .disabled)
+							.buttonStyle(.primaryRectangular)
 						} else {
-							Text("No backup profiles")
+							Text("No iCloud Backup Data")
 						}
 					}.padding([.horizontal, .bottom], .medium1)
 				}
+				.fileImporter(
+					isPresented: viewStore.binding(
+						get: \.isDisplayingFileImporter,
+						send: .dismissFileImporter
+					),
+					allowedContentTypes: [.profile],
+					onCompletion: { viewStore.send(.profileImported($0.mapError { $0 as NSError })) }
+				)
+				.navigationTitle("Wallet Data Backup")
+				.padding(.top, .medium2)
 				.onAppear {
 					viewStore.send(.appeared)
 				}
-				.sheet(item: viewStore.binding(get: {
-					$0.selectedProfile
-				}, send: { _ in
-					.dismissedSelectedProfile
-				})) { profile in
-					VStack {
-						ProfileView(
-							profile: profile,
-							// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-							secureStorageClient: SecureStorageClient.liveValue
-						)
-
-						Button("Import") {
-							viewStore.send(.importProfile(profile))
-						}
-						.buttonStyle(.primaryRectangular)
-						.padding(.horizontal, .medium3)
-					}.padding(.vertical, .medium3)
-				}
 			}
+		}
+	}
+
+	func backupDataCard(_ item: SelectionItem<Profile>) -> some View {
+		let profile = item.value
+
+		return Card {
+			HStack {
+				VStack(alignment: .leading, spacing: 0) {
+					Text("Creating Device: \(profile.header.creatingDevice.description)")
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
+					Text("Creation Date: \(formatDate(profile.header.creationDate))")
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+					Text("Last Modified Date: \(formatDate(profile.header.lastModified))")
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+				}
+				RadioButton(
+					appearance: .dark,
+					state: item.isSelected ? .selected : .unselected
+				)
+			}
+			.padding(.medium2)
 		}
 	}
 
