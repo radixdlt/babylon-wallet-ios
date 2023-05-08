@@ -71,33 +71,7 @@ extension EngineToolkitClient {
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
 			analyzeManifest: { request in
-				var res = try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
-
-				let identityAddresses = res.componentAddresses.compactMap { try? IdentityAddress(address: $0.address) }
-
-				guard
-					!identityAddresses.isEmpty,
-					let manifestWithJSONInstr = try? convertManifestInstructionsToJSONIfItWasString(.init(
-						version: .default,
-						networkID: request.networkID,
-						manifest: request.manifest
-					))
-				else {
-					return res
-				}
-
-				for instruction in manifestWithJSONInstr.instructions {
-					if
-						case let .setMetadata(setMetadataInstruction) = instruction,
-						setMetadataInstruction.key == SetMetadata.ownerKeysKey,
-						let toAdd = identityAddresses.first(where: { $0.address == setMetadataInstruction.entityAddress.address })
-					{
-						loggerGlobal.notice("'Manually' inserting Identity for SetMetadata instruction into 'entitiesRequiringAuth': \(toAdd)")
-						res.entitiesRequiringAuth.append(.init(address: toAdd.address))
-					}
-				}
-
-				return res
+				try engineToolkit.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
 			},
 			analyzeManifestWithPreviewContext: { manifestWithPreviewContext in
 				try engineToolkit.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
