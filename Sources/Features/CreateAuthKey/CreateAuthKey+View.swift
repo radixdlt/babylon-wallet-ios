@@ -1,4 +1,5 @@
 import FeaturePrelude
+import TransactionReviewFeature
 
 extension CreateAuthKey.State {
 	var viewState: CreateAuthKey.ViewState {
@@ -21,12 +22,15 @@ extension CreateAuthKey {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: CreateAuthKey")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			ZStack {
+				LoadingView()
+				IfLetStore(
+					store.scope(
+						state: \.transactionReview,
+						action: { CreateAuthKey.Action.child(.transactionReview($0)) }
+					),
+					then: { TransactionReview.View(store: $0) }
+				)
 			}
 		}
 	}
