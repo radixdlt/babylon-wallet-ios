@@ -31,13 +31,13 @@ Pointer decompile_unknown_transaction_intent(Pointer string_pointer);
 
 Pointer derive_babylon_address_from_olympia_address(Pointer string_pointer);
 
-Pointer derive_olympia_address_from_public_key(Pointer string_pointer);
-
 Pointer derive_virtual_account_address(Pointer string_pointer);
 
 Pointer derive_virtual_identity_address(Pointer string_pointer);
 
 Pointer derive_non_fungible_global_id_from_public_key(Pointer string_pointer);
+
+Pointer derive_olympia_address_from_public_key(Pointer string_pointer);
 
 Pointer encode_address(Pointer string_pointer);
 

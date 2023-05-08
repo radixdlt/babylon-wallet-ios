@@ -11,12 +11,12 @@ import Resources
 // MARK: - MyEntitiesInvolvedInTransaction
 public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public let entitiesRequiringAuth: OrderedSet<Signer.Entity>
-	public var entitiesThatAreAccountsRequiringAuth: OrderedSet<Profile.Network.Account> {
-		OrderedSet(entitiesRequiringAuth.compactMap {
-			try? $0.asAccount()
-		})
+	public var entitiesRequiringAuth: OrderedSet<Signer.Entity> {
+		OrderedSet(accountsRequiringAuth.map { .account($0) } + identitiesRequiringAuth.map { .persona($0) })
 	}
+
+	public let identitiesRequiringAuth: OrderedSet<Profile.Network.Persona>
+	public let accountsRequiringAuth: OrderedSet<Profile.Network.Account>
 
 	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
 	public let accountsWithdrawnFrom: OrderedSet<Profile.Network.Account>
@@ -45,23 +45,21 @@ extension TransactionClient {
 			func accountFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Account? {
 				allAccounts.first(where: { $0.address.address == componentAddress.address })
 			}
-			func map(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
+			func identityFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Persona {
+				try await personasClient.getPersona(id: IdentityAddress(address: componentAddress.address))
+			}
+			func mapAccount(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
 				try .init(validating: analyzed[keyPath: keyPath].compactMap(accountFromComponentAddress))
+			}
+			func mapIdentity(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Persona> {
+				try .init(validating: analyzed[keyPath: keyPath].map(identityFromComponentAddress))
 			}
 
 			return try await MyEntitiesInvolvedInTransaction(
-				entitiesRequiringAuth: OrderedSet(validating: analyzed.entitiesRequiringAuth.asyncCompactMap { component -> Signer.Entity? in
-					if let identityAddress = try? IdentityAddress(address: component.address) {
-						let persona = try await personasClient.getPersona(id: identityAddress)
-						return Signer.Entity.persona(persona)
-					} else if let account = accountFromComponentAddress(component) {
-						return Signer.Entity.account(account)
-					} else {
-						return nil
-					}
-				}),
-				accountsWithdrawnFrom: map(\.accountsWithdrawnFrom),
-				accountsDepositedInto: map(\.accountsDepositedInto)
+				identitiesRequiringAuth: mapIdentity(\.identitiesRequiringAuth),
+				accountsRequiringAuth: mapAccount(\.accountsRequiringAuth),
+				accountsWithdrawnFrom: mapAccount(\.accountsWithdrawnFrom),
+				accountsDepositedInto: mapAccount(\.accountsDepositedInto)
 			)
 		}
 
@@ -204,8 +202,8 @@ extension TransactionClient {
 				loggerGlobal.debug("Find suitable fee payer in: 'accountsWithdrawnFrom', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
 				return .includesLockFee(withLockFee)
 			}
-			// no candiates amonst `accountsWithdrawnFrom` => fallback to `entitiesThatAreAccountsRequiringAuth`
-			if let withLockFee = try await findFeePayer(amongst: \.entitiesThatAreAccountsRequiringAuth) {
+			// no candiates amonst `accountsWithdrawnFrom` => fallback to `accountsRequiringAuth`
+			if let withLockFee = try await findFeePayer(amongst: \.accountsRequiringAuth) {
 				loggerGlobal.debug("Find suitable fee payer in: 'accountsRequiringAuth', specifically: \(withLockFee.feePayerSelectionAmongstCandidates.selected)")
 				return .includesLockFee(withLockFee)
 			}
