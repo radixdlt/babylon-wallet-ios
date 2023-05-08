@@ -64,17 +64,15 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
 			VStack(alignment: .leading, spacing: .small2) {
-				HStack {
+				HStack(spacing: 0) {
 					if let primaryHeading {
 						Text(primaryHeading)
 							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+							.foregroundColor(accentColor)
 							.multilineTextAlignment(.leading)
 					}
 
-					if primaryHeading != nil || secondaryHeading != nil {
-						Spacer(minLength: 0)
-					}
+					Spacer(minLength: 0)
 
 					if let secondaryHeading {
 						Text(secondaryHeading)
@@ -104,7 +102,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(borderColor, lineWidth: 1)
+						.stroke(accentColor, lineWidth: 1)
 				)
 				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
@@ -116,7 +114,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		}
 	}
 
-	private var borderColor: Color {
+	private var accentColor: Color {
 		switch hint?.kind {
 		case .none:
 			return .app.gray1
