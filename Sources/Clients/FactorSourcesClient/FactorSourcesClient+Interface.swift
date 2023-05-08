@@ -37,7 +37,7 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
-	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Signer.Entity>>) async throws -> SigningFactors
+	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
 }
 
@@ -46,6 +46,18 @@ public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<S
 extension SigningFactors {
 	public var signerCount: Int {
 		values.flatMap { $0.map(\.signers.count) }.reduce(0, +)
+	}
+}
+
+// MARK: - GetSigningFactorsRequest
+public struct GetSigningFactorsRequest: Sendable, Hashable {
+	public let networkID: NetworkID
+	public let signers: NonEmpty<Set<Signer.Entity>>
+	public let signingPurpose: SigningPurpose
+	public init(networkID: NetworkID, signers: NonEmpty<Set<Signer.Entity>>, signingPurpose: SigningPurpose) {
+		self.networkID = networkID
+		self.signers = signers
+		self.signingPurpose = signingPurpose
 	}
 }
 
@@ -87,10 +99,10 @@ extension FactorSourcesClient {
 public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	public let factorSourceIDs: [FactorSource.ID]
 	public let lastUsedOn: Date
-	public let usagePurpose: FactorSource.UsagePurpose
+	public let usagePurpose: SigningPurpose
 	public init(
 		factorSourceIDs: [FactorSource.ID],
-		usagePurpose: FactorSource.UsagePurpose,
+		usagePurpose: SigningPurpose,
 		lastUsedOn: Date = .init()
 	) {
 		self.factorSourceIDs = factorSourceIDs

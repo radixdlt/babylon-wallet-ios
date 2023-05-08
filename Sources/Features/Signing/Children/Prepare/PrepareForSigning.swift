@@ -9,6 +9,7 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 		public let manifest: TransactionManifest
 		public let feePayer: Profile.Network.Account
 		public let networkID: NetworkID
+		public let purpose: SigningPurpose
 
 		public var compiledIntent: CompileTransactionIntentResponse? = nil
 		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
@@ -16,11 +17,13 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 			manifest: TransactionManifest,
 			networkID: NetworkID,
 			feePayer: Profile.Network.Account,
+			purpose: SigningPurpose,
 			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 		) {
 			self.manifest = manifest
 			self.networkID = networkID
 			self.feePayer = feePayer
+			self.purpose = purpose
 			self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 		}
 	}
@@ -67,7 +70,7 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 			)!
 			do {
 				state.compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
-				return loadSigningFactors(networkID: state.networkID, entities: entities)
+				return loadSigningFactors(networkID: state.networkID, entities: entities, purpose: state.purpose)
 			} catch {
 				loggerGlobal.error("Failed to compile manifest: \(error)")
 				errorQueue.schedule(error)
@@ -102,11 +105,15 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadSigningFactors(networkID: NetworkID, entities: NonEmpty<Set<Signer.Entity>>) -> EffectTask<Action> {
+	private func loadSigningFactors(networkID: NetworkID, entities: NonEmpty<Set<Signer.Entity>>, purpose: SigningPurpose) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.loadSigningFactors(
 				TaskResult {
-					try await factorSourcesClient.getSigningFactors(networkID, entities)
+					try await factorSourcesClient.getSigningFactors(.init(
+						networkID: networkID,
+						signers: entities,
+						signingPurpose: purpose
+					))
 				}
 			)))
 		}

@@ -789,7 +789,11 @@ extension DappInteractionFlow.Destinations.State {
 				requiredFieldIDs: item.fields
 			)))
 		case let .remote(.send(item)):
-			self = .relayed(anyItem, with: .reviewTransaction(.init(transactionManifest: item.transactionManifest, message: item.message)))
+			self = .relayed(anyItem, with: .reviewTransaction(.init(
+				transactionManifest: item.transactionManifest,
+				signTransactionPurpose: .manifestFromDapp,
+				message: item.message
+			)))
 		}
 	}
 }

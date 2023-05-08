@@ -45,19 +45,23 @@ public struct Signing: Sendable, FeatureReducer {
 		public var expectedSignatureCount = -1
 		public var signatures: OrderedSet<Signature> = []
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+		public let purpose: SigningPurpose
 
 		public init(
 			networkID: NetworkID,
 			manifest: TransactionManifest,
-			feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+			feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates,
+			purpose: SigningPurpose
 		) {
 			let ephemeralNotaryPrivateKey = Curve25519.Signing.PrivateKey()
 			self.step = .prepare(.init(
 				manifest: manifest,
 				networkID: networkID,
 				feePayer: feePayerSelectionAmongstCandidates.selected.account,
+				purpose: purpose,
 				ephemeralNotaryPublicKey: ephemeralNotaryPrivateKey.publicKey
 			))
+			self.purpose = purpose
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
 			self.feePayerSelectionAmongstCandidates = feePayerSelectionAmongstCandidates
 		}
@@ -187,10 +191,10 @@ public struct Signing: Sendable, FeatureReducer {
 		let kind = signingFactors.first.factorSource.kind
 		precondition(signingFactors.allSatisfy { $0.factorSource.kind == kind })
 		state.factorsLeftToSignWith.removeValue(forKey: kind)
-		return .fireAndForget {
+		return .fireAndForget { [purpose = state.purpose] in
 			try? await factorSourcesClient.updateLastUsed(.init(
 				factorSourceIDs: signingFactors.map(\.factorSource.id),
-				usagePurpose: .transactionSigning
+				usagePurpose: purpose
 			))
 		}.concatenate(with: proceedWithNextFactorSource(&state))
 	}

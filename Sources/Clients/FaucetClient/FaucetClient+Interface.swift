@@ -118,7 +118,7 @@ extension FaucetClient {
 
 	/// A "simple TX" is a transaction which cannot require signing of any factor source except
 	/// `.device` or signing with only ephemeral keys, typically used for `getFreeXRD`.
-	public typealias SignSubmitSimpleTX = @Sendable (TransactionManifest, DeviceFactorSourceClient.Purpose) async throws -> Void
+	public typealias SignSubmitSimpleTX = @Sendable (TransactionManifest, SigningPurpose) async throws -> Void
 
 	#if DEBUG
 	public typealias CreateFungibleToken = @Sendable (CreateFungibleTokenRequest) async throws -> Void
