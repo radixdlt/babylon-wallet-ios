@@ -118,7 +118,7 @@ private extension PersonaDetails.State {
 			canCreateAuthKey: canCreateAuthKey
 		)
 		#else
-			.init(
+		.init(
 				thumbnail: nil,
 				personaName: personaName,
 				isDappPersona: isDappPersona
