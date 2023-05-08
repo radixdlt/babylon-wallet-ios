@@ -33,6 +33,13 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.transactionReview, action: /Action.child .. ChildAction.transactionReview) {
+				TransactionReview()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:

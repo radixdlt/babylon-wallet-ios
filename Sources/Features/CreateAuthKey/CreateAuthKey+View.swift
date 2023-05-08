@@ -22,15 +22,18 @@ extension CreateAuthKey {
 		}
 
 		public var body: some SwiftUI.View {
-			ZStack {
-				LoadingView()
-				IfLetStore(
-					store.scope(
-						state: \.transactionReview,
-						action: { CreateAuthKey.Action.child(.transactionReview($0)) }
-					),
-					then: { TransactionReview.View(store: $0) }
-				)
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				ZStack {
+					LoadingView()
+						.onAppear { viewStore.send(.appeared) }
+					IfLetStore(
+						store.scope(
+							state: \.transactionReview,
+							action: { CreateAuthKey.Action.child(.transactionReview($0)) }
+						),
+						then: { TransactionReview.View(store: $0) }
+					)
+				}
 			}
 		}
 	}
