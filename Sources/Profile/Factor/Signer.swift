@@ -77,3 +77,17 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol {
 		property(\.displayName)
 	}
 }
+
+// MARK: - SigningPurpose
+public enum SigningPurpose: Sendable, Hashable {
+	case signAuth
+	case signTransaction(SignTransactionPurpose)
+	public enum SignTransactionPurpose: Sendable, Hashable {
+		case manifestFromDapp
+		case internalManifest(InternalTXSignPurpose)
+		public enum InternalTXSignPurpose: Sendable, Hashable {
+			case transfer
+			case uploadAuthKey
+		}
+	}
+}

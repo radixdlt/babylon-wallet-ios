@@ -105,7 +105,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				)
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
 				let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: hashedMsg) }
-				var accountSignatures = Set<SignatureOfEntity>()
+				var signatures = Set<SignatureOfEntity>()
+
+				let signerEntities = Set(request.signingFactor.signers.map(\.entity))
 
 				for requiredSigner in request.signingFactor.signers {
 					for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
@@ -118,39 +120,23 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							throw MissingSignatureFromRequiredSigner()
 						}
 						assert(requiredSigningFactor.derivationPath == signature.derivationPath)
-						let accountSignature = try SignatureOfEntity(
-							account: requiredSigner.entity.asAccount(),
-							signature: signature
+
+						let entitySignature = try SignatureOfEntity(
+							signerEntity: requiredSigner.entity,
+							factorInstance: requiredSigningFactor,
+							signature: Signature(
+								signatureWithPublicKey: signature.signature,
+								derivationPath: requiredSigningFactor.getDerivationPath()
+							)
 						)
-						accountSignatures.insert(accountSignature)
+						signatures.insert(entitySignature)
 					}
 				}
 
-				return accountSignatures
+				return signatures
 			}
 		)
 	}()
-}
-
-extension SignatureOfEntity {
-	init(
-		account: Profile.Network.Account,
-		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Validated
-	) throws {
-		guard let factorInstance = account.factorInstances.first(where: { $0.publicKey == signatureParsed.signature.publicKey }) else {
-			throw FailedToFindFactorInstanceMatchingDerivationPathInSignature()
-		}
-
-		let signature = try Signature(
-			signatureWithPublicKey: signatureParsed.signature,
-			derivationPath: factorInstance.derivationPathOrThrow()
-		)
-		try self.init(
-			signerEntity: .account(account),
-			factorInstance: factorInstance,
-			signature: signature
-		)
-	}
 }
 
 // MARK: - MissingSignatureFromRequiredSigner

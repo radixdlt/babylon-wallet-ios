@@ -11,6 +11,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public let transactionManifest: TransactionManifest
 		public let message: String?
+		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 
 		public var transactionWithLockFee: TransactionManifest?
 
@@ -33,11 +34,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public init(
 			transactionManifest: TransactionManifest,
+			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: String?,
 			feeToAdd: BigDecimal = 10, // fix me use estimate from `analyze`
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
 			self.transactionManifest = transactionManifest
+			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.fee = feeToAdd
 			if let customizeGuarantees {
@@ -372,7 +375,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = .signing(.init(
 				networkID: networkID,
 				manifest: manifest,
-				feePayerSelectionAmongstCandidates: feePayerSelectionAmongstCandidates
+				feePayerSelectionAmongstCandidates: feePayerSelectionAmongstCandidates,
+				purpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
 

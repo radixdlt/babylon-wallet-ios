@@ -75,11 +75,12 @@ extension FactorSourcesClient: DependencyKey {
 				}
 			},
 			addOffDeviceFactorSource: addOffDeviceFactorSource,
-			getSigningFactors: { networkID, entities in
-				assert(entities.allSatisfy { $0.networkID == networkID })
+			getSigningFactors: { request in
+				assert(request.signers.allSatisfy { $0.networkID == request.networkID })
 				return try await signingFactors(
-					for: entities,
-					from: getFactorSources().rawValue
+					for: request.signers,
+					from: getFactorSources().rawValue,
+					signingPurpose: request.signingPurpose
 				)
 			},
 			updateLastUsed: { request in
@@ -105,14 +106,24 @@ extension FactorSourcesClient: DependencyKey {
 
 internal func signingFactors(
 	for entities: some Collection<EntityPotentiallyVirtual>,
-	from allFactorSources: IdentifiedArrayOf<FactorSource>
+	from allFactorSources: IdentifiedArrayOf<FactorSource>,
+	signingPurpose: SigningPurpose
 ) throws -> SigningFactors {
 	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
 	for entity in entities {
 		switch entity.securityState {
 		case let .unsecured(unsecuredEntityControl):
-			let factorInstance = unsecuredEntityControl.transactionSigning
+
+			let factorInstance = {
+				switch signingPurpose {
+				case .signAuth:
+					return unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
+				case .signTransaction:
+					return unsecuredEntityControl.transactionSigning
+				}
+			}()
+
 			let id = factorInstance.factorSourceID
 			guard let factorSource = allFactorSources[id: id] else {
 				assertionFailure("Bad! factor source not found")

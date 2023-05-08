@@ -204,14 +204,14 @@
 "dAppDetails.forgetDappAlertConfirm" = "Forget";
 "dAppDetails.forgetDappAlertCancel" = "Cancel";
 
-"personaDetails.personaNameHeading" = "Persona Name";
+"personaDetails.personaLabelHeading" = "Persona Label";
+"personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
 "personaDetails.personaDataSharingDescription" = "Here is the personal data that you are sharing with %@";
 "personaDetails.editPersona" = "Edit Persona";
 "personaDetails.firstNameHeading" = "First Name";
 "personaDetails.lastNameHeading" = "Last Name";
 "personaDetails.emailAddressHeading" = "Email Address";
 "personaDetails.phoneNumberHeading" = "Phone Number";
-"personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
 
 "personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
 "personaDetails.authorizedDappsDescription" = "Here are the dApps you have logged into with this persona.";

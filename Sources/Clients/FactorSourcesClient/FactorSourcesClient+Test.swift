@@ -26,7 +26,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		addPrivateHDFactorSource: { _ in throw NoopError() },
 		checkIfHasOlympiaFactorSourceForAccounts: { _ in nil },
 		addOffDeviceFactorSource: { _ in },
-		getSigningFactors: { _, _ in throw NoopError() },
+		getSigningFactors: { _ in throw NoopError() },
 		updateLastUsed: { _ in }
 	)
 }

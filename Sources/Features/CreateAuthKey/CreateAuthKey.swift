@@ -62,7 +62,11 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .createdManifestAndAuthKey(manifestAndAuthKey):
-			state.transactionReview = .init(transactionManifest: manifestAndAuthKey.manifest, message: nil)
+			state.transactionReview = .init(
+				transactionManifest: manifestAndAuthKey.manifest,
+				signTransactionPurpose: .internalManifest(.uploadAuthKey),
+				message: nil
+			)
 			state.authenticationSigningFactorInstance = manifestAndAuthKey.authenticationSigning
 			return .none
 

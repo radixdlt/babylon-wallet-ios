@@ -73,7 +73,7 @@ extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		signerEntity: EntityPotentiallyVirtual,
 		unhashedDataToSign: some DataProtocol,
-		purpose: Purpose
+		purpose: SigningPurpose
 	) async throws -> SignatureOfEntity {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
@@ -113,7 +113,7 @@ extension DeviceFactorSourceClient {
 		deviceFactorSource: FactorSource,
 		signerEntities: Set<EntityPotentiallyVirtual>,
 		unhashedDataToSign: some DataProtocol,
-		purpose: Purpose
+		purpose: SigningPurpose
 	) async throws -> Set<SignatureOfEntity> {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
@@ -183,23 +183,7 @@ extension DeviceFactorSourceClient {
 	}
 }
 
-// MARK: - DeviceFactorSourceClient.Purpose
-extension DeviceFactorSourceClient {
-	public enum Purpose: Sendable, Equatable {
-		case signAuth
-		case signTransaction(SignTransactionPurpose)
-		public enum SignTransactionPurpose: Sendable, Equatable {
-			case manifestFromDapp
-			case internalManifest(InternalTXSignPurpose)
-			public enum InternalTXSignPurpose: Sendable, Equatable {
-				case transfer
-				case uploadAuthKey
-			}
-		}
-	}
-}
-
-extension DeviceFactorSourceClient.Purpose {
+extension SigningPurpose {
 	public var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
 		switch self {
 		case .signAuth: return .signAuthChallenge

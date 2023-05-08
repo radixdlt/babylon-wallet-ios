@@ -232,9 +232,9 @@ extension PersonaDetails.View {
 
 					ForEach(viewStore.state) { dApp in
 						Card {
+							viewStore.send(.dAppTapped(dApp.id))
+						} contents: {
 							PlainListRow(title: dApp.displayName) {
-								viewStore.send(.dAppTapped(dApp.id))
-							} icon: {
 								DappThumbnail(.known(dApp.thumbnail))
 							}
 						}
@@ -312,7 +312,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					VPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
+					VPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
 
 					Separator()
 

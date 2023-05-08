@@ -311,23 +311,30 @@ extension GatewayAPI.EntityMetadataCollection {
 		let lengthQuotesAndTwoParenthesis = 2 * lengthQuoteAndParenthesis
 		let lengthCurve25519PubKeyHex = 32 * 2
 		let lengthSecp256K1PubKeyHex = 33 * 2
-		let keys = asStringCollection.compactMap { elem -> Engine.PublicKey? in
-			if elem.starts(with: curve25519Prefix), elem.count == lengthQuotesAndTwoParenthesis + lengthCurve25519Prefix + lengthCurve25519PubKeyHex {
+		let keys = try asStringCollection.compactMap { elem -> Engine.PublicKey? in
+			if elem.starts(with: curve25519Prefix) {
+				guard elem.count == lengthQuotesAndTwoParenthesis + lengthCurve25519Prefix + lengthCurve25519PubKeyHex else {
+					throw FailedToParsePublicKeyFromOwnerKeysBadLength()
+				}
 				var key = elem
-				key.removeFirst(curve25519Prefix.count + lengthQuoteAndParenthesis)
+				key.removeFirst(lengthCurve25519Prefix + lengthQuoteAndParenthesis)
 				key.removeLast(lengthQuoteAndParenthesis)
 				guard key.count == lengthCurve25519PubKeyHex else {
 					return nil
 				}
-				return try? .eddsaEd25519(.init(hex: key))
-			} else if elem.starts(with: secp256k1Prefix), elem.count == lengthQuotesAndTwoParenthesis + lengthSecp256k1Prefix + lengthSecp256K1PubKeyHex {
+				return try .eddsaEd25519(.init(hex: key))
+
+			} else if elem.starts(with: secp256k1Prefix) {
+				guard elem.count == lengthQuotesAndTwoParenthesis + lengthSecp256k1Prefix + lengthSecp256K1PubKeyHex else {
+					throw FailedToParsePublicKeyFromOwnerKeysBadLength()
+				}
 				var key = elem
-				key.removeFirst(secp256k1Prefix.count + lengthQuoteAndParenthesis)
+				key.removeFirst(lengthSecp256k1Prefix + lengthQuoteAndParenthesis)
 				key.removeLast(lengthQuoteAndParenthesis)
 				guard key.count == lengthSecp256K1PubKeyHex else {
 					return nil
 				}
-				return try? .ecdsaSecp256k1(.init(hex: key))
+				return try .ecdsaSecp256k1(.init(hex: key))
 			} else {
 				return nil
 			}
@@ -339,6 +346,9 @@ extension GatewayAPI.EntityMetadataCollection {
 		)
 	}
 }
+
+// MARK: - FailedToParsePublicKeyFromOwnerKeysBadLength
+struct FailedToParsePublicKeyFromOwnerKeysBadLength: Swift.Error {}
 
 extension SLIP10.PublicKey {
 	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W

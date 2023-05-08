@@ -124,25 +124,27 @@ extension TransactionReviewGuarantee {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
-				Card(verticalSpacing: 0) {
-					SmallAccountCard(account: viewStore.account)
+				Card {
+					VStack(spacing: 0) {
+						SmallAccountCard(account: viewStore.account)
 
-					TransactionReviewTokenView(viewState: viewStore.token)
+						TransactionReviewTokenView(viewState: viewStore.token)
 
-					Separator()
+						Separator()
 
-					HStack(spacing: .medium3) {
-						Text(L10n.TransactionReview.Guarantees.setText)
-							.lineLimit(2)
-							.textStyle(.body2Header)
-							.foregroundColor(.app.gray1)
+						HStack(spacing: .medium3) {
+							Text(L10n.TransactionReview.Guarantees.setText)
+								.lineLimit(2)
+								.textStyle(.body2Header)
+								.foregroundColor(.app.gray1)
 
-						Spacer(minLength: 0)
+							Spacer(minLength: 0)
 
-						let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
-						MinimumPercentageStepper.View(store: stepperStore)
+							let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
+							MinimumPercentageStepper.View(store: stepperStore)
+						}
+						.padding(.medium3)
 					}
-					.padding(.medium3)
 				}
 			}
 		}
