@@ -119,7 +119,6 @@ final class CacheClientTests: TestCase {
 			sut.save(data2, entry2)
 			sut.save(data3, entry3)
 			sut.removeAll()
-
 			// then
 			XCTAssertThrowsError(try sut.load(URL.self, entry1))
 			XCTAssertThrowsError(try sut.load(Bool.self, entry2))

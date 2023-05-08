@@ -105,7 +105,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				)
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
 				let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: hashedMsg) }
-				var accountSignatures = Set<AccountSignature>()
+				var signatures = Set<SignatureOfEntity>()
+
+				let signerEntities = Set(request.signingFactor.signers.map(\.entity))
 
 				for requiredSigner in request.signingFactor.signers {
 					for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
@@ -115,42 +117,33 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							})
 						else {
 							loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.compressedRepresentation.hex)")
-							throw MissingAccountFromSignatures()
+							throw MissingSignatureFromRequiredSigner()
 						}
 						assert(requiredSigningFactor.derivationPath == signature.derivationPath)
-						let accountSignature = try AccountSignature(
-							account: requiredSigner.account,
-							signature: signature
+
+						let entitySignature = try SignatureOfEntity(
+							signerEntity: requiredSigner.entity,
+							factorInstance: requiredSigningFactor,
+							signature: Signature(
+								signatureWithPublicKey: signature.signature,
+								derivationPath: requiredSigningFactor.getDerivationPath()
+							)
 						)
-						accountSignatures.insert(accountSignature)
+						signatures.insert(entitySignature)
 					}
 				}
 
-				return accountSignatures
+				return signatures
 			}
 		)
 	}()
 }
 
-extension AccountSignature {
-	init(
-		account: Profile.Network.Account,
-		signature signatureParsed: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner.Validated
-	) throws {
-		let signature = try Signature(
-			signatureWithPublicKey: signatureParsed.signature,
-			derivationPath: account.derivationPath()
-		)
-		try self.init(
-			entity: account,
-			factorInstance: account.factorInstance,
-			signature: signature
-		)
-	}
-}
+// MARK: - MissingSignatureFromRequiredSigner
+public struct MissingSignatureFromRequiredSigner: Swift.Error {}
 
-// MARK: - MissingAccountFromSignatures
-struct MissingAccountFromSignatures: Swift.Error {}
+// MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
+public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
@@ -211,7 +204,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 // MARK: - InvalidSignature
 struct InvalidSignature: Swift.Error {}
 
-extension SigningFactor.Signer {
+extension Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
 		factorInstancesRequiredToSign.compactMap {
 			guard let derivationPath = $0.derivationPath else {

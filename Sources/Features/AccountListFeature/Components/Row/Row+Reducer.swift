@@ -77,7 +77,10 @@ extension AccountList {
 					return .none
 				}
 
-				return checkIfDeviceFactorSourceControls(factorInstance: state.account.factorInstance)
+				switch state.account.securityState {
+				case let .unsecured(unsecuredEntityControl):
+					return checkIfDeviceFactorSourceControls(factorInstance: unsecuredEntityControl.transactionSigning)
+				}
 			}
 		}
 

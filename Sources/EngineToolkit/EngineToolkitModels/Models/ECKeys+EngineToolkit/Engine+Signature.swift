@@ -1,8 +1,9 @@
+import CustomDump
 import Foundation
 
 // MARK: - Engine.Signature
 extension Engine {
-	public enum Signature: Sendable, Codable, Hashable {
+	public enum Signature: Sendable, Codable, Hashable, CustomStringConvertible, CustomDebugStringConvertible, CustomDumpStringConvertible {
 		// ==============
 		// Enum Variants
 		// ==============
@@ -69,5 +70,17 @@ extension Engine.Signature {
 
 	public var hex: String {
 		bytes.hex
+	}
+
+	public var description: String {
+		switch self {
+		case .ecdsaSecp256k1: return "K1(\(hex))"
+		case .eddsaEd25519: return "Curve25519(\(hex))"
+		}
+	}
+
+	public var debugDescription: String { description }
+	public var customDumpDescription: String {
+		description
 	}
 }

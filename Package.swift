@@ -37,6 +37,7 @@ package.addModules([
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
+			"CreateAuthKeyFeature",
 		],
 		tests: .yes()
 	),
@@ -76,6 +77,15 @@ package.addModules([
 			"EditPersonaFeature",
 			"PersonasFeature",
 			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "CreateAuthKeyFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"TransactionReviewFeature",
+			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -124,6 +134,7 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"EditPersonaFeature",
+			"CreateAuthKeyFeature",
 			"GatewayAPI",
 		],
 		tests: .no
@@ -262,7 +273,7 @@ package.addModules([
 			"LedgerHardwareWalletClient",
 			"Profile",
 			"TransactionClient",
-			"UseFactorSourceClient",
+			"DeviceFactorSourceClient",
 		],
 		tests: .no
 	),
@@ -390,6 +401,7 @@ package.addModules([
 	.client(
 		name: "FaucetClient",
 		dependencies: [
+			"DeviceFactorSourceClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
@@ -542,7 +554,7 @@ package.addModules([
 			"Profile",
 			"SecureStorageClient",
 			"MnemonicClient",
-			"UseFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
+			"DeviceFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
 		],
 		tests: .yes()
 	),
@@ -559,8 +571,11 @@ package.addModules([
 	.client(
 		name: "ROLAClient",
 		dependencies: [
+			"AccountsClient",
 			"GatewayAPI",
 			"CacheClient",
+			"DeviceFactorSourceClient",
+			"EngineToolkitClient",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -581,6 +596,7 @@ package.addModules([
 		name: "TransactionClient",
 		dependencies: [
 			"AccountsClient",
+			"PersonasClient",
 			"AccountPortfoliosClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
@@ -588,7 +604,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "UseFactorSourceClient",
+		name: "DeviceFactorSourceClient",
 		dependencies: [
 			"Profile",
 			"Cryptography",
@@ -688,7 +704,7 @@ package.addModules([
 			"Profile",
 		],
 		exclude: [
-			"P2P/Codable/README.md",
+			"P2P/Dapp/README.md",
 			"P2P/Application/README.md",
 		],
 		tests: .yes()

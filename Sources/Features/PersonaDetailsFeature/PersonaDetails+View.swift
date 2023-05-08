@@ -1,3 +1,4 @@
+import CreateAuthKeyFeature
 import EditPersonaFeature
 import FeaturePrelude
 
@@ -17,6 +18,10 @@ extension PersonaDetails {
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
+
+		#if DEBUG
+		public var canCreateAuthKey: Bool
+		#endif // DEBUG
 	}
 }
 
@@ -31,6 +36,16 @@ extension PersonaDetails.View {
 						.padding(.vertical, .large2)
 
 					InfoSection(store: store.actionless)
+
+					#if DEBUG
+					VStack {
+						Button("Create & Upload Auth Key") {
+							viewStore.send(.createAndUploadAuthKeyButtonTapped)
+						}
+						.controlState(viewStore.canCreateAuthKey ? .enabled : .disabled)
+						.buttonStyle(.secondaryRectangular)
+					}
+					#endif
 
 					Button(L10n.PersonaDetails.editPersona) {
 						viewStore.send(.editPersonaTapped)
@@ -70,6 +85,13 @@ extension PersonaDetails.View {
 		) { store in
 			EditPersona.View(store: store)
 		}
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.createAuthKey,
+			action: PersonaDetails.Destination.Action.createAuthKey
+		) { store in
+			CreateAuthKey.View(store: store)
+		}
 		.alert(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.confirmForgetAlert,
@@ -88,7 +110,20 @@ private extension StoreOf<PersonaDetails> {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(thumbnail: nil, personaName: personaName, isDappPersona: isDappPersona)
+		#if DEBUG
+		.init(
+			thumbnail: nil,
+			personaName: personaName,
+			isDappPersona: isDappPersona,
+			canCreateAuthKey: canCreateAuthKey
+		)
+		#else
+		.init(
+				thumbnail: nil,
+				personaName: personaName,
+				isDappPersona: isDappPersona
+			)
+		#endif
 	}
 
 	var personaName: String {

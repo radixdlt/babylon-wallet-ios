@@ -17,7 +17,8 @@ extension AccountsClient: TestDependencyKey {
 		newUnsavedVirtualAccountControlledByLedgerFactorSource: { _ in throw NoopError() },
 		saveVirtualAccount: { _ in },
 		getAccountByAddress: { _ in throw NoopError() },
-		hasAccountOnNetwork: { _ in false }
+		hasAccountOnNetwork: { _ in false },
+		updateAccount: { _ in }
 	)
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
@@ -28,6 +29,7 @@ extension AccountsClient: TestDependencyKey {
 		newUnsavedVirtualAccountControlledByLedgerFactorSource: unimplemented("\(Self.self).newUnsavedVirtualAccountControlledByLedgerFactorSource"),
 		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),
-		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork")
+		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
+		updateAccount: unimplemented("\(Self.self).updateAccount")
 	)
 }

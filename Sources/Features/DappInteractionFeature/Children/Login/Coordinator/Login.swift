@@ -3,7 +3,7 @@ import CreateEntityFeature
 import EngineToolkit
 import FeaturePrelude
 import PersonasClient
-import UseFactorSourceClient
+import ROLAClient
 
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
@@ -65,7 +65,7 @@ struct Login: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+	@Dependency(\.rolaClient) var rolaClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -97,21 +97,15 @@ struct Login: Sendable, FeatureReducer {
 			guard let challenge = state.loginRequest.challenge else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
-			let payloadToHash = P2P.Dapp.Request.AuthLoginRequestItem.payloadToHash(
+
+			let signAuthRequest = SignAuthChallengeRequest(
 				challenge: challenge,
-				dAppDefinitionAddress: state.dappMetadata.origin.rawValue,
-				origin: state.dappDefinitionAddress.address
+				origin: state.dappMetadata.origin,
+				dAppDefinitionAddress: state.dappDefinitionAddress,
+				persona: persona
 			)
 			return .run { [authorizedDapp = state.authorizedDapp] send in
-				let signature = try await useFactorSourceClient.signUsingDeviceFactorSource(
-					of: persona,
-					unhashedDataToSign: payloadToHash,
-					purpose: .signData(isTransaction: false)
-				)
-				let signedAuthChallenge = SignedAuthChallenge(
-					challenge: challenge,
-					signatureWithPublicKey: signature.signature.signatureWithPublicKey
-				)
+				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
 				await send(.delegate(.continueButtonTapped(
 					persona,
 					authorizedDapp,

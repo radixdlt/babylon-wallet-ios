@@ -10,7 +10,7 @@ final class ToDappResponseTests: TestCase {
 					oneTimeAccounts: .withoutProof(.init(
 						accounts: [
 							.init(
-								accountAddress: try! .init(address: "address"),
+								accountAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
 								label: "Label",
 								appearanceId: .fromIndex(0)
 							),
@@ -36,7 +36,7 @@ final class ToDappResponseTests: TestCase {
 					"oneTimeAccounts": [
 						"accounts": [
 							[
-								"address": "address",
+								"address": "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p",
 								"appearanceId": 0,
 								"label": "Label",
 							],
@@ -74,7 +74,7 @@ final class ToDappResponseTests: TestCase {
 			"metadata": [
 				"networkId": 34,
 				"origin": "radixdlt.dashboard.com",
-				"dAppDefinitionAddress": "account_deadbeef",
+				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -95,7 +95,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					networkId: 34,
 					origin: "radixdlt.dashboard.com",
-					dAppDefinitionAddress: try! .init(address: "account_deadbeef")
+					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
 				)
 			)
 		)
@@ -115,7 +115,7 @@ final class ToDappResponseTests: TestCase {
 			"metadata": [
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
-				"dAppDefinitionAddress": "account_deadbeef",
+				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -132,7 +132,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: try! .init(address: "account_deadbeef")
+					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
 				)
 			)
 		)

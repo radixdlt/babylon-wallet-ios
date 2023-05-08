@@ -128,7 +128,7 @@ extension AddressView {
 #if DEBUG
 struct AddressView_Previews: PreviewProvider {
 	static var previews: some View {
-		AddressView(.address(.account(try! .init(address: "account_wqs8qxdx7qw8c"))))
+		AddressView(.address(.account(try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"))))
 	}
 }
 #endif

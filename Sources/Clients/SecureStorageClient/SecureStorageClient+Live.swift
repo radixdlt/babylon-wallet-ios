@@ -105,6 +105,7 @@ extension SecureStorageClient: DependencyKey {
 						return L10n.Common.BiometricsPrompt.creationOfEntity(entityKindName)
 					case .signTransaction: return L10n.Common.BiometricsPrompt.signTransaction
 					case .signAuthChallenge: return L10n.Common.BiometricsPrompt.signAuthChallenge
+					case .createSignAuthKey: return "Create Auth signing key"
 					#if DEBUG
 					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
 					#endif

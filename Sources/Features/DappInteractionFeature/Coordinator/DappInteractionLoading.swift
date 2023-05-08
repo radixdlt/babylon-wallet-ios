@@ -38,6 +38,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.cacheClient) var cacheClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -80,7 +81,12 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 					// FIXME: cleanup DappMetaData
 					return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {
-					throw error
+					if await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled {
+						loggerGlobal.notice("Failed to load metadata, but we surpressed the error since is appdeveloper")
+						return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
+					} else {
+						throw error
+					}
 				}
 			}
 			await send(.internal(.dappMetadataLoadingResult(metadata)))

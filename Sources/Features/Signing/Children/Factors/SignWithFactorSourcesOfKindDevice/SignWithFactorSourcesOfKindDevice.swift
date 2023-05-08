@@ -1,6 +1,6 @@
+import DeviceFactorSourceClient
 import FactorSourcesClient
 import FeaturePrelude
-import UseFactorSourceClient
 
 public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducerProtocol {
 	public static let factorSourceKind = FactorSourceKind.device
@@ -16,11 +16,11 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
 		case done(
 			signingFactors: NonEmpty<Set<SigningFactor>>,
-			signatures: Set<AccountSignature>
+			signatures: Set<SignatureOfEntity>
 		)
 	}
 
-	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -44,12 +44,12 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	func sign(
 		signingFactor: SigningFactor,
 		state: State
-	) async throws -> Set<AccountSignature> {
-		try await useFactorSourceClient.signUsingDeviceFactorSource(
+	) async throws -> Set<SignatureOfEntity> {
+		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: signingFactor.factorSource,
-			of: Set(signingFactor.signers.map(\.account)),
+			signerEntities: Set(signingFactor.signers.map(\.entity)),
 			unhashedDataToSign: state.dataToSign,
-			purpose: .signData(isTransaction: true)
+			purpose: .signTransaction(.manifestFromDapp)
 		)
 	}
 }

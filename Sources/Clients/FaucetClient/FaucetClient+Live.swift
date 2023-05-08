@@ -1,5 +1,6 @@
 import ClientPrelude
 import Cryptography
+import DeviceFactorSourceClient
 import EngineToolkitClient
 import EngineToolkitModels
 import GatewayAPI
@@ -44,9 +45,10 @@ extension FaucetClient: DependencyKey {
 			await isAllowedToUseFaucetIfSoGetEpochs(accountAddress: accountAddress) != nil
 		}
 
-		/// This function can ONLY sign transaction which does not spend funds or otherwise require
-		/// auth, since we use an ephemeral key pair
-		@Sendable func signSubmitTX(manifest: TransactionManifest) async throws {
+		@Sendable func signSubmitTX(
+			manifest: TransactionManifest,
+			signIntent: (Data, TransactionSigners) async throws -> Set<Engine.SignatureWithPublicKey> = { _, _ in [] }
+		) async throws {
 			@Dependency(\.transactionClient) var transactionClient
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			@Dependency(\.submitTXClient) var submitTXClient
@@ -68,13 +70,13 @@ extension FaucetClient: DependencyKey {
 			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 
 			let notarized = try await transactionClient.notarizeTransaction(.init(
-				intentSignatures: [],
+				intentSignatures: signIntent(Data(compiledIntent.compiledIntent), builtTransactionIntentWithSigners.transactionSigners),
 				compileTransactionIntent: compiledIntent,
 				notary: .curve25519(ephemeralNotary)
-			)
-			)
+			))
 
 			let txID = notarized.txID
+
 			_ = try await submitTXClient.submitTransaction(.init(
 				txID: txID,
 				compiledNotarizedTXIntent: notarized.notarized
