@@ -143,6 +143,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return .none
 		case let .createAuthKey(.presented(.delegate(.done(wasSuccessful)))):
 			state.createAuthKey = nil
+			state.canCreateAuthSigningKey = false
 			return .none
 
 		default: return .none

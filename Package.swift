@@ -574,8 +574,8 @@ package.addModules([
 			"AccountsClient",
 			"GatewayAPI",
 			"CacheClient",
-			"PersonasClient",
-			"FaucetClient", // FIXME: REALLY should move `submitSimpleTX` out of `FaucetClient` into... `SimpleTXClient`?
+			"DeviceFactorSourceClient",
+			"EngineToolkitClient",
 		],
 		tests: .yes(
 			dependencies: [],

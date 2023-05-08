@@ -5,6 +5,7 @@ import EngineToolkitClient
 // MARK: - TransactionClient
 public struct TransactionClient: Sendable, DependencyKey {
 	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
+	public var convertManifestToString: ConvertManifestToString
 	public var lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer
 	public var lockFeeWithSelectedPayer: LockFeeWithSelectedPayer
 	public var addInstructionToManifest: AddInstructionToManifest
@@ -21,6 +22,8 @@ extension TransactionClient {
 	public typealias LockFeeWithSelectedPayer = @Sendable (TransactionManifest, _ fee: BigDecimal, _ payer: AccountAddress) async throws -> TransactionManifest
 	public typealias AddGuaranteesToManifest = @Sendable (TransactionManifest, [Guarantee]) async throws -> TransactionManifest
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
+	public typealias ConvertManifestToString = @Sendable (TransactionManifest) async throws -> TransactionManifest
+
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
 	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntentWithSigners
 	public typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse

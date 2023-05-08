@@ -40,6 +40,7 @@ extension EngineToolkitClient {
 			getTransactionVersion: { TXVersion.default },
 			generateTXNonce: generateTXNonce,
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
+			convertManifestToString: { try engineToolkit.convertManifest(request: .init(manifest: $0.manifest, outputFormat: .string, networkId: $0.networkID)).get() },
 			compileTransactionIntent: compileTransactionIntent,
 			compileSignedTransactionIntent: {
 				try engineToolkit

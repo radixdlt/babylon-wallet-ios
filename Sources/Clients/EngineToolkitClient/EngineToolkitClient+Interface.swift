@@ -8,6 +8,7 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var generateTXNonce: GenerateTXNonce
 
 	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
+	public var convertManifestToString: ConvertManifestToString
 
 	public var compileTransactionIntent: CompileTransactionIntent
 	public var compileSignedTransactionIntent: CompileSignedTransactionIntent
@@ -49,12 +50,25 @@ public struct ConvertManifestInstructionsToJSONIfItWasStringRequest: Sendable, H
 	}
 }
 
+// MARK: - ConvertManifestToStringRequest
+public struct ConvertManifestToStringRequest: Sendable, Hashable {
+	public let version: TXVersion
+	public let networkID: NetworkID
+	public let manifest: TransactionManifest
+	public init(version: TXVersion, networkID: NetworkID, manifest: TransactionManifest) {
+		self.version = version
+		self.networkID = networkID
+		self.manifest = manifest
+	}
+}
+
 extension EngineToolkitClient {
 	public typealias GetTransactionVersion = @Sendable () -> TXVersion
 
 	public typealias GenerateTXNonce = @Sendable () -> Nonce
 
 	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (ConvertManifestInstructionsToJSONIfItWasStringRequest) throws -> JSONInstructionsTransactionManifest
+	public typealias ConvertManifestToString = @Sendable (ConvertManifestToStringRequest) throws -> TransactionManifest
 
 	public typealias CompileTransactionIntent = @Sendable (TransactionIntent) throws -> CompileTransactionIntentResponse
 

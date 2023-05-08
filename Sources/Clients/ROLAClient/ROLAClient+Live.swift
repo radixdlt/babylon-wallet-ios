@@ -1,17 +1,15 @@
-import AccountsClient
 import CacheClient
 import ClientPrelude
 import Cryptography
 import DeviceFactorSourceClient
-import EngineToolkit
-import FaucetClient // Actually just `SignSubmitSimpleTX`
+import EngineToolkitClient
 import GatewayAPI
-import PersonasClient
 
 extension ROLAClient {
 	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 		// FIXME: change to using hashes, which will happen... soon. Post Enkinet upgrade and once support in the
 		// whole ecosystem.
@@ -24,7 +22,7 @@ extension ROLAClient {
 			for entity: EntityPotentiallyVirtual,
 			assertingTransactionSigningKeyIsNotRemoved transactionSigningKey: SLIP10.PublicKey
 		) async throws -> TransactionManifest {
-			@Dependency(\.faucetClient) var faucetClient
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 			let entityAddress: String = {
 				switch entity {
@@ -74,20 +72,25 @@ extension ROLAClient {
 				)
 			)
 
-			let manifest = TransactionManifest(
+			let manifestParsed = TransactionManifest(
 				instructions: [
 					.setMetadata(setMetadataInstruction),
 				]
 			)
 
-			return manifest
+			let manifestString = try engineToolkitClient.convertManifestToString(.init(
+				version: .default,
+				networkID: entity.networkID,
+				manifest: manifestParsed
+			))
+
+			return manifestString
 		}
 
 		@Sendable func manifestCreatingAuthKey(
 			for entity: EntityPotentiallyVirtual
 		) async throws -> ManifestForAuthKeyCreationResponse {
 			@Dependency(\.factorSourcesClient) var factorSourcesClient
-			@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 			let factorSourceID: FactorSourceID
 			let authSignDerivationPath: DerivationPath
@@ -225,7 +228,6 @@ extension ROLAClient {
 				try await manifestCreatingAuthKey(for: request.entity)
 			},
 			signAuthChallenge: { request in
-				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 				let payload = payloadToHash(
 					challenge: request.challenge,

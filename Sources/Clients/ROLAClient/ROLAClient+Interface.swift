@@ -1,5 +1,7 @@
 import ClientPrelude
+import Cryptography
 import Profile
+import SharedModels
 
 // MARK: - ROLAClient
 public struct ROLAClient: Sendable, DependencyKey {
@@ -43,10 +45,6 @@ public struct ManifestForAuthKeyCreationRequest: Sendable, Hashable {
 
 // MARK: - EntityHasAuthSigningKeyAlready
 struct EntityHasAuthSigningKeyAlready: Swift.Error {}
-
-import Cryptography
-import DeviceFactorSourceClient
-import SharedModels
 
 // MARK: - SignAuthChallengeRequest
 public struct SignAuthChallengeRequest: Sendable, Hashable {
