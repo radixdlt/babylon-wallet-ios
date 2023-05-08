@@ -45,8 +45,14 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 	/// A set of all of the account component addresses seen in the manifest.
 	public let accountAddresses: [ComponentAddress]
 
-	/// A set of all of the personas and account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public var entitiesRequiringAuth: [ComponentAddress] // mutable for now, since we need to insert Identities manually until ET support them
+	/// A set of all of the identity component addresses seen in the manifest.
+	public let identityAddresses: [ComponentAddress]
+
+	/// A set of all of the account component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public let accountsRequiringAuth: [ComponentAddress]
+
+	/// A set of all of the identity component addresses in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public let identitiesRequiringAuth: [ComponentAddress]
 
 	/// A set of all of the account component addresses in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
 	public let accountsWithdrawnFrom: [ComponentAddress]
@@ -58,12 +64,14 @@ public struct AnalyzeManifestResponse: Sendable, Codable, Hashable {
 
 	private enum CodingKeys: String, CodingKey {
 		case accountAddresses = "account_addresses"
+		case identityAddresses = "identity_addresses"
 		case packageAddresses = "package_addresses"
 		case resourceAddresses = "resource_addresses"
 		case componentAddresses = "component_addresses"
 
 		case accountsDepositedInto = "accounts_deposited_into"
-		case entitiesRequiringAuth = "accounts_requiring_auth"
+		case accountsRequiringAuth = "accounts_requiring_auth"
+		case identitiesRequiringAuth = "identities_requiring_auth"
 		case accountsWithdrawnFrom = "accounts_withdrawn_from"
 	}
 }

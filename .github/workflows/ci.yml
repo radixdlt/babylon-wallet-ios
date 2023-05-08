@@ -14,7 +14,7 @@ jobs:
 
   linting:
     name: "Linting"
-    runs-on: macos-12
+    runs-on: macos-13
 
     steps:
       - uses: actions/checkout@v3.1.0
@@ -27,7 +27,7 @@ jobs:
 
   test-and-build:
     name: "Test and build"
-    runs-on: macos-12
+    runs-on: macos-13
 
     needs:
       - linting
@@ -45,6 +45,10 @@ jobs:
             ${{ secrets.CONVERSE_SSH_KEY }}
             ${{ secrets.BITE_SSH_KEY }}
             ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "14.3"
 
       - name: "Set up ruby"
         uses: ruby/setup-ruby@v1
