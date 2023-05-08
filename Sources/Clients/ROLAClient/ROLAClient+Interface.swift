@@ -13,8 +13,14 @@ public struct ROLAClient: Sendable, DependencyKey {
 extension ROLAClient {
 	public typealias PerformDappDefinitionVerification = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
-	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> TransactionManifest
+	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> ManifestForAuthKeyCreationResponse
 	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeRequest) async throws -> SignedAuthChallenge
+}
+
+// MARK: - ManifestForAuthKeyCreationResponse
+public struct ManifestForAuthKeyCreationResponse: Sendable, Hashable {
+	public let manifest: TransactionManifest
+	public let authenticationSigning: FactorInstance
 }
 
 extension DependencyValues {

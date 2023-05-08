@@ -19,14 +19,21 @@ extension ROLAClient {
 		// see Russ confluence page:
 		/// https://radixdlt.atlassian.net/wiki/spaces/DevEcosystem/pages/3055026344/Metadata+Standards+for+Provable+Ownership+Encrypted+Messaging
 		/// if it is already present, no change is done
-		@Sendable func addOwnerKey<Entity: EntityProtocol>(
-			newPublicKey: SLIP10.PublicKey,
-			for entity: Entity,
+		@Sendable func manifestAdding(
+			ownerKey newPublicKey: SLIP10.PublicKey,
+			for entity: EntityPotentiallyVirtual,
 			assertingTransactionSigningKeyIsNotRemoved transactionSigningKey: SLIP10.PublicKey
 		) async throws -> TransactionManifest {
 			@Dependency(\.faucetClient) var faucetClient
 
-			let entityAddress = entity.address.address
+			let entityAddress: String = {
+				switch entity {
+				case let .account(account):
+					return account.address.address
+				case let .persona(persona):
+					return persona.address.address
+				}
+			}()
 			let metadata = try await gatewayAPIClient.getEntityMetadata(entityAddress)
 			var ownerKeys = try metadata.ownerKeys() ?? []
 			loggerGlobal.debug("ownerKeys: \(ownerKeys)")
@@ -76,32 +83,36 @@ extension ROLAClient {
 			return manifest
 		}
 
-		@Sendable func createAndUploadNewAuth<Entity: EntityProtocol>(
-			for entity: inout Entity,
-			authSignDerivationPath makeAuthSignDerivationPath: (DerivationPath) throws -> DerivationPath
-		) async throws {
+		@Sendable func manifestCreatingAuthKey(
+			for entity: EntityPotentiallyVirtual
+		) async throws -> ManifestForAuthKeyCreationResponse {
 			@Dependency(\.factorSourcesClient) var factorSourcesClient
 			@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 			let factorSourceID: FactorSourceID
 			let authSignDerivationPath: DerivationPath
 			let transactionSigning: FactorInstance
-			var unsecuredEntityControl: UnsecuredEntityControl
+			let unsecuredEntityControl: UnsecuredEntityControl
 			switch entity.securityState {
 			case let .unsecured(unsecuredEntityControl_):
 				unsecuredEntityControl = unsecuredEntityControl_
 				transactionSigning = unsecuredEntityControl.transactionSigning
 				guard unsecuredEntityControl.authenticationSigning == nil else {
-					loggerGlobal.notice("Entity: \(entity.id) already has an authenticationSigning")
-					return
+					loggerGlobal.notice("Entity: \(entity) already has an authenticationSigning")
+					throw EntityHasAuthSigningKeyAlready()
 				}
 
-				loggerGlobal.notice("Entity: \(entity.id) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
+				loggerGlobal.notice("Entity: \(entity) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
 				factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
 				guard let hdPath = unsecuredEntityControl.transactionSigning.derivationPath else {
 					fatalError()
 				}
-				authSignDerivationPath = try makeAuthSignDerivationPath(hdPath)
+				switch entity {
+				case .account:
+					authSignDerivationPath = try hdPath.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+				case .persona:
+					authSignDerivationPath = try hdPath.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+				}
 			}
 			let factorSources = try await factorSourcesClient.getFactorSources()
 			guard
@@ -128,16 +139,15 @@ extension ROLAClient {
 					derivationPath: authSignDerivationPath
 				)
 			}()
-			loggerGlobal.notice("Entity: \(entity.id) created and is about to upload authenticationSigning key: \(authenticationSigning.publicKey)")
+			loggerGlobal.notice("Entity: \(entity) created and is about to upload authenticationSigning key: \(authenticationSigning.publicKey)")
 
-			try await addOwnerKey(
-				newPublicKey: authenticationSigning.publicKey,
+			let manifest = try await manifestAdding(
+				ownerKey: authenticationSigning.publicKey,
 				for: entity,
 				assertingTransactionSigningKeyIsNotRemoved: transactionSigning.publicKey
 			)
 
-			unsecuredEntityControl.authenticationSigning = authenticationSigning
-			entity.securityState = .unsecured(unsecuredEntityControl)
+			return ManifestForAuthKeyCreationResponse(manifest: manifest, authenticationSigning: authenticationSigning)
 		}
 
 		return Self(
@@ -211,20 +221,8 @@ extension ROLAClient {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
-//			createAuthSigningKeyForAccountIfNeeded: { request in
-//				@Dependency(\.accountsClient) var accountsClient
-//				var account = try await accountsClient.getAccountByAddress(request.accountAddress)
-//				try await createAndUploadNewAuth(for: &account) { try $0.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
-//				try await accountsClient.updateAccount(account)
-//			},
-//			createAuthSigningKeyForPersonaIfNeeded: { request in
-//				@Dependency(\.personasClient) var personasClient
-//				var persona = try await personasClient.getPersona(id: request.identityAddress)
-//				try await createAndUploadNewAuth(for: &persona) { try $0.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath() }
-//				try await personasClient.updatePersona(persona)
-//			},
-			manifestForAuthKeyCreation: { _ in
-				throw NoopError()
+			manifestForAuthKeyCreation: { request in
+				try await manifestCreatingAuthKey(for: request.entity)
 			},
 			signAuthChallenge: { request in
 				@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient

@@ -1,4 +1,6 @@
+import AccountsClient
 import FeaturePrelude
+import PersonasClient
 import ROLAClient
 import TransactionReviewFeature
 
@@ -7,6 +9,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let entity: EntityPotentiallyVirtual
 		public var transactionReview: TransactionReview.State?
+		public var authenticationSigningFactorInstance: FactorInstance?
 
 		public init(entity: EntityPotentiallyVirtual) {
 			self.entity = entity
@@ -18,7 +21,8 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case createdManifest(TransactionManifest)
+		case createdManifestAndAuthKey(ManifestForAuthKeyCreationResponse)
+		case finishedSettingFactorInstance
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -30,6 +34,8 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.rolaClient) var rolaClient
+	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.personasClient) var personasClient
 
 	public init() {}
 
@@ -44,8 +50,8 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { [entity = state.entity] send in
-				let manifest = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity))
-				await send(.internal(.createdManifest(manifest)))
+				let response = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity))
+				await send(.internal(.createdManifestAndAuthKey(response)))
 			} catch: { _, send in
 				loggerGlobal.error("Failed to create manifest for create auth")
 				await send(.delegate(.done(success: false)))
@@ -55,9 +61,13 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .createdManifest(manifest):
-			state.transactionReview = .init(transactionManifest: manifest, message: nil)
+		case let .createdManifestAndAuthKey(manifestAndAuthKey):
+			state.transactionReview = .init(transactionManifest: manifestAndAuthKey.manifest, message: nil)
+			state.authenticationSigningFactorInstance = manifestAndAuthKey.authenticationSigning
 			return .none
+
+		case .finishedSettingFactorInstance:
+			return .send(.delegate(.done(success: true)))
 		}
 	}
 
@@ -71,7 +81,33 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 			return .none
 		case let .transactionReview(.delegate(.transactionCompleted(txID))):
 			loggerGlobal.notice("Successfully CreateAuthKey, txID: \(txID)")
-			return .send(.delegate(.done(success: true)))
+			guard let authenticationSigningFactorInstance = state.authenticationSigningFactorInstance else {
+				loggerGlobal.error("Expected authenticationSigningFactorInstance")
+				return .send(.delegate(.done(success: false)))
+			}
+
+			return .run { [entity = state.entity] send in
+				switch entity {
+				case var .account(account):
+					switch account.securityState {
+					case var .unsecured(entityControl):
+						assert(entityControl.authenticationSigning == nil)
+						entityControl.authenticationSigning = authenticationSigningFactorInstance
+						account.securityState = .unsecured(entityControl)
+						try await accountsClient.updateAccount(account)
+						await send(.internal(.finishedSettingFactorInstance))
+					}
+				case var .persona(persona):
+					switch persona.securityState {
+					case var .unsecured(entityControl):
+						assert(entityControl.authenticationSigning == nil)
+						entityControl.authenticationSigning = authenticationSigningFactorInstance
+						persona.securityState = .unsecured(entityControl)
+						try await personasClient.updatePersona(persona)
+						await send(.internal(.finishedSettingFactorInstance))
+					}
+				}
+			}
 
 		case .transactionReview:
 			return .none
