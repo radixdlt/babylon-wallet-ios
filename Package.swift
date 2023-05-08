@@ -126,6 +126,7 @@ package.addModules([
 			"AuthorizedDappsClient",
 			"EditPersonaFeature",
 			"ROLAClient",
+			"TransactionReviewFeature",
 		],
 		tests: .no
 	),

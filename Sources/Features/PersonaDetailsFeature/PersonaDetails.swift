@@ -3,6 +3,7 @@ import EditPersonaFeature
 import FeaturePrelude
 import GatewayAPI
 import ROLAClient
+import TransactionReviewFeature
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
@@ -48,6 +49,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		@PresentationState
 		var destination: Destination.State? = nil
+
+		var identityAddress: IdentityAddress {
+			mode.id
+		}
 
 		#if DEBUG
 		public var createAndUploadAuthKeyButtonState: ControlState
@@ -98,6 +103,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
+
+		case reviewCreateAuthKeyTransaction(TransactionManifest)
 	}
 
 	// MARK: - Destination
@@ -105,13 +112,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public struct Destination: ReducerProtocol {
 		public enum State: Equatable, Hashable {
 			case editPersona(EditPersona.State)
+			case createAuthKeyTransaction(TransactionReview.State)
+
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
 		}
 
 		public enum Action: Equatable {
 			case editPersona(EditPersona.Action)
-			case confirmForgetAlert(ConfirmForgetAlert)
+			case createAuthKeyTransaction(TransactionReview.Action)
 
+			case confirmForgetAlert(ConfirmForgetAlert)
 			public enum ConfirmForgetAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
@@ -121,6 +131,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
+			}
+			Scope(state: /State.createAuthKeyTransaction, action: /Action.createAuthKeyTransaction) {
+				TransactionReview()
 			}
 		}
 	}
@@ -174,12 +187,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-			return call(
-				buttonState: \.createAndUploadAuthKeyButtonState,
-				into: &state,
-				onSuccess: .disabled // should not be able to create another auth key
-			) {
-				try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: $0))
+			return .run { [identityAddress = state.identityAddress] send in
+				let manifest = try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: identityAddress))
+				await send(.internal(.reviewCreateAuthKeyTransaction(manifest)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to create transaction for auth key creation, error: \(error)")
+				errorQueue.schedule(error)
 			}
 		#endif
 
@@ -224,6 +237,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
 			}
 
+			return .none
+
+		case let .reviewCreateAuthKeyTransaction(manifest):
+			state.destination = .createAuthKeyTransaction(.init(transactionManifest: manifest, message: nil))
 			return .none
 
 		case let .dAppsUpdated(dApps):

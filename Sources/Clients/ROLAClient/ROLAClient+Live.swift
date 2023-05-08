@@ -23,7 +23,7 @@ extension ROLAClient {
 			newPublicKey: SLIP10.PublicKey,
 			for entity: Entity,
 			assertingTransactionSigningKeyIsNotRemoved transactionSigningKey: SLIP10.PublicKey
-		) async throws {
+		) async throws -> TransactionManifest {
 			@Dependency(\.faucetClient) var faucetClient
 
 			let entityAddress = entity.address.address
@@ -73,8 +73,9 @@ extension ROLAClient {
 				]
 			)
 
-			try await faucetClient.signSubmitSimpleTX(manifest, .signTransaction(.internalManifest(.uploadAuthKey)))
-			loggerGlobal.debug("Submimtted TX updating ownerKeys!")
+//			try await faucetClient.signSubmitSimpleTX(manifest, .signTransaction(.internalManifest(.uploadAuthKey)))
+//			loggerGlobal.debug("Submimtted TX updating ownerKeys!")
+			return manifest
 		}
 
 		@Sendable func createAndUploadNewAuth<Entity: EntityProtocol>(

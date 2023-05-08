@@ -90,6 +90,13 @@ extension PersonaDetails.View {
 		) { store in
 			EditPersona.View(store: store)
 		}
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.createAuthKeyTransaction,
+			action: PersonaDetails.Destination.Action.createAuthKeyTransaction
+		) { store in
+			TransactionReview.View(store: store)
+		}
 		.alert(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.confirmForgetAlert,
