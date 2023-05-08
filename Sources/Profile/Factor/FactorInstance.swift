@@ -57,12 +57,12 @@ public struct Signature: Sendable, Hashable {
 
 // MARK: - SignatureOfEntity
 public struct SignatureOfEntity: Sendable, Hashable {
-	public let signerEntity: Signer.Entity
+	public let signerEntity: EntityPotentiallyVirtual
 	public let factorInstance: FactorInstance
 	public let signature: Signature
 
 	public init(
-		signerEntity: Signer.Entity,
+		signerEntity: EntityPotentiallyVirtual,
 		factorInstance: FactorInstance,
 		signature: Signature
 	) throws {

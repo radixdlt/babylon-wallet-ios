@@ -52,9 +52,9 @@ extension SigningFactors {
 // MARK: - GetSigningFactorsRequest
 public struct GetSigningFactorsRequest: Sendable, Hashable {
 	public let networkID: NetworkID
-	public let signers: NonEmpty<Set<Signer.Entity>>
+	public let signers: NonEmpty<Set<EntityPotentiallyVirtual>>
 	public let signingPurpose: SigningPurpose
-	public init(networkID: NetworkID, signers: NonEmpty<Set<Signer.Entity>>, signingPurpose: SigningPurpose) {
+	public init(networkID: NetworkID, signers: NonEmpty<Set<EntityPotentiallyVirtual>>, signingPurpose: SigningPurpose) {
 		self.networkID = networkID
 		self.signers = signers
 		self.signingPurpose = signingPurpose

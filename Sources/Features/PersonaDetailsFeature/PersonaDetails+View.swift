@@ -1,3 +1,4 @@
+import CreateAuthKeyFeature
 import EditPersonaFeature
 import FeaturePrelude
 
@@ -19,7 +20,7 @@ extension PersonaDetails {
 		let isDappPersona: Bool
 
 		#if DEBUG
-		public var createAndUploadAuthKeyButtonState: ControlState
+		public var canCreateAuthKey: Bool
 		#endif // DEBUG
 	}
 }
@@ -41,14 +42,8 @@ extension PersonaDetails.View {
 						Button("Create & Upload Auth Key") {
 							viewStore.send(.createAndUploadAuthKeyButtonTapped)
 						}
-						.controlState(viewStore.createAndUploadAuthKeyButtonState)
+						.controlState(viewStore.canCreateAuthKey ? .enabled : .disabled)
 						.buttonStyle(.secondaryRectangular)
-
-						if viewStore.createAndUploadAuthKeyButtonState.isLoading {
-							Text("Creating and uploading auth Key")
-								.font(.app.body2Regular)
-								.foregroundColor(.app.gray1)
-						}
 					}
 					#endif
 
@@ -90,6 +85,13 @@ extension PersonaDetails.View {
 		) { store in
 			EditPersona.View(store: store)
 		}
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.createAuthKey,
+			action: PersonaDetails.Destination.Action.createAuthKey
+		) { store in
+			CreateAuthKey.View(store: store)
+		}
 		.alert(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.confirmForgetAlert,
@@ -113,7 +115,7 @@ private extension PersonaDetails.State {
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona,
-			createAndUploadAuthKeyButtonState: createAndUploadAuthKeyButtonState
+			canCreateAuthKey: canCreateAuthKey
 		)
 		#else
 		.init(

@@ -1,8 +1,8 @@
 import AuthorizedDappsClient
+import CreateAuthKeyFeature
 import EditPersonaFeature
 import FeaturePrelude
 import GatewayAPI
-import ROLAClient
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
@@ -12,8 +12,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
 	public typealias Store = StoreOf<Self>
-
-	@Dependency(\.rolaClient) var rolaClient
 
 	public init() {}
 
@@ -49,8 +47,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State? = nil
 
+		var identityAddress: IdentityAddress {
+			mode.id
+		}
+
 		#if DEBUG
-		public var createAndUploadAuthKeyButtonState: ControlState
+		public var canCreateAuthKey: Bool
 		#endif
 
 		public init(_ mode: Mode) {
@@ -64,7 +66,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case let .dApp(_, persona):
 				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
 			}
-			self.createAndUploadAuthKeyButtonState = hasAuthenticationSigningKey ? .disabled : .enabled
+			self.canCreateAuthKey = !hasAuthenticationSigningKey
 			#endif
 		}
 	}
@@ -98,6 +100,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
+		case personaToCreateAuthKeyForFetched(Profile.Network.Persona)
 	}
 
 	// MARK: - Destination
@@ -105,13 +108,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public struct Destination: ReducerProtocol {
 		public enum State: Equatable, Hashable {
 			case editPersona(EditPersona.State)
+			case createAuthKey(CreateAuthKey.State)
+
 			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
 		}
 
 		public enum Action: Equatable {
 			case editPersona(EditPersona.Action)
-			case confirmForgetAlert(ConfirmForgetAlert)
+			case createAuthKey(CreateAuthKey.Action)
 
+			case confirmForgetAlert(ConfirmForgetAlert)
 			public enum ConfirmForgetAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
@@ -121,6 +127,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.editPersona, action: /Action.editPersona) {
 				EditPersona()
+			}
+			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
+				CreateAuthKey()
 			}
 		}
 	}
@@ -159,6 +168,13 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
+		case let .destination(.presented(.createAuthKey(.delegate(.done(wasSuccessful))))):
+			#if DEBUG
+			state.canCreateAuthKey = false
+			#endif
+			state.destination = nil
+			return .none
+
 		case .destination:
 			return .none
 		}
@@ -174,13 +190,15 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-			return call(
-				buttonState: \.createAndUploadAuthKeyButtonState,
-				into: &state,
-				onSuccess: .disabled // should not be able to create another auth key
-			) {
-				try await rolaClient.createAuthSigningKeyForPersonaIfNeeded(.init(identityAddress: $0))
+			let identityAddress = state.identityAddress
+			return .run { send in
+				let persona = try await personasClient.getPersona(id: identityAddress)
+				await send(.internal(.personaToCreateAuthKeyForFetched(persona)))
+			} catch: { error, _ in
+				loggerGlobal.error("Could not get persona with address: \(identityAddress), error: \(error)")
+				errorQueue.schedule(error)
 			}
+			return .none
 		#endif
 
 		case let .accountTapped(address):
@@ -215,6 +233,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .personaToCreateAuthKeyForFetched(persona):
+			state.destination = .createAuthKey(.init(entity: .persona(persona)))
+			return .none
+
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
 			case .general:

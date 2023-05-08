@@ -1,8 +1,8 @@
 import AccountPortfoliosClient
 import AccountsClient
+import CreateAuthKeyFeature
 import FaucetClient
 import FeaturePrelude
-import ROLAClient
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
@@ -10,8 +10,11 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 
+		@PresentationState
+		var createAuthKey: CreateAuthKey.State? = nil
+
 		#if DEBUG
-		public var createAndUploadAuthKeyButtonState: ControlState
+		public var canCreateAuthSigningKey: Bool
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
 		public var createMultipleFungibleTokenButtonState: ControlState
@@ -26,7 +29,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
-			self.createAndUploadAuthKeyButtonState = .disabled // will load from account from accountsClient and check...
+			self.canCreateAuthSigningKey = false
 			self.createFungibleTokenButtonState = .enabled
 			self.createNonFungibleTokenButtonState = .enabled
 			self.createMultipleFungibleTokenButtonState = .enabled
@@ -55,6 +58,11 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case refreshAccountCompleted(TaskResult<AccountPortfolio>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		case canCreateAuthSigningKey(Bool)
+		case createAuthKeyWithAccount(Profile.Network.Account)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case createAuthKey(PresentationAction<CreateAuthKey.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -62,12 +70,18 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$createAuthKey, action: /Action.child .. ChildAction.createAuthKey) {
+				CreateAuthKey()._printChanges()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -85,12 +99,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 		#if DEBUG
 		case .createAndUploadAuthKeyButtonTapped:
-			return call(
-				buttonState: \.createAndUploadAuthKeyButtonState,
-				into: &state,
-				onSuccess: .disabled // should not be able to create another authSigning key
-			) {
-				try await rolaClient.createAuthSigningKeyForAccountIfNeeded(.init(accountAddress: $0))
+			return .run { [accountAddress = state.address] send in
+				let account = try await accountsClient.getAccountByAddress(accountAddress)
+				await send(.internal(.createAuthKeyWithAccount(account)))
 			}
 
 		case .createFungibleTokenButtonTapped:
@@ -125,26 +136,31 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	private func call(
-		buttonState: WritableKeyPath<State, ControlState>,
-		into state: inout State,
-		onSuccess: ControlState = .enabled,
-		call: @escaping @Sendable (AccountAddress) async throws -> Void
-	) -> EffectTask<Action> {
-		state[keyPath: buttonState] = .loading(.local)
-		return .run { [address = state.address] send in
-			try await call(address)
-			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
-		} catch: { error, send in
-			await send(.internal(.hideLoader(updateControlState: buttonState)))
-			if !Task.isCancelled {
-				errorQueue.schedule(error)
-			}
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .createAuthKey(.dismiss):
+			state.createAuthKey = nil
+			return .none
+		case let .createAuthKey(.presented(.delegate(.done(wasSuccessful)))):
+			state.createAuthKey = nil
+			#if DEBUG
+			state.canCreateAuthSigningKey = false
+			#endif
+			return .none
+
+		default: return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .createAuthKeyWithAccount(account):
+			guard !account.hasAuthenticationSigningKey else {
+				return .none
+			}
+			state.createAuthKey = .init(entity: .account(account))
+			return .none
+
 		case let .isAllowedToUseFaucet(.success(value)):
 			state.faucetButtonState = value ? .enabled : .disabled
 			return .none
@@ -172,9 +188,27 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		case let .canCreateAuthSigningKey(canCreateAuthSigningKey):
 			#if DEBUG
-			state.createAndUploadAuthKeyButtonState = canCreateAuthSigningKey ? .enabled : .disabled
+			state.canCreateAuthSigningKey = canCreateAuthSigningKey
 			#endif
 			return .none
+		}
+	}
+
+	private func call(
+		buttonState: WritableKeyPath<State, ControlState>,
+		into state: inout State,
+		onSuccess: ControlState = .enabled,
+		call: @escaping @Sendable (AccountAddress) async throws -> Void
+	) -> EffectTask<Action> {
+		state[keyPath: buttonState] = .loading(.local)
+		return .run { [address = state.address] send in
+			try await call(address)
+			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
+		} catch: { error, send in
+			await send(.internal(.hideLoader(updateControlState: buttonState)))
+			if !Task.isCancelled {
+				errorQueue.schedule(error)
+			}
 		}
 	}
 }

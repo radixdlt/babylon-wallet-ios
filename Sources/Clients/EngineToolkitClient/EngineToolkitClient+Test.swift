@@ -12,6 +12,7 @@ extension EngineToolkitClient: TestDependencyKey {
 				convertedManifestThatContainsThem: .init(instructions: .parsed([]))
 			)
 		},
+		convertManifestToString: { $0.manifest },
 		compileTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		compileSignedTransactionIntent: { _ in .init(bytes: [0xDE, 0xAD]) },
 		compileNotarizedTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
@@ -29,6 +30,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		getTransactionVersion: unimplemented("\(Self.self).getTransactionVersion"),
 		generateTXNonce: unimplemented("\(Self.self).generateTXNonce"),
 		convertManifestInstructionsToJSONIfItWasString: unimplemented("\(Self.self).convertManifestInstructionsToJSONIfItWasString"),
+		convertManifestToString: unimplemented("\(Self.self).convertManifestToString"),
 		compileTransactionIntent: unimplemented("\(Self.self).compileTransactionIntent"),
 		compileSignedTransactionIntent: unimplemented("\(Self.self).compileSignedTransactionIntent"),
 		compileNotarizedTransactionIntent: unimplemented("\(Self.self).compileNotarizedTransactionIntent"),

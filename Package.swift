@@ -37,7 +37,7 @@ package.addModules([
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
-			"ROLAClient",
+			"CreateAuthKeyFeature",
 		],
 		tests: .yes()
 	),
@@ -77,6 +77,15 @@ package.addModules([
 			"EditPersonaFeature",
 			"PersonasFeature",
 			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "CreateAuthKeyFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"TransactionReviewFeature",
+			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -125,8 +134,8 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"EditPersonaFeature",
+			"CreateAuthKeyFeature",
 			"GatewayAPI",
-			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -565,8 +574,8 @@ package.addModules([
 			"AccountsClient",
 			"GatewayAPI",
 			"CacheClient",
-			"PersonasClient",
-			"FaucetClient", // FIXME: REALLY should move `submitSimpleTX` out of `FaucetClient` into... `SimpleTXClient`?
+			"DeviceFactorSourceClient",
+			"EngineToolkitClient",
 		],
 		tests: .yes(
 			dependencies: [],

@@ -105,7 +105,11 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadSigningFactors(networkID: NetworkID, entities: NonEmpty<Set<Signer.Entity>>, purpose: SigningPurpose) -> EffectTask<Action> {
+	private func loadSigningFactors(
+		networkID: NetworkID,
+		entities: NonEmpty<Set<EntityPotentiallyVirtual>>,
+		purpose: SigningPurpose
+	) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.loadSigningFactors(
 				TaskResult {
