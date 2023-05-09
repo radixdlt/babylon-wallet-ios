@@ -38,14 +38,35 @@ extension DependencyValues {
 	}
 }
 
+// MARK: - InvalidateCachedDecision
+public enum InvalidateCachedDecision {
+	case cachedIsInvalid
+	case cachedIsValid
+}
+
 extension CacheClient {
-	public func withCaching<Model: Codable>(cacheEntry: Entry, forceRefresh: Bool = false, request: () async throws -> Model) async throws -> Model {
-		if !forceRefresh, let model = try? load(Model.self, cacheEntry) as? Model {
-			return model
-		} else {
+	public func withCaching<Model: Codable>(
+		cacheEntry: Entry,
+		forceRefresh: Bool = false,
+		invalidateCached: (Model) -> InvalidateCachedDecision = { _ in .cachedIsValid },
+		request: () async throws -> Model
+	) async throws -> Model {
+		@Sendable func fetchNew() async throws -> Model {
 			let model = try await request()
 			save(model, cacheEntry)
 			return model
+		}
+
+		if !forceRefresh, let model = try? load(Model.self, cacheEntry) as? Model {
+			switch invalidateCached(model) {
+			case .cachedIsInvalid:
+				removeFile(cacheEntry)
+				return try await fetchNew()
+			case .cachedIsValid:
+				return model
+			}
+		} else {
+			return try await fetchNew()
 		}
 	}
 }

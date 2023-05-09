@@ -15,7 +15,9 @@ extension Profile.Network {
 
 		public let dAppDefinitionAddress: AccountAddress
 
-		public let displayName: NonEmpty<String>
+		/// Will be nil if the `dAppDefinitionAddress` is `invalid` and thus we fialed to fetch
+		/// the name from Ledger (metadata on the entity)
+		public let displayName: NonEmptyString?
 
 		// mutable so that we can add new authorized personas
 		public var referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple>
@@ -23,7 +25,7 @@ extension Profile.Network {
 		public init(
 			networkID: Radix.Network.ID,
 			dAppDefinitionAddress: AccountAddress,
-			displayName: NonEmpty<String>,
+			displayName: NonEmptyString?,
 			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
 		) {
 			self.networkID = networkID
@@ -33,6 +35,63 @@ extension Profile.Network {
 		}
 	}
 }
+
+extension Profile.Network.AuthorizedDapp {
+	public var id: AccountAddress {
+		dAppDefinitionAddress
+	}
+}
+
+// MARK: - DappDefinitionAddress
+/// YES! DappDefinitionAddress **is** an AccountAddress! NOT to be confused with the
+/// address the an component on Ledger, the `DappAddress`.
+public enum DappDefinitionAddress: Sendable, Hashable, Codable {
+	/// A dAppDefinition address is a valid AccountAddress.
+	case valid(AccountAddress)
+
+	/// In case `isDeveloperModeEnabled` is `true`, we allow invalid dAppDefinitiion addresses.
+	case invalid(InvalidDappDefinitionAddress)
+
+	public struct InvalidDappDefinitionAddress: Sendable, Hashable, Codable {
+		public let invalidAddress: String
+		public let origin: DappOrigin
+	}
+
+	private enum Discriminator: String, Codable {
+		case valid, invalid
+	}
+
+	public enum CodingKeys: String, CodingKey {
+		case discriminator
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
+		switch discriminator {
+		case .invalid:
+			self = try .invalid(.init(from: decoder))
+		case .valid:
+			self = try .valid(.init(from: decoder))
+		}
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		switch self {
+		case let .invalid(invalid):
+			try container.encode(Discriminator.invalid, forKey: .discriminator)
+			try invalid.encode(to: encoder)
+		case let .valid(accountAddress):
+			try container.encode(Discriminator.valid, forKey: .discriminator)
+			try accountAddress.encode(to: encoder)
+		}
+	}
+}
+
+// MARK: - DappOriginTag
+public enum DappOriginTag {}
+public typealias DappOrigin = Tagged<DappOriginTag, NonEmptyString>
 
 // MARK: - Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple
 extension Profile.Network.AuthorizedDapp {
@@ -154,12 +213,6 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts 
 extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple {
 	public var id: ID {
 		identityAddress
-	}
-}
-
-extension Profile.Network.AuthorizedDapp {
-	public var id: AccountAddress {
-		dAppDefinitionAddress
 	}
 }
 

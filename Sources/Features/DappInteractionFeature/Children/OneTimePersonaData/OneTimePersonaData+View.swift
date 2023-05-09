@@ -20,7 +20,7 @@ extension OneTimePersonaData {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
-				let dappName = AttributedString(state.dappContext.name ?? L10n.DApp.Metadata.unknownName, foregroundColor: highlightColor)
+				let dappName = AttributedString(state.dappContext.name, foregroundColor: highlightColor)
 
 				let explanation: AttributedString = {
 					let justOneTime = AttributedString(L10n.DApp.OneTimePersonaData.Subtitle.justOneTime, foregroundColor: highlightColor)

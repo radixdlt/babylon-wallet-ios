@@ -2,12 +2,12 @@ import EditPersonaFeature
 import FeaturePrelude
 
 extension DappContext {
-	var name: String? {
+	var name: String {
 		switch self {
 		case let .fromLedger(fromLedger):
 			return fromLedger.name.rawValue
 		case .fromRequest:
-			return nil
+			return L10n.DApp.Metadata.unknownName
 		}
 	}
 }
@@ -39,7 +39,7 @@ extension PersonaDataPermission {
 						)
 				}()
 
-				let name = state.dappContext.name ?? L10n.DApp.Metadata.unknownName
+				let name = state.dappContext.name
 				let dappName = AttributedString(name, foregroundColor: highlightColor)
 				return dappName + explanation
 			}()

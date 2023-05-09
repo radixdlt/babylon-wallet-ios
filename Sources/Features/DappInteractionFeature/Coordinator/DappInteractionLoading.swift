@@ -81,6 +81,9 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 					do {
 						let fromLedger = try await cacheClient.withCaching(
 							cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
+							invalidateCached: { (cached: FromLedgerDappMetadata) in
+								guard cached.name != nil, cached.
+							}
 							request: {
 								let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
 								return FromLedgerDappMetadata(

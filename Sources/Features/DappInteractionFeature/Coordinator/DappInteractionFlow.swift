@@ -231,15 +231,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			if let usePersonaItem = state.usePersonaRequestItem {
-				guard case let .valid(dappDefinitionAddress) = state.dappContext.dAppDefintionAddress else {
-					return dismissEffect(for: state, errorKind: .invalidRequest, message: "Invalid DappDefinitionAddress")
-				}
-
-				return .run { send in
+				return .run { [authDappID = state.dappContext.dAppDefintionAddress] send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
 					if
 						let persona = try await personasClient.getPersonas()[id: identityAddress],
-						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
+						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: authDappID],
 						let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: identityAddress]
 					{
 						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
@@ -606,23 +602,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					if let persona = state.persona {
 						let networkID = await gatewaysClient.getCurrentNetworkID()
 
-						guard
-							case let .valid(dappDefinitionAddress) = state.remoteInteraction.metadata.dAppDefinitionAddress
-						else {
-							await send(.delegate(.dismissWithFailure(.init(interactionId: state.remoteInteraction.id, errorType: .invalidRequest, message: "Invalid DappDefinitionAddress"))))
-							return
-						}
-						guard
-							let displayName = NonEmptyString(rawValue: state.dappContext.name ?? L10n.DApp.Metadata.unknownName)
-						else {
-							await send(.delegate(.dismissWithFailure(.init(interactionId: state.remoteInteraction.id, errorType: .invalidRequest, message: "Invalid DappName"))))
-							return
-						}
-
 						var authorizedDapp = state.authorizedDapp ?? .init(
 							networkID: networkID,
-							dAppDefinitionAddress: dappDefinitionAddress,
-							displayName: displayName
+							dAppDefinitionAddress: state.dappContext.dAppDefintionAddress,
+							displayName: {
+								switch state.dappContext {
+								case let .fromLedger(fromLedger): return fromLedger.name
+								case .fromRequest: return nil
+								}
+							}()
 						)
 						// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 						let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(

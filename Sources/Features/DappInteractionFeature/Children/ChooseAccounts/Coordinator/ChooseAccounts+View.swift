@@ -51,7 +51,7 @@ extension ChooseAccounts {
 				}()
 
 				let attributedMessage = AttributedString(message, foregroundColor: .app.gray2)
-				let dappName = AttributedString(state.dappContext.name ?? L10n.DApp.Metadata.unknownName, foregroundColor: .app.gray1)
+				let dappName = AttributedString(state.dappContext.name, foregroundColor: .app.gray1)
 				let dot = AttributedString(".", foregroundColor: .app.gray2)
 
 				switch state.accessKind {

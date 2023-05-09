@@ -32,7 +32,7 @@ extension P2P.Dapp {
 // MARK: - P2P.Dapp.Request.Metadata
 extension P2P.Dapp.Request {
 	public struct Metadata: Sendable, Hashable, Decodable {
-		public typealias Origin = Tagged<(Self, origin: ()), String>
+		public typealias Origin = DappOrigin
 
 		public let networkId: NetworkID
 		public let origin: Origin

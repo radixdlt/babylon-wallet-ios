@@ -109,24 +109,3 @@ extension Profile.Network {
 	public struct AuthorizedDappReferencesFieldIDThatDoesNotExist: Swift.Error {}
 	public struct AuthorizedDappReferencesAccountThatDoesNotExist: Swift.Error {}
 }
-
-// MARK: - DappDefinitionAddress
-/// YES! DappDefinitionAddress **is** an AccountAddress! NOT to be confused with the
-/// address the an component on Ledger, the `DappAddress`.
-public enum DappDefinitionAddress: Sendable, Hashable, Decodable {
-	/// A dAppDefinition address is a valid AccountAddress.
-	case valid(AccountAddress)
-
-	/// In case `isDeveloperModeEnabled` is `true`, we allow invalid dAppDefinitiion addresses.
-	case invalid(String)
-
-	public init(from decoder: Decoder) throws {
-		let singleValueContainer = try decoder.singleValueContainer()
-		let string = try singleValueContainer.decode(String.self)
-		do {
-			self = try .valid(.init(address: string))
-		} catch {
-			self = .invalid(string)
-		}
-	}
-}

@@ -164,11 +164,7 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
-		guard case let .valid(dappDefinitionAddress) = state.dappContext.dAppDefintionAddress else {
-			return .send(.delegate(.failedToSignAuthChallenge))
-		}
-
-		return .run { send in
+		.run { send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
 			let authorizedDapp = authorizedDapps[id: dappDefinitionAddress]
