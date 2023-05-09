@@ -234,17 +234,14 @@ extension ROLAClient {
 					dAppDefinitionAddress: request.dAppDefinitionAddress,
 					origin: request.origin
 				)
-				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-					signerEntity: .persona(request.persona),
+
+				let signatures = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+					signerEntities: Set(request.entities),
 					unhashedDataToSign: payload,
 					purpose: .signAuth
 				)
-				let signedAuthChallenge = SignedAuthChallenge(
-					challenge: request.challenge,
-					signatureWithPublicKey: signature.signature.signatureWithPublicKey
-				)
 
-				return signedAuthChallenge
+				return .init(challenge: request.challenge, entitySignatures: signatures)
 			}
 		)
 	}()

@@ -1,6 +1,7 @@
 import AccountsClient
 import CreateEntityFeature
 import FeaturePrelude
+import ROLAClient
 
 // MARK: - ChooseAccountsResult
 enum ChooseAccountsResult: Sendable, Hashable {
@@ -74,6 +75,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.rolaClient) var rolaClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -111,13 +113,46 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 				)))
 			}
 
-			loggerGlobal.critical("IGNORING PROOF OF OWNERSHIP, TODO, IMPLEMENT!")
-			fatalError("impl me")
+			let signAuthRequest = SignAuthChallengeRequest(
+				challenge: challenge,
+				origin: state.dappMetadata.origin,
+				dAppDefinitionAddress: state.dappDefinitionAddress,
+				entities: .init(uniqueElements: selectedAccounts.elements.map { .account($0) })
+			)
 
-			return .send(.delegate(.continueButtonTapped(
-				accessKind: state.accessKind,
-				chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
-			)))
+			return .run { [accessKind = state.accessKind] send in
+				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
+				//                await send(.delegate(.continueButtonTapped(
+				//                    persona,
+				//                    authorizedDapp,
+				//                    authorizedPersona,
+				//                    signedAuthChallenge
+				//                )))
+				let walletAccountsWithProof: [P2P.Dapp.Response.WalletAccountWithProof] = signedAuthChallenge.entitySignatures.map {
+					guard case let .account(account) = $0.signerEntity else {
+						fatalError()
+					}
+					guard let proof = P2P.Dapp.AuthProof(entitySignature: $0) else {
+						fatalError()
+					}
+					return P2P.Dapp.Response.WalletAccountWithProof(account: .init(account: account), proof: proof)
+				}
+				let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
+					challenge: challenge,
+					IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>.init(uniqueElements: walletAccountsWithProof)
+				)
+
+				await send(.delegate(.continueButtonTapped(
+					accessKind: accessKind,
+					chosenAccounts: chosenAccounts
+				)))
+
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
+				errorQueue.schedule(error)
+				fatalError("impl failure")
+				//                await send(.delegate(.failedToSign)
+			}
 		}
 	}
 

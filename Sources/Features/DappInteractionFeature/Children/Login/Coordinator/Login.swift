@@ -102,8 +102,9 @@ struct Login: Sendable, FeatureReducer {
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
 				dAppDefinitionAddress: state.dappDefinitionAddress,
-				persona: persona
+				entities: [.persona(persona)]
 			)
+
 			return .run { [authorizedDapp = state.authorizedDapp] send in
 				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
 				await send(.delegate(.continueButtonTapped(

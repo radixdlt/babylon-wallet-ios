@@ -281,14 +281,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case let .autofillOngoingResponseItemsIfPossible(payload):
 			if let accountsPayload = payload.accountsPayload {
 				state.responseItems[.local(.accountPermissionRequested(accountsPayload.numberOfAccountsRequested))] = .local(.accountPermissionGranted)
-//				setAccountsResponse(
-//					to: accountsPayload.requestItem,
-//					accountsPayload.accounts,
-				//                    accessKind: .ongoing,
-				//                    proofOfOwnership: accountsPayload.proofOfOwnership,
-//					into: &state
-//				)
-				setAccountsResponse(to: accountsPayload.requestItem, accessKind: .ongoing, chosenAccounts: .withoutProofOfOwnership(.init(uniqueElements: accountsPayload.accounts)), into: &state)
+				setAccountsResponse(
+					to: accountsPayload.requestItem,
+					accessKind: .ongoing,
+					chosenAccounts: .withoutProofOfOwnership(.init(uniqueElements: accountsPayload.accounts)),
+					into: &state
+				)
 			}
 			if let personaDataPayload = payload.personaDataPayload {
 				let fields = personaDataPayload.fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
@@ -338,21 +336,24 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)
 
 			if let signedAuthChallenge {
-				if let proof = try? P2P.Dapp.AuthProof(
-					publicKey: signedAuthChallenge.signatureWithPublicKey.publicKey.compressedRepresentation.hex,
-					curve: signedAuthChallenge.signatureWithPublicKey.publicKey.curve.rawValue,
-					signature: signedAuthChallenge.signatureWithPublicKey.signature.serialize().hex
-				) {
-					let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withChallenge(.init(
-						persona: responsePersona,
-						challenge: signedAuthChallenge.challenge,
-						proof: proof
-					)))))
-
-					state.responseItems[item] = responseItem
-				} else {
+				guard
+					let entitySignature = signedAuthChallenge.entitySignatures.first,
+					signedAuthChallenge.entitySignatures.count == 1,
+					let proof = P2P.Dapp.AuthProof(
+						entitySignature: entitySignature
+					)
+				else {
 					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 				}
+
+				let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withChallenge(.init(
+					persona: responsePersona,
+					challenge: signedAuthChallenge.challenge,
+					proof: proof
+				)))))
+
+				state.responseItems[item] = responseItem
+
 			} else {
 				let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
 					persona: responsePersona
@@ -575,7 +576,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let responseItem: State.AnyInteractionResponseItem = {
 			switch chosenAccounts {
 			case let .withProofOfOwnership(challenge, accountsWithProof):
-				fatalError("impl me")
+				let accounts = Array(accountsWithProof)
+				switch accessKind {
+				case .oneTime:
+					return .remote(.oneTimeAccounts(.withProof(.init(challenge: challenge, accounts: accounts))))
+				case .ongoing:
+					return .remote(.ongoingAccounts(.withProof(.init(challenge: challenge, accounts: accounts))))
+				}
+
 			case let .withoutProofOfOwnership(accounts):
 				switch accessKind {
 				case .oneTime:
@@ -809,5 +817,19 @@ extension DappInteractionFlow.Destinations.State {
 				message: item.message
 			)))
 		}
+	}
+}
+
+extension P2P.Dapp.AuthProof {
+	init?(entitySignature: SignatureOfEntity) {
+		let sigPub = entitySignature.signature.signatureWithPublicKey
+		guard let signature = try? sigPub.signature.serialize() else {
+			return nil
+		}
+		self.init(
+			publicKey: sigPub.publicKey.compressedRepresentation.hex,
+			curve: sigPub.publicKey.curve.rawValue,
+			signature: signature.hex
+		)
 	}
 }

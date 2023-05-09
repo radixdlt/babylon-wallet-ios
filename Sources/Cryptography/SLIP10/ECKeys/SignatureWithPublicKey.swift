@@ -3,7 +3,7 @@ import Foundation
 import K1
 
 // MARK: - SignatureWithPublicKey
-public enum SignatureWithPublicKey: Sendable, Hashable, CustomDebugStringConvertible {
+public enum SignatureWithPublicKey: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {
 	case ecdsaSecp256k1(
 		signature: ECDSASignatureRecoverable,
 		publicKey: K1.PublicKey
@@ -23,6 +23,10 @@ extension SignatureWithPublicKey {
 		case let .ecdsaSecp256k1(signature, _):
 			return .ecdsaSecp256k1(signature)
 		}
+	}
+
+	public var id: SLIP10.PublicKey {
+		publicKey
 	}
 
 	public var publicKey: SLIP10.PublicKey {

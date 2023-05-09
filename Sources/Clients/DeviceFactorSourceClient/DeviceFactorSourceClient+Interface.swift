@@ -110,6 +110,16 @@ extension DeviceFactorSourceClient {
 	}
 
 	public func signUsingDeviceFactorSource(
+		signerEntities: Set<EntityPotentiallyVirtual>,
+		unhashedDataToSign: some DataProtocol,
+		purpose: SigningPurpose
+	) async throws -> Set<SignatureOfEntity> {
+		try await Set(signerEntities.asyncMap { entity in
+			try await signUsingDeviceFactorSource(signerEntity: entity, unhashedDataToSign: unhashedDataToSign, purpose: purpose)
+		})
+	}
+
+	public func signUsingDeviceFactorSource(
 		deviceFactorSource: FactorSource,
 		signerEntities: Set<EntityPotentiallyVirtual>,
 		unhashedDataToSign: some DataProtocol,
