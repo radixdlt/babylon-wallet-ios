@@ -299,19 +299,19 @@ public struct DappDetails: Sendable, FeatureReducer {
 		guard let dappDefinitions, !dappDefinitions.isEmpty else {
 			return .idle
 		}
-
-		let result = await TaskResult {
-			let allResourceItems = try await gatewayAPIClient.getDappMetadata(<#T##dappDefinition: DappDefinitionAddress##DappDefinitionAddress#>, validating: <#T##ComponentAddress?#>)
-				.items
-				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
-				.compactMap(\.resourceDetails)
-
-			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
-		}
-
-		return .init(result: result)
+		fatalError()
+//		let result = await TaskResult {
+//			let allResourceItems = try await gatewayAPIClient.getDappMetadata(<#T##dappDefinition: DappDefinitionAddress##DappDefinitionAddress#>, validating: <#T##ComponentAddress?#>)
+//				.items
+//				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+//				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+//				.compactMap(\.resourceDetails)
+//
+//			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
+//			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+//		}
+//
+//		return .init(result: result)
 	}
 
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
