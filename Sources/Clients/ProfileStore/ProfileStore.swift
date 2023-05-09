@@ -172,19 +172,34 @@ extension ProfileStore {
 		changeState(to: .persisted(profile))
 	}
 
-	public func importICloudProfileSnapshot(_ id: ProfileSnapshot.Header.ID) async throws {
+	public func importICloudProfileSnapshot(_ header: ProfileSnapshot.Header) async throws {
 		try assertProfileStateIsEphemeral()
 
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		do {
-			let profile = try await secureStorageClient.loadProfile(id)
-			guard let profile else {
+                        var header = header
+
+                        // read the device id
+                        @Dependency(\.date) var dateGenerator
+                        @Dependency(\.uuid) var uuid
+
+                        let date = dateGenerator()
+                        let identifier = uuid().uuidString
+                        let description = NonEmptyString(rawValue: "sd")!
+
+                        header.lastUsedOnDevice = ProfileSnapshot.Header.UsedDeviceInfo(description: description, deviceIdentifier: .init(rawValue: identifier)!, date: date)
+                        // Update the header
+                        // Update the profile
+
+                        let profileSnapshot = try await secureStorageClient.loadProfileSnapshot(header.id)
+			guard var profileSnapshot else {
 				struct FailedToLoadProfile: Swift.Error {}
 				throw FailedToLoadProfile()
 			}
-			await userDefaultsClient.setActiveProfileId(id)
-			changeState(to: .persisted(profile))
+                        profileSnapshot.header.lastUsedOnDevice = header.lastUsedOnDevice
+                        await userDefaultsClient.setActiveProfileId(header.id)
+                        try changeState(to: .persisted(.init(snapshot: profileSnapshot)))
 		} catch {
 			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -198,14 +213,13 @@ extension ProfileStore {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		do {
-			await userDefaultsClient.setActiveProfileId(ephemeral.profile.header.id)
-			if var profileHeaders = try await secureStorageClient.loadProfileHeaderList() {
-				profileHeaders.append(ephemeral.profile.header)
-				try await secureStorageClient.saveProfileHeaderList(profileHeaders)
-			} else {
-				try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [ephemeral.profile.header])!)
-			}
-
+                        await userDefaultsClient.setActiveProfileId(ephemeral.profile.header.id)
+                        if var profileHeaders = try await secureStorageClient.loadProfileHeaderList() {
+                                profileHeaders.append(ephemeral.profile.header)
+                                try await secureStorageClient.saveProfileHeaderList(profileHeaders)
+                        } else {
+                                try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [ephemeral.profile.header])!)
+                        }
 			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
@@ -454,7 +468,29 @@ extension ProfileStore {
 
 			loggerGlobal.debug("Created new profile with factorSourceID: \(factorSource.id)")
 
-			return Profile(factorSource: factorSource.factorSource, creatingDevice: deviceDescription(label: label, description: description))
+
+                        @Dependency(\.date) var dateGenerator
+                        @Dependency(\.uuid) var uuid
+
+                        let date = dateGenerator.now
+                        let deviceDescription = deviceDescription(label: label, description: description)
+                        // read from UserDefaults
+                        let deviceID = uuid().uuidString
+
+                        let deviceInfo = ProfileSnapshot.Header.UsedDeviceInfo(
+                                description: deviceDescription,
+                                deviceIdentifier: .init(rawValue: deviceID)!, // crash the app since we need the id to be valid.
+                                date: date
+                        )
+
+                        let header = ProfileSnapshot.Header(creatingDevice: deviceInfo,
+                                                            lastUsedOnDevice: deviceInfo,
+                                                            id: uuid(),
+                                                            creationDate: date,
+                                                            lastModified: date)
+                        
+
+                        return Profile(header: header, factorSources: .init(factorSource.factorSource))
 
 		} catch {
 			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"
@@ -508,6 +544,23 @@ extension ProfileStore {
 	}
 }
 
+extension Profile {
+        func createDeviceInfo(deviceDescription: NonEmptyString) -> ProfileSnapshot.Header.UsedDeviceInfo {
+                @Dependency(\.date) var dateGenerator
+                @Dependency(\.uuid) var uuid
+
+                let date = dateGenerator.now
+                // read from UserDefaults
+                let deviceID = uuid().uuidString
+
+                return ProfileSnapshot.Header.UsedDeviceInfo(
+                        description: deviceDescription,
+                        deviceIdentifier: .init(rawValue: deviceID)!, // crash the app since we need the id to be valid.
+                        date: date
+                )
+        }
+}
+
 // MARK: - EphemeralProfile
 struct EphemeralProfile: Sendable, Hashable {
 	var profile: Profile
@@ -517,6 +570,7 @@ struct EphemeralProfile: Sendable, Hashable {
 
 extension UserDefaultsClient {
 	static let activeProfileId = "profile.activeProfileID"
+        static let deviceId = "profile.deviceID"
 
 	enum ActiveProfileIdErrors: Error {
 		case noActiveProfileId
@@ -529,6 +583,13 @@ extension UserDefaultsClient {
 				.init(uuidString: $0)
 			}
 	}
+
+        func deviceId() -> UUID? {
+                stringForKey(Self.deviceId)
+                        .flatMap {
+                                .init(uuidString: $0)
+                        }
+        }
 
 	func setActiveProfileId(_ id: ProfileSnapshot.Header.ID) async {
 		await setString(id.uuidString, Self.activeProfileId)

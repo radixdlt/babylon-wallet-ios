@@ -32,31 +32,13 @@ public struct Profile:
 	public init(
 		header: ProfileSnapshot.Header,
 		factorSources: FactorSources,
-		appPreferences: AppPreferences,
-		networks: Networks
+                appPreferences: AppPreferences = .init(),
+                networks: Networks = .init()
 	) {
 		self.header = header
 		self.factorSources = factorSources
 		self.appPreferences = appPreferences
 		self.networks = networks
-	}
-
-	public init(
-		factorSource: FactorSource,
-		creatingDevice: NonEmptyString = "placeholder",
-		appPreferences: AppPreferences = .init()
-	) {
-		@Dependency(\.uuid) var uuid
-
-		let date = Date()
-		let creatingDevice_ = ProfileSnapshot.Header.UsedDeviceInfo(description: creatingDevice.rawValue, deviceIdentifier: UUID().uuidString, date: date)
-		let lastUsedOnDevice = ProfileSnapshot.Header.UsedDeviceInfo(description: creatingDevice.rawValue, deviceIdentifier: UUID().uuidString, date: date)
-		self.init(
-			header: .init(creatingDevice: creatingDevice_, lastUsedOnDevice: lastUsedOnDevice, id: uuid(), creationDate: date, lastModified: date),
-			factorSources: .init(factorSource),
-			appPreferences: appPreferences,
-			networks: .init()
-		)
 	}
 }
 

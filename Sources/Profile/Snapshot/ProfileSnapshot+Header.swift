@@ -12,18 +12,30 @@ extension ProfileSnapshot {
 		CustomDumpReflectable,
 		Identifiable
 	{
-		public struct UsedDeviceInfo: Sendable,
-			Hashable, Codable
-		{
-			/// `"My private phone (iPhone SE (2nd generation))"`
-			public let description: String
+                public struct UsedDeviceInfo:
+                        Sendable,
+                        Hashable,
+                        Codable
+                {
+                        /// `"My private phone (iPhone SE (2nd generation))"`
+                        public let description: NonEmptyString
 
-			/// To detect if the same Profile is used on two different phones
-			public let deviceIdentifier: String
+                        /// To detect if the same Profile is used on two different phones
+                        public let deviceIdentifier: NonEmptyString
 
-			/// Date when the Profile was tied to this device
-			public let date: Date
-		}
+                        /// Date when the Profile was tied to this device
+                        public let date: Date
+
+                        public init(
+                                description: NonEmptyString,
+                                deviceIdentifier: NonEmptyString,
+                                date: Date
+                        ) {
+                                self.description = description
+                                self.deviceIdentifier = deviceIdentifier
+                                self.date = date
+                        }
+                }
 
 		public typealias Version = Tagged<Self, UInt32>
 
@@ -55,7 +67,7 @@ extension ProfileSnapshot {
 		public init(
 			creatingDevice: UsedDeviceInfo,
 			lastUsedOnDevice: UsedDeviceInfo,
-			id: ProfileSnapshot.Header.ID,
+			id: ID,
 			creationDate: Date,
 			lastModified: Date,
 			snapshotVersion: Version = .minimum
