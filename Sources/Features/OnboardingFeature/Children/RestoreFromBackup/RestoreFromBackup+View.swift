@@ -43,12 +43,9 @@ extension RestoreFromBackup.View {
 										.selectedProfile($0)
 									}
 								),
-								from: backupProfiles
+                                                                from: backupProfiles
 							) { item in
 								iCloudBackupDataCard(item)
-									.onTapGesture {
-										item.action()
-                                                                        }
 							}
 
 							Button("Use iCloud Backup Data") {
@@ -81,8 +78,9 @@ extension RestoreFromBackup.View {
 
 	private func iCloudBackupDataCard(_ item: SelectionItem<Profile>) -> some View {
 		let profile = item.value
+                let isVersionCompatible = profile.header.isVersionCompatible()
 
-		return Card {
+                return Card(action: item.action, isDisabled: isVersionCompatible) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
@@ -95,14 +93,23 @@ extension RestoreFromBackup.View {
 					Text("Last Modified Date: \(formatDate(profile.header.lastModified))")
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
+
+                                        if !isVersionCompatible {
+                                                Text("Incompatible Wallet data")
+                                                        .foregroundColor(.red)
+                                                        .textStyle(.body2HighImportance)
+                                        }
 				}
-				RadioButton(
-					appearance: .dark,
-					state: item.isSelected ? .selected : .unselected
-				)
+                                if isVersionCompatible {
+                                        RadioButton(
+                                                appearance: .dark,
+                                                state: item.isSelected ? .selected : .unselected
+                                        )
+
+                                }
 			}
 			.padding(.medium2)
-		}
+                }
 	}
 
 	func formatDate(_ date: Date) -> String {

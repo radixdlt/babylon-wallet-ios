@@ -124,6 +124,15 @@ extension ProfileSnapshot.Header {
 			)
 		}
 	}
+
+        public func isVersionCompatible() -> Bool {
+                do {
+                        try validateCompatibility()
+                        return true
+                } catch {
+                        return false
+                }
+        }
 }
 
 extension ProfileSnapshot.Header {

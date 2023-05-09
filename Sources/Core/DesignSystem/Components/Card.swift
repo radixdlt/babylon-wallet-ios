@@ -16,11 +16,12 @@ public struct Card<Contents: View>: View {
 
 	public init(
 		action: @escaping () -> Void,
+                isDisabled: Bool = false,
 		@ViewBuilder contents: () -> Contents
 	) {
 		self.action = action
 		self.contents = contents()
-		self.disabled = false
+		self.disabled = isDisabled
 	}
 
 	public var body: some View {
