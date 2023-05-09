@@ -44,7 +44,7 @@ enum DappContext: Sendable, Hashable {
 	public var origin: P2P.Dapp.Request.Metadata.Origin {
 		switch self {
 		case let .fromLedger(metadata): return metadata.origin
-		case let .fromRequet(metadata): return metadata.origin
+		case let .fromRequest(metadata): return metadata.origin
 		}
 	}
 }

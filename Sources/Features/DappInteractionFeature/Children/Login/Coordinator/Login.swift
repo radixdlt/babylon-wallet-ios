@@ -5,7 +5,7 @@ import FeaturePrelude
 import PersonasClient
 import ROLAClient
 
-// MARK: - LoginRequest
+// MARK: - Login
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappContext: DappContext
@@ -98,7 +98,7 @@ struct Login: Sendable, FeatureReducer {
 			let signAuthRequest = SignAuthChallengeRequest(
 				challenge: challenge,
 				origin: state.dappContext.origin,
-				dAppDefinitionAddress: state.dappDefinitionAddress,
+				dAppDefinitionAddress: state.dappContext.dAppDefintionAddress,
 				persona: persona
 			)
 			return .run { [authorizedDapp = state.authorizedDapp] send in
@@ -164,7 +164,11 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
-		.run { [dappContext = state.dappContext] send in
+		guard case let .valid(dappDefinitionAddress) = state.dappContext.dAppDefintionAddress else {
+			return .send(.delegate(.failedToSignAuthChallenge))
+		}
+
+		return .run { send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
 			let authorizedDapp = authorizedDapps[id: dappDefinitionAddress]
@@ -194,6 +198,15 @@ struct Login: Sendable, FeatureReducer {
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
 			return .internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork))
+		}
+	}
+}
+
+extension DappContext {
+	var dAppDefintionAddress: DappDefinitionAddress {
+		switch self {
+		case let .fromLedger(fromLedger): return .valid(fromLedger.dAppDefinintionAddress)
+		case let .fromRequest(fromRequest): return fromRequest.dAppDefinitionAddress
 		}
 	}
 }

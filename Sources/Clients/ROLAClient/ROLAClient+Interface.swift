@@ -50,8 +50,20 @@ struct EntityHasAuthSigningKeyAlready: Swift.Error {}
 public struct SignAuthChallengeRequest: Sendable, Hashable {
 	public let challenge: P2P.Dapp.AuthChallengeNonce
 	public let origin: P2P.Dapp.Request.Metadata.Origin
-	public let dAppDefinitionAddress: AccountAddress
+	public let dAppDefinitionAddress: DappDefinitionAddress
 	public let persona: Profile.Network.Persona
+
+	public init(
+		challenge: P2P.Dapp.AuthChallengeNonce,
+		origin: P2P.Dapp.Request.Metadata.Origin,
+		dAppDefinitionAddress: DappDefinitionAddress,
+		persona: Profile.Network.Persona
+	) {
+		self.challenge = challenge
+		self.origin = origin
+		self.dAppDefinitionAddress = dAppDefinitionAddress
+		self.persona = persona
+	}
 
 	public init(
 		challenge: P2P.Dapp.AuthChallengeNonce,
@@ -59,10 +71,7 @@ public struct SignAuthChallengeRequest: Sendable, Hashable {
 		dAppDefinitionAddress: AccountAddress,
 		persona: Profile.Network.Persona
 	) {
-		self.challenge = challenge
-		self.origin = origin
-		self.dAppDefinitionAddress = dAppDefinitionAddress
-		self.persona = persona
+		self.init(challenge: challenge, origin: origin, dAppDefinitionAddress: .valid(dAppDefinitionAddress), persona: persona)
 	}
 }
 

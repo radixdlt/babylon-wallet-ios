@@ -299,10 +299,15 @@ struct UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddre
 /// `challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
 func payloadToHash(
 	challenge: P2P.Dapp.AuthChallengeNonce,
-	dAppDefinitionAddress accountAddress: AccountAddress,
+	dAppDefinitionAddress: DappDefinitionAddress,
 	origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
 ) -> Data {
-	let dAppDefinitionAddress = accountAddress.address
+	let dAppDefinitionAddress: String = {
+		switch dAppDefinitionAddress {
+		case let .invalid(string): return string
+		case let .valid(accountAddress): return accountAddress.address
+		}
+	}()
 	let origin = metadataOrigin.rawValue
 	precondition(dAppDefinitionAddress.count <= UInt8.max)
 	let challengeBytes = [UInt8](challenge.data.data)
