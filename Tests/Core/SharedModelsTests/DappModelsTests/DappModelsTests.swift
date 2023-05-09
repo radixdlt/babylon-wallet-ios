@@ -95,7 +95,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					networkId: 34,
 					origin: "radixdlt.dashboard.com",
-					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
+					dAppDefinitionAddress: try! .valid(.init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"))
 				)
 			)
 		)
@@ -132,7 +132,44 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
+					dAppDefinitionAddress: try! .valid(.init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"))
+				)
+			)
+		)
+	}
+
+	func test_decode_dApp_request_with_invalid_dappDefinitionAddress() throws {
+		let json: JSON = [
+			"interactionId": "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
+			"items": [
+				"discriminator": "transaction",
+				"send": [
+					"version": 1,
+					"transactionManifest": "",
+					"message": "MSG",
+				],
+			],
+			"metadata": [
+				"networkId": 34,
+				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
+				"dAppDefinitionAddress": "invalid_non_account_string",
+			],
+		]
+		try XCTAssertJSONDecoding(
+			json,
+			P2P.Dapp.Request(
+				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
+				items: .transaction(.init(
+					send: .init(
+						version: 1,
+						transactionManifest: .init(instructions: .string("")),
+						message: "MSG"
+					)
+				)),
+				metadata: .init(
+					networkId: 34,
+					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
+					dAppDefinitionAddress: .invalid("invalid_non_account_string")
 				)
 			)
 		)
