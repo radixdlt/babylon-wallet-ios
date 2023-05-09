@@ -3,14 +3,14 @@ import FeaturePrelude
 // MARK: - AccountPermission
 struct AccountPermission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let dappMetadata: DappMetadata
+		let dappContext: DappContext
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
 
 		init(
-			dappMetadata: DappMetadata,
+			dappContext: DappContext,
 			numberOfAccounts: DappInteraction.NumberOfAccounts
 		) {
-			self.dappMetadata = dappMetadata
+			self.dappContext = dappContext
 			self.numberOfAccounts = numberOfAccounts
 		}
 	}

@@ -8,7 +8,7 @@ extension Completion {
 
 		init(state: Completion.State) {
 			title = L10n.DApp.Completion.title
-			subtitle = L10n.DApp.Completion.subtitle(state.dappMetadata.name.rawValue)
+			subtitle = L10n.DApp.Completion.subtitle(state.dappContext.name.rawValue)
 		}
 	}
 
@@ -84,6 +84,6 @@ struct Completion_Preview: PreviewProvider {
 }
 
 extension Completion.State {
-	static let previewValue: Self = .init(dappMetadata: .previewValue)
+	static let previewValue: Self = .init(dappContext: .previewValue)
 }
 #endif

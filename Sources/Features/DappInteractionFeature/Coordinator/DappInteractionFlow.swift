@@ -160,8 +160,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
-		case dismissWithSuccess(DappMetadata)
-		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
+		case dismissWithSuccess(DappContext)
+		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappContext)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -584,7 +584,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(for: nextRequest, state.remoteInteraction, state.dappMetadata, state.persona)
+			let destination = Destinations.State(for: nextRequest, state.remoteInteraction, state.dappContext, state.persona)
 		{
 			if state.root == nil {
 				state.root = destination

@@ -51,7 +51,7 @@ extension ChooseAccounts {
 				}()
 
 				let attributedMessage = AttributedString(message, foregroundColor: .app.gray2)
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
+				let dappName = AttributedString(state.dappContext.name.rawValue, foregroundColor: .app.gray1)
 				let dot = AttributedString(".", foregroundColor: .app.gray2)
 
 				switch state.accessKind {
@@ -164,8 +164,7 @@ struct ChooseAccounts_Preview: PreviewProvider {
 extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
 		accessKind: .ongoing,
-		dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
-		dappMetadata: .previewValue,
+		dappContext: .previewValue,
 		availableAccounts: .init(
 			uniqueElements: [
 				.previewValue0,

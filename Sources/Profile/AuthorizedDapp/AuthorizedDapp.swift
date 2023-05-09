@@ -1,5 +1,4 @@
 import Prelude
-import SharedModels
 
 // MARK: - Profile.Network.AuthorizedDapp
 extension Profile.Network {
@@ -14,7 +13,7 @@ extension Profile.Network {
 	{
 		public let networkID: Radix.Network.ID
 
-		public let dAppDefinitionAddress: DappDefinitionAddress
+		public let dAppDefinitionAddress: AccountAddress
 
 		public let displayName: NonEmpty<String>
 
@@ -23,7 +22,7 @@ extension Profile.Network {
 
 		public init(
 			networkID: Radix.Network.ID,
-			dAppDefinitionAddress: DappDefinitionAddress,
+			dAppDefinitionAddress: AccountAddress,
 			displayName: NonEmpty<String>,
 			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
 		) {
@@ -159,7 +158,7 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple {
 }
 
 extension Profile.Network.AuthorizedDapp {
-	public var id: DappDefinitionAddress {
+	public var id: AccountAddress {
 		dAppDefinitionAddress
 	}
 }

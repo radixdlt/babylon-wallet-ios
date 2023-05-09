@@ -49,14 +49,3 @@ extension P2P.Dapp.Request {
 		}
 	}
 }
-
-// MARK: - DappDefinitionAddress
-/// YES! DappDefinitionAddress **is** an AccountAddress! NOT to be confused with the
-/// address the an component on Ledger, the `DappAddress`.
-public enum DappDefinitionAddress: Sendable, Hashable {
-	/// A dAppDefinition address is a valid AccountAddress.
-	case valid(AccountAddress)
-
-	/// In case `isDeveloperModeEnabled` is `true`, we allow invalid dAppDefinitiion addresses.
-	case invalid(String)
-}

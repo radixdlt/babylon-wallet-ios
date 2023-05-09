@@ -159,7 +159,7 @@ struct OneTimePersonaData_Preview: PreviewProvider {
 
 extension OneTimePersonaData.State {
 	static let previewValue: Self = .init(
-		dappMetadata: .previewValue,
+		dappContext: .previewValue,
 		requiredFieldIDs: [.givenName, .emailAddress]
 	)
 }

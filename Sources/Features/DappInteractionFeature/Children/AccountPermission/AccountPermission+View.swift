@@ -115,7 +115,7 @@ struct AccountPermission_Preview: PreviewProvider {
 
 extension AccountPermission.State {
 	static let previewValue: Self = .init(
-		dappMetadata: .previewValue,
+		dappContext: .previewValue,
 		numberOfAccounts: .exactly(1)
 	)
 }

@@ -65,29 +65,42 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
 		state.isLoading = true
-		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress, origin = state.interaction.metadata.origin] send in
-			let metadata = await TaskResult {
+		return .run { [fromRequest = state.interaction.metadata] send in
+
+			let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+
+			switch (fromRequest.dAppDefinitionAddress, isDeveloperModeEnabled) {
+			case (.invalid, true):
+				// DeveloperMode accepts invalid dapp definition addresses
+				await send(.internal(.dappMetadataLoadingResult(.success(.fromRequest(fromRequest)))))
+
+			case let (.valid(dappDefinitionAddress), _):
+				// Valid DappDefinition => fetch from Ledger
+
 				do {
-					let dappMetadata = try await cacheClient.withCaching(
+					let fromLedger = try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
 						request: {
-							try await DappMetadata(
-								gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items,
-								origin: origin
+							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
+							return FromLedgerDappMetadata(
+								entityMetadataForDapp: entityMetadataForDapp,
+								dAppDefinintionAddress: dappDefinitionAddress,
+								origin: fromRequest.origin
 							)
 						}
 					)
-					return DappContext.metadataFetched(dappMetadata)
 				} catch {
-					if await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled {
-						loggerGlobal.notice("Failed to load metadata, but we surpressed the error since is appdeveloper")
-						return DappContext.developerMode
-					} else {
-						throw error
+					guard isDeveloperModeEnabled else {
+						await send(.internal(.dappMetadataLoadingResult(.failure(error))))
+						return
 					}
+					loggerGlobal.warning("Failed to fetch Dapps metadata, but since 'isDeveloperModeEnabled' is enabled we surpress the error and allow continuation. Error: \(error)")
+					await send(.internal(.dappMetadataLoadingResult(.success(.fromRequest(fromRequest)))))
 				}
+
+			default:
+				await send(.internal(.dappMetadataLoadingResult(.failure(InvalidDappDefintionAddressNotSupportedWithoutDeveloperModeEnabled()))))
 			}
-			await send(.internal(.dappMetadataLoadingResult(metadata)))
 		}
 	}
 
@@ -125,15 +138,21 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 }
 
-extension DappMetadata {
+// MARK: - InvalidDappDefintionAddressNotSupportedWithoutDeveloperModeEnabled
+struct InvalidDappDefintionAddressNotSupportedWithoutDeveloperModeEnabled: Swift.Error {}
+
+extension FromLedgerDappMetadata {
 	init(
-		_ items: [GatewayAPI.EntityMetadataItem],
+		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
+		dAppDefinintionAddress: AccountAddress,
 		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
+		let items = entityMetadataForDapp.items
 		self.init(
+			dAppDefinintionAddress: dAppDefinintionAddress,
+			origin: origin,
 			name: items.first(where: { $0.key == "name" })?.value.asString,
-			description: items.first(where: { $0.key == "description" })?.value.asString,
-			origin: origin
+			description: items.first(where: { $0.key == "description" })?.value.asString
 		)
 	}
 }

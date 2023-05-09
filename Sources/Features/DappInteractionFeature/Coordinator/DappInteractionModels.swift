@@ -22,7 +22,7 @@ struct FromLedgerDappMetadata: Sendable, Hashable, Codable {
 		dAppDefinintionAddress: AccountAddress,
 		origin: P2P.Dapp.Request.Metadata.Origin,
 		name: String?,
-		description: String? = nil,
+		description: String? = nil
 	) {
 		self.dAppDefinintionAddress = dAppDefinintionAddress
 		self.origin = origin
@@ -43,12 +43,13 @@ enum DappContext: Sendable, Hashable {
 }
 
 #if DEBUG
-extension DappMetadata {
-	static let previewValue: Self = .init(
+extension DappContext {
+	static let previewValue: Self = try! .fromLedger(.init(
+		dAppDefinintionAddress: .init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
+		origin: .init(rawValue: "https://radfi.com"),
 		name: "Collabo.Fi",
-		description: "A very collaby finance dapp",
-		origin: .init(rawValue: "https://radfi.com")
-	)
+		description: "A very collaby finance dapp"
+	))
 }
 #endif
 

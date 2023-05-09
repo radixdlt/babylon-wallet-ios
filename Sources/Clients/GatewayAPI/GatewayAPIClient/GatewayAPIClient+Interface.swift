@@ -61,13 +61,14 @@ extension GatewayAPIClient {
 		guard let dappDefinitionAddressString = entityMetadata.dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingDappDefinition
 		}
+		let dappDefinitionAddress: AccountAddress = try .init(address: dappDefinitionAddressString)
 
-		return try await getDappMetadata(.init(address: dappDefinitionAddressString), validating: address)
+		return try await getDappMetadata(dappDefinitionAddress, validating: address)
 	}
 
 	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
 	public func getDappMetadata(
-		_ dappDefinition: DappDefinitionAddress,
+		_ dappDefinition: AccountAddress,
 		validating component: ComponentAddress? = nil
 	) async throws -> GatewayAPI.EntityMetadataCollection {
 		let dappDefinition = try await getEntityMetadata(dappDefinition.address)

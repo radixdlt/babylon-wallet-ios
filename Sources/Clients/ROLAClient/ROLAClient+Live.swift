@@ -155,10 +155,19 @@ extension ROLAClient {
 
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
+
+				let dappDefAddress: AccountAddress = try {
+					switch metadata.dAppDefinitionAddress {
+					case .invalid:
+						throw UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddress()
+					case let .valid(address):
+						return address
+					}
+				}()
 				let metadataCollection = try await cacheClient.withCaching(
-					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
+					cacheEntry: .rolaDappVerificationMetadata(dappDefAddress.address),
 					request: {
-						try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address)
+						try await gatewayAPIClient.getEntityMetadata(dappDefAddress.address)
 					}
 				)
 
@@ -185,6 +194,15 @@ extension ROLAClient {
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
+
+				let dappDefAddress: AccountAddress = try {
+					switch metadata.dAppDefinitionAddress {
+					case .invalid:
+						throw UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddress()
+					case let .valid(address):
+						return address
+					}
+				}()
 
 				guard let originURL = URL(string: metadata.origin.rawValue) else {
 					throw ROLAFailure.invalidOriginURL
@@ -220,7 +238,7 @@ extension ROLAClient {
 				)
 
 				let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
-				guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {
+				guard dAppDefinitionAddresses.contains(dappDefAddress) else {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
@@ -253,7 +271,7 @@ extension ROLAClient {
 		let dApps: [Item]
 
 		struct Item: Codable {
-			let dAppDefinitionAddress: DappDefinitionAddress
+			let dAppDefinitionAddress: AccountAddress
 		}
 	}
 
@@ -274,6 +292,9 @@ extension ROLAClient {
 		static let dAppDefinitionAccountType = "dapp definition"
 	}
 }
+
+// MARK: - UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddress
+struct UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddress: Swift.Error {}
 
 /// `challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
 func payloadToHash(

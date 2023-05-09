@@ -24,17 +24,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
 			case cancelButtonTapped(P2P.RTCIncomingDappRequest)
-			case retryButtonTapped(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?)
+			case retryButtonTapped(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappContext?)
 		}
 	}
 
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(P2P.RTCIncomingDappRequest)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?)
-		case failedToSendResponseToDapp(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?, reason: String)
-		case presentResponseFailureAlert(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappMetadata?, reason: String)
-		case presentResponseSuccessView(DappMetadata)
+		case sentResponseToDapp(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappContext?)
+		case failedToSendResponseToDapp(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappContext?, reason: String)
+		case presentResponseFailureAlert(P2P.Dapp.Response, for: P2P.RTCIncomingDappRequest, DappContext?, reason: String)
+		case presentResponseSuccessView(DappContext)
 	}
 
 	enum ChildAction: Sendable, Equatable {

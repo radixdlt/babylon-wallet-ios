@@ -37,8 +37,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(P2P.Dapp.Response, DappMetadata? = nil)
-		case dismiss(DappMetadata? = nil)
+		case submit(P2P.Dapp.Response, DappContext? = nil)
+		case dismiss(DappContext? = nil)
 	}
 
 	var body: some ReducerProtocolOf<Self> {
