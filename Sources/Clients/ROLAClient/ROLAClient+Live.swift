@@ -87,6 +87,8 @@ extension ROLAClient {
 			return manifestString
 		}
 
+		// FIXME: Move this to `Signing` and change `Signing` to `UseFactors` which should be able to do both signing and derivation...?
+		// Rationale: the solution below makes it impossible to create `authenticationSigning` key for Ledger factor sources :/
 		@Sendable func manifestCreatingAuthKey(
 			for entity: EntityPotentiallyVirtual
 		) async throws -> ManifestForAuthKeyCreationResponse {
@@ -227,7 +229,7 @@ extension ROLAClient {
 			manifestForAuthKeyCreation: { request in
 				try await manifestCreatingAuthKey(for: request.entity)
 			},
-			signAuthChallenge: { request in
+			authenticationDataToSignForChallenge: { request in
 
 				let payload = payloadToHash(
 					challenge: request.challenge,
@@ -235,13 +237,10 @@ extension ROLAClient {
 					origin: request.origin
 				)
 
-				let signatures = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-					signerEntities: Set(request.entities),
-					unhashedDataToSign: payload,
-					purpose: .signAuth
+				return AuthenticationDataToSignForChallengeResponse(
+					input: request,
+					payloadToHashAndSign: payload
 				)
-
-				return .init(challenge: request.challenge, entitySignatures: signatures)
 			}
 		)
 	}()

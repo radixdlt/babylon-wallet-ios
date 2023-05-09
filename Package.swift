@@ -274,6 +274,7 @@ package.addModules([
 			"Profile",
 			"TransactionClient",
 			"DeviceFactorSourceClient",
+			"ROLAClient",
 		],
 		tests: .no
 	),

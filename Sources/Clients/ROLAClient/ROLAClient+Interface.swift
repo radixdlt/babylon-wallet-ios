@@ -8,7 +8,7 @@ public struct ROLAClient: Sendable, DependencyKey {
 	public var performDappDefinitionVerification: PerformDappDefinitionVerification
 	public var performWellKnownFileCheck: PerformWellKnownFileCheck
 	public var manifestForAuthKeyCreation: ManifestForAuthKeyCreation
-	public var signAuthChallenge: SignAuthChallenge
+	public var authenticationDataToSignForChallenge: AuthenticationDataToSignForChallenge
 }
 
 // MARK: ROLAClient.PerformWellKnownFileCheck
@@ -16,13 +16,44 @@ extension ROLAClient {
 	public typealias PerformDappDefinitionVerification = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> ManifestForAuthKeyCreationResponse
-	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeRequest) async throws -> SignedAuthChallenge
+	public typealias AuthenticationDataToSignForChallenge = @Sendable (AuthenticationDataToSignForChallengeRequest) async throws -> AuthenticationDataToSignForChallengeResponse
 }
 
 // MARK: - ManifestForAuthKeyCreationResponse
 public struct ManifestForAuthKeyCreationResponse: Sendable, Hashable {
 	public let manifest: TransactionManifest
 	public let authenticationSigning: FactorInstance
+}
+
+// MARK: - AuthenticationDataToSignForChallengeResponse
+public struct AuthenticationDataToSignForChallengeResponse: Sendable, Hashable {
+	public let input: AuthenticationDataToSignForChallengeRequest
+	public let payloadToHashAndSign: Data
+
+	public init(
+		input: AuthenticationDataToSignForChallengeRequest,
+		payloadToHashAndSign: Data
+	) {
+		self.input = input
+		self.payloadToHashAndSign = payloadToHashAndSign
+	}
+}
+
+// MARK: - AuthenticationDataToSignForChallengeRequest
+public struct AuthenticationDataToSignForChallengeRequest: Sendable, Hashable {
+	public let challenge: P2P.Dapp.AuthChallengeNonce
+	public let origin: P2P.Dapp.Request.Metadata.Origin
+	public let dAppDefinitionAddress: DappDefinitionAddress
+
+	public init(
+		challenge: P2P.Dapp.AuthChallengeNonce,
+		origin: P2P.Dapp.Request.Metadata.Origin,
+		dAppDefinitionAddress: DappDefinitionAddress
+	) {
+		self.challenge = challenge
+		self.origin = origin
+		self.dAppDefinitionAddress = dAppDefinitionAddress
+	}
 }
 
 extension DependencyValues {
@@ -45,29 +76,3 @@ public struct ManifestForAuthKeyCreationRequest: Sendable, Hashable {
 
 // MARK: - EntityHasAuthSigningKeyAlready
 struct EntityHasAuthSigningKeyAlready: Swift.Error {}
-
-// MARK: - SignAuthChallengeRequest
-public struct SignAuthChallengeRequest: Sendable, Hashable {
-	public let challenge: P2P.Dapp.AuthChallengeNonce
-	public let origin: P2P.Dapp.Request.Metadata.Origin
-	public let dAppDefinitionAddress: DappDefinitionAddress
-	public let entities: IdentifiedArrayOf<EntityPotentiallyVirtual>
-
-	public init(
-		challenge: P2P.Dapp.AuthChallengeNonce,
-		origin: P2P.Dapp.Request.Metadata.Origin,
-		dAppDefinitionAddress: DappDefinitionAddress,
-		entities: IdentifiedArrayOf<EntityPotentiallyVirtual>
-	) {
-		self.challenge = challenge
-		self.origin = origin
-		self.dAppDefinitionAddress = dAppDefinitionAddress
-		self.entities = entities
-	}
-}
-
-// MARK: - SignedAuthChallenge
-public struct SignedAuthChallenge: Sendable, Hashable {
-	public let challenge: P2P.Dapp.AuthChallengeNonce
-	public let entitySignatures: Set<SignatureOfEntity>
-}

@@ -8,7 +8,7 @@ extension ROLAClient: TestDependencyKey {
 		performDappDefinitionVerification: unimplemented("\(Self.self).performDappDefinitionVerification"),
 		performWellKnownFileCheck: unimplemented("\(Self.self).performWellKnownFileCheck"),
 		manifestForAuthKeyCreation: unimplemented("\(Self.self).manifestForAuthKeyCreation"),
-		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge")
+		authenticationDataToSignForChallenge: unimplemented("\(Self.self).authenticationDataToSignForChallenge")
 	)
 }
 
@@ -17,6 +17,6 @@ extension ROLAClient {
 		performDappDefinitionVerification: { _ in },
 		performWellKnownFileCheck: { _ in },
 		manifestForAuthKeyCreation: { _ in throw NoopError() },
-		signAuthChallenge: { _ in throw NoopError() }
+		authenticationDataToSignForChallenge: { _ in throw NoopError() }
 	)
 }

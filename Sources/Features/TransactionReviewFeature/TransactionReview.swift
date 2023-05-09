@@ -28,6 +28,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var deposits: TransactionReviewAccounts.State? = nil
 		public var proofs: TransactionReviewProofs.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
+		private let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
@@ -37,6 +38,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: String?,
 			feeToAdd: BigDecimal = 10, // fix me use estimate from `analyze`
+			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
 			self.transactionManifest = transactionManifest
@@ -46,6 +48,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			if let customizeGuarantees {
 				self.destination = .customizeGuarantees(customizeGuarantees)
 			}
+			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
 		}
 
 		public enum DisplayMode: Sendable, Hashable {
@@ -95,6 +98,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case selectFeePayer(SelectFeePayer.State)
+			case prepareForSigning(PrepareForSigning.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
 		}
@@ -102,6 +106,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case selectFeePayer(SelectFeePayer.Action)
+			case prepareForSigning(PrepareForSigning.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
 		}
@@ -112,6 +117,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
 				SelectFeePayer()
+			}
+			Scope(
+				state: /State.prepareForSigning,
+				action: /Action.prepareForSigning
+			) {
+				PrepareForSigning()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
@@ -244,6 +255,35 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				)))
 			}
 
+		case .destination(.presented(.prepareForSigning(.delegate(.failedToBuildTX))))
+		     return .none
+
+		     case .destination(.presented(.prepareForSigning(.delegate(.failedToLoadSigners)))):
+			return .none
+
+		case let .destination(.presented(.prepareForSigning(.delegate(.done(compiledIntent, signingFactors))))):
+
+			func printSigners() {
+				for (factorSourceKind, signingFactorsOfKind) in signingFactors {
+					print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
+					for signingFactor in signingFactorsOfKind {
+						let factorSource = signingFactor.factorSource
+						print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
+						for signer in signingFactor.signers {
+							let entity = signer.entity
+							print("\t\t🔮 * Entity: \(entity.displayName): *")
+							for factorInstance in signer.factorInstancesRequiredToSign {
+								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
+							}
+						}
+					}
+				}
+			}
+			printSigners()
+
+			state.destination = .signing(.init(dataToHashAndSign: Data(compiledIntent.compiledIntent), factorsLeftToSignWith: signingFactors, purpose: .signTransaction(state.signTransactionPurpose)))
+			return .none
+
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
@@ -369,14 +409,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 			guard let networkID = state.networkID else {
-				assertionFailure("Expected feePayerSelectionAmongstCandidates")
+				assertionFailure("Expected networkID")
 				return .none
 			}
-			state.destination = .signing(.init(
-				networkID: networkID,
+
+			state.destination = .prepareForSigning(.init(
 				manifest: manifest,
-				feePayerSelectionAmongstCandidates: feePayerSelectionAmongstCandidates,
-				purpose: .signTransaction(state.signTransactionPurpose)
+				networkID: networkID,
+				feePayer: feePayerSelectionAmongstCandidates.selected.account,
+				purpose: .signTransaction(state.signTransactionPurpose),
+				ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
 			))
 			return .none
 

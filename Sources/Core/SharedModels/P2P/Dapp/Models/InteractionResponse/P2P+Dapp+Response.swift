@@ -1,9 +1,20 @@
 import Prelude
+import Profile
 
 // MARK: - P2P.Dapp
 extension P2P {
 	/// Just a namespace
 	public enum Dapp {}
+}
+
+// MARK: - SignedAuthChallenge
+public struct SignedAuthChallenge: Sendable, Hashable {
+	public let challenge: P2P.Dapp.AuthChallengeNonce
+	public let entitySignatures: Set<SignatureOfEntity>
+	public init(challenge: P2P.Dapp.AuthChallengeNonce, entitySignatures: Set<SignatureOfEntity>) {
+		self.challenge = challenge
+		self.entitySignatures = entitySignatures
+	}
 }
 
 // MARK: - P2P.Dapp.Response

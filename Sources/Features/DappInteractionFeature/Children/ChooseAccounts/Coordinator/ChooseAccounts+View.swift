@@ -1,5 +1,6 @@
 import CreateEntityFeature
 import FeaturePrelude
+import SigningFeature
 
 // MARK: - ChooseAccounts.View
 extension ChooseAccounts {
@@ -131,11 +132,16 @@ extension ChooseAccounts {
 					viewStore.send(.appeared)
 				}
 				.sheet(
-					store: store.scope(
-						state: \.$createAccountCoordinator,
-						action: { .child(.createAccountCoordinator($0)) }
-					),
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ChooseAccounts.Destinations.State.createAccount,
+					action: ChooseAccounts.Destinations.Action.createAccount,
 					content: { CreateAccountCoordinator.View(store: $0) }
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ChooseAccounts.Destinations.State.signing,
+					action: ChooseAccounts.Destinations.Action.signing,
+					content: { Signing.View(store: $0) }
 				)
 			}
 		}

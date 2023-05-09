@@ -98,27 +98,31 @@ struct Login: Sendable, FeatureReducer {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
 
-			let signAuthRequest = SignAuthChallengeRequest(
+			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
-				dAppDefinitionAddress: state.dappDefinitionAddress,
-				entities: [.persona(persona)]
+				dAppDefinitionAddress: state.dappDefinitionAddress
 			)
 
-			return .run { [authorizedDapp = state.authorizedDapp] send in
-				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
-				await send(.delegate(.continueButtonTapped(
-					persona,
-					authorizedDapp,
-					authorizedPersona,
-					signedAuthChallenge
-				)))
-
-			} catch: { error, send in
-				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
-				errorQueue.schedule(error)
-				await send(.delegate(.failedToSignAuthChallenge))
+			return .run { [authorizedDapp = state.authorizedDapp] _ in
+				let authToSignResponse = try await rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 			}
+
+//			return .run { [authorizedDapp = state.authorizedDapp] send in
+//				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
+//				await send(.delegate(.continueButtonTapped(
+//					persona,
+//					authorizedDapp,
+//					authorizedPersona,
+//					signedAuthChallenge
+//				)))
+//
+//			} catch: { error, send in
+//				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
+//				errorQueue.schedule(error)
+//				await send(.delegate(.failedToSignAuthChallenge))
+//			}
+			fatalError()
 		}
 	}
 

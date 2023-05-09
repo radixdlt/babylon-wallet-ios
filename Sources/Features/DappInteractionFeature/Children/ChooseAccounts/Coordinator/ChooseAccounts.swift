@@ -2,6 +2,7 @@ import AccountsClient
 import CreateEntityFeature
 import FeaturePrelude
 import ROLAClient
+import SigningFeature
 
 // MARK: - ChooseAccountsResult
 enum ChooseAccountsResult: Sendable, Hashable {
@@ -28,7 +29,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		var selectedAccounts: [ChooseAccountsRow.State]?
 
 		@PresentationState
-		var createAccountCoordinator: CreateAccountCoordinator.State?
+		var destination: Destinations.State?
 
 		init(
 			challenge: P2P.Dapp.AuthChallengeNonce?,
@@ -47,7 +48,9 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			self.availableAccounts = availableAccounts
 			self.numberOfAccounts = numberOfAccounts
 			self.selectedAccounts = selectedAccounts
-			self.createAccountCoordinator = createAccountCoordinator
+			if let createAccountCoordinator {
+				self.destination = .createAccount(createAccountCoordinator)
+			}
 		}
 	}
 
@@ -63,7 +66,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case createAccountCoordinator(PresentationAction<CreateAccountCoordinator.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -73,14 +76,35 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		)
 	}
 
+	struct Destinations: Sendable, ReducerProtocol {
+		enum State: Sendable, Hashable {
+			case createAccount(CreateAccountCoordinator.State)
+			case signing(Signing.State)
+		}
+
+		enum Action: Sendable, Equatable {
+			case createAccount(CreateAccountCoordinator.Action)
+			case signing(Signing.Action)
+		}
+
+		var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.createAccount, action: /Action.createAccount) {
+				CreateAccountCoordinator()
+			}
+			Scope(state: /State.signing, action: /Action.signing) {
+				Signing()
+			}
+		}
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.rolaClient) var rolaClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
-				CreateAccountCoordinator()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -94,9 +118,9 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 
 		case .createAccountButtonTapped:
-			state.createAccountCoordinator = .init(config: .init(
+			state.destination = .createAccount(.init(config: .init(
 				purpose: .newAccountDuringDappInteraction
-			), displayIntroduction: { _ in false })
+			), displayIntroduction: { _ in false }))
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):
@@ -113,46 +137,54 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 				)))
 			}
 
-			let signAuthRequest = SignAuthChallengeRequest(
+			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
-				dAppDefinitionAddress: state.dappDefinitionAddress,
-				entities: .init(uniqueElements: selectedAccounts.elements.map { .account($0) })
+				dAppDefinitionAddress: state.dappDefinitionAddress
 			)
 
-			return .run { [accessKind = state.accessKind] send in
-				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
-				//                await send(.delegate(.continueButtonTapped(
-				//                    persona,
-				//                    authorizedDapp,
-				//                    authorizedPersona,
-				//                    signedAuthChallenge
-				//                )))
-				let walletAccountsWithProof: [P2P.Dapp.Response.WalletAccountWithProof] = signedAuthChallenge.entitySignatures.map {
-					guard case let .account(account) = $0.signerEntity else {
-						fatalError()
-					}
-					guard let proof = P2P.Dapp.AuthProof(entitySignature: $0) else {
-						fatalError()
-					}
-					return P2P.Dapp.Response.WalletAccountWithProof(account: .init(account: account), proof: proof)
-				}
-				let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
-					challenge: challenge,
-					IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>.init(uniqueElements: walletAccountsWithProof)
-				)
-
-				await send(.delegate(.continueButtonTapped(
-					accessKind: accessKind,
-					chosenAccounts: chosenAccounts
-				)))
-
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
-				errorQueue.schedule(error)
-				fatalError("impl failure")
-				//                await send(.delegate(.failedToSign)
+			return .run { _ in
+				let dataToSign = try await rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+				let networkID = await accountsClient.getCurrentNetworkID()
 			}
+
+//			state.destination = .signing(Signing.State.init(networkID: , manifest: <#T##TransactionManifest#>, feePayerSelectionAmongstCandidates: <#T##FeePayerSelectionAmongstCandidates#>, purpose: <#T##SigningPurpose#>))
+			fatalError()
+
+//			let signAuthRequest = SignAuthChallengeRequest(
+//				challenge: challenge,
+//				origin: state.dappMetadata.origin,
+//				dAppDefinitionAddress: state.dappDefinitionAddress,
+//				entities: .init(uniqueElements: selectedAccounts.elements.map { .account($0) })
+//			)
+
+//			return .run { [accessKind = state.accessKind] send in
+//				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
+//				let walletAccountsWithProof: [P2P.Dapp.Response.WalletAccountWithProof] = signedAuthChallenge.entitySignatures.map {
+//					guard case let .account(account) = $0.signerEntity else {
+//						fatalError()
+//					}
+//					guard let proof = P2P.Dapp.AuthProof(entitySignature: $0) else {
+//						fatalError()
+//					}
+//					return P2P.Dapp.Response.WalletAccountWithProof(account: .init(account: account), proof: proof)
+//				}
+//				let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
+//					challenge: challenge,
+//					IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>.init(uniqueElements: walletAccountsWithProof)
+//				)
+//
+//				await send(.delegate(.continueButtonTapped(
+//					accessKind: accessKind,
+//					chosenAccounts: chosenAccounts
+//				)))
+//
+//			} catch: { error, _ in
+//				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
+//				errorQueue.schedule(error)
+//				fatalError("impl failure")
+//				//                await send(.delegate(.failedToSign)
+//			}
 		}
 	}
 
@@ -170,7 +202,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .createAccountCoordinator(.presented(.delegate(.completed))):
+		case .destination(.presented(.createAccount(.delegate(.completed)))):
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
 					try await accountsClient.getAccountsOnCurrentNetwork()
