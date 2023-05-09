@@ -15,13 +15,13 @@ extension PersonaDetails {
 	}
 
 	public struct ViewState: Equatable {
-		#if DEBUG
-		public var canCreateAuthKey: Bool
-		#endif // DEBUG
-
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
+
+		#if DEBUG
+		public var canCreateAuthKey: Bool
+		#endif // DEBUG
 	}
 }
 
@@ -110,22 +110,24 @@ private extension StoreOf<PersonaDetails> {
 // MARK: - Extensions
 
 private extension PersonaDetails.State {
+	#if DEBUG
 	var viewState: PersonaDetails.ViewState {
-		#if DEBUG
-		(
-			canCreateAuthKey: canCreateAuthKey,
+		.init(
+			thumbnail: nil,
+			personaName: personaName,
+			isDappPersona: isDappPersona,
+			canCreateAuthKey: canCreateAuthKey
+		)
+	}
+	#else
+	var viewState: PersonaDetails.ViewState {
+		.init(
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona
 		)
-		#else
-			.init(
-				thumbnail: nil,
-				personaName: personaName,
-				isDappPersona: isDappPersona
-			)
-		#endif
 	}
+	#endif
 
 	var personaName: String {
 		switch mode {
