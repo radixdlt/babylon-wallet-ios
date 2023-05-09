@@ -89,6 +89,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 							)
 						}
 					)
+					await send(.internal(.dappMetadataLoadingResult(.success(.fromLedger(fromLedger)))))
 				} catch {
 					guard isDeveloperModeEnabled else {
 						await send(.internal(.dappMetadataLoadingResult(.failure(error))))
