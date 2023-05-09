@@ -610,11 +610,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							case let .valid(dappDefinitionAddress) = state.remoteInteraction.metadata.dAppDefinitionAddress
 						else {
 							await send(.delegate(.dismissWithFailure(.init(interactionId: state.remoteInteraction.id, errorType: .invalidRequest, message: "Invalid DappDefinitionAddress"))))
+							return
 						}
 						guard
 							let displayName = NonEmptyString(rawValue: state.dappContext.name ?? L10n.DApp.Metadata.unknownName)
 						else {
 							await send(.delegate(.dismissWithFailure(.init(interactionId: state.remoteInteraction.id, errorType: .invalidRequest, message: "Invalid DappName"))))
+							return
 						}
 
 						var authorizedDapp = state.authorizedDapp ?? .init(
