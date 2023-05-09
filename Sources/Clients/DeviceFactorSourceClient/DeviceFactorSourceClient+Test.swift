@@ -1,14 +1,14 @@
 import ClientPrelude
 
 extension DependencyValues {
-	public var useFactorSourceClient: UseFactorSourceClient {
-		get { self[UseFactorSourceClient.self] }
-		set { self[UseFactorSourceClient.self] = newValue }
+	public var deviceFactorSourceClient: DeviceFactorSourceClient {
+		get { self[DeviceFactorSourceClient.self] }
+		set { self[DeviceFactorSourceClient.self] = newValue }
 	}
 }
 
-// MARK: - UseFactorSourceClient + TestDependencyKey
-extension UseFactorSourceClient: TestDependencyKey {
+// MARK: - DeviceFactorSourceClient + TestDependencyKey
+extension DeviceFactorSourceClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let noop = Self(

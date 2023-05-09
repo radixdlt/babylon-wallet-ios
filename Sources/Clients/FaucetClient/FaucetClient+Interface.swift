@@ -1,5 +1,6 @@
 import ClientPrelude
 import Cryptography
+import DeviceFactorSourceClient
 import TransactionClient
 
 // MARK: - FaucetClient
@@ -10,6 +11,7 @@ public struct FaucetClient: Sendable {
 	#if DEBUG
 	public var createFungibleToken: CreateFungibleToken
 	public var createNonFungibleToken: CreateNonFungibleToken
+
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
 		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
@@ -104,6 +106,7 @@ public struct CreateNonFungibleTokenRequest: Sendable {
 extension FaucetClient {
 	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> Void
 	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async -> Bool
+
 	#if DEBUG
 	public typealias CreateFungibleToken = @Sendable (CreateFungibleTokenRequest) async throws -> Void
 	public typealias CreateNonFungibleToken = @Sendable (CreateNonFungibleTokenRequest) async throws -> Void

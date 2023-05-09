@@ -44,7 +44,7 @@
 //			$0.currentRequest = .chooseAccounts(
 //				.init(
 //					kind: .oneTime,
-//					dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+//					dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
 //					dappMetadata: .init(name: "Dapp name", description: "A description"),
 //					request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: request))
 //				)
@@ -60,7 +60,7 @@
 //		let currentRequest: DappInteractor.State.CurrentRequest = .chooseAccounts(
 //			.init(
 //				kind: .oneTime,
-//				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+//				dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
 //				dappMetadata: .init(name: "Dapp name", description: "A description"),
 //				request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: .previewValueOneTimeAccountAccess))
 //			)
@@ -105,7 +105,7 @@
 //				metadata: .init(
 //					networkId: .nebunet,
 //					origin: "",
-//					dAppDefinitionAddress: try! .init(address: "account_deadbeef")
+//					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
 //				)
 //			),
 //			client: .previewValue

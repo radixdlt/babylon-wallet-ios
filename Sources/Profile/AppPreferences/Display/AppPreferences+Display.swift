@@ -15,12 +15,16 @@ extension AppPreferences {
 
 		public var isCurrencyAmountVisible: Bool
 
+		public var ledgerHQHardwareWalletSigningDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode
+
 		public init(
 			fiatCurrencyPriceTarget: FiatCurrency = .usd,
-			isCurrencyAmountVisible: Bool = true
+			isCurrencyAmountVisible: Bool = true,
+			ledgerHQHardwareWalletSigningDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = .default
 		) {
 			self.fiatCurrencyPriceTarget = fiatCurrencyPriceTarget
 			self.isCurrencyAmountVisible = isCurrencyAmountVisible
+			self.ledgerHQHardwareWalletSigningDisplayMode = ledgerHQHardwareWalletSigningDisplayMode
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import AppPreferencesClient
 import EngineToolkit
 import FactorSourcesClient
 import FeaturePrelude
@@ -17,10 +18,12 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 
 	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
-		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<AccountSignature>)
+		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<SignatureOfEntity>)
 	}
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
+
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -41,16 +44,33 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		}
 	}
 
-	public func sign(signingFactor: SigningFactor, state: State) async throws -> Set<AccountSignature> {
+	public func sign(
+		signingFactor: SigningFactor,
+		state: State
+	) async throws -> Set<SignatureOfEntity> {
 		do {
 			let expectedHash = try blake2b(data: state.dataToSign)
 			loggerGlobal.notice("\n\nExpected hash: \(expectedHash.hex)\n\n")
 		} catch {
 			loggerGlobal.critical("Failed to hash: \(error)")
 		}
-		return try await ledgerHardwareWalletClient.sign(
+		let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
+
+		return try await ledgerHardwareWalletClient.sign(.init(
 			signingFactor: signingFactor,
-			unhashedDataToSign: state.dataToSign
-		)
+			unhashedDataToSign: state.dataToSign,
+			ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
+			displayHashOnLedgerDisplay: true
+		))
+	}
+}
+
+extension FactorSource.LedgerHardwareWallet.SigningDisplayMode {
+	// seperation so that we do not accidentally break profile or RadixConnect
+	var mode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode {
+		switch self {
+		case .verbose: return .verbose
+		case .summary: return .summary
+		}
 	}
 }

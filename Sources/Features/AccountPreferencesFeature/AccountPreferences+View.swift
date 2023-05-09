@@ -1,3 +1,4 @@
+import CreateAuthKeyFeature
 import FeaturePrelude
 
 extension AccountPreferences.State {
@@ -5,6 +6,7 @@ extension AccountPreferences.State {
 		#if DEBUG
 		return .init(
 			faucetButtonState: faucetButtonState,
+			canCreateAuthSigningKey: canCreateAuthSigningKey,
 			createFungibleTokenButtonState: createFungibleTokenButtonState,
 			createNonFungibleTokenButtonState: createNonFungibleTokenButtonState,
 			createMultipleFungibleTokenButtonState: createMultipleFungibleTokenButtonState,
@@ -22,6 +24,7 @@ extension AccountPreferences {
 		public var faucetButtonState: ControlState
 
 		#if DEBUG
+		public var canCreateAuthSigningKey: Bool
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
 		public var createMultipleFungibleTokenButtonState: ControlState
@@ -31,12 +34,14 @@ extension AccountPreferences {
 		#if DEBUG
 		public init(
 			faucetButtonState: ControlState,
+			canCreateAuthSigningKey: Bool,
 			createFungibleTokenButtonState: ControlState,
 			createNonFungibleTokenButtonState: ControlState,
 			createMultipleFungibleTokenButtonState: ControlState,
 			createMultipleNonFungibleTokenButtonState: ControlState
 		) {
 			self.faucetButtonState = faucetButtonState
+			self.canCreateAuthSigningKey = canCreateAuthSigningKey
 			self.createFungibleTokenButtonState = createFungibleTokenButtonState
 			self.createNonFungibleTokenButtonState = createNonFungibleTokenButtonState
 			self.createMultipleFungibleTokenButtonState = createMultipleFungibleTokenButtonState
@@ -63,6 +68,7 @@ extension AccountPreferences {
 					VStack(alignment: .leading) {
 						faucetButton(with: viewStore)
 						#if DEBUG
+						createAndUploadAuthKeyButton(with: viewStore)
 						createFungibleTokenButton(with: viewStore)
 						createNonFungibleTokenButton(with: viewStore)
 						createMultipleFungibleTokenButton(with: viewStore)
@@ -75,17 +81,24 @@ extension AccountPreferences {
 						viewStore.send(.appeared)
 					}
 					.navigationTitle(L10n.AccountPreferences.title)
+					.sheet(
+						store: store.scope(
+							state: \.$createAuthKey,
+							action: { .child(.createAuthKey($0)) }
+						),
+						content: { CreateAuthKey.View(store: $0) }
+					)
 					#if os(iOS)
-						.navigationBarTitleColor(.app.gray1)
-						.navigationBarTitleDisplayMode(.inline)
-						.navigationBarInlineTitleFont(.app.secondaryHeader)
-						.toolbar {
-							ToolbarItem(placement: .navigationBarLeading) {
-								CloseButton {
-									viewStore.send(.closeButtonTapped)
-								}
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
 							}
 						}
+					}
 					#endif // os(iOS)
 				}
 			}
@@ -112,6 +125,15 @@ extension AccountPreferences.View {
 
 #if DEBUG
 extension AccountPreferences.View {
+	@ViewBuilder
+	private func createAndUploadAuthKeyButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Create & Upload Auth Key") {
+			viewStore.send(.createAndUploadAuthKeyButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.canCreateAuthSigningKey ? .enabled : .disabled)
+	}
+
 	@ViewBuilder
 	private func createFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
 		Button("Create Fungible Token") {
@@ -182,7 +204,7 @@ struct AccountPreferences_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountPreferences.View(
 			store: .init(
-				initialState: .init(address: try! .init(address: "account-address-deadbeef")),
+				initialState: .init(address: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")),
 				reducer: AccountPreferences()
 			)
 		)

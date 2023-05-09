@@ -203,6 +203,7 @@ extension AppSettings.View {
 		let action: AppSettings.ViewAction
 	}
 
+	@MainActor
 	private func settingsRows() -> [RowModel] {
 		[
 			.init(
@@ -233,6 +234,7 @@ extension AppSettings.View {
 		]
 	}
 
+	@MainActor
 	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
 		VStack(spacing: 0) {
 			ScrollView {
@@ -246,38 +248,36 @@ extension AppSettings.View {
 
 					#if DEBUG
 					PlainListRow(title: L10n.Settings.inspectProfileButtonTitle) {
-						viewStore.send(.debugInspectProfileButtonTapped)
-					} icon: {
 						Image(systemName: "wallet.pass")
 							.frame(.verySmall)
 					}
+					.tappable {
+						viewStore.send(.debugInspectProfileButtonTapped)
+					}
 					.withSeparator
-					.buttonStyle(.tappableRowStyle)
 
 					PlainListRow(title: "Factor Sources") {
-						viewStore.send(.factorSourcesButtonTapped)
-					} icon: {
 						Image(systemName: "person.badge.key")
 							.frame(.verySmall)
 					}
-					.withSeparator
-					.buttonStyle(.tappableRowStyle)
-
-					PlainListRow(title: L10n.Settings.importLegacyWallet) {
-						viewStore.send(.importFromOlympiaWalletButtonTapped)
-					} icon: {
-						Image(asset: AssetResource.generalSettings)
+					.tappable {
+						viewStore.send(.debugInspectProfileButtonTapped)
 					}
 					.withSeparator
-					.buttonStyle(.tappableRowStyle)
+
+					PlainListRow(title: L10n.Settings.importLegacyWallet, asset: AssetResource.generalSettings)
+						.tappable {
+							viewStore.send(.importFromOlympiaWalletButtonTapped)
+						}
+						.withSeparator
 					#endif
 
 					ForEach(settingsRows()) { row in
-						PlainListRow(title: row.title, asset: row.asset) {
-							viewStore.send(row.action)
-						}
-						.withSeparator
-						.buttonStyle(.tappableRowStyle)
+						PlainListRow(title: row.title, asset: row.asset)
+							.tappable {
+								viewStore.send(row.action)
+							}
+							.withSeparator
 					}
 				}
 				.padding(.bottom, .large3)

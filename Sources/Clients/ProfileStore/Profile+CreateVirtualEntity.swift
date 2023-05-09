@@ -1,7 +1,7 @@
 import ClientPrelude
 import Cryptography
+import DeviceFactorSourceClient
 import Profile
-import UseFactorSourceClient
 
 extension Profile {
 	public func createNewUnsavedVirtualEntityControlledByDeviceFactorSource<Entity: EntityProtocol>(
@@ -27,7 +27,7 @@ extension Profile {
 		request: CreateVirtualEntityControlledByDeviceFactorSourceRequest,
 		entityType: Entity.Type
 	) async throws -> Entity {
-		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 		let entityKind = Entity.entityKind
 		let networkID = request.networkID ?? self.appPreferences.gateways.current.network.id
 		let babylonDeviceFactorSource = request.babylonDeviceFactorSource
@@ -42,13 +42,13 @@ extension Profile {
 			index: index
 		)
 
-		let genesisFactorInstance: FactorInstance = try await {
-			let publicKey = try await useFactorSourceClient.publicKeyFromOnDeviceHD(
+		let transactionSigning: FactorInstance = try await {
+			let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
 				.init(
 					hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
 					derivationPath: derivationPath,
 					curve: .curve25519, // we always use Curve25519 for new accounts
-					creationOfEntity: entityKind
+					loadMnemonicPurpose: .createEntity(kind: entityKind)
 				)
 			)
 
@@ -71,7 +71,7 @@ extension Profile {
 
 		return try Entity(
 			networkID: networkID,
-			factorInstance: genesisFactorInstance,
+			factorInstance: transactionSigning,
 			displayName: request.displayName,
 			extraProperties: request.extraProperties(numberOfExistingEntities).get(entityType: Entity.self)
 		)
@@ -89,7 +89,7 @@ extension Profile {
 		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let publicKey = try await request.derivePublicKey(derivationPath)
-		let genesisFactorInstance = FactorInstance(factorSourceID: ledger.id, publicKey: .eddsaEd25519(publicKey), derivationPath: derivationPath)
+		let transactionSigning = FactorInstance(factorSourceID: ledger.id, publicKey: .eddsaEd25519(publicKey), derivationPath: derivationPath)
 
 		let numberOfExistingEntities = {
 			guard let network = (try? self.network(id: networkID)) else {
@@ -103,7 +103,7 @@ extension Profile {
 
 		return try Entity(
 			networkID: networkID,
-			factorInstance: genesisFactorInstance,
+			factorInstance: transactionSigning,
 			displayName: request.displayName,
 			extraProperties: request.extraProperties(numberOfExistingEntities).get(entityType: Entity.self)
 		)

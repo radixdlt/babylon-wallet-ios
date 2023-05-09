@@ -1,9 +1,12 @@
 import AuthorizedDappsClient
+import CreateAuthKeyFeature
 import EditPersonaFeature
 import FeaturePrelude
+import GatewayAPI
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
@@ -18,52 +21,72 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		public enum Mode: Sendable, Hashable {
-			case general(Profile.Network.Persona)
+			case general(Profile.Network.Persona, dApps: IdentifiedArrayOf<DappInfo>)
 			case dApp(Profile.Network.AuthorizedDappDetailed, persona: Profile.Network.AuthorizedPersonaDetailed)
 
 			var id: Profile.Network.Persona.ID {
 				switch self {
-				case let .general(persona): return persona.id
+				case let .general(persona, _): return persona.id
 				case let .dApp(_, persona: persona): return persona.id
-				}
-			}
-
-			var networkID: NetworkID {
-				switch self {
-				case let .general(persona): return persona.networkID
-				case let .dApp(dApp, _): return dApp.networkID
 				}
 			}
 		}
 
-		@PresentationState
-		public var confirmForgetAlert: AlertState<ViewAction.ConfirmForgetAlert>? = nil
+		public struct DappInfo: Sendable, Hashable, Identifiable {
+			public let id: Profile.Network.AuthorizedDapp.ID
+			public var thumbnail: URL?
+			public let displayName: String
+
+			public init(dApp: Profile.Network.AuthorizedDapp) {
+				self.id = dApp.id
+				self.thumbnail = nil
+				self.displayName = dApp.displayName.rawValue
+			}
+		}
 
 		@PresentationState
-		public var editPersona: EditPersona.State? = nil
+		var destination: Destination.State? = nil
+
+		var identityAddress: IdentityAddress {
+			mode.id
+		}
+
+		#if DEBUG
+		public var canCreateAuthKey: Bool
+		#endif
 
 		public init(_ mode: Mode) {
 			self.mode = mode
+
+			#if DEBUG
+			let hasAuthenticationSigningKey: Bool
+			switch mode {
+			case let .general(persona, _):
+				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
+			case let .dApp(_, persona):
+				hasAuthenticationSigningKey = persona.hasAuthenticationSigningKey
+			}
+			self.canCreateAuthKey = !hasAuthenticationSigningKey
+			#endif
 		}
 	}
 
 	// MARK: - Action
 
 	public enum ViewAction: Sendable, Equatable {
+		case appeared
 		case accountTapped(AccountAddress)
+		case dAppTapped(Profile.Network.AuthorizedDapp.ID)
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
-		case confirmForgetAlert(PresentationAction<ConfirmForgetAlert>)
-
-		public enum ConfirmForgetAlert: Sendable, Equatable {
-			case confirmTapped
-			case cancelTapped
-		}
+		#if DEBUG
+		case createAndUploadAuthKeyButtonTapped
+		#endif
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case editPersona(PresentationAction<EditPersona.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -74,21 +97,55 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case editablePersonaFetched(Profile.Network.Persona)
 		case reloaded(State.Mode)
+		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
+		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
+		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
+		case personaToCreateAuthKeyForFetched(Profile.Network.Persona)
+	}
+
+	// MARK: - Destination
+
+	public struct Destination: ReducerProtocol {
+		public enum State: Equatable, Hashable {
+			case editPersona(EditPersona.State)
+			case createAuthKey(CreateAuthKey.State)
+
+			case confirmForgetAlert(AlertState<Action.ConfirmForgetAlert>)
+		}
+
+		public enum Action: Equatable {
+			case editPersona(EditPersona.Action)
+			case createAuthKey(CreateAuthKey.Action)
+
+			case confirmForgetAlert(ConfirmForgetAlert)
+			public enum ConfirmForgetAlert: Sendable, Equatable {
+				case confirmTapped
+				case cancelTapped
+			}
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.editPersona, action: /Action.editPersona) {
+				EditPersona()
+			}
+			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
+				CreateAuthKey()
+			}
+		}
 	}
 
 	// MARK: - Reducer
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$editPersona, action: /Action.child .. ChildAction.editPersona) {
-				EditPersona()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
-			.ifLet(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert)
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .editPersona(.presented(.delegate(.personaSaved(persona)))):
+		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
 			guard persona.id == state.mode.id else { return .none }
 			return .run { [mode = state.mode] send in
 				let updated = try await reload(in: mode)
@@ -98,19 +155,61 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to reload, error: \(error)")
 			}
 
-		case .editPersona:
+		case .destination(.presented(.confirmForgetAlert(.confirmTapped))):
+			guard case let .dApp(dApp, persona: persona) = state.mode else {
+				return .none
+			}
+			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
+			return .run { send in
+				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
+				await send(.delegate(.personaDeauthorized))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
+				errorQueue.schedule(error)
+			}
+
+		case let .destination(.presented(.createAuthKey(.delegate(.done(wasSuccessful))))):
+			#if DEBUG
+			state.canCreateAuthKey = false
+			#endif
+			state.destination = nil
+			return .none
+
+		case .destination:
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .accountTapped:
+		case .appeared:
+			guard case let .general(_, dApps) = state.mode else { return .none }
+			return .task {
+				await .internal(.dAppsUpdated(addingDappMetadata(to: dApps)))
+			}
+
+		#if DEBUG
+		case .createAndUploadAuthKeyButtonTapped:
+			let identityAddress = state.identityAddress
+			return .run { send in
+				let persona = try await personasClient.getPersona(id: identityAddress)
+				await send(.internal(.personaToCreateAuthKeyForFetched(persona)))
+			} catch: { error, _ in
+				loggerGlobal.error("Could not get persona with address: \(identityAddress), error: \(error)")
+				errorQueue.schedule(error)
+			}
+			return .none
+		#endif
+
+		case let .accountTapped(address):
+			return .none
+
+		case let .dAppTapped(dAppID):
 			return .none
 
 		case .editPersonaTapped:
 			switch state.mode {
-			case let .general(persona):
+			case let .general(persona, _):
 				return .send(.internal(.editablePersonaFetched(persona)))
 
 			case let .dApp(_, persona: persona):
@@ -127,42 +226,43 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .deauthorizePersonaTapped:
-			state.confirmForgetAlert = .confirmForget
-			return .none
-
-		case .confirmForgetAlert(.presented(.confirmTapped)):
-			guard case let .dApp(dApp, persona: persona) = state.mode else {
-				return .none
-			}
-			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
-			return .run { send in
-				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
-				await send(.delegate(.personaDeauthorized))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
-				errorQueue.schedule(error)
-			}
-
-		case .confirmForgetAlert:
+			state.destination = .confirmForgetAlert(.confirmForget)
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .personaToCreateAuthKeyForFetched(persona):
+			state.destination = .createAuthKey(.init(entity: .persona(persona)))
+			return .none
+
 		case let .editablePersonaFetched(persona):
 			switch state.mode {
 			case .general:
-				state.editPersona = .init(mode: .edit, persona: persona)
+				state.destination = .editPersona(.init(mode: .edit, persona: persona))
 			case let .dApp(_, detailedPersona):
 				let fieldIDs = (detailedPersona.sharedFields ?? []).ids
-				state.editPersona = .init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona)
+				state.destination = .editPersona(.init(mode: .dapp(requiredFieldIDs: Set(fieldIDs)), persona: persona))
 			}
 
 			return .none
 
+		case let .dAppsUpdated(dApps):
+			guard case let .general(persona, _) = state.mode else { return .none }
+			state.mode = .general(persona, dApps: dApps)
+			return .none
+
 		case let .reloaded(mode):
 			state.mode = mode
+			return .none
+
+		case let .hideLoader(controlStateKeyPath):
+			state[keyPath: controlStateKeyPath] = .enabled
+			return .none
+
+		case let .callDone(controlStateKeyPath, newState):
+			state[keyPath: controlStateKeyPath] = newState
 			return .none
 		}
 	}
@@ -175,9 +275,43 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				throw ReloadError.personaNotPresentInDapp(persona.id, updatedDapp.dAppDefinitionAddress)
 			}
 			return .dApp(updatedDapp, persona: updatedPersona)
-		case let .general(persona):
-			let updatedPersona = try await personasClient.getPersona(id: persona.id)
-			return .general(updatedPersona)
+		case let .general(oldPersona, _):
+			let persona = try await personasClient.getPersona(id: oldPersona.id)
+			let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(oldPersona.id)
+				.map(State.DappInfo.init)
+
+			return await .general(persona, dApps: addingDappMetadata(to: .init(uniqueElements: dApps)))
+		}
+	}
+
+	private func addingDappMetadata(to dApps: State.DappsSection) async -> State.DappsSection {
+		var dApps = dApps
+		for dApp in dApps {
+			do {
+				let metadata = try await gatewayAPIClient.getDappMetadata(dApp.id)
+				dApps[id: dApp.id]?.thumbnail = metadata.iconURL
+			} catch {
+				loggerGlobal.error("Failed to load dApp metadata, error: \(error)")
+			}
+		}
+		return dApps
+	}
+
+	private func call(
+		buttonState: WritableKeyPath<State, ControlState>,
+		into state: inout State,
+		onSuccess: ControlState,
+		call: @escaping @Sendable (IdentityAddress) async throws -> Void
+	) -> EffectTask<Action> {
+		state[keyPath: buttonState] = .loading(.local)
+		return .run { [address = state.mode.id] send in
+			try await call(address)
+			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
+		} catch: { error, send in
+			await send(.internal(.hideLoader(updateControlState: buttonState)))
+			if !Task.isCancelled {
+				errorQueue.schedule(error)
+			}
 		}
 	}
 
@@ -186,7 +320,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert> {
+extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 	static var confirmForget: AlertState {
 		AlertState {
 			TextState(L10n.PersonaDetails.deauthorizePersonaAlertTitle)

@@ -96,7 +96,7 @@ extension SecureStorageClient: DependencyKey {
 					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
 						key: profileSnapshot.header.id.keychainKey,
-						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled.rawValue,
+						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled,
 						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
@@ -131,6 +131,7 @@ extension SecureStorageClient: DependencyKey {
 					case .signTransaction: return L10n.Common.BiometricsPrompt.signTransaction
 					case .signAuthChallenge: return L10n.Common.BiometricsPrompt.signAuthChallenge
 					case .checkingAccounts: return L10n.Common.BiometricsPrompt.checkingAccounts
+					case .createSignAuthKey: return "Create Auth signing key"
 					#if DEBUG
 					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
 					#endif
@@ -156,7 +157,7 @@ extension SecureStorageClient: DependencyKey {
 					return
 				}
 				if keepIcloudIfPresent {
-					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled.rawValue {
+					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled {
 						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
 					} else {
 						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")

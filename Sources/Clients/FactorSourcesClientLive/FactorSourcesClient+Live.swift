@@ -44,14 +44,16 @@ extension FactorSourcesClient: DependencyKey {
 
 				return factorSourceID
 			},
-			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts in
+			checkIfHasOlympiaFactorSourceForAccounts: { softwareAccounts -> FactorSourceID? in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
 				}
 				do {
+					// cannot use `getFactorSources:ofKind`
 					let factorSourceIDs = try await getFactorSources()
-						.filter { $0.kind == .device && $0.supportsOlympia }
+						.filter(\.supportsOlympia)
+						.filter { $0.kind == .device }
 						.map(\.id)
 
 					for factorSourceID in factorSourceIDs {
@@ -73,10 +75,12 @@ extension FactorSourcesClient: DependencyKey {
 				}
 			},
 			addOffDeviceFactorSource: addOffDeviceFactorSource,
-			getSigningFactors: { _, accounts in
-				try await signingFactors(
-					for: accounts,
-					from: getFactorSources().rawValue
+			getSigningFactors: { request in
+				assert(request.signers.allSatisfy { $0.networkID == request.networkID })
+				return try await signingFactors(
+					for: request.signers,
+					from: getFactorSources().rawValue,
+					signingPurpose: request.signingPurpose
 				)
 			},
 			updateLastUsed: { request in
@@ -101,21 +105,31 @@ extension FactorSourcesClient: DependencyKey {
 }
 
 internal func signingFactors(
-	for accounts: some Collection<Profile.Network.Account>,
-	from allFactorSources: IdentifiedArrayOf<FactorSource>
+	for entities: some Collection<EntityPotentiallyVirtual>,
+	from allFactorSources: IdentifiedArrayOf<FactorSource>,
+	signingPurpose: SigningPurpose
 ) throws -> SigningFactors {
 	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
-	for account in accounts {
-		switch account.securityState {
+	for entity in entities {
+		switch entity.securityState {
 		case let .unsecured(unsecuredEntityControl):
-			let factorInstance = unsecuredEntityControl.genesisFactorInstance
+
+			let factorInstance = {
+				switch signingPurpose {
+				case .signAuth:
+					return unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
+				case .signTransaction:
+					return unsecuredEntityControl.transactionSigning
+				}
+			}()
+
 			let id = factorInstance.factorSourceID
 			guard let factorSource = allFactorSources[id: id] else {
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}
-			let signer = SigningFactor.Signer(account: account, factorInstanceRequiredToSign: factorInstance)
+			let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
 			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
 			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactorsNotNonEmpty[factorSource.kind] {

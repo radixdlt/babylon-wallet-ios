@@ -34,7 +34,7 @@ extension SecureStorageClient {
 	public typealias SaveProfileHeaderList = @Sendable (NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>) async throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
 
-	public enum LoadMnemonicPurpose: Sendable, Equatable, CustomStringConvertible {
+	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
 		case signAuthChallenge
 		case importOlympiaAccounts
@@ -43,6 +43,7 @@ extension SecureStorageClient {
 		/// Check if account(/persona) recovery is needed
 		case checkingAccounts
 
+		case createSignAuthKey
 		#if DEBUG
 		case debugOnlyInspect
 		#endif
@@ -59,6 +60,8 @@ extension SecureStorageClient {
 				return "signTransaction"
 			case .checkingAccounts:
 				return "checkingAccounts"
+			case .createSignAuthKey:
+				return "createSignAuthKey"
 			#if DEBUG
 			case .debugOnlyInspect:
 				return "debugOnlyInspect"

@@ -1,3 +1,4 @@
+import FeaturePrelude
 import Prelude
 import Profile
 import RadixConnectModels
@@ -156,13 +157,17 @@ extension FactorSourceView {
 					}
 				}
 				.padding()
-				.border(Color.green, width: 2)
+				.border(Color.green, width: 3)
 			}
 
 			if let entityCreatingStorage = factorSource.storage?.entityCreating {
 				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: entityCreatingStorage.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
 			}
 		}
+		.background {
+			Color.randomDark(seed: factorSource.id.hexCodable.data)
+		}
+		.foregroundColor(.white)
 		.padding([.leading], leadingPadding)
 		.task {
 			#if DEBUG
@@ -308,6 +313,7 @@ extension DisplayView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
+			Labeled("Ledger Signing Display Mode", value: display.ledgerHQHardwareWalletSigningDisplayMode.rawValue)
 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
 		}
 		.padding([.leading], leadingPadding)
@@ -611,7 +617,14 @@ extension EntityView {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}
 		}
+		.foregroundColor(entity.kind == .account ? .white : .black)
 		.padding([.leading], leadingPadding)
+		.background {
+			if let account = entity as? Profile.Network.Account {
+				account.appearanceID.gradient
+					.brightness(-0.2)
+			}
+		}
 	}
 }
 
@@ -624,22 +637,25 @@ public struct UnsecuredEntityControlView: IndentedView {
 extension UnsecuredEntityControlView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Genesis factor instance")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-
 			FactorInstanceView(
-				factorInstance: unsecuredControl.genesisFactorInstance,
+				description: "Transaction Signing",
+				factorInstance: unsecuredControl.transactionSigning,
 				indentation: inOneLevel
 			)
+			if let authenticationSigning = unsecuredControl.authenticationSigning {
+				FactorInstanceView(
+					description: "Auth Signing",
+					factorInstance: authenticationSigning,
+					indentation: inOneLevel
+				)
+			}
 		}
 	}
 }
 
 // MARK: - FactorInstanceView
 public struct FactorInstanceView: IndentedView {
+	public let description: String
 	public let factorInstance: FactorInstance
 	public let indentation: Indentation
 }
@@ -647,7 +663,7 @@ public struct FactorInstanceView: IndentedView {
 extension FactorInstanceView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Factor Instance")
+			Text("\(description) factor instance")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
@@ -678,8 +694,10 @@ public struct Labeled: SwiftUI.View {
 		HStack(alignment: .top) {
 			Text(label)
 				.fontWeight(.light)
+				.textSelection(.enabled)
 			Text(value)
 				.fontWeight(.bold)
+				.textSelection(.enabled)
 		}
 	}
 }

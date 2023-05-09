@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 5.8
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -30,13 +30,14 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"FactorSourcesClient", // check if `device` or `ledger` controlled for security prompting
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.feature(
 		name: "AccountPreferencesFeature",
 		dependencies: [
 			"FaucetClient",
 			"AccountPortfoliosClient",
+			"CreateAuthKeyFeature",
 		],
 		tests: .yes()
 	),
@@ -76,6 +77,15 @@ package.addModules([
 			"EditPersonaFeature",
 			"PersonasFeature",
 			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "CreateAuthKeyFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"TransactionReviewFeature",
+			"ROLAClient",
 		],
 		tests: .no
 	),
@@ -124,6 +134,8 @@ package.addModules([
 		dependencies: [
 			"AuthorizedDappsClient",
 			"EditPersonaFeature",
+			"CreateAuthKeyFeature",
+			"GatewayAPI",
 		],
 		tests: .no
 	),
@@ -140,6 +152,7 @@ package.addModules([
 		name: "GeneralSettings",
 		dependencies: [
 			"AppPreferencesClient",
+			"FactorSourcesClient", // check if has any ledgers
 		],
 		tests: .no
 	),
@@ -254,12 +267,13 @@ package.addModules([
 		name: "SigningFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
+			"AppPreferencesClient",
 			"EngineToolkit",
 			"FactorSourcesClient",
 			"LedgerHardwareWalletClient",
 			"Profile",
 			"TransactionClient",
-			"UseFactorSourceClient",
+			"DeviceFactorSourceClient",
 		],
 		tests: .no
 	),
@@ -388,6 +402,7 @@ package.addModules([
 	.client(
 		name: "FaucetClient",
 		dependencies: [
+			"DeviceFactorSourceClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaysClient", // getCurrentNetworkID
@@ -540,7 +555,7 @@ package.addModules([
 			"Profile",
 			"SecureStorageClient",
 			"MnemonicClient",
-			"UseFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
+			"DeviceFactorSourceClient", // FIXME: break out to `BaseProfileClient` or similar
 		],
 		tests: .yes()
 	),
@@ -557,10 +572,18 @@ package.addModules([
 	.client(
 		name: "ROLAClient",
 		dependencies: [
+			"AccountsClient",
 			"GatewayAPI",
 			"CacheClient",
+			"DeviceFactorSourceClient",
+			"EngineToolkitClient",
 		],
-		tests: .yes()
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
 	),
 	.client(
 		name: "SubmitTransactionClient",
@@ -574,6 +597,7 @@ package.addModules([
 		name: "TransactionClient",
 		dependencies: [
 			"AccountsClient",
+			"PersonasClient",
 			"AccountPortfoliosClient",
 			"EngineToolkitClient",
 			"GatewayAPI",
@@ -581,24 +605,13 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "UseFactorSourceClient",
+		name: "DeviceFactorSourceClient",
 		dependencies: [
 			"Cryptography",
 			"FactorSourcesClient",
 			"Profile",
 			"SecureStorageClient",
-		],
-		tests: .no
-	),
-	.client(
-		name: "UseFactorSourceClientLive",
-		dependencies: [
-			"AccountsClientLive",
-			"Cryptography",
-			"FactorSourcesClient",
-			"Profile",
-			"SecureStorageClient",
-			"UseFactorSourceClient",
+			"AccountsClient",
 		],
 		tests: .no
 	),
@@ -660,7 +673,7 @@ package.addModules([
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
 			},
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.core(
 		name: "Resources",
@@ -693,7 +706,7 @@ package.addModules([
 			"Profile",
 		],
 		exclude: [
-			"P2P/Codable/README.md",
+			"P2P/Dapp/README.md",
 			"P2P/Application/README.md",
 		],
 		tests: .yes()

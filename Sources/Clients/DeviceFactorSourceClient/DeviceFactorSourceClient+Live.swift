@@ -1,46 +1,38 @@
 import AccountsClient
 import ClientPrelude
-import Cryptography
 import EngineToolkit
-import FactorSourcesClient
 import Profile
 import SecureStorageClient
-import UseFactorSourceClient
 
 // MARK: - FailedToFindFactorSource
 struct FailedToFindFactorSource: Swift.Error {}
 
-// MARK: - UseFactorSourceClient + DependencyKey
-extension UseFactorSourceClient: DependencyKey {
+// MARK: - DeviceFactorSourceClient + DependencyKey
+extension DeviceFactorSourceClient: DependencyKey {
 	public typealias Value = Self
 
 	public static let liveValue: Self = {
 		@Dependency(\.secureStorageClient) var secureStorageClient
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-		let publicKeyFromOnDeviceHD: PublicKeyFromOnDeviceHD = { request in
-			let factorSourceID = request.hdOnDeviceFactorSource.id
-
-			guard
-				let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(
-					factorSourceID,
-					.createEntity(kind: request.entityKind)
-				)
-			else {
-				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
-				throw FailedToFindFactorSource()
-			}
-			let hdRoot = try mnemonicWithPassphrase.hdRoot()
-			let privateKey = try hdRoot.derivePrivateKey(
-				path: request.derivationPath,
-				curve: request.curve
-			)
-
-			return try privateKey.publicKey().intoEngine()
-		}
 
 		return Self(
-			publicKeyFromOnDeviceHD: publicKeyFromOnDeviceHD,
+			publicKeyFromOnDeviceHD: { request in
+				let factorSourceID = request.hdOnDeviceFactorSource.id
+
+				guard
+					let mnemonicWithPassphrase = try await secureStorageClient
+					.loadMnemonicByFactorSourceID(factorSourceID, request.loadMnemonicPurpose)
+				else {
+					loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
+					throw FailedToFindFactorSource()
+				}
+				let hdRoot = try mnemonicWithPassphrase.hdRoot()
+				let privateKey = try hdRoot.derivePrivateKey(
+					path: request.derivationPath,
+					curve: request.curve
+				)
+
+				return try privateKey.publicKey().intoEngine()
+			},
 			signatureFromOnDeviceHD: { request in
 				let privateKey = try request.hdRoot.derivePrivateKey(
 					path: request.derivationPath,
@@ -68,11 +60,12 @@ extension UseFactorSourceClient: DependencyKey {
 						// Failed to find mnemonic for factor source
 						return true
 					}
+
 					@Sendable func hasControl(of account: Profile.Network.Account) -> Bool {
 						do {
 							switch account.securityState {
 							case let .unsecured(unsecuredEntityControl):
-								let factorInstance = unsecuredEntityControl.genesisFactorInstance
+								let factorInstance = unsecuredEntityControl.transactionSigning
 								guard let derivationPath = factorInstance.derivationPath else {
 									// FIXME: create a new HDFactorInstance type like HDOnDeviceFactorSource where `derivationPath` is not optional?
 									loggerGlobal.critical("Factor instance did not contain a derivationPath, this is troublesome.")
@@ -103,16 +96,4 @@ extension UseFactorSourceClient: DependencyKey {
 	}()
 }
 
-// MARK: - UseFactorSourceClient.Purpose
-extension UseFactorSourceClient {
-	public enum Purpose: Sendable, Equatable {
-		case signData(Data, isTransaction: Bool)
-		case createEntity(kind: EntityKind)
-		fileprivate var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
-			switch self {
-			case let .signData(_, isTransaction): return isTransaction ? .signTransaction : .signAuthChallenge
-			case let .createEntity(kind): return .createEntity(kind: kind)
-			}
-		}
-	}
-}
+import Cryptography

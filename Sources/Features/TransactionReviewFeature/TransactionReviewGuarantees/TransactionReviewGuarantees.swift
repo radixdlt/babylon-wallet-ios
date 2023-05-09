@@ -71,8 +71,6 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 
 // MARK: - TransactionReviewGuarantee
 public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
-	@Dependency(\.pasteboardClient) var pasteboardClient
-
 	public struct State: Identifiable, Sendable, Hashable {
 		public var id: TransactionReview.Transfer.ID { transfer.id }
 		public let account: TransactionReview.Account
@@ -95,10 +93,6 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case copyAddressTapped
-	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case percentageStepper(MinimumPercentageStepper.Action)
 	}
@@ -114,14 +108,6 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			MinimumPercentageStepper()
 		}
 		Reduce(core)
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .copyAddressTapped:
-			pasteboardClient.copyString(state.account.address.address)
-			return .none
-		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {

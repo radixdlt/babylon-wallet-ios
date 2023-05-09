@@ -99,7 +99,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		case .moveToForeground:
 			return .fireAndForget {
-				await radixConnectClient.loadFromProfileAndConnectAll()
+				_ = await radixConnectClient.loadFromProfileAndConnectAll()
 			}
 		}
 	}
@@ -117,7 +117,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
+				// FIXME: cleanup DappMetaData
+				return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil, origin: .init("")))))
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -163,7 +164,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil))))
+			// FIXME: cleanup DappMetaData
+			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil, origin: .init("")))))
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
@@ -246,7 +248,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
 			_ = await radixConnectClient.loadFromProfileAndConnectAll()
-			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 
 			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
 				guard !Task.isCancelled else {
@@ -257,6 +258,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					let request = try incomingRequest.result.get()
 					try validate(request)
 
+					let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 					guard request.metadata.networkId == currentNetworkID else {
 						let incomingRequestNetwork = try Radix.Network.lookupBy(id: request.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
@@ -269,7 +271,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						continue
 					}
 
-					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled.rawValue
+					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 					if !isDeveloperModeEnabled {
 						try await rolaClient.performDappDefinitionVerification(request.metadata)
 						try await rolaClient.performWellKnownFileCheck(request.metadata)

@@ -34,9 +34,16 @@ extension P2P.Dapp.Response {
 	///
 	public struct WalletAccountWithProof: Sendable, Hashable, Encodable {
 		public let account: WalletAccount
-		public let challenge: String
+
+		/// A 32 bytes nonce used as a challenge
+		public let challenge: P2P.Dapp.AuthChallengeNonce
 		public let signature: String
-		public init(account: WalletAccount, challenge: String, signature: String) {
+
+		public init(
+			account: WalletAccount,
+			challenge: P2P.Dapp.AuthChallengeNonce,
+			signature: String
+		) {
 			self.account = account
 			self.challenge = challenge
 			self.signature = signature

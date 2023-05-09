@@ -5,20 +5,17 @@ extension NonFungibleTokenList {
 	// MARK: - NonFungibleTokenDetails
 	public struct Detail: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable {
-			var resource: AccountPortfolio.NonFungibleResource
-			var nftID: AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
+			let resource: AccountPortfolio.NonFungibleResource
+			let localId: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID
 		}
 
 		public enum ViewAction: Sendable, Equatable {
 			case closeButtonTapped
-			case copyAddressButtonTapped(String)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
 			case dismiss
 		}
-
-		@Dependency(\.pasteboardClient) var pasteboardClient
 
 		public init() {}
 
@@ -26,10 +23,6 @@ extension NonFungibleTokenList {
 			switch viewAction {
 			case .closeButtonTapped:
 				return .send(.delegate(.dismiss))
-			case let .copyAddressButtonTapped(address):
-				return .run { _ in
-					pasteboardClient.copyString(address)
-				}
 			}
 		}
 	}

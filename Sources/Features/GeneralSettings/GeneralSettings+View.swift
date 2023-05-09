@@ -3,8 +3,10 @@ import FeaturePrelude
 extension GeneralSettings.State {
 	var viewState: GeneralSettings.ViewState {
 		.init(
-			isCloudProfileSyncEnabled: preferences?.security.isCloudProfileSyncEnabled ?? .default,
-			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? .default
+			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
+			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
+			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
+			isCloudProfileSyncEnabled: preferences?.security.isCloudProfileSyncEnabled ?? false
 		)
 	}
 }
@@ -12,8 +14,13 @@ extension GeneralSettings.State {
 // MARK: - GeneralSettings.View
 extension GeneralSettings {
 	public struct ViewState: Equatable {
-		let isCloudProfileSyncEnabled: AppPreferences.Security.IsCloudProfileSyncEnabled
-		let isDeveloperModeEnabled: AppPreferences.Security.IsDeveloperModeEnabled
+		let hasLedgerHardwareWalletFactorSources: Bool
+
+		/// only to be displayed if `hasLedgerHardwareWalletFactorSources` is true
+		let useVerboseLedgerDisplayMode: Bool
+
+		let isDeveloperModeEnabled: Bool
+		let isCloudProfileSyncEnabled: Bool
 	}
 
 	@MainActor
@@ -37,21 +44,35 @@ extension GeneralSettings {
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				VStack(spacing: .zero) {
-					isIcloudProfileSyncEnabled(with: viewStore)
+					isCloudProfileSyncEnabled(with: viewStore)
 					isDeveloperModeEnabled(with: viewStore)
+					if viewStore.hasLedgerHardwareWalletFactorSources {
+						isUsingVerboseLedgerMode(with: viewStore)
+					}
 					Separator()
 				}
 				.padding(.medium3)
 			}
 		}
 
-		private func isIcloudProfileSyncEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+		private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			ToggleView(
 				title: "Sync Wallet Data to iCloud",
 				subtitle: "Warning: If disabled you might lose access to accounts/personas.",
 				isOn: viewStore.binding(
-					get: \.isCloudProfileSyncEnabled.rawValue,
-					send: { .isCloudProfileSyncEnabledToggled(.init($0)) }
+					get: \.isCloudProfileSyncEnabled,
+					send: { .cloudProfileSyncToggled($0) }
+				)
+			)
+		}
+
+		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			ToggleView(
+				title: "Verbose Ledger transaction signing",
+				subtitle: "When signing with your Ledger hardware wallet, should all instructions be displayed?",
+				isOn: viewStore.binding(
+					get: \.useVerboseLedgerDisplayMode,
+					send: { .useVerboseModeToggled($0) }
 				)
 			)
 		}
@@ -61,8 +82,8 @@ extension GeneralSettings {
 				title: L10n.GeneralSettings.DeveloperMode.title,
 				subtitle: L10n.GeneralSettings.DeveloperMode.subtitle,
 				isOn: viewStore.binding(
-					get: \.isDeveloperModeEnabled.rawValue,
-					send: { .isDeveloperModeEnabledToggled(.init($0)) }
+					get: \.isDeveloperModeEnabled,
+					send: { .developerModeToggled(.init($0)) }
 				)
 			)
 		}

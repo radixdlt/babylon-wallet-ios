@@ -33,6 +33,7 @@ public enum AssetResource {
   public static let chevronUp = ImageAsset(name: "chevron-up")
   public static let close = ImageAsset(name: "close")
   public static let code = ImageAsset(name: "code")
+  public static let copyBig = ImageAsset(name: "copy-big")
   public static let copy = ImageAsset(name: "copy")
   public static let ellipsis = ImageAsset(name: "ellipsis")
   public static let error = ImageAsset(name: "error")

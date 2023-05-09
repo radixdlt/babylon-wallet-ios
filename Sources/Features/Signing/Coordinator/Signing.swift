@@ -1,10 +1,10 @@
 import Cryptography
 import CustomDump
+import DeviceFactorSourceClient
 import FactorSourcesClient
 import FeaturePrelude
 import Profile
 import TransactionClient
-import UseFactorSourceClient
 
 // MARK: - K1.PublicKey + CustomDumpStringConvertible
 extension K1.PublicKey: CustomDumpStringConvertible {
@@ -27,13 +27,6 @@ extension CompileNotarizedTransactionIntentResponse: CustomDumpStringConvertible
 	}
 }
 
-// MARK: - Curve25519.Signing.PublicKey + CustomDumpStringConvertible
-extension Curve25519.Signing.PublicKey: CustomDumpStringConvertible {
-	public var customDumpDescription: String {
-		rawRepresentation.hex
-	}
-}
-
 // MARK: - Signing
 public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -52,19 +45,23 @@ public struct Signing: Sendable, FeatureReducer {
 		public var expectedSignatureCount = -1
 		public var signatures: OrderedSet<Signature> = []
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+		public let purpose: SigningPurpose
 
 		public init(
 			networkID: NetworkID,
 			manifest: TransactionManifest,
-			feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+			feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates,
+			purpose: SigningPurpose
 		) {
 			let ephemeralNotaryPrivateKey = Curve25519.Signing.PrivateKey()
 			self.step = .prepare(.init(
 				manifest: manifest,
 				networkID: networkID,
 				feePayer: feePayerSelectionAmongstCandidates.selected.account,
+				purpose: purpose,
 				ephemeralNotaryPublicKey: ephemeralNotaryPrivateKey.publicKey
 			))
+			self.purpose = purpose
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
 			self.feePayerSelectionAmongstCandidates = feePayerSelectionAmongstCandidates
 		}
@@ -164,8 +161,8 @@ public struct Signing: Sendable, FeatureReducer {
 						let factorSource = signingFactor.factorSource
 						print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
 						for signer in signingFactor.signers {
-							let account = signer.account
-							print("\t\t🔮 * Account: \(account.displayName) \(account.address): *")
+							let entity = signer.entity
+							print("\t\t🔮 * Entity: \(entity.displayName): *")
 							for factorInstance in signer.factorInstancesRequiredToSign {
 								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
 							}
@@ -187,19 +184,18 @@ public struct Signing: Sendable, FeatureReducer {
 
 	private func handleSignatures(
 		signingFactors: NonEmpty<Set<SigningFactor>>,
-		signatures: Set<AccountSignature>,
+		signatures: Set<SignatureOfEntity>,
 		_ state: inout State
 	) -> EffectTask<Action> {
 		state.signatures.append(contentsOf: signatures.map(\.signature))
 		let kind = signingFactors.first.factorSource.kind
 		precondition(signingFactors.allSatisfy { $0.factorSource.kind == kind })
 		state.factorsLeftToSignWith.removeValue(forKey: kind)
-		let lastUsedOn = Date()
-		return .fireAndForget {
+
+		return .fireAndForget { [purpose = state.purpose] in
 			try? await factorSourcesClient.updateLastUsed(.init(
 				factorSourceIDs: signingFactors.map(\.factorSource.id),
-				usagePurpose: .transactionSigning,
-				lastUsedOn: lastUsedOn
+				usagePurpose: purpose
 			))
 		}.concatenate(with: proceedWithNextFactorSource(&state))
 	}

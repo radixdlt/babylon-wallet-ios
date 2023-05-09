@@ -4,8 +4,8 @@ import FactorSourcesClient
 import Profile
 import SecureStorageClient
 
-// MARK: - UseFactorSourceClient
-public struct UseFactorSourceClient: Sendable {
+// MARK: - DeviceFactorSourceClient
+public struct DeviceFactorSourceClient: Sendable {
 	public var publicKeyFromOnDeviceHD: PublicKeyFromOnDeviceHD
 	public var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
 	public var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
@@ -21,8 +21,8 @@ public struct UseFactorSourceClient: Sendable {
 	}
 }
 
-// MARK: UseFactorSourceClient.onDeviceHDPublicKey
-extension UseFactorSourceClient {
+// MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
+extension DeviceFactorSourceClient {
 	public typealias PublicKeyFromOnDeviceHD = @Sendable (PublicKeyFromOnDeviceHDRequest) async throws -> Engine.PublicKey
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async -> Bool
@@ -36,13 +36,13 @@ public struct PublicKeyFromOnDeviceHDRequest: Sendable, Hashable {
 	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
 	public let derivationPath: DerivationPath
 	public let curve: SLIP10.Curve
-	public let entityKind: EntityKind
+	public let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 
 	public init(
 		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
 		derivationPath: DerivationPath,
 		curve: SLIP10.Curve,
-		creationOfEntity entityKind: EntityKind
+		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 	) throws {
 		guard hdOnDeviceFactorSource.parameters.supportedCurves.contains(curve) else {
 			throw DiscrepancyUnsupportedCurve()
@@ -50,7 +50,7 @@ public struct PublicKeyFromOnDeviceHDRequest: Sendable, Hashable {
 		self.hdOnDeviceFactorSource = hdOnDeviceFactorSource
 		self.derivationPath = derivationPath
 		self.curve = curve
-		self.entityKind = entityKind
+		self.loadMnemonicPurpose = loadMnemonicPurpose
 	}
 }
 
@@ -79,32 +79,81 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 // MARK: - FailedToDeviceFactorSourceForSigning
 struct FailedToDeviceFactorSourceForSigning: Swift.Error {}
 
-extension UseFactorSourceClient {
+// MARK: - IncorrectSignatureCountExpectedExactlyOne
+struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
+extension DeviceFactorSourceClient {
+	public func signUsingDeviceFactorSource(
+		signerEntity: EntityPotentiallyVirtual,
+		unhashedDataToSign: some DataProtocol,
+		purpose: SigningPurpose
+	) async throws -> SignatureOfEntity {
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		switch signerEntity.securityState {
+		case let .unsecured(control):
+			let factorInstance = {
+				switch purpose {
+				case .signAuth:
+					return control.authenticationSigning ?? control.transactionSigning
+				case .signTransaction:
+					return control.transactionSigning
+				}
+			}()
+
+			guard
+				let deviceFactorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
+			else {
+				throw FailedToDeviceFactorSourceForSigning()
+			}
+
+			let signatures = try await signUsingDeviceFactorSource(
+				deviceFactorSource: deviceFactorSource,
+				signerEntities: [signerEntity],
+				unhashedDataToSign: unhashedDataToSign,
+				purpose: purpose
+			)
+
+			guard let signature = signatures.first, signatures.count == 1 else {
+				throw IncorrectSignatureCountExpectedExactlyOne()
+			}
+			return signature
+		}
+	}
+
 	public func signUsingDeviceFactorSource(
 		deviceFactorSource: FactorSource,
-		of accounts: Set<Profile.Network.Account>,
-		unhashedDataToSign: some DataProtocol
-	) async throws -> Set<AccountSignature> {
+		signerEntities: Set<EntityPotentiallyVirtual>,
+		unhashedDataToSign: some DataProtocol,
+		purpose: SigningPurpose
+	) async throws -> Set<SignatureOfEntity> {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let factorSourceID = deviceFactorSource.id
 
 		guard
-			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .signTransaction)
+			let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
 		else {
 			throw FailedToDeviceFactorSourceForSigning()
 		}
 		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 
-		var signatures = Set<AccountSignature>()
+		var signatures = Set<SignatureOfEntity>()
 
-		loggerGlobal.debug("🔏 Signing data with device factor source label=\(deviceFactorSource.label), description=\(deviceFactorSource.description)")
-
-		for account in accounts {
-			switch account.securityState {
+		for entity in signerEntities {
+			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
-				let factorInstance = unsecuredControl.genesisFactorInstance
+
+				let factorInstance = {
+					switch purpose {
+					case .signAuth:
+						return unsecuredControl.authenticationSigning ?? unsecuredControl.transactionSigning
+					case .signTransaction:
+						return unsecuredControl.transactionSigning
+					}
+				}()
+
 				guard let derivationPath = factorInstance.derivationPath else {
 					let errMsg = "Expected derivation path on unsecured factorInstance"
 					loggerGlobal.critical(.init(stringLiteral: errMsg))
@@ -119,7 +168,7 @@ extension UseFactorSourceClient {
 				}
 				let curve = factorInstance.publicKey.curve
 
-				loggerGlobal.debug("🔏 Signing data with device, with account=\(account.displayName), curve=\(curve)")
+				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source label=\(deviceFactorSource.label), description=\(deviceFactorSource.description)")
 
 				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
 					hdRoot: hdRoot,
@@ -127,13 +176,36 @@ extension UseFactorSourceClient {
 					curve: curve,
 					unhashedData: Data(unhashedDataToSign)
 				))
-				let sigatureWithDerivationPath = Signature(signatureWithPublicKey: signatureWithPublicKey, derivationPath: factorInstance.derivationPath)
-				let accountSignature = try AccountSignature(entity: account, factorInstance: factorInstance, signature: sigatureWithDerivationPath)
-				signatures.insert(accountSignature)
+				let sigatureWithDerivationPath = Signature(
+					signatureWithPublicKey: signatureWithPublicKey,
+					derivationPath: factorInstance.derivationPath
+				)
+
+				let entitySignature = try SignatureOfEntity(
+					signerEntity: entity,
+					factorInstance: factorInstance,
+					signature: sigatureWithDerivationPath
+				)
+
+				signatures.insert(entitySignature)
 			}
 		}
 
 		return signatures
+	}
+}
+
+extension SigningPurpose {
+	public var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
+		switch self {
+		case .signAuth: return .signAuthChallenge
+		case .signTransaction(.manifestFromDapp):
+			return .signTransaction
+		case .signTransaction(.internalManifest(.transfer)):
+			return .signTransaction
+		case .signTransaction(.internalManifest(.uploadAuthKey)):
+			return .createSignAuthKey
+		}
 	}
 }
 

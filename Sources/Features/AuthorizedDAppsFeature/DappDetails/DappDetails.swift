@@ -11,7 +11,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.cacheClient) var cacheClient
 
@@ -52,7 +51,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case openURLTapped(URL)
-		case copyAddressButtonTapped
 		case fungibleTokenTapped(ComponentAddress)
 		case nonFungibleTokenTapped(ComponentAddress)
 		case dismissPersonaTapped
@@ -110,12 +108,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 					)
 				}
 				return .internal(.metadataLoaded(.init(result: result)))
-			}
-
-		case .copyAddressButtonTapped:
-			let address = state.dApp.dAppDefinitionAddress
-			return .fireAndForget {
-				pasteboardClient.copyString(address.address)
 			}
 
 		case let .openURLTapped(url):

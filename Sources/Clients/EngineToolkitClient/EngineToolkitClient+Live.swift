@@ -15,30 +15,32 @@ extension EngineToolkitClient {
 			).get()
 		}
 
+		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { request in
+
+			let converted = try engineToolkit.convertManifest(
+				request: .init(
+					manifest: request.manifest,
+					outputFormat: .parsed,
+					networkId: request.networkID
+				)
+			)
+			.get()
+
+			guard case let .parsed(instructions) = converted.instructions else {
+				throw FailedToConvertManifestToFormatWhereInstructionsAreJSON()
+			}
+
+			return JSONInstructionsTransactionManifest(
+				instructions: instructions,
+				convertedManifestThatContainsThem: converted
+			)
+		}
+
 		return Self(
 			getTransactionVersion: { TXVersion.default },
 			generateTXNonce: generateTXNonce,
-			convertManifestInstructionsToJSONIfItWasString: { request in
-
-				let converted = try engineToolkit.convertManifest(
-					request: .init(
-						manifest: request.manifest,
-						outputFormat: .parsed,
-						networkId: request.networkID
-					)
-				)
-				.get()
-
-				guard case let .parsed(instructions) = converted.instructions else {
-					throw FailedToConvertManifestToFormatWhereInstructionsAreJSON()
-				}
-
-				return JSONInstructionsTransactionManifest(
-					instructions: instructions,
-					convertedManifestThatContainsThem: converted
-				)
-
-			},
+			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
+			convertManifestToString: { try engineToolkit.convertManifest(request: .init(manifest: $0.manifest, outputFormat: .string, networkId: $0.networkID)).get() },
 			compileTransactionIntent: compileTransactionIntent,
 			compileSignedTransactionIntent: {
 				try engineToolkit
@@ -84,3 +86,7 @@ extension EngineToolkitClient {
 
 // MARK: - FailedToConvertManifestToFormatWhereInstructionsAreJSON
 struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
+
+extension SetMetadata {
+	public static let ownerKeysKey = "owner_keys"
+}

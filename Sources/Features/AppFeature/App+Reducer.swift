@@ -1,3 +1,5 @@
+import DeviceFactorSourceClient
+import EngineToolkit
 import FeaturePrelude
 import MainFeature
 import OnboardingClient
@@ -5,7 +7,6 @@ import OnboardingFeature
 import ProfileStore
 import SecureStorageClient
 import SplashFeature
-import UseFactorSourceClient
 
 // MARK: - App
 public struct App: Sendable, FeatureReducer {
@@ -69,7 +70,7 @@ public struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
-	@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	public init() {}
 
@@ -96,6 +97,9 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .task:
+			if let engineVersion = try? EngineToolkit().information().get() {
+				print("EngineToolkit commit hash: \(engineVersion.lastCommitHash), package version: \(engineVersion.packageVersion)")
+			}
 			return .run { send in
 				for try await error in errorQueue.errors() {
 					if !_XCTIsTesting {
@@ -191,7 +195,7 @@ public struct App: Sendable, FeatureReducer {
 
 	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
 		.run { send in
-			let isAccountRecoveryNeeded = await useFactorSourceClient.isAccountRecoveryNeeded()
+			let isAccountRecoveryNeeded = await deviceFactorSourceClient.isAccountRecoveryNeeded()
 			await send(.internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded)))
 		}
 	}

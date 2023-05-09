@@ -5,11 +5,17 @@ import Cryptography
 import EngineToolkitClient
 import GatewayAPI
 import GatewaysClient
+import PersonasClient
 import Resources
 
-// MARK: - MyAccountsInvolvedInTransaction
-public struct MyAccountsInvolvedInTransaction: Sendable, Hashable {
-	/// A set of all MY accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+// MARK: - MyEntitiesInvolvedInTransaction
+public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
+	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
+	public var entitiesRequiringAuth: OrderedSet<EntityPotentiallyVirtual> {
+		OrderedSet(accountsRequiringAuth.map { .account($0) } + identitiesRequiringAuth.map { .persona($0) })
+	}
+
+	public let identitiesRequiringAuth: OrderedSet<Profile.Network.Persona>
 	public let accountsRequiringAuth: OrderedSet<Profile.Network.Account>
 
 	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
@@ -25,39 +31,47 @@ extension TransactionClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 		@Sendable
-		func myAccountsInvolvedInTransaction(
+		func myEntitiesInvolvedInTransaction(
 			networkID: NetworkID,
 			manifest: TransactionManifest
-		) async throws -> MyAccountsInvolvedInTransaction {
+		) async throws -> MyEntitiesInvolvedInTransaction {
 			let analyzed = try engineToolkitClient.analyzeManifest(.init(manifest: manifest, networkID: networkID))
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
 			func accountFromComponentAddress(_ componentAddress: ComponentAddress) -> Profile.Network.Account? {
 				allAccounts.first(where: { $0.address.address == componentAddress.address })
 			}
-			func map(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
+			func identityFromComponentAddress(_ componentAddress: ComponentAddress) async throws -> Profile.Network.Persona {
+				try await personasClient.getPersona(id: IdentityAddress(address: componentAddress.address))
+			}
+			func mapAccount(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) throws -> OrderedSet<Profile.Network.Account> {
 				try .init(validating: analyzed[keyPath: keyPath].compactMap(accountFromComponentAddress))
 			}
+			func mapIdentity(_ keyPath: KeyPath<AnalyzeManifestResponse, [ComponentAddress]>) async throws -> OrderedSet<Profile.Network.Persona> {
+				try await .init(validating: analyzed[keyPath: keyPath].asyncMap(identityFromComponentAddress))
+			}
 
-			return try MyAccountsInvolvedInTransaction(
-				accountsRequiringAuth: map(\.accountsRequiringAuth),
-				accountsWithdrawnFrom: map(\.accountsWithdrawnFrom),
-				accountsDepositedInto: map(\.accountsDepositedInto)
+			return try await MyEntitiesInvolvedInTransaction(
+				identitiesRequiringAuth: mapIdentity(\.identitiesRequiringAuth),
+				accountsRequiringAuth: mapAccount(\.accountsRequiringAuth),
+				accountsWithdrawnFrom: mapAccount(\.accountsWithdrawnFrom),
+				accountsDepositedInto: mapAccount(\.accountsDepositedInto)
 			)
 		}
 
 		@Sendable
 		func getTransactionSigners(_ request: BuildTransactionIntentRequest) async throws -> TransactionSigners {
-			let myInvolvedAccounts = try await myAccountsInvolvedInTransaction(
+			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
 				networkID: request.networkID,
 				manifest: request.manifest
 			)
 
 			let intentSigning: TransactionSigners.IntentSigning = {
-				if let nonEmpty = NonEmpty(rawValue: myInvolvedAccounts.accountsRequiringAuth) {
+				if let nonEmpty = NonEmpty(rawValue: myInvolvedEntities.entitiesRequiringAuth) {
 					return .intentSigners(nonEmpty)
 				} else {
 					return .notaryAsSignatory
@@ -143,17 +157,18 @@ extension TransactionClient {
 
 		let lockFeeBySearchingForSuitablePayer: LockFeeBySearchingForSuitablePayer = { manifest, feeToAdd in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let myInvolvedAccounts = try await myAccountsInvolvedInTransaction(
+			let myInvolvedEntities = try await myEntitiesInvolvedInTransaction(
 				networkID: networkID,
 				manifest: manifest
 			)
 
-			loggerGlobal.debug("My involved accounts: \(myInvolvedAccounts)")
+			loggerGlobal.debug("My involved entities: \(myInvolvedEntities)")
 			var triedAccounts: Set<Profile.Network.Account> = []
+
 			func findFeePayer(
-				amongst keyPath: KeyPath<MyAccountsInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
+				amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>
 			) async throws -> AddFeeToManifestOutcomeIncludesLockFee? {
-				let accountsToCheck = myInvolvedAccounts[keyPath: keyPath]
+				let accountsToCheck = myInvolvedEntities[keyPath: keyPath]
 				let involvedFeePayerCandidates = try await feePayerCandiates(
 					accounts: accountsToCheck,
 					fee: feeToAdd
@@ -321,6 +336,20 @@ extension TransactionClient {
 			)
 		}
 
+		let addInstructionToManifest: AddInstructionToManifest = { request in
+			let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(request.manifest)
+			var instructions = manifestWithJSONInstructions.instructions
+			let new = request.instruction
+			switch request.location {
+			case .first:
+				instructions.insert(new, at: 0)
+			}
+			return TransactionManifest(
+				instructions: instructions,
+				blobs: request.manifest.blobs
+			)
+		}
+
 		@Sendable
 		func addGuaranteesToManifest(
 			_ manifestWithLockFee: TransactionManifest,
@@ -352,8 +381,10 @@ extension TransactionClient {
 
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
+			convertManifestToString: { try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0)) },
 			lockFeeBySearchingForSuitablePayer: lockFeeBySearchingForSuitablePayer,
 			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
+			addInstructionToManifest: addInstructionToManifest,
 			addGuaranteesToManifest: addGuaranteesToManifest,
 			getTransactionReview: getTransactionPreview,
 			buildTransactionIntent: buildTransactionIntent,

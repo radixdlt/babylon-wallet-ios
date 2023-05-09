@@ -1,3 +1,4 @@
+import CreateAuthKeyFeature
 import EditPersonaFeature
 import FeaturePrelude
 
@@ -17,6 +18,10 @@ extension PersonaDetails {
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
+
+		#if DEBUG
+		public var canCreateAuthKey: Bool
+		#endif // DEBUG
 	}
 }
 
@@ -31,6 +36,16 @@ extension PersonaDetails.View {
 						.padding(.vertical, .large2)
 
 					InfoSection(store: store.actionless)
+
+					#if DEBUG
+					VStack {
+						Button("Create & Upload Auth Key") {
+							viewStore.send(.createAndUploadAuthKeyButtonTapped)
+						}
+						.controlState(viewStore.canCreateAuthKey ? .enabled : .disabled)
+						.buttonStyle(.secondaryRectangular)
+					}
+					#endif
 
 					Button(L10n.PersonaDetails.editPersona) {
 						viewStore.send(.editPersonaTapped)
@@ -50,15 +65,44 @@ extension PersonaDetails.View {
 						.buttonStyle(.primaryRectangular(isDestructive: true))
 						.padding([.horizontal, .top], .medium3)
 						.padding(.bottom, .large2)
+					} else {
+						IfLetStore(store.scope(state: \.dAppsSection, action: PersonaDetails.Action.view)) {
+							DappsSection(store: $0)
+								.background(.app.gray5)
+						}
 					}
 				}
 				.navigationTitle(viewStore.personaName)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 		}
-		.sheet(store: store.scope(state: \.$editPersona, action: { .child(.editPersona($0)) })) {
-			EditPersona.View(store: $0)
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.editPersona,
+			action: PersonaDetails.Destination.Action.editPersona
+		) { store in
+			EditPersona.View(store: store)
 		}
-		.alert(store: store.confirmForgetAlert)
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.createAuthKey,
+			action: PersonaDetails.Destination.Action.createAuthKey
+		) { store in
+			CreateAuthKey.View(store: store)
+		}
+		.alert(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.confirmForgetAlert,
+			action: PersonaDetails.Destination.Action.confirmForgetAlert
+		)
+	}
+}
+
+private extension StoreOf<PersonaDetails> {
+	var destination: PresentationStoreOf<PersonaDetails.Destination> {
+		scope(state: \.$destination, action: { .child(.destination($0)) })
 	}
 }
 
@@ -66,12 +110,25 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(thumbnail: nil, personaName: personaName, isDappPersona: isDappPersona)
+		#if DEBUG
+		(
+			thumbnail: nil,
+			personaName: personaName,
+			isDappPersona: isDappPersona,
+			canCreateAuthKey: canCreateAuthKey
+		)
+		#else
+			.init(
+				thumbnail: nil,
+				personaName: personaName,
+				isDappPersona: isDappPersona
+			)
+		#endif
 	}
 
 	var personaName: String {
 		switch mode {
-		case let .general(persona):
+		case let .general(persona, _):
 			return persona.displayName.rawValue
 		case let .dApp(_, persona):
 			return persona.displayName.rawValue
@@ -88,11 +145,7 @@ private extension PersonaDetails.State {
 	}
 }
 
-private extension PersonaDetails.Store {
-	var confirmForgetAlert: AlertPresentationStore<PersonaDetails.ViewAction.ConfirmForgetAlert> {
-		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
-	}
-}
+// MARK: - AccountSection
 
 extension PersonaDetails.State {
 	var accountSection: AccountSection? {
@@ -127,13 +180,12 @@ extension PersonaDetails.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.sharingAccounts) { account in
-							AccountButton(
+							SmallAccountCard(
 								account.label.rawValue,
-								address: account.address.address,
+								identifiable: .address(.account(account.address)),
 								gradient: .init(account.appearanceID)
-							) {
-								viewStore.send(.accountTapped(account.address))
-							}
+							)
+							.cornerRadius(.small1)
 						}
 					}
 					.padding(.horizontal, .medium3)
@@ -149,7 +201,53 @@ extension PersonaDetails.View {
 	}
 }
 
-// MARK: - Body
+// MARK: - DappsSection
+
+extension PersonaDetails.State {
+	var dAppsSection: DappsSection? {
+		switch mode {
+		case let .general(_, dApps):
+			return dApps.isEmpty ? nil : dApps
+		case .dApp:
+			return nil
+		}
+	}
+
+	typealias DappsSection = IdentifiedArrayOf<PersonaDetails.State.DappInfo>
+}
+
+// MARK: - PersonaDetails.View.DappsSection
+extension PersonaDetails.View {
+	@MainActor
+	struct DappsSection: View {
+		let store: Store<PersonaDetails.State.DappsSection, PersonaDetails.ViewAction>
+
+		var body: some View {
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				VStack(spacing: .medium1) {
+					Text(L10n.PersonaDetails.authorizedDappsDescription)
+						.textBlock
+						.flushedLeft
+						.padding(.horizontal, .medium1)
+
+					ForEach(viewStore.state) { dApp in
+						Card {
+							viewStore.send(.dAppTapped(dApp.id))
+						} contents: {
+							PlainListRow(title: dApp.displayName) {
+								DappThumbnail(.known(dApp.thumbnail))
+							}
+						}
+						.padding(.horizontal, .medium3)
+					}
+				}
+			}
+			.padding(.vertical, .medium2)
+		}
+	}
+}
+
+// MARK: - InfoSection
 
 private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
@@ -160,7 +258,7 @@ private extension PersonaDetails.State {
 				personaName: personaName,
 				fields: persona.sharedFields ?? []
 			)
-		case let .general(persona):
+		case let .general(persona, _):
 			return .init(
 				dAppInfo: nil,
 				personaName: personaName,
@@ -214,7 +312,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					VPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
+					VPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
 
 					Separator()
 

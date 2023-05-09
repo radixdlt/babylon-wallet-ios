@@ -23,7 +23,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case appeared
 		case backButtonTapped
 		case preferencesButtonTapped
-		case copyAddressButtonTapped
 		case transferButtonTapped
 		case pullToRefreshStarted
 	}
@@ -64,7 +63,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 	public init() {}
@@ -98,10 +96,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .preferencesButtonTapped:
 			state.destination = .preferences(.init(address: state.account.address))
 			return .none
-		case .copyAddressButtonTapped:
-			return .fireAndForget { [state] in
-				pasteboardClient.copyString(state.account.address.address)
-			}
 		case .pullToRefreshStarted:
 			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)

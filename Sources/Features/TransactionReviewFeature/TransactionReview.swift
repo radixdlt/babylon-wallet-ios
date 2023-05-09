@@ -11,6 +11,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public let transactionManifest: TransactionManifest
 		public let message: String?
+		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 
 		public var transactionWithLockFee: TransactionManifest?
 
@@ -33,11 +34,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public init(
 			transactionManifest: TransactionManifest,
+			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: String?,
 			feeToAdd: BigDecimal = 10, // fix me use estimate from `analyze`
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
 			self.transactionManifest = transactionManifest
+			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.fee = feeToAdd
 			if let customizeGuarantees {
@@ -372,7 +375,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = .signing(.init(
 				networkID: networkID,
 				manifest: manifest,
-				feePayerSelectionAmongstCandidates: feePayerSelectionAmongstCandidates
+				feePayerSelectionAmongstCandidates: feePayerSelectionAmongstCandidates,
+				purpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
 
@@ -430,18 +434,17 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
-		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications.map(\.address)
-
+		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications
 		let dApps = try await addresses.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
 
 		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: dApps))
 	}
 
-	private func extractDappInfo(_ address: String) async throws -> LedgerEntity {
+	private func extractDappInfo(_ address: ComponentAddress) async throws -> LedgerEntity {
 		let metadata = try? await gatewayAPIClient.getDappDefinition(address)
 		return LedgerEntity(
-			id: address,
+			id: address.address,
 			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
 			                thumbnail: metadata?.iconURL,
 			                description: metadata?.description)

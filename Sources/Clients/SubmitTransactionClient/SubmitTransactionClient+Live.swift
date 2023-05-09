@@ -90,17 +90,17 @@ extension SubmitTransactionClient: DependencyKey {
 						// RET prints when convertManifest is called, when it is removed, this can be moved down
 						// inline inside `print`.
 						let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-						print("\n\n🔮 DEBUG TRANSACTION START 🔮")
+						print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
 						print("TXID: \(txID.rawValue)")
 						print("TransactionIntent: \(txIntentString)")
-						print("intentSignatures: \(intentSignatures.map(\.signature.hex).joined(separator: "\n"))")
-						print("NotarySignature: \(notarySignature)")
-						print("Compiled Transaction Intent:\n\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
-						print("Compiled Notarized Intent:\n\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)\n\n")
-						print("🔮 DEBUG TRANSACTION END 🔮\n\n")
+						print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.compressedRepresentation.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
+						print("\nNOTARY SIGNATURE: \(notarySignature)")
+						print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
+						print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
+						print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
 					} catch {}
 				}
-//				debugPrintTX()
+				debugPrintTX()
 
 				let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 					notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex

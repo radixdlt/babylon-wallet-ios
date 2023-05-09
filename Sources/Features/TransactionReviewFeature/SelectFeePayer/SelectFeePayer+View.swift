@@ -82,13 +82,13 @@ enum SelectAccountToPayForFeeRow {
 	struct ViewState: Equatable {
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let accountName: String
-		let accountAddress: AddressView.ViewState
+		let accountAddress: AccountAddress
 		let xrdBalance: BigDecimal
 
 		init(candidate: FeePayerCandiate) {
 			appearanceID = candidate.account.appearanceID
 			accountName = candidate.account.displayName.rawValue
-			accountAddress = AddressView.ViewState(address: candidate.account.address.address, format: .default)
+			accountAddress = candidate.account.address
 			xrdBalance = candidate.xrdBalance
 		}
 	}
@@ -107,8 +107,8 @@ enum SelectAccountToPayForFeeRow {
 							.foregroundColor(.app.white)
 							.textStyle(.body1Header)
 
-						AddressView(viewState.accountAddress, copyAddressAction: .none)
-							.foregroundColor(.app.white.opacity(0.8))
+						AddressView(.address(.account(viewState.accountAddress)), isTappable: false)
+							.foregroundColor(.app.whiteTransparent)
 							.textStyle(.body2HighImportance)
 					}
 

@@ -9,33 +9,17 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public var isCloudProfileSyncEnabled: IsCloudProfileSyncEnabled
-		public var isDeveloperModeEnabled: IsDeveloperModeEnabled
+		public var isCloudProfileSyncEnabled: Bool
+		public var isDeveloperModeEnabled: Bool
 
 		public init(
-			isCloudProfileSyncEnabled: IsCloudProfileSyncEnabled = .default,
-			isDeveloperModeEnabled: IsDeveloperModeEnabled = .default
+			isCloudProfileSyncEnabled: Bool = true,
+			isDeveloperModeEnabled: Bool = true
 		) {
 			self.isCloudProfileSyncEnabled = isCloudProfileSyncEnabled
 			self.isDeveloperModeEnabled = isDeveloperModeEnabled
 		}
 	}
-}
-
-extension AppPreferences.Security {
-	public enum IsCloudProfileSyncEnabledTag {}
-	public typealias IsCloudProfileSyncEnabled = Tagged<IsCloudProfileSyncEnabledTag, Bool>
-	public enum IsDeveloperModeEnabledTag {}
-	public typealias IsDeveloperModeEnabled = Tagged<IsDeveloperModeEnabledTag, Bool>
-}
-
-extension AppPreferences.Security.IsDeveloperModeEnabled {
-	// FIXME: Mainnet: change to `false`
-	public static let `default`: Self = true
-}
-
-extension AppPreferences.Security.IsCloudProfileSyncEnabled {
-	public static let `default`: Self = true
 }
 
 extension AppPreferences.Security {
@@ -47,8 +31,8 @@ extension AppPreferences.Security {
 		.init(
 			self,
 			children: [
-				"isCloudProfileSyncEnabled": isCloudProfileSyncEnabled.rawValue,
-				"isDeveloperModeEnabled": isDeveloperModeEnabled.rawValue,
+				"isCloudProfileSyncEnabled": isCloudProfileSyncEnabled,
+				"isDeveloperModeEnabled": isDeveloperModeEnabled,
 			],
 			displayStyle: .struct
 		)
@@ -57,7 +41,7 @@ extension AppPreferences.Security {
 	public var description: String {
 		"""
 		isCloudProfileSyncEnabled: \(isCloudProfileSyncEnabled),
-		isDeveloperModeEnabled: \(isDeveloperModeEnabled)
+		  isDeveloperModeEnabled: \(isDeveloperModeEnabled)
 		"""
 	}
 }

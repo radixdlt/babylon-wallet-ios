@@ -88,12 +88,6 @@ extension TransactionReviewGuarantees {
 	}
 }
 
-extension TransactionReviewGuarantee.State {
-	var viewState: TransactionReviewGuarantee.ViewState {
-		.init(id: transfer.id, account: account, token: .init(transfer: transfer))
-	}
-}
-
 extension TransactionReviewTokenView.ViewState {
 	init(transfer: TransactionReview.Transfer) {
 		self.init(name: transfer.metadata.name,
@@ -101,6 +95,16 @@ extension TransactionReviewTokenView.ViewState {
 		          amount: transfer.amount,
 		          guaranteedAmount: transfer.guarantee?.amount,
 		          fiatAmount: transfer.metadata.fiatAmount)
+	}
+}
+
+extension TransactionReviewGuarantee.State {
+	var viewState: TransactionReviewGuarantee.ViewState {
+		.init(
+			id: transfer.id,
+			account: account,
+			token: .init(transfer: transfer)
+		)
 	}
 }
 
@@ -119,28 +123,28 @@ extension TransactionReviewGuarantee {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Card(verticalSpacing: 0) {
-					AccountLabel(account: viewStore.account) {
-						viewStore.send(.copyAddressTapped)
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				Card {
+					VStack(spacing: 0) {
+						SmallAccountCard(account: viewStore.account)
+
+						TransactionReviewTokenView(viewState: viewStore.token)
+
+						Separator()
+
+						HStack(spacing: .medium3) {
+							Text(L10n.TransactionReview.Guarantees.setText)
+								.lineLimit(2)
+								.textStyle(.body2Header)
+								.foregroundColor(.app.gray1)
+
+							Spacer(minLength: 0)
+
+							let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
+							MinimumPercentageStepper.View(store: stepperStore)
+						}
+						.padding(.medium3)
 					}
-
-					TransactionReviewTokenView(viewState: viewStore.token)
-
-					Separator()
-
-					HStack(spacing: .medium3) {
-						Text(L10n.TransactionReview.Guarantees.setText)
-							.lineLimit(2)
-							.textStyle(.body2Header)
-							.foregroundColor(.app.gray1)
-
-						Spacer(minLength: 0)
-
-						let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
-						MinimumPercentageStepper.View(store: stepperStore)
-					}
-					.padding(.medium3)
 				}
 			}
 		}

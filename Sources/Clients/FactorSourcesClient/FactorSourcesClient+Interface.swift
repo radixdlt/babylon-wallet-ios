@@ -37,7 +37,7 @@ extension FactorSourcesClient {
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
-	public typealias GetSigningFactors = @Sendable (NetworkID, NonEmpty<Set<Profile.Network.Account>>) async throws -> SigningFactors
+	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
 }
 
@@ -49,14 +49,61 @@ extension SigningFactors {
 	}
 }
 
+// MARK: - GetSigningFactorsRequest
+public struct GetSigningFactorsRequest: Sendable, Hashable {
+	public let networkID: NetworkID
+	public let signers: NonEmpty<Set<EntityPotentiallyVirtual>>
+	public let signingPurpose: SigningPurpose
+	public init(networkID: NetworkID, signers: NonEmpty<Set<EntityPotentiallyVirtual>>, signingPurpose: SigningPurpose) {
+		self.networkID = networkID
+		self.signers = signers
+		self.signingPurpose = signingPurpose
+	}
+}
+
+extension FactorSourcesClient {
+	public func getFactorSource(
+		id: FactorSourceID,
+		matching filter: @escaping (FactorSource) -> Bool = { _ in true }
+	) async throws -> FactorSource? {
+		try await getFactorSources(matching: filter)[id: id]
+	}
+
+	public func getFactorSource(
+		id: FactorSourceID,
+		ensureKind kind: FactorSourceKind
+	) async throws -> FactorSource? {
+		try await getFactorSource(id: id) { $0.kind == kind }
+	}
+
+	public func getFactorSource(
+		of factorInstance: FactorInstance
+	) async throws -> FactorSource? {
+		try await getFactorSource(id: factorInstance.factorSourceID)
+	}
+
+	public func getFactorSources(
+		matching filter: (FactorSource) -> Bool
+	) async throws -> IdentifiedArrayOf<FactorSource> {
+		try await IdentifiedArrayOf(uniqueElements: getFactorSources().filter(filter))
+	}
+
+	public func getFactorSources(
+		ofKind kind: FactorSourceKind
+	) async throws -> IdentifiedArrayOf<FactorSource> {
+		try await getFactorSources(matching: { $0.kind == kind })
+	}
+}
+
 // MARK: - UpdateFactorSourceLastUsedRequest
 public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	public let factorSourceIDs: [FactorSource.ID]
 	public let lastUsedOn: Date
-	public let usagePurpose: FactorSource.UsagePurpose
+	public let usagePurpose: SigningPurpose
+
 	public init(
 		factorSourceIDs: [FactorSource.ID],
-		usagePurpose: FactorSource.UsagePurpose,
+		usagePurpose: SigningPurpose,
 		lastUsedOn: Date = .init()
 	) {
 		self.factorSourceIDs = factorSourceIDs
@@ -88,26 +135,6 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 			factorSource: factorSource,
 			signers: .init(rawValue: .init(uniqueElements: [signer]))! // ok to force unwrap since we know we have one element.
 		)
-	}
-
-	public struct Signer: Sendable, Hashable, Identifiable {
-		public typealias ID = Profile.Network.Account.ID
-		public var id: ID { account.id }
-		public let account: Profile.Network.Account
-
-		public let factorInstancesRequiredToSign: Set<FactorInstance>
-
-		init(account: Profile.Network.Account, factorInstancesRequiredToSign: Set<FactorInstance>) {
-			self.account = account
-			self.factorInstancesRequiredToSign = factorInstancesRequiredToSign
-		}
-
-		// Now, before MultiFactor, this is the only public init, but once we have MultiFactor we
-		// will remove this init and always use the `, factorInstancesRequiredToSign: Set<FactorInstance>` one.
-		public init(account: Profile.Network.Account, factorInstanceRequiredToSign: FactorInstance) {
-			precondition(account.factorInstance == factorInstanceRequiredToSign) // technically we can remove `factorInstanceRequiredToSign` but that makes logic in FactorSourceClientLive hide to much complexity that we will get once we have MultiFactor, better be prepared for MultiFactor a bit more
-			self.init(account: account, factorInstancesRequiredToSign: [factorInstanceRequiredToSign])
-		}
 	}
 }
 

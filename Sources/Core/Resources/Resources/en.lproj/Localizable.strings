@@ -11,6 +11,11 @@
 "accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
 "accountPreferences.title" = "Account Preferences";
 
+"addressAction.copyAddress" = "Copy Address";
+"addressAction.copyTransactionId" = "Copy Transaction ID";
+"addressAction.copyNftId" = "Copy NFT ID";
+"addressAction.viewOnDashboard" = "View on Radix Dashboard";
+
 "aggregatedValue.title" = "Total value";
 
 "app.developmentOnlyInfo" = "Development use only. Not usable on Radix mainnet.";
@@ -42,7 +47,7 @@
 
 
 "common.biometricsPrompt.signTransaction" = "Authenticate to sign transaction with this phone.";
-"common.biometricsPrompt.signAuthChallenge" = "Authenticate to sign auth chellenge with this phone.";
+"common.biometricsPrompt.signAuthChallenge" = "Authenticate to sign auth challenge with this phone.";
 "common.biometricsPrompt.creationOfEntity" = "Authenticate to create new %s with this phone.";
 "common.biometricsPrompt.checkingAccounts" = "Checking accounts.";
 "common.biometricsPrompt.importOlympiaAccounts" = "Validate seed phrase exists.";
@@ -200,16 +205,17 @@
 "dAppDetails.forgetDappAlertConfirm" = "Forget";
 "dAppDetails.forgetDappAlertCancel" = "Cancel";
 
-"personaDetails.personaNameHeading" = "Persona Name";
+"personaDetails.personaLabelHeading" = "Persona Label";
+"personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
 "personaDetails.personaDataSharingDescription" = "Here is the personal data that you are sharing with %@";
 "personaDetails.editPersona" = "Edit Persona";
 "personaDetails.firstNameHeading" = "First Name";
 "personaDetails.lastNameHeading" = "Last Name";
 "personaDetails.emailAddressHeading" = "Email Address";
 "personaDetails.phoneNumberHeading" = "Phone Number";
-"personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
 
 "personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
+"personaDetails.authorizedDappsDescription" = "Here are the dApps you have logged into with this persona.";
 
 "personaDetails.editAccountSharing" = "Edit Account Sharing";
 "personaDetails.deauthorizePersona" = "Remove Authorization";
@@ -261,11 +267,9 @@
 "onboarding.newAccountButtonTitle" = "New Account";
 
 "personas.createNewPersonaButtonTitle" = "Create a New Persona";
-"personas.subtitle" = "Here are all of your current Personas in your Wallet";
-"personas.title" = "Personas";
-"personaList.createNewPersonaButtonTitle" = "Create new persona";
-"personaList.subtitle" = "Here are all of your current Personas in your Wallet";
+
 "personaList.title" = "Personas";
+"personaList.subtitle" = "Here are all of your current Personas in your Wallet";
 
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";

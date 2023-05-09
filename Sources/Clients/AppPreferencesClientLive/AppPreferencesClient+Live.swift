@@ -27,7 +27,7 @@ extension AppPreferencesClient: DependencyKey {
 				guard let change = try await (getProfileStore().updating { profile -> CloudProfileSyncActivation? in
 					let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
-					switch (wasEnabled.rawValue, isEnabled.rawValue) {
+					switch (wasEnabled, isEnabled) {
 					case (false, false): return nil
 					case (true, true): return nil
 					case (true, false): return .disable

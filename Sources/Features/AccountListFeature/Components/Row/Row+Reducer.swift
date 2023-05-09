@@ -23,7 +23,6 @@ extension AccountList {
 		}
 
 		public enum ViewAction: Sendable, Equatable {
-			case copyAddressButtonTapped
 			case tapped
 			case task
 			case securityPromptTapped
@@ -35,15 +34,12 @@ extension AccountList {
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
-			case copyAddressButtonTapped(Profile.Network.Account)
 			case tapped(Profile.Network.Account)
 			case securityPromptTapped(Profile.Network.Account)
 		}
 
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-		public init() {}
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
@@ -58,8 +54,6 @@ extension AccountList {
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
 					}
 				}
-			case .copyAddressButtonTapped:
-				return .send(.delegate(.copyAddressButtonTapped(state.account)))
 			case .securityPromptTapped:
 				return .send(.delegate(.securityPromptTapped(state.account)))
 			case .tapped:
@@ -81,15 +75,17 @@ extension AccountList {
 					return .none
 				}
 
-				return checkIfDeviceFactorSourceControls(factorInstance: state.account.factorInstance)
+				switch state.account.securityState {
+				case let .unsecured(unsecuredEntityControl):
+					return checkIfDeviceFactorSourceControls(factorInstance: unsecuredEntityControl.transactionSigning)
+				}
 			}
 		}
 
 		private func checkIfDeviceFactorSourceControls(factorInstance: FactorInstance) -> EffectTask<Action> {
 			.run { send in
-				let allFactorSources = try await factorSourcesClient.getFactorSources()
 				guard
-					let factorSource = allFactorSources[id: factorInstance.factorSourceID]
+					let factorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
 				else {
 					loggerGlobal.warning("Did not find factor source for factor instance.")
 					return

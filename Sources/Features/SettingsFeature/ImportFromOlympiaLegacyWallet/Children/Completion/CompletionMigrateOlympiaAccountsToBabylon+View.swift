@@ -32,9 +32,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 						LazyVStack {
 							ForEach(viewStore.accounts) { account in
 								InnerCard {
-									AccountLabel(account: account) {
-										viewStore.send(.copyAddress(account.address))
-									}
+									AddressView(.address(.account(account.address)))
 								}
 							}
 						}
@@ -51,21 +49,6 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 			}
 			.navigationBarBackButtonHidden()
 		}
-	}
-}
-
-extension AccountLabel {
-	public init(
-		account: Profile.Network.Account,
-		copyAction: (() -> Void)? = nil
-	) {
-		self.init(
-			account.displayName.rawValue,
-			address: account.address.address,
-			gradient: .init(account.appearanceID),
-			height: .guaranteeAccountLabelHeight,
-			copyAction: copyAction
-		)
 	}
 }
 

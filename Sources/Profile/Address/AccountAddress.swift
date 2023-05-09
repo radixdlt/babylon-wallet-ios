@@ -18,9 +18,15 @@ public struct AccountAddress:
 {
 	public let address: String
 	public init(address: String) throws {
+		guard address.starts(with: "account_") else {
+			throw NotAnAccountAddress()
+		}
 		self.address = address
 	}
 }
+
+// MARK: - NotAnAccountAddress
+struct NotAnAccountAddress: Swift.Error {}
 
 extension AccountAddress {
 	public static let kind: AddressKind = .account

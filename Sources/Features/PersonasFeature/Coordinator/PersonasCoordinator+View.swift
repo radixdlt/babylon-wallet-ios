@@ -32,7 +32,21 @@ extension PersonasCoordinator {
 					state: \.$personaDetails,
 					action: { .child(.personaDetails($0)) }
 				),
-				content: { PersonaDetails.View(store: $0) }
+				content: { personaDetailsStore in
+					NavigationStack {
+						PersonaDetails.View(store: personaDetailsStore)
+						#if os(iOS)
+							.navigationBarTitleDisplayMode(.inline)
+						#endif
+							.toolbar {
+								ToolbarItem(placement: .primaryAction) {
+									CloseButton {
+										ViewStore(store).send(.view(.dismissPersonaTapped))
+									}
+								}
+							}
+					}
+				}
 			)
 		}
 	}

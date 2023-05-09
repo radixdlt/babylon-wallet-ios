@@ -99,7 +99,7 @@ extension NonFungibleTokenList.Row.View {
 		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))
 		.transition(.move(edge: .bottom))
 		.contentShape(Rectangle())
-		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.resource, nftID: asset.id))) }
+		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.resource, localId: asset.id))) }
 	}
 
 	fileprivate func collapsedHeight(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> CGFloat {
@@ -217,7 +217,7 @@ struct NonFungibleRow_Preview: PreviewProvider {
 
 extension NonFungibleTokenList.Row.State {
 	public static let previewValue = Self(
-		token: .init(resourceAddress: .init(address: "some"), tokens: [])
+		token: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: [])
 	)
 }
 #endif

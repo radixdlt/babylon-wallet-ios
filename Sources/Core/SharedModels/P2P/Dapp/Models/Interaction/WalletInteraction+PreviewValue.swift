@@ -75,7 +75,7 @@ extension P2P.Dapp.Request.Metadata {
 	public static let previewValue = Self(
 		networkId: .simulator,
 		origin: "Placeholder",
-		dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress")
+		dAppDefinitionAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
 	)
 }
 
