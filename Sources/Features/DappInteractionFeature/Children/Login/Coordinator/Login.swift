@@ -27,7 +27,7 @@ struct Login: Sendable, FeatureReducer {
 			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
-			self.dappMetadata = dappMetadata
+			self.dappContext = dappContext
 			self.loginRequest = loginRequest
 			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 		}

@@ -183,7 +183,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
+	private func update(dAppID: AccountAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
 		.run { send in
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
 			await send(.internal(.dAppUpdated(updatedDapp)))

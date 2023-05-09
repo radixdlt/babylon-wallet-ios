@@ -19,7 +19,7 @@ extension DappDetails {
 		let description: String
 		let domain: String?
 		let thumbnail: URL?
-		let address: DappDefinitionAddress
+		let address: AccountAddress
 		let otherMetadata: [MetadataItem]
 		let fungibleTokens: [Token]
 		let nonFungibleTokens: [Token]

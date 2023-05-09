@@ -1,6 +1,17 @@
 import EditPersonaFeature
 import FeaturePrelude
 
+extension DappContext {
+	var name: String? {
+		switch self {
+		case let .fromLedger(fromLedger):
+			return fromLedger.name.rawValue
+		case .fromRequest:
+			return nil
+		}
+	}
+}
+
 // MARK: - Permission.View
 extension PersonaDataPermission {
 	struct ViewState: Equatable {
@@ -13,8 +24,6 @@ extension PersonaDataPermission {
 			subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
-
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
 
 				let explanation: AttributedString = {
 					let always = AttributedString(L10n.DApp.PersonaDataPermission.Subtitle.always, foregroundColor: highlightColor)
@@ -30,6 +39,8 @@ extension PersonaDataPermission {
 						)
 				}()
 
+				let name = state.dappContext.name ?? L10n.DApp.Metadata.unknownName
+				let dappName = AttributedString(name, foregroundColor: highlightColor)
 				return dappName + explanation
 			}()
 			output = {
@@ -128,7 +139,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 
 extension PersonaDataPermission.State {
 	static let previewValue: Self = .init(
-		dappMetadata: .previewValue,
+		dappContext: .previewValue,
 		personaID: Profile.Network.Persona.previewValue0.id,
 		requiredFieldIDs: [.givenName, .emailAddress]
 	)

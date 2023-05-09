@@ -197,7 +197,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func sendResponseToDappEffect(
 		_ responseToDapp: P2P.Dapp.Response,
 		for request: P2P.RTCIncomingDappRequest,
-		dappContext: DappContext?
+		dappContext: DappContext
 	) -> EffectTask<Action> {
 		.run { send in
 
@@ -219,7 +219,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						.sentResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappMetadata
+							dappContext
 						)
 					))
 				}
@@ -229,7 +229,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						.failedToSendResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappMetadata,
+							dappContext,
 							reason: error.localizedDescription
 						)
 					))
