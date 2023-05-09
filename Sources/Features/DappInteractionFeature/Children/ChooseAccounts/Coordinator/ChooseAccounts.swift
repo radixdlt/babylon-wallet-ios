@@ -1,5 +1,6 @@
 import AccountsClient
 import CreateEntityFeature
+import FactorSourcesClient
 import FeaturePrelude
 import ROLAClient
 import SigningFeature
@@ -63,6 +64,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case loadAccountsResult(TaskResult<Profile.Network.Accounts>)
+		case proveAccountOwnership(SigningFactors, AuthenticationDataToSignForChallengeResponse)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -74,6 +76,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			accessKind: ChooseAccounts.State.AccessKind,
 			chosenAccounts: ChooseAccountsResult
 		)
+		case failedToProveOwnership(of: [Profile.Network.Account])
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -100,6 +103,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.rolaClient) var rolaClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -137,54 +141,29 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 				)))
 			}
 
+			guard let signers = NonEmpty<Set<EntityPotentiallyVirtual>>.init(rawValue: Set(selectedAccounts.map { EntityPotentiallyVirtual.account($0) })) else {
+				return .send(.delegate(.continueButtonTapped(
+					accessKind: state.accessKind,
+					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
+				)))
+			}
+
 			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
 				dAppDefinitionAddress: state.dappDefinitionAddress
 			)
 
-			return .run { _ in
+			return .run { send in
 				let dataToSign = try await rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 				let networkID = await accountsClient.getCurrentNetworkID()
+				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
+					networkID: networkID,
+					signers: signers,
+					signingPurpose: .signAuth
+				))
+				await send(.internal(.proveAccountOwnership(signingFactors, dataToSign)))
 			}
-
-//			state.destination = .signing(Signing.State.init(networkID: , manifest: <#T##TransactionManifest#>, feePayerSelectionAmongstCandidates: <#T##FeePayerSelectionAmongstCandidates#>, purpose: <#T##SigningPurpose#>))
-			fatalError()
-
-//			let signAuthRequest = SignAuthChallengeRequest(
-//				challenge: challenge,
-//				origin: state.dappMetadata.origin,
-//				dAppDefinitionAddress: state.dappDefinitionAddress,
-//				entities: .init(uniqueElements: selectedAccounts.elements.map { .account($0) })
-//			)
-
-//			return .run { [accessKind = state.accessKind] send in
-//				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
-//				let walletAccountsWithProof: [P2P.Dapp.Response.WalletAccountWithProof] = signedAuthChallenge.entitySignatures.map {
-//					guard case let .account(account) = $0.signerEntity else {
-//						fatalError()
-//					}
-//					guard let proof = P2P.Dapp.AuthProof(entitySignature: $0) else {
-//						fatalError()
-//					}
-//					return P2P.Dapp.Response.WalletAccountWithProof(account: .init(account: account), proof: proof)
-//				}
-//				let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
-//					challenge: challenge,
-//					IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>.init(uniqueElements: walletAccountsWithProof)
-//				)
-//
-//				await send(.delegate(.continueButtonTapped(
-//					accessKind: accessKind,
-//					chosenAccounts: chosenAccounts
-//				)))
-//
-//			} catch: { error, _ in
-//				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
-//				errorQueue.schedule(error)
-//				fatalError("impl failure")
-//				//                await send(.delegate(.failedToSign)
-//			}
 		}
 	}
 
@@ -197,6 +176,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case let .loadAccountsResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
+		case let .proveAccountOwnership(signingFactors, authenticationDataToSignForChallenge):
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: signingFactors,
+				signingPurposeWithPayload: SigningPurposeWithPayload.signAuth(authenticationDataToSignForChallenge),
+				ephemeralNotaryPrivateKey: .init()
+			)
+			)
+			return .none
 		}
 	}
 
@@ -208,6 +196,39 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 					try await accountsClient.getAccountsOnCurrentNetwork()
 				})))
 			}
+
+		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(signedAuthChallenge)))))):
+
+			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set((state.selectedAccounts ?? []).map(\.account.id))
+			let walletAccountsWithProof: [P2P.Dapp.Response.WalletAccountWithProof] = signedAuthChallenge.entitySignatures.map {
+				guard case let .account(account) = $0.signerEntity else {
+					fatalError()
+				}
+				accountsLeftToVerifyDidSign.remove(account.id)
+				guard let proof = P2P.Dapp.AuthProof(entitySignature: $0) else {
+					fatalError()
+				}
+				return P2P.Dapp.Response.WalletAccountWithProof(account: .init(account: account), proof: proof)
+			}
+			guard accountsLeftToVerifyDidSign.isEmpty else {
+				loggerGlobal.error("Failed to sign with all accounts..")
+				return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
+			}
+
+			let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
+				challenge: signedAuthChallenge.challenge,
+				IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>.init(uniqueElements: walletAccountsWithProof)
+			)
+			return .send(.delegate(.continueButtonTapped(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
+
+		case .destination(.presented(.signing(.delegate(.failedToSign)))):
+			loggerGlobal.error("Failed to sign proof of ownership")
+			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
+
+		case .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction))))):
+			assertionFailure("wrong signing, signed tx, expected auth...")
+			loggerGlobal.error("Failed to sign proof of ownership")
+			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
 
 		default:
 			return .none
