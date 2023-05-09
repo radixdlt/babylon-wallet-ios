@@ -45,6 +45,7 @@ extension PersonaDetails.View {
 						.controlState(viewStore.canCreateAuthKey ? .enabled : .disabled)
 						.buttonStyle(.secondaryRectangular)
 					}
+					.padding(.top, .large3)
 					#endif
 
 					Button(L10n.PersonaDetails.editPersona) {
@@ -111,14 +112,14 @@ private extension StoreOf<PersonaDetails> {
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
 		#if DEBUG
-		.init(
+		(
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona,
 			canCreateAuthKey: canCreateAuthKey
 		)
 		#else
-		.init(
+			.init(
 				thumbnail: nil,
 				personaName: personaName,
 				isDappPersona: isDappPersona
