@@ -183,4 +183,17 @@ extension Loadable {
 			return .failure(error)
 		}
 	}
+
+	public func flatMap<NewValue>(_ transform: (Value) async -> Loadable<NewValue>) async -> Loadable<NewValue> {
+		switch self {
+		case .idle:
+			return .idle
+		case .loading:
+			return .loading
+		case let .success(value):
+			return await transform(value)
+		case let .failure(error):
+			return .failure(error)
+		}
+	}
 }

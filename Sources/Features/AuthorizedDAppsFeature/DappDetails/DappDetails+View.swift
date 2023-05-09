@@ -20,8 +20,9 @@ extension DappDetails {
 		let domain: URL?
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
-		let fungibles: [State.Associated.ResourceDetails]?
-		let nonFungibles: [State.Associated.ResourceDetails]?
+		let fungibles: [State.Resources.ResourceDetails]?
+		let nonFungibles: [State.Resources.ResourceDetails]?
+		let associatedDapps: [State.AssociatedDapp]?
 		let hasPersonas: Bool
 	}
 }
@@ -95,8 +96,9 @@ private extension DappDetails.State {
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
 			address: dApp.dAppDefinitionAddress,
-			fungibles: associated?.fungible,
-			nonFungibles: associated?.nonFungible,
+			fungibles: resources?.fungible,
+			nonFungibles: resources?.nonFungible,
+			associatedDapps: associatedDapps,
 			hasPersonas: !personaList.personas.isEmpty
 		)
 	}

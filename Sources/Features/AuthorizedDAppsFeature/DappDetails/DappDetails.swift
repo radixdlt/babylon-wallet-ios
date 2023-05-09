@@ -30,7 +30,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var resources: Resources? = nil
 
 		@Loadable
-		public var dApps: [DappDetails]? = nil
+		public var associatedDapps: [AssociatedDapp]? = nil
 
 		public var personaList: PersonaList.State
 
@@ -41,14 +41,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 			dApp: Profile.Network.AuthorizedDappDetailed,
 			metadata: GatewayAPI.EntityMetadataCollection? = nil,
 			resources: Resources? = nil,
-			dApps: [DappDetails]? = nil,
+			associatedDapps: [AssociatedDapp]? = nil,
 			personaDetails: PersonaDetails.State? = nil,
 			destination: Destination.State? = nil
 		) {
 			self.dApp = dApp
 			self.metadata = metadata
 			self.resources = resources
-			self.dApps = dApps
+			self.associatedDapps = associatedDapps
 			self.personaList = .init(dApp: dApp)
 			self.destination = destination
 		}
@@ -76,7 +76,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 
 		// TODO: This should be consolidated with other types that represent resources
-		public struct DappDetails: Identifiable, Hashable, Sendable {
+		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
 			public var id: DappDefinitionAddress { address }
 
 			public let address: DappDefinitionAddress
@@ -104,7 +104,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
 		case resourcesLoaded(Loadable<State.Resources>)
-		case associatedDappsLoaded(Loadable<[State.DappDetails]>)
+		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 		case dAppForgotten
 	}
@@ -235,30 +235,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
 
-			let dappDefinitionAddress = state.dApp.dAppDefinitionAddress
-			let claimedEntities = state.metadata?.claimedEntities
-			let dappDefinitions = try? state.metadata?.dappDefinitions?.compactMap(DappDefinitionAddress.init)
-
+			let dAppDefinitionAddress = state.dApp.dAppDefinitionAddress
 			return .run { send in
-				if let claimedEntities, !claimedEntities.isEmpty {
-					let result = await TaskResult {
-						// FIXME: When we can be sure that resources point back to the dapp definition we should switch to the validating version
-						try await resources(addresses: claimedEntities)
-						// try await resources(addresses: claimedEntities, validated: dappDefinitionAddress)
-					}
-					await send(.internal(.resourcesLoaded(.init(result: result))))
-				} else {
-					await send(.internal(.resourcesLoaded(metadata.flatMap { _ in .idle })))
-				}
+				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
+				await send(.internal(.resourcesLoaded(resources)))
 
-				if let dappDefinitions, !dappDefinitions.isEmpty {
-					let result = await TaskResult {
-						try await dApps(addresses: dappDefinitions, validated: dappDefinitionAddress)
-					}
-					await send(.internal(.associatedDappsLoaded(.init(result: result))))
-				} else {
-					await send(.internal(.associatedDappsLoaded(metadata.flatMap { _ in .idle })))
-				}
+				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
+				await send(.internal(.associatedDappsLoaded(associatedDapps)))
 			}
 
 		case let .resourcesLoaded(resources):
@@ -266,7 +249,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .associatedDappsLoaded(dApps):
-			state.$dApps = dApps
+			state.$associatedDapps = dApps
 			return .none
 
 		case let .dAppUpdated(dApp):
@@ -286,33 +269,49 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func resources(addresses: [String]) async throws -> State.Resources {
-		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
-			.items
-			.compactMap(\.resourceDetails)
+	private func loadResources(
+		metadata: GatewayAPI.EntityMetadataCollection,
+		validated dappDefinitionAddress: DappDefinitionAddress
+	) async -> Loadable<DappDetails.State.Resources> {
+		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
+			return .idle
+		}
 
-		return .init(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-		             nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+		let result = await TaskResult {
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+				.items
+				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.compactMap(\.resourceDetails)
+
+			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
+			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+		}
+
+		return .init(result: result)
 	}
 
-	private func resources(addresses: [String], validated dAppDefinitionAddress: DappDefinitionAddress) async throws -> State.Resources {
-		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
-			.items
-			.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
-			.compactMap(\.resourceDetails)
+	private func loadDapps(
+		metadata: GatewayAPI.EntityMetadataCollection,
+		validated dappDefinitionAddress: DappDefinitionAddress
+	) async -> Loadable<[State.AssociatedDapp]> {
+		let dappDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
+		guard let dappDefinitions, !dappDefinitions.isEmpty else {
+			return .idle
+		}
 
-		return .init(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-		             nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
-	}
+		let result = await TaskResult {
+			let allResourceItems = try await gatewayAPIClient.getDappMetadata(<#T##dappDefinition: DappDefinitionAddress##DappDefinitionAddress#>, validating: <#T##ComponentAddress?#>)
+				.items
+				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.compactMap(\.resourceDetails)
 
-	private func dApps(addresses: [DappDefinitionAddress], validated dAppDefinitionAddress: DappDefinitionAddress) async throws -> [State.DappDetails] {
-		let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(addresses)
-			.items
-			.filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
-			.compactMap(\.resourceDetails)
+			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
+			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+		}
 
-		return .init(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-		             nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+		return .init(result: result)
 	}
 
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
