@@ -772,7 +772,6 @@ extension DappInteractionFlow.Destinations.State {
 			return nil
 		case let .remote(.auth(.login(loginRequest))):
 			self = .relayed(anyItem, with: .login(.init(
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappContext: dappContext,
 				loginRequest: loginRequest
 			)))
@@ -801,7 +800,6 @@ extension DappInteractionFlow.Destinations.State {
 		case let .remote(.oneTimeAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				accessKind: .oneTime,
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappContext: dappContext,
 				numberOfAccounts: item.numberOfAccounts
 			)))
