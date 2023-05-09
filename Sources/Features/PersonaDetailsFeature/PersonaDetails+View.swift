@@ -111,7 +111,7 @@ private extension StoreOf<PersonaDetails> {
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
 		#if DEBUG
-		(
+                .init(
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona,

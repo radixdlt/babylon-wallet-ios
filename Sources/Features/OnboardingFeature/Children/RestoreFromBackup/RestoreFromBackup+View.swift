@@ -48,7 +48,7 @@ extension RestoreFromBackup.View {
 								iCloudBackupDataCard(item)
 									.onTapGesture {
 										item.action()
-									}
+                                                                        }
 							}
 
 							Button("Use iCloud Backup Data") {

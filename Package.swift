@@ -260,6 +260,7 @@ package.addModules([
 			"RadixConnectClient",
 			"ScanQRFeature",
 			"EditPersonaFeature",
+			"ProfileBackups",
 		],
 		tests: .yes()
 	),
@@ -294,6 +295,11 @@ package.addModules([
 			"SubmitTransactionClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "ProfileBackups",
+		dependencies: [],
+		tests: .no
 	),
 ])
 

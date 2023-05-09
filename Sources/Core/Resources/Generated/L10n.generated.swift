@@ -783,6 +783,8 @@ public enum L10n {
   public enum Settings {
     /// Authorized dApps
     public static let authorizedDappsButtonTitle = L10n.tr("Localizable", "settings.authorizedDappsButtonTitle", fallback: "Authorized dApps")
+    /// Backups
+    public static let backups = L10n.tr("Localizable", "settings.backups", fallback: "Backups")
     /// Close
     public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
     /// Delete Wallet Data
@@ -806,6 +808,12 @@ public enum L10n {
     /// Version: %@ build #%@
     public static func versionInfo(_ p1: Any, _ p2: Any) -> String {
       return L10n.tr("Localizable", "settings.versionInfo", String(describing: p1), String(describing: p2), fallback: "Version: %@ build #%@")
+    }
+    public enum Backups {
+      /// Last backed up: %@ ago
+      public static func subtitle(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "settings.backups.subtitle", String(describing: p1), fallback: "Last backed up: %@ ago")
+      }
     }
     public enum ConnectExtension {
       /// Link to Connector

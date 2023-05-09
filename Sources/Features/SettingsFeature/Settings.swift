@@ -7,6 +7,7 @@ import GatewaySettingsFeature
 import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
+import ProfileBackups
 
 // MARK: - AppSettings
 public struct AppSettings: Sendable, FeatureReducer {
@@ -50,6 +51,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case generalSettingsButtonTapped
 		case factorSourcesButtonTapped
 		case importFromOlympiaWalletButtonTapped
+		case profileBackupsTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -91,6 +93,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 			case generalSettings(GeneralSettings.State)
+			case profileBackups(ProfileBackups.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -102,6 +105,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 			case generalSettings(GeneralSettings.Action)
+			case profileBackups(ProfileBackups.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -125,6 +129,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.generalSettings, action: /Action.generalSettings) {
 				GeneralSettings()
+			}
+			Scope(state: /State.profileBackups, action: /Action.profileBackups) {
+				ProfileBackups()
 			}
 		}
 	}
@@ -199,6 +206,10 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		case .generalSettingsButtonTapped:
 			state.destination = .generalSettings(.init())
+			return .none
+
+		case .profileBackupsTapped:
+			state.destination = .profileBackups(.init())
 			return .none
 
 		#if DEBUG

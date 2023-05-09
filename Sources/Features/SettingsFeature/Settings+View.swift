@@ -5,6 +5,7 @@ import GatewaySettingsFeature
 import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
+import ProfileBackups
 #if DEBUG
 import EngineToolkit // read RET commit hash
 import InspectProfileFeature
@@ -118,6 +119,7 @@ extension View {
 			.authorizedDapps(with: store)
 			.personas(with: store)
 			.generalSettings(with: store)
+			.profileBackups(with: store)
 	}
 }
 
@@ -191,6 +193,16 @@ extension View {
 			destination: { GeneralSettings.View(store: $0) }
 		)
 	}
+
+	@MainActor
+	private func profileBackups(with store: StoreOf<AppSettings>) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.profileBackups,
+			action: AppSettings.Destinations.Action.profileBackups,
+			destination: { ProfileBackups.View(store: $0) }
+		)
+	}
 }
 
 // MARK: - SettingsRowModel
@@ -199,8 +211,16 @@ extension AppSettings.View {
 	struct RowModel: Identifiable {
 		var id: String { title }
 		let title: String
+		let subtitle: String?
 		let asset: ImageAsset
 		let action: AppSettings.ViewAction
+
+		init(title: String, subtitle: String? = nil, asset: ImageAsset, action: AppSettings.ViewAction) {
+			self.title = title
+			self.subtitle = subtitle
+			self.asset = asset
+			self.action = action
+		}
 	}
 
 	@MainActor
@@ -230,6 +250,12 @@ extension AppSettings.View {
 				title: L10n.Settings.generalSettingsButtonTitle,
 				asset: AssetResource.generalSettings,
 				action: .generalSettingsButtonTapped
+			),
+			.init(
+				title: L10n.Settings.backups,
+				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
+				asset: AssetResource.backups,
+				action: .profileBackupsTapped
 			),
 		]
 	}
