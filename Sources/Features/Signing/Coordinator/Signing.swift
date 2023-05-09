@@ -64,12 +64,13 @@ public struct Signing: Sendable, FeatureReducer {
 			case signWithLedgerFactors(SignWithFactorSourcesOfKindLedger.State)
 		}
 
+		public var signatures: OrderedSet<SignatureOfEntity> = []
+
 		public var step: Step
 
 //		public let dataToHashAndSign: Data
 		public var factorsLeftToSignWith: SigningFactors
 		public let expectedSignatureCount: Int
-		public var signatures: OrderedSet<SignatureOfEntity> = []
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		public let signingPurposeWithPayload: SigningPurposeWithPayload
 
@@ -78,6 +79,7 @@ public struct Signing: Sendable, FeatureReducer {
 			signingPurposeWithPayload: SigningPurposeWithPayload,
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		) {
+			precondition(!factorsLeftToSignWith.isEmpty)
 //			let ephemeralNotaryPrivateKey = Curve25519.Signing.PrivateKey()
 //			self.purpose = purpose
 //			self.dataToHashAndSign = dataToHashAndSign
@@ -85,6 +87,7 @@ public struct Signing: Sendable, FeatureReducer {
 			self.factorsLeftToSignWith = factorsLeftToSignWith
 			self.expectedSignatureCount = factorsLeftToSignWith.signerCount
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
+			self.step = Signing.nextStep(factorsLeftToSignWith: factorsLeftToSignWith, dataToSign: signingPurposeWithPayload.dataToSign)!
 		}
 	}
 
@@ -206,21 +209,32 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	private func proceedWithNextFactorSource(_ state: inout State) -> EffectTask<Action> {
-		if
-			let nextKind = state.factorsLeftToSignWith.keys.first,
-			let nextFactors = state.factorsLeftToSignWith[nextKind]
-		{
-			let dataToSign = state.signingPurposeWithPayload.dataToSign
-			switch nextKind {
-			case .device:
-				state.step = .signWithDeviceFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
-			case .ledgerHQHardwareWallet:
-				state.step = .signWithLedgerFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
-			}
-			return .none
-		} else {
+		guard let nextStep = Self.nextStep(
+			factorsLeftToSignWith: state.factorsLeftToSignWith,
+			dataToSign: state.signingPurposeWithPayload.dataToSign
+		) else {
 			assert(state.signatures.count == state.expectedSignatureCount)
 			return .send(.internal(.finishedSigningWithAllFactors))
+		}
+		state.step = nextStep
+		return .none
+	}
+
+	private static func nextStep(
+		factorsLeftToSignWith: SigningFactors,
+		dataToSign: Data
+	) -> State.Step? {
+		guard
+			let nextKind = factorsLeftToSignWith.keys.first,
+			let nextFactors = factorsLeftToSignWith[nextKind]
+		else {
+			return nil
+		}
+		switch nextKind {
+		case .device:
+			return .signWithDeviceFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
+		case .ledgerHQHardwareWallet:
+			return .signWithLedgerFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
 		}
 	}
 }

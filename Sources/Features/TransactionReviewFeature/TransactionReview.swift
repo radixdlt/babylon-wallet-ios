@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import CryptoKit
 import FeaturePrelude
 import GatewayAPI
 import SigningFeature
@@ -28,7 +29,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var deposits: TransactionReviewAccounts.State? = nil
 		public var proofs: TransactionReviewProofs.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
-		private let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
@@ -255,10 +256,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				)))
 			}
 
-		case .destination(.presented(.prepareForSigning(.delegate(.failedToBuildTX))))
-		     return .none
+		case .destination(.presented(.prepareForSigning(.delegate(.failedToBuildTX)))):
+			return .none
 
-		     case .destination(.presented(.prepareForSigning(.delegate(.failedToLoadSigners)))):
+		case .destination(.presented(.prepareForSigning(.delegate(.failedToLoadSigners)))):
 			return .none
 
 		case let .destination(.presented(.prepareForSigning(.delegate(.done(compiledIntent, signingFactors))))):
@@ -281,7 +282,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			printSigners()
 
-			state.destination = .signing(.init(dataToHashAndSign: Data(compiledIntent.compiledIntent), factorsLeftToSignWith: signingFactors, purpose: .signTransaction(state.signTransactionPurpose)))
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: signingFactors,
+				signingPurposeWithPayload: .signTransaction(
+					compiledIntent,
+					origin: state.signTransactionPurpose
+				),
+				ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey
+			))
 			return .none
 
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
@@ -289,8 +297,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.signing(.delegate(.notarized(notarizedTX))))):
+		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))))):
 			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			return .none
+
+		case .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(_)))))):
+			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
 		case let .destination(.presented(.submitting(.delegate(.submittedButNotCompleted(txID))))):
