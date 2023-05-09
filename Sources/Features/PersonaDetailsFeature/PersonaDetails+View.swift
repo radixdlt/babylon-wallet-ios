@@ -15,13 +15,13 @@ extension PersonaDetails {
 	}
 
 	public struct ViewState: Equatable {
-		#if DEBUG
-		public var canCreateAuthKey: Bool
-		#endif // DEBUG
-
 		let thumbnail: URL?
 		let personaName: String
 		let isDappPersona: Bool
+
+		#if DEBUG
+		public var canCreateAuthKey: Bool
+		#endif // DEBUG
 	}
 }
 
