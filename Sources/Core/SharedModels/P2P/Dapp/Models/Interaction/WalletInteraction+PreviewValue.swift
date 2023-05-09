@@ -48,7 +48,7 @@ CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9
 extension P2P.Dapp.Request.OneTimeAccountsRequestItem {
 	public static let previewValue: Self = .init(
 		numberOfAccounts: .exactly(1),
-		requiresProofOfOwnership: false
+		challenge: nil
 	)
 }
 
@@ -88,7 +88,7 @@ extension P2P.Dapp.Request {
 				reset: nil,
 				ongoingAccounts: .init(
 					numberOfAccounts: .atLeast(2),
-					requiresProofOfOwnership: false
+					challenge: nil
 				),
 				ongoingPersonaData: .init(
 					fields: [.givenName, .familyName, .emailAddress]

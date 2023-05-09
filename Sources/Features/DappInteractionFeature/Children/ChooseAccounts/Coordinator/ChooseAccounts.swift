@@ -2,6 +2,12 @@ import AccountsClient
 import CreateEntityFeature
 import FeaturePrelude
 
+// MARK: - ChooseAccountsResult
+enum ChooseAccountsResult: Sendable, Hashable {
+	case withoutProofOfOwnership(IdentifiedArrayOf<Profile.Network.Account>)
+	case withProofOfOwnership(challenge: P2P.Dapp.AuthChallengeNonce, IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>)
+}
+
 // MARK: - ChooseAccounts
 struct ChooseAccounts: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
@@ -9,6 +15,9 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			case ongoing
 			case oneTime
 		}
+
+		/// if `proofOfOwnership`, sign this challenge
+		let challenge: P2P.Dapp.AuthChallengeNonce?
 
 		let accessKind: AccessKind
 		let dappDefinitionAddress: DappDefinitionAddress
@@ -21,6 +30,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		init(
+			challenge: P2P.Dapp.AuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
@@ -29,6 +39,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
+			self.challenge = challenge
 			self.accessKind = accessKind
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
@@ -55,7 +66,10 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Account>, ChooseAccounts.State.AccessKind)
+		case continueButtonTapped(
+			accessKind: ChooseAccounts.State.AccessKind,
+			chosenAccounts: ChooseAccountsResult
+		)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -89,7 +103,21 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(selectedAccounts):
 			let selectedAccounts = IdentifiedArray(uncheckedUniqueElements: selectedAccounts.map(\.account))
-			return .send(.delegate(.continueButtonTapped(selectedAccounts, state.accessKind)))
+
+			guard let challenge = state.challenge else {
+				return .send(.delegate(.continueButtonTapped(
+					accessKind: state.accessKind,
+					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
+				)))
+			}
+
+			loggerGlobal.critical("IGNORING PROOF OF OWNERSHIP, TODO, IMPLEMENT!")
+			fatalError("impl me")
+
+			return .send(.delegate(.continueButtonTapped(
+				accessKind: state.accessKind,
+				chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
+			)))
 		}
 	}
 

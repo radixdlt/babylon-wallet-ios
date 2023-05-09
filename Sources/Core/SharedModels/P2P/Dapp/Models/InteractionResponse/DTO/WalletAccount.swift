@@ -32,21 +32,19 @@ extension P2P.Dapp.Response {
 	///
 	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 	///
-	public struct WalletAccountWithProof: Sendable, Hashable, Encodable {
+	public struct WalletAccountWithProof: Sendable, Hashable, Encodable, Identifiable {
+		public typealias ID = WalletAccount
+		public var id: ID { account }
 		public let account: WalletAccount
 
-		/// A 32 bytes nonce used as a challenge
-		public let challenge: P2P.Dapp.AuthChallengeNonce
-		public let signature: String
+		public let proof: P2P.Dapp.AuthProof
 
 		public init(
 			account: WalletAccount,
-			challenge: P2P.Dapp.AuthChallengeNonce,
-			signature: String
+			proof: P2P.Dapp.AuthProof
 		) {
 			self.account = account
-			self.challenge = challenge
-			self.signature = signature
+			self.proof = proof
 		}
 	}
 }

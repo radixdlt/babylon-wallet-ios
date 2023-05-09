@@ -281,12 +281,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case let .autofillOngoingResponseItemsIfPossible(payload):
 			if let accountsPayload = payload.accountsPayload {
 				state.responseItems[.local(.accountPermissionRequested(accountsPayload.numberOfAccountsRequested))] = .local(.accountPermissionGranted)
-				setAccountsResponse(
-					to: accountsPayload.requestItem,
-					accountsPayload.accounts,
-					accessKind: .ongoing,
-					into: &state
-				)
+//				setAccountsResponse(
+//					to: accountsPayload.requestItem,
+//					accountsPayload.accounts,
+				//                    accessKind: .ongoing,
+				//                    proofOfOwnership: accountsPayload.proofOfOwnership,
+//					into: &state
+//				)
+				setAccountsResponse(to: accountsPayload.requestItem, accessKind: .ongoing, chosenAccounts: .withoutProofOfOwnership(.init(uniqueElements: accountsPayload.accounts)), into: &state)
 			}
 			if let personaDataPayload = payload.personaDataPayload {
 				let fields = personaDataPayload.fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
@@ -371,10 +373,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		func handleAccounts(
 			_ item: State.AnyInteractionItem,
-			_ accounts: IdentifiedArrayOf<Profile.Network.Account>,
+			_ choseAccounts: ChooseAccountsResult,
 			_ accessKind: ChooseAccounts.State.AccessKind
 		) -> EffectTask<Action> {
-			setAccountsResponse(to: item, accounts, accessKind: accessKind, into: &state)
+			setAccountsResponse(
+				to: item,
+				accessKind: accessKind,
+				chosenAccounts: choseAccounts,
+				into: &state
+			)
 			return continueEffect(for: &state)
 		}
 
@@ -458,8 +465,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case .accountPermission(.delegate(.continueButtonTapped)):
 			return handleAccountPermission(item)
 
-		case let .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind))):
-			return handleAccounts(item, accounts, accessKind)
+		case let .chooseAccounts(.delegate(.continueButtonTapped(accessKind, chosenAccounts))):
+			return handleAccounts(item, chosenAccounts, accessKind)
 
 		case let .personaDataPermission(.delegate(.personaUpdated(persona))):
 			return handlePersonaUpdated(&state, persona)
@@ -561,16 +568,21 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	func setAccountsResponse(
 		to item: State.AnyInteractionItem,
-		_ accounts: some Collection<Profile.Network.Account>,
 		accessKind: ChooseAccounts.State.AccessKind,
+		chosenAccounts: ChooseAccountsResult,
 		into state: inout State
 	) {
 		let responseItem: State.AnyInteractionResponseItem = {
-			switch accessKind {
-			case .ongoing:
-				return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
-			case .oneTime:
-				return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
+			switch chosenAccounts {
+			case let .withProofOfOwnership(challenge, accountsWithProof):
+				fatalError("impl me")
+			case let .withoutProofOfOwnership(accounts):
+				switch accessKind {
+				case .oneTime:
+					return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
+				case .ongoing:
+					return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
+				}
 			}
 		}()
 		state.responseItems[item] = responseItem
@@ -760,6 +772,7 @@ extension DappInteractionFlow.Destinations.State {
 			)))
 		case let .remote(.ongoingAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
+				challenge: item.challenge,
 				accessKind: .ongoing,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
@@ -778,6 +791,7 @@ extension DappInteractionFlow.Destinations.State {
 			}
 		case let .remote(.oneTimeAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
+				challenge: item.challenge,
 				accessKind: .oneTime,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,

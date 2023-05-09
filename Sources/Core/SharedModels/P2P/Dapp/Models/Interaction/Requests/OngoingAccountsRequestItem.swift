@@ -4,14 +4,14 @@ import Prelude
 extension P2P.Dapp.Request {
 	public struct OngoingAccountsRequestItem: Sendable, Hashable, Decodable {
 		public let numberOfAccounts: NumberOfAccounts
-		public let requiresProofOfOwnership: Bool
+		public let challenge: P2P.Dapp.AuthChallengeNonce?
 
 		public init(
 			numberOfAccounts: NumberOfAccounts,
-			requiresProofOfOwnership: Bool
+			challenge: P2P.Dapp.AuthChallengeNonce?
 		) {
 			self.numberOfAccounts = numberOfAccounts
-			self.requiresProofOfOwnership = requiresProofOfOwnership
+			self.challenge = challenge
 		}
 	}
 }
