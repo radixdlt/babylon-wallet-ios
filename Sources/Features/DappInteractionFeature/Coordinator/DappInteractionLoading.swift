@@ -28,11 +28,11 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case dappMetadataLoadingResult(TaskResult<DappMetadata>)
+		case dappMetadataLoadingResult(TaskResult<DappContext>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dappMetadataLoaded(DappMetadata)
+		case dappContextLoaded(DappContext)
 		case dismiss
 	}
 
@@ -68,7 +68,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress, origin = state.interaction.metadata.origin] send in
 			let metadata = await TaskResult {
 				do {
-					return try await cacheClient.withCaching(
+					let dappMetadata = try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
 						request: {
 							try await DappMetadata(
@@ -77,13 +77,11 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 							)
 						}
 					)
-				} catch is BadHTTPResponseCode {
-					// FIXME: cleanup DappMetaData
-					return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
+					return DappContext.metadataFetched(dappMetadata)
 				} catch {
 					if await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled {
 						loggerGlobal.notice("Failed to load metadata, but we surpressed the error since is appdeveloper")
-						return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
+						return DappContext.developerMode
 					} else {
 						throw error
 					}
@@ -95,9 +93,10 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .dappMetadataLoadingResult(.success(dappMetadata)):
+		case let .dappMetadataLoadingResult(.success(dappContextLoaded)):
 			state.isLoading = false
-			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
+			return .send(.delegate(.dappContextLoaded(dappContextLoaded)))
+
 		case let .dappMetadataLoadingResult(.failure(error)):
 			state.errorAlert = .init(
 				title: { TextState(L10n.App.errorOccurredTitle) },

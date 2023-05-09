@@ -27,6 +27,12 @@ struct DappMetadata: Sendable, Hashable, Codable {
 	}
 }
 
+// MARK: - DappContext
+enum DappContext: Sendable, Hashable {
+	case metadataFetched(DappMetadata)
+	case developerMode
+}
+
 #if DEBUG
 extension DappMetadata {
 	static let previewValue: Self = .init(

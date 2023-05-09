@@ -33,7 +33,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case accountPermissionGranted
 		}
 
-		let dappMetadata: DappMetadata
+		let dappContext: DappContext
 		let remoteInteraction: RemoteInteraction
 		var persona: Profile.Network.Persona?
 		var authorizedDapp: Profile.Network.AuthorizedDapp?
@@ -94,15 +94,20 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var path: StackState<Destinations.State> = []
 
 		init?(
-			dappMetadata: DappMetadata,
+			dappContext: DappContext,
 			interaction remoteInteraction: RemoteInteraction
 		) {
-			self.dappMetadata = dappMetadata
+			self.dappContext = dappContext
 			self.remoteInteraction = remoteInteraction
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
-				self.root = Destinations.State(for: interactionItems.first, remoteInteraction, dappMetadata, nil)
+				self.root = Destinations.State(
+					for: interactionItems.first,
+					interaction: remoteInteraction,
+					dappContext: dappContext,
+					persona: nil
+				)
 			} else {
 				return nil
 			}
@@ -700,7 +705,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 }
 
 extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
-	init(for remoteInteractionItems: some Collection<DappInteractionFlow.State.RemoteInteractionItem>) {
+	init(
+		for remoteInteractionItems: some Collection<DappInteractionFlow.State.RemoteInteractionItem>
+	) {
 		self.init(
 			remoteInteractionItems
 				.sorted(by: { $0.priority < $1.priority })
@@ -740,9 +747,9 @@ extension DappInteractionFlow.ChildAction {
 extension DappInteractionFlow.Destinations.State {
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
-		_ interaction: DappInteractionFlow.State.RemoteInteraction,
-		_ dappMetadata: DappMetadata,
-		_ persona: Profile.Network.Persona?
+		interaction: DappInteractionFlow.State.RemoteInteraction,
+		dappContext: DappContext,
+		persona: Profile.Network.Persona?
 	) {
 		switch anyItem {
 		case .remote(.auth(.usePersona)):
@@ -750,25 +757,25 @@ extension DappInteractionFlow.Destinations.State {
 		case let .remote(.auth(.login(loginRequest))):
 			self = .relayed(anyItem, with: .login(.init(
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
-				dappMetadata: dappMetadata,
+				dappContext: dappContext,
 				loginRequest: loginRequest
 			)))
 		case let .local(.accountPermissionRequested(numberOfAccounts)):
 			self = .relayed(anyItem, with: .accountPermission(.init(
-				dappMetadata: dappMetadata,
+				dappContext: dappContext,
 				numberOfAccounts: numberOfAccounts
 			)))
 		case let .remote(.ongoingAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				accessKind: .ongoing,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
-				dappMetadata: dappMetadata,
+				dappContext: dappContext,
 				numberOfAccounts: item.numberOfAccounts
 			)))
 		case let .remote(.ongoingPersonaData(item)):
 			if let persona {
 				self = .relayed(anyItem, with: .personaDataPermission(.init(
-					dappMetadata: dappMetadata,
+					dappContext: dappContext,
 					personaID: persona.id,
 					requiredFieldIDs: item.fields
 				)))
@@ -780,12 +787,12 @@ extension DappInteractionFlow.Destinations.State {
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				accessKind: .oneTime,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
-				dappMetadata: dappMetadata,
+				dappContext: dappContext,
 				numberOfAccounts: item.numberOfAccounts
 			)))
 		case let .remote(.oneTimePersonaData(item)):
 			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
-				dappMetadata: dappMetadata,
+				dappContext: dappContext,
 				requiredFieldIDs: item.fields
 			)))
 		case let .remote(.send(item)):

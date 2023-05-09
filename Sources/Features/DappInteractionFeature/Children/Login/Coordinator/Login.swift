@@ -8,8 +8,7 @@ import ROLAClient
 // MARK: - LoginRequest
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let dappDefinitionAddress: DappDefinitionAddress
-		let dappMetadata: DappMetadata
+		let dappContext: DappContext
 		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
 
 		var isFirstPersonaOnAnyNetwork: Bool? = nil
@@ -25,7 +24,7 @@ struct Login: Sendable, FeatureReducer {
 
 		init(
 			dappDefinitionAddress: DappDefinitionAddress,
-			dappMetadata: DappMetadata,
+			dappContext: DappContext,
 			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
