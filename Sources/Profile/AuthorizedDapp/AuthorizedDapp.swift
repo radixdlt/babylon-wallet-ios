@@ -1,4 +1,5 @@
 import Prelude
+import SharedModels
 
 // MARK: - Profile.Network.AuthorizedDapp
 extension Profile.Network {

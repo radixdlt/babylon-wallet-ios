@@ -1,4 +1,5 @@
 import Prelude
+import SharedModels
 
 // MARK: ~~~=== LOGIC ===~~~
 extension Profile.Network {

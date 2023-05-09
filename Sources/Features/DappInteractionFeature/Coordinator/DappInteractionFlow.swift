@@ -768,7 +768,6 @@ extension DappInteractionFlow.Destinations.State {
 		case let .remote(.ongoingAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				accessKind: .ongoing,
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappContext: dappContext,
 				numberOfAccounts: item.numberOfAccounts
 			)))

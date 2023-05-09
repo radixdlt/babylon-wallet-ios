@@ -8,29 +8,38 @@ extension DappInteraction {
 	typealias NumberOfAccounts = P2P.Dapp.Request.NumberOfAccounts
 }
 
-// MARK: - DappMetadata
-struct DappMetadata: Sendable, Hashable, Codable {
+// MARK: - FromLedgerDappMetadata
+struct FromLedgerDappMetadata: Sendable, Hashable, Codable {
 	static let defaultName = NonEmptyString(rawValue: L10n.DApp.Metadata.unknownName)!
 
+	/// A dAppDefinition address is a valid `AccountAddress`
+	let dAppDefinintionAddress: AccountAddress
+	let origin: P2P.Dapp.Request.Metadata.Origin
 	let name: NonEmpty<String>
 	let description: String?
-	let origin: P2P.Dapp.Request.Metadata.Origin
 
 	init(
+		dAppDefinintionAddress: AccountAddress,
+		origin: P2P.Dapp.Request.Metadata.Origin,
 		name: String?,
 		description: String? = nil,
-		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
+		self.dAppDefinintionAddress = dAppDefinintionAddress
+		self.origin = origin
 		self.name = name.flatMap(NonEmptyString.init(rawValue:)) ?? Self.defaultName
 		self.description = description
-		self.origin = origin
 	}
 }
 
 // MARK: - DappContext
 enum DappContext: Sendable, Hashable {
-	case metadataFetched(DappMetadata)
-	case developerMode
+	/// The metadata sent with the request from the Dapp. Contains `origin` and `networkID`
+	/// and possibly and invalid dAppDefinition address. We only allow this case `fromRequest`
+	/// to be passed around if `isDeveloperModeEnabled` is `true`.
+	case fromRequest(P2P.Dapp.Request.Metadata)
+
+	/// A detailed DappMetaData fetched from Ledger.
+	case fromLedger(FromLedgerDappMetadata)
 }
 
 #if DEBUG

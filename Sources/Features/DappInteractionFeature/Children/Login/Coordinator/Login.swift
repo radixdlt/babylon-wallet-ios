@@ -23,12 +23,10 @@ struct Login: Sendable, FeatureReducer {
 		var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
 
 		init(
-			dappDefinitionAddress: DappDefinitionAddress,
 			dappContext: DappContext,
 			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
-			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
 			self.loginRequest = loginRequest
 			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
@@ -166,7 +164,7 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
-		.run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
+		.run { [dappContext = state.dappContext] send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
 			let authorizedDapp = authorizedDapps[id: dappDefinitionAddress]
