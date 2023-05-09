@@ -231,7 +231,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			if let usePersonaItem = state.usePersonaRequestItem {
-				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
+				guard case let .valid(dappDefinitionAddress) = state.dappContext.dAppDefintionAddress else {
+					return dismissEffect(for: state, errorKind: .invalidRequest, message: "Invalid DappDefinitionAddress")
+				}
+
+				return .run { send in
 					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
 					if
 						let persona = try await personasClient.getPersonas()[id: identityAddress],
@@ -584,7 +588,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(for: nextRequest, state.remoteInteraction, state.dappContext, state.persona)
+			let destination = Destinations.State(for: nextRequest, interaction: state.remoteInteraction, dappContext: state.dappContext, persona: state.persona)
 		{
 			if state.root == nil {
 				state.root = destination
@@ -601,10 +605,22 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					// Save login date, data fields, and ongoing accounts to Profile
 					if let persona = state.persona {
 						let networkID = await gatewaysClient.getCurrentNetworkID()
+
+						guard
+							case let .valid(dappDefinitionAddress) = state.remoteInteraction.metadata.dAppDefinitionAddress
+						else {
+							await send(.delegate(.dismissWithFailure(.init(interactionId: state.remoteInteraction.id, errorType: .invalidRequest, message: "Invalid DappDefinitionAddress"))))
+						}
+						guard
+							let displayName = NonEmptyString(rawValue: state.dappContext.name ?? L10n.DApp.Metadata.unknownName)
+						else {
+							await send(.delegate(.dismissWithFailure(.init(interactionId: state.remoteInteraction.id, errorType: .invalidRequest, message: "Invalid DappName"))))
+						}
+
 						var authorizedDapp = state.authorizedDapp ?? .init(
 							networkID: networkID,
-							dAppDefinitionAddress: state.remoteInteraction.metadata.dAppDefinitionAddress,
-							displayName: state.dappContext.name ?? L10n.DApp.Metadata.unknownName
+							dAppDefinitionAddress: dappDefinitionAddress,
+							displayName: displayName
 						)
 						// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 						let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
