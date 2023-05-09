@@ -37,8 +37,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(P2P.Dapp.Response, DappContext? = nil)
-		case dismiss(DappContext? = nil)
+		case submit(P2P.Dapp.Response, DappContext)
+		case dismiss(DappContext)
 	}
 
 	var body: some ReducerProtocolOf<Self> {
@@ -70,7 +70,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 					interactionId: state.interaction.id,
 					errorType: .rejectedByUser,
 					message: nil
-				)))))
+				)), .fromRequest(state.interaction.metadata))))
 			}
 		case .malformedInteractionErrorAlert:
 			return .none
@@ -99,15 +99,15 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 				interactionId: state.interaction.id,
 				errorType: .rejectedByUser,
 				message: nil
-			)))))
+			)), .fromRequest(state.interaction.metadata))))
 		case let .flow(.delegate(.dismissWithFailure(error))):
-			return .send(.delegate(.submit(.failure(error))))
+			return .send(.delegate(.submit(.failure(error), .fromRequest(state.interaction.metadata))))
 
-		case let .flow(.delegate(.dismissWithSuccess(dappMetadata))):
-			return .send(.delegate(.dismiss(dappMetadata)))
+		case let .flow(.delegate(.dismissWithSuccess(dappContext))):
+			return .send(.delegate(.dismiss(dappContext)))
 
-		case let .flow(.delegate(.submit(response, dappMetadata))):
-			return .send(.delegate(.submit(.success(response), dappMetadata)))
+		case let .flow(.delegate(.submit(response, dappContext))):
+			return .send(.delegate(.submit(.success(response), dappContext)))
 		default:
 			return .none
 		}
