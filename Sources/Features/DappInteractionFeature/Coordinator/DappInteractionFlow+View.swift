@@ -103,7 +103,7 @@ struct DappInteraction_Preview: PreviewProvider {
 		DappInteractionFlow.View(
 			store: .init(
 				initialState: .init(
-					dappMetadata: .previewValue,
+					dappContext: .previewValue,
 					interaction: .previewValueAllRequests(
 						auth: .login(.init(challenge: nil))
 //						auth: .usePersona(.init(identityAddress: Profile.Network.Persona.previewValue0.address.address))

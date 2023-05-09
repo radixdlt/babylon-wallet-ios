@@ -40,6 +40,13 @@ enum DappContext: Sendable, Hashable {
 
 	/// A detailed DappMetaData fetched from Ledger.
 	case fromLedger(FromLedgerDappMetadata)
+
+	public var origin: P2P.Dapp.Request.Metadata.Origin {
+		switch self {
+		case let .fromLedger(metadata): return metadata.origin
+		case let .fromRequet(metadata): return metadata.origin
+		}
+	}
 }
 
 #if DEBUG

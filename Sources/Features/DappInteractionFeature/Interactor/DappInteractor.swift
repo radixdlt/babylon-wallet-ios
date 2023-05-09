@@ -126,14 +126,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
 
-		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
+		case let .presentResponseFailureAlert(response, for: request, dappContext, reason):
 			state.responseFailureAlert = .init(
 				title: { TextState(L10n.App.errorOccurredTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
 						TextState(L10n.DApp.Response.FailureAlert.cancelButtonTitle)
 					}
-					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
+					ButtonState(action: .retryButtonTapped(response, for: request, dappContext)) {
 						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)
 					}
 				},

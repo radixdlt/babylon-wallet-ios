@@ -482,7 +482,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return handleSignAndSubmitTX(item, txID)
 
 		case .reviewTransaction(.delegate(.transactionCompleted)):
-			return .send(.delegate(.dismissWithSuccess(state.dappMetadata)))
+			return .send(.delegate(.dismissWithSuccess(state.dappContext)))
 
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
@@ -604,7 +604,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						var authorizedDapp = state.authorizedDapp ?? .init(
 							networkID: networkID,
 							dAppDefinitionAddress: state.remoteInteraction.metadata.dAppDefinitionAddress,
-							displayName: state.dappMetadata.name
+							displayName: state.dappContext.name ?? L10n.DApp.Metadata.unknownName
 						)
 						// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 						let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
@@ -677,7 +677,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 					}
 
-					await send(.delegate(.submit(response, state.dappMetadata)))
+					await send(.delegate(.submit(response, state.dappContext)))
 				}
 			} else {
 				return .none // TODO: throw error (invalid response format)

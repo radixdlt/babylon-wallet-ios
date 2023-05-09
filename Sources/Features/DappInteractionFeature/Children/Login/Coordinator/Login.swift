@@ -97,7 +97,7 @@ struct Login: Sendable, FeatureReducer {
 
 			let signAuthRequest = SignAuthChallengeRequest(
 				challenge: challenge,
-				origin: state.dappMetadata.origin,
+				origin: state.dappContext.origin,
 				dAppDefinitionAddress: state.dappDefinitionAddress,
 				persona: persona
 			)

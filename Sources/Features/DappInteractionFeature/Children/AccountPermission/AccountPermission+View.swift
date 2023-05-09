@@ -13,7 +13,7 @@ extension AccountPermission {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
+				let dappName = AttributedString(state.dappContext.name ?? L10n.DApp.Metadata.unknownName, foregroundColor: highlightColor)
 
 				let explanation: AttributedString = {
 					let always = AttributedString(L10n.DApp.AccountPermission.Subtitle.always, foregroundColor: highlightColor)
