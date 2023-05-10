@@ -95,6 +95,8 @@ extension P2P.Dapp.Response.WalletInteractionFailureResponse {
 				return "Invalid request"
 			case .failedToSignAuthChallenge:
 				return "Failed to sign auth challenge"
+			case .incompatibleVersion:
+				return "Incompatible versions"
 			}
 		}
 	}
