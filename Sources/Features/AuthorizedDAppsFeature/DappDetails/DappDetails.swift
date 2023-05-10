@@ -269,6 +269,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	/// Loads any fungible and non-fungible resources associated with the dApp
 	private func loadResources(
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dappDefinitionAddress: DappDefinitionAddress
@@ -291,27 +292,36 @@ public struct DappDetails: Sendable, FeatureReducer {
 		return .init(result: result)
 	}
 
+	/// Loads any other dApps associated with the dApp
 	private func loadDapps(
 		metadata: GatewayAPI.EntityMetadataCollection,
 		validated dappDefinitionAddress: DappDefinitionAddress
 	) async -> Loadable<[State.AssociatedDapp]> {
-		let dappDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
-		guard let dappDefinitions, !dappDefinitions.isEmpty else {
-			return .idle
+		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
+		guard let dAppDefinitions else { return .idle }
+
+		let associatedDapps = await dAppDefinitions.parallelMap { dApp in
+			try? await extractDappInfo(for: dApp, validating: dappDefinitionAddress)
 		}
-		fatalError()
-//		let result = await TaskResult {
-//			let allResourceItems = try await gatewayAPIClient.getDappMetadata(<#T##dappDefinition: DappDefinitionAddress##DappDefinitionAddress#>, validating: <#T##ComponentAddress?#>)
-//				.items
-//				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
-//				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
-//				.compactMap(\.resourceDetails)
-//
-//			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
-//			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
-//		}
-//
-//		return .init(result: result)
+		.compactMap { $0 }
+
+		guard !associatedDapps.isEmpty else { return .idle }
+
+		return .success(associatedDapps)
+	}
+
+	/// Helper function that loads and extracts dApp info for a given dApp, validating that it points back to the dApp of this screen
+	private func extractDappInfo(
+		for dApp: DappDefinitionAddress,
+		validating dAppDefinitionAddress: DappDefinitionAddress
+	) async throws -> State.AssociatedDapp {
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
+		guard let name = metadata.name else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
+		}
+		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
 	}
 
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {

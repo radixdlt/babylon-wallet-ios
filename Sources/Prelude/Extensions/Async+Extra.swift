@@ -43,14 +43,14 @@ extension Collection where Element: Sendable {
 		}
 	}
 
-	public func parallelCompactMap<T: Sendable>(_ transform: @Sendable @escaping (Element) async throws -> T?) async rethrows -> [T] {
-		try await withThrowingTaskGroup(of: T?.self) { group in
+	public func parallelMap<T: Sendable>(_ transform: @Sendable @escaping (Element) async -> T) async -> [T] {
+		await withTaskGroup(of: T.self) { group in
 			for element in self {
 				_ = group.addTaskUnlessCancelled {
-					try await transform(element)
+					await transform(element)
 				}
 			}
-			return try await group.collect().compactMap { $0 }
+			return await group.collect()
 		}
 	}
 }

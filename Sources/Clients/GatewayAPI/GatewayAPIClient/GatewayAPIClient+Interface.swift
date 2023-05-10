@@ -57,7 +57,8 @@ extension GatewayAPIClient {
 	/// Extracts the dApp definition from a component, if it has one
 	public func getDappDefinition(_ component: ComponentAddress) async throws -> GatewayAPI.EntityMetadataCollection {
 		let dappDefinitionAddress = try await getDappDefinitionAddress(component)
-		return try await getDappMetadata(dappDefinitionAddress, validating: component)
+		return try await getDappMetadata(dappDefinitionAddress)
+			.validating(dAppComponent: component)
 	}
 
 	/// Extracts the dApp definition address from a component, if one is present
@@ -72,23 +73,11 @@ extension GatewayAPIClient {
 	}
 
 	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
-	public func getDappMetadata(
-		_ dappDefinition: DappDefinitionAddress,
-		validating component: ComponentAddress? = nil
-	) async throws -> GatewayAPI.EntityMetadataCollection {
+	public func getDappMetadata(_ dappDefinition: DappDefinitionAddress) async throws -> GatewayAPI.EntityMetadataCollection {
 		let dappDefinition = try await getEntityMetadata(dappDefinition.address)
 
 		guard dappDefinition.accountType == .dappDefinition else {
 			throw GatewayAPI.EntityMetadataCollection.MetadataError.accountTypeNotDappDefinition
-		}
-
-		if let component {
-			guard let claimedEntities = dappDefinition.claimedEntities else {
-				throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
-			}
-			guard claimedEntities.contains(component.address) else {
-				throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
-			}
 		}
 
 		return dappDefinition
@@ -117,5 +106,28 @@ extension GatewayAPIClient {
 		let ledgerState = allResponses.first!.ledgerState
 
 		return .init(ledgerState: ledgerState, items: allItems)
+	}
+}
+
+extension GatewayAPI.EntityMetadataCollection {
+	public func validating(dAppComponent component: ComponentAddress) throws -> GatewayAPI.EntityMetadataCollection {
+		guard let claimedEntities else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingClaimedEntities
+		}
+
+		guard claimedEntities.contains(component.address) else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.entityNotClaimed
+		}
+
+		return self
+	}
+
+	/// Validate that the entity that owns this metadata gives the provided dAppDefinitionAddress
+	public func validating(dAppDefinitionAddress: DappDefinitionAddress) throws -> GatewayAPI.EntityMetadataCollection {
+		guard dappDefinition == dAppDefinitionAddress.address else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.dAppDefinitionNotReciprocating
+		}
+
+		return self
 	}
 }

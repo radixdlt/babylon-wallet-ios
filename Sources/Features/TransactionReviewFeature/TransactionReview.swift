@@ -443,7 +443,8 @@ extension TransactionReview {
 
 	private func extractDappInfo(_ component: ComponentAddress) async throws -> LedgerEntity {
 		let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
-		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress, validating: component)
+		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
+			.validating(dAppComponent: component)
 
 		return LedgerEntity(
 			id: dAppDefinitionAddress.id,

@@ -109,13 +109,17 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public enum MetadataError: Error, CustomStringConvertible {
+		case missingName
 		case missingDappDefinition
 		case accountTypeNotDappDefinition
 		case missingClaimedEntities
 		case entityNotClaimed
+		case dAppDefinitionNotReciprocating
 
 		public var description: String {
 			switch self {
+			case .missingName:
+				return "The entity has no name"
 			case .missingDappDefinition:
 				return "The entity has no dApp definition address"
 			case .accountTypeNotDappDefinition:
@@ -123,7 +127,9 @@ extension GatewayAPI.EntityMetadataCollection {
 			case .missingClaimedEntities:
 				return "The dapp definition has no claimed_entities key"
 			case .entityNotClaimed:
-				return "The entity is not claimed by the dapp definition"
+				return "The entity is not claimed by the dApp definition"
+			case .dAppDefinitionNotReciprocating:
+				return "This dApp definition does not point back to the dApp definition that claims to be associated with it"
 			}
 		}
 	}
