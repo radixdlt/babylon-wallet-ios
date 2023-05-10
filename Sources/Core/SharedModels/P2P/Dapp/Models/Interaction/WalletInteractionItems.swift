@@ -44,17 +44,7 @@ extension P2P.Dapp.Request {
 		public init(
 			oneTimeAccounts: AccountsRequestItem?,
 			oneTimePersonaData: PersonaDataRequestItem?
-		) throws {
-			if let oneTimeAccounts {
-				guard oneTimeAccounts.isOneTime else {
-					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
-				}
-			}
-			if let oneTimePersonaData {
-				guard oneTimePersonaData.isOneTime else {
-					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
-				}
-			}
+		) {
 			self.oneTimeAccounts = oneTimeAccounts
 			self.oneTimePersonaData = oneTimePersonaData
 		}

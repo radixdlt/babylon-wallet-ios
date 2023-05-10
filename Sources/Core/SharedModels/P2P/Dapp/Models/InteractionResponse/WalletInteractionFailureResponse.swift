@@ -50,6 +50,7 @@ extension P2P.Dapp.Response.WalletInteractionFailureResponse {
 		case unknownDappDefinitionAddress
 		case invalidPersona
 		case invalidRequest
+		case incompatibleVersion
 		case failedToSignAuthChallenge
 
 		public var errorDescription: String? {

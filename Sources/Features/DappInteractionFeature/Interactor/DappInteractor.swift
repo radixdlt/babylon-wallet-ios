@@ -256,7 +256,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 				do {
 					let request = try incomingRequest.result.get()
-					try validate(request)
+					if let invalidRequest = validateRequest(request) {
+						// FIXME: also propagate `invalidRequest.message`
+						throw invalidRequest.failure
+					}
 
 					let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
 					guard request.metadata.networkId == currentNetworkID else {
@@ -287,23 +290,36 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func validate(_ interaction: P2P.Dapp.Request) throws {
+	func validateRequest(_ interaction: P2P.Dapp.Request) -> (failure: P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType, message: String?)? {
+		guard interaction.metadata.version == P2P.Dapp.currentVersion else {
+			return (failure: .incompatibleVersion, message: "Wallet has version: \(P2P.Dapp.currentVersion), but CE sent: \(interaction.metadata.version)")
+		}
+
 		switch interaction.items {
 		case let .request(items):
 			switch items {
 			case let .unauthorized(unauthorized):
-				if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
-				}
-			case let .authorized(authorized):
-				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false ||
-					authorized.oneTimeAccounts?.numberOfAccounts.isValid == false
+
+				if
+					unauthorized.oneTimeAccounts?.isOneTime == false ||
+					unauthorized.oneTimePersonaData?.isOneTime == false
 				{
-					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
+					return (failure: .invalidRequest, message: "Invalid oneTimeAccounts or oneTimePersonaData incorrectly specified isOneTime: false, expected: true")
+				}
+
+				if
+					unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false
+				{
+					return (failure: .invalidRequest, message: "Invalid numberOfAccounts in unauthorized request")
+				}
+
+			case let .authorized(authorized):
+				if authorized.accounts?.numberOfAccounts.isValid == false {
+					return (failure: .invalidRequest, message: "Invalid numberOfAccounts in authorized request")
 				}
 			}
 		case .transaction:
-			return
+			return nil
 		}
 	}
 
