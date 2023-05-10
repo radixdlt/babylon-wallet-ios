@@ -42,16 +42,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
-		var usePersonaRequestItem: P2P.Dapp.Request.AuthUsePersonaRequestItem? {
+		var loginRequestItem: P2P.Dapp.Request.LoginRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?]
 			guard
-				case let .request(.authorized(item)) = remoteInteraction.items,
-				case let .usePersona(item) = item.auth
+				case let .request(.authorized(item)) = remoteInteraction.items
 			else {
 				return nil
 			}
-			return item
+			return item.login
 		}
 
 		var resetRequestItem: P2P.Dapp.Request.ResetRequestItem? {
@@ -65,7 +64,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return item.reset
 		}
 
-		var ongoingAccountsRequestItem: P2P.Dapp.Request.OngoingAccountsRequestItem? {
+		var accountsRequestItem: P2P.Dapp.Request.AccountsRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingAccounts]
 			guard
@@ -73,10 +72,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			else {
 				return nil
 			}
-			return item.ongoingAccounts
+			return item.accounts
 		}
 
-		var ongoingPersonaDataRequestItem: P2P.Dapp.Request.OngoingPersonaDataRequestItem? {
+		var personaDataRequestItem: P2P.Dapp.Request.PersonaDataRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingPersonaData]
 			guard
@@ -84,7 +83,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			else {
 				return nil
 			}
-			return item.ongoingPersonaData
+			return item.personaData
 		}
 
 		@PresentationState
@@ -121,8 +120,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case usePersona(
-			P2P.Dapp.Request.AuthUsePersonaRequestItem,
+		case login(
+			P2P.Dapp.Request.LoginRequestItem,
 			Profile.Network.Persona,
 			Profile.Network.AuthorizedDapp,
 			Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple
@@ -225,24 +224,33 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			if let usePersonaItem = state.usePersonaRequestItem {
-				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
-					let identityAddress = try IdentityAddress(address: usePersonaItem.identityAddress)
-					if
-						let persona = try await personasClient.getPersonas()[id: identityAddress],
-						let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
-						let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: identityAddress]
-					{
-						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
-					} else {
-						await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
-					}
-				} catch: { error, send in
-					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
-				}
-			} else {
-				return .none
-			}
+//			if let loginItem = state.loginRequestItem {
+//				return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
+			////					let identityAddress = try IdentityAddress(address: loginItem.identityAddress)
+//
+//					if let identityAddress = loginItem.identityAddress {
+//						if
+//							let persona = try await personasClient.getPersonas()[id: identityAddress],
+//							let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
+//							let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: identityAddress]
+//						{
+//	//						await send(.internal(.usePersona(usePersonaItem, persona, authorizedDapp, authorizedPersona)))
+//							await send(.internal(.login(loginItem, persona, authorizedDapp, authorizedPersona)))
+//						} else {
+//							await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
+//						}
+//					} else {
+//						await send(.internal(.login(loginItem, <#T##Profile.Network.Persona#>, <#T##Profile.Network.AuthorizedDapp#>, <#T##Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple#>)))
+//					}
+//
+//
+//				} catch: { error, send in
+//					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+//				}
+//			} else {
+//				return .none
+//			}
+			fatalError()
 
 		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
@@ -262,21 +270,22 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .usePersona(item, persona, authorizedDapp, authorizedPersona):
-			state.persona = persona
-			state.authorizedDapp = authorizedDapp
-			state.authorizedPersona = authorizedPersona
-
-			state.responseItems[.remote(.auth(.usePersona(item)))] = .remote(.auth(.usePersona(.init(
-				persona: .init(
-					identityAddress: persona.address.address,
-					label: persona.displayName.rawValue
-				)
-			))))
-
-			resetOngoingResponseItemsIfNeeded(for: &state)
-
-			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
+		case let .login(item, persona, authorizedDapp, authorizedPersona):
+			fatalError()
+//			state.persona = persona
+//			state.authorizedDapp = authorizedDapp
+//			state.authorizedPersona = authorizedPersona
+//			if let item.challenge
+//			state.responseItems[.remote(.login(item))] = .remote(.login(.init(
+//				persona: .init(
+//					identityAddress: persona.address.address,
+//					label: persona.displayName.rawValue
+//				), challengeWithProof: nil
+//			)))
+//
+//			resetOngoingResponseItemsIfNeeded(for: &state)
+//
+//			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 
 		case let .autofillOngoingResponseItemsIfPossible(payload):
 			if let accountsPayload = payload.accountsPayload {
@@ -290,7 +299,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 			if let personaDataPayload = payload.personaDataPayload {
 				let fields = personaDataPayload.fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
-				state.responseItems[.remote(.ongoingPersonaData(.init(fields: personaDataPayload.fieldsRequested)))] = .remote(.ongoingPersonaData(.init(fields: fields)))
+//				state.responseItems[.remote(.ongoingPersonaData(.init(fields: personaDataPayload.fieldsRequested)))] = .remote(.ongoingPersonaData(.init(fields: fields)))
+				state.responseItems[.remote(.personaData(.init(isOneTime: false, fields: personaDataPayload.fieldsRequested)))] = .remote(.personaData(.init(isOneTime: false, fields: fields)))
 			}
 			return continueEffect(for: &state)
 
@@ -335,30 +345,33 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				label: persona.displayName.rawValue
 			)
 
-			if let signedAuthChallenge {
-				guard
-					let entitySignature = signedAuthChallenge.entitySignatures.first,
-					signedAuthChallenge.entitySignatures.count == 1,
-					let proof = P2P.Dapp.AuthProof(
-						entitySignature: entitySignature
-					)
-				else {
-					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+			do {
+				if let signedAuthChallenge {
+					guard
+						let entitySignature = signedAuthChallenge.entitySignatures.first,
+						signedAuthChallenge.entitySignatures.count == 1,
+						let proof = P2P.Dapp.Response.AuthProof(
+							entitySignature: entitySignature
+						)
+					else {
+						return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+					}
+
+					let responseItem: State.AnyInteractionResponseItem = try .remote(.login(.init(
+						persona: responsePersona,
+						challengeWithProof: .init(
+							challenge: signedAuthChallenge.challenge,
+							proof: proof
+						)
+					)))
+					state.responseItems[item] = responseItem
+
+				} else {
+					let responseItem: State.AnyInteractionResponseItem = try .remote(.login(.init(persona: responsePersona, challengeWithProof: nil)))
+					state.responseItems[item] = responseItem
 				}
-
-				let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withChallenge(.init(
-					persona: responsePersona,
-					challenge: signedAuthChallenge.challenge,
-					proof: proof
-				)))))
-
-				state.responseItems[item] = responseItem
-
-			} else {
-				let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
-					persona: responsePersona
-				)))))
-				state.responseItems[item] = responseItem
+			} catch {
+				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Auth login discrepancy, error: \(error)")
 			}
 
 			resetOngoingResponseItemsIfNeeded(for: &state)
@@ -397,20 +410,22 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			for (request, response) in state.responseItems {
 				// NB: native case paths should simplify this mutation logic a lot
 				switch response {
-				case let .remote(.auth(.login(.withChallenge(item)))):
-					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
-						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue),
-						challenge: item.challenge,
-						proof: item.proof
-					)))))
-				case .remote(.auth(.login(.withoutChallenge))):
-					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
-						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
-					)))))
-				case .remote(.auth(.usePersona)):
-					state.responseItems[request] = .remote(.auth(.usePersona(.init(
-						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
-					))))
+//				case let .remote(.auth(.login(.withChallenge(item)))):
+//					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
+//						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue),
+//						challenge: item.challenge,
+//						proof: item.proof
+//					)))))
+//				case .remote(.auth(.login(.withoutChallenge))):
+//					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
+//						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
+//					)))))
+//				case .remote(.auth(.usePersona)):
+//					state.responseItems[request] = .remote(.auth(.usePersona(.init(
+//						persona: .init(identityAddress: persona.address.address, label: persona.displayName.rawValue)
+//					))))
+				case let .remote(.login(loginResponseItem)):
+					state.responseItems[request] = .remote(.login(loginResponseItem))
 				default:
 					continue
 				}
@@ -423,7 +438,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
 			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
-			state.responseItems[item] = .remote(.ongoingPersonaData(.init(fields: fields)))
+//			state.responseItems[item] = .remote(.ongoingPersonaData(.init(fields: fields)))
+			state.responseItems[item] = .remote(.personaData(.init(isOneTime: false, fields: fields)))
 			return continueEffect(for: &state)
 		}
 
@@ -432,7 +448,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
 			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
-			state.responseItems[item] = .remote(.oneTimePersonaData(.init(fields: fields)))
+//			state.responseItems[item] = .remote(.oneTimePersonaData(.init(fields: fields)))
+			state.responseItems[item] = .remote(.personaData(.init(isOneTime: true, fields: fields)))
 			return continueEffect(for: &state)
 		}
 
@@ -523,10 +540,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
 			if
-				let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
+				let accountsRequestItem = state.accountsRequestItem,
 				let sharedAccounts = state.authorizedPersona?.sharedAccounts
 			{
-				if ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request {
+				if accountsRequestItem.numberOfAccounts == sharedAccounts.request {
 					let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if
 						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
@@ -535,7 +552,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
 					{
 						payload.accountsPayload = .init(
-							requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
+							//							requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
+							requestItem: .remote(.accounts(accountsRequestItem)),
 							numberOfAccountsRequested: sharedAccounts.request,
 							accounts: selectedAccounts
 						)
@@ -544,17 +562,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 
 			if
-				let ongoingPersonaDataRequestItem = state.ongoingPersonaDataRequestItem,
+				let personaDataRequestItem = state.personaDataRequestItem,
 				let authorizedPersonaID = state.authorizedPersona?.id,
 				let sharedFieldIDs = state.authorizedPersona?.sharedFieldIDs
 			{
-				if ongoingPersonaDataRequestItem.fields.isSubset(of: sharedFieldIDs) {
+				if personaDataRequestItem.fields.isSubset(of: sharedFieldIDs) {
 					let allPersonas = try await personasClient.getPersonas()
 					if let persona = allPersonas[id: authorizedPersonaID] {
 						let sharedFields = persona.fields.filter { sharedFieldIDs.contains($0.id) }
 						if sharedFields.count == sharedFieldIDs.count {
 							payload.personaDataPayload = .init(
-								requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
+								//								requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
+								requestItem: .remote(.personaData(personaDataRequestItem)),
 								fieldsRequested: sharedFieldIDs,
 								fields: sharedFields
 							)
@@ -570,36 +589,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func setAccountsResponse(
 		to item: State.AnyInteractionItem,
 		accessKind: ChooseAccounts.State.AccessKind,
-		chosenAccounts: ChooseAccountsResult,
+		chosenAccounts: P2P.Dapp.Response.Accounts,
 		into state: inout State
 	) {
-		let responseItem: State.AnyInteractionResponseItem = {
-			switch chosenAccounts {
-			case let .withProofOfOwnership(challenge, accountsWithProof):
-				let accounts = Array(accountsWithProof)
-				switch accessKind {
-				case .oneTime:
-					return .remote(.oneTimeAccountsWithProofOfOwnership(.init(
-						challenge: challenge,
-						accounts: accounts
-					)))
-				case .ongoing:
-					return .remote(.ongoingAccountsWithProofOfOwnership(.init(
-						challenge: challenge,
-						accounts: accounts
-					)))
-				}
-
-			case let .withoutProofOfOwnership(accounts):
-				switch accessKind {
-				case .oneTime:
-					return .remote(.oneTimeAccountsWithoutProofOfOwnership(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init))))
-				case .ongoing:
-					return .remote(.ongoingAccountsWithoutProofOfOwnership(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init))))
-				}
-			}
-		}()
-		state.responseItems[item] = responseItem
+		state.responseItems[item] = .remote(.accounts(.init(
+			isOneTime: accessKind == .oneTime,
+			accounts: chosenAccounts
+		)))
 	}
 
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
@@ -632,7 +628,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							{
 								switch state.remoteInteraction.items {
 								case let .request(.authorized(items)):
-									return items.ongoingAccounts?.numberOfAccounts
+//									return items.ongoingAccounts?.numberOfAccounts
+									return items.accounts?.numberOfAccounts
 								default:
 									return nil
 								}
@@ -640,13 +637,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							{
 								switch response.items {
 								case let .request(.authorized(items)):
-									if let withProof = items.ongoingAccountsWithProofOfOwnership {
-										return withProof.accounts.map(\.account)
-									} else if let withoutProof = items.ongoingAccountsWithoutProofOfOwnership {
-										return withoutProof.accounts
-									} else {
-										return nil
-									}
+									return items.accounts?.accounts
 								default:
 									return nil
 								}
@@ -655,7 +646,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 							sharedAccounts = try .init(
-								accountsReferencedByAddress: OrderedSet(accounts.map { try .init(address: $0.address) }),
+								accountsReferencedByAddress: OrderedSet(accounts.map(\.address)),
 								forRequest: numberOfAccounts
 							)
 						} else {
@@ -664,7 +655,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						let sharedFieldIDs: Set<Profile.Network.Persona.Field.ID>? = {
 							switch state.remoteInteraction.items {
 							case let .request(.authorized(items)):
-								return items.ongoingPersonaData?.fields
+//								return items.ongoingPersonaData?.fields
+								return items.personaData?.fields
 							default:
 								return nil
 							}
@@ -730,19 +722,28 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 			remoteInteractionItems
 				.sorted(by: { $0.priority < $1.priority })
 				.reduce(into: []) { items, currentItem in
+//					switch currentItem {
+//					case .auth:
+//						items.append(.remote(currentItem))
+//					case let .ongoingAccounts(item):
+//						items.append(.local(.accountPermissionRequested(item.numberOfAccounts)))
+//						items.append(.remote(currentItem))
+//					case .ongoingPersonaData:
+//						items.append(.remote(currentItem))
+//					case .oneTimeAccounts:
+//						items.append(.remote(currentItem))
+//					case .oneTimePersonaData:
+//						items.append(.remote(currentItem))
+//					case .send:
+//						items.append(.remote(currentItem))
+//					}
 					switch currentItem {
-					case .auth:
-						items.append(.remote(currentItem))
-					case let .ongoingAccounts(item):
-						items.append(.local(.accountPermissionRequested(item.numberOfAccounts)))
-						items.append(.remote(currentItem))
-					case .ongoingPersonaData:
-						items.append(.remote(currentItem))
-					case .oneTimeAccounts:
-						items.append(.remote(currentItem))
-					case .oneTimePersonaData:
-						items.append(.remote(currentItem))
-					case .send:
+					case let .accounts(item):
+						if !item.isOneTime {
+							items.append(.local(.accountPermissionRequested(item.numberOfAccounts)))
+						}
+						fallthrough
+					default:
 						items.append(.remote(currentItem))
 					}
 				}
@@ -770,51 +771,46 @@ extension DappInteractionFlow.Destinations.State {
 		_ persona: Profile.Network.Persona?
 	) {
 		switch anyItem {
-		case .remote(.auth(.usePersona)):
-			return nil
-		case let .remote(.auth(.login(loginRequest))):
+		case let .remote(.login(loginRequest)):
 			self = .relayed(anyItem, with: .login(.init(
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
 				loginRequest: loginRequest
 			)))
+
 		case let .local(.accountPermissionRequested(numberOfAccounts)):
 			self = .relayed(anyItem, with: .accountPermission(.init(
 				dappMetadata: dappMetadata,
 				numberOfAccounts: numberOfAccounts
 			)))
-		case let .remote(.ongoingAccounts(item)):
+
+		case let .remote(.accounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
-				accessKind: .ongoing,
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
-				dappMetadata: dappMetadata,
+				accessKind: item.isOneTime ? .oneTime : .ongoing,
+				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress, dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))
-		case let .remote(.ongoingPersonaData(item)):
-			if let persona {
-				self = .relayed(anyItem, with: .personaDataPermission(.init(
+
+		case let .remote(.personaData(item)):
+			if item.isOneTime {
+				self = .relayed(anyItem, with: .oneTimePersonaData(.init(
 					dappMetadata: dappMetadata,
-					personaID: persona.id,
 					requiredFieldIDs: item.fields
 				)))
 			} else {
-				assertionFailure("Persona data request requires a persona")
-				return nil
+				if let persona {
+					self = .relayed(anyItem, with: .personaDataPermission(.init(
+						dappMetadata: dappMetadata,
+						personaID: persona.id,
+						requiredFieldIDs: item.fields
+					)))
+				} else {
+					assertionFailure("Persona data request requires a persona")
+					return nil
+				}
 			}
-		case let .remote(.oneTimeAccounts(item)):
-			self = .relayed(anyItem, with: .chooseAccounts(.init(
-				challenge: item.challenge,
-				accessKind: .oneTime,
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
-				dappMetadata: dappMetadata,
-				numberOfAccounts: item.numberOfAccounts
-			)))
-		case let .remote(.oneTimePersonaData(item)):
-			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
-				dappMetadata: dappMetadata,
-				requiredFieldIDs: item.fields
-			)))
+
 		case let .remote(.send(item)):
 			self = .relayed(anyItem, with: .reviewTransaction(.init(
 				transactionManifest: item.transactionManifest,
@@ -825,7 +821,7 @@ extension DappInteractionFlow.Destinations.State {
 	}
 }
 
-extension P2P.Dapp.AuthProof {
+extension P2P.Dapp.Response.AuthProof {
 	init?(entitySignature: SignatureOfEntity) {
 		let sigPub = entitySignature.signature.signatureWithPublicKey
 		guard let signature = try? sigPub.signature.serialize() else {

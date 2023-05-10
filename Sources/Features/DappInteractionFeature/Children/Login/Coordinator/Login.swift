@@ -11,7 +11,7 @@ struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
-		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
+		let loginRequest: P2P.Dapp.Request.LoginRequestItem
 
 		var isFirstPersonaOnAnyNetwork: Bool? = nil
 
@@ -27,7 +27,7 @@ struct Login: Sendable, FeatureReducer {
 		init(
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
-			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
+			loginRequest: P2P.Dapp.Request.LoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress

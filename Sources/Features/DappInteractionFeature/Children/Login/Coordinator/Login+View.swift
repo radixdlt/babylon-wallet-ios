@@ -118,34 +118,35 @@ extension Login {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - LoginRequest_Preview
-struct Login_Preview: PreviewProvider {
-	static var previews: some SwiftUI.View {
-		NavigationStack {
-			Login.View(
-				store: .init(
-					initialState: .previewValue,
-					reducer: Login()
-						.dependency(\.accountsClient, .previewValueTwoAccounts())
-						.dependency(\.authorizedDappsClient, .previewValueOnePersona())
-						.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
-						.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
-				)
-			)
-			#if os(iOS)
-			.toolbar(.visible, for: .navigationBar)
-			#endif // iOS
-		}
-	}
-}
-
-extension Login.State {
-	static let previewValue: Self = .init(
-		dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
-		dappMetadata: .previewValue, loginRequest: try! .init(challenge: .init(HexCodable32Bytes(.deadbeef32Bytes)))
-	)
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - LoginRequest_Preview
+// struct Login_Preview: PreviewProvider {
+//	static var previews: some SwiftUI.View {
+//		NavigationStack {
+//			Login.View(
+//				store: .init(
+//					initialState: .previewValue,
+//					reducer: Login()
+//						.dependency(\.accountsClient, .previewValueTwoAccounts())
+//						.dependency(\.authorizedDappsClient, .previewValueOnePersona())
+//						.dependency(\.personasClient, .previewValueTwoPersonas(existing: true))
+//						.dependency(\.personasClient, .previewValueTwoPersonas(existing: false))
+//				)
+//			)
+//			#if os(iOS)
+//			.toolbar(.visible, for: .navigationBar)
+//			#endif // iOS
+//		}
+//	}
+// }
+//
+// extension Login.State {
+//	static let previewValue: Self = .init(
+//		dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
+//		dappMetadata: .previewValue,
+//		loginRequest: try! .init(challenge: .init(HexCodable32Bytes(.deadbeef32Bytes)))
+//	)
+// }
+// #endif

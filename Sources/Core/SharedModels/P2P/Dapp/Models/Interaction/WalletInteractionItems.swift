@@ -38,40 +38,44 @@ extension P2P.Dapp.Request {
 	}
 
 	public struct UnauthorizedRequestItems: Sendable, Hashable, Decodable {
-		public let oneTimeAccounts: OneTimeAccountsRequestItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestItem?
+		public let oneTimeAccounts: AccountsRequestItem?
+		public let oneTimePersonaData: PersonaDataRequestItem?
 
 		public init(
-			oneTimeAccounts: OneTimeAccountsRequestItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestItem?
-		) {
+			oneTimeAccounts: AccountsRequestItem?,
+			oneTimePersonaData: PersonaDataRequestItem?
+		) throws {
+			if let oneTimeAccounts {
+				guard oneTimeAccounts.isOneTime else {
+					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
+				}
+			}
+			if let oneTimePersonaData {
+				guard oneTimePersonaData.isOneTime else {
+					throw P2P.Dapp.Response.WalletInteractionFailureResponse.ErrorType.invalidRequest
+				}
+			}
 			self.oneTimeAccounts = oneTimeAccounts
 			self.oneTimePersonaData = oneTimePersonaData
 		}
 	}
 
 	public struct AuthorizedRequestItems: Sendable, Hashable, Decodable {
-		public let auth: AuthRequestItem
+		public let login: LoginRequestItem
 		public let reset: ResetRequestItem?
-		public let ongoingAccounts: OngoingAccountsRequestItem?
-		public let ongoingPersonaData: OngoingPersonaDataRequestItem?
-		public let oneTimeAccounts: OneTimeAccountsRequestItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestItem?
+		public let accounts: AccountsRequestItem?
+		public let personaData: PersonaDataRequestItem?
 
 		public init(
-			auth: AuthRequestItem,
+			login: LoginRequestItem,
 			reset: ResetRequestItem?,
-			ongoingAccounts: OngoingAccountsRequestItem?,
-			ongoingPersonaData: OngoingPersonaDataRequestItem?,
-			oneTimeAccounts: OneTimeAccountsRequestItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestItem?
+			accounts: AccountsRequestItem?,
+			personaData: PersonaDataRequestItem?
 		) {
-			self.auth = auth
+			self.login = login
 			self.reset = reset
-			self.ongoingAccounts = ongoingAccounts
-			self.ongoingPersonaData = ongoingPersonaData
-			self.oneTimeAccounts = oneTimeAccounts
-			self.oneTimePersonaData = oneTimePersonaData
+			self.accounts = accounts
+			self.personaData = personaData
 		}
 	}
 }

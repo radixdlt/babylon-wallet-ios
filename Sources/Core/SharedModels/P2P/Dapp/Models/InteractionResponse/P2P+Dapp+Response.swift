@@ -67,6 +67,10 @@ extension P2P.Dapp.Response {
 	public struct ChallengeWithProof: Sendable, Hashable {
 		public let challenge: P2P.Dapp.Request.AuthChallengeNonce
 		public let proof: P2P.Dapp.Response.AuthProof
+		public init(challenge: P2P.Dapp.Request.AuthChallengeNonce, proof: P2P.Dapp.Response.AuthProof) {
+			self.challenge = challenge
+			self.proof = proof
+		}
 	}
 
 	public enum Accounts: Sendable, Hashable {

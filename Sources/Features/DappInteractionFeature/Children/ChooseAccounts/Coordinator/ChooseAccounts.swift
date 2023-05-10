@@ -198,15 +198,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			state.destination = nil
 
 			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set((state.selectedAccounts ?? []).map(\.account.id))
-			let walletAccountsWithProof: [P2P.Dapp.Response.WalletAccountWithProof] = signedAuthChallenge.entitySignatures.map {
+			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
 				guard case let .account(account) = $0.signerEntity else {
 					fatalError()
 				}
 				accountsLeftToVerifyDidSign.remove(account.id)
-				guard let proof = P2P.Dapp.AuthProof(entitySignature: $0) else {
+				guard let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0) else {
 					fatalError()
 				}
-				return P2P.Dapp.Response.WalletAccountWithProof(account: .init(account: account), proof: proof)
+				return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
 			}
 			guard accountsLeftToVerifyDidSign.isEmpty else {
 				loggerGlobal.error("Failed to sign with all accounts..")
@@ -215,7 +215,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 			let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
 				challenge: signedAuthChallenge.challenge,
-				IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>.init(uniqueElements: walletAccountsWithProof)
+				IdentifiedArrayOf<P2P.Dapp.Response.Accounts.WithProof>.init(uniqueElements: walletAccountsWithProof)
 			)
 			return .send(.delegate(.continueButtonTapped(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
 
