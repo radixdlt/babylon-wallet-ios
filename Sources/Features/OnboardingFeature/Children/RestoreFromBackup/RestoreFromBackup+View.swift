@@ -43,7 +43,7 @@ extension RestoreFromBackup.View {
 										.selectedProfile($0)
 									}
 								),
-                                                                from: backupProfiles
+								from: backupProfiles
 							) { item in
 								iCloudBackupDataCard(item)
 							}
@@ -78,13 +78,13 @@ extension RestoreFromBackup.View {
 
 	private func iCloudBackupDataCard(_ item: SelectionItem<Profile>) -> some View {
 		let profile = item.value
-                let isVersionCompatible = profile.header.isVersionCompatible()
+		let isVersionCompatible = profile.header.isVersionCompatible()
 
-                return Card(action: item.action, isDisabled: !isVersionCompatible) {
+		return Card(action: item.action, isDisabled: !isVersionCompatible) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
-                                        Text("Creating Device: \(profile.header.creatingDevice.description.rawValue)")
+					Text("Creating Device: \(profile.header.creatingDevice.description.rawValue)")
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 					Text("Creation Date: \(formatDate(profile.header.creationDate))")
@@ -94,22 +94,21 @@ extension RestoreFromBackup.View {
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 
-                                        if !isVersionCompatible {
-                                                Text("Incompatible Wallet data")
-                                                        .foregroundColor(.red)
-                                                        .textStyle(.body2HighImportance)
-                                        }
+					if !isVersionCompatible {
+						Text("Incompatible Wallet data")
+							.foregroundColor(.red)
+							.textStyle(.body2HighImportance)
+					}
 				}
-                                if isVersionCompatible {
-                                        RadioButton(
-                                                appearance: .dark,
-                                                state: item.isSelected ? .selected : .unselected
-                                        )
-
-                                }
+				if isVersionCompatible {
+					RadioButton(
+						appearance: .dark,
+						state: item.isSelected ? .selected : .unselected
+					)
+				}
 			}
 			.padding(.medium2)
-                }
+		}
 	}
 
 	func formatDate(_ date: Date) -> String {

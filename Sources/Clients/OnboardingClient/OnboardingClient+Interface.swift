@@ -13,7 +13,7 @@ public struct OnboardingClient: Sendable {
 		loadProfile: @escaping LoadProfile,
 		loadProfileBackups: @escaping LoadProfileBackups,
 		importProfileSnapshot: @escaping ImportProfileSnapshot,
-                importCloudProfile: @escaping ImportCloudProfile,
+		importCloudProfile: @escaping ImportCloudProfile,
 		commitEphemeral: @escaping CommitEphemeral
 	) {
 		self.loadProfile = loadProfile
@@ -26,7 +26,7 @@ public struct OnboardingClient: Sendable {
 
 extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> LoadProfileOutcome
-        public typealias LoadProfileBackups = @Sendable () async -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>?
+	public typealias LoadProfileBackups = @Sendable () async -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>?
 
 	public typealias CommitEphemeral = @Sendable () async throws -> Void
 	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void

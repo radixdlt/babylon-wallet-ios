@@ -111,14 +111,14 @@ private extension StoreOf<PersonaDetails> {
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
 		#if DEBUG
-                .init(
+		.init(
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona,
 			canCreateAuthKey: canCreateAuthKey
 		)
 		#else
-			.init(
+		.init(
 				thumbnail: nil,
 				personaName: personaName,
 				isDappPersona: isDappPersona

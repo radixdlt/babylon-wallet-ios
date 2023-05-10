@@ -32,8 +32,8 @@ public struct Profile:
 	public init(
 		header: ProfileSnapshot.Header,
 		factorSources: FactorSources,
-                appPreferences: AppPreferences = .init(),
-                networks: Networks = .init()
+		appPreferences: AppPreferences = .init(),
+		networks: Networks = .init()
 	) {
 		self.header = header
 		self.factorSources = factorSources

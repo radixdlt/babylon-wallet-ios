@@ -41,7 +41,7 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		case .appeared:
 			return .run { send in
 				await send(.internal(.loadBackupProfilesResult(
-					await onboardingClient.loadProfileBackups()
+					onboardingClient.loadProfileBackups()
 				)))
 			}
 
@@ -59,7 +59,7 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-                                try await onboardingClient.importICloudProfile(selectedProfile.header)
+				try await onboardingClient.importICloudProfile(selectedProfile.header)
 				await send(.delegate(.completed))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

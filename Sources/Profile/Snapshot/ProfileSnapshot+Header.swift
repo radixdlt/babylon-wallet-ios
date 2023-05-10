@@ -21,7 +21,7 @@ extension ProfileSnapshot {
 		public let creatingDevice: UsedDeviceInfo
 
 		/// The device on which the profile last used.
-                /// **Mutable**: will be updated every time the profile is used on a different device
+		/// **Mutable**: will be updated every time the profile is used on a different device
 		public var lastUsedOnDevice: UsedDeviceInfo
 
 		/// A locally generated stable identfier of this Profile. Useful for checking if
@@ -35,8 +35,8 @@ extension ProfileSnapshot {
 		/// When the profile was last updated, by modifications from the user.
 		public var lastModified: Date
 
-                /// The hint about the content held by the profile
-                public var contentHint: ContentHint
+		/// The hint about the content held by the profile
+		public var contentHint: ContentHint
 
 		/// A version of the Profile Snapshot data format used for compatibility checks.
 		public let snapshotVersion: Version
@@ -47,7 +47,7 @@ extension ProfileSnapshot {
 			id: ID,
 			creationDate: Date,
 			lastModified: Date,
-                        contentHint: ContentHint,
+			contentHint: ContentHint,
 			snapshotVersion: Version = .minimum
 		) {
 			self.creatingDevice = creatingDevice
@@ -55,60 +55,60 @@ extension ProfileSnapshot {
 			self.id = id
 			self.creationDate = creationDate
 			self.lastModified = lastModified
-                        self.contentHint = contentHint
+			self.contentHint = contentHint
 			self.snapshotVersion = snapshotVersion
 		}
 	}
 }
 
 extension ProfileSnapshot.Header {
-        public typealias Version = Tagged<Self, UInt32>
-        public typealias ID = UUID
+	public typealias Version = Tagged<Self, UInt32>
+	public typealias ID = UUID
 
-        public struct UsedDeviceInfo:
-                Sendable,
-                Hashable,
-                Codable
-        {
-                /// `"My private phone (iPhone SE (2nd generation))"`
-                public let description: NonEmptyString
+	public struct UsedDeviceInfo:
+		Sendable,
+		Hashable,
+		Codable
+	{
+		/// `"My private phone (iPhone SE (2nd generation))"`
+		public let description: NonEmptyString
 
-                /// To detect if the same Profile is used on two different phones
-                public let id: ID; public typealias ID = UUID
+		/// To detect if the same Profile is used on two different phones
+		public let id: ID; public typealias ID = UUID
 
-                /// Date when the Profile was tied to this device
-                public let date: Date
+		/// Date when the Profile was tied to this device
+		public let date: Date
 
-                public init(
-                        description: NonEmptyString,
-                        id: ID,
-                        date: Date
-                ) {
-                        self.description = description
-                        self.id = id
-                        self.date = date
-                }
-        }
+		public init(
+			description: NonEmptyString,
+			id: ID,
+			date: Date
+		) {
+			self.description = description
+			self.id = id
+			self.date = date
+		}
+	}
 
-        public struct ContentHint:
-                Sendable,
-                Hashable,
-                Codable
-        {
-                public var numberOfAccountsOnAllNetworksInTotal: Int
-                public var numberOfPersonasOnAllNetworksInTotal: Int
-                public var numberOfNetworks: Int
+	public struct ContentHint:
+		Sendable,
+		Hashable,
+		Codable
+	{
+		public var numberOfAccountsOnAllNetworksInTotal: Int
+		public var numberOfPersonasOnAllNetworksInTotal: Int
+		public var numberOfNetworks: Int
 
-                public init(
-                        numberOfAccountsOnAllNetworksInTotal: Int = 0,
-                        numberOfPersonasOnAllNetworksInTotal: Int = 0,
-                        numberOfNetworks: Int = 0
-                ) {
-                        self.numberOfAccountsOnAllNetworksInTotal = numberOfAccountsOnAllNetworksInTotal
-                        self.numberOfPersonasOnAllNetworksInTotal = numberOfPersonasOnAllNetworksInTotal
-                        self.numberOfNetworks = numberOfNetworks
-                }
-        }
+		public init(
+			numberOfAccountsOnAllNetworksInTotal: Int = 0,
+			numberOfPersonasOnAllNetworksInTotal: Int = 0,
+			numberOfNetworks: Int = 0
+		) {
+			self.numberOfAccountsOnAllNetworksInTotal = numberOfAccountsOnAllNetworksInTotal
+			self.numberOfPersonasOnAllNetworksInTotal = numberOfPersonasOnAllNetworksInTotal
+			self.numberOfNetworks = numberOfNetworks
+		}
+	}
 }
 
 extension ProfileSnapshot.Header.Version {
@@ -166,14 +166,14 @@ extension ProfileSnapshot.Header {
 		}
 	}
 
-        public func isVersionCompatible() -> Bool {
-                do {
-                        try validateCompatibility()
-                        return true
-                } catch {
-                        return false
-                }
-        }
+	public func isVersionCompatible() -> Bool {
+		do {
+			try validateCompatibility()
+			return true
+		} catch {
+			return false
+		}
+	}
 }
 
 extension ProfileSnapshot.Header {

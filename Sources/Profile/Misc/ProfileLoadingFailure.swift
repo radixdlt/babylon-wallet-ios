@@ -16,7 +16,7 @@ extension Profile {
 		// error when creating a profile from a snapshot.
 		case failedToCreateProfileFromSnapshot(FailedToCreateProfileFromSnapshot)
 
-                case profileUsedOnAnotherDevice(ProfileIsUsedOnAnotherDeviceError)
+		case profileUsedOnAnotherDevice(ProfileIsUsedOnAnotherDeviceError)
 	}
 }
 
@@ -35,13 +35,13 @@ extension Profile {
 		case unknown(UnknownDecodingError)
 	}
 
-        public struct ProfileIsUsedOnAnotherDeviceError: Sendable, Swift.Error, Hashable {
-                public let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo
+	public struct ProfileIsUsedOnAnotherDeviceError: Sendable, Swift.Error, Hashable {
+		public let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo
 
-                public init(lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo) {
-                        self.lastUsedOnDevice = lastUsedOnDevice
-                }
-        }
+		public init(lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo) {
+			self.lastUsedOnDevice = lastUsedOnDevice
+		}
+	}
 }
 
 extension Profile.FailedToCreateProfileFromSnapshot {

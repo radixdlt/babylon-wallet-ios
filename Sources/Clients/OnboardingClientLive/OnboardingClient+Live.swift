@@ -21,7 +21,7 @@ extension OnboardingClient: DependencyKey {
 				do {
 					return try await secureStorageClient.loadProfileHeaderList()
 				} catch {
-                                        // Corupt Profile Headers, delete
+					// Corupt Profile Headers, delete
 					try? await secureStorageClient.deleteProfileHeaderList()
 					return nil
 				}

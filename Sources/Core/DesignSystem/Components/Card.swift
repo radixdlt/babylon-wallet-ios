@@ -16,7 +16,7 @@ public struct Card<Contents: View>: View {
 
 	public init(
 		action: @escaping () -> Void,
-                isDisabled: Bool = false,
+		isDisabled: Bool = false,
 		@ViewBuilder contents: () -> Contents
 	) {
 		self.action = action

@@ -168,10 +168,10 @@ public struct App: Sendable, FeatureReducer {
 
 			case .existingProfile:
 				return checkAccountRecoveryNeeded()
-                        case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(device)):
-                                // TODO: Show the error with the device info
-                                return goToOnboarding(state: &state)
-                        }
+			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(device)):
+				// TODO: Show the error with the device info
+				return goToOnboarding(state: &state)
+			}
 
 		default:
 			return .none
