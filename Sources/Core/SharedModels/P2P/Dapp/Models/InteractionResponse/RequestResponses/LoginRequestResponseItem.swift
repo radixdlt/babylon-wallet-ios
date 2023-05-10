@@ -9,7 +9,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		public init(
 			persona: P2P.Dapp.Response.Persona,
 			challengeWithProof: P2P.Dapp.Response.ChallengeWithProof?
-		) throws {
+		) {
 			self.persona = persona
 			self.challenge = challengeWithProof?.challenge
 			self.proof = challengeWithProof?.proof
