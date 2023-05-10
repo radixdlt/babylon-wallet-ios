@@ -110,22 +110,24 @@ private extension StoreOf<PersonaDetails> {
 // MARK: - Extensions
 
 private extension PersonaDetails.State {
+	#if DEBUG
 	var viewState: PersonaDetails.ViewState {
-		#if DEBUG
 		.init(
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona,
 			canCreateAuthKey: canCreateAuthKey
 		)
-		#else
+	}
+	#else
+	var viewState: PersonaDetails.ViewState {
 		.init(
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona
 		)
-		#endif
 	}
+	#endif
 
 	var personaName: String {
 		switch mode {
