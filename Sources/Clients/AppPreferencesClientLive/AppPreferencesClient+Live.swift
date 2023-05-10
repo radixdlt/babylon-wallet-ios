@@ -23,22 +23,20 @@ extension AppPreferencesClient: DependencyKey {
 			},
 			setIsCloudProfileSyncEnabled: { isEnabled in
 				@Dependency(\.secureStorageClient) var secureStorageClient
+				let profile = await getProfileStore().profile
+				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
-				guard let change = try await (getProfileStore().updating { profile -> CloudProfileSyncActivation? in
-					let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
-					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
-					switch (wasEnabled, isEnabled) {
-					case (false, false): return nil
-					case (true, true): return nil
-					case (true, false): return .disable
-					case (false, true): return .enable
+				switch (wasEnabled, isEnabled) {
+				case (false, false), (true, true): return // Do not update if no change
+				case (true, false), (false, true):
+					try await getProfileStore().updating { profile in
+						profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
 					}
-				}) else {
-					return
+					try await secureStorageClient.updateIsCloudProfileSyncEnabled(
+						profile.id,
+						isEnabled ? .enable : .disable
+					)
 				}
-
-				let profileId = await getProfileStore().profile.header.id
-				try await secureStorageClient.updateIsCloudProfileSyncEnabled(profileId, change)
 			}
 		)
 	}

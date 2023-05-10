@@ -25,7 +25,6 @@ extension OnboardingClient: DependencyKey {
 					try? await secureStorageClient.deleteProfileHeaderList()
 					return nil
 				}
-
 			},
 			importProfileSnapshot: {
 				try await getProfileStore().importProfileSnapshot($0)

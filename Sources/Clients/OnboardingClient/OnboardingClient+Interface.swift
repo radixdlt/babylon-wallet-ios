@@ -26,7 +26,7 @@ public struct OnboardingClient: Sendable {
 
 extension OnboardingClient {
 	public typealias LoadProfile = @Sendable () async -> LoadProfileOutcome
-	public typealias LoadProfileBackups = @Sendable () async -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>?
+	public typealias LoadProfileBackups = @Sendable () async -> ProfileSnapshot.HeaderList?
 
 	public typealias CommitEphemeral = @Sendable () async throws -> Void
 	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void

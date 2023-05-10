@@ -10,7 +10,6 @@ public struct FactorSourcesClient: Sendable {
 	public var addOffDeviceFactorSource: AddOffDeviceFactorSource
 	public var getSigningFactors: GetSigningFactors
 	public var updateLastUsed: UpdateLastUsed
-
 	public init(
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
