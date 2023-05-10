@@ -365,33 +365,29 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				label: persona.displayName.rawValue
 			)
 
-			do {
-				if let signedAuthChallenge {
-					guard
-						let entitySignature = signedAuthChallenge.entitySignatures.first,
-						signedAuthChallenge.entitySignatures.count == 1,
-						let proof = P2P.Dapp.Response.AuthProof(
-							entitySignature: entitySignature
-						)
-					else {
-						return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
-					}
-
-					let responseItem: State.AnyInteractionResponseItem = try .remote(.login(.init(
-						persona: responsePersona,
-						challengeWithProof: .init(
-							challenge: signedAuthChallenge.challenge,
-							proof: proof
-						)
-					)))
-					state.responseItems[item] = responseItem
-
-				} else {
-					let responseItem: State.AnyInteractionResponseItem = try .remote(.login(.init(persona: responsePersona, challengeWithProof: nil)))
-					state.responseItems[item] = responseItem
+			if let signedAuthChallenge {
+				guard
+					let entitySignature = signedAuthChallenge.entitySignatures.first,
+					signedAuthChallenge.entitySignatures.count == 1,
+					let proof = P2P.Dapp.Response.AuthProof(
+						entitySignature: entitySignature
+					)
+				else {
+					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 				}
-			} catch {
-				return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Auth login discrepancy, error: \(error)")
+
+				let responseItem: State.AnyInteractionResponseItem = .remote(.login(.init(
+					persona: responsePersona,
+					challengeWithProof: .init(
+						challenge: signedAuthChallenge.challenge,
+						proof: proof
+					)
+				)))
+				state.responseItems[item] = responseItem
+
+			} else {
+				let responseItem: State.AnyInteractionResponseItem = .remote(.login(.init(persona: responsePersona, challengeWithProof: nil)))
+				state.responseItems[item] = responseItem
 			}
 
 			resetOngoingResponseItemsIfNeeded(for: &state)
