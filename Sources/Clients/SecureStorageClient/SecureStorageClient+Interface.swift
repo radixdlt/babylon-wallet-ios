@@ -30,8 +30,8 @@ extension SecureStorageClient {
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSource.ID) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepIcloudIfPresent: Bool) async throws -> Void
 
-	public typealias LoadProfileHeaderList = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>?
-	public typealias SaveProfileHeaderList = @Sendable (NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>) async throws -> Void
+	public typealias LoadProfileHeaderList = @Sendable () async throws -> NonEmpty<Set<ProfileSnapshot.Header>>?
+	public typealias SaveProfileHeaderList = @Sendable (NonEmpty<Set<ProfileSnapshot.Header>>) async throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {

@@ -46,8 +46,8 @@ extension OnboardingClient: DependencyKey {
 			importProfileSnapshot: {
 				try await getProfileStore().importProfileSnapshot($0)
 			},
-			importICloudProfile: { id in
-				try await getProfileStore().importICloudProfileSnapshot(id)
+			importICloudProfile: { header in
+				try await getProfileStore().importICloudProfileSnapshot(header)
 			},
 			commitEphemeral: {
 				try await getProfileStore().commitEphemeral()

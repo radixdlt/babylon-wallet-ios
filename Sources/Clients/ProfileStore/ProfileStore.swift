@@ -178,28 +178,34 @@ extension ProfileStore {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		do {
+                        // Update the header with the current device info
                         var header = header
+                        @Dependency(\.device) var device
+                        /// we use name as label and model as description
+                        let deviceName = await device.name
+                        let deviceModel = await device.model
 
-                        // read the device id
-                        @Dependency(\.date) var dateGenerator
-                        @Dependency(\.uuid) var uuid
+                        let description = NonEmptyString(rawValue: "\(deviceName) (\(deviceModel))")!
+                        let deviceInfo = await Self.createDeviceInfo(description)
+                        header.lastUsedOnDevice = deviceInfo
+                        try await updateProfileHeadersList(header)
 
-                        let date = dateGenerator()
-                        let identifier = uuid().uuidString
-                        let description = NonEmptyString(rawValue: "sd")!
-
-                        header.lastUsedOnDevice = ProfileSnapshot.Header.UsedDeviceInfo(description: description, deviceIdentifier: .init(rawValue: identifier)!, date: date)
-                        // Update the header
-                        // Update the profile
-
+                        // Load the related profile snapshot
                         let profileSnapshot = try await secureStorageClient.loadProfileSnapshot(header.id)
 			guard var profileSnapshot else {
 				struct FailedToLoadProfile: Swift.Error {}
 				throw FailedToLoadProfile()
 			}
-                        profileSnapshot.header.lastUsedOnDevice = header.lastUsedOnDevice
-                        await userDefaultsClient.setActiveProfileId(header.id)
+
+                        // Update the header with any changes made. Now only lastUsedOnDevice is updated
+                        profileSnapshot.header = header
+                        // Save the update
+                        try await secureStorageClient.saveProfileSnapshot(profileSnapshot)
+
                         try changeState(to: .persisted(.init(snapshot: profileSnapshot)))
+
+                        // Update to new active profile id, so it is used from now on.
+                        await userDefaultsClient.setActiveProfileId(header.id)
 		} catch {
 			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -214,12 +220,10 @@ extension ProfileStore {
 
 		do {
                         await userDefaultsClient.setActiveProfileId(ephemeral.profile.header.id)
-                        if var profileHeaders = try await secureStorageClient.loadProfileHeaderList() {
-                                profileHeaders.append(ephemeral.profile.header)
-                                try await secureStorageClient.saveProfileHeaderList(profileHeaders)
-                        } else {
-                                try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [ephemeral.profile.header])!)
-                        }
+
+                        // Save the new profile header
+                        try await updateProfileHeadersList(ephemeral.profile.header)
+
 			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
@@ -262,6 +266,29 @@ extension ProfileStore {
 			changeState(to: .ephemeral(ephemeral))
 
 		case .persisted:
+                        // Check if the profile is still owned by the device
+                        if let lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(profile.header.id)?.header.lastUsedOnDevice {
+                                let deviceId = await Self.getDeviceId()
+                                guard lastUsedOnDevice.id == deviceId else {
+                                        throw Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
+                                }
+                        }
+
+                        @Dependency(\.date) var dateGenerator
+                        var profile = profile
+                        profile.header.lastModified = dateGenerator()
+                        let networks = profile.networks
+
+                        profile.header.contentHint.numberOfNetworks = networks.count
+                        profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.reduce(0, { partialResult, network in
+                                partialResult + network.accounts.count
+                        })
+                        profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.reduce(0, { partialResult, network in
+                                partialResult + network.personas.count
+                        })
+
+
+                        try await updateProfileHeadersList(profile.header)
 			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 			changeState(to: .persisted(profile))
 		}
@@ -280,6 +307,15 @@ extension ProfileStore {
 		let ephemeral = await Self.newEphemeralProfile()
 		changeState(to: .ephemeral(.init(profile: ephemeral, loadFailure: nil)))
 	}
+
+        func updateProfileHeadersList(_ header: ProfileSnapshot.Header) async throws {
+                if var profileHeaders = try await secureStorageClient.loadProfileHeaderList() {
+                        profileHeaders.insert(header)
+                        try await secureStorageClient.saveProfileHeaderList(profileHeaders)
+                } else {
+                        try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [header])!)
+                }
+        }
 }
 
 // MARK: Sugar (Public)
@@ -379,6 +415,10 @@ extension ProfileStore {
 				)
 			}
 
+                        guard await decodedHeader.lastUsedOnDevice.id == Self.getDeviceId() else {
+                                return .failure(.profileUsedOnAnotherDevice(.init(lastUsedOnDevice: decodedHeader.lastUsedOnDevice)))
+                        }
+
 			do {
 				try decodedHeader.validateCompatibility()
 			} catch {
@@ -474,20 +514,16 @@ extension ProfileStore {
 
                         let date = dateGenerator.now
                         let deviceDescription = deviceDescription(label: label, description: description)
-                        // read from UserDefaults
-                        let deviceID = uuid().uuidString
+                        let deviceInfo = await createDeviceInfo(deviceDescription)
 
-                        let deviceInfo = ProfileSnapshot.Header.UsedDeviceInfo(
-                                description: deviceDescription,
-                                deviceIdentifier: .init(rawValue: deviceID)!, // crash the app since we need the id to be valid.
-                                date: date
+                        let header = ProfileSnapshot.Header(
+                                creatingDevice: deviceInfo,
+                                lastUsedOnDevice: deviceInfo, // Whe creating the Profile the lastUsedOnDevice is the same as creatingDevice
+                                id: uuid(),
+                                creationDate: date,
+                                lastModified: date,
+                                contentHint: .init() // Empty initially
                         )
-
-                        let header = ProfileSnapshot.Header(creatingDevice: deviceInfo,
-                                                            lastUsedOnDevice: deviceInfo,
-                                                            id: uuid(),
-                                                            creationDate: date,
-                                                            lastModified: date)
                         
 
                         return Profile(header: header, factorSources: .init(factorSource.factorSource))
@@ -544,20 +580,30 @@ extension ProfileStore {
 	}
 }
 
-extension Profile {
-        func createDeviceInfo(deviceDescription: NonEmptyString) -> ProfileSnapshot.Header.UsedDeviceInfo {
+extension ProfileStore {
+        static func createDeviceInfo(_ deviceDescription: NonEmptyString) async -> ProfileSnapshot.Header.UsedDeviceInfo {
                 @Dependency(\.date) var dateGenerator
-                @Dependency(\.uuid) var uuid
-
                 let date = dateGenerator.now
-                // read from UserDefaults
-                let deviceID = uuid().uuidString
 
-                return ProfileSnapshot.Header.UsedDeviceInfo(
+                return await ProfileSnapshot.Header.UsedDeviceInfo(
                         description: deviceDescription,
-                        deviceIdentifier: .init(rawValue: deviceID)!, // crash the app since we need the id to be valid.
+                        id: getDeviceId(),
                         date: date
                 )
+        }
+
+        static func getDeviceId() async -> ProfileSnapshot.Header.UsedDeviceInfo.ID {
+                @Dependency(\.userDefaultsClient) var userDefaults
+
+                guard let deviceId = userDefaults.getDeviceId() else {
+                        @Dependency(\.uuid) var uuid
+
+                        let deviceId = uuid()
+                        await userDefaults.setDeviceId(deviceId)
+                        return deviceId
+                }
+
+                return deviceId
         }
 }
 
@@ -584,14 +630,18 @@ extension UserDefaultsClient {
 			}
 	}
 
-        func deviceId() -> UUID? {
+        func getDeviceId() -> ProfileSnapshot.Header.UsedDeviceInfo.ID? {
                 stringForKey(Self.deviceId)
                         .flatMap {
                                 .init(uuidString: $0)
                         }
         }
 
-	func setActiveProfileId(_ id: ProfileSnapshot.Header.ID) async {
+        func setDeviceId(_ id: UUID) async {
+                await setString(id.uuidString, Self.deviceId)
+        }
+
+        func setActiveProfileId(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) async {
 		await setString(id.uuidString, Self.activeProfileId)
 	}
 

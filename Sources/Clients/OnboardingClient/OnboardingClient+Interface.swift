@@ -30,5 +30,5 @@ extension OnboardingClient {
 
 	public typealias CommitEphemeral = @Sendable () async throws -> Void
 	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	public typealias ImportICloudProfile = @Sendable (ProfileSnapshot.Header.ID) async throws -> Void
+	public typealias ImportICloudProfile = @Sendable (ProfileSnapshot.Header) async throws -> Void
 }

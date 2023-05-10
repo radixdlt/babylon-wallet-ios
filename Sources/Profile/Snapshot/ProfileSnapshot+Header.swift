@@ -12,33 +12,6 @@ extension ProfileSnapshot {
 		CustomDumpReflectable,
 		Identifiable
 	{
-                public struct UsedDeviceInfo:
-                        Sendable,
-                        Hashable,
-                        Codable
-                {
-                        /// `"My private phone (iPhone SE (2nd generation))"`
-                        public let description: NonEmptyString
-
-                        /// To detect if the same Profile is used on two different phones
-                        public let deviceIdentifier: NonEmptyString
-
-                        /// Date when the Profile was tied to this device
-                        public let date: Date
-
-                        public init(
-                                description: NonEmptyString,
-                                deviceIdentifier: NonEmptyString,
-                                date: Date
-                        ) {
-                                self.description = description
-                                self.deviceIdentifier = deviceIdentifier
-                                self.date = date
-                        }
-                }
-
-		public typealias Version = Tagged<Self, UInt32>
-
 		/// A description of the device the Profile was first generated on,
 		/// typically the wallet app reads a human provided device name
 		/// if present and able, and/or a model description of the device e.g:
@@ -47,22 +20,30 @@ extension ProfileSnapshot {
 		/// when the profile is restored from backup.
 		public let creatingDevice: UsedDeviceInfo
 
-		/// The device on which the profile last used
+		/// The device on which the profile last used.
+                /// **Mutable**: will be updated every time the profile is used on a different device
 		public var lastUsedOnDevice: UsedDeviceInfo
 
 		/// A locally generated stable identfier of this Profile. Useful for checking if
 		/// to Profiles which are inequal based on `Equatable` (content) might be the
 		/// semantically the same, based on the ID.
-		public let id: ID; public typealias ID = UUID
+		public let id: ID
 
 		/// When this profile was first created
 		public let creationDate: Date
 
-		/// When the profile was last updated, by modifications from the user
-		public let lastModified: Date
+		/// When the profile was last updated, by modifications from the user.
+		public var lastModified: Date
+
+                /// The hint about the content held by the profile
+                public var contentHint: ContentHint
 
 		/// A version of the Profile Snapshot data format used for compatibility checks.
 		public let snapshotVersion: Version
+
+                public func hash(into hasher: inout Hasher) {
+                        hasher.combine(id)
+                }
 
 		public init(
 			creatingDevice: UsedDeviceInfo,
@@ -70,6 +51,7 @@ extension ProfileSnapshot {
 			id: ID,
 			creationDate: Date,
 			lastModified: Date,
+                        contentHint: ContentHint,
 			snapshotVersion: Version = .minimum
 		) {
 			self.creatingDevice = creatingDevice
@@ -77,9 +59,60 @@ extension ProfileSnapshot {
 			self.id = id
 			self.creationDate = creationDate
 			self.lastModified = lastModified
+                        self.contentHint = contentHint
 			self.snapshotVersion = snapshotVersion
 		}
 	}
+}
+
+extension ProfileSnapshot.Header {
+        public typealias Version = Tagged<Self, UInt32>
+        public typealias ID = UUID
+
+        public struct UsedDeviceInfo:
+                Sendable,
+                Hashable,
+                Codable
+        {
+                /// `"My private phone (iPhone SE (2nd generation))"`
+                public let description: NonEmptyString
+
+                /// To detect if the same Profile is used on two different phones
+                public let id: ID; public typealias ID = UUID
+
+                /// Date when the Profile was tied to this device
+                public let date: Date
+
+                public init(
+                        description: NonEmptyString,
+                        id: ID,
+                        date: Date
+                ) {
+                        self.description = description
+                        self.id = id
+                        self.date = date
+                }
+        }
+
+        public struct ContentHint:
+                Sendable,
+                Hashable,
+                Codable
+        {
+                public var numberOfAccountsOnAllNetworksInTotal: Int
+                public var numberOfPersonasOnAllNetworksInTotal: Int
+                public var numberOfNetworks: Int
+
+                public init(
+                        numberOfAccountsOnAllNetworksInTotal: Int = 0,
+                        numberOfPersonasOnAllNetworksInTotal: Int = 0,
+                        numberOfNetworks: Int = 0
+                ) {
+                        self.numberOfAccountsOnAllNetworksInTotal = numberOfAccountsOnAllNetworksInTotal
+                        self.numberOfPersonasOnAllNetworksInTotal = numberOfPersonasOnAllNetworksInTotal
+                        self.numberOfNetworks = numberOfNetworks
+                }
+        }
 }
 
 extension ProfileSnapshot.Header.Version {

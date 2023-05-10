@@ -80,11 +80,11 @@ extension RestoreFromBackup.View {
 		let profile = item.value
                 let isVersionCompatible = profile.header.isVersionCompatible()
 
-                return Card(action: item.action, isDisabled: isVersionCompatible) {
+                return Card(action: item.action, isDisabled: !isVersionCompatible) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
-					Text("Creating Device: \(profile.header.creatingDevice.description)")
+                                        Text("Creating Device: \(profile.header.creatingDevice.description.rawValue)")
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 					Text("Creation Date: \(formatDate(profile.header.creationDate))")

@@ -16,7 +16,7 @@ public struct Profile:
 		header.snapshotVersion
 	}
 
-	public let header: ProfileSnapshot.Header
+	public var header: ProfileSnapshot.Header
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
 	/// secrets.

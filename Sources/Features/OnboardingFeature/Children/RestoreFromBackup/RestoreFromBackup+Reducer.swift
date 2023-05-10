@@ -59,7 +59,7 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 			}
 
 			return .run { send in
-				try await onboardingClient.importICloudProfile(selectedProfile.id)
+                                try await onboardingClient.importICloudProfile(selectedProfile.header)
 				await send(.delegate(.completed))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
