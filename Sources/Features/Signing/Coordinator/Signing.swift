@@ -68,7 +68,6 @@ public struct Signing: Sendable, FeatureReducer {
 
 		public var step: Step
 
-//		public let dataToHashAndSign: Data
 		public var factorsLeftToSignWith: SigningFactors
 		public let expectedSignatureCount: Int
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
@@ -80,9 +79,6 @@ public struct Signing: Sendable, FeatureReducer {
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		) {
 			precondition(!factorsLeftToSignWith.isEmpty)
-//			let ephemeralNotaryPrivateKey = Curve25519.Signing.PrivateKey()
-//			self.purpose = purpose
-//			self.dataToHashAndSign = dataToHashAndSign
 			self.signingPurposeWithPayload = signingPurposeWithPayload
 			self.factorsLeftToSignWith = factorsLeftToSignWith
 			self.expectedSignatureCount = factorsLeftToSignWith.signerCount
@@ -134,10 +130,6 @@ public struct Signing: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case .finishedSigningWithAllFactors:
-
-//			guard case let .signTransaction = state.signingPurposeWithPayload else {
-//				return .send(.delegate(.))
-//			}
 			switch state.signingPurposeWithPayload {
 			case let .signAuth(authData):
 				let response = SignedAuthChallenge(challenge: authData.input.challenge, entitySignatures: Set(state.signatures))
@@ -158,11 +150,6 @@ public struct Signing: Sendable, FeatureReducer {
 					})))
 				}
 			}
-
-//			guard let compiledIntent = state.compiledIntent else {
-//				assertionFailure("Expected compiledIntent")
-//				return .none
-//			}
 
 		case let .notarizeResult(.failure(error)):
 			loggerGlobal.error("Failed to notarize transaction, error: \(error)")
