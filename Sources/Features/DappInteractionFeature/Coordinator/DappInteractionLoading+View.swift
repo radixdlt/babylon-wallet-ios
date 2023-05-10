@@ -45,28 +45,27 @@ extension DappInteractionLoading {
 	}
 }
 
-//
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - DappInteraction_Preview
-// struct DappInteractionLoading_Preview: PreviewProvider {
-//	static var previews: some View {
-//		DappInteractionLoading.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: DappInteractionLoading()
-//					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
-//					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
-//			)
-//		)
-//		.presentsLoadingViewOverlay()
-//	}
-// }
-//
-// extension DappInteractionLoading.State {
-//	static let previewValue: Self = .init(
-//		interaction: .previewValueOneTimeAccount
-//	)
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+// MARK: - DappInteraction_Preview
+struct DappInteractionLoading_Preview: PreviewProvider {
+	static var previews: some View {
+		DappInteractionLoading.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: DappInteractionLoading()
+					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
+					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
+			)
+		)
+		.presentsLoadingViewOverlay()
+	}
+}
+
+extension DappInteractionLoading.State {
+	static let previewValue: Self = .init(
+		interaction: .previewValueOneTimeAccount
+	)
+}
+#endif
