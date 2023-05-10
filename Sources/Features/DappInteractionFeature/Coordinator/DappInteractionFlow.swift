@@ -64,7 +64,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return item.reset
 		}
 
-		var accountsRequestItem: P2P.Dapp.Request.AccountsRequestItem? {
+		var ongoingAccountsRequestItem: P2P.Dapp.Request.AccountsRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingAccounts]
 			guard
@@ -72,10 +72,32 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			else {
 				return nil
 			}
-			return item.accounts
+			return item.ongoingAccounts
 		}
 
-		var personaDataRequestItem: P2P.Dapp.Request.PersonaDataRequestItem? {
+		var oneTimeAccountsRequestItem: P2P.Dapp.Request.AccountsRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.oneTimeAccountsRequestItem]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.oneTimeAccounts
+		}
+
+		var oneTimePersonaDataRequestItem: P2P.Dapp.Request.PersonaDataRequestItem? {
+			// NB: this should become a one liner with native case paths:
+			// remoteInteractions.items[keyPath: \.request?.authorized?.oneTimePersonaDataRequestItem]
+			guard
+				case let .request(.authorized(item)) = remoteInteraction.items
+			else {
+				return nil
+			}
+			return item.oneTimePersonaData
+		}
+
+		var ongoingPersonaDataRequestItem: P2P.Dapp.Request.PersonaDataRequestItem? {
 			// NB: this should become a one liner with native case paths:
 			// remoteInteractions.items[keyPath: \.request?.authorized?.ongoingPersonaData]
 			guard
@@ -83,7 +105,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			else {
 				return nil
 			}
-			return item.personaData
+			return item.ongoingPersonaData
 		}
 
 		@PresentationState
@@ -299,8 +321,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 			if let personaDataPayload = payload.personaDataPayload {
 				let fields = personaDataPayload.fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
+				state.responseItems
 //				state.responseItems[.remote(.ongoingPersonaData(.init(fields: personaDataPayload.fieldsRequested)))] = .remote(.ongoingPersonaData(.init(fields: fields)))
-				state.responseItems[.remote(.personaData(.init(isOneTime: false, fields: personaDataPayload.fieldsRequested)))] = .remote(.personaData(.init(isOneTime: false, fields: fields)))
+//				state.responseItems[.remote(.personaData(.init(isOneTime: false, fields: personaDataPayload.fieldsRequested)))] = .remote(.personaData(.init(isOneTime: false, fields: fields)))
 			}
 			return continueEffect(for: &state)
 
@@ -438,8 +461,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
 			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
-//			state.responseItems[item] = .remote(.ongoingPersonaData(.init(fields: fields)))
-			state.responseItems[item] = .remote(.personaData(.init(isOneTime: false, fields: fields)))
+			state.responseItems[item] = .remote(.ongoingPersonaData(.init(isOneTime: false, fields: fields)))
 			return continueEffect(for: &state)
 		}
 
@@ -448,8 +470,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
 			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
-//			state.responseItems[item] = .remote(.oneTimePersonaData(.init(fields: fields)))
-			state.responseItems[item] = .remote(.personaData(.init(isOneTime: true, fields: fields)))
+			state.responseItems[item] = .remote(.oneTimePersonaData(.init(isOneTime: true, fields: fields)))
 			return continueEffect(for: &state)
 		}
 
@@ -540,10 +561,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
 			if
-				let accountsRequestItem = state.accountsRequestItem,
+				let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
 				let sharedAccounts = state.authorizedPersona?.sharedAccounts
 			{
-				if accountsRequestItem.numberOfAccounts == sharedAccounts.request {
+				if ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request {
 					let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if
 						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
@@ -552,8 +573,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
 					{
 						payload.accountsPayload = .init(
-							//							requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
-							requestItem: .remote(.accounts(accountsRequestItem)),
+							requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
 							numberOfAccountsRequested: sharedAccounts.request,
 							accounts: selectedAccounts
 						)
@@ -562,18 +582,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 
 			if
-				let personaDataRequestItem = state.personaDataRequestItem,
+				let ongoingPersonaDataRequestItem = state.ongoingPersonaDataRequestItem,
 				let authorizedPersonaID = state.authorizedPersona?.id,
 				let sharedFieldIDs = state.authorizedPersona?.sharedFieldIDs
 			{
-				if personaDataRequestItem.fields.isSubset(of: sharedFieldIDs) {
+				if ongoingPersonaDataRequestItem.fields.isSubset(of: sharedFieldIDs) {
 					let allPersonas = try await personasClient.getPersonas()
 					if let persona = allPersonas[id: authorizedPersonaID] {
 						let sharedFields = persona.fields.filter { sharedFieldIDs.contains($0.id) }
 						if sharedFields.count == sharedFieldIDs.count {
 							payload.personaDataPayload = .init(
-								//								requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
-								requestItem: .remote(.personaData(personaDataRequestItem)),
+								requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
 								fieldsRequested: sharedFieldIDs,
 								fields: sharedFields
 							)
@@ -592,10 +611,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		chosenAccounts: P2P.Dapp.Response.Accounts,
 		into state: inout State
 	) {
-		state.responseItems[item] = .remote(.accounts(.init(
-			isOneTime: accessKind == .oneTime,
-			accounts: chosenAccounts
-		)))
+		switch accessKind {
+		case .oneTime:
+			state.responseItems[item] = .remote(.oneTimeAccounts(.init(isOneTime: true, accounts: chosenAccounts)))
+		case .ongoing:
+			state.responseItems[item] = .remote(.oneTimeAccounts(.init(isOneTime: false, accounts: chosenAccounts)))
+		}
 	}
 
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
@@ -628,8 +649,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							{
 								switch state.remoteInteraction.items {
 								case let .request(.authorized(items)):
-//									return items.ongoingAccounts?.numberOfAccounts
-									return items.accounts?.numberOfAccounts
+									return items.ongoingAccounts?.numberOfAccounts
 								default:
 									return nil
 								}
@@ -637,7 +657,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							{
 								switch response.items {
 								case let .request(.authorized(items)):
-									return items.accounts?.accounts
+									return items.ongoingAccounts?.accounts
 								default:
 									return nil
 								}
@@ -656,7 +676,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							switch state.remoteInteraction.items {
 							case let .request(.authorized(items)):
 //								return items.ongoingPersonaData?.fields
-								return items.personaData?.fields
+								return items.ongoingPersonaData?.fields
 							default:
 								return nil
 							}

@@ -18,12 +18,12 @@ extension LedgerHardwareWalletClient: DependencyKey {
 		) async throws -> Response {
 			let interactionID = P2P.LedgerHardwareWallet.InteractionId.random()
 
-			loggerGlobal.debug("About to broadcast importOlympiaDevice request with interactionID: \(interactionID)..")
+			loggerGlobal.debug("About to broadcast \(request.discriminator.rawValue) request with interactionID: \(interactionID)..")
 
 			var clientsLeftToReceiveAnswerFrom = try await radixConnectClient
 				.sendRequest(.connectorExtension(.ledgerHardwareWallet(.init(interactionID: interactionID, request: request))), .broadcastToAllPeers)
 
-			loggerGlobal.debug("Broadcasted importOlympiaDevice request with interactionID: \(interactionID) ✅ waiting for response")
+			loggerGlobal.debug("Broadcasted \(request.discriminator.rawValue) request with interactionID: \(interactionID) ✅ waiting for response")
 
 			for try await incomingResponse in await radixConnectClient.receiveResponses(/P2P.RTCMessageFromPeer.Response.connectorExtension .. /P2P.ConnectorExtension.Response.ledgerHardwareWallet) {
 				loggerGlobal.notice("Received response from CE: \(String(describing: incomingResponse))")

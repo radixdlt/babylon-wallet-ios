@@ -55,17 +55,35 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct AuthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.Items.Discriminator.authorizedRequest.rawValue
 		public let login: LoginRequestResponseItem
-		public let accounts: AccountsRequestResponseItem?
-		public let personaData: PersonaDataRequestResponseItem?
+		public let oneTimeAccounts: AccountsRequestResponseItem?
+		public let oneTimePersonaData: PersonaDataRequestResponseItem?
+		public let ongoingAccounts: AccountsRequestResponseItem?
+		public let ongoingPersonaData: PersonaDataRequestResponseItem?
 
 		public init(
 			login: LoginRequestResponseItem,
-			accounts: AccountsRequestResponseItem?,
-			personaData: PersonaDataRequestResponseItem?
+			oneTimeAccounts: AccountsRequestResponseItem?,
+			oneTimePersonaData: PersonaDataRequestResponseItem?,
+			ongoingAccounts: AccountsRequestResponseItem?,
+			ongoingPersonaData: PersonaDataRequestResponseItem?
 		) {
+			if let oneTimeAccounts {
+				assert(oneTimeAccounts.isOneTime)
+			}
+			if let oneTimePersonaData {
+				assert(oneTimePersonaData.isOneTime)
+			}
+			if let ongoingAccounts {
+				assert(!ongoingAccounts.isOneTime)
+			}
+			if let ongoingPersonaData {
+				assert(!ongoingPersonaData.isOneTime)
+			}
 			self.login = login
-			self.accounts = accounts
-			self.personaData = personaData
+			self.oneTimeAccounts = oneTimeAccounts
+			self.oneTimePersonaData = oneTimePersonaData
+			self.ongoingAccounts = ongoingAccounts
+			self.ongoingPersonaData = ongoingPersonaData
 		}
 	}
 }

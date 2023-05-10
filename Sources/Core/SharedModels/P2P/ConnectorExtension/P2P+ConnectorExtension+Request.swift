@@ -42,6 +42,22 @@ extension P2P.ConnectorExtension.Request {
 			case signTransaction(SignTransaction)
 			case importOlympiaDevice(ImportOlympiaDevice)
 
+			public enum Disciminator: String, Sendable, Hashable {
+				case getDeviceInfo
+				case derivePublicKey
+				case signTransaction
+				case importOlympiaDevice
+			}
+
+			public var discriminator: Disciminator {
+				switch self {
+				case .derivePublicKey: return .derivePublicKey
+				case .getDeviceInfo: return .getDeviceInfo
+				case .signTransaction: return .signTransaction
+				case .importOlympiaDevice: return .importOlympiaDevice
+				}
+			}
+
 			public struct ImportOlympiaDevice: Sendable, Hashable, Encodable {
 				public let derivationPaths: [String]
 				public init(derivationPaths: [String]) {

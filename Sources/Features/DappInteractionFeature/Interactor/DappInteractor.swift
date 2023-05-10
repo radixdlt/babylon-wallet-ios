@@ -315,8 +315,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 				return nil
 			case let .authorized(authorized):
-				if authorized.accounts?.numberOfAccounts.isValid == false {
-					return (failure: .invalidRequest, message: "Invalid numberOfAccounts in authorized request")
+				if authorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
+					return (failure: .invalidRequest, message: "Invalid numberOfAccounts for oneTimeAccounts in authorized request")
+				}
+				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
+					return (failure: .invalidRequest, message: "Invalid numberOfAccounts for ongoingAccounts in authorized request")
+				}
+				if authorized.oneTimeAccounts?.isOneTime == false {
+					return (failure: .invalidRequest, message: "Invalid, isOneTime was false for oneTimeAccounts in authorized request")
+				}
+				if authorized.oneTimePersonaData?.isOneTime == false {
+					return (failure: .invalidRequest, message: "Invalid, isOneTime was false for oneTimePersonaData in authorized request")
 				}
 				return nil
 			}
