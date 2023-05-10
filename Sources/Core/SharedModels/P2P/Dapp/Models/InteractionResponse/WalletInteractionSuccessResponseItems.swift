@@ -68,6 +68,8 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?,
 			oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
 		) {
+			precondition(ongoingAccountsWithProofOfOwnership == nil || ongoingAccountsWithoutProofOfOwnership == nil, "Ongoing accounts: Either WITH proof of ownership or WITHOUT, never both")
+			precondition(oneTimeAccountsWithProofOfOwnership == nil || oneTimeAccountsWithoutProofOfOwnership == nil, "Onetime accounts: Either WITH proof of ownership or WITHOUT, never both")
 			self.auth = auth
 			self.ongoingAccountsWithoutProofOfOwnership = ongoingAccountsWithoutProofOfOwnership
 			self.ongoingAccountsWithProofOfOwnership = ongoingAccountsWithProofOfOwnership

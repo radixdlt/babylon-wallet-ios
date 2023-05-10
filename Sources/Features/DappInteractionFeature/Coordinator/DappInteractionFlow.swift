@@ -579,21 +579,23 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				let accounts = Array(accountsWithProof)
 				switch accessKind {
 				case .oneTime:
-//					return .remote(.oneTimeAccountswith(.withProof(.init(challenge: challenge, accounts: accounts))))
-					fatalError()
+					return .remote(.oneTimeAccountsWithProofOfOwnership(.init(
+						challenge: challenge,
+						accounts: accounts
+					)))
 				case .ongoing:
-//					return .remote(.ongoingAccounts(.withProof(.init(challenge: challenge, accounts: accounts))))
-					fatalError()
+					return .remote(.ongoingAccountsWithProofOfOwnership(.init(
+						challenge: challenge,
+						accounts: accounts
+					)))
 				}
 
 			case let .withoutProofOfOwnership(accounts):
 				switch accessKind {
 				case .oneTime:
-//					return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
-					fatalError()
+					return .remote(.oneTimeAccountsWithoutProofOfOwnership(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init))))
 				case .ongoing:
-//					return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
-					fatalError()
+					return .remote(.ongoingAccountsWithoutProofOfOwnership(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init))))
 				}
 			}
 		}()
@@ -638,16 +640,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							{
 								switch response.items {
 								case let .request(.authorized(items)):
-									return items.ongoingAccountsWithProofOfOwnership?.accounts.map(\.account) + items.ongoingAccountsWithoutProofOfOwnership.accounts
-
-//									switch items.ongoingAccountsWithProofOfOwnership {
-//									case nil:
-//										return nil
-//									case let .withProof(item):
-//										return item.accounts.map(\.account)
-//									case let .withoutProof(item):
-//										return item.accounts
-//									}
+									if let withProof = items.ongoingAccountsWithProofOfOwnership {
+										return withProof.accounts.map(\.account)
+									} else if let withoutProof = items.ongoingAccountsWithoutProofOfOwnership {
+										return withoutProof.accounts
+									} else {
+										return nil
+									}
 								default:
 									return nil
 								}
