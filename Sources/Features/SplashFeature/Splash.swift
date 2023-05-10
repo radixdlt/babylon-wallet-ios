@@ -81,12 +81,12 @@ public struct Splash: Sendable, FeatureReducer {
 						ButtonState(
 							role: .none,
 							action: .send(.retryButtonTapped),
-							label: { TextState(L10n.Splash.PasscodeCheckFailedAlert.retry) }
+							label: { TextState(L10n.Common.retry) }
 						)
 						ButtonState(
 							role: .none,
 							action: .send(.openSettingsButtonTapped),
-							label: { TextState(L10n.Splash.PasscodeCheckFailedAlert.settings) }
+							label: { TextState(L10n.Common.systemSettings) }
 						)
 					},
 					message: { .init(L10n.Splash.PasscodeCheckFailedAlert.message) }

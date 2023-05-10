@@ -83,7 +83,7 @@ public struct CameraPermission: Sendable, FeatureReducer {
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.NewConnection.CameraPermissionDeniedAlert.settings) }
+						label: { TextState(L10n.Common.systemSettings) }
 					)
 				},
 				message: { TextState(L10n.NewConnection.CameraPermissionDeniedAlert.message) }

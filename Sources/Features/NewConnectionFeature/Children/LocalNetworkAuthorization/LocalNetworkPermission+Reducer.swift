@@ -83,7 +83,7 @@ public struct LocalNetworkPermission: Sendable, FeatureReducer {
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.NewConnection.LocalNetworkPermissionDeniedAlert.settings) }
+						label: { TextState(L10n.Common.systemSettings) }
 					)
 				},
 				message: { TextState(L10n.NewConnection.LocalNetworkPermissionDeniedAlert.message) }

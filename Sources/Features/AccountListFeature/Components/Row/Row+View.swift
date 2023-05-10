@@ -69,7 +69,7 @@ extension AccountList.Row {
 
 							if viewStore.isLegacyAccount {
 								Text("•")
-								Text("\(L10n.AccountList.Row.legacyAccount)")
+								Text("\(L10n.Home.legacyAccountHeading)")
 							}
 						}
 						.foregroundColor(.app.whiteTransparent)
@@ -170,7 +170,7 @@ extension AccountList.Row.View {
 		HStack {
 			Image(asset: AssetResource.homeAccountSecurity)
 
-			Text(L10n.AccountList.Row.securityPrompt)
+			Text(L10n.Home.applySecuritySettings)
 				.foregroundColor(.white)
 				.textStyle(.body2HighImportance)
 

@@ -234,16 +234,16 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			switch action {
 			case let .removeGateway(gateway):
 				state.removeGatewayAlert = .init(
-					title: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.title) },
+					title: { TextState(L10n.Gateways.RemoveGatewayAlert.title) },
 					actions: {
 						ButtonState(role: .cancel, action: .cancelButtonTapped) {
-							TextState(L10n.GatewaySettings.RemoveGatewayAlert.cancelButtonTitle)
+							TextState(L10n.Common.cancel)
 						}
 						ButtonState(action: .removeButtonTapped(gateway)) {
-							TextState(L10n.GatewaySettings.RemoveGatewayAlert.removeButtonTitle)
+							TextState(L10n.Gateways.RemoveGatewayAlert.remove)
 						}
 					},
-					message: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.message) }
+					message: { TextState(L10n.Gateways.RemoveGatewayAlert.message) }
 				)
 				return .none
 

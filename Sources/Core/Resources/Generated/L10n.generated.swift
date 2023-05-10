@@ -196,6 +196,10 @@ public enum L10n {
     public enum NameNewEntity {
       /// This can be changed any time
       public static let explanation = L10n.tr("Localizable", "createEntity_nameNewEntity_explanation", fallback: "This can be changed any time")
+      /// Requires you to sign transactions using your Ledger
+      public static let ledgerSubtitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerSubtitle", fallback: "Requires you to sign transactions using your Ledger")
+      /// Create with Ledger hardware wallet
+      public static let ledgerTitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerTitle", fallback: "Create with Ledger hardware wallet")
     }
   }
   public enum CreatePersona {
@@ -557,11 +561,11 @@ public enum L10n {
     public static let title = L10n.tr("Localizable", "home_title", fallback: "Radix Wallet")
     /// Total value
     public static let totalValue = L10n.tr("Localizable", "home_totalValue", fallback: "Total value")
-    /// Visit the Radix Dashboard
-    public static let visitDashboard = L10n.tr("Localizable", "home_visitDashboard", fallback: "Visit the Radix Dashboard")
     public enum VisitDashboard {
       /// Ready to get started using the Radix Network and your Wallet?
       public static let subtitle = L10n.tr("Localizable", "home_visitDashboard_subtitle", fallback: "Ready to get started using the Radix Network and your Wallet?")
+      /// Visit the Radix Dashboard
+      public static let title = L10n.tr("Localizable", "home_visitDashboard_title", fallback: "Visit the Radix Dashboard")
     }
   }
   public enum ImportLegacyWallet {
@@ -621,10 +625,9 @@ public enum L10n {
     public static let invalidPayload = L10n.tr("Localizable", "importOlympiaAccounts_invalidPayload", fallback: "Invalid QR code")
     /// Mnemonic
     public static let mnemonic = L10n.tr("Localizable", "importOlympiaAccounts_mnemonic", fallback: "Mnemonic")
-    /// Mnemonic: %@
-    /// Pasphrase: %@
+    /// Mnemonic: %@ Passphrase: %@
     public static func mnemonicAndPassphrase(_ p1: Any, _ p2: Any) -> String {
-      return L10n.tr("Localizable", "importOlympiaAccounts_mnemonicAndPassphrase", String(describing: p1), String(describing: p2), fallback: "Mnemonic: %@\nPasphrase: %@")
+      return L10n.tr("Localizable", "importOlympiaAccounts_mnemonicAndPassphrase", String(describing: p1), String(describing: p2), fallback: "Mnemonic: %@ Passphrase: %@")
     }
     /// Mnemonics
     public static let mnemonics = L10n.tr("Localizable", "importOlympiaAccounts_mnemonics", fallback: "Mnemonics")
@@ -756,12 +759,12 @@ public enum L10n {
     public static func notSharingAnything(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails_notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
     }
+    /// Persona Label
+    public static let personaLabelHeading = L10n.tr("Localizable", "personaDetails_personaLabelHeading", fallback: "Persona Label")
     /// Here is the personal data that you are sharing with %@
     public static func personalDataSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails_personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
     }
-    /// Persona Name
-    public static let personaName = L10n.tr("Localizable", "personaDetails_personaName", fallback: "Persona Name")
     /// Phone Number
     public static let phoneNumber = L10n.tr("Localizable", "personaDetails_phoneNumber", fallback: "Phone Number")
     /// Remove Authorization
