@@ -5,7 +5,7 @@ extension View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor()._printChanges()
+				reducer: DappInteractor()
 			)
 		)
 	}

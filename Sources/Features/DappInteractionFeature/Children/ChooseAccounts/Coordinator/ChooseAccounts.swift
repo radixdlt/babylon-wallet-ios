@@ -198,6 +198,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 
 		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(signedAuthChallenge)))))):
+			state.destination = nil
 
 			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set((state.selectedAccounts ?? []).map(\.account.id))
 			let walletAccountsWithProof: [P2P.Dapp.Response.WalletAccountWithProof] = signedAuthChallenge.entitySignatures.map {
@@ -222,10 +223,12 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			return .send(.delegate(.continueButtonTapped(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
 
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
+			state.destination = nil
 			loggerGlobal.error("Failed to sign proof of ownership")
 			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
 
 		case .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction))))):
+			state.destination = nil
 			assertionFailure("wrong signing, signed tx, expected auth...")
 			loggerGlobal.error("Failed to sign proof of ownership")
 			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
