@@ -322,8 +322,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			if let personaDataPayload = payload.personaDataPayload {
 				let fields = personaDataPayload.fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
 				state.responseItems
-//				state.responseItems[.remote(.ongoingPersonaData(.init(fields: personaDataPayload.fieldsRequested)))] = .remote(.ongoingPersonaData(.init(fields: fields)))
-//				state.responseItems[.remote(.personaData(.init(isOneTime: false, fields: personaDataPayload.fieldsRequested)))] = .remote(.personaData(.init(isOneTime: false, fields: fields)))
 			}
 			return continueEffect(for: &state)
 
@@ -461,7 +459,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
 			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
-			state.responseItems[item] = .remote(.ongoingPersonaData(.init(isOneTime: false, fields: fields)))
+			state.responseItems[item] = .remote(.ongoingPersonaData(.init(fields: fields)))
 			return continueEffect(for: &state)
 		}
 
@@ -470,7 +468,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			_ fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) -> EffectTask<Action> {
 			let fields = fields.map { P2P.Dapp.Response.PersonaData(field: $0.id, value: $0.value) }
-			state.responseItems[item] = .remote(.oneTimePersonaData(.init(isOneTime: true, fields: fields)))
+			state.responseItems[item] = .remote(.oneTimePersonaData(.init(fields: fields)))
 			return continueEffect(for: &state)
 		}
 
@@ -613,9 +611,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	) {
 		switch accessKind {
 		case .oneTime:
-			state.responseItems[item] = .remote(.oneTimeAccounts(.init(isOneTime: true, accounts: chosenAccounts)))
+			state.responseItems[item] = .remote(.oneTimeAccounts(.init(accounts: chosenAccounts)))
 		case .ongoing:
-			state.responseItems[item] = .remote(.oneTimeAccounts(.init(isOneTime: false, accounts: chosenAccounts)))
+			state.responseItems[item] = .remote(.oneTimeAccounts(.init(accounts: chosenAccounts)))
 		}
 	}
 
@@ -790,7 +788,7 @@ extension DappInteractionFlow.Destinations.State {
 		case let .remote(.ongoingAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
-				accessKind: item.isOneTime ? .oneTime : .ongoing,
+				accessKind: .ongoing,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress, dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))
@@ -798,7 +796,7 @@ extension DappInteractionFlow.Destinations.State {
 		case let .remote(.oneTimeAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
-				accessKind: item.isOneTime ? .oneTime : .oneTime,
+				accessKind: .oneTime,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress, dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))

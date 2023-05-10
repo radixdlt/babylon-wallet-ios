@@ -47,7 +47,6 @@ CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9
 
 extension P2P.Dapp.Request.AccountsRequestItem {
 	public static let previewValue: Self = .init(
-		isOneTime: true,
 		numberOfAccounts: .exactly(1),
 		challenge: nil
 	)
@@ -55,7 +54,7 @@ extension P2P.Dapp.Request.AccountsRequestItem {
 
 extension P2P.Dapp.Request.PersonaDataRequestItem {
 	public static let previewValue: Self = .init(
-		isOneTime: true, fields: [.givenName, .familyName, .emailAddress]
+		fields: [.givenName, .familyName, .emailAddress]
 	)
 }
 

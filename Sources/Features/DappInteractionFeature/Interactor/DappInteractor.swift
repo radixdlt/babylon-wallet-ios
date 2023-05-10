@@ -301,13 +301,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .unauthorized(unauthorized):
 
 				if
-					unauthorized.oneTimeAccounts?.isOneTime == false ||
-					unauthorized.oneTimePersonaData?.isOneTime == false
-				{
-					return (failure: .invalidRequest, message: "Invalid oneTimeAccounts or oneTimePersonaData incorrectly specified isOneTime: false, expected: true")
-				}
-
-				if
 					unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false
 				{
 					return (failure: .invalidRequest, message: "Invalid numberOfAccounts in unauthorized request")
@@ -321,12 +314,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
 					return (failure: .invalidRequest, message: "Invalid numberOfAccounts for ongoingAccounts in authorized request")
 				}
-				if authorized.oneTimeAccounts?.isOneTime == false {
-					return (failure: .invalidRequest, message: "Invalid, isOneTime was false for oneTimeAccounts in authorized request")
-				}
-				if authorized.oneTimePersonaData?.isOneTime == false {
-					return (failure: .invalidRequest, message: "Invalid, isOneTime was false for oneTimePersonaData in authorized request")
-				}
+
 				return nil
 			}
 		case .transaction:

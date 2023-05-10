@@ -41,12 +41,6 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			oneTimeAccounts: AccountsRequestResponseItem?,
 			oneTimePersonaData: PersonaDataRequestResponseItem?
 		) {
-			if let oneTimeAccounts {
-				assert(oneTimeAccounts.isOneTime)
-			}
-			if let oneTimePersonaData {
-				assert(oneTimePersonaData.isOneTime)
-			}
 			self.oneTimeAccounts = oneTimeAccounts
 			self.oneTimePersonaData = oneTimePersonaData
 		}
@@ -67,18 +61,6 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			ongoingAccounts: AccountsRequestResponseItem?,
 			ongoingPersonaData: PersonaDataRequestResponseItem?
 		) {
-			if let oneTimeAccounts {
-				assert(oneTimeAccounts.isOneTime)
-			}
-			if let oneTimePersonaData {
-				assert(oneTimePersonaData.isOneTime)
-			}
-			if let ongoingAccounts {
-				assert(!ongoingAccounts.isOneTime)
-			}
-			if let ongoingPersonaData {
-				assert(!ongoingPersonaData.isOneTime)
-			}
 			self.login = login
 			self.oneTimeAccounts = oneTimeAccounts
 			self.oneTimePersonaData = oneTimePersonaData
