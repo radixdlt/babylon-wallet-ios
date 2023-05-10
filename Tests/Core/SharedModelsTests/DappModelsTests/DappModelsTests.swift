@@ -7,15 +7,14 @@ final class ToDappResponseTests: TestCase {
 			interactionId: "an_id",
 			items: .request(
 				.unauthorized(.init(
-					oneTimeAccounts: .withoutProof(.init(
-						accounts: [
-							.init(
-								accountAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
-								label: "Label",
-								appearanceId: .fromIndex(0)
-							),
-						]
-					)),
+					oneTimeAccountsWithoutProofOfOwnership: .init(accounts: [
+						.init(
+							accountAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
+							label: "Label",
+							appearanceId: .fromIndex(0)
+						),
+					]),
+					oneTimeAccountsWithProofOfOwnership: nil,
 					oneTimePersonaData: .init(fields: [
 						.init(field: .givenName, value: NonEmptyString(rawValue: "Percy")!),
 						.init(field: .familyName, value: NonEmptyString(rawValue: "Jackson")!),
@@ -65,7 +64,7 @@ final class ToDappResponseTests: TestCase {
 						"quantifier": "exactly",
 						"quantity": 2,
 					],
-					"requiresProofOfOwnership": true,
+					"challenge": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
 				],
 				"oneTimePersonaData": [
 					"fields": ["givenName", "familyName", "emailAddress", "phoneNumber"],
@@ -85,7 +84,7 @@ final class ToDappResponseTests: TestCase {
 					.unauthorized(.init(
 						oneTimeAccounts: .init(
 							numberOfAccounts: .exactly(2),
-							requiresProofOfOwnership: true
+							challenge: .init(rawValue: .init(data: .deadbeef32Bytes))
 						),
 						oneTimePersonaData: .init(
 							fields: [.givenName, .familyName, .emailAddress, .phoneNumber]

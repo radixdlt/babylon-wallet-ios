@@ -1,8 +1,8 @@
 import Prelude
 
-// MARK: - P2P.Dapp.Request.AuthRequestItem
+// MARK: - P2P.Dapp.Request.LoginRequestItem
 extension P2P.Dapp.Request {
-	public enum AuthRequestItem: Sendable, Hashable, Decodable {
+	public enum LoginRequestItem: Sendable, Hashable, Decodable {
 		private enum CodingKeys: String, CodingKey {
 			case discriminator
 		}
