@@ -742,26 +742,9 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 			remoteInteractionItems
 				.sorted(by: { $0.priority < $1.priority })
 				.reduce(into: []) { items, currentItem in
-//					switch currentItem {
-//					case .auth:
-//						items.append(.remote(currentItem))
-//					case let .ongoingAccounts(item):
-//						items.append(.local(.accountPermissionRequested(item.numberOfAccounts)))
-//						items.append(.remote(currentItem))
-//					case .ongoingPersonaData:
-//						items.append(.remote(currentItem))
-//					case .oneTimeAccounts:
-//						items.append(.remote(currentItem))
-//					case .oneTimePersonaData:
-//						items.append(.remote(currentItem))
-//					case .send:
-//						items.append(.remote(currentItem))
-//					}
 					switch currentItem {
-					case let .accounts(item):
-						if !item.isOneTime {
-							items.append(.local(.accountPermissionRequested(item.numberOfAccounts)))
-						}
+					case let .ongoingAccounts(item):
+						items.append(.local(.accountPermissionRequested(item.numberOfAccounts)))
 						fallthrough
 					default:
 						items.append(.remote(currentItem))
@@ -804,7 +787,7 @@ extension DappInteractionFlow.Destinations.State {
 				numberOfAccounts: numberOfAccounts
 			)))
 
-		case let .remote(.accounts(item)):
+		case let .remote(.ongoingAccounts(item)):
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: item.isOneTime ? .oneTime : .ongoing,
@@ -812,23 +795,30 @@ extension DappInteractionFlow.Destinations.State {
 				numberOfAccounts: item.numberOfAccounts
 			)))
 
-		case let .remote(.personaData(item)):
-			if item.isOneTime {
-				self = .relayed(anyItem, with: .oneTimePersonaData(.init(
+		case let .remote(.oneTimeAccounts(item)):
+			self = .relayed(anyItem, with: .chooseAccounts(.init(
+				challenge: item.challenge,
+				accessKind: item.isOneTime ? .oneTime : .oneTime,
+				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress, dappMetadata: dappMetadata,
+				numberOfAccounts: item.numberOfAccounts
+			)))
+
+		case let .remote(.oneTimePersonaData(item)):
+			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
+				dappMetadata: dappMetadata,
+				requiredFieldIDs: item.fields
+			)))
+
+		case let .remote(.ongoingPersonaData(item)):
+			if let persona {
+				self = .relayed(anyItem, with: .personaDataPermission(.init(
 					dappMetadata: dappMetadata,
+					personaID: persona.id,
 					requiredFieldIDs: item.fields
 				)))
 			} else {
-				if let persona {
-					self = .relayed(anyItem, with: .personaDataPermission(.init(
-						dappMetadata: dappMetadata,
-						personaID: persona.id,
-						requiredFieldIDs: item.fields
-					)))
-				} else {
-					assertionFailure("Persona data request requires a persona")
-					return nil
-				}
+				assertionFailure("Persona data request requires a persona")
+				return nil
 			}
 
 		case let .remote(.send(item)):
