@@ -45,6 +45,7 @@ import SecureStorageClient
 public final actor ProfileStore {
 	@Dependency(\.assertionFailure) var assertionFailure
 	@Dependency(\.secureStorageClient) var secureStorageClient
+        @Dependency(\.userDefaultsClient) var userDefaultsClient
 
 	private static let _shared = ActorIsolated<ProfileStore?>(nil)
 	public static var shared: ProfileStore {
@@ -91,222 +92,220 @@ extension ProfileStore {
 
 // MARK: Public
 extension ProfileStore {
-	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
-	/// for an async sequence of Profile.
-	public var profile: Profile { profileStateSubject.value.profile }
+        /// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
+        /// for an async sequence of Profile.
+        public var profile: Profile { profileStateSubject.value.profile }
 
-	/// The current network if any
-	public func network() async throws -> Profile.Network {
-		try profile.network(id: profile.networkID)
-	}
+        /// The current network if any
+        public func network() async throws -> Profile.Network {
+                try profile.network(id: profile.networkID)
+        }
 
-	public var network: Profile.Network? {
-		profile.network
-	}
+        public var network: Profile.Network? {
+                profile.network
+        }
 
-	/// A multicasting replaying async sequence of distinct Profile.
-	public func values() async -> AnyAsyncSequence<Profile> {
-		lens(\.profile)
-	}
+        /// A multicasting replaying async sequence of distinct Profile.
+        public func values() async -> AnyAsyncSequence<Profile> {
+                lens(\.profile)
+        }
 
-	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
-	public func accountValues() async -> AnyAsyncSequence<Profile.Network.Accounts> {
-		lens {
-			$0.profile.network?.accounts
-		}
-	}
+        /// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
+        public func accountValues() async -> AnyAsyncSequence<Profile.Network.Accounts> {
+                lens {
+                        $0.profile.network?.accounts
+                }
+        }
 
-	/// A multicasting replaying async sequence of distinct Personas for the currently selected network.
-	public func personaValues() -> AnyAsyncSequence<Profile.Network.Personas> {
-		lens {
-			$0.profile.network?.personas
-		}
-	}
+        /// A multicasting replaying async sequence of distinct Personas for the currently selected network.
+        public func personaValues() -> AnyAsyncSequence<Profile.Network.Personas> {
+                lens {
+                        $0.profile.network?.personas
+                }
+        }
 
-	/// A multicasting replaying async sequence of distinct Gateways
-	public func gatewaysValues() async -> AnyAsyncSequence<Gateways> {
-		lens {
-			$0.profile.appPreferences.gateways
-		}
-	}
+        /// A multicasting replaying async sequence of distinct Gateways
+        public func gatewaysValues() async -> AnyAsyncSequence<Gateways> {
+                lens {
+                        $0.profile.appPreferences.gateways
+                }
+        }
 
-	/// A multicasting replaying async sequence of distinct FactorSources
-	public func factorSourcesValues() async -> AnyAsyncSequence<FactorSources> {
-		lens {
-			$0.profile.factorSources
-		}
-	}
+        /// A multicasting replaying async sequence of distinct FactorSources
+        public func factorSourcesValues() async -> AnyAsyncSequence<FactorSources> {
+                lens {
+                        $0.profile.factorSources
+                }
+        }
 
-	public func getLoadProfileOutcome() async -> LoadProfileOutcome {
-		switch self.profileStateSubject.value {
-		case let .persisted(profile):
-			return .existingProfile
-		case let .ephemeral(ephemeral):
-			if let error = ephemeral.loadFailure {
-				return .usersExistingProfileCouldNotBeLoaded(failure: error)
-			} else {
-				return .newUser
-			}
-		}
-	}
+        public func getLoadProfileOutcome() async -> LoadProfileOutcome {
+                switch self.profileStateSubject.value {
+                case .persisted:
+                        return .existingProfile
+                case let .ephemeral(ephemeral):
+                        if let error = ephemeral.loadFailure {
+                                return .usersExistingProfileCouldNotBeLoaded(failure: error)
+                        } else {
+                                return .newUser
+                        }
+                }
+        }
 
-	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
-		try assertProfileStateIsEphemeral()
+        public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
+                try assertProfileStateIsEphemeral()
 
-		guard await (try? secureStorageClient.loadProfileSnapshotData(profile.header.id)) == Data?.none else {
-			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
-			throw ExistingProfileSnapshotFoundAbortingImport()
-		}
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+                guard await (try? secureStorageClient.loadProfileSnapshotData(profile.header.id)) == Data?.none else {
+                        struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
+                        throw ExistingProfileSnapshotFoundAbortingImport()
+                }
 
-		let profile = try Profile(snapshot: profileSnapshot)
-		do {
-			await userDefaultsClient.setActiveProfileId(profileSnapshot.header.id)
-			try await secureStorageClient.saveProfileSnapshot(profileSnapshot)
-		} catch {
-			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage) // for DEBUG builds we want to crash
-			throw error
-		}
-		changeState(to: .persisted(profile))
-	}
-
-	public func importICloudProfileSnapshot(_ header: ProfileSnapshot.Header) async throws {
-		try assertProfileStateIsEphemeral()
-
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
-
-		do {
-                        // Update the header with the current device info
-                        var header = header
-                        @Dependency(\.device) var device
-                        /// we use name as label and model as description
-                        let deviceName = await device.name
-                        let deviceModel = await device.model
-
-                        let description = NonEmptyString(rawValue: "\(deviceName) (\(deviceModel))")!
-                        let deviceInfo = await Self.createDeviceInfo(description)
-                        header.lastUsedOnDevice = deviceInfo
-                        try await updateProfileHeadersList(header)
-
-                        // Load the related profile snapshot
-                        let profileSnapshot = try await secureStorageClient.loadProfileSnapshot(header.id)
-			guard var profileSnapshot else {
-				struct FailedToLoadProfile: Swift.Error {}
-				throw FailedToLoadProfile()
-			}
-
-                        // Update the header with any changes made. Now only lastUsedOnDevice is updated
-                        profileSnapshot.header = header
-                        // Save the update
+                let profile = try Profile(snapshot: profileSnapshot)
+                do {
+                        await userDefaultsClient.setActiveProfileId(profileSnapshot.header.id)
                         try await secureStorageClient.saveProfileSnapshot(profileSnapshot)
+                } catch {
+                        let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
+                        loggerGlobal.critical(.init(stringLiteral: errorMessage))
+                        assertionFailure(errorMessage) // for DEBUG builds we want to crash
+                        throw error
+                }
+                changeState(to: .persisted(profile))
+        }
 
-                        try changeState(to: .persisted(.init(snapshot: profileSnapshot)))
+        public func commitEphemeral() async throws {
+                let ephemeral = try assertProfileStateIsEphemeral()
+                // Set the active profile id, will be used to identify the profile the device can work with.
+                await userDefaultsClient.setActiveProfileId(ephemeral.profile.header.id)
 
-                        // Update to new active profile id, so it is used from now on.
-                        await userDefaultsClient.setActiveProfileId(header.id)
-		} catch {
-			let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage) // for DEBUG builds we want to crash
-			throw error
-		}
-	}
+                var profile = ephemeral.profile
+                try await updateHeader(&profile)
+                try await saveProfileSnapshot(profile.snapshot())
+                changeState(to: .persisted(profile))
+        }
 
-	public func commitEphemeral() async throws {
-		let ephemeral = try assertProfileStateIsEphemeral()
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+        /// If persisted: updates the in-memomry across-the-app-used Profile and also
+        /// sync the new value to secure storage (and iCloud if enabled/able).
+        ///
+        /// if ephemeral: Updates the ephemeral profile.
+        public func update(profile: Profile) async throws {
+                guard profile != profileStateSubject.value.profile else {
+                        // prevent duplicates
+                        return
+                }
+                guard self.profile.header.id == profile.header.id else {
+                        let errorMessage = "Incorrect implementation: `\(#function)` was called with a Profile which UUID does not match the current one. This should never happen."
+                        loggerGlobal.critical(.init(stringLiteral: errorMessage))
+                        assertionFailure(errorMessage)
+                        return
+                }
 
-		do {
-                        await userDefaultsClient.setActiveProfileId(ephemeral.profile.header.id)
+                switch profileStateSubject.value {
+                case var .ephemeral(ephemeral):
+                        // The user is still on onboarding flow, since the Profile has not
+                        // yet been commited. `update:profile:` was called, meaning some
+                        // state was added to this ephemeral profile, but user has not
+                        // yet finished onboarding. The call to `update:profile` might
+                        // originate from creation of first account, but we do not persist
+                        // the ephemeral profile until `commitEphemeral` has been called,
+                        // we do, however, update the ProfileStore's in-memory profile...
+                        ephemeral.profile = profile
 
-                        // Save the new profile header
-                        try await updateProfileHeadersList(ephemeral.profile.header)
+                        // ... and then make the update.
+                        changeState(to: .ephemeral(ephemeral))
 
-			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
-		} catch {
-			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage) // for DEBUG builds we want to crash
-			throw error
-		}
+                case .persisted:
+                        var profile = profile
+                        try await updateHeader(&profile)
+                        try await saveProfileSnapshot(profile.snapshot())
+                        changeState(to: .persisted(profile))
+                }
+        }
 
-		changeState(to: .persisted(ephemeral.profile))
-	}
+        public func importCloudProfileSnapshot(_ header: ProfileSnapshot.Header) async throws {
+                try assertProfileStateIsEphemeral()
 
-	/// If persisted: updates the in-memomry across-the-app-used Profile and also
-	/// sync the new value to secure storage (and iCloud if enabled/able).
-	///
-	/// if ephemeral: Updates the ephemeral profile.
-	public func update(profile: Profile) async throws {
-		guard profile != profileStateSubject.value.profile else {
-			// prevent duplicates
-			return
-		}
-		guard self.profile.header.id == profile.header.id else {
-			let errorMessage = "Incorrect implementation: `\(#function)` was called with a Profile which UUID does not match the current one. This should never happen."
-			loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
-			return
-		}
-
-		switch profileStateSubject.value {
-		case var .ephemeral(ephemeral):
-			// The user is still on onboarding flow, since the Profile has not
-			// yet been commited. `update:profile:` was called, meaning some
-			// state was added to this ephemeral profile, but user has not
-			// yet finished onboarding. The call to `update:profile` might
-			// originate from creation of first account, but we do not persist
-			// the ephemeral profile until `commitEphemeral` has been called,
-			// we do, however, update the ProfileStore's in-memory profile...
-			ephemeral.profile = profile
-
-			// ... and then make the update.
-			changeState(to: .ephemeral(ephemeral))
-
-		case .persisted:
-                        // Check if the profile is still owned by the device
-                        if let lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(profile.header.id)?.header.lastUsedOnDevice {
-                                let deviceId = await Self.getDeviceId()
-                                guard lastUsedOnDevice.id == deviceId else {
-                                        throw Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
-                                }
+                do {
+                        // Load the snapshot, also this will validate if the snapshot actually exist
+                        let profileSnapshot = try await secureStorageClient.loadProfileSnapshot(header.id)
+                        guard var profileSnapshot else {
+                                struct FailedToLoadProfile: Swift.Error {}
+                                throw FailedToLoadProfile()
                         }
 
-                        @Dependency(\.date) var dateGenerator
-                        var profile = profile
-                        profile.header.lastModified = dateGenerator()
-                        let networks = profile.networks
+                        /// Claim the profile by updating **lastUsedOnDevice**
+                        @Dependency(\.device) var device
+                        let description = await NonEmptyString(rawValue: "\(device.name) (\(device.model))")!
+                        let deviceInfo = await Self.createDeviceInfo(description)
+                        profileSnapshot.header.lastUsedOnDevice = deviceInfo
 
-                        profile.header.contentHint.numberOfNetworks = networks.count
-                        profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.reduce(0, { partialResult, network in
-                                partialResult + network.accounts.count
-                        })
-                        profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.reduce(0, { partialResult, network in
-                                partialResult + network.personas.count
-                        })
+                        // Save the update snapshot
+                        try await saveProfileSnapshot(profileSnapshot)
+                        // Update to new active profile id, so it is used from now on.
+                        await userDefaultsClient.setActiveProfileId(profileSnapshot.header.id)
 
+                        // Update the state with the imported snapshot
+                        try changeState(to: .persisted(.init(snapshot: profileSnapshot)))
+                } catch {
+                        let errorMessage = "Critical failure, unable to save imported profile snapshot: \(String(describing: error))"
+                        loggerGlobal.critical(.init(stringLiteral: errorMessage))
+                        assertionFailure(errorMessage) // for DEBUG builds we want to crash
+                        throw error
+                }
+        }
 
-                        try await updateProfileHeadersList(profile.header)
-			try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
-			changeState(to: .persisted(profile))
-		}
-	}
+        public func deleteProfile(keepIcloudIfPresent: Bool) async throws {
+                // Assert that this device is allowed to make changes on Profile
+                try await checkIfProfileIsOwnedByTheDevice()
 
-	public func deleteProfile(keepIcloudIfPresent: Bool) async throws {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
-		do {
-			await userDefaultsClient.removeActiveProfileId()
-			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, true)
-		} catch {
-			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
-			loggerGlobal.error(.init(stringLiteral: errorMessage))
-			assertionFailure(errorMessage)
-		}
-		let ephemeral = await Self.newEphemeralProfile()
-		changeState(to: .ephemeral(.init(profile: ephemeral, loadFailure: nil)))
-	}
+                do {
+                        await userDefaultsClient.removeActiveProfileId()
+                        try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, true)
+                } catch {
+                        let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
+                        loggerGlobal.error(.init(stringLiteral: errorMessage))
+                        assertionFailure(errorMessage)
+                }
+                let ephemeral = await Self.newEphemeralProfile()
+                changeState(to: .ephemeral(.init(profile: ephemeral, loadFailure: nil)))
+        }
+}
+
+extension ProfileStore {
+        /// Update the header with all of the relevant changes
+        func updateHeader(_ profile: inout Profile) async throws {
+                @Dependency(\.date) var date
+                let networks = profile.networks
+
+                profile.header.lastModified = date.now
+                profile.header.contentHint.numberOfNetworks = networks.count
+                profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.reduce(0) { partialResult, network in
+                        partialResult + network.accounts.count
+                }
+                profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.reduce(0) { partialResult, network in
+                        partialResult + network.personas.count
+                }
+        }
+
+        /// Commit the snapshot changes
+        func saveProfileSnapshot(_ snapshot: ProfileSnapshot) async throws {
+                // Assert that this device is allowed to make changes on Profile
+                try await checkIfProfileIsOwnedByTheDevice()
+
+                // Always update the header along with the snapshot itelf,
+                // so we are sure that the Header in Snapshot is synced with the Header in the HeadersList
+                try await updateProfileHeadersList(profile.header)
+                try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
+        }
+
+        func checkIfProfileIsOwnedByTheDevice() async throws {
+                /// The device is allowed to make CRUD operations on the profile only if it is the last used device
+                if let lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(profile.header.id)?.header.lastUsedOnDevice {
+                        let deviceId = await Self.getDeviceId()
+                        guard lastUsedOnDevice.id == deviceId else {
+                                throw Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
+                        }
+                }
+        }
 
         func updateProfileHeadersList(_ header: ProfileSnapshot.Header) async throws {
                 if var profileHeaders = try await secureStorageClient.loadProfileHeaderList()?.rawValue {

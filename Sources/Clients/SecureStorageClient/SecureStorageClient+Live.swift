@@ -89,6 +89,44 @@ extension SecureStorageClient: DependencyKey {
 			try await saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
+                @Sendable func loadProfileHeaderList() async throws -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>? {
+                        try await keychainClient
+                                .getDataWithoutAuthForKey(profileHeaderListKeychainKey)
+                                .map {
+                                        try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
+                                }.flatMap { .init($0) }
+                }
+
+                @Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) async throws {
+                        let data = try jsonEncoder().encode(headers)
+                        try await keychainClient.setDataWithoutAuthForKey(
+                                KeychainClient.SetItemWithoutAuthRequest(
+                                        data: data,
+                                        key: profileHeaderListKeychainKey,
+                                        iCloudSyncEnabled: true,
+                                        accessibility: .whenUnlocked,
+                                        label: "Radix Wallet Metadata",
+                                        comment: "Contains the metadata about Radix Wallet Data."
+                                )
+                        )
+                }
+
+                @Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) async throws {
+                        if let profileHeaders = try await loadProfileHeaderList() {
+                                let remainingHeaders = profileHeaders.filter { $0.id != id }
+                                if remainingHeaders.isEmpty {
+                                        // Delete the list instea of keeping an empty list
+                                        try await deleteProfileHeaderList()
+                                } else {
+                                        try await saveProfileHeaderList(.init(remainingHeaders)!)
+                                }
+                        }
+                }
+
+                @Sendable func deleteProfileHeaderList() async throws {
+                        try await keychainClient.removeDataForKey(profileHeaderListKeychainKey)
+                }
+
 		return Self(
 			saveProfileSnapshot: { profileSnapshot in
 				let data = try jsonEncoder().encode(profileSnapshot)
@@ -162,6 +200,7 @@ extension SecureStorageClient: DependencyKey {
 					} else {
 						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
 						try await keychainClient.removeDataForKey(profileID.keychainKey)
+                                                try await deleteProfileHeader(profileID)
 					}
 				}
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
@@ -185,31 +224,9 @@ extension SecureStorageClient: DependencyKey {
 					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: true)
 				}
 			},
-			loadProfileHeaderList: {
-				try await keychainClient
-					.getDataWithoutAuthForKey(profileHeaderListKeychainKey)
-					.map {
-						try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
-					}.flatMap {
-						.init($0)
-					}
-			},
-			saveProfileHeaderList: { list in
-				let data = try jsonEncoder().encode(list)
-				try await keychainClient.setDataWithoutAuthForKey(
-					KeychainClient.SetItemWithoutAuthRequest(
-						data: data,
-						key: profileHeaderListKeychainKey,
-						iCloudSyncEnabled: true,
-						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
-						label: "Radix Wallet Metadata",
-						comment: "Contains the metadata about Radix Wallet Data."
-					)
-				)
-			},
-			deleteProfileHeaderList: {
-				try await keychainClient.removeDataForKey(profileHeaderListKeychainKey)
-			}
+			loadProfileHeaderList: loadProfileHeaderList,
+			saveProfileHeaderList: saveProfileHeaderList,
+			deleteProfileHeaderList: deleteProfileHeaderList
 		)
 	}()
 }

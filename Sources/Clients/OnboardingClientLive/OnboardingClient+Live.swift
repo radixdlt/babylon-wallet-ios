@@ -19,25 +19,9 @@ extension OnboardingClient: DependencyKey {
 			},
 			loadProfileBackups: {
 				do {
-					let backupProfiles = try await secureStorageClient
-						.loadProfileHeaderList()?
-						.asyncCompactMap { header -> Profile? in
-							guard let profile = try? await secureStorageClient.loadProfile(header.id) else {
-								return nil
-							}
-							do {
-								try profile.header.validateCompatibility()
-								return profile
-							} catch {
-								// delete obsolete profile
-								return nil
-							}
-						}
-
-					return backupProfiles.flatMap {
-						.init(rawValue: .init(uncheckedUniqueElements: $0))
-					}
+					return try await secureStorageClient.loadProfileHeaderList()
 				} catch {
+                                        // Corupt Profile Headers, delete
 					try? await secureStorageClient.deleteProfileHeaderList()
 					return nil
 				}
@@ -46,8 +30,8 @@ extension OnboardingClient: DependencyKey {
 			importProfileSnapshot: {
 				try await getProfileStore().importProfileSnapshot($0)
 			},
-			importICloudProfile: { header in
-				try await getProfileStore().importICloudProfileSnapshot(header)
+			importCloudProfile: { header in
+				try await getProfileStore().importCloudProfileSnapshot(header)
 			},
 			commitEphemeral: {
 				try await getProfileStore().commitEphemeral()
