@@ -130,15 +130,10 @@ extension SecureStorageClient: DependencyKey {
 		return Self(
 			saveProfileSnapshot: { profileSnapshot in
 				let data = try jsonEncoder().encode(profileSnapshot)
-				try await keychainClient.setDataWithoutAuthForKey(
-					KeychainClient.SetItemWithoutAuthRequest(
-						data: data,
-						key: profileSnapshot.header.id.keychainKey,
-						iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled,
-						accessibility: .whenUnlocked, // do not delete the Profile if passcode gets deleted.
-						label: "Radix Wallet Data",
-						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
-					)
+				try await saveProfile(
+					snapshotData: data,
+					key: profileSnapshot.header.id.keychainKey,
+					iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
 				)
 			},
 			loadProfileSnapshotData: loadProfileSnapshotData,

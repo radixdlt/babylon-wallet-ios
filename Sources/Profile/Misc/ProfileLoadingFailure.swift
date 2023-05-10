@@ -35,8 +35,12 @@ extension Profile {
 		case unknown(UnknownDecodingError)
 	}
 
-	public struct ProfileIsUsedOnAnotherDeviceError: Sendable, Swift.Error, Hashable {
+	public struct ProfileIsUsedOnAnotherDeviceError: Sendable, LocalizedError, Hashable {
 		public let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo
+
+		public var errorDescription: String? {
+			"The Wallet Data is being used on another device"
+		}
 
 		public init(lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo) {
 			self.lastUsedOnDevice = lastUsedOnDevice

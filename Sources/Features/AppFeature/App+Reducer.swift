@@ -36,6 +36,7 @@ public struct App: Sendable, FeatureReducer {
 		case incompatibleProfileDeleted
 		case displayErrorAlert(App.UserFacingError)
 		case toMain(isAccountRecoveryNeeded: Bool)
+		case toOnboarding
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -106,6 +107,15 @@ public struct App: Sendable, FeatureReducer {
 						// easy to think a test failed if we print this warning during tests.
 						loggerGlobal.error("An error occurred: \(String(describing: error))")
 					}
+
+					// Maybe instead we should listen here for the Profile.State change,
+					// and when it switches to `.ephemeral` we navigate to onboarding.
+					// For now, we react to the specific error, since the Profile.State is meant to be private.
+					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
+						await send(.internal(.toOnboarding))
+						// A slight delay to allow any modal that may be shown to be dismissed.
+						try? await Task.sleep(for: .seconds(0.5))
+					}
 					await send(.internal(.displayErrorAlert(UserFacingError(error))))
 				}
 			}
@@ -140,6 +150,8 @@ public struct App: Sendable, FeatureReducer {
 			return goToOnboarding(state: &state)
 		case let .toMain(isAccountRecoveryNeeded):
 			return goToMain(state: &state, accountRecoveryIsNeeded: isAccountRecoveryNeeded)
+		case .toOnboarding:
+			return goToOnboarding(state: &state)
 		}
 	}
 
@@ -168,8 +180,8 @@ public struct App: Sendable, FeatureReducer {
 
 			case .existingProfile:
 				return checkAccountRecoveryNeeded()
-			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(device)):
-				// TODO: Show the error with the device info
+			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
+				errorQueue.schedule(error)
 				return goToOnboarding(state: &state)
 			}
 

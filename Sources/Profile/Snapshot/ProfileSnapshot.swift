@@ -14,6 +14,10 @@ public struct ProfileSnapshot:
 		header.snapshotVersion
 	}
 
+	public var id: Header.ID {
+		header.id
+	}
+
 	public var header: Header
 
 	/// All sources of factors, used for authorization such as spending funds, contains no

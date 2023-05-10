@@ -3,22 +3,22 @@ import OnboardingClient
 
 public struct RestoreFromBackup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public typealias BackupProfiles = NonEmpty<IdentifiedArrayOf<Profile>>
-		var backupProfiles: BackupProfiles?
-		var selectedProfile: Profile?
+		public typealias BackupProfileHeaders = NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>
+		var backupProfileHeaders: BackupProfileHeaders?
+		var selectedProfileHeader: ProfileSnapshot.Header?
 
 		public var isDisplayingFileImporter = false
 
-		public init(backupProfiles: BackupProfiles? = nil) {
-			self.backupProfiles = backupProfiles
+		public init(backupProfileHeaders: BackupProfileHeaders? = nil) {
+			self.backupProfileHeaders = backupProfileHeaders
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case tappedImportProfile
-		case tappedUseICloudBackup
-		case selectedProfile(Profile?)
+		case tappedUseCloudBackup
+		case selectedProfileHeader(ProfileSnapshot.Header?)
 		case dismissFileImporter
 		case profileImported(Result<URL, NSError>)
 	}
@@ -28,7 +28,7 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadBackupProfilesResult(State.BackupProfiles?)
+		case loadBackupProfileHeadersResult(State.BackupProfileHeaders?)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -40,7 +40,7 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-				await send(.internal(.loadBackupProfilesResult(
+				await send(.internal(.loadBackupProfileHeadersResult(
 					onboardingClient.loadProfileBackups()
 				)))
 			}
@@ -49,17 +49,17 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 			state.isDisplayingFileImporter = true
 			return .none
 
-		case let .selectedProfile(profile):
-			state.selectedProfile = profile
+		case let .selectedProfileHeader(header):
+			state.selectedProfileHeader = header
 			return .none
 
-		case .tappedUseICloudBackup:
-			guard let selectedProfile = state.selectedProfile else {
+		case .tappedUseCloudBackup:
+			guard let selectedProfileHeader = state.selectedProfileHeader else {
 				return .none
 			}
 
 			return .run { send in
-				try await onboardingClient.importICloudProfile(selectedProfile.header)
+				try await onboardingClient.importCloudProfile(selectedProfileHeader)
 				await send(.delegate(.completed))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -86,8 +86,8 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadBackupProfilesResult(profiles):
-			state.backupProfiles = profiles
+		case let .loadBackupProfileHeadersResult(profileHeaders):
+			state.backupProfileHeaders = profileHeaders
 			return .none
 		}
 	}

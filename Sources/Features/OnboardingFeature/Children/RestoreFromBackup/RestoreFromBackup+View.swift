@@ -35,26 +35,26 @@ extension RestoreFromBackup.View {
 							Spacer()
 						}
 
-						if let backupProfiles = viewStore.backupProfiles {
+						if let backupProfileHeaders = viewStore.backupProfileHeaders {
 							Selection(
 								viewStore.binding(
-									get: \.selectedProfile,
+									get: \.selectedProfileHeader,
 									send: {
-										.selectedProfile($0)
+										.selectedProfileHeader($0)
 									}
 								),
-								from: backupProfiles
+								from: backupProfileHeaders
 							) { item in
-								iCloudBackupDataCard(item)
+								cloudBackupDataCard(item)
 							}
 
 							Button("Use iCloud Backup Data") {
-								viewStore.send(.tappedUseICloudBackup)
+								viewStore.send(.tappedUseCloudBackup)
 							}
-							.controlState(viewStore.selectedProfile != nil ? .enabled : .disabled)
+							.controlState(viewStore.selectedProfileHeader != nil ? .enabled : .disabled)
 							.buttonStyle(.primaryRectangular)
 						} else {
-							Text("No iCloud Backup Data")
+							Text("No Cloud Backup Data")
 						}
 					}
 					.padding([.horizontal, .bottom], .medium1)
@@ -76,23 +76,26 @@ extension RestoreFromBackup.View {
 		}
 	}
 
-	private func iCloudBackupDataCard(_ item: SelectionItem<Profile>) -> some View {
-		let profile = item.value
-		let isVersionCompatible = profile.header.isVersionCompatible()
+	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>) -> some View {
+		let header = item.value
+		let isVersionCompatible = header.isVersionCompatible()
 
 		return Card(action: item.action, isDisabled: !isVersionCompatible) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
-					Text("Creating Device: \(profile.header.creatingDevice.description.rawValue)")
+					Text("Creating Device: \(header.creatingDevice.description.rawValue)")
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
-					Text("Creation Date: \(formatDate(profile.header.creationDate))")
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-					Text("Last Modified Date: \(formatDate(profile.header.lastModified))")
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
+					Group {
+						Text("Creation Date: \(formatDate(header.creationDate))")
+						Text("Last Modified Date: \(formatDate(header.lastModified))")
+						Text("Number of networks: \(header.contentHint.numberOfNetworks)")
+						Text("Number of total accounts: \(header.contentHint.numberOfAccountsOnAllNetworksInTotal)")
+						Text("Number of total personas: \(header.contentHint.numberOfPersonasOnAllNetworksInTotal)")
+					}
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
 						Text("Incompatible Wallet data")

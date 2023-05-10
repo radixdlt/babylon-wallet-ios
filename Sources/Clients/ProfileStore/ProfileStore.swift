@@ -293,8 +293,8 @@ extension ProfileStore {
 
 		// Always update the header along with the snapshot itelf,
 		// so we are sure that the Header in Snapshot is synced with the Header in the HeadersList
-		try await updateProfileHeadersList(profile.header)
-		try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
+		try await updateProfileHeadersList(snapshot.header)
+		try await secureStorageClient.saveProfileSnapshot(snapshot)
 	}
 
 	func checkIfProfileIsOwnedByTheDevice() async throws {
@@ -302,7 +302,13 @@ extension ProfileStore {
 		if let lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(profile.header.id)?.header.lastUsedOnDevice {
 			let deviceId = await Self.getDeviceId()
 			guard lastUsedOnDevice.id == deviceId else {
-				throw Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
+				let error = Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
+				// Go to ephemeral state straightaway. The Wallet will redirect user to the Onboarding screen.
+				await changeState(to: .ephemeral(.init(
+					profile: Self.newEphemeralProfile(),
+					loadFailure: .profileUsedOnAnotherDevice(error)
+				)))
+				throw error
 			}
 		}
 	}
