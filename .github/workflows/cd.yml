@@ -7,9 +7,10 @@ on:
         type: choice
         description: App flavour
         options:
+          - pre-alpha
           - alpha
           - beta
-          # - release
+          - release
   push:
     branches:
       - main
