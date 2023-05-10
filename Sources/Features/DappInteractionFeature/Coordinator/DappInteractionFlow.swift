@@ -579,17 +579,21 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				let accounts = Array(accountsWithProof)
 				switch accessKind {
 				case .oneTime:
-					return .remote(.oneTimeAccounts(.withProof(.init(challenge: challenge, accounts: accounts))))
+//					return .remote(.oneTimeAccountswith(.withProof(.init(challenge: challenge, accounts: accounts))))
+					fatalError()
 				case .ongoing:
-					return .remote(.ongoingAccounts(.withProof(.init(challenge: challenge, accounts: accounts))))
+//					return .remote(.ongoingAccounts(.withProof(.init(challenge: challenge, accounts: accounts))))
+					fatalError()
 				}
 
 			case let .withoutProofOfOwnership(accounts):
 				switch accessKind {
 				case .oneTime:
-					return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
+//					return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
+					fatalError()
 				case .ongoing:
-					return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
+//					return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.Dapp.Response.WalletAccount.init)))))
+					fatalError()
 				}
 			}
 		}()
@@ -634,14 +638,16 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							{
 								switch response.items {
 								case let .request(.authorized(items)):
-									switch items.ongoingAccounts {
-									case nil:
-										return nil
-									case let .withProof(item):
-										return item.accounts.map(\.account)
-									case let .withoutProof(item):
-										return item.accounts
-									}
+									return items.ongoingAccountsWithProofOfOwnership?.accounts.map(\.account) + items.ongoingAccountsWithoutProofOfOwnership.accounts
+
+//									switch items.ongoingAccountsWithProofOfOwnership {
+//									case nil:
+//										return nil
+//									case let .withProof(item):
+//										return item.accounts.map(\.account)
+//									case let .withoutProof(item):
+//										return item.accounts
+//									}
 								default:
 									return nil
 								}

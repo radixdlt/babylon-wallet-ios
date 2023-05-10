@@ -34,14 +34,17 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 	public struct UnauthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.Items.Discriminator.unauthorizedRequest.rawValue
-		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
+		public let oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?
+		public let oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?
 		public let oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
 
 		public init(
-			oneTimeAccounts: OneTimeAccountsRequestResponseItem?,
+			oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?,
+			oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?,
 			oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
 		) {
-			self.oneTimeAccounts = oneTimeAccounts
+			self.oneTimeAccountsWithoutProofOfOwnership = oneTimeAccountsWithoutProofOfOwnership
+			self.oneTimeAccountsWithProofOfOwnership = oneTimeAccountsWithProofOfOwnership
 			self.oneTimePersonaData = oneTimePersonaData
 		}
 	}
@@ -49,22 +52,28 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct AuthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.Items.Discriminator.authorizedRequest.rawValue
 		public let auth: AuthRequestResponseItem
-		public let ongoingAccounts: OngoingAccountsRequestResponseItem?
+		public let ongoingAccountsWithoutProofOfOwnership: OngoingAccountsWithoutProofOfOwnershipRequestResponseItem?
+		public let ongoingAccountsWithProofOfOwnership: OngoingAccountsWithProofOfOwnershipRequestResponseItem?
 		public let ongoingPersonaData: OngoingPersonaDataRequestResponseItem?
-		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
+		public let oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?
+		public let oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?
 		public let oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
 
 		public init(
 			auth: AuthRequestResponseItem,
-			ongoingAccounts: OngoingAccountsRequestResponseItem?,
+			ongoingAccountsWithoutProofOfOwnership: OngoingAccountsWithoutProofOfOwnershipRequestResponseItem?,
+			ongoingAccountsWithProofOfOwnership: OngoingAccountsWithProofOfOwnershipRequestResponseItem?,
 			ongoingPersonaData: OngoingPersonaDataRequestResponseItem?,
-			oneTimeAccounts: OneTimeAccountsRequestResponseItem?,
+			oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?,
+			oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?,
 			oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
 		) {
 			self.auth = auth
-			self.ongoingAccounts = ongoingAccounts
+			self.ongoingAccountsWithoutProofOfOwnership = ongoingAccountsWithoutProofOfOwnership
+			self.ongoingAccountsWithProofOfOwnership = ongoingAccountsWithProofOfOwnership
 			self.ongoingPersonaData = ongoingPersonaData
-			self.oneTimeAccounts = oneTimeAccounts
+			self.oneTimeAccountsWithoutProofOfOwnership = oneTimeAccountsWithoutProofOfOwnership
+			self.oneTimeAccountsWithProofOfOwnership = oneTimeAccountsWithProofOfOwnership
 			self.oneTimePersonaData = oneTimePersonaData
 		}
 	}

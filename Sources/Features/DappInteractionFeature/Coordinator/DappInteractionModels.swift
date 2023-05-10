@@ -106,9 +106,13 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	enum AnyInteractionResponseItem: Sendable, Hashable {
 		// request responses
 		case auth(AuthRequestResponseItem)
-		case ongoingAccounts(OngoingAccountsRequestResponseItem)
+		case ongoingAccountsWithoutProofOfOwnership(OngoingAccountsWithoutProofOfOwnershipRequestResponseItem)
+		case ongoingAccountsWithProofOfOwnership(OngoingAccountsWithProofOfOwnershipRequestResponseItem)
+
 		case ongoingPersonaData(OngoingPersonaDataRequestResponseItem)
-		case oneTimeAccounts(OneTimeAccountsRequestResponseItem)
+		case oneTimeAccountsWithoutProofOfOwnership(OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem)
+		case oneTimeAccountsWithProofOfOwnership(OneTimeAccountsWithProofOfOwnershipRequestResponseItem)
+
 		case oneTimePersonaData(OneTimePersonaDataRequestResponseItem)
 
 		// transaction responses
@@ -123,20 +127,26 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		case .request:
 			// NB: variadic generics + native case paths should greatly help to simplify this "picking" logic
 			var auth: AuthRequestResponseItem? = nil
-			var ongoingAccounts: OngoingAccountsRequestResponseItem? = nil
+			var ongoingAccountsWithoutProofOfOwnership: OngoingAccountsWithoutProofOfOwnershipRequestResponseItem? = nil
+			var ongoingAccountsWithProofOfOwnership: OngoingAccountsWithProofOfOwnershipRequestResponseItem? = nil
 			var ongoingPersonaData: OngoingPersonaDataRequestResponseItem? = nil
-			var oneTimeAccounts: OneTimeAccountsRequestResponseItem? = nil
+			var oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem? = nil
+			var oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem? = nil
 			var oneTimePersonaData: OneTimePersonaDataRequestResponseItem? = nil
 			for item in items {
 				switch item {
 				case let .auth(item):
 					auth = item
-				case let .ongoingAccounts(item):
-					ongoingAccounts = item
+				case let .ongoingAccountsWithProofOfOwnership(item):
+					ongoingAccountsWithProofOfOwnership = item
+				case let .ongoingAccountsWithoutProofOfOwnership(item):
+					ongoingAccountsWithoutProofOfOwnership = item
 				case let .ongoingPersonaData(item):
 					ongoingPersonaData = item
-				case let .oneTimeAccounts(item):
-					oneTimeAccounts = item
+				case let .oneTimeAccountsWithProofOfOwnership(item):
+					oneTimeAccountsWithProofOfOwnership = item
+				case let .oneTimeAccountsWithoutProofOfOwnership(item):
+					oneTimeAccountsWithoutProofOfOwnership = item
 				case let .oneTimePersonaData(item):
 					oneTimePersonaData = item
 				case .send:
@@ -150,9 +160,11 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 					items: .request(
 						.authorized(.init(
 							auth: auth,
-							ongoingAccounts: ongoingAccounts,
+							ongoingAccountsWithoutProofOfOwnership: ongoingAccountsWithoutProofOfOwnership,
+							ongoingAccountsWithProofOfOwnership: ongoingAccountsWithProofOfOwnership,
 							ongoingPersonaData: ongoingPersonaData,
-							oneTimeAccounts: oneTimeAccounts,
+							oneTimeAccountsWithoutProofOfOwnership: oneTimeAccountsWithoutProofOfOwnership,
+							oneTimeAccountsWithProofOfOwnership: oneTimeAccountsWithProofOfOwnership,
 							oneTimePersonaData: oneTimePersonaData
 						))
 					)
@@ -162,7 +174,8 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 					interactionId: interaction.id,
 					items: .request(
 						.unauthorized(.init(
-							oneTimeAccounts: oneTimeAccounts,
+							oneTimeAccountsWithoutProofOfOwnership: oneTimeAccountsWithoutProofOfOwnership,
+							oneTimeAccountsWithProofOfOwnership: oneTimeAccountsWithProofOfOwnership,
 							oneTimePersonaData: oneTimePersonaData
 						))
 					)
@@ -175,11 +188,15 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 				switch item {
 				case .auth:
 					continue
-				case .ongoingAccounts:
+				case .ongoingAccountsWithoutProofOfOwnership:
+					continue
+				case .ongoingAccountsWithProofOfOwnership:
 					continue
 				case .ongoingPersonaData:
 					continue
-				case .oneTimeAccounts:
+				case .oneTimeAccountsWithoutProofOfOwnership:
+					continue
+				case .oneTimeAccountsWithProofOfOwnership:
 					continue
 				case .oneTimePersonaData:
 					continue
