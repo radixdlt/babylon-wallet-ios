@@ -21,5 +21,17 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 				self.proofs = nil
 			}
 		}
+
+		/// for tests
+		private init(withoutProofOfOwnership accounts: [P2P.Dapp.Response.WalletAccount]) {
+			self.accounts = accounts
+			self.challenge = nil
+			self.proofs = nil
+		}
+
+		/// for tests
+		internal static func withoutProofOfOwnership(accounts: [P2P.Dapp.Response.WalletAccount]) -> Self {
+			Self(withoutProofOfOwnership: accounts)
+		}
 	}
 }

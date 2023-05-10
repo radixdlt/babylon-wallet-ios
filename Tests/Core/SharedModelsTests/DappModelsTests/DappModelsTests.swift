@@ -7,20 +7,20 @@ final class ToDappResponseTests: TestCase {
 			interactionId: "an_id",
 			items: .request(
 				.unauthorized(.init(
-					oneTimeAccountsWithoutProofOfOwnership: .init(accounts: [
+					oneTimeAccounts: P2P.Dapp.Response.WalletInteractionSuccessResponse.AccountsRequestResponseItem.withoutProofOfOwnership(accounts: [
 						.init(
 							accountAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
 							label: "Label",
 							appearanceId: .fromIndex(0)
 						),
 					]),
-					oneTimeAccountsWithProofOfOwnership: nil,
 					oneTimePersonaData: .init(fields: [
 						.init(field: .givenName, value: NonEmptyString(rawValue: "Percy")!),
 						.init(field: .familyName, value: NonEmptyString(rawValue: "Jackson")!),
 						.init(field: .emailAddress, value: NonEmptyString(rawValue: "lightningthief@olympus.lol")!),
 						.init(field: .phoneNumber, value: NonEmptyString(rawValue: "555 5555")!),
 					])
+
 				))
 			)
 		))
@@ -71,6 +71,7 @@ final class ToDappResponseTests: TestCase {
 				],
 			],
 			"metadata": [
+				"version": 1,
 				"networkId": 34,
 				"origin": "radixdlt.dashboard.com",
 				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
@@ -92,7 +93,7 @@ final class ToDappResponseTests: TestCase {
 					))
 				),
 				metadata: .init(
-					networkId: 34,
+					version: 1, networkId: 34,
 					origin: "radixdlt.dashboard.com",
 					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
 				)
@@ -112,6 +113,7 @@ final class ToDappResponseTests: TestCase {
 				],
 			],
 			"metadata": [
+				"version": 1,
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
 				"dAppDefinitionAddress": "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6",
@@ -129,7 +131,7 @@ final class ToDappResponseTests: TestCase {
 					)
 				)),
 				metadata: .init(
-					networkId: 34,
+					version: 1, networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
 				)
