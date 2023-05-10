@@ -41,10 +41,6 @@ extension ProfileSnapshot {
 		/// A version of the Profile Snapshot data format used for compatibility checks.
 		public let snapshotVersion: Version
 
-                public func hash(into hasher: inout Hasher) {
-                        hasher.combine(id)
-                }
-
 		public init(
 			creatingDevice: UsedDeviceInfo,
 			lastUsedOnDevice: UsedDeviceInfo,

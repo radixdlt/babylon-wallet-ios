@@ -309,9 +309,9 @@ extension ProfileStore {
 	}
 
         func updateProfileHeadersList(_ header: ProfileSnapshot.Header) async throws {
-                if var profileHeaders = try await secureStorageClient.loadProfileHeaderList() {
-                        profileHeaders.insert(header)
-                        try await secureStorageClient.saveProfileHeaderList(profileHeaders)
+                if var profileHeaders = try await secureStorageClient.loadProfileHeaderList()?.rawValue {
+                        profileHeaders[id: header.id] = header
+                        try await secureStorageClient.saveProfileHeaderList(.init(rawValue: profileHeaders)!)
                 } else {
                         try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [header])!)
                 }
