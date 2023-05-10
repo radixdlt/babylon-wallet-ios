@@ -19,6 +19,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
+		public let discriminator = "oneTimeAccountsWithoutProofOfOwnership"
 		public let accounts: [P2P.Dapp.Response.WalletAccount]
 
 		public init(accounts: [P2P.Dapp.Response.WalletAccount]) {
@@ -27,6 +28,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	}
 
 	public struct OneTimeAccountsWithProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
+		public let discriminator = "oneTimeAccountsWithProofOfOwnership"
 		public let accounts: [P2P.Dapp.Response.WalletAccountWithProof]
 		public let challenge: P2P.Dapp.AuthChallengeNonce
 
