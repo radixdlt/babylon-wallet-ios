@@ -37,6 +37,8 @@
 
 /* Begin PBXFileReference section */
 		83357231294CC633007E0AB4 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
+		833DA0902A0B7BB0004D0A4D /* Project-PreAlpha.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-PreAlpha.xcconfig"; sourceTree = "<group>"; };
+		833DA0912A0B7BCF004D0A4D /* iOS-preAlpha.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-preAlpha.xcconfig"; sourceTree = "<group>"; };
 		839D88D3294B34140098B586 /* Project-Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Beta.xcconfig"; sourceTree = "<group>"; };
 		839D88D4294B34140098B586 /* Project-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Shared.xcconfig"; sourceTree = "<group>"; };
 		839D88D5294B34150098B586 /* Project-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Release.xcconfig"; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				839D88D6294B34150098B586 /* Project-Alpha.xcconfig */,
+				833DA0902A0B7BB0004D0A4D /* Project-PreAlpha.xcconfig */,
 				839D88D3294B34140098B586 /* Project-Beta.xcconfig */,
 				839D88D7294B34150098B586 /* Project-Dev.xcconfig */,
 				83AAF5DF2966BCF7008102F0 /* Project-Debug-Opt.xcconfig */,
@@ -133,6 +136,7 @@
 				839D88D8294B509C0098B586 /* iOS-shared.xcconfig */,
 				839D88D9294B50AC0098B586 /* iOS-dev.xcconfig */,
 				839D88DA294B50B20098B586 /* iOS-alpha.xcconfig */,
+				833DA0912A0B7BCF004D0A4D /* iOS-preAlpha.xcconfig */,
 				839D88DB294B50B60098B586 /* iOS-beta.xcconfig */,
 				839D88DC294B50BD0098B586 /* iOS-release.xcconfig */,
 				839D88E1294B576C0098B586 /* iOS-release-opt.xcconfig */,
@@ -460,6 +464,28 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		833DA0922A0B7C2F004D0A4D /* Debug-PreAlpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 833DA0902A0B7BB0004D0A4D /* Project-PreAlpha.xcconfig */;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+			};
+			name = "Debug-PreAlpha";
+		};
+		833DA0932A0B7C2F004D0A4D /* Debug-PreAlpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 833DA0912A0B7BCF004D0A4D /* iOS-preAlpha.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug-PreAlpha";
+		};
+		833DA0942A0B7C2F004D0A4D /* Debug-PreAlpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug-PreAlpha";
+		};
 		83DEEED62949CA5A003557D7 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D7294B34150098B586 /* Project-Dev.xcconfig */;
@@ -557,6 +583,7 @@
 				83DEEED62949CA5A003557D7 /* Debug-Dev */,
 				E6805BD4286DB3ED00861180 /* Release */,
 				83F41363294B185300EE5EBC /* Debug-Alpha */,
+				833DA0922A0B7C2F004D0A4D /* Debug-PreAlpha */,
 				83E1AEDB2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -568,6 +595,7 @@
 				83DEEED72949CA5A003557D7 /* Debug-Dev */,
 				E6805BD7286DB3ED00861180 /* Release */,
 				83F41364294B185300EE5EBC /* Debug-Alpha */,
+				833DA0932A0B7C2F004D0A4D /* Debug-PreAlpha */,
 				83E1AEDC2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -579,6 +607,7 @@
 				83DEEED82949CA5A003557D7 /* Debug-Dev */,
 				E6805BDA286DB3ED00861180 /* Release */,
 				83F41365294B185300EE5EBC /* Debug-Alpha */,
+				833DA0942A0B7C2F004D0A4D /* Debug-PreAlpha */,
 				83E1AEDD2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
