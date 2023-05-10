@@ -68,8 +68,8 @@ extension Header {
 					if shouldShowNotification {
 						Circle()
 							.foregroundColor(.app.notification)
-							.frame(width: 10, height: 10)
-							.offset(y: 2)
+							.frame(width: .small1, height: .small1) // we should probably have the frame size aligned with the unit size.
+							.offset(y: .small3)
 					}
 				}
 			}

@@ -3,24 +3,28 @@ import OnboardingClient
 
 public struct RestoreFromBackup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public typealias BackupProfileHeaders = NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>
-		var backupProfileHeaders: BackupProfileHeaders?
-		var selectedProfileHeader: ProfileSnapshot.Header?
+		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
+		public var selectedProfileHeader: ProfileSnapshot.Header?
+		public var isDisplayingFileImporter: Bool
 
-		public var isDisplayingFileImporter = false
-
-		public init(backupProfileHeaders: BackupProfileHeaders? = nil) {
+		public init(
+			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
+			selectedProfileHeader: ProfileSnapshot.Header? = nil,
+			isDisplayingFileImporter: Bool = false
+		) {
 			self.backupProfileHeaders = backupProfileHeaders
+			self.selectedProfileHeader = selectedProfileHeader
+			self.isDisplayingFileImporter = isDisplayingFileImporter
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case tappedImportProfile
+		case dismissFileImporter
+		case profileImportResult(Result<URL, NSError>)
 		case tappedUseCloudBackup
 		case selectedProfileHeader(ProfileSnapshot.Header?)
-		case dismissFileImporter
-		case profileImported(Result<URL, NSError>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -28,7 +32,7 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadBackupProfileHeadersResult(State.BackupProfileHeaders?)
+		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -68,11 +72,12 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
 			return .none
-		case let .profileImported(.failure(error)):
+
+		case let .profileImportResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .profileImported(.success(profileURL)):
+		case let .profileImportResult(.success(profileURL)):
 			return .run { send in
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
 				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)

@@ -251,8 +251,8 @@ extension ProfileStore {
 		var profileSnapshot = profileSnapshot
 		await claimProfileSnapshot(&profileSnapshot)
 
-		// Save the update snapshot.
-		// Do not check the ownership since the device did claim the profile ownership
+		// Save the updated snapshot.
+		// Do not check the ownership since the device did claim the profile ownership.
 		try await saveProfileSnapshot(profileSnapshot, checkOwnership: false)
 		// Update to new active profile id, so it is used from now on.
 		await userDefaultsClient.setActiveProfileId(profileSnapshot.header.id)

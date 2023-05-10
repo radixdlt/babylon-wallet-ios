@@ -22,7 +22,7 @@ extension RestoreFromBackup.View {
 				ScrollView {
 					// TODO: This is speculative design, needs to be updated once we have the proper design
 					VStack(spacing: .medium1) {
-						Button("Import Backup data") {
+						Button("Import Backup Wallet data") {
 							viewStore.send(.tappedImportProfile)
 						}
 						.buttonStyle(.primaryRectangular)
@@ -30,7 +30,7 @@ extension RestoreFromBackup.View {
 						Separator()
 
 						HStack {
-							Text("iCloud Backup data: ")
+							Text("Cloud Backup Wallet data: ")
 								.textStyle(.body1Header)
 							Spacer()
 						}
@@ -57,7 +57,7 @@ extension RestoreFromBackup.View {
 							Text("No Cloud Backup Data")
 						}
 					}
-					.padding([.horizontal, .bottom], .medium1)
+					.padding(.horizontal, .medium3)
 				}
 				.fileImporter(
 					isPresented: viewStore.binding(
@@ -65,7 +65,7 @@ extension RestoreFromBackup.View {
 						send: .dismissFileImporter
 					),
 					allowedContentTypes: [.profile],
-					onCompletion: { viewStore.send(.profileImported($0.mapError { $0 as NSError })) }
+					onCompletion: { viewStore.send(.profileImportResult($0.mapError { $0 as NSError })) }
 				)
 				.navigationTitle("Wallet Data Backup")
 				.padding(.top, .medium2)
@@ -76,6 +76,7 @@ extension RestoreFromBackup.View {
 		}
 	}
 
+	@MainActor
 	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
@@ -104,13 +105,14 @@ extension RestoreFromBackup.View {
 					}
 				}
 				if isVersionCompatible {
+					Spacer()
 					RadioButton(
 						appearance: .dark,
 						state: item.isSelected ? .selected : .unselected
 					)
 				}
 			}
-			.padding(.medium2)
+			.padding(.medium3)
 		}
 	}
 

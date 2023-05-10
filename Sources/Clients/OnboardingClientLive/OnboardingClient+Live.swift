@@ -19,7 +19,8 @@ extension OnboardingClient: DependencyKey {
 			},
 			loadProfileBackups: {
 				do {
-					return try await secureStorageClient.loadProfileHeaderList()
+					let headers = try await secureStorageClient.loadProfileHeaderList()
+					return headers
 				} catch {
 					// Corupt Profile Headers, delete
 					try? await secureStorageClient.deleteProfileHeaderList()
