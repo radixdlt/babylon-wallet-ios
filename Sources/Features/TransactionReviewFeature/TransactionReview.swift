@@ -443,7 +443,8 @@ extension TransactionReview {
 
 	private func extractDappInfo(_ component: ComponentAddress) async throws -> LedgerEntity {
 		let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
-		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress, validating: component)
+		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
+			.validating(dAppComponent: component)
 
 		return LedgerEntity(
 			id: dAppDefinitionAddress.id,
@@ -735,28 +736,6 @@ extension Collection where Element: Equatable {
 			count += 1
 		}
 		return count
-	}
-}
-
-extension GatewayAPI.EntityMetadataCollection {
-	var description: String? {
-		self["description"]
-	}
-
-	var symbol: String? {
-		self["symbol"]
-	}
-
-	var name: String? {
-		self["name"]
-	}
-
-	var url: String? {
-		self["url"]
-	}
-
-	subscript(key: String) -> String? {
-		items.first { $0.key == key }?.value.asString
 	}
 }
 

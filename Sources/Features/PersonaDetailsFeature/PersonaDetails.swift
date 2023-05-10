@@ -45,7 +45,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		var destination: Destination.State? = nil
+		public var destination: Destination.State? = nil
 
 		var identityAddress: IdentityAddress {
 			mode.id

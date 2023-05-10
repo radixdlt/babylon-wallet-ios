@@ -293,7 +293,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
 	// terrible parsing mess.
 	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
-		guard let response: GatewayAPI.EntityMetadataItemValue = self[SetMetadata.ownerKeysKey] else {
+		guard let response: GatewayAPI.EntityMetadataItemValue = self[customKey: SetMetadata.ownerKeysKey] else {
 			return nil
 		}
 

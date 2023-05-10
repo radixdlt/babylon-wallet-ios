@@ -26,23 +26,62 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
 
-		@PresentationState
-		public var personaDetails: PersonaDetails.State? = nil
+		@Loadable
+		public var resources: Resources? = nil
 
-		@PresentationState
-		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
+		@Loadable
+		public var associatedDapps: [AssociatedDapp]? = nil
 
 		public var personaList: PersonaList.State
 
+		@PresentationState
+		public var destination: Destination.State? = nil
+
 		public init(
 			dApp: Profile.Network.AuthorizedDappDetailed,
+			metadata: GatewayAPI.EntityMetadataCollection? = nil,
+			resources: Resources? = nil,
+			associatedDapps: [AssociatedDapp]? = nil,
 			personaDetails: PersonaDetails.State? = nil,
-			metadata: GatewayAPI.EntityMetadataCollection? = nil
+			destination: Destination.State? = nil
 		) {
 			self.dApp = dApp
-			self.personaDetails = personaDetails
-			self.personaList = .init(dApp: dApp)
 			self.metadata = metadata
+			self.resources = resources
+			self.associatedDapps = associatedDapps
+			self.personaList = .init(dApp: dApp)
+			self.destination = destination
+		}
+
+		public struct Resources: Hashable, Sendable {
+			public var fungible: [ResourceDetails]
+			public var nonFungible: [ResourceDetails]
+
+			// TODO: This should be consolidated with other types that represent resources
+			public struct ResourceDetails: Identifiable, Hashable, Sendable {
+				public var id: ResourceAddress { address }
+
+				public let address: ResourceAddress
+				public let fungibility: Fungibility
+				public let name: String
+				public let symbol: String?
+				public let description: String?
+				public let iconURL: URL?
+
+				public enum Fungibility: Hashable, Sendable {
+					case fungible
+					case nonFungible
+				}
+			}
+		}
+
+		// TODO: This should be consolidated with other types that represent resources
+		public struct AssociatedDapp: Identifiable, Hashable, Sendable {
+			public var id: DappDefinitionAddress { address }
+
+			public let address: DappDefinitionAddress
+			public let name: String
+			public let iconURL: URL?
 		}
 	}
 
@@ -51,16 +90,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case openURLTapped(URL)
-		case fungibleTokenTapped(ComponentAddress)
-		case nonFungibleTokenTapped(ComponentAddress)
+		case fungibleTapped(ResourceAddress)
+		case nonFungibleTapped(ResourceAddress)
+		case dAppTapped(DappDefinitionAddress)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
-		case confirmDisconnectAlert(PresentationAction<ConfirmDisconnectAlert>)
-
-		public enum ConfirmDisconnectAlert: Sendable, Equatable {
-			case confirmTapped
-			case cancelTapped
-		}
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -69,13 +103,40 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
+		case resourcesLoaded(Loadable<State.Resources>)
+		case associatedDappsLoaded(Loadable<[State.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
 		case dAppForgotten
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case personaDetails(PresentationAction<PersonaDetails.Action>)
 		case personas(PersonaList.Action)
+		case destination(PresentationAction<Destination.Action>)
+	}
+
+	// MARK: - Destination
+
+	public struct Destination: ReducerProtocol {
+		public enum State: Equatable, Hashable {
+			case personaDetails(PersonaDetails.State)
+			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
+		}
+
+		public enum Action: Equatable {
+			case personaDetails(PersonaDetails.Action)
+			case confirmDisconnectAlert(ConfirmDisconnectAlert)
+
+			public enum ConfirmDisconnectAlert: Sendable, Equatable {
+				case confirmTapped
+				case cancelTapped
+			}
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
+				PersonaDetails()
+			}
+		}
 	}
 
 	// MARK: Reducer
@@ -87,16 +148,16 @@ public struct DappDetails: Sendable, FeatureReducer {
 			PersonaList()
 		}
 		Reduce(core)
-			.ifLet(\.$personaDetails, action: /Action.child .. ChildAction.personaDetails) {
-				PersonaDetails()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
-			.ifLet(\.$confirmDisconnectAlert, action: /Action.view .. ViewAction.confirmDisconnectAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
 			state.$metadata = .loading
+			state.$resources = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
 				let result = await TaskResult {
@@ -115,45 +176,53 @@ public struct DappDetails: Sendable, FeatureReducer {
 				await openURL(url)
 			}
 
-		case let .fungibleTokenTapped(token):
+		case let .fungibleTapped(address):
 			// TODO: Handle this
 			return .none
 
-		case let .nonFungibleTokenTapped(nft):
+		case let .nonFungibleTapped(address):
+			// TODO: Handle this
+			return .none
+
+		case let .dAppTapped(address):
 			// TODO: Handle this
 			return .none
 
 		case .dismissPersonaTapped:
-			return .send(.child(.personaDetails(.dismiss)))
+			guard case .personaDetails = state.destination else { return .none }
+			return .send(.child(.destination(.dismiss)))
 
 		case .forgetThisDappTapped:
-			state.confirmDisconnectAlert = .confirmDisconnect
-			return .none
-
-		case .confirmDisconnectAlert(.presented(.confirmTapped)):
-			return disconnectDappEffect(state: state)
-
-		case .confirmDisconnectAlert:
+			state.destination = .confirmDisconnectAlert(.confirmDisconnect)
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .personaDetails(.presented(.delegate(.personaDeauthorized))):
-			let dAppID = state.dApp.dAppDefinitionAddress
-			return update(dAppID: dAppID, dismissPersonaDetails: true)
+		case let .destination(.presented(destinationAction)):
+			switch destinationAction {
+			case .personaDetails(.delegate(.personaDeauthorized)):
+				let dAppID = state.dApp.dAppDefinitionAddress
+				return update(dAppID: dAppID, dismissPersonaDetails: true)
 
-		case .personaDetails(.presented(.delegate(.personaChanged))):
-			let dAppID = state.dApp.dAppDefinitionAddress
-			return update(dAppID: dAppID, dismissPersonaDetails: false)
+			case .personaDetails(.delegate(.personaChanged)):
+				let dAppID = state.dApp.dAppDefinitionAddress
+				return update(dAppID: dAppID, dismissPersonaDetails: false)
 
-		case .personaDetails:
+			case .confirmDisconnectAlert(.confirmTapped):
+				return disconnectDappEffect(state: state)
+
+			default:
+				return .none
+			}
+
+		case .destination:
 			return .none
 
 		case let .personas(.delegate(.openDetails(persona))):
 			guard let detailedPersona = state.dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
-			state.personaDetails = PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona))
+			state.destination = .personaDetails(PersonaDetails.State(.dApp(state.dApp, persona: detailedPersona)))
 			return .none
 
 		case .personas:
@@ -165,7 +234,24 @@ public struct DappDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
+
+			let dAppDefinitionAddress = state.dApp.dAppDefinitionAddress
+			return .run { send in
+				let resources = await metadata.flatMap { await loadResources(metadata: $0, validated: dAppDefinitionAddress) }
+				await send(.internal(.resourcesLoaded(resources)))
+
+				let associatedDapps = await metadata.flatMap { await loadDapps(metadata: $0, validated: dAppDefinitionAddress) }
+				await send(.internal(.associatedDappsLoaded(associatedDapps)))
+			}
+
+		case let .resourcesLoaded(resources):
+			state.$resources = resources
 			return .none
+
+		case let .associatedDappsLoaded(dApps):
+			state.$associatedDapps = dApps
+			return .none
+
 		case let .dAppUpdated(dApp):
 			assert(dApp.dAppDefinitionAddress == state.dApp.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
@@ -183,12 +269,67 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	/// Loads any fungible and non-fungible resources associated with the dApp
+	private func loadResources(
+		metadata: GatewayAPI.EntityMetadataCollection,
+		validated dappDefinitionAddress: DappDefinitionAddress
+	) async -> Loadable<DappDetails.State.Resources> {
+		guard let claimedEntities = metadata.claimedEntities, !claimedEntities.isEmpty else {
+			return .idle
+		}
+
+		let result = await TaskResult {
+			let allResourceItems = try await gatewayAPIClient.fetchResourceDetails(claimedEntities)
+				.items
+				// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+				// .filter { $0.metadata.dappDefinition == dAppDefinitionAddress.address }
+				.compactMap(\.resourceDetails)
+
+			return State.Resources(fungible: allResourceItems.filter { $0.fungibility == .fungible },
+			                       nonFungible: allResourceItems.filter { $0.fungibility == .nonFungible })
+		}
+
+		return .init(result: result)
+	}
+
+	/// Loads any other dApps associated with the dApp
+	private func loadDapps(
+		metadata: GatewayAPI.EntityMetadataCollection,
+		validated dappDefinitionAddress: DappDefinitionAddress
+	) async -> Loadable<[State.AssociatedDapp]> {
+		let dAppDefinitions = try? metadata.dappDefinitions?.compactMap(DappDefinitionAddress.init)
+		guard let dAppDefinitions else { return .idle }
+
+		let associatedDapps = await dAppDefinitions.parallelMap { dApp in
+			try? await extractDappInfo(for: dApp, validating: dappDefinitionAddress)
+		}
+		.compactMap { $0 }
+
+		guard !associatedDapps.isEmpty else { return .idle }
+
+		return .success(associatedDapps)
+	}
+
+	/// Helper function that loads and extracts dApp info for a given dApp, validating that it points back to the dApp of this screen
+	private func extractDappInfo(
+		for dApp: DappDefinitionAddress,
+		validating dAppDefinitionAddress: DappDefinitionAddress
+	) async throws -> State.AssociatedDapp {
+		let metadata = try await gatewayAPIClient.getEntityMetadata(dApp.address)
+		// FIXME: Uncomment this when when we can rely on dApps conforming to the standards
+		// .validating(dAppDefinitionAddress: dAppDefinitionAddress)
+		guard let name = metadata.name else {
+			throw GatewayAPI.EntityMetadataCollection.MetadataError.missingName
+		}
+		return .init(address: dApp, name: name, iconURL: metadata.iconURL)
+	}
+
 	private func update(dAppID: DappDefinitionAddress, dismissPersonaDetails: Bool) -> EffectTask<Action> {
 		.run { send in
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
 			await send(.internal(.dAppUpdated(updatedDapp)))
 			if dismissPersonaDetails {
-				await send(.child(.personaDetails(.dismiss)))
+				await send(.child(.destination(.dismiss)))
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
@@ -206,7 +347,31 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<DappDetails.ViewAction.ConfirmDisconnectAlert> {
+extension GatewayAPI.StateEntityDetailsResponseItem {
+	var resourceDetails: DappDetails.State.Resources.ResourceDetails? {
+		guard let fungibility else { return nil }
+		return .init(address: .init(address: address),
+		             fungibility: fungibility,
+		             name: metadata.name ?? L10n.DAppDetails.unknownTokenName,
+		             symbol: metadata.symbol,
+		             description: metadata.description,
+		             iconURL: metadata.iconURL)
+	}
+
+	private var fungibility: DappDetails.State.Resources.ResourceDetails.Fungibility? {
+		guard let details else { return nil }
+		switch details {
+		case .fungibleResource:
+			return .fungible
+		case .nonFungibleResource:
+			return .nonFungible
+		case .fungibleVault, .nonFungibleVault, .package, .component:
+			return nil
+		}
+	}
+}
+
+extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
 		AlertState {
 			TextState(L10n.DAppDetails.forgetDappAlertTitle)
