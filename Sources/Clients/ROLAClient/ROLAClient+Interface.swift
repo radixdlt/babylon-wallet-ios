@@ -41,12 +41,12 @@ public struct AuthenticationDataToSignForChallengeResponse: Sendable, Hashable {
 
 // MARK: - AuthenticationDataToSignForChallengeRequest
 public struct AuthenticationDataToSignForChallengeRequest: Sendable, Hashable {
-	public let challenge: P2P.Dapp.AuthChallengeNonce
+	public let challenge: P2P.Dapp.Request.AuthChallengeNonce
 	public let origin: P2P.Dapp.Request.Metadata.Origin
 	public let dAppDefinitionAddress: DappDefinitionAddress
 
 	public init(
-		challenge: P2P.Dapp.AuthChallengeNonce,
+		challenge: P2P.Dapp.Request.AuthChallengeNonce,
 		origin: P2P.Dapp.Request.Metadata.Origin,
 		dAppDefinitionAddress: DappDefinitionAddress
 	) {

@@ -6,10 +6,7 @@ import ROLAClient
 import SigningFeature
 
 // MARK: - ChooseAccountsResult
-enum ChooseAccountsResult: Sendable, Hashable {
-	case withoutProofOfOwnership(IdentifiedArrayOf<Profile.Network.Account>)
-	case withProofOfOwnership(challenge: P2P.Dapp.AuthChallengeNonce, IdentifiedArrayOf<P2P.Dapp.Response.WalletAccountWithProof>)
-}
+typealias ChooseAccountsResult = P2P.Dapp.Response.Accounts
 
 // MARK: - ChooseAccounts
 struct ChooseAccounts: Sendable, FeatureReducer {
@@ -20,7 +17,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 
 		/// if `proofOfOwnership`, sign this challenge
-		let challenge: P2P.Dapp.AuthChallengeNonce?
+		let challenge: P2P.Dapp.Request.AuthChallengeNonce?
 
 		let accessKind: AccessKind
 		let dappDefinitionAddress: DappDefinitionAddress
@@ -33,7 +30,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		var destination: Destinations.State?
 
 		init(
-			challenge: P2P.Dapp.AuthChallengeNonce?,
+			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,

@@ -9,29 +9,22 @@ extension P2P {
 
 // MARK: - SignedAuthChallenge
 public struct SignedAuthChallenge: Sendable, Hashable {
-	public let challenge: P2P.Dapp.AuthChallengeNonce
+	public let challenge: P2P.Dapp.Request.AuthChallengeNonce
 	public let entitySignatures: Set<SignatureOfEntity>
-	public init(challenge: P2P.Dapp.AuthChallengeNonce, entitySignatures: Set<SignatureOfEntity>) {
+	public init(challenge: P2P.Dapp.Request.AuthChallengeNonce, entitySignatures: Set<SignatureOfEntity>) {
 		self.challenge = challenge
 		self.entitySignatures = entitySignatures
 	}
 }
 
-// MARK: - P2P.Dapp.Response
-extension P2P.Dapp {
+// MARK: - P2P.Dapp.Request.AuthChallengeNonce
+extension P2P.Dapp.Request {
 	/// A 32 bytes nonce used as a challenge
 	public typealias AuthChallengeNonce = Tagged<(Self, nonce: ()), HexCodable32Bytes>
-	public struct AuthProof: Sendable, Hashable, Codable {
-		public let publicKey: String
-		public let curve: String
-		public let signature: String
-		public init(publicKey: String, curve: String, signature: String) {
-			self.publicKey = publicKey
-			self.curve = curve
-			self.signature = signature
-		}
-	}
+}
 
+// MARK: - P2P.Dapp.Response
+extension P2P.Dapp {
 	public enum Response: Sendable, Hashable, Encodable {
 		private enum CodingKeys: String, CodingKey {
 			case discriminator
@@ -54,6 +47,45 @@ extension P2P.Dapp {
 			case let .failure(failure):
 				try container.encode(Discriminator.failure, forKey: .discriminator)
 				try failure.encode(to: encoder)
+			}
+		}
+	}
+}
+
+extension P2P.Dapp.Response {
+	public struct AuthProof: Sendable, Hashable, Codable {
+		public let publicKey: String
+		public let curve: String
+		public let signature: String
+		public init(publicKey: String, curve: String, signature: String) {
+			self.publicKey = publicKey
+			self.curve = curve
+			self.signature = signature
+		}
+	}
+
+	public struct ChallengeWithProof: Sendable, Hashable {
+		public let challenge: P2P.Dapp.Request.AuthChallengeNonce
+		public let proof: P2P.Dapp.Response.AuthProof
+	}
+
+	public enum Accounts: Sendable, Hashable {
+		case withoutProofOfOwnership(IdentifiedArrayOf<Profile.Network.Account>)
+		case withProofOfOwnership(challenge: P2P.Dapp.Request.AuthChallengeNonce, IdentifiedArrayOf<WithProof>)
+
+		public struct WithProof: Sendable, Hashable, Encodable, Identifiable {
+			public typealias ID = WalletAccount
+			public var id: ID { account }
+			public let account: WalletAccount
+
+			public let proof: P2P.Dapp.Response.AuthProof
+
+			public init(
+				account: WalletAccount,
+				proof: P2P.Dapp.Response.AuthProof
+			) {
+				self.account = account
+				self.proof = proof
 			}
 		}
 	}

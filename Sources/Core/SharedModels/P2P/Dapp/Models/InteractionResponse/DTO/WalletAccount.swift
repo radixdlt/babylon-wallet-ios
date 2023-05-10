@@ -11,40 +11,28 @@ extension P2P.Dapp.Response {
 	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 	///
 	public struct WalletAccount: Sendable, Hashable, Encodable {
-		public let address: String
-		public let label: NonEmpty<String>
+		public let address: AccountAddress
+		public let label: NonEmptyString
 		public let appearanceId: Profile.Network.Account.AppearanceID
 
 		public init(
 			accountAddress: AccountAddress,
-			label: NonEmpty<String>,
+			label: NonEmptyString,
 			appearanceId: Profile.Network.Account.AppearanceID
 		) {
-			address = accountAddress.address
+			self.address = accountAddress
 			self.label = label
 			self.appearanceId = appearanceId
 		}
 	}
 
-	/// Response to Dapp from wallet, info about a users account.
-	///
-	/// Called `AccountAddressWithProofOfOwnership` in [CAP21][cap]
-	///
-	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
-	///
-	public struct WalletAccountWithProof: Sendable, Hashable, Encodable, Identifiable {
-		public typealias ID = WalletAccount
-		public var id: ID { account }
-		public let account: WalletAccount
+	public struct AccountProof: Sendable, Hashable, Encodable {
+		public let accountAddress: AccountAddress
+		public let proof: P2P.Dapp.Response.AuthProof
 
-		public let proof: P2P.Dapp.AuthProof
-
-		public init(
-			account: WalletAccount,
-			proof: P2P.Dapp.AuthProof
-		) {
-			self.account = account
-			self.proof = proof
+		init(accountWithProof: P2P.Dapp.Response.Accounts.WithProof) {
+			self.accountAddress = accountWithProof.account.address
+			self.proof = accountWithProof.proof
 		}
 	}
 }

@@ -34,49 +34,38 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 	public struct UnauthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.Items.Discriminator.unauthorizedRequest.rawValue
-		public let oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?
-		public let oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+		public let oneTimeAccounts: AccountsRequestResponseItem?
+		public let oneTimePersonaData: PersonaDataRequestResponseItem?
 
 		public init(
-			oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?,
-			oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+			oneTimeAccounts: AccountsRequestResponseItem?,
+			oneTimePersonaData: PersonaDataRequestResponseItem?
 		) {
-			self.oneTimeAccountsWithoutProofOfOwnership = oneTimeAccountsWithoutProofOfOwnership
-			self.oneTimeAccountsWithProofOfOwnership = oneTimeAccountsWithProofOfOwnership
+			if let oneTimeAccounts {
+				assert(oneTimeAccounts.isOneTime)
+			}
+			if let oneTimePersonaData {
+				assert(oneTimePersonaData.isOneTime)
+			}
+			self.oneTimeAccounts = oneTimeAccounts
 			self.oneTimePersonaData = oneTimePersonaData
 		}
 	}
 
 	public struct AuthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.Items.Discriminator.authorizedRequest.rawValue
-		public let auth: AuthRequestResponseItem
-		public let ongoingAccountsWithoutProofOfOwnership: OngoingAccountsWithoutProofOfOwnershipRequestResponseItem?
-		public let ongoingAccountsWithProofOfOwnership: OngoingAccountsWithProofOfOwnershipRequestResponseItem?
-		public let ongoingPersonaData: OngoingPersonaDataRequestResponseItem?
-		public let oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?
-		public let oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+		public let login: LoginRequestResponseItem
+		public let accounts: AccountsRequestResponseItem?
+		public let personaData: PersonaDataRequestResponseItem?
 
 		public init(
-			auth: AuthRequestResponseItem,
-			ongoingAccountsWithoutProofOfOwnership: OngoingAccountsWithoutProofOfOwnershipRequestResponseItem?,
-			ongoingAccountsWithProofOfOwnership: OngoingAccountsWithProofOfOwnershipRequestResponseItem?,
-			ongoingPersonaData: OngoingPersonaDataRequestResponseItem?,
-			oneTimeAccountsWithoutProofOfOwnership: OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem?,
-			oneTimeAccountsWithProofOfOwnership: OneTimeAccountsWithProofOfOwnershipRequestResponseItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+			login: LoginRequestResponseItem,
+			accounts: AccountsRequestResponseItem?,
+			personaData: PersonaDataRequestResponseItem?
 		) {
-			precondition(ongoingAccountsWithProofOfOwnership == nil || ongoingAccountsWithoutProofOfOwnership == nil, "Ongoing accounts: Either WITH proof of ownership or WITHOUT, never both")
-			precondition(oneTimeAccountsWithProofOfOwnership == nil || oneTimeAccountsWithoutProofOfOwnership == nil, "Onetime accounts: Either WITH proof of ownership or WITHOUT, never both")
-			self.auth = auth
-			self.ongoingAccountsWithoutProofOfOwnership = ongoingAccountsWithoutProofOfOwnership
-			self.ongoingAccountsWithProofOfOwnership = ongoingAccountsWithProofOfOwnership
-			self.ongoingPersonaData = ongoingPersonaData
-			self.oneTimeAccountsWithoutProofOfOwnership = oneTimeAccountsWithoutProofOfOwnership
-			self.oneTimeAccountsWithProofOfOwnership = oneTimeAccountsWithProofOfOwnership
-			self.oneTimePersonaData = oneTimePersonaData
+			self.login = login
+			self.accounts = accounts
+			self.personaData = personaData
 		}
 	}
 }
