@@ -82,7 +82,7 @@ extension P2P.Dapp.Request.Metadata {
 }
 
 extension P2P.Dapp.Request {
-	public static func previewValueAllRequests(login: P2P.Dapp.Request.LoginRequestItem) -> Self {
+	public static func previewValueAllRequests(login: P2P.Dapp.Request.LoginRequestItem = .init(challenge: nil, identityAddress: nil)) -> Self {
 		.init(
 			id: .previewValue0,
 			items: .request(.authorized(.init(

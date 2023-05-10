@@ -313,10 +313,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 					return (failure: .invalidRequest, message: "Invalid numberOfAccounts in unauthorized request")
 				}
 
+				return nil
 			case let .authorized(authorized):
 				if authorized.accounts?.numberOfAccounts.isValid == false {
 					return (failure: .invalidRequest, message: "Invalid numberOfAccounts in authorized request")
 				}
+				return nil
 			}
 		case .transaction:
 			return nil
