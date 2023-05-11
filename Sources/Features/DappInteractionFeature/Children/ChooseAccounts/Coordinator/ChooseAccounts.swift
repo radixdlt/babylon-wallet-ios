@@ -46,9 +46,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			self.availableAccounts = availableAccounts
 			self.numberOfAccounts = numberOfAccounts
 			self.selectedAccounts = selectedAccounts
-			if let createAccountCoordinator {
-				self.destination = .createAccount(createAccountCoordinator)
-			}
+			self.destination = createAccountCoordinator.map { .createAccount($0) } ?? nil
 		}
 	}
 
@@ -179,8 +177,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 				factorsLeftToSignWith: signingFactors,
 				signingPurposeWithPayload: SigningPurposeWithPayload.signAuth(authenticationDataToSignForChallenge),
 				ephemeralNotaryPrivateKey: .init()
-			)
-			)
+			))
 			return .none
 		}
 	}
