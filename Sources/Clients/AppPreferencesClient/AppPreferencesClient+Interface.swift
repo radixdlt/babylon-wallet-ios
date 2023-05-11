@@ -35,7 +35,7 @@ extension AppPreferencesClient {
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
 	public typealias ExtractProfileSnapshot = @Sendable () async -> ProfileSnapshot
-	public typealias DeleteProfileSnapshot = @Sendable (_ keepIcloudIfPresent: Bool) async throws -> Void
+	public typealias DeleteProfileSnapshot = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
 }
 
 extension AppPreferencesClient {

@@ -18,7 +18,7 @@ extension SecureStorageClient: TestDependencyKey {
 		deleteProfileAndMnemonicsByFactorSourceIDs: { _, _ in },
 		updateIsCloudProfileSyncEnabled: { _, _ in },
 		loadProfileHeaderList: { nil },
-		saveProfileHeaderList: { _ in },
+		saveProfileHeaderList: { _, _ in },
 		deleteProfileHeaderList: {}
 	)
 

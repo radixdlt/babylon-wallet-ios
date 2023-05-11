@@ -154,7 +154,7 @@ extension ProfileStore {
 	public func importProfileSnapshot(_ profileSnapshot: ProfileSnapshot) async throws {
 		try assertProfileStateIsEphemeral()
 
-		guard await (try? secureStorageClient.loadProfileSnapshotData(profile.header.id)) == Data?.none else {
+		guard await (try? secureStorageClient.loadProfileSnapshotData(profile.header.id)) == nil else {
 			struct ExistingProfileSnapshotFoundAbortingImport: Swift.Error {}
 			throw ExistingProfileSnapshotFoundAbortingImport()
 		}
@@ -193,8 +193,8 @@ extension ProfileStore {
 		try await changeProfileSnapshot(to: ephemeral.profile.snapshot())
 	}
 
-	/// If persisted: updates the in-memomry across-the-app-used Profile and also
-	/// sync the new value to secure storage (and iCloud if enabled/able).
+	/// If persisted: updates the in-memory across-the-app-used Profile and also
+	/// syncs the new value to secure storage (and iCloud if enabled/able).
 	///
 	/// if ephemeral: Updates the ephemeral profile.
 	public func update(profile: Profile) async throws {
@@ -228,13 +228,13 @@ extension ProfileStore {
 		}
 	}
 
-	public func deleteProfile(keepIcloudIfPresent: Bool) async throws {
+	public func deleteProfile(keepInICloudIfPresent: Bool) async throws {
 		// Assert that this device is allowed to make changes on Profile
 		try await checkIfProfileIsOwnedByTheDevice()
 
 		do {
 			await userDefaultsClient.removeActiveProfileId()
-			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, true)
+			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
 		} catch {
 			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
@@ -263,10 +263,7 @@ extension ProfileStore {
 
 	/// Claim the profile by updating **lastUsedOnDevice**
 	func claimProfileSnapshot(_ snapshot: inout ProfileSnapshot) async {
-		@Dependency(\.device) var device
-		let description = await NonEmptyString(rawValue: "\(device.name) (\(device.model))")!
-		let deviceInfo = await Self.createDeviceInfo(description)
-		snapshot.header.lastUsedOnDevice = deviceInfo
+		snapshot.header.lastUsedOnDevice = await Self.createDeviceInfo()
 	}
 
 	func saveProfileChanges(_ profile: Profile) async throws {
@@ -300,7 +297,7 @@ extension ProfileStore {
 
 		// Always update the header along with the snapshot itelf,
 		// so we are sure that the Header in Snapshot is synced with the Header in the HeadersList
-		try await updateProfileHeadersList(snapshot.header)
+		try await updateProfileHeadersList(snapshot)
 		try await secureStorageClient.saveProfileSnapshot(snapshot)
 	}
 
@@ -322,12 +319,14 @@ extension ProfileStore {
 		}
 	}
 
-	func updateProfileHeadersList(_ header: ProfileSnapshot.Header) async throws {
+	func updateProfileHeadersList(_ snapshot: ProfileSnapshot) async throws {
+		let header = snapshot.header
+		let iCloudSyncEnabled = snapshot.appPreferences.security.isCloudProfileSyncEnabled
 		if var profileHeaders = try await secureStorageClient.loadProfileHeaderList()?.rawValue {
 			profileHeaders[id: header.id] = header
-			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: profileHeaders)!)
+			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: profileHeaders)!, iCloudSyncEnabled)
 		} else {
-			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [header])!)
+			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [header])!, iCloudSyncEnabled)
 		}
 	}
 }
@@ -493,11 +492,8 @@ extension ProfileStore {
 			let description: FactorSource.Description
 			#if canImport(UIKit)
 			@Dependency(\.device) var device
-			/// we use name as label and model as description
-			let deviceName = await device.name
-			let deviceModel = await device.model
-			label = .init(rawValue: deviceName)
-			description = .init(rawValue: deviceModel)
+			label = await .init(rawValue: device.name)
+			description = await .init(rawValue: device.model)
 			#else
 			label = macOSDeviceLabelFallback
 			description = macOSDeviceDescriptionFallback
@@ -526,8 +522,7 @@ extension ProfileStore {
 			@Dependency(\.uuid) var uuid
 
 			let date = dateGenerator.now
-			let deviceDescription = deviceDescription(label: label, description: description)
-			let deviceInfo = await createDeviceInfo(deviceDescription)
+			let deviceInfo = await createDeviceInfo()
 
 			let header = ProfileSnapshot.Header(
 				creatingDevice: deviceInfo,
@@ -593,12 +588,16 @@ extension ProfileStore {
 }
 
 extension ProfileStore {
-	static func createDeviceInfo(_ deviceDescription: NonEmptyString) async -> ProfileSnapshot.Header.UsedDeviceInfo {
+	static func createDeviceInfo() async -> ProfileSnapshot.Header.UsedDeviceInfo {
 		@Dependency(\.date) var dateGenerator
+		@Dependency(\.device) var device
+
 		let date = dateGenerator.now
 
+		let description = await NonEmptyString(rawValue: "\(device.name) (\(device.model))")!
+
 		return await ProfileSnapshot.Header.UsedDeviceInfo(
-			description: deviceDescription,
+			description: description,
 			id: getDeviceId(),
 			date: date
 		)

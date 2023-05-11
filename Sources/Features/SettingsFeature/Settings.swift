@@ -61,7 +61,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
 			case deleteProfile
 			#if DEBUG
-			case deleteProfileLocalKeepiCloudIfPresent
+			case deleteProfileLocalKeepInICloudIfPresent
 			#endif
 			case cancel
 		}
@@ -80,7 +80,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when TCA tools are released
-		case deleteProfileAndFactorSources(keepIcloudIfPresent: Bool)
+		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -162,7 +162,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 						TextState("Delete Wallet data")
 					}
 					#if DEBUG
-					ButtonState(role: .cancel, action: .send(.deleteProfileLocalKeepiCloudIfPresent)) {
+					ButtonState(role: .cancel, action: .send(.deleteProfileLocalKeepInICloudIfPresent)) {
 						TextState("Delete local Wallet data (keep iCloud)")
 					}
 					#endif // DEBUG
@@ -249,11 +249,11 @@ public struct AppSettings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfile))):
-			return deleteProfile(keepIcloudIfPresent: false)
+			return deleteProfile(keepInICloudIfPresent: false)
 
 		#if DEBUG
-		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfileLocalKeepiCloudIfPresent))):
-			return deleteProfile(keepIcloudIfPresent: true)
+		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfileLocalKeepInICloudIfPresent))):
+			return deleteProfile(keepInICloudIfPresent: true)
 		#endif // DEBUG
 
 		case .destination(.dismiss):
@@ -290,11 +290,11 @@ extension AppSettings {
 		}
 	}
 
-	fileprivate func deleteProfile(keepIcloudIfPresent: Bool) -> EffectTask<Action> {
+	fileprivate func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
 		.task {
 			cacheClient.removeAll()
 			await radixConnectClient.disconnectAndRemoveAll()
-			return .delegate(.deleteProfileAndFactorSources(keepIcloudIfPresent: keepIcloudIfPresent))
+			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
 		}
 	}
 }

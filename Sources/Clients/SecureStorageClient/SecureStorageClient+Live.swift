@@ -100,13 +100,13 @@ extension SecureStorageClient: DependencyKey {
 				}
 		}
 
-		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) async throws {
+		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList, iCloudSyncEnabled: Bool) async throws {
 			let data = try jsonEncoder().encode(headers)
 			try await keychainClient.setDataWithoutAuthForKey(
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
 					key: profileHeaderListKeychainKey,
-					iCloudSyncEnabled: true,
+					iCloudSyncEnabled: iCloudSyncEnabled,
 					accessibility: .whenUnlocked,
 					label: "Radix Wallet Metadata",
 					comment: "Contains the metadata about Radix Wallet Data."
@@ -114,20 +114,25 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) async throws {
+		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) async throws {
 			if let profileHeaders = try await loadProfileHeaderList() {
 				let remainingHeaders = profileHeaders.filter { $0.id != id }
 				if remainingHeaders.isEmpty {
 					// Delete the list instea of keeping an empty list
 					try await deleteProfileHeaderList()
 				} else {
-					try await saveProfileHeaderList(.init(remainingHeaders)!)
+					try await saveProfileHeaderList(.init(remainingHeaders)!, iCloudSyncEnabled: iCloudSyncEnabled)
 				}
 			}
 		}
 
 		@Sendable func deleteProfileHeaderList() async throws {
 			try await keychainClient.removeDataForKey(profileHeaderListKeychainKey)
+		}
+
+		@Sendable func deleteProfile(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) async throws {
+			try await keychainClient.removeDataForKey(id.keychainKey)
+			try await deleteProfileHeader(id, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
 		return Self(
@@ -182,23 +187,23 @@ extension SecureStorageClient: DependencyKey {
 				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepIcloudIfPresent in
+			deleteProfileAndMnemonicsByFactorSourceIDs: { profileID, keepInICloudIfPresent in
 				guard let profileSnapshotData = try await loadProfileSnapshotData(profileID) else {
 					return
-				}
-				if !keepIcloudIfPresent {
-					try await keychainClient.removeDataForKey(profileID.keychainKey)
 				}
 				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
 					return
 				}
-				if keepIcloudIfPresent {
+
+				if !keepInICloudIfPresent {
+					try await deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
+				}
+				if keepInICloudIfPresent {
 					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled {
-						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepIcloudIfPresent))")
+						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepInICloudIfPresent))")
 					} else {
-						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepIcloudIfPresent))")
-						try await keychainClient.removeDataForKey(profileID.keychainKey)
-						try await deleteProfileHeader(profileID)
+						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepInICloudIfPresent))")
+						try await deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
 					}
 				}
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
@@ -208,7 +213,8 @@ extension SecureStorageClient: DependencyKey {
 			},
 			updateIsCloudProfileSyncEnabled: { profileId, change in
 				guard
-					let profileSnapshotData = try await loadProfileSnapshotData(profileId)
+					let profileSnapshotData = try await loadProfileSnapshotData(profileId),
+					let headerList = try await loadProfileHeaderList()
 				else {
 					return
 				}
@@ -217,9 +223,11 @@ extension SecureStorageClient: DependencyKey {
 				case .disable:
 					loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
 					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: false)
+					try await saveProfileHeaderList(headerList, iCloudSyncEnabled: false)
 				case .enable:
 					loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
 					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: true)
+					try await saveProfileHeaderList(headerList, iCloudSyncEnabled: true)
 				}
 			},
 			loadProfileHeaderList: loadProfileHeaderList,

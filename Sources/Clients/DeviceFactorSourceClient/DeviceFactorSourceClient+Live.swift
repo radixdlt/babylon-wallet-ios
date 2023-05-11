@@ -84,9 +84,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 						}
 					}
 
-					let hasControlOfAllAccounts = accounts.reduce(into: true) { $0 = $0 && hasControl(of: $1) }
-					return !hasControlOfAllAccounts
-
+					return !accounts.allSatisfy(hasControl)
 				} catch {
 					loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
 					return true

@@ -19,11 +19,12 @@ extension OnboardingClient: DependencyKey {
 			},
 			loadProfileBackups: {
 				do {
-					let headers = try await secureStorageClient.loadProfileHeaderList()
-					return headers
+					return try await secureStorageClient.loadProfileHeaderList()
 				} catch {
-					// Corupt Profile Headers, delete
-					try? await secureStorageClient.deleteProfileHeaderList()
+					assertionFailure("Corrupt Profile headers")
+					loggerGlobal.critical("Corrupt Profile header: \(error.legibleLocalizedDescription)")
+					// Corrupt Profile Headers, delete
+					_ = try? await secureStorageClient.deleteProfileHeaderList()
 					return nil
 				}
 			},
