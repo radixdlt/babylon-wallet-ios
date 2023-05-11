@@ -147,7 +147,7 @@ extension ProfileSnapshot.Header.Version {
 
 extension ProfileSnapshot.Header {
 	// MARK: - IncompatibleProfileVersion
-	struct IncompatibleProfileVersion: LocalizedError, Equatable {
+	public struct IncompatibleProfileVersion: LocalizedError, Equatable {
 		public let decodedVersion: Version
 		public let minimumRequiredVersion: Version
 		public var errorDescription: String? {
