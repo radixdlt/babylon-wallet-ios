@@ -4,7 +4,7 @@ import FeaturePrelude
 // MARK: - OnboardingCoordinator
 public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
-		case startup(Startup.State)
+		case startup(OnboardingStartup.State)
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
 		public init() {
@@ -13,7 +13,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case startup(Startup.Action)
+		case startup(OnboardingStartup.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 
@@ -35,7 +35,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 				/OnboardingCoordinator.State.startup,
 				action: /Action.child .. ChildAction.startup
 			) {
-				Startup()
+				OnboardingStartup()
 			}
 			.ifCaseLet(
 				/OnboardingCoordinator.State.createAccountCoordinator,

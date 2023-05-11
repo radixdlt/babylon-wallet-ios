@@ -43,10 +43,10 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-				await send(.internal(.loadBackupProfileHeadersResult(
+			return .task {
+				await .internal(.loadBackupProfileHeadersResult(
 					onboardingClient.loadProfileBackups()
-				)))
+				))
 			}
 
 		case .tappedImportProfile:

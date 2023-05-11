@@ -230,10 +230,10 @@ extension ProfileStore {
 
 	public func deleteProfile(keepInICloudIfPresent: Bool) async throws {
 		// Assert that this device is allowed to make changes on Profile
-		try await checkIfProfileIsOwnedByTheDevice()
+		try await assertDeviceOwnsSnapshotElseCreateNew(profile.snapshot())
 
 		do {
-			await userDefaultsClient.removeActiveProfileId()
+			await userDefaultsClient.removeActiveProfileID()
 			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
 		} catch {
 			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
@@ -255,7 +255,7 @@ extension ProfileStore {
 		// Do not check the ownership since the device did claim the profile ownership.
 		try await saveProfileSnapshot(profileSnapshot, checkOwnership: false)
 		// Update to new active profile id, so it is used from now on.
-		await userDefaultsClient.setActiveProfileId(profileSnapshot.header.id)
+		await userDefaultsClient.setActiveProfileID(profileSnapshot.header.id)
 
 		// Update the state with the imported snapshot
 		try changeState(to: .persisted(.init(snapshot: profileSnapshot)))
@@ -280,43 +280,21 @@ extension ProfileStore {
 
 		profile.header.lastModified = date.now
 		profile.header.contentHint.numberOfNetworks = networks.count
-		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.reduce(0) { partialResult, network in
-			partialResult + network.accounts.count
-		}
-		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.reduce(0) { partialResult, network in
-			partialResult + network.personas.count
-		}
+		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map(\.accounts.count).reduce(0, +)
+		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map(\.personas.count).reduce(0, +)
 	}
 
 	/// Commit the snapshot changes
 	func saveProfileSnapshot(_ snapshot: ProfileSnapshot, checkOwnership: Bool = true) async throws {
 		if checkOwnership {
 			// Assert that this device is allowed to make changes on Profile
-			try await checkIfProfileIsOwnedByTheDevice()
+			try await assertDeviceOwnsSnapshotElseCreateNew(snapshot)
 		}
 
 		// Always update the header along with the snapshot itelf,
 		// so we are sure that the Header in Snapshot is synced with the Header in the HeadersList
 		try await updateProfileHeadersList(snapshot)
 		try await secureStorageClient.saveProfileSnapshot(snapshot)
-	}
-
-	func checkIfProfileIsOwnedByTheDevice() async throws {
-		/// The device is allowed to make CRUD operations on the profile only if it is the last used device
-		if let lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(profile.header.id)?.header.lastUsedOnDevice {
-			let deviceId = await Self.getDeviceId()
-			guard lastUsedOnDevice.id == deviceId else {
-				// Note: We do not reset the active profile id, as doing so, will imply that user has no profile.
-				//       Instead, we will prompt that the user, that the currently active profile is used on other device.
-				let error = Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
-				// Go to ephemeral state straightaway. The Wallet will redirect user to the Onboarding screen.
-				await changeState(to: .ephemeral(.init(
-					profile: Self.newEphemeralProfile(),
-					loadFailure: .profileUsedOnAnotherDevice(error)
-				)))
-				throw error
-			}
-		}
 	}
 
 	func updateProfileHeadersList(_ snapshot: ProfileSnapshot) async throws {
@@ -327,6 +305,50 @@ extension ProfileStore {
 			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: profileHeaders)!, iCloudSyncEnabled)
 		} else {
 			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [header])!, iCloudSyncEnabled)
+		}
+	}
+
+	func assertDeviceOwnsSnapshotElseCreateNew(_ snapshot: ProfileSnapshot) async throws {
+		do {
+			try await Self.checkIfDeviceOwnsProfileSnapshot(snapshot.header)
+		} catch {
+			// Note: We do not reset the active profile id, as doing so, will imply that user has no profile.
+			//       Instead, we will prompt that the user, that the currently active profile is used on other device.
+
+			// Go to ephemeral state straightaway. The Wallet will redirect user to the Onboarding screen.
+			await changeState(to: .ephemeral(.init(
+				profile: Self.newEphemeralProfile(),
+				loadFailure: .profileUsedOnAnotherDevice(error as! Profile.ProfileIsUsedOnAnotherDeviceError) // safe cast
+			)))
+
+			// rethrow the error to halt the execution up the chain
+			throw error
+		}
+	}
+
+	static func checkIfDeviceOwnsProfileSnapshot(_ header: ProfileSnapshot.Header) async throws {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
+		// Load the last used device info
+		let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo?
+		do {
+			lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(header.id)?.header.lastUsedOnDevice
+		} catch {
+			@Dependency(\.assertionFailure) var assertionFailure
+			let erorrMessage = "Failed to load the profile snapshot when checking for device ownership"
+			// Should not happen
+			assertionFailure(erorrMessage)
+			loggerGlobal.critical(.init(stringLiteral: erorrMessage))
+			return
+		}
+
+		guard let lastUsedOnDevice else {
+			return
+		}
+
+		let deviceID = await Self.getDeviceId()
+		guard lastUsedOnDevice.id == deviceID else {
+			throw Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
 		}
 	}
 }
@@ -401,7 +423,7 @@ extension ProfileStore {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let loadResult: Swift.Result<Profile?, Profile.LoadingFailure> = await {
-			guard let profileId = userDefaultsClient.activeProfileId() else {
+			guard let profileId = userDefaultsClient.getActiveProfileID() else {
 				return .success(nil)
 			}
 
@@ -428,8 +450,10 @@ extension ProfileStore {
 				)
 			}
 
-			guard await decodedHeader.lastUsedOnDevice.id == Self.getDeviceId() else {
-				return .failure(.profileUsedOnAnotherDevice(.init(lastUsedOnDevice: decodedHeader.lastUsedOnDevice)))
+			do {
+				try await checkIfDeviceOwnsProfileSnapshot(decodedHeader)
+			} catch {
+				return .failure(.profileUsedOnAnotherDevice(error as! Profile.ProfileIsUsedOnAnotherDeviceError))
 			}
 
 			do {
@@ -626,37 +650,28 @@ struct EphemeralProfile: Sendable, Hashable {
 }
 
 extension UserDefaultsClient {
-	static let activeProfileId = "profile.activeProfileID"
+	static let activeProfileID = "profile.activeProfileID"
 	static let deviceId = "profile.deviceID"
 
-	enum ActiveProfileIdErrors: Error {
-		case noActiveProfileId
-		case invalidActiveProfileId
+	func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
+		stringForKey(Self.activeProfileID).flatMap(UUID.init(uuidString:))
 	}
 
-	func activeProfileId() -> ProfileSnapshot.Header.ID? {
-		stringForKey(Self.activeProfileId)
-			.flatMap {
-				.init(uuidString: $0)
-			}
+	func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) async {
+		await setString(id.uuidString, Self.activeProfileID)
 	}
+
+	func removeActiveProfileID() async {
+		await remove(Self.activeProfileID)
+	}
+
+	// TODO: move to keychain
 
 	func getDeviceId() -> ProfileSnapshot.Header.UsedDeviceInfo.ID? {
-		stringForKey(Self.deviceId)
-			.flatMap {
-				.init(uuidString: $0)
-			}
+		stringForKey(Self.deviceId).flatMap(UUID.init(uuidString:))
 	}
 
 	func setDeviceId(_ id: UUID) async {
 		await setString(id.uuidString, Self.deviceId)
-	}
-
-	func setActiveProfileId(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) async {
-		await setString(id.uuidString, Self.activeProfileId)
-	}
-
-	func removeActiveProfileId() async {
-		await remove(Self.activeProfileId)
 	}
 }

@@ -7,7 +7,7 @@ import GatewaySettingsFeature
 import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
-import ProfileBackups
+import ProfileBackupsFeature
 
 // MARK: - AppSettings
 public struct AppSettings: Sendable, FeatureReducer {

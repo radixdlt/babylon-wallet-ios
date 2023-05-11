@@ -1,7 +1,7 @@
 import FeaturePrelude
 import OnboardingClient
 
-public struct Startup: Sendable, FeatureReducer {
+public struct OnboardingStartup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
 		public var destination: Destinations.State?

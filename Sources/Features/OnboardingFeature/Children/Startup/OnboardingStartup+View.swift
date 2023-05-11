@@ -1,18 +1,18 @@
 import FeaturePrelude
 import SwiftUI
 
-// MARK: - Startup.View
-extension Startup {
+// MARK: - OnboardingStartup.View
+extension OnboardingStartup {
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: StoreOf<Startup>
-		public init(store: StoreOf<Startup>) {
+		let store: StoreOf<OnboardingStartup>
+		public init(store: StoreOf<OnboardingStartup>) {
 			self.store = store
 		}
 	}
 }
 
-extension Startup.View {
+extension OnboardingStartup.View {
 	public var body: some View {
 		ForceFullScreen {
 			NavigationStack {
@@ -42,8 +42,8 @@ extension Startup.View {
 				}
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /Startup.Destinations.State.restoreFromBackup,
-					action: Startup.Destinations.Action.restoreFromBackup,
+					state: /OnboardingStartup.Destinations.State.restoreFromBackup,
+					action: OnboardingStartup.Destinations.Action.restoreFromBackup,
 					destination: {
 						RestoreFromBackup.View(store: $0)
 					}

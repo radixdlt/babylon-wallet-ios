@@ -5,7 +5,7 @@ import GatewaySettingsFeature
 import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
-import ProfileBackups
+import ProfileBackupsFeature
 #if DEBUG
 import EngineToolkit // read RET commit hash
 import InspectProfileFeature

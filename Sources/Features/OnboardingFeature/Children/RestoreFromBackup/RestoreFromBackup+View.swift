@@ -7,7 +7,6 @@ extension RestoreFromBackup {
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: StoreOf<RestoreFromBackup>
-		let formatter = DateFormatter()
 
 		public init(store: StoreOf<RestoreFromBackup>) {
 			self.store = store
@@ -117,7 +116,6 @@ extension RestoreFromBackup.View {
 	}
 
 	func formatDate(_ date: Date) -> String {
-		formatter.dateFormat = "d MMM YYY"
-		return formatter.string(from: date)
+		date.ISO8601Format(.iso8601Date(timeZone: .current))
 	}
 }

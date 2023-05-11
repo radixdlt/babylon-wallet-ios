@@ -209,9 +209,9 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
-		.run { send in
+		.task {
 			let isAccountRecoveryNeeded = await deviceFactorSourceClient.isAccountRecoveryNeeded()
-			await send(.internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded)))
+			return .internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded))
 		}
 	}
 
