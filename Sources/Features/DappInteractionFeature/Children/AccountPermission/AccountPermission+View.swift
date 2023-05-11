@@ -8,23 +8,23 @@ extension AccountPermission {
 		let numberOfAccounts: String
 
 		init(state: AccountPermission.State) {
-			title = L10n.DApp.AccountPermission.title
-			subtitle = {
+			self.title = L10n.DappRequest.AccountPermission.title
+			self.subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
 
 				let explanation: AttributedString = {
-					let always = AttributedString(L10n.DApp.AccountPermission.Subtitle.always, foregroundColor: highlightColor)
+					let always = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart2, foregroundColor: highlightColor)
 
 					return AttributedString(
-						L10n.DApp.AccountPermission.Subtitle.Explanation.first,
+						L10n.DappRequest.AccountPermission.subtitlePart1,
 						foregroundColor: normalColor
 					)
 						+ always
 						+ AttributedString(
-							L10n.DApp.AccountPermission.Subtitle.Explanation.second,
+							L10n.DappRequest.AccountPermission.subtitlePart3,
 							foregroundColor: normalColor
 						)
 				}()
@@ -32,16 +32,16 @@ extension AccountPermission {
 				return dappName + explanation
 			}()
 
-			numberOfAccounts = "•  " + {
+			self.numberOfAccounts = "•  " + {
 				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
 				case (.atLeast, 0):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.atLeastZero
+					return L10n.DappRequest.AccountPermission.numberOfAccountsAtLeastZero
 				case let (.atLeast, number):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.atLeast(number)
+					return L10n.DappRequest.AccountPermission.numberOfAccountsAtLeast(number)
 				case (.exactly, 1):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.exactlyOne
+					return L10n.DappRequest.AccountPermission.numberOfAccountsExactlyOne
 				case let (.exactly, number):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.exactly(number)
+					return L10n.DappRequest.AccountPermission.numberOfAccountsExactly(number)
 				}
 			}()
 		}
@@ -73,7 +73,7 @@ extension AccountPermission {
 						}
 						.padding(.horizontal, .medium2)
 
-						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+						Text(L10n.DappRequest.AccountPermission.updateInSettingsExplanation)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)

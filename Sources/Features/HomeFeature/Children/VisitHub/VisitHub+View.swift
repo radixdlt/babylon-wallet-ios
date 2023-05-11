@@ -11,9 +11,9 @@ extension VisitHub {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: Store<State, Action>
+		private let store: StoreOf<VisitHub>
 
-		init(store: Store<State, Action>) {
+		init(store: StoreOf<VisitHub>) {
 			self.store = store
 		}
 
@@ -46,7 +46,7 @@ extension VisitHub {
 			Button(
 				action: action,
 				label: {
-					Text(L10n.Home.visitDashboard)
+					Text(L10n.Home.VisitDashboard.title)
 						.foregroundColor(.app.buttonTextBlack)
 						.textStyle(.body1Regular)
 						.padding()
