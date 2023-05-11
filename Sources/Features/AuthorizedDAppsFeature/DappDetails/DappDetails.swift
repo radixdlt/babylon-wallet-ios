@@ -374,16 +374,16 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
 		AlertState {
-			TextState(L10n.DAppDetails.forgetDappAlertTitle)
+			TextState(L10n.DAppDetails.ForgetDappAlert.title)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState(L10n.DAppDetails.forgetDappAlertConfirm)
+				TextState(L10n.DAppDetails.ForgetDappAlert.forget)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.DAppDetails.forgetDappAlertCancel)
+				TextState(L10n.Common.cancel)
 			}
 		} message: {
-			TextState(L10n.DAppDetails.forgetDappAlertMessage)
+			TextState(L10n.DAppDetails.ForgetDappAlert.message)
 		}
 	}
 }

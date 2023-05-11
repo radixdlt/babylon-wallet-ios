@@ -84,13 +84,13 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 				state.childState = .flow(flowState)
 			} else {
 				state.errorAlert = .init(
-					title: { TextState(L10n.App.errorOccurredTitle) },
+					title: { TextState(L10n.Common.errorAlertTitle) },
 					actions: {
 						ButtonState(role: .cancel, action: .send(.okButtonTapped)) {
-							TextState(L10n.DApp.Request.MalformedErrorAlert.okButtonTitle)
+							TextState(L10n.Common.ok)
 						}
 					},
-					message: { TextState(L10n.DApp.Request.MalformedErrorAlert.message) }
+					message: { TextState(L10n.DappRequest.RequestMalformedAlert.message) }
 				)
 			}
 			return .none

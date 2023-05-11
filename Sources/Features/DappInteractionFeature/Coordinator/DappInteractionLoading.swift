@@ -100,18 +100,18 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
 		case let .dappMetadataLoadingResult(.failure(error)):
 			state.errorAlert = .init(
-				title: { TextState(L10n.App.errorOccurredTitle) },
+				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(action: .send(.retryButtonTapped)) {
-						TextState(L10n.DApp.MetadataLoading.ErrorAlert.retryButtonTitle)
+						TextState(L10n.Common.retry)
 					}
 					ButtonState(role: .cancel, action: .send(.cancelButtonTapped)) {
-						TextState(L10n.DApp.MetadataLoading.ErrorAlert.cancelButtonTitle)
+						TextState(L10n.Common.cancel)
 					}
 				},
 				message: {
 					TextState(
-						L10n.DApp.MetadataLoading.ErrorAlert.message + {
+						L10n.DappRequest.MetadataLoadingAlert.message + {
 							#if DEBUG
 							"\n\n" + error.legibleLocalizedDescription
 							#else

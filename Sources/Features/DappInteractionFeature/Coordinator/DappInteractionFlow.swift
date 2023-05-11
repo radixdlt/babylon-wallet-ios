@@ -296,10 +296,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		case let .presentPersonaNotFoundErrorAlert(reason):
 			state.personaNotFoundErrorAlert = .init(
-				title: { TextState(L10n.App.errorOccurredTitle) },
+				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .send(.cancelButtonTapped)) {
-						TextState(L10n.DApp.Request.SpecifiedPersonaNotFoundError.cancelButtonTitle)
+						TextState(L10n.DAppRequest.SpecifiedPersonaNotFoundError.cancelButtonTitle)
 					}
 				},
 				message: {

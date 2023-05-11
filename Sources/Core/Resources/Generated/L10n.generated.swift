@@ -10,24 +10,6 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
-  public enum AccountDetails {
-    /// Transfer
-    public static let transfer = L10n.tr("Localizable", "accountDetails_transfer", fallback: "Transfer")
-    public enum Assets {
-      /// NFTs
-      public static let nfts = L10n.tr("Localizable", "accountDetails_assets_nfts", fallback: "NFTs")
-      /// You have no NFTs
-      public static let noNftsTitle = L10n.tr("Localizable", "accountDetails_assets_noNftsTitle", fallback: "You have no NFTs")
-      /// You have no Tokens
-      public static let noTokensTitle = L10n.tr("Localizable", "accountDetails_assets_noTokensTitle", fallback: "You have no Tokens")
-      /// Tokens
-      public static let tokens = L10n.tr("Localizable", "accountDetails_assets_tokens", fallback: "Tokens")
-      /// What are NFTs?
-      public static let whatAreNfts = L10n.tr("Localizable", "accountDetails_assets_whatAreNfts", fallback: "What are NFTs?")
-      /// What are Tokens?
-      public static let whatAreTokens = L10n.tr("Localizable", "accountDetails_assets_whatAreTokens", fallback: "What are Tokens?")
-    }
-  }
   public enum AccountPreferences {
     /// Get RCnet XRD Test Tokens
     public static let getXrdTestTokens = L10n.tr("Localizable", "accountPreferences_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
@@ -35,6 +17,80 @@ public enum L10n {
     public static let loadingPrompt = L10n.tr("Localizable", "accountPreferences_loadingPrompt", fallback: "This may take several seconds, please wait for completion")
     /// Account Preferences
     public static let title = L10n.tr("Localizable", "accountPreferences_title", fallback: "Account Preferences")
+  }
+  public enum AccountView {
+    /// Badges
+    public static let badges = L10n.tr("Localizable", "accountView_badges", fallback: "Badges")
+    /// NFTs
+    public static let nfts = L10n.tr("Localizable", "accountView_nfts", fallback: "NFTs")
+    /// Pool Units
+    public static let poolUnits = L10n.tr("Localizable", "accountView_poolUnits", fallback: "Pool Units")
+    /// Tokens
+    public static let tokens = L10n.tr("Localizable", "accountView_tokens", fallback: "Tokens")
+    /// Transfer
+    public static let transfer = L10n.tr("Localizable", "accountView_transfer", fallback: "Transfer")
+    public enum NFTDetails {
+      /// ID
+      public static let id = L10n.tr("Localizable", "accountView_NFTDetails_id", fallback: "ID")
+      /// Name
+      public static let name = L10n.tr("Localizable", "accountView_NFTDetails_name", fallback: "Name")
+      /// %d NFTs
+      public static func nftPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "accountView_NFTDetails_nftPlural", p1, fallback: "%d NFTs")
+      }
+      /// You have no NFTs
+      public static let noNfts = L10n.tr("Localizable", "accountView_NFTDetails_noNfts", fallback: "You have no NFTs")
+      /// %d of %d
+      public static func ownedOfTotal(_ p1: Int, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "accountView_NFTDetails_ownedOfTotal", p1, p2, fallback: "%d of %d")
+      }
+      /// Name
+      public static let resourceName = L10n.tr("Localizable", "accountView_NFTDetails_resourceName", fallback: "Name")
+      /// What are NFTs?
+      public static let whatAreNfts = L10n.tr("Localizable", "accountView_NFTDetails_whatAreNfts", fallback: "What are NFTs?")
+    }
+    public enum AssetBehavior {
+      /// Naming and information about this asset can be changed.
+      public static let canChangeName = L10n.tr("Localizable", "accountView_assetBehavior_canChangeName", fallback: "Naming and information about this asset can be changed.")
+      /// The supply of this asset can be increased or decreased
+      public static let canIncreaseSupply = L10n.tr("Localizable", "accountView_assetBehavior_canIncreaseSupply", fallback: "The supply of this asset can be increased or decreased")
+      /// Movement of this asset can be restricted in the future.
+      public static let canRestrictMovement = L10n.tr("Localizable", "accountView_assetBehavior_canRestrictMovement", fallback: "Movement of this asset can be restricted in the future.")
+    }
+    public enum AssetDetails {
+      /// Associated dApps
+      public static let associatedDapps = L10n.tr("Localizable", "accountView_assetDetails_associatedDapps", fallback: "Associated dApps")
+      /// Behavior
+      public static let behavior = L10n.tr("Localizable", "accountView_assetDetails_behavior", fallback: "Behavior")
+      /// Current Supply
+      public static let currentSupply = L10n.tr("Localizable", "accountView_assetDetails_currentSupply", fallback: "Current Supply")
+      /// Hide Asset
+      public static let hideAsset = L10n.tr("Localizable", "accountView_assetDetails_hideAsset", fallback: "Hide Asset")
+      /// Name
+      public static let name = L10n.tr("Localizable", "accountView_assetDetails_name", fallback: "Name")
+      /// Address
+      public static let resourceAddress = L10n.tr("Localizable", "accountView_assetDetails_resourceAddress", fallback: "Address")
+      /// Unknown
+      public static let supplyUnkown = L10n.tr("Localizable", "accountView_assetDetails_supplyUnkown", fallback: "Unknown")
+    }
+    public enum BadgeDetails {
+      /// You have no badges
+      public static let noBadges = L10n.tr("Localizable", "accountView_badgeDetails_noBadges", fallback: "You have no badges")
+      /// What are badges?
+      public static let whatAreBadges = L10n.tr("Localizable", "accountView_badgeDetails_whatAreBadges", fallback: "What are badges?")
+    }
+    public enum PoolUnitDetails {
+      /// You have no NFTs
+      public static let noPoolUnits = L10n.tr("Localizable", "accountView_poolUnitDetails_noPoolUnits", fallback: "You have no NFTs")
+      /// What are NFTs?
+      public static let whatArePoolUnits = L10n.tr("Localizable", "accountView_poolUnitDetails_whatArePoolUnits", fallback: "What are NFTs?")
+    }
+    public enum TokenDetails {
+      /// You have no Tokens
+      public static let noTokens = L10n.tr("Localizable", "accountView_tokenDetails_noTokens", fallback: "You have no Tokens")
+      /// What are Tokens?
+      public static let whatAreTokens = L10n.tr("Localizable", "accountView_tokenDetails_whatAreTokens", fallback: "What are Tokens?")
+    }
   }
   public enum AddressAction {
     /// Copy Address
@@ -119,6 +175,8 @@ public enum L10n {
     public static let developerDisclaimerText = L10n.tr("Localizable", "common_developerDisclaimerText", fallback: "Development use only. Not usable on Radix mainnet.")
     /// An Error Occurred
     public static let errorAlertTitle = L10n.tr("Localizable", "common_errorAlertTitle", fallback: "An Error Occurred")
+    /// History
+    public static let history = L10n.tr("Localizable", "common_history", fallback: "History")
     /// None
     public static let `none` = L10n.tr("Localizable", "common_none", fallback: "None")
     /// OK
@@ -241,10 +299,14 @@ public enum L10n {
     }
   }
   public enum DAppDetails {
+    /// dApp Definition
+    public static let dAppDefinition = L10n.tr("Localizable", "dAppDetails_dAppDefinition", fallback: "dApp Definition")
     /// This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.
     public static let disconnectDappPrompt = L10n.tr("Localizable", "dAppDetails_disconnectDappPrompt", fallback: "This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.")
     /// Forget this dApp
     public static let forgetThisDapp = L10n.tr("Localizable", "dAppDetails_forgetThisDapp", fallback: "Forget this dApp")
+    /// Missing description
+    public static let missingDescription = L10n.tr("Localizable", "dAppDetails_missingDescription", fallback: "Missing description")
     /// Associated NFTs
     public static let nfts = L10n.tr("Localizable", "dAppDetails_nfts", fallback: "Associated NFTs")
     /// No Personas have been used to connect to this dApp.
@@ -263,12 +325,6 @@ public enum L10n {
       /// Forget dApp?
       public static let title = L10n.tr("Localizable", "dAppDetails_forgetDappAlert_title", fallback: "Forget dApp?")
     }
-  }
-  public enum DappDetails {
-    /// dApp Definition
-    public static let dappDefinition = L10n.tr("Localizable", "dappDetails_dappDefinition", fallback: "dApp Definition")
-    /// Missing description
-    public static let missingDescription = L10n.tr("Localizable", "dappDetails_missingDescription", fallback: "Missing description")
   }
   public enum DappRequest {
     /// Loading...
@@ -506,13 +562,9 @@ public enum L10n {
       }
     }
   }
-  public enum FungibleTokenDetails {
-    /// Resource Address
-    public static let resourceAddress = L10n.tr("Localizable", "fungibleTokenDetails_resourceAddress", fallback: "Resource Address")
-  }
   public enum Gateways {
     /// Add New Gateway
-    public static let addNewGateway = L10n.tr("Localizable", "gateways_addNewGateway", fallback: "Add New Gateway")
+    public static let addNewGatewayButtonTitle = L10n.tr("Localizable", "gateways_addNewGatewayButtonTitle", fallback: "Add New Gateway")
     /// RCnet Gateway
     public static let rcNetGateway = L10n.tr("Localizable", "gateways_rcNetGateway", fallback: "RCnet Gateway")
     /// Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.
@@ -699,16 +751,6 @@ public enum L10n {
       /// Access Required
       public static let title = L10n.tr("Localizable", "newConnection_localNetworkPermissionDeniedAlert_title", fallback: "Access Required")
     }
-  }
-  public enum NonFungibleTokenDetails {
-    /// ID
-    public static let nftLocalId = L10n.tr("Localizable", "nonFungibleTokenDetails_nftLocalId", fallback: "ID")
-    /// Name
-    public static let nftName = L10n.tr("Localizable", "nonFungibleTokenDetails_nftName", fallback: "Name")
-    /// Address
-    public static let resourceAddress = L10n.tr("Localizable", "nonFungibleTokenDetails_resourceAddress", fallback: "Address")
-    /// Name
-    public static let resourceName = L10n.tr("Localizable", "nonFungibleTokenDetails_resourceName", fallback: "Name")
   }
   public enum Onboarding {
     /// I'm a new Radix Wallet user

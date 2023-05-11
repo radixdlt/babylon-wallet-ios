@@ -6,7 +6,7 @@ extension Login {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
-		let shouldShowChooseAPersonaTitle: Bool
+		let showChoosePersonaTitle: Bool
 		let availablePersonas: IdentifiedArrayOf<PersonaRow.State>
 		let selectedPersona: PersonaRow.State?
 		let continueButtonRequirements: ContinueButtonRequirements?
@@ -18,30 +18,31 @@ extension Login {
 		init(state: Login.State) {
 			let isKnownDapp = state.authorizedPersona != nil
 
-			title = isKnownDapp
-				? L10n.DApp.Login.Title.knownDapp
-				: L10n.DApp.Login.Title.newDapp
+			self.title = isKnownDapp
+				? L10n.DappRequest.Login.titleKnownDapp
+				: L10n.DappRequest.Login.titleNewDapp
 
-			subtitle = {
+			self.subtitle = {
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
 
-				let explanation = AttributedString(
-					isKnownDapp ? L10n.DApp.Login.Subtitle.knownDapp : L10n.DApp.Login.Subtitle.newDapp,
-					foregroundColor: .app.gray2
-				)
+				let explanationText = isKnownDapp
+					? L10n.DappRequest.Login.subtitleKnownDapp
+					: L10n.DappRequest.Login.subtitleNewDapp
+
+				let explanation = AttributedString(explanationText, foregroundColor: .app.gray2)
 
 				return dappName + explanation
 			}()
 
-			shouldShowChooseAPersonaTitle = !state.personas.isEmpty
+			self.showChoosePersonaTitle = !state.personas.isEmpty
 
-			availablePersonas = state.personas
-			selectedPersona = state.selectedPersona
+			self.availablePersonas = state.personas
+			self.selectedPersona = state.selectedPersona
 
 			if let persona = state.selectedPersona {
-				continueButtonRequirements = .init(persona: persona.persona)
+				self.continueButtonRequirements = .init(persona: persona.persona)
 			} else {
-				continueButtonRequirements = nil
+				self.continueButtonRequirements = nil
 			}
 		}
 	}
@@ -64,8 +65,8 @@ extension Login {
 							subtitle: viewStore.subtitle
 						)
 
-						if viewStore.shouldShowChooseAPersonaTitle {
-							Text(L10n.DApp.Login.chooseAPersonaTitle)
+						if viewStore.showChoosePersonaTitle {
+							Text(L10n.DappRequest.Login.choosePersona)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 						}
@@ -86,7 +87,7 @@ extension Login {
 							}
 						}
 
-						Button(L10n.Personas.createNewPersonaButtonTitle) {
+						Button(L10n.Personas.createNewPersona) {
 							viewStore.send(.createNewPersonaButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -99,7 +100,7 @@ extension Login {
 						viewStore.continueButtonRequirements,
 						forAction: { viewStore.send(.continueButtonTapped($0.persona)) }
 					) { action in
-						Button(L10n.DApp.Login.continueButtonTitle, action: action)
+						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

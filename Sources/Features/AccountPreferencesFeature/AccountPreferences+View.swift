@@ -109,7 +109,7 @@ extension AccountPreferences {
 extension AccountPreferences.View {
 	@ViewBuilder
 	private func faucetButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button(L10n.AccountPreferences.faucetButtonTitle) {
+		Button(L10n.AccountPreferences.getXrdTestTokens) {
 			viewStore.send(.faucetButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))

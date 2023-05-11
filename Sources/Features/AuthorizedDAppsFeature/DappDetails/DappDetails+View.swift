@@ -46,7 +46,7 @@ extension DappDetails.View {
 					Personas(store: store, hasPersonas: viewStore.hasPersonas)
 						.background(.app.gray5)
 
-					Button(L10n.DAppDetails.forgetDapp) {
+					Button(L10n.DAppDetails.ForgetDappAlert.title) {
 						viewStore.send(.forgetThisDappTapped)
 					}
 					.buttonStyle(.primaryRectangular(isDestructive: true))
@@ -129,7 +129,7 @@ extension DappDetails.View {
 					Separator()
 
 					HStack(spacing: 0) {
-						Text(L10n.DAppDetails.definition)
+						Text(L10n.DAppDetails.dAppDefinition)
 							.sectionHeading
 
 						Spacer(minLength: 0)
@@ -222,7 +222,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			if hasPersonas {
-				Text(L10n.DAppDetails.personaHeading)
+				Text(L10n.DAppDetails.personasHeading)
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)

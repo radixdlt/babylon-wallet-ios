@@ -35,7 +35,7 @@ extension NonFungibleTokenList.Detail {
 						VStack(spacing: .medium1) {
 							VStack(spacing: .medium3) {
 								HStack {
-									Text(L10n.NftList.Detail.nftID)
+									Text(L10n.AccountView.NFTDetails.id)
 										.textStyle(.body1Regular)
 										.foregroundColor(.app.gray2)
 
@@ -71,7 +71,7 @@ extension NonFungibleTokenList.Detail {
 
 									VStack(spacing: .medium3) {
 										HStack {
-											Text(L10n.NftList.Detail.resourceAddress)
+											Text(L10n.AccountView.AssetDetails.resourceAddress)
 												.textStyle(.body1Regular)
 												.foregroundColor(.app.gray2)
 
@@ -81,9 +81,10 @@ extension NonFungibleTokenList.Detail {
 										}
 										if let name = viewStore.resourceName {
 											HStack {
-												Text(L10n.NftList.Detail.resourceName)
+												Text(L10n.AccountView.NFTDetails.resourceName)
 													.textStyle(.body1Regular)
 													.foregroundColor(.app.gray2)
+
 												Text(name)
 													.frame(maxWidth: .infinity, alignment: .trailing)
 													.multilineTextAlignment(.trailing)
