@@ -3,6 +3,7 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - FactorInstance
+/// An factor instance created from a **hierarchical deterministic** FactorSource.
 public struct FactorInstance: Sendable, Hashable, Codable {
 	/// The ID of the `FactorSource` that was used to produce this
 	/// factor instance. We will lookup the `FactorSource` in the
@@ -17,68 +18,36 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 	/// Also contains info about which Curve
 	public let publicKey: SLIP10.PublicKey
 
-	/// Optional, since it might be a single factor instance, not derived from
-	/// and HD factor source
-	public let derivationPath: DerivationPath?
+	/// The derivation path used to derive the publicKey.
+	public let path: DerivationPath
 
 	public init(
 		factorSourceID: FactorSource.ID,
 		publicKey: SLIP10.PublicKey,
-		derivationPath: DerivationPath?
+		derivationPath: DerivationPath
 	) {
 		self.factorSourceID = factorSourceID
 		self.publicKey = publicKey
-		self.derivationPath = derivationPath
-	}
-}
-
-extension FactorInstance {
-	public func getDerivationPath() throws -> DerivationPath {
-		guard let derivationPath else {
-			struct FactorInstanceHasNoDerivationPath: Swift.Error {}
-			throw FactorInstanceHasNoDerivationPath()
-		}
-		return derivationPath
-	}
-}
-
-// MARK: - Signature
-public struct Signature: Sendable, Hashable {
-	public let signatureWithPublicKey: SignatureWithPublicKey
-	public let derivationPath: DerivationPath?
-	public init(
-		signatureWithPublicKey: SignatureWithPublicKey,
-		derivationPath: DerivationPath?
-	) {
-		self.signatureWithPublicKey = signatureWithPublicKey
-		self.derivationPath = derivationPath
+		self.path = derivationPath
 	}
 }
 
 // MARK: - SignatureOfEntity
 public struct SignatureOfEntity: Sendable, Hashable {
 	public let signerEntity: EntityPotentiallyVirtual
-	public let factorInstance: FactorInstance
-	public let signature: Signature
+	public let derivationPath: DerivationPath
+	public let factorSourceID: FactorSourceID
+	public let signatureWithPublicKey: SignatureWithPublicKey
 
 	public init(
 		signerEntity: EntityPotentiallyVirtual,
-		factorInstance: FactorInstance,
-		signature: Signature
-	) throws {
-		guard factorInstance.derivationPath == signature.derivationPath else {
-			throw Error.derivationPathDiscrepancy
-		}
-		guard factorInstance.publicKey == signature.signatureWithPublicKey.publicKey else {
-			throw Error.publicKeyDiscrepancy
-		}
+		derivationPath: DerivationPath,
+		factorSourceID: FactorSourceID,
+		signatureWithPublicKey: SignatureWithPublicKey
+	) {
 		self.signerEntity = signerEntity
-		self.factorInstance = factorInstance
-		self.signature = signature
-	}
-
-	enum Error: Swift.Error {
-		case derivationPathDiscrepancy
-		case publicKeyDiscrepancy
+		self.derivationPath = derivationPath
+		self.factorSourceID = factorSourceID
+		self.signatureWithPublicKey = signatureWithPublicKey
 	}
 }

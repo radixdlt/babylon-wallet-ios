@@ -164,11 +164,9 @@ extension Profile.Network.Persona {
 		networkID: NetworkID,
 		factorInstance: FactorInstance
 	) throws -> EntityAddress {
-		if let derivationPath = factorInstance.derivationPath {
-			let path = try derivationPath.asIdentityPath()
-			guard path.entityKind == .identity else {
-				throw WrongEntityInDerivationPath()
-			}
+		let path = try factorInstance.path.asIdentityPath()
+		guard path.entityKind == .identity else {
+			throw WrongEntityInDerivationPath()
 		}
 
 		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(

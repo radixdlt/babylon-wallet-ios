@@ -195,14 +195,13 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			state.destination = nil
 
 			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set((state.selectedAccounts ?? []).map(\.account.id))
-			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
+			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.compactMap {
 				guard case let .account(account) = $0.signerEntity else {
-					fatalError()
+					loggerGlobal.error("Found personas amonst signers, expected only accounts.")
+					return nil
 				}
 				accountsLeftToVerifyDidSign.remove(account.id)
-				guard let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0) else {
-					fatalError()
-				}
+				let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
 				return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
 			}
 			guard accountsLeftToVerifyDidSign.isEmpty else {

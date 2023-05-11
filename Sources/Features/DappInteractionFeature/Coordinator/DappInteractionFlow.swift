@@ -300,11 +300,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				guard
 					// A **single** signature expected, since we sign auth with a single Persona.
 					let entitySignature = signedAuthChallenge.entitySignatures.first,
-					signedAuthChallenge.entitySignatures.count == 1,
-					let proof = P2P.Dapp.Response.AuthProof(entitySignature: entitySignature)
+					signedAuthChallenge.entitySignatures.count == 1
 				else {
-					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Expected one single signature, bot many.")
 				}
+				let proof = P2P.Dapp.Response.AuthProof(entitySignature: entitySignature)
 
 				state.responseItems[item] = .remote(.login(.init(
 					persona: responsePersona,

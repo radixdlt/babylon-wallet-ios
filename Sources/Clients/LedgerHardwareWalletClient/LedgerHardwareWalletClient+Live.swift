@@ -119,16 +119,15 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.compressedRepresentation.hex)")
 							throw MissingSignatureFromRequiredSigner()
 						}
-						assert(requiredSigningFactor.derivationPath == signature.derivationPath)
+						assert(requiredSigningFactor.path == signature.derivationPath)
 
-						let entitySignature = try SignatureOfEntity(
+						let entitySignature = SignatureOfEntity(
 							signerEntity: requiredSigner.entity,
-							factorInstance: requiredSigningFactor,
-							signature: Signature(
-								signatureWithPublicKey: signature.signature,
-								derivationPath: requiredSigningFactor.getDerivationPath()
-							)
+							derivationPath: requiredSigningFactor.path,
+							factorSourceID: requiredSigningFactor.factorSourceID,
+							signatureWithPublicKey: signature.signature
 						)
+
 						signatures.insert(entitySignature)
 					}
 				}
@@ -206,14 +205,10 @@ struct InvalidSignature: Swift.Error {}
 
 extension Signer {
 	var keyParams: [P2P.LedgerHardwareWallet.KeyParameters] {
-		factorInstancesRequiredToSign.compactMap {
-			guard let derivationPath = $0.derivationPath else {
-				loggerGlobal.warning("Found factor instance without derivation path to be used as signer with Ledger, this is not supported, ignoring it. Probably something wrong somewhere.")
-				return nil
-			}
-			return P2P.LedgerHardwareWallet.KeyParameters(
+		factorInstancesRequiredToSign.map {
+			P2P.LedgerHardwareWallet.KeyParameters(
 				curve: $0.publicKey.curve.cast(),
-				derivationPath: derivationPath.path
+				derivationPath: $0.path.path
 			)
 		}
 	}
