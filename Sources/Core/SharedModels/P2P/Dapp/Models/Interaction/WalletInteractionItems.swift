@@ -51,7 +51,7 @@ extension P2P.Dapp.Request {
 	}
 
 	public struct AuthorizedRequestItems: Sendable, Hashable, Decodable {
-		public let login: LoginRequestItem
+		public let auth: AuthRequestItem
 		public let reset: ResetRequestItem?
 		public let ongoingAccounts: AccountsRequestItem?
 		public let ongoingPersonaData: PersonaDataRequestItem?
@@ -59,14 +59,14 @@ extension P2P.Dapp.Request {
 		public let oneTimePersonaData: PersonaDataRequestItem?
 
 		public init(
-			login: LoginRequestItem,
-			reset: ResetRequestItem?,
-			ongoingAccounts: AccountsRequestItem?,
-			ongoingPersonaData: PersonaDataRequestItem?,
-			oneTimeAccounts: AccountsRequestItem?,
-			oneTimePersonaData: PersonaDataRequestItem?
+			auth: AuthRequestItem,
+			reset: ResetRequestItem? = nil,
+			ongoingAccounts: AccountsRequestItem? = nil,
+			ongoingPersonaData: PersonaDataRequestItem? = nil,
+			oneTimeAccounts: AccountsRequestItem? = nil,
+			oneTimePersonaData: PersonaDataRequestItem? = nil
 		) {
-			self.login = login
+			self.auth = auth
 			self.reset = reset
 			self.ongoingAccounts = ongoingAccounts
 			self.ongoingPersonaData = ongoingPersonaData
