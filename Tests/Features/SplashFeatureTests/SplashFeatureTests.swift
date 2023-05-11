@@ -51,7 +51,7 @@ final class SplashFeatureTests: TestCase {
 
 	func test__GIVEN__splash_appeared__WHEN__biometrics_configured__THEN__notifies_delegate_with_profile_result() async throws {
 		try await assertNotifiesDelegateWithLoadProfileOutcome(.newUser)
-		try await assertNotifiesDelegateWithLoadProfileOutcome(.existingProfileLoaded)
+		try await assertNotifiesDelegateWithLoadProfileOutcome(.existingProfile)
 
 		/// Profile load failure
 		try await assertNotifiesDelegateWithLoadProfileOutcome(
