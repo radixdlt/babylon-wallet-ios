@@ -1,10 +1,10 @@
+import AppPreferencesClient
 import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
 import MainFeature
 import OnboardingClient
 import OnboardingFeature
-import ProfileStore
 import SecureStorageClient
 import SplashFeature
 
@@ -70,8 +70,8 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
 
@@ -123,7 +123,7 @@ public struct App: Sendable, FeatureReducer {
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in
 				do {
-					try await ProfileStore.shared.deleteProfile(keepIcloudIfPresent: true)
+					try await appPreferencesClient.deleteProfileAndFactorSources(true)
 				} catch {
 					errorQueue.schedule(error)
 				}

@@ -113,7 +113,7 @@ private extension SecureStorageClientTests {
 			)
 
 			let sut = SecureStorageClient.liveValue
-                        let profile = Profile(header: snapshotHeader, factorSources: .init(factorSource.factorSource))
+			let profile = Profile(header: snapshotHeader, factorSources: .init(factorSource.factorSource))
 			try await operation(sut, privateHDFactorSource, profile.snapshot())
 		}
 	}
@@ -124,15 +124,15 @@ private let stableDate = Date(timeIntervalSince1970: 0)
 private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
 private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(description: creatingDevice, id: stableUUID, date: stableDate)
 private let snapshotHeader = ProfileSnapshot.Header(
-        creatingDevice: device,
-        lastUsedOnDevice: device,
-        id: stableUUID,
-        creationDate: stableDate,
-        lastModified: stableDate,
-        contentHint: .init(
-                numberOfAccountsOnAllNetworksInTotal: 6,
-                numberOfPersonasOnAllNetworksInTotal: 3,
-                numberOfNetworks: 2
-        ),
-        snapshotVersion: .minimum
+	creatingDevice: device,
+	lastUsedOnDevice: device,
+	id: stableUUID,
+	creationDate: stableDate,
+	lastModified: stableDate,
+	contentHint: .init(
+		numberOfAccountsOnAllNetworksInTotal: 6,
+		numberOfPersonasOnAllNetworksInTotal: 3,
+		numberOfNetworks: 2
+	),
+	snapshotVersion: .minimum
 )

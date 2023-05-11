@@ -20,8 +20,11 @@ final class ProfileStoreTests: TestCase {
 				return .testValue
 			}
 			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.hdOnDeviceFactorSource.factorSource.kind, .device) }
-			$0.secureStorageClient.loadProfileSnapshotData = { nil }
+			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
+			$0.userDefaultsClient.stringForKey = { _ in
+				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+			}
 		} operation: {
 			_ = await ProfileStore()
 		}
@@ -41,41 +44,41 @@ final class ProfileStoreTests: TestCase {
 			}
 		)
 	}
-//
-//	func test_fullOnboarding_assert_factorSource_persisted_when_commitEphemeral_called() async throws {
-//		try await doTestFullOnboarding(
-//			privateFactor: .testValue,
-//			assertFactorSourceSaved: { factorSource in
-//				XCTAssertNoDifference(factorSource.kind, .device)
-//				XCTAssertFalse(factorSource.supportsOlympia)
-//				XCTAssertNoDifference(factorSource.label, deviceLabel)
-//				XCTAssertNoDifference(factorSource.description, deviceDescription)
-//			}
-//		)
-//	}
-//
-//	func test_fullOnboarding_assert_profileSnapshot_persisted_when_commitEphemeral_called() async throws {
-//		let profileID = UUID()
-//		let privateFactor = withDependencies {
-//			$0.date = .constant(Date(timeIntervalSince1970: 0))
-//		} operation: {
-//			PrivateHDFactorSource.testValue
-//		}
-//
-//		try await doTestFullOnboarding(
-//			profileID: profileID,
-//			privateFactor: privateFactor,
-//			assertProfileSnapshotSaved: { profileSnapshot in
-//				XCTAssertNoDifference(profileSnapshot.id, profileID)
-//
-//				XCTAssertNoDifference(
-//					profileSnapshot.factorSources.first,
-//					privateFactor.hdOnDeviceFactorSource.factorSource
-//				)
-	//                                XCTAssertNoDifference(profileSnapshot.header.creatingDevice, expectedDeviceDescription)
-//			}
-//		)
-//	}
+
+	func test_fullOnboarding_assert_factorSource_persisted_when_commitEphemeral_called() async throws {
+		try await doTestFullOnboarding(
+			privateFactor: .testValue,
+			assertFactorSourceSaved: { factorSource in
+				XCTAssertNoDifference(factorSource.kind, .device)
+				XCTAssertFalse(factorSource.supportsOlympia)
+				XCTAssertNoDifference(factorSource.label, deviceLabel)
+				XCTAssertNoDifference(factorSource.description, deviceDescription)
+			}
+		)
+	}
+
+	func test_fullOnboarding_assert_profileSnapshot_persisted_when_commitEphemeral_called() async throws {
+		let profileID = UUID()
+		let privateFactor = withDependencies {
+			$0.date = .constant(Date(timeIntervalSince1970: 0))
+		} operation: {
+			PrivateHDFactorSource.testValue
+		}
+
+		try await doTestFullOnboarding(
+			profileID: profileID,
+			privateFactor: privateFactor,
+			assertProfileSnapshotSaved: { profileSnapshot in
+				XCTAssertNoDifference(profileSnapshot.id, profileID)
+
+				XCTAssertNoDifference(
+					profileSnapshot.factorSources.first,
+					privateFactor.hdOnDeviceFactorSource.factorSource
+				)
+				XCTAssertNoDifference(profileSnapshot.header.creatingDevice.description, expectedDeviceDescription)
+			}
+		)
+	}
 }
 
 private extension ProfileStoreTests {
@@ -95,7 +98,7 @@ private extension ProfileStoreTests {
 			$0.device.$name = deviceLabel.rawValue
 			$0.device.$model = deviceDescription.rawValue
 			#endif
-			$0.secureStorageClient.loadProfileSnapshotData = {
+			$0.secureStorageClient.loadProfileSnapshotData = { _ in
 				provideProfileSnapshotLoaded
 			}
 
@@ -115,6 +118,14 @@ private extension ProfileStoreTests {
 				await profileSnapshotSavedIntoSecureStorage.setValue($0)
 			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
+			$0.userDefaultsClient.stringForKey = { _ in
+				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+			}
+			$0.userDefaultsClient.setString = { _, _ in }
+			$0.secureStorageClient.loadProfileHeaderList = {
+				nil
+			}
+			$0.secureStorageClient.saveProfileHeaderList = { _ in }
 		} operation: {
 			let sut = await ProfileStore()
 			var profile: Profile?
