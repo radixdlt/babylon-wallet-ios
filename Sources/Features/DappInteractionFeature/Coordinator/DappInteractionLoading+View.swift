@@ -7,7 +7,7 @@ extension DappInteractionLoading {
 
 		init(state: State) {
 			self.screenState = state.isLoading
-				? .loading(.global(text: L10n.DApp.MetadataLoading.prompt))
+				? .loading(.global(text: L10n.DappRequest.metadataLoadingPrompt))
 				: .enabled
 		}
 	}

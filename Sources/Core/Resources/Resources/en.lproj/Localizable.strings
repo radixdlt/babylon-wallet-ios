@@ -4,7 +4,6 @@
 "accountView_badges" = "Badges";
 "accountView_transfer" = "Transfer";
 
-
 "accountView_assetDetails_resourceAddress" = "Address";
 "accountView_assetDetails_name" = "Name";
 "accountView_assetDetails_currentSupply" = "Current Supply";
@@ -228,7 +227,6 @@
 "personas_createNewPersona" = "Create a New Persona";
 "personas_subtitle" = "Here are all of your current Personas in your Wallet.";
 "personas_title" = "Personas";
-
 "personas_whatIsPersona" = "What is a Persona";
 
 "splash_incompatibleProfileVersionAlert_delete" = "Delete Wallet Data";

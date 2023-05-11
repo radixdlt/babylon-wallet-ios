@@ -9,30 +9,19 @@ extension PersonaDataPermission {
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: PersonaDataPermission.State) {
-			title = L10n.DApp.PersonaDataPermission.title
-			subtitle = {
+			self.title = L10n.DappRequest.PersonalDataPermission.title
+			self.subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
+				let explanation1 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart1, foregroundColor: normalColor)
+				let explanation2 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart2, foregroundColor: highlightColor)
+				let explanation3 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart3, foregroundColor: normalColor)
 
-				let explanation: AttributedString = {
-					let always = AttributedString(L10n.DApp.PersonaDataPermission.Subtitle.always, foregroundColor: highlightColor)
-
-					return AttributedString(
-						L10n.DApp.PersonaDataPermission.Subtitle.Explanation.first,
-						foregroundColor: normalColor
-					)
-						+ always
-						+ AttributedString(
-							L10n.DApp.PersonaDataPermission.Subtitle.Explanation.second,
-							foregroundColor: normalColor
-						)
-				}()
-
-				return dappName + explanation
+				return dappName + explanation1 + explanation2 + explanation3
 			}()
-			output = {
+			self.output = {
 				guard let persona = state.persona else {
 					return nil
 				}
@@ -72,7 +61,7 @@ extension PersonaDataPermission {
 							then: { PersonaDataPermissionBox.View(store: $0) }
 						)
 
-						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+						Text(L10n.DappRequest.AccountPermission.updateInSettingsExplanation)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
@@ -86,7 +75,7 @@ extension PersonaDataPermission {
 						viewStore.output,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.DApp.PersonaDataPermission.Button.continue, action: action)
+						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -96,7 +85,7 @@ extension PersonaDataPermission {
 					action: PersonaDataPermission.Destinations.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
 				)
-				.task { await viewStore.send(.task) }
+				.task { viewStore.send(.task) }
 			}
 		}
 	}

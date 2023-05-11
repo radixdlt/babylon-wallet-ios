@@ -299,19 +299,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .send(.cancelButtonTapped)) {
-						TextState(L10n.DAppRequest.SpecifiedPersonaNotFoundError.cancelButtonTitle)
+						TextState(L10n.Common.cancel)
 					}
 				},
 				message: {
-					TextState(
-						L10n.DApp.Request.SpecifiedPersonaNotFoundError.message + {
-							#if DEBUG
-							"\n\n" + reason
-							#else
-							""
-							#endif
-						}()
-					)
+					#if DEBUG
+					TextState(L10n.DappRequest.RequestPersonaNotFoundAlert.message + "\n\n" + reason)
+					#else
+					TextState(L10n.DappRequest.RequestPersonaNotFoundAlert.message)
+					#endif
 				}
 			)
 			return .none

@@ -15,29 +15,22 @@ extension OneTimePersonaData {
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: OneTimePersonaData.State) {
-			title = L10n.DApp.OneTimePersonaData.title
-			subtitle = {
+			self.title = L10n.DappRequest.OneTimePersonalData.title
+			self.subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
+				let dAppName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
+				let explanation1 = AttributedString(L10n.DappRequest.OneTimePersonalData.subtitlePart1, foregroundColor: normalColor)
+				let explanation2 = AttributedString(L10n.DappRequest.OneTimePersonalData.subtitlePart2, foregroundColor: highlightColor)
 
-				let explanation: AttributedString = {
-					let justOneTime = AttributedString(L10n.DApp.OneTimePersonaData.Subtitle.justOneTime, foregroundColor: highlightColor)
-
-					return AttributedString(
-						L10n.DApp.OneTimePersonaData.Subtitle.Explanation.first,
-						foregroundColor: normalColor
-					)
-						+ justOneTime
-				}()
-
-				return dappName + explanation
+				return dAppName + explanation1 + explanation2
 			}()
-			shouldShowChooseDataToProvideTitle = !state.personas.isEmpty
-			availablePersonas = state.personas
-			selectedPersona = state.selectedPersona
-			output = {
+
+			self.shouldShowChooseDataToProvideTitle = !state.personas.isEmpty
+			self.availablePersonas = state.personas
+			self.selectedPersona = state.selectedPersona
+			self.output = {
 				guard let selectedPersona = state.selectedPersona else {
 					return nil
 				}
@@ -70,7 +63,7 @@ extension OneTimePersonaData {
 						)
 
 						if viewStore.shouldShowChooseDataToProvideTitle {
-							Text(L10n.DApp.OneTimePersonaData.chooseDataToProvide)
+							Text(L10n.DappRequest.OneTimePersonalData.chooseDataToProvide)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 						}
@@ -97,7 +90,7 @@ extension OneTimePersonaData {
 							)
 						}
 
-						Button(L10n.Personas.createNewPersonaButtonTitle) {
+						Button(L10n.Personas.createNewPersona) {
 							viewStore.send(.createNewPersonaButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -110,7 +103,7 @@ extension OneTimePersonaData {
 						viewStore.output,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.DApp.PersonaDataPermission.Button.continue, action: action)
+						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

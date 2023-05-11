@@ -14,22 +14,11 @@ extension AccountPermission {
 				let highlightColor = Color.app.gray1
 
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
+				let explanation1 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart1, foregroundColor: normalColor)
+				let explanation2 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart2, foregroundColor: highlightColor)
+				let explanation3 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart3, foregroundColor: normalColor)
 
-				let explanation: AttributedString = {
-					let always = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart2, foregroundColor: highlightColor)
-
-					return AttributedString(
-						L10n.DappRequest.AccountPermission.subtitlePart1,
-						foregroundColor: normalColor
-					)
-						+ always
-						+ AttributedString(
-							L10n.DappRequest.AccountPermission.subtitlePart3,
-							foregroundColor: normalColor
-						)
-				}()
-
-				return dappName + explanation
+				return dappName + explanation1 + explanation2 + explanation3
 			}()
 
 			self.numberOfAccounts = "•  " + {

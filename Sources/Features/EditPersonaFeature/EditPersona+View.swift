@@ -82,7 +82,7 @@ extension EditPersona {
 							)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
-								Text(L10n.EditPersona.Button.addAField).padding(.horizontal, .medium2)
+								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
 							}
 							.buttonStyle(.secondaryRectangular)
 							.controlState(viewStore.addAFieldButtonState)
@@ -97,7 +97,7 @@ extension EditPersona {
 							viewStore.output,
 							forAction: { viewStore.send(.saveButtonTapped($0)) }
 						) { action in
-							Button(L10n.EditPersona.Button.save, action: action)
+							Button(L10n.EditPersona.save, action: action)
 								.buttonStyle(.primaryRectangular)
 						}
 					}
