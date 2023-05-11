@@ -315,6 +315,8 @@ public enum L10n {
     public static let personasHeading = L10n.tr("Localizable", "dAppDetails_personasHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
     /// Associated Tokens
     public static let tokens = L10n.tr("Localizable", "dAppDetails_tokens", fallback: "Associated Tokens")
+    /// Unknown name
+    public static let unknownTokenName = L10n.tr("Localizable", "dAppDetails_unknownTokenName", fallback: "Unknown name")
     /// Website
     public static let website = L10n.tr("Localizable", "dAppDetails_website", fallback: "Website")
     public enum ForgetDappAlert {
