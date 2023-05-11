@@ -140,9 +140,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 				},
 				message: {
 					#if DEBUG
-					TextState(L10n.DappRequest.ResponseFailureAlert.message + "\n\n" + reason)
+					TextState(L10n.DAppRequest.ResponseFailureAlert.message + "\n\n" + reason)
 					#else
-					TextState(L10n.DappRequest.ResponseFailureAlert.message)
+					TextState(L10n.DAppRequest.ResponseFailureAlert.message)
 					#endif
 				}
 			)
@@ -263,7 +263,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 							.dapp(.failure(.init(
 								interactionId: request.id,
 								errorType: .wrongNetwork,
-								message: L10n.DappRequest.RequestWrongNetworkAlert.message(incomingRequestNetwork.name, currentNetwork.name)
+								message: L10n.DAppRequest.RequestWrongNetworkAlert.message(incomingRequestNetwork.name, currentNetwork.name)
 							))),
 							incomingRequest.route
 						)

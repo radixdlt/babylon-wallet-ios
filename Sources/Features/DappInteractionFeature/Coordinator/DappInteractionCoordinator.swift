@@ -90,7 +90,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 							TextState(L10n.Common.ok)
 						}
 					},
-					message: { TextState(L10n.DappRequest.RequestMalformedAlert.message) }
+					message: { TextState(L10n.DAppRequest.RequestMalformedAlert.message) }
 				)
 			}
 			return .none

@@ -9,15 +9,15 @@ extension PersonaDataPermission {
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: PersonaDataPermission.State) {
-			self.title = L10n.DappRequest.PersonalDataPermission.title
+			self.title = L10n.DAppRequest.PersonalDataPermission.title
 			self.subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
-				let explanation1 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart1, foregroundColor: normalColor)
-				let explanation2 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart2, foregroundColor: highlightColor)
-				let explanation3 = AttributedString(L10n.DappRequest.AccountPermission.subtitlePart3, foregroundColor: normalColor)
+				let explanation1 = AttributedString(L10n.DAppRequest.AccountPermission.subtitlePart1, foregroundColor: normalColor)
+				let explanation2 = AttributedString(L10n.DAppRequest.AccountPermission.subtitlePart2, foregroundColor: highlightColor)
+				let explanation3 = AttributedString(L10n.DAppRequest.AccountPermission.subtitlePart3, foregroundColor: normalColor)
 
 				return dappName + explanation1 + explanation2 + explanation3
 			}()
@@ -61,7 +61,7 @@ extension PersonaDataPermission {
 							then: { PersonaDataPermissionBox.View(store: $0) }
 						)
 
-						Text(L10n.DappRequest.AccountPermission.updateInSettingsExplanation)
+						Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)

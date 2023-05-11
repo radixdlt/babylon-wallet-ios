@@ -13,9 +13,9 @@ extension ChooseAccounts {
 		init(state: ChooseAccounts.State) {
 			switch state.accessKind {
 			case .ongoing:
-				self.title = L10n.DappRequest.ChooseAccountsOngoing.title
+				self.title = L10n.DAppRequest.ChooseAccountsOngoing.title
 			case .oneTime:
-				self.title = L10n.DappRequest.ChooseAccountsOneTime.title
+				self.title = L10n.DAppRequest.ChooseAccountsOneTime.title
 			}
 
 			self.subtitle = {
@@ -24,28 +24,28 @@ extension ChooseAccounts {
 					case .ongoing:
 						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
 						case (.atLeast, 0):
-							return L10n.DappRequest.ChooseAccountsOngoing.subtitleAtLeastZero
+							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastZero
 						case (.atLeast, 1):
-							return L10n.DappRequest.ChooseAccountsOngoing.subtitleAtLeastOne
+							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastOne
 						case let (.atLeast, number):
-							return L10n.DappRequest.ChooseAccountsOngoing.subtitleAtLeast(number)
+							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeast(number)
 						case (.exactly, 1):
-							return L10n.DappRequest.ChooseAccountsOngoing.subtitleExactlyOne
+							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactlyOne
 						case let (.exactly, number):
-							return L10n.DappRequest.ChooseAccountsOngoing.subtitleExactly(number)
+							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactly(number)
 						}
 					case .oneTime:
 						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
 						case (.atLeast, 0):
-							return L10n.DappRequest.ChooseAccountsOneTime.subtitleAtLeastZero
+							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastZero
 						case (.atLeast, 1):
-							return L10n.DappRequest.ChooseAccountsOneTime.subtitleAtLeastOne
+							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastOne
 						case let (.atLeast, number):
-							return L10n.DappRequest.ChooseAccountsOneTime.subtitleAtLeast(number)
+							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeast(number)
 						case (.exactly, 1):
-							return L10n.DappRequest.ChooseAccountsOneTime.subtitleExactlyOne
+							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactlyOne
 						case let (.exactly, number):
-							return L10n.DappRequest.ChooseAccountsOneTime.subtitleExactly(number)
+							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactly(number)
 						}
 					}
 				}()
@@ -110,7 +110,7 @@ extension ChooseAccounts {
 							}
 						}
 
-						Button(L10n.DappRequest.ChooseAccounts.createNewAccount) {
+						Button(L10n.DAppRequest.ChooseAccounts.createNewAccount) {
 							viewStore.send(.createAccountButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))

@@ -304,9 +304,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				},
 				message: {
 					#if DEBUG
-					TextState(L10n.DappRequest.RequestPersonaNotFoundAlert.message + "\n\n" + reason)
+					TextState(L10n.DAppRequest.RequestPersonaNotFoundAlert.message + "\n\n" + reason)
 					#else
-					TextState(L10n.DappRequest.RequestPersonaNotFoundAlert.message)
+					TextState(L10n.DAppRequest.RequestPersonaNotFoundAlert.message)
 					#endif
 				}
 			)

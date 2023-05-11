@@ -19,15 +19,15 @@ extension Login {
 			let isKnownDapp = state.authorizedPersona != nil
 
 			self.title = isKnownDapp
-				? L10n.DappRequest.Login.titleKnownDapp
-				: L10n.DappRequest.Login.titleNewDapp
+				? L10n.DAppRequest.Login.titleKnownDapp
+				: L10n.DAppRequest.Login.titleNewDapp
 
 			self.subtitle = {
 				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
 
 				let explanationText = isKnownDapp
-					? L10n.DappRequest.Login.subtitleKnownDapp
-					: L10n.DappRequest.Login.subtitleNewDapp
+					? L10n.DAppRequest.Login.subtitleKnownDapp
+					: L10n.DAppRequest.Login.subtitleNewDapp
 
 				let explanation = AttributedString(explanationText, foregroundColor: .app.gray2)
 
@@ -66,7 +66,7 @@ extension Login {
 						)
 
 						if viewStore.showChoosePersonaTitle {
-							Text(L10n.DappRequest.Login.choosePersona)
+							Text(L10n.DAppRequest.Login.choosePersona)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 						}

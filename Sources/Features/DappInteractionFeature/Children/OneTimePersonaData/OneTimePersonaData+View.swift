@@ -15,14 +15,14 @@ extension OneTimePersonaData {
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: OneTimePersonaData.State) {
-			self.title = L10n.DappRequest.OneTimePersonalData.title
+			self.title = L10n.DAppRequest.OneTimePersonalData.title
 			self.subtitle = {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
 				let dAppName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
-				let explanation1 = AttributedString(L10n.DappRequest.OneTimePersonalData.subtitlePart1, foregroundColor: normalColor)
-				let explanation2 = AttributedString(L10n.DappRequest.OneTimePersonalData.subtitlePart2, foregroundColor: highlightColor)
+				let explanation1 = AttributedString(L10n.DAppRequest.OneTimePersonalData.subtitlePart1, foregroundColor: normalColor)
+				let explanation2 = AttributedString(L10n.DAppRequest.OneTimePersonalData.subtitlePart2, foregroundColor: highlightColor)
 
 				return dAppName + explanation1 + explanation2
 			}()
@@ -63,7 +63,7 @@ extension OneTimePersonaData {
 						)
 
 						if viewStore.shouldShowChooseDataToProvideTitle {
-							Text(L10n.DappRequest.OneTimePersonalData.chooseDataToProvide)
+							Text(L10n.DAppRequest.OneTimePersonalData.chooseDataToProvide)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 						}

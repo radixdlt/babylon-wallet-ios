@@ -111,7 +111,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 				},
 				message: {
 					TextState(
-						L10n.DappRequest.MetadataLoadingAlert.message + {
+						L10n.DAppRequest.MetadataLoadingAlert.message + {
 							#if DEBUG
 							"\n\n" + error.legibleLocalizedDescription
 							#else
