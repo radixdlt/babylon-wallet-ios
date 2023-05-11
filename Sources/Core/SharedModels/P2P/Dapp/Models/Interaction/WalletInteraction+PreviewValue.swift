@@ -87,10 +87,10 @@ extension P2P.Dapp.Request {
 			items: .request(.authorized(.init(
 				login: login,
 				reset: nil,
-				oneTimeAccounts: .previewValue,
-				oneTimePersonaData: .previewValue,
 				ongoingAccounts: .previewValue,
-				ongoingPersonaData: .previewValue
+				ongoingPersonaData: .previewValue,
+				oneTimeAccounts: .previewValue,
+				oneTimePersonaData: .previewValue
 			))),
 			metadata: .previewValue
 		)

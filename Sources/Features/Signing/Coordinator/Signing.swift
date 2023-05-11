@@ -4,7 +4,7 @@ import DeviceFactorSourceClient
 import FactorSourcesClient
 import FeaturePrelude
 import Profile
-import ROLAClient
+import struct ROLAClient.AuthenticationDataToSignForChallengeResponse
 import TransactionClient
 
 // MARK: - K1.PublicKey + CustomDumpStringConvertible

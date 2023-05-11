@@ -151,10 +151,10 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 					items: .request(
 						.authorized(.init(
 							login: login,
-							oneTimeAccounts: oneTimeAccounts,
-							oneTimePersonaData: oneTimePersonaData,
 							ongoingAccounts: ongoingAccounts,
-							ongoingPersonaData: ongoingPersonaData
+							ongoingPersonaData: ongoingPersonaData,
+							oneTimeAccounts: oneTimeAccounts,
+							oneTimePersonaData: oneTimePersonaData
 						))
 					)
 				)
