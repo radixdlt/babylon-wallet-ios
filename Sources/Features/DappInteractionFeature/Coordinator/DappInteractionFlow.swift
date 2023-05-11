@@ -737,7 +737,7 @@ extension DappInteractionFlow.Destinations.State {
 					requiredFieldIDs: item.fields
 				)))
 			} else {
-				assertionFailure("Persona data request requires a persona")
+				assertionFailure("Persona data request requires a persona.")
 				return nil
 			}
 
