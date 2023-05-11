@@ -51,7 +51,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelop, DappMetadata?, reason: String)
 		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelop, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
-		case presentInvalidRequest(reason: DappRequestValidationOutcome.Invalid)
+		case presentInvalidRequest(DappRequestValidationOutcome.Invalid)
 	}
 
 	enum ChildAction: Sendable, Equatable {
