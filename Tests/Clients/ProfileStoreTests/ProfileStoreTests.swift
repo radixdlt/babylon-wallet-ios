@@ -21,6 +21,9 @@ final class ProfileStoreTests: TestCase {
 			}
 			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.hdOnDeviceFactorSource.factorSource.kind, .device) }
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
+			$0.secureStorageClient.loadDeviceIdentifier = {
+				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 			$0.userDefaultsClient.stringForKey = { _ in
 				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
@@ -120,6 +123,9 @@ private extension ProfileStoreTests {
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
 			$0.userDefaultsClient.stringForKey = { _ in
 				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+			}
+			$0.secureStorageClient.loadDeviceIdentifier = {
+				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
 			}
 			$0.userDefaultsClient.setString = { _, _ in }
 			$0.secureStorageClient.loadProfileHeaderList = {
