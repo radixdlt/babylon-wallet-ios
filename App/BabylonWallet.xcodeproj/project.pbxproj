@@ -367,10 +367,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		489948242A0186C900EE807A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 489948232A0186C900EE807A /* UseFactorSourceClientLive */;
-		};
 		489948262A0186DC00EE807A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 489948252A0186DC00EE807A /* URLFormatterClientLive */;
@@ -592,10 +588,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		489948232A0186C900EE807A /* UseFactorSourceClientLive */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UseFactorSourceClientLive;
-		};
 		489948252A0186DC00EE807A /* URLFormatterClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = URLFormatterClientLive;

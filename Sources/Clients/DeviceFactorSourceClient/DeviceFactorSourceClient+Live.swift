@@ -46,16 +46,14 @@ extension DeviceFactorSourceClient: DependencyKey {
 				@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 				do {
-					// FIXME: figure out a canonical way to find the expected `device` factor source for this iPhone..?
-					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first!
-
+					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
 					let accounts = try await accountsClient.getAccountsOnNetwork(NetworkID.default)
 
-					guard
-						let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(
-							deviceFactorSource.id,
-							.checkingAccounts
-						)
+					guard let deviceFactorSource,
+					      let mnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(
+					      	deviceFactorSource.id,
+					      	.checkingAccounts
+					      )
 					else {
 						// Failed to find mnemonic for factor source
 						return true
