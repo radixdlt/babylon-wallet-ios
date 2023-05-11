@@ -362,7 +362,7 @@ extension DappInteractor {
 	}
 
 	func handleIncomingRequests() -> EffectTask<Action> {
-		.run { _ in
+		.run { send in
 			_ = await radixConnectClient.loadFromProfileAndConnectAll()
 
 			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
@@ -375,9 +375,9 @@ extension DappInteractor {
 					let validation = await validate(requestToValidate, route: incomingRequest.route)
 					switch validation {
 					case let .valid(requestEnvelop):
-						await send(.internal(DappInteractor.Action.internal(InternalAction.receivedRequestFromDapp(
+						await send(.internal(.receivedRequestFromDapp(
 							requestEnvelop
-						))))
+						)))
 
 					case let .invalid(invalid):
 						await send(.internal(.presentInvalidRequest(invalid)))
