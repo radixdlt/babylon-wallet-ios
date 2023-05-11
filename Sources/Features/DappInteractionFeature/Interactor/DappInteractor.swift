@@ -357,7 +357,7 @@ extension DappInteractor {
 	func validate(_ nonValidated: P2P.Dapp.RequestNonValidated, route: P2P.RTCRoute) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
 		let nonvalidatedMeta = nonValidated.metadata
 		let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
-		let outcome: DappRequestValidationOutcome = try await {
+		let outcome: DappRequestValidationOutcome = await {
 			guard P2P.Dapp.currentVersion == nonvalidatedMeta.version else {
 				return .invalid(.incompatibleVersion(connectorExtensionSent: nonvalidatedMeta.version, walletUses: P2P.Dapp.currentVersion))
 			}
