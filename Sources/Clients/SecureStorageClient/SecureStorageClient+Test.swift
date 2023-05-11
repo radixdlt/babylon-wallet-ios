@@ -19,7 +19,8 @@ extension SecureStorageClient: TestDependencyKey {
 		updateIsCloudProfileSyncEnabled: { _, _ in },
 		loadProfileHeaderList: { nil },
 		saveProfileHeaderList: { _, _ in },
-		deleteProfileHeaderList: {}
+		deleteProfileHeaderList: {},
+		loadDeviceIdentifier: { .init() }
 	)
 
 	public static let previewValue: Self = .noop
@@ -34,6 +35,7 @@ extension SecureStorageClient: TestDependencyKey {
 		updateIsCloudProfileSyncEnabled: unimplemented("\(Self.self).updateIsCloudProfileSyncEnabled"),
 		loadProfileHeaderList: unimplemented("\(Self.self).loadProfileHeaderList"),
 		saveProfileHeaderList: unimplemented("\(Self.self).saveProfileHeaderList"),
-		deleteProfileHeaderList: unimplemented("\(Self.self).deleteProfileHeaderList")
+		deleteProfileHeaderList: unimplemented("\(Self.self).deleteProfileHeaderList"),
+		loadDeviceIdentifier: unimplemented("\(Self.self).loadDeviceIdentifier")
 	)
 }

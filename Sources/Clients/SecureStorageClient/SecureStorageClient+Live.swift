@@ -25,6 +25,8 @@ extension SecureStorageClient: DependencyKey {
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+		@Dependency(\.uuid) var uuid
+		@Dependency(\.assertionFailure) var assertionFailure
 
 		struct AccesibilityAndAuthenticationPolicy: Sendable, Equatable {
 			/// The most secure currently available accessibility
@@ -89,15 +91,13 @@ extension SecureStorageClient: DependencyKey {
 			try await saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
-		@Sendable func loadProfileHeaderList() async throws -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>? {
+		@Sendable func loadProfileHeaderList() async throws -> ProfileSnapshot.HeaderList? {
 			try await keychainClient
 				.getDataWithoutAuthForKey(profileHeaderListKeychainKey)
 				.map {
 					try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
 				}
-				.flatMap {
-					.init($0)
-				}
+				.flatMap(ProfileSnapshot.HeaderList.init)
 		}
 
 		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList, iCloudSyncEnabled: Bool) async throws {
@@ -133,6 +133,41 @@ extension SecureStorageClient: DependencyKey {
 		@Sendable func deleteProfile(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) async throws {
 			try await keychainClient.removeDataForKey(id.keychainKey)
 			try await deleteProfileHeader(id, iCloudSyncEnabled: iCloudSyncEnabled)
+		}
+
+		@Sendable func loadDeviceIdentifier() async throws -> UUID {
+			func generateAndSetNewDeviceIdentifier() async throws -> UUID {
+				let deviceIdentifier = uuid()
+				let data = try jsonEncoder().encode(deviceIdentifier)
+				try await keychainClient.setDataWithoutAuthForKey(
+					KeychainClient.SetItemWithoutAuthRequest(
+						data: data,
+						key: deviceIdentifierKey,
+						iCloudSyncEnabled: false, // Never, ever synced.
+						accessibility: .whenUnlocked,
+						label: "Radix Wallet device identifier",
+						comment: "The unique identifier of this device"
+					)
+				)
+				return deviceIdentifier
+			}
+
+			do {
+				let storedDeviceIdentifier = try await keychainClient
+					.getDataWithoutAuthForKey(deviceIdentifierKey)
+					.map {
+						try jsonDecoder().decode(UUID.self, from: $0)
+					}
+				guard let storedDeviceIdentifier else {
+					return try await generateAndSetNewDeviceIdentifier()
+				}
+				return storedDeviceIdentifier
+			} catch {
+				// clear the identifier and re-generate
+				assertionFailure("Corupted device identifier in keychain")
+				try await keychainClient.removeDataForKey(deviceIdentifierKey)
+				return try await generateAndSetNewDeviceIdentifier()
+			}
 		}
 
 		return Self(
@@ -232,7 +267,8 @@ extension SecureStorageClient: DependencyKey {
 			},
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
-			deleteProfileHeaderList: deleteProfileHeaderList
+			deleteProfileHeaderList: deleteProfileHeaderList,
+			loadDeviceIdentifier: loadDeviceIdentifier
 		)
 	}()
 }
@@ -260,6 +296,7 @@ extension SecureStorageClient {
 }
 
 private let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
+private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 
 extension ProfileSnapshot.Header.ID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"

@@ -249,7 +249,7 @@ extension ProfileStore {
 	// Changes the currently used ProfileSnapshot, usually to one from a backup or to one just created.
 	func changeProfileSnapshot(to profileSnapshot: ProfileSnapshot) async throws {
 		var profileSnapshot = profileSnapshot
-		await claimProfileSnapshot(&profileSnapshot)
+		try await claimProfileSnapshot(&profileSnapshot)
 
 		// Save the updated snapshot.
 		// Do not check the ownership since the device did claim the profile ownership.
@@ -262,8 +262,8 @@ extension ProfileStore {
 	}
 
 	/// Claim the profile by updating **lastUsedOnDevice**
-	func claimProfileSnapshot(_ snapshot: inout ProfileSnapshot) async {
-		snapshot.header.lastUsedOnDevice = await Self.createDeviceInfo()
+	func claimProfileSnapshot(_ snapshot: inout ProfileSnapshot) async throws {
+		snapshot.header.lastUsedOnDevice = try await Self.createDeviceInfo()
 	}
 
 	func saveProfileChanges(_ profile: Profile) async throws {
@@ -346,7 +346,7 @@ extension ProfileStore {
 			return
 		}
 
-		let deviceID = await Self.getDeviceId()
+		let deviceID = try await secureStorageClient.loadDeviceIdentifier()
 		guard lastUsedOnDevice.id == deviceID else {
 			throw Profile.ProfileIsUsedOnAnotherDeviceError(lastUsedOnDevice: lastUsedOnDevice)
 		}
@@ -546,7 +546,7 @@ extension ProfileStore {
 			@Dependency(\.uuid) var uuid
 
 			let date = dateGenerator.now
-			let deviceInfo = await createDeviceInfo()
+			let deviceInfo = try await createDeviceInfo()
 
 			let header = ProfileSnapshot.Header(
 				creatingDevice: deviceInfo,
@@ -612,33 +612,20 @@ extension ProfileStore {
 }
 
 extension ProfileStore {
-	static func createDeviceInfo() async -> ProfileSnapshot.Header.UsedDeviceInfo {
+	static func createDeviceInfo() async throws -> ProfileSnapshot.Header.UsedDeviceInfo {
 		@Dependency(\.date) var dateGenerator
 		@Dependency(\.device) var device
+		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let date = dateGenerator.now
 
 		let description = await NonEmptyString(rawValue: "\(device.name) (\(device.model))")!
 
-		return await ProfileSnapshot.Header.UsedDeviceInfo(
+		return try await ProfileSnapshot.Header.UsedDeviceInfo(
 			description: description,
-			id: getDeviceId(),
+			id: secureStorageClient.loadDeviceIdentifier(),
 			date: date
 		)
-	}
-
-	static func getDeviceId() async -> ProfileSnapshot.Header.UsedDeviceInfo.ID {
-		@Dependency(\.userDefaultsClient) var userDefaults
-
-		guard let deviceId = userDefaults.getDeviceId() else {
-			@Dependency(\.uuid) var uuid
-
-			let deviceId = uuid()
-			await userDefaults.setDeviceId(deviceId)
-			return deviceId
-		}
-
-		return deviceId
 	}
 }
 
@@ -651,7 +638,6 @@ struct EphemeralProfile: Sendable, Hashable {
 
 extension UserDefaultsClient {
 	static let activeProfileID = "profile.activeProfileID"
-	static let deviceId = "profile.deviceID"
 
 	func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
 		stringForKey(Self.activeProfileID).flatMap(UUID.init(uuidString:))
@@ -663,15 +649,5 @@ extension UserDefaultsClient {
 
 	func removeActiveProfileID() async {
 		await remove(Self.activeProfileID)
-	}
-
-	// TODO: move to keychain
-
-	func getDeviceId() -> ProfileSnapshot.Header.UsedDeviceInfo.ID? {
-		stringForKey(Self.deviceId).flatMap(UUID.init(uuidString:))
-	}
-
-	func setDeviceId(_ id: UUID) async {
-		await setString(id.uuidString, Self.deviceId)
 	}
 }
