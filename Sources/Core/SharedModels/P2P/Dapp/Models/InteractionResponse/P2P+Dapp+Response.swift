@@ -1,3 +1,4 @@
+import Cryptography
 import Prelude
 import Profile
 
@@ -55,12 +56,29 @@ extension P2P.Dapp {
 extension P2P.Dapp.Response {
 	public struct AuthProof: Sendable, Hashable, Codable {
 		public let publicKey: String
-		public let curve: String
+		public let curve: SLIP10.Curve
 		public let signature: String
-		public init(publicKey: String, curve: String, signature: String) {
+
+		public init(
+			publicKey: String,
+			curve: SLIP10.Curve,
+			signature: String
+		) {
 			self.publicKey = publicKey
 			self.curve = curve
 			self.signature = signature
+		}
+
+		public init?(entitySignature: SignatureOfEntity) {
+			let sigPub = entitySignature.signature.signatureWithPublicKey
+			guard let signature = try? sigPub.signature.serialize() else {
+				return nil
+			}
+			self.init(
+				publicKey: sigPub.publicKey.compressedRepresentation.hex,
+				curve: sigPub.publicKey.curve,
+				signature: signature.hex
+			)
 		}
 	}
 
