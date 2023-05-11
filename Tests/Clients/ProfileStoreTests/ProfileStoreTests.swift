@@ -125,7 +125,7 @@ private extension ProfileStoreTests {
 			$0.secureStorageClient.loadProfileHeaderList = {
 				nil
 			}
-			$0.secureStorageClient.saveProfileHeaderList = { _ in }
+			$0.secureStorageClient.saveProfileHeaderList = { _, _ in }
 		} operation: {
 			let sut = await ProfileStore()
 			var profile: Profile?
