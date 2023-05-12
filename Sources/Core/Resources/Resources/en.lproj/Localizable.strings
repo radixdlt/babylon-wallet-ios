@@ -193,6 +193,7 @@
 
 "dAppDetails.definition" = "dApp Definition";
 "dAppDetails.missingDescription" = "Missing description";
+"dAppDetails.unknownTokenName" = "Unknown name";
 "dAppDetails.website" = "Website";
 "dAppDetails.tokens" = "Associated Tokens";
 "dAppDetails.nfts" = "Associated NFTs";

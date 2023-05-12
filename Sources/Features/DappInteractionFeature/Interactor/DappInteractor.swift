@@ -429,7 +429,6 @@ extension DappInteractor {
 				guard !Task.isCancelled else {
 					return
 				}
-
 				do {
 					let requestToValidate = try incomingRequest.result.get()
 					let validation = await validate(requestToValidate, route: incomingRequest.route)

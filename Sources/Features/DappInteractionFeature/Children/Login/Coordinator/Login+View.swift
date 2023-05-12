@@ -146,7 +146,7 @@ extension Login.State {
 	static let previewValue: Self = .init(
 		dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
 		dappMetadata: .previewValue,
-		loginRequest: try! .init(challenge: .init(HexCodable32Bytes(.deadbeef32Bytes)), identityAddress: nil)
+		loginRequest: try! .withChallenge(.init(challenge: .init(rawValue: .init(.deadbeef32Bytes))))
 	)
 }
 #endif

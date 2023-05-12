@@ -11,7 +11,7 @@ struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
-		let loginRequest: P2P.Dapp.Request.LoginRequestItem
+		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
 
 		var isFirstPersonaOnAnyNetwork: Bool? = nil
 
@@ -27,7 +27,7 @@ struct Login: Sendable, FeatureReducer {
 		init(
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
-			loginRequest: P2P.Dapp.Request.LoginRequestItem,
+			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
@@ -96,9 +96,11 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
-			guard let challenge = state.loginRequest.challenge else {
+			guard case let .withChallenge(loginWithChallenge) = state.loginRequest else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
+
+			let challenge = loginWithChallenge.challenge
 
 			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,

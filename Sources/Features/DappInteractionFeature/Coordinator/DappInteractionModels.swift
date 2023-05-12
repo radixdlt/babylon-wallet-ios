@@ -42,7 +42,7 @@ extension P2P.Dapp.Request {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
 	enum AnyInteractionItem: Sendable, Hashable {
 		// requests
-		case login(LoginRequestItem)
+		case auth(AuthRequestItem)
 		case oneTimeAccounts(AccountsRequestItem)
 		case ongoingAccounts(AccountsRequestItem)
 		case oneTimePersonaData(PersonaDataRequestItem)
@@ -54,7 +54,7 @@ extension P2P.Dapp.Request {
 		var priority: some Comparable {
 			switch self {
 			// requests
-			case .login:
+			case .auth:
 				return 0
 			case .ongoingAccounts:
 				return 1
@@ -79,7 +79,7 @@ extension P2P.Dapp.Request {
 		switch items {
 		case let .request(.authorized(items)):
 			return [
-				.login(items.login),
+				.auth(items.auth),
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
 				items.ongoingAccounts.map(AnyInteractionItem.ongoingAccounts),
 				items.oneTimePersonaData.map(AnyInteractionItem.oneTimePersonaData),
@@ -105,7 +105,7 @@ extension P2P.Dapp.Request {
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	enum AnyInteractionResponseItem: Sendable, Hashable {
 		// request responses
-		case login(LoginRequestResponseItem)
+		case auth(AuthRequestResponseItem)
 		case oneTimeAccounts(AccountsRequestResponseItem)
 		case ongoingAccounts(AccountsRequestResponseItem)
 		case oneTimePersonaData(PersonaDataRequestResponseItem)
@@ -122,7 +122,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		switch interaction.items {
 		case .request:
 			// NB: variadic generics + native case paths should greatly help to simplify this "picking" logic
-			var login: LoginRequestResponseItem? = nil
+			var auth: AuthRequestResponseItem? = nil
 			var oneTimeAccounts: AccountsRequestResponseItem? = nil
 			var ongoingAccounts: AccountsRequestResponseItem? = nil
 			var oneTimePersonaData: PersonaDataRequestResponseItem? = nil
@@ -130,8 +130,8 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 			for item in items {
 				switch item {
-				case let .login(item):
-					login = item
+				case let .auth(item):
+					auth = item
 				case let .ongoingAccounts(item):
 					ongoingAccounts = item
 				case let .ongoingPersonaData(item):
@@ -145,12 +145,12 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 				}
 			}
 
-			if let login {
+			if let auth {
 				self.init(
 					interactionId: interaction.id,
 					items: .request(
 						.authorized(.init(
-							login: login,
+							auth: auth,
 							ongoingAccounts: ongoingAccounts,
 							ongoingPersonaData: ongoingPersonaData,
 							oneTimeAccounts: oneTimeAccounts,
@@ -174,7 +174,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			var send: SendTransactionResponseItem? = nil
 			for item in items {
 				switch item {
-				case .login, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData:
+				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData:
 					continue
 				case let .send(item):
 					send = item

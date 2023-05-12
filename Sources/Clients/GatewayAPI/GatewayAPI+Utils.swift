@@ -48,47 +48,59 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
+	public enum Key: String {
+		case name
+		case symbol
+		case description
+		case iconURL = "icon_url"
+		case dappDefinition = "dapp_definition"
+		case dappDefinitions = "dapp_definitions"
+		case claimedEntities = "claimed_entities"
+		case claimedWebsites = "claimed_websites"
+		case accountType = "account_type"
+	}
+
 	public var name: String? {
-		self["name"]?.asString
-	}
-
-	public var description: String? {
-		self["description"]?.asString
-	}
-
-	public var iconURL: URL? {
-		self["icon_url"]?.asString.flatMap(URL.init)
-	}
-
-	public var domain: String? {
-		self["domain"]?.asString
-	}
-
-	public var url: URL? {
-		self["url"]?.asString.flatMap(URL.init)
+		self[.name]?.asString
 	}
 
 	public var symbol: String? {
-		self["symbol"]?.asString
+		self[.symbol]?.asString
+	}
+
+	public var description: String? {
+		self[.description]?.asString
+	}
+
+	public var iconURL: URL? {
+		self[.iconURL]?.asString.flatMap(URL.init)
 	}
 
 	public var dappDefinition: String? {
-		self["dapp_definition"]?.asString
+		self[.dappDefinition]?.asString
+	}
+
+	public var dappDefinitions: [String]? {
+		self[.dappDefinitions]?.asStringCollection
 	}
 
 	public var claimedEntities: [String]? {
-		self["claimed_entities"]?.asStringCollection
+		self[.claimedEntities]?.asStringCollection
 	}
 
-	public var claimedWebsites: [String]? {
-		self["claimed_websites"]?.asStringCollection
+	public var claimedWebsites: [URL]? {
+		self[.claimedWebsites]?.asStringCollection?.compactMap(URL.init)
 	}
 
 	public var accountType: AccountType? {
-		self["account_type"]?.asString.flatMap(AccountType.init)
+		self[.accountType]?.asString.flatMap(AccountType.init)
 	}
 
-	public subscript(key: String) -> GatewayAPI.EntityMetadataItemValue? {
+	public subscript(key: Key) -> GatewayAPI.EntityMetadataItemValue? {
+		items.first { $0.key == key.rawValue }?.value
+	}
+
+	public subscript(customKey key: String) -> GatewayAPI.EntityMetadataItemValue? {
 		items.first { $0.key == key }?.value
 	}
 
@@ -97,13 +109,17 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 
 	public enum MetadataError: Error, CustomStringConvertible {
+		case missingName
 		case missingDappDefinition
 		case accountTypeNotDappDefinition
 		case missingClaimedEntities
 		case entityNotClaimed
+		case dAppDefinitionNotReciprocating
 
 		public var description: String {
 			switch self {
+			case .missingName:
+				return "The entity has no name"
 			case .missingDappDefinition:
 				return "The entity has no dApp definition address"
 			case .accountTypeNotDappDefinition:
@@ -111,7 +127,9 @@ extension GatewayAPI.EntityMetadataCollection {
 			case .missingClaimedEntities:
 				return "The dapp definition has no claimed_entities key"
 			case .entityNotClaimed:
-				return "The entity is not claimed by the dapp definition"
+				return "The entity is not claimed by the dApp definition"
+			case .dAppDefinitionNotReciprocating:
+				return "This dApp definition does not point back to the dApp definition that claims to be associated with it"
 			}
 		}
 	}
