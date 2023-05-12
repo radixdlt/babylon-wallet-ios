@@ -9,12 +9,17 @@ public struct ToAccountTransfer: Sendable, FeatureReducer {
 
 		// Either user owned account, or foreign account Address
 		public var account: Either<Account, AccountAddress>?
-		public var assets: [String] // Just string for now as a placeholder
+		public var assets: [Asset]
+
+		public struct Asset: Sendable, Hashable, Identifiable {
+			public typealias ID = UUID
+			public let id = ID()
+		}
 
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(account: Either<Account, AccountAddress>?, assets: [String]) {
+		public init(account: Either<Account, AccountAddress>?, assets: [Asset]) {
 			self.account = account
 			self.assets = assets
 		}
@@ -76,6 +81,16 @@ public struct ToAccountTransfer: Sendable, FeatureReducer {
 			return .none
 		case .chooseAccountTapped:
 			state.destination = .chooseAccount(.init())
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .destination(.dismiss):
+			state.assets.append(.init())
+			return .none
+		default:
 			return .none
 		}
 	}

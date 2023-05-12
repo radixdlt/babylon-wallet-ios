@@ -5,10 +5,11 @@ extension AssetTransferMessage {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AssetTransferMessage>
-		@FocusState var isFocused: Bool
+		let focused: FocusState<FocusField?>.Binding
 
-		public init(store: StoreOf<AssetTransferMessage>) {
+		public init(store: StoreOf<AssetTransferMessage>, focused: FocusState<FocusField?>.Binding) {
 			self.store = store
+			self.focused = focused
 		}
 	}
 }
@@ -31,7 +32,9 @@ extension AssetTransferMessage.View {
 								Text("Private")
 								Image(asset: AssetResource.chevronDown)
 							}
-						}.foregroundColor(.app.gray1)
+						}
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.app.gray1)
 
 						Spacer()
 
@@ -52,7 +55,7 @@ extension AssetTransferMessage.View {
 						}
 					)
 					)
-					.focused($isFocused)
+					.focused(focused, equals: .message)
 					.frame(minHeight: 64, alignment: .leading)
 					.fixedSize(horizontal: false, vertical: true)
 					.padding(.medium3)
@@ -62,7 +65,7 @@ extension AssetTransferMessage.View {
 					.overlay(
 						RoundedCorners(radius: .small2, corners: [.bottomLeft, .bottomRight])
 							.stroke(
-								isFocused ? Color.black : Color.gray,
+								focused.wrappedValue == .message ? Color.black : Color.gray,
 								lineWidth: 1
 							)
 					)

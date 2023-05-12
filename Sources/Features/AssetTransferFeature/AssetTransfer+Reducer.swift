@@ -21,6 +21,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	public enum ViewAction: Equatable, Sendable {
 		case addMessageTapped
 		case addAccountTapped
+		case sendTransferTapped
 	}
 
 	public enum ChildAction: Equatable, Sendable {
@@ -46,6 +47,9 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 
 		case .addAccountTapped:
 			state.toAccounts.append(.empty)
+			return .none
+
+		case .sendTransferTapped:
 			return .none
 		}
 	}

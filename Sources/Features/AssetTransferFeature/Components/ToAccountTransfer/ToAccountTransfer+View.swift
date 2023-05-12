@@ -5,10 +5,11 @@ extension ToAccountTransfer {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ToAccountTransfer>
-		@FocusState var isFocused: Bool
+		let focused: FocusState<FocusField?>.Binding
 
-		public init(store: StoreOf<ToAccountTransfer>) {
+		public init(store: StoreOf<ToAccountTransfer>, focused: FocusState<FocusField?>.Binding) {
 			self.store = store
+			self.focused = focused
 		}
 	}
 }
