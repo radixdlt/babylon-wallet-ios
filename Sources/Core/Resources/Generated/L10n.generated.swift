@@ -96,8 +96,8 @@ public enum L10n {
       public static let getXrdTestTokens = L10n.tr("Localizable", "accountView_settings_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
       /// Hide Account
       public static let hideAccount = L10n.tr("Localizable", "accountView_settings_hideAccount", fallback: "Hide Account")
-      /// Hide This Account
-      public static let hideAccountText = L10n.tr("Localizable", "accountView_settings_hideAccountText", fallback: "Hide This Account")
+      /// Hide this account in your wallet? You can always unhide it from the main application settings.
+      public static let hideAccountText = L10n.tr("Localizable", "accountView_settings_hideAccountText", fallback: "Hide this account in your wallet? You can always unhide it from the main application settings.")
       /// Hide This Account
       public static let hideAccountTitle = L10n.tr("Localizable", "accountView_settings_hideAccountTitle", fallback: "Hide This Account")
       /// This may take several seconds, please wait for completion
@@ -633,6 +633,8 @@ public enum L10n {
   public enum HomePage {
     /// Apply Security Settings
     public static let applySecuritySettings = L10n.tr("Localizable", "homePage_applySecuritySettings", fallback: "Apply Security Settings")
+    /// I have backed up this mnemonic
+    public static let backedUpMnemonicHeading = L10n.tr("Localizable", "homePage_backedUpMnemonicHeading", fallback: "I have backed up this mnemonic")
     /// Create a New Account
     public static let createNewAccount = L10n.tr("Localizable", "homePage_createNewAccount", fallback: "Create a New Account")
     /// Legacy
