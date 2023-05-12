@@ -28,7 +28,7 @@ extension P2P.Dapp {
 			case metadata
 		}
 
-		public typealias ID = Tagged<(Self, id: ()), String>
+		public typealias ID = Tagged<Self, String>
 
 		public let id: ID
 		public let items: P2P.Dapp.Request.Items
@@ -49,7 +49,7 @@ extension P2P.Dapp {
 // MARK: - P2P.Dapp.Request.Metadata
 extension P2P.Dapp.Request {
 	public struct Metadata: Sendable, Hashable {
-		public typealias Origin = Tagged<(Self, origin: ()), String>
+		public typealias Origin = Tagged<Self, String>
 
 		public let version: P2P.Dapp.Version
 		public let networkId: NetworkID
