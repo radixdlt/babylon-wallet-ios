@@ -287,7 +287,6 @@ enum DappRequestValidationOutcome: Sendable, Hashable {
 		case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)
 		case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
 		case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
-		case rolaCheckFailed
 		case badContent(BadContent)
 		enum BadContent: Sendable, Hashable {
 			case numberOfAccountsInvalid
@@ -304,8 +303,6 @@ extension DappRequestValidationOutcome.Invalid {
 			return "Incompatible connector extension"
 		case .invalidDappDefinitionAddress:
 			return "Invalid dAppDefinitionAddress"
-		case .rolaCheckFailed:
-			return "ROLA check failed"
 		case .wrongNetworkID:
 			return "Network mismatch"
 		}
@@ -330,8 +327,6 @@ extension DappRequestValidationOutcome.Invalid {
 			return shortExplaination + " (CE: \(ce), wallet: \(wallet))"
 		case let .invalidDappDefinitionAddress(invalidAddress):
 			return shortExplaination + " ('\(invalidAddress)')"
-		case .rolaCheckFailed:
-			return shortExplaination + ", either well known file does not contain the dAppDefinitionAddress or the metadata of the component fetched from ledger for the dAppDefinitionAddress does not contain the origin."
 		case let .wrongNetworkID(ce, wallet):
 			return shortExplaination + " (CE: \(ce), \(wallet)"
 		}
@@ -345,8 +340,6 @@ extension DappRequestValidationOutcome.Invalid {
 			return ce > wallet ? "Update Wallet" : "Update Connector Extension"
 		case .invalidDappDefinitionAddress:
 			return "Invalid dAppDefinitionAddress"
-		case .rolaCheckFailed:
-			return "ROLA check failed"
 		case .wrongNetworkID:
 			return "Network mismatch"
 		}
@@ -397,16 +390,6 @@ extension DappInteractor {
 				origin: nonvalidatedMeta.origin,
 				dAppDefinitionAddress: dappDefinitionAddress
 			)
-
-			let performROLACheck = !isDeveloperModeEnabled
-			if performROLACheck {
-				do {
-					try await rolaClient.performDappDefinitionVerification(metadataValidDappDefAddres)
-					try await rolaClient.performWellKnownFileCheck(metadataValidDappDefAddres)
-				} catch {
-					return .invalid(.rolaCheckFailed)
-				}
-			}
 
 			return .valid(.init(
 				route: route,
