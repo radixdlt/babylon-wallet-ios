@@ -13,35 +13,10 @@ extension K1: SLIP10CurveProtocol {
 }
 
 // MARK: - K1.ECDSAWithKeyRecovery.PublicKey + ECPublicKey
-extension K1.ECDSAWithKeyRecovery.PublicKey: ECPublicKey {
-//	public var compressedRepresentation: Data {
-	////		try! Data(rawRepresentation(format: .compressed))
-//	}
-
-//	public init<Bytes>(compressedRepresentation pointer: Bytes) throws where Bytes: ContiguousBytes {
-//		self = try K1.ECDSAWithKeyRecovery.PublicKey.import(from: pointer)
-//	}
-//
-//	/// Creates a key from a raw representation.
-//	public init<D>(rawRepresentation: D) throws where D: ContiguousBytes {
-//		self = try K1.ECDSAWithKeyRecovery.PublicKey.import(from: rawRepresentation)
-//	}
-//
-//	/// A raw representation of the key.
-//	public var rawRepresentation: Data {
-//		try! Data(rawRepresentation(format: .compressed)) // hmm use uncompressed here?
-//	}
-}
+extension K1.ECDSAWithKeyRecovery.PublicKey: ECPublicKey {}
 
 // MARK: - K1.ECDSAWithKeyRecovery.PrivateKey + ECPrivateKey
-extension K1.ECDSAWithKeyRecovery.PrivateKey: ECPrivateKey {
-//	public typealias PublicKey = K1.ECDSAWithKeyRecovery.PublicKey
-//
-//	/// Creates a key from a raw representation.
-//	public init<D>(rawRepresentation data: D) throws where D: ContiguousBytes {
-//		self = try K1.ECDSAWithKeyRecovery.PrivateKey.import(rawRepresentation: data)
-//	}
-}
+extension K1.ECDSAWithKeyRecovery.PrivateKey: ECPrivateKey {}
 
 // MARK: - K1.ECDSAWithKeyRecovery.PublicKey + CustomDebugStringConvertible
 extension K1.ECDSAWithKeyRecovery.PublicKey: CustomDebugStringConvertible {
