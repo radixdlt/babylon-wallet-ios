@@ -25,28 +25,101 @@ extension AssetTransfer {
 extension AssetTransfer.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-			VStack {
-				HStack {
-					Text("Transfer").textStyle(.sheetTitle)
-					Spacer()
-					if viewStore.message == nil {
-						Button("Add Message", asset: AssetResource.addMessage) {
-							viewStore.send(.addMessageTapped)
+			ScrollView {
+				VStack(spacing: .medium3) {
+					HStack {
+						Text("Transfer").textStyle(.sheetTitle)
+						Spacer()
+						if viewStore.message == nil {
+							Button("Add Message", asset: AssetResource.addMessage) {
+								viewStore.send(.addMessageTapped)
+							}
+							.textStyle(.button)
+							.foregroundColor(.app.blue2)
 						}
-						.textStyle(.button)
-						.foregroundColor(.app.blue2)
 					}
-				}
-				IfLetStore(
-					store.scope(state: \.message, action: { .child(.message($0)) }),
-					then: {
-						AssetTransferMessage.View(store: $0)
+					IfLetStore(
+						store.scope(state: \.message, action: { .child(.message($0)) }),
+						then: {
+							AssetTransferMessage.View(store: $0)
+						}
+					)
+
+					VStack(alignment: .trailing, spacing: .zero) {
+						VStack(spacing: .small2) {
+							Text("From")
+								.sectionHeading
+								.textCase(.uppercase)
+								.flushedLeft(padding: .medium3)
+							SmallAccountCard(
+								viewStore.fromAccount.displayName.rawValue,
+								identifiable: .address(.account(viewStore.fromAccount.address)),
+								gradient: .init(viewStore.fromAccount.appearanceID)
+							)
+							.cornerRadius(.small1)
+						}
+
+						Text("To")
+							.sectionHeading
+							.textCase(.uppercase)
+							.flushedLeft(padding: .medium3)
+							.padding(.bottom, .small2)
+							.frame(height: 64, alignment: .bottom)
+							.background(alignment: .trailing) {
+								VLine()
+									.stroke(.app.gray3, style: .transactionReview)
+									.frame(width: 1)
+									.padding(.trailing, SpeechbubbleShape.triangleInset)
+							}
+						VStack(spacing: .medium3) {
+							ForEachStore(
+								store.scope(state: \.toAccounts, action: { .child(.toAccountTransfer(id: $0, action: $1)) }),
+								content: { ToAccountTransfer.View(store: $0) }
+							)
+						}
 					}
-				)
-				Spacer()
-			}.padding(.horizontal, .medium3)
+					Button("Add Account", asset: AssetResource.addAccount) {
+						viewStore.send(.addAccountTapped)
+					}
+					.textStyle(.button)
+					.foregroundColor(.app.blue2)
+					.flushedRight
+					Spacer()
+				}.padding(.horizontal, .medium3)
+			}
 		}
 	}
+}
+
+// MARK: - VLine
+struct VLine: Shape {
+	func path(in rect: CGRect) -> SwiftUI.Path {
+		SwiftUI.Path { path in
+			path.move(to: .init(x: rect.midX, y: rect.minY))
+			path.addLine(to: .init(x: rect.midX, y: rect.maxY))
+		}
+	}
+}
+
+// MARK: - FixedSpacer
+public struct FixedSpacer: View {
+	let width: CGFloat
+	let height: CGFloat
+
+	public init(width: CGFloat = 1, height: CGFloat = 1) {
+		self.width = width
+		self.height = height
+	}
+
+	public var body: some View {
+		Rectangle()
+			.fill(.clear)
+			.frame(width: width, height: height)
+	}
+}
+
+extension StrokeStyle {
+	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
 }
 
 // MARK: - RoundedCorners

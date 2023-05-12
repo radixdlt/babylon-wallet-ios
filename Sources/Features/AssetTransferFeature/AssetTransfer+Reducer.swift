@@ -7,25 +7,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public let fromAccount: Profile.Network.Account
 
 		public var message: AssetTransferMessage.State?
-		public var toAccounts: IdentifiedArrayOf<AccountTransferContainer>
-
-		public struct AccountTransferContainer: Sendable, Hashable, Identifiable {
-			public typealias ID = UUID
-			public let id = ID()
-
-			// Either user owned account, or foreign account Address
-			public let account: Either<Account, AccountAddress>?
-			public let assets: [String] // Just string for now as a placeholder
-
-			public init(account: Either<AssetTransfer.State.Account, AccountAddress>?, assets: [String]) {
-				self.account = account
-				self.assets = assets
-			}
-
-			public static var empty: Self {
-				.init(account: nil, assets: [])
-			}
-		}
+		public var toAccounts: IdentifiedArrayOf<ToAccountTransfer.State>
 
 		public init() {
 			self.fromAccount = .previewValue0
@@ -39,17 +21,20 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	public enum ViewAction: Equatable, Sendable {
 		case addMessageTapped
 		case addAccountTapped
-		case removeAccountTapped(State.AccountTransferContainer.ID)
 	}
 
 	public enum ChildAction: Equatable, Sendable {
 		case message(AssetTransferMessage.Action)
+		case toAccountTransfer(id: ToAccountTransfer.State.ID, action: ToAccountTransfer.Action)
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.message, action: /Action.child .. ChildAction.message) {
 				AssetTransferMessage()
+			}
+			.forEach(\.toAccounts, action: /Action.child .. ChildAction.toAccountTransfer) {
+				ToAccountTransfer()
 			}
 	}
 
@@ -62,14 +47,6 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case .addAccountTapped:
 			state.toAccounts.append(.empty)
 			return .none
-
-		case let .removeAccountTapped(id):
-			// Do not allow removing if here is only one toAccount container
-			guard state.toAccounts.count > 1 else {
-				return .none
-			}
-			state.toAccounts.remove(id: id)
-			return .none
 		}
 	}
 
@@ -77,6 +54,13 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		switch childAction {
 		case .message(.delegate(.removed)):
 			state.message = nil
+			return .none
+		case let .toAccountTransfer(id: id, action: .delegate(.removed)):
+			// Do not allow removing if here is only one toAccount container
+			guard state.toAccounts.count > 1 else {
+				return .none
+			}
+			state.toAccounts.remove(id: id)
 			return .none
 		default:
 			return .none

@@ -24,7 +24,15 @@ extension AssetTransferMessage.View {
 
 				VStack(alignment: .leading, spacing: 0) {
 					HStack {
-						Text("Private")
+						Button {
+							viewStore.send(.messageKindTapped)
+						} label: {
+							HStack {
+								Text("Private")
+								Image(asset: AssetResource.chevronDown)
+							}
+						}.foregroundColor(.app.gray1)
+
 						Spacer()
 
 						Button("", asset: AssetResource.close) {
@@ -56,10 +64,23 @@ extension AssetTransferMessage.View {
 							.stroke(
 								isFocused ? Color.black : Color.gray,
 								lineWidth: 1
-							) // TODO: Change stroke color
+							)
 					)
 				}
 			}
+			.sheet(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AssetTransferMessage.Destinations.State.messageMode,
+				action: AssetTransferMessage.Destinations.Action.messageMode,
+				content: {
+					MessageMode.View(store: $0)
+						.presentationDetents([.medium])
+						.presentationDragIndicator(.visible)
+					#if os(iOS)
+						.presentationBackground(.blur)
+					#endif
+				}
+			)
 		}
 	}
 }
