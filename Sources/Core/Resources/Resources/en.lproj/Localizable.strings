@@ -363,7 +363,7 @@
 "error_transactionFailure_pollStatus" = "Failed to poll transaction status";
 "error_transactionFailure_prepare" = "Failed to prepare transaction";
 "error_transactionFailure_rejected" = "Transaction rejected";
-"error_transactionFailure_rejected_by_user" = "Failed to convert transaction manifest";
+"error_transactionFailure_rejectedByUser" = "Failed to convert transaction manifest";
 "error_transactionFailure_submit" = "Failed to submit transaction";
 
 "importOlympiaAccounts_accountAlreadyImported" = "Account already imported";

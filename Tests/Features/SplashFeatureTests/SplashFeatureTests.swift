@@ -31,20 +31,20 @@ final class SplashFeatureTests: TestCase {
 		await clock.advance(by: .seconds(0.2))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig)))) {
 			$0.passcodeCheckFailedAlert = .init(
-				title: { .init(L10n.Splash.Alert.PasscodeCheckFailed.title) },
+				title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 				actions: {
 					ButtonState(
 						role: .none,
 						action: .send(.retryButtonTapped),
-						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.retryButtonTitle) }
+						label: { TextState(L10n.Common.retry) }
 					)
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.Splash.Alert.PasscodeCheckFailed.settingsButtonTitle) }
+						label: { TextState(L10n.Common.systemSettings) }
 					)
 				},
-				message: { .init(L10n.Splash.Alert.PasscodeCheckFailed.message) }
+				message: { .init(L10n.Splash.PasscodeCheckFailedAlert.message) }
 			)
 		}
 	}

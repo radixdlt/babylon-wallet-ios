@@ -554,14 +554,10 @@ public enum L10n {
       public static let prepare = L10n.tr("Localizable", "error_transactionFailure_prepare", fallback: "Failed to prepare transaction")
       /// Transaction rejected
       public static let rejected = L10n.tr("Localizable", "error_transactionFailure_rejected", fallback: "Transaction rejected")
+      /// Failed to convert transaction manifest
+      public static let rejectedByUser = L10n.tr("Localizable", "error_transactionFailure_rejectedByUser", fallback: "Failed to convert transaction manifest")
       /// Failed to submit transaction
       public static let submit = L10n.tr("Localizable", "error_transactionFailure_submit", fallback: "Failed to submit transaction")
-      public enum Rejected {
-        public enum By {
-          /// Failed to convert transaction manifest
-          public static let user = L10n.tr("Localizable", "error_transactionFailure_rejected_by_user", fallback: "Failed to convert transaction manifest")
-        }
-      }
     }
   }
   public enum Gateways {
