@@ -8,31 +8,27 @@ extension AttributedString {
 		self = with(AttributedString(string)) { $0.foregroundColor = foregroundColor }
 	}
 
-	public init(markdown: some StringProtocol, emphasizedColor: Color) {
+	public init(markdown: some StringProtocol, replaceItalicsWith italicsColor: Color) {
 		let string = String(markdown)
 		guard let attributed = try? AttributedString(markdown: string) else {
 			self.init(string)
 			return
 		}
 
-		self = attributed.replacingAttributes(.italic, with: .foregroundColor(emphasizedColor))
+		self = attributed.replacingAttributes(.italics, with: .foregroundColor(italicsColor))
 	}
 }
 
 extension AttributeContainer {
-	static let italic: AttributeContainer = {
-		var result = AttributeContainer()
-		result.inlinePresentationIntent = .emphasized
-		return result
-	}()
+	public static let italics: AttributeContainer = intent(.emphasized)
 
-	static let bold: AttributeContainer = {
+	public static func intent(_ intent: InlinePresentationIntent) -> AttributeContainer {
 		var result = AttributeContainer()
-		result.inlinePresentationIntent = .stronglyEmphasized
+		result.inlinePresentationIntent = intent
 		return result
-	}()
+	}
 
-	static func foregroundColor(_ color: Color) -> AttributeContainer {
+	public static func foregroundColor(_ color: Color) -> AttributeContainer {
 		var result = AttributeContainer()
 		result.foregroundColor = color
 		return result
