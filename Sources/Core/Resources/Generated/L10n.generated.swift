@@ -10,13 +10,13 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
-  public enum AccountPreferences {
+  public enum AccountSettings {
     /// Get RCnet XRD Test Tokens
-    public static let getXrdTestTokens = L10n.tr("Localizable", "accountPreferences_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
+    public static let getXrdTestTokens = L10n.tr("Localizable", "accountSettings_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
     /// This may take several seconds, please wait for completion
-    public static let loadingPrompt = L10n.tr("Localizable", "accountPreferences_loadingPrompt", fallback: "This may take several seconds, please wait for completion")
+    public static let loadingPrompt = L10n.tr("Localizable", "accountSettings_loadingPrompt", fallback: "This may take several seconds, please wait for completion")
     /// Account Preferences
-    public static let title = L10n.tr("Localizable", "accountPreferences_title", fallback: "Account Preferences")
+    public static let title = L10n.tr("Localizable", "accountSettings_title", fallback: "Account Preferences")
   }
   public enum AccountView {
     /// Badges
@@ -66,6 +66,8 @@ public enum L10n {
       public static let currentSupply = L10n.tr("Localizable", "accountView_assetDetails_currentSupply", fallback: "Current Supply")
       /// Hide Asset
       public static let hideAsset = L10n.tr("Localizable", "accountView_assetDetails_hideAsset", fallback: "Hide Asset")
+      /// Hide this asset in your Radix Wallet? You can always unhide it in your account settings.
+      public static let hideAssetMessage = L10n.tr("Localizable", "accountView_assetDetails_hideAssetMessage", fallback: "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.")
       /// Name
       public static let name = L10n.tr("Localizable", "accountView_assetDetails_name", fallback: "Name")
       /// Address
@@ -607,6 +609,8 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "homePage_subtitle", fallback: "Welcome, here are all your accounts on the Radix Network")
     /// Radix Wallet
     public static let title = L10n.tr("Localizable", "homePage_title", fallback: "Radix Wallet")
+    /// Total value
+    public static let totalValue = L10n.tr("Localizable", "homePage_totalValue", fallback: "Total value")
     public enum VisitDashboard {
       /// Ready to get started using the Radix Network and your Wallet?
       public static let subtitle = L10n.tr("Localizable", "homePage_visitDashboard_subtitle", fallback: "Ready to get started using the Radix Network and your Wallet?")

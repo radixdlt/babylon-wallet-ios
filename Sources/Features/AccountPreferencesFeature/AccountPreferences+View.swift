@@ -80,7 +80,7 @@ extension AccountPreferences {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
-					.navigationTitle(L10n.AccountPreferences.title)
+					.navigationTitle(L10n.AccountSettings.title)
 					.sheet(
 						store: store.scope(
 							state: \.$createAuthKey,
@@ -109,14 +109,14 @@ extension AccountPreferences {
 extension AccountPreferences.View {
 	@ViewBuilder
 	private func faucetButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button(L10n.AccountPreferences.getXrdTestTokens) {
+		Button(L10n.AccountSettings.getXrdTestTokens) {
 			viewStore.send(.faucetButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		.controlState(viewStore.faucetButtonState)
 
 		if viewStore.faucetButtonState.isLoading {
-			Text(L10n.AccountPreferences.loadingPrompt)
+			Text(L10n.AccountSettings.loadingPrompt)
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}

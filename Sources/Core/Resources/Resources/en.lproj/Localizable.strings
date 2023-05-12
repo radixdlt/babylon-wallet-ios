@@ -4,16 +4,16 @@
 "homePage_legacyAccountHeading" = "Legacy";
 "homePage_subtitle" = "Welcome, here are all your accounts on the Radix Network";
 "homePage_title" = "Radix Wallet";
-// "homePage_totalValue" = "Total value";
+ "homePage_totalValue" = "Total value";
 
 "homePage_visitDashboard_title" = "Visit the Radix Dashboard";
 "homePage_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
 
+"accountView_transfer" = "Transfer";
 "accountView_tokens" = "Tokens";
 "accountView_nfts" = "NFTs";
 "accountView_poolUnits" = "Pool Units";
 "accountView_badges" = "Badges";
-"accountView_transfer" = "Transfer";
 
 "accountView_assetDetails_resourceAddress" = "Address";
 "accountView_assetDetails_name" = "Name";
@@ -22,6 +22,7 @@
 "accountView_assetDetails_behavior" = "Behavior";
 "accountView_assetDetails_associatedDapps" = "Associated dApps";
 "accountView_assetDetails_hideAsset" = "Hide Asset";
+"accountView_assetDetails_hideAssetMessage" = "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.";
 
 "accountView_assetBehavior_canIncreaseSupply" = "The supply of this asset can be increased or decreased";
 "accountView_assetBehavior_canChangeName" = "Naming and information about this asset can be changed.";
@@ -44,9 +45,9 @@
 "accountView_badgeDetails_noBadges" = "You have no badges";
 "accountView_badgeDetails_whatAreBadges" = "What are badges?";
 
-"accountPreferences_getXrdTestTokens" = "Get RCnet XRD Test Tokens";
-"accountPreferences_loadingPrompt" = "This may take several seconds, please wait for completion";
-"accountPreferences_title" = "Account Preferences";
+"accountSettings_getXrdTestTokens" = "Get RCnet XRD Test Tokens";
+"accountSettings_loadingPrompt" = "This may take several seconds, please wait for completion";
+"accountSettings_title" = "Account Preferences";
 
 "addressAction_copyAddress" = "Copy Address";
 "addressAction_copyNftId" = "Copy NFT ID";
