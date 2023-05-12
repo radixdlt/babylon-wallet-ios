@@ -1,3 +1,14 @@
+"homePage_applySecuritySettings" = "Apply Security Settings";
+// "homePage_backedUpMnemonicHeading" = "I have backed up this mnemonic";
+"homePage_createNewAccount" = "Create a New Account";
+"homePage_legacyAccountHeading" = "Legacy";
+"homePage_subtitle" = "Welcome, here are all your accounts on the Radix Network";
+"homePage_title" = "Radix Wallet";
+// "homePage_totalValue" = "Total value";
+
+"homePage_visitDashboard_title" = "Visit the Radix Dashboard";
+"homePage_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
+
 "accountView_tokens" = "Tokens";
 "accountView_nfts" = "NFTs";
 "accountView_poolUnits" = "Pool Units";
@@ -170,17 +181,6 @@
 "gateways_subtitle" = "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.";
 "gateways_title" = "Gateways";
 "gateways_whatIsAGateway" = "What is a Gateway";
-
-"home_applySecuritySettings" = "Apply Security Settings";
-"home_backedUpMnemonicHeading" = "I have backed up this mnemonic";
-"home_createNewAccount" = "Create a New Account";
-"home_legacyAccountHeading" = "Legacy";
-"home_subtitle" = "Welcome, here are all your accounts on the Radix Network";
-"home_title" = "Radix Wallet";
-"home_totalValue" = "Total value";
-
-"home_visitDashboard_title" = "Visit the Radix Dashboard";
-"home_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
 
 "importLegacyWallet_completion_titleManyAccounts" = "Imported #%@ accounts.";
 "importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";

@@ -600,26 +600,22 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "gateways_removeGatewayAlert_title", fallback: "Remove Gateway")
     }
   }
-  public enum Home {
+  public enum HomePage {
     /// Apply Security Settings
-    public static let applySecuritySettings = L10n.tr("Localizable", "home_applySecuritySettings", fallback: "Apply Security Settings")
-    /// I have backed up this mnemonic
-    public static let backedUpMnemonicHeading = L10n.tr("Localizable", "home_backedUpMnemonicHeading", fallback: "I have backed up this mnemonic")
+    public static let applySecuritySettings = L10n.tr("Localizable", "homePage_applySecuritySettings", fallback: "Apply Security Settings")
     /// Create a New Account
-    public static let createNewAccount = L10n.tr("Localizable", "home_createNewAccount", fallback: "Create a New Account")
+    public static let createNewAccount = L10n.tr("Localizable", "homePage_createNewAccount", fallback: "Create a New Account")
     /// Legacy
-    public static let legacyAccountHeading = L10n.tr("Localizable", "home_legacyAccountHeading", fallback: "Legacy")
+    public static let legacyAccountHeading = L10n.tr("Localizable", "homePage_legacyAccountHeading", fallback: "Legacy")
     /// Welcome, here are all your accounts on the Radix Network
-    public static let subtitle = L10n.tr("Localizable", "home_subtitle", fallback: "Welcome, here are all your accounts on the Radix Network")
+    public static let subtitle = L10n.tr("Localizable", "homePage_subtitle", fallback: "Welcome, here are all your accounts on the Radix Network")
     /// Radix Wallet
-    public static let title = L10n.tr("Localizable", "home_title", fallback: "Radix Wallet")
-    /// Total value
-    public static let totalValue = L10n.tr("Localizable", "home_totalValue", fallback: "Total value")
+    public static let title = L10n.tr("Localizable", "homePage_title", fallback: "Radix Wallet")
     public enum VisitDashboard {
       /// Ready to get started using the Radix Network and your Wallet?
-      public static let subtitle = L10n.tr("Localizable", "home_visitDashboard_subtitle", fallback: "Ready to get started using the Radix Network and your Wallet?")
+      public static let subtitle = L10n.tr("Localizable", "homePage_visitDashboard_subtitle", fallback: "Ready to get started using the Radix Network and your Wallet?")
       /// Visit the Radix Dashboard
-      public static let title = L10n.tr("Localizable", "home_visitDashboard_title", fallback: "Visit the Radix Dashboard")
+      public static let title = L10n.tr("Localizable", "homePage_visitDashboard_title", fallback: "Visit the Radix Dashboard")
     }
   }
   public enum ImportLegacyWallet {
