@@ -80,7 +80,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.RequestNonValidated(
+			P2P.Dapp.RequestUnvalidated(
 				id: "791638de-cefa-43a8-9319-aa31c582fc7d",
 				items: .request(
 					.unauthorized(.init(
@@ -122,7 +122,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.RequestNonValidated(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .transaction(.init(
 					send: .init(
@@ -158,7 +158,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.RequestNonValidated(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .request(.authorized(.init(
 					auth: .login(.withoutChallenge)
@@ -192,7 +192,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.RequestNonValidated(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .request(.authorized(.init(
 					auth: .login(.withChallenge(.init(challenge: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")))
@@ -226,7 +226,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.RequestNonValidated(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .request(.authorized(.init(
 					auth: .usePersona(.init(identityAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"))

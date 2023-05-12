@@ -8,7 +8,7 @@ extension P2P.Dapp {
 	public static let currentVersion: Version = 1
 
 	public struct Request: Sendable, Hashable, Identifiable {
-		public typealias ID = RequestNonValidated.ID
+		public typealias ID = RequestUnvalidated.ID
 
 		public let id: ID
 		public let items: Items
@@ -21,7 +21,7 @@ extension P2P.Dapp {
 		}
 	}
 
-	public struct RequestNonValidated: Sendable, Hashable, Decodable, Identifiable {
+	public struct RequestUnvalidated: Sendable, Hashable, Decodable, Identifiable {
 		private enum CodingKeys: String, CodingKey {
 			case id = "interactionId"
 			case items
@@ -32,12 +32,12 @@ extension P2P.Dapp {
 
 		public let id: ID
 		public let items: P2P.Dapp.Request.Items
-		public let metadata: P2P.Dapp.Request.MetadataNonValidated
+		public let metadata: P2P.Dapp.Request.MetadataUnvalidated
 
 		public init(
 			id: ID,
 			items: P2P.Dapp.Request.Items,
-			metadata: P2P.Dapp.Request.MetadataNonValidated
+			metadata: P2P.Dapp.Request.MetadataUnvalidated
 		) {
 			self.id = id
 			self.items = items
@@ -70,9 +70,9 @@ extension P2P.Dapp.Request {
 	}
 }
 
-// MARK: - P2P.Dapp.Request.MetadataNonValidated
+// MARK: - P2P.Dapp.Request.MetadataUnvalidated
 extension P2P.Dapp.Request {
-	public struct MetadataNonValidated: Sendable, Hashable, Decodable {
+	public struct MetadataUnvalidated: Sendable, Hashable, Decodable {
 		public let version: P2P.Dapp.Version
 		public let networkId: NetworkID
 		public let origin: P2P.Dapp.Request.Metadata.Origin

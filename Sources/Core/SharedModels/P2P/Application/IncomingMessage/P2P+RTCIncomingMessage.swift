@@ -22,7 +22,7 @@ extension P2P {
 	/// An incoming Dapp Request over RTC from some `route`, might have failed
 	/// or succeeded to receive and decode, which is why this contains a
 	/// `result` and not an `P2P.Dapp.Request` directly.
-	public typealias RTCIncomingDappNonValidatedRequest = RTCIncomingMessageContainer<P2P.Dapp.RequestNonValidated>
+	public typealias RTCIncomingDappNonValidatedRequest = RTCIncomingMessageContainer<P2P.Dapp.RequestUnvalidated>
 
 	/// An incoming message over RTC from some `route`, might have failed
 	/// or succeeded to receive and decode, which is why this contains a

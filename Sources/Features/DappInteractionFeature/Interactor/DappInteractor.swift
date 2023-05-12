@@ -347,7 +347,7 @@ extension DappRequestValidationOutcome.Invalid {
 }
 
 extension DappInteractor {
-	func validate(_ nonValidated: P2P.Dapp.RequestNonValidated, route: P2P.RTCRoute) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
+	func validate(_ nonValidated: P2P.Dapp.RequestUnvalidated, route: P2P.RTCRoute) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
 		let nonvalidatedMeta = nonValidated.metadata
 		let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 		let outcome: DappRequestValidationOutcome = await {
