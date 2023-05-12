@@ -83,7 +83,7 @@ public struct Signing: Sendable, FeatureReducer {
 			self.factorsLeftToSignWith = factorsLeftToSignWith
 			self.expectedSignatureCount = factorsLeftToSignWith.signerCount
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
-			self.step = Signing.nextStep(factorsLeftToSignWith: factorsLeftToSignWith, dataToSign: signingPurposeWithPayload.dataToSign)!
+			self.step = Signing.nextStep(factorsLeftToSignWith: factorsLeftToSignWith, signingPurposeWithPayload: signingPurposeWithPayload)!
 		}
 	}
 
@@ -198,7 +198,7 @@ public struct Signing: Sendable, FeatureReducer {
 	private func proceedWithNextFactorSource(_ state: inout State) -> EffectTask<Action> {
 		guard let nextStep = Self.nextStep(
 			factorsLeftToSignWith: state.factorsLeftToSignWith,
-			dataToSign: state.signingPurposeWithPayload.dataToSign
+			signingPurposeWithPayload: state.signingPurposeWithPayload
 		) else {
 			assert(state.signatures.count == state.expectedSignatureCount)
 			return .send(.internal(.finishedSigningWithAllFactors))
@@ -209,7 +209,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 	private static func nextStep(
 		factorsLeftToSignWith: SigningFactors,
-		dataToSign: Data
+		signingPurposeWithPayload: SigningPurposeWithPayload
 	) -> State.Step? {
 		guard
 			let nextKind = factorsLeftToSignWith.keys.first,
@@ -219,9 +219,9 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 		switch nextKind {
 		case .device:
-			return .signWithDeviceFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
+			return .signWithDeviceFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
 		case .ledgerHQHardwareWallet:
-			return .signWithLedgerFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
+			return .signWithLedgerFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
 		}
 	}
 }
