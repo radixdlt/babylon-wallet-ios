@@ -43,21 +43,21 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, forceRefresh in
-				let portfolios = try await {
+				let portfolios: [AccountPortfolio] = try await {
 					// TODO: This logic might be a good candidate for shared logic in cacheClient. When it is wanted to load multiple models as bulk and save independently.
 
 					// Refresh all accounts
 					if forceRefresh {
 						let allPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(accountAddresses)
-						allPortfolios.forEach {
-							cacheClient.save($0, .accountPortfolio(.single($0.owner.address)))
+						for portfolio in allPortfolios {
+							await cacheClient.save(portfolio, .accountPortfolio(.single(portfolio.owner.address)))
 						}
 						return allPortfolios
 					}
 
 					// Otherwise, load the valid portfolios from the cache
-					let cachedPortfolios = accountAddresses.compactMap {
-						try? cacheClient.load(AccountPortfolio.self, .accountPortfolio(.single($0.address))) as? AccountPortfolio
+					let cachedPortfolios = await accountAddresses.asyncCompactMap {
+						try? await cacheClient.load(AccountPortfolio.self, .accountPortfolio(.single($0.address)))
 					}
 
 					let notCachedPortfolios = Set(accountAddresses).subtracting(Set(cachedPortfolios.map(\.owner)))
@@ -68,8 +68,8 @@ extension AccountPortfoliosClient: DependencyKey {
 
 					// Fetch the remaining portfolios from the GW. Either the portfolios were expired in the cache, or missing
 					let freshPortfolios = try await AccountPortfoliosClient.fetchAccountPortfolios(Array(notCachedPortfolios))
-					freshPortfolios.forEach {
-						cacheClient.save($0, .accountPortfolio(.single($0.owner.address)))
+					for portfolio in freshPortfolios {
+						await cacheClient.save(portfolio, .accountPortfolio(.single(portfolio.owner.address)))
 					}
 
 					return cachedPortfolios + freshPortfolios

@@ -2,33 +2,51 @@ import ClientPrelude
 
 // MARK: - CacheClient
 public struct CacheClient: Sendable {
-	public var save: Save
-	public var load: Load
+	public var saveCodable: SaveCodable
+	public var loadCodable: LoadCodable
 	public var removeFile: RemoveFile
 	public var removeFolder: RemoveFolder
 	public var removeAll: RemoveAll
 
 	init(
-		save: @escaping Save,
-		load: @escaping Load,
+		saveCodable: @escaping SaveCodable,
+		loadCodable: @escaping LoadCodable,
 		removeFile: @escaping RemoveFile,
 		removeFolder: @escaping RemoveFolder,
 		removeAll: @escaping RemoveAll
 	) {
-		self.save = save
-		self.load = load
+		self.saveCodable = saveCodable
+		self.loadCodable = loadCodable
 		self.removeFile = removeFile
 		self.removeFolder = removeFolder
 		self.removeAll = removeAll
 	}
+
+	public func save<Model>(_ model: Model, _ entry: Entry) async where Model: Codable {
+		await saveCodable(model, entry)
+	}
+
+	public func load<Model>(_ modelType: Model.Type, _ entry: Entry) async throws -> Model? where Model: Codable {
+		guard let model = try await loadCodable(Model.self, entry) else {
+			return nil
+		}
+		guard let modelTyped = model as? Model else {
+			assertionFailure("Failed to load value, expected type: \(String(describing: modelType)), but got: \(type(of: model)), value: \(model). This should probably never happen.")
+			throw FailedToLoadCachedValue()
+		}
+		return modelTyped
+	}
 }
 
+// MARK: - FailedToLoadCachedValue
+struct FailedToLoadCachedValue: Swift.Error {}
+
 extension CacheClient {
-	public typealias Save = @Sendable (Encodable, Entry) -> Void
-	public typealias Load = @Sendable (Decodable.Type, Entry) throws -> Decodable
-	public typealias RemoveFile = @Sendable (Entry) -> Void
-	public typealias RemoveFolder = @Sendable (Entry) -> Void
-	public typealias RemoveAll = @Sendable () -> Void
+	public typealias SaveCodable = @Sendable (Codable, Entry) async -> Void
+	public typealias LoadCodable = @Sendable (Codable.Type, Entry) async throws -> Codable?
+	public typealias RemoveFile = @Sendable (Entry) async -> Void
+	public typealias RemoveFolder = @Sendable (Entry) async -> Void
+	public typealias RemoveAll = @Sendable () async -> Void
 }
 
 extension DependencyValues {
@@ -39,12 +57,16 @@ extension DependencyValues {
 }
 
 extension CacheClient {
-	public func withCaching<Model: Codable>(cacheEntry: Entry, forceRefresh: Bool = false, request: () async throws -> Model) async throws -> Model {
-		if !forceRefresh, let model = try? load(Model.self, cacheEntry) as? Model {
+	public func withCaching<Model: Codable>(
+		cacheEntry: Entry,
+		forceRefresh: Bool = false,
+		request: () async throws -> Model
+	) async throws -> Model {
+		if !forceRefresh, let model = try await load(Model.self, cacheEntry) {
 			return model
 		} else {
 			let model = try await request()
-			save(model, cacheEntry)
+			await save(model, cacheEntry)
 			return model
 		}
 	}
@@ -123,11 +145,13 @@ extension CacheClient {
 	@Sendable
 	public func clearCacheForAccounts(
 		_ accounts: Set<AccountAddress> = .init()
-	) {
+	) async {
 		if !accounts.isEmpty {
-			accounts.forEach { removeFile(.accountPortfolio(.single($0.address))) }
+			for account in accounts {
+				await removeFile(.accountPortfolio(.single(account.address)))
+			}
 		} else {
-			removeFolder(.accountPortfolio(.all))
+			await removeFolder(.accountPortfolio(.all))
 		}
 	}
 }

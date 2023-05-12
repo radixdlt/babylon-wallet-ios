@@ -1,6 +1,35 @@
 @testable import CacheClient
 import ClientTestingPrelude
 
+public func assertThrowsError<T>(
+	_ function: () async throws -> T,
+	_ message: @autoclosure () -> String = "",
+	line: UInt = #line,
+	file: StaticString = #filePath
+) async throws {
+	do {
+		_ = try await function()
+		XCTFail("Expected function to throw, but did not.\(message())", file: file, line: line)
+	} catch {
+		// All good, expected to throw
+	}
+}
+
+public func assertNoThrowsError<T>(
+	_ function: () async throws -> T,
+	_ message: @autoclosure () -> String = "",
+	line: UInt = #line,
+	file: StaticString = #filePath
+) async throws {
+	do {
+		_ = try await function()
+		// All good, did not throw, as expected
+	} catch {
+		XCTFail("Got unexpected error: \(String(describing: error)).\(message())", file: file, line: line)
+	}
+}
+
+// MARK: - CacheClientTests
 final class CacheClientTests: TestCase {
 	private var sut: CacheClient!
 
@@ -22,24 +51,21 @@ final class CacheClientTests: TestCase {
 		}
 		let entry: CacheClient.Entry = .networkName(dataToBeSaved.absoluteString)
 
-		try withDependencies {
+		try await withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .incrementing(by: 20, from: .now)
 		} operation: {
 			// when
-			sut.save(dataToBeSaved, entry)
+			await sut.save(dataToBeSaved, entry)
 
 			// then
-			guard let retrived = try sut.load(URL.self, entry) as? URL else {
-				XCTFail("Expected to decode URL")
-				return
-			}
+			let retrived = try await sut.load(URL.self, entry)
 			XCTAssertEqual(dataToBeSaved, retrived)
 
 			// when
-			sut.removeFile(entry)
+			await sut.removeFile(entry)
 			// then
-			XCTAssertThrowsError(try sut.load(URL.self, entry))
+			try await assertThrowsError { try await sut.load(URL.self, entry) }
 		}
 	}
 
@@ -53,50 +79,44 @@ final class CacheClientTests: TestCase {
 		let entry: CacheClient.Entry = .networkName(dataToBeSaved.absoluteString)
 
 		let validTimeInterval: TimeInterval = 299
-		try withDependencies {
+		try await withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .incrementing(by: validTimeInterval, from: .now)
 		} operation: {
 			// when
-			sut.save(dataToBeSaved, entry)
+			await sut.save(dataToBeSaved, entry)
 			// then
 			// then
-			guard let retrived = try sut.load(URL.self, entry) as? URL else {
-				XCTFail("Expected to decode URL")
-				return
-			}
+			let retrived = try await sut.load(URL.self, entry)
 			XCTAssertEqual(dataToBeSaved, retrived)
 		}
 
 		let boundaryTimeInterval: TimeInterval = 300
-		try withDependencies {
+		try await withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .incrementing(by: boundaryTimeInterval, from: .now)
 		} operation: {
 			// when
-			sut.save(dataToBeSaved, entry)
+			await sut.save(dataToBeSaved, entry)
 			// then
 			// then
-			guard let retrived = try sut.load(URL.self, entry) as? URL else {
-				XCTFail("Expected to decode URL")
-				return
-			}
+			let retrived = try await sut.load(URL.self, entry)
 			XCTAssertEqual(dataToBeSaved, retrived)
 		}
 
 		let expiredTimeInterval: TimeInterval = 301
-		try withDependencies {
+		try await withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .incrementing(by: expiredTimeInterval, from: .now)
 		} operation: {
 			// when
-			sut.save(dataToBeSaved, entry)
+			await sut.save(dataToBeSaved, entry)
 			// then
-			XCTAssertThrowsError(try sut.load(URL.self, entry))
+			try await assertThrowsError { try await sut.load(URL.self, entry) }
 		}
 	}
 
-	func test_removeAll() throws {
+	func test_removeAll() async throws {
 		// given
 		guard let data1 = URL(string: "https://test.com") else {
 			XCTFail("Could not create URL from string")
@@ -110,19 +130,19 @@ final class CacheClientTests: TestCase {
 		let data3 = 123
 		let entry3: CacheClient.Entry = .rolaWellKnownFileVerification("deadbeef-url")
 
-		try withDependencies {
+		try await withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .constant(.now)
 		} operation: {
 			// when
-			sut.save(data1, entry1)
-			sut.save(data2, entry2)
-			sut.save(data3, entry3)
-			sut.removeAll()
+			await sut.save(data1, entry1)
+			await sut.save(data2, entry2)
+			await sut.save(data3, entry3)
+			await sut.removeAll()
 			// then
-			XCTAssertThrowsError(try sut.load(URL.self, entry1))
-			XCTAssertThrowsError(try sut.load(Bool.self, entry2))
-			XCTAssertThrowsError(try sut.load(Int.self, entry3))
+			try await assertThrowsError({ try await sut.load(URL.self, entry1) }, "Loading URL worked, but expected failure.")
+			try await assertThrowsError({ try await sut.load(Bool.self, entry2) }, "Loading Bool worked, but expected failure.")
+			try await assertThrowsError({ try await sut.load(Int.self, entry3) }, "Loading Int worked, but expected failure.")
 		}
 	}
 }

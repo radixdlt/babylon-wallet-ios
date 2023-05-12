@@ -129,8 +129,8 @@ final class ROLAClientTests: TestCase {
 		// when
 		try await withDependencies {
 			$0.urlSession = urlSession
-			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
-			$0.cacheClient.save = { _, _ in }
+			$0.cacheClient.loadCodable = { _, _ in throw CacheClient.Error.dataLoadingFailed }
+			$0.cacheClient.saveCodable = { _, _ in }
 		} operation: {
 			try await sut.performWellKnownFileCheck(metadata)
 		}
@@ -149,8 +149,8 @@ final class ROLAClientTests: TestCase {
 		// when
 		try await withDependencies {
 			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
-			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
-			$0.cacheClient.save = { _, _ in }
+			$0.cacheClient.loadCodable = { _, _ in throw CacheClient.Error.dataLoadingFailed }
+			$0.cacheClient.saveCodable = { _, _ in }
 		} operation: {
 			try await sut.performDappDefinitionVerification(metadata)
 		}
@@ -172,8 +172,8 @@ final class ROLAClientTests: TestCase {
 		// when
 		await withDependencies {
 			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
-			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
-			$0.cacheClient.save = { _, _ in }
+			$0.cacheClient.loadCodable = { _, _ in throw CacheClient.Error.dataLoadingFailed }
+			$0.cacheClient.saveCodable = { _, _ in }
 		} operation: {
 			do {
 				try await sut.performDappDefinitionVerification(metadata)
@@ -201,8 +201,8 @@ final class ROLAClientTests: TestCase {
 		// when
 		await withDependencies {
 			$0.gatewayAPIClient.getEntityMetadata = { _ in metadataCollection }
-			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
-			$0.cacheClient.save = { _, _ in }
+			$0.cacheClient.loadCodable = { _, _ in throw CacheClient.Error.dataLoadingFailed }
+			$0.cacheClient.saveCodable = { _, _ in }
 		} operation: {
 			do {
 				try await sut.performDappDefinitionVerification(metadata)
@@ -267,8 +267,8 @@ final class ROLAClientTests: TestCase {
 		// when
 		await withDependencies {
 			$0.urlSession = urlSession
-			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
-			$0.cacheClient.save = { _, _ in }
+			$0.cacheClient.loadCodable = { _, _ in throw CacheClient.Error.dataLoadingFailed }
+			$0.cacheClient.saveCodable = { _, _ in }
 		} operation: {
 			do {
 				try await sut.performWellKnownFileCheck(metadata)
@@ -302,8 +302,8 @@ final class ROLAClientTests: TestCase {
 		// when
 		await withDependencies {
 			$0.urlSession = urlSession
-			$0.cacheClient.load = { _, _ in throw CacheClient.Error.dataLoadingFailed }
-			$0.cacheClient.save = { _, _ in }
+			$0.cacheClient.loadCodable = { _, _ in throw CacheClient.Error.dataLoadingFailed }
+			$0.cacheClient.saveCodable = { _, _ in }
 		} operation: {
 			do {
 				try await sut.performWellKnownFileCheck(metadata)

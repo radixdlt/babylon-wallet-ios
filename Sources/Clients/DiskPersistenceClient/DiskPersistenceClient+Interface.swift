@@ -21,10 +21,10 @@ public struct DiskPersistenceClient: Sendable {
 }
 
 extension DiskPersistenceClient {
-	public typealias Save = @Sendable (Encodable, String) throws -> Void
-	public typealias Load = @Sendable (Decodable.Type, String) throws -> Decodable
-	public typealias Remove = @Sendable (String) throws -> Void
-	public typealias RemoveAll = @Sendable () throws -> Void
+	public typealias Save = @Sendable (Codable, String) async throws -> Void
+	public typealias Load = @Sendable (Codable.Type, String) async throws -> Codable?
+	public typealias Remove = @Sendable (String) async throws -> Void
+	public typealias RemoveAll = @Sendable () async throws -> Void
 }
 
 public extension DependencyValues {
