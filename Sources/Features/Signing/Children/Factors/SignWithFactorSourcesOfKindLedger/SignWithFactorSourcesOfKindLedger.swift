@@ -47,20 +47,38 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		signingFactor: SigningFactor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		do {
-			let expectedHash = try blake2b(data: state.dataToSign)
-			loggerGlobal.notice("\n\nExpected hash: \(expectedHash.hex)\n\n")
-		} catch {
-			loggerGlobal.critical("Failed to hash: \(error)")
-		}
-		let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
+		switch state.signingPurposeWithPayload {
+		case let .signTransaction(_, compiledIntent, _):
+			let dataToSign = Data(compiledIntent.compiledIntent)
+			do {
+				let expectedHash = try blake2b(data: dataToSign)
+				loggerGlobal.notice("\n\nExpected TX hash: \(expectedHash.hex)\n\n")
+			} catch {
+				loggerGlobal.critical("Failed to hash: \(error)")
+			}
+			let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
-		return try await ledgerHardwareWalletClient.sign(.init(
-			signingFactor: signingFactor,
-			unhashedDataToSign: state.dataToSign,
-			ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
-			displayHashOnLedgerDisplay: true
-		))
+			return try await ledgerHardwareWalletClient.signTransaction(.init(
+				signingFactor: signingFactor,
+				unhashedDataToSign: dataToSign,
+				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
+				displayHashOnLedgerDisplay: true
+			))
+		case let .signAuth(authToSign):
+			do {
+				let expectedHash = try blake2b(data: authToSign.payloadToHashAndSign)
+				loggerGlobal.notice("\n\nExpected TX hash: \(expectedHash.hex)\n\n")
+			} catch {
+				loggerGlobal.critical("Failed to hash: \(error)")
+			}
+
+			return try await ledgerHardwareWalletClient.signAuthChallenge(.init(
+				signingFactor: signingFactor,
+				challenge: authToSign.input.challenge,
+				origin: authToSign.input.origin,
+				dAppDefinitionAddress: authToSign.input.dAppDefinitionAddress
+			))
+		}
 	}
 }
 

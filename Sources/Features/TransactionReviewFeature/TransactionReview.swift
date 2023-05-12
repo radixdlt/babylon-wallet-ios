@@ -285,10 +285,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = .signing(.init(
 				factorsLeftToSignWith: signingFactors,
 				signingPurposeWithPayload: .signTransaction(
+					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
 					compiledIntent,
 					origin: state.signTransactionPurpose
-				),
-				ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey
+				)
 			))
 			return .none
 

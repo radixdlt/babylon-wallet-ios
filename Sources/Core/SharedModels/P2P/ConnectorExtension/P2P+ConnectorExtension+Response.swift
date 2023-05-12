@@ -39,6 +39,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case getDeviceInfo(GetDeviceInfo)
 		case derivePublicKey(DerivePublicKey)
 		case signTransaction([SignatureOfSigner])
+		case signChallenge([SignatureOfSigner])
 		case importOlympiaDevice(ImportOlympiaDevice)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
@@ -146,6 +147,10 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case .signTransaction:
 			self.response = try decodeResponse {
 				Success.signTransaction($0)
+			}
+		case .signChallenge:
+			self.response = try decodeResponse {
+				Success.signChallenge($0)
 			}
 		}
 	}
