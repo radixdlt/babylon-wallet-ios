@@ -460,6 +460,7 @@ package.addModules([
 	.client(
 		name: "LedgerHardwareWalletClient",
 		dependencies: [
+			"ROLAClient", // calc expected hashed message for signAuth for validation
 			"RadixConnectClient",
 			"FactorSourcesClient", // FIXME: move models to lower level package
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
