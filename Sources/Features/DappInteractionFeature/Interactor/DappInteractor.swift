@@ -253,7 +253,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 				guard !Task.isCancelled else {
 					return
 				}
-
 				do {
 					let request = try incomingRequest.result.get()
 					if let invalidRequest = validateRequest(request) {
