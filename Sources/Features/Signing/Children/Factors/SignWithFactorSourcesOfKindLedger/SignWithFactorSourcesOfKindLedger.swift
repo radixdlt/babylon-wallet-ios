@@ -48,7 +48,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
 		switch state.signingPurposeWithPayload {
-		case let .signTransaction(compiledIntent, _):
+		case let .signTransaction(_, compiledIntent, _):
 			let dataToSign = Data(compiledIntent.compiledIntent)
 			do {
 				let expectedHash = try blake2b(data: dataToSign)

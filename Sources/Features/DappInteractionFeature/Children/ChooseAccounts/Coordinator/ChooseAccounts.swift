@@ -150,7 +150,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			)
 
 			return .run { send in
-				let dataToSign = try await rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+				let dataToSign = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 				let networkID = await accountsClient.getCurrentNetworkID()
 				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
 					networkID: networkID,
@@ -175,8 +175,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case let .proveAccountOwnership(signingFactors, authenticationDataToSignForChallenge):
 			state.destination = .signing(.init(
 				factorsLeftToSignWith: signingFactors,
-				signingPurposeWithPayload: SigningPurposeWithPayload.signAuth(authenticationDataToSignForChallenge),
-				ephemeralNotaryPrivateKey: .init()
+				signingPurposeWithPayload: .signAuth(authenticationDataToSignForChallenge)
 			))
 			return .none
 		}
