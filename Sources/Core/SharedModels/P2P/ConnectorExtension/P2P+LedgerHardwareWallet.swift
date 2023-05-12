@@ -17,6 +17,7 @@ extension P2P {
 			case getDeviceInfo
 			case derivePublicKey
 			case signTransaction
+			case signChallenge
 			case importOlympiaDevice
 		}
 
