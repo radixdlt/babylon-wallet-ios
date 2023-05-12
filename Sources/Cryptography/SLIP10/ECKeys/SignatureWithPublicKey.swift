@@ -5,8 +5,8 @@ import K1
 // MARK: - SignatureWithPublicKey
 public enum SignatureWithPublicKey: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {
 	case ecdsaSecp256k1(
-		signature: ECDSASignatureRecoverable,
-		publicKey: K1.PublicKey
+		signature: K1.ECDSAWithKeyRecovery.Signature,
+		publicKey: K1.ECDSAWithKeyRecovery.PublicKey
 	)
 
 	case eddsaEd25519(
@@ -41,9 +41,7 @@ extension SignatureWithPublicKey {
 	public func isValidSignature(for hashed: Data) -> Bool {
 		switch self {
 		case let .ecdsaSecp256k1(signature, publicKey):
-			do {
-				return try publicKey.isValid(signature: signature, hashed: hashed)
-			} catch { return false }
+			return publicKey.isValidSignature(signature, hashed: hashed)
 		case let .eddsaEd25519(signature, publicKey):
 			return publicKey.isValidSignature(signature, for: hashed)
 		}

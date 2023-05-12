@@ -22,7 +22,7 @@ extension Curve25519.Signing.PrivateKey {
 extension SLIP10 {
 	public enum PrivateKey: Sendable, Hashable {
 		case curve25519(Curve25519.Signing.PrivateKey)
-		case secp256k1(K1.PrivateKey)
+		case secp256k1(K1.ECDSAWithKeyRecovery.PrivateKey)
 	}
 }
 
@@ -45,11 +45,11 @@ extension SLIP10.PrivateKey {
 
 		case let .secp256k1(key):
 			// Recoverable signature is needed
-			let signature = try key.ecdsaSignRecoverable(hashed: hashOfMessage)
+			let signature = try key.signature(for: hashOfMessage)
 			let publicKey = key.publicKey
 
-			let isValid = try publicKey.isValid(
-				signature: signature,
+			let isValid = publicKey.isValidSignature(
+				signature,
 				hashed: hashOfMessage
 			)
 
