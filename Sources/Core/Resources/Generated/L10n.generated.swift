@@ -10,14 +10,6 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
-  public enum AccountSettings {
-    /// Get RCnet XRD Test Tokens
-    public static let getXrdTestTokens = L10n.tr("Localizable", "accountSettings_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
-    /// This may take several seconds, please wait for completion
-    public static let loadingPrompt = L10n.tr("Localizable", "accountSettings_loadingPrompt", fallback: "This may take several seconds, please wait for completion")
-    /// Account Preferences
-    public static let title = L10n.tr("Localizable", "accountSettings_title", fallback: "Account Preferences")
-  }
   public enum AccountView {
     /// Badges
     public static let badges = L10n.tr("Localizable", "accountView_badges", fallback: "Badges")
@@ -86,6 +78,46 @@ public enum L10n {
       public static let noPoolUnits = L10n.tr("Localizable", "accountView_poolUnitDetails_noPoolUnits", fallback: "You have no NFTs")
       /// What are NFTs?
       public static let whatArePoolUnits = L10n.tr("Localizable", "accountView_poolUnitDetails_whatArePoolUnits", fallback: "What are NFTs?")
+    }
+    public enum Settings {
+      /// Account Color
+      public static let accountColor = L10n.tr("Localizable", "accountView_settings_accountColor", fallback: "Account Color")
+      /// Select from a list of unique colors
+      public static let accountColorSubtitle = L10n.tr("Localizable", "accountView_settings_accountColorSubtitle", fallback: "Select from a list of unique colors")
+      /// Select the background color for this Account
+      public static let accountColorText = L10n.tr("Localizable", "accountView_settings_accountColorText", fallback: "Select the background color for this Account")
+      /// Account Label
+      public static let accountLabel = L10n.tr("Localizable", "accountView_settings_accountLabel", fallback: "Account Label")
+      /// Account Security
+      public static let accountSecurity = L10n.tr("Localizable", "accountView_settings_accountSecurity", fallback: "Account Security")
+      /// Set how you want this account to work
+      public static let accountSecuritySubtitle = L10n.tr("Localizable", "accountView_settings_accountSecuritySubtitle", fallback: "Set how you want this account to work")
+      /// Get RCnet XRD Test Tokens
+      public static let getXrdTestTokens = L10n.tr("Localizable", "accountView_settings_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
+      /// Hide Account
+      public static let hideAccount = L10n.tr("Localizable", "accountView_settings_hideAccount", fallback: "Hide Account")
+      /// Hide This Account
+      public static let hideAccountText = L10n.tr("Localizable", "accountView_settings_hideAccountText", fallback: "Hide This Account")
+      /// Hide This Account
+      public static let hideAccountTitle = L10n.tr("Localizable", "accountView_settings_hideAccountTitle", fallback: "Hide This Account")
+      /// This may take several seconds, please wait for completion
+      public static let loadingPrompt = L10n.tr("Localizable", "accountView_settings_loadingPrompt", fallback: "This may take several seconds, please wait for completion")
+      /// Rename Account
+      public static let renameAccount = L10n.tr("Localizable", "accountView_settings_renameAccount", fallback: "Rename Account")
+      /// Enter a new label for this account
+      public static let renameAccountText = L10n.tr("Localizable", "accountView_settings_renameAccountText", fallback: "Enter a new label for this account")
+      /// Set how you want this account to work
+      public static let setBehaviourHeading = L10n.tr("Localizable", "accountView_settings_setBehaviourHeading", fallback: "Set how you want this account to work")
+      /// Show Assets with Tags
+      public static let showAssets = L10n.tr("Localizable", "accountView_settings_showAssets", fallback: "Show Assets with Tags")
+      /// Show Assets with Tags
+      public static let showAssetsSubtitle = L10n.tr("Localizable", "accountView_settings_showAssetsSubtitle", fallback: "Show Assets with Tags")
+      /// Third-party Deposits
+      public static let thirdPartyDeposits = L10n.tr("Localizable", "accountView_settings_thirdPartyDeposits", fallback: "Third-party Deposits")
+      /// Accept all deposits
+      public static let thirdPartyDepositsAcceptAll = L10n.tr("Localizable", "accountView_settings_thirdPartyDepositsAcceptAll", fallback: "Accept all deposits")
+      /// Account Preferences
+      public static let title = L10n.tr("Localizable", "accountView_settings_title", fallback: "Account Preferences")
     }
     public enum TokenDetails {
       /// You have no Tokens
@@ -831,9 +863,9 @@ public enum L10n {
   public enum Settings {
     /// App Settings
     public static let appSettings = L10n.tr("Localizable", "settings_appSettings", fallback: "App Settings")
-    /// App version: %@ build %@
+    /// Version: %@ build #%@
     public static func appVersion(_ p1: Any, _ p2: Any) -> String {
-      return L10n.tr("Localizable", "settings_appVersion", String(describing: p1), String(describing: p2), fallback: "App version: %@ build %@")
+      return L10n.tr("Localizable", "settings_appVersion", String(describing: p1), String(describing: p2), fallback: "Version: %@ build #%@")
     }
     /// Authorized dApps
     public static let authorizedDapps = L10n.tr("Localizable", "settings_authorizedDapps", fallback: "Authorized dApps")

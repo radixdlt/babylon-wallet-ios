@@ -45,9 +45,29 @@
 "accountView_badgeDetails_noBadges" = "You have no badges";
 "accountView_badgeDetails_whatAreBadges" = "What are badges?";
 
-"accountSettings_getXrdTestTokens" = "Get RCnet XRD Test Tokens";
-"accountSettings_loadingPrompt" = "This may take several seconds, please wait for completion";
-"accountSettings_title" = "Account Preferences";
+"accountView_settings_getXrdTestTokens" = "Get RCnet XRD Test Tokens";
+"accountView_settings_loadingPrompt" = "This may take several seconds, please wait for completion";
+"accountView_settings_title" = "Account Preferences";
+"accountView_settings_accountLabel" = "Account Label";
+"accountView_settings_accountColor" = "Account Color";
+"accountView_settings_accountColorSubtitle" = "Select from a list of unique colors";
+"accountView_settings_accountColorText" = "Select the background color for this Account";
+"accountView_settings_showAssets" = "Show Assets with Tags";
+"accountView_settings_showAssetsSubtitle" = "Show Assets with Tags";
+"accountView_settings_accountSecurity" = "Account Security";
+"accountView_settings_accountSecuritySubtitle" = "Set how you want this account to work";
+"accountView_settings_thirdPartyDeposits" = "Third-party Deposits";
+"accountView_settings_thirdPartyDepositsAcceptAll" = "Accept all deposits";
+"accountView_settings_showAssets" = "Show Assets with Tags";
+"accountView_settings_showAssetsSubtitle" = "Show Assets with Tags";
+"accountView_settings_hideAccount" = "Hide Account";
+"accountView_settings_hideAccountTitle" = "Hide This Account";
+"accountView_settings_hideAccountText" = "Hide This Account";
+
+"accountView_settings_setBehaviourHeading" = "Set how you want this account to work";
+
+"accountView_settings_renameAccount" = "Rename Account";
+"accountView_settings_renameAccountText" = "Enter a new label for this account";
 
 "addressAction_copyAddress" = "Copy Address";
 "addressAction_copyNftId" = "Copy NFT ID";
@@ -419,7 +439,7 @@
 "personaDetails_removeAuthorizationAlert_title" = "Remove Authorization";
 
 "settings_appSettings" = "App Settings";
-"settings_appVersion" = "App version: %@ build %@";
+"settings_appVersion" = "Version: %@ build #%@";
 "settings_authorizedDapps" = "Authorized dApps";
 "settings_backups" = "Backups";
 "settings_deleteWalletData" = "Delete Wallet Data";
