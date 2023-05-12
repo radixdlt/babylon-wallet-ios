@@ -1,5 +1,7 @@
+// MARK: 0.2 - Homepage
+
 "homePage_applySecuritySettings" = "Apply Security Settings";
-// "homePage_backedUpMnemonicHeading" = "I have backed up this mnemonic";
+"homePage_backedUpMnemonicHeading" = "I have backed up this mnemonic";
 "homePage_createNewAccount" = "Create a New Account";
 "homePage_legacyAccountHeading" = "Legacy";
 "homePage_subtitle" = "Welcome, here are all your accounts on the Radix Network";
@@ -8,6 +10,8 @@
 
 "homePage_visitDashboard_title" = "Visit the Radix Dashboard";
 "homePage_visitDashboard_subtitle" = "Ready to get started using the Radix Network and your Wallet?";
+
+// MARK: 0.3 - AccountView
 
 "accountView_transfer" = "Transfer";
 "accountView_tokens" = "Tokens";
@@ -62,12 +66,23 @@
 "accountView_settings_showAssetsSubtitle" = "Show Assets with Tags";
 "accountView_settings_hideAccount" = "Hide Account";
 "accountView_settings_hideAccountTitle" = "Hide This Account";
-"accountView_settings_hideAccountText" = "Hide This Account";
+"accountView_settings_hideAccountText" = "Hide this account in your wallet? You can always unhide it from the main application settings.";
 
 "accountView_settings_setBehaviourHeading" = "Set how you want this account to work";
 
 "accountView_settings_renameAccount" = "Rename Account";
 "accountView_settings_renameAccountText" = "Enter a new label for this account";
+
+// MARK: 0.4 - AppSettings
+
+"appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
+"appSettings_developerMode_title" = "Developer Mode";
+
+"appSettings_subtitle" = "Customize your Radix Wallet";
+"appSettings_title" = "App Settings";
+
+
+
 
 "addressAction_copyAddress" = "Copy Address";
 "addressAction_copyNftId" = "Copy NFT ID";
@@ -75,11 +90,6 @@
 "addressAction_noWebBrowserInstalled" = "There is no web browser installed in this device";
 "addressAction_viewOnDashboard" = "View on Radix Dashboard";
 
-"appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
-"appSettings_developerMode_title" = "Developer Mode";
-
-"appSettings_subtitle" = "Customize your Radix Wallet";
-"appSettings_title" = "App Settings";
 
 "authorizedDapps_subtitle" = "Here are all the dApps that you have logged into using this Radix Wallet.";
 "authorizedDapps_title" = "Authorized dApps";
