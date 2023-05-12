@@ -10,120 +10,124 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
-  public enum AccountView {
+  public enum Account {
     /// Badges
-    public static let badges = L10n.tr("Localizable", "accountView_badges", fallback: "Badges")
+    public static let badges = L10n.tr("Localizable", "account_badges", fallback: "Badges")
     /// NFTs
-    public static let nfts = L10n.tr("Localizable", "accountView_nfts", fallback: "NFTs")
+    public static let nfts = L10n.tr("Localizable", "account_nfts", fallback: "NFTs")
     /// Pool Units
-    public static let poolUnits = L10n.tr("Localizable", "accountView_poolUnits", fallback: "Pool Units")
+    public static let poolUnits = L10n.tr("Localizable", "account_poolUnits", fallback: "Pool Units")
     /// Tokens
-    public static let tokens = L10n.tr("Localizable", "accountView_tokens", fallback: "Tokens")
+    public static let tokens = L10n.tr("Localizable", "account_tokens", fallback: "Tokens")
     /// Transfer
-    public static let transfer = L10n.tr("Localizable", "accountView_transfer", fallback: "Transfer")
-    public enum NFTDetails {
-      /// ID
-      public static let id = L10n.tr("Localizable", "accountView_NFTDetails_id", fallback: "ID")
-      /// Name
-      public static let name = L10n.tr("Localizable", "accountView_NFTDetails_name", fallback: "Name")
-      /// %d NFTs
-      public static func nftPlural(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "accountView_NFTDetails_nftPlural", p1, fallback: "%d NFTs")
-      }
-      /// You have no NFTs
-      public static let noNfts = L10n.tr("Localizable", "accountView_NFTDetails_noNfts", fallback: "You have no NFTs")
-      /// %d of %d
-      public static func ownedOfTotal(_ p1: Int, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "accountView_NFTDetails_ownedOfTotal", p1, p2, fallback: "%d of %d")
-      }
-      /// Name
-      public static let resourceName = L10n.tr("Localizable", "accountView_NFTDetails_resourceName", fallback: "Name")
-      /// What are NFTs?
-      public static let whatAreNfts = L10n.tr("Localizable", "accountView_NFTDetails_whatAreNfts", fallback: "What are NFTs?")
-    }
-    public enum AssetBehavior {
-      /// Naming and information about this asset can be changed.
-      public static let canChangeName = L10n.tr("Localizable", "accountView_assetBehavior_canChangeName", fallback: "Naming and information about this asset can be changed.")
-      /// The supply of this asset can be increased or decreased
-      public static let canIncreaseSupply = L10n.tr("Localizable", "accountView_assetBehavior_canIncreaseSupply", fallback: "The supply of this asset can be increased or decreased")
-      /// Movement of this asset can be restricted in the future.
-      public static let canRestrictMovement = L10n.tr("Localizable", "accountView_assetBehavior_canRestrictMovement", fallback: "Movement of this asset can be restricted in the future.")
-    }
-    public enum AssetDetails {
-      /// Associated dApps
-      public static let associatedDapps = L10n.tr("Localizable", "accountView_assetDetails_associatedDapps", fallback: "Associated dApps")
-      /// Behavior
-      public static let behavior = L10n.tr("Localizable", "accountView_assetDetails_behavior", fallback: "Behavior")
-      /// Current Supply
-      public static let currentSupply = L10n.tr("Localizable", "accountView_assetDetails_currentSupply", fallback: "Current Supply")
-      /// Hide Asset
-      public static let hideAsset = L10n.tr("Localizable", "accountView_assetDetails_hideAsset", fallback: "Hide Asset")
-      /// Hide this asset in your Radix Wallet? You can always unhide it in your account settings.
-      public static let hideAssetMessage = L10n.tr("Localizable", "accountView_assetDetails_hideAssetMessage", fallback: "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.")
-      /// Name
-      public static let name = L10n.tr("Localizable", "accountView_assetDetails_name", fallback: "Name")
-      /// Address
-      public static let resourceAddress = L10n.tr("Localizable", "accountView_assetDetails_resourceAddress", fallback: "Address")
-      /// Unknown
-      public static let supplyUnkown = L10n.tr("Localizable", "accountView_assetDetails_supplyUnkown", fallback: "Unknown")
-    }
-    public enum BadgeDetails {
-      /// You have no badges
-      public static let noBadges = L10n.tr("Localizable", "accountView_badgeDetails_noBadges", fallback: "You have no badges")
-      /// What are badges?
-      public static let whatAreBadges = L10n.tr("Localizable", "accountView_badgeDetails_whatAreBadges", fallback: "What are badges?")
-    }
-    public enum PoolUnitDetails {
-      /// You have no NFTs
-      public static let noPoolUnits = L10n.tr("Localizable", "accountView_poolUnitDetails_noPoolUnits", fallback: "You have no NFTs")
-      /// What are NFTs?
-      public static let whatArePoolUnits = L10n.tr("Localizable", "accountView_poolUnitDetails_whatArePoolUnits", fallback: "What are NFTs?")
-    }
-    public enum Settings {
-      /// Account Color
-      public static let accountColor = L10n.tr("Localizable", "accountView_settings_accountColor", fallback: "Account Color")
-      /// Select from a list of unique colors
-      public static let accountColorSubtitle = L10n.tr("Localizable", "accountView_settings_accountColorSubtitle", fallback: "Select from a list of unique colors")
+    public static let transfer = L10n.tr("Localizable", "account_transfer", fallback: "Transfer")
+  }
+  public enum AccountSettings {
+    /// Account Color
+    public static let accountColor = L10n.tr("Localizable", "accountSettings_accountColor", fallback: "Account Color")
+    /// Select from a list of unique colors
+    public static let accountColorSubtitle = L10n.tr("Localizable", "accountSettings_accountColorSubtitle", fallback: "Select from a list of unique colors")
+    /// Account Label
+    public static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Label")
+    /// Account Security
+    public static let accountSecurity = L10n.tr("Localizable", "accountSettings_accountSecurity", fallback: "Account Security")
+    /// Set how you want this account to work
+    public static let accountSecuritySubtitle = L10n.tr("Localizable", "accountSettings_accountSecuritySubtitle", fallback: "Set how you want this account to work")
+    /// Get RCnet XRD Test Tokens
+    public static let getXrdTestTokens = L10n.tr("Localizable", "accountSettings_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
+    /// Hide Account
+    public static let hideAccount = L10n.tr("Localizable", "accountSettings_hideAccount", fallback: "Hide Account")
+    /// This may take several seconds, please wait for completion
+    public static let loadingPrompt = L10n.tr("Localizable", "accountSettings_loadingPrompt", fallback: "This may take several seconds, please wait for completion")
+    /// Personalize this account
+    public static let personalizeHeading = L10n.tr("Localizable", "accountSettings_personalizeHeading", fallback: "Personalize this account")
+    /// Set how you want this account to work
+    public static let setBehaviorHeading = L10n.tr("Localizable", "accountSettings_setBehaviorHeading", fallback: "Set how you want this account to work")
+    /// Show Assets with Tags
+    public static let showAssets = L10n.tr("Localizable", "accountSettings_showAssets", fallback: "Show Assets with Tags")
+    /// Select which tags to show for assets in this account
+    public static let showAssetsSubtitle = L10n.tr("Localizable", "accountSettings_showAssetsSubtitle", fallback: "Select which tags to show for assets in this account")
+    /// Third-party Deposits
+    public static let thirdPartyDeposits = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits", fallback: "Third-party Deposits")
+    /// Account Settings
+    public static let title = L10n.tr("Localizable", "accountSettings_title", fallback: "Account Settings")
+    public enum AccountColor {
+      /// Selected
+      public static let selected = L10n.tr("Localizable", "accountSettings_accountColor_selected", fallback: "Selected")
       /// Select the background color for this Account
-      public static let accountColorText = L10n.tr("Localizable", "accountView_settings_accountColorText", fallback: "Select the background color for this Account")
-      /// Account Label
-      public static let accountLabel = L10n.tr("Localizable", "accountView_settings_accountLabel", fallback: "Account Label")
-      /// Account Security
-      public static let accountSecurity = L10n.tr("Localizable", "accountView_settings_accountSecurity", fallback: "Account Security")
-      /// Set how you want this account to work
-      public static let accountSecuritySubtitle = L10n.tr("Localizable", "accountView_settings_accountSecuritySubtitle", fallback: "Set how you want this account to work")
-      /// Get RCnet XRD Test Tokens
-      public static let getXrdTestTokens = L10n.tr("Localizable", "accountView_settings_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
-      /// Hide Account
-      public static let hideAccount = L10n.tr("Localizable", "accountView_settings_hideAccount", fallback: "Hide Account")
-      /// Hide this account in your wallet? You can always unhide it from the main application settings.
-      public static let hideAccountText = L10n.tr("Localizable", "accountView_settings_hideAccountText", fallback: "Hide this account in your wallet? You can always unhide it from the main application settings.")
-      /// Hide This Account
-      public static let hideAccountTitle = L10n.tr("Localizable", "accountView_settings_hideAccountTitle", fallback: "Hide This Account")
-      /// This may take several seconds, please wait for completion
-      public static let loadingPrompt = L10n.tr("Localizable", "accountView_settings_loadingPrompt", fallback: "This may take several seconds, please wait for completion")
-      /// Rename Account
-      public static let renameAccount = L10n.tr("Localizable", "accountView_settings_renameAccount", fallback: "Rename Account")
-      /// Enter a new label for this account
-      public static let renameAccountText = L10n.tr("Localizable", "accountView_settings_renameAccountText", fallback: "Enter a new label for this account")
-      /// Set how you want this account to work
-      public static let setBehaviourHeading = L10n.tr("Localizable", "accountView_settings_setBehaviourHeading", fallback: "Set how you want this account to work")
-      /// Show Assets with Tags
-      public static let showAssets = L10n.tr("Localizable", "accountView_settings_showAssets", fallback: "Show Assets with Tags")
-      /// Show Assets with Tags
-      public static let showAssetsSubtitle = L10n.tr("Localizable", "accountView_settings_showAssetsSubtitle", fallback: "Show Assets with Tags")
-      /// Third-party Deposits
-      public static let thirdPartyDeposits = L10n.tr("Localizable", "accountView_settings_thirdPartyDeposits", fallback: "Third-party Deposits")
-      /// Accept all deposits
-      public static let thirdPartyDepositsAcceptAll = L10n.tr("Localizable", "accountView_settings_thirdPartyDepositsAcceptAll", fallback: "Accept all deposits")
-      /// Account Preferences
-      public static let title = L10n.tr("Localizable", "accountView_settings_title", fallback: "Account Preferences")
+      public static let text = L10n.tr("Localizable", "accountSettings_accountColor_text", fallback: "Select the background color for this Account")
     }
-    public enum TokenDetails {
-      /// You have no Tokens
-      public static let noTokens = L10n.tr("Localizable", "accountView_tokenDetails_noTokens", fallback: "You have no Tokens")
-      /// What are Tokens?
-      public static let whatAreTokens = L10n.tr("Localizable", "accountView_tokenDetails_whatAreTokens", fallback: "What are Tokens?")
+    public enum Behaviors {
+      /// Naming and information about this asset can be changed.
+      public static let informationChangeable = L10n.tr("Localizable", "accountSettings_behaviors_informationChangeable", fallback: "Naming and information about this asset can be changed.")
+      /// Anyone can change naming and information about this asset.
+      public static let informationChangeableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_informationChangeableByAnyone", fallback: "Anyone can change naming and information about this asset.")
+      /// Movement of this asset can be restricted in the future.
+      public static let movementRestrictableInFuture = L10n.tr("Localizable", "accountSettings_behaviors_movementRestrictableInFuture", fallback: "Movement of this asset can be restricted in the future.")
+      /// Anyone can restrict movement of this token in the future.
+      public static let movementRestrictableInFutureByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_movementRestrictableInFutureByAnyone", fallback: "Anyone can restrict movement of this token in the future.")
+      /// Movement of this asset is restricted.
+      public static let movementRestricted = L10n.tr("Localizable", "accountSettings_behaviors_movementRestricted", fallback: "Movement of this asset is restricted.")
+      /// Data that is set on these NFTs can be changed.
+      public static let nftDataChangeable = L10n.tr("Localizable", "accountSettings_behaviors_nftDataChangeable", fallback: "Data that is set on these NFTs can be changed.")
+      /// Anyone can change data that is set on these NFTs.
+      public static let nftDataChangeableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_nftDataChangeableByAnyone", fallback: "Anyone can change data that is set on these NFTs.")
+      /// Anyone can remove this asset from accounts and dApps.
+      public static let removableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_removableByAnyone", fallback: "Anyone can remove this asset from accounts and dApps.")
+      /// A third party can remove this asset from accounts and dApps.
+      public static let removableByThirdParty = L10n.tr("Localizable", "accountSettings_behaviors_removableByThirdParty", fallback: "A third party can remove this asset from accounts and dApps.")
+      /// This is a simple asset
+      public static let simpleAsset = L10n.tr("Localizable", "accountSettings_behaviors_simpleAsset", fallback: "This is a simple asset")
+      /// The supply of this asset can be decreased.
+      public static let supplyDecreasable = L10n.tr("Localizable", "accountSettings_behaviors_supplyDecreasable", fallback: "The supply of this asset can be decreased.")
+      /// Anyone can decrease the supply of this asset.
+      public static let supplyDecreasableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyDecreasableByAnyone", fallback: "Anyone can decrease the supply of this asset.")
+      /// The supply of this asset can be increased or decreased.
+      public static let supplyFlexible = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexible", fallback: "The supply of this asset can be increased or decreased.")
+      /// Anyone can increase or decrease the supply of this asset.
+      public static let supplyFlexibleByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexibleByAnyone", fallback: "Anyone can increase or decrease the supply of this asset.")
+      /// The supply of this asset can be increased.
+      public static let supplyIncreasable = L10n.tr("Localizable", "accountSettings_behaviors_supplyIncreasable", fallback: "The supply of this asset can be increased.")
+      /// Anyone can increase the supply of this asset.
+      public static let supplyIncreasableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyIncreasableByAnyone", fallback: "Anyone can increase the supply of this asset.")
+    }
+    public enum HideAccount {
+      /// Hide Account
+      public static let button = L10n.tr("Localizable", "accountSettings_hideAccount_button", fallback: "Hide Account")
+      /// Hide this account in your wallet? You can always unhide it from the main application settings.
+      public static let message = L10n.tr("Localizable", "accountSettings_hideAccount_message", fallback: "Hide this account in your wallet? You can always unhide it from the main application settings.")
+      /// Hide This Account
+      public static let title = L10n.tr("Localizable", "accountSettings_hideAccount_title", fallback: "Hide This Account")
+    }
+    public enum RenameAccount {
+      /// Enter a new label for this account
+      public static let subtitle = L10n.tr("Localizable", "accountSettings_renameAccount_subtitle", fallback: "Enter a new label for this account")
+      /// Rename Account
+      public static let title = L10n.tr("Localizable", "accountSettings_renameAccount_title", fallback: "Rename Account")
+    }
+    public enum ShowAssets {
+      /// Recommended
+      public static let recommended = L10n.tr("Localizable", "accountSettings_showAssets_recommended", fallback: "Recommended")
+      /// Select the ones you’d like shown on all your assets.
+      public static let selectShown = L10n.tr("Localizable", "accountSettings_showAssets_selectShown", fallback: "Select the ones you’d like shown on all your assets.")
+      /// Asset creators can add tags to them. You can choose which tags you want to see in this account.
+      public static let text = L10n.tr("Localizable", "accountSettings_showAssets_text", fallback: "Asset creators can add tags to them. You can choose which tags you want to see in this account.")
+    }
+    public enum ThirdPartyDeposits {
+      /// Accept all deposits
+      public static let acceptAll = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_acceptAll", fallback: "Accept all deposits")
+      /// Allow third-parties to deposit any asset
+      public static let acceptAllSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_acceptAllSubtitle", fallback: "Allow third-parties to deposit any asset")
+      /// Deny all
+      public static let denyAll = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAll", fallback: "Deny all")
+      /// Deny all third-parties deposits
+      public static let denyAllSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAllSubtitle", fallback: "Deny all third-parties deposits")
+      /// Only accept known
+      public static let onlyKnown = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnown", fallback: "Only accept known")
+      /// Allow  third-parties to deposit only assets this account already holds
+      public static let onlyKnownSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnownSubtitle", fallback: "Allow  third-parties to deposit only assets this account already holds")
+      /// This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery.
+      public static let text = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_text", fallback: "This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery.")
     }
   }
   public enum AddressAction {
@@ -148,6 +152,74 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "appSettings_developerMode_subtitle", fallback: "Warning: Disables website validity checks")
       /// Developer Mode
       public static let title = L10n.tr("Localizable", "appSettings_developerMode_title", fallback: "Developer Mode")
+    }
+  }
+  public enum AssetDetails {
+    /// Associated dApps
+    public static let associatedDapps = L10n.tr("Localizable", "assetDetails_associatedDapps", fallback: "Associated dApps")
+    /// Behavior
+    public static let behavior = L10n.tr("Localizable", "assetDetails_behavior", fallback: "Behavior")
+    /// Current Supply
+    public static let currentSupply = L10n.tr("Localizable", "assetDetails_currentSupply", fallback: "Current Supply")
+    /// Name
+    public static let name = L10n.tr("Localizable", "assetDetails_name", fallback: "Name")
+    /// Address
+    public static let resourceAddress = L10n.tr("Localizable", "assetDetails_resourceAddress", fallback: "Address")
+    /// Unknown
+    public static let supplyUnkown = L10n.tr("Localizable", "assetDetails_supplyUnkown", fallback: "Unknown")
+    public enum NFTDetails {
+      /// ID
+      public static let id = L10n.tr("Localizable", "assetDetails_NFTDetails_id", fallback: "ID")
+      /// Name
+      public static let name = L10n.tr("Localizable", "assetDetails_NFTDetails_name", fallback: "Name")
+      /// %d NFTs
+      public static func nftPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_NFTDetails_nftPlural", p1, fallback: "%d NFTs")
+      }
+      /// You have no NFTs
+      public static let noNfts = L10n.tr("Localizable", "assetDetails_NFTDetails_noNfts", fallback: "You have no NFTs")
+      /// %d of %d
+      public static func ownedOfTotal(_ p1: Int, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_NFTDetails_ownedOfTotal", p1, p2, fallback: "%d of %d")
+      }
+      /// Name
+      public static let resourceName = L10n.tr("Localizable", "assetDetails_NFTDetails_resourceName", fallback: "Name")
+      /// What are NFTs?
+      public static let whatAreNfts = L10n.tr("Localizable", "assetDetails_NFTDetails_whatAreNfts", fallback: "What are NFTs?")
+    }
+    public enum AssetBehavior {
+      /// Naming and information about this asset can be changed.
+      public static let canChangeName = L10n.tr("Localizable", "assetDetails_assetBehavior_canChangeName", fallback: "Naming and information about this asset can be changed.")
+      /// The supply of this asset can be increased or decreased
+      public static let canIncreaseSupply = L10n.tr("Localizable", "assetDetails_assetBehavior_canIncreaseSupply", fallback: "The supply of this asset can be increased or decreased")
+      /// Movement of this asset can be restricted in the future.
+      public static let canRestrictMovement = L10n.tr("Localizable", "assetDetails_assetBehavior_canRestrictMovement", fallback: "Movement of this asset can be restricted in the future.")
+    }
+    public enum BadgeDetails {
+      /// You have no badges
+      public static let noBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_noBadges", fallback: "You have no badges")
+      /// What are badges?
+      public static let whatAreBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_whatAreBadges", fallback: "What are badges?")
+    }
+    public enum HideAsset {
+      /// Hide Asset
+      public static let button = L10n.tr("Localizable", "assetDetails_hideAsset_button", fallback: "Hide Asset")
+      /// Hide this asset in your Radix Wallet? You can always unhide it in your account settings.
+      public static let message = L10n.tr("Localizable", "assetDetails_hideAsset_message", fallback: "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.")
+      /// Hide Asset
+      public static let title = L10n.tr("Localizable", "assetDetails_hideAsset_title", fallback: "Hide Asset")
+    }
+    public enum PoolUnitDetails {
+      /// You have no Pool units
+      public static let noPoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_noPoolUnits", fallback: "You have no Pool units")
+      /// What are Pool units?
+      public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
+    }
+    public enum TokenDetails {
+      /// You have no Tokens
+      public static let noTokens = L10n.tr("Localizable", "assetDetails_tokenDetails_noTokens", fallback: "You have no Tokens")
+      /// What are Tokens?
+      public static let whatAreTokens = L10n.tr("Localizable", "assetDetails_tokenDetails_whatAreTokens", fallback: "What are Tokens?")
     }
   }
   public enum AuthorizedDapps {
@@ -750,8 +822,6 @@ public enum L10n {
     public enum RemoveConnectionAlert {
       /// You will no longer be able to connect your wallet to this device and browser combination
       public static let message = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_message", fallback: "You will no longer be able to connect your wallet to this device and browser combination")
-      /// Remove
-      public static let remove = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_remove", fallback: "Remove")
       /// Remove Connection
       public static let title = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_title", fallback: "Remove Connection")
     }

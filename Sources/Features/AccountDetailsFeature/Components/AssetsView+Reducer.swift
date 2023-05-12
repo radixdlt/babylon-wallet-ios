@@ -10,9 +10,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			var displayText: String {
 				switch self {
 				case .tokens:
-					return L10n.AccountView.tokens
+					return L10n.Account.tokens
 				case .nfts:
-					return L10n.AccountView.nfts
+					return L10n.Account.nfts
 				}
 			}
 		}

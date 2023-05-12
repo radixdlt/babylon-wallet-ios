@@ -87,7 +87,7 @@ extension FungibleTokenDetails {
 
 				VStack(spacing: .medium3) {
 					HStack {
-						Text(L10n.AccountView.AssetDetails.resourceAddress)
+						Text(L10n.AssetDetails.resourceAddress)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray2)
 

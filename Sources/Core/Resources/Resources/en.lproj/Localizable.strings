@@ -1,3 +1,18 @@
+// MARK: Common
+
+"common_account" = "Account";
+"common_cancel" = "Cancel";
+"common_continue" = "Continue";
+"common_developerDisclaimerText" = "Development use only. Not usable on Radix mainnet.";
+"common_errorAlertTitle" = "An Error Occurred";
+"common_none" = "None";
+"common_ok" = "OK";
+"common_persona" = "Persona";
+"common_history" = "History";
+"common_retry" = "Retry";
+"common_somethingWentWrong" = "Something went wrong";
+"common_systemSettings" = "Settings";
+
 // MARK: 0.2 - Homepage
 
 "homePage_applySecuritySettings" = "Apply Security Settings";
@@ -13,117 +28,262 @@
 
 // MARK: 0.3 - AccountView
 
-"accountView_transfer" = "Transfer";
-"accountView_tokens" = "Tokens";
-"accountView_nfts" = "NFTs";
-"accountView_poolUnits" = "Pool Units";
-"accountView_badges" = "Badges";
+"account_transfer" = "Transfer";
+"account_tokens" = "Tokens";
+"account_nfts" = "NFTs";
+"account_poolUnits" = "Pool Units";
+"account_badges" = "Badges";
 
-"accountView_assetDetails_resourceAddress" = "Address";
-"accountView_assetDetails_name" = "Name";
-"accountView_assetDetails_currentSupply" = "Current Supply";
-"accountView_assetDetails_supplyUnkown" = "Unknown";
-"accountView_assetDetails_behavior" = "Behavior";
-"accountView_assetDetails_associatedDapps" = "Associated dApps";
-"accountView_assetDetails_hideAsset" = "Hide Asset";
-"accountView_assetDetails_hideAssetMessage" = "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.";
+// MARK: 0.3.1 - Asset Details
 
-"accountView_assetBehavior_canIncreaseSupply" = "The supply of this asset can be increased or decreased";
-"accountView_assetBehavior_canChangeName" = "Naming and information about this asset can be changed.";
-"accountView_assetBehavior_canRestrictMovement" = "Movement of this asset can be restricted in the future.";
+"assetDetails_resourceAddress" = "Address";
+"assetDetails_name" = "Name";
+"assetDetails_currentSupply" = "Current Supply";
+"assetDetails_supplyUnkown" = "Unknown";
+"assetDetails_behavior" = "Behavior";
+"assetDetails_associatedDapps" = "Associated dApps";
 
-"accountView_tokenDetails_noTokens" = "You have no Tokens";
-"accountView_tokenDetails_whatAreTokens" = "What are Tokens?";
+"assetDetails_tokenDetails_noTokens" = "You have no Tokens";
+"assetDetails_tokenDetails_whatAreTokens" = "What are Tokens?";
 
-"accountView_NFTDetails_noNfts" = "You have no NFTs";
-"accountView_NFTDetails_whatAreNfts" = "What are NFTs?";
-"accountView_NFTDetails_id" = "ID";
-"accountView_NFTDetails_name" = "Name";
-"accountView_NFTDetails_resourceName" = "Name";
-"accountView_NFTDetails_nftPlural" = "%d NFTs";
-"accountView_NFTDetails_ownedOfTotal" = "%d of %d";
+"assetDetails_NFTDetails_noNfts" = "You have no NFTs";
+"assetDetails_NFTDetails_whatAreNfts" = "What are NFTs?";
+"assetDetails_NFTDetails_id" = "ID";
+"assetDetails_NFTDetails_name" = "Name";
+"assetDetails_NFTDetails_resourceName" = "Name";
+"assetDetails_NFTDetails_nftPlural" = "%d NFTs";
+"assetDetails_NFTDetails_ownedOfTotal" = "%d of %d";
 
-"accountView_poolUnitDetails_noPoolUnits" = "You have no NFTs";
-"accountView_poolUnitDetails_whatArePoolUnits" = "What are NFTs?";
+"assetDetails_poolUnitDetails_noPoolUnits" = "You have no Pool units";
+"assetDetails_poolUnitDetails_whatArePoolUnits" = "What are Pool units?";
 
-"accountView_badgeDetails_noBadges" = "You have no badges";
-"accountView_badgeDetails_whatAreBadges" = "What are badges?";
+"assetDetails_badgeDetails_noBadges" = "You have no badges";
+"assetDetails_badgeDetails_whatAreBadges" = "What are badges?";
 
-"accountView_settings_getXrdTestTokens" = "Get RCnet XRD Test Tokens";
-"accountView_settings_loadingPrompt" = "This may take several seconds, please wait for completion";
-"accountView_settings_title" = "Account Preferences";
-"accountView_settings_accountLabel" = "Account Label";
-"accountView_settings_accountColor" = "Account Color";
-"accountView_settings_accountColorSubtitle" = "Select from a list of unique colors";
-"accountView_settings_accountColorText" = "Select the background color for this Account";
-"accountView_settings_showAssets" = "Show Assets with Tags";
-"accountView_settings_showAssetsSubtitle" = "Show Assets with Tags";
-"accountView_settings_accountSecurity" = "Account Security";
-"accountView_settings_accountSecuritySubtitle" = "Set how you want this account to work";
-"accountView_settings_thirdPartyDeposits" = "Third-party Deposits";
-"accountView_settings_thirdPartyDepositsAcceptAll" = "Accept all deposits";
-"accountView_settings_showAssets" = "Show Assets with Tags";
-"accountView_settings_showAssetsSubtitle" = "Show Assets with Tags";
-"accountView_settings_hideAccount" = "Hide Account";
-"accountView_settings_hideAccountTitle" = "Hide This Account";
-"accountView_settings_hideAccountText" = "Hide this account in your wallet? You can always unhide it from the main application settings.";
+"assetDetails_assetBehavior_canIncreaseSupply" = "The supply of this asset can be increased or decreased";
+"assetDetails_assetBehavior_canChangeName" = "Naming and information about this asset can be changed.";
+"assetDetails_assetBehavior_canRestrictMovement" = "Movement of this asset can be restricted in the future.";
 
-"accountView_settings_setBehaviourHeading" = "Set how you want this account to work";
+"assetDetails_hideAsset_title" = "Hide Asset";
+"assetDetails_hideAsset_message" = "Hide this asset in your Radix Wallet? You can always unhide it in your account settings.";
+"assetDetails_hideAsset_button" = "Hide Asset";
 
-"accountView_settings_renameAccount" = "Rename Account";
-"accountView_settings_renameAccountText" = "Enter a new label for this account";
+// MARK: 0.3.2 - Account Settings
+
+"accountSettings_title" = "Account Settings";
+
+"accountSettings_personalizeHeading" = "Personalize this account";
+"accountSettings_accountLabel" = "Account Label";
+"accountSettings_accountColor" = "Account Color";
+"accountSettings_accountColorSubtitle" = "Select from a list of unique colors";
+"accountSettings_showAssets" = "Show Assets with Tags";
+"accountSettings_showAssetsSubtitle" = "Select which tags to show for assets in this account";
+"accountSettings_setBehaviorHeading" = "Set how you want this account to work";
+"accountSettings_accountSecurity" = "Account Security";
+"accountSettings_accountSecuritySubtitle" = "Set how you want this account to work";
+"accountSettings_thirdPartyDeposits" = "Third-party Deposits";
+"accountSettings_hideAccount" = "Hide Account";
+
+"accountSettings_getXrdTestTokens" = "Get RCnet XRD Test Tokens";
+"accountSettings_loadingPrompt" = "This may take several seconds, please wait for completion";
+
+"accountSettings_renameAccount_title" = "Rename Account";
+"accountSettings_renameAccount_subtitle" = "Enter a new label for this account";
+
+"accountSettings_accountColor_text" = "Select the background color for this Account";
+"accountSettings_accountColor_selected" = "Selected";
+
+"accountSettings_hideAccount_title" = "Hide This Account";
+"accountSettings_hideAccount_message" = "Hide this account in your wallet? You can always unhide it from the main application settings.";
+"accountSettings_hideAccount_button" = "Hide Account";
+
+"accountSettings_thirdPartyDeposits_text" = "Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.";
+"accountSettings_thirdPartyDeposits_acceptAll" = "Accept all deposits";
+"accountSettings_thirdPartyDeposits_acceptAllSubtitle" = "Allow third-parties to deposit any asset";
+"accountSettings_thirdPartyDeposits_onlyKnown" = "Only accept known";
+"accountSettings_thirdPartyDeposits_onlyKnownSubtitle" = "Allow  third-parties to deposit only assets this account already holds";
+"accountSettings_thirdPartyDeposits_denyAll" = "Deny all";
+"accountSettings_thirdPartyDeposits_denyAllSubtitle" = "Deny all third-parties deposits";
+"accountSettings_thirdPartyDeposits_text" = "This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery."; // UNCLEAR
+
+"accountSettings_showAssets_text" = "Asset creators can add tags to them. You can choose which tags you want to see in this account.";
+"accountSettings_showAssets_selectShown" = "Select the ones you’d like shown on all your assets.";
+"accountSettings_showAssets_recommended" = "Recommended";
+
+"accountSettings_behaviors_simpleAsset" = "This is a simple asset";
+"accountSettings_behaviors_supplyIncreasable" = "The supply of this asset can be increased.";
+"accountSettings_behaviors_supplyDecreasable" = "The supply of this asset can be decreased.";
+"accountSettings_behaviors_supplyFlexible" = "The supply of this asset can be increased or decreased.";
+"accountSettings_behaviors_supplyIncreasableByAnyone" = "Anyone can increase the supply of this asset.";
+"accountSettings_behaviors_supplyDecreasableByAnyone" = "Anyone can decrease the supply of this asset.";
+"accountSettings_behaviors_supplyFlexibleByAnyone" = "Anyone can increase or decrease the supply of this asset.";
+"accountSettings_behaviors_movementRestricted" = "Movement of this asset is restricted.";
+"accountSettings_behaviors_movementRestrictableInFuture" = "Movement of this asset can be restricted in the future.";
+"accountSettings_behaviors_movementRestrictableInFutureByAnyone" = "Anyone can restrict movement of this token in the future.";
+"accountSettings_behaviors_informationChangeable" = "Naming and information about this asset can be changed.";
+"accountSettings_behaviors_informationChangeableByAnyone" = "Anyone can change naming and information about this asset.";
+"accountSettings_behaviors_removableByThirdParty" = "A third party can remove this asset from accounts and dApps.";
+"accountSettings_behaviors_removableByAnyone" = "Anyone can remove this asset from accounts and dApps.";
+"accountSettings_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
+"accountSettings_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
 
 // MARK: 0.4 - AppSettings
 
-"appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
-"appSettings_developerMode_title" = "Developer Mode";
+"settings_title" = "Settings";
+"settings_linkedConnectors" = "Linked Connectors";
+"settings_gateways" = "Gateways";
+"settings_authorizedDapps" = "Authorized dApps";
+"settings_personas" = "Personas";
+"settings_appSettings" = "App Settings";
+"settings_backups" = "Backups";
+"settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
 
-"appSettings_subtitle" = "Customize your Radix Wallet";
-"appSettings_title" = "App Settings";
+"settings_appVersion" = "Version: %@ build #%@";
+"settings_deleteWalletData" = "Delete Wallet Data";
+"settings_inspectProfile" = "Inspect Profile";
+"settings_noProfileText" = "No Wallet Data Found";
 
+"settings_linkToConnectorHeader_title" = "Link your Wallet to a Desktop Browser";
+"settings_linkToConnectorHeader_subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
+"settings_linkToConnectorHeader_linkToConnector" = "Link to Connector";
 
+// MARK: 0.4.1 - Linked Connectors
 
+"linkedConnectors_title" = "Linked Connectors";
+"linkedConnectors_subtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
 
-"addressAction_copyAddress" = "Copy Address";
-"addressAction_copyNftId" = "Copy NFT ID";
-"addressAction_copyTransactionId" = "Copy Transaction ID";
-"addressAction_noWebBrowserInstalled" = "There is no web browser installed in this device";
-"addressAction_viewOnDashboard" = "View on Radix Dashboard";
+"linkedConnectors_linkNewConnector" = "Link New Connector";
 
+"linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
+"linkedConnectors_removeConnectionAlert_message" = "You will no longer be able to connect your wallet to this device and browser combination";
 
-"authorizedDapps_subtitle" = "Here are all the dApps that you have logged into using this Radix Wallet.";
+// MARK: 0.4.2 - Gateways
+
+"gateways_addNewGateway_addGatewayButtonTitle" = "Add Gateway";
+"gateways_addNewGateway_errorDuplicateURL" = "This url is already added";
+"gateways_addNewGateway_errorNoGatewayFound" = "No Gateway found at specified URL";
+"gateways_addNewGateway_establishingConnectionErrorMessage" = "There was an error in establishing a connection";
+"gateways_addNewGateway_subtitle" = "Enter a Gateway URL";
+"gateways_addNewGateway_textFieldPlaceholder" = "Enter full URL";
+"gateways_addNewGateway_title" = "Add New Gateway";
+
+"gateways_removeGatewayAlert_message" = "You will no longer be able to connect to this Gateway";
+"gateways_removeGatewayAlert_remove" = "Remove";
+"gateways_removeGatewayAlert_title" = "Remove Gateway";
+
+"gateways_addNewGatewayButtonTitle" = "Add New Gateway";
+"gateways_rcNetGateway" = "RCnet Gateway";
+"gateways_subtitle" = "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.";
+"gateways_title" = "Gateways";
+"gateways_whatIsAGateway" = "What is a Gateway";
+
+// MARK: 0.4.3 - Authorized dApps
+
 "authorizedDapps_title" = "Authorized dApps";
+"authorizedDapps_subtitle" = "Here are all the dApps that you have logged into using this Radix Wallet.";
 "authorizedDapps_whatIsDapp" = "What is a dApp";
 
-"backup_backupWalletData_message" = "Warning: If disabled you might lose access to accounts/personas.";
-"backup_backupWalletData_title" = "Backup Wallet Data";
+"dAppDetails_forgetDappAlert_forget" = "Forget";
+"dAppDetails_forgetDappAlert_message" = "Do you really want to forget this dApp?";
+"dAppDetails_forgetDappAlert_title" = "Forget dApp?";
+
+"dAppDetails_disconnectDappPrompt" = "This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.";
+
+"dAppDetails_forgetThisDapp" = "Forget this dApp";
+"dAppDetails_nfts" = "Associated NFTs";
+"dAppDetails_noPersonasHeading" = "No Personas have been used to connect to this dApp.";
+"dAppDetails_personasHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
+"dAppDetails_tokens" = "Associated Tokens";
+"dAppDetails_website" = "Website";
+"dAppDetails_dAppDefinition" = "dApp Definition";
+"dAppDetails_missingDescription" = "Missing description";
+"dAppDetails_unknownTokenName" = "Unknown name";
+
+"personaDetails_accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
+"personaDetails_authorizedDappsHeading" = "Here are the dApps you have logged into with this persona.";
+
+"personaDetails_editAccountSharing" = "Edit Account Sharing";
+"personaDetails_editAvatarButtonTitle" = "Edit Avatar";
+"personaDetails_editButtonTitle" = "Edit";
+"personaDetails_editPersona" = "Edit Persona";
+"personaDetails_emailAddress" = "Email Address";
+"personaDetails_firstName" = "First Name";
+"personaDetails_lastName" = "Last Name";
+"personaDetails_notSharingAnything" = "You are not sharing any personal data with %@";
+"personaDetails_personaLabelHeading" = "Persona Label";
+"personaDetails_personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
+"personaDetails_phoneNumber" = "Phone Number";
+"personaDetails_removeAuthorization" = "Remove Authorization";
+
+"personaDetails_removeAuthorizationAlert_confirm" = "Confirm";
+"personaDetails_removeAuthorizationAlert_message" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
+"personaDetails_removeAuthorizationAlert_title" = "Remove Authorization";
+
+// MARK: 0.4.4 - Personas
+
+"personas_createNewPersona" = "Create a New Persona";
+"personas_subtitle" = "Here are all of your current Personas in your Wallet.";
+"personas_title" = "Personas";
+"personas_whatIsPersona" = "What is a Persona";
+
+"editPersona_addAField_title" = "Add a Field";
+"editPersona_addAField_subtitle" = "Select from the following fields to add them to this persona.";
+"editPersona_addAField" = "Add a Field";
+"editPersona_addAField_add" = "Add";
+
+"editPersona_closeConfirmationDialog_discardChanges" = "Discard Changes";
+"editPersona_closeConfirmationDialog_keepEditing" = "Keep Editing";
+"editPersona_closeConfirmationDialog_message" = "Are you sure you want to discard changes to this persona?";
+
+"editPersona_error_blank" = "Label cannot be blank";
+"editPersona_error_invalidEmailAddress" = "Invalid email address";
+"editPersona_error_requiredByDapp" = "Required field for this dApp";
+
+"editPersona_requiredByDapp" = "Required by dApp";
+"editPersona_save" = "Save";
+"editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
+
+// MARK: 0.4.5 - App Settings
+
+"appSettings_title" = "App Settings";
+"appSettings_subtitle" = "Customize your Radix Wallet";
+"appSettings_developerMode_title" = "Developer Mode";
+"appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
+
+// MARK: 0.4.6 - Backups
 
 "backup_disabledText" = "Back up is turned off";
 "backup_lastBackedUp" = "Last Backed up: %@";
 "backup_noLastBackUp" = "Not Backed up yet";
 "backup_openSystemBackupSettings" = "Open System Backup Settings";
 
-"biometrics_deviceNotSecureAlert_message" = "Do you want to continue?";
-"biometrics_deviceNotSecureAlert_title" = "Your device is not secured";
+"backup_backupWalletData_title" = "Backup Wallet Data";
+"backup_backupWalletData_message" = "Warning: If disabled you might lose access to accounts/personas.";
 
-"biometrics_prompt_creationOfEntity" = "Authenticate to create new %@ with this phone.";
-"biometrics_prompt_importOlympiaAccounts" = "Validate seed phrase exists.";
-"biometrics_prompt_signAuthChallenge" = "Authenticate to sign auth chellenge with this phone.";
-"biometrics_prompt_signTransaction" = "Authenticate to sign transaction with this phone.";
-"biometrics_prompt_title" = "Use your biometric to continue";
+// MARK: 0.4.7 - Import Legacy Wallet
 
-"common_account" = "Account";
-"common_cancel" = "Cancel";
-"common_continue" = "Continue";
-"common_developerDisclaimerText" = "Development use only. Not usable on Radix mainnet.";
-"common_errorAlertTitle" = "An Error Occurred";
-"common_none" = "None";
-"common_ok" = "OK";
-"common_persona" = "Persona";
-"common_history" = "History";
-"common_retry" = "Retry";
-"common_somethingWentWrong" = "Something went wrong";
-"common_systemSettings" = "Settings";
+"importLegacyWallet_title" = "Import Legacy Wallet";
+
+"importLegacyWallet_scanQRCodeInstructions" = "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.";
+
+"importLegacyWallet_selectAccountsToImport_accountType" = "Type";
+"importLegacyWallet_selectAccountsToImport_derivationPath" = "Path";
+"importLegacyWallet_selectAccountsToImport_deselectAll" = "Deselect all";
+"importLegacyWallet_selectAccountsToImport_importManyAccounts" = "Import %@ accounts";
+"importLegacyWallet_selectAccountsToImport_importOneAcccount" = "Import 1 account";
+"importLegacyWallet_selectAccountsToImport_importZeroAccounts" = "Import accounts";
+"importLegacyWallet_selectAccountsToImport_name" = "Name";
+"importLegacyWallet_selectAccountsToImport_olympiaAddress" = "Olympia Address";
+"importLegacyWallet_selectAccountsToImport_selectAllNonImported" = "Select all non imported";
+"importLegacyWallet_selectAccountsToImport_unnamed" = "Unnamed";
+
+"importLegacyWallet_completion_titleManyAccounts" = "Imported #%@ accounts.";
+"importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";
+"importLegacyWallet_completion_titleOneAccount" = "Imported 1 account.";
+
+// MARK: 0.5 - dApp Details
+
+// MARK: 0.8 - Create Entity
 
 "createAccount_completion_explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
 "createAccount_completion_subtitleFirst" = "You’ve created your first Account.";
@@ -178,144 +338,7 @@
 
 "createPersona_saveAndContinueButtonTitle" = "Save and Continue";
 
-"editPersona_addAField" = "Add a Field";
-"editPersona_addAField_add" = "Add";
-"editPersona_addAField_subtitle" = "Select from the following fields to add them to this persona.";
-"editPersona_addAField_title" = "Add a Field";
-
-"editPersona_closeConfirmationDialog_discardChanges" = "Discard Changes";
-"editPersona_closeConfirmationDialog_keepEditing" = "Keep Editing";
-"editPersona_closeConfirmationDialog_message" = "Are you sure you want to discard changes to this persona?";
-
-"editPersona_error_blank" = "Label cannot be blank";
-"editPersona_error_invalidEmailAddress" = "Invalid email address";
-"editPersona_error_requiredByDapp" = "Required field for this dApp";
-
-"editPersona_requiredByDapp" = "Required by dApp";
-"editPersona_save" = "Save";
-"editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
-
-"gateways_addNewGateway_addGatewayButtonTitle" = "Add Gateway";
-"gateways_addNewGateway_errorDuplicateURL" = "This url is already added";
-"gateways_addNewGateway_errorNoGatewayFound" = "No Gateway found at specified URL";
-"gateways_addNewGateway_establishingConnectionErrorMessage" = "There was an error in establishing a connection";
-"gateways_addNewGateway_subtitle" = "Enter a Gateway URL";
-"gateways_addNewGateway_textFieldPlaceholder" = "Enter full URL";
-"gateways_addNewGateway_title" = "Add New Gateway";
-
-"gateways_removeGatewayAlert_message" = "You will no longer be able to connect to this Gateway";
-"gateways_removeGatewayAlert_remove" = "Remove";
-"gateways_removeGatewayAlert_title" = "Remove Gateway";
-
-"gateways_addNewGatewayButtonTitle" = "Add New Gateway";
-"gateways_rcNetGateway" = "RCnet Gateway";
-"gateways_subtitle" = "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.";
-"gateways_title" = "Gateways";
-"gateways_whatIsAGateway" = "What is a Gateway";
-
-"importLegacyWallet_completion_titleManyAccounts" = "Imported #%@ accounts.";
-"importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";
-"importLegacyWallet_completion_titleOneAccount" = "Imported 1 account.";
-
-"importLegacyWallet_scanQRCodeInstructions" = "Open your Olympia Wallet and export the accounts you would like to migrate to this wallet.";
-
-"importLegacyWallet_selectAccountsToImport_accountType" = "Type";
-"importLegacyWallet_selectAccountsToImport_derivationPath" = "Path";
-"importLegacyWallet_selectAccountsToImport_deselectAll" = "Deselect all";
-"importLegacyWallet_selectAccountsToImport_importManyAccounts" = "Import %@ accounts";
-"importLegacyWallet_selectAccountsToImport_importOneAcccount" = "Import 1 account";
-"importLegacyWallet_selectAccountsToImport_importZeroAccounts" = "Import accounts";
-"importLegacyWallet_selectAccountsToImport_name" = "Name";
-"importLegacyWallet_selectAccountsToImport_olympiaAddress" = "Olympia Address";
-"importLegacyWallet_selectAccountsToImport_selectAllNonImported" = "Select all non imported";
-"importLegacyWallet_selectAccountsToImport_unnamed" = "Unnamed";
-
-"importLegacyWallet_title" = "Import Legacy Wallet";
-
-"importProfile_importProfile" = "Import Radix Wallet backup";
-
-"linkedConnectors_linkNewConnector" = "Link New Connector";
-
-"linkedConnectors_removeConnectionAlert_message" = "You will no longer be able to connect your wallet to this device and browser combination";
-"linkedConnectors_removeConnectionAlert_remove" = "Remove";
-"linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
-
-"linkedConnectors_subtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
-"linkedConnectors_title" = "Linked Connectors";
-
-"newConnection_cameraPermissionDeniedAlert_message" = "Camera access is required to link to connector.";
-"newConnection_cameraPermissionDeniedAlert_title" = "Access Required";
-"newConnection_connectionDefaultName" = "Unnamed";
-"newConnection_linking" = "Linking...";
-"newConnection_localNetworkPermissionDeniedAlert_message" = "Local Network access is required to link to connector.";
-"newConnection_localNetworkPermissionDeniedAlert_title" = "Access Required";
-"newConnection_saveLinkButtonTitle" = "Save Link";
-"newConnection_subtitle" = "Scan your QR code to link your wallet with a browser extension";
-"newConnection_textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
-"newConnection_textFieldPlaceholder" = "Name of Connector";
-"newConnection_title" = "Link to Connector";
-
-"personas_createNewPersona" = "Create a New Persona";
-"personas_subtitle" = "Here are all of your current Personas in your Wallet.";
-"personas_title" = "Personas";
-"personas_whatIsPersona" = "What is a Persona";
-
-"splash_incompatibleProfileVersionAlert_delete" = "Delete Wallet Data";
-"splash_incompatibleProfileVersionAlert_message" = "For this Preview wallet version, you must delete your wallet data to continue.";
-"splash_incompatibleProfileVersionAlert_title" = "Wallet Data is Incompatible";
-
-"splash_passcodeCheckFailedAlert_message" = "Passcode are not set up. Please update settings.";
-"splash_passcodeCheckFailedAlert_title" = "Warning";
-
-"splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
-"splash_passcodeNotSetTitle" = "Passcode not set up";
-
-"transactionReview_approveButtonTitle" = "Approve";
-"transactionReview_customizeGuaranteesButtonTitle" = "Customize Guarantees";
-"transactionReview_depositsHeading" = "Depositing";
-"transactionReview_estimated" = "Estimated";
-"transactionReview_externalAccountName" = "Account";
-"transactionReview_guaranteed" = "Guaranteed";
-"transactionReview_messageHeading" = "Message";
-"transactionReview_presentingHeading" = "Presenting";
-"transactionReview_rawTransactionTitle" = "Raw Transaction";
-"transactionReview_sendingToHeading" = "Sending to";
-"transactionReview_title" = "Review Your Transaction";
-"transactionReview_unknown" = "Unknown";
-"transactionReview_usingDappsHeading" = "Using dApps";
-"transactionReview_withdrawalsHeading" = "Withdrawing";
-"transactionReview_xrdAmount" = "XRD %@";
-
-"transactionReview_guarantees_applyButtonText" = "Apply";
-"transactionReview_guarantees_howDoGuaranteesWork" = "How do Guarantees work";
-"transactionReview_guarantees_setGuaranteedMinimum" = "Set guaranteed minimum %%";
-"transactionReview_guarantees_subtitle" = "Protect yourself by setting guaranteed minimums for estimated deposits";
-"transactionReview_guarantees_title" = "Customize Guarantees";
-
-"transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
-"transactionReview_networkFee_customizeButtonTitle" = "Customize";
-"transactionReview_networkFee_heading" = "Network Fee";
-
-"transactionReview_usingDapps_unknownComponents" = "%d Unknown Components";
-
-"transaction_status_completing" = "Completing Transaction…";
-"transaction_status_successful" = "Your transaction was successful";
-
-"dAppDetails_forgetDappAlert_forget" = "Forget";
-"dAppDetails_forgetDappAlert_message" = "Do you really want to forget this dApp?";
-"dAppDetails_forgetDappAlert_title" = "Forget dApp?";
-
-"dAppDetails_disconnectDappPrompt" = "This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.";
-
-"dAppDetails_forgetThisDapp" = "Forget this dApp";
-"dAppDetails_nfts" = "Associated NFTs";
-"dAppDetails_noPersonasHeading" = "No Personas have been used to connect to this dApp.";
-"dAppDetails_personasHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
-"dAppDetails_tokens" = "Associated Tokens";
-"dAppDetails_website" = "Website";
-"dAppDetails_dAppDefinition" = "dApp Definition";
-"dAppDetails_missingDescription" = "Missing description";
-"dAppDetails_unknownTokenName" = "Unknown name";
+// MARK: 0.9 - dApp Request
 
 "dAppRequest_accountPermission_numberOfAccountsAtLeast" = "%d or more accounts";
 "dAppRequest_accountPermission_numberOfAccountsAtLeastZero" = "Any number of accounts";
@@ -378,6 +401,120 @@
 "dAppRequest_requestWrongNetworkAlert_message" = "Request received from dApp for network %@, but you are currentlA connected to %@.";
 "dAppRequest_responseFailureAlert_message" = "Failed to send response payload back to dApp.";
 
+// MARK: 0.9.1 - Log in Requests
+
+// MARK: 0.9.2 - Account Permissions
+
+// MARK: 0.9.3 - One Time Request: Account
+
+// MARK: 0.9.4 - Error and Persona update
+
+// MARK: 0.9.5 - One time Request: Personal Data
+
+// MARK: 1.0 - Transfer Flow
+
+// MARK: 1.0.1 - Empty States
+
+// MARK: 1.0.2 - Messaging
+
+// MARK: 1.0.3 - Account Selection
+
+// MARK: 1.0.4 - Asset States
+
+// MARK: 1.0.5 - Asset Selection
+
+// MARK: 1.0.6 - Examples
+
+// MARK: 1.1 - Transaction Review
+
+"transactionReview_title" = "Review Transaction";
+"transactionReview_approveButtonTitle" = "Approve";
+"transactionReview_customizeGuaranteesButtonTitle" = "Customize Guarantees";
+"transactionReview_depositsHeading" = "Depositing";
+"transactionReview_estimated" = "Estimated";
+"transactionReview_externalAccountName" = "Account";
+"transactionReview_guaranteed" = "Guaranteed";
+"transactionReview_messageHeading" = "Message";
+"transactionReview_presentingHeading" = "Presenting";
+"transactionReview_rawTransactionTitle" = "Raw Transaction";
+"transactionReview_sendingToHeading" = "Sending to";
+"transactionReview_unknown" = "Unknown";
+"transactionReview_usingDappsHeading" = "Using dApps";
+"transactionReview_withdrawalsHeading" = "Withdrawing";
+"transactionReview_xrdAmount" = "XRD %@";
+
+"transactionReview_guarantees_applyButtonText" = "Apply";
+"transactionReview_guarantees_howDoGuaranteesWork" = "How do Guarantees work";
+"transactionReview_guarantees_setGuaranteedMinimum" = "Set guaranteed minimum %%";
+"transactionReview_guarantees_subtitle" = "Protect yourself by setting guaranteed minimums for estimated deposits";
+"transactionReview_guarantees_title" = "Customize Guarantees";
+
+"transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
+"transactionReview_networkFee_customizeButtonTitle" = "Customize";
+"transactionReview_networkFee_heading" = "Network Fee";
+
+"transactionReview_usingDapps_unknownComponents" = "%d Unknown Components";
+
+// MARK: 1.1.1 - Customize guarantees
+
+// MARK: 1.1.2 - Transaction Status
+
+"transaction_status_completing_text" = "Completing Transaction…";
+"transaction_status_success_title" = "Success";
+"transaction_status_success_text" = "Your transaction was successful";
+"transaction_status_failure_title" = "Something went wrong";
+
+// MARK: Address Action
+
+"addressAction_copyAddress" = "Copy Address";
+"addressAction_copyNftId" = "Copy NFT ID";
+"addressAction_copyTransactionId" = "Copy Transaction ID";
+"addressAction_noWebBrowserInstalled" = "There is no web browser installed in this device";
+"addressAction_viewOnDashboard" = "View on Radix Dashboard";
+
+// MARK: Biometrics
+
+"biometrics_prompt_title" = "Use your biometric to continue";
+"biometrics_prompt_creationOfEntity" = "Authenticate to create new %@ with this phone.";
+"biometrics_prompt_importOlympiaAccounts" = "Validate seed phrase exists.";
+"biometrics_prompt_signAuthChallenge" = "Authenticate to sign auth chellenge with this phone.";
+"biometrics_prompt_signTransaction" = "Authenticate to sign transaction with this phone.";
+
+"biometrics_deviceNotSecureAlert_title" = "Your device is not secured";
+"biometrics_deviceNotSecureAlert_message" = "Do you want to continue?";
+
+// MARK: Import Profile
+
+"importProfile_importProfile" = "Import Radix Wallet backup";
+
+// MARK: New Connection
+
+"newConnection_cameraPermissionDeniedAlert_message" = "Camera access is required to link to connector.";
+"newConnection_cameraPermissionDeniedAlert_title" = "Access Required";
+"newConnection_connectionDefaultName" = "Unnamed";
+"newConnection_linking" = "Linking...";
+"newConnection_localNetworkPermissionDeniedAlert_message" = "Local Network access is required to link to connector.";
+"newConnection_localNetworkPermissionDeniedAlert_title" = "Access Required";
+"newConnection_saveLinkButtonTitle" = "Save Link";
+"newConnection_subtitle" = "Scan your QR code to link your wallet with a browser extension";
+"newConnection_textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
+"newConnection_textFieldPlaceholder" = "Name of Connector";
+"newConnection_title" = "Link to Connector";
+
+// MARK: Splash
+
+"splash_incompatibleProfileVersionAlert_delete" = "Delete Wallet Data";
+"splash_incompatibleProfileVersionAlert_message" = "For this Preview wallet version, you must delete your wallet data to continue.";
+"splash_incompatibleProfileVersionAlert_title" = "Wallet Data is Incompatible";
+
+"splash_passcodeCheckFailedAlert_message" = "Passcode are not set up. Please update settings.";
+"splash_passcodeCheckFailedAlert_title" = "Warning";
+
+"splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
+"splash_passcodeNotSetTitle" = "Passcode not set up";
+
+// MARK: Error
+
 "error_dappRequest_invalidPersonaId" = "Invalid persona id specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 
@@ -396,6 +533,8 @@
 "error_transactionFailure_rejected" = "Transaction rejected";
 "error_transactionFailure_rejectedByUser" = "Failed to convert transaction manifest";
 "error_transactionFailure_submit" = "Failed to submit transaction";
+
+// MARK: Import Olympia Accounts
 
 "importOlympiaAccounts_accountAlreadyImported" = "Account already imported";
 "importOlympiaAccounts_allMnemonicsHeading" = "Here are all your Mnemonics. Tap one to display";
@@ -417,53 +556,20 @@
 "importOlympiaAccounts_viewMnemonics" = "View Mnemonics";
 "importOlympiaAccounts_whatIsMnemonic" = "What is a Mnemonic";
 
+// MARK: Onboarding
+
 "onboarding_newUser" = "I\'m a new Radix Wallet user";
 "onboarding_restoreFromBackup" = "Restore Wallet from Backup";
-"onboarding_step1_subtitle" = "Your direct connection to the Radix Network";
 "onboarding_step1_title" = "Welcome to the Radix Wallet";
+"onboarding_step1_subtitle" = "Your direct connection to the Radix Network";
 
-"onboarding_step2_subtitle" = "Let\'s get started";
 "onboarding_step2_title" = "A World of Possibilities";
+"onboarding_step2_subtitle" = "Let\'s get started";
 
-"onboarding_step3_subtitle" = "Connect and transact securely with a world of web3 dApps, tokens, NFTs, and much more";
 "onboarding_step3_title" = "Your phone is your login";
+"onboarding_step3_subtitle" = "Connect and transact securely with a world of web3 dApps, tokens, NFTs, and much more";
 
-"personaDetails_accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
-"personaDetails_authorizedDappsHeading" = "Here are the dApps you have logged into with this persona.";
-
-"personaDetails_editAccountSharing" = "Edit Account Sharing";
-"personaDetails_editAvatarButtonTitle" = "Edit Avatar";
-"personaDetails_editButtonTitle" = "Edit";
-"personaDetails_editPersona" = "Edit Persona";
-"personaDetails_emailAddress" = "Email Address";
-"personaDetails_firstName" = "First Name";
-"personaDetails_lastName" = "Last Name";
-"personaDetails_notSharingAnything" = "You are not sharing any personal data with %@";
-"personaDetails_personaLabelHeading" = "Persona Label";
-"personaDetails_personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
-"personaDetails_phoneNumber" = "Phone Number";
-"personaDetails_removeAuthorization" = "Remove Authorization";
-
-"personaDetails_removeAuthorizationAlert_confirm" = "Confirm";
-"personaDetails_removeAuthorizationAlert_message" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
-"personaDetails_removeAuthorizationAlert_title" = "Remove Authorization";
-
-"settings_appSettings" = "App Settings";
-"settings_appVersion" = "Version: %@ build #%@";
-"settings_authorizedDapps" = "Authorized dApps";
-"settings_backups" = "Backups";
-"settings_deleteWalletData" = "Delete Wallet Data";
-"settings_gateways" = "Gateways";
-"settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
-"settings_inspectProfile" = "Inspect Profile";
-"settings_linkedConnectors" = "Linked Connectors";
-"settings_noProfileText" = "No Wallet Data Found";
-"settings_personas" = "Personas";
-"settings_title" = "Settings";
-
-"settings_linkToConnectorHeader_linkToConnector" = "Link to Connector";
-"settings_linkToConnectorHeader_subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
-"settings_linkToConnectorHeader_title" = "Link your Wallet to a Desktop Browser";
+// MARK: Transaction Signing
 
 "transactionSigning_preparingTransaction" = "Preparing transaction...";
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";

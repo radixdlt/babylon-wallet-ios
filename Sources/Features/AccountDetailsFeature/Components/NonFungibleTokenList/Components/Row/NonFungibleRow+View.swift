@@ -113,19 +113,19 @@ extension NonFungibleTokenList.Row.View {
 
 	fileprivate func headerSupplyText(with _: ViewStoreOf<NonFungibleTokenList.Row>) -> String {
 		// TODO: remove when API is ready
-		L10n.AccountView.AssetDetails.supplyUnkown
+		L10n.AssetDetails.supplyUnkown
 
 		// TODO: update when API is ready
 		/*
 		 guard let supply = viewStore.containers.first?.asset.supply else {
-		 	return L10n.AccountView.AssetDetails.supplyUnkown
+		 	return L10n.AssetDetails.supplyUnkown
 		 }
 
 		 switch supply {
 		 case let .fixed(value):
-		 	return NSLocalizedString(L10n.AccountView.AssetDetails.ownedOfTotal(viewStore.containers.count, Int(value.magnitude)), comment: "Number of NFTs owned of total number")
+		 	return NSLocalizedString(L10n.AssetDetails.NFTDetails.ownedOfTotal(viewStore.containers.count, Int(value.magnitude)), comment: "Number of NFTs owned of total number")
 		 case .mutable:
-		 	return NSLocalizedString(L10n.AccountView.AssetDetails.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
+		 	return NSLocalizedString(L10n.AssetDetails.NFTDetails.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
 		 }
 		 */
 	}
