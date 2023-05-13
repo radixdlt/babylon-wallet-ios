@@ -232,10 +232,20 @@ public enum L10n {
     public enum DAppDetails {
       /// dApp Definition
       public static let dAppDefinition = L10n.tr("Localizable", "authorizedDapps_dAppDetails_dAppDefinition", fallback: "dApp Definition")
+      /// Forget this dApp
+      public static let forgetDapp = L10n.tr("Localizable", "authorizedDapps_dAppDetails_forgetDapp", fallback: "Forget this dApp")
+      /// Missing description
+      public static let missingDescription = L10n.tr("Localizable", "authorizedDapps_dAppDetails_missingDescription", fallback: "Missing description")
       /// Associated NFTs
       public static let nfts = L10n.tr("Localizable", "authorizedDapps_dAppDetails_nfts", fallback: "Associated NFTs")
+      /// No Personas have been used to connect to this dApp.
+      public static let noPersonasHeading = L10n.tr("Localizable", "authorizedDapps_dAppDetails_noPersonasHeading", fallback: "No Personas have been used to connect to this dApp.")
+      /// Here are the Personas that you have previously used to connect to this dApp.
+      public static let personasHeading = L10n.tr("Localizable", "authorizedDapps_dAppDetails_personasHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
       /// Associated Tokens
       public static let tokens = L10n.tr("Localizable", "authorizedDapps_dAppDetails_tokens", fallback: "Associated Tokens")
+      /// Unknown name
+      public static let unknownTokenName = L10n.tr("Localizable", "authorizedDapps_dAppDetails_unknownTokenName", fallback: "Unknown name")
       /// Website
       public static let website = L10n.tr("Localizable", "authorizedDapps_dAppDetails_website", fallback: "Website")
     }
@@ -246,6 +256,46 @@ public enum L10n {
       public static let message = L10n.tr("Localizable", "authorizedDapps_forgetDappAlert_message", fallback: "Do you really want to forget this dApp?")
       /// Forget dApp?
       public static let title = L10n.tr("Localizable", "authorizedDapps_forgetDappAlert_title", fallback: "Forget dApp?")
+    }
+    public enum PersonaDetails {
+      /// Here are the account names and addresses that you are currently sharing with %@.
+      public static func accountSharingDescription(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "authorizedDapps_personaDetails_accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
+      }
+      /// Here are the dApps you have logged into with this persona.
+      public static let authorizedDappsHeading = L10n.tr("Localizable", "authorizedDapps_personaDetails_authorizedDappsHeading", fallback: "Here are the dApps you have logged into with this persona.")
+      /// Edit Account Sharing
+      public static let editAccountSharing = L10n.tr("Localizable", "authorizedDapps_personaDetails_editAccountSharing", fallback: "Edit Account Sharing")
+      /// Edit Avatar
+      public static let editAvatarButtonTitle = L10n.tr("Localizable", "authorizedDapps_personaDetails_editAvatarButtonTitle", fallback: "Edit Avatar")
+      /// Edit Persona
+      public static let editPersona = L10n.tr("Localizable", "authorizedDapps_personaDetails_editPersona", fallback: "Edit Persona")
+      /// Email Address
+      public static let emailAddress = L10n.tr("Localizable", "authorizedDapps_personaDetails_emailAddress", fallback: "Email Address")
+      /// First Name
+      public static let firstName = L10n.tr("Localizable", "authorizedDapps_personaDetails_firstName", fallback: "First Name")
+      /// Last Name
+      public static let lastName = L10n.tr("Localizable", "authorizedDapps_personaDetails_lastName", fallback: "Last Name")
+      /// You are not sharing any personal data with %@
+      public static func notSharingAnything(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "authorizedDapps_personaDetails_notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
+      }
+      /// Persona Label
+      public static let personaLabelHeading = L10n.tr("Localizable", "authorizedDapps_personaDetails_personaLabelHeading", fallback: "Persona Label")
+      /// Here is the personal data that you are sharing with %@
+      public static func personalDataSharingDescription(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "authorizedDapps_personaDetails_personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
+      }
+      /// Phone Number
+      public static let phoneNumber = L10n.tr("Localizable", "authorizedDapps_personaDetails_phoneNumber", fallback: "Phone Number")
+      /// Disconnect Persona from this dApp
+      public static let removeAuthorization = L10n.tr("Localizable", "authorizedDapps_personaDetails_removeAuthorization", fallback: "Disconnect Persona from this dApp")
+    }
+    public enum RemoveAuthorizationAlert {
+      /// This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.
+      public static let message = L10n.tr("Localizable", "authorizedDapps_removeAuthorizationAlert_message", fallback: "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.")
+      /// Remove Authorization
+      public static let title = L10n.tr("Localizable", "authorizedDapps_removeAuthorizationAlert_title", fallback: "Remove Authorization")
     }
   }
   public enum Backup {
@@ -293,6 +343,8 @@ public enum L10n {
     public static let account = L10n.tr("Localizable", "common_account", fallback: "Account")
     /// Cancel
     public static let cancel = L10n.tr("Localizable", "common_cancel", fallback: "Cancel")
+    /// Confirm
+    public static let confirm = L10n.tr("Localizable", "common_confirm", fallback: "Confirm")
     /// Continue
     public static let `continue` = L10n.tr("Localizable", "common_continue", fallback: "Continue")
     /// Development use only. Not usable on Radix mainnet.
@@ -423,20 +475,6 @@ public enum L10n {
       /// What would you like to call your persona?
       public static let subtitle = L10n.tr("Localizable", "createPersona_nameNewPersona_subtitle", fallback: "What would you like to call your persona?")
     }
-  }
-  public enum DAppDetails {
-    /// This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.
-    public static let disconnectDappPrompt = L10n.tr("Localizable", "dAppDetails_disconnectDappPrompt", fallback: "This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.")
-    /// Forget this dApp
-    public static let forgetThisDapp = L10n.tr("Localizable", "dAppDetails_forgetThisDapp", fallback: "Forget this dApp")
-    /// Missing description
-    public static let missingDescription = L10n.tr("Localizable", "dAppDetails_missingDescription", fallback: "Missing description")
-    /// No Personas have been used to connect to this dApp.
-    public static let noPersonasHeading = L10n.tr("Localizable", "dAppDetails_noPersonasHeading", fallback: "No Personas have been used to connect to this dApp.")
-    /// Here are the Personas that you have previously used to connect to this dApp.
-    public static let personasHeading = L10n.tr("Localizable", "dAppDetails_personasHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
-    /// Unknown name
-    public static let unknownTokenName = L10n.tr("Localizable", "dAppDetails_unknownTokenName", fallback: "Unknown name")
   }
   public enum DAppRequest {
     /// Loading...
@@ -882,50 +920,6 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "onboarding_step3_subtitle", fallback: "Connect and transact securely with a world of web3 dApps, tokens, NFTs, and much more")
       /// Your phone is your login
       public static let title = L10n.tr("Localizable", "onboarding_step3_title", fallback: "Your phone is your login")
-    }
-  }
-  public enum PersonaDetails {
-    /// Here are the account names and addresses that you are currently sharing with %@.
-    public static func accountSharingDescription(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "personaDetails_accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
-    }
-    /// Here are the dApps you have logged into with this persona.
-    public static let authorizedDappsHeading = L10n.tr("Localizable", "personaDetails_authorizedDappsHeading", fallback: "Here are the dApps you have logged into with this persona.")
-    /// Edit Account Sharing
-    public static let editAccountSharing = L10n.tr("Localizable", "personaDetails_editAccountSharing", fallback: "Edit Account Sharing")
-    /// Edit Avatar
-    public static let editAvatarButtonTitle = L10n.tr("Localizable", "personaDetails_editAvatarButtonTitle", fallback: "Edit Avatar")
-    /// Edit
-    public static let editButtonTitle = L10n.tr("Localizable", "personaDetails_editButtonTitle", fallback: "Edit")
-    /// Edit Persona
-    public static let editPersona = L10n.tr("Localizable", "personaDetails_editPersona", fallback: "Edit Persona")
-    /// Email Address
-    public static let emailAddress = L10n.tr("Localizable", "personaDetails_emailAddress", fallback: "Email Address")
-    /// First Name
-    public static let firstName = L10n.tr("Localizable", "personaDetails_firstName", fallback: "First Name")
-    /// Last Name
-    public static let lastName = L10n.tr("Localizable", "personaDetails_lastName", fallback: "Last Name")
-    /// You are not sharing any personal data with %@
-    public static func notSharingAnything(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "personaDetails_notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
-    }
-    /// Persona Label
-    public static let personaLabelHeading = L10n.tr("Localizable", "personaDetails_personaLabelHeading", fallback: "Persona Label")
-    /// Here is the personal data that you are sharing with %@
-    public static func personalDataSharingDescription(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "personaDetails_personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
-    }
-    /// Phone Number
-    public static let phoneNumber = L10n.tr("Localizable", "personaDetails_phoneNumber", fallback: "Phone Number")
-    /// Remove Authorization
-    public static let removeAuthorization = L10n.tr("Localizable", "personaDetails_removeAuthorization", fallback: "Remove Authorization")
-    public enum RemoveAuthorizationAlert {
-      /// Confirm
-      public static let confirm = L10n.tr("Localizable", "personaDetails_removeAuthorizationAlert_confirm", fallback: "Confirm")
-      /// This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.
-      public static let message = L10n.tr("Localizable", "personaDetails_removeAuthorizationAlert_message", fallback: "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.")
-      /// Remove Authorization
-      public static let title = L10n.tr("Localizable", "personaDetails_removeAuthorizationAlert_title", fallback: "Remove Authorization")
     }
   }
   public enum Personas {

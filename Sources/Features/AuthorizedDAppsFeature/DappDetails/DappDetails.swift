@@ -352,7 +352,7 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 		guard let fungibility else { return nil }
 		return .init(address: .init(address: address),
 		             fungibility: fungibility,
-		             name: metadata.name ?? L10n.DAppDetails.unknownTokenName,
+		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
 		             symbol: metadata.symbol,
 		             description: metadata.description,
 		             iconURL: metadata.iconURL)

@@ -13,6 +13,7 @@
 "common_remove" = "Remove";
 "common_somethingWentWrong" = "Something went wrong";
 "common_systemSettings" = "Settings";
+"common_confirm" = "Confirm";
 
 // MARK: 0.2 - Homepage
 
@@ -200,44 +201,35 @@
 "authorizedDapps_whatIsDapp" = "What is a dApp";
 
 "authorizedDapps_dAppDetails_dAppDefinition" = "dApp Definition";
+"authorizedDapps_dAppDetails_missingDescription" = "Missing description";
 "authorizedDapps_dAppDetails_website" = "Website";
 "authorizedDapps_dAppDetails_tokens" = "Associated Tokens";
+"authorizedDapps_dAppDetails_unknownTokenName" = "Unknown name";
 "authorizedDapps_dAppDetails_nfts" = "Associated NFTs";
+"authorizedDapps_dAppDetails_personasHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
+"authorizedDapps_dAppDetails_noPersonasHeading" = "No Personas have been used to connect to this dApp.";
+"authorizedDapps_dAppDetails_forgetDapp" = "Forget this dApp";
 
+"authorizedDapps_personaDetails_editAvatarButtonTitle" = "Edit Avatar";
+"authorizedDapps_personaDetails_personaLabelHeading" = "Persona Label";
+"authorizedDapps_personaDetails_personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
+"authorizedDapps_personaDetails_notSharingAnything" = "You are not sharing any personal data with %@";
+"authorizedDapps_personaDetails_firstName" = "First Name";
+"authorizedDapps_personaDetails_lastName" = "Last Name";
+"authorizedDapps_personaDetails_emailAddress" = "Email Address";
+"authorizedDapps_personaDetails_phoneNumber" = "Phone Number";
+"authorizedDapps_personaDetails_editPersona" = "Edit Persona";
+"authorizedDapps_personaDetails_authorizedDappsHeading" = "Here are the dApps you have logged into with this persona.";
+"authorizedDapps_personaDetails_accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
+"authorizedDapps_personaDetails_editAccountSharing" = "Edit Account Sharing";
+"authorizedDapps_personaDetails_removeAuthorization" = "Disconnect Persona from this dApp";
 
 "authorizedDapps_forgetDappAlert_title" = "Forget dApp?";
 "authorizedDapps_forgetDappAlert_message" = "Do you really want to forget this dApp?";
 "authorizedDapps_forgetDappAlert_forget" = "Forget";
 
-
-
-"dAppDetails_disconnectDappPrompt" = "This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.";
-
-"dAppDetails_forgetThisDapp" = "Forget this dApp";
-"dAppDetails_noPersonasHeading" = "No Personas have been used to connect to this dApp.";
-"dAppDetails_personasHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
-"dAppDetails_missingDescription" = "Missing description";
-"dAppDetails_unknownTokenName" = "Unknown name";
-
-"personaDetails_accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
-"personaDetails_authorizedDappsHeading" = "Here are the dApps you have logged into with this persona.";
-
-"personaDetails_editAccountSharing" = "Edit Account Sharing";
-"personaDetails_editAvatarButtonTitle" = "Edit Avatar";
-"personaDetails_editButtonTitle" = "Edit";
-"personaDetails_editPersona" = "Edit Persona";
-"personaDetails_emailAddress" = "Email Address";
-"personaDetails_firstName" = "First Name";
-"personaDetails_lastName" = "Last Name";
-"personaDetails_notSharingAnything" = "You are not sharing any personal data with %@";
-"personaDetails_personaLabelHeading" = "Persona Label";
-"personaDetails_personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
-"personaDetails_phoneNumber" = "Phone Number";
-"personaDetails_removeAuthorization" = "Remove Authorization";
-
-"personaDetails_removeAuthorizationAlert_confirm" = "Confirm";
-"personaDetails_removeAuthorizationAlert_message" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
-"personaDetails_removeAuthorizationAlert_title" = "Remove Authorization";
+"authorizedDapps_removeAuthorizationAlert_title" = "Remove Authorization";
+"authorizedDapps_removeAuthorizationAlert_message" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
 
 // MARK: 0.4.4 - Personas
 

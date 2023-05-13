@@ -92,7 +92,7 @@ private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
 		.init(
 			title: dApp.displayName.rawValue,
-			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
+			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
 			address: dApp.dAppDefinitionAddress,
@@ -222,7 +222,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			if hasPersonas {
-				Text(L10n.DAppDetails.personasHeading)
+				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)
@@ -234,7 +234,7 @@ extension DappDetails.View {
 				let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
 				PersonaListCoreView(store: personasStore)
 			} else {
-				Text(L10n.DAppDetails.noPersonasHeading)
+				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)

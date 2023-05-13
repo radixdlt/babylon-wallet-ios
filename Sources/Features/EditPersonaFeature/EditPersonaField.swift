@@ -73,7 +73,7 @@ public typealias EditPersonaStaticField = EditPersonaField<EditPersona.State.Sta
 extension EditPersona.State.StaticFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
-		case .personaLabel: return L10n.PersonaDetails.personaLabelHeading
+		case .personaLabel: return L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading
 		}
 	}
 
@@ -123,10 +123,10 @@ public typealias EditPersonaDynamicField = EditPersonaField<EditPersona.State.Dy
 extension EditPersona.State.DynamicFieldID: EditPersonaFieldID {
 	public var title: String {
 		switch self {
-		case .givenName: return L10n.PersonaDetails.firstName
-		case .familyName: return L10n.PersonaDetails.lastName
-		case .emailAddress: return L10n.PersonaDetails.emailAddress
-		case .phoneNumber: return L10n.PersonaDetails.phoneNumber
+		case .givenName: return L10n.AuthorizedDapps.PersonaDetails.firstName
+		case .familyName: return L10n.AuthorizedDapps.PersonaDetails.lastName
+		case .emailAddress: return L10n.AuthorizedDapps.PersonaDetails.emailAddress
+		case .phoneNumber: return L10n.AuthorizedDapps.PersonaDetails.phoneNumber
 		}
 	}
 
