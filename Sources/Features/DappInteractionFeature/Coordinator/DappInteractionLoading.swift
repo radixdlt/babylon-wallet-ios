@@ -132,8 +132,8 @@ extension DappMetadata {
 		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
 		self.init(
-			name: items.first(where: { $0.key == "name" })?.value.asString,
-			description: items.first(where: { $0.key == "description" })?.value.asString,
+			name: items[.name]?.asString,
+			description: items[.description]?.asString,
 			origin: origin
 		)
 	}

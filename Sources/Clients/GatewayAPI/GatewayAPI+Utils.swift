@@ -48,60 +48,40 @@ extension GatewayAPI.StateEntityDetailsResponseItemDetails {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
-	public enum Key: String {
-		case name
-		case symbol
-		case description
-		case iconURL = "icon_url"
-		case dappDefinition = "dapp_definition"
-		case dappDefinitions = "dapp_definitions"
-		case claimedEntities = "claimed_entities"
-		case claimedWebsites = "claimed_websites"
-		case accountType = "account_type"
-	}
-
 	public var name: String? {
-		self[.name]?.asString
+		items[.name]?.asString
 	}
 
 	public var symbol: String? {
-		self[.symbol]?.asString
+		items[.symbol]?.asString
 	}
 
 	public var description: String? {
-		self[.description]?.asString
+		items[.description]?.asString
 	}
 
 	public var iconURL: URL? {
-		self[.iconURL]?.asString.flatMap(URL.init)
+		items[.iconURL]?.asString.flatMap(URL.init)
 	}
 
 	public var dappDefinition: String? {
-		self[.dappDefinition]?.asString
+		items[.dappDefinition]?.asString
 	}
 
 	public var dappDefinitions: [String]? {
-		self[.dappDefinitions]?.asStringCollection
+		items[.dappDefinitions]?.asStringCollection
 	}
 
 	public var claimedEntities: [String]? {
-		self[.claimedEntities]?.asStringCollection
+		items[.claimedEntities]?.asStringCollection
 	}
 
 	public var claimedWebsites: [URL]? {
-		self[.claimedWebsites]?.asStringCollection?.compactMap(URL.init)
+		items[.claimedWebsites]?.asStringCollection?.compactMap(URL.init)
 	}
 
 	public var accountType: AccountType? {
-		self[.accountType]?.asString.flatMap(AccountType.init)
-	}
-
-	public subscript(key: Key) -> GatewayAPI.EntityMetadataItemValue? {
-		items.first { $0.key == key.rawValue }?.value
-	}
-
-	public subscript(customKey key: String) -> GatewayAPI.EntityMetadataItemValue? {
-		items.first { $0.key == key }?.value
+		items[.accountType]?.asString.flatMap(AccountType.init)
 	}
 
 	public enum AccountType: String {
@@ -132,6 +112,28 @@ extension GatewayAPI.EntityMetadataCollection {
 				return "This dApp definition does not point back to the dApp definition that claims to be associated with it"
 			}
 		}
+	}
+}
+
+extension [GatewayAPI.EntityMetadataItem] {
+	public enum Key: String {
+		case name
+		case symbol
+		case description
+		case iconURL = "icon_url"
+		case dappDefinition = "dapp_definition"
+		case dappDefinitions = "dapp_definitions"
+		case claimedEntities = "claimed_entities"
+		case claimedWebsites = "claimed_websites"
+		case accountType = "account_type"
+	}
+
+	public subscript(key: Key) -> GatewayAPI.EntityMetadataItemValue? {
+		first { $0.key == key.rawValue }?.value
+	}
+
+	public subscript(customKey key: String) -> GatewayAPI.EntityMetadataItemValue? {
+		first { $0.key == key }?.value
 	}
 }
 
