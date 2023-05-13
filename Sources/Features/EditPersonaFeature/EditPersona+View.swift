@@ -97,7 +97,7 @@ extension EditPersona {
 							viewStore.output,
 							forAction: { viewStore.send(.saveButtonTapped($0)) }
 						) { action in
-							Button(L10n.EditPersona.save, action: action)
+							Button(L10n.Common.save, action: action)
 								.buttonStyle(.primaryRectangular)
 						}
 					}

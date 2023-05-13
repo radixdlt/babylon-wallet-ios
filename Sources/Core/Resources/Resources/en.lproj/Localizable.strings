@@ -14,6 +14,7 @@
 "common_somethingWentWrong" = "Something went wrong";
 "common_systemSettings" = "Settings";
 "common_confirm" = "Confirm";
+"common_save" = "Save";
 
 // MARK: 0.2 - Homepage
 
@@ -168,11 +169,11 @@
 "linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
 "linkedConnectors_removeConnectionAlert_message" = "You will no longer be able to connect your wallet to this device and browser combination";
 
-"linkedConnectors_cameraPermissionDeniedAlert_message" = "Camera access is required to link to connector.";
 "linkedConnectors_cameraPermissionDeniedAlert_title" = "Access Required";
+"linkedConnectors_cameraPermissionDeniedAlert_message" = "Camera access is required to link to connector.";
 
-"linkedConnectors_localNetworkPermissionDeniedAlert_message" = "Local Network access is required to link to connector.";
 "linkedConnectors_localNetworkPermissionDeniedAlert_title" = "Access Required";
+"linkedConnectors_localNetworkPermissionDeniedAlert_message" = "Local Network access is required to link to connector.";
 
 // MARK: 0.4.2 - Gateways
 
@@ -233,27 +234,28 @@
 
 // MARK: 0.4.4 - Personas
 
-"personas_createNewPersona" = "Create a New Persona";
-"personas_subtitle" = "Here are all of your current Personas in your Wallet.";
 "personas_title" = "Personas";
+"personas_subtitle" = "Here are all of your current Personas in your Wallet.";
 "personas_whatIsPersona" = "What is a Persona";
+"personas_createNewPersona" = "Create a New Persona";
 
-"editPersona_addAField_title" = "Add a Field";
-"editPersona_addAField_subtitle" = "Select from the following fields to add them to this persona.";
-"editPersona_addAField" = "Add a Field";
-"editPersona_addAField_add" = "Add";
+// Edit Persona should be its own section in Zeplin
 
-"editPersona_closeConfirmationDialog_discardChanges" = "Discard Changes";
-"editPersona_closeConfirmationDialog_keepEditing" = "Keep Editing";
-"editPersona_closeConfirmationDialog_message" = "Are you sure you want to discard changes to this persona?";
+"editPersona_requiredByDapp" = "Required by dApp";
+"editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
 
 "editPersona_error_blank" = "Label cannot be blank";
 "editPersona_error_invalidEmailAddress" = "Invalid email address";
 "editPersona_error_requiredByDapp" = "Required field for this dApp";
 
-"editPersona_requiredByDapp" = "Required by dApp";
-"editPersona_save" = "Save";
-"editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
+"editPersona_addAField" = "Add a Field";
+"editPersona_addAField_title" = "Add a Field";
+"editPersona_addAField_subtitle" = "Select from the following fields to add them to this persona.";
+"editPersona_addAField_add" = "Add";
+
+"editPersona_closeConfirmationDialog_discardChanges" = "Discard Changes";
+"editPersona_closeConfirmationDialog_keepEditing" = "Keep Editing";
+"editPersona_closeConfirmationDialog_message" = "Are you sure you want to discard changes to this persona?";
 
 // MARK: 0.4.5 - App Settings
 
@@ -281,7 +283,7 @@
 "importLegacyWallet_selectAccountsToImport_accountType" = "Type";
 "importLegacyWallet_selectAccountsToImport_derivationPath" = "Path";
 "importLegacyWallet_selectAccountsToImport_deselectAll" = "Deselect all";
-"importLegacyWallet_selectAccountsToImport_importManyAccounts" = "Import %@ accounts";
+"importLegacyWallet_selectAccountsToImport_importManyAccounts" = "Import %d accounts";
 "importLegacyWallet_selectAccountsToImport_importOneAcccount" = "Import 1 account";
 "importLegacyWallet_selectAccountsToImport_importZeroAccounts" = "Import accounts";
 "importLegacyWallet_selectAccountsToImport_name" = "Name";
@@ -289,11 +291,9 @@
 "importLegacyWallet_selectAccountsToImport_selectAllNonImported" = "Select all non imported";
 "importLegacyWallet_selectAccountsToImport_unnamed" = "Unnamed";
 
-"importLegacyWallet_completion_titleManyAccounts" = "Imported #%@ accounts.";
 "importLegacyWallet_completion_titleNoAccounts" = "No accounts imported.";
 "importLegacyWallet_completion_titleOneAccount" = "Imported 1 account.";
-
-// MARK: 0.5 - dApp Details
+"importLegacyWallet_completion_titleManyAccounts" = "Imported #%d accounts.";
 
 // MARK: 0.8 - Create Entity
 
@@ -326,8 +326,8 @@
 "createEntity_ledger_usedHeading" = "Used";
 
 "createEntity_nameNewEntity_explanation" = "This can be changed any time";
-"createEntity_nameNewEntity_ledgerTitle" = "Create with Ledger hardware wallet"; // NEW
-"createEntity_nameNewEntity_ledgerSubtitle" = "Requires you to sign transactions using your Ledger"; // NEW
+"createEntity_nameNewEntity_ledgerTitle" = "Create with Ledger hardware wallet";
+"createEntity_nameNewEntity_ledgerSubtitle" = "Requires you to sign transactions using your Ledger";
 
 "createPersona_completion_explanation" = "Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.";
 "createPersona_completion_subtitleFirst" = "You’ve created your first Persona.";
@@ -352,6 +352,18 @@
 
 // MARK: 0.9 - dApp Request
 
+// MARK: 0.9.1 - Login
+
+"dAppRequest_login_titleKnownDapp" = "Login Request";
+"dAppRequest_login_subtitleKnownDapp" = " is requesting you to login with a Persona.";
+"dAppRequest_login_titleNewDapp" = "New Login Request";
+"dAppRequest_login_subtitleNewDapp" = " is requesting you to login for the first time with a Persona.";
+"dAppRequest_login_choosePersona" = "Choose a Persona";
+"dAppRequest_login_lastLoginWasOn" = "Your last login was on %@";
+
+// MARK: 0.9.2 - Account Permission
+
+"dAppRequest_accountPermission_title" = "Account Permission";
 "dAppRequest_accountPermission_numberOfAccountsAtLeast" = "%d or more accounts";
 "dAppRequest_accountPermission_numberOfAccountsAtLeastZero" = "Any number of accounts";
 "dAppRequest_accountPermission_numberOfAccountsExactly" = "%d accounts";
@@ -359,69 +371,66 @@
 "dAppRequest_accountPermission_subtitlePart1" = " is requesting permission to ";
 "dAppRequest_accountPermission_subtitlePart2" = "always";
 "dAppRequest_accountPermission_subtitlePart3" = " be able to view account information when you login with this Persona.";
-"dAppRequest_accountPermission_title" = "Account Permission";
 "dAppRequest_accountPermission_updateInSettingsExplanation" = "You can update this permission in your settings at anA time.";
 
-"dAppRequest_chooseAccountsOneTime_subtitleAtLeast" = " is making a one-time request for at least %d accounts.";
-"dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne" = " is making a one-time request for at least 1 account.";
-"dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero" = " is making a one-time request for any number of accounts.";
-"dAppRequest_chooseAccountsOneTime_subtitleExactly" = " is making a one-time request for at least %d accounts.";
-"dAppRequest_chooseAccountsOneTime_subtitleExactlyOne" = " is making a one-time request for 1 account.";
-"dAppRequest_chooseAccountsOneTime_title" = "Account Request";
-
-"dAppRequest_chooseAccountsOngoing_subtitleAtLeast" = "Choose at least %d accounts you wish to use with ";
-"dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne" = "Choose at least 1 account you wish to use with ";
-"dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero" = "Choose any accounts you wish to use with ";
-"dAppRequest_chooseAccountsOngoing_subtitleExactly" = "Choose %d accounts you wish to use with ";
-"dAppRequest_chooseAccountsOngoing_subtitleExactlyOne" = "Choose 1 account you wish to use with ";
-"dAppRequest_chooseAccountsOngoing_title" = "Account Permission";
+// MARK: 0.9.3 - Choose Accounts
 
 "dAppRequest_chooseAccounts_createNewAccount" = "Create a New Account";
-"dAppRequest_chooseAccounts_successMessage" = "You are now connected to %@. You can change your preferences for this dApA in your Settings at any time.";
+"dAppRequest_chooseAccounts_successMessage" = "You are now connected to %s. You can change your preferences for this dApp in your Settings at any time.";
 "dAppRequest_chooseAccounts_successTitle" = "dApp Connection Successful";
 "dAppRequest_chooseAccounts_verificationErrorTitle" = "DApp error";
 
-"dAppRequest_completion_subtitle" = "Request from %@ complete";
-"dAppRequest_completion_title" = "Success";
+// MARK: 0.9.3.1 - Choose Accounts One Time
 
-"dAppRequest_login_choosePersona" = "Choose a Persona";
-"dAppRequest_login_lastLoginWasOn" = "Your last login was on %@";
-"dAppRequest_login_subtitleKnownDapp" = " is requesting you login with a Persona.";
-"dAppRequest_login_subtitleNewDapp" = " is requesting you login for the first time with a Persona.";
-"dAppRequest_login_titleKnownDapp" = "Login Request";
-"dAppRequest_login_titleNewDapp" = "New Login Request";
+"dAppRequest_chooseAccountsOneTime_title" = "Account Request";
+"dAppRequest_chooseAccountsOneTime_subtitleAtLeast" = " is making a one-time request for at least %d accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero" = " is making a one-time request for any number of accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne" = " is making a one-time request for at least 1 account.";
+"dAppRequest_chooseAccountsOneTime_subtitleExactly" = " is making a one-time request for at least %d accounts.";
+"dAppRequest_chooseAccountsOneTime_subtitleExactlyOne" = " is making a one-time request for 1 account.";
 
-"dAppRequest_metadataLoadingAlert_message" = "Danger! Bad dApp config or you\'re being spoofed!";
-"dAppRequest_metadataLoadingPrompt" = "Loading...";
-"dAppRequest_metadata_unknownName" = "Unknown dApp";
+// MARK: 0.9.3.2 - Choose Accounts Ongoing
 
-"dAppRequest_oneTimePersonalData_chooseDataToProvide" = "Choose the data to provide";
-"dAppRequest_oneTimePersonalData_subtitlePart1" = " is requesting that you provide some pieces of personal data ";
-"dAppRequest_oneTimePersonalData_subtitlePart2" = "just one time.";
-"dAppRequest_oneTimePersonalData_title" = "One-Time Data Request";
+"dAppRequest_chooseAccountsOngoing_title" = "Account Permission";
+"dAppRequest_chooseAccountsOngoing_subtitleAtLeast" = "Choose at least %d accounts you wish to use with ";
+"dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero" = "Choose any accounts you wish to use with ";
+"dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne" = "Choose at least 1 account you wish to use with ";
+"dAppRequest_chooseAccountsOngoing_subtitleExactly" = "Choose %d accounts you wish to use with ";
+"dAppRequest_chooseAccountsOngoing_subtitleExactlyOne" = "Choose 1 account you wish to use with ";
 
-"dAppRequest_personalDataBox_edit" = "Edit";
-"dAppRequest_personalDataBox_requiredInformation" = "Required information:";
+// MARK: 0.9.4 - Error and Persona update
 
+// MARK: 0.9.5 - Personal Data One time
+
+"dAppRequest_personalDataOneTime_title" = "One-Time Data Request";
+"dAppRequest_personalDataOneTime_chooseDataToProvide" = "Choose the data to provide";
+"dAppRequest_personalDataOneTime_subtitlePart1" = " is requesting that you provide some pieces of personal data ";
+"dAppRequest_personalDataOneTime_subtitlePart2" = "just one time.";
+
+// MARK: 0.9.6 - Personal Data Permission
+
+"dAppRequest_personalDataPermission_title" = "Personal Data Permission";
 "dAppRequest_personalDataPermission_subtitlePart1" = " is requesting permission to ";
 "dAppRequest_personalDataPermission_subtitlePart2" = "always";
-"dAppRequest_personalDataPermission_subtitlePart3" = " be able to view the following personal data when you login with thiA Persona.";
-"dAppRequest_personalDataPermission_title" = "Personal Data Permission";
+"dAppRequest_personalDataPermission_subtitlePart3" = " be able to view the following personal data when you login with this Persona.";
 "dAppRequest_personalDataPermission_updateInSettingsExplanation" = "You can update this permission in your settings at anA time.";
+
+// MARK: 0.9.X - ?
+
 "dAppRequest_requestMalformedAlert_message" = "Interaction received from dApp does not contain any valid requests.";
 "dAppRequest_requestPersonaNotFoundAlert_message" = "Persona specified by dApp does not exist.";
 "dAppRequest_requestWrongNetworkAlert_message" = "Request received from dApp for network %@, but you are currentlA connected to %@.";
 "dAppRequest_responseFailureAlert_message" = "Failed to send response payload back to dApp.";
 
-// MARK: 0.9.1 - Log in Requests
+"dAppRequest_completion_title" = "Success";
+"dAppRequest_completion_subtitle" = "Request from %s complete";
 
-// MARK: 0.9.2 - Account Permissions
+"dAppRequest_metadataLoadingAlert_message" = "Danger! Bad dApp config or you\'re being spoofed!";
+"dAppRequest_metadataLoadingPrompt" = "Loading...";
+"dAppRequest_metadata_unknownName" = "Unknown dApp";
 
-// MARK: 0.9.3 - One Time Request: Account
-
-// MARK: 0.9.4 - Error and Persona update
-
-// MARK: 0.9.5 - One time Request: Personal Data
+"dAppRequest_personalDataBox_edit" = "Edit";
+"dAppRequest_personalDataBox_requiredInformation" = "Required information:";
 
 // MARK: 1.0 - Transfer Flow
 
@@ -452,22 +461,21 @@
 "transactionReview_sendingToHeading" = "Sending to";
 "transactionReview_unknown" = "Unknown";
 "transactionReview_usingDappsHeading" = "Using dApps";
+"transactionReview_unknownComponents" = "%d Unknown Components";
 "transactionReview_withdrawalsHeading" = "Withdrawing";
 "transactionReview_xrdAmount" = "XRD %@";
 
+"transactionReview_networkFee_heading" = "Network Fee";
+"transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
+"transactionReview_networkFee_customizeButtonTitle" = "Customize";
+
+// MARK: 1.1.1 - Customize guarantees
+
+"transactionReview_guarantees_title" = "Customize Guarantees";
+"transactionReview_guarantees_subtitle" = "Protect yourself by setting guaranteed minimums for estimated deposits";
 "transactionReview_guarantees_applyButtonText" = "Apply";
 "transactionReview_guarantees_howDoGuaranteesWork" = "How do Guarantees work";
 "transactionReview_guarantees_setGuaranteedMinimum" = "Set guaranteed minimum %%";
-"transactionReview_guarantees_subtitle" = "Protect yourself by setting guaranteed minimums for estimated deposits";
-"transactionReview_guarantees_title" = "Customize Guarantees";
-
-"transactionReview_networkFee_congestedText" = "The network is currently congested. Add a tip to speed up your transfer.";
-"transactionReview_networkFee_customizeButtonTitle" = "Customize";
-"transactionReview_networkFee_heading" = "Network Fee";
-
-"transactionReview_usingDapps_unknownComponents" = "%d Unknown Components";
-
-// MARK: 1.1.1 - Customize guarantees
 
 // MARK: 1.1.2 - Transaction Status
 
@@ -501,15 +509,15 @@
 
 // MARK: Splash
 
+"splash_passcodeNotSetTitle" = "Passcode not set up";
+"splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
+
 "splash_incompatibleProfileVersionAlert_delete" = "Delete Wallet Data";
 "splash_incompatibleProfileVersionAlert_message" = "For this Preview wallet version, you must delete your wallet data to continue.";
 "splash_incompatibleProfileVersionAlert_title" = "Wallet Data is Incompatible";
 
-"splash_passcodeCheckFailedAlert_message" = "Passcode are not set up. Please update settings.";
 "splash_passcodeCheckFailedAlert_title" = "Warning";
-
-"splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
-"splash_passcodeNotSetTitle" = "Passcode not set up";
+"splash_passcodeCheckFailedAlert_message" = "Passcode is not set up. Please update settings.";
 
 // MARK: Error
 
@@ -569,7 +577,7 @@
 
 // MARK: Transaction Signing
 
+"transactionSigning_title" = "Approve Transaction";
 "transactionSigning_preparingTransaction" = "Preparing transaction...";
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning_signingAndSubmittingTransaction" = "Submitting transaction...";
-"transactionSigning_title" = "Approve Transaction";
