@@ -17,7 +17,7 @@ extension ConnectUsingSecrets {
 
 		init(state: ConnectUsingSecrets.State) {
 			nameOfConnection = state.nameOfConnection
-			screenState = state.isConnecting ? .loading(.global(text: L10n.NewConnection.linking)) : .enabled
+			screenState = state.isConnecting ? .loading(.global(text: L10n.LinkedConnectors.NewConnection.linking)) : .enabled
 			focusedField = state.focusedField
 			saveButtonControlState = {
 				if state.isConnecting {
@@ -45,12 +45,12 @@ extension ConnectUsingSecrets {
 			) { viewStore in
 				VStack(alignment: .leading) {
 					AppTextField(
-						placeholder: L10n.NewConnection.textFieldPlaceholder,
+						placeholder: L10n.LinkedConnectors.NewConnection.textFieldPlaceholder,
 						text: viewStore.binding(
 							get: \.nameOfConnection,
 							send: { .nameOfConnectionChanged($0) }
 						),
-						hint: .info(L10n.NewConnection.textFieldHint),
+						hint: .info(L10n.LinkedConnectors.NewConnection.textFieldHint),
 						focus: .on(
 							.connectionName,
 							binding: viewStore.binding(
@@ -65,7 +65,7 @@ extension ConnectUsingSecrets {
 
 					Spacer()
 
-					Button(L10n.NewConnection.saveLinkButtonTitle) {
+					Button(L10n.LinkedConnectors.NewConnection.saveLinkButtonTitle) {
 						viewStore.send(.confirmNameButtonTapped)
 					}
 					.controlState(viewStore.saveButtonControlState)

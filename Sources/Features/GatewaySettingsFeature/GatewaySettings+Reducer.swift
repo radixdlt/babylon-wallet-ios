@@ -280,7 +280,7 @@ extension AlertState<GatewaySettings.ViewAction.RemoveGatewayAction> {
 				TextState(L10n.Common.cancel)
 			}
 			ButtonState(action: .removeButtonTapped(row)) {
-				TextState(L10n.Gateways.RemoveGatewayAlert.remove)
+				TextState(L10n.Common.remove)
 			}
 		} message: {
 			TextState(L10n.Gateways.RemoveGatewayAlert.message)

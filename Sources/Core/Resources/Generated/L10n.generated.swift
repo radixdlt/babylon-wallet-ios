@@ -229,6 +229,24 @@ public enum L10n {
     public static let title = L10n.tr("Localizable", "authorizedDapps_title", fallback: "Authorized dApps")
     /// What is a dApp
     public static let whatIsDapp = L10n.tr("Localizable", "authorizedDapps_whatIsDapp", fallback: "What is a dApp")
+    public enum DAppDetails {
+      /// dApp Definition
+      public static let dAppDefinition = L10n.tr("Localizable", "authorizedDapps_dAppDetails_dAppDefinition", fallback: "dApp Definition")
+      /// Associated NFTs
+      public static let nfts = L10n.tr("Localizable", "authorizedDapps_dAppDetails_nfts", fallback: "Associated NFTs")
+      /// Associated Tokens
+      public static let tokens = L10n.tr("Localizable", "authorizedDapps_dAppDetails_tokens", fallback: "Associated Tokens")
+      /// Website
+      public static let website = L10n.tr("Localizable", "authorizedDapps_dAppDetails_website", fallback: "Website")
+    }
+    public enum ForgetDappAlert {
+      /// Forget
+      public static let forget = L10n.tr("Localizable", "authorizedDapps_forgetDappAlert_forget", fallback: "Forget")
+      /// Do you really want to forget this dApp?
+      public static let message = L10n.tr("Localizable", "authorizedDapps_forgetDappAlert_message", fallback: "Do you really want to forget this dApp?")
+      /// Forget dApp?
+      public static let title = L10n.tr("Localizable", "authorizedDapps_forgetDappAlert_title", fallback: "Forget dApp?")
+    }
   }
   public enum Backup {
     /// Back up is turned off
@@ -289,6 +307,8 @@ public enum L10n {
     public static let ok = L10n.tr("Localizable", "common_ok", fallback: "OK")
     /// Persona
     public static let persona = L10n.tr("Localizable", "common_persona", fallback: "Persona")
+    /// Remove
+    public static let remove = L10n.tr("Localizable", "common_remove", fallback: "Remove")
     /// Retry
     public static let retry = L10n.tr("Localizable", "common_retry", fallback: "Retry")
     /// Something went wrong
@@ -405,34 +425,18 @@ public enum L10n {
     }
   }
   public enum DAppDetails {
-    /// dApp Definition
-    public static let dAppDefinition = L10n.tr("Localizable", "dAppDetails_dAppDefinition", fallback: "dApp Definition")
     /// This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.
     public static let disconnectDappPrompt = L10n.tr("Localizable", "dAppDetails_disconnectDappPrompt", fallback: "This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.")
     /// Forget this dApp
     public static let forgetThisDapp = L10n.tr("Localizable", "dAppDetails_forgetThisDapp", fallback: "Forget this dApp")
     /// Missing description
     public static let missingDescription = L10n.tr("Localizable", "dAppDetails_missingDescription", fallback: "Missing description")
-    /// Associated NFTs
-    public static let nfts = L10n.tr("Localizable", "dAppDetails_nfts", fallback: "Associated NFTs")
     /// No Personas have been used to connect to this dApp.
     public static let noPersonasHeading = L10n.tr("Localizable", "dAppDetails_noPersonasHeading", fallback: "No Personas have been used to connect to this dApp.")
     /// Here are the Personas that you have previously used to connect to this dApp.
     public static let personasHeading = L10n.tr("Localizable", "dAppDetails_personasHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
-    /// Associated Tokens
-    public static let tokens = L10n.tr("Localizable", "dAppDetails_tokens", fallback: "Associated Tokens")
     /// Unknown name
     public static let unknownTokenName = L10n.tr("Localizable", "dAppDetails_unknownTokenName", fallback: "Unknown name")
-    /// Website
-    public static let website = L10n.tr("Localizable", "dAppDetails_website", fallback: "Website")
-    public enum ForgetDappAlert {
-      /// Forget
-      public static let forget = L10n.tr("Localizable", "dAppDetails_forgetDappAlert_forget", fallback: "Forget")
-      /// Do you really want to forget this dApp?
-      public static let message = L10n.tr("Localizable", "dAppDetails_forgetDappAlert_message", fallback: "Do you really want to forget this dApp?")
-      /// Forget dApp?
-      public static let title = L10n.tr("Localizable", "dAppDetails_forgetDappAlert_title", fallback: "Forget dApp?")
-    }
   }
   public enum DAppRequest {
     /// Loading...
@@ -696,8 +700,6 @@ public enum L10n {
     public enum RemoveGatewayAlert {
       /// You will no longer be able to connect to this Gateway
       public static let message = L10n.tr("Localizable", "gateways_removeGatewayAlert_message", fallback: "You will no longer be able to connect to this Gateway")
-      /// Remove
-      public static let remove = L10n.tr("Localizable", "gateways_removeGatewayAlert_remove", fallback: "Remove")
       /// Remove Gateway
       public static let title = L10n.tr("Localizable", "gateways_removeGatewayAlert_title", fallback: "Remove Gateway")
     }
@@ -813,45 +815,49 @@ public enum L10n {
     public static let importProfile = L10n.tr("Localizable", "importProfile_importProfile", fallback: "Import Radix Wallet backup")
   }
   public enum LinkedConnectors {
+    /// Last connected %s
+    public static func lastConnected(_ p1: UnsafePointer<CChar>) -> String {
+      return L10n.tr("Localizable", "linkedConnectors_lastConnected", p1, fallback: "Last connected %s")
+    }
     /// Link New Connector
     public static let linkNewConnector = L10n.tr("Localizable", "linkedConnectors_linkNewConnector", fallback: "Link New Connector")
     /// Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.
     public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.")
     /// Linked Connectors
     public static let title = L10n.tr("Localizable", "linkedConnectors_title", fallback: "Linked Connectors")
+    public enum CameraPermissionDeniedAlert {
+      /// Camera access is required to link to connector.
+      public static let message = L10n.tr("Localizable", "linkedConnectors_cameraPermissionDeniedAlert_message", fallback: "Camera access is required to link to connector.")
+      /// Access Required
+      public static let title = L10n.tr("Localizable", "linkedConnectors_cameraPermissionDeniedAlert_title", fallback: "Access Required")
+    }
+    public enum LocalNetworkPermissionDeniedAlert {
+      /// Local Network access is required to link to connector.
+      public static let message = L10n.tr("Localizable", "linkedConnectors_localNetworkPermissionDeniedAlert_message", fallback: "Local Network access is required to link to connector.")
+      /// Access Required
+      public static let title = L10n.tr("Localizable", "linkedConnectors_localNetworkPermissionDeniedAlert_title", fallback: "Access Required")
+    }
+    public enum NewConnection {
+      /// Unnamed
+      public static let connectionDefaultName = L10n.tr("Localizable", "linkedConnectors_newConnection_connectionDefaultName", fallback: "Unnamed")
+      /// Linking...
+      public static let linking = L10n.tr("Localizable", "linkedConnectors_newConnection_linking", fallback: "Linking...")
+      /// Save Link
+      public static let saveLinkButtonTitle = L10n.tr("Localizable", "linkedConnectors_newConnection_saveLinkButtonTitle", fallback: "Save Link")
+      /// Scan your QR code to link your wallet with a browser extension
+      public static let subtitle = L10n.tr("Localizable", "linkedConnectors_newConnection_subtitle", fallback: "Scan your QR code to link your wallet with a browser extension")
+      /// Name this Connector, e.g. "Chrome on Macbook Pro"
+      public static let textFieldHint = L10n.tr("Localizable", "linkedConnectors_newConnection_textFieldHint", fallback: "Name this Connector, e.g. \"Chrome on Macbook Pro\"")
+      /// Name of Connector
+      public static let textFieldPlaceholder = L10n.tr("Localizable", "linkedConnectors_newConnection_textFieldPlaceholder", fallback: "Name of Connector")
+      /// Link New Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link New Connector")
+    }
     public enum RemoveConnectionAlert {
       /// You will no longer be able to connect your wallet to this device and browser combination
       public static let message = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_message", fallback: "You will no longer be able to connect your wallet to this device and browser combination")
       /// Remove Connection
       public static let title = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_title", fallback: "Remove Connection")
-    }
-  }
-  public enum NewConnection {
-    /// Unnamed
-    public static let connectionDefaultName = L10n.tr("Localizable", "newConnection_connectionDefaultName", fallback: "Unnamed")
-    /// Linking...
-    public static let linking = L10n.tr("Localizable", "newConnection_linking", fallback: "Linking...")
-    /// Save Link
-    public static let saveLinkButtonTitle = L10n.tr("Localizable", "newConnection_saveLinkButtonTitle", fallback: "Save Link")
-    /// Scan your QR code to link your wallet with a browser extension
-    public static let subtitle = L10n.tr("Localizable", "newConnection_subtitle", fallback: "Scan your QR code to link your wallet with a browser extension")
-    /// Name this Connector, e.g. "Chrome on Macbook Pro"
-    public static let textFieldHint = L10n.tr("Localizable", "newConnection_textFieldHint", fallback: "Name this Connector, e.g. \"Chrome on Macbook Pro\"")
-    /// Name of Connector
-    public static let textFieldPlaceholder = L10n.tr("Localizable", "newConnection_textFieldPlaceholder", fallback: "Name of Connector")
-    /// Link to Connector
-    public static let title = L10n.tr("Localizable", "newConnection_title", fallback: "Link to Connector")
-    public enum CameraPermissionDeniedAlert {
-      /// Camera access is required to link to connector.
-      public static let message = L10n.tr("Localizable", "newConnection_cameraPermissionDeniedAlert_message", fallback: "Camera access is required to link to connector.")
-      /// Access Required
-      public static let title = L10n.tr("Localizable", "newConnection_cameraPermissionDeniedAlert_title", fallback: "Access Required")
-    }
-    public enum LocalNetworkPermissionDeniedAlert {
-      /// Local Network access is required to link to connector.
-      public static let message = L10n.tr("Localizable", "newConnection_localNetworkPermissionDeniedAlert_message", fallback: "Local Network access is required to link to connector.")
-      /// Access Required
-      public static let title = L10n.tr("Localizable", "newConnection_localNetworkPermissionDeniedAlert_title", fallback: "Access Required")
     }
   }
   public enum Onboarding {
@@ -990,10 +996,20 @@ public enum L10n {
   }
   public enum Transaction {
     public enum Status {
-      /// Completing Transaction…
-      public static let completing = L10n.tr("Localizable", "transaction_status_completing", fallback: "Completing Transaction…")
-      /// Your transaction was successful
-      public static let successful = L10n.tr("Localizable", "transaction_status_successful", fallback: "Your transaction was successful")
+      public enum Completing {
+        /// Completing Transaction…
+        public static let text = L10n.tr("Localizable", "transaction_status_completing_text", fallback: "Completing Transaction…")
+      }
+      public enum Failure {
+        /// Something went wrong
+        public static let title = L10n.tr("Localizable", "transaction_status_failure_title", fallback: "Something went wrong")
+      }
+      public enum Success {
+        /// Your transaction was successful
+        public static let text = L10n.tr("Localizable", "transaction_status_success_text", fallback: "Your transaction was successful")
+        /// Success
+        public static let title = L10n.tr("Localizable", "transaction_status_success_title", fallback: "Success")
+      }
     }
   }
   public enum TransactionReview {
@@ -1017,8 +1033,8 @@ public enum L10n {
     public static let rawTransactionTitle = L10n.tr("Localizable", "transactionReview_rawTransactionTitle", fallback: "Raw Transaction")
     /// Sending to
     public static let sendingToHeading = L10n.tr("Localizable", "transactionReview_sendingToHeading", fallback: "Sending to")
-    /// Review Your Transaction
-    public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Your Transaction")
+    /// Review Transaction
+    public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Transaction")
     /// Unknown
     public static let unknown = L10n.tr("Localizable", "transactionReview_unknown", fallback: "Unknown")
     /// Using dApps

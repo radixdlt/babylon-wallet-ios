@@ -10,6 +10,7 @@
 "common_persona" = "Persona";
 "common_history" = "History";
 "common_retry" = "Retry";
+"common_remove" = "Remove";
 "common_somethingWentWrong" = "Something went wrong";
 "common_systemSettings" = "Settings";
 
@@ -127,7 +128,7 @@
 "accountSettings_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
 "accountSettings_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
 
-// MARK: 0.4 - AppSettings
+// MARK: 0.4 - Settings
 
 "settings_title" = "Settings";
 "settings_linkedConnectors" = "Linked Connectors";
@@ -151,31 +152,46 @@
 
 "linkedConnectors_title" = "Linked Connectors";
 "linkedConnectors_subtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
-
+"linkedConnectors_lastConnected" = "Last connected %s"; // ADD
 "linkedConnectors_linkNewConnector" = "Link New Connector";
+
+"linkedConnectors_newConnection_title" = "Link New Connector";
+"linkedConnectors_newConnection_subtitle" = "Scan your QR code to link your wallet with a browser extension";
+
+"linkedConnectors_newConnection_connectionDefaultName" = "Unnamed";
+"linkedConnectors_newConnection_linking" = "Linking...";
+"linkedConnectors_newConnection_textFieldPlaceholder" = "Name of Connector";
+"linkedConnectors_newConnection_textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
+"linkedConnectors_newConnection_saveLinkButtonTitle" = "Save Link";
 
 "linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
 "linkedConnectors_removeConnectionAlert_message" = "You will no longer be able to connect your wallet to this device and browser combination";
 
+"linkedConnectors_cameraPermissionDeniedAlert_message" = "Camera access is required to link to connector.";
+"linkedConnectors_cameraPermissionDeniedAlert_title" = "Access Required";
+
+"linkedConnectors_localNetworkPermissionDeniedAlert_message" = "Local Network access is required to link to connector.";
+"linkedConnectors_localNetworkPermissionDeniedAlert_title" = "Access Required";
+
 // MARK: 0.4.2 - Gateways
 
+"gateways_title" = "Gateways";
+"gateways_subtitle" = "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.";
+"gateways_whatIsAGateway" = "What is a Gateway";
+"gateways_rcNetGateway" = "RCnet Gateway";
+"gateways_addNewGatewayButtonTitle" = "Add New Gateway";
+
+"gateways_addNewGateway_title" = "Add New Gateway";
+"gateways_addNewGateway_subtitle" = "Enter a Gateway URL";
+"gateways_addNewGateway_textFieldPlaceholder" = "Enter full URL";
 "gateways_addNewGateway_addGatewayButtonTitle" = "Add Gateway";
+
 "gateways_addNewGateway_errorDuplicateURL" = "This url is already added";
 "gateways_addNewGateway_errorNoGatewayFound" = "No Gateway found at specified URL";
 "gateways_addNewGateway_establishingConnectionErrorMessage" = "There was an error in establishing a connection";
-"gateways_addNewGateway_subtitle" = "Enter a Gateway URL";
-"gateways_addNewGateway_textFieldPlaceholder" = "Enter full URL";
-"gateways_addNewGateway_title" = "Add New Gateway";
 
-"gateways_removeGatewayAlert_message" = "You will no longer be able to connect to this Gateway";
-"gateways_removeGatewayAlert_remove" = "Remove";
 "gateways_removeGatewayAlert_title" = "Remove Gateway";
-
-"gateways_addNewGatewayButtonTitle" = "Add New Gateway";
-"gateways_rcNetGateway" = "RCnet Gateway";
-"gateways_subtitle" = "Choose the gateway your wallet will use to connect. Only change this if you know what you’re doing.";
-"gateways_title" = "Gateways";
-"gateways_whatIsAGateway" = "What is a Gateway";
+"gateways_removeGatewayAlert_message" = "You will no longer be able to connect to this Gateway";
 
 // MARK: 0.4.3 - Authorized dApps
 
@@ -183,19 +199,23 @@
 "authorizedDapps_subtitle" = "Here are all the dApps that you have logged into using this Radix Wallet.";
 "authorizedDapps_whatIsDapp" = "What is a dApp";
 
-"dAppDetails_forgetDappAlert_forget" = "Forget";
-"dAppDetails_forgetDappAlert_message" = "Do you really want to forget this dApp?";
-"dAppDetails_forgetDappAlert_title" = "Forget dApp?";
+"authorizedDapps_dAppDetails_dAppDefinition" = "dApp Definition";
+"authorizedDapps_dAppDetails_website" = "Website";
+"authorizedDapps_dAppDetails_tokens" = "Associated Tokens";
+"authorizedDapps_dAppDetails_nfts" = "Associated NFTs";
+
+
+"authorizedDapps_forgetDappAlert_title" = "Forget dApp?";
+"authorizedDapps_forgetDappAlert_message" = "Do you really want to forget this dApp?";
+"authorizedDapps_forgetDappAlert_forget" = "Forget";
+
+
 
 "dAppDetails_disconnectDappPrompt" = "This dApp will no longer have any authorization to see any of your persona data or accounts. You will need to choose a persona to login with if you connect to this dApp again.";
 
 "dAppDetails_forgetThisDapp" = "Forget this dApp";
-"dAppDetails_nfts" = "Associated NFTs";
 "dAppDetails_noPersonasHeading" = "No Personas have been used to connect to this dApp.";
 "dAppDetails_personasHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
-"dAppDetails_tokens" = "Associated Tokens";
-"dAppDetails_website" = "Website";
-"dAppDetails_dAppDefinition" = "dApp Definition";
 "dAppDetails_missingDescription" = "Missing description";
 "dAppDetails_unknownTokenName" = "Unknown name";
 
@@ -486,20 +506,6 @@
 // MARK: Import Profile
 
 "importProfile_importProfile" = "Import Radix Wallet backup";
-
-// MARK: New Connection
-
-"newConnection_cameraPermissionDeniedAlert_message" = "Camera access is required to link to connector.";
-"newConnection_cameraPermissionDeniedAlert_title" = "Access Required";
-"newConnection_connectionDefaultName" = "Unnamed";
-"newConnection_linking" = "Linking...";
-"newConnection_localNetworkPermissionDeniedAlert_message" = "Local Network access is required to link to connector.";
-"newConnection_localNetworkPermissionDeniedAlert_title" = "Access Required";
-"newConnection_saveLinkButtonTitle" = "Save Link";
-"newConnection_subtitle" = "Scan your QR code to link your wallet with a browser extension";
-"newConnection_textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
-"newConnection_textFieldPlaceholder" = "Name of Connector";
-"newConnection_title" = "Link to Connector";
 
 // MARK: Splash
 
