@@ -7,26 +7,18 @@ import PersonasClient
 // MARK: - Permission.View
 extension OneTimePersonaData {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
+		let subtitle: String
 		let shouldShowChooseDataToProvideTitle: Bool
 		let availablePersonas: IdentifiedArrayOf<PersonaDataPermissionBox.State>
 		let selectedPersona: PersonaDataPermissionBox.State?
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: OneTimePersonaData.State) {
+			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.PersonalDataOneTime.title
-			self.subtitle = {
-				let normalColor = Color.app.gray2
-				let highlightColor = Color.app.gray1
-
-				let dAppName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
-				let explanation1 = AttributedString(L10n.DAppRequest.PersonalDataOneTime.subtitlePart1, foregroundColor: normalColor)
-				let explanation2 = AttributedString(L10n.DAppRequest.PersonalDataOneTime.subtitlePart2, foregroundColor: highlightColor)
-
-				return dAppName + explanation1 + explanation2
-			}()
-
+			self.subtitle = L10n.DAppRequest.PersonalDataOneTime.subtitle(state.dappMetadata.name.rawValue)
 			self.shouldShowChooseDataToProvideTitle = !state.personas.isEmpty
 			self.availablePersonas = state.personas
 			self.selectedPersona = state.selectedPersona
@@ -57,7 +49,7 @@ extension OneTimePersonaData {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
@@ -120,7 +112,7 @@ extension OneTimePersonaData {
 					content: { CreatePersonaCoordinator.View(store: $0) }
 				)
 				.onAppear { viewStore.send(.appeared) }
-				.task { await viewStore.send(.task) }
+				.task { viewStore.send(.task) }
 			}
 		}
 	}

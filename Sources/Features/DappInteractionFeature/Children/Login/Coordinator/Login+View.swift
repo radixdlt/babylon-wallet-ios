@@ -4,8 +4,9 @@ import FeaturePrelude
 // MARK: - LoginRequest.View
 extension Login {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
+		let subtitle: String
 		let showChoosePersonaTitle: Bool
 		let availablePersonas: IdentifiedArrayOf<PersonaRow.State>
 		let selectedPersona: PersonaRow.State?
@@ -18,21 +19,16 @@ extension Login {
 		init(state: Login.State) {
 			let isKnownDapp = state.authorizedPersona != nil
 
+			self.thumbnail = state.dappMetadata.thumbnail
+
 			self.title = isKnownDapp
 				? L10n.DAppRequest.Login.titleKnownDapp
 				: L10n.DAppRequest.Login.titleNewDapp
 
-			self.subtitle = {
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
-
-				let explanationText = isKnownDapp
-					? L10n.DAppRequest.Login.subtitleKnownDapp
-					: L10n.DAppRequest.Login.subtitleNewDapp
-
-				let explanation = AttributedString(explanationText, foregroundColor: .app.gray2)
-
-				return dappName + explanation
-			}()
+			let dAppName = state.dappMetadata.name.rawValue
+			self.subtitle = isKnownDapp
+				? L10n.DAppRequest.Login.subtitleKnownDapp(dAppName)
+				: L10n.DAppRequest.Login.subtitleNewDapp(dAppName)
 
 			self.showChoosePersonaTitle = !state.personas.isEmpty
 
@@ -60,7 +56,7 @@ extension Login {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)

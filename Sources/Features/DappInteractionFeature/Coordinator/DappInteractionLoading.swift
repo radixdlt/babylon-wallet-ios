@@ -133,6 +133,7 @@ extension DappMetadata {
 	) {
 		self.init(
 			name: items[.name]?.asString,
+			thumbnail: items[.iconURL]?.asString.flatMap(URL.init),
 			description: items[.description]?.asString,
 			origin: origin
 		)

@@ -4,23 +4,15 @@ import FeaturePrelude
 // MARK: - Permission.View
 extension PersonaDataPermission {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
+		let subtitle: String
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: PersonaDataPermission.State) {
+			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.PersonalDataPermission.title
-			self.subtitle = {
-				let normalColor = Color.app.gray2
-				let highlightColor = Color.app.gray1
-
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
-				let explanation1 = AttributedString(L10n.DAppRequest.AccountPermission.subtitlePart1, foregroundColor: normalColor)
-				let explanation2 = AttributedString(L10n.DAppRequest.AccountPermission.subtitlePart2, foregroundColor: highlightColor)
-				let explanation3 = AttributedString(L10n.DAppRequest.AccountPermission.subtitlePart3, foregroundColor: normalColor)
-
-				return dappName + explanation1 + explanation2 + explanation3
-			}()
+			self.subtitle = L10n.DAppRequest.PersonalDataPermission.subtitle(state.dappMetadata.name.rawValue)
 			self.output = {
 				guard let persona = state.persona else {
 					return nil
@@ -48,7 +40,7 @@ extension PersonaDataPermission {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)

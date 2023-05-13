@@ -494,12 +494,10 @@ public enum L10n {
       }
       /// 1 account
       public static let numberOfAccountsExactlyOne = L10n.tr("Localizable", "dAppRequest_accountPermission_numberOfAccountsExactlyOne", fallback: "1 account")
-      ///  is requesting permission to 
-      public static let subtitlePart1 = L10n.tr("Localizable", "dAppRequest_accountPermission_subtitlePart1", fallback: " is requesting permission to ")
-      /// always
-      public static let subtitlePart2 = L10n.tr("Localizable", "dAppRequest_accountPermission_subtitlePart2", fallback: "always")
-      ///  be able to view account information when you login with this Persona.
-      public static let subtitlePart3 = L10n.tr("Localizable", "dAppRequest_accountPermission_subtitlePart3", fallback: " be able to view account information when you login with this Persona.")
+      /// *%s* is requesting permission to *always* be able to view account information when you login with this Persona.
+      public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_accountPermission_subtitle", p1, fallback: "*%s* is requesting permission to *always* be able to view account information when you login with this Persona.")
+      }
       /// Account Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_accountPermission_title", fallback: "Account Permission")
       /// You can update this permission in your settings at anA time.
@@ -518,38 +516,50 @@ public enum L10n {
       public static let verificationErrorTitle = L10n.tr("Localizable", "dAppRequest_chooseAccounts_verificationErrorTitle", fallback: "DApp error")
     }
     public enum ChooseAccountsOneTime {
-      ///  is making a one-time request for at least %d accounts.
-      public static func subtitleAtLeast(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeast", p1, fallback: " is making a one-time request for at least %d accounts.")
+      /// *%s* is making a one-time request for at least %d accounts.
+      public static func subtitleAtLeast(_ p1: UnsafePointer<CChar>, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeast", p1, p2, fallback: "*%s* is making a one-time request for at least %d accounts.")
       }
-      ///  is making a one-time request for at least 1 account.
-      public static let subtitleAtLeastOne = L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne", fallback: " is making a one-time request for at least 1 account.")
-      ///  is making a one-time request for any number of accounts.
-      public static let subtitleAtLeastZero = L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", fallback: " is making a one-time request for any number of accounts.")
-      ///  is making a one-time request for at least %d accounts.
-      public static func subtitleExactly(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", p1, fallback: " is making a one-time request for at least %d accounts.")
+      /// *%s* is making a one-time request for at least 1 account.
+      public static func subtitleAtLeastOne(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastOne", p1, fallback: "*%s* is making a one-time request for at least 1 account.")
       }
-      ///  is making a one-time request for 1 account.
-      public static let subtitleExactlyOne = L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne", fallback: " is making a one-time request for 1 account.")
+      /// *%s* is making a one-time request for any number of accounts.
+      public static func subtitleAtLeastZero(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero", p1, fallback: "*%s* is making a one-time request for any number of accounts.")
+      }
+      /// *%s* is making a one-time request for at least %d accounts.
+      public static func subtitleExactly(_ p1: UnsafePointer<CChar>, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactly", p1, p2, fallback: "*%s* is making a one-time request for at least %d accounts.")
+      }
+      /// *%s* is making a one-time request for 1 account.
+      public static func subtitleExactlyOne(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_subtitleExactlyOne", p1, fallback: "*%s* is making a one-time request for 1 account.")
+      }
       /// Account Request
       public static let title = L10n.tr("Localizable", "dAppRequest_chooseAccountsOneTime_title", fallback: "Account Request")
     }
     public enum ChooseAccountsOngoing {
-      /// Choose at least %d accounts you wish to use with 
-      public static func subtitleAtLeast(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeast", p1, fallback: "Choose at least %d accounts you wish to use with ")
+      /// Choose at least %d accounts you wish to use with *%s*.
+      public static func subtitleAtLeast(_ p1: Int, _ p2: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeast", p1, p2, fallback: "Choose at least %d accounts you wish to use with *%s*.")
       }
-      /// Choose at least 1 account you wish to use with 
-      public static let subtitleAtLeastOne = L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne", fallback: "Choose at least 1 account you wish to use with ")
-      /// Choose any accounts you wish to use with 
-      public static let subtitleAtLeastZero = L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero", fallback: "Choose any accounts you wish to use with ")
-      /// Choose %d accounts you wish to use with 
-      public static func subtitleExactly(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactly", p1, fallback: "Choose %d accounts you wish to use with ")
+      /// Choose at least 1 account you wish to use with *%s*.
+      public static func subtitleAtLeastOne(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastOne", p1, fallback: "Choose at least 1 account you wish to use with *%s*.")
       }
-      /// Choose 1 account you wish to use with 
-      public static let subtitleExactlyOne = L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactlyOne", fallback: "Choose 1 account you wish to use with ")
+      /// Choose any accounts you wish to use with *%s*.
+      public static func subtitleAtLeastZero(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleAtLeastZero", p1, fallback: "Choose any accounts you wish to use with *%s*.")
+      }
+      /// Choose %d accounts you wish to use with *%s*.
+      public static func subtitleExactly(_ p1: Int, _ p2: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactly", p1, p2, fallback: "Choose %d accounts you wish to use with *%s*.")
+      }
+      /// Choose 1 account you wish to use with *%s*.
+      public static func subtitleExactlyOne(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_subtitleExactlyOne", p1, fallback: "Choose 1 account you wish to use with *%s*.")
+      }
       /// Account Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_chooseAccountsOngoing_title", fallback: "Account Permission")
     }
@@ -568,10 +578,14 @@ public enum L10n {
       public static func lastLoginWasOn(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_login_lastLoginWasOn", String(describing: p1), fallback: "Your last login was on %@")
       }
-      ///  is requesting you to login with a Persona.
-      public static let subtitleKnownDapp = L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", fallback: " is requesting you to login with a Persona.")
-      ///  is requesting you to login for the first time with a Persona.
-      public static let subtitleNewDapp = L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", fallback: " is requesting you to login for the first time with a Persona.")
+      /// %s is requesting you to login with a Persona.
+      public static func subtitleKnownDapp(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", p1, fallback: "%s is requesting you to login with a Persona.")
+      }
+      /// %s  is requesting you to login for the first time with a Persona.
+      public static func subtitleNewDapp(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", p1, fallback: "%s  is requesting you to login for the first time with a Persona.")
+      }
       /// Login Request
       public static let titleKnownDapp = L10n.tr("Localizable", "dAppRequest_login_titleKnownDapp", fallback: "Login Request")
       /// New Login Request
@@ -594,14 +608,18 @@ public enum L10n {
     public enum PersonalDataOneTime {
       /// Choose the data to provide
       public static let chooseDataToProvide = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_chooseDataToProvide", fallback: "Choose the data to provide")
-      ///  is requesting that you provide some pieces of personal data 
-      public static let subtitlePart1 = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitlePart1", fallback: " is requesting that you provide some pieces of personal data ")
-      /// just one time.
-      public static let subtitlePart2 = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitlePart2", fallback: "just one time.")
+      /// *%s* is requesting that you provide some pieces of personal data *just one time*
+      public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitle", p1, fallback: "*%s* is requesting that you provide some pieces of personal data *just one time*")
+      }
       /// One-Time Data Request
       public static let title = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_title", fallback: "One-Time Data Request")
     }
     public enum PersonalDataPermission {
+      /// *%s* is requesting permission to *always* be able to view the following personal data when you login with this Persona.
+      public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitle", p1, fallback: "*%s* is requesting permission to *always* be able to view the following personal data when you login with this Persona.")
+      }
       ///  is requesting permission to 
       public static let subtitlePart1 = L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitlePart1", fallback: " is requesting permission to ")
       /// always

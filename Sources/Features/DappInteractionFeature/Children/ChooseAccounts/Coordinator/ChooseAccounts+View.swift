@@ -4,63 +4,17 @@ import FeaturePrelude
 // MARK: - ChooseAccounts.View
 extension ChooseAccounts {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
+		let subtitle: String
 		let availableAccounts: [ChooseAccountsRow.State]
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [ChooseAccountsRow.State]?
 
 		init(state: ChooseAccounts.State) {
-			switch state.accessKind {
-			case .ongoing:
-				self.title = L10n.DAppRequest.ChooseAccountsOngoing.title
-			case .oneTime:
-				self.title = L10n.DAppRequest.ChooseAccountsOneTime.title
-			}
-
-			self.subtitle = {
-				let message: String = {
-					switch state.accessKind {
-					case .ongoing:
-						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
-						case (.atLeast, 0):
-							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastZero
-						case (.atLeast, 1):
-							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastOne
-						case let (.atLeast, number):
-							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeast(number)
-						case (.exactly, 1):
-							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactlyOne
-						case let (.exactly, number):
-							return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactly(number)
-						}
-					case .oneTime:
-						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
-						case (.atLeast, 0):
-							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastZero
-						case (.atLeast, 1):
-							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastOne
-						case let (.atLeast, number):
-							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeast(number)
-						case (.exactly, 1):
-							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactlyOne
-						case let (.exactly, number):
-							return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactly(number)
-						}
-					}
-				}()
-
-				let attributedMessage = AttributedString(message, foregroundColor: .app.gray2)
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
-				let dot = AttributedString(".", foregroundColor: .app.gray2)
-
-				switch state.accessKind {
-				case .ongoing:
-					return attributedMessage + dappName + dot
-				case .oneTime:
-					return dappName + attributedMessage
-				}
-			}()
+			self.thumbnail = state.dappMetadata.thumbnail
+			self.title = state.title
+			self.subtitle = state.subtitle
 
 			let selectionRequirement = SelectionRequirement(state.numberOfAccounts)
 
@@ -88,7 +42,7 @@ extension ChooseAccounts {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
@@ -137,6 +91,50 @@ extension ChooseAccounts {
 					),
 					content: { CreateAccountCoordinator.View(store: $0) }
 				)
+			}
+		}
+	}
+}
+
+extension ChooseAccounts.State {
+	var title: String {
+		switch accessKind {
+		case .ongoing:
+			return L10n.DAppRequest.ChooseAccountsOngoing.title
+		case .oneTime:
+			return L10n.DAppRequest.ChooseAccountsOneTime.title
+		}
+	}
+
+	var subtitle: String {
+		let dAppName = dappMetadata.name.rawValue
+
+		switch accessKind {
+		case .ongoing:
+			switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+			case (.atLeast, 0):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastZero(dAppName)
+			case (.atLeast, 1):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastOne(dAppName)
+			case let (.atLeast, number):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeast(number, dAppName)
+			case (.exactly, 1):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactlyOne(dAppName)
+			case let (.exactly, number):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactly(number, dAppName)
+			}
+		case .oneTime:
+			switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+			case (.atLeast, 0):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastZero(dAppName)
+			case (.atLeast, 1):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastOne(dAppName)
+			case let (.atLeast, number):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeast(dAppName, number)
+			case (.exactly, 1):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactlyOne(dAppName)
+			case let (.exactly, number):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactly(dAppName, number)
 			}
 		}
 	}
