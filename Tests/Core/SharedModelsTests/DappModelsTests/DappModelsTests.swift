@@ -80,7 +80,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.Request(
+			P2P.Dapp.RequestUnvalidated(
 				id: "791638de-cefa-43a8-9319-aa31c582fc7d",
 				items: .request(
 					.unauthorized(.init(
@@ -96,7 +96,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					version: 1, networkId: 34,
 					origin: "radixdlt.dashboard.com",
-					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
+					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
 				)
 			)
 		)
@@ -122,7 +122,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.Request(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .transaction(.init(
 					send: .init(
@@ -134,7 +134,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					version: 1, networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
+					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
 				)
 			)
 		)
@@ -158,7 +158,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.Request(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .request(.authorized(.init(
 					auth: .login(.withoutChallenge)
@@ -167,7 +167,7 @@ final class ToDappResponseTests: TestCase {
 					version: 1,
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
+					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
 				)
 			)
 		)
@@ -192,7 +192,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.Request(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .request(.authorized(.init(
 					auth: .login(.withChallenge(.init(challenge: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")))
@@ -201,7 +201,7 @@ final class ToDappResponseTests: TestCase {
 					version: 1,
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
+					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
 				)
 			)
 		)
@@ -226,7 +226,7 @@ final class ToDappResponseTests: TestCase {
 		]
 		try XCTAssertJSONDecoding(
 			json,
-			P2P.Dapp.Request(
+			P2P.Dapp.RequestUnvalidated(
 				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
 				items: .request(.authorized(.init(
 					auth: .usePersona(.init(identityAddress: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"))
@@ -235,7 +235,7 @@ final class ToDappResponseTests: TestCase {
 					version: 1,
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")
+					dAppDefinitionAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"
 				)
 			)
 		)

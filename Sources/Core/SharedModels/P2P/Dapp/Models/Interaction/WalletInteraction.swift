@@ -6,23 +6,38 @@ import Profile
 extension P2P.Dapp {
 	public typealias Version = Tagged<Self, UInt>
 	public static let currentVersion: Version = 1
-	public struct Request: Sendable, Hashable, Decodable, Identifiable {
+
+	public struct Request: Sendable, Hashable, Identifiable {
+		public typealias ID = RequestUnvalidated.ID
+
+		public let id: ID
+		public let items: Items
+		public let metadata: Metadata
+
+		public init(id: ID, items: Items, metadata: Metadata) {
+			self.id = id
+			self.items = items
+			self.metadata = metadata
+		}
+	}
+
+	public struct RequestUnvalidated: Sendable, Hashable, Decodable, Identifiable {
 		private enum CodingKeys: String, CodingKey {
 			case id = "interactionId"
 			case items
 			case metadata
 		}
 
-		public typealias ID = Tagged<(Self, id: ()), String>
+		public typealias ID = Tagged<Self, String>
 
 		public let id: ID
-		public let items: Items
-		public let metadata: Metadata
+		public let items: P2P.Dapp.Request.Items
+		public let metadata: P2P.Dapp.Request.MetadataUnvalidated
 
 		public init(
 			id: ID,
-			items: Items,
-			metadata: Metadata
+			items: P2P.Dapp.Request.Items,
+			metadata: P2P.Dapp.Request.MetadataUnvalidated
 		) {
 			self.id = id
 			self.items = items
@@ -33,8 +48,8 @@ extension P2P.Dapp {
 
 // MARK: - P2P.Dapp.Request.Metadata
 extension P2P.Dapp.Request {
-	public struct Metadata: Sendable, Hashable, Decodable {
-		public typealias Origin = Tagged<(Self, origin: ()), String>
+	public struct Metadata: Sendable, Hashable {
+		public typealias Origin = Tagged<Self, String>
 
 		public let version: P2P.Dapp.Version
 		public let networkId: NetworkID
@@ -52,5 +67,17 @@ extension P2P.Dapp.Request {
 			self.origin = origin
 			self.dAppDefinitionAddress = dAppDefinitionAddress
 		}
+	}
+}
+
+// MARK: - P2P.Dapp.Request.MetadataUnvalidated
+extension P2P.Dapp.Request {
+	public struct MetadataUnvalidated: Sendable, Hashable, Decodable {
+		public let version: P2P.Dapp.Version
+		public let networkId: NetworkID
+		public let origin: P2P.Dapp.Request.Metadata.Origin
+
+		/// Non yet validated dAppDefinitionAddresss
+		public let dAppDefinitionAddress: String
 	}
 }
