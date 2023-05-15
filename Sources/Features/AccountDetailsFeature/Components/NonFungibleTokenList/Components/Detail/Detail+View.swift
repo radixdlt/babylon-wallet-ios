@@ -42,33 +42,25 @@ extension NonFungibleTokenList.Detail {
 					ScrollView {
 						VStack(spacing: .medium1) {
 							VStack(spacing: .medium3) {
-								HStack {
-									Text(L10n.AssetDetails.NFTDetails.id)
-										.textStyle(.body1Regular)
-										.foregroundColor(.app.gray2)
-
-									Spacer()
-
+								KeyValueView(key: L10n.AssetDetails.NFTDetails.id) {
 									AddressView(.identifier(.nonFungibleGlobalID(viewStore.nonFungibleGlobalID)))
 								}
+								if let name = viewStore.name {
+									KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
+								}
 							}
+							.lineLimit(1)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding(.horizontal, .large2)
-							.textStyle(.body1Regular)
-							.lineLimit(1)
 
 							ZStack {
 								Color.app.gray5.edgesIgnoringSafeArea(.bottom)
 
 								VStack(spacing: .medium1) {
-									Image(asset: AssetResource.nft)
-										.resizable()
-										.frame(width: 104, height: 104)
-										.clipShape(RoundedRectangle(cornerRadius: .small1, style: .circular))
-										.border(.red)
+									NFTThumbnail(viewStore.resourceThumbnail, size: .veryLarge)
 
 									let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
-									if let description = viewStore.description {
+									if let description = viewStore.resourceDescription {
 										divider
 										Text(description)
 											.textStyle(.body1Regular)
@@ -79,25 +71,12 @@ extension NonFungibleTokenList.Detail {
 									divider
 
 									VStack(spacing: .medium3) {
-										HStack {
-											Text(L10n.AssetDetails.resourceAddress)
-												.textStyle(.body1Regular)
-												.foregroundColor(.app.gray2)
-
-											Spacer()
-
+										KeyValueView(key: L10n.AssetDetails.resourceAddress) {
 											AddressView(.address(.resource(viewStore.resourceAddress)))
 										}
-										if let name = viewStore.resourceName {
-											HStack {
-												Text(L10n.AssetDetails.NFTDetails.resourceName)
-													.textStyle(.body1Regular)
-													.foregroundColor(.app.gray2)
 
-												Text(name)
-													.frame(maxWidth: .infinity, alignment: .trailing)
-													.multilineTextAlignment(.trailing)
-											}
+										if let name = viewStore.resourceName {
+											KeyValueView(key: L10n.AssetDetails.NFTDetails.resourceName, value: name)
 										}
 									}
 									.padding(.horizontal, .large2)

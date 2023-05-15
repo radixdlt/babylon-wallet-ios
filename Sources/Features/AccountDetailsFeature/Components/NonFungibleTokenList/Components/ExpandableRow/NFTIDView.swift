@@ -31,7 +31,7 @@ struct NFTIDView: View {
 				NFTView(url: thumbnail)
 					.padding(.bottom, .small1)
 
-				KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id, isID: true)
+				KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
 			} else {
 				// This is apparently needed, else the card disappears when not expanded
 				Rectangle()
@@ -52,20 +52,30 @@ struct NFTIDView: View {
 }
 
 // MARK: - KeyValueView
-struct KeyValueView: View {
+struct KeyValueView<Content: View>: View {
 	let key: String
-	let value: String
-	let isID: Bool
+	let content: Content
+
+	init(key: String, value: String) where Content == Text {
+		self.key = key
+		self.content = Text(value)
+	}
+
+	init(key: String, @ViewBuilder content: () -> Content) {
+		self.key = key
+		self.content = content()
+	}
 
 	var body: some View {
 		HStack(alignment: .top, spacing: 0) {
 			Text(key)
 				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray2)
 			Spacer(minLength: 0)
-			Text(value)
-				.foregroundColor(isID ? .app.gray2 : .app.gray1)
+			content
+				.multilineTextAlignment(.trailing)
 				.textStyle(.body1HighImportance)
+				.foregroundColor(.app.gray1)
 		}
-		.foregroundColor(.app.gray2)
 	}
 }

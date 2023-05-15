@@ -193,7 +193,7 @@ public struct LoadableImage<Placeholder: View>: View {
 			image
 				.resizingMode(mode)
 				.frame(width: size.frame.width, height: size.frame.height)
-		case .flexibleHeight:
+		case let .flexibleHeight(maxAspect):
 			if let imageSize {
 				let minAspect: CGFloat = 1
 				let maxAspect: CGFloat = 16 / 9
@@ -228,7 +228,7 @@ public struct LoadableImage<Placeholder: View>: View {
 // MARK: - LoadableImageSize
 public enum LoadableImageSize: Equatable {
 	case fixedSize(HitTargetSize, mode: ImageResizingMode = .aspectFill)
-	case flexibleHeight
+	case flexibleHeight(maxAspect: CGFloat = .infinity)
 }
 
 // MARK: - LoadableImageLoadingBehaviour
