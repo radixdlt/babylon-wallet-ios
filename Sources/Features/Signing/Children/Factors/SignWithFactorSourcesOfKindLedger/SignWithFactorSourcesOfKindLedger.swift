@@ -10,7 +10,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	public typealias State = SignWithFactorSourcesOfKindState<Self>
 
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
-		case appeared
+		case onFirstTask
 	}
 
 	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
@@ -27,7 +27,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .onFirstTask:
 			return signWithSigningFactors(of: state)
 		}
 	}

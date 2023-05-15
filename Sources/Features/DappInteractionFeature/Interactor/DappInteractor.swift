@@ -115,10 +115,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case let .invalidRequestAlert(action):
 			switch action {
 			case .dismiss:
-				state.invalidRequestAlert = nil // needed?
 				return .none
 			case .presented(.ok):
-				state.invalidRequestAlert = nil // needed?
 				return .send(.internal(.presentQueuedRequestIfNeeded))
 			}
 
@@ -322,8 +320,8 @@ extension DappRequestValidationOutcome.Invalid {
 		case let .incompatibleVersion(ce, wallet):
 			return shortExplaination + " (CE: \(ce), wallet: \(wallet))"
 		case let .invalidDappDefinitionAddress(invalidAddress):
-			return shortExplaination + " ('\(invalidAddress)')"
-		case let .wrongNetworkID:
+			return "'\(invalidAddress)' is not valid account address."
+		case .wrongNetworkID:
 			return shortExplaination
 		}
 	}

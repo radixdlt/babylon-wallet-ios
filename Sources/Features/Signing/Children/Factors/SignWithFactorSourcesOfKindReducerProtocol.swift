@@ -16,7 +16,7 @@ protocol SignWithFactorSourcesOfKindInternalActionProtocol: Sendable, Equatable 
 
 // MARK: - SignWithFactorSourcesOfKindViewActionProtocol
 protocol SignWithFactorSourcesOfKindViewActionProtocol: Sendable, Equatable {
-	static var appeared: Self { get }
+	static var onFirstTask: Self { get }
 }
 
 // MARK: - FactorSourceKindSpecifierProtocol
