@@ -168,7 +168,7 @@ public struct LoadableImage<Placeholder: View>: View {
 				} else if let error = state.error {
 					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(error)")
 					// FIXME: Show some image or officially sanctioned copy
-					if sizingBehaviour == .flexibleHeight {
+					if sizingBehaviour == .flexibleHeight(minAspect: minAspectFlexibleHeight) {
 						let text = isVectorImage ? "Can't load image of vector type" : "Can't load image"
 						Text(text)
 							.textStyle(.body1HighImportance)
@@ -185,6 +185,8 @@ public struct LoadableImage<Placeholder: View>: View {
 		}
 	}
 
+	private let minAspectFlexibleHeight: CGFloat = 1
+
 	@MainActor
 	@ViewBuilder
 	private func imageView(image: NukeUI.Image, imageSize: CGSize?) -> some View {
@@ -193,9 +195,8 @@ public struct LoadableImage<Placeholder: View>: View {
 			image
 				.resizingMode(mode)
 				.frame(width: size.frame.width, height: size.frame.height)
-		case let .flexibleHeight(maxAspect):
+		case let .flexibleHeight(minAspect):
 			if let imageSize {
-				let minAspect: CGFloat = 1
 				let maxAspect: CGFloat = 16 / 9
 				let aspect = min(maxAspect, max(imageSize.width / imageSize.height, minAspect))
 				image
@@ -228,7 +229,7 @@ public struct LoadableImage<Placeholder: View>: View {
 // MARK: - LoadableImageSize
 public enum LoadableImageSize: Equatable {
 	case fixedSize(HitTargetSize, mode: ImageResizingMode = .aspectFill)
-	case flexibleHeight(maxAspect: CGFloat = .infinity)
+	case flexibleHeight(minAspect: CGFloat = .zero)
 }
 
 // MARK: - LoadableImageLoadingBehaviour
