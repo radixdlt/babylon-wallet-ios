@@ -83,7 +83,7 @@ public struct Signing: Sendable, FeatureReducer {
 			precondition(!factorsLeftToSignWith.isEmpty)
 			self.signingPurposeWithPayload = signingPurposeWithPayload
 			self.factorsLeftToSignWith = factorsLeftToSignWith
-			self.expectedSignatureCount = factorsLeftToSignWith.signerCount
+			self.expectedSignatureCount = factorsLeftToSignWith.expectedSignatureCount
 			self.step = Signing.nextStep(
 				factorsLeftToSignWith: factorsLeftToSignWith,
 				signingPurposeWithPayload: signingPurposeWithPayload
