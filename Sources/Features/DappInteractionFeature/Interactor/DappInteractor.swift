@@ -182,7 +182,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				title: { TextState("Invalid request") },
 				actions: {
 					ButtonState(role: .cancel, action: .ok) {
-						TextState(L10n.DApp.Response.FailureAlert.cancelButtonTitle)
+						TextState(L10n.Common.cancel)
 					}
 				},
 				message: { TextState(invalidReason.subtitle + "\n" + invalidReason.explaination(isDeveloperModeEnabled)) }
