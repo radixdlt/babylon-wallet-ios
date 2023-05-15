@@ -158,25 +158,21 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
 			state.responseFailureAlert = .init(
-				title: { TextState(L10n.App.errorOccurredTitle) },
+				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
-						TextState(L10n.DApp.Response.FailureAlert.cancelButtonTitle)
+						TextState(L10n.Common.cancel)
 					}
 					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
-						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)
+						TextState(L10n.Common.retry)
 					}
 				},
 				message: {
-					TextState(
-						L10n.DApp.Response.FailureAlert.message + {
-							#if DEBUG
-							"\n\n" + reason
-							#else
-							""
-							#endif
-						}()
-					)
+					#if DEBUG
+					TextState(L10n.DAppRequest.ResponseFailureAlert.message + "\n\n" + reason)
+					#else
+					TextState(L10n.DAppRequest.ResponseFailureAlert.message)
+					#endif
 				}
 			)
 			return .none
@@ -327,8 +323,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return shortExplaination + " (CE: \(ce), wallet: \(wallet))"
 		case let .invalidDappDefinitionAddress(invalidAddress):
 			return shortExplaination + " ('\(invalidAddress)')"
-		case let .wrongNetworkID(ce, wallet):
-			return shortExplaination + " (CE: \(ce), \(wallet)"
+		case let .wrongNetworkID:
+			return shortExplaination
 		}
 	}
 
@@ -340,8 +336,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return ce > wallet ? "Update Wallet" : "Update Connector Extension"
 		case .invalidDappDefinitionAddress:
 			return "Invalid dAppDefinitionAddress"
-		case .wrongNetworkID:
-			return "Network mismatch"
+		case let .wrongNetworkID(ce, wallet):
+			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
 		}
 	}
 }

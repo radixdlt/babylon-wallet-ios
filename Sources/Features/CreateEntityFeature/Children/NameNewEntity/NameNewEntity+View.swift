@@ -9,43 +9,44 @@ extension NameNewEntity.State {
 // MARK: - NameNewEntity.View
 extension NameNewEntity {
 	public struct ViewState: Equatable {
+		public let kind: EntityKind
 		public let namePlaceholder: String
 		public let titleText: String
+		public let subtitleText: String
 		public let entityName: String
-		public let entityKindName: String
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
-		public struct SanitizedNameRequirement: Equatable {
-			public let sanitizedName: NonEmptyString
-		}
-
 		public let focusedField: State.Field?
 		public let useLedgerAsFactorSource: Bool
 		public let canUseLedgerAsFactorSource: Bool
 
+		public struct SanitizedNameRequirement: Equatable {
+			public let sanitizedName: NonEmptyString
+		}
+
 		init(state: State) {
 			let entityKind = Entity.entityKind
-			let entityKindName = entityKind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
-			self.entityKindName = entityKindName
-			self.namePlaceholder = entityKind == .account ? L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.account : L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.persona
-			titleText = {
-				switch entityKind {
-				case .account:
-					return state.isFirst ?
-						L10n.CreateEntity.NameNewEntity.Account.Title.first :
-						L10n.CreateEntity.NameNewEntity.Account.Title.notFirst
-				case .identity:
-					return L10n.CreateEntity.NameNewEntity.Persona.title
-				}
-			}()
-			useLedgerAsFactorSource = state.useLedgerAsFactorSource
-			entityName = state.inputtedName
-			if let sanitizedName = state.sanitizedName {
-				sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
-			} else {
-				sanitizedNameRequirement = nil
+			self.kind = entityKind
+
+			switch entityKind {
+			case .account:
+				self.namePlaceholder = L10n.CreateAccount.NameNewAccount.placeholder
+				self.titleText = state.isFirst ? L10n.CreateAccount.titleFirst : L10n.CreateAccount.titleNotFirst
+				self.subtitleText = L10n.CreateAccount.NameNewAccount.subtitle
+
+			case .identity:
+				self.namePlaceholder = L10n.CreatePersona.NameNewPersona.placeholder
+				self.titleText = L10n.CreatePersona.Introduction.title
+				self.subtitleText = L10n.CreatePersona.NameNewPersona.subtitle
 			}
-			focusedField = state.focusedField
-			canUseLedgerAsFactorSource = state.canUseLedgerAsFactorSource
+			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
+			self.entityName = state.inputtedName
+			if let sanitizedName = state.sanitizedName {
+				self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
+			} else {
+				self.sanitizedNameRequirement = nil
+			}
+			self.focusedField = state.focusedField
+			self.canUseLedgerAsFactorSource = state.canUseLedgerAsFactorSource
 		}
 	}
 
@@ -63,10 +64,10 @@ extension NameNewEntity {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					ScrollView {
 						VStack(spacing: .medium1) {
-							title(with: viewStore)
+							title(with: viewStore.state)
 
 							VStack(spacing: .large1) {
-								subtitle(with: viewStore)
+								subtitle(with: viewStore.state)
 
 								if viewStore.canUseLedgerAsFactorSource {
 									useLedgerAsFactorSource(with: viewStore)
@@ -80,7 +81,7 @@ extension NameNewEntity {
 								AppTextField(
 									placeholder: viewStore.namePlaceholder,
 									text: nameBinding,
-									hint: .info(L10n.CreateEntity.NameNewEntity.Name.Field.explanation),
+									hint: .info(L10n.CreateEntity.NameNewEntity.explanation),
 									focus: .on(
 										.entityName,
 										binding: viewStore.binding(
@@ -106,7 +107,7 @@ extension NameNewEntity {
 							viewStore.sanitizedNameRequirement,
 							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
 						) { action in
-							Button(L10n.CreateEntity.NameNewEntity.Name.Button.title, action: action)
+							Button(L10n.Common.continue, action: action)
 								.buttonStyle(.primaryRectangular)
 						}
 					}
@@ -120,14 +121,14 @@ extension NameNewEntity {
 }
 
 extension NameNewEntity.View {
-	private func title(with viewStore: ViewStoreOf<NameNewEntity>) -> some View {
-		Text(viewStore.titleText)
+	private func title(with viewState: NameNewEntity.ViewState) -> some View {
+		Text(viewState.titleText)
 			.foregroundColor(.app.gray1)
 			.textStyle(.sheetTitle)
 	}
 
-	private func subtitle(with viewStore: ViewStoreOf<NameNewEntity>) -> some View {
-		Text(L10n.CreateEntity.NameNewEntity.subtitle(viewStore.entityKindName.lowercased()))
+	private func subtitle(with viewState: NameNewEntity.ViewState) -> some View {
+		Text(viewState.subtitleText)
 			.fixedSize(horizontal: false, vertical: true)
 			.padding(.horizontal, .large1)
 			.multilineTextAlignment(.center)
@@ -139,8 +140,8 @@ extension NameNewEntity.View {
 		with viewStore: ViewStoreOf<NameNewEntity>
 	) -> some SwiftUI.View {
 		ToggleView(
-			title: "Create with Ledger hardware wallet",
-			subtitle: "Requires you to sign transactions using your Ledger",
+			title: L10n.CreateEntity.NameNewEntity.ledgerTitle,
+			subtitle: L10n.CreateEntity.NameNewEntity.ledgerSubtitle,
 			isOn: viewStore.binding(
 				get: \.useLedgerAsFactorSource,
 				send: { .useLedgerAsFactorSourceToggled($0) }

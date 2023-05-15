@@ -61,7 +61,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 				return .send(
 					.child(.connectUsingSecrets(.delegate(.connected(
 						.init(connectionPassword: connectUsingSecrets.connectionPassword,
-						      displayName: L10n.NewConnection.defaultNameOfConnection)
+						      displayName: L10n.LinkedConnectors.NewConnection.connectionDefaultName)
 					))))
 				)
 			}
@@ -83,7 +83,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		switch childAction {
 		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				state = .scanQR(.init(scanInstructions: L10n.NewConnection.subtitle))
+				state = .scanQR(.init(scanInstructions: L10n.LinkedConnectors.NewConnection.subtitle))
 				return .none
 			} else {
 				return .run { send in await send(.delegate(.dismiss)) }

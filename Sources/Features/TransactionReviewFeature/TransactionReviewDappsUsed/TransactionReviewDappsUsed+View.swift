@@ -106,7 +106,7 @@ extension TransactionReviewDappsUsed {
 						DappThumbnail(.unknown, size: .smaller)
 							.padding(.trailing, .small2)
 
-						Text(L10n.TransactionReview.UsingDapps.unknownComponents(count))
+						Text(L10n.TransactionReview.unknownComponents(count))
 							.lineLimit(2)
 					}
 

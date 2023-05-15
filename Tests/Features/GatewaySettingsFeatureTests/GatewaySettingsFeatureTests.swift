@@ -99,18 +99,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		// when
 		await store.send(.child(.gatewayList(.delegate(.removeGateway(gatewayToBeDeleted))))) {
 			// then
-			$0.removeGatewayAlert = .init(
-				title: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.title) },
-				actions: {
-					ButtonState(role: .cancel, action: .cancelButtonTapped) {
-						TextState(L10n.GatewaySettings.RemoveGatewayAlert.cancelButtonTitle)
-					}
-					ButtonState(action: .removeButtonTapped(gatewayToBeDeleted)) {
-						TextState(L10n.GatewaySettings.RemoveGatewayAlert.removeButtonTitle)
-					}
-				},
-				message: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.message) }
-			)
+			$0.removeGatewayAlert = .removeGateway(row: gatewayToBeDeleted)
 		}
 	}
 
@@ -130,18 +119,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		)
 
 		var initialState = GatewaySettings.State()
-		initialState.removeGatewayAlert = .init(
-			title: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.title) },
-			actions: {
-				ButtonState(role: .cancel, action: .cancelButtonTapped) {
-					TextState(L10n.GatewaySettings.RemoveGatewayAlert.cancelButtonTitle)
-				}
-				ButtonState(action: .removeButtonTapped(gatewayToBeDeleted)) {
-					TextState(L10n.GatewaySettings.RemoveGatewayAlert.removeButtonTitle)
-				}
-			},
-			message: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.message) }
-		)
+		initialState.removeGatewayAlert = .removeGateway(row: gatewayToBeDeleted)
 		initialState.currentGateway = currentGateway
 		initialState.gatewayList = .init(gateways: .init(
 			uniqueElements: gateways.all.elements.map {

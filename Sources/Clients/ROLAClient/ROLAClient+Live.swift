@@ -289,11 +289,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
 	// terrible parsing mess.
 	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
-		guard let response: GatewayAPI.EntityMetadataItemValue = self[customKey: SetMetadata.ownerKeysKey] else {
-			return nil
-		}
-
-		guard let asStringCollection = response.asStringCollection else {
+		guard let response = items[customKey: SetMetadata.ownerKeysKey]?.asStringCollection else {
 			return nil
 		}
 
@@ -307,7 +303,7 @@ extension GatewayAPI.EntityMetadataCollection {
 		let lengthQuotesAndTwoParenthesis = 2 * lengthQuoteAndParenthesis
 		let lengthCurve25519PubKeyHex = 32 * 2
 		let lengthSecp256K1PubKeyHex = 33 * 2
-		let keys = try asStringCollection.compactMap { elem -> Engine.PublicKey? in
+		let keys = try response.compactMap { elem -> Engine.PublicKey? in
 			if elem.starts(with: curve25519Prefix) {
 				guard elem.count == lengthQuotesAndTwoParenthesis + lengthCurve25519Prefix + lengthCurve25519PubKeyHex else {
 					throw FailedToParsePublicKeyFromOwnerKeysBadLength()

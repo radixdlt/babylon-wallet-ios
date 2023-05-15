@@ -46,7 +46,7 @@ extension DappDetails.View {
 					Personas(store: store, hasPersonas: viewStore.hasPersonas)
 						.background(.app.gray5)
 
-					Button(L10n.DAppDetails.forgetDapp) {
+					Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
 						viewStore.send(.forgetThisDappTapped)
 					}
 					.buttonStyle(.primaryRectangular(isDestructive: true))
@@ -92,7 +92,7 @@ private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
 		.init(
 			title: dApp.displayName.rawValue,
-			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
+			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
 			address: dApp.dAppDefinitionAddress,
@@ -129,7 +129,7 @@ extension DappDetails.View {
 					Separator()
 
 					HStack(spacing: 0) {
-						Text(L10n.DAppDetails.definition)
+						Text(L10n.AuthorizedDapps.DAppDetails.dAppDefinition)
 							.sectionHeading
 
 						Spacer(minLength: 0)
@@ -140,7 +140,7 @@ extension DappDetails.View {
 					}
 
 					if let domain = viewStore.domain {
-						Text(L10n.DAppDetails.website)
+						Text(L10n.AuthorizedDapps.DAppDetails.website)
 							.sectionHeading
 //						Button(domain.stringValue) {
 //							viewStore.send(.openURLTapped(domain))
@@ -160,7 +160,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { resource in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.name) { resource in
 					TokenThumbnail(.known(resource.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
@@ -175,7 +175,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { resource in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.name) { resource in
 					NFTThumbnail(resource.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
@@ -222,7 +222,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			if hasPersonas {
-				Text(L10n.DAppDetails.personaHeading)
+				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)
@@ -234,7 +234,7 @@ extension DappDetails.View {
 				let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
 				PersonaListCoreView(store: personasStore)
 			} else {
-				Text(L10n.DAppDetails.noPersonasHeading)
+				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)
