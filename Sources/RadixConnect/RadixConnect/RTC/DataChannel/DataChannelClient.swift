@@ -50,7 +50,7 @@ actor DataChannelClient {
 	// MARK: - Incoming Messages
 
 	/// Incoming messages received over the DataChannel after being assembled.
-	lazy var IncomingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incomingChunks
+	lazy var incomingAssembledMessages: AnyAsyncSequence<Result<AssembledMessage, Error>> = self.incomingChunks
 		.compactMap(handleIncomingChunks)
 		.mapToResult()
 		.handleEvents(onElement: {

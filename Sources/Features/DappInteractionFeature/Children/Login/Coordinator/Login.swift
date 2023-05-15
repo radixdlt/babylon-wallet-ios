@@ -1,5 +1,6 @@
 import AuthorizedDappsClient
 import CreateEntityFeature
+import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
 import PersonasClient
@@ -66,6 +67,7 @@ struct Login: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.rolaClient) var rolaClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -94,29 +96,28 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
-			guard let challenge = state.loginRequest.challenge else {
+			guard case let .withChallenge(loginWithChallenge) = state.loginRequest else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
 
-			let signAuthRequest = SignAuthChallengeRequest(
+			let challenge = loginWithChallenge.challenge
+
+			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
-				dAppDefinitionAddress: state.dappDefinitionAddress,
-				persona: persona
+				dAppDefinitionAddress: state.dappDefinitionAddress
 			)
-			return .run { [authorizedDapp = state.authorizedDapp] send in
-				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
-				await send(.delegate(.continueButtonTapped(
-					persona,
-					authorizedDapp,
-					authorizedPersona,
-					signedAuthChallenge
-				)))
 
-			} catch: { error, send in
-				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
-				errorQueue.schedule(error)
-				await send(.delegate(.failedToSignAuthChallenge))
+			return .run { [authorizedDapp = state.authorizedDapp] send in
+				let authToSignResponse = try await rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+
+				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+					signerEntity: .persona(persona),
+					unhashedDataToSign: authToSignResponse.payloadToHashAndSign,
+					purpose: .signAuth
+				)
+				let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
+				await send(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthChallenge)))
 			}
 		}
 	}

@@ -87,6 +87,8 @@ extension ROLAClient {
 			return manifestString
 		}
 
+		// FIXME: Move this to `Signing` and change `Signing` to `UseFactors` which should be able to do both signing and derivation...?
+		// Rationale: the solution below makes it impossible to create `authenticationSigning` key for Ledger factor sources :/
 		@Sendable func manifestCreatingAuthKey(
 			for entity: EntityPotentiallyVirtual
 		) async throws -> ManifestForAuthKeyCreationResponse {
@@ -112,9 +114,14 @@ extension ROLAClient {
 				}
 				switch entity {
 				case .account:
-					authSignDerivationPath = try hdPath.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asAccountPath().switching(
+						networkID: entity.networkID,
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				case .persona:
-					authSignDerivationPath = try hdPath.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asIdentityPath().switching(
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				}
 			}
 			let factorSources = try await factorSourcesClient.getFactorSources()
@@ -227,24 +234,18 @@ extension ROLAClient {
 			manifestForAuthKeyCreation: { request in
 				try await manifestCreatingAuthKey(for: request.entity)
 			},
-			signAuthChallenge: { request in
+			authenticationDataToSignForChallenge: { request in
 
 				let payload = payloadToHash(
 					challenge: request.challenge,
 					dAppDefinitionAddress: request.dAppDefinitionAddress,
 					origin: request.origin
 				)
-				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-					signerEntity: .persona(request.persona),
-					unhashedDataToSign: payload,
-					purpose: .signAuth
-				)
-				let signedAuthChallenge = SignedAuthChallenge(
-					challenge: request.challenge,
-					signatureWithPublicKey: signature.signature.signatureWithPublicKey
-				)
 
-				return signedAuthChallenge
+				return AuthenticationDataToSignForChallengeResponse(
+					input: request,
+					payloadToHashAndSign: payload
+				)
 			}
 		)
 	}()
@@ -277,7 +278,7 @@ extension ROLAClient {
 
 /// `challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
 func payloadToHash(
-	challenge: P2P.Dapp.AuthChallengeNonce,
+	challenge: P2P.Dapp.Request.AuthChallengeNonce,
 	dAppDefinitionAddress accountAddress: AccountAddress,
 	origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
 ) -> Data {

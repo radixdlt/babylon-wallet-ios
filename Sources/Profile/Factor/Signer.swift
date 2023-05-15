@@ -35,7 +35,15 @@ public struct Signer: Sendable, Hashable, Identifiable {
 }
 
 // MARK: - EntityPotentiallyVirtual
-public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol {
+public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Identifiable {
+	public typealias ID = String
+	public var id: ID {
+		switch self {
+		case let .account(entity): return entity.address.address
+		case let .persona(entity): return entity.address.address
+		}
+	}
+
 	case account(Profile.Network.Account)
 	case persona(Profile.Network.Persona)
 	public var factorInstances: Set<FactorInstance> {

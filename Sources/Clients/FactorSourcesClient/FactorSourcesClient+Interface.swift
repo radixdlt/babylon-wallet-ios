@@ -44,8 +44,8 @@ extension FactorSourcesClient {
 public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<Set<SigningFactor>>>
 
 extension SigningFactors {
-	public var signerCount: Int {
-		values.flatMap { $0.map(\.signers.count) }.reduce(0, +)
+	public var expectedSignatureCount: Int {
+		values.flatMap { $0.map(\.expectedSignatureCount) }.reduce(0, +)
 	}
 }
 
@@ -117,6 +117,10 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 	public var id: ID { factorSource.id }
 	public let factorSource: FactorSource
 	public var signers: NonEmpty<IdentifiedArrayOf<Signer>>
+
+	public var expectedSignatureCount: Int {
+		signers.map(\.factorInstancesRequiredToSign.count).reduce(0, +)
+	}
 
 	public init(
 		factorSource: FactorSource,
