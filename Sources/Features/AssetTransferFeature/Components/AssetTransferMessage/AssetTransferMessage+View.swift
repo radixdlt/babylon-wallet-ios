@@ -44,10 +44,7 @@ extension AssetTransferMessage.View {
 						.foregroundColor(.app.gray2)
 					}
 					.padding(.medium3)
-					.overlay(
-						RoundedCorners(radius: .small2, corners: [.topLeft, .topRight])
-							.stroke(.app.gray4, lineWidth: 1)
-					)
+					.topRoundedCorners(strokeColor: .app.gray4)
 
 					TextEditor(text: viewStore.binding(
 						get: \.message,
@@ -62,14 +59,7 @@ extension AssetTransferMessage.View {
 					.multilineTextAlignment(.leading)
 					.scrollContentBackground(.hidden) // Remove the default background to allow customization
 					.background(.app.gray5)
-					.clipShape(RoundedCorners(radius: .small2, corners: [.bottomLeft, .bottomRight]))
-					.background(
-						RoundedCorners(radius: .small2, corners: [.bottomLeft, .bottomRight])
-							.stroke(
-								focused.wrappedValue == .message ? .app.gray1 : .app.gray4,
-								lineWidth: 1
-							)
-					)
+					.bottomRoundedCorners(strokeColor: focused.wrappedValue == .message ? .app.gray1 : .app.gray4)
 				}
 			}
 			.sheet(

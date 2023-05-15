@@ -29,10 +29,7 @@ extension ToAccountTransfer.View {
 				}
 				.foregroundColor(.app.gray2)
 				.padding(.medium3)
-				.overlay(
-					RoundedCorners(radius: .small2, corners: [.topLeft, .topRight])
-						.stroke(Color.gray, lineWidth: 1)
-				)
+				.topRoundedCorners(strokeColor: .app.gray4)
 
 				VStack {
 					HStack {
@@ -46,11 +43,8 @@ extension ToAccountTransfer.View {
 					}
 				}
 				.foregroundColor(.app.gray2)
-				.background(.app.gray4)
-				.overlay(
-					RoundedCorners(radius: .small2, corners: [.bottomLeft, .bottomRight])
-						.stroke(Color.gray, lineWidth: 1)
-				)
+				.background(.app.gray5)
+				.bottomRoundedCorners(strokeColor: .app.gray4)
 			}
 			.sheet(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
