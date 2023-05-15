@@ -99,7 +99,7 @@ extension NonFungibleTokenList.Row.View {
 		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))
 		.transition(.move(edge: .bottom))
 		.contentShape(Rectangle())
-		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.resource, localId: asset.id))) }
+		.onTapGesture { viewStore.send(.selected(.init(token: asset, resource: viewStore.resource))) }
 	}
 
 	fileprivate func collapsedHeight(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> CGFloat {

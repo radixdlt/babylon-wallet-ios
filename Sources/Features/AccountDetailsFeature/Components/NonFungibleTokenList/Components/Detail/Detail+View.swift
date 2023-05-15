@@ -3,10 +3,14 @@ import FeaturePrelude
 extension NonFungibleTokenList.Detail.State {
 	var viewState: NonFungibleTokenList.Detail.ViewState {
 		.init(
-			nonFungibleGlobalID: resource.nftGlobalID(for: localId),
-			resourceAddress: resource.resourceAddress,
-			description: resource.description,
-			resourceName: resource.name
+			keyImage: token.keyImageURL,
+			nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
+			name: token.name,
+			description: token.description,
+			resourceName: resource.name,
+			resourceThumbnail: resource.iconURL,
+			resourceDescription: resource.description,
+			resourceAddress: resource.resourceAddress
 		)
 	}
 }
@@ -14,10 +18,14 @@ extension NonFungibleTokenList.Detail.State {
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenList.Detail {
 	public struct ViewState: Equatable {
+		let keyImage: URL?
 		let nonFungibleGlobalID: AccountPortfolio.NonFungibleResource.GlobalID
-		let resourceAddress: ResourceAddress
+		let name: String?
 		let description: String?
 		let resourceName: String?
+		let resourceThumbnail: URL?
+		let resourceDescription: String?
+		let resourceAddress: ResourceAddress
 	}
 
 	@MainActor
@@ -122,24 +130,24 @@ extension AccountPortfolio.NonFungibleResource {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct NonFungibleTokenListDetail_Preview: PreviewProvider {
-	static var previews: some View {
-		NonFungibleTokenList.Detail.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: NonFungibleTokenList.Detail()
-			)
-		)
-	}
-}
-
-extension NonFungibleTokenList.Detail.State {
-	public static let previewValue = Self(
-		resource: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: []),
-		localId: .init("#1#")
-	)
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+// struct NonFungibleTokenListDetail_Preview: PreviewProvider {
+//	static var previews: some View {
+//		NonFungibleTokenList.Detail.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: NonFungibleTokenList.Detail()
+//			)
+//		)
+//	}
+// }
+//
+// extension NonFungibleTokenList.Detail.State {
+//	public static let previewValue = Self(
+//		resource: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: []),
+//		localId_: .init("#1#")
+//	)
+// }
+// #endif

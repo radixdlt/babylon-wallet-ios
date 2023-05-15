@@ -5,8 +5,8 @@ extension NonFungibleTokenList {
 	// MARK: - NonFungibleTokenDetails
 	public struct Detail: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable {
+			let token: AccountPortfolio.NonFungibleResource.NonFungibleToken
 			let resource: AccountPortfolio.NonFungibleResource
-			let localId: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID
 		}
 
 		public enum ViewAction: Sendable, Equatable {
