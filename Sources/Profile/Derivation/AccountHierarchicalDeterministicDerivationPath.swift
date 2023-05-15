@@ -54,6 +54,21 @@ public enum AccountDerivationPath: DerivationPathProtocol, Sendable, Hashable, C
 			throw WrongAccountHDPathTypeExpectedBabylon()
 		}
 	}
+
+	/// NetworkID is needed for olympia accounts... :/
+	public func switching(
+		networkID: NetworkID,
+		keyKind newKeyKind: KeyKind
+	) throws -> Self {
+		switch self {
+		case let .babylon(babylon):
+			let converted = try babylon.switching(keyKind: newKeyKind)
+			return .babylon(converted)
+		case let .olympia(olympia):
+			let converted = try olympia.cap26Path(networkID: networkID, keyKind: newKeyKind)
+			return .babylon(converted)
+		}
+	}
 }
 
 // MARK: - WrongAccountHDPathTypeExpectedBabylon

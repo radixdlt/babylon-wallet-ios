@@ -114,9 +114,14 @@ extension ROLAClient {
 				}
 				switch entity {
 				case .account:
-					authSignDerivationPath = try hdPath.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asAccountPath().switching(
+						networkID: entity.networkID,
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				case .persona:
-					authSignDerivationPath = try hdPath.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asIdentityPath().switching(
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				}
 			}
 			let factorSources = try await factorSourcesClient.getFactorSources()
