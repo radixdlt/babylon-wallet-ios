@@ -477,12 +477,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		.run { [state] send in
 			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
-			if
-				let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
-				ongoingAccountsRequestItem.challenge == nil, // autofill not supported for accounts with proof of ownership
-				let sharedAccounts = state.authorizedPersona?.sharedAccounts,
-				ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request
-			{
+			payload.ongoingAccountsPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.AccountsPayload? in
+				guard
+					let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
+					ongoingAccountsRequestItem.challenge == nil, // autofill not supported for accounts with proof of ownership
+					let sharedAccounts = state.authorizedPersona?.sharedAccounts,
+					ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request
+				else {
+					return nil
+				}
 				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 				guard
@@ -490,33 +493,37 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						try allAccounts[id: .init(address: sharedAccount.address)]
 					}),
 					selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
-				else { return }
+				else { return nil }
 
-				payload.ongoingAccountsPayload = .init(
+				return .init(
 					requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
 					numberOfAccountsRequested: sharedAccounts.request,
 					accounts: selectedAccounts
 				)
-			}
+			}()
 
-			if
-				let ongoingPersonaDataRequestItem = state.ongoingPersonaDataRequestItem,
-				let authorizedPersonaID = state.authorizedPersona?.id,
-				let sharedFieldIDs = state.authorizedPersona?.sharedFieldIDs,
-				ongoingPersonaDataRequestItem.fields.isSubset(of: sharedFieldIDs)
-			{
+			payload.ongoingPersonaDataPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload? in
+				guard
+					let ongoingPersonaDataRequestItem = state.ongoingPersonaDataRequestItem,
+					let authorizedPersonaID = state.authorizedPersona?.id,
+					let sharedFieldIDs = state.authorizedPersona?.sharedFieldIDs,
+					ongoingPersonaDataRequestItem.fields.isSubset(of: sharedFieldIDs)
+				else { return nil }
+
 				let allPersonas = try await personasClient.getPersonas()
-				guard let persona = allPersonas[id: authorizedPersonaID] else { return }
+				guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
 				let sharedFields = persona.fields.filter { sharedFieldIDs.contains($0.id) }
-				guard sharedFields.count == sharedFieldIDs.count else { return }
-				payload.ongoingPersonaDataPayload = .init(
+				guard sharedFields.count == sharedFieldIDs.count else { return nil }
+				return .init(
 					requestItem: .remote(.ongoingPersonaData(ongoingPersonaDataRequestItem)),
 					fieldsRequested: sharedFieldIDs,
 					fields: sharedFields
 				)
-			}
+			}()
 
 			await send(.internal(.autofillOngoingResponseItemsIfPossible(payload)))
+		} catch: { error, _ in
+			loggerGlobal.warning("Unable to autofil ongoing response, error: \(error)")
 		}
 	}
 
@@ -530,14 +537,19 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case .oneTime:
 			state.responseItems[item] = .remote(.oneTimeAccounts(.init(accounts: chosenAccounts)))
 		case .ongoing:
-			state.responseItems[item] = .remote(.oneTimeAccounts(.init(accounts: chosenAccounts)))
+			state.responseItems[item] = .remote(.ongoingAccounts(.init(accounts: chosenAccounts)))
 		}
 	}
 
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(for: nextRequest, state.remoteInteraction, state.dappMetadata, state.persona)
+			let destination = Destinations.State(
+				for: nextRequest,
+				state.remoteInteraction,
+				state.dappMetadata,
+				state.persona
+			)
 		{
 			if state.root == nil {
 				state.root = destination
