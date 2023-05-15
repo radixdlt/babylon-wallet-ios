@@ -4,35 +4,16 @@ import FeaturePrelude
 // MARK: - Permission.View
 extension PersonaDataPermission {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
+		let subtitle: String
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: PersonaDataPermission.State) {
-			title = L10n.DApp.PersonaDataPermission.title
-			subtitle = {
-				let normalColor = Color.app.gray2
-				let highlightColor = Color.app.gray1
-
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
-
-				let explanation: AttributedString = {
-					let always = AttributedString(L10n.DApp.PersonaDataPermission.Subtitle.always, foregroundColor: highlightColor)
-
-					return AttributedString(
-						L10n.DApp.PersonaDataPermission.Subtitle.Explanation.first,
-						foregroundColor: normalColor
-					)
-						+ always
-						+ AttributedString(
-							L10n.DApp.PersonaDataPermission.Subtitle.Explanation.second,
-							foregroundColor: normalColor
-						)
-				}()
-
-				return dappName + explanation
-			}()
-			output = {
+			self.thumbnail = state.dappMetadata.thumbnail
+			self.title = L10n.DAppRequest.PersonalDataPermission.title
+			self.subtitle = L10n.DAppRequest.PersonalDataPermission.subtitle(state.dappMetadata.name.rawValue)
+			self.output = {
 				guard let persona = state.persona else {
 					return nil
 				}
@@ -59,7 +40,7 @@ extension PersonaDataPermission {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
@@ -72,7 +53,7 @@ extension PersonaDataPermission {
 							then: { PersonaDataPermissionBox.View(store: $0) }
 						)
 
-						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+						Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
@@ -86,7 +67,7 @@ extension PersonaDataPermission {
 						viewStore.output,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.DApp.PersonaDataPermission.Button.continue, action: action)
+						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -96,7 +77,7 @@ extension PersonaDataPermission {
 					action: PersonaDataPermission.Destinations.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
 				)
-				.task { await viewStore.send(.task) }
+				.task { viewStore.send(.task) }
 			}
 		}
 	}

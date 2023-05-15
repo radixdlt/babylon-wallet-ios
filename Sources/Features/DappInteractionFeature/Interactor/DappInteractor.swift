@@ -129,25 +129,21 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
 			state.responseFailureAlert = .init(
-				title: { TextState(L10n.App.errorOccurredTitle) },
+				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
-						TextState(L10n.DApp.Response.FailureAlert.cancelButtonTitle)
+						TextState(L10n.Common.cancel)
 					}
 					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
-						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)
+						TextState(L10n.Common.retry)
 					}
 				},
 				message: {
-					TextState(
-						L10n.DApp.Response.FailureAlert.message + {
-							#if DEBUG
-							"\n\n" + reason
-							#else
-							""
-							#endif
-						}()
-					)
+					#if DEBUG
+					TextState(L10n.DAppRequest.ResponseFailureAlert.message + "\n\n" + reason)
+					#else
+					TextState(L10n.DAppRequest.ResponseFailureAlert.message)
+					#endif
 				}
 			)
 			return .none
@@ -263,11 +259,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 						let incomingRequestNetwork = try Radix.Network.lookupBy(id: request.metadata.networkId)
 						let currentNetwork = try Radix.Network.lookupBy(id: currentNetworkID)
 
-						try await radixConnectClient.sendResponse(.dapp(.failure(.init(
-							interactionId: request.id,
-							errorType: .wrongNetwork,
-							message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
-						))), incomingRequest.route)
+						try await radixConnectClient.sendResponse(
+							.dapp(.failure(.init(
+								interactionId: request.id,
+								errorType: .wrongNetwork,
+								message: L10n.DAppRequest.RequestWrongNetworkAlert.message(incomingRequestNetwork.name, currentNetwork.name)
+							))),
+							incomingRequest.route
+						)
 						continue
 					}
 

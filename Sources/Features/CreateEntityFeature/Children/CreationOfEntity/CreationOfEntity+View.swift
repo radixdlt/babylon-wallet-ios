@@ -5,7 +5,6 @@ import FeaturePrelude
 extension CreationOfEntity {
 	public struct ViewState: Equatable {
 		let kind: EntityKind
-		let entityKindName: String
 		let useLedgerAsFactorSource: Bool
 		let ledgers: IdentifiedArrayOf<FactorSource>
 		var ledgersArray: [FactorSource]? { .init(ledgers) }
@@ -17,12 +16,7 @@ extension CreationOfEntity {
 		}
 
 		init(state: CreationOfEntity.State) {
-			let entityKind = Entity.entityKind
-			self.kind = entityKind
-
-			let entityKindName = entityKind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
-			self.entityKindName = entityKindName
-
+			self.kind = Entity.entityKind
 			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
 			self.ledgers = state.ledgers
 			self.selectedLedgerID = state.selectedLedgerID
@@ -67,9 +61,9 @@ extension CreationOfEntity.View {
 	private func createWithLedgerView(_ viewStore: ViewStoreOf<CreationOfEntity>) -> some SwiftUI.View {
 		VStack {
 			if viewStore.ledgers.isEmpty {
-				Text("You have no Ledgers added, add a ledger to get started...")
+				Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
 			} else {
-				Text("Select Ledger to Use")
+				Text(L10n.CreateEntity.Ledger.subtitleSelectLedger)
 
 				ScrollView {
 					VStack(spacing: .small1) {
@@ -96,19 +90,19 @@ extension CreationOfEntity.View {
 
 			Spacer()
 
-			Button("Add new ledger") {
+			Button(L10n.CreateEntity.Ledger.addNewLedger) {
 				viewStore.send(.addNewLedgerButtonTapped)
 			}
 			.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		}
 		.padding(.horizontal, .small1)
-		.navigationTitle("Create Ledger \(viewStore.entityKindName)")
+		.navigationTitle(viewStore.navigationTitle)
 		.footer {
 			WithControlRequirements(
 				viewStore.selectedLedgerControlRequirements,
 				forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
 			) { action in
-				Button("Use Ledger", action: action)
+				Button(L10n.CreateEntity.Ledger.useLedger, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
 		}
@@ -123,6 +117,17 @@ extension CreationOfEntity.View {
 
 	private func createWithDevice() -> some SwiftUI.View {
 		Color.white
+	}
+}
+
+extension CreationOfEntity.ViewState {
+	var navigationTitle: String {
+		switch kind {
+		case .account:
+			return L10n.CreateEntity.Ledger.createAccount
+		case .identity:
+			return L10n.CreateEntity.Ledger.createPersona
+		}
 	}
 }
 
@@ -153,8 +158,9 @@ enum SelectLedgerRow {
 						Text(viewState.description)
 							.textStyle(.body1Header)
 
-						HPair(label: "Used", item: viewState.lastUsedOn)
-						HPair(label: "Added", item: viewState.addedOn)
+						HPair(label: L10n.CreateEntity.Ledger.usedHeading, item: viewState.lastUsedOn)
+
+						HPair(label: L10n.CreateEntity.Ledger.addedHeading, item: viewState.addedOn)
 					}
 
 					Spacer()
@@ -166,9 +172,7 @@ enum SelectLedgerRow {
 				}
 				.foregroundColor(.app.white)
 				.padding(.medium1)
-				.background(
-					Color.black
-				)
+				.background(.black)
 				.brightness(isSelected ? -0.1 : 0)
 				.cornerRadius(.small1)
 			}

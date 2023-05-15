@@ -144,8 +144,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case .popoverButtonTapped:
 //			state.destination = .slideUpPanel(
 //				.init(
-//					title: L10n.GatewaySettings.WhatIsAGateway.title,
-//					explanation: L10n.GatewaySettings.WhatIsAGateway.explanation
+//					title: L10n.Gateways.WhatIsAGateway.title,
+//					explanation: L10n.Gateways.WhatIsAGateway.explanation
 //				)
 //			)
 			// FIXME: display what is a gateway once we have copy
@@ -233,18 +233,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case let .gatewayList(.delegate(action)):
 			switch action {
 			case let .removeGateway(gateway):
-				state.removeGatewayAlert = .init(
-					title: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.title) },
-					actions: {
-						ButtonState(role: .cancel, action: .cancelButtonTapped) {
-							TextState(L10n.GatewaySettings.RemoveGatewayAlert.cancelButtonTitle)
-						}
-						ButtonState(action: .removeButtonTapped(gateway)) {
-							TextState(L10n.GatewaySettings.RemoveGatewayAlert.removeButtonTitle)
-						}
-					},
-					message: { TextState(L10n.GatewaySettings.RemoveGatewayAlert.message) }
-				)
+				state.removeGatewayAlert = .removeGateway(row: gateway)
 				return .none
 
 			case let .switchToGateway(gateway):
@@ -277,6 +266,24 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+}
+
+extension AlertState<GatewaySettings.ViewAction.RemoveGatewayAction> {
+	// FIXME: This should probably take an ID and not GatewayRow.State
+	static func removeGateway(row: GatewayRow.State) -> AlertState {
+		AlertState {
+			TextState(L10n.Gateways.RemoveGatewayAlert.title)
+		} actions: {
+			ButtonState(role: .cancel, action: .cancelButtonTapped) {
+				TextState(L10n.Common.cancel)
+			}
+			ButtonState(action: .removeButtonTapped(row)) {
+				TextState(L10n.Common.remove)
+			}
+		} message: {
+			TextState(L10n.Gateways.RemoveGatewayAlert.message)
 		}
 	}
 }

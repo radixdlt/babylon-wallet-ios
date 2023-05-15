@@ -12,9 +12,9 @@ extension IntroductionToEntity {
 			self.titleText = {
 				switch entityKind {
 				case .account:
-					return "Create an Account"
+					return L10n.CreateAccount.Introduction.title
 				case .identity:
-					return L10n.CreateEntity.Introduction.Persona.title
+					return L10n.CreatePersona.Introduction.title
 				}
 			}()
 		}
@@ -46,7 +46,7 @@ extension IntroductionToEntity {
 					.padding(.bottom, .medium2)
 				}
 				.footer {
-					Button(L10n.CreateEntity.Introduction.Button.continue) {
+					Button(L10n.Common.continue) {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -82,18 +82,18 @@ extension IntroductionToEntity {
 				viewStore.send(.showTutorial)
 			} label: {
 				Label {
-					Text(L10n.CreateEntity.Introduction.Persona.Button.tutorial).textStyle(.body1StandaloneLink)
+					Text(L10n.CreatePersona.Introduction.learnAboutPersonas).textStyle(.body1StandaloneLink)
 				} icon: {
 					Image(asset: AssetResource.info)
 				}
 				.tint(.app.blue2)
 			}
 
-			Text(L10n.CreateEntity.Introduction.Persona.subtitle0)
+			Text(L10n.CreatePersona.Introduction.subtitle1)
 				.font(.app.body1Regular)
 				.foregroundColor(.app.gray1)
 
-			Text(L10n.CreateEntity.Introduction.Persona.subtitle1)
+			Text(L10n.CreatePersona.Introduction.subtitle2)
 				.font(.app.body1Regular)
 				.foregroundColor(.app.gray1)
 		}

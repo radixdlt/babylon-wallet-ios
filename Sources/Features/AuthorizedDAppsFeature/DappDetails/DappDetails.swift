@@ -352,7 +352,7 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 		guard let fungibility else { return nil }
 		return .init(address: .init(address: address),
 		             fungibility: fungibility,
-		             name: metadata.name ?? L10n.DAppDetails.unknownTokenName,
+		             name: metadata.name ?? L10n.AuthorizedDapps.DAppDetails.unknownTokenName,
 		             symbol: metadata.symbol,
 		             description: metadata.description,
 		             iconURL: metadata.iconURL)
@@ -374,16 +374,16 @@ extension GatewayAPI.StateEntityDetailsResponseItem {
 extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
 		AlertState {
-			TextState(L10n.DAppDetails.forgetDappAlertTitle)
+			TextState(L10n.AuthorizedDapps.ForgetDappAlert.title)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState(L10n.DAppDetails.forgetDappAlertConfirm)
+				TextState(L10n.AuthorizedDapps.ForgetDappAlert.forget)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.DAppDetails.forgetDappAlertCancel)
+				TextState(L10n.Common.cancel)
 			}
 		} message: {
-			TextState(L10n.DAppDetails.forgetDappAlertMessage)
+			TextState(L10n.AuthorizedDapps.ForgetDappAlert.message)
 		}
 	}
 }

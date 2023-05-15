@@ -1,6 +1,14 @@
 import Prelude
 import SwiftUI
 
+extension Text {
+	/// Shows a markdown string, where any italics sections are shown in the provided color
+	public init(markdown: String, italicsColor: Color) {
+		let attributed = AttributedString(markdown: markdown, replaceItalicsWith: italicsColor)
+		self.init(attributed)
+	}
+}
+
 // TODO: replace usage with AttributedStringBuilder
 // (@davdroman will work on one and open source it in his spare time)
 extension AttributedString {

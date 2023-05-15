@@ -7,8 +7,8 @@ extension Completion {
 		let subtitle: String
 
 		init(state: Completion.State) {
-			title = L10n.DApp.Completion.title
-			subtitle = L10n.DApp.Completion.subtitle(state.dappMetadata.name.rawValue)
+			title = L10n.DAppRequest.Completion.title
+			subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name.rawValue)
 		}
 	}
 

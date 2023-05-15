@@ -323,16 +323,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 	static var confirmForget: AlertState {
 		AlertState {
-			TextState(L10n.PersonaDetails.deauthorizePersonaAlertTitle)
+			TextState(L10n.AuthorizedDapps.RemoveAuthorizationAlert.title)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState(L10n.PersonaDetails.deauthorizePersonaAlertConfirm)
+				TextState(L10n.Common.confirm)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.PersonaDetails.deauthorizePersonaAlertCancel)
+				TextState(L10n.Common.cancel)
 			}
 		} message: {
-			TextState(L10n.PersonaDetails.deauthorizePersonaAlertMessage)
+			TextState(L10n.AuthorizedDapps.RemoveAuthorizationAlert.message)
 		}
 	}
 }
