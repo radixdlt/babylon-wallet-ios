@@ -205,7 +205,7 @@ public struct Signing: Sendable, FeatureReducer {
 			factorsLeftToSignWith: state.factorsLeftToSignWith,
 			signingPurposeWithPayload: state.signingPurposeWithPayload
 		) else {
-			assert(state.signatures.count == state.expectedSignatureCount)
+			assert(state.signatures.count == state.expectedSignatureCount, "Expected to have \(state.expectedSignatureCount) signatures, but got: \(state.signatures.count)")
 			return .send(.internal(.finishedSigningWithAllFactors))
 		}
 		state.step = nextStep
