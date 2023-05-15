@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-public struct ToAccountTransfer: Sendable, FeatureReducer {
+public struct ReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias Account = Profile.Network.Account
 

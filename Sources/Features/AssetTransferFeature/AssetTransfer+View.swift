@@ -1,9 +1,9 @@
 import FeaturePrelude
 
-// MARK: - FocusField
-public enum FocusField: Hashable {
+// MARK: - TransferFocusedField
+public enum TransferFocusedField: Hashable {
 	case message
-	case asset(accountContainer: ToAccountTransfer.State.ID, asset: UUID)
+	case asset(accountContainer: ReceivingAccount.State.ID, asset: UUID)
 }
 
 extension AssetTransfer {
@@ -12,7 +12,7 @@ extension AssetTransfer {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AssetTransfer>
-		@FocusState var focusedField: FocusField?
+		@FocusState var focusedField: TransferFocusedField?
 
 		public init(store: StoreOf<AssetTransfer>) {
 			self.store = store
@@ -33,14 +33,10 @@ extension AssetTransfer.View {
 						}
 					)
 
-					accountsView(viewStore)
-
-					Button("Add Account", asset: AssetResource.addAccount) {
-						viewStore.send(.addAccountTapped)
-					}
-					.textStyle(.button)
-					.foregroundColor(.app.blue2)
-					.flushedRight
+					TransferAccountList.View(
+						store: store.scope(state: \.accounts, action: { .child(.accounts($0)) }),
+						focusedField: $focusedField
+					)
 
 					FixedSpacer(height: .large1)
 
@@ -78,43 +74,6 @@ extension AssetTransfer.View {
 				}
 				.textStyle(.button)
 				.foregroundColor(.app.blue2)
-			}
-		}
-	}
-
-	func accountsView(_ viewStore: ViewStoreOf<AssetTransfer>) -> some View {
-		VStack(alignment: .trailing, spacing: .zero) {
-			VStack(spacing: .small2) {
-				Text("From")
-					.sectionHeading
-					.textCase(.uppercase)
-					.flushedLeft(padding: .medium3)
-
-				SmallAccountCard(
-					viewStore.fromAccount.displayName.rawValue,
-					identifiable: .address(.account(viewStore.fromAccount.address)),
-					gradient: .init(viewStore.fromAccount.appearanceID)
-				)
-				.cornerRadius(.small1)
-			}
-
-			Text("To")
-				.sectionHeading
-				.textCase(.uppercase)
-				.flushedLeft(padding: .medium3)
-				.padding(.bottom, .small2)
-				.frame(height: 64, alignment: .bottom)
-				.background(alignment: .trailing) {
-					VLine()
-						.stroke(.app.gray3, style: .transfer)
-						.frame(width: 1)
-						.padding(.trailing, SpeechbubbleShape.triangleInset)
-				}
-			VStack(spacing: .medium3) {
-				ForEachStore(
-					store.scope(state: \.toAccounts, action: { .child(.toAccountTransfer(id: $0, action: $1)) }),
-					content: { ToAccountTransfer.View(store: $0, focused: $focusedField) }
-				)
 			}
 		}
 	}

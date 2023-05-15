@@ -5,9 +5,9 @@ extension AssetTransferMessage {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AssetTransferMessage>
-		let focused: FocusState<FocusField?>.Binding
+		let focused: FocusState<TransferFocusedField?>.Binding
 
-		public init(store: StoreOf<AssetTransferMessage>, focused: FocusState<FocusField?>.Binding) {
+		public init(store: StoreOf<AssetTransferMessage>, focused: FocusState<TransferFocusedField?>.Binding) {
 			self.store = store
 			self.focused = focused
 		}
@@ -44,7 +44,7 @@ extension AssetTransferMessage.View {
 						.foregroundColor(.app.gray2)
 					}
 					.padding(.medium3)
-					.topRoundedCorners(strokeColor: .app.gray4)
+					.topRoundedCorners(strokeColor: .borderColor)
 
 					TextEditor(text: viewStore.binding(
 						get: \.message,
@@ -58,8 +58,8 @@ extension AssetTransferMessage.View {
 					.padding(.medium3)
 					.multilineTextAlignment(.leading)
 					.scrollContentBackground(.hidden) // Remove the default background to allow customization
-					.background(.app.gray5)
-					.bottomRoundedCorners(strokeColor: focused.wrappedValue == .message ? .app.gray1 : .app.gray4)
+					.background(Color.containerContentBackground)
+					.bottomRoundedCorners(strokeColor: focused.wrappedValue == .message ? .focusedBorderColor : .borderColor)
 				}
 			}
 			.sheet(
