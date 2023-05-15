@@ -620,12 +620,6 @@ public enum L10n {
       public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {
         return L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitle", p1, fallback: "*%s* is requesting permission to *always* be able to view the following personal data when you login with this Persona.")
       }
-      ///  is requesting permission to 
-      public static let subtitlePart1 = L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitlePart1", fallback: " is requesting permission to ")
-      /// always
-      public static let subtitlePart2 = L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitlePart2", fallback: "always")
-      ///  be able to view the following personal data when you login with this Persona.
-      public static let subtitlePart3 = L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitlePart3", fallback: " be able to view the following personal data when you login with this Persona.")
       /// Personal Data Permission
       public static let title = L10n.tr("Localizable", "dAppRequest_personalDataPermission_title", fallback: "Personal Data Permission")
       /// You can update this permission in your settings at anA time.
