@@ -53,10 +53,11 @@ extension NonFungibleTokenList.Detail {
 								Color.app.gray5.edgesIgnoringSafeArea(.bottom)
 
 								VStack(spacing: .medium1) {
-									Image(asset: headerIconAsset)
+									Image(asset: AssetResource.nft)
 										.resizable()
 										.frame(width: 104, height: 104)
 										.clipShape(RoundedRectangle(cornerRadius: .small1, style: .circular))
+										.border(.red)
 
 									let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
 									if let description = viewStore.description {
@@ -110,11 +111,6 @@ extension NonFungibleTokenList.Detail {
 				}
 				.foregroundColor(.app.gray1)
 			}
-		}
-
-		public var headerIconAsset: ImageAsset {
-			// TODO: implement depending on the API design
-			AssetResource.nft
 		}
 	}
 }

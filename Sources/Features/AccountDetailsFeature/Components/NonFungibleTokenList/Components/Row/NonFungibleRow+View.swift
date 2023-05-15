@@ -111,7 +111,7 @@ extension NonFungibleTokenList.Row.View {
 		return headerHeight + visibleCollapsedRowsHeight + totalSpacing
 	}
 
-	fileprivate func headerSupplyText(with _: ViewStoreOf<NonFungibleTokenList.Row>) -> String {
+	fileprivate func headerSupplyText(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> String {
 		// TODO: remove when API is ready
 		L10n.AssetDetails.supplyUnkown
 

@@ -11,7 +11,7 @@ struct NFTView: View {
 				.fill(.app.gray4)
 				.frame(height: .large2)
 		}
-		.cornerRadius(.small3)
+		.cornerRadius(.small1)
 	}
 }
 
