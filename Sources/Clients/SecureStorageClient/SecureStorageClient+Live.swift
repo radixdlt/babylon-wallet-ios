@@ -212,9 +212,9 @@ extension SecureStorageClient: DependencyKey {
 					#endif
 					case .importOlympiaAccounts:
 						return L10n.Biometrics.Prompt.importOlympiaAccounts
-                                        case .checkingAccounts:
-                                                return "Checking accounts."
-                                        }
+					case .checkingAccounts:
+						return "Checking accounts."
+					}
 				}()
 				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
 				guard let data = try await keychainClient.getDataWithAuthForKey(key, authPrompt) else {
