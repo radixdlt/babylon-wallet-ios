@@ -15,7 +15,7 @@ extension PersonaList {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					ScrollView {
-						Text(L10n.PersonaList.subtitle)
+						Text(L10n.Personas.subtitle)
 							.sectionHeading
 							.flushedLeft
 							.padding([.horizontal, .top], .medium3)
@@ -27,14 +27,14 @@ extension PersonaList {
 						PersonaListCoreView(store: store)
 					}
 
-					Button(L10n.Personas.createNewPersonaButtonTitle) {
+					Button(L10n.Personas.createNewPersona) {
 						viewStore.send(.createNewPersonaButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
-				.navigationTitle(L10n.PersonaList.title)
+				.navigationTitle(L10n.Personas.title)
 			}
 		}
 	}

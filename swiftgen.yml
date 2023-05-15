@@ -3,6 +3,8 @@ output_dir: Sources/Core/Resources/Generated
 
 strings:
   inputs: en.lproj
+  options:
+    separator: _
   outputs:
     params:
       publicAccess: true

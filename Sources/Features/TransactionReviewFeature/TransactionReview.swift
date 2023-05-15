@@ -434,17 +434,20 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
-		let addresses = manifest.encounteredAddresses.componentAddresses.userApplications
-		let dApps = try await addresses.asyncMap(extractDappInfo)
+		let components = manifest.encounteredAddresses.componentAddresses.userApplications
+		let dApps = try await components.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
 
-		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: dApps))
+		return TransactionReviewDappsUsed.State(isExpanded: true, dApps: .init(uniqueElements: Set(dApps)))
 	}
 
-	private func extractDappInfo(_ address: ComponentAddress) async throws -> LedgerEntity {
-		let metadata = try? await gatewayAPIClient.getDappDefinition(address)
+	private func extractDappInfo(_ component: ComponentAddress) async throws -> LedgerEntity {
+		let dAppDefinitionAddress = try await gatewayAPIClient.getDappDefinitionAddress(component)
+		let metadata = try? await gatewayAPIClient.getDappMetadata(dAppDefinitionAddress)
+			.validating(dAppComponent: component)
+
 		return LedgerEntity(
-			id: address.address,
+			id: dAppDefinitionAddress.id,
 			metadata: .init(name: metadata?.name ?? L10n.TransactionReview.unknown,
 			                thumbnail: metadata?.iconURL,
 			                description: metadata?.description)
@@ -733,28 +736,6 @@ extension Collection where Element: Equatable {
 			count += 1
 		}
 		return count
-	}
-}
-
-extension GatewayAPI.EntityMetadataCollection {
-	var description: String? {
-		self["description"]
-	}
-
-	var symbol: String? {
-		self["symbol"]
-	}
-
-	var name: String? {
-		self["name"]
-	}
-
-	var url: String? {
-		self["url"]
-	}
-
-	subscript(key: String) -> String? {
-		items.first { $0.key == key }?.value.asString
 	}
 }
 

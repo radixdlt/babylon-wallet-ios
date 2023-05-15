@@ -34,8 +34,6 @@ extension AppSettings {
 		let appVersion: String
 
 		init(state: AppSettings.State) {
-			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
-
 			#if DEBUG
 			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			self.profileToInspect = state.profileToInspect
@@ -48,8 +46,10 @@ extension AppSettings {
 			}()
 			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
 			#endif
-			self.appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
+
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
+			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
+			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
 		}
 	}
 }
@@ -227,27 +227,27 @@ extension AppSettings.View {
 	private func settingsRows() -> [RowModel] {
 		[
 			.init(
-				title: L10n.Settings.desktopConnectionsButtonTitle,
+				title: L10n.Settings.linkedConnectors,
 				asset: AssetResource.desktopConnections,
 				action: .manageP2PLinksButtonTapped
 			),
 			.init(
-				title: L10n.Settings.gatewaysButtonTitle,
+				title: L10n.Settings.gateways,
 				asset: AssetResource.gateway,
 				action: .gatewaysButtonTapped
 			),
 			.init(
-				title: L10n.Settings.authorizedDappsButtonTitle,
+				title: L10n.Settings.authorizedDapps,
 				asset: AssetResource.authorizedDapps,
 				action: .authorizedDappsButtonTapped
 			),
 			.init(
-				title: L10n.Settings.personasButtonTitle,
+				title: L10n.Settings.personas,
 				asset: AssetResource.personas,
 				action: .personasButtonTapped
 			),
 			.init(
-				title: L10n.Settings.generalSettingsButtonTitle,
+				title: L10n.Settings.appSettings,
 				asset: AssetResource.generalSettings,
 				action: .generalSettingsButtonTapped
 			),
@@ -273,7 +273,7 @@ extension AppSettings.View {
 					}
 
 					#if DEBUG
-					PlainListRow(title: L10n.Settings.inspectProfileButtonTitle) {
+					PlainListRow(title: L10n.Settings.inspectProfile) {
 						Image(systemName: "wallet.pass")
 							.frame(.verySmall)
 					}
@@ -291,7 +291,7 @@ extension AppSettings.View {
 					}
 					.withSeparator
 
-					PlainListRow(title: L10n.Settings.importLegacyWallet, asset: AssetResource.generalSettings)
+					PlainListRow(title: L10n.Settings.importFromLegacyWallet, asset: AssetResource.generalSettings)
 						.tappable {
 							viewStore.send(.importFromOlympiaWalletButtonTapped)
 						}
@@ -308,7 +308,7 @@ extension AppSettings.View {
 				}
 				.padding(.bottom, .large3)
 				VStack(spacing: .zero) {
-					Button(L10n.Settings.deleteAllButtonTitle) {
+					Button(L10n.Settings.deleteWalletData) {
 						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular(isDestructive: true))

@@ -3,45 +3,26 @@ import FeaturePrelude
 // MARK: - Permission.View
 extension AccountPermission {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
+		let subtitle: String
 		let numberOfAccounts: String
 
 		init(state: AccountPermission.State) {
-			title = L10n.DApp.AccountPermission.title
-			subtitle = {
-				let normalColor = Color.app.gray2
-				let highlightColor = Color.app.gray1
+			self.thumbnail = state.dappMetadata.thumbnail
+			self.title = L10n.DAppRequest.AccountPermission.title
+			self.subtitle = L10n.DAppRequest.AccountPermission.subtitle(state.dappMetadata.name.rawValue)
 
-				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
-
-				let explanation: AttributedString = {
-					let always = AttributedString(L10n.DApp.AccountPermission.Subtitle.always, foregroundColor: highlightColor)
-
-					return AttributedString(
-						L10n.DApp.AccountPermission.Subtitle.Explanation.first,
-						foregroundColor: normalColor
-					)
-						+ always
-						+ AttributedString(
-							L10n.DApp.AccountPermission.Subtitle.Explanation.second,
-							foregroundColor: normalColor
-						)
-				}()
-
-				return dappName + explanation
-			}()
-
-			numberOfAccounts = "•  " + {
+			self.numberOfAccounts = "•  " + {
 				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
 				case (.atLeast, 0):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.atLeastZero
+					return L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeastZero
 				case let (.atLeast, number):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.atLeast(number)
+					return L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeast(number)
 				case (.exactly, 1):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.exactlyOne
+					return L10n.DAppRequest.AccountPermission.numberOfAccountsExactlyOne
 				case let (.exactly, number):
-					return L10n.DApp.AccountPermission.NumberOfAccounts.exactly(number)
+					return L10n.DAppRequest.AccountPermission.numberOfAccountsExactly(number)
 				}
 			}()
 		}
@@ -60,7 +41,7 @@ extension AccountPermission {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
@@ -73,7 +54,7 @@ extension AccountPermission {
 						}
 						.padding(.horizontal, .medium2)
 
-						Text(L10n.DApp.AccountPermission.updateInSettingsExplanation)
+						Text(L10n.DAppRequest.AccountPermission.updateInSettingsExplanation)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
@@ -83,7 +64,7 @@ extension AccountPermission {
 					.padding(.bottom, .medium2)
 				}
 				.footer {
-					Button(L10n.DApp.AccountPermission.Button.continue) {
+					Button(L10n.Common.continue) {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)

@@ -68,6 +68,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case .task:
 			return .run { [strategy = state.strategy] send in
 				for try await personas in await personasClient.personas() {
+					guard !Task.isCancelled else { return }
 					let ids = try await personaIDs(strategy) ?? personas.ids
 					let result = ids.compactMap { personas[id: $0] }.map(Persona.State.init)
 					guard result.count == ids.count else {
@@ -97,7 +98,8 @@ public struct PersonaList: Sendable, FeatureReducer {
 		case let .ids(ids):
 			return ids
 		case let .dApp(dAppID):
-			return try await authorizedDappsClient.getDetailedDapp(dAppID).detailedAuthorizedPersonas.ids
+			guard let dApp = try? await authorizedDappsClient.getDetailedDapp(dAppID) else { return [] }
+			return dApp.detailedAuthorizedPersonas.ids
 		}
 	}
 

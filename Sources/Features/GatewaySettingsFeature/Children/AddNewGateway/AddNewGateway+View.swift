@@ -15,7 +15,7 @@ extension AddNewGateway.State {
 extension AddNewGateway {
 	public struct ViewState: Equatable {
 		let gatewayURL: String
-		let textFieldPlaceholder: String = L10n.GatewaySettings.AddNewGateway.textFieldPlaceholder
+		let textFieldPlaceholder: String = L10n.Gateways.AddNewGateway.textFieldPlaceholder
 		let focusedField: State.Field?
 		let fieldHint: Hint?
 		let addGatewayButtonState: ControlState
@@ -34,12 +34,12 @@ extension AddNewGateway {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
-						Text(L10n.GatewaySettings.AddNewGateway.title)
+						Text(L10n.Gateways.AddNewGateway.title)
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
 							.multilineTextAlignment(.center)
 
-						Text(L10n.GatewaySettings.AddNewGateway.subtitle)
+						Text(L10n.Gateways.AddNewGateway.subtitle)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
@@ -70,7 +70,7 @@ extension AddNewGateway {
 
 						Spacer()
 
-						Button(L10n.GatewaySettings.AddNewGateway.addGatewayButtonTitle) {
+						Button(L10n.Gateways.AddNewGateway.addGatewayButtonTitle) {
 							viewStore.send(.addNewGatewayButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)

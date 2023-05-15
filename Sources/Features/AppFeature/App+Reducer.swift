@@ -139,7 +139,7 @@ public struct App: Sendable, FeatureReducer {
 		case let .displayErrorAlert(error):
 			state.alert = .userErrorAlert(
 				.init(
-					title: { TextState(L10n.App.errorOccurredTitle) },
+					title: { TextState(L10n.Common.errorAlertTitle) },
 					actions: {},
 					message: { TextState(error.legibleLocalizedDescription) }
 				)
@@ -196,13 +196,13 @@ public struct App: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		state.alert = .incompatibleProfileErrorAlert(
 			.init(
-				title: { TextState(L10n.Splash.incompatibleProfileVersionAlertTitle) },
+				title: { TextState(L10n.Splash.IncompatibleProfileVersionAlert.title) },
 				actions: {
 					ButtonState(role: .destructive, action: .deleteWalletDataButtonTapped) {
-						TextState(L10n.Splash.incompatibleProfileVersionAlertDeleteButton)
+						TextState(L10n.Splash.IncompatibleProfileVersionAlert.delete)
 					}
 				},
-				message: { TextState(L10n.Splash.incompatibleProfileVersionAlertMessage) }
+				message: { TextState(L10n.Splash.IncompatibleProfileVersionAlert.message) }
 			)
 		)
 		return .none

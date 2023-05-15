@@ -11,18 +11,18 @@ extension ConnectExtensionView {
 			Image(asset: AssetResource.browsers)
 				.padding([.top, .horizontal], .medium1)
 
-			Text(L10n.Settings.ConnectExtension.title)
+			Text(L10n.Settings.LinkToConnectorHeader.title)
 				.textStyle(.body1Header)
 				.foregroundColor(.app.gray1)
 				.padding(.horizontal, .medium2)
 
-			Text(L10n.Settings.ConnectExtension.subtitle)
+			Text(L10n.Settings.LinkToConnectorHeader.subtitle)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2Regular)
 				.multilineTextAlignment(.center)
 				.padding(.horizontal, .medium2)
 
-			Button(L10n.Settings.ConnectExtension.buttonTitle) {
+			Button(L10n.Settings.LinkToConnectorHeader.linkToConnector) {
 				action()
 			}
 			.buttonStyle(.secondaryRectangular(

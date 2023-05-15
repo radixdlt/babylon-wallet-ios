@@ -10,18 +10,21 @@ extension DappInteraction {
 
 // MARK: - DappMetadata
 struct DappMetadata: Sendable, Hashable, Codable {
-	static let defaultName = NonEmptyString(rawValue: L10n.DApp.Metadata.unknownName)!
+	static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
 	let name: NonEmpty<String>
+	let thumbnail: URL?
 	let description: String?
 	let origin: P2P.Dapp.Request.Metadata.Origin
 
 	init(
 		name: String?,
+		thumbnail: URL? = nil,
 		description: String? = nil,
 		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
 		self.name = name.flatMap(NonEmptyString.init(rawValue:)) ?? Self.defaultName
+		self.thumbnail = thumbnail
 		self.description = description
 		self.origin = origin
 	}
@@ -31,6 +34,7 @@ struct DappMetadata: Sendable, Hashable, Codable {
 extension DappMetadata {
 	static let previewValue: Self = .init(
 		name: "Collabo.Fi",
+		thumbnail: nil,
 		description: "A very collaby finance dapp",
 		origin: .init(rawValue: "https://radfi.com")
 	)
