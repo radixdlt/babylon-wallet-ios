@@ -7,19 +7,18 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 			case `public`
 		}
 
-		public var kind: Kind
+		public let kind: Kind = .public // only public is supported for now
 		public var message: String
 
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(kind: Kind, message: String) {
-			self.kind = kind
+		init(message: String) {
 			self.message = message
 		}
 
 		static var empty: Self {
-			.init(kind: .private, message: "")
+			.init(message: "")
 		}
 	}
 
