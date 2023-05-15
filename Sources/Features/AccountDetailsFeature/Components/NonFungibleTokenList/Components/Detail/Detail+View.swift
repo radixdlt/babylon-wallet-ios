@@ -2,18 +2,16 @@ import FeaturePrelude
 
 extension NonFungibleTokenList.Detail.State {
 	var viewState: NonFungibleTokenList.Detail.ViewState {
-		print("NFT ID key: \(token.keyImageURL), name: \(token.name)")
-		return
-			.init(
-				keyImage: token.keyImageURL,
-				nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
-				name: token.name,
-				description: token.description,
-				resourceName: resource.name,
-				resourceThumbnail: resource.iconURL,
-				resourceDescription: resource.description,
-				resourceAddress: resource.resourceAddress
-			)
+		.init(
+			keyImage: token.keyImageURL,
+			nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
+			name: token.name,
+			description: token.description,
+			resourceName: resource.name,
+			resourceThumbnail: resource.iconURL,
+			resourceDescription: resource.description,
+			resourceAddress: resource.resourceAddress
+		)
 	}
 }
 
@@ -41,16 +39,17 @@ extension NonFungibleTokenList.Detail {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
-					ScrollView {
+					ScrollView(showsIndicators: false) {
 						VStack(spacing: .medium1) {
-							if let keyImage = viewStore.keyImage {
-								NFTFullView(url: keyImage)
-							}
-
 							VStack(spacing: .medium3) {
+								if let keyImage = viewStore.keyImage {
+									NFTFullView(url: keyImage)
+								}
+
 								KeyValueView(key: L10n.AssetDetails.NFTDetails.id) {
 									AddressView(.identifier(.nonFungibleGlobalID(viewStore.nonFungibleGlobalID)))
 								}
+
 								if let name = viewStore.name {
 									KeyValueView(key: L10n.AssetDetails.NFTDetails.name, value: name)
 								}
