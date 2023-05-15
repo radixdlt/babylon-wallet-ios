@@ -12,6 +12,10 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case closeDetailsTapped
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case asset(NonFungibleTokenList.Row.State.ID, NonFungibleTokenList.Row.Action)
 		case destination(PresentationAction<Destinations.Action>)
@@ -45,6 +49,14 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 			}
 	}
 
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .closeDetailsTapped:
+			state.destination = nil
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .asset(rowID, .delegate(.open(localID))):
@@ -60,11 +72,10 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 			state.destination = .details(.init(token: token, resource: row.resource))
 			return .none
 
-		case .destination(.presented(.details(.delegate(.dismiss)))):
-			state.destination = nil
+		case .asset:
 			return .none
 
-		default:
+		case .destination:
 			return .none
 		}
 	}

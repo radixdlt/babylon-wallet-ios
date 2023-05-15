@@ -9,21 +9,6 @@ extension NonFungibleTokenList {
 			let resource: AccountPortfolio.NonFungibleResource
 		}
 
-		public enum ViewAction: Sendable, Equatable {
-			case closeButtonTapped
-		}
-
-		public enum DelegateAction: Sendable, Equatable {
-			case dismiss
-		}
-
 		public init() {}
-
-		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-			switch viewAction {
-			case .closeButtonTapped:
-				return .send(.delegate(.dismiss))
-			}
-		}
 	}
 }
