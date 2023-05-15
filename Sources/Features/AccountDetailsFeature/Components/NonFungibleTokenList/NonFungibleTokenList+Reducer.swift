@@ -47,8 +47,17 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .asset(_, .delegate(.selected(detailState))):
-			state.destination = .details(detailState)
+		case let .asset(rowID, .delegate(.open(localID))):
+			guard let row = state.rows[id: rowID] else {
+				loggerGlobal.warning("Selected row does not exist \(rowID)")
+				return .none
+			}
+			guard let token = row.resource.tokens[id: localID] else {
+				loggerGlobal.warning("Selected token does not exist: \(localID)")
+				return .none
+			}
+
+			state.destination = .details(.init(token: token, resource: row.resource))
 			return .none
 
 		case .destination(.presented(.details(.delegate(.dismiss)))):

@@ -124,7 +124,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .portfolioUpdated(portfolio):
 			let xrd = portfolio.fungibleResources.xrdResource.map(FungibleTokenList.Row.State.init(xrdToken:))
 			let nonXrd = portfolio.fungibleResources.nonXrdResources.map(FungibleTokenList.Row.State.init(nonXRDToken:))
-			let nfts = portfolio.nonFungibleResources.map(NonFungibleTokenList.Row.State.init(token:))
+			let nfts = portfolio.nonFungibleResources.map(NonFungibleTokenList.Row.State.init(resource:))
 
 			state.assets = .init(
 				fungibleTokenList: .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd)),

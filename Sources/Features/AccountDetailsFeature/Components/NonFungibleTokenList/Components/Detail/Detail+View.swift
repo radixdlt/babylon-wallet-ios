@@ -2,16 +2,18 @@ import FeaturePrelude
 
 extension NonFungibleTokenList.Detail.State {
 	var viewState: NonFungibleTokenList.Detail.ViewState {
-		.init(
-			keyImage: token.keyImageURL,
-			nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
-			name: token.name,
-			description: token.description,
-			resourceName: resource.name,
-			resourceThumbnail: resource.iconURL,
-			resourceDescription: resource.description,
-			resourceAddress: resource.resourceAddress
-		)
+		print("NFT ID key: \(token.keyImageURL), name: \(token.name)")
+		return
+			.init(
+				keyImage: token.keyImageURL,
+				nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
+				name: token.name,
+				description: token.description,
+				resourceName: resource.name,
+				resourceThumbnail: resource.iconURL,
+				resourceDescription: resource.description,
+				resourceAddress: resource.resourceAddress
+			)
 	}
 }
 
@@ -41,6 +43,10 @@ extension NonFungibleTokenList.Detail {
 				NavigationStack {
 					ScrollView {
 						VStack(spacing: .medium1) {
+							if let keyImage = viewStore.keyImage {
+								NFTFullView(url: keyImage)
+							}
+
 							VStack(spacing: .medium3) {
 								KeyValueView(key: L10n.AssetDetails.NFTDetails.id) {
 									AddressView(.identifier(.nonFungibleGlobalID(viewStore.nonFungibleGlobalID)))
@@ -108,25 +114,3 @@ extension AccountPortfolio.NonFungibleResource {
 		resourceAddress.address + ":" + id.rawValue
 	}
 }
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct NonFungibleTokenListDetail_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NonFungibleTokenList.Detail.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: NonFungibleTokenList.Detail()
-//			)
-//		)
-//	}
-// }
-//
-// extension NonFungibleTokenList.Detail.State {
-//	public static let previewValue = Self(
-//		resource: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: []),
-//		localId_: .init("#1#")
-//	)
-// }
-// #endif

@@ -1,12 +1,20 @@
 import FeaturePrelude
 import SharedModels
 
-// MARK: - NFTView
-struct NFTView: View {
+// MARK: - NFTFullView
+struct NFTFullView: View {
 	let url: URL?
+	let minAspect: CGFloat
+	let maxAspect: CGFloat
+
+	init(url: URL?, minAspect: CGFloat = .zero, maxAspect: CGFloat = .infinity) {
+		self.url = url
+		self.minAspect = minAspect
+		self.maxAspect = maxAspect
+	}
 
 	var body: some View {
-		LoadableImage(url: url, size: .flexibleHeight, loading: .shimmer) {
+		LoadableImage(url: url, size: .flexible(minAspect: minAspect, maxAspect: maxAspect), loading: .shimmer) {
 			Rectangle()
 				.fill(.app.gray4)
 				.frame(height: .large2)
@@ -28,7 +36,7 @@ struct NFTIDView: View {
 	var body: some View {
 		VStack(spacing: .small1) {
 			if isExpanded {
-				NFTView(url: thumbnail)
+				NFTFullView(url: thumbnail, minAspect: minImageAspect, maxAspect: maxImageAspect)
 					.padding(.bottom, .small1)
 
 				KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
@@ -49,6 +57,9 @@ struct NFTIDView: View {
 			.tokenRowShadow(isLast || !isExpanded)
 		)
 	}
+
+	private let minImageAspect: CGFloat = 1
+	private let maxImageAspect: CGFloat = 16 / 9
 }
 
 // MARK: - KeyValueView

@@ -72,14 +72,14 @@ extension AccountPortfolio {
 		public let name: String?
 		public let description: String?
 		public let iconURL: URL?
-		public let tokens: [NonFungibleToken]
+		public let tokens: IdentifiedArrayOf<NonFungibleToken>
 
 		public init(
 			resourceAddress: ResourceAddress,
 			name: String? = nil,
 			description: String? = nil,
 			iconURL: URL? = nil,
-			tokens: [NonFungibleToken] = []
+			tokens: IdentifiedArrayOf<NonFungibleToken> = []
 		) {
 			self.resourceAddress = resourceAddress
 			self.name = name
@@ -102,7 +102,7 @@ extension AccountPortfolio {
 				self.name = name
 				self.description = description
 				self.keyImageURL = keyImageURL
-				self.metadata = metadata + [.init(key: "Type", value: "Devin Booker - Dunk")]
+				self.metadata = metadata
 			}
 		}
 	}
