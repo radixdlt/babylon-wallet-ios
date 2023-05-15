@@ -68,7 +68,6 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			state.message = nil
 			return .none
 		case let .toAccountTransfer(id: id, action: .delegate(.removed)):
-			// Do not allow removing if here is only one toAccount container
 			guard state.toAccounts.count > 1 else {
 				return .none
 			}

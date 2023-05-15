@@ -29,7 +29,7 @@ extension AssetTransferMessage.View {
 							viewStore.send(.messageKindTapped)
 						} label: {
 							HStack {
-								Text("Private")
+								Text("Public")
 								Image(asset: AssetResource.chevronDown)
 							}
 						}
@@ -41,11 +41,12 @@ extension AssetTransferMessage.View {
 						Button("", asset: AssetResource.close) {
 							viewStore.send(.removeMessageTapped)
 						}
+						.foregroundColor(.app.gray2)
 					}
 					.padding(.medium3)
 					.overlay(
 						RoundedCorners(radius: .small2, corners: [.topLeft, .topRight])
-							.stroke(Color.gray, lineWidth: 1)
+							.stroke(.app.gray4, lineWidth: 1)
 					)
 
 					TextEditor(text: viewStore.binding(
@@ -56,16 +57,16 @@ extension AssetTransferMessage.View {
 					)
 					)
 					.focused(focused, equals: .message)
-					.frame(minHeight: 64, alignment: .leading)
-					.fixedSize(horizontal: false, vertical: true)
+					.frame(minHeight: .transferMessageDefaultHeight, alignment: .leading)
 					.padding(.medium3)
 					.multilineTextAlignment(.leading)
-					.scrollContentBackground(.hidden)
-					.background(.app.gray4)
-					.overlay(
+					.scrollContentBackground(.hidden) // Remove the default background to allow customization
+					.background(.app.gray5)
+					.clipShape(RoundedCorners(radius: .small2, corners: [.bottomLeft, .bottomRight]))
+					.background(
 						RoundedCorners(radius: .small2, corners: [.bottomLeft, .bottomRight])
 							.stroke(
-								focused.wrappedValue == .message ? Color.black : Color.gray,
+								focused.wrappedValue == .message ? .app.gray1 : .app.gray4,
 								lineWidth: 1
 							)
 					)

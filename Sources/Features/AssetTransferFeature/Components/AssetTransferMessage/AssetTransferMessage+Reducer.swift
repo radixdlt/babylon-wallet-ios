@@ -27,8 +27,6 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 		case messageKindTapped
 		case removeMessageTapped
 		case messageChanged(String)
-		case messageFocusChanged
-		case focusChanged(Bool)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -67,15 +65,12 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 		case .messageKindTapped:
 			state.destination = .messageMode(.init())
 			return .none
+
 		case .removeMessageTapped:
 			return .send(.delegate(.removed))
+
 		case let .messageChanged(message):
 			state.message = message
-			return .none
-		case .messageFocusChanged:
-			return .none
-		case let .focusChanged(focused):
-			// state.isFocused = focused
 			return .none
 		}
 	}

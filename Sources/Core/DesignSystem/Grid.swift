@@ -53,4 +53,7 @@ extension CGFloat {
 
 	/// 75
 	public static let largeButtonHeight: Self = 75
+
+	///
+	public static let transferMessageDefaultHeight: Self = 64
 }
