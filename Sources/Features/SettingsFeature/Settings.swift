@@ -60,9 +60,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
 			case deleteProfile
-			#if DEBUG
 			case deleteProfileLocalKeepInICloudIfPresent
-			#endif
 			case cancel
 		}
 	}
@@ -161,11 +159,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 					ButtonState(role: .destructive, action: .send(.deleteProfile)) {
 						TextState("Delete Wallet data")
 					}
-					#if DEBUG
-					ButtonState(role: .cancel, action: .send(.deleteProfileLocalKeepInICloudIfPresent)) {
+					ButtonState(role: .destructive, action: .send(.deleteProfileLocalKeepInICloudIfPresent)) {
 						TextState("Delete local Wallet data (keep iCloud)")
 					}
-					#endif // DEBUG
 					ButtonState(role: .cancel, action: .send(.cancel)) {
 						TextState("Cancel")
 					}
@@ -251,10 +247,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfile))):
 			return deleteProfile(keepInICloudIfPresent: false)
 
-		#if DEBUG
 		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfileLocalKeepInICloudIfPresent))):
 			return deleteProfile(keepInICloudIfPresent: true)
-		#endif // DEBUG
 
 		case .destination(.dismiss):
 			switch state.destination {

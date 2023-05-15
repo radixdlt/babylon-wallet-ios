@@ -250,6 +250,7 @@ extension ProfileStore {
 	func changeProfileSnapshot(to profileSnapshot: ProfileSnapshot) async throws {
 		var profileSnapshot = profileSnapshot
 		try await claimProfileSnapshot(&profileSnapshot)
+		updateHeader(&profileSnapshot)
 
 		// Save the updated snapshot.
 		// Do not check the ownership since the device did claim the profile ownership.
@@ -267,14 +268,14 @@ extension ProfileStore {
 	}
 
 	func saveProfileChanges(_ profile: Profile) async throws {
-		var profile = profile
-		updateHeader(&profile)
-		try await saveProfileSnapshot(profile.snapshot())
-		changeState(to: .persisted(profile))
+		var snapshot = profile.snapshot()
+		updateHeader(&snapshot)
+		try await saveProfileSnapshot(snapshot)
+		try changeState(to: .persisted(.init(snapshot: snapshot)))
 	}
 
 	/// Update the header with all of the relevant changes
-	func updateHeader(_ profile: inout Profile) {
+	func updateHeader(_ profile: inout ProfileSnapshot) {
 		@Dependency(\.date) var date
 		let networks = profile.networks
 
@@ -299,12 +300,11 @@ extension ProfileStore {
 
 	func updateProfileHeadersList(_ snapshot: ProfileSnapshot) async throws {
 		let header = snapshot.header
-		let iCloudSyncEnabled = snapshot.appPreferences.security.isCloudProfileSyncEnabled
 		if var profileHeaders = try await secureStorageClient.loadProfileHeaderList()?.rawValue {
 			profileHeaders[id: header.id] = header
-			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: profileHeaders)!, iCloudSyncEnabled)
+			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: profileHeaders)!)
 		} else {
-			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [header])!, iCloudSyncEnabled)
+			try await secureStorageClient.saveProfileHeaderList(.init(rawValue: [header])!)
 		}
 	}
 

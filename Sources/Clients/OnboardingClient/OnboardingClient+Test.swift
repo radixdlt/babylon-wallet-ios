@@ -15,7 +15,8 @@ extension OnboardingClient: TestDependencyKey {
 		loadProfileBackups: unimplemented("\(Self.self).loadProfile"),
 		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot"),
 		importCloudProfile: unimplemented("\(Self.self).importCloudProfile"),
-		commitEphemeral: unimplemented("\(Self.self).commitEphemeral")
+		commitEphemeral: unimplemented("\(Self.self).commitEphemeral"),
+		loadDeviceID: unimplemented("\(Self.self).loadDeviceID")
 	)
 
 	public static let noop = Self(
@@ -23,6 +24,7 @@ extension OnboardingClient: TestDependencyKey {
 		loadProfileBackups: { nil },
 		importProfileSnapshot: { _ in throw NoopError() },
 		importCloudProfile: { _ in throw NoopError() },
-		commitEphemeral: {}
+		commitEphemeral: {},
+		loadDeviceID: { nil }
 	)
 }

@@ -32,8 +32,8 @@ extension SecureStorageClient {
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSource.ID) async throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) async throws -> Void
 
-	public typealias LoadProfileHeaderList = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<ProfileSnapshot.Header>>?
-	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList, _ iCloudSyncEnabled: Bool) async throws -> Void
+	public typealias LoadProfileHeaderList = @Sendable () async throws -> ProfileSnapshot.HeaderList?
+	public typealias SaveProfileHeaderList = @Sendable (ProfileSnapshot.HeaderList) async throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () async throws -> Void
 
 	public typealias LoadDeviceIdentifier = @Sendable () async throws -> UUID

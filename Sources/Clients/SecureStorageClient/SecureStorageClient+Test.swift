@@ -18,7 +18,7 @@ extension SecureStorageClient: TestDependencyKey {
 		deleteProfileAndMnemonicsByFactorSourceIDs: { _, _ in },
 		updateIsCloudProfileSyncEnabled: { _, _ in },
 		loadProfileHeaderList: { nil },
-		saveProfileHeaderList: { _, _ in },
+		saveProfileHeaderList: { _ in },
 		deleteProfileHeaderList: {},
 		loadDeviceIdentifier: { .init() }
 	)
@@ -31,7 +31,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
-		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileAndMnemonicsByFactorSourceIDs"),
+		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
 		updateIsCloudProfileSyncEnabled: unimplemented("\(Self.self).updateIsCloudProfileSyncEnabled"),
 		loadProfileHeaderList: unimplemented("\(Self.self).loadProfileHeaderList"),
 		saveProfileHeaderList: unimplemented("\(Self.self).saveProfileHeaderList"),

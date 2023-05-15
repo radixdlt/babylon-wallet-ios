@@ -53,6 +53,11 @@ extension GeneralSettings {
 				}
 				.padding(.medium3)
 			}
+			.alert(
+				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
+				state: /GeneralSettings.Alerts.State.confirmCloudSyncDisable,
+				action: GeneralSettings.Alerts.Action.confirmCloudSyncDisable
+			)
 		}
 
 		private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {

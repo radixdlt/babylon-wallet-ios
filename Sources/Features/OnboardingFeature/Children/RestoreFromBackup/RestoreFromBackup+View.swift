@@ -44,7 +44,7 @@ extension RestoreFromBackup.View {
 								),
 								from: backupProfileHeaders
 							) { item in
-								cloudBackupDataCard(item)
+								cloudBackupDataCard(item, thisDeviceID: viewStore.thisDeviceID)
 							}
 
 							Button("Use iCloud Backup Data") {
@@ -76,19 +76,22 @@ extension RestoreFromBackup.View {
 	}
 
 	@MainActor
-	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>) -> some View {
+	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>, thisDeviceID: UUID?) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
+		let creatingDevice = header.creatingDevice.id == thisDeviceID ? "This Device" : header.creatingDevice.description.rawValue
+		let lastUsedOnDevice = header.lastUsedOnDevice.id == thisDeviceID ? "This Device" : header.lastUsedOnDevice.description.rawValue
 
 		return Card(action: item.action, isDisabled: !isVersionCompatible) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
-					Text("Creating Device: \(header.creatingDevice.description.rawValue)")
+					Text("Creating Device: \(creatingDevice)")
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 					Group {
 						Text("Creation Date: \(formatDate(header.creationDate))")
+						Text("Last used on device: \(lastUsedOnDevice)")
 						Text("Last Modified Date: \(formatDate(header.lastModified))")
 						Text("Number of networks: \(header.contentHint.numberOfNetworks)")
 						Text("Number of total accounts: \(header.contentHint.numberOfAccountsOnAllNetworksInTotal)")
@@ -115,6 +118,7 @@ extension RestoreFromBackup.View {
 		}
 	}
 
+	@MainActor
 	func formatDate(_ date: Date) -> String {
 		date.ISO8601Format(.iso8601Date(timeZone: .current))
 	}

@@ -7,6 +7,9 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var preferences: AppPreferences?
 		public var hasLedgerHardwareWalletFactorSources: Bool = false
+		@PresentationState
+		public var alert: Alerts.State?
+
 		public init() {}
 	}
 
@@ -15,11 +18,30 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		case useVerboseModeToggled(Bool)
 		case developerModeToggled(Bool)
 		case cloudProfileSyncToggled(Bool)
+		case alert(PresentationAction<Alerts.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadPreferences(AppPreferences)
 		case hasLedgerHardwareWalletFactorSourcesLoaded(Bool)
+	}
+
+	public struct Alerts: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case confirmCloudSyncDisable(ConfirmCloudSyncDisable)
+
+			public enum ConfirmCloudSyncDisable: Sendable, Hashable {
+				case confirm
+			}
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			EmptyReducer()
+		}
 	}
 
 	public init() {}
@@ -45,9 +67,20 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			}
 
 		case let .cloudProfileSyncToggled(isEnabled):
-			state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
-			return .fireAndForget {
-				try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
+			if !isEnabled {
+				state.alert = .confirmCloudSyncDisable(.init(
+					title: {
+						TextState("Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?")
+					},
+					actions: {
+						ButtonState(role: .destructive, action: .confirm) {
+							TextState("Confirm")
+						}
+					}
+				))
+				return .none
+			} else {
+				return updateCloudSync(state: &state, isEnabled: true)
 			}
 
 		case let .developerModeToggled(isEnabled):
@@ -63,6 +96,11 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			return .fireAndForget {
 				try await appPreferencesClient.updatePreferences(preferences)
 			}
+		case .alert(.presented(.confirmCloudSyncDisable(.confirm))):
+			state.alert = nil
+			return updateCloudSync(state: &state, isEnabled: false)
+		case .alert(.dismiss):
+			return .none
 		}
 	}
 
@@ -74,6 +112,13 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		case let .hasLedgerHardwareWalletFactorSourcesLoaded(hasLedgerHardwareWalletFactorSources):
 			state.hasLedgerHardwareWalletFactorSources = hasLedgerHardwareWalletFactorSources
 			return .none
+		}
+	}
+
+	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {
+		state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
+		return .fireAndForget {
+			try await appPreferencesClient.setIsCloudProfileSyncEnabled(false)
 		}
 	}
 }

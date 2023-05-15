@@ -6,15 +6,18 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
+		public var thisDeviceID: UUID?
 
 		public init(
 			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
 			selectedProfileHeader: ProfileSnapshot.Header? = nil,
-			isDisplayingFileImporter: Bool = false
+			isDisplayingFileImporter: Bool = false,
+			thisDeviceID: UUID? = nil
 		) {
 			self.backupProfileHeaders = backupProfileHeaders
 			self.selectedProfileHeader = selectedProfileHeader
 			self.isDisplayingFileImporter = isDisplayingFileImporter
+			self.thisDeviceID = thisDeviceID
 		}
 	}
 
@@ -33,6 +36,7 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
+		case loadThisDeviceIDResult(UUID?)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -44,10 +48,15 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .task {
+				await .internal(.loadThisDeviceIDResult(
+					onboardingClient.loadDeviceID()
+				))
+			}
+			.concatenate(with: .task(operation: {
 				await .internal(.loadBackupProfileHeadersResult(
 					onboardingClient.loadProfileBackups()
 				))
-			}
+			}))
 
 		case .tappedImportProfile:
 			state.isDisplayingFileImporter = true
@@ -93,6 +102,9 @@ public struct RestoreFromBackup: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadBackupProfileHeadersResult(profileHeaders):
 			state.backupProfileHeaders = profileHeaders
+			return .none
+		case let .loadThisDeviceIDResult(identifier):
+			state.thisDeviceID = identifier
 			return .none
 		}
 	}

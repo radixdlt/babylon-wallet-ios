@@ -100,13 +100,13 @@ extension SecureStorageClient: DependencyKey {
 				.flatMap(ProfileSnapshot.HeaderList.init)
 		}
 
-		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList, iCloudSyncEnabled: Bool) async throws {
+		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) async throws {
 			let data = try jsonEncoder().encode(headers)
 			try await keychainClient.setDataWithoutAuthForKey(
 				KeychainClient.SetItemWithoutAuthRequest(
 					data: data,
 					key: profileHeaderListKeychainKey,
-					iCloudSyncEnabled: iCloudSyncEnabled,
+					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
 					accessibility: .whenUnlocked,
 					label: "Radix Wallet Metadata",
 					comment: "Contains the metadata about Radix Wallet Data."
@@ -114,14 +114,14 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) async throws {
+		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) async throws {
 			if let profileHeaders = try await loadProfileHeaderList() {
 				let remainingHeaders = profileHeaders.filter { $0.id != id }
 				if remainingHeaders.isEmpty {
 					// Delete the list instea of keeping an empty list
 					try await deleteProfileHeaderList()
 				} else {
-					try await saveProfileHeaderList(.init(remainingHeaders)!, iCloudSyncEnabled: iCloudSyncEnabled)
+					try await saveProfileHeaderList(.init(remainingHeaders)!)
 				}
 			}
 		}
@@ -132,7 +132,7 @@ extension SecureStorageClient: DependencyKey {
 
 		@Sendable func deleteProfile(_ id: ProfileSnapshot.Header.ID, iCloudSyncEnabled: Bool) async throws {
 			try await keychainClient.removeDataForKey(id.keychainKey)
-			try await deleteProfileHeader(id, iCloudSyncEnabled: iCloudSyncEnabled)
+			try await deleteProfileHeader(id)
 		}
 
 		@Sendable func loadDeviceIdentifier() async throws -> UUID {
@@ -226,21 +226,16 @@ extension SecureStorageClient: DependencyKey {
 				guard let profileSnapshotData = try await loadProfileSnapshotData(profileID) else {
 					return
 				}
+
 				guard let profileSnapshot = try? jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData) else {
 					return
 				}
 
-				if !keepInICloudIfPresent {
+				// We want to keep the profile backup in iCloud.
+				if !(profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled && keepInICloudIfPresent) {
 					try await deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
 				}
-				if keepInICloudIfPresent {
-					if profileSnapshot.appPreferences.security.isDeveloperModeEnabled {
-						loggerGlobal.notice("Keeping Profile snapshot in Keychain and thus iCloud (keepIcloudIfPresent=\(keepInICloudIfPresent))")
-					} else {
-						loggerGlobal.notice("Deleting Profile snapshot from keychain since iCloud was not enabled any way. (keepIcloudIfPresent=\(keepInICloudIfPresent))")
-						try await deleteProfile(profileID, iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled)
-					}
-				}
+
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
 					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
@@ -258,11 +253,9 @@ extension SecureStorageClient: DependencyKey {
 				case .disable:
 					loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
 					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: false)
-					try await saveProfileHeaderList(headerList, iCloudSyncEnabled: false)
 				case .enable:
 					loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
 					try await saveProfile(snapshotData: profileSnapshotData, key: profileId.keychainKey, iCloudSyncEnabled: true)
-					try await saveProfileHeaderList(headerList, iCloudSyncEnabled: true)
 				}
 			},
 			loadProfileHeaderList: loadProfileHeaderList,
