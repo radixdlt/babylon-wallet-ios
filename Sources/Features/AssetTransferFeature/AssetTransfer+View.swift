@@ -1,12 +1,6 @@
 import FeaturePrelude
 
 // MARK: - FocusField
-// extension AssetTransfer.State {
-//	var viewState: AssetTransfer.ViewState {
-//		.init()
-//	}
-// }
-
 public enum FocusField: Hashable {
 	case message
 	case asset(accountContainer: ToAccountTransfer.State.ID, asset: UUID)
@@ -14,9 +8,6 @@ public enum FocusField: Hashable {
 
 extension AssetTransfer {
 	public typealias ViewState = State
-//	public struct ViewState: Equatable {
-//		// TODO: Add
-//	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -61,15 +52,18 @@ extension AssetTransfer.View {
 				}
 				.padding(.horizontal, .medium3)
 				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
-					CloseButton {}
-						.padding([.top, .leading], .medium1)
-						.padding(.bottom, .medium3)
+					CloseButton {
+						viewStore.send(.closeButtonTapped)
+					}
+					.padding([.top, .leading], .medium1)
+					.padding(.bottom, .medium3)
 				}
 			}
 			.onTapGesture {
 				focusedField = nil
 			}
 		}
+		.showDeveloperDisclaimerBanner()
 	}
 
 	func headerView(_ viewStore: ViewStoreOf<AssetTransfer>) -> some View {
@@ -112,7 +106,7 @@ extension AssetTransfer.View {
 				.frame(height: 64, alignment: .bottom)
 				.background(alignment: .trailing) {
 					VLine()
-						.stroke(.app.gray3, style: .transactionReview)
+						.stroke(.app.gray3, style: .transfer)
 						.frame(width: 1)
 						.padding(.trailing, SpeechbubbleShape.triangleInset)
 				}

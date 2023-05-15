@@ -24,6 +24,7 @@ public typealias AssetImageTypeAlias = ImageAsset.Image
 public enum AssetResource {
   public static let addAccount = ImageAsset(name: "addAccount")
   public static let addMessage = ImageAsset(name: "addMessage")
+  public static let transfer = ImageAsset(name: "transfer")
   public static let arrowBack = ImageAsset(name: "arrow-back")
   public static let checkmarkBig = ImageAsset(name: "checkmark-big")
   public static let checkmarkDarkSelected = ImageAsset(name: "checkmark-dark-selected")

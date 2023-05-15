@@ -9,8 +9,8 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public var message: AssetTransferMessage.State?
 		public var toAccounts: IdentifiedArrayOf<ToAccountTransfer.State>
 
-		public init() {
-			self.fromAccount = .previewValue0
+		public init(from account: Account) {
+			self.fromAccount = account
 			self.message = nil
 			self.toAccounts = .init(uniqueElements: [.empty])
 		}
@@ -19,6 +19,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	public init() {}
 
 	public enum ViewAction: Equatable, Sendable {
+		case closeButtonTapped
 		case addMessageTapped
 		case addAccountTapped
 		case sendTransferTapped
@@ -27,6 +28,10 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 	public enum ChildAction: Equatable, Sendable {
 		case message(AssetTransferMessage.Action)
 		case toAccountTransfer(id: ToAccountTransfer.State.ID, action: ToAccountTransfer.Action)
+	}
+
+	public enum DelegateAction: Equatable, Sendable {
+		case dismissed
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -51,6 +56,9 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 
 		case .sendTransferTapped:
 			return .none
+
+		case .closeButtonTapped:
+			return .send(.delegate(.dismissed))
 		}
 	}
 

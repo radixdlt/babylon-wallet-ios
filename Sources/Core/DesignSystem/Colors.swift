@@ -78,6 +78,8 @@ extension Color.App {
 	public var whiteTransparent: Color { .white.opacity(0.8) }
 	/// white with 0.3 opacity
 	public var whiteTransparent2: Color { .white.opacity(0.3) }
+	/// white with 0.2 opacity
+	public var whiteTransparent3: Color { .white.opacity(0.2) }
 
 	// orange
 	public var orange1: Color { .init(hex: .orange1) }

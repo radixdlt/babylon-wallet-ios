@@ -1,5 +1,5 @@
 import SwiftUI
 
 extension StrokeStyle {
-	static let transactionReview = StrokeStyle(lineWidth: 2, dash: [5, 5])
+	public static let transfer = StrokeStyle(lineWidth: 2, dash: [5, 5])
 }
