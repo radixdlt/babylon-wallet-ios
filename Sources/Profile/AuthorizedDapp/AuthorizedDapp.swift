@@ -15,8 +15,8 @@ extension Profile.Network {
 
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
-		/// Will be nil if the `dAppDefinitionAddress` is `invalid` and thus we fialed to fetch
-		/// the name from Ledger (metadata on the entity)
+		/// Will be nil if we failed to fetch the DappMeta data from Ledger for some reason, and
+		/// which is allowed if `isDeveloperMode: true` is set.
 		public let displayName: NonEmptyString?
 
 		// mutable so that we can add new authorized personas
