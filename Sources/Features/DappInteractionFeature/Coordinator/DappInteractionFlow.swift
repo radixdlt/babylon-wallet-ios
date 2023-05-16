@@ -591,12 +591,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var authorizedDapp = state.authorizedDapp ?? .init(
 			networkID: networkID,
 			dAppDefinitionAddress: state.dappContext.dAppDefinitionAddress,
-			displayName: {
-				switch state.dappContext {
-				case let .fromLedger(fromLedger): return fromLedger.name
-				case .fromRequest: return nil
-				}
-			}()
+			displayName: state.dappContext.name
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 		let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
