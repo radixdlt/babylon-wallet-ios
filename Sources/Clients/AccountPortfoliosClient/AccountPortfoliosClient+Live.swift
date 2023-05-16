@@ -248,7 +248,9 @@ extension AccountPortfoliosClient {
 		let allResourceDetails = try await gatewayAPIClient.fetchResourceDetails(rawItems.map(\.resourceAddress)).items
 
 		@Sendable
-		func tokens(resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated) async throws -> [AccountPortfolio.NonFungibleResource.NonFungibleToken] {
+		func tokens(
+			resource: GatewayAPI.NonFungibleResourcesCollectionItemVaultAggregated
+		) async throws -> IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> {
 			guard let vault = resource.vaults.items.first else { return [] }
 
 			let nftIDs = try await fetchAllPaginatedItems(
@@ -264,7 +266,7 @@ extension AccountPortfoliosClient {
 			// https://rdxworks.slack.com/archives/C02MTV9602H/p1681155601557349
 			let maximumNFTIDChunkSize = 29
 
-			var result: [AccountPortfolio.NonFungibleResource.NonFungibleToken] = []
+			var result: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken> = []
 			for nftIDChunk in nftIDs.chunks(ofCount: maximumNFTIDChunkSize) {
 				let tokens = try await gatewayAPIClient.getNonFungibleData(.init(
 					resourceAddress: resource.resourceAddress,
