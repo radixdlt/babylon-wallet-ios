@@ -40,7 +40,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			public init(dApp: Profile.Network.AuthorizedDapp) {
 				self.id = dApp.id
 				self.thumbnail = nil
-				self.displayName = dApp.displayName.rawValue
+				self.displayName = dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
 			}
 		}
 

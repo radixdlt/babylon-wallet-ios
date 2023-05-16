@@ -20,7 +20,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		let challenge: P2P.Dapp.Request.AuthChallengeNonce?
 
 		let accessKind: AccessKind
-		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 		var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
@@ -32,7 +31,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		init(
 			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
 			accessKind: AccessKind,
-			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
 			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
 			numberOfAccounts: DappInteraction.NumberOfAccounts,
@@ -41,7 +39,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		) {
 			self.challenge = challenge
 			self.accessKind = accessKind
-			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
 			self.availableAccounts = availableAccounts
 			self.numberOfAccounts = numberOfAccounts
@@ -146,7 +143,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
-				dAppDefinitionAddress: state.dappDefinitionAddress
+				dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
 			)
 
 			return .run { send in

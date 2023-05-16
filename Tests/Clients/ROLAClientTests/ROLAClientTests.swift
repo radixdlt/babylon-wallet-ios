@@ -19,9 +19,9 @@ final class ROLAClientTests: TestCase {
 		origin: String,
 		dAppDefinitionAddress: DappDefinitionAddress
 	) -> P2P.Dapp.Request.Metadata {
-		.init(
+		try! .init(
 			version: 1, networkId: 0,
-			origin: .init(rawValue: origin),
+			origin: .init(string: origin),
 			dAppDefinitionAddress: dAppDefinitionAddress
 		)
 	}
@@ -60,7 +60,7 @@ final class ROLAClientTests: TestCase {
 				let payload = try payloadToHash(
 					challenge: .init(rawValue: .init(hex: vector.challenge)),
 					dAppDefinitionAddress: .init(address: vector.dAppDefinitionAddress),
-					origin: .init(rawValue: vector.origin)
+					origin: .init(string: vector.origin)
 				)
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
 				let blakeHashOfPayload = try blake2b(data: payload)
@@ -70,7 +70,7 @@ final class ROLAClientTests: TestCase {
 	}
 
 	func omit_test_generate_rola_payload_hash_vectors() throws {
-		let origins: [P2P.Dapp.Request.Metadata.Origin] = ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"]
+		let origins: [P2P.Dapp.Request.Metadata.Origin] = try ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"].map { try .init(string: $0) }
 		let accounts: [DappDefinitionAddress] = try [
 			.init(address: "account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"),
 			.init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
@@ -80,7 +80,7 @@ final class ROLAClientTests: TestCase {
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
 					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
-					let challenge = try blake2b(data: Data((origin.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
+					let challenge = try blake2b(data: Data((origin.urlString.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
 					let payload = try payloadToHash(
 						challenge: .init(rawValue: .init(data: challenge)),
 						dAppDefinitionAddress: dAppDefinitionAddress,
@@ -88,7 +88,7 @@ final class ROLAClientTests: TestCase {
 					)
 					let blakeHashOfPayload = try blake2b(data: payload)
 					return TestVector(
-						origin: origin.rawValue,
+						origin: origin.urlString.rawValue,
 						challenge: challenge.hex,
 						dAppDefinitionAddress: dAppDefinitionAddress.address,
 						payloadToHash: payload.hex,
@@ -207,38 +207,6 @@ final class ROLAClientTests: TestCase {
 			do {
 				try await sut.performDappDefinitionVerification(metadata)
 				XCTFail("Expected error: unknownWebsite")
-			} catch {
-				XCTAssertEqual(error as? ROLAFailure, expectedError)
-			}
-		}
-	}
-
-	func testUnhappyPath_whenOriginURLIsInvalid_thenInvalidOriginURLErrorIsThrown() async throws {
-		// given
-		let origin = ""
-		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
-		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
-		let expectedURL = URL(string: "/.well-known/radix.json")!
-
-		MockURLProtocol.requestHandler = { _ in
-			let response = HTTPURLResponse(
-				url: expectedURL,
-				statusCode: 200,
-				httpVersion: nil,
-				headerFields: nil
-			)!
-			return (response, json.data)
-		}
-
-		let expectedError = ROLAFailure.invalidOriginURL
-
-		// when
-		await withDependencies {
-			$0.urlSession = urlSession
-		} operation: {
-			do {
-				try await sut.performWellKnownFileCheck(metadata)
-				XCTFail("Expected error: invalidOriginURL")
 			} catch {
 				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}

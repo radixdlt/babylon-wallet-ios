@@ -18,7 +18,7 @@ extension OneTimePersonaData {
 		init(state: OneTimePersonaData.State) {
 			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.PersonalDataOneTime.title
-			self.subtitle = L10n.DAppRequest.PersonalDataOneTime.subtitle(state.dappMetadata.name.rawValue)
+			self.subtitle = L10n.DAppRequest.PersonalDataOneTime.subtitle(state.dappMetadata.name)
 			self.shouldShowChooseDataToProvideTitle = !state.personas.isEmpty
 			self.availablePersonas = state.personas
 			self.selectedPersona = state.selectedPersona

@@ -11,7 +11,7 @@ extension AccountPermission {
 		init(state: AccountPermission.State) {
 			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.AccountPermission.title
-			self.subtitle = L10n.DAppRequest.AccountPermission.subtitle(state.dappMetadata.name.rawValue)
+			self.subtitle = L10n.DAppRequest.AccountPermission.subtitle(state.dappMetadata.name)
 
 			self.numberOfAccounts = "•  " + {
 				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {

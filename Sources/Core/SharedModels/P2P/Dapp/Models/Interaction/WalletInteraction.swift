@@ -48,8 +48,10 @@ extension P2P.Dapp {
 
 // MARK: - P2P.Dapp.Request.Metadata
 extension P2P.Dapp.Request {
-	public struct Metadata: Sendable, Hashable {
-		public typealias Origin = Tagged<Self, String>
+	/// The metadata sent with the request from the Dapp.
+	/// not to be confused with `DappMetadata` which can hold a value of this type
+	public struct Metadata: Sendable, Hashable, Decodable {
+		public typealias Origin = DappOrigin
 
 		public let version: P2P.Dapp.Version
 		public let networkId: NetworkID
@@ -75,7 +77,7 @@ extension P2P.Dapp.Request {
 	public struct MetadataUnvalidated: Sendable, Hashable, Decodable {
 		public let version: P2P.Dapp.Version
 		public let networkId: NetworkID
-		public let origin: P2P.Dapp.Request.Metadata.Origin
+		public let origin: String
 
 		/// Non yet validated dAppDefinitionAddresss
 		public let dAppDefinitionAddress: String

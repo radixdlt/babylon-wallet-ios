@@ -91,7 +91,7 @@ extension DappDetails.View {
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
 		.init(
-			title: dApp.displayName.rawValue,
+			title: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
 			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
 			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,

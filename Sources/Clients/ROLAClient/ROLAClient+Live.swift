@@ -162,6 +162,7 @@ extension ROLAClient {
 
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
+
 				let metadataCollection = try await cacheClient.withCaching(
 					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
 					request: {
@@ -186,16 +187,15 @@ extension ROLAClient {
 					throw ROLAFailure.wrongAccountType
 				}
 
-				guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.rawValue else {
+				guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.urlString.rawValue else {
 					throw ROLAFailure.unknownWebsite
 				}
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
 
-				guard let originURL = URL(string: metadata.origin.rawValue) else {
-					throw ROLAFailure.invalidOriginURL
-				}
+				let originURL = metadata.origin.url
+
 				let url = originURL.appending(path: Constants.wellKnownFilePath)
 
 				let fetchWellKnownFile = {
@@ -283,7 +283,7 @@ func payloadToHash(
 	origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
 ) -> Data {
 	let dAppDefinitionAddress = accountAddress.address
-	let origin = metadataOrigin.rawValue
+	let origin = metadataOrigin.urlString.rawValue
 	precondition(dAppDefinitionAddress.count <= UInt8.max)
 	let challengeBytes = [UInt8](challenge.data.data)
 	let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
