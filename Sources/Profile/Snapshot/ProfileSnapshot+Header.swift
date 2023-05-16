@@ -142,7 +142,7 @@ extension ProfileSnapshot.Header.Version {
 	/// - 30: Fix critical bug where identity derivation path was used for account
 	/// - 31: Add `ledgerHQHardwareWalletSigningDisplayMode` to appPreferences.display
 	/// - 32: rename `genesisFactorInstance` -> `transactionSigning` and add `authSigning`
-        /// - 33: Add snapshot `header`
+	/// - 33: Add snapshot `header`
 	public static let minimum: Self = 33
 }
 
