@@ -109,7 +109,7 @@ public struct TransactionDetailsView: View {
 	}
 }
 
-extension SmallAccountCard {
+extension SmallAccountCard where Accessory == EmptyView {
 	public init(account: TransactionReview.Account) {
 		switch account {
 		case let .user(account):

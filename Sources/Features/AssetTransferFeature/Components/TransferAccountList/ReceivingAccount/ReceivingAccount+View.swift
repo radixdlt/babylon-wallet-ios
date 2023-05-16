@@ -20,7 +20,13 @@ extension ReceivingAccount.View {
 			VStack(alignment: .leading, spacing: 0) {
 				Group {
 					if let account = viewStore.account {
-						SmallAccountCard(account.name, identifiable: account.identifer, gradient: account.gradient)
+						SmallAccountCard(account.name, identifiable: account.identifer, gradient: account.gradient) {
+							FixedSpacer(width: .small1)
+							Button("", asset: AssetResource.close) {
+								viewStore.send(.removeTapped)
+							}
+							.foregroundColor(.app.white)
+						}
 					} else {
 						HStack {
 							Button("Choose Account") {
