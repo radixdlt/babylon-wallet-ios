@@ -17,7 +17,7 @@ extension P2P {
 		}
 
 		public enum Request: Sendable, Hashable, Equatable, Decodable {
-			case dapp(P2P.Dapp.Request)
+			case dapp(P2P.Dapp.RequestUnvalidated)
 		}
 	}
 }

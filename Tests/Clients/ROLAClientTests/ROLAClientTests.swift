@@ -20,7 +20,7 @@ final class ROLAClientTests: TestCase {
 		dAppDefinitionAddress: AccountAddress
 	) -> P2P.Dapp.Request.Metadata {
 		.init(
-			networkId: 0,
+			version: 1, networkId: 0,
 			origin: .init(rawValue: origin),
 			dAppDefinitionAddress: .valid(dAppDefinitionAddress)
 		)

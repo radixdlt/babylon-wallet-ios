@@ -3,7 +3,7 @@ import FeaturePrelude
 extension GatewayRow.State {
 	var viewState: GatewayRow.ViewState {
 		let name = gateway.isDefault ?
-			L10n.GatewaySettings.rcNetGateway :
+			L10n.Gateways.rcNetGateway :
 			gateway.url.absoluteString
 
 		return .init(

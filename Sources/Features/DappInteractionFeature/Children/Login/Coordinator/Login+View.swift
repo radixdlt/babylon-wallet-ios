@@ -4,9 +4,10 @@ import FeaturePrelude
 // MARK: - LoginRequest.View
 extension Login {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
-		let shouldShowChooseAPersonaTitle: Bool
+		let subtitle: String
+		let showChoosePersonaTitle: Bool
 		let availablePersonas: IdentifiedArrayOf<PersonaRow.State>
 		let selectedPersona: PersonaRow.State?
 		let continueButtonRequirements: ContinueButtonRequirements?
@@ -18,30 +19,26 @@ extension Login {
 		init(state: Login.State) {
 			let isKnownDapp = state.authorizedPersona != nil
 
-			title = isKnownDapp
-				? L10n.DApp.Login.Title.knownDapp
-				: L10n.DApp.Login.Title.newDapp
+			self.thumbnail = state.dappContext.thumbnail
 
-			subtitle = {
-				let dappName = AttributedString(state.dappContext.name, foregroundColor: .app.gray1)
+			self.title = isKnownDapp
+				? L10n.DAppRequest.Login.titleKnownDapp
+				: L10n.DAppRequest.Login.titleNewDapp
 
-				let explanation = AttributedString(
-					isKnownDapp ? L10n.DApp.Login.Subtitle.knownDapp : L10n.DApp.Login.Subtitle.newDapp,
-					foregroundColor: .app.gray2
-				)
+			let dAppName = state.dappContext.name
+			self.subtitle = isKnownDapp
+				? L10n.DAppRequest.Login.subtitleKnownDapp(dAppName)
+				: L10n.DAppRequest.Login.subtitleNewDapp(dAppName)
 
-				return dappName + explanation
-			}()
+			self.showChoosePersonaTitle = !state.personas.isEmpty
 
-			shouldShowChooseAPersonaTitle = !state.personas.isEmpty
-
-			availablePersonas = state.personas
-			selectedPersona = state.selectedPersona
+			self.availablePersonas = state.personas
+			self.selectedPersona = state.selectedPersona
 
 			if let persona = state.selectedPersona {
-				continueButtonRequirements = .init(persona: persona.persona)
+				self.continueButtonRequirements = .init(persona: persona.persona)
 			} else {
-				continueButtonRequirements = nil
+				self.continueButtonRequirements = nil
 			}
 		}
 	}
@@ -59,13 +56,13 @@ extension Login {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
 
-						if viewStore.shouldShowChooseAPersonaTitle {
-							Text(L10n.DApp.Login.chooseAPersonaTitle)
+						if viewStore.showChoosePersonaTitle {
+							Text(L10n.DAppRequest.Login.choosePersona)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 						}
@@ -86,7 +83,7 @@ extension Login {
 							}
 						}
 
-						Button(L10n.Personas.createNewPersonaButtonTitle) {
+						Button(L10n.Personas.createNewPersona) {
 							viewStore.send(.createNewPersonaButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -99,7 +96,7 @@ extension Login {
 						viewStore.continueButtonRequirements,
 						forAction: { viewStore.send(.continueButtonTapped($0.persona)) }
 					) { action in
-						Button(L10n.DApp.Login.continueButtonTitle, action: action)
+						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -145,9 +142,7 @@ struct Login_Preview: PreviewProvider {
 extension Login.State {
 	static let previewValue: Self = .init(
 		dappContext: .previewValue,
-		loginRequest: try! .init(
-			challenge: .init(HexCodable32Bytes(.deadbeef32Bytes))
-		)
+		loginRequest: try! .withChallenge(.init(challenge: .init(rawValue: .init(.deadbeef32Bytes))))
 	)
 }
 #endif

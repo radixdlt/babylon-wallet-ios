@@ -29,7 +29,7 @@ extension AuthorizedDapps.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					Text(L10n.AuthorizedDapps.intro)
+					Text(L10n.AuthorizedDapps.subtitle)
 						.textBlock
 						.padding(.vertical, .medium3)
 
@@ -69,7 +69,11 @@ extension AuthorizedDapps.View {
 extension AuthorizedDapps.State {
 	var viewState: AuthorizedDapps.ViewState {
 		let dAppViewStates = dApps.map {
-			AuthorizedDapps.ViewState.Dapp(id: $0.id, name: $0.displayName.rawValue, thumbnail: thumbnails[$0.id])
+			AuthorizedDapps.ViewState.Dapp(
+				id: $0.id,
+				name: $0.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+				thumbnail: thumbnails[$0.id]
+			)
 		}
 
 		return .init(dApps: .init(uniqueElements: dAppViewStates))

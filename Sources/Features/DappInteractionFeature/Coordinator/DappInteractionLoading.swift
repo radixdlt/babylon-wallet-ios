@@ -69,42 +69,32 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 			let result: TaskResult<DappContext> = await {
 				let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+				let dappDefinitionAddress = fromRequest.dAppDefinitionAddress
 
-				switch (fromRequest.dAppDefinitionAddress, isDeveloperModeEnabled) {
-				case (.invalid, true):
-					// DeveloperMode accepts invalid dapp definition addresses
-					return .success(.fromRequest(fromRequest))
-
-				case let (.valid(dappDefinitionAddress), _):
-					// Valid DappDefinition => fetch from Ledger
-
-					do {
-						let fromLedger = try await cacheClient.withCaching(
-							cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
-							invalidateCached: { (cached: FromLedgerDappMetadata) in
-								guard cached.name != nil, cached.
-							}
-							request: {
-								let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
-								return FromLedgerDappMetadata(
-									entityMetadataForDapp: entityMetadataForDapp,
-									dAppDefinintionAddress: dappDefinitionAddress,
-									origin: fromRequest.origin
-								)
-							}
-						)
-						return .success(.fromLedger(fromLedger))
-					} catch {
-						guard isDeveloperModeEnabled else {
-							return .failure(error)
+				do {
+					let fromLedger = try await cacheClient.withCaching(
+						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
+						invalidateCached: { (cached: FromLedgerDappMetadata) in
+							cached.name == nil ? .cachedIsInvalid : .cachedIsValid
+						},
+						request: {
+							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
+							return FromLedgerDappMetadata(
+								entityMetadataForDapp: entityMetadataForDapp,
+								dAppDefinintionAddress: dappDefinitionAddress,
+								origin: fromRequest.origin
+							)
 						}
-						loggerGlobal.warning("Failed to fetch Dapps metadata, but since 'isDeveloperModeEnabled' is enabled we surpress the error and allow continuation. Error: \(error)")
-						return .success(.fromRequest(fromRequest))
+					)
+					return .success(.fromLedger(fromLedger))
+				} catch {
+					guard isDeveloperModeEnabled else {
+						return .failure(error)
 					}
-
-				default:
-					return .failure(InvalidDappDefintionAddressNotSupportedWithoutDeveloperModeEnabled())
+					loggerGlobal.warning("Failed to fetch Dapps metadata, but since 'isDeveloperModeEnabled' is enabled we surpress the error and allow continuation. Error: \(error)")
+					return .success(.fromRequest(fromRequest))
 				}
+
 			}()
 
 			await send(.internal(.dappMetadataLoadingResult(result)))
@@ -119,18 +109,18 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 		case let .dappMetadataLoadingResult(.failure(error)):
 			state.errorAlert = .init(
-				title: { TextState(L10n.App.errorOccurredTitle) },
+				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(action: .send(.retryButtonTapped)) {
-						TextState(L10n.DApp.MetadataLoading.ErrorAlert.retryButtonTitle)
+						TextState(L10n.Common.retry)
 					}
 					ButtonState(role: .cancel, action: .send(.cancelButtonTapped)) {
-						TextState(L10n.DApp.MetadataLoading.ErrorAlert.cancelButtonTitle)
+						TextState(L10n.Common.cancel)
 					}
 				},
 				message: {
 					TextState(
-						L10n.DApp.MetadataLoading.ErrorAlert.message + {
+						L10n.DAppRequest.MetadataLoadingAlert.message + {
 							#if DEBUG
 							"\n\n" + error.legibleLocalizedDescription
 							#else
@@ -145,8 +135,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - InvalidDappDefintionAddressNotSupportedWithoutDeveloperModeEnabled
-struct InvalidDappDefintionAddressNotSupportedWithoutDeveloperModeEnabled: Swift.Error {}
+// MARK: - InvaliddAppDefinitionAddressNotSupportedWithoutDeveloperModeEnabled
+struct InvaliddAppDefinitionAddressNotSupportedWithoutDeveloperModeEnabled: Swift.Error {}
 
 extension FromLedgerDappMetadata {
 	init(
@@ -155,11 +145,19 @@ extension FromLedgerDappMetadata {
 		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
 		let items = entityMetadataForDapp.items
+		let maybeName: String? = items[.name]?.asString
+		let name: NonEmptyString? = {
+			guard let name = maybeName else {
+				return nil
+			}
+			return NonEmptyString(rawValue: name)
+		}()
 		self.init(
-			dAppDefinintionAddress: dAppDefinintionAddress,
 			origin: origin,
-			name: items.first(where: { $0.key == "name" })?.value.asString,
-			description: items.first(where: { $0.key == "description" })?.value.asString
+			dAppDefinintionAddress: dAppDefinintionAddress,
+			name: name,
+			description: items[.description]?.asString,
+			thumbnail: items[.iconURL]?.asString.flatMap(URL.init)
 		)
 	}
 }

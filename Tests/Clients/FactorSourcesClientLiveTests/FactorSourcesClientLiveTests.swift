@@ -26,6 +26,9 @@ final class FactorSourcesClientLiveTests: TestCase {
 			],
 			signingPurpose: .signTransaction(.manifestFromDapp)
 		)
+
+		XCTAssertEqual(signingFactors.expectedSignatureCount, 6)
+
 		let devices = try XCTUnwrap(signingFactors[.device])
 		XCTAssertEqual(Array(devices.rawValue).map(\.factorSource).sorted(), [.deviceOne, .deviceTwo])
 		XCTAssertEqual(devices.count, 2)

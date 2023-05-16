@@ -79,7 +79,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.$createAuthKey, action: /Action.child .. ChildAction.createAuthKey) {
-				CreateAuthKey()._printChanges()
+				CreateAuthKey()
 			}
 	}
 

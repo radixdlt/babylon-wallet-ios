@@ -45,9 +45,10 @@ extension PersonaDetails.View {
 						.controlState(viewStore.canCreateAuthKey ? .enabled : .disabled)
 						.buttonStyle(.secondaryRectangular)
 					}
+					.padding(.top, .large3)
 					#endif
 
-					Button(L10n.PersonaDetails.editPersona) {
+					Button(L10n.AuthorizedDapps.PersonaDetails.editPersona) {
 						viewStore.send(.editPersonaTapped)
 					}
 					.buttonStyle(.secondaryRectangular)
@@ -59,7 +60,7 @@ extension PersonaDetails.View {
 								.background(.app.gray5)
 						}
 
-						Button(L10n.PersonaDetails.deauthorizePersona) {
+						Button(L10n.AuthorizedDapps.PersonaDetails.removeAuthorization) {
 							viewStore.send(.deauthorizePersonaTapped)
 						}
 						.buttonStyle(.primaryRectangular(isDestructive: true))
@@ -109,22 +110,24 @@ private extension StoreOf<PersonaDetails> {
 // MARK: - Extensions
 
 private extension PersonaDetails.State {
+	#if DEBUG
 	var viewState: PersonaDetails.ViewState {
-		#if DEBUG
 		.init(
 			thumbnail: nil,
 			personaName: personaName,
 			isDappPersona: isDappPersona,
 			canCreateAuthKey: canCreateAuthKey
 		)
-		#else
-		.init(
-				thumbnail: nil,
-				personaName: personaName,
-				isDappPersona: isDappPersona
-			)
-		#endif
 	}
+	#else
+	var viewState: PersonaDetails.ViewState {
+		.init(
+			thumbnail: nil,
+			personaName: personaName,
+			isDappPersona: isDappPersona
+		)
+	}
+	#endif
 
 	var personaName: String {
 		switch mode {
@@ -153,7 +156,7 @@ extension PersonaDetails.State {
 		case .general:
 			return nil
 		case let .dApp(dApp, persona):
-			return .init(dAppName: dApp.displayName.rawValue, sharingAccounts: persona.simpleAccounts ?? [])
+			return .init(dAppName: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName, sharingAccounts: persona.simpleAccounts ?? [])
 		}
 	}
 
@@ -172,7 +175,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				VStack(spacing: 0) {
-					Text(L10n.PersonaDetails.accountSharingDescription(viewStore.dAppName))
+					Text(L10n.AuthorizedDapps.PersonaDetails.accountSharingDescription(viewStore.dAppName))
 						.textBlock
 						.flushedLeft
 						.padding(.vertical, .medium2)
@@ -190,7 +193,7 @@ extension PersonaDetails.View {
 					}
 					.padding(.horizontal, .medium3)
 
-					Button(L10n.PersonaDetails.editAccountSharing) {
+					Button(L10n.AuthorizedDapps.PersonaDetails.editAccountSharing) {
 						viewStore.send(.editAccountSharingTapped)
 					}
 					.buttonStyle(.secondaryRectangular)
@@ -225,7 +228,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				VStack(spacing: .medium1) {
-					Text(L10n.PersonaDetails.authorizedDappsDescription)
+					Text(L10n.AuthorizedDapps.PersonaDetails.authorizedDappsHeading)
 						.textBlock
 						.flushedLeft
 						.padding(.horizontal, .medium1)
@@ -270,7 +273,7 @@ private extension PersonaDetails.State {
 	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
 		guard case let .dApp(dApp, persona) = mode else { return nil }
 		return .init(
-			name: dApp.displayName.rawValue,
+			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
 			isSharingNothing: persona.sharedFields.isNilOrEmpty
 		)
 	}
@@ -312,34 +315,34 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					VPair(heading: L10n.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
+					VPair(heading: L10n.AuthorizedDapps.PersonaDetails.personaLabelHeading, item: viewStore.personaName)
 
 					Separator()
 
 					if let dAppInfo = viewStore.dAppInfo {
 						if dAppInfo.isSharingNothing {
-							Text(L10n.PersonaDetails.notSharingAnything(dAppInfo.name))
+							Text(L10n.AuthorizedDapps.PersonaDetails.notSharingAnything(dAppInfo.name))
 								.textBlock
 						} else {
-							Text(L10n.PersonaDetails.personaDataSharingDescription(dAppInfo.name))
+							Text(L10n.AuthorizedDapps.PersonaDetails.personalDataSharingDescription(dAppInfo.name))
 								.textBlock
 						}
 					}
 
 					if let firstName = viewStore.firstName {
-						VPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)
+						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.firstName, item: firstName)
 					}
 
 					if let lastName = viewStore.lastName {
-						VPair(heading: L10n.PersonaDetails.lastNameHeading, item: lastName)
+						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.lastName, item: lastName)
 					}
 
 					if let emailAddress = viewStore.emailAddress {
-						VPair(heading: L10n.PersonaDetails.emailAddressHeading, item: emailAddress)
+						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.emailAddress, item: emailAddress)
 					}
 
 					if let phoneNumber = viewStore.phoneNumber {
-						VPair(heading: L10n.PersonaDetails.phoneNumberHeading, item: phoneNumber)
+						VPair(heading: L10n.AuthorizedDapps.PersonaDetails.phoneNumber, item: phoneNumber)
 					}
 				}
 				.padding(.horizontal, .medium1)

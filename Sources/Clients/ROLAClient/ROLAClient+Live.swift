@@ -87,6 +87,8 @@ extension ROLAClient {
 			return manifestString
 		}
 
+		// FIXME: Move this to `Signing` and change `Signing` to `UseFactors` which should be able to do both signing and derivation...?
+		// Rationale: the solution below makes it impossible to create `authenticationSigning` key for Ledger factor sources :/
 		@Sendable func manifestCreatingAuthKey(
 			for entity: EntityPotentiallyVirtual
 		) async throws -> ManifestForAuthKeyCreationResponse {
@@ -112,9 +114,14 @@ extension ROLAClient {
 				}
 				switch entity {
 				case .account:
-					authSignDerivationPath = try hdPath.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asAccountPath().switching(
+						networkID: entity.networkID,
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				case .persona:
-					authSignDerivationPath = try hdPath.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asIdentityPath().switching(
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				}
 			}
 			let factorSources = try await factorSourcesClient.getFactorSources()
@@ -156,14 +163,7 @@ extension ROLAClient {
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
 
-				let dappDefAddress: AccountAddress = try {
-					switch metadata.dAppDefinitionAddress {
-					case .invalid:
-						throw UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddress()
-					case let .valid(address):
-						return address
-					}
-				}()
+				let dappDefAddress = metadata.dAppDefinitionAddress
 				let metadataCollection = try await cacheClient.withCaching(
 					cacheEntry: .rolaDappVerificationMetadata(dappDefAddress.address),
 					request: {
@@ -188,23 +188,16 @@ extension ROLAClient {
 					throw ROLAFailure.wrongAccountType
 				}
 
-				guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.rawValue else {
+				guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.rawValue.rawValue else {
 					throw ROLAFailure.unknownWebsite
 				}
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
 
-				let dappDefAddress: AccountAddress = try {
-					switch metadata.dAppDefinitionAddress {
-					case .invalid:
-						throw UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddress()
-					case let .valid(address):
-						return address
-					}
-				}()
+				let dappDefAddress = metadata.dAppDefinitionAddress
 
-				guard let originURL = URL(string: metadata.origin.rawValue) else {
+				guard let originURL = URL(string: metadata.origin.rawValue.rawValue) else {
 					throw ROLAFailure.invalidOriginURL
 				}
 				let url = originURL.appending(path: Constants.wellKnownFilePath)
@@ -245,24 +238,18 @@ extension ROLAClient {
 			manifestForAuthKeyCreation: { request in
 				try await manifestCreatingAuthKey(for: request.entity)
 			},
-			signAuthChallenge: { request in
+			authenticationDataToSignForChallenge: { request in
 
 				let payload = payloadToHash(
 					challenge: request.challenge,
 					dAppDefinitionAddress: request.dAppDefinitionAddress,
 					origin: request.origin
 				)
-				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-					signerEntity: .persona(request.persona),
-					unhashedDataToSign: payload,
-					purpose: .signAuth
-				)
-				let signedAuthChallenge = SignedAuthChallenge(
-					challenge: request.challenge,
-					signatureWithPublicKey: signature.signature.signatureWithPublicKey
-				)
 
-				return signedAuthChallenge
+				return AuthenticationDataToSignForChallengeResponse(
+					input: request,
+					payloadToHashAndSign: payload
+				)
 			}
 		)
 	}()
@@ -298,16 +285,11 @@ struct UnableToPerformWellknownCheckDappDefinitionAddressIsNotAValidAccountAddre
 
 /// `challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
 func payloadToHash(
-	challenge: P2P.Dapp.AuthChallengeNonce,
-	dAppDefinitionAddress: DappDefinitionAddress,
+	challenge: P2P.Dapp.Request.AuthChallengeNonce,
+	dAppDefinitionAddress accountAddress: AccountAddress,
 	origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
 ) -> Data {
-	let dAppDefinitionAddress: String = {
-		switch dAppDefinitionAddress {
-		case let .invalid(string): return string
-		case let .valid(accountAddress): return accountAddress.address
-		}
-	}()
+	let dAppDefinitionAddress = accountAddress.address
 	let origin = metadataOrigin.rawValue
 	precondition(dAppDefinitionAddress.count <= UInt8.max)
 	let challengeBytes = [UInt8](challenge.data.data)
@@ -319,11 +301,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
 	// terrible parsing mess.
 	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
-		guard let response: GatewayAPI.EntityMetadataItemValue = self[SetMetadata.ownerKeysKey] else {
-			return nil
-		}
-
-		guard let asStringCollection = response.asStringCollection else {
+		guard let response = items[customKey: SetMetadata.ownerKeysKey]?.asStringCollection else {
 			return nil
 		}
 
@@ -337,7 +315,7 @@ extension GatewayAPI.EntityMetadataCollection {
 		let lengthQuotesAndTwoParenthesis = 2 * lengthQuoteAndParenthesis
 		let lengthCurve25519PubKeyHex = 32 * 2
 		let lengthSecp256K1PubKeyHex = 33 * 2
-		let keys = try asStringCollection.compactMap { elem -> Engine.PublicKey? in
+		let keys = try response.compactMap { elem -> Engine.PublicKey? in
 			if elem.starts(with: curve25519Prefix) {
 				guard elem.count == lengthQuotesAndTwoParenthesis + lengthCurve25519Prefix + lengthCurve25519PubKeyHex else {
 					throw FailedToParsePublicKeyFromOwnerKeysBadLength()

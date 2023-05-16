@@ -34,12 +34,12 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 	public struct UnauthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.Items.Discriminator.unauthorizedRequest.rawValue
-		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+		public let oneTimeAccounts: AccountsRequestResponseItem?
+		public let oneTimePersonaData: PersonaDataRequestResponseItem?
 
 		public init(
-			oneTimeAccounts: OneTimeAccountsRequestResponseItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+			oneTimeAccounts: AccountsRequestResponseItem?,
+			oneTimePersonaData: PersonaDataRequestResponseItem?
 		) {
 			self.oneTimeAccounts = oneTimeAccounts
 			self.oneTimePersonaData = oneTimePersonaData
@@ -49,17 +49,17 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct AuthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.Items.Discriminator.authorizedRequest.rawValue
 		public let auth: AuthRequestResponseItem
-		public let ongoingAccounts: OngoingAccountsRequestResponseItem?
-		public let ongoingPersonaData: OngoingPersonaDataRequestResponseItem?
-		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+		public let ongoingAccounts: AccountsRequestResponseItem?
+		public let ongoingPersonaData: PersonaDataRequestResponseItem?
+		public let oneTimeAccounts: AccountsRequestResponseItem?
+		public let oneTimePersonaData: PersonaDataRequestResponseItem?
 
 		public init(
 			auth: AuthRequestResponseItem,
-			ongoingAccounts: OngoingAccountsRequestResponseItem?,
-			ongoingPersonaData: OngoingPersonaDataRequestResponseItem?,
-			oneTimeAccounts: OneTimeAccountsRequestResponseItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestResponseItem?
+			ongoingAccounts: AccountsRequestResponseItem? = nil,
+			ongoingPersonaData: PersonaDataRequestResponseItem? = nil,
+			oneTimeAccounts: AccountsRequestResponseItem? = nil,
+			oneTimePersonaData: PersonaDataRequestResponseItem? = nil
 		) {
 			self.auth = auth
 			self.ongoingAccounts = ongoingAccounts

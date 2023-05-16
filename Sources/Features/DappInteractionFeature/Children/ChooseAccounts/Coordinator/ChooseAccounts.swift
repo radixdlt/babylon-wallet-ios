@@ -1,6 +1,12 @@
 import AccountsClient
 import CreateEntityFeature
+import FactorSourcesClient
 import FeaturePrelude
+import ROLAClient
+import SigningFeature
+
+// MARK: - ChooseAccountsResult
+typealias ChooseAccountsResult = P2P.Dapp.Response.Accounts
 
 // MARK: - ChooseAccounts
 struct ChooseAccounts: Sendable, FeatureReducer {
@@ -10,6 +16,9 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			case oneTime
 		}
 
+		/// if `proofOfOwnership`, sign this challenge
+		let challenge: P2P.Dapp.Request.AuthChallengeNonce?
+
 		let accessKind: AccessKind
 		let dappContext: DappContext
 		var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
@@ -17,9 +26,10 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		var selectedAccounts: [ChooseAccountsRow.State]?
 
 		@PresentationState
-		var createAccountCoordinator: CreateAccountCoordinator.State?
+		var destination: Destinations.State?
 
 		init(
+			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappContext: DappContext,
 			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
@@ -27,13 +37,14 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
+			self.challenge = challenge
 			self.accessKind = accessKind
 			self.dappContext = dappContext
 			self.availableAccounts = availableAccounts
 			self.availableAccounts = availableAccounts
 			self.numberOfAccounts = numberOfAccounts
 			self.selectedAccounts = selectedAccounts
-			self.createAccountCoordinator = createAccountCoordinator
+			self.destination = createAccountCoordinator.map { .createAccount($0) } ?? nil
 		}
 	}
 
@@ -46,23 +57,51 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case loadAccountsResult(TaskResult<Profile.Network.Accounts>)
+		case proveAccountOwnership(SigningFactors, AuthenticationDataToSignForChallengeResponse)
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case createAccountCoordinator(PresentationAction<CreateAccountCoordinator.Action>)
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(IdentifiedArrayOf<Profile.Network.Account>, ChooseAccounts.State.AccessKind)
+		case continueButtonTapped(
+			accessKind: ChooseAccounts.State.AccessKind,
+			chosenAccounts: ChooseAccountsResult
+		)
+		case failedToProveOwnership(of: [Profile.Network.Account])
+	}
+
+	struct Destinations: Sendable, ReducerProtocol {
+		enum State: Sendable, Hashable {
+			case createAccount(CreateAccountCoordinator.State)
+			case signing(Signing.State)
+		}
+
+		enum Action: Sendable, Equatable {
+			case createAccount(CreateAccountCoordinator.Action)
+			case signing(Signing.Action)
+		}
+
+		var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.createAccount, action: /Action.createAccount) {
+				CreateAccountCoordinator()
+			}
+			Scope(state: /State.signing, action: /Action.signing) {
+				Signing()
+			}
+		}
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.rolaClient) var rolaClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
-				CreateAccountCoordinator()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -76,9 +115,9 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 
 		case .createAccountButtonTapped:
-			state.createAccountCoordinator = .init(config: .init(
+			state.destination = .createAccount(.init(config: .init(
 				purpose: .newAccountDuringDappInteraction
-			), displayIntroduction: { _ in false })
+			), displayIntroduction: { _ in false }))
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):
@@ -87,7 +126,37 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(selectedAccounts):
 			let selectedAccounts = IdentifiedArray(uncheckedUniqueElements: selectedAccounts.map(\.account))
-			return .send(.delegate(.continueButtonTapped(selectedAccounts, state.accessKind)))
+
+			guard let challenge = state.challenge else {
+				return .send(.delegate(.continueButtonTapped(
+					accessKind: state.accessKind,
+					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
+				)))
+			}
+
+			guard let signers = NonEmpty<Set<EntityPotentiallyVirtual>>.init(rawValue: Set(selectedAccounts.map { EntityPotentiallyVirtual.account($0) })) else {
+				return .send(.delegate(.continueButtonTapped(
+					accessKind: state.accessKind,
+					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
+				)))
+			}
+
+			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
+				challenge: challenge,
+				origin: state.dappContext.origin,
+				dAppDefinitionAddress: state.dappContext.dAppDefinitionAddress
+			)
+
+			return .run { send in
+				let dataToSign = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+				let networkID = await accountsClient.getCurrentNetworkID()
+				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
+					networkID: networkID,
+					signers: signers,
+					signingPurpose: .signAuth
+				))
+				await send(.internal(.proveAccountOwnership(signingFactors, dataToSign)))
+			}
 		}
 	}
 
@@ -100,17 +169,60 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case let .loadAccountsResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
+		case let .proveAccountOwnership(signingFactors, authenticationDataToSignForChallenge):
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: signingFactors,
+				signingPurposeWithPayload: .signAuth(authenticationDataToSignForChallenge)
+			))
+			return .none
 		}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .createAccountCoordinator(.presented(.delegate(.completed))):
+		case .destination(.presented(.createAccount(.delegate(.completed)))):
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
 					try await accountsClient.getAccountsOnCurrentNetwork()
 				})))
 			}
+
+		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(signedAuthChallenge)))))):
+			state.destination = nil
+
+			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set((state.selectedAccounts ?? []).map(\.account.id))
+			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
+				guard case let .account(account) = $0.signerEntity else {
+					fatalError()
+				}
+				accountsLeftToVerifyDidSign.remove(account.id)
+				guard let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0) else {
+					fatalError()
+				}
+				return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
+			}
+			guard accountsLeftToVerifyDidSign.isEmpty else {
+				loggerGlobal.error("Failed to sign with all accounts..")
+				return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
+			}
+
+			let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
+				challenge: signedAuthChallenge.challenge,
+				IdentifiedArrayOf<P2P.Dapp.Response.Accounts.WithProof>.init(uniqueElements: walletAccountsWithProof)
+			)
+			return .send(.delegate(.continueButtonTapped(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
+
+		case .destination(.presented(.signing(.delegate(.failedToSign)))):
+			state.destination = nil
+			loggerGlobal.error("Failed to sign proof of ownership")
+			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
+
+		case .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction))))):
+			state.destination = nil
+			assertionFailure("wrong signing, signed tx, expected auth...")
+			loggerGlobal.error("Failed to sign proof of ownership")
+			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
 
 		default:
 			return .none

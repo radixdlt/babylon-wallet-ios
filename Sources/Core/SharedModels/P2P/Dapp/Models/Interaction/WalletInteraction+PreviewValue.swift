@@ -45,14 +45,14 @@ DROP_ALL_PROOFS;
 CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "complicated_method" Decimal("1") PreciseDecimal("2");
 """
 
-extension P2P.Dapp.Request.OneTimeAccountsRequestItem {
+extension P2P.Dapp.Request.AccountsRequestItem {
 	public static let previewValue: Self = .init(
 		numberOfAccounts: .exactly(1),
-		requiresProofOfOwnership: false
+		challenge: nil
 	)
 }
 
-extension P2P.Dapp.Request.OneTimePersonaDataRequestItem {
+extension P2P.Dapp.Request.PersonaDataRequestItem {
 	public static let previewValue: Self = .init(
 		fields: [.givenName, .familyName, .emailAddress]
 	)
@@ -73,26 +73,24 @@ extension P2P.Dapp.Request.ID {
 
 extension P2P.Dapp.Request.Metadata {
 	public static let previewValue = Self(
+		version: P2P.Dapp.currentVersion,
 		networkId: .simulator,
 		origin: "Placeholder",
-		dAppDefinitionAddress: .valid(try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"))
+		dAppDefinitionAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
 	)
 }
 
 extension P2P.Dapp.Request {
-	public static func previewValueAllRequests(auth: P2P.Dapp.Request.AuthRequestItem) -> Self {
+	public static func previewValueAllRequests(
+		auth: P2P.Dapp.Request.AuthRequestItem = .login(.withoutChallenge)
+	) -> Self {
 		.init(
 			id: .previewValue0,
 			items: .request(.authorized(.init(
 				auth: auth,
 				reset: nil,
-				ongoingAccounts: .init(
-					numberOfAccounts: .atLeast(2),
-					requiresProofOfOwnership: false
-				),
-				ongoingPersonaData: .init(
-					fields: [.givenName, .familyName, .emailAddress]
-				),
+				ongoingAccounts: .previewValue,
+				ongoingPersonaData: .previewValue,
 				oneTimeAccounts: .previewValue,
 				oneTimePersonaData: .previewValue
 			))),

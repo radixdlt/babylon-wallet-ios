@@ -4,6 +4,7 @@ import Profile
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
+			personaLabel: persona.displayName.rawValue,
 			avatarURL: URL(string: "something")!,
 			addAFieldButtonState: {
 				if dynamicFields.count < DynamicFieldID.allCases.count {
@@ -42,6 +43,7 @@ extension EditPersona.State {
 // MARK: - EditPersonaDetails.View
 extension EditPersona {
 	public struct ViewState: Equatable {
+		let personaLabel: String
 		let avatarURL: URL
 		let addAFieldButtonState: ControlState
 		let output: Output?
@@ -80,7 +82,7 @@ extension EditPersona {
 							)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
-								Text(L10n.EditPersona.Button.addAField).padding(.horizontal, .medium2)
+								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
 							}
 							.buttonStyle(.secondaryRectangular)
 							.controlState(viewStore.addAFieldButtonState)
@@ -95,11 +97,13 @@ extension EditPersona {
 							viewStore.output,
 							forAction: { viewStore.send(.saveButtonTapped($0)) }
 						) { action in
-							Button(L10n.EditPersona.Button.save, action: action)
+							Button(L10n.Common.save, action: action)
 								.buttonStyle(.primaryRectangular)
 						}
 					}
 					#if os(iOS)
+					.navigationTitle(viewStore.personaLabel)
+					.navigationBarTitleDisplayMode(.inline)
 					.toolbar {
 						ToolbarItem(placement: .primaryAction) {
 							CloseButton { viewStore.send(.closeButtonTapped) }

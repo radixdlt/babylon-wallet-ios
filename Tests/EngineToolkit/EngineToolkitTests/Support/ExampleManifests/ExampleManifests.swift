@@ -41,8 +41,8 @@ func testTransactionSecp256k1(
 	line: UInt = #line
 ) throws -> TestTransaction {
 	try _testTransaction(
-		notaryPrivateKey: .secp256k1(K1.PrivateKey.generateNew()),
-		signerPrivateKeys: (0 ..< signerCount).map { _ in try .secp256k1(K1.PrivateKey.generateNew()) },
+		notaryPrivateKey: .secp256k1(K1.PrivateKey()),
+		signerPrivateKeys: (0 ..< signerCount).map { _ in .secp256k1(K1.PrivateKey()) },
 		file: file, line: line
 	)
 }

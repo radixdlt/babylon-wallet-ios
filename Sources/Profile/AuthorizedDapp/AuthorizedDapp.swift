@@ -42,52 +42,7 @@ extension Profile.Network.AuthorizedDapp {
 	}
 }
 
-// MARK: - DappDefinitionAddress
-/// YES! DappDefinitionAddress **is** an AccountAddress! NOT to be confused with the
-/// address the an component on Ledger, the `DappAddress`.
-public enum DappDefinitionAddress: Sendable, Hashable, Codable {
-	/// A dAppDefinition address is a valid AccountAddress.
-	case valid(AccountAddress)
-
-	/// In case `isDeveloperModeEnabled` is `true`, we allow invalid dAppDefinitiion addresses.
-	case invalid(InvalidDappDefinitionAddress)
-
-	public struct InvalidDappDefinitionAddress: Sendable, Hashable, Codable {
-		public let invalidAddress: String
-		public let origin: DappOrigin
-	}
-
-	private enum Discriminator: String, Codable {
-		case valid, invalid
-	}
-
-	public enum CodingKeys: String, CodingKey {
-		case discriminator
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
-		switch discriminator {
-		case .invalid:
-			self = try .invalid(.init(from: decoder))
-		case .valid:
-			self = try .valid(.init(from: decoder))
-		}
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		switch self {
-		case let .invalid(invalid):
-			try container.encode(Discriminator.invalid, forKey: .discriminator)
-			try invalid.encode(to: encoder)
-		case let .valid(accountAddress):
-			try container.encode(Discriminator.valid, forKey: .discriminator)
-			try accountAddress.encode(to: encoder)
-		}
-	}
-}
+public typealias DappDefinitionAddress = AccountAddress
 
 // MARK: - DappOriginTag
 public enum DappOriginTag {}

@@ -59,12 +59,12 @@ extension SelectAccountsToImport {
 				}
 				.footer {
 					VStack {
-						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.deselectAll) {
+						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.deselectAll) {
 							viewStore.send(.deselectAll)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 
-						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.Button.selectAllNonImported) {
+						Button(L10n.ImportLegacyWallet.SelectAccountsToImport.selectAllNonImported) {
 							viewStore.send(.selectAllNonImported)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -77,11 +77,11 @@ extension SelectAccountsToImport {
 						let numberOfSelectedAccounts = viewStore.selectedAccounts?.count ?? 0
 						let title: String = {
 							if numberOfSelectedAccounts == 0 {
-								return L10n.ImportLegacyWallet.SelectAccountsToImport.Button.importZeroAccounts
+								return L10n.ImportLegacyWallet.SelectAccountsToImport.importZeroAccounts
 							} else if numberOfSelectedAccounts == 1 {
-								return L10n.ImportLegacyWallet.SelectAccountsToImport.Button.importOneAcccount
+								return L10n.ImportLegacyWallet.SelectAccountsToImport.importOneAcccount
 							} else {
-								return L10n.ImportLegacyWallet.SelectAccountsToImport.Button.importManyAccounts(numberOfSelectedAccounts)
+								return L10n.ImportLegacyWallet.SelectAccountsToImport.importManyAccounts(numberOfSelectedAccounts)
 							}
 						}()
 						Button(title, action: action)
@@ -108,7 +108,7 @@ enum SelectAccountsToImportRow {
 		let olympiaAccountType: Olympia.AccountType
 
 		init(state olympiaAccount: OlympiaAccountToMigrate) {
-			accountName = olympiaAccount.displayName?.rawValue ?? L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Value.nameFallback
+			accountName = olympiaAccount.displayName?.rawValue ?? L10n.ImportLegacyWallet.SelectAccountsToImport.unnamed
 
 			olympiaAddress = olympiaAccount.address.address.rawValue
 			appearanceID = .fromIndex(Int(olympiaAccount.addressIndex))
@@ -143,13 +143,13 @@ enum SelectAccountsToImportRow {
 							.textStyle(.body1HighImportance)
 					}
 
-					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.accountType, item: String(describing: viewState.olympiaAccountType))
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.accountType, item: String(describing: viewState.olympiaAccountType))
 
-					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.name, item: viewState.accountName)
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.name, item: viewState.accountName)
 
 					VStack(alignment: .leading, spacing: .small3) {
 						Group {
-							Text(L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.olympiaAddress)
+							Text(L10n.ImportLegacyWallet.SelectAccountsToImport.olympiaAddress)
 								.textStyle(.body2Header)
 
 							Text(viewState.olympiaAddress)
@@ -158,7 +158,7 @@ enum SelectAccountsToImportRow {
 						}
 						.foregroundColor(.app.white)
 					}
-					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.AccountRow.Label.derivationPath, item: viewState.derivationPath)
+					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.derivationPath, item: viewState.derivationPath)
 				}
 				Spacer()
 

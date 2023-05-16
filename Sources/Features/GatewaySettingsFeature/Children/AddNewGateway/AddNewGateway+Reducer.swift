@@ -88,7 +88,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 		case let .gatewayValidationResult(.success(gateway)):
 			guard let gateway = gateway else {
-				state.errorText = L10n.GatewaySettings.AddNewGateway.Error.noGatewayFound
+				state.errorText = L10n.Gateways.AddNewGateway.errorNoGatewayFound
 				return .none
 			}
 
@@ -110,7 +110,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 			return handle(error, state: &state)
 
 		case .showDuplicateURLError:
-			state.errorText = L10n.GatewaySettings.AddNewGateway.Error.duplicateURL
+			state.errorText = L10n.Gateways.AddNewGateway.errorDuplicateURL
 			return .none
 
 		case let .validateNewGateway(url):
@@ -127,7 +127,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 private extension AddNewGateway {
 	func handle(_ error: Error, state: inout State) -> EffectTask<Action> {
-		state.errorText = L10n.GatewaySettings.AddNewGateway.Error.noGatewayFound
+		state.errorText = L10n.Gateways.AddNewGateway.errorNoGatewayFound
 		state.addGatewayButtonState = .disabled
 		errorQueue.schedule(error)
 		return .none

@@ -6,7 +6,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	public static let factorSourceKind = FactorSourceKind.device
 	public typealias State = SignWithFactorSourcesOfKindState<Self>
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
-		case appeared
+		case onFirstTask
 	}
 
 	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
@@ -25,7 +25,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .onFirstTask:
 			return signWithSigningFactors(of: state)
 		}
 	}
@@ -48,7 +48,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: signingFactor.factorSource,
 			signerEntities: Set(signingFactor.signers.map(\.entity)),
-			unhashedDataToSign: state.dataToSign,
+			unhashedDataToSign: state.signingPurposeWithPayload.dataToSign,
 			purpose: .signTransaction(.manifestFromDapp)
 		)
 	}

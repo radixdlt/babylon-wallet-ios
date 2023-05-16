@@ -1,66 +1,21 @@
 import CreateEntityFeature
 import FeaturePrelude
+import SigningFeature
 
 // MARK: - ChooseAccounts.View
 extension ChooseAccounts {
 	struct ViewState: Equatable {
+		let thumbnail: URL?
 		let title: String
-		let subtitle: AttributedString
+		let subtitle: String
 		let availableAccounts: [ChooseAccountsRow.State]
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [ChooseAccountsRow.State]?
 
 		init(state: ChooseAccounts.State) {
-			switch state.accessKind {
-			case .ongoing:
-				title = L10n.DApp.ChooseAccounts.Title.ongoing
-			case .oneTime:
-				title = L10n.DApp.ChooseAccounts.Title.oneTime
-			}
-
-			subtitle = {
-				let message: String = {
-					switch state.accessKind {
-					case .ongoing:
-						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
-						case (.atLeast, 0):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.atLeastZero
-						case (.atLeast, 1):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.atLeastOne
-						case let (.atLeast, number):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.atLeast(number)
-						case (.exactly, 1):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.exactlyOne
-						case let (.exactly, number):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.exactly(number)
-						}
-					case .oneTime:
-						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
-						case (.atLeast, 0):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.atLeastZero
-						case (.atLeast, 1):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.atLeastOne
-						case let (.atLeast, number):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.atLeast(number)
-						case (.exactly, 1):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.exactlyOne
-						case let (.exactly, number):
-							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.exactly(number)
-						}
-					}
-				}()
-
-				let attributedMessage = AttributedString(message, foregroundColor: .app.gray2)
-				let dappName = AttributedString(state.dappContext.name, foregroundColor: .app.gray1)
-				let dot = AttributedString(".", foregroundColor: .app.gray2)
-
-				switch state.accessKind {
-				case .ongoing:
-					return attributedMessage + dappName + dot
-				case .oneTime:
-					return dappName + attributedMessage
-				}
-			}()
+			self.thumbnail = state.dappContext.thumbnail
+			self.title = state.title
+			self.subtitle = state.subtitle
 
 			let selectionRequirement = SelectionRequirement(state.numberOfAccounts)
 
@@ -88,7 +43,7 @@ extension ChooseAccounts {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							icon: nil,
+							thumbnail: viewStore.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
@@ -110,7 +65,7 @@ extension ChooseAccounts {
 							}
 						}
 
-						Button(L10n.DApp.ChooseAccounts.createNewAccount) {
+						Button(L10n.DAppRequest.ChooseAccounts.createNewAccount) {
 							viewStore.send(.createAccountButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -123,7 +78,7 @@ extension ChooseAccounts {
 						viewStore.selectedAccounts,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.DApp.Login.continueButtonTitle, action: action)
+						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -131,12 +86,61 @@ extension ChooseAccounts {
 					viewStore.send(.appeared)
 				}
 				.sheet(
-					store: store.scope(
-						state: \.$createAccountCoordinator,
-						action: { .child(.createAccountCoordinator($0)) }
-					),
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ChooseAccounts.Destinations.State.createAccount,
+					action: ChooseAccounts.Destinations.Action.createAccount,
 					content: { CreateAccountCoordinator.View(store: $0) }
 				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ChooseAccounts.Destinations.State.signing,
+					action: ChooseAccounts.Destinations.Action.signing,
+					content: { Signing.View(store: $0) }
+				)
+			}
+		}
+	}
+}
+
+extension ChooseAccounts.State {
+	var title: String {
+		switch accessKind {
+		case .ongoing:
+			return L10n.DAppRequest.ChooseAccountsOngoing.title
+		case .oneTime:
+			return L10n.DAppRequest.ChooseAccountsOneTime.title
+		}
+	}
+
+	var subtitle: String {
+		let dAppName = dappContext.name
+
+		switch accessKind {
+		case .ongoing:
+			switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+			case (.atLeast, 0):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastZero(dAppName)
+			case (.atLeast, 1):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastOne(dAppName)
+			case let (.atLeast, number):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeast(number, dAppName)
+			case (.exactly, 1):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactlyOne(dAppName)
+			case let (.exactly, number):
+				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactly(number, dAppName)
+			}
+		case .oneTime:
+			switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+			case (.atLeast, 0):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastZero(dAppName)
+			case (.atLeast, 1):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastOne(dAppName)
+			case let (.atLeast, number):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeast(dAppName, number)
+			case (.exactly, 1):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactlyOne(dAppName)
+			case let (.exactly, number):
+				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleExactly(dAppName, number)
 			}
 		}
 	}
@@ -163,6 +167,7 @@ struct ChooseAccounts_Preview: PreviewProvider {
 
 extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
+		challenge: nil,
 		accessKind: .ongoing,
 		dappContext: .previewValue,
 		availableAccounts: .init(

@@ -42,9 +42,7 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					interaction: .previewValueAllRequests(
-						auth: .login(.init(challenge: nil))
-//						auth: .usePersona(.init(identityAddress: Profile.Network.Persona.previewValue0.address.address))
-//						auth: .usePersona(.init(identityAddress: "invalidaddress"))
+						auth: .login(.withoutChallenge)
 					)
 				),
 				reducer: DappInteractionCoordinator()

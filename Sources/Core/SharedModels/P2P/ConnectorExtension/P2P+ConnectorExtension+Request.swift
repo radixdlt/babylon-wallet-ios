@@ -1,4 +1,5 @@
 import Prelude
+import Profile
 
 // MARK: - P2P.ConnectorExtension
 extension P2P {
@@ -40,7 +41,18 @@ extension P2P.ConnectorExtension.Request {
 			case getDeviceInfo
 			case derivePublicKey(DerivePublicKey)
 			case signTransaction(SignTransaction)
+			case signChallenge(SignAuthChallenge)
 			case importOlympiaDevice(ImportOlympiaDevice)
+
+			public var discriminator: P2P.LedgerHardwareWallet.Discriminator {
+				switch self {
+				case .derivePublicKey: return .derivePublicKey
+				case .getDeviceInfo: return .getDeviceInfo
+				case .signTransaction: return .signTransaction
+				case .signChallenge: return .signChallenge
+				case .importOlympiaDevice: return .importOlympiaDevice
+				}
+			}
 
 			public struct ImportOlympiaDevice: Sendable, Hashable, Encodable {
 				public let derivationPaths: [String]
@@ -87,35 +99,47 @@ extension P2P.ConnectorExtension.Request {
 					self.displayHash = displayHash
 				}
 			}
+
+			public struct SignAuthChallenge: Sendable, Hashable, Encodable {
+				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
+				public let derivationPaths: [String]
+				public let challenge: P2P.Dapp.Request.AuthChallengeNonce
+				public let origin: P2P.Dapp.Request.Metadata.Origin
+				public let dAppDefinitionAddress: AccountAddress
+
+				public init(
+					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
+					derivationPaths: [String],
+					challenge: P2P.Dapp.Request.AuthChallengeNonce,
+					origin: P2P.Dapp.Request.Metadata.Origin,
+					dAppDefinitionAddress: AccountAddress
+				) {
+					self.ledgerDevice = ledgerDevice
+					self.derivationPaths = derivationPaths
+					self.challenge = challenge
+					self.origin = origin
+					self.dAppDefinitionAddress = dAppDefinitionAddress
+				}
+			}
 		}
 
 		private typealias CodingKeys = P2P.LedgerHardwareWallet.CodingKeys
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(interactionID, forKey: .interactionID)
+			try container.encode(
+				request.discriminator,
+				forKey: .discriminator
+			)
 			switch request {
-			case .getDeviceInfo:
-				try container.encode(
-					P2P.LedgerHardwareWallet.Discriminator.getDeviceInfo,
-					forKey: .discriminator
-				)
+			case .getDeviceInfo: break
 			case let .importOlympiaDevice(request):
-				try container.encode(
-					P2P.LedgerHardwareWallet.Discriminator.importOlympiaDevice,
-					forKey: .discriminator
-				)
 				try request.encode(to: encoder)
 			case let .derivePublicKey(request):
-				try container.encode(
-					P2P.LedgerHardwareWallet.Discriminator.derivePublicKey,
-					forKey: .discriminator
-				)
 				try request.encode(to: encoder)
 			case let .signTransaction(request):
-				try container.encode(
-					P2P.LedgerHardwareWallet.Discriminator.signTransaction,
-					forKey: .discriminator
-				)
+				try request.encode(to: encoder)
+			case let .signChallenge(request):
 				try request.encode(to: encoder)
 			}
 		}

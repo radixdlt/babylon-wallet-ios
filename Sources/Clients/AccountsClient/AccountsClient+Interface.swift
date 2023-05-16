@@ -4,6 +4,8 @@ import Profile
 
 // MARK: - AccountsClient
 public struct AccountsClient: Sendable {
+	public var getCurrentNetworkID: GetCurrentNetworkID
+
 	/// Accounts on current network (active gateway)
 	public var getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork
 
@@ -30,6 +32,7 @@ public struct AccountsClient: Sendable {
 	public var updateAccount: UpdateAccount
 
 	public init(
+		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
@@ -40,6 +43,7 @@ public struct AccountsClient: Sendable {
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
 		updateAccount: @escaping UpdateAccount
 	) {
+		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
@@ -53,6 +57,7 @@ public struct AccountsClient: Sendable {
 }
 
 extension AccountsClient {
+	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Accounts
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Profile.Network.Accounts
 

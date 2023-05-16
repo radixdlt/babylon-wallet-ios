@@ -104,11 +104,7 @@ struct DappInteraction_Preview: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					dappContext: .previewValue,
-					interaction: .previewValueAllRequests(
-						auth: .login(.init(challenge: nil))
-//						auth: .usePersona(.init(identityAddress: Profile.Network.Persona.previewValue0.address.address))
-//						auth: .usePersona(.init(identityAddress: "invalidaddress"))
-					)
+					interaction: .previewValueAllRequests()
 				)!,
 				reducer: DappInteractionFlow()
 					.dependency(\.accountsClient, .previewValueTwoAccounts())

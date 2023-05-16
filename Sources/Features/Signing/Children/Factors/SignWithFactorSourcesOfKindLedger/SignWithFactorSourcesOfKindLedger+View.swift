@@ -28,7 +28,9 @@ extension SignWithFactorSourcesOfKindLedger {
 						signing(with: currentSigningFactor)
 					}
 				}
-				.onAppear { viewStore.send(.appeared) }
+				.onFirstTask { @MainActor in
+					ViewStore(store.stateless).send(.view(.onFirstTask))
+				}
 			}
 		}
 	}

@@ -159,7 +159,7 @@ final class DataChannelClientTests: TestCase {
 		expected: Result<DataChannelClient.AssembledMessage, Error>
 	) async throws {
 		try messages.map(DataChannelClient.Message.chunkedMessage).forEach(delegate.receiveIncomingMessage)
-		let receivedMessageResult = try await client.IncomingAssembledMessages.first()
+		let receivedMessageResult = try await client.incomingAssembledMessages.first()
 
 		switch (expected, receivedMessageResult) {
 		case let (.success(expectedMessage), .success(receivedMessage)):

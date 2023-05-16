@@ -22,7 +22,7 @@ extension GatewaySettings {
 				ScrollView {
 					coreView(with: viewStore)
 						.padding(.bottom, .medium1)
-						.navigationTitle(L10n.GatewaySettings.title)
+						.navigationTitle(L10n.Gateways.title)
 						.task { @MainActor in await ViewStore(store.stateless).send(.view(.task)).finish() }
 						.alert(
 							store: store.scope(
@@ -79,7 +79,7 @@ extension GatewaySettings {
 				Spacer()
 					.frame(height: .large1)
 
-				Button(L10n.GatewaySettings.addNewGatewayButtonTitle) {
+				Button(L10n.Gateways.addNewGatewayButtonTitle) {
 					viewStore.send(.addGatewayButtonTapped)
 				}
 				.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -88,7 +88,7 @@ extension GatewaySettings {
 		}
 
 		private var subtitle: some SwiftUI.View {
-			Text(L10n.GatewaySettings.subtitle)
+			Text(L10n.Gateways.subtitle)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body1HighImportance)
 				.flushedLeft
@@ -109,7 +109,7 @@ extension GatewaySettings {
 			} label: {
 				HStack {
 					Image(asset: AssetResource.info)
-					Text(L10n.GatewaySettings.WhatIsAGateway.buttonText)
+					Text(L10n.Gateways.whatIsAGateway)
 						.textStyle(.body1StandaloneLink)
 				}
 				.tint(.app.blue2)

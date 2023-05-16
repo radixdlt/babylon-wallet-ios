@@ -1,5 +1,6 @@
 import AuthorizedDappsClient
 import CreateEntityFeature
+import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
 import PersonasClient
@@ -63,6 +64,7 @@ struct Login: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.rolaClient) var rolaClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -91,29 +93,28 @@ struct Login: Sendable, FeatureReducer {
 
 		case let .continueButtonTapped(persona):
 			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
-			guard let challenge = state.loginRequest.challenge else {
+			guard case let .withChallenge(loginWithChallenge) = state.loginRequest else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
 
-			let signAuthRequest = SignAuthChallengeRequest(
+			let challenge = loginWithChallenge.challenge
+
+			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappContext.origin,
-				dAppDefinitionAddress: state.dappContext.dAppDefintionAddress,
-				persona: persona
+				dAppDefinitionAddress: state.dappContext.dAppDefinitionAddress
 			)
-			return .run { [authorizedDapp = state.authorizedDapp] send in
-				let signedAuthChallenge = try await rolaClient.signAuthChallenge(signAuthRequest)
-				await send(.delegate(.continueButtonTapped(
-					persona,
-					authorizedDapp,
-					authorizedPersona,
-					signedAuthChallenge
-				)))
 
-			} catch: { error, send in
-				loggerGlobal.error("Failed to sign auth challenge, error: \(error)")
-				errorQueue.schedule(error)
-				await send(.delegate(.failedToSignAuthChallenge))
+			return .run { [authorizedDapp = state.authorizedDapp] send in
+				let authToSignResponse = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+
+				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+					signerEntity: .persona(persona),
+					unhashedDataToSign: authToSignResponse.payloadToHashAndSign,
+					purpose: .signAuth
+				)
+				let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
+				await send(.delegate(.continueButtonTapped(persona, authorizedDapp, authorizedPersona, signedAuthChallenge)))
 			}
 		}
 	}
@@ -164,10 +165,10 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
-		.run { send in
+		.run { [dAppDefinitionAddress = state.dappContext.dAppDefinitionAddress] send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
-			let authorizedDapp = authorizedDapps[id: dappDefinitionAddress]
+			let authorizedDapp = authorizedDapps[id: dAppDefinitionAddress]
 			let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple? = {
 				guard let authorizedDapp else {
 					return nil
@@ -199,9 +200,9 @@ struct Login: Sendable, FeatureReducer {
 }
 
 extension DappContext {
-	var dAppDefintionAddress: DappDefinitionAddress {
+	var dAppDefinitionAddress: DappDefinitionAddress {
 		switch self {
-		case let .fromLedger(fromLedger): return .valid(fromLedger.dAppDefinintionAddress)
+		case let .fromLedger(fromLedger): return fromLedger.dAppDefinintionAddress
 		case let .fromRequest(fromRequest): return fromRequest.dAppDefinitionAddress
 		}
 	}
