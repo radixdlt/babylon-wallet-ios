@@ -62,7 +62,7 @@ extension View {
 extension Text {
 	/// Text formatted as a section heading
 	public var sectionHeading: some View {
-		textStyle(.body1Regular)
+		textStyle(.body1Link)
 			.foregroundColor(.app.gray2)
 	}
 

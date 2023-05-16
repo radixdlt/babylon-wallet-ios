@@ -1,4 +1,5 @@
 import AccountPreferencesFeature
+import AssetTransferFeature
 import FeaturePrelude
 
 extension AccountDetails.State {
@@ -37,16 +38,16 @@ extension AccountDetails {
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)
 
-					// TODO: @davdroman take care of proper Asset Transfer implementation
-					// when we have the proper spec and designs
-//						#if DEBUG // FF
-//						Button(
-//							"Transfer",
-//							action: { viewStore.send(.transferButtonTapped) }
-//						)
-//						.buttonStyle(.secondaryRectangular())
-//						.padding(.bottom)
-//						#endif
+					Button("Transfer", asset: AssetResource.transfer) {
+						viewStore.send(.transferButtonTapped)
+					}
+					.textStyle(.body1Header)
+					.foregroundColor(.app.white)
+					.padding(.horizontal, .large2)
+					.frame(height: .standardButtonHeight)
+					.background(.app.whiteTransparent3)
+					.cornerRadius(.standardButtonHeight / 2)
+					.padding(.bottom, .medium1)
 
 					if viewStore.isLoadingResources {
 						ProgressView()
@@ -107,12 +108,12 @@ extension AccountDetails {
 						action: AccountDetails.Destinations.Action.preferences,
 						content: { AccountPreferences.View(store: $0) }
 					)
-				//					.sheet(
-				//						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				//						state: /AccountDetails.Destinations.State.transfer,
-				//						action: AccountDetails.Destinations.Action.transfer,
-				//						content: { AssetTransfer.View(store: $0) }
-				//					)
+					.fullScreenCover(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /AccountDetails.Destinations.State.transfer,
+						action: AccountDetails.Destinations.Action.transfer,
+						content: { AssetTransfer.View(store: $0) }
+					)
 			}
 		}
 	}
