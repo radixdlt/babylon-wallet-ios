@@ -42,8 +42,6 @@ extension Profile.Network.AuthorizedDapp {
 	}
 }
 
-public typealias DappDefinitionAddress = AccountAddress
-
 // MARK: - DappOriginTag
 public enum DappOriginTag {}
 public typealias DappOrigin = Tagged<DappOriginTag, NonEmptyString>

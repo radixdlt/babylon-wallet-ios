@@ -14,19 +14,19 @@ final class ROLAClientTests: TestCase {
 	}()
 
 	private let wellKnownFilePath = ".well-known/radix.json"
-	private let dAppDefinitionAddress = try! AccountAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")
+	private let dAppDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")
 	private func metadata(
 		origin: String,
-		dAppDefinitionAddress: AccountAddress
+		dAppDefinitionAddress: DappDefinitionAddress
 	) -> P2P.Dapp.Request.Metadata {
 		.init(
 			version: 1, networkId: 0,
-			origin: .init(rawValue: origin),
-			dAppDefinitionAddress: .valid(dAppDefinitionAddress)
+			origin: .init(rawValue: .init(rawValue: origin)!),
+			dAppDefinitionAddress: dAppDefinitionAddress
 		)
 	}
 
-	private func json(dAppDefinitionAddress: AccountAddress) -> JSON {
+	private func json(dAppDefinitionAddress: DappDefinitionAddress) -> JSON {
 		[
 			"dApps": [
 				[
@@ -59,8 +59,8 @@ final class ROLAClientTests: TestCase {
 			for vector in vectors {
 				let payload = try payloadToHash(
 					challenge: .init(rawValue: .init(hex: vector.challenge)),
-					dAppDefinitionAddress: .valid(.init(address: vector.dAppDefinitionAddress)),
-					origin: .init(rawValue: vector.origin)
+					dAppDefinitionAddress: .init(address: vector.dAppDefinitionAddress),
+					origin: .init(rawValue: .init(rawValue: vector.origin)!)
 				)
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
 				let blakeHashOfPayload = try blake2b(data: payload)
@@ -71,7 +71,7 @@ final class ROLAClientTests: TestCase {
 
 	func omit_test_generate_rola_payload_hash_vectors() throws {
 		let origins: [P2P.Dapp.Request.Metadata.Origin] = ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"]
-		let accounts: [AccountAddress] = try [
+		let accounts: [DappDefinitionAddress] = try [
 			.init(address: "account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"),
 			.init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
 			.init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
@@ -83,12 +83,12 @@ final class ROLAClientTests: TestCase {
 					let challenge = try blake2b(data: Data((origin.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
 					let payload = try payloadToHash(
 						challenge: .init(rawValue: .init(data: challenge)),
-						dAppDefinitionAddress: .valid(dAppDefinitionAddress),
+						dAppDefinitionAddress: dAppDefinitionAddress,
 						origin: origin
 					)
 					let blakeHashOfPayload = try blake2b(data: payload)
 					return TestVector(
-						origin: origin.rawValue,
+						origin: origin.rawValue.rawValue,
 						challenge: challenge.hex,
 						dAppDefinitionAddress: dAppDefinitionAddress.address,
 						payloadToHash: payload.hex,
@@ -282,7 +282,7 @@ final class ROLAClientTests: TestCase {
 	func testUnhappyPath_whenDappDefinitionAddressIsUnknown_thenUnknownDappDefinitionAddressErrorIsThrown() async throws {
 		// given
 		let origin = "https://origin.com"
-		let unknownDappDefinitionAddress = try! AccountAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh-unknown") // TODO: use another valid DappDefinitionAddress
+		let unknownDappDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh-unknown") // TODO: use another valid DappDefinitionAddress
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: unknownDappDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
 		let expectedURL = URL(string: "/.well-known/radix.json")!

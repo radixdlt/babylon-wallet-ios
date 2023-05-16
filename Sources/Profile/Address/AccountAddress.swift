@@ -1,5 +1,9 @@
 import Prelude
 
+/// YES! DappDefinitionAddress **is** an AccountAddress! NOT to be confused with the
+/// address the an component on Ledger, the `DappAddress`.
+public typealias DappDefinitionAddress = AccountAddress
+
 // MARK: - AccountAddress
 /// The address to an `Account` on the Radix network.
 public struct AccountAddress:

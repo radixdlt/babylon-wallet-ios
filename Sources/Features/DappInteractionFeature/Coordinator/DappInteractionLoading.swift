@@ -135,9 +135,6 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - InvaliddAppDefinitionAddressNotSupportedWithoutDeveloperModeEnabled
-struct InvaliddAppDefinitionAddressNotSupportedWithoutDeveloperModeEnabled: Swift.Error {}
-
 extension FromLedgerDappMetadata {
 	init(
 		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
