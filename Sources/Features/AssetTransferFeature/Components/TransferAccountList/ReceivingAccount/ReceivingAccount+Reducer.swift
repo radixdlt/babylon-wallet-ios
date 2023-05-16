@@ -10,7 +10,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 
 		// Either user owned account, or foreign account Address
 		public var account: Either<Account, AccountAddress>?
-		public var assets: [Asset]
+		public var assets: IdentifiedArrayOf<FungibleResourceAsset.State>
 		public var canBeRemovedWhenEmpty: Bool
 
 		public struct Asset: Sendable, Hashable, Identifiable {
@@ -21,7 +21,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(account: Either<Account, AccountAddress>?, assets: [Asset], canBeRemovedWhenEmpty: Bool) {
+		public init(account: Either<Account, AccountAddress>?, assets: IdentifiedArrayOf<FungibleResourceAsset.State>, canBeRemovedWhenEmpty: Bool) {
 			self.account = account
 			self.assets = assets
 			self.canBeRemovedWhenEmpty = canBeRemovedWhenEmpty
@@ -66,12 +66,16 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+		case row(id: FungibleResourceAsset.State.ID, child: FungibleResourceAsset.Action)
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
+			}
+			.forEach(\.assets, action: /Action.child .. ChildAction.row) {
+				FungibleResourceAsset()
 			}
 	}
 
@@ -80,7 +84,8 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case .removeTapped:
 			return .send(.delegate(.removed))
 		case .addAssetTapped:
-			state.destination = .addAsset(.init())
+			state.assets.append(.init(resourceAddress: .init(address: UUID().uuidString), maxAmount: 100))
+//			state.destination = .addAsset(.init())
 			return .none
 		case .chooseAccountTapped:
 			state.account = Bool.random() ? .left(.previewValue1) : try! .right(.init(address: "account_tdx_adsadaddadwdadwddwdfadwqdawdwdasdwdasdwd"))
@@ -92,7 +97,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.dismiss):
-			state.assets.append(.init())
+			//                        state.assets.append(.init(amount: "0.00", maxAmount: 100))
 			return .none
 		default:
 			return .none
