@@ -163,11 +163,10 @@ extension ROLAClient {
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
 
-				let dappDefAddress = metadata.dAppDefinitionAddress
 				let metadataCollection = try await cacheClient.withCaching(
-					cacheEntry: .rolaDappVerificationMetadata(dappDefAddress.address),
+					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
 					request: {
-						try await gatewayAPIClient.getEntityMetadata(dappDefAddress.address)
+						try await gatewayAPIClient.getEntityMetadata(metadata.dAppDefinitionAddress.address)
 					}
 				)
 
@@ -194,8 +193,6 @@ extension ROLAClient {
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
-
-				let dappDefAddress = metadata.dAppDefinitionAddress
 
 				guard let originURL = URL(string: metadata.origin.rawValue.rawValue) else {
 					throw ROLAFailure.invalidOriginURL
@@ -231,7 +228,7 @@ extension ROLAClient {
 				)
 
 				let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
-				guard dAppDefinitionAddresses.contains(dappDefAddress) else {
+				guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
@@ -258,7 +255,7 @@ extension ROLAClient {
 		let dApps: [Item]
 
 		struct Item: Codable {
-			let dAppDefinitionAddress: AccountAddress
+			let dAppDefinitionAddress: DappDefinitionAddress
 		}
 	}
 

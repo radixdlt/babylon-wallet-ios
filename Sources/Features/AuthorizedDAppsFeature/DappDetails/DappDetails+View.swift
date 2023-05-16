@@ -19,7 +19,7 @@ extension DappDetails {
 		let description: String
 		let domain: URL?
 		let thumbnail: URL?
-		let address: AccountAddress
+		let address: DappDefinitionAddress
 		let fungibles: [State.Resources.ResourceDetails]?
 		let nonFungibles: [State.Resources.ResourceDetails]?
 		let associatedDapps: [State.AssociatedDapp]?
