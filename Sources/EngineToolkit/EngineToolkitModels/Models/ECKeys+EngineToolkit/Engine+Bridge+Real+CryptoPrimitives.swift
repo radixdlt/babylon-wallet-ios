@@ -27,16 +27,16 @@ extension SLIP10.PublicKey {
 		case let .eddsaEd25519(key):
 			self = try .eddsaEd25519(Curve25519.Signing.PublicKey(rawRepresentation: key.bytes))
 		case let .ecdsaSecp256k1(key):
-			self = try .ecdsaSecp256k1(.import(from: key.bytes))
+			self = try .ecdsaSecp256k1(.init(compressedRepresentation: key.bytes))
 		}
 	}
 }
 
 extension SLIP10.PublicKey {
-	public func intoEngine() throws -> Engine.PublicKey {
+	public func intoEngine() -> Engine.PublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(key):
-			return try .ecdsaSecp256k1(key.intoEngine())
+			return .ecdsaSecp256k1(key.intoEngine())
 		case let .eddsaEd25519(key):
 			return .eddsaEd25519(Engine.EddsaEd25519PublicKey(bytes: [UInt8](key.rawRepresentation)))
 		}
@@ -44,8 +44,8 @@ extension SLIP10.PublicKey {
 }
 
 extension K1.PublicKey {
-	public func intoEngine() throws -> Engine.EcdsaSecp256k1PublicKey {
-		try .init(bytes: self.rawRepresentation(format: .compressed))
+	public func intoEngine() -> Engine.EcdsaSecp256k1PublicKey {
+		.init(bytes: Array(compressedRepresentation))
 	}
 }
 
@@ -56,7 +56,7 @@ extension SLIP10.Signature {
 			// TODO: validate
 			self = .eddsaEd25519(Data(signature.bytes))
 		case let .ecdsaSecp256k1(signature):
-			self = try .ecdsaSecp256k1(.init(radixFormat: Data(signature.bytes)))
+			self = try .ecdsaSecp256k1(.init(compact: .init(rawRepresentation: Data(signature.bytes), format: .vrs)))
 		}
 	}
 }
@@ -65,9 +65,7 @@ extension SignatureWithPublicKey {
 	public func intoEngine() throws -> Engine.SignatureWithPublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(signature, _):
-			return try .ecdsaSecp256k1(
-				signature: .init(bytes: [UInt8](signature.radixSerialize()))
-			)
+			return try .ecdsaSecp256k1(signature: .init(bytes: Array(signature.radixSerialize())))
 		case let .eddsaEd25519(signature, publicKey):
 			return .eddsaEd25519(
 				signature: Engine.EddsaEd25519Signature(bytes: [UInt8](signature)),

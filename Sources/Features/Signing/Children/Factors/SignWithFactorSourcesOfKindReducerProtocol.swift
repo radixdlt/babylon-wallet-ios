@@ -16,7 +16,7 @@ protocol SignWithFactorSourcesOfKindInternalActionProtocol: Sendable, Equatable 
 
 // MARK: - SignWithFactorSourcesOfKindViewActionProtocol
 protocol SignWithFactorSourcesOfKindViewActionProtocol: Sendable, Equatable {
-	static var appeared: Self { get }
+	static var onFirstTask: Self { get }
 }
 
 // MARK: - FactorSourceKindSpecifierProtocol
@@ -27,16 +27,16 @@ public protocol FactorSourceKindSpecifierProtocol {
 // MARK: - SignWithFactorSourcesOfKindState
 public struct SignWithFactorSourcesOfKindState<FactorSourceKindSpecifier: FactorSourceKindSpecifierProtocol>: Sendable, Hashable {
 	public let signingFactors: NonEmpty<Set<SigningFactor>>
-	public let dataToSign: Data
+	public let signingPurposeWithPayload: SigningPurposeWithPayload
 	public var currentSigningFactor: SigningFactor?
 	public init(
 		signingFactors: NonEmpty<Set<SigningFactor>>,
-		dataToSign: Data,
+		signingPurposeWithPayload: SigningPurposeWithPayload,
 		currentSigningFactor: SigningFactor? = nil
 	) {
 		assert(signingFactors.allSatisfy { $0.factorSource.kind == FactorSourceKindSpecifier.factorSourceKind })
 		self.signingFactors = signingFactors
-		self.dataToSign = dataToSign
+		self.signingPurposeWithPayload = signingPurposeWithPayload
 		self.currentSigningFactor = currentSigningFactor
 	}
 }

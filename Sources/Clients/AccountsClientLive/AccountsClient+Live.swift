@@ -21,6 +21,7 @@ extension AccountsClient: DependencyKey {
 		}
 
 		return Self(
+			getCurrentNetworkID: { await getProfileStore().profile.networkID },
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
 			getAccountsOnNetwork: { try await getProfileStore().profile.network(id: $0).accounts },

@@ -93,8 +93,8 @@ public struct TransactionDetailsView: View {
 	public var body: some View {
 		switch viewState.metadata.type {
 		case .nonFungible:
-			NFTView(name: viewState.metadata.name,
-			        thumbnail: viewState.metadata.thumbnail)
+			TransactionReviewNFTView(name: viewState.metadata.name,
+			                         thumbnail: viewState.metadata.thumbnail)
 		case .fungible:
 			TransactionReviewTokenView(viewState: .init(
 				name: viewState.metadata.name,
@@ -105,27 +105,6 @@ public struct TransactionDetailsView: View {
 			))
 		case .none:
 			EmptyView()
-		}
-	}
-
-	struct NFTView: View {
-		let name: String?
-		let thumbnail: URL?
-
-		var body: some View {
-			HStack(spacing: .small1) {
-				NFTThumbnail(thumbnail, size: .small)
-					.padding(.vertical, .small1)
-
-				if let name {
-					Text(name)
-						.textStyle(.body1HighImportance)
-						.foregroundColor(.app.gray1)
-				}
-
-				Spacer(minLength: 0)
-			}
-			.padding(.horizontal, .medium3)
 		}
 	}
 }

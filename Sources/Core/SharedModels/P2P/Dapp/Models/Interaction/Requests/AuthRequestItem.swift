@@ -1,4 +1,5 @@
 import Prelude
+import Profile
 
 // MARK: - P2P.Dapp.Request.AuthRequestItem
 extension P2P.Dapp.Request {
@@ -21,13 +22,9 @@ extension P2P.Dapp.Request {
 			let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 			switch discriminator {
 			case .loginWithoutChallenge:
-				self = try .login(.init(from: decoder))
+				self = .login(.withoutChallenge)
 			case .loginWithChallenge:
-				let auth = try AuthLoginRequestItem(from: decoder)
-				guard auth.challenge != nil else {
-					throw ExpectedAuthChallengeForLoginWithChallengeButGotNone()
-				}
-				self = .login(auth)
+				self = try .login(.withChallenge(.init(from: decoder)))
 			case .usePersona:
 				self = try .usePersona(.init(from: decoder))
 			}
@@ -35,16 +32,21 @@ extension P2P.Dapp.Request {
 	}
 }
 
-// MARK: - ExpectedAuthChallengeForLoginWithChallengeButGotNone
-struct ExpectedAuthChallengeForLoginWithChallengeButGotNone: Swift.Error {}
-
 // MARK: - P2P.Dapp.Request.AuthLoginRequestItem
 extension P2P.Dapp.Request {
-	public struct AuthLoginRequestItem: Sendable, Hashable, Decodable {
-		/// A 32 bytes nonce used as a challenge
-		public let challenge: P2P.Dapp.AuthChallengeNonce?
+	public enum AuthLoginRequestItem: Sendable, Hashable {
+		case withoutChallenge
+		case withChallenge(AuthLoginWithChallengeRequestItem)
+	}
+}
 
-		public init(challenge: P2P.Dapp.AuthChallengeNonce?) {
+// MARK: - P2P.Dapp.Request.AuthLoginWithChallengeRequestItem
+extension P2P.Dapp.Request {
+	public struct AuthLoginWithChallengeRequestItem: Sendable, Hashable, Decodable {
+		/// A 32 bytes nonce used as a challenge
+		public let challenge: P2P.Dapp.Request.AuthChallengeNonce
+
+		public init(challenge: P2P.Dapp.Request.AuthChallengeNonce) {
 			self.challenge = challenge
 		}
 	}
@@ -53,9 +55,9 @@ extension P2P.Dapp.Request {
 // MARK: - P2P.Dapp.Request.AuthUsePersonaRequestItem
 extension P2P.Dapp.Request {
 	public struct AuthUsePersonaRequestItem: Sendable, Hashable, Decodable {
-		public let identityAddress: String
+		public let identityAddress: IdentityAddress
 
-		public init(identityAddress: String) {
+		public init(identityAddress: IdentityAddress) {
 			self.identityAddress = identityAddress
 		}
 	}

@@ -1,5 +1,6 @@
 import CreateEntityFeature
 import FeaturePrelude
+import SigningFeature
 
 // MARK: - ChooseAccounts.View
 extension ChooseAccounts {
@@ -85,11 +86,16 @@ extension ChooseAccounts {
 					viewStore.send(.appeared)
 				}
 				.sheet(
-					store: store.scope(
-						state: \.$createAccountCoordinator,
-						action: { .child(.createAccountCoordinator($0)) }
-					),
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ChooseAccounts.Destinations.State.createAccount,
+					action: ChooseAccounts.Destinations.Action.createAccount,
 					content: { CreateAccountCoordinator.View(store: $0) }
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ChooseAccounts.Destinations.State.signing,
+					action: ChooseAccounts.Destinations.Action.signing,
+					content: { Signing.View(store: $0) }
 				)
 			}
 		}
@@ -161,6 +167,7 @@ struct ChooseAccounts_Preview: PreviewProvider {
 
 extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
+		challenge: nil,
 		accessKind: .ongoing,
 		dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
 		dappMetadata: .previewValue,

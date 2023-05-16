@@ -38,12 +38,12 @@ extension P2P.Dapp.Request {
 	}
 
 	public struct UnauthorizedRequestItems: Sendable, Hashable, Decodable {
-		public let oneTimeAccounts: OneTimeAccountsRequestItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestItem?
+		public let oneTimeAccounts: AccountsRequestItem?
+		public let oneTimePersonaData: PersonaDataRequestItem?
 
 		public init(
-			oneTimeAccounts: OneTimeAccountsRequestItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestItem?
+			oneTimeAccounts: AccountsRequestItem?,
+			oneTimePersonaData: PersonaDataRequestItem?
 		) {
 			self.oneTimeAccounts = oneTimeAccounts
 			self.oneTimePersonaData = oneTimePersonaData
@@ -53,18 +53,18 @@ extension P2P.Dapp.Request {
 	public struct AuthorizedRequestItems: Sendable, Hashable, Decodable {
 		public let auth: AuthRequestItem
 		public let reset: ResetRequestItem?
-		public let ongoingAccounts: OngoingAccountsRequestItem?
-		public let ongoingPersonaData: OngoingPersonaDataRequestItem?
-		public let oneTimeAccounts: OneTimeAccountsRequestItem?
-		public let oneTimePersonaData: OneTimePersonaDataRequestItem?
+		public let ongoingAccounts: AccountsRequestItem?
+		public let ongoingPersonaData: PersonaDataRequestItem?
+		public let oneTimeAccounts: AccountsRequestItem?
+		public let oneTimePersonaData: PersonaDataRequestItem?
 
 		public init(
 			auth: AuthRequestItem,
-			reset: ResetRequestItem?,
-			ongoingAccounts: OngoingAccountsRequestItem?,
-			ongoingPersonaData: OngoingPersonaDataRequestItem?,
-			oneTimeAccounts: OneTimeAccountsRequestItem?,
-			oneTimePersonaData: OneTimePersonaDataRequestItem?
+			reset: ResetRequestItem? = nil,
+			ongoingAccounts: AccountsRequestItem? = nil,
+			ongoingPersonaData: PersonaDataRequestItem? = nil,
+			oneTimeAccounts: AccountsRequestItem? = nil,
+			oneTimePersonaData: PersonaDataRequestItem? = nil
 		) {
 			self.auth = auth
 			self.reset = reset
