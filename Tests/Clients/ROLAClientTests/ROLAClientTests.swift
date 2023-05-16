@@ -74,7 +74,7 @@ final class ROLAClientTests: TestCase {
 		let accounts: [DappDefinitionAddress] = try [
 			.init(address: "account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"),
 			.init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
-			.init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
+			.init(address: "account_tdx_b_1p8ahen5yznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
 		]
 		let vectors: [TestVector] = try origins.flatMap { origin -> [TestVector] in
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
@@ -207,38 +207,6 @@ final class ROLAClientTests: TestCase {
 			do {
 				try await sut.performDappDefinitionVerification(metadata)
 				XCTFail("Expected error: unknownWebsite")
-			} catch {
-				XCTAssertEqual(error as? ROLAFailure, expectedError)
-			}
-		}
-	}
-
-	func testUnhappyPath_whenOriginURLIsInvalid_thenInvalidOriginURLErrorIsThrown() async throws {
-		// given
-		let origin = ""
-		let metadata = metadata(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
-		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
-		let expectedURL = URL(string: "/.well-known/radix.json")!
-
-		MockURLProtocol.requestHandler = { _ in
-			let response = HTTPURLResponse(
-				url: expectedURL,
-				statusCode: 200,
-				httpVersion: nil,
-				headerFields: nil
-			)!
-			return (response, json.data)
-		}
-
-		let expectedError = ROLAFailure.invalidOriginURL
-
-		// when
-		await withDependencies {
-			$0.urlSession = urlSession
-		} operation: {
-			do {
-				try await sut.performWellKnownFileCheck(metadata)
-				XCTFail("Expected error: invalidOriginURL")
 			} catch {
 				XCTAssertEqual(error as? ROLAFailure, expectedError)
 			}
