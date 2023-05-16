@@ -26,7 +26,6 @@ extension Profile.Network {
 		/// Address that globally abnd uniquely identifies this Persona.
 		public let identityAddress: IdentityAddress
 
-		// FIXME: change Persona and Account to require displayname, and make this non optional?
 		/// The display name of the Persona, as stored in `Profile.Network.Persona`
 		public let displayName: NonEmptyString
 
