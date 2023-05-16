@@ -13,7 +13,7 @@ extension Profile.Network {
 	{
 		public let networkID: Radix.Network.ID
 
-		public let dAppDefinitionAddress: AccountAddress
+		public let dAppDefinitionAddress: DappDefinitionAddress
 
 		/// Will be nil if the `dAppDefinitionAddress` is `invalid` and thus we fialed to fetch
 		/// the name from Ledger (metadata on the entity)
@@ -24,7 +24,7 @@ extension Profile.Network {
 
 		public init(
 			networkID: Radix.Network.ID,
-			dAppDefinitionAddress: AccountAddress,
+			dAppDefinitionAddress: DappDefinitionAddress,
 			displayName: NonEmptyString?,
 			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
 		) {
@@ -37,7 +37,7 @@ extension Profile.Network {
 }
 
 extension Profile.Network.AuthorizedDapp {
-	public var id: AccountAddress {
+	public var id: DappDefinitionAddress {
 		dAppDefinitionAddress
 	}
 }
