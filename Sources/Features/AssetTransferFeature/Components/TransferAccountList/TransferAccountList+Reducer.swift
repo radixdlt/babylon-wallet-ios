@@ -11,7 +11,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 
 		public init(fromAccount: Profile.Network.Account) {
-			self.init(fromAccount: fromAccount, receivingAccounts: .init(uniqueElements: [.empty]))
+			self.init(fromAccount: fromAccount, receivingAccounts: .init(uniqueElements: [.empty(canBeRemovedWhenEmpty: false)]))
 		}
 	}
 
@@ -33,7 +33,11 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .addAccountTapped:
-			state.receivingAccounts.append(.empty)
+			if state.receivingAccounts.count == 1 {
+				// Allow the first container to be removed
+				state.receivingAccounts[0].canBeRemovedWhenEmpty = true
+			}
+			state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: true))
 			return .none
 		}
 	}
@@ -41,10 +45,16 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .receivingAccount(id: id, action: .delegate(.removed)):
-			guard state.receivingAccounts.count > 1 else {
-				return .none
-			}
 			state.receivingAccounts.remove(id: id)
+
+			if state.receivingAccounts.count == 1 {
+				// Disable removal of the last container
+				state.receivingAccounts[0].canBeRemovedWhenEmpty = false
+			}
+
+			if state.receivingAccounts.isEmpty {
+				state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
+			}
 			return .none
 		default:
 			return .none

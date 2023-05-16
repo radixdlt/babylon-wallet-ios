@@ -24,8 +24,10 @@ extension ReceivingAccount.View {
 					}
 					.textStyle(.body1Header)
 					Spacer()
-					Button("", asset: AssetResource.close) {
-						viewStore.send(.removeTapped)
+					if viewStore.canBeRemovedWhenEmpty {
+						Button("", asset: AssetResource.close) {
+							viewStore.send(.removeTapped)
+						}
 					}
 				}
 				.foregroundColor(.app.gray2)

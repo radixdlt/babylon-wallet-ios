@@ -10,6 +10,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		// Either user owned account, or foreign account Address
 		public var account: Either<Account, AccountAddress>?
 		public var assets: [Asset]
+		public var canBeRemovedWhenEmpty: Bool
 
 		public struct Asset: Sendable, Hashable, Identifiable {
 			public typealias ID = UUID
@@ -19,13 +20,14 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(account: Either<Account, AccountAddress>?, assets: [Asset]) {
+		public init(account: Either<Account, AccountAddress>?, assets: [Asset], canBeRemovedWhenEmpty: Bool) {
 			self.account = account
 			self.assets = assets
+			self.canBeRemovedWhenEmpty = canBeRemovedWhenEmpty
 		}
 
-		public static var empty: Self {
-			.init(account: nil, assets: [])
+		public static func empty(canBeRemovedWhenEmpty: Bool) -> Self {
+			.init(account: nil, assets: [], canBeRemovedWhenEmpty: canBeRemovedWhenEmpty)
 		}
 	}
 
