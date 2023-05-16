@@ -23,7 +23,7 @@ enum DappMetadata: Sendable, Hashable {
 
 // MARK: DappMetadata.Ledger
 extension DappMetadata {
-	/// A detailed DappMetaData fetched from Ledger.    ///
+	/// A detailed DappMetaData fetched from Ledger.
 	struct Ledger: Sendable, Hashable, Codable {
 		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
