@@ -131,12 +131,12 @@ extension ROLAClient {
 				fatalError()
 			}
 
-			let babylonDeviceFactorSource = try BabylonDeviceFactorSource(factorSource: factorSource)
+			let hdDeviceFactorSource = try HDOnDeviceFactorSource(factorSource: factorSource)
 
 			let authenticationSigning: FactorInstance = try await {
 				let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
 					.init(
-						hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
+						hdOnDeviceFactorSource: hdDeviceFactorSource,
 						derivationPath: authSignDerivationPath,
 						curve: .curve25519, // we always use Curve25519 for new accounts
 						loadMnemonicPurpose: .createSignAuthKey
@@ -144,7 +144,7 @@ extension ROLAClient {
 				)
 
 				return try FactorInstance(
-					factorSourceID: babylonDeviceFactorSource.id,
+					factorSourceID: hdDeviceFactorSource.id,
 					publicKey: .init(engine: publicKey),
 					derivationPath: authSignDerivationPath
 				)
