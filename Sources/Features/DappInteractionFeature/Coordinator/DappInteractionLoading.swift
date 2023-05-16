@@ -28,11 +28,11 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case dappMetadataLoadingResult(TaskResult<DappContext>)
+		case dappMetadataLoadingResult(TaskResult<DappMetadata>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dappContextLoaded(DappContext)
+		case dappContextLoaded(DappMetadata)
 		case dismiss
 	}
 
@@ -65,16 +65,16 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
 		state.isLoading = true
-		return .run { [fromRequest = state.interaction.metadata] send in
+		return .run { [request = state.interaction.metadata] send in
 
-			let result: TaskResult<DappContext> = await {
+			let result: TaskResult<DappMetadata> = await {
 				let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
-				let dappDefinitionAddress = fromRequest.dAppDefinitionAddress
+				let dappDefinitionAddress = request.dAppDefinitionAddress
 
 				do {
-					let fromLedger = try await cacheClient.withCaching(
+					let ledger = try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
-						invalidateCached: { (cached: FromLedgerDappMetadata) in
+						invalidateCached: { (cached: DappMetadata.Ledger) in
 							guard
 								cached.name != nil,
 								cached.description != nil,
@@ -89,20 +89,20 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 						},
 						request: {
 							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
-							return FromLedgerDappMetadata(
+							return DappMetadata.Ledger(
 								entityMetadataForDapp: entityMetadataForDapp,
 								dAppDefinintionAddress: dappDefinitionAddress,
-								origin: fromRequest.origin
+								origin: request.origin
 							)
 						}
 					)
-					return .success(.fromLedger(fromLedger))
+					return .success(.ledger(ledger))
 				} catch {
 					guard isDeveloperModeEnabled else {
 						return .failure(error)
 					}
 					loggerGlobal.warning("Failed to fetch Dapps metadata, but since 'isDeveloperModeEnabled' is enabled we surpress the error and allow continuation. Error: \(error)")
-					return .success(.fromRequest(fromRequest))
+					return .success(.request(request))
 				}
 
 			}()
@@ -145,7 +145,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 }
 
-extension FromLedgerDappMetadata {
+extension DappMetadata.Ledger {
 	init(
 		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
 		dAppDefinintionAddress: AccountAddress,

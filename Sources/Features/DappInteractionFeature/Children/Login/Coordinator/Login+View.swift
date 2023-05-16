@@ -19,13 +19,13 @@ extension Login {
 		init(state: Login.State) {
 			let isKnownDapp = state.authorizedPersona != nil
 
-			self.thumbnail = state.dappContext.thumbnail
+			self.thumbnail = state.dappMetadata.thumbnail
 
 			self.title = isKnownDapp
 				? L10n.DAppRequest.Login.titleKnownDapp
 				: L10n.DAppRequest.Login.titleNewDapp
 
-			let dAppName = state.dappContext.name
+			let dAppName = state.dappMetadata.name
 			self.subtitle = isKnownDapp
 				? L10n.DAppRequest.Login.subtitleKnownDapp(dAppName)
 				: L10n.DAppRequest.Login.subtitleNewDapp(dAppName)
@@ -141,7 +141,7 @@ struct Login_Preview: PreviewProvider {
 
 extension Login.State {
 	static let previewValue: Self = .init(
-		dappContext: .previewValue,
+		dappMetadata: .previewValue,
 		loginRequest: try! .withChallenge(.init(challenge: .init(rawValue: .init(.deadbeef32Bytes))))
 	)
 }

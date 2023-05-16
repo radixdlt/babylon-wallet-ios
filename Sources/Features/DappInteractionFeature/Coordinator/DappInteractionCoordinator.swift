@@ -37,8 +37,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case submit(P2P.Dapp.Response, DappContext)
-		case dismiss(DappContext)
+		case submit(P2P.Dapp.Response, DappMetadata)
+		case dismiss(DappMetadata)
 	}
 
 	var body: some ReducerProtocolOf<Self> {
@@ -70,7 +70,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 					interactionId: state.interaction.id,
 					errorType: .rejectedByUser,
 					message: nil
-				)), .fromRequest(state.interaction.metadata))))
+				)), .request(state.interaction.metadata))))
 			}
 		case .malformedInteractionErrorAlert:
 			return .none
@@ -79,8 +79,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .loading(.delegate(.dappContextLoaded(dappContext))):
-			if let flowState = DappInteractionFlow.State(dappContext: dappContext, interaction: state.interaction) {
+		case let .loading(.delegate(.dappContextLoaded(dappMetadata))):
+			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, interaction: state.interaction) {
 				state.childState = .flow(flowState)
 			} else {
 				state.errorAlert = .init(
@@ -99,15 +99,15 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 				interactionId: state.interaction.id,
 				errorType: .rejectedByUser,
 				message: nil
-			)), .fromRequest(state.interaction.metadata))))
+			)), .request(state.interaction.metadata))))
 		case let .flow(.delegate(.dismissWithFailure(error))):
-			return .send(.delegate(.submit(.failure(error), .fromRequest(state.interaction.metadata))))
+			return .send(.delegate(.submit(.failure(error), .request(state.interaction.metadata))))
 
-		case let .flow(.delegate(.dismissWithSuccess(dappContext))):
-			return .send(.delegate(.dismiss(dappContext)))
+		case let .flow(.delegate(.dismissWithSuccess(dappMetadata))):
+			return .send(.delegate(.dismiss(dappMetadata)))
 
-		case let .flow(.delegate(.submit(response, dappContext))):
-			return .send(.delegate(.submit(.success(response), dappContext)))
+		case let .flow(.delegate(.submit(response, dappMetadata))):
+			return .send(.delegate(.submit(.success(response), dappMetadata)))
 		default:
 			return .none
 		}

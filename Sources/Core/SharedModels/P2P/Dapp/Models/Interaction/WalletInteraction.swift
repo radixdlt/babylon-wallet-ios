@@ -48,6 +48,8 @@ extension P2P.Dapp {
 
 // MARK: - P2P.Dapp.Request.Metadata
 extension P2P.Dapp.Request {
+	/// The metadata sent with the request from the Dapp.
+	/// not to be confused with `DappMetadata` which can hold a value of this type
 	public struct Metadata: Sendable, Hashable, Decodable {
 		public typealias Origin = DappOrigin
 

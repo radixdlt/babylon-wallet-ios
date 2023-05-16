@@ -16,9 +16,9 @@ extension OneTimePersonaData {
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: OneTimePersonaData.State) {
-			self.thumbnail = state.dappContext.thumbnail
+			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.PersonalDataOneTime.title
-			self.subtitle = L10n.DAppRequest.PersonalDataOneTime.subtitle(state.dappContext.name)
+			self.subtitle = L10n.DAppRequest.PersonalDataOneTime.subtitle(state.dappMetadata.name)
 			self.shouldShowChooseDataToProvideTitle = !state.personas.isEmpty
 			self.availablePersonas = state.personas
 			self.selectedPersona = state.selectedPersona
@@ -144,7 +144,7 @@ struct OneTimePersonaData_Preview: PreviewProvider {
 
 extension OneTimePersonaData.State {
 	static let previewValue: Self = .init(
-		dappContext: .previewValue,
+		dappMetadata: .previewValue,
 		requiredFieldIDs: [.givenName, .emailAddress]
 	)
 }

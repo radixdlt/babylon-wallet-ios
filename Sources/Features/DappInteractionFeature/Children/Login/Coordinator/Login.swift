@@ -9,7 +9,7 @@ import ROLAClient
 // MARK: - Login
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let dappContext: DappContext
+		let dappMetadata: DappMetadata
 		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
 
 		var isFirstPersonaOnAnyNetwork: Bool? = nil
@@ -24,11 +24,11 @@ struct Login: Sendable, FeatureReducer {
 		var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
 
 		init(
-			dappContext: DappContext,
+			dappMetadata: DappMetadata,
 			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
-			self.dappContext = dappContext
+			self.dappMetadata = dappMetadata
 			self.loginRequest = loginRequest
 			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 		}
@@ -101,8 +101,8 @@ struct Login: Sendable, FeatureReducer {
 
 			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
-				origin: state.dappContext.origin,
-				dAppDefinitionAddress: state.dappContext.dAppDefinitionAddress
+				origin: state.dappMetadata.origin,
+				dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
 			)
 
 			return .run { [authorizedDapp = state.authorizedDapp] send in
@@ -165,7 +165,7 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
-		.run { [dAppDefinitionAddress = state.dappContext.dAppDefinitionAddress] send in
+		.run { [dAppDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
 			let authorizedDapp = authorizedDapps[id: dAppDefinitionAddress]
@@ -199,11 +199,11 @@ struct Login: Sendable, FeatureReducer {
 	}
 }
 
-extension DappContext {
+extension DappMetadata {
 	var dAppDefinitionAddress: DappDefinitionAddress {
 		switch self {
-		case let .fromLedger(fromLedger): return fromLedger.dAppDefinintionAddress
-		case let .fromRequest(fromRequest): return fromRequest.dAppDefinitionAddress
+		case let .ledger(metadata): return metadata.dAppDefinintionAddress
+		case let .request(metadata): return metadata.dAppDefinitionAddress
 		}
 	}
 }

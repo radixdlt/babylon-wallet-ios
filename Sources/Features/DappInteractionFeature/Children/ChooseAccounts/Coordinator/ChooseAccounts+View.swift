@@ -13,7 +13,7 @@ extension ChooseAccounts {
 		let selectedAccounts: [ChooseAccountsRow.State]?
 
 		init(state: ChooseAccounts.State) {
-			self.thumbnail = state.dappContext.thumbnail
+			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = state.title
 			self.subtitle = state.subtitle
 
@@ -113,7 +113,7 @@ extension ChooseAccounts.State {
 	}
 
 	var subtitle: String {
-		let dAppName = dappContext.name
+		let dAppName = dappMetadata.name
 
 		switch accessKind {
 		case .ongoing:
@@ -169,7 +169,7 @@ extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
 		challenge: nil,
 		accessKind: .ongoing,
-		dappContext: .previewValue,
+		dappMetadata: .previewValue,
 		availableAccounts: .init(
 			uniqueElements: [
 				.previewValue0,

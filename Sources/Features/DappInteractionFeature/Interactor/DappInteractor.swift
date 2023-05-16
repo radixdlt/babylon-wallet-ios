@@ -6,8 +6,8 @@ import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
 
-// MARK: - RequestEnvelop
-struct RequestEnvelop: Sendable, Hashable {
+// MARK: - RequestEnvelope
+struct RequestEnvelope: Sendable, Hashable {
 	let route: P2P.RTCRoute
 	let request: P2P.Dapp.Request
 }
@@ -15,7 +15,7 @@ struct RequestEnvelop: Sendable, Hashable {
 // MARK: - DappInteractor
 struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var requestQueue: OrderedSet<RequestEnvelop> = []
+		var requestQueue: OrderedSet<RequestEnvelope> = []
 
 		@PresentationState
 		var currentModal: Destinations.State?
@@ -35,8 +35,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case invalidRequestAlert(PresentationAction<InvalidRequestAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
-			case cancelButtonTapped(RequestEnvelop)
-			case retryButtonTapped(P2P.Dapp.Response, for: RequestEnvelop, DappContext)
+			case cancelButtonTapped(RequestEnvelope)
+			case retryButtonTapped(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
 		}
 
 		enum InvalidRequestAlertAction: Sendable, Hashable {
@@ -45,12 +45,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case receivedRequestFromDapp(RequestEnvelop)
+		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.Dapp.Response, for: RequestEnvelop, DappContext)
-		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelop, DappContext, reason: String)
-		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelop, DappContext, reason: String)
-		case presentResponseSuccessView(DappContext)
+		case sentResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
+		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
+		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
+		case presentResponseSuccessView(DappMetadata)
 		case presentInvalidRequest(DappRequestValidationOutcome.Invalid, isDeveloperModeEnabled: Bool)
 	}
 
@@ -60,12 +60,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
-			case dappInteraction(RelayState<RequestEnvelop, DappInteractionCoordinator.State>)
+			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
-			case dappInteraction(RelayAction<RequestEnvelop, DappInteractionCoordinator.Action>)
+			case dappInteraction(RelayAction<RequestEnvelope, DappInteractionCoordinator.Action>)
 			case dappInteractionCompletion(Completion.Action)
 		}
 
@@ -108,8 +108,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .presented(.cancelButtonTapped(request)):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return .send(.internal(.presentQueuedRequestIfNeeded))
-			case let .presented(.retryButtonTapped(response, request, dappContext)):
-				return sendResponseToDappEffect(response, for: request, dappContext: dappContext)
+			case let .presented(.retryButtonTapped(response, request, dappMetadata)):
+				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
 			}
 
 		case let .invalidRequestAlert(action):
@@ -140,11 +140,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(response, for: request, dappContext):
+		case let .sentResponseToDapp(response, for: request, dappMetadata):
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				return .send(.internal(.presentResponseSuccessView(dappContext)))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata)))
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -153,14 +153,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
 
-		case let .presentResponseFailureAlert(response, for: request, dappContext, reason):
+		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
 			state.responseFailureAlert = .init(
 				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
 						TextState(L10n.Common.cancel)
 					}
-					ButtonState(action: .retryButtonTapped(response, for: request, dappContext)) {
+					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
 						TextState(L10n.Common.retry)
 					}
 				},
@@ -186,19 +186,19 @@ struct DappInteractor: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .presentResponseSuccessView(dappContext):
-			state.currentModal = .dappInteractionCompletion(.init(dappContext: dappContext))
+		case let .presentResponseSuccessView(dappMetadata):
+			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
 			return .none
 		}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappContext)))))):
-			return sendResponseToDappEffect(responseToDapp, for: request, dappContext: dappContext)
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappContext)))))):
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
+			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseSuccessView(dappContext)))
+			return .send(.internal(.presentResponseSuccessView(dappMetadata)))
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
@@ -223,8 +223,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func sendResponseToDappEffect(
 		_ responseToDapp: P2P.Dapp.Response,
-		for request: RequestEnvelop,
-		dappContext: DappContext
+		for request: RequestEnvelope,
+		dappMetadata: DappMetadata
 	) -> EffectTask<Action> {
 		.run { send in
 
@@ -246,7 +246,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						.sentResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappContext
+							dappMetadata
 						)
 					))
 				}
@@ -256,7 +256,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						.failedToSendResponseToDapp(
 							responseToDapp,
 							for: request,
-							dappContext,
+							dappMetadata,
 							reason: error.localizedDescription
 						)
 					))
@@ -265,7 +265,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func dismissCurrentModalAndRequest(_ request: RequestEnvelop, for state: inout State) {
+	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
 		state.requestQueue.remove(request)
 		state.currentModal = nil
 	}
@@ -273,7 +273,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 // MARK: - DappRequestValidationOutcome
 enum DappRequestValidationOutcome: Sendable, Hashable {
-	case valid(RequestEnvelop)
+	case valid(RequestEnvelope)
 	case invalid(Invalid)
 	enum Invalid: Sendable, Hashable {
 		case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)

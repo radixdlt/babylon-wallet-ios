@@ -3,12 +3,12 @@ import FeaturePrelude
 // MARK: - Completion
 struct Completion: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let dappContext: DappContext
+		let dappMetadata: DappMetadata
 
 		init(
-			dappContext: DappContext
+			dappMetadata: DappMetadata
 		) {
-			self.dappContext = dappContext
+			self.dappMetadata = dappMetadata
 		}
 	}
 

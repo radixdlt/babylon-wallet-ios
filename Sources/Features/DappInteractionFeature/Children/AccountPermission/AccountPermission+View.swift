@@ -9,9 +9,9 @@ extension AccountPermission {
 		let numberOfAccounts: String
 
 		init(state: AccountPermission.State) {
-			self.thumbnail = state.dappContext.thumbnail
+			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.AccountPermission.title
-			self.subtitle = L10n.DAppRequest.AccountPermission.subtitle(state.dappContext.name)
+			self.subtitle = L10n.DAppRequest.AccountPermission.subtitle(state.dappMetadata.name)
 
 			self.numberOfAccounts = "•  " + {
 				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
@@ -96,7 +96,7 @@ struct AccountPermission_Preview: PreviewProvider {
 
 extension AccountPermission.State {
 	static let previewValue: Self = .init(
-		dappContext: .previewValue,
+		dappMetadata: .previewValue,
 		numberOfAccounts: .exactly(1)
 	)
 }

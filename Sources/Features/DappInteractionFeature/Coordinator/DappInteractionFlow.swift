@@ -33,7 +33,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case accountPermissionGranted
 		}
 
-		let dappContext: DappContext
+		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
 		var persona: Profile.Network.Persona?
 		var authorizedDapp: Profile.Network.AuthorizedDapp?
@@ -49,10 +49,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var path: StackState<Destinations.State> = []
 
 		init?(
-			dappContext: DappContext,
+			dappMetadata: DappMetadata,
 			interaction remoteInteraction: RemoteInteraction
 		) {
-			self.dappContext = dappContext
+			self.dappMetadata = dappMetadata
 			self.remoteInteraction = remoteInteraction
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
@@ -60,7 +60,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				self.root = Destinations.State(
 					for: interactionItems.first,
 					interaction: remoteInteraction,
-					dappContext: dappContext,
+					dappMetadata: dappMetadata,
 					persona: nil
 				)
 			} else {
@@ -115,8 +115,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
-		case dismissWithSuccess(DappContext)
-		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappContext)
+		case dismissWithSuccess(DappMetadata)
+		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -189,7 +189,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .run { [dappDefinitionAddress = state.dappContext.dAppDefinitionAddress] send in
+			return .run { [dappDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
 
 				let identityAddress = usePersonaRequestItem.identityAddress
 				guard
@@ -441,7 +441,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			return handleSignAndSubmitTX(item, txID)
 
 		case .reviewTransaction(.delegate(.transactionCompleted)):
-			return .send(.delegate(.dismissWithSuccess(state.dappContext)))
+			return .send(.delegate(.dismissWithSuccess(state.dappMetadata)))
 
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
@@ -548,7 +548,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			let destination = Destinations.State(
 				for: nextRequest,
 				interaction: state.remoteInteraction,
-				dappContext: state.dappContext,
+				dappMetadata: state.dappMetadata,
 				persona: state.persona
 			)
 		{
@@ -578,7 +578,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				try await updatePersona(persona, state, responseItems: response.items)
 			}
 
-			await send(.delegate(.submit(response, state.dappContext)))
+			await send(.delegate(.submit(response, state.dappMetadata)))
 		}
 	}
 
@@ -590,11 +590,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let networkID = await gatewaysClient.getCurrentNetworkID()
 		var authorizedDapp = state.authorizedDapp ?? .init(
 			networkID: networkID,
-			dAppDefinitionAddress: state.dappContext.dAppDefinitionAddress,
+			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress,
 			displayName: {
-				switch state.dappContext {
-				case let .fromLedger(fromLedger): return fromLedger.name
-				case .fromRequest: return nil
+				switch state.dappMetadata {
+				case let .ledger(ledger): return ledger.name
+				case .request: return nil
 				}
 			}()
 		)
@@ -717,7 +717,7 @@ extension DappInteractionFlow.Destinations.State {
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		interaction: DappInteractionFlow.State.RemoteInteraction,
-		dappContext: DappContext,
+		dappMetadata: DappMetadata,
 		persona: Profile.Network.Persona?
 	) {
 		switch anyItem {
@@ -725,13 +725,13 @@ extension DappInteractionFlow.Destinations.State {
 			return nil
 		case let .remote(.auth(.login(loginRequest))):
 			self = .relayed(anyItem, with: .login(.init(
-				dappContext: dappContext,
+				dappMetadata: dappMetadata,
 				loginRequest: loginRequest
 			)))
 
 		case let .local(.accountPermissionRequested(numberOfAccounts)):
 			self = .relayed(anyItem, with: .accountPermission(.init(
-				dappContext: dappContext,
+				dappMetadata: dappMetadata,
 				numberOfAccounts: numberOfAccounts
 			)))
 
@@ -739,7 +739,7 @@ extension DappInteractionFlow.Destinations.State {
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .ongoing,
-				dappContext: dappContext,
+				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))
 
@@ -747,20 +747,20 @@ extension DappInteractionFlow.Destinations.State {
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .oneTime,
-				dappContext: dappContext,
+				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))
 
 		case let .remote(.oneTimePersonaData(item)):
 			self = .relayed(anyItem, with: .oneTimePersonaData(.init(
-				dappContext: dappContext,
+				dappMetadata: dappMetadata,
 				requiredFieldIDs: item.fields
 			)))
 
 		case let .remote(.ongoingPersonaData(item)):
 			if let persona {
 				self = .relayed(anyItem, with: .personaDataPermission(.init(
-					dappContext: dappContext,
+					dappMetadata: dappMetadata,
 					personaID: persona.id,
 					requiredFieldIDs: item.fields
 				)))

@@ -5,7 +5,7 @@ import PersonasClient
 // MARK: - AccountPermission
 struct PersonaDataPermission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let dappContext: DappContext
+		let dappMetadata: DappMetadata
 		let personaID: Profile.Network.Persona.ID
 		var persona: PersonaDataPermissionBox.State?
 		let requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
@@ -14,11 +14,11 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		var destination: Destinations.State?
 
 		init(
-			dappContext: DappContext,
+			dappMetadata: DappMetadata,
 			personaID: Profile.Network.Persona.ID,
 			requiredFieldIDs: Set<Profile.Network.Persona.Field.ID>
 		) {
-			self.dappContext = dappContext
+			self.dappMetadata = dappMetadata
 			self.personaID = personaID
 			self.requiredFieldIDs = requiredFieldIDs
 		}

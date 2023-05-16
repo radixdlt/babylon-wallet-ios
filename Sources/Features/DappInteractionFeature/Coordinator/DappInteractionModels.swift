@@ -8,50 +8,58 @@ extension DappInteraction {
 	typealias NumberOfAccounts = P2P.Dapp.Request.NumberOfAccounts
 }
 
-// MARK: - FromLedgerDappMetadata
-struct FromLedgerDappMetadata: Sendable, Hashable, Codable {
-	static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
+// MARK: - DappMetadata
+/// Metadata for a dapp, either from a request or fetched from ledger.
+/// not to be confused with `P2P.Dapp.Request.Metadata` which is the
+/// associated value of one of the cases of this enum.
+enum DappMetadata: Sendable, Hashable {
+	/// The metadata sent with the request from the Dapp.
+	/// We only allow this case `request` to be passed around if `isDeveloperModeEnabled` is `true`.
+	case request(P2P.Dapp.Request.Metadata)
 
-	let origin: P2P.Dapp.Request.Metadata.Origin
+	/// A detailed DappMetaData fetched from Ledger.
+	case ledger(Ledger)
+}
 
-	let dAppDefinintionAddress: DappDefinitionAddress
-	let name: NonEmptyString?
-	let description: String?
-	let thumbnail: URL?
+// MARK: DappMetadata.Ledger
+extension DappMetadata {
+	/// A detailed DappMetaData fetched from Ledger.    ///
+	struct Ledger: Sendable, Hashable, Codable {
+		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
-	init(
-		origin: P2P.Dapp.Request.Metadata.Origin,
-		dAppDefinintionAddress: DappDefinitionAddress,
-		name: NonEmptyString?,
-		description: String? = nil,
-		thumbnail: URL? = nil
-	) {
-		self.dAppDefinintionAddress = dAppDefinintionAddress
-		self.origin = origin
-		self.name = name
-		self.thumbnail = thumbnail
-		self.description = description
+		let origin: P2P.Dapp.Request.Metadata.Origin
+
+		let dAppDefinintionAddress: DappDefinitionAddress
+		let name: NonEmptyString?
+		let description: String?
+		let thumbnail: URL?
+
+		init(
+			origin: P2P.Dapp.Request.Metadata.Origin,
+			dAppDefinintionAddress: DappDefinitionAddress,
+			name: NonEmptyString?,
+			description: String? = nil,
+			thumbnail: URL? = nil
+		) {
+			self.dAppDefinintionAddress = dAppDefinintionAddress
+			self.origin = origin
+			self.name = name
+			self.thumbnail = thumbnail
+			self.description = description
+		}
 	}
 }
 
-// MARK: - DappContext
-enum DappContext: Sendable, Hashable {
-	/// The metadata sent with the request from the Dapp.
-	/// We only allow this case `fromRequest` to be passed around if `isDeveloperModeEnabled` is `true`.
-	case fromRequest(P2P.Dapp.Request.Metadata)
-
-	/// A detailed DappMetaData fetched from Ledger.
-	case fromLedger(FromLedgerDappMetadata)
-
+extension DappMetadata {
 	public var origin: P2P.Dapp.Request.Metadata.Origin {
 		switch self {
-		case let .fromLedger(metadata): return metadata.origin
-		case let .fromRequest(metadata): return metadata.origin
+		case let .ledger(metadata): return metadata.origin
+		case let .request(metadata): return metadata.origin
 		}
 	}
 
 	public var thumbnail: URL? {
-		guard case let .fromLedger(fromLedgerDappMetadata) = self else {
+		guard case let .ledger(fromLedgerDappMetadata) = self else {
 			return nil
 		}
 		return fromLedgerDappMetadata.thumbnail
@@ -59,8 +67,8 @@ enum DappContext: Sendable, Hashable {
 }
 
 #if DEBUG
-extension DappContext {
-	static let previewValue: Self = try! .fromLedger(.init(
+extension DappMetadata {
+	static let previewValue: Self = try! .ledger(.init(
 		origin: .init(string: "https://radfi.com"),
 		dAppDefinintionAddress: .init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
 		name: "Collabo.Fi",

@@ -1,12 +1,12 @@
 import EditPersonaFeature
 import FeaturePrelude
 
-extension DappContext {
+extension DappMetadata {
 	var name: String {
 		switch self {
-		case let .fromLedger(fromLedger):
-			return fromLedger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
-		case .fromRequest:
+		case let .ledger(ledger):
+			return ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
+		case .request:
 			return L10n.DAppRequest.Metadata.unknownName
 		}
 	}
@@ -21,9 +21,9 @@ extension PersonaDataPermission {
 		let output: IdentifiedArrayOf<Profile.Network.Persona.Field>?
 
 		init(state: PersonaDataPermission.State) {
-			self.thumbnail = state.dappContext.thumbnail
+			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.PersonalDataPermission.title
-			self.subtitle = L10n.DAppRequest.PersonalDataPermission.subtitle(state.dappContext.name)
+			self.subtitle = L10n.DAppRequest.PersonalDataPermission.subtitle(state.dappMetadata.name)
 			self.output = {
 				guard let persona = state.persona else {
 					return nil
@@ -120,7 +120,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 
 extension PersonaDataPermission.State {
 	static let previewValue: Self = .init(
-		dappContext: .previewValue,
+		dappMetadata: .previewValue,
 		personaID: Profile.Network.Persona.previewValue0.id,
 		requiredFieldIDs: [.givenName, .emailAddress]
 	)

@@ -103,7 +103,7 @@ struct DappInteraction_Preview: PreviewProvider {
 		DappInteractionFlow.View(
 			store: .init(
 				initialState: .init(
-					dappContext: .previewValue,
+					dappMetadata: .previewValue,
 					interaction: .previewValueAllRequests()
 				)!,
 				reducer: DappInteractionFlow()
