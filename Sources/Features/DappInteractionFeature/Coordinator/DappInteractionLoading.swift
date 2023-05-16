@@ -75,7 +75,17 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 					let fromLedger = try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
 						invalidateCached: { (cached: FromLedgerDappMetadata) in
-							cached.name == nil ? .cachedIsInvalid : .cachedIsValid
+							guard
+								cached.name != nil,
+								cached.description != nil,
+								cached.thumbnail != nil
+							else {
+								/// Some of these fields were not set, fetch and see if they
+								/// have been updated since last time...
+								return .cachedIsInvalid
+							}
+							// All relevant fields are set, the cached metadata is valid.
+							return .cachedIsValid
 						},
 						request: {
 							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)

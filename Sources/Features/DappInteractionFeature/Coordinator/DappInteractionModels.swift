@@ -37,9 +37,8 @@ struct FromLedgerDappMetadata: Sendable, Hashable, Codable {
 
 // MARK: - DappContext
 enum DappContext: Sendable, Hashable {
-	/// The metadata sent with the request from the Dapp. Contains `origin` and `networkID`
-	/// and possibly and invalid dAppDefinition address. We only allow this case `fromRequest`
-	/// to be passed around if `isDeveloperModeEnabled` is `true`.
+	/// The metadata sent with the request from the Dapp.
+	/// We only allow this case `fromRequest` to be passed around if `isDeveloperModeEnabled` is `true`.
 	case fromRequest(P2P.Dapp.Request.Metadata)
 
 	/// A detailed DappMetaData fetched from Ledger.
