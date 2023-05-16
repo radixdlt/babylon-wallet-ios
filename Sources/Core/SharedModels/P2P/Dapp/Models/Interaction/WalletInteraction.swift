@@ -75,7 +75,7 @@ extension P2P.Dapp.Request {
 	public struct MetadataUnvalidated: Sendable, Hashable, Decodable {
 		public let version: P2P.Dapp.Version
 		public let networkId: NetworkID
-		public let origin: P2P.Dapp.Request.Metadata.Origin
+		public let origin: String
 
 		/// Non yet validated dAppDefinitionAddresss
 		public let dAppDefinitionAddress: String

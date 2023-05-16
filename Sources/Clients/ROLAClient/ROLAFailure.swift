@@ -3,7 +3,6 @@ import ClientPrelude
 public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 	case wrongAccountType
 	case unknownWebsite
-	case invalidOriginURL
 	case radixJsonNotFound
 	case radixJsonUnknownFileFormat
 	case unknownDappDefinitionAddress
@@ -14,8 +13,6 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 			return "Expected to find dapp definition account type"
 		case .unknownWebsite:
 			return "Origin does not match any related website"
-		case .invalidOriginURL:
-			return "Invalid origin URL"
 		case .radixJsonNotFound:
 			return "radix.json file is missing"
 		case .radixJsonUnknownFileFormat:
@@ -31,8 +28,6 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 			return (errorKind: .wrongAccountType, message: errorDescription)
 		case .unknownWebsite:
 			return (errorKind: .unknownWebsite, message: errorDescription)
-		case .invalidOriginURL:
-			return (errorKind: .invalidOriginURL, message: errorDescription)
 		case .radixJsonNotFound:
 			return (errorKind: .radixJsonNotFound, message: errorDescription)
 		case .radixJsonUnknownFileFormat:

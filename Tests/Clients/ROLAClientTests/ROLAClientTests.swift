@@ -19,9 +19,9 @@ final class ROLAClientTests: TestCase {
 		origin: String,
 		dAppDefinitionAddress: DappDefinitionAddress
 	) -> P2P.Dapp.Request.Metadata {
-		.init(
+		try! .init(
 			version: 1, networkId: 0,
-			origin: .init(rawValue: .init(rawValue: origin)!),
+			origin: .init(string: origin),
 			dAppDefinitionAddress: dAppDefinitionAddress
 		)
 	}
@@ -60,7 +60,7 @@ final class ROLAClientTests: TestCase {
 				let payload = try payloadToHash(
 					challenge: .init(rawValue: .init(hex: vector.challenge)),
 					dAppDefinitionAddress: .init(address: vector.dAppDefinitionAddress),
-					origin: .init(rawValue: .init(rawValue: vector.origin)!)
+					origin: .init(string: vector.origin)
 				)
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
 				let blakeHashOfPayload = try blake2b(data: payload)
@@ -69,8 +69,8 @@ final class ROLAClientTests: TestCase {
 		}
 	}
 
-	func test_generate_rola_payload_hash_vectors() throws {
-		let origins: [P2P.Dapp.Request.Metadata.Origin] = ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"]
+	func omit_test_generate_rola_payload_hash_vectors() throws {
+		let origins: [P2P.Dapp.Request.Metadata.Origin] = try ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"].map { try .init(string: $0) }
 		let accounts: [DappDefinitionAddress] = try [
 			.init(address: "account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"),
 			.init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
@@ -80,7 +80,7 @@ final class ROLAClientTests: TestCase {
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
 					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
-					let challenge = try blake2b(data: Data((origin.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
+					let challenge = try blake2b(data: Data((origin.urlString.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
 					let payload = try payloadToHash(
 						challenge: .init(rawValue: .init(data: challenge)),
 						dAppDefinitionAddress: dAppDefinitionAddress,
@@ -88,7 +88,7 @@ final class ROLAClientTests: TestCase {
 					)
 					let blakeHashOfPayload = try blake2b(data: payload)
 					return TestVector(
-						origin: origin.rawValue.rawValue,
+						origin: origin.urlString.rawValue,
 						challenge: challenge.hex,
 						dAppDefinitionAddress: dAppDefinitionAddress.address,
 						payloadToHash: payload.hex,

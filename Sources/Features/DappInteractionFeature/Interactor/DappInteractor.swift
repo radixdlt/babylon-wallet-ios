@@ -279,6 +279,7 @@ enum DappRequestValidationOutcome: Sendable, Hashable {
 		case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)
 		case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
 		case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
+		case invalidOrigin(invalidURLString: String)
 		case badContent(BadContent)
 		enum BadContent: Sendable, Hashable {
 			case numberOfAccountsInvalid
@@ -293,6 +294,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return "Invalid content"
 		case .incompatibleVersion:
 			return "Incompatible connector extension"
+		case .invalidOrigin:
+			return "Invalid origin"
 		case .invalidDappDefinitionAddress:
 			return "Invalid dAppDefinitionAddress"
 		case .wrongNetworkID:
@@ -319,6 +322,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return shortExplaination + " (CE: \(ce), wallet: \(wallet))"
 		case let .invalidDappDefinitionAddress(invalidAddress):
 			return "'\(invalidAddress)' is not valid account address."
+		case let .invalidOrigin(invalidURLString):
+			return "'\(invalidURLString)' is not valid origin."
 		case .wrongNetworkID:
 			return shortExplaination
 		}
@@ -332,6 +337,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return ce > wallet ? "Update Wallet" : "Update Connector Extension"
 		case .invalidDappDefinitionAddress:
 			return "Invalid dAppDefinitionAddress"
+		case .invalidOrigin:
+			return "Invalid origin"
 		case let .wrongNetworkID(ce, wallet):
 			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
 		}
@@ -339,7 +346,11 @@ extension DappRequestValidationOutcome.Invalid {
 }
 
 extension DappInteractor {
-	func validate(_ nonValidated: P2P.Dapp.RequestUnvalidated, route: P2P.RTCRoute) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
+	/// Validates a received request from Dapp.
+	func validate(
+		_ nonValidated: P2P.Dapp.RequestUnvalidated,
+		route: P2P.RTCRoute
+	) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
 		let nonvalidatedMeta = nonValidated.metadata
 		let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 		let outcome: DappRequestValidationOutcome = await {
@@ -376,10 +387,18 @@ extension DappInteractor {
 				}
 			}
 
+			guard
+				let originURL = URL(string: nonvalidatedMeta.origin),
+				let nonEmptyOriginURLString = NonEmptyString(rawValue: nonvalidatedMeta.origin)
+			else {
+				return .invalid(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin))
+			}
+			let origin = DappOrigin(urlString: nonEmptyOriginURLString, url: originURL)
+
 			let metadataValidDappDefAddres = P2P.Dapp.Request.Metadata(
 				version: nonvalidatedMeta.version,
 				networkId: nonvalidatedMeta.networkId,
-				origin: nonvalidatedMeta.origin,
+				origin: origin,
 				dAppDefinitionAddress: dappDefinitionAddress
 			)
 
