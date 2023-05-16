@@ -1,5 +1,6 @@
 import FeaturePrelude
 
+// MARK: - ReceivingAccount
 public struct ReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias Account = Profile.Network.Account
@@ -82,7 +83,8 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 			state.destination = .addAsset(.init())
 			return .none
 		case .chooseAccountTapped:
-			state.destination = .chooseAccount(.init())
+			state.account = Bool.random() ? .left(.previewValue1) : try! .right(.init(address: "account_tdx_adsadaddadwdadwddwdfadwqdawdwdasdwdasdwd"))
+			// state.destination = .chooseAccount(.init())
 			return .none
 		}
 	}
@@ -94,6 +96,35 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 			return .none
 		default:
 			return .none
+		}
+	}
+}
+
+extension Either where Left == Profile.Network.Account, Right == AccountAddress {
+	var name: String {
+		switch self {
+		case let .left(account):
+			return account.displayName.rawValue
+		case .right:
+			return "Account"
+		}
+	}
+
+	var identifer: LedgerIdentifiable {
+		switch self {
+		case let .left(account):
+			return .address(.account(account.address))
+		case let .right(address):
+			return .address(.account(address))
+		}
+	}
+
+	var gradient: Gradient {
+		switch self {
+		case let .left(account):
+			return .init(account.appearanceID)
+		case .right:
+			return .init(colors: [.app.gray2])
 		}
 	}
 }

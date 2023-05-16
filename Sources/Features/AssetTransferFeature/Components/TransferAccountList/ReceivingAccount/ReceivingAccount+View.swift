@@ -18,21 +18,27 @@ extension ReceivingAccount.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .leading, spacing: 0) {
-				HStack {
-					Button("Choose Account") {
-						viewStore.send(.chooseAccountTapped)
-					}
-					.textStyle(.body1Header)
-					Spacer()
-					if viewStore.canBeRemovedWhenEmpty {
-						Button("", asset: AssetResource.close) {
-							viewStore.send(.removeTapped)
+				Group {
+					if let account = viewStore.account {
+						SmallAccountCard(account.name, identifiable: account.identifer, gradient: account.gradient)
+					} else {
+						HStack {
+							Button("Choose Account") {
+								viewStore.send(.chooseAccountTapped)
+							}
+							.textStyle(.body1Header)
+							Spacer()
+							if viewStore.canBeRemovedWhenEmpty {
+								Button("", asset: AssetResource.close) {
+									viewStore.send(.removeTapped)
+								}
+							}
 						}
+						.frame(height: .standardButtonHeight)
+						.padding(.horizontal, .medium3)
+						.foregroundColor(.app.gray2)
 					}
 				}
-				.foregroundColor(.app.gray2)
-				.padding(.horizontal, .medium3)
-				.padding(.vertical, .small1)
 				.topRoundedCorners(strokeColor: .borderColor)
 
 				VStack {
