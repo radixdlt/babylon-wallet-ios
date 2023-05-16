@@ -32,7 +32,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dappContextLoaded(DappMetadata)
+		case dappMetadataLoaded(DappMetadata)
 		case dismiss
 	}
 
@@ -72,7 +72,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 				let dappDefinitionAddress = request.dAppDefinitionAddress
 
 				do {
-					let ledger = try await cacheClient.withCaching(
+					let cachedMetadata = try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
 						invalidateCached: { (cached: DappMetadata.Ledger) in
 							guard
@@ -96,7 +96,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 							)
 						}
 					)
-					return .success(.ledger(ledger))
+					return .success(.ledger(cachedMetadata))
 				} catch {
 					guard isDeveloperModeEnabled else {
 						return .failure(error)
@@ -113,9 +113,9 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .dappMetadataLoadingResult(.success(dappContextLoaded)):
+		case let .dappMetadataLoadingResult(.success(dappMetadata)):
 			state.isLoading = false
-			return .send(.delegate(.dappContextLoaded(dappContextLoaded)))
+			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
 
 		case let .dappMetadataLoadingResult(.failure(error)):
 			state.errorAlert = .init(

@@ -79,7 +79,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .loading(.delegate(.dappContextLoaded(dappMetadata))):
+		case let .loading(.delegate(.dappMetadataLoaded(dappMetadata))):
 			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, interaction: state.interaction) {
 				state.childState = .flow(flowState)
 			} else {
