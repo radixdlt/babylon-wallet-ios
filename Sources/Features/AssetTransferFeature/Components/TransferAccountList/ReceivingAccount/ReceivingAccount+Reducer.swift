@@ -84,7 +84,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case .removeTapped:
 			return .send(.delegate(.removed))
 		case .addAssetTapped:
-			state.assets.append(.init(resourceAddress: .init(address: UUID().uuidString), maxAmount: 100))
+			state.assets.append(.init(resourceAddress: .init(address: "xrd"), maxAmount: 100))
 //			state.destination = .addAsset(.init())
 			return .none
 		case .chooseAccountTapped:
@@ -97,7 +97,9 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.dismiss):
-			//                        state.assets.append(.init(amount: "0.00", maxAmount: 100))
+			return .none
+		case let .row(id: id, child: .delegate(.removed)):
+			state.assets.remove(id: id)
 			return .none
 		default:
 			return .none
