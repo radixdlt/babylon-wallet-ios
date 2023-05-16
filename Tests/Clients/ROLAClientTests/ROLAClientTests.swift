@@ -69,12 +69,12 @@ final class ROLAClientTests: TestCase {
 		}
 	}
 
-	func omit_test_generate_rola_payload_hash_vectors() throws {
+	func test_generate_rola_payload_hash_vectors() throws {
 		let origins: [P2P.Dapp.Request.Metadata.Origin] = ["https://dashboard.rdx.works", "https://stella.swap", "https://rola.xrd"]
 		let accounts: [DappDefinitionAddress] = try [
 			.init(address: "account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"),
 			.init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
-			.init(address: "account_tdx_b_1p8ahen5yznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
+			.init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"),
 		]
 		let vectors: [TestVector] = try origins.flatMap { origin -> [TestVector] in
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
