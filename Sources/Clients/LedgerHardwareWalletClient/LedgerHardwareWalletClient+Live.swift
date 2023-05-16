@@ -156,8 +156,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				return try await sign(expectedHashedMessage: hashedMsg.payloadToHashAndSign, signingFactor: request.signingFactor) {
 					try await makeRequest(
 						.signChallenge(P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignAuthChallenge(
+							signers: request.signingFactor.signers.flatMap(\.keyParams),
 							ledgerDevice: .init(factorSource: request.signingFactor.factorSource),
-							derivationPaths: request.signingFactor.signers.flatMap(\.keyParams).map(\.derivationPath),
 							challenge: request.challenge,
 							origin: request.origin,
 							dAppDefinitionAddress: request.dAppDefinitionAddress
