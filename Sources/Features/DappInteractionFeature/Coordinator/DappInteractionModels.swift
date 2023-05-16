@@ -14,15 +14,14 @@ struct FromLedgerDappMetadata: Sendable, Hashable, Codable {
 
 	let origin: P2P.Dapp.Request.Metadata.Origin
 
-	/// A dAppDefinition address is a valid `AccountAddress`
-	let dAppDefinintionAddress: AccountAddress
+	let dAppDefinintionAddress: DappDefinitionAddress
 	let name: NonEmptyString?
 	let description: String?
 	let thumbnail: URL?
 
 	init(
 		origin: P2P.Dapp.Request.Metadata.Origin,
-		dAppDefinintionAddress: AccountAddress,
+		dAppDefinintionAddress: DappDefinitionAddress,
 		name: NonEmptyString?,
 		description: String? = nil,
 		thumbnail: URL? = nil
