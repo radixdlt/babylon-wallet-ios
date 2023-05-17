@@ -45,6 +45,13 @@ extension FungibleResourceAsset.View {
 						          .textStyle(.sectionHeader)
 					}
 
+					if viewStore.totalSum > viewStore.balance {
+						// TODO: Add better style
+						Text("Total Sum is over your current balance")
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.red1)
+					}
+
 					if focused {
 						// TODO: beutify
 						HStack {
@@ -67,9 +74,6 @@ extension FungibleResourceAsset.View {
 			}
 			.padding(.small1)
 			.focused($focused)
-			//                        .onTapGesture {
-			//                                isFocused = nil
-			//                        }
 		}
 	}
 }

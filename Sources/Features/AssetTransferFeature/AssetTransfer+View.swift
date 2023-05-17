@@ -48,7 +48,7 @@ extension AssetTransfer.View {
 				}
 			}
 		}
-		.scrollDismissesKeyboard(.immediately)
+		.scrollDismissesKeyboard(.interactively)
 		.showDeveloperDisclaimerBanner()
 	}
 
