@@ -223,7 +223,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				A4DD048129FABBB70052FCB0 /* PBXTargetDependency */,
+				489948262A0186DC00EE807A /* PBXTargetDependency */,
+				489948242A0186C900EE807A /* PBXTargetDependency */,
 				E6203E5229B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5429B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5629B1E957000B8784 /* PBXTargetDependency */,
@@ -370,13 +371,13 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		489948262A0186DC00EE807A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 489948252A0186DC00EE807A /* URLFormatterClientLive */;
+		};
 		A45AB02F29FD964B0097F5E1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = A45AB02E29FD964B0097F5E1 /* URLFormatterClientLive */;
-		};
-		A4DD048129FABBB70052FCB0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */;
 		};
 		E6203E5029B1E951000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -616,6 +617,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		489948252A0186DC00EE807A /* URLFormatterClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = URLFormatterClientLive;
+		};
 		837BC3C629BB28CF0082C363 /* P2PLinksClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = P2PLinksClientLive;
@@ -625,10 +630,6 @@
 			productName = URLFormatterClientLive;
 		};
 		A45AB03029FD96530097F5E1 /* URLFormatterClientLive */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = URLFormatterClientLive;
-		};
-		A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = URLFormatterClientLive;
 		};

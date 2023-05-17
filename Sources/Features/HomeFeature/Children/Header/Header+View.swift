@@ -2,7 +2,7 @@ import FeaturePrelude
 
 extension Header.State {
 	var viewState: Header.ViewState {
-		.init(hasNotification: hasNotification)
+		.init(hasNotification: accountRecoveryIsNeeded)
 	}
 }
 
@@ -68,7 +68,8 @@ extension Header {
 					if shouldShowNotification {
 						Circle()
 							.foregroundColor(.app.notification)
-							.frame(width: 5, height: 5)
+							.frame(width: .small1, height: .small1) // we should probably have the frame size aligned with the unit size.
+							.offset(y: .small3)
 					}
 				}
 			}
@@ -95,6 +96,6 @@ struct Header_Preview: PreviewProvider {
 }
 
 extension Header.State {
-	static let previewValue = Self()
+	static let previewValue = Self(accountRecoveryIsNeeded: true)
 }
 #endif

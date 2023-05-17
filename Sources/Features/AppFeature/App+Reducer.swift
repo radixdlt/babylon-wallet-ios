@@ -1,3 +1,5 @@
+import AppPreferencesClient
+import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
 import MainFeature
@@ -33,6 +35,8 @@ public struct App: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case incompatibleProfileDeleted
 		case displayErrorAlert(App.UserFacingError)
+		case toMain(isAccountRecoveryNeeded: Bool)
+		case toOnboarding
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -66,7 +70,8 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
 
@@ -102,6 +107,15 @@ public struct App: Sendable, FeatureReducer {
 						// easy to think a test failed if we print this warning during tests.
 						loggerGlobal.error("An error occurred: \(String(describing: error))")
 					}
+
+					// Maybe instead we should listen here for the Profile.State change,
+					// and when it switches to `.ephemeral` we navigate to onboarding.
+					// For now, we react to the specific error, since the Profile.State is meant to be private.
+					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
+						await send(.internal(.toOnboarding))
+						// A slight delay to allow any modal that may be shown to be dismissed.
+						try? await Task.sleep(for: .seconds(0.5))
+					}
 					await send(.internal(.displayErrorAlert(UserFacingError(error))))
 				}
 			}
@@ -109,7 +123,7 @@ public struct App: Sendable, FeatureReducer {
 		case .alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))):
 			return .run { send in
 				do {
-					try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
+					try await appPreferencesClient.deleteProfileAndFactorSources(true)
 				} catch {
 					errorQueue.schedule(error)
 				}
@@ -134,6 +148,10 @@ public struct App: Sendable, FeatureReducer {
 
 		case .incompatibleProfileDeleted:
 			return goToOnboarding(state: &state)
+		case let .toMain(isAccountRecoveryNeeded):
+			return goToMain(state: &state, accountRecoveryIsNeeded: isAccountRecoveryNeeded)
+		case .toOnboarding:
+			return goToOnboarding(state: &state)
 		}
 	}
 
@@ -143,7 +161,7 @@ public struct App: Sendable, FeatureReducer {
 			return goToOnboarding(state: &state)
 
 		case .onboardingCoordinator(.delegate(.completed)):
-			return goToMain(state: &state)
+			return checkAccountRecoveryNeeded()
 
 		case let .splash(.delegate(.loadProfileOutcome(loadProfileOutcome))):
 			switch loadProfileOutcome {
@@ -160,8 +178,11 @@ public struct App: Sendable, FeatureReducer {
 			case let .usersExistingProfileCouldNotBeLoaded(.profileVersionOutdated(_, version)):
 				return incompatibleSnapshotData(version: version, state: &state)
 
-			case .existingProfileLoaded:
-				return goToMain(state: &state)
+			case .existingProfile:
+				return checkAccountRecoveryNeeded()
+			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
+				errorQueue.schedule(error)
+				return goToOnboarding(state: &state)
 			}
 
 		default:
@@ -170,7 +191,7 @@ public struct App: Sendable, FeatureReducer {
 	}
 
 	func incompatibleSnapshotData(
-		version: ProfileSnapshot.Version,
+		version: ProfileSnapshot.Header.Version,
 		state: inout State
 	) -> EffectTask<Action> {
 		state.alert = .incompatibleProfileErrorAlert(
@@ -187,8 +208,15 @@ public struct App: Sendable, FeatureReducer {
 		return .none
 	}
 
-	func goToMain(state: inout State) -> EffectTask<Action> {
-		state.root = .main(.init())
+	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
+		.task {
+			let isAccountRecoveryNeeded = await deviceFactorSourceClient.isAccountRecoveryNeeded()
+			return .internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded))
+		}
+	}
+
+	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> EffectTask<Action> {
+		state.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)))
 		return .none
 	}
 

@@ -1,6 +1,7 @@
 import AppPreferencesClient
 import ClientPrelude
 import ProfileStore
+import SecureStorageClient
 
 // MARK: - AppPreferencesClient + DependencyKey
 extension AppPreferencesClient: DependencyKey {
@@ -17,8 +18,22 @@ extension AppPreferencesClient: DependencyKey {
 			extractProfileSnapshot: {
 				await getProfileStore().profile.snapshot()
 			},
-			deleteProfileAndFactorSources: {
-				try await getProfileStore().deleteProfile()
+			deleteProfileAndFactorSources: { keepInICloudIfPresent in
+				try await getProfileStore().deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
+			},
+			setIsCloudProfileSyncEnabled: { isEnabled in
+				@Dependency(\.secureStorageClient) var secureStorageClient
+				let profile = await getProfileStore().profile
+				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+				guard wasEnabled != isEnabled else { return }
+
+				try await getProfileStore().updating { profile in
+					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
+				}
+				try await secureStorageClient.updateIsCloudProfileSyncEnabled(
+					profile.id,
+					isEnabled ? .enable : .disable
+				)
 			}
 		)
 	}
