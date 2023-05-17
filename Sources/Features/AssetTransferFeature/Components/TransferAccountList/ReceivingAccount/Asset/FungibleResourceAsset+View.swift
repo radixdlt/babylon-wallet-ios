@@ -66,11 +66,6 @@ extension FungibleResourceAsset.View {
 				.padding(.medium3)
 				.background(.app.white)
 				.roundedCorners(strokeColor: focused ? .app.gray1 : .app.white)
-
-				Spacer()
-				Button("", asset: AssetResource.close) {
-					viewStore.send(.removeTapped)
-				}
 			}
 			.padding(.small1)
 			.focused($focused)

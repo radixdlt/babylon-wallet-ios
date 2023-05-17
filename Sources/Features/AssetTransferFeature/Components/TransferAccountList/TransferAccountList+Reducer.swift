@@ -66,7 +66,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			return validateState(&state)
 
 		// Calculate max for account/resource
-		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.amountChanged)))):
+		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged))))):
 			updateTotalSum(&state, resourceAddress: resourceAddress)
 			return validateState(&state)
 		default:
@@ -77,12 +77,20 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	private func updateTotalSum(_ state: inout State, resourceAddress: ResourceAddress) {
 		let totalSum = state.receivingAccounts
 			.flatMap(\.assets)
+			.compactMap(/ResourceAsset.State.fungibleAsset)
 			.filter { $0.resourceAddress == resourceAddress }
 			.compactMap(\.amount)
 			.reduce(0, +)
 
 		for account in state.receivingAccounts {
-			state.receivingAccounts[id: account.id]?.assets[id: resourceAddress]?.totalSum = totalSum
+			guard case var .fungibleAsset(asset) = state.receivingAccounts[id: account.id]?.assets[id: resourceAddress] else {
+				continue
+			}
+
+			asset.totalSum = totalSum
+
+			// update the value from inside enum
+			state.receivingAccounts[id: account.id]?.assets[id: resourceAddress] = .fungibleAsset(asset)
 		}
 	}
 
@@ -100,7 +108,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		let isValid = receivingAccounts.allSatisfy {
 			$0.account != nil &&
 				!$0.assets.isEmpty &&
-				$0.assets.allSatisfy { $0.amount != nil && $0.totalSum <= $0.balance }
+				$0.assets.compactMap(/ResourceAsset.State.fungibleAsset).allSatisfy { $0.amount != nil && $0.totalSum <= $0.balance }
 		}
 
 		return .send(.delegate(.canSendTransferRequest(isValid)))

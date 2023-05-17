@@ -51,7 +51,7 @@ extension ReceivingAccount.View {
 					ForEachStore(
 						store.scope(state: \.assets, action: { .child(.row(id: $0, child: $1)) }),
 						content: {
-							FungibleResourceAsset.View(store: $0)
+							ResourceAsset.View(store: $0)
 						}
 					)
 
