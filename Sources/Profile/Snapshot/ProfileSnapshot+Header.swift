@@ -30,7 +30,9 @@ extension ProfileSnapshot {
 		public let id: ID
 
 		/// When this profile was first created
-		public let creationDate: Date
+		public var creationDate: Date {
+			creatingDevice.date
+		}
 
 		/// When the profile was last updated, by modifications from the user.
 		public var lastModified: Date
@@ -45,7 +47,6 @@ extension ProfileSnapshot {
 			creatingDevice: UsedDeviceInfo,
 			lastUsedOnDevice: UsedDeviceInfo,
 			id: ID,
-			creationDate: Date,
 			lastModified: Date,
 			contentHint: ContentHint,
 			snapshotVersion: Version = .minimum
@@ -53,7 +54,6 @@ extension ProfileSnapshot {
 			self.creatingDevice = creatingDevice
 			self.lastUsedOnDevice = lastUsedOnDevice
 			self.id = id
-			self.creationDate = creationDate
 			self.lastModified = lastModified
 			self.contentHint = contentHint
 			self.snapshotVersion = snapshotVersion

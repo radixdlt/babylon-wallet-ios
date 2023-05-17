@@ -545,15 +545,13 @@ extension ProfileStore {
 			@Dependency(\.date) var dateGenerator
 			@Dependency(\.uuid) var uuid
 
-			let date = dateGenerator.now
 			let deviceInfo = try await createDeviceInfo()
 
 			let header = ProfileSnapshot.Header(
 				creatingDevice: deviceInfo,
 				lastUsedOnDevice: deviceInfo, // Whe creating the Profile the lastUsedOnDevice is the same as creatingDevice
 				id: uuid(),
-				creationDate: date,
-				lastModified: date,
+				lastModified: dateGenerator.now,
 				contentHint: .init() // Empty initially
 			)
 

@@ -355,7 +355,6 @@ final class ProfileTests: TestCase {
 			creatingDevice: device,
 			lastUsedOnDevice: device,
 			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
-			creationDate: date,
 			lastModified: date,
 			contentHint: .init(
 				numberOfAccountsOnAllNetworksInTotal: 6,
@@ -504,7 +503,6 @@ final class ProfileTests: TestCase {
 			creatingDevice: device,
 			lastUsedOnDevice: device,
 			id: stableUUID,
-			creationDate: stableDate,
 			lastModified: stableDate,
 			contentHint: .init(),
 			snapshotVersion: tooLow
@@ -536,7 +534,6 @@ private let snapshotHeader = ProfileSnapshot.Header(
 	creatingDevice: device,
 	lastUsedOnDevice: device,
 	id: stableUUID,
-	creationDate: stableDate,
 	lastModified: stableDate,
 	contentHint: .init(
 		numberOfAccountsOnAllNetworksInTotal: 6,
