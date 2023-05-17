@@ -149,7 +149,7 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let factorInstance = FactorInstance(
+			let factorInstance = HierarchicalDeterministicFactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
@@ -172,7 +172,7 @@ final class ProfileTests: TestCase {
 					curve: .curve25519
 				)
 
-				control.authenticationSigning = FactorInstance(
+				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
 					factorSourceID: babylonFactorSource.id,
 					publicKey: authPublicKey,
 					derivationPath: path.wrapAsDerivationPath()
@@ -206,7 +206,7 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let factorInstance = FactorInstance(
+			let factorInstance = HierarchicalDeterministicFactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
@@ -224,7 +224,7 @@ final class ProfileTests: TestCase {
 					curve: .curve25519
 				)
 
-				control.authenticationSigning = FactorInstance(
+				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
 					factorSourceID: babylonFactorSource.id,
 					publicKey: authPublicKey,
 					derivationPath: path.wrapAsDerivationPath()
