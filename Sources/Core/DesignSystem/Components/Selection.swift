@@ -141,6 +141,7 @@ public struct Selection<Value: Hashable, Content: View>: View {
 		}
 	}
 
+	@MainActor
 	private func updateResult(
 		with chosenValues: Set<Value>,
 		in values: some Collection<Value>,

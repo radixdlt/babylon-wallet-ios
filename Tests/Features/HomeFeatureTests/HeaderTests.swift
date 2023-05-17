@@ -5,7 +5,7 @@ import FeatureTestingPrelude
 final class HeaderTests: TestCase {
 	func testSettingsButtonTapped() async {
 		let store = TestStore(
-			initialState: Header.State(),
+			initialState: Header.State(accountRecoveryIsNeeded: false),
 			reducer: Header()
 		)
 

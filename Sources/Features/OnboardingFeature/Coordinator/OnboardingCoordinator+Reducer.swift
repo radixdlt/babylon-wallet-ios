@@ -4,21 +4,16 @@ import FeaturePrelude
 // MARK: - OnboardingCoordinator
 public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public enum State: Sendable, Hashable {
-		case importProfile(ImportProfile.State)
+		case startup(OnboardingStartup.State)
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
 		public init() {
-			self = .createAccountCoordinator(
-				.init(
-					config: .init(purpose: .firstAccountForNewProfile),
-					displayIntroduction: { _ in false }
-				)
-			)
+			self = .startup(.init())
 		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case importProfile(ImportProfile.Action)
+		case startup(OnboardingStartup.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 
@@ -37,10 +32,10 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifCaseLet(
-				/OnboardingCoordinator.State.importProfile,
-				action: /Action.child .. ChildAction.importProfile
+				/OnboardingCoordinator.State.startup,
+				action: /Action.child .. ChildAction.startup
 			) {
-				ImportProfile()
+				OnboardingStartup()
 			}
 			.ifCaseLet(
 				/OnboardingCoordinator.State.createAccountCoordinator,
@@ -61,14 +56,24 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .startup(.delegate(.setupNewUser)):
+			state = .createAccountCoordinator(
+				.init(
+					config: .init(purpose: .firstAccountForNewProfile),
+					displayIntroduction: { _ in false }
+				)
+			)
+			return .none
+
+		case .startup(.delegate(.completed)):
+			return .send(.delegate(.completed))
+
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .run { send in
 				await send(.internal(.commitEphemeralResult(TaskResult {
 					try await onboardingClient.commitEphemeral()
 				})))
 			}
-		case .importProfile(.delegate(.imported)):
-			return .send(.delegate(.completed))
 		default:
 			return .none
 		}

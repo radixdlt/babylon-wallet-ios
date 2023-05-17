@@ -61,7 +61,7 @@ extension AccountList.Row {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
-						HeaderView(name: viewStore.name)
+						headerView(with: viewStore.name)
 						HStack {
 							AddressView(.address(.account(viewStore.address)))
 								.foregroundColor(.app.whiteTransparent)
@@ -222,17 +222,16 @@ public struct OffsetIdentified<Element>: Identifiable {
 	public let element: Element
 }
 
-// MARK: - HeaderView
-private struct HeaderView: View {
-	let name: String?
-	var body: some View {
+extension AccountList.Row.View {
+	@ViewBuilder
+	private func headerView(
+		with name: String
+	) -> some SwiftUI.View {
 		HStack {
-			if let name {
-				Text(name)
-					.foregroundColor(.app.white)
-					.textStyle(.body1Header)
-					.fixedSize()
-			}
+			Text(name)
+				.foregroundColor(.app.white)
+				.textStyle(.body1Header)
+				.fixedSize()
 			Spacer()
 		}
 	}

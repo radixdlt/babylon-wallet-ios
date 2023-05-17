@@ -1,4 +1,24 @@
 {
+  "header" : {
+         "creatingDevice": {
+                "description": "computer unit tests",
+                "id": "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
+                "date": "1970-01-01T00:00:00Z"
+         },
+        "lastUsedOnDevice": {
+                "description": "computer unit tests",
+                "id": "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
+                "date": "1970-01-01T00:00:00Z"
+        },
+        "id": "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
+        "lastModified": "1970-01-01T00:00:00Z",
+        "snapshotVersion": 33,
+        "contentHint": {
+                "numberOfAccountsOnAllNetworksInTotal": 6,
+                "numberOfPersonasOnAllNetworksInTotal": 3,
+                "numberOfNetworks": 2
+        }
+  },
   "appPreferences" : {
 	"display" : {
 	  "fiatCurrencyPriceTarget" : "usd",
@@ -33,7 +53,6 @@
 	  "isDeveloperModeEnabled" : true
 	}
   },
-  "creatingDevice" : "computer unit test",
   "factorSources" : [
 	{
 	  "addedOn" : "1970-01-01T00:00:00Z",
@@ -80,7 +99,6 @@
 	  }
 	}
   ],
-  "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
   "networks" : [
 	{
 	  "accounts" : [
@@ -316,6 +334,5 @@
 		}
 	  ]
 	}
-  ],
-  "version" : 32
+  ]
 }

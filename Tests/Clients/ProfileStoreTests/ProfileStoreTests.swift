@@ -20,8 +20,14 @@ final class ProfileStoreTests: TestCase {
 				return .testValue
 			}
 			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.hdOnDeviceFactorSource.factorSource.kind, .device) }
-			$0.secureStorageClient.loadProfileSnapshotData = { nil }
+			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
+			$0.secureStorageClient.loadDeviceIdentifier = {
+				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
+			$0.userDefaultsClient.stringForKey = { _ in
+				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+			}
 		} operation: {
 			_ = await ProfileStore()
 		}
@@ -72,7 +78,7 @@ final class ProfileStoreTests: TestCase {
 					profileSnapshot.factorSources.first,
 					privateFactor.hdOnDeviceFactorSource.factorSource
 				)
-				XCTAssertNoDifference(profileSnapshot.creatingDevice, expectedDeviceDescription)
+				XCTAssertNoDifference(profileSnapshot.header.creatingDevice.description, expectedDeviceDescription)
 			}
 		)
 	}
@@ -95,7 +101,7 @@ private extension ProfileStoreTests {
 			$0.device.$name = deviceLabel.rawValue
 			$0.device.$model = deviceDescription.rawValue
 			#endif
-			$0.secureStorageClient.loadProfileSnapshotData = {
+			$0.secureStorageClient.loadProfileSnapshotData = { _ in
 				provideProfileSnapshotLoaded
 			}
 
@@ -115,6 +121,17 @@ private extension ProfileStoreTests {
 				await profileSnapshotSavedIntoSecureStorage.setValue($0)
 			}
 			$0.date = .constant(Date(timeIntervalSince1970: 0))
+			$0.userDefaultsClient.stringForKey = { _ in
+				"BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+			}
+			$0.secureStorageClient.loadDeviceIdentifier = {
+				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+			}
+			$0.userDefaultsClient.setString = { _, _ in }
+			$0.secureStorageClient.loadProfileHeaderList = {
+				nil
+			}
+			$0.secureStorageClient.saveProfileHeaderList = { _ in }
 		} operation: {
 			let sut = await ProfileStore()
 			var profile: Profile?

@@ -20,13 +20,11 @@ public struct Home: Sendable, FeatureReducer {
 		public var destination: Destinations.State?
 
 		public init(
-			header: Header.State = .init(),
-			accountList: AccountList.State = .init(accounts: []),
-			destination: Destinations.State? = nil
+			accountRecoveryIsNeeded: Bool
 		) {
-			self.header = header
-			self.accountList = accountList
-			self.destination = destination
+			self.header = .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)
+			self.accountList = .init(accounts: [])
+			self.destination = nil
 		}
 	}
 

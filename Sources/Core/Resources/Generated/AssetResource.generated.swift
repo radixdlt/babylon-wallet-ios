@@ -62,6 +62,7 @@ public enum AssetResource {
   public static let unknownComponent = ImageAsset(name: "unknown-component")
   public static let xrd = ImageAsset(name: "xrd")
   public static let authorizedDapps = ImageAsset(name: "authorized-dapps")
+  public static let backups = ImageAsset(name: "backups")
   public static let browsers = ImageAsset(name: "browsers")
   public static let delete = ImageAsset(name: "delete")
   public static let desktopConnections = ImageAsset(name: "desktop-connections")

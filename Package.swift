@@ -260,6 +260,7 @@ package.addModules([
 			"RadixConnectClient",
 			"ScanQRFeature",
 			"EditPersonaFeature",
+			"ProfileBackupsFeature",
 		],
 		tests: .yes()
 	),
@@ -295,6 +296,11 @@ package.addModules([
 			"SubmitTransactionClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "ProfileBackupsFeature",
+		dependencies: [],
+		tests: .no
 	),
 ])
 
@@ -337,6 +343,7 @@ package.addModules([
 		dependencies: [
 			"AppPreferencesClient",
 			"ProfileStore",
+			"SecureStorageClient",
 		],
 		tests: .yes()
 	),
@@ -608,10 +615,11 @@ package.addModules([
 	.client(
 		name: "DeviceFactorSourceClient",
 		dependencies: [
-			"Profile",
 			"Cryptography",
 			"FactorSourcesClient",
+			"Profile",
 			"SecureStorageClient",
+			"AccountsClient",
 		],
 		tests: .no
 	),
