@@ -127,7 +127,6 @@ private let snapshotHeader = ProfileSnapshot.Header(
 	creatingDevice: device,
 	lastUsedOnDevice: device,
 	id: stableUUID,
-	creationDate: stableDate,
 	lastModified: stableDate,
 	contentHint: .init(
 		numberOfAccountsOnAllNetworksInTotal: 6,
