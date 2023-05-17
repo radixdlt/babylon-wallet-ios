@@ -79,15 +79,19 @@ extension AccountList {
 
 				switch state.account.securityState {
 				case let .unsecured(unsecuredEntityControl):
-					return checkIfDeviceFactorSourceControls(factorInstance: unsecuredEntityControl.transactionSigning)
+					return checkIfDeviceFactorSourceControls(
+						factorInstance: unsecuredEntityControl.transactionSigning
+					)
 				}
 			}
 		}
 
-		private func checkIfDeviceFactorSourceControls(factorInstance: FactorInstance) -> EffectTask<Action> {
+		private func checkIfDeviceFactorSourceControls(
+			factorInstance: HierarchicalDeterministicFactorInstance
+		) -> EffectTask<Action> {
 			.run { send in
 				guard
-					let factorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
+					let factorSource = try await factorSourcesClient.getFactorSource(of: factorInstance.factorInstance)
 				else {
 					loggerGlobal.warning("Did not find factor source for factor instance.")
 					return
