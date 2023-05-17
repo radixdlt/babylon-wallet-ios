@@ -1,18 +1,11 @@
 import FeaturePrelude
 
-// MARK: - TransferFocusedField
-public enum TransferFocusedField: Hashable {
-	case message
-	case asset(accountContainer: ReceivingAccount.State.ID, asset: UUID)
-}
-
 extension AssetTransfer {
 	public typealias ViewState = State
 
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AssetTransfer>
-		@FocusState var focusedField: TransferFocusedField?
 
 		public init(store: StoreOf<AssetTransfer>) {
 			self.store = store
@@ -29,13 +22,12 @@ extension AssetTransfer.View {
 					IfLetStore(
 						store.scope(state: \.message, action: { .child(.message($0)) }),
 						then: {
-							AssetTransferMessage.View(store: $0, focused: $focusedField)
+							AssetTransferMessage.View(store: $0)
 						}
 					)
 
 					TransferAccountList.View(
-						store: store.scope(state: \.accounts, action: { .child(.accounts($0)) }),
-						focusedField: $focusedField
+						store: store.scope(state: \.accounts, action: { .child(.accounts($0)) })
 					)
 
 					FixedSpacer(height: .large1)
@@ -55,10 +47,8 @@ extension AssetTransfer.View {
 					.padding(.bottom, .medium3)
 				}
 			}
-			.onTapGesture {
-				focusedField = nil
-			}
 		}
+		.scrollDismissesKeyboard(.immediately)
 		.showDeveloperDisclaimerBanner()
 	}
 

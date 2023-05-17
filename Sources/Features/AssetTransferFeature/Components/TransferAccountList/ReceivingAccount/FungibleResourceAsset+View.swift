@@ -10,16 +10,12 @@ extension FungibleResourceAsset {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleResourceAsset>
-		let focused: FocusState<TransferFocusedField?>.Binding
-		@FocusState
-		var textFieldIsFocused: Bool
 
 		@FocusState
-		var isFocused: Focus?
+		private var focused: Bool
 
-		public init(store: StoreOf<FungibleResourceAsset>, focused: FocusState<TransferFocusedField?>.Binding) {
+		public init(store: StoreOf<FungibleResourceAsset>) {
 			self.store = store
-			self.focused = focused
 		}
 	}
 }
@@ -47,10 +43,9 @@ extension FungibleResourceAsset.View {
 						          .multilineTextAlignment(.trailing)
 						          .foregroundColor(.app.gray1)
 						          .textStyle(.sectionHeader)
-						          .focused($isFocused, equals: .entry)
 					}
 
-					if isFocused == .entry {
+					if focused {
 						// TODO: beutify
 						HStack {
 							Button("Max") {
@@ -63,7 +58,7 @@ extension FungibleResourceAsset.View {
 				}
 				.padding(.medium3)
 				.background(.app.white)
-				.roundedCorners(strokeColor: isFocused != nil ? .app.gray1 : .app.white, corners: .allCorners)
+				.roundedCorners(strokeColor: focused ? .app.gray1 : .app.white)
 
 				Spacer()
 				Button("", asset: AssetResource.close) {
@@ -71,6 +66,10 @@ extension FungibleResourceAsset.View {
 				}
 			}
 			.padding(.small1)
+			.focused($focused)
+			//                        .onTapGesture {
+			//                                isFocused = nil
+			//                        }
 		}
 	}
 }

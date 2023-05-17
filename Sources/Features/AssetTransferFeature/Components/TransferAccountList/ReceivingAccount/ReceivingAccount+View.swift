@@ -7,11 +7,9 @@ extension ReceivingAccount {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ReceivingAccount>
-		let focused: FocusState<TransferFocusedField?>.Binding
 
-		public init(store: StoreOf<ReceivingAccount>, focused: FocusState<TransferFocusedField?>.Binding) {
+		public init(store: StoreOf<ReceivingAccount>) {
 			self.store = store
-			self.focused = focused
 		}
 	}
 }
@@ -52,7 +50,9 @@ extension ReceivingAccount.View {
 				VStack {
 					ForEachStore(
 						store.scope(state: \.assets, action: { .child(.row(id: $0, child: $1)) }),
-						content: { FungibleResourceAsset.View(store: $0, focused: focused) }
+						content: {
+							FungibleResourceAsset.View(store: $0)
+						}
 					)
 
 					Button("Add Assets") {
@@ -80,36 +80,5 @@ extension ReceivingAccount.View {
 				content: { AddAsset.View(store: $0) }
 			)
 		}
-	}
-
-	private func assetRow() -> some View {
-		HStack {
-			HStack {
-				Image(asset: AssetResource.xrd)
-					.resizable()
-					.frame(.smallest)
-				Text("XRD")
-					.foregroundColor(.app.gray1)
-					.textStyle(.body2HighImportance)
-
-				Spacer()
-
-				TextField("0.00", text: .constant("0.00"))
-					.keyboardType(.numbersAndPunctuation)
-					.lineLimit(1)
-					.multilineTextAlignment(.trailing)
-					.foregroundColor(.app.gray1)
-					.textStyle(.sectionHeader)
-			}
-			.padding(.medium3)
-			.background(.app.white)
-			.cornerRadius(.small2)
-
-			Spacer()
-			Button("", asset: AssetResource.close) {
-				// viewStore.send(.)
-			}
-		}
-		.padding(.small1)
 	}
 }
