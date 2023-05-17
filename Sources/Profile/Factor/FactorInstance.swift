@@ -31,12 +31,54 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 		/// e.g. an NFT.
 		///
 		/// The `.trustedEntity` `FactorSource` produces `FactorInstance`s with this kind if badge source.
-		case physical(ResourceAddress)
+		// case physical(ResourceAddress) // Will soon be added
 	}
 
 	/// Tries to unwrap this factor instance's badge as virtual hierarchical deterministic one.
 	public func virtualHierarchicalDeterministic() throws -> HierarchicalDeterministicFactorInstance {
 		try .init(factorInstance: self)
+	}
+}
+
+extension FactorInstance.Badge {
+	internal enum Discriminator: String, Sendable, Equatable, Codable {
+		case virtualHierarchicalDeterministic
+	}
+
+	public enum CodingKeys: String, CodingKey {
+		case discriminator, virtualHierarchicalDeterministicPublicKey
+	}
+
+	internal var discriminator: Discriminator {
+		switch self {
+		case .virtualHierarchicalDeterministic: return .virtualHierarchicalDeterministic
+		}
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
+		try keyedContainer.encode(discriminator, forKey: .discriminator)
+		switch self {
+		case let .virtualHierarchicalDeterministic(virtualHierarchicalDeterministicPublicKey):
+			try keyedContainer.encode(
+				virtualHierarchicalDeterministicPublicKey,
+				forKey: .virtualHierarchicalDeterministicPublicKey
+			)
+		}
+	}
+
+	public init(from decoder: Decoder) throws {
+		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try keyedContainer.decode(Discriminator.self, forKey: .discriminator)
+		switch discriminator {
+		case .virtualHierarchicalDeterministic:
+			self = try .virtualHierarchicalDeterministic(
+				keyedContainer.decode(
+					HierarchicalDeterministicPublicKey.self,
+					forKey: .virtualHierarchicalDeterministicPublicKey
+				)
+			)
+		}
 	}
 }
 

@@ -49,24 +49,26 @@ extension FactorSource.Storage {
 	}
 
 	private enum CodingKeys: String, CodingKey {
-		case discriminator
-	}
-
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
-		switch discriminator {
-		case .entityCreating:
-			self = try .entityCreating(FactorSource.Storage.EntityCreating(from: decoder))
-		}
+		case discriminator, entityCreatingStorage
 	}
 
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(discriminator, forKey: .discriminator)
+		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
+		try keyedContainer.encode(discriminator, forKey: .discriminator)
 		switch self {
-		case let .entityCreating(properties):
-			try properties.encode(to: encoder)
+		case let .entityCreating(entityCreatingStorage):
+			try keyedContainer.encode(entityCreatingStorage, forKey: .entityCreatingStorage)
+		}
+	}
+
+	public init(from decoder: Decoder) throws {
+		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try keyedContainer.decode(Discriminator.self, forKey: .discriminator)
+		switch discriminator {
+		case .entityCreating:
+			self = try .entityCreating(
+				keyedContainer.decode(FactorSource.Storage.EntityCreating.self, forKey: .entityCreatingStorage)
+			)
 		}
 	}
 }

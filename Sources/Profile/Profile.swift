@@ -31,7 +31,7 @@ extension ProfileSnapshot.Version {
 	/// - 30: Fix critical bug where identity derivation path was used for account
 	/// - 31: Add `ledgerHQHardwareWalletSigningDisplayMode` to appPreferences.display
 	/// - 32: rename `genesisFactorInstance` -> `transactionSigning` and add `authSigning`
-	/// - 33: Change `FactorInstance` to hold `badge` being an enum `virtual`/`physical`.
+	/// - 33: Change `FactorInstance` to hold `badge` being an enum `virtual`/`physical` (change from flat to nested representation of FactorSource storage)
 	public static let minimum: Self = 33
 }
 
