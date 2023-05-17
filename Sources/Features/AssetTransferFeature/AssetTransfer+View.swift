@@ -36,7 +36,7 @@ extension AssetTransfer.View {
 						viewStore.send(.sendTransferTapped)
 					}
 					.buttonStyle(.primaryRectangular)
-					.controlState(.disabled)
+					.controlState(viewStore.canSendTransferRequest ? .enabled : .disabled)
 				}
 				.padding(.horizontal, .medium3)
 				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {

@@ -23,6 +23,10 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
+	public enum DelegateAction: Equatable, Sendable {
+		case canSendTransferRequest(Bool)
+	}
+
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.receivingAccounts, action: /Action.child .. ChildAction.receivingAccount) {
@@ -55,21 +59,50 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			if state.receivingAccounts.isEmpty {
 				state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
 			}
-			return .none
+			return validateState(&state)
+		case .receivingAccount(_, action: .delegate(.accountAdded)),
+		     .receivingAccount(_, action: .delegate(.assetAdded)),
+		     .receivingAccount(_, action: .delegate(.assetRemoved)):
+			return validateState(&state)
+
 		// Calculate max for account/resource
 		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.amountChanged)))):
-			let totalSum = state.receivingAccounts
-				.flatMap(\.assets)
-				.filter { $0.resourceAddress == resourceAddress }
-				.compactMap(\.amount)
-				.reduce(0, +)
-
-			for account in state.receivingAccounts {
-				state.receivingAccounts[id: account.id]?.assets[id: resourceAddress]?.totalSum = totalSum
-			}
-			return .none
+			updateTotalSum(&state, resourceAddress: resourceAddress)
+			return validateState(&state)
 		default:
 			return .none
 		}
+	}
+
+	private func updateTotalSum(_ state: inout State, resourceAddress: ResourceAddress) {
+		let totalSum = state.receivingAccounts
+			.flatMap(\.assets)
+			.filter { $0.resourceAddress == resourceAddress }
+			.compactMap(\.amount)
+			.reduce(0, +)
+
+		for account in state.receivingAccounts {
+			state.receivingAccounts[id: account.id]?.assets[id: resourceAddress]?.totalSum = totalSum
+		}
+	}
+
+	private func validateState(_ state: inout State) -> EffectTask<Action> {
+		let receivingAccounts = state.receivingAccounts.filter {
+			// filter out empty containers, no account and no assets
+			$0.account != nil || !$0.assets.isEmpty
+		}
+
+		guard !receivingAccounts.isEmpty else {
+			return .send(.delegate(.canSendTransferRequest(false)))
+		}
+
+		// All containers have accounts and asset
+		let isValid = receivingAccounts.allSatisfy {
+			$0.account != nil &&
+				!$0.assets.isEmpty &&
+				$0.assets.allSatisfy { $0.amount != nil && $0.totalSum <= $0.balance }
+		}
+
+		return .send(.delegate(.canSendTransferRequest(isValid)))
 	}
 }

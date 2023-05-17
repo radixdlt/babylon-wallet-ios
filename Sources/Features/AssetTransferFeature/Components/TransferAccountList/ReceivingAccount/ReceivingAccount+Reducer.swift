@@ -61,6 +61,9 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case assetAdded
+		case assetRemoved
+		case accountAdded
 		case removed
 	}
 
@@ -86,11 +89,11 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case .addAssetTapped:
 			state.assets.append(.init(resourceAddress: .init(address: "xrd"), totalSum: 0))
 //			state.destination = .addAsset(.init())
-			return .none
+			return .send(.delegate(.assetAdded))
 		case .chooseAccountTapped:
 			state.account = Bool.random() ? .left(.previewValue1) : try! .right(.init(address: "account_tdx_adsadaddadwdadwddwdfadwqdawdwdasdwdasdwd"))
 			// state.destination = .chooseAccount(.init())
-			return .none
+			return .send(.delegate(.accountAdded))
 		}
 	}
 
@@ -100,7 +103,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 			return .none
 		case let .row(id: id, child: .delegate(.removed)):
 			state.assets.remove(id: id)
-			return .none
+			return .send(.delegate(.assetRemoved))
 		default:
 			return .none
 		}

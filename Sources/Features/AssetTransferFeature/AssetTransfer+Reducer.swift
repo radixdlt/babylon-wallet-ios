@@ -5,9 +5,12 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public var accounts: TransferAccountList.State
 		public var message: AssetTransferMessage.State?
 
+		public var canSendTransferRequest: Bool
+
 		public init(from account: Profile.Network.Account) {
 			self.accounts = .init(fromAccount: account)
 			self.message = nil
+			self.canSendTransferRequest = false
 		}
 	}
 
@@ -57,6 +60,9 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		switch childAction {
 		case .message(.delegate(.removed)):
 			state.message = nil
+			return .none
+		case let .accounts(.delegate(.canSendTransferRequest(enabled))):
+			state.canSendTransferRequest = enabled
 			return .none
 		default:
 			return .none

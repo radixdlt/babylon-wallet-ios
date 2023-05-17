@@ -59,13 +59,11 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			}
 			return .send(.delegate(.amountChanged))
 		case .maxAmountTapped:
-			// Calculate the max allowed amount by taking into account the total sum of
-			// the resource across different accounts.
 			let sumOfOthers = state.totalSum - (state.amount ?? .zero)
 			let remainingAmount = max(state.balance - sumOfOthers, 0)
 			state.amount = remainingAmount
 			state.amountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
-			return .none
+			return .send(.delegate(.amountChanged))
 		case .removeTapped:
 			return .send(.delegate(.removed))
 		}
