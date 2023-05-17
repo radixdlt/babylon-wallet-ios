@@ -1,22 +1,5 @@
 import FeaturePrelude
 
-/*
- can balance and total sum be reused
- struct
-*/
-
-struct AResource {
-        let totalSum: Double
-        let balance: Double
-
-        struct Account {
-                let address: AccountAddress
-                let amount: Double
-        }
-        let accounts: [Account]
-}
-
-
 // MARK: - ReceivingAccount
 public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
@@ -27,22 +10,29 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 		public let resourceAddress: ResourceAddress
 
-                // amount has to be string to allow setting the max value while editting
-		public var amount: String
+		// amount has to be string to allow setting the max value while editting
+		public var amountStr: String
+		public var amount: BigDecimal?
 
-                // Total sum for this given resource
+		// Total sum for this given resource
 		public var totalSum: BigDecimal
-		public var balance: BigDecimal
+		public let balance: BigDecimal
 
-		init(resourceAddress: ResourceAddress, amount: String, totalSum: BigDecimal, balance: BigDecimal) {
+		init(resourceAddress: ResourceAddress, amount: BigDecimal?, totalSum: BigDecimal, balance: BigDecimal) {
 			self.amount = amount
+			self.amountStr = amount?.formatWithoutRounding() ?? ""
 			self.totalSum = totalSum
 			self.resourceAddress = resourceAddress
 			self.balance = balance
 		}
 
 		init(resourceAddress: ResourceAddress, totalSum: BigDecimal, balance: BigDecimal = 100) {
-			self.init(resourceAddress: resourceAddress, amount: "", totalSum: totalSum, balance: balance)
+			self.init(
+				resourceAddress: resourceAddress,
+				amount: nil,
+				totalSum: totalSum,
+				balance: balance
+			)
 		}
 	}
 
@@ -54,25 +44,27 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Equatable, Sendable {
 		case removed
-                case amountChanged
+		case amountChanged
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case let .amountChanged(amount):
-			state.amount = amount
-                        if !amount.isEmpty {
-                                return .send(.delegate(.amountChanged))
-                        }
-                        return .none
+		case let .amountChanged(amountStr):
+			state.amountStr = amountStr
+
+			if let value = try? BigDecimal(localizedFromString: amountStr) {
+				state.amount = value
+			} else {
+				state.amount = nil
+			}
+			return .send(.delegate(.amountChanged))
 		case .maxAmountTapped:
-                        let remainingAmount = max(state.balance - state.totalSum, 0)
-                        guard !state.amount.isEmpty else {
-                                state.amount = remainingAmount.format()
-                                return .none
-                        }
-                        let amount = try! BigDecimal(fromString: state.amount)
-                        state.amount = (amount + remainingAmount).format()
+			// Calculate the max allowed amount by taking into account the total sum of
+			// the resource across different accounts.
+			let sumOfOthers = state.totalSum - (state.amount ?? .zero)
+			let remainingAmount = max(state.balance - sumOfOthers, 0)
+			state.amount = remainingAmount
+			state.amountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
 			return .none
 		case .removeTapped:
 			return .send(.delegate(.removed))

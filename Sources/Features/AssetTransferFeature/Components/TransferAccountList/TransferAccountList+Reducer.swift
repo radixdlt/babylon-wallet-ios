@@ -56,19 +56,18 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
 			}
 			return .none
-                // Calculate max for account/resource
-                case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.amountChanged)))):
-                        let totalSum = state.receivingAccounts
-                                .flatMap(\.assets)
-                                .filter { $0.resourceAddress == resourceAddress && !$0.amount.isEmpty }
-                                .map {
-                                        try! BigDecimal(fromString: $0.amount)
-                                }
-                                .reduce(0, +)
-                        for account in state.receivingAccounts {
-                                state.receivingAccounts[id: account.id]?.assets[id: resourceAddress]?.totalSum = totalSum
-                        }
-                        return .none
+		// Calculate max for account/resource
+		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.amountChanged)))):
+			let totalSum = state.receivingAccounts
+				.flatMap(\.assets)
+				.filter { $0.resourceAddress == resourceAddress }
+				.compactMap(\.amount)
+				.reduce(0, +)
+
+			for account in state.receivingAccounts {
+				state.receivingAccounts[id: account.id]?.assets[id: resourceAddress]?.totalSum = totalSum
+			}
+			return .none
 		default:
 			return .none
 		}

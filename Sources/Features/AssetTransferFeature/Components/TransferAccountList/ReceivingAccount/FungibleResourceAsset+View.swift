@@ -39,7 +39,7 @@ extension FungibleResourceAsset.View {
 
 						TextField("0.00",
 						          text: viewStore.binding(
-						          	get: \.amount,
+						          	get: \.amountStr,
 						          	send: { .amountChanged($0) }
 						          ))
 						          .keyboardType(.decimalPad)
@@ -57,7 +57,7 @@ extension FungibleResourceAsset.View {
 								viewStore.send(.maxAmountTapped)
 							}
 							Text("-")
-                                                        Text("Balance \(viewStore.balance.format())")
+							Text("Balance \(viewStore.balance.format())")
 						}
 					}
 				}
