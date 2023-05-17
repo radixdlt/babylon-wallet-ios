@@ -52,8 +52,8 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 			return .run { [entity = state.entity] send in
 				let response = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity))
 				await send(.internal(.createdManifestAndAuthKey(response)))
-			} catch: { _, send in
-				loggerGlobal.error("Failed to create manifest for create auth")
+			} catch: { error, send in
+				loggerGlobal.error("Failed to create manifest for create auth, \(String(describing: error))")
 				await send(.delegate(.done(success: false)))
 			}
 		}
