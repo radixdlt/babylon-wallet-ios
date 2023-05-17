@@ -2,10 +2,10 @@ import FeaturePrelude
 
 public struct Header: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var hasNotification: Bool
+		var accountRecoveryIsNeeded: Bool
 
-		public init(hasNotification: Bool = false) {
-			self.hasNotification = hasNotification
+		public init(accountRecoveryIsNeeded: Bool) {
+			self.accountRecoveryIsNeeded = accountRecoveryIsNeeded
 		}
 	}
 

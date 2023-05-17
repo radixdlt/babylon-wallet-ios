@@ -38,8 +38,6 @@ extension AccountList {
 			case securityPromptTapped(Profile.Network.Account)
 		}
 
-		public init() {}
-
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 

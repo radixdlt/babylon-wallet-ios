@@ -33,7 +33,6 @@
       "isDeveloperModeEnabled" : true
     }
   },
-  "creatingDevice" : "computer unit test",
   "factorSources" : [
     {
       "addedOn" : "1970-01-01T00:00:00Z",
@@ -82,7 +81,26 @@
       }
     }
   ],
-  "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
+  "header" : {
+    "contentHint" : {
+      "numberOfAccountsOnAllNetworksInTotal" : 6,
+      "numberOfNetworks" : 2,
+      "numberOfPersonasOnAllNetworksInTotal" : 3
+    },
+    "creatingDevice" : {
+      "date" : "1970-01-01T00:00:00Z",
+      "description" : "computer unit test",
+      "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+    },
+    "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
+    "lastModified" : "1970-01-01T00:00:00Z",
+    "lastUsedOnDevice" : {
+      "date" : "1970-01-01T00:00:00Z",
+      "description" : "computer unit test",
+      "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
+    },
+    "snapshotVersion" : 34
+  },
   "networks" : [
     {
       "accounts" : [
@@ -236,8 +254,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
+                "givenName",
+                "familyName"
               ]
             },
             {
@@ -253,8 +271,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "givenName",
-                "familyName"
+                "familyName",
+                "givenName"
               ]
             }
           ]
@@ -368,6 +386,5 @@
         }
       ]
     }
-  ],
-  "version" : 33
+  ]
 }

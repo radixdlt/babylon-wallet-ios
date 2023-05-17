@@ -12,7 +12,7 @@ public struct Main: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(home: Home.State = .init()) {
+		public init(home: Home.State) {
 			self.home = home
 		}
 	}
@@ -64,9 +64,9 @@ public struct Main: Sendable, FeatureReducer {
 			state.destination = .settings(.init())
 			return .none
 
-		case .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources)))):
+		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepIcloudIfPresent))))):
 			return .run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources()
+				try await appPreferencesClient.deleteProfileAndFactorSources(keepIcloudIfPresent)
 				await send(.delegate(.removedWallet))
 			}
 

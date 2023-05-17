@@ -101,8 +101,8 @@ final class ProfileTests: TestCase {
 		let networkID = gateway.network.id
 
 		let (_profile, babylonFactorSource, olympiaFactorSource) = try withDependencies {
-			$0.date = .constant(.init(timeIntervalSince1970: 0))
-			$0.uuid = .constant(.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!)
+			$0.date = .constant(stableDate)
+			$0.uuid = .constant(stableUUID)
 		} operation: {
 			let babylonFactorSource = try FactorSource.babylon(
 				mnemonic: curve25519FactorSourceMnemonic,
@@ -114,9 +114,10 @@ final class ProfileTests: TestCase {
 				label: factorSourceLabel,
 				description: factorSourceDescription
 			)
+
 			let profile = Profile(
-				factorSource: babylonFactorSource.factorSource,
-				creatingDevice: creatingDevice,
+				header: snapshotHeader,
+				factorSources: .init(babylonFactorSource.factorSource),
 				appPreferences: .init(gateways: .init(current: gateway))
 			)
 
@@ -336,15 +337,35 @@ final class ProfileTests: TestCase {
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		// Uncomment the lines below to generate a new test vector
-//		let data = try jsonEncoder.encode(snapshot)
-//		print(String(data: data, encoding: .utf8)!)
+		let data = try jsonEncoder.encode(snapshot)
+		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
 		let snapshot: ProfileSnapshot = try readTestFixture(jsonName: "profile_snapshot")
 
 		let profile = try Profile(snapshot: snapshot)
-		XCTAssertEqual(profile.creatingDevice, creatingDevice)
+		let date = Date(timeIntervalSince1970: 0)
+		let device = ProfileSnapshot.Header.UsedDeviceInfo(
+			description: "computer unit tests",
+			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
+			date: date
+		)
+		let header = ProfileSnapshot.Header(
+			creatingDevice: device,
+			lastUsedOnDevice: device,
+			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
+			lastModified: date,
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 6,
+				numberOfPersonasOnAllNetworksInTotal: 3,
+				numberOfNetworks: 2
+			),
+			snapshotVersion: .init(rawValue: 33)
+		)
+
+		XCTAssertEqual(profile.header, header)
+		// XCTAssertEqual(profile.creatingDevice, creatingDevice)
 
 		XCTAssertEqual(profile.factorSources.count, 2)
 		for factorSource in profile.factorSources {
@@ -476,15 +497,20 @@ final class ProfileTests: TestCase {
 	}
 
 	func test_version_compatibility_check_too_low() throws {
-		let tooLow = ProfileSnapshot.Version.minimum - 1
-		let json = """
-		{ "version": \(tooLow) }
-		""".data(using: .utf8)!
+		let tooLow = ProfileSnapshot.Header.Version.minimum - 1
 
+		let oldHeader = ProfileSnapshot.Header(
+			creatingDevice: device,
+			lastUsedOnDevice: device,
+			id: stableUUID,
+			lastModified: stableDate,
+			contentHint: .init(),
+			snapshotVersion: tooLow
+		)
 		XCTAssertThrowsError(
-			try ProfileSnapshot.validateVersionCompatibility(ofProfileSnapshotJSONData: json)
+			try oldHeader.validateCompatibility()
 		) { anyError in
-			guard let error = anyError as? IncompatibleProfileVersion else {
+			guard let error = anyError as? ProfileSnapshot.Header.IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
 			XCTAssertEqual(error, .init(decodedVersion: tooLow, minimumRequiredVersion: .minimum))
@@ -492,12 +518,8 @@ final class ProfileTests: TestCase {
 	}
 
 	func test_version_compatibility_check_ok() throws {
-		let json = """
-		{ "version": \(ProfileSnapshot.Version.minimum) }
-		""".data(using: .utf8)!
-
 		XCTAssertNoThrow(
-			try ProfileSnapshot.validateVersionCompatibility(ofProfileSnapshotJSONData: json)
+			try snapshotHeader.validateCompatibility()
 		)
 	}
 }
@@ -505,6 +527,21 @@ final class ProfileTests: TestCase {
 private let factorSourceLabel: FactorSource.Label = "computer"
 private let factorSourceDescription: FactorSource.Description = "unit test"
 private let creatingDevice: NonEmptyString = "\(factorSourceLabel) \(factorSourceDescription)"
+private let stableDate = Date(timeIntervalSince1970: 0)
+private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(description: creatingDevice, id: stableUUID, date: stableDate)
+private let snapshotHeader = ProfileSnapshot.Header(
+	creatingDevice: device,
+	lastUsedOnDevice: device,
+	id: stableUUID,
+	lastModified: stableDate,
+	contentHint: .init(
+		numberOfAccountsOnAllNetworksInTotal: 6,
+		numberOfPersonasOnAllNetworksInTotal: 3,
+		numberOfNetworks: 2
+	),
+	snapshotVersion: .minimum
+)
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {

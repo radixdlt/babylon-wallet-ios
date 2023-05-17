@@ -11,11 +11,16 @@ extension DependencyValues {
 extension SecureStorageClient: TestDependencyKey {
 	public static let noop: Self = .init(
 		saveProfileSnapshot: { _ in },
-		loadProfileSnapshotData: { nil },
+		loadProfileSnapshotData: { _ in nil },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _, _ in nil },
 		deleteMnemonicByFactorSourceID: { _ in },
-		deleteProfileAndMnemonicsByFactorSourceIDs: {}
+		deleteProfileAndMnemonicsByFactorSourceIDs: { _, _ in },
+		updateIsCloudProfileSyncEnabled: { _, _ in },
+		loadProfileHeaderList: { nil },
+		saveProfileHeaderList: { _ in },
+		deleteProfileHeaderList: {},
+		loadDeviceIdentifier: { .init() }
 	)
 
 	public static let previewValue: Self = .noop
@@ -26,6 +31,11 @@ extension SecureStorageClient: TestDependencyKey {
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
-		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileAndMnemonicsByFactorSourceIDs")
+		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileMnemonicsByFactorSourceIDs"),
+		updateIsCloudProfileSyncEnabled: unimplemented("\(Self.self).updateIsCloudProfileSyncEnabled"),
+		loadProfileHeaderList: unimplemented("\(Self.self).loadProfileHeaderList"),
+		saveProfileHeaderList: unimplemented("\(Self.self).saveProfileHeaderList"),
+		deleteProfileHeaderList: unimplemented("\(Self.self).deleteProfileHeaderList"),
+		loadDeviceIdentifier: unimplemented("\(Self.self).loadDeviceIdentifier")
 	)
 }

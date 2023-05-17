@@ -192,6 +192,7 @@ public struct Signing: Sendable, FeatureReducer {
 		let kind = signingFactors.first.factorSource.kind
 		precondition(signingFactors.allSatisfy { $0.factorSource.kind == kind })
 		state.factorsLeftToSignWith.removeValue(forKey: kind)
+
 		return .fireAndForget { [purpose = state.signingPurposeWithPayload.purpose] in
 			try? await factorSourcesClient.updateLastUsed(.init(
 				factorSourceIDs: signingFactors.map(\.factorSource.id),
