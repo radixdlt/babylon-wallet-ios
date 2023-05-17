@@ -84,7 +84,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case .removeTapped:
 			return .send(.delegate(.removed))
 		case .addAssetTapped:
-			state.assets.append(.init(resourceAddress: .init(address: "xrd"), maxAmount: 100))
+			state.assets.append(.init(resourceAddress: .init(address: "xrd"), totalSum: 0))
 //			state.destination = .addAsset(.init())
 			return .none
 		case .chooseAccountTapped:

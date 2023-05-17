@@ -37,8 +37,6 @@ extension FungibleResourceAsset.View {
 							.foregroundColor(.app.gray1)
 							.textStyle(.body2HighImportance)
 
-						Spacer()
-
 						TextField("0.00",
 						          text: viewStore.binding(
 						          	get: \.amount,
@@ -59,7 +57,7 @@ extension FungibleResourceAsset.View {
 								viewStore.send(.maxAmountTapped)
 							}
 							Text("-")
-							Text("Balance \(viewStore.balance)")
+                                                        Text("Balance \(viewStore.balance.format())")
 						}
 					}
 				}
