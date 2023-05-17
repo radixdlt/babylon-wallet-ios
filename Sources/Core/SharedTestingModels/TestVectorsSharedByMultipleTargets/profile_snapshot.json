@@ -11,9 +11,8 @@
                 "date": "1970-01-01T00:00:00Z"
         },
         "id": "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
-        "creationDate": "1970-01-01T00:00:00Z",
         "lastModified": "1970-01-01T00:00:00Z",
-        "snapshotVersion": 32,
+        "snapshotVersion": 33,
         "contentHint": {
                 "numberOfAccountsOnAllNetworksInTotal": 6,
                 "numberOfPersonasOnAllNetworksInTotal": 3,
