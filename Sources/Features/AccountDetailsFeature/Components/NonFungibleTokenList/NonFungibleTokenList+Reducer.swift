@@ -12,6 +12,10 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case closeDetailsTapped
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case asset(NonFungibleTokenList.Row.State.ID, NonFungibleTokenList.Row.Action)
 		case destination(PresentationAction<Destinations.Action>)
@@ -45,17 +49,33 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case let .asset(_, .delegate(.selected(detailState))):
-			state.destination = .details(detailState)
-			return .none
-
-		case .destination(.presented(.details(.delegate(.dismiss)))):
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .closeDetailsTapped:
 			state.destination = nil
 			return .none
+		}
+	}
 
-		default:
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .asset(rowID, .delegate(.open(localID))):
+			guard let row = state.rows[id: rowID] else {
+				loggerGlobal.warning("Selected row does not exist \(rowID)")
+				return .none
+			}
+			guard let token = row.resource.tokens[id: localID] else {
+				loggerGlobal.warning("Selected token does not exist: \(localID)")
+				return .none
+			}
+
+			state.destination = .details(.init(token: token, resource: row.resource))
+			return .none
+
+		case .asset:
+			return .none
+
+		case .destination:
 			return .none
 		}
 	}

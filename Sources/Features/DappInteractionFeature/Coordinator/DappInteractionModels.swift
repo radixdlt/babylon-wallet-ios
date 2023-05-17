@@ -9,30 +9,72 @@ extension DappInteraction {
 }
 
 // MARK: - DappMetadata
-struct DappMetadata: Sendable, Hashable, Codable {
-	static let defaultName = NonEmptyString(rawValue: L10n.DApp.Metadata.unknownName)!
+/// Metadata for a dapp, either from a request or fetched from ledger.
+/// not to be confused with `P2P.Dapp.Request.Metadata` which is the
+/// associated value of one of the cases of this enum.
+enum DappMetadata: Sendable, Hashable {
+	/// The metadata sent with the request from the Dapp.
+	/// We only allow this case `request` to be passed around if `isDeveloperModeEnabled` is `true`.
+	case request(P2P.Dapp.Request.Metadata)
 
-	let name: NonEmpty<String>
-	let description: String?
-	let origin: P2P.Dapp.Request.Metadata.Origin
+	/// A detailed DappMetaData fetched from Ledger.
+	case ledger(Ledger)
+}
 
-	init(
-		name: String?,
-		description: String? = nil,
-		origin: P2P.Dapp.Request.Metadata.Origin
-	) {
-		self.name = name.flatMap(NonEmptyString.init(rawValue:)) ?? Self.defaultName
-		self.description = description
-		self.origin = origin
+// MARK: DappMetadata.Ledger
+extension DappMetadata {
+	/// A detailed DappMetaData fetched from Ledger.
+	struct Ledger: Sendable, Hashable, Codable {
+		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
+
+		let origin: P2P.Dapp.Request.Metadata.Origin
+
+		let dAppDefinintionAddress: DappDefinitionAddress
+		let name: NonEmptyString?
+		let description: String?
+		let thumbnail: URL?
+
+		init(
+			origin: P2P.Dapp.Request.Metadata.Origin,
+			dAppDefinintionAddress: DappDefinitionAddress,
+			name: NonEmptyString?,
+			description: String? = nil,
+			thumbnail: URL? = nil
+		) {
+			self.dAppDefinintionAddress = dAppDefinintionAddress
+			self.origin = origin
+			self.name = name
+			self.thumbnail = thumbnail
+			self.description = description
+		}
+	}
+}
+
+extension DappMetadata {
+	public var origin: P2P.Dapp.Request.Metadata.Origin {
+		switch self {
+		case let .ledger(metadata): return metadata.origin
+		case let .request(metadata): return metadata.origin
+		}
+	}
+
+	public var thumbnail: URL? {
+		guard case let .ledger(fromLedgerDappMetadata) = self else {
+			return nil
+		}
+		return fromLedgerDappMetadata.thumbnail
 	}
 }
 
 #if DEBUG
 extension DappMetadata {
-	static let previewValue: Self = .init(
+	static let previewValue: Self = try! .ledger(.init(
+		origin: .init(string: "https://radfi.com"),
+		dAppDefinintionAddress: .init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
 		name: "Collabo.Fi",
 		description: "A very collaby finance dapp",
-		origin: .init(rawValue: "https://radfi.com")
+		thumbnail: nil
+	)
 	)
 }
 #endif
@@ -42,7 +84,7 @@ extension P2P.Dapp.Request {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
 	enum AnyInteractionItem: Sendable, Hashable {
 		// requests
-		case login(LoginRequestItem)
+		case auth(AuthRequestItem)
 		case oneTimeAccounts(AccountsRequestItem)
 		case ongoingAccounts(AccountsRequestItem)
 		case oneTimePersonaData(PersonaDataRequestItem)
@@ -54,7 +96,7 @@ extension P2P.Dapp.Request {
 		var priority: some Comparable {
 			switch self {
 			// requests
-			case .login:
+			case .auth:
 				return 0
 			case .ongoingAccounts:
 				return 1
@@ -79,7 +121,7 @@ extension P2P.Dapp.Request {
 		switch items {
 		case let .request(.authorized(items)):
 			return [
-				.login(items.login),
+				.auth(items.auth),
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
 				items.ongoingAccounts.map(AnyInteractionItem.ongoingAccounts),
 				items.oneTimePersonaData.map(AnyInteractionItem.oneTimePersonaData),
@@ -105,7 +147,7 @@ extension P2P.Dapp.Request {
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	enum AnyInteractionResponseItem: Sendable, Hashable {
 		// request responses
-		case login(LoginRequestResponseItem)
+		case auth(AuthRequestResponseItem)
 		case oneTimeAccounts(AccountsRequestResponseItem)
 		case ongoingAccounts(AccountsRequestResponseItem)
 		case oneTimePersonaData(PersonaDataRequestResponseItem)
@@ -122,7 +164,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 		switch interaction.items {
 		case .request:
 			// NB: variadic generics + native case paths should greatly help to simplify this "picking" logic
-			var login: LoginRequestResponseItem? = nil
+			var auth: AuthRequestResponseItem? = nil
 			var oneTimeAccounts: AccountsRequestResponseItem? = nil
 			var ongoingAccounts: AccountsRequestResponseItem? = nil
 			var oneTimePersonaData: PersonaDataRequestResponseItem? = nil
@@ -130,8 +172,8 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 			for item in items {
 				switch item {
-				case let .login(item):
-					login = item
+				case let .auth(item):
+					auth = item
 				case let .ongoingAccounts(item):
 					ongoingAccounts = item
 				case let .ongoingPersonaData(item):
@@ -145,12 +187,12 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 				}
 			}
 
-			if let login {
+			if let auth {
 				self.init(
 					interactionId: interaction.id,
 					items: .request(
 						.authorized(.init(
-							login: login,
+							auth: auth,
 							ongoingAccounts: ongoingAccounts,
 							ongoingPersonaData: ongoingPersonaData,
 							oneTimeAccounts: oneTimeAccounts,
@@ -174,7 +216,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			var send: SendTransactionResponseItem? = nil
 			for item in items {
 				switch item {
-				case .login, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData:
+				case .auth, .ongoingAccounts, .ongoingPersonaData, .oneTimeAccounts, .oneTimePersonaData:
 					continue
 				case let .send(item):
 					send = item

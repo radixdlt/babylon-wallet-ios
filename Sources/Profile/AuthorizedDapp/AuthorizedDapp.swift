@@ -15,7 +15,9 @@ extension Profile.Network {
 
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
-		public let displayName: NonEmpty<String>
+		/// Will be nil if we failed to fetch the DappMeta data from Ledger for some reason, and
+		/// which is allowed if `isDeveloperMode: true` is set.
+		public let displayName: NonEmptyString?
 
 		// mutable so that we can add new authorized personas
 		public var referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple>
@@ -23,7 +25,7 @@ extension Profile.Network {
 		public init(
 			networkID: Radix.Network.ID,
 			dAppDefinitionAddress: DappDefinitionAddress,
-			displayName: NonEmpty<String>,
+			displayName: NonEmptyString?,
 			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
 		) {
 			self.networkID = networkID
@@ -31,6 +33,44 @@ extension Profile.Network {
 			self.displayName = displayName
 			self.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas
 		}
+	}
+}
+
+extension Profile.Network.AuthorizedDapp {
+	public var id: DappDefinitionAddress {
+		dAppDefinitionAddress
+	}
+}
+
+// MARK: - DappOrigin
+public struct DappOrigin: Sendable, Hashable, Codable {
+	public let urlString: NonEmptyString
+	public let url: URL
+	public func encode(to encoder: Encoder) throws {
+		var singleValueContainer = encoder.singleValueContainer()
+		try singleValueContainer.encode(urlString.rawValue)
+	}
+
+	public init(urlString: NonEmptyString, url: URL) {
+		self.urlString = urlString
+		self.url = url
+	}
+
+	struct InvalidOriginURL: Error {}
+	public init(string: String) throws {
+		guard
+			let urlNonEmpty = NonEmptyString(rawValue: string),
+			let url = URL(string: string)
+		else {
+			throw InvalidOriginURL()
+		}
+		self.init(urlString: urlNonEmpty, url: url)
+	}
+
+	public init(from decoder: Decoder) throws {
+		let singleValueContainer = try decoder.singleValueContainer()
+		let urlStringString = try singleValueContainer.decode(String.self)
+		try self.init(string: urlStringString)
 	}
 }
 
@@ -154,12 +194,6 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts 
 extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple {
 	public var id: ID {
 		identityAddress
-	}
-}
-
-extension Profile.Network.AuthorizedDapp {
-	public var id: DappDefinitionAddress {
-		dAppDefinitionAddress
 	}
 }
 

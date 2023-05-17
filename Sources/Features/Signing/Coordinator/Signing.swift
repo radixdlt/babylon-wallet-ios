@@ -1,6 +1,7 @@
 import Cryptography
 import CustomDump
 import DeviceFactorSourceClient
+import EngineToolkitModels
 import FactorSourcesClient
 import FeaturePrelude
 import Profile
@@ -28,24 +29,27 @@ extension CompileNotarizedTransactionIntentResponse: CustomDumpStringConvertible
 	}
 }
 
-import EngineToolkitModels
-
 // MARK: - SigningPurposeWithPayload
 public enum SigningPurposeWithPayload: Sendable, Hashable {
 	case signAuth(AuthenticationDataToSignForChallengeResponse)
-	case signTransaction(CompileTransactionIntentResponse, origin: SigningPurpose.SignTransactionPurpose)
+
+	case signTransaction(
+		ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey,
+		CompileTransactionIntentResponse,
+		origin: SigningPurpose.SignTransactionPurpose
+	)
 
 	var purpose: SigningPurpose {
 		switch self {
 		case .signAuth: return .signAuth
-		case let .signTransaction(_, purpose): return .signTransaction(purpose)
+		case let .signTransaction(_, _, purpose): return .signTransaction(purpose)
 		}
 	}
 
 	var dataToSign: Data {
 		switch self {
 		case let .signAuth(auth): return auth.payloadToHashAndSign
-		case let .signTransaction(compiledIntent, _): return Data(compiledIntent.compiledIntent)
+		case let .signTransaction(_, compiledIntent, _): return Data(compiledIntent.compiledIntent)
 		}
 	}
 }
@@ -70,20 +74,20 @@ public struct Signing: Sendable, FeatureReducer {
 
 		public var factorsLeftToSignWith: SigningFactors
 		public let expectedSignatureCount: Int
-		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		public let signingPurposeWithPayload: SigningPurposeWithPayload
 
 		public init(
 			factorsLeftToSignWith: SigningFactors,
-			signingPurposeWithPayload: SigningPurposeWithPayload,
-			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+			signingPurposeWithPayload: SigningPurposeWithPayload
 		) {
 			precondition(!factorsLeftToSignWith.isEmpty)
 			self.signingPurposeWithPayload = signingPurposeWithPayload
 			self.factorsLeftToSignWith = factorsLeftToSignWith
-			self.expectedSignatureCount = factorsLeftToSignWith.signerCount
-			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
-			self.step = Signing.nextStep(factorsLeftToSignWith: factorsLeftToSignWith, dataToSign: signingPurposeWithPayload.dataToSign)!
+			self.expectedSignatureCount = factorsLeftToSignWith.expectedSignatureCount
+			self.step = Signing.nextStep(
+				factorsLeftToSignWith: factorsLeftToSignWith,
+				signingPurposeWithPayload: signingPurposeWithPayload
+			)!
 		}
 	}
 
@@ -134,8 +138,8 @@ public struct Signing: Sendable, FeatureReducer {
 			case let .signAuth(authData):
 				let response = SignedAuthChallenge(challenge: authData.input.challenge, entitySignatures: Set(state.signatures))
 				return .send(.delegate(.finishedSigning(.signAuth(response))))
-			case let .signTransaction(compiledIntent, _):
-				let notaryKey: SLIP10.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
+			case let .signTransaction(ephemeralNotaryPrivateKey, compiledIntent, _):
+				let notaryKey: SLIP10.PrivateKey = .curve25519(ephemeralNotaryPrivateKey)
 
 				return .run { [signatures = state.signatures] send in
 					await send(.internal(.notarizeResult(TaskResult {
@@ -161,7 +165,8 @@ public struct Signing: Sendable, FeatureReducer {
 				assertionFailure("Discrepancy")
 				loggerGlobal.warning("Discrepancy in signing, notarized a tx, but state.signingPurposeWithPayload == .signAuth, not possible.")
 				return .none
-			case let .signTransaction(_, purpose):
+
+			case let .signTransaction(_, _, purpose):
 				return .send(.delegate(.finishedSigning(.signTransaction(notarized, origin: purpose))))
 			}
 		}
@@ -198,9 +203,9 @@ public struct Signing: Sendable, FeatureReducer {
 	private func proceedWithNextFactorSource(_ state: inout State) -> EffectTask<Action> {
 		guard let nextStep = Self.nextStep(
 			factorsLeftToSignWith: state.factorsLeftToSignWith,
-			dataToSign: state.signingPurposeWithPayload.dataToSign
+			signingPurposeWithPayload: state.signingPurposeWithPayload
 		) else {
-			assert(state.signatures.count == state.expectedSignatureCount)
+			assert(state.signatures.count == state.expectedSignatureCount, "Expected to have \(state.expectedSignatureCount) signatures, but got: \(state.signatures.count)")
 			return .send(.internal(.finishedSigningWithAllFactors))
 		}
 		state.step = nextStep
@@ -209,7 +214,7 @@ public struct Signing: Sendable, FeatureReducer {
 
 	private static func nextStep(
 		factorsLeftToSignWith: SigningFactors,
-		dataToSign: Data
+		signingPurposeWithPayload: SigningPurposeWithPayload
 	) -> State.Step? {
 		guard
 			let nextKind = factorsLeftToSignWith.keys.first,
@@ -219,9 +224,9 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 		switch nextKind {
 		case .device:
-			return .signWithDeviceFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
+			return .signWithDeviceFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
 		case .ledgerHQHardwareWallet:
-			return .signWithLedgerFactors(.init(signingFactors: nextFactors, dataToSign: dataToSign))
+			return .signWithLedgerFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
 		}
 	}
 }

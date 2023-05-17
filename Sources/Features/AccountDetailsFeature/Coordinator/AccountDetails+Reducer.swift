@@ -1,5 +1,6 @@
 import AccountPortfoliosClient
 import AccountPreferencesFeature
+import AssetTransferFeature
 import FeaturePrelude
 import SharedModels
 
@@ -45,21 +46,21 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
-			// case transfer(AssetTransfer.State)
+			case transfer(AssetTransfer.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case preferences(AccountPreferences.Action)
-			// case transfer(AssetTransfer.Action)
+			case transfer(AssetTransfer.Action)
 		}
 
 		public var body: some ReducerProtocol<State, Action> {
 			Scope(state: /State.preferences, action: /Action.preferences) {
 				AccountPreferences()
 			}
-//			Scope(state: /State.transfer, action: /Action.transfer) {
-//				AssetTransfer()
-//			}
+			Scope(state: /State.transfer, action: /Action.transfer) {
+				AssetTransfer()
+			}
 		}
 	}
 
@@ -101,8 +102,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
 		case .transferButtonTapped:
-			// FIXME: fix post betanet v2
-//			state.destination = .transfer(AssetTransfer.State(from: state.account))
+			state.destination = .transfer(AssetTransfer.State(from: state.account))
 			return .none
 		}
 	}
@@ -112,6 +112,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .destination(.presented(.preferences(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
+
+		case .destination(.presented(.transfer(.delegate(.dismissed)))):
+			state.destination = nil
+			return .none
+
 		case .assets(.child(.fungibleTokenList(.delegate))):
 			return .none
 		default:
@@ -124,7 +129,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .portfolioUpdated(portfolio):
 			let xrd = portfolio.fungibleResources.xrdResource.map(FungibleTokenList.Row.State.init(xrdToken:))
 			let nonXrd = portfolio.fungibleResources.nonXrdResources.map(FungibleTokenList.Row.State.init(nonXRDToken:))
-			let nfts = portfolio.nonFungibleResources.map(NonFungibleTokenList.Row.State.init(token:))
+			let nfts = portfolio.nonFungibleResources.map(NonFungibleTokenList.Row.State.init(resource:))
 
 			state.assets = .init(
 				fungibleTokenList: .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd)),

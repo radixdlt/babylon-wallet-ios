@@ -26,9 +26,8 @@ extension Profile.Network {
 		/// Address that globally abnd uniquely identifies this Persona.
 		public let identityAddress: IdentityAddress
 
-		// FIXME: change Persona and Account to require displayname, and make this non optional?
 		/// The display name of the Persona, as stored in `Profile.Network.Persona`
-		public let displayName: NonEmpty<String>
+		public let displayName: NonEmptyString
 
 		/// Information of accounts the user has given the Dapp access to,
 		/// being the tripple `(accountAddress, displayName, appearanceID)`
@@ -44,8 +43,8 @@ extension Profile.Network {
 
 	public struct AuthorizedDappDetailed: Sendable, Hashable {
 		public let networkID: Radix.Network.ID
-		public let dAppDefinitionAddress: DappDefinitionAddress
-		public let displayName: NonEmpty<String>
+		public let dAppDefinitionAddress: AccountAddress
+		public let displayName: NonEmptyString?
 		public let detailedAuthorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>
 	}
 

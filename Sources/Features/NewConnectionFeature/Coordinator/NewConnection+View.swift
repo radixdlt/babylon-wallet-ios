@@ -33,7 +33,7 @@ extension NewConnection {
 						)
 					}
 				}
-				.navigationTitle(L10n.NewConnection.title)
+				.navigationTitle(L10n.LinkedConnectors.NewConnection.title)
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)

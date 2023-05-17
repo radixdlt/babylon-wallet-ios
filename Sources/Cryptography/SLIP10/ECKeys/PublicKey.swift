@@ -6,7 +6,7 @@ import K1
 // MARK: - SLIP10.PublicKey
 extension SLIP10 {
 	public enum PublicKey: Sendable, Hashable {
-		case ecdsaSecp256k1(K1.PublicKey)
+		case ecdsaSecp256k1(K1.ECDSAWithKeyRecovery.PublicKey)
 		case eddsaEd25519(Curve25519.Signing.PublicKey)
 
 		public init(data: Data) throws {
@@ -27,11 +27,7 @@ extension SLIP10.PublicKey {
 		switch (signatureWrapper, self) {
 		case let (.ecdsaSecp256k1(ecdsaSecp256k1Signature), .ecdsaSecp256k1(ecdsaSecp256k1PublicKey)):
 
-			do {
-				return try ecdsaSecp256k1PublicKey.isValid(signature: ecdsaSecp256k1Signature, hashed: hashed)
-			} catch {
-				return false
-			}
+			return ecdsaSecp256k1PublicKey.isValidSignature(ecdsaSecp256k1Signature, hashed: hashed)
 
 		case (.ecdsaSecp256k1, .eddsaEd25519):
 			return false
@@ -65,7 +61,7 @@ extension SLIP10.PublicKey: CustomDebugStringConvertible, CustomDumpStringConver
 		case let .eddsaEd25519(publicKey):
 			return publicKey.rawRepresentation
 		case let .ecdsaSecp256k1(publicKey):
-			return try! Data(publicKey.rawRepresentation(format: .uncompressed))
+			return publicKey.rawRepresentation
 		}
 	}
 

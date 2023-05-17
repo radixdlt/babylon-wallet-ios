@@ -112,9 +112,14 @@ extension ROLAClient {
 				let hdPath = unsecuredEntityControl.transactionSigning.path
 				switch entity {
 				case .account:
-					authSignDerivationPath = try hdPath.asAccountPath().asBabylonAccountPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asAccountPath().switching(
+						networkID: entity.networkID,
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				case .persona:
-					authSignDerivationPath = try hdPath.asIdentityPath().switching(keyKind: .authenticationSigning).wrapAsDerivationPath()
+					authSignDerivationPath = try hdPath.asIdentityPath().switching(
+						keyKind: .authenticationSigning
+					).wrapAsDerivationPath()
 				}
 			}
 			let factorSources = try await factorSourcesClient.getFactorSources()
@@ -124,12 +129,12 @@ extension ROLAClient {
 				fatalError()
 			}
 
-			let babylonDeviceFactorSource = try BabylonDeviceFactorSource(factorSource: factorSource)
+			let hdDeviceFactorSource = try HDOnDeviceFactorSource(factorSource: factorSource)
 
 			let authenticationSigning: FactorInstance = try await {
 				let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
 					.init(
-						hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
+						hdOnDeviceFactorSource: hdDeviceFactorSource,
 						derivationPath: authSignDerivationPath,
 						curve: .curve25519, // we always use Curve25519 for new accounts
 						loadMnemonicPurpose: .createSignAuthKey
@@ -137,7 +142,7 @@ extension ROLAClient {
 				)
 
 				return try FactorInstance(
-					factorSourceID: babylonDeviceFactorSource.id,
+					factorSourceID: hdDeviceFactorSource.id,
 					publicKey: .init(engine: publicKey),
 					derivationPath: authSignDerivationPath
 				)
@@ -155,6 +160,7 @@ extension ROLAClient {
 
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
+
 				let metadataCollection = try await cacheClient.withCaching(
 					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
 					request: {
@@ -179,16 +185,15 @@ extension ROLAClient {
 					throw ROLAFailure.wrongAccountType
 				}
 
-				guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.rawValue else {
+				guard dAppDefinitionMetadata.relatedWebsites == metadata.origin.urlString.rawValue else {
 					throw ROLAFailure.unknownWebsite
 				}
 			},
 			performWellKnownFileCheck: { metadata async throws in
 				@Dependency(\.urlSession) var urlSession
 
-				guard let originURL = URL(string: metadata.origin.rawValue) else {
-					throw ROLAFailure.invalidOriginURL
-				}
+				let originURL = metadata.origin.url
+
 				let url = originURL.appending(path: Constants.wellKnownFilePath)
 
 				let fetchWellKnownFile = {
@@ -276,7 +281,7 @@ func payloadToHash(
 	origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
 ) -> Data {
 	let dAppDefinitionAddress = accountAddress.address
-	let origin = metadataOrigin.rawValue
+	let origin = metadataOrigin.urlString.rawValue
 	precondition(dAppDefinitionAddress.count <= UInt8.max)
 	let challengeBytes = [UInt8](challenge.data.data)
 	let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
@@ -287,11 +292,7 @@ extension GatewayAPI.EntityMetadataCollection {
 	// FIXME: change to using hashes, which will happen... soon. Which will clean up this
 	// terrible parsing mess.
 	public func ownerKeys() throws -> OrderedSet<SLIP10.PublicKey>? {
-		guard let response: GatewayAPI.EntityMetadataItemValue = self[SetMetadata.ownerKeysKey] else {
-			return nil
-		}
-
-		guard let asStringCollection = response.asStringCollection else {
+		guard let response = items[customKey: SetMetadata.ownerKeysKey]?.asStringCollection else {
 			return nil
 		}
 
@@ -305,7 +306,7 @@ extension GatewayAPI.EntityMetadataCollection {
 		let lengthQuotesAndTwoParenthesis = 2 * lengthQuoteAndParenthesis
 		let lengthCurve25519PubKeyHex = 32 * 2
 		let lengthSecp256K1PubKeyHex = 33 * 2
-		let keys = try asStringCollection.compactMap { elem -> Engine.PublicKey? in
+		let keys = try response.compactMap { elem -> Engine.PublicKey? in
 			if elem.starts(with: curve25519Prefix) {
 				guard elem.count == lengthQuotesAndTwoParenthesis + lengthCurve25519Prefix + lengthCurve25519PubKeyHex else {
 					throw FailedToParsePublicKeyFromOwnerKeysBadLength()

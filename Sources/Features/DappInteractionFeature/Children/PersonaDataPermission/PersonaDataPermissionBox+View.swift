@@ -30,7 +30,7 @@ extension PersonaDataPermissionBox.State {
 				if let missingRequiredFieldIDs {
 					return .error {
 						Text {
-							L10n.DApp.PersonaDataBox.requiredInformation.text.bold()
+							L10n.DAppRequest.PersonalDataBox.requiredInformation.text.bold()
 							" "
 							missingRequiredFieldIDs.sorted().map(\.title.localizedLowercase).joined(separator: ", ")
 						}
@@ -94,7 +94,7 @@ extension PersonaDataPermissionBox {
 
 						viewStore.missingRequiredFields
 
-						Button(L10n.DApp.PersonaDataBox.Button.edit) {
+						Button(L10n.DAppRequest.PersonalDataBox.edit) {
 							viewStore.send(.editButtonTapped)
 						}
 						.modifier {

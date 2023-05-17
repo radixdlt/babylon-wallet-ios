@@ -460,6 +460,7 @@ package.addModules([
 	.client(
 		name: "LedgerHardwareWalletClient",
 		dependencies: [
+			"ROLAClient", // calc expected hashed message for signAuth for validation
 			"RadixConnectClient",
 			"FactorSourcesClient", // FIXME: move models to lower level package
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
@@ -779,7 +780,7 @@ package.addModules([
 		name: "Cryptography",
 		dependencies: [
 			.product(name: "K1", package: "K1") {
-				.package(url: "https://github.com/Sajjon/K1.git", exact: "0.0.8")
+				.package(url: "https://github.com/Sajjon/K1.git", exact: "0.3.8")
 			},
 		],
 		exclude: [

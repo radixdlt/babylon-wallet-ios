@@ -7,7 +7,7 @@ extension NonFungibleTokenList.Row {
 		let isExpanded: Bool
 
 		init(state: NonFungibleTokenList.Row.State) {
-			self.resource = state.token
+			self.resource = state.resource
 			self.isExpanded = state.isExpanded
 		}
 	}
@@ -99,7 +99,7 @@ extension NonFungibleTokenList.Row.View {
 		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))
 		.transition(.move(edge: .bottom))
 		.contentShape(Rectangle())
-		.onTapGesture { viewStore.send(.selected(.init(resource: viewStore.resource, localId: asset.id))) }
+		.onTapGesture { viewStore.send(.tokenTapped(asset.id)) }
 	}
 
 	fileprivate func collapsedHeight(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> CGFloat {
@@ -111,21 +111,21 @@ extension NonFungibleTokenList.Row.View {
 		return headerHeight + visibleCollapsedRowsHeight + totalSpacing
 	}
 
-	fileprivate func headerSupplyText(with _: ViewStoreOf<NonFungibleTokenList.Row>) -> String {
+	fileprivate func headerSupplyText(with viewStore: ViewStoreOf<NonFungibleTokenList.Row>) -> String {
 		// TODO: remove when API is ready
-		L10n.NftList.Header.supplyUnknown
+		L10n.AssetDetails.supplyUnkown
 
 		// TODO: update when API is ready
 		/*
 		 guard let supply = viewStore.containers.first?.asset.supply else {
-		 	return L10n.NftList.Header.supplyUnknown
+		 	return L10n.AssetDetails.supplyUnkown
 		 }
 
 		 switch supply {
 		 case let .fixed(value):
-		 	return NSLocalizedString(L10n.NftList.ownedOfTotal(viewStore.containers.count, Int(value.magnitude)), comment: "Number of NFTs owned of total number")
+		 	return NSLocalizedString(L10n.AssetDetails.NFTDetails.ownedOfTotal(viewStore.containers.count, Int(value.magnitude)), comment: "Number of NFTs owned of total number")
 		 case .mutable:
-		 	return NSLocalizedString(L10n.NftList.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
+		 	return NSLocalizedString(L10n.AssetDetails.NFTDetails.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
 		 }
 		 */
 	}
@@ -217,7 +217,7 @@ struct NonFungibleRow_Preview: PreviewProvider {
 
 extension NonFungibleTokenList.Row.State {
 	public static let previewValue = Self(
-		token: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: [])
+		resource: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), tokens: [])
 	)
 }
 #endif

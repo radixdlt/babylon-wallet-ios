@@ -17,26 +17,13 @@ extension DappDetails {
 	public struct ViewState: Equatable {
 		let title: String
 		let description: String
-		let domain: String?
+		let domain: URL?
 		let thumbnail: URL?
 		let address: DappDefinitionAddress
-		let otherMetadata: [MetadataItem]
-		let fungibleTokens: [Token]
-		let nonFungibleTokens: [Token]
+		let fungibles: [State.Resources.ResourceDetails]?
+		let nonFungibles: [State.Resources.ResourceDetails]?
+		let associatedDapps: [State.AssociatedDapp]?
 		let hasPersonas: Bool
-
-		struct MetadataItem: Identifiable, Hashable, Sendable {
-			var id: Self { self }
-			let key: String
-			let value: String
-		}
-
-		struct Token: Identifiable, Hashable, Sendable {
-			var id: ComponentAddress { address }
-			let name: String
-			let thumbnail: URL?
-			let address: ComponentAddress
-		}
 	}
 }
 
@@ -52,14 +39,14 @@ extension DappDetails.View {
 
 					InfoBlock(store: store)
 
-					TokenList(store: store)
+					FungiblesList(store: store)
 
-					NFTList(store: store)
+					NonFungiblesListList(store: store)
 
 					Personas(store: store, hasPersonas: viewStore.hasPersonas)
 						.background(.app.gray5)
 
-					Button(L10n.DAppDetails.forgetDapp) {
+					Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
 						viewStore.send(.forgetThisDappTapped)
 					}
 					.buttonStyle(.primaryRectangular(isDestructive: true))
@@ -70,7 +57,11 @@ extension DappDetails.View {
 					viewStore.send(.appeared)
 				}
 				.navigationTitle(viewStore.title)
-				.sheet(store: store.personaDetails) { store in
+				.sheet(
+					store: store.destination,
+					state: /DappDetails.Destination.State.personaDetails,
+					action: DappDetails.Destination.Action.personaDetails
+				) { store in
 					NavigationStack {
 						PersonaDetails.View(store: store)
 						#if os(iOS)
@@ -85,7 +76,11 @@ extension DappDetails.View {
 							}
 					}
 				}
-				.alert(store: store.confirmDisconnectAlert)
+				.alert(
+					store: store.destination,
+					state: /DappDetails.Destination.State.confirmDisconnectAlert,
+					action: DappDetails.Destination.Action.confirmDisconnectAlert
+				)
 			}
 		}
 	}
@@ -95,37 +90,23 @@ extension DappDetails.View {
 
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
-		let ignoredKeys: Set<String> = ["description", "domain", "name"]
-
-		let otherMetadata = metadata?.items
-			.filter { !ignoredKeys.contains($0.key) }
-			.compactMap { item in
-				item.value.asString.map {
-					DappDetails.ViewState.MetadataItem(key: item.key, value: $0)
-				}
-			} ?? []
-
-		return .init(
-			title: dApp.displayName.rawValue,
-			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
-			domain: metadata?.domain,
+		.init(
+			title: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
+			domain: metadata?.claimedWebsites?.first,
 			thumbnail: metadata?.iconURL,
 			address: dApp.dAppDefinitionAddress,
-			otherMetadata: otherMetadata,
-			fungibleTokens: [], // TODO: Populate when we have it
-			nonFungibleTokens: [], // TODO: Populate when we have it
+			fungibles: resources?.fungible,
+			nonFungibles: resources?.nonFungible,
+			associatedDapps: associatedDapps,
 			hasPersonas: !personaList.personas.isEmpty
 		)
 	}
 }
 
-private extension DappDetails.Store {
-	var personaDetails: PresentationStoreOf<PersonaDetails> {
-		scope(state: \.$personaDetails) { .child(.personaDetails($0)) }
-	}
-
-	var confirmDisconnectAlert: AlertPresentationStore<DappDetails.ViewAction.ConfirmDisconnectAlert> {
-		scope(state: \.$confirmDisconnectAlert) { .view(.confirmDisconnectAlert($0)) }
+private extension StoreOf<DappDetails> {
+	var destination: PresentationStoreOf<DappDetails.Destination> {
+		scope(state: \.$destination, action: { .child(.destination($0)) })
 	}
 }
 
@@ -148,7 +129,7 @@ extension DappDetails.View {
 					Separator()
 
 					HStack(spacing: 0) {
-						Text(L10n.DAppDetails.definition)
+						Text(L10n.AuthorizedDapps.DAppDetails.dAppDefinition)
 							.sectionHeading
 
 						Spacer(minLength: 0)
@@ -159,18 +140,12 @@ extension DappDetails.View {
 					}
 
 					if let domain = viewStore.domain {
-						Text(L10n.DAppDetails.website)
+						Text(L10n.AuthorizedDapps.DAppDetails.website)
 							.sectionHeading
-						Button(domain) {
-							if let url = URL(string: domain) {
-								viewStore.send(.openURLTapped(url))
-							}
-						}
-						.buttonStyle(.url)
-					}
-
-					ForEach(viewStore.otherMetadata) { item in
-						VPair(heading: item.key, item: item.value)
+//						Button(domain.stringValue) {
+//							viewStore.send(.openURLTapped(domain))
+//						}
+//						.buttonStyle(.url)
 					}
 				}
 				.padding(.horizontal, .medium1)
@@ -180,30 +155,30 @@ extension DappDetails.View {
 	}
 
 	@MainActor
-	struct TokenList: View {
+	struct FungiblesList: View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.fungibleTokens, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { token in
-					TokenThumbnail(.known(token.thumbnail), size: .small)
+			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.name) { resource in
+					TokenThumbnail(.known(resource.iconURL), size: .small)
 				} action: { id in
-					viewStore.send(.fungibleTokenTapped(id))
+					viewStore.send(.fungibleTapped(id))
 				}
 			}
 		}
 	}
 
 	@MainActor
-	struct NFTList: View {
+	struct NonFungiblesListList: View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState.nonFungibleTokens, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { token in
-					NFTThumbnail(token.thumbnail, size: .small)
+			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.name) { resource in
+					NFTThumbnail(resource.iconURL, size: .small)
 				} action: { id in
-					viewStore.send(.nonFungibleTokenTapped(id))
+					viewStore.send(.nonFungibleTapped(id))
 				}
 			}
 		}
@@ -212,13 +187,13 @@ extension DappDetails.View {
 	@MainActor
 	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
 		let heading: String
-		let elements: [Element]
+		let elements: [Element]?
 		let title: (Element) -> String
 		let icon: (Element) -> Icon
 		let action: (Element.ID) -> Void
 
 		var body: some View {
-			if !elements.isEmpty {
+			if let elements, !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
 						.sectionHeading
@@ -247,7 +222,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			if hasPersonas {
-				Text(L10n.DAppDetails.personaHeading)
+				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)
@@ -259,7 +234,7 @@ extension DappDetails.View {
 				let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
 				PersonaListCoreView(store: personasStore)
 			} else {
-				Text(L10n.DAppDetails.noPersonasHeading)
+				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
 					.sectionHeading
 					.flushedLeft
 					.padding(.horizontal, .medium1)

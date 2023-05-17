@@ -96,7 +96,7 @@ final class CacheClientTests: TestCase {
 		}
 	}
 
-	func test_removeAll() throws {
+	func test_removeAll() async throws {
 		// given
 		guard let data1 = URL(string: "https://test.com") else {
 			XCTFail("Could not create URL from string")
@@ -108,9 +108,9 @@ final class CacheClientTests: TestCase {
 		let entry2: CacheClient.Entry = .rolaDappVerificationMetadata("deadbeef-metadata")
 
 		let data3 = 123
-		let entry3: CacheClient.Entry = .rolaWellKnownFileVerification("deadbeef-url")
+		let entry3: CacheClient.Entry = .rolaWellKnownFileVerification("radswap.io")
 
-		try withDependencies {
+		try await withDependencies {
 			$0.diskPersistenceClient = .liveValue
 			$0.date = .constant(.now)
 		} operation: {
@@ -119,6 +119,8 @@ final class CacheClientTests: TestCase {
 			sut.save(data2, entry2)
 			sut.save(data3, entry3)
 			sut.removeAll()
+			try await Task.sleep(for: .milliseconds(100))
+			sut.save("foobar", .rolaWellKnownFileVerification("stellaswap.se"))
 			// then
 			XCTAssertThrowsError(try sut.load(URL.self, entry1))
 			XCTAssertThrowsError(try sut.load(Bool.self, entry2))

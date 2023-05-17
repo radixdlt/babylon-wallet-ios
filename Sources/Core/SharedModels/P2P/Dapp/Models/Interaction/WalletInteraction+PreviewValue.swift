@@ -72,20 +72,22 @@ extension P2P.Dapp.Request.ID {
 }
 
 extension P2P.Dapp.Request.Metadata {
-	public static let previewValue = Self(
+	public static let previewValue = try! Self(
 		version: P2P.Dapp.currentVersion,
 		networkId: .simulator,
-		origin: "Placeholder",
-		dAppDefinitionAddress: try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
+		origin: .init(string: "foo.bar"),
+		dAppDefinitionAddress: .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
 	)
 }
 
 extension P2P.Dapp.Request {
-	public static func previewValueAllRequests(login: P2P.Dapp.Request.LoginRequestItem = .init(challenge: nil, identityAddress: nil)) -> Self {
+	public static func previewValueAllRequests(
+		auth: P2P.Dapp.Request.AuthRequestItem = .login(.withoutChallenge)
+	) -> Self {
 		.init(
 			id: .previewValue0,
 			items: .request(.authorized(.init(
-				login: login,
+				auth: auth,
 				reset: nil,
 				ongoingAccounts: .previewValue,
 				ongoingPersonaData: .previewValue,

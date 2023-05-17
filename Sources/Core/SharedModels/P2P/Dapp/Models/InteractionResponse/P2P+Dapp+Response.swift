@@ -71,10 +71,11 @@ extension P2P.Dapp.Response {
 
 		public init(entitySignature: SignatureOfEntity) {
 			let sigPub = entitySignature.signatureWithPublicKey
+			let signature = sigPub.signature.serialize()
 			self.init(
 				publicKey: sigPub.publicKey.compressedRepresentation.hex,
 				curve: sigPub.publicKey.curve,
-				signature: sigPub.signature.serialize().hex
+				signature: signature.hex
 			)
 		}
 	}

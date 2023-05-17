@@ -1,3 +1,4 @@
+import AssetTransferFeature
 import FeaturePrelude
 import MainFeature
 import OnboardingFeature

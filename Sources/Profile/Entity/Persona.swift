@@ -28,7 +28,7 @@ extension Profile.Network {
 		public var securityState: EntitySecurityState
 
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
-		public var displayName: NonEmpty<String>
+		public var displayName: NonEmptyString
 
 		/// Fields containing personal information you have inputted.
 		public var fields: IdentifiedArrayOf<Field>

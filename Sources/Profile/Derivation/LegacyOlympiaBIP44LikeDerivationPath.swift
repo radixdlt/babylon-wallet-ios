@@ -58,6 +58,10 @@ public struct LegacyOlympiaBIP44LikeDerivationPath:
 	}
 
 	public var derivationPath: String { fullPath.toString() }
+
+	func cap26Path(networkID: NetworkID, keyKind: KeyKind) throws -> AccountBabylonDerivationPath {
+		try .init(networkID: networkID, index: addressIndex, keyKind: keyKind)
+	}
 }
 
 extension HD.Path.Full {

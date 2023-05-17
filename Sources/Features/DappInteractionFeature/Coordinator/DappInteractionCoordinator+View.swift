@@ -42,7 +42,7 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					interaction: .previewValueAllRequests(
-						login: P2P.Dapp.Request.LoginRequestItem(challenge: nil, identityAddress: nil)
+						auth: .login(.withoutChallenge)
 					)
 				),
 				reducer: DappInteractionCoordinator()

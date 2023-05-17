@@ -44,6 +44,12 @@ extension DappInteractor {
 				)
 				.alert(
 					store: store.scope(
+						state: \.$invalidRequestAlert,
+						action: { .view(.invalidRequestAlert($0)) }
+					)
+				)
+				.alert(
+					store: store.scope(
 						state: \.$responseFailureAlert,
 						action: { .view(.responseFailureAlert($0)) }
 					)

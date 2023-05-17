@@ -20,7 +20,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		let challenge: P2P.Dapp.Request.AuthChallengeNonce?
 
 		let accessKind: AccessKind
-		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 		var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
@@ -32,7 +31,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		init(
 			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
 			accessKind: AccessKind,
-			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
 			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
 			numberOfAccounts: DappInteraction.NumberOfAccounts,
@@ -41,7 +39,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		) {
 			self.challenge = challenge
 			self.accessKind = accessKind
-			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
 			self.availableAccounts = availableAccounts
 			self.numberOfAccounts = numberOfAccounts
@@ -146,11 +143,11 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
-				dAppDefinitionAddress: state.dappDefinitionAddress
+				dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
 			)
 
 			return .run { send in
-				let dataToSign = try await rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+				let dataToSign = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 				let networkID = await accountsClient.getCurrentNetworkID()
 				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
 					networkID: networkID,
@@ -175,8 +172,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case let .proveAccountOwnership(signingFactors, authenticationDataToSignForChallenge):
 			state.destination = .signing(.init(
 				factorsLeftToSignWith: signingFactors,
-				signingPurposeWithPayload: SigningPurposeWithPayload.signAuth(authenticationDataToSignForChallenge),
-				ephemeralNotaryPrivateKey: .init()
+				signingPurposeWithPayload: .signAuth(authenticationDataToSignForChallenge)
 			))
 			return .none
 		}
@@ -195,13 +191,14 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			state.destination = nil
 
 			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set((state.selectedAccounts ?? []).map(\.account.id))
-			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.compactMap {
+			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
 				guard case let .account(account) = $0.signerEntity else {
-					loggerGlobal.error("Found personas amonst signers, expected only accounts.")
-					return nil
+					fatalError()
 				}
 				accountsLeftToVerifyDidSign.remove(account.id)
-				let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
+				guard let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0) else {
+					fatalError()
+				}
 				return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
 			}
 			guard accountsLeftToVerifyDidSign.isEmpty else {

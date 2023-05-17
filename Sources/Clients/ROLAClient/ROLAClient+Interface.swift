@@ -5,7 +5,12 @@ import SharedModels
 
 // MARK: - ROLAClient
 public struct ROLAClient: Sendable, DependencyKey {
+	/// verifies that the component on ledger at 'dAppDefinitionAddress' matches the metadata in the request from the dapp.
+	/// it does so by fetching the metadata for dAppDefinitionAddress
+	/// and asserting that the `accounType` is "dapp definition" and that its `relatedWebsites` contain the `metadata.origin`
 	public var performDappDefinitionVerification: PerformDappDefinitionVerification
+
+	/// verifies that the wellknown file found at metadata.origin contains the dDappDefinitionAddress
 	public var performWellKnownFileCheck: PerformWellKnownFileCheck
 	public var manifestForAuthKeyCreation: ManifestForAuthKeyCreation
 	public var authenticationDataToSignForChallenge: AuthenticationDataToSignForChallenge
@@ -16,7 +21,7 @@ extension ROLAClient {
 	public typealias PerformDappDefinitionVerification = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> ManifestForAuthKeyCreationResponse
-	public typealias AuthenticationDataToSignForChallenge = @Sendable (AuthenticationDataToSignForChallengeRequest) async throws -> AuthenticationDataToSignForChallengeResponse
+	public typealias AuthenticationDataToSignForChallenge = @Sendable (AuthenticationDataToSignForChallengeRequest) throws -> AuthenticationDataToSignForChallengeResponse
 }
 
 // MARK: - ManifestForAuthKeyCreationResponse
