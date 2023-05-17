@@ -82,16 +82,14 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					}
 					assert(requiredSigningFactor.path == signature.derivationPath)
 
-//					let entitySignature = try SignatureOfEntity(
-//						signerEntity: requiredSigner.entity,
-//						factorInstance: requiredSigningFactor,
-//						signature: Signature(
-//							signatureWithPublicKey: signature.signature,
-//							derivationPath: requiredSigningFactor.getDerivationPath()
-//						)
-//					)
-//					signatures.insert(entitySignature)
-					fatalError()
+					let entitySignature = SignatureOfEntity(
+						signerEntity: requiredSigner.entity,
+						derivationPath: signature.derivationPath,
+						factorSourceID: requiredSigningFactor.factorSourceID,
+						signatureWithPublicKey: signature.signature
+					)
+
+					signatures.insert(entitySignature)
 				}
 			}
 
