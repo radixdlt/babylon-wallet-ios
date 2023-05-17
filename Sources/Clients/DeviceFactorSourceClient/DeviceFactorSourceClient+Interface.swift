@@ -90,7 +90,7 @@ extension DeviceFactorSourceClient {
 			}()
 
 			guard
-				let deviceFactorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
+				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
 			else {
 				throw FailedToDeviceFactorSourceForSigning()
 			}
@@ -110,7 +110,7 @@ extension DeviceFactorSourceClient {
 	}
 
 	public func signUsingDeviceFactorSource(
-		deviceFactorSource: FactorSource,
+		deviceFactorSource: HDOnDeviceFactorSource,
 		signerEntities: Set<EntityPotentiallyVirtual>,
 		unhashedDataToSign: some DataProtocol,
 		purpose: SigningPurpose

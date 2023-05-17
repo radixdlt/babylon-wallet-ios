@@ -162,7 +162,7 @@ import EngineToolkit
 extension Profile.Network.Persona {
 	public static func deriveAddress(
 		networkID: NetworkID,
-		factorInstance: FactorInstance
+		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
 		let path = try factorInstance.derivationPath.asIdentityPath()
 		guard path.entityKind == .identity else {

@@ -14,17 +14,46 @@ public struct UnsecuredEntityControl:
 {
 	/// The factor instance which was used to create this unsecured entity, which
 	/// also controls this entity and is used for signign transactions.
-	public let transactionSigning: FactorInstance
+	public let transactionSigning: HierarchicalDeterministicFactorInstance
 
 	/// The factor instance which can be used for ROLA.
-	public var authenticationSigning: FactorInstance?
+	public var authenticationSigning: HierarchicalDeterministicFactorInstance?
 
 	public init(
-		transactionSigning: FactorInstance,
-		authenticationSigning: FactorInstance? = nil
+		transactionSigning: HierarchicalDeterministicFactorInstance,
+		authenticationSigning: HierarchicalDeterministicFactorInstance? = nil
 	) {
 		self.transactionSigning = transactionSigning
 		self.authenticationSigning = authenticationSigning
+	}
+}
+
+extension UnsecuredEntityControl {
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		try self.init(
+			transactionSigning: container.decode(
+				FactorInstance.self,
+				forKey: .transactionSigning
+			)
+			.virtualHierarchicalDeterministic(),
+			authenticationSigning: container.decodeIfPresent(
+				FactorInstance.self,
+				forKey: .authenticationSigning
+			)?
+				.virtualHierarchicalDeterministic()
+		)
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(transactionSigning.factorInstance, forKey: .transactionSigning)
+		try container.encodeIfPresent(authenticationSigning?.factorInstance, forKey: .authenticationSigning)
+	}
+
+	private enum CodingKeys: String, CodingKey {
+		case transactionSigning
+		case authenticationSigning
 	}
 }
 

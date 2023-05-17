@@ -637,13 +637,13 @@ public struct UnsecuredEntityControlView: IndentedView {
 extension UnsecuredEntityControlView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			FactorInstanceView(
+			HierarchicalDeterministicFactorInstanceView(
 				description: "Transaction Signing",
 				factorInstance: unsecuredControl.transactionSigning,
 				indentation: inOneLevel
 			)
 			if let authenticationSigning = unsecuredControl.authenticationSigning {
-				FactorInstanceView(
+				HierarchicalDeterministicFactorInstanceView(
 					description: "Auth Signing",
 					factorInstance: authenticationSigning,
 					indentation: inOneLevel
@@ -653,14 +653,14 @@ extension UnsecuredEntityControlView {
 	}
 }
 
-// MARK: - FactorInstanceView
-public struct FactorInstanceView: IndentedView {
+// MARK: - HierarchicalDeterministicFactorInstanceView
+public struct HierarchicalDeterministicFactorInstanceView: IndentedView {
 	public let description: String
-	public let factorInstance: FactorInstance
+	public let factorInstance: HierarchicalDeterministicFactorInstance
 	public let indentation: Indentation
 }
 
-extension FactorInstanceView {
+extension HierarchicalDeterministicFactorInstanceView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("\(description) factor instance")
