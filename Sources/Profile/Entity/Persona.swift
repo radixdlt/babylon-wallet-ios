@@ -164,7 +164,7 @@ extension Profile.Network.Persona {
 		networkID: NetworkID,
 		factorInstance: FactorInstance
 	) throws -> EntityAddress {
-		let path = try factorInstance.path.asIdentityPath()
+		let path = try factorInstance.derivationPath.asIdentityPath()
 		guard path.entityKind == .identity else {
 			throw WrongEntityInDerivationPath()
 		}

@@ -19,7 +19,7 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 	public let publicKey: SLIP10.PublicKey
 
 	/// The derivation path used to derive the publicKey.
-	public let path: DerivationPath
+	public let derivationPath: DerivationPath
 
 	public init(
 		factorSourceID: FactorSource.ID,
@@ -28,7 +28,7 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 	) {
 		self.factorSourceID = factorSourceID
 		self.publicKey = publicKey
-		self.path = derivationPath
+		self.derivationPath = derivationPath
 	}
 }
 

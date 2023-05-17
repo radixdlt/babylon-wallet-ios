@@ -115,7 +115,7 @@ extension Profile.Network.Account {
 		networkID: NetworkID,
 		factorInstance: FactorInstance
 	) throws -> EntityAddress {
-		_ = try factorInstance.path.asAccountPath()
+		_ = try factorInstance.derivationPath.asAccountPath()
 		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
 			request: .init(
 				publicKey: factorInstance.publicKey.intoEngine(),

@@ -109,7 +109,7 @@ extension ROLAClient {
 
 				loggerGlobal.notice("Entity: \(entity) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
 				factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
-				let hdPath = unsecuredEntityControl.transactionSigning.path
+				let hdPath = unsecuredEntityControl.transactionSigning.derivationPath
 				switch entity {
 				case .account:
 					authSignDerivationPath = try hdPath.asAccountPath().switching(

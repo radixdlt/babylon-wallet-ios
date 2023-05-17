@@ -142,7 +142,7 @@ extension DeviceFactorSourceClient {
 					}
 				}()
 
-				let derivationPath = factorInstance.path
+				let derivationPath = factorInstance.derivationPath
 
 				if factorInstance.factorSourceID != factorSourceID {
 					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."

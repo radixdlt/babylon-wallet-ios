@@ -669,8 +669,8 @@ extension FactorInstanceView {
 				.font(.title)
 			#endif // os(macOS)
 
-			Labeled("Derivation Path", value: factorInstance.path.description)
-			Labeled("Derivation Scheme", value: factorInstance.path.scheme.rawValue)
+			Labeled("Derivation Path", value: factorInstance.derivationPath.description)
+			Labeled("Derivation Scheme", value: factorInstance.derivationPath.scheme.rawValue)
 			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
 			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
 			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))

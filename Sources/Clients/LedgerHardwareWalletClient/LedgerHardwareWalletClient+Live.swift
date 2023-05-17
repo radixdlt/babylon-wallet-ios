@@ -80,7 +80,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 						loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.compressedRepresentation.hex)")
 						throw MissingSignatureFromRequiredSigner()
 					}
-					assert(requiredSigningFactor.path == signature.derivationPath)
+					assert(requiredSigningFactor.derivationPath == signature.derivationPath)
 
 					let entitySignature = SignatureOfEntity(
 						signerEntity: requiredSigner.entity,
@@ -239,7 +239,7 @@ extension Signer {
 		factorInstancesRequiredToSign.compactMap {
 			P2P.LedgerHardwareWallet.KeyParameters(
 				curve: $0.publicKey.curve.cast(),
-				derivationPath: $0.path.path
+				derivationPath: $0.derivationPath.path
 			)
 		}
 	}

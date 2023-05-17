@@ -274,7 +274,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 							let entity = signer.entity
 							print("\t\t🔮 * Entity: \(entity.displayName): *")
 							for factorInstance in signer.factorInstancesRequiredToSign {
-								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.path)) \(factorInstance.publicKey)")
+								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
 							}
 						}
 					}
