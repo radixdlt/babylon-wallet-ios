@@ -361,7 +361,7 @@ final class ProfileTests: TestCase {
 				numberOfPersonasOnAllNetworksInTotal: 3,
 				numberOfNetworks: 2
 			),
-			snapshotVersion: .init(rawValue: 32)
+			snapshotVersion: .init(rawValue: 33)
 		)
 
 		XCTAssertEqual(profile.header, header)
