@@ -388,7 +388,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "FactorSourcesClient",
 		dependencies: [
@@ -531,6 +530,18 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
+		name: "QRGeneratorClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "QRGeneratorClientLive",
+		dependencies: [
+			"QRGeneratorClient",
+		],
+		tests: .no
+	),
+	.client(
 		name: "RadixConnectClient",
 		dependencies: [
 			"RadixConnect",
@@ -663,6 +674,7 @@ package.addModules([
 		name: "DesignSystem",
 		dependencies: [
 			"URLFormatterClient",
+			"QRGeneratorClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
 			},
