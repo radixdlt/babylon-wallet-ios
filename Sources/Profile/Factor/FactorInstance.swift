@@ -25,7 +25,11 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 		/// produces virtual badges (signatures).
 		///
 		/// The `.device` `FactorSource` produces `FactorInstance`s with this kind if badge source.
-		case virtualHierarchicalDeterministic(HierarchicalDeterministicPublicKey)
+		case virtual(VirtualSource)
+
+		public enum VirtualSource: Sendable, Hashable, Codable {
+			case hierarchicalDeterministic(HierarchicalDeterministicPublicKey)
+		}
 
 		/// A "physical" or "real" (as opposed to "virtual") badge is an On-Ledger resource
 		/// e.g. an NFT.
@@ -42,16 +46,16 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 
 extension FactorInstance.Badge {
 	internal enum Discriminator: String, Sendable, Equatable, Codable {
-		case virtualHierarchicalDeterministic
+		case virtual = "virtualSource"
 	}
 
 	public enum CodingKeys: String, CodingKey {
-		case discriminator, virtualHierarchicalDeterministicPublicKey
+		case discriminator, virtualSource
 	}
 
 	internal var discriminator: Discriminator {
 		switch self {
-		case .virtualHierarchicalDeterministic: return .virtualHierarchicalDeterministic
+		case .virtual: return .virtual
 		}
 	}
 
@@ -59,10 +63,10 @@ extension FactorInstance.Badge {
 		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
 		try keyedContainer.encode(discriminator, forKey: .discriminator)
 		switch self {
-		case let .virtualHierarchicalDeterministic(virtualHierarchicalDeterministicPublicKey):
+		case let .virtual(virtual):
 			try keyedContainer.encode(
-				virtualHierarchicalDeterministicPublicKey,
-				forKey: .virtualHierarchicalDeterministicPublicKey
+				virtual,
+				forKey: .virtualSource
 			)
 		}
 	}
@@ -71,11 +75,53 @@ extension FactorInstance.Badge {
 		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try keyedContainer.decode(Discriminator.self, forKey: .discriminator)
 		switch discriminator {
-		case .virtualHierarchicalDeterministic:
-			self = try .virtualHierarchicalDeterministic(
+		case .virtual:
+			self = try .virtual(
+				keyedContainer.decode(
+					VirtualSource.self,
+					forKey: .virtualSource
+				)
+			)
+		}
+	}
+}
+
+extension FactorInstance.Badge.VirtualSource {
+	internal enum Discriminator: String, Sendable, Equatable, Codable {
+		case hierarchicalDeterministic = "hierarchicalDeterministicPublicKey"
+	}
+
+	public enum CodingKeys: String, CodingKey {
+		case discriminator, hierarchicalDeterministicPublicKey
+	}
+
+	internal var discriminator: Discriminator {
+		switch self {
+		case .hierarchicalDeterministic: return .hierarchicalDeterministic
+		}
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
+		try keyedContainer.encode(discriminator, forKey: .discriminator)
+		switch self {
+		case let .hierarchicalDeterministic(hierarchicalDeterministic):
+			try keyedContainer.encode(
+				hierarchicalDeterministic,
+				forKey: .hierarchicalDeterministicPublicKey
+			)
+		}
+	}
+
+	public init(from decoder: Decoder) throws {
+		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try keyedContainer.decode(Discriminator.self, forKey: .discriminator)
+		switch discriminator {
+		case .hierarchicalDeterministic:
+			self = try .hierarchicalDeterministic(
 				keyedContainer.decode(
 					HierarchicalDeterministicPublicKey.self,
-					forKey: .virtualHierarchicalDeterministicPublicKey
+					forKey: .hierarchicalDeterministicPublicKey
 				)
 			)
 		}
@@ -114,10 +160,12 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable {
 	public var factorInstance: FactorInstance {
 		.init(
 			factorSourceID: factorSourceID,
-			badge: .virtualHierarchicalDeterministic(.init(
-				publicKey: publicKey,
-				derivationPath: derivationPath
-			))
+			badge: .virtual(
+				.hierarchicalDeterministic(.init(
+					publicKey: publicKey,
+					derivationPath: derivationPath
+				))
+			)
 		)
 	}
 
@@ -132,7 +180,7 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable {
 	}
 
 	public init(factorInstance: FactorInstance) throws {
-		guard case let .virtualHierarchicalDeterministic(badge) = factorInstance.badge else {
+		guard case let .virtual(.hierarchicalDeterministic(badge)) = factorInstance.badge else {
 			throw BadgeIsNotVirtualHierarchicalDeterministic()
 		}
 		self.init(
