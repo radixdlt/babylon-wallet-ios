@@ -72,7 +72,7 @@ extension DappInteractionFlow {
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,
 					action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
-					then: { ChooseAccounts.View(store: $0) }
+					then: { AccountPermissionChooseAccounts.View(store: $0) }
 				)
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.MainState.personaDataPermission,

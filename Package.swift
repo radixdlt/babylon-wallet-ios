@@ -81,6 +81,15 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "ChooseAccounts",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AccountsClient",
+			"CreateEntityFeature",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "CreateAuthKeyFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -106,11 +115,10 @@ package.addModules([
 	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
-			"AccountsClient",
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
-			"CreateEntityFeature",
 			"CacheClient",
+			"ChooseAccounts",
 			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
@@ -118,6 +126,7 @@ package.addModules([
 			"PersonasClient",
 			"ROLAClient",
 			"TransactionReviewFeature",
+			"SigningFeature",
 		],
 		tests: .yes()
 	),
