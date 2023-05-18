@@ -8,7 +8,7 @@ extension Completion {
 
 		init(state: Completion.State) {
 			title = L10n.DAppRequest.Completion.title
-			subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name.rawValue)
+			subtitle = L10n.DAppRequest.Completion.subtitle(state.dappMetadata.name)
 		}
 	}
 

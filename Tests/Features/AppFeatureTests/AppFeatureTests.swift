@@ -31,6 +31,7 @@ final class AppFeatureTests: TestCase {
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
 		// GIVEN: an existing profile (ephemeralPrivateProfile)
+		let accountRecoveryNeeded = true
 		let clock = TestClock()
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
@@ -38,11 +39,16 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue.errors = { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 			$0.continuousClock = clock
+
+			$0.deviceFactorSourceClient.isAccountRecoveryNeeded = {
+				accountRecoveryNeeded
+			}
 		}
 
 		// then
-		await store.send(.child(.splash(.delegate(.loadProfileOutcome(.existingProfileLoaded))))) {
-			$0.root = .main(.init())
+		await store.send(.child(.splash(.delegate(.loadProfileOutcome(.existingProfile)))))
+		await store.receive(.internal(.toMain(isAccountRecoveryNeeded: accountRecoveryNeeded))) {
+			$0.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryNeeded)))
 		}
 
 		await clock.run() // fast-forward clock to the end of time
@@ -128,7 +134,7 @@ final class AppFeatureTests: TestCase {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
 
-			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
+			$0.appPreferencesClient.deleteProfileAndFactorSources = { _ in
 				expectationProfileGotDeleted.fulfill()
 			}
 		}
@@ -137,7 +143,7 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		struct SomeError: Swift.Error {}
-		let badVersion: ProfileSnapshot.Version = 0
+		let badVersion: ProfileSnapshot.Header.Version = 0
 		let failedToCreateProfileFromSnapshot = Profile.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: Profile.LoadingFailure.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
@@ -178,7 +184,7 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
-			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
+			$0.appPreferencesClient.deleteProfileAndFactorSources = { _ in
 				profileDeletedExpectation.fulfill()
 			}
 		}
@@ -187,7 +193,7 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		struct SomeError: Swift.Error {}
-		let badVersion: ProfileSnapshot.Version = 0
+		let badVersion: ProfileSnapshot.Header.Version = 0
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
@@ -212,7 +218,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		waitForExpectations(timeout: 1)
+		await fulfillment(of: [profileDeletedExpectation], timeout: 1.0)
 		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}

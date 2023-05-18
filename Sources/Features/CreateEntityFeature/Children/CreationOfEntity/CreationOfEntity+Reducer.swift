@@ -97,7 +97,8 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case .createEntityResult(.failure):
+		case let .createEntityResult(.failure(error)):
+			errorQueue.schedule(error)
 			return .send(.delegate(.createEntityFailed))
 
 		case let .createEntityResult(.success(entity)):

@@ -65,31 +65,49 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
 		state.isLoading = true
-		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress, origin = state.interaction.metadata.origin] send in
-			let metadata = await TaskResult {
+		return .run { [request = state.interaction.metadata] send in
+
+			let result: TaskResult<DappMetadata> = await {
+				let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+				let dappDefinitionAddress = request.dAppDefinitionAddress
+
 				do {
-					return try await cacheClient.withCaching(
+					let cachedMetadata = try await cacheClient.withCaching(
 						cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
+						invalidateCached: { (cached: DappMetadata.Ledger) in
+							guard
+								cached.name != nil,
+								cached.description != nil,
+								cached.thumbnail != nil
+							else {
+								/// Some of these fields were not set, fetch and see if they
+								/// have been updated since last time...
+								return .cachedIsInvalid
+							}
+							// All relevant fields are set, the cached metadata is valid.
+							return .cachedIsValid
+						},
 						request: {
-							try await DappMetadata(
-								gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address).items,
-								origin: origin
+							let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address)
+							return DappMetadata.Ledger(
+								entityMetadataForDapp: entityMetadataForDapp,
+								dAppDefinintionAddress: dappDefinitionAddress,
+								origin: request.origin
 							)
 						}
 					)
-				} catch is BadHTTPResponseCode {
-					// FIXME: cleanup DappMetaData
-					return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
+					return .success(.ledger(cachedMetadata))
 				} catch {
-					if await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled {
-						loggerGlobal.notice("Failed to load metadata, but we surpressed the error since is appdeveloper")
-						return DappMetadata(name: nil, origin: .init("")) // Not found - return unknown dapp metadata as instructed by network team
-					} else {
-						throw error
+					guard isDeveloperModeEnabled else {
+						return .failure(error)
 					}
+					loggerGlobal.warning("Failed to fetch Dapps metadata, but since 'isDeveloperModeEnabled' is enabled we surpress the error and allow continuation. Error: \(error)")
+					return .success(.request(request))
 				}
-			}
-			await send(.internal(.dappMetadataLoadingResult(metadata)))
+
+			}()
+
+			await send(.internal(.dappMetadataLoadingResult(result)))
 		}
 	}
 
@@ -98,6 +116,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		case let .dappMetadataLoadingResult(.success(dappMetadata)):
 			state.isLoading = false
 			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
+
 		case let .dappMetadataLoadingResult(.failure(error)):
 			state.errorAlert = .init(
 				title: { TextState(L10n.Common.errorAlertTitle) },
@@ -126,16 +145,26 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	}
 }
 
-extension DappMetadata {
+extension DappMetadata.Ledger {
 	init(
-		_ items: [GatewayAPI.EntityMetadataItem],
+		entityMetadataForDapp: GatewayAPI.EntityMetadataCollection,
+		dAppDefinintionAddress: AccountAddress,
 		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
+		let items = entityMetadataForDapp.items
+		let maybeName: String? = items[.name]?.asString
+		let name: NonEmptyString? = {
+			guard let name = maybeName else {
+				return nil
+			}
+			return NonEmptyString(rawValue: name)
+		}()
 		self.init(
-			name: items[.name]?.asString,
-			thumbnail: items[.iconURL]?.asString.flatMap(URL.init),
+			origin: origin,
+			dAppDefinintionAddress: dAppDefinintionAddress,
+			name: name,
 			description: items[.description]?.asString,
-			origin: origin
+			thumbnail: items[.iconURL]?.asString.flatMap(URL.init)
 		)
 	}
 }

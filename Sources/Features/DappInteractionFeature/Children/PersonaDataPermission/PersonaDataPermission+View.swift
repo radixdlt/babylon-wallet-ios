@@ -1,6 +1,17 @@
 import EditPersonaFeature
 import FeaturePrelude
 
+extension DappMetadata {
+	var name: String {
+		switch self {
+		case let .ledger(ledger):
+			return ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
+		case .request:
+			return L10n.DAppRequest.Metadata.unknownName
+		}
+	}
+}
+
 // MARK: - Permission.View
 extension PersonaDataPermission {
 	struct ViewState: Equatable {
@@ -12,7 +23,7 @@ extension PersonaDataPermission {
 		init(state: PersonaDataPermission.State) {
 			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = L10n.DAppRequest.PersonalDataPermission.title
-			self.subtitle = L10n.DAppRequest.PersonalDataPermission.subtitle(state.dappMetadata.name.rawValue)
+			self.subtitle = L10n.DAppRequest.PersonalDataPermission.subtitle(state.dappMetadata.name)
 			self.output = {
 				guard let persona = state.persona else {
 					return nil

@@ -8,12 +8,24 @@ import SecureStorageClient
 public struct DeviceFactorSourceClient: Sendable {
 	public var publicKeyFromOnDeviceHD: PublicKeyFromOnDeviceHD
 	public var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
+	public var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
+
+	public init(
+		publicKeyFromOnDeviceHD: @escaping PublicKeyFromOnDeviceHD,
+		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
+		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded
+	) {
+		self.publicKeyFromOnDeviceHD = publicKeyFromOnDeviceHD
+		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
+		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
+	}
 }
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
 	public typealias PublicKeyFromOnDeviceHD = @Sendable (PublicKeyFromOnDeviceHDRequest) async throws -> Engine.PublicKey
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
+	public typealias IsAccountRecoveryNeeded = @Sendable () async -> Bool
 }
 
 // MARK: - DiscrepancyUnsupportedCurve
@@ -90,7 +102,7 @@ extension DeviceFactorSourceClient {
 			}()
 
 			guard
-				let deviceFactorSource = try await factorSourcesClient.getFactorSource(of: factorInstance)
+				let deviceFactorSource = try await factorSourcesClient.getDeviceFactorSource(of: factorInstance)
 			else {
 				throw FailedToDeviceFactorSourceForSigning()
 			}
@@ -110,7 +122,7 @@ extension DeviceFactorSourceClient {
 	}
 
 	public func signUsingDeviceFactorSource(
-		deviceFactorSource: FactorSource,
+		deviceFactorSource: HDOnDeviceFactorSource,
 		signerEntities: Set<EntityPotentiallyVirtual>,
 		unhashedDataToSign: some DataProtocol,
 		purpose: SigningPurpose
@@ -142,12 +154,7 @@ extension DeviceFactorSourceClient {
 					}
 				}()
 
-				guard let derivationPath = factorInstance.derivationPath else {
-					let errMsg = "Expected derivation path on unsecured factorInstance"
-					loggerGlobal.critical(.init(stringLiteral: errMsg))
-					assertionFailure(errMsg)
-					throw FactorInstanceDoesNotHaveADerivationPathUnableToSign()
-				}
+				let derivationPath = factorInstance.derivationPath
 
 				if factorInstance.factorSourceID != factorSourceID {
 					let errMsg = "Discrepancy, you specified to use a device factor source you beleived to be the one controlling the entity, but it does not match the genesis factor source id."
@@ -164,15 +171,12 @@ extension DeviceFactorSourceClient {
 					curve: curve,
 					unhashedData: Data(unhashedDataToSign)
 				))
-				let sigatureWithDerivationPath = Signature(
-					signatureWithPublicKey: signatureWithPublicKey,
-					derivationPath: factorInstance.derivationPath
-				)
 
-				let entitySignature = try SignatureOfEntity(
+				let entitySignature = SignatureOfEntity(
 					signerEntity: entity,
-					factorInstance: factorInstance,
-					signature: sigatureWithDerivationPath
+					derivationPath: derivationPath,
+					factorSourceID: factorSourceID,
+					signatureWithPublicKey: signatureWithPublicKey
 				)
 
 				signatures.insert(entitySignature)

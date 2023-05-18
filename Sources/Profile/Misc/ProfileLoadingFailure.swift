@@ -6,7 +6,7 @@ extension Profile {
 	public enum LoadingFailure: Sendable, Swift.Error, Hashable {
 		case profileVersionOutdated(
 			json: Data,
-			version: ProfileSnapshot.Version
+			version: ProfileSnapshot.Header.Version
 		)
 
 		case decodingFailure(json: Data, JSONDecodingError)
@@ -15,14 +15,16 @@ extension Profile {
 		// potential discrepancy in version check, or due to some internal
 		// error when creating a profile from a snapshot.
 		case failedToCreateProfileFromSnapshot(FailedToCreateProfileFromSnapshot)
+
+		case profileUsedOnAnotherDevice(ProfileIsUsedOnAnotherDeviceError)
 	}
 }
 
 extension Profile {
 	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Hashable {
-		public let version: ProfileSnapshot.Version
+		public let version: ProfileSnapshot.Header.Version
 		public let error: Swift.Error
-		public init(version: ProfileSnapshot.Version, error: Error) {
+		public init(version: ProfileSnapshot.Header.Version, error: Error) {
 			self.version = version
 			self.error = error
 		}
@@ -31,6 +33,18 @@ extension Profile {
 	public enum JSONDecodingError: Sendable, LocalizedError, Equatable {
 		case known(KnownDecodingError)
 		case unknown(UnknownDecodingError)
+	}
+
+	public struct ProfileIsUsedOnAnotherDeviceError: Sendable, LocalizedError, Hashable {
+		public let lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo
+
+		public var errorDescription: String? {
+			"The Wallet Data is being used on another device"
+		}
+
+		public init(lastUsedOnDevice: ProfileSnapshot.Header.UsedDeviceInfo) {
+			self.lastUsedOnDevice = lastUsedOnDevice
+		}
 	}
 }
 

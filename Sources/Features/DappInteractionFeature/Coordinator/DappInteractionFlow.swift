@@ -57,7 +57,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
-				self.root = Destinations.State(for: interactionItems.first, remoteInteraction, dappMetadata, nil)
+				self.root = Destinations.State(
+					for: interactionItems.first,
+					interaction: remoteInteraction,
+					dappMetadata: dappMetadata,
+					persona: nil
+				)
 			} else {
 				return nil
 			}
@@ -184,7 +189,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .run { [dappDefinitionAddress = state.remoteInteraction.metadata.dAppDefinitionAddress] send in
+			return .run { [dappDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
 
 				let identityAddress = usePersonaRequestItem.identityAddress
 				guard
@@ -293,11 +298,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				guard
 					// A **single** signature expected, since we sign auth with a single Persona.
 					let entitySignature = signedAuthChallenge.entitySignatures.first,
-					signedAuthChallenge.entitySignatures.count == 1,
-					let proof = P2P.Dapp.Response.AuthProof(entitySignature: entitySignature)
+					signedAuthChallenge.entitySignatures.count == 1
 				else {
 					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
 				}
+				let proof = P2P.Dapp.Response.AuthProof(entitySignature: entitySignature)
 
 				state.responseItems[item] = .remote(.auth(.login(.withChallenge(.init(
 					persona: responsePersona,
@@ -542,9 +547,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
 			let destination = Destinations.State(
 				for: nextRequest,
-				state.remoteInteraction,
-				state.dappMetadata,
-				state.persona
+				interaction: state.remoteInteraction,
+				dappMetadata: state.dappMetadata,
+				persona: state.persona
 			)
 		{
 			if state.root == nil {
@@ -585,8 +590,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let networkID = await gatewaysClient.getCurrentNetworkID()
 		var authorizedDapp = state.authorizedDapp ?? .init(
 			networkID: networkID,
-			dAppDefinitionAddress: state.remoteInteraction.metadata.dAppDefinitionAddress,
-			displayName: state.dappMetadata.name
+			dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress,
+			displayName: {
+				switch state.dappMetadata {
+				case let .ledger(ledger): return ledger.name
+				case .request: return nil
+				}
+			}()
 		)
 		// This extraction is really verbose right now, but it should become a lot simpler with native case paths
 		let sharedAccountsInfo: (P2P.Dapp.Request.NumberOfAccounts, [P2P.Dapp.Response.WalletAccount])? = unwrap(
@@ -672,7 +682,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 }
 
 extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
-	init(for remoteInteractionItems: some Collection<DappInteractionFlow.State.RemoteInteractionItem>) {
+	init(
+		for remoteInteractionItems: some Collection<DappInteractionFlow.State.RemoteInteractionItem>
+	) {
 		self.init(
 			remoteInteractionItems
 				.sorted(by: { $0.priority < $1.priority })
@@ -704,16 +716,15 @@ extension DappInteractionFlow.ChildAction {
 extension DappInteractionFlow.Destinations.State {
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
-		_ interaction: DappInteractionFlow.State.RemoteInteraction,
-		_ dappMetadata: DappMetadata,
-		_ persona: Profile.Network.Persona?
+		interaction: DappInteractionFlow.State.RemoteInteraction,
+		dappMetadata: DappMetadata,
+		persona: Profile.Network.Persona?
 	) {
 		switch anyItem {
 		case .remote(.auth(.usePersona)):
 			return nil
 		case let .remote(.auth(.login(loginRequest))):
 			self = .relayed(anyItem, with: .login(.init(
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
 				loginRequest: loginRequest
 			)))
@@ -728,7 +739,7 @@ extension DappInteractionFlow.Destinations.State {
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .ongoing,
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress, dappMetadata: dappMetadata,
+				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))
 
@@ -736,7 +747,7 @@ extension DappInteractionFlow.Destinations.State {
 			self = .relayed(anyItem, with: .chooseAccounts(.init(
 				challenge: item.challenge,
 				accessKind: .oneTime,
-				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress, dappMetadata: dappMetadata,
+				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			)))
 

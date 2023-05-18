@@ -11,10 +11,12 @@ extension SLIP10 {
 }
 
 extension SLIP10.Signature {
-	public func serialize() throws -> Data {
+	public func serialize() -> Data {
 		switch self {
 		case let .ecdsaSecp256k1(secp256k1):
-			return try secp256k1.radixSerialize()
+			do { return try secp256k1.radixSerialize() } catch {
+				fatalError("Failed to serialize signature, this should never happend. Error: \(error)")
+			}
 		case let .eddsaEd25519(curve25519):
 			return curve25519
 		}

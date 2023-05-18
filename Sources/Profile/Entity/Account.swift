@@ -111,13 +111,12 @@ extension Profile.Network.Account {
 	}
 
 	public static let nameMaxLength = 30
+
 	public static func deriveAddress(
 		networkID: NetworkID,
-		factorInstance: FactorInstance
+		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
-		if let derivationPath = factorInstance.derivationPath {
-			_ = try derivationPath.asAccountPath()
-		}
+		_ = try factorInstance.derivationPath.asAccountPath()
 		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
 			request: .init(
 				publicKey: factorInstance.publicKey.intoEngine(),

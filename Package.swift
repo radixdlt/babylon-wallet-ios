@@ -260,6 +260,7 @@ package.addModules([
 			"RadixConnectClient",
 			"ScanQRFeature",
 			"EditPersonaFeature",
+			"ProfileBackupsFeature",
 		],
 		tests: .yes()
 	),
@@ -296,10 +297,14 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+	.feature(
+		name: "ProfileBackupsFeature",
+		dependencies: [],
+		tests: .no
+	),
 ])
 
 // MARK: - Clients
-
 package.addModules([
 	.client(
 		name: "AccountsClient",
@@ -337,6 +342,7 @@ package.addModules([
 		dependencies: [
 			"AppPreferencesClient",
 			"ProfileStore",
+			"SecureStorageClient",
 		],
 		tests: .yes()
 	),
@@ -382,7 +388,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.client(
 		name: "FactorSourcesClient",
 		dependencies: [
@@ -525,6 +530,18 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
+		name: "QRGeneratorClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "QRGeneratorClientLive",
+		dependencies: [
+			"QRGeneratorClient",
+		],
+		tests: .no
+	),
+	.client(
 		name: "RadixConnectClient",
 		dependencies: [
 			"RadixConnect",
@@ -608,10 +625,11 @@ package.addModules([
 	.client(
 		name: "DeviceFactorSourceClient",
 		dependencies: [
-			"Profile",
 			"Cryptography",
 			"FactorSourcesClient",
+			"Profile",
 			"SecureStorageClient",
+			"AccountsClient",
 		],
 		tests: .no
 	),
@@ -656,6 +674,7 @@ package.addModules([
 		name: "DesignSystem",
 		dependencies: [
 			"URLFormatterClient",
+			"QRGeneratorClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
 			},

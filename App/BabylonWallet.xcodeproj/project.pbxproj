@@ -10,6 +10,7 @@
 		837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 837BC3C629BB28CF0082C363 /* P2PLinksClientLive */; };
 		83B9D894294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
+		A43E8A3D2A1658B000642E44 /* QRGeneratorClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A43E8A3C2A1658B000642E44 /* QRGeneratorClientLive */; };
 		A45AB03129FD96530097F5E1 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A45AB03029FD96530097F5E1 /* URLFormatterClientLive */; };
 		A4DD048329FABBC20052FCB0 /* URLFormatterClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
@@ -76,6 +77,7 @@
 				E6203E4029B1E943000B8784 /* AccountsClientLive in Frameworks */,
 				E6203E4829B1E943000B8784 /* GatewaysClientLive in Frameworks */,
 				837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */,
+				A43E8A3D2A1658B000642E44 /* QRGeneratorClientLive in Frameworks */,
 				A4DD048329FABBC20052FCB0 /* URLFormatterClientLive in Frameworks */,
 				E6203E4A29B1E943000B8784 /* OnboardingClientLive in Frameworks */,
 				E6203E4429B1E943000B8784 /* AuthorizedDappsClientLive in Frameworks */,
@@ -223,7 +225,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				A4DD048129FABBB70052FCB0 /* PBXTargetDependency */,
+				A43E8A3B2A1658A800642E44 /* PBXTargetDependency */,
+				489948262A0186DC00EE807A /* PBXTargetDependency */,
 				E6203E5229B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5429B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5629B1E957000B8784 /* PBXTargetDependency */,
@@ -246,6 +249,7 @@
 				E6203E4D29B1E943000B8784 /* PersonasClientLive */,
 				837BC3C629BB28CF0082C363 /* P2PLinksClientLive */,
 				A4DD048229FABBC20052FCB0 /* URLFormatterClientLive */,
+				A43E8A3C2A1658B000642E44 /* QRGeneratorClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -370,13 +374,17 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		489948262A0186DC00EE807A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 489948252A0186DC00EE807A /* URLFormatterClientLive */;
+		};
+		A43E8A3B2A1658A800642E44 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = A43E8A3A2A1658A800642E44 /* QRGeneratorClientLive */;
+		};
 		A45AB02F29FD964B0097F5E1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = A45AB02E29FD964B0097F5E1 /* URLFormatterClientLive */;
-		};
-		A4DD048129FABBB70052FCB0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */;
 		};
 		E6203E5029B1E951000B8784 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -616,19 +624,27 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		489948252A0186DC00EE807A /* URLFormatterClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = URLFormatterClientLive;
+		};
 		837BC3C629BB28CF0082C363 /* P2PLinksClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = P2PLinksClientLive;
+		};
+		A43E8A3A2A1658A800642E44 /* QRGeneratorClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = QRGeneratorClientLive;
+		};
+		A43E8A3C2A1658B000642E44 /* QRGeneratorClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = QRGeneratorClientLive;
 		};
 		A45AB02E29FD964B0097F5E1 /* URLFormatterClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = URLFormatterClientLive;
 		};
 		A45AB03029FD96530097F5E1 /* URLFormatterClientLive */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = URLFormatterClientLive;
-		};
-		A4DD048029FABBB70052FCB0 /* URLFormatterClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = URLFormatterClientLive;
 		};

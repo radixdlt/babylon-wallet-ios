@@ -69,7 +69,11 @@ extension AuthorizedDapps.View {
 extension AuthorizedDapps.State {
 	var viewState: AuthorizedDapps.ViewState {
 		let dAppViewStates = dApps.map {
-			AuthorizedDapps.ViewState.Dapp(id: $0.id, name: $0.displayName.rawValue, thumbnail: thumbnails[$0.id])
+			AuthorizedDapps.ViewState.Dapp(
+				id: $0.id,
+				name: $0.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+				thumbnail: thumbnails[$0.id]
+			)
 		}
 
 		return .init(dApps: .init(uniqueElements: dAppViewStates))

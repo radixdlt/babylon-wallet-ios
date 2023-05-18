@@ -7,9 +7,10 @@ import GatewaySettingsFeature
 import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
+import ProfileBackupsFeature
 
 // MARK: - AppSettings
-public struct AppSettings: FeatureReducer {
+public struct AppSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
@@ -50,11 +51,18 @@ public struct AppSettings: FeatureReducer {
 		case generalSettingsButtonTapped
 		case factorSourcesButtonTapped
 		case importFromOlympiaWalletButtonTapped
+		case profileBackupsTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
 		case setDebugProfileSheet(isPresented: Bool)
 		#endif
+
+		public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
+			case deleteProfile
+			case deleteProfileLocalKeepInICloudIfPresent
+			case cancel
+		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -70,11 +78,12 @@ public struct AppSettings: FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when TCA tools are released
-		case deleteProfileAndFactorSources
+		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case deleteProfileConfirmationDialog(ConfirmationDialogState<ViewAction.DeleteProfileConfirmationDialogAction>)
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 			case manageFactorSources(ManageFactorSources.State)
 			case manageP2PLinks(P2PLinksFeature.State)
@@ -82,9 +91,11 @@ public struct AppSettings: FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 			case generalSettings(GeneralSettings.State)
+			case profileBackups(ProfileBackups.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case deleteProfileConfirmationDialog(ViewAction.DeleteProfileConfirmationDialogAction)
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 			case manageFactorSources(ManageFactorSources.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
@@ -92,6 +103,7 @@ public struct AppSettings: FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 			case generalSettings(GeneralSettings.Action)
+			case profileBackups(ProfileBackups.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -116,6 +128,9 @@ public struct AppSettings: FeatureReducer {
 			Scope(state: /State.generalSettings, action: /Action.generalSettings) {
 				GeneralSettings()
 			}
+			Scope(state: /State.profileBackups, action: /Action.profileBackups) {
+				ProfileBackups()
+			}
 		}
 	}
 
@@ -137,11 +152,24 @@ public struct AppSettings: FeatureReducer {
 			return .send(.delegate(.dismiss))
 
 		case .deleteProfileAndFactorSourcesButtonTapped:
-			return .task {
-				cacheClient.removeAll()
-				await radixConnectClient.disconnectAndRemoveAll()
-				return .delegate(.deleteProfileAndFactorSources)
-			}
+			state.destination = .deleteProfileConfirmationDialog(
+				.init(titleVisibility: .hidden) {
+					TextState("")
+				} actions: {
+					ButtonState(role: .destructive, action: .send(.deleteProfile)) {
+						TextState("Delete Wallet data")
+					}
+					ButtonState(role: .destructive, action: .send(.deleteProfileLocalKeepInICloudIfPresent)) {
+						TextState("Delete local Wallet data (keep iCloud)")
+					}
+					ButtonState(role: .cancel, action: .send(.cancel)) {
+						TextState("Cancel")
+					}
+				} message: {
+					TextState("Are REALLY you sure you wanna delete wallet data? If you have not backed up your seedphrase you will forever lose access to all your assets of all your accounts and also loose all of your personas.")
+				}
+			)
+			return .none
 
 		case .factorSourcesButtonTapped:
 			state.destination = .manageFactorSources(.init())
@@ -176,6 +204,10 @@ public struct AppSettings: FeatureReducer {
 			state.destination = .generalSettings(.init())
 			return .none
 
+		case .profileBackupsTapped:
+			state.destination = .profileBackups(.init())
+			return .none
+
 		#if DEBUG
 		case .debugInspectProfileButtonTapped:
 			return .run { send in
@@ -206,12 +238,18 @@ public struct AppSettings: FeatureReducer {
 		case let .profileToDebugLoaded(profile):
 			state.profileToInspect = profile
 			return .none
-		#endif
+		#endif // DEBUG
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfile))):
+			return deleteProfile(keepInICloudIfPresent: false)
+
+		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfileLocalKeepInICloudIfPresent))):
+			return deleteProfile(keepInICloudIfPresent: true)
+
 		case .destination(.dismiss):
 			switch state.destination {
 			case .manageP2PLinks:
@@ -240,9 +278,17 @@ extension AppSettings {
 		.task {
 			await .internal(.loadP2PLinksResult(
 				TaskResult {
-					try await p2pLinksClient.getP2PLinks()
+					await p2pLinksClient.getP2PLinks()
 				}
 			))
+		}
+	}
+
+	fileprivate func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
+		.task {
+			cacheClient.removeAll()
+			await radixConnectClient.disconnectAndRemoveAll()
+			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
 		}
 	}
 }

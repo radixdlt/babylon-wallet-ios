@@ -5,8 +5,11 @@ import GatewaySettingsFeature
 import GeneralSettings
 import P2PLinksFeature
 import PersonasFeature
+import ProfileBackupsFeature
 #if DEBUG
+import EngineToolkit // read RET commit hash
 import InspectProfileFeature
+import RadixConnectModels // read signaling client url
 import SecureStorageClient
 #endif
 
@@ -25,6 +28,7 @@ extension AppSettings {
 		#if DEBUG
 		let isDebugProfileViewSheetPresented: Bool
 		let profileToInspect: Profile?
+		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
 		let appVersion: String
@@ -33,7 +37,16 @@ extension AppSettings {
 			#if DEBUG
 			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			self.profileToInspect = state.profileToInspect
+			let retCommitHash: String = {
+				do {
+					return try EngineToolkit().information().get().lastCommitHash
+				} catch {
+					return "Unknown"
+				}
+			}()
+			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
 			#endif
+
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
@@ -50,6 +63,11 @@ extension AppSettings.View {
 				.navigationBarTitleDisplayMode(.inline)
 			#endif
 				.navigationDestinations(with: store, viewStore)
+				.confirmationDialog(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
+					action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
+				)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}
@@ -101,6 +119,7 @@ extension View {
 			.authorizedDapps(with: store)
 			.personas(with: store)
 			.generalSettings(with: store)
+			.profileBackups(with: store)
 	}
 }
 
@@ -174,6 +193,16 @@ extension View {
 			destination: { GeneralSettings.View(store: $0) }
 		)
 	}
+
+	@MainActor
+	private func profileBackups(with store: StoreOf<AppSettings>) -> some View {
+		self.navigationDestination(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /AppSettings.Destinations.State.profileBackups,
+			action: AppSettings.Destinations.Action.profileBackups,
+			destination: { ProfileBackups.View(store: $0) }
+		)
+	}
 }
 
 // MARK: - SettingsRowModel
@@ -182,8 +211,16 @@ extension AppSettings.View {
 	struct RowModel: Identifiable {
 		var id: String { title }
 		let title: String
+		let subtitle: String?
 		let asset: ImageAsset
 		let action: AppSettings.ViewAction
+
+		init(title: String, subtitle: String? = nil, asset: ImageAsset, action: AppSettings.ViewAction) {
+			self.title = title
+			self.subtitle = subtitle
+			self.asset = asset
+			self.action = action
+		}
 	}
 
 	@MainActor
@@ -213,6 +250,12 @@ extension AppSettings.View {
 				title: L10n.Settings.appSettings,
 				asset: AssetResource.generalSettings,
 				action: .generalSettingsButtonTapped
+			),
+			.init(
+				title: L10n.Settings.backups,
+				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
+				asset: AssetResource.backups,
+				action: .profileBackupsTapped
 			),
 		]
 	}
@@ -275,6 +318,13 @@ extension AppSettings.View {
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.padding(.bottom, .medium1)
+					#if DEBUG
+
+					Text(viewStore.debugAppInfo)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.padding(.bottom, .medium1)
+					#endif // DEBUG
 				}
 			}
 			.onAppear {

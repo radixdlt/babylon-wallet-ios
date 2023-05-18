@@ -6,8 +6,8 @@ import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
 
-// MARK: - RequestEnvelop
-struct RequestEnvelop: Sendable, Hashable {
+// MARK: - RequestEnvelope
+struct RequestEnvelope: Sendable, Hashable {
 	let route: P2P.RTCRoute
 	let request: P2P.Dapp.Request
 }
@@ -15,7 +15,7 @@ struct RequestEnvelop: Sendable, Hashable {
 // MARK: - DappInteractor
 struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		var requestQueue: OrderedSet<RequestEnvelop> = []
+		var requestQueue: OrderedSet<RequestEnvelope> = []
 
 		@PresentationState
 		var currentModal: Destinations.State?
@@ -35,8 +35,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case invalidRequestAlert(PresentationAction<InvalidRequestAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
-			case cancelButtonTapped(RequestEnvelop)
-			case retryButtonTapped(P2P.Dapp.Response, for: RequestEnvelop, DappMetadata?)
+			case cancelButtonTapped(RequestEnvelope)
+			case retryButtonTapped(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
 		}
 
 		enum InvalidRequestAlertAction: Sendable, Hashable {
@@ -45,11 +45,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case receivedRequestFromDapp(RequestEnvelop)
+		case receivedRequestFromDapp(RequestEnvelope)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(P2P.Dapp.Response, for: RequestEnvelop, DappMetadata?)
-		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelop, DappMetadata?, reason: String)
-		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelop, DappMetadata?, reason: String)
+		case sentResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata)
+		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
+		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
 		case presentResponseSuccessView(DappMetadata)
 		case presentInvalidRequest(DappRequestValidationOutcome.Invalid, isDeveloperModeEnabled: Bool)
 	}
@@ -60,12 +60,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
-			case dappInteraction(RelayState<RequestEnvelop, DappInteractionCoordinator.State>)
+			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
-			case dappInteraction(RelayAction<RequestEnvelop, DappInteractionCoordinator.Action>)
+			case dappInteraction(RelayAction<RequestEnvelope, DappInteractionCoordinator.Action>)
 			case dappInteractionCompletion(Completion.Action)
 		}
 
@@ -144,8 +144,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
-				// FIXME: cleanup DappMetaData
-				return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil, origin: .init("")))))
+				return .send(.internal(.presentResponseSuccessView(dappMetadata)))
 			case .failure:
 				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
@@ -199,8 +198,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
-			// FIXME: cleanup DappMetaData
-			return .send(.internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil, origin: .init("")))))
+			return .send(.internal(.presentResponseSuccessView(dappMetadata)))
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
@@ -225,8 +223,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func sendResponseToDappEffect(
 		_ responseToDapp: P2P.Dapp.Response,
-		for request: RequestEnvelop,
-		dappMetadata: DappMetadata?
+		for request: RequestEnvelope,
+		dappMetadata: DappMetadata
 	) -> EffectTask<Action> {
 		.run { send in
 
@@ -267,7 +265,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	func dismissCurrentModalAndRequest(_ request: RequestEnvelop, for state: inout State) {
+	func dismissCurrentModalAndRequest(_ request: RequestEnvelope, for state: inout State) {
 		state.requestQueue.remove(request)
 		state.currentModal = nil
 	}
@@ -275,12 +273,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 // MARK: - DappRequestValidationOutcome
 enum DappRequestValidationOutcome: Sendable, Hashable {
-	case valid(RequestEnvelop)
+	case valid(RequestEnvelope)
 	case invalid(Invalid)
 	enum Invalid: Sendable, Hashable {
 		case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)
 		case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
 		case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
+		case invalidOrigin(invalidURLString: String)
 		case badContent(BadContent)
 		enum BadContent: Sendable, Hashable {
 			case numberOfAccountsInvalid
@@ -295,6 +294,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return "Invalid content"
 		case .incompatibleVersion:
 			return "Incompatible connector extension"
+		case .invalidOrigin:
+			return "Invalid origin"
 		case .invalidDappDefinitionAddress:
 			return "Invalid dAppDefinitionAddress"
 		case .wrongNetworkID:
@@ -321,6 +322,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return shortExplaination + " (CE: \(ce), wallet: \(wallet))"
 		case let .invalidDappDefinitionAddress(invalidAddress):
 			return "'\(invalidAddress)' is not valid account address."
+		case let .invalidOrigin(invalidURLString):
+			return "'\(invalidURLString)' is not valid origin."
 		case .wrongNetworkID:
 			return shortExplaination
 		}
@@ -334,6 +337,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return ce > wallet ? "Update Wallet" : "Update Connector Extension"
 		case .invalidDappDefinitionAddress:
 			return "Invalid dAppDefinitionAddress"
+		case .invalidOrigin:
+			return "Invalid origin"
 		case let .wrongNetworkID(ce, wallet):
 			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
 		}
@@ -341,7 +346,11 @@ extension DappRequestValidationOutcome.Invalid {
 }
 
 extension DappInteractor {
-	func validate(_ nonValidated: P2P.Dapp.RequestUnvalidated, route: P2P.RTCRoute) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
+	/// Validates a received request from Dapp.
+	func validate(
+		_ nonValidated: P2P.Dapp.RequestUnvalidated,
+		route: P2P.RTCRoute
+	) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
 		let nonvalidatedMeta = nonValidated.metadata
 		let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 		let outcome: DappRequestValidationOutcome = await {
@@ -378,10 +387,18 @@ extension DappInteractor {
 				}
 			}
 
+			guard
+				let originURL = URL(string: nonvalidatedMeta.origin),
+				let nonEmptyOriginURLString = NonEmptyString(rawValue: nonvalidatedMeta.origin)
+			else {
+				return .invalid(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin))
+			}
+			let origin = DappOrigin(urlString: nonEmptyOriginURLString, url: originURL)
+
 			let metadataValidDappDefAddres = P2P.Dapp.Request.Metadata(
 				version: nonvalidatedMeta.version,
 				networkId: nonvalidatedMeta.networkId,
-				origin: nonvalidatedMeta.origin,
+				origin: origin,
 				dAppDefinitionAddress: dappDefinitionAddress
 			)
 

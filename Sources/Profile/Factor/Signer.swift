@@ -15,10 +15,16 @@ public struct Signer: Sendable, Hashable, Identifiable {
 	public var id: ID { entity }
 	public let entity: EntityPotentiallyVirtual
 
-	public let factorInstancesRequiredToSign: Set<FactorInstance>
+	public let factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>
 
-	init(factorInstancesRequiredToSign: Set<FactorInstance>, of entity: EntityPotentiallyVirtual) throws {
-		guard entity.factorInstances.isSuperset(of: factorInstancesRequiredToSign) else {
+	init(
+		factorInstancesRequiredToSign: Set<HierarchicalDeterministicFactorInstance>,
+		of entity: EntityPotentiallyVirtual
+	) throws {
+		guard
+			entity.virtualHierarchicalDeterministicFactorInstances
+			.isSuperset(of: factorInstancesRequiredToSign)
+		else {
 			struct FoundUnrelatedFactorInstances: Swift.Error {}
 			throw FoundUnrelatedFactorInstances()
 		}
@@ -27,10 +33,15 @@ public struct Signer: Sendable, Hashable, Identifiable {
 	}
 
 	public init(
-		factorInstanceRequiredToSign: FactorInstance,
+		factorInstanceRequiredToSign: HierarchicalDeterministicFactorInstance,
 		entity: EntityPotentiallyVirtual
 	) throws {
-		try self.init(factorInstancesRequiredToSign: [factorInstanceRequiredToSign], of: entity)
+		try self.init(
+			factorInstancesRequiredToSign: [
+				factorInstanceRequiredToSign,
+			],
+			of: entity
+		)
 	}
 }
 
@@ -46,8 +57,8 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Id
 
 	case account(Profile.Network.Account)
 	case persona(Profile.Network.Persona)
-	public var factorInstances: Set<FactorInstance> {
-		property(\.factorInstances)
+	public var virtualHierarchicalDeterministicFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
+		property(\.virtualHierarchicalDeterministicFactorInstances)
 	}
 
 	public func asAccount() throws -> Profile.Network.Account {

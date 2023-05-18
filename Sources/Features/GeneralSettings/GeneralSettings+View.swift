@@ -5,7 +5,8 @@ extension GeneralSettings.State {
 		.init(
 			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
 			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
-			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false
+			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
+			isCloudProfileSyncEnabled: preferences?.security.isCloudProfileSyncEnabled ?? false
 		)
 	}
 }
@@ -19,6 +20,7 @@ extension GeneralSettings {
 		let useVerboseLedgerDisplayMode: Bool
 
 		let isDeveloperModeEnabled: Bool
+		let isCloudProfileSyncEnabled: Bool
 	}
 
 	@MainActor
@@ -42,6 +44,7 @@ extension GeneralSettings {
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				VStack(spacing: .zero) {
+					isCloudProfileSyncEnabled(with: viewStore)
 					isDeveloperModeEnabled(with: viewStore)
 					if viewStore.hasLedgerHardwareWalletFactorSources {
 						isUsingVerboseLedgerMode(with: viewStore)
@@ -50,6 +53,22 @@ extension GeneralSettings {
 				}
 				.padding(.medium3)
 			}
+			.alert(
+				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
+				state: /GeneralSettings.Alerts.State.confirmCloudSyncDisable,
+				action: GeneralSettings.Alerts.Action.confirmCloudSyncDisable
+			)
+		}
+
+		private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			ToggleView(
+				title: "Sync Wallet Data to iCloud",
+				subtitle: "Warning: If disabled you might lose access to accounts/personas.",
+				isOn: viewStore.binding(
+					get: \.isCloudProfileSyncEnabled,
+					send: { .cloudProfileSyncToggled($0) }
+				)
+			)
 		}
 
 		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
@@ -69,7 +88,7 @@ extension GeneralSettings {
 				subtitle: L10n.AppSettings.DeveloperMode.subtitle,
 				isOn: viewStore.binding(
 					get: \.isDeveloperModeEnabled,
-					send: { .developerModeToggled($0) }
+					send: { .developerModeToggled(.init($0)) }
 				)
 			)
 		}

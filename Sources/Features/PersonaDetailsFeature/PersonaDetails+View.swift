@@ -156,7 +156,7 @@ extension PersonaDetails.State {
 		case .general:
 			return nil
 		case let .dApp(dApp, persona):
-			return .init(dAppName: dApp.displayName.rawValue, sharingAccounts: persona.simpleAccounts ?? [])
+			return .init(dAppName: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName, sharingAccounts: persona.simpleAccounts ?? [])
 		}
 	}
 
@@ -273,7 +273,7 @@ private extension PersonaDetails.State {
 	var dAppInfo: PersonaDetails.View.InfoSection.ViewState.DappInfo? {
 		guard case let .dApp(dApp, persona) = mode else { return nil }
 		return .init(
-			name: dApp.displayName.rawValue,
+			name: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
 			isSharingNothing: persona.sharedFields.isNilOrEmpty
 		)
 	}

@@ -113,7 +113,7 @@ extension ChooseAccounts.State {
 	}
 
 	var subtitle: String {
-		let dAppName = dappMetadata.name.rawValue
+		let dAppName = dappMetadata.name
 
 		switch accessKind {
 		case .ongoing:
@@ -169,7 +169,6 @@ extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
 		challenge: nil,
 		accessKind: .ongoing,
-		dappDefinitionAddress: try! .init(address: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6"),
 		dappMetadata: .previewValue,
 		availableAccounts: .init(
 			uniqueElements: [

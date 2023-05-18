@@ -6,10 +6,9 @@ import FeaturePrelude
 import PersonasClient
 import ROLAClient
 
-// MARK: - LoginRequest
+// MARK: - Login
 struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 		let loginRequest: P2P.Dapp.Request.AuthLoginRequestItem
 
@@ -25,12 +24,10 @@ struct Login: Sendable, FeatureReducer {
 		var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
 
 		init(
-			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
 			loginRequest: P2P.Dapp.Request.AuthLoginRequestItem,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
-			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
 			self.loginRequest = loginRequest
 			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
@@ -105,11 +102,11 @@ struct Login: Sendable, FeatureReducer {
 			let createAuthPayloadRequest = AuthenticationDataToSignForChallengeRequest(
 				challenge: challenge,
 				origin: state.dappMetadata.origin,
-				dAppDefinitionAddress: state.dappDefinitionAddress
+				dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
 			)
 
 			return .run { [authorizedDapp = state.authorizedDapp] send in
-				let authToSignResponse = try await rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
+				let authToSignResponse = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					signerEntity: .persona(persona),
@@ -168,10 +165,10 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
-		.run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
+		.run { [dAppDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
-			let authorizedDapp = authorizedDapps[id: dappDefinitionAddress]
+			let authorizedDapp = authorizedDapps[id: dAppDefinitionAddress]
 			let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple? = {
 				guard let authorizedDapp else {
 					return nil
@@ -198,6 +195,15 @@ struct Login: Sendable, FeatureReducer {
 			let hasAnyPersonaOnAnyNetwork = await personasClient.hasAnyPersonaOnAnyNetwork()
 			let isFirstPersonaOnAnyNetwork = !hasAnyPersonaOnAnyNetwork
 			return .internal(.isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork))
+		}
+	}
+}
+
+extension DappMetadata {
+	var dAppDefinitionAddress: DappDefinitionAddress {
+		switch self {
+		case let .ledger(metadata): return metadata.dAppDefinintionAddress
+		case let .request(metadata): return metadata.dAppDefinitionAddress
 		}
 	}
 }
