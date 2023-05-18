@@ -59,8 +59,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 		case .startup(.delegate(.setupNewUser)):
 			state = .createAccountCoordinator(
 				.init(
-					config: .init(purpose: .firstAccountForNewProfile),
-					displayIntroduction: { _ in false }
+					config: .init(purpose: .firstAccountForNewProfile)
 				)
 			)
 			return .none
