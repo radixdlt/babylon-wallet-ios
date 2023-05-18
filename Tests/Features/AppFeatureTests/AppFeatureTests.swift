@@ -218,7 +218,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		waitForExpectations(timeout: 1)
+		await fulfillment(of: [profileDeletedExpectation], timeout: 1.0)
 		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
 	}
