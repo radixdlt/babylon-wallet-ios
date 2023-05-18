@@ -99,7 +99,8 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "CreateEntityFeature",
+		name: "CreateAccountFeature",
+		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
@@ -107,7 +108,17 @@ package.addModules([
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"LedgerHardwareWalletClient",
-			"LocalAuthenticationClient",
+			"DerivePublicKeyFeature",
+		],
+		tests: .yes()
+	),
+	.feature(
+		name: "CreatePersonaFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Cryptography",
+			"FactorSourcesClient",
+			"GatewayAPI",
 			"PersonasClient",
 			"DerivePublicKeyFeature",
 		],
@@ -119,7 +130,8 @@ package.addModules([
 			"AccountsClient",
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
-			"CreateEntityFeature",
+			"CreateAccountFeature",
+			"CreatePersonaFeature",
 			"CacheClient",
 			"EditPersonaFeature",
 			"GatewayAPI",
@@ -149,7 +161,7 @@ package.addModules([
 	.feature(
 		name: "GatewaySettingsFeature",
 		dependencies: [
-			"CreateEntityFeature",
+			"CreateAccountFeature",
 			"GatewaysClient",
 			"NetworkSwitchingClient",
 		],
@@ -171,7 +183,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"AccountsClient",
 			"AppPreferencesClient",
-			"CreateEntityFeature",
+			"CreateAccountFeature",
 		],
 		tests: .yes()
 	),
@@ -214,7 +226,7 @@ package.addModules([
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			"CreateEntityFeature",
+			"CreateAccountFeature",
 			"OnboardingClient",
 		],
 		tests: .yes()
@@ -231,7 +243,7 @@ package.addModules([
 		name: "PersonasFeature",
 		dependencies: [
 			"PersonaDetailsFeature",
-			"CreateEntityFeature",
+			"CreatePersonaFeature",
 			"PersonasClient",
 		],
 		tests: .yes()
