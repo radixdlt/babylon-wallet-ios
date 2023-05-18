@@ -1,15 +1,14 @@
-import AccountsClient
-import CreateEntityFeature
+import ChooseAccounts
 import FactorSourcesClient
 import FeaturePrelude
 import ROLAClient
 import SigningFeature
 
 // MARK: - ChooseAccountsResult
-typealias ChooseAccountsResult = P2P.Dapp.Response.Accounts
+typealias AccountPermissionChooseAccountsResult = P2P.Dapp.Response.Accounts
 
-// MARK: - ChooseAccounts
-struct ChooseAccounts: Sendable, FeatureReducer {
+// MARK: - AccountPermissionChooseAccounts
+struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		enum AccessKind: Sendable, Hashable {
 			case ongoing
@@ -21,10 +20,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		let accessKind: AccessKind
 		let dappMetadata: DappMetadata
-		let numberOfAccounts: DappInteraction.NumberOfAccounts
-		var selectedAccounts: [ChooseAccountsRow.State]?
-
-		var _chooseAcounts: _ChooseAccounts.State
+		var chooseAccounts: ChooseAccounts.State
 
 		@PresentationState
 		var destination: Destinations.State?
@@ -33,18 +29,26 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappMetadata: DappMetadata,
-			numberOfAccounts: DappInteraction.NumberOfAccounts,
-			selectedAccounts: [ChooseAccountsRow.State]? = nil,
-			createAccountCoordinator: CreateAccountCoordinator.State? = nil,
-			_chooseAccounts: _ChooseAccounts.State
+			chooseAccounts: ChooseAccounts.State
 		) {
 			self.challenge = challenge
 			self.accessKind = accessKind
 			self.dappMetadata = dappMetadata
-			self.numberOfAccounts = numberOfAccounts
-			self.selectedAccounts = selectedAccounts
-			self.destination = nil
-			self._chooseAcounts = _chooseAccounts
+			self.chooseAccounts = chooseAccounts
+		}
+
+		init(
+			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
+			accessKind: AccessKind,
+			dappMetadata: DappMetadata,
+			numberOfAccounts: DappInteraction.NumberOfAccounts
+		) {
+			self.init(
+				challenge: challenge,
+				accessKind: accessKind,
+				dappMetadata: dappMetadata,
+				chooseAccounts: .init(selectionRequirement: .init(numberOfAccounts))
+			)
 		}
 	}
 
@@ -58,13 +62,13 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
-		case _chooseAccounts(_ChooseAccounts.Action)
+		case chooseAccounts(ChooseAccounts.Action)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
 		case continueButtonTapped(
-			accessKind: ChooseAccounts.State.AccessKind,
-			chosenAccounts: ChooseAccountsResult
+			accessKind: AccountPermissionChooseAccounts.State.AccessKind,
+			chosenAccounts: AccountPermissionChooseAccountsResult
 		)
 		case failedToProveOwnership(of: [Profile.Network.Account])
 	}
@@ -91,6 +95,10 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
+			ChooseAccounts()
+		}
+
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -100,7 +108,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .continueButtonTapped(selectedAccounts):
-
 			let selectedAccounts = IdentifiedArray(uncheckedUniqueElements: selectedAccounts.map(\.account))
 
 			guard let challenge = state.challenge else {
@@ -148,11 +155,13 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		let selectedAccounts = (state.chooseAccounts.selectedAccounts ?? []).map(\.account)
+
 		switch childAction {
 		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(signedAuthChallenge)))))):
 			state.destination = nil
 
-			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set((state.selectedAccounts ?? []).map(\.account.id))
+			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set(selectedAccounts.map(\.id))
 			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
 				guard case let .account(account) = $0.signerEntity else {
 					fatalError()
@@ -163,10 +172,10 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 			guard accountsLeftToVerifyDidSign.isEmpty else {
 				loggerGlobal.error("Failed to sign with all accounts..")
-				return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
+				return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
 			}
 
-			let chosenAccounts: ChooseAccountsResult = .withProofOfOwnership(
+			let chosenAccounts: AccountPermissionChooseAccountsResult = .withProofOfOwnership(
 				challenge: signedAuthChallenge.challenge,
 				IdentifiedArrayOf<P2P.Dapp.Response.Accounts.WithProof>.init(uniqueElements: walletAccountsWithProof)
 			)
@@ -175,13 +184,13 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			state.destination = nil
 			loggerGlobal.error("Failed to sign proof of ownership")
-			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
+			return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
 
 		case .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction))))):
 			state.destination = nil
 			assertionFailure("wrong signing, signed tx, expected auth...")
 			loggerGlobal.error("Failed to sign proof of ownership")
-			return .send(.delegate(.failedToProveOwnership(of: (state.selectedAccounts ?? []).map(\.account))))
+			return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
 
 		default:
 			return .none

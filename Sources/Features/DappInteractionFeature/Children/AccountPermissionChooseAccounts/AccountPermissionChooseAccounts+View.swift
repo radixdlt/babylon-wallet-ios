@@ -1,48 +1,34 @@
-import CreateEntityFeature
+import ChooseAccounts
 import FeaturePrelude
 import SigningFeature
 
-// MARK: - ChooseAccounts.View
-extension ChooseAccounts {
-	struct ViewState: Equatable {
-		let thumbnail: URL?
-		let title: String
-		let subtitle: String
-		let _chooseAccounts: _ChooseAccounts.State
-
-		init(state: ChooseAccounts.State) {
-			self.thumbnail = state.dappMetadata.thumbnail
-			self.title = state.title
-			self.subtitle = state.subtitle
-			self._chooseAccounts = state._chooseAcounts
-		}
-	}
-
+// MARK: - AccountPermissionChooseAccounts.View
+extension AccountPermissionChooseAccounts {
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<ChooseAccounts>
+		let store: StoreOf<AccountPermissionChooseAccounts>
 
 		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: ChooseAccounts.ViewState.init,
+				observe: { $0 },
 				send: { .view($0) }
 			) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
-							thumbnail: viewStore.thumbnail,
+							thumbnail: viewStore.dappMetadata.thumbnail,
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
-						// TODO: Choose Account here
+						ChooseAccounts.View(store: store.scope(state: \.chooseAccounts, action: { .child(.chooseAccounts($0)) }))
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
 				}
 				.footer {
 					WithControlRequirements(
-						viewStore._chooseAccounts.selectedAccounts,
+						viewStore.chooseAccounts.selectedAccounts,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
 						Button(L10n.Common.continue, action: action)
@@ -51,8 +37,8 @@ extension ChooseAccounts {
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ChooseAccounts.Destinations.State.signing,
-					action: ChooseAccounts.Destinations.Action.signing,
+					state: /AccountPermissionChooseAccounts.Destinations.State.signing,
+					action: AccountPermissionChooseAccounts.Destinations.Action.signing,
 					content: { Signing.View(store: $0) }
 				)
 			}
@@ -60,7 +46,7 @@ extension ChooseAccounts {
 	}
 }
 
-extension ChooseAccounts.State {
+extension AccountPermissionChooseAccounts.State {
 	var title: String {
 		switch accessKind {
 		case .ongoing:
@@ -75,7 +61,7 @@ extension ChooseAccounts.State {
 
 		switch accessKind {
 		case .ongoing:
-			switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+			switch (chooseAccounts.selectionRequirement.quantifier, chooseAccounts.selectionRequirement.count) {
 			case (.atLeast, 0):
 				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleAtLeastZero(dAppName)
 			case (.atLeast, 1):
@@ -88,7 +74,7 @@ extension ChooseAccounts.State {
 				return L10n.DAppRequest.ChooseAccountsOngoing.subtitleExactly(number, dAppName)
 			}
 		case .oneTime:
-			switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+			switch (chooseAccounts.selectionRequirement.quantifier, chooseAccounts.selectionRequirement.count) {
 			case (.atLeast, 0):
 				return L10n.DAppRequest.ChooseAccountsOneTime.subtitleAtLeastZero(dAppName)
 			case (.atLeast, 1):
@@ -110,10 +96,10 @@ import SwiftUI // NB: necessary for previews to appear
 struct ChooseAccounts_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
 		NavigationStack {
-			ChooseAccounts.View(
+			AccountPermissionChooseAccounts.View(
 				store: .init(
 					initialState: .previewValue,
-					reducer: ChooseAccounts()
+					reducer: AccountPermissionChooseAccounts()
 				)
 			)
 			#if os(iOS)
@@ -123,22 +109,20 @@ struct ChooseAccounts_Preview: PreviewProvider {
 	}
 }
 
-extension ChooseAccounts.State {
+extension AccountPermissionChooseAccounts.State {
 	static let previewValue: Self = .init(
 		challenge: nil,
 		accessKind: .ongoing,
 		dappMetadata: .previewValue,
-		numberOfAccounts: .exactly(1),
-                createAccountCoordinator: nil,
-                _chooseAccounts: .init(
-                        selectionRequirement: .exactly(1),
-                        availableAccounts: .init(
-                                uniqueElements: [
-                                        .previewValue0,
-                                        .previewValue1,
-                                ]
-                        )
-                )
-        )
+		chooseAccounts: .init(
+			selectionRequirement: .exactly(1),
+			availableAccounts: .init(
+				uniqueElements: [
+					.previewValue0,
+					.previewValue1,
+				]
+			)
+		)
+	)
 }
 #endif

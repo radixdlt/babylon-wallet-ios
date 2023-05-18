@@ -1,17 +1,17 @@
 import FeaturePrelude
 
 // MARK: - ChooseAccountsRow
-enum ChooseAccountsRow {
-	struct State: Sendable, Hashable {
-		enum Mode {
+public enum ChooseAccountsRow {
+	public struct State: Sendable, Hashable {
+		public enum Mode {
 			case checkmark
 			case radioButton
 		}
 
-		let account: Profile.Network.Account
-		let mode: Mode
+		public let account: Profile.Network.Account
+		public let mode: Mode
 
-		init(
+		public init(
 			account: Profile.Network.Account,
 			mode: Mode
 		) {

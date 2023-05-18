@@ -126,7 +126,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		enum MainState: Sendable, Hashable {
 			case login(Login.State)
 			case accountPermission(AccountPermission.State)
-			case chooseAccounts(ChooseAccounts.State)
+			case chooseAccounts(AccountPermissionChooseAccounts.State)
 			case personaDataPermission(PersonaDataPermission.State)
 			case oneTimePersonaData(OneTimePersonaData.State)
 			case reviewTransaction(TransactionReview.State)
@@ -135,7 +135,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		enum MainAction: Sendable, Equatable {
 			case login(Login.Action)
 			case accountPermission(AccountPermission.Action)
-			case chooseAccounts(ChooseAccounts.Action)
+			case chooseAccounts(AccountPermissionChooseAccounts.Action)
 			case personaDataPermission(PersonaDataPermission.Action)
 			case oneTimePersonaData(OneTimePersonaData.Action)
 			case reviewTransaction(TransactionReview.Action)
@@ -151,7 +151,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						AccountPermission()
 					}
 					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
-						ChooseAccounts()
+						AccountPermissionChooseAccounts()
 					}
 					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
 						PersonaDataPermission()
@@ -329,8 +329,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		func handleAccounts(
 			_ item: State.AnyInteractionItem,
-			_ choseAccounts: ChooseAccountsResult,
-			_ accessKind: ChooseAccounts.State.AccessKind
+			_ choseAccounts: AccountPermissionChooseAccountsResult,
+			_ accessKind: AccountPermissionChooseAccounts.State.AccessKind
 		) -> EffectTask<Action> {
 			setAccountsResponse(
 				to: item,
@@ -530,7 +530,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	func setAccountsResponse(
 		to item: State.AnyInteractionItem,
-		accessKind: ChooseAccounts.State.AccessKind,
+		accessKind: AccountPermissionChooseAccounts.State.AccessKind,
 		chosenAccounts: P2P.Dapp.Response.Accounts,
 		into state: inout State
 	) {
@@ -740,8 +740,7 @@ extension DappInteractionFlow.Destinations.State {
 				challenge: item.challenge,
 				accessKind: .ongoing,
 				dappMetadata: dappMetadata,
-				numberOfAccounts: item.numberOfAccounts,
-				_chooseAccounts: .init(selectionRequirement: .exactly(1))
+				numberOfAccounts: item.numberOfAccounts
 			)))
 
 		case let .remote(.oneTimeAccounts(item)):
@@ -749,8 +748,7 @@ extension DappInteractionFlow.Destinations.State {
 				challenge: item.challenge,
 				accessKind: .oneTime,
 				dappMetadata: dappMetadata,
-				numberOfAccounts: item.numberOfAccounts,
-				_chooseAccounts: .init(selectionRequirement: .exactly(1))
+				numberOfAccounts: item.numberOfAccounts
 			)))
 
 		case let .remote(.oneTimePersonaData(item)):
