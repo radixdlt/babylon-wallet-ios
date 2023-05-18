@@ -1,5 +1,5 @@
 import AccountsClient
-import CreateEntityFeature
+import CreateAccountFeature
 import FactorSourcesClient
 import FeaturePrelude
 import ROLAClient

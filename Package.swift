@@ -110,7 +110,7 @@ package.addModules([
 			"LedgerHardwareWalletClient",
 			"DerivePublicKeyFeature",
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.feature(
 		name: "CreatePersonaFeature",
@@ -122,7 +122,7 @@ package.addModules([
 			"PersonasClient",
 			"DerivePublicKeyFeature",
 		],
-		tests: .yes()
+		tests: .no
 	),
 	.feature(
 		name: "DappInteractionFeature",

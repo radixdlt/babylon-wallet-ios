@@ -1,5 +1,5 @@
 import AuthorizedDappsClient
-import CreateEntityFeature
+import CreatePersonaFeature
 import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude

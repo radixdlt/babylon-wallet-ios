@@ -2,7 +2,7 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountsClient
 import AppPreferencesClient
-import CreateEntityFeature
+import CreateAccountFeature
 import FeaturePrelude
 
 // MARK: - Home

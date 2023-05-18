@@ -1,4 +1,4 @@
-import CreateEntityFeature
+import CreatePersonaFeature
 import EditPersonaFeature
 import FeaturePrelude
 import PersonasClient

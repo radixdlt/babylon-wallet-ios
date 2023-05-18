@@ -1,4 +1,4 @@
-import CreateEntityFeature
+import CreateAccountFeature
 import FeaturePrelude
 import SigningFeature
 
