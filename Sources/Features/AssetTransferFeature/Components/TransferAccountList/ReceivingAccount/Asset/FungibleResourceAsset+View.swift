@@ -42,7 +42,7 @@ extension FungibleResourceAsset.View {
 					          .focused($focused)
 				}
 
-				if viewStore.totalTransferSum > viewStore.balance {
+				if viewStore.totalExceedsBalance {
 					// TODO: Add better style
 					Text("Total Sum is over your current balance")
 						.textStyle(.body2HighImportance)

@@ -3,7 +3,21 @@ import FeaturePrelude
 public struct TransferAccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let fromAccount: Profile.Network.Account
-		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
+		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
+			didSet {
+				if receivingAccounts.count > 1, receivingAccounts[0].canBeRemoved == false {
+					receivingAccounts[0].canBeRemoved = true
+				}
+
+				if receivingAccounts.count == 1, receivingAccounts[0].canBeRemoved == true {
+					receivingAccounts[0].canBeRemoved = false
+				}
+
+				if receivingAccounts.isEmpty {
+					receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
+				}
+			}
+		}
 
 		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
@@ -40,10 +54,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .addAccountTapped:
-			if state.receivingAccounts.count == 1 {
-				// Allow the first container to be removed
-				state.receivingAccounts[0].canBeRemovedWhenEmpty = true
-			}
 			state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: true))
 			return .none
 		}
@@ -51,21 +61,10 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .receivingAccount(id: id, action: .delegate(.removed)):
+		case let .receivingAccount(id: id, action: .delegate(.remove)):
 			state.receivingAccounts.remove(id: id)
-
-			if state.receivingAccounts.count == 1 {
-				// Disable removal of the container if it is the last one remaining
-				state.receivingAccounts[0].canBeRemovedWhenEmpty = false
-			}
-
-			if state.receivingAccounts.isEmpty {
-				state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
-			}
 			return validateState(&state)
-		case .receivingAccount(_, action: .delegate(.accountAdded)), // account removal case is handled above
-		     .receivingAccount(_, action: .delegate(.assetAdded)),
-		     .receivingAccount(_, action: .delegate(.assetRemoved)):
+		case .receivingAccount(_, action: .delegate(.validate)):
 			return validateState(&state)
 
 		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged))))):

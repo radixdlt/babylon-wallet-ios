@@ -19,8 +19,12 @@ extension ReceivingAccount.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .leading, spacing: .zero) {
 				account(viewStore)
+				Divider()
+					.frame(height: 1)
+					.background(Color.borderColor)
 				assets(viewStore)
 			}
+			.roundedCorners(strokeColor: .borderColor, corners: .allCorners)
 			.sheet(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 				state: /ReceivingAccount.Destinations.State.chooseAccount,
@@ -64,7 +68,7 @@ extension ReceivingAccount.View {
 					}
 					.textStyle(.body1Header)
 					Spacer()
-					if viewStore.canBeRemovedWhenEmpty {
+					if viewStore.canBeRemoved {
 						removeAccountButton(viewStore)
 					}
 				}
@@ -73,7 +77,7 @@ extension ReceivingAccount.View {
 			}
 		}
 		.frame(height: .standardButtonHeight)
-		.topRoundedCorners(strokeColor: .borderColor)
+		// .topRoundedCorners(strokeColor: .borderColor)
 	}
 
 	private func assets(_ viewStore: ViewStoreOf<ReceivingAccount>) -> some View {
@@ -95,6 +99,6 @@ extension ReceivingAccount.View {
 		.frame(maxWidth: .infinity)
 		.padding([.top, .horizontal], .medium3)
 		.background(Color.containerContentBackground)
-		.bottomRoundedCorners(strokeColor: .borderColor)
+		// .bottomRoundedCorners(strokeColor: .borderColor)
 	}
 }

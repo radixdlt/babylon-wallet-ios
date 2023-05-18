@@ -50,9 +50,7 @@ extension AssetTransferMessage.View {
 					TextEditor(text:
 						viewStore.binding(
 							get: \.message,
-							send: {
-								.messageChanged($0)
-							}
+							send: { .messageChanged($0) }
 						)
 					)
 					.focused($focused)

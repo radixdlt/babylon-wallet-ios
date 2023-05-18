@@ -13,27 +13,26 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			resource.amount
 		}
 
+		public var totalExceedsBalance: Bool {
+			totalTransferSum > balance
+		}
+
 		// Transfered resource
 		public let resource: AccountPortfolio.FungibleResource
-		public let isXRD: Bool = true
+		public let isXRD: Bool
 
 		// MARK: - Mutable state
 
-		public var transferAmountStr: String
-		public var transferAmount: BigDecimal?
+		public var transferAmountStr: String = ""
+		public var transferAmount: BigDecimal? = nil
 
 		// Total transfer sum for the transferred resource
 		public var totalTransferSum: BigDecimal
 
-		init(resource: AccountPortfolio.FungibleResource, transferAmount: BigDecimal?, totalTransferSum: BigDecimal) {
-			self.transferAmount = transferAmount
-			self.transferAmountStr = transferAmount?.formatWithoutRounding() ?? ""
-			self.totalTransferSum = totalTransferSum
+		init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, totalTransferSum: BigDecimal) {
 			self.resource = resource
-		}
-
-		init(resource: AccountPortfolio.FungibleResource) {
-			self.init(resource: resource, transferAmount: nil, totalTransferSum: .zero)
+			self.isXRD = isXRD
+			self.totalTransferSum = totalTransferSum
 		}
 	}
 

@@ -11,7 +11,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		// Either user owned account, or foreign account Address
 		public var account: Either<Account, AccountAddress>?
 		public var assets: IdentifiedArrayOf<ResourceAsset.State>
-		public var canBeRemovedWhenEmpty: Bool
+		public var canBeRemoved: Bool
 
 		public struct Asset: Sendable, Hashable, Identifiable {
 			public typealias ID = UUID
@@ -28,7 +28,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		) {
 			self.account = account
 			self.assets = assets
-			self.canBeRemovedWhenEmpty = canBeRemovedWhenEmpty
+			self.canBeRemoved = canBeRemovedWhenEmpty
 		}
 
 		public static func empty(canBeRemovedWhenEmpty: Bool) -> Self {
@@ -65,10 +65,8 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case assetAdded
-		case assetRemoved
-		case accountAdded
-		case removed
+		case validate
+		case remove
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -89,7 +87,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .removeTapped:
-			return .send(.delegate(.removed))
+			return .send(.delegate(.remove))
 		case .addAssetTapped:
 			state.destination = .addAsset(.init())
 			return .none
@@ -101,25 +99,26 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.chooseAccount(.delegate(.addOwnedAccount(account))))):
-			state.account = .left(account)
-			return .send(.delegate(.accountAdded))
+		case let .destination(.presented(action)):
+			switch action {
+			case let .chooseAccount(.delegate(.addOwnedAccount(account))):
+				state.account = .left(account)
+				return .send(.delegate(.validate))
+			case let .chooseAccount(.delegate(.addExternalAccount(address))):
+				state.account = .right(address)
+				return .send(.delegate(.validate))
+			case let .addAsset(.delegate(.addFungibleResource(resource, isXRD))):
+				state.assets.append(.fungibleAsset(.init(resource: resource, isXRD: isXRD, totalTransferSum: .zero)))
+				return .send(.delegate(.validate))
 
-		case let .destination(.presented(.chooseAccount(.delegate(.foreignAccount(address))))):
-			state.account = .right(address)
-			return .send(.delegate(.accountAdded))
-
-		case let .destination(.presented(.addAsset(.delegate(.addFungibleResource(resource))))):
-			state.assets.append(.fungibleAsset(.init(resource: resource)))
-			return .send(.delegate(.assetAdded))
-
-		case let .destination(.presented(.addAsset(.delegate(.addNonFungibleResource(resourceAddress, token))))):
-			state.assets.append(.nonFungibleAsset(.init(resourceAddress: resourceAddress, nftToken: token)))
-			return .send(.delegate(.assetAdded))
+			case let .addAsset(.delegate(.addNonFungibleResource(resourceAddress, token))):
+				state.assets.append(.nonFungibleAsset(.init(resourceAddress: resourceAddress, nftToken: token)))
+				return .send(.delegate(.validate))
+			}
 
 		case let .row(id: id, child: .delegate(.removed)):
 			state.assets.remove(id: id)
-			return .send(.delegate(.assetRemoved))
+			return .send(.delegate(.validate))
 
 		case .destination(.dismiss):
 			return .none
