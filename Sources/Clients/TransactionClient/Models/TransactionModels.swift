@@ -78,7 +78,7 @@ extension TransactionSigners {
 	public var signerPublicKeys: Set<SLIP10.PublicKey> {
 		switch intentSigning {
 		case let .intentSigners(signers):
-			return Set(signers.flatMap { $0.factorInstances.map(\.publicKey) })
+			return Set(signers.flatMap { $0.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey) })
 		case .notaryAsSignatory:
 			return []
 		}

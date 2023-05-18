@@ -9,7 +9,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let entity: EntityPotentiallyVirtual
 		public var transactionReview: TransactionReview.State?
-		public var authenticationSigningFactorInstance: FactorInstance?
+		public var authenticationSigningFactorInstance: HierarchicalDeterministicFactorInstance?
 
 		public init(entity: EntityPotentiallyVirtual) {
 			self.entity = entity

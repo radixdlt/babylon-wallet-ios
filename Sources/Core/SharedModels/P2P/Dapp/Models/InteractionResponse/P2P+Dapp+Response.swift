@@ -69,11 +69,9 @@ extension P2P.Dapp.Response {
 			self.signature = signature
 		}
 
-		public init?(entitySignature: SignatureOfEntity) {
-			let sigPub = entitySignature.signature.signatureWithPublicKey
-			guard let signature = try? sigPub.signature.serialize() else {
-				return nil
-			}
+		public init(entitySignature: SignatureOfEntity) {
+			let sigPub = entitySignature.signatureWithPublicKey
+			let signature = sigPub.signature.serialize()
 			self.init(
 				publicKey: sigPub.publicKey.compressedRepresentation.hex,
 				curve: sigPub.publicKey.curve,

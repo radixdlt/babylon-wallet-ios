@@ -15,8 +15,8 @@ public protocol EntityBaseProtocol {
 }
 
 extension EntityBaseProtocol {
-	public var factorInstances: Set<FactorInstance> {
-		var factorInstances = Set<FactorInstance>()
+	public var virtualHierarchicalDeterministicFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
+		var factorInstances = Set<HierarchicalDeterministicFactorInstance>()
 		switch securityState {
 		case let .unsecured(unsecuredEntityControl):
 			factorInstances.insert(unsecuredEntityControl.transactionSigning)
@@ -46,7 +46,7 @@ public protocol EntityProtocol: EntityBaseProtocol, Sendable, Equatable, Identif
 
 	static func deriveAddress(
 		networkID: NetworkID,
-		factorInstance: FactorInstance
+		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress
 
 	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
@@ -77,7 +77,7 @@ extension EntityProtocol {
 	public init(
 		networkID: NetworkID,
 		address: EntityAddress,
-		factorInstance: FactorInstance,
+		factorInstance: HierarchicalDeterministicFactorInstance,
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) {
@@ -92,7 +92,7 @@ extension EntityProtocol {
 
 	public init(
 		networkID: NetworkID,
-		factorInstance: FactorInstance,
+		factorInstance: HierarchicalDeterministicFactorInstance,
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) throws {
