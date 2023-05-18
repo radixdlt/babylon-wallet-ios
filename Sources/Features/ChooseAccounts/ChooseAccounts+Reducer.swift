@@ -22,21 +22,18 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.accountsClient) var accountsClient
-
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+	public enum ViewAction: Sendable, Equatable {
+		case appeared
+		case createAccountButtonTapped
+		case selectedAccountsChanged([ChooseAccountsRow.State]?)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadAccountsResult(TaskResult<Profile.Network.Accounts>)
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
-		case createAccountButtonTapped
-		case selectedAccountsChanged([ChooseAccountsRow.State]?)
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -54,6 +51,9 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.accountsClient) var accountsClient
 
 	public init() {}
 
@@ -74,9 +74,13 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 			}
 
 		case .createAccountButtonTapped:
-			state.destination = .createAccount(.init(config: .init(
-				purpose: .newAccountDuringDappInteraction
-			), displayIntroduction: { _ in false }))
+			state.destination = .createAccount(.init(
+				config: .init(
+					purpose: .newAccountDuringDappInteraction
+				),
+				displayIntroduction: { _ in false }
+			)
+			)
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):
