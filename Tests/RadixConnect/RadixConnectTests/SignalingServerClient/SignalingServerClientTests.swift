@@ -6,16 +6,32 @@ final class SignalingClientTests: TestCase {
 	// MARK: - Test Values
 	static let remoteClientId = RemoteClientID(rawValue: UUID().uuidString)
 	static let ownClientId = RemoteClientID(rawValue: UUID().uuidString)
-	static let requestId = SignalingClient.ClientMessage.RequestID(rawValue: UUID().uuidString)
+
+	static let requestId = SignalingClient.ClientMessage.RequestID(
+		rawValue: UUID().uuidString
+	)
+
 	static let sdp = RTCPrimitive.SDP(rawValue: "Some sdp desc")
-	static let offer = IdentifiedRTCPrimitive(content: .offer(.init(sdp: sdp)), id: remoteClientId)
-	static let answer = IdentifiedRTCPrimitive(content: .answer(.init(sdp: sdp)), id: remoteClientId)
-	static let iceCandidate = IdentifiedRTCPrimitive(
-		content: .iceCandidate(.init(sdp: sdp,
-		                             sdpMLineIndex: 32,
-		                             sdpMid: "Mid")),
+
+	static let offer = IdentifiedRTCPrimitive(
+		content: .offer(.init(sdp: sdp)),
 		id: remoteClientId
 	)
+
+	static let answer = IdentifiedRTCPrimitive(
+		content: .answer(.init(sdp: sdp)),
+		id: remoteClientId
+	)
+
+	static let iceCandidate = IdentifiedRTCPrimitive(
+		content: .iceCandidate(.init(
+			sdp: sdp,
+			sdpMLineIndex: 32,
+			sdpMid: "Mid"
+		)),
+		id: remoteClientId
+	)
+
 	static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 
 	var jsonDecoder: JSONDecoder = {
@@ -31,27 +47,29 @@ final class SignalingClientTests: TestCase {
 	}()
 
 	let webSocketClient = MockWebSocketClient()
-	lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
-	                                           transport: webSocketClient,
-	                                           idBuilder: { Self.requestId })
+	lazy var signalingClient = SignalingClient(
+		encryptionKey: Self.encryptionKey,
+		transport: webSocketClient,
+		idBuilder: { Self.requestId }
+	)
 
 	// MARK: - Outgoing Messages
 
-	func test_sentMessagesAreInCorrectFormat_offer() throws {
-		try assertSentMessageFormat(
+	func test_sentMessagesAreInCorrectFormat_offer() async throws {
+		try await assertSentMessageFormat(
 			Self.offer,
 			expectedPayload: Self.offer.content.payload
 		)
 	}
 
-	func test_sentMessagesAreInCorrectFormat_answer() throws {
-		try assertSentMessageFormat(
+	func test_sentMessagesAreInCorrectFormat_answer() async throws {
+		try await assertSentMessageFormat(
 			Self.answer,
 			expectedPayload: Self.answer.content.payload
 		)
 	}
 
-	func testSendMessage_awaitsConfirmation() throws {
+	func testSendMessage_awaitsConfirmation() async throws {
 		let exp = expectation(description: "exp")
 		Task {
 			try await signalingClient.sendToRemote(Self.offer)
@@ -62,64 +80,73 @@ final class SignalingClientTests: TestCase {
 			"requestId": .string(Self.requestId.rawValue),
 		]))
 
-		wait(for: [exp], timeout: 1.0)
+		await fulfillment(of: [exp], timeout: 0.5)
 	}
 
 	// MARK: - Incoming Messages
 
-	func test_receivedMessagesAreProperlyDecoded_remoteClientDisconnected() throws {
+	func test_receivedMessagesAreProperlyDecoded_remoteClientDisconnected() async throws {
 		let notification = SignalingClient.IncomingMessage.FromSignalingServer.Notification.remoteClientDisconnected(Self.remoteClientId)
 
-		try assertIncomingMessageDecoding(
+		try await assertIncomingMessageDecoding(
 			msg: notification.payload,
 			stream: signalingClient.onRemoteClientState,
 			expected: notification
 		)
 	}
 
-	func test_receivedMessagesAreProperlyDecoded_remoteClientIsAlreadyConnected() throws {
+	func test_receivedMessagesAreProperlyDecoded_remoteClientIsAlreadyConnected() async throws {
 		let notification = SignalingClient.IncomingMessage.FromSignalingServer.Notification.remoteClientIsAlreadyConnected(Self.remoteClientId)
 
-		try assertIncomingMessageDecoding(
+		try await assertIncomingMessageDecoding(
 			msg: notification.payload,
 			stream: signalingClient.onRemoteClientState,
 			expected: notification
 		)
 	}
 
-	func test_receivedMessagesAreProperlyDecoded_remoteClientJustConnected() throws {
+	func test_receivedMessagesAreProperlyDecoded_remoteClientJustConnected() async throws {
 		let notification = SignalingClient.IncomingMessage.FromSignalingServer.Notification.remoteClientJustConnected(Self.remoteClientId)
-		try assertIncomingMessageDecoding(
+		try await assertIncomingMessageDecoding(
 			msg: notification.payload,
 			stream: signalingClient.onRemoteClientState,
 			expected: notification
 		)
 	}
 
-	func test_receivedMessagesAreProperlyDecoded_offer() throws {
-		try assertIncomingPrimitiveDecoding(
+	func test_receivedMessagesAreProperlyDecoded_offer() async throws {
+		try await assertIncomingPrimitiveDecoding(
 			payload: Self.offer.content.payload,
 			method: "offer",
 			stream: signalingClient.onOffer,
-			expected: IdentifiedRTCOffer(content: Self.offer.content.offer!, id: Self.offer.id)
+			expected: IdentifiedRTCOffer(
+				content: Self.offer.content.offer!,
+				id: Self.offer.id
+			)
 		)
 	}
 
-	func test_receivedMessagesAreProperlyDecoded_answer() throws {
-		try assertIncomingPrimitiveDecoding(
+	func test_receivedMessagesAreProperlyDecoded_answer() async throws {
+		try await assertIncomingPrimitiveDecoding(
 			payload: Self.answer.content.payload,
 			method: "answer",
 			stream: signalingClient.onAnswer,
-			expected: IdentifiedRTCAnswer(content: Self.answer.content.answer!, id: Self.answer.id)
+			expected: IdentifiedRTCAnswer(
+				content: Self.answer.content.answer!,
+				id: Self.answer.id
+			)
 		)
 	}
 
-	func test_receivedMessagesAreProperlyDecoded_iceCandidate() throws {
-		try assertIncomingPrimitiveDecoding(
+	func test_receivedMessagesAreProperlyDecoded_iceCandidate() async throws {
+		try await assertIncomingPrimitiveDecoding(
 			payload: Self.iceCandidate.content.payload,
 			method: "iceCandidate",
 			stream: signalingClient.onICECanddiate,
-			expected: IdentifiedRTCICECandidate(content: Self.iceCandidate.content.iceCandidate!, id: Self.iceCandidate.id)
+			expected: IdentifiedRTCICECandidate(
+				content: Self.iceCandidate.content.iceCandidate!,
+				id: Self.iceCandidate.id
+			)
 		)
 	}
 
@@ -131,7 +158,7 @@ final class SignalingClientTests: TestCase {
 		expected: Decoded,
 		file: StaticString = #filePath,
 		line: UInt = #line
-	) throws {
+	) async throws {
 		let exp = expectation(description: "Wait for message")
 		Task {
 			let value = try await stream.first()
@@ -139,7 +166,7 @@ final class SignalingClientTests: TestCase {
 			exp.fulfill()
 		}
 		webSocketClient.receiveIncomingMessage(Incoming)
-		wait(for: [exp], timeout: 1.0)
+		await fulfillment(of: [exp], timeout: 0.5)
 	}
 
 	func assertIncomingPrimitiveDecoding<Decoded: Sendable & Equatable>(
@@ -149,7 +176,7 @@ final class SignalingClientTests: TestCase {
 		expected: Decoded,
 		file: StaticString = #filePath,
 		line: UInt = #line
-	) throws {
+	) async throws {
 		let encoded = try jsonEncoder.encode(payload)
 		let encrypted = try Self.encryptionKey.encrypt(data: encoded)
 		let data = JSONValue.dictionary([
@@ -166,18 +193,19 @@ final class SignalingClientTests: TestCase {
 			"data": data,
 		])
 
-		try assertIncomingMessageDecoding(
+		try await assertIncomingMessageDecoding(
 			msg: remoteData,
 			stream: stream,
 			expected: expected
 		)
 	}
 
-	func assertSentMessageFormat(_ primitive: IdentifiedRTCPrimitive,
-	                             expectedPayload: JSONValue,
-	                             file: StaticString = #filePath,
-	                             line: UInt = #line) throws
-	{
+	func assertSentMessageFormat(
+		_ primitive: IdentifiedRTCPrimitive,
+		expectedPayload: JSONValue,
+		file: StaticString = #filePath,
+		line: UInt = #line
+	) async throws {
 		let exp = expectation(description: "Wait for message")
 		let expectedMethod = SignalingClient.ClientMessage.Method(from: primitive.content)
 
@@ -200,6 +228,6 @@ final class SignalingClientTests: TestCase {
 			exp.fulfill()
 		}
 
-		wait(for: [exp], timeout: 1.0)
+		await fulfillment(of: [expectation], timeout: 1.0)
 	}
 }

@@ -56,7 +56,7 @@ final class ImportProfileTests: TestCase {
 		await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
 		await sut.finish()
 
-		wait(for: [expectation], timeout: 0)
+		await fulfillment(of: [expectation], timeout: 0.1)
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__it_gets_imported() async throws {

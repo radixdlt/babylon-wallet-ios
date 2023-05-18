@@ -17,7 +17,7 @@ final class CreateAccountCoordinatorTests: TestCase {
 		await store.send(.view(.closeButtonTapped))
 		await store.receive(.delegate(.dismissed))
 
-		wait(for: [expectation], timeout: 0)
+		await fulfillment(of: [expectation], timeout: 0.1)
 	}
 
 	func test_completionFlow() async throws {
@@ -52,6 +52,6 @@ final class CreateAccountCoordinatorTests: TestCase {
 		await store.receive(.child(.path(.element(id: 2, action: .step3_completion(.delegate(.completed))))))
 		await store.receive(.delegate(.completed))
 
-		wait(for: [expectation], timeout: 0)
+		await fulfillment(of: [expectation], timeout: 0.1)
 	}
 }
