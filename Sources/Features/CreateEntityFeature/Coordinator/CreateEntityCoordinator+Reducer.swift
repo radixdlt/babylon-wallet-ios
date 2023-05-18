@@ -1,4 +1,5 @@
 import Cryptography
+import DerivePublicKeyFeature
 import FactorSourcesClient
 import FeaturePrelude
 
@@ -43,7 +44,10 @@ public struct CreateEntityCoordinator<
 					return false
 				} else if case let .step2_creationOfEntity(creationOfEntity) = last {
 					// do not show back button when using `device` factor source
-					return creationOfEntity.useLedgerAsFactorSource
+					switch creationOfEntity.derivePublicKey.factorSourceOption {
+					case let .specific(specific): return specific.kind == .ledgerHQHardwareWallet
+					case let .anyOf(factorSources): return factorSources.allSatisfy { $0.kind == .ledgerHQHardwareWallet }
+					}
 				} else {
 					return true
 				}
@@ -147,7 +151,7 @@ extension CreateEntityCoordinator {
 
 			let babylonDeviceFactorSources = factorSources.babylonDeviceFactorSources()
 			let ledgerFactorSources: [FactorSource] = factorSources.filter { $0.kind == .ledgerHQHardwareWallet }
-			let source: GenesisFactorSourceSelection = useLedgerAsFactorSource ? .ledger(ledgerFactorSources: ledgerFactorSources) : .device(babylonDeviceFactorSources.first)
+			let source: GenesisFactorSourceSelection = useLedgerAsFactorSource ? .ledger(ledgerFactorSources: .init(uniqueElements: ledgerFactorSources)) : .device(babylonDeviceFactorSources.first)
 
 			return goToStep2Creation(
 				entityName: specifiedNameForNewEntityToCreate,
@@ -205,11 +209,23 @@ extension CreateEntityCoordinator {
 		genesisFactorSourceSelection: GenesisFactorSourceSelection,
 		state: inout State
 	) -> EffectTask<Action> {
-		state.path.append(.step2_creationOfEntity(.init(
-			networkID: state.config.specificNetworkID,
+		let creationOfEntityState = CreationOfEntity<Entity>.State(
 			name: entityName,
-			genesisFactorSourceSelection: genesisFactorSourceSelection
-		)))
+			derivePublicKey: .init(
+				derivationPathOption: .nextBasedOnFactorSource(
+					networkOption: state.config.specificNetworkID.map { .specific($0) } ?? .useCurrent
+				),
+				factorSourceOption: {
+					switch genesisFactorSourceSelection {
+					case let .device(babylonDevice):
+						return .specific(factorSource: babylonDevice.factorSource)
+					case let .ledger(ledgers):
+						return .anyOf(factorSources: ledgers)
+					}
+				}()
+			)
+		)
+		state.path.append(.step2_creationOfEntity(creationOfEntityState))
 		return .none
 	}
 
@@ -223,4 +239,10 @@ extension CreateEntityCoordinator {
 		)))
 		return .none
 	}
+}
+
+// MARK: - GenesisFactorSourceSelection
+public enum GenesisFactorSourceSelection: Sendable, Hashable {
+	case device(BabylonDeviceFactorSource)
+	case ledger(ledgerFactorSources: IdentifiedArrayOf<FactorSource>)
 }

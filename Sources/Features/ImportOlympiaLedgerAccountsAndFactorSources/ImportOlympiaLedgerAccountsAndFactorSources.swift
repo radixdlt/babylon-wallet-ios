@@ -253,9 +253,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
 
 		return .run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(factorSource)
+			try await factorSourcesClient.addOffDeviceFactorSource(factorSource.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.internal(.addedFactorSource(factorSource)))
+			await send(.internal(.addedFactorSource(factorSource.factorSource)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
 			errorQueue.schedule(error)

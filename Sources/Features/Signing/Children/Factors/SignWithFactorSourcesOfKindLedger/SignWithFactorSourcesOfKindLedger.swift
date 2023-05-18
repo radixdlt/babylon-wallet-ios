@@ -48,6 +48,9 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		signingFactor: SigningFactor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
+		let ledger = try LedgerFactorSource(factorSource: signingFactor.factorSource)
+		let signers = signingFactor.signers
+
 		switch state.signingPurposeWithPayload {
 		case let .signTransaction(_, compiledIntent, _):
 			let dataToSign = Data(compiledIntent.compiledIntent)
@@ -60,7 +63,8 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 			let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
-				signingFactor: signingFactor,
+				ledger: ledger,
+				signers: signers,
 				unhashedDataToSign: dataToSign,
 				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
 				displayHashOnLedgerDisplay: true
@@ -74,7 +78,8 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 			}
 
 			return try await ledgerHardwareWalletClient.signAuthChallenge(.init(
-				signingFactor: signingFactor,
+				ledger: ledger,
+				signers: signers,
 				challenge: authToSign.input.challenge,
 				origin: authToSign.input.origin,
 				dAppDefinitionAddress: authToSign.input.dAppDefinitionAddress

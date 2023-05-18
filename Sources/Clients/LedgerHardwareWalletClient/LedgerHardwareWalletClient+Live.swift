@@ -3,6 +3,7 @@ import ComposableArchitecture // actually CasePaths... but CI fails if we do `im
 import Cryptography
 import EngineToolkit
 import FactorSourcesClient
+import Profile
 import RadixConnectClient
 import ROLAClient
 
@@ -59,8 +60,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 		}
 
 		@Sendable func sign(
+			signers: NonEmpty<IdentifiedArrayOf<Signer>>,
 			expectedHashedMessage: Data,
-			signingFactor: SigningFactor,
 			signOnLedgerRequest: () async throws -> [P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner]
 		) async throws -> Set<SignatureOfEntity> {
 			let signaturesRaw = try await signOnLedgerRequest()
@@ -68,9 +69,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			let signaturesValidated = try signaturesRaw.map { try $0.validate(hashed: expectedHashedMessage) }
 			var signatures = Set<SignatureOfEntity>()
 
-			let signerEntities = Set(signingFactor.signers.map(\.entity))
+			let signerEntities = Set(signers.map(\.entity))
 
-			for requiredSigner in signingFactor.signers {
+			for requiredSigner in signers {
 				for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
 					guard
 						let signature = signaturesValidated.first(where: {
@@ -132,11 +133,14 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			},
 			signTransaction: { request in
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
-				return try await sign(expectedHashedMessage: hashedMsg, signingFactor: request.signingFactor) {
+				return try await sign(
+					signers: request.signers,
+					expectedHashedMessage: hashedMsg
+				) {
 					try await makeRequest(
 						.signTransaction(.init(
-							signers: request.signingFactor.signers.flatMap(\.keyParams),
-							ledgerDevice: .init(factorSource: request.signingFactor.factorSource),
+							signers: request.signers.flatMap(\.keyParams),
+							ledgerDevice: request.ledger.device(),
 							compiledTransactionIntent: .init(data: request.unhashedDataToSign),
 							displayHash: request.displayHashOnLedgerDisplay,
 							mode: request.ledgerTXDisplayMode
@@ -147,16 +151,20 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			},
 			signAuthChallenge: { request in
 				@Dependency(\.rolaClient) var rolaClient
+
 				let hashedMsg = try rolaClient.authenticationDataToSignForChallenge(.init(
 					challenge: request.challenge,
 					origin: request.origin,
 					dAppDefinitionAddress: request.dAppDefinitionAddress
 				))
-				return try await sign(expectedHashedMessage: hashedMsg.payloadToHashAndSign, signingFactor: request.signingFactor) {
+				return try await sign(
+					signers: request.signers,
+					expectedHashedMessage: hashedMsg.payloadToHashAndSign
+				) {
 					try await makeRequest(
 						.signChallenge(.init(
-							signers: request.signingFactor.signers.flatMap(\.keyParams),
-							ledgerDevice: .init(factorSource: request.signingFactor.factorSource),
+							signers: request.signers.flatMap(\.keyParams),
+							ledgerDevice: request.ledger.device(),
 							challenge: request.challenge,
 							origin: request.origin,
 							dAppDefinitionAddress: request.dAppDefinitionAddress
@@ -170,8 +178,21 @@ extension LedgerHardwareWalletClient: DependencyKey {
 }
 
 extension LedgerFactorSource {
-	var device: P2P.LedgerHardwareWallet.LedgerDevice {
-		.init(name: self.name ?? "Unnamed", id: factorSource.id.hex(), model: model)
+	func device() throws -> P2P.LedgerHardwareWallet.LedgerDevice {
+		guard let model = P2P.LedgerHardwareWallet.Model(rawValue: model.rawValue) else {
+			throw UnrecognizedLedgerModel(model: model.rawValue)
+		}
+		return P2P.LedgerHardwareWallet.LedgerDevice(
+			name: NonEmptyString(maybeString: self.name),
+			id: factorSource.id.hex(),
+			model: model
+		)
+	}
+}
+
+extension P2P.LedgerHardwareWallet.LedgerDevice {
+	public init(factorSource: FactorSource) throws {
+		self = try LedgerFactorSource(factorSource: factorSource).device()
 	}
 }
 

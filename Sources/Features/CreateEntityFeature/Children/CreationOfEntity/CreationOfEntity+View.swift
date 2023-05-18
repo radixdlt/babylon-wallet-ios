@@ -16,15 +16,16 @@ extension CreationOfEntity {
 		}
 
 		init(state: CreationOfEntity.State) {
-			self.kind = Entity.entityKind
-			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
-			self.ledgers = state.ledgers
-			self.selectedLedgerID = state.selectedLedgerID
-			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers[id: id] {
-				self.selectedLedgerControlRequirements = .init(selectedLedger: selectedLedger)
-			} else {
-				self.selectedLedgerControlRequirements = nil
-			}
+//			self.kind = Entity.entityKind
+//			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
+//			self.ledgers = state.ledgers
+//			self.selectedLedgerID = state.selectedLedgerID
+//			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers[id: id] {
+//				self.selectedLedgerControlRequirements = .init(selectedLedger: selectedLedger)
+//			} else {
+//				self.selectedLedgerControlRequirements = nil
+//			}
+			fatalError()
 		}
 	}
 

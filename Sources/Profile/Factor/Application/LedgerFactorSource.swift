@@ -33,6 +33,9 @@ public struct LedgerFactorSource:
 }
 
 // MARK: - UnrecognizedLedgerModel
-struct UnrecognizedLedgerModel: Error {
-	let model: String
+public struct UnrecognizedLedgerModel: Error {
+	public let model: String
+	public init(model: String) {
+		self.model = model
+	}
 }

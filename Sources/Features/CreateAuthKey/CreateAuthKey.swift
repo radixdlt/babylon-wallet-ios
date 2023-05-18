@@ -144,9 +144,9 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 			return .run { [entity = state.entity] send in
 				let manifest = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity, newPublicKey: newPublicKey))
 
-				let authenticationSigningFactorInstance = try HierarchicalDeterministicFactorInstance(
+				let authenticationSigningFactorInstance = HierarchicalDeterministicFactorInstance(
 					factorSourceID: factorSourceID,
-					publicKey: .init(engine: newPublicKey),
+					publicKey: newPublicKey,
 					derivationPath: derivationPath
 				)
 
@@ -189,7 +189,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 				}
 			}
 
-		case .transactionReview:
+		default:
 			return .none
 		}
 	}
