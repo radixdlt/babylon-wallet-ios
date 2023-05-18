@@ -1,5 +1,8 @@
 import AccountsClient
+import Cryptography
+import DerivePublicKeyFeature
 import EngineToolkitModels
+import FactorSourcesClient
 import FeaturePrelude
 import PersonasClient
 import ROLAClient
@@ -9,10 +12,15 @@ import TransactionReviewFeature
 public struct CreateAuthKey: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let entity: EntityPotentiallyVirtual
+
+		public var derivePublicKey: DerivePublicKey.State?
+
 		public var transactionReview: TransactionReview.State?
 		public var authenticationSigningFactorInstance: HierarchicalDeterministicFactorInstance?
 
-		public init(entity: EntityPotentiallyVirtual) {
+		public init(
+			entity: EntityPotentiallyVirtual
+		) {
 			self.entity = entity
 		}
 	}
@@ -22,11 +30,13 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case createdManifestForAuthKeyCreation(TransactionManifest)
+		case readyToDerivePublicKey(DerivationPath, factorSource: FactorSource)
+		case createdManifestForAuthKeyCreation(TransactionManifest, HierarchicalDeterministicFactorInstance)
 		case finishedSettingFactorInstance
 	}
 
 	public enum ChildAction: Sendable, Equatable {
+		case derivePublicKey(DerivePublicKey.Action)
 		case transactionReview(TransactionReview.Action)
 	}
 
@@ -37,6 +47,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
@@ -50,7 +61,48 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			fatalError("migrate to/or use CreatePublicKey feature")
+
+			return .run { [entity = state.entity] send in
+
+				let factorSourceID: FactorSourceID
+				let authSignDerivationPath: DerivationPath
+				let unsecuredEntityControl: UnsecuredEntityControl
+
+				switch entity.securityState {
+				case let .unsecured(unsecuredEntityControl_):
+					unsecuredEntityControl = unsecuredEntityControl_
+					guard unsecuredEntityControl.authenticationSigning == nil else {
+						loggerGlobal.notice("Entity: \(entity) already has an authenticationSigning")
+						await send(.delegate(.done(success: false)))
+						return
+					}
+
+					loggerGlobal.notice("Entity: \(entity) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
+					factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
+					let hdPath = unsecuredEntityControl.transactionSigning.derivationPath
+					switch entity {
+					case .account:
+						authSignDerivationPath = try hdPath.asAccountPath().switching(
+							networkID: entity.networkID,
+							keyKind: .authenticationSigning
+						).wrapAsDerivationPath()
+					case .persona:
+						authSignDerivationPath = try hdPath.asIdentityPath().switching(
+							keyKind: .authenticationSigning
+						).wrapAsDerivationPath()
+					}
+				}
+
+				guard let factorSource = try await factorSourcesClient.getFactorSource(id: factorSourceID) else {
+					fatalError()
+				}
+
+				await send(.internal(.readyToDerivePublicKey(
+					authSignDerivationPath,
+					factorSource: factorSource
+				)))
+			}
+
 //			return .run { [entity = state.entity] send in
 //				let response = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity))
 //				await send(.internal(.createdManifestAndAuthKey(response)))
@@ -63,13 +115,20 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .createdManifestForAuthKeyCreation(manifest):
+		case let .readyToDerivePublicKey(derivationPath, factorSource):
+			state.derivePublicKey = .init(
+				derivationPathOption: .known(derivationPath),
+				factorSourceOption: .specific(factorSource: factorSource)
+			)
+			return .none
+
+		case let .createdManifestForAuthKeyCreation(manifest, authenticationSigningFactorInstance):
 			state.transactionReview = .init(
 				transactionManifest: manifest,
 				signTransactionPurpose: .internalManifest(.uploadAuthKey),
 				message: nil
 			)
-//			state.authenticationSigningFactorInstance = manifestAndAuthKey.authenticationSigning
+			state.authenticationSigningFactorInstance = authenticationSigningFactorInstance
 			return .none
 
 		case .finishedSettingFactorInstance:
@@ -79,6 +138,21 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case let .derivePublicKey(.delegate(.derivedPublicKey(newPublicKey, derivationPath, factorSourceID))):
+			state.derivePublicKey = nil
+
+			return .run { [entity = state.entity] send in
+				let manifest = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity, newPublicKey: newPublicKey))
+
+				let authenticationSigningFactorInstance = try HierarchicalDeterministicFactorInstance(
+					factorSourceID: factorSourceID,
+					publicKey: .init(engine: newPublicKey),
+					derivationPath: derivationPath
+				)
+
+				await send(.internal(.createdManifestForAuthKeyCreation(manifest, authenticationSigningFactorInstance)))
+			}
+
 		case let .transactionReview(.delegate(.failed(error))):
 			loggerGlobal.error("TX failed, error: \(error)")
 			return .send(.delegate(.done(success: false)))

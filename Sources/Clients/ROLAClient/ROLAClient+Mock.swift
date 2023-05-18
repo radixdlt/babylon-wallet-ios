@@ -10,7 +10,7 @@ extension ROLAClient: TestDependencyKey {
 		manifestForAuthKeyCreation: unimplemented("\(Self.self).manifestForAuthKeyCreation"),
 		authenticationDataToSignForChallenge: unimplemented("\(Self.self).authenticationDataToSignForChallenge")
 	)
-} œ
+}
 
 extension ROLAClient {
 	public static let noop = Self(

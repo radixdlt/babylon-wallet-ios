@@ -7,13 +7,14 @@ public protocol _ApplicationFactorSource:
 	Hashable,
 	Identifiable
 {
-	static var assertedKind: FactorSourceKind { get }
+	static var assertedKind: FactorSourceKind? { get }
 	static var assertedParameters: FactorSource.Parameters? { get }
 	var factorSource: FactorSource { get }
 	init(factorSource: FactorSource) throws
 }
 
 extension _ApplicationFactorSource {
+	public static var assertedKind: FactorSourceKind? { nil }
 	public static var assertedParameters: FactorSource.Parameters? { nil }
 	public var kind: FactorSourceKind { factorSource.kind }
 	public var id: FactorSourceID { factorSource.id }
@@ -25,21 +26,31 @@ extension _ApplicationFactorSource {
 	public var storage: FactorSource.Storage? { factorSource.storage }
 
 	public static func validating(factorSource: FactorSource) throws -> FactorSource {
-		guard
-			factorSource.kind == Self.assertedKind
-		else {
+		if
+			let expectedFactorSourceKind = Self.assertedKind,
+			factorSource.kind != Self.assertedKind
+		{
 			throw DisrepancyFactorSourceWrongKind(
-				expected: Self.assertedKind,
+				expected: expectedFactorSourceKind,
 				actual: factorSource.kind
 			)
 		}
-		if let expectedParameters = Self.assertedParameters, factorSource.parameters != expectedParameters {
+
+		if
+			let expectedParameters = Self.assertedParameters,
+			factorSource.parameters != expectedParameters
+		{
 			throw DisrepancyFactorSourceWrongParameters(
 				expected: expectedParameters,
 				actual: factorSource.parameters
 			)
 		}
+
 		return factorSource
+	}
+
+	public init(_ applicationFactorSource: some _ApplicationFactorSource) throws {
+		try self.init(factorSource: applicationFactorSource.factorSource)
 	}
 
 	public var supportsOlympia: Bool {

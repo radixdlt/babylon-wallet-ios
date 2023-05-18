@@ -5,7 +5,7 @@ import Prelude
 /// This is NOT a `Codable` factor source, this is never saved anywhere, just in memory.
 /// It acts a a convenience in code to not have to assert that `kind == .device` and
 /// if storage exists, we assert that it is `device` storage
-public struct HDOnDeviceFactorSource: _ApplicationFactorSource {
+public struct HDOnDeviceFactorSource: _ApplicationFactorSource, _EntityCreatingFactorSourceProtocol {
 	public static let assertedKind: FactorSourceKind = .device
 
 	public let factorSource: FactorSource

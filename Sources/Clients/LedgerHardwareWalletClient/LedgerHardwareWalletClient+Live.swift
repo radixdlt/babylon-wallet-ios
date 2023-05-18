@@ -169,6 +169,12 @@ extension LedgerHardwareWalletClient: DependencyKey {
 	}()
 }
 
+extension LedgerFactorSource {
+	var device: P2P.LedgerHardwareWallet.LedgerDevice {
+		.init(name: self.name ?? "Unnamed", id: factorSource.id.hex(), model: model)
+	}
+}
+
 // MARK: - MissingSignatureFromRequiredSigner
 public struct MissingSignatureFromRequiredSigner: Swift.Error {}
 

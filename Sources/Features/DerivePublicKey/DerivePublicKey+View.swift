@@ -32,22 +32,22 @@ extension DerivePublicKey {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - DerivePublicKey_Preview
-struct DerivePublicKey_Preview: PreviewProvider {
-	static var previews: some View {
-		DerivePublicKey.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: DerivePublicKey()
-			)
-		)
-	}
-}
-
-extension DerivePublicKey.State {
-	public static let previewValue = Self()
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - DerivePublicKey_Preview
+// struct DerivePublicKey_Preview: PreviewProvider {
+//	static var previews: some View {
+//		DerivePublicKey.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: DerivePublicKey()
+//			)
+//		)
+//	}
+// }
+//
+// extension DerivePublicKey.State {
+//	public static let previewValue = Self()
+// }
+// #endif

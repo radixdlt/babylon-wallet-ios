@@ -13,12 +13,6 @@ public struct AccountsClient: Sendable {
 	/// value of Accounts when you switch network (if new active gateway is on a new network).
 	public var accountsOnCurrentNetwork: AccountsOnCurrentNetwork
 
-	/// Creates a new virtual account controlled by a `device` factor source, without saving it into the profile
-	public var newUnsavedVirtualAccountControlledByDeviceFactorSource: NewUnsavedVirtualAccountControlledByDeviceFactorSource
-
-	/// Creates a new virtual account controlled by a `ledger` factor source, without saving it into the profile
-	public var newUnsavedVirtualAccountControlledByLedgerFactorSource: NewUnsavedVirtualAccountControlledByLedgerFactorSource
-
 	/// Saves a virtual account into the profile.
 	public var saveVirtualAccount: SaveVirtualAccount
 
@@ -36,8 +30,6 @@ public struct AccountsClient: Sendable {
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
-		newUnsavedVirtualAccountControlledByDeviceFactorSource: @escaping NewUnsavedVirtualAccountControlledByDeviceFactorSource,
-		newUnsavedVirtualAccountControlledByLedgerFactorSource: @escaping NewUnsavedVirtualAccountControlledByLedgerFactorSource,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
 		getAccountByAddress: @escaping GetAccountByAddress,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
@@ -47,8 +39,6 @@ public struct AccountsClient: Sendable {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
-		self.newUnsavedVirtualAccountControlledByDeviceFactorSource = newUnsavedVirtualAccountControlledByDeviceFactorSource
-		self.newUnsavedVirtualAccountControlledByLedgerFactorSource = newUnsavedVirtualAccountControlledByLedgerFactorSource
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
@@ -62,10 +52,6 @@ extension AccountsClient {
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Profile.Network.Accounts
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
-
-	public typealias NewUnsavedVirtualAccountControlledByDeviceFactorSource = @Sendable (CreateVirtualEntityControlledByDeviceFactorSourceRequest) async throws -> Profile.Network.Account
-
-	public typealias NewUnsavedVirtualAccountControlledByLedgerFactorSource = @Sendable (CreateVirtualEntityControlledByLedgerFactorSourceRequest) async throws -> Profile.Network.Account
 
 	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void
 

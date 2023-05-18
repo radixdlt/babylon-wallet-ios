@@ -85,6 +85,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"TransactionReviewFeature",
+			"DerivePublicKeyFeature",
 			"ROLAClient",
 		],
 		tests: .no
@@ -100,6 +101,7 @@ package.addModules([
 			"LedgerHardwareWalletClient",
 			"LocalAuthenticationClient",
 			"PersonasClient",
+			"DerivePublicKeyFeature",
 		],
 		tests: .yes()
 	),

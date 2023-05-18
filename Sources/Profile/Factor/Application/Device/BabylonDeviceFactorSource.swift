@@ -5,7 +5,7 @@ import Prelude
 /// It acts a a convenience in code to not have to assert that `kind == .device` and
 /// try to access `entityCreatingStorage` which is optional also asserting `parameters` to
 /// only declare `curve25519` and `cap26` derivation path.
-public struct BabylonDeviceFactorSource: _ApplicationFactorSource {
+public struct BabylonDeviceFactorSource: _ApplicationFactorSource, _EntityCreatingFactorSourceProtocol {
 	public static let assertedKind: FactorSourceKind = .device
 	public static let assertedParameters: FactorSource.Parameters = .babylon
 

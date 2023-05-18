@@ -1,36 +1,26 @@
 import AccountsClient
 import AddLedgerFactorSourceFeature
 import Cryptography
+import DerivePublicKeyFeature
 import FeaturePrelude
 import LedgerHardwareWalletClient
 import PersonasClient
 
-// MARK: - GenesisFactorSourceSelection
-public enum GenesisFactorSourceSelection: Sendable, Hashable {
-	case device(BabylonDeviceFactorSource)
-	case ledger(ledgerFactorSources: [FactorSource])
-}
-
 // MARK: - CreationOfEntity
 public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let networkID: NetworkID?
 		public let name: NonEmptyString
-		public let genesisFactorSourceSelection: GenesisFactorSourceSelection
-		public var selectedLedgerID: FactorSource.ID? = nil
-		public var ledgers: IdentifiedArrayOf<FactorSource> = []
+		public var derivePublicKey: DerivePublicKey.State
 
 		@PresentationState
 		public var addNewLedger: AddLedgerFactorSource.State?
 
 		public init(
-			networkID: NetworkID?,
 			name: NonEmptyString,
-			genesisFactorSourceSelection: GenesisFactorSourceSelection
+			derivePublicKey: DerivePublicKey.State
 		) {
-			self.networkID = networkID
 			self.name = name
-			self.genesisFactorSourceSelection = genesisFactorSourceSelection
+			self.derivePublicKey = derivePublicKey
 		}
 	}
 
@@ -69,154 +59,65 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, FeatureReducer
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
-			switch state.genesisFactorSourceSelection {
-			case let .device(babylonDeviceFactorSource):
-				return createEntityControlledByDeviceFactorSource(babylonDeviceFactorSource, state: state)
-			case let .ledger(ledgers):
-				precondition(ledgers.allSatisfy { $0.kind == .ledgerHQHardwareWallet })
-				state.ledgers = IdentifiedArrayOf<FactorSource>.init(uniqueElements: ledgers, id: \.id)
-				if let first = ledgers.first {
-					state.selectedLedgerID = first.id
-				}
-				return .none
-			}
-		case let .selectedLedger(selectedID):
-			state.selectedLedgerID = selectedID
-			return .none
-
-		case .addNewLedgerButtonTapped:
-			state.addNewLedger = .init()
-			return .none
-
-		case let .confirmedLedger(ledger):
-			return sendDerivePublicKeyRequest(ledger, state: state)
-		}
+//		switch viewAction {
+//		case .appeared:
+//			switch state.genesisFactorSourceSelection {
+//			case let .device(babylonDeviceFactorSource):
+//				return createEntityControlledByDeviceFactorSource(babylonDeviceFactorSource, state: state)
+//			case let .ledger(ledgers):
+//				precondition(ledgers.allSatisfy { $0.kind == .ledgerHQHardwareWallet })
+//				state.ledgers = IdentifiedArrayOf<FactorSource>.init(uniqueElements: ledgers, id: \.id)
+//				if let first = ledgers.first {
+//					state.selectedLedgerID = first.id
+//				}
+//				return .none
+//			}
+//		case let .selectedLedger(selectedID):
+//			state.selectedLedgerID = selectedID
+//			return .none
+//
+//		case .addNewLedgerButtonTapped:
+//			state.addNewLedger = .init()
+//			return .none
+//
+//		case let .confirmedLedger(ledger):
+//			return sendDerivePublicKeyRequest(ledger, state: state)
+//		}
+		fatalError()
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .createEntityResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .send(.delegate(.createEntityFailed))
-
-		case let .createEntityResult(.success(entity)):
-			return .send(.delegate(.createdEntity(entity)))
-		}
+//		switch internalAction {
+//		case let .createEntityResult(.failure(error)):
+//			errorQueue.schedule(error)
+//			return .send(.delegate(.createEntityFailed))
+//
+//		case let .createEntityResult(.success(entity)):
+//			return .send(.delegate(.createdEntity(entity)))
+//		}
+		fatalError()
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case let .addNewLedger(.presented(.delegate(.completed(ledger)))):
-			state.addNewLedger = nil
-			state.selectedLedgerID = ledger.id
-			state.ledgers[id: ledger.id] = ledger
-			return .none
-
-		default:
-			return .none
-		}
+//		switch childAction {
+//		case let .addNewLedger(.presented(.delegate(.completed(ledger)))):
+//			state.addNewLedger = nil
+//			state.selectedLedgerID = ledger.id
+//			state.ledgers[id: ledger.id] = ledger
+//			return .none
+//
+//		default:
+//			return .none
+//		}
+		fatalError()
 	}
 }
 
-extension CreationOfEntity.State {
-	public var useLedgerAsFactorSource: Bool {
-		switch genesisFactorSourceSelection {
-		case .ledger: return true
-		case .device: return false
-		}
-	}
-}
-
-extension CreationOfEntity {
-	private func createEntityControlledByDeviceFactorSource(
-		_ babylonFactorSource: BabylonDeviceFactorSource,
-		state: State
-	) -> EffectTask<Action> {
-		let entityKind = Entity.entityKind
-
-		let request = CreateVirtualEntityControlledByDeviceFactorSourceRequest(
-			networkID: state.networkID,
-			babylonDeviceFactorSource: babylonFactorSource,
-			displayName: state.name,
-			extraProperties: { numberOfEntities in
-				switch entityKind {
-				case .identity: return .forPersona(.init(fields: []))
-				case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
-				}
-			}
-		)
-
-		return .run { send in
-			await send(.internal(.createEntityResult(TaskResult {
-				switch entityKind {
-				case .account:
-					let account = try await accountsClient.newUnsavedVirtualAccountControlledByDeviceFactorSource(request)
-					try await accountsClient.saveVirtualAccount(.init(
-						account: account,
-						shouldUpdateFactorSourceNextDerivationIndex: true
-					))
-					return try account.cast()
-				case .identity:
-					let persona = try await personasClient.newUnsavedVirtualPersonaControlledByDeviceFactorSource(request)
-					try await personasClient.saveVirtualPersona(persona)
-					return try persona.cast()
-				}
-			}
-			)))
-		}
-	}
-
-	// FIXME: Delete this when we have Multifactor support
-	private func sendDerivePublicKeyRequest(
-		_ ledger: FactorSource,
-		state: State
-	) -> EffectTask<Action> {
-		let entityKind = Entity.entityKind
-
-		let request: CreateVirtualEntityControlledByLedgerFactorSourceRequest
-
-		do {
-			request = try CreateVirtualEntityControlledByLedgerFactorSourceRequest(
-				networkID: state.networkID,
-				ledger: ledger,
-				displayName: state.name,
-				extraProperties: { numberOfEntities in
-					switch entityKind {
-					case .identity: return .forPersona(.init(fields: []))
-					case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
-					}
-				},
-				derivePublicKey: { derivationPath in
-					try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
-				}
-			)
-		} catch {
-			loggerGlobal.error("Failed to create CreateVirtualEntityControlledByLedgerFactorSourceRequest, error: \(error)")
-			return .none
-		}
-
-		return .run { send in
-			await send(.internal(
-				.createEntityResult(
-					TaskResult {
-						switch entityKind {
-						case .account:
-							let account = try await accountsClient.newUnsavedVirtualAccountControlledByLedgerFactorSource(request)
-							try await accountsClient.saveVirtualAccount(.init(
-								account: account,
-								shouldUpdateFactorSourceNextDerivationIndex: true
-							))
-							return try account.cast()
-						case .identity:
-							let persona = try await personasClient.newUnsavedVirtualPersonaControlledByLedgerFactorSource(request)
-							try await personasClient.saveVirtualPersona(persona)
-							return try persona.cast()
-						}
-					}
-				)
-			))
-		}
-	}
-}
+// extension CreationOfEntity.State {
+//	public var useLedgerAsFactorSource: Bool {
+//		switch genesisFactorSourceSelection {
+//		case .ledger: return true
+//		case .device: return false
+//		}
+//	}
+// }

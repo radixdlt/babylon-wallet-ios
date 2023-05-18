@@ -4,7 +4,12 @@ import Prelude
 /// This is NOT a `Codable` factor source, this is never saved anywhere, just in memory.
 /// It acts a a convenience in code to not have to assert that `kind == .ledger` and
 /// also `LedgerHardwareWallet.DeviceModel`
-public struct LedgerFactorSource: _ApplicationFactorSource {
+public struct LedgerFactorSource:
+	_ApplicationFactorSource,
+
+	// FIXME: Remove this protocol conformance once we have multifactor, because once we have multi factor it should not be possible to create accounts controlled with Ledger, since no need, a user can add Ledger as another factor source when securifying the account
+	_EntityCreatingFactorSourceProtocol
+{
 	public static let assertedKind: FactorSourceKind = .ledgerHQHardwareWallet
 	public static let assertedParameters: FactorSource.Parameters = .olympiaBackwardsCompatible
 
