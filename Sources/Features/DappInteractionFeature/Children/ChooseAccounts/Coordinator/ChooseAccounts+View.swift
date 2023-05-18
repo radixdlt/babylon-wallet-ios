@@ -128,15 +128,17 @@ extension ChooseAccounts.State {
 		challenge: nil,
 		accessKind: .ongoing,
 		dappMetadata: .previewValue,
-		availableAccounts: .init(
-			uniqueElements: [
-				.previewValue0,
-				.previewValue1,
-			]
-		),
 		numberOfAccounts: .exactly(1),
-		createAccountCoordinator: nil,
-		_chooseAccounts: .init(selectionRequirement: .exactly(1))
-	)
+                createAccountCoordinator: nil,
+                _chooseAccounts: .init(
+                        selectionRequirement: .exactly(1),
+                        availableAccounts: .init(
+                                uniqueElements: [
+                                        .previewValue0,
+                                        .previewValue1,
+                                ]
+                        )
+                )
+        )
 }
 #endif

@@ -21,7 +21,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		let accessKind: AccessKind
 		let dappMetadata: DappMetadata
-		var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
 		var selectedAccounts: [ChooseAccountsRow.State]?
 
@@ -34,7 +33,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
 			accessKind: AccessKind,
 			dappMetadata: DappMetadata,
-			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
 			numberOfAccounts: DappInteraction.NumberOfAccounts,
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil,
@@ -43,7 +41,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			self.challenge = challenge
 			self.accessKind = accessKind
 			self.dappMetadata = dappMetadata
-			self.availableAccounts = availableAccounts
 			self.numberOfAccounts = numberOfAccounts
 			self.selectedAccounts = selectedAccounts
 			self.destination = nil
