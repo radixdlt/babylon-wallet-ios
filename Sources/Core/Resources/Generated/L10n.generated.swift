@@ -122,12 +122,14 @@ public enum L10n {
       public static let denyAll = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAll", fallback: "Deny all")
       /// Deny all third-parties deposits
       public static let denyAllSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAllSubtitle", fallback: "Deny all third-parties deposits")
+      /// This account will not be able to receive "air drops" or be used by a trusted contact to assist with account recovery.
+      public static let denyAllWarning = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAllWarning", fallback: "This account will not be able to receive \"air drops\" or be used by a trusted contact to assist with account recovery.")
       /// Only accept known
       public static let onlyKnown = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnown", fallback: "Only accept known")
       /// Allow  third-parties to deposit only assets this account already holds
       public static let onlyKnownSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnownSubtitle", fallback: "Allow  third-parties to deposit only assets this account already holds")
-      /// This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery.
-      public static let text = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_text", fallback: "This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery.")
+      /// Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.
+      public static let text = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_text", fallback: "Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.")
     }
   }
   public enum AddressAction {
