@@ -8,25 +8,13 @@ extension ChooseAccounts {
 		let thumbnail: URL?
 		let title: String
 		let subtitle: String
-		let availableAccounts: [ChooseAccountsRow.State]
-		let selectionRequirement: SelectionRequirement
-		let selectedAccounts: [ChooseAccountsRow.State]?
+		let _chooseAccounts: _ChooseAccounts.State
 
 		init(state: ChooseAccounts.State) {
 			self.thumbnail = state.dappMetadata.thumbnail
 			self.title = state.title
 			self.subtitle = state.subtitle
-
-			let selectionRequirement = SelectionRequirement(state.numberOfAccounts)
-
-			self.availableAccounts = state.availableAccounts.map { account in
-				ChooseAccountsRow.State(
-					account: account,
-					mode: selectionRequirement == .exactly(1) ? .radioButton : .checkmark
-				)
-			}
-			self.selectionRequirement = selectionRequirement
-			self.selectedAccounts = state.selectedAccounts
+			self._chooseAccounts = state._chooseAcounts
 		}
 	}
 
@@ -47,50 +35,20 @@ extension ChooseAccounts {
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
-
-						VStack(spacing: .small1) {
-							Selection(
-								viewStore.binding(
-									get: \.selectedAccounts,
-									send: { .selectedAccountsChanged($0) }
-								),
-								from: viewStore.availableAccounts,
-								requiring: viewStore.selectionRequirement
-							) { item in
-								ChooseAccountsRow.View(
-									viewState: .init(state: item.value),
-									isSelected: item.isSelected,
-									action: item.action
-								)
-							}
-						}
-
-						Button(L10n.DAppRequest.ChooseAccounts.createNewAccount) {
-							viewStore.send(.createAccountButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: false))
+						// TODO: Choose Account here
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
 				}
 				.footer {
 					WithControlRequirements(
-						viewStore.selectedAccounts,
+						viewStore._chooseAccounts.selectedAccounts,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
 						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
-				.onAppear {
-					viewStore.send(.appeared)
-				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ChooseAccounts.Destinations.State.createAccount,
-					action: ChooseAccounts.Destinations.Action.createAccount,
-					content: { CreateAccountCoordinator.View(store: $0) }
-				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /ChooseAccounts.Destinations.State.signing,
@@ -177,7 +135,8 @@ extension ChooseAccounts.State {
 			]
 		),
 		numberOfAccounts: .exactly(1),
-		createAccountCoordinator: nil
+		createAccountCoordinator: nil,
+		_chooseAccounts: .init(selectionRequirement: .exactly(1))
 	)
 }
 #endif

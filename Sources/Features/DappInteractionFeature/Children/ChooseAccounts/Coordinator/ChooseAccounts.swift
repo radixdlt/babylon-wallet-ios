@@ -25,6 +25,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
 		var selectedAccounts: [ChooseAccountsRow.State]?
 
+		var _chooseAcounts: _ChooseAccounts.State
+
 		@PresentationState
 		var destination: Destinations.State?
 
@@ -35,7 +37,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
 			numberOfAccounts: DappInteraction.NumberOfAccounts,
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
-			createAccountCoordinator: CreateAccountCoordinator.State? = nil
+			createAccountCoordinator: CreateAccountCoordinator.State? = nil,
+			_chooseAccounts: _ChooseAccounts.State
 		) {
 			self.challenge = challenge
 			self.accessKind = accessKind
@@ -43,24 +46,22 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			self.availableAccounts = availableAccounts
 			self.numberOfAccounts = numberOfAccounts
 			self.selectedAccounts = selectedAccounts
-			self.destination = createAccountCoordinator.map { .createAccount($0) } ?? nil
+			self.destination = nil
+			self._chooseAcounts = _chooseAccounts
 		}
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case appeared
-		case createAccountButtonTapped
-		case selectedAccountsChanged([ChooseAccountsRow.State]?)
 		case continueButtonTapped([ChooseAccountsRow.State])
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<Profile.Network.Accounts>)
 		case proveAccountOwnership(SigningFactors, AuthenticationDataToSignForChallengeResponse)
 	}
 
 	enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
+		case _chooseAccounts(_ChooseAccounts.Action)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -73,19 +74,14 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
-			case createAccount(CreateAccountCoordinator.State)
 			case signing(Signing.State)
 		}
 
 		enum Action: Sendable, Equatable {
-			case createAccount(CreateAccountCoordinator.Action)
 			case signing(Signing.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.createAccount, action: /Action.createAccount) {
-				CreateAccountCoordinator()
-			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
 			}
@@ -106,24 +102,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .run { send in
-				await send(.internal(.loadAccountsResult(TaskResult {
-					try await accountsClient.getAccountsOnCurrentNetwork()
-				})))
-			}
-
-		case .createAccountButtonTapped:
-			state.destination = .createAccount(.init(config: .init(
-				purpose: .newAccountDuringDappInteraction
-			), displayIntroduction: { _ in false }))
-			return .none
-
-		case let .selectedAccountsChanged(selectedAccounts):
-			state.selectedAccounts = selectedAccounts
-			return .none
-
 		case let .continueButtonTapped(selectedAccounts):
+
 			let selectedAccounts = IdentifiedArray(uncheckedUniqueElements: selectedAccounts.map(\.account))
 
 			guard let challenge = state.challenge else {
@@ -161,14 +141,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadAccountsResult(.success(accounts)):
-			state.availableAccounts = .init(uniqueElements: accounts)
-			return .none
-
-		case let .loadAccountsResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
-
 		case let .proveAccountOwnership(signingFactors, authenticationDataToSignForChallenge):
 			state.destination = .signing(.init(
 				factorsLeftToSignWith: signingFactors,
@@ -180,13 +152,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.createAccount(.delegate(.completed)))):
-			return .run { send in
-				await send(.internal(.loadAccountsResult(TaskResult {
-					try await accountsClient.getAccountsOnCurrentNetwork()
-				})))
-			}
-
 		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(signedAuthChallenge)))))):
 			state.destination = nil
 

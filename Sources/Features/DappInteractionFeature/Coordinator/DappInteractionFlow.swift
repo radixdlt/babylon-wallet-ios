@@ -740,7 +740,8 @@ extension DappInteractionFlow.Destinations.State {
 				challenge: item.challenge,
 				accessKind: .ongoing,
 				dappMetadata: dappMetadata,
-				numberOfAccounts: item.numberOfAccounts
+				numberOfAccounts: item.numberOfAccounts,
+				_chooseAccounts: .init(selectionRequirement: .exactly(1))
 			)))
 
 		case let .remote(.oneTimeAccounts(item)):
@@ -748,7 +749,8 @@ extension DappInteractionFlow.Destinations.State {
 				challenge: item.challenge,
 				accessKind: .oneTime,
 				dappMetadata: dappMetadata,
-				numberOfAccounts: item.numberOfAccounts
+				numberOfAccounts: item.numberOfAccounts,
+				_chooseAccounts: .init(selectionRequirement: .exactly(1))
 			)))
 
 		case let .remote(.oneTimePersonaData(item)):
