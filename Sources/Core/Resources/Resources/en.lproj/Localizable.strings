@@ -58,13 +58,14 @@
 "accountSettings_hideAccount_title" = "Hide This Account";
 "accountSettings_hideAccount_message" = "Hide this account in your wallet? You can always unhide it from the main application settings.";
 "accountSettings_hideAccount_button" = "Hide Account";
-"accountSettings_thirdPartyDeposits_text" = "This account will not be able to receive “air drops” or be used by a trusted contact to assist with account recovery.";
+"accountSettings_thirdPartyDeposits_text" = "Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.";
 "accountSettings_thirdPartyDeposits_acceptAll" = "Accept all deposits";
 "accountSettings_thirdPartyDeposits_acceptAllSubtitle" = "Allow third-parties to deposit any asset";
 "accountSettings_thirdPartyDeposits_onlyKnown" = "Only accept known";
 "accountSettings_thirdPartyDeposits_onlyKnownSubtitle" = "Allow  third-parties to deposit only assets this account already holds";
 "accountSettings_thirdPartyDeposits_denyAll" = "Deny all";
 "accountSettings_thirdPartyDeposits_denyAllSubtitle" = "Deny all third-parties deposits";
+"accountSettings_thirdPartyDeposits_denyAllWarning" = "This account will not be able to receive \"air drops\" or be used by a trusted contact to assist with account recovery.";
 "accountSettings_showAssets_text" = "Asset creators can add tags to them. You can choose which tags you want to see in this account.";
 "accountSettings_showAssets_selectShown" = "Select the ones you’d like shown on all your assets.";
 "accountSettings_showAssets_recommended" = "Recommended";
