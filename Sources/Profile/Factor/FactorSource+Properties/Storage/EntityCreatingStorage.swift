@@ -136,7 +136,6 @@ extension FactorSource.Storage {
 		networkID: NetworkID
 	) throws {
 		switch self {
-		case .securityQuestions: throw Discrepancy()
 		case var .entityCreating(entityCreatingStorage):
 			entityCreatingStorage.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
 			self = .entityCreating(entityCreatingStorage)

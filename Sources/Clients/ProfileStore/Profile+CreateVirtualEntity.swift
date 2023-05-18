@@ -42,7 +42,7 @@ extension Profile {
 			index: index
 		)
 
-		let transactionSigning: FactorInstance = try await {
+		let transactionSigning: HierarchicalDeterministicFactorInstance = try await {
 			let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
 				.init(
 					hdOnDeviceFactorSource: babylonDeviceFactorSource.hdOnDeviceFactorSource,
@@ -52,7 +52,7 @@ extension Profile {
 				)
 			)
 
-			return try FactorInstance(
+			return try HierarchicalDeterministicFactorInstance(
 				factorSourceID: babylonDeviceFactorSource.id,
 				publicKey: .init(engine: publicKey),
 				derivationPath: derivationPath
@@ -89,7 +89,12 @@ extension Profile {
 		let derivationPath = try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
 
 		let publicKey = try await request.derivePublicKey(derivationPath)
-		let transactionSigning = FactorInstance(factorSourceID: ledger.id, publicKey: .eddsaEd25519(publicKey), derivationPath: derivationPath)
+
+		let transactionSigning = HierarchicalDeterministicFactorInstance(
+			factorSourceID: ledger.id,
+			publicKey: .eddsaEd25519(publicKey),
+			derivationPath: derivationPath
+		)
 
 		let numberOfExistingEntities = {
 			guard let network = (try? self.network(id: networkID)) else {

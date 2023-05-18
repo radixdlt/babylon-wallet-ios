@@ -196,9 +196,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 					fatalError()
 				}
 				accountsLeftToVerifyDidSign.remove(account.id)
-				guard let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0) else {
-					fatalError()
-				}
+				let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
 				return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
 			}
 			guard accountsLeftToVerifyDidSign.isEmpty else {

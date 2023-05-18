@@ -27,7 +27,7 @@ extension ROLAClient {
 // MARK: - ManifestForAuthKeyCreationResponse
 public struct ManifestForAuthKeyCreationResponse: Sendable, Hashable {
 	public let manifest: TransactionManifest
-	public let authenticationSigning: FactorInstance
+	public let authenticationSigning: HierarchicalDeterministicFactorInstance
 }
 
 // MARK: - AuthenticationDataToSignForChallengeResponse

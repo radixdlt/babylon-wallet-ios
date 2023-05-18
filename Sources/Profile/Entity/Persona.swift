@@ -162,13 +162,11 @@ import EngineToolkit
 extension Profile.Network.Persona {
 	public static func deriveAddress(
 		networkID: NetworkID,
-		factorInstance: FactorInstance
+		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
-		if let derivationPath = factorInstance.derivationPath {
-			let path = try derivationPath.asIdentityPath()
-			guard path.entityKind == .identity else {
-				throw WrongEntityInDerivationPath()
-			}
+		let path = try factorInstance.derivationPath.asIdentityPath()
+		guard path.entityKind == .identity else {
+			throw WrongEntityInDerivationPath()
 		}
 
 		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(

@@ -22,7 +22,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
-				let factorInstance = FactorInstance(
+				let factorInstance = HierarchicalDeterministicFactorInstance(
 					factorSourceID: factorSouceID,
 					publicKey: publicKey,
 					derivationPath: olympiaAccount.path.wrapAsDerivationPath()

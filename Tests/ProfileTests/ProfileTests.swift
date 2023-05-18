@@ -150,7 +150,7 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let factorInstance = FactorInstance(
+			let factorInstance = HierarchicalDeterministicFactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
@@ -173,7 +173,7 @@ final class ProfileTests: TestCase {
 					curve: .curve25519
 				)
 
-				control.authenticationSigning = FactorInstance(
+				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
 					factorSourceID: babylonFactorSource.id,
 					publicKey: authPublicKey,
 					derivationPath: path.wrapAsDerivationPath()
@@ -207,7 +207,7 @@ final class ProfileTests: TestCase {
 				curve: .curve25519
 			)
 
-			let factorInstance = FactorInstance(
+			let factorInstance = HierarchicalDeterministicFactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
@@ -225,7 +225,7 @@ final class ProfileTests: TestCase {
 					curve: .curve25519
 				)
 
-				control.authenticationSigning = FactorInstance(
+				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
 					factorSourceID: babylonFactorSource.id,
 					publicKey: authPublicKey,
 					derivationPath: path.wrapAsDerivationPath()
@@ -347,7 +347,7 @@ final class ProfileTests: TestCase {
 		let profile = try Profile(snapshot: snapshot)
 		let date = Date(timeIntervalSince1970: 0)
 		let device = ProfileSnapshot.Header.UsedDeviceInfo(
-			description: "computer unit tests",
+			description: "computer unit test",
 			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
 			date: date
 		)
@@ -361,10 +361,10 @@ final class ProfileTests: TestCase {
 				numberOfPersonasOnAllNetworksInTotal: 3,
 				numberOfNetworks: 2
 			),
-			snapshotVersion: .init(rawValue: 33)
+			snapshotVersion: .init(rawValue: 34)
 		)
 
-		XCTAssertEqual(profile.header, header)
+		XCTAssertNoDifference(profile.header, header)
 		// XCTAssertEqual(profile.creatingDevice, creatingDevice)
 
 		XCTAssertEqual(profile.factorSources.count, 2)

@@ -69,6 +69,15 @@ extension FactorSourcesClient {
 		try await getFactorSources(matching: filter)[id: id]
 	}
 
+	public func getDeviceFactorSource(
+		of hdFactorInstance: HierarchicalDeterministicFactorInstance
+	) async throws -> HDOnDeviceFactorSource? {
+		guard let factorSource = try await getFactorSource(of: hdFactorInstance.factorInstance) else {
+			return nil
+		}
+		return try HDOnDeviceFactorSource(factorSource: factorSource)
+	}
+
 	public func getFactorSource(
 		id: FactorSourceID,
 		ensureKind kind: FactorSourceKind

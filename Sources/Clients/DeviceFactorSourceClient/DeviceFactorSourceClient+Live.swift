@@ -64,11 +64,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 							switch account.securityState {
 							case let .unsecured(unsecuredEntityControl):
 								let factorInstance = unsecuredEntityControl.transactionSigning
-								guard let derivationPath = factorInstance.derivationPath else {
-									// FIXME: create a new HDFactorInstance type like HDOnDeviceFactorSource where `derivationPath` is not optional?
-									loggerGlobal.critical("Factor instance did not contain a derivationPath, this is troublesome.")
-									return false
-								}
+								let derivationPath = factorInstance.derivationPath
 								let hdRoot = try mnemonicWithPassphrase.hdRoot()
 								let privateKey = try hdRoot.derivePrivateKey(
 									path: derivationPath,

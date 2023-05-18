@@ -45,8 +45,9 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		signingFactor: SigningFactor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
-			deviceFactorSource: signingFactor.factorSource,
+		let deviceFactorSource = try HDOnDeviceFactorSource(factorSource: signingFactor.factorSource)
+		return try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+			deviceFactorSource: deviceFactorSource,
 			signerEntities: Set(signingFactor.signers.map(\.entity)),
 			unhashedDataToSign: state.signingPurposeWithPayload.dataToSign,
 			purpose: .signTransaction(.manifestFromDapp)

@@ -314,7 +314,6 @@ package.addModules([
 ])
 
 // MARK: - Clients
-
 package.addModules([
 	.client(
 		name: "AccountsClient",

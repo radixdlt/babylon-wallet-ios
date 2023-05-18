@@ -143,7 +143,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 31: Add `ledgerHQHardwareWalletSigningDisplayMode` to appPreferences.display
 	/// - 32: rename `genesisFactorInstance` -> `transactionSigning` and add `authSigning`
 	/// - 33: Add snapshot `header`
-	public static let minimum: Self = 33
+	/// - 34: Change `FactorInstance` to hold `badge` being an enum `virtual`/`physical` (change from flat to nested representation of FactorSource storage)
+	public static let minimum: Self = 34
 }
 
 extension ProfileSnapshot.Header {

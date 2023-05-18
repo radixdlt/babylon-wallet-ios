@@ -96,7 +96,7 @@ extension ROLAClient {
 
 			let factorSourceID: FactorSourceID
 			let authSignDerivationPath: DerivationPath
-			let transactionSigning: FactorInstance
+			let transactionSigning: HierarchicalDeterministicFactorInstance
 			let unsecuredEntityControl: UnsecuredEntityControl
 			switch entity.securityState {
 			case let .unsecured(unsecuredEntityControl_):
@@ -109,9 +109,7 @@ extension ROLAClient {
 
 				loggerGlobal.notice("Entity: \(entity) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
 				factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
-				guard let hdPath = unsecuredEntityControl.transactionSigning.derivationPath else {
-					fatalError()
-				}
+				let hdPath = unsecuredEntityControl.transactionSigning.derivationPath
 				switch entity {
 				case .account:
 					authSignDerivationPath = try hdPath.asAccountPath().switching(
@@ -141,7 +139,7 @@ extension ROLAClient {
 					)
 				)
 
-				return try FactorInstance(
+				return try HierarchicalDeterministicFactorInstance(
 					factorSourceID: hdDeviceFactorSource.id,
 					publicKey: .init(engine: publicKey),
 					derivationPath: authSignDerivationPath
@@ -155,7 +153,10 @@ extension ROLAClient {
 				assertingTransactionSigningKeyIsNotRemoved: transactionSigning.publicKey
 			)
 
-			return ManifestForAuthKeyCreationResponse(manifest: manifest, authenticationSigning: authenticationSigning)
+			return ManifestForAuthKeyCreationResponse(
+				manifest: manifest,
+				authenticationSigning: authenticationSigning
+			)
 		}
 
 		return Self(
