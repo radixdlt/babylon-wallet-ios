@@ -1,16 +1,28 @@
 import AddLedgerFactorSourceFeature
 import FeaturePrelude
 
-extension ChoseLedgerHardwareDevice.State {
-	var viewState: ChoseLedgerHardwareDevice.ViewState {
-		.init()
-	}
-}
-
 // MARK: - ChoseLedgerHardwareDevice.View
 extension ChoseLedgerHardwareDevice {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let useLedgerAsFactorSource: Bool
+		let ledgers: IdentifiedArrayOf<FactorSource>
+		var ledgersArray: [FactorSource]? { .init(ledgers) }
+		let selectedLedgerID: FactorSourceID?
+		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
+
+		struct SelectedLedgerControlRequirements: Hashable {
+			let selectedLedger: FactorSource
+		}
+
+		init(state: ChoseLedgerHardwareDevice.State) {
+			self.ledgers = state.ledgers
+			self.selectedLedgerID = state.selectedLedgerID
+			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers[id: id] {
+				self.selectedLedgerControlRequirements = .init(selectedLedger: selectedLedger)
+			} else {
+				self.selectedLedgerControlRequirements = nil
+			}
+		}
 	}
 
 	@MainActor

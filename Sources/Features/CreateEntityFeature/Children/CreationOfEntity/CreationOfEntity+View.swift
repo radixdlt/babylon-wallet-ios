@@ -6,25 +6,9 @@ extension CreationOfEntity {
 	public struct ViewState: Equatable {
 		let kind: EntityKind
 		let useLedgerAsFactorSource: Bool
-		let ledgers: IdentifiedArrayOf<FactorSource>
-		var ledgersArray: [FactorSource]? { .init(ledgers) }
-		let selectedLedgerID: FactorSourceID?
-		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
-
-		struct SelectedLedgerControlRequirements: Hashable {
-			let selectedLedger: FactorSource
-		}
 
 		init(state: CreationOfEntity.State) {
-//			self.kind = Entity.entityKind
-//			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
-//			self.ledgers = state.ledgers
-//			self.selectedLedgerID = state.selectedLedgerID
-//			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers[id: id] {
-//				self.selectedLedgerControlRequirements = .init(selectedLedger: selectedLedger)
-//			} else {
-//				self.selectedLedgerControlRequirements = nil
-//			}
+			self.kind = Entity.entityKind
 			fatalError()
 		}
 	}
@@ -42,17 +26,18 @@ extension CreationOfEntity {
 				store,
 				observe: CreationOfEntity.ViewState.init(state:),
 				send: { .view($0) }
-			) { viewStore in
-				Group {
-					if viewStore.useLedgerAsFactorSource {
-						createWithLedgerView(viewStore)
-					} else {
-						createWithDevice()
-					}
-				}
-				.onAppear {
-					viewStore.send(.appeared)
-				}
+			) { _ in
+//				Group {
+//					if viewStore.useLedgerAsFactorSource {
+//						createWithLedgerView(viewStore)
+//					} else {
+//						createWithDevice()
+//					}
+//				}
+				Text("Hmm add Ledger selection her if able..")
+//				.onAppear {
+//					viewStore.send(.appeared)
+//				}
 			}
 		}
 	}
