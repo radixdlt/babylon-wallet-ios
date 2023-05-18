@@ -9,7 +9,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		public var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
 		public var selectedAccounts: [ChooseAccountsRow.State]?
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destinations.State? = nil
 
 		public init(
 			selectionRequirement: SelectionRequirement,
@@ -67,20 +67,13 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { send in
-				await send(.internal(.loadAccountsResult(TaskResult {
-					try await accountsClient.getAccountsOnCurrentNetwork()
-				})))
-			}
+			return loadAccounts()
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(.init(
-				config: .init(
-					purpose: .newAccountDuringDappInteraction
-				),
+				config: .init(purpose: .newAccountDuringDappInteraction),
 				displayIntroduction: { _ in false }
-			)
-			)
+			))
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):
@@ -92,6 +85,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
+			// Uniqueness is guaranteed as per `Profile.Network.Accounts`
 			state.availableAccounts = .init(uniqueElements: accounts)
 			return .none
 
@@ -104,14 +98,19 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .destination(.presented(.createAccount(.delegate(.completed)))):
-			return .run { send in
-				await send(.internal(.loadAccountsResult(TaskResult {
-					try await accountsClient.getAccountsOnCurrentNetwork()
-				})))
-			}
+			return loadAccounts()
 
 		default:
 			return .none
+		}
+	}
+
+	private func loadAccounts() -> EffectTask<Action> {
+		.task {
+			let result = await TaskResult {
+				try await accountsClient.getAccountsOnCurrentNetwork()
+			}
+			return .internal(.loadAccountsResult(result))
 		}
 	}
 }

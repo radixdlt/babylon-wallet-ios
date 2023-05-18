@@ -66,7 +66,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(
+		case `continue`(
 			accessKind: AccountPermissionChooseAccounts.State.AccessKind,
 			chosenAccounts: AccountPermissionChooseAccountsResult
 		)
@@ -111,14 +111,14 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			let selectedAccounts = IdentifiedArray(uncheckedUniqueElements: selectedAccounts.map(\.account))
 
 			guard let challenge = state.challenge else {
-				return .send(.delegate(.continueButtonTapped(
+				return .send(.delegate(.continue(
 					accessKind: state.accessKind,
 					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
 				)))
 			}
 
 			guard let signers = NonEmpty<Set<EntityPotentiallyVirtual>>.init(rawValue: Set(selectedAccounts.map { EntityPotentiallyVirtual.account($0) })) else {
-				return .send(.delegate(.continueButtonTapped(
+				return .send(.delegate(.continue(
 					accessKind: state.accessKind,
 					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
 				)))
@@ -130,7 +130,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				dAppDefinitionAddress: state.dappMetadata.dAppDefinitionAddress
 			)
 
-			return .run { send in
+			return .task {
 				let dataToSign = try rolaClient.authenticationDataToSignForChallenge(createAuthPayloadRequest)
 				let networkID = await accountsClient.getCurrentNetworkID()
 				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
@@ -138,7 +138,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 					signers: signers,
 					signingPurpose: .signAuth
 				))
-				await send(.internal(.proveAccountOwnership(signingFactors, dataToSign)))
+				return .internal(.proveAccountOwnership(signingFactors, dataToSign))
 			}
 		}
 	}
@@ -179,7 +179,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				challenge: signedAuthChallenge.challenge,
 				IdentifiedArrayOf<P2P.Dapp.Response.Accounts.WithProof>.init(uniqueElements: walletAccountsWithProof)
 			)
-			return .send(.delegate(.continueButtonTapped(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
+			return .send(.delegate(.continue(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
 
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			state.destination = nil
