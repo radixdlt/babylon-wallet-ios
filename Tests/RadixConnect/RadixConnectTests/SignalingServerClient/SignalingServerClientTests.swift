@@ -228,6 +228,6 @@ final class SignalingClientTests: TestCase {
 			exp.fulfill()
 		}
 
-		await fulfillment(of: [expectation], timeout: 1.0)
+		await fulfillment(of: [exp], timeout: 1.0)
 	}
 }
