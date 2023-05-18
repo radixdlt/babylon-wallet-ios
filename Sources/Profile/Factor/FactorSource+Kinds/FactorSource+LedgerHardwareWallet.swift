@@ -21,8 +21,8 @@ extension FactorSource {
 		id: FactorSource.ID,
 		model: LedgerHardwareWallet.DeviceModel,
 		name: String?
-	) -> Self {
-		Self(
+	) -> LedgerFactorSource {
+		let factorSource = Self(
 			kind: .ledgerHQHardwareWallet,
 			id: id,
 			label: .init(name ?? "Unnamed"),
@@ -32,5 +32,6 @@ extension FactorSource {
 			addedOn: .now,
 			lastUsedOn: .now
 		)
+		return try! LedgerFactorSource(factorSource: factorSource)
 	}
 }

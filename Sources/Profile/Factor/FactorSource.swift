@@ -2,7 +2,7 @@ import Cryptography
 import Prelude
 
 // MARK: - _FactorSourceProtocol
-protocol _FactorSourceProtocol {
+public protocol _FactorSourceProtocol {
 	var kind: FactorSourceKind { get }
 	var id: FactorSourceID { get }
 	var label: FactorSource.Label { get }

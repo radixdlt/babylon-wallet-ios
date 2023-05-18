@@ -1,7 +1,7 @@
 import Prelude
 
 // MARK: - _ApplicationFactorSource
-protocol _ApplicationFactorSource:
+public protocol _ApplicationFactorSource:
 	_FactorSourceProtocol,
 	Sendable,
 	Hashable,

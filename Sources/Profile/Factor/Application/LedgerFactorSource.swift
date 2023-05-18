@@ -3,38 +3,31 @@ import Prelude
 // MARK: - LedgerFactorSource
 /// This is NOT a `Codable` factor source, this is never saved anywhere, just in memory.
 /// It acts a a convenience in code to not have to assert that `kind == .ledger` and
-/// also creates `LedgerDevice` from `label` and `description`
+/// also `LedgerHardwareWallet.DeviceModel`
 public struct LedgerFactorSource: _ApplicationFactorSource {
 	public static let assertedKind: FactorSourceKind = .ledgerHQHardwareWallet
 	public static let assertedParameters: FactorSource.Parameters = .olympiaBackwardsCompatible
 
 	public let factorSource: FactorSource
+	public let model: FactorSource.LedgerHardwareWallet.DeviceModel
+
+	// FIXME: Remove once we have multifactor, because once we have multi factor it should not be possible to create accounts controlled with Ledger, since no need, a user can add Ledger as another factor source when securifying the account
+	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
+
+	public let name: String?
 
 	public init(factorSource: FactorSource) throws {
 		self.factorSource = try Self.validating(factorSource: factorSource)
 		self.entityCreatingStorage = try factorSource.entityCreatingStorage()
-	}
-
-	public init(hdOnDeviceFactorSource: HDOnDeviceFactorSource) throws {
-		try self.init(factorSource: hdOnDeviceFactorSource.factorSource)
-	}
-}
-
-extension P2P.LedgerHardwareWallet.LedgerDevice {
-	public init(factorSource: FactorSource) {
-		self.init(
-			name: .init(rawValue: factorSource.label.rawValue),
-			id: factorSource.id.description,
-			model: .init(from: factorSource)
-		)
+		guard let model = FactorSource.LedgerHardwareWallet.DeviceModel(rawValue: factorSource.description.rawValue) else {
+			throw UnrecognizedLedgerModel(model: factorSource.description.rawValue)
+		}
+		self.model = model
+		self.name = factorSource.label.rawValue
 	}
 }
 
-extension P2P.LedgerHardwareWallet.Model {
-	public init(from factorSource: FactorSource) {
-		precondition(factorSource.kind == .ledgerHQHardwareWallet)
-		self = Self(
-			rawValue: factorSource.description.rawValue
-		) ?? .nanoSPlus // FIXME: handle optional better.
-	}
+// MARK: - UnrecognizedLedgerModel
+struct UnrecognizedLedgerModel: Error {
+	let model: String
 }
