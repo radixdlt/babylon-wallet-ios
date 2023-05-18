@@ -31,12 +31,14 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
 		let conenctionBuilder = PeerConnectionNegotiator(signalingClient: signalingClient, factory: peerConnectionFactory)
 
-		// Negotiate the PeerConnection
-		try await performNegotiation(forClient: remoteClientID, peerConnection: peerConnection, peerConnectionDelegate: delegate)
+		try await withTimeout {
+			// Negotiate the PeerConnection
+			try await self.performNegotiation(forClient: remoteClientID, peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
-		// Await for PeerConnection to be estblished
-		let result = try await conenctionBuilder.negotiationResults.first()
-		XCTAssertEqual(result.map(\.id), .success(.init(remoteClientID.rawValue)))
+			// Await for PeerConnection to be estblished
+			let result = try await conenctionBuilder.negotiationResults.first()
+			XCTAssertEqual(result.map(\.id), .success(.init(remoteClientID.rawValue)))
+		}
 	}
 
 	// TODO: For some reason fails on CI with timeout, to investigate
@@ -117,13 +119,15 @@ final class PeerConnectionNegotiatorTests: TestCase {
 		)
 		delegate.sendNegotiationNeededEvent()
 
-		// Await set offer
-		_ = try await peerConnection.onOfferConfigured()
-		peerConnection.completeSetRemoteDescription(with: .failure(NSError(domain: "dom", code: 1)))
+		try await withTimeout {
+			// Await set offer
+			_ = try await peerConnection.onOfferConfigured()
+			peerConnection.completeSetRemoteDescription(with: .failure(NSError(domain: "dom", code: 1)))
 
-		let result = try await peerConnectionTask.value
+			let result = try await peerConnectionTask.value
 
-		XCTAssertThrowsError(try result.get())
+			XCTAssertThrowsError(try result.get())
+		}
 	}
 
 	func test_makePeerConnection_failsToGenerateAnswer() async throws {
@@ -136,14 +140,16 @@ final class PeerConnectionNegotiatorTests: TestCase {
 			try await conenctionBuilder.negotiationResults.first()
 		}
 
-		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
+		try await withTimeout {
+			try await self.receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
-		await peerConnection.onLocalAnswerCreated()
-		peerConnection.completeCreateLocalAnswerRequest(with: .failure(NSError(domain: "dom", code: 1)))
+			await peerConnection.onLocalAnswerCreated()
+			peerConnection.completeCreateLocalAnswerRequest(with: .failure(NSError(domain: "dom", code: 1)))
 
-		let result = try await peerConnectionTask.value
+			let result = try await peerConnectionTask.value
 
-		XCTAssertThrowsError(try result.get())
+			XCTAssertThrowsError(try result.get())
+		}
 	}
 
 	func test_makePeerConnection_failsToSendAnswerToRemote() async throws {
@@ -156,19 +162,21 @@ final class PeerConnectionNegotiatorTests: TestCase {
 			try await conenctionBuilder.negotiationResults.first()
 		}
 
-		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
+		try await withTimeout {
+			try await self.receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
-		await peerConnection.onLocalAnswerCreated()
-		peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
+			await peerConnection.onLocalAnswerCreated()
+			peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
 
-		_ = try await peerConnection.onAnswerConfigured()
-		peerConnection.completeSetLocalDescription(with: .success(()))
+			_ = try await peerConnection.onAnswerConfigured()
+			peerConnection.completeSetLocalDescription(with: .success(()))
 
-		let message = try await jsonDecoder.decode(SignalingClient.ClientMessage.self, from: webSocketClient.onClientMessageSent())
-		webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
-		let result = try await peerConnectionTask.value
+			let message = try await self.jsonDecoder.decode(SignalingClient.ClientMessage.self, from: self.webSocketClient.onClientMessageSent())
+			self.webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
+			let result = try await peerConnectionTask.value
 
-		XCTAssertThrowsError(try result.get())
+			XCTAssertThrowsError(try result.get())
+		}
 	}
 
 	// MARK: - Private
@@ -335,6 +343,26 @@ final class PeerConnectionNegotiatorTests: TestCase {
 			peerConnection,
 			delegate
 		)
+	}
+}
+
+extension XCTestCase {
+	public func withTimeout(
+		_ milliseconds: UInt64 = 1000,
+		description: String = "",
+		operation: @Sendable @escaping () async throws -> Void,
+		file: StaticString = #filePath,
+		line: UInt = #line
+	) async rethrows {
+		try await withThrowingTaskGroup(of: Void.self) { group in
+			group.addTask(operation: operation)
+			group.addTask {
+				try await Task.sleep(nanoseconds: milliseconds * NSEC_PER_MSEC)
+				XCTFail(description, file: file, line: line)
+			}
+			defer { group.cancelAll() }
+			try await group.next()
+		}
 	}
 }
 
