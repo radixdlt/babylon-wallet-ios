@@ -224,7 +224,6 @@
 			);
 			dependencies = (
 				489948262A0186DC00EE807A /* PBXTargetDependency */,
-				489948242A0186C900EE807A /* PBXTargetDependency */,
 				E6203E5229B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5429B1E957000B8784 /* PBXTargetDependency */,
 				E6203E5629B1E957000B8784 /* PBXTargetDependency */,

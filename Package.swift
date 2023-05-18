@@ -122,20 +122,17 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "EditPersonaFeature",
+		name: "DerivePublicKeyFeature",
+		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
-			"PersonasClient",
-			"Profile",
 		],
 		tests: .no
 	),
 	.feature(
-		name: "PersonaDetailsFeature",
+		name: "EditPersonaFeature",
 		dependencies: [
-			"AuthorizedDappsClient",
-			"EditPersonaFeature",
-			"CreateAuthKeyFeature",
-			"GatewayAPI",
+			"PersonasClient",
+			"Profile",
 		],
 		tests: .no
 	),
@@ -195,14 +192,7 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-	.feature(
-		name: "P2PLinksFeature",
-		dependencies: [
-			"NewConnectionFeature",
-			"RadixConnectClient",
-		],
-		tests: .yes()
-	),
+
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
@@ -220,6 +210,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "P2PLinksFeature",
+		dependencies: [
+			"NewConnectionFeature",
+			"RadixConnectClient",
+		],
+		tests: .yes()
+	),
+	.feature(
 		name: "PersonasFeature",
 		dependencies: [
 			"PersonaDetailsFeature",
@@ -227,6 +225,21 @@ package.addModules([
 			"PersonasClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "PersonaDetailsFeature",
+		dependencies: [
+			"AuthorizedDappsClient",
+			"EditPersonaFeature",
+			"CreateAuthKeyFeature",
+			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "ProfileBackupsFeature",
+		dependencies: [],
+		tests: .no
 	),
 	.feature(
 		name: "ScanQRFeature",
@@ -297,11 +310,7 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-	.feature(
-		name: "ProfileBackupsFeature",
-		dependencies: [],
-		tests: .no
-	),
+
 ])
 
 // MARK: - Clients

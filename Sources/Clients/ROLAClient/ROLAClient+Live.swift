@@ -131,8 +131,6 @@ extension ROLAClient {
 				fatalError()
 			}
 
-			let hdDeviceFactorSource = try HDOnDeviceFactorSource(factorSource: factorSource)
-
 			let authenticationSigning: FactorInstance = try await {
 				let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
 					.init(
