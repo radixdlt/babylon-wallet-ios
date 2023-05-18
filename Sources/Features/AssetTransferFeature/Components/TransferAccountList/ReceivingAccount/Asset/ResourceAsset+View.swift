@@ -35,14 +35,18 @@ extension ResourceAsset.View {
 				.background(.app.white)
 				.focused($focused)
 				.roundedCorners(strokeColor: focused ? .app.gray1 : .app.white)
+				.tokenRowShadow()
 
 				Spacer()
-				Button("", asset: AssetResource.close) {
+
+				Button {
 					viewStore.send(.removeTapped)
+				} label: {
+					Image(asset: AssetResource.close)
+						.frame(.smallest)
 				}
 				.foregroundColor(.app.gray2)
 			}
-			.padding(.small1)
 		}
 	}
 }

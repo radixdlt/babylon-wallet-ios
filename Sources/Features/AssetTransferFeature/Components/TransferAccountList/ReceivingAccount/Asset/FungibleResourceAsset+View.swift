@@ -57,11 +57,19 @@ extension FungibleResourceAsset.View {
 					if focused {
 						// TODO: beutify
 						HStack {
-							Button("Max") {
+							Button {
 								viewStore.send(.maxAmountTapped)
+							} label: {
+								Text("Max")
+									.underline()
+									.textStyle(.body3HighImportance)
+									.foregroundColor(.app.blue2)
 							}
+
 							Text("-")
-							Text("Balance \(viewStore.balance.format())")
+							Text("Balance: \(viewStore.balance.format())")
+								.textStyle(.body3HighImportance)
+								.foregroundColor(.app.gray2)
 						}
 					}
 				}

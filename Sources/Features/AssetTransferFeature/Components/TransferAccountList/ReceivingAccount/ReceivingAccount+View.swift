@@ -21,11 +21,9 @@ extension ReceivingAccount.View {
 				Group {
 					if let account = viewStore.account {
 						SmallAccountCard(account.name, identifiable: account.identifer, gradient: account.gradient) {
-							FixedSpacer(width: .small1)
-							Button("", asset: AssetResource.close) {
-								viewStore.send(.removeTapped)
-							}
-							.foregroundColor(.app.white)
+							removeAccountButton(viewStore)
+								.foregroundColor(.app.white)
+								.padding(.leading, .medium3)
 						}
 					} else {
 						HStack {
@@ -35,19 +33,17 @@ extension ReceivingAccount.View {
 							.textStyle(.body1Header)
 							Spacer()
 							if viewStore.canBeRemovedWhenEmpty {
-								Button("", asset: AssetResource.close) {
-									viewStore.send(.removeTapped)
-								}
+								removeAccountButton(viewStore)
 							}
 						}
-						.frame(height: .standardButtonHeight)
 						.padding(.horizontal, .medium3)
 						.foregroundColor(.app.gray2)
 					}
 				}
+				.frame(height: .standardButtonHeight)
 				.topRoundedCorners(strokeColor: .borderColor)
 
-				VStack {
+				VStack(spacing: .medium3) {
 					ForEachStore(
 						store.scope(state: \.assets, action: { .child(.row(id: $0, child: $1)) }),
 						content: {
@@ -64,6 +60,7 @@ extension ReceivingAccount.View {
 					.textStyle(.body1StandaloneLink)
 				}
 				.frame(maxWidth: .infinity)
+				.padding([.top, .horizontal], .medium3)
 				.background(Color.containerContentBackground)
 				.bottomRoundedCorners(strokeColor: .borderColor)
 			}
@@ -79,6 +76,15 @@ extension ReceivingAccount.View {
 				action: ReceivingAccount.Destinations.Action.addAsset,
 				content: { AddAsset.View(store: $0) }
 			)
+		}
+	}
+
+	private func removeAccountButton(_ viewStore: ViewStoreOf<ReceivingAccount>) -> some View {
+		Button {
+			viewStore.send(.removeTapped)
+		} label: {
+			Image(asset: AssetResource.close)
+				.frame(.smallest)
 		}
 	}
 }

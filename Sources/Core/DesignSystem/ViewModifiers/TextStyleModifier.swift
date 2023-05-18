@@ -14,6 +14,7 @@ public enum TextStyle {
 	case body2HighImportance
 	case body2Regular
 	case body2Link
+	case body3HighImportance
 	case button
 	case monospace
 }
@@ -33,6 +34,7 @@ extension TextStyle {
 		case .body2HighImportance: return .app.body2HighImportance
 		case .body2Regular: return .app.body2Regular
 		case .body2Link: return .app.body2Link
+		case .body3HighImportance: return .app.body3HighImportance
 		case .button: return .app.button
 		case .monospace: return .app.monospace
 		}
@@ -46,7 +48,7 @@ extension TextStyle {
 		     .body1HighImportance, .body1Regular, .body1StandaloneLink, .body1Link:
 			return 23 / 4
 		case .body2Header, .body2HighImportance, .body2Regular,
-		     .body2Link, .button, .monospace:
+		     .body2Link, .body3HighImportance, .button, .monospace:
 			return 18 / 4
 		}
 	}

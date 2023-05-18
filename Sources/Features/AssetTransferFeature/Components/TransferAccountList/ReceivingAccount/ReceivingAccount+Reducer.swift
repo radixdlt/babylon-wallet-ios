@@ -87,11 +87,12 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case .removeTapped:
 			return .send(.delegate(.removed))
 		case .addAssetTapped:
-			Bool.random() ? state.assets.append(.fungibleAsset(.init(resource: .init(resourceAddress: .init(address: UUID().uuidString), amount: 200, name: "XRD")))) :
+			Bool.random() ? state.assets.append(.fungibleAsset(.init(resource: .init(resourceAddress: .init(address: "XRD"), amount: 200, name: "XRD")))) :
 				state.assets.append(.nonFungibleAsset(.init(resourceAddress: .init(address: UUID().uuidString), nftToken: .init(id: .init("any"), name: "A name", description: "des", keyImageURL: nil, metadata: []))))
 			// state.destination = .addAsset(.init())
 			return .none
 		case .chooseAccountTapped:
+			state.account = Bool.random() ? .left(.previewValue1) : try! .right(.init(address: "account_tdx_adsadaddadwdadwddwdfadwqdawdwdasdwdasdwd"))
 			return .none
 		}
 	}
