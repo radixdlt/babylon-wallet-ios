@@ -116,7 +116,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(.init(config: .init(
 				purpose: .newAccountDuringDappInteraction
-			), displayIntroduction: { _ in false }))
+			)))
 			return .none
 
 		case let .selectedAccountsChanged(selectedAccounts):
