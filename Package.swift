@@ -81,6 +81,14 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "ChoseLedgerHardwareDeviceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AddLedgerFactorSourceFeature",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "CreateAuthKeyFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
