@@ -1,4 +1,5 @@
 import AccountsClient
+import EngineToolkitModels
 import FeaturePrelude
 import PersonasClient
 import ROLAClient
@@ -21,7 +22,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case createdManifestAndAuthKey(ManifestForAuthKeyCreationResponse)
+		case createdManifestForAuthKeyCreation(TransactionManifest)
 		case finishedSettingFactorInstance
 	}
 
@@ -49,25 +50,26 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { [entity = state.entity] send in
-				let response = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity))
-				await send(.internal(.createdManifestAndAuthKey(response)))
-			} catch: { error, send in
-				loggerGlobal.error("Failed to create manifest for create auth, \(String(describing: error))")
-				await send(.delegate(.done(success: false)))
-			}
+			fatalError("migrate to/or use CreatePublicKey feature")
+//			return .run { [entity = state.entity] send in
+//				let response = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity))
+//				await send(.internal(.createdManifestAndAuthKey(response)))
+//			} catch: { error, send in
+//				loggerGlobal.error("Failed to create manifest for create auth, \(String(describing: error))")
+//				await send(.delegate(.done(success: false)))
+//			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .createdManifestAndAuthKey(manifestAndAuthKey):
+		case let .createdManifestForAuthKeyCreation(manifest):
 			state.transactionReview = .init(
-				transactionManifest: manifestAndAuthKey.manifest,
+				transactionManifest: manifest,
 				signTransactionPurpose: .internalManifest(.uploadAuthKey),
 				message: nil
 			)
-			state.authenticationSigningFactorInstance = manifestAndAuthKey.authenticationSigning
+//			state.authenticationSigningFactorInstance = manifestAndAuthKey.authenticationSigning
 			return .none
 
 		case .finishedSettingFactorInstance:

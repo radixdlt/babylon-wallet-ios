@@ -17,12 +17,17 @@ extension ROLAClient {
 		// see Russ confluence page:
 		/// https://radixdlt.atlassian.net/wiki/spaces/DevEcosystem/pages/3055026344/Metadata+Standards+for+Provable+Ownership+Encrypted+Messaging
 		/// if it is already present, no change is done
-		@Sendable func manifestAdding(
-			ownerKey newPublicKey: SLIP10.PublicKey,
-			for entity: EntityPotentiallyVirtual,
-			assertingTransactionSigningKeyIsNotRemoved transactionSigningKey: SLIP10.PublicKey
-		) async throws -> TransactionManifest {
+		let manifestForAuthKeyCreation: ManifestForAuthKeyCreation = { request in
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
+			let entity = request.entity
+			let newPublicKey = request.newPublicKey
+
+			let transactionSigningKey: SLIP10.PublicKey = {
+				switch entity.securityState {
+				case let .unsecured(control):
+					return control.transactionSigning.publicKey
+				}
+			}()
 
 			let entityAddress: String = {
 				switch entity {
@@ -85,78 +90,6 @@ extension ROLAClient {
 			))
 
 			return manifestString
-		}
-
-		// FIXME: Move this to `Signing` and change `Signing` to `UseFactors` which should be able to do both signing and derivation...?
-		// Rationale: the solution below makes it impossible to create `authenticationSigning` key for Ledger factor sources :/
-		@Sendable func manifestCreatingAuthKey(
-			for entity: EntityPotentiallyVirtual
-		) async throws -> ManifestForAuthKeyCreationResponse {
-			@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-			let factorSourceID: FactorSourceID
-			let authSignDerivationPath: DerivationPath
-			let transactionSigning: HierarchicalDeterministicFactorInstance
-			let unsecuredEntityControl: UnsecuredEntityControl
-			switch entity.securityState {
-			case let .unsecured(unsecuredEntityControl_):
-				unsecuredEntityControl = unsecuredEntityControl_
-				transactionSigning = unsecuredEntityControl.transactionSigning
-				guard unsecuredEntityControl.authenticationSigning == nil else {
-					loggerGlobal.notice("Entity: \(entity) already has an authenticationSigning")
-					throw EntityHasAuthSigningKeyAlready()
-				}
-
-				loggerGlobal.notice("Entity: \(entity) is about to create an authenticationSigning, publicKey of transactionSigning factor instance: \(unsecuredEntityControl.transactionSigning.publicKey)")
-				factorSourceID = unsecuredEntityControl.transactionSigning.factorSourceID
-				let hdPath = unsecuredEntityControl.transactionSigning.derivationPath
-				switch entity {
-				case .account:
-					authSignDerivationPath = try hdPath.asAccountPath().switching(
-						networkID: entity.networkID,
-						keyKind: .authenticationSigning
-					).wrapAsDerivationPath()
-				case .persona:
-					authSignDerivationPath = try hdPath.asIdentityPath().switching(
-						keyKind: .authenticationSigning
-					).wrapAsDerivationPath()
-				}
-			}
-			let factorSources = try await factorSourcesClient.getFactorSources()
-			guard
-				let factorSource = factorSources[id: factorSourceID]
-			else {
-				fatalError()
-			}
-
-			let authenticationSigning: FactorInstance = try await {
-				let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(
-					.init(
-						hdOnDeviceFactorSource: hdDeviceFactorSource,
-						derivationPath: authSignDerivationPath,
-						curve: .curve25519, // we always use Curve25519 for new accounts
-						loadMnemonicPurpose: .createSignAuthKey
-					)
-				)
-
-				return try HierarchicalDeterministicFactorInstance(
-					factorSourceID: hdDeviceFactorSource.id,
-					publicKey: .init(engine: publicKey),
-					derivationPath: authSignDerivationPath
-				)
-			}()
-			loggerGlobal.notice("Entity: \(entity) created and is about to upload authenticationSigning key: \(authenticationSigning.publicKey)")
-
-			let manifest = try await manifestAdding(
-				ownerKey: authenticationSigning.publicKey,
-				for: entity,
-				assertingTransactionSigningKeyIsNotRemoved: transactionSigning.publicKey
-			)
-
-			return ManifestForAuthKeyCreationResponse(
-				manifest: manifest,
-				authenticationSigning: authenticationSigning
-			)
 		}
 
 		return Self(
@@ -230,9 +163,7 @@ extension ROLAClient {
 					throw ROLAFailure.unknownDappDefinitionAddress
 				}
 			},
-			manifestForAuthKeyCreation: { request in
-				try await manifestCreatingAuthKey(for: request.entity)
-			},
+			manifestForAuthKeyCreation: manifestForAuthKeyCreation,
 			authenticationDataToSignForChallenge: { request in
 
 				let payload = payloadToHash(
