@@ -52,7 +52,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			state.receivingAccounts.remove(id: id)
 
 			if state.receivingAccounts.count == 1 {
-				// Disable removal of the last container
+				// Disable removal of the container if it is the last one remaining
 				state.receivingAccounts[0].canBeRemovedWhenEmpty = false
 			}
 
@@ -65,7 +65,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		     .receivingAccount(_, action: .delegate(.assetRemoved)):
 			return validateState(&state)
 
-		// Calculate max for account/resource
 		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged))))):
 			updateTotalSum(&state, resourceAddress: resourceAddress)
 			return validateState(&state)
@@ -78,8 +77,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		let totalSum = state.receivingAccounts
 			.flatMap(\.assets)
 			.compactMap(/ResourceAsset.State.fungibleAsset)
-			.filter { $0.resourceAddress == resourceAddress }
-			.compactMap(\.amount)
+			.filter { $0.resource.resourceAddress == resourceAddress }
+			.compactMap(\.transferAmount)
 			.reduce(0, +)
 
 		for account in state.receivingAccounts {
@@ -87,7 +86,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				continue
 			}
 
-			asset.totalSum = totalSum
+			asset.totalTransferSum = totalSum
 
 			// update the value from inside enum
 			state.receivingAccounts[id: account.id]?.assets[id: resourceAddress] = .fungibleAsset(asset)
@@ -108,7 +107,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		let isValid = receivingAccounts.allSatisfy {
 			$0.account != nil &&
 				!$0.assets.isEmpty &&
-				$0.assets.compactMap(/ResourceAsset.State.fungibleAsset).allSatisfy { $0.amount != nil && $0.totalSum <= $0.balance }
+				$0.assets
+				.compactMap(/ResourceAsset.State.fungibleAsset)
+				.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
 		}
 
 		return .send(.delegate(.canSendTransferRequest(isValid)))

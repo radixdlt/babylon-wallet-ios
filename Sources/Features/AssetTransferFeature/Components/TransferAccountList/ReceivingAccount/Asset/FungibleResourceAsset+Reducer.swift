@@ -4,35 +4,35 @@ import FeaturePrelude
 public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = ResourceAddress
+
 		public var id: ID {
-			resourceAddress
+			resource.resourceAddress
 		}
 
-		public let resourceAddress: ResourceAddress
+		public var balance: BigDecimal {
+			resource.amount
+		}
+
+		// Transfered resource
+		public let resource: AccountPortfolio.FungibleResource
+
+		// Mutable state
 
 		// amount has to be string to allow setting the max value while editting
-		public var amountStr: String
-		public var amount: BigDecimal?
+		public var transferAmountStr: String
+		public var transferAmount: BigDecimal?
+		// Total transfer sum for the given resource
+		public var totalTransferSum: BigDecimal
 
-		// Total sum for this given resource
-		public var totalSum: BigDecimal
-		public let balance: BigDecimal
-
-		init(resourceAddress: ResourceAddress, amount: BigDecimal?, totalSum: BigDecimal, balance: BigDecimal) {
-			self.amount = amount
-			self.amountStr = amount?.formatWithoutRounding() ?? ""
-			self.totalSum = totalSum
-			self.resourceAddress = resourceAddress
-			self.balance = balance
+		init(resource: AccountPortfolio.FungibleResource, transferAmount: BigDecimal?, totalTransferSum: BigDecimal) {
+			self.transferAmount = transferAmount
+			self.transferAmountStr = transferAmount?.formatWithoutRounding() ?? ""
+			self.totalTransferSum = totalTransferSum
+			self.resource = resource
 		}
 
-		init(resourceAddress: ResourceAddress, totalSum: BigDecimal, balance: BigDecimal = 100) {
-			self.init(
-				resourceAddress: resourceAddress,
-				amount: nil,
-				totalSum: totalSum,
-				balance: balance
-			)
+		init(resource: AccountPortfolio.FungibleResource) {
+			self.init(resource: resource, transferAmount: nil, totalTransferSum: .zero)
 		}
 	}
 
@@ -49,21 +49,23 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case let .amountChanged(amountStr):
-			state.amountStr = amountStr
+		case let .amountChanged(transferAmountStr):
+			state.transferAmountStr = transferAmountStr
 
-			if let value = try? BigDecimal(localizedFromString: amountStr) {
-				state.amount = value
+			if let value = try? BigDecimal(localizedFromString: transferAmountStr) {
+				state.transferAmount = value
 			} else {
-				state.amount = nil
+				state.transferAmount = nil
 			}
 			return .send(.delegate(.amountChanged))
+
 		case .maxAmountTapped:
-			let sumOfOthers = state.totalSum - (state.amount ?? .zero)
+			let sumOfOthers = state.totalTransferSum - (state.transferAmount ?? .zero)
 			let remainingAmount = max(state.balance - sumOfOthers, 0)
-			state.amount = remainingAmount
-			state.amountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
+			state.transferAmount = remainingAmount
+			state.transferAmountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
 			return .send(.delegate(.amountChanged))
+
 		case .removeTapped:
 			return .send(.delegate(.removed))
 		}

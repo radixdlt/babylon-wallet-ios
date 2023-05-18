@@ -87,23 +87,39 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case .removeTapped:
 			return .send(.delegate(.removed))
 		case .addAssetTapped:
-			state.assets.append(.fungibleAsset(.init(resourceAddress: .init(address: "xrd"), totalSum: 0)))
-//			state.destination = .addAsset(.init())
-			return .send(.delegate(.assetAdded))
+			Bool.random() ? state.assets.append(.fungibleAsset(.init(resource: .init(resourceAddress: .init(address: UUID().uuidString), amount: 200, name: "XRD")))) :
+				state.assets.append(.nonFungibleAsset(.init(resourceAddress: .init(address: UUID().uuidString), nftToken: .init(id: .init("any"), name: "A name", description: "des", keyImageURL: nil, metadata: []))))
+			// state.destination = .addAsset(.init())
+			return .none
 		case .chooseAccountTapped:
-			state.account = Bool.random() ? .left(.previewValue1) : try! .right(.init(address: "account_tdx_adsadaddadwdadwddwdfadwqdawdwdasdwdasdwd"))
-			// state.destination = .chooseAccount(.init())
-			return .send(.delegate(.accountAdded))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.dismiss):
-			return .none
+		case let .destination(.presented(.chooseAccount(.delegate(.addOwnedAccount(account))))):
+			state.account = .left(account)
+			return .send(.delegate(.accountAdded))
+
+		case let .destination(.presented(.chooseAccount(.delegate(.foreignAccount(address))))):
+			state.account = .right(address)
+			return .send(.delegate(.accountAdded))
+
+		case let .destination(.presented(.addAsset(.delegate(.addFungibleResource(resource))))):
+			state.assets.append(.fungibleAsset(.init(resource: resource)))
+			return .send(.delegate(.assetAdded))
+
+		case let .destination(.presented(.addAsset(.delegate(.addNonFungibleResource(resourceAddress, token))))):
+			state.assets.append(.nonFungibleAsset(.init(resourceAddress: resourceAddress, nftToken: token)))
+			return .send(.delegate(.assetAdded))
+
 		case let .row(id: id, child: .delegate(.removed)):
 			state.assets.remove(id: id)
 			return .send(.delegate(.assetRemoved))
+
+		case .destination(.dismiss):
+			return .none
 		default:
 			return .none
 		}

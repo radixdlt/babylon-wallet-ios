@@ -5,10 +5,11 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = ResourceAddress
 		public var id: ID {
-			resourceAddress
+			ResourceAddress(address: resourceAddress.address + ":" + nftToken.id.rawValue)
 		}
 
 		public let resourceAddress: ResourceAddress
+		public let nftToken: AccountPortfolio.NonFungibleResource.NonFungibleToken
 	}
 }
 
@@ -26,7 +27,12 @@ extension NonFungibleResourceAsset {
 
 extension NonFungibleResourceAsset.View {
 	public var body: some View {
-		WithViewStore(store, observe: { $0 }) { _ in
+		WithViewStore(store, observe: { $0 }) { viewStore in
+			TransferNFTView(
+				name: viewStore.nftToken.name, // TODO: Determin if other fields should be added
+				thumbnail: viewStore.nftToken.keyImageURL
+			)
+			.frame(height: .largeButtonHeight)
 		}
 	}
 }

@@ -93,8 +93,8 @@ public struct TransactionDetailsView: View {
 	public var body: some View {
 		switch viewState.metadata.type {
 		case .nonFungible:
-			TransactionReviewNFTView(name: viewState.metadata.name,
-			                         thumbnail: viewState.metadata.thumbnail)
+			TransferNFTView(name: viewState.metadata.name,
+			                thumbnail: viewState.metadata.thumbnail)
 		case .fungible:
 			TransactionReviewTokenView(viewState: .init(
 				name: viewState.metadata.name,

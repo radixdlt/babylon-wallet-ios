@@ -6,6 +6,9 @@ extension ResourceAsset {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ResourceAsset>
+		@FocusState
+		private var focused: Bool
+
 		public init(store: StoreOf<ResourceAsset>) {
 			self.store = store
 		}
@@ -29,11 +32,17 @@ extension ResourceAsset.View {
 						then: { NonFungibleResourceAsset.View(store: $0.actionless) }
 					)
 				}
+				.background(.app.white)
+				.focused($focused)
+				.roundedCorners(strokeColor: focused ? .app.gray1 : .app.white)
+
 				Spacer()
 				Button("", asset: AssetResource.close) {
 					viewStore.send(.removeTapped)
 				}
+				.foregroundColor(.app.gray2)
 			}
+			.padding(.small1)
 		}
 	}
 }

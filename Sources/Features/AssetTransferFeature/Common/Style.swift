@@ -13,6 +13,23 @@ extension View {
 		}
 	}
 
+	func roundedCorners(corners: UIRectCorner = .allCorners) -> some View {
+		self.modifier { view in
+			view
+				.clipShape(RoundedCorners(radius: .small2, corners: corners))
+		}
+	}
+
+	func bordered(strokeColor: Color, corners: UIRectCorner = .allCorners) -> some View {
+		self.modifier { view in
+			view
+				.background(
+					RoundedCorners(radius: .small2, corners: corners)
+						.stroke(strokeColor, lineWidth: 1)
+				)
+		}
+	}
+
 	func topRoundedCorners(strokeColor: Color) -> some View {
 		roundedCorners(strokeColor: strokeColor, corners: [.topLeft, .topRight])
 	}

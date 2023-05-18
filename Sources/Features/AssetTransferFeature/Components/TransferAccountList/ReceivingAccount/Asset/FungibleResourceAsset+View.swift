@@ -26,16 +26,17 @@ extension FungibleResourceAsset.View {
 			HStack {
 				VStack(alignment: .trailing) {
 					HStack {
-						Image(asset: AssetResource.xrd)
-							.resizable()
-							.frame(.smallest)
-						Text("XRD")
-							.foregroundColor(.app.gray1)
-							.textStyle(.body2HighImportance)
+						TokenThumbnail(.xrd, size: .smallest)
+
+						if let name = viewStore.resource.name {
+							Text(name)
+								.textStyle(.body2HighImportance)
+								.foregroundColor(.app.gray1)
+						}
 
 						TextField("0.00",
 						          text: viewStore.binding(
-						          	get: \.amountStr,
+						          	get: \.transferAmountStr,
 						          	send: { .amountChanged($0) }
 						          ))
 						          .keyboardType(.decimalPad)
@@ -43,9 +44,10 @@ extension FungibleResourceAsset.View {
 						          .multilineTextAlignment(.trailing)
 						          .foregroundColor(.app.gray1)
 						          .textStyle(.sectionHeader)
+						          .focused($focused)
 					}
 
-					if viewStore.totalSum > viewStore.balance {
+					if viewStore.totalTransferSum > viewStore.balance {
 						// TODO: Add better style
 						Text("Total Sum is over your current balance")
 							.textStyle(.body2HighImportance)
@@ -64,11 +66,7 @@ extension FungibleResourceAsset.View {
 					}
 				}
 				.padding(.medium3)
-				.background(.app.white)
-				.roundedCorners(strokeColor: focused ? .app.gray1 : .app.white)
 			}
-			.padding(.small1)
-			.focused($focused)
 		}
 	}
 }
