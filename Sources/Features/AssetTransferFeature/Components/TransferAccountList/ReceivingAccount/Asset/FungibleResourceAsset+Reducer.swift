@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-// MARK: - ReceivingAccount
+// MARK: - FungibleResourceAsset
 public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = ResourceAddress
@@ -15,13 +15,14 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 		// Transfered resource
 		public let resource: AccountPortfolio.FungibleResource
+		public let isXRD: Bool = true
 
-		// Mutable state
+		// MARK: - Mutable state
 
-		// amount has to be string to allow setting the max value while editting
 		public var transferAmountStr: String
 		public var transferAmount: BigDecimal?
-		// Total transfer sum for the given resource
+
+		// Total transfer sum for the transferred resource
 		public var totalTransferSum: BigDecimal
 
 		init(resource: AccountPortfolio.FungibleResource, transferAmount: BigDecimal?, totalTransferSum: BigDecimal) {

@@ -40,7 +40,7 @@ extension TransferAccountList.View {
 						VLine()
 							.stroke(.app.gray3, style: .transfer)
 							.frame(width: 1)
-							.padding(.trailing, 51)
+							.padding(.trailing, .large1)
 					}
 
 				VStack(spacing: .medium3) {

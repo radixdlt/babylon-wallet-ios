@@ -11,7 +11,10 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 
 		public init(fromAccount: Profile.Network.Account) {
-			self.init(fromAccount: fromAccount, receivingAccounts: .init(uniqueElements: [.empty(canBeRemovedWhenEmpty: false)]))
+			self.init(
+				fromAccount: fromAccount,
+				receivingAccounts: .init(uniqueElements: [.empty(canBeRemovedWhenEmpty: false)])
+			)
 		}
 	}
 
@@ -60,7 +63,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: false))
 			}
 			return validateState(&state)
-		case .receivingAccount(_, action: .delegate(.accountAdded)),
+		case .receivingAccount(_, action: .delegate(.accountAdded)), // account removal case is handled above
 		     .receivingAccount(_, action: .delegate(.assetAdded)),
 		     .receivingAccount(_, action: .delegate(.assetRemoved)):
 			return validateState(&state)
@@ -87,15 +90,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			}
 
 			asset.totalTransferSum = totalSum
-
-			// update the value from inside enum
 			state.receivingAccounts[id: account.id]?.assets[id: resourceAddress] = .fungibleAsset(asset)
 		}
 	}
 
 	private func validateState(_ state: inout State) -> EffectTask<Action> {
 		let receivingAccounts = state.receivingAccounts.filter {
-			// filter out empty containers, no account and no assets
 			$0.account != nil || !$0.assets.isEmpty
 		}
 
@@ -103,7 +103,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			return .send(.delegate(.canSendTransferRequest(false)))
 		}
 
-		// All containers have accounts and asset
 		let isValid = receivingAccounts.allSatisfy {
 			$0.account != nil &&
 				!$0.assets.isEmpty &&
