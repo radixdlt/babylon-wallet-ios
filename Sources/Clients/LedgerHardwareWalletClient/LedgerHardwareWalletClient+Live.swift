@@ -259,25 +259,6 @@ extension SLIP10.Curve {
 	}
 }
 
-extension P2P.LedgerHardwareWallet.LedgerDevice {
-	public init(factorSource: FactorSource) {
-		self.init(
-			name: .init(rawValue: factorSource.label.rawValue),
-			id: factorSource.id.description,
-			model: .init(from: factorSource)
-		)
-	}
-}
-
-extension P2P.LedgerHardwareWallet.Model {
-	public init(from factorSource: FactorSource) {
-		precondition(factorSource.kind == .ledgerHQHardwareWallet)
-		self = Self(
-			rawValue: factorSource.description.rawValue
-		) ?? .nanoSPlus // FIXME: handle optional better.
-	}
-}
-
 // MARK: - FailedToReceiveAnyResponseFromAnyClient
 struct FailedToReceiveAnyResponseFromAnyClient: Swift.Error {}
 
