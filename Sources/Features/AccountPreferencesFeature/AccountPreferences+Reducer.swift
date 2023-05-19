@@ -3,7 +3,7 @@ import AccountsClient
 import CreateAuthKeyFeature
 import FaucetClient
 import FeaturePrelude
-import QRGeneratorClient
+import ShowQRFeature
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
