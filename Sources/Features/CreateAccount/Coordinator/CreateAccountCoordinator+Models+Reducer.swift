@@ -77,7 +77,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadFactorSourcesResult(
 			TaskResult<FactorSources>,
-			beforeCreatingEntityWithName: NonEmptyString,
+			beforeCreatingAccountWithName: NonEmptyString,
 			useLedgerAsFactorSource: Bool
 		)
 	}
@@ -128,7 +128,7 @@ extension CreateAccountCoordinator {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate, useLedgerAsFactorSource):
+		case let .loadFactorSourcesResult(.success(factorSources), accountName, useLedgerAsFactorSource):
 			precondition(!factorSources.isEmpty)
 
 			let babylonDeviceFactorSources = factorSources.babylonDeviceFactorSources()
@@ -136,7 +136,7 @@ extension CreateAccountCoordinator {
 			let source: GenesisFactorSourceSelection = useLedgerAsFactorSource ? .ledger(ledgerFactorSources: .init(uniqueElements: ledgerFactorSources)) : .device(babylonDeviceFactorSources.first)
 
 			return goToStep2Creation(
-				entityName: specifiedNameForNewEntityToCreate,
+				accountName: accountName,
 				genesisFactorSourceSelection: source,
 				state: &state
 			)
@@ -144,50 +144,49 @@ extension CreateAccountCoordinator {
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-//		switch childAction {
-//		case .root(.step1_nameAccount(.delegate(.done))):
-//
-//			return .run { send in
-//				await send(.internal(
-//					.loadFactorSourcesResult(
-//						TaskResult {
-//							try await factorSourcesClient.getFactorSources()
-//						},
-//						beforeCreatingEntityWithName: name,
-//						useLedgerAsFactorSource: useLedgerAsFactorSource
-//					)
-//				))
-//			}
-//
-//		case let .path(.element(_, action: .step2_creationOfEntity(.delegate(.createdEntity(newEntity))))):
-//			return goToStep3Completion(
-//				entity: newEntity,
-//				state: &state
-//			)
-//
-//		case .path(.element(_, action: .step2_creationOfEntity(.delegate(.createEntityFailed)))):
-//			state.path.removeLast()
-//			return .none
-//
-//		case .path(.element(_, action: .step3_completion(.delegate(.completed)))):
-//			return .run { send in
-//				await send(.delegate(.completed))
-//				await dismiss()
-//			}
-//
-//		default:
-//			return .none
-//		}
-		fatalError()
+		switch childAction {
+		case let .root(.step1_nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
+
+			return .run { send in
+				await send(.internal(
+					.loadFactorSourcesResult(
+						TaskResult {
+							try await factorSourcesClient.getFactorSources()
+						},
+						beforeCreatingAccountWithName: accountName,
+						useLedgerAsFactorSource: useLedgerAsFactorSource
+					)
+				))
+			}
+
+		case let .path(.element(_, action: .step2_creationOfAccount(.delegate(.createdAccount(newAccount))))):
+			return goToStep3Completion(
+				account: newAccount,
+				state: &state
+			)
+
+		case .path(.element(_, action: .step2_creationOfAccount(.delegate(.createAccountFailed)))):
+			state.path.removeLast()
+			return .none
+
+		case .path(.element(_, action: .step3_completion(.delegate(.completed)))):
+			return .run { send in
+				await send(.delegate(.completed))
+				await dismiss()
+			}
+
+		default:
+			return .none
+		}
 	}
 
 	private func goToStep2Creation(
-		entityName: NonEmpty<String>,
+		accountName: NonEmptyString,
 		genesisFactorSourceSelection: GenesisFactorSourceSelection,
 		state: inout State
 	) -> EffectTask<Action> {
 		let creationOfAccountState = CreationOfAccount.State(
-			name: entityName,
+			name: accountName,
 			derivePublicKey: .init(
 				derivationPathOption: .nextBasedOnFactorSource(
 					networkOption: state.config.specificNetworkID.map { .specific($0) } ?? .useCurrent

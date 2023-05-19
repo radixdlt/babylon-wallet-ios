@@ -23,6 +23,10 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		case createAccountResult(TaskResult<Profile.Network.Account>)
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case derivePublicKey(DerivePublicKey.Action)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case createdAccount(Profile.Network.Account)
 		case createAccountFailed
@@ -33,6 +37,14 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.derivePublicKey, action: /Action.child .. ChildAction.derivePublicKey) {
+			DerivePublicKey()
+		}
+
+		Reduce(core)
+	}
 
 //	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 //		switch viewAction {

@@ -6,7 +6,7 @@ extension CreationOfAccount {
 		let useLedgerAsFactorSource: Bool
 
 		init(state: CreationOfAccount.State) {
-			fatalError()
+			useLedgerAsFactorSource = false
 		}
 	}
 
@@ -31,7 +31,7 @@ extension CreationOfAccount {
 //						createWithDevice()
 //					}
 //				}
-				Text("Hmm add Ledger selection her if able..")
+				Text("Hmm add Ledger selection here if able..")
 //				.onAppear {
 //					viewStore.send(.appeared)
 //				}
