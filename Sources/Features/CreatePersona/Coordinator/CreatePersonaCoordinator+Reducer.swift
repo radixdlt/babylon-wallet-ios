@@ -31,6 +31,8 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 			if let last = path.last {
 				if case .step3_completion = last {
 					return false
+				} else if case .step2_creationOfPersona = last {
+					return false
 				} else {
 					return true
 				}
