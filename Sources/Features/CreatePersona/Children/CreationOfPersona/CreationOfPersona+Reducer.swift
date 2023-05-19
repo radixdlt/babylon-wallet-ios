@@ -73,7 +73,8 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 			factorSourceID,
 			networkID
 		))):
-			return .run { [name = state.name, fields = state.fields] _ in
+			return .run { [name = state.name, fields = state.fields] send in
+
 				let persona = try Profile.Network.Persona(
 					networkID: networkID,
 					factorInstance: .init(
@@ -85,10 +86,14 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 					extraProperties: .init(fields: fields)
 				)
 
-				try await personasClient.saveVirtualPersona(persona)
-
+				await send(.internal(.createPersonaResult(
+					TaskResult {
+						try await personasClient.saveVirtualPersona(persona)
+						return persona
+					}
+				)))
 			} catch: { error, send in
-				loggerGlobal.error("Failed to create or save persona, error: \(error)")
+				loggerGlobal.error("Failed to create, error: \(error)")
 				await send(.delegate(.createPersonaFailed))
 			}
 
