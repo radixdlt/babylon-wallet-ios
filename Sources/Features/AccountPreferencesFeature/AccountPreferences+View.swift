@@ -74,6 +74,7 @@ extension AccountPreferences {
 						createMultipleFungibleTokenButton(with: viewStore)
 						createMultipleNonFungibleTokenButton(with: viewStore)
 						#endif // DEBUG
+						qrCodeButton(with: viewStore)
 					}
 					.frame(maxHeight: .infinity, alignment: .top)
 					.padding(.medium1)
@@ -120,6 +121,14 @@ extension AccountPreferences.View {
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}
+	}
+
+	@ViewBuilder
+	private func qrCodeButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Show QR Code") { // FIXME: Add string
+			viewStore.send(.qrCodeButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 	}
 }
 

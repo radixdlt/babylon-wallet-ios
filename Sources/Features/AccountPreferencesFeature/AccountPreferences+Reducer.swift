@@ -3,6 +3,7 @@ import AccountsClient
 import CreateAuthKeyFeature
 import FaucetClient
 import FeaturePrelude
+import QRGeneratorClient
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
@@ -12,6 +13,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		@PresentationState
 		var createAuthKey: CreateAuthKey.State? = nil
+
+		@PresentationState
+		var qrCodeAddress: AccountAddress? = nil
 
 		#if DEBUG
 		public var canCreateAuthSigningKey: Bool
@@ -50,6 +54,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case createMultipleFungibleTokenButtonTapped
 		case createMultipleNonFungibleTokenButtonTapped
 		#endif
+
+		case qrCodeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -133,6 +139,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				))
 			}
 		#endif
+
+		case .qrCodeButtonTapped:
+			state.qrCodeAddress = state.address
+			return .none
 		}
 	}
 
