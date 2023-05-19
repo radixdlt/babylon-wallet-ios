@@ -117,8 +117,9 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .readyToDerivePublicKey(derivationPath, factorSource):
 			state.derivePublicKey = .init(
-				derivationPathOption: .known(derivationPath),
-				factorSourceOption: .specific(factorSource)
+				derivationPathOption: .known(derivationPath, networkID: state.entity.networkID),
+				factorSourceOption: .specific(factorSource),
+				loadMnemonicPurpose: .createEntity(kind: .identity)
 			)
 			return .none
 
