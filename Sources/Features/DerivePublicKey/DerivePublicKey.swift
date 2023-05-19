@@ -12,6 +12,17 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)
 				case useCurrent
+				public init(networkID: NetworkID?) {
+					if let networkID {
+						self = .specific(networkID)
+					} else {
+						self = .useCurrent
+					}
+				}
+			}
+
+			public static func next(networkID: NetworkID?) -> Self {
+				.nextBasedOnFactorSource(networkOption: .init(networkID: networkID))
 			}
 		}
 
@@ -25,8 +36,10 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 
 		public let factorSourceOption: FactorSourceOption
 		public enum FactorSourceOption: Sendable, Hashable {
-			case anyOf(factorSources: IdentifiedArrayOf<FactorSource>)
-			case specific(factorSource: FactorSource)
+//			case anyOf(factorSources: IdentifiedArrayOf<FactorSource>)
+//			case specific(factorSource: FactorSource)
+			case device
+			case specific(FactorSource)
 		}
 
 		public init(

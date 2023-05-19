@@ -35,12 +35,6 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 			if let last = path.last {
 				if case .step3_completion = last {
 					return false
-				} else if case let .step2_creationOfPersona(creationOfEntity) = last {
-					// do not show back button when using `device` factor source
-					switch creationOfEntity.derivePublicKey.factorSourceOption {
-					case let .specific(specific): return specific.kind == .ledgerHQHardwareWallet
-					case let .anyOf(factorSources): return factorSources.allSatisfy { $0.kind == .ledgerHQHardwareWallet }
-					}
 				} else {
 					return true
 				}

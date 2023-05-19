@@ -118,7 +118,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		case let .readyToDerivePublicKey(derivationPath, factorSource):
 			state.derivePublicKey = .init(
 				derivationPathOption: .known(derivationPath),
-				factorSourceOption: .specific(factorSource: factorSource)
+				factorSourceOption: .specific(factorSource)
 			)
 			return .none
 

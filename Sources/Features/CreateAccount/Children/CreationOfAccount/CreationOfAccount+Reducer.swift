@@ -21,13 +21,18 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		public init(
 			name: NonEmptyString,
 			networkID: NetworkID?,
-			isCreatingLedgerAccount: Bool,
-			step: Step
+			isCreatingLedgerAccount: Bool
 		) {
 			self.name = name
 			self.networkID = networkID
 			self.isCreatingLedgerAccount = isCreatingLedgerAccount
-			self.step = step
+
+			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init()) : .step1_derivePublicKey(
+				.init(
+					derivationPathOption: .next(networkID: networkID),
+					factorSourceOption: .device
+				)
+			)
 		}
 	}
 
@@ -106,8 +111,8 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		switch childAction {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
 			state.step = .step1_derivePublicKey(.init(
-				derivationPathOption: .nextBasedOnFactorSource(networkOption: state.networkID.map { .specific($0) } ?? .useCurrent),
-				factorSourceOption: .specific(factorSource: ledger.factorSource)
+				derivationPathOption: .next(networkID: state.networkID),
+				factorSourceOption: .specific(ledger.factorSource)
 			))
 			return .none
 
