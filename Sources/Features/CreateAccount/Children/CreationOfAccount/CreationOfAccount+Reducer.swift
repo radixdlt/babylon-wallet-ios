@@ -100,9 +100,10 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		switch childAction {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
 			state.step = .step1_derivePublicKey(.init(
-				derivationPathOption: .next(networkID: state.networkID),
-				factorSourceOption: .specific(ledger.factorSource), loadMnemonicPurpose: .createEntity(kind: .account)
-			))
+				derivationPathOption: .next(for: .account, networkID: state.networkID),
+				factorSourceOption: .specific(ledger.factorSource)
+			)
+			)
 			return .none
 
 		case let .step1_derivePublicKey(.delegate(.derivedPublicKey(publicKey, derivationPath, factorSourceID, networkID))):

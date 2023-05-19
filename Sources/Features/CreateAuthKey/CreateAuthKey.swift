@@ -102,14 +102,6 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 					factorSource: factorSource
 				)))
 			}
-
-//			return .run { [entity = state.entity] send in
-//				let response = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity))
-//				await send(.internal(.createdManifestAndAuthKey(response)))
-//			} catch: { error, send in
-//				loggerGlobal.error("Failed to create manifest for create auth, \(String(describing: error))")
-//				await send(.delegate(.done(success: false)))
-//			}
 		}
 	}
 
@@ -118,8 +110,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		case let .readyToDerivePublicKey(derivationPath, factorSource):
 			state.derivePublicKey = .init(
 				derivationPathOption: .known(derivationPath, networkID: state.entity.networkID),
-				factorSourceOption: .specific(factorSource),
-				loadMnemonicPurpose: .createEntity(kind: .identity)
+				factorSourceOption: .specific(factorSource)
 			)
 			return .none
 
