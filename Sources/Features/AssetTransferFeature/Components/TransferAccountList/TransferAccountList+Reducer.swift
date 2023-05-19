@@ -19,6 +19,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			}
 		}
 
+		@PresentationState
+		public var destination: Destinations.State?
+
 		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
 			self.receivingAccounts = receivingAccounts
@@ -37,6 +40,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Equatable, Sendable {
+		case destination(PresentationAction<Destinations.Action>)
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
@@ -44,8 +48,38 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case canSendTransferRequest(Bool)
 	}
 
+	public struct Destinations: Sendable, ReducerProtocol {
+		public typealias State = RelayState<ReceivingAccount.State.ID, MainState>
+		public typealias Action = RelayAction<ReceivingAccount.State.ID, MainAction>
+
+		public enum MainState: Sendable, Hashable {
+			case chooseAccount(ChooseReceivingAccount.State)
+			case addAsset(AddAsset.State)
+		}
+
+		public enum MainAction: Sendable, Equatable {
+			case chooseAccount(ChooseReceivingAccount.Action)
+			case addAsset(AddAsset.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Relay {
+				Scope(state: /MainState.chooseAccount, action: /MainAction.chooseAccount) {
+					ChooseReceivingAccount()
+				}
+
+				Scope(state: /MainState.addAsset, action: /MainAction.addAsset) {
+					AddAsset()
+				}
+			}
+		}
+	}
+
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 			.forEach(\.receivingAccounts, action: /Action.child .. ChildAction.receivingAccount) {
 				ReceivingAccount()
 			}
@@ -70,6 +104,32 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged))))):
 			updateTotalSum(&state, resourceAddress: resourceAddress)
 			return validateState(&state)
+
+		case let .receivingAccount(id: id, action: .delegate(.chooseAccount)):
+			let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
+			let chooseAccount: ChooseReceivingAccount.State = .init(
+				chooseAccounts: .init(
+					selectionRequirement: .exactly(1),
+					filteredAccounts: filteredAccounts
+				)
+			)
+
+			state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
+			return .none
+
+		case let .destination(.presented(.relay(id, destinationAction))):
+			switch destinationAction {
+			case let .chooseAccount(.delegate(.handleResult(account))):
+				state.receivingAccounts[id: id]?.account = account
+				state.destination = nil
+				return .none
+			case .chooseAccount(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+			// TODO: Handle Add assets
+			default:
+				return .none
+			}
 		default:
 			return .none
 		}

@@ -6,6 +6,7 @@ import FeaturePrelude
 public struct ChooseAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let selectionRequirement: SelectionRequirement
+		public let filteredAccounts: [AccountAddress]
 		public var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
 		public var selectedAccounts: [ChooseAccountsRow.State]?
 		@PresentationState
@@ -13,10 +14,12 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 
 		public init(
 			selectionRequirement: SelectionRequirement,
+			filteredAccounts: [AccountAddress] = [],
 			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil
 		) {
 			self.selectionRequirement = selectionRequirement
+			self.filteredAccounts = filteredAccounts
 			self.availableAccounts = availableAccounts
 			self.selectedAccounts = selectedAccounts
 		}
@@ -86,7 +89,9 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
 			// Uniqueness is guaranteed as per `Profile.Network.Accounts`
-			state.availableAccounts = .init(uniqueElements: accounts)
+			state.availableAccounts = .init(uniqueElements: accounts).filter {
+				!state.filteredAccounts.contains($0.address)
+			}
 			return .none
 
 		case let .loadAccountsResult(.failure(error)):

@@ -25,18 +25,6 @@ extension ReceivingAccount.View {
 				assets(viewStore)
 			}
 			.roundedCorners(strokeColor: .borderColor, corners: .allCorners)
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /ReceivingAccount.Destinations.State.chooseAccount,
-				action: ReceivingAccount.Destinations.Action.chooseAccount,
-				content: { ChooseAccount.View(store: $0) }
-			)
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /ReceivingAccount.Destinations.State.addAsset,
-				action: ReceivingAccount.Destinations.Action.addAsset,
-				content: { AddAsset.View(store: $0) }
-			)
 		}
 	}
 
@@ -77,7 +65,6 @@ extension ReceivingAccount.View {
 			}
 		}
 		.frame(height: .standardButtonHeight)
-		// .topRoundedCorners(strokeColor: .borderColor)
 	}
 
 	private func assets(_ viewStore: ViewStoreOf<ReceivingAccount>) -> some View {
@@ -99,6 +86,5 @@ extension ReceivingAccount.View {
 		.frame(maxWidth: .infinity)
 		.padding([.top, .horizontal], .medium3)
 		.background(Color.containerContentBackground)
-		// .bottomRoundedCorners(strokeColor: .borderColor)
 	}
 }
