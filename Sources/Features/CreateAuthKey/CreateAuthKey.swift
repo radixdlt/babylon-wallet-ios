@@ -138,7 +138,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .derivePublicKey(.delegate(.derivedPublicKey(newPublicKey, derivationPath, factorSourceID))):
+		case let .derivePublicKey(.delegate(.derivedPublicKey(newPublicKey, derivationPath, factorSourceID, _))):
 			state.derivePublicKey = nil
 
 			return .run { [entity = state.entity] send in
