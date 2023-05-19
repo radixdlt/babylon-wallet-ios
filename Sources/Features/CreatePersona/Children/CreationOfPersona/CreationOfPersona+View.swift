@@ -2,9 +2,7 @@ import FeaturePrelude
 
 extension CreationOfPersona {
 	public struct ViewState: Equatable {
-		init(state: CreationOfPersona.State) {
-			fatalError()
-		}
+		init(state: CreationOfPersona.State) {}
 	}
 
 	@MainActor
@@ -21,6 +19,11 @@ extension CreationOfPersona {
 				observe: CreationOfPersona.ViewState.init(state:),
 				send: { .view($0) }
 			) { _ in
+
+				DerivePublicKey.View(store: store.scope(
+					state: <#T##(CreationOfPersona.State) -> ChildState#>,
+					action: <#T##(ChildAction) -> CreationOfPersona.Action#>
+				))
 //				Group {
 //					if viewStore.useLedgerAsFactorSource {
 //						createWithLedgerView(viewStore)
