@@ -91,6 +91,9 @@ extension ChooseLedgerHardwareDevice {
 					),
 					content: { AddLedgerFactorSource.View(store: $0) }
 				)
+				.onFirstTask { @MainActor in
+					ViewStore(store.stateless).send(.view(.onFirstTask))
+				}
 			}
 		}
 	}
