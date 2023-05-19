@@ -113,7 +113,7 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = .createAccount(
 				.init(config: .init(
 					purpose: .newAccountFromHome
-				), displayIntroduction: { _ in false })
+				))
 			)
 			return .none
 		case .pullToRefreshStarted:
