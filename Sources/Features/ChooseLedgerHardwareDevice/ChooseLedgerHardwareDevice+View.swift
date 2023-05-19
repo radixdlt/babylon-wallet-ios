@@ -2,6 +2,12 @@ import AddLedgerFactorSourceFeature
 import FeaturePrelude
 import Profile
 
+extension ChooseLedgerHardwareDevice.State {
+	var viewState: ChooseLedgerHardwareDevice.ViewState {
+		.init(state: self)
+	}
+}
+
 // MARK: - ChooseLedgerHardwareDevice.View
 extension ChooseLedgerHardwareDevice {
 	public struct ViewState: Equatable {
@@ -31,64 +37,61 @@ extension ChooseLedgerHardwareDevice {
 		}
 
 		public var body: some SwiftUI.View {
-			//			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			//				VStack {
-			//					if viewStore.ledgers.isEmpty {
-			//						Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
-			//					} else {
-			//						Text(L10n.CreateEntity.Ledger.subtitleSelectLedger)
-			//
-			//						ScrollView {
-			//							VStack(spacing: .small1) {
-			//								Selection(
-			//									viewStore.binding(
-			//										get: \.ledgersArray,
-			//										send: { .selectedLedger(id: $0?.first?.id) }
-			//									),
-			//									from: viewStore.ledgers,
-			//									requiring: .exactly(1)
-			//								) { item in
-			//									SelectLedgerRow.View(
-			//										viewState: .init(factorSource: item.value),
-			//										isSelected: item.isSelected,
-			//										action: item.action
-			//									)
-			//								}
-			//							}
-			//
-			//							.padding(.horizontal, .medium1)
-			//							.padding(.bottom, .medium2)
-			//						}
-			//					}
-			//
-			//					Spacer()
-			//
-			//					Button(L10n.CreateEntity.Ledger.addNewLedger) {
-			//						viewStore.send(.addNewLedgerButtonTapped)
-			//					}
-			//					.buttonStyle(.secondaryRectangular(shouldExpand: true))
-			//				}
-			//				.padding(.horizontal, .small1)
-			//				.navigationTitle(viewStore.navigationTitle)
-			//				.footer {
-			//					WithControlRequirements(
-			//						viewStore.selectedLedgerControlRequirements,
-			//						forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
-			//					) { action in
-			//						Button(L10n.CreateEntity.Ledger.useLedger, action: action)
-			//							.buttonStyle(.primaryRectangular)
-			//					}
-			//				}
-			//				.sheet(
-			//					store: store.scope(
-			//						state: \.$addNewLedger,
-			//						action: { .child(.addNewLedger($0)) }
-			//					),
-			//					content: { AddLedgerFactorSource.View(store: $0) }
-			//				)
-			//			}
-			//		}
-			Text("imple me")
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack {
+					if viewStore.ledgers.isEmpty {
+						Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
+					} else {
+						Text(L10n.CreateEntity.Ledger.subtitleSelectLedger)
+
+						ScrollView {
+							VStack(spacing: .small1) {
+								Selection(
+									viewStore.binding(
+										get: \.ledgersArray,
+										send: { .selectedLedger(id: $0?.first?.id) }
+									),
+									from: viewStore.ledgers,
+									requiring: .exactly(1)
+								) { item in
+									SelectLedgerRow.View(
+										viewState: .init(factorSource: item.value),
+										isSelected: item.isSelected,
+										action: item.action
+									)
+								}
+							}
+
+							.padding(.horizontal, .medium1)
+							.padding(.bottom, .medium2)
+						}
+					}
+
+					Spacer()
+
+					Button(L10n.CreateEntity.Ledger.addNewLedger) {
+						viewStore.send(.addNewLedgerButtonTapped)
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+				}
+				.padding(.horizontal, .small1)
+				.footer {
+					WithControlRequirements(
+						viewStore.selectedLedgerControlRequirements,
+						forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
+					) { action in
+						Button(L10n.CreateEntity.Ledger.useLedger, action: action)
+							.buttonStyle(.primaryRectangular)
+					}
+				}
+				.sheet(
+					store: store.scope(
+						state: \.$addNewLedger,
+						action: { .child(.addNewLedger($0)) }
+					),
+					content: { AddLedgerFactorSource.View(store: $0) }
+				)
+			}
 		}
 	}
 }
