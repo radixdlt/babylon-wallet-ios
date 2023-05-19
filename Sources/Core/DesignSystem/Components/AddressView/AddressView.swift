@@ -1,17 +1,21 @@
 import Prelude
+import QRGeneratorClient
 import Resources
 import SharedModels
 import SwiftUI
 
 // MARK: - AddressView
-public struct AddressView: SwiftUI.View, Sendable {
+public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
 	private let format: AddressFormat
 	private let action: Action
 
 	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
 	@Dependency(\.openURL) var openURL
+
+	@State private var qrCodeContent: AccountAddress? = nil
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
@@ -22,16 +26,16 @@ public struct AddressView: SwiftUI.View, Sendable {
 
 		switch identifiable {
 		case .address:
-			format = .default
-			action = .copy
+			self.format = .default
+			self.action = .copy
 		case let .identifier(identifier):
 			switch identifier {
 			case .transaction:
-				format = .default
-				action = .viewOnDashboard
+				self.format = .default
+				self.action = .viewOnDashboard
 			case .nonFungibleGlobalID:
-				format = .nonFungibleLocalId
-				action = .copy
+				self.format = .nonFungibleLocalId
+				self.action = .copy
 			}
 		}
 	}
@@ -42,6 +46,9 @@ extension AddressView {
 	public var body: some View {
 		if isTappable {
 			tappableAddressView
+				.sheet(item: $qrCodeContent) { accountAddress in
+					AccountAddressQRCodePanel(address: accountAddress)
+				}
 		} else {
 			addressView
 		}
@@ -63,6 +70,12 @@ extension AddressView {
 
 				Button(L10n.AddressAction.viewOnDashboard, asset: AssetResource.iconLinkOut) {
 					viewOnRadixDashboard()
+				}
+
+				if case let .address(.account(accountAddress)) = identifiable {
+					Button("Show QR code for account", asset: AssetResource.qrCodeScanner) { // FIXME: Add to strings
+						showQR(for: accountAddress)
+					}
 				}
 			}
 		}
@@ -107,6 +120,10 @@ extension AddressView {
 		Task { await openURL(addressURL) }
 	}
 
+	private func showQR(for accountAddress: AccountAddress) {
+		qrCodeContent = accountAddress
+	}
+
 	private var path: String? {
 		identifiable.addressPrefix + "/" + identifiable.address
 	}
@@ -132,3 +149,63 @@ struct AddressView_Previews: PreviewProvider {
 	}
 }
 #endif
+
+// MARK: - AccountAddressQRCodePanel
+public struct AccountAddressQRCodePanel: View {
+	private let address: AccountAddress
+
+	public init(address: AccountAddress) {
+		self.address = address
+	}
+
+	public var body: some View {
+		QRCodeView(Self.prefix + address.address, size: Self.qrImageSize)
+			.padding(.large3)
+			.presentationDetents([.medium])
+			.presentationDragIndicator(.visible)
+	}
+
+	private static let prefix: String = "radix:"
+	private static let qrImageSize: CGFloat = 300
+}
+
+// MARK: - QRCodeView
+public struct QRCodeView: View {
+	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
+
+	private let content: String
+	private let size: CGSize
+	@State private var qrImage: Result<CGImage, Error>? = nil
+
+	public init(_ content: String, size: CGFloat) {
+		self.content = content
+		self.size = .init(width: size, height: size)
+	}
+
+	public var body: some View {
+		ZStack {
+			switch qrImage {
+			case .none:
+				Color.clear
+			case let .success(value):
+				Image(value, scale: 1, label: Text("QR code for an account")) // FIXME: Add to strings
+					.resizable()
+					.aspectRatio(1, contentMode: .fit)
+					.transition(.scale(scale: 0.95).combined(with: .opacity))
+			case .failure:
+				Text("Could not create QR code") // FIXME: Add to strings
+					.foregroundColor(.app.alert)
+					.textStyle(.body1HighImportance)
+			}
+		}
+		.animation(.easeInOut, value: qrImage != nil)
+		.task {
+			do {
+				let image = try await qrGeneratorClient.generate(.init(content: content, size: size))
+				self.qrImage = .success(image)
+			} catch {
+				self.qrImage = .failure(error)
+			}
+		}
+	}
+}

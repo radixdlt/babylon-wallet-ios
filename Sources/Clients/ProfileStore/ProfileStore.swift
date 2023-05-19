@@ -451,12 +451,6 @@ extension ProfileStore {
 			}
 
 			do {
-				try await checkIfDeviceOwnsProfileSnapshot(decodedHeader)
-			} catch {
-				return .failure(.profileUsedOnAnotherDevice(error as! Profile.ProfileIsUsedOnAnotherDeviceError))
-			}
-
-			do {
 				try decodedHeader.validateCompatibility()
 			} catch {
 				// Incompatible Versions
@@ -464,6 +458,12 @@ extension ProfileStore {
 					json: profileSnapshotData,
 					version: decodedHeader.snapshotVersion
 				))
+			}
+
+			do {
+				try await checkIfDeviceOwnsProfileSnapshot(decodedHeader)
+			} catch {
+				return .failure(.profileUsedOnAnotherDevice(error as! Profile.ProfileIsUsedOnAnotherDeviceError))
 			}
 
 			let profileSnapshot: ProfileSnapshot

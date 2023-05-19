@@ -60,6 +60,10 @@ extension SwiftUI.Font.App {
 		body2Header
 	}
 
+	public var body3HighImportance: SwiftUI.Font {
+		.custom(FontFamily.IBMPlexSans.medium, size: 12)
+	}
+
 	public var button: SwiftUI.Font {
 		.custom(FontFamily.IBMPlexSans.bold, size: 16)
 	}

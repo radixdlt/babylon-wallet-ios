@@ -121,6 +121,12 @@ extension AccountPortfolio {
 
 extension AccountPortfolio.NonFungibleResource {
 	public func nftGlobalID(for id: NonFungibleToken.LocalID) -> GlobalID {
-		resourceAddress.address + ":" + id.rawValue
+		resourceAddress.nftGlobalId(id).address
+	}
+}
+
+extension ResourceAddress {
+	public func nftGlobalId(_ localID: AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID) -> ResourceAddress {
+		ResourceAddress(address: address + ":" + localID.rawValue)
 	}
 }

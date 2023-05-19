@@ -26,7 +26,6 @@ public struct PersonasClient: Sendable {
 	}
 }
 
-// MARK: PersonasClient.GetPersonas
 extension PersonasClient {
 	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Profile.Network.Personas>
 	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas

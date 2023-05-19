@@ -5,11 +5,9 @@ extension TransferAccountList {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<TransferAccountList>
-		let focusedField: FocusState<TransferFocusedField?>.Binding
 
-		public init(store: StoreOf<TransferAccountList>, focusedField: FocusState<TransferFocusedField?>.Binding) {
+		public init(store: StoreOf<TransferAccountList>) {
 			self.store = store
-			self.focusedField = focusedField
 		}
 	}
 }
@@ -48,7 +46,7 @@ extension TransferAccountList.View {
 				VStack(spacing: .medium3) {
 					ForEachStore(
 						store.scope(state: \.receivingAccounts, action: { .child(.receivingAccount(id: $0, action: $1)) }),
-						content: { ReceivingAccount.View(store: $0, focused: focusedField) }
+						content: { ReceivingAccount.View(store: $0) }
 					)
 				}
 
