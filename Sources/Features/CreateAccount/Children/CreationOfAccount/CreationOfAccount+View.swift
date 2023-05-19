@@ -1,4 +1,5 @@
-import AddLedgerFactorSourceFeature
+import ChooseLedgerHardwareDeviceFeature
+import DerivePublicKeyFeature
 import FeaturePrelude
 
 extension CreationOfAccount {
@@ -24,18 +25,23 @@ extension CreationOfAccount {
 				observe: CreationOfAccount.ViewState.init(state:),
 				send: { .view($0) }
 			) { _ in
-//				Group {
-//					if viewStore.useLedgerAsFactorSource {
-				//                        Text("Creating with Ledger...")
-//
-//					} else {
-				//                        Text("Remove this text, which is to say: creating with .device")
-//					}
-//				}
-				Text("Creation of account..")
-					.onFirstTask { @MainActor in
-						ViewStore(store.stateless).send(.view(.onFirstTask))
+				ZStack {
+					SwitchStore(store.scope(state: \.step)) {
+						CaseLet(
+							state: /CreationOfAccount.State.Step.step0_chooseLedger,
+							action: { CreationOfAccount.Action.child(.step0_chooseLedger($0)) },
+							then: { ChooseLedgerHardwareDevice.View(store: $0) }
+						)
+						CaseLet(
+							state: /CreationOfAccount.State.Step.step1_derivePublicKey,
+							action: { CreationOfAccount.Action.child(.step1_derivePublicKey($0)) },
+							then: { DerivePublicKey.View(store: $0) }
+						)
 					}
+				}
+				.onFirstTask { @MainActor in
+					ViewStore(store.stateless).send(.view(.onFirstTask))
+				}
 			}
 		}
 	}

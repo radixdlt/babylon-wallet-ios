@@ -30,7 +30,8 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init()) : .step1_derivePublicKey(
 				.init(
 					derivationPathOption: .next(networkID: networkID),
-					factorSourceOption: .device
+					factorSourceOption: .device,
+					loadMnemonicPurpose: .createEntity(kind: .account)
 				)
 			)
 		}
@@ -112,7 +113,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
 			state.step = .step1_derivePublicKey(.init(
 				derivationPathOption: .next(networkID: state.networkID),
-				factorSourceOption: .specific(ledger.factorSource)
+				factorSourceOption: .specific(ledger.factorSource), loadMnemonicPurpose: .createEntity(kind: .account)
 			))
 			return .none
 
