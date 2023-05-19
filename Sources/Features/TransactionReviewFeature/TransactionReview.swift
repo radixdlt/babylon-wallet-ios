@@ -119,10 +119,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
 				SelectFeePayer()
 			}
-			Scope(
-				state: /State.prepareForSigning,
-				action: /Action.prepareForSigning
-			) {
+			Scope(state: /State.prepareForSigning, action: /Action.prepareForSigning) {
 				PrepareForSigning()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
