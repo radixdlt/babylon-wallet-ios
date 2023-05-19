@@ -46,7 +46,8 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 		case derivedPublicKey(
 			SLIP10.PublicKey,
 			derivationPath: DerivationPath,
-			factorSourceID: FactorSourceID
+			factorSourceID: FactorSourceID,
+			networkID: NetworkID
 		)
 	}
 

@@ -32,9 +32,10 @@ extension CreationOfAccount {
 				//                        Text("Remove this text, which is to say: creating with .device")
 //					}
 //				}
-				.onFirstTask { @MainActor in
-					ViewStore(store.stateless).send(.view(.onFirstTask))
-				}
+				Text("Creation of account..")
+					.onFirstTask { @MainActor in
+						ViewStore(store.stateless).send(.view(.onFirstTask))
+					}
 			}
 		}
 	}

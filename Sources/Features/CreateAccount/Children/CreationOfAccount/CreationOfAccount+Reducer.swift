@@ -1,5 +1,6 @@
 import AccountsClient
 import AddLedgerFactorSourceFeature
+import ChooseLedgerHardwareDeviceFeature
 import Cryptography
 import DerivePublicKeyFeature
 import FeaturePrelude
@@ -8,14 +9,25 @@ import LedgerHardwareWalletClient
 public struct CreationOfAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let name: NonEmptyString
-		public var derivePublicKey: DerivePublicKey.State
+		public let networkID: NetworkID?
+		public let isCreatingLedgerAccount: Bool
+		public enum Step: Sendable, Hashable {
+			case step0_chooseLedger(ChooseLedgerHardwareDevice.State)
+			case step1_derivePublicKey(DerivePublicKey.State)
+		}
+
+		public var step: Step
 
 		public init(
 			name: NonEmptyString,
-			derivePublicKey: DerivePublicKey.State
+			networkID: NetworkID?,
+			isCreatingLedgerAccount: Bool,
+			step: Step
 		) {
 			self.name = name
-			self.derivePublicKey = derivePublicKey
+			self.networkID = networkID
+			self.isCreatingLedgerAccount = isCreatingLedgerAccount
+			self.step = step
 		}
 	}
 
@@ -28,7 +40,8 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case derivePublicKey(DerivePublicKey.Action)
+		case step0_chooseLedger(ChooseLedgerHardwareDevice.Action)
+		case step1_derivePublicKey(DerivePublicKey.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -43,8 +56,19 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.derivePublicKey, action: /Action.child .. ChildAction.derivePublicKey) {
-			DerivePublicKey()
+		Scope(state: \.step, action: /.self) {
+			Scope(
+				state: /State.Step.step0_chooseLedger,
+				action: /Action.child .. ChildAction.step0_chooseLedger
+			) {
+				ChooseLedgerHardwareDevice()
+			}
+			Scope(
+				state: /State.Step.step1_derivePublicKey,
+				action: /Action.child .. ChildAction.step1_derivePublicKey
+			) {
+				DerivePublicKey()
+			}
 		}
 
 		Reduce(core)
@@ -75,6 +99,22 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 		case let .createAccountResult(.success(account)):
 			return .send(.delegate(.createdAccount(account)))
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
+			state.step = .step1_derivePublicKey(.init(
+				derivationPathOption: .nextBasedOnFactorSource(networkOption: state.networkID.map { .specific($0) } ?? .useCurrent),
+				factorSourceOption: .specific(factorSource: ledger.factorSource)
+			))
+			return .none
+
+		case let .step1_derivePublicKey(.delegate(.derivedPublicKey(publicKey, derivationPath, factorSourceID, networkID))):
+			Profile.Network.Account(networkID: networkID, factorInstance: .init(factorSourceID: factorSourceID, publicKey: publicKey, derivationPath: derivationPath), displayName: state.name, extraProperties: .)
+
+		default: return .none
 		}
 	}
 }

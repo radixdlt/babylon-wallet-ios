@@ -2,8 +2,8 @@ import AddLedgerFactorSourceFeature
 import FeaturePrelude
 import Profile
 
-// MARK: - ChoseLedgerHardwareDevice.View
-extension ChoseLedgerHardwareDevice {
+// MARK: - ChooseLedgerHardwareDevice.View
+extension ChooseLedgerHardwareDevice {
 	public struct ViewState: Equatable {
 		let useLedgerAsFactorSource: Bool
 		let ledgers: IdentifiedArrayOf<LedgerFactorSource>
@@ -11,7 +11,7 @@ extension ChoseLedgerHardwareDevice {
 		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 
-		init(state: ChoseLedgerHardwareDevice.State) {
+		init(state: ChooseLedgerHardwareDevice.State) {
 			self.ledgers = state.ledgers
 			self.selectedLedgerID = state.selectedLedgerID
 			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers[id: id] {
@@ -24,9 +24,9 @@ extension ChoseLedgerHardwareDevice {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ChoseLedgerHardwareDevice>
+		private let store: StoreOf<ChooseLedgerHardwareDevice>
 
-		public init(store: StoreOf<ChoseLedgerHardwareDevice>) {
+		public init(store: StoreOf<ChooseLedgerHardwareDevice>) {
 			self.store = store
 		}
 
@@ -144,19 +144,19 @@ enum SelectLedgerRow {
 // #if DEBUG
 // import SwiftUI // NB: necessary for previews to appear
 //
-//// MARK: - ChoseLedgerHardwareDevice_Preview
-// struct ChoseLedgerHardwareDevice_Preview: PreviewProvider {
+//// MARK: - ChooseLedgerHardwareDevice_Preview
+// struct ChooseLedgerHardwareDevice_Preview: PreviewProvider {
 //	static var previews: some View {
-//		ChoseLedgerHardwareDevice.View(
+//		ChooseLedgerHardwareDevice.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: ChoseLedgerHardwareDevice()
+//				reducer: ChooseLedgerHardwareDevice()
 //			)
 //		)
 //	}
 // }
 //
-// extension ChoseLedgerHardwareDevice.State {
+// extension ChooseLedgerHardwareDevice.State {
 //	public static let previewValue = Self()
 // }
 // #endif

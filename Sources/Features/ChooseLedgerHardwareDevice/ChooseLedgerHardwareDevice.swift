@@ -7,8 +7,8 @@ struct SelectedLedgerControlRequirements: Hashable {
 	let selectedLedger: LedgerFactorSource
 }
 
-// MARK: - ChoseLedgerHardwareDevice
-public struct ChoseLedgerHardwareDevice: Sendable, FeatureReducer {
+// MARK: - ChooseLedgerHardwareDevice
+public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var ledgers: IdentifiedArrayOf<LedgerFactorSource> = []
 		var selectedLedgerID: FactorSourceID? = nil
@@ -24,11 +24,15 @@ public struct ChoseLedgerHardwareDevice: Sendable, FeatureReducer {
 		case appeared
 		case selectedLedger(id: FactorSource.ID?)
 		case addNewLedgerButtonTapped
-		case confirmedLedger(FactorSource)
+		case confirmedLedger(LedgerFactorSource)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case addNewLedger(PresentationAction<AddLedgerFactorSource.Action>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case choseLedger(LedgerFactorSource)
 	}
 
 	public init() {}
@@ -64,8 +68,7 @@ public struct ChoseLedgerHardwareDevice: Sendable, FeatureReducer {
 			return .none
 
 		case let .confirmedLedger(ledger):
-//			return sendDerivePublicKeyRequest(ledger, state: state)
-			fatalError()
+			return .send(.delegate(.choseLedger(ledger)))
 		}
 	}
 

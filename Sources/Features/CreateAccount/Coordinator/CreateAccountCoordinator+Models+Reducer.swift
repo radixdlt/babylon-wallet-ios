@@ -30,12 +30,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 			if let last = path.last {
 				if case .step3_completion = last {
 					return false
-				} else if case let .step2_creationOfAccount(creationOfEntity) = last {
-					// do not show back button when using `device` factor source
-					switch creationOfEntity.derivePublicKey.factorSourceOption {
-					case let .specific(specific): return specific.kind == .ledgerHQHardwareWallet
-					case let .anyOf(factorSources): return factorSources.allSatisfy { $0.kind == .ledgerHQHardwareWallet }
-					}
+				} else if case let .step2_creationOfAccount(creationOfAccount) = last {
+					return creationOfAccount.isCreatingLedgerAccount
 				} else {
 					return true
 				}
@@ -46,6 +42,9 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case step_first
+			case step_last
+
 			case step1_nameAccount(NameAccount.State)
 			case step2_creationOfAccount(CreationOfAccount.State)
 			case step3_completion(NewAccountCompletion.State)
@@ -185,23 +184,24 @@ extension CreateAccountCoordinator {
 		genesisFactorSourceSelection: GenesisFactorSourceSelection,
 		state: inout State
 	) -> EffectTask<Action> {
-		let creationOfAccountState = CreationOfAccount.State(
-			name: accountName,
-			derivePublicKey: .init(
-				derivationPathOption: .nextBasedOnFactorSource(
-					networkOption: state.config.specificNetworkID.map { .specific($0) } ?? .useCurrent
-				),
-				factorSourceOption: {
-					switch genesisFactorSourceSelection {
-					case let .device(babylonDevice):
-						return .specific(factorSource: babylonDevice.factorSource)
-					case let .ledger(ledgers):
-						return .anyOf(factorSources: ledgers)
-					}
-				}()
-			)
-		)
-		state.path.append(.step2_creationOfAccount(creationOfAccountState))
+//		let creationOfAccountState = CreationOfAccount.State(
+//			name: accountName,
+//			derivePublicKey: .init(
+//				derivationPathOption: .nextBasedOnFactorSource(
+//					networkOption: state.config.specificNetworkID.map { .specific($0) } ?? .useCurrent
+//				),
+//				factorSourceOption: {
+//					switch genesisFactorSourceSelection {
+//					case let .device(babylonDevice):
+//						return .specific(factorSource: babylonDevice.factorSource)
+//					case let .ledger(ledgers):
+//						return .anyOf(factorSources: ledgers)
+//					}
+//				}()
+//			)
+//		)
+		//		state.path.append(.step2_creationOfAccount(creationOfAccountState))
+		fatalError()
 		return .none
 	}
 

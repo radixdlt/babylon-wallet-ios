@@ -81,7 +81,7 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "ChoseLedgerHardwareDeviceFeature",
+		name: "ChooseLedgerHardwareDeviceFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
@@ -104,11 +104,12 @@ package.addModules([
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
+			"ChooseLedgerHardwareDeviceFeature",
 			"Cryptography",
+			"DerivePublicKeyFeature",
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"LedgerHardwareWalletClient",
-			"DerivePublicKeyFeature",
 		],
 		tests: .no
 	),
