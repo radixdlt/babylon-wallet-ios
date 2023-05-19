@@ -14,7 +14,7 @@ extension AccountsClient: TestDependencyKey {
 		getAccountsOnCurrentNetwork: { throw NoopError() },
 		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getAccountsOnNetwork: { _ in throw NoopError() },
-		newVirtualAccount: { _ in },
+		newVirtualAccount: { _ in throw NoopError() },
 		saveVirtualAccount: { _ in },
 		getAccountByAddress: { _ in throw NoopError() },
 		hasAccountOnNetwork: { _ in false },
