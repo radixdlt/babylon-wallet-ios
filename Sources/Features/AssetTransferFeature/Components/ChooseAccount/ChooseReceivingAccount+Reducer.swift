@@ -6,10 +6,7 @@ import ScanQRFeature
 // MARK: - ChooseReceivingAccount
 public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		@PresentationState
-		var destination: Destinations.State? = nil
 		var chooseAccounts: ChooseAccounts.State
-
 		var manualAccountAddress: String = ""
 		var manualAccountAddressFocused: Bool = false {
 			didSet {
@@ -18,6 +15,20 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 				}
 			}
 		}
+
+		var validatedAccountAddress: AccountAddress? {
+			if !manualAccountAddressFocused, !manualAccountAddress.isEmpty {
+				do {
+					return try AccountAddress(address: manualAccountAddress)
+				} catch {
+					return nil
+				}
+			}
+			return nil
+		}
+
+		@PresentationState
+		var destination: Destinations.State? = nil
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -25,7 +36,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case closeButtonTapped
 		case manualAccountAddressChanged(String)
 		case focusChanged(Bool)
-		case chooseButtonTapped(Either<Profile.Network.Account, AccountAddress>)
+		case chooseButtonTapped(ReceivingAccount.State.Account)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -35,7 +46,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case handleResult(Either<Profile.Network.Account, AccountAddress>)
+		case handleResult(ReceivingAccount.State.Account)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -89,12 +100,11 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.scanAccountAddress(.delegate(.scanned(address))))):
+		case var .destination(.presented(.scanAccountAddress(.delegate(.scanned(address))))):
 			state.destination = nil
 
+			// FIXME: We should have a predefined way to handle the qr address prefix
 			let prefix = "radix:"
-			var address = address
-
 			if address.hasPrefix(prefix) {
 				address.removeFirst(prefix.count)
 			}
@@ -103,17 +113,6 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			return .none
 		default:
 			return .none
-		}
-	}
-}
-
-extension DecodeAddressResponse {
-	var isAccountAddress: Bool {
-		switch entityType {
-		case .accountComponent, .ed25519VirtualAccountComponent, .secp256k1VirtualAccountComponent:
-			return true
-		default:
-			return false
 		}
 	}
 }

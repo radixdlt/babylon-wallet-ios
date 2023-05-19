@@ -67,7 +67,6 @@ package.addModules([
 		dependencies: [
 			"ScanQRFeature",
 			"ChooseAccounts",
-			"EngineToolkitClient",
 		],
 		tests: .yes()
 	),

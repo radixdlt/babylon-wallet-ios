@@ -1,3 +1,4 @@
+import EngineToolkit
 import Prelude
 
 /// YES! DappDefinitionAddress **is** an AccountAddress! NOT to be confused with the
@@ -18,7 +19,8 @@ public struct AccountAddress:
 {
 	public let address: String
 	public init(address: String) throws {
-		guard address.starts(with: "account_") else {
+		let decoded = try EngineToolkit().decodeAddressRequest(request: .init(address: address)).get()
+		guard decoded.isAccountAddress else {
 			throw NotAnAccountAddress()
 		}
 		self.address = address
@@ -51,6 +53,17 @@ extension AccountAddress {
 		switch address {
 		case let .account(address): return address
 		default: return nil
+		}
+	}
+}
+
+extension DecodeAddressResponse {
+	var isAccountAddress: Bool {
+		switch entityType {
+		case .accountComponent, .ed25519VirtualAccountComponent, .secp256k1VirtualAccountComponent:
+			return true
+		default:
+			return false
 		}
 	}
 }

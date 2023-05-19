@@ -3,13 +3,14 @@ import FeaturePrelude
 // MARK: - ReceivingAccount
 public struct ReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias Account = Profile.Network.Account
+		public typealias OwnedAccount = Profile.Network.Account
+		public typealias Account = Either<OwnedAccount, AccountAddress>
 
 		public typealias ID = UUID
 		public let id = ID()
 
 		// Either user owned account, or foreign account Address
-		public var account: Either<Account, AccountAddress>?
+		public var account: Account?
 		public var assets: IdentifiedArrayOf<ResourceAsset.State>
 		public var canBeRemoved: Bool
 
@@ -19,7 +20,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		}
 
 		public init(
-			account: Either<Account, AccountAddress>?,
+			account: Account?,
 			assets: IdentifiedArrayOf<ResourceAsset.State>,
 			canBeRemovedWhenEmpty: Bool
 		) {
@@ -79,7 +80,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 }
 
-extension Either where Left == Profile.Network.Account, Right == AccountAddress {
+extension ReceivingAccount.State.Account {
 	var name: String {
 		switch self {
 		case let .left(account):

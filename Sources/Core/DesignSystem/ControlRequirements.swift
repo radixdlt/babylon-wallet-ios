@@ -61,7 +61,7 @@ public struct WithControlRequirements<Control: View>: View {
 		forAction action: @escaping (Either<A, B>) -> Void,
 		@ViewBuilder control: (@escaping () -> Void) -> Control
 	) {
-		let action: (() -> Void)? = {
+		let controlAction: (() -> Void)? = {
 			if let a = a() {
 				return { action(.left(a)) }
 			}
@@ -72,8 +72,8 @@ public struct WithControlRequirements<Control: View>: View {
 
 			return nil
 		}()
-		self.action = action
-		self.control = control(action ?? {})
+		self.action = controlAction
+		self.control = control(controlAction ?? {})
 	}
 
 	public init<A, B, C>(

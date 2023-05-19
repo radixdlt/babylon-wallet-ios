@@ -16,29 +16,14 @@ extension ChooseReceivingAccount {
 			manualAccountAddress = state.manualAccountAddress
 			chooseAccounts = state.chooseAccounts
 			manualAccountAddressFocused = state.manualAccountAddressFocused
-
-			let _validateAccountAddress: AccountAddress? = {
-				if !state.manualAccountAddressFocused, !state.manualAccountAddress.isEmpty {
-					do {
-						@Dependency(\.engineToolkitClient) var engineToolkitClient
-						if try engineToolkitClient.decodeAddress(state.manualAccountAddress).isAccountAddress {
-							return try AccountAddress(address: state.manualAccountAddress)
-						}
-					} catch {
-						return nil
-					}
-				}
-				return nil
-			}()
-
-			self.validateAccountAddress = _validateAccountAddress
+			validateAccountAddress = state.validatedAccountAddress
 
 			manualAddressHint = {
 				guard !state.manualAccountAddressFocused, !state.manualAccountAddress.isEmpty else {
 					return .none
 				}
 
-				if _validateAccountAddress == nil {
+				if state.validatedAccountAddress == nil {
 					return .error("Invalid address")
 				}
 				return .none
@@ -105,9 +90,16 @@ extension ChooseReceivingAccount.View {
 							}
 						}
 					}
+
 				#endif
 			}
 		}
+		.frame(maxWidth: .infinity)
+		.presentationDragIndicator(.visible)
+		.presentationDetents([.fraction(0.9)])
+		#if os(iOS)
+			.presentationBackground(.blur)
+		#endif
 	}
 
 	private func addressField(_ viewStore: ViewStoreOf<ChooseReceivingAccount>) -> some View {

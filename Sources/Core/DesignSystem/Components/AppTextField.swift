@@ -92,7 +92,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 					}
 				}
 
-				HStack(spacing: .small3) {
+				HStack(spacing: .small2) {
 					TextField(
 						placeholder,
 						text: text.removeDuplicates()
