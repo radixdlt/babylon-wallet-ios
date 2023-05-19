@@ -27,6 +27,10 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 		case createPersonaResult(TaskResult<Profile.Network.Persona>)
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case derivePublicKey(DerivePublicKey.Action)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case createdPersona(Profile.Network.Persona)
 		case createPersonaFailed
@@ -37,6 +41,17 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(
+			state: \.derivePublicKey,
+			action: /Action.child .. ChildAction.derivePublicKey
+		) {
+			DerivePublicKey()
+		}
+
+		Reduce(core)
+	}
+
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .createPersonaResult(.failure(error)):
@@ -45,6 +60,37 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 		case let .createPersonaResult(.success(persona)):
 			return .send(.delegate(.createdPersona(persona)))
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .derivePublicKey(.delegate(.derivedPublicKey(
+			publicKey,
+			derivationPath,
+			factorSourceID,
+			networkID
+		))):
+			return .run { [name = state.name, fields = state.fields] _ in
+				let persona = try Profile.Network.Persona(
+					networkID: networkID,
+					factorInstance: .init(
+						factorSourceID: factorSourceID,
+						publicKey: publicKey,
+						derivationPath: derivationPath
+					),
+					displayName: name,
+					extraProperties: .init(fields: fields)
+				)
+
+				try await personasClient.saveVirtualPersona(persona)
+
+			} catch: { error, send in
+				loggerGlobal.error("Failed to create or save persona, error: \(error)")
+				await send(.delegate(.createPersonaFailed))
+			}
+
+		default: return .none
 		}
 	}
 }

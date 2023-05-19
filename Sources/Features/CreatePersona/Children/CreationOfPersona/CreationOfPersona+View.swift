@@ -1,3 +1,4 @@
+import DerivePublicKeyFeature
 import FeaturePrelude
 
 extension CreationOfPersona {
@@ -20,10 +21,12 @@ extension CreationOfPersona {
 				send: { .view($0) }
 			) { _ in
 
-				DerivePublicKey.View(store: store.scope(
-					state: <#T##(CreationOfPersona.State) -> ChildState#>,
-					action: <#T##(ChildAction) -> CreationOfPersona.Action#>
-				))
+				DerivePublicKey.View(
+					store: store.scope(
+						state: \.derivePublicKey,
+						action: { CreationOfPersona.Action.child(.derivePublicKey($0)) }
+					)
+				)
 //				Group {
 //					if viewStore.useLedgerAsFactorSource {
 //						createWithLedgerView(viewStore)
