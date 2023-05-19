@@ -2,15 +2,13 @@ import FeaturePrelude
 import SwiftUI
 
 extension View {
-	func roundedCorners(strokeColor: Color, corners: UIRectCorner) -> some View {
-		self.modifier { view in
-			view
-				.clipShape(RoundedCorners(radius: .small2, corners: corners))
-				.background(
-					RoundedCorners(radius: .small2, corners: corners)
-						.stroke(strokeColor, lineWidth: 1)
-				)
-		}
+	func roundedCorners(strokeColor: Color, corners: UIRectCorner = .allCorners) -> some View {
+		self
+			.clipShape(RoundedCorners(radius: .small2, corners: corners))
+			.background(
+				RoundedCorners(radius: .small2, corners: corners)
+					.stroke(strokeColor, lineWidth: 1)
+			)
 	}
 
 	func topRoundedCorners(strokeColor: Color) -> some View {
@@ -31,6 +29,5 @@ extension Color {
 
 extension CGFloat {
 	static let dottedLineHeight: CGFloat = 64.0
-
 	public static let transferMessageDefaultHeight: Self = 64
 }
