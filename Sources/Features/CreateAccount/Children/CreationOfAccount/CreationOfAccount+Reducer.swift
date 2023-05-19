@@ -29,9 +29,8 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init()) : .step1_derivePublicKey(
 				.init(
-					derivationPathOption: .next(networkID: networkID),
-					factorSourceOption: .device,
-					loadMnemonicPurpose: .createEntity(kind: .account)
+					derivationPathOption: .next(for: .account, networkID: networkID),
+					factorSourceOption: .device
 				)
 			)
 		}

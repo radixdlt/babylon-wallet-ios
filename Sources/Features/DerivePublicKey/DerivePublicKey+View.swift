@@ -1,15 +1,16 @@
 import FeaturePrelude
+import Profile
 
 extension DerivePublicKey.State {
 	var viewState: DerivePublicKey.ViewState {
-		.init()
+		.init(ledger: ledgerBeingUsed)
 	}
 }
 
 // MARK: - DerivePublicKey.View
 extension DerivePublicKey {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		public let ledger: LedgerFactorSource?
 	}
 
 	@MainActor
@@ -21,14 +22,17 @@ extension DerivePublicKey {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
-				// TODO: implement
-				Text("Implement: DerivePublicKey")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onFirstTask { @MainActor in
-						ViewStore(store.stateless).send(.view(.onFirstTask))
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				Group {
+					if let ledger = viewStore.ledger {
+						Text("Connect Ledger: \(String(describing: ledger.name)) \(ledger.model.rawValue)")
+					} else {
+						Color.white
 					}
+				}
+				.onFirstTask { @MainActor in
+					ViewStore(store.stateless).send(.view(.onFirstTask))
+				}
 			}
 		}
 	}

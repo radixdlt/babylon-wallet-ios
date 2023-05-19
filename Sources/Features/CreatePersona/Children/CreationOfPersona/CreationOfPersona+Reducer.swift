@@ -16,9 +16,11 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 			self.name = name
 			self.fields = fields
 			self.derivePublicKey = .init(
-				derivationPathOption: .nextBasedOnFactorSource(networkOption: .useCurrent),
-				factorSourceOption: .device,
-				loadMnemonicPurpose: .createEntity(kind: .identity)
+				derivationPathOption: .nextBasedOnFactorSource(
+					networkOption: .useCurrent,
+					entityKind: .identity
+				),
+				factorSourceOption: .device
 			)
 		}
 	}
