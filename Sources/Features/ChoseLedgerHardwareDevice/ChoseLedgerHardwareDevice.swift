@@ -1,9 +1,10 @@
 import AddLedgerFactorSourceFeature
 import FeaturePrelude
+import Profile
 
 // MARK: - SelectedLedgerControlRequirements
 struct SelectedLedgerControlRequirements: Hashable {
-	let selectedLedger: FactorSource
+	let selectedLedger: LedgerFactorSource
 }
 
 // MARK: - ChoseLedgerHardwareDevice
