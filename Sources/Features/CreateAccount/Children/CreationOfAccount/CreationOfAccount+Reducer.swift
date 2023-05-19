@@ -112,7 +112,19 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			return .none
 
 		case let .step1_derivePublicKey(.delegate(.derivedPublicKey(publicKey, derivationPath, factorSourceID, networkID))):
-			Profile.Network.Account(networkID: networkID, factorInstance: .init(factorSourceID: factorSourceID, publicKey: publicKey, derivationPath: derivationPath), displayName: state.name, extraProperties: .)
+			return .run { [name = state.name] send in
+				await send(.internal(.createAccountResult(TaskResult {
+					try await accountsClient.newVirtualAccount(.init(
+						name: name,
+						factorInstance: .init(
+							factorSourceID: factorSourceID,
+							publicKey: publicKey,
+							derivationPath: derivationPath
+						),
+						networkID: networkID
+					))
+				})))
+			}
 
 		default: return .none
 		}

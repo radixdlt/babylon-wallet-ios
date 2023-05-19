@@ -25,6 +25,22 @@ extension AccountsClient: DependencyKey {
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
 			accountsOnCurrentNetwork: { await getProfileStore().accountValues() },
 			getAccountsOnNetwork: { try await getProfileStore().profile.network(id: $0).accounts },
+			newVirtualAccount: { request in
+				let networkID = request.networkID
+				let profile = await getProfileStore().profile
+				let numberOfExistingAccount = {
+					guard let network = (try? profile.network(id: networkID)) else {
+						return 0
+					}
+					return network.accounts.count
+				}()
+				return try Profile.Network.Account(
+					networkID: networkID,
+					factorInstance: request.factorInstance,
+					displayName: request.name,
+					extraProperties: .init(numberOfAccountsOnNetwork: numberOfExistingAccount)
+				)
+			},
 			saveVirtualAccount: saveVirtualAccount,
 			getAccountByAddress: { address in
 				try await getProfileStore().network().entity(address: address)

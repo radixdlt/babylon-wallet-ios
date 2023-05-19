@@ -13,6 +13,8 @@ public struct AccountsClient: Sendable {
 	/// value of Accounts when you switch network (if new active gateway is on a new network).
 	public var accountsOnCurrentNetwork: AccountsOnCurrentNetwork
 
+	public var newVirtualAccount: NewVirtualAccount
+
 	/// Saves a virtual account into the profile.
 	public var saveVirtualAccount: SaveVirtualAccount
 
@@ -30,6 +32,7 @@ public struct AccountsClient: Sendable {
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
+		newVirtualAccount: @escaping NewVirtualAccount,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
 		getAccountByAddress: @escaping GetAccountByAddress,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
@@ -39,6 +42,7 @@ public struct AccountsClient: Sendable {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
+		self.newVirtualAccount = newVirtualAccount
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
 		self.hasAccountOnNetwork = hasAccountOnNetwork
@@ -53,6 +57,7 @@ extension AccountsClient {
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Profile.Network.Accounts>
 
+	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Profile.Network.Account
 	public typealias SaveVirtualAccount = @Sendable (SaveAccountRequest) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account
@@ -60,6 +65,18 @@ extension AccountsClient {
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
 	public typealias UpdateAccount = @Sendable (Profile.Network.Account) async throws -> Void
+}
+
+// MARK: - NewAccountRequest
+public struct NewAccountRequest: Sendable, Hashable {
+	public let name: NonEmptyString
+	public let factorInstance: HierarchicalDeterministicFactorInstance
+	public let networkID: NetworkID
+	public init(name: NonEmptyString, factorInstance: HierarchicalDeterministicFactorInstance, networkID: NetworkID) {
+		self.name = name
+		self.factorInstance = factorInstance
+		self.networkID = networkID
+	}
 }
 
 // MARK: - SaveAccountRequest
