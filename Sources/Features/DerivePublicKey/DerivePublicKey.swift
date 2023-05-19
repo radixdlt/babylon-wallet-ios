@@ -8,6 +8,11 @@ import SecureStorageClient
 // MARK: - DerivePublicKey
 public struct DerivePublicKey: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Purpose: Sendable, Hashable {
+			case createEntity
+			case createAuthSigningKey
+		}
+
 		public let derivationPathOption: DerivationPathOption
 		public var ledgerBeingUsed: LedgerFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
@@ -34,6 +39,13 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 					networkOption: .init(networkID: networkID),
 					entityKind: entityKind
 				)
+			}
+		}
+
+		var purpose: Purpose {
+			switch derivationPathOption {
+			case .known: return .createAuthSigningKey
+			case .nextBasedOnFactorSource: return .createEntity
 			}
 		}
 

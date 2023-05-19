@@ -3,7 +3,7 @@ import Profile
 
 extension DerivePublicKey.State {
 	var viewState: DerivePublicKey.ViewState {
-		.init(ledger: ledgerBeingUsed)
+		.init(ledger: ledgerBeingUsed, purpose: self.purpose == .createAuthSigningKey ? .createAuthSigningKey : .createAccount)
 	}
 }
 
@@ -11,6 +11,7 @@ extension DerivePublicKey.State {
 extension DerivePublicKey {
 	public struct ViewState: Equatable {
 		public let ledger: LedgerFactorSource?
+		public let purpose: UseLedgerView.Purpose
 	}
 
 	@MainActor
@@ -25,7 +26,7 @@ extension DerivePublicKey {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				Group {
 					if let ledger = viewStore.ledger {
-						Text("Connect Ledger: \(String(describing: ledger.name)) \(ledger.model.rawValue)")
+						UseLedgerView(ledgerFactorSource: ledger, purpose: viewStore.purpose)
 					} else {
 						Color.white
 					}
