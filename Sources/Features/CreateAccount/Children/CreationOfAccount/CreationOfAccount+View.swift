@@ -26,23 +26,17 @@ extension CreationOfAccount {
 			) { _ in
 //				Group {
 //					if viewStore.useLedgerAsFactorSource {
-//						createWithLedgerView(viewStore)
+				//                        Text("Creating with Ledger...")
+//
 //					} else {
-//						createWithDevice()
+				//                        Text("Remove this text, which is to say: creating with .device")
 //					}
 //				}
-				Text("Hmm add Ledger selection here if able..")
-//				.onAppear {
-//					viewStore.send(.appeared)
-//				}
+				.onFirstTask { @MainActor in
+					ViewStore(store.stateless).send(.view(.onFirstTask))
+				}
 			}
 		}
-	}
-}
-
-extension CreationOfAccount.View {
-	private func createWithDevice() -> some SwiftUI.View {
-		Color.white
 	}
 }
 
