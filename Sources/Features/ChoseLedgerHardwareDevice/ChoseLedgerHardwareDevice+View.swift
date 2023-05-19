@@ -10,10 +10,6 @@ extension ChoseLedgerHardwareDevice {
 		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 
-		struct SelectedLedgerControlRequirements: Hashable {
-			let selectedLedger: FactorSource
-		}
-
 		init(state: ChoseLedgerHardwareDevice.State) {
 			self.ledgers = state.ledgers
 			self.selectedLedgerID = state.selectedLedgerID

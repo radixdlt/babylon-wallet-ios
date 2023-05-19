@@ -1,13 +1,17 @@
 import AddLedgerFactorSourceFeature
 import FeaturePrelude
 
+// MARK: - SelectedLedgerControlRequirements
+struct SelectedLedgerControlRequirements: Hashable {
+	let selectedLedger: FactorSource
+}
+
 // MARK: - ChoseLedgerHardwareDevice
 public struct ChoseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let ledgers: IdentifiedArrayOf<FactorSource>
-		var ledgersArray: [FactorSource]? { .init(ledgers) }
-		let selectedLedgerID: FactorSourceID?
-		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
+		var ledgers: IdentifiedArrayOf<LedgerFactorSource> = []
+		var selectedLedgerID: FactorSourceID? = nil
+		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
 		public var addNewLedger: AddLedgerFactorSource.State?
@@ -38,17 +42,18 @@ public struct ChoseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			switch state.genesisFactorSourceSelection {
-			case let .device(babylonDeviceFactorSource):
-				return createEntityControlledByDeviceFactorSource(babylonDeviceFactorSource, state: state)
-			case let .ledger(ledgers):
-				precondition(ledgers.allSatisfy { $0.kind == .ledgerHQHardwareWallet })
-				state.ledgers = IdentifiedArrayOf<FactorSource>.init(uniqueElements: ledgers, id: \.id)
-				if let first = ledgers.first {
-					state.selectedLedgerID = first.id
-				}
-				return .none
-			}
+			fatalError()
+//			switch state.genesisFactorSourceSelection {
+//			case let .device(babylonDeviceFactorSource):
+//				return createEntityControlledByDeviceFactorSource(babylonDeviceFactorSource, state: state)
+//			case let .ledger(ledgers):
+//				precondition(ledgers.allSatisfy { $0.kind == .ledgerHQHardwareWallet })
+//				state.ledgers = IdentifiedArrayOf<FactorSource>.init(uniqueElements: ledgers, id: \.id)
+//				if let first = ledgers.first {
+//					state.selectedLedgerID = first.id
+//				}
+//				return .none
+//			}
 		case let .selectedLedger(selectedID):
 			state.selectedLedgerID = selectedID
 			return .none
@@ -58,7 +63,8 @@ public struct ChoseLedgerHardwareDevice: Sendable, FeatureReducer {
 			return .none
 
 		case let .confirmedLedger(ledger):
-			return sendDerivePublicKeyRequest(ledger, state: state)
+//			return sendDerivePublicKeyRequest(ledger, state: state)
+			fatalError()
 		}
 	}
 
