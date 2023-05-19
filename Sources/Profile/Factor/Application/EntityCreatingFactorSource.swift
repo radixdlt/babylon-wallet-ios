@@ -17,6 +17,8 @@ extension _EntityCreatingFactorSourceProtocol {
 
 // MARK: - EntityCreatingFactorSource
 public struct EntityCreatingFactorSource: _ApplicationFactorSource, _EntityCreatingFactorSourceProtocol {
+	public static var assertedKind: FactorSourceKind? { nil }
+	public static var assertedParameters: FactorSource.Parameters? { nil }
 	public let factorSource: FactorSource
 	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
 

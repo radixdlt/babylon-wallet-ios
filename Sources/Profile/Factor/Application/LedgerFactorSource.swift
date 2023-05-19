@@ -10,8 +10,8 @@ public struct LedgerFactorSource:
 	// FIXME: Remove this protocol conformance once we have multifactor, because once we have multi factor it should not be possible to create accounts controlled with Ledger, since no need, a user can add Ledger as another factor source when securifying the account
 	_EntityCreatingFactorSourceProtocol
 {
-	public static let assertedKind: FactorSourceKind = .ledgerHQHardwareWallet
-	public static let assertedParameters: FactorSource.Parameters = .olympiaBackwardsCompatible
+	public static let assertedKind: FactorSourceKind? = .ledgerHQHardwareWallet
+	public static let assertedParameters: FactorSource.Parameters? = .olympiaBackwardsCompatible
 
 	public let factorSource: FactorSource
 	public let model: FactorSource.LedgerHardwareWallet.DeviceModel

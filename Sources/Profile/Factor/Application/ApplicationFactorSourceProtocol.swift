@@ -14,7 +14,6 @@ public protocol _ApplicationFactorSource:
 }
 
 extension _ApplicationFactorSource {
-	public static var assertedKind: FactorSourceKind? { nil }
 	public static var assertedParameters: FactorSource.Parameters? { nil }
 	public var kind: FactorSourceKind { factorSource.kind }
 	public var id: FactorSourceID { factorSource.id }
@@ -28,7 +27,7 @@ extension _ApplicationFactorSource {
 	public static func validating(factorSource: FactorSource) throws -> FactorSource {
 		if
 			let expectedFactorSourceKind = Self.assertedKind,
-			factorSource.kind != Self.assertedKind
+			factorSource.kind != expectedFactorSourceKind
 		{
 			throw DisrepancyFactorSourceWrongKind(
 				expected: expectedFactorSourceKind,
@@ -45,7 +44,6 @@ extension _ApplicationFactorSource {
 				actual: factorSource.parameters
 			)
 		}
-
 		return factorSource
 	}
 

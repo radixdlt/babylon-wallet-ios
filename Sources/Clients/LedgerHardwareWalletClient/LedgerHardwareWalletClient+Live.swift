@@ -124,7 +124,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 							curve: .curve25519,
 							derivationPath: derivationPath.path
 						),
-						ledgerDevice: .init(factorSource: factorSource)
+						ledgerDevice: factorSource.device()
 					)),
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
 				)

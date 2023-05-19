@@ -6,8 +6,8 @@ import Prelude
 /// try to access `entityCreatingStorage` which is optional also asserting `parameters` to
 /// only declare `curve25519` and `cap26` derivation path.
 public struct BabylonDeviceFactorSource: _ApplicationFactorSource, _EntityCreatingFactorSourceProtocol {
-	public static let assertedKind: FactorSourceKind = .device
-	public static let assertedParameters: FactorSource.Parameters = .babylon
+	public static let assertedKind: FactorSourceKind? = .device
+	public static let assertedParameters: FactorSource.Parameters? = .babylon
 
 	public let factorSource: FactorSource
 	public let entityCreatingStorage: FactorSource.Storage.EntityCreating

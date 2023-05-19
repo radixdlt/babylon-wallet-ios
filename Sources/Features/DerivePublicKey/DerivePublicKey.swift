@@ -184,7 +184,18 @@ extension DerivePublicKey {
 		networkID: NetworkID,
 		state: State
 	) -> EffectTask<Action> {
-		fatalError()
+		.run { send in
+			let publicKey = try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
+			await send(.delegate(.derivedPublicKey(
+				.eddsaEd25519(publicKey),
+				derivationPath: derivationPath,
+				factorSourceID: ledger.id,
+				networkID: networkID
+			)))
+		} catch: { error, send in
+			loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
+			await send(.delegate(.failedToDerivePublicKey))
+		}
 	}
 }
 
@@ -222,100 +233,3 @@ extension DerivePublicKey {
 		}
 	}
 }
-
-/*
- // FIXME: Delete this when we have Multifactor support
- private func sendDerivePublicKeyRequest(
-     _ ledger: FactorSource,
-     state: State
- ) -> EffectTask<Action> {
-     let entityKind = Entity.entityKind
-
-     let request: CreateVirtualEntityRequest
-
-     do {
-         request = try CreateVirtualEntityRequest(
-             networkID: state.networkID,
-             ledger: ledger,
-             displayName: state.name,
-             extraProperties: { numberOfEntities in
-                 switch entityKind {
-                 case .identity: return .forPersona(.init(fields: []))
-                 case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
-                 }
-             },
-             derivePublicKey: { derivationPath in
-
-             }
-         )
-     } catch {
-         loggerGlobal.error("Failed to create CreateVirtualEntityRequest, error: \(error)")
-         return .none
-     }
-
-     return .run { send in
-         await send(.internal(
-             .createEntityResult(
-                 TaskResult {
-                     switch entityKind {
-                     case .account:
-                         let account = try await accountsClient.newUnsavedVirtualAccountControlledByLedgerFactorSource(request)
-                         try await accountsClient.saveVirtualAccount(.init(
-                             account: account,
-                             shouldUpdateFactorSourceNextDerivationIndex: true
-                         ))
-                         return try account.cast()
-                     case .identity:
-                         let persona = try await personasClient.newUnsavedVirtualPersonaControlledByLedgerFactorSource(request)
-                         try await personasClient.saveVirtualPersona(persona)
-                         return try persona.cast()
-                     }
-                 }
-             )
-         ))
-     }
- }*/
-
-/*
-
- extension CreationOfEntity {
-     private func createEntityControlledByDeviceFactorSource(
-         _ babylonFactorSource: BabylonDeviceFactorSource,
-         state: State
-     ) -> EffectTask<Action> {
-         let entityKind = Entity.entityKind
-
-         let request = CreateVirtualEntityRequest(
-             networkID: state.networkID,
-             babylonDeviceFactorSource: babylonFactorSource,
-             displayName: state.name,
-             extraProperties: { numberOfEntities in
-                 switch entityKind {
-                 case .identity: return .forPersona(.init(fields: []))
-                 case .account: return .forAccount(.init(numberOfAccountsOnNetwork: numberOfEntities))
-                 }
-             }
-         )
-
-         return .run { send in
-             await send(.internal(.createEntityResult(TaskResult {
-                 switch entityKind {
-                 case .account:
-                     let account = try await accountsClient.newUnsavedVirtualAccountControlledByDeviceFactorSource(request)
-                     try await accountsClient.saveVirtualAccount(.init(
-                         account: account,
-                         shouldUpdateFactorSourceNextDerivationIndex: true
-                     ))
-                     return try account.cast()
-                 case .identity:
-                     let persona = try await personasClient.newUnsavedVirtualPersonaControlledByDeviceFactorSource(request)
-                     try await personasClient.saveVirtualPersona(persona)
-                     return try persona.cast()
-                 }
-             }
-             )))
-         }
-     }
-
- }
- */

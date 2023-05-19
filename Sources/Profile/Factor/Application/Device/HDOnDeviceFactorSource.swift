@@ -6,7 +6,7 @@ import Prelude
 /// It acts a a convenience in code to not have to assert that `kind == .device` and
 /// if storage exists, we assert that it is `device` storage
 public struct HDOnDeviceFactorSource: _ApplicationFactorSource, _EntityCreatingFactorSourceProtocol {
-	public static let assertedKind: FactorSourceKind = .device
+	public static let assertedKind: FactorSourceKind? = .device
 
 	public let factorSource: FactorSource
 	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
