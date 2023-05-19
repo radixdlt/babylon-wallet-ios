@@ -80,23 +80,6 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
-//	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-//		switch viewAction {
-//		case .appeared:
-//			switch state.genesisFactorSourceSelection {
-//			case let .device(babylonDeviceFactorSource):
-//				return createEntityControlledByDeviceFactorSource(babylonDeviceFactorSource, state: state)
-//			case let .ledger(ledgers):
-//				precondition(ledgers.allSatisfy { $0.kind == .ledgerHQHardwareWallet })
-//				state.ledgers = IdentifiedArrayOf<FactorSource>.init(uniqueElements: ledgers, id: \.id)
-//				if let first = ledgers.first {
-//					state.selectedLedgerID = first.id
-//				}
-//				return .none
-//			}
-//		}
-//	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .createAccountResult(.failure(error)):
@@ -104,7 +87,13 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			return .send(.delegate(.createAccountFailed))
 
 		case let .createAccountResult(.success(account)):
-			return .send(.delegate(.createdAccount(account)))
+			return .run { send in
+				try await accountsClient.saveVirtualAccount(.init(account: account, shouldUpdateFactorSourceNextDerivationIndex: true))
+				await send(.delegate(.createdAccount(account)))
+			} catch: { error, send in
+				loggerGlobal.error("Failed to save newly created virtual account into profile: \(error)")
+				await send(.delegate(.createAccountFailed))
+			}
 		}
 	}
 
