@@ -1,5 +1,6 @@
 import CreateAuthKeyFeature
 import FeaturePrelude
+import ShowQRFeature
 
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
@@ -83,18 +84,25 @@ extension AccountPreferences {
 					}
 					.navigationTitle(L10n.AccountSettings.title)
 					.sheet(
-						store: store.scope(
-							state: \.$createAuthKey,
-							action: { .child(.createAuthKey($0)) }
-						),
-						content: { CreateAuthKey.View(store: $0) }
-					)
+						store: store.destination,
+						state: /AccountPreferences.Destination.State.createAuthKey,
+						action: AccountPreferences.Destination.Action.createAuthKey
+					) { store in
+						CreateAuthKey.View(store: store)
+					}
+					.sheet(
+						store: store.destination,
+						state: /AccountPreferences.Destination.State.showQR,
+						action: AccountPreferences.Destination.Action.showQR
+					) { store in
+						ShowQR.View(store: store)
+					}
 					#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
+						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
 								viewStore.send(.closeButtonTapped)
 							}
@@ -104,6 +112,12 @@ extension AccountPreferences {
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<AccountPreferences> {
+	var destination: PresentationStoreOf<AccountPreferences.Destination> {
+		scope(state: \.$destination, action: { .child(.destination($0)) })
 	}
 }
 

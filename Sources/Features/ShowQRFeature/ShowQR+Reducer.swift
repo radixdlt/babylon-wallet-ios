@@ -11,7 +11,7 @@ public struct ShowQR: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let accountAddress: AccountAddress
 
-		init(accountAddress: AccountAddress) {
+		public init(accountAddress: AccountAddress) {
 			self.accountAddress = accountAddress
 		}
 	}

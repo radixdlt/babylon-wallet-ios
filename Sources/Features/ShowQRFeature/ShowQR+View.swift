@@ -17,14 +17,8 @@ extension ShowQR {
 extension ShowQR.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-			VStack(spacing: 0) {
-				HStack {
-					Spacer()
-					CloseButton {
-						viewStore.send(.closeeButtonTapped)
-					}
-				}
-				AccountAddressQRCodePanel(address: viewStore.address)
+			AccountAddressQRCodePanel(address: viewStore.accountAddress) {
+				viewStore.send(.closeButtonTapped)
 			}
 		}
 	}
