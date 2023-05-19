@@ -19,14 +19,10 @@ extension NewPersonaCompletion {
 
 			destinationDisplayText = {
 				switch state.navigationButtonCTA {
-				case .goHome:
-					return L10n.CreateEntity.Completion.destinationHome
-				case .goBackToChooseEntities:
+				case .goBackToChoosePersonas:
 					return L10n.CreateEntity.Completion.destinationChoosePersonas
-				case .goBackToPersonaList:
+				case .goBackToPersonaListInSettings:
 					return L10n.CreateEntity.Completion.destinationPersonaList
-				case .goBackToGateways:
-					return L10n.CreateEntity.Completion.destinationGateways
 				}
 			}()
 

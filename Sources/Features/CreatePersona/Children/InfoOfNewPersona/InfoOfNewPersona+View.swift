@@ -13,10 +13,11 @@ extension InfoOfNewPersona {
 		public let subtitleText: String
 		public let entityName: String
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
-		public let focusedField: State.Field?
+		public let focusedInputField: State.InputField?
 
 		public struct SanitizedNameRequirement: Equatable {
 			public let sanitizedName: NonEmptyString
+			public let personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		}
 
 		init(state: State) {
@@ -25,18 +26,18 @@ extension InfoOfNewPersona {
 			self.subtitleText = L10n.CreatePersona.NameNewPersona.subtitle
 			self.entityName = state.inputtedName
 			if let sanitizedName = state.sanitizedName {
-				self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName)
+				self.sanitizedNameRequirement = .init(sanitizedName: sanitizedName, personaInfoFields: state.personaInfoFields)
 			} else {
 				self.sanitizedNameRequirement = nil
 			}
-			self.focusedField = state.focusedField
+			self.focusedInputField = state.focusedInputField
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<InfoOfNewPersona>
-		@FocusState private var focusedField: State.Field?
+		@FocusState private var focusedInputField: State.InputField?
 
 		public init(store: StoreOf<InfoOfNewPersona>) {
 			self.store = store
@@ -62,12 +63,12 @@ extension InfoOfNewPersona {
 									text: nameBinding,
 									hint: .info(L10n.CreateEntity.NameNewEntity.explanation),
 									focus: .on(
-										.entityName,
+										.personaName,
 										binding: viewStore.binding(
-											get: \.focusedField,
+											get: \.focusedInputField,
 											send: { .textFieldFocused($0) }
 										),
-										to: $focusedField
+										to: $focusedInputField
 									)
 								)
 								#if os(iOS)
@@ -84,7 +85,7 @@ extension InfoOfNewPersona {
 					.footer {
 						WithControlRequirements(
 							viewStore.sanitizedNameRequirement,
-							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
+							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName, $0.personaInfoFields)) }
 						) { action in
 							Button(L10n.Common.continue, action: action)
 								.buttonStyle(.primaryRectangular)

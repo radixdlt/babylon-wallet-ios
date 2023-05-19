@@ -1,91 +1,60 @@
 import FeaturePrelude
 
-// MARK: - CreateEntityConfig
-public struct CreateEntityConfig: Sendable, Hashable {
-	public let specificNetworkID: NetworkID?
-	public let isFirstEntity: Bool
-	public let canBeDismissed: Bool
-	public let navigationButtonCTA: CreateEntityNavigationButtonCTA
-
-	fileprivate init(
-		isFirstEntity: Bool,
-		canBeDismissed: Bool,
-		navigationButtonCTA: CreateEntityNavigationButtonCTA,
-		specificNetworkID: NetworkID? = nil
-	) {
-		self.specificNetworkID = specificNetworkID
-		self.isFirstEntity = isFirstEntity
-		self.canBeDismissed = canBeDismissed
-		self.navigationButtonCTA = navigationButtonCTA
+// MARK: - IsFirstPersona
+public enum IsFirstPersona: Sendable, Hashable {
+	case no
+	case yes(FirstPersona)
+	public enum FirstPersona: Sendable, Hashable {
+		case onAnyNetwork
+		case justOnCurrentNetwork
 	}
-}
 
-// MARK: - CreateEntityNavigationButtonCTA
-public enum CreateEntityNavigationButtonCTA: Sendable, Equatable {
-	case goHome
-	case goBackToPersonaList
-	case goBackToChooseEntities
-	case goBackToGateways
+	public init(firstOnAnyNetwork: Bool, firstOnCurrent: Bool) {
+		switch (firstOnAnyNetwork, firstOnCurrent) {
+		case (true, false):
+			assertionFailure("Discrepancy")
+			fallthrough
+		case (true, true):
+			self = .yes(.onAnyNetwork)
+		case (false, false):
+			self = .no
+		case (false, true):
+			self = .yes(.justOnCurrentNetwork)
+		}
+	}
 
-	public static let goBackToChooseAccounts: Self = .goBackToChooseEntities
-	public static let goBackToChoosePersonas: Self = .goBackToChooseEntities
-}
+	public var firstPersonaOnCurrentNetwork: Bool {
+		switch self {
+		case .no: return false
+		case .yes: return true
+		}
+	}
 
-extension CreateEntityConfig {
-	public init(purpose: CreateEntityPurpose) {
-		switch purpose {
-		case .firstAccountForNewProfile:
-			self.init(
-				isFirstEntity: true,
-				canBeDismissed: false,
-				navigationButtonCTA: .goHome,
-				specificNetworkID: nil
-			)
-		case let .firstAccountOnNewNetwork(specificNetworkID):
-			self.init(
-				isFirstEntity: true,
-				canBeDismissed: false,
-				navigationButtonCTA: .goBackToGateways,
-				specificNetworkID: specificNetworkID
-			)
-		case .newAccountDuringDappInteraction:
-			self.init(
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToChooseAccounts,
-				specificNetworkID: nil
-			)
-		case let .newPersonaDuringDappInteract(isFirst):
-			self.init(
-				isFirstEntity: isFirst,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToPersonaList,
-				specificNetworkID: nil
-			)
-		case .newAccountFromHome:
-			self.init(
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome,
-				specificNetworkID: nil
-			)
-		case let .newPersonaFromSettings(isFirst):
-			self.init(
-				isFirstEntity: isFirst,
-				canBeDismissed: true,
-				navigationButtonCTA: .goBackToPersonaList,
-				specificNetworkID: nil
-			)
+	public var isFirstEver: Bool {
+		switch self {
+		case .yes(.onAnyNetwork): return true
+		default: return false
 		}
 	}
 }
 
-// MARK: - CreateEntityPurpose
-public enum CreateEntityPurpose {
-	case firstAccountForNewProfile
-	case firstAccountOnNewNetwork(NetworkID)
-	case newAccountDuringDappInteraction
-	case newPersonaDuringDappInteract(isFirst: Bool)
-	case newAccountFromHome
-	case newPersonaFromSettings(isFirst: Bool)
+// MARK: - CreatePersonaConfig
+public struct CreatePersonaConfig: Sendable, Hashable {
+	public let isFirstPersona: IsFirstPersona
+
+	public let navigationButtonCTA: CreatePersonaNavigationButtonCTA
+
+	public init(
+		isFirstPersona: IsFirstPersona,
+		navigationButtonCTA: CreatePersonaNavigationButtonCTA
+	) {
+		self.isFirstPersona = isFirstPersona
+		self.navigationButtonCTA = navigationButtonCTA
+	}
+}
+
+// MARK: - CreatePersonaNavigationButtonCTA
+public enum CreatePersonaNavigationButtonCTA: Sendable, Equatable {
+	case goBackToPersonaListInSettings
+	case goBackToChoosePersonas
 }

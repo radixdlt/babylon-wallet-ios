@@ -94,14 +94,13 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			let isFirstOnThisNetwork = state.personaList.personas.count == 0
 			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
-			state.createPersonaCoordinator = .init(
-				config: .init(
-					purpose: .newPersonaFromSettings(isFirst: isFirstOnThisNetwork)
+			state.createPersonaCoordinator = .init(config: .init(
+				isFirstPersona: .init(
+					firstOnAnyNetwork: isFirstOnAnyNetwork,
+					firstOnCurrent: isFirstOnThisNetwork
 				),
-				displayIntroduction: { _ in
-					isFirstOnAnyNetwork
-				}
-			)
+				navigationButtonCTA: .goBackToPersonaListInSettings
+			))
 			return .none
 
 		case let .personaList(.delegate(.openDetails(persona))):

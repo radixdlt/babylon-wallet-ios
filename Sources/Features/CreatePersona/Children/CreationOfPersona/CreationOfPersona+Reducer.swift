@@ -6,14 +6,20 @@ import PersonasClient
 public struct CreationOfPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let name: NonEmptyString
+		public let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		public var derivePublicKey: DerivePublicKey.State
 
 		public init(
 			name: NonEmptyString,
-			derivePublicKey: DerivePublicKey.State
+			fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
 		) {
 			self.name = name
-			self.derivePublicKey = derivePublicKey
+			self.fields = fields
+			self.derivePublicKey = .init(
+				derivationPathOption: .nextBasedOnFactorSource(networkOption: .useCurrent),
+				factorSourceOption: .device,
+				loadMnemonicPurpose: .createEntity(kind: .identity)
+			)
 		}
 	}
 

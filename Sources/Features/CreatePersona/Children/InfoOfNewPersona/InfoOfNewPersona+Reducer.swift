@@ -3,45 +3,51 @@ import FeaturePrelude
 
 public struct InfoOfNewPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum Field: String, Sendable, Hashable {
-			case entityName
+		public enum InputField: String, Sendable, Hashable {
+			case personaName
 		}
 
-		public var isFirst: Bool
+		public var isFirstPersona: Bool
 		public var inputtedName: String
 		public var sanitizedName: NonEmptyString?
-		public var focusedField: Field?
+		public var personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		public var focusedInputField: InputField?
 
 		public init(
-			isFirst: Bool,
+			isFirstPersona: Bool,
 			inputtedEntityName: String = "",
 			sanitizedName: NonEmptyString? = nil,
-			focusedField: Field? = nil
+			personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field> = [],
+			focusedInputField: InputField? = nil
 		) {
 			self.inputtedName = inputtedEntityName
-			self.focusedField = focusedField
+			self.focusedInputField = focusedInputField
 			self.sanitizedName = sanitizedName
-			self.isFirst = isFirst
+			self.isFirstPersona = isFirstPersona
+			self.personaInfoFields = personaInfoFields
 		}
 
-		public init(config: CreateEntityConfig) {
-			self.init(isFirst: config.isFirstEntity)
+		public init(config: CreatePersonaConfig) {
+			self.init(isFirstPersona: config.isFirstPersona.firstPersonaOnCurrentNetwork)
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case confirmNameButtonTapped(NonEmptyString)
-		case textFieldFocused(State.Field?)
+		case confirmNameButtonTapped(NonEmptyString, IdentifiedArrayOf<Profile.Network.Persona.Field>)
+		case textFieldFocused(State.InputField?)
 		case textFieldChanged(String)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case focusTextField(State.Field?)
+		case focusTextField(State.InputField?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case proceed(nameOfEntity: NonEmpty<String>)
+		case proceed(
+			personaName: NonEmptyString,
+			personaInfoFields: IdentifiedArrayOf<Profile.Network.Persona.Field>
+		)
 	}
 
 	@Dependency(\.continuousClock) var clock
@@ -54,14 +60,15 @@ public struct InfoOfNewPersona: Sendable, FeatureReducer {
 		case .appeared:
 			return .run { send in
 				try await clock.sleep(for: .seconds(0.5))
-				await send(.internal(.focusTextField(.entityName)))
+				await send(.internal(.focusTextField(.personaName)))
 			}
 
-		case let .confirmNameButtonTapped(sanitizedName):
-			state.focusedField = nil
+		case let .confirmNameButtonTapped(sanitizedName, personaInfoFields):
+			state.focusedInputField = nil
 			return .run { send in
 				await send(.delegate(.proceed(
-					nameOfEntity: sanitizedName
+					personaName: sanitizedName,
+					personaInfoFields: personaInfoFields
 				)))
 			}
 
@@ -81,7 +88,7 @@ public struct InfoOfNewPersona: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .focusTextField(focus):
-			state.focusedField = focus
+			state.focusedInputField = focus
 			return .none
 		}
 	}

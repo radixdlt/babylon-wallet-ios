@@ -9,18 +9,17 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		var root: Destinations.State?
 		var path: StackState<Destinations.State> = []
 
-		public let config: CreateEntityConfig
+		public let config: CreatePersonaConfig
 
 		public init(
 			root: Destinations.State? = nil,
-			config: CreateEntityConfig,
-			displayIntroduction: (CreateEntityConfig) -> Bool = { _ in false }
+			config: CreatePersonaConfig
 		) {
 			self.config = config
 			if let root {
 				self.root = root
 			} else {
-				if displayIntroduction(config) {
+				if config.isFirstPersona.isFirstEver {
 					self.root = .step0_introduction(.init())
 				} else {
 					self.root = .step1_infoOfNewPersona(.init(config: config))
@@ -29,9 +28,6 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 
 		var shouldDisplayNavBar: Bool {
-			guard config.canBeDismissed else {
-				return false
-			}
 			if let last = path.last {
 				if case .step3_completion = last {
 					return false
@@ -109,36 +105,12 @@ extension CreatePersonaCoordinator {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			assert(state.config.canBeDismissed)
 			return .run { send in
 				await send(.delegate(.dismissed))
 				await dismiss()
 			}
 		}
 	}
-
-//	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-//		switch internalAction {
-//		case let .loadFactorSourcesResult(.failure(error), _, _):
-//			loggerGlobal.error("Failed to load factor sources: \(error)")
-//			errorQueue.schedule(error)
-//			return .none
-//
-//		case let .loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate, useLedgerAsFactorSource):
-//			precondition(!factorSources.isEmpty)
-//
-	////			let babylonDeviceFactorSources = factorSources.babylonDeviceFactorSources()
-	////			let ledgerFactorSources: [FactorSource] = factorSources.filter { $0.kind == .ledgerHQHardwareWallet }
-	////			let source: GenesisFactorSourceSelection = useLedgerAsFactorSource ? .ledger(ledgerFactorSources: .init(uniqueElements: ledgerFactorSources)) : .device(babylonDeviceFactorSources.first)
-	////
-	////			return goToStep2Creation(
-	////				entityName: specifiedNameForNewEntityToCreate,
-	////				genesisFactorSourceSelection: source,
-	////				state: &state
-	////			)
-//			fatalError()
-//		}
-//	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
@@ -147,26 +119,21 @@ extension CreatePersonaCoordinator {
 			return .none
 
 		case
-			let .root(.step1_infoOfNewPersona(.delegate(.proceed(name)))),
-			let .path(.element(_, action: .step1_infoOfNewPersona(.delegate(.proceed(name))))):
+			let .root(.step1_infoOfNewPersona(.delegate(.proceed(name, fields)))),
+			let .path(.element(_, action: .step1_infoOfNewPersona(.delegate(.proceed(name, fields))))):
 
-//			return .run { send in
-//				await send(.internal(
-//					.loadFactorSourcesResult(
-//						TaskResult {
-//							try await factorSourcesClient.getFactorSources()
-//						},
-//						beforeCreatingEntityWithName: name
-//					)
-//				))
-//			}
-			fatalError()
+			state.path.append(.step2_creationOfPersona(.init(
+				name: name,
+				fields: fields
+			)))
+			return .none
 
 		case let .path(.element(_, action: .step2_creationOfPersona(.delegate(.createdPersona(persona))))):
-			return goToStep3Completion(
+			state.path.append(.step3_completion(.init(
 				persona: persona,
-				state: &state
-			)
+				config: state.config
+			)))
+			return .none
 
 		case .path(.element(_, action: .step2_creationOfPersona(.delegate(.createPersonaFailed)))):
 			state.path.removeLast()
@@ -181,41 +148,5 @@ extension CreatePersonaCoordinator {
 		default:
 			return .none
 		}
-	}
-
-	private func goToStep2Creation(
-		personaName: NonEmpty<String>,
-		state: inout State
-	) -> EffectTask<Action> {
-//		let creationOfEntityState = CreationOfPersona.State(
-//			name: entityName,
-//			derivePublicKey: .init(
-//				derivationPathOption: .nextBasedOnFactorSource(
-//					networkOption: state.config.specificNetworkID.map { .specific($0) } ?? .useCurrent
-//				),
-//				factorSourceOption: {
-//					switch genesisFactorSourceSelection {
-//					case let .device(babylonDevice):
-//						return .specific(factorSource: babylonDevice.factorSource)
-//					case let .ledger(ledgers):
-//						return .anyOf(factorSources: ledgers)
-//					}
-//				}()
-//			)
-//		)
-//		state.path.append(.step2_creationOfPersona(creationOfEntityState))
-		fatalError()
-		return .none
-	}
-
-	private func goToStep3Completion(
-		persona: Profile.Network.Persona,
-		state: inout State
-	) -> EffectTask<Action> {
-		state.path.append(.step3_completion(.init(
-			persona: persona,
-			config: state.config
-		)))
-		return .none
 	}
 }

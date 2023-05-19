@@ -4,12 +4,12 @@ public struct NewPersonaCompletion: Sendable, FeatureReducer {
 	public struct State: Sendable & Hashable {
 		public let persona: Profile.Network.Persona
 		public let isFirstOnNetwork: Bool
-		public let navigationButtonCTA: CreateEntityNavigationButtonCTA
+		public let navigationButtonCTA: CreatePersonaNavigationButtonCTA
 
 		public init(
 			persona: Profile.Network.Persona,
 			isFirstOnNetwork: Bool,
-			navigationButtonCTA: CreateEntityNavigationButtonCTA
+			navigationButtonCTA: CreatePersonaNavigationButtonCTA
 		) {
 			self.persona = persona
 			self.isFirstOnNetwork = isFirstOnNetwork
@@ -18,11 +18,11 @@ public struct NewPersonaCompletion: Sendable, FeatureReducer {
 
 		public init(
 			persona: Profile.Network.Persona,
-			config: CreateEntityConfig
+			config: CreatePersonaConfig
 		) {
 			self.init(
 				persona: persona,
-				isFirstOnNetwork: config.isFirstEntity,
+				isFirstOnNetwork: config.isFirstPersona.firstPersonaOnCurrentNetwork,
 				navigationButtonCTA: config.navigationButtonCTA
 			)
 		}
