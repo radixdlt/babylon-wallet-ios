@@ -13,9 +13,13 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let entity: EntityPotentiallyVirtual
 
-		public var derivePublicKey: DerivePublicKey.State?
+		public enum Step: Sendable, Hashable {
+			case derivePublicKey(DerivePublicKey.State)
+			case transactionReview(TransactionReview.State)
+		}
 
-		public var transactionReview: TransactionReview.State?
+		public var step: Step
+
 		public var authenticationSigningFactorInstance: HierarchicalDeterministicFactorInstance?
 
 		public init(
