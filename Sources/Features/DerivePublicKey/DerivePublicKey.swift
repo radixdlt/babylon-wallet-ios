@@ -22,6 +22,7 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)
 				case useCurrent
+
 				public init(networkID: NetworkID?) {
 					if let networkID {
 						self = .specific(networkID)
