@@ -4,6 +4,7 @@ import FeaturePrelude
 public enum IsFirstPersona: Sendable, Hashable {
 	case no
 	case yes(FirstPersona)
+
 	public enum FirstPersona: Sendable, Hashable {
 		case onAnyNetwork
 		case justOnCurrentNetwork

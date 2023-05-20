@@ -32,7 +32,7 @@ extension DerivePublicKey {
 					}
 				}
 				.onFirstTask { @MainActor in
-					ViewStore(store.stateless).send(.view(.onFirstTask))
+					viewStore.send(.onFirstTask)
 				}
 			}
 		}
