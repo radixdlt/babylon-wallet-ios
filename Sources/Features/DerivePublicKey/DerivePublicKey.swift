@@ -101,17 +101,18 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 		case .onFirstTask:
 			switch state.factorSourceOption {
 			case .device:
-				return .run { send in
+				return .task { _ in
+					do {
+						let babylonFactorSource = try await factorSourcesClient
+							.getFactorSources()
+							.babylonDeviceFactorSources()
+							.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
 
-					let babylonFactorSource = try await factorSourcesClient
-						.getFactorSources()
-						.babylonDeviceFactorSources()
-						.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
-
-					await send(.internal(.loadedHDOnDeviceFactorSource(babylonFactorSource.hdOnDeviceFactorSource)))
-				} catch: { error, send in
-					loggerGlobal.error("Failed to load factor source, error: \(error)")
-					await send(.delegate(.failedToDerivePublicKey))
+						return .internal(.loadedHDOnDeviceFactorSource(babylonFactorSource.hdOnDeviceFactorSource))
+					} catch {
+						loggerGlobal.error("Failed to load factor source, error: \(error)")
+						return .delegate(.failedToDerivePublicKey)
+					}
 				}
 
 			case let .specific(factorSource):
