@@ -107,9 +107,9 @@ enum SelectLedgerRow {
 		let lastUsedOn: String
 
 		init(factorSource: LedgerFactorSource) {
-			description = "\(factorSource.label.rawValue) (\(factorSource.description.rawValue))"
-			addedOn = factorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current))
-			lastUsedOn = factorSource.lastUsedOn.ISO8601Format(.iso8601Date(timeZone: .current))
+			self.description = "\(factorSource.label.rawValue) (\(factorSource.description.rawValue))"
+			self.addedOn = factorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current))
+			self.lastUsedOn = factorSource.lastUsedOn.ISO8601Format(.iso8601Date(timeZone: .current))
 		}
 	}
 

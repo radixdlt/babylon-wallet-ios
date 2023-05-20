@@ -63,13 +63,11 @@ public struct UseLedgerView: SwiftUI.View {
 
 	public var body: some View {
 		VStack {
-			Group {
-				Text(title).textStyle(.body1HighImportance)
-				let display = "\(model) - \(name)"
-				VPair(heading: "Ledger", item: display)
-				VPair(heading: "Last used", item: lastUsedOn.ISO8601Format())
-				VPair(heading: "Added on", item: addedOn.ISO8601Format())
-			}
+			Text(title).textStyle(.body1HighImportance)
+			let display = "\(model) - \(name)"
+			VPair(heading: "Ledger", item: display)
+			VPair(heading: "Last used", item: lastUsedOn.ISO8601Format())
+			VPair(heading: "Added on", item: addedOn.ISO8601Format())
 		}
 		.padding()
 	}
