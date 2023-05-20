@@ -173,22 +173,25 @@ extension DerivePublicKey {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
 	) -> EffectTask<Action> {
-		.run { [curve = state.curve] send in
-			let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(.init(
-				hdOnDeviceFactorSource: hdOnDeviceFactorSource,
-				derivationPath: derivationPath,
-				curve: curve,
-				loadMnemonicPurpose: loadMnemonicPurpose
-			))
-			try await send(.delegate(.derivedPublicKey(
-				.init(engine: publicKey),
-				derivationPath: derivationPath,
-				factorSourceID: hdOnDeviceFactorSource.id,
-				networkID: networkID
-			)))
-		} catch: { error, send in
-			loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-			await send(.delegate(.failedToDerivePublicKey))
+		.task { [curve = state.curve] in
+			do {
+				let publicKey = try await deviceFactorSourceClient.publicKeyFromOnDeviceHD(.init(
+					hdOnDeviceFactorSource: hdOnDeviceFactorSource,
+					derivationPath: derivationPath,
+					curve: curve,
+					loadMnemonicPurpose: loadMnemonicPurpose
+				))
+
+				return try .delegate(.derivedPublicKey(
+					.init(engine: publicKey),
+					derivationPath: derivationPath,
+					factorSourceID: hdOnDeviceFactorSource.id,
+					networkID: networkID
+				))
+			} catch {
+				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
+				return .delegate(.failedToDerivePublicKey)
+			}
 		}
 	}
 
@@ -198,17 +201,19 @@ extension DerivePublicKey {
 		networkID: NetworkID,
 		state: State
 	) -> EffectTask<Action> {
-		.run { send in
-			let publicKey = try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
-			await send(.delegate(.derivedPublicKey(
-				.eddsaEd25519(publicKey),
-				derivationPath: derivationPath,
-				factorSourceID: ledger.id,
-				networkID: networkID
-			)))
-		} catch: { error, send in
-			loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
-			await send(.delegate(.failedToDerivePublicKey))
+		.task {
+			do {
+				let publicKey = try await ledgerHardwareWalletClient.deriveCurve25519PublicKey(derivationPath, ledger)
+				return .delegate(.derivedPublicKey(
+					.eddsaEd25519(publicKey),
+					derivationPath: derivationPath,
+					factorSourceID: ledger.id,
+					networkID: networkID
+				))
+			} catch {
+				loggerGlobal.error("Failed to derive or cast public key, error: \(error)")
+				return .delegate(.failedToDerivePublicKey)
+			}
 		}
 	}
 }
