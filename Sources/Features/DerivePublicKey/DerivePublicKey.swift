@@ -151,7 +151,7 @@ extension DerivePublicKey {
 	) -> EffectTask<Action> {
 		withDerivationPath(
 			state: state,
-			entityCreatingFactorSource: hdOnDeviceFactorSource,
+			hdFactorSource: hdOnDeviceFactorSource,
 			known: { deriveWith(hdOnDeviceFactorSource: hdOnDeviceFactorSource, derivationPath: $0, networkID: $1, loadMnemonicPurpose: $2, state: state) },
 			calculating: { .internal(.deriveWithDeviceFactor(hdOnDeviceFactorSource, $0, $1, $2)) }
 		)
@@ -160,7 +160,7 @@ extension DerivePublicKey {
 	private func deriveWith(ledgerFactorSource: LedgerFactorSource, _ state: State) -> EffectTask<Action> {
 		withDerivationPath(
 			state: state,
-			entityCreatingFactorSource: ledgerFactorSource,
+			hdFactorSource: ledgerFactorSource,
 			known: { path, networkID, _ in deriveWith(ledger: ledgerFactorSource, derivationPath: path, networkID: networkID, state: state) },
 			calculating: { path, networkID, _ in .internal(.deriveWithLedgerFactor(ledgerFactorSource, path, networkID)) }
 		)
@@ -219,9 +219,9 @@ extension DerivePublicKey {
 }
 
 extension DerivePublicKey {
-	private func withDerivationPath<Source: _EntityCreatingFactorSourceProtocol & Sendable>(
+	private func withDerivationPath<Source: _HDFactorSourceProtocol>(
 		state: State,
-		entityCreatingFactorSource: Source,
+		hdFactorSource: Source,
 		known deriveWithKnownDerivationPath: (DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> EffectTask<Action>,
 		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> Action
 	) -> EffectTask<Action> {
@@ -229,6 +229,10 @@ extension DerivePublicKey {
 		case let .known(derivationPath, networkID):
 			return deriveWithKnownDerivationPath(derivationPath, networkID, .createSignAuthKey)
 		case let .nextBasedOnFactorSource(networkOption, entityKind):
+			guard let entityCreatingFactorSource = try? EntityCreatingFactorSource(hdFactorSource) else {
+				loggerGlobal.critical("Cannot derive public key for next entity with a non EntityCreating FactorSource. Got kind: \(hdFactorSource.kind)")
+				return .send(.delegate(.failedToDerivePublicKey))
+			}
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = .createEntity(kind: entityKind)
 			switch networkOption {
 			case let .specific(networkID):

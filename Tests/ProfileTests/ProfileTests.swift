@@ -87,6 +87,23 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(factorSourceID.hex(), "56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
 	}
 
+	func test_hdOnDeviceFactorSource() throws {
+		let secp256K1FactorMnemonic = try Mnemonic(
+			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
+			language: .english
+		)
+		try withDependencies {
+			$0.date = .constant(stableDate)
+			$0.uuid = .constant(stableUUID)
+		} operation: {
+			XCTAssertNoThrow(try FactorSource.olympia(
+				mnemonic: secp256K1FactorMnemonic,
+				label: factorSourceLabel,
+				description: factorSourceDescription
+			))
+		}
+	}
+
 	func test_new_profile() async throws {
 		continueAfterFailure = false
 

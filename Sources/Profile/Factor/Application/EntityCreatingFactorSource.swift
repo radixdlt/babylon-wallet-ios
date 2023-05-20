@@ -15,6 +15,15 @@ extension _EntityCreatingFactorSourceProtocol {
 	}
 }
 
+// MARK: - _HDFactorSourceProtocol
+public protocol _HDFactorSourceProtocol: _ApplicationFactorSource {}
+
+// MARK: - HDOnDeviceFactorSource + _HDFactorSourceProtocol
+extension HDOnDeviceFactorSource: _HDFactorSourceProtocol {}
+
+// MARK: - LedgerFactorSource + _HDFactorSourceProtocol
+extension LedgerFactorSource: _HDFactorSourceProtocol {}
+
 // MARK: - EntityCreatingFactorSource
 public struct EntityCreatingFactorSource: _ApplicationFactorSource, _EntityCreatingFactorSourceProtocol {
 	public static var assertedKind: FactorSourceKind? { nil }

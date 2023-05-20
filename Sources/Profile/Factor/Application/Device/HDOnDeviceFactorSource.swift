@@ -5,15 +5,13 @@ import Prelude
 /// This is NOT a `Codable` factor source, this is never saved anywhere, just in memory.
 /// It acts a a convenience in code to not have to assert that `kind == .device` and
 /// if storage exists, we assert that it is `device` storage
-public struct HDOnDeviceFactorSource: _ApplicationFactorSource, _EntityCreatingFactorSourceProtocol {
+public struct HDOnDeviceFactorSource: _ApplicationFactorSource {
 	public static let assertedKind: FactorSourceKind? = .device
 
 	public let factorSource: FactorSource
-	public let entityCreatingStorage: FactorSource.Storage.EntityCreating
 
 	public init(factorSource: FactorSource) throws {
 		self.factorSource = try Self.validating(factorSource: factorSource)
-		self.entityCreatingStorage = try factorSource.entityCreatingStorage()
 	}
 }
 
