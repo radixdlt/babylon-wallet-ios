@@ -72,11 +72,11 @@ extension TransactionReview {
 							.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
 						}
 					}
-					.customizeGuarantees(with: store, viewStore)
-					.selectFeePayer(with: store, viewStore)
-					.prepareForSigning(with: store, viewStore)
-					.signing(with: store, viewStore)
-					.submitting(with: store, viewStore)
+					.customizeGuarantees(with: store)
+					.selectFeePayer(with: store)
+					.prepareForSigning(with: store)
+					.signing(with: store)
+					.submitting(with: store)
 					.onAppear {
 						viewStore.send(.appeared)
 					}
@@ -210,14 +210,19 @@ extension TransactionReview {
 	}
 }
 
+extension StoreOf<TransactionReview> {
+	var destination: PresentationStoreOf<TransactionReview.Destinations> {
+		scope(state: \.$destination, action: { .child(.destination($0)) })
+	}
+}
+
 extension View {
 	@MainActor
 	fileprivate func customizeGuarantees(
-		with store: StoreOf<TransactionReview>,
-		_ viewStore: ViewStoreOf<TransactionReview>
+		with store: StoreOf<TransactionReview>
 	) -> some View {
-		self.sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+		sheet(
+			store: store.destination,
 			state: /TransactionReview.Destinations.State.customizeGuarantees,
 			action: TransactionReview.Destinations.Action.customizeGuarantees,
 			content: { TransactionReviewGuarantees.View(store: $0) }
@@ -226,11 +231,10 @@ extension View {
 
 	@MainActor
 	fileprivate func selectFeePayer(
-		with store: StoreOf<TransactionReview>,
-		_ viewStore: ViewStoreOf<TransactionReview>
+		with store: StoreOf<TransactionReview>
 	) -> some View {
-		self.sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+		sheet(
+			store: store.destination,
 			state: /TransactionReview.Destinations.State.selectFeePayer,
 			action: TransactionReview.Destinations.Action.selectFeePayer,
 			content: { SelectFeePayer.View(store: $0) }
@@ -239,11 +243,10 @@ extension View {
 
 	@MainActor
 	fileprivate func prepareForSigning(
-		with store: StoreOf<TransactionReview>,
-		_ viewStore: ViewStoreOf<TransactionReview>
+		with store: StoreOf<TransactionReview>
 	) -> some View {
-		self.sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+		sheet(
+			store: store.destination,
 			state: /TransactionReview.Destinations.State.prepareForSigning,
 			action: TransactionReview.Destinations.Action.prepareForSigning,
 			content: { PrepareForSigning.View(store: $0) }
@@ -252,11 +255,10 @@ extension View {
 
 	@MainActor
 	fileprivate func signing(
-		with store: StoreOf<TransactionReview>,
-		_ viewStore: ViewStoreOf<TransactionReview>
+		with store: StoreOf<TransactionReview>
 	) -> some View {
-		self.sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+		sheet(
+			store: store.destination,
 			state: /TransactionReview.Destinations.State.signing,
 			action: TransactionReview.Destinations.Action.signing,
 			content: { Signing.View(store: $0) }
@@ -265,11 +267,10 @@ extension View {
 
 	@MainActor
 	fileprivate func submitting(
-		with store: StoreOf<TransactionReview>,
-		_ viewStore: ViewStoreOf<TransactionReview>
+		with store: StoreOf<TransactionReview>
 	) -> some View {
-		self.sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+		sheet(
+			store: store.destination,
 			state: /TransactionReview.Destinations.State.submitting,
 			action: TransactionReview.Destinations.Action.submitting,
 			content: { SubmitTransaction.View(store: $0) }
