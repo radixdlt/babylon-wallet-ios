@@ -93,6 +93,13 @@ extension PersonaDetails.View {
 		) { store in
 			CreateAuthKey.View(store: store)
 		}
+		.sheet(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.dAppDetails,
+			action: PersonaDetails.Destination.Action.dAppDetails
+		) { store in
+			SimpleDappDetails.View(store: store)
+		}
 		.alert(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.confirmForgetAlert,
@@ -346,6 +353,219 @@ extension PersonaDetails.View {
 					}
 				}
 				.padding(.horizontal, .medium1)
+			}
+		}
+	}
+}
+
+// FIXME: Remove and make settings use stacks
+
+// MARK: - SimpleDappDetails
+
+extension SimpleDappDetails {
+	@MainActor
+	public struct View: SwiftUI.View {
+		let store: Store
+
+		public init(store: Store) {
+			self.store = store
+		}
+	}
+
+	public struct ViewState: Equatable {
+		let title: String
+		let description: String
+		let domain: URL?
+		let thumbnail: URL?
+		let address: DappDefinitionAddress
+		let fungibles: [State.Resources.ResourceDetails]?
+		let nonFungibles: [State.Resources.ResourceDetails]?
+		let associatedDapps: [State.AssociatedDapp]?
+		let personas: [Persona]
+	}
+
+	public struct Persona: Sendable, Hashable, Identifiable {
+		public let id: Profile.Network.Persona.ID
+		public let thumbnail: URL?
+		public let displayName: String
+	}
+}
+
+// MARK: - Body
+
+extension SimpleDappDetails.View {
+	public var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			ScrollView {
+				VStack(spacing: 0) {
+					DappThumbnail(.known(viewStore.thumbnail), size: .veryLarge)
+						.padding(.vertical, .large2)
+
+					InfoBlock(store: store)
+
+					FungiblesList(store: store)
+
+					NonFungiblesListList(store: store)
+
+					Personas(personas: viewStore.personas)
+						.background(.app.gray5)
+				}
+				.onAppear {
+					viewStore.send(.appeared)
+				}
+				.navigationTitle(viewStore.title)
+			}
+		}
+	}
+}
+
+// MARK: - Extensions
+
+private extension SimpleDappDetails.State {
+	var viewState: SimpleDappDetails.ViewState {
+		.init(
+			title: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+			description: metadata?.description ?? L10n.AuthorizedDapps.DAppDetails.missingDescription,
+			domain: metadata?.claimedWebsites?.first,
+			thumbnail: metadata?.iconURL,
+			address: dApp.dAppDefinitionAddress,
+			fungibles: resources?.fungible,
+			nonFungibles: resources?.nonFungible,
+			associatedDapps: associatedDapps,
+			personas: dApp.detailedAuthorizedPersonas.map {
+				.init(id: $0.id, thumbnail: nil, displayName: $0.displayName.rawValue)
+			}
+		)
+	}
+}
+
+// MARK: Child Views
+
+extension SimpleDappDetails.View {
+	@MainActor
+	struct InfoBlock: View {
+		let store: StoreOf<SimpleDappDetails>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(alignment: .leading, spacing: .medium2) {
+					Separator()
+
+					Text(viewStore.description)
+						.textBlock
+						.flushedLeft
+
+					Separator()
+
+					HStack(spacing: 0) {
+						Text(L10n.AuthorizedDapps.DAppDetails.dAppDefinition)
+							.sectionHeading
+
+						Spacer(minLength: 0)
+
+						AddressView(.address(.account(viewStore.address)))
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1HighImportance)
+					}
+
+					if let domain = viewStore.domain {
+						Text(L10n.AuthorizedDapps.DAppDetails.website)
+							.sectionHeading
+						Button(domain.absoluteString) {
+							viewStore.send(.openURLTapped(domain))
+						}
+						.buttonStyle(.url)
+					}
+				}
+				.padding(.horizontal, .medium1)
+				.padding(.bottom, .large2)
+			}
+		}
+	}
+
+	@MainActor
+	struct FungiblesList: View {
+		let store: StoreOf<SimpleDappDetails>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState.fungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.name) { resource in
+					TokenThumbnail(.known(resource.iconURL), size: .small)
+				}
+			}
+		}
+	}
+
+	@MainActor
+	struct NonFungiblesListList: View {
+		let store: StoreOf<SimpleDappDetails>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState.nonFungibles, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.name) { resource in
+					NFTThumbnail(resource.iconURL, size: .small)
+				}
+			}
+		}
+	}
+
+	@MainActor
+	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
+		let heading: String
+		let elements: [Element]?
+		let title: (Element) -> String
+		let icon: (Element) -> Icon
+
+		var body: some View {
+			if let elements, !elements.isEmpty {
+				VStack(alignment: .leading, spacing: .medium3) {
+					Text(heading)
+						.sectionHeading
+						.padding(.horizontal, .medium1)
+
+					ForEach(elements) { element in
+						Card {
+							PlainListRow(showChevron: false, title: title(element)) {
+								icon(element)
+							}
+						}
+						.padding(.horizontal, .medium3)
+					}
+				}
+				.padding(.bottom, .medium1)
+			}
+		}
+	}
+
+	@MainActor
+	struct Personas: View {
+		let personas: [SimpleDappDetails.Persona]
+
+		var body: some View {
+			if personas.isEmpty {
+				Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
+					.sectionHeading
+					.flushedLeft
+					.padding(.horizontal, .medium1)
+					.padding(.vertical, .small2)
+			} else {
+				Text(L10n.AuthorizedDapps.DAppDetails.personasHeading)
+					.sectionHeading
+					.flushedLeft
+					.padding(.horizontal, .medium1)
+					.padding(.vertical, .small2)
+
+				Separator()
+					.padding(.bottom, .small2)
+
+				ForEach(personas) { persona in
+					Card {
+						PlainListRow(showChevron: false, title: persona.displayName) {
+							PersonaThumbnail(persona.thumbnail)
+						}
+					}
+					.padding(.horizontal, .medium3)
+				}
 			}
 		}
 	}
