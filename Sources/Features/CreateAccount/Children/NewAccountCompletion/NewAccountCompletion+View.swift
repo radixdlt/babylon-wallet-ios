@@ -8,7 +8,6 @@ extension NewAccountCompletion.State {
 
 extension NewAccountCompletion {
 	public struct ViewState: Equatable {
-		let entityKind: String
 		let entityName: String
 		let destinationDisplayText: String
 		let isFirstOnNetwork: Bool
@@ -19,12 +18,9 @@ extension NewAccountCompletion {
 		let appearanceID: Profile.Network.Account.AppearanceID
 
 		init(state: NewAccountCompletion.State) {
-			let entityKind = L10n.Common.account
-			self.entityKind = entityKind
-//			entityName = EntityKind.account.displayName.rawValue
-			entityName = "Account"
+			self.entityName = state.account.displayName.rawValue
 
-			destinationDisplayText = {
+			self.destinationDisplayText = {
 				switch state.navigationButtonCTA {
 				case .goHome:
 					return L10n.CreateEntity.Completion.destinationHome
@@ -35,7 +31,7 @@ extension NewAccountCompletion {
 				}
 			}()
 
-			isFirstOnNetwork = state.isFirstOnNetwork
+			self.isFirstOnNetwork = state.isFirstOnNetwork
 
 			self.accountAddress = state.account.address
 			self.appearanceID = state.account.appearanceID

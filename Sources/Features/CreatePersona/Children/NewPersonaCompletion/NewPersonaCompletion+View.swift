@@ -15,9 +15,9 @@ extension NewPersonaCompletion {
 		let subtitle: String
 
 		init(state: NewPersonaCompletion.State) {
-			entityName = L10n.Common.persona
+			self.entityName = state.persona.displayName.rawValue
 
-			destinationDisplayText = {
+			self.destinationDisplayText = {
 				switch state.navigationButtonCTA {
 				case .goBackToChoosePersonas:
 					return L10n.CreateEntity.Completion.destinationChoosePersonas
@@ -26,11 +26,10 @@ extension NewPersonaCompletion {
 				}
 			}()
 
-			isFirstOnNetwork = state.isFirstOnNetwork
-
+			self.isFirstOnNetwork = state.isFirstOnNetwork
 			self.explaination = L10n.CreatePersona.Completion.explanation
 
-			subtitle = state.isFirstOnNetwork ? L10n.CreatePersona.Completion.subtitleFirst : L10n.CreatePersona.Completion.subtitleNotFirst
+			self.subtitle = state.isFirstOnNetwork ? L10n.CreatePersona.Completion.subtitleFirst : L10n.CreatePersona.Completion.subtitleNotFirst
 		}
 	}
 
