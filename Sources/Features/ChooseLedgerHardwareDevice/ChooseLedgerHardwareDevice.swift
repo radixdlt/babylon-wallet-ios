@@ -54,11 +54,11 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .run { send in
+			return .task {
 				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet).compactMap {
 					try? LedgerFactorSource(factorSource: $0)
 				}
-				await send(.internal(.loadedLedgers(.init(uniqueElements: ledgers))))
+				return .internal(.loadedLedgers(.init(uniqueElements: ledgers)))
 			}
 
 		case let .selectedLedger(selectedID):
