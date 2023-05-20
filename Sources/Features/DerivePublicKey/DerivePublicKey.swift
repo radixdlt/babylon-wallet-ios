@@ -101,7 +101,7 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 		case .onFirstTask:
 			switch state.factorSourceOption {
 			case .device:
-				return .task { _ in
+				return .task { in
 					do {
 						let babylonFactorSource = try await factorSourcesClient
 							.getFactorSources()
