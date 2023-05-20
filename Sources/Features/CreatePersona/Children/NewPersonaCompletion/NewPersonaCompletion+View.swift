@@ -11,7 +11,7 @@ extension NewPersonaCompletion {
 		let entityName: String
 		let destinationDisplayText: String
 		let isFirstOnNetwork: Bool
-		let explaination: String
+		let explanation: String
 		let subtitle: String
 
 		init(state: NewPersonaCompletion.State) {
@@ -27,7 +27,7 @@ extension NewPersonaCompletion {
 			}()
 
 			self.isFirstOnNetwork = state.isFirstOnNetwork
-			self.explaination = L10n.CreatePersona.Completion.explanation
+			self.explanation = L10n.CreatePersona.Completion.explanation
 
 			self.subtitle = state.isFirstOnNetwork ? L10n.CreatePersona.Completion.subtitleFirst : L10n.CreatePersona.Completion.subtitleNotFirst
 		}
@@ -55,7 +55,7 @@ extension NewPersonaCompletion {
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 
-						Text(viewStore.explaination)
+						Text(viewStore.explanation)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)

@@ -11,7 +11,7 @@ extension NewAccountCompletion {
 		let entityName: String
 		let destinationDisplayText: String
 		let isFirstOnNetwork: Bool
-		let explaination: String
+		let explanation: String
 		let subtitle: String
 
 		let accountAddress: AccountAddress
@@ -35,7 +35,7 @@ extension NewAccountCompletion {
 
 			self.accountAddress = state.account.address
 			self.appearanceID = state.account.appearanceID
-			self.explaination = L10n.CreateAccount.Completion.explanation
+			self.explanation = L10n.CreateAccount.Completion.explanation
 
 			self.subtitle = state.isFirstOnNetwork ? L10n.CreateAccount.Completion.subtitleFirst : L10n.CreateAccount.Completion.subtitleNotFirst
 		}
@@ -65,7 +65,7 @@ extension NewAccountCompletion {
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 
-						Text(viewStore.explaination)
+						Text(viewStore.explanation)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
