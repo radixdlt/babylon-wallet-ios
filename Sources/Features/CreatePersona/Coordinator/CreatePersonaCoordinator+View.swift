@@ -28,7 +28,7 @@ extension CreatePersonaCoordinator {
 					IfLetStore(
 						store.scope(state: \.root, action: { .child(.root($0)) })
 					) {
-						destination(for: $0, with: viewStore)
+						destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 						#if os(iOS)
 							.toolbar {
 								if viewStore.shouldDisplayNavBar {
@@ -44,7 +44,7 @@ extension CreatePersonaCoordinator {
 					// This is required to disable the animation of internal components during transition
 					.transaction { $0.animation = nil }
 				} destination: {
-					destination(for: $0, with: viewStore)
+					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
 				#if os(iOS)
 				.navigationTransition(.slide, interactivity: .disabled)
@@ -54,7 +54,7 @@ extension CreatePersonaCoordinator {
 
 		private func destination(
 			for store: StoreOf<CreatePersonaCoordinator.Destinations>,
-			with viewStore: ViewStoreOf<CreatePersonaCoordinator>
+			shouldDisplayNavBar: Bool
 		) -> some SwiftUI.View {
 			ZStack {
 				SwitchStore(store) {
@@ -81,8 +81,8 @@ extension CreatePersonaCoordinator {
 				}
 			}
 			#if os(iOS)
-			.navigationBarBackButtonHidden(!viewStore.shouldDisplayNavBar)
-			.navigationBarHidden(!viewStore.shouldDisplayNavBar)
+			.navigationBarBackButtonHidden(!shouldDisplayNavBar)
+			.navigationBarHidden(!shouldDisplayNavBar)
 			#endif // iOS
 		}
 	}

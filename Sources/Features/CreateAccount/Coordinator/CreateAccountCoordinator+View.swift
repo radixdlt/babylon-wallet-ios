@@ -27,7 +27,7 @@ extension CreateAccountCoordinator {
 					IfLetStore(
 						store.scope(state: \.root, action: { .child(.root($0)) })
 					) {
-						destination(for: $0, with: viewStore)
+						destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 						#if os(iOS)
 							.toolbar {
 								if viewStore.shouldDisplayNavBar {
@@ -43,7 +43,7 @@ extension CreateAccountCoordinator {
 					// This is required to disable the animation of internal components during transition
 					.transaction { $0.animation = nil }
 				} destination: {
-					destination(for: $0, with: viewStore)
+					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
 				#if os(iOS)
 				.navigationTransition(.slide, interactivity: .disabled)
@@ -53,7 +53,7 @@ extension CreateAccountCoordinator {
 
 		private func destination(
 			for store: StoreOf<CreateAccountCoordinator.Destinations>,
-			with viewStore: ViewStoreOf<CreateAccountCoordinator>
+			shouldDisplayNavBar: Bool
 		) -> some SwiftUI.View {
 			ZStack {
 				SwitchStore(store) {
@@ -75,8 +75,8 @@ extension CreateAccountCoordinator {
 				}
 			}
 			#if os(iOS)
-			.navigationBarBackButtonHidden(!viewStore.shouldDisplayNavBar)
-			.navigationBarHidden(!viewStore.shouldDisplayNavBar)
+			.navigationBarBackButtonHidden(!shouldDisplayNavBar)
+			.navigationBarHidden(!shouldDisplayNavBar)
 			#endif // iOS
 		}
 	}
