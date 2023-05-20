@@ -95,7 +95,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
 			state.createPersonaCoordinator = .init(config: .init(
-				isFirstPersona: .init(
+				personaPrimacy: .init(
 					firstOnAnyNetwork: isFirstOnAnyNetwork,
 					firstOnCurrent: isFirstOnThisNetwork
 				),

@@ -86,7 +86,7 @@ struct Login: Sendable, FeatureReducer {
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
 			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
-			state.createPersonaCoordinator = .init(config: .init(isFirstPersona: .init(firstOnAnyNetwork: isFirstOnAnyNetwork, firstOnCurrent: state.personas.isEmpty), navigationButtonCTA: .goBackToChoosePersonas))
+			state.createPersonaCoordinator = .init(config: .init(personaPrimacy: .init(firstOnAnyNetwork: isFirstOnAnyNetwork, firstOnCurrent: state.personas.isEmpty), navigationButtonCTA: .goBackToChoosePersonas))
 			return .none
 
 		case let .continueButtonTapped(persona):

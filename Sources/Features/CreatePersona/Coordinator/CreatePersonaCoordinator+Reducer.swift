@@ -19,7 +19,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 			if let root {
 				self.root = root
 			} else {
-				if config.isFirstPersona.isFirstEver {
+				if config.personaPrimacy.isFirstEver {
 					self.root = .step0_introduction(.init())
 				} else {
 					self.root = .step1_newPersonaInfo(.init(config: config))

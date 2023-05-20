@@ -1,11 +1,11 @@
 import FeaturePrelude
 
-// MARK: - IsFirstPersona
-public enum IsFirstPersona: Sendable, Hashable {
-	case no
-	case yes(FirstPersona)
+// MARK: - PersonaPrimacy
+public enum PersonaPrimacy: Sendable, Hashable {
+	case first(First)
+	case notFirst
 
-	public enum FirstPersona: Sendable, Hashable {
+	public enum First: Sendable, Hashable {
 		case onAnyNetwork
 		case justOnCurrentNetwork
 	}
@@ -16,24 +16,24 @@ public enum IsFirstPersona: Sendable, Hashable {
 			assertionFailure("Discrepancy")
 			fallthrough
 		case (true, true):
-			self = .yes(.onAnyNetwork)
+			self = .first(.onAnyNetwork)
 		case (false, false):
-			self = .no
+			self = .notFirst
 		case (false, true):
-			self = .yes(.justOnCurrentNetwork)
+			self = .first(.justOnCurrentNetwork)
 		}
 	}
 
 	public var firstPersonaOnCurrentNetwork: Bool {
 		switch self {
-		case .no: return false
-		case .yes: return true
+		case .notFirst: return false
+		case .first: return true
 		}
 	}
 
 	public var isFirstEver: Bool {
 		switch self {
-		case .yes(.onAnyNetwork): return true
+		case .first(.onAnyNetwork): return true
 		default: return false
 		}
 	}
@@ -41,15 +41,15 @@ public enum IsFirstPersona: Sendable, Hashable {
 
 // MARK: - CreatePersonaConfig
 public struct CreatePersonaConfig: Sendable, Hashable {
-	public let isFirstPersona: IsFirstPersona
+	public let personaPrimacy: PersonaPrimacy
 
 	public let navigationButtonCTA: CreatePersonaNavigationButtonCTA
 
 	public init(
-		isFirstPersona: IsFirstPersona,
+		personaPrimacy: PersonaPrimacy,
 		navigationButtonCTA: CreatePersonaNavigationButtonCTA
 	) {
-		self.isFirstPersona = isFirstPersona
+		self.personaPrimacy = personaPrimacy
 		self.navigationButtonCTA = navigationButtonCTA
 	}
 }

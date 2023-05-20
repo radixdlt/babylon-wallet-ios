@@ -22,7 +22,7 @@ public struct NewPersonaCompletion: Sendable, FeatureReducer {
 		) {
 			self.init(
 				persona: persona,
-				isFirstOnNetwork: config.isFirstPersona.firstPersonaOnCurrentNetwork,
+				isFirstOnNetwork: config.personaPrimacy.firstPersonaOnCurrentNetwork,
 				navigationButtonCTA: config.navigationButtonCTA
 			)
 		}

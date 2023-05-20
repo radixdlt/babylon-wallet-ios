@@ -111,7 +111,10 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 			state.destination = .createPersona(.init(
 				config: .init(
-					isFirstPersona: .init(firstOnAnyNetwork: isFirstOnAnyNetwork, firstOnCurrent: state.personas.isEmpty),
+					personaPrimacy: .init(
+						firstOnAnyNetwork: isFirstOnAnyNetwork,
+						firstOnCurrent: state.personas.isEmpty
+					),
 					navigationButtonCTA: .goBackToChoosePersonas
 				))
 			)

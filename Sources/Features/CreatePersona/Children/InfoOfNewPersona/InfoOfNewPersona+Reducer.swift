@@ -28,7 +28,7 @@ public struct NewPersonaInfo: Sendable, FeatureReducer {
 		}
 
 		public init(config: CreatePersonaConfig) {
-			self.init(isFirstPersona: config.isFirstPersona.firstPersonaOnCurrentNetwork)
+			self.init(isFirstPersona: config.personaPrimacy.firstPersonaOnCurrentNetwork)
 		}
 	}
 
