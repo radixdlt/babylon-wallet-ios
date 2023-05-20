@@ -64,9 +64,9 @@ extension CreatePersonaCoordinator {
 						then: { IntroductionToPersonas.View(store: $0) }
 					)
 					CaseLet(
-						state: /CreatePersonaCoordinator.Destinations.State.step1_infoOfNewPersona,
-						action: CreatePersonaCoordinator.Destinations.Action.step1_infoOfNewPersona,
-						then: { InfoOfNewPersona.View(store: $0) }
+						state: /CreatePersonaCoordinator.Destinations.State.step1_newPersonaInfo,
+						action: CreatePersonaCoordinator.Destinations.Action.step1_newPersonaInfo,
+						then: { NewPersonaInfo.View(store: $0) }
 					)
 					CaseLet(
 						state: /CreatePersonaCoordinator.Destinations.State.step2_creationOfPersona,

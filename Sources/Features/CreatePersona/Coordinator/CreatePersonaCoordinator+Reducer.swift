@@ -22,7 +22,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 				if config.isFirstPersona.isFirstEver {
 					self.root = .step0_introduction(.init())
 				} else {
-					self.root = .step1_infoOfNewPersona(.init(config: config))
+					self.root = .step1_newPersonaInfo(.init(config: config))
 				}
 			}
 		}
@@ -44,14 +44,14 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case step0_introduction(IntroductionToPersonas.State)
-			case step1_infoOfNewPersona(InfoOfNewPersona.State)
+			case step1_newPersonaInfo(NewPersonaInfo.State)
 			case step2_creationOfPersona(CreationOfPersona.State)
 			case step3_completion(NewPersonaCompletion.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case step0_introduction(IntroductionToPersonas.Action)
-			case step1_infoOfNewPersona(InfoOfNewPersona.Action)
+			case step1_newPersonaInfo(NewPersonaInfo.Action)
 			case step2_creationOfPersona(CreationOfPersona.Action)
 			case step3_completion(NewPersonaCompletion.Action)
 		}
@@ -60,8 +60,8 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.step0_introduction, action: /Action.step0_introduction) {
 				IntroductionToPersonas()
 			}
-			Scope(state: /State.step1_infoOfNewPersona, action: /Action.step1_infoOfNewPersona) {
-				InfoOfNewPersona()
+			Scope(state: /State.step1_newPersonaInfo, action: /Action.step1_newPersonaInfo) {
+				NewPersonaInfo()
 			}
 			Scope(state: /State.step2_creationOfPersona, action: /Action.step2_creationOfPersona) {
 				CreationOfPersona()
@@ -117,12 +117,12 @@ extension CreatePersonaCoordinator {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .root(.step0_introduction(.delegate(.done))):
-			state.path.append(.step1_infoOfNewPersona(.init(config: state.config)))
+			state.path.append(.step1_newPersonaInfo(.init(config: state.config)))
 			return .none
 
 		case
-			let .root(.step1_infoOfNewPersona(.delegate(.proceed(name, fields)))),
-			let .path(.element(_, action: .step1_infoOfNewPersona(.delegate(.proceed(name, fields))))):
+			let .root(.step1_newPersonaInfo(.delegate(.proceed(name, fields)))),
+			let .path(.element(_, action: .step1_newPersonaInfo(.delegate(.proceed(name, fields))))):
 
 			state.path.append(.step2_creationOfPersona(.init(
 				name: name,

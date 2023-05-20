@@ -1,12 +1,12 @@
 import FeaturePrelude
 
-extension InfoOfNewPersona.State {
-	var viewState: InfoOfNewPersona.ViewState {
+extension NewPersonaInfo.State {
+	var viewState: NewPersonaInfo.ViewState {
 		.init(state: self)
 	}
 }
 
-extension InfoOfNewPersona {
+extension NewPersonaInfo {
 	public struct ViewState: Equatable {
 		public let namePlaceholder: String
 		public let titleText: String
@@ -36,10 +36,10 @@ extension InfoOfNewPersona {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<InfoOfNewPersona>
+		private let store: StoreOf<NewPersonaInfo>
 		@FocusState private var focusedInputField: State.InputField?
 
-		public init(store: StoreOf<InfoOfNewPersona>) {
+		public init(store: StoreOf<NewPersonaInfo>) {
 			self.store = store
 		}
 
@@ -100,14 +100,14 @@ extension InfoOfNewPersona {
 	}
 }
 
-extension InfoOfNewPersona.View {
-	private func title(with viewState: InfoOfNewPersona.ViewState) -> some View {
+extension NewPersonaInfo.View {
+	private func title(with viewState: NewPersonaInfo.ViewState) -> some View {
 		Text(viewState.titleText)
 			.foregroundColor(.app.gray1)
 			.textStyle(.sheetTitle)
 	}
 
-	private func subtitle(with viewState: InfoOfNewPersona.ViewState) -> some View {
+	private func subtitle(with viewState: NewPersonaInfo.ViewState) -> some View {
 		Text(viewState.subtitleText)
 			.fixedSize(horizontal: false, vertical: true)
 			.padding(.horizontal, .large1)
