@@ -17,14 +17,12 @@ extension NewPersonaCompletion {
 		init(state: NewPersonaCompletion.State) {
 			self.entityName = state.persona.displayName.rawValue
 
-			self.destinationDisplayText = {
-				switch state.navigationButtonCTA {
-				case .goBackToChoosePersonas:
-					return L10n.CreateEntity.Completion.destinationChoosePersonas
-				case .goBackToPersonaListInSettings:
-					return L10n.CreateEntity.Completion.destinationPersonaList
-				}
-			}()
+			switch state.navigationButtonCTA {
+			case .goBackToChoosePersonas:
+				self.destinationDisplayText = L10n.CreateEntity.Completion.destinationChoosePersonas
+			case .goBackToPersonaListInSettings:
+				self.destinationDisplayText = L10n.CreateEntity.Completion.destinationPersonaList
+			}
 
 			self.isFirstOnNetwork = state.isFirstOnNetwork
 			self.explanation = L10n.CreatePersona.Completion.explanation
