@@ -153,16 +153,28 @@ struct AddressView_Previews: PreviewProvider {
 // MARK: - AccountAddressQRCodePanel
 public struct AccountAddressQRCodePanel: View {
 	private let address: AccountAddress
+	private let closeAction: (() -> Void)?
 
-	public init(address: AccountAddress) {
+	public init(address: AccountAddress, closeAction: (() -> Void)? = nil) {
 		self.address = address
+		self.closeAction = closeAction
 	}
 
 	public var body: some View {
-		QRCodeView(Self.prefix + address.address, size: Self.qrImageSize)
-			.padding(.large3)
-			.presentationDetents([.medium])
-			.presentationDragIndicator(.visible)
+		VStack(spacing: 0) {
+			if let closeAction {
+				CloseButtonBar(action: closeAction)
+			}
+			QRCodeView(Self.prefix + address.address, size: Self.qrImageSize)
+				.padding([.horizontal, .bottom], .large3)
+				.padding(.top, topPadding)
+		}
+		.presentationDetents([.medium])
+		.presentationDragIndicator(.visible)
+	}
+
+	private var topPadding: CGFloat {
+		closeAction == nil ? .large3 : 0
 	}
 
 	private static let prefix: String = "radix:"
