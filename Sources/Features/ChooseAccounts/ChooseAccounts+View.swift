@@ -1,4 +1,4 @@
-import CreateEntityFeature
+import CreateAccountFeature
 import FeaturePrelude
 
 // MARK: - ChooseAccounts.View

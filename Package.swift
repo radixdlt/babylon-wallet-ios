@@ -82,11 +82,19 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "ChooseAccounts",
+		name: "ChooseAccountsFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AccountsClient",
-			"CreateEntityFeature",
+			"CreateAccountFeature",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "ChooseLedgerHardwareDeviceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AddLedgerFactorSourceFeature",
 		],
 		tests: .no
 	),
@@ -95,31 +103,47 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"TransactionReviewFeature",
+			"DerivePublicKeyFeature",
 			"ROLAClient",
 		],
 		tests: .no
 	),
 	.feature(
-		name: "CreateEntityFeature",
+		name: "CreateAccountFeature",
+		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
+			"ChooseLedgerHardwareDeviceFeature",
 			"Cryptography",
+			"DerivePublicKeyFeature",
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"LedgerHardwareWalletClient",
-			"LocalAuthenticationClient",
-			"PersonasClient",
 		],
-		tests: .yes()
+		tests: .no
+	),
+	.feature(
+		name: "CreatePersonaFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Cryptography",
+			"FactorSourcesClient",
+			"GatewayAPI",
+			"PersonasClient",
+			"DerivePublicKeyFeature",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"AppPreferencesClient",
 			"AuthorizedDappsClient",
+			"CreateAccountFeature",
+			"CreatePersonaFeature",
 			"CacheClient",
-			"ChooseAccounts",
+			"ChooseAccountsFeature",
 			"EditPersonaFeature",
 			"GatewayAPI",
 			"GatewaysClient", // get current network
@@ -132,6 +156,16 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "DerivePublicKeyFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"LedgerHardwareWalletClient",
+			"DeviceFactorSourceClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "EditPersonaFeature",
 		dependencies: [
 			"PersonasClient",
@@ -140,19 +174,9 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "PersonaDetailsFeature",
-		dependencies: [
-			"AuthorizedDappsClient",
-			"EditPersonaFeature",
-			"CreateAuthKeyFeature",
-			"GatewayAPI",
-		],
-		tests: .no
-	),
-	.feature(
 		name: "GatewaySettingsFeature",
 		dependencies: [
-			"CreateEntityFeature",
+			"CreateAccountFeature",
 			"GatewaysClient",
 			"NetworkSwitchingClient",
 		],
@@ -174,7 +198,7 @@ package.addModules([
 			"AccountPortfoliosClient",
 			"AccountsClient",
 			"AppPreferencesClient",
-			"CreateEntityFeature",
+			"CreateAccountFeature",
 		],
 		tests: .yes()
 	),
@@ -205,14 +229,7 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-	.feature(
-		name: "P2PLinksFeature",
-		dependencies: [
-			"NewConnectionFeature",
-			"RadixConnectClient",
-		],
-		tests: .yes()
-	),
+
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
@@ -224,8 +241,16 @@ package.addModules([
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			"CreateEntityFeature",
+			"CreateAccountFeature",
 			"OnboardingClient",
+		],
+		tests: .yes()
+	),
+	.feature(
+		name: "P2PLinksFeature",
+		dependencies: [
+			"NewConnectionFeature",
+			"RadixConnectClient",
 		],
 		tests: .yes()
 	),
@@ -233,10 +258,25 @@ package.addModules([
 		name: "PersonasFeature",
 		dependencies: [
 			"PersonaDetailsFeature",
-			"CreateEntityFeature",
+			"CreatePersonaFeature",
 			"PersonasClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "PersonaDetailsFeature",
+		dependencies: [
+			"AuthorizedDappsClient",
+			"EditPersonaFeature",
+			"CreateAuthKeyFeature",
+			"GatewayAPI",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "ProfileBackupsFeature",
+		dependencies: [],
+		tests: .no
 	),
 	.feature(
 		name: "ScanQRFeature",
@@ -312,11 +352,7 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-	.feature(
-		name: "ProfileBackupsFeature",
-		dependencies: [],
-		tests: .no
-	),
+
 ])
 
 // MARK: - Clients

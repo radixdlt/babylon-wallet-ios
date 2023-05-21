@@ -101,21 +101,21 @@ extension P2P.ConnectorExtension.Request {
 			}
 
 			public struct SignAuthChallenge: Sendable, Hashable, Encodable {
+				public let signers: [P2P.LedgerHardwareWallet.KeyParameters]
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
-				public let derivationPaths: [String]
 				public let challenge: P2P.Dapp.Request.AuthChallengeNonce
 				public let origin: P2P.Dapp.Request.Metadata.Origin
 				public let dAppDefinitionAddress: AccountAddress
 
 				public init(
+					signers: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice,
-					derivationPaths: [String],
 					challenge: P2P.Dapp.Request.AuthChallengeNonce,
 					origin: P2P.Dapp.Request.Metadata.Origin,
 					dAppDefinitionAddress: AccountAddress
 				) {
+					self.signers = signers
 					self.ledgerDevice = ledgerDevice
-					self.derivationPaths = derivationPaths
 					self.challenge = challenge
 					self.origin = origin
 					self.dAppDefinitionAddress = dAppDefinitionAddress

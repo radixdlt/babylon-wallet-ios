@@ -61,7 +61,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public enum InternalAction: Sendable, Equatable {
 		case gotLinksConnectionStatusUpdate([P2P.LinkConnectionUpdate])
 
-		case validateLedgerBeforeNamingIt(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice)
+		case validateLedgerBeforeNamingIt(
+			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
+		)
+
 		case nameLedgerDeviceBeforeSavingIt(
 			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 		)
@@ -253,9 +256,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
 
 		return .run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(factorSource)
+			try await factorSourcesClient.addOffDeviceFactorSource(factorSource.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.internal(.addedFactorSource(factorSource)))
+			await send(.internal(.addedFactorSource(factorSource.factorSource)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
 			errorQueue.schedule(error)

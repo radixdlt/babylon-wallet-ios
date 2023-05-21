@@ -1,4 +1,4 @@
-import ChooseAccounts
+import ChooseAccountsFeature
 import FactorSourcesClient
 import FeaturePrelude
 import ROLAClient

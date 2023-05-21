@@ -1,4 +1,4 @@
-import CreateEntityFeature
+import CreateAccountFeature
 import FeaturePrelude
 import GatewaysClient
 import NetworkSwitchingClient
@@ -201,9 +201,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			state.destination = .createAccount(
 				.init(config: .init(
 					purpose: .firstAccountOnNewNetwork(gateway.network.id)
-				), displayIntroduction: { _ in
-					false
-				})
+				))
 			)
 			return .none
 

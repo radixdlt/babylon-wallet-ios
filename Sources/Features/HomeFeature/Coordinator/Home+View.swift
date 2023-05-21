@@ -1,6 +1,6 @@
 import AccountDetailsFeature
 import AccountListFeature
-import CreateEntityFeature
+import CreateAccountFeature
 import FeaturePrelude
 
 extension Home.State {
