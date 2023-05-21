@@ -61,7 +61,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public enum InternalAction: Sendable, Equatable {
 		case gotLinksConnectionStatusUpdate([P2P.LinkConnectionUpdate])
 
-		case validateLedgerBeforeNamingIt(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice)
+		case validateLedgerBeforeNamingIt(
+			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
+		)
+
 		case nameLedgerDeviceBeforeSavingIt(
 			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 		)
