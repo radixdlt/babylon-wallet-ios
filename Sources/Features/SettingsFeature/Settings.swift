@@ -292,3 +292,12 @@ extension AppSettings {
 		}
 	}
 }
+
+// MARK: - LedgerHardwareWallets
+public struct LedgerHardwareWallets: FeatureReducer {
+	public struct State: Sendable, Hashable {}
+
+	public enum ViewAction: Sendable, Equatable {}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {}
+}
