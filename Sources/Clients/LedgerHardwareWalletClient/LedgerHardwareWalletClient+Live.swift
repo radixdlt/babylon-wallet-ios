@@ -152,14 +152,15 @@ extension LedgerHardwareWalletClient: DependencyKey {
 			signAuthChallenge: { request in
 				@Dependency(\.rolaClient) var rolaClient
 
-				let hashedMsg = try rolaClient.authenticationDataToSignForChallenge(.init(
+				let rolaPayload = try rolaClient.authenticationDataToSignForChallenge(.init(
 					challenge: request.challenge,
 					origin: request.origin,
 					dAppDefinitionAddress: request.dAppDefinitionAddress
 				))
+				let hash = try blake2b(data: rolaPayload.payloadToHashAndSign)
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hashedMsg.payloadToHashAndSign
+					expectedHashedMessage: hash
 				) {
 					try await makeRequest(
 						.signChallenge(.init(
@@ -227,6 +228,12 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 				publicKey: .init(compressedRepresentation: self.publicKey.data)
 			)
 		}
+
+		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+			throw InvalidSignature()
+		}
+
 		let derivationPath: DerivationPath
 		do {
 			derivationPath = try .init(
@@ -244,11 +251,6 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 				)
 				.derivationPath
 			)
-		}
-
-		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
-			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
-			throw InvalidSignature()
 		}
 
 		return Validated(
