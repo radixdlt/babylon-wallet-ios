@@ -54,7 +54,7 @@ extension ChooseLedgerHardwareDevice {
 									from: viewStore.ledgers,
 									requiring: .exactly(1)
 								) { item in
-									SelectLedgerRow.View(
+									LedgerRowView(
 										viewState: .init(factorSource: item.value),
 										isSelected: item.isSelected,
 										action: item.action
@@ -95,56 +95,6 @@ extension ChooseLedgerHardwareDevice {
 					ViewStore(store.stateless).send(.view(.onFirstTask))
 				}
 			}
-		}
-	}
-}
-
-// MARK: - SelectLedgerRow
-enum SelectLedgerRow {
-	struct ViewState: Equatable {
-		let description: String
-		let addedOn: String
-		let lastUsedOn: String
-
-		init(factorSource: LedgerFactorSource) {
-			self.description = "\(factorSource.label.rawValue) (\(factorSource.description.rawValue))"
-			self.addedOn = factorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current))
-			self.lastUsedOn = factorSource.lastUsedOn.ISO8601Format(.iso8601Date(timeZone: .current))
-		}
-	}
-
-	@MainActor
-	struct View: SwiftUI.View {
-		let viewState: ViewState
-		let isSelected: Bool
-		let action: () -> Void
-
-		var body: some SwiftUI.View {
-			Button(action: action) {
-				HStack {
-					VStack(alignment: .leading, spacing: 0) {
-						Text(viewState.description)
-							.textStyle(.body1Header)
-
-						HPair(label: L10n.CreateEntity.Ledger.usedHeading, item: viewState.lastUsedOn)
-
-						HPair(label: L10n.CreateEntity.Ledger.addedHeading, item: viewState.addedOn)
-					}
-
-					Spacer()
-
-					RadioButton(
-						appearance: .light,
-						state: isSelected ? .selected : .unselected
-					)
-				}
-				.foregroundColor(.app.white)
-				.padding(.medium1)
-				.background(.black)
-				.brightness(isSelected ? -0.1 : 0)
-				.cornerRadius(.small1)
-			}
-			.buttonStyle(.inert)
 		}
 	}
 }
