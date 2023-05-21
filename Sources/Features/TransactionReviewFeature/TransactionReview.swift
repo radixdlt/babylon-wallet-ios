@@ -119,10 +119,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
 				SelectFeePayer()
 			}
-			Scope(
-				state: /State.prepareForSigning,
-				action: /Action.prepareForSigning
-			) {
+			Scope(state: /State.prepareForSigning, action: /Action.prepareForSigning) {
 				PrepareForSigning()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
@@ -168,13 +165,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .run { [feeToAdd = state.fee] send in
-				await send(.internal(.previewLoaded(TaskResult {
+			return .task { [feeToAdd = state.fee] in
+				await .internal(.previewLoaded(TaskResult {
 					try await transactionClient.getTransactionReview(.init(
 						manifestToSign: manifest,
 						feeToAdd: feeToAdd
 					))
-				})))
+				}))
 			}
 
 		case .closeTapped:
