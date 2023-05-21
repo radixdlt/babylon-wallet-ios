@@ -103,6 +103,7 @@ extension View {
 			.personas(with: destinationStore)
 			.generalSettings(with: destinationStore)
 			.profileBackups(with: destinationStore)
+			.ledgerHardwareWallets(with: destinationStore)
 	}
 }
 
@@ -184,6 +185,16 @@ extension View {
 			state: /AppSettings.Destinations.State.profileBackups,
 			action: AppSettings.Destinations.Action.profileBackups,
 			destination: { ProfileBackups.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
+			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
+			destination: { LedgerHardwareWallets.View(store: $0) }
 		)
 	}
 
@@ -334,6 +345,11 @@ extension AppSettings.View {
 				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
 				asset: AssetResource.backups,
 				action: .profileBackupsButtonTapped
+			),
+			.init(
+				title: "Ledger Hardware Wallets", // FIXME: Strings
+				asset: AssetResource.generalSettings, // FIXME: asset
+				action: .ledgerHardwareWalletsButtonTapped
 			),
 		]
 	}
