@@ -51,7 +51,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case generalSettingsButtonTapped
 		case factorSourcesButtonTapped
 		case importFromOlympiaWalletButtonTapped
-		case profileBackupsTapped
+		case profileBackupsButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -204,7 +204,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			state.destination = .generalSettings(.init())
 			return .none
 
-		case .profileBackupsTapped:
+		case .profileBackupsButtonTapped:
 			state.destination = .profileBackups(.init())
 			return .none
 
