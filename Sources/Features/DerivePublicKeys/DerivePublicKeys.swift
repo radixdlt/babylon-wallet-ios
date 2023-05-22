@@ -178,8 +178,6 @@ extension DerivePublicKeys {
 					loadMnemonicPurpose: loadMnemonicPurpose
 				))
 				return .delegate(.derivedPublicKeys(
-					//					.init(engine: publicKey),
-//					derivationPath: derivationPath,
 					hdKeys,
 					factorSourceID: hdOnDeviceFactorSource.id,
 					networkID: networkID
@@ -199,13 +197,11 @@ extension DerivePublicKeys {
 	) -> EffectTask<Action> {
 		.task {
 			do {
-				let publicKeys = try await ledgerHardwareWalletClient.derivePublicKeys(OrderedSet(validating: derivationPaths.map {
+				let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(OrderedSet(validating: derivationPaths.map {
 					P2P.LedgerHardwareWallet.KeyParameters(curve: $0.curveForScheme.p2pCurve, derivationPath: $0.path)
 				}), ledger)
-				let hdKeys: OrderedSet<HierarchicalDeterministicPublicKey> = []
+
 				return .delegate(.derivedPublicKeys(
-					//					.eddsaEd25519(publicKey),
-//					derivationPath: derivationPath,
 					hdKeys,
 					factorSourceID: ledger.id,
 					networkID: networkID
