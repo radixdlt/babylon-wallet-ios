@@ -162,15 +162,21 @@ final class PeerConnectionNegotiatorTests: TestCase {
 			try await conenctionBuilder.negotiationResults.first()
 		}
 
-		try await withTimeout {
+		try await withTimeout(description: "Failed to receive remote offer") {
 			try await self.receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
+		}
 
+		await withTimeout(description: "Failed onLocalAnswer") {
 			await peerConnection.onLocalAnswerCreated()
 			peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
+		}
 
+		try await withTimeout(description: "Failed onAnswerConfigured") {
 			_ = try await peerConnection.onAnswerConfigured()
 			peerConnection.completeSetLocalDescription(with: .success(()))
+		}
 
+		try await withTimeout(description: "Failed wait for task value") {
 			let message = try await self.jsonDecoder.decode(SignalingClient.ClientMessage.self, from: self.webSocketClient.onClientMessageSent())
 			self.webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
 			let result = try await peerConnectionTask.value
