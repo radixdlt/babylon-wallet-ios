@@ -37,7 +37,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 
 	public enum Success: Sendable, Hashable {
 		case getDeviceInfo(GetDeviceInfo)
-		case derivePublicKey(DerivePublicKey)
+		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
 		case signChallenge([SignatureOfSigner])
 		case importOlympiaDevice(ImportOlympiaDevice)
@@ -55,30 +55,32 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 
-		public struct DerivePublicKey: Sendable, Hashable, Decodable {
-			public let publicKey: HexCodable
-
-			public init(publicKey: HexCodable) {
-				self.publicKey = publicKey
-			}
-		}
-
-		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
+		public struct DerivedPublicKey: Sendable, Hashable, Decodable {
 			public let curve: String
 			public let derivationPath: String
-			public let signature: HexCodable
 			public let publicKey: HexCodable
 
 			public init(
 				curve: String,
 				derivationPath: String,
-				signature: HexCodable,
 				publicKey: HexCodable
 			) {
 				self.curve = curve
 				self.derivationPath = derivationPath
-				self.signature = signature
 				self.publicKey = publicKey
+			}
+		}
+
+		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
+			public let signature: HexCodable
+			public let derivedPublicKey: DerivedPublicKey
+
+			public init(
+				derivedPublicKey: DerivedPublicKey,
+				signature: HexCodable
+			) {
+				self.derivedPublicKey = derivedPublicKey
+				self.signature = signature
 			}
 		}
 
@@ -132,9 +134,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 		switch discriminator {
-		case .derivePublicKey:
+		case .derivePublicKeys:
 			self.response = try decodeResponse {
-				Success.derivePublicKey($0)
+				Success.derivePublicKeys($0)
 			}
 		case .getDeviceInfo:
 			self.response = try decodeResponse {

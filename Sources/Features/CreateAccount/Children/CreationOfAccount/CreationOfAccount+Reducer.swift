@@ -29,7 +29,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init()) : .step1_derivePublicKey(
 				.init(
-					derivationPathOption: .next(for: .account, networkID: networkID),
+					derivationPathOption: .next(for: .account, networkID: networkID, curve: .curve25519),
 					factorSourceOption: .device
 				)
 			)
@@ -100,21 +100,26 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		switch childAction {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
 			state.step = .step1_derivePublicKey(.init(
-				derivationPathOption: .next(for: .account, networkID: state.networkID),
+				derivationPathOption: .next(for: .account, networkID: state.networkID, curve: .curve25519),
 				factorSourceOption: .specific(ledger.factorSource)
 			)
 			)
 			return .none
 
-		case let .step1_derivePublicKey(.delegate(.derivedPublicKey(publicKey, derivationPath, factorSourceID, networkID))):
+		case let .step1_derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
+			guard let hdKey = hdKeys.first else {
+				loggerGlobal.error("Failed to create account expected one single key, got: \(hdKeys.count)")
+				return .send(.delegate(.createAccountFailed))
+			}
+
 			return .run { [name = state.name] send in
 				await send(.internal(.createAccountResult(TaskResult {
 					try await accountsClient.newVirtualAccount(.init(
 						name: name,
 						factorInstance: .init(
 							factorSourceID: factorSourceID,
-							publicKey: publicKey,
-							derivationPath: derivationPath
+							publicKey: hdKey.publicKey,
+							derivationPath: hdKey.derivationPath
 						),
 						networkID: networkID
 					))

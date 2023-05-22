@@ -8,7 +8,7 @@ public struct LedgerHardwareWalletClient: Sendable {
 	public var isConnectedToAnyConnectorExtension: IsConnectedToAnyConnectorExtension
 	public var getDeviceInfo: GetDeviceInfo
 	public var importOlympiaDevice: ImportOlympiaDevice
-	public var deriveCurve25519PublicKey: DeriveCurve25519PublicKey
+	public var derivePublicKeys: DerivePublicKeys
 	public var signTransaction: SignTransaction
 	public var signAuthChallenge: SignAuthChallenge
 }
@@ -17,7 +17,7 @@ extension LedgerHardwareWalletClient {
 	public typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
 	public typealias ImportOlympiaDevice = @Sendable (Set<OlympiaAccountToMigrate>) async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
 	public typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
-	public typealias DeriveCurve25519PublicKey = @Sendable (DerivationPath, LedgerFactorSource) async throws -> Curve25519.Signing.PublicKey
+	public typealias DerivePublicKeys = @Sendable (OrderedSet<P2P.LedgerHardwareWallet.KeyParameters>, LedgerFactorSource) async throws -> OrderedSet<HierarchicalDeterministicPublicKey>
 	public typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }

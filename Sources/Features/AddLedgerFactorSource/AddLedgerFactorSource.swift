@@ -33,9 +33,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		public var olympiaAccountsValidation: OlympiaAccountsValidation?
 
 		public init(
-			olympiaAccountsToImport: Set<OlympiaAccountToMigrate>? = nil
+			olympiaAccountsValidation: OlympiaAccountsValidation?
 		) {
-			self.olympiaAccountsValidation = olympiaAccountsToImport.map { OlympiaAccountsValidation(validated: [], unvalidated: $0) } ?? nil
+			self.olympiaAccountsValidation = olympiaAccountsValidation
 		}
 	}
 
@@ -277,7 +277,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .run { send in
 			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-//			await send(.internal(.addedFactorSource(factorSource, model, name: name)))
 			await send(.delegate(.completed(ledger: ledger, isNew: true, olympiaAccountsValidation: olympiaAccountsValidation)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
@@ -353,8 +352,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 // MARK: - OlympiaAccountsValidation
 public struct OlympiaAccountsValidation: Sendable, Hashable {
-	public let validated: Set<OlympiaAccountToMigrate>
-	public let unvalidated: Set<OlympiaAccountToMigrate>
+	public var validated: Set<OlympiaAccountToMigrate>
+	public var unvalidated: Set<OlympiaAccountToMigrate>
+	public init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
+		self.validated = validated
+		self.unvalidated = unvalidated
+	}
 }
 
 extension FactorSource.LedgerHardwareWallet.DeviceModel {

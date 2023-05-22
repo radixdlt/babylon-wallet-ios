@@ -28,10 +28,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public struct State: Sendable, Hashable {
-		/// unverified, to verify and migrate
-		public var unverified: Set<OlympiaAccountToMigrate>
+		public var unmigrated: OlympiaAccountsValidation
 
-		/// verified and migrated
+		/// migrated (an before that validated)
 		public var ledgersWithAccounts: OrderedSet<LedgerWithAccounts> = []
 
 		@PresentationState
@@ -41,9 +40,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		) {
 			precondition(hardwareAccounts.allSatisfy { $0.accountType == .hardware })
-			let unverified = Set(hardwareAccounts.elements)
-			self.unverified = unverified
-			self.addLedgerFactorSource = .init(olympiaAccountsToImport: unverified)
+			let accountsValidation = OlympiaAccountsValidation(validated: [], unvalidated: Set(hardwareAccounts.elements))
+			self.unmigrated = accountsValidation
+//			self.addLedgerFactorSource = .init(olympiaAccountsToImport: accountsValidation)
 		}
 	}
 
@@ -86,7 +85,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case .skipRestOfTheAccounts:
 			return .send(.delegate(.completed(
 				ledgersWithAccounts: state.ledgersWithAccounts,
-				unvalidatedAccounts: state.unverified
+				unvalidatedAccounts: state.unmigrated.unvalidated
 			)))
 		}
 	}
@@ -109,7 +108,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			let validatedAccounts = olympiaAccountsValidation?.validated ?? []
 
 			for validatedAccount in validatedAccounts {
-				state.unverified.remove(validatedAccount)
+				state.unmigrated.unvalidated.remove(validatedAccount)
 			}
 			return convertHardwareAccountsToBabylon(
 				isLedgerNew: isNew,
@@ -158,7 +157,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	private func continueWithRestOfAccountsIfNeeded(state: inout State) -> EffectTask<Action> {
-		if state.unverified.isEmpty {
+		if state.unmigrated.unvalidated.isEmpty {
 			loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
 
 			return .send(.delegate(.completed(
@@ -166,9 +165,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				unvalidatedAccounts: []
 			)))
 		} else {
-			loggerGlobal.notice("state.unverified not empty #\(state.unverified.count) unverfied remain, preparing to send importOlympiaDevice request...")
+			loggerGlobal.notice("state.unverified not empty #\(state.unmigrated.unvalidated) unverfied remain, preparing to send importOlympiaDevice request...")
 
-			state.addLedgerFactorSource = .init(olympiaAccountsToImport: state.unverified)
+			state.addLedgerFactorSource = .init(olympiaAccountsValidation: state.unmigrated)
 
 			return .none
 		}

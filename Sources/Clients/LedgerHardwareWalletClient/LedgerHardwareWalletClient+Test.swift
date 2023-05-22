@@ -31,8 +31,8 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 				derivedPublicKeys: []
 			)
 		},
-		deriveCurve25519PublicKey: { _, _ in
-			Curve25519.Signing.PrivateKey().publicKey
+		derivePublicKeys: { _, _ in
+			[]
 		},
 		signTransaction: { _ in [] },
 		signAuthChallenge: { _ in [] }
@@ -42,7 +42,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
 		importOlympiaDevice: unimplemented("\(Self.self).importOlympiaDevice"),
-		deriveCurve25519PublicKey: unimplemented("\(Self.self).deriveCurve25519PublicKey"),
+		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
 		signTransaction: unimplemented("\(Self.self).signTransaction"),
 		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge")
 	)

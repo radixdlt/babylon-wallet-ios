@@ -18,7 +18,13 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 		@PresentationState
 		public var addNewLedger: AddLedgerFactorSource.State?
 
-		public init() {}
+		public var olympiaAccountsValidation: OlympiaAccountsValidation?
+
+		public init(
+			olympiaAccountsValidation: OlympiaAccountsValidation? = nil
+		) {
+			self.olympiaAccountsValidation = olympiaAccountsValidation
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -66,7 +72,7 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 			return .none
 
 		case .addNewLedgerButtonTapped:
-			state.addNewLedger = .init()
+			state.addNewLedger = .init(olympiaAccountsValidation: state.olympiaAccountsValidation)
 			return .none
 
 		case let .confirmedLedger(ledger):
@@ -85,7 +91,6 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .addNewLedger(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
-			assert(olympiaAccountsValidation == nil, "Unexpected Olympia Account validation")
 			state.addNewLedger = nil
 			state.selectedLedgerID = ledger.id
 			state.ledgers[id: ledger.id] = ledger

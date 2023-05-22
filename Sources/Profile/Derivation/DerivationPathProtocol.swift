@@ -68,6 +68,10 @@ public struct DerivationPath:
 {
 	public let scheme: DerivationPathScheme
 	public let path: String
+	public var curveForScheme: SLIP10.Curve {
+		scheme.curve
+	}
+
 	public init(scheme: DerivationPathScheme, path: String) {
 		self.scheme = scheme
 		self.path = path

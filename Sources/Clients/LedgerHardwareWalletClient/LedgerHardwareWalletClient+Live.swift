@@ -117,19 +117,17 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.importOlympiaDevice
 				)
 			},
-			deriveCurve25519PublicKey: { derivationPath, factorSource in
+			derivePublicKeys: { keysParams, factorSource in
 				let response = try await makeRequest(
-					.derivePublicKey(.init(
-						keyParameters: .init(
-							curve: .curve25519,
-							derivationPath: derivationPath.path
-						),
+					.derivePublicKeys(.init(
+						keysParameters: Array(keysParams),
 						ledgerDevice: factorSource.device()
 					)),
-					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
 				)
 
-				return try .init(compressedRepresentation: response.publicKey.data)
+//				return try .init(compressedRepresentation: response.publicKey.data)
+				fatalError()
 			},
 			signTransaction: { request in
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
@@ -203,35 +201,22 @@ public struct MissingSignatureFromRequiredSigner: Swift.Error {}
 // MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
 public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
-extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
-	struct Validated: Sendable, Hashable {
-		public let signature: SignatureWithPublicKey
-		public let derivationPath: DerivationPath
-	}
-
-	func validate(hashed: Data) throws -> Validated {
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPublicKey {
+	public func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
 		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
 			struct BadCurve: Swift.Error {}
 			loggerGlobal.error("Bad curve")
 			throw BadCurve()
 		}
-		let signatureWithPublicKey: SignatureWithPublicKey
+		let publicKey: SLIP10.PublicKey
+		//        let derivationPath: DerivationPath
 		switch curve {
 		case .secp256k1:
-			signatureWithPublicKey = try .ecdsaSecp256k1(
-				signature: .init(radixFormat: self.signature.data),
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
-			)
+			publicKey = try .ecdsaSecp256k1(.init(compressedRepresentation: self.publicKey.data))
+		//            derivationPath = DerivationPath(scheme: .bip44Olympia, path: self.derivationPath)
 		case .curve25519:
-			signatureWithPublicKey = try .eddsaEd25519(
-				signature: self.signature.data,
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
-			)
-		}
-
-		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
-			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
-			throw InvalidSignature()
+			publicKey = try .eddsaEd25519(.init(compressedRepresentation: self.publicKey.data))
+			//            derivationPath = DerivationPath(scheme: .cap26, path: self.derivationPath)
 		}
 
 		let derivationPath: DerivationPath
@@ -253,9 +238,42 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 			)
 		}
 
+		assert(derivationPath.curveForScheme == curve)
+
+		return .init(publicKey: publicKey, derivationPath: derivationPath)
+	}
+}
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
+	struct Validated: Sendable, Hashable {
+		public let signature: SignatureWithPublicKey
+		public let derivationPath: DerivationPath
+	}
+
+	func validate(hashed: Data) throws -> Validated {
+		let hdPubKey = try self.derivedPublicKey.hdPubKey()
+		let signatureWithPublicKey: SignatureWithPublicKey
+		switch hdPubKey.publicKey {
+		case let .ecdsaSecp256k1(pubKey):
+			signatureWithPublicKey = try .ecdsaSecp256k1(
+				signature: .init(radixFormat: self.signature.data),
+				publicKey: pubKey
+			)
+		case let .eddsaEd25519(pubKey):
+			signatureWithPublicKey = .eddsaEd25519(
+				signature: self.signature.data,
+				publicKey: pubKey
+			)
+		}
+
+		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+			throw InvalidSignature()
+		}
+
 		return Validated(
 			signature: signatureWithPublicKey,
-			derivationPath: derivationPath
+			derivationPath: hdPubKey.derivationPath
 		)
 	}
 }

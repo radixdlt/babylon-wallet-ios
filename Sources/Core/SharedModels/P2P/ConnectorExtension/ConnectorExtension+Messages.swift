@@ -15,8 +15,8 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success {
 		return payload
 	}
 
-	public var derivePublicKey: DerivePublicKey? {
-		guard case let .derivePublicKey(payload) = self else {
+	public var derivedPublicKeys: [DerivedPublicKey]? {
+		guard case let .derivePublicKeys(payload) = self else {
 			return nil
 		}
 		return payload

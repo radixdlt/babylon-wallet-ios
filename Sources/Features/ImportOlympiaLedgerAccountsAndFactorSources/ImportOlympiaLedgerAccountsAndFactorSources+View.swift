@@ -4,7 +4,7 @@ import FeaturePrelude
 extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
 		.init(
-			numberOfUnverifiedAccounts: unverified.count,
+			numberOfUnverifiedAccounts: unmigrated.unvalidated.count,
 			ledgersWithAccounts: ledgersWithAccounts
 		)
 	}

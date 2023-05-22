@@ -182,20 +182,24 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 		case let .getAuthKeyDerivationPath(.delegate(.gotDerivationPath(derivationPath, factorSource))):
 			state.step = .derivePublicKey(.init(
-				derivationPathOption: .known(derivationPath, networkID: state.entity.networkID),
+				derivationPathOption: .knownPaths([derivationPath], networkID: state.entity.networkID),
 				factorSourceOption: .specific(factorSource)
 			)
 			)
 			return .none
 
-		case let .derivePublicKey(.delegate(.derivedPublicKey(newPublicKey, derivationPath, factorSourceID, _))):
+		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, _))):
+			guard let hdKey = hdKeys.first else {
+				loggerGlobal.error("Failed to create auth key one single key, got: \(hdKeys.count)")
+				return .send(.delegate(.done(success: false)))
+			}
 			return .run { [entity = state.entity] send in
-				let manifest = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity, newPublicKey: newPublicKey))
+				let manifest = try await rolaClient.manifestForAuthKeyCreation(.init(entity: entity, newPublicKey: hdKey.publicKey))
 
 				let authenticationSigningFactorInstance = HierarchicalDeterministicFactorInstance(
 					factorSourceID: factorSourceID,
-					publicKey: newPublicKey,
-					derivationPath: derivationPath
+					publicKey: hdKey.publicKey,
+					derivationPath: hdKey.derivationPath
 				)
 
 				await send(.internal(.createdManifestForAuthKeyCreation(manifest, authenticationSigningFactorInstance)))

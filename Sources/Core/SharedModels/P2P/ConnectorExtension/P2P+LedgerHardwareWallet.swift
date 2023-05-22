@@ -15,7 +15,7 @@ extension P2P {
 
 		public enum Discriminator: String, Sendable, Hashable, Codable {
 			case getDeviceInfo
-			case derivePublicKey
+			case derivePublicKeys
 			case signTransaction
 			case signChallenge
 			case importOlympiaDevice

@@ -18,7 +18,8 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 			self.derivePublicKey = .init(
 				derivationPathOption: .nextBasedOnFactorSource(
 					networkOption: .useCurrent,
-					entityKind: .identity
+					entityKind: .identity,
+					curve: .curve25519
 				),
 				factorSourceOption: .device
 			)
@@ -67,20 +68,23 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .derivePublicKey(.delegate(.derivedPublicKey(
-			publicKey,
-			derivationPath,
+		case let .derivePublicKey(.delegate(.derivedPublicKeys(
+			hdKeys,
 			factorSourceID,
 			networkID
 		))):
+			guard let hdKey = hdKeys.first else {
+				loggerGlobal.error("Failed to create persona expected one single key, got: \(hdKeys.count)")
+				return .send(.delegate(.createPersonaFailed))
+			}
 			return .run { [name = state.name, fields = state.fields] send in
 
 				let persona = try Profile.Network.Persona(
 					networkID: networkID,
 					factorInstance: .init(
 						factorSourceID: factorSourceID,
-						publicKey: publicKey,
-						derivationPath: derivationPath
+						publicKey: hdKey.publicKey,
+						derivationPath: hdKey.derivationPath
 					),
 					displayName: name,
 					extraProperties: .init(fields: fields)
@@ -93,7 +97,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 					}
 				)))
 			} catch: { error, send in
-				loggerGlobal.error("Failed to create, error: \(error)")
+				loggerGlobal.error("Failed to create persona, error: \(error)")
 				await send(.delegate(.createPersonaFailed))
 			}
 
