@@ -3,7 +3,16 @@ import Profile
 
 extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
-		.init(ledger: ledgerBeingUsed, purpose: self.purpose == .createAuthSigningKey ? .createAuthSigningKey : .createAccount)
+		.init(ledger: ledgerBeingUsed, purpose: {
+			switch purpose {
+			case .createAuthSigningKey:
+				return .createAuthSigningKey
+			case .importLegacyAccounts:
+				return .importLegacyAccounts
+			case .createEntity:
+				return .createAccount
+			}
+		}())
 	}
 }
 
