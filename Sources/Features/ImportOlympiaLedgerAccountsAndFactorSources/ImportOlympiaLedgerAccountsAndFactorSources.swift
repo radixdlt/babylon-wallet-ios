@@ -140,7 +140,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					.init(uncheckedUniqueElements: state.unmigrated.unvalidated.map { $0.path.wrapAsDerivationPath() }),
 					networkID: state.networkID
 				),
-				factorSourceOption: .specific(ledger.factorSource)
+				factorSourceOption: .specific(ledger.factorSource),
+				purpose: .importLegacyAccounts
 			)
 			return .none
 

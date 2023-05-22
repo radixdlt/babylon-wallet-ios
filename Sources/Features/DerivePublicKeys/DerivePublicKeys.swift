@@ -10,6 +10,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Purpose: Sendable, Hashable {
 			case createEntity
+			case importLegacyAccounts
 			case createAuthSigningKey
 		}
 
@@ -45,13 +46,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			}
 		}
 
-		var purpose: Purpose {
-			switch derivationsPathOption {
-			case .knownPaths: return .createAuthSigningKey
-			case .nextBasedOnFactorSource: return .createEntity
-			}
-		}
-
 		public let factorSourceOption: FactorSourceOption
 
 		public enum FactorSourceOption: Sendable, Hashable {
@@ -59,12 +53,16 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			case specific(FactorSource)
 		}
 
+		public let purpose: Purpose
+
 		public init(
 			derivationPathOption: DerivationPathOption,
-			factorSourceOption: FactorSourceOption
+			factorSourceOption: FactorSourceOption,
+			purpose: Purpose
 		) {
 			self.derivationsPathOption = derivationPathOption
 			self.factorSourceOption = factorSourceOption
+			self.purpose = purpose
 		}
 	}
 

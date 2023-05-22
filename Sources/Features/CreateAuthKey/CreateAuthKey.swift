@@ -183,9 +183,9 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 		case let .getAuthKeyDerivationPath(.delegate(.gotDerivationPath(derivationPath, factorSource))):
 			state.step = .derivePublicKeys(.init(
 				derivationPathOption: .knownPaths([derivationPath], networkID: state.entity.networkID),
-				factorSourceOption: .specific(factorSource)
-			)
-			)
+				factorSourceOption: .specific(factorSource),
+				purpose: .createAuthSigningKey
+			))
 			return .none
 
 		case let .derivePublicKeys(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, _))):

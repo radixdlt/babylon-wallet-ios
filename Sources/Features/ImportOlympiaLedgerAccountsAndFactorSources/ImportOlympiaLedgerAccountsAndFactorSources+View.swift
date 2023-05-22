@@ -1,4 +1,5 @@
 import AddLedgerFactorSourceFeature
+import ChooseLedgerHardwareDeviceFeature
 import DerivePublicKeysFeature
 import FeaturePrelude
 
@@ -46,7 +47,15 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					}
 
 					Spacer()
+
+					ChooseLedgerHardwareDevice.View(
+						store: store.scope(
+							state: \.chooseLedger,
+							action: { .child(.chooseLedger($0)) }
+						)
+					)
 				}
+
 				.sheet(
 					store: store.scope(
 						state: \.$derivePublicKeys,
