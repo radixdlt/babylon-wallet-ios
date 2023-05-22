@@ -210,7 +210,7 @@ package.addModules([
 			"FactorSourcesClient",
 			"RadixConnectClient",
 			"ImportLegacyWalletClient",
-			"AddLedgerFactorSourceFeature",
+			"ChooseLedgerHardwareDeviceFeature",
 		],
 		tests: .no
 	),

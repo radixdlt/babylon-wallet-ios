@@ -1,4 +1,5 @@
 import AddLedgerFactorSourceFeature
+import ChooseLedgerHardwareDeviceFeature
 import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
@@ -33,8 +34,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		/// migrated (an before that validated)
 		public var ledgersWithAccounts: OrderedSet<LedgerWithAccounts> = []
 
-		@PresentationState
-		public var addLedgerFactorSource: AddLedgerFactorSource.State?
+		public var chooseLedger: ChooseLedgerHardwareDevice.State
 
 		public init(
 			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
@@ -42,6 +42,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			precondition(hardwareAccounts.allSatisfy { $0.accountType == .hardware })
 			let accountsValidation = OlympiaAccountsValidation(validated: [], unvalidated: Set(hardwareAccounts.elements))
 			self.unmigrated = accountsValidation
+			self.chooseLedger = .init(olympiaAccountsValidation: accountsValidation)
 //			self.addLedgerFactorSource = .init(olympiaAccountsToImport: accountsValidation)
 		}
 	}
@@ -51,11 +52,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case derivedPublicKeysOnLedger(OrderedSet<HierarchicalDeterministicPublicKey>, LedgerFactorSource)
+		case validedAccounts(Set<OlympiaAccountToMigrate>, LedgerFactorSource)
 		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case addLedgerFactorSource(PresentationAction<AddLedgerFactorSource.Action>)
+		case chooseLedger(ChooseLedgerHardwareDevice.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -74,10 +77,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public init() {}
 
 	public var body: some ReducerProtocolOf<ImportOlympiaLedgerAccountsAndFactorSources> {
+		Scope(state: \.chooseLedger, action: /Action.child .. ChildAction.chooseLedger) {
+			ChooseLedgerHardwareDevice()
+		}
 		Reduce(core)
-			.ifLet(\.$addLedgerFactorSource, action: /Action.child .. ChildAction.addLedgerFactorSource) {
-				AddLedgerFactorSource()
-			}
+//			.ifLet(\.$chooseLedger, action: /Action.child .. ChildAction.addLedgerFactorSource) {
+//				AddLedgerFactorSource()
+//			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -92,20 +98,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .migratedOlympiaHardwareAccounts(ledgerWithAccounts):
-			loggerGlobal.notice("Adding Ledger with accounts...")
-			state.ledgersWithAccounts.append(ledgerWithAccounts)
+		case let .derivedPublicKeysOnLedger(publicKeys, ledger):
+			return validat()
 
-			return continueWithRestOfAccountsIfNeeded(state: &state)
-		}
-	}
-
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case let .addLedgerFactorSource(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
-			state.addLedgerFactorSource = nil
-
-			let validatedAccounts = olympiaAccountsValidation?.validated ?? []
+		case let .validedAccounts(validatedAccounts, ledger):
 
 			for validatedAccount in validatedAccounts {
 				state.unmigrated.unvalidated.remove(validatedAccount)
@@ -117,9 +113,25 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				state
 			)
 
+		case let .migratedOlympiaHardwareAccounts(ledgerWithAccounts):
+			loggerGlobal.notice("Adding Ledger with accounts...")
+			state.ledgersWithAccounts.append(ledgerWithAccounts)
+
+			return continueWithRestOfAccountsIfNeeded(state: &state)
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+//		case let .addLedgerFactorSource(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
+//			state.addLedgerFactorSource = nil
+		case let .chooseLedger(.delegate(.choseLedger(ledger))):
+
 		default: return .none
 		}
 	}
+
+	private func deriveKeys(on ledger: LedgerFactorSource) {}
 
 	private func convertHardwareAccountsToBabylon(
 		isLedgerNew: Bool,
@@ -157,20 +169,71 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	private func continueWithRestOfAccountsIfNeeded(state: inout State) -> EffectTask<Action> {
-		if state.unmigrated.unvalidated.isEmpty {
-			loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
-
-			return .send(.delegate(.completed(
-				ledgersWithAccounts: state.ledgersWithAccounts,
-				unvalidatedAccounts: []
-			)))
-		} else {
-			loggerGlobal.notice("state.unverified not empty #\(state.unmigrated.unvalidated) unverfied remain, preparing to send importOlympiaDevice request...")
-
-			state.addLedgerFactorSource = .init(olympiaAccountsValidation: state.unmigrated)
-
+		guard state.unmigrated.unvalidated.isEmpty else {
+			loggerGlobal.notice("state.unverified not empty #\(state.unmigrated.unvalidated) unverfied remain...")
 			return .none
 		}
+
+		loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
+
+		return .send(.delegate(.completed(
+			ledgersWithAccounts: state.ledgersWithAccounts,
+			unvalidatedAccounts: []
+		)))
+	}
+
+	private func validate(
+		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
+		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
+	) async throws -> OlympiaAccountsValidation {
+		//        let derivedKeys = try Set(
+		//            olympiaDevice
+		//                .derivedPublicKeys
+		//                .map { try K1.PublicKey(compressedRepresentation: $0.publicKey.data) }
+		//        )
+
+		guard !derivedPublicKeys.isEmpty else {
+			loggerGlobal.warning("Response contained no public keys at all.")
+			return OlympiaAccountsValidation(
+				validated: [],
+				unvalidated: olympiaAccountsToValidate
+			)
+		}
+
+		let derivedKeys: [K1.PublicKey] = derivedPublicKeys.compactMap {
+			guard case let .ecdsaSecp256k1(k1Key) = $0.publicKey else {
+				return nil
+			}
+			return k1Key
+		}
+
+		var olympiaAccountsToValidate = olympiaAccountsToValidate
+
+		let olympiaAccountsToMigrate = olympiaAccountsToValidate.filter {
+			derivedKeys.contains($0.publicKey)
+		}
+
+		if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !derivedKeys.isEmpty {
+			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map { $0.compressedRepresentation.hex() })\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.compressedRepresentation.hex))")
+		}
+
+		guard
+			let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(
+				rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))
+			)
+		else {
+			loggerGlobal.warning("No accounts to migrated.")
+			return OlympiaAccountsValidation(validated: [], unvalidated: olympiaAccountsToValidate)
+		}
+
+		olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
+			olympiaAccountsToValidate.remove(verifiedAccountToMigrate)
+		}
+
+		return OlympiaAccountsValidation(
+			validated: olympiaAccountsToMigrate,
+			unvalidated: olympiaAccountsToValidate
+		)
 	}
 }
 
