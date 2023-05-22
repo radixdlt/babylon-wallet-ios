@@ -4,32 +4,35 @@ import SwiftUI
 public struct Card<Contents: View>: View {
 	let contents: Contents
 	let action: () -> Void
-	let disabled: Bool
+	let isButton: Bool
 
 	public init(
 		@ViewBuilder contents: () -> Contents
 	) {
 		self.action = {}
 		self.contents = contents()
-		self.disabled = true
+		self.isButton = false
 	}
 
 	public init(
 		action: @escaping () -> Void,
-		isDisabled: Bool = false,
 		@ViewBuilder contents: () -> Contents
 	) {
 		self.action = action
 		self.contents = contents()
-		self.disabled = isDisabled
+		self.isButton = true
 	}
 
 	public var body: some View {
-		Button(action: action) {
+		if isButton {
+			Button(action: action) {
+				contents
+			}
+			.buttonStyle(.cardButtonStyle)
+		} else {
 			contents
+				.inCard
 		}
-		.buttonStyle(.cardButtonStyle)
-		.disabled(disabled)
 	}
 }
 

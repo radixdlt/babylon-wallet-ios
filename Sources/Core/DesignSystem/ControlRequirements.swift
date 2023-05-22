@@ -1,3 +1,4 @@
+import Either
 import SwiftUI
 
 // MARK: - WithControlRequirements
@@ -52,6 +53,27 @@ public struct WithControlRequirements<Control: View>: View {
 		}()
 		self.action = action
 		self.control = control(action ?? {})
+	}
+
+	public init<A, B>(
+		_ a: @autoclosure () -> A?,
+		or b: @autoclosure () -> B?,
+		forAction action: @escaping (Either<A, B>) -> Void,
+		@ViewBuilder control: (@escaping () -> Void) -> Control
+	) {
+		let controlAction: (() -> Void)? = {
+			if let a = a() {
+				return { action(.left(a)) }
+			}
+
+			if let b = b() {
+				return { action(.right(b)) }
+			}
+
+			return nil
+		}()
+		self.action = controlAction
+		self.control = control(controlAction ?? {})
 	}
 
 	public init<A, B, C>(
