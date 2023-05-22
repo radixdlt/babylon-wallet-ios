@@ -138,8 +138,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					)
 					let hdKey = try HierarchicalDeterministicPublicKey(curve: keyParams.curve.rawValue, key: response.publicKey.data, path: keyParams.derivationPath)
 					keys.append(hdKey)
+					loggerGlobal.notice("Finished deriving one public keys")
 				}
-
+				loggerGlobal.notice("Finished deriving ALL public keys 👍")
 				return keys
 			},
 			signTransaction: { request in

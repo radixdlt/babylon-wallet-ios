@@ -58,7 +58,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Validated public keys against expected, then migrate...
-		case validedAccounts(Set<OlympiaAccountToMigrate>, LedgerFactorSource)
+		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerFactorSource)
 
 		/// migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
@@ -106,10 +106,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .validedAccounts(validatedAccounts, ledger):
+		case let .validatedAccounts(validatedAccounts, ledger):
 
 			for validatedAccount in validatedAccounts {
 				state.unmigrated.unvalidated.remove(validatedAccount)
+				state.unmigrated.validated.append(contentsOf: validatedAccounts)
 			}
 			return convertHardwareAccountsToBabylon(
 				ledger: ledger,
@@ -150,14 +151,26 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 				return .none
 			}
-			return validate(derivedPublicKeys: publicKeys, ledger: ledger)
+			return validate(derivedPublicKeys: publicKeys, ledger: ledger, state: state)
 
 		default: return .none
 		}
 	}
 
-	private func validate(derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>, ledger: LedgerFactorSource) -> EffectTask<Action> {
-		.none
+	private func validate(
+		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
+		ledger: LedgerFactorSource,
+		state: State
+	) -> EffectTask<Action> {
+		.run { [olympiaAccountsToValidate = state.unmigrated.unvalidated] send in
+			do {
+				let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
+				await send(.internal(.validatedAccounts(validation.validated, ledger)))
+			} catch {
+				loggerGlobal.error("Failed to validate accounts, error: \(error)")
+				errorQueue.schedule(error)
+			}
+		}
 	}
 
 	private func convertHardwareAccountsToBabylon(
