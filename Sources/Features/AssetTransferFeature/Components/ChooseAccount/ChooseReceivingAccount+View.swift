@@ -23,12 +23,16 @@ extension ChooseReceivingAccount {
 					return .none
 				}
 
-				if state.validatedAccountAddress == nil {
+				guard let validateAccountAddress = state.validatedAccountAddress else {
 					return .error("Invalid address")
+				}
+
+				if state.chooseAccounts.filteredAccounts.contains(where: { $0 == validateAccountAddress }) {
+					return .error("Account already added")
 				}
 				return .none
 			}()
-			canSelectOwnAccount = !manualAccountAddressFocused && manualAccountAddress.isEmpty
+			canSelectOwnAccount = manualAccountAddress.isEmpty
 		}
 	}
 

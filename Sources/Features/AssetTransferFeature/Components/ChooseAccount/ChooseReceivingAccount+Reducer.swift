@@ -7,22 +7,19 @@ import ScanQRFeature
 public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var chooseAccounts: ChooseAccounts.State
-		var manualAccountAddress: String = ""
-		var manualAccountAddressFocused: Bool = false {
+		var manualAccountAddress: String = "" {
 			didSet {
-				if manualAccountAddressFocused {
+				if !manualAccountAddress.isEmpty {
 					chooseAccounts.selectedAccounts = nil
 				}
 			}
 		}
 
+		var manualAccountAddressFocused: Bool = false
+
 		var validatedAccountAddress: AccountAddress? {
 			if !manualAccountAddressFocused, !manualAccountAddress.isEmpty {
-				do {
-					return try AccountAddress(address: manualAccountAddress)
-				} catch {
-					return nil
-				}
+				return try? AccountAddress(address: manualAccountAddress)
 			}
 			return nil
 		}
@@ -85,15 +82,24 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case .scanQRCode:
 			state.destination = .scanAccountAddress(.init(scanInstructions: "Scan a QR code of a Radix account address"))
 			return .none
+
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
+
 		case let .manualAccountAddressChanged(address):
 			state.manualAccountAddress = address
 			return .none
+
 		case let .focusChanged(isFocused):
 			state.manualAccountAddressFocused = isFocused
 			return .none
+
 		case let .chooseButtonTapped(result):
+			// While we allow to easily selected the owned account, user is still able to paste the address of an owned account.
+			// This be sure to check if the manually introduced address matches any of the user owned accounts.
+			if case let .right(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
+				return .send(.delegate(.handleResult(.left(ownedAccount))))
+			}
 			return .send(.delegate(.handleResult(result)))
 		}
 	}
