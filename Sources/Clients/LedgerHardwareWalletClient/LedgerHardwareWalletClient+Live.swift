@@ -110,25 +110,36 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.getDeviceInfo
 				)
 			},
-			importOlympiaDevice: { olympiaHardwareAccounts in
-
-				try await makeRequest(
-					.importOlympiaDevice(.init(derivationPaths: olympiaHardwareAccounts.map(\.path.derivationPath))),
-					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.importOlympiaDevice
-				)
-			},
 			derivePublicKeys: { keysParams, factorSource in
-				let response = try await makeRequest(
-					.derivePublicKeys(.init(
-						keysParameters: Array(keysParams),
-						ledgerDevice: factorSource.device()
-					)),
-					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
-				)
+				// TODO: use when Sowa has impl support for hit
+				/*
+				 let response = try await makeRequest(
+				 	.derivePublicKeys(.init(
+				 		keysParameters: Array(keysParams),
+				 		ledgerDevice: factorSource.device()
+				 	)),
+				 	responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
+				 )
 
-				return try OrderedSet(validating: response.map {
-					try $0.hdPubKey()
-				})
+				 return try OrderedSet(validating: response.map {
+				 	try $0.hdPubKey()
+				 })
+				 */
+				var keys = OrderedSet<HierarchicalDeterministicPublicKey>()
+
+				for keyParams in keysParams {
+					let response = try await makeRequest(
+						.derivePublicKeys(.init(
+							keysParameters: Array(keysParams),
+							ledgerDevice: factorSource.device()
+						)),
+						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
+					)
+					let hdKey = try HierarchicalDeterministicPublicKey(curve: keyParams.curve.rawValue, key: response.publicKey.data, path: keyParams.derivationPath)
+					keys.append(hdKey)
+				}
+
+				return keys
 			},
 			signTransaction: { request in
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
@@ -202,9 +213,9 @@ public struct MissingSignatureFromRequiredSigner: Swift.Error {}
 // MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
 public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
-extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPublicKey {
-	public func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
-		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
+extension HierarchicalDeterministicPublicKey {
+	init(curve curveString: String, key keyData: Data, path: String) throws {
+		guard let curve = SLIP10.Curve(rawValue: curveString) else {
 			struct BadCurve: Swift.Error {}
 			loggerGlobal.error("Bad curve")
 			throw BadCurve()
@@ -212,9 +223,100 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPu
 		let publicKey: SLIP10.PublicKey
 		switch curve {
 		case .secp256k1:
-			publicKey = try .ecdsaSecp256k1(.init(compressedRepresentation: self.publicKey.data))
+			publicKey = try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
 		case .curve25519:
-			publicKey = try .eddsaEd25519(.init(compressedRepresentation: self.publicKey.data))
+			publicKey = try .eddsaEd25519(.init(compressedRepresentation: keyData))
+		}
+
+		let derivationPath: DerivationPath
+		do {
+			derivationPath = try .init(
+				scheme: .cap26,
+				path: AccountBabylonDerivationPath(
+					derivationPath: path
+				)
+				.derivationPath
+			)
+		} catch {
+			derivationPath = try .init(
+				scheme: .bip44Olympia,
+				path: LegacyOlympiaBIP44LikeDerivationPath(
+					derivationPath: path
+				)
+				.derivationPath
+			)
+		}
+
+		assert(derivationPath.curveForScheme == curve)
+
+		self.init(publicKey: publicKey, derivationPath: derivationPath)
+	}
+}
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPublicKey {
+	public func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
+		try .init(curve: self.curve, key: self.publicKey.data, path: self.derivationPath)
+	}
+}
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
+	struct Validated: Sendable, Hashable {
+		public let signature: SignatureWithPublicKey
+		public let derivationPath: DerivationPath
+	}
+
+	// TODO: use this when CE has support for it
+	/*
+	 func validate(hashed: Data) throws -> Validated {
+	 	let hdPubKey = try self.derivedPublicKey.hdPubKey()
+	 	let signatureWithPublicKey: SignatureWithPublicKey
+	 	switch hdPubKey.publicKey {
+	 	case let .ecdsaSecp256k1(pubKey):
+	 		signatureWithPublicKey = try .ecdsaSecp256k1(
+	 			signature: .init(radixFormat: self.signature.data),
+	 			publicKey: pubKey
+	 		)
+	 	case let .eddsaEd25519(pubKey):
+	 		signatureWithPublicKey = .eddsaEd25519(
+	 			signature: self.signature.data,
+	 			publicKey: pubKey
+	 		)
+	 	}
+
+	 	guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+	 		loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+	 		throw InvalidSignature()
+	 	}
+
+	 	return Validated(
+	 		signature: signatureWithPublicKey,
+	 		derivationPath: hdPubKey.derivationPath
+	 	)
+	 }
+	 */
+	func validate(hashed: Data) throws -> Validated {
+		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
+			struct BadCurve: Swift.Error {}
+			loggerGlobal.error("Bad curve")
+			throw BadCurve()
+		}
+		let signatureWithPublicKey: SignatureWithPublicKey
+		switch curve {
+		case .secp256k1:
+			signatureWithPublicKey = try .ecdsaSecp256k1(
+				signature: .init(radixFormat: self.signature.data),
+				publicKey: .init(compressedRepresentation: self.publicKey.data)
+			)
+		case .curve25519:
+			signatureWithPublicKey = try .eddsaEd25519(
+				signature: self.signature.data,
+				publicKey: .init(compressedRepresentation: self.publicKey.data)
+			)
+		}
+
+		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+			throw InvalidSignature()
 		}
 
 		let derivationPath: DerivationPath
@@ -236,42 +338,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPu
 			)
 		}
 
-		assert(derivationPath.curveForScheme == curve)
-
-		return .init(publicKey: publicKey, derivationPath: derivationPath)
-	}
-}
-
-extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
-	struct Validated: Sendable, Hashable {
-		public let signature: SignatureWithPublicKey
-		public let derivationPath: DerivationPath
-	}
-
-	func validate(hashed: Data) throws -> Validated {
-		let hdPubKey = try self.derivedPublicKey.hdPubKey()
-		let signatureWithPublicKey: SignatureWithPublicKey
-		switch hdPubKey.publicKey {
-		case let .ecdsaSecp256k1(pubKey):
-			signatureWithPublicKey = try .ecdsaSecp256k1(
-				signature: .init(radixFormat: self.signature.data),
-				publicKey: pubKey
-			)
-		case let .eddsaEd25519(pubKey):
-			signatureWithPublicKey = .eddsaEd25519(
-				signature: self.signature.data,
-				publicKey: pubKey
-			)
-		}
-
-		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
-			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
-			throw InvalidSignature()
-		}
-
 		return Validated(
 			signature: signatureWithPublicKey,
-			derivationPath: hdPubKey.derivationPath
+			derivationPath: derivationPath
 		)
 	}
 }

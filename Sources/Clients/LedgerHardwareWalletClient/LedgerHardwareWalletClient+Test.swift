@@ -24,13 +24,6 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 				model: .nanoS
 			)
 		},
-		importOlympiaDevice: { _ in
-			.init(
-				id: .mocked,
-				model: .nanoS,
-				derivedPublicKeys: []
-			)
-		},
 		derivePublicKeys: { _, _ in
 			[]
 		},
@@ -41,7 +34,6 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 	public static let testValue = Self(
 		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
 		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
-		importOlympiaDevice: unimplemented("\(Self.self).importOlympiaDevice"),
 		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
 		signTransaction: unimplemented("\(Self.self).signTransaction"),
 		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge")

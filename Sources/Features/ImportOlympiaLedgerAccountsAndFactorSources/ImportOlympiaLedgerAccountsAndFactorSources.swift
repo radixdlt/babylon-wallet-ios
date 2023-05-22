@@ -195,11 +195,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	private func continueWithRestOfAccountsIfNeeded(state: inout State) -> EffectTask<Action> {
 		guard state.unmigrated.unvalidated.isEmpty else {
-			loggerGlobal.notice("state.unverified not empty #\(state.unmigrated.unvalidated) unverfied remain...")
+			loggerGlobal.notice("state.unmigrated.unvalidated not empty #\(state.unmigrated.unvalidated) , need to migrate more accounds...")
 			return .none
 		}
-
-		loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
 
 		return .send(.delegate(.completed(
 			ledgersWithAccounts: state.ledgersWithAccounts,
@@ -211,12 +209,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
 	) async throws -> OlympiaAccountsValidation {
-		//        let derivedKeys = try Set(
-		//            olympiaDevice
-		//                .derivedPublicKeys
-		//                .map { try K1.PublicKey(compressedRepresentation: $0.publicKey.data) }
-		//        )
-
 		guard !derivedPublicKeys.isEmpty else {
 			loggerGlobal.warning("Response contained no public keys at all.")
 			return OlympiaAccountsValidation(
