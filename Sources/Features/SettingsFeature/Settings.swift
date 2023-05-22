@@ -5,6 +5,7 @@ import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
+import LedgerHardwareWalletsFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -301,13 +302,4 @@ extension AppSettings {
 			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
 		}
 	}
-}
-
-// MARK: - LedgerHardwareWallets
-public struct LedgerHardwareWallets: FeatureReducer {
-	public struct State: Sendable, Hashable {}
-
-	public enum ViewAction: Sendable, Equatable {}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {}
 }

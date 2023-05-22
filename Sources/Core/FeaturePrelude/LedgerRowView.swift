@@ -16,9 +16,17 @@ public struct LedgerRowView: View {
 	}
 
 	private let viewState: ViewState
-	private let isSelected: Bool
+	private let isSelected: Bool?
 	private let action: () -> Void
 
+	/// Initialises a plain LedgerRowView
+	public init(viewState: ViewState) {
+		self.viewState = viewState
+		self.isSelected = nil
+		self.action = {}
+	}
+
+	/// Initialises a selectable LedgerRowView
 	public init(viewState: ViewState, isSelected: Bool, action: @escaping () -> Void) {
 		self.viewState = viewState
 		self.isSelected = isSelected
@@ -39,15 +47,17 @@ public struct LedgerRowView: View {
 
 				Spacer()
 
-				RadioButton(
-					appearance: .light,
-					state: isSelected ? .selected : .unselected
-				)
+				if let isSelected {
+					RadioButton(
+						appearance: .light,
+						state: isSelected ? .selected : .unselected
+					)
+				}
 			}
 			.foregroundColor(.app.white)
 			.padding(.medium1)
 			.background(.black)
-			.brightness(isSelected ? -0.1 : 0)
+			.brightness(isSelected == true ? -0.1 : 0)
 			.cornerRadius(.small1)
 		}
 		.buttonStyle(.inert)

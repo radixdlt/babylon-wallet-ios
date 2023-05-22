@@ -3,6 +3,7 @@ import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
+import LedgerHardwareWalletsFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -369,30 +370,3 @@ struct SettingsView_Previews: PreviewProvider {
 	}
 }
 #endif
-
-extension LedgerHardwareWallets {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<LedgerHardwareWallets>
-
-		public init(store: StoreOf<LedgerHardwareWallets>) {
-			self.store = store
-		}
-	}
-
-	public struct ViewState: Equatable {}
-}
-
-extension LedgerHardwareWallets.View {
-	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
-			EmptyView()
-		}
-	}
-}
-
-extension LedgerHardwareWallets.State {
-	var viewState: LedgerHardwareWallets.ViewState {
-		.init()
-	}
-}
