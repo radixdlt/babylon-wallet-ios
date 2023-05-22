@@ -3,7 +3,7 @@ import FeaturePrelude
 
 extension SignWithFactorSourcesOfKindLedger.State {
 	var viewState: SignWithFactorSourcesOfKindLedger.ViewState {
-		.init(currentSigningFactor: currentSigningFactor)
+		.init(currentSigningFactor: currentSigningFactor, purpose: self.signingPurposeWithPayload.purpose == .signAuth ? .signAuth : .signTX)
 	}
 }
 
@@ -11,6 +11,7 @@ extension SignWithFactorSourcesOfKindLedger.State {
 extension SignWithFactorSourcesOfKindLedger {
 	public struct ViewState: Equatable {
 		let currentSigningFactor: SigningFactor?
+		let purpose: UseLedgerView.Purpose
 	}
 
 	@MainActor
@@ -24,8 +25,14 @@ extension SignWithFactorSourcesOfKindLedger {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					if let currentSigningFactor = viewStore.currentSigningFactor {
-						signing(with: currentSigningFactor)
+					if
+						let currentSigningFactor = viewStore.currentSigningFactor,
+						let ledger = try? LedgerFactorSource(factorSource: currentSigningFactor.factorSource)
+					{
+						UseLedgerView(
+							ledgerFactorSource: ledger,
+							purpose: viewStore.purpose
+						)
 					}
 				}
 				.onFirstTask { @MainActor in
@@ -33,25 +40,5 @@ extension SignWithFactorSourcesOfKindLedger {
 				}
 			}
 		}
-	}
-}
-
-extension SignWithFactorSourcesOfKindLedger.View {
-	@ViewBuilder
-	private func signing(
-		with signingFactor: SigningFactor
-	) -> some SwiftUI.View {
-		VStack {
-			Text("Signing with ledger").textStyle(.body1HighImportance)
-
-			let factorSource = signingFactor.factorSource
-			let ledger = P2P.LedgerHardwareWallet.LedgerDevice(factorSource: factorSource)
-			let maybeName: String? = ledger.name?.rawValue
-			let nameOrEmpty = maybeName.map { "'\($0)'" } ?? ""
-			let display = "\(ledger.model.rawValue) - \(nameOrEmpty)"
-			VPair(heading: "Ledger", item: display)
-			VPair(heading: "Last used", item: factorSource.lastUsedOn.ISO8601Format())
-			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
-		}.padding()
 	}
 }

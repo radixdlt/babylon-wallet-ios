@@ -42,7 +42,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		)
 		case alreadyExists(FactorSource)
 		case nameLedgerBeforeAddingIt(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo)
-		case addedFactorSource(FactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
+		case addedFactorSource(LedgerFactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
 		case saveNewConnection(P2PLink)
 	}
 
@@ -52,7 +52,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case completed(
-			ledger: FactorSource
+			ledger: LedgerFactorSource
 		)
 	}
 
@@ -245,7 +245,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
 
 		return .run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(factorSource)
+			try await factorSourcesClient.addOffDeviceFactorSource(factorSource.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.internal(.addedFactorSource(factorSource, model, name: name)))
 		} catch: { error, _ in

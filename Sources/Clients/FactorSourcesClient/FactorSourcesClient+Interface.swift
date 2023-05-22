@@ -3,6 +3,7 @@ import Profile
 
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {
+	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getFactorSources: GetFactorSources
 	public var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
@@ -12,6 +13,7 @@ public struct FactorSourcesClient: Sendable {
 	public var updateLastUsed: UpdateLastUsed
 
 	public init(
+		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
@@ -20,6 +22,7 @@ public struct FactorSourcesClient: Sendable {
 		getSigningFactors: @escaping GetSigningFactors,
 		updateLastUsed: @escaping UpdateLastUsed
 	) {
+		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
@@ -32,6 +35,7 @@ public struct FactorSourcesClient: Sendable {
 
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
+	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID

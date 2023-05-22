@@ -1,5 +1,6 @@
 import CacheClient
 import ClientTestingPrelude
+import Cryptography
 import EngineToolkit
 import GatewayAPI
 @testable import ROLAClient
@@ -101,6 +102,27 @@ final class ROLAClientTests: TestCase {
 		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
 		let json = try jsonEncoder.encode(vectors)
 		print(String(data: json, encoding: .utf8)!)
+	}
+
+	func test_sign_auth() throws {
+		let mnemonic = try Mnemonic(phrase: "equip will roof matter pink blind book anxiety banner elbow sun young", language: .english)
+		let hdRoot = try mnemonic.hdRoot()
+		let path = try HD.Path.Full(string: "m/44H/1022H/12H/525H/1460H/1H")
+		let key = try hdRoot.derivePrivateKey(path: path, curve: Curve25519.self)
+		let publicKey = key.publicKey
+		XCTAssertEqual(publicKey.compressedRepresentation.hex, "0a4b894208a1f6b1bd7e823b59909f01aae0172b534baa2905b25f1bcbbb4f0a")
+
+		let hash: Data = try {
+			let payload = try payloadToHash(
+				challenge: .init(.init(data: Data(hex: "4dff87ac88ecfebdd97445b6fe42952162e72e6f2ab57c569f66bffe80fd21d5"))),
+				dAppDefinitionAddress: .init(address: "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"),
+				origin: .init(string: "https://radix-dapp-toolkit-dev.rdx-works-main.extratools.works")
+			)
+			return try blake2b(data: payload)
+		}()
+
+		let signature = try Data(hex: "2e57f53accbd51c8835e66b83e50a64d85c0f96e0f6e58f20c2d0bc07e82fa0d8ee563c007a3898c4d88ed6352c7c5c0b3fac183b5f0e32304f649bb1d176c06")
+		XCTAssertTrue(publicKey.isValidSignature(signature, for: hash))
 	}
 
 	func testHappyPath_performWellKnownFileCheck() async throws {

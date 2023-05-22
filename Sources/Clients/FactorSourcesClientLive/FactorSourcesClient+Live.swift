@@ -25,6 +25,7 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		return Self(
+			getCurrentNetworkID: { await getProfileStore().profile.networkID },
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await getProfileStore().factorSourcesValues()

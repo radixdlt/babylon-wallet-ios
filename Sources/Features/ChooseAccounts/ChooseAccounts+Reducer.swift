@@ -1,5 +1,5 @@
 import AccountsClient
-import CreateEntityFeature
+import CreateAccountFeature
 import FeaturePrelude
 
 // MARK: - _ChooseAccounts
@@ -74,8 +74,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(.init(
-				config: .init(purpose: .newAccountDuringDappInteraction),
-				displayIntroduction: { _ in false }
+				config: .init(purpose: .newAccountDuringDappInteraction)
 			))
 			return .none
 

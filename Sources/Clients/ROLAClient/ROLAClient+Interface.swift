@@ -20,27 +20,14 @@ public struct ROLAClient: Sendable, DependencyKey {
 extension ROLAClient {
 	public typealias PerformDappDefinitionVerification = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
 	public typealias PerformWellKnownFileCheck = @Sendable (P2P.Dapp.Request.Metadata) async throws -> Void
-	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> ManifestForAuthKeyCreationResponse
+	public typealias ManifestForAuthKeyCreation = @Sendable (ManifestForAuthKeyCreationRequest) async throws -> TransactionManifest
 	public typealias AuthenticationDataToSignForChallenge = @Sendable (AuthenticationDataToSignForChallengeRequest) throws -> AuthenticationDataToSignForChallengeResponse
 }
 
-// MARK: - ManifestForAuthKeyCreationResponse
-public struct ManifestForAuthKeyCreationResponse: Sendable, Hashable {
-	public let manifest: TransactionManifest
-	public let authenticationSigning: HierarchicalDeterministicFactorInstance
-}
-
-// MARK: - AuthenticationDataToSignForChallengeResponse
-public struct AuthenticationDataToSignForChallengeResponse: Sendable, Hashable {
-	public let input: AuthenticationDataToSignForChallengeRequest
-	public let payloadToHashAndSign: Data
-
-	public init(
-		input: AuthenticationDataToSignForChallengeRequest,
-		payloadToHashAndSign: Data
-	) {
-		self.input = input
-		self.payloadToHashAndSign = payloadToHashAndSign
+extension DependencyValues {
+	public var rolaClient: ROLAClient {
+		get { self[ROLAClient.self] }
+		set { self[ROLAClient.self] = newValue }
 	}
 }
 
@@ -61,21 +48,34 @@ public struct AuthenticationDataToSignForChallengeRequest: Sendable, Hashable {
 	}
 }
 
-extension DependencyValues {
-	public var rolaClient: ROLAClient {
-		get { self[ROLAClient.self] }
-		set { self[ROLAClient.self] = newValue }
+// MARK: - AuthenticationDataToSignForChallengeResponse
+public struct AuthenticationDataToSignForChallengeResponse: Sendable, Hashable {
+	public let input: AuthenticationDataToSignForChallengeRequest
+	public let payloadToHashAndSign: Data
+
+	public init(
+		input: AuthenticationDataToSignForChallengeRequest,
+		payloadToHashAndSign: Data
+	) {
+		self.input = input
+		self.payloadToHashAndSign = payloadToHashAndSign
 	}
 }
 
 // MARK: - ManifestForAuthKeyCreationRequest
 public struct ManifestForAuthKeyCreationRequest: Sendable, Hashable {
 	public let entity: EntityPotentiallyVirtual
-	public init(entity: EntityPotentiallyVirtual) throws {
+	public let newPublicKey: SLIP10.PublicKey
+
+	public init(
+		entity: EntityPotentiallyVirtual,
+		newPublicKey: SLIP10.PublicKey
+	) throws {
 		guard !entity.hasAuthenticationSigningKey else {
 			throw EntityHasAuthSigningKeyAlready()
 		}
 		self.entity = entity
+		self.newPublicKey = newPublicKey
 	}
 }
 

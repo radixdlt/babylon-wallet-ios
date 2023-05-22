@@ -1,4 +1,4 @@
-import CreateEntityFeature
+import CreatePersonaFeature
 import EditPersonaFeature
 import FeaturePrelude
 import PersonasClient
@@ -109,9 +109,15 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
 			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
-			state.destination = .createPersona(.init(config: .init(
-				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
-			), displayIntroduction: { _ in isFirstOnAnyNetwork }))
+			state.destination = .createPersona(.init(
+				config: .init(
+					personaPrimacy: .init(
+						firstOnAnyNetwork: isFirstOnAnyNetwork,
+						firstOnCurrent: state.personas.isEmpty
+					),
+					navigationButtonCTA: .goBackToChoosePersonas
+				))
+			)
 			return .none
 
 		case let .continueButtonTapped(fields):

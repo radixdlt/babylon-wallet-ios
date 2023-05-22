@@ -14,8 +14,6 @@ extension PersonasClient: TestDependencyKey {
 		personas: unimplemented("\(Self.self).personas"),
 		getPersonas: unimplemented("\(Self.self).getPersonas"),
 		updatePersona: unimplemented("\(Self.self).updatePersona"),
-		newUnsavedVirtualPersonaControlledByDeviceFactorSource: unimplemented("\(Self.self).newUnsavedVirtualPersonaControlledByDeviceFactorSource"),
-		newUnsavedVirtualPersonaControlledByLedgerFactorSource: unimplemented("\(Self.self).newUnsavedVirtualPersonaControlledByLedgerFactorSource"),
 		saveVirtualPersona: unimplemented("\(Self.self).saveVirtualPersona"),
 		hasAnyPersonaOnAnyNetwork: unimplemented("\(Self.self).hasAnyPersonaOnAnyNetwork")
 	)
@@ -23,8 +21,6 @@ extension PersonasClient: TestDependencyKey {
 		personas: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getPersonas: { .init() },
 		updatePersona: { _ in throw NoopError() },
-		newUnsavedVirtualPersonaControlledByDeviceFactorSource: { _ in throw NoopError() },
-		newUnsavedVirtualPersonaControlledByLedgerFactorSource: { _ in throw NoopError() },
 		saveVirtualPersona: { _ in },
 		hasAnyPersonaOnAnyNetwork: { true }
 	)

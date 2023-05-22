@@ -287,7 +287,7 @@ extension AppSettings.View {
 							.frame(.verySmall)
 					}
 					.tappable {
-						viewStore.send(.debugInspectProfileButtonTapped)
+						viewStore.send(.factorSourcesButtonTapped)
 					}
 					.withSeparator
 

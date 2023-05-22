@@ -65,7 +65,7 @@ extension FactorSource {
 			description: description, // will be changed by ProfileStore to *device* **model**
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: true,
-			storage: nil
+			storage: nil // we do not wanna create new Entities with Olympia `.device` factor sources.
 		)
 	}
 

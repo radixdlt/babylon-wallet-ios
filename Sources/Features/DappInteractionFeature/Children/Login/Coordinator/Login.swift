@@ -1,5 +1,5 @@
 import AuthorizedDappsClient
-import CreateEntityFeature
+import CreatePersonaFeature
 import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
@@ -86,9 +86,7 @@ struct Login: Sendable, FeatureReducer {
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
 			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
-			state.createPersonaCoordinator = .init(config: .init(
-				purpose: .newPersonaDuringDappInteract(isFirst: state.personas.isEmpty)
-			), displayIntroduction: { _ in isFirstOnAnyNetwork })
+			state.createPersonaCoordinator = .init(config: .init(personaPrimacy: .init(firstOnAnyNetwork: isFirstOnAnyNetwork, firstOnCurrent: state.personas.isEmpty), navigationButtonCTA: .goBackToChoosePersonas))
 			return .none
 
 		case let .continueButtonTapped(persona):

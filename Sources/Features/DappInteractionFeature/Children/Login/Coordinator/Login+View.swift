@@ -1,4 +1,4 @@
-import CreateEntityFeature
+import CreatePersonaFeature
 import FeaturePrelude
 
 // MARK: - LoginRequest.View
