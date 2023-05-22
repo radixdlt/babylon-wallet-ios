@@ -3,6 +3,7 @@ import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
+import LedgerHardwareWalletsFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -57,17 +58,21 @@ extension AppSettings {
 extension AppSettings.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 			settingsView(viewStore: viewStore)
 				.navigationTitle(L10n.Settings.title)
 			#if os(iOS)
 				.navigationBarTitleDisplayMode(.inline)
 			#endif
-				.navigationDestinations(with: store, viewStore)
+				.navigationDestinations(with: destinationStore)
 				.confirmationDialog(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					store: destinationStore,
 					state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
 					action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
 				)
+			#if DEBUG
+				.inspectProfile(with: viewStore)
+			#endif
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}
@@ -89,45 +94,25 @@ extension View {
 	//
 	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
 	@MainActor
-	fileprivate func navigationDestinations(
-		with store: StoreOf<AppSettings>,
-		_ viewStore: ViewStoreOf<AppSettings>
-	) -> some View {
+	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		self
-		#if DEBUG
-			.navigationDestination(
-				isPresented: viewStore.binding(
-					get: \.isDebugProfileViewSheetPresented,
-					send: { .setDebugProfileSheet(isPresented: $0) }
-				)
-			) {
-				if let profile = viewStore.profileToInspect {
-					ProfileView(
-						profile: profile,
-						// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-						secureStorageClient: SecureStorageClient.liveValue
-					)
-				} else {
-					Text(L10n.Settings.noProfileText)
-				}
-			}
-		#endif
-			.importFromOlympiaLegacyWallet(with: store)
-			.factorSources(with: store)
-			.manageP2PLinks(with: store)
-			.gatewaySettings(with: store)
-			.authorizedDapps(with: store)
-			.personas(with: store)
-			.generalSettings(with: store)
-			.profileBackups(with: store)
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.factorSources(with: destinationStore)
+			.manageP2PLinks(with: destinationStore)
+			.gatewaySettings(with: destinationStore)
+			.authorizedDapps(with: destinationStore)
+			.personas(with: destinationStore)
+			.generalSettings(with: destinationStore)
+			.profileBackups(with: destinationStore)
+			.ledgerHardwareWallets(with: destinationStore)
 	}
 }
 
 extension View {
 	@MainActor
-	private func importFromOlympiaLegacyWallet(with store: StoreOf<AppSettings>) -> some View {
-		self.sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
 			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
@@ -135,9 +120,9 @@ extension View {
 	}
 
 	@MainActor
-	private func factorSources(with store: StoreOf<AppSettings>) -> some View {
-		self.navigationDestination(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func factorSources(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.manageFactorSources,
 			action: AppSettings.Destinations.Action.manageFactorSources,
 			destination: { ManageFactorSources.View(store: $0) }
@@ -145,9 +130,9 @@ extension View {
 	}
 
 	@MainActor
-	private func manageP2PLinks(with store: StoreOf<AppSettings>) -> some View {
-		self.navigationDestination(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.manageP2PLinks,
 			action: AppSettings.Destinations.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
@@ -155,9 +140,9 @@ extension View {
 	}
 
 	@MainActor
-	private func gatewaySettings(with store: StoreOf<AppSettings>) -> some View {
-		self.navigationDestination(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.gatewaySettings,
 			action: AppSettings.Destinations.Action.gatewaySettings,
 			destination: { GatewaySettings.View(store: $0) }
@@ -165,9 +150,9 @@ extension View {
 	}
 
 	@MainActor
-	fileprivate func authorizedDapps(with store: StoreOf<AppSettings>) -> some View {
-		self.navigationDestination(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func authorizedDapps(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.authorizedDapps,
 			action: AppSettings.Destinations.Action.authorizedDapps,
 			destination: { AuthorizedDapps.View(store: $0) }
@@ -175,9 +160,9 @@ extension View {
 	}
 
 	@MainActor
-	fileprivate func personas(with store: StoreOf<AppSettings>) -> some View {
-		self.navigationDestination(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func personas(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.personas,
 			action: AppSettings.Destinations.Action.personas,
 			destination: { PersonasCoordinator.View(store: $0) }
@@ -185,9 +170,9 @@ extension View {
 	}
 
 	@MainActor
-	private func generalSettings(with store: StoreOf<AppSettings>) -> some View {
-		self.navigationDestination(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func generalSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.generalSettings,
 			action: AppSettings.Destinations.Action.generalSettings,
 			destination: { GeneralSettings.View(store: $0) }
@@ -195,14 +180,46 @@ extension View {
 	}
 
 	@MainActor
-	private func profileBackups(with store: StoreOf<AppSettings>) -> some View {
-		self.navigationDestination(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+	private func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
 			state: /AppSettings.Destinations.State.profileBackups,
 			action: AppSettings.Destinations.Action.profileBackups,
 			destination: { ProfileBackups.View(store: $0) }
 		)
 	}
+
+	@MainActor
+	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
+			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
+			destination: { LedgerHardwareWallets.View(store: $0) }
+		)
+	}
+
+	#if DEBUG
+	@MainActor
+	fileprivate func inspectProfile(with viewStore: ViewStoreOf<AppSettings>) -> some View {
+		navigationDestination(
+			isPresented: viewStore.binding(
+				get: \.isDebugProfileViewSheetPresented,
+				send: { .setDebugProfileSheet(isPresented: $0) }
+			)
+		) {
+			if let profile = viewStore.profileToInspect {
+				ProfileView(
+					profile: profile,
+					// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+					secureStorageClient: SecureStorageClient.liveValue
+				)
+			} else {
+				Text(L10n.Settings.noProfileText)
+			}
+		}
+	}
+	#endif
 }
 
 // MARK: - SettingsRowModel
@@ -221,43 +238,6 @@ extension AppSettings.View {
 			self.asset = asset
 			self.action = action
 		}
-	}
-
-	@MainActor
-	private func settingsRows() -> [RowModel] {
-		[
-			.init(
-				title: L10n.Settings.linkedConnectors,
-				asset: AssetResource.desktopConnections,
-				action: .manageP2PLinksButtonTapped
-			),
-			.init(
-				title: L10n.Settings.gateways,
-				asset: AssetResource.gateway,
-				action: .gatewaysButtonTapped
-			),
-			.init(
-				title: L10n.Settings.authorizedDapps,
-				asset: AssetResource.authorizedDapps,
-				action: .authorizedDappsButtonTapped
-			),
-			.init(
-				title: L10n.Settings.personas,
-				asset: AssetResource.personas,
-				action: .personasButtonTapped
-			),
-			.init(
-				title: L10n.Settings.appSettings,
-				asset: AssetResource.generalSettings,
-				action: .generalSettingsButtonTapped
-			),
-			.init(
-				title: L10n.Settings.backups,
-				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
-				asset: AssetResource.backups,
-				action: .profileBackupsTapped
-			),
-		]
 	}
 
 	@MainActor
@@ -318,8 +298,8 @@ extension AppSettings.View {
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.padding(.bottom, .medium1)
-					#if DEBUG
 
+					#if DEBUG
 					Text(viewStore.debugAppInfo)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
@@ -331,6 +311,48 @@ extension AppSettings.View {
 				viewStore.send(.appeared)
 			}
 		}
+	}
+
+	@MainActor
+	private func settingsRows() -> [RowModel] {
+		[
+			.init(
+				title: L10n.Settings.linkedConnectors,
+				asset: AssetResource.desktopConnections,
+				action: .manageP2PLinksButtonTapped
+			),
+			.init(
+				title: L10n.Settings.gateways,
+				asset: AssetResource.gateway,
+				action: .gatewaysButtonTapped
+			),
+			.init(
+				title: L10n.Settings.authorizedDapps,
+				asset: AssetResource.authorizedDapps,
+				action: .authorizedDappsButtonTapped
+			),
+			.init(
+				title: L10n.Settings.personas,
+				asset: AssetResource.personas,
+				action: .personasButtonTapped
+			),
+			.init(
+				title: L10n.Settings.appSettings,
+				asset: AssetResource.generalSettings,
+				action: .generalSettingsButtonTapped
+			),
+			.init(
+				title: L10n.Settings.backups,
+				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
+				asset: AssetResource.backups,
+				action: .profileBackupsButtonTapped
+			),
+			.init(
+				title: "Ledger Hardware Wallets", // FIXME: Strings
+				asset: AssetResource.generalSettings, // FIXME: asset
+				action: .ledgerHardwareWalletsButtonTapped
+			),
+		]
 	}
 }
 

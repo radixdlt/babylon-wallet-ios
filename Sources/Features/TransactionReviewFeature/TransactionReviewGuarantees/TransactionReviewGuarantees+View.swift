@@ -30,11 +30,10 @@ extension TransactionReviewGuarantees {
 							.multilineTextAlignment(.center)
 							.padding(.vertical, .medium3)
 
-						Button(L10n.TransactionReview.Guarantees.howDoGuaranteesWork, asset: AssetResource.info) {
+						Button(L10n.TransactionReview.Guarantees.howDoGuaranteesWork) {
 							ViewStore(store).send(.view(.infoTapped))
 						}
-						.textStyle(.body1Header)
-						.foregroundColor(.app.blue2)
+						.buttonStyle(.info)
 						.padding(.horizontal, .large2)
 						.padding(.bottom, .medium1)
 

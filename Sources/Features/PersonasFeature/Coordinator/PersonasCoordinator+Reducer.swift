@@ -91,7 +91,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 		case .personaList(.delegate(.createNewPersona)):
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
-			let isFirstOnThisNetwork = state.personaList.personas.count == 0
+			let isFirstOnThisNetwork = state.personaList.personas.isEmpty
 			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
 			state.createPersonaCoordinator = .init(config: .init(

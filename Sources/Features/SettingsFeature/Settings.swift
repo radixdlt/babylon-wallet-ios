@@ -5,6 +5,7 @@ import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
+import LedgerHardwareWalletsFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -51,7 +52,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case generalSettingsButtonTapped
 		case factorSourcesButtonTapped
 		case importFromOlympiaWalletButtonTapped
-		case profileBackupsTapped
+		case profileBackupsButtonTapped
+		case ledgerHardwareWalletsButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -92,6 +94,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case personas(PersonasCoordinator.State)
 			case generalSettings(GeneralSettings.State)
 			case profileBackups(ProfileBackups.State)
+			case ledgerHardwareWallets(LedgerHardwareWallets.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -104,6 +107,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case personas(PersonasCoordinator.Action)
 			case generalSettings(GeneralSettings.Action)
 			case profileBackups(ProfileBackups.Action)
+			case ledgerHardwareWallets(LedgerHardwareWallets.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -130,6 +134,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.profileBackups, action: /Action.profileBackups) {
 				ProfileBackups()
+			}
+			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
+				LedgerHardwareWallets()
 			}
 		}
 	}
@@ -204,8 +211,12 @@ public struct AppSettings: Sendable, FeatureReducer {
 			state.destination = .generalSettings(.init())
 			return .none
 
-		case .profileBackupsTapped:
+		case .profileBackupsButtonTapped:
 			state.destination = .profileBackups(.init())
+			return .none
+
+		case .ledgerHardwareWalletsButtonTapped:
+			state.destination = .ledgerHardwareWallets(.init())
 			return .none
 
 		#if DEBUG
