@@ -280,7 +280,6 @@ extension ImportOlympiaWalletCoordinator {
 			)
 
 			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
-				// We have not yet saved the factorSource, so lets do that
 				guard try factorSourceToSave.id == FactorSource.id(fromPrivateHDFactorSource: factorSource) else {
 					throw OlympiaFactorSourceToSaveIDDisrepancy()
 				}
@@ -289,14 +288,25 @@ extension ImportOlympiaWalletCoordinator {
 					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
 						mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
 						hdOnDeviceFactorSource: factorSourceToSave
-					)
-					)
-
+					))
 				} catch {
-					let msg = "Failed to save factor source (mnemonic) but have already created accounts, error: \(error)"
-					loggerGlobal.critical(.init(stringLiteral: msg))
-					assertionFailure(msg)
-					errorQueue.schedule(error)
+					// Check if we have already imported this Mnemonic
+					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id) {
+						if existing.kind == .device, existing.supportsOlympia {
+							// all good, we had already imported it.
+							loggerGlobal.notice("We had already imported this factor source (mnemonic) before.")
+						} else {
+							let msg = "Failed to save factor source (mnemonic), found existing but it is not of .device kind or does not support olympia params. error: \(error)"
+							loggerGlobal.critical(.init(stringLiteral: msg))
+							assertionFailure(msg)
+							errorQueue.schedule(error)
+						}
+					} else {
+						let msg = "Failed to save factor source (mnemonic) but have already created accounts, error: \(error)"
+						loggerGlobal.critical(.init(stringLiteral: msg))
+						assertionFailure(msg)
+						errorQueue.schedule(error)
+					}
 				}
 			}
 
