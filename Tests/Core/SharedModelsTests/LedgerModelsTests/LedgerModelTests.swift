@@ -34,6 +34,7 @@ final class LedgerModelTests: TestCase {
 		)
 	}
 
+	// TODO: use this when CE has support for it: https://rdxworks.slack.com/archives/C03QFAWBRNX/p1684748435008259?thread_ts=1684677908.435869&cid=C03QFAWBRNX
 	/*
 	 func test_decode_derivePublicKeys() throws {
 	 	let json: JSON = [

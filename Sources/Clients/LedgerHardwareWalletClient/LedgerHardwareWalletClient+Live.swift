@@ -111,7 +111,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				)
 			},
 			derivePublicKeys: { keysParams, factorSource in
-				// TODO: use when Sowa has impl support for hit
+
+				// TODO: use this when CE has support for it: https://rdxworks.slack.com/archives/C03QFAWBRNX/p1684748435008259?thread_ts=1684677908.435869&cid=C03QFAWBRNX
 				/*
 				 let response = try await makeRequest(
 				 	.derivePublicKeys(.init(
@@ -265,7 +266,7 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 		public let derivationPath: DerivationPath
 	}
 
-	// TODO: use this when CE has support for it
+	// TODO: use this when CE has support for it: https://rdxworks.slack.com/archives/C03QFAWBRNX/p1684748435008259?thread_ts=1684677908.435869&cid=C03QFAWBRNX
 	/*
 	 func validate(hashed: Data) throws -> Validated {
 	 	let hdPubKey = try self.derivedPublicKey.hdPubKey()
