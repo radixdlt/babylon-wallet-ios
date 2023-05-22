@@ -98,12 +98,6 @@ extension ChooseReceivingAccount.View {
 				#endif
 			}
 		}
-		.frame(maxWidth: .infinity)
-		.presentationDragIndicator(.visible)
-		.presentationDetents([.fraction(0.9)])
-		#if os(iOS)
-			.presentationBackground(.blur)
-		#endif
 	}
 
 	private func addressField(_ viewStore: ViewStoreOf<ChooseReceivingAccount>) -> some View {
