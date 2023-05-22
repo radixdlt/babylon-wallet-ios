@@ -4,8 +4,6 @@ import FeaturePrelude
 
 // MARK: - LedgerHardwareWallets
 public struct LedgerHardwareWallets: Sendable, FeatureReducer {
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
-
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
@@ -37,6 +35,8 @@ public struct LedgerHardwareWallets: Sendable, FeatureReducer {
 	}
 
 	// MARK: - Reducer
+
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 

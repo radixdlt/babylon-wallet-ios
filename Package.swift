@@ -222,6 +222,7 @@ package.addModules([
 	),
 	.feature(
 		name: "LedgerHardwareWalletsFeature",
+		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
 			"FactorSourcesClient",
