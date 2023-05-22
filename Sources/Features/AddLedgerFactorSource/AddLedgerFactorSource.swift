@@ -13,6 +13,12 @@ public struct UnnamedLedger: Sendable, Hashable {
 	public let model: P2P.LedgerHardwareWallet.Model
 }
 
+// MARK: - UnnamedOlympiaLedgerWithValidatedAccounts
+public struct UnnamedOlympiaLedgerWithValidatedAccounts: Sendable, Hashable {
+	let unnamedLedger: UnnamedLedger
+	let olympiaAccountsValidation: OlympiaAccountsValidation
+}
+
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -24,12 +30,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destinations.State? = nil
 
-		public let olympiaAccountsToImport: Set<OlympiaAccountToMigrate>?
+		public var olympiaAccountsValidation: OlympiaAccountsValidation?
 
 		public init(
 			olympiaAccountsToImport: Set<OlympiaAccountToMigrate>? = nil
 		) {
-			self.olympiaAccountsToImport = olympiaAccountsToImport
+			self.olympiaAccountsValidation = olympiaAccountsToImport.map { OlympiaAccountsValidation(validated: [], unvalidated: $0) } ?? nil
 		}
 	}
 
@@ -39,7 +45,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case sendAddLedgerRequestButtonTapped
 		case ledgerNameChanged(String)
 		case confirmNameButtonTapped
-		case skipNamingLedgerButtonTapped
 
 		public enum CloseLedgerAlreadyExistsDialogAction: Sendable, Hashable {
 			case tryAnotherLedger
@@ -52,9 +57,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case getDeviceInfoResult(
 			TaskResult<UnnamedLedger>
 		)
+		case getOlympiaDeviceResult(TaskResult<UnnamedOlympiaLedgerWithValidatedAccounts>)
 		case alreadyExists(LedgerFactorSource)
 		case nameLedgerBeforeAddingIt(UnnamedLedger)
-		case addedFactorSource(LedgerFactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
 		case saveNewConnection(P2PLink)
 	}
 
@@ -64,9 +69,10 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case completed(
-			ledger: LedgerFactorSource
+			ledger: LedgerFactorSource,
+			isNew: Bool,
+			olympiaAccountsValidation: OlympiaAccountsValidation?
 		)
-		case alreadyExists(LedgerFactorSource)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -137,17 +143,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			}
 			return addFactorSource(
 				name: name,
-				unnamedDeviceToAdd: device
-			)
-
-		case .skipNamingLedgerButtonTapped:
-			guard let device = state.unnamedDeviceToAdd else {
-				assertionFailure("Expected device to name")
-				return .none
-			}
-			return addFactorSource(
-				name: nil,
-				unnamedDeviceToAdd: device
+				unnamedDeviceToAdd: device,
+				olympiaAccountsValidation: state.olympiaAccountsValidation
 			)
 		}
 	}
@@ -171,9 +168,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.finish(ledger)))):
-			return .task {
+			return .task { [olympiaAccountsValidation = state.olympiaAccountsValidation] in
 				await dismiss()
-				return .delegate(.alreadyExists(ledger))
+				return .delegate(.completed(ledger: ledger, isNew: false, olympiaAccountsValidation: olympiaAccountsValidation))
 			}
 
 		case .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.tryAnotherLedger))):
@@ -184,6 +181,34 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
+	private func gotDevice(
+		_ ledgerDeviceInfo: UnnamedLedger,
+		_ state: inout State
+	) -> EffectTask<Action> {
+		state.isWaitingForResponseFromLedger = false
+		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
+		return .run { send in
+			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
+				let ledger = try LedgerFactorSource(factorSource: existing)
+				await send(.internal(.alreadyExists(ledger)))
+			} else {
+				// new!
+				await send(.internal(.nameLedgerBeforeAddingIt(
+					ledgerDeviceInfo
+				)))
+			}
+		} catch: { _, send in
+			await send(.internal(.nameLedgerBeforeAddingIt(ledgerDeviceInfo)))
+		}
+	}
+
+	private func failedToGetDevice(_ state: inout State, error: Swift.Error) -> EffectTask<Action> {
+		state.isWaitingForResponseFromLedger = false
+		loggerGlobal.error("Failed to get ledger device info: \(error)")
+		errorQueue.schedule(error)
+		return .none
+	}
+
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .isConnectedToAnyConnectorExtension(isConnectedToAnyCE):
@@ -192,21 +217,17 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			return .none
 
 		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
-			state.isWaitingForResponseFromLedger = false
-			loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
-			return .run { send in
-				if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
-					let ledger = try LedgerFactorSource(factorSource: existing)
-					await send(.internal(.alreadyExists(ledger)))
-				} else {
-					// new!
-					await send(.internal(.nameLedgerBeforeAddingIt(
-						ledgerDeviceInfo
-					)))
-				}
-			} catch: { _, send in
-				await send(.internal(.nameLedgerBeforeAddingIt(ledgerDeviceInfo)))
-			}
+			return gotDevice(ledgerDeviceInfo, &state)
+
+		case let .getDeviceInfoResult(.failure(error)):
+			return failedToGetDevice(&state, error: error)
+
+		case let .getOlympiaDeviceResult(.success(deviceWithAccounts)):
+			state.olympiaAccountsValidation = deviceWithAccounts.olympiaAccountsValidation
+			return gotDevice(deviceWithAccounts.unnamedLedger, &state)
+
+		case let .getOlympiaDeviceResult(.failure(error)):
+			return failedToGetDevice(&state, error: error)
 
 		case let .alreadyExists(ledger):
 
@@ -230,30 +251,22 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			state.unnamedDeviceToAdd = unnamedDevice
 			return .none
 
-		case let .getDeviceInfoResult(.failure(error)):
-			state.isWaitingForResponseFromLedger = false
-			loggerGlobal.error("Failed to get ledger device info: \(error)")
-			errorQueue.schedule(error)
-			return .none
-
 		case .saveNewConnection:
 			state.isConnectedToAnyCE = true
 			return .none
-
-		case let .addedFactorSource(factorSource, _, _):
-			return .send(.delegate(.completed(ledger: factorSource)))
 		}
 	}
 
 	private func addFactorSource(
 		name: String?,
-		unnamedDeviceToAdd device: UnnamedLedger
+		unnamedDeviceToAdd device: UnnamedLedger,
+		olympiaAccountsValidation: OlympiaAccountsValidation?
 	) -> EffectTask<Action> {
 		let model = FactorSource.LedgerHardwareWallet.DeviceModel(model: device.model)
 
 		loggerGlobal.notice("Creating factor source for Ledger...")
 
-		let factorSource = FactorSource.ledger(
+		let ledger = FactorSource.ledger(
 			id: device.id,
 			model: model,
 			name: name
@@ -262,9 +275,10 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		loggerGlobal.notice("Created factor source for Ledger! adding it now")
 
 		return .run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(factorSource.factorSource)
+			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.internal(.addedFactorSource(factorSource, model, name: name)))
+//			await send(.internal(.addedFactorSource(factorSource, model, name: name)))
+			await send(.delegate(.completed(ledger: ledger, isNew: true, olympiaAccountsValidation: olympiaAccountsValidation)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
 			errorQueue.schedule(error)
@@ -273,11 +287,16 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func sendAddLedgerRequest(_ state: inout State) -> EffectTask<Action> {
 		state.isWaitingForResponseFromLedger = true
-		if let olympiaAccountsToValidate = state.olympiaAccountsToImport {
+		if let olympiaAccountsValidation = state.olympiaAccountsValidation {
 			return .task {
-				let device = try await ledgerHardwareWalletClient.importOlympiaDevice(olympiaAccountsToValidate)
-				let (validated, unvalidated) = try await validate(device, olympiaAccountsToValidate: olympiaAccountsToValidate)
-				fatalError()
+				await .internal(.getOlympiaDeviceResult(TaskResult {
+					let device = try await ledgerHardwareWalletClient.importOlympiaDevice(olympiaAccountsValidation.unvalidated)
+					let olympiaAccountsValidation = try await validate(device, olympiaAccountsToValidate: olympiaAccountsValidation.unvalidated)
+					return .init(
+						unnamedLedger: .init(id: device.id, model: device.model),
+						olympiaAccountsValidation: olympiaAccountsValidation
+					)
+				}))
 			}
 		} else {
 			return .task {
@@ -292,11 +311,14 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	private func validate(
 		_ olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice,
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
-	) async throws -> (validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
+	) async throws -> OlympiaAccountsValidation {
 		var olympiaAccountsToValidate = olympiaAccountsToValidate
 		guard !olympiaDevice.derivedPublicKeys.isEmpty else {
 			loggerGlobal.warning("Response contained no public keys at all.")
-			return (validated: [], unvalidated: olympiaAccountsToValidate)
+			return OlympiaAccountsValidation(
+				validated: [],
+				unvalidated: olympiaAccountsToValidate
+			)
 		}
 		let derivedKeys = try Set(
 			olympiaDevice
@@ -314,7 +336,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 		guard let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>.init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))) else {
 			loggerGlobal.warning("No accounts to migrated.")
-			return (validated: [], unvalidated: olympiaAccountsToValidate)
+			return OlympiaAccountsValidation(validated: [], unvalidated: olympiaAccountsToValidate)
 		}
 		loggerGlobal.notice("Prompting to name ledger with ID=\(olympiaDevice.id) before migrating #\(verifiedToBeMigrated.count) accounts.")
 
@@ -322,8 +344,17 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			olympiaAccountsToValidate.remove(verifiedAccountToMigrate)
 		}
 
-		return (validated: olympiaAccountsToMigrate, unvalidated: olympiaAccountsToValidate)
+		return OlympiaAccountsValidation(
+			validated: olympiaAccountsToMigrate,
+			unvalidated: olympiaAccountsToValidate
+		)
 	}
+}
+
+// MARK: - OlympiaAccountsValidation
+public struct OlympiaAccountsValidation: Sendable, Hashable {
+	public let validated: Set<OlympiaAccountToMigrate>
+	public let unvalidated: Set<OlympiaAccountToMigrate>
 }
 
 extension FactorSource.LedgerHardwareWallet.DeviceModel {

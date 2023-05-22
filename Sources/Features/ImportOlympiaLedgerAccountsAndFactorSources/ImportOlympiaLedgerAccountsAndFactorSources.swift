@@ -31,9 +31,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		/// unverified, to verify and migrate
 		public var unverified: Set<OlympiaAccountToMigrate>
 
-		/// verified but not yet migrated, to be migrated/converted
-		public var verifiedToBeMigrated: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
-
 		/// verified and migrated
 		public var ledgersWithAccounts: OrderedSet<LedgerWithAccounts> = []
 
@@ -97,7 +94,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case let .migratedOlympiaHardwareAccounts(ledgerWithAccounts):
 			loggerGlobal.notice("Adding Ledger with accounts...")
 			state.ledgersWithAccounts.append(ledgerWithAccounts)
-			state.verifiedToBeMigrated = nil
 
 			return continueWithRestOfAccountsIfNeeded(state: &state)
 		}
@@ -105,18 +101,16 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .addLedgerFactorSource(.presented(.delegate(.completed(ledger)))):
-			return convertHardwareAccountsToBabylon(
-				isLedgerNew: true,
-				ledger: ledger,
-				state
-			)
+		case let .addLedgerFactorSource(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
+			let validatedAccounts = olympiaAccountsValidation?.validated ?? []
 
-		case let .addLedgerFactorSource(.presented(.delegate(.alreadyExists(ledger)))):
-
+			for validatedAccount in validatedAccounts {
+				state.unverified.remove(validatedAccount)
+			}
 			return convertHardwareAccountsToBabylon(
-				isLedgerNew: false,
+				isLedgerNew: isNew,
 				ledger: ledger,
+				validatedAccountsToMigrate: validatedAccounts,
 				state
 			)
 
@@ -127,12 +121,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	private func convertHardwareAccountsToBabylon(
 		isLedgerNew: Bool,
 		ledger: LedgerFactorSource,
+		validatedAccountsToMigrate olympiaAccounts: Set<OlympiaAccountToMigrate>,
 		_ state: State
 	) -> EffectTask<Action> {
-		guard let olympiaAccounts = state.verifiedToBeMigrated else {
-			assertionFailure("Expected verified accounts to migrated")
-			return .none
-		}
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
 		let ledgerName = ledger.label.rawValue
 
@@ -142,7 +133,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			// Migrates and saved all accounts to Profile
 			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 				.init(
-					olympiaAccounts: Set(olympiaAccounts.elements),
+					olympiaAccounts: Set(olympiaAccounts),
 					ledgerFactorSourceID: ledger.id
 				)
 			)
@@ -173,7 +164,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		} else {
 			loggerGlobal.notice("state.unverified not empty #\(state.unverified.count) unverfied remain, preparing to send importOlympiaDevice request...")
 
-			state.addLedgerFactorSource = .some(.init())
+			state.addLedgerFactorSource = .init(olympiaAccountsToImport: state.unverified)
 
 			return .none
 		}

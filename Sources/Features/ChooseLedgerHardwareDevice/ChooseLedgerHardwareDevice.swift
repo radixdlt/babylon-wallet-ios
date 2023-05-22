@@ -84,7 +84,8 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .addNewLedger(.presented(.delegate(.completed(ledger)))):
+		case let .addNewLedger(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
+			assert(olympiaAccountsValidation == nil, "Unexpected Olympia Account validation")
 			state.addNewLedger = nil
 			state.selectedLedgerID = ledger.id
 			state.ledgers[id: ledger.id] = ledger
