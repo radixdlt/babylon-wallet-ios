@@ -49,11 +49,11 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 				}
 				.sheet(
 					store: store.scope(
-						state: \.$addLedgerFactorSource,
-						action: { .child(.addLedgerFactorSource($0)) }
+						state: \.$derivePublicKeys,
+						action: { .child(.derivePublicKeys($0)) }
 					),
 					content: {
-						AddLedgerFactorSource.View(store: $0)
+						DerivePublicKeys.View(store: $0)
 					}
 				)
 

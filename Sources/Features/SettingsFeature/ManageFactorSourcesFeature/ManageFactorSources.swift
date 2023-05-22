@@ -78,7 +78,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			state.destination = .importOlympiaFactorSource(.init(shouldPersist: true))
 			return .none
 		case .addLedgerButtonTapped:
-			state.destination = .addLedger(.init(olympiaAccountsValidation: nil))
+			state.destination = .addLedger(.init())
 			return .none
 		}
 	}

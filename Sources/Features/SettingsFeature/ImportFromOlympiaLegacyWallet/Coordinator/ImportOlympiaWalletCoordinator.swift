@@ -106,6 +106,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	private func migrateHardwareAccounts(
+		_ hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+	) -> EffectTask<Action> {
+		.task {
+			let networkID = await factorSourcesClient.getCurrentNetworkID()
+			return .internal(.migrateHardwareAccounts(hardwareAccounts, networkID))
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .root(.scanMultipleOlympiaQRCodes(.delegate(.finishedScanning(olympiaWallet)))):
@@ -143,10 +152,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					state.path.append(destination)
 				}
 			} else if let hardwareAccounts = accounts.hardware {
-				return .task {
-					let networkID = await factorSourcesClient.getCurrentNetworkID()
-					return .internal(.migrateHardwareAccounts(hardwareAccounts, networkID))
-				}
+				return migrateHardwareAccounts(hardwareAccounts)
 			}
 
 			return .none
@@ -227,12 +233,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			if let hardwareAccounts = state.selectedAccounts?.hardware {
 				state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
 				// also need to add ledger and then migrate hardware account
-				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
-					hardwareAccounts: hardwareAccounts
-				))
-				if state.path.last != destination {
-					state.path.append(destination)
-				}
+				return migrateHardwareAccounts(hardwareAccounts)
 			} else {
 				assert(state.selectedAccounts?.hardware == nil)
 				// no hardware accounts to migrate...
