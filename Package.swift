@@ -221,6 +221,15 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "LedgerHardwareWalletsFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AddLedgerFactorSourceFeature",
+			"FactorSourcesClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "MainFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -230,7 +239,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
@@ -305,6 +313,7 @@ package.addModules([
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
 			"InspectProfileFeature",
+			"LedgerHardwareWalletsFeature",
 			"MnemonicClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
