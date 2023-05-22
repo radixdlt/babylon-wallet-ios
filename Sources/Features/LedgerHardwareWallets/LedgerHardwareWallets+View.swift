@@ -23,7 +23,7 @@ extension LedgerHardwareWallets.View {
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Link)
 						Button("What is a Ledger Factor Source") { // FIXME: Strings
-							print("TAP")
+							viewStore.send(.whatIsALedgerButtonTapped)
 						}
 						.buttonStyle(.info)
 

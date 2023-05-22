@@ -24,6 +24,7 @@ public struct LedgerHardwareWallets: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case onFirstTask
 		case addNewLedgerButtonTapped
+		case whatIsALedgerButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -53,6 +54,10 @@ public struct LedgerHardwareWallets: Sendable, FeatureReducer {
 			return updateLedgersEffekt(state: &state)
 
 		case .addNewLedgerButtonTapped:
+			state.addNewLedger = .init()
+			return .none
+
+		case .whatIsALedgerButtonTapped:
 			state.addNewLedger = .init()
 			return .none
 		}

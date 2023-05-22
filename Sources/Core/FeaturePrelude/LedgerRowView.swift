@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 // MARK: - LedgerRowView
@@ -17,24 +18,17 @@ public struct LedgerRowView: View {
 
 	private let viewState: ViewState
 	private let isSelected: Bool?
-	private let action: () -> Void
+	private let action: (() -> Void)?
 
-	/// Initialises a plain LedgerRowView
-	public init(viewState: ViewState) {
-		self.viewState = viewState
-		self.isSelected = nil
-		self.action = {}
-	}
-
-	/// Initialises a selectable LedgerRowView
-	public init(viewState: ViewState, isSelected: Bool, action: @escaping () -> Void) {
+	/// If `isSelected` is non-nil, the card will have a radio button. If an action is supplied, it will be tappable.
+	public init(viewState: ViewState, isSelected: Bool? = nil, action: (() -> Void)? = nil) {
 		self.viewState = viewState
 		self.isSelected = isSelected
 		self.action = action
 	}
 
 	public var body: some View {
-		Button(action: action) {
+		Card(.app.gray5, action: action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					Text(viewState.description)
@@ -45,7 +39,7 @@ public struct LedgerRowView: View {
 					HPair(label: L10n.CreateEntity.Ledger.addedHeading, item: viewState.addedOn)
 				}
 
-				Spacer()
+				Spacer(minLength: 0)
 
 				if let isSelected {
 					RadioButton(
@@ -54,12 +48,8 @@ public struct LedgerRowView: View {
 					)
 				}
 			}
-			.foregroundColor(.app.white)
+			.foregroundColor(.app.gray1)
 			.padding(.medium1)
-			.background(.black)
-			.brightness(isSelected == true ? -0.1 : 0)
-			.cornerRadius(.small1)
 		}
-		.buttonStyle(.inert)
 	}
 }

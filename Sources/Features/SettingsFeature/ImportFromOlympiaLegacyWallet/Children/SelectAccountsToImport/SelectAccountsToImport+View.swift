@@ -148,18 +148,17 @@ enum SelectAccountsToImportRow {
 					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.name, item: viewState.accountName)
 
 					VStack(alignment: .leading, spacing: .small3) {
-						Group {
-							Text(L10n.ImportLegacyWallet.SelectAccountsToImport.olympiaAddress)
-								.textStyle(.body2Header)
+						Text(L10n.ImportLegacyWallet.SelectAccountsToImport.olympiaAddress)
+							.textStyle(.body2Header)
 
-							Text(viewState.olympiaAddress)
-								.textStyle(.monospace)
-								.frame(maxWidth: .infinity, alignment: .leading)
-						}
-						.foregroundColor(.app.white)
+						Text(viewState.olympiaAddress)
+							.textStyle(.monospace)
+							.frame(maxWidth: .infinity, alignment: .leading)
 					}
 					HPair(label: L10n.ImportLegacyWallet.SelectAccountsToImport.derivationPath, item: viewState.derivationPath)
 				}
+				.foregroundColor(.app.white)
+
 				Spacer()
 
 				if !isAlreadyImported {
