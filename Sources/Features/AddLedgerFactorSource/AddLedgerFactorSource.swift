@@ -7,18 +7,30 @@ import Profile
 import RadixConnectClient
 import SharedModels
 
+// MARK: - UnnamedLedger
+public struct UnnamedLedger: Sendable, Hashable {
+	public let id: FactorSource.ID
+	public let model: P2P.LedgerHardwareWallet.Model
+}
+
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var isConnectedToAnyCE = false
 		public var ledgerName = ""
 		public var isWaitingForResponseFromLedger = false
-		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo?
+		public var unnamedDeviceToAdd: UnnamedLedger?
 
 		@PresentationState
 		var destination: Destinations.State? = nil
 
-		public init() {}
+		public let olympiaAccountsToImport: Set<OlympiaAccountToMigrate>?
+
+		public init(
+			olympiaAccountsToImport: Set<OlympiaAccountToMigrate>? = nil
+		) {
+			self.olympiaAccountsToImport = olympiaAccountsToImport
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -31,17 +43,17 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 		public enum CloseLedgerAlreadyExistsDialogAction: Sendable, Hashable {
 			case tryAnotherLedger
-			case finish
+			case finish(LedgerFactorSource)
 		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case isConnectedToAnyConnectorExtension(Bool)
 		case getDeviceInfoResult(
-			TaskResult<P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo>
+			TaskResult<UnnamedLedger>
 		)
-		case alreadyExists(FactorSource)
-		case nameLedgerBeforeAddingIt(P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo)
+		case alreadyExists(LedgerFactorSource)
+		case nameLedgerBeforeAddingIt(UnnamedLedger)
 		case addedFactorSource(LedgerFactorSource, FactorSource.LedgerHardwareWallet.DeviceModel, name: String?)
 		case saveNewConnection(P2PLink)
 	}
@@ -54,6 +66,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case completed(
 			ledger: LedgerFactorSource
 		)
+		case alreadyExists(LedgerFactorSource)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -78,7 +91,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
-	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	public init() {}
 
@@ -94,7 +107,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case .task:
 
 			return .run { send in
-				for try await isConnected in await ledgerHardwareClient.isConnectedToAnyConnectorExtension() {
+				for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
 					guard !Task.isCancelled else {
 						return
 					}
@@ -157,8 +170,11 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.finish))):
-			return .fireAndForget { await dismiss() }
+		case let .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.finish(ledger)))):
+			return .task {
+				await dismiss()
+				return .delegate(.alreadyExists(ledger))
+			}
 
 		case .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.tryAnotherLedger))):
 			return sendAddLedgerRequest(&state)
@@ -180,7 +196,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 			return .run { send in
 				if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
-					await send(.internal(.alreadyExists(existing)))
+					let ledger = try LedgerFactorSource(factorSource: existing)
+					await send(.internal(.alreadyExists(ledger)))
 				} else {
 					// new!
 					await send(.internal(.nameLedgerBeforeAddingIt(
@@ -191,20 +208,20 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 				await send(.internal(.nameLedgerBeforeAddingIt(ledgerDeviceInfo)))
 			}
 
-		case let .alreadyExists(existingFactorSource):
+		case let .alreadyExists(ledger):
 
 			state.destination = .closeLedgerAlreadyExistsConfirmationDialog(
 				.init(titleVisibility: .hidden) {
 					TextState("")
 				} actions: {
-					ButtonState(role: .destructive, action: .send(.finish)) {
-						TextState("Finish adding ledgers..")
+					ButtonState(action: .send(.finish(ledger))) {
+						TextState("OK")
 					}
 					ButtonState(role: .cancel, action: .send(.tryAnotherLedger)) {
 						TextState("Connect a different Ledger to computer")
 					}
 				} message: {
-					TextState("You have already added this ledger \(existingFactorSource.label.rawValue) \(existingFactorSource.description.rawValue) on \(existingFactorSource.addedOn.ISO8601Format())")
+					TextState("You have already added this ledger \(ledger.label.rawValue) \(ledger.description.rawValue) on \(ledger.addedOn.ISO8601Format())")
 				}
 			)
 			return .none
@@ -230,7 +247,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func addFactorSource(
 		name: String?,
-		unnamedDeviceToAdd device: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
+		unnamedDeviceToAdd device: UnnamedLedger
 	) -> EffectTask<Action> {
 		let model = FactorSource.LedgerHardwareWallet.DeviceModel(model: device.model)
 
@@ -256,11 +273,56 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func sendAddLedgerRequest(_ state: inout State) -> EffectTask<Action> {
 		state.isWaitingForResponseFromLedger = true
-		return .run { send in
-			await send(.internal(.getDeviceInfoResult(TaskResult {
-				try await ledgerHardwareClient.getDeviceInfo()
-			})))
+		if let olympiaAccountsToValidate = state.olympiaAccountsToImport {
+			return .task {
+				let device = try await ledgerHardwareWalletClient.importOlympiaDevice(olympiaAccountsToValidate)
+				let (validated, unvalidated) = try await validate(device, olympiaAccountsToValidate: olympiaAccountsToValidate)
+				fatalError()
+			}
+		} else {
+			return .task {
+				await .internal(.getDeviceInfoResult(TaskResult {
+					let info = try await ledgerHardwareWalletClient.getDeviceInfo()
+					return .init(id: info.id, model: info.model)
+				}))
+			}
 		}
+	}
+
+	private func validate(
+		_ olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice,
+		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
+	) async throws -> (validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
+		var olympiaAccountsToValidate = olympiaAccountsToValidate
+		guard !olympiaDevice.derivedPublicKeys.isEmpty else {
+			loggerGlobal.warning("Response contained no public keys at all.")
+			return (validated: [], unvalidated: olympiaAccountsToValidate)
+		}
+		let derivedKeys = try Set(
+			olympiaDevice
+				.derivedPublicKeys
+				.map { try K1.PublicKey(compressedRepresentation: $0.publicKey.data) }
+		)
+
+		let olympiaAccountsToMigrate = olympiaAccountsToValidate.filter {
+			derivedKeys.contains($0.publicKey)
+		}
+
+		if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !olympiaDevice.derivedPublicKeys.isEmpty {
+			loggerGlobal.critical("Invalid keys from export format?\nolympiaDevice.derivedPublicKeys: \(olympiaDevice.derivedPublicKeys.map { $0.publicKey.data.hex() })\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.compressedRepresentation.hex))")
+		}
+
+		guard let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>.init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))) else {
+			loggerGlobal.warning("No accounts to migrated.")
+			return (validated: [], unvalidated: olympiaAccountsToValidate)
+		}
+		loggerGlobal.notice("Prompting to name ledger with ID=\(olympiaDevice.id) before migrating #\(verifiedToBeMigrated.count) accounts.")
+
+		olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
+			olympiaAccountsToValidate.remove(verifiedAccountToMigrate)
+		}
+
+		return (validated: olympiaAccountsToMigrate, unvalidated: olympiaAccountsToValidate)
 	}
 }
 

@@ -1,14 +1,11 @@
+import AddLedgerFactorSourceFeature
 import FeaturePrelude
 
 extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
 		.init(
-			failedToFindAnyLinks: failedToFindAnyLinks,
-			ledgerName: ledgerName,
-			modelOfLedgerToName: unnamedDeviceToAdd?.model,
 			numberOfUnverifiedAccounts: unverified.count,
-			ledgersWithAccounts: ledgersWithAccounts,
-			viewControlState: isWaitingForResponseFromLedger ? .loading(.global(text: "Waiting for ledger response")) : .enabled
+			ledgersWithAccounts: ledgersWithAccounts
 		)
 	}
 }
@@ -16,12 +13,8 @@ extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources.View
 extension ImportOlympiaLedgerAccountsAndFactorSources {
 	public struct ViewState: Equatable {
-		public let failedToFindAnyLinks: Bool
-		public let ledgerName: String
-		public let modelOfLedgerToName: P2P.LedgerHardwareWallet.Model?
 		public let numberOfUnverifiedAccounts: Int
 		public let ledgersWithAccounts: OrderedSet<LedgerWithAccounts>
-		public let viewControlState: ControlState
 	}
 
 	@MainActor
@@ -38,10 +31,6 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					Text("#\(viewStore.numberOfUnverifiedAccounts) accounts left to import")
 						.textStyle(.body1Header)
 
-					if viewStore.failedToFindAnyLinks {
-						Text("⚠️ Found no open RadixConnect connections. Either open your previously linked browser or Go to settings and link to a new browser.")
-					}
-
 					Spacer()
 
 					if !viewStore.ledgersWithAccounts.isEmpty {
@@ -56,58 +45,18 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					}
 
 					Spacer()
-
-					if let model = viewStore.modelOfLedgerToName {
-						VStack {
-							nameLedgerField(with: viewStore, model: model)
-
-							Button("Confirm name") {
-								viewStore.send(.confirmNameButtonTapped)
-							}
-							.buttonStyle(.primaryRectangular)
-
-							Button("Skip name") {
-								viewStore.send(.skipNamingLedgerButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular(shouldExpand: true))
-						}
-					} else {
-						Button("Send Add Ledger Request") {
-							viewStore.send(.sendAddLedgerRequestButtonTapped)
-						}
-						.controlState(viewStore.viewControlState)
-						.buttonStyle(.primaryRectangular)
-
-						Button("Skip remaining accounts") {
-							viewStore.send(.skipRestOfTheAccounts)
-						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: true))
-					}
 				}
-				.padding(.horizontal, .medium3)
-				.task { @MainActor in await ViewStore(store.stateless).send(.view(.task)).finish()
-				}
-			}
-		}
-
-		@ViewBuilder
-		private func nameLedgerField(
-			with viewStore: ViewStoreOf<ImportOlympiaLedgerAccountsAndFactorSources>,
-			model: P2P.LedgerHardwareWallet.Model
-		) -> some SwiftUI.View {
-			VStack {
-				Text("Found ledger model: '\(model.rawValue)'")
-				AppTextField(
-					primaryHeading: "Name your Ledger",
-					secondaryHeading: "e.g. 'scratch'",
-					placeholder: "scratched",
-					text: .init(
-						get: { viewStore.ledgerName },
-						set: { viewStore.send(.ledgerNameChanged($0)) }
+				.sheet(
+					store: store.scope(
+						state: \.$addLedgerFactorSource,
+						action: { .child(.addLedgerFactorSource($0)) }
 					),
-					hint: .info("Displayed when you are prompted to sign with this.")
+					content: {
+						AddLedgerFactorSource.View(store: $0)
+					}
 				)
-				.padding()
+
+				.padding(.horizontal, .medium3)
 			}
 		}
 	}

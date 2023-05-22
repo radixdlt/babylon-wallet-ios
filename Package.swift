@@ -209,6 +209,7 @@ package.addModules([
 			"FactorSourcesClient",
 			"RadixConnectClient",
 			"ImportLegacyWalletClient",
+			"AddLedgerFactorSourceFeature",
 		],
 		tests: .no
 	),
