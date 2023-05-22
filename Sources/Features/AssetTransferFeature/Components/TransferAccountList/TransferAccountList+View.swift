@@ -58,6 +58,23 @@ extension TransferAccountList.View {
 				.flushedRight
 				.padding(.top, .medium1)
 			}
+			.sheet(
+				store: store.scope(
+					state: \.$destination,
+					action: { .child(.destination($0)) }
+				),
+				content: { destinations($0) }
+			)
+		}
+	}
+
+	private func destinations(_ store: StoreOf<TransferAccountList.Destinations>) -> some View {
+		SwitchStore(store.relay()) {
+			CaseLet(
+				state: /TransferAccountList.Destinations.MainState.chooseAccount,
+				action: TransferAccountList.Destinations.MainAction.chooseAccount,
+				then: { ChooseReceivingAccount.View(store: $0) }
+			)
 		}
 	}
 }

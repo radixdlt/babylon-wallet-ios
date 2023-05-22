@@ -3,7 +3,7 @@ import SwiftUI
 import SwiftUINavigation
 
 // MARK: - AppTextField
-public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
+public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory: View>: View {
 	public struct Focus {
 		let value: FocusValue
 		let binding: Binding<FocusValue>
@@ -24,7 +24,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 	let text: Binding<String>
 	let hint: Hint?
 	let focus: Focus?
+	let showClearButton: Bool
 	let accessory: Accessory
+	let innerAccesory: InnerAccessory
 
 	public init(
 		primaryHeading: String? = nil,
@@ -33,7 +35,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		text: Binding<String>,
 		hint: Hint? = nil,
 		focus: Focus,
-		@ViewBuilder accessory: () -> Accessory = { EmptyView() }
+		showClearButton: Bool = false,
+		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
+		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) {
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
@@ -41,7 +45,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		self.text = text
 		self.hint = hint
 		self.focus = focus
+		self.showClearButton = showClearButton
 		self.accessory = accessory()
+		self.innerAccesory = innerAccessory()
 	}
 
 	public init(
@@ -50,7 +56,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		placeholder: String,
 		text: Binding<String>,
 		hint: Hint? = nil,
-		@ViewBuilder accessory: () -> Accessory = { EmptyView() }
+		showClearButton: Bool = false,
+		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
+		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) where FocusValue == Never {
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
@@ -58,7 +66,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 		self.text = text
 		self.hint = hint
 		self.focus = nil
+		self.showClearButton = showClearButton
 		self.accessory = accessory()
+		self.innerAccesory = innerAccessory()
 	}
 
 	public var body: some View {
@@ -82,29 +92,44 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View>: View {
 					}
 				}
 
-				TextField(
-					placeholder,
-					text: text.removeDuplicates()
-				)
-				.modifier { view in
-					if let focus {
-						view.focused(focus.focusState, equals: focus.value)
-							.bind(focus.binding, to: focus.focusState)
-					} else {
-						view
+				HStack(spacing: .small2) {
+					TextField(
+						placeholder,
+						text: text.removeDuplicates()
+					)
+					.modifier { view in
+						if let focus {
+							view.focused(focus.focusState, equals: focus.value)
+								.bind(focus.binding, to: focus.focusState)
+						} else {
+							view
+						}
 					}
+					.foregroundColor(.app.gray1)
+					.textStyle(.body1Regular)
+					.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
+
+					if showClearButton {
+						if !text.wrappedValue.isEmpty {
+							Button {
+								text.wrappedValue = ""
+							} label: {
+								Image(systemName: "multiply.circle.fill")
+									.foregroundStyle(.gray)
+							}
+						}
+					}
+
+					innerAccesory
 				}
 				.padding()
 				.frame(height: .standardButtonHeight)
 				.background(Color.app.gray5)
-				.foregroundColor(.app.gray1)
-				.textStyle(.body1Regular)
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
 						.stroke(accentColor, lineWidth: 1)
 				)
-				.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
 				hint
 			}

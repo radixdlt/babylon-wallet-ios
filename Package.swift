@@ -66,7 +66,8 @@ package.addModules([
 	.feature(
 		name: "AssetTransferFeature",
 		dependencies: [
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+			"ScanQRFeature",
+			"ChooseAccountsFeature",
 		],
 		tests: .yes()
 	),
