@@ -14,7 +14,7 @@ final class ROLAClientTests: TestCase {
 	}()
 
 	private let wellKnownFilePath = ".well-known/radix.json"
-	private let dAppDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")
+	private let dAppDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke")
 	private func metadata(
 		origin: String,
 		dAppDefinitionAddress: DappDefinitionAddress
@@ -250,7 +250,7 @@ final class ROLAClientTests: TestCase {
 	func testUnhappyPath_whenDappDefinitionAddressIsUnknown_thenUnknownDappDefinitionAddressErrorIsThrown() async throws {
 		// given
 		let origin = "https://origin.com"
-		let unknownDappDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh-unknown") // TODO: use another valid DappDefinitionAddress
+		let unknownDappDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_c_1pycvv2pummryhvmr6tveuva4cgap63lapgu5y4eeqlwstajjxx") // TODO: use another valid DappDefinitionAddress
 		let metadata = metadata(origin: origin, dAppDefinitionAddress: unknownDappDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
 		let expectedURL = URL(string: "/.well-known/radix.json")!

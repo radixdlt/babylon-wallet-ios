@@ -288,7 +288,7 @@ final class ProfileTests: TestCase {
 		let authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
-				dAppDefinitionAddress: .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
+				dAppDefinitionAddress: .init(address: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"),
 				displayName: "RadiSwap",
 				referencesToAuthorizedPersonas:
 				.init(arrayLiteral:
@@ -417,7 +417,7 @@ final class ProfileTests: TestCase {
 		// Account 0
 		XCTAssertEqual(
 			network.accounts[0].address.address,
-			"account_tdx_b_1p9dkged3rpzy860ampt5jpmvv3yl4y6f5yppp4tnscdslvt9v3"
+			"account_tdx_c_1pycvv2pummryhvmr6tveuva4cgap63lapgu5y4eeqlwstajjxx"
 		)
 		XCTAssertEqual(
 			network.accounts[0].publicKey()?.compressedData.hex(),
@@ -431,7 +431,7 @@ final class ProfileTests: TestCase {
 		// Account 1
 		XCTAssertEqual(
 			network.accounts[1].address.address,
-			"account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa"
+			"account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke"
 		)
 		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
@@ -445,7 +445,7 @@ final class ProfileTests: TestCase {
 		// Account 2
 		XCTAssertEqual(
 			network.accounts[2].address.address,
-			"account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"
+			"account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"
 		)
 		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
