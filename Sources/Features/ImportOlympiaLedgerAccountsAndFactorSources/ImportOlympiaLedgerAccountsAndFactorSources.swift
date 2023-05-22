@@ -41,7 +41,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 		) {
 			precondition(hardwareAccounts.allSatisfy { $0.accountType == .hardware })
-			self.unverified = Set(hardwareAccounts.elements)
+			let unverified = Set(hardwareAccounts.elements)
+			self.unverified = unverified
+			self.addLedgerFactorSource = .init(olympiaAccountsToImport: unverified)
 		}
 	}
 
@@ -102,6 +104,8 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .addLedgerFactorSource(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
+			state.addLedgerFactorSource = nil
+
 			let validatedAccounts = olympiaAccountsValidation?.validated ?? []
 
 			for validatedAccount in validatedAccounts {
