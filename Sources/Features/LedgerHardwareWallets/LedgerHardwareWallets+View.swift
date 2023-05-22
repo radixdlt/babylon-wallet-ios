@@ -22,6 +22,7 @@ extension LedgerHardwareWallets.View {
 						Text("Here are all the Ledger devices you have connected to") // FIXME: Strings
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Link)
+
 						Button("What is a Ledger Factor Source") { // FIXME: Strings
 							viewStore.send(.whatIsALedgerButtonTapped)
 						}
@@ -30,6 +31,13 @@ extension LedgerHardwareWallets.View {
 						ForEach(ledgers) { ledger in
 							LedgerRowView(viewState: .init(factorSource: ledger))
 						}
+
+						Button(L10n.CreateEntity.Ledger.addNewLedger) {
+							viewStore.send(.addNewLedgerButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: false))
+						.padding(.top, .small1)
+
 					} else {
 						Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
 					}
@@ -37,12 +45,6 @@ extension LedgerHardwareWallets.View {
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.top, .small1)
-			}
-			.footer {
-				Button(L10n.CreateEntity.Ledger.addNewLedger) {
-					viewStore.send(.addNewLedgerButtonTapped)
-				}
-				.buttonStyle(.secondaryRectangular(shouldExpand: true))
 			}
 			.navigationTitle("Ledger Hardware Wallets") // FIXME: Strings
 			#if os(iOS)

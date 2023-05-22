@@ -39,7 +39,7 @@ extension ChooseLedgerHardwareDevice {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack(spacing: .small1) {
+					VStack(spacing: .medium3) {
 						if viewStore.ledgers.isEmpty {
 							Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
 						} else {
@@ -50,7 +50,7 @@ extension ChooseLedgerHardwareDevice {
 									get: \.ledgersArray,
 									send: { .selectedLedger(id: $0?.first?.id) }
 								),
-								from: viewStore.ledgers,
+								from: viewStore.ledgers + viewStore.ledgers,
 								requiring: .exactly(1)
 							) { item in
 								LedgerRowView(
@@ -62,16 +62,17 @@ extension ChooseLedgerHardwareDevice {
 							}
 						}
 
+						Button(L10n.CreateEntity.Ledger.addNewLedger) {
+							viewStore.send(.addNewLedgerButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(shouldExpand: false))
+						.padding(.top, .small1)
+
 						Spacer(minLength: 0)
 					}
 					.padding(.top, .small1)
 				}
 				.footer {
-					Button(L10n.CreateEntity.Ledger.addNewLedger) {
-						viewStore.send(.addNewLedgerButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(shouldExpand: true))
-
 					WithControlRequirements(
 						viewStore.selectedLedgerControlRequirements,
 						forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
