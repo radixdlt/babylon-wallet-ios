@@ -130,8 +130,8 @@ extension LedgerHardwareWalletClient: DependencyKey {
 
 				for keyParams in keysParams {
 					let response = try await makeRequest(
-						.derivePublicKeys(.init(
-							keysParameters: Array(keysParams),
+						.derivePublicKey(.init(
+							keyParameters: keyParams,
 							ledgerDevice: factorSource.device()
 						)),
 						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
