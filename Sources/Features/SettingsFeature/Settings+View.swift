@@ -349,7 +349,7 @@ extension AppSettings.View {
 			),
 			.init(
 				title: "Ledger Hardware Wallets", // FIXME: Strings
-				asset: AssetResource.generalSettings, // FIXME: asset
+				asset: AssetResource.ledger,
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 		]
