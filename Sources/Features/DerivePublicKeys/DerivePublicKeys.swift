@@ -221,13 +221,32 @@ extension DerivePublicKeys {
 	) -> EffectTask<Action> {
 		switch state.derivationsPathOption {
 		case let .knownPaths(derivationPaths, networkID):
-			return deriveWithKnownDerivationPaths(derivationPaths, networkID, .createSignAuthKey)
+			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = {
+				switch state.purpose {
+				case .createEntity:
+					return .createEntity(kind: .account)
+				case .createAuthSigningKey:
+					return .createSignAuthKey
+				case .importLegacyAccounts:
+					return .importOlympiaAccounts
+				}
+			}()
+			return deriveWithKnownDerivationPaths(derivationPaths, networkID, loadMnemonicPurpose)
 		case let .nextBasedOnFactorSource(networkOption, entityKind, curve):
 			guard let entityCreatingFactorSource = try? EntityCreatingFactorSource(hdFactorSource) else {
 				loggerGlobal.critical("Cannot derive public key for next entity with a non EntityCreating FactorSource. Got kind: \(hdFactorSource.kind)")
 				return .send(.delegate(.failedToDerivePublicKey))
 			}
-			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = .createEntity(kind: entityKind)
+			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = {
+				switch state.purpose {
+				case .createEntity:
+					return .createEntity(kind: entityKind)
+				case .createAuthSigningKey:
+					return .createSignAuthKey
+				case .importLegacyAccounts:
+					return .importOlympiaAccounts
+				}
+			}()
 			switch networkOption {
 			case let .specific(networkID):
 				do {
