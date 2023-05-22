@@ -67,7 +67,7 @@ package.addModules([
 		name: "AssetTransferFeature",
 		dependencies: [
 			"ScanQRFeature",
-			"ChooseAccounts",
+			"ChooseAccountsFeature",
 		],
 		tests: .yes()
 	),

@@ -1,4 +1,4 @@
-import ChooseAccounts
+import ChooseAccountsFeature
 import EngineToolkitClient
 import FeaturePrelude
 import ScanQRFeature
