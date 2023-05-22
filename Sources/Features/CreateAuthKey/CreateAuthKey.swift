@@ -1,6 +1,6 @@
 import AccountsClient
 import Cryptography
-import DerivePublicKeyFeature
+import DerivePublicKeysFeature
 import EngineToolkitModels
 import FactorSourcesClient
 import FeaturePrelude
@@ -96,7 +96,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 		public enum Step: Sendable, Hashable {
 			case getAuthKeyDerivationPath(GetAuthKeyDerivationPath.State)
-			case derivePublicKey(DerivePublicKey.State)
+			case derivePublicKeys(DerivePublicKeys.State)
 			case transactionReview(TransactionReview.State)
 		}
 
@@ -119,7 +119,7 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case getAuthKeyDerivationPath(GetAuthKeyDerivationPath.Action)
-		case derivePublicKey(DerivePublicKey.Action)
+		case derivePublicKeys(DerivePublicKeys.Action)
 		case transactionReview(TransactionReview.Action)
 	}
 
@@ -143,10 +143,10 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 				GetAuthKeyDerivationPath()
 			}
 			Scope(
-				state: /State.Step.derivePublicKey,
-				action: /Action.child .. ChildAction.derivePublicKey
+				state: /State.Step.derivePublicKeys,
+				action: /Action.child .. ChildAction.derivePublicKeys
 			) {
-				DerivePublicKey()
+				DerivePublicKeys()
 			}
 			Scope(
 				state: /State.Step.transactionReview,
@@ -181,14 +181,14 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 			return .send(.delegate(.done(success: false)))
 
 		case let .getAuthKeyDerivationPath(.delegate(.gotDerivationPath(derivationPath, factorSource))):
-			state.step = .derivePublicKey(.init(
+			state.step = .derivePublicKeys(.init(
 				derivationPathOption: .knownPaths([derivationPath], networkID: state.entity.networkID),
 				factorSourceOption: .specific(factorSource)
 			)
 			)
 			return .none
 
-		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, _))):
+		case let .derivePublicKeys(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, _))):
 			guard let hdKey = hdKeys.first else {
 				loggerGlobal.error("Failed to create auth key one single key, got: \(hdKeys.count)")
 				return .send(.delegate(.done(success: false)))

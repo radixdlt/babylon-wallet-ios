@@ -2,7 +2,7 @@ import AccountsClient
 import AddLedgerFactorSourceFeature
 import ChooseLedgerHardwareDeviceFeature
 import Cryptography
-import DerivePublicKeyFeature
+import DerivePublicKeysFeature
 import FeaturePrelude
 import LedgerHardwareWalletClient
 
@@ -13,7 +13,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		public let isCreatingLedgerAccount: Bool
 		public enum Step: Sendable, Hashable {
 			case step0_chooseLedger(ChooseLedgerHardwareDevice.State)
-			case step1_derivePublicKey(DerivePublicKey.State)
+			case step1_derivePublicKeys(DerivePublicKeys.State)
 		}
 
 		public var step: Step
@@ -27,7 +27,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			self.networkID = networkID
 			self.isCreatingLedgerAccount = isCreatingLedgerAccount
 
-			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init()) : .step1_derivePublicKey(
+			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init()) : .step1_derivePublicKeys(
 				.init(
 					derivationPathOption: .next(for: .account, networkID: networkID, curve: .curve25519),
 					factorSourceOption: .device
@@ -46,7 +46,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case step0_chooseLedger(ChooseLedgerHardwareDevice.Action)
-		case step1_derivePublicKey(DerivePublicKey.Action)
+		case step1_derivePublicKeys(DerivePublicKeys.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -69,10 +69,10 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 				ChooseLedgerHardwareDevice()
 			}
 			Scope(
-				state: /State.Step.step1_derivePublicKey,
-				action: /Action.child .. ChildAction.step1_derivePublicKey
+				state: /State.Step.step1_derivePublicKeys,
+				action: /Action.child .. ChildAction.step1_derivePublicKeys
 			) {
-				DerivePublicKey()
+				DerivePublicKeys()
 			}
 		}
 
@@ -99,14 +99,14 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
-			state.step = .step1_derivePublicKey(.init(
+			state.step = .step1_derivePublicKeys(.init(
 				derivationPathOption: .next(for: .account, networkID: state.networkID, curve: .curve25519),
 				factorSourceOption: .specific(ledger.factorSource)
 			)
 			)
 			return .none
 
-		case let .step1_derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
+		case let .step1_derivePublicKeys(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
 			guard let hdKey = hdKeys.first else {
 				loggerGlobal.error("Failed to create account expected one single key, got: \(hdKeys.count)")
 				return .send(.delegate(.createAccountFailed))

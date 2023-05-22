@@ -1,5 +1,5 @@
 import Cryptography
-import DerivePublicKeyFeature
+import DerivePublicKeysFeature
 import FeaturePrelude
 import PersonasClient
 
@@ -7,7 +7,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let name: NonEmptyString
 		public let fields: IdentifiedArrayOf<Profile.Network.Persona.Field>
-		public var derivePublicKey: DerivePublicKey.State
+		public var derivePublicKeys: DerivePublicKeys.State
 
 		public init(
 			name: NonEmptyString,
@@ -15,7 +15,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 		) {
 			self.name = name
 			self.fields = fields
-			self.derivePublicKey = .init(
+			self.derivePublicKeys = .init(
 				derivationPathOption: .nextBasedOnFactorSource(
 					networkOption: .useCurrent,
 					entityKind: .identity,
@@ -31,7 +31,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case derivePublicKey(DerivePublicKey.Action)
+		case derivePublicKeys(DerivePublicKeys.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -46,10 +46,10 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(
-			state: \.derivePublicKey,
-			action: /Action.child .. ChildAction.derivePublicKey
+			state: \.derivePublicKeys,
+			action: /Action.child .. ChildAction.derivePublicKeys
 		) {
-			DerivePublicKey()
+			DerivePublicKeys()
 		}
 
 		Reduce(core)
@@ -68,7 +68,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .derivePublicKey(.delegate(.derivedPublicKeys(
+		case let .derivePublicKeys(.delegate(.derivedPublicKeys(
 			hdKeys,
 			factorSourceID,
 			networkID

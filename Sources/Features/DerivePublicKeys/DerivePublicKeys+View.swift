@@ -1,14 +1,14 @@
 import FeaturePrelude
 import Profile
 
-extension DerivePublicKey.State {
-	var viewState: DerivePublicKey.ViewState {
+extension DerivePublicKeys.State {
+	var viewState: DerivePublicKeys.ViewState {
 		.init(ledger: ledgerBeingUsed, purpose: self.purpose == .createAuthSigningKey ? .createAuthSigningKey : .createAccount)
 	}
 }
 
-// MARK: - DerivePublicKey.View
-extension DerivePublicKey {
+// MARK: - DerivePublicKeys.View
+extension DerivePublicKeys {
 	public struct ViewState: Equatable {
 		public let ledger: LedgerFactorSource?
 		public let purpose: UseLedgerView.Purpose
@@ -16,9 +16,9 @@ extension DerivePublicKey {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<DerivePublicKey>
+		private let store: StoreOf<DerivePublicKeys>
 
-		public init(store: StoreOf<DerivePublicKey>) {
+		public init(store: StoreOf<DerivePublicKeys>) {
 			self.store = store
 		}
 
@@ -45,16 +45,16 @@ extension DerivePublicKey {
 //// MARK: - DerivePublicKey_Preview
 // struct DerivePublicKey_Preview: PreviewProvider {
 //	static var previews: some View {
-//		DerivePublicKey.View(
+//		DerivePublicKeys.View(
 //			store: .init(
 //				initialState: .previewValue,
-//				reducer: DerivePublicKey()
+//				reducer: DerivePublicKeys()
 //			)
 //		)
 //	}
 // }
 //
-// extension DerivePublicKey.State {
+// extension DerivePublicKeys.State {
 //	public static let previewValue = Self()
 // }
 // #endif

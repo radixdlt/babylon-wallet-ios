@@ -5,8 +5,8 @@ import FeaturePrelude
 import LedgerHardwareWalletClient
 import SecureStorageClient
 
-// MARK: - DerivePublicKey
-public struct DerivePublicKey: Sendable, FeatureReducer {
+// MARK: - DerivePublicKeys
+public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Purpose: Sendable, Hashable {
 			case createEntity
@@ -141,7 +141,7 @@ public struct DerivePublicKey: Sendable, FeatureReducer {
 	}
 }
 
-extension DerivePublicKey {
+extension DerivePublicKeys {
 	private func deriveWith(
 		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
 		_ state: State
@@ -218,7 +218,7 @@ extension DerivePublicKey {
 	}
 }
 
-extension DerivePublicKey {
+extension DerivePublicKeys {
 	private func withDerivationPath<Source: _HDFactorSourceProtocol>(
 		state: State,
 		hdFactorSource: Source,
