@@ -126,8 +126,9 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
 				)
 
-//				return try .init(compressedRepresentation: response.publicKey.data)
-				fatalError()
+				return try OrderedSet(validating: response.map {
+					try $0.hdPubKey()
+				})
 			},
 			signTransaction: { request in
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
@@ -209,14 +210,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPu
 			throw BadCurve()
 		}
 		let publicKey: SLIP10.PublicKey
-		//        let derivationPath: DerivationPath
 		switch curve {
 		case .secp256k1:
 			publicKey = try .ecdsaSecp256k1(.init(compressedRepresentation: self.publicKey.data))
-		//            derivationPath = DerivationPath(scheme: .bip44Olympia, path: self.derivationPath)
 		case .curve25519:
 			publicKey = try .eddsaEd25519(.init(compressedRepresentation: self.publicKey.data))
-			//            derivationPath = DerivationPath(scheme: .cap26, path: self.derivationPath)
 		}
 
 		let derivationPath: DerivationPath
