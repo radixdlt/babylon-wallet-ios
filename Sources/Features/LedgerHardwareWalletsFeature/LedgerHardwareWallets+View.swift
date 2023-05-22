@@ -17,19 +17,26 @@ extension LedgerHardwareWallets.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			ScrollView {
-				if let ledgers = viewStore.ledgers, !ledgers.isEmpty {
-					VStack(spacing: .medium2) {
+				VStack(alignment: .leading, spacing: .medium2) {
+					if let ledgers = viewStore.ledgers, !ledgers.isEmpty {
+						Text("Here are all the Ledger devices you have connected to") // FIXME: Strings
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1Link)
+						Button("What is a Ledger Factor Source") { // FIXME: Strings
+							print("TAP")
+						}
+						.buttonStyle(.info)
+
 						ForEach(ledgers) { ledger in
 							LedgerRowView(viewState: .init(factorSource: ledger))
-								.padding(.horizontal, .medium1)
 						}
+					} else {
+						Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
 					}
-					.padding(.top, .small1)
-				} else {
-					Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
+					Spacer(minLength: 0)
 				}
-
-				Spacer(minLength: 0)
+				.padding(.horizontal, .medium1)
+				.padding(.top, .small1)
 			}
 			.footer {
 				Button(L10n.CreateEntity.Ledger.addNewLedger) {

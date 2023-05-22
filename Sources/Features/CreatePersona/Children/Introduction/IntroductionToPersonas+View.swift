@@ -58,16 +58,10 @@ extension IntroductionToPersonas {
 				.foregroundColor(.app.gray1)
 				.textStyle(.sheetTitle)
 
-			Button {
+			Button(L10n.CreatePersona.Introduction.learnAboutPersonas) {
 				viewStore.send(.showTutorial)
-			} label: {
-				Label {
-					Text(L10n.CreatePersona.Introduction.learnAboutPersonas).textStyle(.body1StandaloneLink)
-				} icon: {
-					Image(asset: AssetResource.info)
-				}
-				.tint(.app.blue2)
 			}
+			.buttonStyle(.info)
 
 			Text(L10n.CreatePersona.Introduction.subtitle1)
 				.font(.app.body1Regular)
