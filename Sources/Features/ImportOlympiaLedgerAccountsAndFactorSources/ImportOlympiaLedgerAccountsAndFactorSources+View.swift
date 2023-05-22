@@ -1,4 +1,5 @@
 import AddLedgerFactorSourceFeature
+import DerivePublicKeysFeature
 import FeaturePrelude
 
 extension ImportOlympiaLedgerAccountsAndFactorSources.State {
@@ -38,7 +39,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 						ScrollView {
 							ForEach(viewStore.ledgersWithAccounts, id: \.self) { ledgerWithAccounts in
 								LazyVStack {
-									Text("\(ledgerWithAccounts.displayName) (new? \(ledgerWithAccounts.isLedgerNew ? "yes" : "no")) - #\(ledgerWithAccounts.migratedAccounts.count) accounts")
+									Text("\(ledgerWithAccounts.displayName) - #\(ledgerWithAccounts.migratedAccounts.count) accounts")
 								}
 							}
 						}

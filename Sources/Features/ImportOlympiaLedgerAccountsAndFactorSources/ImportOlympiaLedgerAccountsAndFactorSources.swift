@@ -1,6 +1,7 @@
 import AddLedgerFactorSourceFeature
 import ChooseLedgerHardwareDeviceFeature
 import Cryptography
+import DerivePublicKeysFeature
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
@@ -14,7 +15,6 @@ import SharedModels
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	public struct LedgerWithAccounts: Sendable, Hashable {
 		public let name: String?
-		public let isLedgerNew: Bool
 		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
 		public var displayName: String {
 			if let name {
@@ -29,6 +29,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public struct State: Sendable, Hashable {
+		public let networkID: NetworkID
 		public var unmigrated: OlympiaAccountsValidation
 
 		/// migrated (an before that validated)
@@ -36,14 +37,18 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		public var chooseLedger: ChooseLedgerHardwareDevice.State
 
+		@PresentationState
+		public var derivePublicKeys: DerivePublicKeys.State?
+
 		public init(
-			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+			networkID: NetworkID
 		) {
 			precondition(hardwareAccounts.allSatisfy { $0.accountType == .hardware })
 			let accountsValidation = OlympiaAccountsValidation(validated: [], unvalidated: Set(hardwareAccounts.elements))
+			self.networkID = networkID
 			self.unmigrated = accountsValidation
-			self.chooseLedger = .init(olympiaAccountsValidation: accountsValidation)
-//			self.addLedgerFactorSource = .init(olympiaAccountsToImport: accountsValidation)
+			self.chooseLedger = .init()
 		}
 	}
 
@@ -52,13 +57,16 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case derivedPublicKeysOnLedger(OrderedSet<HierarchicalDeterministicPublicKey>, LedgerFactorSource)
+		/// Validated public keys against expected, then migrate...
 		case validedAccounts(Set<OlympiaAccountToMigrate>, LedgerFactorSource)
+
+		/// migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case chooseLedger(ChooseLedgerHardwareDevice.Action)
+		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -81,9 +89,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			ChooseLedgerHardwareDevice()
 		}
 		Reduce(core)
-//			.ifLet(\.$chooseLedger, action: /Action.child .. ChildAction.addLedgerFactorSource) {
-//				AddLedgerFactorSource()
-//			}
+			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
+				DerivePublicKeys()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -98,16 +106,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .derivedPublicKeysOnLedger(publicKeys, ledger):
-			return validat()
-
 		case let .validedAccounts(validatedAccounts, ledger):
 
 			for validatedAccount in validatedAccounts {
 				state.unmigrated.unvalidated.remove(validatedAccount)
 			}
 			return convertHardwareAccountsToBabylon(
-				isLedgerNew: isNew,
 				ledger: ledger,
 				validatedAccountsToMigrate: validatedAccounts,
 				state
@@ -123,18 +127,39 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-//		case let .addLedgerFactorSource(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
-//			state.addLedgerFactorSource = nil
 		case let .chooseLedger(.delegate(.choseLedger(ledger))):
+			guard !state.unmigrated.unvalidated.isEmpty else {
+				return .send(.delegate(.completed(
+					ledgersWithAccounts: state.ledgersWithAccounts,
+					unvalidatedAccounts: []
+				)))
+			}
+
+			state.derivePublicKeys = .init(
+				derivationPathOption: .knownPaths(
+					.init(uncheckedUniqueElements: state.unmigrated.unvalidated.map { $0.path.wrapAsDerivationPath() }),
+					networkID: state.networkID
+				),
+				factorSourceOption: .specific(ledger.factorSource)
+			)
+			return .none
+
+		case let .derivePublicKeys(.presented(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _)))):
+			guard let ledger = state.chooseLedger.ledgers[id: factorSourceID] else {
+				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
+				return .none
+			}
+			return validate(derivedPublicKeys: publicKeys, ledger: ledger)
 
 		default: return .none
 		}
 	}
 
-	private func deriveKeys(on ledger: LedgerFactorSource) {}
+	private func validate(derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>, ledger: LedgerFactorSource) -> EffectTask<Action> {
+		.none
+	}
 
 	private func convertHardwareAccountsToBabylon(
-		isLedgerNew: Bool,
 		ledger: LedgerFactorSource,
 		validatedAccountsToMigrate olympiaAccounts: Set<OlympiaAccountToMigrate>,
 		_ state: State
@@ -155,7 +180,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			loggerGlobal.notice("Converted #\(migrated.babylonAccounts.count) accounts to babylon! ✅")
 			let addedLedgerWithAccounts = LedgerWithAccounts(
 				name: ledgerName,
-				isLedgerNew: isLedgerNew,
 				model: model,
 				id: ledger.id,
 				migratedAccounts: migrated.accounts

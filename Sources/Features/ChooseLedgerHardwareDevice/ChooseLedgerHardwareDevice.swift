@@ -11,20 +11,14 @@ struct SelectedLedgerControlRequirements: Hashable {
 // MARK: - ChooseLedgerHardwareDevice
 public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var ledgers: IdentifiedArrayOf<LedgerFactorSource> = []
-		var selectedLedgerID: FactorSourceID? = nil
+		public var ledgers: IdentifiedArrayOf<LedgerFactorSource> = []
+		public var selectedLedgerID: FactorSourceID? = nil
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
 		public var addNewLedger: AddLedgerFactorSource.State?
 
-		public var olympiaAccountsValidation: OlympiaAccountsValidation?
-
-		public init(
-			olympiaAccountsValidation: OlympiaAccountsValidation? = nil
-		) {
-			self.olympiaAccountsValidation = olympiaAccountsValidation
-		}
+		public init() {}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -72,7 +66,7 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 			return .none
 
 		case .addNewLedgerButtonTapped:
-			state.addNewLedger = .init(olympiaAccountsValidation: state.olympiaAccountsValidation)
+			state.addNewLedger = .init()
 			return .none
 
 		case let .confirmedLedger(ledger):
@@ -90,7 +84,7 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .addNewLedger(.presented(.delegate(.completed(ledger, isNew, olympiaAccountsValidation)))):
+		case let .addNewLedger(.presented(.delegate(.completed(ledger, _)))):
 			state.addNewLedger = nil
 			state.selectedLedgerID = ledger.id
 			state.ledgers[id: ledger.id] = ledger

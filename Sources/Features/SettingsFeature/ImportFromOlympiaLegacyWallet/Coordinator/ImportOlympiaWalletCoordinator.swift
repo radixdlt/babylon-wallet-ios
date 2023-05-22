@@ -71,7 +71,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			scanned: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			alreadyImported: Set<OlympiaAccountToMigrate.ID>
 		)
-
+		case migrateHardwareAccounts(NonEmpty<OrderedSet<OlympiaAccountToMigrate>>, NetworkID)
 		case validatedOlympiaSoftwareAccounts(
 			softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			privateHDFactorSource: PrivateHDFactorSource
@@ -143,11 +143,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					state.path.append(destination)
 				}
 			} else if let hardwareAccounts = accounts.hardware {
-				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
-					hardwareAccounts: hardwareAccounts
-				))
-				if state.path.last != destination {
-					state.path.append(destination)
+				return .task {
+					let networkID = await factorSourcesClient.getCurrentNetworkID()
+					return .internal(.migrateHardwareAccounts(hardwareAccounts, networkID))
 				}
 			}
 
@@ -195,6 +193,16 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .migrateHardwareAccounts(hardwareAccounts, networkID):
+			let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
+				hardwareAccounts: hardwareAccounts,
+				networkID: networkID
+			))
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
+			return .none
+
 		case let .findAlreadyImportedOlympiaSoftwareAccounts(scanned, alreadyImported):
 			let destination = Destinations.State.selectAccountsToImport(.init(
 				scannedAccounts: scanned,
