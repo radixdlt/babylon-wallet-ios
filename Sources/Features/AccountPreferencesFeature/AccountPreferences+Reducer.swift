@@ -3,15 +3,18 @@ import AccountsClient
 import CreateAuthKeyFeature
 import FaucetClient
 import FeaturePrelude
+import ShowQRFeature
 
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
+	// MARK: - State
+
 	public struct State: Sendable, Hashable {
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 
 		@PresentationState
-		var createAuthKey: CreateAuthKey.State? = nil
+		var destination: Destination.State? = nil
 
 		#if DEBUG
 		public var canCreateAuthSigningKey: Bool
@@ -38,6 +41,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
+	// MARK: - Action
+
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
@@ -50,6 +55,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case createMultipleFungibleTokenButtonTapped
 		case createMultipleNonFungibleTokenButtonTapped
 		#endif
+
+		case qrCodeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -62,11 +69,34 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case createAuthKey(PresentationAction<CreateAuthKey.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
+	}
+
+	// MARK: - Destination
+
+	public struct Destination: ReducerProtocol {
+		public enum State: Equatable, Hashable {
+			case createAuthKey(CreateAuthKey.State)
+			case showQR(ShowQR.State)
+		}
+
+		public enum Action: Equatable {
+			case createAuthKey(CreateAuthKey.Action)
+			case showQR(ShowQR.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.createAuthKey, action: /Action.createAuthKey) {
+				CreateAuthKey()
+			}
+			Scope(state: /State.showQR, action: /Action.showQR) {
+				ShowQR()
+			}
+		}
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
@@ -78,8 +108,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.$createAuthKey, action: /Action.child .. ChildAction.createAuthKey) {
-				CreateAuthKey()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -133,22 +163,40 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				))
 			}
 		#endif
+
+		case .qrCodeButtonTapped:
+			state.destination = .showQR(.init(accountAddress: state.address))
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .createAuthKey(.dismiss):
-			state.createAuthKey = nil
-			return .none
-		case let .createAuthKey(.presented(.delegate(.done(wasSuccessful)))):
-			state.createAuthKey = nil
-			#if DEBUG
-			state.canCreateAuthSigningKey = false
-			#endif
-			return .none
+		case let .destination(.presented(action)):
+			switch action {
+			case let .createAuthKey(.delegate(.done(wasSuccessful))):
+				if case .createAuthKey = state.destination {
+					state.destination = nil
+				}
+				#if DEBUG
+				if wasSuccessful {
+					state.canCreateAuthSigningKey = false
+				}
+				#endif
+				return .none
 
-		default: return .none
+			case .showQR(.delegate(.dismiss)):
+				if case .showQR = state.destination {
+					state.destination = nil
+				}
+				return .none
+
+			default:
+				return .none
+			}
+
+		default:
+			return .none
 		}
 	}
 
@@ -158,7 +206,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			guard !account.hasAuthenticationSigningKey else {
 				return .none
 			}
-			state.createAuthKey = .init(entity: .account(account))
+			state.destination = .createAuthKey(.init(entity: .account(account)))
 			return .none
 
 		case let .isAllowedToUseFaucet(.success(value)):

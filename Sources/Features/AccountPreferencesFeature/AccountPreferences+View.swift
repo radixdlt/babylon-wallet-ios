@@ -1,5 +1,6 @@
 import CreateAuthKeyFeature
 import FeaturePrelude
+import ShowQRFeature
 
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
@@ -74,6 +75,7 @@ extension AccountPreferences {
 						createMultipleFungibleTokenButton(with: viewStore)
 						createMultipleNonFungibleTokenButton(with: viewStore)
 						#endif // DEBUG
+						qrCodeButton(with: viewStore)
 					}
 					.frame(maxHeight: .infinity, alignment: .top)
 					.padding(.medium1)
@@ -82,18 +84,25 @@ extension AccountPreferences {
 					}
 					.navigationTitle(L10n.AccountSettings.title)
 					.sheet(
-						store: store.scope(
-							state: \.$createAuthKey,
-							action: { .child(.createAuthKey($0)) }
-						),
-						content: { CreateAuthKey.View(store: $0) }
-					)
+						store: store.destination,
+						state: /AccountPreferences.Destination.State.createAuthKey,
+						action: AccountPreferences.Destination.Action.createAuthKey
+					) { store in
+						CreateAuthKey.View(store: store)
+					}
+					.sheet(
+						store: store.destination,
+						state: /AccountPreferences.Destination.State.showQR,
+						action: AccountPreferences.Destination.Action.showQR
+					) { store in
+						ShowQR.View(store: store)
+					}
 					#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
+						ToolbarItem(placement: .primaryAction) {
 							CloseButton {
 								viewStore.send(.closeButtonTapped)
 							}
@@ -103,6 +112,12 @@ extension AccountPreferences {
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<AccountPreferences> {
+	var destination: PresentationStoreOf<AccountPreferences.Destination> {
+		scope(state: \.$destination, action: { .child(.destination($0)) })
 	}
 }
 
@@ -120,6 +135,14 @@ extension AccountPreferences.View {
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}
+	}
+
+	@ViewBuilder
+	private func qrCodeButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Show QR Code") { // FIXME: Add string
+			viewStore.send(.qrCodeButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 	}
 }
 

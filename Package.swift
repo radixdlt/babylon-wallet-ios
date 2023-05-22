@@ -38,6 +38,7 @@ package.addModules([
 			"FaucetClient",
 			"AccountPortfoliosClient",
 			"CreateAuthKeyFeature",
+			"ShowQRFeature",
 		],
 		tests: .yes()
 	),
@@ -274,6 +275,11 @@ package.addModules([
 			"ProfileBackupsFeature",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "ShowQRFeature",
+		dependencies: [],
+		tests: .no
 	),
 	.feature(
 		name: "SigningFeature",

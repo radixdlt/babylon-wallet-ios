@@ -82,7 +82,7 @@ extension RestoreFromBackup.View {
 		let creatingDevice = header.creatingDevice.id == thisDeviceID ? "This Device" : header.creatingDevice.description.rawValue
 		let lastUsedOnDevice = header.lastUsedOnDevice.id == thisDeviceID ? "This Device" : header.lastUsedOnDevice.description.rawValue
 
-		return Card(action: item.action, isDisabled: !isVersionCompatible) {
+		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
@@ -116,6 +116,7 @@ extension RestoreFromBackup.View {
 			}
 			.padding(.medium3)
 		}
+		.disabled(!isVersionCompatible)
 	}
 
 	@MainActor
