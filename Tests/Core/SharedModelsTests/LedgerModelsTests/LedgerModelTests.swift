@@ -2,22 +2,24 @@
 import TestingPrelude
 
 final class LedgerModelTests: TestCase {
-	func test_decode_derivePublicKey() throws {
+	func test_decode_derivePublicKeys() throws {
 		let json: JSON = [
 			"success": [
-				"publicKey": "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8",
+				[
+					"curve": "curve25519",
+					"derivationPath": "testPath",
+					"publicKey": "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8",
+				],
 			],
 			"interactionId": "32b94cc3-2418-4964-9877-b3cd1d66a007",
-			"discriminator": "derivePublicKey",
+			"discriminator": "derivePublicKeys",
 		]
 
 		let expected = P2P.ConnectorExtension.Response.LedgerHardwareWallet(
 			interactionID: "32b94cc3-2418-4964-9877-b3cd1d66a007",
-			discriminator: .derivePublicKey,
+			discriminator: .derivePublicKeys,
 			response: .success(
-				.derivePublicKey(.init(
-					publicKey: "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8")
-				)
+				.derivePublicKeys([.init(curve: "curve25519", derivationPath: "testPath", publicKey: "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8")])
 			)
 		)
 
@@ -33,43 +35,6 @@ final class LedgerModelTests: TestCase {
 			P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
 		)
 	}
-
-	// TODO: use this when CE has support for it: https://rdxworks.slack.com/archives/C03QFAWBRNX/p1684748435008259?thread_ts=1684677908.435869&cid=C03QFAWBRNX
-	/*
-	 func test_decode_derivePublicKeys() throws {
-	 	let json: JSON = [
-	 		"success": [
-	 			[
-	 				"curve": "curve25519",
-	 				"derivationPath": "testPath",
-	 				"publicKey": "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8",
-	 			],
-	 		],
-	 		"interactionId": "32b94cc3-2418-4964-9877-b3cd1d66a007",
-	 		"discriminator": "derivePublicKeys",
-	 	]
-
-	 	let expected = P2P.ConnectorExtension.Response.LedgerHardwareWallet(
-	 		interactionID: "32b94cc3-2418-4964-9877-b3cd1d66a007",
-	 		discriminator: .derivePublicKeys,
-	 		response: .success(
-	 			.derivePublicKeys([.init(curve: "curve25519", derivationPath: "testPath", publicKey: "03e6e5f34b265cca342ac711e68b5df9d839bc722e0b004f471539867d179d57c8")])
-	 		)
-	 	)
-
-	 	// Decode assocated value
-	 	try XCTAssertJSONDecoding(
-	 		json,
-	 		expected
-	 	)
-
-	 	// Decode enum
-	 	try XCTAssertJSONDecoding(
-	 		json,
-	 		P2P.ConnectorExtension.Response.ledgerHardwareWallet(expected)
-	 	)
-	 }
-	 */
 
 	func test_decode_getDeviceInfo() throws {
 		let json: JSON = [

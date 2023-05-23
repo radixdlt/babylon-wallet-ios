@@ -37,7 +37,6 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 
 	public enum Success: Sendable, Hashable {
 		case getDeviceInfo(GetDeviceInfo)
-		case derivePublicKey(SimplePublicKey)
 		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
 		case signChallenge([SignatureOfSigner])
@@ -52,14 +51,6 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			) {
 				self.id = id
 				self.model = model
-			}
-		}
-
-		public struct SimplePublicKey: Sendable, Hashable, Decodable {
-			public let publicKey: HexCodable
-
-			public init(publicKey: HexCodable) {
-				self.publicKey = publicKey
 			}
 		}
 
@@ -79,37 +70,16 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 
-		// TODO: use this when CE has support for it: https://rdxworks.slack.com/archives/C03QFAWBRNX/p1684748435008259?thread_ts=1684677908.435869&cid=C03QFAWBRNX
-		/*
-		 public struct SignatureOfSigner: Sendable, Hashable, Decodable {
-		 	public let signature: HexCodable
-		 	public let derivedPublicKey: DerivedPublicKey
-
-		 	public init(
-		 		derivedPublicKey: DerivedPublicKey,
-		 		signature: HexCodable
-		 	) {
-		 		self.derivedPublicKey = derivedPublicKey
-		 		self.signature = signature
-		 	}
-		 }*/
-
 		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
-			public let curve: String
-			public let derivationPath: String
 			public let signature: HexCodable
-			public let publicKey: HexCodable
+			public let derivedPublicKey: DerivedPublicKey
 
 			public init(
-				curve: String,
-				derivationPath: String,
-				signature: HexCodable,
-				publicKey: HexCodable
+				derivedPublicKey: DerivedPublicKey,
+				signature: HexCodable
 			) {
-				self.curve = curve
-				self.derivationPath = derivationPath
+				self.derivedPublicKey = derivedPublicKey
 				self.signature = signature
-				self.publicKey = publicKey
 			}
 		}
 	}
@@ -134,10 +104,6 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 		switch discriminator {
-		case .derivePublicKey:
-			self.response = try decodeResponse {
-				Success.derivePublicKey($0)
-			}
 		case .derivePublicKeys:
 			self.response = try decodeResponse {
 				Success.derivePublicKeys($0)

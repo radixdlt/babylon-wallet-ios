@@ -111,37 +111,17 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				)
 			},
 			derivePublicKeys: { keysParams, factorSource in
+				let response = try await makeRequest(
+					.derivePublicKeys(.init(
+						keysParameters: Array(keysParams),
+						ledgerDevice: factorSource.device()
+					)),
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
+				)
 
-				// TODO: use this when CE has support for it: https://rdxworks.slack.com/archives/C03QFAWBRNX/p1684748435008259?thread_ts=1684677908.435869&cid=C03QFAWBRNX
-				/*
-				 let response = try await makeRequest(
-				 	.derivePublicKeys(.init(
-				 		keysParameters: Array(keysParams),
-				 		ledgerDevice: factorSource.device()
-				 	)),
-				 	responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
-				 )
-
-				 return try OrderedSet(validating: response.map {
-				 	try $0.hdPubKey()
-				 })
-				 */
-				var keys = OrderedSet<HierarchicalDeterministicPublicKey>()
-
-				for keyParams in keysParams {
-					let response = try await makeRequest(
-						.derivePublicKey(.init(
-							keyParameters: keyParams,
-							ledgerDevice: factorSource.device()
-						)),
-						responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
-					)
-					let hdKey = try HierarchicalDeterministicPublicKey(curve: keyParams.curve.rawValue, key: response.publicKey.data, path: keyParams.derivationPath)
-					keys.append(hdKey)
-					loggerGlobal.notice("Finished deriving one public keys")
-				}
-				loggerGlobal.notice("Finished deriving ALL public keys 👍")
-				return keys
+				return try OrderedSet(validating: response.map {
+					try $0.hdPubKey()
+				})
 			},
 			signTransaction: { request in
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
@@ -267,52 +247,19 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 		public let derivationPath: DerivationPath
 	}
 
-	// TODO: use this when CE has support for it: https://rdxworks.slack.com/archives/C03QFAWBRNX/p1684748435008259?thread_ts=1684677908.435869&cid=C03QFAWBRNX
-	/*
-	 func validate(hashed: Data) throws -> Validated {
-	 	let hdPubKey = try self.derivedPublicKey.hdPubKey()
-	 	let signatureWithPublicKey: SignatureWithPublicKey
-	 	switch hdPubKey.publicKey {
-	 	case let .ecdsaSecp256k1(pubKey):
-	 		signatureWithPublicKey = try .ecdsaSecp256k1(
-	 			signature: .init(radixFormat: self.signature.data),
-	 			publicKey: pubKey
-	 		)
-	 	case let .eddsaEd25519(pubKey):
-	 		signatureWithPublicKey = .eddsaEd25519(
-	 			signature: self.signature.data,
-	 			publicKey: pubKey
-	 		)
-	 	}
-
-	 	guard signatureWithPublicKey.isValidSignature(for: hashed) else {
-	 		loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
-	 		throw InvalidSignature()
-	 	}
-
-	 	return Validated(
-	 		signature: signatureWithPublicKey,
-	 		derivationPath: hdPubKey.derivationPath
-	 	)
-	 }
-	 */
 	func validate(hashed: Data) throws -> Validated {
-		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
-			struct BadCurve: Swift.Error {}
-			loggerGlobal.error("Bad curve")
-			throw BadCurve()
-		}
+		let hdPubKey = try self.derivedPublicKey.hdPubKey()
 		let signatureWithPublicKey: SignatureWithPublicKey
-		switch curve {
-		case .secp256k1:
+		switch hdPubKey.publicKey {
+		case let .ecdsaSecp256k1(pubKey):
 			signatureWithPublicKey = try .ecdsaSecp256k1(
 				signature: .init(radixFormat: self.signature.data),
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
+				publicKey: pubKey
 			)
-		case .curve25519:
-			signatureWithPublicKey = try .eddsaEd25519(
+		case let .eddsaEd25519(pubKey):
+			signatureWithPublicKey = .eddsaEd25519(
 				signature: self.signature.data,
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
+				publicKey: pubKey
 			)
 		}
 
@@ -321,28 +268,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 			throw InvalidSignature()
 		}
 
-		let derivationPath: DerivationPath
-		do {
-			derivationPath = try .init(
-				scheme: .cap26,
-				path: AccountBabylonDerivationPath(
-					derivationPath: self.derivationPath
-				)
-				.derivationPath
-			)
-		} catch {
-			derivationPath = try .init(
-				scheme: .bip44Olympia,
-				path: LegacyOlympiaBIP44LikeDerivationPath(
-					derivationPath: self.derivationPath
-				)
-				.derivationPath
-			)
-		}
-
 		return Validated(
 			signature: signatureWithPublicKey,
-			derivationPath: derivationPath
+			derivationPath: hdPubKey.derivationPath
 		)
 	}
 }
