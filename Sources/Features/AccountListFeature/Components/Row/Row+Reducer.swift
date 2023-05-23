@@ -2,7 +2,7 @@ import AccountPortfoliosClient
 import FactorSourcesClient
 import FeaturePrelude
 
-// MARK: - AccoœuntList.Row
+// MARK: - AccountList.Row
 extension AccountList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
