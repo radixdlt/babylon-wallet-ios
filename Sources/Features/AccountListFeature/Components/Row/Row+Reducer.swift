@@ -13,7 +13,7 @@ extension AccountList {
 			public var portfolio: Loadable<AccountPortfolio>
 
 			public var shouldShowSecurityPrompt = false
-			public var isLegacyAccount: Bool
+			public let isLegacyAccount: Bool
 			public var isLedgerAccount: Bool = false
 			public var isDappDefinitionAccount: Bool = false
 
