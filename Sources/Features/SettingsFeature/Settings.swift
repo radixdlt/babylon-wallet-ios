@@ -1,11 +1,11 @@
 import AppPreferencesClient
 import AuthorizedDAppsFeature
 import CacheClient
-import ChooseLedgerHardwareDeviceFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
+import LedgerHardwareDevicesFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -94,7 +94,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case personas(PersonasCoordinator.State)
 			case generalSettings(GeneralSettings.State)
 			case profileBackups(ProfileBackups.State)
-			case ledgerHardwareWallets(ChooseLedgerHardwareDevice.State)
+			case ledgerHardwareWallets(LedgerHardwareDevices.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -107,7 +107,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case personas(PersonasCoordinator.Action)
 			case generalSettings(GeneralSettings.Action)
 			case profileBackups(ProfileBackups.Action)
-			case ledgerHardwareWallets(ChooseLedgerHardwareDevice.Action)
+			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -136,7 +136,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 				ProfileBackups()
 			}
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
-				ChooseLedgerHardwareDevice()
+				LedgerHardwareDevices()
 			}
 		}
 	}
@@ -216,7 +216,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:
-			state.destination = .ledgerHardwareWallets(.init(mode: .list))
+			state.destination = .ledgerHardwareWallets(.init(allowSelection: false))
 			return .none
 
 		#if DEBUG

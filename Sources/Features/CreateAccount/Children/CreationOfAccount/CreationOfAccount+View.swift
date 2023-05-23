@@ -1,6 +1,6 @@
-import ChooseLedgerHardwareDeviceFeature
 import DerivePublicKeysFeature
 import FeaturePrelude
+import LedgerHardwareDevicesFeature
 
 extension CreationOfAccount {
 	@MainActor
@@ -17,7 +17,7 @@ extension CreationOfAccount {
 					CaseLet(
 						state: /CreationOfAccount.State.Step.step0_chooseLedger,
 						action: { CreationOfAccount.Action.child(.step0_chooseLedger($0)) },
-						then: { ChooseLedgerHardwareDevice.View(store: $0) }
+						then: { LedgerHardwareDevices.View(store: $0) }
 					)
 					CaseLet(
 						state: /CreationOfAccount.State.Step.step1_derivePublicKeys,

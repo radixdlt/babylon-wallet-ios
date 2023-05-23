@@ -2,26 +2,27 @@ import AddLedgerFactorSourceFeature
 import FeaturePrelude
 import Profile
 
-extension ChooseLedgerHardwareDevice.State {
-	var viewState: ChooseLedgerHardwareDevice.ViewState {
+extension LedgerHardwareDevices.State {
+	var viewState: LedgerHardwareDevices.ViewState {
 		.init(state: self)
 	}
 }
 
-// MARK: - ChooseLedgerHardwareDevice.View
-extension ChooseLedgerHardwareDevice {
+// MARK: - LedgerHardwareDevice.View
+extension LedgerHardwareDevices {
 	public struct ViewState: Equatable {
-		let mode: ChooseLedgerHardwareDevice.State.Mode
+		let allowSelection: Bool
+		let showHeaders: Bool
 		let ledgers: Loadable<IdentifiedArrayOf<LedgerFactorSource>>
 		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 
 		let navigationTitle: String
 		let subtitle: String
-		let showFooter: Bool
 
-		init(state: ChooseLedgerHardwareDevice.State) {
-			self.mode = state.mode
+		init(state: LedgerHardwareDevices.State) {
+			self.allowSelection = state.allowSelection
+			self.showHeaders = state.showHeaders
 			self.ledgers = state.$ledgers
 			self.selectedLedgerID = state.selectedLedgerID
 			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers?[id: id] {
@@ -30,15 +31,12 @@ extension ChooseLedgerHardwareDevice {
 				self.selectedLedgerControlRequirements = nil
 			}
 
-			switch mode {
-			case .select:
+			if allowSelection {
 				self.navigationTitle = "Choose Ledger Device" // FIXME: Strings
 				self.subtitle = "Choose a Ledger hardware wallet device" // FIXME: Strings -> L10n.CreateEntity.Ledger.subtitleSelectLedger
-				self.showFooter = true
-			case .list:
+			} else {
 				self.navigationTitle = "Ledger Hardware Wallets" // FIXME: Strings
 				self.subtitle = "Here are all the Ledger devices you have connected to" // FIXME: Strings
-				self.showFooter = false
 			}
 		}
 
@@ -47,9 +45,9 @@ extension ChooseLedgerHardwareDevice {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ChooseLedgerHardwareDevice>
+		private let store: StoreOf<LedgerHardwareDevices>
 
-		public init(store: StoreOf<ChooseLedgerHardwareDevice>) {
+		public init(store: StoreOf<LedgerHardwareDevices>) {
 			self.store = store
 		}
 
@@ -57,16 +55,18 @@ extension ChooseLedgerHardwareDevice {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium3) {
-						Text(viewStore.subtitle)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1Link)
-							.flushedLeft
+						if viewStore.showHeaders {
+							Text(viewStore.subtitle)
+								.foregroundColor(.app.gray2)
+								.textStyle(.body1Link)
+								.flushedLeft
 
-						Button("What is a Ledger Factor Source") { // FIXME: Strings
-							viewStore.send(.whatIsALedgerButtonTapped)
+							Button("What is a Ledger Factor Source") { // FIXME: Strings
+								viewStore.send(.whatIsALedgerButtonTapped)
+							}
+							.buttonStyle(.info)
+							.flushedLeft
 						}
-						.buttonStyle(.info)
-						.flushedLeft
 
 						ledgerList(viewStore: viewStore)
 
@@ -82,7 +82,7 @@ extension ChooseLedgerHardwareDevice {
 					.padding(.top, .small1)
 				}
 				.navigationTitle(viewStore.navigationTitle)
-				.footer(visible: viewStore.showFooter) {
+				.footer(visible: viewStore.allowSelection) {
 					WithControlRequirements(
 						viewStore.selectedLedgerControlRequirements,
 						forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
@@ -106,7 +106,7 @@ extension ChooseLedgerHardwareDevice {
 		}
 
 		@ViewBuilder
-		private func ledgerList(viewStore: ViewStoreOf<ChooseLedgerHardwareDevice>) -> some SwiftUI.View {
+		private func ledgerList(viewStore: ViewStoreOf<LedgerHardwareDevices>) -> some SwiftUI.View {
 			switch viewStore.ledgers {
 			case .idle, .loading, .failure:
 				EmptyView()
@@ -115,27 +115,24 @@ extension ChooseLedgerHardwareDevice {
 					Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
 						.foregroundColor(.app.gray1)
 						.textStyle(.body1Regular)
+				} else if viewStore.allowSelection {
+					Selection(
+						viewStore.binding(
+							get: \.ledgersArray,
+							send: { .selectedLedger(id: $0?.first?.id) }
+						),
+						from: ledgers,
+						requiring: .exactly(1)
+					) { item in
+						LedgerRowView(
+							viewState: .init(factorSource: item.value),
+							isSelected: item.isSelected,
+							action: item.action
+						)
+					}
 				} else {
-					switch viewStore.mode {
-					case .list:
-						ForEach(ledgers) { ledger in
-							LedgerRowView(viewState: .init(factorSource: ledger))
-						}
-					case .select:
-						Selection(
-							viewStore.binding(
-								get: \.ledgersArray,
-								send: { .selectedLedger(id: $0?.first?.id) }
-							),
-							from: ledgers,
-							requiring: .exactly(1)
-						) { item in
-							LedgerRowView(
-								viewState: .init(factorSource: item.value),
-								isSelected: item.isSelected,
-								action: item.action
-							)
-						}
+					ForEach(ledgers) { ledger in
+						LedgerRowView(viewState: .init(factorSource: ledger))
 					}
 				}
 			}

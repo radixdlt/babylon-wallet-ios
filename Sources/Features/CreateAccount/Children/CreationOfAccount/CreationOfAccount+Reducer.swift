@@ -1,9 +1,9 @@
 import AccountsClient
 import AddLedgerFactorSourceFeature
-import ChooseLedgerHardwareDeviceFeature
 import Cryptography
 import DerivePublicKeysFeature
 import FeaturePrelude
+import LedgerHardwareDevicesFeature
 import LedgerHardwareWalletClient
 
 public struct CreationOfAccount: Sendable, FeatureReducer {
@@ -12,7 +12,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 		public let networkID: NetworkID?
 		public let isCreatingLedgerAccount: Bool
 		public enum Step: Sendable, Hashable {
-			case step0_chooseLedger(ChooseLedgerHardwareDevice.State)
+			case step0_chooseLedger(LedgerHardwareDevices.State)
 			case step1_derivePublicKeys(DerivePublicKeys.State)
 		}
 
@@ -27,13 +27,17 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			self.networkID = networkID
 			self.isCreatingLedgerAccount = isCreatingLedgerAccount
 
-			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init(mode: .select)) : .step1_derivePublicKeys(
-				.init(
-					derivationPathOption: .next(for: .account, networkID: networkID, curve: .curve25519),
-					factorSourceOption: .device,
-					purpose: .createEntity
+			if isCreatingLedgerAccount {
+				self.step = .step0_chooseLedger(.init(allowSelection: true))
+			} else {
+				self.step = .step1_derivePublicKeys(
+					.init(
+						derivationPathOption: .next(for: .account, networkID: networkID, curve: .curve25519),
+						factorSourceOption: .device,
+						purpose: .createEntity
+					)
 				)
-			)
+			}
 		}
 	}
 
@@ -46,7 +50,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case step0_chooseLedger(ChooseLedgerHardwareDevice.Action)
+		case step0_chooseLedger(LedgerHardwareDevices.Action)
 		case step1_derivePublicKeys(DerivePublicKeys.Action)
 	}
 
@@ -67,7 +71,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 				state: /State.Step.step0_chooseLedger,
 				action: /Action.child .. ChildAction.step0_chooseLedger
 			) {
-				ChooseLedgerHardwareDevice()
+				LedgerHardwareDevices()
 			}
 			Scope(
 				state: /State.Step.step1_derivePublicKeys,

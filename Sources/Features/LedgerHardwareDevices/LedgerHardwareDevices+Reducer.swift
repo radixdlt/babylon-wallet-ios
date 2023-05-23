@@ -8,10 +8,11 @@ struct SelectedLedgerControlRequirements: Hashable {
 	let selectedLedger: LedgerFactorSource
 }
 
-// MARK: - ChooseLedgerHardwareDevice
-public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
+// MARK: - LedgerHardwareDevices
+public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let mode: Mode
+		public let allowSelection: Bool
+		public let showHeaders: Bool
 
 		@Loadable
 		public var ledgers: IdentifiedArrayOf<LedgerFactorSource>? = nil
@@ -22,13 +23,9 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 		@PresentationState
 		public var addNewLedger: AddLedgerFactorSource.State?
 
-		public init(mode: Mode) {
-			self.mode = mode
-		}
-
-		public enum Mode: Sendable, Hashable {
-			case select
-			case list
+		public init(allowSelection: Bool, showHeaders: Bool = true) {
+			self.allowSelection = allowSelection
+			self.showHeaders = showHeaders
 		}
 	}
 

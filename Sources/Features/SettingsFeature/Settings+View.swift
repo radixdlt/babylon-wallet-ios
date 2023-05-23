@@ -1,9 +1,9 @@
 import AuthorizedDAppsFeature
-import ChooseLedgerHardwareDeviceFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
+import LedgerHardwareDevicesFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -197,7 +197,7 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: { ChooseLedgerHardwareDevice.View(store: $0) }
+			destination: { LedgerHardwareDevices.View(store: $0) }
 		)
 	}
 
