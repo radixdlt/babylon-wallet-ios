@@ -1,5 +1,5 @@
 import ChooseLedgerHardwareDeviceFeature
-import DerivePublicKeyFeature
+import DerivePublicKeysFeature
 import FeaturePrelude
 
 extension CreationOfAccount {
@@ -20,9 +20,9 @@ extension CreationOfAccount {
 						then: { ChooseLedgerHardwareDevice.View(store: $0) }
 					)
 					CaseLet(
-						state: /CreationOfAccount.State.Step.step1_derivePublicKey,
-						action: { CreationOfAccount.Action.child(.step1_derivePublicKey($0)) },
-						then: { DerivePublicKey.View(store: $0) }
+						state: /CreationOfAccount.State.Step.step1_derivePublicKeys,
+						action: { CreationOfAccount.Action.child(.step1_derivePublicKeys($0)) },
+						then: { DerivePublicKeys.View(store: $0) }
 					)
 				}
 			}

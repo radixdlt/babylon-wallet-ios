@@ -1,5 +1,5 @@
 import Cryptography
-import DerivePublicKeyFeature
+import DerivePublicKeysFeature
 import FactorSourcesClient
 import FeaturePrelude
 

@@ -11,8 +11,8 @@ struct SelectedLedgerControlRequirements: Hashable {
 // MARK: - ChooseLedgerHardwareDevice
 public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var ledgers: IdentifiedArrayOf<LedgerFactorSource> = []
-		var selectedLedgerID: FactorSourceID? = nil
+		public var ledgers: IdentifiedArrayOf<LedgerFactorSource> = []
+		public var selectedLedgerID: FactorSourceID? = nil
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
@@ -84,7 +84,7 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .addNewLedger(.presented(.delegate(.completed(ledger)))):
+		case let .addNewLedger(.presented(.delegate(.completed(ledger, _)))):
 			state.addNewLedger = nil
 			state.selectedLedgerID = ledger.id
 			state.ledgers[id: ledger.id] = ledger

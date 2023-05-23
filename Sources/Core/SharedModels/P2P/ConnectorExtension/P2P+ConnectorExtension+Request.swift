@@ -39,37 +39,28 @@ extension P2P.ConnectorExtension.Request {
 
 		public enum Request: Sendable, Hashable, Encodable {
 			case getDeviceInfo
-			case derivePublicKey(DerivePublicKey)
+			case derivePublicKeys(DerivePublicKeys)
 			case signTransaction(SignTransaction)
 			case signChallenge(SignAuthChallenge)
-			case importOlympiaDevice(ImportOlympiaDevice)
 
 			public var discriminator: P2P.LedgerHardwareWallet.Discriminator {
 				switch self {
-				case .derivePublicKey: return .derivePublicKey
+				case .derivePublicKeys: return .derivePublicKeys
 				case .getDeviceInfo: return .getDeviceInfo
 				case .signTransaction: return .signTransaction
 				case .signChallenge: return .signChallenge
-				case .importOlympiaDevice: return .importOlympiaDevice
 				}
 			}
 
-			public struct ImportOlympiaDevice: Sendable, Hashable, Encodable {
-				public let derivationPaths: [String]
-				public init(derivationPaths: [String]) {
-					self.derivationPaths = derivationPaths
-				}
-			}
-
-			public struct DerivePublicKey: Sendable, Hashable, Encodable {
-				public let keyParameters: P2P.LedgerHardwareWallet.KeyParameters
+			public struct DerivePublicKeys: Sendable, Hashable, Encodable {
+				public let keysParameters: [P2P.LedgerHardwareWallet.KeyParameters]
 				public let ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 
 				public init(
-					keyParameters: P2P.LedgerHardwareWallet.KeyParameters,
+					keysParameters: [P2P.LedgerHardwareWallet.KeyParameters],
 					ledgerDevice: P2P.LedgerHardwareWallet.LedgerDevice
 				) {
-					self.keyParameters = keyParameters
+					self.keysParameters = keysParameters
 					self.ledgerDevice = ledgerDevice
 				}
 			}
@@ -133,9 +124,7 @@ extension P2P.ConnectorExtension.Request {
 			)
 			switch request {
 			case .getDeviceInfo: break
-			case let .importOlympiaDevice(request):
-				try request.encode(to: encoder)
-			case let .derivePublicKey(request):
+			case let .derivePublicKeys(request):
 				try request.encode(to: encoder)
 			case let .signTransaction(request):
 				try request.encode(to: encoder)

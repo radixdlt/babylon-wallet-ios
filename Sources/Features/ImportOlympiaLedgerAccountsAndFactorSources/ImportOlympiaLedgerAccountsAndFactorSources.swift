@@ -1,4 +1,7 @@
+import AddLedgerFactorSourceFeature
+import ChooseLedgerHardwareDeviceFeature
 import Cryptography
+import DerivePublicKeysFeature
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
@@ -12,7 +15,6 @@ import SharedModels
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	public struct LedgerWithAccounts: Sendable, Hashable {
 		public let name: String?
-		public let isLedgerNew: Bool
 		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
 		public var displayName: String {
 			if let name {
@@ -27,53 +29,44 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public struct State: Sendable, Hashable {
-		/// unverified, to verify and migrate
-		public var unverified: Set<OlympiaAccountToMigrate>
+		public let networkID: NetworkID
+		public var unmigrated: OlympiaAccountsValidation
 
-		/// verified but not yet migrated, to be migrated/converted
-		public var verifiedToBeMigrated: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>?
-
-		/// verified and migrated
+		/// migrated (an before that validated)
 		public var ledgersWithAccounts: OrderedSet<LedgerWithAccounts> = []
 
-		public var failedToFindAnyLinks = false
-		public var ledgerName = ""
-		public var isWaitingForResponseFromLedger = false
-		public var unnamedDeviceToAdd: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice?
+		public var chooseLedger: ChooseLedgerHardwareDevice.State
+
+		@PresentationState
+		public var derivePublicKeys: DerivePublicKeys.State?
 
 		public init(
-			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+			hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
+			networkID: NetworkID
 		) {
 			precondition(hardwareAccounts.allSatisfy { $0.accountType == .hardware })
-			self.unverified = Set(hardwareAccounts.elements)
+			let accountsValidation = OlympiaAccountsValidation(validated: [], unvalidated: Set(hardwareAccounts.elements))
+			self.networkID = networkID
+			self.unmigrated = accountsValidation
+			self.chooseLedger = .init()
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
-		case sendAddLedgerRequestButtonTapped
 		case skipRestOfTheAccounts
-		case ledgerNameChanged(String)
-		case confirmNameButtonTapped
-		case skipNamingLedgerButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case gotLinksConnectionStatusUpdate([P2P.LinkConnectionUpdate])
+		/// Validated public keys against expected, then migrate...
+		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerFactorSource)
 
-		case validateLedgerBeforeNamingIt(
-			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
-		)
-
-		case nameLedgerDeviceBeforeSavingIt(
-			P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
-		)
-
-		case failedToImportOlympiaLedger
-		case alreadyExists(FactorSource)
-		case addedFactorSource(FactorSource)
-
+		/// migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case chooseLedger(ChooseLedgerHardwareDevice.Action)
+		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -91,207 +84,124 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<ImportOlympiaLedgerAccountsAndFactorSources> {
+		Scope(state: \.chooseLedger, action: /Action.child .. ChildAction.chooseLedger) {
+			ChooseLedgerHardwareDevice()
+		}
+		Reduce(core)
+			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
+				DerivePublicKeys()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .task:
-
-			return .run { send in
-				for try await linksConnectionUpdate in await radixConnectClient.getP2PLinksWithConnectionStatusUpdates() {
-					guard !Task.isCancelled else {
-						return
-					}
-					await send(.internal(.gotLinksConnectionStatusUpdate(linksConnectionUpdate)))
-				}
-			} catch: { error, _ in
-				loggerGlobal.error("failed to get links updates, error: \(error)")
-			}
-		case .sendAddLedgerRequestButtonTapped:
-			return continueWithRestOfAccountsIfNeeded(state: &state)
-
 		case .skipRestOfTheAccounts:
 			return .send(.delegate(.completed(
 				ledgersWithAccounts: state.ledgersWithAccounts,
-				unvalidatedAccounts: state.unverified
+				unvalidatedAccounts: state.unmigrated.unvalidated
 			)))
-
-		case let .ledgerNameChanged(name):
-			state.ledgerName = name
-			return .none
-
-		case .confirmNameButtonTapped:
-			let name = state.ledgerName
-			loggerGlobal.notice("Confirmed ledger name: '\(name)' => adding factor source")
-			guard let device = state.unnamedDeviceToAdd else {
-				assertionFailure("Expected device to name")
-				return .none
-			}
-			return addFactorSource(
-				name: name,
-				unnamedDeviceToAdd: device
-			)
-
-		case .skipNamingLedgerButtonTapped:
-			guard let device = state.unnamedDeviceToAdd else {
-				assertionFailure("Expected device to name")
-				return .none
-			}
-			return addFactorSource(
-				name: nil,
-				unnamedDeviceToAdd: device
-			)
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .gotLinksConnectionStatusUpdate(linksConnectionStatusUpdate):
-			loggerGlobal.notice("links connection status update: \(linksConnectionStatusUpdate)")
-			let connectedLinks = linksConnectionStatusUpdate.filter(\.hasAnyConnectedPeers)
-			state.failedToFindAnyLinks = connectedLinks.isEmpty
-			return .none
+		case let .validatedAccounts(validatedAccounts, ledger):
 
-		case let .nameLedgerDeviceBeforeSavingIt(device):
-			state.unnamedDeviceToAdd = device
-			return .none
-
-		case .failedToImportOlympiaLedger:
-			state.isWaitingForResponseFromLedger = false
-			return .none
-
-		case let .validateLedgerBeforeNamingIt(ledger):
-			return validate(ledger, againstUnverifiedOf: &state)
-
-		case let .addedFactorSource(factorSource):
-			state.unnamedDeviceToAdd = nil
-			state.ledgerName = ""
-
+			for validatedAccount in validatedAccounts {
+				state.unmigrated.unvalidated.remove(validatedAccount)
+				state.unmigrated.validated.append(contentsOf: validatedAccounts)
+			}
 			return convertHardwareAccountsToBabylon(
-				isLedgerNew: true,
-				factorSource: factorSource,
-				state
-			)
-
-		case let .alreadyExists(factorSource):
-
-			return convertHardwareAccountsToBabylon(
-				isLedgerNew: false,
-				factorSource: factorSource,
+				ledger: ledger,
+				validatedAccountsToMigrate: validatedAccounts,
 				state
 			)
 
 		case let .migratedOlympiaHardwareAccounts(ledgerWithAccounts):
 			loggerGlobal.notice("Adding Ledger with accounts...")
 			state.ledgersWithAccounts.append(ledgerWithAccounts)
-			state.verifiedToBeMigrated = nil
 
 			return continueWithRestOfAccountsIfNeeded(state: &state)
 		}
 	}
 
-	private func validate(
-		_ olympiaDevice: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice,
-		againstUnverifiedOf state: inout State
-	) -> EffectTask<Action> {
-		guard !olympiaDevice.derivedPublicKeys.isEmpty else {
-			loggerGlobal.warning("Response contained no public keys at all.")
-			return .none
-		}
-		do {
-			let derivedKeys = try Set(
-				olympiaDevice
-					.derivedPublicKeys
-					.map { try K1.PublicKey(compressedRepresentation: $0.publicKey.data) }
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .chooseLedger(.delegate(.choseLedger(ledger))):
+			guard !state.unmigrated.unvalidated.isEmpty else {
+				return .send(.delegate(.completed(
+					ledgersWithAccounts: state.ledgersWithAccounts,
+					unvalidatedAccounts: []
+				)))
+			}
+
+			state.derivePublicKeys = .init(
+				derivationPathOption: .knownPaths(
+					.init(uncheckedUniqueElements: state.unmigrated.unvalidated.map { $0.path.wrapAsDerivationPath() }),
+					networkID: state.networkID
+				),
+				factorSourceOption: .specific(ledger.factorSource),
+				purpose: .importLegacyAccounts
 			)
+			return .none
 
-			let olympiaAccountsToMigrate = state.unverified.filter {
-				derivedKeys.contains($0.publicKey)
-			}
+		case let .derivePublicKeys(.presented(.delegate(.failedToDerivePublicKey))):
+			loggerGlobal.error("ImportOlympiaAccountsAndFactorSource - child derivePublicKeys failed to derive public key")
+			state.derivePublicKeys = nil
+			return .none
 
-			if olympiaAccountsToMigrate.isEmpty, !state.unverified.isEmpty, !olympiaDevice.derivedPublicKeys.isEmpty {
-				loggerGlobal.critical("Invalid keys from export format?\nolympiaDevice.derivedPublicKeys: \(olympiaDevice.derivedPublicKeys.map { $0.publicKey.data.hex() })\nstate.unverified:\(state.unverified.map(\.publicKey.compressedRepresentation.hex))")
-			}
-
-			guard let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>.init(rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))) else {
-				loggerGlobal.warning("No accounts to migrated.")
+		case let .derivePublicKeys(.presented(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _)))):
+			state.derivePublicKeys = nil
+			guard let ledger = state.chooseLedger.ledgers[id: factorSourceID] else {
+				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 				return .none
 			}
-			loggerGlobal.notice("Prompting to name ledger with ID=\(olympiaDevice.id) before migrating #\(verifiedToBeMigrated.count) accounts.")
-			state.verifiedToBeMigrated = verifiedToBeMigrated
+			return validate(derivedPublicKeys: publicKeys, ledger: ledger, state: state)
 
-			olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
-				state.unverified.remove(verifiedAccountToMigrate)
-			}
-
-			return .run { send in
-				if let existing = try await factorSourcesClient.getFactorSource(id: olympiaDevice.id) {
-					await send(.internal(.alreadyExists(existing)))
-				} else {
-					// new!
-					await send(.internal(
-						.nameLedgerDeviceBeforeSavingIt(olympiaDevice)
-					))
-				}
-			}
-
-		} catch {
-			loggerGlobal.error("got error: \(error)")
-			return .none
+		default: return .none
 		}
 	}
 
-	private func addFactorSource(
-		name: String?,
-		unnamedDeviceToAdd device: P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.ImportOlympiaDevice
+	private func validate(
+		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
+		ledger: LedgerFactorSource,
+		state: State
 	) -> EffectTask<Action> {
-		let model = FactorSource.LedgerHardwareWallet.DeviceModel(model: device.model)
-
-		loggerGlobal.notice("Creating factor source for Ledger...")
-
-		let factorSource = FactorSource.ledger(
-			id: device.id,
-			model: model,
-			name: name
-		)
-
-		loggerGlobal.notice("Created factor source for Ledger! adding it now")
-
-		return .run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(factorSource.factorSource)
-			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.internal(.addedFactorSource(factorSource.factorSource)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
-			errorQueue.schedule(error)
+		.run { [olympiaAccountsToValidate = state.unmigrated.unvalidated] send in
+			do {
+				let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
+				await send(.internal(.validatedAccounts(validation.validated, ledger)))
+			} catch {
+				loggerGlobal.error("Failed to validate accounts, error: \(error)")
+				errorQueue.schedule(error)
+			}
 		}
 	}
 
 	private func convertHardwareAccountsToBabylon(
-		isLedgerNew: Bool,
-		factorSource: FactorSource,
+		ledger: LedgerFactorSource,
+		validatedAccountsToMigrate olympiaAccounts: Set<OlympiaAccountToMigrate>,
 		_ state: State
 	) -> EffectTask<Action> {
-		guard let olympiaAccounts = state.verifiedToBeMigrated else {
-			assertionFailure("Expected verified accounts to migrated")
-			return .none
-		}
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
-		let ledgerName = factorSource.label.rawValue
-		let model = FactorSource.LedgerHardwareWallet.DeviceModel(rawValue: factorSource.debugDescription) ?? .nanoSPlus // FIXME: better fallback
+		let ledgerName = ledger.label.rawValue
+
+		let model = ledger.model
 
 		return .run { send in
 			// Migrates and saved all accounts to Profile
 			let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
 				.init(
-					olympiaAccounts: Set(olympiaAccounts.elements),
-					ledgerFactorSourceID: factorSource.id
+					olympiaAccounts: Set(olympiaAccounts),
+					ledgerFactorSourceID: ledger.id
 				)
 			)
 			loggerGlobal.notice("Converted #\(migrated.babylonAccounts.count) accounts to babylon! ✅")
 			let addedLedgerWithAccounts = LedgerWithAccounts(
 				name: ledgerName,
-				isLedgerNew: isLedgerNew,
 				model: model,
-				id: factorSource.id,
+				id: ledger.id,
 				migratedAccounts: migrated.accounts
 			)
 
@@ -303,24 +213,64 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	private func continueWithRestOfAccountsIfNeeded(state: inout State) -> EffectTask<Action> {
-		if state.unverified.isEmpty {
-			loggerGlobal.notice("state.unverified.isEmpty skipping sending importOlympiaDevice request => delegate completed!")
-
-			return .send(.delegate(.completed(
-				ledgersWithAccounts: state.ledgersWithAccounts,
-				unvalidatedAccounts: []
-			)))
-		} else {
-			loggerGlobal.notice("state.unverified not empty #\(state.unverified.count) unverfied remain, preparing to send importOlympiaDevice request...")
-			state.isWaitingForResponseFromLedger = true
-			return .run { [olympiaAccounts = state.unverified] send in
-				let device = try await ledgerHardwareWalletClient.importOlympiaDevice(olympiaAccounts)
-				await send(.internal(.validateLedgerBeforeNamingIt(device)))
-			} catch: { error, send in
-				loggerGlobal.error("Failed to import olympia ledger device, error: \(error)")
-				await send(.internal(.failedToImportOlympiaLedger))
-			}
+		guard state.unmigrated.unvalidated.isEmpty else {
+			loggerGlobal.notice("state.unmigrated.unvalidated not empty #\(state.unmigrated.unvalidated) , need to migrate more accounds...")
+			return .none
 		}
+		loggerGlobal.notice("Finished migrating all accounts.")
+
+		return .send(.delegate(.completed(
+			ledgersWithAccounts: state.ledgersWithAccounts,
+			unvalidatedAccounts: []
+		)))
+	}
+
+	private func validate(
+		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
+		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
+	) async throws -> OlympiaAccountsValidation {
+		guard !derivedPublicKeys.isEmpty else {
+			loggerGlobal.warning("Response contained no public keys at all.")
+			return OlympiaAccountsValidation(
+				validated: [],
+				unvalidated: olympiaAccountsToValidate
+			)
+		}
+
+		let derivedKeys: [K1.PublicKey] = derivedPublicKeys.compactMap {
+			guard case let .ecdsaSecp256k1(k1Key) = $0.publicKey else {
+				return nil
+			}
+			return k1Key
+		}
+
+		var olympiaAccountsToValidate = olympiaAccountsToValidate
+
+		let olympiaAccountsToMigrate = olympiaAccountsToValidate.filter {
+			derivedKeys.contains($0.publicKey)
+		}
+
+		if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !derivedKeys.isEmpty {
+			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map { $0.compressedRepresentation.hex() })\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.compressedRepresentation.hex))")
+		}
+
+		guard
+			let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(
+				rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))
+			)
+		else {
+			loggerGlobal.warning("No accounts to migrated.")
+			return OlympiaAccountsValidation(validated: [], unvalidated: olympiaAccountsToValidate)
+		}
+
+		olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
+			olympiaAccountsToValidate.remove(verifiedAccountToMigrate)
+		}
+
+		return OlympiaAccountsValidation(
+			validated: olympiaAccountsToMigrate,
+			unvalidated: olympiaAccountsToValidate
+		)
 	}
 }
 
