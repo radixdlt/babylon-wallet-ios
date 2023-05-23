@@ -26,15 +26,14 @@ extension CreationOfAccount {
 					)
 				}
 			}
-			.navigationTitle(L10n.CreateEntity.Ledger.createAccount)
 			#if os(iOS)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
-				.onFirstTask { @MainActor in
-					ViewStore(store.stateless).send(.view(.onFirstTask))
-				}
+			.onFirstTask { @MainActor in
+				ViewStore(store.stateless).send(.view(.onFirstTask))
+			}
 		}
 	}
 }

@@ -1,8 +1,13 @@
 import SwiftUI
 
 extension View {
-	public func footer<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-		self.modifier(FooterModifier(footerContent: content))
+	@ViewBuilder
+	public func footer<Content: View>(visible: Bool = true, @ViewBuilder _ content: () -> Content) -> some View {
+		if visible {
+			modifier(FooterModifier(footerContent: content))
+		} else {
+			self
+		}
 	}
 }
 

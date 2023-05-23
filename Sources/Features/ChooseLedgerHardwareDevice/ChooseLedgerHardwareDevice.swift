@@ -11,14 +11,25 @@ struct SelectedLedgerControlRequirements: Hashable {
 // MARK: - ChooseLedgerHardwareDevice
 public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var ledgers: IdentifiedArrayOf<LedgerFactorSource> = []
+		public let mode: Mode
+
+		@Loadable
+		public var ledgers: IdentifiedArrayOf<LedgerFactorSource>? = nil
+
 		public var selectedLedgerID: FactorSourceID? = nil
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
 		public var addNewLedger: AddLedgerFactorSource.State?
 
-		public init() {}
+		public init(mode: Mode) {
+			self.mode = mode
+		}
+
+		public enum Mode: Sendable, Hashable {
+			case select
+			case list
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -26,10 +37,11 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 		case selectedLedger(id: FactorSource.ID?)
 		case addNewLedgerButtonTapped
 		case confirmedLedger(LedgerFactorSource)
+		case whatIsALedgerButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedLedgers(IdentifiedArrayOf<LedgerFactorSource>)
+		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerFactorSource>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -54,12 +66,7 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .task {
-				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet).compactMap {
-					try? LedgerFactorSource(factorSource: $0)
-				}
-				return .internal(.loadedLedgers(.init(uniqueElements: ledgers)))
-			}
+			return updateLedgersEffekt(state: &state)
 
 		case let .selectedLedger(selectedID):
 			state.selectedLedgerID = selectedID
@@ -71,13 +78,16 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 
 		case let .confirmedLedger(ledger):
 			return .send(.delegate(.choseLedger(ledger)))
+
+		case .whatIsALedgerButtonTapped:
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadedLedgers(ledgers):
-			state.ledgers = ledgers
+		case let .loadedLedgers(result):
+			state.$ledgers = .init(result: result)
 			return .none
 		}
 	}
@@ -87,11 +97,22 @@ public struct ChooseLedgerHardwareDevice: Sendable, FeatureReducer {
 		case let .addNewLedger(.presented(.delegate(.completed(ledger, _)))):
 			state.addNewLedger = nil
 			state.selectedLedgerID = ledger.id
-			state.ledgers[id: ledger.id] = ledger
-			return .none
+			return updateLedgersEffekt(state: &state)
 
 		default:
 			return .none
+		}
+	}
+
+	private func updateLedgersEffekt(state: inout State) -> EffectTask<Action> {
+		state.$ledgers = .loading
+		return .task {
+			let result = await TaskResult {
+				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
+					.compactMap { try? LedgerFactorSource(factorSource: $0) }
+				return IdentifiedArray(uniqueElements: ledgers)
+			}
+			return .internal(.loadedLedgers(result))
 		}
 	}
 }

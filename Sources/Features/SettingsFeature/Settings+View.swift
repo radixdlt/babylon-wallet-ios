@@ -1,9 +1,9 @@
 import AuthorizedDAppsFeature
+import ChooseLedgerHardwareDeviceFeature
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
-import LedgerHardwareWalletsFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -62,7 +62,9 @@ extension AppSettings.View {
 			settingsView(viewStore: viewStore)
 				.navigationTitle(L10n.Settings.title)
 			#if os(iOS)
+				.navigationBarTitleColor(.app.gray1)
 				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
 				.navigationDestinations(with: destinationStore)
 				.confirmationDialog(
@@ -195,7 +197,7 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: { LedgerHardwareWallets.View(store: $0) }
+			destination: { ChooseLedgerHardwareDevice.View(store: $0) }
 		)
 	}
 

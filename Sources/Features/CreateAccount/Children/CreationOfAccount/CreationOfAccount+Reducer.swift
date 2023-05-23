@@ -27,7 +27,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			self.networkID = networkID
 			self.isCreatingLedgerAccount = isCreatingLedgerAccount
 
-			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init()) : .step1_derivePublicKeys(
+			self.step = isCreatingLedgerAccount ? .step0_chooseLedger(.init(mode: .select)) : .step1_derivePublicKeys(
 				.init(
 					derivationPathOption: .next(for: .account, networkID: networkID, curve: .curve25519),
 					factorSourceOption: .device,
@@ -87,12 +87,12 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			return .send(.delegate(.createAccountFailed))
 
 		case let .createAccountResult(.success(account)):
-			return .run { send in
+			return .task {
 				try await accountsClient.saveVirtualAccount(.init(account: account, shouldUpdateFactorSourceNextDerivationIndex: true))
-				await send(.delegate(.createdAccount(account)))
-			} catch: { error, send in
+				return .delegate(.createdAccount(account))
+			} catch: { error in
 				loggerGlobal.error("Failed to save newly created virtual account into profile: \(error)")
-				await send(.delegate(.createAccountFailed))
+				return .delegate(.createAccountFailed)
 			}
 		}
 	}
@@ -104,8 +104,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 				derivationPathOption: .next(for: .account, networkID: state.networkID, curve: .curve25519),
 				factorSourceOption: .specific(ledger.factorSource),
 				purpose: .createEntity
-			)
-			)
+			))
 			return .none
 
 		case let .step1_derivePublicKeys(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
