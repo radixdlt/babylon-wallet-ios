@@ -196,6 +196,10 @@ extension SigningPurpose {
 			return .signTransaction
 		case .signTransaction(.internalManifest(.uploadAuthKey)):
 			return .createSignAuthKey
+		#if DEBUG
+		case .signTransaction(.internalManifest(.debugModifyAccount)):
+			return .debugOnlyInspect
+		#endif // DEBUG
 		}
 	}
 }

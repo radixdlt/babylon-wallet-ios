@@ -2,11 +2,17 @@ import CreateAuthKeyFeature
 import FeaturePrelude
 import ShowQRFeature
 
+#if DEBUG
+// Manifest turning account into Dapp Definition type, debug action...
+import TransactionReviewFeature
+#endif // DEBUG
+
 extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		#if DEBUG
 		return .init(
 			faucetButtonState: faucetButtonState,
+			canTurnIntoDappDefinitionAccounType: canTurnIntoDappDefinitionAccountType,
 			canCreateAuthSigningKey: canCreateAuthSigningKey,
 			createFungibleTokenButtonState: createFungibleTokenButtonState,
 			createNonFungibleTokenButtonState: createNonFungibleTokenButtonState,
@@ -25,6 +31,7 @@ extension AccountPreferences {
 		public var faucetButtonState: ControlState
 
 		#if DEBUG
+		public var canTurnIntoDappDefinitionAccounType: Bool
 		public var canCreateAuthSigningKey: Bool
 		public var createFungibleTokenButtonState: ControlState
 		public var createNonFungibleTokenButtonState: ControlState
@@ -35,6 +42,7 @@ extension AccountPreferences {
 		#if DEBUG
 		public init(
 			faucetButtonState: ControlState,
+			canTurnIntoDappDefinitionAccounType: Bool,
 			canCreateAuthSigningKey: Bool,
 			createFungibleTokenButtonState: ControlState,
 			createNonFungibleTokenButtonState: ControlState,
@@ -42,6 +50,7 @@ extension AccountPreferences {
 			createMultipleNonFungibleTokenButtonState: ControlState
 		) {
 			self.faucetButtonState = faucetButtonState
+			self.canTurnIntoDappDefinitionAccounType = canTurnIntoDappDefinitionAccounType
 			self.canCreateAuthSigningKey = canCreateAuthSigningKey
 			self.createFungibleTokenButtonState = createFungibleTokenButtonState
 			self.createNonFungibleTokenButtonState = createNonFungibleTokenButtonState
@@ -69,6 +78,7 @@ extension AccountPreferences {
 					VStack(alignment: .leading) {
 						faucetButton(with: viewStore)
 						#if DEBUG
+						turnIntoDappDefinitionAccountTypeButton(with: viewStore)
 						createAndUploadAuthKeyButton(with: viewStore)
 						createFungibleTokenButton(with: viewStore)
 						createNonFungibleTokenButton(with: viewStore)
@@ -97,6 +107,15 @@ extension AccountPreferences {
 					) { store in
 						ShowQR.View(store: store)
 					}
+					#if DEBUG
+					.sheet(
+							store: store.destination,
+							state: /AccountPreferences.Destination.State.reviewTransactionTurningAccountIntoDappDefType,
+							action: AccountPreferences.Destination.Action.reviewTransactionTurningAccountIntoDappDefType
+						) { store in
+							TransactionReview.View(store: store)
+						}
+					#endif // DEBUG
 					#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
@@ -148,6 +167,15 @@ extension AccountPreferences.View {
 
 #if DEBUG
 extension AccountPreferences.View {
+	@ViewBuilder
+	private func turnIntoDappDefinitionAccountTypeButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button("Turn into dApp Definition account type") {
+			viewStore.send(.turnIntoDappDefinitionAccountTypeButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.canTurnIntoDappDefinitionAccounType ? .enabled : .disabled)
+	}
+
 	@ViewBuilder
 	private func createAndUploadAuthKeyButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
 		Button("Create & Upload Auth Key") {
