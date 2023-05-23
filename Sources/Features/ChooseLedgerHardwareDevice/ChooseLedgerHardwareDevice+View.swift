@@ -32,8 +32,8 @@ extension ChooseLedgerHardwareDevice {
 
 			switch mode {
 			case .select:
-				self.navigationTitle = L10n.CreateEntity.Ledger.createAccount
-				self.subtitle = L10n.CreateEntity.Ledger.subtitleSelectLedger
+				self.navigationTitle = "Choose Ledger Device" // FIXME: Strings
+				self.subtitle = "Choose a Ledger hardware wallet device" // FIXME: Strings -> L10n.CreateEntity.Ledger.subtitleSelectLedger
 				self.showFooter = true
 			case .list:
 				self.navigationTitle = "Ledger Hardware Wallets" // FIXME: Strings
@@ -70,7 +70,7 @@ extension ChooseLedgerHardwareDevice {
 
 						ledgerList(viewStore: viewStore)
 
-						Button(L10n.CreateEntity.Ledger.addNewLedger) {
+						Button("Add Ledger Device") { // FIXME: Strings -> L10n.CreateEntity.Ledger.addNewLedger
 							viewStore.send(.addNewLedgerButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -87,7 +87,8 @@ extension ChooseLedgerHardwareDevice {
 						viewStore.selectedLedgerControlRequirements,
 						forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
 					) { action in
-						Button(L10n.CreateEntity.Ledger.useLedger, action: action)
+						// FIXME: Strings: remove L10n.CreateEntity.Ledger.useLedger
+						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

@@ -44,6 +44,7 @@ extension DerivePublicKeys {
 					viewStore.send(.onFirstTask)
 				}
 			}
+			.navigationTitle(L10n.CreateEntity.Ledger.createAccount)
 		}
 	}
 }
