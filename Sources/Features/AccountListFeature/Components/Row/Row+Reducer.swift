@@ -6,6 +6,13 @@ import FeaturePrelude
 extension AccountList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
+			public enum AccountTag: Int, Hashable, Identifiable, Sendable {
+				case ledgerBabylon
+				case ledgerLegacy
+				case legacySoftware
+				case dAppDefinition
+			}
+
 			public var id: AccountAddress { account.address }
 
 			public let account: Profile.Network.Account
@@ -13,12 +20,16 @@ extension AccountList {
 			public var portfolio: Loadable<AccountPortfolio>
 
 			public var shouldShowSecurityPrompt = false
+			public var tag: AccountTag?
 
 			public init(
 				account: Profile.Network.Account
 			) {
 				self.account = account
 				self.portfolio = .loading
+				if account.isOlympiaAccount {
+					tag = .legacySoftware
+				}
 			}
 		}
 
@@ -31,6 +42,8 @@ extension AccountList {
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
 			case displaySecurityPrompting
+			case isLedgerAccount
+			case isDappDefinitionAccount
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -38,6 +51,8 @@ extension AccountList {
 			case securityPromptTapped(Profile.Network.Account)
 		}
 
+		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -47,6 +62,15 @@ extension AccountList {
 				let accountAddress = state.account.address
 				state.portfolio = .loading
 				return .run { send in
+
+					let isDappDefinitionAccount: Bool = try await (cacheClient.withCaching(
+						cacheEntry: .dAppMetadata(accountAddress.address),
+						request: { try await gatewayAPIClient.getEntityMetadata(accountAddress.address) }
+					)).accountType == .dappDefinition
+					if isDappDefinitionAccount {
+						await send(.internal(.isDappDefinitionAccount))
+					}
+
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
 						guard !Task.isCancelled else {
 							return
@@ -63,6 +87,17 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
+			case .isDappDefinitionAccount:
+				state.tag = .dAppDefinition
+				return .none
+			case .isLedgerAccount:
+				if state.account.isOlympiaAccount {
+					state.tag = .ledgerLegacy
+				} else {
+					state.tag = .ledgerBabylon
+				}
+				return .none
+
 			case .displaySecurityPrompting:
 				state.shouldShowSecurityPrompt = true
 				return .none
@@ -96,6 +131,9 @@ extension AccountList {
 				}
 				guard factorSource.kind == .device else {
 					// probably ledger account
+					if factorSource.kind == .ledgerHQHardwareWallet {
+						await send(.internal(.isLedgerAccount))
+					}
 					return
 				}
 				await send(.internal(.displaySecurityPrompting))

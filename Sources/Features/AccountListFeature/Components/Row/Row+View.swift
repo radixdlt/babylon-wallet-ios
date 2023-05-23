@@ -14,7 +14,9 @@ extension AccountList.Row {
 		let address: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
-		let isLegacyAccount: Bool
+
+		let tag: AccountList.Row.State.AccountTag?
+
 		let shouldShowSecurityPrompt: Bool
 		let nonFungibleResourcesCount: Int
 		let fungibleResourceIcons: FungibleResources
@@ -25,8 +27,7 @@ extension AccountList.Row {
 			self.appearanceID = state.account.appearanceID
 			self.isLoadingResources = state.portfolio.isLoading
 
-			// Olympia accounts are legacy
-			self.isLegacyAccount = state.account.isOlympiaAccount
+			self.tag = state.tag
 
 			// Show the prompt if the account has any XRD
 			self.shouldShowSecurityPrompt = state.shouldShowSecurityPrompt
@@ -67,9 +68,9 @@ extension AccountList.Row {
 								.foregroundColor(.app.whiteTransparent)
 								.textStyle(.body2HighImportance)
 
-							if viewStore.isLegacyAccount {
+							if let tag = viewStore.tag {
 								Text("•")
-								Text("\(L10n.HomePage.legacyAccountHeading)")
+								Text("\(tag.display)")
 							}
 						}
 						.foregroundColor(.app.whiteTransparent)
@@ -233,6 +234,25 @@ extension AccountList.Row.View {
 				.textStyle(.body1Header)
 				.fixedSize()
 			Spacer()
+		}
+	}
+}
+
+extension AccountList.Row.State.AccountTag {
+	var display: String {
+		switch self {
+		case .dAppDefinition:
+			// FIXME: change to `L10n.home.accountsTag.dAppDefinition`
+			return "dapp definition"
+		case .legacySoftware:
+			// FIXME: change to `L10n.home.accountsTag.legacySoftware`
+			return L10n.HomePage.legacyAccountHeading // "Legacy"
+		case .ledgerLegacy:
+			// FIXME: change to `L10n.home.accountsTag.ledgerLegacy`
+			return "Legacy (Ledger)"
+		case .ledgerBabylon:
+			// FIXME: change to `L10n.home.accountsTag.ledgerBabylon`
+			return "Ledger"
 		}
 	}
 }
