@@ -15,7 +15,24 @@ extension AccountList.Row {
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
 
-		let tag: AccountList.Row.State.AccountTag?
+		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
+			case ledgerBabylon
+			case ledgerLegacy
+			case legacySoftware
+			case dAppDefinition
+
+			init?(state: AccountList.Row.State) {
+				switch (state.isDappDefinitionAccount, state.isLegacyAccount, state.isLedgerAccount) {
+				case (false, false, false): return nil
+				case (true, _, _): self = .dAppDefinition
+				case (false, true, true): self = .ledgerLegacy
+				case (false, true, false): self = .legacySoftware
+				case (false, false, true): self = .ledgerBabylon
+				}
+			}
+		}
+
+		let tag: AccountTag?
 
 		let shouldShowSecurityPrompt: Bool
 		let nonFungibleResourcesCount: Int
@@ -27,7 +44,7 @@ extension AccountList.Row {
 			self.appearanceID = state.account.appearanceID
 			self.isLoadingResources = state.portfolio.isLoading
 
-			self.tag = state.tag
+			self.tag = .init(state: state)
 
 			// Show the prompt if the account has any XRD
 			self.shouldShowSecurityPrompt = state.shouldShowSecurityPrompt
@@ -238,7 +255,7 @@ extension AccountList.Row.View {
 	}
 }
 
-extension AccountList.Row.State.AccountTag {
+extension AccountList.Row.ViewState.AccountTag {
 	var display: String {
 		switch self {
 		case .dAppDefinition:

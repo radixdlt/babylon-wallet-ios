@@ -2,17 +2,10 @@ import AccountPortfoliosClient
 import FactorSourcesClient
 import FeaturePrelude
 
-// MARK: - AccountList.Row
+// MARK: - AccoœuntList.Row
 extension AccountList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
-			public enum AccountTag: Int, Hashable, Identifiable, Sendable {
-				case ledgerBabylon
-				case ledgerLegacy
-				case legacySoftware
-				case dAppDefinition
-			}
-
 			public var id: AccountAddress { account.address }
 
 			public let account: Profile.Network.Account
@@ -20,16 +13,16 @@ extension AccountList {
 			public var portfolio: Loadable<AccountPortfolio>
 
 			public var shouldShowSecurityPrompt = false
-			public var tag: AccountTag?
+			public var isLegacyAccount: Bool
+			public var isLedgerAccount: Bool = false
+			public var isDappDefinitionAccount: Bool = false
 
 			public init(
 				account: Profile.Network.Account
 			) {
 				self.account = account
 				self.portfolio = .loading
-				if account.isOlympiaAccount {
-					tag = .legacySoftware
-				}
+				self.isLegacyAccount = account.isOlympiaAccount
 			}
 		}
 
@@ -67,7 +60,9 @@ extension AccountList {
 						cacheEntry: .dAppMetadata(accountAddress.address),
 						request: { try await gatewayAPIClient.getEntityMetadata(accountAddress.address) }
 					)).accountType == .dappDefinition
+
 					if isDappDefinitionAccount {
+						print("🔮 account:\(accountAddress) is DAPP DEF")
 						await send(.internal(.isDappDefinitionAccount))
 					}
 
@@ -88,14 +83,10 @@ extension AccountList {
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
 			case .isDappDefinitionAccount:
-				state.tag = .dAppDefinition
+				state.isDappDefinitionAccount = true
 				return .none
 			case .isLedgerAccount:
-				if state.account.isOlympiaAccount {
-					state.tag = .ledgerLegacy
-				} else {
-					state.tag = .ledgerBabylon
-				}
+				state.isLedgerAccount = true
 				return .none
 
 			case .displaySecurityPrompting:
