@@ -95,13 +95,6 @@ extension AccountPreferences {
 					.navigationTitle(L10n.AccountSettings.title)
 					.sheet(
 						store: store.destination,
-						state: /AccountPreferences.Destination.State.createAuthKey,
-						action: AccountPreferences.Destination.Action.createAuthKey
-					) { store in
-						CreateAuthKey.View(store: store)
-					}
-					.sheet(
-						store: store.destination,
 						state: /AccountPreferences.Destination.State.showQR,
 						action: AccountPreferences.Destination.Action.showQR
 					) { store in
@@ -109,6 +102,13 @@ extension AccountPreferences {
 					}
 					#if DEBUG
 					.sheet(
+							store: store.destination,
+							state: /AccountPreferences.Destination.State.createAuthKey,
+							action: AccountPreferences.Destination.Action.createAuthKey
+						) { store in
+							CreateAuthKey.View(store: store)
+						}
+						.sheet(
 							store: store.destination,
 							state: /AccountPreferences.Destination.State.reviewTransactionTurningAccountIntoDappDefType,
 							action: AccountPreferences.Destination.Action.reviewTransactionTurningAccountIntoDappDefType
