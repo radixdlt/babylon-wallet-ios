@@ -146,7 +146,13 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			)
 			return .none
 
+		case let .derivePublicKeys(.presented(.delegate(.failedToDerivePublicKey))):
+			loggerGlobal.error("ImportOlympiaAccountsAndFactorSource - child derivePublicKeys failed to derive public key")
+			state.derivePublicKeys = nil
+			return .none
+
 		case let .derivePublicKeys(.presented(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _)))):
+			state.derivePublicKeys = nil
 			guard let ledger = state.chooseLedger.ledgers[id: factorSourceID] else {
 				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 				return .none
@@ -211,6 +217,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			loggerGlobal.notice("state.unmigrated.unvalidated not empty #\(state.unmigrated.unvalidated) , need to migrate more accounds...")
 			return .none
 		}
+		loggerGlobal.notice("Finished migrating all accounts.")
 
 		return .send(.delegate(.completed(
 			ledgersWithAccounts: state.ledgersWithAccounts,

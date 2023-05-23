@@ -179,7 +179,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSources(.delegate(
 			.completed(ledgersWithAccounts, unvalidatedOlympiaAccounts)
 		)))):
-
+			loggerGlobal.notice("Coordinator, proceeding to completion")
 			state.migratedAccounts.append(contentsOf: ledgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
 
 			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
