@@ -62,7 +62,6 @@ extension AccountList {
 					)).accountType == .dappDefinition
 
 					if isDappDefinitionAccount {
-						print("🔮 account:\(accountAddress) is DAPP DEF")
 						await send(.internal(.isDappDefinitionAccount))
 					}
 
