@@ -7,6 +7,7 @@ public struct UseLedgerView: SwiftUI.View {
 	public enum Purpose: Sendable, Hashable {
 		case createAccount
 		case createAuthSigningKey
+		case importLegacyAccounts
 		case signAuth
 		case signTX
 	}
@@ -58,6 +59,8 @@ public struct UseLedgerView: SwiftUI.View {
 			return "Sign auth challenge"
 		case .signTX:
 			return "Sign transaction"
+		case .importLegacyAccounts:
+			return "Import Legacy Accounts"
 		}
 	}
 

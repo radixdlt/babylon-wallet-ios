@@ -12,13 +12,13 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let noop = Self(
-		publicKeyFromOnDeviceHD: { _ in throw NoopError() },
+		publicKeysFromOnDeviceHD: { _ in throw NoopError() },
 		signatureFromOnDeviceHD: { _ in throw NoopError() },
 		isAccountRecoveryNeeded: { false }
 	)
 
 	public static let testValue = Self(
-		publicKeyFromOnDeviceHD: unimplemented("\(Self.self).publicKeyFromOnDeviceHD"),
+		publicKeysFromOnDeviceHD: unimplemented("\(Self.self).publicKeysFromOnDeviceHD"),
 		signatureFromOnDeviceHD: unimplemented("\(Self.self).signatureFromOnDeviceHD"),
 		isAccountRecoveryNeeded: unimplemented("\(Self.self).isAccountRecoveryNeeded")
 	)

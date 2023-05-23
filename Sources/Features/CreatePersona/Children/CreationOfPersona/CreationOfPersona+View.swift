@@ -1,4 +1,4 @@
-import DerivePublicKeyFeature
+import DerivePublicKeysFeature
 import FeaturePrelude
 
 extension CreationOfPersona {
@@ -11,10 +11,10 @@ extension CreationOfPersona {
 		}
 
 		public var body: some SwiftUI.View {
-			DerivePublicKey.View(
+			DerivePublicKeys.View(
 				store: store.scope(
-					state: \.derivePublicKey,
-					action: { CreationOfPersona.Action.child(.derivePublicKey($0)) }
+					state: \.derivePublicKeys,
+					action: { CreationOfPersona.Action.child(.derivePublicKeys($0)) }
 				)
 			)
 			.navigationTitle(L10n.CreateEntity.Ledger.createPersona)

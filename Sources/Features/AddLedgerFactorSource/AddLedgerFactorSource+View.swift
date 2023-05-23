@@ -49,11 +49,6 @@ extension AddLedgerFactorSource {
 								viewStore.send(.confirmNameButtonTapped)
 							}
 							.buttonStyle(.primaryRectangular)
-
-							Button("Skip name") {
-								viewStore.send(.skipNamingLedgerButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular(shouldExpand: true))
 						}
 					} else {
 						Text("Connect the Ledger device you wanna add to a computer on which you have a Browser you have RadixConnect linked to. Unlock your Ledger and open the Radix Babylon Ledger App on your ledger. Look for a new tab in your linked Browser and follow the instructions on the screen.")

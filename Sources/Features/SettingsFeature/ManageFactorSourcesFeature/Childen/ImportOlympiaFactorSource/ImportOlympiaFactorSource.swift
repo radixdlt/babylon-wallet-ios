@@ -34,7 +34,7 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 			self.passphrase = passphrase
 			self.selectedAccounts = selectedAccounts
 			#if DEBUG
-			if let new = try? Mnemonic(phrase: "pilot sell sword easily rigid penalty please jealous cheese print turtle upgrade", language: .english) {
+			if let new = try? Mnemonic(phrase: "gentle hawk winner rain embrace erosion call update photo frost fatal wrestle", language: .english) {
 				self.mnemonic = new.phrase
 				self.expectedWordCount = new.wordCount
 			}
