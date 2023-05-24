@@ -50,16 +50,16 @@ extension BIP39 {
 }
 
 extension BIP39.WordList {
-	internal func words(at indices: [Word.Index]) -> OrderedSet<NonEmptyString> {
-		OrderedSet(uncheckedUniqueElements: indices.map { index in
+	internal func words(at indices: [Word.Index]) -> [NonEmptyString] {
+		indices.map { index in
 			guard let word = self.indexToWord[index] else {
 				fatalError("Incorrect implementation, should always be able to located word at index. Index was: \(index), language: \(language)")
 			}
 			return word.word
-		})
+		}
 	}
 
-	internal func indices(of words: OrderedSet<NonEmptyString>) -> [Word.Index] {
+	internal func indices(of words: [NonEmptyString]) -> [Word.Index] {
 		words.map { wordString in
 			guard let index = self.wordToIndex[wordString] else {
 				fatalError("Incorrect implementation, should always be able to located index of word. Word was: \(wordString), language: \(language)")
@@ -68,7 +68,7 @@ extension BIP39.WordList {
 		}
 	}
 
-	internal func missingWord(from words: OrderedSet<NonEmptyString>) -> NonEmptyString? {
+	internal func missingWord(from words: [NonEmptyString]) -> NonEmptyString? {
 		for word in words {
 			if self.wordToIndex[word] == nil {
 				return word // missing
@@ -117,7 +117,7 @@ extension BIP39.WordList {
 		return .partialAmongstCandidates(candidates)
 	}
 
-	internal func containsAllWords(in words: OrderedSet<NonEmptyString>) -> Bool {
+	internal func containsAllWords(in words: [NonEmptyString]) -> Bool {
 		missingWord(from: words) == nil
 	}
 }

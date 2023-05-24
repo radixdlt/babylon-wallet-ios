@@ -9,6 +9,10 @@ extension StringProtocol {
 		trimmingCharacters(in: .whitespaces)
 	}
 
+	public func trimmedInclNewlin() -> String {
+		trimmingCharacters(in: .whitespacesAndNewlines)
+	}
+
 	public func lines() -> Int {
 		split(separator: "\n", omittingEmptySubsequences: false).count
 	}

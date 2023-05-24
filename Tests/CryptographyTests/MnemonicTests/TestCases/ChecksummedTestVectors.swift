@@ -112,7 +112,7 @@ extension ChecksummedTestVectors {
 		let mnemonicFirstWordReplaced: [String] = {
 			var tmp = words
 			tmp[0] = firstWordInVocabularyNotPresentInMnemonic
-			return tmp
+			return tmp.map(\.rawValue)
 
 		}()
 

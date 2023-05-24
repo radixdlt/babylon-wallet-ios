@@ -119,7 +119,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
 		public var words: Words
-
 		public var rowCount: Int {
 			words.count / wordsPerRow
 		}
@@ -135,6 +134,13 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public var language: BIP39.Language
 		public var wordCount: BIP39.WordCount
 		public let wordList: BIP39.WordList
+
+		public var mnemonic: Mnemonic? {
+			try? Mnemonic(
+				words: words.map(\.value.displayText),
+				language: language
+			)
+		}
 
 		public init(
 			language: BIP39.Language = .english,
@@ -302,7 +308,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 
 		return .run { send in
-			try? await Task.sleep(for: .milliseconds(200))
+			try? await Task.sleep(for: .milliseconds(50))
 			await send(.internal(.focusNext(nextID)))
 		}
 	}

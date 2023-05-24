@@ -61,7 +61,7 @@ extension ImportMnemonicWord {
 					placeholder: wordAtIndex,
 					text: .init(
 						get: { viewStore.displayText },
-						set: { viewStore.send(.wordChanged(input: $0.lowercased())) }
+						set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmedInclNewlin())) }
 					),
 					hint: { () -> Hint? in
 						guard let validation = viewStore.state.validation else {
@@ -114,10 +114,7 @@ extension ImportMnemonicWord {
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		.init(
-			mnemonic: try? Mnemonic(
-				words: words.map(\.value.displayText),
-				language: .english
-			),
+			mnemonic: mnemonic,
 			rowCount: rowCount
 		)
 	}

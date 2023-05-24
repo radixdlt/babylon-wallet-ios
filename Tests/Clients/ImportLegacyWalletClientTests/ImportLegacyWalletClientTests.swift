@@ -159,7 +159,7 @@ private func generateTestVector(
 
 	return .init(
 		testID: testID, olympiaWallet: .init(
-			mnemonic: mnemonic.phrase,
+			mnemonic: mnemonic.phrase.rawValue,
 			accounts: accountsWithSanitizedNames
 		), payloadSizeThreshold: payloadSizeThreshold,
 		payloads: payloads
@@ -304,7 +304,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 		let testVector = TestVector(
 			testID: 0,
 			olympiaWallet: .init(
-				mnemonic: softwareWallet.mnemonic.phrase,
+				mnemonic: softwareWallet.mnemonic.phrase.rawValue,
 				accounts: accountsWithSanitizedNames
 			), payloadSizeThreshold: payloadSizeThreshold,
 			payloads: payloads

@@ -161,7 +161,7 @@ extension BIP39TestVectors {
 		let mnemonic = try Mnemonic(rawEntropy: vector.entropy, language: language)
 
 		XCTAssertEqual(
-			mnemonic.words, vector.mnemonic,
+			mnemonic.words.map(\.rawValue), vector.mnemonic,
 			"Mnemonics does not match",
 			file: file, line: line
 		)

@@ -6,7 +6,7 @@ extension BIP39 {
 	internal static func mapEntropyToWords(
 		entropy: Entropy,
 		language: Language
-	) throws -> OrderedSet<NonEmptyString> {
+	) throws -> [NonEmptyString] {
 		let wordlist = BIP39.wordList(for: language)
 		let hash = Data(SHA256.hash(data: entropy.data))
 
@@ -27,7 +27,7 @@ extension BIP39 {
 
 	/// This is not mapping exactly to the entropy because the mnemonic words contains a checksummed word.
 	internal static func mapWordsToEntropyBitArray(
-		words mnemonicWords: OrderedSet<NonEmptyString>,
+		words mnemonicWords: [NonEmptyString],
 		language: Language
 	) throws -> BitArray {
 		let wordList = BIP39.wordList(for: language)

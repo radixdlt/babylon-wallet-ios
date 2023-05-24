@@ -2,7 +2,7 @@ import Prelude
 
 // MARK: - Mnemonic
 public struct Mnemonic: Sendable, Hashable {
-	public let words: OrderedSet<NonEmptyString>
+	public let words: [NonEmptyString]
 	public let wordCount: BIP39.WordCount
 	public let language: BIP39.Language
 
@@ -15,14 +15,14 @@ public struct Mnemonic: Sendable, Hashable {
 		language maybeKnownLanguage: BIP39.Language?,
 		requireChecksum: Bool = true
 	) throws {
-		let words: OrderedSet<NonEmptyString> = try .init(validating: wordsNonChecked.compactMap {
+		let words: [NonEmptyString] = wordsNonChecked.compactMap {
 			NonEmptyString(rawValue: $0)
-		})
+		}
 		try self.init(words: words, language: maybeKnownLanguage, requireChecksum: requireChecksum)
 	}
 
 	public init(
-		words: OrderedSet<NonEmptyString>,
+		words: [NonEmptyString],
 		language maybeKnownLanguage: BIP39.Language?,
 		requireChecksum: Bool = true
 	) throws {
