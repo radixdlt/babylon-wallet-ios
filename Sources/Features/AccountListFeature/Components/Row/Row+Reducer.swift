@@ -36,7 +36,6 @@ extension AccountList {
 			case accountPortfolioUpdate(AccountPortfolio)
 			case displaySecurityPrompting
 			case isLedgerAccount
-			case isDappDefinitionAccount
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -55,16 +54,6 @@ extension AccountList {
 				let accountAddress = state.account.address
 				state.portfolio = .loading
 				return .run { send in
-
-					let isDappDefinitionAccount: Bool = try await (cacheClient.withCaching(
-						cacheEntry: .dAppMetadata(accountAddress.address),
-						request: { try await gatewayAPIClient.getEntityMetadata(accountAddress.address) }
-					)).accountType == .dappDefinition
-
-					if isDappDefinitionAccount {
-						await send(.internal(.isDappDefinitionAccount))
-					}
-
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
 						guard !Task.isCancelled else {
 							return
@@ -81,9 +70,6 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
-			case .isDappDefinitionAccount:
-				state.isDappDefinitionAccount = true
-				return .none
 			case .isLedgerAccount:
 				state.isLedgerAccount = true
 				return .none
@@ -92,6 +78,7 @@ extension AccountList {
 				state.shouldShowSecurityPrompt = true
 				return .none
 			case let .accountPortfolioUpdate(portfolio):
+				state.isDappDefinitionAccount = portfolio.isDappDefintionAccountType
 				assert(portfolio.owner == state.account.address)
 				state.portfolio = .success(portfolio)
 
