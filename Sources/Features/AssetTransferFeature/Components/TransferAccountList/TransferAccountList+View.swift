@@ -84,6 +84,7 @@ extension TransferAccountList.View {
 					AssetsView.View(store: $0)
 				}
 			)
+
 		}
 	}
 }

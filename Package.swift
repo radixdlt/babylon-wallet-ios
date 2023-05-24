@@ -70,6 +70,8 @@ package.addModules([
 			"ScanQRFeature",
 			"ChooseAccountsFeature",
 			"AssetsFeature",
+                        "TransactionReviewFeature",
+                        "EngineToolkitClient",
 		],
 		tests: .yes()
 	),
