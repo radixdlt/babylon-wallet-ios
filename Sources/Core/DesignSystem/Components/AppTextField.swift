@@ -73,7 +73,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
-			VStack(alignment: .leading, spacing: .small2) {
+			VStack(alignment: .leading, spacing: .small3) {
 				HStack(spacing: 0) {
 					if let primaryHeading {
 						Text(primaryHeading)

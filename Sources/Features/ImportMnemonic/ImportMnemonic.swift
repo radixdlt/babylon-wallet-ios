@@ -74,6 +74,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Hashable {
 		case lookupWord(input: String)
+		case lostFocus(displayText: String)
 		case autocompleteWith(candidate: NonEmptyString, fromPartial: String)
 	}
 
@@ -104,7 +105,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			)))
 		case let .textFieldFocused(field):
 			state.focusedField = field
-			return .none
+			return field == nil ? .send(.delegate(.lostFocus(displayText: state.value.displayText))) : .none
 		}
 	}
 }
@@ -218,8 +219,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .word(id, child: .delegate(.lookupWord(input))):
-			let lookedUp = state.wordList.lookup(input, minLengthForPartial: 2, ignoreCandidateIfCountExceeds: 5)
-			return updateWord(id: id, input: input, &state, lookupResult: lookedUp)
+			let lookUpResult = lookup(input: input, state)
+			return updateWord(id: id, input: input, &state, lookupResult: lookUpResult)
+
+		case let .word(id, child: .delegate(.lostFocus(displayText))):
+			guard case .invalid = lookup(input: displayText, state) else {
+				return .none
+			}
+
+			return updateWord(id: id, input: displayText, &state, lookupResult: .invalid)
 
 		case let .word(id, child: .delegate(.autocompleteWith(candidate, input))):
 			return updateWord(id: id, input: input, &state, lookupResult: .knownFull(candidate))
@@ -227,6 +235,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case .word(_, child: .view), .word(_, child: .internal):
 			return .none
 		}
+	}
+
+	private func lookup(input: String, _ state: State) -> BIP39.WordList.LookupResult {
+		state.wordList.lookup(input, minLengthForPartial: 2, ignoreCandidateIfCountExceeds: 5)
 	}
 
 	private func updateWord(
@@ -255,6 +267,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.words[id: id]?.autocompletionCandidates = nil
 			state.words[id: id]?.value = .knownAutocompleted(knownAutocomplete, fromPartial: input)
 			return focusNext(&state)
+
+		case .invalid:
+			state.words[id: id]?.autocompletionCandidates = nil
+			state.words[id: id]?.value = .invalid(input)
+			return .none
 		}
 	}
 

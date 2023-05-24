@@ -55,14 +55,13 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-
+				let wordAtIndex = "Word #\(viewStore.index + 1)"
 				AppTextField(
-					primaryHeading: "Word \(viewStore.index + 1)",
-//					secondaryHeading: "Word \(viewStore.index + 1)",
-					placeholder: "Word \(viewStore.index + 1)",
+					primaryHeading: wordAtIndex,
+					placeholder: wordAtIndex,
 					text: .init(
 						get: { viewStore.displayText },
-						set: { viewStore.send(.wordChanged(input: $0)) }
+						set: { viewStore.send(.wordChanged(input: $0.lowercased())) }
 					),
 					hint: { () -> Hint? in
 						guard let validation = viewStore.state.validation else {
@@ -89,9 +88,8 @@ extension ImportMnemonicWord {
 					}
 				)
 				.minimumScaleFactor(0.9)
-				.textCase(.lowercase)
 				.keyboardType(.alphabet)
-				.autocapitalization(.none)
+				.textInputAutocapitalization(.never)
 				.autocorrectionDisabled()
 				.toolbar {
 					if let autocompletionCandidates = viewStore.autocompletionCandidates {
@@ -143,7 +141,7 @@ extension ImportMnemonic {
 							columns: .init(
 								repeating: .init(
 									.adaptive(minimum: geoProxy.frame(in: .local).width / CGFloat(wordsPerRow)),
-									spacing: 8,
+									spacing: .small2,
 									alignment: .top
 								),
 								count: 3
@@ -151,14 +149,17 @@ extension ImportMnemonic {
 						) {
 							ForEachStore(
 								store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) }),
-								content: {
-									ImportMnemonicWord.View(store: $0)
+								content: { importMnemonicWordStore in
+									VStack(spacing: 0) {
+										ImportMnemonicWord.View(store: importMnemonicWordStore)
+										Spacer(minLength: .medium2)
+									}
 								}
 							)
 						}
 					}
 				}
-				.padding(14)
+				.padding(.medium3)
 				.footer {
 					WithControlRequirements(
 						viewStore.mnemonic,
