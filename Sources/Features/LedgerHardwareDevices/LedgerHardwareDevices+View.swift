@@ -2,6 +2,54 @@ import AddLedgerFactorSourceFeature
 import FeaturePrelude
 import Profile
 
+// MARK: - LedgerHardwareDevicesCoordinator.View
+extension LedgerHardwareDevicesCoordinator {
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<LedgerHardwareDevicesCoordinator>
+
+		public init(store: StoreOf<LedgerHardwareDevicesCoordinator>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+			Color.red
+				.navigationDestination(
+					store: destinationStore,
+					state: /LedgerHardwareDevicesCoordinator.Destinations.State.linkConnector,
+					action: LedgerHardwareDevicesCoordinator.Destinations.Action.linkConnector,
+					destination: { LedgerHardwareDevicesLinkConnector.View(store: $0) }
+				)
+				.navigationDestination(
+					store: destinationStore,
+					state: /LedgerHardwareDevicesCoordinator.Destinations.State.selectDevice,
+					action: LedgerHardwareDevicesCoordinator.Destinations.Action.selectDevice,
+					destination: { childStore in
+						LedgerHardwareDevices.View(store: childStore)
+							.navigationBarBackButtonHidden()
+					}
+				)
+		}
+	}
+}
+
+// MARK: - LedgerHardwareDevicesLinkConnector.View
+extension LedgerHardwareDevicesLinkConnector {
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<LedgerHardwareDevicesLinkConnector>
+
+		public init(store: StoreOf<LedgerHardwareDevicesLinkConnector>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			Button("") {}
+		}
+	}
+}
+
 extension LedgerHardwareDevices.State {
 	var viewState: LedgerHardwareDevices.ViewState {
 		.init(state: self)

@@ -3,6 +3,126 @@ import FactorSourcesClient
 import FeaturePrelude
 import Profile
 
+// MARK: - LedgerHardwareDevicesCoordinator
+public struct LedgerHardwareDevicesCoordinator: Sendable, FeatureReducer {
+	// MARK: - State
+
+	public struct State: Sendable, Hashable {
+		@PresentationState
+		public var destination: Destinations.State? = nil
+
+		public init(destination: Destinations.State? = nil) {
+			self.destination = destination
+		}
+	}
+
+	// MARK: - Action
+
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case onFirstTask
+	}
+
+	// MARK: - Destination
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case selectDevice(LedgerHardwareDevices.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case linkConnector(LedgerHardwareDevicesLinkConnector.Action)
+			case selectDevice(LedgerHardwareDevices.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.linkConnector, action: /Action.linkConnector) {
+				LedgerHardwareDevicesLinkConnector()
+			}
+			Scope(state: /State.selectDevice, action: /Action.selectDevice) {
+				LedgerHardwareDevices()
+			}
+		}
+	}
+
+	// MARK: - Reducer
+
+	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
+	}
+}
+
+import NewConnectionFeature
+
+// MARK: - LedgerHardwareDevicesLinkConnector
+public struct LedgerHardwareDevicesLinkConnector: Sendable, FeatureReducer {
+	// MARK: - State
+
+	public struct State: Sendable, Hashable {
+		@PresentationState
+		var destination: Destinations.State? = nil
+	}
+
+	// MARK: - Action
+
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case onFirstTask
+		case addConnectorButtonTapped
+	}
+
+	// MARK: - Destination
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case addNewP2PLink(NewConnection.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case addNewP2PLink(NewConnection.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
+				NewConnection()
+			}
+		}
+	}
+
+	// MARK: - Reducer
+
+	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .onFirstTask:
+			return .none
+
+		case .addConnectorButtonTapped:
+			state.destination = .addNewP2PLink(.init())
+			return .none
+		}
+	}
+}
+
 // MARK: - SelectedLedgerControlRequirements
 struct SelectedLedgerControlRequirements: Hashable {
 	let selectedLedger: LedgerFactorSource

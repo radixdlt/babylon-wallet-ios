@@ -107,6 +107,7 @@ extension View {
 			.generalSettings(with: destinationStore)
 			.profileBackups(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
+			.ledgerHardwareWallets_(with: destinationStore)
 	}
 }
 
@@ -198,6 +199,16 @@ extension View {
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
 			destination: { LedgerHardwareDevices.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func ledgerHardwareWallets_(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.ledgerHardwareWallets_,
+			action: AppSettings.Destinations.Action.ledgerHardwareWallets_,
+			destination: { LedgerHardwareDevicesCoordinator.View(store: $0) }
 		)
 	}
 

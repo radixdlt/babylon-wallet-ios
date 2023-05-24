@@ -95,6 +95,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case generalSettings(GeneralSettings.State)
 			case profileBackups(ProfileBackups.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
+			case ledgerHardwareWallets_(LedgerHardwareDevicesCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -108,6 +109,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case generalSettings(GeneralSettings.Action)
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
+			case ledgerHardwareWallets_(LedgerHardwareDevicesCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -137,6 +139,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
 				LedgerHardwareDevices()
+			}
+			Scope(state: /State.ledgerHardwareWallets_, action: /Action.ledgerHardwareWallets_) {
+				LedgerHardwareDevicesCoordinator()
 			}
 		}
 	}
@@ -212,7 +217,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .profileBackupsButtonTapped:
-			state.destination = .profileBackups(.init())
+//			state.destination = .profileBackups(.init())
+			state.destination = .ledgerHardwareWallets_(.init(destination: .selectDevice(.init(allowSelection: false))))
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:
