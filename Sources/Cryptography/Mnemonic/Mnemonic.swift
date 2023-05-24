@@ -1,8 +1,8 @@
-import Foundation
+import Prelude
 
 // MARK: - Mnemonic
 public struct Mnemonic: Sendable, Hashable {
-	public let words: [String]
+	public let words: OrderedSet<NonEmptyString>
 	public let wordCount: BIP39.WordCount
 	public let language: BIP39.Language
 
@@ -11,7 +11,18 @@ public struct Mnemonic: Sendable, Hashable {
 	///
 	/// Pass `false` to `requireChecksum` if you need to support non-checksummed mnemonics.
 	public init(
-		words: [String],
+		words wordsNonChecked: [String],
+		language maybeKnownLanguage: BIP39.Language?,
+		requireChecksum: Bool = true
+	) throws {
+		let words: OrderedSet<NonEmptyString> = try .init(validating: wordsNonChecked.compactMap {
+			NonEmptyString(rawValue: $0)
+		})
+		try self.init(words: words, language: maybeKnownLanguage, requireChecksum: requireChecksum)
+	}
+
+	public init(
+		words: OrderedSet<NonEmptyString>,
 		language maybeKnownLanguage: BIP39.Language?,
 		requireChecksum: Bool = true
 	) throws {
@@ -32,7 +43,7 @@ public struct Mnemonic: Sendable, Hashable {
 		// Wordlist
 		let wordList = BIP39.wordList(for: language)
 		if let missingWord = wordList.missingWord(from: words) {
-			throw Error.wordListDoesNotContainWord(missingWord, in: language)
+			throw Error.wordListDoesNotContainWord(missingWord.rawValue, in: language)
 		}
 
 		// Checksum
@@ -50,7 +61,15 @@ public struct Mnemonic: Sendable, Hashable {
 }
 
 extension Mnemonic {
-	public var phrase: String { words.joined(separator: String(Self.wordSeparator)) }
+	public var phrase: NonEmptyString {
+		precondition(!words.isEmpty)
+		guard let phrase = NonEmptyString(
+			rawValue: words.map(\.rawValue).joined(separator: String(Self.wordSeparator))
+		) else {
+			fatalError("Expected phrase to never be empty, was `words` empty?")
+		}
+		return phrase
+	}
 }
 
 // MARK: Codable

@@ -4,9 +4,9 @@ import Prelude
 extension BIP39 {
 	@discardableResult
 	internal static func validateChecksumOf(
-		mnemonicWords: [String],
+		mnemonicWords: OrderedSet<NonEmptyString>,
 		language: BIP39.Language
-	) throws -> [String] {
+	) throws -> OrderedSet<NonEmptyString> {
 		let bitArray = try BIP39.mapWordsToEntropyBitArray(words: mnemonicWords, language: language)
 
 		// https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic

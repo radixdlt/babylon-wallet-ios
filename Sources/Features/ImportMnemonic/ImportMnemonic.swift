@@ -1,0 +1,207 @@
+import Cryptography
+import FeaturePrelude
+
+// MARK: - ImportMnemonicWord
+public struct ImportMnemonicWord: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable, Identifiable {
+		public enum Field: Hashable {
+			case textField
+		}
+
+		public enum WordValue: Sendable, Hashable {
+			case empty
+			case partial(String)
+			case knownFull(NonEmptyString)
+			case knownAutocompleted(NonEmptyString, fromPartial: String)
+
+			var isValid: Bool {
+				switch self {
+				case .knownFull, .knownAutocompleted: return true
+				case .partial, .empty: return false
+				}
+			}
+
+			var displayText: String {
+				switch self {
+				case .empty: return ""
+				case let .partial(text): return text
+				case let .knownFull(word): return word.rawValue
+				case let .knownAutocompleted(word, _): return word.rawValue
+				}
+			}
+		}
+
+		public struct AutocompletionCandidates: Sendable, Hashable {
+			public let input: String
+			public let candidates: OrderedSet<NonEmptyString>
+		}
+
+		public typealias ID = Int
+		public let id: ID
+		public var value: WordValue
+		public var autocompletionCandidates: AutocompletionCandidates? = nil
+		public var focusedField: Field? = nil
+		public init(id: ID, value: WordValue = .empty) {
+			self.id = id
+			self.value = value
+		}
+
+		public var isValidWord: Bool {
+			value.isValid
+		}
+
+		public mutating func focus() {
+			self.focusedField = .textField
+		}
+
+		public mutating func resignFocus() {
+			self.focusedField = nil
+		}
+	}
+
+	public enum ViewAction: Sendable, Hashable {
+		case wordChanged(input: String)
+		case autocompleteWith(candidate: NonEmptyString)
+		case textFieldFocused(State.Field?)
+	}
+
+	public enum DelegateAction: Sendable, Hashable {
+		case lookupWord(input: String)
+		case autocompleteWith(candidate: NonEmptyString, fromPartial: String)
+	}
+
+	public init() {}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case let .wordChanged(input):
+			return .send(.delegate(.lookupWord(input: input)))
+		case let .autocompleteWith(candidate):
+			return .send(.delegate(.autocompleteWith(
+				candidate: candidate,
+				fromPartial: state.value.displayText
+			)))
+		case .textFieldFocused:
+			fatalError()
+		}
+	}
+}
+
+// MARK: - BIP39.WordList + Sendable
+extension BIP39.WordList: @unchecked Sendable {}
+let wordsPerRow = 3
+
+// MARK: - ImportMnemonic
+public struct ImportMnemonic: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
+		public var words: Words
+
+		public var rowCount: Int {
+			words.count / wordsPerRow
+		}
+
+		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID? {
+			mutating willSet {
+				if let current = idOfWordWithTextFieldFocus {
+					words[id: current]?.resignFocus()
+				}
+				if let newValue {
+					words[id: newValue]?.focus()
+				}
+			}
+		}
+
+		public var language: BIP39.Language
+		public var wordCount: BIP39.WordCount
+		public let wordList: BIP39.WordList
+
+		public init(
+			language: BIP39.Language = .english,
+			wordCount: BIP39.WordCount = .twelve
+		) {
+			self.wordList = BIP39.wordList(for: language)
+			self.language = language
+			self.wordCount = wordCount
+			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
+			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
+				ImportMnemonicWord.State(id: $0)
+			})
+		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case appeared
+		case continueButtonTapped(Mnemonic)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case finishedInputtingMnemonic(Mnemonic)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
+	}
+
+	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.forEach(\.words, action: /Action.child .. ChildAction.word) {
+				ImportMnemonicWord()
+			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .word(id, child: .delegate(.lookupWord(input))):
+
+			state.words[id: id]?.autocompletionCandidates = nil
+			state.words[id: id]?.value = .partial(input)
+
+			switch state.wordList.lookup(input, minLengthForPartial: 2) {
+			case let .partialAmongstCandidates(candidates):
+				state.words[id: id]?.autocompletionCandidates = .init(input: input, candidates: candidates)
+
+			case .unknown:
+				break
+
+			case let .knownFull(knownFull):
+				state.words[id: id]?.value = .knownFull(knownFull)
+				focusNext(&state)
+
+			case let .knownAutocomplete(knownAutocomplete):
+				state.words[id: id]?.value = .knownAutocompleted(knownAutocomplete, fromPartial: input)
+				focusNext(&state)
+			}
+			return .none
+
+		case let .word(id, child: .delegate(.autocompleteWith(candidate, _))):
+			state.words[id: id]?.value = .knownFull(candidate)
+			state.words[id: id]?.autocompletionCandidates = nil
+			return .none
+
+		case .word(_, child: .view), .word(_, child: .internal):
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			focusNext(&state)
+			return .none
+
+		case let .continueButtonTapped(mnemonic):
+			return .send(.delegate(.finishedInputtingMnemonic(mnemonic)))
+		}
+	}
+
+	func focusNext(_ state: inout State) {
+		guard let nextID = state.words.first(where: { !$0.isValidWord })?.id else {
+			return
+		}
+
+		state.idOfWordWithTextFieldFocus = nextID
+	}
+}

@@ -204,6 +204,12 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "ImportMnemonicFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [],
+		tests: .no
+	),
+	.feature(
 		name: "ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -312,6 +318,7 @@ package.addModules([
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
+			"ImportMnemonicFeature",
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
 			"InspectProfileFeature",
