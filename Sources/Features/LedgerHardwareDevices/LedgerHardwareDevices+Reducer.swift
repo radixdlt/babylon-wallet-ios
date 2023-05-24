@@ -8,6 +8,79 @@ public struct LedgerHardwareDevicesCoordinator: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
+		public var linkConnector: LedgerHardwareDevicesLinkConnector.State? = nil
+
+		@PresentationState
+		public var destination: Destinations.State? = nil
+
+		public init(destination: Destinations.State? = nil, linkConnector: LedgerHardwareDevicesLinkConnector.State? = nil) {
+			self.destination = destination
+			self.linkConnector = linkConnector
+		}
+	}
+
+	// MARK: - Action
+
+	public enum ChildAction: Sendable, Equatable {
+		case linkConnector(LedgerHardwareDevicesLinkConnector.Action)
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case onFirstTask
+	}
+
+	// MARK: - Destination
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case selectDevice(LedgerHardwareDevices.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case selectDevice(LedgerHardwareDevices.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.selectDevice, action: /Action.selectDevice) {
+				LedgerHardwareDevices()
+			}
+		}
+	}
+
+	// MARK: - Reducer
+
+	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\State.linkConnector, action: /Action.child .. ChildAction.linkConnector) {
+				LedgerHardwareDevicesLinkConnector()
+			}
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .linkConnector(.delegate(.didConnect)):
+			state.destination = .selectDevice(.init(allowSelection: true))
+			return .none
+
+		default:
+			return .none
+		}
+	}
+}
+
+import NewConnectionFeature
+
+// MARK: - LedgerHardwareDevicesLinkConnector
+public struct LedgerHardwareDevicesLinkConnector: Sendable, FeatureReducer {
+	// MARK: - State
+
+	public struct State: Sendable, Hashable {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
@@ -24,62 +97,11 @@ public struct LedgerHardwareDevicesCoordinator: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case onFirstTask
-	}
-
-	// MARK: - Destination
-
-	public struct Destinations: Sendable, ReducerProtocol {
-		public enum State: Sendable, Hashable {
-			case selectDevice(LedgerHardwareDevices.State)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case linkConnector(LedgerHardwareDevicesLinkConnector.Action)
-			case selectDevice(LedgerHardwareDevices.Action)
-		}
-
-		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.linkConnector, action: /Action.linkConnector) {
-				LedgerHardwareDevicesLinkConnector()
-			}
-			Scope(state: /State.selectDevice, action: /Action.selectDevice) {
-				LedgerHardwareDevices()
-			}
-		}
-	}
-
-	// MARK: - Reducer
-
-	public init() {}
-
-	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
-			}
-	}
-}
-
-import NewConnectionFeature
-
-// MARK: - LedgerHardwareDevicesLinkConnector
-public struct LedgerHardwareDevicesLinkConnector: Sendable, FeatureReducer {
-	// MARK: - State
-
-	public struct State: Sendable, Hashable {
-		@PresentationState
-		var destination: Destinations.State? = nil
-	}
-
-	// MARK: - Action
-
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
 		case addConnectorButtonTapped
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case didConnect
 	}
 
 	// MARK: - Destination

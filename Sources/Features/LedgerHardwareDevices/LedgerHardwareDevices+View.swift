@@ -13,23 +13,18 @@ extension LedgerHardwareDevicesCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-			Color.red
-				.navigationDestination(
-					store: destinationStore,
-					state: /LedgerHardwareDevicesCoordinator.Destinations.State.linkConnector,
-					action: LedgerHardwareDevicesCoordinator.Destinations.Action.linkConnector,
-					destination: { LedgerHardwareDevicesLinkConnector.View(store: $0) }
-				)
-				.navigationDestination(
-					store: destinationStore,
-					state: /LedgerHardwareDevicesCoordinator.Destinations.State.selectDevice,
-					action: LedgerHardwareDevicesCoordinator.Destinations.Action.selectDevice,
-					destination: { childStore in
-						LedgerHardwareDevices.View(store: childStore)
-							.navigationBarBackButtonHidden()
-					}
-				)
+			IfLetStore(
+				store.scope(state: \.linkConnector, action: { .child(.linkConnector($0)) }),
+				then: {
+					LedgerHardwareDevicesLinkConnector.View(store: $0)
+						.navigationDestination(
+							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+							state: /LedgerHardwareDevicesCoordinator.Destinations.State.selectDevice,
+							action: LedgerHardwareDevicesCoordinator.Destinations.Action.selectDevice,
+							destination: { LedgerHardwareDevices.View(store: $0) }
+						)
+				}
+			)
 		}
 	}
 }
@@ -45,7 +40,9 @@ extension LedgerHardwareDevicesLinkConnector {
 		}
 
 		public var body: some SwiftUI.View {
-			Button("") {}
+			Button("DID CONNECT") {
+				ViewStore(store).send(.delegate(.didConnect))
+			}
 		}
 	}
 }

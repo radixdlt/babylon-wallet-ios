@@ -218,7 +218,10 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		case .profileBackupsButtonTapped:
 //			state.destination = .profileBackups(.init())
-			state.destination = .ledgerHardwareWallets_(.init(destination: .selectDevice(.init(allowSelection: false))))
+//			state.destination = .ledgerHardwareWallets_(.init(destination: .selectDevice(.init(allowSelection: false))))
+			state.destination = .ledgerHardwareWallets_(
+				.init(linkConnector: .init())
+			)
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:
