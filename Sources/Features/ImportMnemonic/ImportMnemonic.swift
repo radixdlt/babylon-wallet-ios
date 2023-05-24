@@ -11,19 +11,28 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		public enum WordValue: Sendable, Hashable {
 			case empty
 			case partial(String)
+			case invalid(String)
 			case knownFull(NonEmptyString)
 			case knownAutocompleted(NonEmptyString, fromPartial: String)
 
 			var isValid: Bool {
 				switch self {
 				case .knownFull, .knownAutocompleted: return true
-				case .partial, .empty: return false
+				case .partial, .empty, .invalid: return false
 				}
+			}
+
+			var isInvalid: Bool {
+				guard case .invalid = self else {
+					return false
+				}
+				return true
 			}
 
 			var displayText: String {
 				switch self {
 				case .empty: return ""
+				case let .invalid(text): return text
 				case let .partial(text): return text
 				case let .knownFull(word): return word.rawValue
 				case let .knownAutocompleted(word, _): return word.rawValue
@@ -122,9 +131,38 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = language
 			self.wordCount = wordCount
 			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
+			#if DEBUG
+			self.words = .init(uncheckedUniqueElements: ["position",
+			                                             "possible",
+			                                             "ultrasuperlong",
+			                                             "priority",
+			                                             "property",
+			                                             "purchase",
+			                                             "question",
+			                                             "remember",
+			                                             "resemble",
+			                                             "resource",
+			                                             "response",
+			                                             "scissors",
+			                                             "scorpion",
+			                                             "security",
+			                                             "sentence",
+			                                             "shoulder",
+			                                             "solution",
+			                                             "squirrel",
+			                                             "strategy",
+			                                             "struggle",
+			                                             "surprise",
+			                                             "surround",
+			                                             "together",
+			                                             "tomorrow"].enumerated().map {
+					ImportMnemonicWord.State(id: $0.offset, value: .knownFull(NonEmptyString(rawValue: $0.element)!))
+				})
+			#else
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
 				ImportMnemonicWord.State(id: $0)
 			})
+			#endif
 		}
 	}
 
