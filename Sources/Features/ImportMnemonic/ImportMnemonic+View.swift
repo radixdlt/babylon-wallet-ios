@@ -113,23 +113,14 @@ extension ImportMnemonic {
 							count: 3
 						)
 					) {
-						//				LazyHGrid(
-						//					rows: .init(repeating: .init(), count: viewStore.rowCount)
-						//				) {
 						ForEachStore(
 							store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) }),
 							content: {
 								ImportMnemonicWord.View(store: $0)
 							}
 						)
-						////					ForEach(viewStore.rows) { row in
-						//						LazyHGrid(rows: [.init(.flexible(), spacing: nil, alignment: .center)]) {
-						//							ForEach(row.rowWords) { wordInput in
-						//								ImportMnemonic.View.init(store: .)
-						//							}
-						//						}
-						//					}
 					}
+					.padding()
 					.footer {
 						WithControlRequirements(
 							viewStore.mnemonic,

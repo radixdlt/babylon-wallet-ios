@@ -81,8 +81,9 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 				candidate: candidate,
 				fromPartial: state.value.displayText
 			)))
-		case .textFieldFocused:
-			fatalError()
+		case let .textFieldFocused(field):
+			state.focusedField = field
+			return .none
 		}
 	}
 }
@@ -103,9 +104,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID? {
 			mutating willSet {
-				if let current = idOfWordWithTextFieldFocus {
-					words[id: current]?.resignFocus()
-				}
 				if let newValue {
 					words[id: newValue]?.focus()
 				}
@@ -133,6 +131,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case continueButtonTapped(Mnemonic)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case focusNext(ImportMnemonicWord.State.ID)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -168,19 +170,18 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			case let .knownFull(knownFull):
 				state.words[id: id]?.value = .knownFull(knownFull)
-				focusNext(&state)
+				return focusNext(&state)
 
 			case let .knownAutocomplete(knownAutocomplete):
 				state.words[id: id]?.value = .knownAutocompleted(knownAutocomplete, fromPartial: input)
-				focusNext(&state)
+				return focusNext(&state)
 			}
 			return .none
 
 		case let .word(id, child: .delegate(.autocompleteWith(candidate, _))):
 			state.words[id: id]?.value = .knownFull(candidate)
 			state.words[id: id]?.autocompletionCandidates = nil
-			focusNext(&state)
-			return .none
+			return focusNext(&state)
 
 		case .word(_, child: .view), .word(_, child: .internal):
 			return .none
@@ -190,19 +191,32 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			focusNext(&state)
-			return .none
+			return focusNext(&state)
 
 		case let .continueButtonTapped(mnemonic):
 			return .send(.delegate(.finishedInputtingMnemonic(mnemonic)))
 		}
 	}
 
-	func focusNext(_ state: inout State) {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .focusNext(id):
+			state.idOfWordWithTextFieldFocus = id
+			return .none
+		}
+	}
+
+	func focusNext(_ state: inout State) -> EffectTask<Action> {
+		if let current = state.idOfWordWithTextFieldFocus {
+			state.words[id: current]?.resignFocus()
+		}
 		guard let nextID = state.words.first(where: { !$0.isValidWord })?.id else {
-			return
+			return .none
 		}
 
-		state.idOfWordWithTextFieldFocus = nextID
+		return .run { send in
+			try? await Task.sleep(for: .milliseconds(200))
+			await send(.internal(.focusNext(nextID)))
+		}
 	}
 }
