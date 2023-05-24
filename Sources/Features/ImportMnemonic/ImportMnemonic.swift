@@ -219,7 +219,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		switch childAction {
 		case let .word(id, child: .delegate(.lookupWord(input))):
 			let lookedUp = state.wordList.lookup(input, minLengthForPartial: 2, ignoreCandidateIfCountExceeds: 5)
-			print("🔮: \(lookedUp)")
 			return updateWord(id: id, input: input, &state, lookupResult: lookedUp)
 
 		case let .word(id, child: .delegate(.autocompleteWith(candidate, input))):
