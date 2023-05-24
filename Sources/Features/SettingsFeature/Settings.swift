@@ -51,11 +51,12 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
 		case generalSettingsButtonTapped
-		case importFromOlympiaWalletButtonTapped
 		case profileBackupsButtonTapped
 		case ledgerHardwareWalletsButtonTapped
 
 		#if DEBUG
+		case importFromOlympiaWalletButtonTapped
+		case mnemonicsButtonTapped
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
 		#endif
@@ -86,17 +87,21 @@ public struct AppSettings: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case deleteProfileConfirmationDialog(ConfirmationDialogState<ViewAction.DeleteProfileConfirmationDialogAction>)
-			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 			case generalSettings(GeneralSettings.State)
-			case mnemonics(DisplayMnemonics.State)
 			case profileBackups(ProfileBackups.State)
 			case ledgerHardwareWallets(LedgerHardwareWallets.State)
 
 			#if DEBUG
+			// FIXME: move out of DEBUG flag once ready...
+			case mnemonics(DisplayMnemonics.State)
+
+			// FIXME: move out of DEBUG flag once ready...
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
+
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(ManageFactorSources.State)
 			#endif
@@ -104,27 +109,27 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case deleteProfileConfirmationDialog(ViewAction.DeleteProfileConfirmationDialogAction)
-			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 			case generalSettings(GeneralSettings.Action)
-			case mnemonics(DisplayMnemonics.Action)
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareWallets.Action)
 
 			#if DEBUG
+			// FIXME: move out of DEBUG flag once ready...
+			case mnemonics(DisplayMnemonics.Action)
+
+			// FIXME: move out of DEBUG flag once ready...
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
+
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(ManageFactorSources.Action)
 			#endif
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
-				ImportOlympiaWalletCoordinator()
-			}
-
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
 				P2PLinksFeature()
 			}
@@ -147,11 +152,19 @@ public struct AppSettings: Sendable, FeatureReducer {
 				LedgerHardwareWallets()
 			}
 			#if DEBUG
+			// FIXME: move out of DEBUG flag once ready...
+			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
+				ImportOlympiaWalletCoordinator()
+			}
+
 			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
 				DebugInspectProfile()
 			}
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				ManageFactorSources()
+			}
+			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
+				DisplayMnemonics()
 			}
 			#endif
 		}
@@ -194,10 +207,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case .importFromOlympiaWalletButtonTapped:
-			state.destination = .importOlympiaWalletCoordinator(.init())
-			return .none
-
 		case .addP2PLinkButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
 			return .none
@@ -232,18 +241,27 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		#if DEBUG
+
+		// FIXME: move out of DEBUG flag once ready...
+		case .importFromOlympiaWalletButtonTapped:
+			state.destination = .importOlympiaWalletCoordinator(.init())
+			return .none
+
+		// FIXME: move out of DEBUG flag once ready...
+		case .mnemonicsButtonTapped:
+			fatalError()
+
 		case .factorSourcesButtonTapped:
 			state.destination = .debugManageFactorSources(.init())
 			return .none
 
 		case .debugInspectProfileButtonTapped:
-//			return .run { send in
-//				let snapshot = await appPreferencesClient.extractProfileSnapshot()
-//				guard let profile = try? Profile(snapshot: snapshot) else { return }
-//				await send(.internal(.profileToDebugLoaded(profile)))
-//			}
+			return .run { send in
+				let snapshot = await appPreferencesClient.extractProfileSnapshot()
+				guard let profile = try? Profile(snapshot: snapshot) else { return }
+				await send(.internal(.profileToDebugLoaded(profile)))
+			}
 
-			fatalError()
 		#endif
 		}
 	}
@@ -260,7 +278,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case let .profileToDebugLoaded(profile):
-			fatalError()
+			state.destination = .debugInspectProfile(.init(profile: profile))
+			return .none
 		#endif // DEBUG
 		}
 	}

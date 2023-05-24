@@ -89,16 +89,16 @@ extension View {
 	@MainActor
 	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		self
-			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.manageP2PLinks(with: destinationStore)
 			.gatewaySettings(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
 			.generalSettings(with: destinationStore)
-			.mnemonics(with: destinationStore)
 			.profileBackups(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
 		#if DEBUG
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.mnemonics(with: destinationStore)
 			.factorSources(with: destinationStore)
 			.debugInspectProfile(with: destinationStore)
 		#endif // DEBUG
@@ -106,16 +106,6 @@ extension View {
 }
 
 extension View {
-	@MainActor
-	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
-			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
-			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
-		)
-	}
-
 	@MainActor
 	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		navigationDestination(
@@ -167,16 +157,6 @@ extension View {
 	}
 
 	@MainActor
-	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.mnemonics,
-			action: AppSettings.Destinations.Action.mnemonics,
-			destination: { DisplayMnemonics.View(store: $0) }
-		)
-	}
-
-	@MainActor
 	private func profileBackups(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		navigationDestination(
 			store: destinationStore,
@@ -197,6 +177,25 @@ extension View {
 	}
 
 	#if DEBUG
+	@MainActor
+	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
+			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
+			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.mnemonics,
+			action: AppSettings.Destinations.Action.mnemonics,
+			destination: { DisplayMnemonics.View(store: $0) }
+		)
+	}
 
 	@MainActor
 	private func factorSources(
@@ -232,14 +231,18 @@ extension AppSettings.View {
 		var id: String { title }
 		let title: String
 		let subtitle: String?
-		let asset: ImageAsset
+		let image: Image
 		let action: AppSettings.ViewAction
 
-		init(title: String, subtitle: String? = nil, asset: ImageAsset, action: AppSettings.ViewAction) {
+		init(title: String, subtitle: String? = nil, image: Image, action: AppSettings.ViewAction) {
 			self.title = title
 			self.subtitle = subtitle
-			self.asset = asset
+			self.image = image
 			self.action = action
+		}
+
+		init(title: String, subtitle: String? = nil, asset: ImageAsset, action: AppSettings.ViewAction) {
+			self.init(title: title, subtitle: subtitle, image: .init(asset: asset), action: action)
 		}
 	}
 
@@ -256,7 +259,7 @@ extension AppSettings.View {
 					}
 
 					ForEach(settingsRows()) { row in
-						PlainListRow(title: row.title, asset: row.asset)
+						PlainListRow(title: row.title, image: row.image)
 							.tappable {
 								viewStore.send(row.action)
 							}
@@ -339,14 +342,19 @@ extension AppSettings.View {
 				action: .importFromOlympiaWalletButtonTapped
 			),
 			.init(
+				title: "Factor sources",
+				image: Image(systemName: "person.badge.key"),
+				action: .factorSourcesButtonTapped
+			),
+			.init(
 				title: "Inspect profile",
-				asset: AssetResource.generalSettings,
+				image: Image(systemName: "wallet.pass"),
 				action: .debugInspectProfileButtonTapped
 			),
 			.init(
-				title: "Factor sources",
-				asset: AssetResource.generalSettings,
-				action: .factorSourcesButtonTapped
+				title: "Mnemonics",
+				image: Image(systemName: "person.badge.key"),
+				action: .mnemonicsButtonTapped
 			),
 		])
 		#endif
