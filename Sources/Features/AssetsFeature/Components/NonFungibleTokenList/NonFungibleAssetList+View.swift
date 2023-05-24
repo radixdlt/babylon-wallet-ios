@@ -11,7 +11,7 @@ extension NonFungibleTokenList {
 		}
 
 		public var body: some SwiftUI.View {
-			LazyVStack(spacing: .medium1) {
+			VStack(spacing: .medium1) {
 				ForEachStore(
 					store.scope(
 						state: \.rows,

@@ -33,3 +33,27 @@ public struct RoundedCorners: Shape {
 		)
 	}
 }
+
+extension View {
+	public func roundedCorners(radius: CGFloat, corners: UIRectCorner = .allCorners) -> some View {
+		self.clipShape(RoundedCorners(radius: radius, corners: corners))
+	}
+
+	public func topRoundedCorners(radius: CGFloat) -> some View {
+		roundedCorners(radius: radius, corners: .top)
+	}
+
+	public func bottomRoundedCorners(radius: CGFloat) -> some View {
+		roundedCorners(radius: radius, corners: .bottom)
+	}
+}
+
+extension UIRectCorner {
+	public static var top: UIRectCorner {
+		[.topLeft, .topRight]
+	}
+
+	public static var bottom: UIRectCorner {
+		[.bottomLeft, .bottomRight]
+	}
+}

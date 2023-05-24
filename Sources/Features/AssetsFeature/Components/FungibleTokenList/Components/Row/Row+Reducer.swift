@@ -8,21 +8,29 @@ extension FungibleTokenList {
 
 			public var token: AccountPortfolio.FungibleResource
 			public var isXRD: Bool
+			public var mode: Mode
 
-			public init(xrdToken: AccountPortfolio.FungibleResource) {
-				self.init(token: xrdToken, isXRD: true)
+			public enum Mode: Hashable, Sendable {
+				case normal
+				case selection(isSelected: Bool)
 			}
 
-			public init(nonXRDToken: AccountPortfolio.FungibleResource) {
-				self.init(token: nonXRDToken, isXRD: false)
+			public init(xrdToken: AccountPortfolio.FungibleResource, mode: Mode = .normal) {
+				self.init(token: xrdToken, isXRD: true, mode: mode)
+			}
+
+			public init(nonXRDToken: AccountPortfolio.FungibleResource, mode: Mode = .normal) {
+				self.init(token: nonXRDToken, isXRD: false, mode: mode)
 			}
 
 			init(
 				token: AccountPortfolio.FungibleResource,
-				isXRD: Bool
+				isXRD: Bool,
+				mode: Mode = .normal
 			) {
 				self.token = token
 				self.isXRD = isXRD
+				self.mode = mode
 			}
 		}
 
@@ -37,6 +45,10 @@ extension FungibleTokenList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case .tapped:
+				if case let .selection(isSelected) = state.mode {
+					state.mode = .selection(isSelected: !isSelected)
+					return .none
+				}
 				return .send(.delegate(.selected(state.token)))
 			}
 		}

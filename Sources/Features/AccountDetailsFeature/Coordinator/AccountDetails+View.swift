@@ -1,4 +1,5 @@
 import AccountPreferencesFeature
+import AssetsFeature
 import AssetTransferFeature
 import FeaturePrelude
 
@@ -7,8 +8,7 @@ extension AccountDetails.State {
 		.init(
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
-			displayName: account.displayName.rawValue,
-			isLoadingResources: isLoadingResources
+			displayName: account.displayName.rawValue
 		)
 	}
 }
@@ -19,7 +19,6 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
-		let isLoadingResources: Bool
 	}
 
 	@MainActor
@@ -49,27 +48,7 @@ extension AccountDetails {
 					.cornerRadius(.standardButtonHeight / 2)
 					.padding(.bottom, .medium1)
 
-					if viewStore.isLoadingResources {
-						ProgressView()
-					}
-					ScrollView {
-						VStack(spacing: .medium3) {
-							AssetsView.View(
-								store: store.scope(
-									state: \.assets,
-									action: { .child(.assets($0)) }
-								)
-							)
-						}
-						.padding(.bottom, .medium1)
-					}
-					.refreshable {
-						await viewStore.send(.pullToRefreshStarted).finish()
-					}
-					.background(Color.app.gray5)
-					.padding(.bottom, .medium2)
-					.cornerRadius(.medium2)
-					.padding(.bottom, .medium2 * -2)
+					AssetsView.View(store: store.scope(state: \.assets, action: { .child(.assets($0)) }))
 				}
 				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()
@@ -96,12 +75,6 @@ extension AccountDetails {
 						}
 					}
 				#endif
-					.onAppear {
-						viewStore.send(.appeared)
-					}
-					.task {
-						viewStore.send(.task)
-					}
 					.sheet(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /AccountDetails.Destinations.State.preferences,

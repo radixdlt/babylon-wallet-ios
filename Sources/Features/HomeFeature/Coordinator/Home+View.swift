@@ -1,5 +1,6 @@
 import AccountDetailsFeature
 import AccountListFeature
+import AssetsFeature
 import CreateAccountFeature
 import FeaturePrelude
 
@@ -22,6 +23,12 @@ extension Home {
 		}
 
 		public var body: some SwiftUI.View {
+			//                        HStack {
+			//                                Spacer()
+			//                                NonFungibleAssets.View(store: .init(initialState: NonFungibleAssets.State(), reducer: NonFungibleAssets()))
+			//                                Spacer()
+			//                        }
+
 			WithViewStore(
 				store,
 				observe: \.viewState,

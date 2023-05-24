@@ -17,7 +17,6 @@ struct NFTFullView: View {
 		LoadableImage(url: url, size: .flexible(minAspect: minAspect, maxAspect: maxAspect), loading: .shimmer) {
 			Rectangle()
 				.fill(.app.gray4)
-				.frame(height: .large2)
 		}
 		.cornerRadius(.small1)
 	}
@@ -29,33 +28,14 @@ struct NFTIDView: View {
 	let name: String?
 	let description: String?
 	let thumbnail: URL?
-	let metadata: [AccountPortfolio.Metadata]
-	let isLast: Bool
-	let isExpanded: Bool
 
 	var body: some View {
 		VStack(spacing: .small1) {
-			if isExpanded {
-				NFTFullView(url: thumbnail, minAspect: minImageAspect, maxAspect: maxImageAspect)
-					.padding(.bottom, .small1)
+			NFTFullView(url: thumbnail, minAspect: minImageAspect, maxAspect: maxImageAspect)
+				.padding(.bottom, .small1)
 
-				KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
-			} else {
-				// This is apparently needed, else the card disappears when not expanded
-				Rectangle()
-					.fill(.clear)
-					.frame(height: 20)
-			}
+			KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
 		}
-		.padding(.medium1)
-		.frame(maxWidth: .infinity)
-		.background(
-			RoundedCornerBackground(
-				exclude: isExpanded ? (isLast ? .top : .vertical) : [],
-				cornerRadius: .small1
-			)
-			.tokenRowShadow(isLast || !isExpanded)
-		)
 	}
 
 	private let minImageAspect: CGFloat = 1

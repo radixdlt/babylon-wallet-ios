@@ -243,7 +243,7 @@ extension Color {
 		}
 	}
 
-	private static func random(
+	public static func random(
 		range: ClosedRange<UInt8> = 0 ... UInt8.max
 	) -> Self {
 		Self(

@@ -5,7 +5,8 @@ extension FungibleTokenList.Row.State {
 		.init(
 			thumbnail: isXRD ? .xrd : .known(token.iconURL),
 			symbol: token.symbol ?? token.name ?? "",
-			tokenAmount: token.amount.format()
+			tokenAmount: token.amount.format(),
+			mode: mode
 		)
 	}
 }
@@ -16,6 +17,7 @@ extension FungibleTokenList.Row {
 		let thumbnail: TokenThumbnail.Content
 		let symbol: String
 		let tokenAmount: String
+		let mode: State.Mode
 	}
 
 	@MainActor
@@ -44,6 +46,10 @@ extension FungibleTokenList.Row {
 							Text(viewStore.tokenAmount)
 								.foregroundColor(.app.gray1)
 								.textStyle(.secondaryHeader)
+						}
+
+						if case let .selection(isSelected) = viewStore.mode {
+							CheckmarkView(appearance: .dark, isChecked: isSelected)
 						}
 					}
 

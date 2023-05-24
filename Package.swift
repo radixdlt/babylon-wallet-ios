@@ -21,6 +21,7 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AssetTransferFeature",
 			"AccountPortfoliosClient",
+			"AssetsFeature",
 		],
 		tests: .yes()
 	),
@@ -68,8 +69,16 @@ package.addModules([
 		dependencies: [
 			"ScanQRFeature",
 			"ChooseAccountsFeature",
+			"AssetsFeature",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "AssetsFeature",
+		dependencies: [
+			"AccountPortfoliosClient",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "AuthorizedDAppsFeature",
@@ -194,6 +203,7 @@ package.addModules([
 	.feature(
 		name: "HomeFeature",
 		dependencies: [
+			"AssetsFeature",
 			"AccountDetailsFeature",
 			"AccountListFeature",
 			"AccountPortfoliosClient",

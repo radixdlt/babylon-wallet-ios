@@ -1,3 +1,4 @@
+import AssetsFeature
 import FeaturePrelude
 
 public struct TransferAccountList: Sendable, FeatureReducer {
@@ -54,12 +55,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 		public enum MainState: Sendable, Hashable {
 			case chooseAccount(ChooseReceivingAccount.State)
-			case addAsset(AddAsset.State)
+			case addAsset(AssetsView.State)
 		}
 
 		public enum MainAction: Sendable, Equatable {
 			case chooseAccount(ChooseReceivingAccount.Action)
-			case addAsset(AddAsset.Action)
+			case addAsset(AssetsView.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -69,7 +70,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				}
 
 				Scope(state: /MainState.addAsset, action: /MainAction.addAsset) {
-					AddAsset()
+					AssetsView()
 				}
 			}
 		}
@@ -95,27 +96,33 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .receivingAccount(id: id, action: .delegate(.remove)):
-			state.receivingAccounts.remove(id: id)
-			return validateState(&state)
-		case .receivingAccount(_, action: .delegate(.validate)):
-			return validateState(&state)
-
-		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged))))):
-			updateTotalSum(&state, resourceAddress: resourceAddress)
-			return validateState(&state)
-
-		case let .receivingAccount(id: id, action: .delegate(.chooseAccount)):
-			let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
-			let chooseAccount: ChooseReceivingAccount.State = .init(
-				chooseAccounts: .init(
-					selectionRequirement: .exactly(1),
-					filteredAccounts: filteredAccounts
+		case let .receivingAccount(id: id, action: action):
+			switch action {
+			case .delegate(.remove):
+				state.receivingAccounts.remove(id: id)
+				return validateState(&state)
+			case .delegate(.validate):
+				return validateState(&state)
+			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))):
+				updateTotalSum(&state, resourceAddress: resourceAddress)
+				return validateState(&state)
+			case .delegate(.chooseAccount):
+				let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
+				let chooseAccount: ChooseReceivingAccount.State = .init(
+					chooseAccounts: .init(
+						selectionRequirement: .exactly(1),
+						filteredAccounts: filteredAccounts
+					)
 				)
-			)
 
-			state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
-			return .none
+				state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
+				return .none
+			case .delegate(.addAssets):
+				state.destination = .relayed(id, with: .addAsset(.init(account: state.fromAccount)))
+				return .none
+			default:
+				return .none
+			}
 
 		case let .destination(.presented(.relay(id, destinationAction))):
 			switch destinationAction {
@@ -126,7 +133,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			case .chooseAccount(.delegate(.dismiss)):
 				state.destination = nil
 				return .none
-			// TODO: Handle Add assets
 			default:
 				return .none
 			}

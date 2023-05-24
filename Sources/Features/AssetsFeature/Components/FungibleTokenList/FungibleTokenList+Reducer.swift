@@ -10,6 +10,11 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 
+		public enum Mode: Hashable, Sendable {
+			case normal
+			case selection(AccountPortfolio.FungibleResources)
+		}
+
 		public init(
 			xrdToken: Row.State? = nil,
 			nonXrdTokens: IdentifiedArrayOf<Row.State> = []

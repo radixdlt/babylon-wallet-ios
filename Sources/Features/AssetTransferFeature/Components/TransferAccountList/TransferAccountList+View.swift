@@ -1,3 +1,4 @@
+import AssetsFeature
 import FeaturePrelude
 
 // MARK: - TransferAccountList.View
@@ -74,6 +75,12 @@ extension TransferAccountList.View {
 				state: /TransferAccountList.Destinations.MainState.chooseAccount,
 				action: TransferAccountList.Destinations.MainAction.chooseAccount,
 				then: { ChooseReceivingAccount.View(store: $0) }
+			)
+
+			CaseLet(
+				state: /TransferAccountList.Destinations.MainState.addAsset,
+				action: TransferAccountList.Destinations.MainAction.addAsset,
+				then: { AssetsView.View(store: $0) }
 			)
 		}
 	}
