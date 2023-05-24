@@ -102,7 +102,6 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-//	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -118,9 +117,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .merge(updateLedgersEffekt(state: &state),
-			              checkP2PLinkEffect())
-			//			return updateLedgersEffekt(state: &state)
+			return .merge(updateLedgersEffekt(state: &state), checkP2PLinkEffect())
 
 		case let .selectedLedger(selectedID):
 			state.selectedLedgerID = selectedID
@@ -143,13 +140,11 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			state.$ledgers = .init(result: result)
 			return .none
 		case let .hasAConnectorExtension(isConnected, source):
-			print("Is connected to any CE?: \(isConnected) \(source)")
-//			loggerGlobal.notice("Is connected to any CE?: \(isConnected) \(source)")
+			loggerGlobal.notice("Is connected to any CE?: \(isConnected) SOURCE \(source)")
 			state.hasAConnectorExtension = isConnected
 			return .none
 
 		case let .fulfillIntention(intention):
-			print("fulfillIntention")
 			return fulfillEffect(state: &state, intention: intention)
 		}
 	}
@@ -163,7 +158,6 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 				return .none
 
 			case .cancelTapped:
-				print("Setting intention to nil", state.intendedAction)
 				state.intendedAction = nil
 				return .none
 			}
@@ -171,8 +165,6 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case let .destination(.presented(.addNewP2PLink(.delegate(newP2PAction)))):
 			switch newP2PAction {
 			case let .newConnection(connectedClient):
-				print("addNewP2PLink connectedClient")
-
 				let intention = state.intendedAction
 				state.destination = nil
 				return .run { send in
@@ -216,15 +208,12 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	private func checkP2PLinkEffect() -> EffectTask<Action> {
 		.run { send in
 			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-				print("updateLedgersEffekt isConnected", isConnected)
 				guard !Task.isCancelled else {
 					print("updateLedgersEffekt task cancelled")
 					return
 				}
 
-				print("updateLedgersEffekt sending connectivity")
-
-				await send(.internal(.hasAConnectorExtension(isConnected, source: "task effect")))
+				await send(.internal(.hasAConnectorExtension(isConnected, source: "SOURCE: task effect")))
 			}
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
@@ -232,16 +221,12 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	}
 
 	private func fulfillEffect(state: inout State, intention: State.Intention) -> EffectTask<Action> {
-		print("fulfillEffect")
 		// If we don't have a connection, we remember what we were trying to do and then ask if they want to link one
 		guard state.hasAConnectorExtension else {
-			print("fulfillEffect: No connection, do that first")
 			state.intendedAction = intention
 			state.destination = .noP2PLink(.noP2Plink)
 			return .none
 		}
-
-		print("fulfillEffect: We have a connection")
 
 		// If we have a connection, we can proceed directly
 		state.intendedAction = nil
@@ -250,8 +235,6 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			state.destination = .addNewLedger(.init())
 			return .none
 		case let .selectLedger(ledger):
-			print("fulfillEffect: choseLedger")
-
 			return .send(.delegate(.choseLedger(ledger)))
 		}
 	}
