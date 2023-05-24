@@ -25,8 +25,6 @@ private struct FooterModifier<FooterContent: View>: ViewModifier {
 					}
 					.background(Color.app.background)
 				}
-		} else {
-			EmptyView()
 		}
 	}
 }

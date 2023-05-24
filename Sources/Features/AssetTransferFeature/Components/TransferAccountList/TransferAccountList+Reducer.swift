@@ -118,7 +118,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
 				return .none
 			case .delegate(.addAssets):
-				state.destination = .relayed(id, with: .addAsset(.init(account: state.fromAccount)))
+				state.destination = .relayed(id, with: .addAsset(.init(account: state.fromAccount, mode: .selection(.init()))))
 				return .none
 			default:
 				return .none

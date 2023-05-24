@@ -85,6 +85,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
 		case chooseButtonTapped(AssetsViewMode.SelectedItems)
+		case closeButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -98,6 +99,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(AssetsViewMode.SelectedItems)
+		case dismiss
 	}
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -134,6 +136,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		case let .chooseButtonTapped(items):
 			return .send(.delegate(.handleSelectedAssets(items)))
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
 		}
 	}
 

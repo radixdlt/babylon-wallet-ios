@@ -15,7 +15,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		public init(for account: Profile.Network.Account) {
 			self.account = account
-			self.assets = AssetsView.State(account: account)
+			self.assets = AssetsView.State(account: account, mode: .normal)
 		}
 	}
 

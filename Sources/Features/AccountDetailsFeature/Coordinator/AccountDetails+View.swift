@@ -49,6 +49,7 @@ extension AccountDetails {
 					.padding(.bottom, .medium1)
 
 					AssetsView.View(store: store.scope(state: \.assets, action: { .child(.assets($0)) }))
+						.topRoundedCorners(radius: .medium1)
 				}
 				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()

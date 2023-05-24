@@ -80,7 +80,9 @@ extension TransferAccountList.View {
 			CaseLet(
 				state: /TransferAccountList.Destinations.MainState.addAsset,
 				action: TransferAccountList.Destinations.MainAction.addAsset,
-				then: { AssetsView.View(store: $0) }
+				then: {
+					AssetsView.View(store: $0)
+				}
 			)
 		}
 	}
