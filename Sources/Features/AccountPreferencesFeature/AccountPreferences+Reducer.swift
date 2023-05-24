@@ -148,8 +148,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return loadIsAllowedToUseFaucet(&state)
+			#if DEBUG
 				.concatenate(with: loadCanCreateAuthSigningKey(state))
 				.concatenate(with: loadCanTurnIntoDappDefAccountType(state))
+			#endif
 
 		case .closeButtonTapped:
 			return .run { send in
@@ -341,6 +343,7 @@ extension AccountPreferences {
 		}
 	}
 
+	#if DEBUG
 	private func loadCanCreateAuthSigningKey(_ state: State) -> EffectTask<Action> {
 		.run { [address = state.address] send in
 			let account = try await accountsClient.getAccountByAddress(address)
@@ -361,6 +364,7 @@ extension AccountPreferences {
 			} catch {}
 		}
 	}
+	#endif
 }
 
 #if DEBUG
@@ -378,7 +382,7 @@ extension EngineToolkitClient {
 				fields: [
 					.enum(.init(
 						.u8(0), // what is this?
-						fields: [.string(EntityMetadataValue.accountTypeDappDefinition.rawValue)]
+						fields: [.string(GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue)]
 					)),
 				]
 			)

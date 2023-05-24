@@ -129,14 +129,6 @@ public enum EntityMetadataKey: String {
 	case accountType = "account_type"
 }
 
-// MARK: - EntityMetadataValue
-public struct EntityMetadataValue {
-	public let rawValue: String
-	public static let accountTypeDappDefinition = Self(
-		rawValue: GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue
-	)
-}
-
 extension [GatewayAPI.EntityMetadataItem] {
 	public typealias Key = EntityMetadataKey
 

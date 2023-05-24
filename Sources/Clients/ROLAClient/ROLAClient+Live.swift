@@ -115,7 +115,7 @@ extension ROLAClient {
 					relatedWebsites: dict[.relatedWebsites]
 				)
 
-				guard dAppDefinitionMetadata.accountType == EntityMetadataValue.accountTypeDappDefinition.rawValue else {
+				guard dAppDefinitionMetadata.accountType == GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue else {
 					throw ROLAFailure.wrongAccountType
 				}
 
