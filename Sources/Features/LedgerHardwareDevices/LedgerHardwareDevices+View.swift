@@ -160,7 +160,7 @@ extension View {
 			store: destinationStore,
 			state: /LedgerHardwareDevices.Destinations.State.addNewP2PLink,
 			action: LedgerHardwareDevices.Destinations.Action.addNewP2PLink,
-			content: { NewConnection.View(store: $0) }
+			content: { NewConnection.View(store: $0.scope(state: \.0)) }
 		)
 	}
 
