@@ -93,7 +93,7 @@ extension LedgerHardwareDevices {
 							.buttonStyle(.primaryRectangular)
 					}
 				}
-				.task { @MainActor in
+				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}

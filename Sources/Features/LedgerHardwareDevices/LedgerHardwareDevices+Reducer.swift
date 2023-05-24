@@ -55,8 +55,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerFactorSource>>)
-
-		case hasAConnectorExtension(Bool, source: String)
+		case hasAConnectorExtension(Bool)
 		case fulfillIntention(State.Intention)
 	}
 
@@ -139,8 +138,9 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case let .loadedLedgers(result):
 			state.$ledgers = .init(result: result)
 			return .none
-		case let .hasAConnectorExtension(isConnected, source):
-			loggerGlobal.notice("Is connected to any CE?: \(isConnected) SOURCE \(source)")
+
+		case let .hasAConnectorExtension(isConnected):
+			loggerGlobal.notice("Is connected to any CE?: \(isConnected)")
 			state.hasAConnectorExtension = isConnected
 			return .none
 
@@ -169,7 +169,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 				state.destination = nil
 				return .run { send in
 					try await p2pLinksClient.addP2PLink(connectedClient)
-					await send(.internal(.hasAConnectorExtension(true, source: "After connecting")))
+					await send(.internal(.hasAConnectorExtension(true)))
 					if let intention {
 						// Continue what we were doing
 						await send(.internal(.fulfillIntention(intention)))
@@ -208,12 +208,8 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	private func checkP2PLinkEffect() -> EffectTask<Action> {
 		.run { send in
 			for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-				guard !Task.isCancelled else {
-					print("updateLedgersEffekt task cancelled")
-					return
-				}
-
-				await send(.internal(.hasAConnectorExtension(isConnected, source: "SOURCE: task effect")))
+				guard !Task.isCancelled else { return }
+				await send(.internal(.hasAConnectorExtension(isConnected)))
 			}
 		} catch: { error, _ in
 			loggerGlobal.error("failed to get links updates, error: \(error)")
