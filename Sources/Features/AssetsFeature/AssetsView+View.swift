@@ -68,11 +68,12 @@ extension AssetsView {
 				.padding(.bottom, .medium2)
 				.cornerRadius(.medium2)
 				.padding(.bottom, .medium2 * -2)
-				.footer {
-					if case let .selection(selection) = viewStore.mode {
-						Button("Choose", action: {})
+				.footer(shouldShow: viewStore.mode.isSelection) {
+					WithControlRequirements(viewStore.selectedItems,
+					                        forAction: { viewStore.send(.chooseButtonTapped($0)) })
+					{ action in
+						Button("Choose", action: action)
 							.buttonStyle(.primaryRectangular)
-							.controlState(selection.isEmpty ? .disabled : .enabled)
 					}
 				}
 			}

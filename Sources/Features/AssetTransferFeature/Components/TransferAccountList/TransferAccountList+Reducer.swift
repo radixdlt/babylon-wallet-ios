@@ -133,6 +133,30 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			case .chooseAccount(.delegate(.dismiss)):
 				state.destination = nil
 				return .none
+			case let .addAsset(.delegate(.handleSelectedAssets(selectedItems))):
+				let alreadyAddedAssets = state.receivingAccounts[id: id]?.assets ?? []
+
+				var assets: IdentifiedArrayOf<ResourceAsset.State> = []
+
+				if let selectedXRD = selectedItems.fungibleResources.xrdResource {
+					assets.append(
+						ResourceAsset.State.fungibleAsset(.init(resource: selectedXRD, isXRD: true, totalTransferSum: .zero))
+					)
+				}
+
+				assets += selectedItems.fungibleResources.nonXrdResources.map {
+					ResourceAsset.State.fungibleAsset(.init(resource: $0, isXRD: false, totalTransferSum: .zero))
+				}
+
+				assets += selectedItems.nonFungibleResources.flatMap { resource in
+					resource.tokens.map {
+						ResourceAsset.State.nonFungibleAsset(.init(resourceAddress: resource.resourceAddress, nftToken: $0))
+					}
+				}
+
+				state.receivingAccounts[id: id]?.assets = assets
+				state.destination = nil
+				return .none
 			default:
 				return .none
 			}

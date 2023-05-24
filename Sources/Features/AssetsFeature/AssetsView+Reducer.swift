@@ -18,6 +18,13 @@ public enum AssetsViewMode: Hashable, Sendable {
 
 	case normal
 	case selection(SelectedItems)
+
+	public var isSelection: Bool {
+		if case .selection = self {
+			return true
+		}
+		return false
+	}
 }
 
 // MARK: - AssetsView
@@ -40,45 +47,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public var activeAssetKind: AssetKind
 		public var assetKinds: NonEmpty<[AssetKind]>
-		public var fungibleTokenList: FungibleTokenList.State {
-			didSet {
-				if case var .selection(selectedItems) = mode {
-					func selectedResource(_ row: FungibleTokenList.Row.State) -> AccountPortfolio.FungibleResource? {
-						if case .selection(true) = row.mode {
-							return row.token
-						}
-						return nil
-					}
-
-					selectedItems.fungibleResources = .init(
-						xrdResource: fungibleTokenList.xrdToken.flatMap(selectedResource),
-						nonXrdResources: fungibleTokenList.nonXrdTokens.compactMap(selectedResource)
-					)
-
-					mode = .selection(selectedItems)
-				}
-			}
-		}
-
-		public var nonFungibleTokenList: NonFungibleTokenList.State {
-			didSet {
-				if case var .selection(selectedItems) = mode {
-					selectedItems.nonFungibleResources = nonFungibleTokenList.rows.compactMap {
-						if case let .selection(tokens) = $0.mode, !tokens.isEmpty {
-							return AccountPortfolio.NonFungibleResource(resourceAddress: $0.resource.resourceAddress, tokens: tokens)
-						}
-						return nil
-					}
-
-					mode = .selection(selectedItems)
-				}
-			}
-		}
+		public var fungibleTokenList: FungibleTokenList.State
+		public var nonFungibleTokenList: NonFungibleTokenList.State
 
 		public let account: Profile.Network.Account
 		public var isLoadingResources: Bool = false
 
-		public var mode: AssetsViewMode
+		public let mode: AssetsViewMode
 
 		public init(account: Profile.Network.Account, mode: AssetsViewMode = .selection(.init())) {
 			self.init(
@@ -109,6 +84,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case task
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
+		case chooseButtonTapped(AssetsViewMode.SelectedItems)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -118,6 +94,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case portfolioUpdated(AccountPortfolio)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case handleSelectedAssets(AssetsViewMode.SelectedItems)
 	}
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -152,6 +132,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			}
+		case let .chooseButtonTapped(items):
+			return .send(.delegate(.handleSelectedAssets(items)))
 		}
 	}
 
@@ -172,5 +154,39 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.nonFungibleTokenList = .init(rows: .init(uniqueElements: nfts))
 			return .none
 		}
+	}
+}
+
+extension AssetsView.State {
+	public var selectedItems: AssetsViewMode.SelectedItems? {
+		guard case .selection = mode else { return nil }
+
+		func selectedFungibleResource(_ row: FungibleTokenList.Row.State) -> AccountPortfolio.FungibleResource? {
+			if case .selection(true) = row.mode {
+				return row.token
+			}
+			return nil
+		}
+
+		let fungibleresources = AccountPortfolio.FungibleResources(
+			xrdResource: fungibleTokenList.xrdToken.flatMap(selectedFungibleResource),
+			nonXrdResources: fungibleTokenList.nonXrdTokens.compactMap(selectedFungibleResource)
+		)
+
+		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
+			if case let .selection(tokens) = $0.mode, !tokens.isEmpty {
+				return AccountPortfolio.NonFungibleResource(resourceAddress: $0.resource.resourceAddress, tokens: tokens)
+			}
+			return nil
+		}
+
+		guard fungibleresources.xrdResource != nil || !fungibleresources.nonXrdResources.isEmpty || !nonFungibleResources.isEmpty else {
+			return nil
+		}
+
+		return .init(
+			fungibleResources: fungibleresources,
+			nonFungibleResources: nonFungibleResources
+		)
 	}
 }
