@@ -179,6 +179,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case let .word(id, child: .delegate(.autocompleteWith(candidate, _))):
 			state.words[id: id]?.value = .knownFull(candidate)
 			state.words[id: id]?.autocompletionCandidates = nil
+			focusNext(&state)
 			return .none
 
 		case .word(_, child: .view), .word(_, child: .internal):
