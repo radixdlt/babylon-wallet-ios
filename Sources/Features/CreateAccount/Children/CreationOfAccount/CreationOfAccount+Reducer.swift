@@ -104,8 +104,6 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
-			print("CREATION OF ACCOUNT: choseLedger")
-
 			state.step = .step1_derivePublicKeys(.init(
 				derivationPathOption: .next(for: .account, networkID: state.networkID, curve: .curve25519),
 				factorSourceOption: .specific(ledger.factorSource),

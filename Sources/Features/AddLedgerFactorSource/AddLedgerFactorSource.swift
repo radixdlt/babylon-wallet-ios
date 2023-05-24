@@ -16,7 +16,6 @@ public struct UnnamedLedger: Sendable, Hashable {
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var isConnectedToAnyCE = false
 		public var ledgerName = ""
 		public var isWaitingForResponseFromLedger = false
 		public var unnamedDeviceToAdd: UnnamedLedger?
@@ -28,8 +27,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
-		case addNewP2PLinkButtonTapped
 		case sendAddLedgerRequestButtonTapped
 		case ledgerNameChanged(String)
 		case confirmNameButtonTapped
@@ -41,13 +38,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case isConnectedToAnyConnectorExtension(Bool)
-		case getDeviceInfoResult(
-			TaskResult<UnnamedLedger>
-		)
+		case getDeviceInfoResult(TaskResult<UnnamedLedger>)
 		case alreadyExists(LedgerFactorSource)
 		case nameLedgerBeforeAddingIt(UnnamedLedger)
-		case saveNewConnection(P2PLink)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -61,21 +54,13 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
+	public enum Destinations {
 		public enum State: Sendable, Hashable {
-			case addNewP2PLink(NewConnection.State)
 			case closeLedgerAlreadyExistsConfirmationDialog(ConfirmationDialogState<ViewAction.CloseLedgerAlreadyExistsDialogAction>)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case addNewP2PLink(NewConnection.Action)
 			case closeLedgerAlreadyExistsConfirmationDialog(ViewAction.CloseLedgerAlreadyExistsDialogAction)
-		}
-
-		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
-				NewConnection()
-			}
 		}
 	}
 
@@ -87,32 +72,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
-			}
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .task:
-
-			return .run { send in
-				for try await isConnected in await ledgerHardwareWalletClient.isConnectedToAnyConnectorExtension() {
-					guard !Task.isCancelled else {
-						return
-					}
-					await send(.internal(.isConnectedToAnyConnectorExtension(isConnected)))
-				}
-			} catch: { error, _ in
-				loggerGlobal.error("failed to get links updates, error: \(error)")
-			}
-
-		case .addNewP2PLinkButtonTapped:
-			state.destination = .addNewP2PLink(.init())
-			return .none
-
 		case .sendAddLedgerRequestButtonTapped:
 			return sendAddLedgerRequest(&state)
 
@@ -127,31 +88,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 				assertionFailure("Expected device to name")
 				return .none
 			}
-			return addFactorSource(
-				name: name,
-				unnamedDeviceToAdd: device
-			)
+			return addFactorSourceEffect(name: name, unnamedDeviceToAdd: device)
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.addNewP2PLink(.delegate(.newConnection(connectedClient))))):
-
-			state.destination = nil
-			return .run { send in
-				try await radixConnectClient.storeP2PLink(
-					connectedClient
-				)
-				await send(.internal(.saveNewConnection(connectedClient)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed P2PLink, error \(error)")
-				errorQueue.schedule(error)
-			}
-		case .destination(.presented(.addNewP2PLink(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-
 		case let .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.finish(ledger)))):
 			return .task {
 				await dismiss()
@@ -196,11 +138,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .isConnectedToAnyConnectorExtension(isConnectedToAnyCE):
-			loggerGlobal.notice("Is connected to any CE?: \(isConnectedToAnyCE)")
-			state.isConnectedToAnyCE = isConnectedToAnyCE
-			return .none
-
 		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
 			return gotDevice(ledgerDeviceInfo, &state)
 
@@ -208,7 +145,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			return failedToGetDevice(&state, error: error)
 
 		case let .alreadyExists(ledger):
-
 			state.destination = .closeLedgerAlreadyExistsConfirmationDialog(
 				.init(titleVisibility: .hidden) {
 					TextState("")
@@ -228,14 +164,10 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case let .nameLedgerBeforeAddingIt(unnamedDevice):
 			state.unnamedDeviceToAdd = unnamedDevice
 			return .none
-
-		case .saveNewConnection:
-			state.isConnectedToAnyCE = true
-			return .none
 		}
 	}
 
-	private func addFactorSource(
+	private func addFactorSourceEffect(
 		name: String?,
 		unnamedDeviceToAdd device: UnnamedLedger
 	) -> EffectTask<Action> {

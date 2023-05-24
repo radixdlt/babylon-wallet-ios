@@ -29,13 +29,15 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
+		var pendingAction: ActionRequiringP2P? = nil
+
 		public init(allowSelection: Bool, showHeaders: Bool = true) {
 			self.allowSelection = allowSelection
 			self.showHeaders = showHeaders
 		}
 	}
 
-	public enum Intent: Sendable, Hashable {
+	public enum ActionRequiringP2P: Sendable, Hashable {
 		case addLedger
 		case selectLedger(LedgerFactorSource)
 	}
@@ -53,7 +55,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerFactorSource>>)
 		case hasAConnectorExtension(Bool)
-		case fulfillIntent(Intent)
+		case perform(ActionRequiringP2P)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -69,13 +71,8 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<Action.NoP2PLinkAlert>)
-			case addNewP2PLink(NewConnection.State, andThen: Intent)
+			case addNewP2PLink(NewConnection.State)
 			case addNewLedger(AddLedgerFactorSource.State)
-
-			public var intent: Intent? {
-				guard case let .addNewP2PLink(_, andThen: intent) = self else { return nil }
-				return intent
-			}
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -84,16 +81,14 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case addNewLedger(AddLedgerFactorSource.Action)
 
 			public enum NoP2PLinkAlert: Sendable, Hashable {
-				case addNewP2PLinkTapped(Intent)
+				case addNewP2PLinkTapped
 				case cancelTapped
 			}
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
-				Scope(state: \.0, action: /.self) {
-					NewConnection()
-				}
+				NewConnection()
 			}
 			Scope(state: /State.addNewLedger, action: /Action.addNewLedger) {
 				AddLedgerFactorSource()
@@ -127,10 +122,10 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			return .none
 
 		case let .confirmedLedger(ledger):
-			return fulfillEffect(state: &state, intent: .selectLedger(ledger))
+			return performActionRequiringP2PEffect(.selectLedger(ledger), in: &state)
 
 		case .addNewLedgerButtonTapped:
-			return fulfillEffect(state: &state, intent: .addLedger)
+			return performActionRequiringP2PEffect(.addLedger, in: &state)
 
 		case .whatIsALedgerButtonTapped:
 			return .none
@@ -146,10 +141,15 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case let .hasAConnectorExtension(isConnected):
 			loggerGlobal.notice("Is connected to any CE?: \(isConnected)")
 			state.hasAConnectorExtension = isConnected
-			return .none
 
-		case let .fulfillIntent(intent):
-			return fulfillEffect(state: &state, intent: intent)
+			if isConnected, let pendingAction = state.pendingAction {
+				return performActionRequiringP2PEffect(pendingAction, in: &state)
+			} else {
+				return .none
+			}
+
+		case let .perform(action):
+			return performActionRequiringP2PEffect(action, in: &state)
 		}
 	}
 
@@ -157,8 +157,8 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		switch childAction {
 		case let .destination(.presented(.noP2PLink(alertAction))):
 			switch alertAction {
-			case let .addNewP2PLinkTapped(intent: intent):
-				state.destination = .addNewP2PLink(.init(), andThen: intent)
+			case .addNewP2PLinkTapped:
+				state.destination = .addNewP2PLink(.init())
 				return .none
 
 			case .cancelTapped:
@@ -168,15 +168,9 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case let .destination(.presented(.addNewP2PLink(.delegate(newP2PAction)))):
 			switch newP2PAction {
 			case let .newConnection(connectedClient):
-				let intent = state.destination?.intent
 				state.destination = nil
-				return .run { send in
+				return .run { _ in
 					try await p2pLinksClient.addP2PLink(connectedClient)
-					await send(.internal(.hasAConnectorExtension(true)))
-					if let intent {
-						// Continue what we were doing
-						await send(.internal(.fulfillIntent(intent)))
-					}
 				} catch: { error, _ in
 					loggerGlobal.error("Failed P2PLink, error \(error)")
 					errorQueue.schedule(error)
@@ -219,15 +213,18 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	private func fulfillEffect(state: inout State, intent: Intent) -> EffectTask<Action> {
+	private func performActionRequiringP2PEffect(_ action: ActionRequiringP2P, in state: inout State) -> EffectTask<Action> {
 		// If we don't have a connection, we remember what we were trying to do and then ask if they want to link one
 		guard state.hasAConnectorExtension else {
-			state.destination = .noP2PLink(.noP2Plink(intent: intent))
+			state.pendingAction = action
+			state.destination = .noP2PLink(.noP2Plink)
 			return .none
 		}
 
+		state.pendingAction = nil
+
 		// If we have a connection, we can proceed directly
-		switch intent {
+		switch action {
 		case .addLedger:
 			state.destination = .addNewLedger(.init())
 			return .none
@@ -238,14 +235,14 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 }
 
 extension AlertState<LedgerHardwareDevices.Destinations.Action.NoP2PLinkAlert> {
-	static func noP2Plink(intent: LedgerHardwareDevices.Intent) -> AlertState {
+	static var noP2Plink: AlertState {
 		AlertState {
 			TextState("No connector!!") // FIXME: Strings
 		} actions: {
 			ButtonState(role: .cancel, action: .cancelTapped) {
 				TextState(L10n.Common.cancel)
 			}
-			ButtonState(action: .addNewP2PLinkTapped(intent)) {
+			ButtonState(action: .addNewP2PLinkTapped) {
 				TextState(L10n.Common.continue) // FIXME: Strings
 			}
 		} message: {
