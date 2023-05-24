@@ -1,51 +1,7 @@
 import AddLedgerFactorSourceFeature
 import FeaturePrelude
+import NewConnectionFeature
 import Profile
-
-// MARK: - LedgerHardwareDevicesCoordinator.View
-extension LedgerHardwareDevicesCoordinator {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<LedgerHardwareDevicesCoordinator>
-
-		public init(store: StoreOf<LedgerHardwareDevicesCoordinator>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			IfLetStore(
-				store.scope(state: \.linkConnector, action: { .child(.linkConnector($0)) }),
-				then: {
-					LedgerHardwareDevicesLinkConnector.View(store: $0)
-						.navigationDestination(
-							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-							state: /LedgerHardwareDevicesCoordinator.Destinations.State.selectDevice,
-							action: LedgerHardwareDevicesCoordinator.Destinations.Action.selectDevice,
-							destination: { LedgerHardwareDevices.View(store: $0) }
-						)
-				}
-			)
-		}
-	}
-}
-
-// MARK: - LedgerHardwareDevicesLinkConnector.View
-extension LedgerHardwareDevicesLinkConnector {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<LedgerHardwareDevicesLinkConnector>
-
-		public init(store: StoreOf<LedgerHardwareDevicesLinkConnector>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			Button("DID CONNECT") {
-				ViewStore(store).send(.delegate(.didConnect))
-			}
-		}
-	}
-}
 
 extension LedgerHardwareDevices.State {
 	var viewState: LedgerHardwareDevices.ViewState {
@@ -137,17 +93,11 @@ extension LedgerHardwareDevices {
 							.buttonStyle(.primaryRectangular)
 					}
 				}
-				.sheet(
-					store: store.scope(
-						state: \.$addNewLedger,
-						action: { .child(.addNewLedger($0)) }
-					),
-					content: { AddLedgerFactorSource.View(store: $0) }
-				)
-				.onFirstTask { @MainActor in
-					viewStore.send(.onFirstTask)
+				.task { @MainActor in
+					await viewStore.send(.onFirstTask).finish()
 				}
 			}
+			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -182,6 +132,45 @@ extension LedgerHardwareDevices {
 				}
 			}
 		}
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func destinations(with store: StoreOf<LedgerHardwareDevices>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return addNewLedgerSheet(with: destinationStore)
+			.addNewP2PLinkSheet(with: destinationStore)
+			.noP2PLinkAlert(with: destinationStore)
+	}
+
+	@MainActor
+	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /LedgerHardwareDevices.Destinations.State.addNewLedger,
+			action: LedgerHardwareDevices.Destinations.Action.addNewLedger,
+			content: { AddLedgerFactorSource.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /LedgerHardwareDevices.Destinations.State.addNewP2PLink,
+			action: LedgerHardwareDevices.Destinations.Action.addNewP2PLink,
+			content: { NewConnection.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destinations>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /LedgerHardwareDevices.Destinations.State.noP2PLink,
+			action: LedgerHardwareDevices.Destinations.Action.noP2PLink
+		)
 	}
 }
 
