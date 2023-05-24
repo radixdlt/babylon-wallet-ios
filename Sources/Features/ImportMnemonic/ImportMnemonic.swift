@@ -144,49 +144,49 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = language
 			self.wordCount = wordCount
 			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
-			#if DEBUG
-			self.words = .init(
-				uncheckedUniqueElements: [
-					"position",
-					"possible",
-					"REPLACEME",
-					"priority",
-					"property",
-					"purchase",
-					"question",
-					"remember",
-					"resemble",
-					"resource",
-					"response",
-					"scissors",
-					"scorpion",
-					"security",
-					"sentence",
-					"shoulder",
-					"solution",
-					"squirrel",
-					"strategy",
-					"struggle",
-					"surprise",
-					"surround",
-					"together",
-					"tomorrow",
-				]
-				.enumerated()
-				.map {
-					ImportMnemonicWord.State(
-						id: $0.offset,
-						value: .knownFull(NonEmptyString(rawValue: $0.element)!, fromPartial: $0.element)
-					)
-				}
-			)
-
-			words[id: 2]?.value = .invalid("Ultrasuperlong")
-			#else
+//			#if DEBUG
+//			self.words = .init(
+//				uncheckedUniqueElements: [
+//					"position",
+//					"possible",
+//					"REPLACEME",
+//					"priority",
+//					"property",
+//					"purchase",
+//					"question",
+//					"remember",
+//					"resemble",
+//					"resource",
+//					"response",
+//					"scissors",
+//					"scorpion",
+//					"security",
+//					"sentence",
+//					"shoulder",
+//					"solution",
+//					"squirrel",
+//					"strategy",
+//					"struggle",
+//					"surprise",
+//					"surround",
+//					"together",
+//					"tomorrow",
+//				]
+//				.enumerated()
+//				.map {
+//					ImportMnemonicWord.State(
+//						id: $0.offset,
+//						value: .knownFull(NonEmptyString(rawValue: $0.element)!, fromPartial: $0.element)
+//					)
+//				}
+//			)
+//
+//			words[id: 2]?.value = .invalid("Ultrasuperlong")
+//			#else
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
 				ImportMnemonicWord.State(id: $0)
 			})
-			#endif
+//			#endif
 		}
 	}
 

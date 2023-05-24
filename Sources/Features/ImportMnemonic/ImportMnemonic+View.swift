@@ -113,7 +113,13 @@ extension ImportMnemonicWord {
 
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
-		.init(mnemonic: nil, rowCount: rowCount)
+		.init(
+			mnemonic: try? Mnemonic(
+				words: words.map(\.value.displayText),
+				language: .english
+			),
+			rowCount: rowCount
+		)
 	}
 }
 
@@ -157,18 +163,20 @@ extension ImportMnemonic {
 								}
 							)
 						}
+
+						.padding(.medium3)
+						.footer {
+							WithControlRequirements(
+								viewStore.mnemonic,
+								forAction: { viewStore.send(.continueButtonTapped($0)) }
+							) { action in
+								Button("Import mnemonic", action: action)
+									.buttonStyle(.primaryRectangular)
+							}
+						}
 					}
 				}
-				.padding(.medium3)
-				.footer {
-					WithControlRequirements(
-						viewStore.mnemonic,
-						forAction: { viewStore.send(.continueButtonTapped($0)) }
-					) { action in
-						Button("Import mnemonic", action: action)
-							.buttonStyle(.primaryRectangular)
-					}
-				}
+
 				.onAppear { viewStore.send(.appeared) }
 			}
 		}
