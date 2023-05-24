@@ -78,7 +78,7 @@ extension BIP39.WordList {
 	}
 
 	public enum LookupResult: Sendable, Hashable {
-		case unknown
+		case emptyOrTooShort
 		case partialAmongstCandidates(OrderedSet<NonEmptyString>)
 		case knownFull(NonEmptyString)
 		case knownAutocomplete(NonEmptyString)
@@ -86,16 +86,17 @@ extension BIP39.WordList {
 
 	public func lookup(
 		_ stringMaybeEmpty: String,
-		minLengthForPartial: Int = 3
+		minLengthForPartial: Int = 2
 	) -> LookupResult {
 		guard let string = NonEmptyString(rawValue: stringMaybeEmpty) else {
-			return .unknown
+			return .emptyOrTooShort
 		}
 		if _list.contains(string) {
 			return .knownFull(string)
 		}
+
 		guard string.count >= minLengthForPartial else {
-			return .unknown
+			return .emptyOrTooShort
 		}
 		let candidates = _list.filter { $0.starts(with: string) }
 		if candidates.count == 1 {

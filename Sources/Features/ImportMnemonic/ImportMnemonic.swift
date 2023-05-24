@@ -134,7 +134,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			#if DEBUG
 			self.words = .init(uncheckedUniqueElements: ["position",
 			                                             "possible",
-			                                             "ultrasuperlong",
+			                                             "REPLACEME",
 			                                             "priority",
 			                                             "property",
 			                                             "purchase",
@@ -158,6 +158,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			                                             "tomorrow"].enumerated().map {
 					ImportMnemonicWord.State(id: $0.offset, value: .knownFull(NonEmptyString(rawValue: $0.element)!))
 				})
+			words[id: 2]?.value = .invalid("Ultrasuperlong")
 			#else
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
 				ImportMnemonicWord.State(id: $0)
@@ -195,34 +196,45 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .word(id, child: .delegate(.lookupWord(input))):
+			let lookedUp = state.wordList.lookup(input, minLengthForPartial: 2)
+			return updateWord(id: id, input: input, &state, lookupResult: lookedUp)
 
-			state.words[id: id]?.autocompletionCandidates = nil
-			state.words[id: id]?.value = .partial(input)
-
-			switch state.wordList.lookup(input, minLengthForPartial: 2) {
-			case let .partialAmongstCandidates(candidates):
-				state.words[id: id]?.autocompletionCandidates = .init(input: input, candidates: candidates)
-
-			case .unknown:
-				break
-
-			case let .knownFull(knownFull):
-				state.words[id: id]?.value = .knownFull(knownFull)
-				return focusNext(&state)
-
-			case let .knownAutocomplete(knownAutocomplete):
-				state.words[id: id]?.value = .knownAutocompleted(knownAutocomplete, fromPartial: input)
-				return focusNext(&state)
-			}
-			return .none
-
-		case let .word(id, child: .delegate(.autocompleteWith(candidate, _))):
-			state.words[id: id]?.value = .knownFull(candidate)
-			state.words[id: id]?.autocompletionCandidates = nil
-			return focusNext(&state)
+		case let .word(id, child: .delegate(.autocompleteWith(candidate, input))):
+//			state.words[id: id]?.value = .knownFull(candidate)
+//			state.words[id: id]?.autocompletionCandidates = nil
+//			return focusNext(&state)
+			return updateWord(id: id, input: input, &state, lookupResult: .knownFull(candidate))
 
 		case .word(_, child: .view), .word(_, child: .internal):
 			return .none
+		}
+	}
+
+	private func updateWord(
+		id: ImportMnemonicWord.State.ID,
+		input: String,
+		_ state: inout State,
+		lookupResult: BIP39.WordList.LookupResult
+	) -> EffectTask<Action> {
+		switch lookupResult {
+		case let .partialAmongstCandidates(candidates):
+			state.words[id: id]?.autocompletionCandidates = .init(input: input, candidates: candidates)
+			return .none
+
+		case .emptyOrTooShort:
+			state.words[id: id]?.autocompletionCandidates = nil
+			state.words[id: id]?.value = .partial(input)
+			return .none
+
+		case let .knownFull(knownFull):
+			state.words[id: id]?.autocompletionCandidates = nil
+			state.words[id: id]?.value = .knownFull(knownFull)
+			return focusNext(&state)
+
+		case let .knownAutocomplete(knownAutocomplete):
+			state.words[id: id]?.autocompletionCandidates = nil
+			state.words[id: id]?.value = .knownAutocompleted(knownAutocomplete, fromPartial: input)
+			return focusNext(&state)
 		}
 	}
 
