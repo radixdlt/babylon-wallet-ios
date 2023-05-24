@@ -57,8 +57,8 @@ extension ImportMnemonicWord {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 
 				AppTextField(
-					//					primaryHeading: "Primary",
-//					secondaryHeading: "Secondary",
+					primaryHeading: "Word \(viewStore.index + 1)",
+//					secondaryHeading: "Word \(viewStore.index + 1)",
 					placeholder: "Word \(viewStore.index + 1)",
 					text: .init(
 						get: { viewStore.displayText },
@@ -144,7 +144,7 @@ extension ImportMnemonic {
 								repeating: .init(
 									.adaptive(minimum: geoProxy.frame(in: .local).width / CGFloat(wordsPerRow)),
 									spacing: 8,
-									alignment: .center
+									alignment: .top
 								),
 								count: 3
 							)
