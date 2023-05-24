@@ -13,12 +13,16 @@ extension AccountList {
 			public var portfolio: Loadable<AccountPortfolio>
 
 			public var shouldShowSecurityPrompt = false
+			public let isLegacyAccount: Bool
+			public var isLedgerAccount: Bool = false
+			public var isDappDefinitionAccount: Bool = false
 
 			public init(
 				account: Profile.Network.Account
 			) {
 				self.account = account
 				self.portfolio = .loading
+				self.isLegacyAccount = account.isOlympiaAccount
 			}
 		}
 
@@ -31,6 +35,7 @@ extension AccountList {
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
 			case displaySecurityPrompting
+			case isLedgerAccount
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -38,6 +43,8 @@ extension AccountList {
 			case securityPromptTapped(Profile.Network.Account)
 		}
 
+		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -63,10 +70,15 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
+			case .isLedgerAccount:
+				state.isLedgerAccount = true
+				return .none
+
 			case .displaySecurityPrompting:
 				state.shouldShowSecurityPrompt = true
 				return .none
 			case let .accountPortfolioUpdate(portfolio):
+				state.isDappDefinitionAccount = portfolio.isDappDefintionAccountType
 				assert(portfolio.owner == state.account.address)
 				state.portfolio = .success(portfolio)
 
@@ -96,6 +108,9 @@ extension AccountList {
 				}
 				guard factorSource.kind == .device else {
 					// probably ledger account
+					if factorSource.kind == .ledgerHQHardwareWallet {
+						await send(.internal(.isLedgerAccount))
+					}
 					return
 				}
 				await send(.internal(.displaySecurityPrompting))

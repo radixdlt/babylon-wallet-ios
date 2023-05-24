@@ -174,8 +174,11 @@ extension AccountPortfoliosClient {
 		async let fungibleResources = createFungibleResources(rawItems: rawFungibleResources)
 		async let nonFungibleResources = createNonFungibleResources(rawAccountDetails.address, rawItems: rawNonFungibleResources)
 
+		let isDappDefintionAccountType = rawAccountDetails.metadata.accountType == .dappDefinition
+
 		return try await AccountPortfolio(
 			owner: .init(address: rawAccountDetails.address),
+			isDappDefintionAccountType: isDappDefintionAccountType,
 			fungibleResources: fungibleResources,
 			nonFungibleResources: nonFungibleResources
 		)

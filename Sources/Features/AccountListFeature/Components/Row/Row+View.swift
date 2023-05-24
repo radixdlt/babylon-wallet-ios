@@ -14,7 +14,26 @@ extension AccountList.Row {
 		let address: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
-		let isLegacyAccount: Bool
+
+		public enum AccountTag: Int, Hashable, Identifiable, Sendable {
+			case ledgerBabylon
+			case ledgerLegacy
+			case legacySoftware
+			case dAppDefinition
+
+			init?(state: AccountList.Row.State) {
+				switch (state.isDappDefinitionAccount, state.isLegacyAccount, state.isLedgerAccount) {
+				case (false, false, false): return nil
+				case (true, _, _): self = .dAppDefinition
+				case (false, true, true): self = .ledgerLegacy
+				case (false, true, false): self = .legacySoftware
+				case (false, false, true): self = .ledgerBabylon
+				}
+			}
+		}
+
+		let tag: AccountTag?
+
 		let shouldShowSecurityPrompt: Bool
 		let nonFungibleResourcesCount: Int
 		let fungibleResourceIcons: FungibleResources
@@ -25,8 +44,7 @@ extension AccountList.Row {
 			self.appearanceID = state.account.appearanceID
 			self.isLoadingResources = state.portfolio.isLoading
 
-			// Olympia accounts are legacy
-			self.isLegacyAccount = state.account.isOlympiaAccount
+			self.tag = .init(state: state)
 
 			// Show the prompt if the account has any XRD
 			self.shouldShowSecurityPrompt = state.shouldShowSecurityPrompt
@@ -67,9 +85,9 @@ extension AccountList.Row {
 								.foregroundColor(.app.whiteTransparent)
 								.textStyle(.body2HighImportance)
 
-							if viewStore.isLegacyAccount {
+							if let tag = viewStore.tag {
 								Text("•")
-								Text("\(L10n.HomePage.legacyAccountHeading)")
+								Text("\(tag.display)")
 							}
 						}
 						.foregroundColor(.app.whiteTransparent)
@@ -233,6 +251,25 @@ extension AccountList.Row.View {
 				.textStyle(.body1Header)
 				.fixedSize()
 			Spacer()
+		}
+	}
+}
+
+extension AccountList.Row.ViewState.AccountTag {
+	var display: String {
+		switch self {
+		case .dAppDefinition:
+			// FIXME: change to `L10n.home.accountsTag.dAppDefinition`
+			return "dapp definition"
+		case .legacySoftware:
+			// FIXME: change to `L10n.home.accountsTag.legacySoftware`
+			return L10n.HomePage.legacyAccountHeading // "Legacy"
+		case .ledgerLegacy:
+			// FIXME: change to `L10n.home.accountsTag.ledgerLegacy`
+			return "Legacy (Ledger)"
+		case .ledgerBabylon:
+			// FIXME: change to `L10n.home.accountsTag.ledgerBabylon`
+			return "Ledger"
 		}
 	}
 }

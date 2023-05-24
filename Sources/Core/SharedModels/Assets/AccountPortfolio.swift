@@ -4,15 +4,18 @@ import Prelude
 /// Describes all of the owned resources by a given account
 public struct AccountPortfolio: Sendable, Hashable, Codable {
 	public let owner: AccountAddress
+	public let isDappDefintionAccountType: Bool
 	public var fungibleResources: FungibleResources
 	public var nonFungibleResources: NonFungibleResources
 
 	public init(
 		owner: AccountAddress,
+		isDappDefintionAccountType: Bool,
 		fungibleResources: FungibleResources,
 		nonFungibleResources: NonFungibleResources
 	) {
 		self.owner = owner
+		self.isDappDefintionAccountType = isDappDefintionAccountType
 		self.fungibleResources = fungibleResources
 		self.nonFungibleResources = nonFungibleResources
 	}

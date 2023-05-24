@@ -102,9 +102,9 @@ extension ROLAClient {
 					}
 				)
 
-				let dict: [Metadata.Key: String] = .init(
+				let dict: [EntityMetadataKey: String] = .init(
 					uniqueKeysWithValues: metadataCollection.items.compactMap { item in
-						guard let key = Metadata.Key(rawValue: item.key),
+						guard let key = EntityMetadataKey(rawValue: item.key),
 						      let value = item.value.asString else { return nil }
 						return (key: key, value: value)
 					}
@@ -115,7 +115,7 @@ extension ROLAClient {
 					relatedWebsites: dict[.relatedWebsites]
 				)
 
-				guard dAppDefinitionMetadata.accountType == Constants.dAppDefinitionAccountType else {
+				guard dAppDefinitionMetadata.accountType == GatewayAPI.EntityMetadataCollection.AccountType.dappDefinition.rawValue else {
 					throw ROLAFailure.wrongAccountType
 				}
 
@@ -193,16 +193,8 @@ extension ROLAClient {
 		let relatedWebsites: String?
 	}
 
-	enum Metadata {
-		enum Key: String, Sendable, Hashable {
-			case accountType = "account_type"
-			case relatedWebsites = "related_websites"
-		}
-	}
-
 	enum Constants {
 		static let wellKnownFilePath = ".well-known/radix.json"
-		static let dAppDefinitionAccountType = "dapp definition"
 	}
 }
 
@@ -289,12 +281,4 @@ extension SLIP10.PublicKey {
 	var bytes: EngineToolkitModels.Bytes {
 		.init(bytes: Array(self.compressedRepresentation))
 	}
-}
-
-extension EnumDiscriminator {
-	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
-	public static let metadataEntry: Self = .u8(0x01)
-
-	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
-	public static let publicKey: Self = .u8(0x09)
 }
