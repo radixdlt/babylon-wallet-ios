@@ -86,7 +86,8 @@ extension BIP39.WordList {
 
 	public func lookup(
 		_ stringMaybeEmpty: String,
-		minLengthForPartial: Int = 2
+		minLengthForPartial: Int = 2,
+		ignoreCandidateIfCountExceeds: Int = 5
 	) -> LookupResult {
 		guard let string = NonEmptyString(rawValue: stringMaybeEmpty) else {
 			return .emptyOrTooShort
@@ -101,6 +102,9 @@ extension BIP39.WordList {
 		let candidates = _list.filter { $0.starts(with: string) }
 		if candidates.count == 1 {
 			return .knownAutocomplete(candidates[0])
+		}
+		guard candidates.count <= ignoreCandidateIfCountExceeds else {
+			return .emptyOrTooShort
 		}
 		return .partialAmongstCandidates(candidates)
 	}

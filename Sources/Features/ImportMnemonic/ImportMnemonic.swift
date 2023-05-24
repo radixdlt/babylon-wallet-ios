@@ -9,16 +9,15 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		}
 
 		public enum WordValue: Sendable, Hashable {
-			case empty
-			case partial(String)
+			case partial(String = "")
 			case invalid(String)
-			case knownFull(NonEmptyString)
+			case knownFull(NonEmptyString, fromPartial: String)
 			case knownAutocompleted(NonEmptyString, fromPartial: String)
 
 			var isValid: Bool {
 				switch self {
 				case .knownFull, .knownAutocompleted: return true
-				case .partial, .empty, .invalid: return false
+				case .partial, .invalid: return false
 				}
 			}
 
@@ -31,10 +30,9 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 			var displayText: String {
 				switch self {
-				case .empty: return ""
 				case let .invalid(text): return text
 				case let .partial(text): return text
-				case let .knownFull(word): return word.rawValue
+				case let .knownFull(word, _): return word.rawValue
 				case let .knownAutocompleted(word, _): return word.rawValue
 				}
 			}
@@ -50,7 +48,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		public var value: WordValue
 		public var autocompletionCandidates: AutocompletionCandidates? = nil
 		public var focusedField: Field? = nil
-		public init(id: ID, value: WordValue = .empty) {
+		public init(id: ID, value: WordValue = .partial()) {
 			self.id = id
 			self.value = value
 		}
@@ -84,7 +82,21 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .wordChanged(input):
+			guard input.count >= state.value.displayText.count else {
+				// We dont perform lookup when we decrease character count
+				switch state.value {
+				case .invalid, .partial:
+					state.value = .partial(input)
+				case let .knownAutocompleted(_, fromPartial) where fromPartial != input:
+					state.value = .partial(input)
+				case let .knownFull(_, fromPartial) where fromPartial != input:
+					state.value = .partial(input)
+				default: break
+				}
+				return .none
+			}
 			return .send(.delegate(.lookupWord(input: input)))
+
 		case let .autocompleteWith(candidate):
 			return .send(.delegate(.autocompleteWith(
 				candidate: candidate,
@@ -132,32 +144,42 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.wordCount = wordCount
 			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
 			#if DEBUG
-			self.words = .init(uncheckedUniqueElements: ["position",
-			                                             "possible",
-			                                             "REPLACEME",
-			                                             "priority",
-			                                             "property",
-			                                             "purchase",
-			                                             "question",
-			                                             "remember",
-			                                             "resemble",
-			                                             "resource",
-			                                             "response",
-			                                             "scissors",
-			                                             "scorpion",
-			                                             "security",
-			                                             "sentence",
-			                                             "shoulder",
-			                                             "solution",
-			                                             "squirrel",
-			                                             "strategy",
-			                                             "struggle",
-			                                             "surprise",
-			                                             "surround",
-			                                             "together",
-			                                             "tomorrow"].enumerated().map {
-					ImportMnemonicWord.State(id: $0.offset, value: .knownFull(NonEmptyString(rawValue: $0.element)!))
-				})
+			self.words = .init(
+				uncheckedUniqueElements: [
+					"position",
+					"possible",
+					"REPLACEME",
+					"priority",
+					"property",
+					"purchase",
+					"question",
+					"remember",
+					"resemble",
+					"resource",
+					"response",
+					"scissors",
+					"scorpion",
+					"security",
+					"sentence",
+					"shoulder",
+					"solution",
+					"squirrel",
+					"strategy",
+					"struggle",
+					"surprise",
+					"surround",
+					"together",
+					"tomorrow",
+				]
+				.enumerated()
+				.map {
+					ImportMnemonicWord.State(
+						id: $0.offset,
+						value: .knownFull(NonEmptyString(rawValue: $0.element)!, fromPartial: $0.element)
+					)
+				}
+			)
+
 			words[id: 2]?.value = .invalid("Ultrasuperlong")
 			#else
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
@@ -196,13 +218,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .word(id, child: .delegate(.lookupWord(input))):
-			let lookedUp = state.wordList.lookup(input, minLengthForPartial: 2)
+			let lookedUp = state.wordList.lookup(input, minLengthForPartial: 2, ignoreCandidateIfCountExceeds: 5)
+			print("🔮: \(lookedUp)")
 			return updateWord(id: id, input: input, &state, lookupResult: lookedUp)
 
 		case let .word(id, child: .delegate(.autocompleteWith(candidate, input))):
-//			state.words[id: id]?.value = .knownFull(candidate)
-//			state.words[id: id]?.autocompletionCandidates = nil
-//			return focusNext(&state)
 			return updateWord(id: id, input: input, &state, lookupResult: .knownFull(candidate))
 
 		case .word(_, child: .view), .word(_, child: .internal):
@@ -219,6 +239,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		switch lookupResult {
 		case let .partialAmongstCandidates(candidates):
 			state.words[id: id]?.autocompletionCandidates = .init(input: input, candidates: candidates)
+			state.words[id: id]?.value = .partial(input)
 			return .none
 
 		case .emptyOrTooShort:
@@ -228,7 +249,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .knownFull(knownFull):
 			state.words[id: id]?.autocompletionCandidates = nil
-			state.words[id: id]?.value = .knownFull(knownFull)
+			state.words[id: id]?.value = .knownFull(knownFull, fromPartial: input)
 			return focusNext(&state)
 
 		case let .knownAutocomplete(knownAutocomplete):
