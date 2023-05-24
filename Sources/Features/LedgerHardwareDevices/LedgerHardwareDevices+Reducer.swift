@@ -237,7 +237,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 extension AlertState<LedgerHardwareDevices.Destinations.Action.NoP2PLinkAlert> {
 	static var noP2Plink: AlertState {
 		AlertState {
-			TextState("No connector!!") // FIXME: Strings
+			TextState("Link a Connector") // FIXME: Strings
 		} actions: {
 			ButtonState(role: .cancel, action: .cancelTapped) {
 				TextState(L10n.Common.cancel)
@@ -246,7 +246,7 @@ extension AlertState<LedgerHardwareDevices.Destinations.Action.NoP2PLinkAlert> {
 				TextState(L10n.Common.continue) // FIXME: Strings
 			}
 		} message: {
-			TextState("You need to connect to a connector extension first") // FIXME: Strings
+			TextState("To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.\n\nInstall the Connector extension, open it to see the linking QR code, and tap continue") // FIXME: Strings
 		}
 	}
 }
