@@ -81,7 +81,12 @@ extension ImportMnemonicWord {
 						),
 						to: $focusedField
 					),
-					showClearButton: viewStore.focusedField != nil
+					showClearButton: viewStore.focusedField != nil,
+					innerAccessory: {
+						if viewStore.state.validation == .valid, viewStore.focusedField == nil {
+							Image(systemName: "checkmark.seal.fill").foregroundColor(.app.green1)
+						}
+					}
 				)
 				.minimumScaleFactor(0.9)
 				.textCase(.lowercase)
