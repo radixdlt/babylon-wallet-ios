@@ -2,23 +2,19 @@ import FeaturePrelude
 import Prelude
 import Profile
 import RadixConnectModels
-import SecureStorageClient
 import SwiftUI
 
 // MARK: - ProfileView
 public struct ProfileView: IndentedView {
 	public let profile: Profile
 	public let indentation: Indentation
-	public var secureStorageClient: SecureStorageClient?
 
 	public init(
 		profile: Profile,
-		indentation: Indentation = .init(),
-		secureStorageClient: SecureStorageClient? = nil
+		indentation: Indentation = .init()
 	) {
 		self.profile = profile
 		self.indentation = indentation
-		self.secureStorageClient = secureStorageClient
 	}
 }
 
@@ -70,8 +66,7 @@ extension ProfileView {
 
 				FactorSourcesView(
 					factorSources: profile.factorSources,
-					indentation: inOneLevel,
-					secureStorageClient: secureStorageClient
+					indentation: inOneLevel
 				)
 			}
 		}
@@ -97,7 +92,6 @@ extension IndentedView {
 public struct FactorSourcesView: IndentedView {
 	public let factorSources: FactorSources
 	public let indentation: Indentation
-	public var secureStorageClient: SecureStorageClient?
 }
 
 extension FactorSourcesView {
@@ -113,8 +107,7 @@ extension FactorSourcesView {
 			ForEach(factorSources) { factorSource in
 				FactorSourceView(
 					factorSource: factorSource,
-					indentation: inOneLevel,
-					secureStorageClient: secureStorageClient
+					indentation: inOneLevel
 				)
 			}
 		}
@@ -126,9 +119,6 @@ extension FactorSourcesView {
 public struct FactorSourceView: IndentedView {
 	public let factorSource: FactorSource
 	public let indentation: Indentation
-	public var secureStorageClient: SecureStorageClient?
-	@State private var mnemonicPhraseLoadedFromKeychain: String?
-	@State private var mnemonicPassphraseLoadedFromKeychain: String?
 }
 
 extension FactorSourceView {
@@ -146,20 +136,6 @@ extension FactorSourceView {
 			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
 			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 
-			if let mnemonicPhraseLoadedFromKeychain {
-				VStack {
-					Text("✅ Mnemonic found in keychain ✅")
-					Text(mnemonicPhraseLoadedFromKeychain).fontWeight(.semibold)
-					if let mnemonicPassphraseLoadedFromKeychain {
-						Spacer()
-						Text("Bip39 Passphrase:")
-						Text("'\(mnemonicPassphraseLoadedFromKeychain)'")
-					}
-				}
-				.padding()
-				.border(Color.green, width: 3)
-			}
-
 			if let entityCreatingStorage = factorSource.storage?.entityCreating {
 				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: entityCreatingStorage.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
 			}
@@ -169,14 +145,6 @@ extension FactorSourceView {
 		}
 		.foregroundColor(.white)
 		.padding([.leading], leadingPadding)
-		.task {
-			#if DEBUG
-			if let mnemonic = try? await secureStorageClient?.loadMnemonicByFactorSourceID(factorSource.id, .debugOnlyInspect) {
-				self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
-				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
-			}
-			#endif
-		}
 	}
 }
 

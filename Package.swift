@@ -157,6 +157,15 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "DebugInspectProfileFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"RadixConnectModels",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DerivePublicKeysFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -212,13 +221,6 @@ package.addModules([
 			"ImportLegacyWalletClient",
 			"DerivePublicKeysFeature",
 			"ChooseLedgerHardwareDeviceFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "InspectProfileFeature",
-		dependencies: [
-			"SecureStorageClient",
 		],
 		tests: .no
 	),
@@ -314,7 +316,7 @@ package.addModules([
 			"GatewaySettingsFeature",
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
-			"InspectProfileFeature",
+			"DebugInspectProfileFeature",
 			"LedgerHardwareWalletsFeature",
 			"MnemonicClient",
 			"P2PLinksFeature",

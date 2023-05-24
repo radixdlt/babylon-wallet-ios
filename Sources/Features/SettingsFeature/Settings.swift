@@ -10,6 +10,10 @@ import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
 
+#if DEBUG
+import DebugInspectProfileFeature
+#endif // DEBUG
+
 // MARK: - AppSettings
 public struct AppSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -29,9 +33,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 		public var destination: Destinations.State?
 
 		public var userHasNoP2PLinks: Bool?
-		#if DEBUG
-		public var profileToInspect: Profile?
-		#endif
 
 		public init() {}
 	}
@@ -50,14 +51,13 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
 		case generalSettingsButtonTapped
-		case factorSourcesButtonTapped
 		case importFromOlympiaWalletButtonTapped
 		case profileBackupsButtonTapped
 		case ledgerHardwareWalletsButtonTapped
 
 		#if DEBUG
+		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
-		case setDebugProfileSheet(isPresented: Bool)
 		#endif
 
 		public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
@@ -87,36 +87,44 @@ public struct AppSettings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case deleteProfileConfirmationDialog(ConfirmationDialogState<ViewAction.DeleteProfileConfirmationDialogAction>)
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
-			case manageFactorSources(ManageFactorSources.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 			case generalSettings(GeneralSettings.State)
+			case mnemonics(DisplayMnemonics.State)
 			case profileBackups(ProfileBackups.State)
 			case ledgerHardwareWallets(LedgerHardwareWallets.State)
+
+			#if DEBUG
+			case debugInspectProfile(DebugInspectProfile.State)
+			case debugManageFactorSources(ManageFactorSources.State)
+			#endif
 		}
 
 		public enum Action: Sendable, Equatable {
 			case deleteProfileConfirmationDialog(ViewAction.DeleteProfileConfirmationDialogAction)
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
-			case manageFactorSources(ManageFactorSources.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 			case generalSettings(GeneralSettings.Action)
+			case mnemonics(DisplayMnemonics.Action)
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareWallets.Action)
+
+			#if DEBUG
+			case debugInspectProfile(DebugInspectProfile.Action)
+			case debugManageFactorSources(ManageFactorSources.Action)
+			#endif
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
 				ImportOlympiaWalletCoordinator()
 			}
-			Scope(state: /State.manageFactorSources, action: /Action.manageFactorSources) {
-				ManageFactorSources()
-			}
+
 			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
 				P2PLinksFeature()
 			}
@@ -138,6 +146,14 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
 				LedgerHardwareWallets()
 			}
+			#if DEBUG
+			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
+				DebugInspectProfile()
+			}
+			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
+				ManageFactorSources()
+			}
+			#endif
 		}
 	}
 
@@ -178,10 +194,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case .factorSourcesButtonTapped:
-			state.destination = .manageFactorSources(.init())
-			return .none
-
 		case .importFromOlympiaWalletButtonTapped:
 			state.destination = .importOlympiaWalletCoordinator(.init())
 			return .none
@@ -220,17 +232,18 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		#if DEBUG
-		case .debugInspectProfileButtonTapped:
-			return .run { send in
-				let snapshot = await appPreferencesClient.extractProfileSnapshot()
-				guard let profile = try? Profile(snapshot: snapshot) else { return }
-				await send(.internal(.profileToDebugLoaded(profile)))
-			}
-
-		case let .setDebugProfileSheet(isPresented):
-			precondition(!isPresented)
-			state.profileToInspect = nil
+		case .factorSourcesButtonTapped:
+			state.destination = .debugManageFactorSources(.init())
 			return .none
+
+		case .debugInspectProfileButtonTapped:
+//			return .run { send in
+//				let snapshot = await appPreferencesClient.extractProfileSnapshot()
+//				guard let profile = try? Profile(snapshot: snapshot) else { return }
+//				await send(.internal(.profileToDebugLoaded(profile)))
+//			}
+
+			fatalError()
 		#endif
 		}
 	}
@@ -247,8 +260,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case let .profileToDebugLoaded(profile):
-			state.profileToInspect = profile
-			return .none
+			fatalError()
 		#endif // DEBUG
 		}
 	}
