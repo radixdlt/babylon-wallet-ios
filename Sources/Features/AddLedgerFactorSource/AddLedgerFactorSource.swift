@@ -103,6 +103,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			switch alertAction {
 			case let .finish(ledger):
 				return completeWithLedgerEffect(ledger, isNew: false)
+
 			case .tryAnotherLedger:
 				return sendAddLedgerRequestEffect(&state)
 			}
