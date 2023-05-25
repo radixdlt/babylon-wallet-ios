@@ -1,142 +1,73 @@
 import Cryptography
 import FeaturePrelude
 
-// MARK: - ImportMnemonicWord
-public struct ImportMnemonicWord: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable, Identifiable {
-		public enum Field: Hashable {
-			case textField
-		}
-
-		public enum WordValue: Sendable, Hashable {
-			case partial(String = "")
-			case invalid(String)
-			case knownFull(NonEmptyString, fromPartial: String)
-			case knownAutocompleted(NonEmptyString, fromPartial: String, userPressedCandidateButtonToComplete: Bool)
-
-			var isValid: Bool {
-				switch self {
-				case .knownFull, .knownAutocompleted: return true
-				case .partial, .invalid: return false
-				}
-			}
-
-			var isInvalid: Bool {
-				guard case .invalid = self else {
-					return false
-				}
-				return true
-			}
-
-			var displayText: String {
-				switch self {
-				case let .invalid(text): return text
-				case let .partial(text): return text
-				case let .knownFull(word, _): return word.rawValue
-				case let .knownAutocompleted(word, _, _): return word.rawValue
-				}
-			}
-		}
-
-		public struct AutocompletionCandidates: Sendable, Hashable {
-			public let input: String
-			public let candidates: OrderedSet<NonEmptyString>
-		}
-
-		public typealias ID = Int
-		public let id: ID
-		public var value: WordValue
-
-		public var autocompletionCandidates: AutocompletionCandidates? = nil
-		public var focusedField: Field? = nil
-		public init(id: ID, value: WordValue = .partial()) {
-			self.id = id
-			self.value = value
-		}
-
-		public var isValidWord: Bool {
-			value.isValid
-		}
-
-		public mutating func focus() {
-			self.focusedField = .textField
-		}
-
-		public mutating func resignFocus() {
-			self.focusedField = nil
-		}
-	}
-
-	public enum ViewAction: Sendable, Hashable {
-		case wordChanged(input: String)
-		case autocompleteWith(candidate: NonEmptyString)
-		case textFieldFocused(State.Field?)
-	}
-
-	public enum DelegateAction: Sendable, Hashable {
-		case lookupWord(input: String)
-		case lostFocus(displayText: String)
-		case autocompleteWith(candidate: NonEmptyString, fromPartial: String)
-	}
-
-	public init() {}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case let .wordChanged(input):
-			guard input.count >= state.value.displayText.count else {
-				// We dont perform lookup when we decrease character count
-				switch state.value {
-				case .invalid, .partial:
-					state.value = .partial(input)
-
-				case let .knownAutocompleted(_, fromPartial, userPressedCandidateButtonToComplete) where fromPartial != input && userPressedCandidateButtonToComplete:
-					// User explicitly chose a candidate to autocomlete
-					state.value = .partial(input)
-
-				case let .knownAutocompleted(_, fromPartial, userPressedCandidateButtonToComplete) where fromPartial != input && !userPressedCandidateButtonToComplete:
-					// The word was automatically autocompleted, use `fromPartial.dropLast` (since user wanted to erase one char)
-					state.value = .partial(.init(fromPartial.dropLast()))
-
-				case let .knownFull(_, fromPartial) where fromPartial != input:
-					state.value = .partial(input)
-				default: break
-				}
-				return .none
-			}
-
-			return .send(.delegate(.lookupWord(input: input)))
-
-		case let .autocompleteWith(candidate):
-			return .send(.delegate(.autocompleteWith(
-				candidate: candidate,
-				fromPartial: state.value.displayText
-			)))
-		case let .textFieldFocused(field):
-			state.focusedField = field
-			return field == nil ? .send(.delegate(.lostFocus(displayText: state.value.displayText))) : .none
-		}
-	}
-}
-
 // MARK: - BIP39.WordList + Sendable
 extension BIP39.WordList: @unchecked Sendable {}
 let wordsPerRow = 3
+
+// MARK: - BIP39.WordCount + Comparable
+extension BIP39.WordCount: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.rawValue < rhs.rawValue
+	}
+
+	mutating func increaseBy3() {
+		guard self != .twentyFour else {
+			assertionFailure("Invalid, cannot increase to than 24 words")
+			return
+		}
+		self = .init(rawValue: rawValue + 3)!
+	}
+
+	mutating func decreaseBy3() {
+		guard self != .twelve else {
+			assertionFailure("Invalid, cannot decrease to less than 12 words")
+			return
+		}
+		self = .init(rawValue: rawValue - 3)!
+	}
+}
 
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
 		public var words: Words
-		public var rowCount: Int {
-			words.count / wordsPerRow
-		}
 
 		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID?
 
 		public var language: BIP39.Language
-		public var wordCount: BIP39.WordCount
+		public var wordCount: BIP39.WordCount {
+			willSet {
+				let delta = newValue.rawValue - wordCount.rawValue
+
+				if delta > 0 {
+					// is increasing word count
+					words.append(contentsOf: (wordCount.rawValue ..< newValue.rawValue).map {
+						.init(id: $0)
+					})
+				} else if delta < 0 {
+					// is decreasing word count
+					words.removeLast(abs(delta))
+				}
+				switch newValue {
+				case .twelve:
+					self.isRemoveRowButtonVisible = false
+				case .fifteen, .eighteen, .twentyOne:
+					self.isRemoveRowButtonVisible = true
+					self.isAddRowButtonVisible = true
+				case .twentyFour:
+					self.isAddRowButtonVisible = false
+				}
+			}
+		}
+
 		public let wordList: BIP39.WordList
+
+		public var isAddRowButtonVisible: Bool
+		public var isRemoveRowButtonVisible: Bool
+
+		public var bip39Passphrase: String = ""
 
 		public var mnemonic: Mnemonic? {
 			try? Mnemonic(
@@ -147,11 +78,17 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public init(
 			language: BIP39.Language = .english,
-			wordCount: BIP39.WordCount = .twelve
+			wordCount: BIP39.WordCount = .twelve,
+			bip39Passphrase: String = ""
 		) {
 			self.wordList = BIP39.wordList(for: language)
 			self.language = language
 			self.wordCount = wordCount
+			self.bip39Passphrase = bip39Passphrase
+
+			self.isAddRowButtonVisible = wordCount != .twentyFour
+			self.isRemoveRowButtonVisible = wordCount != .twelve
+
 			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
 				ImportMnemonicWord.State(id: $0)
@@ -161,6 +98,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case passphraseChanged(String)
+		case addRowButtonTapped
+		case removeRowButtonTapped
+
 		case continueButtonTapped(Mnemonic)
 	}
 
@@ -169,12 +110,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case finishedInputtingMnemonic(Mnemonic)
+		case finishedInputtingMnemonicWithPassphrase(MnemonicWithPassphrase)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
 	}
+
+	@Dependency(\.continuousClock) var clock
 
 	public init() {}
 
@@ -209,6 +152,45 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return focusNext(&state)
+
+		case let .passphraseChanged(passphrase):
+			state.bip39Passphrase = passphrase
+			return .none
+
+		case .addRowButtonTapped:
+			assert(state.isAddRowButtonVisible)
+			state.wordCount.increaseBy3()
+			return .none
+
+		case .removeRowButtonTapped:
+			assert(state.isRemoveRowButtonVisible)
+			state.wordCount.decreaseBy3()
+			return .none
+
+		case let .continueButtonTapped(mnemonic):
+			let mnemonicWithPassphrase = MnemonicWithPassphrase(
+				mnemonic: mnemonic,
+				passphrase: state.bip39Passphrase
+			)
+			return .send(.delegate(.finishedInputtingMnemonicWithPassphrase(mnemonicWithPassphrase)))
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .focusNext(id):
+			state.idOfWordWithTextFieldFocus = id
+			state.words[id: id]?.focus()
+			return .none
+		}
+	}
+}
+
+extension ImportMnemonic {
 	private func lookup(input: String, _ state: State) -> BIP39.WordList.LookupResult {
 		state.wordList.lookup(input, minLengthForPartial: 2, ignoreCandidateIfCountExceeds: 5)
 	}
@@ -271,26 +253,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
-			return focusNext(&state)
-
-		case let .continueButtonTapped(mnemonic):
-			return .send(.delegate(.finishedInputtingMnemonic(mnemonic)))
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .focusNext(id):
-			state.idOfWordWithTextFieldFocus = id
-			state.words[id: id]?.focus()
-			return .none
-		}
-	}
-
-	func focusNext(_ state: inout State) -> EffectTask<Action> {
+	private func focusNext(_ state: inout State) -> EffectTask<Action> {
 		if let current = state.idOfWordWithTextFieldFocus {
 			state.words[id: current]?.resignFocus()
 		}
@@ -299,7 +262,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 
 		return .run { send in
-			try? await Task.sleep(for: .milliseconds(50))
+			try? await clock.sleep(for: .milliseconds(75))
 			await send(.internal(.focusNext(nextID)))
 		}
 	}
