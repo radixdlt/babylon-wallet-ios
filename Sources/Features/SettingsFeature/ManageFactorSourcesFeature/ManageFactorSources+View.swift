@@ -36,8 +36,8 @@ extension ManageFactorSources {
 								}
 							}
 						}
-						Button("Import Olympia factor source") {
-							viewStore.send(.importOlympiaFactorSourceButtonTapped)
+						Button("Import Mnemonic source") {
+							viewStore.send(.importMnemonicButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
 

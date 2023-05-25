@@ -23,7 +23,15 @@ extension NewConnection {
 						CaseLet(
 							state: /NewConnection.State.scanQR,
 							action: { NewConnection.Action.child(.scanQR($0)) },
-							then: { ScanQRCoordinator.View(store: $0) }
+							then: { newConnectionStore in
+								VStack {
+									Text(L10n.LinkedConnectors.NewConnection.title)
+										.foregroundColor(.app.gray1)
+										.textStyle(.sheetTitle)
+
+									ScanQRCoordinator.View(store: newConnectionStore)
+								}
+							}
 						)
 						CaseLet(
 							state: /NewConnection.State.connectUsingSecrets,

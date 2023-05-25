@@ -38,7 +38,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 	// MARK: Action
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case importOlympiaFactorSourceButtonTapped
+		case importMnemonicButtonTapped
 		case addLedgerButtonTapped
 	}
 
@@ -75,7 +75,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-		case .importOlympiaFactorSourceButtonTapped:
+		case .importMnemonicButtonTapped:
 			state.destination = .importMnemonic(.init(saveInProfile: true))
 			return .none
 		case .addLedgerButtonTapped:
