@@ -1,17 +1,15 @@
 import AppFeature
 import FeaturePrelude
-import ImportMnemonicFeature
 
 // MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
 	var body: some SwiftUI.Scene {
 		WindowGroup {
-			ImportMnemonic.View(
+			App.View(
 				store: Store(
-					initialState: ImportMnemonic.State(),
-					reducer: ImportMnemonic()
-						._printChanges()
+					initialState: App.State(),
+					reducer: App()
 					#if targetEnvironment(simulator)
 						.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
 					#endif
