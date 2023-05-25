@@ -92,7 +92,10 @@ extension ImportMnemonicWord {
 				.textInputAutocapitalization(.never)
 				.autocorrectionDisabled()
 				.toolbar {
-					if let autocompletionCandidates = viewStore.autocompletionCandidates {
+					if
+						let autocompletionCandidates = viewStore.autocompletionCandidates,
+						viewStore.focusedField != nil // we only display the currently selected textfields candidates
+					{
 						ToolbarItemGroup(placement: .keyboard) {
 							HStack {
 								ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in

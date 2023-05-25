@@ -132,13 +132,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.count / wordsPerRow
 		}
 
-		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID? {
-			mutating willSet {
-				if let newValue {
-					words[id: newValue]?.focus()
-				}
-			}
-		}
+		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID?
 
 		public var language: BIP39.Language
 		public var wordCount: BIP39.WordCount
@@ -159,49 +153,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = language
 			self.wordCount = wordCount
 			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
-//			#if DEBUG
-//			self.words = .init(
-//				uncheckedUniqueElements: [
-//					"position",
-//					"possible",
-//					"REPLACEME",
-//					"priority",
-//					"property",
-//					"purchase",
-//					"question",
-//					"remember",
-//					"resemble",
-//					"resource",
-//					"response",
-//					"scissors",
-//					"scorpion",
-//					"security",
-//					"sentence",
-//					"shoulder",
-//					"solution",
-//					"squirrel",
-//					"strategy",
-//					"struggle",
-//					"surprise",
-//					"surround",
-//					"together",
-//					"tomorrow",
-//				]
-//				.enumerated()
-//				.map {
-//					ImportMnemonicWord.State(
-//						id: $0.offset,
-//						value: .knownFull(NonEmptyString(rawValue: $0.element)!, fromPartial: $0.element)
-//					)
-//				}
-//			)
-//
-//			words[id: 2]?.value = .invalid("Ultrasuperlong")
-//			#else
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
 				ImportMnemonicWord.State(id: $0)
 			})
-//			#endif
 		}
 	}
 
@@ -281,7 +235,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		default: break
 		}
 
-		state.words[id: id]?.autocompletionCandidates = nil
 		state.words[id: id]?.value = .knownAutocompleted(word, fromPartial: input, userPressedCandidateButtonToComplete: userPressedCandidateButtonToComplete)
 		return focusNext(&state)
 	}
@@ -299,12 +252,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case .emptyOrTooShort:
-			state.words[id: id]?.autocompletionCandidates = nil
 			state.words[id: id]?.value = .partial(input)
 			return .none
 
 		case let .knownFull(knownFull):
-			state.words[id: id]?.autocompletionCandidates = nil
 			state.words[id: id]?.value = .knownFull(knownFull, fromPartial: input)
 			return focusNext(&state)
 
@@ -312,7 +263,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return autocompleteWithCandidate(id: id, input: input, &state, word: knownAutocomplete, userPressedCandidateButtonToComplete: false)
 
 		case .invalid:
-			state.words[id: id]?.autocompletionCandidates = nil
 			state.words[id: id]?.value = .invalid(input)
 			return .none
 		}
@@ -332,6 +282,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .focusNext(id):
 			state.idOfWordWithTextFieldFocus = id
+			state.words[id: id]?.focus()
 			return .none
 		}
 	}
