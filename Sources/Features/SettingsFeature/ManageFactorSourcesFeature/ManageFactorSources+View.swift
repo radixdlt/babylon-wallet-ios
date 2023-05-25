@@ -1,5 +1,6 @@
 import AddLedgerFactorSourceFeature
 import FeaturePrelude
+import ImportMnemonicFeature
 
 extension ManageFactorSources.State {
 	var viewState: ManageFactorSources.ViewState {
@@ -52,9 +53,9 @@ extension ManageFactorSources {
 					.navigationTitle("Factor Sources")
 					.sheet(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /ManageFactorSources.Destinations.State.importOlympiaFactorSource,
-						action: ManageFactorSources.Destinations.Action.importOlympiaFactorSource,
-						content: { ImportOlympiaFactorSource.View(store: $0) }
+						state: /ManageFactorSources.Destinations.State.importMnemonic,
+						action: ManageFactorSources.Destinations.Action.importMnemonic,
+						content: { ImportMnemonic.View(store: $0) }
 					)
 					.sheet(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
