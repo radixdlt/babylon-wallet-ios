@@ -73,7 +73,6 @@ extension ImportMnemonic {
 											.foregroundColor(.app.red1)
 									}
 								}
-								.textStyle(.body1HighImportance)
 							}
 							if viewStore.isAddRowButtonVisible {
 								Button {
@@ -86,7 +85,6 @@ extension ImportMnemonic {
 											.foregroundColor(.app.green1)
 									}
 								}
-								.textStyle(.body1HighImportance)
 							}
 						}
 						.buttonStyle(.secondaryRectangular)
