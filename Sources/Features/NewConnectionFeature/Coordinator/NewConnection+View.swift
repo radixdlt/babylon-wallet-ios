@@ -32,18 +32,14 @@ extension NewConnection {
 						)
 					}
 				}
-//				.navigationTitle(L10n.LinkedConnectors.NewConnection.title)
 				#if os(iOS)
-//					.navigationBarTitleColor(.app.gray1)
-//					.navigationBarTitleDisplayMode(.inline)
-//					.navigationBarInlineTitleFont(.app.secondaryHeader)
-.toolbar {
-	ToolbarItem(placement: .primaryAction) {
-		CloseButton {
-			ViewStore(store.stateless).send(.view(.closeButtonTapped))
-		}
-	}
-}
+				.toolbar {
+					ToolbarItem(placement: .primaryAction) {
+						CloseButton {
+							ViewStore(store.stateless).send(.view(.closeButtonTapped))
+						}
+					}
+				}
 				#endif
 			}
 			.tint(.app.gray1)
