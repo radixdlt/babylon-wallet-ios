@@ -10,7 +10,8 @@ struct WalletApp: SwiftUI.App {
 			ImportMnemonic.View(
 				store: Store(
 					initialState: ImportMnemonic.State(),
-					reducer: ImportMnemonic()._printChanges()
+					reducer: ImportMnemonic()
+						._printChanges()
 					#if targetEnvironment(simulator)
 						.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
 					#endif

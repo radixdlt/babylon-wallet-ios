@@ -12,7 +12,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			case partial(String = "")
 			case invalid(String)
 			case knownFull(NonEmptyString, fromPartial: String)
-			case knownAutocompleted(NonEmptyString, fromPartial: String)
+			case knownAutocompleted(NonEmptyString, fromPartial: String, userPressedCandidateButtonToComplete: Bool)
 
 			var isValid: Bool {
 				switch self {
@@ -33,7 +33,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 				case let .invalid(text): return text
 				case let .partial(text): return text
 				case let .knownFull(word, _): return word.rawValue
-				case let .knownAutocompleted(word, _): return word.rawValue
+				case let .knownAutocompleted(word, _, _): return word.rawValue
 				}
 			}
 		}
@@ -45,7 +45,12 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 		public typealias ID = Int
 		public let id: ID
-		public var value: WordValue
+		public var value: WordValue {
+			willSet {
+				print("🍀 newValue: \(newValue)")
+			}
+		}
+
 		public var autocompletionCandidates: AutocompletionCandidates? = nil
 		public var focusedField: Field? = nil
 		public init(id: ID, value: WordValue = .partial()) {
@@ -88,14 +93,24 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 				switch state.value {
 				case .invalid, .partial:
 					state.value = .partial(input)
-				case let .knownAutocompleted(_, fromPartial) where fromPartial != input:
+
+				case let .knownAutocompleted(_, fromPartial, userPressedCandidateButtonToComplete) where fromPartial != input && userPressedCandidateButtonToComplete:
+					// User explicitly chose a candidate to autocomlete
 					state.value = .partial(input)
+
+				case let .knownAutocompleted(_, fromPartial, userPressedCandidateButtonToComplete) where fromPartial != input && !userPressedCandidateButtonToComplete:
+					// The word was automatically autocompleted, use `fromPartial.dropLast` (since user wanted to erase one char)
+					let originalInputStringMinusLastChar = String(fromPartial.dropLast())
+					print("🔮 originalInputStringMinusLastChar: '\(originalInputStringMinusLastChar)'\ninput: '\(input)'\nvalue: \(state.value)")
+					state.value = .partial(originalInputStringMinusLastChar)
+
 				case let .knownFull(_, fromPartial) where fromPartial != input:
 					state.value = .partial(input)
 				default: break
 				}
 				return .none
 			}
+
 			return .send(.delegate(.lookupWord(input: input)))
 
 		case let .autocompleteWith(candidate):
@@ -236,7 +251,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return updateWord(id: id, input: displayText, &state, lookupResult: .invalid)
 
 		case let .word(id, child: .delegate(.autocompleteWith(candidate, input))):
-			return updateWord(id: id, input: input, &state, lookupResult: .knownFull(candidate))
+			return autocompleteWithCandidate(id: id, input: input, &state, word: candidate, userPressedCandidateButtonToComplete: true)
 
 		case .word(_, child: .view), .word(_, child: .internal):
 			return .none
@@ -245,6 +260,36 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	private func lookup(input: String, _ state: State) -> BIP39.WordList.LookupResult {
 		state.wordList.lookup(input, minLengthForPartial: 2, ignoreCandidateIfCountExceeds: 5)
+	}
+
+	private func autocompleteWithCandidate(
+		id: ImportMnemonicWord.State.ID,
+		input: String,
+		_ state: inout State,
+		word: NonEmptyString,
+		userPressedCandidateButtonToComplete: Bool
+	) -> EffectTask<Action> {
+		switch state.words[id: id]?.value {
+		case let .some(.partial(partial)):
+			guard abs(input.count - partial.count) <= 1 else {
+				// It is unfortunate that this is needed, perhaps just needed due to nature of current implementation... so here is what is going on:
+				// We do this to support a very special corner case where user has inputted e.g. "ret" and then "r" => "retr" which gets autocompleted
+				// into "retret", and the next field is focused. She realize the last "r" was a mistake, it is not "retret" she wanted to input, but
+				// actually e.g. "return", so she refocuses the textfield and presses erase keyboard button. Now the current implementation is smart!
+				// we do not change the **displayed** word from "retreat" => "retrea", rather we have saved that user had originally only inputted
+				// "retr" so what we WANT the textfield to change into is "ret", which we have logic for in `ImportMnemonicWord` reducer
+				// (search for "dropLast()"), however, due to SwiftUI... what happens is that **immediately** after "ret" is set as text on the
+				// TextField, a subsequent event is emitted from TextField `text` binding with the value "retrea", which overrides what we **just**
+				// had accomplished (replaced with "ret"). Luckily we can prevent this, by guarding that the character limit is only `1` char,
+				// and not in this case `3` (`"retrea".count - "ret".count`)
+				return .none
+			}
+		default: break
+		}
+
+		state.words[id: id]?.autocompletionCandidates = nil
+		state.words[id: id]?.value = .knownAutocompleted(word, fromPartial: input, userPressedCandidateButtonToComplete: userPressedCandidateButtonToComplete)
+		return focusNext(&state)
 	}
 
 	private func updateWord(
@@ -270,9 +315,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return focusNext(&state)
 
 		case let .knownAutocomplete(knownAutocomplete):
-			state.words[id: id]?.autocompletionCandidates = nil
-			state.words[id: id]?.value = .knownAutocompleted(knownAutocomplete, fromPartial: input)
-			return focusNext(&state)
+			return autocompleteWithCandidate(id: id, input: input, &state, word: knownAutocomplete, userPressedCandidateButtonToComplete: false)
 
 		case .invalid:
 			state.words[id: id]?.autocompletionCandidates = nil
