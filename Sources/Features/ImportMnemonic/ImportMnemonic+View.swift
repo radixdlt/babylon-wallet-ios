@@ -92,13 +92,16 @@ extension ImportMnemonic {
 					}
 
 					AppTextField(
-						placeholder: "Passphrase",
+						primaryHeading: "Optional",
+						secondaryHeading: "BIP39 Passphrase (Optional)",
+						placeholder: "BIP39 Passphrase",
 						text: viewStore.binding(
 							get: \.bip39Passphrase,
 							send: { .passphraseChanged($0) }
 						),
 						hint: .info("BIP39 Passphrase is often called a '25th word'.")
 					)
+					.textInputAutocapitalization(.never)
 					.autocorrectionDisabled()
 
 					.footer {
