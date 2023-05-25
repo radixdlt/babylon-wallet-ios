@@ -53,12 +53,25 @@ extension AccountList {
 			case .task:
 				let accountAddress = state.account.address
 				state.portfolio = .loading
-				return .run { send in
+				return .run { [account = state.account] send in
+
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
 						guard !Task.isCancelled else {
 							return
 						}
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
+
+						switch account.securityState {
+						case let .unsecured(unsecuredEntityControl):
+							if
+								let factorSource = try? await factorSourcesClient.getFactorSource(
+									of: unsecuredEntityControl.transactionSigning.factorInstance
+								),
+								factorSource.kind == .ledgerHQHardwareWallet
+							{
+								await send(.internal(.isLedgerAccount))
+							}
+						}
 					}
 				}
 			case .securityPromptTapped:
@@ -107,10 +120,7 @@ extension AccountList {
 					return
 				}
 				guard factorSource.kind == .device else {
-					// probably ledger account
-					if factorSource.kind == .ledgerHQHardwareWallet {
-						await send(.internal(.isLedgerAccount))
-					}
+					// probably ledger
 					return
 				}
 				await send(.internal(.displaySecurityPrompting))
