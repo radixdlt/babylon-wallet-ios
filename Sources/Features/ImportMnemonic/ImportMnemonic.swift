@@ -52,20 +52,20 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				}
 				switch newValue {
 				case .twelve:
-					self.isRemoveRowButtonVisible = false
+					self.isRemoveRowButtonEnabled = false
 				case .fifteen, .eighteen, .twentyOne:
-					self.isRemoveRowButtonVisible = true
-					self.isAddRowButtonVisible = true
+					self.isRemoveRowButtonEnabled = true
+					self.isAddRowButtonEnabled = true
 				case .twentyFour:
-					self.isAddRowButtonVisible = false
+					self.isAddRowButtonEnabled = false
 				}
 			}
 		}
 
 		public let wordList: BIP39.WordList
 
-		public var isAddRowButtonVisible: Bool
-		public var isRemoveRowButtonVisible: Bool
+		public var isAddRowButtonEnabled: Bool
+		public var isRemoveRowButtonEnabled: Bool
 
 		public var bip39Passphrase: String = ""
 
@@ -86,8 +86,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.wordCount = wordCount
 			self.bip39Passphrase = bip39Passphrase
 
-			self.isAddRowButtonVisible = wordCount != .twentyFour
-			self.isRemoveRowButtonVisible = wordCount != .twelve
+			self.isAddRowButtonEnabled = wordCount != .twentyFour
+			self.isRemoveRowButtonEnabled = wordCount != .twelve
 
 			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
@@ -162,12 +162,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case .addRowButtonTapped:
-			assert(state.isAddRowButtonVisible)
+			assert(state.isAddRowButtonEnabled)
 			state.wordCount.increaseBy3()
 			return .none
 
 		case .removeRowButtonTapped:
-			assert(state.isRemoveRowButtonVisible)
+			assert(state.isRemoveRowButtonEnabled)
 			state.wordCount.decreaseBy3()
 			return .none
 
