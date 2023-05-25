@@ -4,128 +4,166 @@ import FeaturePrelude
 import LedgerHardwareWalletClient
 import NewConnectionFeature
 import Profile
-import RadixConnectClient
 import SharedModels
 
-// MARK: - UnnamedLedger
-public struct UnnamedLedger: Sendable, Hashable {
+// MARK: - DeviceInfo
+public struct DeviceInfo: Sendable, Hashable {
 	public let id: FactorSource.ID
 	public let model: P2P.LedgerHardwareWallet.Model
 }
 
 // MARK: - AddLedgerFactorSource
 public struct AddLedgerFactorSource: Sendable, FeatureReducer {
+	// MARK: AddLedgerFactorSource
+
 	public struct State: Sendable, Hashable {
-		public var ledgerName = ""
 		public var isWaitingForResponseFromLedger = false
-		public var unnamedDeviceToAdd: UnnamedLedger?
+		public var unnamedDeviceToAdd: DeviceInfo?
 
 		@PresentationState
-		var destination: Destinations.State? = nil
+		public var destination: Destinations.State? = nil
 
 		public init() {}
 	}
 
+	// MARK: Action
+
 	public enum ViewAction: Sendable, Equatable {
 		case sendAddLedgerRequestButtonTapped
-		case ledgerNameChanged(String)
-		case confirmNameButtonTapped
-
-		public enum CloseLedgerAlreadyExistsDialogAction: Sendable, Hashable {
-			case tryAnotherLedger
-			case finish(LedgerFactorSource)
-		}
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case getDeviceInfoResult(TaskResult<UnnamedLedger>)
-		case alreadyExists(LedgerFactorSource)
-		case nameLedgerBeforeAddingIt(UnnamedLedger)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case completed(
-			ledger: LedgerFactorSource,
-			isNew: Bool
-		)
+	public enum InternalAction: Sendable, Equatable {
+		case getDeviceInfoResult(TaskResult<DeviceInfo>)
+		case alreadyExists(LedgerFactorSource)
+		case proceedToNameDevice(DeviceInfo)
 	}
 
-	public enum Destinations {
+	public enum DelegateAction: Sendable, Equatable {
+		case completed(ledger: LedgerFactorSource, isNew: Bool)
+	}
+
+	// MARK: Destinations
+
+	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case closeLedgerAlreadyExistsConfirmationDialog(ConfirmationDialogState<ViewAction.CloseLedgerAlreadyExistsDialogAction>)
+			case ledgerAlreadyExistsAlert(AlertState<Action.LedgerAlreadyExists>)
+			case nameLedger(NameLedgerFactorSource.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case closeLedgerAlreadyExistsConfirmationDialog(ViewAction.CloseLedgerAlreadyExistsDialogAction)
+			case ledgerAlreadyExistsAlert(LedgerAlreadyExists)
+			case nameLedger(NameLedgerFactorSource.Action)
+
+			public enum LedgerAlreadyExists: Sendable, Hashable {
+				case tryAnotherLedger
+				case finish(LedgerFactorSource)
+			}
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
+				NameLedgerFactorSource()
+			}
 		}
 	}
 
+	// MARK: Reduce
+
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .sendAddLedgerRequestButtonTapped:
-			return sendAddLedgerRequest(&state)
-
-		case let .ledgerNameChanged(name):
-			state.ledgerName = name
-			return .none
-
-		case .confirmNameButtonTapped:
-			let name = state.ledgerName
-			loggerGlobal.notice("Confirmed ledger name: '\(name)' => adding factor source")
-			guard let device = state.unnamedDeviceToAdd else {
-				assertionFailure("Expected device to name")
-				return .none
-			}
-			return addFactorSourceEffect(name: name, unnamedDeviceToAdd: device)
+			return sendAddLedgerRequestEffect(&state)
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.finish(ledger)))):
-			return .task {
-				await dismiss()
-				return .delegate(.completed(ledger: ledger, isNew: false))
+		case let .destination(.presented(.ledgerAlreadyExistsAlert(alertAction))):
+			switch alertAction {
+			case let .finish(ledger):
+				return completeWithLedgerEffect(ledger, isNew: false)
+			case .tryAnotherLedger:
+				return sendAddLedgerRequestEffect(&state)
 			}
 
-		case .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.tryAnotherLedger))):
-			return sendAddLedgerRequest(&state)
+		case let .destination(.presented(.nameLedger(.delegate(.complete(ledger))))):
+			state.destination = nil
+			return completeWithLedgerEffect(ledger, isNew: true)
 
 		default:
 			return .none
 		}
 	}
 
-	private func gotDevice(
-		_ ledgerDeviceInfo: UnnamedLedger,
-		_ state: inout State
-	) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
+			return gotDeviceEffect(ledgerDeviceInfo, in: &state)
+
+		case let .getDeviceInfoResult(.failure(error)):
+			return failedToGetDevice(&state, error: error)
+
+		case let .alreadyExists(ledger):
+			state.destination = .ledgerAlreadyExistsAlert(.ledgerAlreadyExists(ledger))
+			return .none
+
+		case let .proceedToNameDevice(device):
+			state.destination = .nameLedger(.init(deviceInfo: device))
+			return .none
+		}
+	}
+
+	// MARK: Helper methods
+
+	private func sendAddLedgerRequestEffect(_ state: inout State) -> EffectTask<Action> {
+		state.isWaitingForResponseFromLedger = true
+		return .task {
+			let result = await TaskResult {
+				let info = try await ledgerHardwareWalletClient.getDeviceInfo()
+				return DeviceInfo(id: info.id, model: info.model)
+			}
+
+			return .internal(.getDeviceInfoResult(result))
+		}
+	}
+
+	private func gotDeviceEffect(_ ledgerDeviceInfo: DeviceInfo, in state: inout State) -> EffectTask<Action> {
 		state.isWaitingForResponseFromLedger = false
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
 			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
 				let ledger = try LedgerFactorSource(factorSource: existing)
+
+				print("This is an existing ledger")
+
 				await send(.internal(.alreadyExists(ledger)))
 			} else {
-				// new!
-				await send(.internal(.nameLedgerBeforeAddingIt(
-					ledgerDeviceInfo
-				)))
+				print("This is a new ledger")
+
+				await send(.internal(.proceedToNameDevice(ledgerDeviceInfo)))
 			}
-		} catch: { _, send in
-			await send(.internal(.nameLedgerBeforeAddingIt(ledgerDeviceInfo)))
+		} catch: { error, _ in
+			print("WRONG")
+
+			errorQueue.schedule(error)
 		}
 	}
 
@@ -136,71 +174,36 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .none
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
-			return gotDevice(ledgerDeviceInfo, &state)
-
-		case let .getDeviceInfoResult(.failure(error)):
-			return failedToGetDevice(&state, error: error)
-
-		case let .alreadyExists(ledger):
-			state.destination = .closeLedgerAlreadyExistsConfirmationDialog(
-				.init(titleVisibility: .hidden) {
-					TextState("")
-				} actions: {
-					ButtonState(action: .send(.finish(ledger))) {
-						TextState("OK")
-					}
-					ButtonState(role: .cancel, action: .send(.tryAnotherLedger)) {
-						TextState("Connect a different Ledger to computer")
-					}
-				} message: {
-					TextState("You have already added this ledger \(ledger.label.rawValue) \(ledger.description.rawValue) on \(ledger.addedOn.ISO8601Format())")
-				}
-			)
-			return .none
-
-		case let .nameLedgerBeforeAddingIt(unnamedDevice):
-			state.unnamedDeviceToAdd = unnamedDevice
-			return .none
+	private func completeWithLedgerEffect(_ ledger: LedgerFactorSource, isNew: Bool) -> EffectTask<Action> {
+		guard isNew else {
+			return .send(.delegate(.completed(ledger: ledger, isNew: true)))
 		}
-	}
-
-	private func addFactorSourceEffect(
-		name: String?,
-		unnamedDeviceToAdd device: UnnamedLedger
-	) -> EffectTask<Action> {
-		let model = FactorSource.LedgerHardwareWallet.DeviceModel(model: device.model)
-
-		loggerGlobal.notice("Creating factor source for Ledger...")
-
-		let ledger = FactorSource.ledger(
-			id: device.id,
-			model: model,
-			name: name
-		)
-
-		loggerGlobal.notice("Created factor source for Ledger! adding it now")
 
 		return .run { send in
 			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.delegate(.completed(ledger: ledger, isNew: true)))
+			await dismiss()
+			await send(.delegate(.completed(ledger: ledger, isNew: false)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
 			errorQueue.schedule(error)
 		}
 	}
+}
 
-	private func sendAddLedgerRequest(_ state: inout State) -> EffectTask<Action> {
-		state.isWaitingForResponseFromLedger = true
-
-		return .task {
-			await .internal(.getDeviceInfoResult(TaskResult {
-				let info = try await ledgerHardwareWalletClient.getDeviceInfo()
-				return .init(id: info.id, model: info.model)
-			}))
+extension AlertState<AddLedgerFactorSource.Destinations.Action.LedgerAlreadyExists> {
+	static func ledgerAlreadyExists(_ ledger: LedgerFactorSource) -> AlertState {
+		AlertState {
+			TextState(L10n.AuthorizedDapps.ForgetDappAlert.title)
+		} actions: {
+			ButtonState(action: .finish(ledger)) {
+				TextState("Use this ledger")
+			}
+			ButtonState(role: .cancel, action: .tryAnotherLedger) {
+				TextState("Connect another")
+			}
+		} message: {
+			TextState("You have already added this ledger \(ledger.label.rawValue) \(ledger.description.rawValue) on \(ledger.addedOn.ISO8601Format()), do you want to connect another?") // FIXME: Strings
 		}
 	}
 }
@@ -208,191 +211,43 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 // MARK: - NameLedgerFactorSource
 public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public let deviceInfo: DeviceInfo
 		public var ledgerName = ""
-		public var isWaitingForResponseFromLedger = false
-		public var unnamedDeviceToAdd: UnnamedLedger?
 
-		@PresentationState
-		var destination: Destinations.State? = nil
+		public init(deviceInfo: DeviceInfo) {
+			self.deviceInfo = deviceInfo
+		}
 
-		public init() {}
+		public var nameIsValid: Bool {
+			ledgerName.count > 2
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case sendAddLedgerRequestButtonTapped
 		case ledgerNameChanged(String)
 		case confirmNameButtonTapped
-
-		public enum CloseLedgerAlreadyExistsDialogAction: Sendable, Hashable {
-			case tryAnotherLedger
-			case finish(LedgerFactorSource)
-		}
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case getDeviceInfoResult(TaskResult<UnnamedLedger>)
-		case alreadyExists(LedgerFactorSource)
-		case nameLedgerBeforeAddingIt(UnnamedLedger)
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(
-			ledger: LedgerFactorSource,
-			isNew: Bool
-		)
+		case complete(LedgerFactorSource)
 	}
-
-	public enum Destinations {
-		public enum State: Sendable, Hashable {
-			case closeLedgerAlreadyExistsConfirmationDialog(ConfirmationDialogState<ViewAction.CloseLedgerAlreadyExistsDialogAction>)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case closeLedgerAlreadyExistsConfirmationDialog(ViewAction.CloseLedgerAlreadyExistsDialogAction)
-		}
-	}
-
-	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
-	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .sendAddLedgerRequestButtonTapped:
-			return sendAddLedgerRequest(&state)
-
 		case let .ledgerNameChanged(name):
 			state.ledgerName = name
 			return .none
 
 		case .confirmNameButtonTapped:
-			let name = state.ledgerName
-			loggerGlobal.notice("Confirmed ledger name: '\(name)' => adding factor source")
-			guard let device = state.unnamedDeviceToAdd else {
-				assertionFailure("Expected device to name")
-				return .none
-			}
-			return addFactorSourceEffect(name: name, unnamedDeviceToAdd: device)
-		}
-	}
+			loggerGlobal.notice("Confirmed ledger name: '\(state.ledgerName)'")
+			loggerGlobal.notice("Creating factor source for Ledger...")
+			let ledger = FactorSource.ledger(id: state.deviceInfo.id,
+			                                 model: .init(model: state.deviceInfo.model),
+			                                 name: state.ledgerName)
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case let .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.finish(ledger)))):
-			return .task {
-				await dismiss()
-				return .delegate(.completed(ledger: ledger, isNew: false))
-			}
-
-		case .destination(.presented(.closeLedgerAlreadyExistsConfirmationDialog(.tryAnotherLedger))):
-			return sendAddLedgerRequest(&state)
-
-		default:
-			return .none
-		}
-	}
-
-	private func gotDevice(
-		_ ledgerDeviceInfo: UnnamedLedger,
-		_ state: inout State
-	) -> EffectTask<Action> {
-		state.isWaitingForResponseFromLedger = false
-		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
-		return .run { send in
-			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
-				let ledger = try LedgerFactorSource(factorSource: existing)
-				await send(.internal(.alreadyExists(ledger)))
-			} else {
-				// new!
-				await send(.internal(.nameLedgerBeforeAddingIt(
-					ledgerDeviceInfo
-				)))
-			}
-		} catch: { _, send in
-			await send(.internal(.nameLedgerBeforeAddingIt(ledgerDeviceInfo)))
-		}
-	}
-
-	private func failedToGetDevice(_ state: inout State, error: Swift.Error) -> EffectTask<Action> {
-		state.isWaitingForResponseFromLedger = false
-		loggerGlobal.error("Failed to get ledger device info: \(error)")
-		errorQueue.schedule(error)
-		return .none
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
-			return gotDevice(ledgerDeviceInfo, &state)
-
-		case let .getDeviceInfoResult(.failure(error)):
-			return failedToGetDevice(&state, error: error)
-
-		case let .alreadyExists(ledger):
-			state.destination = .closeLedgerAlreadyExistsConfirmationDialog(
-				.init(titleVisibility: .hidden) {
-					TextState("")
-				} actions: {
-					ButtonState(action: .send(.finish(ledger))) {
-						TextState("OK")
-					}
-					ButtonState(role: .cancel, action: .send(.tryAnotherLedger)) {
-						TextState("Connect a different Ledger to computer")
-					}
-				} message: {
-					TextState("You have already added this ledger \(ledger.label.rawValue) \(ledger.description.rawValue) on \(ledger.addedOn.ISO8601Format())")
-				}
-			)
-			return .none
-
-		case let .nameLedgerBeforeAddingIt(unnamedDevice):
-			state.unnamedDeviceToAdd = unnamedDevice
-			return .none
-		}
-	}
-
-	private func addFactorSourceEffect(
-		name: String?,
-		unnamedDeviceToAdd device: UnnamedLedger
-	) -> EffectTask<Action> {
-		let model = FactorSource.LedgerHardwareWallet.DeviceModel(model: device.model)
-
-		loggerGlobal.notice("Creating factor source for Ledger...")
-
-		let ledger = FactorSource.ledger(
-			id: device.id,
-			model: model,
-			name: name
-		)
-
-		loggerGlobal.notice("Created factor source for Ledger! adding it now")
-
-		return .run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
-			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.delegate(.completed(ledger: ledger, isNew: true)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
-			errorQueue.schedule(error)
-		}
-	}
-
-	private func sendAddLedgerRequest(_ state: inout State) -> EffectTask<Action> {
-		state.isWaitingForResponseFromLedger = true
-
-		return .task {
-			await .internal(.getDeviceInfoResult(TaskResult {
-				let info = try await ledgerHardwareWalletClient.getDeviceInfo()
-				return .init(id: info.id, model: info.model)
-			}))
+			return .send(.delegate(.complete(ledger)))
 		}
 	}
 }
