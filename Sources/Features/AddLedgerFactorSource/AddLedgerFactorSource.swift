@@ -91,7 +91,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .sendAddLedgerRequestButtonTapped:
+			print("sendAddLedgerRequestButtonTapped")
 			return sendAddLedgerRequestEffect(&state)
+
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 		}
@@ -119,16 +121,24 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
+			print("getDeviceInfoResult success")
+
 			return gotDeviceEffect(ledgerDeviceInfo, in: &state)
 
 		case let .getDeviceInfoResult(.failure(error)):
+			print("getDeviceInfoResult failure")
+
 			return failedToGetDevice(&state, error: error)
 
 		case let .alreadyExists(ledger):
+			print("alreadyExists")
+
 			state.destination = .ledgerAlreadyExistsAlert(.ledgerAlreadyExists(ledger))
 			return .none
 
 		case let .proceedToNameDevice(device):
+			print("proceedToNameDevice")
+
 			state.destination = .nameLedger(.init(deviceInfo: device))
 			return .none
 		}
@@ -141,6 +151,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .task {
 			let result = await TaskResult {
 				let info = try await ledgerHardwareWalletClient.getDeviceInfo()
+				print("got device info:", info.model)
 				return DeviceInfo(id: info.id, model: info.model)
 			}
 
@@ -152,12 +163,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		state.isWaitingForResponseFromLedger = false
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
-			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
-				let ledger = try LedgerFactorSource(factorSource: existing)
-				await send(.internal(.alreadyExists(ledger)))
-			} else {
-				await send(.internal(.proceedToNameDevice(ledgerDeviceInfo)))
-			}
+//			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
+//				let ledger = try LedgerFactorSource(factorSource: existing)
+//				await send(.internal(.alreadyExists(ledger)))
+//			} else {
+			await send(.internal(.proceedToNameDevice(ledgerDeviceInfo)))
+//			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
