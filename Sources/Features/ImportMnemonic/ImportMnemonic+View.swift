@@ -97,10 +97,13 @@ extension ImportMnemonicWord {
 						viewStore.focusedField != nil // we only display the currently selected textfields candidates
 					{
 						ToolbarItemGroup(placement: .keyboard) {
-							HStack {
-								ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
-									Button("\(candidate.rawValue)") {
-										viewStore.send(.autocompleteWith(candidate: candidate))
+							ScrollView([.horizontal], showsIndicators: false) {
+								HStack {
+									ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
+										Button("\(candidate.rawValue)") {
+											viewStore.send(.autocompleteWith(candidate: candidate))
+										}
+										.buttonStyle(.primaryRectangular(height: .toolbarButtonHeight))
 									}
 								}
 							}
