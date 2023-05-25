@@ -44,6 +44,7 @@ extension AssetsView {
 								)
 							}
 						}
+						.padding(.bottom, .medium3)
 					}
 					.refreshable {
 						await viewStore.send(.pullToRefreshStarted).finish()
