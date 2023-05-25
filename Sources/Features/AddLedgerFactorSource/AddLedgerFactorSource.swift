@@ -73,7 +73,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	// MARK: Reduce
 
-	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
@@ -105,7 +104,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 			}
 
 		case let .destination(.presented(.nameLedger(.delegate(.complete(ledger))))):
-			state.destination = nil
 			return completeWithLedgerEffect(ledger, isNew: true)
 
 		default:
@@ -151,18 +149,11 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .run { send in
 			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
 				let ledger = try LedgerFactorSource(factorSource: existing)
-
-				print("This is an existing ledger")
-
 				await send(.internal(.alreadyExists(ledger)))
 			} else {
-				print("This is a new ledger")
-
 				await send(.internal(.proceedToNameDevice(ledgerDeviceInfo)))
 			}
 		} catch: { error, _ in
-			print("WRONG")
-
 			errorQueue.schedule(error)
 		}
 	}
@@ -182,7 +173,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .run { send in
 			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await dismiss()
 			await send(.delegate(.completed(ledger: ledger, isNew: false)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")

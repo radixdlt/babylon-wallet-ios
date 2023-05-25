@@ -196,6 +196,8 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			let result = await TaskResult {
 				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
 					.compactMap { try? LedgerFactorSource(factorSource: $0) }
+
+				print("Updated ledgers:", ledgers.map(\.name))
 				return IdentifiedArray(uniqueElements: ledgers)
 			}
 			return .internal(.loadedLedgers(result))

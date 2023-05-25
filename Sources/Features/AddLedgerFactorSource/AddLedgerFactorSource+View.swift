@@ -66,6 +66,7 @@ extension View {
 	fileprivate func destination(store: StoreOf<AddLedgerFactorSource>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return ledgerAlreadyExistsAlert(with: destinationStore)
+			.nameLedger(with: destinationStore)
 	}
 
 	@MainActor
