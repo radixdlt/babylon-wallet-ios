@@ -152,10 +152,6 @@ public struct ImportOlympiaFactorSource: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .focusTextField(field):
-			state.focusedField = field
-			return .none
-
 		case let .importOlympiaFactorSourceResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
