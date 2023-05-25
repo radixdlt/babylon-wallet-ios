@@ -144,7 +144,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 				let destination = Destinations.State.importOlympiaMnemonic(.init(
 					shouldPersist: false,
-					expectedWordCount: expectedWordCount,
+					wordCount: expectedWordCount,
 					selectedAccounts: accounts.software
 				))
 
