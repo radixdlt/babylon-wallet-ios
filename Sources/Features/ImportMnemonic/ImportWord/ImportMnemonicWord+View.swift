@@ -55,9 +55,9 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				let wordAtIndex = "Word #\(viewStore.index + 1)"
+				let wordAtIndex = "word #\(viewStore.index + 1)"
 				AppTextField(
-					primaryHeading: wordAtIndex,
+					secondaryHeading: wordAtIndex,
 					placeholder: wordAtIndex,
 					text: .init(
 						get: { viewStore.displayText },
