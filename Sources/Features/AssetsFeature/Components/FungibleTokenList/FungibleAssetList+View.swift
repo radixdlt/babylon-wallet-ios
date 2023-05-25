@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - FungibleTokenList.View
-extension FungibleTokenList {
+// MARK: - FungibleAssetList.View
+extension FungibleAssetList {
 	@MainActor
 	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -13,7 +13,7 @@ extension FungibleTokenList {
 	}
 }
 
-extension FungibleTokenList.View {
+extension FungibleAssetList.View {
 	public var body: some View {
 		VStack(spacing: .medium1) {
 			IfLetStore(
@@ -21,7 +21,7 @@ extension FungibleTokenList.View {
 					state: \.xrdToken,
 					action: { .child(.xrdRow($0)) }
 				),
-				then: { FungibleTokenList.Row.View(store: $0) }
+				then: { FungibleAssetList.Row.View(store: $0) }
 			).background(
 				RoundedRectangle(cornerRadius: .small1)
 					.fill(Color.white)
@@ -34,7 +34,7 @@ extension FungibleTokenList.View {
 						state: \.nonXrdTokens,
 						action: { .child(.nonXRDRow($0, $1)) }
 					),
-					content: { FungibleTokenList.Row.View(store: $0) }
+					content: { FungibleAssetList.Row.View(store: $0) }
 				)
 			}.background(
 				RoundedRectangle(cornerRadius: .small1)
@@ -44,8 +44,8 @@ extension FungibleTokenList.View {
 		}
 		.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /FungibleTokenList.Destinations.State.details,
-			action: FungibleTokenList.Destinations.Action.details,
+			state: /FungibleAssetList.Destinations.State.details,
+			action: FungibleAssetList.Destinations.Action.details,
 			content: { FungibleTokenDetails.View(store: $0) }
 		)
 	}
@@ -56,10 +56,10 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct FungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
-		FungibleTokenList.View(
+		FungibleAssetList.View(
 			store: .init(
 				initialState: .init(),
-				reducer: FungibleTokenList()
+				reducer: FungibleAssetList()
 			)
 		)
 	}

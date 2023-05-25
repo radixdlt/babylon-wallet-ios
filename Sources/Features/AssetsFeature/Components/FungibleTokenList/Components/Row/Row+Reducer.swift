@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-extension FungibleTokenList {
+extension FungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
 			public typealias ID = ResourceAddress

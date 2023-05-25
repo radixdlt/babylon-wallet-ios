@@ -29,7 +29,7 @@ extension AssetsView {
 
 							switch viewStore.activeAssetKind {
 							case .tokens:
-								FungibleTokenList.View(
+								FungibleAssetList.View(
 									store: store.scope(
 										state: \.fungibleTokenList,
 										action: { .child(.fungibleTokenList($0)) }

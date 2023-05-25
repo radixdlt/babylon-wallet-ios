@@ -118,7 +118,38 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
 				return .none
 			case .delegate(.addAssets):
-				state.destination = .relayed(id, with: .addAsset(.init(account: state.fromAccount, mode: .selection(.init()))))
+				guard let assets = state.receivingAccounts[id: id]?.assets else {
+					return .none
+				}
+
+				var xrdResource: AccountPortfolio.FungibleResource?
+				var nonXrdResources: [AccountPortfolio.FungibleResource] = []
+				for asset in assets.compactMap(/ResourceAsset.State.fungibleAsset) {
+					if asset.isXRD {
+						xrdResource = asset.resource
+					} else {
+						nonXrdResources.append(asset.resource)
+					}
+				}
+
+				let selectedFungibleResources = AccountPortfolio.FungibleResources(xrdResource: xrdResource, nonXrdResources: nonXrdResources)
+				let selectedNonFunibleResources = assets.compactMap(/ResourceAsset.State.nonFungibleAsset)
+					.reduce(into: IdentifiedArrayOf<AssetsViewMode.SelectedItems.NonFungibleTokensPerResource>()) { partialResult, asset in
+						if var resource = partialResult[id: asset.resourceAddress] {
+							resource.tokens.append(asset.nftToken)
+						} else {
+							partialResult.append(.init(resourceAddress: asset.resourceAddress, tokens: [asset.nftToken]))
+						}
+					}
+
+				state.destination = .relayed(
+					id,
+					with: .addAsset(.init(
+						account: state.fromAccount,
+						mode: .selection(.init(fungibleResources: selectedFungibleResources, nonFungibleResources: selectedNonFunibleResources))
+					)
+					)
+				)
 				return .none
 			default:
 				return .none
@@ -154,7 +185,17 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 					}
 				}
 
-				state.receivingAccounts[id: id]?.assets = assets
+				// Existing assets to keep
+				let existingAssets = alreadyAddedAssets.filter {
+					assets.contains($0)
+				}
+
+				// Newly added assets
+				let newAssets = assets.filter {
+					!existingAssets.contains($0)
+				}
+
+				state.receivingAccounts[id: id]?.assets = existingAssets + newAssets
 				state.destination = nil
 				return .none
 			default:

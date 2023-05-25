@@ -3,14 +3,28 @@ import FeaturePrelude
 // MARK: - AssetsViewMode
 public enum AssetsViewMode: Hashable, Sendable {
 	public struct SelectedItems: Hashable, Sendable {
+		public struct NonFungibleTokensPerResource: Hashable, Sendable, Identifiable {
+			public var id: ResourceAddress {
+				resourceAddress
+			}
+
+			public let resourceAddress: ResourceAddress
+			public var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+
+			public init(resourceAddress: ResourceAddress, tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>) {
+				self.resourceAddress = resourceAddress
+				self.tokens = tokens
+			}
+		}
+
 		public var fungibleResources: AccountPortfolio.FungibleResources
-		public var nonFungibleResources: AccountPortfolio.NonFungibleResources
+		public var nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource>
 
 		public var isEmpty: Bool {
 			fungibleResources.xrdResource == nil && fungibleResources.nonXrdResources.isEmpty && nonFungibleResources.isEmpty
 		}
 
-		public init(fungibleResources: AccountPortfolio.FungibleResources = .init(), nonFungibleResources: AccountPortfolio.NonFungibleResources = []) {
+		public init(fungibleResources: AccountPortfolio.FungibleResources = .init(), nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = []) {
 			self.fungibleResources = fungibleResources
 			self.nonFungibleResources = nonFungibleResources
 		}
@@ -47,7 +61,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public var activeAssetKind: AssetKind
 		public var assetKinds: NonEmpty<[AssetKind]>
-		public var fungibleTokenList: FungibleTokenList.State
+		public var fungibleTokenList: FungibleAssetList.State
 		public var nonFungibleTokenList: NonFungibleTokenList.State
 
 		public let account: Profile.Network.Account
@@ -67,7 +81,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		init(
 			account: Profile.Network.Account,
 			assetKinds: NonEmpty<[AssetKind]> = .init([.tokens, .nfts])!,
-			fungibleTokenList: FungibleTokenList.State,
+			fungibleTokenList: FungibleAssetList.State,
 			nonFungibleTokenList: NonFungibleTokenList.State,
 			mode: AssetsViewMode
 		) {
@@ -89,7 +103,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case fungibleTokenList(FungibleTokenList.Action)
+		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleTokenList.Action)
 	}
 
@@ -111,7 +125,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 
 		Scope(state: \.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
-			FungibleTokenList()
+			FungibleAssetList()
 		}
 		Reduce(self.core)
 	}
@@ -145,13 +159,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .portfolioUpdated(portfolio):
 			let xrd = portfolio.fungibleResources.xrdResource.map {
-				FungibleTokenList.Row.State(xrdToken: $0, mode: .selection(isSelected: false))
+				FungibleAssetList.Row.State(xrdToken: $0, mode: state.mode.xrdRowMode)
 			}
 			let nonXrd = portfolio.fungibleResources.nonXrdResources.map {
-				FungibleTokenList.Row.State(nonXRDToken: $0, mode: .selection(isSelected: false))
+				FungibleAssetList.Row.State(nonXRDToken: $0, mode: state.mode.nonXrdRowMode($0.resourceAddress))
 			}
 			let nfts = portfolio.nonFungibleResources.map {
-				NonFungibleTokenList.Row.State(resource: $0, mode: .selection([]))
+				NonFungibleTokenList.Row.State(resource: $0, mode: state.mode.nftRowMode($0.resourceAddress))
 			}
 
 			state.fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
@@ -165,7 +179,7 @@ extension AssetsView.State {
 	public var selectedItems: AssetsViewMode.SelectedItems? {
 		guard case .selection = mode else { return nil }
 
-		func selectedFungibleResource(_ row: FungibleTokenList.Row.State) -> AccountPortfolio.FungibleResource? {
+		func selectedFungibleResource(_ row: FungibleAssetList.Row.State) -> AccountPortfolio.FungibleResource? {
 			if case .selection(true) = row.mode {
 				return row.token
 			}
@@ -179,7 +193,7 @@ extension AssetsView.State {
 
 		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
 			if case let .selection(tokens) = $0.mode, !tokens.isEmpty {
-				return AccountPortfolio.NonFungibleResource(resourceAddress: $0.resource.resourceAddress, tokens: tokens)
+				return AssetsViewMode.SelectedItems.NonFungibleTokensPerResource(resourceAddress: $0.resource.resourceAddress, tokens: tokens)
 			}
 			return nil
 		}
@@ -190,7 +204,36 @@ extension AssetsView.State {
 
 		return .init(
 			fungibleResources: fungibleresources,
-			nonFungibleResources: nonFungibleResources
+			nonFungibleResources: IdentifiedArrayOf(uniqueElements: nonFungibleResources)
 		)
+	}
+}
+
+extension AssetsViewMode {
+	var xrdRowMode: FungibleAssetList.Row.State.Mode {
+		switch self {
+		case .normal:
+			return .normal
+		case let .selection(items):
+			return .selection(isSelected: items.fungibleResources.xrdResource != nil)
+		}
+	}
+
+	func nonXrdRowMode(_ resource: ResourceAddress) -> FungibleAssetList.Row.State.Mode {
+		switch self {
+		case .normal:
+			return .normal
+		case let .selection(items):
+			return .selection(isSelected: items.fungibleResources.nonXrdResources.contains { $0.resourceAddress == resource })
+		}
+	}
+
+	func nftRowMode(_ resource: ResourceAddress) -> NonFungibleTokenList.Row.State.Mode {
+		switch self {
+		case .normal:
+			return .normal
+		case let .selection(items):
+			return .selection(items.nonFungibleResources[id: resource]?.tokens ?? [])
+		}
 	}
 }
