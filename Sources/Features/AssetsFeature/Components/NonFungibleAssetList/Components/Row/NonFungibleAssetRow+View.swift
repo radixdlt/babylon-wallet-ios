@@ -20,7 +20,7 @@ extension NonFungibleAssetList.Row.View {
 			if viewStore.resource.tokens.isEmpty {
 				EmptyView()
 			} else {
-				StackedViewsLayout(isExpanded: viewStore.isExpanded, collapsedViewsCount: Constants.collapsedCardsCount) {
+				StackedViewsLayout(isExpanded: viewStore.isExpanded) {
 					rowView(viewStore)
 						.zIndex(.infinity)
 					ForEach(

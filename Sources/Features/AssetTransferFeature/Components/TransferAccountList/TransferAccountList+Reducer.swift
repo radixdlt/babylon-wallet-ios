@@ -100,12 +100,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			switch action {
 			case .delegate(.remove):
 				state.receivingAccounts.remove(id: id)
-				return validateState(&state)
-			case .delegate(.validate):
-				return validateState(&state)
+				return .none
+
 			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))):
 				updateTotalSum(&state, resourceAddress: resourceAddress)
-				return validateState(&state)
+				return .none
+
 			case .delegate(.chooseAccount):
 				let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
 				let chooseAccount: ChooseReceivingAccount.State = .init(
@@ -117,6 +117,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 				state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
 				return .none
+
 			case .delegate(.addAssets):
 				guard let assets = state.receivingAccounts[id: id]?.assets else {
 					return .none
@@ -133,10 +134,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				}
 
 				let selectedFungibleResources = AccountPortfolio.FungibleResources(xrdResource: xrdResource, nonXrdResources: nonXrdResources)
-				let selectedNonFunibleResources = assets.compactMap(/ResourceAsset.State.nonFungibleAsset)
-					.reduce(into: IdentifiedArrayOf<AssetsViewMode.SelectedItems.NonFungibleTokensPerResource>()) { partialResult, asset in
+
+				let selectedNonFunibleResources = assets
+					.compactMap(/ResourceAsset.State.nonFungibleAsset)
+					.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 						if var resource = partialResult[id: asset.resourceAddress] {
-							resource.tokens.append(asset.nftToken)
+							partialResult[id: asset.resourceAddress]?.tokens.append(asset.nftToken)
 						} else {
 							partialResult.append(.init(resourceAddress: asset.resourceAddress, tokens: [asset.nftToken]))
 						}
@@ -147,10 +150,10 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 					with: .addAsset(.init(
 						account: state.fromAccount,
 						mode: .selection(.init(fungibleResources: selectedFungibleResources, nonFungibleResources: selectedNonFunibleResources))
-					)
-					)
+					))
 				)
 				return .none
+
 			default:
 				return .none
 			}
@@ -161,25 +164,27 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				state.receivingAccounts[id: id]?.account = account
 				state.destination = nil
 				return .none
+
 			case .chooseAccount(.delegate(.dismiss)):
 				state.destination = nil
 				return .none
-			case let .addAsset(.delegate(.handleSelectedAssets(selectedItems))):
+
+			case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
 				let alreadyAddedAssets = state.receivingAccounts[id: id]?.assets ?? []
 
 				var assets: IdentifiedArrayOf<ResourceAsset.State> = []
 
-				if let selectedXRD = selectedItems.fungibleResources.xrdResource {
+				if let selectedXRD = selectedAssets.fungibleResources.xrdResource {
 					assets.append(
-						ResourceAsset.State.fungibleAsset(.init(resource: selectedXRD, isXRD: true, totalTransferSum: .zero))
+						ResourceAsset.State.fungibleAsset(.init(resource: selectedXRD, isXRD: true))
 					)
 				}
 
-				assets += selectedItems.fungibleResources.nonXrdResources.map {
-					ResourceAsset.State.fungibleAsset(.init(resource: $0, isXRD: false, totalTransferSum: .zero))
+				assets += selectedAssets.fungibleResources.nonXrdResources.map {
+					ResourceAsset.State.fungibleAsset(.init(resource: $0, isXRD: false))
 				}
 
-				assets += selectedItems.nonFungibleResources.flatMap { resource in
+				assets += selectedAssets.nonFungibleResources.flatMap { resource in
 					resource.tokens.map {
 						ResourceAsset.State.nonFungibleAsset(.init(resourceAddress: resource.resourceAddress, nftToken: $0))
 					}
@@ -197,7 +202,13 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 				state.receivingAccounts[id: id]?.assets = existingAssets + newAssets
 				state.destination = nil
+
 				return .none
+
+			case .addAsset(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+
 			default:
 				return .none
 			}
@@ -222,25 +233,5 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			asset.totalTransferSum = totalSum
 			state.receivingAccounts[id: account.id]?.assets[id: resourceAddress] = .fungibleAsset(asset)
 		}
-	}
-
-	private func validateState(_ state: inout State) -> EffectTask<Action> {
-		let receivingAccounts = state.receivingAccounts.filter {
-			$0.account != nil || !$0.assets.isEmpty
-		}
-
-		guard !receivingAccounts.isEmpty else {
-			return .send(.delegate(.canSendTransferRequest(false)))
-		}
-
-		let isValid = receivingAccounts.allSatisfy {
-			$0.account != nil &&
-				!$0.assets.isEmpty &&
-				$0.assets
-				.compactMap(/ResourceAsset.State.fungibleAsset)
-				.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
-		}
-
-		return .send(.delegate(.canSendTransferRequest(isValid)))
 	}
 }

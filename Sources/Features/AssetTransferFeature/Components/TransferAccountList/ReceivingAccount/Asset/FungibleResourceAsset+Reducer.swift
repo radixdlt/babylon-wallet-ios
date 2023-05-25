@@ -29,7 +29,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		// Total transfer sum for the transferred resource
 		public var totalTransferSum: BigDecimal
 
-		init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, totalTransferSum: BigDecimal) {
+		init(resource: AccountPortfolio.FungibleResource, isXRD: Bool, totalTransferSum: BigDecimal = .zero) {
 			self.resource = resource
 			self.isXRD = isXRD
 			self.totalTransferSum = totalTransferSum

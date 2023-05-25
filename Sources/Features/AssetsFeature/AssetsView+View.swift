@@ -64,10 +64,10 @@ extension AssetsView {
 			VStack(spacing: 0) {
 				Separator()
 				WithControlRequirements(
-					viewStore.selectedItems,
+					viewStore.selectedAssets,
 					forAction: { viewStore.send(.chooseButtonTapped($0)) },
 					control: { action in
-						Button("Select Assets", action: action)
+						Button(viewStore.chooseButtonTitle, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				)
@@ -80,7 +80,7 @@ extension AssetsView {
 			ZStack {
 				HStack {
 					CloseButton {
-						// viewStore.send(.closeButtonTapped)
+						viewStore.send(.closeButtonTapped)
 					}
 					Spacer()
 				}

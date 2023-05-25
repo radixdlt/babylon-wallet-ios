@@ -41,7 +41,6 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case validate
 		case remove
 		case chooseAccount
 		case addAssets
@@ -73,7 +72,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		switch childAction {
 		case let .row(id: id, child: .delegate(.removed)):
 			state.assets.remove(id: id)
-			return .send(.delegate(.validate))
+			return .none
 		default:
 			return .none
 		}
