@@ -45,11 +45,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 		public typealias ID = Int
 		public let id: ID
-		public var value: WordValue {
-			willSet {
-				print("🍀 newValue: \(newValue)")
-			}
-		}
+		public var value: WordValue
 
 		public var autocompletionCandidates: AutocompletionCandidates? = nil
 		public var focusedField: Field? = nil
