@@ -115,18 +115,22 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 }
 
+// MARK: - EntityMetadataKey
+public enum EntityMetadataKey: String {
+	case name
+	case symbol
+	case description
+	case iconURL = "icon_url"
+	case dappDefinition = "dapp_definition"
+	case dappDefinitions = "dapp_definitions"
+	case claimedEntities = "claimed_entities"
+	case claimedWebsites = "claimed_websites"
+	case relatedWebsites = "related_websites"
+	case accountType = "account_type"
+}
+
 extension [GatewayAPI.EntityMetadataItem] {
-	public enum Key: String {
-		case name
-		case symbol
-		case description
-		case iconURL = "icon_url"
-		case dappDefinition = "dapp_definition"
-		case dappDefinitions = "dapp_definitions"
-		case claimedEntities = "claimed_entities"
-		case claimedWebsites = "claimed_websites"
-		case accountType = "account_type"
-	}
+	public typealias Key = EntityMetadataKey
 
 	public subscript(key: Key) -> GatewayAPI.EntityMetadataItemValue? {
 		first { $0.key == key.rawValue }?.value

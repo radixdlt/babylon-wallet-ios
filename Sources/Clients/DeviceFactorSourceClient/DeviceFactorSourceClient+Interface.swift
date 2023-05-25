@@ -6,16 +6,16 @@ import SecureStorageClient
 
 // MARK: - DeviceFactorSourceClient
 public struct DeviceFactorSourceClient: Sendable {
-	public var publicKeyFromOnDeviceHD: PublicKeyFromOnDeviceHD
+	public var publicKeysFromOnDeviceHD: PublicKeysFromOnDeviceHD
 	public var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
 	public var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
 
 	public init(
-		publicKeyFromOnDeviceHD: @escaping PublicKeyFromOnDeviceHD,
+		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
 		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
 		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded
 	) {
-		self.publicKeyFromOnDeviceHD = publicKeyFromOnDeviceHD
+		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
 		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
 		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
 	}
@@ -23,7 +23,7 @@ public struct DeviceFactorSourceClient: Sendable {
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	public typealias PublicKeyFromOnDeviceHD = @Sendable (PublicKeyFromOnDeviceHDRequest) async throws -> Engine.PublicKey
+	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> OrderedSet<HierarchicalDeterministicPublicKey>
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async -> Bool
 }
@@ -31,25 +31,24 @@ extension DeviceFactorSourceClient {
 // MARK: - DiscrepancyUnsupportedCurve
 struct DiscrepancyUnsupportedCurve: Swift.Error {}
 
-// MARK: - PublicKeyFromOnDeviceHDRequest
-public struct PublicKeyFromOnDeviceHDRequest: Sendable, Hashable {
+// MARK: - PublicKeysFromOnDeviceHDRequest
+public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
-	public let derivationPath: DerivationPath
-	public let curve: SLIP10.Curve
+	public let derivationPaths: OrderedSet<DerivationPath>
 	public let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 
 	public init(
 		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
-		derivationPath: DerivationPath,
-		curve: SLIP10.Curve,
+		derivationPaths: OrderedSet<DerivationPath>,
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 	) throws {
-		guard hdOnDeviceFactorSource.parameters.supportedCurves.contains(curve) else {
-			throw DiscrepancyUnsupportedCurve()
+		for derivationPath in derivationPaths {
+			guard hdOnDeviceFactorSource.parameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+				throw DiscrepancyUnsupportedCurve()
+			}
 		}
 		self.hdOnDeviceFactorSource = hdOnDeviceFactorSource
-		self.derivationPath = derivationPath
-		self.curve = curve
+		self.derivationPaths = derivationPaths
 		self.loadMnemonicPurpose = loadMnemonicPurpose
 	}
 }
@@ -197,6 +196,10 @@ extension SigningPurpose {
 			return .signTransaction
 		case .signTransaction(.internalManifest(.uploadAuthKey)):
 			return .createSignAuthKey
+		#if DEBUG
+		case .signTransaction(.internalManifest(.debugModifyAccount)):
+			return .debugOnlyInspect
+		#endif // DEBUG
 		}
 	}
 }

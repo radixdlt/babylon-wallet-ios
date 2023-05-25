@@ -37,10 +37,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 
 	public enum Success: Sendable, Hashable {
 		case getDeviceInfo(GetDeviceInfo)
-		case derivePublicKey(DerivePublicKey)
+		case derivePublicKeys([DerivedPublicKey])
 		case signTransaction([SignatureOfSigner])
 		case signChallenge([SignatureOfSigner])
-		case importOlympiaDevice(ImportOlympiaDevice)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
 			public let id: FactorSource.ID
@@ -55,59 +54,32 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 
-		public struct DerivePublicKey: Sendable, Hashable, Decodable {
-			public let publicKey: HexCodable
-
-			public init(publicKey: HexCodable) {
-				self.publicKey = publicKey
-			}
-		}
-
-		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
+		public struct DerivedPublicKey: Sendable, Hashable, Decodable {
 			public let curve: String
 			public let derivationPath: String
-			public let signature: HexCodable
 			public let publicKey: HexCodable
 
 			public init(
 				curve: String,
 				derivationPath: String,
-				signature: HexCodable,
 				publicKey: HexCodable
 			) {
 				self.curve = curve
 				self.derivationPath = derivationPath
-				self.signature = signature
 				self.publicKey = publicKey
 			}
 		}
 
-		public struct ImportOlympiaDevice: Sendable, Hashable, Decodable {
-			public let id: FactorSource.ID
-			public let model: P2P.LedgerHardwareWallet.Model
-			public let derivedPublicKeys: [DerivedPublicKey]
-
-			public struct DerivedPublicKey: Sendable, Hashable, Decodable {
-				public let publicKey: HexCodable
-				public let path: String
-
-				public init(
-					publicKey: HexCodable,
-					path: String
-				) {
-					self.publicKey = publicKey
-					self.path = path
-				}
-			}
+		public struct SignatureOfSigner: Sendable, Hashable, Decodable {
+			public let signature: HexCodable
+			public let derivedPublicKey: DerivedPublicKey
 
 			public init(
-				id: FactorSource.ID,
-				model: P2P.LedgerHardwareWallet.Model,
-				derivedPublicKeys: [DerivedPublicKey]
+				derivedPublicKey: DerivedPublicKey,
+				signature: HexCodable
 			) {
-				self.id = id
-				self.model = model
-				self.derivedPublicKeys = derivedPublicKeys
+				self.derivedPublicKey = derivedPublicKey
+				self.signature = signature
 			}
 		}
 	}
@@ -132,17 +104,13 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 			}
 		}
 		switch discriminator {
-		case .derivePublicKey:
+		case .derivePublicKeys:
 			self.response = try decodeResponse {
-				Success.derivePublicKey($0)
+				Success.derivePublicKeys($0)
 			}
 		case .getDeviceInfo:
 			self.response = try decodeResponse {
 				Success.getDeviceInfo($0)
-			}
-		case .importOlympiaDevice:
-			self.response = try decodeResponse {
-				Success.importOlympiaDevice($0)
 			}
 		case .signTransaction:
 			self.response = try decodeResponse {

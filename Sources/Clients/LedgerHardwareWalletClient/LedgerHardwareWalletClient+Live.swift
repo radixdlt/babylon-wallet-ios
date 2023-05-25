@@ -110,26 +110,18 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.getDeviceInfo
 				)
 			},
-			importOlympiaDevice: { olympiaHardwareAccounts in
-
-				try await makeRequest(
-					.importOlympiaDevice(.init(derivationPaths: olympiaHardwareAccounts.map(\.path.derivationPath))),
-					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.importOlympiaDevice
-				)
-			},
-			deriveCurve25519PublicKey: { derivationPath, factorSource in
+			derivePublicKeys: { keysParams, factorSource in
 				let response = try await makeRequest(
-					.derivePublicKey(.init(
-						keyParameters: .init(
-							curve: .curve25519,
-							derivationPath: derivationPath.path
-						),
+					.derivePublicKeys(.init(
+						keysParameters: Array(keysParams),
 						ledgerDevice: factorSource.device()
 					)),
-					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKey
+					responseCasePath: /P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.derivePublicKeys
 				)
 
-				return try .init(compressedRepresentation: response.publicKey.data)
+				return try OrderedSet(validating: response.map {
+					try $0.hdPubKey()
+				})
 			},
 			signTransaction: { request in
 				let hashedMsg = try blake2b(data: request.unhashedDataToSign)
@@ -203,6 +195,52 @@ public struct MissingSignatureFromRequiredSigner: Swift.Error {}
 // MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
 public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
+extension HierarchicalDeterministicPublicKey {
+	init(curve curveString: String, key keyData: Data, path: String) throws {
+		guard let curve = SLIP10.Curve(rawValue: curveString) else {
+			struct BadCurve: Swift.Error {}
+			loggerGlobal.error("Bad curve")
+			throw BadCurve()
+		}
+		let publicKey: SLIP10.PublicKey
+		switch curve {
+		case .secp256k1:
+			publicKey = try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
+		case .curve25519:
+			publicKey = try .eddsaEd25519(.init(compressedRepresentation: keyData))
+		}
+
+		let derivationPath: DerivationPath
+		do {
+			derivationPath = try .init(
+				scheme: .cap26,
+				path: AccountBabylonDerivationPath(
+					derivationPath: path
+				)
+				.derivationPath
+			)
+		} catch {
+			derivationPath = try .init(
+				scheme: .bip44Olympia,
+				path: LegacyOlympiaBIP44LikeDerivationPath(
+					derivationPath: path
+				)
+				.derivationPath
+			)
+		}
+
+		assert(derivationPath.curveForScheme == curve)
+
+		self.init(publicKey: publicKey, derivationPath: derivationPath)
+	}
+}
+
+extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.DerivedPublicKey {
+	public func hdPubKey() throws -> HierarchicalDeterministicPublicKey {
+		try .init(curve: self.curve, key: self.publicKey.data, path: self.derivationPath)
+	}
+}
+
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
 		public let signature: SignatureWithPublicKey
@@ -210,22 +248,18 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 	}
 
 	func validate(hashed: Data) throws -> Validated {
-		guard let curve = SLIP10.Curve(rawValue: self.curve) else {
-			struct BadCurve: Swift.Error {}
-			loggerGlobal.error("Bad curve")
-			throw BadCurve()
-		}
+		let hdPubKey = try self.derivedPublicKey.hdPubKey()
 		let signatureWithPublicKey: SignatureWithPublicKey
-		switch curve {
-		case .secp256k1:
+		switch hdPubKey.publicKey {
+		case let .ecdsaSecp256k1(pubKey):
 			signatureWithPublicKey = try .ecdsaSecp256k1(
 				signature: .init(radixFormat: self.signature.data),
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
+				publicKey: pubKey
 			)
-		case .curve25519:
-			signatureWithPublicKey = try .eddsaEd25519(
+		case let .eddsaEd25519(pubKey):
+			signatureWithPublicKey = .eddsaEd25519(
 				signature: self.signature.data,
-				publicKey: .init(compressedRepresentation: self.publicKey.data)
+				publicKey: pubKey
 			)
 		}
 
@@ -234,28 +268,9 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 			throw InvalidSignature()
 		}
 
-		let derivationPath: DerivationPath
-		do {
-			derivationPath = try .init(
-				scheme: .cap26,
-				path: AccountBabylonDerivationPath(
-					derivationPath: self.derivationPath
-				)
-				.derivationPath
-			)
-		} catch {
-			derivationPath = try .init(
-				scheme: .bip44Olympia,
-				path: LegacyOlympiaBIP44LikeDerivationPath(
-					derivationPath: self.derivationPath
-				)
-				.derivationPath
-			)
-		}
-
 		return Validated(
 			signature: signatureWithPublicKey,
-			derivationPath: derivationPath
+			derivationPath: hdPubKey.derivationPath
 		)
 	}
 }

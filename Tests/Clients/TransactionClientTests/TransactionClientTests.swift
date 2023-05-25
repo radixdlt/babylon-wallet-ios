@@ -42,6 +42,7 @@ final class TransactionClientTests: TestCase {
 			$0.accountPortfoliosClient.fetchAccountPortfolios = { addresses, _ in addresses.map {
 				.init(
 					owner: $0,
+					isDappDefintionAccountType: false,
 					fungibleResources: .init(
 						xrdResource: .init(
 							resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag",

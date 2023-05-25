@@ -63,12 +63,14 @@ extension GatewaySettings {
 
 		private func coreView(with viewStore: ViewStoreOf<GatewaySettings>) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
-				VStack(spacing: .small2) {
+				VStack(alignment: .leading, spacing: .small2) {
 					subtitle
 
-					whatIsAGatewayButton(with: viewStore)
-						.flushedLeft
-						.padding(.vertical, .medium2)
+					Button(L10n.Gateways.whatIsAGateway) {
+						viewStore.send(.popoverButtonTapped)
+					}
+					.buttonStyle(.info)
+					.padding(.vertical, .medium2)
 
 					Separator()
 				}
@@ -91,7 +93,6 @@ extension GatewaySettings {
 			Text(L10n.Gateways.subtitle)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body1HighImportance)
-				.flushedLeft
 		}
 
 		private var gatewayList: some SwiftUI.View {
@@ -101,19 +102,6 @@ extension GatewaySettings {
 					action: { .child(.gatewayList($0)) }
 				)
 			)
-		}
-
-		private func whatIsAGatewayButton(with viewStore: ViewStoreOf<GatewaySettings>) -> some SwiftUI.View {
-			Button {
-				viewStore.send(.popoverButtonTapped)
-			} label: {
-				HStack {
-					Image(asset: AssetResource.info)
-					Text(L10n.Gateways.whatIsAGateway)
-						.textStyle(.body1StandaloneLink)
-				}
-				.tint(.app.blue2)
-			}
 		}
 	}
 }

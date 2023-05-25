@@ -113,7 +113,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"TransactionReviewFeature",
-			"DerivePublicKeyFeature",
+			"DerivePublicKeysFeature",
 			"ROLAClient",
 		],
 		tests: .no
@@ -126,7 +126,7 @@ package.addModules([
 			"AccountsClient",
 			"ChooseLedgerHardwareDeviceFeature",
 			"Cryptography",
-			"DerivePublicKeyFeature",
+			"DerivePublicKeysFeature",
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"LedgerHardwareWalletClient",
@@ -141,7 +141,7 @@ package.addModules([
 			"FactorSourcesClient",
 			"GatewayAPI",
 			"PersonasClient",
-			"DerivePublicKeyFeature",
+			"DerivePublicKeysFeature",
 		],
 		tests: .no
 	),
@@ -166,7 +166,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "DerivePublicKeyFeature",
+		name: "DerivePublicKeysFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
@@ -219,6 +219,8 @@ package.addModules([
 			"FactorSourcesClient",
 			"RadixConnectClient",
 			"ImportLegacyWalletClient",
+			"DerivePublicKeysFeature",
+			"ChooseLedgerHardwareDeviceFeature",
 		],
 		tests: .no
 	),
@@ -226,6 +228,15 @@ package.addModules([
 		name: "InspectProfileFeature",
 		dependencies: [
 			"SecureStorageClient",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "LedgerHardwareWalletsFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AddLedgerFactorSourceFeature",
+			"FactorSourcesClient",
 		],
 		tests: .no
 	),
@@ -239,7 +250,6 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
@@ -314,6 +324,7 @@ package.addModules([
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
 			"InspectProfileFeature",
+			"LedgerHardwareWalletsFeature",
 			"MnemonicClient",
 			"P2PLinksFeature",
 			"PersonasFeature",

@@ -111,6 +111,14 @@ public enum EnumDiscriminator: Sendable, Codable, Hashable {
 }
 
 extension EnumDiscriminator {
+	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
+	public static let metadataEntry: Self = .u8(0x01)
+
+	/// https://rdxworks.slack.com/archives/C031A0V1A1W/p1683275008777499?thread_ts=1683221252.228129&cid=C031A0V1A1W
+	public static let publicKey: Self = .u8(0x09)
+}
+
+extension EnumDiscriminator {
 	private enum Kind: String, Codable {
 		case u8 = "U8"
 		case string = "String"

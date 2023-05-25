@@ -15,7 +15,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		return Self(
-			publicKeyFromOnDeviceHD: { request in
+			publicKeysFromOnDeviceHD: { request in
 				let factorSourceID = request.hdOnDeviceFactorSource.id
 
 				guard
@@ -26,12 +26,14 @@ extension DeviceFactorSourceClient: DependencyKey {
 					throw FailedToFindFactorSource()
 				}
 				let hdRoot = try mnemonicWithPassphrase.hdRoot()
-				let privateKey = try hdRoot.derivePrivateKey(
-					path: request.derivationPath,
-					curve: request.curve
-				)
-
-				return try privateKey.publicKey().intoEngine()
+				let derivedKeys = try request.derivationPaths.map {
+					let key = try hdRoot.derivePrivateKey(
+						path: $0,
+						curve: $0.curveForScheme
+					)
+					return HierarchicalDeterministicPublicKey(publicKey: key.publicKey(), derivationPath: $0)
+				}
+				return OrderedSet(derivedKeys)
 			},
 			signatureFromOnDeviceHD: { request in
 				let privateKey = try request.hdRoot.derivePrivateKey(

@@ -71,7 +71,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			scanned: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			alreadyImported: Set<OlympiaAccountToMigrate.ID>
 		)
-
+		case migrateHardwareAccounts(NonEmpty<OrderedSet<OlympiaAccountToMigrate>>, NetworkID)
 		case validatedOlympiaSoftwareAccounts(
 			softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>,
 			privateHDFactorSource: PrivateHDFactorSource
@@ -103,6 +103,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		switch viewAction {
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
+		}
+	}
+
+	private func migrateHardwareAccounts(
+		_ hardwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
+	) -> EffectTask<Action> {
+		.task {
+			let networkID = await factorSourcesClient.getCurrentNetworkID()
+			return .internal(.migrateHardwareAccounts(hardwareAccounts, networkID))
 		}
 	}
 
@@ -143,12 +152,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					state.path.append(destination)
 				}
 			} else if let hardwareAccounts = accounts.hardware {
-				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
-					hardwareAccounts: hardwareAccounts
-				))
-				if state.path.last != destination {
-					state.path.append(destination)
-				}
+				return migrateHardwareAccounts(hardwareAccounts)
 			}
 
 			return .none
@@ -175,7 +179,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importOlympiaLedgerAccountsAndFactorSources(.delegate(
 			.completed(ledgersWithAccounts, unvalidatedOlympiaAccounts)
 		)))):
-
+			loggerGlobal.notice("Coordinator, proceeding to completion")
 			state.migratedAccounts.append(contentsOf: ledgersWithAccounts.flatMap { $0.migratedAccounts.map(\.babylon) })
 
 			guard let migratedAccounts = Profile.Network.Accounts(rawValue: state.migratedAccounts) else {
@@ -195,6 +199,16 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
+		case let .migrateHardwareAccounts(hardwareAccounts, networkID):
+			let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
+				hardwareAccounts: hardwareAccounts,
+				networkID: networkID
+			))
+			if state.path.last != destination {
+				state.path.append(destination)
+			}
+			return .none
+
 		case let .findAlreadyImportedOlympiaSoftwareAccounts(scanned, alreadyImported):
 			let destination = Destinations.State.selectAccountsToImport(.init(
 				scannedAccounts: scanned,
@@ -219,12 +233,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			if let hardwareAccounts = state.selectedAccounts?.hardware {
 				state.migratedAccounts.append(contentsOf: migratedSoftwareAccounts.babylonAccounts.rawValue)
 				// also need to add ledger and then migrate hardware account
-				let destination = Destinations.State.importOlympiaLedgerAccountsAndFactorSources(.init(
-					hardwareAccounts: hardwareAccounts
-				))
-				if state.path.last != destination {
-					state.path.append(destination)
-				}
+				return migrateHardwareAccounts(hardwareAccounts)
 			} else {
 				assert(state.selectedAccounts?.hardware == nil)
 				// no hardware accounts to migrate...
@@ -280,7 +289,6 @@ extension ImportOlympiaWalletCoordinator {
 			)
 
 			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
-				// We have not yet saved the factorSource, so lets do that
 				guard try factorSourceToSave.id == FactorSource.id(fromPrivateHDFactorSource: factorSource) else {
 					throw OlympiaFactorSourceToSaveIDDisrepancy()
 				}
@@ -289,14 +297,25 @@ extension ImportOlympiaWalletCoordinator {
 					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
 						mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
 						hdOnDeviceFactorSource: factorSourceToSave
-					)
-					)
-
+					))
 				} catch {
-					let msg = "Failed to save factor source (mnemonic) but have already created accounts, error: \(error)"
-					loggerGlobal.critical(.init(stringLiteral: msg))
-					assertionFailure(msg)
-					errorQueue.schedule(error)
+					// Check if we have already imported this Mnemonic
+					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id) {
+						if existing.kind == .device, existing.supportsOlympia {
+							// all good, we had already imported it.
+							loggerGlobal.notice("We had already imported this factor source (mnemonic) before.")
+						} else {
+							let msg = "Failed to save factor source (mnemonic), found existing but it is not of .device kind or does not support olympia params. error: \(error)"
+							loggerGlobal.critical(.init(stringLiteral: msg))
+							assertionFailure(msg)
+							errorQueue.schedule(error)
+						}
+					} else {
+						let msg = "Failed to save factor source (mnemonic) but have already created accounts, error: \(error)"
+						loggerGlobal.critical(.init(stringLiteral: msg))
+						assertionFailure(msg)
+						errorQueue.schedule(error)
+					}
 				}
 			}
 
