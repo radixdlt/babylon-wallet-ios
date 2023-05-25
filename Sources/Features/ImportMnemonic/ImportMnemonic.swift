@@ -192,7 +192,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return updateWord(id: id, input: input, &state, lookupResult: lookUpResult)
 
 		case let .word(id, child: .delegate(.lostFocus(displayText))):
-			guard case .invalid = lookup(input: displayText, state) else {
+			switch lookup(input: displayText, state) {
+			case .invalid, .partialAmongstCandidates, .emptyOrTooShort:
+				break // => perform validation
+			case .knownAutocomplete, .knownFull:
 				return .none
 			}
 
