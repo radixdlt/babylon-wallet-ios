@@ -131,6 +131,6 @@ struct ImportMnemonic_Preview: PreviewProvider {
 }
 
 extension ImportMnemonic.State {
-	public static let previewValue = Self()
+	public static let previewValue = Self(saveInProfile: false)
 }
 #endif

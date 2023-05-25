@@ -206,7 +206,9 @@ package.addModules([
 	.feature(
 		name: "ImportMnemonicFeature",
 		featureSuffixDroppedFromFolderName: true,
-		dependencies: [],
+		dependencies: [
+			"FactorSourcesClient", // saves into profile, if specified
+		],
 		tests: .no
 	),
 	.feature(

@@ -1,4 +1,5 @@
 import Cryptography
+import FactorSourcesClient
 import FeaturePrelude
 
 // MARK: - BIP39.WordList + Sendable
@@ -76,11 +77,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 		}
 
+		public let saveInProfile: Bool
+
 		public init(
+			saveInProfile: Bool,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
 			bip39Passphrase: String = ""
 		) {
+			self.saveInProfile = saveInProfile
 			self.wordList = BIP39.wordList(for: language)
 			self.language = language
 			self.wordCount = wordCount
@@ -107,17 +112,21 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusNext(ImportMnemonicWord.State.ID)
+		case importOlympiaFactorSourceResult(TaskResult<FactorSourceID>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case finishedInputtingMnemonicWithPassphrase(MnemonicWithPassphrase)
+		case savedInProfile(FactorSourceID)
+		case notSavedInProfile(MnemonicWithPassphrase)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
@@ -176,7 +185,19 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				mnemonic: mnemonic,
 				passphrase: state.bip39Passphrase
 			)
-			return .send(.delegate(.finishedInputtingMnemonicWithPassphrase(mnemonicWithPassphrase)))
+			guard state.saveInProfile else {
+				return .send(.delegate(.notSavedInProfile(mnemonicWithPassphrase)))
+			}
+
+			return .run { send in
+				await send(.internal(.importOlympiaFactorSourceResult(
+					TaskResult {
+						try await factorSourcesClient.importOlympiaFactorSource(
+							mnemonicWithPassphrase: mnemonicWithPassphrase
+						)
+					}
+				)))
+			}
 		}
 	}
 
@@ -186,6 +207,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.idOfWordWithTextFieldFocus = id
 			state.words[id: id]?.focus()
 			return .none
+
+		case let .importOlympiaFactorSourceResult(.failure(error)):
+			errorQueue.schedule(error)
+			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
+			return .none
+
+		case let .importOlympiaFactorSourceResult(.success(factorSourceID)):
+			return .send(.delegate(.savedInProfile(factorSourceID)))
 		}
 	}
 }
