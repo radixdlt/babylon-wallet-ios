@@ -249,7 +249,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		// FIXME: move out of DEBUG flag once ready...
 		case .mnemonicsButtonTapped:
-			fatalError()
+			state.destination = .mnemonics(.init())
+			return .none
 
 		case .factorSourcesButtonTapped:
 			state.destination = .debugManageFactorSources(.init())
