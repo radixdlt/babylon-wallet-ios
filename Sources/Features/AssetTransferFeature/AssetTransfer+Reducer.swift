@@ -67,16 +67,12 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 
 extension AssetTransfer.State {
 	public var canSendTransferRequest: Bool {
-		let receivingAccounts = accounts.receivingAccounts.filter {
-			$0.account != nil || !$0.assets.isEmpty
-		}
-
-		guard !receivingAccounts.isEmpty else {
+		guard !accounts.receivingAccounts.isEmpty else {
 			return false
 		}
 
-		return receivingAccounts.allSatisfy {
-			guard $0.account != nil, !$0.assets.isEmpty else {
+		return accounts.receivingAccounts.allSatisfy {
+			guard $0.account != nil else {
 				return false
 			}
 			let fungibleAssets = $0.assets.compactMap(/ResourceAsset.State.fungibleAsset)

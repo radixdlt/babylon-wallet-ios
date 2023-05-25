@@ -87,15 +87,15 @@ extension NameAccount {
 					.toolbar(.visible, for: .navigationBar)
 					#endif
 					.footer {
-//						WithControlRequirements(
-//							viewStore.sanitizedNameRequirement,
-//							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
-//						) { action in
-						Button(L10n.Common.continue, action: {
-							viewStore.send(.confirmNameButtonTapped("adsds"))
-						})
-						.buttonStyle(.primaryRectangular)
-//						}
+						WithControlRequirements(
+							viewStore.sanitizedNameRequirement,
+							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
+						) { _ in
+							Button(L10n.Common.continue, action: {
+								viewStore.send(.confirmNameButtonTapped("adsds"))
+							})
+							.buttonStyle(.primaryRectangular)
+						}
 					}
 					.onAppear {
 						viewStore.send(.appeared)

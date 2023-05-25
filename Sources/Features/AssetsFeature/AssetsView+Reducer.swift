@@ -5,14 +5,14 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		/// All of the possible asset list
 		public enum AssetKind: String, Sendable, Hashable, CaseIterable, Identifiable {
-			case tokens
-			case nfts
+			case fungibles
+			case nonFungibles
 
 			var displayText: String {
 				switch self {
-				case .tokens:
+				case .fungibles:
 					return L10n.Account.tokens
-				case .nfts:
+				case .nonFungibles:
 					return L10n.Account.nfts
 				}
 			}
@@ -25,7 +25,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public let account: Profile.Network.Account
 		public var isLoadingResources: Bool = false
-
 		public let mode: Mode
 
 		public init(account: Profile.Network.Account, mode: Mode = .selection(.init())) {
@@ -39,7 +38,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		init(
 			account: Profile.Network.Account,
-			assetKinds: NonEmpty<[AssetKind]> = .init([.tokens, .nfts])!,
+			assetKinds: NonEmpty<[AssetKind]> = .init([.fungibles, .nonFungibles])!,
 			fungibleTokenList: FungibleAssetList.State,
 			nonFungibleTokenList: NonFungibleAssetList.State,
 			mode: Mode

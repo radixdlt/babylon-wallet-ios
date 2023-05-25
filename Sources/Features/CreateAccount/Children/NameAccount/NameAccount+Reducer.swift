@@ -8,8 +8,8 @@ public struct NameAccount: Sendable, FeatureReducer {
 		}
 
 		public var isFirst: Bool
-		public var inputtedName: String = "asds"
-		public var sanitizedName: NonEmptyString? = "asds"
+		public var inputtedName: String
+		public var sanitizedName: NonEmptyString?
 		public var focusedField: Field?
 		public var useLedgerAsFactorSource: Bool
 
@@ -56,9 +56,9 @@ public struct NameAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { _ in
-//				try await clock.sleep(for: .seconds(0.5))
-//				await send(.internal(.focusTextField(.entityName)))
+			return .run { send in
+				try await clock.sleep(for: .seconds(0.5))
+				await send(.internal(.focusTextField(.entityName)))
 			}
 
 		case let .useLedgerAsFactorSourceToggled(useLedgerAsFactorSource):

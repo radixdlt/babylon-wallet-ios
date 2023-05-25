@@ -90,7 +90,7 @@ extension EngineToolkitClient {
 		tokensCount: Int = 20
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
-		let tokens: [any InstructionProtocol] = stride(from: 0, to: tokensCount, by: 1).map { _ in
+		let fungibles: [any InstructionProtocol] = stride(from: 0, to: tokensCount, by: 1).map { _ in
 			var metdataEntries: [[ManifestASTValue]] = []
 
 			let addName = Bool.random()
@@ -156,7 +156,7 @@ extension EngineToolkitClient {
 
 		let instructions: [any InstructionProtocol] = [
 			lockFeeCallMethod(address: faucetAddress),
-		] + tokens +
+		] + fungibles +
 			[
 				CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
 					Expression(stringLiteral: "ENTIRE_WORKTOP")
@@ -272,7 +272,7 @@ extension EngineToolkitClient {
 		idsCount: Int = 100
 	) throws -> TransactionManifest {
 		let faucetAddress = try faucetAddress(for: networkID)
-		let tokens = try stride(from: 0, to: tokensCount, by: 1).map { _ in
+		let fungibles = try stride(from: 0, to: tokensCount, by: 1).map { _ in
 			var metadataEntries: [[ManifestASTValue]] = []
 			let shouldAddName = Bool.random()
 			if shouldAddName {
@@ -321,7 +321,7 @@ extension EngineToolkitClient {
 			)
 		}
 
-		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + tokens + [CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
+		let instructions: [any InstructionProtocol] = [lockFeeCallMethod(address: faucetAddress)] + fungibles + [CallMethod(receiver: .init(address: accountAddress.address), methodName: "deposit_batch") {
 			Expression(stringLiteral: "ENTIRE_WORKTOP")
 		}]
 

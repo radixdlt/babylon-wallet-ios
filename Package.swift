@@ -203,7 +203,6 @@ package.addModules([
 	.feature(
 		name: "HomeFeature",
 		dependencies: [
-			"AssetsFeature",
 			"AccountDetailsFeature",
 			"AccountListFeature",
 			"AccountPortfoliosClient",

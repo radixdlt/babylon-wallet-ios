@@ -28,14 +28,14 @@ extension AssetsView {
 							assetTypeSelectorView(viewStore)
 
 							switch viewStore.activeAssetKind {
-							case .tokens:
+							case .fungibles:
 								FungibleAssetList.View(
 									store: store.scope(
 										state: \.fungibleTokenList,
 										action: { .child(.fungibleTokenList($0)) }
 									)
 								)
-							case .nfts:
+							case .nonFungibles:
 								NonFungibleAssetList.View(
 									store: store.scope(
 										state: \.nonFungibleTokenList,
