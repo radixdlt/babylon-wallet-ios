@@ -19,10 +19,10 @@ extension ScanQR {
 		#endif // macOS
 		public let instructions: String
 		init(state: ScanQR.State) {
-			scanMode = state.scanMode
-			instructions = state.scanInstructions
+			self.scanMode = state.scanMode
+			self.instructions = state.scanInstructions
 			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
-			connectionPassword = state.manualQRContent
+			self.connectionPassword = state.manualQRContent
 			#endif // macOS
 		}
 	}
@@ -37,7 +37,7 @@ extension ScanQR {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .center, spacing: .large3) {
+				VStack(spacing: .medium1) {
 					#if os(iOS) && !targetEnvironment(simulator)
 					scanQRCode(viewStore: viewStore)
 					#else
@@ -86,9 +86,14 @@ extension ScanQR.View {
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
+		Text(L10n.LinkedConnectors.NewConnection.title)
+			.foregroundColor(.app.gray1)
+			.textStyle(.sheetTitle)
+
 		Text(viewStore.instructions)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
+			.multilineTextAlignment(.center)
 
 		CodeScannerView(
 			codeTypes: [.qr],

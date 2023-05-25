@@ -13,12 +13,16 @@ extension AccountList {
 			public var portfolio: Loadable<AccountPortfolio>
 
 			public var shouldShowSecurityPrompt = false
+			public let isLegacyAccount: Bool
+			public var isLedgerAccount: Bool = false
+			public var isDappDefinitionAccount: Bool = false
 
 			public init(
 				account: Profile.Network.Account
 			) {
 				self.account = account
 				self.portfolio = .loading
+				self.isLegacyAccount = account.isOlympiaAccount
 			}
 		}
 
@@ -31,6 +35,7 @@ extension AccountList {
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
 			case displaySecurityPrompting
+			case isLedgerAccount
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -38,6 +43,8 @@ extension AccountList {
 			case securityPromptTapped(Profile.Network.Account)
 		}
 
+		@Dependency(\.cacheClient) var cacheClient
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -46,12 +53,25 @@ extension AccountList {
 			case .task:
 				let accountAddress = state.account.address
 				state.portfolio = .loading
-				return .run { send in
+				return .run { [account = state.account] send in
+
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
 						guard !Task.isCancelled else {
 							return
 						}
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
+
+						switch account.securityState {
+						case let .unsecured(unsecuredEntityControl):
+							if
+								let factorSource = try? await factorSourcesClient.getFactorSource(
+									of: unsecuredEntityControl.transactionSigning.factorInstance
+								),
+								factorSource.kind == .ledgerHQHardwareWallet
+							{
+								await send(.internal(.isLedgerAccount))
+							}
+						}
 					}
 				}
 			case .securityPromptTapped:
@@ -63,10 +83,15 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
+			case .isLedgerAccount:
+				state.isLedgerAccount = true
+				return .none
+
 			case .displaySecurityPrompting:
 				state.shouldShowSecurityPrompt = true
 				return .none
 			case let .accountPortfolioUpdate(portfolio):
+				state.isDappDefinitionAccount = portfolio.isDappDefintionAccountType
 				assert(portfolio.owner == state.account.address)
 				state.portfolio = .success(portfolio)
 
@@ -95,7 +120,7 @@ extension AccountList {
 					return
 				}
 				guard factorSource.kind == .device else {
-					// probably ledger account
+					// probably ledger
 					return
 				}
 				await send(.internal(.displaySecurityPrompting))

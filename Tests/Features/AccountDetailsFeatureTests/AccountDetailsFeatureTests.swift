@@ -49,7 +49,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		let didFetchAccountPortfolio: ActorIsolated<(address: String, forceRefresh: Bool)?> = ActorIsolated(nil)
 		store.dependencies.accountPortfoliosClient.fetchAccountPortfolio = { address, forceRefresh in
 			await didFetchAccountPortfolio.setValue((address.address, forceRefresh))
-			return AccountPortfolio(owner: account.address, fungibleResources: .init(), nonFungibleResources: [])
+			return AccountPortfolio(owner: account.address, isDappDefintionAccountType: false, fungibleResources: .init(), nonFungibleResources: [])
 		}
 
 		// when

@@ -2,14 +2,12 @@ import FeaturePrelude
 
 extension Header.State {
 	var viewState: Header.ViewState {
-		.init(hasNotification: accountRecoveryIsNeeded)
+		.init()
 	}
 }
 
 extension Header {
-	public struct ViewState: Equatable {
-		let hasNotification: Bool
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -20,11 +18,7 @@ extension Header {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				VStack(alignment: .leading, spacing: .small2) {
 					Text(L10n.HomePage.title)
 						.foregroundColor(.app.gray1)
@@ -35,43 +29,11 @@ extension Header {
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1HighImportance)
 
-						Spacer()
-							.frame(width: .large1 * 3)
+						Spacer(minLength: 3 * .large1)
 					}
 				}
 				.padding(.leading, .medium1)
 				.padding(.top, .small3)
-				#if os(iOS)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							SettingsButton(
-								shouldShowNotification: viewStore.hasNotification,
-								action: { viewStore.send(.settingsButtonTapped) }
-							)
-						}
-					}
-				#endif
-			}
-		}
-
-		private struct SettingsButton: SwiftUI.View {
-			let shouldShowNotification: Bool
-			let action: () -> Void
-
-			var body: some SwiftUI.View {
-				ZStack(alignment: .topTrailing) {
-					Button(action: action) {
-						Image(asset: AssetResource.homeHeaderSettings)
-					}
-					.frame(.small)
-
-					if shouldShowNotification {
-						Circle()
-							.foregroundColor(.app.notification)
-							.frame(width: .small1, height: .small1) // we should probably have the frame size aligned with the unit size.
-							.offset(y: .small3)
-					}
-				}
 			}
 		}
 	}
@@ -96,6 +58,6 @@ struct Header_Preview: PreviewProvider {
 }
 
 extension Header.State {
-	static let previewValue = Self(accountRecoveryIsNeeded: true)
+	static let previewValue = Self()
 }
 #endif

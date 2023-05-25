@@ -1,6 +1,6 @@
-import ChooseLedgerHardwareDeviceFeature
 import DerivePublicKeysFeature
 import FeaturePrelude
+import LedgerHardwareDevicesFeature
 
 extension CreationOfAccount {
 	@MainActor
@@ -17,7 +17,7 @@ extension CreationOfAccount {
 					CaseLet(
 						state: /CreationOfAccount.State.Step.step0_chooseLedger,
 						action: { CreationOfAccount.Action.child(.step0_chooseLedger($0)) },
-						then: { ChooseLedgerHardwareDevice.View(store: $0) }
+						then: { LedgerHardwareDevices.View(store: $0) }
 					)
 					CaseLet(
 						state: /CreationOfAccount.State.Step.step1_derivePublicKeys,
@@ -26,15 +26,14 @@ extension CreationOfAccount {
 					)
 				}
 			}
-			.navigationTitle(L10n.CreateEntity.Ledger.createAccount)
 			#if os(iOS)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
-				.onFirstTask { @MainActor in
-					ViewStore(store.stateless).send(.view(.onFirstTask))
-				}
+			.onFirstTask { @MainActor in
+				ViewStore(store.stateless).send(.view(.onFirstTask))
+			}
 		}
 	}
 }
