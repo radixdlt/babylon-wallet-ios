@@ -68,6 +68,7 @@ public enum AssetResource {
   public static let desktopConnections = ImageAsset(name: "desktop-connections")
   public static let gateway = ImageAsset(name: "gateway")
   public static let generalSettings = ImageAsset(name: "generalSettings")
+  public static let ledger = ImageAsset(name: "ledger")
   public static let personas = ImageAsset(name: "personas")
   public static let qrCodeScanner = ImageAsset(name: "qr-code-scanner")
   public static let splash = ImageAsset(name: "Splash")

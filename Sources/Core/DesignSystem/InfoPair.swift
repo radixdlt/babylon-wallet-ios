@@ -53,7 +53,6 @@ extension HPair {
 					.textStyle(.monospace)
 					.frame(maxWidth: .infinity, alignment: .leading)
 			}
-			.foregroundColor(.app.white)
 		}
 	}
 }

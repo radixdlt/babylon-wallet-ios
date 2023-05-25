@@ -1,10 +1,10 @@
 import AddLedgerFactorSourceFeature
-import ChooseLedgerHardwareDeviceFeature
 import Cryptography
 import DerivePublicKeysFeature
 import FactorSourcesClient
 import FeaturePrelude
 import ImportLegacyWalletClient
+import LedgerHardwareDevicesFeature
 import LedgerHardwareWalletClient
 import Profile
 import RadixConnectClient
@@ -37,7 +37,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		/// Migrated (an before that validated)
 		public var ledgersWithAccounts: OrderedSet<LedgerWithAccounts> = []
 
-		public var chooseLedger: ChooseLedgerHardwareDevice.State
+		public var chooseLedger: LedgerHardwareDevices.State
 
 		@PresentationState
 		public var derivePublicKeys: DerivePublicKeys.State?
@@ -50,7 +50,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			let accountsValidation = OlympiaAccountsValidation(validated: [], unvalidated: Set(hardwareAccounts.elements))
 			self.networkID = networkID
 			self.unmigrated = accountsValidation
-			self.chooseLedger = .init()
+			self.chooseLedger = .init(allowSelection: true, showHeaders: false)
 		}
 	}
 
@@ -67,7 +67,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case chooseLedger(ChooseLedgerHardwareDevice.Action)
+		case chooseLedger(LedgerHardwareDevices.Action)
 		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
 	}
 
@@ -88,7 +88,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public var body: some ReducerProtocolOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Scope(state: \.chooseLedger, action: /Action.child .. ChildAction.chooseLedger) {
-			ChooseLedgerHardwareDevice()
+			LedgerHardwareDevices()
 		}
 		Reduce(core)
 			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
@@ -155,7 +155,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .derivePublicKeys(.presented(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _)))):
 			state.derivePublicKeys = nil
-			guard let ledger = state.chooseLedger.ledgers[id: factorSourceID] else {
+			guard let ledger = state.chooseLedger.ledgers?[id: factorSourceID] else {
 				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 				return .none
 			}

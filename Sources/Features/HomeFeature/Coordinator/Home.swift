@@ -9,6 +9,7 @@ import FeaturePrelude
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
+		public var accountRecoveryIsNeeded: Bool
 		public var header: Header.State
 		public var accountList: AccountList.State
 		public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
@@ -22,17 +23,18 @@ public struct Home: Sendable, FeatureReducer {
 		public init(
 			accountRecoveryIsNeeded: Bool
 		) {
-			self.header = .init(accountRecoveryIsNeeded: accountRecoveryIsNeeded)
+			self.accountRecoveryIsNeeded = accountRecoveryIsNeeded
+			self.header = .init()
 			self.accountList = .init(accounts: [])
 			self.destination = nil
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
 		case task
 		case pullToRefreshStarted
 		case createAccountButtonTapped
+		case settingsButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -85,11 +87,9 @@ public struct Home: Sendable, FeatureReducer {
 		Scope(state: \.header, action: /Action.child .. ChildAction.header) {
 			Header()
 		}
-
 		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
 			AccountList()
 		}
-
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
@@ -123,8 +123,8 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-		default:
-			return .none
+		case .settingsButtonTapped:
+			return .send(.delegate(.displaySettings))
 		}
 	}
 
@@ -154,11 +154,6 @@ public struct Home: Sendable, FeatureReducer {
 		case let .accountList(.delegate(.displayAccountSecurity(account))):
 			state.destination = .accountSecurity(account)
 			return .none
-
-		case .header(.delegate(.displaySettings)):
-			return .run { send in
-				await send(.delegate(.displaySettings))
-			}
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil

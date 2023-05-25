@@ -27,7 +27,9 @@ extension SlideUpPanel {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-					topBar(with: viewStore)
+					CloseButtonBar {
+						viewStore.send(.closeButtonTapped)
+					}
 
 					ScrollView {
 						VStack(spacing: .large3) {
@@ -54,14 +56,6 @@ extension SlideUpPanel {
 					}
 				#endif
 			}
-		}
-
-		private func topBar(with viewStore: ViewStoreOf<SlideUpPanel>) -> some SwiftUI.View {
-			HStack {
-				CloseButton { viewStore.send(.closeButtonTapped) }
-				Spacer()
-			}
-			.padding(.small2)
 		}
 	}
 }
