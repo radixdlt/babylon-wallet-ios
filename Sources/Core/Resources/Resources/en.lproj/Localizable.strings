@@ -343,7 +343,7 @@
 "common_systemSettings" = "Settings";
 "common_confirm" = "Confirm";
 "common_save" = "Save";
-"error_dappRequest_invalidPersonaId" = "Invalid persona id specified by dApp";
+"error_dappRequest_invalidPersonaId" = "Invalid persona Id specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to create Wallet from backup: %@";
 "error_profileLoad_failedToCreateProfileFromSnapshot" = "Failed to create Wallet from backup, error: %@, version: %@";
