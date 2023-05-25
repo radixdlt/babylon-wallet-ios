@@ -96,8 +96,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 				case let .knownAutocompleted(_, fromPartial, userPressedCandidateButtonToComplete) where fromPartial != input && !userPressedCandidateButtonToComplete:
 					// The word was automatically autocompleted, use `fromPartial.dropLast` (since user wanted to erase one char)
-					let originalInputStringMinusLastChar = String(fromPartial.dropLast())
-					state.value = .partial(originalInputStringMinusLastChar)
+					state.value = .partial(.init(fromPartial.dropLast()))
 
 				case let .knownFull(_, fromPartial) where fromPartial != input:
 					state.value = .partial(input)
