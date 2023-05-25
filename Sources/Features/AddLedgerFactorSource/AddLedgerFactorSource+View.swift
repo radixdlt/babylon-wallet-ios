@@ -30,8 +30,13 @@ extension AddLedgerFactorSource {
 							.padding(.bottom, .large1)
 
 						Text("Let’s set up a Ledger hardware wallet device. You will be able to use it to create new Ledger-secured Accounts, or import Ledger-secured Accounts from the Radix Olympia Desktop Wallet.") // FIXME: String
+							.textStyle(.body1Regular)
 							.padding(.bottom, .large1)
+							.padding(.horizontal, .medium3)
+
 						Text("Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.") // FIXME: String
+							.textStyle(.body1Regular)
+							.padding(.horizontal, .medium3)
 
 						Spacer()
 
@@ -44,7 +49,7 @@ extension AddLedgerFactorSource {
 					}
 					.multilineTextAlignment(.center)
 					.foregroundColor(.app.gray1)
-					.padding(.horizontal, .large2)
+					.padding(.horizontal, .medium3)
 					#if os(iOS)
 						.toolbar {
 							ToolbarItem(placement: .primaryAction) {
@@ -118,25 +123,36 @@ extension NameLedgerFactorSource {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack {
-						Text("Found ledger model: '\(viewStore.model.rawValue)'")
+						Text("Name Your Ledger") // FIXME: String
+							.textStyle(.sheetTitle)
+							.padding(.top, .small1)
+							.padding(.bottom, .medium3)
+
+						Text("Enter a name for this Ledger device") // FIXME: String
+							.textStyle(.body1Regular)
+							.padding(.bottom, .medium1)
+
 						AppTextField(
-							primaryHeading: "Name your Ledger",
-							placeholder: "scratched",
+							placeholder: "My green Ledger", // FIXME: String
 							text: Binding(
 								get: { viewStore.ledgerName },
 								set: { viewStore.send(.ledgerNameChanged($0)) }
-							),
-							hint: .info("Displayed when you are prompted to sign with this.")
+							)
 						)
 
-						Button("Confirm name") { // FIXME: String
+						Spacer()
+					}
+					.padding(.horizontal, .large2)
+					.multilineTextAlignment(.center)
+					.foregroundColor(.app.gray1)
+					.footer {
+						Button("Save and Continue") { // FIXME: String
 							viewStore.send(.confirmNameButtonTapped)
 						}
 						.controlState(viewStore.confirmButtonControlState)
 						.buttonStyle(.primaryRectangular)
-						.padding(.bottom, .large2)
+						.padding([.bottom, .horizontal], .medium3)
 					}
-					.padding(.horizontal, .large2)
 				}
 			}
 		}
