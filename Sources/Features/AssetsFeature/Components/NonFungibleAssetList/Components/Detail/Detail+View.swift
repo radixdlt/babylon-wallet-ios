@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-extension NonFungibleTokenList.Detail.State {
-	var viewState: NonFungibleTokenList.Detail.ViewState {
+extension NonFungibleAssetList.Detail.State {
+	var viewState: NonFungibleAssetList.Detail.ViewState {
 		.init(
 			keyImage: token.keyImageURL,
 			nonFungibleGlobalID: resource.nftGlobalID(for: token.id),
@@ -16,7 +16,7 @@ extension NonFungibleTokenList.Detail.State {
 }
 
 // MARK: - NonFungibleTokenList.Detail.View
-extension NonFungibleTokenList.Detail {
+extension NonFungibleAssetList.Detail {
 	public struct ViewState: Equatable {
 		let keyImage: URL?
 		let nonFungibleGlobalID: AccountPortfolio.NonFungibleResource.GlobalID
@@ -30,9 +30,9 @@ extension NonFungibleTokenList.Detail {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<NonFungibleTokenList.Detail>
+		private let store: StoreOf<NonFungibleAssetList.Detail>
 
-		public init(store: StoreOf<NonFungibleTokenList.Detail>) {
+		public init(store: StoreOf<NonFungibleAssetList.Detail>) {
 			self.store = store
 		}
 

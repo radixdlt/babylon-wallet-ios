@@ -1,12 +1,12 @@
 import FeaturePrelude
 
-// MARK: - NonFungibleTokenList.View
-extension NonFungibleTokenList {
+// MARK: - NonFungibleAssetList.View
+extension NonFungibleAssetList {
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<NonFungibleTokenList>
+		private let store: StoreOf<NonFungibleAssetList>
 
-		public init(store: StoreOf<NonFungibleTokenList>) {
+		public init(store: StoreOf<NonFungibleAssetList>) {
 			self.store = store
 		}
 
@@ -17,16 +17,16 @@ extension NonFungibleTokenList {
 						state: \.rows,
 						action: { .child(.asset($0, $1)) }
 					),
-					content: { NonFungibleTokenList.Row.View(store: $0) }
+					content: { NonFungibleAssetList.Row.View(store: $0) }
 				)
 			}
 			.sheet(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /NonFungibleTokenList.Destinations.State.details,
-				action: NonFungibleTokenList.Destinations.Action.details,
+				state: /NonFungibleAssetList.Destinations.State.details,
+				action: NonFungibleAssetList.Destinations.Action.details,
 				content: { detailsStore in
 					NavigationStack {
-						NonFungibleTokenList.Detail.View(store: detailsStore)
+						NonFungibleAssetList.Detail.View(store: detailsStore)
 						#if os(iOS)
 							.navigationBarTitleDisplayMode(.inline)
 						#endif
@@ -49,10 +49,10 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
-		NonFungibleTokenList.View(
+		NonFungibleAssetList.View(
 			store: .init(
 				initialState: .init(rows: []),
-				reducer: NonFungibleTokenList()
+				reducer: NonFungibleAssetList()
 			)
 		)
 	}

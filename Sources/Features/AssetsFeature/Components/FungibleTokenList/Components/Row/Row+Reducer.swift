@@ -8,29 +8,24 @@ extension FungibleAssetList {
 
 			public var token: AccountPortfolio.FungibleResource
 			public var isXRD: Bool
-			public var mode: Mode
+			public var isSelected: Bool?
 
-			public enum Mode: Hashable, Sendable {
-				case normal
-				case selection(isSelected: Bool)
+			public init(xrdToken: AccountPortfolio.FungibleResource, isSelected: Bool? = nil) {
+				self.init(token: xrdToken, isXRD: true, isSelected: isSelected)
 			}
 
-			public init(xrdToken: AccountPortfolio.FungibleResource, mode: Mode = .normal) {
-				self.init(token: xrdToken, isXRD: true, mode: mode)
-			}
-
-			public init(nonXRDToken: AccountPortfolio.FungibleResource, mode: Mode = .normal) {
-				self.init(token: nonXRDToken, isXRD: false, mode: mode)
+			public init(nonXRDToken: AccountPortfolio.FungibleResource, isSelected: Bool? = nil) {
+				self.init(token: nonXRDToken, isXRD: false, isSelected: isSelected)
 			}
 
 			init(
 				token: AccountPortfolio.FungibleResource,
 				isXRD: Bool,
-				mode: Mode = .normal
+				isSelected: Bool? = nil
 			) {
 				self.token = token
 				self.isXRD = isXRD
-				self.mode = mode
+				self.isSelected = isSelected
 			}
 		}
 
@@ -45,8 +40,8 @@ extension FungibleAssetList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case .tapped:
-				if case let .selection(isSelected) = state.mode {
-					state.mode = .selection(isSelected: !isSelected)
+				if let isSelected = state.isSelected {
+					state.isSelected?.toggle()
 					return .none
 				}
 				return .send(.delegate(.selected(state.token)))

@@ -36,7 +36,7 @@ extension AssetsView {
 									)
 								)
 							case .nfts:
-								NonFungibleTokenList.View(
+								NonFungibleAssetList.View(
 									store: store.scope(
 										state: \.nonFungibleTokenList,
 										action: { .child(.nonFungibleTokenList($0)) }

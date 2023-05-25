@@ -6,7 +6,7 @@ extension FungibleAssetList.Row.State {
 			thumbnail: isXRD ? .xrd : .known(token.iconURL),
 			symbol: token.symbol ?? token.name ?? "",
 			tokenAmount: token.amount.format(),
-			mode: mode
+			isSelected: isSelected
 		)
 	}
 }
@@ -17,7 +17,7 @@ extension FungibleAssetList.Row {
 		let thumbnail: TokenThumbnail.Content
 		let symbol: String
 		let tokenAmount: String
-		let mode: State.Mode
+		let isSelected: Bool?
 	}
 
 	@MainActor
@@ -48,7 +48,7 @@ extension FungibleAssetList.Row {
 								.textStyle(.secondaryHeader)
 						}
 
-						if case let .selection(isSelected) = viewStore.mode {
+						if let isSelected = viewStore.isSelected {
 							CheckmarkView(appearance: .dark, isChecked: isSelected)
 						}
 					}
