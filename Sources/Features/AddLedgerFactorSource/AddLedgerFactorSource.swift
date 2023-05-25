@@ -30,6 +30,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case sendAddLedgerRequestButtonTapped
+		case closeButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -44,6 +45,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case completed(ledger: LedgerFactorSource, isNew: Bool)
+		case dismiss
 	}
 
 	// MARK: Destinations
@@ -90,6 +92,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		switch viewAction {
 		case .sendAddLedgerRequestButtonTapped:
 			return sendAddLedgerRequestEffect(&state)
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
 		}
 	}
 

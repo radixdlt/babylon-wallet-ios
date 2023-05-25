@@ -180,10 +180,16 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .destination(.presented(.addNewLedger(.delegate(.completed(ledger: ledger, isNew: _))))):
-			state.destination = nil
-			state.selectedLedgerID = ledger.id
-			return updateLedgersEffekt(state: &state)
+		case let .destination(.presented(.addNewLedger(.delegate(newLedgerAction)))):
+			switch newLedgerAction {
+			case let .completed(ledger: ledger, isNew: _):
+				state.destination = nil
+				state.selectedLedgerID = ledger.id
+				return updateLedgersEffekt(state: &state)
+			case .dismiss:
+				state.destination = nil
+				return .none
+			}
 
 		default:
 			return .none
@@ -196,8 +202,6 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			let result = await TaskResult {
 				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
 					.compactMap { try? LedgerFactorSource(factorSource: $0) }
-
-				print("Updated ledgers:", ledgers.map(\.name))
 				return IdentifiedArray(uniqueElements: ledgers)
 			}
 			return .internal(.loadedLedgers(result))

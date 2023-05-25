@@ -49,7 +49,7 @@ extension AddLedgerFactorSource {
 						.toolbar {
 							ToolbarItem(placement: .primaryAction) {
 								CloseButton {
-//								viewStore.send(.closeButtonTapped)
+									viewStore.send(.closeButtonTapped)
 								}
 							}
 						}
@@ -91,7 +91,11 @@ extension View {
 
 extension NameLedgerFactorSource.State {
 	var viewState: NameLedgerFactorSource.ViewState {
-		.init(ledgerName: ledgerName, model: deviceInfo.model)
+		.init(
+			ledgerName: ledgerName,
+			model: deviceInfo.model,
+			confirmButtonControlState: nameIsValid ? .enabled : .disabled
+		)
 	}
 }
 
@@ -99,6 +103,7 @@ extension NameLedgerFactorSource {
 	public struct ViewState: Equatable {
 		public let ledgerName: String
 		public let model: P2P.LedgerHardwareWallet.Model
+		public let confirmButtonControlState: ControlState
 	}
 
 	@MainActor
@@ -116,7 +121,6 @@ extension NameLedgerFactorSource {
 						Text("Found ledger model: '\(viewStore.model.rawValue)'")
 						AppTextField(
 							primaryHeading: "Name your Ledger",
-							secondaryHeading: "e.g. 'scratch'",
 							placeholder: "scratched",
 							text: Binding(
 								get: { viewStore.ledgerName },
@@ -124,13 +128,15 @@ extension NameLedgerFactorSource {
 							),
 							hint: .info("Displayed when you are prompted to sign with this.")
 						)
-						.padding()
 
-						Button("Confirm name") {
+						Button("Confirm name") { // FIXME: String
 							viewStore.send(.confirmNameButtonTapped)
 						}
+						.controlState(viewStore.confirmButtonControlState)
 						.buttonStyle(.primaryRectangular)
+						.padding(.bottom, .large2)
 					}
+					.padding(.horizontal, .large2)
 				}
 			}
 		}
