@@ -20,11 +20,18 @@ public struct LedgerRowView: View {
 	private let isSelected: Bool?
 	private let action: (() -> Void)?
 
-	/// If `isSelected` is non-nil, the card will have a radio button. If an action is supplied, it will be tappable.
-	public init(viewState: ViewState, isSelected: Bool? = nil, action: (() -> Void)? = nil) {
+	/// Creates a tappable Ledger card. If `isSelected` is non-nil, the card will have a radio button.
+	public init(viewState: ViewState, isSelected: Bool? = nil, action: @escaping () -> Void) {
 		self.viewState = viewState
 		self.isSelected = isSelected
 		self.action = action
+	}
+
+	/// Creates an inert Ledger card, with no selection indication.
+	public init(viewState: ViewState) {
+		self.viewState = viewState
+		self.isSelected = nil
+		self.action = nil
 	}
 
 	public var body: some View {
