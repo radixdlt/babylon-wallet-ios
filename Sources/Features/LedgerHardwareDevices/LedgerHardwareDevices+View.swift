@@ -18,9 +18,6 @@ extension LedgerHardwareDevices {
 		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 
-		let navigationTitle: String
-		let subtitle: String
-
 		init(state: LedgerHardwareDevices.State) {
 			self.allowSelection = state.allowSelection
 			self.showHeaders = state.showHeaders
@@ -31,17 +28,34 @@ extension LedgerHardwareDevices {
 			} else {
 				self.selectedLedgerControlRequirements = nil
 			}
-
-			if allowSelection {
-				self.navigationTitle = "Choose Ledger Device" // FIXME: Strings
-				self.subtitle = "Choose a Ledger hardware wallet device" // FIXME: Strings -> L10n.CreateEntity.Ledger.subtitleSelectLedger
-			} else {
-				self.navigationTitle = "Ledger Hardware Wallets" // FIXME: Strings
-				self.subtitle = "Here are all the Ledger devices you have connected to" // FIXME: Strings
-			}
 		}
 
 		var ledgersArray: [LedgerFactorSource]? { .init(ledgers.wrappedValue ?? []) }
+
+		var navigationTitle: String {
+			if allowSelection {
+				return "Choose Ledger Device" // FIXME: Strings
+			} else {
+				return "Ledger Hardware Wallets" // FIXME: Strings
+			}
+		}
+
+		var subtitle: String? {
+			switch ledgers {
+			case .idle, .loading:
+				return nil
+			case .failure:
+				return "Could not load ledger devices"
+			case .success([]):
+				return L10n.CreateEntity.Ledger.subtitleNoLedgers
+			case .success:
+				if allowSelection {
+					return "Choose a Ledger hardware wallet device" // FIXME: Strings -> L10n.CreateEntity.Ledger.subtitleSelectLedger
+				} else {
+					return "Here are all the Ledger devices you have connected to" // FIXME: Strings
+				}
+			}
+		}
 	}
 
 	@MainActor
@@ -57,10 +71,12 @@ extension LedgerHardwareDevices {
 				ScrollView {
 					VStack(spacing: .medium3) {
 						if viewStore.showHeaders {
-							Text(viewStore.subtitle)
-								.foregroundColor(.app.gray2)
-								.textStyle(.body1Link)
-								.flushedLeft
+							if let subtitle = viewStore.subtitle {
+								Text(subtitle)
+									.foregroundColor(.app.gray2)
+									.textStyle(.body1Link)
+									.flushedLeft
+							}
 
 							Button("What is a Ledger Factor Source") { // FIXME: Strings
 								viewStore.send(.whatIsALedgerButtonTapped)
@@ -103,14 +119,17 @@ extension LedgerHardwareDevices {
 		@ViewBuilder
 		private func ledgerList(viewStore: ViewStoreOf<LedgerHardwareDevices>) -> some SwiftUI.View {
 			switch viewStore.ledgers {
-			case .idle, .loading, .failure:
+			case .idle, .loading, .failure,
+			     // We are already showing `subtitleNoLedgers` in the header
+			     .success([]) where viewStore.showHeaders:
 				EmptyView()
+			case .success([]):
+				Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body1Regular)
+					.flushedLeft
 			case let .success(ledgers):
-				if ledgers.isEmpty {
-					Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Regular)
-				} else if viewStore.allowSelection {
+				if viewStore.allowSelection {
 					Selection(
 						viewStore.binding(
 							get: \.ledgersArray,
