@@ -7,7 +7,7 @@ struct ImportMnemonicPreviewApp: App {
 		WindowGroup {
 			ImportMnemonic.View(
 				store: Store(
-					initialState: ImportMnemonic.State(),
+					initialState: ImportMnemonic.State(saveInProfile: false),
 					reducer: ImportMnemonic()
 				)
 			)
