@@ -142,6 +142,8 @@ extension NonFungibleAssetList.Row.View {
 		/// number of visible NFT cards in collapsed view, excluding header (top) card
 		static let collapsedVisibleCardsCount = 2
 
+		/// Even though `collapsedVisibleCardsCount` will be visible, we do collapse more cards
+		/// so that the expand/collapse animation hides the addition/removal for the rest of the cards
 		static let collapsedCardsCount = 6
 
 		/// default scale for one card

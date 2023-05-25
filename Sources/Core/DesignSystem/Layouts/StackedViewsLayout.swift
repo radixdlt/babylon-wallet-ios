@@ -28,7 +28,7 @@ public struct StackedViewsLayout: Layout {
 	public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
 		let container = proposal.replacingUnspecifiedDimensions()
 		guard !subviews.isEmpty else {
-			return proposal.replacingUnspecifiedDimensions()
+			return container
 		}
 
 		let heights = subviews.map { $0.sizeThatFits(.init(width: container.width, height: nil)).height }
@@ -53,7 +53,7 @@ public struct StackedViewsLayout: Layout {
 				let subviewSize = subview.sizeThatFits(.init(width: container.width, height: nil))
 				offset += subviewSize.height + spacing
 			} else {
-				// The rest of the cards that go over `numberOfCards` will go behind the last card.
+				// The rest of the cards that go over `collapsedViewsCount` will go behind the last card.
 				if index < collapsedViewsCount - 1 {
 					offset += collapsedSpacing
 				}

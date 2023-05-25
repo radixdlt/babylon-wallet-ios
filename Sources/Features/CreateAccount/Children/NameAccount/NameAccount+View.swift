@@ -90,11 +90,9 @@ extension NameAccount {
 						WithControlRequirements(
 							viewStore.sanitizedNameRequirement,
 							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
-						) { _ in
-							Button(L10n.Common.continue, action: {
-								viewStore.send(.confirmNameButtonTapped("adsds"))
-							})
-							.buttonStyle(.primaryRectangular)
+						) { action in
+							Button(L10n.Common.continue, action: action)
+								.buttonStyle(.primaryRectangular)
 						}
 					}
 					.onAppear {

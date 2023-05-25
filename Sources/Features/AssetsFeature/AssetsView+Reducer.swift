@@ -169,14 +169,14 @@ extension AssetsView.State {
 
 	public var chooseButtonTitle: String {
 		guard let selectedAssets else {
-			return "Select Assets"
+			return "Select Assets" // FIXME: Localize
 		}
 
 		if selectedAssets.assetsCount == 1 {
-			return "Choose 1 Asset"
+			return "Choose 1 Asset" // FIXME: Localize
 		}
 
-		return "Choose \(selectedAssets.assetsCount) Assets"
+		return "Choose \(selectedAssets.assetsCount) Assets" // FIXME: Localize
 	}
 }
 
