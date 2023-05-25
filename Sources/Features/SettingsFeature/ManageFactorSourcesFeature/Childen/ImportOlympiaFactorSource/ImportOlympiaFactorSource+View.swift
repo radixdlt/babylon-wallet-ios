@@ -39,8 +39,8 @@ extension ImportOlympiaFactorSource {
 					}
 					.controlState(viewStore.canTapAlreadyImportedButton ? .enabled : .disabled)
 					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+					.padding([.horizontal, .bottom], .medium1)
 				}
-				.padding([.horizontal, .bottom], .medium1)
 				.alert(
 					store: store.scope(
 						state: \.$foundNoExistFactorSourceAlert,

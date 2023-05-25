@@ -71,6 +71,8 @@ extension ImportMnemonic {
 							}
 							.controlState(viewStore.isRemoveRowButtonEnabled ? .enabled : .disabled)
 
+							Spacer(minLength: 0)
+
 							Button {
 								viewStore.send(.addRowButtonTapped)
 							} label: {
