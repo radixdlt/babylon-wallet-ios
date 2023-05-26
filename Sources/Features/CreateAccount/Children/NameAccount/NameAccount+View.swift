@@ -13,7 +13,6 @@ extension NameAccount {
 		public let subtitleText: String
 		public let entityName: String
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
-		public let focusedField: State.Field?
 		public let useLedgerAsFactorSource: Bool
 
 		public struct SanitizedNameRequirement: Equatable {
@@ -32,14 +31,12 @@ extension NameAccount {
 			} else {
 				self.sanitizedNameRequirement = nil
 			}
-			self.focusedField = state.focusedField
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<NameAccount>
-		@FocusState private var focusedField: State.Field?
 
 		public init(store: StoreOf<NameAccount>) {
 			self.store = store
@@ -60,20 +57,10 @@ extension NameAccount {
 							send: { .textFieldChanged($0) }
 						)
 
-						let focusBinding = viewStore.binding(
-							get: \.focusedField,
-							send: { .textFieldFocused($0) }
-						)
-
 						AppTextField(
 							placeholder: viewStore.namePlaceholder,
 							text: nameBinding,
-							hint: .info(L10n.CreateEntity.NameNewEntity.explanation),
-							focus: .on(
-								.entityName,
-								binding: focusBinding,
-								to: $focusedField
-							)
+							hint: .info(L10n.CreateEntity.NameNewEntity.explanation)
 						)
 						#if os(iOS)
 						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
@@ -96,9 +83,6 @@ extension NameAccount {
 						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
-				}
-				.onAppear {
-					viewStore.send(.appeared)
 				}
 			}
 		}
