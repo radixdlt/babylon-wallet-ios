@@ -8,6 +8,7 @@ extension ImportMnemonic.State {
 			wordCount: wordCount.rawValue,
 			isAddRowButtonEnabled: isAddRowButtonEnabled,
 			isRemoveRowButtonEnabled: isRemoveRowButtonEnabled,
+			completedWords: completedWords,
 			mnemonic: mnemonic,
 			bip39Passphrase: bip39Passphrase
 		)
@@ -25,6 +26,7 @@ extension ImportMnemonic {
 		let wordCount: Int
 		let isAddRowButtonEnabled: Bool
 		let isRemoveRowButtonEnabled: Bool
+		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
 	}
@@ -102,6 +104,12 @@ extension ImportMnemonic {
 							viewStore.mnemonic,
 							forAction: { viewStore.send(.continueButtonTapped($0)) }
 						) { action in
+
+							if viewStore.mnemonic == nil, viewStore.completedWords.count == viewStore.wordCount {
+								Text("Mnemonic not checksummed")
+									.foregroundColor(.app.red1)
+							}
+
 							Button("Import mnemonic", action: action)
 								.buttonStyle(.primaryRectangular)
 						}

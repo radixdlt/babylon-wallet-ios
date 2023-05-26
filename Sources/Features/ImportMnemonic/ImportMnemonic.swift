@@ -47,8 +47,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public var mnemonic: Mnemonic? {
 			try? Mnemonic(
-				words: words.compactMap(\.completeWord)
+				words: completedWords
 			)
+		}
+
+		public var completedWords: [BIP39.Word] {
+			words.compactMap(\.completeWord)
 		}
 
 		public let saveInProfile: Bool
