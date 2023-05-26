@@ -28,11 +28,19 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failedToLoad
+		case doneViewing
 	}
 
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.importMnemonic, action: /Action.child .. ChildAction.importMnemonic) {
+				ImportMnemonic()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -60,6 +68,15 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 		case let .loadMnemonicResult(.failure(error)):
 			loggerGlobal.error("Error loading mnemonic: \(error)")
 			return .send(.delegate(.failedToLoad))
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .importMnemonic(.delegate(.doneViewing)):
+			state.importMnemonic = nil
+			return .send(.delegate(.doneViewing))
+		default: return .none
 		}
 	}
 }

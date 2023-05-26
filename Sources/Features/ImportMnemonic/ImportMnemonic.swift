@@ -20,7 +20,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				if delta > 0 {
 					// is increasing word count
 					words.append(contentsOf: (wordCount.rawValue ..< newValue.rawValue).map {
-						.init(id: $0)
+						.init(id: $0, isReadonlyMode: isReadonlyMode)
 					})
 				} else if delta < 0 {
 					// is decreasing word count
@@ -57,6 +57,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public let saveInProfile: Bool
 
+		public let isReadonlyMode: Bool
+
 		public init(
 			saveInProfile: Bool,
 			language: BIP39.Language = .english,
@@ -71,10 +73,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			self.isAddRowButtonEnabled = wordCount != .twentyFour
 			self.isRemoveRowButtonEnabled = wordCount != .twelve
-
+			let isReadonlyMode = false
+			self.isReadonlyMode = isReadonlyMode
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
-				ImportMnemonicWord.State(id: $0)
+				ImportMnemonicWord.State(id: $0, isReadonlyMode: isReadonlyMode)
 			})
 		}
 
@@ -86,9 +89,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.language = mnemonic.language
 			self.wordCount = mnemonic.wordCount
 			self.isAddRowButtonEnabled = false
+			let isReadonlyMode = true
+			self.isReadonlyMode = isReadonlyMode
 			self.isRemoveRowButtonEnabled = false
 			self.words = .init(uniqueElements: mnemonic.words.enumerated().map {
-				ImportMnemonicWord.State(id: $0.offset, value: .complete(text: $0.element.word.rawValue, word: $0.element, completion: .auto(match: .exact)))
+				ImportMnemonicWord.State(id: $0.offset, value: .complete(text: $0.element.word.rawValue, word: $0.element, completion: .auto(match: .exact)), isReadonlyMode: isReadonlyMode)
 			})
 		}
 	}
@@ -98,7 +103,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case passphraseChanged(String)
 		case addRowButtonTapped
 		case removeRowButtonTapped
-
+		case doneViewing
 		case continueButtonTapped(Mnemonic)
 	}
 
@@ -110,6 +115,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case savedInProfile(FactorSourceID)
 		case notSavedInProfile(MnemonicWithPassphrase)
+		case doneViewing
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -196,6 +202,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					}
 				)))
 			}
+
+		case .doneViewing:
+			assert(state.isReadonlyMode)
+			return .send(.delegate(.doneViewing))
 		}
 	}
 

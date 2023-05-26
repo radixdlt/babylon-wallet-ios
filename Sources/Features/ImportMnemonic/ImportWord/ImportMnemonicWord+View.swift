@@ -5,6 +5,7 @@ import FeaturePrelude
 extension ImportMnemonicWord.State {
 	var viewState: ImportMnemonicWord.ViewState {
 		.init(
+			isReadonlyMode: isReadonlyMode,
 			index: id,
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
@@ -35,6 +36,7 @@ enum Validation: Sendable, Hashable {
 
 extension ImportMnemonicWord {
 	public struct ViewState: Equatable {
+		let isReadonlyMode: Bool
 		let index: Int
 
 		let displayText: String
@@ -71,6 +73,7 @@ extension ImportMnemonicWord {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 
 				AppTextField(
+					isReadonlyMode: viewStore.isReadonlyMode,
 					secondaryHeading: viewStore.wordAtIndex,
 					placeholder: viewStore.wordAtIndex,
 					text: .init(
@@ -88,7 +91,7 @@ extension ImportMnemonicWord {
 					),
 					showClearButton: viewStore.showClearButton,
 					innerAccessory: {
-						if viewStore.state.validation == .valid, viewStore.focusedField == nil {
+						if !viewStore.isReadonlyMode, viewStore.state.validation == .valid, viewStore.focusedField == nil {
 							Image(systemName: "checkmark.seal.fill").foregroundColor(.app.green1)
 						}
 					}

@@ -4,6 +4,7 @@ import FeaturePrelude
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		.init(
+			isReadonlyMode: isReadonlyMode,
 			rowCount: rowCount,
 			wordCount: wordCount.rawValue,
 			isAddRowButtonEnabled: isAddRowButtonEnabled,
@@ -22,6 +23,7 @@ extension ImportMnemonic.State {
 // MARK: - ImportMnemonic.View
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
+		let isReadonlyMode: Bool
 		let rowCount: Int
 		let wordCount: Int
 		let isAddRowButtonEnabled: Bool
@@ -60,58 +62,66 @@ extension ImportMnemonic {
 							)
 						}
 
-						HStack {
-							Button {
-								viewStore.send(.removeRowButtonTapped)
-							} label: {
-								HStack {
-									Text("Less words")
-										.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
-									Image(systemName: "text.badge.plus")
-										.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.red1 : .app.white)
+						if !viewStore.isReadonlyMode {
+							HStack {
+								Button {
+									viewStore.send(.removeRowButtonTapped)
+								} label: {
+									HStack {
+										Text("Less words")
+											.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
+										Image(systemName: "text.badge.plus")
+											.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.red1 : .app.white)
+									}
 								}
-							}
-							.controlState(viewStore.isRemoveRowButtonEnabled ? .enabled : .disabled)
+								.controlState(viewStore.isRemoveRowButtonEnabled ? .enabled : .disabled)
 
-							Spacer(minLength: 0)
+								Spacer(minLength: 0)
 
-							Button {
-								viewStore.send(.addRowButtonTapped)
-							} label: {
-								HStack {
-									Text("More words")
-										.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
-									Image(systemName: "text.badge.plus")
-										.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.green1 : .app.white)
+								Button {
+									viewStore.send(.addRowButtonTapped)
+								} label: {
+									HStack {
+										Text("More words")
+											.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
+										Image(systemName: "text.badge.plus")
+											.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.green1 : .app.white)
+									}
 								}
+								.controlState(viewStore.isAddRowButtonEnabled ? .enabled : .disabled)
 							}
-							.controlState(viewStore.isAddRowButtonEnabled ? .enabled : .disabled)
+							.buttonStyle(.secondaryRectangular)
+
+							AppTextField(
+								placeholder: "Passphrase",
+								text: viewStore.binding(
+									get: \.bip39Passphrase,
+									send: { .passphraseChanged($0) }
+								),
+								hint: .info("BIP39 Passphrase is often called a '25th word'.")
+							)
+							.autocorrectionDisabled()
 						}
-						.buttonStyle(.secondaryRectangular)
-
-						AppTextField(
-							placeholder: "Passphrase",
-							text: viewStore.binding(
-								get: \.bip39Passphrase,
-								send: { .passphraseChanged($0) }
-							),
-							hint: .info("BIP39 Passphrase is often called a '25th word'.")
-						)
-						.autocorrectionDisabled()
 					}
 					.footer {
 						WithControlRequirements(
 							viewStore.mnemonic,
 							forAction: { viewStore.send(.continueButtonTapped($0)) }
 						) { action in
+							if !viewStore.isReadonlyMode {
+								if viewStore.mnemonic == nil, viewStore.completedWords.count == viewStore.wordCount {
+									Text("Mnemonic not checksummed")
+										.foregroundColor(.app.red1)
+								}
 
-							if viewStore.mnemonic == nil, viewStore.completedWords.count == viewStore.wordCount {
-								Text("Mnemonic not checksummed")
-									.foregroundColor(.app.red1)
-							}
-
-							Button("Import mnemonic", action: action)
+								Button("Import mnemonic", action: action)
+									.buttonStyle(.primaryRectangular)
+							} else {
+								Button("Done") {
+									viewStore.send(.doneViewing)
+								}
 								.buttonStyle(.primaryRectangular)
+							}
 						}
 					}
 				}

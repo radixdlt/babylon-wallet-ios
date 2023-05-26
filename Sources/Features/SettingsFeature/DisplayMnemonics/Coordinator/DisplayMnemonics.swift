@@ -81,6 +81,11 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		case .details(.presented(.delegate(.failedToLoad))):
 			state.displayMnemonic = nil
 			return .none
+
+		case .details(.presented(.delegate(.doneViewing))):
+			state.displayMnemonic = nil
+			return .none
+
 		default: return .none
 		}
 	}

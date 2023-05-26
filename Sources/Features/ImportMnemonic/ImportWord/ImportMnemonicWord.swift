@@ -69,16 +69,19 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		public typealias ID = Int
 		public let id: ID
 		public var value: WordValue
+		public let isReadonlyMode: Bool
 
 		public var autocompletionCandidates: AutocompletionCandidates? = nil
 		public var focusedField: Field? = nil
 
 		public init(
 			id: ID,
-			value: WordValue = .incomplete(text: "", hasFailedValidation: false)
+			value: WordValue = .incomplete(text: "", hasFailedValidation: false),
+			isReadonlyMode: Bool
 		) {
 			self.id = id
 			self.value = value
+			self.isReadonlyMode = isReadonlyMode
 		}
 
 		public var isComplete: Bool {
@@ -118,7 +121,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .wordChanged(input):
-
+			guard !state.isReadonlyMode else { return .none }
 			switch state.value {
 			case let .complete(text, _, completion: .auto(match: .startsWith)):
 				guard input != text else {
