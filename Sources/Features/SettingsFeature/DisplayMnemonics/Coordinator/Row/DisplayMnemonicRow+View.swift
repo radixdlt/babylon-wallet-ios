@@ -1,16 +1,16 @@
 import FeaturePrelude
 
-extension DisplayMnemonicRow.State {
-	var viewState: DisplayMnemonicRow.ViewState {
-		.init(
-			factorSourceID: deviceFactorSource.factorSource.id,
-			labelSeedPhraseKind: deviceFactorSource.labelSeedPhraseKind,
-			addedOn: deviceFactorSource
-				.addedOn
-				.ISO8601Format(.iso8601Date(timeZone: .current))
-		)
-	}
-}
+// extension DisplayMnemonicRow.State {
+//	var viewState: DisplayMnemonicRow.ViewState {
+//		.init(
+//			factorSourceID: deviceFactorSource.factorSource.id,
+//			accounts: accountsForDeviceFactorSource.accounts,
+//			labelSeedPhraseKind: deviceFactorSource.labelSeedPhraseKind,
+//			addedOn:
+
+//		)
+//	}
+// }
 
 extension HDOnDeviceFactorSource {
 	var labelSeedPhraseKind: String {
@@ -21,12 +21,6 @@ extension HDOnDeviceFactorSource {
 
 // MARK: - DisplayMnemonicRow.View
 extension DisplayMnemonicRow {
-	public struct ViewState: Equatable {
-		let factorSourceID: FactorSourceID
-		let labelSeedPhraseKind: String
-		let addedOn: String
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<DisplayMnemonicRow>
@@ -36,14 +30,37 @@ extension DisplayMnemonicRow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Card {
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				Card(.app.gray5) {
 					viewStore.send(.tapped)
 				} contents: {
-					PlainListRow(title: "\(viewStore.labelSeedPhraseKind) added: \(viewStore.addedOn)") {
-						EmptyView()
-					}
+					AccountsForDeviceFactorSourceView(
+						accountsForDeviceFactorSource: viewStore.accountsForDeviceFactorSource
+					)
 				}
+			}
+		}
+	}
+}
+
+// MARK: - AccountsForDeviceFactorSourceView
+struct AccountsForDeviceFactorSourceView: SwiftUI.View {
+	let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
+	var deviceFactorSource: HDOnDeviceFactorSource {
+		accountsForDeviceFactorSource.deviceFactorSource
+	}
+
+	var body: some View {
+		VStack {
+			Text(deviceFactorSource.labelSeedPhraseKind)
+				.font(.title3)
+
+			HPair(label: "Added", item: deviceFactorSource
+				.addedOn
+				.ISO8601Format(.iso8601Date(timeZone: .current)))
+
+			ForEach(accountsForDeviceFactorSource.accounts) { account in
+				SmallAccountCard(account: account)
 			}
 		}
 	}

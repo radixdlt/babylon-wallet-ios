@@ -1,7 +1,16 @@
 import FactorSourcesClient
 import FeaturePrelude
 import ImportMnemonicFeature
+import Profile
 import SecureStorageClient
+
+// MARK: - AccountsForDeviceFactorSource
+public struct AccountsForDeviceFactorSource: Sendable, Hashable, Identifiable {
+	public typealias ID = FactorSourceID
+	public var id: ID { deviceFactorSource.id }
+	public let accounts: [Profile.Network.Account]
+	public let deviceFactorSource: HDOnDeviceFactorSource
+}
 
 // MARK: - DisplayMnemonics
 public struct DisplayMnemonics: Sendable, FeatureReducer {
@@ -19,7 +28,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedFactorSources(TaskResult<IdentifiedArrayOf<HDOnDeviceFactorSource>>)
+		case loadedFactorSources(TaskResult<IdentifiedArrayOf<AccountsForDeviceFactorSource>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -27,6 +36,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		case details(PresentationAction<DisplayMnemonic.Action>)
 	}
 
+	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -49,8 +59,19 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			return .task {
 				let result = await TaskResult {
 					let sources = try await factorSourcesClient.getFactorSources(ofKind: .device)
-					let devices = try IdentifiedArrayOf(uncheckedUniqueElements: sources.map(HDOnDeviceFactorSource.init(factorSource:)))
-					return devices
+					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+					return try IdentifiedArrayOf(uniqueElements: sources.map { factorSource in
+						let accountsForSource = accounts.filter { account in
+							switch account.securityState {
+							case let .unsecured(unsecuredEntityControl):
+								return unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
+							}
+						}
+						return try AccountsForDeviceFactorSource(
+							accounts: accountsForSource,
+							deviceFactorSource: HDOnDeviceFactorSource(factorSource: factorSource)
+						)
+					})
 				}
 				return .internal(.loadedFactorSources(result))
 			}
@@ -59,9 +80,14 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadedFactorSources(.success(sources)):
-			state.deviceFactorSources = .init(uniqueElements: sources.map { .init(deviceFactorSource: $0) }, id: \.id)
+		case let .loadedFactorSources(.success(accountsForDeviceFactorSources)):
+			state.deviceFactorSources = .init(
+				uniqueElements: accountsForDeviceFactorSources.map { .init(accountsForDeviceFactorSource: $0) },
+				id: \.id
+			)
+
 			return .none
+
 		case let .loadedFactorSources(.failure(error)):
 			loggerGlobal.error("Failed to load factor source, error: \(error)")
 			errorQueue.schedule(error)

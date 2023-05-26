@@ -20,16 +20,18 @@ extension DisplayMnemonics {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					ForEachStore(
-						store.scope(
-							state: \.deviceFactorSources,
-							action: { .child(.row(id: $0, action: $1)) }
-						)
-					) {
-						DisplayMnemonicRow.View(store: $0)
+				ScrollView {
+					VStack {
+						ForEachStore(
+							store.scope(
+								state: \.deviceFactorSources,
+								action: { .child(.row(id: $0, action: $1)) }
+							)
+						) {
+							DisplayMnemonicRow.View(store: $0)
+						}
+						.padding()
 					}
-					.padding()
 				}
 				// FIXME: strings
 				.navigationTitle("Seed phrases")
