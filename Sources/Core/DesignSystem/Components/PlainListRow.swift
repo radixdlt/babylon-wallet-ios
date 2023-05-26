@@ -8,8 +8,8 @@ public struct PlainListRow<Icon: View>: View {
 	let icon: Icon
 
 	public init(
-		showChevron: Bool = true,
 		title: String,
+		showChevron: Bool = true,
 		@ViewBuilder icon: () -> Icon
 	) {
 		self.isShowingChevron = showChevron
@@ -18,13 +18,13 @@ public struct PlainListRow<Icon: View>: View {
 	}
 
 	public init(
-		showChevron: Bool = true,
+		_ content: AssetIcon.Content,
 		title: String,
-		asset: ImageAsset
+		showChevron: Bool = true
 	) where Icon == AssetIcon {
 		self.isShowingChevron = showChevron
 		self.title = title
-		self.icon = AssetIcon(asset: asset)
+		self.icon = AssetIcon(content)
 	}
 
 	public var body: some View {
@@ -73,9 +73,9 @@ extension View {
 struct PlainListRow_Previews: PreviewProvider {
 	static var previews: some View {
 		PlainListRow(
-			showChevron: true,
+			.asset(AssetResource.generalSettings),
 			title: "A title",
-			asset: AssetResource.generalSettings
+			showChevron: true
 		)
 	}
 }

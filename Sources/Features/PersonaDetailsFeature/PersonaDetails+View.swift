@@ -525,7 +525,7 @@ extension SimpleDappDetails.View {
 
 					ForEach(elements) { element in
 						Card {
-							PlainListRow(showChevron: false, title: title(element)) {
+							PlainListRow(title: title(element), showChevron: false) {
 								icon(element)
 							}
 						}
@@ -560,7 +560,7 @@ extension SimpleDappDetails.View {
 
 				ForEach(personas) { persona in
 					Card {
-						PlainListRow(showChevron: false, title: persona.displayName) {
+						PlainListRow(title: persona.displayName, showChevron: false) {
 							PersonaThumbnail(persona.thumbnail)
 						}
 					}
