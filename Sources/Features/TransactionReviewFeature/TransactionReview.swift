@@ -87,7 +87,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case rawTransactionCreated(String)
 		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
-		case showSumbitting(NotarizeTransactionResponse)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -297,11 +296,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))))):
-			state.destination = nil
-			return .task {
-				try? await clock.sleep(for: .milliseconds(700)) // bah, we need to to dismiss `state.destination` before proceeding with completion
-				return .internal(.showSumbitting(notarizedTX))
-			}
+			state.destination = .submitting(.init(notarizedTX: notarizedTX))
+			return .none
 
 		case .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(_)))))):
 			assertionFailure("Did not expect to have sign auth data...")
@@ -443,9 +439,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .rawTransactionCreated(transaction):
 			state.displayMode = .raw(transaction)
-			return .none
-		case let .showSumbitting(tx):
-			state.destination = .submitting(.init(notarizedTX: tx))
 			return .none
 		}
 	}

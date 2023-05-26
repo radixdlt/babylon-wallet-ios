@@ -1,7 +1,7 @@
 import AppPreferencesClient
+import DappInteractionClient
 import FeaturePrelude
 import GatewaysClient
-import HandleDappRequestsClient
 import RadixConnect
 import RadixConnectClient
 import RadixConnectModels
@@ -88,7 +88,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
-	@Dependency(\.dappRequestQueueClient) var dappRequestQueueClient
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -242,7 +242,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}()
 
 			do {
-				_ = try await dappRequestQueueClient.sendResponse(.response(.dapp(responseToDapp), origin: request.route))
+				_ = try await dappInteractionClient.sendResponse(.response(.dapp(responseToDapp), origin: request.route))
 				if !isTransactionResponse {
 					await send(.internal(
 						.sentResponseToDapp(
@@ -429,7 +429,7 @@ extension DappInteractor {
 
 	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
-			for try await incomingRequest in dappRequestQueueClient.requests {
+			for try await incomingRequest in dappInteractionClient.requests {
 				guard !Task.isCancelled else {
 					return
 				}

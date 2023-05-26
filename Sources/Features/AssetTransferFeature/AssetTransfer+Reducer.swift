@@ -1,6 +1,6 @@
+import DappInteractionClient
 import EngineToolkitClient
 import FeaturePrelude
-import HandleDappRequestsClient
 
 // MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, FeatureReducer {
@@ -14,7 +14,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.dappRequestQueueClient) var dappRequestQueueClient
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 	public init() {}
 
@@ -60,7 +60,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 					message: state.message?.message
 				)
 			))
-			dappRequestQueueClient.addWalletRequest(request)
+			dappInteractionClient.addWalletRequest(request)
 			return .send(.delegate(.dismissed))
 
 		case .closeButtonTapped:

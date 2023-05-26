@@ -6,15 +6,15 @@ import GatewaysClient
 import RadixConnectClient
 import SharedModels
 
-// MARK: - DappRequestQueueClient
-public struct DappRequestQueueClient: DependencyKey, Sendable {
+// MARK: - DappInteractionClient
+public struct DappInteractionClient: DependencyKey, Sendable {
 	public let requests: AnyAsyncSequence<P2P.RTCIncomingDappNonValidatedRequest>
 	public let addWalletRequest: (P2P.Dapp.Request.Items) -> Void
 	public let sendResponse: (P2P.RTCOutgoingMessage) async throws -> Void
 }
 
-extension DappRequestQueueClient {
-	public static var liveValue: DappRequestQueueClient = {
+extension DappInteractionClient {
+	public static var liveValue: DappInteractionClient = {
 		let requestsStream: AsyncPassthroughSubject<P2P.RTCIncomingDappNonValidatedRequest> = .init()
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
@@ -60,8 +60,8 @@ extension DappRequestQueueClient {
 }
 
 extension DependencyValues {
-	public var dappRequestQueueClient: DappRequestQueueClient {
-		get { self[DappRequestQueueClient.self] }
-		set { self[DappRequestQueueClient.self] = newValue }
+	public var dappInteractionClient: DappInteractionClient {
+		get { self[DappInteractionClient.self] }
+		set { self[DappInteractionClient.self] = newValue }
 	}
 }

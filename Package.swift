@@ -71,7 +71,7 @@ package.addModules([
 			"ChooseAccountsFeature",
 			"AssetsFeature",
 			"EngineToolkitClient",
-			"HandleDappRequestsClient",
+			"DappInteractionClient",
 		],
 		tests: .yes()
 	),
@@ -164,7 +164,7 @@ package.addModules([
 			"ROLAClient",
 			"TransactionReviewFeature",
 			"SigningFeature",
-			"HandleDappRequestsClient",
+			"DappInteractionClient",
 		],
 		tests: .yes()
 	),
@@ -389,7 +389,7 @@ package.addModules([
 		tests: .no
 	),
 	.client(
-		name: "HandleDappRequestsClient",
+		name: "DappInteractionClient",
 		dependencies: [
 			"RadixConnectClient",
 			"GatewaysClient",
