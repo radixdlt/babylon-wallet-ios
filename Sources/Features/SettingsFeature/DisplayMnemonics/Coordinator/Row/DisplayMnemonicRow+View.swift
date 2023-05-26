@@ -4,7 +4,7 @@ extension DisplayMnemonicRow.State {
 	var viewState: DisplayMnemonicRow.ViewState {
 		.init(
 			factorSourceID: deviceFactorSource.factorSource.id,
-			supportsOlympia: deviceFactorSource.supportsOlympia,
+			labelSeedPhraseKind: deviceFactorSource.labelSeedPhraseKind,
 			addedOn: deviceFactorSource
 				.addedOn
 				.ISO8601Format(.iso8601Date(timeZone: .current))
@@ -12,16 +12,19 @@ extension DisplayMnemonicRow.State {
 	}
 }
 
+extension HDOnDeviceFactorSource {
+	var labelSeedPhraseKind: String {
+		// FIXME: string
+		supportsOlympia ? "Legacy seed phrase" : "Main seed phrase"
+	}
+}
+
 // MARK: - DisplayMnemonicRow.View
 extension DisplayMnemonicRow {
 	public struct ViewState: Equatable {
 		let factorSourceID: FactorSourceID
-		let supportsOlympia: Bool
+		let labelSeedPhraseKind: String
 		let addedOn: String
-		var olympiaLabelOrEmpty: String {
-			guard supportsOlympia else { return "Main seed phrase" }
-			return "Legacy seed phrase"
-		}
 	}
 
 	@MainActor
@@ -37,7 +40,7 @@ extension DisplayMnemonicRow {
 				Card {
 					viewStore.send(.tapped)
 				} contents: {
-					PlainListRow(title: "\(viewStore.olympiaLabelOrEmpty) added: \(viewStore.addedOn)") {
+					PlainListRow(title: "\(viewStore.labelSeedPhraseKind) added: \(viewStore.addedOn)") {
 						EmptyView()
 					}
 				}

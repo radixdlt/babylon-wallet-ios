@@ -21,8 +21,15 @@ extension DisplayMnemonics {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					deviceFactorSourcesListView(store: store)
-						.padding()
+					ForEachStore(
+						store.scope(
+							state: \.deviceFactorSources,
+							action: { .child(.row(id: $0, action: $1)) }
+						)
+					) {
+						DisplayMnemonicRow.View(store: $0)
+					}
+					.padding()
 				}
 				// FIXME: strings
 				.navigationTitle("Seed phrases")
@@ -38,20 +45,6 @@ extension DisplayMnemonics {
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
-			}
-		}
-
-		@ViewBuilder
-		private func deviceFactorSourcesListView(
-			store: StoreOf<DisplayMnemonics>
-		) -> some SwiftUI.View {
-			ForEachStore(
-				store.scope(
-					state: \.deviceFactorSources,
-					action: { .child(.row(id: $0, action: $1)) }
-				)
-			) {
-				DisplayMnemonicRow.View(store: $0)
 			}
 		}
 	}
