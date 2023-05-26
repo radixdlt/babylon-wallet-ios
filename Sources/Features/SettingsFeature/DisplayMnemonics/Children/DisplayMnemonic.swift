@@ -22,6 +22,10 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 		case loadMnemonicResult(TaskResult<MnemonicWithPassphrase?>)
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case importMnemonic(ImportMnemonic.Action)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case failedToLoad
 	}

@@ -1,15 +1,16 @@
 import FeaturePrelude
+import ImportMnemonicFeature
 
 extension DisplayMnemonic.State {
 	var viewState: DisplayMnemonic.ViewState {
-		.init()
+		.init(isLoading: importMnemonic == nil)
 	}
 }
 
 // MARK: - DisplayMnemonic.View
 extension DisplayMnemonic {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let isLoading: Bool
 	}
 
 	@MainActor
@@ -22,11 +23,17 @@ extension DisplayMnemonic {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-
-				Text("Loading mnemonic...")
-					.onFirstTask { @MainActor in
-						await viewStore.send(.onFirstTask).finish()
+				if viewStore.isLoading {
+					Text("Loading mnemonic...")
+						.font(.largeTitle)
+						.onFirstTask { @MainActor in
+							await viewStore.send(.onFirstTask).finish()
+						}
+				} else {
+					IfLetStore(store.scope(state: \.importMnemonic, action: { .child(.importMnemonic($0)) })) {
+						ImportMnemonic.View(store: $0)
 					}
+				}
 			}
 		}
 	}
