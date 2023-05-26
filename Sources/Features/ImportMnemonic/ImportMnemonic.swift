@@ -2,35 +2,10 @@ import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
 
-// MARK: - BIP39.WordList + Sendable
-extension BIP39.WordList: @unchecked Sendable {}
-let wordsPerRow = 3
-
-// MARK: - BIP39.WordCount + Comparable
-extension BIP39.WordCount: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.rawValue < rhs.rawValue
-	}
-
-	mutating func increaseBy3() {
-		guard self != .twentyFour else {
-			assertionFailure("Invalid, cannot increase to than 24 words")
-			return
-		}
-		self = .init(rawValue: rawValue + 3)!
-	}
-
-	mutating func decreaseBy3() {
-		guard self != .twelve else {
-			assertionFailure("Invalid, cannot decrease to less than 12 words")
-			return
-		}
-		self = .init(rawValue: rawValue - 3)!
-	}
-}
-
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: Sendable, FeatureReducer {
+	public static let wordsPerRow = 3
+
 	public struct State: Sendable, Hashable {
 		public typealias Words = IdentifiedArrayOf<ImportMnemonicWord.State>
 		public var words: Words
@@ -72,8 +47,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public var mnemonic: Mnemonic? {
 			try? Mnemonic(
-				words: words.map(\.value.displayText),
-				language: language
+				words: words.compactMap(\.completeWord)
 			)
 		}
 
@@ -94,7 +68,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.isAddRowButtonEnabled = wordCount != .twentyFour
 			self.isRemoveRowButtonEnabled = wordCount != .twelve
 
-			precondition(wordCount.rawValue.isMultiple(of: wordsPerRow))
+			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
 				ImportMnemonicWord.State(id: $0)
 			})
@@ -145,16 +119,26 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .word(id, child: .delegate(.lostFocus(displayText))):
 			switch lookup(input: displayText, state) {
-			case .invalid, .partialAmongstCandidates:
-				break // => perform validation
-			case .knownAutocomplete, .knownFull, .emptyOrTooShort:
+			case .known(.ambigous), .unknown(.notInList):
+				state.words[id: id]?.value = .incomplete(text: displayText, hasFailedValidation: true)
+				return .none
+
+			case .known(.unambiguous), .unknown(.tooShort):
 				return .none
 			}
 
-			return updateWord(id: id, input: displayText, &state, lookupResult: .invalid)
-
-		case let .word(id, child: .delegate(.autocompleteWith(candidate, input))):
-			return autocompleteWithCandidate(id: id, input: input, &state, word: candidate, userPressedCandidateButtonToComplete: true)
+		case let .word(id, child: .delegate(.userSelectedCandidate(candidate, input))):
+			guard let nonEmptyString = NonEmptyString(rawValue: input) else {
+				return .none
+			}
+			return completeWith(
+				word: candidate,
+				completion: .user,
+				match: .startsWith,
+				id: id,
+				input: nonEmptyString,
+				&state
+			)
 
 		case .word(_, child: .view), .word(_, child: .internal):
 			return .none
@@ -221,19 +205,20 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 extension ImportMnemonic {
 	private func lookup(input: String, _ state: State) -> BIP39.WordList.LookupResult {
-		state.wordList.lookup(input, minLengthForPartial: 2, ignoreCandidateIfCountExceeds: 5)
+		state.wordList.lookup(input, minLengthForCandidatesLookup: 2)
 	}
 
-	private func autocompleteWithCandidate(
+	private func completeWith(
+		word: BIP39.Word,
+		completion: ImportMnemonicWord.State.WordValue.Completion,
+		match: BIP39.WordList.LookupResult.Known.UnambiguousMatch,
 		id: ImportMnemonicWord.State.ID,
-		input: String,
-		_ state: inout State,
-		word: NonEmptyString,
-		userPressedCandidateButtonToComplete: Bool
+		input: NonEmptyString,
+		_ state: inout State
 	) -> EffectTask<Action> {
 		switch state.words[id: id]?.value {
-		case let .some(.partial(partial)):
-			guard abs(input.count - partial.count) <= 1 else {
+		case let .some(.incomplete(text, _)):
+			guard abs(input.rawValue.count - text.count) <= 1 else {
 				// It is unfortunate that this is needed, perhaps just needed due to nature of current implementation... so here is what is going on:
 				// We do this to support a very special corner case where user has inputted e.g. "ret" and then "r" => "retr" which gets autocompleted
 				// into "retret", and the next field is focused. She realize the last "r" was a mistake, it is not "retret" she wanted to input, but
@@ -249,7 +234,7 @@ extension ImportMnemonic {
 		default: break
 		}
 
-		state.words[id: id]?.value = .knownAutocompleted(word, fromPartial: input, userPressedCandidateButtonToComplete: userPressedCandidateButtonToComplete)
+		state.words[id: id]?.value = .complete(text: input, word: word, match: match, completion: completion)
 		return focusNext(&state)
 	}
 
@@ -260,24 +245,31 @@ extension ImportMnemonic {
 		lookupResult: BIP39.WordList.LookupResult
 	) -> EffectTask<Action> {
 		switch lookupResult {
-		case let .partialAmongstCandidates(candidates):
-			state.words[id: id]?.autocompletionCandidates = .init(input: input, candidates: candidates)
-			state.words[id: id]?.value = .partial(input)
+		case let .known(.ambigous(candidates, nonEmptyInput)):
+			state.words[id: id]?.autocompletionCandidates = .init(input: nonEmptyInput, candidates: candidates)
+			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
 			return .none
 
-		case .emptyOrTooShort:
-			state.words[id: id]?.value = .partial(input)
+		case let .known(.unambiguous(word, match, nonEmptyInput)):
+			switch match {
+			case .startsWith:
+				return completeWith(word: word, completion: .auto, match: match, id: id, input: nonEmptyInput, &state)
+			case .exact:
+				state.words[id: id]?.value = .complete(
+					text: nonEmptyInput,
+					word: word,
+					match: match,
+					completion: .auto
+				)
+				return focusNext(&state)
+			}
+
+		case .unknown(.notInList):
+			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: true)
 			return .none
 
-		case let .knownFull(knownFull):
-			state.words[id: id]?.value = .knownFull(knownFull, fromPartial: input)
-			return focusNext(&state)
-
-		case let .knownAutocomplete(knownAutocomplete):
-			return autocompleteWithCandidate(id: id, input: input, &state, word: knownAutocomplete, userPressedCandidateButtonToComplete: false)
-
-		case .invalid:
-			state.words[id: id]?.value = .invalid(input)
+		case .unknown(.tooShort):
+			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
 			return .none
 		}
 	}
@@ -286,7 +278,7 @@ extension ImportMnemonic {
 		if let current = state.idOfWordWithTextFieldFocus {
 			state.words[id: current]?.resignFocus()
 		}
-		guard let nextID = state.words.first(where: { !$0.isValidWord })?.id else {
+		guard let nextID = state.words.first(where: { !$0.isComplete })?.id else {
 			return .none
 		}
 

@@ -4,6 +4,14 @@ import Prelude
 extension BIP39 {
 	@discardableResult
 	internal static func validateChecksumOf(
+		mnemonicWords: [BIP39.Word],
+		language: BIP39.Language
+	) throws -> [NonEmptyString] {
+		try validateChecksumOf(mnemonicWords: mnemonicWords.map(\.word), language: language)
+	}
+
+	@discardableResult
+	internal static func validateChecksumOf(
 		mnemonicWords: [NonEmptyString],
 		language: BIP39.Language
 	) throws -> [NonEmptyString] {

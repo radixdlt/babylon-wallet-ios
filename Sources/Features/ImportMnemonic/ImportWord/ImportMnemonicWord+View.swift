@@ -6,13 +6,13 @@ extension ImportMnemonicWord.State {
 	var viewState: ImportMnemonicWord.ViewState {
 		.init(
 			index: id,
-			displayText: value.displayText,
+			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
 			focusedField: focusedField,
 			validation: {
-				if self.value.isInvalid {
+				if self.value.hasFailedValidation {
 					return .invalid
-				} else if self.value.isValid {
+				} else if self.value.isComplete {
 					return .valid
 				} else {
 					return nil
@@ -42,6 +42,20 @@ extension ImportMnemonicWord {
 		let focusedField: State.Field?
 
 		let validation: Validation?
+		var wordAtIndex: String {
+			"word #\(index + 1)"
+		}
+
+		var hint: Hint? {
+			guard let validation, validation == .invalid else {
+				return nil
+			}
+			return .error("Invalid")
+		}
+
+		var showClearButton: Bool {
+			focusedField != nil
+		}
 	}
 
 	@MainActor
@@ -55,23 +69,15 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				let wordAtIndex = "word #\(viewStore.index + 1)"
+
 				AppTextField(
-					secondaryHeading: wordAtIndex,
-					placeholder: wordAtIndex,
+					secondaryHeading: viewStore.wordAtIndex,
+					placeholder: viewStore.wordAtIndex,
 					text: .init(
 						get: { viewStore.displayText },
 						set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmedInclNewlin())) }
 					),
-					hint: { () -> Hint? in
-						guard let validation = viewStore.state.validation else {
-							return nil
-						}
-						guard validation == .invalid else {
-							return nil
-						}
-						return .error("Invalid")
-					}(),
+					hint: viewStore.hint,
 					focus: .on(
 						.textField,
 						binding: viewStore.binding(
@@ -80,7 +86,7 @@ extension ImportMnemonicWord {
 						),
 						to: $focusedField
 					),
-					showClearButton: viewStore.focusedField != nil,
+					showClearButton: viewStore.showClearButton,
 					innerAccessory: {
 						if viewStore.state.validation == .valid, viewStore.focusedField == nil {
 							Image(systemName: "checkmark.seal.fill").foregroundColor(.app.green1)
@@ -100,8 +106,8 @@ extension ImportMnemonicWord {
 							ScrollView([.horizontal], showsIndicators: false) {
 								HStack {
 									ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
-										Button("\(candidate.rawValue)") {
-											viewStore.send(.autocompleteWith(candidate: candidate))
+										Button("\(candidate.word.rawValue)") {
+											viewStore.send(.userSelectedCandidate(candidate))
 										}
 										.buttonStyle(.primaryRectangular(height: .toolbarButtonHeight))
 									}

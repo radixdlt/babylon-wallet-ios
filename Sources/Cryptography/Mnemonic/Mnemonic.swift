@@ -2,7 +2,7 @@ import Prelude
 
 // MARK: - Mnemonic
 public struct Mnemonic: Sendable, Hashable {
-	public let words: [NonEmptyString]
+	public let words: NonEmptyArray<BIP39.Word>
 	public let wordCount: BIP39.WordCount
 	public let language: BIP39.Language
 
@@ -22,17 +22,40 @@ public struct Mnemonic: Sendable, Hashable {
 	}
 
 	public init(
-		words: [NonEmptyString],
+		words wordStrings: [NonEmptyString],
 		language maybeKnownLanguage: BIP39.Language?,
 		requireChecksum: Bool = true
 	) throws {
 		// Language
 		guard
-			let language = maybeKnownLanguage ?? BIP39.languageFromWords(words)
+			let language = maybeKnownLanguage ?? BIP39.languageFromWords(wordStrings)
 		else {
 			throw Error.unknownLanguage
 		}
 
+		// Wordlist
+		let wordList = BIP39.wordList(for: language)
+		guard let words = wordList.bip39Words(from: wordStrings) else {
+			throw Error.wordListDoesNotContainWord(language)
+		}
+
+		try self.init(words: words, requireChecksum: requireChecksum)
+	}
+
+	public init(
+		words wordsMaybeEmpty: [BIP39.Word],
+		requireChecksum: Bool = true
+	) throws {
+		guard let words = NonEmptyArray(rawValue: wordsMaybeEmpty) else {
+			throw Error.invalidWordCount
+		}
+		try self.init(words: words, requireChecksum: requireChecksum)
+	}
+
+	public init(
+		words: NonEmptyArray<BIP39.Word>,
+		requireChecksum: Bool = true
+	) throws {
 		// WordCount
 		guard
 			let wordCount = BIP39.WordCount(wordCount: words.count)
@@ -40,16 +63,15 @@ public struct Mnemonic: Sendable, Hashable {
 			throw Error.invalidWordCount
 		}
 
-		// Wordlist
-		let wordList = BIP39.wordList(for: language)
-		if let missingWord = wordList.missingWord(from: words) {
-			throw Error.wordListDoesNotContainWord(missingWord.rawValue, in: language)
+		let language = words[0].language
+		guard words.allSatisfy({ $0.language == language }) else {
+			throw Error.mixedLanguage
 		}
 
 		// Checksum
 		if requireChecksum {
 			try BIP39.validateChecksumOf(
-				mnemonicWords: words,
+				mnemonicWords: words.rawValue,
 				language: language
 			)
 		}
@@ -64,7 +86,7 @@ extension Mnemonic {
 	public var phrase: NonEmptyString {
 		precondition(!words.isEmpty)
 		guard let phrase = NonEmptyString(
-			rawValue: words.map(\.rawValue).joined(separator: String(Self.wordSeparator))
+			rawValue: words.map(\.word.rawValue).joined(separator: String(Self.wordSeparator))
 		) else {
 			fatalError("Expected phrase to never be empty, was `words` empty?")
 		}

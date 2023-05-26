@@ -14,7 +14,7 @@ extension ImportMnemonic.State {
 	}
 
 	var rowCount: Int {
-		words.count / wordsPerRow
+		words.count / ImportMnemonic.wordsPerRow
 	}
 }
 

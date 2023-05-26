@@ -102,7 +102,7 @@ extension ChecksummedTestVectors {
 
 		let words = mnemonic.words
 
-		guard let firstWordInVocabularyNotPresentInMnemonic = wordlist._list.first(where: { !words.contains($0) }) else {
+		guard let firstWordInVocabularyNotPresentInMnemonic = wordlist.words.first(where: { !words.contains($0) }) else {
 			return XCTFail(
 				"This is not a valid mnemonic, it is 2048 words long!",
 				file: file, line: line
@@ -112,7 +112,7 @@ extension ChecksummedTestVectors {
 		let mnemonicFirstWordReplaced: [String] = {
 			var tmp = words
 			tmp[0] = firstWordInVocabularyNotPresentInMnemonic
-			return tmp.map(\.rawValue)
+			return tmp.map(\.word.rawValue)
 
 		}()
 

@@ -25,6 +25,13 @@ extension BIP39 {
 		)
 	}
 
+	internal static func mapWordsToEntropyBitArray(
+		words mnemonicWords: some Collection<BIP39.Word>,
+		language: Language
+	) throws -> BitArray {
+		try mapWordsToEntropyBitArray(words: mnemonicWords.map(\.word), language: language)
+	}
+
 	/// This is not mapping exactly to the entropy because the mnemonic words contains a checksummed word.
 	internal static func mapWordsToEntropyBitArray(
 		words mnemonicWords: [NonEmptyString],

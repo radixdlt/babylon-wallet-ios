@@ -2,31 +2,36 @@ import Prelude
 
 // MARK: - BIP39.WordList
 extension BIP39 {
-	public struct WordList: Hashable {
-		public struct Word: Hashable {
-			public typealias Index = UInt11
-			public let word: NonEmptyString
-			public let index: Index
+	public struct Word: Sendable, Hashable, Comparable {
+		public typealias Index = UInt11
+		public let word: NonEmptyString
+		public let index: Index
+		public let language: Language
+		public static func < (lhs: Self, rhs: Self) -> Bool {
+			lhs.index < rhs.index
 		}
+	}
 
+	public struct WordList: Sendable, Hashable {
+		public typealias Word = BIP39.Word
 		public let language: Language
 		private let indexToWord: [Word.Index: Word]
 		private let wordToIndex: [NonEmptyString: Word.Index]
 
-		// used in tests
-		internal let _list: OrderedSet<NonEmptyString>
+		public let words: NonEmpty<OrderedSet<Word>>
 
 		enum Error: Swift.Error {
 			case invalidWordCount(got: Int, butExpected: Int)
 		}
 
 		public init(words wordsArrayMaybeEmpty: [String], language: Language) throws {
-			let words = try OrderedSet(validating: wordsArrayMaybeEmpty.compactMap {
+			let wordsStrings = try OrderedSet(validating: wordsArrayMaybeEmpty.compactMap {
 				NonEmptyString($0)
 			})
-			guard words.count == Self.size else {
+			assert(wordsStrings.count == wordsArrayMaybeEmpty.count)
+			guard wordsStrings.count == Self.size else {
 				throw Error.invalidWordCount(
-					got: words.count,
+					got: wordsStrings.count,
 					butExpected: Self.size
 				)
 			}
@@ -35,27 +40,30 @@ extension BIP39 {
 			var indexToWord: [Word.Index: Word] = [:]
 			var wordToIndex: [NonEmptyString: Word.Index] = [:]
 
-			for (indexInt, wordString) in words.enumerated() {
+			var words: OrderedSet<Word> = []
+			for (indexInt, wordString) in wordsStrings.enumerated() {
 				let index = Word.Index(exactly: indexInt)!
-				let word = Word(word: wordString, index: index)
+				let word = Word(word: wordString, index: index, language: language)
 				wordToIndex[wordString] = index
 				indexToWord[index] = word
+				words.append(word)
 			}
 
 			self.indexToWord = indexToWord
 			self.wordToIndex = wordToIndex
-			self._list = words
+			self.words = .init(rawValue: words)!
+			assert(words.count == wordsStrings.count)
 		}
 	}
 }
 
 extension BIP39.WordList {
-	internal func words(at indices: [Word.Index]) -> [NonEmptyString] {
+	internal func words(at indices: [Word.Index]) -> [Word] {
 		indices.map { index in
 			guard let word = self.indexToWord[index] else {
 				fatalError("Incorrect implementation, should always be able to located word at index. Index was: \(index), language: \(language)")
 			}
-			return word.word
+			return word
 		}
 	}
 
@@ -68,57 +76,94 @@ extension BIP39.WordList {
 		}
 	}
 
-	internal func missingWord(from words: [NonEmptyString]) -> NonEmptyString? {
-		for word in words {
-			if self.wordToIndex[word] == nil {
-				return word // missing
+	internal func bip39Words(from wordStrings: [NonEmptyString]) -> NonEmptyArray<Word>? {
+		guard !wordStrings.isEmpty else { return nil }
+		var words: [Word] = []
+		for wordString in wordStrings {
+			guard let word = self.words.first(where: { $0.word == wordString }) else {
+				return nil
 			}
+			words.append(word)
 		}
-		return nil // no missing
+		return NonEmpty(rawValue: words)
 	}
 
 	public enum LookupResult: Sendable, Hashable {
-		case emptyOrTooShort
-		case partialAmongstCandidates(OrderedSet<NonEmptyString>)
+		case unknown(Unknown)
+		case known(Known)
 
-		case invalid
+		public enum Unknown: Sendable, Hashable {
+			/// Text was too short (possible empty)
+			case tooShort
+			/// Text is known to **not** be in the list
+			case notInList(input: NonEmptyString)
+		}
 
-		case knownFull(NonEmptyString)
-		case knownAutocomplete(NonEmptyString)
+		public enum Known: Sendable, Hashable {
+			public enum UnambiguousMatch: Sendable, Hashable {
+				/// "zoo" **exactly** and **unambiguously** matches "zoo"
+				/// however "cat" exactly, but does **not** unambiguously, match "cat",
+				/// because "category" is another candiate.
+				case exact
+
+				/// "aban" **unambiguously** matches "abandon", but not **exactly**, it starts with.
+				case startsWith
+			}
+
+			/// We managed to unambigously identify the word, there are no other candidates which starts with the input
+			case unambiguous(BIP39.Word, match: UnambiguousMatch, input: NonEmptyString)
+
+			/// We could not unambigously identify the word, but we have some candidates
+			case ambigous(candidates: NonEmpty<OrderedSet<BIP39.Word>>, input: NonEmptyString)
+		}
 	}
 
 	public func lookup(
 		_ stringMaybeEmpty: String,
-		minLengthForPartial: Int = 2,
-		ambiguityLengthThreshold: Int = 4, // 4 for English as per BIP39
-		ignoreCandidateIfCountExceeds: Int = 5
+		minLengthForCandidatesLookup: Int = 2
 	) -> LookupResult {
-		guard let string = NonEmptyString(rawValue: stringMaybeEmpty) else {
-			return .emptyOrTooShort
-		}
-		if _list.contains(string) {
-			return .knownFull(string)
-		}
-		guard string.count >= minLengthForPartial else {
-			return .emptyOrTooShort
-		}
-		let candidates = _list.filter { $0.starts(with: string) }
-		if candidates.count == 1 {
-			return .knownAutocomplete(candidates[0])
+		guard
+			let string = NonEmptyString(rawValue: stringMaybeEmpty)
+		else {
+			return .unknown(.tooShort)
 		}
 
-		if candidates.isEmpty, string.count >= ambiguityLengthThreshold {
-			return .invalid
+		guard
+			case let _arrayOfCandidates = words.filter({ $0.word.starts(with: string) }),
+			case let _setOfCandidates = OrderedSet<BIP39.Word>.init(uncheckedUniqueElements: _arrayOfCandidates),
+			let candidates = NonEmpty<OrderedSet<BIP39.Word>>(rawValue: _setOfCandidates)
+		else {
+			if string.count >= language.numberOfCharactersWhichUnambiguouslyIdentifiesWords {
+				return .unknown(.notInList(input: string))
+			} else if string.count >= minLengthForCandidatesLookup {
+				return .unknown(.tooShort)
+			} else {
+				assertionFailure("what is this case?")
+				return .unknown(.notInList(input: string))
+			}
 		}
 
-		guard candidates.count <= ignoreCandidateIfCountExceeds else {
-			return .emptyOrTooShort
+		guard candidates.count == 1 else {
+			return .known(.ambigous(candidates: candidates, input: string))
 		}
-		return .partialAmongstCandidates(candidates)
+
+		return .known(
+			.unambiguous(
+				candidates.first,
+				match: words.contains(string) ? .exact : .startsWith,
+				input: string
+			)
+		)
 	}
 
 	internal func containsAllWords(in words: [NonEmptyString]) -> Bool {
-		missingWord(from: words) == nil
+		bip39Words(from: words) != nil
+	}
+}
+
+extension NonEmpty<OrderedSet<BIP39.Word>> {
+	func contains(_ string: NonEmptyString) -> Bool {
+		contains(where: { $0.word == string })
 	}
 }
 

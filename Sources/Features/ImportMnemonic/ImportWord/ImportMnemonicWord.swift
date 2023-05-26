@@ -4,43 +4,58 @@ import FeaturePrelude
 // MARK: - ImportMnemonicWord
 public struct ImportMnemonicWord: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public enum Field: Hashable {
+		public enum Field: Hashable, Sendable {
 			case textField
 		}
 
 		public enum WordValue: Sendable, Hashable {
-			case partial(String = "")
-			case invalid(String)
-			case knownFull(NonEmptyString, fromPartial: String)
-			case knownAutocompleted(NonEmptyString, fromPartial: String, userPressedCandidateButtonToComplete: Bool)
+			case incomplete(
+				text: String,
+				hasFailedValidation: Bool
+			)
 
-			var isValid: Bool {
+			case complete(
+				text: NonEmptyString,
+				word: BIP39.Word,
+				match: BIP39.WordList.LookupResult.Known.UnambiguousMatch,
+				completion: Completion
+			)
+
+			public enum Completion: String, Sendable, Hashable {
+				/// We automatically completed the word, since it was unambigiously identified as a BIP39 word.
+				case auto
+
+				/// User explicitly chose the word from a list of candidates.
+				case user
+			}
+
+			var isComplete: Bool {
 				switch self {
-				case .knownFull, .knownAutocompleted: return true
-				case .partial, .invalid: return false
+				case .complete: return true
+				case .incomplete: return false
 				}
 			}
 
-			var isInvalid: Bool {
-				guard case .invalid = self else {
+			var hasFailedValidation: Bool {
+				guard case let .incomplete(_, hasFailedValidation) = self else {
 					return false
 				}
-				return true
+				return hasFailedValidation
 			}
 
-			var displayText: String {
+			var text: String {
 				switch self {
-				case let .invalid(text): return text
-				case let .partial(text): return text
-				case let .knownFull(word, _): return word.rawValue
-				case let .knownAutocompleted(word, _, _): return word.rawValue
+				case let .complete(_, word, _, _):
+					return word.word.rawValue
+				case let .incomplete(text, _):
+					return text
 				}
 			}
 		}
 
 		public struct AutocompletionCandidates: Sendable, Hashable {
-			public let input: String
-			public let candidates: OrderedSet<NonEmptyString>
+			public let input: NonEmptyString
+			public let candidates: NonEmpty<OrderedSet<BIP39.Word>>
 		}
 
 		public typealias ID = Int
@@ -49,13 +64,24 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 		public var autocompletionCandidates: AutocompletionCandidates? = nil
 		public var focusedField: Field? = nil
-		public init(id: ID, value: WordValue = .partial()) {
+
+		public init(
+			id: ID,
+			value: WordValue = .incomplete(text: "", hasFailedValidation: false)
+		) {
 			self.id = id
 			self.value = value
 		}
 
-		public var isValidWord: Bool {
-			value.isValid
+		public var isComplete: Bool {
+			value.isComplete
+		}
+
+		public var completeWord: BIP39.Word? {
+			guard case let .complete(_, word, _, _) = value else {
+				return nil
+			}
+			return word
 		}
 
 		public mutating func focus() {
@@ -69,14 +95,14 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Hashable {
 		case wordChanged(input: String)
-		case autocompleteWith(candidate: NonEmptyString)
+		case userSelectedCandidate(BIP39.Word)
 		case textFieldFocused(State.Field?)
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
 		case lookupWord(input: String)
 		case lostFocus(displayText: String)
-		case autocompleteWith(candidate: NonEmptyString, fromPartial: String)
+		case userSelectedCandidate(BIP39.Word, fromPartial: String)
 	}
 
 	public init() {}
@@ -84,37 +110,39 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .wordChanged(input):
-			guard input.count >= state.value.displayText.count else {
+			guard input.count >= state.value.text.count else {
 				// We dont perform lookup when we decrease character count
 				switch state.value {
-				case .invalid, .partial:
-					state.value = .partial(input)
+				case .incomplete:
+					state.value = .incomplete(text: input, hasFailedValidation: false)
 
-				case let .knownAutocompleted(_, fromPartial, userPressedCandidateButtonToComplete) where fromPartial != input && userPressedCandidateButtonToComplete:
+				case let .complete(fromPartial, _, match: .startsWith, completion: .user) where fromPartial.rawValue != input:
 					// User explicitly chose a candidate to autocomlete
-					state.value = .partial(input)
+					state.value = .incomplete(text: input, hasFailedValidation: false)
 
-				case let .knownAutocompleted(_, fromPartial, userPressedCandidateButtonToComplete) where fromPartial != input && !userPressedCandidateButtonToComplete:
+				case let .complete(fromPartial, _, match: .startsWith, completion: .auto) where fromPartial.rawValue != input:
 					// The word was automatically autocompleted, use `fromPartial.dropLast` (since user wanted to erase one char)
-					state.value = .partial(.init(fromPartial.dropLast()))
+					state.value = .incomplete(text: .init(fromPartial.rawValue.dropLast()), hasFailedValidation: false)
 
-				case let .knownFull(_, fromPartial) where fromPartial != input:
-					state.value = .partial(input)
-				default: break
+				case let .complete(fromPartial, _, match: .exact, completion: .auto) where fromPartial.rawValue != input:
+					state.value = .incomplete(text: input, hasFailedValidation: false)
+
+				default:
+					break
 				}
 				return .none
 			}
 
 			return .send(.delegate(.lookupWord(input: input)))
 
-		case let .autocompleteWith(candidate):
-			return .send(.delegate(.autocompleteWith(
-				candidate: candidate,
-				fromPartial: state.value.displayText
+		case let .userSelectedCandidate(candidate):
+			return .send(.delegate(.userSelectedCandidate(
+				candidate,
+				fromPartial: state.value.text
 			)))
 		case let .textFieldFocused(field):
 			state.focusedField = field
-			return field == nil ? .send(.delegate(.lostFocus(displayText: state.value.displayText))) : .none
+			return field == nil ? .send(.delegate(.lostFocus(displayText: state.value.text))) : .none
 		}
 	}
 }
