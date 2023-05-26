@@ -190,13 +190,13 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 extension AlertState<AddLedgerFactorSource.Destinations.Action.LedgerAlreadyExists> {
 	static func ledgerAlreadyExists(_ ledger: LedgerFactorSource) -> AlertState {
 		AlertState {
-			TextState(L10n.AuthorizedDapps.ForgetDappAlert.title)
+			TextState("Ledger is already added") // FIXME: Strings
 		} actions: {
 			ButtonState(action: .finish(ledger)) {
-				TextState("Use this ledger")
+				TextState("Use this ledger") // FIXME: Strings
 			}
 			ButtonState(role: .cancel, action: .tryAnotherLedger) {
-				TextState("Connect another")
+				TextState("Connect another") // FIXME: Strings
 			}
 		} message: {
 			TextState("You have already added this ledger \(ledger.label.rawValue) \(ledger.description.rawValue) on \(ledger.addedOn.formatted(.dateTime)), do you want to connect another?") // FIXME: Strings
