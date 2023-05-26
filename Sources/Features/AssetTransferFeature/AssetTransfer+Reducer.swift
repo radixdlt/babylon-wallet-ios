@@ -55,7 +55,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case .sendTransferTapped:
 			do {
 				let manifest = try createManifest(state)
-				dappInteractionClient.addWalletRequest(
+				dappInteractionClient.addWalletInteraction(
 					.transaction(.init(
 						send: .init(
 							version: .default,
@@ -326,7 +326,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
 		case "[":
 			return .bytes(Data(stringLiteral: value).bytes)
 		default:
-			// UUID local id is not working properly in current version of REt
+			// UUID local id is not working properly in current version of RET
 			throw InvalidLocalID()
 		}
 	}

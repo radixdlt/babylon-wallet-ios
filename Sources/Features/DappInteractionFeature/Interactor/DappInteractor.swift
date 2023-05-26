@@ -245,7 +245,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}()
 
 			do {
-				_ = try await dappInteractionClient.sendResponse(.response(.dapp(responseToDapp), origin: request.route))
+				_ = try await dappInteractionClient.completeInteraction(.response(.dapp(responseToDapp), origin: request.route))
 				if !isTransactionResponse {
 					await send(.internal(
 						.sentResponseToDapp(
@@ -343,7 +343,7 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 extension DappInteractor {
 	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
-			for try await incomingRequest in dappInteractionClient.requests {
+			for try await incomingRequest in dappInteractionClient.interactions {
 				guard !Task.isCancelled else {
 					return
 				}

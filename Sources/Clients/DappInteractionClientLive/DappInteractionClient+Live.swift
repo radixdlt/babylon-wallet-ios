@@ -10,7 +10,7 @@ import SharedModels
 // MARK: - DappInteractionClient + DependencyKey
 extension DappInteractionClient: DependencyKey {
 	public static var liveValue: DappInteractionClient = {
-		let requestsStream: AsyncPassthroughSubject<ValidatedDappRequest> = .init()
+		let interactionsStream: AsyncPassthroughSubject<ValidatedDappRequest> = .init()
 		@Dependency(\.radixConnectClient) var radixConnectClient
 
 		Task {
@@ -20,12 +20,12 @@ extension DappInteractionClient: DependencyKey {
 				guard !Task.isCancelled else {
 					return
 				}
-				await requestsStream.send(validate(incomingRequest))
+				await interactionsStream.send(validate(incomingRequest))
 			}
 		}
 		return .init(
-			requests: requestsStream.share().eraseToAnyAsyncSequence(),
-			addWalletRequest: { items in
+			interactions: interactionsStream.share().eraseToAnyAsyncSequence(),
+			addWalletInteraction: { items in
 				let request = ValidatedDappRequest.valid(.init(
 					route: .wallet,
 					request: .init(
@@ -39,9 +39,9 @@ extension DappInteractionClient: DependencyKey {
 						)
 					)
 				))
-				requestsStream.send(request)
+				interactionsStream.send(request)
 			},
-			sendResponse: { message in
+			completeInteraction: { message in
 				switch message {
 				case let .response(response, .rtc(route)):
 					try await radixConnectClient.sendResponse(response, route)

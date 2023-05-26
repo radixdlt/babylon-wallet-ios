@@ -29,7 +29,7 @@ extension NonFungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }) { viewStore in
 			TransferNFTView(
-				name: viewStore.nftToken.id.rawValue,
+				name: viewStore.nftToken.userFacingID,
 				thumbnail: viewStore.nftToken.keyImageURL
 			)
 			.frame(height: .largeButtonHeight)

@@ -4,24 +4,24 @@ import SharedModels
 
 // MARK: - DappInteractionClient
 public struct DappInteractionClient: Sendable {
-	public let requests: AnyAsyncSequence<ValidatedDappRequest>
-	public let addWalletRequest: AddWalletRequest
-	public let sendResponse: SendResponse
+	public let interactions: AnyAsyncSequence<ValidatedDappRequest>
+	public let addWalletInteraction: AddWalletInteraction
+	public let completeInteraction: CompleteInteraction
 
 	public init(
-		requests: AnyAsyncSequence<ValidatedDappRequest>,
-		addWalletRequest: @escaping AddWalletRequest,
-		sendResponse: @escaping SendResponse
+		interactions: AnyAsyncSequence<ValidatedDappRequest>,
+		addWalletInteraction: @escaping AddWalletInteraction,
+		completeInteraction: @escaping CompleteInteraction
 	) {
-		self.requests = requests
-		self.addWalletRequest = addWalletRequest
-		self.sendResponse = sendResponse
+		self.interactions = interactions
+		self.addWalletInteraction = addWalletInteraction
+		self.completeInteraction = completeInteraction
 	}
 }
 
 extension DappInteractionClient {
-	public typealias AddWalletRequest = @Sendable (P2P.Dapp.Request.Items) -> Void
-	public typealias SendResponse = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
+	public typealias AddWalletInteraction = @Sendable (P2P.Dapp.Request.Items) -> Void
+	public typealias CompleteInteraction = @Sendable (P2P.RTCOutgoingMessage) async throws -> Void
 }
 
 extension DappInteractionClient {
