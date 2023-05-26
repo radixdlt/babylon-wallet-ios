@@ -24,6 +24,8 @@ extension DisplayMnemonics {
 					deviceFactorSourcesListView(store: store)
 						.padding()
 				}
+				// FIXME: strings
+				.navigationTitle("Seed phrases")
 				.sheet(
 					store: store.scope(
 						state: \.$displayMnemonic,

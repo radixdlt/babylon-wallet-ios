@@ -24,8 +24,8 @@ extension DisplayMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				if viewStore.isLoading {
-					Text("Loading mnemonic...")
-						.font(.largeTitle)
+					Color
+						.white
 						.onFirstTask { @MainActor in
 							await viewStore.send(.onFirstTask).finish()
 						}

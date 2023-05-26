@@ -198,7 +198,7 @@ extension SigningPurpose {
 			return .createSignAuthKey
 		#if DEBUG
 		case .signTransaction(.internalManifest(.debugModifyAccount)):
-			return .debugOnlyInspect
+			return .updateAccountMetadata
 		#endif // DEBUG
 		}
 	}
