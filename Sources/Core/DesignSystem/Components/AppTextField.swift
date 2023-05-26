@@ -93,19 +93,17 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 				}
 
 				HStack(spacing: .small2) {
-					Group {
-						TextField(
-							placeholder,
-							text: text.removeDuplicates()
-						)
-						.modifier { view in
-							if let focus {
-								view
-									.focused(focus.focusState, equals: focus.value)
-									.bind(focus.binding, to: focus.focusState)
-							} else {
-								view
-							}
+					TextField(
+						placeholder,
+						text: text.removeDuplicates()
+					)
+					.modifier { view in
+						if let focus {
+							view
+								.focused(focus.focusState, equals: focus.value)
+								.bind(focus.binding, to: focus.focusState)
+						} else {
+							view
 						}
 					}
 					.foregroundColor(.app.gray1)
