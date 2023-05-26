@@ -3,7 +3,7 @@ import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
 import GeneralSettings
-import LedgerHardwareWalletsFeature
+import LedgerHardwareDevicesFeature
 import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
@@ -58,7 +58,9 @@ extension AppSettings.View {
 			settingsView(viewStore: viewStore)
 				.navigationTitle(L10n.Settings.title)
 			#if os(iOS)
+				.navigationBarTitleColor(.app.gray1)
 				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
 				.navigationDestinations(with: destinationStore)
 				.confirmationDialog(
@@ -103,9 +105,7 @@ extension View {
 			.debugInspectProfile(with: destinationStore)
 		#endif // DEBUG
 	}
-}
 
-extension View {
 	@MainActor
 	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		navigationDestination(
@@ -172,7 +172,7 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: { LedgerHardwareWallets.View(store: $0) }
+			destination: { LedgerHardwareDevices.View(store: $0) }
 		)
 	}
 
@@ -329,7 +329,7 @@ extension AppSettings.View {
 			),
 			.init(
 				title: "Ledger Hardware Wallets", // FIXME: Strings
-				asset: AssetResource.generalSettings, // FIXME: asset
+				asset: AssetResource.ledger,
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 		]

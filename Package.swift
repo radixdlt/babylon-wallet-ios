@@ -92,7 +92,7 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "ChooseLedgerHardwareDeviceFeature",
+		name: "LedgerHardwareDevicesFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
@@ -115,7 +115,7 @@ package.addModules([
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
-			"ChooseLedgerHardwareDeviceFeature",
+			"LedgerHardwareDevicesFeature",
 			"Cryptography",
 			"DerivePublicKeysFeature",
 			"FactorSourcesClient",
@@ -220,16 +220,7 @@ package.addModules([
 			"RadixConnectClient",
 			"ImportLegacyWalletClient",
 			"DerivePublicKeysFeature",
-			"ChooseLedgerHardwareDeviceFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "LedgerHardwareWalletsFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"AddLedgerFactorSourceFeature",
-			"FactorSourcesClient",
+			"LedgerHardwareDevicesFeature",
 		],
 		tests: .no
 	),
@@ -311,13 +302,12 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
+			"DebugInspectProfileFeature",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
-			"DebugInspectProfileFeature",
-			"LedgerHardwareWalletsFeature",
 			"MnemonicClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
