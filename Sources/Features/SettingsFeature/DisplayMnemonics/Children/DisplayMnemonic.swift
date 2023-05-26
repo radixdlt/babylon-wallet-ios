@@ -54,7 +54,7 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 				loggerGlobal.error("Mnemonic was nil")
 				return .send(.delegate(.failedToLoad))
 			}
-			state.importMnemonic = .init(saveInProfile: false)
+			state.importMnemonic = .init(mnemonic: mnemonic.mnemonic)
 			return .none
 
 		case let .loadMnemonicResult(.failure(error)):

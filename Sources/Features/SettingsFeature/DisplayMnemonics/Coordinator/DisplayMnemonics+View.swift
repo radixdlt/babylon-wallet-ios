@@ -22,6 +22,7 @@ extension DisplayMnemonics {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					deviceFactorSourcesListView(store: store)
+						.padding()
 				}
 				.sheet(
 					store: store.scope(

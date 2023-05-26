@@ -19,8 +19,8 @@ extension DisplayMnemonicRow {
 		let supportsOlympia: Bool
 		let addedOn: String
 		var olympiaLabelOrEmpty: String {
-			guard supportsOlympia else { return "" }
-			return " (Olympia)"
+			guard supportsOlympia else { return "Main seed phrase" }
+			return "Legacy seed phrase"
 		}
 	}
 
@@ -37,7 +37,7 @@ extension DisplayMnemonicRow {
 				Card {
 					viewStore.send(.tapped)
 				} contents: {
-					PlainListRow(title: "Added: \(viewStore.addedOn)\(viewStore.olympiaLabelOrEmpty)") {
+					PlainListRow(title: "\(viewStore.olympiaLabelOrEmpty) added: \(viewStore.addedOn)") {
 						EmptyView()
 					}
 				}

@@ -77,6 +77,20 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				ImportMnemonicWord.State(id: $0)
 			})
 		}
+
+		public init(
+			mnemonic: Mnemonic
+		) {
+			self.saveInProfile = false
+			self.wordList = BIP39.wordList(for: mnemonic.language)
+			self.language = mnemonic.language
+			self.wordCount = mnemonic.wordCount
+			self.isAddRowButtonEnabled = false
+			self.isRemoveRowButtonEnabled = false
+			self.words = .init(uniqueElements: mnemonic.words.enumerated().map {
+				ImportMnemonicWord.State(id: $0.offset, value: .complete(text: $0.element.word.rawValue, word: $0.element, completion: .auto(match: .exact)))
+			})
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {

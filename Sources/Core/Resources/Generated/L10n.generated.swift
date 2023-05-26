@@ -330,8 +330,8 @@ public enum L10n {
       public static func creationOfEntity(_ p1: Any) -> String {
         return L10n.tr("Localizable", "biometrics_prompt_creationOfEntity", String(describing: p1), fallback: "Authenticate to create new %@ with this phone.")
       }
-      /// Validate seed phrase exists.
-      public static let importOlympiaAccounts = L10n.tr("Localizable", "biometrics_prompt_importOlympiaAccounts", fallback: "Validate seed phrase exists.")
+      /// Check if seed phrase already exists.
+      public static let importOlympiaAccounts = L10n.tr("Localizable", "biometrics_prompt_importOlympiaAccounts", fallback: "Check if seed phrase already exists.")
       /// Authenticate to sign auth chellenge with this phone.
       public static let signAuthChallenge = L10n.tr("Localizable", "biometrics_prompt_signAuthChallenge", fallback: "Authenticate to sign auth chellenge with this phone.")
       /// Authenticate to sign transaction with this phone.
