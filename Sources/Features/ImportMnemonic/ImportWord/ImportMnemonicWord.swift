@@ -15,15 +15,14 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			)
 
 			case complete(
-				text: NonEmptyString,
+				text: String, // might be empty if user pressed candidates button when empty
 				word: BIP39.Word,
-				match: BIP39.WordList.LookupResult.Known.UnambiguousMatch,
 				completion: Completion
 			)
 
-			public enum Completion: String, Sendable, Hashable {
+			public enum Completion: Sendable, Hashable {
 				/// We automatically completed the word, since it was unambigiously identified as a BIP39 word.
-				case auto
+				case auto(match: BIP39.WordList.LookupResult.Known.UnambiguousMatch)
 
 				/// User explicitly chose the word from a list of candidates.
 				case user
@@ -45,8 +44,17 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 			var text: String {
 				switch self {
-				case let .complete(_, word, _, _):
+				case let .complete(_, word, _):
 					return word.word.rawValue
+				case let .incomplete(text, _):
+					return text
+				}
+			}
+
+			var input: String {
+				switch self {
+				case let .complete(text, _, _):
+					return text
 				case let .incomplete(text, _):
 					return text
 				}
@@ -78,7 +86,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		}
 
 		public var completeWord: BIP39.Word? {
-			guard case let .complete(_, word, _, _) = value else {
+			guard case let .complete(_, word, _) = value else {
 				return nil
 			}
 			return word
@@ -110,26 +118,21 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .wordChanged(input):
-			guard input.count >= state.value.text.count else {
-				// We dont perform lookup when we decrease character count
-				switch state.value {
-				case .incomplete:
-					state.value = .incomplete(text: input, hasFailedValidation: false)
 
-				case let .complete(fromPartial, _, match: .startsWith, completion: .user) where fromPartial.rawValue != input:
-					// User explicitly chose a candidate to autocomlete
-					state.value = .incomplete(text: input, hasFailedValidation: false)
-
-				case let .complete(fromPartial, _, match: .startsWith, completion: .auto) where fromPartial.rawValue != input:
-					// The word was automatically autocompleted, use `fromPartial.dropLast` (since user wanted to erase one char)
-					state.value = .incomplete(text: .init(fromPartial.rawValue.dropLast()), hasFailedValidation: false)
-
-				case let .complete(fromPartial, _, match: .exact, completion: .auto) where fromPartial.rawValue != input:
-					state.value = .incomplete(text: input, hasFailedValidation: false)
-
-				default:
-					break
+			switch state.value {
+			case let .complete(text, _, completion: .auto(match: .startsWith)):
+				guard input != text else {
+					// This is an unfortunate edge case we need to handle (perhaps can be solved in view layer?),
+					// if text was "com" and we type "f" the word gets autocompleted into "comfort", however,
+					// SwiftUI will **immediately** afterwards emit another "comf" event. Which we wanna prevent.
+					return .none
 				}
+			default: break
+			}
+
+			guard input.count >= state.value.text.count else {
+				// We don't perform lookup when we decrease character count
+				state.value = .incomplete(text: input, hasFailedValidation: false)
 				return .none
 			}
 
