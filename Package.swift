@@ -449,21 +449,21 @@ package.addModules([
 		dependencies: [],
 		tests: .no
 	),
-        .client(
-                name: "DappInteractionClient",
-                dependencies: [],
-                tests: .no
-        ),
-        .client(
-                name: "DappInteractionClientLive",
-                dependencies: [
-                        "RadixConnectClient",
-                        "GatewaysClient",
-                        "AppPreferencesClient",
-                        "DappInteractionClient",
-                ],
-                tests: .no
-        ),
+	.client(
+		name: "DappInteractionClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "DappInteractionClientLive",
+		dependencies: [
+			"RadixConnectClient",
+			"GatewaysClient",
+			"AppPreferencesClient",
+			"DappInteractionClient",
+		],
+		tests: .no
+	),
 	.client(
 		name: "DiskPersistenceClient",
 		dependencies: [],

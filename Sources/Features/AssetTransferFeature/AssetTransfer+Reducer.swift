@@ -164,7 +164,9 @@ extension AssetTransfer {
 		))
 	}
 
-	private func extractInvolvedFungibleResources(_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) -> IdentifiedArrayOf<InvolvedFungibleResource> {
+	private func extractInvolvedFungibleResources(
+		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
+	) -> IdentifiedArrayOf<InvolvedFungibleResource> {
 		var resources: IdentifiedArrayOf<InvolvedFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
@@ -175,7 +177,10 @@ extension AssetTransfer {
 				guard let transferAmount = fungibleAsset.transferAmount else {
 					continue
 				}
-				let accountTransfer = InvolvedFungibleResource.PerAccountAmount(id: accountAddress, amount: transferAmount)
+				let accountTransfer = InvolvedFungibleResource.PerAccountAmount(
+					id: accountAddress,
+					amount: transferAmount
+				)
 
 				if resources[id: fungibleAsset.resource.resourceAddress] != nil {
 					resources[id: fungibleAsset.resource.resourceAddress]?.accounts.append(accountTransfer)
@@ -192,7 +197,9 @@ extension AssetTransfer {
 		return resources
 	}
 
-	private func extractInvolvedNonFungibleResource(_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) -> IdentifiedArrayOf<InvolvedNonFungibleResource> {
+	private func extractInvolvedNonFungibleResource(
+		_ receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>
+	) -> IdentifiedArrayOf<InvolvedNonFungibleResource> {
 		var resources: IdentifiedArrayOf<InvolvedNonFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
@@ -216,14 +223,19 @@ extension AssetTransfer {
 		return resources
 	}
 
-	private func fungibleResourceTransferInstruction(witdhrawAccount: AccountAddress, _ resource: InvolvedFungibleResource) -> [any InstructionProtocol] {
+	private func fungibleResourceTransferInstruction(
+		witdhrawAccount: AccountAddress,
+		_ resource: InvolvedFungibleResource
+	) -> [any InstructionProtocol] {
 		let accountWidthraw: [any InstructionProtocol] = [
-			CallMethod(receiver: .init(address: witdhrawAccount.address),
-			           methodName: "withdraw",
-			           arguments: [
-			           	.address(.init(address: resource.address.address)),
-			           	.decimal(.init(value: resource.totalTransferAmount.toString())),
-			           ]),
+			CallMethod(
+				receiver: .init(address: witdhrawAccount.address),
+				methodName: "withdraw",
+				arguments: [
+					.address(.init(address: resource.address.address)),
+					.decimal(.init(value: resource.totalTransferAmount.toString())),
+				]
+			),
 		]
 
 		let deposits: [any InstructionProtocol] = resource.accounts.flatMap { account in
@@ -249,24 +261,33 @@ extension AssetTransfer {
 		return accountWidthraw + deposits
 	}
 
-	private func nonFungibleResourceTransferInstruction(witdhrawAccount: AccountAddress, _ resource: InvolvedNonFungibleResource) throws -> [any InstructionProtocol] {
+	private func nonFungibleResourceTransferInstruction(
+		witdhrawAccount: AccountAddress,
+		_ resource: InvolvedNonFungibleResource
+	) throws -> [any InstructionProtocol] {
 		let accountWidthraw: [any InstructionProtocol] = try [
-			CallMethod(receiver: .init(address: witdhrawAccount.address),
-			           methodName: "withdraw_non_fungibles",
-			           arguments: [
-			           	.address(.init(address: resource.address.address)),
-			           	.array(.init(elementKind: .nonFungibleLocalId, elements: resource.allTokens.map {
-			           		try .nonFungibleLocalId($0.id.toRETLocalID())
-			           	})),
-			           ]),
+			CallMethod(
+				receiver: .init(address: witdhrawAccount.address),
+				methodName: "withdraw_non_fungibles",
+				arguments: [
+					.address(.init(address: resource.address.address)),
+					.array(.init(
+						elementKind: .nonFungibleLocalId,
+						elements: resource.allTokens.map {
+							try .nonFungibleLocalId($0.id.toRETLocalID())
+						}
+					)
+					),
+				]
+			),
 		]
 
-		let deposits: [any InstructionProtocol] = resource.accounts.flatMap { account in
+		let deposits: [any InstructionProtocol] = try resource.accounts.flatMap { account in
 			let bucket = UUID().uuidString
 
-			let instructions: [any InstructionProtocol] = [
+			let instructions: [any InstructionProtocol] = try [
 				TakeFromWorktopByIds(
-					Set(account.tokens.map { _ in .integer(15) }),
+					Set(account.tokens.map { try $0.id.toRETLocalID() }),
 					resourceAddress: .init(address: resource.address.address),
 					bucket: .init(identifier: bucket)
 				),
@@ -288,6 +309,7 @@ extension AssetTransfer {
 extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
 	struct InvalidLocalID: Error {}
 
+	// TODO: Remove once RET is migrated to `ash`, this is meant to be temporary
 	func toRETLocalID() throws -> NonFungibleLocalId {
 		guard self.rawValue.count >= 3 else {
 			throw InvalidLocalID()
