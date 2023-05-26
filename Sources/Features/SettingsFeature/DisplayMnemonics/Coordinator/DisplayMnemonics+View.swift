@@ -36,7 +36,7 @@ extension DisplayMnemonics {
 					}
 				)
 				.onFirstTask { @MainActor in
-					viewStore.send(.onFirstTask)
+					await viewStore.send(.onFirstTask).finish()
 				}
 			}
 		}

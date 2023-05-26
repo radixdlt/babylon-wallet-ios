@@ -41,7 +41,7 @@ extension DerivePublicKeys {
 					}
 				}
 				.onFirstTask { @MainActor in
-					viewStore.send(.onFirstTask)
+					await viewStore.send(.onFirstTask).finish()
 				}
 			}
 			.navigationTitle(L10n.CreateEntity.Ledger.createAccount)
