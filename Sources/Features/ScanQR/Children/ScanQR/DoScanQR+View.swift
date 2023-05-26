@@ -86,10 +86,6 @@ extension ScanQR.View {
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
-		Text(L10n.LinkedConnectors.NewConnection.title)
-			.foregroundColor(.app.gray1)
-			.textStyle(.sheetTitle)
-
 		Text(viewStore.instructions)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)

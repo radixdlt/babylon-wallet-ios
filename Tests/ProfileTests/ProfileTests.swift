@@ -64,6 +64,12 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(factorSourceID.hex(), "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
 	}
 
+	func test_factorSourceID_zoo_zoo__wrong() throws {
+		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot()).hex(), "09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo")).hex(), "537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
+	}
+
 	func test_factor_source_id_cap33() async throws {
 		let curve25519FactorSourceMnemonic = try Mnemonic(
 			phrase: "surprise jaguar gloom bring cage obey rotate fiber agree castle rich tomorrow",

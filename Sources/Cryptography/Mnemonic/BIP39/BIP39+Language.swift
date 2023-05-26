@@ -22,4 +22,17 @@ extension BIP39.Language {
 	public var description: String {
 		rawValue
 	}
+
+	/// The number of letters to unambiguously identify the word
+	/// https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#wordlist
+	public var numberOfCharactersWhichUnambiguouslyIdentifiesWords: Int {
+		switch self {
+		case .english:
+			//  - the wordlist is created in such a way that it's enough to type the first four
+			// letters to unambiguously identify the word
+			return 4
+		default:
+			return 4 // TODO: verify!
+		}
+	}
 }

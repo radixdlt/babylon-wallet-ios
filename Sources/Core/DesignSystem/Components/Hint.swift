@@ -10,6 +10,10 @@ public struct Hint: View, Equatable {
 
 	let kind: Kind
 	let text: Text
+	public init(kind: Kind, text: Text) {
+		self.kind = kind
+		self.text = text
+	}
 
 	public static func info(@ViewBuilder _ text: () -> Text) -> Self {
 		.init(kind: .info, text: text())

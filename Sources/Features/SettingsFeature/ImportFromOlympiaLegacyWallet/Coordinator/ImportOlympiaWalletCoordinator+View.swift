@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ImportMnemonicFeature
 import ImportOlympiaLedgerAccountsAndFactorSourcesFeature
 
 extension ImportOlympiaWalletCoordinator.State {
@@ -70,9 +71,9 @@ extension ImportOlympiaWalletCoordinator.Destinations {
 						then: { SelectAccountsToImport.View(store: $0) }
 					)
 					CaseLet(
-						state: /State.importOlympiaMnemonic,
-						action: Action.importOlympiaMnemonic,
-						then: { ImportOlympiaFactorSource.View(store: $0) }
+						state: /State.importMnemonic,
+						action: Action.importMnemonic,
+						then: { ImportMnemonic.View(store: $0) }
 					)
 					CaseLet(
 						state: /State.importOlympiaLedgerAccountsAndFactorSources,

@@ -1,5 +1,6 @@
 import AddLedgerFactorSourceFeature
 import FeaturePrelude
+import ImportMnemonicFeature
 
 // MARK: - ManageFactorSources
 public struct ManageFactorSources: Sendable, FeatureReducer {
@@ -15,18 +16,18 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case importOlympiaFactorSource(ImportOlympiaFactorSource.State)
+			case importMnemonic(ImportMnemonic.State)
 			case addLedger(AddLedgerFactorSource.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case importOlympiaFactorSource(ImportOlympiaFactorSource.Action)
+			case importMnemonic(ImportMnemonic.Action)
 			case addLedger(AddLedgerFactorSource.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.importOlympiaFactorSource, action: /Action.importOlympiaFactorSource) {
-				ImportOlympiaFactorSource()
+			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
+				ImportMnemonic()
 			}
 			Scope(state: /State.addLedger, action: /Action.addLedger) {
 				AddLedgerFactorSource()
@@ -37,7 +38,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 	// MARK: Action
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case importOlympiaFactorSourceButtonTapped
+		case importMnemonicButtonTapped
 		case addLedgerButtonTapped
 	}
 
@@ -74,8 +75,8 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-		case .importOlympiaFactorSourceButtonTapped:
-			state.destination = .importOlympiaFactorSource(.init(shouldPersist: true))
+		case .importMnemonicButtonTapped:
+			state.destination = .importMnemonic(.init(saveInProfile: true))
 			return .none
 		case .addLedgerButtonTapped:
 			state.destination = .addLedger(.init())
@@ -96,10 +97,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.importOlympiaFactorSource(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-		case .destination(.presented(.importOlympiaFactorSource(.delegate(.persisted)))):
+		case .destination(.presented(.importMnemonic(.delegate(.savedInProfile)))):
 			state.destination = nil
 			return .none
 
