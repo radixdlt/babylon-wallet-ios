@@ -1,5 +1,4 @@
 import FeaturePrelude
-import TransactionReviewFeature
 
 extension AssetTransfer {
 	public typealias ViewState = State
@@ -17,43 +16,37 @@ extension AssetTransfer {
 extension AssetTransfer.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-                        ScrollView {
-                                VStack(spacing: .medium3) {
-                                        headerView(viewStore)
-                                        IfLetStore(
-                                                store.scope(state: \.message, action: { .child(.message($0)) }),
-                                                then: {
-                                                        AssetTransferMessage.View(store: $0)
-                                                }
-                                        )
+			ScrollView {
+				VStack(spacing: .medium3) {
+					headerView(viewStore)
+					IfLetStore(
+						store.scope(state: \.message, action: { .child(.message($0)) }),
+						then: {
+							AssetTransferMessage.View(store: $0)
+						}
+					)
 
-                                        TransferAccountList.View(
-                                                store: store.scope(state: \.accounts, action: { .child(.accounts($0)) })
-                                        )
+					TransferAccountList.View(
+						store: store.scope(state: \.accounts, action: { .child(.accounts($0)) })
+					)
 
-                                        FixedSpacer(height: .large1)
+					FixedSpacer(height: .large1)
 
-                                        Button("Send Transfer Request") {
-                                                viewStore.send(.sendTransferTapped)
-                                        }
-                                        .buttonStyle(.primaryRectangular)
-                                        //.controlState(viewStore.canSendTransferRequest ? .enabled : .disabled)
-                                }
-                                .padding(.horizontal, .medium3)
-                                .safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
-                                        CloseButton {
-                                                viewStore.send(.closeButtonTapped)
-                                        }
-                                        .padding([.top, .leading], .medium1)
-                                        .padding(.bottom, .medium3)
-                                }
+					Button("Send Transfer Request") {
+						viewStore.send(.sendTransferTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+					// .controlState(viewStore.canSendTransferRequest ? .enabled : .disabled)
+				}
+				.padding(.horizontal, .medium3)
+				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
+					CloseButton {
+						viewStore.send(.closeButtonTapped)
+					}
+					.padding([.top, .leading], .medium1)
+					.padding(.bottom, .medium3)
+				}
 			}
-                        .sheet(
-                                store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-                                state: /AssetTransfer.Destinations.State.transactionReview,
-                                action: AssetTransfer.Destinations.Action.transactionReview,
-                                content: { TransactionReview.View(store: $0) }
-                        )
 		}
 		.scrollDismissesKeyboard(.interactively)
 		.showDeveloperDisclaimerBanner()

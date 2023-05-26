@@ -70,8 +70,8 @@ package.addModules([
 			"ScanQRFeature",
 			"ChooseAccountsFeature",
 			"AssetsFeature",
-                        "TransactionReviewFeature",
-                        "EngineToolkitClient",
+			"EngineToolkitClient",
+			"HandleDappRequestsClient",
 		],
 		tests: .yes()
 	),
@@ -164,6 +164,7 @@ package.addModules([
 			"ROLAClient",
 			"TransactionReviewFeature",
 			"SigningFeature",
+			"HandleDappRequestsClient",
 		],
 		tests: .yes()
 	),
@@ -384,6 +385,15 @@ package.addModules([
 		name: "AccountsClient",
 		dependencies: [
 			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "HandleDappRequestsClient",
+		dependencies: [
+			"RadixConnectClient",
+			"GatewaysClient",
+			"AppPreferencesClient",
 		],
 		tests: .no
 	),

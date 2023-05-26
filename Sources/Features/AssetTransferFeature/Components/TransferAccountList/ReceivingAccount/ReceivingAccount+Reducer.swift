@@ -107,18 +107,19 @@ extension ReceivingAccount.State.Account {
 		}
 	}
 
-        var address: AccountAddress {
-                switch self {
-                case let .left(account):
-                        return account.address
-                case let .right(address):
-                        return address
-                }
-        }
+	var address: AccountAddress {
+		switch self {
+		case let .left(account):
+			return account.address
+		case let .right(address):
+			return address
+		}
+	}
 }
 
+// MARK: - ReceivingAccount.State.Account + Identifiable
 extension ReceivingAccount.State.Account: Identifiable {
-        public var id: AccountAddress {
-                address
-        }
+	public var id: AccountAddress {
+		address
+	}
 }

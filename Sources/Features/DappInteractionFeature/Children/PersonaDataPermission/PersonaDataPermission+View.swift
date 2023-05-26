@@ -8,6 +8,8 @@ extension DappMetadata {
 			return ledger.name?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
 		case .request:
 			return L10n.DAppRequest.Metadata.unknownName
+		case .wallet:
+			return L10n.DAppRequest.Metadata.unknownName
 		}
 	}
 }

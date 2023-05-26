@@ -1,6 +1,7 @@
 import AppPreferencesClient
 import FeaturePrelude
 import GatewaysClient
+import HandleDappRequestsClient
 import RadixConnect
 import RadixConnectClient
 import RadixConnectModels
@@ -8,7 +9,7 @@ import ROLAClient
 
 // MARK: - RequestEnvelope
 struct RequestEnvelope: Sendable, Hashable {
-	let route: P2P.RTCRoute
+	let route: P2P.Route
 	let request: P2P.Dapp.Request
 }
 
@@ -87,6 +88,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.dappRequestQueueClient) var dappRequestQueueClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -240,7 +242,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}()
 
 			do {
-				_ = try await radixConnectClient.sendResponse(.dapp(responseToDapp), request.route)
+				_ = try await dappRequestQueueClient.sendResponse(.response(.dapp(responseToDapp), origin: request.route))
 				if !isTransactionResponse {
 					await send(.internal(
 						.sentResponseToDapp(
@@ -349,8 +351,18 @@ extension DappInteractor {
 	/// Validates a received request from Dapp.
 	func validate(
 		_ nonValidated: P2P.Dapp.RequestUnvalidated,
-		route: P2P.RTCRoute
+		route: P2P.Route
 	) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
+		if case .wallet = route {
+			return (.valid(.init(
+				route: route,
+				request: .init(
+					id: nonValidated.id,
+					items: nonValidated.items,
+					metadata: .previewValue
+				)
+			)), true)
+		}
 		let nonvalidatedMeta = nonValidated.metadata
 		let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
 		let outcome: DappRequestValidationOutcome = await {
@@ -417,12 +429,11 @@ extension DappInteractor {
 
 	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
-			_ = await radixConnectClient.loadFromProfileAndConnectAll()
-
-			for try await incomingRequest in await radixConnectClient.receiveRequests(/P2P.RTCMessageFromPeer.Request.dapp) {
+			for try await incomingRequest in dappRequestQueueClient.requests {
 				guard !Task.isCancelled else {
 					return
 				}
+
 				do {
 					let requestToValidate = try incomingRequest.result.get()
 					let validation = await validate(requestToValidate, route: incomingRequest.route)
