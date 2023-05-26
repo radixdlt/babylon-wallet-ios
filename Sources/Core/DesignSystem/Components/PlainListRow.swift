@@ -22,17 +22,9 @@ public struct PlainListRow<Icon: View>: View {
 		title: String,
 		asset: ImageAsset
 	) where Icon == AssetIcon {
-		self.init(showChevron: showChevron, title: title, image: .init(asset: asset))
-	}
-
-	public init(
-		showChevron: Bool = true,
-		title: String,
-		image: Image
-	) where Icon == AssetIcon {
 		self.isShowingChevron = showChevron
 		self.title = title
-		self.icon = AssetIcon(image: image)
+		self.icon = AssetIcon(asset: asset)
 	}
 
 	public var body: some View {

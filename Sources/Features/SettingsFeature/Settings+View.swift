@@ -229,26 +229,28 @@ extension View {
 extension AppSettings.View {
 	struct RowModel: Identifiable {
 		var id: String { title }
+
 		let title: String
 		let subtitle: String?
-		let image: Image
+		let asset: ImageAsset
 		let action: AppSettings.ViewAction
 
-		init(title: String, subtitle: String? = nil, image: Image, action: AppSettings.ViewAction) {
+		init(
+			title: String,
+			subtitle: String? = nil,
+			asset: ImageAsset,
+			action: AppSettings.ViewAction
+		) {
 			self.title = title
 			self.subtitle = subtitle
-			self.image = image
+			self.asset = asset
 			self.action = action
-		}
-
-		init(title: String, subtitle: String? = nil, asset: ImageAsset, action: AppSettings.ViewAction) {
-			self.init(title: title, subtitle: subtitle, image: .init(asset: asset), action: action)
 		}
 	}
 
 	@MainActor
 	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
-		VStack(spacing: 0) {
+		VStack(spacing: .zero) {
 			ScrollView {
 				VStack(spacing: .zero) {
 					if viewStore.shouldShowAddP2PLinkButton {
@@ -259,7 +261,7 @@ extension AppSettings.View {
 					}
 
 					ForEach(settingsRows()) { row in
-						PlainListRow(title: row.title, image: row.image)
+						PlainListRow(title: row.title, asset: row.asset)
 							.tappable {
 								viewStore.send(row.action)
 							}
@@ -342,18 +344,19 @@ extension AppSettings.View {
 				action: .importFromOlympiaWalletButtonTapped
 			),
 			.init(
-				title: "Factor sources",
-				image: Image(systemName: "person.badge.key"),
+				title: "Factor sources", // ONLY DEBUG EVER
+				asset: AssetResource.ellipsis,
 				action: .factorSourcesButtonTapped
 			),
 			.init(
-				title: "Inspect profile",
-				image: Image(systemName: "wallet.pass"),
+				title: "Inspect profile", // ONLY DEBUG EVER
+				asset: AssetResource.ellipsis,
 				action: .debugInspectProfileButtonTapped
 			),
 			.init(
+				// FIXME: strings
 				title: "Seed phrases",
-				image: Image(systemName: "person.badge.key"),
+				asset: AssetResource.ellipsis,
 				action: .mnemonicsButtonTapped
 			),
 		])
