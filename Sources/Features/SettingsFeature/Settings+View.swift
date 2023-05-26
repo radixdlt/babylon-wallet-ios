@@ -352,7 +352,7 @@ extension AppSettings.View {
 				action: .debugInspectProfileButtonTapped
 			),
 			.init(
-				title: "Mnemonics",
+				title: "Seed phrases",
 				image: Image(systemName: "person.badge.key"),
 				action: .mnemonicsButtonTapped
 			),
