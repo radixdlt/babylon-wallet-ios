@@ -2,7 +2,7 @@ import FeaturePrelude
 
 extension DisplayMnemonics.State {
 	var viewState: DisplayMnemonics.ViewState {
-		.init()
+		.init(deviceFactorSources: $deviceFactorSources)
 	}
 }
 
@@ -10,6 +10,7 @@ extension DisplayMnemonics.State {
 extension DisplayMnemonics {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
+		let deviceFactorSources: Loadable<NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>>
 	}
 
 	@MainActor
@@ -22,13 +23,41 @@ extension DisplayMnemonics {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: DisplayMnemonics")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack {
+					deviceFactorSourcesListView(viewStore: viewStore)
+				}
+				.onFirstTask { @MainActor in
+					viewStore.send(.onFirstTask)
+				}
 			}
 		}
+
+		@ViewBuilder
+		private func deviceFactorSourcesListView(viewStore: ViewStoreOf<DisplayMnemonics>) -> some SwiftUI.View {
+			switch viewStore.deviceFactorSources {
+			case .idle, .loading:
+				EmptyView()
+			case let .failure(error):
+				Text("Failed to load factor sources: \(String(describing: error))")
+			case let .success(deviceFactorSources):
+				ForEach(deviceFactorSources) { deviceFactorSource in
+					DeviceFactorSourceRowView(deviceFactorSource: deviceFactorSource)
+				}
+			}
+		}
+	}
+}
+
+// MARK: - DeviceFactorSourceRowView
+struct DeviceFactorSourceRowView: SwiftUI.View {
+	let deviceFactorSource: HDOnDeviceFactorSource
+	private var olympiaLabelOrEmpty: String {
+		guard deviceFactorSource.supportsOlympia else { return "" }
+		return " (Olympia)"
+	}
+
+	var body: some SwiftUI.View {
+		Text("Mnemonic: added \(deviceFactorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current)))\(olympiaLabelOrEmpty)")
 	}
 }
 

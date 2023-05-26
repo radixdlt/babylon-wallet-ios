@@ -165,6 +165,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
 				DisplayMnemonics()
+					._printChanges()
 			}
 			#endif
 		}
