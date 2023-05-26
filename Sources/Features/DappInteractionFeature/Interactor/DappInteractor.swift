@@ -7,11 +7,7 @@ import RadixConnectClient
 import RadixConnectModels
 import ROLAClient
 
-// MARK: - RequestEnvelope
-struct RequestEnvelope: Sendable, Hashable {
-	let route: P2P.Route
-	let request: P2P.Dapp.Request
-}
+typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
 // MARK: - DappInteractor
 struct DappInteractor: Sendable, FeatureReducer {
@@ -52,7 +48,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case failedToSendResponseToDapp(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
 		case presentResponseFailureAlert(P2P.Dapp.Response, for: RequestEnvelope, DappMetadata, reason: String)
 		case presentResponseSuccessView(DappMetadata)
-		case presentInvalidRequest(DappRequestValidationOutcome.Invalid, isDeveloperModeEnabled: Bool)
+		case presentInvalidRequest(DappInteractionClient.ValidatedDappRequest.Invalid, isDeveloperModeEnabled: Bool)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -273,23 +269,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - DappRequestValidationOutcome
-enum DappRequestValidationOutcome: Sendable, Hashable {
-	case valid(RequestEnvelope)
-	case invalid(Invalid)
-	enum Invalid: Sendable, Hashable {
-		case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)
-		case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
-		case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
-		case invalidOrigin(invalidURLString: String)
-		case badContent(BadContent)
-		enum BadContent: Sendable, Hashable {
-			case numberOfAccountsInvalid
-		}
-	}
-}
-
-extension DappRequestValidationOutcome.Invalid {
+extension DappInteractionClient.ValidatedDappRequest.Invalid {
 	var subtitle: String {
 		switch self {
 		case .badContent(.numberOfAccountsInvalid):
@@ -302,6 +282,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return "Invalid dAppDefinitionAddress"
 		case .wrongNetworkID:
 			return "Network mismatch"
+		case .p2pError:
+			return "P2P connection error"
 		}
 	}
 
@@ -328,6 +310,8 @@ extension DappRequestValidationOutcome.Invalid {
 			return "'\(invalidURLString)' is not valid origin."
 		case .wrongNetworkID:
 			return shortExplaination
+		case let .p2pError(message):
+			return message
 		}
 	}
 
@@ -343,90 +327,13 @@ extension DappRequestValidationOutcome.Invalid {
 			return "Invalid origin"
 		case let .wrongNetworkID(ce, wallet):
 			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
+		case .p2pError:
+			return "P2P connection error"
 		}
 	}
 }
 
 extension DappInteractor {
-	/// Validates a received request from Dapp.
-	func validate(
-		_ nonValidated: P2P.Dapp.RequestUnvalidated,
-		route: P2P.Route
-	) async -> (outcome: DappRequestValidationOutcome, isDeveloperModeEnabled: Bool) {
-		if case .wallet = route {
-			return (.valid(.init(
-				route: route,
-				request: .init(
-					id: nonValidated.id,
-					items: nonValidated.items,
-					metadata: .previewValue
-				)
-			)), true)
-		}
-		let nonvalidatedMeta = nonValidated.metadata
-		let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
-		let outcome: DappRequestValidationOutcome = await {
-			guard P2P.Dapp.currentVersion == nonvalidatedMeta.version else {
-				return .invalid(.incompatibleVersion(connectorExtensionSent: nonvalidatedMeta.version, walletUses: P2P.Dapp.currentVersion))
-			}
-			let currentNetworkID = await gatewaysClient.getCurrentNetworkID()
-			guard currentNetworkID == nonValidated.metadata.networkId else {
-				return .invalid(.wrongNetworkID(connectorExtensionSent: nonvalidatedMeta.networkId, walletUses: currentNetworkID))
-			}
-
-			let dappDefinitionAddress: DappDefinitionAddress
-			do {
-				dappDefinitionAddress = try DappDefinitionAddress(
-					address: nonValidated.metadata.dAppDefinitionAddress
-				)
-			} catch {
-				return .invalid(.invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: nonvalidatedMeta.dAppDefinitionAddress))
-			}
-
-			if case let .request(readRequest) = nonValidated.items {
-				switch readRequest {
-				case let .authorized(authorized):
-					if authorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-						return .invalid(.badContent(.numberOfAccountsInvalid))
-					}
-					if authorized.ongoingAccounts?.numberOfAccounts.isValid == false {
-						return .invalid(.badContent(.numberOfAccountsInvalid))
-					}
-				case let .unauthorized(unauthorized):
-					if unauthorized.oneTimeAccounts?.numberOfAccounts.isValid == false {
-						return .invalid(.badContent(.numberOfAccountsInvalid))
-					}
-				}
-			}
-
-			guard
-				let originURL = URL(string: nonvalidatedMeta.origin),
-				let nonEmptyOriginURLString = NonEmptyString(rawValue: nonvalidatedMeta.origin)
-			else {
-				return .invalid(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin))
-			}
-			let origin = DappOrigin(urlString: nonEmptyOriginURLString, url: originURL)
-
-			let metadataValidDappDefAddres = P2P.Dapp.Request.Metadata(
-				version: nonvalidatedMeta.version,
-				networkId: nonvalidatedMeta.networkId,
-				origin: origin,
-				dAppDefinitionAddress: dappDefinitionAddress
-			)
-
-			return .valid(.init(
-				route: route,
-				request: .init(
-					id: nonValidated.id,
-					items: nonValidated.items,
-					metadata: metadataValidDappDefAddres
-				)
-			))
-		}()
-
-		return (outcome, isDeveloperModeEnabled)
-	}
-
 	func handleIncomingRequests() -> EffectTask<Action> {
 		.run { send in
 			for try await incomingRequest in dappInteractionClient.requests {
@@ -434,21 +341,14 @@ extension DappInteractor {
 					return
 				}
 
-				do {
-					let requestToValidate = try incomingRequest.result.get()
-					let validation = await validate(requestToValidate, route: incomingRequest.route)
-					switch validation.outcome {
-					case let .valid(requestEnvelop):
-						await send(.internal(.receivedRequestFromDapp(
-							requestEnvelop
-						)))
-
-					case let .invalid(invalid):
-						await send(.internal(.presentInvalidRequest(invalid, isDeveloperModeEnabled: validation.isDeveloperModeEnabled)))
-					}
-				} catch {
-					loggerGlobal.error("Received message contans error: \(error.localizedDescription)")
-					errorQueue.schedule(error)
+				switch incomingRequest {
+				case let .valid(requestEnvelope):
+					await send(.internal(.receivedRequestFromDapp(
+						requestEnvelope
+					)))
+				case let .invalid(invalid):
+					let isDeveloperModeEnabled = await appPreferencesClient.getPreferences().security.isDeveloperModeEnabled
+					await send(.internal(.presentInvalidRequest(invalid, isDeveloperModeEnabled: isDeveloperModeEnabled)))
 				}
 			}
 		} catch: { error, _ in
