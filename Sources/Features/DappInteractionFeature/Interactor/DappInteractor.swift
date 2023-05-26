@@ -132,7 +132,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
-			state.requestQueue.append(request)
+			if request.route == .wallet {
+				// dismiss current request, wallet request takes precedence
+				state.currentModal = nil
+				state.requestQueue.insert(request, at: 0)
+			} else {
+				state.requestQueue.append(request)
+			}
+
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case .presentQueuedRequestIfNeeded:

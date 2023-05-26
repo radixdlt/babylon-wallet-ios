@@ -1,9 +1,5 @@
-import AppPreferencesClient
 import AsyncExtensions
 import ClientPrelude
-import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
-import GatewaysClient
-import RadixConnectClient
 import SharedModels
 
 // MARK: - DappInteractionClient
