@@ -336,7 +336,7 @@ extension AppSettings.View {
 
 		#if DEBUG
 		models.append(contentsOf: [
-			RowModel(
+			.init(
 				title: L10n.Settings.importFromLegacyWallet,
 				asset: AssetResource.generalSettings,
 				action: .importFromOlympiaWalletButtonTapped
@@ -400,15 +400,13 @@ extension ConnectExtensionView {
 				.multilineTextAlignment(.center)
 				.padding(.horizontal, .medium2)
 
-			Button(L10n.Settings.LinkToConnectorHeader.linkToConnector) {
-				action()
-			}
-			.buttonStyle(.secondaryRectangular(
-				shouldExpand: true,
-				image: .init(asset: AssetResource.qrCodeScanner)
-			)
-			)
-			.padding([.bottom, .horizontal], .medium1)
+			Button(L10n.Settings.LinkToConnectorHeader.linkToConnector, action: action)
+				.buttonStyle(.secondaryRectangular(
+					shouldExpand: true,
+					image: .init(asset: AssetResource.qrCodeScanner)
+				)
+				)
+				.padding([.bottom, .horizontal], .medium1)
 		}
 		.background(Color.app.gray5)
 		.cornerRadius(.medium3)

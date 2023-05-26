@@ -18,7 +18,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
-	let isReadonlyMode: Bool
 	let primaryHeading: String?
 	let secondaryHeading: String?
 	let placeholder: String
@@ -30,7 +29,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let innerAccesory: InnerAccessory
 
 	public init(
-		isReadonlyMode: Bool = false,
 		primaryHeading: String? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
@@ -41,7 +39,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) {
-		self.isReadonlyMode = isReadonlyMode
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
 		self.placeholder = placeholder
@@ -54,7 +51,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	}
 
 	public init(
-		isReadonlyMode: Bool = false,
 		primaryHeading: String? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
@@ -64,7 +60,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		@ViewBuilder accessory: () -> Accessory = { EmptyView() },
 		@ViewBuilder innerAccessory: () -> InnerAccessory = { EmptyView() }
 	) where FocusValue == Never {
-		self.isReadonlyMode = isReadonlyMode
 		self.primaryHeading = primaryHeading
 		self.secondaryHeading = secondaryHeading
 		self.placeholder = placeholder
@@ -99,22 +94,17 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 				HStack(spacing: .small2) {
 					Group {
-						if isReadonlyMode {
-							Text(text.wrappedValue)
-								.frame(maxWidth: .infinity)
-						} else {
-							TextField(
-								placeholder,
-								text: text.removeDuplicates()
-							)
-							.modifier { view in
-								if let focus {
-									view
-										.focused(focus.focusState, equals: focus.value)
-										.bind(focus.binding, to: focus.focusState)
-								} else {
-									view
-								}
+						TextField(
+							placeholder,
+							text: text.removeDuplicates()
+						)
+						.modifier { view in
+							if let focus {
+								view
+									.focused(focus.focusState, equals: focus.value)
+									.bind(focus.binding, to: focus.focusState)
+							} else {
+								view
 							}
 						}
 					}
@@ -123,7 +113,6 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 					.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
 					if
-						!isReadonlyMode,
 						showClearButton,
 						!text.wrappedValue.isEmpty
 					{
@@ -205,10 +194,11 @@ struct AppTextFieldPreview: View {
 			placeholder: "Placeholder",
 			text: $text,
 			hint: .error("Hint"),
-			focus: .on(.field, binding: $focus, to: $focusState)
-		) {
-			Image(asset: AssetResource.trash).frame(.small)
-		}
+			focus: .on(.field, binding: $focus, to: $focusState),
+			innerAccessory: {
+				Image(asset: AssetResource.trash).frame(.small)
+			}
+		)
 	}
 }
 #endif

@@ -23,11 +23,6 @@ extension ImportMnemonicWord.State {
 	}
 }
 
-// MARK: - ImportMnemonicWordField
-public struct ImportMnemonicWordField: Sendable, Hashable {
-	public let id: ImportMnemonicWord.State.ID
-}
-
 // MARK: - Validation
 enum Validation: Sendable, Hashable {
 	case invalid
@@ -58,6 +53,10 @@ extension ImportMnemonicWord {
 		var showClearButton: Bool {
 			focusedField != nil
 		}
+
+		var displayValidAccessory: Bool {
+			!isReadonlyMode && validation == .valid && focusedField == nil
+		}
 	}
 
 	@MainActor
@@ -71,9 +70,7 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-
 				AppTextField(
-					isReadonlyMode: viewStore.isReadonlyMode,
 					secondaryHeading: viewStore.wordAtIndex,
 					placeholder: viewStore.wordAtIndex,
 					text: .init(
@@ -91,11 +88,12 @@ extension ImportMnemonicWord {
 					),
 					showClearButton: viewStore.showClearButton,
 					innerAccessory: {
-						if !viewStore.isReadonlyMode, viewStore.state.validation == .valid, viewStore.focusedField == nil {
+						if viewStore.displayValidAccessory {
 							Image(systemName: "checkmark.seal.fill").foregroundColor(.app.green1)
 						}
 					}
 				)
+				.disabled(viewStore.isReadonlyMode)
 				.minimumScaleFactor(0.9)
 				.keyboardType(.alphabet)
 				.textInputAutocapitalization(.never)
