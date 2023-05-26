@@ -2,16 +2,13 @@ import FeaturePrelude
 
 extension DisplayMnemonics.State {
 	var viewState: DisplayMnemonics.ViewState {
-		.init(deviceFactorSources: $deviceFactorSources)
+		.init()
 	}
 }
 
 // MARK: - DisplayMnemonics.View
 extension DisplayMnemonics {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-		let deviceFactorSources: Loadable<NonEmpty<IdentifiedArrayOf<HDOnDeviceFactorSource>>>
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -24,7 +21,7 @@ extension DisplayMnemonics {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					deviceFactorSourcesListView(viewStore: viewStore)
+					deviceFactorSourcesListView(store: store)
 				}
 				.onFirstTask { @MainActor in
 					viewStore.send(.onFirstTask)
@@ -33,31 +30,18 @@ extension DisplayMnemonics {
 		}
 
 		@ViewBuilder
-		private func deviceFactorSourcesListView(viewStore: ViewStoreOf<DisplayMnemonics>) -> some SwiftUI.View {
-			switch viewStore.deviceFactorSources {
-			case .idle, .loading:
-				EmptyView()
-			case let .failure(error):
-				Text("Failed to load factor sources: \(String(describing: error))")
-			case let .success(deviceFactorSources):
-				ForEach(deviceFactorSources) { deviceFactorSource in
-					DeviceFactorSourceRowView(deviceFactorSource: deviceFactorSource)
-				}
+		private func deviceFactorSourcesListView(
+			store: StoreOf<DisplayMnemonics>
+		) -> some SwiftUI.View {
+			ForEachStore(
+				store.scope(
+					state: \.deviceFactorSources,
+					action: { .child(.row(id: $0, action: $1)) }
+				)
+			) {
+				DisplayMnemonicRow.View(store: $0)
 			}
 		}
-	}
-}
-
-// MARK: - DeviceFactorSourceRowView
-struct DeviceFactorSourceRowView: SwiftUI.View {
-	let deviceFactorSource: HDOnDeviceFactorSource
-	private var olympiaLabelOrEmpty: String {
-		guard deviceFactorSource.supportsOlympia else { return "" }
-		return " (Olympia)"
-	}
-
-	var body: some SwiftUI.View {
-		Text("Mnemonic: added \(deviceFactorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current)))\(olympiaLabelOrEmpty)")
 	}
 }
 
