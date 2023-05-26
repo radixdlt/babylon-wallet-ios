@@ -204,16 +204,26 @@ extension SecureStorageClient: DependencyKey {
 					case let .createEntity(kind):
 						let entityKindName = kind == .account ? L10n.Common.account : L10n.Common.persona
 						return L10n.Biometrics.Prompt.creationOfEntity(entityKindName)
-					case .signTransaction: return L10n.Biometrics.Prompt.signTransaction
-					case .signAuthChallenge: return L10n.Biometrics.Prompt.signAuthChallenge
-					case .createSignAuthKey: return "Create Auth signing key"
-					#if DEBUG
-					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
-					#endif
+					case .signTransaction:
+						return L10n.Biometrics.Prompt.signTransaction
+					case .signAuthChallenge:
+						return L10n.Biometrics.Prompt.signAuthChallenge
+					case .displaySeedPhrase:
+						// FIXME: strings
+						return "Display seed phrase"
+					case .createSignAuthKey:
+						// FIXME: strings
+						return "Create Auth signing key"
 					case .importOlympiaAccounts:
-						return L10n.Biometrics.Prompt.importOlympiaAccounts
+						// FIXME: strings
+						return "Check if seed phrase already exists"
 					case .checkingAccounts:
+						// FIXME: strings
 						return "Checking accounts."
+
+					case .updateAccountMetadata:
+						// This is debug only... for now.
+						return "Update account metadata"
 					}
 				}()
 				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."

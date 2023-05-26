@@ -157,6 +157,15 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "DebugInspectProfileFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"RadixConnectModels",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DerivePublicKeysFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -207,7 +216,8 @@ package.addModules([
 		name: "ImportMnemonicFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
-			"FactorSourcesClient", // saves into profile, if specified
+			"FactorSourcesClient", // saves into profile, if specified,
+			"MnemonicClient",
 		],
 		tests: .no
 	),
@@ -220,13 +230,6 @@ package.addModules([
 			"ImportLegacyWalletClient",
 			"DerivePublicKeysFeature",
 			"LedgerHardwareDevicesFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "InspectProfileFeature",
-		dependencies: [
-			"SecureStorageClient",
 		],
 		tests: .no
 	),
@@ -308,14 +311,13 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
+			"DebugInspectProfileFeature",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
 			"ImportMnemonicFeature",
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
-			"InspectProfileFeature",
-			"MnemonicClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
 			"RadixConnectClient",

@@ -8,8 +8,8 @@ import P2PLinksFeature
 import PersonasFeature
 import ProfileBackupsFeature
 #if DEBUG
+import DebugInspectProfileFeature
 import EngineToolkit // read RET commit hash
-import InspectProfileFeature
 import RadixConnectModels // read signaling client url
 import SecureStorageClient
 #endif
@@ -27,8 +27,6 @@ extension AppSettings {
 
 	public struct ViewState: Equatable {
 		#if DEBUG
-		let isDebugProfileViewSheetPresented: Bool
-		let profileToInspect: Profile?
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
@@ -36,8 +34,6 @@ extension AppSettings {
 
 		init(state: AppSettings.State) {
 			#if DEBUG
-			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
-			self.profileToInspect = state.profileToInspect
 			let retCommitHash: String = {
 				do {
 					return try EngineToolkit().information().get().lastCommitHash
@@ -72,9 +68,6 @@ extension AppSettings.View {
 					state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
 					action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
 				)
-			#if DEBUG
-				.inspectProfile(with: viewStore)
-			#endif
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}
@@ -98,8 +91,6 @@ extension View {
 	@MainActor
 	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		self
-			.importFromOlympiaLegacyWallet(with: destinationStore)
-			.factorSources(with: destinationStore)
 			.manageP2PLinks(with: destinationStore)
 			.gatewaySettings(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
@@ -107,26 +98,12 @@ extension View {
 			.generalSettings(with: destinationStore)
 			.profileBackups(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
-	}
-
-	@MainActor
-	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
-			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
-			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func factorSources(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.manageFactorSources,
-			action: AppSettings.Destinations.Action.manageFactorSources,
-			destination: { ManageFactorSources.View(store: $0) }
-		)
+		#if DEBUG
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.mnemonics(with: destinationStore)
+			.factorSources(with: destinationStore)
+			.debugInspectProfile(with: destinationStore)
+		#endif // DEBUG
 	}
 
 	@MainActor
@@ -201,24 +178,49 @@ extension View {
 
 	#if DEBUG
 	@MainActor
-	fileprivate func inspectProfile(with viewStore: ViewStoreOf<AppSettings>) -> some View {
-		navigationDestination(
-			isPresented: viewStore.binding(
-				get: \.isDebugProfileViewSheetPresented,
-				send: { .setDebugProfileSheet(isPresented: $0) }
-			)
-		) {
-			if let profile = viewStore.profileToInspect {
-				ProfileView(
-					profile: profile,
-					// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-					secureStorageClient: SecureStorageClient.liveValue
-				)
-			} else {
-				Text(L10n.Settings.noProfileText)
-			}
-		}
+	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
+			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
+			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
+		)
 	}
+
+	@MainActor
+	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.mnemonics,
+			action: AppSettings.Destinations.Action.mnemonics,
+			destination: { DisplayMnemonics.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func factorSources(
+		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.debugManageFactorSources,
+			action: AppSettings.Destinations.Action.debugManageFactorSources,
+			destination: { ManageFactorSources.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func debugInspectProfile(
+		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.debugInspectProfile,
+			action: AppSettings.Destinations.Action.debugInspectProfile,
+			destination: { DebugInspectProfile.View(store: $0) }
+		)
+	}
+
 	#endif
 }
 
@@ -227,12 +229,18 @@ extension View {
 extension AppSettings.View {
 	struct RowModel: Identifiable {
 		var id: String { title }
+
 		let title: String
 		let subtitle: String?
 		let asset: ImageAsset
 		let action: AppSettings.ViewAction
 
-		init(title: String, subtitle: String? = nil, asset: ImageAsset, action: AppSettings.ViewAction) {
+		init(
+			title: String,
+			subtitle: String? = nil,
+			asset: ImageAsset,
+			action: AppSettings.ViewAction
+		) {
 			self.title = title
 			self.subtitle = subtitle
 			self.asset = asset
@@ -242,7 +250,7 @@ extension AppSettings.View {
 
 	@MainActor
 	private func settingsView(viewStore: ViewStoreOf<AppSettings>) -> some View {
-		VStack(spacing: 0) {
+		VStack(spacing: .zero) {
 			ScrollView {
 				VStack(spacing: .zero) {
 					if viewStore.shouldShowAddP2PLinkButton {
@@ -251,32 +259,6 @@ extension AppSettings.View {
 						}
 						.padding(.medium3)
 					}
-
-					#if DEBUG
-					PlainListRow(title: L10n.Settings.inspectProfile) {
-						Image(systemName: "wallet.pass")
-							.frame(.verySmall)
-					}
-					.tappable {
-						viewStore.send(.debugInspectProfileButtonTapped)
-					}
-					.withSeparator
-
-					PlainListRow(title: "Factor Sources") {
-						Image(systemName: "person.badge.key")
-							.frame(.verySmall)
-					}
-					.tappable {
-						viewStore.send(.factorSourcesButtonTapped)
-					}
-					.withSeparator
-
-					PlainListRow(title: L10n.Settings.importFromLegacyWallet, asset: AssetResource.generalSettings)
-						.tappable {
-							viewStore.send(.importFromOlympiaWalletButtonTapped)
-						}
-						.withSeparator
-					#endif
 
 					ForEach(settingsRows()) { row in
 						PlainListRow(title: row.title, asset: row.asset)
@@ -315,7 +297,7 @@ extension AppSettings.View {
 
 	@MainActor
 	private func settingsRows() -> [RowModel] {
-		[
+		var models: [RowModel] = [
 			.init(
 				title: L10n.Settings.linkedConnectors,
 				asset: AssetResource.desktopConnections,
@@ -353,6 +335,34 @@ extension AppSettings.View {
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 		]
+
+		#if DEBUG
+		models.append(contentsOf: [
+			.init(
+				title: L10n.Settings.importFromLegacyWallet,
+				asset: AssetResource.generalSettings,
+				action: .importFromOlympiaWalletButtonTapped
+			),
+			.init(
+				title: "Factor sources", // ONLY DEBUG EVER
+				asset: AssetResource.ellipsis,
+				action: .factorSourcesButtonTapped
+			),
+			.init(
+				title: "Inspect profile", // ONLY DEBUG EVER
+				asset: AssetResource.ellipsis,
+				action: .debugInspectProfileButtonTapped
+			),
+			.init(
+				// FIXME: strings
+				title: "Seed phrases",
+				asset: AssetResource.ellipsis,
+				action: .mnemonicsButtonTapped
+			),
+		])
+		#endif
+
+		return models
 	}
 }
 
@@ -367,6 +377,51 @@ struct SettingsView_Previews: PreviewProvider {
 				reducer: AppSettings()
 			)
 		)
+	}
+}
+#endif
+
+// MARK: - ConnectExtensionView
+struct ConnectExtensionView: View {
+	let action: () -> Void
+}
+
+extension ConnectExtensionView {
+	var body: some View {
+		VStack(spacing: .medium2) {
+			Image(asset: AssetResource.browsers)
+				.padding([.top, .horizontal], .medium1)
+
+			Text(L10n.Settings.LinkToConnectorHeader.title)
+				.textStyle(.body1Header)
+				.foregroundColor(.app.gray1)
+				.padding(.horizontal, .medium2)
+
+			Text(L10n.Settings.LinkToConnectorHeader.subtitle)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2Regular)
+				.multilineTextAlignment(.center)
+				.padding(.horizontal, .medium2)
+
+			Button(L10n.Settings.LinkToConnectorHeader.linkToConnector, action: action)
+				.buttonStyle(.secondaryRectangular(
+					shouldExpand: true,
+					image: .init(asset: AssetResource.qrCodeScanner)
+				)
+				)
+				.padding([.bottom, .horizontal], .medium1)
+		}
+		.background(Color.app.gray5)
+		.cornerRadius(.medium3)
+	}
+}
+
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct ConnectExtensionView_Previews: PreviewProvider {
+	static var previews: some View {
+		ConnectExtensionView {}
 	}
 }
 #endif

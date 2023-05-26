@@ -5,6 +5,7 @@ import FeaturePrelude
 extension ImportMnemonicWord.State {
 	var viewState: ImportMnemonicWord.ViewState {
 		.init(
+			isReadonlyMode: isReadonlyMode,
 			index: id,
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
@@ -22,11 +23,6 @@ extension ImportMnemonicWord.State {
 	}
 }
 
-// MARK: - ImportMnemonicWordField
-public struct ImportMnemonicWordField: Sendable, Hashable {
-	public let id: ImportMnemonicWord.State.ID
-}
-
 // MARK: - Validation
 enum Validation: Sendable, Hashable {
 	case invalid
@@ -35,6 +31,7 @@ enum Validation: Sendable, Hashable {
 
 extension ImportMnemonicWord {
 	public struct ViewState: Equatable {
+		let isReadonlyMode: Bool
 		let index: Int
 
 		let displayText: String
@@ -43,6 +40,7 @@ extension ImportMnemonicWord {
 
 		let validation: Validation?
 		var wordAtIndex: String {
+			// FIXME: strings
 			"word #\(index + 1)"
 		}
 
@@ -50,11 +48,16 @@ extension ImportMnemonicWord {
 			guard let validation, validation == .invalid else {
 				return nil
 			}
+			// FIXME: strings
 			return .error("Invalid")
 		}
 
 		var showClearButton: Bool {
 			focusedField != nil
+		}
+
+		var displayValidAccessory: Bool {
+			!isReadonlyMode && validation == .valid && focusedField == nil
 		}
 	}
 
@@ -69,7 +72,6 @@ extension ImportMnemonicWord {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-
 				AppTextField(
 					secondaryHeading: viewStore.wordAtIndex,
 					placeholder: viewStore.wordAtIndex,
@@ -88,11 +90,12 @@ extension ImportMnemonicWord {
 					),
 					showClearButton: viewStore.showClearButton,
 					innerAccessory: {
-						if viewStore.state.validation == .valid, viewStore.focusedField == nil {
+						if viewStore.displayValidAccessory {
 							Image(systemName: "checkmark.seal.fill").foregroundColor(.app.green1)
 						}
 					}
 				)
+				.disabled(viewStore.isReadonlyMode)
 				.minimumScaleFactor(0.9)
 				.keyboardType(.alphabet)
 				.textInputAutocapitalization(.never)

@@ -99,9 +99,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 					)
 					.modifier { view in
 						if let focus {
-							view.focused(focus.focusState, equals: focus.value)
+							view
+								.focused(focus.focusState, equals: focus.value)
 								.bind(focus.binding, to: focus.focusState)
-
 						} else {
 							view
 						}
@@ -192,10 +192,11 @@ struct AppTextFieldPreview: View {
 			placeholder: "Placeholder",
 			text: $text,
 			hint: .error("Hint"),
-			focus: .on(.field, binding: $focus, to: $focusState)
-		) {
-			Image(asset: AssetResource.trash).frame(.small)
-		}
+			focus: .on(.field, binding: $focus, to: $focusState),
+			innerAccessory: {
+				Image(asset: AssetResource.trash).frame(.small)
+			}
+		)
 	}
 }
 #endif

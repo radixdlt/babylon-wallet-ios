@@ -32,7 +32,7 @@ extension CreationOfAccount {
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
 			.onFirstTask { @MainActor in
-				ViewStore(store.stateless).send(.view(.onFirstTask))
+				await ViewStore(store.stateless).send(.view(.onFirstTask)).finish()
 			}
 		}
 	}
