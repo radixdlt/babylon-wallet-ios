@@ -216,7 +216,8 @@ package.addModules([
 		name: "ImportMnemonicFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
-			"FactorSourcesClient", // saves into profile, if specified
+			"FactorSourcesClient", // saves into profile, if specified,
+			"MnemonicClient",
 		],
 		tests: .no
 	),
@@ -317,7 +318,6 @@ package.addModules([
 			"ImportMnemonicFeature",
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
-			"MnemonicClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
 			"RadixConnectClient",

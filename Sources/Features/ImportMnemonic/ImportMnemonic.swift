@@ -1,6 +1,7 @@
 import Cryptography
 import FactorSourcesClient
 import FeaturePrelude
+import MnemonicClient
 
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: Sendable, FeatureReducer {
@@ -38,8 +39,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 		}
 
-		public let wordList: BIP39.WordList
-
 		public var isAddRowButtonEnabled: Bool
 		public var isRemoveRowButtonEnabled: Bool
 
@@ -65,36 +64,55 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			wordCount: BIP39.WordCount = .twelve,
 			bip39Passphrase: String = ""
 		) {
+			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
+
 			self.saveInProfile = saveInProfile
-			self.wordList = BIP39.wordList(for: language)
 			self.language = language
 			self.wordCount = wordCount
 			self.bip39Passphrase = bip39Passphrase
 
 			self.isAddRowButtonEnabled = wordCount != .twentyFour
 			self.isRemoveRowButtonEnabled = wordCount != .twelve
+
 			let isReadonlyMode = false
 			self.isReadonlyMode = isReadonlyMode
-			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
-			self.words = .init(uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
-				ImportMnemonicWord.State(id: $0, isReadonlyMode: isReadonlyMode)
-			})
+			self.words = .init(
+				uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
+					ImportMnemonicWord.State(
+						id: $0,
+						isReadonlyMode: isReadonlyMode
+					)
+				}
+			)
 		}
 
 		public init(
-			mnemonic: Mnemonic
+			mnemonicWithPassphrase: MnemonicWithPassphrase
 		) {
+			let mnemonic = mnemonicWithPassphrase.mnemonic
 			self.saveInProfile = false
-			self.wordList = BIP39.wordList(for: mnemonic.language)
 			self.language = mnemonic.language
 			self.wordCount = mnemonic.wordCount
 			self.isAddRowButtonEnabled = false
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
 			self.isRemoveRowButtonEnabled = false
-			self.words = .init(uniqueElements: mnemonic.words.enumerated().map {
-				ImportMnemonicWord.State(id: $0.offset, value: .complete(text: $0.element.word.rawValue, word: $0.element, completion: .auto(match: .exact)), isReadonlyMode: isReadonlyMode)
-			})
+			self.words = .init(
+				uniqueElements: mnemonic.words
+					.enumerated()
+					.map {
+						ImportMnemonicWord.State(
+							id: $0.offset,
+							value: .complete(
+								text: $0.element.word.rawValue,
+								word: $0.element,
+								completion: .auto(match: .exact)
+							),
+							isReadonlyMode: isReadonlyMode
+						)
+					}
+			)
+			self.bip39Passphrase = mnemonicWithPassphrase.passphrase
 		}
 	}
 
@@ -123,6 +141,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -229,7 +248,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 extension ImportMnemonic {
 	private func lookup(input: String, _ state: State) -> BIP39.WordList.LookupResult {
-		state.wordList.lookup(input, minLengthForCandidatesLookup: 2)
+		mnemonicClient.lookup(.init(
+			language: state.language,
+			input: input,
+			minLenghForCandidatesLookup: 2
+		))
 	}
 
 	private func completeWith(

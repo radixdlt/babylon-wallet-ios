@@ -58,12 +58,12 @@ public struct DisplayMnemonic: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadMnemonicResult(.success(maybeMnemonic)):
-			guard let mnemonic = maybeMnemonic else {
+		case let .loadMnemonicResult(.success(maybeMnemonicWithPassphrase)):
+			guard let mnemonicWithPassphrase = maybeMnemonicWithPassphrase else {
 				loggerGlobal.error("Mnemonic was nil")
 				return .send(.delegate(.failedToLoad))
 			}
-			state.importMnemonic = .init(mnemonic: mnemonic.mnemonic)
+			state.importMnemonic = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			return .none
 
 		case let .loadMnemonicResult(.failure(error)):

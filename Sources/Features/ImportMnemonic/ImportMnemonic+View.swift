@@ -67,6 +67,7 @@ extension ImportMnemonic {
 								Button {
 									viewStore.send(.removeRowButtonTapped)
 								} label: {
+									// FIXME: strings
 									HStack {
 										Text("Less words")
 											.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
@@ -81,6 +82,7 @@ extension ImportMnemonic {
 								Button {
 									viewStore.send(.addRowButtonTapped)
 								} label: {
+									// FIXME: strings
 									HStack {
 										Text("More words")
 											.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
@@ -91,15 +93,21 @@ extension ImportMnemonic {
 								.controlState(viewStore.isAddRowButtonEnabled ? .enabled : .disabled)
 							}
 							.buttonStyle(.secondaryRectangular)
+						}
 
+						if !(viewStore.isReadonlyMode && viewStore.bip39Passphrase.isEmpty) {
 							AppTextField(
+								// FIXME: strings
+								primaryHeading: "Passhprase",
 								placeholder: "Passphrase",
 								text: viewStore.binding(
 									get: \.bip39Passphrase,
 									send: { .passphraseChanged($0) }
 								),
-								hint: .info("BIP39 Passphrase is often called a '25th word'.")
+								// FIXME: strings
+								hint: viewStore.isReadonlyMode ? nil : .info("BIP39 Passphrase is often called a '25th word'.")
 							)
+							.disabled(viewStore.isReadonlyMode)
 							.autocorrectionDisabled()
 						}
 					}
@@ -110,13 +118,15 @@ extension ImportMnemonic {
 						) { action in
 							if !viewStore.isReadonlyMode {
 								if viewStore.mnemonic == nil, viewStore.completedWords.count == viewStore.wordCount {
+									// FIXME: strings
 									Text("Mnemonic not checksummed")
 										.foregroundColor(.app.red1)
 								}
-
+								// FIXME: strings
 								Button("Import mnemonic", action: action)
 									.buttonStyle(.primaryRectangular)
 							} else {
+								// FIXME: strings
 								Button("Done") {
 									viewStore.send(.doneViewing)
 								}

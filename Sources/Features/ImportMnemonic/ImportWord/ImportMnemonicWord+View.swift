@@ -40,6 +40,7 @@ extension ImportMnemonicWord {
 
 		let validation: Validation?
 		var wordAtIndex: String {
+			// FIXME: strings
 			"word #\(index + 1)"
 		}
 
@@ -47,6 +48,7 @@ extension ImportMnemonicWord {
 			guard let validation, validation == .invalid else {
 				return nil
 			}
+			// FIXME: strings
 			return .error("Invalid")
 		}
 
