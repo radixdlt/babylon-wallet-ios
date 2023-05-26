@@ -33,6 +33,16 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
+				DisplayMnemonicRow()
+			}
+			.ifLet(\.$displayMnemonic, action: /Action.child .. ChildAction.details) {
+				DisplayMnemonic()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:

@@ -23,6 +23,15 @@ extension DisplayMnemonics {
 				VStack {
 					deviceFactorSourcesListView(store: store)
 				}
+				.sheet(
+					store: store.scope(
+						state: \.$displayMnemonic,
+						action: { .child(.details($0)) }
+					),
+					content: {
+						DisplayMnemonic.View(store: $0)
+					}
+				)
 				.onFirstTask { @MainActor in
 					viewStore.send(.onFirstTask)
 				}
