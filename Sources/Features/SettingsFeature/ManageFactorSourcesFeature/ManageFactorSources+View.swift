@@ -1,5 +1,6 @@
 import AddLedgerFactorSourceFeature
 import FeaturePrelude
+import ImportMnemonicFeature
 
 extension ManageFactorSources.State {
 	var viewState: ManageFactorSources.ViewState {
@@ -22,47 +23,52 @@ extension ManageFactorSources {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationStack {
-				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 
-					VStack(alignment: .leading) {
-						if let factorSources = viewStore.factorSources {
-							ScrollView(showsIndicators: false) {
-								VStack(alignment: .leading, spacing: .medium2) {
-									ForEach(factorSources) {
-										FactorSourceView(factorSource: $0)
-									}
+				VStack(alignment: .leading) {
+					if let factorSources = viewStore.factorSources {
+						ScrollView(showsIndicators: false) {
+							VStack(alignment: .leading, spacing: .medium2) {
+								ForEach(factorSources) {
+									FactorSourceView(factorSource: $0)
 								}
 							}
 						}
-						Button("Import Olympia factor source") {
-							viewStore.send(.importOlympiaFactorSourceButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
+					}
+					Button("Import Mnemonic source") {
+						viewStore.send(.importMnemonicButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
 
-						Button("Add Ledger factor source") {
-							viewStore.send(.addLedgerButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
+					Button("Add Ledger factor source") {
+						viewStore.send(.addLedgerButtonTapped)
 					}
-					.padding([.horizontal, .bottom], .medium1)
-					.task { @MainActor in
-						await ViewStore(store.stateless).send(.view(.task)).finish()
-					}
-					.navigationTitle("Factor Sources")
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /ManageFactorSources.Destinations.State.importOlympiaFactorSource,
-						action: ManageFactorSources.Destinations.Action.importOlympiaFactorSource,
-						content: { ImportOlympiaFactorSource.View(store: $0) }
-					)
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /ManageFactorSources.Destinations.State.addLedger,
-						action: ManageFactorSources.Destinations.Action.addLedger,
-						content: { AddLedgerFactorSource.View(store: $0) }
-					)
+					.buttonStyle(.primaryRectangular)
 				}
+				.padding([.horizontal, .bottom], .medium1)
+				.task { @MainActor in
+					await ViewStore(store.stateless).send(.view(.task)).finish()
+				}
+				.navigationTitle("Factor Sources")
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ManageFactorSources.Destinations.State.importMnemonic,
+					action: ManageFactorSources.Destinations.Action.importMnemonic,
+					content: { importMnemonicStore in
+						NavigationView {
+							// We depend on `.toolbar` to display buttons on top of
+							// keyboard. And they are not displayed if we are not
+							// inside a NavigationView
+							ImportMnemonic.View(store: importMnemonicStore)
+						}
+					}
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ManageFactorSources.Destinations.State.addLedger,
+					action: ManageFactorSources.Destinations.Action.addLedger,
+					content: { AddLedgerFactorSource.View(store: $0) }
+				)
 			}
 		}
 	}

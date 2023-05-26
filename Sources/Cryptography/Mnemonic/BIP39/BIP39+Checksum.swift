@@ -4,9 +4,17 @@ import Prelude
 extension BIP39 {
 	@discardableResult
 	internal static func validateChecksumOf(
-		mnemonicWords: [String],
+		mnemonicWords: [BIP39.Word],
 		language: BIP39.Language
-	) throws -> [String] {
+	) throws -> [NonEmptyString] {
+		try validateChecksumOf(mnemonicWords: mnemonicWords.map(\.word), language: language)
+	}
+
+	@discardableResult
+	internal static func validateChecksumOf(
+		mnemonicWords: [NonEmptyString],
+		language: BIP39.Language
+	) throws -> [NonEmptyString] {
 		let bitArray = try BIP39.mapWordsToEntropyBitArray(words: mnemonicWords, language: language)
 
 		// https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#generating-the-mnemonic

@@ -6,7 +6,6 @@ extension ProfileBackups.State {
 	}
 }
 
-// MARK: - ScanQR.View
 extension ProfileBackups {
 	public struct ViewState: Equatable {
 		// TODO: Configure

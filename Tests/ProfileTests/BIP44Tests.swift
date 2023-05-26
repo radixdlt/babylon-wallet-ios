@@ -51,7 +51,7 @@ final class BIP44Tests: TestCase {
 					)
 				}
 			}
-			return BIP44TestSuite.TestGroup(mnemonic: mnemonic.phrase, tests: tests)
+			return BIP44TestSuite.TestGroup(mnemonic: mnemonic.phrase.rawValue, tests: tests)
 		}
 
 		let suite = BIP44TestSuite(testGroups: groups, description: "Secp256k1 BIP44 and BIP44 like tests")

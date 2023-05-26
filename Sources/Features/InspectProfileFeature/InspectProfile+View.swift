@@ -127,7 +127,7 @@ public struct FactorSourceView: IndentedView {
 	public let factorSource: FactorSource
 	public let indentation: Indentation
 	public var secureStorageClient: SecureStorageClient?
-	@State private var mnemonicPhraseLoadedFromKeychain: String?
+	@State private var mnemonicPhraseLoadedFromKeychain: NonEmptyString?
 	@State private var mnemonicPassphraseLoadedFromKeychain: String?
 }
 
@@ -149,7 +149,7 @@ extension FactorSourceView {
 			if let mnemonicPhraseLoadedFromKeychain {
 				VStack {
 					Text("✅ Mnemonic found in keychain ✅")
-					Text(mnemonicPhraseLoadedFromKeychain).fontWeight(.semibold)
+					Text(mnemonicPhraseLoadedFromKeychain.rawValue).fontWeight(.semibold)
 					if let mnemonicPassphraseLoadedFromKeychain {
 						Spacer()
 						Text("Bip39 Passphrase:")

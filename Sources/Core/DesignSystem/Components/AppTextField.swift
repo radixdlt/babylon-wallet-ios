@@ -73,7 +73,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
-			VStack(alignment: .leading, spacing: .small2) {
+			VStack(alignment: .leading, spacing: .small3) {
 				HStack(spacing: 0) {
 					if let primaryHeading {
 						Text(primaryHeading)
@@ -101,6 +101,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 						if let focus {
 							view.focused(focus.focusState, equals: focus.value)
 								.bind(focus.binding, to: focus.focusState)
+
 						} else {
 							view
 						}
@@ -109,20 +110,22 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 					.textStyle(.body1Regular)
 					.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
-					if showClearButton {
-						if !text.wrappedValue.isEmpty {
-							Button {
-								text.wrappedValue = ""
-							} label: {
-								Image(systemName: "multiply.circle.fill")
-									.foregroundStyle(.gray)
-							}
+					if
+						showClearButton,
+						!text.wrappedValue.isEmpty
+					{
+						Button {
+							text.wrappedValue = ""
+						} label: {
+							Image(systemName: "multiply.circle.fill")
+								.foregroundStyle(.gray)
 						}
 					}
 
 					innerAccesory
 				}
-				.padding()
+				.padding([.top, .bottom])
+				.padding([.leading, .trailing], 6)
 				.frame(height: .standardButtonHeight)
 				.background(Color.app.gray5)
 				.cornerRadius(.small2)
