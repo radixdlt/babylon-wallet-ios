@@ -17,7 +17,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public var wordCount: BIP39.WordCount {
 			willSet {
 				let delta = newValue.rawValue - wordCount.rawValue
+				guard delta != 0 else { return }
 
+				// Update words
 				if delta > 0 {
 					// is increasing word count
 					words.append(contentsOf: (wordCount.rawValue ..< newValue.rawValue).map {
@@ -35,15 +37,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					// is decreasing word count
 					words.removeLast(abs(delta))
 				}
-				switch newValue {
-				case .twelve:
-					self.isRemoveRowButtonEnabled = false
-				case .fifteen, .eighteen, .twentyOne:
-					self.isRemoveRowButtonEnabled = true
-					self.isAddRowButtonEnabled = true
-				case .twentyFour:
-					self.isAddRowButtonEnabled = false
-				}
+
+				// Update buttons
+				self.isRemoveRowButtonEnabled = newValue != .twelve
+				self.isAddRowButtonEnabled = newValue != .twentyFour
 			}
 		}
 
@@ -80,8 +77,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.wordCount = wordCount
 			self.bip39Passphrase = bip39Passphrase
 
-			self.isAddRowButtonEnabled = wordCount != .twentyFour
 			self.isRemoveRowButtonEnabled = wordCount != .twelve
+			self.isAddRowButtonEnabled = wordCount != .twentyFour
 
 			let isReadonlyMode = false
 			self.isReadonlyMode = isReadonlyMode
@@ -358,3 +355,6 @@ extension ImportMnemonic {
 		return word.word.rawValue
 	}
 }
+
+// MARK: - ScenePhase + Sendable
+extension ScenePhase: @unchecked Sendable {}
