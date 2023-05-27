@@ -5,27 +5,6 @@ import MnemonicClient
 
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: Sendable, FeatureReducer {
-	static func placeholder(
-		index: Int,
-		wordCount: BIP39.WordCount,
-		language: BIP39.Language
-	) -> String {
-		let word: BIP39.Word = {
-			let wordList = BIP39.wordList(for: language)
-			switch language {
-			case .english:
-				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
-				return wordList.words.first(where: { $0.word.rawValue.hasPrefix(bip39Alphabet[index]) })!
-
-			default:
-				let scale = UInt16(89) // 2048 / 23
-				let indexScaled = BIP39.Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
-				return wordList.indexToWord[indexScaled]!
-			}
-		}()
-		return word.word.rawValue
-	}
-
 	public static let wordsPerRow = 3
 
 	public struct State: Sendable, Hashable {
@@ -353,5 +332,28 @@ extension ImportMnemonic {
 			try? await clock.sleep(for: .milliseconds(75))
 			await send(.internal(.focusNext(nextID)))
 		}
+	}
+}
+
+extension ImportMnemonic {
+	static func placeholder(
+		index: Int,
+		wordCount: BIP39.WordCount,
+		language: BIP39.Language
+	) -> String {
+		let word: BIP39.Word = {
+			let wordList = BIP39.wordList(for: language)
+			switch language {
+			case .english:
+				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
+				return wordList.words.first(where: { $0.word.rawValue.hasPrefix(bip39Alphabet[index]) })!
+
+			default:
+				let scale = UInt16(89) // 2048 / 23
+				let indexScaled = BIP39.Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
+				return wordList.indexToWord[indexScaled]!
+			}
+		}()
+		return word.word.rawValue
 	}
 }
