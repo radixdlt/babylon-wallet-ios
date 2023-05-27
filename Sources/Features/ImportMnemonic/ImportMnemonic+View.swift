@@ -1,7 +1,7 @@
 import Cryptography
 import FeaturePrelude
 #if os(iOS)
-import ScreenshotPreventingSwiftUI
+import ScreenshotPreventing
 #endif
 
 extension ImportMnemonic.State {

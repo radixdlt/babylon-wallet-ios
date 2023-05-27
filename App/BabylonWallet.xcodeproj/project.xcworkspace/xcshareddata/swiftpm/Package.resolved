@@ -100,21 +100,12 @@
       }
     },
     {
-      "identity" : "rxswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactiveX/RxSwift.git",
-      "state" : {
-        "revision" : "9dcaa4b333db437b0fbfaf453fad29069044a8b4",
-        "version" : "6.6.0"
-      }
-    },
-    {
       "identity" : "screenshotpreventing-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/yoxisem544/ScreenshotPreventing-iOS.git",
+      "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS.git",
       "state" : {
-        "revision" : "10d868c738ec1debba944388c5941dac957e9a8d",
-        "version" : "1.4.0"
+        "revision" : "02d9892489ef2bb145f693a36ec914109f1d90ab",
+        "version" : "0.0.1"
       }
     },
     {
