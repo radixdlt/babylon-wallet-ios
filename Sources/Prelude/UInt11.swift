@@ -6,7 +6,7 @@ public struct UInt11: Sendable, Hashable, ExpressibleByIntegerLiteral, Comparabl
 
 	public let valueBoundBy16Bits: UInt16
 
-	internal init?(valueBoundBy16Bits: UInt16) {
+	public init?(valueBoundBy16Bits: UInt16) {
 		if valueBoundBy16Bits > UInt11.max16 {
 			return nil
 		}

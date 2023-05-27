@@ -7,6 +7,7 @@ extension ImportMnemonicWord.State {
 		.init(
 			isReadonlyMode: isReadonlyMode,
 			index: id,
+			placeholder: placeholder,
 			displayText: value.text,
 			autocompletionCandidates: autocompletionCandidates,
 			focusedField: focusedField,
@@ -33,16 +34,12 @@ extension ImportMnemonicWord {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
 		let index: Int
-
+		let placeholder: String
 		let displayText: String
 		let autocompletionCandidates: ImportMnemonicWord.State.AutocompletionCandidates?
 		let focusedField: State.Field?
 
 		let validation: Validation?
-		var wordAtIndex: String {
-			// FIXME: strings
-			"word #\(index + 1)"
-		}
 
 		var hint: Hint? {
 			guard let validation, validation == .invalid else {
@@ -73,8 +70,8 @@ extension ImportMnemonicWord {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				AppTextField(
-					secondaryHeading: viewStore.wordAtIndex,
-					placeholder: viewStore.wordAtIndex,
+					secondaryHeading: "word #\(viewStore.index + 1)",
+					placeholder: viewStore.placeholder,
 					text: .init(
 						get: { viewStore.displayText },
 						set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmedInclNewlin())) }

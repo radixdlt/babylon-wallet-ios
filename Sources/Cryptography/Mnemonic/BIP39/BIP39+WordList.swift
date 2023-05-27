@@ -15,8 +15,8 @@ extension BIP39 {
 	public struct WordList: Sendable, Hashable {
 		public typealias Word = BIP39.Word
 		public let language: Language
-		private let indexToWord: [Word.Index: Word]
-		private let wordToIndex: [NonEmptyString: Word.Index]
+		public let indexToWord: [Word.Index: Word]
+		public let wordToIndex: [NonEmptyString: Word.Index]
 
 		public let words: NonEmpty<OrderedSet<Word>>
 
