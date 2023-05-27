@@ -16,7 +16,7 @@ public struct AccountsForDeviceFactorSource: Sendable, Hashable, Identifiable {
 public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var displayMnemonic: DisplayMnemonic.State?
+		public var destination: Destinations.State? = nil
 
 		public var deviceFactorSources: IdentifiedArrayOf<DisplayMnemonicRow.State> = []
 
@@ -33,7 +33,31 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case row(id: DisplayMnemonicRow.State.ID, action: DisplayMnemonicRow.Action)
-		case details(PresentationAction<DisplayMnemonic.Action>)
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
+	public struct Destinations: Sendable, Equatable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case useCaution(AlertState<Action.UseCautionAlert>)
+			case displayMnemonic(DisplayMnemonic.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case useCaution(UseCautionAlert)
+			case displayMnemonic(DisplayMnemonic.Action)
+
+			public enum UseCautionAlert: Sendable, Hashable {
+				case revealTapped(DisplayMnemonicRow.State.ID)
+				case cancelTapped
+			}
+		}
+
+		public init() {}
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
+				DisplayMnemonic()
+			}
+		}
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
@@ -48,8 +72,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
 				DisplayMnemonicRow()
 			}
-			.ifLet(\.$displayMnemonic, action: /Action.child .. ChildAction.details) {
-				DisplayMnemonic()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -98,18 +122,23 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .row(id, action: .delegate(.openDetails)):
+			state.destination = .useCaution(.useCaution(id))
+			return .none
+		case .destination(.presented(.displayMnemonic(.delegate(.failedToLoad)))):
+			state.destination = nil
+			return .none
+
+		case .destination(.presented(.displayMnemonic(.delegate(.doneViewing)))):
+			state.destination = nil
+			return .none
+
+		case let .destination(.presented(.useCaution(.revealTapped(id)))):
 			guard let deviceFactorSource = state.deviceFactorSources[id: id]?.deviceFactorSource else {
 				loggerGlobal.warning("Unable to find factor source in state... strange!")
 				return .none
 			}
-			state.displayMnemonic = .init(deviceFactorSource: deviceFactorSource)
-			return .none
-		case .details(.presented(.delegate(.failedToLoad))):
-			state.displayMnemonic = nil
-			return .none
-
-		case .details(.presented(.delegate(.doneViewing))):
-			state.displayMnemonic = nil
+			// FIXME: Auto close after 2 minutes?
+			state.destination = .displayMnemonic(.init(deviceFactorSource: deviceFactorSource))
 			return .none
 
 		default: return .none
@@ -117,5 +146,19 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - InvalidStateExpectedToAlwaysHaveAtLeastOneDeviceFactorSource
-struct InvalidStateExpectedToAlwaysHaveAtLeastOneDeviceFactorSource: Swift.Error {}
+extension AlertState<DisplayMnemonics.Destinations.Action.UseCautionAlert> {
+	static func useCaution(_ id: DisplayMnemonicRow.State.ID) -> Self {
+		Self {
+			TextState("Use Caution") // FIXME: Strings
+		} actions: {
+			ButtonState(role: .cancel, action: .cancelTapped) {
+				TextState(L10n.Common.cancel)
+			}
+			ButtonState(role: .destructive, action: .revealTapped(id)) {
+				TextState("Reveal Seed phrase") // FIXME: Strings
+			}
+		} message: {
+			TextState("Make sure you are not in a public place and that there is not possibility that anyone can be looking over your shoulders or otherwise see your display. Watch out for cameras. Do not take a screenshot of the seed phrase, that is not safe. Don't read it out, seal your lips.") // FIXME: Strings
+		}
+	}
+}

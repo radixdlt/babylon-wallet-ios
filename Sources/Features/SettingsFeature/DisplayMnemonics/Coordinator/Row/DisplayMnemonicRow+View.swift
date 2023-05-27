@@ -51,18 +51,28 @@ struct AccountsForDeviceFactorSourceView: SwiftUI.View {
 	}
 
 	var body: some View {
-		VStack {
-			Text(deviceFactorSource.labelSeedPhraseKind)
-				.font(.title3)
+		HStack(spacing: 0) {
+			VStack(alignment: .leading) {
+				Text(deviceFactorSource.labelSeedPhraseKind)
+					.font(.title3)
 
-			HPair(label: "Added", item: deviceFactorSource
-				.addedOn
-				.ISO8601Format(.iso8601Date(timeZone: .current)))
+				HPair(
+					// FIXME: strings
+					label: deviceFactorSource.supportsOlympia ? "Imported on" : "Generated on",
+					item: deviceFactorSource
+						.addedOn
+						.ISO8601Format(.iso8601Date(timeZone: .current))
+				)
 
-			ForEach(accountsForDeviceFactorSource.accounts) { account in
-				SmallAccountCard(account: account)
+				ForEach(accountsForDeviceFactorSource.accounts) { account in
+					SmallAccountCard(account: account)
+						.cornerRadius(.small1)
+				}
 			}
+			.padding()
+			Image(asset: AssetResource.chevronRight)
 		}
+		.multilineTextAlignment(.leading)
 	}
 }
 
