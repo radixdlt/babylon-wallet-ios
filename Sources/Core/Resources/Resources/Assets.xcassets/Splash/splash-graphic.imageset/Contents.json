@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "splash-graphic.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
