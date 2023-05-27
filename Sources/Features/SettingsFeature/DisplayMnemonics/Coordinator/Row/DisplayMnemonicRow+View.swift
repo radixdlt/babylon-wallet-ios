@@ -1,17 +1,5 @@
 import FeaturePrelude
 
-// extension DisplayMnemonicRow.State {
-//	var viewState: DisplayMnemonicRow.ViewState {
-//		.init(
-//			factorSourceID: deviceFactorSource.factorSource.id,
-//			accounts: accountsForDeviceFactorSource.accounts,
-//			labelSeedPhraseKind: deviceFactorSource.labelSeedPhraseKind,
-//			addedOn:
-
-//		)
-//	}
-// }
-
 extension HDOnDeviceFactorSource {
 	var labelSeedPhraseKind: String {
 		// FIXME: string
