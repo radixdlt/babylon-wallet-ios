@@ -26,6 +26,7 @@ extension DisplayMnemonicRow {
 						accountsForDeviceFactorSource: viewStore.accountsForDeviceFactorSource
 					)
 				}
+				.shadow(color: .app.cardShadowBlack, radius: .small2)
 			}
 		}
 	}
@@ -52,9 +53,11 @@ struct AccountsForDeviceFactorSourceView: SwiftUI.View {
 						.ISO8601Format(.iso8601Date(timeZone: .current))
 				)
 
-				ForEach(accountsForDeviceFactorSource.accounts) { account in
-					SmallAccountCard(account: account)
-						.cornerRadius(.small1)
+				VStack(alignment: .leading, spacing: .small3) {
+					ForEach(accountsForDeviceFactorSource.accounts) { account in
+						SmallAccountCard(account: account)
+							.cornerRadius(.small1)
+					}
 				}
 			}
 			.padding()

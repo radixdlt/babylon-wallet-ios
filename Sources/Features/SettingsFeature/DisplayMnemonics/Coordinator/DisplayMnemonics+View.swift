@@ -46,8 +46,14 @@ extension DisplayMnemonics {
 
 extension View {
 	@MainActor
-	fileprivate func destinations(with store: StoreOf<DisplayMnemonics>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+	fileprivate func destinations(
+		with store: StoreOf<DisplayMnemonics>
+	) -> some View {
+		let destinationStore = store.scope(
+			state: \.$destination,
+			action: { .child(.destination($0)) }
+		)
+
 		return displayMnemonicSheet(with: destinationStore)
 			.useCautionAlert(with: destinationStore)
 	}
