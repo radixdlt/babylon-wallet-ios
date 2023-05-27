@@ -193,12 +193,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return focusNext(&state)
 
 		case .scenePhase(.background), .scenePhase(.inactive):
-			print("🔮 \(viewAction) => hide secrets")
 			state.isHidingSecrets = true
 			return .none
 
 		case .scenePhase(.active), .scenePhase:
-			print("🔮 \(viewAction) => show secrets")
 			state.isHidingSecrets = false
 			return .none
 
