@@ -341,6 +341,7 @@ extension ImportMnemonic {
 		wordCount: BIP39.WordCount,
 		language: BIP39.Language
 	) -> String {
+		precondition(index <= 23, "Invalid BIP39 word index, got index: \(index), exected less than 24.")
 		let word: BIP39.Word = {
 			let wordList = BIP39.wordList(for: language)
 			switch language {
