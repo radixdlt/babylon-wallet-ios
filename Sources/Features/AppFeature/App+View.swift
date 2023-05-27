@@ -8,6 +8,11 @@ import SplashFeature
 extension App {
 	@MainActor
 	public struct View: SwiftUI.View {
+		// N.B. BEWARE we MUST have `scenePhase` here in root view in order for any child
+		// views own `@Environment(\.scenePhase) var scenePhase` to work. See SO comment:
+		// https://stackoverflow.com/a/71596896/1311272
+		@Environment(\.scenePhase) var scenePhase
+
 		private let store: StoreOf<App>
 
 		public init(store: StoreOf<App>) {
