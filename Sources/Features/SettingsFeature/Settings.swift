@@ -301,6 +301,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 				return .none
 			}
 
+		#if DEBUG
 		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
@@ -308,6 +309,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration)))):
 			state.destination = nil
 			return .none
+		#endif // DEBUG
 
 		case .destination:
 			return .none
