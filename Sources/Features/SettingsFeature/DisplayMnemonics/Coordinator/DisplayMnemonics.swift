@@ -168,7 +168,7 @@ extension AlertState<DisplayMnemonics.Destinations.Action.UseCautionAlert> {
 				TextState("Reveal Seed phrase") // FIXME: Strings
 			}
 		} message: {
-			TextState("Make sure you are not in a public place and that there is not possibility that anyone can be looking over your shoulders or otherwise see your display. Watch out for cameras. Do not take a screenshot of the seed phrase, that is not safe. Don't read it out, seal your lips.") // FIXME: Strings
+			TextState("Make sure no person or camera can see your display. Don't read or mouth the words. We have prevented you from taking screenshots.") // FIXME: Strings
 		}
 	}
 }
