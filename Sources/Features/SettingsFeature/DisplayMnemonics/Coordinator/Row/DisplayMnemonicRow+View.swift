@@ -58,6 +58,7 @@ struct AccountsForDeviceFactorSourceView: SwiftUI.View {
 				}
 			}
 			.padding()
+
 			Image(asset: AssetResource.chevronRight)
 		}
 		.multilineTextAlignment(.leading)

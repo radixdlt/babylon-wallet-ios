@@ -53,6 +53,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		}
 
 		public init() {}
+
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
 				DisplayMnemonic()
@@ -80,25 +81,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .task {
-				let result = await TaskResult {
-					let sources = try await factorSourcesClient.getFactorSources(ofKind: .device)
-					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-					return try IdentifiedArrayOf(uniqueElements: sources.map { factorSource in
-						let accountsForSource = accounts.filter { account in
-							switch account.securityState {
-							case let .unsecured(unsecuredEntityControl):
-								return unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
-							}
-						}
-						return try AccountsForDeviceFactorSource(
-							accounts: accountsForSource,
-							deviceFactorSource: HDOnDeviceFactorSource(factorSource: factorSource)
-						)
-					})
-				}
-				return .internal(.loadedFactorSources(result))
-			}
+			return load()
 		}
 	}
 
@@ -142,6 +125,33 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			return .none
 
 		default: return .none
+		}
+	}
+}
+
+extension DisplayMnemonics {
+	private func load() -> EffectTask<Action> {
+		@Sendable func doLoad() async throws -> IdentifiedArrayOf<AccountsForDeviceFactorSource> {
+			let sources = try await factorSourcesClient.getFactorSources(ofKind: .device)
+			let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+			return try IdentifiedArrayOf(uniqueElements: sources.map { factorSource in
+				let accountsForSource = accounts.filter { account in
+					switch account.securityState {
+					case let .unsecured(unsecuredEntityControl):
+						return unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
+					}
+				}
+				return try AccountsForDeviceFactorSource(
+					accounts: accountsForSource,
+					deviceFactorSource: HDOnDeviceFactorSource(factorSource: factorSource)
+				)
+			})
+		}
+
+		return .task {
+			await .internal(.loadedFactorSources(TaskResult {
+				try await doLoad()
+			}))
 		}
 	}
 }
