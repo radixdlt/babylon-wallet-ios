@@ -1,5 +1,8 @@
 import Cryptography
 import FeaturePrelude
+#if os(iOS)
+import ScreenshotPreventingSwiftUI
+#endif
 
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
@@ -114,6 +117,7 @@ extension ImportMnemonic {
 							.autocorrectionDisabled()
 						}
 					}
+					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 					.onChange(of: scenePhase) { newPhase in
 						viewStore.send(.scenePhase(newPhase))
 					}
@@ -141,10 +145,12 @@ extension ImportMnemonic {
 						}
 					}
 				}
-				.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 				.animation(.default, value: viewStore.wordCount)
 				.padding(.medium3)
 				.onAppear { viewStore.send(.appeared) }
+				#if os(iOS)
+					.screenshotProtected(isProtected: true)
+				#endif // iOS
 			}
 		}
 	}

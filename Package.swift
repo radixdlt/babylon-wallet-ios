@@ -216,8 +216,11 @@ package.addModules([
 		name: "ImportMnemonicFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
-			"FactorSourcesClient", // saves into profile, if specified,
+			"FactorSourcesClient", // saves into profile, if specified
 			"MnemonicClient",
+			.product(name: "ScreenshotPreventingSwiftUI", package: "ScreenshotPreventing-iOS", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/yoxisem544/ScreenshotPreventing-iOS.git", from: "1.4.0")
+			},
 		],
 		tests: .no
 	),
