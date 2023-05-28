@@ -69,6 +69,7 @@ public struct App: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -114,7 +115,7 @@ public struct App: Sendable, FeatureReducer {
 					if error is Profile.ProfileIsUsedOnAnotherDeviceError {
 						await send(.internal(.toOnboarding))
 						// A slight delay to allow any modal that may be shown to be dismissed.
-						try? await Task.sleep(for: .seconds(0.5))
+						try? await clock.sleep(for: .seconds(0.5))
 					}
 					await send(.internal(.displayErrorAlert(UserFacingError(error))))
 				}
