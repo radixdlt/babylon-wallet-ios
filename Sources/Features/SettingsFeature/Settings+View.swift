@@ -231,21 +231,9 @@ extension AppSettings.View {
 		var id: String { title }
 
 		let title: String
-		let subtitle: String?
-		let asset: ImageAsset
+		var subtitle: String?
+		let icon: AssetIcon.Content
 		let action: AppSettings.ViewAction
-
-		init(
-			title: String,
-			subtitle: String? = nil,
-			asset: ImageAsset,
-			action: AppSettings.ViewAction
-		) {
-			self.title = title
-			self.subtitle = subtitle
-			self.asset = asset
-			self.action = action
-		}
 	}
 
 	@MainActor
@@ -261,7 +249,7 @@ extension AppSettings.View {
 					}
 
 					ForEach(settingsRows()) { row in
-						PlainListRow(title: row.title, asset: row.asset)
+						PlainListRow(row.icon, title: row.title)
 							.tappable {
 								viewStore.send(row.action)
 							}
@@ -300,38 +288,38 @@ extension AppSettings.View {
 		var models: [RowModel] = [
 			.init(
 				title: L10n.Settings.linkedConnectors,
-				asset: AssetResource.desktopConnections,
+				icon: .asset(AssetResource.desktopConnections),
 				action: .manageP2PLinksButtonTapped
 			),
 			.init(
 				title: L10n.Settings.gateways,
-				asset: AssetResource.gateway,
+				icon: .asset(AssetResource.gateway),
 				action: .gatewaysButtonTapped
 			),
 			.init(
 				title: L10n.Settings.authorizedDapps,
-				asset: AssetResource.authorizedDapps,
+				icon: .asset(AssetResource.authorizedDapps),
 				action: .authorizedDappsButtonTapped
 			),
 			.init(
 				title: L10n.Settings.personas,
-				asset: AssetResource.personas,
+				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			),
 			.init(
 				title: L10n.Settings.appSettings,
-				asset: AssetResource.generalSettings,
+				icon: .asset(AssetResource.generalSettings),
 				action: .generalSettingsButtonTapped
 			),
 			.init(
 				title: L10n.Settings.backups,
 				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
-				asset: AssetResource.backups,
+				icon: .asset(AssetResource.backups),
 				action: .profileBackupsButtonTapped
 			),
 			.init(
 				title: "Ledger Hardware Wallets", // FIXME: Strings
-				asset: AssetResource.ledger,
+				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 		]
@@ -340,23 +328,23 @@ extension AppSettings.View {
 		models.append(contentsOf: [
 			.init(
 				title: L10n.Settings.importFromLegacyWallet,
-				asset: AssetResource.generalSettings,
+				icon: .asset(AssetResource.generalSettings),
 				action: .importFromOlympiaWalletButtonTapped
 			),
 			.init(
 				title: "Factor sources", // ONLY DEBUG EVER
-				asset: AssetResource.ellipsis,
+				icon: .systemImage("person.badge.key"),
 				action: .factorSourcesButtonTapped
 			),
 			.init(
 				title: "Inspect profile", // ONLY DEBUG EVER
-				asset: AssetResource.ellipsis,
+				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
 			),
 			.init(
 				// FIXME: strings
 				title: "Seed phrases",
-				asset: AssetResource.ellipsis,
+				icon: .asset(AssetResource.ellipsis),
 				action: .mnemonicsButtonTapped
 			),
 		])
@@ -407,8 +395,7 @@ extension ConnectExtensionView {
 				.buttonStyle(.secondaryRectangular(
 					shouldExpand: true,
 					image: .init(asset: AssetResource.qrCodeScanner)
-				)
-				)
+				))
 				.padding([.bottom, .horizontal], .medium1)
 		}
 		.background(Color.app.gray5)
