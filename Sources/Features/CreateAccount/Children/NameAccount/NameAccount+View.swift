@@ -13,7 +13,6 @@ extension NameAccount {
 		public let subtitleText: String
 		public let entityName: String
 		public let sanitizedNameRequirement: SanitizedNameRequirement?
-		public let focusedField: State.Field?
 		public let useLedgerAsFactorSource: Bool
 
 		public struct SanitizedNameRequirement: Equatable {
@@ -32,71 +31,57 @@ extension NameAccount {
 			} else {
 				self.sanitizedNameRequirement = nil
 			}
-			self.focusedField = state.focusedField
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<NameAccount>
-		@FocusState private var focusedField: State.Field?
 
 		public init(store: StoreOf<NameAccount>) {
 			self.store = store
 		}
 
 		public var body: some SwiftUI.View {
-			ForceFullScreen {
-				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-					ScrollView {
-						VStack(spacing: .medium1) {
-							title(with: viewStore.state)
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				ScrollView {
+					VStack(spacing: 0) {
+						title(with: viewStore.state)
+							.padding(.bottom, .medium1)
 
-							VStack(spacing: .large1) {
-								subtitle(with: viewStore.state)
+						subtitle(with: viewStore.state)
+							.padding(.bottom, .large1)
 
-								useLedgerAsFactorSource(with: viewStore)
+						let nameBinding = viewStore.binding(
+							get: \.entityName,
+							send: { .textFieldChanged($0) }
+						)
 
-								let nameBinding = viewStore.binding(
-									get: \.entityName,
-									send: { .textFieldChanged($0) }
-								)
+						AppTextField(
+							placeholder: viewStore.namePlaceholder,
+							text: nameBinding,
+							hint: .info(L10n.CreateEntity.NameNewEntity.explanation)
+						)
+						#if os(iOS)
+						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
+						#endif
+						.autocorrectionDisabled()
+						.padding(.bottom, .medium3)
 
-								AppTextField(
-									placeholder: viewStore.namePlaceholder,
-									text: nameBinding,
-									hint: .info(L10n.CreateEntity.NameNewEntity.explanation),
-									focus: .on(
-										.entityName,
-										binding: viewStore.binding(
-											get: \.focusedField,
-											send: { .textFieldFocused($0) }
-										),
-										to: $focusedField
-									)
-								)
-								#if os(iOS)
-								.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
-								#endif
-								.autocorrectionDisabled()
-							}
-						}
-						.padding([.horizontal, .bottom], .medium1)
+						useLedgerAsFactorSource(with: viewStore)
 					}
-					#if os(iOS)
-					.toolbar(.visible, for: .navigationBar)
-					#endif
-					.footer {
-						WithControlRequirements(
-							viewStore.sanitizedNameRequirement,
-							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
-						) { action in
-							Button(L10n.Common.continue, action: action)
-								.buttonStyle(.primaryRectangular)
-						}
-					}
-					.onAppear {
-						viewStore.send(.appeared)
+					.padding([.bottom, .horizontal], .medium1)
+				}
+				#if os(iOS)
+				.toolbar(.visible, for: .navigationBar)
+				#endif
+				.footer {
+					WithControlRequirements(
+						viewStore.sanitizedNameRequirement,
+						forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
+					) { action in
+						Button(L10n.Common.continue, action: action)
+							.buttonStyle(.primaryRectangular)
 					}
 				}
 			}
@@ -124,7 +109,7 @@ extension NameAccount.View {
 		with viewStore: ViewStoreOf<NameAccount>
 	) -> some SwiftUI.View {
 		ToggleView(
-			title: L10n.CreateEntity.NameNewEntity.ledgerTitle,
+			title: "Create with Ledger Hardware Wallet", // FIXME: Strings -> L10n.CreateEntity.NameNewEntity.ledgerTitle
 			subtitle: L10n.CreateEntity.NameNewEntity.ledgerSubtitle,
 			isOn: viewStore.binding(
 				get: \.useLedgerAsFactorSource,
