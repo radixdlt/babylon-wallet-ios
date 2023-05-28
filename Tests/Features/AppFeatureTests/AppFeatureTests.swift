@@ -30,7 +30,7 @@ final class AppFeatureTests: TestCase {
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
-		// GIVEN: an existing profile (ephemeralPrivateProfile)
+		// GIVEN: an existing profile
 		let accountRecoveryNeeded = true
 		let clock = TestClock()
 		let store = TestStore(
@@ -45,7 +45,7 @@ final class AppFeatureTests: TestCase {
 			}
 		}
 
-		// then
+		// THEN: navigate to main
 		await store.send(.child(.splash(.delegate(.loadProfileOutcome(.existingProfile)))))
 		await store.receive(.internal(.toMain(isAccountRecoveryNeeded: accountRecoveryNeeded))) {
 			$0.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryNeeded)))
