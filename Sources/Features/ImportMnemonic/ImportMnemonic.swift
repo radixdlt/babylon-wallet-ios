@@ -15,35 +15,45 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public var language: BIP39.Language
 		public var wordCount: BIP39.WordCount {
-			willSet {
-				let delta = newValue.rawValue - wordCount.rawValue
-				guard delta != 0 else { return }
+			guard let wordCount = BIP39.WordCount(wordCount: words.count) else {
+				assertionFailure("Should never happen")
+				return .twentyFour
+			}
+			return wordCount
+		}
 
-				// Update words
-				if delta > 0 {
-					// is increasing word count
-					words.append(contentsOf: (wordCount.rawValue ..< newValue.rawValue).map {
-						.init(
-							id: $0,
-							placeholder: ImportMnemonic.placeholder(
-								index: $0,
-								wordCount: newValue,
-								language: language
-							),
-							isReadonlyMode: isReadonlyMode
-						)
-					})
-				} else if delta < 0 {
-					// is decreasing word count
-					words.removeLast(abs(delta))
-				}
+		public mutating func changeWordCount(by delta: Int) {
+			let positiveDelta = abs(delta)
+			precondition(positiveDelta == ImportMnemonic.wordsPerRow)
+
+			let wordCount = words.count
+			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might infact be subtraction
+			if delta > 0 {
+				// is increasing word count
+				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
+					.init(
+						id: $0,
+						placeholder: ImportMnemonic.placeholder(
+							index: $0,
+							wordCount: newWordCount,
+							language: language
+						),
+						isReadonlyMode: isReadonlyMode
+					)
+				})
+			} else if delta < 0 {
+				// is decreasing word count
+				words.removeLast(positiveDelta)
 			}
 		}
 
 		public var bip39Passphrase: String = ""
 
 		public var mnemonic: Mnemonic? {
-			try? Mnemonic(
+			guard completedWords.count == words.count else {
+				return nil
+			}
+			return try? Mnemonic(
 				words: completedWords
 			)
 		}
@@ -67,7 +77,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			self.saveInProfile = saveInProfile
 			self.language = language
-			self.wordCount = wordCount
 			self.bip39Passphrase = bip39Passphrase
 
 			let isReadonlyMode = false
@@ -93,7 +102,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let mnemonic = mnemonicWithPassphrase.mnemonic
 			self.saveInProfile = false
 			self.language = mnemonic.language
-			self.wordCount = mnemonic.wordCount
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
 			self.words = .init(
@@ -208,11 +216,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case .addRowButtonTapped:
-			state.wordCount.increaseBy3()
+			state.changeWordCount(by: +ImportMnemonic.wordsPerRow)
 			return .none
 
 		case .removeRowButtonTapped:
-			state.wordCount.decreaseBy3()
+			state.changeWordCount(by: -ImportMnemonic.wordsPerRow)
 			return .none
 
 		case let .continueButtonTapped(mnemonic):
