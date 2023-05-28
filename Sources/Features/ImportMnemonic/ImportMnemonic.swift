@@ -37,15 +37,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					// is decreasing word count
 					words.removeLast(abs(delta))
 				}
-
-				// Update buttons
-				self.isRemoveRowButtonEnabled = newValue != .twelve
-				self.isAddRowButtonEnabled = newValue != .twentyFour
 			}
 		}
-
-		public var isAddRowButtonEnabled: Bool
-		public var isRemoveRowButtonEnabled: Bool
 
 		public var bip39Passphrase: String = ""
 
@@ -77,9 +70,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.wordCount = wordCount
 			self.bip39Passphrase = bip39Passphrase
 
-			self.isRemoveRowButtonEnabled = wordCount != .twelve
-			self.isAddRowButtonEnabled = wordCount != .twentyFour
-
 			let isReadonlyMode = false
 			self.isReadonlyMode = isReadonlyMode
 			self.words = .init(
@@ -104,10 +94,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.saveInProfile = false
 			self.language = mnemonic.language
 			self.wordCount = mnemonic.wordCount
-			self.isAddRowButtonEnabled = false
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
-			self.isRemoveRowButtonEnabled = false
 			self.words = .init(
 				uniqueElements: mnemonic.words
 					.enumerated()
@@ -220,12 +208,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case .addRowButtonTapped:
-			assert(state.isAddRowButtonEnabled)
 			state.wordCount.increaseBy3()
 			return .none
 
 		case .removeRowButtonTapped:
-			assert(state.isRemoveRowButtonEnabled)
 			state.wordCount.decreaseBy3()
 			return .none
 
