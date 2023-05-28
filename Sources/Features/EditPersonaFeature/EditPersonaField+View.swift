@@ -53,7 +53,7 @@ extension EditPersonaField {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
 				AppTextField(
-					primaryHeading: viewStore.primaryHeading,
+					primaryHeading: .init(text: viewStore.primaryHeading),
 					secondaryHeading: viewStore.secondaryHeading,
 					placeholder: "",
 					text: viewStore.validation(

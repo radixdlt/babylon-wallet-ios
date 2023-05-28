@@ -69,6 +69,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		public typealias ID = Int
 		public let id: ID
 		public var value: WordValue
+		public let placeholder: String
 		public let isReadonlyMode: Bool
 
 		public var autocompletionCandidates: AutocompletionCandidates? = nil
@@ -77,10 +78,12 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		public init(
 			id: ID,
 			value: WordValue = .incomplete(text: "", hasFailedValidation: false),
+			placeholder: String,
 			isReadonlyMode: Bool
 		) {
 			self.id = id
 			self.value = value
+			self.placeholder = placeholder
 			self.isReadonlyMode = isReadonlyMode
 		}
 

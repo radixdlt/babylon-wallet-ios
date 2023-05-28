@@ -15,37 +15,45 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public var language: BIP39.Language
 		public var wordCount: BIP39.WordCount {
-			willSet {
-				let delta = newValue.rawValue - wordCount.rawValue
-
-				if delta > 0 {
-					// is increasing word count
-					words.append(contentsOf: (wordCount.rawValue ..< newValue.rawValue).map {
-						.init(id: $0, isReadonlyMode: isReadonlyMode)
-					})
-				} else if delta < 0 {
-					// is decreasing word count
-					words.removeLast(abs(delta))
-				}
-				switch newValue {
-				case .twelve:
-					self.isRemoveRowButtonEnabled = false
-				case .fifteen, .eighteen, .twentyOne:
-					self.isRemoveRowButtonEnabled = true
-					self.isAddRowButtonEnabled = true
-				case .twentyFour:
-					self.isAddRowButtonEnabled = false
-				}
+			guard let wordCount = BIP39.WordCount(wordCount: words.count) else {
+				assertionFailure("Should never happen")
+				return .twentyFour
 			}
+			return wordCount
 		}
 
-		public var isAddRowButtonEnabled: Bool
-		public var isRemoveRowButtonEnabled: Bool
+		public mutating func changeWordCount(by delta: Int) {
+			let positiveDelta = abs(delta)
+			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
+
+			let wordCount = words.count
+			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might infact be subtraction
+			if delta > 0 {
+				// is increasing word count
+				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
+					.init(
+						id: $0,
+						placeholder: ImportMnemonic.placeholder(
+							index: $0,
+							wordCount: newWordCount,
+							language: language
+						),
+						isReadonlyMode: isReadonlyMode
+					)
+				})
+			} else if delta < 0 {
+				// is decreasing word count
+				words.removeLast(positiveDelta)
+			}
+		}
 
 		public var bip39Passphrase: String = ""
 
 		public var mnemonic: Mnemonic? {
-			try? Mnemonic(
+			guard completedWords.count == words.count else {
+				return nil
+			}
+			return try? Mnemonic(
 				words: completedWords
 			)
 		}
@@ -69,22 +77,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			self.saveInProfile = saveInProfile
 			self.language = language
-			self.wordCount = wordCount
 			self.bip39Passphrase = bip39Passphrase
-
-			self.isAddRowButtonEnabled = wordCount != .twentyFour
-			self.isRemoveRowButtonEnabled = wordCount != .twelve
 
 			let isReadonlyMode = false
 			self.isReadonlyMode = isReadonlyMode
-			self.words = .init(
-				uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
-					ImportMnemonicWord.State(
-						id: $0,
-						isReadonlyMode: isReadonlyMode
-					)
-				}
-			)
+			self.words = []
+			changeWordCount(by: wordCount.rawValue)
 		}
 
 		public init(
@@ -93,11 +91,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let mnemonic = mnemonicWithPassphrase.mnemonic
 			self.saveInProfile = false
 			self.language = mnemonic.language
-			self.wordCount = mnemonic.wordCount
-			self.isAddRowButtonEnabled = false
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
-			self.isRemoveRowButtonEnabled = false
 			self.words = .init(
 				uniqueElements: mnemonic.words
 					.enumerated()
@@ -108,6 +103,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 								text: $0.element.word.rawValue,
 								word: $0.element,
 								completion: .auto(match: .exact)
+							),
+							placeholder: ImportMnemonic.placeholder(
+								index: $0.offset,
+								wordCount: mnemonic.wordCount,
+								language: mnemonic.language
 							),
 							isReadonlyMode: isReadonlyMode
 						)
@@ -205,13 +205,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case .addRowButtonTapped:
-			assert(state.isAddRowButtonEnabled)
-			state.wordCount.increaseBy3()
+			state.changeWordCount(by: +ImportMnemonic.wordsPerRow)
 			return .none
 
 		case .removeRowButtonTapped:
-			assert(state.isRemoveRowButtonEnabled)
-			state.wordCount.decreaseBy3()
+			state.changeWordCount(by: -ImportMnemonic.wordsPerRow)
 			return .none
 
 		case let .continueButtonTapped(mnemonic):
@@ -316,3 +314,37 @@ extension ImportMnemonic {
 		}
 	}
 }
+
+extension ImportMnemonic {
+	static func placeholder(
+		index: Int,
+		wordCount: BIP39.WordCount,
+		language: BIP39.Language
+	) -> String {
+		precondition(index <= 23, "Invalid BIP39 word index, got index: \(index), exected less than 24.")
+		let word: BIP39.Word = {
+			let wordList = BIP39.wordList(for: language)
+			switch language {
+			case .english:
+				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
+				return wordList
+					.words
+					// we use `last` simply because we did not like the words "abandon baby"
+					// which we get by using `first`, too sad a combination.
+					.last(
+						where: { $0.word.rawValue.hasPrefix(bip39Alphabet[index]) }
+					)!
+
+			default:
+				let scale = UInt16(89) // 2048 / 23
+				let indexScaled = BIP39.Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
+				return wordList.indexToWord[indexScaled]!
+			}
+
+		}()
+		return word.word.rawValue
+	}
+}
+
+// MARK: - ScenePhase + Sendable
+extension ScenePhase: @unchecked Sendable {}

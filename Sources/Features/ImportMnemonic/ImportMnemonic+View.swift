@@ -10,9 +10,7 @@ extension ImportMnemonic.State {
 			isReadonlyMode: isReadonlyMode,
 			isHidingSecrets: isHidingSecrets,
 			rowCount: rowCount,
-			wordCount: wordCount.rawValue,
-			isAddRowButtonEnabled: isAddRowButtonEnabled,
-			isRemoveRowButtonEnabled: isRemoveRowButtonEnabled,
+			wordCount: wordCount,
 			completedWords: completedWords,
 			mnemonic: mnemonic,
 			bip39Passphrase: bip39Passphrase
@@ -24,20 +22,43 @@ extension ImportMnemonic.State {
 	}
 }
 
-// MARK: - ImportMnemonic.View
+// MARK: - ImportMnemonic.ViewState
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
 		let isHidingSecrets: Bool
 		let rowCount: Int
-		let wordCount: Int
-		let isAddRowButtonEnabled: Bool
-		let isRemoveRowButtonEnabled: Bool
+		let wordCount: BIP39.WordCount
 		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
 	}
+}
 
+extension ImportMnemonic.ViewState {
+	var isNonChecksummed: Bool {
+		mnemonic == nil && completedWords.count == wordCount.rawValue
+	}
+
+	var isAddRowButtonEnabled: Bool {
+		wordCount != .twentyFour
+	}
+
+	var isRemoveRowButtonEnabled: Bool {
+		wordCount != .twelve
+	}
+
+	var isShowingPassphrase: Bool {
+		!(isReadonlyMode && bip39Passphrase.isEmpty)
+	}
+
+	var isShowingChangeWordCountButtons: Bool {
+		!isReadonlyMode
+	}
+}
+
+// MARK: - ImportMnemonic.View
+extension ImportMnemonic {
 	@MainActor
 	public struct View: SwiftUI.View {
 		@Environment(\.scenePhase) var scenePhase
@@ -51,70 +72,14 @@ extension ImportMnemonic {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView(showsIndicators: false) {
 					VStack(spacing: .large1) {
-						LazyVGrid(
-							columns: .init(
-								repeating: .init(.flexible()),
-								count: 3
-							)
-						) {
-							ForEachStore(
-								store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) }),
-								content: { importMnemonicWordStore in
-									VStack(spacing: 0) {
-										ImportMnemonicWord.View(store: importMnemonicWordStore)
-										Spacer(minLength: .medium2)
-									}
-								}
-							)
+						wordsGrid(with: viewStore)
+
+						if viewStore.isShowingChangeWordCountButtons {
+							changeWordCountButtons(with: viewStore)
 						}
 
-						if !viewStore.isReadonlyMode {
-							HStack {
-								Button {
-									viewStore.send(.removeRowButtonTapped)
-								} label: {
-									// FIXME: strings
-									HStack {
-										Text("Less words")
-											.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
-										Image(systemName: "text.badge.plus")
-											.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.red1 : .app.white)
-									}
-								}
-								.controlState(viewStore.isRemoveRowButtonEnabled ? .enabled : .disabled)
-
-								Spacer(minLength: 0)
-
-								Button {
-									viewStore.send(.addRowButtonTapped)
-								} label: {
-									// FIXME: strings
-									HStack {
-										Text("More words")
-											.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
-										Image(systemName: "text.badge.plus")
-											.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.green1 : .app.white)
-									}
-								}
-								.controlState(viewStore.isAddRowButtonEnabled ? .enabled : .disabled)
-							}
-							.buttonStyle(.secondaryRectangular)
-						}
-
-						if !(viewStore.isReadonlyMode && viewStore.bip39Passphrase.isEmpty) {
-							AppTextField(
-								// FIXME: strings
-								primaryHeading: "Passhprase",
-								placeholder: "Passphrase",
-								text: viewStore.binding(
-									get: \.bip39Passphrase,
-									send: { .passphraseChanged($0) }
-								),
-								// FIXME: strings
-								hint: viewStore.isReadonlyMode ? nil : .info("BIP39 Passphrase is often called a '25th word'.")
-							)
-							.disabled(viewStore.isReadonlyMode)
-							.autocorrectionDisabled()
+						if viewStore.isShowingPassphrase {
+							passphrase(with: viewStore)
 						}
 					}
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
@@ -122,27 +87,7 @@ extension ImportMnemonic {
 						viewStore.send(.scenePhase(newPhase))
 					}
 					.footer {
-						WithControlRequirements(
-							viewStore.mnemonic,
-							forAction: { viewStore.send(.continueButtonTapped($0)) }
-						) { action in
-							if !viewStore.isReadonlyMode {
-								if viewStore.mnemonic == nil, viewStore.completedWords.count == viewStore.wordCount {
-									// FIXME: strings
-									Text("Mnemonic not checksummed")
-										.foregroundColor(.app.red1)
-								}
-								// FIXME: strings
-								Button("Import mnemonic", action: action)
-									.buttonStyle(.primaryRectangular)
-							} else {
-								// FIXME: strings
-								Button("Done") {
-									viewStore.send(.doneViewing)
-								}
-								.buttonStyle(.primaryRectangular)
-							}
-						}
+						footer(with: viewStore)
 					}
 				}
 				.animation(.default, value: viewStore.wordCount)
@@ -151,6 +96,104 @@ extension ImportMnemonic {
 				#if os(iOS)
 					.screenshotProtected(isProtected: true)
 				#endif // iOS
+			}
+		}
+	}
+}
+
+extension ImportMnemonic.View {
+	@ViewBuilder
+	private func wordsGrid(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+		LazyVGrid(
+			columns: .init(
+				repeating: .init(.flexible()),
+				count: 3
+			)
+		) {
+			ForEachStore(
+				store.scope(state: \.words, action: { .child(.word(id: $0, child: $1)) }),
+				content: { importMnemonicWordStore in
+					VStack(spacing: 0) {
+						ImportMnemonicWord.View(store: importMnemonicWordStore)
+						Spacer(minLength: .medium2)
+					}
+				}
+			)
+		}
+	}
+
+	@ViewBuilder
+	private func passphrase(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+		AppTextField(
+			// FIXME: strings
+			primaryHeading: .init(text: "Passhprase", isProminent: false),
+			placeholder: "Passphrase",
+			text: viewStore.binding(
+				get: \.bip39Passphrase,
+				send: { .passphraseChanged($0) }
+			),
+			// FIXME: strings
+			hint: viewStore.isReadonlyMode ? nil : .info("BIP39 Passphrase is often called a '25th word'.")
+		)
+		.disabled(viewStore.isReadonlyMode)
+		.autocorrectionDisabled()
+	}
+
+	@ViewBuilder
+	private func changeWordCountButtons(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+		HStack {
+			Button {
+				viewStore.send(.removeRowButtonTapped)
+			} label: {
+				// FIXME: strings
+				HStack {
+					Text("Less words")
+						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
+					Image(systemName: "text.badge.plus")
+						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.red1 : .app.white)
+				}
+			}
+			.controlState(viewStore.isRemoveRowButtonEnabled ? .enabled : .disabled)
+
+			Spacer(minLength: 0)
+
+			Button {
+				viewStore.send(.addRowButtonTapped)
+			} label: {
+				// FIXME: strings
+				HStack {
+					Text("More words")
+						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
+					Image(systemName: "text.badge.plus")
+						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.green1 : .app.white)
+				}
+			}
+			.controlState(viewStore.isAddRowButtonEnabled ? .enabled : .disabled)
+		}
+		.buttonStyle(.secondaryRectangular)
+	}
+
+	@ViewBuilder
+	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+		WithControlRequirements(
+			viewStore.mnemonic,
+			forAction: { viewStore.send(.continueButtonTapped($0)) }
+		) { action in
+			if !viewStore.isReadonlyMode {
+				if viewStore.isNonChecksummed {
+					// FIXME: strings
+					Text("Mnemonic not checksummed")
+						.foregroundColor(.app.red1)
+				}
+				// FIXME: strings
+				Button("Import mnemonic", action: action)
+					.buttonStyle(.primaryRectangular)
+			} else {
+				// FIXME: strings
+				Button("Done") {
+					viewStore.send(.doneViewing)
+				}
+				.buttonStyle(.primaryRectangular)
 			}
 		}
 	}
