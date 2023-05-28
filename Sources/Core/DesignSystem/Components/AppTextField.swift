@@ -18,7 +18,20 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
-	let primaryHeading: String?
+	public struct PrimaryHeading: Sendable, Hashable, ExpressibleByStringLiteral {
+		public let text: String
+		public let isProminent: Bool
+		public init(text: String, isProminent: Bool = true) {
+			self.text = text
+			self.isProminent = isProminent
+		}
+
+		public init(stringLiteral value: StringLiteralType) {
+			self.init(text: value)
+		}
+	}
+
+	let primaryHeading: PrimaryHeading?
 	let secondaryHeading: String?
 	let placeholder: String
 	let text: Binding<String>
@@ -29,7 +42,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let innerAccesory: InnerAccessory
 
 	public init(
-		primaryHeading: String? = nil,
+		primaryHeading: PrimaryHeading? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
@@ -51,7 +64,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	}
 
 	public init(
-		primaryHeading: String? = nil,
+		primaryHeading: PrimaryHeading? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
@@ -76,9 +89,9 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 			VStack(alignment: .leading, spacing: .small3) {
 				HStack(spacing: 0) {
 					if let primaryHeading {
-						Text(primaryHeading)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(accentColor)
+						Text(primaryHeading.text)
+							.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
+							.foregroundColor(primaryHeading.isProminent ? accentColor : .app.gray2)
 							.multilineTextAlignment(.leading)
 					}
 

@@ -104,7 +104,7 @@ extension ImportMnemonic {
 						if !(viewStore.isReadonlyMode && viewStore.bip39Passphrase.isEmpty) {
 							AppTextField(
 								// FIXME: strings
-								primaryHeading: "Passhprase",
+								primaryHeading: .init(text: "Passhprase", isProminent: false),
 								placeholder: "Passphrase",
 								text: viewStore.binding(
 									get: \.bip39Passphrase,

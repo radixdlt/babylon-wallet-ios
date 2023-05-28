@@ -341,9 +341,22 @@ extension ImportMnemonic {
 		precondition(index <= 23, "Invalid BIP39 word index, got index: \(index), exected less than 24.")
 		let word: BIP39.Word = {
 			let wordList = BIP39.wordList(for: language)
-			let scale = UInt16(89) // 2047 / 23 => 24th word => 2047
-			let indexScaled = BIP39.Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
-			return wordList.indexToWord[indexScaled]!
+			switch language {
+			case .english:
+				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
+				return wordList
+					.words
+					// we use `last` simply because we did not like the words "abandon baby"
+					// which we get by using `first`, too sad a combination.
+					.last(
+						where: { $0.word.rawValue.hasPrefix(bip39Alphabet[index]) }
+					)!
+
+			default:
+				let scale = UInt16(89) // 2048 / 23
+				let indexScaled = BIP39.Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
+				return wordList.indexToWord[indexScaled]!
+			}
 
 		}()
 		return word.word.rawValue
