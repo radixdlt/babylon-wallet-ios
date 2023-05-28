@@ -24,7 +24,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public mutating func changeWordCount(by delta: Int) {
 			let positiveDelta = abs(delta)
-			precondition(positiveDelta == ImportMnemonic.wordsPerRow)
+			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
 
 			let wordCount = words.count
 			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might infact be subtraction
@@ -81,19 +81,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			let isReadonlyMode = false
 			self.isReadonlyMode = isReadonlyMode
-			self.words = .init(
-				uncheckedUniqueElements: (0 ..< wordCount.rawValue).map {
-					ImportMnemonicWord.State(
-						id: $0,
-						placeholder: ImportMnemonic.placeholder(
-							index: $0,
-							wordCount: wordCount,
-							language: language
-						),
-						isReadonlyMode: isReadonlyMode
-					)
-				}
-			)
+			self.words = []
+			changeWordCount(by: wordCount.rawValue)
 		}
 
 		public init(
