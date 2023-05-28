@@ -1,10 +1,14 @@
 import Cryptography
 import FeaturePrelude
+#if os(iOS)
+import ScreenshotPreventing
+#endif
 
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		.init(
 			isReadonlyMode: isReadonlyMode,
+			isHidingSecrets: isHidingSecrets,
 			rowCount: rowCount,
 			wordCount: wordCount.rawValue,
 			isAddRowButtonEnabled: isAddRowButtonEnabled,
@@ -24,6 +28,7 @@ extension ImportMnemonic.State {
 extension ImportMnemonic {
 	public struct ViewState: Equatable {
 		let isReadonlyMode: Bool
+		let isHidingSecrets: Bool
 		let rowCount: Int
 		let wordCount: Int
 		let isAddRowButtonEnabled: Bool
@@ -35,6 +40,7 @@ extension ImportMnemonic {
 
 	@MainActor
 	public struct View: SwiftUI.View {
+		@Environment(\.scenePhase) var scenePhase
 		private let store: StoreOf<ImportMnemonic>
 
 		public init(store: StoreOf<ImportMnemonic>) {
@@ -111,6 +117,10 @@ extension ImportMnemonic {
 							.autocorrectionDisabled()
 						}
 					}
+					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
+					.onChange(of: scenePhase) { newPhase in
+						viewStore.send(.scenePhase(newPhase))
+					}
 					.footer {
 						WithControlRequirements(
 							viewStore.mnemonic,
@@ -138,7 +148,25 @@ extension ImportMnemonic {
 				.animation(.default, value: viewStore.wordCount)
 				.padding(.medium3)
 				.onAppear { viewStore.send(.appeared) }
+				#if os(iOS)
+					.screenshotProtected(isProtected: true)
+				#endif // iOS
 			}
+		}
+	}
+}
+
+extension View {
+	/// Conditionally adds a reason to apply a redaction to this view hierarchy.
+	///
+	/// Adding a redaction is an additive process: any redaction
+	/// provided will be added to the reasons provided by the parent.
+	@ViewBuilder
+	public func redacted(reason: RedactionReasons, if condition: @autoclosure () -> Bool) -> some View {
+		if condition() {
+			redacted(reason: reason)
+		} else {
+			self
 		}
 	}
 }

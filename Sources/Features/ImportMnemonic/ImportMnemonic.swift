@@ -57,6 +57,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public let saveInProfile: Bool
 
 		public let isReadonlyMode: Bool
+		public var isHidingSecrets: Bool = false
 
 		public init(
 			saveInProfile: Bool,
@@ -118,6 +119,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case scenePhase(ScenePhase)
+
 		case passphraseChanged(String)
 		case addRowButtonTapped
 		case removeRowButtonTapped
@@ -188,6 +191,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return focusNext(&state)
+
+		case .scenePhase(.background), .scenePhase(.inactive):
+			state.isHidingSecrets = true
+			return .none
+
+		case .scenePhase(.active), .scenePhase:
+			state.isHidingSecrets = false
+			return .none
 
 		case let .passphraseChanged(passphrase):
 			state.bip39Passphrase = passphrase

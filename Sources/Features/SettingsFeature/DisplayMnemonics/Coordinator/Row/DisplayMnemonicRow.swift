@@ -3,11 +3,14 @@ import FeaturePrelude
 // MARK: - DisplayMnemonicRow
 public struct DisplayMnemonicRow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = FactorSourceID
-		public var id: ID { deviceFactorSource.id }
-		public let deviceFactorSource: HDOnDeviceFactorSource
-		public init(deviceFactorSource: HDOnDeviceFactorSource) {
-			self.deviceFactorSource = deviceFactorSource
+		public typealias ID = AccountsForDeviceFactorSource.ID
+		public var id: ID { accountsForDeviceFactorSource.id }
+		public var deviceFactorSource: HDOnDeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
+
+		public let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
+
+		public init(accountsForDeviceFactorSource: AccountsForDeviceFactorSource) {
+			self.accountsForDeviceFactorSource = accountsForDeviceFactorSource
 		}
 	}
 

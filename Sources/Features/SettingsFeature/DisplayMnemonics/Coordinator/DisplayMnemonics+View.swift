@@ -20,33 +20,61 @@ extension DisplayMnemonics {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					ForEachStore(
-						store.scope(
-							state: \.deviceFactorSources,
-							action: { .child(.row(id: $0, action: $1)) }
-						)
-					) {
-						DisplayMnemonicRow.View(store: $0)
+				ScrollView {
+					VStack {
+						ForEachStore(
+							store.scope(
+								state: \.deviceFactorSources,
+								action: { .child(.row(id: $0, action: $1)) }
+							)
+						) {
+							DisplayMnemonicRow.View(store: $0)
+						}
+						.padding()
 					}
-					.padding()
 				}
 				// FIXME: strings
 				.navigationTitle("Seed phrases")
-				.sheet(
-					store: store.scope(
-						state: \.$displayMnemonic,
-						action: { .child(.details($0)) }
-					),
-					content: {
-						DisplayMnemonic.View(store: $0)
-					}
-				)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
+			.destinations(with: store)
 		}
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func destinations(
+		with store: StoreOf<DisplayMnemonics>
+	) -> some View {
+		let destinationStore = store.scope(
+			state: \.$destination,
+			action: { .child(.destination($0)) }
+		)
+
+		return displayMnemonicSheet(with: destinationStore)
+			.useCautionAlert(with: destinationStore)
+	}
+
+	@MainActor
+	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DisplayMnemonics.Destinations.State.displayMnemonic,
+			action: DisplayMnemonics.Destinations.Action.displayMnemonic,
+			content: { DisplayMnemonic.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func useCautionAlert(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /DisplayMnemonics.Destinations.State.useCaution,
+			action: DisplayMnemonics.Destinations.Action.useCaution
+		)
 	}
 }
 

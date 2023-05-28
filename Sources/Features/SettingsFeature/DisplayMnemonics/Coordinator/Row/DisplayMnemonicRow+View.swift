@@ -1,17 +1,5 @@
 import FeaturePrelude
 
-extension DisplayMnemonicRow.State {
-	var viewState: DisplayMnemonicRow.ViewState {
-		.init(
-			factorSourceID: deviceFactorSource.factorSource.id,
-			labelSeedPhraseKind: deviceFactorSource.labelSeedPhraseKind,
-			addedOn: deviceFactorSource
-				.addedOn
-				.ISO8601Format(.iso8601Date(timeZone: .current))
-		)
-	}
-}
-
 extension HDOnDeviceFactorSource {
 	var labelSeedPhraseKind: String {
 		// FIXME: string
@@ -21,12 +9,6 @@ extension HDOnDeviceFactorSource {
 
 // MARK: - DisplayMnemonicRow.View
 extension DisplayMnemonicRow {
-	public struct ViewState: Equatable {
-		let factorSourceID: FactorSourceID
-		let labelSeedPhraseKind: String
-		let addedOn: String
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<DisplayMnemonicRow>
@@ -36,16 +18,53 @@ extension DisplayMnemonicRow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Card {
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				Card(.app.gray5) {
 					viewStore.send(.tapped)
 				} contents: {
-					PlainListRow(title: "\(viewStore.labelSeedPhraseKind) added: \(viewStore.addedOn)") {
-						EmptyView()
+					AccountsForDeviceFactorSourceView(
+						accountsForDeviceFactorSource: viewStore.accountsForDeviceFactorSource
+					)
+				}
+				.shadow(color: .app.cardShadowBlack, radius: .small2)
+			}
+		}
+	}
+}
+
+// MARK: - AccountsForDeviceFactorSourceView
+struct AccountsForDeviceFactorSourceView: SwiftUI.View {
+	let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
+	var deviceFactorSource: HDOnDeviceFactorSource {
+		accountsForDeviceFactorSource.deviceFactorSource
+	}
+
+	var body: some View {
+		HStack(spacing: 0) {
+			VStack(alignment: .leading) {
+				Text(deviceFactorSource.labelSeedPhraseKind)
+					.font(.title3)
+
+				HPair(
+					// FIXME: strings
+					label: deviceFactorSource.supportsOlympia ? "Imported on" : "Generated on",
+					item: deviceFactorSource
+						.addedOn
+						.ISO8601Format(.iso8601Date(timeZone: .current))
+				)
+
+				VStack(alignment: .leading, spacing: .small3) {
+					ForEach(accountsForDeviceFactorSource.accounts) { account in
+						SmallAccountCard(account: account)
+							.cornerRadius(.small1)
 					}
 				}
 			}
+			.padding()
+
+			Image(asset: AssetResource.chevronRight)
 		}
+		.multilineTextAlignment(.leading)
 	}
 }
 

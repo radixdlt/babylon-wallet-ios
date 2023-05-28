@@ -241,8 +241,8 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 }
 
 extension AlertState<LedgerHardwareDevices.Destinations.Action.NoP2PLinkAlert> {
-	static var noP2Plink: AlertState {
-		AlertState {
+	static var noP2Plink: Self {
+		Self {
 			TextState("Link a Connector") // FIXME: Strings
 		} actions: {
 			ButtonState(role: .cancel, action: .cancelTapped) {
