@@ -141,7 +141,6 @@ public struct App: Sendable, FeatureReducer {
 			state.alert = .userErrorAlert(
 				.init(
 					title: { TextState(L10n.Common.errorAlertTitle) },
-					actions: {},
 					message: { TextState(error.legibleLocalizedDescription) }
 				)
 			)

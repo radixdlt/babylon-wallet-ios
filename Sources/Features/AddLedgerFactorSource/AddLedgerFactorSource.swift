@@ -44,7 +44,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(ledger: LedgerFactorSource, isNew: Bool)
+		case completed(LedgerFactorSource)
 		case dismiss
 	}
 
@@ -52,18 +52,13 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case ledgerAlreadyExistsAlert(AlertState<Action.LedgerAlreadyExists>)
+			case ledgerAlreadyExistsAlert(AlertState<Never>)
 			case nameLedger(NameLedgerFactorSource.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case ledgerAlreadyExistsAlert(LedgerAlreadyExists)
+			case ledgerAlreadyExistsAlert(Never)
 			case nameLedger(NameLedgerFactorSource.Action)
-
-			public enum LedgerAlreadyExists: Sendable, Hashable {
-				case tryAnotherLedger
-				case finish(LedgerFactorSource)
-			}
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -100,17 +95,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .destination(.presented(.ledgerAlreadyExistsAlert(alertAction))):
-			switch alertAction {
-			case let .finish(ledger):
-				return completeWithLedgerEffect(ledger, isNew: false)
-
-			case .tryAnotherLedger:
-				return sendAddLedgerRequestEffect(&state)
-			}
-
 		case let .destination(.presented(.nameLedger(.delegate(.complete(ledger))))):
-			return completeWithLedgerEffect(ledger, isNew: true)
+			return completeWithLedgerEffect(ledger)
 
 		default:
 			return .none
@@ -171,15 +157,11 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func completeWithLedgerEffect(_ ledger: LedgerFactorSource, isNew: Bool) -> EffectTask<Action> {
-		guard isNew else {
-			return .send(.delegate(.completed(ledger: ledger, isNew: true)))
-		}
-
-		return .run { send in
+	private func completeWithLedgerEffect(_ ledger: LedgerFactorSource) -> EffectTask<Action> {
+		.run { send in
 			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
-			await send(.delegate(.completed(ledger: ledger, isNew: false)))
+			await send(.delegate(.completed(ledger)))
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to add Factor Source, error: \(error)")
 			errorQueue.schedule(error)
@@ -187,19 +169,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<AddLedgerFactorSource.Destinations.Action.LedgerAlreadyExists> {
+extension AlertState<Never> {
 	static func ledgerAlreadyExists(_ ledger: LedgerFactorSource) -> AlertState {
 		AlertState {
 			TextState("Ledger is already added") // FIXME: Strings
-		} actions: {
-			ButtonState(action: .finish(ledger)) {
-				TextState("Use this ledger") // FIXME: Strings
-			}
-			ButtonState(role: .cancel, action: .tryAnotherLedger) {
-				TextState("Connect another") // FIXME: Strings
-			}
 		} message: {
-			TextState("You have already added this ledger \(ledger.label.rawValue) \(ledger.description.rawValue) on \(ledger.addedOn.formatted(.dateTime)), do you want to connect another?") // FIXME: Strings
+			TextState("You have already added this ledger \(ledger.label.rawValue) \(ledger.description.rawValue)") // FIXME: Strings
 		}
 	}
 }
