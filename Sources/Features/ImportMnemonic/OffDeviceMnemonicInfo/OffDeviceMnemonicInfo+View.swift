@@ -11,6 +11,18 @@ extension OffDeviceMnemonicInfo {
 	public struct ViewState: Equatable {
 		public let story: String
 		public let backup: String
+
+		public var isStoryValid: Bool {
+			!story.isEmpty
+		}
+
+		public var isBackupValid: Bool {
+			!backup.isEmpty
+		}
+
+		public var saveWithDescriptionControlState: ControlState {
+			isStoryValid && isBackupValid ? .enabled : .disabled
+		}
 	}
 
 	@MainActor
@@ -51,12 +63,13 @@ extension OffDeviceMnemonicInfo {
 				.padding()
 				.footer {
 					// FIXME: strings
-					Button("Save") {
+					Button("Save with description") {
 						viewStore.send(.saveButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
+					.controlState(viewStore.saveWithDescriptionControlState)
 
-					Button("Skip") {
+					Button("Save without description") {
 						viewStore.send(.skipButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular(shouldExpand: true))
