@@ -192,7 +192,8 @@ extension FactorSourceView {
 					Labeled("Word count", value: offDeviceMnemonic.wordCount.rawValue)
 					Labeled("Language", value: offDeviceMnemonic.language)
 					Labeled("Passphrase?", value: offDeviceMnemonic.usedBip39Passphrase)
-				}.padding([.leading], indentation.inOneLevel.leadingPadding)
+				}
+				.padding([.leading], indentation.inOneLevel.leadingPadding)
 			}
 		}
 		.background {

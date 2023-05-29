@@ -247,15 +247,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			switch persistedKind {
 			case let .onDevice(onDeviceKind):
-				return .run { send in
-					await send(.internal(.saveFactorSourceResult(
+				return .task {
+					await .internal(.saveFactorSourceResult(
 						TaskResult {
 							try await factorSourcesClient.addOnDeviceFactorSource(
 								onDeviceMnemonicKind: onDeviceKind,
 								mnemonicWithPassphrase: mnemonicWithPassphrase
 							)
 						}
-					)))
+					))
 				}
 			case .offDevice:
 				state.offDeviceMnemonicInfoPrompt = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)

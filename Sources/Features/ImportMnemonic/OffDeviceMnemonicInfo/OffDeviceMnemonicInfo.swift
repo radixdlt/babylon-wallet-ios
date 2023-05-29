@@ -45,8 +45,8 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 					label: .init(state.story),
 					description: .init(state.backup),
 					state.mnemonicWithPassphrase
-				))
-			)
+				)
+			))
 		}
 	}
 }
