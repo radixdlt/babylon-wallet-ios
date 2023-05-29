@@ -139,9 +139,14 @@ extension FactorSource.Storage {
 		case var .entityCreating(entityCreatingStorage):
 			entityCreatingStorage.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
 			self = .entityCreating(entityCreatingStorage)
+		default:
+			throw WrongStorageType()
 		}
 	}
 }
+
+// MARK: - WrongStorageType
+struct WrongStorageType: Swift.Error {}
 
 extension FactorSource.Storage.EntityCreating {
 	public mutating func increaseNextDerivationIndex(

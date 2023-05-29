@@ -84,7 +84,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			saveInProfileKind: MnemonicBasedFactorSourceKind?,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
-			bip39Passphrase: String = ""
+			bip39Passphrase: String = "",
+			offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State? = nil
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
@@ -95,6 +96,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let isReadonlyMode = false
 			self.isReadonlyMode = isReadonlyMode
 			self.words = []
+			self.offDeviceMnemonicInfoPrompt = offDeviceMnemonicInfoPrompt
 			changeWordCount(by: wordCount.rawValue)
 		}
 

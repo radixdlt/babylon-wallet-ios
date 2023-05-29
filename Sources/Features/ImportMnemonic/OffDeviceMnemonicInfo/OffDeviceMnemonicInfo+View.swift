@@ -26,6 +26,7 @@ extension OffDeviceMnemonicInfo {
 				VStack {
 					AppTextField(
 						primaryHeading: "Tell a story",
+						secondaryHeading: "Optional",
 						placeholder: "Hitchcock's The Birds mixed with Office space",
 						text: viewStore.binding(
 							get: \.story,
@@ -33,8 +34,31 @@ extension OffDeviceMnemonicInfo {
 						),
 						hint: .info("Without revealing the words, what comes to mind when reading this seed phrase?")
 					)
+
+					AppTextField(
+						primaryHeading: "Backup location?",
+						secondaryHeading: "Optional",
+						placeholder: "In that book my mother used to read to me at my best childhoods summer vacation place",
+						text: viewStore.binding(
+							get: \.backup,
+							send: { .backupChanged($0) }
+						),
+						hint: .info("Without revealing location, vague hint on where this mnemonic is backed up, if anywhere.")
+					)
 				}
+				.padding()
 				.onAppear { viewStore.send(.appeared) }
+				.footer {
+					Button("Save") {
+						viewStore.send(.saveButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+
+					Button("Skip") {
+						viewStore.send(.skipButtonTapped)
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+				}
 			}
 		}
 	}
