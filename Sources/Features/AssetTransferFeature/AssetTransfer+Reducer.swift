@@ -321,7 +321,10 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
 		case "<":
 			return .string(value)
 		case "[":
-			return .bytes(Data(stringLiteral: value).bytes)
+			guard let bytes = value.data(using: .utf8)?.bytes else {
+				throw InvalidLocalID()
+			}
+			return .bytes(bytes)
 		default:
 			// UUID local id is not working properly in current version of RET
 			throw InvalidLocalID()
