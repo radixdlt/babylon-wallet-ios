@@ -80,7 +80,6 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case .message(.delegate(.removed)):
 			state.message = nil
 			return .none
-
 		default:
 			return .none
 		}

@@ -100,6 +100,15 @@
       }
     },
     {
+      "identity" : "screenshotpreventing-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS.git",
+      "state" : {
+        "revision" : "02d9892489ef2bb145f693a36ec914109f1d90ab",
+        "version" : "0.0.1"
+      }
+    },
+    {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-algorithms",

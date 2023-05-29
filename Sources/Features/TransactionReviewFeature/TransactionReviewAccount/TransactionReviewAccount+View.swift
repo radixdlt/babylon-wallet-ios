@@ -126,13 +126,4 @@ extension SmallAccountCard where Accessory == EmptyView {
 			)
 		}
 	}
-
-	public init(account: Profile.Network.AccountForDisplay) {
-		self.init(
-			account.label.rawValue,
-			identifiable: .address(.account(account.address)),
-			gradient: .init(account.appearanceID),
-			height: .guaranteeAccountLabelHeight
-		)
-	}
 }

@@ -1,6 +1,6 @@
 targets:
   - name: macosx
     sources:
-      - en/**/*.json
+      - Content/**/*.json
     file: /Sources/Core/Resources/Resources/%two_letters_code%.lproj/Localizable.strings
     format: macosx

@@ -2,49 +2,48 @@ import SwiftUI
 
 // MARK: - Card
 public struct Card<Contents: View>: View {
+	let action: (() -> Void)?
+	let color: Color
 	let contents: Contents
-	let action: () -> Void
-	let isButton: Bool
 
 	public init(
-		@ViewBuilder contents: () -> Contents
-	) {
-		self.action = {}
-		self.contents = contents()
-		self.isButton = false
-	}
-
-	public init(
-		action: @escaping () -> Void,
+		_ color: Color = .app.white,
+		action: (() -> Void)? = nil,
 		@ViewBuilder contents: () -> Contents
 	) {
 		self.action = action
+		self.color = color
 		self.contents = contents()
-		self.isButton = true
 	}
 
 	public var body: some View {
-		if isButton {
+		if let action {
 			Button(action: action) {
 				contents
 			}
-			.buttonStyle(.cardButtonStyle)
+			.buttonStyle(.cardButtonStyle(color))
 		} else {
 			contents
-				.inCard
+				.inCard(color)
 		}
 	}
 }
 
 public extension ButtonStyle where Self == CardButtonStyle {
-	static var cardButtonStyle: CardButtonStyle { CardButtonStyle() }
+	static func cardButtonStyle(_ color: Color) -> CardButtonStyle { CardButtonStyle(color: color) }
 }
 
 // MARK: - CardButtonStyle
 public struct CardButtonStyle: ButtonStyle {
+	public let color: Color
+
+	public init(color: Color) {
+		self.color = color
+	}
+
 	public func makeBody(configuration: Configuration) -> some View {
 		configuration.label
-			.inCard(isPressed: configuration.isPressed)
+			.inCard(color, isPressed: configuration.isPressed)
 	}
 }
 
@@ -85,12 +84,8 @@ public struct InnerCard<Contents: View>: View {
 
 extension View {
 	/// Gives the view a white background, rounded corners (16 px), and a shadow, useful for root level cards
-	public var inCard: some View {
-		inCard(isPressed: false)
-	}
-
-	fileprivate func inCard(isPressed: Bool) -> some View {
-		background(isPressed ? .app.gray4 : .app.white)
+	fileprivate func inCard(_ color: Color = .white, isPressed: Bool = false) -> some View {
+		background(isPressed ? .app.gray4 : color)
 			.clipShape(RoundedRectangle(cornerRadius: .medium3))
 			.cardShadow
 	}

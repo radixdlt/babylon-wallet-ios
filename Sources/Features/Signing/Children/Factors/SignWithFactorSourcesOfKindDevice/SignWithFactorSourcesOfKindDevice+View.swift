@@ -30,7 +30,7 @@ extension SignWithFactorSourcesOfKindDevice {
 					}
 				}
 				.onFirstTask { @MainActor in
-					ViewStore(store.stateless).send(.view(.onFirstTask))
+					await viewStore.send(.onFirstTask).finish()
 				}
 			}
 		}

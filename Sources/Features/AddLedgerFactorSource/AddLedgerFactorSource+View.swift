@@ -1,24 +1,15 @@
 import FeaturePrelude
-import NewConnectionFeature
 
 extension AddLedgerFactorSource.State {
 	var viewState: AddLedgerFactorSource.ViewState {
-		.init(
-			failedToFindAnyLinks: !isConnectedToAnyCE,
-			ledgerName: ledgerName,
-			modelOfLedgerToName: unnamedDeviceToAdd?.model,
-			sendAddLedgerRequestControlState: isConnectedToAnyCE ? (isWaitingForResponseFromLedger ? .loading(.local) : .enabled) : .disabled
-		)
+		.init(continueButtonControlState: isWaitingForResponseFromLedger ? .loading(.local) : .enabled)
 	}
 }
 
 // MARK: - AddLedgerFactorSource.View
 extension AddLedgerFactorSource {
 	public struct ViewState: Equatable {
-		public let failedToFindAnyLinks: Bool
-		public let ledgerName: String
-		public let modelOfLedgerToName: P2P.LedgerHardwareWallet.Model?
-		public let sendAddLedgerRequestControlState: ControlState
+		public let continueButtonControlState: ControlState
 	}
 
 	@MainActor
@@ -30,72 +21,139 @@ extension AddLedgerFactorSource {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					if viewStore.failedToFindAnyLinks {
-						Text("⚠️ Found no open RadixConnect connections.")
+			NavigationStack {
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+					VStack {
+						Text("Add Ledger Device") // FIXME: String
+							.textStyle(.sheetTitle)
+							.padding(.top, .small1)
+							.padding(.bottom, .large1)
 
-						Button("Add New P2P Link") {
-							viewStore.send(.addNewP2PLinkButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: true))
-					}
+						Text("Let’s set up a Ledger hardware wallet device. You will be able to use it to create new Ledger-secured Accounts, or import Ledger-secured Accounts from the Radix Olympia Desktop Wallet.") // FIXME: String
+							.textStyle(.body1Regular)
+							.padding(.bottom, .large1)
+							.padding(.horizontal, .medium3)
 
-					if let model = viewStore.modelOfLedgerToName {
-						VStack {
-							nameLedgerField(with: viewStore, model: model)
+						Text("Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.") // FIXME: String
+							.textStyle(.body1Regular)
+							.padding(.horizontal, .medium3)
 
-							Button("Confirm name") {
-								viewStore.send(.confirmNameButtonTapped)
-							}
-							.buttonStyle(.primaryRectangular)
-						}
-					} else {
-						Text("Connect the Ledger device you wanna add to a computer on which you have a Browser you have RadixConnect linked to. Unlock your Ledger and open the Radix Babylon Ledger App on your ledger. Look for a new tab in your linked Browser and follow the instructions on the screen.")
+						Spacer()
 
-						Button("Send Add Ledger Request") {
+						Button(L10n.Common.continue) {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
-						.controlState(viewStore.sendAddLedgerRequestControlState)
+						.controlState(viewStore.continueButtonControlState)
 						.buttonStyle(.primaryRectangular)
+						.padding(.bottom, .large2)
 					}
+					.multilineTextAlignment(.center)
+					.foregroundColor(.app.gray1)
+					.padding(.horizontal, .medium3)
+					#if os(iOS)
+						.toolbar {
+							ToolbarItem(placement: .primaryAction) {
+								CloseButton {
+									viewStore.send(.closeButtonTapped)
+								}
+							}
+						}
+					#endif
 				}
-				.padding(.horizontal, .medium3)
-				.task { @MainActor in
-					await ViewStore(store.stateless).send(.view(.task)).finish()
-				}
-				.confirmationDialog(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AddLedgerFactorSource.Destinations.State.closeLedgerAlreadyExistsConfirmationDialog,
-					action: AddLedgerFactorSource.Destinations.Action.closeLedgerAlreadyExistsConfirmationDialog
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AddLedgerFactorSource.Destinations.State.addNewP2PLink,
-					action: AddLedgerFactorSource.Destinations.Action.addNewP2PLink,
-					content: { NewConnection.View(store: $0) }
-				)
+				.destination(store: store)
 			}
 		}
+	}
+}
 
-		@ViewBuilder
-		private func nameLedgerField(
-			with viewStore: ViewStoreOf<AddLedgerFactorSource>,
-			model: P2P.LedgerHardwareWallet.Model
-		) -> some SwiftUI.View {
-			VStack {
-				Text("Found ledger model: '\(model.rawValue)'")
-				AppTextField(
-					primaryHeading: "Name your Ledger",
-					secondaryHeading: "e.g. 'scratch'",
-					placeholder: "scratched",
-					text: .init(
-						get: { viewStore.ledgerName },
-						set: { viewStore.send(.ledgerNameChanged($0)) }
-					),
-					hint: .info("Displayed when you are prompted to sign with this.")
-				)
-				.padding()
+extension View {
+	@MainActor
+	fileprivate func destination(store: StoreOf<AddLedgerFactorSource>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return ledgerAlreadyExistsAlert(with: destinationStore)
+			.nameLedger(with: destinationStore)
+	}
+
+	@MainActor
+	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destinations>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /AddLedgerFactorSource.Destinations.State.ledgerAlreadyExistsAlert,
+			action: AddLedgerFactorSource.Destinations.Action.ledgerAlreadyExistsAlert
+		)
+	}
+
+	@MainActor
+	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AddLedgerFactorSource.Destinations.State.nameLedger,
+			action: AddLedgerFactorSource.Destinations.Action.nameLedger,
+			destination: { NameLedgerFactorSource.View(store: $0) }
+		)
+	}
+}
+
+extension NameLedgerFactorSource.State {
+	var viewState: NameLedgerFactorSource.ViewState {
+		.init(
+			ledgerName: ledgerName,
+			model: deviceInfo.model,
+			confirmButtonControlState: nameIsValid ? .enabled : .disabled
+		)
+	}
+}
+
+extension NameLedgerFactorSource {
+	public struct ViewState: Equatable {
+		public let ledgerName: String
+		public let model: P2P.LedgerHardwareWallet.Model
+		public let confirmButtonControlState: ControlState
+	}
+
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<NameLedgerFactorSource>
+
+		public init(store: StoreOf<NameLedgerFactorSource>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			NavigationStack {
+				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+					VStack {
+						Text("Name Your Ledger") // FIXME: String
+							.textStyle(.sheetTitle)
+							.padding(.top, .small1)
+							.padding(.bottom, .medium3)
+
+						Text("Enter a name for this Ledger device") // FIXME: String
+							.textStyle(.body1Regular)
+							.padding(.bottom, .medium1)
+
+						AppTextField(
+							placeholder: "My green Ledger", // FIXME: String
+							text: Binding(
+								get: { viewStore.ledgerName },
+								set: { viewStore.send(.ledgerNameChanged($0)) }
+							)
+						)
+
+						Spacer()
+					}
+					.padding(.horizontal, .large2)
+					.multilineTextAlignment(.center)
+					.foregroundColor(.app.gray1)
+					.footer {
+						Button("Save and Continue") { // FIXME: String
+							viewStore.send(.confirmNameButtonTapped)
+						}
+						.controlState(viewStore.confirmButtonControlState)
+						.buttonStyle(.primaryRectangular)
+						.padding([.bottom, .horizontal], .medium3)
+					}
+				}
 			}
 		}
 	}

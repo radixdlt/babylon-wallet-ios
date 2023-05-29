@@ -10,6 +10,12 @@ extension HD.Root {
 
 // MARK: - ComboTests
 final class ComboTests: TestCase {
+	func test_zoo() throws {
+		let fromPhrase = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+		let fromWords = try Mnemonic(words: ["zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "zoo", "wrong"], language: .english)
+		XCTAssertEqual(fromPhrase, fromPhrase)
+	}
+
 	func testInterface() throws {
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let root = try HD.Root(mnemonic: mnemonic)

@@ -18,7 +18,20 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 		}
 	}
 
-	let primaryHeading: String?
+	public struct PrimaryHeading: Sendable, Hashable, ExpressibleByStringLiteral {
+		public let text: String
+		public let isProminent: Bool
+		public init(text: String, isProminent: Bool = true) {
+			self.text = text
+			self.isProminent = isProminent
+		}
+
+		public init(stringLiteral value: StringLiteralType) {
+			self.init(text: value)
+		}
+	}
+
+	let primaryHeading: PrimaryHeading?
 	let secondaryHeading: String?
 	let placeholder: String
 	let text: Binding<String>
@@ -29,7 +42,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	let innerAccesory: InnerAccessory
 
 	public init(
-		primaryHeading: String? = nil,
+		primaryHeading: PrimaryHeading? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
@@ -51,7 +64,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	}
 
 	public init(
-		primaryHeading: String? = nil,
+		primaryHeading: PrimaryHeading? = nil,
 		secondaryHeading: String? = nil,
 		placeholder: String,
 		text: Binding<String>,
@@ -73,12 +86,12 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 
 	public var body: some View {
 		HStack(alignment: .textFieldAlignment, spacing: 0) {
-			VStack(alignment: .leading, spacing: .small2) {
+			VStack(alignment: .leading, spacing: .small3) {
 				HStack(spacing: 0) {
 					if let primaryHeading {
-						Text(primaryHeading)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(accentColor)
+						Text(primaryHeading.text)
+							.textStyle(primaryHeading.isProminent ? .body1HighImportance : .body2Regular)
+							.foregroundColor(primaryHeading.isProminent ? accentColor : .app.gray2)
 							.multilineTextAlignment(.leading)
 					}
 
@@ -99,30 +112,34 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 					)
 					.modifier { view in
 						if let focus {
-							view.focused(focus.focusState, equals: focus.value)
+							view
+								.focused(focus.focusState, equals: focus.value)
 								.bind(focus.binding, to: focus.focusState)
 						} else {
 							view
 						}
 					}
+					.privacySensitive()
 					.foregroundColor(.app.gray1)
 					.textStyle(.body1Regular)
 					.alignmentGuide(.textFieldAlignment, computeValue: { $0[VerticalAlignment.center] })
 
-					if showClearButton {
-						if !text.wrappedValue.isEmpty {
-							Button {
-								text.wrappedValue = ""
-							} label: {
-								Image(systemName: "multiply.circle.fill")
-									.foregroundStyle(.gray)
-							}
+					if
+						showClearButton,
+						!text.wrappedValue.isEmpty
+					{
+						Button {
+							text.wrappedValue = ""
+						} label: {
+							Image(systemName: "multiply.circle.fill")
+								.foregroundStyle(.gray)
 						}
 					}
 
 					innerAccesory
 				}
-				.padding()
+				.padding([.top, .bottom])
+				.padding([.leading, .trailing], 6)
 				.frame(height: .standardButtonHeight)
 				.background(Color.app.gray5)
 				.cornerRadius(.small2)
@@ -189,10 +206,11 @@ struct AppTextFieldPreview: View {
 			placeholder: "Placeholder",
 			text: $text,
 			hint: .error("Hint"),
-			focus: .on(.field, binding: $focus, to: $focusState)
-		) {
-			Image(asset: AssetResource.trash).frame(.small)
-		}
+			focus: .on(.field, binding: $focus, to: $focusState),
+			innerAccessory: {
+				Image(asset: AssetResource.trash).frame(.small)
+			}
+		)
 	}
 }
 #endif

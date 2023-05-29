@@ -103,7 +103,7 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
-		name: "ChooseLedgerHardwareDeviceFeature",
+		name: "LedgerHardwareDevicesFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
@@ -126,7 +126,7 @@ package.addModules([
 		dependencies: [
 			"AddLedgerFactorSourceFeature",
 			"AccountsClient",
-			"ChooseLedgerHardwareDeviceFeature",
+			"LedgerHardwareDevicesFeature",
 			"Cryptography",
 			"DerivePublicKeysFeature",
 			"FactorSourcesClient",
@@ -167,6 +167,15 @@ package.addModules([
 			"DappInteractionClient",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "DebugInspectProfileFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"RadixConnectModels",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "DerivePublicKeysFeature",
@@ -216,6 +225,18 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "ImportMnemonicFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient", // saves into profile, if specified
+			"MnemonicClient",
+			.product(name: "ScreenshotPreventing", package: "ScreenshotPreventing-iOS", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/Sajjon/ScreenshotPreventing-iOS.git", from: "0.0.1")
+			},
+		],
+		tests: .no
+	),
+	.feature(
 		name: "ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
@@ -223,23 +244,7 @@ package.addModules([
 			"RadixConnectClient",
 			"ImportLegacyWalletClient",
 			"DerivePublicKeysFeature",
-			"ChooseLedgerHardwareDeviceFeature",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "InspectProfileFeature",
-		dependencies: [
-			"SecureStorageClient",
-		],
-		tests: .no
-	),
-	.feature(
-		name: "LedgerHardwareWalletsFeature",
-		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			"AddLedgerFactorSourceFeature",
-			"FactorSourcesClient",
+			"LedgerHardwareDevicesFeature",
 		],
 		tests: .no
 	),
@@ -321,14 +326,13 @@ package.addModules([
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
+			"DebugInspectProfileFeature",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
+			"ImportMnemonicFeature",
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
-			"InspectProfileFeature",
-			"LedgerHardwareWalletsFeature",
-			"MnemonicClient",
 			"P2PLinksFeature",
 			"PersonasFeature",
 			"RadixConnectClient",

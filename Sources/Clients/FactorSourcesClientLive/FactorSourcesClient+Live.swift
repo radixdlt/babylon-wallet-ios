@@ -51,7 +51,7 @@ extension FactorSourcesClient: DependencyKey {
 					return nil
 				}
 				do {
-					// cannot use `getFactorSources:ofKind`
+					// Might be empty, if it is, we will just return nil (for-loop below not run).
 					let factorSourceIDs = try await getFactorSources()
 						.filter(\.supportsOlympia)
 						.filter { $0.kind == .device }
@@ -69,10 +69,10 @@ extension FactorSourcesClient: DependencyKey {
 						return factorSourceID
 					}
 
-					return nil // failed to find any factor source
+					return nil // Did not find any Olympia `.device` factor sources
 				} catch {
 					loggerGlobal.warning("Failed to check if olympia factor source exists, error: \(error)")
-					return nil // failure
+					return nil // failed? to find any Olympia `.device` factor sources
 				}
 			},
 			addOffDeviceFactorSource: addOffDeviceFactorSource,

@@ -1,8 +1,12 @@
 // MARK: - UInt11
-public struct UInt11: Hashable, ExpressibleByIntegerLiteral {
+public struct UInt11: Sendable, Hashable, ExpressibleByIntegerLiteral, Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.valueBoundBy16Bits < rhs.valueBoundBy16Bits
+	}
+
 	public let valueBoundBy16Bits: UInt16
 
-	internal init?(valueBoundBy16Bits: UInt16) {
+	public init?(valueBoundBy16Bits: UInt16) {
 		if valueBoundBy16Bits > UInt11.max16 {
 			return nil
 		}

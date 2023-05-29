@@ -42,7 +42,7 @@ extension SubmitTransaction {
 				}
 				.padding(.medium1)
 				.onFirstTask { @MainActor in
-					viewStore.send(.appeared)
+					await viewStore.send(.appeared).finish()
 				}
 				.navigationTitle("Submitting Transaction")
 			}

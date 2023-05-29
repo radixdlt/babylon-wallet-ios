@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ImportMnemonicFeature
 import ImportOlympiaLedgerAccountsAndFactorSourcesFeature
 
 extension ImportOlympiaWalletCoordinator.State {
@@ -28,7 +29,7 @@ extension ImportOlympiaWalletCoordinator {
 				IfLetStore(
 					store.scope(state: \.root, action: { .child(.root($0)) })
 				) {
-					destination(for: $0)
+					Destinations.View(store: $0)
 					#if os(iOS)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
@@ -42,41 +43,46 @@ extension ImportOlympiaWalletCoordinator {
 				// This is required to disable the animation of internal components during transition
 				.transaction { $0.animation = nil }
 			} destination: {
-				destination(for: $0)
+				Destinations.View(store: $0)
 			}
 			#if os(iOS)
 			.navigationTransition(.slide, interactivity: .disabled)
 			#endif
 		}
+	}
+}
 
-		private func destination(
-			for store: StoreOf<ImportOlympiaWalletCoordinator.Destinations>
-		) -> some SwiftUI.View {
+// MARK: - ImportOlympiaWalletCoordinator.Destinations.View
+extension ImportOlympiaWalletCoordinator.Destinations {
+	struct View: SwiftUI.View {
+		let store: StoreOf<ImportOlympiaWalletCoordinator.Destinations>
+
+		var body: some SwiftUI.View {
 			ZStack {
 				SwitchStore(store) {
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.scanMultipleOlympiaQRCodes,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.scanMultipleOlympiaQRCodes,
+						state: /State.scanMultipleOlympiaQRCodes,
+						action: Action.scanMultipleOlympiaQRCodes,
 						then: { ScanMultipleOlympiaQRCodes.View(store: $0) }
 					)
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.selectAccountsToImport,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.selectAccountsToImport,
+						state: /State.selectAccountsToImport,
+						action: Action.selectAccountsToImport,
 						then: { SelectAccountsToImport.View(store: $0) }
 					)
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.importOlympiaMnemonic,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.importOlympiaMnemonic,
-						then: { ImportOlympiaFactorSource.View(store: $0) }
+						state: /State.importMnemonic,
+						action: Action.importMnemonic,
+						then: { ImportMnemonic.View(store: $0) }
 					)
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.importOlympiaLedgerAccountsAndFactorSources,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.importOlympiaLedgerAccountsAndFactorSources,
+						state: /State.importOlympiaLedgerAccountsAndFactorSources,
+						action: Action.importOlympiaLedgerAccountsAndFactorSources,
 						then: { ImportOlympiaLedgerAccountsAndFactorSources.View(store: $0) }
 					)
 					CaseLet(
-						state: /ImportOlympiaWalletCoordinator.Destinations.State.completion,
-						action: ImportOlympiaWalletCoordinator.Destinations.Action.completion,
+						state: /State.completion,
+						action: Action.completion,
 						then: { CompletionMigrateOlympiaAccountsToBabylon.View(store: $0) }
 					)
 				}

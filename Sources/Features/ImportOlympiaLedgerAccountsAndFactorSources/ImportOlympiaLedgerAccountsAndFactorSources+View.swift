@@ -1,7 +1,7 @@
 import AddLedgerFactorSourceFeature
-import ChooseLedgerHardwareDeviceFeature
 import DerivePublicKeysFeature
 import FeaturePrelude
+import LedgerHardwareDevicesFeature
 
 extension ImportOlympiaLedgerAccountsAndFactorSources.State {
 	var viewState: ImportOlympiaLedgerAccountsAndFactorSources.ViewState {
@@ -48,7 +48,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 					Spacer()
 
-					ChooseLedgerHardwareDevice.View(
+					LedgerHardwareDevices.View(
 						store: store.scope(
 							state: \.chooseLedger,
 							action: { .child(.chooseLedger($0)) }
