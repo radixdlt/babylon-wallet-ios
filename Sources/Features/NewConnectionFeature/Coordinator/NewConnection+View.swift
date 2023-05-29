@@ -29,6 +29,8 @@ extension NewConnection {
 										.foregroundColor(.app.gray1)
 										.textStyle(.sheetTitle)
 
+									Spacer(minLength: 0)
+
 									ScanQRCoordinator.View(store: newConnectionStore)
 								}
 							}
