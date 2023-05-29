@@ -76,7 +76,7 @@ final class ProfileStoreTests: TestCase {
 
 				XCTAssertNoDifference(
 					profileSnapshot.factorSources.first,
-					privateFactor.hdOnDeviceFactorSource.factorSource
+					privateFactor.factorSource
 				)
 				XCTAssertNoDifference(profileSnapshot.header.creatingDevice.description, expectedDeviceDescription)
 			}
@@ -113,7 +113,7 @@ private extension ProfileStoreTests {
 						assertMnemonicWithPassphraseSaved(privateFactorSource.mnemonicWithPassphrase)
 					}
 					if let assertFactorSourceSaved {
-						assertFactorSourceSaved(privateFactorSource.hdOnDeviceFactorSource.factorSource)
+						assertFactorSourceSaved(privateFactorSource.factorSource)
 					}
 				}
 			}
@@ -139,7 +139,7 @@ private extension ProfileStoreTests {
 				switch state {
 				case let .ephemeral(ephemeral):
 					profile = ephemeral.profile
-					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.hdOnDeviceFactorSource.factorSource)
+					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.factorSource)
 					try await sut.commitEphemeral()
 				case let .persisted(persistedProfile):
 					XCTAssertNoDifference(
