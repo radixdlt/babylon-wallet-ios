@@ -62,7 +62,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
-		public let saveInProfileKind: MnemonicBasedFactorSourceKind?
+		public let persistedKind: MnemonicBasedFactorSourceKind?
 
 		public let isReadonlyMode: Bool
 		public var isHidingSecrets: Bool = false
@@ -71,7 +71,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
 
 		public init(
-			saveInProfileKind: MnemonicBasedFactorSourceKind?,
+			persistAsMnemonicKind persistedKind: MnemonicBasedFactorSourceKind?,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
 			bip39Passphrase: String = "",
@@ -79,7 +79,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
-			self.saveInProfileKind = saveInProfileKind
+			self.persistedKind = persistedKind
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
@@ -94,7 +94,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			mnemonicWithPassphrase: MnemonicWithPassphrase
 		) {
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.saveInProfileKind = nil
+			self.persistedKind = nil
 			self.language = mnemonic.language
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
@@ -193,9 +193,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, description, mnemonicWithPassphrase)))):
 			state.offDeviceMnemonicInfoPrompt = nil
-			precondition(state.saveInProfileKind == .offDevice)
-			return .run { send in
-				await send(.internal(.saveFactorSourceResult(
+			precondition(state.persistedKind == .offDevice)
+			return .task {
+				await .internal(.saveFactorSourceResult(
 					TaskResult {
 						try await factorSourcesClient.addOffDeviceFactorSource(
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
@@ -203,7 +203,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 							description: description
 						)
 					}
-				)))
+				))
 			}
 
 		default:
@@ -241,11 +241,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				mnemonic: mnemonic,
 				passphrase: state.bip39Passphrase
 			)
-			guard let factorSourceKind = state.saveInProfileKind else {
+			guard let persistedKind = state.persistedKind else {
 				return .send(.delegate(.notSavedInProfile(mnemonicWithPassphrase)))
 			}
 
-			switch factorSourceKind {
+			switch persistedKind {
 			case let .onDevice(onDeviceKind):
 				return .run { send in
 					await send(.internal(.saveFactorSourceResult(

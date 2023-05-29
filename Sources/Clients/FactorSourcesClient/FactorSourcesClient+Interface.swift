@@ -187,7 +187,10 @@ extension FactorSourcesClient {
 			label: label,
 			description: description
 		)
-		return try await self.addPrivateHDFactorSource(.init(privateFactorSource: privateFactorSource, saveIntoProfile: true))
+		return try await addPrivateHDFactorSource(.init(
+			privateFactorSource: privateFactorSource,
+			saveIntoProfile: true
+		))
 	}
 
 	public func addOnDeviceFactorSource(
@@ -203,7 +206,7 @@ extension FactorSourcesClient {
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			factorSource: hdOnDeviceFactorSource.factorSource
 		)
-		return try await self.addPrivateHDFactorSource(.init(
+		return try await addPrivateHDFactorSource(.init(
 			privateFactorSource: privateFactorSource,
 			saveIntoProfile: isOlympia
 		))

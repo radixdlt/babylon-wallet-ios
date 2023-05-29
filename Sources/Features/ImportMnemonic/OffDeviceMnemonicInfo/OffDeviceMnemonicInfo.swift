@@ -13,7 +13,6 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
 		case storyChanged(String)
 		case backupChanged(String)
 		case skipButtonTapped
@@ -32,9 +31,6 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .none
-
 		case let .storyChanged(story):
 			state.story = story
 			return .none

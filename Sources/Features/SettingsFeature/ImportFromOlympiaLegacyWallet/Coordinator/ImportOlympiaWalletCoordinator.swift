@@ -191,7 +191,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				}()
 
 				let destination = Destinations.State.importMnemonic(.init(
-					saveInProfileKind: nil,
+					persistAsMnemonicKind: nil,
 					wordCount: expectedWordCount
 				))
 
@@ -311,8 +311,8 @@ extension ImportOlympiaWalletCoordinator {
 							factorSource: factorSourceToSave
 						),
 						saveIntoProfile: true
-					)
-					)
+					))
+
 				} catch {
 					// Check if we have already imported this Mnemonic
 					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id) {

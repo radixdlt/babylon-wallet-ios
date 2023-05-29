@@ -47,7 +47,6 @@ extension OffDeviceMnemonicInfo {
 					)
 				}
 				.padding()
-				.onAppear { viewStore.send(.appeared) }
 				.footer {
 					Button("Save") {
 						viewStore.send(.saveButtonTapped)
