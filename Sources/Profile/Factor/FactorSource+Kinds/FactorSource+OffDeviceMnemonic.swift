@@ -15,7 +15,11 @@ extension FactorSource {
 			label: label,
 			description: description,
 			parameters: .babylon,
-			storage: nil
+			storage: .offDeviceMnemonic(.init(
+				wordCount: mnemonicWithPassphrase.mnemonic.wordCount,
+				language: mnemonicWithPassphrase.mnemonic.language,
+				usedBip39Passphrase: !mnemonicWithPassphrase.passphrase.isEmpty
+			))
 		)
 		return try PrivateHDFactorSource(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,

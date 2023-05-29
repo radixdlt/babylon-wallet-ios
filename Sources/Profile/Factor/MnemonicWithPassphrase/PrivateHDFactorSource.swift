@@ -16,6 +16,7 @@ public struct PrivateHDFactorSource: _FactorSourceHolderProtocol {
 			throw CriticalDisrepancyBetweenFactorSourceID()
 		}
 		self.mnemonicWithPassphrase = mnemonicWithPassphrase
+		self.factorSource = factorSource
 	}
 
 	struct CriticalDisrepancyBetweenFactorSourceID: Swift.Error {}
@@ -40,11 +41,9 @@ extension PrivateHDFactorSource {
 			lastUsedOn: .init(timeIntervalSince1970: 0)
 		)
 
-		let hdOnDeviceFactorSource = try! HDOnDeviceFactorSource(factorSource: factorSource)
-
 		return try! .init(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			hdOnDeviceFactorSource: hdOnDeviceFactorSource
+			factorSource: factorSource
 		)
 	}
 }

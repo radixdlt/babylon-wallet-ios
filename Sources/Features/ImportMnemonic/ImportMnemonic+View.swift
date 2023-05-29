@@ -96,6 +96,15 @@ extension ImportMnemonic {
 				#if os(iOS)
 					.screenshotProtected(isProtected: true)
 				#endif // iOS
+					.sheet(
+						store: store.scope(
+							state: \.$offDeviceMnemonicInfoPrompt,
+							action: { .child(.offDeviceMnemonicInfoPrompt($0)) }
+						),
+						content: {
+							OffDeviceMnemonicInfo.View(store: $0)
+						}
+					)
 			}
 		}
 	}
@@ -230,6 +239,6 @@ struct ImportMnemonic_Preview: PreviewProvider {
 }
 
 extension ImportMnemonic.State {
-	public static let previewValue = Self(saveInProfile: false)
+	public static let previewValue = Self(saveInProfileKind: .offDevice)
 }
 #endif

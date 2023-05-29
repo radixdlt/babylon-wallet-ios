@@ -5,6 +5,8 @@ extension FactorSource {
 	public enum Storage: Sendable, Hashable, Codable {
 		/// EntityCreating
 		case entityCreating(FactorSource.Storage.EntityCreating)
+
+		case offDeviceMnemonic(FactorSource.Storage.OffDeviceMnemonic)
 	}
 }
 
@@ -40,16 +42,18 @@ extension FactorSource {
 extension FactorSource.Storage {
 	private enum Discriminator: String, Codable {
 		case entityCreating
+		case offDeviceMnemonic
 	}
 
 	private var discriminator: Discriminator {
 		switch self {
 		case .entityCreating: return .entityCreating
+		case .offDeviceMnemonic: return .offDeviceMnemonic
 		}
 	}
 
 	private enum CodingKeys: String, CodingKey {
-		case discriminator, entityCreatingStorage
+		case discriminator, entityCreatingStorage, offDeviceMnemonic
 	}
 
 	public func encode(to encoder: Encoder) throws {
@@ -58,6 +62,8 @@ extension FactorSource.Storage {
 		switch self {
 		case let .entityCreating(entityCreatingStorage):
 			try keyedContainer.encode(entityCreatingStorage, forKey: .entityCreatingStorage)
+		case let .offDeviceMnemonic(offDeviceMnemonic):
+			try keyedContainer.encode(offDeviceMnemonic, forKey: .offDeviceMnemonic)
 		}
 	}
 
@@ -68,6 +74,10 @@ extension FactorSource.Storage {
 		case .entityCreating:
 			self = try .entityCreating(
 				keyedContainer.decode(FactorSource.Storage.EntityCreating.self, forKey: .entityCreatingStorage)
+			)
+		case .offDeviceMnemonic:
+			self = try .offDeviceMnemonic(
+				keyedContainer.decode(FactorSource.Storage.OffDeviceMnemonic.self, forKey: .offDeviceMnemonic)
 			)
 		}
 	}
