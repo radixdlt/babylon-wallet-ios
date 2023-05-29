@@ -133,3 +133,17 @@ extension ResourceAddress {
 		ResourceAddress(address: address + ":" + localID.rawValue)
 	}
 }
+
+extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
+	public var userFacingID: String {
+		let rawValue = id.rawValue
+
+		// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
+		guard rawValue.count >= 3 else {
+			loggerGlobal.warning("Invalid nft id: \(rawValue)")
+			return rawValue
+		}
+		// Nothing fancy, just remove the prefix and suffix.
+		return String(rawValue.dropLast().dropFirst())
+	}
+}

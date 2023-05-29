@@ -70,6 +70,8 @@ package.addModules([
 			"ScanQRFeature",
 			"ChooseAccountsFeature",
 			"AssetsFeature",
+			"EngineToolkitClient",
+			"DappInteractionClient",
 		],
 		tests: .yes()
 	),
@@ -162,6 +164,7 @@ package.addModules([
 			"ROLAClient",
 			"TransactionReviewFeature",
 			"SigningFeature",
+			"DappInteractionClient",
 		],
 		tests: .yes()
 	),
@@ -448,6 +451,21 @@ package.addModules([
 	.client(
 		name: "CameraPermissionClient",
 		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "DappInteractionClient",
+		dependencies: [],
+		tests: .no
+	),
+	.client(
+		name: "DappInteractionClientLive",
+		dependencies: [
+			"RadixConnectClient",
+			"GatewaysClient",
+			"AppPreferencesClient",
+			"DappInteractionClient",
+		],
 		tests: .no
 	),
 	.client(

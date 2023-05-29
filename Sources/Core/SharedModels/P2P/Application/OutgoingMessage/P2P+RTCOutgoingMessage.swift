@@ -9,7 +9,7 @@ extension P2P {
 	public enum RTCOutgoingMessage: Sendable, Hashable {
 		/// A response to some request that we received from `origin`,
 		/// we will use `origin` to identify the RTC channel to send over.
-		case response(Response, origin: RTCRoute)
+		case response(Response, origin: Route)
 
 		/// A request initiated by us, sent over RTC using `sendStrategy`.
 		case request(Request, sendStrategy: Request.SendStrategy)

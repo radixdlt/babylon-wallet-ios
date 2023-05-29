@@ -5,6 +5,11 @@ import Prelude
 /// address the an component on Ledger, the `DappAddress`.
 public typealias DappDefinitionAddress = AccountAddress
 
+extension DappDefinitionAddress {
+	/// This address is just a placeholder for now to be compatible with DappInteractor flow
+	public static let wallet: Self = try! .init(address: "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p")
+}
+
 // MARK: - AccountAddress
 /// The address to an `Account` on the Radix network.
 public struct AccountAddress:

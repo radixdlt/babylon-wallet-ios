@@ -373,7 +373,7 @@ extension RTCClient {
 				let route = P2P.RTCRoute(connectionId: self.id, peerConnectionId: connection.id)
 				return P2P.RTCIncomingMessage(
 					result: decode(messageResult),
-					route: route
+					route: .rtc(route)
 				)
 			}
 			.subscribe(self.incomingMessagesContinuation)

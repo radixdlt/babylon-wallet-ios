@@ -81,5 +81,17 @@ extension P2P.Dapp.Request {
 
 		/// Non yet validated dAppDefinitionAddresss
 		public let dAppDefinitionAddress: String
+
+		public init(
+			version: P2P.Dapp.Version,
+			networkId: NetworkID,
+			origin: String,
+			dAppDefinitionAddress: String
+		) {
+			self.version = version
+			self.networkId = networkId
+			self.origin = origin
+			self.dAppDefinitionAddress = dAppDefinitionAddress
+		}
 	}
 }

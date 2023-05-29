@@ -80,5 +80,9 @@ extension P2P.Dapp.Request {
 extension P2P.Dapp.Request {
 	public struct TransactionItems: Sendable, Hashable, Decodable {
 		public let send: SendTransactionItem
+
+		public init(send: SendTransactionItem) {
+			self.send = send
+		}
 	}
 }
