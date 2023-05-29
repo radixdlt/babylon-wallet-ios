@@ -6,6 +6,7 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 		public let mnemonicWithPassphrase: MnemonicWithPassphrase
 		public var story: String = ""
 		public var backup: String = ""
+
 		public init(mnemonicWithPassphrase: MnemonicWithPassphrase) {
 			self.mnemonicWithPassphrase = mnemonicWithPassphrase
 		}
