@@ -87,14 +87,15 @@ public struct NewConnection: Sendable, FeatureReducer {
 				state = .scanQR(.init(scanInstructions: string))
 				return .none
 			} else {
-				return .run { send in await send(.delegate(.dismiss)) }
+				return .send(.delegate(.dismiss))
 			}
 
 		case let .scanQR(.delegate(.scanned(qrString))):
-			return .run { send in
-				await send(.internal(.connectionPasswordFromStringResult(TaskResult {
+			return .task {
+				let result = await TaskResult {
 					try ConnectionPassword(.init(hex: qrString))
-				})))
+				}
+				return .internal(.connectionPasswordFromStringResult(result))
 			}
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):

@@ -201,15 +201,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			let guarantees = state.allGuarantees
 
-			return .run { send in
-				await send(.internal(.addGuaranteeToManifestResult(
+			return .task {
+				await .internal(.addGuaranteeToManifestResult(
 					TaskResult {
 						try await addingGuarantees(
 							to: transactionWithLockFee,
 							guarantees: guarantees
 						)
 					}
-				)))
+				))
 			}
 		}
 	}
