@@ -38,6 +38,7 @@ extension DappInteractionClient {
 	public enum ValidatedDappRequest: Sendable, Hashable {
 		case valid(RequestEnvelope)
 		case invalid(Invalid)
+
 		public enum Invalid: Sendable, Hashable {
 			case incompatibleVersion(connectorExtensionSent: P2P.Dapp.Version, walletUses: P2P.Dapp.Version)
 			case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)

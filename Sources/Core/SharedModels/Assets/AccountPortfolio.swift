@@ -144,6 +144,6 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken {
 			return rawValue
 		}
 		// Nothing fancy, just remove the prefix and suffix.
-		return String(rawValue.dropLast(1).dropFirst())
+		return String(rawValue.dropLast().dropFirst())
 	}
 }

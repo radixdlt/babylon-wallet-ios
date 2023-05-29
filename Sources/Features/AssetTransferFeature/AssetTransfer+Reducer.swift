@@ -227,7 +227,7 @@ extension AssetTransfer {
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedFungibleResource
 	) -> [any InstructionProtocol] {
-		let accountWidthraw: [any InstructionProtocol] = [
+		let accountWithdrawals: [any InstructionProtocol] = [
 			CallMethod(
 				receiver: .init(address: witdhrawAccount.address),
 				methodName: "withdraw",
@@ -258,14 +258,14 @@ extension AssetTransfer {
 			return instructions
 		}
 
-		return accountWidthraw + deposits
+		return accountWithdrawals + deposits
 	}
 
 	private func nonFungibleResourceTransferInstruction(
 		witdhrawAccount: AccountAddress,
 		_ resource: InvolvedNonFungibleResource
 	) throws -> [any InstructionProtocol] {
-		let accountWidthraw: [any InstructionProtocol] = try [
+		let accountWithdrawals: [any InstructionProtocol] = try [
 			CallMethod(
 				receiver: .init(address: witdhrawAccount.address),
 				methodName: "withdraw_non_fungibles",
@@ -276,8 +276,7 @@ extension AssetTransfer {
 						elements: resource.allTokens.map {
 							try .nonFungibleLocalId($0.id.toRETLocalID())
 						}
-					)
-					),
+					)),
 				]
 			),
 		]
@@ -302,7 +301,7 @@ extension AssetTransfer {
 			return instructions
 		}
 
-		return accountWidthraw + deposits
+		return accountWithdrawals + deposits
 	}
 }
 
@@ -311,11 +310,10 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
 
 	// TODO: Remove once RET is migrated to `ash`, this is meant to be temporary
 	func toRETLocalID() throws -> NonFungibleLocalId {
-		guard self.rawValue.count >= 3 else {
+		guard rawValue.count >= 3 else {
 			throw InvalidLocalID()
 		}
-
-		let prefix = self.rawValue.prefix(1)
+		let prefix = rawValue.prefix(1)
 		let value = String(self.rawValue.dropLast().dropFirst())
 
 		switch prefix {
