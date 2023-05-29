@@ -38,11 +38,22 @@ extension FactorSourcesClient {
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
+	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
+}
+
+// MARK: - AddPrivateHDFactorSourceRequest
+public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
+	public let privateFactorSource: PrivateHDFactorSource
+	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
+	public let saveIntoProfile: Bool
+	public init(privateFactorSource: PrivateHDFactorSource, saveIntoProfile: Bool) {
+		self.privateFactorSource = privateFactorSource
+		self.saveIntoProfile = saveIntoProfile
+	}
 }
 
 public typealias SigningFactors = OrderedDictionary<FactorSourceKind, NonEmpty<Set<SigningFactor>>>
@@ -124,6 +135,17 @@ public struct UpdateFactorSourceLastUsedRequest: Sendable, Hashable {
 	}
 }
 
+// MARK: - MnemonicBasedFactorSourceKind
+public enum MnemonicBasedFactorSourceKind: Sendable, Hashable {
+	public enum OnDeviceMnemonicKind: Sendable, Hashable {
+		case babylon
+		case olympia
+	}
+
+	case onDevice(OnDeviceMnemonicKind)
+	case offDevice
+}
+
 // MARK: - SigningFactor
 public struct SigningFactor: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSource.ID
@@ -165,13 +187,14 @@ extension FactorSourcesClient {
 			label: label,
 			description: description
 		)
-		return try await self.addPrivateHDFactorSource(privateFactorSource)
+		return try await self.addPrivateHDFactorSource(.init(privateFactorSource: privateFactorSource, saveIntoProfile: true))
 	}
 
 	public func addOnDeviceFactorSource(
-		isOlympia: Bool,
+		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
 	) async throws -> FactorSourceID {
+		let isOlympia = onDeviceMnemonicKind == .olympia
 		let hdOnDeviceFactorSource: HDOnDeviceFactorSource = isOlympia ? try FactorSource.olympia(
 			mnemonicWithPassphrase: mnemonicWithPassphrase
 		) : try FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase).hdOnDeviceFactorSource
@@ -180,7 +203,10 @@ extension FactorSourcesClient {
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			factorSource: hdOnDeviceFactorSource.factorSource
 		)
-		return try await self.addPrivateHDFactorSource(privateFactorSource)
+		return try await self.addPrivateHDFactorSource(.init(
+			privateFactorSource: privateFactorSource,
+			saveIntoProfile: isOlympia
+		))
 	}
 }
 

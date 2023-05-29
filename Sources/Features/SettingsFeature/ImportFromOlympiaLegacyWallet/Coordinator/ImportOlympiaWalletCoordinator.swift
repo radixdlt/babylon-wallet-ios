@@ -306,9 +306,13 @@ extension ImportOlympiaWalletCoordinator {
 
 				do {
 					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
-						mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
-						factorSource: factorSourceToSave
-					))
+						privateFactorSource: .init(
+							mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
+							factorSource: factorSourceToSave
+						),
+						saveIntoProfile: true
+					)
+					)
 				} catch {
 					// Check if we have already imported this Mnemonic
 					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id) {

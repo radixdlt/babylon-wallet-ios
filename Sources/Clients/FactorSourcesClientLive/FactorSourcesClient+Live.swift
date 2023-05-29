@@ -30,21 +30,27 @@ extension FactorSourcesClient: DependencyKey {
 			factorSourcesAsyncSequence: {
 				await getProfileStore().factorSourcesValues()
 			},
-			addPrivateHDFactorSource: { privateFactorSource in
-
+			addPrivateHDFactorSource: { request in
+				let privateFactorSource = request.privateFactorSource
 				if privateFactorSource.kind == .device {
 					try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
 				}
 				let factorSourceID = privateFactorSource.id
-				do {
-					try await saveFactorSource(privateFactorSource.factorSource)
-				} catch {
-					if privateFactorSource.kind == .device {
-						// We were unlucky, failed to update Profile, thus best to undo the saving of
-						// the mnemonic in keychain (if we can).
-						try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+
+				/// We only need to save olympia mnemonics into Profile, the Babylon ones
+				/// already exist in profile, and this function is used only to save the
+				/// imported mnemonic into keychain (done above).
+				if request.saveIntoProfile {
+					do {
+						try await saveFactorSource(privateFactorSource.factorSource)
+					} catch {
+						if privateFactorSource.kind == .device {
+							// We were unlucky, failed to update Profile, thus best to undo the saving of
+							// the mnemonic in keychain (if we can).
+							try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+						}
+						throw error
 					}
-					throw error
 				}
 
 				return factorSourceID

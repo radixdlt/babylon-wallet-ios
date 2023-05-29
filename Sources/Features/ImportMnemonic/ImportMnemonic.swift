@@ -62,16 +62,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
-		public enum MnemonicBasedFactorSourceKind: Sendable, Hashable {
-			public enum OnDeviceMnemonicKind: Sendable, Hashable {
-				case babylon
-				case olympia
-			}
-
-			case onDevice(OnDeviceMnemonicKind)
-			case offDevice
-		}
-
 		public let saveInProfileKind: MnemonicBasedFactorSourceKind?
 
 		public let isReadonlyMode: Bool
@@ -261,7 +251,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					await send(.internal(.saveFactorSourceResult(
 						TaskResult {
 							try await factorSourcesClient.addOnDeviceFactorSource(
-								isOlympia: onDeviceKind == .olympia,
+								onDeviceMnemonicKind: onDeviceKind,
 								mnemonicWithPassphrase: mnemonicWithPassphrase
 							)
 						}
