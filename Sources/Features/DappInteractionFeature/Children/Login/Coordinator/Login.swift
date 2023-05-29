@@ -202,6 +202,7 @@ extension DappMetadata {
 		switch self {
 		case let .ledger(metadata): return metadata.dAppDefinintionAddress
 		case let .request(metadata): return metadata.dAppDefinitionAddress
+		case .wallet: return .wallet
 		}
 	}
 }

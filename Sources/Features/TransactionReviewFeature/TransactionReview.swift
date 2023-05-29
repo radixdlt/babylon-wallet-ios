@@ -159,6 +159,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
+			.debug()
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

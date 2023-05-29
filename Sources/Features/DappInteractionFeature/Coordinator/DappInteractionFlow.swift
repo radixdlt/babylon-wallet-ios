@@ -594,7 +594,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			displayName: {
 				switch state.dappMetadata {
 				case let .ledger(ledger): return ledger.name
-				case .request: return nil
+				case .request, .wallet: return nil
 				}
 			}()
 		)

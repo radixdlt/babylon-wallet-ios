@@ -44,6 +44,11 @@ extension Profile.Network.AuthorizedDapp {
 
 // MARK: - DappOrigin
 public struct DappOrigin: Sendable, Hashable, Codable {
+	public static let wallet: DappOrigin = {
+		let walletAppScheme = "com.radixpublishing.radixwallet.ios"
+		return .init(urlString: .init(stringLiteral: walletAppScheme), url: .init(string: walletAppScheme)!)
+	}()
+
 	public let urlString: NonEmptyString
 	public let url: URL
 	public func encode(to encoder: Encoder) throws {

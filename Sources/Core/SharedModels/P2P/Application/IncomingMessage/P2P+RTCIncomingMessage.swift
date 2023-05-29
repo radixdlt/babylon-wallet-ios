@@ -1,6 +1,11 @@
 import RadixConnectModels
 
 extension P2P {
+	public enum Route: Sendable, Hashable {
+		case wallet
+		case rtc(RTCRoute)
+	}
+
 	/// Recipient of sender of an RTC message
 	public struct RTCRoute: Sendable, Hashable {
 		/// The PerPeerPairConnection password.
@@ -29,8 +34,8 @@ extension P2P {
 	/// `result` and not an `P2P.RTCMessageFromPeer` directly.
 	public struct RTCIncomingMessageContainer<Success: Sendable & Hashable>: Sendable, Hashable {
 		public let result: Result<Success, Error>
-		public let route: RTCRoute
-		public init(result: Result<Success, Error>, route: RTCRoute) {
+		public let route: Route
+		public init(result: Result<Success, Error>, route: Route) {
 			self.result = result
 			self.route = route
 		}

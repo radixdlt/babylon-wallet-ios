@@ -19,6 +19,18 @@ enum DappMetadata: Sendable, Hashable {
 
 	/// A detailed DappMetaData fetched from Ledger.
 	case ledger(Ledger)
+
+	case wallet(Wallet)
+}
+
+extension DappMetadata {
+	static let wallet: Wallet = .init()
+	struct Wallet: Sendable, Hashable {
+		let origin: DappOrigin = .wallet
+		let name: NonEmptyString = "Radix Wallet"
+		let description: String? = nil
+		let thumbnail: URL? = nil
+	}
 }
 
 // MARK: DappMetadata.Ledger
@@ -51,10 +63,11 @@ extension DappMetadata {
 }
 
 extension DappMetadata {
-	public var origin: P2P.Dapp.Request.Metadata.Origin {
+	public var origin: DappOrigin {
 		switch self {
 		case let .ledger(metadata): return metadata.origin
 		case let .request(metadata): return metadata.origin
+		case let .wallet(metadata): return metadata.origin
 		}
 	}
 
