@@ -104,7 +104,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			state.alert = nil
 			return updateCloudSync(state: &state, isEnabled: false)
 		case .alert(.dismiss):
-                        return .none
+			return .none
 		case .exportLogsTapped:
 			state.exportLogs = Logger.logFilePath
 			return .none
