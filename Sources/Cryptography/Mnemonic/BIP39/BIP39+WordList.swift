@@ -138,7 +138,7 @@ extension BIP39.WordList {
 			} else if string.count >= minLengthForCandidatesLookup {
 				return .unknown(.tooShort)
 			} else {
-				assertionFailure("what is this case?")
+				// e.g. "x" which no word starts with in English, yielding no candidates.
 				return .unknown(.notInList(input: string))
 			}
 		}
