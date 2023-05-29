@@ -19,7 +19,7 @@ final class ProfileStoreTests: TestCase {
 				XCTAssertNoDifference($1, BIP39.Language.english)
 				return .testValue
 			}
-			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.hdOnDeviceFactorSource.factorSource.kind, .device) }
+			$0.secureStorageClient.saveMnemonicForFactorSource = { XCTAssertNoDifference($0.factorSource.kind, .device) }
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in nil }
 			$0.secureStorageClient.loadDeviceIdentifier = {
 				.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
