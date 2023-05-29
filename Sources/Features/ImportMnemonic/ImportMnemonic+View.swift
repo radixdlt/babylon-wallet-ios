@@ -239,6 +239,6 @@ struct ImportMnemonic_Preview: PreviewProvider {
 }
 
 extension ImportMnemonic.State {
-	public static let previewValue = Self(saveInProfileKind: .offDevice)
+	public static let previewValue = Self(persistAsMnemonicKind: nil)
 }
 #endif
