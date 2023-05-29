@@ -53,7 +53,7 @@ extension ProfileView {
 		ScrollView {
 			VStack(alignment: .leading, spacing: indentation.spacing) {
 				HeaderView(
-					profile.header,
+					header: profile.header,
 					indentation: inOneLevel
 				)
 
@@ -100,8 +100,8 @@ public struct HeaderView: IndentedView {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("ID", value: header.id)
 			Labeled("Snapshot version", value: header.snapshotVersion)
-			Labeled("Content hint", value: header.contentHint)
 			CreatingDeviceView(device: header.creatingDevice, indentation: inOneLevel)
+			HeaderHintView(hint: header.contentHint, indentation: inOneLevel)
 		}
 	}
 }
@@ -127,7 +127,9 @@ public struct HeaderHintView: IndentedView {
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Device ID", value:)
+			Labeled("#Networks", value: hint.numberOfNetworks)
+			Labeled("#Accounts", value: hint.numberOfAccountsOnAllNetworksInTotal)
+			Labeled("#Personas", value: hint.numberOfPersonasOnAllNetworksInTotal)
 		}
 	}
 }
