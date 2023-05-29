@@ -177,7 +177,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 
 		return .run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
+			try await factorSourcesClient.saveFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.delegate(.completed(ledger: ledger, isNew: false)))
 		} catch: { error, _ in

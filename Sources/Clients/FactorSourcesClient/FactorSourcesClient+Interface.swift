@@ -8,7 +8,7 @@ public struct FactorSourcesClient: Sendable {
 	public var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
 	public var checkIfHasOlympiaFactorSourceForAccounts: CheckIfHasOlympiaFactorSourceForAccounts
-	public var addOffDeviceFactorSource: AddOffDeviceFactorSource
+	public var saveFactorSource: SaveFactorSource
 	public var getSigningFactors: GetSigningFactors
 	public var updateLastUsed: UpdateLastUsed
 
@@ -18,7 +18,7 @@ public struct FactorSourcesClient: Sendable {
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
-		addOffDeviceFactorSource: @escaping AddOffDeviceFactorSource,
+		saveFactorSource: @escaping SaveFactorSource,
 		getSigningFactors: @escaping GetSigningFactors,
 		updateLastUsed: @escaping UpdateLastUsed
 	) {
@@ -27,7 +27,7 @@ public struct FactorSourcesClient: Sendable {
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
-		self.addOffDeviceFactorSource = addOffDeviceFactorSource
+		self.saveFactorSource = saveFactorSource
 		self.getSigningFactors = getSigningFactors
 		self.updateLastUsed = updateLastUsed
 	}
@@ -40,7 +40,7 @@ extension FactorSourcesClient {
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	public typealias AddPrivateHDFactorSource = @Sendable (PrivateHDFactorSource) async throws -> FactorSourceID
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID?
-	public typealias AddOffDeviceFactorSource = @Sendable (FactorSource) async throws -> Void
+	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
 	public typealias UpdateLastUsed = @Sendable (UpdateFactorSourceLastUsedRequest) async throws -> Void
 }

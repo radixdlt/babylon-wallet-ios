@@ -79,7 +79,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			migrateOlympiaSoftwareAccountsToBabylon: { request in
 
 				let olympiaFactorSource = request.olympiaFactorSource
-				let factorSource = olympiaFactorSource?.hdOnDeviceFactorSource
+				let factorSource = olympiaFactorSource?.factorSource
 
 				let (accounts, networkID) = try await migrate(
 					accounts: request.olympiaAccounts,

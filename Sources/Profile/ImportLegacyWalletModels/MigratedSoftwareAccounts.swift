@@ -10,12 +10,12 @@ public struct MigratedSoftwareAccounts: Sendable, Hashable {
 		.init(rawValue: .init(uncheckedUniqueElements: self.accounts.rawValue.elements.map(\.babylon)))!
 	}
 
-	public let factorSourceToSave: HDOnDeviceFactorSource?
+	public let factorSourceToSave: FactorSource?
 
 	public init(
 		networkID: NetworkID,
 		accounts: NonEmpty<OrderedSet<MigratedAccount>>,
-		factorSourceToSave: HDOnDeviceFactorSource?
+		factorSourceToSave: FactorSource?
 	) throws {
 		guard accounts.allSatisfy({ $0.babylon.networkID == networkID }) else {
 			throw NetworkIDDisrepancy()

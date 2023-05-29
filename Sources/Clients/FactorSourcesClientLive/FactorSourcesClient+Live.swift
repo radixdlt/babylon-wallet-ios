@@ -15,7 +15,7 @@ extension FactorSourcesClient: DependencyKey {
 			await getProfileStore().profile.factorSources
 		}
 
-		let addOffDeviceFactorSource: AddOffDeviceFactorSource = { source in
+		let saveFactorSource: SaveFactorSource = { source in
 			try await getProfileStore().updating { profile in
 				guard !profile.factorSources.contains(where: { $0.id == source.id }) else {
 					throw FactorSourceAlreadyPresent()
@@ -37,7 +37,7 @@ extension FactorSourcesClient: DependencyKey {
 				}
 				let factorSourceID = privateFactorSource.id
 				do {
-					try await addOffDeviceFactorSource(privateFactorSource.factorSource)
+					try await saveFactorSource(privateFactorSource.factorSource)
 				} catch {
 					if privateFactorSource.kind == .device {
 						// We were unlucky, failed to update Profile, thus best to undo the saving of
@@ -79,7 +79,7 @@ extension FactorSourcesClient: DependencyKey {
 					return nil // failed? to find any Olympia `.device` factor sources
 				}
 			},
-			addOffDeviceFactorSource: addOffDeviceFactorSource,
+			saveFactorSource: saveFactorSource,
 			getSigningFactors: { request in
 				assert(request.signers.allSatisfy { $0.networkID == request.networkID })
 				return try await signingFactors(

@@ -76,12 +76,18 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-		case .importOlympiaMnemonicButtonTapped:
 
-			state.destination = .importMnemonic(.init(saveInProfile: true))
+		case .importOlympiaMnemonicButtonTapped:
+			state.destination = .importMnemonic(.init(
+				saveInProfileKind: .onDevice(.olympia)
+			))
 			return .none
 
 		case .addOffDeviceMnemonicButtonTapped:
+			state.destination = .importMnemonic(.init(
+				saveInProfileKind: .offDevice
+			))
+			return .none
 
 		case .addLedgerButtonTapped:
 			state.destination = .addLedger(.init())
@@ -106,7 +112,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.addLedger(.delegate(.completed(_))))):
+		case .destination(.presented(.addLedger(.delegate(.completed(_))))):
 			state.destination = nil
 			return .none
 

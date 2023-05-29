@@ -181,7 +181,7 @@ extension SecureStorageClient: DependencyKey {
 			},
 			loadProfileSnapshotData: loadProfileSnapshotData,
 			saveMnemonicForFactorSource: { privateFactorSource in
-				let factorSource = privateFactorSource.hdOnDeviceFactorSource.factorSource
+				let factorSource = privateFactorSource.factorSource
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
 				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
