@@ -182,7 +182,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.addNewLedger(.delegate(newLedgerAction)))):
 			switch newLedgerAction {
-			case let .completed(ledger: ledger, isNew: _):
+			case let .completed(ledger):
 				state.destination = nil
 				state.selectedLedgerID = ledger.id
 				return updateLedgersEffekt(state: &state)
