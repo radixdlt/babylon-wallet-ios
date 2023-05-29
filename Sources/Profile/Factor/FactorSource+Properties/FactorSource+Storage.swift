@@ -18,6 +18,13 @@ extension FactorSource.Storage {
 		return storage
 	}
 
+	public var offDeviceMnemonic: FactorSource.Storage.OffDeviceMnemonic? {
+		guard case let .offDeviceMnemonic(storage) = self else {
+			return nil
+		}
+		return storage
+	}
+
 	public func asEntityCreating() throws -> FactorSource.Storage.EntityCreating {
 		guard let entityCreating else {
 			throw WasNotDeviceFactorSource()

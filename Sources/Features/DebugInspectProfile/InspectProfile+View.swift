@@ -52,7 +52,10 @@ extension ProfileView {
 	public var body: some View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: indentation.spacing) {
-				Labeled("Version", value: String(describing: profile.version))
+				HeaderView(
+					profile.header,
+					indentation: inOneLevel
+				)
 
 				PerNetworkView(
 					networks: profile.networks,
@@ -85,6 +88,47 @@ extension IndentedView {
 
 	public var leadingPadding: CGFloat {
 		indentation.leadingPadding
+	}
+}
+
+// MARK: - HeaderView
+public struct HeaderView: IndentedView {
+	public let header: ProfileSnapshot.Header
+	public let indentation: Indentation
+
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Labeled("ID", value: header.id)
+			Labeled("Snapshot version", value: header.snapshotVersion)
+			Labeled("Content hint", value: header.contentHint)
+			CreatingDeviceView(device: header.creatingDevice, indentation: inOneLevel)
+		}
+	}
+}
+
+// MARK: - CreatingDeviceView
+public struct CreatingDeviceView: IndentedView {
+	public let device: ProfileSnapshot.Header.UsedDeviceInfo
+	public let indentation: Indentation
+
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Labeled("Device ID", value: device.id)
+			Labeled("Creation date", value: device.date.ISO8601Format())
+			Labeled("Device", value: device.description.rawValue)
+		}
+	}
+}
+
+// MARK: - HeaderHintView
+public struct HeaderHintView: IndentedView {
+	public let hint: ProfileSnapshot.Header.ContentHint
+	public let indentation: Indentation
+
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Labeled("Device ID", value:)
+		}
 	}
 }
 
@@ -137,7 +181,16 @@ extension FactorSourceView {
 			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
 
 			if let entityCreatingStorage = factorSource.storage?.entityCreating {
-				NextDerivationIndicesPerNetworkView(nextDerivationIndicesPerNetwork: entityCreatingStorage.nextDerivationIndicesPerNetwork, indentation: indentation.inOneLevel)
+				NextDerivationIndicesPerNetworkView(
+					nextDerivationIndicesPerNetwork: entityCreatingStorage.nextDerivationIndicesPerNetwork,
+					indentation: indentation.inOneLevel
+				)
+			} else if let offDeviceMnemonic = factorSource.storage?.offDeviceMnemonic {
+				VStack {
+					Labeled("Word count", value: offDeviceMnemonic.wordCount.rawValue)
+					Labeled("Language", value: offDeviceMnemonic.language)
+					Labeled("Passphrase?", value: offDeviceMnemonic.usedBip39Passphrase)
+				}.padding([.leading], indentation.inOneLevel.leadingPadding)
 			}
 		}
 		.background {
@@ -654,6 +707,10 @@ public struct Labeled: SwiftUI.View {
 	public init(_ label: String, value: String) {
 		self.label = label
 		self.value = value
+	}
+
+	public init<Value>(_ label: String, value: Value) where Value: CustomStringConvertible {
+		self.init(label, value: String(describing: value))
 	}
 
 	public var body: some View {
