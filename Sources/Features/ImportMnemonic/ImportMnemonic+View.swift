@@ -82,6 +82,7 @@ extension ImportMnemonic {
 							passphrase(with: viewStore)
 						}
 					}
+					.padding(.horizontal, .small3)
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 					.onChange(of: scenePhase) { newPhase in
 						viewStore.send(.scenePhase(newPhase))
@@ -93,7 +94,7 @@ extension ImportMnemonic {
 				.animation(.default, value: viewStore.wordCount)
 				.padding(.medium3)
 				.onAppear { viewStore.send(.appeared) }
-				#if os(iOS)
+				#if !DEBUG && os(iOS)
 					.screenshotProtected(isProtected: true)
 				#endif // iOS
 					.sheet(
