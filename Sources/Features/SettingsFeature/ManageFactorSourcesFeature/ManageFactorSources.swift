@@ -38,8 +38,9 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 	// MARK: Action
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case importMnemonicButtonTapped
+		case importOlympiaMnemonicButtonTapped
 		case addLedgerButtonTapped
+		case addOffDeviceMnemonicButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -75,9 +76,13 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
-		case .importMnemonicButtonTapped:
+		case .importOlympiaMnemonicButtonTapped:
+
 			state.destination = .importMnemonic(.init(saveInProfile: true))
 			return .none
+
+		case .addOffDeviceMnemonicButtonTapped:
+
 		case .addLedgerButtonTapped:
 			state.destination = .addLedger(.init())
 			return .none
@@ -101,7 +106,7 @@ public struct ManageFactorSources: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.addLedger(.delegate(.completed(ledger))))):
+		case let .destination(.presented(.addLedger(.delegate(.completed(_))))):
 			state.destination = nil
 			return .none
 

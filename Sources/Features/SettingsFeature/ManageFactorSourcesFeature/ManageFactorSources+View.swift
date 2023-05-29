@@ -35,13 +35,18 @@ extension ManageFactorSources {
 							}
 						}
 					}
-					Button("Import Mnemonic source") {
-						viewStore.send(.importMnemonicButtonTapped)
+					Button("Import Olympia mnemonic") {
+						viewStore.send(.importOlympiaMnemonicButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 
-					Button("Add Ledger factor source") {
+					Button("Add Ledger hardware wallet") {
 						viewStore.send(.addLedgerButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+
+					Button("Add `.offDevice` mnemonic") {
+						viewStore.send(.addOffDeviceMnemonicButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 				}

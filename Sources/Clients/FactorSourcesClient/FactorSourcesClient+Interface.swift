@@ -155,15 +155,30 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 }
 
 extension FactorSourcesClient {
-	public func importOlympiaFactorSource(
+	public func addOffDeviceFactorSource(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		label: FactorSource.Label,
+		description: FactorSource.Description
+	) async throws -> FactorSourceID {
+		let privateFactorSource = try FactorSource.offDeviceMnemonic(
+			withPassphrase: mnemonicWithPassphrase,
+			label: label,
+			description: description
+		)
+		return try await self.addPrivateHDFactorSource(privateFactorSource)
+	}
+
+	public func addOnDeviceFactorSource(
+		isOlympia: Bool,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
 	) async throws -> FactorSourceID {
-		let factorSource = try FactorSource.olympia(
+		let hdOnDeviceFactorSource: HDOnDeviceFactorSource = isOlympia ? try FactorSource.olympia(
 			mnemonicWithPassphrase: mnemonicWithPassphrase
-		)
+		) : try FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase).hdOnDeviceFactorSource
+
 		let privateFactorSource = try PrivateHDFactorSource(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			hdOnDeviceFactorSource: factorSource
+			factorSource: hdOnDeviceFactorSource.factorSource
 		)
 		return try await self.addPrivateHDFactorSource(privateFactorSource)
 	}

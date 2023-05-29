@@ -32,14 +32,18 @@ extension FactorSourcesClient: DependencyKey {
 			},
 			addPrivateHDFactorSource: { privateFactorSource in
 
-				try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
-				let factorSourceID = privateFactorSource.hdOnDeviceFactorSource.factorSource.id
+				if privateFactorSource.kind == .device {
+					try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
+				}
+				let factorSourceID = privateFactorSource.id
 				do {
-					try await addOffDeviceFactorSource(privateFactorSource.hdOnDeviceFactorSource.factorSource)
+					try await addOffDeviceFactorSource(privateFactorSource.factorSource)
 				} catch {
-					// We were unlucky, failed to update Profile, thus best to undo the saving of
-					// the mnemonic in keychain (if we can).
-					try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+					if privateFactorSource.kind == .device {
+						// We were unlucky, failed to update Profile, thus best to undo the saving of
+						// the mnemonic in keychain (if we can).
+						try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+					}
 					throw error
 				}
 
@@ -174,11 +178,12 @@ extension FactorSourceKind: Comparable {
 	fileprivate var signingOrder: Int {
 		switch self {
 		case .ledgerHQHardwareWallet: return 0
+		case .offDeviceMnemonic: return 1
 		case .device:
 			// we want to sign with device last, since it would allow for us to stop using
 			// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
 			// deletes items after 1 sec, thus `device` must come last.
-			return 1
+			return 2
 		}
 	}
 }

@@ -1,32 +1,21 @@
 import Prelude
 
 // MARK: - PrivateHDFactorSource
-public struct PrivateHDFactorSource: Sendable, Hashable, Identifiable {
-	public typealias ID = FactorSourceID
-	public var id: ID { hdOnDeviceFactorSource.id }
+public struct PrivateHDFactorSource: _FactorSourceHolderProtocol {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
-
-	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
-
-	public init(
-		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		hdOnDeviceFactorSource: HDOnDeviceFactorSource
-	) throws {
-		self.hdOnDeviceFactorSource = hdOnDeviceFactorSource // try factorSource.assertIsHD()
-		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)
-		guard factorSourceID == hdOnDeviceFactorSource.id else {
-			loggerGlobal.critical("FactorSourceOD of new factor does not match mnemonic.")
-			throw CriticalDisrepancyBetweenFactorSourceID()
-		}
-		self.mnemonicWithPassphrase = mnemonicWithPassphrase
-	}
+	public let factorSource: FactorSource
 
 	public init(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		factorSource: FactorSource
 	) throws {
-		try self.init(mnemonicWithPassphrase: mnemonicWithPassphrase, hdOnDeviceFactorSource: .init(factorSource: factorSource))
+		let hdRoot = try mnemonicWithPassphrase.hdRoot()
+		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)
+		guard factorSourceID == factorSource.id else {
+			loggerGlobal.critical("FactorSourceOD of new factor does not match mnemonic.")
+			throw CriticalDisrepancyBetweenFactorSourceID()
+		}
+		self.mnemonicWithPassphrase = mnemonicWithPassphrase
 	}
 
 	struct CriticalDisrepancyBetweenFactorSourceID: Swift.Error {}
