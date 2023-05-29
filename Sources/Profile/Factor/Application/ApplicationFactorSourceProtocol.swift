@@ -1,11 +1,29 @@
 import Prelude
 
-// MARK: - _ApplicationFactorSource
-public protocol _ApplicationFactorSource:
+// MARK: - _FactorSourceHolderProtocol
+public protocol _FactorSourceHolderProtocol:
 	_FactorSourceProtocol,
 	Sendable,
 	Hashable,
 	Identifiable
+{
+	var factorSource: FactorSource { get }
+}
+
+extension _FactorSourceHolderProtocol {
+	public var kind: FactorSourceKind { factorSource.kind }
+	public var id: FactorSourceID { factorSource.id }
+	public var label: FactorSource.Label { factorSource.label }
+	public var description: FactorSource.Description { factorSource.description }
+	public var parameters: FactorSource.Parameters { factorSource.parameters }
+	public var addedOn: Date { factorSource.addedOn }
+	public var lastUsedOn: Date { factorSource.lastUsedOn }
+	public var storage: FactorSource.Storage? { factorSource.storage }
+}
+
+// MARK: - _ApplicationFactorSource
+public protocol _ApplicationFactorSource:
+	_FactorSourceHolderProtocol
 {
 	static var assertedKind: FactorSourceKind? { get }
 	static var assertedParameters: FactorSource.Parameters? { get }
@@ -15,14 +33,6 @@ public protocol _ApplicationFactorSource:
 
 extension _ApplicationFactorSource {
 	public static var assertedParameters: FactorSource.Parameters? { nil }
-	public var kind: FactorSourceKind { factorSource.kind }
-	public var id: FactorSourceID { factorSource.id }
-	public var label: FactorSource.Label { factorSource.label }
-	public var description: FactorSource.Description { factorSource.description }
-	public var parameters: FactorSource.Parameters { factorSource.parameters }
-	public var addedOn: Date { factorSource.addedOn }
-	public var lastUsedOn: Date { factorSource.lastUsedOn }
-	public var storage: FactorSource.Storage? { factorSource.storage }
 
 	public static func validating(factorSource: FactorSource) throws -> FactorSource {
 		if

@@ -16,7 +16,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		factorSourcesAsyncSequence: unimplemented("\(Self.self).factorSourcesAsyncSequence"),
 		addPrivateHDFactorSource: unimplemented("\(Self.self).addPrivateHDFactorSource"),
 		checkIfHasOlympiaFactorSourceForAccounts: unimplemented("\(Self.self).checkIfHasOlympiaFactorSourceForAccounts"),
-		addOffDeviceFactorSource: unimplemented("\(Self.self).addOffDeviceFactorSource"),
+		saveFactorSource: unimplemented("\(Self.self).saveFactorSource"),
 		getSigningFactors: unimplemented("\(Self.self).getSigningFactors"),
 		updateLastUsed: unimplemented("\(Self.self).updateLastUsed")
 	)
@@ -27,7 +27,7 @@ extension FactorSourcesClient: TestDependencyKey {
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		addPrivateHDFactorSource: { _ in throw NoopError() },
 		checkIfHasOlympiaFactorSourceForAccounts: { _ in nil },
-		addOffDeviceFactorSource: { _ in },
+		saveFactorSource: { _ in },
 		getSigningFactors: { _ in throw NoopError() },
 		updateLastUsed: { _ in }
 	)

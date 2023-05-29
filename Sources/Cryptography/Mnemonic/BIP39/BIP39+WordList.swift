@@ -128,17 +128,18 @@ extension BIP39.WordList {
 			return .unknown(.tooShort)
 		}
 
+		let arrayOfCandidates = words.filter { $0.word.starts(with: string) }
+		let setOfCandidates = OrderedSet<BIP39.Word>.init(uncheckedUniqueElements: arrayOfCandidates)
+
 		guard
-			case let _arrayOfCandidates = words.filter({ $0.word.starts(with: string) }),
-			case let _setOfCandidates = OrderedSet<BIP39.Word>.init(uncheckedUniqueElements: _arrayOfCandidates),
-			let candidates = NonEmpty<OrderedSet<BIP39.Word>>(rawValue: _setOfCandidates)
+			let candidates = NonEmpty<OrderedSet<BIP39.Word>>(rawValue: setOfCandidates)
 		else {
 			if string.count >= language.numberOfCharactersWhichUnambiguouslyIdentifiesWords {
 				return .unknown(.notInList(input: string))
 			} else if string.count >= minLengthForCandidatesLookup {
 				return .unknown(.tooShort)
 			} else {
-				assertionFailure("what is this case?")
+				// e.g. "x" which no word starts with in English, yielding no candidates.
 				return .unknown(.notInList(input: string))
 			}
 		}

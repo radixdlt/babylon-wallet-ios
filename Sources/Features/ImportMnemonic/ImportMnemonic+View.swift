@@ -96,6 +96,15 @@ extension ImportMnemonic {
 				#if os(iOS)
 					.screenshotProtected(isProtected: true)
 				#endif // iOS
+					.sheet(
+						store: store.scope(
+							state: \.$offDeviceMnemonicInfoPrompt,
+							action: { .child(.offDeviceMnemonicInfoPrompt($0)) }
+						),
+						content: {
+							OffDeviceMnemonicInfo.View(store: $0)
+						}
+					)
 			}
 		}
 	}
@@ -182,11 +191,11 @@ extension ImportMnemonic.View {
 			if !viewStore.isReadonlyMode {
 				if viewStore.isNonChecksummed {
 					// FIXME: strings
-					Text("Mnemonic not checksummed")
+					Text("Seed phrase not checksummed")
 						.foregroundColor(.app.red1)
 				}
 				// FIXME: strings
-				Button("Import mnemonic", action: action)
+				Button("Import seed phrase", action: action)
 					.buttonStyle(.primaryRectangular)
 			} else {
 				// FIXME: strings
@@ -230,6 +239,6 @@ struct ImportMnemonic_Preview: PreviewProvider {
 }
 
 extension ImportMnemonic.State {
-	public static let previewValue = Self(saveInProfile: false)
+	public static let previewValue = Self(persistAsMnemonicKind: nil)
 }
 #endif

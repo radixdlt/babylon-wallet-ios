@@ -62,26 +62,31 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			words.compactMap(\.completeWord)
 		}
 
-		public let saveInProfile: Bool
+		public let persistedKind: MnemonicBasedFactorSourceKind?
 
 		public let isReadonlyMode: Bool
 		public var isHidingSecrets: Bool = false
 
+		@PresentationState
+		public var offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State?
+
 		public init(
-			saveInProfile: Bool,
+			persistAsMnemonicKind persistedKind: MnemonicBasedFactorSourceKind?,
 			language: BIP39.Language = .english,
 			wordCount: BIP39.WordCount = .twelve,
-			bip39Passphrase: String = ""
+			bip39Passphrase: String = "",
+			offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State? = nil
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
-			self.saveInProfile = saveInProfile
+			self.persistedKind = persistedKind
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 
 			let isReadonlyMode = false
 			self.isReadonlyMode = isReadonlyMode
 			self.words = []
+			self.offDeviceMnemonicInfoPrompt = offDeviceMnemonicInfoPrompt
 			changeWordCount(by: wordCount.rawValue)
 		}
 
@@ -89,7 +94,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			mnemonicWithPassphrase: MnemonicWithPassphrase
 		) {
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.saveInProfile = false
+			self.persistedKind = nil
 			self.language = mnemonic.language
 			let isReadonlyMode = true
 			self.isReadonlyMode = isReadonlyMode
@@ -130,17 +135,18 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusNext(ImportMnemonicWord.State.ID)
-		case importOlympiaFactorSourceResult(TaskResult<FactorSourceID>)
+		case saveFactorSourceResult(TaskResult<FactorSourceID>)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case offDeviceMnemonicInfoPrompt(PresentationAction<OffDeviceMnemonicInfo.Action>)
+		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case savedInProfile(FactorSourceID)
 		case notSavedInProfile(MnemonicWithPassphrase)
 		case doneViewing
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -154,6 +160,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		Reduce(core)
 			.forEach(\.words, action: /Action.child .. ChildAction.word) {
 				ImportMnemonicWord()
+			}
+			.ifLet(\.$offDeviceMnemonicInfoPrompt, action: /Action.child .. ChildAction.offDeviceMnemonicInfoPrompt) {
+				OffDeviceMnemonicInfo()
 			}
 	}
 
@@ -182,7 +191,22 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				&state
 			)
 
-		case .word(_, child: .view), .word(_, child: .internal):
+		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, description, mnemonicWithPassphrase)))):
+			state.offDeviceMnemonicInfoPrompt = nil
+			precondition(state.persistedKind == .offDevice)
+			return .task {
+				await .internal(.saveFactorSourceResult(
+					TaskResult {
+						try await factorSourcesClient.addOffDeviceFactorSource(
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							label: label,
+							description: description
+						)
+					}
+				))
+			}
+
+		default:
 			return .none
 		}
 	}
@@ -217,18 +241,25 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				mnemonic: mnemonic,
 				passphrase: state.bip39Passphrase
 			)
-			guard state.saveInProfile else {
+			guard let persistedKind = state.persistedKind else {
 				return .send(.delegate(.notSavedInProfile(mnemonicWithPassphrase)))
 			}
 
-			return .run { send in
-				await send(.internal(.importOlympiaFactorSourceResult(
-					TaskResult {
-						try await factorSourcesClient.importOlympiaFactorSource(
-							mnemonicWithPassphrase: mnemonicWithPassphrase
-						)
-					}
-				)))
+			switch persistedKind {
+			case let .onDevice(onDeviceKind):
+				return .task {
+					await .internal(.saveFactorSourceResult(
+						TaskResult {
+							try await factorSourcesClient.addOnDeviceFactorSource(
+								onDeviceMnemonicKind: onDeviceKind,
+								mnemonicWithPassphrase: mnemonicWithPassphrase
+							)
+						}
+					))
+				}
+			case .offDevice:
+				state.offDeviceMnemonicInfoPrompt = .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
+				return .none
 			}
 
 		case .doneViewing:
@@ -244,12 +275,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.words[id: id]?.focus()
 			return .none
 
-		case let .importOlympiaFactorSourceResult(.failure(error)):
+		case let .saveFactorSourceResult(.failure(error)):
 			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
-		case let .importOlympiaFactorSourceResult(.success(factorSourceID)):
+		case let .saveFactorSourceResult(.success(factorSourceID)):
 			return .send(.delegate(.savedInProfile(factorSourceID)))
 		}
 	}

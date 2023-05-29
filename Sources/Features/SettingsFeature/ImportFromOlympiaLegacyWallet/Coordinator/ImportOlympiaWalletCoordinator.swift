@@ -191,7 +191,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				}()
 
 				let destination = Destinations.State.importMnemonic(.init(
-					saveInProfile: false,
+					persistAsMnemonicKind: nil,
 					wordCount: expectedWordCount
 				))
 
@@ -270,7 +270,7 @@ extension ImportOlympiaWalletCoordinator {
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hdOnDeviceFactorSource: FactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+				factorSource: FactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase).factorSource
 			)
 			await send(
 				.internal(.validatedOlympiaSoftwareAccounts(
@@ -306,9 +306,13 @@ extension ImportOlympiaWalletCoordinator {
 
 				do {
 					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
-						mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
-						hdOnDeviceFactorSource: factorSourceToSave
+						privateFactorSource: .init(
+							mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
+							factorSource: factorSourceToSave
+						),
+						saveIntoProfile: true
 					))
+
 				} catch {
 					// Check if we have already imported this Mnemonic
 					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id) {
