@@ -1,3 +1,5 @@
+import IdentifiedCollections
+
 extension Collection {
 	public var nilIfEmpty: Self? {
 		isEmpty ? nil : self
@@ -17,6 +19,17 @@ extension Collection {
 	) -> [Element] {
 		sorted {
 			comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
+		}
+	}
+}
+
+extension IdentifiedArray {
+	/// Add or remove the given element
+	public mutating func toggle(_ element: Element) {
+		if contains(element) {
+			remove(element)
+		} else {
+			append(element)
 		}
 	}
 }

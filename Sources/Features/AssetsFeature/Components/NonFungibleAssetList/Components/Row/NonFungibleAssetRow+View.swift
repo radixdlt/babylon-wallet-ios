@@ -50,7 +50,7 @@ extension NonFungibleAssetList.Row.View {
 		.padding(.horizontal, .medium1)
 		.padding(.vertical, .large3)
 		.background(.app.white)
-		.roundedCorners(radius: .small1, corners: viewStore.isExpanded ? .top : .allCorners)
+		.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
 		.tokenRowShadow(!viewStore.isExpanded)
 		.onTapGesture {
 			viewStore.send(.isExpandedToggled, animation: .easeIn)
@@ -86,7 +86,10 @@ extension NonFungibleAssetList.Row.View {
 		}
 		.padding(.medium1)
 		.background(.app.white)
-		.bottomRoundedCorners(radius: viewStore.isExpanded ? .zero : .small1)
+		.roundedCorners(
+			.bottom,
+			radius: viewStore.isExpanded && index != (viewStore.nftCount - 1) ? .zero : .small1
+		)
 		.tokenRowShadow(!viewStore.isExpanded)
 		.scaleEffect(scale(isExpanded: viewStore.isExpanded, index: index))
 		.zIndex(reversedZIndex(count: viewStore.nftCount, index: index))

@@ -15,12 +15,12 @@ public struct VLine: Shape {
 // MARK: - RoundedCorners
 /// A more advanced rounded corners shape, allowing to round specific corners.
 public struct RoundedCorners: Shape {
-	let radius: CGFloat
 	let corners: UIRectCorner
+	let radius: CGFloat
 
-	public init(radius: CGFloat, corners: UIRectCorner = .allCorners) {
-		self.radius = radius
+	public init(corners: UIRectCorner = .allCorners, radius: CGFloat) {
 		self.corners = corners
+		self.radius = radius
 	}
 
 	public func path(in rect: CGRect) -> SwiftUI.Path {
@@ -35,16 +35,8 @@ public struct RoundedCorners: Shape {
 }
 
 extension View {
-	public func roundedCorners(radius: CGFloat, corners: UIRectCorner = .allCorners) -> some View {
-		self.clipShape(RoundedCorners(radius: radius, corners: corners))
-	}
-
-	public func topRoundedCorners(radius: CGFloat) -> some View {
-		roundedCorners(radius: radius, corners: .top)
-	}
-
-	public func bottomRoundedCorners(radius: CGFloat) -> some View {
-		roundedCorners(radius: radius, corners: .bottom)
+	public func roundedCorners(_ corners: UIRectCorner = .allCorners, radius: CGFloat) -> some View {
+		self.clipShape(RoundedCorners(corners: corners, radius: radius))
 	}
 }
 

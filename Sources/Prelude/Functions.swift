@@ -8,3 +8,11 @@ public func with<T>(
 	try update(&value)
 	return value
 }
+
+public func not<T>(
+	_ f: @escaping (T) -> Bool
+) -> (T) -> Bool {
+	{ input in
+		!f(input)
+	}
+}

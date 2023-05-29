@@ -34,17 +34,12 @@ extension NonFungibleAssetList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case let .assetTapped(localID):
-				if var selectedAssets = state.selectedAssets {
+				if state.selectedAssets != nil {
 					guard let token = state.resource.tokens[id: localID] else {
+						loggerGlobal.warning("Selected a missing token")
 						return .none
 					}
-
-					if selectedAssets.contains(token) {
-						selectedAssets.remove(token)
-					} else {
-						selectedAssets.append(token)
-					}
-					state.selectedAssets = selectedAssets
+					state.selectedAssets?.toggle(token)
 					return .none
 				}
 				return .send(.delegate(.open(localID)))

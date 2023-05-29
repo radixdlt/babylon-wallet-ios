@@ -190,14 +190,10 @@ extension TransferAccountList {
 		}
 
 		// Existing assets to keep
-		let existingAssets = alreadyAddedAssets.filter {
-			assets.contains($0)
-		}
+		let existingAssets = alreadyAddedAssets.filter(assets.contains)
 
 		// Newly added assets
-		let newAssets = assets.filter {
-			!existingAssets.contains($0)
-		}
+		let newAssets = assets.filter(not(existingAssets.contains))
 
 		state.receivingAccounts[id: id]?.assets = existingAssets + newAssets
 
@@ -222,26 +218,23 @@ extension TransferAccountList {
 			return .none
 		}
 
-		var xrdResource: AccountPortfolio.FungibleResource?
-		var nonXrdResources: [AccountPortfolio.FungibleResource] = []
-		for asset in assets.compactMap(/ResourceAsset.State.fungibleAsset) {
-			if asset.isXRD {
-				xrdResource = asset.resource
-			} else {
-				nonXrdResources.append(asset.resource)
-			}
-		}
-
-		let selectedFungibleResources = AccountPortfolio.FungibleResources(xrdResource: xrdResource, nonXrdResources: nonXrdResources)
+		let fungibleAssets = assets.compactMap(/ResourceAsset.State.fungibleAsset)
+		let xrdResource = fungibleAssets.first(where: \.isXRD).map(\.resource)
+		let nonXrdResources = fungibleAssets.filter(not(\.isXRD)).map(\.resource)
+		let selectedFungibleResources = AccountPortfolio.FungibleResources(
+			xrdResource: xrdResource,
+			nonXrdResources: nonXrdResources
+		)
 
 		let selectedNonFunibleResources = assets
 			.compactMap(/ResourceAsset.State.nonFungibleAsset)
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
-				if partialResult[id: asset.resourceAddress] != nil {
-					partialResult[id: asset.resourceAddress]?.tokens.append(asset.nftToken)
-				} else {
-					partialResult.append(.init(resourceAddress: asset.resourceAddress, tokens: [asset.nftToken]))
-				}
+				var resource = partialResult[id: asset.resourceAddress] ?? .init(
+					resourceAddress: asset.resourceAddress,
+					tokens: []
+				)
+				resource.tokens.append(asset.nftToken)
+				partialResult.updateOrAppend(resource)
 			}
 
 		state.destination = .relayed(

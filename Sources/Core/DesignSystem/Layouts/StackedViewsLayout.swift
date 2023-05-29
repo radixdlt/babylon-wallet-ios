@@ -12,7 +12,12 @@ public struct StackedViewsLayout: Layout {
 	/// Number of visible views in Collapsed state
 	var collapsedViewsCount: Int
 
-	public init(isExpanded: Bool, spacing: CGFloat = 10, collapsedSpacing: CGFloat = 10, collapsedViewsCount: Int = 3) {
+	public init(
+		isExpanded: Bool,
+		spacing: CGFloat = .small3,
+		collapsedSpacing: CGFloat = 10,
+		collapsedViewsCount: Int = 3
+	) {
 		self.isExpanded = isExpanded
 		self.spacing = spacing
 		self.collapsedSpacing = collapsedSpacing
@@ -33,10 +38,10 @@ public struct StackedViewsLayout: Layout {
 
 		let heights = subviews.map { $0.sizeThatFits(.init(width: container.width, height: nil)).height }
 		let height: CGFloat = {
-			if !isExpanded {
-				return heights[0] + CGFloat(collapsedViewsCount - 1) * collapsedSpacing
-			} else {
+			if isExpanded {
 				return heights.reduce(0.0, +) + spacing * CGFloat(subviews.count - 1)
+			} else {
+				return heights[0] + CGFloat(collapsedViewsCount - 1) * collapsedSpacing
 			}
 		}()
 		return .init(width: container.width, height: height)
