@@ -2,7 +2,7 @@ import AccountPortfoliosClient
 import FeaturePrelude
 import SharedModels
 
-public struct FungibleTokenList: Sendable, FeatureReducer {
+public struct FungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var xrdToken: Row.State?
 		public var nonXrdTokens: IdentifiedArrayOf<Row.State>
@@ -21,8 +21,8 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
-		case xrdRow(FungibleTokenList.Row.Action)
-		case nonXRDRow(FungibleTokenList.Row.State.ID, FungibleTokenList.Row.Action)
+		case xrdRow(FungibleAssetList.Row.Action)
+		case nonXRDRow(FungibleAssetList.Row.State.ID, FungibleAssetList.Row.Action)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -46,10 +46,10 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.xrdToken, action: /Action.child .. ChildAction.xrdRow) {
-				FungibleTokenList.Row()
+				FungibleAssetList.Row()
 			}
 			.forEach(\.nonXrdTokens, action: /Action.child .. ChildAction.nonXRDRow, element: {
-				FungibleTokenList.Row()
+				FungibleAssetList.Row()
 			})
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

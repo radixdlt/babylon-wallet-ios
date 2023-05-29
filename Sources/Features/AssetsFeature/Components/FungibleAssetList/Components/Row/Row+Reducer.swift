@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-extension FungibleTokenList {
+extension FungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
 			public typealias ID = ResourceAddress
@@ -8,21 +8,24 @@ extension FungibleTokenList {
 
 			public var token: AccountPortfolio.FungibleResource
 			public var isXRD: Bool
+			public var isSelected: Bool?
 
-			public init(xrdToken: AccountPortfolio.FungibleResource) {
-				self.init(token: xrdToken, isXRD: true)
+			public init(xrdToken: AccountPortfolio.FungibleResource, isSelected: Bool? = nil) {
+				self.init(token: xrdToken, isXRD: true, isSelected: isSelected)
 			}
 
-			public init(nonXRDToken: AccountPortfolio.FungibleResource) {
-				self.init(token: nonXRDToken, isXRD: false)
+			public init(nonXRDToken: AccountPortfolio.FungibleResource, isSelected: Bool? = nil) {
+				self.init(token: nonXRDToken, isXRD: false, isSelected: isSelected)
 			}
 
 			init(
 				token: AccountPortfolio.FungibleResource,
-				isXRD: Bool
+				isXRD: Bool,
+				isSelected: Bool? = nil
 			) {
 				self.token = token
 				self.isXRD = isXRD
+				self.isSelected = isSelected
 			}
 		}
 
@@ -37,6 +40,10 @@ extension FungibleTokenList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case .tapped:
+				if let isSelected = state.isSelected {
+					state.isSelected?.toggle()
+					return .none
+				}
 				return .send(.delegate(.selected(state.token)))
 			}
 		}

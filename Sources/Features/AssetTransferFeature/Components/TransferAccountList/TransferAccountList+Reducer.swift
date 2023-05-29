@@ -1,5 +1,7 @@
+import AssetsFeature
 import FeaturePrelude
 
+// MARK: - TransferAccountList
 public struct TransferAccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let fromAccount: Profile.Network.Account
@@ -54,12 +56,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 		public enum MainState: Sendable, Hashable {
 			case chooseAccount(ChooseReceivingAccount.State)
-			case addAsset(AddAsset.State)
+			case addAsset(AssetsView.State)
 		}
 
 		public enum MainAction: Sendable, Equatable {
 			case chooseAccount(ChooseReceivingAccount.Action)
-			case addAsset(AddAsset.Action)
+			case addAsset(AssetsView.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -69,7 +71,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				}
 
 				Scope(state: /MainState.addAsset, action: /MainAction.addAsset) {
-					AddAsset()
+					AssetsView()
 				}
 			}
 		}
@@ -95,27 +97,25 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .receivingAccount(id: id, action: .delegate(.remove)):
-			state.receivingAccounts.remove(id: id)
-			return validateState(&state)
-		case .receivingAccount(_, action: .delegate(.validate)):
-			return validateState(&state)
+		case let .receivingAccount(id: id, action: action):
+			switch action {
+			case .delegate(.remove):
+				state.receivingAccounts.remove(id: id)
+				return .none
 
-		case let .receivingAccount(_, action: .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged))))):
-			updateTotalSum(&state, resourceAddress: resourceAddress)
-			return validateState(&state)
+			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))):
+				updateTotalSum(&state, resourceAddress: resourceAddress)
+				return .none
 
-		case let .receivingAccount(id: id, action: .delegate(.chooseAccount)):
-			let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
-			let chooseAccount: ChooseReceivingAccount.State = .init(
-				chooseAccounts: .init(
-					selectionRequirement: .exactly(1),
-					filteredAccounts: filteredAccounts
-				)
-			)
+			case .delegate(.chooseAccount):
+				return navigateToChooseAccounts(&state, id: id)
 
-			state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
-			return .none
+			case .delegate(.addAssets):
+				return navigateToSelectAssets(&state, id: id)
+
+			default:
+				return .none
+			}
 
 		case let .destination(.presented(.relay(id, destinationAction))):
 			switch destinationAction {
@@ -123,10 +123,19 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				state.receivingAccounts[id: id]?.account = account
 				state.destination = nil
 				return .none
+
 			case .chooseAccount(.delegate(.dismiss)):
 				state.destination = nil
 				return .none
-			// TODO: Handle Add assets
+
+			case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
+				state.destination = nil
+				return handleSelectedAssets(selectedAssets, id: id, state: &state)
+
+			case .addAsset(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+
 			default:
 				return .none
 			}
@@ -134,7 +143,9 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
 
+extension TransferAccountList {
 	private func updateTotalSum(_ state: inout State, resourceAddress: ResourceAddress) {
 		let totalSum = state.receivingAccounts
 			.flatMap(\.assets)
@@ -153,23 +164,86 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 	}
 
-	private func validateState(_ state: inout State) -> EffectTask<Action> {
-		let receivingAccounts = state.receivingAccounts.filter {
-			$0.account != nil || !$0.assets.isEmpty
+	private func handleSelectedAssets(
+		_ selectedAssets: AssetsView.State.Mode.SelectedAssets,
+		id: ReceivingAccount.State.ID,
+		state: inout State
+	) -> EffectTask<Action> {
+		let alreadyAddedAssets = state.receivingAccounts[id: id]?.assets ?? []
+
+		var assets: IdentifiedArrayOf<ResourceAsset.State> = []
+
+		if let selectedXRD = selectedAssets.fungibleResources.xrdResource {
+			assets.append(
+				ResourceAsset.State.fungibleAsset(.init(resource: selectedXRD, isXRD: true))
+			)
 		}
 
-		guard !receivingAccounts.isEmpty else {
-			return .send(.delegate(.canSendTransferRequest(false)))
+		assets += selectedAssets.fungibleResources.nonXrdResources.map {
+			ResourceAsset.State.fungibleAsset(.init(resource: $0, isXRD: false))
 		}
 
-		let isValid = receivingAccounts.allSatisfy {
-			$0.account != nil &&
-				!$0.assets.isEmpty &&
-				$0.assets
-				.compactMap(/ResourceAsset.State.fungibleAsset)
-				.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
+		assets += selectedAssets.nonFungibleResources.flatMap { resource in
+			resource.tokens.map {
+				ResourceAsset.State.nonFungibleAsset(.init(resourceAddress: resource.resourceAddress, nftToken: $0))
+			}
 		}
 
-		return .send(.delegate(.canSendTransferRequest(isValid)))
+		// Existing assets to keep
+		let existingAssets = alreadyAddedAssets.filter(assets.contains)
+
+		// Newly added assets
+		let newAssets = assets.filter(not(existingAssets.contains))
+
+		state.receivingAccounts[id: id]?.assets = existingAssets + newAssets
+
+		return .none
+	}
+
+	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> EffectTask<Action> {
+		let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
+		let chooseAccount: ChooseReceivingAccount.State = .init(
+			chooseAccounts: .init(
+				selectionRequirement: .exactly(1),
+				filteredAccounts: filteredAccounts
+			)
+		)
+
+		state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
+		return .none
+	}
+
+	private func navigateToSelectAssets(_ state: inout State, id: ReceivingAccount.State.ID) -> EffectTask<Action> {
+		guard let assets = state.receivingAccounts[id: id]?.assets else {
+			return .none
+		}
+
+		let fungibleAssets = assets.compactMap(/ResourceAsset.State.fungibleAsset)
+		let xrdResource = fungibleAssets.first(where: \.isXRD).map(\.resource)
+		let nonXrdResources = fungibleAssets.filter(not(\.isXRD)).map(\.resource)
+		let selectedFungibleResources = AccountPortfolio.FungibleResources(
+			xrdResource: xrdResource,
+			nonXrdResources: nonXrdResources
+		)
+
+		let selectedNonFunibleResources = assets
+			.compactMap(/ResourceAsset.State.nonFungibleAsset)
+			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
+				var resource = partialResult[id: asset.resourceAddress] ?? .init(
+					resourceAddress: asset.resourceAddress,
+					tokens: []
+				)
+				resource.tokens.append(asset.nftToken)
+				partialResult.updateOrAppend(resource)
+			}
+
+		state.destination = .relayed(
+			id,
+			with: .addAsset(.init(
+				account: state.fromAccount,
+				mode: .selection(.init(fungibleResources: selectedFungibleResources, nonFungibleResources: selectedNonFunibleResources))
+			))
+		)
+		return .none
 	}
 }

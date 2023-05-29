@@ -1,16 +1,14 @@
 import FeaturePrelude
 
+// MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var accounts: TransferAccountList.State
 		public var message: AssetTransferMessage.State?
 
-		public var canSendTransferRequest: Bool
-
 		public init(from account: Profile.Network.Account) {
 			self.accounts = .init(fromAccount: account)
 			self.message = nil
-			self.canSendTransferRequest = false
 		}
 	}
 
@@ -61,11 +59,30 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case .message(.delegate(.removed)):
 			state.message = nil
 			return .none
-		case let .accounts(.delegate(.canSendTransferRequest(enabled))):
-			state.canSendTransferRequest = enabled
-			return .none
 		default:
 			return .none
+		}
+	}
+}
+
+extension AssetTransfer.State {
+	public var canSendTransferRequest: Bool {
+		guard !accounts.receivingAccounts.isEmpty else {
+			return false
+		}
+
+		return accounts.receivingAccounts.allSatisfy {
+			guard $0.account != nil else {
+				return false
+			}
+			let fungibleAssets = $0.assets.compactMap(/ResourceAsset.State.fungibleAsset)
+			let nonFungibleAssets = $0.assets.compactMap(/ResourceAsset.State.nonFungibleAsset)
+
+			if !fungibleAssets.isEmpty {
+				return fungibleAssets.allSatisfy { $0.transferAmount != nil && $0.totalTransferSum <= $0.balance }
+			}
+
+			return !nonFungibleAssets.isEmpty
 		}
 	}
 }

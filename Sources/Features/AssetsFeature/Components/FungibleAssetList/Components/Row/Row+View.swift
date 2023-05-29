@@ -1,28 +1,30 @@
 import FeaturePrelude
 
-extension FungibleTokenList.Row.State {
-	var viewState: FungibleTokenList.Row.ViewState {
+extension FungibleAssetList.Row.State {
+	var viewState: FungibleAssetList.Row.ViewState {
 		.init(
 			thumbnail: isXRD ? .xrd : .known(token.iconURL),
 			symbol: token.symbol ?? token.name ?? "",
-			tokenAmount: token.amount.format()
+			tokenAmount: token.amount.format(),
+			isSelected: isSelected
 		)
 	}
 }
 
 // MARK: - FungibleTokenList.Row.View
-extension FungibleTokenList.Row {
+extension FungibleAssetList.Row {
 	public struct ViewState: Equatable {
 		let thumbnail: TokenThumbnail.Content
 		let symbol: String
 		let tokenAmount: String
+		let isSelected: Bool?
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<FungibleTokenList.Row>
+		private let store: StoreOf<FungibleAssetList.Row>
 
-		public init(store: StoreOf<FungibleTokenList.Row>) {
+		public init(store: StoreOf<FungibleAssetList.Row>) {
 			self.store = store
 		}
 
@@ -45,6 +47,10 @@ extension FungibleTokenList.Row {
 								.foregroundColor(.app.gray1)
 								.textStyle(.secondaryHeader)
 						}
+
+						if let isSelected = viewStore.isSelected {
+							CheckmarkView(appearance: .dark, isChecked: isSelected)
+						}
 					}
 
 					VStack {
@@ -66,10 +72,10 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
-		FungibleTokenList.Row.View(
+		FungibleAssetList.Row.View(
 			store: .init(
 				initialState: .init(xrdToken: .init(resourceAddress: .init(address: "resource_tdx_c_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq40v2wv"), amount: .zero)),
-				reducer: FungibleTokenList.Row()
+				reducer: FungibleAssetList.Row()
 			)
 		)
 	}

@@ -1,13 +1,13 @@
 import FeaturePrelude
 
-public struct NonFungibleTokenList: Sendable, FeatureReducer {
+public struct NonFungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>
+		public var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>
 
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>) {
+		public init(rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>) {
 			self.rows = rows
 		}
 	}
@@ -17,22 +17,22 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case asset(NonFungibleTokenList.Row.State.ID, NonFungibleTokenList.Row.Action)
+		case asset(NonFungibleAssetList.Row.State.ID, NonFungibleAssetList.Row.Action)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case details(NonFungibleTokenList.Detail.State)
+			case details(NonFungibleAssetList.Detail.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case details(NonFungibleTokenList.Detail.Action)
+			case details(NonFungibleAssetList.Detail.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.details, action: /Action.details) {
-				NonFungibleTokenList.Detail()
+				NonFungibleAssetList.Detail()
 			}
 		}
 	}
@@ -42,7 +42,7 @@ public struct NonFungibleTokenList: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.rows, action: /Action.child .. ChildAction.asset) {
-				NonFungibleTokenList.Row()
+				NonFungibleAssetList.Row()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

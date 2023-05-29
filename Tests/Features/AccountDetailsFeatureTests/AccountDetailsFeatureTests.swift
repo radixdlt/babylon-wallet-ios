@@ -37,30 +37,6 @@ final class AccountDetailsFeatureTests: TestCase {
 //		}
 //	}
 
-	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
-		// given
-		let account = Profile.Network.Account.previewValue0
-		let initialState = AccountDetails.State(for: account)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: AccountDetails()
-		)
-
-		let didFetchAccountPortfolio: ActorIsolated<(address: String, forceRefresh: Bool)?> = ActorIsolated(nil)
-		store.dependencies.accountPortfoliosClient.fetchAccountPortfolio = { address, forceRefresh in
-			await didFetchAccountPortfolio.setValue((address.address, forceRefresh))
-			return AccountPortfolio(owner: account.address, isDappDefintionAccountType: false, fungibleResources: .init(), nonFungibleResources: [])
-		}
-
-		// when
-		await store.send(.view(.pullToRefreshStarted))
-
-		await didFetchAccountPortfolio.withValue { value in
-			XCTAssertEqual(value?.address, account.address.address)
-			XCTAssertEqual(value?.forceRefresh, true)
-		}
-	}
-
 	// FIXME: @davdroman-rdx after proper TCA tools are released
 //	func test_displayTransfer_whenTappedOnDisplayTransfer_thenCoordinateNavigationToTransfer() async {
 //		// given

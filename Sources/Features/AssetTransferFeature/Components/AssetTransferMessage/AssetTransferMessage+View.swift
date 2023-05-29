@@ -45,7 +45,7 @@ extension AssetTransferMessage.View {
 						.foregroundColor(.app.gray2)
 					}
 					.padding(.medium3)
-					.topRoundedCorners(strokeColor: .borderColor)
+					.roundedCorners(.top, strokeColor: .borderColor)
 
 					TextEditor(text:
 						viewStore.binding(
@@ -59,7 +59,7 @@ extension AssetTransferMessage.View {
 					.multilineTextAlignment(.leading)
 					.scrollContentBackground(.hidden) // Remove the default background to allow customization
 					.background(Color.containerContentBackground)
-					.bottomRoundedCorners(strokeColor: focused ? .focusedBorderColor : .borderColor)
+					.roundedCorners(.bottom, strokeColor: focused ? .focusedBorderColor : .borderColor)
 				}
 			}
 			.sheet(

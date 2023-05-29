@@ -2,21 +2,13 @@ import FeaturePrelude
 import SwiftUI
 
 extension View {
-	func roundedCorners(strokeColor: Color, corners: UIRectCorner = .allCorners) -> some View {
+	func roundedCorners(_ corners: UIRectCorner = .allCorners, strokeColor: Color) -> some View {
 		self
-			.clipShape(RoundedCorners(radius: .small2, corners: corners))
+			.clipShape(RoundedCorners(corners: corners, radius: .small2))
 			.background(
-				RoundedCorners(radius: .small2, corners: corners)
+				RoundedCorners(corners: corners, radius: .small2)
 					.stroke(strokeColor, lineWidth: 1)
 			)
-	}
-
-	func topRoundedCorners(strokeColor: Color) -> some View {
-		roundedCorners(strokeColor: strokeColor, corners: [.topLeft, .topRight])
-	}
-
-	func bottomRoundedCorners(strokeColor: Color) -> some View {
-		roundedCorners(strokeColor: strokeColor, corners: [.bottomLeft, .bottomRight])
 	}
 }
 

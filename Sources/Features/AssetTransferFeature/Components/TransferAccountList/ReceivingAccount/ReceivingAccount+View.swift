@@ -24,7 +24,7 @@ extension ReceivingAccount.View {
 					.background(Color.borderColor)
 				assets(viewStore)
 			}
-			.roundedCorners(strokeColor: .borderColor, corners: .allCorners)
+			.roundedCorners(strokeColor: .borderColor)
 		}
 	}
 
