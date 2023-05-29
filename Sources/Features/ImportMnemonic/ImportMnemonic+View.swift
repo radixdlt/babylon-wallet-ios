@@ -191,11 +191,11 @@ extension ImportMnemonic.View {
 			if !viewStore.isReadonlyMode {
 				if viewStore.isNonChecksummed {
 					// FIXME: strings
-					Text("Mnemonic not checksummed")
+					Text("Seed phrase not checksummed")
 						.foregroundColor(.app.red1)
 				}
 				// FIXME: strings
-				Button("Import mnemonic", action: action)
+				Button("Import seed phrase", action: action)
 					.buttonStyle(.primaryRectangular)
 			} else {
 				// FIXME: strings
