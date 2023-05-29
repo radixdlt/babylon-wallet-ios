@@ -73,7 +73,7 @@ extension AddressView {
 				}
 
 				if case let .address(.account(accountAddress)) = identifiable {
-					Button("Show QR code for account", asset: AssetResource.qrCodeScanner) { // FIXME: Add to strings
+					Button(L10n.AddressAction.showAccountQR, asset: AssetResource.qrCodeScanner) {
 						showQR(for: accountAddress)
 					}
 				}
@@ -200,12 +200,12 @@ public struct QRCodeView: View {
 			case .none:
 				Color.clear
 			case let .success(value):
-				Image(value, scale: 1, label: Text("QR code for an account")) // FIXME: Add to strings
+				Image(value, scale: 1, label: Text(L10n.AddressAction.QrCodeView.qrCodeLabel))
 					.resizable()
 					.aspectRatio(1, contentMode: .fit)
 					.transition(.scale(scale: 0.95).combined(with: .opacity))
 			case .failure:
-				Text("Could not create QR code") // FIXME: Add to strings
+				Text(L10n.AddressAction.QrCodeView.failureLabel)
 					.foregroundColor(.app.alert)
 					.textStyle(.body1HighImportance)
 			}

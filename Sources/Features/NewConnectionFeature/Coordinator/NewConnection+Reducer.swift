@@ -82,8 +82,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		switch childAction {
 		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				// FIXME: String -> L10n.LinkedConnectors.NewConnection.subtitle
-				let string = "Scan the QR code shown in the Radix Connector browser extension"
+				let string = L10n.LinkedConnectors.NewConnection.subtitle
 				state = .scanQR(.init(scanInstructions: string))
 				return .none
 			} else {

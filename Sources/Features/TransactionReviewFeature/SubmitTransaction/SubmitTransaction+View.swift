@@ -9,11 +9,11 @@ extension SubmitTransaction.State {
 extension SubmitTransaction.State.TXStatus {
 	var display: String {
 		switch self {
-		case .notYetSubmitted, .submitting: return "Submitting"
-		case .submittedUnknown, .submittedPending: return "Submitted but not confirmed"
-		case .rejected: return "Rejected"
-		case .committedFailure: return "Failed"
-		case .committedSuccessfully: return "Successfully commited"
+		case .notYetSubmitted, .submitting: return L10n.TransactionReview.SubmitTransaction.displaySubmitting
+		case .submittedUnknown, .submittedPending: return L10n.TransactionReview.SubmitTransaction.displaySubmittedUnknown
+		case .rejected: return L10n.TransactionReview.SubmitTransaction.displayRejected
+		case .committedFailure: return L10n.TransactionReview.SubmitTransaction.displayFailed
+		case .committedSuccessfully: return L10n.TransactionReview.SubmitTransaction.displayCommitted
 		}
 	}
 }
@@ -37,14 +37,14 @@ extension SubmitTransaction {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					VPair(heading: "TXID", item: viewStore.txID)
-					VPair(heading: "Status", item: viewStore.status.display)
+					VPair(heading: L10n.TransactionReview.SubmitTransaction.txID, item: viewStore.txID)
+					VPair(heading: L10n.TransactionReview.SubmitTransaction.status, item: viewStore.status.display)
 				}
 				.padding(.medium1)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.appeared).finish()
 				}
-				.navigationTitle("Submitting Transaction")
+				.navigationTitle(L10n.TransactionReview.SubmitTransaction.navigationTitle)
 			}
 		}
 	}

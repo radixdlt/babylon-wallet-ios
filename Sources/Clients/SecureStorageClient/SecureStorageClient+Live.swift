@@ -108,8 +108,8 @@ extension SecureStorageClient: DependencyKey {
 					key: profileHeaderListKeychainKey,
 					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
 					accessibility: .whenUnlocked,
-					label: "Radix Wallet Metadata",
-					comment: "Contains the metadata about Radix Wallet Data."
+					label: "Radix Wallet Metadata", // FIXME: • localize?
+					comment: "Contains the metadata about Radix Wallet Data." // FIXME: • localize?
 				)
 			)
 		}
@@ -164,7 +164,7 @@ extension SecureStorageClient: DependencyKey {
 				return storedDeviceIdentifier
 			} catch {
 				// clear the identifier and re-generate
-				assertionFailure("Corupted device identifier in keychain")
+				assertionFailure("Corrupt device identifier in keychain")
 				try await keychainClient.removeDataForKey(deviceIdentifierKey)
 				return try await generateAndSetNewDeviceIdentifier()
 			}
@@ -209,21 +209,17 @@ extension SecureStorageClient: DependencyKey {
 					case .signAuthChallenge:
 						return L10n.Biometrics.Prompt.signAuthChallenge
 					case .displaySeedPhrase:
-						// FIXME: strings
-						return "Display seed phrase"
+						return L10n.Biometrics.Prompt.displaySeedPhrase
 					case .createSignAuthKey:
-						// FIXME: strings
-						return "Create Auth signing key"
+						return L10n.Biometrics.Prompt.createSignAuthKey
 					case .importOlympiaAccounts:
-						// FIXME: strings
-						return "Check if seed phrase already exists"
+						return L10n.Biometrics.Prompt.importOlympiaAccounts
 					case .checkingAccounts:
-						// FIXME: strings
-						return "Checking accounts."
+						return L10n.Biometrics.Prompt.checkingAccounts
 
 					case .updateAccountMetadata:
 						// This is debug only... for now.
-						return "Update account metadata"
+						return L10n.Biometrics.Prompt.updateAccountMetadata
 					}
 				}()
 				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."

@@ -12,9 +12,9 @@ extension ImportMnemonicWord.State {
 			autocompletionCandidates: autocompletionCandidates,
 			focusedField: focusedField,
 			validation: {
-				if self.value.hasFailedValidation {
+				if value.hasFailedValidation {
 					return .invalid
-				} else if self.value.isComplete {
+				} else if value.isComplete {
 					return .valid
 				} else {
 					return nil
@@ -45,8 +45,7 @@ extension ImportMnemonicWord {
 			guard let validation, validation == .invalid else {
 				return nil
 			}
-			// FIXME: strings
-			return .error("Invalid")
+			return .error(L10n.Common.invalid)
 		}
 
 		var showClearButton: Bool {
@@ -70,7 +69,7 @@ extension ImportMnemonicWord {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				AppTextField(
-					primaryHeading: .init(text: "word #\(viewStore.index + 1)", isProminent: false),
+					primaryHeading: .init(text: L10n.ImportMnemonic.wordHeading(viewStore.index + 1), isProminent: false),
 					placeholder: viewStore.placeholder,
 					text: .init(
 						get: { viewStore.displayText },
@@ -106,7 +105,7 @@ extension ImportMnemonicWord {
 							ScrollView([.horizontal], showsIndicators: false) {
 								HStack {
 									ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
-										Button("\(candidate.word.rawValue)") {
+										Button(candidate.word.rawValue) {
 											viewStore.send(.userSelectedCandidate(candidate))
 										}
 										.buttonStyle(.primaryRectangular(height: .toolbarButtonHeight))

@@ -109,7 +109,7 @@ extension NameAccount.View {
 		with viewStore: ViewStoreOf<NameAccount>
 	) -> some SwiftUI.View {
 		ToggleView(
-			title: "Create with Ledger Hardware Wallet", // FIXME: Strings -> L10n.CreateEntity.NameNewEntity.ledgerTitle
+			title: L10n.CreateEntity.NameNewEntity.ledgerTitle,
 			subtitle: L10n.CreateEntity.NameNewEntity.ledgerSubtitle,
 			isOn: viewStore.binding(
 				get: \.useLedgerAsFactorSource,

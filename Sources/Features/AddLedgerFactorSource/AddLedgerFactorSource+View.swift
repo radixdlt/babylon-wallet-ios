@@ -24,17 +24,17 @@ extension AddLedgerFactorSource {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack {
-						Text("Add Ledger Device") // FIXME: String
+						Text(L10n.AddLedger.AddDevice.title)
 							.textStyle(.sheetTitle)
 							.padding(.top, .small1)
 							.padding(.bottom, .large1)
 
-						Text("Let’s set up a Ledger hardware wallet device. You will be able to use it to create new Ledger-secured Accounts, or import Ledger-secured Accounts from the Radix Olympia Desktop Wallet.") // FIXME: String
+						Text(L10n.AddLedger.AddDevice.body1)
 							.textStyle(.body1Regular)
 							.padding(.bottom, .large1)
 							.padding(.horizontal, .medium3)
 
-						Text("Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.") // FIXME: String
+						Text(L10n.AddLedger.AddDevice.body2)
 							.textStyle(.body1Regular)
 							.padding(.horizontal, .medium3)
 
@@ -123,17 +123,17 @@ extension NameLedgerFactorSource {
 			NavigationStack {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					VStack {
-						Text("Name Your Ledger") // FIXME: String
+						Text(L10n.AddLedger.NameLedger.title)
 							.textStyle(.sheetTitle)
 							.padding(.top, .small1)
 							.padding(.bottom, .medium3)
 
-						Text("Enter a name for this Ledger device") // FIXME: String
+						Text(L10n.AddLedger.NameLedger.body)
 							.textStyle(.body1Regular)
 							.padding(.bottom, .medium1)
 
 						AppTextField(
-							placeholder: "My green Ledger", // FIXME: String
+							placeholder: L10n.AddLedger.NameLedger.namePlaceholder,
 							text: Binding(
 								get: { viewStore.ledgerName },
 								set: { viewStore.send(.ledgerNameChanged($0)) }
@@ -146,7 +146,7 @@ extension NameLedgerFactorSource {
 					.multilineTextAlignment(.center)
 					.foregroundColor(.app.gray1)
 					.footer {
-						Button("Save and Continue") { // FIXME: String
+						Button(L10n.AddLedger.NameLedger.continueButtonTitle) {
 							viewStore.send(.confirmNameButtonTapped)
 						}
 						.controlState(viewStore.confirmButtonControlState)

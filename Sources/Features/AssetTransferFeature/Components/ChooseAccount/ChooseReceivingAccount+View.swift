@@ -24,11 +24,11 @@ extension ChooseReceivingAccount {
 				}
 
 				guard let validateAccountAddress = state.validatedAccountAddress else {
-					return .error("Invalid address")
+					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				}
 
 				if state.chooseAccounts.filteredAccounts.contains(where: { $0 == validateAccountAddress }) {
-					return .error("Account already added")
+					return .error(L10n.AssetTransfer.ChooseReceivingAccount.alreadyAddedError)
 				}
 				return .none
 			}()
@@ -53,14 +53,14 @@ extension ChooseReceivingAccount.View {
 			WithViewStore(store, observe: ChooseReceivingAccount.ViewState.init(state:), send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
-						Text("Enter an account address manually")
+						Text(L10n.AssetTransfer.ChooseReceivingAccount.enterManually)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray1)
 
 						addressField(viewStore)
 						Divider()
 
-						Text("Or choose one of your own accounts")
+						Text(L10n.AssetTransfer.ChooseReceivingAccount.chooseOwnAccount)
 
 						ChooseAccounts.View(
 							store: store.scope(
@@ -78,11 +78,12 @@ extension ChooseReceivingAccount.View {
 					state: /ChooseReceivingAccount.Destinations.State.scanAccountAddress,
 					action: ChooseReceivingAccount.Destinations.Action.scanAccountAddress,
 					destination: {
-						ScanQRCoordinator.View(store: $0).navigationTitle("Scan QR Code")
+						ScanQRCoordinator.View(store: $0)
+							.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)
 					}
 				)
 				.footer { chooseButton(viewStore) }
-				.navigationTitle("Choose Receiving Account")
+				.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
@@ -102,7 +103,7 @@ extension ChooseReceivingAccount.View {
 
 	private func addressField(_ viewStore: ViewStoreOf<ChooseReceivingAccount>) -> some View {
 		AppTextField(
-			placeholder: "Enter or paste address",
+			placeholder: L10n.AssetTransfer.ChooseReceivingAccount.addressFieldPlaceholder,
 			text: viewStore.binding(
 				get: \.manualAccountAddress,
 				send: { .manualAccountAddressChanged($0) }
@@ -136,7 +137,7 @@ extension ChooseReceivingAccount.View {
 				viewStore.send(.chooseButtonTapped(result))
 			},
 			control: { action in
-				Button("Choose", action: action)
+				Button(L10n.Common.choose, action: action)
 					.buttonStyle(.primaryRectangular)
 			}
 		)

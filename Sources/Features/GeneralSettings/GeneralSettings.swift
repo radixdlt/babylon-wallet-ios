@@ -74,11 +74,11 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			if !isEnabled {
 				state.alert = .confirmCloudSyncDisable(.init(
 					title: {
-						TextState("Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?")
+						TextState(L10n.GeneralSettings.ConfirmCloudSyncDisableAlert.title)
 					},
 					actions: {
 						ButtonState(role: .destructive, action: .confirm) {
-							TextState("Confirm")
+							TextState(L10n.Common.confirm)
 						}
 					}
 				))

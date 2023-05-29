@@ -30,17 +30,18 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("#\(viewStore.numberOfUnverifiedAccounts) accounts left to import")
+					Text(L10n.ImportOlympiaLedgerAccounts.unverifiedAccountsLeft(viewStore.numberOfUnverifiedAccounts))
 						.textStyle(.body1Header)
 
 					Spacer()
 
 					if !viewStore.ledgersWithAccounts.isEmpty {
-						Text("Imported ledgers and accounts")
+						Text(L10n.ImportOlympiaLedgerAccounts.importLedgersAndAccounts)
+
 						ScrollView {
 							ForEach(viewStore.ledgersWithAccounts, id: \.self) { ledgerWithAccounts in
 								LazyVStack {
-									Text("\(ledgerWithAccounts.displayName) - #\(ledgerWithAccounts.migratedAccounts.count) accounts")
+									Text(L10n.ImportOlympiaLedgerAccounts.accountCount(ledgerWithAccounts.displayName, ledgerWithAccounts.migratedAccounts.count))
 								}
 							}
 						}

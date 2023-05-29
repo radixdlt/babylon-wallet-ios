@@ -142,6 +142,7 @@ extension DappDetails.View {
 					if let domain = viewStore.domain {
 						Text(L10n.AuthorizedDapps.DAppDetails.website)
 							.sectionHeading
+						// FIXME: Update
 //						Button(domain.stringValue) {
 //							viewStore.send(.openURLTapped(domain))
 //						}

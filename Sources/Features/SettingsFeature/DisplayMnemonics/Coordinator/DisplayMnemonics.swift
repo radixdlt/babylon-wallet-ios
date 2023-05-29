@@ -157,18 +157,18 @@ extension DisplayMnemonics {
 }
 
 extension AlertState<DisplayMnemonics.Destinations.Action.UseCautionAlert> {
-	static func useCaution(_ id: DisplayMnemonicRow.State.ID) -> Self {
-		Self {
-			TextState("Use Caution") // FIXME: Strings
+	static func useCaution(_ id: DisplayMnemonicRow.State.ID) -> AlertState {
+		AlertState {
+			TextState(L10n.DisplayMnemonics.CautionAlert.title)
 		} actions: {
 			ButtonState(role: .cancel, action: .cancelTapped) {
 				TextState(L10n.Common.cancel)
 			}
 			ButtonState(role: .destructive, action: .revealTapped(id)) {
-				TextState("Reveal Seed phrase") // FIXME: Strings
+				TextState(L10n.DisplayMnemonics.CautionAlert.revealButtonLabel)
 			}
 		} message: {
-			TextState("Make sure no person or camera can see your display. Don't read or mouth the words. We have prevented you from taking screenshots.") // FIXME: Strings
+			TextState(L10n.DisplayMnemonics.CautionAlert.message)
 		}
 	}
 }

@@ -37,7 +37,7 @@ extension AccountDetails {
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)
 
-					Button("Transfer", asset: AssetResource.transfer) {
+					Button(L10n.Account.transfer, asset: AssetResource.transfer) {
 						viewStore.send(.transferButtonTapped)
 					}
 					.textStyle(.body1Header)
