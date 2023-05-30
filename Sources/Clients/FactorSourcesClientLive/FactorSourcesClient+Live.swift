@@ -117,16 +117,6 @@ extension FactorSourcesClient: DependencyKey {
 	public static let liveValue = Self.live()
 }
 
-extension FactorSource {
-	public mutating func updateLastUsedOn(to newLastUsedOn: Date = .now) {
-		switch self {
-		case var .device(source):
-			source.common.lastUsedOn = lastUsedOn
-			self = .device(source)
-		}
-	}
-}
-
 internal func signingFactors(
 	for entities: some Collection<EntityPotentiallyVirtual>,
 	from allFactorSources: IdentifiedArrayOf<FactorSource>,

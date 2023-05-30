@@ -5,7 +5,7 @@ import Prelude
 // MARK: - BaseFactorSourceProtocol
 public protocol BaseFactorSourceProtocol {
 	var kind: FactorSourceKind { get }
-	var common: FactorSource.Common { get }
+	var common: FactorSource.Common { get set }
 }
 
 extension BaseFactorSourceProtocol {
@@ -40,11 +40,33 @@ extension FactorSource {
 	}
 
 	public var common: FactorSource.Common {
-		property(\.common)
+		get { property(\.common) }
+		set {
+			update(\.common, to: newValue)
+		}
 	}
 
 	public var kind: FactorSourceKind {
 		property(\.kind)
+	}
+
+	public mutating func update<Property>(
+		_ writableKeyPath: WritableKeyPath<any FactorSourceProtocol, Property>,
+		to newValue: Property
+	) {
+		switch self {
+		case var .device(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .ledger(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .offDeviceMnemonic(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+		}
 	}
 
 	private func property<Property>(_ keyPath: KeyPath<BaseFactorSourceProtocol, Property>) -> Property {
@@ -96,7 +118,6 @@ extension FactorSource {
 
 // MARK: - FactorSourceProtocol
 public protocol FactorSourceProtocol: BaseFactorSourceProtocol, Sendable, Hashable, Codable {
-	var common: FactorSource.Common { get set } // refine that `common` has setter
 	static var kind: FactorSourceKind { get }
 	static var casePath: CasePath<FactorSource, Self> { get }
 }
