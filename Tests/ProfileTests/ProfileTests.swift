@@ -150,8 +150,8 @@ final class ProfileTests: TestCase {
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-			let index = profile.factorSources.babylonDevice.nextDerivationIndicesPerNetwork.nextForEntity(
-				kind: .account,
+			let index = try profile.factorSources.babylonDevice.nextDerivationIndex(
+				for: .account,
 				networkID: networkID
 			)
 
@@ -210,7 +210,10 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-			let derivationPath = try profile.factorSources.babylonDevice.derivationPathForNextEntity(kind: .identity, networkID: profile.networkID)
+			let derivationPath = try profile.factorSources.babylonDevice.derivationPath(
+				forNext: .identity,
+				networkID: profile.networkID
+			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
 			let publicKey = try hdRoot.derivePublicKey(
@@ -308,7 +311,7 @@ final class ProfileTests: TestCase {
 				.init(arrayLiteral:
 					.init(
 						identityAddress: firstPersona.address,
-						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
@@ -320,7 +323,7 @@ final class ProfileTests: TestCase {
 					),
 					.init(
 						identityAddress: secondPersona.address,
-						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
@@ -386,8 +389,8 @@ final class ProfileTests: TestCase {
 			XCTAssertEqual(factorSource.hint.model, deviceFactorModel)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
-		XCTAssertEqual(deviceFactorSource.nextDerivationIndicesPerNetwork.nextForEntity(kind: .account, networkID: profile.networkID), 3)
-		XCTAssertEqual(deviceFactorSource.nextDerivationIndicesPerNetwork.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
+		XCTAssertEqual(try deviceFactorSource.nextDerivationIndex(for: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(try deviceFactorSource.nextDerivationIndex(for: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id

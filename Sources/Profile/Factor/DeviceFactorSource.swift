@@ -237,7 +237,9 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 		self.hint = hint
 		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
 	}
+}
 
+extension DeviceFactorSource {
 	public static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
@@ -293,6 +295,29 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 		)
 	}
 }
+
+import EngineToolkitModels
+extension DeviceFactorSource {
+	public func nextDerivationIndex(for entityKind: EntityKind, networkID: NetworkID) throws -> Profile.Network.NextDerivationIndices.Index {
+		guard let nextDerivationIndicesPerNetwork else {
+			throw CalledPerivationPathOnOlympiaDeviceFactorNotSupported()
+		}
+		return nextDerivationIndicesPerNetwork.nextForEntity(kind: entityKind, networkID: networkID)
+	}
+
+	public func derivationPath(forNext entityKind: EntityKind, networkID: NetworkID) throws -> DerivationPath {
+		guard let nextDerivationIndicesPerNetwork else {
+			throw CalledPerivationPathOnOlympiaDeviceFactorNotSupported()
+		}
+		return try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(
+			kind: entityKind,
+			networkID: networkID
+		)
+	}
+}
+
+// MARK: - CalledPerivationPathOnOlympiaDeviceFactorNotSupported
+struct CalledPerivationPathOnOlympiaDeviceFactorNotSupported: Swift.Error {}
 
 // MARK: - FactorSource.Common
 extension FactorSource {
