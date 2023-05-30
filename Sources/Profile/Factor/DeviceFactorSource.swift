@@ -31,7 +31,7 @@ extension BaseFactorSourceProtocol {
 public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
 	case device(DeviceFactorSource)
 	case ledger(LedgerHardwareWalletFactorSource)
-	case offDeviceMnemonic(OffDeviceMnemonic)
+	case offDeviceMnemonic(OffDeviceMnemonicFactorSource)
 }
 
 extension FactorSource {
@@ -88,7 +88,7 @@ extension FactorSource {
 			)
 		case .offDeviceMnemonic:
 			self = try .offDeviceMnemonic(
-				keyedContainer.decode(OffDeviceMnemonic.self, forKey: .offDeviceMnemonic)
+				keyedContainer.decode(OffDeviceMnemonicFactorSource.self, forKey: .offDeviceMnemonic)
 			)
 		}
 	}
@@ -96,6 +96,7 @@ extension FactorSource {
 
 // MARK: - FactorSourceProtocol
 public protocol FactorSourceProtocol: BaseFactorSourceProtocol, Sendable, Hashable, Codable {
+	var common: FactorSource.Common { get set } // refine that `common` has setter
 	static var kind: FactorSourceKind { get }
 	static var casePath: CasePath<FactorSource, Self> { get }
 }
@@ -195,7 +196,8 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 		public var model: Model; public typealias Model = Tagged<(Self, model: ()), String>
 	}
 
-	public let common: FactorSource.Common
+	// Mutable so we can update "lastUsedOn"
+	public var common: FactorSource.Common
 	public var hint: Hint
 
 	/// nil for olympia
@@ -213,8 +215,8 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 
 	public static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		model: Hint.Model,
-		name: Hint.Name,
+		model: Hint.Model = "",
+		name: Hint.Name = "",
 		isOlympiaCompatible: Bool,
 		addedOn: Date = .now,
 		lastUsedOn: Date = .now
@@ -288,8 +290,8 @@ extension FactorSource {
 	}
 }
 
-// MARK: - OffDeviceMnemonic
-public struct OffDeviceMnemonic: FactorSourceProtocol {
+// MARK: - OffDeviceMnemonicFactorSource
+public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 	/// Kind of factor source
 	public static let kind: FactorSourceKind = .offDeviceMnemonic
 	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.offDeviceMnemonic
@@ -300,17 +302,62 @@ public struct OffDeviceMnemonic: FactorSourceProtocol {
 
 		/// "In a book at my safe place"
 		public var backupLocation: BackupLocation; public typealias BackupLocation = Tagged<(Self, backupLocation: ()), String>
+
+		public init(story: Story, backupLocation: BackupLocation) {
+			self.story = story
+			self.backupLocation = backupLocation
+		}
 	}
 
 	public struct BIP39Parameters: Sendable, Hashable, Codable {
 		public let wordCount: BIP39.WordCount
 		public let language: BIP39.Language
 		public let bip39PassphraseSpecified: Bool
+		public init(wordCount: BIP39.WordCount, language: BIP39.Language, bip39PassphraseSpecified: Bool) {
+			self.wordCount = wordCount
+			self.language = language
+			self.bip39PassphraseSpecified = bip39PassphraseSpecified
+		}
+
+		public init(mnemonicWithPassphrase: MnemonicWithPassphrase) {
+			let mnemonic = mnemonicWithPassphrase.mnemonic
+			self.init(wordCount: mnemonic.wordCount, language: mnemonic.language, bip39PassphraseSpecified: !mnemonicWithPassphrase.passphrase.isEmpty)
+		}
 	}
 
 	public var common: FactorSource.Common
 	public var hint: Hint
 	public let bip39Parameters: BIP39Parameters
+
+	public init(
+		common: FactorSource.Common,
+		hint: Hint,
+		bip39Parameters: BIP39Parameters
+	) {
+		self.common = common
+		self.hint = hint
+		self.bip39Parameters = bip39Parameters
+	}
+
+	public static func from(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		story: Hint.Story,
+		backupLocation: Hint.BackupLocation,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self(
+			common: .from(
+				factorSourceKind: .device,
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				cryptoParameters: .babylon,
+				addedOn: addedOn,
+				lastUsedOn: lastUsedOn
+			),
+			hint: .init(story: story, backupLocation: backupLocation),
+			bip39Parameters: .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
+		)
+	}
 }
 
 // MARK: - BIP39.WordCount + Codable

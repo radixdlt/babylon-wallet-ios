@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-extension HDOnDeviceFactorSource {
+extension DeviceFactorSource {
 	var labelSeedPhraseKind: String {
 		// FIXME: string
 		supportsOlympia ? "Legacy seed phrase" : "Main seed phrase"
@@ -35,7 +35,7 @@ extension DisplayMnemonicRow {
 // MARK: - AccountsForDeviceFactorSourceView
 struct AccountsForDeviceFactorSourceView: SwiftUI.View {
 	let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
-	var deviceFactorSource: HDOnDeviceFactorSource {
+	var deviceFactorSource: DeviceFactorSource {
 		accountsForDeviceFactorSource.deviceFactorSource
 	}
 

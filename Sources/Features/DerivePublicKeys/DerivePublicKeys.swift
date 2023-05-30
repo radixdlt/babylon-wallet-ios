@@ -71,8 +71,8 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case loadedHDOnDeviceFactorSource(HDOnDeviceFactorSource)
-		case deriveWithDeviceFactor(HDOnDeviceFactorSource, DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose)
+		case loadedHDOnDeviceFactorSource(DeviceFactorSource)
+		case deriveWithDeviceFactor(DeviceFactorSource, DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose)
 		case deriveWithLedgerFactor(LedgerFactorSource, DerivationPath, NetworkID)
 	}
 
@@ -111,7 +111,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				}
 
 			case let .specific(factorSource):
-				if let hdOnDeviceFactorSource = try? HDOnDeviceFactorSource(factorSource: factorSource) {
+				if let hdOnDeviceFactorSource = try? DeviceFactorSource(factorSource: factorSource) {
 					return deriveWith(hdOnDeviceFactorSource: hdOnDeviceFactorSource, state)
 				} else if let ledgerFactorSource = try? LedgerFactorSource(factorSource: factorSource) {
 					state.ledgerBeingUsed = ledgerFactorSource
@@ -141,7 +141,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 extension DerivePublicKeys {
 	private func deriveWith(
-		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
+		hdOnDeviceFactorSource: DeviceFactorSource,
 		_ state: State
 	) -> EffectTask<Action> {
 		withDerivationPath(
@@ -162,7 +162,7 @@ extension DerivePublicKeys {
 	}
 
 	private func deriveWith(
-		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
+		hdOnDeviceFactorSource: DeviceFactorSource,
 		derivationPaths: OrderedSet<DerivationPath>,
 		networkID: NetworkID,
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,

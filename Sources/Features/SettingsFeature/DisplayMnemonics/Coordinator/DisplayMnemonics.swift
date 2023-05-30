@@ -9,7 +9,7 @@ public struct AccountsForDeviceFactorSource: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
 	public var id: ID { deviceFactorSource.id }
 	public let accounts: [Profile.Network.Account]
-	public let deviceFactorSource: HDOnDeviceFactorSource
+	public let deviceFactorSource: DeviceFactorSource
 }
 
 // MARK: - DisplayMnemonics
@@ -143,7 +143,7 @@ extension DisplayMnemonics {
 				}
 				return try AccountsForDeviceFactorSource(
 					accounts: accountsForSource,
-					deviceFactorSource: HDOnDeviceFactorSource(factorSource: factorSource)
+					deviceFactorSource: DeviceFactorSource(factorSource: factorSource)
 				)
 			})
 		}

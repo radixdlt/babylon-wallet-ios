@@ -31,20 +31,23 @@ extension FactorSourcesClient: DependencyKey {
 				await getProfileStore().factorSourcesValues()
 			},
 			addPrivateHDFactorSource: { request in
-				let privateFactorSource = request.privateFactorSource
-				if privateFactorSource.kind == .device {
-					try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
+				let factorSource = request.factorSource
+
+				switch factorSource {
+				case let .device(deviceFactorSource):
+					try await secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
+				default: break
 				}
-				let factorSourceID = privateFactorSource.id
+				let factorSourceID = factorSource.id
 
 				/// We only need to save olympia mnemonics into Profile, the Babylon ones
 				/// already exist in profile, and this function is used only to save the
 				/// imported mnemonic into keychain (done above).
 				if request.saveIntoProfile {
 					do {
-						try await saveFactorSource(privateFactorSource.factorSource)
+						try await saveFactorSource(factorSource)
 					} catch {
-						if privateFactorSource.kind == .device {
+						if factorSource.kind == .device {
 							// We were unlucky, failed to update Profile, thus best to undo the saving of
 							// the mnemonic in keychain (if we can).
 							try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
@@ -102,8 +105,7 @@ extension FactorSourcesClient: DependencyKey {
 						guard var factorSource = factorSources[id: id] else {
 							throw FactorSourceNotFound()
 						}
-
-						factorSource.lastUsedOn = request.lastUsedOn
+						factorSource.common.lastUsedOn = request.lastUsedOn
 						factorSources[id: id] = factorSource
 					}
 					profile.factorSources = .init(rawValue: factorSources)!
@@ -113,6 +115,16 @@ extension FactorSourcesClient: DependencyKey {
 	}
 
 	public static let liveValue = Self.live()
+}
+
+extension FactorSource {
+	public mutating func updateLastUsedOn(to newLastUsedOn: Date = .now) {
+		switch self {
+		case var .device(source):
+			source.common.lastUsedOn = lastUsedOn
+			self = .device(source)
+		}
+	}
 }
 
 internal func signingFactors(

@@ -11,7 +11,7 @@ extension FactorSource {
 //		bip39Passphrase: String = "",
 //		olympiaCompatible: Bool,
 //		storage: Storage?
-//	) throws -> HDOnDeviceFactorSource {
+//	) throws -> DeviceFactorSource {
 //		let factorSource = try Self(
 //			kind: .device,
 //			id: id(fromRoot: mnemonic.hdRoot(passphrase: bip39Passphrase)),
@@ -20,7 +20,7 @@ extension FactorSource {
 //			cryptoParameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
 //			storage: storage
 //		)
-//		return try HDOnDeviceFactorSource(factorSource: factorSource)
+//		return try DeviceFactorSource(factorSource: factorSource)
 //	}
 //
 //	public static func babylon(
@@ -58,7 +58,7 @@ extension FactorSource {
 //		bip39Passphrase: String = "",
 //		label: FactorSource.Label = "iPhone",
 //		description: FactorSource.Description = "olympia"
-//	) throws -> HDOnDeviceFactorSource {
+//	) throws -> DeviceFactorSource {
 //		try device(
 //			mnemonic: mnemonic,
 //			label: label, // will be changed by ProfileStore to *device* **name**
@@ -73,7 +73,7 @@ extension FactorSource {
 //		mnemonicWithPassphrase: MnemonicWithPassphrase,
 //		label: FactorSource.Label = "iPhone",
 //		description: FactorSource.Description = "olympia"
-//	) throws -> HDOnDeviceFactorSource {
+//	) throws -> DeviceFactorSource {
 //		try olympia(
 //			mnemonic: mnemonicWithPassphrase.mnemonic,
 //			bip39Passphrase: mnemonicWithPassphrase.passphrase,

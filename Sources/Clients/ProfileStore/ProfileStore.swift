@@ -402,15 +402,15 @@ extension ProfileStore.ProfileState {
 extension ProfileStore {
 	#if !canImport(UIKit)
 	/// used by tests
-	internal static let macOSDeviceDescriptionFallback: FactorSource.Description = "macOS"
-	internal static let macOSDeviceLabelFallback: FactorSource.Label = "macOS"
+	internal static let macOSDeviceNameFallback: DeviceFactorSource.Hint.Name = "macOS"
+	internal static let macOSDeviceModelFallback: DeviceFactorSource.Hint.Model = "macOS"
 	#endif
 
 	internal static func deviceDescription(
-		label: FactorSource.Label,
-		description: FactorSource.Description
+		name: DeviceFactorSource.Hint.Name,
+		model: DeviceFactorSource.Hint.Model
 	) -> NonEmptyString {
-		"\(label.rawValue) (\(description.rawValue))"
+		"\(name.rawValue) (\(model.rawValue))"
 	}
 }
 
@@ -512,23 +512,24 @@ extension ProfileStore {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		do {
-			let label: FactorSource.Label
-			let description: FactorSource.Description
+			let name: DeviceFactorSource.Hint.Name
+			let model: DeviceFactorSource.Hint.Model
 			#if canImport(UIKit)
 			@Dependency(\.device) var device
-			label = await .init(rawValue: device.name)
-			description = await .init(rawValue: device.model)
+			name = await .init(rawValue: device.name)
+			model = await .init(rawValue: device.model)
 			#else
-			label = macOSDeviceLabelFallback
-			description = macOSDeviceDescriptionFallback
+			name = macOSDeviceNameFallback
+			model = macOSDeviceModelFallback
 			#endif
 
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic)
-			let factorSource = try FactorSource.babylon(
+
+			let factorSource = try DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				label: label,
-				description: description
+				model: model,
+				name: name
 			)
 
 			// We eagerly save the factor source here because we wanna use the same flow for

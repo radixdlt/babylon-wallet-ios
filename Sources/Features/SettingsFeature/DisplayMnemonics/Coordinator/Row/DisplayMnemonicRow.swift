@@ -5,7 +5,7 @@ public struct DisplayMnemonicRow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = AccountsForDeviceFactorSource.ID
 		public var id: ID { accountsForDeviceFactorSource.id }
-		public var deviceFactorSource: HDOnDeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
+		public var deviceFactorSource: DeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
 
 		public let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
 

@@ -47,11 +47,13 @@ extension FactorSourcesClient {
 
 // MARK: - AddPrivateHDFactorSourceRequest
 public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
-	public let privateFactorSource: PrivateHDFactorSource
+	public let factorSource: FactorSource
+	public let mnemonicWithPasshprase: MnemonicWithPassphrase
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
 	public let saveIntoProfile: Bool
-	public init(privateFactorSource: PrivateHDFactorSource, saveIntoProfile: Bool) {
-		self.privateFactorSource = privateFactorSource
+	public init(factorSource: FactorSource, mnemonicWithPasshprase: MnemonicWithPassphrase, saveIntoProfile: Bool) {
+		self.factorSource = factorSource
+		self.mnemonicWithPasshprase = mnemonicWithPasshprase
 		self.saveIntoProfile = saveIntoProfile
 	}
 }
@@ -86,11 +88,11 @@ extension FactorSourcesClient {
 
 	public func getDeviceFactorSource(
 		of hdFactorInstance: HierarchicalDeterministicFactorInstance
-	) async throws -> HDOnDeviceFactorSource? {
+	) async throws -> DeviceFactorSource? {
 		guard let factorSource = try await getFactorSource(of: hdFactorInstance.factorInstance) else {
 			return nil
 		}
-		return try HDOnDeviceFactorSource(factorSource: factorSource)
+		return try factorSource.extract(as: DeviceFactorSource.self)
 	}
 
 	public func getFactorSource(
@@ -179,16 +181,18 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 extension FactorSourcesClient {
 	public func addOffDeviceFactorSource(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		label: FactorSource.Label,
-		description: FactorSource.Description
+		story: OffDeviceMnemonicFactorSource.Hint.Story,
+		backupLocationHint backupLocation: OffDeviceMnemonicFactorSource.Hint.BackupLocation
 	) async throws -> FactorSourceID {
-		let privateFactorSource = try FactorSource.offDeviceMnemonic(
-			withPassphrase: mnemonicWithPassphrase,
-			label: label,
-			description: description
+		let factorSource = try OffDeviceMnemonicFactorSource.from(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			story: story,
+			backupLocation: backupLocation
 		)
+
 		return try await addPrivateHDFactorSource(.init(
-			privateFactorSource: privateFactorSource,
+			factorSource: factorSource.embed(),
+			mnemonicWithPasshprase: mnemonicWithPassphrase,
 			saveIntoProfile: true
 		))
 	}
@@ -197,18 +201,17 @@ extension FactorSourcesClient {
 		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
 	) async throws -> FactorSourceID {
-		let isOlympia = onDeviceMnemonicKind == .olympia
-		let hdOnDeviceFactorSource: HDOnDeviceFactorSource = isOlympia ? try FactorSource.olympia(
-			mnemonicWithPassphrase: mnemonicWithPassphrase
-		) : try FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase).hdOnDeviceFactorSource
+		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
 
-		let privateFactorSource = try PrivateHDFactorSource(
+		let deviceFactorSource = try DeviceFactorSource.from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			factorSource: hdOnDeviceFactorSource.factorSource
+			isOlympiaCompatible: isOlympiaCompatible
 		)
+
 		return try await addPrivateHDFactorSource(.init(
-			privateFactorSource: privateFactorSource,
-			saveIntoProfile: isOlympia
+			factorSource: deviceFactorSource.embed(),
+			mnemonicWithPasshprase: mnemonicWithPassphrase,
+			saveIntoProfile: isOlympiaCompatible
 		))
 	}
 }

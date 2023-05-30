@@ -1,10 +1,9 @@
 import Prelude
 
 // MARK: - PrivateHDFactorSource
-public struct PrivateHDFactorSource {
+public struct PrivateHDFactorSource: Sendable, Hashable {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 	public let factorSource: DeviceFactorSource
-
 	public init(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		factorSource: DeviceFactorSource
