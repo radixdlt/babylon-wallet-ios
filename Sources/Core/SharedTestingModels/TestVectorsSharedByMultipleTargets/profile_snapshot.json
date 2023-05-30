@@ -6,15 +6,15 @@
       "ledgerHQHardwareWalletSigningDisplayMode" : "verbose"
     },
     "gateways" : {
-      "current" : "https://betanet.radixdlt.com",
+      "current" : "https://rcnet.radixdlt.com/",
       "saved" : [
         {
           "network" : {
-            "displayDescription" : "Betanet",
-            "id" : 11,
-            "name" : "nebunet"
+            "displayDescription" : "RCnet",
+            "id" : 12,
+            "name" : "kisharnet"
           },
-          "url" : "https://betanet.radixdlt.com"
+          "url" : "https://rcnet.radixdlt.com/"
         }
       ]
     },
@@ -35,50 +35,55 @@
   },
   "factorSources" : [
     {
-      "addedOn" : "1970-01-01T00:00:00Z",
-      "description" : "unit test",
-      "id" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033",
-      "kind" : "device",
-      "label" : "computer",
-      "lastUsedOn" : "1970-01-01T00:00:00Z",
-      "cryptoParameters" : {
-        "supportedCurves" : [
-          "curve25519"
-        ],
-        "supportedDerivationPathSchemes" : [
-          "cap26"
+      "device" : {
+        "common" : {
+          "addedOn" : "2023-05-30T10:31:32Z",
+          "cryptoParameters" : {
+            "supportedCurves" : [
+              "curve25519"
+            ],
+            "supportedDerivationPathSchemes" : [
+              "cap26"
+            ]
+          },
+          "id" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033",
+          "lastUsedOn" : "2023-05-30T10:31:32Z"
+        },
+        "hint" : {
+          "model" : "computer",
+          "name" : "unit test"
+        },
+        "nextDerivationIndicesPerNetwork" : [
+          {
+            "forAccount" : 3,
+            "forIdentity" : 2,
+            "networkID" : 12
+          }
         ]
       },
-      "storage" : {
-        "discriminator" : "entityCreating",
-        "entityCreatingStorage" : {
-          "nextDerivationIndicesPerNetwork" : [
-            {
-              "forAccount" : 3,
-              "forIdentity" : 2,
-              "networkID" : 11
-            }
-          ]
-        }
-      }
+      "discriminator" : 222
     },
     {
-      "addedOn" : "1970-01-01T00:00:00Z",
-      "description" : "unit test",
-      "id" : "c23c47a8a37b79298878506692e42f3a1a11967ff1239bb344ad6ab0c21ddda8",
-      "kind" : "device",
-      "label" : "computer",
-      "lastUsedOn" : "1970-01-01T00:00:00Z",
-      "cryptoParameters" : {
-        "supportedCurves" : [
-          "curve25519",
-          "secp256k1"
-        ],
-        "supportedDerivationPathSchemes" : [
-          "cap26",
-          "bip44Olympia"
-        ]
-      }
+      "device" : {
+        "common" : {
+          "addedOn" : "2023-05-30T10:31:32Z",
+          "cryptoParameters" : {
+            "supportedCurves" : [
+              "curve25519"
+            ],
+            "supportedDerivationPathSchemes" : [
+              "cap26"
+            ]
+          },
+          "id" : "dec23c47a8a37b79298878506692e42f3a1a11967ff1239bb344ad6ab0c21ddda8",
+          "lastUsedOn" : "2023-05-30T10:31:32Z"
+        },
+        "hint" : {
+          "model" : "computer",
+          "name" : "unit test"
+        }
+      },
+      "discriminator" : 222
     }
   ],
   "header" : {
@@ -99,16 +104,16 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 34
+    "snapshotVersion" : 35
   },
   "networks" : [
     {
       "accounts" : [
         {
-          "address" : "account_tdx_c_1pycvv2pummryhvmr6tveuva4cgap63lapgu5y4eeqlwstajjxx",
+          "address" : "account_tdx_c_1pyezed90u5qtagu2247rqw7f04vc7wnhsfjz4nf6vuvqtj9kcq",
           "appearanceID" : 0,
           "displayName" : "First",
-          "networkID" : 11,
+          "networkID" : 12,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -119,17 +124,17 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/525H/1678H/0H",
+                        "path" : "m/44H/1022H/12H/525H/1678H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "03c834335f40429223db22a3cc91f7ca354050081692bd1054b5eb4e379b5a6d",
+                        "compressedData" : "042f0f24e62932483972b4ff07d63963990e5d7952305babf8014523d65c2b38",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               },
               "transactionSigning" : {
                 "badge" : {
@@ -138,26 +143,26 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/525H/1460H/0H",
+                        "path" : "m/44H/1022H/12H/525H/1460H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3",
+                        "compressedData" : "229c2acaeba87f5231390bfde38da4f4e9f84ab90fb77658aea7983a7af6741d",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               }
             }
           }
         },
         {
-          "address" : "account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke",
+          "address" : "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj",
           "appearanceID" : 1,
           "displayName" : "Second",
-          "networkID" : 11,
+          "networkID" : 12,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -168,17 +173,17 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/525H/1678H/1H",
+                        "path" : "m/44H/1022H/12H/525H/1678H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "11bef8496426d98e053cf7ce3a85a1a7504fe7ceb1ebbc6f7c14dd7b7071de2e",
+                        "compressedData" : "82a8ebf9216cef03592ba6d798d67159e154c41b3f2d8d22faf3f4f9b1a5c859",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               },
               "transactionSigning" : {
                 "badge" : {
@@ -187,26 +192,26 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/525H/1460H/1H",
+                        "path" : "m/44H/1022H/12H/525H/1460H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719",
+                        "compressedData" : "150a73661bfae1e6aad771d47bef2b20a92925fcaee3e49762872b2af191b3e7",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               }
             }
           }
         },
         {
-          "address" : "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
+          "address" : "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw",
           "appearanceID" : 2,
           "displayName" : "Third",
-          "networkID" : 11,
+          "networkID" : 12,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -217,17 +222,17 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/525H/1678H/2H",
+                        "path" : "m/44H/1022H/12H/525H/1678H/2H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "5edbfbc93b7cea2e948c6dc85a61e306064a13328a8fed0ffa2843d184c39ac9",
+                        "compressedData" : "ee4565de7dd845d21fece2579bb1cf8c977dbf03408240d63ad11e53a2aa3bd5",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               },
               "transactionSigning" : {
                 "badge" : {
@@ -236,17 +241,17 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/525H/1460H/2H",
+                        "path" : "m/44H/1022H/12H/525H/1460H/2H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3",
+                        "compressedData" : "5cc3c64b1d155494bcf03bf607e0fa4aa8c86fca796d7cafc4f88c24d109fc01",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               }
             }
           }
@@ -254,17 +259,17 @@
       ],
       "authorizedDapps" : [
         {
-          "dAppDefinitionAddress" : "account_tdx_c_1p93ajvqydyyhragwgda7az3kacz602s66j9nc3qfyn5qucqkr3",
+          "dAppDefinitionAddress" : "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3",
           "displayName" : "RadiSwap",
-          "networkID" : 11,
+          "networkID" : 12,
           "referencesToAuthorizedPersonas" : [
             {
-              "identityAddress" : "identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8",
+              "identityAddress" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa",
-                  "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"
+                  "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj",
+                  "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"
                 ],
                 "request" : {
                   "quantifier" : "exactly",
@@ -277,11 +282,11 @@
               ]
             },
             {
-              "identityAddress" : "identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw",
+              "identityAddress" : "identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r",
               "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"
+                  "account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj"
                 ],
                 "request" : {
                   "quantifier" : "atLeast",
@@ -296,10 +301,10 @@
           ]
         }
       ],
-      "networkID" : 11,
+      "networkID" : 12,
       "personas" : [
         {
-          "address" : "identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8",
+          "address" : "identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv",
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
@@ -311,7 +316,7 @@
               "value" : "Incognitoson"
             }
           ],
-          "networkID" : 11,
+          "networkID" : 12,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -322,17 +327,17 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/618H/1678H/0H",
+                        "path" : "m/44H/1022H/12H/618H/1678H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "83426e4c587553bd3a949a490683a16fdd77e400a05615e5734daac139c7afb7",
+                        "compressedData" : "bac131975cc66651961835490731f321f70289c306dfae52652cbad44a3647c7",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               },
               "transactionSigning" : {
                 "badge" : {
@@ -341,23 +346,23 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/618H/1460H/0H",
+                        "path" : "m/44H/1022H/12H/618H/1460H/0H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4",
+                        "compressedData" : "e8b6f865cf2696442ba3106550b3e55d8c65c181066d76f49138306d101d0db7",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               }
             }
           }
         },
         {
-          "address" : "identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw",
+          "address" : "identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r",
           "displayName" : "Mrs Public",
           "fields" : [
             {
@@ -369,7 +374,7 @@
               "value" : "Publicson"
             }
           ],
-          "networkID" : 11,
+          "networkID" : 12,
           "securityState" : {
             "discriminator" : "unsecured",
             "unsecuredEntityControl" : {
@@ -380,17 +385,17 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/618H/1678H/1H",
+                        "path" : "m/44H/1022H/12H/618H/1678H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "44547fabd1e1fd642d96103eb71d80216abf0dc87f0e17ed4a9f5dbc91d2c856",
+                        "compressedData" : "20a16f3d5df0fb8ebb34fa08edb5143a154c55e857fb5c2273366b8c716ca740",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               },
               "transactionSigning" : {
                 "badge" : {
@@ -399,17 +404,17 @@
                     "discriminator" : "hierarchicalDeterministicPublicKey",
                     "hierarchicalDeterministicPublicKey" : {
                       "derivationPath" : {
-                        "path" : "m/44H/1022H/11H/618H/1460H/1H",
+                        "path" : "m/44H/1022H/12H/618H/1460H/1H",
                         "scheme" : "cap26"
                       },
                       "publicKey" : {
-                        "compressedData" : "6b33fec79f1535ac566b3d840f753942af6447efbe5c50dc343f8ec2122af9b3",
+                        "compressedData" : "873a41469982a92b52ecb9e5ef6d8267db306b3143efd50d220f867bc3403c22",
                         "curve" : "curve25519"
                       }
                     }
                   }
                 },
-                "factorSourceID" : "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
+                "factorSourceID" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033"
               }
             }
           }

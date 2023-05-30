@@ -7,7 +7,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let gateway = Radix.Gateway.nebunet
+	let gateway = Radix.Gateway.kisharnet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
@@ -152,7 +152,7 @@ final class ProfileTests: TestCase {
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
 			let index = profile.factorSources.babylonDevice.nextDerivationIndicesPerNetwork.nextForEntity(
 				kind: .account,
-				networkID: profile.networkID
+				networkID: networkID
 			)
 
 			let derivationPath = try AccountBabylonDerivationPath(
