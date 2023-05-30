@@ -355,162 +355,160 @@ final class ProfileTests: TestCase {
 		print(String(data: data, encoding: .utf8)!)
 	}
 
-	/*
-	 func test_decode() throws {
-	 	let snapshot: ProfileSnapshot = try readTestFixture(jsonName: "profile_snapshot")
+	func test_decode() throws {
+		let snapshot: ProfileSnapshot = try readTestFixture(jsonName: "profile_snapshot")
 
-	 	let profile = try Profile(snapshot: snapshot)
-	 	let date = Date(timeIntervalSince1970: 0)
-	 	let device = ProfileSnapshot.Header.UsedDeviceInfo(
-	 		description: "computer unit test",
-	 		id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
-	 		date: date
-	 	)
-	 	let header = ProfileSnapshot.Header(
-	 		creatingDevice: device,
-	 		lastUsedOnDevice: device,
-	 		id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
-	 		lastModified: date,
-	 		contentHint: .init(
-	 			numberOfAccountsOnAllNetworksInTotal: 6,
-	 			numberOfPersonasOnAllNetworksInTotal: 3,
-	 			numberOfNetworks: 2
-	 		),
-	 		snapshotVersion: .init(rawValue: 34)
-	 	)
+		let profile = try Profile(snapshot: snapshot)
+		let date = Date(timeIntervalSince1970: 0)
+		let device = ProfileSnapshot.Header.UsedDeviceInfo(
+			description: "computer unit test",
+			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
+			date: date
+		)
+		let header = ProfileSnapshot.Header(
+			creatingDevice: device,
+			lastUsedOnDevice: device,
+			id: .init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!,
+			lastModified: date,
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 6,
+				numberOfPersonasOnAllNetworksInTotal: 3,
+				numberOfNetworks: 2
+			),
+			snapshotVersion: .init(rawValue: 35)
+		)
 
-	 	XCTAssertNoDifference(profile.header, header)
-	 	// XCTAssertEqual(profile.creatingDevice, creatingDevice)
+		XCTAssertNoDifference(profile.header, header)
+		// XCTAssertEqual(profile.creatingDevice, creatingDevice)
 
-	 	XCTAssertEqual(profile.factorSources.count, 2)
-	 	for factorSource in profile.factorSources {
-	 		XCTAssertEqual(factorSource.label, factorSourceLabel)
-	 		XCTAssertEqual(factorSource.description, factorSourceDescription)
-	 	}
-	 	let deviceFactorSource = profile.factorSources.babylonDevice
-	 	XCTAssertNil(profile.factorSources.last.storage)
-	 	XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
-	 	XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
+		XCTAssertEqual(profile.factorSources.count, 2)
+		for factorSource in profile.factorSources.compactMap({ $0.extract(DeviceFactorSource.self) }) {
+			XCTAssertEqual(factorSource.hint.name, deviceFactorName)
+			XCTAssertEqual(factorSource.hint.model, deviceFactorModel)
+		}
+		let deviceFactorSource = profile.factorSources.babylonDevice
+		XCTAssertEqual(deviceFactorSource.nextDerivationIndicesPerNetwork.nextForEntity(kind: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(deviceFactorSource.nextDerivationIndicesPerNetwork.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
 
-	 	XCTAssertEqual(profile.networks.count, 1)
-	 	let networkID = gateway.network.id
-	 	let network = try profile.networks.network(id: networkID)
-	 	XCTAssertEqual(network.accounts.count, 3)
+		XCTAssertEqual(profile.networks.count, 1)
+		let networkID = gateway.network.id
+		let network = try profile.networks.network(id: networkID)
+		XCTAssertEqual(network.accounts.count, 3)
 
-	 	XCTAssertEqual(network.accounts[0].networkID, networkID)
-	 	XCTAssertEqual(network.accounts[0].displayName, "First")
-	 	XCTAssertEqual(network.accounts[1].displayName, "Second")
-	 	XCTAssertEqual(network.accounts[2].displayName, "Third")
-	 	XCTAssertEqual(network.personas[0].networkID, networkID)
-	 	XCTAssertEqual(network.personas[0].displayName, "Mrs Incognito")
-	 	XCTAssertEqual(network.personas[1].displayName, "Mrs Public")
-	 	XCTAssertEqual(network.personas.count, 2)
-	 	XCTAssertEqual(network.networkID, networkID)
+		XCTAssertEqual(network.accounts[0].networkID, networkID)
+		XCTAssertEqual(network.accounts[0].displayName, "First")
+		XCTAssertEqual(network.accounts[1].displayName, "Second")
+		XCTAssertEqual(network.accounts[2].displayName, "Third")
+		XCTAssertEqual(network.personas[0].networkID, networkID)
+		XCTAssertEqual(network.personas[0].displayName, "Mrs Incognito")
+		XCTAssertEqual(network.personas[1].displayName, "Mrs Public")
+		XCTAssertEqual(network.personas.count, 2)
+		XCTAssertEqual(network.networkID, networkID)
 
-	 	XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
-	 	XCTAssertTrue(profile.appPreferences.security.isDeveloperModeEnabled, "Developer mode should default to on")
+		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+		XCTAssertTrue(profile.appPreferences.security.isDeveloperModeEnabled, "Developer mode should default to on")
 
-	 	let curve25519FactorSourceMnemonic = try Mnemonic(
-	 		phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
-	 		language: .english
-	 	)
-	 	let secp256K1FactorMnemonic = try Mnemonic(
-	 		phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
-	 		language: .english
-	 	)
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
+			language: .english
+		)
+		let secp256K1FactorMnemonic = try Mnemonic(
+			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
+			language: .english
+		)
 
-	 	XCTAssertEqual(
-	 		profile.factorSources.first.id,
-	 		try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot())
-	 	)
+		XCTAssertEqual(
+			profile.factorSources.first.id,
+			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot(), factorSourceKind: .device)
+		)
 
-	 	XCTAssertEqual(
-	 		profile.factorSources.first(where: { $0.supportsOlympia })!.id,
-	 		try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot())
-	 	)
+		XCTAssertEqual(
+			profile.factorSources.first(where: { $0.supportsOlympia })!.id,
+			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot(), factorSourceKind: .device)
+		)
 
-	 	// Account 0
-	 	XCTAssertEqual(
-	 		network.accounts[0].address.address,
-	 		"account_tdx_c_1pycvv2pummryhvmr6tveuva4cgap63lapgu5y4eeqlwstajjxx"
-	 	)
-	 	XCTAssertEqual(
-	 		network.accounts[0].publicKey()?.compressedData.hex(),
-	 		"7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3"
-	 	)
-	 	XCTAssertEqual(
-	 		network.accounts[0].authPublicKey()?.compressedData.hex(),
-	 		"03c834335f40429223db22a3cc91f7ca354050081692bd1054b5eb4e379b5a6d"
-	 	)
+		// Account 0
+		XCTAssertEqual(
+			network.accounts[0].address.address,
+			"account_tdx_c_1pycvv2pummryhvmr6tveuva4cgap63lapgu5y4eeqlwstajjxx"
+		)
+		XCTAssertEqual(
+			network.accounts[0].publicKey()?.compressedData.hex(),
+			"7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3"
+		)
+		XCTAssertEqual(
+			network.accounts[0].authPublicKey()?.compressedData.hex(),
+			"03c834335f40429223db22a3cc91f7ca354050081692bd1054b5eb4e379b5a6d"
+		)
 
-	 	// Account 1
-	 	XCTAssertEqual(
-	 		network.accounts[1].address.address,
-	 		"account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke"
-	 	)
-	 	XCTAssertEqual(
-	 		network.accounts[1].publicKey()?.compressedData.hex(),
-	 		"216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719"
-	 	)
-	 	XCTAssertEqual(
-	 		network.accounts[1].authPublicKey()?.compressedData.hex(),
-	 		"11bef8496426d98e053cf7ce3a85a1a7504fe7ceb1ebbc6f7c14dd7b7071de2e"
-	 	)
+		// Account 1
+		XCTAssertEqual(
+			network.accounts[1].address.address,
+			"account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke"
+		)
+		XCTAssertEqual(
+			network.accounts[1].publicKey()?.compressedData.hex(),
+			"216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719"
+		)
+		XCTAssertEqual(
+			network.accounts[1].authPublicKey()?.compressedData.hex(),
+			"11bef8496426d98e053cf7ce3a85a1a7504fe7ceb1ebbc6f7c14dd7b7071de2e"
+		)
 
-	 	// Account 2
-	 	XCTAssertEqual(
-	 		network.accounts[2].address.address,
-	 		"account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"
-	 	)
-	 	XCTAssertEqual(
-	 		network.accounts[2].publicKey()?.compressedData.hex(),
-	 		"a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3"
-	 	)
-	 	XCTAssertEqual(
-	 		network.accounts[2].authPublicKey()?.compressedData.hex(),
-	 		"5edbfbc93b7cea2e948c6dc85a61e306064a13328a8fed0ffa2843d184c39ac9"
-	 	)
+		// Account 2
+		XCTAssertEqual(
+			network.accounts[2].address.address,
+			"account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"
+		)
+		XCTAssertEqual(
+			network.accounts[2].publicKey()?.compressedData.hex(),
+			"a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3"
+		)
+		XCTAssertEqual(
+			network.accounts[2].authPublicKey()?.compressedData.hex(),
+			"5edbfbc93b7cea2e948c6dc85a61e306064a13328a8fed0ffa2843d184c39ac9"
+		)
 
-	 	// Persona 0
-	 	XCTAssertEqual(
-	 		network.personas[0].address.address,
-	 		"identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8"
-	 	)
-	 	XCTAssertEqual(
-	 		network.personas[0].publicKey()?.compressedData.hex(),
-	 		"573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"
-	 	)
-	 	XCTAssertEqual(
-	 		network.personas[0].authPublicKey()?.compressedData.hex(),
-	 		"83426e4c587553bd3a949a490683a16fdd77e400a05615e5734daac139c7afb7"
-	 	)
+		// Persona 0
+		XCTAssertEqual(
+			network.personas[0].address.address,
+			"identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8"
+		)
+		XCTAssertEqual(
+			network.personas[0].publicKey()?.compressedData.hex(),
+			"573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"
+		)
+		XCTAssertEqual(
+			network.personas[0].authPublicKey()?.compressedData.hex(),
+			"83426e4c587553bd3a949a490683a16fdd77e400a05615e5734daac139c7afb7"
+		)
 
-	 	// Persona 1
-	 	XCTAssertEqual(
-	 		network.personas[1].address.address,
-	 		"identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw"
-	 	)
-	 	XCTAssertEqual(
-	 		network.personas[1].publicKey()?.compressedData.hex(),
-	 		"6b33fec79f1535ac566b3d840f753942af6447efbe5c50dc343f8ec2122af9b3"
-	 	)
-	 	XCTAssertEqual(
-	 		network.personas[1].authPublicKey()?.compressedData.hex(),
-	 		"44547fabd1e1fd642d96103eb71d80216abf0dc87f0e17ed4a9f5dbc91d2c856"
-	 	)
+		// Persona 1
+		XCTAssertEqual(
+			network.personas[1].address.address,
+			"identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw"
+		)
+		XCTAssertEqual(
+			network.personas[1].publicKey()?.compressedData.hex(),
+			"6b33fec79f1535ac566b3d840f753942af6447efbe5c50dc343f8ec2122af9b3"
+		)
+		XCTAssertEqual(
+			network.personas[1].authPublicKey()?.compressedData.hex(),
+			"44547fabd1e1fd642d96103eb71d80216abf0dc87f0e17ed4a9f5dbc91d2c856"
+		)
 
-	 	XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
-	 	let p2pLinks0 = try XCTUnwrap(profile.appPreferences.p2pLinks.first)
-	 	XCTAssertEqual(p2pLinks0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
+		let p2pLinks0 = try XCTUnwrap(profile.appPreferences.p2pLinks.first)
+		XCTAssertEqual(p2pLinks0.connectionPassword.data.hex(), "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 
-	 	XCTAssertEqual(network.authorizedDapps.count, 1)
-	 	XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
-	 	XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
-	 	XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
-	 	XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-	 	XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa", "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"])
-	 }
-	 */
+		XCTAssertEqual(network.authorizedDapps.count, 1)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa", "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"])
+	}
+
 	func test_version_compatibility_check_too_low() throws {
 		let tooLow = ProfileSnapshot.Header.Version.minimum - 1
 

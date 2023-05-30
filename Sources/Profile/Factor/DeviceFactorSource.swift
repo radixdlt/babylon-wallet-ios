@@ -35,6 +35,10 @@ public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable,
 }
 
 extension FactorSource {
+	public var supportsOlympia: Bool {
+		common.cryptoParameters.supportsOlympia
+	}
+
 	public var common: FactorSource.Common {
 		property(\.common)
 	}
@@ -219,6 +223,7 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 			common: .from(
 				factorSourceKind: .device,
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
 				addedOn: addedOn,
 				lastUsedOn: lastUsedOn
 			),
