@@ -16,19 +16,15 @@ extension BackupsClient: DependencyKey {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable
-		func importWith(
-			mnemonicWithPassphrase: MnemonicWithPassphrase,
+		func importFor(
+			factorSourceID: FactorSourceID,
 			operation: () async throws -> Void
 		) async throws {
-			let id = try await factorSourcesClient.addOnDeviceFactorSource(
-				onDeviceMnemonicKind: .babylon,
-				mnemonicWithPassphrase: mnemonicWithPassphrase
-			)
 			do {
 				try await operation()
 			} catch {
 				// revert the saved mnemonic
-				try? await secureStorageClient.deleteMnemonicByFactorSourceID(id)
+				try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
 				throw error
 			}
 		}
@@ -60,13 +56,13 @@ extension BackupsClient: DependencyKey {
 					return nil
 				}
 			},
-			importProfileSnapshot: { snapshot, mnemonicWithPassphrase in
-				try await importWith(mnemonicWithPassphrase: mnemonicWithPassphrase) {
+			importProfileSnapshot: { snapshot, factorSourceID in
+				try await importFor(factorSourceID: factorSourceID) {
 					try await getProfileStore().importProfileSnapshot(snapshot)
 				}
 			},
-			importCloudProfile: { header, mnemonicWithPassphrase in
-				try await importWith(mnemonicWithPassphrase: mnemonicWithPassphrase) {
+			importCloudProfile: { header, factorSourceID in
+				try await importFor(factorSourceID: factorSourceID) {
 					try await getProfileStore().importCloudProfileSnapshot(header)
 				}
 			},

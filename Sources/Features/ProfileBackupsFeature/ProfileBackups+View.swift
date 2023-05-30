@@ -30,7 +30,12 @@ extension ProfileBackups {
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /ProfileBackups.Destinations.State.importMnemonic,
 					action: ProfileBackups.Destinations.Action.importMnemonic,
-					content: { ImportMnemonic.View(store: $0) }
+					content: { store in
+						NavigationView {
+							ImportMnemonic.View(store: store)
+								.navigationTitle("Import Seed Phrase") // FIXME: strings
+						}
+					}
 				)
 				.fileImporter(
 					isPresented: viewStore.binding(
