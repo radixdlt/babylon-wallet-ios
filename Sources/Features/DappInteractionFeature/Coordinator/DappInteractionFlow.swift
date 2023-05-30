@@ -687,7 +687,7 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 	) {
 		self.init(
 			remoteInteractionItems
-				.sorted(by: { $0.priority < $1.priority })
+				.sorted(by: \.priority)
 				.reduce(into: []) { items, currentItem in
 					switch currentItem {
 					case let .ongoingAccounts(item):

@@ -131,14 +131,13 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.newConnection(.delegate(.newConnection(connectedClient))))):
 			state.destination = nil
-			return .run { send in
-				await send(.internal(.saveNewConnectionResult(
-					TaskResult {
-						try await radixConnectClient.storeP2PLink(
-							connectedClient
-						)
-					}.map { connectedClient }
-				)))
+			return .task {
+				let result = await TaskResult {
+					try await radixConnectClient.storeP2PLink(connectedClient)
+				}
+				.map { connectedClient }
+
+				return .internal(.saveNewConnectionResult(result))
 			}
 
 		case .destination(.presented(.newConnection(.delegate(.dismiss)))):

@@ -181,13 +181,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentInvalidRequest(invalidReason, isDeveloperModeEnabled):
 			state.invalidRequestAlert = .init(
-				title: { TextState("Invalid request") },
+				title: { TextState(L10n.Error.DappRequest.invalidRequest) },
 				actions: {
 					ButtonState(role: .cancel, action: .ok) {
 						TextState(L10n.Common.cancel)
 					}
 				},
-				message: { TextState(invalidReason.subtitle + "\n" + invalidReason.explaination(isDeveloperModeEnabled)) }
+				message: { TextState(invalidReason.subtitle + "\n" + invalidReason.explanation(isDeveloperModeEnabled)) }
 			)
 			return .none
 
@@ -280,62 +280,62 @@ extension DappInteractionClient.ValidatedDappRequest.Invalid {
 	var subtitle: String {
 		switch self {
 		case .badContent(.numberOfAccountsInvalid):
-			return "Invalid content"
+			return L10n.DAppRequest.ValidationOutcome.subtitleBadContent
 		case .incompatibleVersion:
-			return "Incompatible connector extension"
-		case .invalidOrigin:
-			return "Invalid origin"
-		case .invalidDappDefinitionAddress:
-			return "Invalid dAppDefinitionAddress"
+			return L10n.DAppRequest.ValidationOutcome.subtitleIncompatibleVersion
 		case .wrongNetworkID:
-			return "Network mismatch"
-		case .p2pError:
-			return "P2P connection error"
+			return L10n.DAppRequest.ValidationOutcome.subtitleWrongNetworkID
+		case .invalidOrigin, .invalidDappDefinitionAddress, .p2pError:
+			return shortExplanation
 		}
 	}
 
-	func explaination(_ isDeveloperModeEnabled: Bool) -> String {
+	func explanation(_ isDeveloperModeEnabled: Bool) -> String {
 		if isDeveloperModeEnabled {
-			return detailedExplainationForDevelopers
+			return detailedExplanationForDevelopers
 		}
 		#if DEBUG
-		return detailedExplainationForDevelopers
+		return detailedExplanationForDevelopers
 		#else
-		return shortExplaination
+		return shortExplanation
 		#endif
 	}
 
-	private var detailedExplainationForDevelopers: String {
+	private var detailedExplanationForDevelopers: String {
 		switch self {
 		case .badContent(.numberOfAccountsInvalid):
-			return "Invalid value of `numberOfAccountsInvalid`: must not be be `exactly(0)` nor can `quantity` be negative"
+			return L10n.DAppRequest.ValidationOutcome.devExplanationBadContent
 		case let .incompatibleVersion(ce, wallet):
-			return shortExplaination + " (CE: \(ce), wallet: \(wallet))"
-		case let .invalidDappDefinitionAddress(invalidAddress):
-			return "'\(invalidAddress)' is not valid account address."
+			return L10n.DAppRequest.ValidationOutcome.devExplanationIncompatibleVersion(shortExplanation, ce, wallet)
 		case let .invalidOrigin(invalidURLString):
-			return "'\(invalidURLString)' is not valid origin."
+			return L10n.DAppRequest.ValidationOutcome.devExplanationInvalidOrigin(invalidURLString)
+		case let .invalidDappDefinitionAddress(invalidAddress):
+			return L10n.DAppRequest.ValidationOutcome.devExplanationInvalidDappDefinitionAddress(invalidAddress)
 		case .wrongNetworkID:
-			return shortExplaination
+			return shortExplanation
 		case let .p2pError(message):
 			return message
 		}
 	}
 
-	private var shortExplaination: String {
+	private var shortExplanation: String {
 		switch self {
 		case .badContent(.numberOfAccountsInvalid):
-			return "Invalid data in request"
+			return L10n.DAppRequest.ValidationOutcome.shortExplanationBadContent
 		case let .incompatibleVersion(ce, wallet):
-			return ce > wallet ? "Update Wallet" : "Update Connector Extension"
-		case .invalidDappDefinitionAddress:
-			return "Invalid dAppDefinitionAddress"
+			if ce > wallet {
+				return L10n.DAppRequest.ValidationOutcome.shortExplanationIncompatibleVersionCEGreater
+			} else {
+				return L10n.DAppRequest.ValidationOutcome.shortExplanationIncompatibleVersionCENotGreater
+			}
 		case .invalidOrigin:
-			return "Invalid origin"
+			return L10n.DAppRequest.ValidationOutcome.shortExplanationInvalidOrigin
+		case .invalidDappDefinitionAddress:
+			return L10n.DAppRequest.ValidationOutcome.shortExplanationInvalidDappDefinitionAddress
 		case let .wrongNetworkID(ce, wallet):
 			return L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
 		case .p2pError:
-			return "P2P connection error"
+			return L10n.DAppRequest.ValidationOutcome.shortExplanationP2PError
 		}
 	}
 }
@@ -367,9 +367,9 @@ extension DappInteractor {
 		delay: Duration = .seconds(0.75),
 		for action: Action
 	) -> EffectTask<Action> {
-		.run { send in
+		.task {
 			try await clock.sleep(for: delay)
-			await send(action)
+			return action
 		}
 	}
 }

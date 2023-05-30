@@ -2,8 +2,11 @@ import FeaturePrelude
 
 extension DeviceFactorSource {
 	var labelSeedPhraseKind: String {
-		// FIXME: string
-		supportsOlympia ? "Legacy seed phrase" : "Main seed phrase"
+		supportsOlympia ? L10n.DisplayMnemonics.labelSeedPhraseKindOlympia : L10n.DisplayMnemonics.labelSeedPhraseKind
+	}
+
+	var labelDate: String {
+		supportsOlympia ? L10n.DisplayMnemonics.labelDateOlympia : L10n.DisplayMnemonics.labelDate
 	}
 }
 
@@ -46,8 +49,7 @@ struct AccountsForDeviceFactorSourceView: SwiftUI.View {
 					.font(.title3)
 
 				HPair(
-					// FIXME: strings
-					label: deviceFactorSource.supportsOlympia ? "Imported on" : "Generated on",
+					label: deviceFactorSource.labelDate,
 					item: deviceFactorSource
 						.addedOn
 						.ISO8601Format(.iso8601Date(timeZone: .current))

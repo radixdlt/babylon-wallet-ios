@@ -241,18 +241,18 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 }
 
 extension AlertState<LedgerHardwareDevices.Destinations.Action.NoP2PLinkAlert> {
-	static var noP2Plink: Self {
-		Self {
-			TextState("Link a Connector") // FIXME: Strings
+	static var noP2Plink: AlertState {
+		AlertState {
+			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.title)
 		} actions: {
 			ButtonState(role: .cancel, action: .cancelTapped) {
 				TextState(L10n.Common.cancel)
 			}
 			ButtonState(action: .addNewP2PLinkTapped) {
-				TextState(L10n.Common.continue) // FIXME: Strings
+				TextState(L10n.Common.continue)
 			}
 		} message: {
-			TextState("To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.\n\nInstall the Connector extension, open it to see the linking QR code, and tap continue") // FIXME: Strings
+			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)
 		}
 	}
 }

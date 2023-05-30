@@ -34,9 +34,11 @@ extension SelectFeePayer {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					VStack {
-						Text("The transaction you are about to sign does not reference and your accounts so you must chose which account you would like to pay the transaction fee with.")
+						Text(L10n.TransactionReview.SelectFeePayer.body)
+
 						Spacer()
-						Text("Select account to pay \(viewStore.fee.format()) tx fee.")
+
+						Text(L10n.TransactionReview.SelectFeePayer.selectAccount(viewStore.fee.format()))
 
 						ScrollView {
 							VStack(spacing: .small1) {
@@ -61,14 +63,14 @@ extension SelectFeePayer {
 						}
 					}
 					.padding(.horizontal, .small1)
-					.navigationTitle("Select Fee Payer")
+					.navigationTitle(L10n.TransactionReview.SelectFeePayer.navigationTitle)
 				}
 				.footer {
 					WithControlRequirements(
 						viewStore.selectedPayer,
 						forAction: { viewStore.send(.confirmedFeePayer($0)) }
 					) { action in
-						Button("Confirm fee payer", action: action)
+						Button(L10n.TransactionReview.SelectFeePayer.confirmButton, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

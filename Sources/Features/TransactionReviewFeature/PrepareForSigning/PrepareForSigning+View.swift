@@ -23,11 +23,11 @@ extension PrepareForSigning {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("Preparing transaction for signing")
+					Text(L10n.TransactionReview.PrepareForSigning.body)
 				}
 				.padding(.medium1)
 				.onAppear { viewStore.send(.appeared) }
-				.navigationTitle("Preparing Transaction")
+				.navigationTitle(L10n.TransactionReview.PrepareForSigning.navigationTitle)
 			}
 		}
 	}

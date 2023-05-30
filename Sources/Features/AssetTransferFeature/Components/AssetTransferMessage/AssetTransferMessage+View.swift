@@ -19,7 +19,7 @@ extension AssetTransferMessage.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .leading) {
-				Text("Message")
+				Text(L10n.AssetTransfer.transactionMessage)
 					.sectionHeading
 					.textCase(.uppercase)
 					.flushedLeft(padding: .medium3)
@@ -30,7 +30,7 @@ extension AssetTransferMessage.View {
 							viewStore.send(.messageKindTapped)
 						} label: {
 							HStack {
-								Text("Public")
+								Text(L10n.Common.public)
 								Image(asset: AssetResource.chevronDown)
 							}
 						}

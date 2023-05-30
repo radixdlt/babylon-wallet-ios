@@ -37,7 +37,6 @@ public struct SelectFeePayer: Sendable, FeatureReducer {
 			return .none
 
 		case let .confirmedFeePayer(payer):
-
 			let selected = FeePayerSelectionAmongstCandidates(
 				selected: payer,
 				candidates: state.feePayerCandidates,

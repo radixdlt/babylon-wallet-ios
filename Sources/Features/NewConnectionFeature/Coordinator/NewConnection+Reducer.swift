@@ -82,19 +82,19 @@ public struct NewConnection: Sendable, FeatureReducer {
 		switch childAction {
 		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
 			if allowed {
-				// FIXME: String -> L10n.LinkedConnectors.NewConnection.subtitle
-				let string = "Scan the QR code shown in the Radix Connector browser extension"
+				let string = L10n.LinkedConnectors.NewConnection.subtitle
 				state = .scanQR(.init(scanInstructions: string))
 				return .none
 			} else {
-				return .run { send in await send(.delegate(.dismiss)) }
+				return .send(.delegate(.dismiss))
 			}
 
 		case let .scanQR(.delegate(.scanned(qrString))):
-			return .run { send in
-				await send(.internal(.connectionPasswordFromStringResult(TaskResult {
+			return .task {
+				let result = await TaskResult {
 					try ConnectionPassword(.init(hex: qrString))
-				})))
+				}
+				return .internal(.connectionPasswordFromStringResult(result))
 			}
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):

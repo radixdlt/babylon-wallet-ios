@@ -271,6 +271,7 @@ package.addModules([
 		dependencies: [
 			"CreateAccountFeature",
 			"OnboardingClient",
+			"ProfileBackupsFeature",
 		],
 		tests: .yes()
 	),
@@ -303,7 +304,11 @@ package.addModules([
 	),
 	.feature(
 		name: "ProfileBackupsFeature",
-		dependencies: [],
+		dependencies: [
+			"AppPreferencesClient",
+			"BackupsClient",
+			"ImportMnemonicFeature",
+		],
 		tests: .no
 	),
 	.feature(
@@ -441,6 +446,24 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "BackupsClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+		],
+		tests: .no
+	),
+	.client(
+		name: "BackupsClientLive",
+		dependencies: [
+			"BackupsClient",
+			"ProfileStore",
+		],
+		tests: .no
+	),
+
 	.client(
 		name: "CacheClient",
 		dependencies: [

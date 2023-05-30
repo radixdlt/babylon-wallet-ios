@@ -80,7 +80,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .scanQRCode:
-			state.destination = .scanAccountAddress(.init(scanInstructions: "Scan a QR code of a Radix account address"))
+			state.destination = .scanAccountAddress(.init(scanInstructions: L10n.AssetTransfer.qrScanInstructions))
 			return .none
 
 		case .closeButtonTapped:

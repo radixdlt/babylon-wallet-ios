@@ -18,7 +18,7 @@ extension TransferAccountList.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing, spacing: .zero) {
 				VStack(spacing: .small2) {
-					Text("From")
+					Text(L10n.AssetTransfer.AccountList.fromLabel)
 						.sectionHeading
 						.textCase(.uppercase)
 						.flushedLeft(padding: .medium3)
