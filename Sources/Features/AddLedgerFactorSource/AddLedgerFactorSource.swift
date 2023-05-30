@@ -140,7 +140,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
 			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
-				let ledger = try LedgerHardwareWalletFactorSource(factorSource: existing)
+				let ledger = try existing.extract(as: LedgerHardwareWalletFactorSource.self)
 				await send(.internal(.alreadyExists(ledger)))
 			} else {
 				await send(.internal(.proceedToNameDevice(ledgerDeviceInfo)))
@@ -159,7 +159,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func completeWithLedgerEffect(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
 		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.factorSource)
+			try await factorSourcesClient.saveFactorSource(ledger.embed())
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.delegate(.completed(ledger)))
 		} catch: { error, _ in
@@ -174,7 +174,7 @@ extension AlertState<Never> {
 		AlertState {
 			TextState(L10n.AddLedger.AlreadyAddedAlert.title)
 		} message: {
-			TextState(L10n.AddLedger.AlreadyAddedAlert.message(ledger.label.rawValue, ledger.description.rawValue))
+			TextState(L10n.AddLedger.AlreadyAddedAlert.message(ledger.hint.name, ledger.hint.model))
 		}
 	}
 }
@@ -213,9 +213,15 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 
 		case .confirmNameButtonTapped:
 			loggerGlobal.notice("Confirmed ledger name: '\(state.ledgerName)', creating factor source")
-			let ledger = FactorSource.ledger(id: state.deviceInfo.id,
-			                                 model: .init(model: state.deviceInfo.model),
-			                                 name: state.ledgerName)
+			let ledger = LedgerHardwareWalletFactorSource(
+				common: .init(
+					id: state.deviceInfo.id
+				),
+				hint: .init(
+					name: .init(rawValue: state.ledgerName),
+					model: .init(model: state.deviceInfo.model)
+				)
+			)
 
 			return .send(.delegate(.complete(ledger)))
 		}

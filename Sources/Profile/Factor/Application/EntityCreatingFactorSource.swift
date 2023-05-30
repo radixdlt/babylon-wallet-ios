@@ -102,7 +102,7 @@ public struct DisrepancyFactorSourceWrongParameters: Swift.Error {
 }
 
 // MARK: - _HDFactorSourceProtocol
-public protocol _HDFactorSourceProtocol {}
+public protocol _HDFactorSourceProtocol: BaseFactorSourceProtocol {}
 
 // MARK: - DeviceFactorSource + _HDFactorSourceProtocol
 extension DeviceFactorSource: _HDFactorSourceProtocol {}
@@ -110,8 +110,11 @@ extension DeviceFactorSource: _HDFactorSourceProtocol {}
 // MARK: - LedgerHardwareWalletFactorSource + _HDFactorSourceProtocol
 extension LedgerHardwareWalletFactorSource: _HDFactorSourceProtocol {}
 
+// MARK: - OffDeviceMnemonicFactorSource + _HDFactorSourceProtocol
+extension OffDeviceMnemonicFactorSource: _HDFactorSourceProtocol {}
+
 // MARK: - EntityCreatingFactorSource
-public struct EntityCreatingFactorSource: _EntityCreatingFactorSourceProtocol {
+public struct EntityCreatingFactorSource: _EntityCreatingFactorSourceProtocol, Sendable {
 	public var kind: FactorSourceKind {
 		factorSource.kind
 	}

@@ -50,16 +50,35 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 
 		/// "nanoS+"
 		public var model: Model; public typealias Model = FactorSource.LedgerHardwareWallet.DeviceModel
+
+		public init(name: Name, model: Model) {
+			self.name = name
+			self.model = model
+		}
 	}
 
-	public struct LedgerParameters: Sendable, Hashable, Codable {
-		public var signingDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode
-	}
+//	public struct LedgerParameters: Sendable, Hashable, Codable {
+//		public var signingDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode
+	//        public init(signingDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode) {
+	//            self.signingDisplayMode = signingDisplayMode
+	//        }
+	//        public static let `default`: Self = .init(signingDisplayMode: .verbose)
+//	}
 
 	public var common: FactorSource.Common
 	public var hint: Hint
 
+	//    public var ledgerParameters: LedgerParameters // Use this once we have this granularity.
 	// FIXME: MFA remove (should not be able to create accounts using ledger when MFA)
 	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
-	public var ledgerParameters: LedgerParameters
+
+	public init(
+		common: FactorSource.Common,
+		hint: Hint,
+		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? = nil
+	) {
+		self.common = common
+		self.hint = hint
+		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
+	}
 }

@@ -29,7 +29,7 @@ extension FactorSource {
 //		label: FactorSource.Label = "iPhone",
 //		description: FactorSource.Description = "babylon"
 //	) throws -> BabylonDeviceFactorSource {
-//		let hdOnDeviceFactorSource = try Self.device(
+//		let deviceFactorSource = try Self.device(
 //			mnemonic: mnemonic,
 //			label: label, // will be changed by ProfileStore to *device* **name**
 //			description: description, // will be changed by ProfileStore to *device* **model**
@@ -37,7 +37,7 @@ extension FactorSource {
 //			olympiaCompatible: false,
 //			storage: .entityCreating(.init())
 //		)
-//		return try BabylonDeviceFactorSource(hdOnDeviceFactorSource: hdOnDeviceFactorSource)
+//		return try BabylonDeviceFactorSource(deviceFactorSource: deviceFactorSource)
 //	}
 //
 //	public static func babylon(

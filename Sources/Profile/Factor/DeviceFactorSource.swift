@@ -302,6 +302,9 @@ extension FactorSource {
 		/// Canonical identifier which uniquely identifies this factor source
 		public let id: FactorSourceID
 
+		/// Curve/Derivation scheme
+		public let cryptoParameters: FactorSource.CryptoParameters
+
 		/// When this factor source for originally added by the user.
 		public let addedOn: Date
 
@@ -312,8 +315,17 @@ extension FactorSource {
 		/// is used.
 		public var lastUsedOn: Date
 
-		/// Curve/Derivation scheme
-		public let cryptoParameters: FactorSource.CryptoParameters
+		public init(
+			id: FactorSourceID,
+			cryptoParameters: FactorSource.CryptoParameters = .babylon,
+			addedOn: Date = .now,
+			lastUsedOn: Date = .now
+		) {
+			self.id = id
+			self.cryptoParameters = cryptoParameters
+			self.addedOn = addedOn
+			self.lastUsedOn = lastUsedOn
+		}
 	}
 }
 
@@ -330,7 +342,10 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 		/// "In a book at my safe place"
 		public var backupLocation: BackupLocation; public typealias BackupLocation = Tagged<(Self, backupLocation: ()), String>
 
-		public init(story: Story, backupLocation: BackupLocation) {
+		public init(
+			story: Story,
+			backupLocation: BackupLocation
+		) {
 			self.story = story
 			self.backupLocation = backupLocation
 		}
@@ -340,7 +355,12 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 		public let wordCount: BIP39.WordCount
 		public let language: BIP39.Language
 		public let bip39PassphraseSpecified: Bool
-		public init(wordCount: BIP39.WordCount, language: BIP39.Language, bip39PassphraseSpecified: Bool) {
+
+		public init(
+			wordCount: BIP39.WordCount,
+			language: BIP39.Language,
+			bip39PassphraseSpecified: Bool
+		) {
 			self.wordCount = wordCount
 			self.language = language
 			self.bip39PassphraseSpecified = bip39PassphraseSpecified

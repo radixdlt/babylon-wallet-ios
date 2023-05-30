@@ -227,7 +227,6 @@ public struct LedgerFactorSourceView: View {
 	public var body: some View {
 		Labeled("Name", value: ledgerFactorSource.hint.name.rawValue)
 		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
-		Labeled("signingDisplayMode", value: ledgerFactorSource.ledgerParameters.signingDisplayMode.rawValue)
 	}
 }
 
