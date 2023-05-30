@@ -39,12 +39,12 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case getDeviceInfoResult(TaskResult<DeviceInfo>)
-		case alreadyExists(LedgerFactorSource)
+		case alreadyExists(LedgerHardwareWalletFactorSource)
 		case proceedToNameDevice(DeviceInfo)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LedgerFactorSource)
+		case completed(LedgerHardwareWalletFactorSource)
 		case dismiss
 	}
 
@@ -140,7 +140,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
 			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
-				let ledger = try LedgerFactorSource(factorSource: existing)
+				let ledger = try LedgerHardwareWalletFactorSource(factorSource: existing)
 				await send(.internal(.alreadyExists(ledger)))
 			} else {
 				await send(.internal(.proceedToNameDevice(ledgerDeviceInfo)))
@@ -157,7 +157,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func completeWithLedgerEffect(_ ledger: LedgerFactorSource) -> EffectTask<Action> {
+	private func completeWithLedgerEffect(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
 		.run { send in
 			try await factorSourcesClient.saveFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
@@ -170,7 +170,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 }
 
 extension AlertState<Never> {
-	static func ledgerAlreadyExists(_ ledger: LedgerFactorSource) -> AlertState {
+	static func ledgerAlreadyExists(_ ledger: LedgerHardwareWalletFactorSource) -> AlertState {
 		AlertState {
 			TextState("Ledger is already added") // FIXME: Strings
 		} message: {
@@ -200,7 +200,7 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case complete(LedgerFactorSource)
+		case complete(LedgerHardwareWalletFactorSource)
 	}
 
 	public init() {}

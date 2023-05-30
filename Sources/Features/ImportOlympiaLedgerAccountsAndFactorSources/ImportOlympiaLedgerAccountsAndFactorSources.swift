@@ -60,7 +60,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Validated public keys against expected, then migrate...
-		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerFactorSource)
+		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerHardwareWalletFactorSource)
 
 		/// migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
@@ -167,7 +167,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	private func validate(
 		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
-		ledger: LedgerFactorSource,
+		ledger: LedgerHardwareWalletFactorSource,
 		state: State
 	) -> EffectTask<Action> {
 		.run { [olympiaAccountsToValidate = state.unmigrated.unvalidated] send in
@@ -182,7 +182,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	private func convertHardwareAccountsToBabylon(
-		ledger: LedgerFactorSource,
+		ledger: LedgerHardwareWalletFactorSource,
 		validatedAccountsToMigrate olympiaAccounts: Set<OlympiaAccountToMigrate>,
 		_ state: State
 	) -> EffectTask<Action> {

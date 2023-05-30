@@ -7,7 +7,7 @@ import Profile
 
 // MARK: - SelectedLedgerControlRequirements
 struct SelectedLedgerControlRequirements: Hashable {
-	let selectedLedger: LedgerFactorSource
+	let selectedLedger: LedgerHardwareWalletFactorSource
 }
 
 // MARK: - LedgerHardwareDevices
@@ -21,7 +21,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		public var hasAConnectorExtension: Bool = false
 
 		@Loadable
-		public var ledgers: IdentifiedArrayOf<LedgerFactorSource>? = nil
+		public var ledgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>? = nil
 
 		public var selectedLedgerID: FactorSourceID? = nil
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
@@ -39,7 +39,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public enum ActionRequiringP2P: Sendable, Hashable {
 		case addLedger
-		case selectLedger(LedgerFactorSource)
+		case selectLedger(LedgerHardwareWalletFactorSource)
 	}
 
 	// MARK: - Action
@@ -48,12 +48,12 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case onFirstTask
 		case selectedLedger(id: FactorSource.ID?)
 		case addNewLedgerButtonTapped
-		case confirmedLedger(LedgerFactorSource)
+		case confirmedLedger(LedgerHardwareWalletFactorSource)
 		case whatIsALedgerButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerFactorSource>>)
+		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>)
 		case hasAConnectorExtension(Bool)
 		case perform(ActionRequiringP2P)
 	}
@@ -63,7 +63,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case choseLedger(LedgerFactorSource)
+		case choseLedger(LedgerHardwareWalletFactorSource)
 	}
 
 	// MARK: - Destination
@@ -201,7 +201,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		return .task {
 			let result = await TaskResult {
 				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
-					.compactMap { try? LedgerFactorSource(factorSource: $0) }
+					.compactMap { try? LedgerHardwareWalletFactorSource(factorSource: $0) }
 				return IdentifiedArray(uniqueElements: ledgers)
 			}
 			return .internal(.loadedLedgers(result))

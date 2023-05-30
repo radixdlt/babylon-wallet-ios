@@ -170,7 +170,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 	}()
 }
 
-extension LedgerFactorSource {
+extension LedgerHardwareWalletFactorSource {
 	func device() throws -> P2P.LedgerHardwareWallet.LedgerDevice {
 		guard let model = P2P.LedgerHardwareWallet.Model(rawValue: model.rawValue) else {
 			throw UnrecognizedLedgerModel(model: model.rawValue)
@@ -185,7 +185,7 @@ extension LedgerFactorSource {
 
 extension P2P.LedgerHardwareWallet.LedgerDevice {
 	public init(factorSource: FactorSource) throws {
-		self = try LedgerFactorSource(factorSource: factorSource).device()
+		self = try LedgerHardwareWalletFactorSource(factorSource: factorSource).device()
 	}
 }
 

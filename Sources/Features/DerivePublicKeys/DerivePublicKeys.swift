@@ -15,7 +15,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		}
 
 		public let derivationsPathOption: DerivationPathOption
-		public var ledgerBeingUsed: LedgerFactorSource?
+		public var ledgerBeingUsed: LedgerHardwareWalletFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
 			case knownPaths(OrderedSet<DerivationPath>, networkID: NetworkID)
 			case nextBasedOnFactorSource(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
@@ -73,7 +73,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Hashable {
 		case loadedHDOnDeviceFactorSource(DeviceFactorSource)
 		case deriveWithDeviceFactor(DeviceFactorSource, DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose)
-		case deriveWithLedgerFactor(LedgerFactorSource, DerivationPath, NetworkID)
+		case deriveWithLedgerFactor(LedgerHardwareWalletFactorSource, DerivationPath, NetworkID)
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
@@ -113,7 +113,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			case let .specific(factorSource):
 				if let hdOnDeviceFactorSource = try? DeviceFactorSource(factorSource: factorSource) {
 					return deriveWith(hdOnDeviceFactorSource: hdOnDeviceFactorSource, state)
-				} else if let ledgerFactorSource = try? LedgerFactorSource(factorSource: factorSource) {
+				} else if let ledgerFactorSource = try? LedgerHardwareWalletFactorSource(factorSource: factorSource) {
 					state.ledgerBeingUsed = ledgerFactorSource
 					return deriveWith(ledgerFactorSource: ledgerFactorSource, state)
 				} else {
@@ -152,7 +152,7 @@ extension DerivePublicKeys {
 		)
 	}
 
-	private func deriveWith(ledgerFactorSource: LedgerFactorSource, _ state: State) -> EffectTask<Action> {
+	private func deriveWith(ledgerFactorSource: LedgerHardwareWalletFactorSource, _ state: State) -> EffectTask<Action> {
 		withDerivationPath(
 			state: state,
 			hdFactorSource: ledgerFactorSource,
@@ -188,7 +188,7 @@ extension DerivePublicKeys {
 	}
 
 	private func deriveWith(
-		ledger: LedgerFactorSource,
+		ledger: LedgerHardwareWalletFactorSource,
 		derivationPaths: OrderedSet<DerivationPath>,
 		networkID: NetworkID,
 		state: State

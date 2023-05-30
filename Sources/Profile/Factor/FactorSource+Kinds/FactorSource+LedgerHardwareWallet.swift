@@ -23,7 +23,7 @@ extension FactorSource {
 //		id: FactorSource.ID,
 //		model: LedgerHardwareWallet.DeviceModel,
 //		name: String?
-//	) -> LedgerFactorSource {
+//	) -> LedgerHardwareWalletFactorSource {
 //		let factorSource = Self(
 //			kind: .ledgerHQHardwareWallet,
 //			id: id,
@@ -34,7 +34,7 @@ extension FactorSource {
 //			addedOn: .now,
 //			lastUsedOn: .now
 //		)
-//		return try! LedgerFactorSource(factorSource: factorSource)
+//		return try! LedgerHardwareWalletFactorSource(factorSource: factorSource)
 //	}
 }
 

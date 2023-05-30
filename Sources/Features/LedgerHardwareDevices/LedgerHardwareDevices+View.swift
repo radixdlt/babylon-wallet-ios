@@ -14,7 +14,7 @@ extension LedgerHardwareDevices {
 	public struct ViewState: Equatable {
 		let allowSelection: Bool
 		let showHeaders: Bool
-		let ledgers: Loadable<IdentifiedArrayOf<LedgerFactorSource>>
+		let ledgers: Loadable<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>
 		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 
@@ -30,7 +30,7 @@ extension LedgerHardwareDevices {
 			}
 		}
 
-		var ledgersArray: [LedgerFactorSource]? { .init(ledgers.wrappedValue ?? []) }
+		var ledgersArray: [LedgerHardwareWalletFactorSource]? { .init(ledgers.wrappedValue ?? []) }
 
 		var navigationTitle: String {
 			if allowSelection {

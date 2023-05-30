@@ -15,7 +15,7 @@ public struct LedgerHardwareWalletClient: Sendable {
 extension LedgerHardwareWalletClient {
 	public typealias IsConnectedToAnyConnectorExtension = @Sendable () async -> AnyAsyncSequence<Bool>
 	public typealias GetDeviceInfo = @Sendable () async throws -> P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
-	public typealias DerivePublicKeys = @Sendable (OrderedSet<P2P.LedgerHardwareWallet.KeyParameters>, LedgerFactorSource) async throws -> OrderedSet<HierarchicalDeterministicPublicKey>
+	public typealias DerivePublicKeys = @Sendable (OrderedSet<P2P.LedgerHardwareWallet.KeyParameters>, LedgerHardwareWalletFactorSource) async throws -> OrderedSet<HierarchicalDeterministicPublicKey>
 	public typealias SignTransaction = @Sendable (SignTransactionWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 	public typealias SignAuthChallenge = @Sendable (SignAuthChallengeWithLedgerRequest) async throws -> Set<SignatureOfEntity>
 }
@@ -23,13 +23,13 @@ extension LedgerHardwareWalletClient {
 // MARK: - SignTransactionWithLedgerRequest
 public struct SignTransactionWithLedgerRequest: Sendable, Hashable {
 	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
-	public let ledger: LedgerFactorSource
+	public let ledger: LedgerHardwareWalletFactorSource
 	public let unhashedDataToSign: Data
 	public let ledgerTXDisplayMode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode
 	public let displayHashOnLedgerDisplay: Bool
 
 	public init(
-		ledger: LedgerFactorSource,
+		ledger: LedgerHardwareWalletFactorSource,
 		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
 		unhashedDataToSign: Data,
 		ledgerTXDisplayMode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode,
@@ -46,13 +46,13 @@ public struct SignTransactionWithLedgerRequest: Sendable, Hashable {
 // MARK: - SignAuthChallengeWithLedgerRequest
 public struct SignAuthChallengeWithLedgerRequest: Sendable, Hashable {
 	public let signers: NonEmpty<IdentifiedArrayOf<Signer>>
-	public let ledger: LedgerFactorSource
+	public let ledger: LedgerHardwareWalletFactorSource
 	public let challenge: P2P.Dapp.Request.AuthChallengeNonce
 	public let origin: P2P.Dapp.Request.Metadata.Origin
 	public let dAppDefinitionAddress: AccountAddress
 
 	public init(
-		ledger: LedgerFactorSource,
+		ledger: LedgerHardwareWalletFactorSource,
 		signers: NonEmpty<IdentifiedArrayOf<Signer>>,
 		challenge: P2P.Dapp.Request.AuthChallengeNonce,
 		origin: P2P.Dapp.Request.Metadata.Origin,

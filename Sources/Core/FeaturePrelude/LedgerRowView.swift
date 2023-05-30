@@ -1,4 +1,5 @@
 import DesignSystem
+import Profile
 import SwiftUI
 
 // MARK: - LedgerRowView
@@ -9,8 +10,8 @@ public struct LedgerRowView: View {
 		let addedOn: String
 		let lastUsedOn: String
 
-		public init(factorSource: LedgerFactorSource) {
-			self.description = "\(factorSource.label.rawValue) (\(factorSource.description.rawValue))"
+		public init(factorSource: LedgerHardwareWalletFactorSource) {
+			self.description = "\(factorSource.hint.name.rawValue) (\(factorSource.hint.name.rawValue))"
 			self.addedOn = factorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current))
 			self.lastUsedOn = factorSource.lastUsedOn.ISO8601Format(.iso8601Date(timeZone: .current))
 		}
