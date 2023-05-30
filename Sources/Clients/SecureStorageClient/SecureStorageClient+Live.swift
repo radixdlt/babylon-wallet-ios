@@ -108,8 +108,8 @@ extension SecureStorageClient: DependencyKey {
 					key: profileHeaderListKeychainKey,
 					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
 					accessibility: .whenUnlocked,
-					label: "Radix Wallet Metadata", // FIXME: • localize?
-					comment: "Contains the metadata about Radix Wallet Data." // FIXME: • localize?
+					label: "Radix Wallet Metadata",
+					comment: "Contains the metadata about Radix Wallet Data."
 				)
 			)
 		}
