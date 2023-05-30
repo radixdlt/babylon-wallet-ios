@@ -109,7 +109,7 @@ private extension SecureStorageClientTests {
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				hdOnDeviceFactorSource: factorSource.hdOnDeviceFactorSource
+				factorSource: factorSource.factorSource
 			)
 
 			let sut = SecureStorageClient.liveValue

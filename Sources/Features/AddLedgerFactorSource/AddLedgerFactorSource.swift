@@ -159,7 +159,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func completeWithLedgerEffect(_ ledger: LedgerFactorSource) -> EffectTask<Action> {
 		.run { send in
-			try await factorSourcesClient.addOffDeviceFactorSource(ledger.factorSource)
+			try await factorSourcesClient.saveFactorSource(ledger.factorSource)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.delegate(.completed(ledger)))
 		} catch: { error, _ in

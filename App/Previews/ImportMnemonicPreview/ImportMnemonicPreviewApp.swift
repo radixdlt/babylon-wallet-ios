@@ -7,8 +7,11 @@ struct ImportMnemonicPreviewApp: App {
 		WindowGroup {
 			ImportMnemonic.View(
 				store: Store(
-					initialState: ImportMnemonic.State(saveInProfile: false),
-					reducer: ImportMnemonic()._printChanges()
+					initialState: ImportMnemonic.State(
+						saveInProfileKind: .offDevice
+					),
+					reducer: ImportMnemonic()
+						._printChanges()
 				)
 			)
 		}

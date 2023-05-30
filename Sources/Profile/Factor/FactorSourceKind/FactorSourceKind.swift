@@ -17,6 +17,7 @@ public enum FactorSourceKind:
 	/// * Mine
 	/// * On device
 	/// * Hierarchical deterministic (Mnemonic)
+	/// * Entity creating
 	case device
 
 	/// A user owned hardware wallet by vendor Ledger HQ, most commonly
@@ -28,7 +29,17 @@ public enum FactorSourceKind:
 	/// * Off device
 	/// * Hardware (requires Browser Connector Extension to communicate with wallet)
 	/// * Hierarchical deterministic
+	/// * Entity creating (accounts only) // FIXME: MFA remove
 	case ledgerHQHardwareWallet
+
+	/// A user owned mnemonic (and BIP39 passphrase) user has to input when used,
+	/// e.g. during signing.
+	///
+	/// Attributes:
+	///  * Mine
+	///  * Off device
+	///  * Hierarchical deterministic  (Mnemonic)
+	case offDeviceMnemonic
 }
 
 extension FactorSourceKind {
@@ -38,21 +49,21 @@ extension FactorSourceKind {
 
 	public var isHD: Bool {
 		switch self {
-		case .device, .ledgerHQHardwareWallet: return true
+		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic: return true
 		}
 	}
 
 	public var isOnDevice: Bool {
 		switch self {
 		case .device: return true
-		case .ledgerHQHardwareWallet:
+		case .ledgerHQHardwareWallet, .offDeviceMnemonic:
 			return false
 		}
 	}
 
 	public var isMine: Bool {
 		switch self {
-		case .device, .ledgerHQHardwareWallet: return true
+		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic: return true
 		}
 	}
 }
