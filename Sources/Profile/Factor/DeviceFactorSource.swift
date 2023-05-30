@@ -173,9 +173,9 @@ extension FactorSource.Common {
 				fromRoot: hdRoot,
 				factorSourceKind: factorSourceKind
 			),
+			cryptoParameters: cryptoParameters,
 			addedOn: addedOn,
-			lastUsedOn: lastUsedOn,
-			cryptoParameters: cryptoParameters
+			lastUsedOn: lastUsedOn
 		)
 	}
 
