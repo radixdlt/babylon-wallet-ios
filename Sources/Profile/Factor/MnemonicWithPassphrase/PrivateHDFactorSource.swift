@@ -10,7 +10,7 @@ public struct PrivateHDFactorSource {
 		factorSource: DeviceFactorSource
 	) throws {
 		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)
+		let factorSourceID = try FactorSource.id(fromRoot: hdRoot, factorSourceKind: factorSource.kind)
 		guard factorSourceID == factorSource.id else {
 			loggerGlobal.critical("FactorSourceOD of new factor does not match mnemonic.")
 			throw CriticalDisrepancyBetweenFactorSourceID()
