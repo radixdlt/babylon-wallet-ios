@@ -8,7 +8,7 @@ import SharedModels
 
 // MARK: - DeviceInfo
 public struct DeviceInfo: Sendable, Hashable {
-	public let id: FactorSource.ID
+	public let id: HexCodable32Bytes
 	public let model: P2P.LedgerHardwareWallet.Model
 }
 
@@ -141,7 +141,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .run { send in
 
 			if let ledger = try await factorSourcesClient.getFactorSource(
-				id: ledgerDeviceInfo.id,
+				id: .init(factorSourceKind: .ledgerHQHardwareWallet, hash: ledgerDeviceInfo.id.data.data),
 				as: LedgerHardwareWalletFactorSource.self
 			) {
 				await send(.internal(.alreadyExists(ledger)))
@@ -219,7 +219,7 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 			loggerGlobal.notice("Confirmed ledger name: '\(state.ledgerName)', creating factor source")
 			let ledger = LedgerHardwareWalletFactorSource(
 				common: .init(
-					id: state.deviceInfo.id
+					id: try! .init(factorSourceKind: .ledgerHQHardwareWallet, hash: state.deviceInfo.id.data.data)
 				),
 				hint: .init(
 					name: .init(rawValue: state.ledgerName),
