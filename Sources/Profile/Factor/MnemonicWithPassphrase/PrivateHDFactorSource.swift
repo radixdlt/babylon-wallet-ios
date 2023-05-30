@@ -3,11 +3,11 @@ import Prelude
 // MARK: - PrivateHDFactorSource
 public struct PrivateHDFactorSource {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
-	public let factorSource: FactorSource
+	public let factorSource: DeviceFactorSource
 
 	public init(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		factorSource: FactorSource
+		factorSource: DeviceFactorSource
 	) throws {
 		let hdRoot = try mnemonicWithPassphrase.hdRoot()
 		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)

@@ -3,7 +3,7 @@ import Foundation
 // MARK: - FactorSourceKind
 /// The **kind** (or "type") of FactorSource describes how it is used.
 public enum FactorSourceKind:
-	String,
+	UInt8,
 	Sendable,
 	Hashable,
 	Codable,
@@ -44,7 +44,11 @@ public enum FactorSourceKind:
 
 extension FactorSourceKind {
 	public var description: String {
-		rawValue
+		switch self {
+		case .device: return "device"
+		case .ledgerHQHardwareWallet: return "ledgerHQHardwareWallet"
+		case .offDeviceMnemonic: return "offDeviceMnemonic"
+		}
 	}
 
 	public var isHD: Bool {

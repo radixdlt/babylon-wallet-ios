@@ -98,7 +98,7 @@ public protocol FactorSourceProtocol: BaseFactorSourceProtocol, Sendable, Hashab
 
 extension FactorSourceProtocol {
 	public var kind: FactorSourceKind { Self.kind }
-	public static var casePath: CasePath<FactorSource, Self> { Self.casePath }
+	public var casePath: CasePath<FactorSource, Self> { Self.casePath }
 }
 
 extension FactorSourceProtocol {
