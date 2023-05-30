@@ -95,25 +95,33 @@ extension FactorSource: Comparable {
 
 extension FactorSource {
 	static func device(_ name: String, olympiaCompat: Bool) -> Self {
-		let device = try! DeviceFactorSource(
-			common: .init(
-				id: .init(factorSourceKind: .device, hash: .random(byteCount: 32)),
-				cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
-			),
-			hint: .init(name: .init(name), model: "")
-		)
-		return device.embed()
+		withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
+		} operation: {
+			let device = try! DeviceFactorSource(
+				common: .init(
+					id: .init(factorSourceKind: .device, hash: .random(byteCount: 32)),
+					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+				),
+				hint: .init(name: .init(name), model: "")
+			)
+			return device.embed()
+		}
 	}
 
 	static func ledger(_ name: String, olympiaCompat: Bool) -> Self {
-		let ledger = try! LedgerHardwareWalletFactorSource(
-			common: .init(
-				id: .init(factorSourceKind: .ledgerHQHardwareWallet, hash: .random(byteCount: 32)),
-				cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
-			),
-			hint: .init(name: .init(name), model: .nanoS)
-		)
-		return ledger.embed()
+		withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
+		} operation: {
+			let ledger = try! LedgerHardwareWalletFactorSource(
+				common: .init(
+					id: .init(factorSourceKind: .ledgerHQHardwareWallet, hash: .random(byteCount: 32)),
+					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+				),
+				hint: .init(name: .init(name), model: .nanoS)
+			)
+			return ledger.embed()
+		}
 	}
 
 	static let deviceOne = Self.device("One", olympiaCompat: true)
