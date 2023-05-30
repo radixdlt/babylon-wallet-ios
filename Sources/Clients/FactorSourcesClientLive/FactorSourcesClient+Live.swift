@@ -122,7 +122,7 @@ internal func signingFactors(
 	from allFactorSources: IdentifiedArrayOf<FactorSource>,
 	signingPurpose: SigningPurpose
 ) throws -> SigningFactors {
-	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
+	var signingFactors: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
 	for entity in entities {
 		switch entity.securityState {
@@ -145,7 +145,7 @@ internal func signingFactors(
 			let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
 			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
-			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactorsNotNonEmpty[factorSource.kind] {
+			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactors[factorSource.kind] {
 				if var existingSigningFactor = existingArray[id: factorSource.id] {
 					var signers = existingSigningFactor.signers.rawValue
 					signers[id: signer.id] = signer // update copy of `signers`
@@ -154,16 +154,16 @@ internal func signingFactors(
 				} else {
 					existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
 				}
-				signingFactorsNotNonEmpty[factorSource.kind] = existingArray // write back to Dictionary
+				signingFactors[factorSource.kind] = existingArray // write back to Dictionary
 			} else {
 				// trivial case,
-				signingFactorsNotNonEmpty[factorSource.kind] = .init(uniqueElements: [sigingFactor])
+				signingFactors[factorSource.kind] = .init(uniqueElements: [sigingFactor])
 			}
 		}
 	}
 
 	return SigningFactors(
-		uniqueKeysWithValues: signingFactorsNotNonEmpty.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
+		uniqueKeysWithValues: signingFactors.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
 			assert(!keyValuePair.value.isEmpty, "Incorrect implementation, IdentifiedArrayOf<SigningFactor> should never be empty.")
 			let value: NonEmpty<Set<SigningFactor>> = .init(rawValue: Set(keyValuePair.value))!
 			return (key: keyValuePair.key, value: value)

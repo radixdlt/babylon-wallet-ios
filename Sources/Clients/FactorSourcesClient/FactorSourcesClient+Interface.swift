@@ -153,7 +153,8 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSource.ID
 	public var id: ID { factorSource.id }
 	public let factorSource: FactorSource
-	public var signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	public typealias Signers = NonEmpty<IdentifiedArrayOf<Signer>>
+	public var signers: Signers
 
 	public var expectedSignatureCount: Int {
 		signers.map(\.factorInstancesRequiredToSign.count).reduce(0, +)
@@ -161,7 +162,7 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 
 	public init(
 		factorSource: FactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>
+		signers: Signers
 	) {
 		self.factorSource = factorSource
 		self.signers = signers
