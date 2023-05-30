@@ -52,7 +52,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		case .selectedNewWalletUser:
 			return .send(.delegate(.setupNewUser))
 		case .selectedRestoreFromBackup:
-			state.destination = .restoreFromBackup(.init(shownInSettings: false))
+			state.destination = .restoreFromBackup(.init(context: .onboarding))
 			return .none
 		}
 	}

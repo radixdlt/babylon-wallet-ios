@@ -46,8 +46,8 @@ extension ProfileBackups.View {
 	@MainActor
 	private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<ProfileBackups>) -> some SwiftUI.View {
 		ToggleView(
-			title: "Sync Wallet Data to iCloud",
-			subtitle: "Warning: If disabled you might lose access to accounts/personas.",
+			title: "Sync Wallet Data to iCloud", // FIXME: strings
+			subtitle: "Warning: If disabled you might lose access to accounts/personas.", // FIXME: strings
 			isOn: viewStore.binding(
 				get: \.isCloudProfileSyncEnabled,
 				send: { .cloudProfileSyncToggled($0) }
@@ -61,7 +61,7 @@ extension ProfileBackups.View {
 			// TODO: This is speculative design, needs to be updated once we have the proper design
 			VStack(spacing: .medium1) {
 				if !viewStore.shownInSettings {
-					Button("Import Backup Wallet data") {
+					Button("Import Backup Wallet data") { // FIXME: strings
 						viewStore.send(.tappedImportProfile)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -70,7 +70,7 @@ extension ProfileBackups.View {
 				Separator()
 
 				HStack {
-					Text("Cloud Backup Wallet data: ")
+					Text("Cloud Backup Wallet data: ") // FIXME: strings
 						.textStyle(.body1Header)
 					Spacer()
 				}
@@ -89,14 +89,14 @@ extension ProfileBackups.View {
 					}
 
 					if !viewStore.shownInSettings {
-						Button("Use iCloud Backup Data") {
+						Button("Use iCloud Backup Data") { // FIXME: strings
 							viewStore.send(.tappedUseCloudBackup)
 						}
 						.controlState(viewStore.selectedProfileHeader != nil ? .enabled : .disabled)
 						.buttonStyle(.primaryRectangular)
 					}
 				} else {
-					Text("No Cloud Backup Data")
+					Text("No Cloud Backup Data") // FIXME: strings
 				}
 			}
 			.padding(.horizontal, .medium3)
@@ -107,8 +107,8 @@ extension ProfileBackups.View {
 	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>, viewStore: ViewStoreOf<ProfileBackups>) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? "This Device" : header.creatingDevice.description.rawValue
-		let lastUsedOnDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? "This Device" : header.lastUsedOnDevice.description.rawValue
+		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? "This Device" : header.creatingDevice.description.rawValue // FIXME: strings
+		let lastUsedOnDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? "This Device" : header.lastUsedOnDevice.description.rawValue // FIXME: strings
 
 		return Card(action: item.action) {
 			HStack {
@@ -118,18 +118,18 @@ extension ProfileBackups.View {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 					Group {
-						Text("Creation Date: \(formatDate(header.creationDate))")
-						Text("Last used on device: \(lastUsedOnDevice)")
-						Text("Last Modified Date: \(formatDate(header.lastModified))")
-						Text("Number of networks: \(header.contentHint.numberOfNetworks)")
-						Text("Number of total accounts: \(header.contentHint.numberOfAccountsOnAllNetworksInTotal)")
-						Text("Number of total personas: \(header.contentHint.numberOfPersonasOnAllNetworksInTotal)")
+						Text("Creation Date: \(formatDate(header.creationDate))") // FIXME: strings
+						Text("Last used on device: \(lastUsedOnDevice)") // FIXME: strings
+						Text("Last Modified Date: \(formatDate(header.lastModified))") // FIXME: strings
+						Text("Number of networks: \(header.contentHint.numberOfNetworks)") // FIXME: strings
+						Text("Number of total accounts: \(header.contentHint.numberOfAccountsOnAllNetworksInTotal)") // FIXME: strings
+						Text("Number of total personas: \(header.contentHint.numberOfPersonasOnAllNetworksInTotal)") // FIXME: strings
 					}
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
-						Text("Incompatible Wallet data")
+						Text("Incompatible Wallet data") // FIXME: strings
 							.foregroundColor(.red)
 							.textStyle(.body2HighImportance)
 					}

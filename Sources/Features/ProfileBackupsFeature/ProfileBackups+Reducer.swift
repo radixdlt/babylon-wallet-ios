@@ -6,31 +6,37 @@ import ImportMnemonicFeature
 // MARK: - ScanQR
 public struct ProfileBackups: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Context: Sendable, Hashable {
+			case onboarding
+			case settings
+		}
+
 		public var preferences: AppPreferences?
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
+		public var context: Context
 
 		var isCloudProfileSyncEnabled: Bool {
 			preferences?.security.isCloudProfileSyncEnabled == true
 		}
 
+		var shownInSettings: Bool {
+			context == .settings
+		}
+
 		@PresentationState
 		public var alert: Alerts.State?
 
-		/// Temporary flag to drive the UI based on the location.
-		/// In the future we most probably would want to allow users to import/select a backup also from the settings.
-		public var shownInSettings: Bool
-
 		public init(
-			shownInSettings: Bool,
+			context: Context,
 			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
 			selectedProfileHeader: ProfileSnapshot.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
-			self.shownInSettings = shownInSettings
+			self.context = context
 			self.backupProfileHeaders = backupProfileHeaders
 			self.selectedProfileHeader = selectedProfileHeader
 			self.isDisplayingFileImporter = isDisplayingFileImporter
@@ -91,7 +97,8 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			if !isEnabled {
 				state.alert = .confirmCloudSyncDisable(.init(
 					title: {
-						TextState("Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?")
+						// FIXME: strings
+						TextState("Disabling iCloud sync will delete the iCloud backup data(wallet data will still be kept on this iPhone), are you sure you want to disable iCloud sync?")
 					},
 					actions: {
 						ButtonState(role: .destructive, action: .confirm) {

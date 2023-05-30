@@ -233,7 +233,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .profileBackupsButtonTapped:
-			state.destination = .profileBackups(.init(shownInSettings: true))
+			state.destination = .profileBackups(.init(context: .settings))
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:
