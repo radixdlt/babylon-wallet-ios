@@ -1,0 +1,107 @@
+import CasePaths
+import Cryptography
+import Prelude
+
+// MARK: - FactorSource
+public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
+	case device(DeviceFactorSource)
+	case ledger(LedgerHardwareWalletFactorSource)
+	case offDeviceMnemonic(OffDeviceMnemonicFactorSource)
+}
+
+extension FactorSource {
+	public var common: FactorSource.Common {
+		get { property(\.common) }
+		set {
+			update(\.common, to: newValue)
+		}
+	}
+
+	public var kind: FactorSourceKind {
+		property(\.kind)
+	}
+
+	public mutating func update<Property>(
+		_ writableKeyPath: WritableKeyPath<any FactorSourceProtocol, Property>,
+		to newValue: Property
+	) {
+		switch self {
+		case var .device(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .ledger(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .offDeviceMnemonic(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+		}
+	}
+
+	private func property<Property>(_ keyPath: KeyPath<BaseFactorSourceProtocol, Property>) -> Property {
+		switch self {
+		case let .device(factorSource): return factorSource[keyPath: keyPath]
+		case let .ledger(factorSource): return factorSource[keyPath: keyPath]
+		case let .offDeviceMnemonic(factorSource): return factorSource[keyPath: keyPath]
+		}
+	}
+}
+
+extension FactorSource {
+	private enum CodingKeys: String, CodingKey {
+		case discriminator, device, ledgerHQHardwareWallet, offDeviceMnemonic
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
+		try keyedContainer.encode(kind.discriminator, forKey: .discriminator)
+		switch self {
+		case let .device(device):
+			try keyedContainer.encode(device, forKey: .device)
+		case let .ledger(ledger):
+			try keyedContainer.encode(ledger, forKey: .ledgerHQHardwareWallet)
+		case let .offDeviceMnemonic(ledger):
+			try keyedContainer.encode(ledger, forKey: .offDeviceMnemonic)
+		}
+	}
+
+	public init(from decoder: Decoder) throws {
+		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try keyedContainer.decode(FactorSourceKind.Discriminator.self, forKey: .discriminator)
+		switch discriminator {
+		case .device:
+			self = try .device(
+				keyedContainer.decode(DeviceFactorSource.self, forKey: .device)
+			)
+		case .ledgerHQHardwareWallet:
+			self = try .ledger(
+				keyedContainer.decode(LedgerHardwareWalletFactorSource.self, forKey: .ledgerHQHardwareWallet)
+			)
+		case .offDeviceMnemonic:
+			self = try .offDeviceMnemonic(
+				keyedContainer.decode(OffDeviceMnemonicFactorSource.self, forKey: .offDeviceMnemonic)
+			)
+		}
+	}
+}
+
+extension FactorSource {
+	public func extract<F>(_ type: F.Type) -> F? where F: FactorSourceProtocol {
+		F.extract(from: self)
+	}
+
+	public func extract<F>(as _: F.Type) throws -> F where F: FactorSourceProtocol {
+		guard let extracted = extract(F.self) else {
+			throw IncorrectFactorSourceType(expectedKind: F.kind, actualKind: kind)
+		}
+		return extracted
+	}
+}
+
+// MARK: - IncorrectFactorSourceType
+public struct IncorrectFactorSourceType: Swift.Error {
+	public let expectedKind: FactorSourceKind
+	public let actualKind: FactorSourceKind
+}
