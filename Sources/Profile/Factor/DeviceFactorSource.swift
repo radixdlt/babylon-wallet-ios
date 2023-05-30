@@ -121,12 +121,14 @@ extension FactorSource {
 }
 
 // MARK: - FactorSourceProtocol
-public protocol FactorSourceProtocol: BaseFactorSourceProtocol, Sendable, Hashable, Codable {
+public protocol FactorSourceProtocol: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
 	static var kind: FactorSourceKind { get }
 	static var casePath: CasePath<FactorSource, Self> { get }
 }
 
 extension FactorSourceProtocol {
+	public typealias ID = FactorSourceID
+	public var id: ID { common.id }
 	public var kind: FactorSourceKind { Self.kind }
 	public var casePath: CasePath<FactorSource, Self> { Self.casePath }
 }
