@@ -27,17 +27,24 @@ extension FactorSources {
 
 extension FactorSources {
 	/// Babylon `device` factor source
-	public var babylonDevice: BabylonDeviceFactorSource {
+	public var babylonDevice: DeviceFactorSource {
 		babylonDeviceFactorSources().first
 	}
 
-	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<BabylonDeviceFactorSource>> {
+	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<DeviceFactorSource>> {
 		guard
-			case let array = self.compactMap({
-				try? BabylonDeviceFactorSource(factorSource: $0)
+			case let array = self.compactMap({ (factorSource: FactorSource) -> DeviceFactorSource? in
+				guard
+					let device = factorSource.extract(DeviceFactorSource.self),
+					device.supportsOlympia,
+					device.nextDerivationIndicesPerNetwork != nil
+				else {
+					return nil
+				}
+				return device
 			}),
-			case let identifiedArray = IdentifiedArrayOf<BabylonDeviceFactorSource>(uncheckedUniqueElements: array),
-			let nonEmpty = NonEmpty<IdentifiedArrayOf<BabylonDeviceFactorSource>>(rawValue: identifiedArray)
+			case let identifiedArray = IdentifiedArrayOf<DeviceFactorSource>(uncheckedUniqueElements: array),
+			let nonEmpty = NonEmpty<IdentifiedArrayOf<DeviceFactorSource>>(rawValue: identifiedArray)
 		else {
 			let errorMsg = "Critical failure, every single execution path of the babylon wallet should ALWAYS contain a babylon device factorsource, did you do something weird in a test?"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))
@@ -52,19 +59,3 @@ extension FactorSources {
 			.first(where: { filter($0) })
 	}
 }
-
-// #if DEBUG
-// extension FactorSources {
-//	public init(_ factorSource: FactorSource) {
-//		self.init(uniqueElements: [factorSource])
-//	}
-//
-//	public init(uniqueElements: some Swift.Collection<FactorSource>) {
-//		precondition(!uniqueElements.isEmpty)
-//		self.init(rawValue: .init(uniqueElements: uniqueElements))!
-//	}
-//
-//	public static let previewValue: Self = .init(.previewValueDevice)
-// }
-//
-// #endif // DEBUG

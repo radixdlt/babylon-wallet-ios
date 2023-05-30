@@ -103,7 +103,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 							.babylonDeviceFactorSources()
 							.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
 
-						return .internal(.loadedDeviceFactorSource(babylonFactorSource.deviceFactorSource))
+						return .internal(.loadedDeviceFactorSource(babylonFactorSource))
 					} catch {
 						loggerGlobal.error("Failed to load factor source, error: \(error)")
 						return .delegate(.failedToDerivePublicKey)
@@ -214,7 +214,7 @@ extension DerivePublicKeys {
 }
 
 extension DerivePublicKeys {
-	private func withDerivationPath<Source: _HDFactorSourceProtocol>(
+	private func withDerivationPath<Source: HDFactorSourceProtocol>(
 		state: State,
 		hdFactorSource: Source,
 		knownPaths deriveWithKnownDerivationPaths: (OrderedSet<DerivationPath>, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> EffectTask<Action>,

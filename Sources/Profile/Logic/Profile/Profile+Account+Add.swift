@@ -96,3 +96,9 @@ extension FactorSource {
 		}
 	}
 }
+
+// MARK: - DisrepancyFactorSourceWrongKind
+public struct DisrepancyFactorSourceWrongKind: Swift.Error {
+	public let expected: FactorSourceKind
+	public let actual: FactorSourceKind
+}

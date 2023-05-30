@@ -103,3 +103,37 @@ extension Profile.Network.NextDerivationIndices {
 		}
 	}
 }
+
+extension NextDerivationIndicesPerNetwork {
+	public func derivationPathForNextEntity(
+		kind entityKind: EntityKind,
+		networkID: NetworkID
+	) throws -> DerivationPath {
+		try DerivationPath.forEntity(
+			kind: entityKind,
+			networkID: networkID,
+			index: nextForEntity(kind: entityKind, networkID: networkID)
+		)
+	}
+}
+
+extension NextDerivationIndicesPerNetwork {
+	public func nextForEntity(
+		kind entityKind: EntityKind,
+		networkID: Radix.Network.ID
+	) -> Profile.Network.NextDerivationIndices.Index {
+		guard let network = self.networks[id: networkID] else {
+			return 0
+		}
+		return network.nextForEntity(kind: entityKind)
+	}
+}
+
+extension Profile.Network.NextDerivationIndices {
+	public func nextForEntity(kind entityKind: EntityKind) -> Index {
+		switch entityKind {
+		case .identity: return forIdentity
+		case .account: return forAccount
+		}
+	}
+}
