@@ -143,7 +143,7 @@ extension DisplayMnemonics {
 				}
 				return try AccountsForDeviceFactorSource(
 					accounts: accountsForSource,
-					deviceFactorSource: DeviceFactorSource(factorSource: factorSource)
+					deviceFactorSource: factorSource.extract(as: DeviceFactorSource.self)
 				)
 			})
 		}
