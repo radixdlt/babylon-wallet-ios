@@ -8,10 +8,6 @@ extension DependencyValues {
 	}
 }
 
-extension FactorSourceID {
-	static let mocked = try! FactorSource.ID(factorSourceKind: .device, hash: .init(hex: String(repeating: "deadbeef", count: 8)))
-}
-
 // MARK: - LedgerHardwareWalletClient + TestDependencyKey
 extension LedgerHardwareWalletClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
@@ -20,7 +16,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		isConnectedToAnyConnectorExtension: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getDeviceInfo: {
 			.init(
-				id: .mocked,
+				id: try! .init(.deadbeef32Bytes),
 				model: .nanoS
 			)
 		},
