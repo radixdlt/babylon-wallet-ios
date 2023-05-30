@@ -90,7 +90,10 @@ extension FactorSource {
 		switch self {
 		case var .device(deviceFactorSource):
 			deviceFactorSource.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
-			self = .device(deviceFactorSource)
+			self = deviceFactorSource.embed()
+		case var .ledger(ledger): // FIXME: Post-MFA remove this
+			ledger.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
+			self = ledger.embed()
 		default:
 			throw DisrepancyFactorSourceWrongKind(expected: .device, actual: kind)
 		}

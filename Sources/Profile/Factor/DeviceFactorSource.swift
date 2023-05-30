@@ -39,10 +39,6 @@ public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable,
 }
 
 extension FactorSource {
-	public var supportsOlympia: Bool {
-		property(\.supportsOlympia)
-	}
-
 	public var common: FactorSource.Common {
 		get { property(\.common) }
 		set {
