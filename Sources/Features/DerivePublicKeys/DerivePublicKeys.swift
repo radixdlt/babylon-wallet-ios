@@ -234,8 +234,8 @@ extension DerivePublicKeys {
 			}()
 			return deriveWithKnownDerivationPaths(derivationPaths, networkID, loadMnemonicPurpose)
 		case let .nextBasedOnFactorSource(networkOption, entityKind, curve):
-			guard let entityCreatingFactorSource = try? EntityCreatingFactorSource(factorSource: hdFactorSource) else {
-				loggerGlobal.critical("Cannot derive public key for next entity with a non EntityCreating FactorSource. Got kind: \(hdFactorSource.kind)")
+			guard let nextDerivationIndicesPerNetwork = hdFactorSource.nextDerivationIndicesPerNetwork else {
+				loggerGlobal.error("Unable to derive public keys with non entity creating factor source")
 				return .send(.delegate(.failedToDerivePublicKey))
 			}
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = {
@@ -251,7 +251,7 @@ extension DerivePublicKeys {
 			switch networkOption {
 			case let .specific(networkID):
 				do {
-					let derivationPath = try entityCreatingFactorSource.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
+					let derivationPath = try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
 					assert(derivationPath.curveForScheme == curve)
 					return deriveWithKnownDerivationPaths([derivationPath], networkID, loadMnemonicPurpose)
 				} catch {
@@ -261,7 +261,7 @@ extension DerivePublicKeys {
 			case .useCurrent:
 				return .run { send in
 					let networkID = await factorSourcesClient.getCurrentNetworkID()
-					let derivationPath = try entityCreatingFactorSource.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
+					let derivationPath = try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
 					await send(calculatedDerivationPath(derivationPath, networkID, loadMnemonicPurpose))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")

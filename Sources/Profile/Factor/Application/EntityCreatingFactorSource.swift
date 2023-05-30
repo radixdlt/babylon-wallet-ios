@@ -102,7 +102,9 @@ public struct DisrepancyFactorSourceWrongParameters: Swift.Error {
 }
 
 // MARK: - _HDFactorSourceProtocol
-public protocol _HDFactorSourceProtocol: BaseFactorSourceProtocol {}
+public protocol _HDFactorSourceProtocol: BaseFactorSourceProtocol {
+	var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? { get }
+}
 
 // MARK: - DeviceFactorSource + _HDFactorSourceProtocol
 extension DeviceFactorSource: _HDFactorSourceProtocol {}
@@ -111,40 +113,9 @@ extension DeviceFactorSource: _HDFactorSourceProtocol {}
 extension LedgerHardwareWalletFactorSource: _HDFactorSourceProtocol {}
 
 // MARK: - OffDeviceMnemonicFactorSource + _HDFactorSourceProtocol
-extension OffDeviceMnemonicFactorSource: _HDFactorSourceProtocol {}
-
-// MARK: - EntityCreatingFactorSource
-public struct EntityCreatingFactorSource: _EntityCreatingFactorSourceProtocol, Sendable {
-	public var kind: FactorSourceKind {
-		factorSource.kind
-	}
-
-	public var common: FactorSource.Common {
-		get { factorSource.common }
-		set { fatalError("should not be used") }
-	}
-
-	public static var assertedKind: FactorSourceKind? { nil }
-	public static var assertedParameters: FactorSource.CryptoParameters? { nil }
-	public let factorSource: any BaseFactorSourceProtocol
-	public let nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
-
-	public init(factorSource: any BaseFactorSourceProtocol) throws {
-//		self.factorSource = try Self.validating(factorSource: factorSource)
-//		self.entityCreatingStorage = try factorSource.entityCreatingStorage()
-		fatalError()
-	}
-}
-
-extension EntityCreatingFactorSource {
-	public func derivationPathForNextEntity(
-		kind entityKind: EntityKind,
-		networkID: NetworkID
-	) throws -> DerivationPath {
-		try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(
-			kind: entityKind,
-			networkID: networkID
-		)
+extension OffDeviceMnemonicFactorSource: _HDFactorSourceProtocol {
+	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? {
+		nil
 	}
 }
 
