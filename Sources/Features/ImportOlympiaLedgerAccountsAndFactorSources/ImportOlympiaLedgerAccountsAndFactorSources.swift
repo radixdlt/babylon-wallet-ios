@@ -143,7 +143,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					.init(uncheckedUniqueElements: state.unmigrated.unvalidated.map { $0.path.wrapAsDerivationPath() }),
 					networkID: state.networkID
 				),
-				factorSourceOption: .specific(ledger.factorSource),
+				factorSourceOption: .specific(ledger.embed()),
 				purpose: .importLegacyAccounts
 			)
 			return .none
@@ -187,9 +187,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		_ state: State
 	) -> EffectTask<Action> {
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
-		let ledgerName = ledger.label.rawValue
+		let ledgerName = ledger.hint.name.rawValue
 
-		let model = ledger.model
+		let model = ledger.hint.model
 
 		return .run { send in
 			// Migrates and saved all accounts to Profile
