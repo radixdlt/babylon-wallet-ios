@@ -24,9 +24,10 @@ extension SignWithFactorSourcesOfKindDevice {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Text("Sign transaction with phone")
+					Text(L10n.Signing.WithDeviceFactorSource.signTransaction)
+
 					if let currentSigningFactor = viewStore.currentSigningFactor {
-						Text("Factor Source ID: \(currentSigningFactor.factorSource.id.hex())")
+						Text(L10n.Signing.WithDeviceFactorSource.idLabel(currentSigningFactor.factorSource.id.hex()))
 					}
 				}
 				.onFirstTask { @MainActor in

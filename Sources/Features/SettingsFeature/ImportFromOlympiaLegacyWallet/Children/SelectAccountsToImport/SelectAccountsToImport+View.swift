@@ -139,7 +139,7 @@ enum SelectAccountsToImportRow {
 			HStack {
 				VStack(alignment: .leading, spacing: .medium2) {
 					if isAlreadyImported {
-						Text("Already imported")
+						Text(L10n.ImportLegacyWallet.alreadyImportedLabel)
 							.textStyle(.body1HighImportance)
 					}
 

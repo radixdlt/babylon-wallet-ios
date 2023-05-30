@@ -11,8 +11,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 
-	public typealias Store = StoreOf<Self>
-
 	public init() {}
 
 	// MARK: - State

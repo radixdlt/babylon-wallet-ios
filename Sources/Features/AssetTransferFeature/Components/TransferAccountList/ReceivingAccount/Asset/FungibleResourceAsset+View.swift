@@ -29,22 +29,24 @@ extension FungibleResourceAsset.View {
 							.foregroundColor(.app.gray1)
 					}
 
-					TextField("0.00",
-					          text: viewStore.binding(
-					          	get: \.transferAmountStr,
-					          	send: { .amountChanged($0) }
-					          ))
-					          .keyboardType(.decimalPad)
-					          .lineLimit(1)
-					          .multilineTextAlignment(.trailing)
-					          .foregroundColor(.app.gray1)
-					          .textStyle(.sectionHeader)
-					          .focused($focused)
+					TextField(
+						"0.00",
+						text: viewStore.binding(
+							get: \.transferAmountStr,
+							send: { .amountChanged($0) }
+						)
+					)
+					.keyboardType(.decimalPad)
+					.lineLimit(1)
+					.multilineTextAlignment(.trailing)
+					.foregroundColor(.app.gray1)
+					.textStyle(.sectionHeader)
+					.focused($focused)
 				}
 
 				if viewStore.totalExceedsBalance {
 					// TODO: Add better style
-					Text("Total Sum is over your current balance")
+					Text(L10n.AssetTransfer.FungibleResource.totalExceedsBalance)
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.red1)
 				}
@@ -54,16 +56,18 @@ extension FungibleResourceAsset.View {
 						Button {
 							viewStore.send(.maxAmountTapped)
 						} label: {
-							Text("Max")
+							Text(L10n.Common.max)
 								.underline()
 								.textStyle(.body3HighImportance)
 								.foregroundColor(.app.blue2)
 						}
 
-						Text("-")
-						Text("Balance: \(viewStore.balance.format())")
-							.textStyle(.body3HighImportance)
-							.foregroundColor(.app.gray2)
+						Group {
+							Text("-")
+							Text(L10n.AssetTransfer.FungibleResource.balance(viewStore.balance.format()))
+						}
+						.textStyle(.body3HighImportance)
+						.foregroundColor(.app.gray2)
 					}
 				}
 			}

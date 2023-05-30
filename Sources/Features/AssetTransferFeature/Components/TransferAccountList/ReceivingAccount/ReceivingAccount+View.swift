@@ -51,7 +51,7 @@ extension ReceivingAccount.View {
 				}
 			} else {
 				HStack {
-					Button("Choose Account") {
+					Button(L10n.AssetTransfer.ReceivingAccount.chooseAccountButton) {
 						viewStore.send(.chooseAccountTapped)
 					}
 					.textStyle(.body1Header)
@@ -76,7 +76,7 @@ extension ReceivingAccount.View {
 				}
 			)
 
-			Button("Add Assets") {
+			Button(L10n.AssetTransfer.ReceivingAccount.addAssetsButton) {
 				viewStore.send(.addAssetTapped)
 			}
 			.frame(height: .standardButtonHeight)

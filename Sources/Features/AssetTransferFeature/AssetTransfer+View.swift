@@ -30,7 +30,7 @@ extension AssetTransfer.View {
 
 					FixedSpacer(height: .large1)
 
-					Button("Send Transfer Request") {
+					Button(L10n.AssetTransfer.sendTransferButton) {
 						viewStore.send(.sendTransferTapped)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -52,12 +52,12 @@ extension AssetTransfer.View {
 
 	func headerView(_ viewStore: ViewStoreOf<AssetTransfer>) -> some View {
 		HStack {
-			Text("Transfer")
+			Text(L10n.AssetTransfer.Header.transfer)
 				.textStyle(.sheetTitle)
 				.flushedLeft(padding: .small1)
 			Spacer()
 			if viewStore.message == nil {
-				Button("Add Message", asset: AssetResource.addMessage) {
+				Button(L10n.AssetTransfer.Header.addMessageButton, asset: AssetResource.addMessage) {
 					viewStore.send(.addMessageTapped)
 				}
 				.textStyle(.button)

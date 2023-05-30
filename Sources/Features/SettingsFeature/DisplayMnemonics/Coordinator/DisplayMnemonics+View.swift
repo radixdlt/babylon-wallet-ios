@@ -33,8 +33,7 @@ extension DisplayMnemonics {
 						.padding()
 					}
 				}
-				// FIXME: strings
-				.navigationTitle("Seed phrases")
+				.navigationTitle(L10n.DisplayMnemonics.seedPhrases)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}

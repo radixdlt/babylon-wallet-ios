@@ -7,9 +7,9 @@ import FeaturePrelude
 extension PersonaDetails {
 	@MainActor
 	public struct View: SwiftUI.View {
-		let store: Store
+		let store: StoreOf<PersonaDetails>
 
-		public init(store: Store) {
+		public init(store: StoreOf<PersonaDetails>) {
 			self.store = store
 		}
 	}

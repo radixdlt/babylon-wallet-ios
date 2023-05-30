@@ -85,7 +85,7 @@ extension ReceivingAccount.State.Account {
 		case let .left(account):
 			return account.displayName.rawValue
 		case .right:
-			return "Account"
+			return L10n.Common.account
 		}
 	}
 

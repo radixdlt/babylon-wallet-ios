@@ -34,9 +34,9 @@ extension LedgerHardwareDevices {
 
 		var navigationTitle: String {
 			if allowSelection {
-				return "Choose Ledger Device" // FIXME: Strings
+				return L10n.LedgerHardwareDevices.navigationTitleAllowSelection
 			} else {
-				return "Ledger Hardware Wallets" // FIXME: Strings
+				return L10n.LedgerHardwareDevices.navigationTitleAllowSelection
 			}
 		}
 
@@ -45,14 +45,14 @@ extension LedgerHardwareDevices {
 			case .idle, .loading:
 				return nil
 			case .failure:
-				return "Could not load ledger devices"
+				return L10n.LedgerHardwareDevices.subtitleFailure
 			case .success([]):
-				return L10n.CreateEntity.Ledger.subtitleNoLedgers
+				return L10n.LedgerHardwareDevices.subtitleNoLedgers
 			case .success:
 				if allowSelection {
-					return "Choose a Ledger hardware wallet device" // FIXME: Strings -> L10n.CreateEntity.Ledger.subtitleSelectLedger
+					return L10n.LedgerHardwareDevices.subtitleSelectLedger
 				} else {
-					return "Here are all the Ledger devices you have connected to" // FIXME: Strings
+					return L10n.LedgerHardwareDevices.subtitleAllLedgers
 				}
 			}
 		}
@@ -78,7 +78,7 @@ extension LedgerHardwareDevices {
 									.flushedLeft
 							}
 
-							Button("What is a Ledger Factor Source") { // FIXME: Strings
+							Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
 								viewStore.send(.whatIsALedgerButtonTapped)
 							}
 							.buttonStyle(.info)
@@ -87,7 +87,7 @@ extension LedgerHardwareDevices {
 
 						ledgerList(viewStore: viewStore)
 
-						Button("Add Ledger Device") { // FIXME: Strings -> L10n.CreateEntity.Ledger.addNewLedger
+						Button(L10n.LedgerHardwareDevices.addNewLedger) {
 							viewStore.send(.addNewLedgerButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
@@ -104,7 +104,6 @@ extension LedgerHardwareDevices {
 						viewStore.selectedLedgerControlRequirements,
 						forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
 					) { action in
-						// FIXME: Strings: remove L10n.CreateEntity.Ledger.useLedger
 						Button(L10n.Common.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
@@ -124,7 +123,7 @@ extension LedgerHardwareDevices {
 			     .success([]) where viewStore.showHeaders:
 				EmptyView()
 			case .success([]):
-				Text(L10n.CreateEntity.Ledger.subtitleNoLedgers)
+				Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
 					.foregroundColor(.app.gray1)
 					.textStyle(.body1Regular)
 					.flushedLeft

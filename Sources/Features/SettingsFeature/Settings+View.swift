@@ -318,7 +318,7 @@ extension AppSettings.View {
 				action: .profileBackupsButtonTapped
 			),
 			.init(
-				title: "Ledger Hardware Wallets", // FIXME: Strings
+				title: L10n.Settings.ledgerHardwareWallets,
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
 			),
@@ -331,19 +331,18 @@ extension AppSettings.View {
 				icon: .asset(AssetResource.generalSettings),
 				action: .importFromOlympiaWalletButtonTapped
 			),
-			.init(
-				title: "Factor sources", // ONLY DEBUG EVER
+			.init( // ONLY DEBUG EVER
+				title: L10n.Settings.Debug.factorSources,
 				icon: .systemImage("person.badge.key"),
 				action: .factorSourcesButtonTapped
 			),
-			.init(
-				title: "Inspect profile", // ONLY DEBUG EVER
+			.init( // ONLY DEBUG EVER
+				title: L10n.Settings.Debug.inspectProfile,
 				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
 			),
 			.init(
-				// FIXME: strings
-				title: "Seed phrases",
+				title: L10n.DisplayMnemonics.seedPhrases,
 				icon: .asset(AssetResource.ellipsis),
 				action: .mnemonicsButtonTapped
 			),

@@ -29,7 +29,7 @@ extension ScanMultipleOlympiaQRCodes {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					if let numberOfPayloadsToScan = viewStore.numberOfPayloadsToScan {
-						Text("Scanned: \(viewStore.numberOfPayloadsScanned)/\(numberOfPayloadsToScan)")
+						Text(L10n.ImportLegacyWallet.scannedLabel(viewStore.numberOfPayloadsScanned, numberOfPayloadsToScan))
 					}
 					SwitchStore(store.scope(state: \.step)) {
 						CaseLet(
