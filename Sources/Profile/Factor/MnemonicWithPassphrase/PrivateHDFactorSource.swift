@@ -1,7 +1,7 @@
 import Prelude
 
 // MARK: - PrivateHDFactorSource
-public struct PrivateHDFactorSource: _FactorSourceHolderProtocol {
+public struct PrivateHDFactorSource {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 	public let factorSource: FactorSource
 
@@ -22,29 +22,29 @@ public struct PrivateHDFactorSource: _FactorSourceHolderProtocol {
 	struct CriticalDisrepancyBetweenFactorSourceID: Swift.Error {}
 }
 
-#if DEBUG
-extension PrivateHDFactorSource {
-	public static func testValue(
-		label: FactorSource.Label,
-		description: FactorSource.Description
-	) -> Self {
-		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
-
-		let factorSource = try! FactorSource(
-			kind: .device,
-			id: FactorSource.id(fromRoot: mnemonicWithPassphrase.hdRoot()),
-			label: label,
-			description: description,
-			parameters: .babylon,
-			storage: .entityCreating(.init()),
-			addedOn: .init(timeIntervalSince1970: 0),
-			lastUsedOn: .init(timeIntervalSince1970: 0)
-		)
-
-		return try! .init(
-			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			factorSource: factorSource
-		)
-	}
-}
-#endif
+// #if DEBUG
+// extension PrivateHDFactorSource {
+//	public static func testValue(
+//		label: FactorSource.Label,
+//		description: FactorSource.Description
+//	) -> Self {
+//		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
+//
+//		let factorSource = try! FactorSource(
+//			kind: .device,
+//			id: FactorSource.id(fromRoot: mnemonicWithPassphrase.hdRoot()),
+//			label: label,
+//			description: description,
+//			cryptoParameters: .babylon,
+//			storage: .entityCreating(.init()),
+//			addedOn: .init(timeIntervalSince1970: 0),
+//			lastUsedOn: .init(timeIntervalSince1970: 0)
+//		)
+//
+//		return try! .init(
+//			mnemonicWithPassphrase: mnemonicWithPassphrase,
+//			factorSource: factorSource
+//		)
+//	}
+// }
+// #endif

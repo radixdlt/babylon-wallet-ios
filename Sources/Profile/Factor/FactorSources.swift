@@ -47,18 +47,18 @@ extension FactorSources {
 	}
 }
 
-#if DEBUG
-extension FactorSources {
-	public init(_ factorSource: FactorSource) {
-		self.init(uniqueElements: [factorSource])
-	}
-
-	public init(uniqueElements: some Swift.Collection<FactorSource>) {
-		precondition(!uniqueElements.isEmpty)
-		self.init(rawValue: .init(uniqueElements: uniqueElements))!
-	}
-
-	public static let previewValue: Self = .init(.previewValueDevice)
-}
-
-#endif // DEBUG
+// #if DEBUG
+// extension FactorSources {
+//	public init(_ factorSource: FactorSource) {
+//		self.init(uniqueElements: [factorSource])
+//	}
+//
+//	public init(uniqueElements: some Swift.Collection<FactorSource>) {
+//		precondition(!uniqueElements.isEmpty)
+//		self.init(rawValue: .init(uniqueElements: uniqueElements))!
+//	}
+//
+//	public static let previewValue: Self = .init(.previewValueDevice)
+// }
+//
+// #endif // DEBUG

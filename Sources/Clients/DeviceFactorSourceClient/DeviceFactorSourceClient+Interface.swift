@@ -43,7 +43,7 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 	) throws {
 		for derivationPath in derivationPaths {
-			guard hdOnDeviceFactorSource.parameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+			guard hdOnDeviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
 				throw DiscrepancyUnsupportedCurve()
 			}
 		}

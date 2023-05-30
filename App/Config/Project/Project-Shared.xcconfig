@@ -125,7 +125,7 @@ CLANG_WARN__DUPLICATE_METHOD_MATCH = YES
 
 // Block Capture of Autoreleasing
 //
-// Warn about block captures of implicitly autoreleasing parameters.
+// Warn about block captures of implicitly autoreleasing cryptoParameters.
 
 CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES
 

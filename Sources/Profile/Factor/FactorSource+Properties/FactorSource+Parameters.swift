@@ -1,9 +1,9 @@
 import Cryptography
 import Prelude
 
-// MARK: - FactorSource.Parameters
+// MARK: - FactorSource.CryptoParameters
 extension FactorSource {
-	public struct Parameters: Sendable, Hashable, Codable {
+	public struct CryptoParameters: Sendable, Hashable, Codable {
 		/// either Curve25519 or secp256k1 (or P256?)
 		public let supportedCurves: NonEmpty<OrderedSet<SLIP10.Curve>>
 

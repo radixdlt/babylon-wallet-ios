@@ -124,12 +124,12 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 	private func requestAuthorization(completion: @escaping (Bool) -> Void) {
 		self.completion = completion
 
-		// Create parameters, and allow browsing over p2pConnection-to-p2pConnection link.
-		let parameters = NWParameters()
-		parameters.includePeerToPeer = true
+		// Create cryptoParameters, and allow browsing over p2pConnection-to-p2pConnection link.
+		let cryptoParameters = NWParameters()
+		cryptoParameters.includePeerToPeer = true
 
 		// Browse for a custom service type.
-		let browser = NWBrowser(for: .bonjour(type: "_bonjour._tcp", domain: nil), using: parameters)
+		let browser = NWBrowser(for: .bonjour(type: "_bonjour._tcp", domain: nil), using: cryptoParameters)
 		self.browser = browser
 		browser.stateUpdateHandler = { newState in
 			switch newState {

@@ -80,7 +80,7 @@ extension FactorSource {
 			id: .init(data: .random(byteCount: 32)),
 			label: .init(label),
 			description: .init(rawValue: label),
-			parameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon,
+			cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon,
 			storage: nil,
 			addedOn: Date(),
 			lastUsedOn: Date()
@@ -93,7 +93,7 @@ extension FactorSource {
 			id: .init(data: .random(byteCount: 32)),
 			label: .init(label),
 			description: .init(rawValue: label),
-			parameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon,
+			cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon,
 			storage: nil,
 			addedOn: Date(),
 			lastUsedOn: Date()

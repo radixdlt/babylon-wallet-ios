@@ -75,9 +75,10 @@ extension Profile {
 		switch account.securityState {
 		case let .unsecured(entityControl):
 			let factorSourceID = entityControl.transactionSigning.factorSourceID
-			try self.factorSources.updateFactorSource(id: factorSourceID) {
-				try $0.increaseNextDerivationIndex(for: account.kind, networkID: account.networkID)
-			}
+//			try self.factorSources.updateFactorSource(id: factorSourceID) {
+//				try $0.increaseNextDerivationIndex(for: account.kind, networkID: account.networkID)
+//			}
+			fatalError()
 		}
 	}
 }
