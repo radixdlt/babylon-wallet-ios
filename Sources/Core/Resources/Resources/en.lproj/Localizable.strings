@@ -47,6 +47,7 @@
 "accountSettings_accountColor" = "Account Color";
 "accountSettings_accountColorSubtitle" = "Select from a list of unique colors";
 "accountSettings_showAssets" = "Show Assets with Tags";
+"accountSettings_showQR" = "Show QR Code";
 "accountSettings_showAssetsSubtitle" = "Select which tags to show for assets in this account";
 "accountSettings_setBehaviorHeading" = "Set how you want this account to work";
 "accountSettings_accountSecurity" = "Account Security";
@@ -89,6 +90,16 @@
 "accountSettings_behaviors_removableByAnyone" = "Anyone can remove this asset from accounts and dApps.";
 "accountSettings_behaviors_nftDataChangeable" = "Data that is set on these NFTs can be changed.";
 "accountSettings_behaviors_nftDataChangeableByAnyone" = "Anyone can change data that is set on these NFTs.";
+"accountSettings_debug_turnIntoDappDefinition" = "Turn into dApp Definition account type";
+"accountSettings_debug_createAndUploadAuthKey" = "Create & Upload Auth Key";
+"accountSettings_debug_createFungibleToken" = "Create Fungible Token";
+"accountSettings_debug_creatingToken" = "Creating Token";
+"accountSettings_debug_createNFT" = "Create NFT";
+"accountSettings_debug_creatingNFT" = "Creating NFT";
+"accountSettings_debug_createFungibleTokens" = "Create Multiple Fungible Tokens";
+"accountSettings_debug_creatingTokens" = "Creating Tokens";
+"accountSettings_debug_createNFTs" = "Create Multiple NFTs";
+"accountSettings_debug_creatingNFTs" = "Creating NFTs";
 "settings_title" = "Settings";
 "settings_linkedConnectors" = "Linked Connectors";
 "settings_gateways" = "Gateways";
@@ -514,3 +525,17 @@
 "importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";
 "signing_withDeviceFactorSource_signTransaction" = "Sign transaction with phone";
 "signing_withDeviceFactorSource_idLabel" = "Factor Source ID: %@";
+"ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
+"ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.
+
+Install the Connector extension, open it to see the linking QR code, and tap continue.";
+"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Ledger Device";
+"ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Hardware Wallets";
+"ledgerHardwareDevices_ledgerFactorSourceInfoCaption" = "What is a Ledger Factor Source";
+"ledgerHardwareDevices_addNewLedger" = "Add New Ledger";
+"ledgerHardwareDevices_addedHeading" = "Added";
+"ledgerHardwareDevices_usedHeading" = "Used";
+"ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
+"ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger hardware wallet device";
+"ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have connected to";
+"ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
