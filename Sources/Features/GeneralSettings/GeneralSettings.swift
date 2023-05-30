@@ -8,8 +8,6 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var preferences: AppPreferences?
 		public var hasLedgerHardwareWalletFactorSources: Bool = false
-		@PresentationState
-		public var alert: Alerts.State?
 		var exportLogs: URL?
 
 		public init() {}
@@ -19,8 +17,6 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		case appeared
 		case useVerboseModeToggled(Bool)
 		case developerModeToggled(Bool)
-		case cloudProfileSyncToggled(Bool)
-		case alert(PresentationAction<Alerts.Action>)
 		case exportLogsTapped
 		case exportLogsDismissed
 	}
@@ -28,24 +24,6 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadPreferences(AppPreferences)
 		case hasLedgerHardwareWalletFactorSourcesLoaded(Bool)
-	}
-
-	public struct Alerts: Sendable, ReducerProtocol {
-		public enum State: Sendable, Hashable {
-			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case confirmCloudSyncDisable(ConfirmCloudSyncDisable)
-
-			public enum ConfirmCloudSyncDisable: Sendable, Hashable {
-				case confirm
-			}
-		}
-
-		public var body: some ReducerProtocolOf<Self> {
-			EmptyReducer()
-		}
 	}
 
 	public init() {}
@@ -70,23 +48,6 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 				}
 			}
 
-		case let .cloudProfileSyncToggled(isEnabled):
-			if !isEnabled {
-				state.alert = .confirmCloudSyncDisable(.init(
-					title: {
-						TextState(L10n.GeneralSettings.ConfirmCloudSyncDisableAlert.title)
-					},
-					actions: {
-						ButtonState(role: .destructive, action: .confirm) {
-							TextState(L10n.Common.confirm)
-						}
-					}
-				))
-				return .none
-			} else {
-				return updateCloudSync(state: &state, isEnabled: true)
-			}
-
 		case let .developerModeToggled(isEnabled):
 			state.preferences?.security.isDeveloperModeEnabled = isEnabled
 			guard let preferences = state.preferences else { return .none }
@@ -100,11 +61,6 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			return .fireAndForget {
 				try await appPreferencesClient.updatePreferences(preferences)
 			}
-		case .alert(.presented(.confirmCloudSyncDisable(.confirm))):
-			state.alert = nil
-			return updateCloudSync(state: &state, isEnabled: false)
-		case .alert(.dismiss):
-			return .none
 		case .exportLogsTapped:
 			state.exportLogs = Logger.logFilePath
 			return .none
@@ -122,13 +78,6 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		case let .hasLedgerHardwareWalletFactorSourcesLoaded(hasLedgerHardwareWalletFactorSources):
 			state.hasLedgerHardwareWalletFactorSources = hasLedgerHardwareWalletFactorSources
 			return .none
-		}
-	}
-
-	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {
-		state.preferences?.security.isCloudProfileSyncEnabled = isEnabled
-		return .fireAndForget {
-			try await appPreferencesClient.setIsCloudProfileSyncEnabled(false)
 		}
 	}
 }

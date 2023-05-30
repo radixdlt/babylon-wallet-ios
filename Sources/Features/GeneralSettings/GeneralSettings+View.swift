@@ -6,7 +6,6 @@ extension GeneralSettings.State {
 			hasLedgerHardwareWalletFactorSources: hasLedgerHardwareWalletFactorSources,
 			useVerboseLedgerDisplayMode: (preferences?.display.ledgerHQHardwareWalletSigningDisplayMode ?? .default) == .verbose,
 			isDeveloperModeEnabled: preferences?.security.isDeveloperModeEnabled ?? false,
-			isCloudProfileSyncEnabled: preferences?.security.isCloudProfileSyncEnabled ?? false,
 			isExportingLogs: exportLogs
 		)
 	}
@@ -21,8 +20,6 @@ extension GeneralSettings {
 		let useVerboseLedgerDisplayMode: Bool
 
 		let isDeveloperModeEnabled: Bool
-		let isCloudProfileSyncEnabled: Bool
-
 		let isExportingLogs: URL?
 	}
 
@@ -45,36 +42,17 @@ extension GeneralSettings {
 		}
 
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
-			VStack(spacing: .zero) {
-				VStack(alignment: .leading, spacing: .zero) {
-					isCloudProfileSyncEnabled(with: viewStore)
-					isDeveloperModeEnabled(with: viewStore)
-					if !RuntimeInfo.isAppStoreBuild {
-						exportLogs(with: viewStore)
-					}
-					if viewStore.hasLedgerHardwareWalletFactorSources {
-						isUsingVerboseLedgerMode(with: viewStore)
-					}
-					Separator()
+			VStack(alignment: .leading, spacing: .zero) {
+				isDeveloperModeEnabled(with: viewStore)
+				if !RuntimeInfo.isAppStoreBuild {
+					exportLogs(with: viewStore)
 				}
-				.padding(.medium3)
+				if viewStore.hasLedgerHardwareWalletFactorSources {
+					isUsingVerboseLedgerMode(with: viewStore)
+				}
+				Separator()
 			}
-			.alert(
-				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
-				state: /GeneralSettings.Alerts.State.confirmCloudSyncDisable,
-				action: GeneralSettings.Alerts.Action.confirmCloudSyncDisable
-			)
-		}
-
-		private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
-			ToggleView(
-				title: L10n.GeneralSettings.ProfileSync.title,
-				subtitle: L10n.GeneralSettings.ProfileSync.subtitle,
-				isOn: viewStore.binding(
-					get: \.isCloudProfileSyncEnabled,
-					send: { .cloudProfileSyncToggled($0) }
-				)
-			)
+			.padding(.medium3)
 		}
 
 		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {

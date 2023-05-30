@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ProfileBackupsFeature
 import SwiftUI
 
 // MARK: - OnboardingStartup.View
@@ -45,7 +46,7 @@ extension OnboardingStartup.View {
 					state: /OnboardingStartup.Destinations.State.restoreFromBackup,
 					action: OnboardingStartup.Destinations.Action.restoreFromBackup,
 					destination: {
-						RestoreFromBackup.View(store: $0)
+						ProfileBackups.View(store: $0)
 					}
 				)
 			}

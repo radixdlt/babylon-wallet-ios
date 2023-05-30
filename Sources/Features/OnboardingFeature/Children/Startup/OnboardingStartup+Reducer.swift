@@ -1,5 +1,6 @@
 import FeaturePrelude
 import OnboardingClient
+import ProfileBackupsFeature
 
 public struct OnboardingStartup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -25,16 +26,16 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case restoreFromBackup(RestoreFromBackup.State)
+			case restoreFromBackup(ProfileBackups.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case restoreFromBackup(RestoreFromBackup.Action)
+			case restoreFromBackup(ProfileBackups.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.restoreFromBackup, action: /Action.restoreFromBackup) {
-				RestoreFromBackup()
+				ProfileBackups()
 			}
 		}
 	}
@@ -51,14 +52,14 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		case .selectedNewWalletUser:
 			return .send(.delegate(.setupNewUser))
 		case .selectedRestoreFromBackup:
-			state.destination = .restoreFromBackup(.init())
+			state.destination = .restoreFromBackup(.init(context: .onboarding))
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.restoreFromBackup(.delegate(.completed)))):
+		case .destination(.presented(.restoreFromBackup(.delegate(.profileImported)))):
 			return .send(.delegate(.completed))
 		default:
 			return .none
