@@ -130,6 +130,41 @@ public struct IncorrectFactorSourceType: Swift.Error {
 	public let actualKind: FactorSourceKind
 }
 
+extension FactorSource.Common {
+	public static func from(
+		factorSourceKind: FactorSourceKind,
+		hdRoot: HD.Root,
+		cryptoParameters: FactorSource.CryptoParameters = .babylon,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try .init(
+			id: FactorSource.id(
+				fromRoot: hdRoot,
+				factorSourceKind: factorSourceKind
+			),
+			addedOn: addedOn,
+			lastUsedOn: lastUsedOn,
+			cryptoParameters: cryptoParameters
+		)
+	}
+
+	public static func from(
+		factorSourceKind: FactorSourceKind,
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		cryptoParameters: FactorSource.CryptoParameters = .babylon,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self.from(
+			factorSourceKind: factorSourceKind,
+			hdRoot: mnemonicWithPassphrase.hdRoot(),
+			cryptoParameters: cryptoParameters,
+			addedOn: addedOn, lastUsedOn: lastUsedOn
+		)
+	}
+}
+
 // MARK: - DeviceFactorSource
 public struct DeviceFactorSource: FactorSourceProtocol {
 	/// Kind of factor source
@@ -161,6 +196,70 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 
 	/// nil for olympia
 	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
+
+	public init(
+		common: FactorSource.Common,
+		hint: Hint,
+		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? = nil
+	) {
+		self.common = common
+		self.hint = hint
+		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
+	}
+
+	public static func from(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		model: Hint.Model,
+		name: Hint.Name,
+		isOlympiaCompatible: Bool,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self(
+			common: .from(
+				factorSourceKind: .device,
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				addedOn: addedOn,
+				lastUsedOn: lastUsedOn
+			),
+			hint: .init(name: name, model: model),
+			nextDerivationIndicesPerNetwork: isOlympiaCompatible ? nil : .init()
+		)
+	}
+
+	public static func babylon(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		model: Hint.Model,
+		name: Hint.Name,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self.from(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			model: model,
+			name: name,
+			isOlympiaCompatible: false,
+			addedOn: addedOn,
+			lastUsedOn: lastUsedOn
+		)
+	}
+
+	public static func olympia(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		model: Hint.Model,
+		name: Hint.Name,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self.from(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			model: model,
+			name: name,
+			isOlympiaCompatible: true,
+			addedOn: addedOn,
+			lastUsedOn: lastUsedOn
+		)
+	}
 }
 
 // MARK: - FactorSource.Common
