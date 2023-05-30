@@ -60,7 +60,7 @@ extension SubmitTransaction {
 					await viewStore.send(.appeared).finish()
 				}
 				.presentationDragIndicator(.visible)
-				.presentationDetentIntrinsicHeight()
+				.presentationDetents([.fraction(0.5)])
 				#if os(iOS)
 					.presentationBackground(.blur)
 				#endif

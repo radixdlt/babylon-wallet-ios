@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import CryptoKit
+import DappInteractionClient
 import FeaturePrelude
 import GatewayAPI
 import SigningFeature
@@ -91,6 +92,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case rawTransactionCreated(String)
 		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
+		case prepareForSigningResult(TaskResult<DappInteractionClient.PrepareForSiginingResponse>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -103,7 +105,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case selectFeePayer(SelectFeePayer.State)
-			case prepareForSigning(PrepareForSigning.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
 		}
@@ -111,7 +112,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case selectFeePayer(SelectFeePayer.Action)
-			case prepareForSigning(PrepareForSigning.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
 		}
@@ -122,9 +122,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
 				SelectFeePayer()
-			}
-			Scope(state: /State.prepareForSigning, action: /Action.prepareForSigning) {
-				PrepareForSigning()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
@@ -140,6 +137,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -258,44 +257,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					}
 				)))
 			}
-
-		case .destination(.presented(.prepareForSigning(.delegate(.failedToBuildTX)))):
-			state.canApproveTX = true
-			return .none
-
-		case .destination(.presented(.prepareForSigning(.delegate(.failedToLoadSigners)))):
-			state.canApproveTX = true
-			return .none
-
-		case let .destination(.presented(.prepareForSigning(.delegate(.done(compiledIntent, signingFactors))))):
-
-			func printSigners() {
-				for (factorSourceKind, signingFactorsOfKind) in signingFactors {
-					print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
-					for signingFactor in signingFactorsOfKind {
-						let factorSource = signingFactor.factorSource
-						print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
-						for signer in signingFactor.signers {
-							let entity = signer.entity
-							print("\t\t🔮 * Entity: \(entity.displayName): *")
-							for factorInstance in signer.factorInstancesRequiredToSign {
-								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
-							}
-						}
-					}
-				}
-			}
-			printSigners()
-
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: signingFactors,
-				signingPurposeWithPayload: .signTransaction(
-					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					compiledIntent,
-					origin: state.signTransactionPurpose
-				)
-			))
-			return .none
 
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			loggerGlobal.error("Failed sign tx")
@@ -434,15 +395,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.destination = .prepareForSigning(.init(
-				nonce: state.nonce,
+			let request = DappInteractionClient.PrepareForSigningRequest(
+                                nonce: state.nonce,
 				manifest: manifest,
 				networkID: networkID,
 				feePayer: feePayerSelectionAmongstCandidates.selected.account,
 				purpose: .signTransaction(state.signTransactionPurpose),
 				ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
-			))
-			return .none
+			)
+			return .task {
+				await .internal(.prepareForSigningResult(TaskResult {
+					try await dappInteractionClient.prepareFoSigning(request)
+				}))
+			}
 
 		case let .addGuaranteeToManifestResult(.failure(error)):
 			loggerGlobal.error("Failed to add guarantees to manifest, error: \(error)")
@@ -451,6 +416,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .rawTransactionCreated(transaction):
 			state.displayMode = .raw(transaction)
+			return .none
+		case let .prepareForSigningResult(.success(response)):
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: response.signingFactors,
+				signingPurposeWithPayload: .signTransaction(
+					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
+					response.compiledIntent,
+					origin: state.signTransactionPurpose
+				)
+			))
+			return .none
+		case let .prepareForSigningResult(.failure(error)):
+			errorQueue.schedule(error)
 			return .none
 		}
 	}
