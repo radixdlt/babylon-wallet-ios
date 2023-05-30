@@ -37,14 +37,33 @@ extension SubmitTransaction {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					VPair(heading: L10n.TransactionReview.SubmitTransaction.txID, item: viewStore.txID)
-					VPair(heading: L10n.TransactionReview.SubmitTransaction.status, item: viewStore.status.display)
+					switch viewStore.status {
+					case .submitting, .submittedPending, .submittedUnknown, .notYetSubmitted:
+						Image(asset: AssetResource.transactionInProgress)
+						//                                                        .resizable()
+						//                                                        .frame(.)
+						Text("Completing Transaction..").textStyle(.body1Regular)
+					case .committedSuccessfully:
+						Image(asset: AssetResource.successCheckmark)
+						Text("Succcess").textStyle(.sheetTitle)
+						//                                                        .resizable()
+						//                                                        .frame(.)
+						Text("Your transaction was successful").textStyle(.body1Regular)
+					case .committedFailure, .rejected:
+						Image(asset: AssetResource.warningError)
+						Text("Something went wrong").textStyle(.sheetTitle)
+						Text("Your transaction error here").textStyle(.body1Regular)
+					}
 				}
 				.padding(.medium1)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.appeared).finish()
 				}
-				.navigationTitle(L10n.TransactionReview.SubmitTransaction.navigationTitle)
+				.presentationDragIndicator(.visible)
+				.presentationDetentIntrinsicHeight()
+				#if os(iOS)
+					.presentationBackground(.blur)
+				#endif
 			}
 		}
 	}

@@ -14,6 +14,23 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			case committedSuccessfully
 			case committedFailure
 			case rejected
+
+			var isInProgress: Bool {
+				switch self {
+				case .submitting, .submittedPending, .submittedUnknown, .notYetSubmitted:
+					return true
+				default:
+					return false
+				}
+			}
+
+			var isSuccess: Bool {
+				if case .committedSuccessfully = self {
+					return true
+				}
+
+				return false
+			}
 		}
 
 		public let notarizedTX: NotarizeTransactionResponse
