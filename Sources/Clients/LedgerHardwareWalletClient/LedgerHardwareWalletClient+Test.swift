@@ -8,8 +8,8 @@ extension DependencyValues {
 	}
 }
 
-extension FactorSource.ID {
-	static let mocked = try! Self(hexCodable: .init(hex: String(repeating: "deadbeef", count: 8)))
+extension FactorSourceID {
+	static let mocked = try! FactorSource.ID(factorSourceKind: .device, hash: .init(hex: String(repeating: "deadbeef", count: 8)))
 }
 
 // MARK: - LedgerHardwareWalletClient + TestDependencyKey
