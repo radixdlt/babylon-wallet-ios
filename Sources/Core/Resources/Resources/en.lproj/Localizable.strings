@@ -177,10 +177,6 @@
 "personas_subtitle" = "Here are all of your current Personas in your Wallet.";
 "personas_whatIsPersona" = "What is a Persona";
 "personas_createNewPersona" = "Create a New Persona";
-"appSettings_title" = "App Settings";
-"appSettings_subtitle" = "Customize your Radix Wallet";
-"appSettings_developerMode_title" = "Developer Mode";
-"appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
 "backup_disabledText" = "Back up is turned off";
 "backup_lastBackedUp" = "Last Backed up: %@";
 "backup_noLastBackUp" = "Not Backed up yet";
@@ -217,14 +213,8 @@
 "createEntity_completion_destinationPersonaList" = "Persona List";
 "createEntity_completion_goToDestination" = "Go to %@";
 "createEntity_completion_title" = "Congratulations";
-"createEntity_ledger_addNewLedger" = "Add New Ledger";
-"createEntity_ledger_addedHeading" = "Added";
 "createEntity_ledger_createAccount" = "Create Ledger Account";
 "createEntity_ledger_createPersona" = "Create Ledger Persona";
-"createEntity_ledger_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
-"createEntity_ledger_subtitleSelectLedger" = "Select Ledger to use";
-"createEntity_ledger_useLedger" = "Use Ledger";
-"createEntity_ledger_usedHeading" = "Used";
 "createEntity_nameNewEntity_explanation" = "This can be changed any time";
 "createEntity_nameNewEntity_ledgerTitle" = "Create with Ledger hardware wallet";
 "createEntity_nameNewEntity_ledgerSubtitle" = "Requires you to sign transactions using your Ledger";
@@ -398,3 +388,220 @@
 "transactionSigning_preparingTransaction" = "Preparing transaction...";
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning_signingAndSubmittingTransaction" = "Submitting transaction...";
+
+"importMnemonic_wordHeading" = "word #%d";
+"common_invalid" = "invalid";
+
+"addLedger_alreadyAddedAlert_title" = "Ledger is already added.";
+"addLedger_alreadyAddedAlert_message" = "You have already added this ledger %@ %@";
+
+"addLedger_addDevice_title" = "Add Ledger Device.";
+"addLedger_addDevice_body1" = "Let’s set up a Ledger hardware wallet device. You will be able to use it to create new Ledger-secured Accounts, or import Ledger-secured Accounts from the Radix Olympia Desktop Wallet.";
+"addLedger_addDevice_body2" = "Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.";
+
+"addLedger_nameLedger_title" = "Name Your Ledger";
+"addLedger_nameLedger_body" = "Enter a name for this Ledger device";
+"addLedger_nameLedger_namePlaceholder" = "My green Ledger";
+"addLedger_nameLedger_continueButtonTitle" = "Save and Continue";
+
+"accountSettings_showQR" = "Show QR Code";
+
+"biometrics_prompt_displaySeedPhrase" = "Display seed phrase.";
+"biometrics_prompt_createSignAuthKey" = "Create Auth signing key.";
+"biometrics_prompt_importOlympiaAccounts" = "Check if seed phrase already exists.";
+"biometrics_prompt_checkingAccounts" = "Checking accounts.";
+"biometrics_prompt_updateAccountMetadata" = "Update account metadata.";
+
+"addressAction_showAccountQR" = "Show QR code for account";
+
+"addressAction_qrCodeView_qrCodeLabel" = "QR code for an account";
+"addressAction_qrCodeView_failureLabel" = "Could not create QR code";
+
+"misc_remoteThumbnails_vectorImageFailure" = "Can't displays image of vector type";
+"misc_remoteThumbnails_loadingFailure" = "Can't load image";
+
+"homePage_accountsTag_dAppDefinition" = "dapp definition";
+"homePage_accountsTag_legacySoftware" = "Legacy";
+"homePage_accountsTag_ledgerLegacy" = "Legacy (Ledger)";
+"homePage_accountsTag_ledgerBabylon" = "Ledger";
+
+"importMnemonic_passphrase" = "Passphrase";
+"importMnemonic_passphrasePlaceholder" = "Passphrase";
+"importMnemonic_passphraseHint" = "BIP39 Passphrase is often called a '25th word'.";
+
+"importMnemonic_fewerWords" = "Fewer words";
+"importMnemonic_moreWords" = "More words";
+
+"importMnemonic_checksumFailure" = "Seed phrase not checksummed";
+"importMnemonic_importSeedPhrase" = "Import seed phrase";
+
+"common_done" = "Done";
+
+"accountSettings_debug_turnIntoDappDefinition" = "Turn into dApp Definition account type";
+"accountSettings_debug_createAndUploadAuthKey" = "Create & Upload Auth Key";
+"accountSettings_debug_createFungibleToken" = "Create Fungible Token";
+"accountSettings_debug_creatingToken" = "Creating Token";
+"accountSettings_debug_createNFT" = "Create NFT";
+"accountSettings_debug_creatingNFT" = "Creating NFT";
+
+"accountSettings_debug_createFungibleTokens" = "Create Multiple Fungible Tokens";
+"accountSettings_debug_creatingTokens" = "Creating Tokens";
+"accountSettings_debug_createNFTs" = "Create Multiple NFTs";
+"accountSettings_debug_creatingNFTs" = "Creating NFTs";
+
+"accountSettings_debug_turnIntoDappDefinition" = "Turn into dApp Definition account type";
+"accountSettings_debug_turnIntoDappDefinition" = "Turn into dApp Definition account type";
+
+"ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
+"ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.\n\nInstall the Connector extension, open it to see the linking QR code, and tap continue.";
+
+"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Ledger Device";
+"ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Hardware Wallets";
+
+"ledgerHardwareDevices_ledgerFactorSourceInfoCaption" = "What is a Ledger Factor Source";
+
+"ledgerHardwareDevices_addNewLedger" = "Add New Ledger";
+"ledgerHardwareDevices_addedHeading" = "Added";
+"ledgerHardwareDevices_usedHeading" = "Used";
+
+"ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
+"ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger hardware wallet device";
+"ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have connected to";
+"ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
+
+"displayMnemonics_labelSeedPhraseKindOlympia" = "Legacy Seed Phrase";
+"displayMnemonics_labelSeedPhraseKind" = "Main Seed Phrase";
+"displayMnemonics_labelDateOlympia" = "Imported on";
+"displayMnemonics_labelDate" = "Generated on";
+
+"displayMnemonics_cautionAlert_title" = "Use Caution";
+"displayMnemonics_cautionAlert_revealButtonLabel" = "Reveal Seed phrase";
+"displayMnemonics_cautionAlert_message" = "Make sure no person or camera can see your display. Don't read or mouth the words. We have prevented you from taking screenshots";
+
+"displayMnemonics_seedPhrases" = "Seed Phrases";
+
+"settings_debug_factorSources" = "Factor sources";
+"settings_debug_inspectProfile" = "Inspect profile";
+"settings_ledgerHardwareWallets" = "Ledger Hardware Wallets";
+
+"assetTransfer_transactionMessage" = "Message";
+
+"common_public" = "Public";
+
+"assetTransfer_qrScanInstructions" = "Scan a QR code of a Radix account address";
+
+"common_choose" = "Choose";
+"common_max" = "Max";
+
+"assetTransfer_chooseReceivingAccount_invalidAddressError" = "Invalid address";
+"assetTransfer_chooseReceivingAccount_alreadyAddedError" = "Account already added";
+"assetTransfer_chooseReceivingAccount_navigationTitle" = "Choose Receiving Account";
+
+"assetTransfer_chooseReceivingAccount_enterManually" = "Enter an account address manually";
+"assetTransfer_chooseReceivingAccount_chooseOwnAccount" = "Or choose one of your own accounts";
+"assetTransfer_chooseReceivingAccount_scanQRNavigationTitle" = "Scan QR Code";
+"assetTransfer_chooseReceivingAccount_addressFieldPlaceholder" = "Enter or paste address";
+
+"assetTransfer_fungibleResource_totalExceedsBalance" = "The total amount exceeds your current balance";
+"assetTransfer_fungibleResource_balance" = "Balance: %@";
+
+"assetTransfer_receivingAccount_chooseAccountButton" = "Choose Account";
+"assetTransfer_receivingAccount_addAssetsButton" = "Add Assets";
+
+"assetTransfer_sendTransferButton" = "Send Transfer Request";
+"assetTransfer_accountList_fromLabel" = "From";
+
+"assetTransfer_header_transfer" = "Transfer";
+"assetTransfer_header_addMessageButton" = "Add Message";
+
+"dAppRequest_validationOutcome_subtitleBadContent" = "Invalid content";
+"dAppRequest_validationOutcome_subtitleIncompatibleVersion" = "Incompatible connector extension";
+"dAppRequest_validationOutcome_subtitleWrongNetworkID" = "Network mismatch";
+
+"dAppRequest_validationOutcome_devExplanationBadContent" = "Invalid value of `numberOfAccountsInvalid`: must not be be `exactly(0)` nor can `quantity` be negative";
+"dAppRequest_validationOutcome_devExplanationIncompatibleVersion" = "%@ (CE: %@, wallet: %@)";
+"dAppRequest_validationOutcome_devExplanationInvalidOrigin" = "'%@' is not valid origin.";
+"dAppRequest_validationOutcome_devExplanationInvalidDappDefinitionAddress" = "'%@' is not valid account address.";
+
+"dAppRequest_validationOutcome_shortExplanationBadContent" = "Invalid data in request";
+"dAppRequest_validationOutcome_shortExplanationIncompatibleVersionCEGreater" = "Update Wallet";
+"dAppRequest_validationOutcome_shortExplanationIncompatibleVersionCENotGreater" = "Update Connector Extension";
+"dAppRequest_validationOutcome_shortExplanationInvalidOrigin" = "Invalid origin";
+"dAppRequest_validationOutcome_shortExplanationInvalidDappDefinitionAddress" = "Invalid dAppDefinitionAddress";
+
+"generalSettings_confirmCloudSyncDisableAlert_title" = "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?";
+
+"generalSettings_profileSync_title" = "Sync Wallet Data to iCloud";
+"generalSettings_profileSync_subtitle" = "Warning: If disabled you might lose access to accounts/personas.";
+
+"generalSettings_verboseLedgerMode_title" = "Verbose Ledger transaction signing";
+"generalSettings_verboseLedgerMode_subtitle" = "When signing with your Ledger hardware wallet, should all instructions be displayed?";
+
+"generalSettings_title" = "App Settings";
+//"generalSettings_subtitle" = "Customize your Radix Wallet";
+"generalSettings_developerMode_title" = "Developer Mode";
+"generalSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
+
+"importOlympiaLedgerAccounts_unverifiedAccountsLeft" = "#%d accounts left to import";
+"importOlympiaLedgerAccounts_importLedgersAndAccounts" = "Imported ledgers and accounts";
+"importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";
+
+"restoreFromBackup_navigationTitle" = "Wallet Data Backup";
+
+"restoreFromBackup_importBackupWallet" = "Import Backup Wallet data";
+"restoreFromBackup_cloudBackupWallet" = "Cloud Backup Wallet data:";
+"restoreFromBackup_useICloudBackup" = "Use iCloud Backup Data";
+"restoreFromBackup_noCloudBackup" = "No Cloud Backup Data";
+
+"restoreFromBackup_thisDevice" = "This Device";
+"restoreFromBackup_creatingDevice" = "Creating Device: %@";
+
+"restoreFromBackup_creationDateLabel" = "Creation Date: %@";
+"restoreFromBackup_lastUsedOnDeviceLabel" = "Last used on device: %@";
+"restoreFromBackup_lastModifedDateLabel" = "Last Modified Date: %@";
+"restoreFromBackup_numberOfNetworksLabel" = "Number of networks: %d";
+"restoreFromBackup_totalAccountsNumberLabel" = "Number of total accounts: %d";
+"restoreFromBackup_totalPersonasNumberLabel" = "Number of total personas: %d";
+
+"restoreFromBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
+
+"importLegacyWallet_scannedLabel" = "Scanned: %d/%d";
+
+"importLegacyWallet_alreadyImportedLabel" = "Already imported";
+
+"signing_withDeviceFactorSource_signTransaction" = "Sign transaction with phone";
+"signing_withDeviceFactorSource_idLabel" = "Factor Source ID: %@";
+
+"transactionReview_prepareForSigning_navigationTitle" = "Preparing Transaction";
+"transactionReview_prepareForSigning_body" = "Preparing transaction for signing";
+
+"transactionReview_selectFeePayer_navigationTitle" = "Select Fee Payer";
+"transactionReview_selectFeePayer_selectAccount" = "Select account to pay %@ tx fee with";
+"transactionReview_selectFeePayer_body" = "The transaction you are about to sign does not involve any of your accounts so you must choose an account to pay the transaction fee with.";
+
+"transactionReview_selectFeePayer_confirmButton" = "Confirm Fee Payer";
+
+"transactionReview_submitTransaction_displaySubmitting" = "Submitting";
+"transactionReview_submitTransaction_displaySubmittedUnknown" = "Submitted but not confirmed";
+"transactionReview_submitTransaction_displayRejected" = "Rejected";
+"transactionReview_submitTransaction_displayFailed" = "Failed";
+"transactionReview_submitTransaction_displayCommitted" = "Successfully committed";
+
+"transactionReview_submitTransaction_txID" = "TXID";
+"transactionReview_submitTransaction_status" = "Status";
+"transactionReview_submitTransaction_navigationTitle" = "Submitting Transaction";
+
+"dAppRequest_validationOutcome_shortExplanationP2PError" = "P2P connection error";
+
+"common_optional" = "Optional";
+
+"importMnemonic_offDevice_storyPrimaryHeading" = "Tell a story";
+"importMnemonic_offDevice_storyPlaceholder" = "Hitchcock's The Birds mixed with Office space";
+"importMnemonic_offDevice_storyHint" = "Without revealing the words, what comes to mind when reading this seed phrase?";
+
+"importMnemonic_offDevice_locationPrimaryHeading" = "Backup location?";
+"importMnemonic_offDevice_locationPlaceholder" = "In that book my mother used to read to me at my best childhoods summer vacation place";
+"importMnemonic_offDevice_locationHint" = "Without revealing location, vague hint on where this mnemonic is backed up, if anywhere.";
+
+"importMnemonic_offDevice_saveWithDescription" = "Save with description";
+"importMnemonic_offDevice_saveWithoutDescription" = "Save without description";

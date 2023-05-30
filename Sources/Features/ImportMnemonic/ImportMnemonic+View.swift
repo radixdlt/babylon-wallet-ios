@@ -134,15 +134,13 @@ extension ImportMnemonic.View {
 	@ViewBuilder
 	private func passphrase(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
 		AppTextField(
-			// FIXME: strings
-			primaryHeading: .init(text: "Passhprase", isProminent: false),
-			placeholder: "Passphrase",
+			primaryHeading: .init(text: L10n.ImportMnemonic.passphrase, isProminent: false),
+			placeholder: L10n.ImportMnemonic.passphrasePlaceholder,
 			text: viewStore.binding(
 				get: \.bip39Passphrase,
 				send: { .passphraseChanged($0) }
 			),
-			// FIXME: strings
-			hint: viewStore.isReadonlyMode ? nil : .info("BIP39 Passphrase is often called a '25th word'.")
+			hint: viewStore.isReadonlyMode ? nil : .info(L10n.ImportMnemonic.passphraseHint)
 		)
 		.disabled(viewStore.isReadonlyMode)
 		.autocorrectionDisabled()
@@ -154,11 +152,10 @@ extension ImportMnemonic.View {
 			Button {
 				viewStore.send(.removeRowButtonTapped)
 			} label: {
-				// FIXME: strings
 				HStack {
-					Text("Less words")
+					Text(L10n.ImportMnemonic.fewerWords)
 						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
-					Image(systemName: "text.badge.plus")
+					Image(systemName: "text.badge.minus")
 						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.red1 : .app.white)
 				}
 			}
@@ -169,9 +166,8 @@ extension ImportMnemonic.View {
 			Button {
 				viewStore.send(.addRowButtonTapped)
 			} label: {
-				// FIXME: strings
 				HStack {
-					Text("More words")
+					Text(L10n.ImportMnemonic.moreWords)
 						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
 					Image(systemName: "text.badge.plus")
 						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.green1 : .app.white)
@@ -190,16 +186,13 @@ extension ImportMnemonic.View {
 		) { action in
 			if !viewStore.isReadonlyMode {
 				if viewStore.isNonChecksummed {
-					// FIXME: strings
-					Text("Seed phrase not checksummed")
+					Text(L10n.ImportMnemonic.checksumFailure)
 						.foregroundColor(.app.red1)
 				}
-				// FIXME: strings
-				Button("Import seed phrase", action: action)
+				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
 					.buttonStyle(.primaryRectangular)
 			} else {
-				// FIXME: strings
-				Button("Done") {
+				Button(L10n.Common.done) {
 					viewStore.send(.doneViewing)
 				}
 				.buttonStyle(.primaryRectangular)

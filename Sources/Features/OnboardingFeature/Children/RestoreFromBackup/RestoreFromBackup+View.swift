@@ -21,18 +21,16 @@ extension RestoreFromBackup.View {
 				ScrollView {
 					// TODO: This is speculative design, needs to be updated once we have the proper design
 					VStack(spacing: .medium1) {
-						Button("Import Backup Wallet data") {
+						Button(L10n.RestoreFromBackup.importBackupWallet) {
 							viewStore.send(.tappedImportProfile)
 						}
 						.buttonStyle(.primaryRectangular)
 
 						Separator()
 
-						HStack {
-							Text("Cloud Backup Wallet data: ")
-								.textStyle(.body1Header)
-							Spacer()
-						}
+						Text(L10n.RestoreFromBackup.cloudBackupWallet)
+							.textStyle(.body1Header)
+							.flushedLeft
 
 						if let backupProfileHeaders = viewStore.backupProfileHeaders {
 							Selection(
@@ -47,13 +45,13 @@ extension RestoreFromBackup.View {
 								cloudBackupDataCard(item, thisDeviceID: viewStore.thisDeviceID)
 							}
 
-							Button("Use iCloud Backup Data") {
+							Button(L10n.RestoreFromBackup.useICloudBackup) {
 								viewStore.send(.tappedUseCloudBackup)
 							}
 							.controlState(viewStore.selectedProfileHeader != nil ? .enabled : .disabled)
 							.buttonStyle(.primaryRectangular)
 						} else {
-							Text("No Cloud Backup Data")
+							Text(L10n.RestoreFromBackup.noCloudBackup)
 						}
 					}
 					.padding(.horizontal, .medium3)
@@ -66,7 +64,7 @@ extension RestoreFromBackup.View {
 					allowedContentTypes: [.profile],
 					onCompletion: { viewStore.send(.profileImportResult($0.mapError { $0 as NSError })) }
 				)
-				.navigationTitle("Wallet Data Backup")
+				.navigationTitle(L10n.RestoreFromBackup.navigationTitle)
 				.padding(.top, .medium2)
 				.onAppear {
 					viewStore.send(.appeared)
@@ -79,29 +77,31 @@ extension RestoreFromBackup.View {
 	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>, thisDeviceID: UUID?) -> some View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
-		let creatingDevice = header.creatingDevice.id == thisDeviceID ? "This Device" : header.creatingDevice.description.rawValue
-		let lastUsedOnDevice = header.lastUsedOnDevice.id == thisDeviceID ? "This Device" : header.lastUsedOnDevice.description.rawValue
+
+		let thisDeviceLabel = L10n.RestoreFromBackup.thisDevice
+		let creatingDevice = header.creatingDevice.id == thisDeviceID ? thisDeviceLabel : header.creatingDevice.description.rawValue
+		let lastUsedOnDevice = header.lastUsedOnDevice.id == thisDeviceID ? thisDeviceLabel : header.lastUsedOnDevice.description.rawValue
 
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					// TODO: Proper fields to be updated based on the final UX
-					Text("Creating Device: \(creatingDevice)")
+					Text(L10n.RestoreFromBackup.creatingDevice(creatingDevice))
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 					Group {
-						Text("Creation Date: \(formatDate(header.creationDate))")
-						Text("Last used on device: \(lastUsedOnDevice)")
-						Text("Last Modified Date: \(formatDate(header.lastModified))")
-						Text("Number of networks: \(header.contentHint.numberOfNetworks)")
-						Text("Number of total accounts: \(header.contentHint.numberOfAccountsOnAllNetworksInTotal)")
-						Text("Number of total personas: \(header.contentHint.numberOfPersonasOnAllNetworksInTotal)")
+						Text(L10n.RestoreFromBackup.creationDateLabel(formatDate(header.creationDate)))
+						Text(L10n.RestoreFromBackup.lastUsedOnDeviceLabel(lastUsedOnDevice))
+						Text(L10n.RestoreFromBackup.lastModifedDateLabel(formatDate(header.lastModified)))
+						Text(L10n.RestoreFromBackup.numberOfNetworksLabel(header.contentHint.numberOfNetworks))
+						Text(L10n.RestoreFromBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
+						Text(L10n.RestoreFromBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
 					}
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
-						Text("Incompatible Wallet data")
+						Text(L10n.RestoreFromBackup.incompatibleWalletDataLabel)
 							.foregroundColor(.red)
 							.textStyle(.body2HighImportance)
 					}

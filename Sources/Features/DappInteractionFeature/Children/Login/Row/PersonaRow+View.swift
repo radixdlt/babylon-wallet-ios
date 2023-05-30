@@ -7,13 +7,11 @@ extension PersonaRow {
 		let lastLogin: String?
 
 		init(state: PersonaRow.State) {
-			name = state.persona.displayName.rawValue
+			self.name = state.persona.displayName.rawValue
 
 			if let lastLogin = state.lastLogin {
-				let formatter = DateFormatter()
-				formatter.dateFormat = "d MMM YYY"
-				let formatted = formatter.string(from: lastLogin)
-				self.lastLogin = L10n.DAppRequest.Login.lastLoginWasOn(formatted)
+				let lastLoginString = lastLogin.formatted(date: .abbreviated, time: .omitted)
+				self.lastLogin = L10n.DAppRequest.Login.lastLoginWasOn(lastLoginString)
 			} else {
 				self.lastLogin = nil
 			}

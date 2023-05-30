@@ -38,7 +38,7 @@ extension GeneralSettings {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					coreView(with: viewStore)
-						.navigationTitle(L10n.AppSettings.title)
+						.navigationTitle(L10n.GeneralSettings.title)
 						.onAppear { viewStore.send(.appeared) }
 				}
 			}
@@ -68,8 +68,8 @@ extension GeneralSettings {
 
 		private func isCloudProfileSyncEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			ToggleView(
-				title: "Sync Wallet Data to iCloud",
-				subtitle: "Warning: If disabled you might lose access to accounts/personas.",
+				title: L10n.GeneralSettings.ProfileSync.title,
+				subtitle: L10n.GeneralSettings.ProfileSync.subtitle,
 				isOn: viewStore.binding(
 					get: \.isCloudProfileSyncEnabled,
 					send: { .cloudProfileSyncToggled($0) }
@@ -79,8 +79,8 @@ extension GeneralSettings {
 
 		private func isUsingVerboseLedgerMode(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			ToggleView(
-				title: "Verbose Ledger transaction signing",
-				subtitle: "When signing with your Ledger hardware wallet, should all instructions be displayed?",
+				title: L10n.GeneralSettings.VerboseLedgerMode.title,
+				subtitle: L10n.GeneralSettings.VerboseLedgerMode.subtitle,
 				isOn: viewStore.binding(
 					get: \.useVerboseLedgerDisplayMode,
 					send: { .useVerboseModeToggled($0) }
@@ -90,8 +90,8 @@ extension GeneralSettings {
 
 		private func isDeveloperModeEnabled(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
 			ToggleView(
-				title: L10n.AppSettings.DeveloperMode.title,
-				subtitle: L10n.AppSettings.DeveloperMode.subtitle,
+				title: L10n.GeneralSettings.DeveloperMode.title,
+				subtitle: L10n.GeneralSettings.DeveloperMode.subtitle,
 				isOn: viewStore.binding(
 					get: \.isDeveloperModeEnabled,
 					send: { .developerModeToggled(.init($0)) }

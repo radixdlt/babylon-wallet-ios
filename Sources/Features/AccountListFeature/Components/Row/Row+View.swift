@@ -259,17 +259,13 @@ extension AccountList.Row.ViewState.AccountTag {
 	var display: String {
 		switch self {
 		case .dAppDefinition:
-			// FIXME: change to `L10n.home.accountsTag.dAppDefinition`
-			return "dapp definition"
+			return L10n.HomePage.AccountsTag.dAppDefinition
 		case .legacySoftware:
-			// FIXME: change to `L10n.home.accountsTag.legacySoftware`
-			return L10n.HomePage.legacyAccountHeading // "Legacy"
+			return L10n.HomePage.AccountsTag.legacySoftware
 		case .ledgerLegacy:
-			// FIXME: change to `L10n.home.accountsTag.ledgerLegacy`
-			return "Legacy (Ledger)"
+			return L10n.HomePage.AccountsTag.ledgerLegacy
 		case .ledgerBabylon:
-			// FIXME: change to `L10n.home.accountsTag.ledgerBabylon`
-			return "Ledger"
+			return L10n.HomePage.AccountsTag.ledgerBabylon
 		}
 	}
 }

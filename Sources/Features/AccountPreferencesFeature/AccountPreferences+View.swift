@@ -158,7 +158,7 @@ extension AccountPreferences.View {
 
 	@ViewBuilder
 	private func qrCodeButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Show QR Code") { // FIXME: Add string
+		Button(L10n.AccountSettings.showQR) {
 			viewStore.send(.qrCodeButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -169,7 +169,7 @@ extension AccountPreferences.View {
 extension AccountPreferences.View {
 	@ViewBuilder
 	private func turnIntoDappDefinitionAccountTypeButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Turn into dApp Definition account type") {
+		Button(L10n.AccountSettings.Debug.turnIntoDappDefinition) {
 			viewStore.send(.turnIntoDappDefinitionAccountTypeButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -178,7 +178,7 @@ extension AccountPreferences.View {
 
 	@ViewBuilder
 	private func createAndUploadAuthKeyButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Create & Upload Auth Key") {
+		Button(L10n.AccountSettings.Debug.createAndUploadAuthKey) {
 			viewStore.send(.createAndUploadAuthKeyButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -187,14 +187,14 @@ extension AccountPreferences.View {
 
 	@ViewBuilder
 	private func createFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Create Fungible Token") {
+		Button(L10n.AccountSettings.Debug.createFungibleToken) {
 			viewStore.send(.createFungibleTokenButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		.controlState(viewStore.createFungibleTokenButtonState)
 
 		if viewStore.createFungibleTokenButtonState.isLoading {
-			Text("Creating Token")
+			Text(L10n.AccountSettings.Debug.creatingToken)
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}
@@ -202,14 +202,14 @@ extension AccountPreferences.View {
 
 	@ViewBuilder
 	private func createNonFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Create NFT") {
+		Button(L10n.AccountSettings.Debug.createNFT) {
 			viewStore.send(.createNonFungibleTokenButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		.controlState(viewStore.createNonFungibleTokenButtonState)
 
 		if viewStore.createNonFungibleTokenButtonState.isLoading {
-			Text("Creating NFT")
+			Text(L10n.AccountSettings.Debug.creatingNFT)
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}
@@ -217,14 +217,14 @@ extension AccountPreferences.View {
 
 	@ViewBuilder
 	private func createMultipleFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Create Multiple Fungible Tokens") {
+		Button(L10n.AccountSettings.Debug.createFungibleTokens) {
 			viewStore.send(.createMultipleFungibleTokenButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		.controlState(viewStore.createMultipleFungibleTokenButtonState)
 
 		if viewStore.createMultipleFungibleTokenButtonState.isLoading {
-			Text("Creating Tokens")
+			Text(L10n.AccountSettings.Debug.creatingTokens)
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}
@@ -232,14 +232,14 @@ extension AccountPreferences.View {
 
 	@ViewBuilder
 	private func createMultipleNonFungibleTokenButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
-		Button("Create Multiple NFTs") {
+		Button(L10n.AccountSettings.Debug.createNFTs) {
 			viewStore.send(.createMultipleNonFungibleTokenButtonTapped)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
 		.controlState(viewStore.createMultipleNonFungibleTokenButtonState)
 
 		if viewStore.createMultipleNonFungibleTokenButtonState.isLoading {
-			Text("Creating NFTs")
+			Text(L10n.AccountSettings.Debug.creatingNFTs)
 				.font(.app.body2Regular)
 				.foregroundColor(.app.gray1)
 		}

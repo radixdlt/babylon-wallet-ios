@@ -41,9 +41,9 @@ public struct LedgerRowView: View {
 					Text(viewState.description)
 						.textStyle(.body1Header)
 
-					HPair(label: L10n.CreateEntity.Ledger.usedHeading, item: viewState.lastUsedOn)
+					HPair(label: L10n.LedgerHardwareDevices.usedHeading, item: viewState.lastUsedOn)
 
-					HPair(label: L10n.CreateEntity.Ledger.addedHeading, item: viewState.addedOn)
+					HPair(label: L10n.LedgerHardwareDevices.addedHeading, item: viewState.addedOn)
 				}
 
 				Spacer(minLength: 0)
