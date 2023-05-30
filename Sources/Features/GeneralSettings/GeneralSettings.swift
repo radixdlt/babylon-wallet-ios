@@ -39,7 +39,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 				await send(.internal(.loadPreferences(preferences)))
 
 				do {
-					let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
+					let ledgers = try await factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self)
 					await send(.internal(.hasLedgerHardwareWalletFactorSourcesLoaded(!ledgers.isEmpty)))
 				} catch {
 					loggerGlobal.warning("Failed to load ledgers, error: \(error)")

@@ -200,8 +200,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		state.$ledgers = .loading
 		return .task {
 			let result = await TaskResult {
-				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
-					.compactMap { $0.extract(LedgerHardwareWalletFactorSource.self) }
+				let ledgers = try await factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self)
 				return IdentifiedArray(uniqueElements: ledgers)
 			}
 			return .internal(.loadedLedgers(result))
