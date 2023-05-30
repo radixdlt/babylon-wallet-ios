@@ -2,7 +2,7 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - _EntityCreatingFactorSourceProtocol
-public protocol _EntityCreatingFactorSourceProtocol: BaseFactorSourceProtocol, _FactorSourceHolderProtocol {
+public protocol _EntityCreatingFactorSourceProtocol: BaseFactorSourceProtocol {
 	var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork { get }
 }
 
@@ -116,6 +116,14 @@ extension LedgerHardwareWalletFactorSource: _HDFactorSourceProtocol {}
 
 // MARK: - EntityCreatingFactorSource
 public struct EntityCreatingFactorSource: _EntityCreatingFactorSourceProtocol {
+	public var kind: FactorSourceKind {
+		factorSource.kind
+	}
+
+	public var common: FactorSource.Common {
+		factorSource.common
+	}
+
 	public static var assertedKind: FactorSourceKind? { nil }
 	public static var assertedParameters: FactorSource.CryptoParameters? { nil }
 	public let factorSource: any BaseFactorSourceProtocol
