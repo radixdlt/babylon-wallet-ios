@@ -63,7 +63,7 @@ extension FactorSource {
 
 	public func encode(to encoder: Encoder) throws {
 		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
-		try keyedContainer.encode(kind, forKey: .discriminator)
+		try keyedContainer.encode(kind.discriminator, forKey: .discriminator)
 		switch self {
 		case let .device(device):
 			try keyedContainer.encode(device, forKey: .device)
@@ -76,7 +76,7 @@ extension FactorSource {
 
 	public init(from decoder: Decoder) throws {
 		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try keyedContainer.decode(FactorSourceKind.self, forKey: .discriminator)
+		let discriminator = try keyedContainer.decode(FactorSourceKind.Discriminator.self, forKey: .discriminator)
 		switch discriminator {
 		case .device:
 			self = try .device(

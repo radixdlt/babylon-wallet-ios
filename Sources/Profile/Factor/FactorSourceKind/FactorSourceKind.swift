@@ -45,11 +45,21 @@ public enum FactorSourceKind:
 }
 
 extension FactorSourceKind {
+	public enum Discriminator: String, Codable {
+		case device
+		case ledgerHQHardwareWallet
+		case offDeviceMnemonic
+	}
+
 	public var description: String {
+		discriminator.rawValue
+	}
+
+	public var discriminator: Discriminator {
 		switch self {
-		case .device: return "device"
-		case .ledgerHQHardwareWallet: return "ledgerHQHardwareWallet"
-		case .offDeviceMnemonic: return "offDeviceMnemonic"
+		case .device: return .device
+		case .ledgerHQHardwareWallet: return .ledgerHQHardwareWallet
+		case .offDeviceMnemonic: return .offDeviceMnemonic
 		}
 	}
 
