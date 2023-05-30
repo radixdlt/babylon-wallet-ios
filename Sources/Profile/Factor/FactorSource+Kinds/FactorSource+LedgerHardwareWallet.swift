@@ -56,7 +56,7 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 		public var signingDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode
 	}
 
-	public let common: FactorSource.Common
+	public var common: FactorSource.Common
 	public var hint: Hint
 
 	// FIXME: MFA remove (should not be able to create accounts using ledger when MFA)

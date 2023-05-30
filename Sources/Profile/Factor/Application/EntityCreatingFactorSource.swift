@@ -87,10 +87,6 @@ extension _ApplicationFactorSource {
 	public init(_ applicationFactorSource: some _ApplicationFactorSource) throws {
 		try self.init(factorSource: applicationFactorSource.factorSource)
 	}
-
-	public var supportsOlympia: Bool {
-		cryptoParameters.supportsOlympia
-	}
 }
 
 // MARK: - DisrepancyFactorSourceWrongKind
@@ -121,7 +117,8 @@ public struct EntityCreatingFactorSource: _EntityCreatingFactorSourceProtocol {
 	}
 
 	public var common: FactorSource.Common {
-		factorSource.common
+		get { factorSource.common }
+		set { fatalError("should not be used") }
 	}
 
 	public static var assertedKind: FactorSourceKind? { nil }

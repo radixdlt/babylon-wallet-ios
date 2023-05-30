@@ -16,7 +16,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		return Self(
 			publicKeysFromOnDeviceHD: { request in
-				let factorSourceID = request.hdOnDeviceFactorSource.id
+				let factorSourceID = request.deviceFactorSource.id
 
 				guard
 					let mnemonicWithPassphrase = try await secureStorageClient

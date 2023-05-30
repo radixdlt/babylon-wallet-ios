@@ -25,6 +25,10 @@ extension BaseFactorSourceProtocol {
 	public var lastUsedOn: Date {
 		common.lastUsedOn
 	}
+
+	public var supportsOlympia: Bool {
+		cryptoParameters.supportsOlympia
+	}
 }
 
 // MARK: - FactorSource
@@ -36,7 +40,7 @@ public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable,
 
 extension FactorSource {
 	public var supportsOlympia: Bool {
-		common.cryptoParameters.supportsOlympia
+		property(\.supportsOlympia)
 	}
 
 	public var common: FactorSource.Common {
@@ -219,6 +223,8 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 
 	// Mutable so we can update "lastUsedOn"
 	public var common: FactorSource.Common
+
+	// Mutable so we can update "name"
 	public var hint: Hint
 
 	/// nil for olympia

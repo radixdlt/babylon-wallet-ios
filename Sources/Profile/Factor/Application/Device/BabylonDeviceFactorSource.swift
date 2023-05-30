@@ -11,7 +11,8 @@ public struct BabylonDeviceFactorSource: _EntityCreatingFactorSourceProtocol, Id
 	}
 
 	public var common: FactorSource.Common {
-		deviceFactorSource.common
+		get { deviceFactorSource.common }
+		set { fatalError("should not be used") }
 	}
 
 	public typealias ID = FactorSourceID
