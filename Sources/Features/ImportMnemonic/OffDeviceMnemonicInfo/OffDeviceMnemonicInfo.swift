@@ -1,4 +1,5 @@
 import FeaturePrelude
+import Profile
 
 // MARK: - OffDeviceMnemonicInfo
 public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
@@ -21,8 +22,8 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case done(
-			label: FactorSource.Label,
-			description: FactorSource.Description,
+			story: OffDeviceMnemonicFactorSource.Hint.Story,
+			backupLocationHint: OffDeviceMnemonicFactorSource.Hint.BackupLocation,
 			MnemonicWithPassphrase
 		)
 	}
@@ -42,8 +43,8 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 		case .skipButtonTapped, .saveButtonTapped:
 			return .send(.delegate(
 				.done(
-					label: .init(state.story),
-					description: .init(state.backup),
+					story: .init(state.story),
+					backupLocationHint: .init(state.backup),
 					state.mnemonicWithPassphrase
 				)
 			))

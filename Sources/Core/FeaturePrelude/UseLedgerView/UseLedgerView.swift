@@ -42,7 +42,7 @@ public struct UseLedgerView: SwiftUI.View {
 		self.init(
 			purpose: purpose,
 			id: ledger.id.hex(),
-			name: ledger.hint.name.rawValue ?? "Unnamned",
+			name: ledger.hint.name.rawValue,
 			model: ledger.hint.model.rawValue,
 			lastUsedOn: ledger.lastUsedOn,
 			addedOn: ledger.addedOn
