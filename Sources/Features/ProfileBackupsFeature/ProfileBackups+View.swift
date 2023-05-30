@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ImportMnemonicFeature
 
 extension ProfileBackups {
 	public typealias ViewState = State
@@ -21,9 +22,15 @@ extension ProfileBackups {
 				}
 				.padding(.medium3)
 				.alert(
-					store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
-					state: /ProfileBackups.Alerts.State.confirmCloudSyncDisable,
-					action: ProfileBackups.Alerts.Action.confirmCloudSyncDisable
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ProfileBackups.Destinations.State.confirmCloudSyncDisable,
+					action: ProfileBackups.Destinations.Action.confirmCloudSyncDisable
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ProfileBackups.Destinations.State.importMnemonic,
+					action: ProfileBackups.Destinations.Action.importMnemonic,
+					content: { ImportMnemonic.View(store: $0) }
 				)
 				.fileImporter(
 					isPresented: viewStore.binding(

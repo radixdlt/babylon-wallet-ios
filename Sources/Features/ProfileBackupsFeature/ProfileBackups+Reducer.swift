@@ -3,7 +3,7 @@ import BackupsClient
 import FeaturePrelude
 import ImportMnemonicFeature
 
-// MARK: - ScanQR
+// MARK: - ProfileBackups
 public struct ProfileBackups: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Context: Sendable, Hashable {
@@ -17,6 +17,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
 		public var context: Context
+		public var importedContent: Either<ProfileSnapshot, ProfileSnapshot.Header>?
 
 		var isCloudProfileSyncEnabled: Bool {
 			preferences?.security.isCloudProfileSyncEnabled == true
@@ -27,7 +28,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var alert: Alerts.State?
+		public var destination: Destinations.State?
 
 		public init(
 			context: Context,
@@ -47,7 +48,6 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case cloudProfileSyncToggled(Bool)
-		case alert(PresentationAction<Alerts.Action>)
 		case selectedProfileHeader(ProfileSnapshot.Header?)
 		case tappedImportProfile
 		case dismissFileImporter
@@ -55,21 +55,28 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		case tappedUseCloudBackup
 	}
 
-	public struct Alerts: Sendable, ReducerProtocol {
+	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
+			case importMnemonic(ImportMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case confirmCloudSyncDisable(ConfirmCloudSyncDisable)
+			case importMnemonic(ImportMnemonic.Action)
 
 			public enum ConfirmCloudSyncDisable: Sendable, Hashable {
 				case confirm
 			}
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
-			EmptyReducer()
+		public var body: some ReducerProtocol<State, Action> {
+			Scope(state: /State.confirmCloudSyncDisable, action: /Action.confirmCloudSyncDisable) {
+				EmptyReducer()
+			}
+			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
+				ImportMnemonic()
+			}
 		}
 	}
 
@@ -83,6 +90,10 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		case profileImported
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destinations.Action>)
+	}
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
@@ -91,11 +102,18 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<ProfileBackups> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
+				Destinations()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case let .cloudProfileSyncToggled(isEnabled):
 			if !isEnabled {
-				state.alert = .confirmCloudSyncDisable(.init(
+				state.destination = .confirmCloudSyncDisable(.init(
 					title: {
 						// FIXME: strings
 						TextState("Disabling iCloud sync will delete the iCloud backup data(wallet data will still be kept on this iPhone), are you sure you want to disable iCloud sync?")
@@ -110,13 +128,6 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			} else {
 				return updateCloudSync(state: &state, isEnabled: true)
 			}
-
-		case .alert(.presented(.confirmCloudSyncDisable(.confirm))):
-			state.alert = nil
-			return updateCloudSync(state: &state, isEnabled: false)
-
-		case .alert(.dismiss):
-			return .none
 
 		case .task:
 			return .run { send in
@@ -143,15 +154,12 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 
 		case .tappedUseCloudBackup:
 			guard let selectedProfileHeader = state.selectedProfileHeader else {
+				assertionFailure("Tapped use backup, but didn't select a profile header")
 				return .none
 			}
-
-			return .run { send in
-				try await backupsClient.importCloudProfile(selectedProfileHeader)
-				await send(.delegate(.profileImported))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+			state.importedContent = .right(selectedProfileHeader)
+			showImportMnemonic(state: &state)
+			return .none
 
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
@@ -162,14 +170,15 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			return .none
 
 		case let .profileImportResult(.success(profileURL)):
-			return .run { send in
+			do {
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
 				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
-				try await backupsClient.importProfileSnapshot(snapshot)
-				await send(.delegate(.profileImported))
-			} catch: { error, _ in
+				state.importedContent = .left(snapshot)
+				showImportMnemonic(state: &state)
+			} catch {
 				errorQueue.schedule(error)
 			}
+			return .none
 		}
 	}
 
@@ -185,6 +194,42 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			state.preferences = preferences
 			return .none
 		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .destination(.presented(.importMnemonic(.delegate(.notSavedInProfile(mnemonicWithPassphrase))))):
+			guard let importedContent = state.importedContent else {
+				assertionFailure("Imported mnemonic, but didn't import neither a snapshot or a profile header")
+				return .none
+			}
+
+			return .run { [importedContent] send in
+				switch importedContent {
+				case let .left(snapshot):
+					try await backupsClient.importProfileSnapshot(snapshot, mnemonicWithPassphrase)
+				case let .right(header):
+					try await backupsClient.importCloudProfile(header, mnemonicWithPassphrase)
+				}
+				await send(.delegate(.profileImported))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
+		case .destination(.presented(.confirmCloudSyncDisable(.confirm))):
+			state.destination = nil
+			return updateCloudSync(state: &state, isEnabled: false)
+
+		case .destination(.dismiss):
+			state.destination = nil
+			return .none
+		default:
+			return .none
+		}
+	}
+
+	private func showImportMnemonic(state: inout State) {
+		state.destination = .importMnemonic(.init(persistAsMnemonicKind: .onDevice(.babylon)))
 	}
 
 	private func updateCloudSync(state: inout State, isEnabled: Bool) -> EffectTask<Action> {

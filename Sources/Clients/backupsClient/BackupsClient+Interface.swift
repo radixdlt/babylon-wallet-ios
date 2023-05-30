@@ -24,8 +24,8 @@ public struct BackupsClient: Sendable {
 extension BackupsClient {
 	public typealias LoadProfileBackups = @Sendable () async -> ProfileSnapshot.HeaderList?
 
-	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	public typealias ImportCloudProfile = @Sendable (ProfileSnapshot.Header) async throws -> Void
+	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot, MnemonicWithPassphrase) async throws -> Void
+	public typealias ImportCloudProfile = @Sendable (ProfileSnapshot.Header, MnemonicWithPassphrase) async throws -> Void
 
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
 }
