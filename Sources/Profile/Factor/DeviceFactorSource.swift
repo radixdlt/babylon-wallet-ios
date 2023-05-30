@@ -282,8 +282,8 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 
 	public static func olympia(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		model: Hint.Model,
-		name: Hint.Name,
+		model: Hint.Model = "",
+		name: Hint.Name = "",
 		addedOn: Date = .now,
 		lastUsedOn: Date = .now
 	) throws -> Self {
