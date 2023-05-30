@@ -48,7 +48,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		signingFactor: SigningFactor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		let ledger = try LedgerHardwareWalletFactorSource(factorSource: signingFactor.factorSource)
+		let ledger = try signingFactor.factorSource.extract(as: LedgerHardwareWalletFactorSource.self)
 		let signers = signingFactor.signers
 
 		switch state.signingPurposeWithPayload {
