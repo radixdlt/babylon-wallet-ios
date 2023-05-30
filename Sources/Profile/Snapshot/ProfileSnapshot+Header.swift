@@ -144,7 +144,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 32: rename `genesisFactorInstance` -> `transactionSigning` and add `authSigning`
 	/// - 33: Add snapshot `header`
 	/// - 34: Change `FactorInstance` to hold `badge` being an enum `virtual`/`physical` (change from flat to nested representation of FactorSource storage)
-	public static let minimum: Self = 34
+	/// - 35: Change FactorSource into an enum
+	public static let minimum: Self = 35
 }
 
 extension ProfileSnapshot.Header {

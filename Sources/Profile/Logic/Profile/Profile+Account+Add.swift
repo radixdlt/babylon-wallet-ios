@@ -75,10 +75,24 @@ extension Profile {
 		switch account.securityState {
 		case let .unsecured(entityControl):
 			let factorSourceID = entityControl.transactionSigning.factorSourceID
-//			try self.factorSources.updateFactorSource(id: factorSourceID) {
-//				try $0.increaseNextDerivationIndex(for: account.kind, networkID: account.networkID)
-//			}
-			fatalError()
+			try self.factorSources.updateFactorSource(id: factorSourceID) {
+				try $0.increaseNextDerivationIndex(for: account.kind, networkID: account.networkID)
+			}
+		}
+	}
+}
+
+extension FactorSource {
+	public mutating func increaseNextDerivationIndex(
+		for entityKind: EntityKind,
+		networkID: NetworkID
+	) throws {
+		switch self {
+		case var .device(deviceFactorSource):
+			deviceFactorSource.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
+			self = .device(deviceFactorSource)
+		default:
+			throw DisrepancyFactorSourceWrongKind(expected: .device, actual: kind)
 		}
 	}
 }
