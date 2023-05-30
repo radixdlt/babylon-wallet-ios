@@ -1,13 +1,19 @@
+import CasePaths
 import Prelude
 
 // MARK: - FactorSourceProtocol
-public protocol FactorSourceProtocol: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
+public protocol FactorSourceProtocol:
+	BaseFactorSourceProtocol,
+	Sendable,
+	Hashable,
+	Codable,
+	Identifiable where ID == FactorSourceID
+{
 	static var kind: FactorSourceKind { get }
 	static var casePath: CasePath<FactorSource, Self> { get }
 }
 
 extension FactorSourceProtocol {
-	public typealias ID = FactorSourceID
 	public var id: ID { common.id }
 	public var kind: FactorSourceKind { Self.kind }
 	public var casePath: CasePath<FactorSource, Self> { Self.casePath }
