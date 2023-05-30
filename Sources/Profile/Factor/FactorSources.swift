@@ -36,7 +36,7 @@ extension FactorSources {
 			case let array = self.compactMap({ (factorSource: FactorSource) -> DeviceFactorSource? in
 				guard
 					let device = factorSource.extract(DeviceFactorSource.self),
-					device.supportsOlympia,
+					!device.supportsOlympia,
 					device.nextDerivationIndicesPerNetwork != nil
 				else {
 					return nil
