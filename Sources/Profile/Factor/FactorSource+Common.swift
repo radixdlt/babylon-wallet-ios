@@ -1,3 +1,4 @@
+import Cryptography
 import Prelude
 
 // MARK: - FactorSource.Common
@@ -64,7 +65,8 @@ extension FactorSource.Common {
 			factorSourceKind: factorSourceKind,
 			hdRoot: mnemonicWithPassphrase.hdRoot(),
 			cryptoParameters: cryptoParameters,
-			addedOn: addedOn, lastUsedOn: lastUsedOn
+			addedOn: addedOn,
+			lastUsedOn: lastUsedOn
 		)
 	}
 }
