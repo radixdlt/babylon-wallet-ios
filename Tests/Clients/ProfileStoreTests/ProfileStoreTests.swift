@@ -188,7 +188,6 @@ extension PrivateHDFactorSource {
 	static let testValue: Self = withDependencies {
 		$0.date = .constant(Date(timeIntervalSince1970: 0))
 	} operation: {
-//		Self.testValue(label: deviceLabel, description: deviceDescription)
-		fatalError()
+		Self.testValue(name: deviceName, model: deviceModel)
 	}
 }

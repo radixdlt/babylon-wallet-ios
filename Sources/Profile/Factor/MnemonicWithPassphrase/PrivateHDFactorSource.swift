@@ -21,29 +21,26 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 	struct CriticalDisrepancyBetweenFactorSourceID: Swift.Error {}
 }
 
-// #if DEBUG
-// extension PrivateHDFactorSource {
-//	public static func testValue(
-//		label: FactorSource.Label,
-//		description: FactorSource.Description
-//	) -> Self {
-//		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
-//
-//		let factorSource = try! FactorSource(
-//			kind: .device,
-//			id: FactorSource.id(fromRoot: mnemonicWithPassphrase.hdRoot()),
-//			label: label,
-//			description: description,
-//			cryptoParameters: .babylon,
-//			storage: .entityCreating(.init()),
-//			addedOn: .init(timeIntervalSince1970: 0),
-//			lastUsedOn: .init(timeIntervalSince1970: 0)
-//		)
-//
-//		return try! .init(
-//			mnemonicWithPassphrase: mnemonicWithPassphrase,
-//			factorSource: factorSource
-//		)
-//	}
-// }
-// #endif
+#if DEBUG
+extension PrivateHDFactorSource {
+	public static func testValue(
+		name: DeviceFactorSource.Hint.Name,
+		model: DeviceFactorSource.Hint.Model
+	) -> Self {
+		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
+
+		let deviceFactorSource = try! DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			model: model,
+			name: name,
+			addedOn: .init(timeIntervalSince1970: 0),
+			lastUsedOn: .init(timeIntervalSince1970: 0)
+		)
+
+		return try! .init(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			factorSource: deviceFactorSource
+		)
+	}
+}
+#endif
