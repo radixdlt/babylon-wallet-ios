@@ -42,331 +42,318 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(factorSourceID.hex(), "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
-//	func test_blake_hash() throws {
-//		// https://github.com/radixdlt/radixdlt-scrypto/blob/2cdf297f6c7d8e52fd96bb964217a4833306e1ec/radix-engine-common/src/crypto/blake2b.rs#L15-L22
-//		let digest = try blake2b(data: "Hello Radix".data(using: .utf8)!)
-//		XCTAssertEqual(digest.hex, "48f1bd08444b5e713db9e14caac2faae71836786ac94d645b00679728202a935")
-//	}
-//
-//	func test_factor_source_id_ledger() throws {
-//		let curve25519FactorSourceMnemonic = try Mnemonic(
-//			phrase: "equip will roof matter pink blind book anxiety banner elbow sun young",
-//			language: .english
-//		)
-//		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
-//		let key = try root.derivePublicKey(
-//			path: .getID,
-//			curve: Curve25519.self
-//		)
-//
-//		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "e358493920c6f967dc16eff9943fcd5765ab8f42b338ee6769d8ba7f1b9e097f")
-//		let factorSourceID = try FactorSource.id(fromRoot: root)
-//		XCTAssertEqual(factorSourceID.hex(), "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
-//	}
-//
-//	func test_factorSourceID_zoo_zoo__wrong() throws {
-//		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-//		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot()).hex(), "09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
-//		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo")).hex(), "537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
-//	}
-//
-//	func test_factor_source_id_cap33() async throws {
-//		let curve25519FactorSourceMnemonic = try Mnemonic(
-//			phrase: "surprise jaguar gloom bring cage obey rotate fiber agree castle rich tomorrow",
-//			language: .english
-//		)
-//		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
-//		let key = try root.derivePublicKey(
-//			path: .init(
-//				children: [
-//					.bip44Purpose,
-//					.coinType,
-//					.getID,
-//				],
-//				onlyPublic: false
-//			),
-//			curve: Curve25519.self
-//		)
-//
-//		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "156220ef37c5cd3e6da10cdfdba8a0d87ddc4411b4829f60155db3f6bbafc9f8")
-//		let factorSourceID = try FactorSource.id(fromRoot: root)
-//		XCTAssertEqual(factorSourceID.hex(), "56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
-//	}
-//
-//	func test_hdOnDeviceFactorSource() throws {
-//		let secp256K1FactorMnemonic = try Mnemonic(
-//			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
-//			language: .english
-//		)
-//		try withDependencies {
-//			$0.date = .constant(stableDate)
-//			$0.uuid = .constant(stableUUID)
-//		} operation: {
-//			XCTAssertNoThrow(
-	////                try FactorSource.olympia(
-	////				mnemonic: secp256K1FactorMnemonic,
-	////				model: deviceFactorModel,
-	////				name: deviceFactorName
-	////			)
-	//                DeviceFactorSource.init(common: <#T##FactorSource.Common#>, hint: <#T##DeviceFactorSource.Hint#>)
-	//            )
-//		}
-//	}
-	/*
-	 func test_new_profile() async throws {
-	 	continueAfterFailure = false
+	func test_blake_hash() throws {
+		// https://github.com/radixdlt/radixdlt-scrypto/blob/2cdf297f6c7d8e52fd96bb964217a4833306e1ec/radix-engine-common/src/crypto/blake2b.rs#L15-L22
+		let digest = try blake2b(data: "Hello Radix".data(using: .utf8)!)
+		XCTAssertEqual(digest.hex, "48f1bd08444b5e713db9e14caac2faae71836786ac94d645b00679728202a935")
+	}
 
-	 	let curve25519FactorSourceMnemonic = try Mnemonic(
-	 		phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
-	 		language: .english
-	 	)
-	 	let secp256K1FactorMnemonic = try Mnemonic(
-	 		phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
-	 		language: .english
-	 	)
-	 	let networkID = gateway.network.id
+	func test_factor_source_id_ledger() throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "equip will roof matter pink blind book anxiety banner elbow sun young",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
+		let key = try root.derivePublicKey(
+			path: .getID,
+			curve: Curve25519.self
+		)
 
-	 	let (_profile, babylonFactorSource, olympiaFactorSource) = try withDependencies {
-	 		$0.date = .constant(stableDate)
-	 		$0.uuid = .constant(stableUUID)
-	 	} operation: {
-	 		let babylonFactorSource = try FactorSource.babylon(
-	 			mnemonic: curve25519FactorSourceMnemonic,
-	 			label: factorSourceLabel,
-	 			description: factorSourceDescription
-	 		)
-	 		let olympiaFactorSource = try FactorSource.olympia(
-	 			mnemonic: secp256K1FactorMnemonic,
-	 			label: factorSourceLabel,
-	 			description: factorSourceDescription
-	 		)
+		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "e358493920c6f967dc16eff9943fcd5765ab8f42b338ee6769d8ba7f1b9e097f")
+		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
+		XCTAssertEqual(factorSourceID.hex(), "de41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
+	}
 
-	 		let profile = Profile(
-	 			header: snapshotHeader,
-	 			factorSources: .init(babylonFactorSource.factorSource),
-	 			appPreferences: .init(gateways: .init(current: gateway))
-	 		)
+	func test_factorSourceID_zoo_zoo__wrong() throws {
+		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(), factorSourceKind: .device).hex(), "de09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo"), factorSourceKind: .device).hex(), "de537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
+	}
 
-	 		return (profile, babylonFactorSource, olympiaFactorSource)
-	 	}
+	func test_factor_source_id_cap33() async throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "surprise jaguar gloom bring cage obey rotate fiber agree castle rich tomorrow",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
+		let key = try root.derivePublicKey(
+			path: .init(
+				children: [
+					.bip44Purpose,
+					.coinType,
+					.getID,
+				],
+				onlyPublic: false
+			),
+			curve: Curve25519.self
+		)
 
-	 	var profile = _profile
-	 	XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
-	 	XCTAssertNil(olympiaFactorSource.factorSource.storage)
-	 	profile.factorSources.append(olympiaFactorSource.factorSource)
+		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "156220ef37c5cd3e6da10cdfdba8a0d87ddc4411b4829f60155db3f6bbafc9f8")
+		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
+		XCTAssertEqual(factorSourceID.hex(), "de56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
+	}
 
-	 	func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-	 		let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(
-	 			kind: .account,
-	 			networkID: profile.networkID
-	 		)
+	func test_hdOnDeviceFactorSource() throws {
+		let mnemonic = try Mnemonic(
+			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
+			language: .english
+		)
+		try withDependencies {
+			$0.date = .constant(stableDate)
+			$0.uuid = .constant(stableUUID)
+		} operation: {
+			XCTAssertNoThrow(
+				try DeviceFactorSource.olympia(mnemonic: mnemonic, model: deviceFactorModel, name: deviceFactorName)
+			)
+		}
+	}
 
-	 		let derivationPath = try AccountBabylonDerivationPath(
-	 			networkID: networkID,
-	 			index: index,
-	 			keyKind: .transactionSigning
-	 		)
-	 		let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
+	func test_new_profile() async throws {
+		continueAfterFailure = false
 
-	 		let publicKey = try hdRoot.derivePublicKey(
-	 			path: .init(
-	 				scheme: .cap26,
-	 				path: derivationPath.derivationPath
-	 			),
-	 			curve: .curve25519
-	 		)
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
+			language: .english
+		)
+		let secp256K1FactorMnemonic = try Mnemonic(
+			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
+			language: .english
+		)
+		let networkID = gateway.network.id
 
-	 		let factorInstance = HierarchicalDeterministicFactorInstance(
-	 			factorSourceID: babylonFactorSource.id,
-	 			publicKey: publicKey,
-	 			derivationPath: derivationPath.wrapAsDerivationPath()
-	 		)
+		let (_profile, babylonFactorSource, olympiaFactorSource) = try withDependencies {
+			$0.date = .constant(stableDate)
+			$0.uuid = .constant(stableUUID)
+		} operation: {
+			let babylonFactorSource = try DeviceFactorSource.babylon(
+				mnemonic: curve25519FactorSourceMnemonic,
+				model: deviceFactorModel,
+				name: deviceFactorName
+			)
+			let olympiaFactorSource = try DeviceFactorSource.olympia(
+				mnemonic: secp256K1FactorMnemonic,
+				model: deviceFactorModel,
+				name: deviceFactorName
+			)
 
-	 		var account = try Profile.Network.Account(
-	 			networkID: networkID,
-	 			factorInstance: factorInstance,
-	 			displayName: name,
-	 			extraProperties: .init(appearanceID: .fromIndex(Int(index)))
-	 		)
+			let profile = Profile(
+				header: snapshotHeader,
+				deviceFactorSource: babylonFactorSource,
+				appPreferences: .init(gateways: .init(current: gateway))
+			)
 
-	 		if case var .unsecured(control) = account.securityState {
-	 			let path = try derivationPath.switching(keyKind: .authenticationSigning)
-	 			let authPublicKey = try hdRoot.derivePublicKey(
-	 				path: .init(
-	 					scheme: .cap26,
-	 					path: path.derivationPath
-	 				),
-	 				curve: .curve25519
-	 			)
+			return (profile, babylonFactorSource, olympiaFactorSource)
+		}
 
-	 			control.authenticationSigning = HierarchicalDeterministicFactorInstance(
-	 				factorSourceID: babylonFactorSource.id,
-	 				publicKey: authPublicKey,
-	 				derivationPath: path.wrapAsDerivationPath()
-	 			)
-	 			account.securityState = .unsecured(control)
-	 		}
+		var profile = _profile
+		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
+		profile.factorSources.append(olympiaFactorSource)
 
-	 		try profile.addAccount(account)
+		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
+			let index = profile.factorSources.babylonDevice.nextDerivationIndicesPerNetwork.nextForEntity(
+				kind: .account,
+				networkID: profile.networkID
+			)
 
-	 		XCTAssertEqual(profile.network?.networkID, gateway.network.id)
-	 		XCTAssertEqual(profile.network?.networkID, networkID)
+			let derivationPath = try AccountBabylonDerivationPath(
+				networkID: networkID,
+				index: index,
+				keyKind: .transactionSigning
+			)
+			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
-	 		return account
-	 	}
+			let publicKey = try hdRoot.derivePublicKey(
+				path: .init(
+					scheme: .cap26,
+					path: derivationPath.derivationPath
+				),
+				curve: .curve25519
+			)
 
-	 	func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-	 		let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID)
+			let factorInstance = HierarchicalDeterministicFactorInstance(
+				factorSourceID: babylonFactorSource.id,
+				publicKey: publicKey,
+				derivationPath: derivationPath.wrapAsDerivationPath()
+			)
 
-	 		let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
-	 			networkID: networkID,
-	 			index: index,
-	 			keyKind: .transactionSigning
-	 		)
-	 		let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
+			var account = try Profile.Network.Account(
+				networkID: networkID,
+				factorInstance: factorInstance,
+				displayName: name,
+				extraProperties: .init(appearanceID: .fromIndex(Int(index)))
+			)
 
-	 		let publicKey = try hdRoot.derivePublicKey(
-	 			path: .init(
-	 				scheme: .cap26,
-	 				path: derivationPath.derivationPath
-	 			),
-	 			curve: .curve25519
-	 		)
+			if case var .unsecured(control) = account.securityState {
+				let path = try derivationPath.switching(keyKind: .authenticationSigning)
+				let authPublicKey = try hdRoot.derivePublicKey(
+					path: .init(
+						scheme: .cap26,
+						path: path.derivationPath
+					),
+					curve: .curve25519
+				)
 
-	 		let factorInstance = HierarchicalDeterministicFactorInstance(
-	 			factorSourceID: babylonFactorSource.id,
-	 			publicKey: publicKey,
-	 			derivationPath: derivationPath.wrapAsDerivationPath()
-	 		)
+				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
+					factorSourceID: babylonFactorSource.id,
+					publicKey: authPublicKey,
+					derivationPath: path.wrapAsDerivationPath()
+				)
+				account.securityState = .unsecured(control)
+			}
 
-	 		var persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
+			try profile.addAccount(account)
 
-	 		if case var .unsecured(control) = persona.securityState {
-	 			let path = try derivationPath.switching(keyKind: .authenticationSigning)
-	 			let authPublicKey = try hdRoot.derivePublicKey(
-	 				path: .init(
-	 					scheme: .cap26,
-	 					path: path.derivationPath
-	 				),
-	 				curve: .curve25519
-	 			)
+			XCTAssertEqual(profile.network?.networkID, gateway.network.id)
+			XCTAssertEqual(profile.network?.networkID, networkID)
 
-	 			control.authenticationSigning = HierarchicalDeterministicFactorInstance(
-	 				factorSourceID: babylonFactorSource.id,
-	 				publicKey: authPublicKey,
-	 				derivationPath: path.wrapAsDerivationPath()
-	 			)
-	 			persona.securityState = .unsecured(control)
-	 		}
+			return account
+		}
 
-	 		try profile.addPersona(persona)
+		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
+			let derivationPath = try profile.factorSources.babylonDevice.derivationPathForNextEntity(kind: .identity, networkID: profile.networkID)
+			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
-	 		XCTAssertEqual(profile.network?.networkID, gateway.network.id)
-	 		XCTAssertEqual(profile.network?.networkID, networkID)
+			let publicKey = try hdRoot.derivePublicKey(
+				path: .init(
+					scheme: .cap26,
+					path: derivationPath.path
+				),
+				curve: .curve25519
+			)
 
-	 		return persona
-	 	}
+			let factorInstance = HierarchicalDeterministicFactorInstance(
+				factorSourceID: babylonFactorSource.id,
+				publicKey: publicKey,
+				derivationPath: derivationPath
+			)
 
-	 	let firstAccount = try addNewAccount("First")
-	 	XCTAssertEqual(try profile.network(id: networkID).accounts.count, 1)
-	 	XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
-	 	let secondAccount = try addNewAccount("Second")
-	 	XCTAssertEqual(try profile.network(id: networkID).accounts.count, 2)
-	 	XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
-	 	XCTAssertEqual(try profile.network(id: networkID).accounts.last!, secondAccount)
+			var persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
 
-	 	let thirdAccount = try addNewAccount("Third")
+			if case var .unsecured(control) = persona.securityState {
+				let path = try derivationPath.asIdentityPath().switching(keyKind: .authenticationSigning)
+				let authPublicKey = try hdRoot.derivePublicKey(
+					path: .init(
+						scheme: .cap26,
+						path: path.derivationPath
+					),
+					curve: .curve25519
+				)
 
-	 	let firstPersona = try addNewPersona("Mrs Incognito", fields: [
-	 		.init(id: .givenName, value: "Jane"),
-	 		.init(id: .familyName, value: "Incognitoson"),
-	 	])
-	 	let secondPersona = try addNewPersona("Mrs Public", fields: [
-	 		.init(id: .givenName, value: "Maria"),
-	 		.init(id: .familyName, value: "Publicson"),
-	 	])
+				control.authenticationSigning = HierarchicalDeterministicFactorInstance(
+					factorSourceID: babylonFactorSource.id,
+					publicKey: authPublicKey,
+					derivationPath: path.wrapAsDerivationPath()
+				)
+				persona.securityState = .unsecured(control)
+			}
 
-	 	XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+			try profile.addPersona(persona)
 
-	 	let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
-	 	XCTAssertNotNil(profile.appendP2PLink(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
-	 	// Should not be possible to add a client with the same password
-	 	XCTAssertNil(profile.appendP2PLink(
-	 		P2PLink(
-	 			connectionPassword: connectionPassword,
-	 			displayName: "irrelevant"
-	 		)
-	 	), "Should not be possible to add another P2PLink with same password")
+			XCTAssertEqual(profile.network?.networkID, gateway.network.id)
+			XCTAssertEqual(profile.network?.networkID, networkID)
 
-	 	XCTAssertNotNil(profile.appendP2PLink(
-	 		P2PLink(
-	 			connectionPassword: try! ConnectionPassword(.init(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef")),
-	 			displayName: "iPhone 13"
-	 		)
-	 	))
+			return persona
+		}
 
-	 	XCTAssertEqual(profile.networks.count, 1)
-	 	let network = try profile.network(id: networkID)
-	 	XCTAssertEqual(network.networkID, networkID)
-	 	XCTAssertEqual(network.accounts.count, 3)
-	 	XCTAssertEqual(network.personas.count, 2)
+		let firstAccount = try addNewAccount("First")
+		XCTAssertEqual(try profile.network(id: networkID).accounts.count, 1)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
+		let secondAccount = try addNewAccount("Second")
+		XCTAssertEqual(try profile.network(id: networkID).accounts.count, 2)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.first, firstAccount)
+		XCTAssertEqual(try profile.network(id: networkID).accounts.last!, secondAccount)
 
-	 	let authorizedDapp = try profile.addAuthorizedDapp(
-	 		.init(
-	 			networkID: networkID,
-	 			dAppDefinitionAddress: .init(address: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"),
-	 			displayName: "RadiSwap",
-	 			referencesToAuthorizedPersonas:
-	 			.init(arrayLiteral:
-	 				.init(
-	 					identityAddress: firstPersona.address,
-	 					lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
-	 					sharedAccounts: .init(
-	 						accountsReferencedByAddress: [
-	 							secondAccount.address,
-	 							thirdAccount.address,
-	 						],
-	 						forRequest: .exactly(2)
-	 					),
-	 					sharedFieldIDs: .init(firstPersona.fields.map(\.id))
-	 				),
-	 				.init(
-	 					identityAddress: secondPersona.address,
-	 					lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
-	 					sharedAccounts: .init(
-	 						accountsReferencedByAddress: [
-	 							secondAccount.address,
-	 						],
-	 						forRequest: .atLeast(1)
-	 					),
-	 					sharedFieldIDs: .init(secondPersona.fields.map(\.id))
-	 				))
-	 		)
-	 	)
-	 	let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
-	 	var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
-	 	XCTAssertThrowsError(
-	 		try authorizedPersona0SharedAccounts.updateAccounts([secondAccount.address]),
-	 		"Should not be able to specify another number of accounts if `exactly` was specified."
-	 	)
+		let thirdAccount = try addNewAccount("Third")
 
-	 	let authorizedPersona1 = authorizedDapp.referencesToAuthorizedPersonas[1]
-	 	var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
-	 	XCTAssertNoThrow(
-	 		try authorizedPersona1SharedAccounts.updateAccounts([
-	 			secondAccount.address,
-	 			thirdAccount.address,
-	 		]), "Should be able to specify more accounts if `atLeast` was specified."
-	 	)
+		let firstPersona = try addNewPersona("Mrs Incognito", fields: [
+			.init(id: .givenName, value: "Jane"),
+			.init(id: .familyName, value: "Incognitoson"),
+		])
+		let secondPersona = try addNewPersona("Mrs Public", fields: [
+			.init(id: .givenName, value: "Maria"),
+			.init(id: .familyName, value: "Publicson"),
+		])
 
-	 	let snapshot = profile.snapshot()
-	 	let jsonEncoder = JSONEncoder.iso8601
-	 	XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
-	 	// Uncomment the lines below to generate a new test vector
-	 	let data = try jsonEncoder.encode(snapshot)
-	 	print(String(data: data, encoding: .utf8)!)
-	 }
-	 */
+		XCTAssertTrue(profile.appPreferences.security.isCloudProfileSyncEnabled, "iCloud sync should be opt-out.")
+
+		let connectionPassword = try ConnectionPassword(.init(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf"))
+		XCTAssertNotNil(profile.appendP2PLink(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
+		// Should not be possible to add a client with the same password
+		XCTAssertNil(profile.appendP2PLink(
+			P2PLink(
+				connectionPassword: connectionPassword,
+				displayName: "irrelevant"
+			)
+		), "Should not be possible to add another P2PLink with same password")
+
+		XCTAssertNotNil(profile.appendP2PLink(
+			P2PLink(
+				connectionPassword: try! ConnectionPassword(.init(hex: "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef")),
+				displayName: "iPhone 13"
+			)
+		))
+
+		XCTAssertEqual(profile.networks.count, 1)
+		let network = try profile.network(id: networkID)
+		XCTAssertEqual(network.networkID, networkID)
+		XCTAssertEqual(network.accounts.count, 3)
+		XCTAssertEqual(network.personas.count, 2)
+
+		let authorizedDapp = try profile.addAuthorizedDapp(
+			.init(
+				networkID: networkID,
+				dAppDefinitionAddress: .init(address: "account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"),
+				displayName: "RadiSwap",
+				referencesToAuthorizedPersonas:
+				.init(arrayLiteral:
+					.init(
+						identityAddress: firstPersona.address,
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						sharedAccounts: .init(
+							accountsReferencedByAddress: [
+								secondAccount.address,
+								thirdAccount.address,
+							],
+							forRequest: .exactly(2)
+						),
+						sharedFieldIDs: .init(firstPersona.fields.map(\.id))
+					),
+					.init(
+						identityAddress: secondPersona.address,
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						sharedAccounts: .init(
+							accountsReferencedByAddress: [
+								secondAccount.address,
+							],
+							forRequest: .atLeast(1)
+						),
+						sharedFieldIDs: .init(secondPersona.fields.map(\.id))
+					))
+			)
+		)
+		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
+		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
+		XCTAssertThrowsError(
+			try authorizedPersona0SharedAccounts.updateAccounts([secondAccount.address]),
+			"Should not be able to specify another number of accounts if `exactly` was specified."
+		)
+
+		let authorizedPersona1 = authorizedDapp.referencesToAuthorizedPersonas[1]
+		var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
+		XCTAssertNoThrow(
+			try authorizedPersona1SharedAccounts.updateAccounts([
+				secondAccount.address,
+				thirdAccount.address,
+			]), "Should be able to specify more accounts if `atLeast` was specified."
+		)
+
+		let snapshot = profile.snapshot()
+		let jsonEncoder = JSONEncoder.iso8601
+		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
+		// Uncomment the lines below to generate a new test vector
+		let data = try jsonEncoder.encode(snapshot)
+		print(String(data: data, encoding: .utf8)!)
+	}
 
 	/*
 	 func test_decode() throws {
@@ -584,5 +571,27 @@ extension EntityProtocol {
 		case let .unsecured(control):
 			return control.authenticationSigning?.publicKey
 		}
+	}
+}
+
+extension DeviceFactorSource {
+	public static func babylon(
+		mnemonic: Mnemonic,
+		model: Hint.Model,
+		name: Hint.Name,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self.babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
+	}
+
+	public static func olympia(
+		mnemonic: Mnemonic,
+		model: Hint.Model,
+		name: Hint.Name,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self.olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
 	}
 }

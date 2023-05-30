@@ -23,7 +23,18 @@ public protocol _FactorSourceHolderProtocol:
 	Hashable,
 	Identifiable
 {
-	var factorSource: FactorSource { get }
+	var factorSource: any BaseFactorSourceProtocol { get }
+}
+
+extension _FactorSourceHolderProtocol {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.id == rhs.id
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(id)
+		hasher.combine(common)
+	}
 }
 
 extension _FactorSourceHolderProtocol {
@@ -39,13 +50,18 @@ public protocol _ApplicationFactorSource:
 {
 	static var assertedKind: FactorSourceKind? { get }
 	static var assertedParameters: FactorSource.CryptoParameters? { get }
-	init(factorSource: FactorSource) throws
+//	init(factorSource: FactorSource) throws
+	init(factorSource: any BaseFactorSourceProtocol) throws
 }
 
 extension _ApplicationFactorSource {
+//	public  {
+//		try self.init(factorSource: factorSource.embed())
+//	}
+
 	public static var assertedParameters: FactorSource.CryptoParameters? { nil }
 
-	public static func validating(factorSource: FactorSource) throws -> FactorSource {
+	public static func validating(factorSource: any BaseFactorSourceProtocol) throws -> any BaseFactorSourceProtocol {
 		if
 			let expectedFactorSourceKind = Self.assertedKind,
 			factorSource.kind != expectedFactorSourceKind
@@ -102,10 +118,10 @@ extension LedgerHardwareWalletFactorSource: _HDFactorSourceProtocol {}
 public struct EntityCreatingFactorSource: _EntityCreatingFactorSourceProtocol {
 	public static var assertedKind: FactorSourceKind? { nil }
 	public static var assertedParameters: FactorSource.CryptoParameters? { nil }
-	public let factorSource: FactorSource
+	public let factorSource: any BaseFactorSourceProtocol
 	public let nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
 
-	public init(factorSource: FactorSource) throws {
+	public init(factorSource: any BaseFactorSourceProtocol) throws {
 //		self.factorSource = try Self.validating(factorSource: factorSource)
 //		self.entityCreatingStorage = try factorSource.entityCreatingStorage()
 		fatalError()

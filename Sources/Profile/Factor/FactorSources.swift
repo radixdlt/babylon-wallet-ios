@@ -2,6 +2,12 @@ import Prelude
 
 public typealias FactorSources = NonEmpty<IdentifiedArrayOf<FactorSource>>
 
+extension FactorSources {
+	public mutating func append(_ newElement: any FactorSourceProtocol) {
+		append(newElement.embed())
+	}
+}
+
 // MARK: - FactorSourceWithIDNotFound
 struct FactorSourceWithIDNotFound: Swift.Error {}
 extension FactorSources {

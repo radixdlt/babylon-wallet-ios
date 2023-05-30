@@ -9,15 +9,23 @@ public struct BabylonDeviceFactorSource: _EntityCreatingFactorSourceProtocol, _A
 	public static let assertedKind: FactorSourceKind? = .device
 	public static let assertedParameters: FactorSource.CryptoParameters? = .babylon
 
-	public let factorSource: FactorSource
+	public let factorSource: any BaseFactorSourceProtocol
 	public let nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork
 
-	public init(factorSource: FactorSource) throws {
-//		self.factorSource = try Self.validating(factorSource: factorSource)
-//		self.entityCreatingStorage = try factorSource.entityCreatingStorage()
-		fatalError()
+	public init(factorSource: any BaseFactorSourceProtocol) throws {
+		self.factorSource = try Self.validating(factorSource: factorSource)
+		guard let deviceFactorSource = factorSource as? DeviceFactorSource else {
+			throw DisrepancyFactorSourceWrongKind(expected: .device, actual: factorSource.kind)
+		}
+		guard let nextDerivationIndicesPerNetwork = deviceFactorSource.nextDerivationIndicesPerNetwork else {
+			throw ExpectedNextDerivationIndicesPerNetwork()
+		}
+		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
 	}
 }
+
+// MARK: - ExpectedNextDerivationIndicesPerNetwork
+struct ExpectedNextDerivationIndicesPerNetwork: Swift.Error {}
 
 // #if DEBUG
 // extension BabylonDeviceFactorSource {
