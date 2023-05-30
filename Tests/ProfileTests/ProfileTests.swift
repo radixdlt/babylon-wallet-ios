@@ -19,29 +19,29 @@ final class ProfileTests: TestCase {
 		XCTAssertNil(clients.append(second))
 	}
 
-//	func test_factor_source_id() async throws {
-//		let curve25519FactorSourceMnemonic = try Mnemonic(
-//			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
-//			language: .english
-//		)
-//		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
-//		let key = try root.derivePublicKey(
-//			path: .init(
-//				children: [
-//					.bip44Purpose,
-//					.coinType,
-//					.getID,
-//				],
-//				onlyPublic: false
-//			),
-//			curve: Curve25519.self
-//		)
-//
-//		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "3b4fc51ce164be26723264f0a78b7e5ab44a143520c77e0e82bfbb9642e9cfd4")
-//		let factorSourceID = try FactorSource.id(fromRoot: root)
-//		XCTAssertEqual(factorSourceID.hex(), "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
-//	}
-//
+	func test_factor_source_id() async throws {
+		let curve25519FactorSourceMnemonic = try Mnemonic(
+			phrase: "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate",
+			language: .english
+		)
+		let root = try HD.Root(seed: curve25519FactorSourceMnemonic.seed())
+		let key = try root.derivePublicKey(
+			path: .init(
+				children: [
+					.bip44Purpose,
+					.coinType,
+					.getID,
+				],
+				onlyPublic: false
+			),
+			curve: Curve25519.self
+		)
+
+		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "3b4fc51ce164be26723264f0a78b7e5ab44a143520c77e0e82bfbb9642e9cfd4")
+		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
+		XCTAssertEqual(factorSourceID.hex(), "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
+	}
+
 //	func test_blake_hash() throws {
 //		// https://github.com/radixdlt/radixdlt-scrypto/blob/2cdf297f6c7d8e52fd96bb964217a4833306e1ec/radix-engine-common/src/crypto/blake2b.rs#L15-L22
 //		let digest = try blake2b(data: "Hello Radix".data(using: .utf8)!)
