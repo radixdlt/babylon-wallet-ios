@@ -53,16 +53,17 @@ extension DeviceFactorSource {
 		model: Hint.Model = "",
 		name: Hint.Name = "",
 		isOlympiaCompatible: Bool,
-		addedOn: Date,
-		lastUsedOn: Date
+		addedOn: Date? = nil,
+		lastUsedOn: Date? = nil
 	) throws -> Self {
-		try Self(
+		@Dependency(\.date) var date
+		return try Self(
 			common: .from(
 				factorSourceKind: .device,
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
-				addedOn: addedOn,
-				lastUsedOn: lastUsedOn
+				addedOn: addedOn ?? date(),
+				lastUsedOn: lastUsedOn ?? date()
 			),
 			hint: .init(name: name, model: model),
 			nextDerivationIndicesPerNetwork: isOlympiaCompatible ? nil : .init()
