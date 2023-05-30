@@ -95,11 +95,11 @@ extension FactorSourcesClient {
 		return try factorSource.extract(as: DeviceFactorSource.self)
 	}
 
-	public func getFactorSource(
+	public func getFactorSource<Source: FactorSourceProtocol>(
 		id: FactorSourceID,
-		ensureKind kind: FactorSourceKind
-	) async throws -> FactorSource? {
-		try await getFactorSource(id: id) { $0.kind == kind }
+		as _: Source.Type
+	) async throws -> Source? {
+		try await getFactorSource(id: id)?.extract(Source.self)
 	}
 
 	public func getFactorSource(
@@ -114,10 +114,10 @@ extension FactorSourcesClient {
 		try await IdentifiedArrayOf(uniqueElements: getFactorSources().filter(filter))
 	}
 
-	public func getFactorSources(
-		ofKind kind: FactorSourceKind
-	) async throws -> IdentifiedArrayOf<FactorSource> {
-		try await getFactorSources(matching: { $0.kind == kind })
+	public func getFactorSources<Source: FactorSourceProtocol>(
+		type _: Source.Type
+	) async throws -> IdentifiedArrayOf<Source> {
+		try await IdentifiedArrayOf(uniqueElements: getFactorSources().compactMap { $0.extract(Source.self) })
 	}
 }
 

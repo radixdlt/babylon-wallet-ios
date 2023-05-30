@@ -22,6 +22,7 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case failedToFindFactorSource
 		case entityAlreadyHasAuthenticationSigningKey
 		case gotDerivationPath(DerivationPath, FactorSource)
 	}
@@ -77,7 +78,9 @@ public struct GetAuthKeyDerivationPath: Sendable, FeatureReducer {
 				}
 
 				guard let factorSource = try await factorSourcesClient.getFactorSource(id: factorSourceID) else {
-					fatalError()
+					loggerGlobal.error("Failed to find factor source with ID: \(factorSourceID)")
+					await send(.delegate(.failedToFindFactorSource))
+					return
 				}
 
 				await send(.delegate(.gotDerivationPath(
@@ -177,6 +180,9 @@ public struct CreateAuthKey: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
+		case .getAuthKeyDerivationPath(.delegate(.failedToFindFactorSource)):
+			return .send(.delegate(.done(success: false)))
+
 		case .getAuthKeyDerivationPath(.delegate(.entityAlreadyHasAuthenticationSigningKey)):
 			return .send(.delegate(.done(success: false)))
 
