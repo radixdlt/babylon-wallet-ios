@@ -36,7 +36,7 @@ public struct UseLedgerView: SwiftUI.View {
 	}
 
 	public init(
-		ledgerFactorSource ledger: LedgerFactorSource,
+		ledgerFactorSource ledger: LedgerHardwareWalletFactorSource,
 		purpose: Purpose
 	) {
 		self.init(
