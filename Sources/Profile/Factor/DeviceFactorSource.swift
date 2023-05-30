@@ -1,3 +1,4 @@
+import CasePaths
 import Cryptography
 import Prelude
 
@@ -92,16 +93,48 @@ extension FactorSource {
 // MARK: - FactorSourceProtocol
 public protocol FactorSourceProtocol: BaseFactorSourceProtocol, Sendable, Hashable, Codable {
 	static var kind: FactorSourceKind { get }
+	static var casePath: CasePath<FactorSource, Self> { get }
 }
 
 extension FactorSourceProtocol {
 	public var kind: FactorSourceKind { Self.kind }
+	public static var casePath: CasePath<FactorSource, Self> { Self.casePath }
+}
+
+extension FactorSourceProtocol {
+	public func embed() -> FactorSource {
+		casePath.embed(self)
+	}
+
+	public static func extract(from factorSource: FactorSource) -> Self? {
+		casePath.extract(from: factorSource)
+	}
+}
+
+extension FactorSource {
+	public func extract<F>(_ type: F.Type) -> F? where F: FactorSourceProtocol {
+		F.extract(from: self)
+	}
+
+	public func extract<F>(as _: F.Type) throws -> F where F: FactorSourceProtocol {
+		guard let extracted = extract(F.self) else {
+			throw IncorrectFactorSourceType(expectedKind: F.kind, actualKind: kind)
+		}
+		return extracted
+	}
+}
+
+// MARK: - IncorrectFactorSourceType
+public struct IncorrectFactorSourceType: Swift.Error {
+	public let expectedKind: FactorSourceKind
+	public let actualKind: FactorSourceKind
 }
 
 // MARK: - DeviceFactorSource
 public struct DeviceFactorSource: FactorSourceProtocol {
 	/// Kind of factor source
 	public static let kind: FactorSourceKind = .device
+	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.device
 
 	public struct Hint: Sendable, Hashable, Codable {
 		/// "iPhone RED"
@@ -155,6 +188,7 @@ extension FactorSource {
 public struct OffDeviceMnemonic: FactorSourceProtocol {
 	/// Kind of factor source
 	public static let kind: FactorSourceKind = .offDeviceMnemonic
+	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.offDeviceMnemonic
 
 	public struct Hint: Sendable, Hashable, Codable {
 		/// "Horse battery"

@@ -2,7 +2,7 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - _EntityCreatingFactorSourceProtocol
-public protocol _EntityCreatingFactorSourceProtocol: BaseFactorSourceProtocol {
+public protocol _EntityCreatingFactorSourceProtocol: BaseFactorSourceProtocol, _FactorSourceHolderProtocol {
 	var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork { get }
 }
 
@@ -14,6 +14,79 @@ extension _EntityCreatingFactorSourceProtocol {
 //		try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
 		try nextDerivationIndicesPerNetwork.derivationPathForNextEntity(kind: entityKind, networkID: networkID)
 	}
+}
+
+// MARK: - _FactorSourceHolderProtocol
+public protocol _FactorSourceHolderProtocol:
+	BaseFactorSourceProtocol,
+	Sendable,
+	Hashable,
+	Identifiable
+{
+	var factorSource: FactorSource { get }
+}
+
+extension _FactorSourceHolderProtocol {
+	public typealias ID = FactorSourceID
+	public var id: ID { common.id }
+	public var kind: FactorSourceKind { factorSource.kind }
+	public var common: FactorSource.Common { factorSource.common }
+}
+
+// MARK: - _ApplicationFactorSource
+public protocol _ApplicationFactorSource:
+	_FactorSourceHolderProtocol
+{
+	static var assertedKind: FactorSourceKind? { get }
+	static var assertedParameters: FactorSource.CryptoParameters? { get }
+	init(factorSource: FactorSource) throws
+}
+
+extension _ApplicationFactorSource {
+	public static var assertedParameters: FactorSource.CryptoParameters? { nil }
+
+	public static func validating(factorSource: FactorSource) throws -> FactorSource {
+		if
+			let expectedFactorSourceKind = Self.assertedKind,
+			factorSource.kind != expectedFactorSourceKind
+		{
+			throw DisrepancyFactorSourceWrongKind(
+				expected: expectedFactorSourceKind,
+				actual: factorSource.kind
+			)
+		}
+
+		if
+			let expectedParameters = Self.assertedParameters,
+			factorSource.cryptoParameters != expectedParameters
+		{
+			throw DisrepancyFactorSourceWrongParameters(
+				expected: expectedParameters,
+				actual: factorSource.cryptoParameters
+			)
+		}
+		return factorSource
+	}
+
+	public init(_ applicationFactorSource: some _ApplicationFactorSource) throws {
+		try self.init(factorSource: applicationFactorSource.factorSource)
+	}
+
+	public var supportsOlympia: Bool {
+		cryptoParameters.supportsOlympia
+	}
+}
+
+// MARK: - DisrepancyFactorSourceWrongKind
+public struct DisrepancyFactorSourceWrongKind: Swift.Error {
+	public let expected: FactorSourceKind
+	public let actual: FactorSourceKind
+}
+
+// MARK: - DisrepancyFactorSourceWrongParameters
+public struct DisrepancyFactorSourceWrongParameters: Swift.Error {
+	public let expected: FactorSource.CryptoParameters
+	public let actual: FactorSource.CryptoParameters
 }
 
 // MARK: - _HDFactorSourceProtocol

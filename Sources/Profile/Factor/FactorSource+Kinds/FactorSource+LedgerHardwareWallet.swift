@@ -1,3 +1,4 @@
+import CasePaths
 import Prelude
 
 // MARK: - FactorSource.LedgerHardwareWallet
@@ -41,6 +42,7 @@ extension FactorSource {
 public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 	/// Kind of factor source
 	public static let kind: FactorSourceKind = .ledgerHQHardwareWallet
+	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.ledger
 
 	public struct Hint: Sendable, Hashable, Codable {
 		/// "Orange, scratched"

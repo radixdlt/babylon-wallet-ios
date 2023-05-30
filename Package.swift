@@ -562,7 +562,6 @@ package.addModules([
 			"ROLAClient", // calc expected hashed message for signAuth for validation
 			"RadixConnectClient",
 			"FactorSourcesClient", // FIXME: move models to lower level package
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .no
 	),
@@ -836,6 +835,7 @@ package.addModules([
 			"EngineToolkit", // address derivation, blake hash
 			"RadixConnectModels",
 			"Resources",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes(
 			dependencies: [
