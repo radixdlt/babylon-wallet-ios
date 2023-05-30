@@ -27,7 +27,7 @@ extension SignWithFactorSourcesOfKindLedger {
 				VStack {
 					if
 						let currentSigningFactor = viewStore.currentSigningFactor,
-						let ledger = try? LedgerHardwareWalletFactorSource(factorSource: currentSigningFactor.factorSource)
+						let ledger = currentSigningFactor.factorSource.extract(LedgerHardwareWalletFactorSource.self)
 					{
 						UseLedgerView(
 							ledgerFactorSource: ledger,
