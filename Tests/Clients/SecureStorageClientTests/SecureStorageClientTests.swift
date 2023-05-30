@@ -111,11 +111,14 @@ private extension SecureStorageClientTests {
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				factorSource: factorSource.factorSource
+				factorSource: factorSource
 			)
 
 			let sut = SecureStorageClient.liveValue
-			let profile = Profile(header: snapshotHeader, factorSources: .init(factorSource.factorSource))
+			let profile = Profile(
+				header: snapshotHeader,
+				deviceFactorSource: factorSource
+			)
 			try await operation(sut, privateHDFactorSource, profile.snapshot())
 		}
 	}

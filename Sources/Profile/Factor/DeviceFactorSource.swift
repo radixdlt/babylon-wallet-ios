@@ -263,8 +263,8 @@ extension DeviceFactorSource {
 
 	public static func babylon(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		model: Hint.Model,
-		name: Hint.Name,
+		model: Hint.Model = "",
+		name: Hint.Name = "",
 		addedOn: Date = .now,
 		lastUsedOn: Date = .now
 	) throws -> Self {
