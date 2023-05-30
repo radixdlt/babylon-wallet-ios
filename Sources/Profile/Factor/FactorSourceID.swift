@@ -52,6 +52,9 @@ extension FactorSourceID {
 
 #if DEBUG
 extension FactorSourceID {
-	public static let previewValue = try! Self(hex: .deadbeef32Bytes)
+	public static let previewValue = Self.preview(.device)
+	public static func preview(_ factorSourceKind: FactorSourceKind) -> Self {
+		try! Self(factorSourceKind: factorSourceKind, hash: .deadbeef32Bytes)
+	}
 }
 #endif // DEBUG
