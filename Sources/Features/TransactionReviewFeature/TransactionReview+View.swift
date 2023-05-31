@@ -121,7 +121,7 @@ extension TransactionReview {
 						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
 							viewStore.send(.approveTapped)
 						}
-						.disabled(viewStore.hasApprovedTX)
+						.controlState(viewStore.hasApprovedTX ? .disabled : .enabled)
 						.buttonStyle(.primaryRectangular)
 						.padding(.bottom, .medium1)
 					}
