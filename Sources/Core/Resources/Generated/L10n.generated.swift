@@ -93,28 +93,6 @@ public enum L10n {
       /// Anyone can increase the supply of this asset.
       public static let supplyIncreasableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyIncreasableByAnyone", fallback: "Anyone can increase the supply of this asset.")
     }
-    public enum Debug {
-      /// Create & Upload Auth Key
-      public static let createAndUploadAuthKey = L10n.tr("Localizable", "accountSettings_debug_createAndUploadAuthKey", fallback: "Create & Upload Auth Key")
-      /// Create Fungible Token
-      public static let createFungibleToken = L10n.tr("Localizable", "accountSettings_debug_createFungibleToken", fallback: "Create Fungible Token")
-      /// Create Multiple Fungible Tokens
-      public static let createFungibleTokens = L10n.tr("Localizable", "accountSettings_debug_createFungibleTokens", fallback: "Create Multiple Fungible Tokens")
-      /// Create NFT
-      public static let createNFT = L10n.tr("Localizable", "accountSettings_debug_createNFT", fallback: "Create NFT")
-      /// Create Multiple NFTs
-      public static let createNFTs = L10n.tr("Localizable", "accountSettings_debug_createNFTs", fallback: "Create Multiple NFTs")
-      /// Creating NFT
-      public static let creatingNFT = L10n.tr("Localizable", "accountSettings_debug_creatingNFT", fallback: "Creating NFT")
-      /// Creating NFTs
-      public static let creatingNFTs = L10n.tr("Localizable", "accountSettings_debug_creatingNFTs", fallback: "Creating NFTs")
-      /// Creating Token
-      public static let creatingToken = L10n.tr("Localizable", "accountSettings_debug_creatingToken", fallback: "Creating Token")
-      /// Creating Tokens
-      public static let creatingTokens = L10n.tr("Localizable", "accountSettings_debug_creatingTokens", fallback: "Creating Tokens")
-      /// Turn into dApp Definition account type
-      public static let turnIntoDappDefinition = L10n.tr("Localizable", "accountSettings_debug_turnIntoDappDefinition", fallback: "Turn into dApp Definition account type")
-    }
     public enum HideAccount {
       /// Hide Account
       public static let button = L10n.tr("Localizable", "accountSettings_hideAccount_button", fallback: "Hide Account")
@@ -162,6 +140,8 @@ public enum L10n {
       public static let body1 = L10n.tr("Localizable", "addLedger_addDevice_body1", fallback: "Let’s set up a Ledger hardware wallet device. You will be able to use it to create new Ledger-secured Accounts, or import Ledger-secured Accounts from the Radix Olympia Desktop Wallet.")
       /// Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.
       public static let body2 = L10n.tr("Localizable", "addLedger_addDevice_body2", fallback: "Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.")
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "addLedger_addDevice_continue", fallback: "Continue")
       /// Add Ledger Device.
       public static let title = L10n.tr("Localizable", "addLedger_addDevice_title", fallback: "Add Ledger Device.")
     }
@@ -280,8 +260,12 @@ public enum L10n {
     /// Message
     public static let transactionMessage = L10n.tr("Localizable", "assetTransfer_transactionMessage", fallback: "Message")
     public enum AccountList {
+      /// Add Account
+      public static let addAccountButton = L10n.tr("Localizable", "assetTransfer_accountList_addAccountButton", fallback: "Add Account")
       /// From
       public static let fromLabel = L10n.tr("Localizable", "assetTransfer_accountList_fromLabel", fallback: "From")
+      /// To
+      public static let toLabel = L10n.tr("Localizable", "assetTransfer_accountList_toLabel", fallback: "To")
     }
     public enum ChooseReceivingAccount {
       /// Enter or paste address
@@ -390,6 +374,8 @@ public enum L10n {
       public static let removeAuthorization = L10n.tr("Localizable", "authorizedDapps_personaDetails_removeAuthorization", fallback: "Disconnect Persona from this dApp")
     }
     public enum RemoveAuthorizationAlert {
+      /// Confirm
+      public static let confirm = L10n.tr("Localizable", "authorizedDapps_removeAuthorizationAlert_confirm", fallback: "Confirm")
       /// This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.
       public static let message = L10n.tr("Localizable", "authorizedDapps_removeAuthorizationAlert_message", fallback: "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.")
       /// Remove Authorization
@@ -506,6 +492,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "createAccount_introduction_title", fallback: "Create an Account")
     }
     public enum NameNewAccount {
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "createAccount_nameNewAccount_continue", fallback: "Continue")
       /// e.g. My Main Account
       public static let placeholder = L10n.tr("Localizable", "createAccount_nameNewAccount_placeholder", fallback: "e.g. My Main Account")
       /// What would you like to call your account?
@@ -568,6 +556,8 @@ public enum L10n {
       public static let thisWillBeShared = L10n.tr("Localizable", "createPersona_explanation_thisWillBeShared", fallback: "This will be shared with dApps you login to")
     }
     public enum Introduction {
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "createPersona_introduction_continue", fallback: "Continue")
       /// Learn about Personas
       public static let learnAboutPersonas = L10n.tr("Localizable", "createPersona_introduction_learnAboutPersonas", fallback: "Learn about Personas")
       /// A Persona is an identity that you own and control. You can have as many as you like.
@@ -578,6 +568,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "createPersona_introduction_title", fallback: "Create a Persona")
     }
     public enum NameNewPersona {
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "createPersona_nameNewPersona_continue", fallback: "Continue")
       /// e.g. My Main Persona
       public static let placeholder = L10n.tr("Localizable", "createPersona_nameNewPersona_placeholder", fallback: "e.g. My Main Persona")
       /// What would you like to call your persona?
@@ -588,6 +580,8 @@ public enum L10n {
     /// Loading...
     public static let metadataLoadingPrompt = L10n.tr("Localizable", "dAppRequest_metadataLoadingPrompt", fallback: "Loading...")
     public enum AccountPermission {
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "dAppRequest_accountPermission_continue", fallback: "Continue")
       /// %d or more accounts
       public static func numberOfAccountsAtLeast(_ p1: Int) -> String {
         return L10n.tr("Localizable", "dAppRequest_accountPermission_numberOfAccountsAtLeast", p1, fallback: "%d or more accounts")
@@ -610,6 +604,8 @@ public enum L10n {
       public static let updateInSettingsExplanation = L10n.tr("Localizable", "dAppRequest_accountPermission_updateInSettingsExplanation", fallback: "You can update this permission in your settings at any time.")
     }
     public enum ChooseAccounts {
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "dAppRequest_chooseAccounts_continue", fallback: "Continue")
       /// Create a New Account
       public static let createNewAccount = L10n.tr("Localizable", "dAppRequest_chooseAccounts_createNewAccount", fallback: "Create a New Account")
       /// You are now connected to %@. You can change your preferences for this dApp in your Settings at any time.
@@ -680,6 +676,8 @@ public enum L10n {
     public enum Login {
       /// Choose a Persona
       public static let choosePersona = L10n.tr("Localizable", "dAppRequest_login_choosePersona", fallback: "Choose a Persona")
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "dAppRequest_login_continue", fallback: "Continue")
       /// Your last login was on %@
       public static func lastLoginWasOn(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_login_lastLoginWasOn", String(describing: p1), fallback: "Your last login was on %@")
@@ -714,6 +712,8 @@ public enum L10n {
     public enum PersonalDataOneTime {
       /// Choose the data to provide
       public static let chooseDataToProvide = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_chooseDataToProvide", fallback: "Choose the data to provide")
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_continue", fallback: "Continue")
       /// *%@* is requesting that you provide some pieces of personal data *just one time*
       public static func subtitle(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_personalDataOneTime_subtitle", String(describing: p1), fallback: "*%@* is requesting that you provide some pieces of personal data *just one time*")
@@ -722,6 +722,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "dAppRequest_personalDataOneTime_title", fallback: "One-Time Data Request")
     }
     public enum PersonalDataPermission {
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "dAppRequest_personalDataPermission_continue", fallback: "Continue")
       /// *%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.
       public static func subtitle(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_personalDataPermission_subtitle", String(describing: p1), fallback: "*%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.")
@@ -915,6 +917,8 @@ public enum L10n {
     }
   }
   public enum GeneralSettings {
+    /// Customize your Radix Wallet
+    public static let subtitle = L10n.tr("Localizable", "generalSettings_subtitle", fallback: "Customize your Radix Wallet")
     /// App Settings
     public static let title = L10n.tr("Localizable", "generalSettings_title", fallback: "App Settings")
     public enum ConfirmCloudSyncDisableAlert {
@@ -1121,6 +1125,8 @@ public enum L10n {
     public static let addedHeading = L10n.tr("Localizable", "ledgerHardwareDevices_addedHeading", fallback: "Added")
     /// Add New Ledger
     public static let addNewLedger = L10n.tr("Localizable", "ledgerHardwareDevices_addNewLedger", fallback: "Add New Ledger")
+    /// Continue
+    public static let continueWithLedger = L10n.tr("Localizable", "ledgerHardwareDevices_continueWithLedger", fallback: "Continue")
     /// What is a Ledger Factor Source
     public static let ledgerFactorSourceInfoCaption = L10n.tr("Localizable", "ledgerHardwareDevices_ledgerFactorSourceInfoCaption", fallback: "What is a Ledger Factor Source")
     /// Choose Ledger Device
@@ -1138,6 +1144,8 @@ public enum L10n {
     /// Used
     public static let usedHeading = L10n.tr("Localizable", "ledgerHardwareDevices_usedHeading", fallback: "Used")
     public enum LinkConnectorAlert {
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "ledgerHardwareDevices_linkConnectorAlert_continue", fallback: "Continue")
       /// To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.
       /// 
       /// Install the Connector extension, open it to see the linking QR code, and tap continue.
@@ -1323,6 +1331,26 @@ public enum L10n {
     }
   }
   public enum Signing {
+    public enum UseLedgerLabel {
+      /// Added on
+      public static let addedOn = L10n.tr("Localizable", "signing_useLedgerLabel_addedOn", fallback: "Added on")
+      /// Last used
+      public static let lastUsed = L10n.tr("Localizable", "signing_useLedgerLabel_lastUsed", fallback: "Last used")
+      /// Ledger
+      public static let ledger = L10n.tr("Localizable", "signing_useLedgerLabel_Ledger", fallback: "Ledger")
+    }
+    public enum UseLedgerPurpose {
+      /// Creating account
+      public static let createAccount = L10n.tr("Localizable", "signing_useLedgerPurpose_createAccount", fallback: "Creating account")
+      /// Creating auth key
+      public static let createAuthSigningKey = L10n.tr("Localizable", "signing_useLedgerPurpose_createAuthSigningKey", fallback: "Creating auth key")
+      /// Import Legacy Accounts
+      public static let importLegacyAccounts = L10n.tr("Localizable", "signing_useLedgerPurpose_importLegacyAccounts", fallback: "Import Legacy Accounts")
+      /// Sign auth challenge
+      public static let signAuth = L10n.tr("Localizable", "signing_useLedgerPurpose_signAuth", fallback: "Sign auth challenge")
+      /// Sign transaction
+      public static let signTX = L10n.tr("Localizable", "signing_useLedgerPurpose_signTX", fallback: "Sign transaction")
+    }
     public enum WithDeviceFactorSource {
       /// Factor Source ID: %@
       public static func idLabel(_ p1: Any) -> String {

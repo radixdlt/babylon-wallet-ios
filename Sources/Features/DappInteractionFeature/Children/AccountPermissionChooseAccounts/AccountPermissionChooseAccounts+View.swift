@@ -31,7 +31,7 @@ extension AccountPermissionChooseAccounts {
 						viewStore.chooseAccounts.selectedAccounts,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.Common.continue, action: action)
+						Button(L10n.DAppRequest.ChooseAccounts.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

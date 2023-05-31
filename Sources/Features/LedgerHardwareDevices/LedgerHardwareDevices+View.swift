@@ -104,7 +104,7 @@ extension LedgerHardwareDevices {
 						viewStore.selectedLedgerControlRequirements,
 						forAction: { viewStore.send(.confirmedLedger($0.selectedLedger)) }
 					) { action in
-						Button(L10n.Common.continue, action: action)
+						Button(L10n.LedgerHardwareDevices.continueWithLedger, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

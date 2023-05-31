@@ -40,7 +40,7 @@ extension AddLedgerFactorSource {
 
 						Spacer()
 
-						Button(L10n.Common.continue) {
+						Button(L10n.AddLedger.AddDevice.continue) {
 							viewStore.send(.sendAddLedgerRequestButtonTapped)
 						}
 						.controlState(viewStore.continueButtonControlState)
