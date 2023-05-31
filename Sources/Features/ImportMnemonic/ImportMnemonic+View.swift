@@ -61,7 +61,6 @@ extension ImportMnemonic.ViewState {
 extension ImportMnemonic {
 	@MainActor
 	public struct View: SwiftUI.View {
-		@Environment(\.scenePhase) var scenePhase
 		private let store: StoreOf<ImportMnemonic>
 
 		public init(store: StoreOf<ImportMnemonic>) {
@@ -83,12 +82,17 @@ extension ImportMnemonic {
 						}
 					}
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
-					.onChange(of: scenePhase) { newPhase in
-						viewStore.send(.scenePhase(newPhase))
-					}
-					.footer {
-						footer(with: viewStore)
-					}
+					#if os(iOS)
+						.onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+							viewStore.send(.scenePhase(.active))
+						}
+						.onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+							viewStore.send(.scenePhase(.inactive))
+						}
+					#endif
+						.footer {
+							footer(with: viewStore)
+						}
 				}
 				.animation(.default, value: viewStore.wordCount)
 				.padding(.medium3)
