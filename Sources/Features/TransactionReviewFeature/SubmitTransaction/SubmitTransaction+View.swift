@@ -49,7 +49,13 @@ extension SubmitTransaction {
 						.onAppear {
 							animationAmount = 0.5
 						}
-					Text("Completing Transaction...").textStyle(.body1Regular)
+
+					Text("Completing Transaction...").textStyle(.body1Regular) // FIXME: strings
+
+					HStack {
+						Text("TXID: ") // FIXME: strings
+						AddressView(.identifier(.transaction(viewStore.txID)))
+					}
 				}
 				.onWillDisappear {
 					viewStore.send(.willDisappear)

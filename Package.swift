@@ -382,7 +382,6 @@ package.addModules([
 			"TransactionClient",
 			"SigningFeature",
 			"SubmitTransactionClient",
-			"DappInteractionClient",
 		],
 		tests: .yes()
 	),
@@ -479,10 +478,7 @@ package.addModules([
 	),
 	.client(
 		name: "DappInteractionClient",
-		dependencies: [
-			"TransactionClient",
-			"FactorSourcesClient",
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.client(

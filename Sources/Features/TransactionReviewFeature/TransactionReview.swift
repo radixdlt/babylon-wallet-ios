@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import CryptoKit
-import DappInteractionClient
 import FeaturePrelude
 import GatewayAPI
 import SigningFeature
@@ -138,7 +137,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.continuousClock) var clock
-	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
@@ -297,16 +295,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
 			state.destination = nil
-			return .task {
-				try? await clock.sleep(for: .milliseconds(300)) // bah, we need to to dismiss `state.destination` before proceeding with completion
-				return .delegate(.transactionCompleted(txID))
-			}
+			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
+
 		case .destination(.presented(.submitting(.delegate(.dismiss)))):
 			state.destination = nil
-			return .task {
-				try? await clock.sleep(for: .milliseconds(300)) // bah, we need to to dismiss `state.destination` before proceeding with completion
-				return .delegate(.userDismissedTransactionStatus)
-			}
+			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
 		default:
 			return .none
@@ -449,6 +442,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	) async throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
 		return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
+	}
+
+	func delayedEffect(
+		delay: Duration = .seconds(0.3),
+		for action: Action
+	) -> EffectTask<Action> {
+		.task {
+			try await clock.sleep(for: delay)
+			return action
+		}
 	}
 }
 
