@@ -179,6 +179,7 @@
 "authorizedDapps_forgetDappAlert_forget" = "Forget";
 "authorizedDapps_removeAuthorizationAlert_title" = "Remove Authorization";
 "authorizedDapps_removeAuthorizationAlert_message" = "This dApp will no longer have authorization to see data associated with this persona, unless you choose to login with it again in the future.";
+"authorizedDapps_removeAuthorizationAlert_confirm" = "Confirm";
 "editPersona_requiredByDapp" = "Required by dApp";
 "editPersona_sharedInformationHeading" = "The following information can be seen if requested by the dApp";
 "editPersona_error_blank" = "Label cannot be blank";
@@ -227,6 +228,7 @@
 "createAccount_completion_subtitleNotFirst" = "Your Account has been created.";
 "createAccount_nameNewAccount_placeholder" = "e.g. My Main Account";
 "createAccount_nameNewAccount_subtitle" = "What would you like to call your account?";
+"createAccount_nameNewAccount_continue" = "Continue";
 "createAccount_introduction_title" = "Create an Account";
 "createAccount_titleFirst" = "Create First Account";
 "createAccount_titleNotFirst" = "Create New Account";
@@ -252,8 +254,10 @@
 "createPersona_introduction_subtitle1" = "A Persona is an identity that you own and control. You can have as many as you like.";
 "createPersona_introduction_subtitle2" = "You will chosose Peronas to login to dApps, and dApps may request access to personal information associated with that Persona.";
 "createPersona_introduction_learnAboutPersonas" = "Learn about Personas";
+"createPersona_introduction_continue" = "Continue";
 "createPersona_nameNewPersona_subtitle" = "What would you like to call your persona?";
 "createPersona_nameNewPersona_placeholder" = "e.g. My Main Persona";
+"createPersona_nameNewPersona_continue" = "Continue";
 "createPersona_requiredField" = "Required field";
 "createPersona_saveAndContinueButtonTitle" = "Save and Continue";
 "dAppRequest_login_titleKnownDapp" = "Login Request";
@@ -262,17 +266,20 @@
 "dAppRequest_login_subtitleNewDapp" = "%@  is requesting you to login for the first time with a Persona.";
 "dAppRequest_login_choosePersona" = "Choose a Persona";
 "dAppRequest_login_lastLoginWasOn" = "Your last login was on %@";
+"dAppRequest_login_continue" = "Continue";
 "dAppRequest_accountPermission_title" = "Account Permission";
 "dAppRequest_accountPermission_numberOfAccountsAtLeast" = "%d or more accounts";
 "dAppRequest_accountPermission_numberOfAccountsAtLeastZero" = "Any number of accounts";
 "dAppRequest_accountPermission_numberOfAccountsExactly" = "%d accounts";
 "dAppRequest_accountPermission_numberOfAccountsExactlyOne" = "1 account";
+"dAppRequest_accountPermission_continue" = "Continue";
 "dAppRequest_accountPermission_subtitle" = "*%@* is requesting permission to *always* be able to view account information when you login with this Persona.";
 "dAppRequest_accountPermission_updateInSettingsExplanation" = "You can update this permission in your settings at any time.";
 "dAppRequest_chooseAccounts_createNewAccount" = "Create a New Account";
 "dAppRequest_chooseAccounts_successMessage" = "You are now connected to %@. You can change your preferences for this dApp in your Settings at any time.";
 "dAppRequest_chooseAccounts_successTitle" = "dApp Connection Successful";
 "dAppRequest_chooseAccounts_verificationErrorTitle" = "DApp error";
+"dAppRequest_chooseAccounts_continue" = "Continue";
 "dAppRequest_chooseAccountsOneTime_title" = "Account Request";
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeast" = "*%@* is making a one-time request for at least %d accounts.";
 "dAppRequest_chooseAccountsOneTime_subtitleAtLeastZero" = "*%@* is making a one-time request for any number of accounts.";
@@ -288,9 +295,11 @@
 "dAppRequest_personalDataOneTime_title" = "One-Time Data Request";
 "dAppRequest_personalDataOneTime_chooseDataToProvide" = "Choose the data to provide";
 "dAppRequest_personalDataOneTime_subtitle" = "*%@* is requesting that you provide some pieces of personal data *just one time*";
+"dAppRequest_personalDataOneTime_continue" = "Continue";
 "dAppRequest_personalDataPermission_title" = "Personal Data Permission";
 "dAppRequest_personalDataPermission_subtitle" = "*%@* is requesting permission to *always* be able to view the following personal data when you login with this Persona.";
 "dAppRequest_personalDataPermission_updateInSettingsExplanation" = "You can update this permission in your Settings at any time.";
+"dAppRequest_personalDataPermission_continue" = "Continue";
 "dAppRequest_validationOutcome_subtitleBadContent" = "Invalid content";
 "dAppRequest_validationOutcome_subtitleIncompatibleVersion" = "Incompatible connector extension";
 "dAppRequest_validationOutcome_subtitleWrongNetworkID" = "Network mismatch";
@@ -458,6 +467,7 @@
 "addLedger_addDevice_title" = "Add Ledger Device.";
 "addLedger_addDevice_body1" = "Let’s set up a Ledger hardware wallet device. You will be able to use it to create new Ledger-secured Accounts, or import Ledger-secured Accounts from the Radix Olympia Desktop Wallet.";
 "addLedger_addDevice_body2" = "Connect your Ledger to a computer running a linked Radix Connector browser extension, and make sure the Radix Babylon app is running on the Ledger device.";
+"addLedger_addDevice_continue" = "Continue";
 "addLedger_nameLedger_title" = "Name Your Ledger";
 "addLedger_nameLedger_body" = "Enter a name for this Ledger device";
 "addLedger_nameLedger_namePlaceholder" = "My green Ledger";
@@ -478,6 +488,9 @@
 "importMnemonic_offDevice_locationHint" = "Without revealing location, vague hint on where this mnemonic is backed up, if anywhere.";
 "importMnemonic_offDevice_saveWithDescription" = "Save with description";
 "importMnemonic_offDevice_saveWithoutDescription" = "Save without description";
+"importMnemonic_tempAndroid_changeSeedPhrase" = "Change seed phrase length";
+"importMnemonic_tempAndroid_seedLength" = "%d word seed phrase";
+"importMnemonic_tempAndroid_heading" = "Recover Mnemonic";
 "misc_remoteThumbnails_vectorImageFailure" = "Can\'t displays image of vector type";
 "misc_remoteThumbnails_loadingFailure" = "Can\'t load image";
 "generalSettings_title" = "App Settings";
@@ -493,6 +506,8 @@
 "assetTransfer_qrScanInstructions" = "Scan a QR code of a Radix account address";
 "assetTransfer_sendTransferButton" = "Send Transfer Request";
 "assetTransfer_accountList_fromLabel" = "From";
+"assetTransfer_accountList_toLabel" = "To";
+"assetTransfer_accountList_addAccountButton" = "Add Account";
 "assetTransfer_header_transfer" = "Transfer";
 "assetTransfer_header_addMessageButton" = "Add Message";
 "assetTransfer_chooseReceivingAccount_invalidAddressError" = "Invalid address";
@@ -525,16 +540,26 @@
 "importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";
 "signing_withDeviceFactorSource_signTransaction" = "Sign transaction with phone";
 "signing_withDeviceFactorSource_idLabel" = "Factor Source ID: %@";
+"signing_useLedgerPurpose_createAccount" = "Creating account";
+"signing_useLedgerPurpose_createAuthSigningKey" = "Creating auth key";
+"signing_useLedgerPurpose_signAuth" = "Sign auth challenge";
+"signing_useLedgerPurpose_signTX" = "Sign transaction";
+"signing_useLedgerPurpose_importLegacyAccounts" = "Import Legacy Accounts";
+"signing_useLedgerLabel_Ledger" = "Ledger";
+"signing_useLedgerLabel_lastUsed" = "Last used";
+"signing_useLedgerLabel_addedOn" = "Added on";
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
 "ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.
 
 Install the Connector extension, open it to see the linking QR code, and tap continue.";
+"ledgerHardwareDevices_linkConnectorAlert_continue" = "Continue";
 "ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Ledger Device";
 "ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Hardware Wallets";
 "ledgerHardwareDevices_ledgerFactorSourceInfoCaption" = "What is a Ledger Factor Source";
 "ledgerHardwareDevices_addNewLedger" = "Add New Ledger";
 "ledgerHardwareDevices_addedHeading" = "Added";
 "ledgerHardwareDevices_usedHeading" = "Used";
+"ledgerHardwareDevices_continueWithLedger" = "Continue";
 "ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
 "ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger hardware wallet device";
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have connected to";
