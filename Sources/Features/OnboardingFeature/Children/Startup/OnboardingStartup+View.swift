@@ -1,5 +1,6 @@
 import CoreMotion
 import FeaturePrelude
+import ProfileBackupsFeature
 import SwiftUI
 
 // MARK: - OnboardingStartup.View
@@ -22,14 +23,14 @@ extension OnboardingStartup.View {
 		NavigationStack {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
-					Text("Welcome to the Radix Wallet") // FIXME: Strings
+					Text(L10n.Onboarding.Step1.title)
 						.foregroundColor(.app.gray1)
 						.textStyle(.sheetTitle)
 						.padding(.top, .large1)
 						.padding(.horizontal, .large1)
 						.padding(.bottom, .medium3)
 
-					Text("Your direct connection to the Radix Network") // FIXME: Strings
+					Text(L10n.Onboarding.Step1.subtitle)
 						.foregroundColor(.app.gray2)
 						.textStyle(.secondaryHeader)
 						.padding(.horizontal, .huge3)
@@ -42,13 +43,13 @@ extension OnboardingStartup.View {
 				}
 				.multilineTextAlignment(.center)
 				.footer {
-					Button("I'm a New Radix Wallet User") { // FIXME: Strings
+					Button(L10n.Onboarding.newUser) {
 						viewStore.send(.selectedNewWalletUser)
 					}
 					.buttonStyle(.primaryRectangular)
 					.padding(.bottom, .small2)
 
-					Button("Restore Wallet from Backup") { // FIXME: Strings
+					Button(L10n.Onboarding.restoreFromBackup) {
 						viewStore.send(.selectedRestoreFromBackup)
 					}
 					.buttonStyle(.primaryText())
@@ -59,7 +60,7 @@ extension OnboardingStartup.View {
 				state: /OnboardingStartup.Destinations.State.restoreFromBackup,
 				action: OnboardingStartup.Destinations.Action.restoreFromBackup,
 				destination: {
-					RestoreFromBackup.View(store: $0)
+					ProfileBackups.View(store: $0)
 				}
 			)
 		}
