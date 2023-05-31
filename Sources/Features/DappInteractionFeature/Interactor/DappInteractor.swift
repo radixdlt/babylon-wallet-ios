@@ -132,6 +132,15 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
+
+			switch state.currentModal {
+			case .some(.dappInteractionCompletion):
+				// FIXME: this is a temporary hack, to solve bug where incoming requests
+				// are ignored since completion is believed to be shown, but is not.
+				state.currentModal = nil
+			default: break
+			}
+
 			if request.route == .wallet {
 				// dismiss current request, wallet request takes precedence
 				state.currentModal = nil
