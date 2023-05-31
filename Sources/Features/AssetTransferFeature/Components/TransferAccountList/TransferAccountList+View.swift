@@ -31,7 +31,7 @@ extension TransferAccountList.View {
 					.cornerRadius(.small1)
 				}
 
-				Text("To")
+				Text(L10n.AssetTransfer.AccountList.toLabel)
 					.sectionHeading
 					.textCase(.uppercase)
 					.flushedLeft(padding: .medium3)
@@ -51,7 +51,7 @@ extension TransferAccountList.View {
 					)
 				}
 
-				Button("Add Account", asset: AssetResource.addAccount) {
+				Button(L10n.AssetTransfer.AccountList.addAccountButton, asset: AssetResource.addAccount) {
 					viewStore.send(.addAccountTapped)
 				}
 				.textStyle(.button)
