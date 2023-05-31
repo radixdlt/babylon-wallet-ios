@@ -382,7 +382,7 @@ extension TransactionClient {
 			)
 		}
 
-		let prepareForSigning: PrepareFoSigning = { request in
+		let prepareForSigning: PrepareForSigning = { request in
 			let transactionIntentWithSigners = try await buildTransactionIntent(.init(
 				networkID: request.networkID,
 				manifest: request.manifest,

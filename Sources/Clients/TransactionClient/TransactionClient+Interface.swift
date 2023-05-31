@@ -14,7 +14,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 	public var getTransactionReview: GetTransactionReview
 	public var buildTransactionIntent: BuildTransactionIntent
 	public var notarizeTransaction: NotarizeTransaction
-	public var prepareForSigning: PrepareFoSigning
+	public var prepareForSigning: PrepareForSigning
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
@@ -30,7 +30,7 @@ extension TransactionClient {
 	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntentWithSigners
 	public typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
 
-	public typealias PrepareFoSigning = @Sendable (PrepareForSigningRequest) async throws -> PrepareForSiginingResponse
+	public typealias PrepareForSigning = @Sendable (PrepareForSigningRequest) async throws -> PrepareForSiginingResponse
 }
 
 extension DependencyValues {
