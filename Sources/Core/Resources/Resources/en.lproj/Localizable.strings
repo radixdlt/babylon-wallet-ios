@@ -377,11 +377,11 @@
 "addressAction_qrCodeView_failureLabel" = "Could not create QR code";
 "biometrics_prompt_title" = "Use your biometric to continue";
 "biometrics_prompt_creationOfEntity" = "Authenticate to create new %@ with this phone.";
-"biometrics_prompt_importOlympiaAccounts" = "Check if seed phrase already exists.";
 "biometrics_prompt_signAuthChallenge" = "Authenticate to sign auth chellenge with this phone.";
 "biometrics_prompt_signTransaction" = "Authenticate to sign transaction with this phone.";
 "biometrics_prompt_displaySeedPhrase" = "Display seed phrase.";
 "biometrics_prompt_createSignAuthKey" = "Create Auth signing key.";
+"biometrics_prompt_importOlympiaAccounts" = "Check if seed phrase already exists.";
 "biometrics_prompt_checkingAccounts" = "Checking accounts.";
 "biometrics_prompt_updateAccountMetadata" = "Update account metadata.";
 "biometrics_deviceNotSecureAlert_title" = "Your device is not secured";
@@ -505,6 +505,7 @@
 "assetTransfer_transactionMessage" = "Message";
 "assetTransfer_qrScanInstructions" = "Scan a QR code of a Radix account address";
 "assetTransfer_sendTransferButton" = "Send Transfer Request";
+"assetTransfer_accountList_externalAccountName" = "Account";
 "assetTransfer_accountList_fromLabel" = "From";
 "assetTransfer_accountList_toLabel" = "To";
 "assetTransfer_accountList_addAccountButton" = "Add Account";
@@ -517,6 +518,10 @@
 "assetTransfer_chooseReceivingAccount_chooseOwnAccount" = "Or choose one of your own accounts";
 "assetTransfer_chooseReceivingAccount_scanQRNavigationTitle" = "Scan QR Code";
 "assetTransfer_chooseReceivingAccount_addressFieldPlaceholder" = "Enter or paste address";
+"assetTransfer_addAssets_navigationTitle" = "Choose Asset(s)";
+"assetTransfer_addAssets_buttonAssetsNone" = "Select Assets";
+"assetTransfer_addAssets_buttonAssetsOne" = "Choose 1 Asset";
+"assetTransfer_addAssets_buttonAssets" = "Choose %d Assets";
 "assetTransfer_fungibleResource_totalExceedsBalance" = "The total amount exceeds your current balance";
 "assetTransfer_fungibleResource_balance" = "Balance: %@";
 "assetTransfer_receivingAccount_chooseAccountButton" = "Choose Account";
@@ -564,3 +569,11 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger hardware wallet device";
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have connected to";
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
+"displayMnemonics_cautionAlert_title" = "Use Caution";
+"displayMnemonics_cautionAlert_revealButtonLabel" = "Reveal Seed phrase";
+"displayMnemonics_cautionAlert_message" = "Make sure no person or camera can see your display. Don\'t read or mouth the words. We have prevented you from taking screenshots";
+"displayMnemonics_labelSeedPhraseKindOlympia" = "Legacy Seed Phrase";
+"displayMnemonics_labelSeedPhraseKind" = "Main Seed Phrase";
+"displayMnemonics_labelDateOlympia" = "Imported on";
+"displayMnemonics_labelDate" = "Generated on";
+"displayMnemonics_seedPhrases" = "Seed Phrases";
