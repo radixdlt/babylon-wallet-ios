@@ -92,7 +92,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case rawTransactionCreated(String)
 		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
-		case prepareForSigningResult(TaskResult<DappInteractionClient.PrepareForSiginingResponse>)
+		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -395,7 +395,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-			let request = DappInteractionClient.PrepareForSigningRequest(
+			let request = TransactionClient.PrepareForSigningRequest(
                                 nonce: state.nonce,
 				manifest: manifest,
 				networkID: networkID,
@@ -405,7 +405,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			)
 			return .task {
 				await .internal(.prepareForSigningResult(TaskResult {
-					try await dappInteractionClient.prepareFoSigning(request)
+					try await transactionClient.prepareForSigning(request)
 				}))
 			}
 

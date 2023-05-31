@@ -6,7 +6,6 @@ import DappInteractionClient
 import GatewaysClient
 import RadixConnectClient
 import SharedModels
-import TransactionClient
 
 // MARK: - DappInteractionClient + DependencyKey
 extension DappInteractionClient: DependencyKey {
@@ -49,57 +48,12 @@ extension DappInteractionClient: DependencyKey {
 				default:
 					break
 				}
-			},
-			prepareFoSigning: prepareForSigning
+			}
 		)
 	}()
 }
 
 extension DappInteractionClient {
-	static let prepareForSigning: PrepareFoSigning = { request in
-		@Dependency(\.transactionClient) var transactionClient
-		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-		let transactionIntentWithSigners = try await transactionClient.buildTransactionIntent(.init(
-			networkID: request.networkID,
-			manifest: request.manifest,
-			ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
-		))
-
-		let entities = NonEmpty(
-			rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()) + [.account(request.feePayer)])
-		)!
-
-		let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
-
-		let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
-			networkID: request.networkID,
-			signers: entities,
-			signingPurpose: request.purpose
-		))
-
-		func printSigners() {
-			for (factorSourceKind, signingFactorsOfKind) in signingFactors {
-				print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
-				for signingFactor in signingFactorsOfKind {
-					let factorSource = signingFactor.factorSource
-					print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
-					for signer in signingFactor.signers {
-						let entity = signer.entity
-						print("\t\t🔮 * Entity: \(entity.displayName): *")
-						for factorInstance in signer.factorInstancesRequiredToSign {
-							print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
-						}
-					}
-				}
-			}
-		}
-		printSigners()
-
-		return .init(compiledIntent: compiledIntent, signingFactors: signingFactors)
-	}
-
 	/// Validates a received request from Dapp.
 	static func validate(
 		_ message: P2P.RTCIncomingMessageContainer<P2P.Dapp.RequestUnvalidated>

@@ -40,14 +40,10 @@ extension SubmitTransaction {
 					switch viewStore.status {
 					case .submitting, .submittedPending, .submittedUnknown, .notYetSubmitted:
 						Image(asset: AssetResource.transactionInProgress)
-						//                                                        .resizable()
-						//                                                        .frame(.)
 						Text("Completing Transaction..").textStyle(.body1Regular)
 					case .committedSuccessfully:
 						Image(asset: AssetResource.successCheckmark)
 						Text("Succcess").textStyle(.sheetTitle)
-						//                                                        .resizable()
-						//                                                        .frame(.)
 						Text("Your transaction was successful").textStyle(.body1Regular)
 					case .committedFailure, .rejected:
 						Image(asset: AssetResource.warningError)
