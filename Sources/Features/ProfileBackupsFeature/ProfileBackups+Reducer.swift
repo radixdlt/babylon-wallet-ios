@@ -52,10 +52,22 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		case tappedImportProfile
 		case dismissFileImporter
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup
+		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
+		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
+			title: {
+				// FIXME: strings
+				TextState("Disabling iCloud sync will delete the iCloud backup data(wallet data will still be kept on this iPhone), are you sure you want to disable iCloud sync?")
+			},
+			actions: {
+				ButtonState(role: .destructive, action: .confirm) {
+					TextState("Confirm")
+				}
+			}
+		))
+
 		public enum State: Sendable, Hashable {
 			case confirmCloudSyncDisable(AlertState<Action.ConfirmCloudSyncDisable>)
 			case importMnemonic(ImportMnemonic.State)
@@ -113,17 +125,7 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .cloudProfileSyncToggled(isEnabled):
 			if !isEnabled {
-				state.destination = .confirmCloudSyncDisable(.init(
-					title: {
-						// FIXME: strings
-						TextState("Disabling iCloud sync will delete the iCloud backup data(wallet data will still be kept on this iPhone), are you sure you want to disable iCloud sync?")
-					},
-					actions: {
-						ButtonState(role: .destructive, action: .confirm) {
-							TextState("Confirm")
-						}
-					}
-				))
+				state.destination = Destinations.confirmCloudSyncDisableAlert
 				return .none
 			} else {
 				return updateCloudSync(state: &state, isEnabled: true)
@@ -152,12 +154,8 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 			state.selectedProfileHeader = header
 			return .none
 
-		case .tappedUseCloudBackup:
-			guard let selectedProfileHeader = state.selectedProfileHeader else {
-				assertionFailure("Tapped use backup, but didn't select a profile header")
-				return .none
-			}
-			state.importedContent = .right(selectedProfileHeader)
+		case let .tappedUseCloudBackup(profileHeader):
+			state.importedContent = .right(profileHeader)
 			showImportMnemonic(state: &state)
 			return .none
 
@@ -239,3 +237,5 @@ public struct ProfileBackups: Sendable, FeatureReducer {
 		}
 	}
 }
+
+extension ProfileBackups {}

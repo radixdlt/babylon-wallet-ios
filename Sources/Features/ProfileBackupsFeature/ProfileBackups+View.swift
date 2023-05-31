@@ -101,11 +101,14 @@ extension ProfileBackups.View {
 					}
 
 					if !viewStore.shownInSettings {
-						Button("Use iCloud Backup Data") { // FIXME: strings
-							viewStore.send(.tappedUseCloudBackup)
-						}
-						.controlState(viewStore.selectedProfileHeader != nil ? .enabled : .disabled)
-						.buttonStyle(.primaryRectangular)
+						WithControlRequirements(
+							viewStore.selectedProfileHeader,
+							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
+							control: { action in
+								Button("Use iCloud Backup Data", action: action)
+									.buttonStyle(.primaryRectangular)
+							}
+						)
 					}
 				} else {
 					Text("No Cloud Backup Data") // FIXME: strings
