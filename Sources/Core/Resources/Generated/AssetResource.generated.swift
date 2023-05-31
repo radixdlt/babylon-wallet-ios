@@ -73,6 +73,8 @@ public enum AssetResource {
   public static let qrCodeScanner = ImageAsset(name: "qr-code-scanner")
   public static let splash = ImageAsset(name: "Splash")
   public static let successCheckmark = ImageAsset(name: "success-checkmark")
+  public static let transactionInProgress = ImageAsset(name: "transaction_in_progress")
+  public static let warningError = ImageAsset(name: "warning_error")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

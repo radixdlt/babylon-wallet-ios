@@ -1,6 +1,7 @@
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
+import FactorSourcesClient
 
 // MARK: - TransactionClient
 public struct TransactionClient: Sendable, DependencyKey {
@@ -13,6 +14,7 @@ public struct TransactionClient: Sendable, DependencyKey {
 	public var getTransactionReview: GetTransactionReview
 	public var buildTransactionIntent: BuildTransactionIntent
 	public var notarizeTransaction: NotarizeTransaction
+	public var prepareForSigning: PrepareForSigning
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
@@ -27,6 +29,8 @@ extension TransactionClient {
 	public typealias GetTransactionReview = @Sendable (ManifestReviewRequest) async throws -> TransactionToReview
 	public typealias BuildTransactionIntent = @Sendable (BuildTransactionIntentRequest) async throws -> TransactionIntentWithSigners
 	public typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
+
+	public typealias PrepareForSigning = @Sendable (PrepareForSigningRequest) async throws -> PrepareForSiginingResponse
 }
 
 extension DependencyValues {
@@ -63,5 +67,44 @@ public struct AddInstructionToManifestRequest: Sendable, Hashable {
 		at location: AddInstructionToManifestLocation
 	) {
 		self.init(instruction: instruction.embed(), to: manifest, at: location)
+	}
+}
+
+extension TransactionClient {
+	public struct PrepareForSigningRequest: Equatable, Sendable {
+		public let nonce: Nonce
+		public let manifest: TransactionManifest
+		public let feePayer: Profile.Network.Account
+		public let networkID: NetworkID
+		public let purpose: SigningPurpose
+
+		public var compiledIntent: CompileTransactionIntentResponse? = nil
+		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+
+		public init(
+			nonce: Nonce,
+			manifest: TransactionManifest,
+			networkID: NetworkID,
+			feePayer: Profile.Network.Account,
+			purpose: SigningPurpose,
+			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+		) {
+			self.nonce = nonce
+			self.manifest = manifest
+			self.networkID = networkID
+			self.feePayer = feePayer
+			self.purpose = purpose
+			self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
+		}
+	}
+
+	public struct PrepareForSiginingResponse: Equatable, Sendable {
+		public let compiledIntent: CompileTransactionIntentResponse
+		public let signingFactors: SigningFactors
+
+		public init(compiledIntent: CompileTransactionIntentResponse, signingFactors: SigningFactors) {
+			self.compiledIntent = compiledIntent
+			self.signingFactors = signingFactors
+		}
 	}
 }

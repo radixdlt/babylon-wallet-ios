@@ -27,7 +27,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public var isLoadingResources: Bool = false
 		public let mode: Mode
 
-		public init(account: Profile.Network.Account, mode: Mode = .selection(.init())) {
+		public init(account: Profile.Network.Account, mode: Mode = .normal) {
 			self.init(
 				account: account,
 				fungibleTokenList: .init(),
@@ -236,7 +236,7 @@ extension AssetsView.State {
 		}
 
 		var xrdRowSelected: Bool? {
-			selectedAssets?.fungibleResources.xrdResource != nil
+			selectedAssets.map { $0.fungibleResources.xrdResource != nil }
 		}
 
 		func nonXrdRowSelected(_ resource: ResourceAddress) -> Bool? {

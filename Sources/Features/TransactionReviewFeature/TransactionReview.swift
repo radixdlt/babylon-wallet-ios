@@ -91,19 +91,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case rawTransactionCreated(String)
 		case addGuaranteeToManifestResult(TaskResult<TransactionManifest>)
+		case prepareForSigningResult(TaskResult<TransactionClient.PrepareForSiginingResponse>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
 		case transactionCompleted(TransactionIntent.TXID)
+		case userDismissedTransactionStatus
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case selectFeePayer(SelectFeePayer.State)
-			case prepareForSigning(PrepareForSigning.State)
 			case signing(Signing.State)
 			case submitting(SubmitTransaction.State)
 		}
@@ -111,7 +112,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case customizeGuarantees(TransactionReviewGuarantees.Action)
 			case selectFeePayer(SelectFeePayer.Action)
-			case prepareForSigning(PrepareForSigning.Action)
 			case signing(Signing.Action)
 			case submitting(SubmitTransaction.Action)
 		}
@@ -122,9 +122,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.selectFeePayer, action: /Action.selectFeePayer) {
 				SelectFeePayer()
-			}
-			Scope(state: /State.prepareForSigning, action: /Action.prepareForSigning) {
-				PrepareForSigning()
 			}
 			Scope(state: /State.signing, action: /Action.signing) {
 				Signing()
@@ -140,6 +137,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
 
@@ -259,44 +257,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				)))
 			}
 
-		case .destination(.presented(.prepareForSigning(.delegate(.failedToBuildTX)))):
-			state.canApproveTX = true
-			return .none
-
-		case .destination(.presented(.prepareForSigning(.delegate(.failedToLoadSigners)))):
-			state.canApproveTX = true
-			return .none
-
-		case let .destination(.presented(.prepareForSigning(.delegate(.done(compiledIntent, signingFactors))))):
-
-			func printSigners() {
-				for (factorSourceKind, signingFactorsOfKind) in signingFactors {
-					print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
-					for signingFactor in signingFactorsOfKind {
-						let factorSource = signingFactor.factorSource
-						print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
-						for signer in signingFactor.signers {
-							let entity = signer.entity
-							print("\t\t🔮 * Entity: \(entity.displayName): *")
-							for factorInstance in signer.factorInstancesRequiredToSign {
-								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
-							}
-						}
-					}
-				}
-			}
-			printSigners()
-
-			state.destination = .signing(.init(
-				factorsLeftToSignWith: signingFactors,
-				signingPurposeWithPayload: .signTransaction(
-					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
-					compiledIntent,
-					origin: state.signTransactionPurpose
-				)
-			))
-			return .none
-
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
@@ -335,7 +295,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
 			state.destination = nil
-			return .send(.delegate(.transactionCompleted(txID)))
+			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
+
+		case .destination(.presented(.submitting(.delegate(.dismiss)))):
+			state.destination = nil
+			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
 		default:
 			return .none
@@ -434,15 +398,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.destination = .prepareForSigning(.init(
+			let request = TransactionClient.PrepareForSigningRequest(
 				nonce: state.nonce,
 				manifest: manifest,
 				networkID: networkID,
 				feePayer: feePayerSelectionAmongstCandidates.selected.account,
 				purpose: .signTransaction(state.signTransactionPurpose),
 				ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey
-			))
-			return .none
+			)
+			return .task {
+				await .internal(.prepareForSigningResult(TaskResult {
+					try await transactionClient.prepareForSigning(request)
+				}))
+			}
 
 		case let .addGuaranteeToManifestResult(.failure(error)):
 			loggerGlobal.error("Failed to add guarantees to manifest, error: \(error)")
@@ -451,6 +419,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .rawTransactionCreated(transaction):
 			state.displayMode = .raw(transaction)
+			return .none
+		case let .prepareForSigningResult(.success(response)):
+			state.destination = .signing(.init(
+				factorsLeftToSignWith: response.signingFactors,
+				signingPurposeWithPayload: .signTransaction(
+					ephemeralNotaryPrivateKey: state.ephemeralNotaryPrivateKey,
+					response.compiledIntent,
+					origin: state.signTransactionPurpose
+				)
+			))
+			return .none
+		case let .prepareForSigningResult(.failure(error)):
+			errorQueue.schedule(error)
 			return .none
 		}
 	}
@@ -461,6 +442,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	) async throws -> TransactionManifest {
 		guard !guarantees.isEmpty else { return manifest }
 		return try await transactionClient.addGuaranteesToManifest(manifest, guarantees)
+	}
+
+	func delayedEffect(
+		delay: Duration = .seconds(0.3),
+		for action: Action
+	) -> EffectTask<Action> {
+		.task {
+			try await clock.sleep(for: delay)
+			return action
+		}
 	}
 }
 

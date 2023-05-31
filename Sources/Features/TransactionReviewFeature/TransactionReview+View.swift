@@ -76,7 +76,6 @@ extension TransactionReview {
 					}
 					.customizeGuarantees(with: store)
 					.selectFeePayer(with: store)
-					.prepareForSigning(with: store)
 					.signing(with: store)
 					.submitting(with: store)
 					.onAppear {
@@ -241,18 +240,6 @@ extension View {
 			state: /TransactionReview.Destinations.State.selectFeePayer,
 			action: TransactionReview.Destinations.Action.selectFeePayer,
 			content: { SelectFeePayer.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	fileprivate func prepareForSigning(
-		with store: StoreOf<TransactionReview>
-	) -> some View {
-		sheet(
-			store: store.destination,
-			state: /TransactionReview.Destinations.State.prepareForSigning,
-			action: TransactionReview.Destinations.Action.prepareForSigning,
-			content: { PrepareForSigning.View(store: $0) }
 		)
 	}
 

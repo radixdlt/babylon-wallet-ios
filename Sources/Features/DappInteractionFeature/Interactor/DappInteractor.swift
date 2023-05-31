@@ -213,6 +213,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata)))))):
 			dismissCurrentModalAndRequest(request, for: &state)
 			return .send(.internal(.presentResponseSuccessView(dappMetadata)))
+
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismissSilently))))):
+			dismissCurrentModalAndRequest(request, for: &state)
+			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
