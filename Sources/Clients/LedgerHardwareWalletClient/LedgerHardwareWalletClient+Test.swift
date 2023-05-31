@@ -16,7 +16,7 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		isConnectedToAnyConnectorExtension: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getDeviceInfo: {
 			.init(
-				id: try! .init(.deadbeef32Bytes),
+				id: try! .init(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
 				model: .nanoS
 			)
 		},
