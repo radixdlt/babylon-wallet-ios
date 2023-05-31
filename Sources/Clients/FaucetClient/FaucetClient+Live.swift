@@ -61,6 +61,7 @@ extension FaucetClient: DependencyKey {
 				.init(
 					networkID: networkID,
 					manifest: manifest,
+					nonce: engineToolkitClient.generateTXNonce(),
 					isFaucetTransaction: true,
 					ephemeralNotaryPublicKey: ephemeralNotary.publicKey
 				)
