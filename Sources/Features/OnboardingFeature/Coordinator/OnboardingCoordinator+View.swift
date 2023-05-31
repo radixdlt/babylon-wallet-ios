@@ -21,7 +21,10 @@ extension OnboardingCoordinator {
 				CaseLet(
 					state: /OnboardingCoordinator.State.createAccountCoordinator,
 					action: { OnboardingCoordinator.Action.child(.createAccountCoordinator($0)) },
-					then: { CreateAccountCoordinator.View(store: $0) }
+					then: {
+						CreateAccountCoordinator.View(store: $0)
+							.padding(.top, .medium3)
+					}
 				)
 			}
 		}

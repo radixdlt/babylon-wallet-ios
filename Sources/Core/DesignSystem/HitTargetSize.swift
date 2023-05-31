@@ -62,9 +62,3 @@ public enum Screen {
 	public static let pixelScale: CGFloat = 2
 	#endif
 }
-
-public extension CGSize {
-	static func * (lhs: CGFloat, rhs: CGSize) -> CGSize {
-		.init(width: lhs * rhs.width, height: lhs * rhs.height)
-	}
-}

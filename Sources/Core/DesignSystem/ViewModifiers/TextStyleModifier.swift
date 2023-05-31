@@ -43,7 +43,7 @@ extension TextStyle {
 	var lineSpacing: CGFloat {
 		switch self {
 		case .sheetTitle:
-			return 36 / 4
+			return 0
 		case .sectionHeader, .secondaryHeader, .body1Header,
 		     .body1HighImportance, .body1Regular, .body1StandaloneLink, .body1Link:
 			return 23 / 4
