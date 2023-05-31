@@ -40,8 +40,8 @@ extension FungibleAssetList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case .tapped:
-				if state.isSelected != nil {
-					state.isSelected?.toggle()
+				if let isSelected = state.isSelected {
+					state.isSelected = isSelected
 					return .none
 				}
 				return .send(.delegate(.selected(state.token)))
