@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ImportMnemonicFeature
 
 extension ProfileBackups {
 	public typealias ViewState = State
@@ -21,9 +22,20 @@ extension ProfileBackups {
 				}
 				.padding(.medium3)
 				.alert(
-					store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
-					state: /ProfileBackups.Alerts.State.confirmCloudSyncDisable,
-					action: ProfileBackups.Alerts.Action.confirmCloudSyncDisable
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ProfileBackups.Destinations.State.confirmCloudSyncDisable,
+					action: ProfileBackups.Destinations.Action.confirmCloudSyncDisable
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ProfileBackups.Destinations.State.importMnemonic,
+					action: ProfileBackups.Destinations.Action.importMnemonic,
+					content: { store in
+						NavigationView {
+							ImportMnemonic.View(store: store)
+								.navigationTitle("Import Seed Phrase") // FIXME: strings
+						}
+					}
 				)
 				.fileImporter(
 					isPresented: viewStore.binding(
@@ -89,11 +101,14 @@ extension ProfileBackups.View {
 					}
 
 					if !viewStore.shownInSettings {
-						Button("Use iCloud Backup Data") { // FIXME: strings
-							viewStore.send(.tappedUseCloudBackup)
-						}
-						.controlState(viewStore.selectedProfileHeader != nil ? .enabled : .disabled)
-						.buttonStyle(.primaryRectangular)
+						WithControlRequirements(
+							viewStore.selectedProfileHeader,
+							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
+							control: { action in
+								Button("Use iCloud Backup Data", action: action)
+									.buttonStyle(.primaryRectangular)
+							}
+						)
 					}
 				} else {
 					Text("No Cloud Backup Data") // FIXME: strings

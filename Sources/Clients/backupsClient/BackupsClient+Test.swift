@@ -19,8 +19,8 @@ extension BackupsClient: TestDependencyKey {
 
 	public static let noop = Self(
 		loadProfileBackups: { nil },
-		importProfileSnapshot: { _ in throw NoopError() },
-		importCloudProfile: { _ in throw NoopError() },
+		importProfileSnapshot: { _, _ in throw NoopError() },
+		importCloudProfile: { _, _ in throw NoopError() },
 		loadDeviceID: { nil }
 	)
 }

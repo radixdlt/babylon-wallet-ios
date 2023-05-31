@@ -81,6 +81,7 @@ extension ImportMnemonic {
 							passphrase(with: viewStore)
 						}
 					}
+					.padding(.horizontal, .small3)
 					.redacted(reason: .privacy, if: viewStore.isHidingSecrets)
 					#if os(iOS)
 						.onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
@@ -97,7 +98,7 @@ extension ImportMnemonic {
 				.animation(.default, value: viewStore.wordCount)
 				.padding(.medium3)
 				.onAppear { viewStore.send(.appeared) }
-				#if os(iOS)
+				#if !DEBUG && os(iOS)
 					.screenshotProtected(isProtected: true)
 				#endif // iOS
 					.sheet(

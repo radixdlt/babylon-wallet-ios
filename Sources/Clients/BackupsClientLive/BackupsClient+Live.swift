@@ -1,5 +1,6 @@
 import BackupsClient
 import ClientPrelude
+import FactorSourcesClient
 import ProfileStore
 
 extension BackupsClient: DependencyKey {
@@ -12,6 +13,21 @@ extension BackupsClient: DependencyKey {
 	) -> Self {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
+
+		@Sendable
+		func importFor(
+			factorSourceID: FactorSourceID,
+			operation: () async throws -> Void
+		) async throws {
+			do {
+				try await operation()
+			} catch {
+				// revert the saved mnemonic
+				try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+				throw error
+			}
+		}
 
 		return Self(
 			loadProfileBackups: { () -> ProfileSnapshot.HeaderList? in
@@ -40,11 +56,15 @@ extension BackupsClient: DependencyKey {
 					return nil
 				}
 			},
-			importProfileSnapshot: {
-				try await getProfileStore().importProfileSnapshot($0)
+			importProfileSnapshot: { snapshot, factorSourceID in
+				try await importFor(factorSourceID: factorSourceID) {
+					try await getProfileStore().importProfileSnapshot(snapshot)
+				}
 			},
-			importCloudProfile: { header in
-				try await getProfileStore().importCloudProfileSnapshot(header)
+			importCloudProfile: { header, factorSourceID in
+				try await importFor(factorSourceID: factorSourceID) {
+					try await getProfileStore().importCloudProfileSnapshot(header)
+				}
 			},
 			loadDeviceID: {
 				try? await secureStorageClient.loadDeviceIdentifier()
