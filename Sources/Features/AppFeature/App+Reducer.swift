@@ -182,6 +182,7 @@ public struct App: Sendable, FeatureReducer {
 
 			case .existingProfile:
 				return checkAccountRecoveryNeeded()
+
 			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
 				errorQueue.schedule(error)
 				return goToOnboarding(state: &state)

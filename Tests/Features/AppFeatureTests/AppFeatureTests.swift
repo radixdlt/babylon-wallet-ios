@@ -123,55 +123,45 @@ final class AppFeatureTests: TestCase {
 		await viewTask.cancel()
 	}
 
-	func test__GIVEN__splash__WHEN__loadProfile_results_in_failedToCreateProfileFromSnapshot__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
-		// given
+	func test__GIVEN__splash__WHEN__invalid_profile__THEN__deleted_and_user_is_onboarded() async throws {
 		let expectationProfileGotDeleted = expectation(description: "Profile gets deleted")
 		let clock = TestClock()
+
 		let store = TestStore(
+			// 🫴 GIVEN splash
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.errorQueue = .liveValue
 			$0.continuousClock = clock
-
-			$0.appPreferencesClient.deleteProfileAndFactorSources = { _ in
-				expectationProfileGotDeleted.fulfill()
-			}
 		}
-
+		store.exhaustivity = .off
 		let viewTask = await store.send(.view(.task))
 
-		// when
-		struct SomeError: Swift.Error {}
-		let badVersion: ProfileSnapshot.Header.Version = 0
-		let failedToCreateProfileFromSnapshot = Profile.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
-
-		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: Profile.LoadingFailure.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
-
-		await store.send(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
-			$0.alert = .incompatibleProfileErrorAlert(
-				.init(
-					title: { TextState("Wallet Data is Incompatible") },
-					actions: {
-						ButtonState(role: .destructive, action: .deleteWalletDataButtonTapped) {
-							TextState("Delete Wallet Data")
-						}
-					},
-					message: { TextState("For this Preview wallet version, you must delete your wallet data to continue.") }
+		await store.send(.child(.splash(.delegate(
+			.loadProfileOutcome(
+				.usersExistingProfileCouldNotBeLoaded(
+					failure: .failedToCreateProfileFromSnapshot(
+						// 🕑 WHEN invalid profile
+						Profile.FailedToCreateProfileFromSnapshot(version: 0, error: NoopError())
+					)
 				)
 			)
-		}
+		))))
 
-		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
-			$0.alert = nil
+		store.dependencies.appPreferencesClient.deleteProfileAndFactorSources = { _ in
+			// ➡️ THEN delete user...
+			expectationProfileGotDeleted.fulfill()
 		}
+		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped)))))
 		await store.receive(.internal(.incompatibleProfileDeleted)) {
+			// ➡️ ... and onboard user
 			$0.root = .onboardingCoordinator(.init())
 		}
 
-		await fulfillment(of: [expectationProfileGotDeleted])
-		await clock.run() // fast-forward clock to the end of time
 		await viewTask.cancel()
+		await clock.run() // fast-forward clock to the end of time
+		await fulfillment(of: [expectationProfileGotDeleted])
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_profileVersionOutdated__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
