@@ -37,19 +37,13 @@ extension SubmitTransaction {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					switch viewStore.status {
-					case .submitting, .submittedPending, .submittedUnknown, .notYetSubmitted:
-						Image(asset: AssetResource.transactionInProgress)
-						Text("Completing Transaction..").textStyle(.body1Regular)
-					case .committedSuccessfully:
-						Image(asset: AssetResource.successCheckmark)
-						Text("Succcess").textStyle(.sheetTitle)
-						Text("Your transaction was successful").textStyle(.body1Regular)
-					case .committedFailure, .rejected:
-						Image(asset: AssetResource.warningError)
-						Text("Something went wrong").textStyle(.sheetTitle)
-						Text("Your transaction error here").textStyle(.body1Regular)
-					}
+                                        switch viewStore.status {
+                                        case .submitting, .submittedPending, .submittedUnknown, .notYetSubmitted:
+                                                Image(asset: AssetResource.transactionInProgress)
+                                                Text("Completing Transaction...").textStyle(.body1Regular)
+                                        default:
+                                                EmptyView()
+                                        }
 				}
 				.padding(.medium1)
 				.onFirstTask { @MainActor in
