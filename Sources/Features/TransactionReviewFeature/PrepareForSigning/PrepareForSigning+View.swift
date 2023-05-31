@@ -8,9 +8,7 @@ extension PrepareForSigning.State {
 
 // MARK: - PrepareForSigning.View
 extension PrepareForSigning {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {

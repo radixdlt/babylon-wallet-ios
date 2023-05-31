@@ -10,16 +10,18 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 		public let feePayer: Profile.Network.Account
 		public let networkID: NetworkID
 		public let purpose: SigningPurpose
-
+		public let nonce: Nonce
 		public var compiledIntent: CompileTransactionIntentResponse? = nil
 		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 		public init(
+			nonce: Nonce,
 			manifest: TransactionManifest,
 			networkID: NetworkID,
 			feePayer: Profile.Network.Account,
 			purpose: SigningPurpose,
 			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 		) {
+			self.nonce = nonce
 			self.manifest = manifest
 			self.networkID = networkID
 			self.feePayer = feePayer
@@ -98,6 +100,7 @@ public struct PrepareForSigning: Sendable, FeatureReducer {
 					try await transactionClient.buildTransactionIntent(.init(
 						networkID: state.networkID,
 						manifest: state.manifest,
+						nonce: state.nonce,
 						ephemeralNotaryPublicKey: state.ephemeralNotaryPublicKey
 					))
 				}

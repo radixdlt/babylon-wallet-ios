@@ -168,6 +168,7 @@ final class FaucetClientTests: TestCase {
 					)
 				)
 			}
+			$0.engineToolkitClient.generateTXNonce = { .init(0xDEAD) }
 			$0.engineToolkitClient.compileTransactionIntent = { _ in try .init(compiledIntentHex: "") }
 			$0.transactionClient.notarizeTransaction = { _ in NotarizeTransactionResponse(notarized: .init(compiledIntent: []), txID: .init("mocked_txid")) }
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }

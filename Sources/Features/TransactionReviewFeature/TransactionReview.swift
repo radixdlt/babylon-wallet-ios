@@ -10,6 +10,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var displayMode: DisplayMode = .review
 
+		public let nonce: Nonce
 		public let transactionManifest: TransactionManifest
 		public let message: String?
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
@@ -30,18 +31,21 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var proofs: TransactionReviewProofs.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
+		public var canApproveTX: Bool = true
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
 		public init(
 			transactionManifest: TransactionManifest,
+			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: String?,
 			feeToAdd: BigDecimal = 10, // fix me use estimate from `analyze`
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
+			self.nonce = nonce
 			self.transactionManifest = transactionManifest
 			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
@@ -159,17 +163,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
-			.debug()
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
 			let manifest = state.transactionManifest
-			return .task { [feeToAdd = state.fee] in
+			return .task { [feeToAdd = state.fee, nonce = state.nonce] in
 				await .internal(.previewLoaded(TaskResult {
 					try await transactionClient.getTransactionReview(.init(
 						manifestToSign: manifest,
+						nonce: nonce,
 						feeToAdd: feeToAdd
 					))
 				}))
@@ -198,6 +202,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
+			state.canApproveTX = false
 
 			let guarantees = state.allGuarantees
 
@@ -255,9 +260,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 		case .destination(.presented(.prepareForSigning(.delegate(.failedToBuildTX)))):
+			state.canApproveTX = true
 			return .none
 
 		case .destination(.presented(.prepareForSigning(.delegate(.failedToLoadSigners)))):
+			state.canApproveTX = true
 			return .none
 
 		case let .destination(.presented(.prepareForSigning(.delegate(.done(compiledIntent, signingFactors))))):
@@ -293,6 +300,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
+			state.canApproveTX = true
 			return .none
 
 		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))))):
@@ -300,6 +308,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(_)))))):
+			state.canApproveTX = true
 			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
@@ -307,14 +316,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
 		case
-			.destination(.presented(.submitting(.delegate(.failedToSubmit)))),
-			.destination(.presented(.submitting(.delegate(.failedToReceiveStatusUpdate)))):
+			.destination(.presented(.submitting(.delegate(.failedToSubmit)))):
 			state.destination = nil
+			state.canApproveTX = true
 			loggerGlobal.error("Failed to submit tx")
+			return .none
+
+		case .destination(.presented(.submitting(.delegate(.failedToReceiveStatusUpdate)))):
+			state.destination = nil
+			loggerGlobal.error("Failed to receive status update")
 			return .none
 
 		case .destination(.presented(.submitting(.delegate(.submittedTransactionFailed)))):
 			state.destination = nil
+			state.canApproveTX = true
 			loggerGlobal.error("Submitted TX failed")
 			return .send(.delegate(.failed(.failedToSubmit)))
 
@@ -420,6 +435,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 			state.destination = .prepareForSigning(.init(
+				nonce: state.nonce,
 				manifest: manifest,
 				networkID: networkID,
 				feePayer: feePayerSelectionAmongstCandidates.selected.account,
