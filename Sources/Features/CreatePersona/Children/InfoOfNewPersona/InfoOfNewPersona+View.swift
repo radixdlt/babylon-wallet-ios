@@ -87,7 +87,7 @@ extension NewPersonaInfo {
 							viewStore.sanitizedNameRequirement,
 							forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName, $0.personaInfoFields)) }
 						) { action in
-							Button(L10n.Common.continue, action: action)
+							Button(L10n.CreatePersona.NameNewPersona.continue, action: action)
 								.buttonStyle(.primaryRectangular)
 						}
 					}

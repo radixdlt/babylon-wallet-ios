@@ -64,7 +64,7 @@ extension AccountPermission {
 					.padding(.bottom, .medium2)
 				}
 				.footer {
-					Button(L10n.Common.continue) {
+					Button(L10n.DAppRequest.AccountPermission.continue) {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)

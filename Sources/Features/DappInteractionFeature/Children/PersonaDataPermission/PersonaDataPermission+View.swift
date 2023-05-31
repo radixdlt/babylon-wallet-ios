@@ -80,7 +80,7 @@ extension PersonaDataPermission {
 						viewStore.output,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.Common.continue, action: action)
+						Button(L10n.DAppRequest.PersonalDataPermission.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

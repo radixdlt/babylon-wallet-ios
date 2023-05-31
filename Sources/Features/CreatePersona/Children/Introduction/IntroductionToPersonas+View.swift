@@ -31,7 +31,7 @@ extension IntroductionToPersonas {
 					.padding(.bottom, .medium2)
 				}
 				.footer {
-					Button(L10n.Common.continue) {
+					Button(L10n.CreatePersona.Introduction.continue) {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
