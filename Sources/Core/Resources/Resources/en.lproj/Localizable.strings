@@ -125,7 +125,7 @@
 "linkedConnectors_newConnection_title" = "Link New Connector";
 "linkedConnectors_newConnection_subtitle" = "Scan the QR code shown in the Radix Connector browser extension";
 "linkedConnectors_newConnection_connectionDefaultName" = "Unnamed";
-"linkedConnectors_newConnection_linking" = "Linking...";
+"linkedConnectors_newConnection_linking" = "Linking…";
 "linkedConnectors_newConnection_textFieldPlaceholder" = "Name of Connector";
 "linkedConnectors_newConnection_textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
 "linkedConnectors_newConnection_saveLinkButtonTitle" = "Save Link";
@@ -320,7 +320,7 @@
 "dAppRequest_completion_title" = "Success";
 "dAppRequest_completion_subtitle" = "Request from %@ complete";
 "dAppRequest_metadataLoadingAlert_message" = "Danger! Bad dApp config or you\'re being spoofed!";
-"dAppRequest_metadataLoadingPrompt" = "Loading...";
+"dAppRequest_metadataLoadingPrompt" = "Loading…";
 "dAppRequest_metadata_unknownName" = "Unknown dApp";
 "dAppRequest_personalDataBox_edit" = "Edit";
 "dAppRequest_personalDataBox_requiredInformation" = "Required information:";
@@ -459,9 +459,9 @@
 "splash_passcodeCheckFailedAlert_title" = "Warning";
 "splash_passcodeCheckFailedAlert_message" = "Passcode is not set up. Please update settings.";
 "transactionSigning_title" = "Approve Transaction";
-"transactionSigning_preparingTransaction" = "Preparing transaction...";
+"transactionSigning_preparingTransaction" = "Preparing transaction…";
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";
-"transactionSigning_signingAndSubmittingTransaction" = "Submitting transaction...";
+"transactionSigning_signingAndSubmittingTransaction" = "Submitting transaction…";
 "addLedger_alreadyAddedAlert_title" = "Ledger is already added.";
 "addLedger_alreadyAddedAlert_message" = "You have already added this ledger %@ %@";
 "addLedger_addDevice_title" = "Add Ledger Device.";
@@ -560,7 +560,7 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "ledgerHardwareDevices_addedHeading" = "Added";
 "ledgerHardwareDevices_usedHeading" = "Used";
 "ledgerHardwareDevices_continueWithLedger" = "Continue";
-"ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
+"ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started…";
 "ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger hardware wallet device";
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have connected to";
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
