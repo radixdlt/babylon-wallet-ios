@@ -72,7 +72,7 @@ public struct AddInstructionToManifestRequest: Sendable, Hashable {
 
 extension TransactionClient {
 	public struct PrepareForSigningRequest: Equatable, Sendable {
-                public let nonce: Nonce
+		public let nonce: Nonce
 		public let manifest: TransactionManifest
 		public let feePayer: Profile.Network.Account
 		public let networkID: NetworkID
@@ -82,14 +82,14 @@ extension TransactionClient {
 		public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
 		public init(
-                        nonce: Nonce,
+			nonce: Nonce,
 			manifest: TransactionManifest,
 			networkID: NetworkID,
 			feePayer: Profile.Network.Account,
 			purpose: SigningPurpose,
 			ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 		) {
-                        self.nonce = nonce
+			self.nonce = nonce
 			self.manifest = manifest
 			self.networkID = networkID
 			self.feePayer = feePayer

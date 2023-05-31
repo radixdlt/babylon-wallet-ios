@@ -99,6 +99,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
 		case transactionCompleted(TransactionIntent.TXID)
+		case userDismissedTransactionStatus
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -296,7 +297,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.submitting(.delegate(.committedSuccessfully(txID))))):
 			state.destination = nil
-			return .send(.delegate(.transactionCompleted(txID)))
+			return .task {
+				try? await clock.sleep(for: .milliseconds(300)) // bah, we need to to dismiss `state.destination` before proceeding with completion
+				return .delegate(.transactionCompleted(txID))
+			}
+		case .destination(.presented(.submitting(.delegate(.dismiss)))):
+			state.destination = nil
+			return .task {
+				try? await clock.sleep(for: .milliseconds(300)) // bah, we need to to dismiss `state.destination` before proceeding with completion
+				return .delegate(.userDismissedTransactionStatus)
+			}
 
 		default:
 			return .none
@@ -396,7 +406,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 			let request = TransactionClient.PrepareForSigningRequest(
-                                nonce: state.nonce,
+				nonce: state.nonce,
 				manifest: manifest,
 				networkID: networkID,
 				feePayer: feePayerSelectionAmongstCandidates.selected.account,

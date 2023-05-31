@@ -386,6 +386,7 @@ extension TransactionClient {
 			let transactionIntentWithSigners = try await buildTransactionIntent(.init(
 				networkID: request.networkID,
 				manifest: request.manifest,
+				nonce: request.nonce,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
