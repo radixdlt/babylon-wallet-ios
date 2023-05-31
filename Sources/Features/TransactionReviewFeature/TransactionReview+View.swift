@@ -24,7 +24,7 @@ extension TransactionReview.State {
 			showDottedLine: (withdrawals != nil || message != nil) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
 			showApproveButton: transactionWithLockFee != nil,
-			hasApprovedTX: hasApprovedTX
+			canApproveTX: canApproveTX
 		)
 	}
 
@@ -47,7 +47,7 @@ extension TransactionReview {
 		let showDottedLine: Bool
 		let rawTransaction: String?
 		let showApproveButton: Bool
-		let hasApprovedTX: Bool
+		let canApproveTX: Bool
 	}
 
 	@MainActor
@@ -121,7 +121,7 @@ extension TransactionReview {
 						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
 							viewStore.send(.approveTapped)
 						}
-						.controlState(viewStore.hasApprovedTX ? .disabled : .enabled)
+						.controlState(viewStore.canApproveTX ? .enabled : .disabled)
 						.buttonStyle(.primaryRectangular)
 						.padding(.bottom, .medium1)
 					}

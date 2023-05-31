@@ -31,7 +31,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var proofs: TransactionReviewProofs.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
-		public var hasApprovedTX: Bool = false
+		public var canApproveTX: Bool = true
 
 		@PresentationState
 		public var destination: Destinations.State? = nil
@@ -202,7 +202,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .approveTapped:
 			guard let transactionWithLockFee = state.transactionWithLockFee else { return .none }
-			state.hasApprovedTX = true
+			state.canApproveTX = false
 
 			let guarantees = state.allGuarantees
 
@@ -260,9 +260,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 		case .destination(.presented(.prepareForSigning(.delegate(.failedToBuildTX)))):
+			state.canApproveTX = true
 			return .none
 
 		case .destination(.presented(.prepareForSigning(.delegate(.failedToLoadSigners)))):
+			state.canApproveTX = true
 			return .none
 
 		case let .destination(.presented(.prepareForSigning(.delegate(.done(compiledIntent, signingFactors))))):
@@ -298,6 +300,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
+			state.canApproveTX = true
 			return .none
 
 		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))))):
@@ -305,6 +308,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(_)))))):
+			state.canApproveTX = true
 			assertionFailure("Did not expect to have sign auth data...")
 			return .none
 
@@ -312,14 +316,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
 
 		case
-			.destination(.presented(.submitting(.delegate(.failedToSubmit)))),
-			.destination(.presented(.submitting(.delegate(.failedToReceiveStatusUpdate)))):
+			.destination(.presented(.submitting(.delegate(.failedToSubmit)))):
 			state.destination = nil
+			state.canApproveTX = true
 			loggerGlobal.error("Failed to submit tx")
+			return .none
+
+		case .destination(.presented(.submitting(.delegate(.failedToReceiveStatusUpdate)))):
+			state.destination = nil
+			loggerGlobal.error("Failed to receive status update")
 			return .none
 
 		case .destination(.presented(.submitting(.delegate(.submittedTransactionFailed)))):
 			state.destination = nil
+			state.canApproveTX = true
 			loggerGlobal.error("Submitted TX failed")
 			return .send(.delegate(.failed(.failedToSubmit)))
 
