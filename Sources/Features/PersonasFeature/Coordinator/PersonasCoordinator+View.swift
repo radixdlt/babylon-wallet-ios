@@ -20,21 +20,37 @@ extension PersonasCoordinator {
 				)
 			)
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
-			.sheet(
-				store: store.scope(
-					state: \.$createPersonaCoordinator,
-					action: { .child(.createPersonaCoordinator($0)) }
-				),
-				content: { CreatePersonaCoordinator.View(store: $0) }
-			)
-			.navigationDestination(
-				store: store.scope(
-					state: \.$personaDetails,
-					action: { .child(.personaDetails($0)) }
-				),
-				destination: { PersonaDetails.View(store: $0) }
-			)
+			.destination(store: store)
 		}
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func destination(store: StoreOf<PersonasCoordinator>) -> some View {
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		return createPersonaCoordinator(with: destinationStore)
+			.personaDetails(with: destinationStore)
+	}
+
+	@MainActor
+	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /PersonasCoordinator.Destination.State.createPersonaCoordinator,
+			action: PersonasCoordinator.Destination.Action.createPersonaCoordinator,
+			content: { CreatePersonaCoordinator.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func personaDetails(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /PersonasCoordinator.Destination.State.personaDetails,
+			action: PersonasCoordinator.Destination.Action.personaDetails,
+			destination: { PersonaDetails.View(store: $0) }
+		)
 	}
 }
 
