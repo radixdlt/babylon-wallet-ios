@@ -618,3 +618,4 @@
 "assetTransfer_accountList_toLabel" = "To";
 "assetTransfer_accountList_addAccountButton" = "Add Account";
 
+"assetTransfer_addAssets_navigationTitle" = "Choose Asset(s)";

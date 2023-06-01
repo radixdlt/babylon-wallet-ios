@@ -79,17 +79,12 @@ extension AssetsView {
 
 		private func headerView(_ viewStore: ViewStoreOf<AssetsView>) -> some SwiftUI.View {
 			ZStack {
-				HStack {
-					CloseButton {
-						viewStore.send(.closeButtonTapped)
-					}
-					Spacer()
+				CloseButtonBar {
+					viewStore.send(.closeButtonTapped)
 				}
-				Text("Choose Asset(s)")
+				Text(L10n.AssetTransfer.AddAssets.navigationTitle)
 					.textStyle(.body1Header)
-				Spacer()
 			}
-			.padding([.top, .leading], .medium1)
 			.padding(.bottom, .small1)
 		}
 
