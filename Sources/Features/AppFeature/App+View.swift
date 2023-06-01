@@ -35,6 +35,7 @@ extension App {
 						then: { Splash.View(store: $0) }
 					)
 				}
+				.tint(.app.gray1)
 				.alert(
 					store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
 					state: /App.Alerts.State.userErrorAlert,

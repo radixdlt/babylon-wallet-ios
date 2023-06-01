@@ -530,8 +530,8 @@ public enum L10n {
       public static let explanation = L10n.tr("Localizable", "createEntity_nameNewEntity_explanation", fallback: "This can be changed any time")
       /// Requires you to sign transactions using your Ledger
       public static let ledgerSubtitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerSubtitle", fallback: "Requires you to sign transactions using your Ledger")
-      /// Create with Ledger hardware wallet
-      public static let ledgerTitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerTitle", fallback: "Create with Ledger hardware wallet")
+      /// Create with Ledger Hardware Wallet
+      public static let ledgerTitle = L10n.tr("Localizable", "createEntity_nameNewEntity_ledgerTitle", fallback: "Create with Ledger Hardware Wallet")
     }
   }
   public enum CreatePersona {

@@ -216,7 +216,7 @@
 "createEntity_ledger_createAccount" = "Create Ledger Account";
 "createEntity_ledger_createPersona" = "Create Ledger Persona";
 "createEntity_nameNewEntity_explanation" = "This can be changed any time";
-"createEntity_nameNewEntity_ledgerTitle" = "Create with Ledger hardware wallet";
+"createEntity_nameNewEntity_ledgerTitle" = "Create with Ledger Hardware Wallet";
 "createEntity_nameNewEntity_ledgerSubtitle" = "Requires you to sign transactions using your Ledger";
 "createPersona_emptyDisplayName" = "Empty display name";
 "createPersona_completion_subtitleFirst" = "You’ve created your first Persona.";
