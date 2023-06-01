@@ -74,32 +74,32 @@ extension PersonaDetails.View {
 					}
 				}
 				.navigationTitle(viewStore.personaName)
-				.onAppear {
-					viewStore.send(.appeared)
-				}
+				#if os(iOS)
+					.navigationBarTitleDisplayMode(.inline)
+				#endif
+					.onAppear {
+						viewStore.send(.appeared)
+					}
 			}
 		}
+		.navigationDestination(
+			store: store.destination,
+			state: /PersonaDetails.Destination.State.dAppDetails,
+			action: PersonaDetails.Destination.Action.dAppDetails,
+			destination: { SimpleDappDetails.View(store: $0) }
+		)
 		.sheet(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.editPersona,
-			action: PersonaDetails.Destination.Action.editPersona
-		) { store in
-			EditPersona.View(store: store)
-		}
+			action: PersonaDetails.Destination.Action.editPersona,
+			content: { EditPersona.View(store: $0) }
+		)
 		.sheet(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.createAuthKey,
-			action: PersonaDetails.Destination.Action.createAuthKey
-		) { store in
-			CreateAuthKey.View(store: store)
-		}
-		.sheet(
-			store: store.destination,
-			state: /PersonaDetails.Destination.State.dAppDetails,
-			action: PersonaDetails.Destination.Action.dAppDetails
-		) { store in
-			SimpleDappDetails.View(store: store)
-		}
+			action: PersonaDetails.Destination.Action.createAuthKey,
+			content: { CreateAuthKey.View(store: $0) }
+		)
 		.alert(
 			store: store.destination,
 			state: /PersonaDetails.Destination.State.confirmForgetAlert,

@@ -29,7 +29,6 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case dismissPersonaTapped
 	}
 
 	public enum InternalAction: Sendable & Equatable {
@@ -67,9 +66,6 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return checkIfFirstPersonaByUserEver()
-		case .dismissPersonaTapped:
-			state.personaDetails = nil
-			return .none
 		}
 	}
 
