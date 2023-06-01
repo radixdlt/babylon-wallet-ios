@@ -29,7 +29,7 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 	public init(
 		common: FactorSource.Common,
 		hint: Hint,
-		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? = nil
+		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
 	) {
 		self.common = common
 		self.hint = hint

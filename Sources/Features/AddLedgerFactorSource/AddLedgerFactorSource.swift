@@ -224,7 +224,8 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 				hint: .init(
 					name: .init(rawValue: state.ledgerName),
 					model: .init(model: state.deviceInfo.model)
-				)
+				),
+				nextDerivationIndicesPerNetwork: .init() // FIXME: Post-MFA remove this
 			)
 
 			return .send(.delegate(.complete(ledger)))
