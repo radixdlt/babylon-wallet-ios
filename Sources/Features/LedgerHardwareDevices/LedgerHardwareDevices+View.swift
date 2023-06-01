@@ -36,7 +36,7 @@ extension LedgerHardwareDevices {
 			if allowSelection {
 				return L10n.LedgerHardwareDevices.navigationTitleAllowSelection
 			} else {
-				return L10n.LedgerHardwareDevices.navigationTitleAllowSelection
+				return L10n.LedgerHardwareDevices.navigationTitleGeneral
 			}
 		}
 
@@ -69,36 +69,47 @@ extension LedgerHardwareDevices {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack(spacing: .medium3) {
-						if viewStore.showHeaders {
-							if let subtitle = viewStore.subtitle {
-								Text(subtitle)
-									.foregroundColor(.app.gray2)
-									.textStyle(.body1Link)
-									.flushedLeft
-							}
+					VStack(spacing: 0) {
+						Group {
+							Image(asset: AssetResource.iconHardwareLedger)
+								.frame(.medium)
+								.padding(.vertical, .medium2)
 
-							Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
-								viewStore.send(.whatIsALedgerButtonTapped)
+							Text(viewStore.navigationTitle)
+								.textStyle(.sheetTitle)
+								.foregroundColor(.app.gray1)
+								.padding(.bottom, .medium1)
+
+							if viewStore.showHeaders {
+								if let subtitle = viewStore.subtitle {
+									Text(subtitle)
+										.foregroundColor(.app.gray1)
+										.textStyle(.secondaryHeader)
+										.padding(.horizontal, .medium1)
+										.padding(.bottom, .medium1)
+								}
+
+								//							Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
+								//								viewStore.send(.whatIsALedgerButtonTapped)
+								//							}
+								//							.buttonStyle(.info)
+								//							.flushedLeft
 							}
-							.buttonStyle(.info)
-							.flushedLeft
 						}
+						.multilineTextAlignment(.center)
 
 						ledgerList(viewStore: viewStore)
+							.padding(.bottom, .medium1)
 
 						Button(L10n.LedgerHardwareDevices.addNewLedger) {
 							viewStore.send(.addNewLedgerButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
-						.padding(.top, .small1)
 
 						Spacer(minLength: 0)
 					}
 					.padding(.horizontal, .medium1)
-					.padding(.top, .small1)
 				}
-				.navigationTitle(viewStore.navigationTitle)
 				.footer(visible: viewStore.allowSelection) {
 					WithControlRequirements(
 						viewStore.selectedLedgerControlRequirements,
@@ -106,6 +117,7 @@ extension LedgerHardwareDevices {
 					) { action in
 						Button(L10n.LedgerHardwareDevices.continueWithLedger, action: action)
 							.buttonStyle(.primaryRectangular)
+							.padding(.bottom, .medium1)
 					}
 				}
 				.onFirstTask { @MainActor in
@@ -125,27 +137,30 @@ extension LedgerHardwareDevices {
 			case .success([]):
 				Text(L10n.LedgerHardwareDevices.subtitleNoLedgers)
 					.foregroundColor(.app.gray1)
-					.textStyle(.body1Regular)
-					.flushedLeft
+					.textStyle(.secondaryHeader)
+					.multilineTextAlignment(.center)
+
 			case let .success(ledgers):
-				if viewStore.allowSelection {
-					Selection(
-						viewStore.binding(
-							get: \.ledgersArray,
-							send: { .selectedLedger(id: $0?.first?.id) }
-						),
-						from: ledgers,
-						requiring: .exactly(1)
-					) { item in
-						LedgerRowView(
-							viewState: .init(factorSource: item.value),
-							isSelected: item.isSelected,
-							action: item.action
-						)
-					}
-				} else {
-					ForEach(ledgers) { ledger in
-						LedgerRowView(viewState: .init(factorSource: ledger))
+				VStack(spacing: .medium1) {
+					if viewStore.allowSelection {
+						Selection(
+							viewStore.binding(
+								get: \.ledgersArray,
+								send: { .selectedLedger(id: $0?.first?.id) }
+							),
+							from: ledgers,
+							requiring: .exactly(1)
+						) { item in
+							LedgerRowView(
+								viewState: .init(factorSource: item.value),
+								isSelected: item.isSelected,
+								action: item.action
+							)
+						}
+					} else {
+						ForEach(ledgers) { ledger in
+							LedgerRowView(viewState: .init(factorSource: ledger))
+						}
 					}
 				}
 			}

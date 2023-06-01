@@ -440,17 +440,18 @@
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
 "ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.\n\nInstall the Connector extension, open it to see the linking QR code, and tap continue.";
 
-"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Ledger Device";
-"ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Hardware Wallets";
+"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Ledger";
+"ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Devices";
 
 "ledgerHardwareDevices_ledgerFactorSourceInfoCaption" = "What is a Ledger Factor Source";
 
-"ledgerHardwareDevices_addNewLedger" = "Add New Ledger";
+"ledgerHardwareDevices_addNewLedger" = "Add Ledger Device";
 "ledgerHardwareDevices_addedHeading" = "Added";
 "ledgerHardwareDevices_usedHeading" = "Used";
 
 "ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
-"ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger hardware wallet device";
+"ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger device to use";
+
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have connected to";
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
 

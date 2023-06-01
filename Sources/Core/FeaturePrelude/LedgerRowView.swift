@@ -7,13 +7,13 @@ import SwiftUI
 public struct LedgerRowView: View {
 	public struct ViewState: Equatable {
 		let description: String
-		let addedOn: String
-		let lastUsedOn: String
+		let addedOn: Date
+		let lastUsedOn: Date
 
 		public init(factorSource: LedgerHardwareWalletFactorSource) {
-			self.description = "\(factorSource.hint.name.rawValue) (\(factorSource.hint.name.rawValue))"
-			self.addedOn = factorSource.addedOn.ISO8601Format(.iso8601Date(timeZone: .current))
-			self.lastUsedOn = factorSource.lastUsedOn.ISO8601Format(.iso8601Date(timeZone: .current))
+			self.description = factorSource.hint.name.rawValue
+			self.addedOn = factorSource.addedOn
+			self.lastUsedOn = factorSource.lastUsedOn
 		}
 	}
 
@@ -37,14 +37,17 @@ public struct LedgerRowView: View {
 
 	public var body: some View {
 		Card(.app.gray5, action: action) {
-			HStack {
+			HStack(spacing: 0) {
 				VStack(alignment: .leading, spacing: 0) {
 					Text(viewState.description)
-						.textStyle(.body1Header)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
+						.padding(.bottom, .small1)
 
-					HPair(label: L10n.LedgerHardwareDevices.usedHeading, item: viewState.lastUsedOn)
+					LedgerDatePair(label: L10n.LedgerHardwareDevices.usedHeading, date: viewState.lastUsedOn)
+						.padding(.bottom, .small3)
 
-					HPair(label: L10n.LedgerHardwareDevices.addedHeading, item: viewState.addedOn)
+					LedgerDatePair(label: L10n.LedgerHardwareDevices.addedHeading, date: viewState.addedOn)
 				}
 
 				Spacer(minLength: 0)
@@ -57,7 +60,28 @@ public struct LedgerRowView: View {
 				}
 			}
 			.foregroundColor(.app.gray1)
-			.padding(.medium1)
+			.padding(.horizontal, .large3)
+			.padding(.vertical, .medium1)
 		}
 	}
+}
+
+// MARK: - LedgerDatePair
+struct LedgerDatePair: View {
+	let label: String
+	let date: Date
+
+	var body: some View {
+		HStack(spacing: .small3) {
+			Text(label)
+				.textStyle(.body2Header)
+
+			Text(date.formatted(dateFormat))
+				.textStyle(.body2Regular)
+				.frame(maxWidth: .infinity, alignment: .leading)
+		}
+		.foregroundColor(.app.gray2)
+	}
+
+	private let dateFormat: Date.FormatStyle = .dateTime.day().month(.wide).year()
 }
