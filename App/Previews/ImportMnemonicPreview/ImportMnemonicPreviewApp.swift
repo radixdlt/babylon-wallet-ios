@@ -8,7 +8,8 @@ struct ImportMnemonicPreviewApp: App {
 			ImportMnemonic.View(
 				store: Store(
 					initialState: ImportMnemonic.State(
-						saveInProfileKind: .offDevice
+						persistAsMnemonicKind: .offDevice,
+						offDeviceMnemonicInfoPrompt: .init(mnemonicWithPassphrase: .testValue)
 					),
 					reducer: ImportMnemonic()
 						._printChanges()

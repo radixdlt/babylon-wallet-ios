@@ -182,13 +182,11 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 extension FactorSourcesClient {
 	public func addOffDeviceFactorSource(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		story: OffDeviceMnemonicFactorSource.Hint.Story,
-		backupLocationHint backupLocation: OffDeviceMnemonicFactorSource.Hint.BackupLocation
+		label: OffDeviceMnemonicFactorSource.Hint.Label
 	) async throws -> FactorSourceID {
 		let factorSource = try OffDeviceMnemonicFactorSource.from(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			story: story,
-			backupLocation: backupLocation
+			label: label
 		)
 
 		return try await addPrivateHDFactorSource(.init(

@@ -10,17 +10,12 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 
 	public struct Hint: Sendable, Hashable, Codable {
 		/// "Horse battery"
-		public var story: Story; public typealias Story = Tagged<(Self, story: ()), String>
-
-		/// "In a book at my safe place"
-		public var backupLocation: BackupLocation; public typealias BackupLocation = Tagged<(Self, backupLocation: ()), String>
+		public var label: Label; public typealias Label = Tagged<(Self, label: ()), String>
 
 		public init(
-			story: Story,
-			backupLocation: BackupLocation
+			label: Label
 		) {
-			self.story = story
-			self.backupLocation = backupLocation
+			self.label = label
 		}
 	}
 
@@ -41,7 +36,11 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 
 		public init(mnemonicWithPassphrase: MnemonicWithPassphrase) {
 			let mnemonic = mnemonicWithPassphrase.mnemonic
-			self.init(wordCount: mnemonic.wordCount, language: mnemonic.language, bip39PassphraseSpecified: !mnemonicWithPassphrase.passphrase.isEmpty)
+			self.init(
+				wordCount: mnemonic.wordCount,
+				language: mnemonic.language,
+				bip39PassphraseSpecified: !mnemonicWithPassphrase.passphrase.isEmpty
+			)
 		}
 	}
 
@@ -61,8 +60,7 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 
 	public static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		story: Hint.Story,
-		backupLocation: Hint.BackupLocation,
+		label: Hint.Label,
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
 	) throws -> Self {
@@ -75,7 +73,7 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),
-			hint: .init(story: story, backupLocation: backupLocation),
+			hint: .init(label: label),
 			bip39Parameters: .init(mnemonicWithPassphrase: mnemonicWithPassphrase)
 		)
 	}
