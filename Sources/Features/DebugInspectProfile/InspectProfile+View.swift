@@ -237,8 +237,7 @@ public struct OffDeviceMnemonicFactorSourceView: View {
 		Labeled("Word count", value: offDeviceMnemonicFactorSource.bip39Parameters.wordCount)
 		Labeled("Language", value: offDeviceMnemonicFactorSource.bip39Parameters.language)
 		Labeled("Passphrase?", value: offDeviceMnemonicFactorSource.bip39Parameters.bip39PassphraseSpecified)
-		Labeled("Story", value: offDeviceMnemonicFactorSource.hint.story)
-		Labeled("Backup location", value: offDeviceMnemonicFactorSource.hint.backupLocation)
+		Labeled("Label", value: offDeviceMnemonicFactorSource.hint.label)
 	}
 }
 
