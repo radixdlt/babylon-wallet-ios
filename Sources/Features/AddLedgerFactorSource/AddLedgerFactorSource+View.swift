@@ -142,7 +142,7 @@ extension NameLedgerFactorSource {
 
 						Spacer()
 					}
-					.padding(.horizontal, .large2)
+					.padding(.horizontal, .medium1)
 					.multilineTextAlignment(.center)
 					.foregroundColor(.app.gray1)
 					.footer {
@@ -151,7 +151,6 @@ extension NameLedgerFactorSource {
 						}
 						.controlState(viewStore.confirmButtonControlState)
 						.buttonStyle(.primaryRectangular)
-						.padding([.bottom, .horizontal], .medium3)
 					}
 				}
 			}
