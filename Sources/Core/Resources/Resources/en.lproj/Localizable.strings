@@ -437,21 +437,6 @@
 
 "common_done" = "Done";
 
-"accountSettings_debug_turnIntoDappDefinition" = "Turn into dApp Definition account type";
-"accountSettings_debug_createAndUploadAuthKey" = "Create & Upload Auth Key";
-"accountSettings_debug_createFungibleToken" = "Create Fungible Token";
-"accountSettings_debug_creatingToken" = "Creating Token";
-"accountSettings_debug_createNFT" = "Create NFT";
-"accountSettings_debug_creatingNFT" = "Creating NFT";
-
-"accountSettings_debug_createFungibleTokens" = "Create Multiple Fungible Tokens";
-"accountSettings_debug_creatingTokens" = "Creating Tokens";
-"accountSettings_debug_createNFTs" = "Create Multiple NFTs";
-"accountSettings_debug_creatingNFTs" = "Creating NFTs";
-
-"accountSettings_debug_turnIntoDappDefinition" = "Turn into dApp Definition account type";
-"accountSettings_debug_turnIntoDappDefinition" = "Turn into dApp Definition account type";
-
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
 "ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.\n\nInstall the Connector extension, open it to see the linking QR code, and tap continue.";
 
@@ -538,7 +523,7 @@
 "generalSettings_verboseLedgerMode_subtitle" = "When signing with your Ledger hardware wallet, should all instructions be displayed?";
 
 "generalSettings_title" = "App Settings";
-//"generalSettings_subtitle" = "Customize your Radix Wallet";
+"generalSettings_subtitle" = "Customize your Radix Wallet";
 "generalSettings_developerMode_title" = "Developer Mode";
 "generalSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
 
@@ -605,3 +590,31 @@
 
 "importMnemonic_offDevice_saveWithDescription" = "Save with description";
 "importMnemonic_offDevice_saveWithoutDescription" = "Save without description";
+
+"authorizedDapps_removeAuthorizationAlert_confirm" = "Confirm";
+
+"signing_useLedgerPurpose_createAccount" = "Creating account";
+"signing_useLedgerPurpose_createAuthSigningKey" = "Creating auth key";
+"signing_useLedgerPurpose_signAuth" = "Sign auth challenge";
+"signing_useLedgerPurpose_signTX" = "Sign transaction";
+"signing_useLedgerPurpose_importLegacyAccounts" = "Import Legacy Accounts";
+
+"signing_useLedgerLabel_Ledger" = "Ledger";
+"signing_useLedgerLabel_lastUsed" = "Last used";
+"signing_useLedgerLabel_addedOn" = "Added on";
+
+"addLedger_addDevice_continue" = "Continue";
+"createAccount_nameNewAccount_continue" = "Continue";
+"createPersona_nameNewPersona_continue" = "Continue";
+"createPersona_introduction_continue" = "Continue";
+"dAppRequest_accountPermission_continue" = "Continue";
+"dAppRequest_chooseAccounts_continue" = "Continue";
+"dAppRequest_login_continue" = "Continue";
+"dAppRequest_personalDataOneTime_continue" = "Continue";
+"dAppRequest_personalDataPermission_continue" = "Continue";
+"ledgerHardwareDevices_linkConnectorAlert_continue" = "Continue";
+"ledgerHardwareDevices_continueWithLedger" = "Continue";
+
+"assetTransfer_accountList_toLabel" = "To";
+"assetTransfer_accountList_addAccountButton" = "Add Account";
+

@@ -248,7 +248,7 @@ extension AlertState<LedgerHardwareDevices.Destinations.Action.NoP2PLinkAlert> {
 				TextState(L10n.Common.cancel)
 			}
 			ButtonState(action: .addNewP2PLinkTapped) {
-				TextState(L10n.Common.continue)
+				TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.continue)
 			}
 		} message: {
 			TextState(L10n.LedgerHardwareDevices.LinkConnectorAlert.message)

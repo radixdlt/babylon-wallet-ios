@@ -80,7 +80,7 @@ extension NameAccount {
 						viewStore.sanitizedNameRequirement,
 						forAction: { viewStore.send(.confirmNameButtonTapped($0.sanitizedName)) }
 					) { action in
-						Button(L10n.Common.continue, action: action)
+						Button(L10n.CreateAccount.NameNewAccount.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

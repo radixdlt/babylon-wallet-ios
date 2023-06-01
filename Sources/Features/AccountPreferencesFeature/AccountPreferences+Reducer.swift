@@ -129,10 +129,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	#if DEBUG
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-	@Dependency(\.engineToolkitClient) var engineToolkitClient
 	#endif // DEBUG
 
 	public init() {}
@@ -289,6 +289,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case let .turnIntoDappDefAccountType(manifest):
 			state.destination = .reviewTransactionTurningAccountIntoDappDefType(.init(
 				transactionManifest: manifest,
+				nonce: engineToolkitClient.generateTXNonce(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
 				message: nil
 			))

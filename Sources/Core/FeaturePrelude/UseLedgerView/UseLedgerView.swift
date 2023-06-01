@@ -52,15 +52,15 @@ public struct UseLedgerView: SwiftUI.View {
 	var title: String {
 		switch purpose {
 		case .createAccount:
-			return "Creating account"
+			return L10n.Signing.UseLedgerPurpose.createAccount
 		case .createAuthSigningKey:
-			return "Creating auth key"
+			return L10n.Signing.UseLedgerPurpose.createAuthSigningKey
 		case .signAuth:
-			return "Sign auth challenge"
+			return L10n.Signing.UseLedgerPurpose.signAuth
 		case .signTX:
-			return "Sign transaction"
+			return L10n.Signing.UseLedgerPurpose.signTX
 		case .importLegacyAccounts:
-			return "Import Legacy Accounts"
+			return L10n.Signing.UseLedgerPurpose.importLegacyAccounts
 		}
 	}
 
@@ -68,9 +68,9 @@ public struct UseLedgerView: SwiftUI.View {
 		VStack {
 			Text(title).textStyle(.body1HighImportance)
 			let display = "\(model) - \(name)"
-			VPair(heading: "Ledger", item: display)
-			VPair(heading: "Last used", item: lastUsedOn.ISO8601Format())
-			VPair(heading: "Added on", item: addedOn.ISO8601Format())
+			VPair(heading: L10n.Signing.UseLedgerLabel.ledger, item: display)
+			VPair(heading: L10n.Signing.UseLedgerLabel.lastUsed, item: lastUsedOn.ISO8601Format())
+			VPair(heading: L10n.Signing.UseLedgerLabel.addedOn, item: addedOn.ISO8601Format())
 		}
 		.padding()
 	}

@@ -341,7 +341,7 @@ extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 			TextState(L10n.AuthorizedDapps.RemoveAuthorizationAlert.title)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState(L10n.Common.confirm)
+				TextState(L10n.AuthorizedDapps.RemoveAuthorizationAlert.confirm)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
 				TextState(L10n.Common.cancel)

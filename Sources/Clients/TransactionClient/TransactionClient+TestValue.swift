@@ -11,7 +11,8 @@ extension TransactionClient: TestDependencyKey {
 		addGuaranteesToManifest: unimplemented("\(Self.self).addGuaranteesToManifest"),
 		getTransactionReview: unimplemented("\(Self.self).getTransactionReview"),
 		buildTransactionIntent: unimplemented("\(Self.self).buildTransactionIntent"),
-		notarizeTransaction: unimplemented("\(Self.self).notarizeTransaction")
+		notarizeTransaction: unimplemented("\(Self.self).notarizeTransaction"),
+		prepareForSigning: unimplemented("\(Self.self).prepareForSigning")
 	)
 }
 #endif // DEBUG

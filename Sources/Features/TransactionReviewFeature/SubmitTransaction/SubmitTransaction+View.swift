@@ -29,6 +29,7 @@ extension SubmitTransaction {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SubmitTransaction>
+		@SwiftUI.State var animationAmount: Double = 1.0
 
 		public init(store: StoreOf<SubmitTransaction>) {
 			self.store = store
@@ -36,15 +37,44 @@ extension SubmitTransaction {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					VPair(heading: L10n.TransactionReview.SubmitTransaction.txID, item: viewStore.txID)
-					VPair(heading: L10n.TransactionReview.SubmitTransaction.status, item: viewStore.status.display)
+				VStack(spacing: .medium1) {
+					Image(asset: AssetResource.transactionInProgress)
+						.opacity(animationAmount)
+						.animation(
+							.linear(duration: 0.3)
+								.delay(0.2)
+								.repeatForever(autoreverses: true),
+							value: animationAmount
+						)
+						.onAppear {
+							animationAmount = 0.5
+						}
+
+					Text("Completing Transaction...").textStyle(.body1Regular) // FIXME: strings
+
+					HStack {
+						Text("TXID: ") // FIXME: strings
+						AddressView(.identifier(.transaction(viewStore.txID)))
+					}
 				}
-				.padding(.medium1)
+				.onWillDisappear {
+					viewStore.send(.willDisappear)
+				}
+				.padding(.horizontal, .small2)
+				.padding(.bottom, .medium3)
+				.frame(maxWidth: .infinity)
+				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
+					CloseButton { viewStore.send(.closeButtonTapped) }
+						.padding([.top, .leading], .small2)
+				}
 				.onFirstTask { @MainActor in
-					await viewStore.send(.appeared).finish()
+					viewStore.send(.appeared)
 				}
-				.navigationTitle(L10n.TransactionReview.SubmitTransaction.navigationTitle)
+				.presentationDragIndicator(.visible)
+				.presentationDetentIntrinsicHeight()
+				#if os(iOS)
+					.presentationBackground(.blur)
+				#endif
 			}
 		}
 	}

@@ -23,7 +23,8 @@ extension TransactionReview.State {
 			viewControlState: viewControlState,
 			showDottedLine: (withdrawals != nil || message != nil) && deposits != nil,
 			rawTransaction: displayMode.rawTransaction,
-			showApproveButton: transactionWithLockFee != nil
+			showApproveButton: transactionWithLockFee != nil,
+			canApproveTX: canApproveTX
 		)
 	}
 
@@ -46,6 +47,7 @@ extension TransactionReview {
 		let showDottedLine: Bool
 		let rawTransaction: String?
 		let showApproveButton: Bool
+		let canApproveTX: Bool
 	}
 
 	@MainActor
@@ -74,7 +76,6 @@ extension TransactionReview {
 					}
 					.customizeGuarantees(with: store)
 					.selectFeePayer(with: store)
-					.prepareForSigning(with: store)
 					.signing(with: store)
 					.submitting(with: store)
 					.onAppear {
@@ -119,6 +120,7 @@ extension TransactionReview {
 						Button(L10n.TransactionReview.approveButtonTitle, asset: AssetResource.lock) {
 							viewStore.send(.approveTapped)
 						}
+						.controlState(viewStore.canApproveTX ? .enabled : .disabled)
 						.buttonStyle(.primaryRectangular)
 						.padding(.bottom, .medium1)
 					}
@@ -238,18 +240,6 @@ extension View {
 			state: /TransactionReview.Destinations.State.selectFeePayer,
 			action: TransactionReview.Destinations.Action.selectFeePayer,
 			content: { SelectFeePayer.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	fileprivate func prepareForSigning(
-		with store: StoreOf<TransactionReview>
-	) -> some View {
-		sheet(
-			store: store.destination,
-			state: /TransactionReview.Destinations.State.prepareForSigning,
-			action: TransactionReview.Destinations.Action.prepareForSigning,
-			content: { PrepareForSigning.View(store: $0) }
 		)
 	}
 

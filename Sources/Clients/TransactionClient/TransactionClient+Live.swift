@@ -3,6 +3,7 @@ import AccountsClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
+import FactorSourcesClient
 import GatewayAPI
 import GatewaysClient
 import PersonasClient
@@ -33,6 +34,7 @@ extension TransactionClient {
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.personasClient) var personasClient
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable
 		func myEntitiesInvolvedInTransaction(
@@ -232,12 +234,12 @@ extension TransactionClient {
 			let epoch = try await gatewayAPIClient.getEpoch()
 			let transactionSigners = try await getTransactionSigners(request)
 
-			let header = try TransactionHeader(
+			let header = TransactionHeader(
 				version: engineToolkitClient.getTransactionVersion(),
 				networkId: request.networkID,
 				startEpochInclusive: epoch,
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
-				nonce: engineToolkitClient.generateTXNonce(),
+				nonce: request.nonce,
 				publicKey: SLIP10.PublicKey.eddsaEd25519(transactionSigners.notaryPublicKey).intoEngine(),
 				notaryAsSignatory: transactionSigners.notaryAsSignatory,
 				costUnitLimit: request.makeTransactionHeaderInput.costUnitLimit,
@@ -288,7 +290,7 @@ extension TransactionClient {
 			)
 		}
 
-		let getTransactionPreview: GetTransactionReview = { request in
+		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID)
@@ -325,6 +327,7 @@ extension TransactionClient {
 			let intent = try await buildTransactionIntent(.init(
 				networkID: gatewaysClient.getCurrentNetworkID(),
 				manifest: request.manifestToSign,
+				nonce: request.nonce,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
@@ -379,6 +382,47 @@ extension TransactionClient {
 			)
 		}
 
+		let prepareForSigning: PrepareForSigning = { request in
+			let transactionIntentWithSigners = try await buildTransactionIntent(.init(
+				networkID: request.networkID,
+				manifest: request.manifest,
+				nonce: request.nonce,
+				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
+			))
+
+			let entities = NonEmpty(
+				rawValue: Set(Array(transactionIntentWithSigners.transactionSigners.intentSignerEntitiesOrEmpty()) + [.account(request.feePayer)])
+			)!
+
+			let compiledIntent = try engineToolkitClient.compileTransactionIntent(transactionIntentWithSigners.intent)
+
+			let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
+				networkID: request.networkID,
+				signers: entities,
+				signingPurpose: request.purpose
+			))
+
+			func printSigners() {
+				for (factorSourceKind, signingFactorsOfKind) in signingFactors {
+					print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
+					for signingFactor in signingFactorsOfKind {
+						let factorSource = signingFactor.factorSource
+						print("\t🔮 == Signers for factorSource: \(factorSource.id): ==")
+						for signer in signingFactor.signers {
+							let entity = signer.entity
+							print("\t\t🔮 * Entity: \(entity.displayName): *")
+							for factorInstance in signer.factorInstancesRequiredToSign {
+								print("\t\t\t🔮 * FactorInstance: \(String(describing: factorInstance.derivationPath)) \(factorInstance.publicKey)")
+							}
+						}
+					}
+				}
+			}
+			printSigners()
+
+			return .init(compiledIntent: compiledIntent, signingFactors: signingFactors)
+		}
+
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			convertManifestToString: { try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0)) },
@@ -386,9 +430,10 @@ extension TransactionClient {
 			lockFeeWithSelectedPayer: lockFeeWithSelectedPayer,
 			addInstructionToManifest: addInstructionToManifest,
 			addGuaranteesToManifest: addGuaranteesToManifest,
-			getTransactionReview: getTransactionPreview,
+			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
-			notarizeTransaction: notarizeTransaction
+			notarizeTransaction: notarizeTransaction,
+			prepareForSigning: prepareForSigning
 		)
 	}
 }

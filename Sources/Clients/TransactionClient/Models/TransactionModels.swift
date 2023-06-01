@@ -143,6 +143,7 @@ public struct NotarizeTransactionResponse: Sendable, Hashable {
 // MARK: - BuildTransactionIntentRequest
 public struct BuildTransactionIntentRequest: Sendable {
 	public let networkID: NetworkID
+	public let nonce: Nonce
 	public let manifest: TransactionManifest
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let isFaucetTransaction: Bool
@@ -151,12 +152,14 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
+		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		isFaucetTransaction: Bool = false,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 	) {
 		self.networkID = networkID
 		self.manifest = manifest
+		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.isFaucetTransaction = isFaucetTransaction
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
@@ -199,17 +202,20 @@ extension TransactionClient {
 // MARK: - ManifestReviewRequest
 public struct ManifestReviewRequest: Sendable {
 	public let manifestToSign: TransactionManifest
+	public let nonce: Nonce
 	public let feeToAdd: BigDecimal
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
 	public init(
 		manifestToSign: TransactionManifest,
+		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		feeToAdd: BigDecimal,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey = Curve25519.Signing.PrivateKey().publicKey
 	) {
 		self.manifestToSign = manifestToSign
+		self.nonce = nonce
 		self.feeToAdd = feeToAdd
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey

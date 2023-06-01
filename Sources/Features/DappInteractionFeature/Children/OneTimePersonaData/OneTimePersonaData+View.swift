@@ -95,7 +95,7 @@ extension OneTimePersonaData {
 						viewStore.output,
 						forAction: { viewStore.send(.continueButtonTapped($0)) }
 					) { action in
-						Button(L10n.Common.continue, action: action)
+						Button(L10n.DAppRequest.PersonalDataOneTime.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

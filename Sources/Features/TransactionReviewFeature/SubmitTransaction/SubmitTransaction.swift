@@ -36,6 +36,8 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case willDisappear
+		case closeButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -44,6 +46,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 		case submittedButNotCompleted(TXID)
 		case submittedTransactionFailed
 		case committedSuccessfully(TXID)
+		case dismiss
 	}
 
 	@Dependency(\.submitTXClient) var submitTXClient
@@ -64,6 +67,8 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 					}
 				))
 			}
+		case .willDisappear, .closeButtonTapped:
+			return .send(.delegate(.dismiss))
 		}
 	}
 

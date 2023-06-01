@@ -731,10 +731,11 @@ package.addModules([
 		name: "TransactionClient",
 		dependencies: [
 			"AccountsClient",
-			"PersonasClient",
 			"AccountPortfoliosClient",
 			"EngineToolkitClient",
+			"FactorSourcesClient",
 			"GatewayAPI",
+			"PersonasClient",
 		],
 		tests: .yes()
 	),

@@ -1,4 +1,5 @@
 import ClientPrelude
+import FactorSourcesClient
 import OnboardingClient
 import ProfileStore
 

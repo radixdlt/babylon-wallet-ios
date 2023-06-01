@@ -96,7 +96,7 @@ extension Login {
 						viewStore.continueButtonRequirements,
 						forAction: { viewStore.send(.continueButtonTapped($0.persona)) }
 					) { action in
-						Button(L10n.Common.continue, action: action)
+						Button(L10n.DAppRequest.Login.continue, action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}

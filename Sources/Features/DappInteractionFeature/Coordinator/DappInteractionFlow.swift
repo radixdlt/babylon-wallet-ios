@@ -1,6 +1,7 @@
 import AccountsClient
 import AuthorizedDappsClient
 import Cryptography
+import EngineToolkitClient
 import FeaturePrelude
 import GatewaysClient
 import PersonasClient
@@ -117,6 +118,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
 		case dismissWithSuccess(DappMetadata)
 		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
+		case dismiss
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -181,6 +183,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	@Dependency(\.personasClient) var personasClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.engineToolkitClient) var engineToolkitClient
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -442,6 +445,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		case .reviewTransaction(.delegate(.transactionCompleted)):
 			return .send(.delegate(.dismissWithSuccess(state.dappMetadata)))
+		case .reviewTransaction(.delegate(.userDismissedTransactionStatus)):
+			return .send(.delegate(.dismiss))
 
 		case let .reviewTransaction(.delegate(.failed(error))):
 			return handleSignAndSubmitTXFailed(error)
@@ -770,8 +775,10 @@ extension DappInteractionFlow.Destinations.State {
 			}
 
 		case let .remote(.send(item)):
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			self = .relayed(anyItem, with: .reviewTransaction(.init(
 				transactionManifest: item.transactionManifest,
+				nonce: engineToolkitClient.generateTXNonce(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message
 			)))
