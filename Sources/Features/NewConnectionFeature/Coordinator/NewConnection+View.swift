@@ -13,33 +13,31 @@ extension NewConnection {
 
 		public var body: some SwiftUI.View {
 			NavigationStack {
-				ZStack {
-					SwitchStore(store) {
-						CaseLet(
-							state: /NewConnection.State.localNetworkPermission,
-							action: { NewConnection.Action.child(.localNetworkPermission($0)) },
-							then: { LocalNetworkPermission.View(store: $0) }
-						)
-						CaseLet(
-							state: /NewConnection.State.scanQR,
-							action: { NewConnection.Action.child(.scanQR($0)) },
-							then: { newConnectionStore in
-								VStack {
-									Text(L10n.LinkedConnectors.NewConnection.title)
-										.foregroundColor(.app.gray1)
-										.textStyle(.sheetTitle)
+				VStack {
+					Text(L10n.LinkedConnectors.NewConnection.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
 
-									Spacer(minLength: 0)
+					Spacer(minLength: 0)
 
-									ScanQRCoordinator.View(store: newConnectionStore)
-								}
-							}
-						)
-						CaseLet(
-							state: /NewConnection.State.connectUsingSecrets,
-							action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
-							then: { ConnectUsingSecrets.View(store: $0) }
-						)
+					ZStack {
+						SwitchStore(store) {
+							CaseLet(
+								state: /NewConnection.State.localNetworkPermission,
+								action: { NewConnection.Action.child(.localNetworkPermission($0)) },
+								then: { LocalNetworkPermission.View(store: $0) }
+							)
+							CaseLet(
+								state: /NewConnection.State.scanQR,
+								action: { NewConnection.Action.child(.scanQR($0)) },
+								then: { ScanQRCoordinator.View(store: $0) }
+							)
+							CaseLet(
+								state: /NewConnection.State.connectUsingSecrets,
+								action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
+								then: { ConnectUsingSecrets.View(store: $0) }
+							)
+						}
 					}
 				}
 				#if os(iOS)
