@@ -118,7 +118,8 @@ extension FactorSource {
 					id: .init(factorSourceKind: .ledgerHQHardwareWallet, hash: .random(byteCount: 32)),
 					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
 				),
-				hint: .init(name: .init(name), model: .nanoS)
+				hint: .init(name: .init(name), model: .nanoS),
+				nextDerivationIndicesPerNetwork: .init()
 			)
 			return ledger.embed()
 		}
