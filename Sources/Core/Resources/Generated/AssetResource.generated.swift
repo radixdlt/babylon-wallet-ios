@@ -40,6 +40,7 @@ public enum AssetResource {
   public static let copy = ImageAsset(name: "copy")
   public static let ellipsis = ImageAsset(name: "ellipsis")
   public static let error = ImageAsset(name: "error")
+  public static let iconHardwareLedger = ImageAsset(name: "icon-hardware-ledger")
   public static let iconLinkOut = ImageAsset(name: "icon-link-out")
   public static let info = ImageAsset(name: "info")
   public static let lock = ImageAsset(name: "lock")

@@ -85,6 +85,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.isPresented) var isPresented
 	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
@@ -107,7 +108,9 @@ extension CreateAccountCoordinator {
 			assert(state.config.canBeDismissed)
 			return .run { send in
 				await send(.delegate(.dismissed))
-				await dismiss()
+				if isPresented {
+					await dismiss()
+				}
 			}
 		}
 	}
@@ -136,7 +139,9 @@ extension CreateAccountCoordinator {
 		case .path(.element(_, action: .step3_completion(.delegate(.completed)))):
 			return .run { send in
 				await send(.delegate(.completed))
-				await dismiss()
+				if isPresented {
+					await dismiss()
+				}
 			}
 
 		default:
