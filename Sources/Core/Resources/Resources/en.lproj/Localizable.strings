@@ -558,15 +558,15 @@
 
 Install the Connector extension, open it to see the linking QR code, and tap continue.";
 "ledgerHardwareDevices_linkConnectorAlert_continue" = "Continue";
-"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Ledger Device";
-"ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Hardware Wallets";
+"ledgerHardwareDevices_navigationTitleAllowSelection" = "Choose Device";
+"ledgerHardwareDevices_navigationTitleGeneral" = "Ledger Devices";
 "ledgerHardwareDevices_ledgerFactorSourceInfoCaption" = "What is a Ledger Factor Source";
-"ledgerHardwareDevices_addNewLedger" = "Add New Ledger";
+"ledgerHardwareDevices_addNewLedger" = "Add Ledger Device";
 "ledgerHardwareDevices_addedHeading" = "Added";
-"ledgerHardwareDevices_usedHeading" = "Used";
+"ledgerHardwareDevices_usedHeading" = "Last Used";
 "ledgerHardwareDevices_continueWithLedger" = "Continue";
 "ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started…";
-"ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger hardware wallet device";
+"ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger device to use";
 "ledgerHardwareDevices_subtitleAllLedgers" = "Here are all the Ledger devices you have connected to";
 "ledgerHardwareDevices_subtitleFailure" = "Could not find Ledger devices";
 "displayMnemonics_cautionAlert_title" = "Use Caution";
