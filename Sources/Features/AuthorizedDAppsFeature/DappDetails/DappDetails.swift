@@ -93,7 +93,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case fungibleTapped(ResourceAddress)
 		case nonFungibleTapped(ResourceAddress)
 		case dAppTapped(DappDefinitionAddress)
-		case dismissPersonaTapped
 		case forgetThisDappTapped
 	}
 
@@ -187,10 +186,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .dAppTapped(address):
 			// TODO: Handle this
 			return .none
-
-		case .dismissPersonaTapped:
-			guard case .personaDetails = state.destination else { return .none }
-			return .send(.child(.destination(.dismiss)))
 
 		case .forgetThisDappTapped:
 			state.destination = .confirmDisconnectAlert(.confirmDisconnect)

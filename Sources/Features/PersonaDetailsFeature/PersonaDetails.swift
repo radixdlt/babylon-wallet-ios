@@ -119,6 +119,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case dAppDetails(SimpleDappDetails.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
+
 			public enum ConfirmForgetAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped
