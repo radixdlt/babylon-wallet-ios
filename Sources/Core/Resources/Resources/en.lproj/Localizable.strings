@@ -196,10 +196,6 @@
 "personas_subtitle" = "Here are all of your current Personas in your Wallet.";
 "personas_whatIsPersona" = "What is a Persona";
 "personas_createNewPersona" = "Create a New Persona";
-"appSettings_title" = "App Settings";
-"appSettings_subtitle" = "Customize your Radix Wallet";
-"appSettings_developerMode_title" = "Developer Mode";
-"appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
 "backup_disabledText" = "Back up is turned off";
 "backup_lastBackedUp" = "Last Backed up: %@";
 "backup_noLastBackUp" = "Not Backed up yet";
