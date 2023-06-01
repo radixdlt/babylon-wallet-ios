@@ -67,7 +67,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 				signers: signers,
 				unhashedDataToSign: dataToSign,
 				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
-				displayHashOnLedgerDisplay: true
+				displayHashOnLedgerDisplay: false
 			))
 		case let .signAuth(authToSign):
 			do {
