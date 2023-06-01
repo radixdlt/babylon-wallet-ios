@@ -80,8 +80,14 @@ extension TransferAccountList.View {
 			CaseLet(
 				state: /TransferAccountList.Destinations.MainState.addAsset,
 				action: TransferAccountList.Destinations.MainAction.addAsset,
-				then: {
-					AssetsView.View(store: $0)
+				then: { assetsStore in
+					WithNavigationBar {
+						ViewStore(assetsStore).send(.view(.closeButtonTapped))
+					} content: {
+						AssetsView.View(store: assetsStore)
+							.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
+							.navigationBarTitleDisplayMode(.inline)
+					}
 				}
 			)
 		}

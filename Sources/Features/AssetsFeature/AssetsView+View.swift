@@ -14,78 +14,55 @@ extension AssetsView {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(spacing: .zero) {
-					if viewStore.mode.isSelection {
-						headerView(viewStore)
-					}
+				ScrollView {
+					VStack(spacing: .medium3) {
+						assetTypeSelectorView(viewStore)
 
-					if viewStore.isLoadingResources {
-						ProgressView()
-					}
-
-					ScrollView {
-						VStack(spacing: .medium3) {
-							assetTypeSelectorView(viewStore)
-
-							switch viewStore.activeAssetKind {
-							case .fungible:
-								FungibleAssetList.View(
-									store: store.scope(
-										state: \.fungibleTokenList,
-										action: { .child(.fungibleTokenList($0)) }
-									)
-								)
-							case .nonFungible:
-								NonFungibleAssetList.View(
-									store: store.scope(
-										state: \.nonFungibleTokenList,
-										action: { .child(.nonFungibleTokenList($0)) }
-									)
-								)
-							}
+						if viewStore.isLoadingResources {
+							ProgressView()
+								.padding(.small1)
 						}
-						.padding(.bottom, .medium3)
-					}
-					.refreshable {
-						await viewStore.send(.pullToRefreshStarted).finish()
-					}
 
-					if viewStore.mode.isSelection {
-						footerView(viewStore)
+						switch viewStore.activeAssetKind {
+						case .fungible:
+							FungibleAssetList.View(
+								store: store.scope(
+									state: \.fungibleTokenList,
+									action: { .child(.fungibleTokenList($0)) }
+								)
+							)
+						case .nonFungible:
+							NonFungibleAssetList.View(
+								store: store.scope(
+									state: \.nonFungibleTokenList,
+									action: { .child(.nonFungibleTokenList($0)) }
+								)
+							)
+						}
 					}
+					.padding(.bottom, .medium1)
+				}
+				.refreshable {
+					await viewStore.send(.pullToRefreshStarted).finish()
+				}
+				.footer(visible: viewStore.mode.isSelection) {
+					WithControlRequirements(
+						viewStore.selectedAssets,
+						forAction: { viewStore.send(.chooseButtonTapped($0)) },
+						control: { action in
+							Button(viewStore.chooseButtonTitle, action: action)
+								.buttonStyle(.primaryRectangular)
+						}
+					)
+				}
+				.background {
+					Color.app.gray5
+						.ignoresSafeArea(edges: .bottom)
+				}
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
 				}
 			}
-			.background(Color.app.gray5)
-			.task { @MainActor in
-				await ViewStore(store.stateless).send(.view(.task)).finish()
-			}
-		}
-
-		private func footerView(_ viewStore: ViewStoreOf<AssetsView>) -> some SwiftUI.View {
-			VStack(spacing: 0) {
-				Separator()
-				WithControlRequirements(
-					viewStore.selectedAssets,
-					forAction: { viewStore.send(.chooseButtonTapped($0)) },
-					control: { action in
-						Button(viewStore.chooseButtonTitle, action: action)
-							.buttonStyle(.primaryRectangular)
-					}
-				)
-				.padding(.medium3)
-			}
-			.background(Color.app.background)
-		}
-
-		private func headerView(_ viewStore: ViewStoreOf<AssetsView>) -> some SwiftUI.View {
-			ZStack {
-				CloseButtonBar {
-					viewStore.send(.closeButtonTapped)
-				}
-				Text(L10n.AssetTransfer.AddAssets.navigationTitle)
-					.textStyle(.body1Header)
-			}
-			.padding(.bottom, .small1)
 		}
 
 		private func assetTypeSelectorView(_ viewStore: ViewStoreOf<AssetsView>) -> some SwiftUI.View {

@@ -35,6 +35,7 @@ extension AssetTransfer.View {
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.canSendTransferRequest ? .enabled : .disabled)
+					.padding(.bottom, .medium3)
 				}
 				.padding(.horizontal, .medium3)
 				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
@@ -55,7 +56,9 @@ extension AssetTransfer.View {
 			Text(L10n.AssetTransfer.Header.transfer)
 				.textStyle(.sheetTitle)
 				.flushedLeft(padding: .small1)
+
 			Spacer()
+
 			if viewStore.message == nil {
 				Button(L10n.AssetTransfer.Header.addMessageButton, asset: AssetResource.addMessage) {
 					viewStore.send(.addMessageTapped)
