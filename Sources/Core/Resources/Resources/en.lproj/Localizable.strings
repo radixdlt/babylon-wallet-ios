@@ -124,11 +124,11 @@
 "linkedConnectors_linkNewConnector" = "Link New Connector";
 "linkedConnectors_newConnection_title" = "Link New Connector";
 "linkedConnectors_newConnection_subtitle" = "Scan the QR code shown in the Radix Connector browser extension";
-"linkedConnectors_newConnection_connectionDefaultName" = "Unnamed";
 "linkedConnectors_newConnection_linking" = "Linking…";
-"linkedConnectors_newConnection_textFieldPlaceholder" = "e.g. Chrome on Personal Laptop";
-"linkedConnectors_newConnection_textFieldHint" = "Give a name to this Radix Connector";
-"linkedConnectors_newConnection_saveLinkButtonTitle" = "Save Link and Continue";
+"linkedConnectors_nameNewConnector_title" = "Name New Connector";
+"linkedConnectors_nameNewConnector_textFieldPlaceholder" = "e.g. Chrome on Personal Laptop";
+"linkedConnectors_nameNewConnector_textFieldHint" = "Give a name to this Radix Connector";
+"linkedConnectors_nameNewConnector_saveLinkButtonTitle" = "Save Link and Continue";
 "linkedConnectors_removeConnectionAlert_title" = "Remove Connection";
 "linkedConnectors_removeConnectionAlert_message" = "Your Radix Wallet will no longer automatically connect to this Radix Connector.";
 "linkedConnectors_cameraPermissionDeniedAlert_title" = "Access Required";
@@ -228,6 +228,8 @@
 "createAccount_introduction_title" = "Create an Account";
 "createAccount_titleFirst" = "Create First Account";
 "createAccount_titleNotFirst" = "Create New Account";
+"createAccount_derivePublicKeys_title" = "Creating Account";
+"createAccount_derivePublicKeys_subtitle" = "Deriving public keys";
 "createEntity_completion_destinationChooseAccounts" = "Choose Accounts";
 "createEntity_completion_destinationChoosePersonas" = "Choose Personas";
 "createEntity_completion_destinationGateways" = "Gateways";
@@ -541,14 +543,12 @@
 "importOlympiaLedgerAccounts_accountCount" = "%@ - #%d accounts";
 "signing_withDeviceFactorSource_signTransaction" = "Sign transaction with phone";
 "signing_withDeviceFactorSource_idLabel" = "Factor Source ID: %@";
-"signing_useLedgerPurpose_createAccount" = "Creating Account";
-"signing_useLedgerPurpose_createAuthSigningKey" = "Creating auth key";
-"signing_useLedgerPurpose_signAuth" = "Sign proof";
-"signing_useLedgerPurpose_signTX" = "Sign transaction";
-"signing_useLedgerPurpose_importLegacyAccounts" = "Import Legacy Accounts";
 "signing_useLedgerLabel_Ledger" = "Ledger";
 "signing_useLedgerLabel_lastUsed" = "Last used";
 "signing_useLedgerLabel_addedOn" = "Added on";
+"signing_signatureRequest_title" = "Signature Request";
+"signing_signatureRequest_body" = "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.";
+"signing_signatureRequest_instructions" = "Review and sign the transaction on the Ledger device to continue.";
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
 "ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.
 
