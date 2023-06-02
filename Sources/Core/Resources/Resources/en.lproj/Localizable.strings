@@ -446,7 +446,7 @@
 
 "ledgerHardwareDevices_addNewLedger" = "Add Ledger Device";
 "ledgerHardwareDevices_addedHeading" = "Added";
-"ledgerHardwareDevices_usedHeading" = "Used";
+"ledgerHardwareDevices_usedHeading" = "Last Used";
 
 "ledgerHardwareDevices_subtitleNoLedgers" = "You have no Ledgers added, add a ledger to get started...";
 "ledgerHardwareDevices_subtitleSelectLedger" = "Choose a Ledger device to use";
@@ -619,3 +619,10 @@
 "assetTransfer_accountList_addAccountButton" = "Add Account";
 
 "assetTransfer_addAssets_navigationTitle" = "Choose Asset(s)";
+
+
+"signing_signatureRequest_title" = "Signature Request";
+
+"signing_signatureRequest_body" = "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.";
+
+"signing_signatureRequest_instructions" = "Review and sign the transaction on the Ledger device to continue.";

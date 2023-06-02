@@ -1145,8 +1145,8 @@ public enum L10n {
     public static let subtitleNoLedgers = L10n.tr("Localizable", "ledgerHardwareDevices_subtitleNoLedgers", fallback: "You have no Ledgers added, add a ledger to get started...")
     /// Choose a Ledger device to use
     public static let subtitleSelectLedger = L10n.tr("Localizable", "ledgerHardwareDevices_subtitleSelectLedger", fallback: "Choose a Ledger device to use")
-    /// Used
-    public static let usedHeading = L10n.tr("Localizable", "ledgerHardwareDevices_usedHeading", fallback: "Used")
+    /// Last Used
+    public static let usedHeading = L10n.tr("Localizable", "ledgerHardwareDevices_usedHeading", fallback: "Last Used")
     public enum LinkConnectorAlert {
       /// Continue
       public static let `continue` = L10n.tr("Localizable", "ledgerHardwareDevices_linkConnectorAlert_continue", fallback: "Continue")
@@ -1333,6 +1333,14 @@ public enum L10n {
     }
   }
   public enum Signing {
+    public enum SignatureRequest {
+      /// Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.
+      public static let body = L10n.tr("Localizable", "signing_signatureRequest_body", fallback: "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.")
+      /// Review and sign the transaction on the Ledger device to continue.
+      public static let instructions = L10n.tr("Localizable", "signing_signatureRequest_instructions", fallback: "Review and sign the transaction on the Ledger device to continue.")
+      /// Signature Request
+      public static let title = L10n.tr("Localizable", "signing_signatureRequest_title", fallback: "Signature Request")
+    }
     public enum UseLedgerLabel {
       /// Added on
       public static let addedOn = L10n.tr("Localizable", "signing_useLedgerLabel_addedOn", fallback: "Added on")
