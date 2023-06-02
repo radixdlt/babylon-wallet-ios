@@ -3,10 +3,7 @@ import FeaturePrelude
 
 extension SignWithFactorSourcesOfKindLedger.State {
 	var viewState: SignWithFactorSourcesOfKindLedger.ViewState {
-		.init(
-			currentSigningFactor: currentSigningFactor,
-			purpose: signingPurposeWithPayload.purpose == .signAuth ? .signAuth : .signTX
-		)
+		.init(currentSigningFactor: currentSigningFactor)
 	}
 }
 
@@ -14,7 +11,6 @@ extension SignWithFactorSourcesOfKindLedger.State {
 extension SignWithFactorSourcesOfKindLedger {
 	public struct ViewState: Equatable {
 		let currentSigningFactor: SigningFactor?
-		let purpose: UseLedgerView.Purpose
 
 		var ledger: LedgerHardwareWalletFactorSource? {
 			currentSigningFactor.flatMap {

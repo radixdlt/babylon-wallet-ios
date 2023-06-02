@@ -3,16 +3,7 @@ import Profile
 
 extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
-		.init(ledger: ledgerBeingUsed, purpose: {
-			switch purpose {
-			case .createAuthSigningKey:
-				return .createAuthSigningKey
-			case .importLegacyAccounts:
-				return .importLegacyAccounts
-			case .createEntity:
-				return .createAccount
-			}
-		}())
+		.init(ledger: ledgerBeingUsed)
 	}
 }
 
@@ -35,7 +26,8 @@ extension DerivePublicKeys {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				Group {
 					if let ledger = viewStore.ledger {
-						UseLedgerView(ledgerFactorSource: ledger, purpose: viewStore.purpose)
+						Text(ledger.name)
+							.border(.green)
 					} else {
 						Color.white
 					}

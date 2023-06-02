@@ -200,11 +200,11 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			}
 
 		case .destination(.dismiss):
-			guard case .signing = state.destination else {
+			if case .signing = state.destination {
+				return cancelSigningEffect(state: &state)
+			} else {
 				return .none
 			}
-
-			return cancelSigningEffect(state: &state)
 
 		default:
 			return .none
@@ -213,6 +213,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 
 	private func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
 		// FIXME: How to cancel?
-		.none
+		loggerGlobal.error("Cancelled signing")
+		return .none
 	}
 }

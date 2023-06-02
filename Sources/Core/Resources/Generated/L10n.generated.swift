@@ -1349,18 +1349,6 @@ public enum L10n {
       /// Ledger
       public static let ledger = L10n.tr("Localizable", "signing_useLedgerLabel_Ledger", fallback: "Ledger")
     }
-    public enum UseLedgerPurpose {
-      /// Creating account
-      public static let createAccount = L10n.tr("Localizable", "signing_useLedgerPurpose_createAccount", fallback: "Creating account")
-      /// Creating auth key
-      public static let createAuthSigningKey = L10n.tr("Localizable", "signing_useLedgerPurpose_createAuthSigningKey", fallback: "Creating auth key")
-      /// Import Legacy Accounts
-      public static let importLegacyAccounts = L10n.tr("Localizable", "signing_useLedgerPurpose_importLegacyAccounts", fallback: "Import Legacy Accounts")
-      /// Sign auth challenge
-      public static let signAuth = L10n.tr("Localizable", "signing_useLedgerPurpose_signAuth", fallback: "Sign auth challenge")
-      /// Sign transaction
-      public static let signTX = L10n.tr("Localizable", "signing_useLedgerPurpose_signTX", fallback: "Sign transaction")
-    }
     public enum WithDeviceFactorSource {
       /// Factor Source ID: %@
       public static func idLabel(_ p1: Any) -> String {

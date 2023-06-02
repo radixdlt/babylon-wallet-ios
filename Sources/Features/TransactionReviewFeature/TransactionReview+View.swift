@@ -249,14 +249,9 @@ extension View {
 		sheet(
 			store: destinationStore,
 			state: /TransactionReview.Destinations.State.signing,
-			action: TransactionReview.Destinations.Action.signing
-		) { signingStore in
-			WithNavigationBar {
-				ViewStore(signingStore).send(.view(.closeButtonTapped))
-			} content: {
-				Signing.View(store: signingStore)
-			}
-		}
+			action: TransactionReview.Destinations.Action.signing,
+			content: { Signing.SheetView(store: $0) }
+		)
 	}
 
 	@MainActor

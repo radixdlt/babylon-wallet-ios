@@ -258,7 +258,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 		case .destination(.presented(.signing(.delegate(.cancelSigning)))):
-			loggerGlobal.error("Cancel signing")
 			state.destination = nil
 			return cancelSigningEffect(state: &state)
 
@@ -307,10 +306,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
 		case .destination(.dismiss):
-			guard case .signing = state.destination else {
+			if case .signing = state.destination {
+				return cancelSigningEffect(state: &state)
+			} else {
 				return .none
 			}
-			return cancelSigningEffect(state: &state)
 
 		default:
 			return .none
@@ -318,8 +318,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	private func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
-		// FIXME: How to cancel?
-		.none
+		loggerGlobal.error("Cancelled signing")
+		state.canApproveTX = true
+		return .none
 	}
 
 	private func review(_ state: State) -> EffectTask<Action> {

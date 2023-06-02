@@ -593,12 +593,6 @@
 
 "authorizedDapps_removeAuthorizationAlert_confirm" = "Confirm";
 
-"signing_useLedgerPurpose_createAccount" = "Creating account";
-"signing_useLedgerPurpose_createAuthSigningKey" = "Creating auth key";
-"signing_useLedgerPurpose_signAuth" = "Sign auth challenge";
-"signing_useLedgerPurpose_signTX" = "Sign transaction";
-"signing_useLedgerPurpose_importLegacyAccounts" = "Import Legacy Accounts";
-
 "signing_useLedgerLabel_Ledger" = "Ledger";
 "signing_useLedgerLabel_lastUsed" = "Last used";
 "signing_useLedgerLabel_addedOn" = "Added on";
