@@ -57,25 +57,12 @@ extension DappDetails.View {
 					viewStore.send(.appeared)
 				}
 				.navigationTitle(viewStore.title)
-				.sheet(
+				.navigationDestination(
 					store: store.destination,
 					state: /DappDetails.Destination.State.personaDetails,
-					action: DappDetails.Destination.Action.personaDetails
-				) { store in
-					NavigationStack {
-						PersonaDetails.View(store: store)
-						#if os(iOS)
-							.navigationBarTitleDisplayMode(.inline)
-						#endif
-							.toolbar {
-								ToolbarItem(placement: .primaryAction) {
-									CloseButton {
-										viewStore.send(.dismissPersonaTapped)
-									}
-								}
-							}
-					}
-				}
+					action: DappDetails.Destination.Action.personaDetails,
+					destination: { PersonaDetails.View(store: $0) }
+				)
 				.alert(
 					store: store.destination,
 					state: /DappDetails.Destination.State.confirmDisconnectAlert,

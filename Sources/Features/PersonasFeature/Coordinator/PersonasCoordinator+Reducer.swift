@@ -5,31 +5,31 @@ import PersonasClient
 
 // MARK: - PersonasCoordinator
 public struct PersonasCoordinator: Sendable, FeatureReducer {
+	// MARK: - State
+
 	public struct State: Sendable, Hashable {
 		public var personaList: PersonaList.State
 
 		@PresentationState
-		public var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
-
-		@PresentationState
-		public var personaDetails: PersonaDetails.State? = nil
+		public var destination: Destination.State? = nil
 
 		public var isFirstPersonaOnAnyNetwork: Bool? = nil
 
 		public init(
 			personaList: PersonaList.State = .init(),
-			createPersonaCoordinator: CreatePersonaCoordinator.State? = nil,
+			destination: Destination.State? = nil,
 			isFirstPersonaOnAnyNetwork: Bool? = nil
 		) {
 			self.personaList = personaList
-			self.createPersonaCoordinator = createPersonaCoordinator
+			self.destination = destination
 			self.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 		}
 	}
 
+	// MARK: - Action
+
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case dismissPersonaTapped
 	}
 
 	public enum InternalAction: Sendable & Equatable {
@@ -39,10 +39,33 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case personaList(PersonaList.Action)
-
-		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
-		case personaDetails(PresentationAction<PersonaDetails.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
+
+	// MARK: - Destination
+
+	public struct Destination: ReducerProtocol {
+		public enum State: Equatable, Hashable {
+			case createPersonaCoordinator(CreatePersonaCoordinator.State)
+			case personaDetails(PersonaDetails.State)
+		}
+
+		public enum Action: Equatable {
+			case createPersonaCoordinator(CreatePersonaCoordinator.Action)
+			case personaDetails(PersonaDetails.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.createPersonaCoordinator, action: /Action.createPersonaCoordinator) {
+				CreatePersonaCoordinator()
+			}
+			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
+				PersonaDetails()
+			}
+		}
+	}
+
+	// MARK: - Reducer
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.personasClient) var personasClient
@@ -55,11 +78,8 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			PersonaList()
 		}
 		Reduce(core)
-			.ifLet(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
-				CreatePersonaCoordinator()
-			}
-			.ifLet(\.$personaDetails, action: /Action.child .. ChildAction.personaDetails) {
-				PersonaDetails()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -67,9 +87,6 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return checkIfFirstPersonaByUserEver()
-		case .dismissPersonaTapped:
-			state.personaDetails = nil
-			return .none
 		}
 	}
 
@@ -78,29 +95,32 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case let .isFirstPersonaOnAnyNetwork(isFirstPersonaOnAnyNetwork):
 			state.isFirstPersonaOnAnyNetwork = isFirstPersonaOnAnyNetwork
 			return .none
+
 		case let .loadedPersonaDetails(personaDetails):
-			state.personaDetails = personaDetails
+			state.destination = .personaDetails(personaDetails)
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .personaDetails:
-			return .none
-
 		case .personaList(.delegate(.createNewPersona)):
 			assert(state.isFirstPersonaOnAnyNetwork != nil, "Should have checked 'isFirstPersonaOnAnyNetwork' already")
 			let isFirstOnThisNetwork = state.personaList.personas.isEmpty
 			let isFirstOnAnyNetwork = state.isFirstPersonaOnAnyNetwork ?? true
 
-			state.createPersonaCoordinator = .init(config: .init(
-				personaPrimacy: .init(
-					firstOnAnyNetwork: isFirstOnAnyNetwork,
-					firstOnCurrent: isFirstOnThisNetwork
-				),
-				navigationButtonCTA: .goBackToPersonaListInSettings
-			))
+			let coordinatorState = CreatePersonaCoordinator.State(
+				config: .init(
+					personaPrimacy: .init(
+						firstOnAnyNetwork: isFirstOnAnyNetwork,
+						firstOnCurrent: isFirstOnThisNetwork
+					),
+					navigationButtonCTA: .goBackToPersonaListInSettings
+				)
+			)
+
+			state.destination = .createPersonaCoordinator(coordinatorState)
+
 			return .none
 
 		case let .personaList(.delegate(.openDetails(persona))):
@@ -114,16 +134,19 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case .personaList:
 			return .none
 
-		case .createPersonaCoordinator(.presented(.delegate(.dismissed))):
-			state.createPersonaCoordinator = nil
-			return .none
+		case let .destination(.presented(.createPersonaCoordinator(.delegate(delegateAction)))):
+			switch delegateAction {
+			case .dismissed:
+				state.destination = nil
+				return .none
 
-		case .createPersonaCoordinator(.presented(.delegate(.completed))):
-			state.createPersonaCoordinator = nil
-			state.isFirstPersonaOnAnyNetwork = false
-			return .none
+			case .completed:
+				state.destination = nil
+				state.isFirstPersonaOnAnyNetwork = false
+				return .none
+			}
 
-		case .createPersonaCoordinator:
+		case .destination:
 			return .none
 		}
 	}
