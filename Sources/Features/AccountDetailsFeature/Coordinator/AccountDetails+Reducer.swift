@@ -73,9 +73,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		switch viewAction {
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
+
 		case .preferencesButtonTapped:
 			state.destination = .preferences(.init(address: state.account.address))
 			return .none
+
 		case .transferButtonTapped:
 			state.destination = .transfer(AssetTransfer.State(from: state.account))
 			return .none
@@ -94,6 +96,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case .assets(.child(.fungibleTokenList(.delegate))):
 			return .none
+
 		default:
 			return .none
 		}

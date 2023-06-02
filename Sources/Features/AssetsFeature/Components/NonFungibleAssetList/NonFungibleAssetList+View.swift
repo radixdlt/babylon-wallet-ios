@@ -25,18 +25,10 @@ extension NonFungibleAssetList {
 				state: /NonFungibleAssetList.Destinations.State.details,
 				action: NonFungibleAssetList.Destinations.Action.details,
 				content: { detailsStore in
-					NavigationStack {
+					WithNavigationBar {
+						ViewStore(store).send(.view(.closeDetailsTapped))
+					} content: {
 						NonFungibleAssetList.Detail.View(store: detailsStore)
-						#if os(iOS)
-							.navigationBarTitleDisplayMode(.inline)
-						#endif
-							.toolbar {
-								ToolbarItem(placement: .primaryAction) {
-									CloseButton {
-										ViewStore(store).send(.view(.closeDetailsTapped))
-									}
-								}
-							}
 					}
 				}
 			)

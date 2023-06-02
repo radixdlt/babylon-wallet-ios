@@ -19,6 +19,7 @@ extension AssetTransfer.View {
 			ScrollView {
 				VStack(spacing: .medium3) {
 					headerView(viewStore)
+
 					IfLetStore(
 						store.scope(state: \.message, action: { .child(.message($0)) }),
 						then: { AssetTransferMessage.View(store: $0) }

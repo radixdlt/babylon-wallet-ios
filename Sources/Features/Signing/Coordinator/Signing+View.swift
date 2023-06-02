@@ -40,7 +40,7 @@ extension Signing {
 			WithNavigationBar {
 				ViewStore(store).send(.view(.closeButtonTapped))
 			} content: {
-				Signing.View(store: store)
+				View(store: store)
 			}
 		}
 	}
