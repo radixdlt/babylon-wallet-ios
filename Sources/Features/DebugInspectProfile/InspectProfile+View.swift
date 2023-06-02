@@ -225,7 +225,7 @@ public struct DeviceFactorSouceView: View {
 public struct LedgerFactorSourceView: View {
 	public let ledgerFactorSource: LedgerHardwareWalletFactorSource
 	public var body: some View {
-		Labeled("Name", value: ledgerFactorSource.hint.name.rawValue)
+		Labeled("Name", value: ledgerFactorSource.hint.name)
 		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
 	}
 }

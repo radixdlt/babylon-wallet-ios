@@ -11,7 +11,6 @@ extension DerivePublicKeys.State {
 extension DerivePublicKeys {
 	public struct ViewState: Equatable {
 		public let ledger: LedgerHardwareWalletFactorSource?
-		public let purpose: UseLedgerView.Purpose
 	}
 
 	@MainActor
@@ -26,7 +25,7 @@ extension DerivePublicKeys {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				Group {
 					if let ledger = viewStore.ledger {
-						Text(ledger.name)
+						Text(ledger.hint.name)
 							.border(.green)
 					} else {
 						Color.white

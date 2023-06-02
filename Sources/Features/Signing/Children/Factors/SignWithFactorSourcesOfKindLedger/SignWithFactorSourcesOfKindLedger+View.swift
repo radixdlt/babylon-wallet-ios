@@ -8,14 +8,13 @@ extension SignWithFactorSourcesOfKindLedger.State {
 }
 
 // MARK: - SignWithFactorSourcesOfKindLedger.View
+
 extension SignWithFactorSourcesOfKindLedger {
 	public struct ViewState: Equatable {
 		let currentSigningFactor: SigningFactor?
 
 		var ledger: LedgerHardwareWalletFactorSource? {
-			currentSigningFactor.flatMap {
-				currentSigningFactor.factorSource.extract(LedgerHardwareWalletFactorSource.self)
-			}
+			currentSigningFactor.flatMap { $0.factorSource.extract() }
 		}
 	}
 
@@ -59,8 +58,10 @@ extension SignWithFactorSourcesOfKindLedger {
 								.frame(.smallest)
 								.padding(.trailing, .small1)
 
-							Text(ledger.name)
+							Text(ledger.hint.name)
+								.minimumScaleFactor(0.7)
 								.textStyle(.secondaryHeader)
+								.foregroundColor(.app.gray1)
 						}
 						.padding(.horizontal, .medium2)
 						.padding(.vertical, .medium3)

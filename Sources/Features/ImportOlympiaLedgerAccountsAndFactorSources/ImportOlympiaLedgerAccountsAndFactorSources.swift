@@ -187,7 +187,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		_ state: State
 	) -> EffectTask<Action> {
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
-		let ledgerName = ledger.hint.name.rawValue
+		let ledgerName = ledger.hint.name
 
 		let model = ledger.hint.model
 
