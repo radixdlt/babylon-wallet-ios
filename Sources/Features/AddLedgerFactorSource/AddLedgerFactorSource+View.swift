@@ -131,6 +131,7 @@ extension NameLedgerFactorSource {
 						Text(L10n.AddLedger.NameLedger.body)
 							.textStyle(.body1Regular)
 							.padding(.bottom, .medium1)
+							.multilineTextAlignment(.center)
 
 						AppTextField(
 							placeholder: L10n.AddLedger.NameLedger.namePlaceholder,
@@ -143,7 +144,6 @@ extension NameLedgerFactorSource {
 						Spacer()
 					}
 					.padding(.horizontal, .medium1)
-					.multilineTextAlignment(.center)
 					.foregroundColor(.app.gray1)
 					.footer {
 						Button(L10n.AddLedger.NameLedger.continueButtonTitle) {
