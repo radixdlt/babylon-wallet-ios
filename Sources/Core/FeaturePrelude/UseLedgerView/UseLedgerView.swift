@@ -3,7 +3,7 @@ import Resources
 import SharedModels
 import SwiftUI
 
-public struct UseLedgerView: SwiftUI.View {
+public struct UseLedgerView: View {
 	public enum Purpose: Sendable, Hashable {
 		case createAccount
 		case createAuthSigningKey
