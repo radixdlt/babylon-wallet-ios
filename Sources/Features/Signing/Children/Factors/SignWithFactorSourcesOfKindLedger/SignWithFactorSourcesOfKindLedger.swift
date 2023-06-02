@@ -58,7 +58,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 			} catch {
 				loggerGlobal.critical("Failed to hash: \(error)")
 			}
-			let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
+			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
 				ledger: ledger,
@@ -86,7 +86,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 }
 
-extension FactorSource.LedgerHardwareWallet.SigningDisplayMode {
+extension LedgerHardwareWalletFactorSource.SigningDisplayMode {
 	// seperation so that we do not accidentally break profile or RadixConnect
 	var mode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode {
 		switch self {

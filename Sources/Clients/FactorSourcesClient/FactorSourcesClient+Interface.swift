@@ -202,13 +202,12 @@ extension FactorSourcesClient {
 	) async throws -> FactorSourceID {
 		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
 
-		let deviceFactorSource = try DeviceFactorSource.from(
-			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			isOlympiaCompatible: isOlympiaCompatible
-		)
+		let factorSource: DeviceFactorSource = try isOlympiaCompatible
+			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
 		return try await addPrivateHDFactorSource(.init(
-			factorSource: deviceFactorSource.embed(),
+			factorSource: factorSource.embed(),
 			mnemonicWithPasshprase: mnemonicWithPassphrase,
 			saveIntoProfile: isOlympiaCompatible
 		))

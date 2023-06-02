@@ -45,6 +45,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case completed(LedgerHardwareWalletFactorSource)
+		case failedToAddLedger
 		case dismiss
 	}
 
@@ -97,7 +98,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		switch childAction {
 		case let .destination(.presented(.nameLedger(.delegate(.complete(ledger))))):
 			return completeWithLedgerEffect(ledger)
-
+		case .destination(.presented(.nameLedger(.delegate(.failedToCreateLedgerFactorSource)))):
+			return .send(.delegate(.failedToAddLedger))
 		default:
 			return .none
 		}
@@ -205,8 +207,10 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case complete(LedgerHardwareWalletFactorSource)
+		case failedToCreateLedgerFactorSource
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -217,19 +221,32 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 
 		case .confirmNameButtonTapped:
 			loggerGlobal.notice("Confirmed ledger name: '\(state.ledgerName)', creating factor source")
-			let ledger = LedgerHardwareWalletFactorSource(
-				common: .init(
-					id: try! .init(factorSourceKind: .ledgerHQHardwareWallet, hash: state.deviceInfo.id.data.data)
-				),
-				hint: .init(
-					name: .init(rawValue: state.ledgerName),
-					model: .init(model: state.deviceInfo.model)
-				),
-				nextDerivationIndicesPerNetwork: .init() // FIXME: Post-MFA remove this
-			)
 
-			return .send(.delegate(.complete(ledger)))
+			do {
+				let ledger = try LedgerHardwareWalletFactorSource.from(
+					device: state.deviceInfo,
+					name: state.ledgerName
+				)
+				return .send(.delegate(.complete(ledger)))
+			} catch {
+				loggerGlobal.error("Failed to created Ledger FactorSource, error: \(error)")
+				errorQueue.schedule(error)
+				return .send(.delegate(.failedToCreateLedgerFactorSource))
+			}
 		}
+	}
+}
+
+extension LedgerHardwareWalletFactorSource {
+	static func from(
+		device: DeviceInfo,
+		name: String
+	) throws -> Self {
+		try Self.model(
+			.init(model: device.model),
+			name: .init(rawValue: name),
+			deviceID: device.id
+		)
 	}
 }
 
@@ -243,7 +260,7 @@ public struct OlympiaAccountsValidation: Sendable, Hashable {
 	}
 }
 
-extension FactorSource.LedgerHardwareWallet.DeviceModel {
+extension LedgerHardwareWalletFactorSource.DeviceModel {
 	init(model: P2P.LedgerHardwareWallet.Model) {
 		switch model {
 		case .nanoS: self = .nanoS

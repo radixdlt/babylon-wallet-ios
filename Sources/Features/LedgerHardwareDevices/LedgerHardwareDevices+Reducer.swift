@@ -186,6 +186,9 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 				state.destination = nil
 				state.selectedLedgerID = ledger.id
 				return updateLedgersEffect(state: &state)
+			case .failedToAddLedger:
+				state.destination = nil
+				return .none
 			case .dismiss:
 				state.destination = nil
 				return .none

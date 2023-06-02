@@ -4,13 +4,35 @@ import Prelude
 
 // MARK: - OffDeviceMnemonicFactorSource
 public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
+	public var common: FactorSource.Common // We update `lastUsed`
+	public let hint: Hint
+	public let bip39Parameters: BIP39Parameters
+
+	internal init(
+		common: FactorSource.Common,
+		hint: Hint,
+		bip39Parameters: BIP39Parameters
+	) {
+		precondition(common.id.factorSourceKind == Self.kind)
+		self.common = common
+		self.hint = hint
+		self.bip39Parameters = bip39Parameters
+	}
+}
+
+extension OffDeviceMnemonicFactorSource {
 	/// Kind of factor source
 	public static let kind: FactorSourceKind = .offDeviceMnemonic
 	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.offDeviceMnemonic
+}
 
+// MARK: OffDeviceMnemonicFactorSource.Hint
+extension OffDeviceMnemonicFactorSource {
 	public struct Hint: Sendable, Hashable, Codable {
+		public typealias Label = Tagged<(Self, label: ()), String>
+
 		/// "Horse battery"
-		public var label: Label; public typealias Label = Tagged<(Self, label: ()), String>
+		public let label: Label
 
 		public init(
 			label: Label
@@ -18,7 +40,10 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 			self.label = label
 		}
 	}
+}
 
+// MARK: OffDeviceMnemonicFactorSource.BIP39Parameters
+extension OffDeviceMnemonicFactorSource {
 	public struct BIP39Parameters: Sendable, Hashable, Codable {
 		public let wordCount: BIP39.WordCount
 		public let language: BIP39.Language
@@ -43,21 +68,9 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 			)
 		}
 	}
+}
 
-	public var common: FactorSource.Common
-	public var hint: Hint
-	public let bip39Parameters: BIP39Parameters
-
-	public init(
-		common: FactorSource.Common,
-		hint: Hint,
-		bip39Parameters: BIP39Parameters
-	) {
-		self.common = common
-		self.hint = hint
-		self.bip39Parameters = bip39Parameters
-	}
-
+extension OffDeviceMnemonicFactorSource {
 	public static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		label: Hint.Label,
@@ -67,7 +80,7 @@ public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 		@Dependency(\.date) var date
 		return try Self(
 			common: .from(
-				factorSourceKind: .device,
+				factorSourceKind: Self.kind,
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				cryptoParameters: .babylon,
 				addedOn: addedOn ?? date(),

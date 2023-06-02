@@ -3,44 +3,18 @@ import Prelude
 
 // MARK: - DeviceFactorSource
 public struct DeviceFactorSource: FactorSourceProtocol {
-	/// Kind of factor source
-	public static let kind: FactorSourceKind = .device
-	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.device
+	public var common: FactorSource.Common // We update `lastUsed`
 
-	public struct Hint: Sendable, Hashable, Codable {
-		/// "iPhone RED"
-		// The reason why this is mutable (`var`) instead of immutable `let` is
-		// an implementation detailed on iOS, where reading the device name
-		// and model is `async` but we want to be able to `sync` create the
-		// profile, thus this property at a later point in time where an async
-		// context is available.
-		//
-		public var name: Name; public typealias Name = Tagged<(Self, name: ()), String>
+	public var hint: Hint // We update "name"
 
-		/// "iPhone SE 2nd gen"
-		// The reason why this is mutable (`var`) instead of immutable `let` is
-		// an implementation detailed on iOS, where reading the device name
-		// and model is `async` but we want to be able to `sync` create the
-		// profile, thus this property at a later point in time where an async
-		// context is available.
-		//
-		public var model: Model; public typealias Model = Tagged<(Self, model: ()), String>
-	}
+	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? // nil for olympia
 
-	// Mutable so we can update "lastUsedOn"
-	public var common: FactorSource.Common
-
-	// Mutable so we can update "name"
-	public var hint: Hint
-
-	/// nil for olympia
-	public var nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork?
-
-	public init(
+	internal init(
 		common: FactorSource.Common,
 		hint: Hint,
 		nextDerivationIndicesPerNetwork: NextDerivationIndicesPerNetwork? = nil
 	) {
+		precondition(common.id.factorSourceKind == Self.kind)
 		self.common = common
 		self.hint = hint
 		self.nextDerivationIndicesPerNetwork = nextDerivationIndicesPerNetwork
@@ -48,7 +22,27 @@ public struct DeviceFactorSource: FactorSourceProtocol {
 }
 
 extension DeviceFactorSource {
-	public static func from(
+	/// Kind of factor source
+	public static let kind: FactorSourceKind = .device
+	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.device
+}
+
+// MARK: DeviceFactorSource.Hint
+extension DeviceFactorSource {
+	public struct Hint: Sendable, Hashable, Codable {
+		public typealias Name = Tagged<(Self, name: ()), String>
+		public typealias Model = Tagged<(Self, model: ()), String>
+
+		/// "iPhone RED"
+		public var name: Name // mutable so we can update name
+
+		/// "iPhone SE 2nd gen"
+		public var model: Model // mutable because name gets `async` fetched and updated later.
+	}
+}
+
+extension DeviceFactorSource {
+	internal static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
 		name: Hint.Name = "",

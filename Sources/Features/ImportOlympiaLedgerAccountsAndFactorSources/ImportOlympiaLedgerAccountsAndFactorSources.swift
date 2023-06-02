@@ -15,7 +15,7 @@ import SharedModels
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	public struct LedgerWithAccounts: Sendable, Hashable {
 		public let name: String?
-		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
+		public let model: LedgerHardwareWalletFactorSource.DeviceModel
 		public var displayName: String {
 			if let name {
 				return "\(name) (\(model.rawValue))"
@@ -276,7 +276,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 }
 
-extension FactorSource.LedgerHardwareWallet.DeviceModel {
+extension LedgerHardwareWalletFactorSource.DeviceModel {
 	init(model: P2P.LedgerHardwareWallet.Model) {
 		switch model {
 		case .nanoS: self = .nanoS
