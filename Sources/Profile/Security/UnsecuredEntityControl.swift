@@ -33,22 +33,20 @@ extension UnsecuredEntityControl {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(
 			transactionSigning: container.decode(
-				FactorInstance.self,
+				HierarchicalDeterministicFactorInstance.self,
 				forKey: .transactionSigning
-			)
-			.virtualHierarchicalDeterministic(),
+			),
 			authenticationSigning: container.decodeIfPresent(
-				FactorInstance.self,
+				HierarchicalDeterministicFactorInstance.self,
 				forKey: .authenticationSigning
-			)?
-				.virtualHierarchicalDeterministic()
+			)
 		)
 	}
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(transactionSigning.factorInstance, forKey: .transactionSigning)
-		try container.encodeIfPresent(authenticationSigning?.factorInstance, forKey: .authenticationSigning)
+		try container.encode(transactionSigning, forKey: .transactionSigning)
+		try container.encodeIfPresent(authenticationSigning, forKey: .authenticationSigning)
 	}
 
 	private enum CodingKeys: String, CodingKey {

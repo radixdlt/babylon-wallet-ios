@@ -13,6 +13,8 @@ public enum EntitySecurityState:
 	/// with single factor instance until securified, and
 	/// thus protected with an "AccessControl".
 	case unsecured(UnsecuredEntityControl)
+
+	case securified(Securified)
 }
 
 extension EntitySecurityState {
