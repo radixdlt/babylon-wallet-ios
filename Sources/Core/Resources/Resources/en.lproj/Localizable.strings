@@ -613,6 +613,9 @@
 "assetTransfer_accountList_addAccountButton" = "Add Account";
 
 "assetTransfer_addAssets_navigationTitle" = "Choose Asset(s)";
+"assetTransfer_addAssets_buttonAssetsNone" = "Select Assets";
+"assetTransfer_addAssets_buttonAssetsOne" = "Choose 1 Asset";
+"assetTransfer_addAssets_buttonAssets" = "Choose %d Assets";
 
 
 "signing_signatureRequest_title" = "Signature Request";

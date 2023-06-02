@@ -63,7 +63,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		Scope(state: \.assets, action: /Action.child .. ChildAction.assets) {
 			AssetsView()
 		}
-
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()

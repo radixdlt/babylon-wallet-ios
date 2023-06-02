@@ -268,6 +268,14 @@ public enum L10n {
       public static let toLabel = L10n.tr("Localizable", "assetTransfer_accountList_toLabel", fallback: "To")
     }
     public enum AddAssets {
+      /// Choose %d Assets
+      public static func buttonAssets(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetTransfer_addAssets_buttonAssets", p1, fallback: "Choose %d Assets")
+      }
+      /// Select Assets
+      public static let buttonAssetsNone = L10n.tr("Localizable", "assetTransfer_addAssets_buttonAssetsNone", fallback: "Select Assets")
+      /// Choose 1 Asset
+      public static let buttonAssetsOne = L10n.tr("Localizable", "assetTransfer_addAssets_buttonAssetsOne", fallback: "Choose 1 Asset")
       /// Choose Asset(s)
       public static let navigationTitle = L10n.tr("Localizable", "assetTransfer_addAssets_navigationTitle", fallback: "Choose Asset(s)")
     }
