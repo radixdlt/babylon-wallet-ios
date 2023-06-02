@@ -1,17 +1,8 @@
 import FeaturePrelude
 
-extension Signing.State {
-	var viewState: Signing.ViewState {
-		.init()
-	}
-}
-
 // MARK: - Signing.View
-extension Signing {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
 
+extension Signing {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Signing>
