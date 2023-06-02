@@ -36,14 +36,14 @@ public struct UseLedgerView: SwiftUI.View {
 	}
 
 	public init(
-		ledgerFactorSource ledger: LedgerFactorSource,
+		ledgerFactorSource ledger: LedgerHardwareWalletFactorSource,
 		purpose: Purpose
 	) {
 		self.init(
 			purpose: purpose,
 			id: ledger.id.hex(),
-			name: ledger.name,
-			model: ledger.model.rawValue,
+			name: ledger.hint.name.rawValue,
+			model: ledger.hint.model.rawValue,
 			lastUsedOn: ledger.lastUsedOn,
 			addedOn: ledger.addedOn
 		)

@@ -8,7 +8,7 @@ import SharedModels
 
 // MARK: - DeviceInfo
 public struct DeviceInfo: Sendable, Hashable {
-	public let id: FactorSource.ID
+	public let id: HexCodable32Bytes
 	public let model: P2P.LedgerHardwareWallet.Model
 }
 
@@ -39,12 +39,13 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case getDeviceInfoResult(TaskResult<DeviceInfo>)
-		case alreadyExists(LedgerFactorSource)
+		case alreadyExists(LedgerHardwareWalletFactorSource)
 		case proceedToNameDevice(DeviceInfo)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(LedgerFactorSource)
+		case completed(LedgerHardwareWalletFactorSource)
+		case failedToAddLedger
 		case dismiss
 	}
 
@@ -97,7 +98,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		switch childAction {
 		case let .destination(.presented(.nameLedger(.delegate(.complete(ledger))))):
 			return completeWithLedgerEffect(ledger)
-
+		case .destination(.presented(.nameLedger(.delegate(.failedToCreateLedgerFactorSource)))):
+			return .send(.delegate(.failedToAddLedger))
 		default:
 			return .none
 		}
@@ -139,12 +141,16 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		state.isWaitingForResponseFromLedger = false
 		loggerGlobal.notice("Successfully received response from CE! \(ledgerDeviceInfo) ✅")
 		return .run { send in
-			if let existing = try await factorSourcesClient.getFactorSource(id: ledgerDeviceInfo.id) {
-				let ledger = try LedgerFactorSource(factorSource: existing)
+
+			if let ledger = try await factorSourcesClient.getFactorSource(
+				id: .init(factorSourceKind: .ledgerHQHardwareWallet, hash: ledgerDeviceInfo.id.data.data),
+				as: LedgerHardwareWalletFactorSource.self
+			) {
 				await send(.internal(.alreadyExists(ledger)))
 			} else {
 				await send(.internal(.proceedToNameDevice(ledgerDeviceInfo)))
 			}
+
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -157,9 +163,9 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func completeWithLedgerEffect(_ ledger: LedgerFactorSource) -> EffectTask<Action> {
+	private func completeWithLedgerEffect(_ ledger: LedgerHardwareWalletFactorSource) -> EffectTask<Action> {
 		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.factorSource)
+			try await factorSourcesClient.saveFactorSource(ledger.embed())
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.delegate(.completed(ledger)))
 		} catch: { error, _ in
@@ -170,11 +176,11 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 }
 
 extension AlertState<Never> {
-	static func ledgerAlreadyExists(_ ledger: LedgerFactorSource) -> AlertState {
+	static func ledgerAlreadyExists(_ ledger: LedgerHardwareWalletFactorSource) -> AlertState {
 		AlertState {
 			TextState(L10n.AddLedger.AlreadyAddedAlert.title)
 		} message: {
-			TextState(L10n.AddLedger.AlreadyAddedAlert.message(ledger.label.rawValue, ledger.description.rawValue))
+			TextState(L10n.AddLedger.AlreadyAddedAlert.message(ledger.hint.name, ledger.hint.model))
 		}
 	}
 }
@@ -200,9 +206,11 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case complete(LedgerFactorSource)
+		case complete(LedgerHardwareWalletFactorSource)
+		case failedToCreateLedgerFactorSource
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -213,12 +221,32 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 
 		case .confirmNameButtonTapped:
 			loggerGlobal.notice("Confirmed ledger name: '\(state.ledgerName)', creating factor source")
-			let ledger = FactorSource.ledger(id: state.deviceInfo.id,
-			                                 model: .init(model: state.deviceInfo.model),
-			                                 name: state.ledgerName)
 
-			return .send(.delegate(.complete(ledger)))
+			do {
+				let ledger = try LedgerHardwareWalletFactorSource.from(
+					device: state.deviceInfo,
+					name: state.ledgerName
+				)
+				return .send(.delegate(.complete(ledger)))
+			} catch {
+				loggerGlobal.error("Failed to created Ledger FactorSource, error: \(error)")
+				errorQueue.schedule(error)
+				return .send(.delegate(.failedToCreateLedgerFactorSource))
+			}
 		}
+	}
+}
+
+extension LedgerHardwareWalletFactorSource {
+	static func from(
+		device: DeviceInfo,
+		name: String
+	) throws -> Self {
+		try Self.model(
+			.init(model: device.model),
+			name: .init(rawValue: name),
+			deviceID: device.id
+		)
 	}
 }
 
@@ -232,7 +260,7 @@ public struct OlympiaAccountsValidation: Sendable, Hashable {
 	}
 }
 
-extension FactorSource.LedgerHardwareWallet.DeviceModel {
+extension LedgerHardwareWalletFactorSource.DeviceModel {
 	init(model: P2P.LedgerHardwareWallet.Model) {
 		switch model {
 		case .nanoS: self = .nanoS

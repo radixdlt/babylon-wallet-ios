@@ -42,11 +42,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case signChallenge([SignatureOfSigner])
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
-			public let id: FactorSource.ID
+			public let id: HexCodable32Bytes
 			public let model: P2P.LedgerHardwareWallet.Model
 
 			public init(
-				id: FactorSource.ID,
+				id: HexCodable32Bytes,
 				model: P2P.LedgerHardwareWallet.Model
 			) {
 				self.id = id

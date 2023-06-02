@@ -9,7 +9,7 @@ public struct AccountsForDeviceFactorSource: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
 	public var id: ID { deviceFactorSource.id }
 	public let accounts: [Profile.Network.Account]
-	public let deviceFactorSource: HDOnDeviceFactorSource
+	public let deviceFactorSource: DeviceFactorSource
 }
 
 // MARK: - DisplayMnemonics
@@ -132,18 +132,18 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 extension DisplayMnemonics {
 	private func load() -> EffectTask<Action> {
 		@Sendable func doLoad() async throws -> IdentifiedArrayOf<AccountsForDeviceFactorSource> {
-			let sources = try await factorSourcesClient.getFactorSources(ofKind: .device)
+			let sources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-			return try IdentifiedArrayOf(uniqueElements: sources.map { factorSource in
+			return IdentifiedArrayOf(uniqueElements: sources.map { factorSource in
 				let accountsForSource = accounts.filter { account in
 					switch account.securityState {
 					case let .unsecured(unsecuredEntityControl):
 						return unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
 					}
 				}
-				return try AccountsForDeviceFactorSource(
+				return AccountsForDeviceFactorSource(
 					accounts: accountsForSource,
-					deviceFactorSource: HDOnDeviceFactorSource(factorSource: factorSource)
+					deviceFactorSource: factorSource
 				)
 			})
 		}

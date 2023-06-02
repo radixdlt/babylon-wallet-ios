@@ -19,7 +19,7 @@ extension DerivePublicKeys.State {
 // MARK: - DerivePublicKeys.View
 extension DerivePublicKeys {
 	public struct ViewState: Equatable {
-		public let ledger: LedgerFactorSource?
+		public let ledger: LedgerHardwareWalletFactorSource?
 		public let purpose: UseLedgerView.Purpose
 	}
 

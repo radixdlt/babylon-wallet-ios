@@ -15,7 +15,7 @@ import SharedModels
 public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureReducer {
 	public struct LedgerWithAccounts: Sendable, Hashable {
 		public let name: String?
-		public let model: FactorSource.LedgerHardwareWallet.DeviceModel
+		public let model: LedgerHardwareWalletFactorSource.DeviceModel
 		public var displayName: String {
 			if let name {
 				return "\(name) (\(model.rawValue))"
@@ -60,7 +60,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum InternalAction: Sendable, Equatable {
 		/// Validated public keys against expected, then migrate...
-		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerFactorSource)
+		case validatedAccounts(Set<OlympiaAccountToMigrate>, LedgerHardwareWalletFactorSource)
 
 		/// migrated accounts of validated public keys
 		case migratedOlympiaHardwareAccounts(LedgerWithAccounts)
@@ -143,7 +143,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					.init(uncheckedUniqueElements: state.unmigrated.unvalidated.map { $0.path.wrapAsDerivationPath() }),
 					networkID: state.networkID
 				),
-				factorSourceOption: .specific(ledger.factorSource),
+				factorSourceOption: .specific(ledger.embed()),
 				purpose: .importLegacyAccounts
 			)
 			return .none
@@ -167,7 +167,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	private func validate(
 		derivedPublicKeys: OrderedSet<HierarchicalDeterministicPublicKey>,
-		ledger: LedgerFactorSource,
+		ledger: LedgerHardwareWalletFactorSource,
 		state: State
 	) -> EffectTask<Action> {
 		.run { [olympiaAccountsToValidate = state.unmigrated.unvalidated] send in
@@ -182,14 +182,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 
 	private func convertHardwareAccountsToBabylon(
-		ledger: LedgerFactorSource,
+		ledger: LedgerHardwareWalletFactorSource,
 		validatedAccountsToMigrate olympiaAccounts: Set<OlympiaAccountToMigrate>,
 		_ state: State
 	) -> EffectTask<Action> {
 		loggerGlobal.notice("Converting hardware accounts to babylon...")
-		let ledgerName = ledger.label.rawValue
+		let ledgerName = ledger.hint.name.rawValue
 
-		let model = ledger.model
+		let model = ledger.hint.model
 
 		return .run { send in
 			// Migrates and saved all accounts to Profile
@@ -276,7 +276,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	}
 }
 
-extension FactorSource.LedgerHardwareWallet.DeviceModel {
+extension LedgerHardwareWalletFactorSource.DeviceModel {
 	init(model: P2P.LedgerHardwareWallet.Model) {
 		switch model {
 		case .nanoS: self = .nanoS

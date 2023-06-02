@@ -105,15 +105,20 @@ private extension SecureStorageClientTests {
 			let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 			let passphrase = ""
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
-			let factorSource = try FactorSource.babylon(mnemonic: mnemonicWithPassphrase.mnemonic, bip39Passphrase: passphrase)
+			let factorSource = try DeviceFactorSource.babylon(
+				mnemonicWithPassphrase: mnemonicWithPassphrase
+			)
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				factorSource: factorSource.factorSource
+				factorSource: factorSource
 			)
 
 			let sut = SecureStorageClient.liveValue
-			let profile = Profile(header: snapshotHeader, factorSources: .init(factorSource.factorSource))
+			let profile = Profile(
+				header: snapshotHeader,
+				deviceFactorSource: factorSource
+			)
 			try await operation(sut, privateHDFactorSource, profile.snapshot())
 		}
 	}

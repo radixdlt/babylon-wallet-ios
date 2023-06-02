@@ -407,7 +407,7 @@ extension TransactionClient {
 					print("🔮 ~~~ SIGNINGFACTORS OF KIND: \(factorSourceKind) #\(signingFactorsOfKind.count) many: ~~~")
 					for signingFactor in signingFactorsOfKind {
 						let factorSource = signingFactor.factorSource
-						print("\t🔮 == Signers for factorSource: \(factorSource.label) \(factorSource.description): ==")
+						print("\t🔮 == Signers for factorSource: \(factorSource.id): ==")
 						for signer in signingFactor.signers {
 							let entity = signer.entity
 							print("\t\t🔮 * Entity: \(entity.displayName): *")

@@ -1,11 +1,11 @@
 import FeaturePrelude
+import Profile
 
 // MARK: - OffDeviceMnemonicInfo
 public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let mnemonicWithPassphrase: MnemonicWithPassphrase
-		public var story: String = ""
-		public var backup: String = ""
+		public var label: String = ""
 
 		public init(mnemonicWithPassphrase: MnemonicWithPassphrase) {
 			self.mnemonicWithPassphrase = mnemonicWithPassphrase
@@ -13,16 +13,13 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case storyChanged(String)
-		case backupChanged(String)
-		case skipButtonTapped
+		case labelChanged(String)
 		case saveButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case done(
-			label: FactorSource.Label,
-			description: FactorSource.Description,
+			label: OffDeviceMnemonicFactorSource.Hint.Label,
 			MnemonicWithPassphrase
 		)
 	}
@@ -31,19 +28,14 @@ public struct OffDeviceMnemonicInfo: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case let .storyChanged(story):
-			state.story = story
+		case let .labelChanged(label):
+			state.label = label
 			return .none
 
-		case let .backupChanged(backup):
-			state.backup = backup
-			return .none
-
-		case .skipButtonTapped, .saveButtonTapped:
+		case .saveButtonTapped:
 			return .send(.delegate(
 				.done(
-					label: .init(state.story),
-					description: .init(state.backup),
+					label: .init(state.label),
 					state.mnemonicWithPassphrase
 				)
 			))

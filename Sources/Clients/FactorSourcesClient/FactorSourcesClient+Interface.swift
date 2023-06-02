@@ -47,11 +47,13 @@ extension FactorSourcesClient {
 
 // MARK: - AddPrivateHDFactorSourceRequest
 public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
-	public let privateFactorSource: PrivateHDFactorSource
+	public let factorSource: FactorSource
+	public let mnemonicWithPasshprase: MnemonicWithPassphrase
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
 	public let saveIntoProfile: Bool
-	public init(privateFactorSource: PrivateHDFactorSource, saveIntoProfile: Bool) {
-		self.privateFactorSource = privateFactorSource
+	public init(factorSource: FactorSource, mnemonicWithPasshprase: MnemonicWithPassphrase, saveIntoProfile: Bool) {
+		self.factorSource = factorSource
+		self.mnemonicWithPasshprase = mnemonicWithPasshprase
 		self.saveIntoProfile = saveIntoProfile
 	}
 }
@@ -86,18 +88,18 @@ extension FactorSourcesClient {
 
 	public func getDeviceFactorSource(
 		of hdFactorInstance: HierarchicalDeterministicFactorInstance
-	) async throws -> HDOnDeviceFactorSource? {
+	) async throws -> DeviceFactorSource? {
 		guard let factorSource = try await getFactorSource(of: hdFactorInstance.factorInstance) else {
 			return nil
 		}
-		return try HDOnDeviceFactorSource(factorSource: factorSource)
+		return try factorSource.extract(as: DeviceFactorSource.self)
 	}
 
-	public func getFactorSource(
+	public func getFactorSource<Source: FactorSourceProtocol>(
 		id: FactorSourceID,
-		ensureKind kind: FactorSourceKind
-	) async throws -> FactorSource? {
-		try await getFactorSource(id: id) { $0.kind == kind }
+		as _: Source.Type
+	) async throws -> Source? {
+		try await getFactorSource(id: id)?.extract(Source.self)
 	}
 
 	public func getFactorSource(
@@ -112,10 +114,10 @@ extension FactorSourcesClient {
 		try await IdentifiedArrayOf(uniqueElements: getFactorSources().filter(filter))
 	}
 
-	public func getFactorSources(
-		ofKind kind: FactorSourceKind
-	) async throws -> IdentifiedArrayOf<FactorSource> {
-		try await getFactorSources(matching: { $0.kind == kind })
+	public func getFactorSources<Source: FactorSourceProtocol>(
+		type _: Source.Type
+	) async throws -> IdentifiedArrayOf<Source> {
+		try await IdentifiedArrayOf(uniqueElements: getFactorSources().compactMap { $0.extract(Source.self) })
 	}
 }
 
@@ -151,7 +153,8 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSource.ID
 	public var id: ID { factorSource.id }
 	public let factorSource: FactorSource
-	public var signers: NonEmpty<IdentifiedArrayOf<Signer>>
+	public typealias Signers = NonEmpty<IdentifiedArrayOf<Signer>>
+	public var signers: Signers
 
 	public var expectedSignatureCount: Int {
 		signers.map(\.factorInstancesRequiredToSign.count).reduce(0, +)
@@ -159,7 +162,7 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 
 	public init(
 		factorSource: FactorSource,
-		signers: NonEmpty<IdentifiedArrayOf<Signer>>
+		signers: Signers
 	) {
 		self.factorSource = factorSource
 		self.signers = signers
@@ -179,16 +182,16 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 extension FactorSourcesClient {
 	public func addOffDeviceFactorSource(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		label: FactorSource.Label,
-		description: FactorSource.Description
+		label: OffDeviceMnemonicFactorSource.Hint.Label
 	) async throws -> FactorSourceID {
-		let privateFactorSource = try FactorSource.offDeviceMnemonic(
-			withPassphrase: mnemonicWithPassphrase,
-			label: label,
-			description: description
+		let factorSource = try OffDeviceMnemonicFactorSource.from(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			label: label
 		)
+
 		return try await addPrivateHDFactorSource(.init(
-			privateFactorSource: privateFactorSource,
+			factorSource: factorSource.embed(),
+			mnemonicWithPasshprase: mnemonicWithPassphrase,
 			saveIntoProfile: true
 		))
 	}
@@ -197,18 +200,16 @@ extension FactorSourcesClient {
 		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
 	) async throws -> FactorSourceID {
-		let isOlympia = onDeviceMnemonicKind == .olympia
-		let hdOnDeviceFactorSource: HDOnDeviceFactorSource = isOlympia ? try FactorSource.olympia(
-			mnemonicWithPassphrase: mnemonicWithPassphrase
-		) : try FactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase).hdOnDeviceFactorSource
+		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
 
-		let privateFactorSource = try PrivateHDFactorSource(
-			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			factorSource: hdOnDeviceFactorSource.factorSource
-		)
+		let factorSource: DeviceFactorSource = try isOlympiaCompatible
+			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
+
 		return try await addPrivateHDFactorSource(.init(
-			privateFactorSource: privateFactorSource,
-			saveIntoProfile: isOlympia
+			factorSource: factorSource.embed(),
+			mnemonicWithPasshprase: mnemonicWithPassphrase,
+			saveIntoProfile: isOlympiaCompatible
 		))
 	}
 }

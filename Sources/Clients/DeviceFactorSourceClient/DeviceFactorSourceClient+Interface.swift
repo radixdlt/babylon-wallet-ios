@@ -33,21 +33,21 @@ struct DiscrepancyUnsupportedCurve: Swift.Error {}
 
 // MARK: - PublicKeysFromOnDeviceHDRequest
 public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
-	public let hdOnDeviceFactorSource: HDOnDeviceFactorSource
+	public let deviceFactorSource: DeviceFactorSource
 	public let derivationPaths: OrderedSet<DerivationPath>
 	public let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 
 	public init(
-		hdOnDeviceFactorSource: HDOnDeviceFactorSource,
+		deviceFactorSource: DeviceFactorSource,
 		derivationPaths: OrderedSet<DerivationPath>,
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
 	) throws {
 		for derivationPath in derivationPaths {
-			guard hdOnDeviceFactorSource.parameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+			guard deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
 				throw DiscrepancyUnsupportedCurve()
 			}
 		}
-		self.hdOnDeviceFactorSource = hdOnDeviceFactorSource
+		self.deviceFactorSource = deviceFactorSource
 		self.derivationPaths = derivationPaths
 		self.loadMnemonicPurpose = loadMnemonicPurpose
 	}
@@ -121,7 +121,7 @@ extension DeviceFactorSourceClient {
 	}
 
 	public func signUsingDeviceFactorSource(
-		deviceFactorSource: HDOnDeviceFactorSource,
+		deviceFactorSource: DeviceFactorSource,
 		signerEntities: Set<EntityPotentiallyVirtual>,
 		unhashedDataToSign: some DataProtocol,
 		purpose: SigningPurpose
@@ -162,7 +162,7 @@ extension DeviceFactorSourceClient {
 				}
 				let curve = factorInstance.publicKey.curve
 
-				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source label=\(deviceFactorSource.label), description=\(deviceFactorSource.description)")
+				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
 
 				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
 					hdRoot: hdRoot,

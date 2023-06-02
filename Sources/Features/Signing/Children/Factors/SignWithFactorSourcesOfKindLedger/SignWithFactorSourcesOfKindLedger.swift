@@ -6,8 +6,8 @@ import LedgerHardwareWalletClient
 
 // MARK: - SignWithFactorSourcesOfKindLedger
 public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindReducerProtocol {
-	public static let factorSourceKind = FactorSourceKind.ledgerHQHardwareWallet
-	public typealias State = SignWithFactorSourcesOfKindState<Self>
+	public typealias Factor = LedgerHardwareWalletFactorSource
+	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
 		case onFirstTask
@@ -45,12 +45,10 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 
 	public func sign(
-		signingFactor: SigningFactor,
+		signers: SigningFactor.Signers,
+		factor ledger: Factor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		let ledger = try LedgerFactorSource(factorSource: signingFactor.factorSource)
-		let signers = signingFactor.signers
-
 		switch state.signingPurposeWithPayload {
 		case let .signTransaction(_, compiledIntent, _):
 			let dataToSign = Data(compiledIntent.compiledIntent)
@@ -60,7 +58,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 			} catch {
 				loggerGlobal.critical("Failed to hash: \(error)")
 			}
-			let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
+			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
 				ledger: ledger,
@@ -88,7 +86,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 }
 
-extension FactorSource.LedgerHardwareWallet.SigningDisplayMode {
+extension LedgerHardwareWalletFactorSource.SigningDisplayMode {
 	// seperation so that we do not accidentally break profile or RadixConnect
 	var mode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode {
 		switch self {

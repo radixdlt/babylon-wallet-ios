@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-extension HDOnDeviceFactorSource {
+extension DeviceFactorSource {
 	var labelSeedPhraseKind: String {
 		supportsOlympia ? L10n.DisplayMnemonics.labelSeedPhraseKindOlympia : L10n.DisplayMnemonics.labelSeedPhraseKind
 	}
@@ -38,7 +38,7 @@ extension DisplayMnemonicRow {
 // MARK: - AccountsForDeviceFactorSourceView
 struct AccountsForDeviceFactorSourceView: SwiftUI.View {
 	let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
-	var deviceFactorSource: HDOnDeviceFactorSource {
+	var deviceFactorSource: DeviceFactorSource {
 		accountsForDeviceFactorSource.deviceFactorSource
 	}
 

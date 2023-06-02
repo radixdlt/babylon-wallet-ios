@@ -81,3 +81,27 @@ extension Profile {
 		}
 	}
 }
+
+extension FactorSource {
+	public mutating func increaseNextDerivationIndex(
+		for entityKind: EntityKind,
+		networkID: NetworkID
+	) throws {
+		switch self {
+		case var .device(deviceFactorSource):
+			deviceFactorSource.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
+			self = deviceFactorSource.embed()
+		case var .ledger(ledger): // FIXME: Post-MFA remove this
+			ledger.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(for: entityKind, networkID: networkID)
+			self = ledger.embed()
+		default:
+			throw DisrepancyFactorSourceWrongKind(expected: .device, actual: kind)
+		}
+	}
+}
+
+// MARK: - DisrepancyFactorSourceWrongKind
+public struct DisrepancyFactorSourceWrongKind: Swift.Error {
+	public let expected: FactorSourceKind
+	public let actual: FactorSourceKind
+}

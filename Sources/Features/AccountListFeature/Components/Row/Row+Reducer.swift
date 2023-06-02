@@ -14,7 +14,7 @@ extension AccountList {
 
 			public var shouldShowSecurityPrompt = false
 			public let isLegacyAccount: Bool
-			public var isLedgerAccount: Bool = false
+			public let isLedgerAccount: Bool
 			public var isDappDefinitionAccount: Bool = false
 
 			public init(
@@ -23,6 +23,13 @@ extension AccountList {
 				self.account = account
 				self.portfolio = .loading
 				self.isLegacyAccount = account.isOlympiaAccount
+
+				self.isLedgerAccount = {
+					switch account.securityState {
+					case let .unsecured(unsecuredEntityControl):
+						return unsecuredEntityControl.transactionSigning.factorInstance.factorSourceID.factorSourceKind == .ledgerHQHardwareWallet
+					}
+				}()
 			}
 		}
 
@@ -35,7 +42,6 @@ extension AccountList {
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(AccountPortfolio)
 			case displaySecurityPrompting
-			case isLedgerAccount
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -53,25 +59,12 @@ extension AccountList {
 			case .task:
 				let accountAddress = state.account.address
 				state.portfolio = .loading
-				return .run { [account = state.account] send in
-
+				return .run { send in
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
 						guard !Task.isCancelled else {
 							return
 						}
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
-
-						switch account.securityState {
-						case let .unsecured(unsecuredEntityControl):
-							if
-								let factorSource = try? await factorSourcesClient.getFactorSource(
-									of: unsecuredEntityControl.transactionSigning.factorInstance
-								),
-								factorSource.kind == .ledgerHQHardwareWallet
-							{
-								await send(.internal(.isLedgerAccount))
-							}
-						}
 					}
 				}
 			case .securityPromptTapped:
@@ -83,10 +76,6 @@ extension AccountList {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 			switch internalAction {
-			case .isLedgerAccount:
-				state.isLedgerAccount = true
-				return .none
-
 			case .displaySecurityPrompting:
 				state.shouldShowSecurityPrompt = true
 				return .none
@@ -102,28 +91,12 @@ extension AccountList {
 
 				switch state.account.securityState {
 				case let .unsecured(unsecuredEntityControl):
-					return checkIfDeviceFactorSourceControls(
-						factorInstance: unsecuredEntityControl.transactionSigning
-					)
+					if unsecuredEntityControl.transactionSigning.factorSourceID.factorSourceKind == .device {
+						return .send(.internal(.displaySecurityPrompting))
+					} else {
+						return .none
+					}
 				}
-			}
-		}
-
-		private func checkIfDeviceFactorSourceControls(
-			factorInstance: HierarchicalDeterministicFactorInstance
-		) -> EffectTask<Action> {
-			.run { send in
-				guard
-					let factorSource = try await factorSourcesClient.getFactorSource(of: factorInstance.factorInstance)
-				else {
-					loggerGlobal.warning("Did not find factor source for factor instance.")
-					return
-				}
-				guard factorSource.kind == .device else {
-					// probably ledger
-					return
-				}
-				await send(.internal(.displaySecurityPrompting))
 			}
 		}
 	}

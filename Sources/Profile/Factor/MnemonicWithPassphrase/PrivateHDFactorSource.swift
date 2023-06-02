@@ -1,16 +1,15 @@
 import Prelude
 
 // MARK: - PrivateHDFactorSource
-public struct PrivateHDFactorSource: _FactorSourceHolderProtocol {
+public struct PrivateHDFactorSource: Sendable, Hashable {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
-	public let factorSource: FactorSource
-
+	public let factorSource: DeviceFactorSource
 	public init(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		factorSource: FactorSource
+		factorSource: DeviceFactorSource
 	) throws {
 		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)
+		let factorSourceID = try FactorSource.id(fromRoot: hdRoot, factorSourceKind: factorSource.kind)
 		guard factorSourceID == factorSource.id else {
 			loggerGlobal.critical("FactorSourceOD of new factor does not match mnemonic.")
 			throw CriticalDisrepancyBetweenFactorSourceID()
@@ -25,25 +24,22 @@ public struct PrivateHDFactorSource: _FactorSourceHolderProtocol {
 #if DEBUG
 extension PrivateHDFactorSource {
 	public static func testValue(
-		label: FactorSource.Label,
-		description: FactorSource.Description
+		name: DeviceFactorSource.Hint.Name,
+		model: DeviceFactorSource.Hint.Model
 	) -> Self {
 		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue
 
-		let factorSource = try! FactorSource(
-			kind: .device,
-			id: FactorSource.id(fromRoot: mnemonicWithPassphrase.hdRoot()),
-			label: label,
-			description: description,
-			parameters: .babylon,
-			storage: .entityCreating(.init()),
+		let deviceFactorSource = try! DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			model: model,
+			name: name,
 			addedOn: .init(timeIntervalSince1970: 0),
 			lastUsedOn: .init(timeIntervalSince1970: 0)
 		)
 
 		return try! .init(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			factorSource: factorSource
+			factorSource: deviceFactorSource
 		)
 	}
 }

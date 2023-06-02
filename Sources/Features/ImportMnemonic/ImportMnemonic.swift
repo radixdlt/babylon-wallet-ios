@@ -191,7 +191,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				&state
 			)
 
-		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, description, mnemonicWithPassphrase)))):
+		case let .offDeviceMnemonicInfoPrompt(.presented(.delegate(.done(label, mnemonicWithPassphrase)))):
 			state.offDeviceMnemonicInfoPrompt = nil
 			precondition(state.persistedKind == .offDevice)
 			return .task {
@@ -199,8 +199,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 					TaskResult {
 						try await factorSourcesClient.addOffDeviceFactorSource(
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							label: label,
-							description: description
+							label: label
 						)
 					}
 				))

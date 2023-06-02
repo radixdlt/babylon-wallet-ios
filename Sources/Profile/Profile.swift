@@ -40,6 +40,20 @@ public struct Profile:
 		self.appPreferences = appPreferences
 		self.networks = networks
 	}
+
+	public init(
+		header: ProfileSnapshot.Header,
+		deviceFactorSource: DeviceFactorSource,
+		appPreferences: AppPreferences = .init(),
+		networks: Networks = .init()
+	) {
+		self.init(
+			header: header,
+			factorSources: .init(deviceFactorSource.embed()),
+			appPreferences: appPreferences,
+			networks: networks
+		)
+	}
 }
 
 // MARK: Codable

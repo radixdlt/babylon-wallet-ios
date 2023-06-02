@@ -7,7 +7,7 @@ import Profile
 
 // MARK: - SelectedLedgerControlRequirements
 struct SelectedLedgerControlRequirements: Hashable {
-	let selectedLedger: LedgerFactorSource
+	let selectedLedger: LedgerHardwareWalletFactorSource
 }
 
 // MARK: - LedgerHardwareDevices
@@ -21,7 +21,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		public var hasAConnectorExtension: Bool = false
 
 		@Loadable
-		public var ledgers: IdentifiedArrayOf<LedgerFactorSource>? = nil
+		public var ledgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>? = nil
 
 		public var selectedLedgerID: FactorSourceID? = nil
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
@@ -39,7 +39,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public enum ActionRequiringP2P: Sendable, Hashable {
 		case addLedger
-		case selectLedger(LedgerFactorSource)
+		case selectLedger(LedgerHardwareWalletFactorSource)
 	}
 
 	// MARK: - Action
@@ -48,12 +48,12 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case onFirstTask
 		case selectedLedger(id: FactorSource.ID?)
 		case addNewLedgerButtonTapped
-		case confirmedLedger(LedgerFactorSource)
+		case confirmedLedger(LedgerHardwareWalletFactorSource)
 		case whatIsALedgerButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerFactorSource>>)
+		case loadedLedgers(TaskResult<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>)
 		case hasAConnectorExtension(Bool)
 		case perform(ActionRequiringP2P)
 	}
@@ -63,7 +63,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case choseLedger(LedgerFactorSource)
+		case choseLedger(LedgerHardwareWalletFactorSource)
 	}
 
 	// MARK: - Destination
@@ -115,7 +115,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return .merge(updateLedgersEffekt(state: &state), checkP2PLinkEffect())
+			return .merge(updateLedgersEffect(state: &state), checkP2PLinkEffect())
 
 		case let .selectedLedger(selectedID):
 			state.selectedLedgerID = selectedID
@@ -185,7 +185,10 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case let .completed(ledger):
 				state.destination = nil
 				state.selectedLedgerID = ledger.id
-				return updateLedgersEffekt(state: &state)
+				return updateLedgersEffect(state: &state)
+			case .failedToAddLedger:
+				state.destination = nil
+				return .none
 			case .dismiss:
 				state.destination = nil
 				return .none
@@ -196,12 +199,11 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	private func updateLedgersEffekt(state: inout State) -> EffectTask<Action> {
+	private func updateLedgersEffect(state: inout State) -> EffectTask<Action> {
 		state.$ledgers = .loading
 		return .task {
 			let result = await TaskResult {
-				let ledgers = try await factorSourcesClient.getFactorSources(ofKind: .ledgerHQHardwareWallet)
-					.compactMap { try? LedgerFactorSource(factorSource: $0) }
+				let ledgers = try await factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self)
 				return IdentifiedArray(uniqueElements: ledgers)
 			}
 			return .internal(.loadedLedgers(result))
