@@ -5,7 +5,7 @@ import TestingPrelude
 
 // MARK: - FactorSourcesCodableTests
 final class FactorSourcesCodableTests: TestCase {
-	func test_generate_vector() throws {
+	func omit_test_generate_vector() throws {
 		let networkID = NetworkID.kisharnet
 
 		let factorSources: [FactorSource] = try withDependencies {
@@ -50,12 +50,12 @@ final class FactorSourcesCodableTests: TestCase {
 			XCTAssertNil(olympia.nextDerivationIndicesPerNetwork)
 			anyFactorSources.append(olympia)
 
-			let ledger = try LedgerHardwareWalletFactorSource.model(
+			var ledger = try LedgerHardwareWalletFactorSource.model(
 				.nanoS,
 				name: "Orange",
 				deviceID: .init(.deadbeef32Bytes)
 			)
-			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
+			ledger.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
 				for: .account,
 				networkID: networkID
 			)

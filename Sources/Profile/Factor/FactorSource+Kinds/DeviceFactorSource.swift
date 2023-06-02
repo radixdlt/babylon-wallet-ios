@@ -53,7 +53,7 @@ extension DeviceFactorSource {
 		@Dependency(\.date) var date
 		return try Self(
 			common: .from(
-				factorSourceKind: .device,
+				factorSourceKind: Self.kind,
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
 				addedOn: addedOn ?? date(),

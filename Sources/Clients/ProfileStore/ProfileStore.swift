@@ -335,10 +335,10 @@ extension ProfileStore {
 			lastUsedOnDevice = try await secureStorageClient.loadProfileSnapshot(header.id)?.header.lastUsedOnDevice
 		} catch {
 			@Dependency(\.assertionFailure) var assertionFailure
-			let errorMessage = "Failed to load the profile snapshot when checking for device ownership"
+			let errorMessage = "Failed to load the profile snapshot when checking for device ownership, error: \(error)"
 			// Should not happen
-			assertionFailure(errorMessage)
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
 			return
 		}
 
