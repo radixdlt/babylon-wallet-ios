@@ -38,9 +38,14 @@ extension AccountPermissionChooseAccounts {
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /AccountPermissionChooseAccounts.Destinations.State.signing,
-					action: AccountPermissionChooseAccounts.Destinations.Action.signing,
-					content: { Signing.View(store: $0) }
-				)
+					action: AccountPermissionChooseAccounts.Destinations.Action.signing
+				) { signingStore in
+					WithNavigationBar {
+						ViewStore(signingStore).send(.view(.closeButtonTapped))
+					} content: {
+						Signing.View(store: signingStore)
+					}
+				}
 			}
 		}
 	}

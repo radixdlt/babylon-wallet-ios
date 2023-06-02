@@ -158,42 +158,61 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		let selectedAccounts = (state.chooseAccounts.selectedAccounts ?? []).map(\.account)
 
 		switch childAction {
-		case let .destination(.presented(.signing(.delegate(.finishedSigning(.signAuth(signedAuthChallenge)))))):
-			state.destination = nil
+		case let .destination(.presented(.signing(.delegate(signingAction)))):
+			switch signingAction {
+			case .cancelSigning:
+				state.destination = nil
+				return cancelSigningEffect(state: &state)
 
-			var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set(selectedAccounts.map(\.id))
-			let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
-				guard case let .account(account) = $0.signerEntity else {
-					fatalError()
+			case let .finishedSigning(.signAuth(signedAuthChallenge)):
+				state.destination = nil
+
+				var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set(selectedAccounts.map(\.id))
+				let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
+					guard case let .account(account) = $0.signerEntity else {
+						fatalError()
+					}
+					accountsLeftToVerifyDidSign.remove(account.id)
+					let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
+					return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
 				}
-				accountsLeftToVerifyDidSign.remove(account.id)
-				let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
-				return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)
-			}
-			guard accountsLeftToVerifyDidSign.isEmpty else {
-				loggerGlobal.error("Failed to sign with all accounts..")
+				guard accountsLeftToVerifyDidSign.isEmpty else {
+					loggerGlobal.error("Failed to sign with all accounts..")
+					return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
+				}
+
+				let chosenAccounts: AccountPermissionChooseAccountsResult = .withProofOfOwnership(
+					challenge: signedAuthChallenge.challenge,
+					IdentifiedArrayOf<P2P.Dapp.Response.Accounts.WithProof>.init(uniqueElements: walletAccountsWithProof)
+				)
+				return .send(.delegate(.continue(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
+
+			case .failedToSign:
+				state.destination = nil
+				loggerGlobal.error("Failed to sign proof of ownership")
+				return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
+
+			case .finishedSigning(.signTransaction):
+				state.destination = nil
+				assertionFailure("wrong signing, signed tx, expected auth...")
+				loggerGlobal.error("Failed to sign proof of ownership")
 				return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
 			}
 
-			let chosenAccounts: AccountPermissionChooseAccountsResult = .withProofOfOwnership(
-				challenge: signedAuthChallenge.challenge,
-				IdentifiedArrayOf<P2P.Dapp.Response.Accounts.WithProof>.init(uniqueElements: walletAccountsWithProof)
-			)
-			return .send(.delegate(.continue(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
+		case .destination(.dismiss):
+			guard case .signing = state.destination else {
+				return .none
+			}
 
-		case .destination(.presented(.signing(.delegate(.failedToSign)))):
-			state.destination = nil
-			loggerGlobal.error("Failed to sign proof of ownership")
-			return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
-
-		case .destination(.presented(.signing(.delegate(.finishedSigning(.signTransaction))))):
-			state.destination = nil
-			assertionFailure("wrong signing, signed tx, expected auth...")
-			loggerGlobal.error("Failed to sign proof of ownership")
-			return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
+			return cancelSigningEffect(state: &state)
 
 		default:
 			return .none
 		}
+	}
+
+	private func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
+		// FIXME: How to cancel?
+		.none
 	}
 }

@@ -267,6 +267,10 @@ public enum L10n {
       /// To
       public static let toLabel = L10n.tr("Localizable", "assetTransfer_accountList_toLabel", fallback: "To")
     }
+    public enum AddAssets {
+      /// Choose Asset(s)
+      public static let navigationTitle = L10n.tr("Localizable", "assetTransfer_addAssets_navigationTitle", fallback: "Choose Asset(s)")
+    }
     public enum ChooseReceivingAccount {
       /// Enter or paste address
       public static let addressFieldPlaceholder = L10n.tr("Localizable", "assetTransfer_chooseReceivingAccount_addressFieldPlaceholder", fallback: "Enter or paste address")
@@ -1178,8 +1182,6 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "linkedConnectors_localNetworkPermissionDeniedAlert_title", fallback: "Access Required")
     }
     public enum NewConnection {
-      /// Unnamed
-      public static let connectionDefaultName = L10n.tr("Localizable", "linkedConnectors_newConnection_connectionDefaultName", fallback: "Unnamed")
       /// Linking...
       public static let linking = L10n.tr("Localizable", "linkedConnectors_newConnection_linking", fallback: "Linking...")
       /// Save Link

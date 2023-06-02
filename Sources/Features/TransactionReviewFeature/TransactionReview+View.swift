@@ -220,6 +220,20 @@ extension StoreOf<TransactionReview> {
 
 extension View {
 	@MainActor
+	private func destinati(
+		with store: StoreOf<TransactionReview>
+	) -> some View {
+		sheet(
+			store: store.destination,
+			state: /TransactionReview.Destinations.State.customizeGuarantees,
+			action: TransactionReview.Destinations.Action.customizeGuarantees,
+			content: { TransactionReviewGuarantees.View(store: $0) }
+		)
+	}
+}
+
+extension View {
+	@MainActor
 	fileprivate func customizeGuarantees(
 		with store: StoreOf<TransactionReview>
 	) -> some View {
@@ -250,9 +264,14 @@ extension View {
 		sheet(
 			store: store.destination,
 			state: /TransactionReview.Destinations.State.signing,
-			action: TransactionReview.Destinations.Action.signing,
-			content: { Signing.View(store: $0) }
-		)
+			action: TransactionReview.Destinations.Action.signing
+		) { signingStore in
+			WithNavigationBar {
+				ViewStore(signingStore).send(.view(.closeButtonTapped))
+			} content: {
+				Signing.View(store: signingStore)
+			}
+		}
 	}
 
 	@MainActor
