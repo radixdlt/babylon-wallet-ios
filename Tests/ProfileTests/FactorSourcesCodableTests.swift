@@ -53,7 +53,7 @@ final class FactorSourcesCodableTests: TestCase {
 			let ledger = try LedgerHardwareWalletFactorSource.model(
 				.nanoS,
 				name: "Orange",
-				deviceID: .deadbeef
+				deviceID: .init(.deadbeef32Bytes)
 			)
 			babylon.nextDerivationIndicesPerNetwork?.increaseNextDerivationIndex(
 				for: .account,

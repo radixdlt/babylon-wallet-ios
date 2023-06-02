@@ -73,7 +73,7 @@ extension LedgerHardwareWalletFactorSource {
 		deviceID: HexCodable32Bytes
 	) throws -> Self {
 		try .init(
-			common: Self.common(hashForID: deviceID),
+			common: Self.common(hashForID: deviceID.data),
 			hint: .init(name: name, model: model),
 			nextDerivationIndicesPerNetwork: .init()
 		)
