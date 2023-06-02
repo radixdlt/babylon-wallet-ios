@@ -4,18 +4,34 @@ import Prelude
 
 // MARK: - FactorInstance
 /// An factor instance created from a FactorSource.
-public struct FactorInstance: Sendable, Hashable, Codable {
+public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
+	/// FIXME: Update to whatever is the exact correct representation which
+	/// becomes clear once we start integrating with the network (/ledger/node/gateway)
+	public enum ID: Sendable, Hashable {
+		/// "virtual"/"non fungible"
+		case virtual(NonFungibleGlobalId)
+
+		/// "physical"/"real"/"fungible"
+		case resourceAddress(ResourceAddress)
+	}
+
 	/// The ID of the `FactorSource` that was used to produce this
 	/// factor instance. We will lookup the `FactorSource` in the
 	/// `Profile` and can present user with instruction to re-access
 	/// this factor source in order control the `badge`.
 	public let factorSourceID: FactorSource.ID
 
+	/// FactorInstanceID is a referenced by security structure
+	public let id: ID
+
 	/// Either a "physical" badge (NFT) or some source for recreation of a producer
 	/// of a virtual badge (signature), e.g. a HD derivation path, from which a private key
 	/// is derived which produces virtual badges (signatures).
 	public let badge: Badge
+}
 
+// MARK: FactorInstance.Badge
+extension FactorInstance {
 	/// Either a "physical" badge (NFT) or some source for recreation of a producer
 	/// of a virtual badge (signature), e.g. a HD derivation path, from which a private key
 	/// is derived which produces virtual badges (signatures).
@@ -37,7 +53,9 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 		/// The `.trustedEntity` `FactorSource` produces `FactorInstance`s with this kind if badge source.
 		// case physical(ResourceAddress) // Will soon be added
 	}
+}
 
+extension FactorInstance {
 	/// Tries to unwrap this factor instance's badge as virtual hierarchical deterministic one.
 	public func virtualHierarchicalDeterministic() throws -> HierarchicalDeterministicFactorInstance {
 		try .init(factorInstance: self)
