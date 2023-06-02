@@ -53,7 +53,7 @@ extension NonFungibleAssetList.Row.View {
 		.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
 		.tokenRowShadow(!viewStore.isExpanded)
 		.onTapGesture {
-			viewStore.send(.isExpandedToggled, animation: .easeIn)
+			viewStore.send(.isExpandedToggled, animation: .easeInOut)
 		}
 	}
 
