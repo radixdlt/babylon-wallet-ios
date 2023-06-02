@@ -128,8 +128,8 @@ public enum L10n {
       public static let denyAllWarning = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_denyAllWarning", fallback: "This account will not be able to receive \"air drops\" or be used by a trusted contact to assist with account recovery.")
       /// Only accept known
       public static let onlyKnown = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnown", fallback: "Only accept known")
-      /// Allow  third-parties to deposit only assets this account already holds
-      public static let onlyKnownSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnownSubtitle", fallback: "Allow  third-parties to deposit only assets this account already holds")
+      /// Allow third-parties to deposit only assets this account already holds
+      public static let onlyKnownSubtitle = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_onlyKnownSubtitle", fallback: "Allow third-parties to deposit only assets this account already holds")
       /// Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.
       public static let text = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits_text", fallback: "Choose if you want to allow third-parties to directly deposit assets into your account. Deposits that you approve yourself in your Radix Wallet are always accepted.")
     }
@@ -430,8 +430,8 @@ public enum L10n {
       }
       /// Display seed phrase.
       public static let displaySeedPhrase = L10n.tr("Localizable", "biometrics_prompt_displaySeedPhrase", fallback: "Display seed phrase.")
-      /// Check if seed phrase already exists.
-      public static let importOlympiaAccounts = L10n.tr("Localizable", "biometrics_prompt_importOlympiaAccounts", fallback: "Check if seed phrase already exists.")
+      /// Validate seed phrase exists.
+      public static let importOlympiaAccounts = L10n.tr("Localizable", "biometrics_prompt_importOlympiaAccounts", fallback: "Validate seed phrase exists.")
       /// Authenticate to sign auth chellenge with this phone.
       public static let signAuthChallenge = L10n.tr("Localizable", "biometrics_prompt_signAuthChallenge", fallback: "Authenticate to sign auth chellenge with this phone.")
       /// Authenticate to sign transaction with this phone.
@@ -704,9 +704,9 @@ public enum L10n {
       public static func subtitleKnownDapp(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dAppRequest_login_subtitleKnownDapp", String(describing: p1), fallback: "%@ is requesting you to login with a Persona.")
       }
-      /// %@  is requesting you to login for the first time with a Persona.
+      /// %@ is requesting you to login for the first time with a Persona.
       public static func subtitleNewDapp(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@  is requesting you to login for the first time with a Persona.")
+        return L10n.tr("Localizable", "dAppRequest_login_subtitleNewDapp", String(describing: p1), fallback: "%@ is requesting you to login for the first time with a Persona.")
       }
       /// Login Request
       public static let titleKnownDapp = L10n.tr("Localizable", "dAppRequest_login_titleKnownDapp", fallback: "Login Request")
@@ -1195,17 +1195,21 @@ public enum L10n {
       /// Access Required
       public static let title = L10n.tr("Localizable", "linkedConnectors_localNetworkPermissionDeniedAlert_title", fallback: "Access Required")
     }
+    public enum NameNewConnector {
+      /// Save Link and Continue
+      public static let saveLinkButtonTitle = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_saveLinkButtonTitle", fallback: "Save Link and Continue")
+      /// Give a name to this Radix Connector
+      public static let textFieldHint = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_textFieldHint", fallback: "Give a name to this Radix Connector")
+      /// e.g. Chrome on Personal Laptop
+      public static let textFieldPlaceholder = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_textFieldPlaceholder", fallback: "e.g. Chrome on Personal Laptop")
+      /// Name New Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_nameNewConnector_title", fallback: "Name New Connector")
+    }
     public enum NewConnection {
       /// Linking...
       public static let linking = L10n.tr("Localizable", "linkedConnectors_newConnection_linking", fallback: "Linking...")
-      /// Save Link
-      public static let saveLinkButtonTitle = L10n.tr("Localizable", "linkedConnectors_newConnection_saveLinkButtonTitle", fallback: "Save Link")
       /// Scan your QR code to link your wallet with a browser extension
       public static let subtitle = L10n.tr("Localizable", "linkedConnectors_newConnection_subtitle", fallback: "Scan your QR code to link your wallet with a browser extension")
-      /// Name this Connector, e.g. "Chrome on Macbook Pro"
-      public static let textFieldHint = L10n.tr("Localizable", "linkedConnectors_newConnection_textFieldHint", fallback: "Name this Connector, e.g. \"Chrome on Macbook Pro\"")
-      /// Name of Connector
-      public static let textFieldPlaceholder = L10n.tr("Localizable", "linkedConnectors_newConnection_textFieldPlaceholder", fallback: "Name of Connector")
       /// Link New Connector
       public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link New Connector")
     }

@@ -13,31 +13,32 @@ extension NewConnection {
 
 		public var body: some SwiftUI.View {
 			NavigationStack {
-				VStack {
-					Text(L10n.LinkedConnectors.NewConnection.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.sheetTitle)
-
-					Spacer(minLength: 0)
-
-					ZStack {
-						SwitchStore(store) {
-							CaseLet(
-								state: /NewConnection.State.localNetworkPermission,
-								action: { NewConnection.Action.child(.localNetworkPermission($0)) },
-								then: { LocalNetworkPermission.View(store: $0) }
-							)
-							CaseLet(
-								state: /NewConnection.State.scanQR,
-								action: { NewConnection.Action.child(.scanQR($0)) },
-								then: { ScanQRCoordinator.View(store: $0) }
-							)
-							CaseLet(
-								state: /NewConnection.State.connectUsingSecrets,
-								action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
-								then: { ConnectUsingSecrets.View(store: $0) }
-							)
-						}
+				ZStack {
+					SwitchStore(store) {
+						CaseLet(
+							state: /NewConnection.State.localNetworkPermission,
+							action: { NewConnection.Action.child(.localNetworkPermission($0)) },
+							then: {
+								LocalNetworkPermission.View(store: $0)
+									.withTitle(L10n.LinkedConnectors.NewConnection.title)
+							}
+						)
+						CaseLet(
+							state: /NewConnection.State.scanQR,
+							action: { NewConnection.Action.child(.scanQR($0)) },
+							then: {
+								ScanQRCoordinator.View(store: $0)
+									.withTitle(L10n.LinkedConnectors.NewConnection.title)
+							}
+						)
+						CaseLet(
+							state: /NewConnection.State.connectUsingSecrets,
+							action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
+							then: {
+								ConnectUsingSecrets.View(store: $0)
+									.withTitle(L10n.LinkedConnectors.NameNewConnector.title)
+							}
+						)
 					}
 				}
 				#if os(iOS)
@@ -52,6 +53,20 @@ extension NewConnection {
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
+		}
+	}
+}
+
+extension View {
+	func withTitle(_ title: String) -> some View {
+		VStack {
+			Text(title)
+				.foregroundColor(.app.gray1)
+				.textStyle(.sheetTitle)
+
+			Spacer(minLength: 0)
+
+			self
 		}
 	}
 }
