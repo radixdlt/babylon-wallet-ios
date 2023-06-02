@@ -499,6 +499,12 @@ public enum L10n {
       /// Your Account has been created.
       public static let subtitleNotFirst = L10n.tr("Localizable", "createAccount_completion_subtitleNotFirst", fallback: "Your Account has been created.")
     }
+    public enum DerivePublicKeys {
+      /// Deriving public keys
+      public static let subtitle = L10n.tr("Localizable", "createAccount_derivePublicKeys_subtitle", fallback: "Deriving public keys")
+      /// Creating Account
+      public static let title = L10n.tr("Localizable", "createAccount_derivePublicKeys_title", fallback: "Creating Account")
+    }
     public enum Introduction {
       /// Create an Account
       public static let title = L10n.tr("Localizable", "createAccount_introduction_title", fallback: "Create an Account")

@@ -23,19 +23,33 @@ extension DerivePublicKeys {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Group {
+				VStack(spacing: 0) {
+					Image(asset: AssetResource.iconHardwareLedger)
+						.frame(.medium)
+						.padding(.vertical, .medium2)
+
+					Text(L10n.CreateAccount.DerivePublicKeys.title)
+						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
+
+					Text(L10n.CreateAccount.DerivePublicKeys.subtitle)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
+						.padding(.horizontal, .medium1)
+						.padding(.bottom, .medium1)
+
 					if let ledger = viewStore.ledger {
-						Text(ledger.hint.name)
-							.border(.green)
-					} else {
-						Color.white
+						LedgerRowView(viewState: .init(factorSource: ledger))
 					}
+
+					Spacer(minLength: 0)
 				}
+				.padding(.horizontal, .medium1)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
-			.navigationTitle(L10n.CreateEntity.Ledger.createAccount)
 		}
 	}
 }

@@ -623,3 +623,6 @@
 "signing_signatureRequest_body" = "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.";
 
 "signing_signatureRequest_instructions" = "Review and sign the transaction on the Ledger device to continue.";
+
+"createAccount_derivePublicKeys_title" = "Creating Account";
+"createAccount_derivePublicKeys_subtitle" = "Deriving public keys";
