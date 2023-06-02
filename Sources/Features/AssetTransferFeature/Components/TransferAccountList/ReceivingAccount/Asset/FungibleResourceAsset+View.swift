@@ -22,7 +22,6 @@ extension FungibleResourceAsset.View {
 			VStack(alignment: .trailing) {
 				HStack {
 					TokenThumbnail(viewStore.isXRD ? .xrd : .known(viewStore.resource.iconURL), size: .smallest)
-
 					if let name = viewStore.resource.name {
 						Text(name)
 							.textStyle(.body2HighImportance)
@@ -36,6 +35,15 @@ extension FungibleResourceAsset.View {
 							send: { .amountChanged($0) }
 						)
 					)
+					.toolbar {
+						ToolbarItemGroup(placement: .keyboard) {
+							Spacer()
+
+							Button(L10n.Common.done) {
+								focused = false
+							}
+						}
+					}
 					.keyboardType(.decimalPad)
 					.lineLimit(1)
 					.multilineTextAlignment(.trailing)
