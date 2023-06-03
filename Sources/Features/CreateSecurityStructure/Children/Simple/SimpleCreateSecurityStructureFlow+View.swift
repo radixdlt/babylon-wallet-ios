@@ -1,4 +1,5 @@
 import FeaturePrelude
+import Logging
 
 extension SimpleCreateSecurityStructureFlow.State {
 	var viewState: SimpleCreateSecurityStructureFlow.ViewState {
@@ -85,6 +86,14 @@ extension RoleProtocol {
 	static var subtitleSimpleFlow: String {
 		role.subtitleSimpleFlow
 	}
+
+	static var titleAdvancedFlow: String {
+		role.titleAdvancedFlow
+	}
+
+	static var subtitleAdvancedFlow: String {
+		role.subtitleAdvancedFlow
+	}
 }
 
 extension SecurityStructureRole {
@@ -109,14 +118,39 @@ extension SecurityStructureRole {
 			return "Select a third-party who can help you recover your account if you lose your phone."
 		}
 	}
+
+	var titleAdvancedFlow: String {
+		switch self {
+		case .primary:
+			return "To Withdraw Assets"
+		case .confirmation:
+			return "To Initiate Recovery"
+		case .recovery:
+			return "To Confirm Recovery"
+		}
+	}
+
+	var subtitleAdvancedFlow: String {
+		switch self {
+		case .primary:
+			return "Choose which factors allow you to withdraw assets and authenticate yourself to dApps"
+		case .confirmation:
+			return "Chose how you'd like to start the recovery of your accounts in the event of losing your phone."
+		case .recovery:
+			return "Chhose which factors to confirm your account recovery."
+		}
+	}
 }
 
 // MARK: - FactorForRoleView
-public struct FactorForRoleView<Role: RoleProtocol, Factor: BaseFactorSourceProtocol>: SwiftUI.View {
+public struct FactorForRoleView<Role: RoleProtocol, Factor: FactorSourceProtocol>: SwiftUI.View {
 	public let factorSet: Factor?
-	public let action: @Sendable () -> Void
+	public let action: () -> Void
 
-	public init(factorSet: Factor? = nil, action: @escaping @Sendable () -> Void) {
+	public init(
+		factorSet: Factor? = nil,
+		action: @escaping () -> Void
+	) {
 		self.factorSet = factorSet
 		self.action = action
 	}
@@ -137,12 +171,12 @@ public struct SelectFactorView: SwiftUI.View {
 	public let title: String
 	public let subtitle: String
 	public let factorSet: BaseFactorSourceProtocol?
-	public let action: @Sendable () -> Void
+	public let action: () -> Void
 	public init(
 		title: String,
 		subtitle: String,
 		factorSet: BaseFactorSourceProtocol? = nil,
-		action: (@Sendable () -> Void)? = nil
+		action: (() -> Void)? = nil
 	) {
 		self.title = title
 		self.subtitle = subtitle
@@ -187,7 +221,9 @@ public struct SelectFactorView: SwiftUI.View {
 public struct SecurityStructureTutorialHeader: SwiftUI.View {
 	public let action: () -> Void
 	public init(
-		action: @escaping @Sendable () -> Void = { loggerGlobal.debug("MFA: How does it work? Button tapped") }
+		action: @escaping () -> Void = {
+			loggerGlobal.debug("MFA: How does it work? Button tapped")
+		}
 	) {
 		self.action = action
 	}

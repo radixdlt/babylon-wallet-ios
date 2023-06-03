@@ -21,12 +21,10 @@ extension AdvancedCreateSecurityStructureFlow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: AdvancedCreateSecurityStructureFlow")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
+				VStack {
+					Text("Foo")
+				}
 			}
 		}
 	}
