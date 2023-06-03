@@ -45,6 +45,16 @@ extension CreateSecurityStructureCoordinator {
 					action: CreateSecurityStructureCoordinator.Path.Action.start,
 					then: { CreateSecurityStructureStart.View(store: $0) }
 				)
+				CaseLet(
+					state: /CreateSecurityStructureCoordinator.Path.State.simpleSetupFlow,
+					action: CreateSecurityStructureCoordinator.Path.Action.simpleSetupFlow,
+					then: { SimpleCreateSecurityStructureFlow.View(store: $0) }
+				)
+				CaseLet(
+					state: /CreateSecurityStructureCoordinator.Path.State.advancedSetupFlow,
+					action: CreateSecurityStructureCoordinator.Path.Action.advancedSetupFlow,
+					then: { AdvancedCreateSecurityStructureFlow.View(store: $0) }
+				)
 			}
 		}
 	}
