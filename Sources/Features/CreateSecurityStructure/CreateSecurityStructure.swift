@@ -6,16 +6,11 @@ public struct CreateSecurityStructure: Sendable, FeatureReducer {
 		public init() {}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
-	}
+	public enum ViewAction: Sendable, Equatable {}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
-			return .none
-		}
+		switch viewAction {}
 	}
 }

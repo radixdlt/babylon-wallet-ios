@@ -8,9 +8,7 @@ extension CreateSecurityStructure.State {
 
 // MARK: - CreateSecurityStructure.View
 extension CreateSecurityStructure {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -21,12 +19,10 @@ extension CreateSecurityStructure {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: CreateSecurityStructure")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
+				VStack {
+					Text("Imple me")
+				}
 			}
 		}
 	}
