@@ -21,45 +21,31 @@ extension CreateSecurityStructureCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: 0) {
-					VStack {
-						Image(asset: AssetResource.placeholderSecurityStructure)
-
-						Spacer(minLength: 0)
-
-						Text("Security Setup for Accounts") // FIXME: strings
-							.font(.app.sheetTitle)
-
-						Spacer(minLength: 0)
-
-						Text("Let's make sure you can always access your accounts - even if you lose your phone or buy a new one.") // FIXME: strings
-							.font(.app.body1Regular)
-
-						Button("Set up account Security") { // FIXME: strings
-							viewStore.send(.simpleFlow)
-						}
-						.buttonStyle(.primaryRectangular)
-					}
-					.padding(.medium1)
-
-					footerView(viewStore)
+			NavigationStackStore(
+				store.scope(state: \.path, action: { .child(.path($0)) })
+			) {
+				IfLetStore(
+					store.scope(state: \.root, action: { .child(.root($0)) })
+				) {
+					path(for: $0)
 				}
+				// This is required to disable the animation of internal components during transition
+				.transaction { $0.animation = nil }
+			} destination: {
+				path(for: $0)
 			}
 		}
 
-		private func footerView(_ viewStore: ViewStoreOf<CreateSecurityStructureCoordinator>) -> some SwiftUI.View {
-			VStack(spacing: .medium1) {
-				Text("Used Metamask or other crypto wallets? You may prefer:")
-					.font(.app.body1Header)
-					.padding()
-				Button("Advanced Security Setup") {
-					viewStore.send(.advancedFlow)
-				}
-				.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		func path(
+			for store: StoreOf<CreateSecurityStructureCoordinator.Path>
+		) -> some SwiftUI.View {
+			SwitchStore(store) {
+				CaseLet(
+					state: /CreateSecurityStructureCoordinator.Path.State.start,
+					action: CreateSecurityStructureCoordinator.Path.Action.start,
+					then: { CreateSecurityStructureStart.View(store: $0) }
+				)
 			}
-			.padding(.medium1)
-			.background(Color.app.gray3)
 		}
 	}
 }

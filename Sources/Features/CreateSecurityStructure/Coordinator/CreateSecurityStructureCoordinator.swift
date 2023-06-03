@@ -7,21 +7,28 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 		var root: Path.State?
 		var path: StackState<Path.State> = []
 
-		public init() {}
+		public init() {
+			root = .start(.init())
+		}
 	}
 
 	public struct Path: Sendable, Hashable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
+			case start(CreateSecurityStructureStart.State)
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.State)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case start(CreateSecurityStructureStart.Action)
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.Action)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.start, action: /Action.start) {
+				CreateSecurityStructureStart()
+			}
 			Scope(state: /State.simpleSetupFlow, action: /Action.simpleSetupFlow) {
 				SimpleCreateSecurityStructureFlow()
 			}
@@ -31,11 +38,6 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case simpleFlow
-		case advancedFlow
-	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackAction<Path.Action>)
@@ -43,14 +45,25 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .simpleFlow:
+	public var body: some ReducerProtocolOf<CreateSecurityStructureCoordinator> {
+		Reduce(core)
+			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
+				Path()
+			}
+			.forEach(\.path, action: /Action.child .. ChildAction.path) {
+				Path()
+			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .root(.start(.delegate(.simpleFlow))):
 			state.path.append(.simpleSetupFlow(.init()))
 			return .none
-		case .advancedFlow:
-			state.path.append(.simpleSetupFlow(.init()))
+		case .root(.start(.delegate(.advancedFlow))):
+			state.path.append(.advancedSetupFlow(.init()))
 			return .none
+		default: return .none
 		}
 	}
 }

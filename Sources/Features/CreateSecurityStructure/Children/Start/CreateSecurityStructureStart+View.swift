@@ -22,11 +22,44 @@ extension CreateSecurityStructureStart {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					Text("Imple me")
+				VStack(spacing: 0) {
+					VStack {
+						Image(asset: AssetResource.placeholderSecurityStructure)
+
+						Spacer(minLength: 0)
+
+						Text("Security Setup for Accounts") // FIXME: strings
+							.font(.app.sheetTitle)
+
+						Spacer(minLength: 0)
+
+						Text("Let's make sure you can always access your accounts - even if you lose your phone or buy a new one.") // FIXME: strings
+							.font(.app.body1Regular)
+
+						Button("Set up account Security") { // FIXME: strings
+							viewStore.send(.simpleFlow)
+						}
+						.buttonStyle(.primaryRectangular)
+					}
+					.padding(.medium1)
+
+					footerView(viewStore)
 				}
-				.onAppear { viewStore.send(.appeared) }
 			}
+		}
+
+		private func footerView(_ viewStore: ViewStoreOf<CreateSecurityStructureStart>) -> some SwiftUI.View {
+			VStack(spacing: .medium1) {
+				Text("Used Metamask or other crypto wallets? You may prefer:")
+					.font(.app.body1Header)
+					.padding()
+				Button("Advanced Security Setup") {
+					viewStore.send(.advancedFlow)
+				}
+				.buttonStyle(.secondaryRectangular(shouldExpand: true))
+			}
+			.padding(.medium1)
+			.background(Color.app.gray3)
 		}
 	}
 }
