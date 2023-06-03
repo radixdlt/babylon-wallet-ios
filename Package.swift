@@ -148,6 +148,14 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "CreateSecurityStructureFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"AppPreferencesClient",
