@@ -24,7 +24,12 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case selectPhoneConfirmer
+		case selectNewPhoneConfirmer
+		case selectLostPhoneHelper
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case selectNewPhoneConfirmer
 		case selectLostPhoneHelper
 	}
 
@@ -32,13 +37,13 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .selectPhoneConfirmer:
+		case .selectNewPhoneConfirmer:
 			loggerGlobal.debug("'New phone confirmer' tapped")
-			return .none
+			return .send(.delegate(.selectNewPhoneConfirmer))
 
 		case .selectLostPhoneHelper:
 			loggerGlobal.debug("'Lost phone helper' button tapped")
-			return .none
+			return .send(.delegate(.selectLostPhoneHelper))
 		}
 	}
 }

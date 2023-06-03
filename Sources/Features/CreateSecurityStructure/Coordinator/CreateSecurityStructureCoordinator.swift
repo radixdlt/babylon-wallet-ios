@@ -17,12 +17,18 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case start(CreateSecurityStructureStart.State)
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.State)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.State)
+
+			case simpleLostPhoneHelper(SimpleLostPhoneHelper.State)
+			case simpleNewPhoneConfirmer(SimpleNewPhoneConfirmer.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case start(CreateSecurityStructureStart.Action)
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.Action)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.Action)
+
+			case simpleLostPhoneHelper(SimpleLostPhoneHelper.Action)
+			case simpleNewPhoneConfirmer(SimpleNewPhoneConfirmer.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -34,6 +40,12 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.advancedSetupFlow, action: /Action.advancedSetupFlow) {
 				AdvancedCreateSecurityStructureFlow()
+			}
+			Scope(state: /State.simpleNewPhoneConfirmer, action: /Action.simpleNewPhoneConfirmer) {
+				SimpleNewPhoneConfirmer()
+			}
+			Scope(state: /State.simpleLostPhoneHelper, action: /Action.simpleLostPhoneHelper) {
+				SimpleLostPhoneHelper()
 			}
 		}
 	}
@@ -63,6 +75,15 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 		case .root(.start(.delegate(.advancedFlow))):
 			state.path.append(.advancedSetupFlow(.init()))
 			return .none
+
+		case .path(.element(_, action: .simpleSetupFlow(.delegate(.selectNewPhoneConfirmer)))):
+			state.path.append(.simpleNewPhoneConfirmer(.init()))
+			return .none
+
+		case .path(.element(_, action: .simpleSetupFlow(.delegate(.selectLostPhoneHelper)))):
+			state.path.append(.simpleLostPhoneHelper(.init()))
+			return .none
+
 		default: return .none
 		}
 	}

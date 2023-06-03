@@ -55,6 +55,16 @@ extension CreateSecurityStructureCoordinator {
 					action: CreateSecurityStructureCoordinator.Path.Action.advancedSetupFlow,
 					then: { AdvancedCreateSecurityStructureFlow.View(store: $0) }
 				)
+				CaseLet(
+					state: /CreateSecurityStructureCoordinator.Path.State.simpleNewPhoneConfirmer,
+					action: CreateSecurityStructureCoordinator.Path.Action.simpleNewPhoneConfirmer,
+					then: { SimpleNewPhoneConfirmer.View(store: $0) }
+				)
+				CaseLet(
+					state: /CreateSecurityStructureCoordinator.Path.State.simpleLostPhoneHelper,
+					action: CreateSecurityStructureCoordinator.Path.Action.simpleLostPhoneHelper,
+					then: { SimpleLostPhoneHelper.View(store: $0) }
+				)
 			}
 		}
 	}

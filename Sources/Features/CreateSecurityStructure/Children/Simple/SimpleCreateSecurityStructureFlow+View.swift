@@ -41,7 +41,7 @@ extension SimpleCreateSecurityStructureFlow {
 					FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>(
 						factorSet: viewStore.newPhoneConfirmer
 					) {
-						viewStore.send(.selectPhoneConfirmer)
+						viewStore.send(.selectNewPhoneConfirmer)
 					}
 
 					FactorForRoleView<RecoveryRoleTag, TrustedContactFactorSource>(
