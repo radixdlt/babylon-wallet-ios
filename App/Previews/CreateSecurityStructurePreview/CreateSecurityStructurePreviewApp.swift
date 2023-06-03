@@ -5,10 +5,10 @@ import FeaturePrelude
 struct CreateSecurityStructurePreviewApp: App {
 	var body: some Scene {
 		WindowGroup {
-			CreateSecurityStructure.View(
+			CreateSecurityStructureCoordinator.View(
 				store: Store(
-					initialState: CreateSecurityStructure.State(),
-					reducer: CreateSecurityStructure()
+					initialState: CreateSecurityStructureCoordinator.State(),
+					reducer: CreateSecurityStructureCoordinator()
 						._printChanges()
 				)
 			)
