@@ -2,7 +2,7 @@ import FeaturePrelude
 
 extension SimpleCreateSecurityStructureFlow.State {
 	var viewState: SimpleCreateSecurityStructureFlow.ViewState {
-		.init()
+		.init(structure: structure)
 	}
 }
 
@@ -15,7 +15,14 @@ public typealias TrustedContactFactorSource = LedgerHardwareWalletFactorSource
 // MARK: - SimpleCreateSecurityStructureFlow.View
 extension SimpleCreateSecurityStructureFlow {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let structure: NewStructure
+		var newPhoneConfirmer: SecurityQuestionsFactorSource? {
+			structure.newPhoneConfirmer
+		}
+
+		var lostPhoneHelper: TrustedContactFactorSource? {
+			structure.lostPhoneHelper
+		}
 	}
 
 	@MainActor
@@ -31,8 +38,16 @@ extension SimpleCreateSecurityStructureFlow {
 				VStack {
 					SecurityStructureTutorialHeader()
 
-					FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource> {
+					FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>(
+						factorSet: viewStore.newPhoneConfirmer
+					) {
 						viewStore.send(.selectPhoneConfirmer)
+					}
+
+					FactorForRoleView<RecoveryRoleTag, TrustedContactFactorSource>(
+						factorSet: viewStore.lostPhoneHelper
+					) {
+						viewStore.send(.selectLostPhoneHelper)
 					}
 
 					Spacer(minLength: 0)

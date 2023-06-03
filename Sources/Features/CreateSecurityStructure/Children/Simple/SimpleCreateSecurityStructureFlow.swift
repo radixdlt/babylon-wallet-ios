@@ -3,12 +3,12 @@ import FeaturePrelude
 // MARK: - NewStructure
 public struct NewStructure: Sendable, Hashable {
 	/// Confirmation role
-	public var newPhoneConfirmer: FactorSource?
+	public var newPhoneConfirmer: SecurityQuestionsFactorSource?
 
 	/// Recovery role
-	public var lostPhoneHelper: FactorSource?
+	public var lostPhoneHelper: TrustedContactFactorSource?
 
-	public init(newPhoneConfirmer: FactorSource? = nil, lostPhoneHelper: FactorSource? = nil) {
+	public init(newPhoneConfirmer: SecurityQuestionsFactorSource? = nil, lostPhoneHelper: TrustedContactFactorSource? = nil) {
 		self.newPhoneConfirmer = newPhoneConfirmer
 		self.lostPhoneHelper = lostPhoneHelper
 	}
@@ -25,6 +25,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case selectPhoneConfirmer
+		case selectLostPhoneHelper
 	}
 
 	public init() {}
@@ -32,7 +33,11 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .selectPhoneConfirmer:
-			loggerGlobal.debug("Select phone clicked")
+			loggerGlobal.debug("'New phone confirmer' tapped")
+			return .none
+
+		case .selectLostPhoneHelper:
+			loggerGlobal.debug("'Lost phone helper' button tapped")
 			return .none
 		}
 	}
