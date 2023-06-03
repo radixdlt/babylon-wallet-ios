@@ -69,14 +69,14 @@ extension Profile.Network.Account: Comparable {
 // MARK: - DeviceFactorSource + Comparable
 extension DeviceFactorSource: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.hint.name.rawValue < rhs.hint.name.rawValue
+		lhs.hint.name < rhs.hint.name
 	}
 }
 
 // MARK: - LedgerHardwareWalletFactorSource + Comparable
 extension LedgerHardwareWalletFactorSource: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.hint.name.rawValue < rhs.hint.name.rawValue
+		lhs.hint.name < rhs.hint.name
 	}
 }
 
@@ -103,7 +103,7 @@ extension FactorSource {
 					id: .init(factorSourceKind: .device, hash: .random(byteCount: 32)),
 					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
 				),
-				hint: .init(name: .init(name), model: "")
+				hint: .init(name: name, model: "")
 			)
 			return device.embed()
 		}

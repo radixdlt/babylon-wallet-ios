@@ -10,7 +10,7 @@ final class ProfileStoreTests: TestCase {
 	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {
 		await withDependencies {
 			#if canImport(UIKit)
-			$0.device.$name = deviceName.rawValue
+			$0.device.$name = deviceName
 			$0.device.$model = deviceModel.rawValue
 			#endif
 			$0.uuid = .incrementing
@@ -102,7 +102,7 @@ private extension ProfileStoreTests {
 			$0.uuid = .constant(profileID)
 			$0.mnemonicClient.generate = { _, _ in privateFactor.mnemonicWithPassphrase.mnemonic }
 			#if canImport(UIKit)
-			$0.device.$name = deviceName.rawValue
+			$0.device.$name = deviceName
 			$0.device.$model = deviceModel.rawValue
 			#endif
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in
@@ -174,7 +174,7 @@ private extension ProfileStoreTests {
 }
 
 #if canImport(UIKit)
-private let deviceName: DeviceFactorSource.Hint.Name = "NAME"
+private let deviceName: String = "NAME"
 private let deviceModel: DeviceFactorSource.Hint.Model = "MODEL"
 private let expectedDeviceDescription = ProfileStore.deviceDescription(
 	name: deviceName,
