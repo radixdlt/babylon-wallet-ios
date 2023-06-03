@@ -31,10 +31,44 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 	/// this factor source in order control the `badge`.
 	public let factorSourceID: FactorSource.ID
 
-	// FIXME: COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
+	// FIXME: CHANGE TO STORED PROPERTY, COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
 	// use EngineToolkit which we must, to do Blake hash.
 	/// FactorInstanceID is a referenced by security structure
-	public let id: ID
+	public var id: ID {
+		switch badge {
+		case let .virtual(.hierarchicalDeterministic(hdPubKey)):
+			switch hdPubKey.publicKey {
+			case let .ecdsaSecp256k1(k1PubKey):
+				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
+				let payload = k1PubKey.compressedRepresentation.prefix(26)
+				return .init(
+					factorSourceKind: factorSourceID.factorSourceKind,
+					badgeAddress: .virtual(.init(
+						resourceAddress: .init(
+							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
+							address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq056vhf"
+						),
+						nonFungibleLocalId: .bytes(Array(payload))
+					)
+					)
+				)
+			case let .eddsaEd25519(curve25519PubKey):
+				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
+				let payload = curve25519PubKey.compressedRepresentation.prefix(26)
+				return .init(
+					factorSourceKind: factorSourceID.factorSourceKind,
+					badgeAddress: .virtual(.init(
+						resourceAddress: .init(
+							// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
+							address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6"
+						),
+						nonFungibleLocalId: .bytes(Array(payload))
+					)
+					)
+				)
+			}
+		}
+	}
 
 	/// Either a "physical" badge (NFT) or some source for recreation of a producer
 	/// of a virtual badge (signature), e.g. a HD derivation path, from which a private key
@@ -47,44 +81,6 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable {
 	) {
 		self.factorSourceID = factorSourceID
 		self.badge = badge
-
-		// FIXME: COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
-		// use EngineToolkit which we must, to do Blake hash.
-		self.id = {
-			switch badge {
-			case let .virtual(.hierarchicalDeterministic(hdPubKey)):
-				switch hdPubKey.publicKey {
-				case let .ecdsaSecp256k1(k1PubKey):
-					// FIXME: THIS IS COMPLETELY WRONG, placeholder only
-					let payload = k1PubKey.compressedRepresentation.prefix(26)
-					return .init(
-						factorSourceKind: factorSourceID.factorSourceKind,
-						badgeAddress: .virtual(.init(
-							resourceAddress: .init(
-								// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
-								address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq056vhf"
-							),
-							nonFungibleLocalId: .bytes(Array(payload))
-						)
-						)
-					)
-				case let .eddsaEd25519(curve25519PubKey):
-					// FIXME: THIS IS COMPLETELY WRONG, placeholder only
-					let payload = curve25519PubKey.compressedRepresentation.prefix(26)
-					return .init(
-						factorSourceKind: factorSourceID.factorSourceKind,
-						badgeAddress: .virtual(.init(
-							resourceAddress: .init(
-								// FIXME: This is wrong! should be fetched from gateway or from RET... and depends on the network.
-								address: "resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6"
-							),
-							nonFungibleLocalId: .bytes(Array(payload))
-						)
-						)
-					)
-				}
-			}
-		}()
 	}
 }
 

@@ -42,6 +42,8 @@ public enum FactorSourceKind:
 	case offDeviceMnemonic = 0x0F // `0f` == "of" as in "off"
 
 //	case trustedContact = 0xc0 // `c0` == "co" as in "contact
+	public static let trustedContact: Self = .ledgerHQHardwareWallet // PLACEHOLDER
+	public static let securityQuestions: Self = .offDeviceMnemonic // PLACEHOLDER
 }
 
 extension FactorSourceKind {

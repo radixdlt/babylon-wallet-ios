@@ -1,30 +1,125 @@
 import Prelude
 
 // MARK: - RoleOfTier
-public struct RoleOfTier<AbstractFactor>: Sendable, Hashable, Codable where AbstractFactor: Sendable & Hashable & Codable {
-	/// Factor instances which are used in combination with other instances, amounting to at
+public struct RoleOfTier<Role, AbstractFactor>:
+	Sendable, Hashable, Codable
+	where AbstractFactor: Sendable & Hashable & Codable
+{
+	/// Factors which are used in combination with other instances, amounting to at
 	/// least `threshold` many instances to perform some function with this role.
-	public let thresholdFactorInstances: OrderedSet<AbstractFactor>
+	public let thresholdFactors: OrderedSet<AbstractFactor>
 
-	/// How many threshold factor instances that must be used to perform some function with this role.
+	/// How many threshold factors that must be used to perform some function with this role.
 	public let threshold: UInt
 
-	/// "sudo" factor instances, any **single** factor which can perform some function with this role,
+	/// "sudo" factors, any **single** factor which can perform some function with this role,
 	/// disregarding of `threshold`.
-	public let superAdminFactorInstances: OrderedSet<AbstractFactor>
+	public let superAdminFactors: OrderedSet<AbstractFactor>
+
+	public init(
+		thresholdFactors: OrderedSet<AbstractFactor>,
+		threshold: UInt,
+		superAdminFactors: OrderedSet<AbstractFactor>
+	) {
+		precondition(threshold <= thresholdFactors.count)
+		self.thresholdFactors = thresholdFactors
+		self.threshold = threshold
+		self.superAdminFactors = superAdminFactors
+	}
+
+	public static func single(_ factor: AbstractFactor) -> Self {
+		.init(thresholdFactors: [factor], threshold: 1, superAdminFactors: [])
+	}
 }
 
-// MARK: - Profile.EntitySecurityStructure
-extension Profile {
-	public struct EntitySecurityStructure<AbstractFactor>: Sendable, Hashable, Codable where AbstractFactor: Sendable & Hashable & Codable {
-		public typealias Role = RoleOfTier<AbstractFactor>
-		public typealias PrimaryRole = Tagged<(Self, primary: ()), Role>
-		public typealias RecoveryRole = Tagged<(Self, recovery: ()), Role>
-		public typealias ConfirmationRole = Tagged<(Self, confirmation: ()), Role>
-		public let primaryRole: PrimaryRole
-		public let recoveryRole: RecoveryRole
-		public let confirmationRole: ConfirmationRole
+// MARK: - PrimaryRoleTag
+/// Tag for Primary role
+public enum PrimaryRoleTag {}
+
+// MARK: - RecoveryRoleTag
+/// Tag for Recovery role
+public enum RecoveryRoleTag {}
+
+// MARK: - ConfirmationRoleTag
+/// Tag for confirmation role
+public enum ConfirmationRoleTag {}
+
+public typealias PrimaryRole<AbstractFactor> = RoleOfTier<PrimaryRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
+public typealias RecoveryRole<AbstractFactor> = RoleOfTier<RecoveryRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
+public typealias ConfirmationRole<AbstractFactor> = RoleOfTier<ConfirmationRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
+
+// MARK: - AbstractSecurityStructure
+public struct AbstractSecurityStructure<AbstractFactor>:
+	Sendable, Hashable, Codable
+	where AbstractFactor: Sendable & Hashable & Codable
+{
+	public let primaryRole: PrimaryRole<AbstractFactor>
+	public let recoveryRole: RecoveryRole<AbstractFactor>
+	public let confirmationRole: ConfirmationRole<AbstractFactor>
+}
+
+// MARK: - AbstractSecurityStructureConfiguration
+public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
+	Sendable, Hashable, Codable
+	where AbstractFactor: Sendable & Hashable & Codable
+{
+	public typealias Configuration = AbstractSecurityStructure<AbstractFactor>
+	public let label: NonEmptyString
+	public let configuration: Configuration
+	public let created: Date
+
+	public init(
+		label: NonEmptyString,
+		configuration: Configuration,
+		created: Date = .now
+	) {
+		self.label = label
+		self.created = created
+		self.configuration = configuration
 	}
+}
+
+extension ProfileSnapshot {
+	public typealias SecurityStructureConfiguration = AbstractSecurityStructureConfiguration<FactorSource.ID>
+
+	/// A version of `AppliedSecurityStructure` which only contains IDs of factor sources, suitable for storage in Profile Snapshot.
+	public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance.ID>
+}
+
+public typealias SecurityStructureConfiguration = AbstractSecurityStructureConfiguration<FactorSource>
+
+public typealias AppliedSecurityStructure = AbstractSecurityStructure<FactorInstance>
+
+// MARK: - TemplateFactorSourceKindPlaceholder
+public struct TemplateFactorSourceKindPlaceholder: Sendable, Hashable, Codable {
+	/// The factor source kind we wanna use for some role.
+	public let factorSourceKind: FactorSourceKind
+
+	/// Only serves as a semi hacky workaround the fact that we use `OrderedSet` (and wanna keep it) in Role structure,
+	/// but with a`SecurityStructureConfigurationTemplate` we wanna be able to express "use two `device` Factor Sources for primaryRole"
+	/// the `placeholderID` make sure two can put two `device` in the same `OrderedSet` wrapped in `TemplateFactorSourceKindPlaceholder`.
+	public let placeholderID: UUID
+
+	public init(
+		_ factorSourceKind: FactorSourceKind,
+		placeholderID: UUID = .init()
+	) {
+		self.placeholderID = placeholderID
+		self.factorSourceKind = factorSourceKind
+	}
+}
+
+public typealias SecurityStructureConfigurationTemplate = AbstractSecurityStructureConfiguration<TemplateFactorSourceKindPlaceholder>
+
+extension SecurityStructureConfigurationTemplate {
+	public static let `default`: Self = .init(
+		label: "Recommended security structure",
+		configuration: .init(
+			primaryRole: .single(.init(.device)),
+			recoveryRole: .single(.init(.trustedContact)),
+			confirmationRole: .single(.init(.securityQuestions))
+		)
+	)
 }
 
 // MARK: - AccessController
@@ -38,7 +133,7 @@ public struct AccessController: Sendable, Hashable, Codable {
 	/// goes through.
 	public let time: Duration
 
-	public let securityStructure: Profile.EntitySecurityStructure<FactorInstance.ID>
+	public let securityStructure: ProfileSnapshot.AppliedSecurityStructure
 }
 
 // MARK: - Securified
@@ -53,14 +148,39 @@ public struct Securified: Sendable, Hashable, Codable {
 	/// The factor instance used to encrypt/decrypt messages
 	public var messageEncryption: HierarchicalDeterministicFactorInstance?
 
-	public var transactionSigningStructure: Profile.EntitySecurityStructure<FactorInstance> {
-		func decorate(_ keyPath: KeyPath<Profile.EntitySecurityStructure<FactorInstance.ID>, Profile.EntitySecurityStructure<FactorInstance.ID>.Role>) -> Profile.EntitySecurityStructure<FactorInstance>.Role {
-			fatalError()
+	/// Maps from `FactorInstance.ID` to `FactorInstance`, which is what is useful for use through out the wallet.
+	var transactionSigningStructure: AppliedSecurityStructure {
+		func decorate<RoleTag>(
+			tag: RoleTag.Type = RoleTag.self,
+			_ keyPath: KeyPath<ProfileSnapshot.AppliedSecurityStructure, RoleOfTier<RoleTag, FactorInstance.ID>>
+		) -> RoleOfTier<RoleTag, FactorInstance> {
+			let roleWithfactorInstanceIDs = accessController.securityStructure[keyPath: keyPath]
+
+			func lookup(id: FactorInstance.ID) -> FactorInstance {
+				guard let factorInstance = transactionSigningFactorInstances.first(where: { $0.id == id }) else {
+					let errorMessage = "Critical error, unable to find factor instance with ID: \(id), this should never happen."
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					fatalError(errorMessage)
+				}
+				return factorInstance
+			}
+
+			return .init(
+				thresholdFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.thresholdFactors.map(lookup(id:))),
+				threshold: roleWithfactorInstanceIDs.threshold,
+				superAdminFactors: .init(uncheckedUniqueElements: roleWithfactorInstanceIDs.superAdminFactors.map(lookup(id:)))
+			)
 		}
+
 		return .init(
-			primaryRole: .init(rawValue: decorate(\.primaryRole)),
-			recoveryRole: .init(rawValue: decorate(\.recoveryRole)),
-			confirmationRole: .init(decorate(\.confirmationRole))
+			primaryRole: decorate(\.primaryRole),
+			recoveryRole: decorate(\.recoveryRole),
+			confirmationRole: decorate(\.confirmationRole)
 		)
 	}
+}
+
+// MARK: - UnableToFindFactorInstanceWithID
+struct UnableToFindFactorInstanceWithID: Swift.Error {
+	let id: FactorInstance.ID
 }
