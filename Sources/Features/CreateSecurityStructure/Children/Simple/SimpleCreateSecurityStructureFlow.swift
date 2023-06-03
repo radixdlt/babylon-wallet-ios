@@ -24,14 +24,15 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case selectPhoneConfirmer
 	}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
+		case .selectPhoneConfirmer:
+			loggerGlobal.debug("Select phone clicked")
 			return .none
 		}
 	}

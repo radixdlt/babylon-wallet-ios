@@ -3,8 +3,12 @@ import Prelude
 // MARK: - RoleOfTier
 public struct RoleOfTier<Role, AbstractFactor>:
 	Sendable, Hashable, Codable
-	where AbstractFactor: Sendable & Hashable & Codable
+	where
+	Role: RoleProtocol,
+	AbstractFactor: Sendable & Hashable & Codable
 {
+	public static var role: SecurityStructureRole { Role.role }
+
 	/// Factors which are used in combination with other instances, amounting to at
 	/// least `threshold` many instances to perform some function with this role.
 	public let thresholdFactors: OrderedSet<AbstractFactor>
@@ -32,17 +36,35 @@ public struct RoleOfTier<Role, AbstractFactor>:
 	}
 }
 
+// MARK: - SecurityStructureRole
+public enum SecurityStructureRole: Sendable, Hashable {
+	case primary
+	case recovery
+	case confirmation
+}
+
+// MARK: - RoleProtocol
+public protocol RoleProtocol {
+	static var role: SecurityStructureRole { get }
+}
+
 // MARK: - PrimaryRoleTag
 /// Tag for Primary role
-public enum PrimaryRoleTag {}
+public enum PrimaryRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .primary
+}
 
 // MARK: - RecoveryRoleTag
 /// Tag for Recovery role
-public enum RecoveryRoleTag {}
+public enum RecoveryRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .recovery
+}
 
 // MARK: - ConfirmationRoleTag
 /// Tag for confirmation role
-public enum ConfirmationRoleTag {}
+public enum ConfirmationRoleTag: RoleProtocol {
+	public static let role: SecurityStructureRole = .confirmation
+}
 
 public typealias PrimaryRole<AbstractFactor> = RoleOfTier<PrimaryRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable
 public typealias RecoveryRole<AbstractFactor> = RoleOfTier<RecoveryRoleTag, AbstractFactor> where AbstractFactor: Sendable & Hashable & Codable

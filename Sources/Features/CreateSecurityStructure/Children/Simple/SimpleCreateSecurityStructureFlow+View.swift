@@ -6,6 +6,12 @@ extension SimpleCreateSecurityStructureFlow.State {
 	}
 }
 
+/// PLACEHOLDER
+public typealias SecurityQuestionsFactorSource = OffDeviceMnemonicFactorSource
+
+/// PLACEHOLDER
+public typealias TrustedContactFactorSource = LedgerHardwareWalletFactorSource
+
 // MARK: - SimpleCreateSecurityStructureFlow.View
 extension SimpleCreateSecurityStructureFlow {
 	public struct ViewState: Equatable {
@@ -21,14 +27,144 @@ extension SimpleCreateSecurityStructureFlow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					SecurityStructureTutorialHeader()
+
+					FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource> {
+						viewStore.send(.selectPhoneConfirmer)
+					}
 
 					Spacer(minLength: 0)
 				}
 			}
 		}
+	}
+}
+
+extension BaseFactorSourceProtocol {
+	var selectedFactorDisplay: String {
+		kind.selectedFactorDisplay
+	}
+}
+
+extension FactorSourceKind {
+	var selectedFactorDisplay: String {
+		switch self {
+		// FIXME: Strings
+		case .device:
+			return "Phone"
+		case .ledgerHQHardwareWallet:
+			return "Ledger"
+		case .offDeviceMnemonic:
+			return "Seed phrase"
+		}
+	}
+}
+
+extension RoleProtocol {
+	static var titleSimpleFlow: String {
+		role.titleSimpleFlow
+	}
+
+	static var subtitleSimpleFlow: String {
+		role.subtitleSimpleFlow
+	}
+}
+
+extension SecurityStructureRole {
+	var titleSimpleFlow: String {
+		switch self {
+		case .primary:
+			fatalError("not used")
+		case .confirmation:
+			return "New phone confirmer"
+		case .recovery:
+			return "Lost phone helper"
+		}
+	}
+
+	var subtitleSimpleFlow: String {
+		switch self {
+		case .primary:
+			fatalError("not used")
+		case .confirmation:
+			return "Set security questions that are trigger when you move to a new phone"
+		case .recovery:
+			return "Select a third-party who can help you recover your account if you lose your phone."
+		}
+	}
+}
+
+// MARK: - FactorForRoleView
+public struct FactorForRoleView<Role: RoleProtocol, Factor: BaseFactorSourceProtocol>: SwiftUI.View {
+	public let factorSet: Factor?
+	public let action: @Sendable () -> Void
+
+	public init(factorSet: Factor? = nil, action: @escaping @Sendable () -> Void) {
+		self.factorSet = factorSet
+		self.action = action
+	}
+
+	public var body: some View {
+		SelectFactorView(
+			title: Role.titleSimpleFlow,
+			subtitle: Role.subtitleSimpleFlow,
+			factorSet: factorSet,
+			action: action
+		)
+		.frame(maxWidth: .infinity)
+	}
+}
+
+// MARK: - SelectFactorView
+public struct SelectFactorView: SwiftUI.View {
+	public let title: String
+	public let subtitle: String
+	public let factorSet: BaseFactorSourceProtocol?
+	public let action: @Sendable () -> Void
+	public init(
+		title: String,
+		subtitle: String,
+		factorSet: BaseFactorSourceProtocol? = nil,
+		action: (@Sendable () -> Void)? = nil
+	) {
+		self.title = title
+		self.subtitle = subtitle
+		self.factorSet = factorSet
+		self.action = action ?? {
+			loggerGlobal.debug("\(title) factor selection tapped")
+		}
+	}
+
+	public var body: some SwiftUI.View {
+		VStack(alignment: .leading, spacing: .medium2) {
+			Text(title)
+				.font(.app.sectionHeader)
+
+			Text(subtitle)
+				.font(.app.body2Header)
+				.foregroundColor(.app.gray3)
+
+			Button(action: action) {
+				HStack {
+					// FIXME: Strings
+					Text(factorSet?.selectedFactorDisplay ?? "None set")
+						.font(.app.body1Header)
+
+					Spacer(minLength: 0)
+
+					Image(asset: AssetResource.chevronRight)
+				}
+				.foregroundColor(.app.gray3)
+			}
+			.cornerRadius(.medium2)
+			.frame(maxWidth: .infinity)
+			.padding()
+			.background(.app.gray5)
+		}
+		.padding()
+		.frame(maxWidth: .infinity)
 	}
 }
 
