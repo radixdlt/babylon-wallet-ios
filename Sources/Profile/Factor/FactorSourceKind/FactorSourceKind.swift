@@ -9,7 +9,7 @@ public enum FactorSourceKind:
 	Codable,
 	CustomStringConvertible
 {
-	/// A user owned unencrypted mnemonic (and BIP39 passphrase) stored on device,
+	/// A user owned unencrypted mnemonic (and optional BIP39 passphrase) stored on device,
 	/// thus directly usable. This kind is used as the standard factor source for all new
 	/// wallet users.
 	///
@@ -32,7 +32,7 @@ public enum FactorSourceKind:
 	/// * Entity creating (accounts only) // FIXME: MFA remove
 	case ledgerHQHardwareWallet = 0x1E // `1e` == "le"  as in "ledger"
 
-	/// A user owned mnemonic (and BIP39 passphrase) user has to input when used,
+	/// A user owned mnemonic (and optional BIP39 passphrase) user has to input when used,
 	/// e.g. during signing.
 	///
 	/// Attributes:
@@ -41,9 +41,23 @@ public enum FactorSourceKind:
 	///  * Hierarchical deterministic  (Mnemonic)
 	case offDeviceMnemonic = 0x0F // `0f` == "of" as in "off"
 
-//	case trustedContact = 0xc0 // `c0` == "co" as in "contact
-	public static let trustedContact: Self = .ledgerHQHardwareWallet // PLACEHOLDER
-	public static let securityQuestions: Self = .offDeviceMnemonic // PLACEHOLDER
+	/// A contact, friend, company, organisation or otherwise third party the user trusts enought
+	/// to be given a recovery token user has minted and sent the this contact.
+	///
+	/// Attributes:
+	///  * **Not** mine
+	///  * Off device
+	case trustedContact = 0xC0 // `c0` == "co" as in "contact"
+
+	/// An encrypted user owned mnemonic (*never* any BIP39 passphrase) which can
+	/// be decrypted by answers to **security question**, which are personal questions
+	/// that should be only known to the user.
+	///
+	/// Attributes:
+	///  * Mine
+	///  * Off device
+	///  * Hierarchical deterministic  (**Encrypted** mnemonic)
+	case securityQuestions = 0x5E // `5e` == "se" as in "security"
 }
 
 extension FactorSourceKind {
@@ -51,6 +65,8 @@ extension FactorSourceKind {
 		case device
 		case ledgerHQHardwareWallet
 		case offDeviceMnemonic
+		case securityQuestions
+		case trustedContact
 	}
 
 	public var description: String {
@@ -62,26 +78,8 @@ extension FactorSourceKind {
 		case .device: return .device
 		case .ledgerHQHardwareWallet: return .ledgerHQHardwareWallet
 		case .offDeviceMnemonic: return .offDeviceMnemonic
-		}
-	}
-
-	public var isHD: Bool {
-		switch self {
-		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic: return true
-		}
-	}
-
-	public var isOnDevice: Bool {
-		switch self {
-		case .device: return true
-		case .ledgerHQHardwareWallet, .offDeviceMnemonic:
-			return false
-		}
-	}
-
-	public var isMine: Bool {
-		switch self {
-		case .device, .ledgerHQHardwareWallet, .offDeviceMnemonic: return true
+		case .securityQuestions: return .securityQuestions
+		case .trustedContact: return .trustedContact
 		}
 	}
 }

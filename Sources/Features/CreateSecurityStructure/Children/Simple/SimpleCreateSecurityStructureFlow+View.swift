@@ -10,14 +10,23 @@ extension SimpleCreateSecurityStructureFlow.State {
 /// PLACEHOLDER
 public typealias SecurityQuestionsFactorSource = OffDeviceMnemonicFactorSource
 
-/// PLACEHOLDER
-public typealias TrustedContactFactorSource = LedgerHardwareWalletFactorSource
+// MARK: - SimpleUnnamedSecurityStructureConfig
+public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
+	let newPhoneConfirmer: SecurityQuestionsFactorSource
+	let lostPhoneHelper: TrustedContactFactorSource
+}
 
 // MARK: - SimpleCreateSecurityStructureFlow.View
 extension SimpleCreateSecurityStructureFlow {
 	public struct ViewState: Equatable {
 		let newPhoneConfirmer: SecurityQuestionsFactorSource?
 		let lostPhoneHelper: TrustedContactFactorSource?
+		var simpleSecurityStructure: SimpleUnnamedSecurityStructureConfig? {
+			guard let newPhoneConfirmer, let lostPhoneHelper else {
+				return nil
+			}
+			return .init(newPhoneConfirmer: newPhoneConfirmer, lostPhoneHelper: lostPhoneHelper)
+		}
 	}
 
 	@MainActor
@@ -47,27 +56,18 @@ extension SimpleCreateSecurityStructureFlow {
 
 					Spacer(minLength: 0)
 				}
-				/*
-				 WithControlRequirements(
-				 viewStore.chooseAccounts.selectedAccounts?.first?.account,
-				 or: viewStore.validateAccountAddress,
-				 forAction: { result in
-				 viewStore.send(.chooseButtonTapped(result))
-				 },
-				 control: { action in
-				 Button(L10n.Common.choose, action: action)
-				 .buttonStyle(.primaryRectangular)
-				 }
-				 )
-				 */
 				.footer {
-//					WithControlRequirements(
-//						viewStore.
-//					) { action in
-//						// FIXME: Strings
-//						Button("Confirm Multifactor Settings", action: action)
-//							.buttonStyle(.primaryRectangular)
-//					}
+					WithControlRequirements(
+						viewStore.simpleSecurityStructure,
+						forAction: { simpleStructure in
+							viewStore.send(.finishSelectingFactors(simpleStructure))
+						},
+						control: { action in
+							// FIXME: Strings
+							Button("Confirm Multifactor Settings", action: action)
+								.buttonStyle(.primaryRectangular)
+						}
+					)
 				}
 			}
 		}

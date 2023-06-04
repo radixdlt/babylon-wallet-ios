@@ -7,6 +7,8 @@ public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable,
 	case device(DeviceFactorSource)
 	case ledger(LedgerHardwareWalletFactorSource)
 	case offDeviceMnemonic(OffDeviceMnemonicFactorSource)
+	case securityQuestions(SecurityQuestionsFactorSource)
+	case trustedContact(TrustedContactFactorSource)
 }
 
 extension FactorSource {
@@ -37,6 +39,14 @@ extension FactorSource {
 		case var .offDeviceMnemonic(factorSource as (any FactorSourceProtocol)):
 			factorSource[keyPath: writableKeyPath] = newValue
 			self = factorSource.embed()
+
+		case var .securityQuestions(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .trustedContact(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
 		}
 	}
 
@@ -45,13 +55,15 @@ extension FactorSource {
 		case let .device(factorSource): return factorSource[keyPath: keyPath]
 		case let .ledger(factorSource): return factorSource[keyPath: keyPath]
 		case let .offDeviceMnemonic(factorSource): return factorSource[keyPath: keyPath]
+		case let .securityQuestions(factorSource): return factorSource[keyPath: keyPath]
+		case let .trustedContact(factorSource): return factorSource[keyPath: keyPath]
 		}
 	}
 }
 
 extension FactorSource {
 	private enum CodingKeys: String, CodingKey {
-		case discriminator, device, ledgerHQHardwareWallet, offDeviceMnemonic
+		case discriminator, device, ledgerHQHardwareWallet, offDeviceMnemonic, securityQuestions, trustedContact
 	}
 
 	public func encode(to encoder: Encoder) throws {
@@ -64,24 +76,41 @@ extension FactorSource {
 			try keyedContainer.encode(ledger, forKey: .ledgerHQHardwareWallet)
 		case let .offDeviceMnemonic(ledger):
 			try keyedContainer.encode(ledger, forKey: .offDeviceMnemonic)
+		case let .trustedContact(ledger):
+			try keyedContainer.encode(ledger, forKey: .trustedContact)
+		case let .securityQuestions(ledger):
+			try keyedContainer.encode(ledger, forKey: .securityQuestions)
 		}
 	}
 
 	public init(from decoder: Decoder) throws {
 		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try keyedContainer.decode(FactorSourceKind.Discriminator.self, forKey: .discriminator)
+
 		switch discriminator {
 		case .device:
 			self = try .device(
 				keyedContainer.decode(DeviceFactorSource.self, forKey: .device)
 			)
+
 		case .ledgerHQHardwareWallet:
 			self = try .ledger(
 				keyedContainer.decode(LedgerHardwareWalletFactorSource.self, forKey: .ledgerHQHardwareWallet)
 			)
+
 		case .offDeviceMnemonic:
 			self = try .offDeviceMnemonic(
 				keyedContainer.decode(OffDeviceMnemonicFactorSource.self, forKey: .offDeviceMnemonic)
+			)
+
+		case .securityQuestions:
+			self = try .securityQuestions(
+				keyedContainer.decode(SecurityQuestionsFactorSource.self, forKey: .securityQuestions)
+			)
+
+		case .trustedContact:
+			self = try .trustedContact(
+				keyedContainer.decode(TrustedContactFactorSource.self, forKey: .trustedContact)
 			)
 		}
 	}

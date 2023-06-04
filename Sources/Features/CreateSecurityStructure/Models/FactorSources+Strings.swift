@@ -16,6 +16,10 @@ extension FactorSourceKind {
 			return "Ledger"
 		case .offDeviceMnemonic:
 			return "Seed phrase"
+		case .trustedContact:
+			return "Third-party"
+		case .securityQuestions:
+			return "Security Questions"
 		}
 	}
 }
