@@ -17,6 +17,7 @@ public struct SecurityStructureTutorialHeader: SwiftUI.View {
 				.font(.app.sheetTitle)
 
 			Text("You can assign diffrent factors to different actions on Radix Accounts")
+				.fixedSize(horizontal: false, vertical: true)
 				.font(.app.body2Regular)
 
 			Button("How does it work?", action: action)
