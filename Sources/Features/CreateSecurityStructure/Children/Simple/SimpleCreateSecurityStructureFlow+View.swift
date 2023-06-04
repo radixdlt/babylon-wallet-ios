@@ -3,7 +3,7 @@ import Logging
 
 extension SimpleCreateSecurityStructureFlow.State {
 	var viewState: SimpleCreateSecurityStructureFlow.ViewState {
-		.init(structure: structure)
+		.init(newPhoneConfirmer: newPhoneConfirmer, lostPhoneHelper: lostPhoneHelper)
 	}
 }
 
@@ -16,14 +16,8 @@ public typealias TrustedContactFactorSource = LedgerHardwareWalletFactorSource
 // MARK: - SimpleCreateSecurityStructureFlow.View
 extension SimpleCreateSecurityStructureFlow {
 	public struct ViewState: Equatable {
-		let structure: NewStructure
-		var newPhoneConfirmer: SecurityQuestionsFactorSource? {
-			structure.newPhoneConfirmer
-		}
-
-		var lostPhoneHelper: TrustedContactFactorSource? {
-			structure.lostPhoneHelper
-		}
+		let newPhoneConfirmer: SecurityQuestionsFactorSource?
+		let lostPhoneHelper: TrustedContactFactorSource?
 	}
 
 	@MainActor
@@ -53,195 +47,30 @@ extension SimpleCreateSecurityStructureFlow {
 
 					Spacer(minLength: 0)
 				}
-			}
-		}
-	}
-}
-
-extension BaseFactorSourceProtocol {
-	var selectedFactorDisplay: String {
-		kind.selectedFactorDisplay
-	}
-}
-
-extension FactorSourceKind {
-	var selectedFactorDisplay: String {
-		switch self {
-		// FIXME: Strings
-		case .device:
-			return "Phone"
-		case .ledgerHQHardwareWallet:
-			return "Ledger"
-		case .offDeviceMnemonic:
-			return "Seed phrase"
-		}
-	}
-}
-
-extension RoleProtocol {
-	static var titleSimpleFlow: String {
-		role.titleSimpleFlow
-	}
-
-	static var subtitleSimpleFlow: String {
-		role.subtitleSimpleFlow
-	}
-
-	static var titleAdvancedFlow: String {
-		role.titleAdvancedFlow
-	}
-
-	static var subtitleAdvancedFlow: String {
-		role.subtitleAdvancedFlow
-	}
-}
-
-extension SecurityStructureRole {
-	var titleSimpleFlow: String {
-		switch self {
-		case .primary:
-			fatalError("not used")
-		case .confirmation:
-			return "New phone confirmer"
-		case .recovery:
-			return "Lost phone helper"
-		}
-	}
-
-	var subtitleSimpleFlow: String {
-		switch self {
-		case .primary:
-			fatalError("not used")
-		case .confirmation:
-			return "Set security questions that are trigger when you move to a new phone"
-		case .recovery:
-			return "Select a third-party who can help you recover your account if you lose your phone."
-		}
-	}
-
-	var titleAdvancedFlow: String {
-		switch self {
-		case .primary:
-			return "To Withdraw Assets"
-		case .confirmation:
-			return "To Initiate Recovery"
-		case .recovery:
-			return "To Confirm Recovery"
-		}
-	}
-
-	var subtitleAdvancedFlow: String {
-		switch self {
-		case .primary:
-			return "Choose which factors allow you to withdraw assets and authenticate yourself to dApps"
-		case .confirmation:
-			return "Chose how you'd like to start the recovery of your accounts in the event of losing your phone."
-		case .recovery:
-			return "Chhose which factors to confirm your account recovery."
-		}
-	}
-}
-
-// MARK: - FactorForRoleView
-public struct FactorForRoleView<Role: RoleProtocol, Factor: FactorSourceProtocol>: SwiftUI.View {
-	public let factorSet: Factor?
-	public let action: () -> Void
-
-	public init(
-		factorSet: Factor? = nil,
-		action: @escaping () -> Void
-	) {
-		self.factorSet = factorSet
-		self.action = action
-	}
-
-	public var body: some View {
-		SelectFactorView(
-			title: Role.titleSimpleFlow,
-			subtitle: Role.subtitleSimpleFlow,
-			factorSet: factorSet,
-			action: action
-		)
-		.frame(maxWidth: .infinity)
-	}
-}
-
-// MARK: - SelectFactorView
-public struct SelectFactorView: SwiftUI.View {
-	public let title: String
-	public let subtitle: String
-	public let factorSet: BaseFactorSourceProtocol?
-	public let action: () -> Void
-	public init(
-		title: String,
-		subtitle: String,
-		factorSet: BaseFactorSourceProtocol? = nil,
-		action: (() -> Void)? = nil
-	) {
-		self.title = title
-		self.subtitle = subtitle
-		self.factorSet = factorSet
-		self.action = action ?? {
-			loggerGlobal.debug("\(title) factor selection tapped")
-		}
-	}
-
-	public var body: some SwiftUI.View {
-		VStack(alignment: .leading, spacing: .medium2) {
-			Text(title)
-				.font(.app.sectionHeader)
-
-			Text(subtitle)
-				.font(.app.body2Header)
-				.foregroundColor(.app.gray3)
-
-			Button(action: action) {
-				HStack {
-					// FIXME: Strings
-					Text(factorSet?.selectedFactorDisplay ?? "None set")
-						.font(.app.body1Header)
-
-					Spacer(minLength: 0)
-
-					Image(asset: AssetResource.chevronRight)
+				/*
+				 WithControlRequirements(
+				 viewStore.chooseAccounts.selectedAccounts?.first?.account,
+				 or: viewStore.validateAccountAddress,
+				 forAction: { result in
+				 viewStore.send(.chooseButtonTapped(result))
+				 },
+				 control: { action in
+				 Button(L10n.Common.choose, action: action)
+				 .buttonStyle(.primaryRectangular)
+				 }
+				 )
+				 */
+				.footer {
+//					WithControlRequirements(
+//						viewStore.
+//					) { action in
+//						// FIXME: Strings
+//						Button("Confirm Multifactor Settings", action: action)
+//							.buttonStyle(.primaryRectangular)
+//					}
 				}
-				.foregroundColor(.app.gray3)
 			}
-			.cornerRadius(.medium2)
-			.frame(maxWidth: .infinity)
-			.padding()
-			.background(.app.gray5)
 		}
-		.padding()
-		.frame(maxWidth: .infinity)
-	}
-}
-
-// MARK: - SecurityStructureTutorialHeader
-public struct SecurityStructureTutorialHeader: SwiftUI.View {
-	public let action: () -> Void
-	public init(
-		action: @escaping () -> Void = {
-			loggerGlobal.debug("MFA: How does it work? Button tapped")
-		}
-	) {
-		self.action = action
-	}
-
-	public var body: some SwiftUI.View {
-		VStack(spacing: .medium1) {
-			Text("Multi-Factor Setup") // FIXME: Strings
-				.font(.app.sheetTitle)
-
-			Text("You can assign diffrent factors to different actions on Radix Accounts")
-				.font(.app.body2Regular)
-
-			Button("How does it work?", action: action)
-				.buttonStyle(.info)
-				.padding(.horizontal, .large2)
-				.padding(.bottom, .medium1)
-		}
-		.padding(.medium1)
 	}
 }
 
@@ -261,6 +90,9 @@ struct SimpleCreateSecurityStructureFlow_Preview: PreviewProvider {
 }
 
 extension SimpleCreateSecurityStructureFlow.State {
-	public static let previewValue = Self()
+	public static let previewValue = Self(
+		newPhoneConfirmer: nil,
+		lostPhoneHelper: nil
+	)
 }
 #endif

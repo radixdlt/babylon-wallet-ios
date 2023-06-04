@@ -1,25 +1,20 @@
 import FeaturePrelude
 
-// MARK: - NewStructure
-public struct NewStructure: Sendable, Hashable {
-	/// Confirmation role
-	public var newPhoneConfirmer: SecurityQuestionsFactorSource?
-
-	/// Recovery role
-	public var lostPhoneHelper: TrustedContactFactorSource?
-
-	public init(newPhoneConfirmer: SecurityQuestionsFactorSource? = nil, lostPhoneHelper: TrustedContactFactorSource? = nil) {
-		self.newPhoneConfirmer = newPhoneConfirmer
-		self.lostPhoneHelper = lostPhoneHelper
-	}
-}
-
 // MARK: - SimpleCreateSecurityStructureFlow
 public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var structure: NewStructure
-		public init(structure: NewStructure = .init()) {
-			self.structure = structure
+		/// Confirmation role
+		public var newPhoneConfirmer: SecurityQuestionsFactorSource?
+
+		/// Recovery role
+		public var lostPhoneHelper: TrustedContactFactorSource?
+
+		public init(
+			newPhoneConfirmer: SecurityQuestionsFactorSource? = nil,
+			lostPhoneHelper: TrustedContactFactorSource? = nil
+		) {
+			self.newPhoneConfirmer = newPhoneConfirmer
+			self.lostPhoneHelper = lostPhoneHelper
 		}
 	}
 
