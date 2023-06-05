@@ -88,7 +88,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 						precondition(factorSource.sealedMnemonic.securityQuestions.elements == answers.elements.map(\.question))
 						let mnemonic = try factorSource.sealedMnemonic.decrypt(withAnswersToQuestions: answers)
 						return AnswerSecurityQuestions.State.Purpose.AnswersResult.decrypted(mnemonic)
-					case let .encrypt:
+					case .encrypt:
 						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
 						let factorSource = try SecurityQuestionsFactorSource.from(
 							mnemonic: mnemonic,
@@ -103,4 +103,9 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
+
+// MARK: - ForceErrorToTestFailure
+struct ForceErrorToTestFailure: Swift.Error, CustomStringConvertible {
+	let description = "Forced Error testing failure"
 }
