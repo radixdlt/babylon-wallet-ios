@@ -24,10 +24,12 @@ extension AnswerSecurityQuestions {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 
 				VStack {
-					Button("Done") {
+					Button("Finished answering questions") {
 						viewStore.send(.done)
 					}
+					.buttonStyle(.primaryRectangular)
 				}
+				.padding()
 				.navigationTitle("Answer Security Questions")
 			}
 		}

@@ -13,6 +13,7 @@
 		488BBEEF2A2CB40A0019C723 /* AnswerSecurityQuestionsPreviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488BBEEE2A2CB40A0019C723 /* AnswerSecurityQuestionsPreviewApp.swift */; };
 		488BBEF32A2CB40B0019C723 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 488BBEF22A2CB40B0019C723 /* Assets.xcassets */; };
 		488BBEFE2A2CB4FA0019C723 /* AnswerSecurityQuestionsFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBEFD2A2CB4FA0019C723 /* AnswerSecurityQuestionsFeature */; };
+		488BBF022A2DCB110019C723 /* FeaturesPreviewerFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBF012A2DCB110019C723 /* FeaturesPreviewerFeature */; };
 		8329E48B2A20E948004FC2AE /* DappInteractionClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 8329E48A2A20E948004FC2AE /* DappInteractionClientLive */; };
 		837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 837BC3C629BB28CF0082C363 /* P2PLinksClientLive */; };
 		838B08EF2A24F16E006F6320 /* BackupsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 838B08EE2A24F16E006F6320 /* BackupsClientLive */; };
@@ -99,6 +100,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				488BBF022A2DCB110019C723 /* FeaturesPreviewerFeature in Frameworks */,
 				488BBEFE2A2CB4FA0019C723 /* AnswerSecurityQuestionsFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -325,11 +327,13 @@
 			buildRules = (
 			);
 			dependencies = (
+				488BBF042A2DCB140019C723 /* PBXTargetDependency */,
 				488BBF002A2CB4FF0019C723 /* PBXTargetDependency */,
 			);
 			name = AnswerSecurityQuestionsPreview;
 			packageProductDependencies = (
 				488BBEFD2A2CB4FA0019C723 /* AnswerSecurityQuestionsFeature */,
+				488BBF012A2DCB110019C723 /* FeaturesPreviewerFeature */,
 			);
 			productName = AnswerSecurityQuestionsPreview;
 			productReference = 488BBEEC2A2CB40A0019C723 /* AnswerSecurityQuestionsPreview.app */;
@@ -585,6 +589,10 @@
 		488BBF002A2CB4FF0019C723 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 488BBEFF2A2CB4FF0019C723 /* AnswerSecurityQuestionsFeature */;
+		};
+		488BBF042A2DCB140019C723 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 488BBF032A2DCB140019C723 /* FeaturesPreviewerFeature */;
 		};
 		489948262A0186DC00EE807A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2080,6 +2088,14 @@
 		488BBEFF2A2CB4FF0019C723 /* AnswerSecurityQuestionsFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AnswerSecurityQuestionsFeature;
+		};
+		488BBF012A2DCB110019C723 /* FeaturesPreviewerFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeaturesPreviewerFeature;
+		};
+		488BBF032A2DCB140019C723 /* FeaturesPreviewerFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeaturesPreviewerFeature;
 		};
 		489948252A0186DC00EE807A /* URLFormatterClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
