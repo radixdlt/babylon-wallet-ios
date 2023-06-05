@@ -15,7 +15,19 @@ extension AnswerSecurityQuestions.View: FeatureViewProtocol {
 
 // MARK: - AnswerSecurityQuestions + PreviewedFeature
 extension AnswerSecurityQuestions: PreviewedFeature {
-	public typealias ResultFromFeature = SecurityQuestionsFactorSource
+	public typealias ResultFromFeature = TaskResult<AnswerSecurityQuestions.State.Purpose.AnswersResult>
+}
+
+// MARK: - AnswerSecurityQuestions.State.Purpose.AnswersResult + Encodable
+extension AnswerSecurityQuestions.State.Purpose.AnswersResult: Encodable {
+	public func encode(to encoder: Encoder) throws {
+		switch self {
+		case let .encrypted(factor):
+			try factor.encode(to: encoder)
+		case let .decrypted(mnemonic):
+			try mnemonic.encode(to: encoder)
+		}
+	}
 }
 
 // MARK: - AnswerSecurityQuestionsApp_
@@ -23,8 +35,8 @@ extension AnswerSecurityQuestions: PreviewedFeature {
 struct AnswerSecurityQuestionsApp_: SwiftUI.App {
 	var body: some Scene {
 		FeaturesPreviewer<AnswerSecurityQuestions>.scene {
-			guard case let .done(factorSource) = $0 else { return nil }
-			return factorSource
+			guard case let .done(taskResult) = $0 else { return nil }
+			return taskResult.
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import Cryptography
 import FeaturePrelude
 import MnemonicClient
 
@@ -33,7 +34,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 			case encrypt(NonEmpty<OrderedSet<SecurityQuestion>>)
 
 			public enum AnswersResult: Sendable, Hashable {
-				case decrypted(MnemonicWithPassphrase)
+				case decrypted(Mnemonic)
 				case encrypted(SecurityQuestionsFactorSource)
 			}
 		}
@@ -59,7 +60,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case done(AnswerSecurityQuestions.State.Purpose.AnswersResult)
+		case done(TaskResult<AnswerSecurityQuestions.State.Purpose.AnswersResult>)
 	}
 
 	@Dependency(\.mnemonicClient) var mnemonicClient
@@ -79,18 +80,24 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .flow(.delegate(.answeredAllQuestions(with: answers))):
-			switch state.purpose {
-			case let .decrypt(factorSource):
-			}
-			do {
-				let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
-				let factorSource = try SecurityQuestionsFactorSource.from(
-					mnemonic: mnemonic,
-					answersToQuestions: answers
-				)
-				return .send(.delegate(.done(factorSource)))
-			} catch {
-				fatalError("Failed to create SecurityQuestionsFactorSource from answers, error: \(error)")
+			return .task { [purpose = state.purpose] in
+
+				let taskResult = await TaskResult {
+					switch purpose {
+					case let .decrypt(factorSource):
+						precondition(factorSource.sealedMnemonic.securityQuestions.elements == answers.elements.map(\.question))
+						let mnemonic = try factorSource.sealedMnemonic.decrypt(withAnswersToQuestions: answers)
+						return AnswerSecurityQuestions.State.Purpose.AnswersResult.decrypted(mnemonic)
+					case let .encrypt:
+						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
+						let factorSource = try SecurityQuestionsFactorSource.from(
+							mnemonic: mnemonic,
+							answersToQuestions: answers
+						)
+						return AnswerSecurityQuestions.State.Purpose.AnswersResult.encrypted(factorSource)
+					}
+				}
+				return .delegate(.done(taskResult))
 			}
 		default:
 			return .none

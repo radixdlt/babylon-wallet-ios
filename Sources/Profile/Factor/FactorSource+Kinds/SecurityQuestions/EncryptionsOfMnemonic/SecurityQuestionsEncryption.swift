@@ -91,12 +91,12 @@ public enum CAP23 {
 }
 
 extension SecurityQuestionsFactorSource.SealedMnemonic {
-	static func encrypt(
-		mnemonicwithPassphrase: MnemonicWithPassphrase,
+	public static func encrypt(
+		mnemonic: Mnemonic,
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
 		jsonEncoder: JSONEncoder
 	) throws -> NonEmpty<Set<HexCodable>> {
-		let plaintext = try jsonEncoder.encode(mnemonicwithPassphrase)
+		let plaintext = try jsonEncoder.encode(mnemonic)
 //			let encryptionKeys = try kdf.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
 //			let encryptionsArray = try encryptionKeys.map {
 //				try HexCodable(data: encryptionScheme.encrypt(data: plaintext, key: $0))
@@ -109,10 +109,10 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 		fatalError()
 	}
 
-	func decrypt(
+	public func decrypt(
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
-		jsonDecoder: JSONDecoder
-	) throws -> MnemonicWithPassphrase {
+		jsonDecoder: JSONDecoder = .init()
+	) throws -> Mnemonic {
 //			let decryptionKeys = try keyDerivationFunctionUsed.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
 //
 //			for decryptionKey in decryptionKeys {
