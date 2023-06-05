@@ -31,6 +31,11 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 		public enum Purpose: Sendable, Hashable {
 			case decrypt(SecurityQuestionsFactorSource)
 			case encrypt(NonEmpty<OrderedSet<SecurityQuestion>>)
+
+			public enum AnswersResult: Sendable, Hashable {
+				case decrypted(MnemonicWithPassphrase)
+				case encrypted(SecurityQuestionsFactorSource)
+			}
 		}
 
 		public var step: Step
@@ -54,7 +59,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case done(SecurityQuestionsFactorSource)
+		case done(AnswerSecurityQuestions.State.Purpose.AnswersResult)
 	}
 
 	@Dependency(\.mnemonicClient) var mnemonicClient
@@ -74,6 +79,9 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .flow(.delegate(.answeredAllQuestions(with: answers))):
+			switch state.purpose {
+			case let .decrypt(factorSource):
+			}
 			do {
 				let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
 				let factorSource = try SecurityQuestionsFactorSource.from(
