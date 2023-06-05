@@ -57,6 +57,7 @@ public extension AnswerSecurityQuestionsFreeform {
 						.buttonStyle(.primaryRectangular)
 						.controlState(viewStore.submitButtonState)
 					}
+					.padding()
 				}
 			}
 		}

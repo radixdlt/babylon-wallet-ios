@@ -59,11 +59,7 @@ public struct AnswerToSecurityQuestion: Sendable, Hashable, Codable {
 
 		public static func from(_ answer: NonEmptyString) -> Self {
 			.init(
-				entropy: NonEmpty(
-					rawValue: HexCodable(
-						data: Data(answer.rawValue.trimmed().utf8)
-					)
-				)!
+				entropy: CAP23.entropyFrom(freeformAnswer: answer)
 			)
 		}
 	}

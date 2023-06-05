@@ -9,7 +9,7 @@ extension StringProtocol {
 		trimmingCharacters(in: .whitespaces)
 	}
 
-	public func trimmedInclNewlin() -> String {
+	public func trimWhitespacesAndNewLines() -> String {
 		trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 

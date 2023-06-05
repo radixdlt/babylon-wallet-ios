@@ -6,62 +6,7 @@ extension AnswerSecurityQuestions.State: EmptyInitializable {
 	public init() {
 		self.init(
 			//			purpose: .encrypt(SecurityQuestionsFactorSource.defaultQuestions)
-			purpose: .decrypt(
-				// dilemma agree bind idea parade notable stock tuna buddy million nest day kitchen menu spell maple stand face cabin whip write lens hint february
-				try! .fromJSON(
-					"""
-					 {
-						"common" :  {
-							"addedOn" : "2023-06-05T14:44:02Z",
-							"cryptoParameters" :  {
-								"supportedCurves" :  [
-									"curve25519"
-								],
-								"supportedDerivationPathSchemes" :  [
-									"cap26"
-								]
-							},
-							"id" : "5e32c43a862b4274e9cd885bebe45a94c7f6d69e66cbb9cb97ca0639905ce80276",
-							"lastUsedOn" : "2023-06-05T14:44:02Z"
-						},
-						"sealedMnemonic" :  {
-							"encryptions" :  [
-								"7d45e404e1590b0e3c254a5e194468ce3d9ab6252ad02dd98f4e7c43ea06bec63b1fe5bb07480506dda3b16dd1c631f37764326f376542c00559c0ab25f887ed243f625fe4c3e402aa43eb4dae7ca691043a41f87a20d7a3e22e5ca6e1fc2263dceaa862fecb21f66ee6e833c4ec2a1ae687cce7597eca8ee59b6938018bc8ffb2a1d0c7cd0fac9f264266cf19a6c52b157cb2219e9bd6845d850f4d082b1fe04adcd45a17d8a5e3350ae6d4384c",
-								"083d6517575938faa61ac085088fc1153955b3076ec1e4ddbcd9fd8fab3d6be23c77b3348e5ab00f6a187de235883404fa0389b37be01e21d87aa0f0c1618dc0aeb6192a9de860829cdfe51377fd71e1ae7f0b3740bbf571655fa0fe728a38edea2934f15f858680dfec8027c397b844e91c98954a66c0aabe74b248a3c600ac1dab7890b451c895123ba9688d28a606161ccab5ad3899d6ec9e987f1bf0ae47ec1f433f8bd1a84c4cb9fe542e34",
-								"934e08ac8e439b61c93adf037fb40cb01100fa05e4d1d48f5137424c79157334d6b8849a0609439baf4d48835c78a821bd1594deda93367a93e213d89ea2217422fbc9f586aec2d7ee27f23a0d3230bac2859a441b0a0b90c433a13e69f9233890830124a3975d74af91c55a0b936c248ba97fc3e05bb9be3214fac5e40cdb5f4ed35e5d6dfa02dbc1a38c207b15481d45f693b30f1399478101e47b7e49900487282036e1b5869e08757bb7123c",
-								"bf89e796feb53c8ec17903c0d3a26dc86287f0b48122a78fd1f146e9a6a4e9d9e8c9e14b15fc89a2026e3395069d71d4c57dc15597104cc3ddf321a609d8c7100afb241311cb68de1af932a5bd55d26fac9ac3767b5b087bef1ac7cc6ae5fb1038e64e78d2b24192e7f5839ea1cb7e7ac0fbfb1b2ad7ca87f4737e4b5ac3ed753228e5a56a4b009369e98bc6f2d1cc8a5135b46caa83ec3cecd1568358d59718bf67833a4caffefdc3d3e2999488"
-							],
-							"securityQuestions" :  [
-								 {
-									"id" : 0,
-									"kind" : "freeform",
-									"question" : "Name of Radix DLT's Founder?",
-									"version" : 1
-								},
-								 {
-									"id" : 1,
-									"kind" : "freeform",
-									"question" : "Name of Radix DLT's CEO?",
-									"version" : 1
-								},
-								 {
-									"id" : 2,
-									"kind" : "freeform",
-									"question" : "Name of Radix DLT's CTO?",
-									"version" : 1
-								},
-								 {
-									"id" : 3,
-									"kind" : "freeform",
-									"question" : "Common first name amongst Radix DLT employees from Sweden?",
-									"version" : 1
-								}
-							]
-						}
-					}
-					"""
-				)
-			)
+			purpose: .decrypt(try! .fromJSON(json))
 		)
 	}
 }
@@ -109,3 +54,57 @@ extension SecurityQuestionsFactorSource {
 		return try jsonDecoder().decode(SecurityQuestionsFactorSource.self, from: data)
 	}
 }
+
+/// expect: `"call slim street lamp noble grunt fire moral artwork item write kind camp trouble dwarf iron twice damage popular confirm issue lunar behave fire"`
+private let json = """
+ {
+	"common" :  {
+		"addedOn" : "2023-06-05T15:01:58Z",
+		"cryptoParameters" :  {
+			"supportedCurves" :  [
+				"curve25519"
+			],
+			"supportedDerivationPathSchemes" :  [
+				"cap26"
+			]
+		},
+		"id" : "5ebe9bf59ac38f18651b6f13a5a19979a39249e1419549e94422d09ae363c2ddc2",
+		"lastUsedOn" : "2023-06-05T15:01:58Z"
+	},
+	"sealedMnemonic" :  {
+		"encryptions" :  [
+			"23e32b4ac1e4d682e2d32e1b5461f911636f7c4dc008a6c984da1e84574cda4f6229700ba633f79110a5a2a79a6684e45c1e9a9306a86ccdf03302b05f6557a6615d0833c1de7e696cd40922134dd3963fff9b112f7e953f56516f0dba4c4ef10250e7d7d1eb513d96930cb8be676d1fc9cee397c02624829f178bc292fc469c17276abe8cbfa7bae35f88db0a9afffdc20d6098e2b967ef73e287003bbe7a82be067e09c5d63a282ffe4975778285",
+			"6c6ac47a0038c0a8ec892edeb4fcbf339ff6ea8500de09365ad040c7283094aed1f782a97652953daffe6d547fa0e2c3fcd4581d0ef7babade143336312d87ab6777d300721600975c3da8a808df568408d3de5a4c788a7cb67a175b51f7ceb8f5d878cb42ef8f46cfaa5fdcad2ce8d7c1dc7e842ef500cbd6f464afd0db44242389e7fd665fae7d0a1a85b0d2b13937554be85f8226e006ba13334ac4b9ea204f5c9959e6d44b90295b763d4ede3c",
+			"680b1be6a1aebfc2902ad2e983ff739c265ae33118e786e2883dade70e22d479c99880418130228b7d4ae32cf58a4278f0fbfd1f2999560e78d9d4de50cf64104c9ad3d3989ad315405fb8328caa0e55667a37bb36799d862c107ff2d5f10d0ae30e7657b10c37fa452ad0c485cbd41a1180567f0fb769823a7b23f3589f68e3ae934b76706a4674be204a72e5d462c2b144562d90d3eae4ec720023016f26b5e84c0fbfab220c0bbe9b89f0060c83",
+			"f5b15f3836830cd7f772d7428279415550e3ca96a671af8bc025f676e3acfb58edc6bcd613f72b6204f811798d4d11fb8b810fcfc1c7040f9a8601703659f5c76deb21236118d7d960204e02d7e21ddb3032aa024c723cdb3b04fbb012ad0a1fb9df8b048ba777fc3a9603f587219987fbbf92da559881b2db31d3eb75d613f419edf42750be8f229a9a911874883a932cc9832f0ca34df18efec1ba5a44559d258a9786adf2d9ef6792da726e7a90"
+		],
+		"securityQuestions" :  [
+			 {
+				"id" : 0,
+				"kind" : "freeform",
+				"question" : "Name of Radix DLT's Founder?",
+				"version" : 1
+			},
+			 {
+				"id" : 1,
+				"kind" : "freeform",
+				"question" : "Name of Radix DLT's CEO?",
+				"version" : 1
+			},
+			 {
+				"id" : 2,
+				"kind" : "freeform",
+				"question" : "Name of Radix DLT's CTO?",
+				"version" : 1
+			},
+			 {
+				"id" : 3,
+				"kind" : "freeform",
+				"question" : "Common first name amongst Radix DLT employees from Sweden?",
+				"version" : 1
+			}
+		]
+	}
+}
+
+"""

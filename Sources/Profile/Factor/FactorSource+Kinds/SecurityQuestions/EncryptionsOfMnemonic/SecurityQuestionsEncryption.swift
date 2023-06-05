@@ -3,6 +3,20 @@ import Prelude
 
 // MARK: - CAP23
 public enum CAP23 {
+	/// `answer.lowercased().trimWhitespaceAndNewLine().utf8`
+	public static func entropyFrom(
+		freeformAnswer: NonEmptyString
+	) -> NonEmpty<HexCodable> {
+		let data = Data(
+			freeformAnswer.rawValue
+				.lowercased()
+				.trimWhitespacesAndNewLines()
+				.utf8
+		)
+
+		return NonEmpty<HexCodable>(rawValue: .init(data: data))!
+	}
+
 	public static func deriveEncryptionKeysFrom(
 		answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>
 	) throws -> NonEmpty<[SymmetricKey]> {
