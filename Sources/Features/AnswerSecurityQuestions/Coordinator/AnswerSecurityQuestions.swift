@@ -92,7 +92,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 						return AnswerSecurityQuestions.State.Purpose.AnswersResult.decrypted(mnemonic)
 					case .encrypt:
 						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
-
+						loggerGlobal.debug("mnemonic: \(mnemonic.phrase)")
 						let factorSource = try SecurityQuestionsFactorSource.from(
 							mnemonic: mnemonic,
 							answersToQuestions: answers
