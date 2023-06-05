@@ -51,11 +51,28 @@ public struct SecurityQuestion: Sendable, Hashable, Codable, Identifiable {
 
 // MARK: - AnswerToSecurityQuestion
 public struct AnswerToSecurityQuestion: Sendable, Hashable, Codable {
-	public let answer: String
+	public struct Answer: Sendable, Hashable, Codable {
+		public let entropy: NonEmpty<HexCodable>
+		private init(entropy: NonEmpty<HexCodable>) {
+			self.entropy = entropy
+		}
+
+		public static func from(_ answer: NonEmptyString) -> Self {
+			.init(
+				entropy: NonEmpty(
+					rawValue: HexCodable(
+						data: Data(answer.rawValue.trimmed().utf8)
+					)
+				)!
+			)
+		}
+	}
+
 	public let question: SecurityQuestion
+	public let answer: Answer
 
 	public init(
-		answer: String,
+		answer: Answer,
 		to question: SecurityQuestion
 	) {
 		self.answer = answer

@@ -2,25 +2,38 @@ import FeaturePrelude
 import MnemonicClient
 
 extension SecurityQuestionsFactorSource {
-	public static let defaultQuestions: IdentifiedArrayOf<SecurityQuestion> = {
-		.init(uniqueElements: [
-			.init(id: 0, question: "1+1"),
-			.init(id: 1, question: "2+2"),
-			.init(id: 2, question: "3+3"),
-			.init(id: 3, question: "5+5"),
-		])
+	public static let defaultQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = {
+		.init(
+			rawValue: .init(
+				uncheckedUniqueElements:
+				[
+					"Name of Radix DLT's Founder?",
+					"Name of Radix DLT's CEO?",
+					"Name of Radix DLT's CTO?",
+					"Common first name amongst Radix DLT employees from Sweden?",
+				].enumerated().map {
+					SecurityQuestion(
+						id: .init(UInt($0.offset)),
+						question: .init(rawValue: $0.element)!
+					)
+				}
+			))!
 	}()
 }
 
 // MARK: - AnswerSecurityQuestions
 public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var answersToQuestions: Set<AnswerToSecurityQuestion> = []
-		public let questions: IdentifiedArrayOf<SecurityQuestion>
+		public enum Step: Sendable, Hashable {
+			case flow(AnswerSecurityQuestionsFlow.State)
+		}
+
+		public var step: Step
+
 		public init(
-			questions: IdentifiedArrayOf<SecurityQuestion>
+			questions: NonEmpty<OrderedSet<SecurityQuestion>>
 		) {
-			self.questions = questions
+			self.step = .flow(.init(questions: questions))
 		}
 
 		public init() {
@@ -28,8 +41,8 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case done
+	public enum ChildAction: Sendable, Equatable {
+		case flow(AnswerSecurityQuestionsFlow.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -39,20 +52,32 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .done:
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.step, action: /Action.self) {
+			EmptyReducer()
+				.ifCaseLet(/State.Step.flow, action: /Action.child .. ChildAction.flow) {
+					AnswerSecurityQuestionsFlow()
+				}
+		}
 
+		Reduce(core)
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .flow(.delegate(.answeredAllQuestions(with: answers))):
 			do {
 				let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
 				let factorSource = try SecurityQuestionsFactorSource.from(
 					mnemonic: mnemonic,
-					answersToQuestions: state.answersToQuestions
+					answersToQuestions: Set(answers.elements)
 				)
 				return .send(.delegate(.done(factorSource)))
 			} catch {
-				fatalError()
+				fatalError("Failed to create SecurityQuestionsFactorSource from answers, error: \(error)")
 			}
+		default:
+			return .none
 		}
 	}
 }

@@ -21,16 +21,14 @@ extension AnswerSecurityQuestions {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-
-				VStack {
-					Button("Finished answering questions") {
-						viewStore.send(.done)
-					}
-					.buttonStyle(.primaryRectangular)
-				}
-				.padding()
-				.navigationTitle("Answer Security Questions")
+			SwitchStore(
+				store.scope(state: \.step)
+			) {
+				CaseLet(
+					state: /AnswerSecurityQuestions.State.Step.flow,
+					action: { AnswerSecurityQuestions.Action.child(.flow($0)) },
+					then: { AnswerSecurityQuestionsFlow.View(store: $0) }
+				)
 			}
 		}
 	}
