@@ -87,9 +87,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 					case let .decrypt(factorSource):
 						precondition(factorSource.sealedMnemonic.securityQuestions.elements == answers.elements.map(\.question))
 
-						let mnemonic = try factorSource.sealedMnemonic.decrypt(
-							withAnswersToQuestions: answers
-						)
+						let mnemonic = try factorSource.decrypt(answersToQuestions: answers)
 
 						return AnswerSecurityQuestions.State.Purpose.AnswersResult.decrypted(mnemonic)
 					case .encrypt:

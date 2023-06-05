@@ -109,7 +109,7 @@ public struct EncryptionAES256GCM_Version1 {
 }
 
 extension SecurityQuestionsFactorSource.SealedMnemonic {
-	public static func encrypt(
+	static func encrypt(
 		mnemonic: Mnemonic,
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
 		jsonEncoder: JSONEncoder
@@ -138,7 +138,7 @@ extension SecurityQuestionsFactorSource.SealedMnemonic {
 		)
 	}
 
-	public func decrypt(
+	func decrypt(
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
 		jsonDecoder: JSONDecoder
 	) throws -> Mnemonic {

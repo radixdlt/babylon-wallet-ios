@@ -89,6 +89,16 @@ extension SecurityQuestionsFactorSource {
 }
 
 extension SecurityQuestionsFactorSource {
+	public func decrypt(
+		answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>
+	) throws -> Mnemonic {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		return try sealedMnemonic.decrypt(
+			withAnswersToQuestions: answersToQuestions,
+			jsonDecoder: jsonDecoder()
+		)
+	}
+
 	public static func from(
 		mnemonic: Mnemonic,
 		answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
