@@ -12,6 +12,10 @@ extension PreviewResult {
 				GeometryReader { geoProxy in
 					ScrollView {
 						VStack {
+							if let error = viewStore.failure {
+								Text("Failure: \(error)")
+							}
+
 							if let json = viewStore.json {
 								VStack {
 									Text("JSON").font(.app.sectionHeader)
@@ -33,21 +37,23 @@ extension PreviewResult {
 									}
 								}
 							}
-						}
 
-						VStack {
-							Text("Debug").font(.app.sectionHeader)
+							if let debugDescription = viewStore.debugDescription {
+								VStack {
+									Text("Debug").font(.app.sectionHeader)
 
-							Toggle(
-								isOn: viewStore.binding(
-									get: \.isShowingDebugDescription,
-									send: { .view(.showDebugDescriptionToggled($0)) }
-								),
-								label: { Text("Show Debug") }
-							)
+									Toggle(
+										isOn: viewStore.binding(
+											get: \.isShowingDebugDescription,
+											send: { .view(.showDebugDescriptionToggled($0)) }
+										),
+										label: { Text("Show Debug") }
+									)
 
-							if viewStore.isShowingDebugDescription {
-								Text("\(String(describing: viewStore.previewResult))")
+									if viewStore.isShowingDebugDescription {
+										Text("\(String(describing: viewStore.previewResult))")
+									}
+								}
 							}
 						}
 					}

@@ -6,7 +6,7 @@ public struct FeaturesPreviewer<Feature>
 	Feature: PreviewedFeature
 {
 	public static func scene(
-		resultFrom: @escaping (Feature.DelegateAction) -> Feature.ResultFromFeature?
+		resultFrom: @escaping (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?
 	) -> some Scene {
 		WindowGroup {
 			PreviewOfSomeFeatureReducer<Feature>.View(

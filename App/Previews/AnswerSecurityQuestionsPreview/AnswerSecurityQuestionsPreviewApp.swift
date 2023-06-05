@@ -15,7 +15,7 @@ extension AnswerSecurityQuestions.View: FeatureViewProtocol {
 
 // MARK: - AnswerSecurityQuestions + PreviewedFeature
 extension AnswerSecurityQuestions: PreviewedFeature {
-	public typealias ResultFromFeature = TaskResult<AnswerSecurityQuestions.State.Purpose.AnswersResult>
+	public typealias ResultFromFeature = AnswerSecurityQuestions.State.Purpose.AnswersResult
 }
 
 // MARK: - AnswerSecurityQuestions.State.Purpose.AnswersResult + Encodable
@@ -36,7 +36,7 @@ struct AnswerSecurityQuestionsApp_: SwiftUI.App {
 	var body: some Scene {
 		FeaturesPreviewer<AnswerSecurityQuestions>.scene {
 			guard case let .done(taskResult) = $0 else { return nil }
-			return taskResult.
+			return taskResult
 		}
 	}
 }

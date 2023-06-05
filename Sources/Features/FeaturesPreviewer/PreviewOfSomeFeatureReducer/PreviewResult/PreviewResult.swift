@@ -13,16 +13,31 @@ public struct PreviewResult<ResultFromFeature>: FeatureReducer where ResultFromF
 	}
 
 	public struct State: Sendable, Hashable {
-		public let previewResult: ResultFromFeature
+		public let previewResult: TaskResult<ResultFromFeature>
 		public var isShowingJSON: Bool = true
 		public var isShowingDebugDescription: Bool = true
+
+		public var failure: String? {
+			guard case let .failure(error) = previewResult else {
+				return nil
+			}
+			return String(describing: error)
+		}
+
+		public var debugDescription: String? {
+			guard
+				case let .success(success) = previewResult
+			else { return nil }
+			return String(describing: success)
+		}
 
 		public var json: String? {
 			@Dependency(\.jsonEncoder) var jsonEncoder
 			let encoder = jsonEncoder()
 			encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
 			guard
-				let encodable = previewResult as? Encodable,
+				case let .success(success) = previewResult,
+				let encodable = success as? Encodable,
 				let json = try? encoder.encode(encodable),
 				let jsonString = String(data: json, encoding: .utf8)
 			else { return nil }

@@ -18,9 +18,9 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		case previewResult(PreviewResult<Feature.ResultFromFeature>.Action)
 	}
 
-	public let resultFromAction: (Feature.DelegateAction) -> Feature.ResultFromFeature?
+	public let resultFromAction: (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?
 	public init(
-		resultFrom resultFromAction: @escaping (Feature.DelegateAction) -> Feature.ResultFromFeature?
+		resultFrom resultFromAction: @escaping (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?
 	) {
 		self.resultFromAction = resultFromAction
 	}
