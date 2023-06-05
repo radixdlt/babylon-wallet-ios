@@ -318,7 +318,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	private func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
-		loggerGlobal.error("Cancelled signing")
+		loggerGlobal.notice("Cancelled signing")
 		state.canApproveTX = true
 		return .none
 	}

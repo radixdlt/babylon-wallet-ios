@@ -22,20 +22,11 @@ extension SignWithFactorSourcesOfKindDevice {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
-					// FIXME: Temporary UI shows only the navigation title
-					//                                                Text(L10n.Signing.WithDeviceFactorSource.signTransaction)
-					//
-					//                                                if let currentSigningFactor = viewStore.currentSigningFactor {
-					//                                                        Text(L10n.Signing.WithDeviceFactorSource.idLabel(currentSigningFactor.factorSource.id.hex()))
-					//                                                }
-				}
+			Color.app.background
 				.onFirstTask { @MainActor in
-					await viewStore.send(.onFirstTask).finish()
+					await ViewStore(store).send(.view(.onFirstTask)).finish()
 				}
-			}
-			.navigationTitle(L10n.Signing.SignatureRequest.title)
+				.navigationTitle(L10n.Signing.SignatureRequest.title)
 		}
 	}
 }
