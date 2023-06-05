@@ -214,6 +214,20 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "FeaturesPreviewerFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			.product(
+				name: "JSONPreview",
+				package: "JSONPreview",
+				condition: .when(platforms: [.iOS])
+			) {
+				.package(url: "https://github.com/rakuyoMo/JSONPreview.git", from: "2.0.0")
+			},
+		],
+		tests: .no
+	),
+	.feature(
 		name: "GatewaySettingsFeature",
 		dependencies: [
 			"CreateAccountFeature",
@@ -334,7 +348,11 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+			.product(
+				name: "CodeScanner",
+				package: "CodeScanner",
+				condition: .when(platforms: [.iOS])
+			) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
 		],
