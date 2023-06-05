@@ -2,7 +2,11 @@ import AnswerSecurityQuestionsFeature
 import FeaturesPreviewerFeature
 
 // MARK: - AnswerSecurityQuestions.State + EmptyInitializable
-extension AnswerSecurityQuestions.State: EmptyInitializable {}
+extension AnswerSecurityQuestions.State: EmptyInitializable {
+	public init() {
+		self.init(purpose: .encrypt(SecurityQuestionsFactorSource.defaultQuestions))
+	}
+}
 
 // MARK: - AnswerSecurityQuestions.View + FeatureViewProtocol
 extension AnswerSecurityQuestions.View: FeatureViewProtocol {

@@ -91,7 +91,7 @@ extension SecurityQuestionsFactorSource {
 			public let publicKey: SLIP10.PublicKey
 		}
 
-		public let securityQuestions: OrderedSet<SecurityQuestion>
+		public let securityQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
 		public let encryptions: OrderedSet<Encryption>
 	}
 }
@@ -99,17 +99,17 @@ extension SecurityQuestionsFactorSource {
 extension SecurityQuestionsFactorSource {
 	internal static func encrypt(
 		mnemonic: Mnemonic,
-		with answersToQuestions: Set<AnswerToSecurityQuestion>
+		with answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>
 	) throws -> SealedMnemonic {
 		try .init(
-			securityQuestions: .init(validating: answersToQuestions.map(\.question)),
+			securityQuestions: .init(rawValue: .init(validating: answersToQuestions.map(\.question)))!,
 			encryptions: [] // FIXME: impl me
 		)
 	}
 
 	public static func from(
 		mnemonic: Mnemonic,
-		answersToQuestions: Set<AnswerToSecurityQuestion>,
+		answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
 	) throws -> Self {

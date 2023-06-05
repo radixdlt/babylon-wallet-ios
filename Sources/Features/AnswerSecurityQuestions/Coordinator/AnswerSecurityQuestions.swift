@@ -28,16 +28,24 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 			case flow(AnswerSecurityQuestionsFlow.State)
 		}
 
-		public var step: Step
-
-		public init(
-			questions: NonEmpty<OrderedSet<SecurityQuestion>>
-		) {
-			self.step = .flow(.init(questions: questions))
+		public enum Purpose: Sendable, Hashable {
+			case decrypt(SecurityQuestionsFactorSource)
+			case encrypt(NonEmpty<OrderedSet<SecurityQuestion>>)
 		}
 
-		public init() {
-			self.init(questions: SecurityQuestionsFactorSource.defaultQuestions)
+		public var step: Step
+		public let purpose: Purpose
+
+		public init(
+			purpose: Purpose
+		) {
+			self.purpose = purpose
+			switch purpose {
+			case let .decrypt(factorSource):
+				self.step = .flow(.init(questions: factorSource.sealedMnemonic.securityQuestions))
+			case let .encrypt(questions):
+				self.step = .flow(.init(questions: questions))
+			}
 		}
 	}
 
@@ -70,7 +78,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 				let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
 				let factorSource = try SecurityQuestionsFactorSource.from(
 					mnemonic: mnemonic,
-					answersToQuestions: Set(answers.elements)
+					answersToQuestions: answers
 				)
 				return .send(.delegate(.done(factorSource)))
 			} catch {

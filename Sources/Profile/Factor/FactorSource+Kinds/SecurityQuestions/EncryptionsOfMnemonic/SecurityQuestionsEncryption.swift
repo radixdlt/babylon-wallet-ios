@@ -90,17 +90,13 @@ public enum CAP23 {
 	}
 }
 
-// MARK: - Profile.EncryptionsOfMnemonic
-public extension Profile {
-	struct EncryptionsOfMnemonic: Sendable, Hashable, Codable {
-		public let encryptions: NonEmpty<OrderedSet<HexCodable>>
-
-		static func encrypt(
-			mnemonicwithPassphrase: MnemonicWithPassphrase,
-			withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
-			jsonEncoder: JSONEncoder
-		) throws -> Self {
-			let plaintext = try jsonEncoder.encode(mnemonicwithPassphrase)
+extension SecurityQuestionsFactorSource.SealedMnemonic {
+	static func encrypt(
+		mnemonicwithPassphrase: MnemonicWithPassphrase,
+		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
+		jsonEncoder: JSONEncoder
+	) throws -> NonEmpty<Set<HexCodable>> {
+		let plaintext = try jsonEncoder.encode(mnemonicwithPassphrase)
 //			let encryptionKeys = try kdf.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
 //			let encryptionsArray = try encryptionKeys.map {
 //				try HexCodable(data: encryptionScheme.encrypt(data: plaintext, key: $0))
@@ -110,13 +106,13 @@ public extension Profile {
 //				encryptionSchemeUsed: encryptionScheme.embed(),
 //				encryptions: NonEmpty(rawValue: .init(encryptionsArray.rawValue))!
 //			)
-			fatalError()
-		}
+		fatalError()
+	}
 
-		func decrypt(
-			withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
-			jsonDecoder: JSONDecoder
-		) throws -> MnemonicWithPassphrase {
+	func decrypt(
+		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
+		jsonDecoder: JSONDecoder
+	) throws -> MnemonicWithPassphrase {
 //			let decryptionKeys = try keyDerivationFunctionUsed.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
 //
 //			for decryptionKey in decryptionKeys {
@@ -133,7 +129,6 @@ public extension Profile {
 //			}
 //			struct FailedToDecrypt: Swift.Error {}
 //			throw FailedToDecrypt()
-			fatalError()
-		}
+		fatalError()
 	}
 }

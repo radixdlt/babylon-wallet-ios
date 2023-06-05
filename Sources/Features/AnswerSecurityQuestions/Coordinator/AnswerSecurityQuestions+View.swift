@@ -50,6 +50,8 @@ struct AnswerSecurityQuestions_Preview: PreviewProvider {
 }
 
 extension AnswerSecurityQuestions.State {
-	public static let previewValue = Self()
+	public static let previewValue = Self(
+		purpose: .encrypt(SecurityQuestionsFactorSource.defaultQuestions)
+	)
 }
 #endif
