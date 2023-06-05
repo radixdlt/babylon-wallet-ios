@@ -83,30 +83,12 @@ public struct AnswerToSecurityQuestion: Sendable, Hashable, Codable {
 // MARK: - SecurityQuestionsFactorSource.SealedMnemonic
 extension SecurityQuestionsFactorSource {
 	public struct SealedMnemonic: Sendable, Hashable, Codable {
-		public struct Encryption: Sendable, Hashable, Codable {
-			public typealias Version = Tagged<(Self, version: ()), String>
-			public let version: Version
-			/// The encrypted mnemonic
-			public let hexCodable: HexCodable
-			public let publicKey: SLIP10.PublicKey
-		}
-
 		public let securityQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
-		public let encryptions: OrderedSet<Encryption>
+		public let encryptions: NonEmpty<OrderedSet<HexCodable>>
 	}
 }
 
 extension SecurityQuestionsFactorSource {
-	internal static func encrypt(
-		mnemonic: Mnemonic,
-		with answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>
-	) throws -> SealedMnemonic {
-		try .init(
-			securityQuestions: .init(rawValue: .init(validating: answersToQuestions.map(\.question)))!,
-			encryptions: [] // FIXME: impl me
-		)
-	}
-
 	public static func from(
 		mnemonic: Mnemonic,
 		answersToQuestions: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
@@ -114,10 +96,12 @@ extension SecurityQuestionsFactorSource {
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
+		@Dependency(\.jsonEncoder) var jsonEncoder
 
-		let sealedMnemonic = try Self.encrypt(
+		let sealedMnemonic = try SealedMnemonic.encrypt(
 			mnemonic: mnemonic,
-			with: answersToQuestions
+			withAnswersToQuestions: answersToQuestions,
+			jsonEncoder: jsonEncoder()
 		)
 
 		return try Self(

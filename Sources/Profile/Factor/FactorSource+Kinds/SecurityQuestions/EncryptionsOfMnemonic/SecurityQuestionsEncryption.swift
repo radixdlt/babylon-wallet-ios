@@ -90,45 +90,76 @@ public enum CAP23 {
 	}
 }
 
+// MARK: - EncryptionAES256GCM_Version1
+public struct EncryptionAES256GCM_Version1 {
+	public init() {}
+	public func decrypt(data: Data, key: SymmetricKey) throws -> Data {
+		let sealedBox = try AES.GCM.SealedBox(combined: data)
+		return try AES.GCM.open(sealedBox, using: key)
+	}
+
+	public func encrypt(data: Data, key: SymmetricKey) throws -> Data {
+		let sealedBox = try AES.GCM.seal(data, using: key)
+		guard let combined = sealedBox.combined else {
+			struct SealedBoxContainsNoCombinedCipher: Swift.Error {}
+			throw SealedBoxContainsNoCombinedCipher()
+		}
+		return combined
+	}
+}
+
 extension SecurityQuestionsFactorSource.SealedMnemonic {
 	public static func encrypt(
 		mnemonic: Mnemonic,
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
 		jsonEncoder: JSONEncoder
-	) throws -> NonEmpty<Set<HexCodable>> {
+	) throws -> Self {
 		let plaintext = try jsonEncoder.encode(mnemonic)
-//			let encryptionKeys = try kdf.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
-//			let encryptionsArray = try encryptionKeys.map {
-//				try HexCodable(data: encryptionScheme.encrypt(data: plaintext, key: $0))
-//			}
-//			return Self(
-//				keyDerivationFunctionUsed: kdf.embed(),
-//				encryptionSchemeUsed: encryptionScheme.embed(),
-//				encryptions: NonEmpty(rawValue: .init(encryptionsArray.rawValue))!
-//			)
-		fatalError()
+		let encryptionKeys = try CAP23.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
+		let encryptionScheme = EncryptionAES256GCM_Version1()
+		let encryptionsArray = try encryptionKeys.map {
+			try HexCodable(data: encryptionScheme.encrypt(data: plaintext, key: $0))
+		}
+		let encryptionsNonEmpty = NonEmpty<OrderedSet<HexCodable>>(
+			rawValue: OrderedSet(
+				uncheckedUniqueElements: encryptionsArray
+			)
+		)!
+
+		let questions = NonEmpty<OrderedSet<SecurityQuestion>>(
+			rawValue: OrderedSet(
+				uncheckedUniqueElements: answersToQuestion.map(\.question)
+			)
+		)!
+
+		return Self(
+			securityQuestions: questions,
+			encryptions: encryptionsNonEmpty
+		)
 	}
 
 	public func decrypt(
 		withAnswersToQuestions answersToQuestion: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>,
-		jsonDecoder: JSONDecoder = .init()
+		jsonDecoder: JSONDecoder
 	) throws -> Mnemonic {
-//			let decryptionKeys = try keyDerivationFunctionUsed.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
-//
-//			for decryptionKey in decryptionKeys {
-//				for encryptedMnemonic in self.encryptions {
-//					let decrypted: Data
-//					do {
-//						decrypted = try encryptionSchemeUsed.decrypt(data: encryptedMnemonic.data, key: decryptionKey)
-//					} catch {
-//						continue
-//					}
-//					let decoded = try jsonDecoder.decode(MnemonicWithPassphrase.self, from: decrypted)
-//					return decoded
-//				}
-//			}
-//			struct FailedToDecrypt: Swift.Error {}
-//			throw FailedToDecrypt()
-		fatalError()
+		let decryptionKeys = try CAP23.deriveEncryptionKeysFrom(answersToQuestions: answersToQuestion)
+		let encryptionScheme = EncryptionAES256GCM_Version1()
+		for decryptionKey in decryptionKeys {
+			for encryptedMnemonic in self.encryptions {
+				let decrypted: Data
+				do {
+					decrypted = try encryptionScheme.decrypt(
+						data: encryptedMnemonic.data,
+						key: decryptionKey
+					)
+				} catch {
+					continue
+				}
+				let decoded = try jsonDecoder.decode(Mnemonic.self, from: decrypted)
+				return decoded
+			}
+		}
+		struct FailedToDecrypt: Swift.Error {}
+		throw FailedToDecrypt()
 	}
 }
