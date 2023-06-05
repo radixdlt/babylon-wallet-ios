@@ -81,11 +81,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 		Scope(state: \.nonFungibleTokenList, action: /Action.child .. ChildAction.nonFungibleTokenList) {
 			NonFungibleAssetList()
 		}
-
 		Scope(state: \.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
 			FungibleAssetList()
 		}
-		Reduce(self.core)
+		Reduce(core)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -152,7 +151,10 @@ extension AssetsView.State {
 
 		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
 			if let selectedAssets = $0.selectedAssets, !selectedAssets.isEmpty {
-				return Mode.SelectedAssets.NonFungibleTokensPerResource(resourceAddress: $0.resource.resourceAddress, tokens: selectedAssets)
+				return Mode.SelectedAssets.NonFungibleTokensPerResource(
+					resourceAddress: $0.resource.resourceAddress,
+					tokens: selectedAssets
+				)
 			}
 			return nil
 		}
@@ -169,14 +171,14 @@ extension AssetsView.State {
 
 	public var chooseButtonTitle: String {
 		guard let selectedAssets else {
-			return "Select Assets" // FIXME: Localize
+			return L10n.AssetTransfer.AddAssets.buttonAssetsNone
 		}
 
 		if selectedAssets.assetsCount == 1 {
-			return "Choose 1 Asset" // FIXME: Localize
+			return L10n.AssetTransfer.AddAssets.buttonAssetsOne
 		}
 
-		return "Choose \(selectedAssets.assetsCount) Assets" // FIXME: Localize
+		return L10n.AssetTransfer.AddAssets.buttonAssets(selectedAssets.assetsCount)
 	}
 }
 
@@ -192,7 +194,10 @@ extension AssetsView.State {
 				public let resourceAddress: ResourceAddress
 				public var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
 
-				public init(resourceAddress: ResourceAddress, tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>) {
+				public init(
+					resourceAddress: ResourceAddress,
+					tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+				) {
 					self.resourceAddress = resourceAddress
 					self.tokens = tokens
 				}
@@ -244,7 +249,7 @@ extension AssetsView.State {
 		}
 
 		func nftRowSelectedAssets(_ resource: ResourceAddress) -> NonFungibleAssetList.Row.State.SelectedAssets? {
-			selectedAssets?.nonFungibleResources[id: resource]?.tokens ?? []
+			selectedAssets.map { $0.nonFungibleResources[id: resource]?.tokens ?? [] }
 		}
 	}
 }

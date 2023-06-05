@@ -24,7 +24,7 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 #if DEBUG
 extension PrivateHDFactorSource {
 	public static func testValue(
-		name: DeviceFactorSource.Hint.Name,
+		name: String,
 		model: DeviceFactorSource.Hint.Model
 	) -> Self {
 		let mnemonicWithPassphrase = MnemonicWithPassphrase.testValue

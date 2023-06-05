@@ -53,24 +53,14 @@ public struct NewConnection: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			switch state {
-			case .localNetworkPermission, .scanQR:
-				return .send(.delegate(.dismiss))
-			case let .connectUsingSecrets(connectUsingSecrets):
-				return .send(
-					.child(.connectUsingSecrets(.delegate(.connected(
-						.init(connectionPassword: connectUsingSecrets.connectionPassword,
-						      displayName: L10n.LinkedConnectors.NewConnection.connectionDefaultName)
-					))))
-				)
-			}
+			return .send(.delegate(.dismiss))
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .connectionPasswordFromStringResult(.success(ConnectionPassword)):
-			state = .connectUsingSecrets(.init(connectionPassword: ConnectionPassword))
+		case let .connectionPasswordFromStringResult(.success(connectionPassword)):
+			state = .connectUsingSecrets(.init(connectionPassword: connectionPassword))
 			return .none
 		case let .connectionPasswordFromStringResult(.failure(error)):
 			errorQueue.schedule(error)

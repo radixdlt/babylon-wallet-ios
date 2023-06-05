@@ -180,7 +180,7 @@ extension AlertState<Never> {
 		AlertState {
 			TextState(L10n.AddLedger.AlreadyAddedAlert.title)
 		} message: {
-			TextState(L10n.AddLedger.AlreadyAddedAlert.message(ledger.hint.name, ledger.hint.model))
+			TextState(L10n.AddLedger.AlreadyAddedAlert.message(ledger.hint.name))
 		}
 	}
 }
@@ -244,7 +244,7 @@ extension LedgerHardwareWalletFactorSource {
 	) throws -> Self {
 		try Self.model(
 			.init(model: device.model),
-			name: .init(rawValue: name),
+			name: name,
 			deviceID: device.id
 		)
 	}

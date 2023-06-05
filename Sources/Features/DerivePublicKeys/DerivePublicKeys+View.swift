@@ -3,16 +3,7 @@ import Profile
 
 extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
-		.init(ledger: ledgerBeingUsed, purpose: {
-			switch purpose {
-			case .createAuthSigningKey:
-				return .createAuthSigningKey
-			case .importLegacyAccounts:
-				return .importLegacyAccounts
-			case .createEntity:
-				return .createAccount
-			}
-		}())
+		.init(ledger: ledgerBeingUsed)
 	}
 }
 
@@ -20,7 +11,6 @@ extension DerivePublicKeys.State {
 extension DerivePublicKeys {
 	public struct ViewState: Equatable {
 		public let ledger: LedgerHardwareWalletFactorSource?
-		public let purpose: UseLedgerView.Purpose
 	}
 
 	@MainActor
@@ -33,18 +23,33 @@ extension DerivePublicKeys {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Group {
+				VStack(spacing: 0) {
+					Image(asset: AssetResource.iconHardwareLedger)
+						.frame(.medium)
+						.padding(.vertical, .medium2)
+
+					Text(L10n.CreateAccount.DerivePublicKeys.title)
+						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
+
+					Text(L10n.CreateAccount.DerivePublicKeys.subtitle)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
+						.padding(.horizontal, .medium1)
+						.padding(.bottom, .medium1)
+
 					if let ledger = viewStore.ledger {
-						UseLedgerView(ledgerFactorSource: ledger, purpose: viewStore.purpose)
-					} else {
-						Color.white
+						LedgerRowView(viewState: .init(factorSource: ledger))
 					}
+
+					Spacer(minLength: 0)
 				}
+				.padding(.horizontal, .medium1)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
-			.navigationTitle(L10n.CreateEntity.Ledger.createAccount)
 		}
 	}
 }

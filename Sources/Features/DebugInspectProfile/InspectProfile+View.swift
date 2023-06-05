@@ -209,7 +209,7 @@ public struct FactorSourceCommonView: View {
 public struct DeviceFactorSouceView: View {
 	public let deviceFactorSource: DeviceFactorSource
 	public var body: some View {
-		Labeled("Name", value: deviceFactorSource.hint.name.rawValue)
+		Labeled("Name", value: deviceFactorSource.hint.name)
 		Labeled("Model", value: deviceFactorSource.hint.model.rawValue)
 
 		if let nextDerivationIndicesPerNetwork = deviceFactorSource.nextDerivationIndicesPerNetwork {
@@ -225,7 +225,7 @@ public struct DeviceFactorSouceView: View {
 public struct LedgerFactorSourceView: View {
 	public let ledgerFactorSource: LedgerHardwareWalletFactorSource
 	public var body: some View {
-		Labeled("Name", value: ledgerFactorSource.hint.name.rawValue)
+		Labeled("Name", value: ledgerFactorSource.hint.name)
 		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
 	}
 }

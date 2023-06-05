@@ -546,7 +546,7 @@ final class ProfileTests: TestCase {
 }
 
 private let deviceFactorModel: DeviceFactorSource.Hint.Model = "computer"
-private let deviceFactorName: DeviceFactorSource.Hint.Name = "unit test"
+private let deviceFactorName: String = "unit test"
 private let creatingDevice: NonEmptyString = "\(deviceFactorModel) \(deviceFactorName)"
 private let stableDate = Date(timeIntervalSince1970: 0)
 private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
@@ -584,7 +584,7 @@ extension DeviceFactorSource {
 	public static func babylon(
 		mnemonic: Mnemonic,
 		model: Hint.Model,
-		name: Hint.Name,
+		name: String,
 		addedOn: Date = .now,
 		lastUsedOn: Date = .now
 	) throws -> Self {
@@ -594,7 +594,7 @@ extension DeviceFactorSource {
 	public static func olympia(
 		mnemonic: Mnemonic,
 		model: Hint.Model,
-		name: Hint.Name,
+		name: String,
 		addedOn: Date = .now,
 		lastUsedOn: Date = .now
 	) throws -> Self {

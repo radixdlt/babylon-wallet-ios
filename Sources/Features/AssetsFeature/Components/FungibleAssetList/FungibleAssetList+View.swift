@@ -21,26 +21,28 @@ extension FungibleAssetList.View {
 					state: \.xrdToken,
 					action: { .child(.xrdRow($0)) }
 				),
-				then: { FungibleAssetList.Row.View(store: $0) }
-			).background(
-				RoundedRectangle(cornerRadius: .small1)
-					.fill(Color.white)
-					.tokenRowShadow()
-			).padding(.horizontal, .medium3)
+				then: { store in
+					Card {
+						FungibleAssetList.Row.View(store: store)
+					}
+				}
+			)
+			.padding(.horizontal, .medium3)
 
-			LazyVStack(spacing: .medium2) {
-				ForEachStore(
-					store.scope(
-						state: \.nonXrdTokens,
-						action: { .child(.nonXRDRow($0, $1)) }
-					),
-					content: { FungibleAssetList.Row.View(store: $0) }
-				)
-			}.background(
-				RoundedRectangle(cornerRadius: .small1)
-					.fill(Color.white)
-					.tokenRowShadow()
-			).padding(.horizontal, .medium3)
+			Card {
+				LazyVStack(spacing: 0) {
+					ForEachStore(
+						store.scope(
+							state: \.nonXrdTokens,
+							action: { .child(.nonXRDRow($0, $1)) }
+						)
+					) { rowStore in
+						FungibleAssetList.Row.View(store: rowStore)
+							.separator(.bottom)
+					}
+				}
+			}
+			.padding(.horizontal, .medium3)
 		}
 		.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),

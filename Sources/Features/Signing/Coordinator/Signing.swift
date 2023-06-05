@@ -91,6 +91,10 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case closeButtonTapped
+	}
+
 	public enum InternalAction: Sendable, Equatable {
 		case finishedSigningWithAllFactors
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
@@ -102,6 +106,7 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
+		case cancelSigning
 		case finishedSigning(SigningResponse)
 		case failedToSign
 	}
@@ -129,6 +134,13 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 
 		Reduce(self.core)
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .closeButtonTapped:
+			return .send(.delegate(.cancelSigning))
+		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
@@ -178,6 +190,7 @@ public struct Signing: Sendable, FeatureReducer {
 			let .signWithDeviceFactors(.delegate(.done(factors, signatures))),
 			let .signWithLedgerFactors(.delegate(.done(factors, signatures))):
 			return handleSignatures(signingFactors: factors, signatures: signatures, &state)
+
 		default:
 			return .none
 		}

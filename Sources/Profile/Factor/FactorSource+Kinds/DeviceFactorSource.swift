@@ -30,11 +30,10 @@ extension DeviceFactorSource {
 // MARK: DeviceFactorSource.Hint
 extension DeviceFactorSource {
 	public struct Hint: Sendable, Hashable, Codable {
-		public typealias Name = Tagged<(Self, name: ()), String>
 		public typealias Model = Tagged<(Self, model: ()), String>
 
 		/// "iPhone RED"
-		public var name: Name // mutable so we can update name
+		public var name: String // mutable so we can update name
 
 		/// "iPhone SE 2nd gen"
 		public var model: Model // mutable because name gets `async` fetched and updated later.
@@ -45,7 +44,7 @@ extension DeviceFactorSource {
 	internal static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
-		name: Hint.Name = "",
+		name: String = "",
 		isOlympiaCompatible: Bool,
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
@@ -67,7 +66,7 @@ extension DeviceFactorSource {
 	public static func babylon(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
-		name: Hint.Name = "",
+		name: String = "",
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
 	) throws -> Self {
@@ -85,7 +84,7 @@ extension DeviceFactorSource {
 	public static func olympia(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
-		name: Hint.Name = "",
+		name: String = "",
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
 	) throws -> Self {

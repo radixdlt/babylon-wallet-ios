@@ -176,7 +176,7 @@ extension LedgerHardwareWalletFactorSource {
 			throw UnrecognizedLedgerModel(model: hint.model.rawValue)
 		}
 		return P2P.LedgerHardwareWallet.LedgerDevice(
-			name: NonEmptyString(maybeString: self.hint.name.rawValue),
+			name: NonEmptyString(maybeString: hint.name),
 			id: Data(id.hexCodable.data.dropFirst()).hex, // Connector Extension only cares about the hash not the factor source ID prefix.
 			model: model
 		)

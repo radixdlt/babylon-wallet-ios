@@ -38,19 +38,15 @@ extension ConnectUsingSecrets {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
 					AppTextField(
-						placeholder: L10n.LinkedConnectors.NewConnection.textFieldPlaceholder,
+						placeholder: L10n.LinkedConnectors.NameNewConnector.textFieldPlaceholder,
 						text: viewStore.binding(
 							get: \.nameOfConnection,
 							send: { .nameOfConnectionChanged($0) }
 						),
-						hint: .info(L10n.LinkedConnectors.NewConnection.textFieldHint),
+						hint: .info(L10n.LinkedConnectors.NameNewConnector.textFieldHint),
 						focus: .on(
 							.connectionName,
 							binding: viewStore.binding(
@@ -65,7 +61,7 @@ extension ConnectUsingSecrets {
 
 					Spacer()
 
-					Button(L10n.LinkedConnectors.NewConnection.saveLinkButtonTitle) {
+					Button(L10n.LinkedConnectors.NameNewConnector.saveLinkButtonTitle) {
 						viewStore.send(.confirmNameButtonTapped)
 					}
 					.controlState(viewStore.saveButtonControlState)
