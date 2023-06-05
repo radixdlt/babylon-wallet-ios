@@ -14,6 +14,8 @@
 		488BBEF32A2CB40B0019C723 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 488BBEF22A2CB40B0019C723 /* Assets.xcassets */; };
 		488BBEFE2A2CB4FA0019C723 /* AnswerSecurityQuestionsFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBEFD2A2CB4FA0019C723 /* AnswerSecurityQuestionsFeature */; };
 		488BBF022A2DCB110019C723 /* FeaturesPreviewerFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBF012A2DCB110019C723 /* FeaturesPreviewerFeature */; };
+		488BBF062A2DDFBD0019C723 /* FeaturesPreviewerFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBF052A2DDFBD0019C723 /* FeaturesPreviewerFeature */; };
+		488BBF0A2A2DE0550019C723 /* FeaturesPreviewerFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 488BBF092A2DE0550019C723 /* FeaturesPreviewerFeature */; };
 		8329E48B2A20E948004FC2AE /* DappInteractionClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 8329E48A2A20E948004FC2AE /* DappInteractionClientLive */; };
 		837BC3C729BB28CF0082C363 /* P2PLinksClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 837BC3C629BB28CF0082C363 /* P2PLinksClientLive */; };
 		838B08EF2A24F16E006F6320 /* BackupsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = 838B08EE2A24F16E006F6320 /* BackupsClientLive */; };
@@ -92,6 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				488BBF062A2DDFBD0019C723 /* FeaturesPreviewerFeature in Frameworks */,
 				488BBED72A2B2B0B0019C723 /* CreateSecurityStructureFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -146,6 +149,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				488BBF0A2A2DE0550019C723 /* FeaturesPreviewerFeature in Frameworks */,
 				E6E778032A1F63250085529F /* ImportMnemonicFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -306,11 +310,13 @@
 			buildRules = (
 			);
 			dependencies = (
+				488BBF082A2DDFC20019C723 /* PBXTargetDependency */,
 				488BBED92A2B2B0F0019C723 /* PBXTargetDependency */,
 			);
 			name = CreateSecurityStructurePreview;
 			packageProductDependencies = (
 				488BBED62A2B2B0B0019C723 /* CreateSecurityStructureFeature */,
+				488BBF052A2DDFBD0019C723 /* FeaturesPreviewerFeature */,
 			);
 			productName = CreateSecurityStructurePreview;
 			productReference = 488BBEC32A2B29F30019C723 /* CreateSecurityStructurePreview.app */;
@@ -432,11 +438,13 @@
 			buildRules = (
 			);
 			dependencies = (
+				488BBF0C2A2DE0590019C723 /* PBXTargetDependency */,
 				E6E778052A1F632F0085529F /* PBXTargetDependency */,
 			);
 			name = ImportMnemonicPreview;
 			packageProductDependencies = (
 				E6E778022A1F63250085529F /* ImportMnemonicFeature */,
+				488BBF092A2DE0550019C723 /* FeaturesPreviewerFeature */,
 			);
 			productName = ImportMnemonicPreview;
 			productReference = E6CDB37C2A1F628E00F9DA44 /* ImportMnemonicPreview.app */;
@@ -593,6 +601,14 @@
 		488BBF042A2DCB140019C723 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 488BBF032A2DCB140019C723 /* FeaturesPreviewerFeature */;
+		};
+		488BBF082A2DDFC20019C723 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 488BBF072A2DDFC20019C723 /* FeaturesPreviewerFeature */;
+		};
+		488BBF0C2A2DE0590019C723 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 488BBF0B2A2DE0590019C723 /* FeaturesPreviewerFeature */;
 		};
 		489948262A0186DC00EE807A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2094,6 +2110,22 @@
 			productName = FeaturesPreviewerFeature;
 		};
 		488BBF032A2DCB140019C723 /* FeaturesPreviewerFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeaturesPreviewerFeature;
+		};
+		488BBF052A2DDFBD0019C723 /* FeaturesPreviewerFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeaturesPreviewerFeature;
+		};
+		488BBF072A2DDFC20019C723 /* FeaturesPreviewerFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeaturesPreviewerFeature;
+		};
+		488BBF092A2DE0550019C723 /* FeaturesPreviewerFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FeaturesPreviewerFeature;
+		};
+		488BBF0B2A2DE0590019C723 /* FeaturesPreviewerFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FeaturesPreviewerFeature;
 		};
