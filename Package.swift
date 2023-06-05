@@ -55,6 +55,15 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "AnswerSecurityQuestionsFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"MnemonicClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -152,6 +161,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"Profile",
+			"AnswerSecurityQuestionsFeature",
 		],
 		tests: .no
 	),

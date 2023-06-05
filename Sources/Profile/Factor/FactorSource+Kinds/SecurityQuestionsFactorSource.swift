@@ -35,6 +35,32 @@ public struct SecurityQuestion: Sendable, Hashable, Codable, Identifiable {
 	public let version: Version
 	public let kind: Kind
 	public let question: NonEmptyString
+
+	public init(
+		id: ID,
+		question: NonEmptyString,
+		version: Version = 1,
+		kind: Kind = .freeform
+	) {
+		self.id = id
+		self.version = version
+		self.kind = kind
+		self.question = question
+	}
+}
+
+// MARK: - AnswerToSecurityQuestion
+public struct AnswerToSecurityQuestion: Sendable, Hashable, Codable {
+	public let answer: String
+	public let question: SecurityQuestion
+
+	public init(
+		answer: String,
+		to question: SecurityQuestion
+	) {
+		self.answer = answer
+		self.question = question
+	}
 }
 
 // MARK: - SecurityQuestionsFactorSource.SealedMnemonic
@@ -54,13 +80,29 @@ extension SecurityQuestionsFactorSource {
 }
 
 extension SecurityQuestionsFactorSource {
+	internal static func encrypt(
+		mnemonic: Mnemonic,
+		with answersToQuestions: Set<AnswerToSecurityQuestion>
+	) throws -> SealedMnemonic {
+		try .init(
+			securityQuestions: .init(validating: answersToQuestions.map(\.question)),
+			encryptions: [] // FIXME: impl me
+		)
+	}
+
 	public static func from(
 		mnemonic: Mnemonic,
-		sealedMnemonic: SealedMnemonic,
+		answersToQuestions: Set<AnswerToSecurityQuestion>,
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
+
+		let sealedMnemonic = try Self.encrypt(
+			mnemonic: mnemonic,
+			with: answersToQuestions
+		)
+
 		return try Self(
 			common: .from(
 				factorSourceKind: Self.kind,
