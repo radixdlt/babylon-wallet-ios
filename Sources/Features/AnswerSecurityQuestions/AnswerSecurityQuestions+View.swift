@@ -22,10 +22,13 @@ extension AnswerSecurityQuestions {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				Button("Done") {
-					viewStore.send(.done)
+
+				VStack {
+					Button("Done") {
+						viewStore.send(.done)
+					}
 				}
-				.onAppear { viewStore.send(.done) }
+				.navigationTitle("Answer Security Questions")
 			}
 		}
 	}

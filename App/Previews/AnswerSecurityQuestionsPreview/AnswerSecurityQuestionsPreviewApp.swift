@@ -18,7 +18,11 @@ extension AnswerSecurityQuestions: PreviewedFeature {
 @main
 struct AnswerSecurityQuestionsApp_: SwiftUI.App {
 	var body: some Scene {
-		PreviewAppOf<AnswerSecurityQuestions>.scene()
+		PreviewAppOf<AnswerSecurityQuestions>.scene {
+			print("🔮 \($0)")
+			guard case let .done(factorSource) = $0 else { return nil }
+			return factorSource
+		}
 	}
 }
 
@@ -40,12 +44,14 @@ public struct PreviewAppOf<Feature>
 	where
 	Feature: PreviewedFeature
 {
-	public static func scene() -> some Scene {
+	public static func scene(
+		resultFrom: @escaping (Feature.DelegateAction) -> Feature.ResultFromFeature?
+	) -> some Scene {
 		WindowGroup {
 			PreviewOfSomeFeatureReducer<Feature>.View(
 				store: Store(
 					initialState: PreviewOfSomeFeatureReducer<Feature>.State(),
-					reducer: PreviewOfSomeFeatureReducer<Feature>()
+					reducer: PreviewOfSomeFeatureReducer<Feature>(resultFrom: resultFrom)
 						._printChanges()
 				)
 			)
@@ -54,7 +60,7 @@ public struct PreviewAppOf<Feature>
 }
 
 // MARK: - PreviewedFeature
-public protocol PreviewedFeature: FeatureReducer where View: FeatureViewProtocol, View.Feature == Self, State: EmptyInitializable {
+public protocol PreviewedFeature: FeatureReducer & EmptyInitializable where View: FeatureViewProtocol, View.Feature == Self, State: EmptyInitializable {
 	associatedtype ResultFromFeature: Hashable & Sendable
 }
 
@@ -68,18 +74,20 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store) {
-				CaseLet(
-					state: /F.State.previewOf,
-					action: { F.Action.child(.previewOf($0)) },
-					then: { Feature.View(store: $0) }
-				)
+			NavigationView {
+				SwitchStore(store) {
+					CaseLet(
+						state: /F.State.previewOf,
+						action: { F.Action.child(.previewOf($0)) },
+						then: { Feature.View(store: $0) }
+					)
 
-				CaseLet(
-					state: /F.State.previewResult,
-					action: { F.Action.child(.previewResult($0)) },
-					then: { PreviewResult<Feature.ResultFromFeature>.View(store: $0) }
-				)
+					CaseLet(
+						state: /F.State.previewResult,
+						action: { F.Action.child(.previewResult($0)) },
+						then: { PreviewResult<Feature.ResultFromFeature>.View(store: $0) }
+					)
+				}
 			}
 		}
 	}
@@ -98,7 +106,39 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		case previewResult(PreviewResult<Feature.ResultFromFeature>.Action)
 	}
 
-	public init() {}
+	public let resultFromAction: (Feature.DelegateAction) -> Feature.ResultFromFeature?
+	public init(
+		resultFrom resultFromAction: @escaping (Feature.DelegateAction) -> Feature.ResultFromFeature?
+	) {
+		self.resultFromAction = resultFromAction
+	}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: /F.State.previewOf, action: /F.Action.child .. ChildAction.previewOf) {
+			Feature()
+		}
+		Scope(state: /F.State.previewResult, action: /F.Action.child .. ChildAction.previewResult) {
+			PreviewResult<Feature.ResultFromFeature>()
+		}
+
+		Reduce(core)
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .previewOf(.delegate(previewDelegate)):
+			if let result = resultFromAction(previewDelegate) {
+				state = .previewResult(.init(previewResult: result))
+			}
+			return .none
+
+		case .previewResult(.delegate(.restart)):
+			state = .previewOf(.init())
+			return .none
+
+		default: return .none
+		}
+	}
 }
 
 // MARK: - PreviewResult
@@ -110,13 +150,96 @@ public struct PreviewResult<ResultFromFeature>: FeatureReducer where ResultFromF
 		}
 
 		public var body: some SwiftUI.View {
-			Text("impl me: result")
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				ScrollView {
+					VStack {
+						if let json = viewStore.json {
+							VStack {
+								Text("JSON").font(.app.sectionHeader)
+
+								Toggle(
+									isOn: viewStore.binding(
+										get: \.isShowingJSON,
+										send: { .view(.showJSONToggled($0)) }
+									),
+									label: { Text("Show JSON") }
+								)
+
+								if viewStore.isShowingJSON {
+									Text("`\(json)`")
+								}
+							}
+						}
+
+						VStack {
+							Text("Debug").font(.app.sectionHeader)
+
+							Toggle(
+								isOn: viewStore.binding(
+									get: \.isShowingDebugDescription,
+									send: { .view(.showDebugDescriptionToggled($0)) }
+								),
+								label: { Text("Show Debug") }
+							)
+
+							if viewStore.isShowingDebugDescription {
+								Text("\(String(describing: viewStore.previewResult))")
+							}
+						}
+					}
+				}
+				.footer {
+					Button("Restart") {
+						viewStore.send(.view(.restart))
+					}
+				}
+				.navigationTitle("Feature Result")
+			}
 		}
+	}
+
+	public enum ViewAction: Sendable, Hashable {
+		case restart
+		case showJSONToggled(Bool)
+		case showDebugDescriptionToggled(Bool)
+	}
+
+	public enum DelegateAction: Sendable, Hashable {
+		case restart
 	}
 
 	public struct State: Sendable, Hashable {
 		public let previewResult: ResultFromFeature
+		public var isShowingJSON: Bool = true
+		public var isShowingDebugDescription: Bool = true
+
+		public var json: String? {
+			@Dependency(\.jsonEncoder) var jsonEncoder
+			let encoder = jsonEncoder()
+			encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+			guard
+				let encodable = previewResult as? Encodable,
+				let json = try? encoder.encode(encodable),
+				let jsonString = String(data: json, encoding: .utf8)
+			else { return nil }
+			return jsonString
+		}
 	}
 
 	public init() {}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case let .showJSONToggled(showJSON):
+			state.isShowingJSON = showJSON
+			return .none
+
+		case let .showDebugDescriptionToggled(showDebugDescription):
+			state.isShowingDebugDescription = showDebugDescription
+			return .none
+
+		case .restart:
+			return .send(.delegate(.restart))
+		}
+	}
 }

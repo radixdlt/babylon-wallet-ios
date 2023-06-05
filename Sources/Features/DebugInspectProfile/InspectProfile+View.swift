@@ -184,6 +184,12 @@ extension FactorSourceView {
 				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
 			case let .offDeviceMnemonic(offDeviceMnemonicFactorSource):
 				OffDeviceMnemonicFactorSourceView(offDeviceMnemonicFactorSource: offDeviceMnemonicFactorSource)
+			case let .securityQuestions(questionsFactorSource):
+				// FIXME: impl me
+				Text("\(String(describing: questionsFactorSource))")
+			case let .trustedContact(trustedContact):
+				// FIXME: impl me
+				Text("\(String(describing: trustedContact))")
 			}
 		}
 		.background {

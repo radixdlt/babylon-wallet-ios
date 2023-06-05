@@ -187,11 +187,13 @@ extension FactorSourceKind: Comparable {
 		switch self {
 		case .ledgerHQHardwareWallet: return 0
 		case .offDeviceMnemonic: return 1
+		case .securityQuestions: return 2
+		case .trustedContact: return 3
 
 		// we want to sign with device last, since it would allow for us to stop using
 		// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
 		// deletes items after 1 sec, thus `device` must come last.
-		case .device: return 2
+		case .device: return .max
 		}
 	}
 }
