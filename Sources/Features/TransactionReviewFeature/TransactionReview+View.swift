@@ -222,6 +222,7 @@ extension View {
 		return customizeGuarantees(with: destinationStore)
 			.selectFeePayer(with: destinationStore)
 			.signing(with: destinationStore)
+			.submitting(with: destinationStore)
 	}
 
 	@MainActor
