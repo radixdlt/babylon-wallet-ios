@@ -69,7 +69,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				Scope(state: /MainState.chooseAccount, action: /MainAction.chooseAccount) {
 					ChooseReceivingAccount()
 				}
-
 				Scope(state: /MainState.addAsset, action: /MainAction.addAsset) {
 					AssetsView()
 				}
@@ -226,7 +225,7 @@ extension TransferAccountList {
 			nonXrdResources: nonXrdResources
 		)
 
-		let selectedNonFunibleResources = assets
+		let selectedNonFungibleResources = assets
 			.compactMap(/ResourceAsset.State.nonFungibleAsset)
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 				var resource = partialResult[id: asset.resourceAddress] ?? .init(
@@ -237,11 +236,21 @@ extension TransferAccountList {
 				partialResult.updateOrAppend(resource)
 			}
 
+		let nftsSelectedForOtherAccounts = state.receivingAccounts
+			.filter { $0.id != id }
+			.flatMap(\.assets)
+			.compactMap(/ResourceAsset.State.nonFungibleAsset)
+			.map(\.nftToken.id)
+
 		state.destination = .relayed(
 			id,
 			with: .addAsset(.init(
 				account: state.fromAccount,
-				mode: .selection(.init(fungibleResources: selectedFungibleResources, nonFungibleResources: selectedNonFunibleResources))
+				mode: .selection(.init(
+					fungibleResources: selectedFungibleResources,
+					nonFungibleResources: selectedNonFungibleResources,
+					disabledNFTs: Set(nftsSelectedForOtherAccounts)
+				))
 			))
 		)
 		return .none

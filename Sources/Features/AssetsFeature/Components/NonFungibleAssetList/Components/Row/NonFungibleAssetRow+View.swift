@@ -75,6 +75,7 @@ extension NonFungibleAssetList.Row.View {
 		asset: AccountPortfolio.NonFungibleResource.NonFungibleToken,
 		index: Int
 	) -> some View {
+		let isDisabled = viewStore.disabled.contains(asset.id)
 		HStack {
 			NFTIDView(
 				id: asset.id.toUserFacingString,
@@ -86,7 +87,7 @@ extension NonFungibleAssetList.Row.View {
 				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset.id))
 			}
 		}
-		.disabled(viewStore.disabled.contains(asset.id))
+		.opacity(isDisabled ? 0.35 : 1)
 		.padding(.medium1)
 		.frame(minHeight: headerHeight)
 		.background(.app.white)

@@ -25,7 +25,7 @@ extension NonFungibleAssetList {
 
 		public enum ViewAction: Sendable, Equatable {
 			case isExpandedToggled
-			case assetTapped(AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID)
+			case assetTapped(State.AssetID)
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -37,6 +37,7 @@ extension NonFungibleAssetList {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 			switch viewAction {
 			case let .assetTapped(localID):
+				guard !state.disabled.contains(localID) else { return .none }
 				if state.selectedAssets != nil {
 					guard let token = state.resource.tokens[id: localID] else {
 						loggerGlobal.warning("Selected a missing token")

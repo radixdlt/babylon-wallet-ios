@@ -119,10 +119,17 @@ public struct AssetsView: Sendable, FeatureReducer {
 				FungibleAssetList.Row.State(xrdToken: $0, isSelected: state.mode.xrdRowSelected)
 			}
 			let nonXrd = portfolio.fungibleResources.nonXrdResources.map {
-				FungibleAssetList.Row.State(nonXRDToken: $0, isSelected: state.mode.nonXrdRowSelected($0.resourceAddress))
+				FungibleAssetList.Row.State(
+					nonXRDToken: $0,
+					isSelected: state.mode.nonXrdRowSelected($0.resourceAddress)
+				)
 			}
 			let nfts = portfolio.nonFungibleResources.map {
-				NonFungibleAssetList.Row.State(resource: $0, selectedAssets: state.mode.nftRowSelectedAssets($0.resourceAddress))
+				NonFungibleAssetList.Row.State(
+					resource: $0,
+					disabled: state.mode.selectedAssets?.disabledNFTs ?? [],
+					selectedAssets: state.mode.nftRowSelectedAssets($0.resourceAddress)
+				)
 			}
 
 			state.fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
@@ -168,7 +175,8 @@ extension AssetsView.State {
 
 		return .init(
 			fungibleResources: fungibleresources,
-			nonFungibleResources: IdentifiedArrayOf(uniqueElements: nonFungibleResources)
+			nonFungibleResources: IdentifiedArrayOf(uniqueElements: nonFungibleResources),
+			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
 		)
 	}
 
@@ -208,13 +216,16 @@ extension AssetsView.State {
 
 			public var fungibleResources: AccountPortfolio.FungibleResources
 			public var nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource>
+			public var disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
 
 			public init(
 				fungibleResources: AccountPortfolio.FungibleResources = .init(),
-				nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = []
+				nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = [],
+				disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
 			) {
 				self.fungibleResources = fungibleResources
 				self.nonFungibleResources = nonFungibleResources
+				self.disabledNFTs = disabledNFTs
 			}
 
 			public var assetsCount: Int {
