@@ -83,9 +83,10 @@ extension NonFungibleAssetList.Row.View {
 				thumbnail: viewStore.isExpanded ? asset.keyImageURL : nil
 			)
 			if let selectedAssets = viewStore.selectedAssets {
-				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset.id))
 			}
 		}
+		.disabled(viewStore.disabled.contains(asset.id))
 		.padding(.medium1)
 		.frame(minHeight: headerHeight)
 		.background(.app.white)

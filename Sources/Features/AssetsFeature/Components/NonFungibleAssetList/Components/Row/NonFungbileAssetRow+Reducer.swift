@@ -5,17 +5,20 @@ extension NonFungibleAssetList {
 		public struct State: Sendable, Hashable, Identifiable {
 			public var id: ResourceAddress { resource.resourceAddress }
 
-			public typealias SelectedAssets = IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+			public typealias AssetID = AccountPortfolio.NonFungibleResource.NonFungibleToken.ID
 
 			public let resource: AccountPortfolio.NonFungibleResource
 			public var isExpanded = false
-			public var selectedAssets: SelectedAssets?
+			public var disabled: Set<AssetID> = []
+			public var selectedAssets: OrderedSet<AssetID>?
 
 			public init(
 				resource: AccountPortfolio.NonFungibleResource,
-				selectedAssets: SelectedAssets?
+				disabled: Set<AssetID> = [],
+				selectedAssets: OrderedSet<AssetID>?
 			) {
 				self.resource = resource
+				self.disabled = disabled
 				self.selectedAssets = selectedAssets
 			}
 		}
@@ -39,7 +42,7 @@ extension NonFungibleAssetList {
 						loggerGlobal.warning("Selected a missing token")
 						return .none
 					}
-					state.selectedAssets?.toggle(token)
+					state.selectedAssets?.toggle(token.id)
 					return .none
 				}
 				return .send(.delegate(.open(localID)))

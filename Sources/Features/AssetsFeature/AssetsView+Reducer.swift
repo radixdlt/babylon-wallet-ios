@@ -151,9 +151,12 @@ extension AssetsView.State {
 
 		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
 			if let selectedAssets = $0.selectedAssets, !selectedAssets.isEmpty {
+				let selected = $0.resource.tokens.filter { token in selectedAssets.contains(token.id)
+				}
+
 				return Mode.SelectedAssets.NonFungibleTokensPerResource(
 					resourceAddress: $0.resource.resourceAddress,
-					tokens: selectedAssets
+					tokens: selected
 				)
 			}
 			return nil
@@ -248,8 +251,8 @@ extension AssetsView.State {
 			selectedAssets?.fungibleResources.nonXrdResources.contains { $0.resourceAddress == resource }
 		}
 
-		func nftRowSelectedAssets(_ resource: ResourceAddress) -> NonFungibleAssetList.Row.State.SelectedAssets? {
-			selectedAssets.map { $0.nonFungibleResources[id: resource]?.tokens ?? [] }
+		func nftRowSelectedAssets(_ resource: ResourceAddress) -> OrderedSet<NonFungibleAssetList.Row.State.AssetID>? {
+			selectedAssets.map { $0.nonFungibleResources[id: resource]?.tokens.ids ?? [] }
 		}
 	}
 }

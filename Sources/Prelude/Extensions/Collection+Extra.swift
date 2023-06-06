@@ -23,7 +23,7 @@ extension Collection {
 	}
 }
 
-extension IdentifiedArray {
+extension OrderedSet where Element: Hashable {
 	/// Add or remove the given element
 	public mutating func toggle(_ element: Element) {
 		if contains(element) {
