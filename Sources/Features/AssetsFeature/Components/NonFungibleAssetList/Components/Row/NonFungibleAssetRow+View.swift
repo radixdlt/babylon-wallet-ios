@@ -48,7 +48,7 @@ extension NonFungibleAssetList.Row.View {
 			Spacer()
 		}
 		.padding(.horizontal, .medium1)
-		.padding(.vertical, .large3)
+		.frame(height: headerHeight)
 		.background(.app.white)
 		.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
 		.tokenRowShadow(!viewStore.isExpanded)
@@ -63,6 +63,8 @@ extension NonFungibleAssetList.Row.View {
 		}
 		return viewStore.resource.tokens
 	}
+
+	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
 }
 
 // MARK: - Private Computed Properties
@@ -85,6 +87,7 @@ extension NonFungibleAssetList.Row.View {
 			}
 		}
 		.padding(.medium1)
+		.frame(minHeight: headerHeight)
 		.background(.app.white)
 		.roundedCorners(
 			.bottom,
