@@ -47,14 +47,14 @@
 "accountSettings_accountColor" = "Account Color";
 "accountSettings_accountColorSubtitle" = "Select from a list of unique colors";
 "accountSettings_showAssets" = "Show Assets with Tags";
-"accountSettings_showQR" = "Show QR Code";
+"accountSettings_showQR" = "Show Account QR Code";
 "accountSettings_showAssetsSubtitle" = "Select which tags to show for assets in this Account";
 "accountSettings_setBehaviorHeading" = "Set how you want this Account to work";
 "accountSettings_accountSecurity" = "Account Security";
 "accountSettings_accountSecuritySubtitle" = "Set how you want this Account to work";
 "accountSettings_thirdPartyDeposits" = "Third-party Deposits";
 "accountSettings_hideAccount" = "Hide Account";
-"accountSettings_getXrdTestTokens" = "Get RCnet XRD Test Tokens";
+"accountSettings_getXrdTestTokens" = "Get XRD Test Tokens";
 "accountSettings_loadingPrompt" = "This may take several seconds, please wait for completion";
 "accountSettings_renameAccount_title" = "Rename Account";
 "accountSettings_renameAccount_subtitle" = "Enter a new label for this Account";
@@ -201,7 +201,7 @@
 "backup_noLastBackUp" = "Not Backed up yet";
 "backup_openSystemBackupSettings" = "Open System Backup Settings";
 "backup_backupWalletData_title" = "Backup Wallet Data";
-"backup_backupWalletData_message" = "Warning: If disabled, you might lose access to Accounts/Personas.";
+"backup_backupWalletData_message" = "Warning: If disabled you might lose access to your Accounts and Personas.";
 "importLegacyWallet_title" = "Legacy Wallet Import";
 "importLegacyWallet_scanQRCodeInstructions" = "Use the export feature of your Radix Olympia Desktop Wallet to choose the accounts to export and generate an export QR code.";
 "importLegacyWallet_scannedLabel" = "Scanned: %d/%d";
@@ -496,7 +496,7 @@
 "generalSettings_developerMode_title" = "Developer Mode";
 "generalSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
 "generalSettings_profileSync_title" = "Sync Wallet Data to iCloud";
-"generalSettings_profileSync_subtitle" = "Warning: If disabled you might lose access to accounts/personas.";
+"generalSettings_profileSync_subtitle" = "Warning: If disabled you might lose access to your Accounts and Personas.";
 "generalSettings_verboseLedgerMode_title" = "Verbose Ledger transaction signing";
 "generalSettings_verboseLedgerMode_subtitle" = "When signing with your Ledger hardware wallet, should all instructions be displayed?";
 "generalSettings_confirmCloudSyncDisableAlert_title" = "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?";
