@@ -21,7 +21,6 @@ extension SubmitTransaction.State.TXStatus {
 // MARK: - SubmitTransaction.View
 extension SubmitTransaction {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
 		let txID: TXID
 		let status: SubmitTransaction.State.TXStatus
 	}
@@ -53,7 +52,7 @@ extension SubmitTransaction {
 					Text("Completing Transaction...").textStyle(.body1Regular) // FIXME: strings
 
 					HStack {
-						Text("TXID: ") // FIXME: strings
+						Text("Transaction ID: ") // FIXME: strings
 						AddressView(.identifier(.transaction(viewStore.txID)))
 					}
 				}

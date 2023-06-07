@@ -15,8 +15,8 @@ extension Radix {
 }
 
 extension Radix.Dashboard {
-	public static let `default`: Self = {
-		switch Radix.Network.default {
+	public static func dashboard(forNetwork network: Radix.Network) -> Self {
+		switch network {
 		case .nebunet:
 			return .rcnet
 		case .kisharnet:
@@ -30,7 +30,7 @@ extension Radix.Dashboard {
 		default:
 			return .rcnet
 		}
-	}()
+	}
 }
 
 extension Radix.Dashboard {
