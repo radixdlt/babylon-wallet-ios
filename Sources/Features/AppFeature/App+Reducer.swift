@@ -165,7 +165,7 @@ public struct App: Sendable, FeatureReducer {
 		case .onboardingCoordinator(.delegate(.completed)):
 			return checkAccountRecoveryNeeded()
 
-		case let .splash(.delegate(.loadProfileOutcome(loadProfileOutcome))):
+		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
 			switch loadProfileOutcome {
 			case .newUser:
 				return goToOnboarding(state: &state)
@@ -181,7 +181,7 @@ public struct App: Sendable, FeatureReducer {
 				return incompatibleSnapshotData(version: version, state: &state)
 
 			case .existingProfile:
-				return checkAccountRecoveryNeeded()
+				return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
 
 			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
 				errorQueue.schedule(error)
@@ -213,7 +213,8 @@ public struct App: Sendable, FeatureReducer {
 
 	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
 		.task {
-			let isAccountRecoveryNeeded = await deviceFactorSourceClient.isAccountRecoveryNeeded()
+			// When coming from onboarding flow, recovery check is allowed to fail
+			let isAccountRecoveryNeeded = await (try? deviceFactorSourceClient.isAccountRecoveryNeeded()) ?? true
 			return .internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded))
 		}
 	}

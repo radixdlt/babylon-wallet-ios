@@ -370,6 +370,7 @@ package.addModules([
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
+			"DeviceFactorSourceClient",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
 		],

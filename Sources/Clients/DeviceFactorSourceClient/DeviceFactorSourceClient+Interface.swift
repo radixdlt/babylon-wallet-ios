@@ -25,7 +25,7 @@ public struct DeviceFactorSourceClient: Sendable {
 extension DeviceFactorSourceClient {
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> OrderedSet<HierarchicalDeterministicPublicKey>
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
-	public typealias IsAccountRecoveryNeeded = @Sendable () async -> Bool
+	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 }
 
 // MARK: - DiscrepancyUnsupportedCurve

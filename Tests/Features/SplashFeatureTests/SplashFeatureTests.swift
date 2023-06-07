@@ -80,6 +80,9 @@ final class SplashFeatureTests: TestCase {
 			$0.onboardingClient.loadProfile = {
 				outcome
 			}
+			$0.deviceFactorSourceClient.isAccountRecoveryNeeded = {
+				false
+			}
 		}
 
 		// when
@@ -88,7 +91,11 @@ final class SplashFeatureTests: TestCase {
 		// then
 		await clock.advance(by: .seconds(0.2))
 		await store.receive(.internal(.passcodeConfigResult(.success(authBiometricsConfig))))
-		await store.receive(.delegate(.loadProfileOutcome(outcome)))
+		await store.receive(.internal(.loadProfileOutcome(outcome)))
+		if case .existingProfile = outcome {
+			await store.receive(.internal(.accountRecoveryNeeded(outcome, .success(false))))
+		}
+		await store.receive(.delegate(.completed(outcome, accountRecoveryNeeded: false)))
 	}
 }
 
