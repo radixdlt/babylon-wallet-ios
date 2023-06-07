@@ -94,14 +94,10 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case generalSettings(GeneralSettings.State)
 			case profileBackups(ProfileBackups.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
-
-			#if DEBUG
-			// FIXME: move out of DEBUG flag once ready...
 			case mnemonics(DisplayMnemonics.State)
-
-			// FIXME: move out of DEBUG flag once ready...
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 
+			#if DEBUG
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(ManageFactorSources.State)
 			#endif
@@ -116,14 +112,10 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case generalSettings(GeneralSettings.Action)
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
-
-			#if DEBUG
-			// FIXME: move out of DEBUG flag once ready...
 			case mnemonics(DisplayMnemonics.Action)
-
-			// FIXME: move out of DEBUG flag once ready...
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 
+			#if DEBUG
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(ManageFactorSources.Action)
 			#endif
@@ -151,20 +143,21 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
 				LedgerHardwareDevices()
 			}
-			#if DEBUG
-			// FIXME: move out of DEBUG flag once ready...
+
 			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
 				ImportOlympiaWalletCoordinator()
 			}
 
+			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
+				DisplayMnemonics()
+			}
+
+			#if DEBUG
 			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
 				DebugInspectProfile()
 			}
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				ManageFactorSources()
-			}
-			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
-				DisplayMnemonics()
 			}
 			#endif
 		}
@@ -240,18 +233,15 @@ public struct AppSettings: Sendable, FeatureReducer {
 			state.destination = .ledgerHardwareWallets(.init(allowSelection: false))
 			return .none
 
-		#if DEBUG
-
-		// FIXME: move out of DEBUG flag once ready...
 		case .importFromOlympiaWalletButtonTapped:
 			state.destination = .importOlympiaWalletCoordinator(.init())
 			return .none
 
-		// FIXME: move out of DEBUG flag once ready...
 		case .mnemonicsButtonTapped:
 			state.destination = .mnemonics(.init())
 			return .none
 
+		#if DEBUG
 		case .factorSourcesButtonTapped:
 			state.destination = .debugManageFactorSources(.init())
 			return .none
@@ -301,7 +291,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 				return .none
 			}
 
-		#if DEBUG
 		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
@@ -309,7 +298,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration)))):
 			state.destination = nil
 			return .none
-		#endif // DEBUG
 
 		case .destination:
 			return .none

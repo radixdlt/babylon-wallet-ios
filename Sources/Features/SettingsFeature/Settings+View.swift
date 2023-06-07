@@ -98,9 +98,9 @@ extension View {
 			.generalSettings(with: destinationStore)
 			.profileBackups(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
-		#if DEBUG
 			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.mnemonics(with: destinationStore)
+		#if DEBUG
 			.factorSources(with: destinationStore)
 			.debugInspectProfile(with: destinationStore)
 		#endif // DEBUG
@@ -176,7 +176,6 @@ extension View {
 		)
 	}
 
-	#if DEBUG
 	@MainActor
 	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
 		sheet(
@@ -197,6 +196,7 @@ extension View {
 		)
 	}
 
+	#if DEBUG
 	@MainActor
 	private func factorSources(
 		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
