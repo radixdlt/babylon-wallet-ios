@@ -130,6 +130,9 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 				})))
 			}
 
+		case .step1_derivePublicKeys(.delegate(.failedToDerivePublicKey)):
+			return .send(.delegate(.createAccountFailed))
+
 		default: return .none
 		}
 	}
