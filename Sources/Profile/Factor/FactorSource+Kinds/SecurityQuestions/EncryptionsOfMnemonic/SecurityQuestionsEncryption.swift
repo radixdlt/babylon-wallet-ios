@@ -16,8 +16,8 @@ extension String {
 }
 
 extension CharacterSet {
-	public func characters(in collection: [Character]) -> Self {
-		.init(charactersIn: collection.map().joined(separator: ""))
+	public static func characters(in collection: [Character]) -> Self {
+		.init(collection.map(String.init).joined(""))
 	}
 }
 
@@ -25,8 +25,16 @@ extension CharacterSet {
 public enum CAP23 {
 	public static let forbiddenCharacters = CharacterSet
 		.whitespacesAndNewlines
-		.union(.init(charactersIn: "'?!."))
-		.union("a")
+		.union(.characters(in: [
+			".", // Rationale: Might be natural for some to end answers with a dot, but at a later point in time might be omitted.
+			"!", // Rationale: Same as dot
+			"?", // Rationale: Same as dot (also strange for an answer to a question to contain a question mark)
+			"'", // Rationale: Feels like an unnessary risk for differences, sometimes some might omit apostrophe (U+0027)
+			"\"", // Rationale: Same as apostrophe (this is "Quotation Mark" (U+0022))
+			"‘", // Rationale: Same as apostrophe (this is "Left Single Quotation Mark" (U+2018))
+			"’", // Rationale: Same as apostrophe (this is "Right Single Quotation Mark" (U+2019))
+			"＇", // Rationale: Same as apostrophe (this is "Full Width Apostrophe" (U+FF07))
+		]))
 
 	/// `answer.lowercased().trimWhitespaceAndNewLine().utf8`
 	public static func entropyFrom(
