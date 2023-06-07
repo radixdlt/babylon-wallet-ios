@@ -18,7 +18,7 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 			questions: NonEmpty<OrderedSet<SecurityQuestion>>
 		) {
 			self.questions = questions
-			self.root = .freeform(.init(question: questions.first))
+			self.root = .freeform(.init(question: questions.first, isLast: questions.count == 1))
 		}
 	}
 
@@ -94,8 +94,14 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 	}
 
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
-		if let nextQuestion = state.questions.first(where: { state.answers[$0.id] == nil }) {
-			let pathState = Path.State.freeform(.init(question: nextQuestion))
+		let unansweredQuestions = state.questions.filter { state.answers[$0.id] == nil }
+		if let nextQuestion = unansweredQuestions.first {
+			let pathState = Path.State.freeform(
+				.init(
+					question: nextQuestion,
+					isLast: unansweredQuestions.count == 1
+				)
+			)
 			if state.root == nil {
 				state.root = pathState
 			} else {

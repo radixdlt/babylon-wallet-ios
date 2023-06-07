@@ -20,7 +20,7 @@ extension SimpleNewPhoneConfirmer {
 		}
 
 		public var body: some SwiftUI.View {
-			Color.white
+			Color.red
 				.sheet(
 					store: store.scope(
 						state: \.$answerSecurityQuestions,

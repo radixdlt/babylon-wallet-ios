@@ -1,4 +1,5 @@
 import Cryptography
+import FactorSourcesClient
 import FeaturePrelude
 import MnemonicClient
 
@@ -63,6 +64,7 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 		case done(TaskResult<AnswerSecurityQuestions.State.Purpose.AnswersResult>)
 	}
 
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	public init() {}
 
@@ -90,13 +92,17 @@ public struct AnswerSecurityQuestions: Sendable, FeatureReducer {
 						let mnemonic = try factorSource.decrypt(answersToQuestions: answers)
 
 						return AnswerSecurityQuestions.State.Purpose.AnswersResult.decrypted(mnemonic)
+
 					case .encrypt:
 						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
 						loggerGlobal.debug("mnemonic: \(mnemonic.phrase)")
+
 						let factorSource = try SecurityQuestionsFactorSource.from(
 							mnemonic: mnemonic,
 							answersToQuestions: answers
 						)
+
+						try await factorSourcesClient.saveFactorSource(factorSource.embed())
 
 						return AnswerSecurityQuestions.State.Purpose.AnswersResult.encrypted(factorSource)
 					}

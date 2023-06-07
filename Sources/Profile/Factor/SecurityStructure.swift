@@ -75,9 +75,22 @@ public struct AbstractSecurityStructure<AbstractFactor>:
 	Sendable, Hashable, Codable
 	where AbstractFactor: Sendable & Hashable & Codable
 {
-	public let primaryRole: PrimaryRole<AbstractFactor>
-	public let recoveryRole: RecoveryRole<AbstractFactor>
-	public let confirmationRole: ConfirmationRole<AbstractFactor>
+	public typealias Primary = PrimaryRole<AbstractFactor>
+	public typealias Recovery = RecoveryRole<AbstractFactor>
+	public typealias Confirmation = ConfirmationRole<AbstractFactor>
+	public let primaryRole: Primary
+	public let recoveryRole: Recovery
+	public let confirmationRole: Confirmation
+
+	public init(
+		primaryRole: Primary,
+		recoveryRole: Recovery,
+		confirmationRole: Confirmation
+	) {
+		self.primaryRole = primaryRole
+		self.recoveryRole = recoveryRole
+		self.confirmationRole = confirmationRole
+	}
 }
 
 // MARK: - AbstractSecurityStructureConfiguration

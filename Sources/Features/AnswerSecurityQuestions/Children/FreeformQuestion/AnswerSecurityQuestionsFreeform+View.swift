@@ -7,7 +7,7 @@ import SwiftUI
 
 public extension AnswerSecurityQuestionsFreeform.State {
 	var viewState: AnswerSecurityQuestionsFreeform.ViewState {
-		.init(state: .init(question: self.question))
+		.init(state: self)
 	}
 }
 
@@ -16,11 +16,13 @@ public extension AnswerSecurityQuestionsFreeform {
 	struct ViewState: Equatable {
 		public let question: String
 		public let answer: String
-		public let submitButtonState: ControlState
+		public let continueButtonState: ControlState
+		public let buttonTitle: String
 		init(state: AnswerSecurityQuestionsFreeform.State) {
 			question = state.question.question.rawValue
 			answer = state.answer.map(\.rawValue) ?? ""
-			submitButtonState = state.answer == nil ? .disabled : .enabled
+			buttonTitle = state.isLast ? "Submit" : "Next question"
+			continueButtonState = state.answer == nil ? .disabled : .enabled
 		}
 	}
 
@@ -51,11 +53,11 @@ public extension AnswerSecurityQuestionsFreeform {
 						)
 						.textFieldStyle(.roundedBorder)
 
-						Button("Submit") {
+						Button(viewStore.buttonTitle) {
 							viewStore.send(.submitAnswer)
 						}
 						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.submitButtonState)
+						.controlState(viewStore.continueButtonState)
 					}
 					.padding()
 				}
@@ -84,6 +86,7 @@ public extension AnswerSecurityQuestionsFreeform.State {
 		question: .init(
 			id: 0,
 			question: "What was the make and model of your first car?"
-		))
+		), isLast: true
+	)
 }
 #endif

@@ -27,6 +27,7 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case selectNewPhoneConfirmer
 		case selectLostPhoneHelper
+		case createSecurityStructure(SimpleUnnamedSecurityStructureConfig)
 	}
 
 	public init() {}
@@ -41,8 +42,8 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 			loggerGlobal.debug("'Lost phone helper' button tapped")
 			return .send(.delegate(.selectLostPhoneHelper))
 
-		case .finishSelectingFactors:
-			fatalError()
+		case let .finishSelectingFactors(simpleFactorConfig):
+			return .send(.delegate(.createSecurityStructure(simpleFactorConfig)))
 		}
 	}
 }

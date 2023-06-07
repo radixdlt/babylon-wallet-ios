@@ -18,16 +18,19 @@ public struct PreviewOfSomeFeatureReducer<Feature>: FeatureReducer where Feature
 		case previewResult(PreviewResult<Feature.ResultFromFeature>.Action)
 	}
 
+	private let withReducer: ((Feature) -> (Reduce<Feature.State, Feature.Action>))?
 	public let resultFromAction: (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?
 	public init(
+		withReducer: ((Feature) -> (Reduce<Feature.State, Feature.Action>))? = nil,
 		resultFrom resultFromAction: @escaping (Feature.DelegateAction) -> TaskResult<Feature.ResultFromFeature>?
 	) {
+		self.withReducer = withReducer
 		self.resultFromAction = resultFromAction
 	}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: /F.State.previewOf, action: /F.Action.child .. ChildAction.previewOf) {
-			Feature()
+			(withReducer ?? { Reduce($0._printChanges()) })(Feature())
 		}
 		Scope(state: /F.State.previewResult, action: /F.Action.child .. ChildAction.previewResult) {
 			PreviewResult<Feature.ResultFromFeature>()

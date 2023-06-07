@@ -22,6 +22,7 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 		case createdFactorSource(SecurityQuestionsFactorSource)
 	}
 
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
@@ -35,7 +36,11 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .answerSecurityQuestions(.presented(.delegate(.done(.success(.encrypted(factorSource)))))):
-			return .send(.delegate(.createdFactorSource(factorSource)))
+			state.answerSecurityQuestions = nil
+			return .run { send in
+				await send(.delegate(.createdFactorSource(factorSource)))
+				await dismiss()
+			}
 
 		case .answerSecurityQuestions(.presented(.delegate(.done(.success(.decrypted))))):
 			let errorMessage = "Unexpecte delegate action, expected to have created a factor source, not decrypt one."

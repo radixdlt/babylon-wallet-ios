@@ -60,6 +60,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"MnemonicClient",
+			"FactorSourcesClient",
 		],
 		tests: .no
 	),

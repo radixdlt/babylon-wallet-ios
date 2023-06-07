@@ -1,3 +1,4 @@
+import FactorSourcesClient
 import FeaturePrelude
 import Profile
 
@@ -20,6 +21,11 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 			case simpleLostPhoneHelper(SimpleLostPhoneHelper.State)
 			case simpleNewPhoneConfirmer(SimpleNewPhoneConfirmer.State)
+
+			var simpleSetupFlow: SimpleCreateSecurityStructureFlow.State? {
+				guard case let .simpleSetupFlow(simpleSetupFlow) = self else { return nil }
+				return simpleSetupFlow
+			}
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -55,6 +61,11 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 		case path(StackAction<Path.Action>)
 	}
 
+	public enum DelegateAction: Sendable, Hashable {
+		case done(TaskResult<SecurityStructureConfiguration>)
+	}
+
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	public init() {}
 
 	public var body: some ReducerProtocolOf<CreateSecurityStructureCoordinator> {
@@ -83,6 +94,39 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 		case .path(.element(_, action: .simpleSetupFlow(.delegate(.selectLostPhoneHelper)))):
 			state.path.append(.simpleLostPhoneHelper(.init()))
 			return .none
+
+		case let .path(.element(id, action: .simpleNewPhoneConfirmer(.delegate(.createdFactorSource(newPhoneConfirmer))))):
+			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
+			guard
+				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
+				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
+			else {
+				assertionFailure("Unexpectly where in wrong state..?")
+				return .none
+			}
+			simpleSetupFlow.newPhoneConfirmer = newPhoneConfirmer
+			state.path[simpleSetupFlowIndex] = .simpleSetupFlow(simpleSetupFlow)
+			return .none
+
+		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.createSecurityStructure(simpleFactorConfig))))):
+			return .task {
+				let taskResult = await TaskResult {
+					let primary = try await factorSourcesClient
+						.getFactorSources(matching: {
+							$0.kind == .device && !$0.supportsOlympia
+						}).first!
+
+					return SecurityStructureConfiguration(
+						label: "Unnamed",
+						configuration: .init(
+							primaryRole: .single(primary),
+							recoveryRole: .single(simpleFactorConfig.lostPhoneHelper.embed()),
+							confirmationRole: .single(simpleFactorConfig.newPhoneConfirmer.embed())
+						)
+					)
+				}
+				return .delegate(.done(taskResult))
+			}
 
 		default: return .none
 		}

@@ -10,8 +10,10 @@ public struct AnswerSecurityQuestionsFreeform: Sendable, FeatureReducer {
 		public var id: SecurityQuestion.ID { question.id }
 		public let question: SecurityQuestion
 		public var answer: NonEmptyString? = nil
-		public init(question: SecurityQuestion) {
+		public let isLast: Bool
+		public init(question: SecurityQuestion, isLast: Bool) {
 			self.question = question
+			self.isLast = isLast
 		}
 	}
 
