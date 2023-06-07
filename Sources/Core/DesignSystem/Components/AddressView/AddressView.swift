@@ -130,7 +130,7 @@ extension AddressView {
 
 	private var addressURL: URL? {
 		guard let path else { return nil }
-		return Radix.Dashboard.rcnet.url.appending(path: path)
+		return Radix.Dashboard.default.url.appending(path: path)
 	}
 }
 

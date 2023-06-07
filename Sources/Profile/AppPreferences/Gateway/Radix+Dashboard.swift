@@ -15,13 +15,58 @@ extension Radix {
 }
 
 extension Radix.Dashboard {
-	public static let `default` = rcnet
+	public static let `default`: Self = {
+		switch Radix.Network.default {
+		case .nebunet:
+			return .rcnet
+		case .kisharnet:
+			return .kisharnet
+		case .mardunet:
+			return .mardunet
+		case .enkinet:
+			return .enkinet
+		case .hammunet:
+			return .hammunet
+		default:
+			return .rcnet
+		}
+	}()
 }
 
 extension Radix.Dashboard {
 	public static var rcnet: Self {
 		.init(
 			url: URL(string: "https://rcnet-dashboard.radixdlt.com/")!
+		)
+	}
+
+	public static var kisharnet: Self {
+		.init(
+			url: URL(string: "https://kisharnet-dashboard.radixdlt.com/")!
+		)
+	}
+
+	public static var mardunet: Self {
+		.init(
+			url: URL(string: "https://mardunet-dashboard.rdx-works-main.extratools.works/")!
+		)
+	}
+
+	public static var gilganet: Self {
+		.init(
+			url: URL(string: "https://gilganet-dashboard.rdx-works-main.extratools.works/")!
+		)
+	}
+
+	public static var enkinet: Self {
+		.init(
+			url: URL(string: "https://enkinet-dashboard.rdx-works-main.extratools.works/")!
+		)
+	}
+
+	public static var hammunet: Self {
+		.init(
+			url: URL(string: "https://hammunet-dashboard.rdx-works-main.extratools.works/")!
 		)
 	}
 }
