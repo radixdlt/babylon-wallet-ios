@@ -1,11 +1,5 @@
 import FeaturePrelude
 
-extension Splash.State {
-	var viewState: Splash.ViewState {
-		.init()
-	}
-}
-
 // MARK: - Splash.View
 extension Splash {
 	public struct ViewState: Equatable {}
@@ -21,13 +15,36 @@ extension Splash {
 		public var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: \.viewState,
+				observe: { $0 },
 				send: { .view($0) }
 			) { viewStore in
 				ForceFullScreen {
-					Image(asset: AssetResource.splash)
-						.resizable()
-						.scaledToFill()
+					VStack {
+						if viewStore.biometricsCheckFailed {
+							Spacer()
+							Image(systemName: "lock.circle.fill")
+								.resizable()
+								.frame(.small)
+							Text("Tap anywhere to unlock")
+								.textStyle(.body1HighImportance)
+						}
+					}
+					.padding([.bottom], .medium1)
+					.foregroundColor(.app.white)
+					.frame(
+						minWidth: 0,
+						maxWidth: .infinity,
+						minHeight: 0,
+						maxHeight: .infinity
+					)
+					.background(
+						Image(asset: AssetResource.splash)
+							.resizable()
+							.scaledToFill()
+					)
+					.onTapGesture {
+						viewStore.send(.didTapToUnlock)
+					}
 				}
 				.edgesIgnoringSafeArea(.all)
 				.alert(

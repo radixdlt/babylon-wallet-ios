@@ -83,6 +83,9 @@ extension DeviceFactorSourceClient: DependencyKey {
 					return !accounts.allSatisfy(hasControl)
 				} catch {
 					loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
+					if error is KeychainAccess.Status {
+						throw error
+					}
 					return true
 				}
 			}
