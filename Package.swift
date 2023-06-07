@@ -790,7 +790,6 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
-			"GatewaysClient",
 			"URLFormatterClient",
 			"QRGeneratorClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
