@@ -456,7 +456,7 @@
 "linkedConnectors_title" = "Linked Connectors";
 "misc_remoteThumbnails_loadingFailure" = "Can\'t load image";
 "misc_remoteThumbnails_vectorImageFailure" = "Can\'t displays image of vector type";
-"onboarding_newUser" = "I\'m a New Radix Wallet user";
+"onboarding_newUser" = "I\'m a New Radix Wallet User";
 "onboarding_restoreFromBackup" = "Restore Wallet from Backup";
 "onboarding_step1_subtitle" = "Your direct connection to the Radix Network";
 "onboarding_step1_title" = "Welcome to the Radix Wallet";
@@ -538,10 +538,10 @@
 "transactionReview_prepareForSigning_navigationTitle" = "Preparing Transaction";
 "transactionReview_presentingHeading" = "Presenting";
 "transactionReview_rawTransactionTitle" = "Raw Transaction";
-"transactionReview_selectFeePayer_body" = "The transaction you are about to sign does not involve any of your accounts so you must choose an account to pay the transaction fee with.";
-"transactionReview_selectFeePayer_confirmButton" = "Confirm Fee Payer";
-"transactionReview_selectFeePayer_navigationTitle" = "Select Fee Payer";
-"transactionReview_selectFeePayer_selectAccount" = "Select account to pay %@ tx fee with";
+"transactionReview_selectFeePayer_body" = "Please select an Account with enough XRD to pay 10 XRD fee for this transaction.";
+"transactionReview_selectFeePayer_confirmButton" = "Continue";
+"transactionReview_selectFeePayer_navigationTitle" = "Select Fee Account";
+"transactionReview_selectFeePayer_selectAccount" = "Select Account:";
 "transactionReview_sendingToHeading" = "Sending to";
 "transactionReview_submitTransaction_displayCommitted" = "Successfully committed";
 "transactionReview_submitTransaction_displayFailed" = "Failed";

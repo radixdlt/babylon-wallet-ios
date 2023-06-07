@@ -45,7 +45,7 @@ extension SelectFeePayer {
 							.foregroundColor(.app.gray2)
 							.padding(.bottom, .small1)
 
-						Text(L10n.TransactionReview.SelectFeePayer.selectAccount(viewStore.fee.format()))
+						Text(L10n.TransactionReview.SelectFeePayer.selectAccount)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray2)
 

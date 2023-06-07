@@ -1243,8 +1243,8 @@ public enum L10n {
     }
   }
   public enum Onboarding {
-    /// I'm a New Radix Wallet user
-    public static let newUser = L10n.tr("Localizable", "onboarding_newUser", fallback: "I'm a New Radix Wallet user")
+    /// I'm a New Radix Wallet User
+    public static let newUser = L10n.tr("Localizable", "onboarding_newUser", fallback: "I'm a New Radix Wallet User")
     /// Restore Wallet from Backup
     public static let restoreFromBackup = L10n.tr("Localizable", "onboarding_restoreFromBackup", fallback: "Restore Wallet from Backup")
     public enum Step1 {
@@ -1492,16 +1492,14 @@ public enum L10n {
       public static let navigationTitle = L10n.tr("Localizable", "transactionReview_prepareForSigning_navigationTitle", fallback: "Preparing Transaction")
     }
     public enum SelectFeePayer {
-      /// The transaction you are about to sign does not involve any of your accounts so you must choose an account to pay the transaction fee with.
-      public static let body = L10n.tr("Localizable", "transactionReview_selectFeePayer_body", fallback: "The transaction you are about to sign does not involve any of your accounts so you must choose an account to pay the transaction fee with.")
-      /// Confirm Fee Payer
-      public static let confirmButton = L10n.tr("Localizable", "transactionReview_selectFeePayer_confirmButton", fallback: "Confirm Fee Payer")
-      /// Select Fee Payer
-      public static let navigationTitle = L10n.tr("Localizable", "transactionReview_selectFeePayer_navigationTitle", fallback: "Select Fee Payer")
-      /// Select account to pay %@ tx fee with
-      public static func selectAccount(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "transactionReview_selectFeePayer_selectAccount", String(describing: p1), fallback: "Select account to pay %@ tx fee with")
-      }
+      /// Please select an Account with enough XRD to pay 10 XRD fee for this transaction.
+      public static let body = L10n.tr("Localizable", "transactionReview_selectFeePayer_body", fallback: "Please select an Account with enough XRD to pay 10 XRD fee for this transaction.")
+      /// Continue
+      public static let confirmButton = L10n.tr("Localizable", "transactionReview_selectFeePayer_confirmButton", fallback: "Continue")
+      /// Select Fee Account
+      public static let navigationTitle = L10n.tr("Localizable", "transactionReview_selectFeePayer_navigationTitle", fallback: "Select Fee Account")
+      /// Select Account:
+      public static let selectAccount = L10n.tr("Localizable", "transactionReview_selectFeePayer_selectAccount", fallback: "Select Account:")
     }
     public enum SubmitTransaction {
       /// Successfully committed
