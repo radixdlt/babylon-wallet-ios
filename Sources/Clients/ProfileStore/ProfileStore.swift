@@ -407,10 +407,10 @@ extension ProfileStore {
 	#endif
 
 	internal static func deviceDescription(
-		name: DeviceFactorSource.Hint.Name,
+		name: String,
 		model: DeviceFactorSource.Hint.Model
 	) -> NonEmptyString {
-		"\(name.rawValue) (\(model.rawValue))"
+		"\(name) (\(model.rawValue))"
 	}
 }
 
@@ -512,11 +512,11 @@ extension ProfileStore {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		do {
-			let name: DeviceFactorSource.Hint.Name
+			let name: String
 			let model: DeviceFactorSource.Hint.Model
 			#if canImport(UIKit)
 			@Dependency(\.device) var device
-			name = await .init(rawValue: device.name)
+			name = await device.name
 			model = await .init(rawValue: device.model)
 			#else
 			name = macOSDeviceNameFallback

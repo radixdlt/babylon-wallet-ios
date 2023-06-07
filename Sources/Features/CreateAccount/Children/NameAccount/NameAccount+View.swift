@@ -65,6 +65,7 @@ extension NameAccount {
 						#if os(iOS)
 						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
 						#endif
+						.keyboardType(.asciiCapable)
 						.autocorrectionDisabled()
 						.padding(.bottom, .medium3)
 

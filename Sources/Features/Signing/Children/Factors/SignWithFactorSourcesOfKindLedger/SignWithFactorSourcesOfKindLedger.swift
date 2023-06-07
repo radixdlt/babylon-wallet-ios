@@ -11,6 +11,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
 		case onFirstTask
+		case retryButtonTapped
 	}
 
 	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
@@ -29,6 +30,9 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
+			return signWithSigningFactors(of: state)
+
+		case .retryButtonTapped:
 			return signWithSigningFactors(of: state)
 		}
 	}

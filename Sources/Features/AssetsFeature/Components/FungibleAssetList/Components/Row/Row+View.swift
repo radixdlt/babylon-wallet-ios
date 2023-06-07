@@ -30,35 +30,28 @@ extension FungibleAssetList.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ZStack {
-					HStack(alignment: .center) {
-						HStack(spacing: .small1) {
-							TokenThumbnail(viewStore.thumbnail, size: .small)
+				HStack(alignment: .center) {
+					HStack(spacing: .small1) {
+						TokenThumbnail(viewStore.thumbnail, size: .small)
 
-							Text(viewStore.symbol)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body2HighImportance)
-						}
-
-						Spacer()
-
-						VStack(alignment: .trailing, spacing: .small3) {
-							Text(viewStore.tokenAmount)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-						}
-
-						if let isSelected = viewStore.isSelected {
-							CheckmarkView(appearance: .dark, isChecked: isSelected)
-						}
+						Text(viewStore.symbol)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body2HighImportance)
 					}
 
-					VStack {
-						Spacer()
-						Separator()
+					Spacer()
+
+					VStack(alignment: .trailing, spacing: .small3) {
+						Text(viewStore.tokenAmount)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
+					}
+
+					if let isSelected = viewStore.isSelected {
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
 					}
 				}
-				.frame(height: .large1 * 2)
+				.frame(height: 2 * .large1)
 				.padding(.horizontal, .medium1)
 				.contentShape(Rectangle())
 				.onTapGesture { viewStore.send(.tapped) }

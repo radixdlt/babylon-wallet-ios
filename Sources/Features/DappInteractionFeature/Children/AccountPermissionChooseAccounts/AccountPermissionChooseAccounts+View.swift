@@ -9,11 +9,7 @@ extension AccountPermissionChooseAccounts {
 		let store: StoreOf<AccountPermissionChooseAccounts>
 
 		var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: { $0 },
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
@@ -21,7 +17,9 @@ extension AccountPermissionChooseAccounts {
 							title: viewStore.title,
 							subtitle: viewStore.subtitle
 						)
-						ChooseAccounts.View(store: store.scope(state: \.chooseAccounts, action: { .child(.chooseAccounts($0)) }))
+
+						let accountsStore = store.scope(state: \.chooseAccounts, action: { .child(.chooseAccounts($0)) })
+						ChooseAccounts.View(store: accountsStore)
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
@@ -39,7 +37,7 @@ extension AccountPermissionChooseAccounts {
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /AccountPermissionChooseAccounts.Destinations.State.signing,
 					action: AccountPermissionChooseAccounts.Destinations.Action.signing,
-					content: { Signing.View(store: $0) }
+					content: { Signing.SheetView(store: $0) }
 				)
 			}
 		}

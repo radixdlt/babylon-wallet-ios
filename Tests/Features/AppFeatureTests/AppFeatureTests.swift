@@ -109,7 +109,7 @@ final class AppFeatureTests: TestCase {
 				.init(
 					title: { TextState("An Error Occurred") },
 					actions: {},
-					message: { TextState("Failed to create Wallet from backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))") }
+					message: { TextState("Failed to import Radix Wallet backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))") }
 				)
 			)
 		}

@@ -19,6 +19,8 @@ extension AssetTransfer.View {
 			ScrollView {
 				VStack(spacing: .medium3) {
 					headerView(viewStore)
+						.padding(.top, .medium3)
+
 					IfLetStore(
 						store.scope(state: \.message, action: { .child(.message($0)) }),
 						then: { AssetTransferMessage.View(store: $0) }
@@ -35,19 +37,12 @@ extension AssetTransfer.View {
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.canSendTransferRequest ? .enabled : .disabled)
-				}
-				.padding(.horizontal, .medium3)
-				.safeAreaInset(edge: .top, alignment: .leading, spacing: 0) {
-					CloseButton {
-						viewStore.send(.closeButtonTapped)
-					}
-					.padding([.top, .leading], .medium1)
 					.padding(.bottom, .medium3)
 				}
+				.padding(.horizontal, .medium3)
 			}
 		}
 		.scrollDismissesKeyboard(.interactively)
-		.showDeveloperDisclaimerBanner()
 	}
 
 	func headerView(_ viewStore: ViewStoreOf<AssetTransfer>) -> some View {
@@ -55,7 +50,9 @@ extension AssetTransfer.View {
 			Text(L10n.AssetTransfer.Header.transfer)
 				.textStyle(.sheetTitle)
 				.flushedLeft(padding: .small1)
+
 			Spacer()
+
 			if viewStore.message == nil {
 				Button(L10n.AssetTransfer.Header.addMessageButton, asset: AssetResource.addMessage) {
 					viewStore.send(.addMessageTapped)
@@ -63,6 +60,27 @@ extension AssetTransfer.View {
 				.textStyle(.button)
 				.foregroundColor(.app.blue2)
 			}
+		}
+	}
+}
+
+// MARK: - AssetTransfer.SheetView
+extension AssetTransfer {
+	@MainActor
+	public struct SheetView: SwiftUI.View {
+		private let store: StoreOf<AssetTransfer>
+
+		public init(store: StoreOf<AssetTransfer>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithNavigationBar {
+				ViewStore(store).send(.view(.closeButtonTapped))
+			} content: {
+				View(store: store)
+			}
+			.showDeveloperDisclaimerBanner()
 		}
 	}
 }

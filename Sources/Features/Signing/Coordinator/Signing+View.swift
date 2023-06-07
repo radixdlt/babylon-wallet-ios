@@ -1,17 +1,8 @@
 import FeaturePrelude
 
-extension Signing.State {
-	var viewState: Signing.ViewState {
-		.init()
-	}
-}
-
 // MARK: - Signing.View
-extension Signing {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
 
+extension Signing {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Signing>
@@ -32,6 +23,24 @@ extension Signing {
 					action: { Signing.Action.child(.signWithLedgerFactors($0)) },
 					then: { SignWithFactorSourcesOfKindLedger.View(store: $0) }
 				)
+			}
+		}
+	}
+
+	/// A wrapper for Signing.View to be used in a sheet context
+	@MainActor
+	public struct SheetView: SwiftUI.View {
+		private let store: StoreOf<Signing>
+
+		public init(store: StoreOf<Signing>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithNavigationBar {
+				ViewStore(store).send(.view(.closeButtonTapped))
+			} content: {
+				View(store: store)
 			}
 		}
 	}

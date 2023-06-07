@@ -62,29 +62,22 @@ extension AddNewGateway {
 								to: $focusedField
 							)
 						)
-						.autocorrectionDisabled()
 						#if os(iOS)
-							.textInputAutocapitalization(.never)
-							.keyboardType(.URL)
+						.textInputAutocapitalization(.never)
+						.keyboardType(.URL)
 						#endif // iOS
-
-						Spacer()
-
-						Button(L10n.Gateways.AddNewGateway.addGatewayButtonTitle) {
-							viewStore.send(.addNewGatewayButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.addGatewayButtonState)
-
-						Spacer()
+						.autocorrectionDisabled()
 					}
-					.padding(.horizontal, .medium3)
-					.safeAreaInset(edge: .top, alignment: .leading, spacing: .zero) {
-						CloseButton { viewStore.send(.closeButtonTapped) }
-							.padding([.top, .leading], .small2)
-					}
-					.onAppear { viewStore.send(.appeared) }
+					.padding([.bottom, .horizontal], .medium1)
 				}
+				.footer {
+					Button(L10n.Gateways.AddNewGateway.addGatewayButtonTitle) {
+						viewStore.send(.addNewGatewayButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+					.controlState(viewStore.addGatewayButtonState)
+				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}

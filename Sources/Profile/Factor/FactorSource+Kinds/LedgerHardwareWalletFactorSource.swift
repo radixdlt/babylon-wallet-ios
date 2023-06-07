@@ -30,17 +30,16 @@ extension LedgerHardwareWalletFactorSource {
 // MARK: LedgerHardwareWalletFactorSource.Hint
 extension LedgerHardwareWalletFactorSource {
 	public struct Hint: Sendable, Hashable, Codable {
-		public typealias Name = Tagged<(Self, name: ()), String>
 		public typealias Model = LedgerHardwareWalletFactorSource.DeviceModel
 
 		/// "Orange, scratched"
-		public let name: Name
+		public let name: String
 
 		/// "nanoS+"
 		public let model: Model
 
 		public init(
-			name: Name,
+			name: String,
 			model: Model
 		) {
 			self.name = name
@@ -69,7 +68,7 @@ extension LedgerHardwareWalletFactorSource {
 	/// Ledger model, name and `deviceID` (hash of public key)
 	public static func model(
 		_ model: DeviceModel,
-		name: Hint.Name,
+		name: String,
 		deviceID: HexCodable32Bytes
 	) throws -> Self {
 		try .init(

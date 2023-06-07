@@ -177,6 +177,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 				}
 
 			case .dismiss:
+				state.destination = nil
 				return .none
 			}
 
