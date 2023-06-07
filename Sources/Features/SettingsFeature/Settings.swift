@@ -53,10 +53,10 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case generalSettingsButtonTapped
 		case profileBackupsButtonTapped
 		case ledgerHardwareWalletsButtonTapped
+		case mnemonicsButtonTapped
 
 		#if DEBUG
 		case importFromOlympiaWalletButtonTapped
-		case mnemonicsButtonTapped
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
 		#endif
@@ -95,9 +95,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case profileBackups(ProfileBackups.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
 			case mnemonics(DisplayMnemonics.State)
-			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 
 			#if DEBUG
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(ManageFactorSources.State)
 			#endif
@@ -113,9 +113,9 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 			case mnemonics(DisplayMnemonics.Action)
-			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 
 			#if DEBUG
+			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(ManageFactorSources.Action)
 			#endif
@@ -143,16 +143,14 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
 				LedgerHardwareDevices()
 			}
-
-			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
-				ImportOlympiaWalletCoordinator()
-			}
-
 			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
 				DisplayMnemonics()
 			}
 
 			#if DEBUG
+			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
+				ImportOlympiaWalletCoordinator()
+			}
 			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
 				DebugInspectProfile()
 			}
@@ -233,15 +231,15 @@ public struct AppSettings: Sendable, FeatureReducer {
 			state.destination = .ledgerHardwareWallets(.init(allowSelection: false))
 			return .none
 
-		case .importFromOlympiaWalletButtonTapped:
-			state.destination = .importOlympiaWalletCoordinator(.init())
-			return .none
-
 		case .mnemonicsButtonTapped:
 			state.destination = .mnemonics(.init())
 			return .none
 
 		#if DEBUG
+		case .importFromOlympiaWalletButtonTapped:
+			state.destination = .importOlympiaWalletCoordinator(.init())
+			return .none
+
 		case .factorSourcesButtonTapped:
 			state.destination = .debugManageFactorSources(.init())
 			return .none
