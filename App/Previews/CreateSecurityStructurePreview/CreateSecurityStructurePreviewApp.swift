@@ -20,15 +20,13 @@ extension CreateSecurityStructureCoordinator: PreviewedFeature {
 struct CreateSecurityStructurePreviewApp: SwiftUI.App {
 	var body: some Scene {
 		FeaturesPreviewer<CreateSecurityStructureCoordinator>.scene {
-			Reduce(
-				$0
-					.dependency(\.date, .constant(.now))
-					.dependency(\.factorSourcesClient, .previewApp)
-					._printChanges()
-			)
-		} resultFrom: {
 			guard case let .done(secStructureConfig) = $0 else { return nil }
 			return secStructureConfig
+		} withReducer: {
+			$0
+				.dependency(\.date, .constant(.now))
+				.dependency(\.factorSourcesClient, .previewApp)
+				._printChanges()
 		}
 	}
 }
