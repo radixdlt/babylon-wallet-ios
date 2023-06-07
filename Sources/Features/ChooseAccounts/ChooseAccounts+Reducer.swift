@@ -9,6 +9,8 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		public let filteredAccounts: [AccountAddress]
 		public var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
 		public var selectedAccounts: [ChooseAccountsRow.State]?
+		public var canCreateNewAccount: Bool
+
 		@PresentationState
 		var destination: Destinations.State? = nil
 
@@ -16,12 +18,14 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 			selectionRequirement: SelectionRequirement,
 			filteredAccounts: [AccountAddress] = [],
 			availableAccounts: IdentifiedArrayOf<Profile.Network.Account> = [],
-			selectedAccounts: [ChooseAccountsRow.State]? = nil
+			selectedAccounts: [ChooseAccountsRow.State]? = nil,
+			canCreateNewAccount: Bool = true
 		) {
 			self.selectionRequirement = selectionRequirement
 			self.filteredAccounts = filteredAccounts
 			self.availableAccounts = availableAccounts
 			self.selectedAccounts = selectedAccounts
+			self.canCreateNewAccount = canCreateNewAccount
 		}
 	}
 

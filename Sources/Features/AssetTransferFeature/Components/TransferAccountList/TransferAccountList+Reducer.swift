@@ -205,7 +205,9 @@ extension TransferAccountList {
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			chooseAccounts: .init(
 				selectionRequirement: .exactly(1),
-				filteredAccounts: filteredAccounts
+				filteredAccounts: filteredAccounts,
+				// Create account is very buggy when started from AssetTransfer, disable it for now.
+				canCreateNewAccount: false
 			)
 		)
 

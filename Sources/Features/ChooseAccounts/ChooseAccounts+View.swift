@@ -7,6 +7,7 @@ extension ChooseAccounts {
 		let availableAccounts: [ChooseAccountsRow.State]
 		let selectionRequirement: SelectionRequirement
 		let selectedAccounts: [ChooseAccountsRow.State]?
+		let canCreateNewAccount: Bool
 
 		init(state: ChooseAccounts.State) {
 			let selectionRequirement = state.selectionRequirement
@@ -19,6 +20,7 @@ extension ChooseAccounts {
 			}
 			self.selectionRequirement = selectionRequirement
 			self.selectedAccounts = state.selectedAccounts
+			self.canCreateNewAccount = state.canCreateNewAccount
 		}
 	}
 
@@ -55,10 +57,12 @@ extension ChooseAccounts {
 							}
 						}
 
-						Button(L10n.DAppRequest.ChooseAccounts.createNewAccount) {
-							viewStore.send(.createAccountButtonTapped)
+						if viewStore.canCreateNewAccount {
+							Button(L10n.DAppRequest.ChooseAccounts.createNewAccount) {
+								viewStore.send(.createAccountButtonTapped)
+							}
+							.buttonStyle(.secondaryRectangular(shouldExpand: false))
 						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: false))
 					}
 				}
 				.onAppear {

@@ -57,25 +57,26 @@ extension NameAccount {
 							send: { .textFieldChanged($0) }
 						)
 
-						AppTextField(
-							placeholder: viewStore.namePlaceholder,
-							text: nameBinding,
-							hint: .info(L10n.CreateEntity.NameNewEntity.explanation)
-						)
-						#if os(iOS)
-						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
-						#endif
-						.keyboardType(.asciiCapable)
-						.autocorrectionDisabled()
-						.padding(.bottom, .medium3)
+						TextField("asd", text: nameBinding)
+//						AppTextField(
+//							placeholder: viewStore.namePlaceholder,
+//							text: nameBinding,
+//							hint: .info(L10n.CreateEntity.NameNewEntity.explanation)
+//						)
+//						#if os(iOS)
+//						.textFieldCharacterLimit(Profile.Network.Account.nameMaxLength, forText: nameBinding)
+//						#endif
+//						.keyboardType(.asciiCapable)
+//						.autocorrectionDisabled()
+//						.padding(.bottom, .medium3)
 
 						useLedgerAsFactorSource(with: viewStore)
 					}
 					.padding([.bottom, .horizontal], .medium1)
 				}
-				#if os(iOS)
-				.toolbar(.visible, for: .navigationBar)
-				#endif
+//				#if os(iOS)
+//				.toolbar(.visible, for: .navigationBar)
+//				#endif
 				.footer {
 					WithControlRequirements(
 						viewStore.sanitizedNameRequirement,
