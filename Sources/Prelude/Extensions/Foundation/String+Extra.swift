@@ -2,7 +2,7 @@ import Foundation
 
 extension StringProtocol {
 	public var isBlank: Bool {
-		trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+		trimWhitespacesAndNewLines().isEmpty
 	}
 
 	public func trimmed() -> String {

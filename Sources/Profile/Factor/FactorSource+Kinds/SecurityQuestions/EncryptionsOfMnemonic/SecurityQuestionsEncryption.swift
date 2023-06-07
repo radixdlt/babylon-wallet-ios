@@ -1,8 +1,33 @@
 import Cryptography
 import Prelude
 
+extension String {
+	func removingAll(where condition: @escaping (Character) -> Bool) -> Self {
+		var copy = self
+		copy.removeAll(where: condition)
+		return copy
+	}
+
+	func removingCharacters(from set: CharacterSet) -> Self {
+		removingAll(where: { character in
+			character.unicodeScalars.contains(where: { set.contains($0) })
+		})
+	}
+}
+
+extension CharacterSet {
+	public func characters(in collection: [Character]) -> Self {
+		.init(charactersIn: collection.map().joined(separator: ""))
+	}
+}
+
 // MARK: - CAP23
 public enum CAP23 {
+	public static let forbiddenCharacters = CharacterSet
+		.whitespacesAndNewlines
+		.union(.init(charactersIn: "'?!."))
+		.union("a")
+
 	/// `answer.lowercased().trimWhitespaceAndNewLine().utf8`
 	public static func entropyFrom(
 		freeformAnswer: NonEmptyString
@@ -10,7 +35,7 @@ public enum CAP23 {
 		let data = Data(
 			freeformAnswer.rawValue
 				.lowercased()
-				.trimWhitespacesAndNewLines()
+				.removingCharacters(from: forbiddenCharacters)
 				.utf8
 		)
 
