@@ -7,9 +7,6 @@ extension SimpleCreateSecurityStructureFlow.State {
 	}
 }
 
-/// PLACEHOLDER
-public typealias SecurityQuestionsFactorSource = OffDeviceMnemonicFactorSource
-
 // MARK: - SimpleUnnamedSecurityStructureConfig
 public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
 	let newPhoneConfirmer: SecurityQuestionsFactorSource

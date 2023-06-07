@@ -20,15 +20,7 @@ extension SimpleNewPhoneConfirmer {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: SimpleNewPhoneConfirmer")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
-			}
-		}
+		public var body: some SwiftUI.View {}
 	}
 }
 

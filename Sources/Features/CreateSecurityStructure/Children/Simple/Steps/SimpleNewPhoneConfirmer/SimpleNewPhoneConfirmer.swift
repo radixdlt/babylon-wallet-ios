@@ -1,9 +1,19 @@
+import AnswerSecurityQuestionsFeature
 import FeaturePrelude
 
 // MARK: - SimpleNewPhoneConfirmer
 public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public init() {}
+		public var answerSecurityQuestions: AnswerSecurityQuestions.State
+		public init(
+			questions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions
+		) {
+			self.answerSecurityQuestions = .init(purpose: .encrypt(questions))
+		}
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case answerSecurityQuestions(AnswerSecurityQuestions.Action)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
