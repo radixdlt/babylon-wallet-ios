@@ -19,7 +19,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 			signatures: Set<SignatureOfEntity>
 		)
 
-		case failedToSign(signingFactor: SigningFactor)
+		case failedToSign(SigningFactor)
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient

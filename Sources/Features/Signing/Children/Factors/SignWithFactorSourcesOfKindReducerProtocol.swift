@@ -8,7 +8,7 @@ protocol SignWithFactorSourcesOfKindDelegateActionProtocol: Sendable, Equatable 
 		signatures: Set<SignatureOfEntity>
 	) -> Self
 
-	static func failedToSign(signingFactor: SigningFactor) -> Self
+	static func failedToSign(_ signingFactor: SigningFactor) -> Self
 }
 
 // MARK: - SignWithFactorSourcesOfKindInternalActionProtocol
@@ -76,7 +76,7 @@ extension SignWithFactorSourcesOfKindReducerProtocol {
 					)
 					allSignatures.append(contentsOf: signatures)
 				} catch {
-					await send(.delegate(.failedToSign(signingFactor: signingFactor)))
+					await send(.delegate(.failedToSign(signingFactor)))
 					break
 				}
 			}
