@@ -191,6 +191,10 @@ public struct Signing: Sendable, FeatureReducer {
 			let .signWithLedgerFactors(.delegate(.done(factors, signatures))):
 			return handleSignatures(signingFactors: factors, signatures: signatures, &state)
 
+		case let .signWithDeviceFactors(.delegate(.failedToSign(factor))),
+		     let .signWithLedgerFactors(.delegate(.failedToSign(factor))):
+			loggerGlobal.error("Failed to sign with \(factor.factorSource.kind)")
+			return .send(.delegate(.failedToSign))
 		default:
 			return .none
 		}

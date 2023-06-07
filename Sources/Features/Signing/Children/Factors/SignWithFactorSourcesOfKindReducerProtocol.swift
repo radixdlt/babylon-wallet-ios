@@ -7,6 +7,8 @@ protocol SignWithFactorSourcesOfKindDelegateActionProtocol: Sendable, Equatable 
 		signingFactors: NonEmpty<Set<SigningFactor>>,
 		signatures: Set<SignatureOfEntity>
 	) -> Self
+
+	static func failedToSign(_ signingFactor: SigningFactor) -> Self
 }
 
 // MARK: - SignWithFactorSourcesOfKindInternalActionProtocol
@@ -66,17 +68,19 @@ extension SignWithFactorSourcesOfKindReducerProtocol {
 			for signingFactor in signingFactors {
 				await send(.internal(.signingWithFactor(signingFactor)))
 
-				let signatures = try await sign(
-					signers: signingFactor.signers,
-					factor: signingFactor.factorSource.extract(as: Factor.self),
-					state: state
-				)
-
-				allSignatures.append(contentsOf: signatures)
+				do {
+					let signatures = try await sign(
+						signers: signingFactor.signers,
+						factor: signingFactor.factorSource.extract(as: Factor.self),
+						state: state
+					)
+					allSignatures.append(contentsOf: signatures)
+				} catch {
+					await send(.delegate(.failedToSign(signingFactor)))
+					break
+				}
 			}
 			await send(.delegate(.done(signingFactors: signingFactors, signatures: allSignatures)))
-		} catch: { _, _ in
-			loggerGlobal.error("Failed to sign with factor source of kind: \(Factor.kind)")
 		}
 	}
 }
