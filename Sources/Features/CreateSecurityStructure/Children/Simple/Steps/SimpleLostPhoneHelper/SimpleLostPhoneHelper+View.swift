@@ -1,17 +1,8 @@
+import AddTrustedContactFactorSourceFeature
 import FeaturePrelude
-
-extension SimpleLostPhoneHelper.State {
-	var viewState: SimpleLostPhoneHelper.ViewState {
-		.init()
-	}
-}
 
 // MARK: - SimpleLostPhoneHelper.View
 extension SimpleLostPhoneHelper {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SimpleLostPhoneHelper>
@@ -21,13 +12,14 @@ extension SimpleLostPhoneHelper {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: SimpleLostPhoneHelper")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
-			}
+			Color.white
+				.sheet(
+					store: store.scope(
+						state: \.$addTrustedContactFactorSource,
+						action: { .child(.addTrustedContactFactorSource($0)) }
+					),
+					content: { AddTrustedContactFactorSource.View(store: $0) }
+				)
 		}
 	}
 }

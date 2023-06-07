@@ -172,6 +172,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"AnswerSecurityQuestionsFeature",
+			"AddTrustedContactFactorSourceFeature",
 		],
 		tests: .no
 	),

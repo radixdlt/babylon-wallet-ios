@@ -95,7 +95,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			state.path.append(.simpleLostPhoneHelper(.init()))
 			return .none
 
-		case let .path(.element(id, action: .simpleNewPhoneConfirmer(.delegate(.createdFactorSource(newPhoneConfirmer))))):
+		case let .path(.element(_, action: .simpleNewPhoneConfirmer(.delegate(.createdFactorSource(newPhoneConfirmer))))):
 			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
 			guard
 				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
@@ -105,6 +105,19 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 				return .none
 			}
 			simpleSetupFlow.newPhoneConfirmer = newPhoneConfirmer
+			state.path[simpleSetupFlowIndex] = .simpleSetupFlow(simpleSetupFlow)
+			return .none
+
+		case let .path(.element(_, action: .simpleLostPhoneHelper(.delegate(.createdFactorSource(lostPhoneHelper))))):
+			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
+			guard
+				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
+				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
+			else {
+				assertionFailure("Unexpectly where in wrong state..?")
+				return .none
+			}
+			simpleSetupFlow.lostPhoneHelper = lostPhoneHelper
 			state.path[simpleSetupFlowIndex] = .simpleSetupFlow(simpleSetupFlow)
 			return .none
 

@@ -1,16 +1,8 @@
 import AnswerSecurityQuestionsFeature
 import FeaturePrelude
 
-extension SimpleNewPhoneConfirmer.State {
-	var viewState: SimpleNewPhoneConfirmer.ViewState {
-		.init()
-	}
-}
-
 // MARK: - SimpleNewPhoneConfirmer.View
 extension SimpleNewPhoneConfirmer {
-	public struct ViewState: Equatable {}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SimpleNewPhoneConfirmer>
@@ -20,7 +12,7 @@ extension SimpleNewPhoneConfirmer {
 		}
 
 		public var body: some SwiftUI.View {
-			Color.red
+			Color.white
 				.sheet(
 					store: store.scope(
 						state: \.$answerSecurityQuestions,

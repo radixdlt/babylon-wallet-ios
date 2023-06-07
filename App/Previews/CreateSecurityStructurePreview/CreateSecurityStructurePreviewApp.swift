@@ -39,7 +39,7 @@ extension FactorSourcesClient {
 			$0.getFactorSources = { @Sendable in
 				let device = try! DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: .init(
-						mnemonic: Mnemonic(phrase: "", language: .english)
+						mnemonic: Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 					)
 				)
 				return NonEmpty<IdentifiedArrayOf<FactorSource>>.init(rawValue: [device.embed()])!
