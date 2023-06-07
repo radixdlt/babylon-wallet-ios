@@ -47,7 +47,8 @@ extension AccountList.Row {
 			self.tag = .init(state: state)
 
 			// Show the prompt if the account has any XRD
-			self.shouldShowSecurityPrompt = state.shouldShowSecurityPrompt
+			// FIXME: Enable back after apple review release
+			self.shouldShowSecurityPrompt = false // state.shouldShowSecurityPrompt
 
 			// Resources
 			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
