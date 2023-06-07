@@ -58,10 +58,11 @@ extension IntroductionToPersonas {
 				.foregroundColor(.app.gray1)
 				.textStyle(.sheetTitle)
 
-			Button(L10n.CreatePersona.Introduction.learnAboutPersonas) {
-				viewStore.send(.showTutorial)
-			}
-			.buttonStyle(.info)
+			//	FIXME: Uncomment and implement
+			//	Button(L10n.CreatePersona.Introduction.learnAboutPersonas) {
+			//		viewStore.send(.showTutorial)
+			//	}
+			//	.buttonStyle(.info)
 
 			Text(L10n.CreatePersona.Introduction.subtitle1)
 				.font(.app.body1Regular)

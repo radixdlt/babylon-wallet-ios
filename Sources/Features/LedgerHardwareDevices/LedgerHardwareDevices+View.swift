@@ -89,11 +89,12 @@ extension LedgerHardwareDevices {
 										.padding(.bottom, .medium1)
 								}
 
-								//							Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
-								//								viewStore.send(.whatIsALedgerButtonTapped)
-								//							}
-								//							.buttonStyle(.info)
-								//							.flushedLeft
+								//	FIXME: Uncomment and implement
+								//	Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
+								//		viewStore.send(.whatIsALedgerButtonTapped)
+								//	}
+								//	.buttonStyle(.info)
+								//	.flushedLeft
 							}
 						}
 						.multilineTextAlignment(.center)

@@ -19,10 +19,10 @@ extension TransactionReviewNetworkFee {
 							.sectionHeading
 							.textCase(.uppercase)
 
-						// TODO: Enable back
-//						TransactionReviewInfoButton {
-//							viewStore.send(.infoTapped)
-//						}
+						//	FIXME: Uncomment and implement
+						//	TransactionReviewInfoButton {
+						//	viewStore.send(.infoTapped)
+						//	}
 
 						Spacer(minLength: 0)
 
@@ -37,12 +37,12 @@ extension TransactionReviewNetworkFee {
 							.foregroundColor(.app.alert)
 					}
 
-					// FIXME: mainnet
-//					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
-//						viewStore.send(.customizeTapped)
-//					}
-//					.textStyle(.body1StandaloneLink)
-//					.foregroundColor(.app.blue2)
+					//	FIXME: Uncomment and implement
+					//	Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
+					//		viewStore.send(.customizeTapped)
+					//	}
+					//	.textStyle(.body1StandaloneLink)
+					//	.foregroundColor(.app.blue2)
 				}
 			}
 			.padding(.horizontal, .medium3)

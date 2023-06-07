@@ -18,9 +18,10 @@ extension TransactionReviewProofs {
 							.sectionHeading
 							.textCase(.uppercase)
 
-						TransactionReviewInfoButton {
-							viewStore.send(.infoTapped)
-						}
+						//	FIXME: Uncomment and implement
+						//	TransactionReviewInfoButton {
+						//		viewStore.send(.infoTapped)
+						//	}
 
 						Spacer(minLength: 0)
 					}
