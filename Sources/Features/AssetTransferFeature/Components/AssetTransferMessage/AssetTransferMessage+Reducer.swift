@@ -62,7 +62,8 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .messageKindTapped:
-			state.destination = .messageMode(.init())
+			// FIXME: Enable once the `messageMode` is implemented
+			// state.destination = .messageMode(.init())
 			return .none
 
 		case .removeMessageTapped:
