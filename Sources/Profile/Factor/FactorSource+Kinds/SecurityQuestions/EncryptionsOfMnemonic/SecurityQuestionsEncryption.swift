@@ -17,7 +17,9 @@ extension String {
 
 extension CharacterSet {
 	public static func characters(in collection: [Character]) -> Self {
-		.init(collection.map(String.init).joined(""))
+		collection.map {
+			Self(charactersIn: String($0))
+		}.reduce(CharacterSet()) { $0.union($1) }
 	}
 }
 
