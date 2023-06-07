@@ -39,7 +39,7 @@ extension FactorSourcesClient {
 		with(noop) {
 			$0.saveFactorSource = { _ in }
 			$0.getFactorSources = { @Sendable in
-				let device = try! try DeviceFactorSource.babylon(
+				let device = try! DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: .init(
 						mnemonic: Mnemonic(phrase: "", language: .english)
 					)

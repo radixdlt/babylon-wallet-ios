@@ -55,6 +55,14 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "AddTrustedContactFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AnswerSecurityQuestionsFeature",
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
