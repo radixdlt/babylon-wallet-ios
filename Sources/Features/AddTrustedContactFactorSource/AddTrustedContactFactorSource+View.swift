@@ -45,8 +45,6 @@ extension AddTrustedContactFactorSource {
 					// FIXME: Strings
 					Text("Your phone is your only access to your wallet. If you lose it, you’ll need someone you trust to lock your old phone and process a new one.")
 
-					Spacer()
-
 					addressField(with: viewStore)
 					emailField(with: viewStore)
 					nameField(with: viewStore)
@@ -55,6 +53,7 @@ extension AddTrustedContactFactorSource {
 				.footer {
 					continueButton(viewStore)
 				}
+				// FIXME: Strings
 				.navigationTitle("Add Trusted Contact")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -81,14 +80,6 @@ extension AddTrustedContactFactorSource {
 					send: { .radixAddressChanged($0) }
 				),
 				hint: nil,
-				//                focus: .on(
-				//                    true,
-				//                    binding: viewStore.binding(
-				//                        get: \.manualAccountAddressFocused,
-				//                        send: { .focusChanged($0) }
-				//                    ),
-				//                    to: $focusedField
-				//                ),
 				showClearButton: true,
 				innerAccessory: {
 					Button {
@@ -114,14 +105,6 @@ extension AddTrustedContactFactorSource {
 					send: { .emailAddressChanged($0) }
 				),
 				hint: nil,
-				//                focus: .on(
-				//                    true,
-				//                    binding: viewStore.binding(
-				//                        get: \.manualAccountAddressFocused,
-				//                        send: { .focusChanged($0) }
-				//                    ),
-				//                    to: $focusedField
-				//                ),
 				showClearButton: true
 			)
 			.autocorrectionDisabled()
@@ -140,14 +123,6 @@ extension AddTrustedContactFactorSource {
 					send: { .nameChanged($0) }
 				),
 				hint: nil
-				//                focus: .on(
-				//                    true,
-				//                    binding: viewStore.binding(
-				//                        get: \.manualAccountAddressFocused,
-				//                        send: { .focusChanged($0) }
-				//                    ),
-				//                    to: $focusedField
-				//                ),
 			)
 			.autocorrectionDisabled()
 			.keyboardType(.alphabet)
