@@ -1,3 +1,4 @@
+import GatewaysClient
 import Prelude
 import QRGeneratorClient
 import Resources
@@ -11,9 +12,10 @@ public struct AddressView: View {
 	private let format: AddressFormat
 	private let action: Action
 
+	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
-	@Dependency(\.openURL) var openURL
 
 	@State private var qrCodeContent: AccountAddress? = nil
 
@@ -116,8 +118,15 @@ extension AddressView {
 	}
 
 	private func viewOnRadixDashboard() {
-		guard let addressURL else { return }
-		Task { await openURL(addressURL) }
+		guard let path else { return }
+		Task { [openURL, gatewaysClient] in
+			let currentNetwork = await gatewaysClient.getCurrentGateway().network
+			await openURL(
+				Radix.Dashboard.dashboard(forNetwork: currentNetwork)
+					.url
+					.appending(path: path)
+			)
+		}
 	}
 
 	private func showQR(for accountAddress: AccountAddress) {
@@ -126,11 +135,6 @@ extension AddressView {
 
 	private var path: String? {
 		identifiable.addressPrefix + "/" + identifiable.address
-	}
-
-	private var addressURL: URL? {
-		guard let path else { return nil }
-		return Radix.Dashboard.rcnet.url.appending(path: path)
 	}
 }
 
