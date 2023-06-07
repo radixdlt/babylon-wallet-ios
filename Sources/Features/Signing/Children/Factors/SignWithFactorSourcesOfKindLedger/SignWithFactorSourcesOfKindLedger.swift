@@ -20,6 +20,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
 		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<SignatureOfEntity>)
+		case failedToSign(signingFactor: SigningFactor)
 	}
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient

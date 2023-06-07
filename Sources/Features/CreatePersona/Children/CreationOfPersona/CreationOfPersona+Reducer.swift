@@ -101,6 +101,8 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to create persona, error: \(error)")
 				await send(.delegate(.createPersonaFailed))
 			}
+		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
+			return .send(.delegate(.createPersonaFailed))
 
 		default: return .none
 		}
