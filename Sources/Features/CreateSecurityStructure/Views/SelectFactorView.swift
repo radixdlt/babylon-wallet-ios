@@ -34,12 +34,12 @@ public struct SelectFactorView: SwiftUI.View {
 					// FIXME: Strings
 					Text(factorSet?.selectedFactorDisplay ?? "None set")
 						.font(.app.body1Header)
+						.foregroundColor(factorSet == nil ? .app.gray3 : .app.gray1)
 
 					Spacer(minLength: 0)
 
 					Image(asset: AssetResource.chevronRight)
 				}
-				.foregroundColor(.app.gray3)
 			}
 			.cornerRadius(.medium2)
 			.frame(maxWidth: .infinity)

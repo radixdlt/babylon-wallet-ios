@@ -59,6 +59,7 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"FactorSourcesClient",
+			"ScanQRFeature",
 		],
 		tests: .no
 	),
