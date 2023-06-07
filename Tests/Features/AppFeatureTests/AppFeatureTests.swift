@@ -46,8 +46,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// THEN: navigate to main
-		await store.send(.child(.splash(.delegate(.loadProfileOutcome(.existingProfile)))))
-		await store.receive(.internal(.toMain(isAccountRecoveryNeeded: accountRecoveryNeeded))) {
+		await store.send(.child(.splash(.delegate(.completed(.existingProfile, accountRecoveryNeeded: accountRecoveryNeeded))))) {
 			$0.root = .main(.init(home: .init(accountRecoveryIsNeeded: accountRecoveryNeeded)))
 		}
 
@@ -68,7 +67,7 @@ final class AppFeatureTests: TestCase {
 		let viewTask = await store.send(.view(.task))
 
 		// then
-		await store.send(.child(.splash(.delegate(.loadProfileOutcome(.newUser))))) {
+		await store.send(.child(.splash(.delegate(.completed(.newUser, accountRecoveryNeeded: false))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
@@ -98,7 +97,7 @@ final class AppFeatureTests: TestCase {
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: failure)
 
 		// then
-		await store.send(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
+		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
@@ -139,13 +138,14 @@ final class AppFeatureTests: TestCase {
 		let viewTask = await store.send(.view(.task))
 
 		await store.send(.child(.splash(.delegate(
-			.loadProfileOutcome(
+			.completed(
 				.usersExistingProfileCouldNotBeLoaded(
 					failure: .failedToCreateProfileFromSnapshot(
 						// 🕑 WHEN invalid profile
 						Profile.FailedToCreateProfileFromSnapshot(version: 0, error: NoopError())
 					)
-				)
+				),
+				accountRecoveryNeeded: false
 			)
 		))))
 
@@ -187,7 +187,7 @@ final class AppFeatureTests: TestCase {
 
 		let outcome = LoadProfileOutcome.usersExistingProfileCouldNotBeLoaded(failure: .profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 
-		await store.send(.child(.splash(.delegate(.loadProfileOutcome(outcome))))) {
+		await store.send(.child(.splash(.delegate(.completed(outcome, accountRecoveryNeeded: false))))) {
 			$0.alert = .incompatibleProfileErrorAlert(
 				.init(
 					title: { TextState("Wallet Data is Incompatible") },
