@@ -200,11 +200,12 @@ extension PersonaDetails.View {
 					}
 					.padding(.horizontal, .medium3)
 
-					Button(L10n.AuthorizedDapps.PersonaDetails.editAccountSharing) {
-						viewStore.send(.editAccountSharingTapped)
-					}
-					.buttonStyle(.secondaryRectangular)
-					.padding(.vertical, .large3)
+					//	FIXME: Uncomment and enable the functionality
+					//	Button(L10n.AuthorizedDapps.PersonaDetails.editAccountSharing) {
+					//		viewStore.send(.editAccountSharingTapped)
+					//	}
+					//	.buttonStyle(.secondaryRectangular)
+					//	.padding(.vertical, .large3)
 				}
 			}
 		}
