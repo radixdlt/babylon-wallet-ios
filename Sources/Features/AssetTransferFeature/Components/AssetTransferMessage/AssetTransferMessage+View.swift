@@ -26,18 +26,18 @@ extension AssetTransferMessage.View {
 
 				VStack(alignment: .leading, spacing: 0) {
 					HStack {
+						// 	FIXME: Uncomment and implement once messageKind is implemented
+						//	Button {
+						//		viewStore.send(.messageKindTapped)
+						//	} label: {
+						//		HStack {
+						//			Text(L10n.Common.public)
+						//			Image(asset: AssetResource.chevronDown)
+						//		}
+						//	}
 						Text(L10n.Common.public)
-						// FIXME: Enable once messageKind is implemented
-//						Button {
-//							viewStore.send(.messageKindTapped)
-//						} label: {
-//							HStack {
-						//                                                                Text(L10n.Common.public)
-//								Image(asset: AssetResource.chevronDown)
-//							}
-//						}
-//						.textStyle(.body1HighImportance)
-//						.foregroundColor(.app.gray1)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray1)
 
 						Spacer()
 

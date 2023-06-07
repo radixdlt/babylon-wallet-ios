@@ -30,12 +30,13 @@ extension TransactionReviewGuarantees {
 							.multilineTextAlignment(.center)
 							.padding(.vertical, .medium3)
 
-						Button(L10n.TransactionReview.Guarantees.howDoGuaranteesWork) {
-							ViewStore(store).send(.view(.infoTapped))
-						}
-						.buttonStyle(.info)
-						.padding(.horizontal, .large2)
-						.padding(.bottom, .medium1)
+						//	FIXME: Uncomment and implement
+						//	Button(L10n.TransactionReview.Guarantees.howDoGuaranteesWork) {
+						//		ViewStore(store).send(.view(.infoTapped))
+						//	}
+						//	.buttonStyle(.info)
+						//	.padding(.horizontal, .large2)
+						//	.padding(.bottom, .medium1)
 
 						Text(L10n.TransactionReview.Guarantees.subtitle)
 							.textStyle(.body1Regular)
