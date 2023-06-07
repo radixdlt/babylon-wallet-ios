@@ -4,7 +4,9 @@ import FeaturePrelude
 // MARK: - SimpleNewPhoneConfirmer
 public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var answerSecurityQuestions: AnswerSecurityQuestions.State
+		@PresentationState
+		public var answerSecurityQuestions: AnswerSecurityQuestions.State?
+
 		public init(
 			questions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions
 		) {
@@ -13,18 +15,41 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case answerSecurityQuestions(AnswerSecurityQuestions.Action)
+		case answerSecurityQuestions(PresentationAction<AnswerSecurityQuestions.Action>)
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case appeared
+	public enum DelegateAction: Sendable, Equatable {
+		case createdFactorSource(SecurityQuestionsFactorSource)
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$answerSecurityQuestions, action: /Action.child .. ChildAction.answerSecurityQuestions) {
+				AnswerSecurityQuestions()
+			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .answerSecurityQuestions(.presented(.delegate(.done(.success(.encrypted(factorSource)))))):
+			return .send(.delegate(.createdFactorSource(factorSource)))
+
+		case .answerSecurityQuestions(.presented(.delegate(.done(.success(.decrypted))))):
+			let errorMessage = "Unexpecte delegate action, expected to have created a factor source, not decrypt one."
+			loggerGlobal.error(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
+			return .none
+
+		case let .answerSecurityQuestions(.presented(.delegate(.done(.failure(error))))):
+			let errorMessage = "Failed to create factor source from answers, error: \(error)"
+			loggerGlobal.error(.init(stringLiteral: errorMessage))
+			errorQueue.schedule(error)
+			return .none
+
+		default:
 			return .none
 		}
 	}

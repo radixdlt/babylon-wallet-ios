@@ -1,3 +1,4 @@
+import AnswerSecurityQuestionsFeature
 import FeaturePrelude
 
 extension SimpleNewPhoneConfirmer.State {
@@ -8,9 +9,7 @@ extension SimpleNewPhoneConfirmer.State {
 
 // MARK: - SimpleNewPhoneConfirmer.View
 extension SimpleNewPhoneConfirmer {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
+	public struct ViewState: Equatable {}
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -20,7 +19,16 @@ extension SimpleNewPhoneConfirmer {
 			self.store = store
 		}
 
-		public var body: some SwiftUI.View {}
+		public var body: some SwiftUI.View {
+			Color.white
+				.sheet(
+					store: store.scope(
+						state: \.$answerSecurityQuestions,
+						action: { .child(.answerSecurityQuestions($0)) }
+					),
+					content: { AnswerSecurityQuestions.View(store: $0) }
+				)
+		}
 	}
 }
 
