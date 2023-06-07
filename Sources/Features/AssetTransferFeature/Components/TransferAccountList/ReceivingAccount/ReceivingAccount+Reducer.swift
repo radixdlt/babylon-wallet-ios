@@ -14,11 +14,6 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		public var assets: IdentifiedArrayOf<ResourceAsset.State>
 		public var canBeRemoved: Bool
 
-		public struct Asset: Sendable, Hashable, Identifiable {
-			public typealias ID = UUID
-			public let id = ID()
-		}
-
 		public init(
 			account: Account?,
 			assets: IdentifiedArrayOf<ResourceAsset.State>,
