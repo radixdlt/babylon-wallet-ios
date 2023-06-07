@@ -213,7 +213,7 @@ public struct App: Sendable, FeatureReducer {
 
 	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
 		.task {
-			// When coming from onboarding flow, it is allowed for the recovery check to fail
+			// When coming from onboarding flow, recovery check is allowed to fail
 			let isAccountRecoveryNeeded = await (try? deviceFactorSourceClient.isAccountRecoveryNeeded()) ?? true
 			return .internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded))
 		}
