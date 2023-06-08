@@ -60,8 +60,9 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			return .send(.delegate(.amountChanged))
 
 		case .maxAmountTapped:
+			let fee: BigDecimal = .temporaryStandardFee
 			let sumOfOthers = state.totalTransferSum - (state.transferAmount ?? .zero)
-			let remainingAmount = max(state.balance - sumOfOthers, 0)
+			let remainingAmount = max(state.balance - sumOfOthers - fee, 0)
 			state.transferAmount = remainingAmount
 			state.transferAmountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
 			return .send(.delegate(.amountChanged))
