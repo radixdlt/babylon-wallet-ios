@@ -319,7 +319,7 @@ private extension GatewayAPI.StateNonFungibleDetailsResponseItem {
 		guard let dictionary = mutableData.rawJson.value as? [String: Any] else { return nil }
 		guard let elements = dictionary["elements"] as? [[String: Any]] else { return nil }
 		let values = elements.filter { $0["type"] as? String == "String" }.compactMap { $0["value"] as? String }
-		let extensions = ["jpg", "jpeg", "png", "pdf", "svg"]
+		let extensions = ["jpg", "jpeg", "png", "pdf", "svg", "gif"]
 		for value in values {
 			for ext in extensions {
 				if value.lowercased().hasSuffix(ext) {

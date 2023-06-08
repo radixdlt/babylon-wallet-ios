@@ -39,17 +39,27 @@ extension GeneralSettings {
 						.onAppear { viewStore.send(.appeared) }
 				}
 			}
+			.confirmationDialog(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /GeneralSettings.Destinations.State.deleteProfileConfirmationDialog,
+				action: GeneralSettings.Destinations.Action.deleteProfileConfirmationDialog
+			)
 		}
 
 		private func coreView(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .zero) {
+			VStack(spacing: .zero) {
 				isDeveloperModeEnabled(with: viewStore)
+
 				if !RuntimeInfo.isAppStoreBuild {
 					exportLogs(with: viewStore)
 				}
+
 				if viewStore.hasLedgerHardwareWalletFactorSources {
 					isUsingVerboseLedgerMode(with: viewStore)
 				}
+
+				resetWallet(with: viewStore)
+
 				Separator()
 			}
 			.padding(.medium3)
@@ -103,6 +113,29 @@ extension GeneralSettings {
 				)
 			) { logFilePath in
 				ShareView(items: [logFilePath])
+			}
+			.frame(height: .largeButtonHeight)
+		}
+
+		private func resetWallet(with viewStore: ViewStoreOf<GeneralSettings>) -> some SwiftUI.View {
+			HStack {
+				VStack(alignment: .leading, spacing: 0) {
+					Text(L10n.GeneralSettings.ResetWallet.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1HighImportance)
+
+					Text(L10n.GeneralSettings.ResetWallet.subtitle)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.fixedSize()
+				}
+
+				Spacer(minLength: 0)
+
+				Button(L10n.GeneralSettings.ResetWallet.buttonTitle) {
+					viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+				}
+				.buttonStyle(.secondaryRectangular(isDestructive: true))
 			}
 			.frame(height: .largeButtonHeight)
 		}
