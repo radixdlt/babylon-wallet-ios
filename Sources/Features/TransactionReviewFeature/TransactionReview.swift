@@ -41,7 +41,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: String?,
-			feeToAdd: BigDecimal = 10, // fix me use estimate from `analyze`
+			feeToAdd: BigDecimal = .temporaryStandardFee, // fix me use estimate from `analyze`
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {

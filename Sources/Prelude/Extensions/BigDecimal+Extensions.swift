@@ -2,6 +2,11 @@ import BigDecimal
 import Foundation
 
 extension BigDecimal {
+	// FIXME: This should not be used once we can get the actual fees
+	public static let temporaryStandardFee: BigDecimal = 10
+}
+
+extension BigDecimal {
 	public func format(
 		fiatCurrency: FiatCurrency,
 		locale: Locale = .autoupdatingCurrent
