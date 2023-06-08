@@ -1,11 +1,10 @@
 import Cryptography
 @testable import EngineToolkit
-import EngineToolkitModels
 import TestingPrelude
 
 // MARK: - ManifestToStringTests
 final class ManifestToStringTests: TestCase {
-	private let engineToolkit = EngineToolkit()
+	private let engineToolkit = RadixEngine.instance
 
 	override func setUp() {
 		debugPrint = false

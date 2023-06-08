@@ -55,7 +55,7 @@ private func _testTransaction(
 	line: UInt = #line
 ) throws -> TestTransaction {
 	// The engine toolkit to use to create this notarized transaction
-	let sut = EngineToolkit()
+	let sut = RadixEngine.instance
 
 	let transactionManifest = TransactionManifest(instructions: .string(complexManifestString))
 	let transactionHeader = try TransactionHeader(

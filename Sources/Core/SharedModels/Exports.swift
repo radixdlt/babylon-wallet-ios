@@ -1,3 +1,3 @@
-@_exported import EngineToolkitModels
+@_exported import EngineToolkit
 @_exported import Profile
 @_exported import RadixConnectModels

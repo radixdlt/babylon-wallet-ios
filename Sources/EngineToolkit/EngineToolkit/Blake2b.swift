@@ -1,15 +1,12 @@
-import EngineToolkitModels
 import Foundation
 
 // MARK: - Blake2b
 public struct Blake2b {
-	private static let engineToolkit = EngineToolkit()
-
 	private init() {}
 
 	public static func hash(data: Data) throws -> Data {
 		let request = HashRequest(payload: data.hex)
-		let response = engineToolkit.hashRequest(request: request)
+		let response = RadixEngine.instance.hashRequest(request: request)
 		let hex = try response.get().value
 		return try Data(hex: hex)
 	}
@@ -17,7 +14,7 @@ public struct Blake2b {
 	#if DEBUG
 	fileprivate static func hash(hex: String) throws -> String {
 		let request = HashRequest(payload: hex)
-		let response = engineToolkit.hashRequest(request: request)
+		let response = RadixEngine.instance.hashRequest(request: request)
 		return try response.get().value
 	}
 	#endif

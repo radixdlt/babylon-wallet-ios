@@ -100,7 +100,7 @@ extension DeviceFactorSource {
 	}
 }
 
-import EngineToolkitModels
+import EngineToolkit
 extension DeviceFactorSource {
 	public func nextDerivationIndex(for entityKind: EntityKind, networkID: NetworkID) throws -> Profile.Network.NextDerivationIndices.Index {
 		guard let nextDerivationIndicesPerNetwork else {

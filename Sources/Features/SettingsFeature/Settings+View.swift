@@ -36,7 +36,7 @@ extension AppSettings {
 			#if DEBUG
 			let retCommitHash: String = {
 				do {
-					return try EngineToolkit().information().get().lastCommitHash
+					return try RadixEngine.instance.information().get().lastCommitHash
 				} catch {
 					return "Unknown"
 				}

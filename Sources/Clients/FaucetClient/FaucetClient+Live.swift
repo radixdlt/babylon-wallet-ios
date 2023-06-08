@@ -2,7 +2,6 @@ import ClientPrelude
 import Cryptography
 import DeviceFactorSourceClient
 import EngineToolkitClient
-import EngineToolkitModels
 import GatewayAPI
 import GatewaysClient
 import SubmitTransactionClient

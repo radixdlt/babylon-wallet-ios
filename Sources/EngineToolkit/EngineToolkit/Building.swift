@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 extension TransactionManifest {
@@ -67,7 +67,7 @@ extension TransactionIntent {
 	}
 
 	public func sign(withMany privateKeys: [Engine.PrivateKey]) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
-		let compiledTransactionIntentResponse = try EngineToolkit()
+		let compiledTransactionIntentResponse = try RadixEngine.instance
 			.compileTransactionIntentRequest(
 				request: self
 			).get()
@@ -106,7 +106,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	}
 
 	public func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
-		let compiledSignedTransactionIntent = try EngineToolkit().compileSignedTransactionIntentRequest(
+		let compiledSignedTransactionIntent = try RadixEngine.instance.compileSignedTransactionIntentRequest(
 			request: self.signedTransactionIntent
 		).get().compiledIntent
 
@@ -137,7 +137,7 @@ extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	}
 
 	public func notarize(_ notaryPrivateKey: Engine.PrivateKey) throws -> NotarizedSignedTransctionContext {
-		let compileSignedTransactionIntentResponse = try EngineToolkit().compileSignedTransactionIntentRequest(
+		let compileSignedTransactionIntentResponse = try RadixEngine.instance.compileSignedTransactionIntentRequest(
 			request: signedTransactionIntent
 		).get()
 

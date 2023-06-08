@@ -1,5 +1,5 @@
 import ClientPrelude
-import EngineToolkitModels
+import EngineToolkit
 import GatewayAPI
 
 // MARK: - SubmitTransactionFailure

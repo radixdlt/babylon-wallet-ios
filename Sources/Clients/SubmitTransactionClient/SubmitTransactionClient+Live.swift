@@ -1,7 +1,7 @@
 import AccountPortfoliosClient
 import ClientPrelude
+import EngineToolkit
 import EngineToolkitClient
-import EngineToolkitModels
 import GatewayAPI
 import TransactionClient
 

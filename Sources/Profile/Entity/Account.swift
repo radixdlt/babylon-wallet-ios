@@ -1,6 +1,5 @@
 import Cryptography
 import EngineToolkit
-import EngineToolkitModels
 import Prelude
 
 // MARK: - EntityExtraProperties
@@ -117,7 +116,7 @@ extension Profile.Network.Account {
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
 		_ = try factorInstance.derivationPath.asAccountPath()
-		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
+		let response = try RadixEngine.instance.deriveVirtualAccountAddressRequest(
 			request: .init(
 				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID

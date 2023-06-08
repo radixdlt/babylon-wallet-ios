@@ -23,7 +23,7 @@ final class TransactionBuildingTests: TestCase {
 			intentSignatures: txContext.notarizedTransaction.signedIntent.intentSignatures
 		)
 
-		let compiledSignedTransactionIntent = try EngineToolkit().compileSignedTransactionIntentRequest(
+		let compiledSignedTransactionIntent = try RadixEngine.instance.compileSignedTransactionIntentRequest(
 			request: signedTransactionIntent
 		).get().compiledIntent
 

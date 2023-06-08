@@ -25,11 +25,11 @@ func XCTAssertThrowsFailure<Success, Failure: Swift.Error & Equatable>(
 }
 
 func XCTAssertThrowsEngineError<Success>(
-	_ expression: @autoclosure () -> Result<Success, EngineToolkit.Error>,
+	_ expression: @autoclosure () -> Result<Success, RadixEngine.Error>,
 	_ message: @autoclosure () -> String = "",
 	file: StaticString = #filePath,
 	line: UInt = #line,
-	_ errorHandler: (_ failure: EngineToolkit.Error) -> Void = { _ in }
+	_ errorHandler: (_ failure: RadixEngine.Error) -> Void = { _ in }
 ) {
 	XCTAssertThrowsFailure(
 		expression(),
@@ -41,8 +41,8 @@ func XCTAssertThrowsEngineError<Success>(
 }
 
 func XCTAssert<Success>(
-	_ expression: @autoclosure () -> Result<Success, EngineToolkit.Error>,
-	throwsSpecificError specificError: EngineToolkit.Error,
+	_ expression: @autoclosure () -> Result<Success, RadixEngine.Error>,
+	throwsSpecificError specificError: RadixEngine.Error,
 	_ message: @autoclosure () -> String = "",
 	file: StaticString = #filePath,
 	line: UInt = #line
