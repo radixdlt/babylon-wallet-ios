@@ -724,6 +724,7 @@ package.addModules([
 		dependencies: [
 			"EngineToolkitClient",
 			"GatewayAPI",
+			"TransactionClient",
 		],
 		tests: .no
 	),
