@@ -63,11 +63,6 @@ extension AppSettings.View {
 				.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
 				.navigationDestinations(with: destinationStore)
-				.confirmationDialog(
-					store: destinationStore,
-					state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
-					action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
-				)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}
@@ -257,12 +252,6 @@ extension AppSettings.View {
 				}
 				.padding(.bottom, .large3)
 				VStack(spacing: .zero) {
-					Button(L10n.Settings.deleteWalletData) {
-						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(isDestructive: true))
-					.padding(.bottom, .large1)
-
 					Text(viewStore.appVersion)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)

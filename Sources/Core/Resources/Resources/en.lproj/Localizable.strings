@@ -563,3 +563,12 @@ Install the Connector extension, open it to see the linking QR code, and tap con
 "displayMnemonics_labelDateOlympia" = "Imported on";
 "displayMnemonics_labelDate" = "Generated on";
 "displayMnemonics_seedPhrases" = "Seed Phrases";
+
+"generalSettings_resetWallet_title" = "Reset Wallet";
+"generalSettings_resetWallet_subtitle" = "Clear all data in this Wallet";
+"generalSettings_resetWallet_buttonTitle" = "Reset";
+
+"generalSettings_resetWalletDialog_title" = "Reset Wallet?";
+"generalSettings_resetWalletDialog_resetButtonTitle" = "Reset Wallet";
+"generalSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle" = "Reset and Delete iCloud Backup";
+"generalSettings_resetWalletDialog_message" = "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.";

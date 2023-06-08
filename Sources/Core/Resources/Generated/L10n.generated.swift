@@ -959,6 +959,24 @@ public enum L10n {
       /// Sync Wallet Data to iCloud
       public static let title = L10n.tr("Localizable", "generalSettings_profileSync_title", fallback: "Sync Wallet Data to iCloud")
     }
+    public enum ResetWallet {
+      /// Reset
+      public static let buttonTitle = L10n.tr("Localizable", "generalSettings_resetWallet_buttonTitle", fallback: "Reset")
+      /// Clear all data in this Wallet
+      public static let subtitle = L10n.tr("Localizable", "generalSettings_resetWallet_subtitle", fallback: "Clear all data in this Wallet")
+      /// Reset Wallet
+      public static let title = L10n.tr("Localizable", "generalSettings_resetWallet_title", fallback: "Reset Wallet")
+    }
+    public enum ResetWalletDialog {
+      /// WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.
+      public static let message = L10n.tr("Localizable", "generalSettings_resetWalletDialog_message", fallback: "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.")
+      /// Reset and Delete iCloud Backup
+      public static let resetAndDeleteBackupButtonTitle = L10n.tr("Localizable", "generalSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle", fallback: "Reset and Delete iCloud Backup")
+      /// Reset Wallet
+      public static let resetButtonTitle = L10n.tr("Localizable", "generalSettings_resetWalletDialog_resetButtonTitle", fallback: "Reset Wallet")
+      /// Reset Wallet?
+      public static let title = L10n.tr("Localizable", "generalSettings_resetWalletDialog_title", fallback: "Reset Wallet?")
+    }
     public enum VerboseLedgerMode {
       /// When signing with your Ledger hardware wallet, should all instructions be displayed?
       public static let subtitle = L10n.tr("Localizable", "generalSettings_verboseLedgerMode_subtitle", fallback: "When signing with your Ledger hardware wallet, should all instructions be displayed?")
