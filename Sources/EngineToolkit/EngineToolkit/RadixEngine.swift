@@ -202,7 +202,7 @@ extension RadixEngine {
 	) -> Result<AnalyzeManifestWithPreviewContextResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: analyze_manifest_with_preview_context
+			function: analyze_transaction_execution
 		)
 	}
 
@@ -211,7 +211,7 @@ extension RadixEngine {
 	) -> Result<AnalyzeManifestResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: analyze_manifest
+			function: extract_addresses_from_manifest
 		)
 	}
 }
