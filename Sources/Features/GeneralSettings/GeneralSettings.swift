@@ -46,7 +46,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 
 	// MARK: Destinations
 
-	public struct Destinations: Sendable {
+	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case deleteProfileConfirmationDialog(ConfirmationDialogState<Action.DeleteProfileConfirmationDialogAction>)
 		}
@@ -60,6 +60,10 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 				case cancel
 			}
 		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			EmptyReducer()
+		}
 	}
 
 	// MARK: Reducer
@@ -70,6 +74,13 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
@@ -141,10 +152,6 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			case .cancel:
 				return .none
 			}
-
-		case .destination(.dismiss):
-			state.destination = nil
-			return .none
 
 		case .destination:
 			return .none
