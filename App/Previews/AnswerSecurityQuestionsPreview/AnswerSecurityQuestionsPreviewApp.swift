@@ -1,8 +1,8 @@
 import AnswerSecurityQuestionsFeature
 import FeaturesPreviewerFeature
 
-// MARK: - AnswerSecurityQuestions.State + EmptyInitializable
-extension AnswerSecurityQuestions.State: EmptyInitializable {
+// MARK: - AnswerSecurityQuestionsCoordinator.State + EmptyInitializable
+extension AnswerSecurityQuestionsCoordinator.State: EmptyInitializable {
 	public init() {
 		self.init(
 			//						purpose: .encrypt(SecurityQuestionsFactorSource.defaultQuestions)
@@ -11,18 +11,18 @@ extension AnswerSecurityQuestions.State: EmptyInitializable {
 	}
 }
 
-// MARK: - AnswerSecurityQuestions.View + FeatureViewProtocol
-extension AnswerSecurityQuestions.View: FeatureViewProtocol {
-	public typealias Feature = AnswerSecurityQuestions
+// MARK: - AnswerSecurityQuestionsCoordinator.View + FeatureViewProtocol
+extension AnswerSecurityQuestionsCoordinator.View: FeatureViewProtocol {
+	public typealias Feature = AnswerSecurityQuestionsCoordinator
 }
 
-// MARK: - AnswerSecurityQuestions + PreviewedFeature
-extension AnswerSecurityQuestions: PreviewedFeature {
-	public typealias ResultFromFeature = AnswerSecurityQuestions.State.Purpose.AnswersResult
+// MARK: - AnswerSecurityQuestionsCoordinator + PreviewedFeature
+extension AnswerSecurityQuestionsCoordinator: PreviewedFeature {
+	public typealias ResultFromFeature = AnswerSecurityQuestionsCoordinator.State.Purpose.AnswersResult
 }
 
-// MARK: - AnswerSecurityQuestions.State.Purpose.AnswersResult + Encodable
-extension AnswerSecurityQuestions.State.Purpose.AnswersResult: Encodable {
+// MARK: - AnswerSecurityQuestionsCoordinator.State.Purpose.AnswersResult + Encodable
+extension AnswerSecurityQuestionsCoordinator.State.Purpose.AnswersResult: Encodable {
 	public func encode(to encoder: Encoder) throws {
 		switch self {
 		case let .encrypted(factor):
@@ -37,7 +37,7 @@ extension AnswerSecurityQuestions.State.Purpose.AnswersResult: Encodable {
 @main
 struct AnswerSecurityQuestionsApp_: SwiftUI.App {
 	var body: some Scene {
-		FeaturesPreviewer<AnswerSecurityQuestions>.scene {
+		FeaturesPreviewer<AnswerSecurityQuestionsCoordinator>.scene {
 			guard case let .done(taskResult) = $0 else { return nil }
 			return taskResult
 		}

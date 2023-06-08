@@ -1,10 +1,35 @@
+import AddTrustedContactFactorSourceFeature
+import AnswerSecurityQuestionsFeature
 import FactorSourcesClient
 import FeaturePrelude
 import Profile
 
+extension SecurityQuestionsFactorSource {
+	public static let defaultQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = {
+		.init(
+			rawValue: .init(
+				uncheckedUniqueElements:
+				[
+					"Name of Radix DLT's Founder?",
+					"Name of Radix DLT's CEO?",
+					"Name of Radix DLT's CTO?",
+					"Common first name amongst Radix DLT employees from Sweden?",
+				].enumerated().map {
+					SecurityQuestion(
+						id: .init(UInt($0.offset)),
+						question: .init(rawValue: $0.element)!
+					)
+				}
+			))!
+	}()
+}
+
 // MARK: - CreateSecurityStructureCoordinator
 public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		@PresentationState
+		public var modalDestinations: ModalDestinations.State?
+
 		var root: Path.State?
 		var path: StackState<Path.State> = []
 
@@ -19,9 +44,6 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.State)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.State)
 
-			case simpleLostPhoneHelper(SimpleLostPhoneHelper.State)
-			case simpleNewPhoneConfirmer(SimpleNewPhoneConfirmer.State)
-
 			var simpleSetupFlow: SimpleCreateSecurityStructureFlow.State? {
 				guard case let .simpleSetupFlow(simpleSetupFlow) = self else { return nil }
 				return simpleSetupFlow
@@ -32,9 +54,6 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case start(CreateSecurityStructureStart.Action)
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.Action)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.Action)
-
-			case simpleLostPhoneHelper(SimpleLostPhoneHelper.Action)
-			case simpleNewPhoneConfirmer(SimpleNewPhoneConfirmer.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -47,18 +66,35 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.advancedSetupFlow, action: /Action.advancedSetupFlow) {
 				AdvancedCreateSecurityStructureFlow()
 			}
-			Scope(state: /State.simpleNewPhoneConfirmer, action: /Action.simpleNewPhoneConfirmer) {
-				SimpleNewPhoneConfirmer()
-			}
-			Scope(state: /State.simpleLostPhoneHelper, action: /Action.simpleLostPhoneHelper) {
-				SimpleLostPhoneHelper()
-			}
 		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackAction<Path.Action>)
+
+		case modalDestinations(PresentationAction<ModalDestinations.Action>)
+	}
+
+	public struct ModalDestinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.State)
+			case simpleLostPhoneHelper(AddTrustedContactFactorSource.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.Action)
+			case simpleLostPhoneHelper(AddTrustedContactFactorSource.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.simpleNewPhoneConfirmer, action: /Action.simpleNewPhoneConfirmer) {
+				AnswerSecurityQuestionsCoordinator()
+			}
+			Scope(state: /State.simpleLostPhoneHelper, action: /Action.simpleLostPhoneHelper) {
+				AddTrustedContactFactorSource()
+			}
+		}
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
@@ -76,6 +112,9 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
+			.ifLet(\.$modalDestinations, action: /Action.child .. ChildAction.modalDestinations) {
+				ModalDestinations()
+			}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
@@ -88,37 +127,11 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .path(.element(_, action: .simpleSetupFlow(.delegate(.selectNewPhoneConfirmer)))):
-			state.path.append(.simpleNewPhoneConfirmer(.init()))
+			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: .encrypt(SecurityQuestionsFactorSource.defaultQuestions)))
 			return .none
 
 		case .path(.element(_, action: .simpleSetupFlow(.delegate(.selectLostPhoneHelper)))):
-			state.path.append(.simpleLostPhoneHelper(.init()))
-			return .none
-
-		case let .path(.element(_, action: .simpleNewPhoneConfirmer(.delegate(.createdFactorSource(newPhoneConfirmer))))):
-			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
-			guard
-				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
-				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
-			else {
-				assertionFailure("Unexpectly where in wrong state..?")
-				return .none
-			}
-			simpleSetupFlow.newPhoneConfirmer = newPhoneConfirmer
-			state.path[simpleSetupFlowIndex] = .simpleSetupFlow(simpleSetupFlow)
-			return .none
-
-		case let .path(.element(_, action: .simpleLostPhoneHelper(.delegate(.createdFactorSource(lostPhoneHelper))))):
-			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
-			guard
-				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
-				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
-			else {
-				assertionFailure("Unexpectly where in wrong state..?")
-				return .none
-			}
-			simpleSetupFlow.lostPhoneHelper = lostPhoneHelper
-			state.path[simpleSetupFlowIndex] = .simpleSetupFlow(simpleSetupFlow)
+			state.modalDestinations = .simpleLostPhoneHelper(.init())
 			return .none
 
 		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.createSecurityStructure(simpleFactorConfig))))):
@@ -140,6 +153,49 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 				}
 				return .delegate(.done(taskResult))
 			}
+
+		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.success(lostPhoneHelper)))))):
+			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
+			guard
+				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
+				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
+			else {
+				assertionFailure("Unexpectly where in wrong state..?")
+				return .none
+			}
+			simpleSetupFlow.lostPhoneHelper = lostPhoneHelper
+			state.path[simpleSetupFlowIndex] = .simpleSetupFlow(simpleSetupFlow)
+			state.modalDestinations = nil
+			return .none
+
+		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.failure(error)))))):
+			state.modalDestinations = nil
+			loggerGlobal.error("Failed to create lost phone helper, error: \(error)")
+			return .none
+
+		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.encrypted(newPhoneConfirmer))))))):
+			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
+			guard
+				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
+				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
+			else {
+				assertionFailure("Unexpectly where in wrong state..?")
+				return .none
+			}
+			simpleSetupFlow.newPhoneConfirmer = newPhoneConfirmer
+			state.path[simpleSetupFlowIndex] = .simpleSetupFlow(simpleSetupFlow)
+			state.modalDestinations = nil
+			return .none
+
+		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.decrypted)))))):
+			state.modalDestinations = nil
+			assertionFailure("Expected to encrypt, not decrypt.")
+			return .none
+
+		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.failure(error)))))):
+			state.modalDestinations = nil
+			loggerGlobal.error("Failed to create new phone confirmer, error: \(error)")
+			return .none
 
 		default: return .none
 		}

@@ -1,23 +1,43 @@
 import ComposableArchitecture
 import Cryptography
 import DesignSystem
+import FactorSourcesClient
 import FeaturePrelude
+import MnemonicClient
 import Prelude
 
-// MARK: - AnswerSecurityQuestionsFlow
-public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
+// MARK: - AnswerSecurityQuestionsCoordinator
+public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let questions: NonEmpty<OrderedSet<SecurityQuestion>>
 		public var answers: OrderedDictionary<SecurityQuestion.ID, AnswerToSecurityQuestion> = [:]
+
+		public enum Purpose: Sendable, Hashable {
+			case decrypt(SecurityQuestionsFactorSource)
+			case encrypt(NonEmpty<OrderedSet<SecurityQuestion>>)
+
+			public enum AnswersResult: Sendable, Hashable {
+				case decrypted(Mnemonic)
+				case encrypted(SecurityQuestionsFactorSource)
+			}
+		}
 
 		var root: Path.State?
 
 		var path: StackState<Path.State> = []
 
-		init(
-			questions: NonEmpty<OrderedSet<SecurityQuestion>>
+		public let purpose: Purpose
+
+		public init(
+			purpose: Purpose
 		) {
-			self.questions = questions
+			self.purpose = purpose
+			switch purpose {
+			case let .decrypt(factorSource):
+				self.questions = factorSource.sealedMnemonic.securityQuestions
+			case let .encrypt(questions):
+				self.questions = questions
+			}
 			self.root = .freeform(.init(question: questions.first, isLast: questions.count == 1))
 		}
 	}
@@ -37,10 +57,7 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
-		case dismiss(errorKind: Error, message: String?)
-		case answeredAllQuestions(
-			with: NonEmpty<OrderedSet<AnswerToSecurityQuestion>>
-		)
+		case done(TaskResult<State.Purpose.AnswersResult>)
 	}
 
 	public struct Path: Sendable, ReducerProtocol {
@@ -59,6 +76,10 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.mnemonicClient) var mnemonicClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	public init() {}
+
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
@@ -72,7 +93,7 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+			return dismissEffect(for: state, errorKind: .rejectedByUser)
 		case .backButtonTapped:
 			return goBackEffect(for: &state)
 		}
@@ -80,9 +101,6 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-//		case
-//			let .root(.relay(item, .freeform(.delegate(.answered(answer, question))))),
-//			let .path(.element(_, .relay(item, .freeform(.delegate(.answered(answer, question)))))):
 		case
 			let .root(.freeform(.delegate(.answered(answerToQuestion)))),
 			let .path(.element(id: _, action: .freeform(.delegate(.answered(answerToQuestion))))):
@@ -114,8 +132,32 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 					uncheckedUniqueElements: state.answers.values.map { $0 }
 				)
 			)!
-			return .run { send in
-				await send(.delegate(.answeredAllQuestions(with: answers)))
+			return .task { [purpose = state.purpose] in
+
+				let taskResult = await TaskResult {
+					switch purpose {
+					case let .decrypt(factorSource):
+						precondition(factorSource.sealedMnemonic.securityQuestions.elements == answers.elements.map(\.question))
+
+						let mnemonic = try factorSource.decrypt(answersToQuestions: answers)
+
+						return State.Purpose.AnswersResult.decrypted(mnemonic)
+
+					case .encrypt:
+						let mnemonic = try mnemonicClient.generate(.twentyFour, .english)
+						loggerGlobal.debug("mnemonic: \(mnemonic.phrase)")
+
+						let factorSource = try SecurityQuestionsFactorSource.from(
+							mnemonic: mnemonic,
+							answersToQuestions: answers
+						)
+
+						try await factorSourcesClient.saveFactorSource(factorSource.embed())
+
+						return State.Purpose.AnswersResult.encrypted(factorSource)
+					}
+				}
+				return .delegate(.done(taskResult))
 			}
 		}
 	}
@@ -128,13 +170,9 @@ public struct AnswerSecurityQuestionsFlow: Sendable, FeatureReducer {
 
 	func dismissEffect(
 		for state: State,
-		errorKind: Error,
-		message: String?
+		errorKind: Error
 	) -> EffectTask<Action> {
-		.send(.delegate(.dismiss(
-			errorKind: errorKind,
-			message: message
-		)))
+		.send(.delegate(.done(.failure(errorKind))))
 	}
 
 	public enum Error: String, Swift.Error {

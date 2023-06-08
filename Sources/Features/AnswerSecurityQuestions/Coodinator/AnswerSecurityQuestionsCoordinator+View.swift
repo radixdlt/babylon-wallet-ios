@@ -5,18 +5,18 @@ import FeaturePrelude
 import Prelude
 import SwiftUI
 
-public extension AnswerSecurityQuestionsFlow {
+public extension AnswerSecurityQuestionsCoordinator {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<AnswerSecurityQuestionsFlow>
+		private let store: StoreOf<AnswerSecurityQuestionsCoordinator>
 
-		public init(store: StoreOf<AnswerSecurityQuestionsFlow>) {
+		public init(store: StoreOf<AnswerSecurityQuestionsCoordinator>) {
 			self.store = store
 		}
 
 		// MARK: ViewState
 		struct ViewState: Equatable {
-			init(state: AnswerSecurityQuestionsFlow.State) {}
+			init(state: AnswerSecurityQuestionsCoordinator.State) {}
 		}
 
 		public var body: some SwiftUI.View {
@@ -58,12 +58,12 @@ public extension AnswerSecurityQuestionsFlow {
 		}
 
 		func path(
-			for store: StoreOf<AnswerSecurityQuestionsFlow.Path>
+			for store: StoreOf<AnswerSecurityQuestionsCoordinator.Path>
 		) -> some SwiftUI.View {
 			SwitchStore(store) {
 				CaseLet(
-					state: /AnswerSecurityQuestionsFlow.Path.State.freeform,
-					action: AnswerSecurityQuestionsFlow.Path.Action.freeform,
+					state: /AnswerSecurityQuestionsCoordinator.Path.State.freeform,
+					action: AnswerSecurityQuestionsCoordinator.Path.Action.freeform,
 					then: { AnswerSecurityQuestionsFreeform.View(store: $0) }
 				)
 			}

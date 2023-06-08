@@ -5,7 +5,7 @@ import FeaturePrelude
 public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var answerSecurityQuestions: AnswerSecurityQuestions.State?
+		public var answerSecurityQuestions: AnswerSecurityQuestionsCoordinator.State?
 
 		public init(
 			questions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions
@@ -15,7 +15,7 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case answerSecurityQuestions(PresentationAction<AnswerSecurityQuestions.Action>)
+		case answerSecurityQuestions(PresentationAction<AnswerSecurityQuestionsCoordinator.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -29,7 +29,7 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifLet(\.$answerSecurityQuestions, action: /Action.child .. ChildAction.answerSecurityQuestions) {
-				AnswerSecurityQuestions()
+				AnswerSecurityQuestionsCoordinator()
 			}
 	}
 
@@ -49,6 +49,12 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 			return .none
 
 		case let .answerSecurityQuestions(.presented(.delegate(.done(.failure(error))))):
+			if let _error = error as? AnswerSecurityQuestionsCoordinator.Error, _error == .rejectedByUser {
+				state.answerSecurityQuestions = nil
+				return .run { _ in
+					await dismiss()
+				}
+			}
 			let errorMessage = "Failed to create factor source from answers, error: \(error)"
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
 			errorQueue.schedule(error)

@@ -18,7 +18,7 @@ extension SimpleNewPhoneConfirmer {
 						state: \.$answerSecurityQuestions,
 						action: { .child(.answerSecurityQuestions($0)) }
 					),
-					content: { AnswerSecurityQuestions.View(store: $0) }
+					content: { AnswerSecurityQuestionsCoordinator.View(store: $0) }
 				)
 		}
 	}

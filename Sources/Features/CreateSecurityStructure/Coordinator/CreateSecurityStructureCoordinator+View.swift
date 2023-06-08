@@ -1,17 +1,11 @@
+import AddTrustedContactFactorSourceFeature
+import AnswerSecurityQuestionsFeature
 import DesignSystem
 import FeaturePrelude
 import Profile
 
-extension CreateSecurityStructureCoordinator.State {
-	var viewState: CreateSecurityStructureCoordinator.ViewState {
-		.init()
-	}
-}
-
 // MARK: - CreateSecurityStructureCoordinator.View
 extension CreateSecurityStructureCoordinator {
-	public struct ViewState: Equatable {}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<CreateSecurityStructureCoordinator>
@@ -34,6 +28,7 @@ extension CreateSecurityStructureCoordinator {
 			} destination: {
 				path(for: $0)
 			}
+			.modalDestination(store: self.store)
 		}
 
 		func path(
@@ -55,18 +50,37 @@ extension CreateSecurityStructureCoordinator {
 					action: CreateSecurityStructureCoordinator.Path.Action.advancedSetupFlow,
 					then: { AdvancedCreateSecurityStructureFlow.View(store: $0) }
 				)
-				CaseLet(
-					state: /CreateSecurityStructureCoordinator.Path.State.simpleNewPhoneConfirmer,
-					action: CreateSecurityStructureCoordinator.Path.Action.simpleNewPhoneConfirmer,
-					then: { SimpleNewPhoneConfirmer.View(store: $0) }
-				)
-				CaseLet(
-					state: /CreateSecurityStructureCoordinator.Path.State.simpleLostPhoneHelper,
-					action: CreateSecurityStructureCoordinator.Path.Action.simpleLostPhoneHelper,
-					then: { SimpleLostPhoneHelper.View(store: $0) }
-				)
 			}
 		}
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func modalDestination(store: StoreOf<CreateSecurityStructureCoordinator>) -> some View {
+		let destinationStore = store.scope(state: \.$modalDestinations, action: { .child(.modalDestinations($0)) })
+		return lostPhoneHelper(with: destinationStore)
+			.newPhoneConfirmer(with: destinationStore)
+	}
+
+	@MainActor
+	private func lostPhoneHelper(with destinationStore: PresentationStoreOf<CreateSecurityStructureCoordinator.ModalDestinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /CreateSecurityStructureCoordinator.ModalDestinations.State.simpleLostPhoneHelper,
+			action: CreateSecurityStructureCoordinator.ModalDestinations.Action.simpleLostPhoneHelper,
+			content: { AddTrustedContactFactorSource.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func newPhoneConfirmer(with destinationStore: PresentationStoreOf<CreateSecurityStructureCoordinator.ModalDestinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /CreateSecurityStructureCoordinator.ModalDestinations.State.simpleNewPhoneConfirmer,
+			action: CreateSecurityStructureCoordinator.ModalDestinations.Action.simpleNewPhoneConfirmer,
+			content: { AnswerSecurityQuestionsCoordinator.View(store: $0) }
+		)
 	}
 }
 
