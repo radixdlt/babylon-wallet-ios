@@ -98,9 +98,9 @@ extension View {
 			.generalSettings(with: destinationStore)
 			.profileBackups(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
+			.mnemonics(with: destinationStore)
 		#if DEBUG
 			.importFromOlympiaLegacyWallet(with: destinationStore)
-			.mnemonics(with: destinationStore)
 			.factorSources(with: destinationStore)
 			.debugInspectProfile(with: destinationStore)
 		#endif // DEBUG
@@ -176,6 +176,16 @@ extension View {
 		)
 	}
 
+	@MainActor
+	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.mnemonics,
+			action: AppSettings.Destinations.Action.mnemonics,
+			destination: { DisplayMnemonics.View(store: $0) }
+		)
+	}
+
 	#if DEBUG
 	@MainActor
 	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
@@ -184,16 +194,6 @@ extension View {
 			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
 			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.mnemonics,
-			action: AppSettings.Destinations.Action.mnemonics,
-			destination: { DisplayMnemonics.View(store: $0) }
 		)
 	}
 
@@ -220,7 +220,6 @@ extension View {
 			destination: { DebugInspectProfile.View(store: $0) }
 		)
 	}
-
 	#endif
 }
 
