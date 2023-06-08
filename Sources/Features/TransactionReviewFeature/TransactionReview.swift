@@ -811,7 +811,7 @@ extension Collection where Element: Equatable {
 	}
 }
 
-extension EngineToolkitModels.AddressKind {
+extension EngineToolkit.AddressKind {
 	var resourceType: TransactionReview.ResourceType? {
 		switch self {
 		case .fungibleResource:

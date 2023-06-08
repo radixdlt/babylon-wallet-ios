@@ -1,4 +1,3 @@
-import EngineToolkitModels
 import Prelude
 @_implementationOnly import RadixEngineToolkit
 
@@ -6,11 +5,11 @@ typealias UnderlyingPointerType = CChar
 typealias MutableToolkitPointer = UnsafeMutablePointer<UnderlyingPointerType>
 typealias ImmutableToolkitPointer = UnsafePointer<UnderlyingPointerType>
 
-// MARK: - EngineToolkit
+// MARK: - RadixEngine
 /// A type provides a high level functions and method for the
 /// interaction with the transaction library and abstracting away
 /// the low level memory allocation, serialization, and other low level concepts.
-public struct EngineToolkit {
+public struct RadixEngine {
 	internal static var _debugPrint = false
 
 	private let jsonEncoder: JSONEncoder
@@ -19,7 +18,9 @@ public struct EngineToolkit {
 	private let jsonStringFromJSONData: JSONStringFromJSONData
 	private let jsonDataFromJSONString: JSONDataFromJSONString
 
-	public init() {
+	public static let instance = RadixEngine()
+
+	init() {
 		self.init(
 			jsonEncoder: JSONEncoder(),
 			jsonDecoder: JSONDecoder()
@@ -39,7 +40,7 @@ public struct EngineToolkit {
 	}
 }
 
-extension EngineToolkit {
+extension RadixEngine {
 	typealias JSONStringFromJSONData = @Sendable (Data) -> String?
 	typealias CCharsFromJSONString = @Sendable (String) -> [CChar]?
 	typealias JSONDataFromJSONString = @Sendable (String) -> Data?
@@ -47,7 +48,7 @@ extension EngineToolkit {
 
 // MARK: Public
 
-extension EngineToolkit {
+extension RadixEngine {
 	/// Obtains information on the current transaction library used.
 	///
 	/// This function is used to get information on the transaction library such as the package version. You may
@@ -217,7 +218,7 @@ extension EngineToolkit {
 
 // MARK: Private (But Internal For Tests)
 
-extension EngineToolkit {
+extension RadixEngine {
 	/// Calls the transaction library with a given input and returns the output back.
 	///
 	/// This function abstracts away how the transaction library is called and provides a high level interface for
@@ -272,7 +273,7 @@ extension EngineToolkit {
 	}
 }
 
-extension EngineToolkit {
+extension RadixEngine {
 	/// Serializes an object to a JSON string.
 	///
 	/// This private function takes an object and serializes it to a JSON string. In the current implementation, this
@@ -428,7 +429,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 /// using old Cocoa APIs
 func prettyPrint(jsonString: String, label: String?) {
 	guard
-		EngineToolkit._debugPrint,
+		RadixEngine._debugPrint,
 		let data = jsonString.data(using: .utf8),
 		let pretty = data.prettyPrintedJSONString
 	else {

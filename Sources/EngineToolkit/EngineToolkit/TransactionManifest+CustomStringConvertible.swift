@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - TransactionManifest + CustomStringConvertible
@@ -21,7 +21,7 @@ extension TransactionManifest {
 		case unknown(type: String)
 
 		public init?(error: Error) {
-			guard case let .deserializeResponseFailure(.errorResponse(json)) = error as? EngineToolkit.Error else { return nil }
+			guard case let .deserializeResponseFailure(.errorResponse(json)) = error as? RadixEngine.Error else { return nil }
 			guard let errorType = json["error"]?.string else { return nil }
 			switch errorType {
 			case "NetworkMismatchError":
@@ -70,7 +70,7 @@ extension TransactionManifest {
 		case .parsed:
 			// We dont wanna print JSON, so we go through conversion to STRING first
 			func stringifyManifest(networkForRequest: NetworkID) throws -> TransactionManifest {
-				try EngineToolkit()
+				try RadixEngine.instance
 					.convertManifest(
 						request: .init(
 							manifest: manifest, // need blobs

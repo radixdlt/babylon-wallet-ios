@@ -8,7 +8,7 @@ final class AccountsRequiredToSignTests: TestCase {
 	}
 
 	func analyze(manifest: TransactionManifest, networkID: NetworkID = .simulator) throws -> AnalyzeManifestResponse {
-		try EngineToolkit().analyzeManifest(request: .init(manifest: manifest, networkId: networkID)).get()
+		try RadixEngine.instance.analyzeManifest(request: .init(manifest: manifest, networkId: networkID)).get()
 	}
 
 	func test_setMetaData() throws {

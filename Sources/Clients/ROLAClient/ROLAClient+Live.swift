@@ -278,7 +278,7 @@ extension SLIP10.PublicKey {
 		}
 	}
 
-	var bytes: EngineToolkitModels.Bytes {
+	var bytes: Bytes {
 		.init(bytes: Array(self.compressedRepresentation))
 	}
 }

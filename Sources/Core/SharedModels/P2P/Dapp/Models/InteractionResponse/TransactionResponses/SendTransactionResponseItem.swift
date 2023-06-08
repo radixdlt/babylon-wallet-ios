@@ -1,4 +1,4 @@
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {

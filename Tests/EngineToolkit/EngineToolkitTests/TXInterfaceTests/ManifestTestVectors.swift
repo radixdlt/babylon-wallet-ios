@@ -1,5 +1,4 @@
 import EngineToolkit
-import EngineToolkitModels
 import Foundation
 
 public func manifestTestVectors() throws -> [(manifest: String, blobs: [[UInt8]])] {

@@ -39,7 +39,7 @@ final class AnalyzeManifestWithPreviewContextTests: TestCase {
 		)
 
 		// Act
-		let response = EngineToolkit().analyzeManifestWithPreviewContext(request: request)
+		let response = RadixEngine.instance.analyzeManifestWithPreviewContext(request: request)
 
 		// Assert
 		XCTAssertNoThrow(try response.get())

@@ -1,4 +1,4 @@
-import EngineToolkitModels
+import EngineToolkit
 import Prelude
 
 // MARK: - Profile.Network.Persona
@@ -169,7 +169,7 @@ extension Profile.Network.Persona {
 			throw WrongEntityInDerivationPath()
 		}
 
-		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(
+		let response = try RadixEngine.instance.deriveVirtualIdentityAddressRequest(
 			request: .init(
 				publicKey: factorInstance.publicKey.intoEngine(),
 				networkId: networkID

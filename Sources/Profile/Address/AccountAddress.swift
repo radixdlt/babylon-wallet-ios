@@ -24,7 +24,7 @@ public struct AccountAddress:
 {
 	public let address: String
 	public init(address: String) throws {
-		let decoded = try EngineToolkit().decodeAddressRequest(request: .init(address: address)).get()
+		let decoded = try RadixEngine.instance.decodeAddressRequest(request: .init(address: address)).get()
 		guard decoded.isAccountAddress else {
 			throw NotAnAccountAddress()
 		}

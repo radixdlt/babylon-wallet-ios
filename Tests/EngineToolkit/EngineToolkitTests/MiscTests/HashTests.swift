@@ -1,5 +1,4 @@
 @testable import EngineToolkit
-import EngineToolkitModels
 import TestingPrelude
 
 final class HashTests: TestCase {
@@ -20,5 +19,5 @@ final class HashTests: TestCase {
 		return try result.get().value
 	}
 
-	private let engineToolkit = EngineToolkit()
+	private let engineToolkit = RadixEngine.instance
 }
