@@ -1,3 +1,4 @@
+import AccountPortfoliosClient
 import ClientPrelude
 import EngineToolkitClient
 import EngineToolkitModels
@@ -14,7 +15,7 @@ extension SubmitTransactionClient: DependencyKey {
 		let transactionStatusUpdates: TransactionStatusUpdates = { txID, pollStrategy in
 			@Dependency(\.continuousClock) var clock
 
-			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>.init(.init(txID: txID, result: .success(.pending)))
+			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>(.init(txID: txID, result: .success(.pending)))
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
@@ -95,7 +96,7 @@ extension SubmitTransactionClient: DependencyKey {
 
 			@Dependency(\.engineToolkitClient) var engineToolkitClient
 			@Dependency(\.transactionClient) var transactionClient
-			@Dependency(\.cacheClient) var cacheClient
+			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
 
@@ -130,7 +131,9 @@ extension SubmitTransactionClient: DependencyKey {
 			Task.detached {
 				try await hasTXBeenCommittedSuccessfully(txID)
 				if let changedAccounts {
-					cacheClient.clearCacheForAccounts(Set(changedAccounts))
+					// FIXME: Ideally we should only have to call the cacheClient here
+					// cacheClient.clearCacheForAccounts(Set(changedAccounts))
+					_ = try await accountPortfoliosClient.fetchAccountPortfolios(changedAccounts, true)
 				}
 			}
 
