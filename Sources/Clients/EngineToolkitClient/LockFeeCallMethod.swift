@@ -250,7 +250,7 @@ extension EngineToolkitClient {
 				),
 				initialSupply: .map(
 					.init(keyValueKind: .nonFungibleLocalId, valueValueKind: .tuple, entries: [
-						[.nonFungibleLocalId(.integer(1)), .tuple([.tuple(
+						[.nonFungibleLocalId("#1#"), .tuple([.tuple(
 							[.string("Hello World"), .decimal(.init(value: "12"))]
 						)])],
 					])
@@ -286,7 +286,7 @@ extension EngineToolkitClient {
 			)
 
 			let nftIds = stride(from: 0, to: idsCount, by: 1).map {
-				[ManifestASTValue.nonFungibleLocalId(.integer(UInt64($0))), .tuple([.tuple(
+				[ManifestASTValue.nonFungibleLocalId(.init(value: "#\($0)#")), .tuple([.tuple(
 					[.string("Hello World \($0)"), .decimal(.init(value: "\($0)"))]
 				)])]
 			}

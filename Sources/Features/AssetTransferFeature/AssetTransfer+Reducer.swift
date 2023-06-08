@@ -312,22 +312,7 @@ extension AccountPortfolio.NonFungibleResource.NonFungibleToken.LocalID {
 		guard rawValue.count >= 3 else {
 			throw InvalidLocalID()
 		}
-		let prefix = rawValue.prefix(1)
 		let value = String(self.rawValue.dropLast().dropFirst())
-
-		switch prefix {
-		case "#":
-			return .integer(UInt64(value)!)
-		case "<":
-			return .string(value)
-		case "[":
-			guard let bytes = value.data(using: .utf8)?.bytes else {
-				throw InvalidLocalID()
-			}
-			return .bytes(bytes)
-		default:
-			// UUID local id is not working properly in current version of RET
-			throw InvalidLocalID()
-		}
+		return .init(value: value)
 	}
 }

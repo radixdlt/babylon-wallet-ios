@@ -553,9 +553,9 @@ extension TransactionReview {
 		for withdrawal in manifest.accountWithdraws {
 			try await collectTransferInfo(
 				componentAddress: withdrawal.componentAddress,
-				resourceSpecifier: withdrawal.resourceSpecifier,
+				resourcesQuantifer: withdrawal.resourceQuantifier,
 				userAccounts: userAccounts,
-				createdEntities: manifest.createdEntities,
+				createdEntities: manifest.newlyCreated,
 				container: &withdrawals,
 				networkID: networkID,
 				type: .exact
@@ -579,22 +579,22 @@ extension TransactionReview {
 
 		for deposit in manifest.accountDeposits {
 			switch deposit {
-			case let .exact(componentAddress, resourceSpecifier):
+			case let .guaranteed(componentAddress, resourcesQuantifer):
 				try await collectTransferInfo(
 					componentAddress: componentAddress,
-					resourceSpecifier: resourceSpecifier,
+					resourcesQuantifer: resourcesQuantifer,
 					userAccounts: userAccounts,
-					createdEntities: manifest.createdEntities,
+					createdEntities: manifest.newlyCreated,
 					container: &deposits,
 					networkID: networkID,
 					type: .exact
 				)
-			case let .estimate(index, componentAddress, resourceSpecifier):
+			case let .predicted(index, componentAddress, resourcesQuantifer):
 				try await collectTransferInfo(
 					componentAddress: componentAddress,
-					resourceSpecifier: resourceSpecifier,
+					resourcesQuantifer: resourcesQuantifer,
 					userAccounts: userAccounts,
-					createdEntities: manifest.createdEntities,
+					createdEntities: manifest.newlyCreated,
 					container: &deposits,
 					networkID: networkID,
 					type: .estimated(instructionIndex: index)
@@ -619,7 +619,7 @@ extension TransactionReview {
 
 	func collectTransferInfo(
 		componentAddress: ComponentAddress,
-		resourceSpecifier: ResourceSpecifier,
+		resourcesQuantifer: ResourceQuantifier,
 		userAccounts: [Account],
 		createdEntities: CreatedEntitities?,
 		container: inout [Account: [Transfer]],
@@ -663,11 +663,13 @@ extension TransactionReview {
 			container[account, default: []].append(transfer)
 		}
 
-		switch resourceSpecifier {
+		switch resourcesQuantifer {
 		case let .amount(resourceAddress, amount):
-			try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
+			fatalError()
+		// try await addTransfer(resourceAddress, amount: .init(fromString: amount.value))
 		case let .ids(resourceAddress, ids):
-			try await addTransfer(resourceAddress, amount: BigDecimal(ids.count))
+			fatalError()
+			// try await addTransfer(resourceAddress, amount: BigDecimal(ids.count))
 		}
 	}
 }

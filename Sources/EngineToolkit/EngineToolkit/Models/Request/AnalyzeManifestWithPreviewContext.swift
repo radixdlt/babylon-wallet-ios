@@ -1,5 +1,5 @@
 // MARK: - AnalyzeTransactionExecutionRequest
-public struct AnalyzeTransactionExecutionRequest: Codable {
+public struct AnalyzeTransactionExecutionRequest: Encodable {
 	public let networkId: NetworkID
 	public let manifest: TransactionManifest
 	public let transactionReceipt: [UInt8]
@@ -22,13 +22,13 @@ public struct AnalyzeTransactionExecutionRequest: Codable {
 }
 
 // MARK: - AnalyzeTransactionExecutionResponse
-public struct AnalyzeTransactionExecutionResponse: Sendable, Codable, Hashable {
+public struct AnalyzeTransactionExecutionResponse: Sendable, Decodable, Hashable {
 	public let encounteredAddresses: EncounteredAddresses
 	public let accountsRequiringAuth: Set<ComponentAddress>
 	public let accountProofResources: Set<ResourceAddress>
 	public let accountWithdraws: [AccountWithdraw]
 	public let accountDeposits: [AccountDeposit]
-	public let createdEntities: CreatedEntitities?
+	public let newlyCreated: CreatedEntitities?
 
 	enum CodingKeys: String, CodingKey {
 		case encounteredAddresses = "encountered_addresses"
@@ -36,12 +36,12 @@ public struct AnalyzeTransactionExecutionResponse: Sendable, Codable, Hashable {
 		case accountProofResources = "account_proof_resources"
 		case accountWithdraws = "account_withdraws"
 		case accountDeposits = "account_deposits"
-		case createdEntities = "created_entities"
+		case newlyCreated = "newly_created"
 	}
 }
 
 // MARK: - EncounteredAddresses
-public struct EncounteredAddresses: Sendable, Codable, Hashable {
+public struct EncounteredAddresses: Sendable, Decodable, Hashable {
 	public let componentAddresses: EncounteredComponents
 	public let resourceAddresses: Set<ResourceAddress>
 	public let packageAddresses: Set<PackageAddress>
@@ -54,59 +54,57 @@ public struct EncounteredAddresses: Sendable, Codable, Hashable {
 }
 
 // MARK: - EncounteredComponents
-public struct EncounteredComponents: Sendable, Codable, Hashable {
-	public let userApplications: Set<ComponentAddress>
-	public let accounts: Set<ComponentAddress>
-	public let identities: Set<ComponentAddress>
-	public let clocks: Set<ComponentAddress>
-	public let epochManagers: Set<ComponentAddress>
-	public let validators: Set<ComponentAddress>
+public struct EncounteredComponents: Sendable, Decodable, Hashable {
 	public let accessController: Set<ComponentAddress>
+	public let accounts: Set<ComponentAddress>
+	public let consensusManagers: Set<ComponentAddress>
+	public let identities: Set<ComponentAddress>
+	public let userApplications: Set<ComponentAddress>
+	public let validators: Set<ComponentAddress>
 
 	enum CodingKeys: String, CodingKey {
-		case userApplications = "user_applications"
-		case accounts
-		case identities
-		case clocks
-		case epochManagers = "epoch_managers"
-		case validators
 		case accessController = "access_controller"
+		case accounts
+		case consensusManagers = "consensus_managers"
+		case identities
+		case userApplications = "user_applications"
+		case validators
 	}
 }
 
 // MARK: - AccountWithdraw
-public struct AccountWithdraw: Sendable, Codable, Hashable {
+public struct AccountWithdraw: Sendable, Decodable, Hashable {
 	public let componentAddress: ComponentAddress
-	public let resourceSpecifier: ResourceSpecifier
+	public let resourceQuantifier: ResourceQuantifier
 
 	enum CodingKeys: String, CodingKey {
 		case componentAddress = "component_address"
-		case resourceSpecifier = "resource_specifier"
+		case resourceQuantifier = "resource_quantifier"
 	}
 }
 
 // MARK: - AccountDeposit
-public enum AccountDeposit: Sendable, Codable, Hashable {
-	case exact(
+public enum AccountDeposit: Sendable, Decodable, Hashable {
+	case guaranteed(
 		componentAddress: ComponentAddress,
-		resourceSpecifier: ResourceSpecifier
+		resourceQuantifier: ResourceQuantifier
 	)
-	case estimate(
+	case predicted(
 		index: UInt32,
 		componentAddress: ComponentAddress,
-		resourceSpecifier: ResourceSpecifier
+		resourceQuantifier: ResourceQuantifier
 	)
 
 	enum CodingKeys: String, CodingKey {
 		case type
 		case index = "instruction_index"
 		case componentAddress = "component_address"
-		case resourceSpecifier = "resource_specifier"
+		case resourceQuantifier = "resource_quantifier"
 	}
 }
 
 // MARK: - CreatedEntitities
-public struct CreatedEntitities: Sendable, Codable, Hashable {
+public struct CreatedEntitities: Sendable, Decodable, Hashable {
 	public let componentAddresses: Set<ComponentAddress>
 	public let resourceAddresses: Set<ResourceAddress>
 	public let packageAddresses: Set<PackageAddress>
@@ -118,10 +116,10 @@ public struct CreatedEntitities: Sendable, Codable, Hashable {
 	}
 }
 
-// MARK: - ResourceSpecifier
-public enum ResourceSpecifier: Sendable, Codable, Hashable {
-	case amount(ResourceAddress, Decimal_)
-	case ids(ResourceAddress, Set<NonFungibleLocalIdInternal>)
+// MARK: - ResourceQuantifier
+public enum ResourceQuantifier: Sendable, Decodable, Hashable {
+	case amount(ResourceManagerSpecifier, Decimal_)
+	case ids(ResourceManagerSpecifier, Set<NonFungibleLocalId>)
 
 	enum CodingKeys: String, CodingKey {
 		case type
@@ -131,27 +129,41 @@ public enum ResourceSpecifier: Sendable, Codable, Hashable {
 	}
 }
 
+// MARK: - ResourceManagerSpecifier
+public enum ResourceManagerSpecifier: Sendable, Decodable, Hashable {
+	case existing(ResourceAddress)
+	case newlyCreated(index: Int)
+
+	enum CodingKeys: String, CodingKey {
+		case type
+		case address
+		case index
+	}
+
+	internal enum Kind: String, Codable {
+		case existing = "Existing"
+		case newlyCreated = "NewlyCreated"
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let kind = try container.decode(Kind.self, forKey: .type)
+
+		switch kind {
+		case .existing:
+			self = try .existing(container.decode(ResourceAddress.self, forKey: .address))
+		case .newlyCreated:
+			self = try .newlyCreated(index: decodeAndConvertToNumericType(container: container, key: .index))
+		}
+	}
+}
+
 // MARK: Codable stuff
 
-public extension ResourceSpecifier {
+public extension ResourceQuantifier {
 	internal enum Kind: String, Codable {
 		case amount = "Amount"
 		case ids = "Ids"
-	}
-
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-
-		switch self {
-		case let .amount(resourceAddress, amount):
-			try container.encode(Kind.amount, forKey: .type)
-			try container.encode(resourceAddress, forKey: .resourceAddress)
-			try container.encode(amount.value, forKey: .amount)
-		case let .ids(resourceAddress, ids):
-			try container.encode(Kind.ids, forKey: .type)
-			try container.encode(resourceAddress, forKey: .resourceAddress)
-			try container.encode(ids, forKey: .ids)
-		}
 	}
 
 	init(from decoder: Decoder) throws {
@@ -160,13 +172,13 @@ public extension ResourceSpecifier {
 		switch kind {
 		case .amount:
 			self = try .amount(
-				container.decode(ResourceAddress.self, forKey: .resourceAddress),
+				container.decode(ResourceManagerSpecifier.self, forKey: .resourceAddress),
 				Decimal_(value: container.decode(String.self, forKey: .amount))
 			)
 		case .ids:
 			self = try .ids(
-				container.decode(ResourceAddress.self, forKey: .resourceAddress),
-				container.decode(Set<NonFungibleLocalIdInternal>.self, forKey: .ids)
+				container.decode(ResourceManagerSpecifier.self, forKey: .resourceAddress),
+				container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
 			)
 		}
 	}
@@ -174,40 +186,24 @@ public extension ResourceSpecifier {
 
 public extension AccountDeposit {
 	internal enum Kind: String, Codable {
-		case exact = "Exact"
-		case estimate = "Estimate"
-	}
-
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-
-		switch self {
-		case let .exact(componentAddress, resourceSpecifier):
-			try container.encode(Kind.exact, forKey: .type)
-			try container.encode(componentAddress, forKey: .componentAddress)
-			try container.encode(resourceSpecifier, forKey: .resourceSpecifier)
-		case let .estimate(index, componentAddress, resourceSpecifier):
-			try container.encode(Kind.estimate, forKey: .type)
-			try container.encode(String(index), forKey: .index)
-			try container.encode(componentAddress, forKey: .componentAddress)
-			try container.encode(resourceSpecifier, forKey: .resourceSpecifier)
-		}
+		case guaranteed = "Guaranteed"
+		case predicted = "Predicted"
 	}
 
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(Kind.self, forKey: .type)
 		switch kind {
-		case .exact:
-			self = try .exact(
+		case .guaranteed:
+			self = try .guaranteed(
 				componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress),
-				resourceSpecifier: container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
+				resourceQuantifier: container.decode(ResourceQuantifier.self, forKey: .resourceQuantifier)
 			)
-		case .estimate:
-			self = try .estimate(
+		case .predicted:
+			self = try .predicted(
 				index: decodeAndConvertToNumericType(container: container, key: .index),
 				componentAddress: container.decode(ComponentAddress.self, forKey: .componentAddress),
-				resourceSpecifier: container.decode(ResourceSpecifier.self, forKey: .resourceSpecifier)
+				resourceQuantifier: container.decode(ResourceQuantifier.self, forKey: .resourceQuantifier)
 			)
 		}
 	}
@@ -219,14 +215,5 @@ public extension AnalyzeTransactionExecutionRequest {
 		try container.encode(manifest, forKey: .manifest)
 		try container.encode(String(networkId), forKey: .networkId)
 		try container.encode(transactionReceipt.hex(), forKey: .transactionReceipt)
-	}
-
-	init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		try self.init(
-			networkId: NetworkID(decodeAndConvertToNumericType(container: container, key: .networkId)),
-			manifest: container.decode(TransactionManifest.self, forKey: .manifest),
-			transactionReceipt: [UInt8](hex: container.decode(String.self, forKey: .transactionReceipt))
-		)
 	}
 }
