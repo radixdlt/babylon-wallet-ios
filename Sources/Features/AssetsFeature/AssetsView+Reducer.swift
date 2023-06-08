@@ -115,20 +115,26 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .portfolioUpdated(portfolio):
-			let xrd = portfolio.fungibleResources.xrdResource.map {
-				FungibleAssetList.Row.State(xrdToken: $0, isSelected: state.mode.xrdRowSelected)
+			let xrd = portfolio.fungibleResources.xrdResource.flatMap { token -> FungibleAssetList.Row.State? in
+				guard token.amount > 0 else { return nil }
+				return FungibleAssetList.Row.State(xrdToken: token, isSelected: state.mode.xrdRowSelected)
 			}
-			let nonXrd = portfolio.fungibleResources.nonXrdResources.map {
-				FungibleAssetList.Row.State(
-					nonXRDToken: $0,
-					isSelected: state.mode.nonXrdRowSelected($0.resourceAddress)
-				)
-			}
-			let nfts = portfolio.nonFungibleResources.map {
-				NonFungibleAssetList.Row.State(
-					resource: $0,
+			let nonXrd = portfolio.fungibleResources.nonXrdResources
+				.filter {
+					$0.amount > 0
+				}
+				.map { token in
+					FungibleAssetList.Row.State(
+						nonXRDToken: token,
+						isSelected: state.mode.nonXrdRowSelected(token.resourceAddress)
+					)
+				}
+			let nfts = portfolio.nonFungibleResources.compactMap { resource -> NonFungibleAssetList.Row.State? in
+				guard !resource.tokens.isEmpty else { return nil }
+				return NonFungibleAssetList.Row.State(
+					resource: resource,
 					disabled: state.mode.selectedAssets?.disabledNFTs ?? [],
-					selectedAssets: state.mode.nftRowSelectedAssets($0.resourceAddress)
+					selectedAssets: state.mode.nftRowSelectedAssets(resource.resourceAddress)
 				)
 			}
 
