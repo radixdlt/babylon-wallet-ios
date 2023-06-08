@@ -33,8 +33,8 @@ public enum L10n {
     public static let accountSecurity = L10n.tr("Localizable", "accountSettings_accountSecurity", fallback: "Account Security")
     /// Set how you want this Account to work
     public static let accountSecuritySubtitle = L10n.tr("Localizable", "accountSettings_accountSecuritySubtitle", fallback: "Set how you want this Account to work")
-    /// Get RCnet XRD Test Tokens
-    public static let getXrdTestTokens = L10n.tr("Localizable", "accountSettings_getXrdTestTokens", fallback: "Get RCnet XRD Test Tokens")
+    /// Get XRD Test Tokens
+    public static let getXrdTestTokens = L10n.tr("Localizable", "accountSettings_getXrdTestTokens", fallback: "Get XRD Test Tokens")
     /// Hide Account
     public static let hideAccount = L10n.tr("Localizable", "accountSettings_hideAccount", fallback: "Hide Account")
     /// This may take several seconds, please wait for completion
@@ -47,8 +47,8 @@ public enum L10n {
     public static let showAssets = L10n.tr("Localizable", "accountSettings_showAssets", fallback: "Show Assets with Tags")
     /// Select which tags to show for assets in this Account
     public static let showAssetsSubtitle = L10n.tr("Localizable", "accountSettings_showAssetsSubtitle", fallback: "Select which tags to show for assets in this Account")
-    /// Show QR Code
-    public static let showQR = L10n.tr("Localizable", "accountSettings_showQR", fallback: "Show QR Code")
+    /// Show Account QR Code
+    public static let showQR = L10n.tr("Localizable", "accountSettings_showQR", fallback: "Show Account QR Code")
     /// Third-party Deposits
     public static let thirdPartyDeposits = L10n.tr("Localizable", "accountSettings_thirdPartyDeposits", fallback: "Third-party Deposits")
     /// Account Settings
@@ -410,8 +410,8 @@ public enum L10n {
     /// Open System Backup Settings
     public static let openSystemBackupSettings = L10n.tr("Localizable", "backup_openSystemBackupSettings", fallback: "Open System Backup Settings")
     public enum BackupWalletData {
-      /// Warning: If disabled, you might lose access to Accounts/Personas.
-      public static let message = L10n.tr("Localizable", "backup_backupWalletData_message", fallback: "Warning: If disabled, you might lose access to Accounts/Personas.")
+      /// Warning: If disabled you might lose access to your Accounts and Personas.
+      public static let message = L10n.tr("Localizable", "backup_backupWalletData_message", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
       /// Backup Wallet Data
       public static let title = L10n.tr("Localizable", "backup_backupWalletData_title", fallback: "Backup Wallet Data")
     }
@@ -954,8 +954,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "generalSettings_developerMode_title", fallback: "Developer Mode")
     }
     public enum ProfileSync {
-      /// Warning: If disabled you might lose access to accounts/personas.
-      public static let subtitle = L10n.tr("Localizable", "generalSettings_profileSync_subtitle", fallback: "Warning: If disabled you might lose access to accounts/personas.")
+      /// Warning: If disabled you might lose access to your Accounts and Personas.
+      public static let subtitle = L10n.tr("Localizable", "generalSettings_profileSync_subtitle", fallback: "Warning: If disabled you might lose access to your Accounts and Personas.")
       /// Sync Wallet Data to iCloud
       public static let title = L10n.tr("Localizable", "generalSettings_profileSync_title", fallback: "Sync Wallet Data to iCloud")
     }
