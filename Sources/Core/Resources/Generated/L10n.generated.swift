@@ -1349,8 +1349,6 @@ public enum L10n {
     public static let authorizedDapps = L10n.tr("Localizable", "settings_authorizedDapps", fallback: "Authorized dApps")
     /// Backups
     public static let backups = L10n.tr("Localizable", "settings_backups", fallback: "Backups")
-    /// Delete Wallet Data
-    public static let deleteWalletData = L10n.tr("Localizable", "settings_deleteWalletData", fallback: "Delete Wallet Data")
     /// Gateways
     public static let gateways = L10n.tr("Localizable", "settings_gateways", fallback: "Gateways")
     /// Import from a Legacy Wallet

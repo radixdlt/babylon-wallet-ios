@@ -101,9 +101,11 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			return .fireAndForget {
 				try await appPreferencesClient.updatePreferences(preferences)
 			}
+
 		case .exportLogsTapped:
 			state.exportLogs = Logger.logFilePath
 			return .none
+
 		case .exportLogsDismissed:
 			state.exportLogs = nil
 			return .none
@@ -119,6 +121,7 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 		case let .loadPreferences(preferences):
 			state.preferences = preferences
 			return .none
+
 		case let .hasLedgerHardwareWalletFactorSourcesLoaded(hasLedgerHardwareWalletFactorSources):
 			state.hasLedgerHardwareWalletFactorSources = hasLedgerHardwareWalletFactorSources
 			return .none
@@ -138,6 +141,10 @@ public struct GeneralSettings: Sendable, FeatureReducer {
 			case .cancel:
 				return .none
 			}
+
+		case .destination(.dismiss):
+			state.destination = nil
+			return .none
 
 		case .destination:
 			return .none

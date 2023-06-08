@@ -100,7 +100,6 @@
 "settings_importFromLegacyWallet" = "Import from a Legacy Wallet";
 "settings_ledgerHardwareWallets" = "Ledger Hardware Wallets";
 "settings_appVersion" = "Version: %@ build #%@";
-"settings_deleteWalletData" = "Delete Wallet Data";
 "settings_inspectProfile" = "Inspect Profile";
 "settings_noProfileText" = "No Wallet Data Found";
 "settings_linkToConnectorHeader_title" = "Link your Wallet to a Desktop Browser";
