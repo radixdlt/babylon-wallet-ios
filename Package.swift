@@ -773,7 +773,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/radixdlt/swift-composable-architecture", branch: "navigation-stack-and-full-scope")
+				.package(url: "https://github.com/radixdlt/swift-composable-architecture", branch: "full-scope")
 			},
 			"DesignSystem",
 			"Resources",
@@ -806,7 +806,7 @@ package.addModules([
 			},
 			"Resources",
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
-				.package(url: "https://github.com/pointfreeco/swiftui-navigation", exact: "0.7.1")
+				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.7.1")
 			},
 			.product(name: "TextBuilder", package: "TextBuilder") {
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
@@ -997,13 +997,13 @@ package.addModules([
 				.package(url: "https://github.com/JohnSundell/CollectionConcurrencyKit.git", from: "0.1.0")
 			},
 			.product(name: "CustomDump", package: "swift-custom-dump") {
-				.package(url: "https://github.com/pointfreeco/swift-custom-dump", exact: "0.9.1")
+				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.9.1")
 			},
 			.product(name: "Dependencies", package: "swift-dependencies") {
-				.package(url: "https://github.com/pointfreeco/swift-dependencies", exact: "0.2.0")
+				.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.2.0")
 			},
 			.product(name: "DependenciesAdditions", package: "swift-dependencies-additions") {
-				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", exact: "0.3.0")
+				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "0.3.0")
 			},
 			.product(name: "Either", package: "swift-either") {
 				.package(url: "https://github.com/pointfreeco/swift-either", branch: "main")

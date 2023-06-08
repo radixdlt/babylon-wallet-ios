@@ -15,7 +15,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		public var migratedAccounts: IdentifiedArrayOf<Profile.Network.Account> = .init()
 
 		var root: Destinations.State?
-		var path: StackState<Destinations.State> = []
+		var path: StackState<Destinations.State> = .init()
 
 		public init() {
 			self.root = .scanMultipleOlympiaQRCodes(.init())
@@ -64,7 +64,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case root(Destinations.Action)
-		case path(StackAction<Destinations.Action>)
+		case path(StackActionOf<Destinations>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
