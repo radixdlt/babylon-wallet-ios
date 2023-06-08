@@ -99,10 +99,14 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .receivingAccount(id: id, action: action):
 			switch action {
 			case .delegate(.remove):
-				state.receivingAccounts.remove(id: id)
+				let account = state.receivingAccounts.remove(id: id)
+				account?.assets.compactMap(/ResourceAsset.State.fungibleAsset).forEach {
+					updateTotalSum(&state, resourceAddress: $0.resource.resourceAddress)
+				}
 				return .none
 
-			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))):
+			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))),
+			     let .child(.row(resourceAddress, child: .delegate(.removed))):
 				updateTotalSum(&state, resourceAddress: resourceAddress)
 				return .none
 
