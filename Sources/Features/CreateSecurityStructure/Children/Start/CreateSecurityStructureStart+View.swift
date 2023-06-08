@@ -29,6 +29,8 @@ extension CreateSecurityStructureStart {
 						Spacer(minLength: 0)
 
 						Text("Security Setup for Accounts") // FIXME: strings
+							.fixedSize(horizontal: true, vertical: false)
+							.lineLimit(2)
 							.font(.app.sheetTitle)
 
 						Spacer(minLength: 0)
