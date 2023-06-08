@@ -648,7 +648,7 @@ extension TransactionReview {
 
 			let resourceMetadata = ResourceMetadata(
 				name: metadata?.symbol ?? metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: nil,
+				thumbnail: metadata?.iconURL,
 				type: addressKind.resourceType
 			)
 
