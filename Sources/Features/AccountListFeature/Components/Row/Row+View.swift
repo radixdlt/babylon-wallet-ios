@@ -51,7 +51,8 @@ extension AccountList.Row {
 			self.shouldShowSecurityPrompt = false // state.shouldShowSecurityPrompt
 
 			// Resources
-			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.count ?? 0
+			self.nonFungibleResourcesCount = state.portfolio.wrappedValue?.nonFungibleResources.filter { !$0.tokens.isEmpty }.count ?? 0
+
 			self.fungibleResourceIcons = {
 				guard let fungibleResources = state.portfolio.wrappedValue?.fungibleResources else {
 					return .init(icons: [], additionalItemsText: nil)

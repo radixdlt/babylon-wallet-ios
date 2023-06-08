@@ -59,7 +59,7 @@ extension AssetsView {
 					Color.app.gray5
 						.ignoresSafeArea(edges: .bottom)
 				}
-				.task { @MainActor in
+				.onFirstTask { @MainActor in
 					await viewStore.send(.task).finish()
 				}
 			}
