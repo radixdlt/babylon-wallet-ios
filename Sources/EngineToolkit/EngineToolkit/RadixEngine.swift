@@ -197,18 +197,18 @@ extension RadixEngine {
 		)
 	}
 
-	public func analyzeManifestWithPreviewContext(
-		request: AnalyzeManifestWithPreviewContextRequest
-	) -> Result<AnalyzeManifestWithPreviewContextResponse, Error> {
+	public func analyzeTransactionExecution(
+		request: AnalyzeTransactionExecutionRequest
+	) -> Result<AnalyzeTransactionExecutionResponse, Error> {
 		callLibraryFunction(
 			request: request,
 			function: analyze_transaction_execution
 		)
 	}
 
-	public func analyzeManifest(
-		request: AnalyzeManifestRequest
-	) -> Result<AnalyzeManifestResponse, Error> {
+	public func extractAddressesFromManifest(
+		request: ExtractAddressesFromManifestRequest
+	) -> Result<ExtractAddressesFromManifestResponse, Error> {
 		callLibraryFunction(
 			request: request,
 			function: extract_addresses_from_manifest

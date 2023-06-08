@@ -1,5 +1,5 @@
-// MARK: - AnalyzeManifestWithPreviewContextRequest
-public struct AnalyzeManifestWithPreviewContextRequest: Codable {
+// MARK: - AnalyzeTransactionExecutionRequest
+public struct AnalyzeTransactionExecutionRequest: Codable {
 	public let networkId: NetworkID
 	public let manifest: TransactionManifest
 	public let transactionReceipt: [UInt8]
@@ -21,8 +21,8 @@ public struct AnalyzeManifestWithPreviewContextRequest: Codable {
 	}
 }
 
-// MARK: - AnalyzeManifestWithPreviewContextResponse
-public struct AnalyzeManifestWithPreviewContextResponse: Sendable, Codable, Hashable {
+// MARK: - AnalyzeTransactionExecutionResponse
+public struct AnalyzeTransactionExecutionResponse: Sendable, Codable, Hashable {
 	public let encounteredAddresses: EncounteredAddresses
 	public let accountsRequiringAuth: Set<ComponentAddress>
 	public let accountProofResources: Set<ResourceAddress>
@@ -213,7 +213,7 @@ public extension AccountDeposit {
 	}
 }
 
-public extension AnalyzeManifestWithPreviewContextRequest {
+public extension AnalyzeTransactionExecutionRequest {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(manifest, forKey: .manifest)

@@ -11,7 +11,7 @@ final class AnalyzeManifestWithPreviewContextTests: TestCase {
 
 	func test_analyzeManifestWithPreviewContext_succeeds() throws {
 		// Arrange
-		let request = try AnalyzeManifestWithPreviewContextRequest(
+		let request = try AnalyzeTransactionExecutionRequest(
 			networkId: .simulator,
 			manifest: .init(instructions: .string("""
 			CALL_METHOD
@@ -39,7 +39,7 @@ final class AnalyzeManifestWithPreviewContextTests: TestCase {
 		)
 
 		// Act
-		let response = RadixEngine.instance.analyzeManifestWithPreviewContext(request: request)
+		let response = RadixEngine.instance.analyzeTransactionExecution(request: request)
 
 		// Assert
 		XCTAssertNoThrow(try response.get())

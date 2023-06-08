@@ -70,10 +70,10 @@ extension EngineToolkitClient {
 				try RadixEngine.instance.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			},
 			analyzeManifest: { request in
-				try RadixEngine.instance.analyzeManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
+				try RadixEngine.instance.extractAddressesFromManifest(request: .init(manifest: request.manifest, networkId: request.networkID)).get()
 			},
 			analyzeManifestWithPreviewContext: { manifestWithPreviewContext in
-				try RadixEngine.instance.analyzeManifestWithPreviewContext(request: manifestWithPreviewContext).get()
+				try RadixEngine.instance.analyzeTransactionExecution(request: manifestWithPreviewContext).get()
 			},
 			decodeAddress: { address in
 				try RadixEngine.instance.decodeAddressRequest(request: .init(address: address)).get()

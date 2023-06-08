@@ -20,7 +20,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkID: NetworkID? = nil
 
 		/// does not include lock fee?
-		public var analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse? = nil
+		public var analyzedManifestToReview: AnalyzeTransactionExecutionResponse? = nil
 
 		public var fee: BigDecimal
 		public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates?
@@ -336,7 +336,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	}
 
 	private func review(
-		manifestPreview manifestPreviewToReview: AnalyzeManifestWithPreviewContextResponse,
+		manifestPreview manifestPreviewToReview: AnalyzeTransactionExecutionResponse,
 		feeAdded: BigDecimal,
 		networkID: NetworkID
 	) -> EffectTask<Action> {
@@ -487,7 +487,7 @@ extension TransactionReview {
 		case estimated(instructionIndex: UInt32)
 	}
 
-	private func extractUserAccounts(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> [Account] {
+	private func extractUserAccounts(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 		return try manifest
 			.encounteredAddresses
@@ -505,7 +505,7 @@ extension TransactionReview {
 			}
 	}
 
-	private func extractUsedDapps(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewDappsUsed.State? {
+	private func extractUsedDapps(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> TransactionReviewDappsUsed.State? {
 		let components = manifest.encounteredAddresses.componentAddresses.userApplications
 		let dApps = try await components.asyncMap(extractDappInfo)
 		guard !dApps.isEmpty else { return nil }
@@ -526,7 +526,7 @@ extension TransactionReview {
 		)
 	}
 
-	private func exctractProofs(_ manifest: AnalyzeManifestWithPreviewContextResponse) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ manifest: AnalyzeTransactionExecutionResponse) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await manifest.accountProofResources.map(\.address).asyncMap(extractProofInfo)
 		guard !proofs.isEmpty else { return nil }
 
@@ -544,7 +544,7 @@ extension TransactionReview {
 	}
 
 	private func extractWithdrawals(
-		_ manifest: AnalyzeManifestWithPreviewContextResponse,
+		_ manifest: AnalyzeTransactionExecutionResponse,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -571,7 +571,7 @@ extension TransactionReview {
 	}
 
 	private func extractDeposits(
-		_ manifest: AnalyzeManifestWithPreviewContextResponse,
+		_ manifest: AnalyzeTransactionExecutionResponse,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {

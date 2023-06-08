@@ -251,7 +251,7 @@ public struct AddFeeToManifestOutcomeExcludesLockFee: Sendable, Equatable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Equatable {
-	public let analyzedManifestToReview: AnalyzeManifestWithPreviewContextResponse
+	public let analyzedManifestToReview: AnalyzeTransactionExecutionResponse
 	public let addFeeToManifestOutcome: AddFeeToManifestOutcome
 	public let networkID: NetworkID
 }

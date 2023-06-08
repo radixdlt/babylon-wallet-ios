@@ -82,8 +82,8 @@ extension EngineToolkitClient {
 
 	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 
-	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> AnalyzeManifestResponse
-	public typealias AnalyzeManifestWithPreviewContext = @Sendable (AnalyzeManifestWithPreviewContextRequest) throws -> AnalyzeManifestWithPreviewContextResponse
+	public typealias AnalyzeManifest = @Sendable (AnalyzeManifestRequest) throws -> ExtractAddressesFromManifestResponse
+	public typealias AnalyzeManifestWithPreviewContext = @Sendable (AnalyzeTransactionExecutionRequest) throws -> AnalyzeTransactionExecutionResponse
 
 	public typealias DecodeAddressRequest = @Sendable (String) throws -> DecodeAddressResponse
 
