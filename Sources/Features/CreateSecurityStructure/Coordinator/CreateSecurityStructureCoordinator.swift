@@ -139,7 +139,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
 				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
 			else {
-				assertionFailure("Unexpectly where in wrong state..?")
+				assertionFailure("Unexpectedly were in wrong state..?")
 				return .none
 			}
 			simpleSetupFlow.lostPhoneHelper = lostPhoneHelper
@@ -159,7 +159,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 				let simpleSetupFlowIndex = state.path.firstIndex(where: { $0.simpleSetupFlow != nil }),
 				var simpleSetupFlow = state.path[simpleSetupFlowIndex].simpleSetupFlow
 			else {
-				assertionFailure("Unexpectly where in wrong state..?")
+				assertionFailure("Unexpectedly were in wrong state..?")
 				return .none
 			}
 			simpleSetupFlow.newPhoneConfirmer = newPhoneConfirmer
