@@ -18,13 +18,13 @@ extension ImportMnemonic: PreviewedFeature {
 	public typealias ResultFromFeature = MnemonicWithPassphrase
 }
 
-// MARK: - CreateSecurityStructurePreviewApp
+// MARK: - ImportMnemonicPreviewApp
 @main
-struct CreateSecurityStructurePreviewApp: SwiftUI.App {
+struct ImportMnemonicPreviewApp: SwiftUI.App {
 	var body: some Scene {
 		FeaturesPreviewer<ImportMnemonic>.scene {
 			guard case let .notSavedInProfile(mnemonic) = $0 else { return nil }
-			return mnemonic
+			return .success(mnemonic)
 		}
 	}
 }
