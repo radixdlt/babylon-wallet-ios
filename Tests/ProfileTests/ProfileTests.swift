@@ -378,7 +378,7 @@ final class ProfileTests: TestCase {
 				numberOfPersonasOnAllNetworksInTotal: 3,
 				numberOfNetworks: 2
 			),
-			snapshotVersion: .init(rawValue: 35)
+			snapshotVersion: ProfileSnapshot.Header.Version.minimum
 		)
 
 		XCTAssertNoDifference(profile.header, header)
