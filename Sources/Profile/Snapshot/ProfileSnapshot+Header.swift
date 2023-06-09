@@ -145,7 +145,8 @@ extension ProfileSnapshot.Header.Version {
 	/// - 33: Add snapshot `header`
 	/// - 34: Change `FactorInstance` to hold `badge` being an enum `virtual`/`physical` (change from flat to nested representation of FactorSource storage)
 	/// - 35: Change FactorSource into an enum
-	public static let minimum: Self = 35
+	/// - 36: Add `structureConfigurations` to `AppPreferences.Security`
+	public static let minimum: Self = 36
 }
 
 extension ProfileSnapshot.Header {
