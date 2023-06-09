@@ -1,17 +1,7 @@
 import FeaturePrelude
 
-extension AnswerSecurityQuestionsCoordinator.State {
-	var viewState: AnswerSecurityQuestionsCoordinator.ViewState {
-		.init()
-	}
-}
-
 // MARK: - AnswerSecurityQuestionsCoordinator.View
 extension AnswerSecurityQuestionsCoordinator {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<AnswerSecurityQuestionsCoordinator>
