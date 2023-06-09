@@ -6,10 +6,15 @@ extension SecurityQuestionsFactorSource {
 			rawValue: .init(
 				uncheckedUniqueElements:
 				[
-					"Name of Radix DLT's Founder?",
-					"Name of Radix DLT's CEO?",
-					"Name of Radix DLT's CTO?",
-					"Common first name amongst Radix DLT employees from Sweden?",
+					"What's the fisrt name of RDX Works Founder",
+					"What's the fisrt name of RDX Works CEO",
+					"What's the fisrt name of RDX Works CTO",
+					"What's the fisrt name of RDX Works CPO",
+					"What's a common first name amongst Swedish RDX Works employees",
+					"What's the name of the first version of the Radix network (launch 2022)",
+					"What's the name of the second version of the Radix network (launch 2022)",
+					"What's the name of the third version of the Radix network (launch 2023)",
+					"What's the name of the fourth version of the Radix network (launch 2024)",
 				].enumerated().map {
 					SecurityQuestion(
 						id: .init(UInt($0.offset)),
@@ -26,7 +31,6 @@ public struct ChooseQuestions: Sendable, FeatureReducer {
 		public let availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
 
 		public let selectionRequirement: SelectionRequirement = .atLeast(CAP23.minimumNumberOfQuestions)
-//		public var availableAccounts: IdentifiedArrayOf<Profile.Network.Account>
 		public var selectedQuestions: [SecurityQuestion]?
 
 		public init(

@@ -5,8 +5,8 @@ extension ChooseQuestions {
 	public struct ViewState: Equatable {
 		let availableQuestions: [SecurityQuestion]
 		let selectionRequirement: SelectionRequirement
-		let selectedQuestions: [SecurityQuestion]?
-		let securityQuestionsToUse: NonEmpty<OrderedSet<SecurityQuestion>>?
+		var selectedQuestions: [SecurityQuestion]?
+		var securityQuestionsToUse: NonEmpty<OrderedSet<SecurityQuestion>>?
 
 		init(state: ChooseQuestions.State) {
 			let selectionRequirement = state.selectionRequirement
@@ -36,21 +36,16 @@ extension ChooseQuestions {
 					send: { .selectedQuestionsChanged($0) }
 				)
 				ScrollView {
-					VStack(spacing: .medium2) {
-						VStack(spacing: .small1) {
-							Selection(
-								selection,
-								from: viewStore.availableQuestions,
-								requiring: viewStore.selectionRequirement
-							) { item in
-								Text("Question: \(String(describing: item.value))")
-							}
+					VStack(spacing: .small1) {
+						Selection(
+							selection,
+							from: viewStore.availableQuestions,
+							requiring: viewStore.selectionRequirement
+						) { item in
+							ChooseyQuestionRowView(item: item)
 						}
-
-//						Button("Confirm question selection") {
-//							viewStore.send(.mockChoseQuetions)
-//						}.buttonStyle(.primaryRectangular)
 					}
+					.padding()
 				}
 				.footer {
 					WithControlRequirements(
@@ -66,6 +61,43 @@ extension ChooseQuestions {
 				}
 			}
 		}
+	}
+}
+
+// MARK: - ChooseyQuestionRowView
+@MainActor
+struct ChooseyQuestionRowView: SwiftUI.View {
+	let question: SecurityQuestion
+	let isSelected: Bool
+	let action: () -> Void
+	init(item: SelectionItem<SecurityQuestion>) {
+		self.question = item.value
+		self.isSelected = item.isSelected
+		self.action = item.action
+	}
+
+	var body: some SwiftUI.View {
+		Button(action: action) {
+			HStack {
+				Text("\(question.question.rawValue)")
+					.font(.app.body1HighImportance)
+					.foregroundColor(.app.white)
+
+				Spacer()
+
+				CheckmarkView(
+					appearance: .light,
+					isChecked: isSelected
+				)
+			}
+			.padding(.medium1)
+			.background(
+				Color.black
+					.brightness(isSelected ? -0.1 : 0)
+			)
+			.cornerRadius(.small1)
+		}
+		.buttonStyle(.inert)
 	}
 }
 
