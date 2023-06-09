@@ -50,6 +50,11 @@ extension CreateSecurityStructureCoordinator {
 					action: CreateSecurityStructureCoordinator.Path.Action.advancedSetupFlow,
 					then: { AdvancedCreateSecurityStructureFlow.View(store: $0) }
 				)
+				CaseLet(
+					state: /CreateSecurityStructureCoordinator.Path.State.nameNewStructure,
+					action: CreateSecurityStructureCoordinator.Path.Action.nameNewStructure,
+					then: { NameNewSecurityStructure.View(store: $0) }
+				)
 			}
 		}
 	}

@@ -23,6 +23,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case start(CreateSecurityStructureStart.State)
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.State)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.State)
+			case nameNewStructure(NameNewSecurityStructure.State)
 
 			var simpleSetupFlow: SimpleCreateSecurityStructureFlow.State? {
 				guard case let .simpleSetupFlow(simpleSetupFlow) = self else { return nil }
@@ -34,6 +35,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			case start(CreateSecurityStructureStart.Action)
 			case simpleSetupFlow(SimpleCreateSecurityStructureFlow.Action)
 			case advancedSetupFlow(AdvancedCreateSecurityStructureFlow.Action)
+			case nameNewStructure(NameNewSecurityStructure.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -45,6 +47,9 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.advancedSetupFlow, action: /Action.advancedSetupFlow) {
 				AdvancedCreateSecurityStructureFlow()
+			}
+			Scope(state: /State.nameNewStructure, action: /Action.nameNewStructure) {
+				NameNewSecurityStructure()
 			}
 		}
 	}
@@ -81,6 +86,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 		case done(TaskResult<SecurityStructureConfiguration>)
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	public init() {}
 
@@ -114,25 +120,18 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			state.modalDestinations = .simpleLostPhoneHelper(.init())
 			return .none
 
-		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.createSecurityStructure(simpleFactorConfig))))):
-			return .task {
-				let taskResult = await TaskResult {
-					let primary = try await factorSourcesClient
-						.getFactorSources(matching: {
-							$0.kind == .device && !$0.supportsOlympia
-						}).first!
+		case let .path(.element(_, action: .simpleSetupFlow(.delegate(.createSecurityStructure(simpleFlowResult))))):
 
-					return SecurityStructureConfiguration(
-						label: "Unnamed",
-						configuration: .init(
-							primaryRole: .single(primary),
-							recoveryRole: .single(simpleFactorConfig.lostPhoneHelper.embed()),
-							confirmationRole: .single(simpleFactorConfig.newPhoneConfirmer.embed())
-						)
-					)
-				}
-				return .delegate(.done(taskResult))
+			switch simpleFlowResult {
+			case let .success(simple):
+				let config = SecurityStructureConfiguration.Configuration(from: simple)
+				state.path.append(.nameNewStructure(.init(configuration: config)))
+			case let .failure(error):
+				loggerGlobal.error("Failed to create simple security structure, error: \(error)")
+				errorQueue.schedule(error)
 			}
+
+			return .none
 
 		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.success(lostPhoneHelper)))))):
 			// FIXME: uh.. this is terrible... hmm change to tree based navigation?
@@ -150,6 +149,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.failure(error)))))):
 			state.modalDestinations = nil
+			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to create lost phone helper, error: \(error)")
 			return .none
 
@@ -167,17 +167,31 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			state.modalDestinations = nil
 			return .none
 
-		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.decrypted)))))):
+		case .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.decrypted)))))):
 			state.modalDestinations = nil
 			assertionFailure("Expected to encrypt, not decrypt.")
 			return .none
 
 		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.failure(error)))))):
 			state.modalDestinations = nil
+			errorQueue.schedule(error)
 			loggerGlobal.error("Failed to create new phone confirmer, error: \(error)")
 			return .none
 
+		case let .path(.element(_, action: .nameNewStructure(.delegate(.securityStructureCreationResult(result))))):
+			return .send(.delegate(.done(result)))
+
 		default: return .none
 		}
+	}
+}
+
+extension SecurityStructureConfiguration.Configuration {
+	init(from simple: SimpleUnnamedSecurityStructureConfig) {
+		self.init(
+			primaryRole: .single(simple.singlePrimaryFactor),
+			recoveryRole: .single(simple.singleRecoveryFactor),
+			confirmationRole: .single(simple.singleConfirmationFactor)
+		)
 	}
 }

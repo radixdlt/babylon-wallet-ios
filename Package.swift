@@ -173,6 +173,7 @@ package.addModules([
 			"Profile",
 			"AnswerSecurityQuestionsFeature",
 			"AddTrustedContactFactorSourceFeature",
+			"AppPreferencesClient", // Save SecurityStructureConfig
 		],
 		tests: .no
 	),

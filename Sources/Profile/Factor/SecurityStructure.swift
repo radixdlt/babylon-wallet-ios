@@ -36,6 +36,12 @@ public struct RoleOfTier<Role, AbstractFactor>:
 	}
 }
 
+extension RoleOfTier where AbstractFactor == FactorSource {
+	public static func single(_ factor: any FactorSourceProtocol) -> Self {
+		Self.single(factor.embed())
+	}
+}
+
 // MARK: - SecurityStructureRole
 public enum SecurityStructureRole: Sendable, Hashable {
 	case primary

@@ -7,10 +7,10 @@ extension SimpleCreateSecurityStructureFlow.State {
 	}
 }
 
-// MARK: - SimpleUnnamedSecurityStructureConfig
-public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
-	let newPhoneConfirmer: SecurityQuestionsFactorSource
-	let lostPhoneHelper: TrustedContactFactorSource
+// MARK: - RecoveryAndConfirmationFactors
+public struct RecoveryAndConfirmationFactors: Sendable, Hashable {
+	let singleRecoveryFactor: TrustedContactFactorSource
+	let singleConfirmationFactor: SecurityQuestionsFactorSource
 }
 
 // MARK: - SimpleCreateSecurityStructureFlow.View
@@ -18,11 +18,14 @@ extension SimpleCreateSecurityStructureFlow {
 	public struct ViewState: Equatable {
 		let newPhoneConfirmer: SecurityQuestionsFactorSource?
 		let lostPhoneHelper: TrustedContactFactorSource?
-		var simpleSecurityStructure: SimpleUnnamedSecurityStructureConfig? {
-			guard let newPhoneConfirmer, let lostPhoneHelper else {
+		var simpleSecurityStructure: RecoveryAndConfirmationFactors? {
+			guard let lostPhoneHelper, let newPhoneConfirmer else {
 				return nil
 			}
-			return .init(newPhoneConfirmer: newPhoneConfirmer, lostPhoneHelper: lostPhoneHelper)
+			return .init(
+				singleRecoveryFactor: lostPhoneHelper,
+				singleConfirmationFactor: newPhoneConfirmer
+			)
 		}
 	}
 

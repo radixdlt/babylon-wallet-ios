@@ -1,4 +1,12 @@
+import FactorSourcesClient
 import FeaturePrelude
+
+// MARK: - SimpleUnnamedSecurityStructureConfig
+public struct SimpleUnnamedSecurityStructureConfig: Sendable, Hashable {
+	let singlePrimaryFactor: DeviceFactorSource
+	let singleRecoveryFactor: TrustedContactFactorSource
+	let singleConfirmationFactor: SecurityQuestionsFactorSource
+}
 
 // MARK: - SimpleCreateSecurityStructureFlow
 public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
@@ -21,14 +29,16 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case selectNewPhoneConfirmer
 		case selectLostPhoneHelper
-		case finishSelectingFactors(SimpleUnnamedSecurityStructureConfig)
+		case finishSelectingFactors(RecoveryAndConfirmationFactors)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case selectNewPhoneConfirmer
 		case selectLostPhoneHelper
-		case createSecurityStructure(SimpleUnnamedSecurityStructureConfig)
+		case createSecurityStructure(TaskResult<SimpleUnnamedSecurityStructureConfig>)
 	}
+
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
@@ -43,7 +53,22 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 			return .send(.delegate(.selectLostPhoneHelper))
 
 		case let .finishSelectingFactors(simpleFactorConfig):
-			return .send(.delegate(.createSecurityStructure(simpleFactorConfig)))
+			return .task {
+				let taskResult = await TaskResult {
+					let primary = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).filter {
+						!$0.supportsOlympia
+					}.first!
+
+					let simpleUnnamed = SimpleUnnamedSecurityStructureConfig(
+						singlePrimaryFactor: primary,
+						singleRecoveryFactor: simpleFactorConfig.singleRecoveryFactor,
+						singleConfirmationFactor: simpleFactorConfig.singleConfirmationFactor
+					)
+
+					return simpleUnnamed
+				}
+				return .delegate(.createSecurityStructure(taskResult))
+			}
 		}
 	}
 }

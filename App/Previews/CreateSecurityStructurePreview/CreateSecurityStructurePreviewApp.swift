@@ -26,6 +26,7 @@ struct CreateSecurityStructurePreviewApp: SwiftUI.App {
 			$0
 				.dependency(\.date, .constant(.now))
 				.dependency(\.factorSourcesClient, .previewApp)
+				.dependency(\.appPreferencesClient, .previewApp)
 				._printChanges()
 		}
 	}
@@ -45,4 +46,11 @@ extension FactorSourcesClient {
 				return NonEmpty<IdentifiedArrayOf<FactorSource>>.init(rawValue: [device.embed()])!
 			}
 		}
+}
+
+import AppPreferencesClient
+extension AppPreferencesClient {
+	static let previewApp: Self = with(noop) {
+		$0.updatePreferences = { _ in }
+	}
 }
