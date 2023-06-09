@@ -25,6 +25,7 @@ extension CharacterSet {
 
 // MARK: - CAP23
 public enum CAP23 {
+	public static let minimumNumberOfQuestions = 4
 	public static let forbiddenCharacters = CharacterSet
 		.whitespacesAndNewlines
 		.union(.characters(in: [

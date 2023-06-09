@@ -7,10 +7,8 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 		@PresentationState
 		public var answerSecurityQuestions: AnswerSecurityQuestionsCoordinator.State?
 
-		public init(
-			questions: NonEmpty<OrderedSet<SecurityQuestion>> = SecurityQuestionsFactorSource.defaultQuestions
-		) {
-			self.answerSecurityQuestions = .init(purpose: .encrypt(questions))
+		public init() {
+			self.answerSecurityQuestions = .init(purpose: .encrypt)
 		}
 	}
 

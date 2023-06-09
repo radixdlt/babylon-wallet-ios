@@ -1,20 +1,14 @@
-import ComposableArchitecture
 import Cryptography
-import DesignSystem
 import FactorSourcesClient
 import FeaturePrelude
 import MnemonicClient
-import Prelude
 
 // MARK: - AnswerSecurityQuestionsCoordinator
 public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let questions: NonEmpty<OrderedSet<SecurityQuestion>>
-		public var answers: OrderedDictionary<SecurityQuestion.ID, AnswerToSecurityQuestion> = [:]
-
 		public enum Purpose: Sendable, Hashable {
 			case decrypt(SecurityQuestionsFactorSource)
-			case encrypt(NonEmpty<OrderedSet<SecurityQuestion>>)
+			case encrypt
 
 			public enum AnswersResult: Sendable, Hashable {
 				case decrypted(Mnemonic)
@@ -22,29 +16,35 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			}
 		}
 
-		var root: Path.State?
-
-		var path: StackState<Path.State> = []
+		public var questions: OrderedSet<SecurityQuestion>
+		public var answers: OrderedDictionary<SecurityQuestion.ID, AnswerToSecurityQuestion> = [:]
 
 		public let purpose: Purpose
+		var root: Path.State?
+		var path: StackState<Path.State> = []
 
-		public init(
-			purpose: Purpose
-		) {
+		public init(purpose: Purpose) {
 			self.purpose = purpose
 			switch purpose {
+			case .encrypt:
+				self.questions = []
+				self.root = .chooseQuestions(.init())
+
 			case let .decrypt(factorSource):
-				self.questions = factorSource.sealedMnemonic.securityQuestions
-			case let .encrypt(questions):
-				self.questions = questions
+				let questions = factorSource.sealedMnemonic.securityQuestions
+				self.questions = questions.rawValue
+				self.root = .answerQuestion(.init(question: questions.first, isLast: questions.count == 1))
 			}
-			self.root = .freeform(.init(question: questions.first, isLast: questions.count == 1))
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case backButtonTapped
+	}
+
+	public enum DelegateAction: Sendable, Hashable {
+		case done(TaskResult<State.Purpose.AnswersResult>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -56,21 +56,22 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		case path(StackAction<Path.Action>)
 	}
 
-	public enum DelegateAction: Sendable, Hashable {
-		case done(TaskResult<State.Purpose.AnswersResult>)
-	}
-
 	public struct Path: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case freeform(AnswerSecurityQuestionsFreeform.State)
+			case chooseQuestions(ChooseQuestions.State)
+			case answerQuestion(AnswerSecurityQuestionsFreeform.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case freeform(AnswerSecurityQuestionsFreeform.Action)
+			case chooseQuestions(ChooseQuestions.Action)
+			case answerQuestion(AnswerSecurityQuestionsFreeform.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.freeform, action: /Action.freeform) {
+			Scope(state: /State.chooseQuestions, action: /Action.chooseQuestions) {
+				ChooseQuestions()
+			}
+			Scope(state: /State.answerQuestion, action: /Action.answerQuestion) {
 				AnswerSecurityQuestionsFreeform()
 			}
 		}
@@ -78,6 +79,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -102,8 +104,15 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case
-			let .root(.freeform(.delegate(.answered(answerToQuestion)))),
-			let .path(.element(id: _, action: .freeform(.delegate(.answered(answerToQuestion))))):
+			let .root(.chooseQuestions(.delegate(.choseQuestions(chosenQuestions)))):
+			state.questions = chosenQuestions.rawValue
+			state.path.append(.answerQuestion(.init(question: chosenQuestions.first, isLast: chosenQuestions.count == 1)))
+			return .none
+
+		case
+			let .root(.answerQuestion(.delegate(.answered(answerToQuestion)))),
+			let .path(.element(id: _, action: .answerQuestion(.delegate(.answered(answerToQuestion))))):
+
 			state.answers[answerToQuestion.question.id] = answerToQuestion
 			return continueEffect(for: &state)
 
@@ -114,7 +123,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		let unansweredQuestions = state.questions.filter { state.answers[$0.id] == nil }
 		if let nextQuestion = unansweredQuestions.first {
-			let pathState = Path.State.freeform(
+			let pathState = Path.State.answerQuestion(
 				.init(
 					question: nextQuestion,
 					isLast: unansweredQuestions.count == 1
@@ -163,7 +172,9 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	}
 
 	func goBackEffect(for state: inout State) -> EffectTask<Action> {
-		state.answers.removeLast()
+		if !state.answers.isEmpty {
+			state.answers.removeLast()
+		}
 		state.path.removeLast()
 		return .none
 	}

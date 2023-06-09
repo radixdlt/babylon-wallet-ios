@@ -1,22 +1,23 @@
-import ComposableArchitecture
-import Cryptography
-import DesignSystem
 import FeaturePrelude
-import Prelude
-import SwiftUI
 
-public extension AnswerSecurityQuestionsCoordinator {
+extension AnswerSecurityQuestionsCoordinator.State {
+	var viewState: AnswerSecurityQuestionsCoordinator.ViewState {
+		.init()
+	}
+}
+
+// MARK: - AnswerSecurityQuestionsCoordinator.View
+extension AnswerSecurityQuestionsCoordinator {
+	public struct ViewState: Equatable {
+		// TODO: declare some properties
+	}
+
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<AnswerSecurityQuestionsCoordinator>
 
 		public init(store: StoreOf<AnswerSecurityQuestionsCoordinator>) {
 			self.store = store
-		}
-
-		// MARK: ViewState
-		struct ViewState: Equatable {
-			init(state: AnswerSecurityQuestionsCoordinator.State) {}
 		}
 
 		public var body: some SwiftUI.View {
@@ -62,11 +63,36 @@ public extension AnswerSecurityQuestionsCoordinator {
 		) -> some SwiftUI.View {
 			SwitchStore(store) {
 				CaseLet(
-					state: /AnswerSecurityQuestionsCoordinator.Path.State.freeform,
-					action: AnswerSecurityQuestionsCoordinator.Path.Action.freeform,
+					state: /AnswerSecurityQuestionsCoordinator.Path.State.chooseQuestions,
+					action: AnswerSecurityQuestionsCoordinator.Path.Action.chooseQuestions,
+					then: { ChooseQuestions.View(store: $0) }
+				)
+				CaseLet(
+					state: /AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
+					action: AnswerSecurityQuestionsCoordinator.Path.Action.answerQuestion,
 					then: { AnswerSecurityQuestionsFreeform.View(store: $0) }
 				)
 			}
 		}
 	}
 }
+
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+// MARK: - AnswerSecurityQuestionsCoordinator_Preview
+struct AnswerSecurityQuestionsCoordinator_Preview: PreviewProvider {
+	static var previews: some View {
+		AnswerSecurityQuestionsCoordinator.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: AnswerSecurityQuestionsCoordinator()
+			)
+		)
+	}
+}
+
+extension AnswerSecurityQuestionsCoordinator.State {
+	public static let previewValue = Self(purpose: .encrypt)
+}
+#endif

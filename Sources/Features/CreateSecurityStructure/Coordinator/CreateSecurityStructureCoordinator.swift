@@ -4,26 +4,6 @@ import FactorSourcesClient
 import FeaturePrelude
 import Profile
 
-extension SecurityQuestionsFactorSource {
-	public static let defaultQuestions: NonEmpty<OrderedSet<SecurityQuestion>> = {
-		.init(
-			rawValue: .init(
-				uncheckedUniqueElements:
-				[
-					"Name of Radix DLT's Founder?",
-					"Name of Radix DLT's CEO?",
-					"Name of Radix DLT's CTO?",
-					"Common first name amongst Radix DLT employees from Sweden?",
-				].enumerated().map {
-					SecurityQuestion(
-						id: .init(UInt($0.offset)),
-						question: .init(rawValue: $0.element)!
-					)
-				}
-			))!
-	}()
-}
-
 // MARK: - CreateSecurityStructureCoordinator
 public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -127,7 +107,7 @@ public struct CreateSecurityStructureCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .path(.element(_, action: .simpleSetupFlow(.delegate(.selectNewPhoneConfirmer)))):
-			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: .encrypt(SecurityQuestionsFactorSource.defaultQuestions)))
+			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: .encrypt))
 			return .none
 
 		case .path(.element(_, action: .simpleSetupFlow(.delegate(.selectLostPhoneHelper)))):
