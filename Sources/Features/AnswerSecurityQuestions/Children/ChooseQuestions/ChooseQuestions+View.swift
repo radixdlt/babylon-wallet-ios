@@ -37,6 +37,9 @@ extension ChooseQuestions {
 				)
 				ScrollView {
 					VStack(spacing: .small1) {
+						// FIXME: Strings
+						Text("Choose at least #\(CAP23.minimumNumberOfQuestions) security questions. You will only need to remember #\(CAP23.minimumNumberCorrectAnswers)")
+							.font(.app.body1Header)
 						Selection(
 							selection,
 							from: viewStore.availableQuestions,
@@ -47,6 +50,7 @@ extension ChooseQuestions {
 					}
 					.padding()
 				}
+				.navigationTitle("Choose Questions") // FIXME: Strings
 				.footer {
 					WithControlRequirements(
 						{
@@ -55,7 +59,8 @@ extension ChooseQuestions {
 						}(),
 						forAction: { viewStore.send(.confirmedSelectedQuestions($0)) }
 					) { action in
-						Button(L10n.DAppRequest.ChooseAccounts.continue, action: action)
+						// FIXME:
+						Button("Answer chosen questions", action: action)
 							.buttonStyle(.primaryRectangular)
 					}
 				}
@@ -79,7 +84,7 @@ struct ChooseyQuestionRowView: SwiftUI.View {
 	var body: some SwiftUI.View {
 		Button(action: action) {
 			HStack {
-				Text("\(question.question.rawValue)")
+				Text("\(question.question.rawValue)?")
 					.font(.app.body1HighImportance)
 					.foregroundColor(.app.white)
 

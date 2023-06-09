@@ -6,10 +6,10 @@ extension SecurityQuestionsFactorSource {
 			rawValue: .init(
 				uncheckedUniqueElements:
 				[
-					"What's the fisrt name of RDX Works Founder",
-					"What's the fisrt name of RDX Works CEO",
-					"What's the fisrt name of RDX Works CTO",
-					"What's the fisrt name of RDX Works CPO",
+					"What's the first name of RDX Works Founder",
+					"What's the first name of RDX Works CEO",
+					"What's the first name of RDX Works CTO",
+					"What's the first name of RDX Works CPO",
 					"What's a common first name amongst Swedish RDX Works employees",
 					"What's the name of the first version of the Radix network (launch 2022)",
 					"What's the name of the second version of the Radix network (launch 2022)",

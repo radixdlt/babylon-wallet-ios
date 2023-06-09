@@ -21,6 +21,7 @@ public extension AnswerSecurityQuestionsFreeform {
 		init(state: AnswerSecurityQuestionsFreeform.State) {
 			question = state.question.question.rawValue
 			answer = state.answer.map(\.rawValue) ?? ""
+			// FIXME: Strings
 			buttonTitle = state.isLast ? "Submit" : "Next question"
 			continueButtonState = state.answer == nil ? .disabled : .enabled
 		}
@@ -42,8 +43,18 @@ public extension AnswerSecurityQuestionsFreeform {
 					send: { .view($0) }
 				) { viewStore in
 					VStack {
-						Text("Q: \(viewStore.question)")
+						Image(systemName: "questionmark.app.dashed")
+							.resizable()
+							.scaledToFit()
+							.padding([.leading, .trailing], 100)
 
+						// FIXME: Strings
+						Text("\(viewStore.question)?")
+							.font(.app.sheetTitle)
+							.fixedSize(horizontal: false, vertical: true)
+							.padding()
+
+						// FIXME: Strings
 						TextField(
 							"Answer",
 							text: viewStore.binding(
@@ -58,8 +69,11 @@ public extension AnswerSecurityQuestionsFreeform {
 						}
 						.buttonStyle(.primaryRectangular)
 						.controlState(viewStore.continueButtonState)
+
+						Spacer(minLength: 0)
 					}
 					.padding()
+					.navigationTitle("Answer Question")
 				}
 			}
 		}
