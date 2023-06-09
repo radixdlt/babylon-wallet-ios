@@ -41,7 +41,7 @@ public struct SimpleNewPhoneConfirmer: Sendable, FeatureReducer {
 			}
 
 		case .answerSecurityQuestions(.presented(.delegate(.done(.success(.decrypted))))):
-			let errorMessage = "Unexpecte delegate action, expected to have created a factor source, not decrypt one."
+			let errorMessage = "Unexpected delegate action, expected to have created a factor source, not decrypt one."
 			loggerGlobal.error(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 			return .none

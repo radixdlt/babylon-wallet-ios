@@ -23,7 +23,9 @@ extension AdvancedCreateSecurityStructureFlow {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				VStack {
-					Text("Foo")
+					Text("NOT IMPLEMENTED YET")
+						.font(.app.sheetTitle)
+						.foregroundColor(.red)
 				}
 			}
 		}
