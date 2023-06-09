@@ -196,7 +196,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:
-			state.destination = .ledgerHardwareWallets(.init(allowSelection: false))
+			state.destination = .ledgerHardwareWallets(.init(allowSelection: false, context: .settings, showHeaders: true))
 			return .none
 
 		case .mnemonicsButtonTapped:

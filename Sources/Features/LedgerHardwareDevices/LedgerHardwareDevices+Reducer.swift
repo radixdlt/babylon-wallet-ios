@@ -15,8 +15,14 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
+		public enum Context {
+			case settings
+			case ledgerSelection
+		}
+
 		public let allowSelection: Bool
 		public let showHeaders: Bool
+		public let context: Context
 
 		public var hasAConnectorExtension: Bool = false
 
@@ -31,8 +37,9 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 		var pendingAction: ActionRequiringP2P? = nil
 
-		public init(allowSelection: Bool, showHeaders: Bool = true) {
+		public init(allowSelection: Bool, context: Context, showHeaders: Bool = true) {
 			self.allowSelection = allowSelection
+			self.context = context
 			self.showHeaders = showHeaders
 		}
 	}

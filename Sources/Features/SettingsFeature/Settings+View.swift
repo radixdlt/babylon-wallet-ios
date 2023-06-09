@@ -167,7 +167,12 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: { LedgerHardwareDevices.View(store: $0) }
+			destination: {
+				LedgerHardwareDevices.View(store: $0)
+					.background(.app.gray5)
+					.navigationTitle(L10n.Settings.ledgerHardwareWallets)
+					.toolbarBackground(.visible, for: .navigationBar)
+			}
 		)
 	}
 

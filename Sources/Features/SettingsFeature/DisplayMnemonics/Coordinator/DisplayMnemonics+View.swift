@@ -36,16 +36,18 @@ extension DisplayMnemonics {
 								state: \.deviceFactorSources,
 								action: { .child(.row(id: $0, action: $1)) }
 							)
-						) {
-							DisplayMnemonicRow.View(store: $0)
-								.padding(.medium3)
-							Separator()
+						) { store in
+							VStack(spacing: .small2) {
+								DisplayMnemonicRow.View(store: store)
+								Separator()
+							}
+							.padding([.top, .horizontal], .medium3)
 						}
 						.background(.app.background)
 					}
 					.padding(.top, .medium3)
 				}
-				.background(.app.gray4)
+				.background(.app.gray5)
 				.navigationTitle(L10n.SeedPhrases.title)
 				.toolbarBackground(.visible, for: .navigationBar)
 				.onFirstTask { @MainActor in
