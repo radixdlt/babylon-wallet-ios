@@ -311,7 +311,7 @@ extension AppSettings.View {
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 			.init(
-				title: L10n.DisplayMnemonics.seedPhrases,
+				title: L10n.SeedPhrases.title,
 				icon: .asset(AssetResource.ellipsis),
 				action: .mnemonicsButtonTapped
 			),

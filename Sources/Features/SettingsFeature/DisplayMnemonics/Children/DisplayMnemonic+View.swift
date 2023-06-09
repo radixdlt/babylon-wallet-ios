@@ -4,8 +4,7 @@ import ImportMnemonicFeature
 extension DisplayMnemonic.State {
 	var viewState: DisplayMnemonic.ViewState {
 		.init(
-			isLoading: importMnemonic == nil,
-			navigationTitle: deviceFactorSource.labelSeedPhraseKind
+			isLoading: importMnemonic == nil
 		)
 	}
 }
@@ -14,7 +13,6 @@ extension DisplayMnemonic.State {
 extension DisplayMnemonic {
 	public struct ViewState: Equatable {
 		let isLoading: Bool
-		let navigationTitle: String
 	}
 
 	@MainActor
@@ -41,7 +39,7 @@ extension DisplayMnemonic {
 						)
 					) { importMnemonicViewStore in
 						VStack(alignment: .leading, spacing: .medium2) {
-							WarningView(text: "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.")
+							WarningView(text: L10n.RevealSeedPhrase.warning)
 								.padding(.horizontal, .medium3)
 
 							ImportMnemonic.View(store: importMnemonicViewStore)
@@ -50,7 +48,7 @@ extension DisplayMnemonic {
 					}
 				}
 			}
-			.navigationTitle("Reveal Seed Phrase")
+			.navigationTitle(L10n.RevealSeedPhrase.title)
 			.navigationBarTitleDisplayMode(.inline)
 		}
 	}

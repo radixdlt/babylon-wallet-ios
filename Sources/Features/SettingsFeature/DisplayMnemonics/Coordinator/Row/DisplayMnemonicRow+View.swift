@@ -1,12 +1,13 @@
 import FeaturePrelude
 
-extension DeviceFactorSource {
-	var labelSeedPhraseKind: String {
-		supportsOlympia ? L10n.DisplayMnemonics.labelSeedPhraseKindOlympia : L10n.DisplayMnemonics.labelSeedPhraseKind
-	}
-
-	var labelDate: String {
-		supportsOlympia ? L10n.DisplayMnemonics.labelDateOlympia : L10n.DisplayMnemonics.labelDate
+extension DisplayMnemonicRow.State {
+	var connectedAccounts: String {
+		let accountsCount = accountsForDeviceFactorSource.accounts.count
+		if accountsCount == 1 {
+			return L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
+		} else {
+			return L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accountsCount)
+		}
 	}
 }
 
@@ -32,10 +33,10 @@ extension DisplayMnemonicRow {
 								.frame(.smallest)
 
 							VStack(alignment: .leading) {
-								Text("Reveal Seed Phrase")
+								Text(L10n.SeedPhrases.SeedPhrase.reveal)
 									.textStyle(.body1Header)
 									.foregroundColor(.app.gray1)
-								Text("Connected to \(viewStore.accountsForDeviceFactorSource.accounts.count) accounts")
+								Text(viewStore.connectedAccounts)
 									.textStyle(.body2Regular)
 									.foregroundColor(.app.gray2)
 							}
@@ -51,44 +52,6 @@ extension DisplayMnemonicRow {
 								.cornerRadius(.small1)
 						}
 					}
-				}
-			}
-		}
-	}
-}
-
-// MARK: - AccountsForDeviceFactorSourceView
-struct AccountsForDeviceFactorSourceView: SwiftUI.View {
-	let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
-	var deviceFactorSource: DeviceFactorSource {
-		accountsForDeviceFactorSource.deviceFactorSource
-	}
-
-	var body: some View {
-		VStack(alignment: .leading) {
-			HStack {
-				Image(asset: AssetResource.signingKey)
-					.resizable()
-					.frame(.smallest)
-
-				VStack(alignment: .leading) {
-					Text("Reveal Seed Phrase")
-						.textStyle(.body1Header)
-						.foregroundColor(.app.gray1)
-					Text("Connected to \(accountsForDeviceFactorSource.accounts.count) accounts")
-						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
-				}
-
-				Spacer()
-				Image(asset: AssetResource.chevronRight)
-			}
-			.border(.red)
-
-			VStack(alignment: .leading, spacing: .small3) {
-				ForEach(accountsForDeviceFactorSource.accounts) { account in
-					SmallAccountCard(account: account)
-						.cornerRadius(.small1)
 				}
 			}
 		}
