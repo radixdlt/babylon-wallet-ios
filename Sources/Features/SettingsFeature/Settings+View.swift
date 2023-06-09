@@ -167,7 +167,12 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: { LedgerHardwareDevices.View(store: $0) }
+			destination: {
+				LedgerHardwareDevices.View(store: $0)
+					.background(.app.gray5)
+					.navigationTitle(L10n.Settings.ledgerHardwareWallets)
+					.toolbarBackground(.visible, for: .navigationBar)
+			}
 		)
 	}
 
@@ -310,6 +315,11 @@ extension AppSettings.View {
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
 			),
+			.init(
+				title: L10n.SeedPhrases.title,
+				icon: .asset(AssetResource.ellipsis),
+				action: .mnemonicsButtonTapped
+			),
 		]
 
 		#if DEBUG
@@ -328,11 +338,6 @@ extension AppSettings.View {
 				title: L10n.Settings.Debug.inspectProfile,
 				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
-			),
-			.init(
-				title: L10n.DisplayMnemonics.seedPhrases,
-				icon: .asset(AssetResource.ellipsis),
-				action: .mnemonicsButtonTapped
 			),
 		])
 		#endif

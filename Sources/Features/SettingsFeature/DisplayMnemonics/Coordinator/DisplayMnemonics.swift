@@ -38,18 +38,11 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, Equatable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case useCaution(AlertState<Action.UseCautionAlert>)
 			case displayMnemonic(DisplayMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case useCaution(UseCautionAlert)
 			case displayMnemonic(DisplayMnemonic.Action)
-
-			public enum UseCautionAlert: Sendable, Hashable {
-				case revealTapped(DisplayMnemonicRow.State.ID)
-				case cancelTapped
-			}
 		}
 
 		public init() {}
@@ -105,7 +98,12 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .row(id, action: .delegate(.openDetails)):
-			state.destination = .useCaution(.useCaution(id))
+			guard let deviceFactorSource = state.deviceFactorSources[id: id]?.deviceFactorSource else {
+				loggerGlobal.warning("Unable to find factor source in state... strange!")
+				return .none
+			}
+			// FIXME: Auto close after 2 minutes?
+			state.destination = .displayMnemonic(.init(deviceFactorSource: deviceFactorSource))
 			return .none
 		case .destination(.presented(.displayMnemonic(.delegate(.failedToLoad)))):
 			state.destination = nil
@@ -113,15 +111,6 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 		case .destination(.presented(.displayMnemonic(.delegate(.doneViewing)))):
 			state.destination = nil
-			return .none
-
-		case let .destination(.presented(.useCaution(.revealTapped(id)))):
-			guard let deviceFactorSource = state.deviceFactorSources[id: id]?.deviceFactorSource else {
-				loggerGlobal.warning("Unable to find factor source in state... strange!")
-				return .none
-			}
-			// FIXME: Auto close after 2 minutes?
-			state.destination = .displayMnemonic(.init(deviceFactorSource: deviceFactorSource))
 			return .none
 
 		default: return .none
@@ -152,23 +141,6 @@ extension DisplayMnemonics {
 			await .internal(.loadedFactorSources(TaskResult {
 				try await doLoad()
 			}))
-		}
-	}
-}
-
-extension AlertState<DisplayMnemonics.Destinations.Action.UseCautionAlert> {
-	static func useCaution(_ id: DisplayMnemonicRow.State.ID) -> AlertState {
-		AlertState {
-			TextState(L10n.DisplayMnemonics.CautionAlert.title)
-		} actions: {
-			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.Common.cancel)
-			}
-			ButtonState(role: .destructive, action: .revealTapped(id)) {
-				TextState(L10n.DisplayMnemonics.CautionAlert.revealButtonLabel)
-			}
-		} message: {
-			TextState(L10n.DisplayMnemonics.CautionAlert.message)
 		}
 	}
 }

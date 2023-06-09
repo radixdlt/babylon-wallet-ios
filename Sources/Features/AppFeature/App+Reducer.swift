@@ -1,5 +1,4 @@
 import AppPreferencesClient
-import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
 import MainFeature
@@ -73,7 +72,6 @@ public struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
@@ -163,7 +161,7 @@ public struct App: Sendable, FeatureReducer {
 			return goToOnboarding(state: &state)
 
 		case .onboardingCoordinator(.delegate(.completed)):
-			return checkAccountRecoveryNeeded()
+			return goToMain(state: &state, accountRecoveryIsNeeded: false)
 
 		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
 			switch loadProfileOutcome {
@@ -209,14 +207,6 @@ public struct App: Sendable, FeatureReducer {
 			)
 		)
 		return .none
-	}
-
-	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
-		.task {
-			// When coming from onboarding flow, recovery check is allowed to fail
-			let isAccountRecoveryNeeded = await (try? deviceFactorSourceClient.isAccountRecoveryNeeded()) ?? true
-			return .internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded))
-		}
 	}
 
 	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> EffectTask<Action> {

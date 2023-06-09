@@ -808,26 +808,6 @@ public enum L10n {
       public static let subtitleWrongNetworkID = L10n.tr("Localizable", "dAppRequest_validationOutcome_subtitleWrongNetworkID", fallback: "Network mismatch")
     }
   }
-  public enum DisplayMnemonics {
-    /// Generated on
-    public static let labelDate = L10n.tr("Localizable", "displayMnemonics_labelDate", fallback: "Generated on")
-    /// Imported on
-    public static let labelDateOlympia = L10n.tr("Localizable", "displayMnemonics_labelDateOlympia", fallback: "Imported on")
-    /// Main Seed Phrase
-    public static let labelSeedPhraseKind = L10n.tr("Localizable", "displayMnemonics_labelSeedPhraseKind", fallback: "Main Seed Phrase")
-    /// Legacy Seed Phrase
-    public static let labelSeedPhraseKindOlympia = L10n.tr("Localizable", "displayMnemonics_labelSeedPhraseKindOlympia", fallback: "Legacy Seed Phrase")
-    /// Seed Phrases
-    public static let seedPhrases = L10n.tr("Localizable", "displayMnemonics_seedPhrases", fallback: "Seed Phrases")
-    public enum CautionAlert {
-      /// A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.
-      public static let message = L10n.tr("Localizable", "displayMnemonics_cautionAlert_message", fallback: "A seed phrase provides full control of its Accounts. Do not view in a public area. Back up the seed phrase words securely. Screenshots are disabled.")
-      /// Reveal Seed Phrase
-      public static let revealButtonLabel = L10n.tr("Localizable", "displayMnemonics_cautionAlert_revealButtonLabel", fallback: "Reveal Seed Phrase")
-      /// Use Caution
-      public static let title = L10n.tr("Localizable", "displayMnemonics_cautionAlert_title", fallback: "Use Caution")
-    }
-  }
   public enum EditPersona {
     /// Add a Field
     public static let addAField = L10n.tr("Localizable", "editPersona_addAField", fallback: "Add a Field")
@@ -1337,6 +1317,30 @@ public enum L10n {
     }
     /// Use iCloud Backup Data
     public static let useICloudBackup = L10n.tr("Localizable", "restoreFromBackup_useICloudBackup", fallback: "Use iCloud Backup Data")
+  }
+  public enum RevealSeedPhrase {
+    /// Reveal Seed Phrase
+    public static let title = L10n.tr("Localizable", "revealSeedPhrase_title", fallback: "Reveal Seed Phrase")
+    /// For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.
+    public static let warning = L10n.tr("Localizable", "revealSeedPhrase_warning", fallback: "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.")
+  }
+  public enum SeedPhrases {
+    /// A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.
+    public static let message = L10n.tr("Localizable", "seedPhrases_message", fallback: "A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.")
+    /// Seed Phrases
+    public static let title = L10n.tr("Localizable", "seedPhrases_title", fallback: "Seed Phrases")
+    /// You are responsible for the security of your Seed Phrase
+    public static let warning = L10n.tr("Localizable", "seedPhrases_warning", fallback: "You are responsible for the security of your Seed Phrase")
+    public enum SeedPhrase {
+      /// Connected to %d accounts
+      public static func multipleConnectedAccounts(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "seedPhrases_seedPhrase_multipleConnectedAccounts", p1, fallback: "Connected to %d accounts")
+      }
+      /// Connected to 1 account
+      public static let oneConnectedAccount = L10n.tr("Localizable", "seedPhrases_seedPhrase_oneConnectedAccount", fallback: "Connected to 1 account")
+      /// Reveal Seed Phrase
+      public static let reveal = L10n.tr("Localizable", "seedPhrases_seedPhrase_reveal", fallback: "Reveal Seed Phrase")
+    }
   }
   public enum Settings {
     /// App Settings
