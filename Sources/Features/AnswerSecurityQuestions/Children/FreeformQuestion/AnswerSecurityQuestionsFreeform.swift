@@ -33,6 +33,7 @@ public struct AnswerSecurityQuestionsFreeform: Sendable, FeatureReducer {
 		case let .answerChanged(answer):
 			state.answer = NonEmpty(answer)
 			return .none
+
 		case .submitAnswer:
 			guard let answerString = state.answer else {
 				return .none

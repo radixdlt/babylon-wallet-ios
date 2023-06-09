@@ -42,35 +42,42 @@ public extension AnswerSecurityQuestionsFreeform {
 					observe: ViewState.init(state:),
 					send: { .view($0) }
 				) { viewStore in
-					VStack {
-						Image(systemName: "questionmark.app.dashed")
-							.resizable()
-							.scaledToFit()
-							.padding([.leading, .trailing], 100)
+					ScrollView {
+						VStack {
+							LinearGradient(._1)
+								.rotationEffect(.degrees(45))
+								.mask {
+									Image(systemName: "questionmark.app")
+										.resizable()
+										.padding(25)
+								}
+								.scaledToFit()
+								.frame(idealHeight: 150)
 
-						// FIXME: Strings
-						Text("\(viewStore.question)?")
-							.font(.app.sheetTitle)
-							.fixedSize(horizontal: false, vertical: true)
-							.padding()
+							// FIXME: Strings
+							Text("\(viewStore.question)?")
+								.font(.app.sectionHeader)
+								.fixedSize(horizontal: false, vertical: true)
+								.padding()
 
-						// FIXME: Strings
-						TextField(
-							"Answer",
-							text: viewStore.binding(
-								get: \.answer,
-								send: { .answerChanged($0) }
+							// FIXME: Strings
+							TextField(
+								"Answer",
+								text: viewStore.binding(
+									get: \.answer,
+									send: { .answerChanged($0) }
+								)
 							)
-						)
-						.textFieldStyle(.roundedBorder)
-
+							.textFieldStyle(.roundedBorder)
+							.layoutPriority(1)
+						}
+					}
+					.footer {
 						Button(viewStore.buttonTitle) {
 							viewStore.send(.submitAnswer)
 						}
 						.buttonStyle(.primaryRectangular)
 						.controlState(viewStore.continueButtonState)
-
-						Spacer(minLength: 0)
 					}
 					.padding()
 					.navigationTitle("Answer Question")

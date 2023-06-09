@@ -5,7 +5,8 @@ import FeaturesPreviewerFeature
 extension AnswerSecurityQuestionsCoordinator.State: EmptyInitializable {
 	public init() {
 		self.init(
-			//						purpose: .encrypt(SecurityQuestionsFactorSource.defaultQuestions)
+			/// expect: `"walk warrior drive idle maid cherry connect slide slide phrase tower ability trash entry almost follow erupt egg trash tennis omit wing course sugar"`
+//			purpose: .encrypt
 			purpose: .decrypt(try! .fromJSON(json))
 		)
 	}
@@ -40,6 +41,11 @@ struct AnswerSecurityQuestionsApp_: SwiftUI.App {
 		FeaturesPreviewer<AnswerSecurityQuestionsCoordinator>.scene {
 			guard case let .done(taskResult) = $0 else { return nil }
 			return taskResult
+		} withReducer: {
+			$0
+				.dependency(\.date, .constant(.now))
+				.dependency(\.factorSourcesClient, .noop)
+				._printChanges()
 		}
 	}
 }
@@ -55,11 +61,10 @@ extension SecurityQuestionsFactorSource {
 	}
 }
 
-/// expect: `"stamp canvas project humble post satisfy easily term regular wheat feed ticket ecology absent desert flat custom erode scrub jelly coffee purity rebuild wink"`
 private let json = """
  {
 	"common" :  {
-		"addedOn" : "2023-06-07T08:35:53Z",
+		"addedOn" : "2023-06-09T12:30:28Z",
 		"cryptoParameters" :  {
 			"supportedCurves" :  [
 				"curve25519"
@@ -68,39 +73,39 @@ private let json = """
 				"cap26"
 			]
 		},
-		"id" : "5e3c2c3afdd4d62920e1ba5288202ab9f4e747abf81c3a40330c5df966e052ccb7",
-		"lastUsedOn" : "2023-06-07T08:35:53Z"
+		"id" : "5eec63f760a8d15b4e544bf334f5532b61ce741c28aa24475f49c472f33ac29d0e",
+		"lastUsedOn" : "2023-06-09T12:30:28Z"
 	},
 	"sealedMnemonic" :  {
 		"encryptions" :  [
-			"0133af86be52840d01c80fafb5d13ed990000b83eca4f8f2e2cc9c98b7e7e541a71cc6bf8333790e3a88b4eac546fd7bf02534341a40841a33129a0d5913949ebc4712d92f139fb7585d6de689bd04ceb7c09b7cd5334f6aa1bf7e509a17fe8d59e108cea528d2e9911bb53a710dccce795f8929242ec4cb261f62ea9f6986515b5c52c3dbc6b54950bcbc9041d885d1ba1b5a8f3b12e788beddaa9b91e93aab7934430e494816fa07a9c0bda1389ece6754a0afe79428d47a04da",
-			"6f4d0978fbbc60ea723bfdcd84aa91becb17c10015dff77f3bf2abbf470dd70de63ee9933c6e47ba52722989cc05edced8e4c929cc63843c7cb9605350287f519ec3eb5ff37cd552460096914a287446da46a6a10a39906855f40e21bab0bb85b3f37dee0f6082fbe285ff9889ac745e83061e47c4a83caa7acfce2bff0a251cb12a0f31ef0e08b6c3835403b0c03cea0ad78151a60f709304f87cd3249eb3cf25d8d7bc8c87d70c2a22f1c55f4376e2331db34f77441c18d8cf61",
-			"d9bf65839a98e2535684a79b9d8190cfc2635e75f831bc1a5d2bcbadffa53abc028721b1eb71557820fc14b137a8c831228ee7a6015932eedd2900ebcbe5dcfca7594bfadeb3f1fe6a5a3840edf5272876b04aa44dcde7a49acc3e91a959ae2b1c4baff794977fa116381235b3ba12b66b0606ee82d482e6b4b87f858554e177d2eb568cb04131c0ac2ed2c1bed0cd8c4166a960b18c90784a2a6e794dc5993d72f41ff6e1f0373b2c2e046ef2d5105695c58179904475e4b9f00f",
-			"4953d939f76593f6bee51284b491cbc2288282e2ce6ac5e412588866847d0692033bfc8b7f63e5367eb28499702b3d8837d3303706d1293f972bddc1be1f583d73b1e9bbb7a0648955e23669b785c5374b78e9f0eb518722cf4b82357dd691dc55a56cc66c0b33c1080282808d53b49fc34b9a3b5f773dee98e172bd922f7e7d9dbc2e7cd6ff6c0213ddac076839284a189378b7d3a4281311fdb1e1eea560ba5ef67c53f109bfc6a0beadf9354aca9a5e4a1e9820584fd0667be8"
+			"df0056d91a2e9a0ed9337b666c737268e0f1ecd894de302774647ec63001149d80df8054906ef9432b01f9adc13782ad441efdf263dab355f7e841742e1d82779094f78e5ba54012294578dd864c3cc47b3a54bd95edd0116f0c0f9962849914a9109632742b5780b926249bda284fce2194ea3225278b0dee1ec317c6cdb5c3ef6b10bf939004b8e1cffa2fb00a0c7a24026cd844e84eb0334da318bae3681652d1f7d22913262773100b8c8d6dcd3a46d2",
+			"0eddb0d0af54f52941dde0889d01c41b204fcce8e2b01e03a1244239150387f186807114a51e1f642026c8af3fffda722df5359b8a0dd7aee8395d044bd211c919bc8b4ec4e0e0aa5b6692a45e025664dfeadc2ba5bd02f8e34caa3cd3a11efac0751e3266df33df3ea8b00dd7c903dff632bfacf3e02ab639a03c15526d4e7908d96c031fe6c1959778e990dcc55a4583207d579b5b0d4d60c66768791800bd5aaa20f70c20c9e6f013d28b145ab69b4fca",
+			"10414dd09216922a3b6b3e2e3398f2488e83bd13adc7f24cbbdf11161d3e72e8670ed307d25f2d55197e9e604877ec5c45056ddda681b86aa7e1fa79bcdbf5c5beeb67c8b9f69c824e67df3855ee5c5896d956925f25b47c948fb85d2ea516ed8e19fb9112aa84a4542878ef61856e7e00cece114cf87ab7a97e36472f07e66417b62f63eea2d2afaf847b10ce5d7a88bc0021511e55dd07d6ef1ff67b938cb4a825d5445439bd03a86947b44163138ef868",
+			"68d1701a00e36376a3365cf151eb032a4de5fd9e00944404ddb0b6761f607ef9fe6dc0327a1d8b1d1f83ce5103fa913187e1ab99d12d8706817d1f054e27c5e54871612f7b54cb0c6a097ee46b39200d1b1f2a322620f8469be01a00805031f469434eb4d18fcf89a7715c9f83d4579d751aea445afcece2cccd20a803aad9390b0d36434f6bf94336cc7560df0b7b41c787991869ee2c9f25f8d0e974267d792c546816a7ece807693a5688f936dd1b9106"
 		],
 		"securityQuestions" :  [
 			 {
 				"id" : 0,
 				"kind" : "freeform",
-				"question" : "Name of Radix DLT's Founder?",
+				"question" : "What's the first name of RDX Works Founder",
 				"version" : 1
 			},
 			 {
 				"id" : 1,
 				"kind" : "freeform",
-				"question" : "Name of Radix DLT's CEO?",
+				"question" : "What's the first name of RDX Works CEO",
 				"version" : 1
 			},
 			 {
 				"id" : 2,
 				"kind" : "freeform",
-				"question" : "Name of Radix DLT's CTO?",
+				"question" : "What's the first name of RDX Works CTO",
 				"version" : 1
 			},
 			 {
 				"id" : 3,
 				"kind" : "freeform",
-				"question" : "Common first name amongst Radix DLT employees from Sweden?",
+				"question" : "What's the first name of RDX Works CPO",
 				"version" : 1
 			}
 		]
