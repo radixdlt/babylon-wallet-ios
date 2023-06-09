@@ -9,7 +9,7 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let ids: Set<NonFungibleLocalId>
 	public let bucket: Bucket
 
@@ -21,7 +21,7 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 		resourceAddress: ResourceAddress,
 		bucket: Bucket
 	) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.ids = ids
 		self.bucket = bucket
 	}
@@ -58,7 +58,7 @@ extension TakeFromWorktopByIds {
 
 		try self.init(
 			container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
 			bucket: container.decode(Bucket.self, forKey: .intoBucket)
 		)
 	}

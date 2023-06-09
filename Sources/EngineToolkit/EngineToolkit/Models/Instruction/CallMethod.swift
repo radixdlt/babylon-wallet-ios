@@ -9,7 +9,7 @@ public struct CallMethod: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let receiver: Address_
+	public let receiver: ComponentAddress
 	public let methodName: String
 	public let arguments: [ManifestASTValue]
 
@@ -20,7 +20,7 @@ public struct CallMethod: InstructionProtocol {
 		methodName: String,
 		arguments: [ManifestASTValue] = []
 	) {
-		self.receiver = receiver.asGeneral
+		self.receiver = receiver
 		self.methodName = methodName
 		self.arguments = arguments
 	}
@@ -93,7 +93,7 @@ extension CallMethod {
 		}
 
 		try self.init(
-			receiver: container.decode(Address_.self, forKey: .receiver).asSpecific(),
+			receiver: container.decode(ComponentAddress.self, forKey: .receiver),
 			methodName: container.decode(String.ProxyDecodable.self, forKey: .methodName).decoded,
 			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []
 		)

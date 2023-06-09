@@ -9,13 +9,13 @@ public struct TakeFromWorktop: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let bucket: Bucket
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, bucket: Bucket) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.bucket = bucket
 	}
 }
@@ -46,7 +46,7 @@ extension TakeFromWorktop {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
 			bucket: container.decode(Bucket.self, forKey: .intoBucket)
 		)
 	}

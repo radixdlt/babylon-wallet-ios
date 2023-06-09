@@ -9,13 +9,13 @@ public struct NonFungibleGlobalId: ValueProtocol, Sendable, Codable, Hashable {
 	}
 
 	// MARK: Stored properties
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let nonFungibleLocalId: NonFungibleLocalId
 
 	// MARK: Init
 
 	public init(resourceAddress: ResourceAddress, nonFungibleLocalId: NonFungibleLocalId) {
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.nonFungibleLocalId = nonFungibleLocalId
 	}
 }
@@ -45,7 +45,7 @@ extension NonFungibleGlobalId {
 		}
 
 		try self.init(
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
 			nonFungibleLocalId: container.decode(NonFungibleLocalId.self, forKey: .nonFungibleLocalId)
 		)
 	}

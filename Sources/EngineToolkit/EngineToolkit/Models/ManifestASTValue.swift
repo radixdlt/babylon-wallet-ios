@@ -49,7 +49,7 @@ public indirect enum ManifestASTValue: Sendable, Codable, Hashable {
 
 	// case own(Own) // Not implemented and commented out because it isn't supported to well by Scrypto
 
-	case address(Address_)
+	case address(Address)
 
 	case bucket(Bucket)
 	case proof(Proof)

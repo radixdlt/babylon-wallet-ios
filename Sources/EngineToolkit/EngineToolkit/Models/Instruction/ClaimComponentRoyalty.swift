@@ -10,12 +10,12 @@ public struct ClaimPackageRoyalty: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let packageAddress: Address_
+	public let packageAddress: PackageAddress
 
 	// MARK: Init
 
 	public init(packageAddress: PackageAddress) {
-		self.packageAddress = packageAddress.asGeneral
+		self.packageAddress = packageAddress
 	}
 }
 
@@ -45,7 +45,7 @@ extension ClaimPackageRoyalty {
 		}
 
 		try self.init(
-			packageAddress: container.decode(Address_.self, forKey: .packageAddress).asSpecific()
+			packageAddress: container.decode(PackageAddress.self, forKey: .packageAddress)
 		)
 	}
 }

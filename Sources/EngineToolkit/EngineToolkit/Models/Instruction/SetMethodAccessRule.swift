@@ -10,13 +10,13 @@ public struct SetMethodAccessRule: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let entityAddress: Address_
+	public let entityAddress: EntityAddress
 	public let key: Tuple
 	public let rule: Enum
 
 	// MARK: Init
 
-	public init(entityAddress: Address_, key: Tuple, rule: Enum) {
+	public init(entityAddress: EntityAddress, key: Tuple, rule: Enum) {
 		self.entityAddress = entityAddress
 		self.key = key
 		self.rule = rule
@@ -53,7 +53,7 @@ extension SetMethodAccessRule {
 		}
 
 		try self.init(
-			entityAddress: container.decode(Address_.self, forKey: .entityAddress),
+			entityAddress: container.decode(EntityAddress.self, forKey: .entityAddress),
 			key: container.decode(Tuple.self, forKey: .key),
 			rule: container.decode(Enum.self, forKey: .rule)
 		)

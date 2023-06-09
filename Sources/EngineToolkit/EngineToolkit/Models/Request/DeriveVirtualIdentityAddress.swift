@@ -34,10 +34,10 @@ extension DeriveVirtualIdentityAddressRequest {
 
 // MARK: - DeriveVirtualIdentityAddressResponse
 public struct DeriveVirtualIdentityAddressResponse: Sendable, Codable, Hashable {
-	public let virtualIdentityAddress: ComponentAddress
+	public let virtualIdentityAddress: IdentityAddress_
 
 	public init(
-		virtualIdentityAddress: ComponentAddress
+		virtualIdentityAddress: IdentityAddress_
 	) {
 		self.virtualIdentityAddress = virtualIdentityAddress
 	}

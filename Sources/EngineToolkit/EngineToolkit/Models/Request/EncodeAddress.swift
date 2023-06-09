@@ -46,5 +46,3 @@ extension EncodeAddressRequest {
 		)
 	}
 }
-
-public typealias EncodeAddressResponse = PolymorphicAddress

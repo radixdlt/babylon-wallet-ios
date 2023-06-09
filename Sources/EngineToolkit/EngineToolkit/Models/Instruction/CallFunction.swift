@@ -9,7 +9,7 @@ public struct CallFunction: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
-	public let packageAddress: Address_
+	public let packageAddress: PackageAddress
 	public let blueprintName: String
 	public let functionName: String
 	public let arguments: [ManifestASTValue]
@@ -22,7 +22,7 @@ public struct CallFunction: InstructionProtocol {
 		functionName: String,
 		arguments: [ManifestASTValue] = []
 	) {
-		self.packageAddress = packageAddress.asGeneral
+		self.packageAddress = packageAddress
 		self.blueprintName = blueprintName
 		self.functionName = functionName
 		self.arguments = arguments
@@ -103,7 +103,7 @@ extension CallFunction {
 		}
 
 		try self.init(
-			packageAddress: container.decode(Address_.self, forKey: .packageAddress).asSpecific(),
+			packageAddress: container.decode(PackageAddress.self, forKey: .packageAddress),
 			blueprintName: container.decode(String.ProxyDecodable.self, forKey: .blueprintName).decoded,
 			functionName: container.decode(String.ProxyDecodable.self, forKey: .functionName).decoded,
 			arguments: container.decodeIfPresent([ManifestASTValue].self, forKey: .arguments) ?? []

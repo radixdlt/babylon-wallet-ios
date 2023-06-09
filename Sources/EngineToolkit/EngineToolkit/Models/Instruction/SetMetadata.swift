@@ -10,13 +10,13 @@ public struct SetMetadata: InstructionProtocol {
 
 	// MARK: Stored properties
 
-	public let entityAddress: Address_
+	public let entityAddress: EntityAddress
 	public let key: String
 	public let value: Enum
 
 	// MARK: Init
 
-	public init(entityAddress: Address_, key: String, value: Enum) {
+	public init(entityAddress: EntityAddress, key: String, value: Enum) {
 		self.entityAddress = entityAddress
 		self.key = key
 		self.value = value
@@ -53,7 +53,7 @@ extension SetMetadata {
 		}
 
 		try self.init(
-			entityAddress: container.decode(Address_.self, forKey: .entityAddress),
+			entityAddress: container.decode(EntityAddress.self, forKey: .entityAddress),
 			key: container.decode(String.ProxyDecodable.self, forKey: .key).decoded,
 			value: container.decode(Enum.self, forKey: .value)
 		)

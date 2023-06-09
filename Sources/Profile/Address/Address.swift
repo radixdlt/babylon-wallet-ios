@@ -1,4 +1,5 @@
 import Prelude
+import EngineToolkit
 
 // MARK: - Address
 /// Shared nominal type for all addresses.
@@ -13,9 +14,9 @@ public enum Address:
 	CustomDumpStringConvertible
 {
 	/// AccountAddress
-	case account(AccountAddress)
+	case account(AccountAddress_)
 
-	case identity(IdentityAddress)
+	case identity(IdentityAddress_)
 }
 
 extension Address {

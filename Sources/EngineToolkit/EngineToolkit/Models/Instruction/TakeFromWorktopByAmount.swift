@@ -10,7 +10,7 @@ public struct TakeFromWorktopByAmount: InstructionProtocol {
 
 	// MARK: Stored properties
 	public let amount: Decimal_
-	public let resourceAddress: Address_
+	public let resourceAddress: ResourceAddress
 	public let bucket: Bucket
 
 	// MARK: Init
@@ -22,7 +22,7 @@ public struct TakeFromWorktopByAmount: InstructionProtocol {
 		bucket: Bucket
 	) {
 		self.amount = amount
-		self.resourceAddress = resourceAddress.asGeneral
+		self.resourceAddress = resourceAddress
 		self.bucket = bucket
 	}
 }
@@ -56,7 +56,7 @@ extension TakeFromWorktopByAmount {
 
 		try self.init(
 			amount: container.decode(Decimal_.self, forKey: .amount),
-			resourceAddress: container.decode(Address_.self, forKey: .resourceAddress).asSpecific(),
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
 			bucket: container.decode(Bucket.self, forKey: .intoBucket)
 		)
 	}

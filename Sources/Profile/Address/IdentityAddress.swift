@@ -1,5 +1,23 @@
 import Prelude
+import EngineToolkit
 
+extension AccountAddress_: AddressKindProtocol, AddressProtocol, CustomStringConvertible,
+                           CustomDumpStringConvertible {
+        public static var kind: AddressKind {
+                .account
+        }
+
+        public func wrapAsAddress() -> Address {
+                .account(self)
+        }
+
+        public static func unwrap(address: Address) -> Self? {
+                switch address {
+                case let .account(address): return address
+                default: return nil
+                }
+        }
+}
 // MARK: - IdentityAddress
 /// The address to an `Identity` on the Radix network, used by `Persona`s.
 public struct IdentityAddress:
