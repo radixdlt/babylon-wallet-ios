@@ -310,6 +310,11 @@ extension AppSettings.View {
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
 			),
+			.init(
+				title: L10n.DisplayMnemonics.seedPhrases,
+				icon: .asset(AssetResource.ellipsis),
+				action: .mnemonicsButtonTapped
+			),
 		]
 
 		#if DEBUG
@@ -328,11 +333,6 @@ extension AppSettings.View {
 				title: L10n.Settings.Debug.inspectProfile,
 				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
-			),
-			.init(
-				title: L10n.DisplayMnemonics.seedPhrases,
-				icon: .asset(AssetResource.ellipsis),
-				action: .mnemonicsButtonTapped
 			),
 		])
 		#endif
