@@ -13,9 +13,6 @@ public struct SecurityStructureTutorialHeader: SwiftUI.View {
 
 	public var body: some SwiftUI.View {
 		VStack(spacing: .medium1) {
-			Text("Multi-Factor Setup") // FIXME: Strings
-				.font(.app.sheetTitle)
-
 			Text("You can assign diffrent factors to different actions on Radix Accounts")
 				.fixedSize(horizontal: false, vertical: true)
 				.font(.app.body2Regular)
@@ -23,7 +20,6 @@ public struct SecurityStructureTutorialHeader: SwiftUI.View {
 			Button("How does it work?", action: action)
 				.buttonStyle(.info)
 				.padding(.horizontal, .large2)
-				.padding(.bottom, .medium1)
 		}
 		.padding(.medium1)
 	}

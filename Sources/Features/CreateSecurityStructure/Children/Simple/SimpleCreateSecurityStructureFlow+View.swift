@@ -37,22 +37,23 @@ extension SimpleCreateSecurityStructureFlow {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					SecurityStructureTutorialHeader()
+					ScrollView {
+						SecurityStructureTutorialHeader()
 
-					FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>(
-						factorSet: viewStore.newPhoneConfirmer
-					) {
-						viewStore.send(.selectNewPhoneConfirmer)
+						FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>(
+							factorSet: viewStore.newPhoneConfirmer
+						) {
+							viewStore.send(.selectNewPhoneConfirmer)
+						}
+
+						FactorForRoleView<RecoveryRoleTag, TrustedContactFactorSource>(
+							factorSet: viewStore.lostPhoneHelper
+						) {
+							viewStore.send(.selectLostPhoneHelper)
+						}
 					}
-
-					FactorForRoleView<RecoveryRoleTag, TrustedContactFactorSource>(
-						factorSet: viewStore.lostPhoneHelper
-					) {
-						viewStore.send(.selectLostPhoneHelper)
-					}
-
-					Spacer(minLength: 0)
 				}
+				.navigationTitle("Multi-Factor Setup") // FIXME: Strings
 				.footer {
 					WithControlRequirements(
 						viewStore.simpleSecurityStructure,
