@@ -40,14 +40,18 @@ extension DisplayMnemonic {
 							action: { .child(.importMnemonic($0)) }
 						)
 					) { importMnemonicViewStore in
-						// We must have a NavigationView in order to display navigationTitle
-						NavigationView {
+						VStack(alignment: .leading, spacing: .medium2) {
+							WarningView(text: "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.")
+								.padding(.horizontal, .medium3)
+
 							ImportMnemonic.View(store: importMnemonicViewStore)
-								.navigationTitle(viewStore.navigationTitle)
 						}
+						.padding(.top, .medium3)
 					}
 				}
 			}
+			.navigationTitle("Reveal Seed Phrase")
+			.navigationBarTitleDisplayMode(.inline)
 		}
 	}
 }

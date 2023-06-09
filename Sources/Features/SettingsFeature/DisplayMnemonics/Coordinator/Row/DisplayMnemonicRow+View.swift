@@ -22,14 +22,36 @@ extension DisplayMnemonicRow {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				Card(.app.gray5) {
-					viewStore.send(.tapped)
-				} contents: {
-					AccountsForDeviceFactorSourceView(
-						accountsForDeviceFactorSource: viewStore.accountsForDeviceFactorSource
-					)
+				VStack(alignment: .leading) {
+					Button {
+						viewStore.send(.tapped)
+					} label: {
+						HStack {
+							Image(asset: AssetResource.signingKey)
+								.resizable()
+								.frame(.smallest)
+
+							VStack(alignment: .leading) {
+								Text("Reveal Seed Phrase")
+									.textStyle(.body1Header)
+									.foregroundColor(.app.gray1)
+								Text("Connected to \(viewStore.accountsForDeviceFactorSource.accounts.count) accounts")
+									.textStyle(.body2Regular)
+									.foregroundColor(.app.gray2)
+							}
+
+							Spacer()
+							Image(asset: AssetResource.chevronRight)
+						}
+					}
+
+					VStack(alignment: .leading, spacing: .small3) {
+						ForEach(viewStore.accountsForDeviceFactorSource.accounts) { account in
+							SmallAccountCard(account: account)
+								.cornerRadius(.small1)
+						}
+					}
 				}
-				.shadow(color: .app.cardShadowBlack, radius: .small2)
 			}
 		}
 	}
@@ -43,30 +65,33 @@ struct AccountsForDeviceFactorSourceView: SwiftUI.View {
 	}
 
 	var body: some View {
-		HStack(spacing: 0) {
-			VStack(alignment: .leading) {
-				Text(deviceFactorSource.labelSeedPhraseKind)
-					.font(.title3)
+		VStack(alignment: .leading) {
+			HStack {
+				Image(asset: AssetResource.signingKey)
+					.resizable()
+					.frame(.smallest)
 
-				HPair(
-					label: deviceFactorSource.labelDate,
-					item: deviceFactorSource
-						.addedOn
-						.ISO8601Format(.iso8601Date(timeZone: .current))
-				)
+				VStack(alignment: .leading) {
+					Text("Reveal Seed Phrase")
+						.textStyle(.body1Header)
+						.foregroundColor(.app.gray1)
+					Text("Connected to \(accountsForDeviceFactorSource.accounts.count) accounts")
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+				}
 
-				VStack(alignment: .leading, spacing: .small3) {
-					ForEach(accountsForDeviceFactorSource.accounts) { account in
-						SmallAccountCard(account: account)
-							.cornerRadius(.small1)
-					}
+				Spacer()
+				Image(asset: AssetResource.chevronRight)
+			}
+			.border(.red)
+
+			VStack(alignment: .leading, spacing: .small3) {
+				ForEach(accountsForDeviceFactorSource.accounts) { account in
+					SmallAccountCard(account: account)
+						.cornerRadius(.small1)
 				}
 			}
-			.padding()
-
-			Image(asset: AssetResource.chevronRight)
 		}
-		.multilineTextAlignment(.leading)
 	}
 }
 

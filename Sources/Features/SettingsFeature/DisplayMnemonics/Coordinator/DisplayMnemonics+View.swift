@@ -21,7 +21,16 @@ extension DisplayMnemonics {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack {
+					VStack(alignment: .leading, spacing: .medium1) {
+						Text("A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.")
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray2)
+							.multilineTextAlignment(.leading)
+							.padding(.horizontal, .medium3)
+
+						WarningView(text: "You are responsible for the security of your Seed Phrase")
+							.padding(.horizontal, .medium3)
+
 						ForEachStore(
 							store.scope(
 								state: \.deviceFactorSources,
@@ -29,11 +38,16 @@ extension DisplayMnemonics {
 							)
 						) {
 							DisplayMnemonicRow.View(store: $0)
+								.padding(.medium3)
+							Separator()
 						}
-						.padding()
+						.background(.app.background)
 					}
+					.padding(.top, .medium3)
 				}
+				.background(.app.gray4)
 				.navigationTitle(L10n.DisplayMnemonics.seedPhrases)
+				.toolbarBackground(.visible, for: .navigationBar)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
@@ -54,25 +68,15 @@ extension View {
 		)
 
 		return displayMnemonicSheet(with: destinationStore)
-			.useCautionAlert(with: destinationStore)
 	}
 
 	@MainActor
 	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
-		sheet(
+		navigationDestination(
 			store: destinationStore,
 			state: /DisplayMnemonics.Destinations.State.displayMnemonic,
 			action: DisplayMnemonics.Destinations.Action.displayMnemonic,
-			content: { DisplayMnemonic.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func useCautionAlert(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /DisplayMnemonics.Destinations.State.useCaution,
-			action: DisplayMnemonics.Destinations.Action.useCaution
+			destination: { DisplayMnemonic.View(store: $0) }
 		)
 	}
 }
