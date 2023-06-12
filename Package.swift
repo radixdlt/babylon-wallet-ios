@@ -228,15 +228,7 @@ package.addModules([
 	.feature(
 		name: "FeaturesPreviewerFeature",
 		featureSuffixDroppedFromFolderName: true,
-		dependencies: [
-			.product(
-				name: "JSONPreview",
-				package: "JSONPreview",
-				condition: .when(platforms: [.iOS])
-			) {
-				.package(url: "https://github.com/rakuyoMo/JSONPreview.git", from: "2.0.0")
-			},
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.feature(
@@ -868,6 +860,13 @@ package.addModules([
 			},
 			.product(name: "TextBuilder", package: "TextBuilder") {
 				.package(url: "https://github.com/davdroman/TextBuilder", from: "2.2.0")
+			},
+			.product(
+				name: "JSONPreview",
+				package: "JSONPreview",
+				condition: .when(platforms: [.iOS])
+			) {
+				.package(url: "https://github.com/rakuyoMo/JSONPreview.git", from: "2.0.0")
 			},
 		],
 		tests: .no
