@@ -1,3 +1,5 @@
+import AddTrustedContactFactorSourceFeature
+import AnswerSecurityQuestionsFeature
 import FactorSourcesClient
 import FeaturePrelude
 
@@ -17,6 +19,9 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 		/// Recovery role
 		public var lostPhoneHelper: TrustedContactFactorSource?
 
+		@PresentationState
+		public var modalDestinations: ModalDestinations.State?
+
 		public init(
 			newPhoneConfirmer: SecurityQuestionsFactorSource? = nil,
 			lostPhoneHelper: TrustedContactFactorSource? = nil
@@ -33,25 +38,88 @@ public struct SimpleCreateSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectNewPhoneConfirmer
-		case selectLostPhoneHelper
 		case createSecurityStructure(TaskResult<SimpleUnnamedSecurityStructureConfig>)
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case modalDestinations(PresentationAction<ModalDestinations.Action>)
+	}
+
+	public struct ModalDestinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.State)
+			case simpleLostPhoneHelper(AddTrustedContactFactorSource.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case simpleNewPhoneConfirmer(AnswerSecurityQuestionsCoordinator.Action)
+			case simpleLostPhoneHelper(AddTrustedContactFactorSource.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.simpleNewPhoneConfirmer, action: /Action.simpleNewPhoneConfirmer) {
+				AnswerSecurityQuestionsCoordinator()
+			}
+			Scope(state: /State.simpleLostPhoneHelper, action: /Action.simpleLostPhoneHelper) {
+				AddTrustedContactFactorSource()
+			}
+		}
+	}
+
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.$modalDestinations, action: /Action.child .. ChildAction.modalDestinations) {
+				ModalDestinations()
+			}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.success(lostPhoneHelper)))))):
+			state.lostPhoneHelper = lostPhoneHelper
+			state.modalDestinations = nil
+			return .none
+
+		case let .modalDestinations(.presented(.simpleLostPhoneHelper(.delegate(.done(.failure(error)))))):
+			state.modalDestinations = nil
+			errorQueue.schedule(error)
+			loggerGlobal.error("Failed to create lost phone helper, error: \(error)")
+			return .none
+
+		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.encrypted(newPhoneConfirmer))))))):
+			state.newPhoneConfirmer = newPhoneConfirmer
+			state.modalDestinations = nil
+			return .none
+
+		case .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.success(.decrypted)))))):
+			state.modalDestinations = nil
+			assertionFailure("Expected to encrypt, not decrypt.")
+			return .none
+
+		case let .modalDestinations(.presented(.simpleNewPhoneConfirmer(.delegate(.done(.failure(error)))))):
+			state.modalDestinations = nil
+			errorQueue.schedule(error)
+			loggerGlobal.error("Failed to create new phone confirmer, error: \(error)")
+			return .none
+
+		default: return .none
+		}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .selectNewPhoneConfirmer:
-			loggerGlobal.debug("'New phone confirmer' tapped")
-			return .send(.delegate(.selectNewPhoneConfirmer))
+			state.modalDestinations = .simpleNewPhoneConfirmer(.init(purpose: .encrypt))
+			return .none
 
 		case .selectLostPhoneHelper:
-			loggerGlobal.debug("'Lost phone helper' button tapped")
-			return .send(.delegate(.selectLostPhoneHelper))
-
+			state.modalDestinations = .simpleLostPhoneHelper(.init())
+			return .none
 		case let .finishSelectingFactors(simpleFactorConfig):
 			return .task {
 				let taskResult = await TaskResult {

@@ -1,3 +1,5 @@
+import AddTrustedContactFactorSourceFeature
+import AnswerSecurityQuestionsFeature
 import FeaturePrelude
 import Logging
 
@@ -67,10 +69,44 @@ extension SimpleCreateSecurityStructureFlow {
 					)
 				}
 			}
+			.modalDestination(store: self.store)
 		}
 
 		typealias NewPhoneConfirmer = FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>
 		typealias LostPhoneHelper = FactorForRoleView<RecoveryRoleTag, TrustedContactFactorSource>
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func modalDestination(store: StoreOf<SimpleCreateSecurityStructureFlow>) -> some View {
+		let destinationStore = store.scope(state: \.$modalDestinations, action: { .child(.modalDestinations($0)) })
+		return lostPhoneHelper(with: destinationStore)
+			.newPhoneConfirmer(with: destinationStore)
+	}
+
+	@MainActor
+	private func newPhoneConfirmer(with destinationStore: PresentationStoreOf<SimpleCreateSecurityStructureFlow.ModalDestinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /SimpleCreateSecurityStructureFlow.ModalDestinations.State.simpleNewPhoneConfirmer,
+			action: SimpleCreateSecurityStructureFlow.ModalDestinations.Action.simpleNewPhoneConfirmer,
+			content: { AnswerSecurityQuestionsCoordinator.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func lostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleCreateSecurityStructureFlow.ModalDestinations>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /SimpleCreateSecurityStructureFlow.ModalDestinations.State.simpleLostPhoneHelper,
+			action: SimpleCreateSecurityStructureFlow.ModalDestinations.Action.simpleLostPhoneHelper,
+			content: { store in
+				NavigationStack {
+					AddTrustedContactFactorSource.View(store: store)
+				}
+			}
+		)
 	}
 }
 
