@@ -16,14 +16,19 @@ public extension AnswerSecurityQuestionFreeform {
 	struct ViewState: Equatable {
 		public let question: String
 		public let answer: String
-		public let continueButtonState: ControlState
 		public let buttonTitle: String
 		init(state: AnswerSecurityQuestionFreeform.State) {
 			question = state.question.question.rawValue
 			answer = state.answer.map(\.rawValue) ?? ""
 			// FIXME: Strings
 			buttonTitle = state.isLast ? "Submit" : "Next question"
-			continueButtonState = state.answer == nil ? .disabled : .enabled
+		}
+
+		var validAnswer: AnswerToSecurityQuestion.Answer? {
+			guard let nonEmpty = NonEmptyString(rawValue: answer) else {
+				return nil
+			}
+			return .from(nonEmpty)
 		}
 	}
 
@@ -73,11 +78,13 @@ public extension AnswerSecurityQuestionFreeform {
 						}
 					}
 					.footer {
-						Button(viewStore.buttonTitle) {
-							viewStore.send(.submitAnswer)
+						WithControlRequirements(
+							viewStore.validAnswer,
+							forAction: { viewStore.send(.submitAnswer($0)) }
+						) { action in
+							Button(viewStore.buttonTitle, action: action)
+								.buttonStyle(.primaryRectangular)
 						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.continueButtonState)
 					}
 					.padding()
 					.navigationTitle("Answer Question")

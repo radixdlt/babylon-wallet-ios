@@ -18,7 +18,7 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Hashable {
-		case submitAnswer
+		case submitAnswer(AnswerToSecurityQuestion.Answer)
 		case answerChanged(String)
 	}
 
@@ -34,16 +34,13 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 			state.answer = NonEmpty(answer)
 			return .none
 
-		case .submitAnswer:
-			guard let answerString = state.answer else {
-				return .none
-			}
-			let answer = AnswerToSecurityQuestion(
-				answer: .from(answerString),
+		case let .submitAnswer(answer):
+			let answerToQuestion = AnswerToSecurityQuestion(
+				answer: answer,
 				to: state.question
 			)
 
-			return .send(.delegate(.answered(answer)))
+			return .send(.delegate(.answered(answerToQuestion)))
 		}
 	}
 }
