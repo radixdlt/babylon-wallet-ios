@@ -20,7 +20,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		public var answers: OrderedDictionary<SecurityQuestion.ID, AnswerToSecurityQuestion> = [:]
 
 		public let purpose: Purpose
-		var root: Path.State?
+		var root: Path.State
 		var path: StackState<Path.State> = []
 
 		public init(purpose: Purpose) {
@@ -83,10 +83,11 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+			Path()
+		}
+
 		Reduce(core)
-			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Path()
-			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
