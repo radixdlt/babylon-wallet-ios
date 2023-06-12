@@ -140,16 +140,25 @@ extension HexCodable {
 #endif // DEBUG
 
 // MARK: - CodableViaHexCodable
-public protocol CodableViaHexCodable: Codable {
+public typealias CodableViaHexCodable = EncodableViaHexCodable & DecodableViaHexCodable
+
+// MARK: - EncodableViaHexCodable
+public protocol EncodableViaHexCodable: Encodable {
 	var hexCodable: HexCodable { get }
+}
+
+// MARK: - DecodableViaHexCodable
+public protocol DecodableViaHexCodable: Decodable {
 	init(hexCodable: HexCodable) throws
 }
 
-extension CodableViaHexCodable {
+extension EncodableViaHexCodable {
 	public func hex(options: Data.HexEncodingOptions = []) -> String {
 		self.hexCodable.hex(options: options)
 	}
+}
 
+extension DecodableViaHexCodable {
 	public init(hex: String) throws {
 		try self.init(data: .init(hex: hex))
 	}
@@ -159,12 +168,14 @@ extension CodableViaHexCodable {
 	}
 }
 
-extension CodableViaHexCodable {
+extension EncodableViaHexCodable {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(self.hexCodable)
 	}
+}
 
+extension DecodableViaHexCodable {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		try self.init(hexCodable: container.decode(HexCodable.self))

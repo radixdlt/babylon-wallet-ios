@@ -64,6 +64,15 @@
       }
     },
     {
+      "identity" : "jsonpreview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rakuyoMo/JSONPreview.git",
+      "state" : {
+        "revision" : "d4eafeea0230f25a2f90087fe4bda50b86ecc8cd",
+        "version" : "2.0.0"
+      }
+    },
+    {
       "identity" : "k1",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/K1.git",

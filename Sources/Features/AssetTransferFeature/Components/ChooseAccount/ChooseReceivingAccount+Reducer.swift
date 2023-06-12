@@ -111,11 +111,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case var .destination(.presented(.scanAccountAddress(.delegate(.scanned(address))))):
 			state.destination = nil
 
-			// FIXME: We should have a predefined way to handle the qr address prefix
-			let prefix = "radix:"
-			if address.hasPrefix(prefix) {
-				address.removeFirst(prefix.count)
-			}
+			QR.removeAddressPrefixIfNeeded(from: &address)
 
 			state.manualAccountAddress = address
 			return .none

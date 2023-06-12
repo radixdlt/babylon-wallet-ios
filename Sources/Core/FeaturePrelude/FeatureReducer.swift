@@ -1,6 +1,14 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - FeatureView
+public protocol FeatureView: SwiftUI.View where Feature.View == Self {
+	associatedtype Feature: FeatureReducer
+
+	@MainActor
+	init(store: StoreOf<Feature>)
+}
+
 // MARK: - FeatureReducer
 public protocol FeatureReducer: ReducerProtocol where State: Sendable & Hashable, Action == FeatureAction<Self> {
 	associatedtype ViewAction: Sendable & Equatable = Never

@@ -55,6 +55,25 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "AddTrustedContactFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"ScanQRFeature",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "AnswerSecurityQuestionsFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"MnemonicClient",
+			"FactorSourcesClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -148,6 +167,17 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "CreateSecurityStructureFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"AnswerSecurityQuestionsFeature",
+			"AddTrustedContactFactorSourceFeature",
+			"AppPreferencesClient", // Save SecurityStructureConfig
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -192,6 +222,20 @@ package.addModules([
 		dependencies: [
 			"PersonasClient",
 			"Profile",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "FeaturesPreviewerFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			.product(
+				name: "JSONPreview",
+				package: "JSONPreview",
+				condition: .when(platforms: [.iOS])
+			) {
+				.package(url: "https://github.com/rakuyoMo/JSONPreview.git", from: "2.0.0")
+			},
 		],
 		tests: .no
 	),
@@ -316,7 +360,11 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+			.product(
+				name: "CodeScanner",
+				package: "CodeScanner",
+				condition: .when(platforms: [.iOS])
+			) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
 		],

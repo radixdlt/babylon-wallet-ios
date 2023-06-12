@@ -245,7 +245,7 @@ public struct Signing: Sendable, FeatureReducer {
 			return .signWithDeviceFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
 		case .ledgerHQHardwareWallet:
 			return .signWithLedgerFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
-		case .offDeviceMnemonic:
+		case .offDeviceMnemonic, .securityQuestions, .trustedContact:
 			fatalError("Implement me")
 		}
 	}

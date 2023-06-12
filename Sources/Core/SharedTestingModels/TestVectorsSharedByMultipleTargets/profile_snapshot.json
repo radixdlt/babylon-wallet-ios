@@ -30,14 +30,17 @@
     ],
     "security" : {
       "isCloudProfileSyncEnabled" : true,
-      "isDeveloperModeEnabled" : true
+      "isDeveloperModeEnabled" : true,
+      "structureConfigurations" : [
+
+      ]
     }
   },
   "factorSources" : [
     {
       "device" : {
         "common" : {
-          "addedOn" : "2023-05-30T10:58:46Z",
+          "addedOn" : "2023-06-09T13:00:15Z",
           "cryptoParameters" : {
             "supportedCurves" : [
               "curve25519"
@@ -47,7 +50,7 @@
             ]
           },
           "id" : "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033",
-          "lastUsedOn" : "2023-05-30T10:58:46Z"
+          "lastUsedOn" : "2023-06-09T13:00:15Z"
         },
         "hint" : {
           "model" : "computer",
@@ -66,7 +69,7 @@
     {
       "device" : {
         "common" : {
-          "addedOn" : "2023-05-30T10:58:46Z",
+          "addedOn" : "2023-06-09T13:00:15Z",
           "cryptoParameters" : {
             "supportedCurves" : [
               "curve25519",
@@ -78,7 +81,7 @@
             ]
           },
           "id" : "dec23c47a8a37b79298878506692e42f3a1a11967ff1239bb344ad6ab0c21ddda8",
-          "lastUsedOn" : "2023-05-30T10:58:46Z"
+          "lastUsedOn" : "2023-06-09T13:00:15Z"
         },
         "hint" : {
           "model" : "computer",
@@ -106,7 +109,7 @@
       "description" : "computer unit test",
       "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D"
     },
-    "snapshotVersion" : 35
+    "snapshotVersion" : 36
   },
   "networks" : [
     {
@@ -279,8 +282,8 @@
                 }
               },
               "sharedFieldIDs" : [
-                "familyName",
-                "givenName"
+                "givenName",
+                "familyName"
               ]
             },
             {
