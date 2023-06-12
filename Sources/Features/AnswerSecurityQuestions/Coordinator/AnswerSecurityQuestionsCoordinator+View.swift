@@ -60,7 +60,7 @@ extension AnswerSecurityQuestionsCoordinator {
 				CaseLet(
 					state: /AnswerSecurityQuestionsCoordinator.Path.State.answerQuestion,
 					action: AnswerSecurityQuestionsCoordinator.Path.Action.answerQuestion,
-					then: { AnswerSecurityQuestionsFreeform.View(store: $0) }
+					then: { AnswerSecurityQuestionFreeform.View(store: $0) }
 				)
 			}
 		}

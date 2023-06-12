@@ -4,8 +4,8 @@ import DesignSystem
 import FeaturePrelude
 import Prelude
 
-// MARK: - AnswerSecurityQuestionsFreeform
-public struct AnswerSecurityQuestionsFreeform: Sendable, FeatureReducer {
+// MARK: - AnswerSecurityQuestionFreeform
+public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public var id: SecurityQuestion.ID { question.id }
 		public let question: SecurityQuestion

@@ -5,20 +5,20 @@ import FeaturePrelude
 import Prelude
 import SwiftUI
 
-public extension AnswerSecurityQuestionsFreeform.State {
-	var viewState: AnswerSecurityQuestionsFreeform.ViewState {
+public extension AnswerSecurityQuestionFreeform.State {
+	var viewState: AnswerSecurityQuestionFreeform.ViewState {
 		.init(state: self)
 	}
 }
 
-// MARK: - AnswerSecurityQuestionsFreeform.View
-public extension AnswerSecurityQuestionsFreeform {
+// MARK: - AnswerSecurityQuestionFreeform.View
+public extension AnswerSecurityQuestionFreeform {
 	struct ViewState: Equatable {
 		public let question: String
 		public let answer: String
 		public let continueButtonState: ControlState
 		public let buttonTitle: String
-		init(state: AnswerSecurityQuestionsFreeform.State) {
+		init(state: AnswerSecurityQuestionFreeform.State) {
 			question = state.question.question.rawValue
 			answer = state.answer.map(\.rawValue) ?? ""
 			// FIXME: Strings
@@ -29,9 +29,9 @@ public extension AnswerSecurityQuestionsFreeform {
 
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<AnswerSecurityQuestionsFreeform>
+		private let store: StoreOf<AnswerSecurityQuestionFreeform>
 
-		public init(store: StoreOf<AnswerSecurityQuestionsFreeform>) {
+		public init(store: StoreOf<AnswerSecurityQuestionFreeform>) {
 			self.store = store
 		}
 
@@ -93,16 +93,16 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - AnswerSecurityQuestionsFreeform_Preview
 struct AnswerSecurityQuestionsFreeform_Preview: PreviewProvider {
 	static var previews: some View {
-		AnswerSecurityQuestionsFreeform.View(
+		AnswerSecurityQuestionFreeform.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AnswerSecurityQuestionsFreeform()
+				reducer: AnswerSecurityQuestionFreeform()
 			)
 		)
 	}
 }
 
-public extension AnswerSecurityQuestionsFreeform.State {
+public extension AnswerSecurityQuestionFreeform.State {
 	static let previewValue = Self(
 		question: .init(
 			id: 0,

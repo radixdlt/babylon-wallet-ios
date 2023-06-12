@@ -59,12 +59,12 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	public struct Path: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case chooseQuestions(ChooseQuestions.State)
-			case answerQuestion(AnswerSecurityQuestionsFreeform.State)
+			case answerQuestion(AnswerSecurityQuestionFreeform.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case chooseQuestions(ChooseQuestions.Action)
-			case answerQuestion(AnswerSecurityQuestionsFreeform.Action)
+			case answerQuestion(AnswerSecurityQuestionFreeform.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
@@ -72,7 +72,7 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 				ChooseQuestions()
 			}
 			Scope(state: /State.answerQuestion, action: /Action.answerQuestion) {
-				AnswerSecurityQuestionsFreeform()
+				AnswerSecurityQuestionFreeform()
 			}
 		}
 	}
