@@ -1,7 +1,9 @@
+import AccountPortfoliosClient
 import ClientPrelude
 import EngineToolkitClient
 import EngineToolkitModels
 import GatewayAPI
+import TransactionClient
 
 // MARK: - SubmitTransactionClient + DependencyKey
 extension SubmitTransactionClient: DependencyKey {
@@ -13,7 +15,7 @@ extension SubmitTransactionClient: DependencyKey {
 		let transactionStatusUpdates: TransactionStatusUpdates = { txID, pollStrategy in
 			@Dependency(\.continuousClock) var clock
 
-			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>.init(.init(txID: txID, result: .success(.pending)))
+			let statusSubject = AsyncCurrentValueSubject<TransactionStatusUpdate>(.init(txID: txID, result: .success(.pending)))
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
@@ -71,48 +73,75 @@ extension SubmitTransactionClient: DependencyKey {
 			throw CancellationError()
 		}
 
+		let submitTransaction: SubmitTransaction = { request in
+			let txID = request.txID
+
+			func debugPrintTX(_ decompiledNotarized: DecompileNotarizedTransactionIntentResponse) {
+				let signedIntent = decompiledNotarized.signedIntent
+				let notarySignature = decompiledNotarized.notarySignature
+				let intent = signedIntent.intent
+				let intentSignatures = signedIntent.intentSignatures
+				// RET prints when convertManifest is called, when it is removed, this can be moved down
+				// inline inside `print`.
+				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
+				print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
+				print("TXID: \(txID.rawValue)")
+				print("TransactionIntent: \(txIntentString)")
+				print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.compressedRepresentation.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
+				print("\nNOTARY SIGNATURE: \(notarySignature)")
+				print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
+				print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
+				print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
+			}
+
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
+			@Dependency(\.transactionClient) var transactionClient
+			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+
+			let changedAccounts: [Profile.Network.Account.EntityAddress]?
+
+			do {
+				let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
+					compiledNotarizedIntent: Array(request.compiledNotarizedTXIntent.compiledIntent),
+					instructionsOutputKind: .parsed
+				))
+				debugPrintTX(decompiledNotarized)
+
+				let manifest = decompiledNotarized.signedIntent.intent.manifest
+
+				let involvedAccounts = try await transactionClient.myInvolvedEntities(manifest)
+				changedAccounts = involvedAccounts.accountsDepositedInto
+					.union(involvedAccounts.accountsWithdrawnFrom)
+					.map(\.address)
+			} catch {
+				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
+				changedAccounts = nil
+			}
+
+			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
+				notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex
+			)
+
+			let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
+
+			guard !response.duplicate else {
+				throw SubmitTXFailure.invalidTXWasDuplicate(txID: txID)
+			}
+
+			Task.detached {
+				try await hasTXBeenCommittedSuccessfully(txID)
+				if let changedAccounts {
+					// FIXME: Ideally we should only have to call the cacheClient here
+					// cacheClient.clearCacheForAccounts(Set(changedAccounts))
+					_ = try await accountPortfoliosClient.fetchAccountPortfolios(changedAccounts, true)
+				}
+			}
+
+			return txID
+		}
+
 		return Self(
-			submitTransaction: { request in
-				let txID = request.txID
-
-				func debugPrintTX() {
-					@Dependency(\.engineToolkitClient) var engineToolkitClient
-
-					do {
-						let decompiledNotarized = try engineToolkitClient.decompileNotarizedTransactionIntent(.init(
-							compiledNotarizedIntent: Array(request.compiledNotarizedTXIntent.compiledIntent),
-							instructionsOutputKind: .parsed
-						))
-						let signedIntent = decompiledNotarized.signedIntent
-						let notarySignature = decompiledNotarized.notarySignature
-						let intent = signedIntent.intent
-						let intentSignatures = signedIntent.intentSignatures
-						// RET prints when convertManifest is called, when it is removed, this can be moved down
-						// inline inside `print`.
-						let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-						print("\n\n🔮 DEBUG TRANSACTION START 🔮a")
-						print("TXID: \(txID.rawValue)")
-						print("TransactionIntent: \(txIntentString)")
-						print("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.compressedRepresentation.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
-						print("\nNOTARY SIGNATURE: \(notarySignature)")
-						print("\n\nCOMPILED TX INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
-						print("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.compiledIntent.hex)")
-						print("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
-					} catch {}
-				}
-				debugPrintTX()
-
-				let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-					notarizedTransactionHex: Data(request.compiledNotarizedTXIntent.compiledIntent).hex
-				)
-
-				let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
-
-				guard !response.duplicate else {
-					throw SubmitTXFailure.invalidTXWasDuplicate(txID: txID)
-				}
-				return txID
-			},
+			submitTransaction: submitTransaction,
 			transactionStatusUpdates: transactionStatusUpdates,
 			hasTXBeenCommittedSuccessfully: hasTXBeenCommittedSuccessfully
 		)

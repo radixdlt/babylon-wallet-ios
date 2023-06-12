@@ -40,8 +40,10 @@ public struct AccountList: Sendable, FeatureReducer {
 			switch action {
 			case let .tapped(account):
 				return .send(.delegate(.displayAccountDetails(account)))
-			case let .securityPromptTapped(account):
-				return .send(.delegate(.displayAccountSecurity(account)))
+			case .securityPromptTapped:
+				// FIXME: Enable back once `displayAccountSecurity` is implemented.
+				// return .send(.delegate(.displayAccountSecurity(account)))
+				return .none
 			}
 		case .account:
 			return .none

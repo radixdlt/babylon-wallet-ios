@@ -69,7 +69,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 				Scope(state: /MainState.chooseAccount, action: /MainAction.chooseAccount) {
 					ChooseReceivingAccount()
 				}
-
 				Scope(state: /MainState.addAsset, action: /MainAction.addAsset) {
 					AssetsView()
 				}
@@ -100,10 +99,14 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .receivingAccount(id: id, action: action):
 			switch action {
 			case .delegate(.remove):
-				state.receivingAccounts.remove(id: id)
+				let account = state.receivingAccounts.remove(id: id)
+				account?.assets.compactMap(/ResourceAsset.State.fungibleAsset).forEach {
+					updateTotalSum(&state, resourceAddress: $0.resource.resourceAddress)
+				}
 				return .none
 
-			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))):
+			case let .child(.row(resourceAddress, child: .delegate(.fungibleAsset(.amountChanged)))),
+			     let .child(.row(resourceAddress, child: .delegate(.removed))):
 				updateTotalSum(&state, resourceAddress: resourceAddress)
 				return .none
 
@@ -205,7 +208,9 @@ extension TransferAccountList {
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			chooseAccounts: .init(
 				selectionRequirement: .exactly(1),
-				filteredAccounts: filteredAccounts
+				filteredAccounts: filteredAccounts,
+				// Create account is very buggy when started from AssetTransfer, disable it for now.
+				canCreateNewAccount: false
 			)
 		)
 
@@ -226,7 +231,7 @@ extension TransferAccountList {
 			nonXrdResources: nonXrdResources
 		)
 
-		let selectedNonFunibleResources = assets
+		let selectedNonFungibleResources = assets
 			.compactMap(/ResourceAsset.State.nonFungibleAsset)
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 				var resource = partialResult[id: asset.resourceAddress] ?? .init(
@@ -237,11 +242,21 @@ extension TransferAccountList {
 				partialResult.updateOrAppend(resource)
 			}
 
+		let nftsSelectedForOtherAccounts = state.receivingAccounts
+			.filter { $0.id != id }
+			.flatMap(\.assets)
+			.compactMap(/ResourceAsset.State.nonFungibleAsset)
+			.map(\.nftToken.id)
+
 		state.destination = .relayed(
 			id,
 			with: .addAsset(.init(
 				account: state.fromAccount,
-				mode: .selection(.init(fungibleResources: selectedFungibleResources, nonFungibleResources: selectedNonFunibleResources))
+				mode: .selection(.init(
+					fungibleResources: selectedFungibleResources,
+					nonFungibleResources: selectedNonFungibleResources,
+					disabledNFTs: Set(nftsSelectedForOtherAccounts)
+				))
 			))
 		)
 		return .none

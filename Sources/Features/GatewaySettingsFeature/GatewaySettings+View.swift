@@ -65,11 +65,12 @@ extension GatewaySettings {
 				VStack(alignment: .leading, spacing: .small2) {
 					subtitle
 
-					Button(L10n.Gateways.whatIsAGateway) {
-						viewStore.send(.popoverButtonTapped)
-					}
-					.buttonStyle(.info)
-					.padding(.vertical, .medium2)
+					//	FIXME: Uncomment and implement
+					//	Button(L10n.Gateways.whatIsAGateway) {
+					//		viewStore.send(.popoverButtonTapped)
+					//	}
+					//	.buttonStyle(.info)
+					//	.padding(.vertical, .medium2)
 
 					Separator()
 				}

@@ -18,7 +18,9 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		var manualAccountAddressFocused: Bool = false
 
 		var validatedAccountAddress: AccountAddress? {
-			if !manualAccountAddressFocused, !manualAccountAddress.isEmpty {
+			if !manualAccountAddress.isEmpty,
+			   !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
+			{
 				return try? AccountAddress(address: manualAccountAddress)
 			}
 			return nil

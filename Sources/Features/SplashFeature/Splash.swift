@@ -1,3 +1,4 @@
+import DeviceFactorSourceClient
 import FeaturePrelude
 import LocalAuthenticationClient
 import OnboardingClient
@@ -7,6 +8,8 @@ public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
 		public var passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>?
+
+		var biometricsCheckFailed: Bool = false
 
 		public init(
 			passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>? = nil
@@ -23,14 +26,17 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case appeared
 		case passcodeCheckFailedAlert(PresentationAction<PasscodeCheckFailedAlertAction>)
+		case didTapToUnlock
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case passcodeConfigResult(TaskResult<LocalAuthenticationConfig>)
+		case loadProfileOutcome(LoadProfileOutcome)
+		case accountRecoveryNeeded(LoadProfileOutcome, TaskResult<Bool>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case loadProfileOutcome(LoadProfileOutcome)
+		case completed(LoadProfileOutcome, accountRecoveryNeeded: Bool)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -38,6 +44,7 @@ public struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.onboardingClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	public init() {}
 
@@ -50,6 +57,12 @@ public struct Splash: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return delay().concatenate(with: verifyPasscode())
+
+		case .didTapToUnlock:
+			state.biometricsCheckFailed = false
+			return .task {
+				await .internal(.loadProfileOutcome(loadProfile()))
+			}
 
 		case let .passcodeCheckFailedAlert(.presented(action)):
 			switch action {
@@ -95,9 +108,33 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			return .run { send in
-				await send(.delegate(.loadProfileOutcome(loadProfile())))
+			return .task {
+				await .internal(.loadProfileOutcome(loadProfile()))
 			}
+
+		case let .loadProfileOutcome(outcome):
+			if case .existingProfile = outcome {
+				return checkAccountRecoveryNeeded(outcome)
+			}
+			return .send(.delegate(.completed(outcome, accountRecoveryNeeded: false)))
+
+		case .accountRecoveryNeeded(_, .failure):
+			state.biometricsCheckFailed = true
+			return .none
+
+		case let .accountRecoveryNeeded(outcome, .success(recoveryNeeded)):
+			return .send(.delegate(.completed(outcome, accountRecoveryNeeded: recoveryNeeded)))
+		}
+	}
+
+	func checkAccountRecoveryNeeded(_ loadProfileOutcome: LoadProfileOutcome) -> EffectTask<Action> {
+		.task {
+			await .internal(.accountRecoveryNeeded(
+				loadProfileOutcome,
+				.init {
+					try await deviceFactorSourceClient.isAccountRecoveryNeeded()
+				}
+			))
 		}
 	}
 

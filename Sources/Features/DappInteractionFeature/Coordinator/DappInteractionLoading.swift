@@ -65,6 +65,11 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
 		state.isLoading = true
+
+		if state.interaction.metadata.origin == .wallet {
+			return .send(.internal(.dappMetadataLoadingResult(.success(.wallet(.init())))))
+		}
+
 		return .run { [request = state.interaction.metadata] send in
 
 			let result: TaskResult<DappMetadata> = await {

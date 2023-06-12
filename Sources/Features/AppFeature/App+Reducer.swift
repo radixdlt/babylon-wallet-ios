@@ -1,5 +1,4 @@
 import AppPreferencesClient
-import DeviceFactorSourceClient
 import EngineToolkit
 import FeaturePrelude
 import MainFeature
@@ -73,7 +72,6 @@ public struct App: Sendable, FeatureReducer {
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
@@ -163,9 +161,9 @@ public struct App: Sendable, FeatureReducer {
 			return goToOnboarding(state: &state)
 
 		case .onboardingCoordinator(.delegate(.completed)):
-			return checkAccountRecoveryNeeded()
+			return goToMain(state: &state, accountRecoveryIsNeeded: false)
 
-		case let .splash(.delegate(.loadProfileOutcome(loadProfileOutcome))):
+		case let .splash(.delegate(.completed(loadProfileOutcome, accountRecoveryNeeded))):
 			switch loadProfileOutcome {
 			case .newUser:
 				return goToOnboarding(state: &state)
@@ -181,7 +179,7 @@ public struct App: Sendable, FeatureReducer {
 				return incompatibleSnapshotData(version: version, state: &state)
 
 			case .existingProfile:
-				return checkAccountRecoveryNeeded()
+				return goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
 
 			case let .usersExistingProfileCouldNotBeLoaded(failure: .profileUsedOnAnotherDevice(error)):
 				errorQueue.schedule(error)
@@ -209,13 +207,6 @@ public struct App: Sendable, FeatureReducer {
 			)
 		)
 		return .none
-	}
-
-	func checkAccountRecoveryNeeded() -> EffectTask<Action> {
-		.task {
-			let isAccountRecoveryNeeded = await deviceFactorSourceClient.isAccountRecoveryNeeded()
-			return .internal(.toMain(isAccountRecoveryNeeded: isAccountRecoveryNeeded))
-		}
 	}
 
 	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> EffectTask<Action> {

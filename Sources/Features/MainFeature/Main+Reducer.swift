@@ -64,10 +64,12 @@ public struct Main: Sendable, FeatureReducer {
 			state.destination = .settings(.init())
 			return .none
 
-		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepIcloudIfPresent))))):
+		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):
 			return .run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(keepIcloudIfPresent)
+				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
 				await send(.delegate(.removedWallet))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to delete profile: \(error)")
 			}
 
 		case .destination(.presented(.settings(.delegate(.dismiss)))):

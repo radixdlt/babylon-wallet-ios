@@ -423,6 +423,14 @@ extension TransactionClient {
 			return .init(compiledIntent: compiledIntent, signingFactors: signingFactors)
 		}
 
+		let myInvolvedEntities: MyInvolvedEntities = { manifest in
+			let networkID = await gatewaysClient.getCurrentNetworkID()
+			return try await myEntitiesInvolvedInTransaction(
+				networkID: networkID,
+				manifest: manifest
+			)
+		}
+
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			convertManifestToString: { try await engineToolkitClient.convertManifestToString(.init(version: .default, networkID: gatewaysClient.getCurrentNetworkID(), manifest: $0)) },
@@ -433,7 +441,8 @@ extension TransactionClient {
 			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction,
-			prepareForSigning: prepareForSigning
+			prepareForSigning: prepareForSigning,
+			myInvolvedEntities: myInvolvedEntities
 		)
 	}
 }

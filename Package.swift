@@ -418,6 +418,7 @@ package.addModules([
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
+			"DeviceFactorSourceClient",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
 		],
@@ -772,6 +773,7 @@ package.addModules([
 		dependencies: [
 			"EngineToolkitClient",
 			"GatewayAPI",
+			"TransactionClient",
 		],
 		tests: .no
 	),
@@ -838,6 +840,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			"GatewaysClient",
 			"URLFormatterClient",
 			"QRGeneratorClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {

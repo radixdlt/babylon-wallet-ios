@@ -9,7 +9,7 @@ extension DappMetadata {
 		case .request:
 			return L10n.DAppRequest.Metadata.unknownName
 		case .wallet:
-			return L10n.DAppRequest.Metadata.unknownName
+			return "Radix Wallet"
 		}
 	}
 }

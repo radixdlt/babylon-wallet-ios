@@ -17,12 +17,15 @@ extension LedgerHardwareDevices {
 		let ledgers: Loadable<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>
 		let selectedLedgerID: FactorSourceID?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
+		let context: State.Context
 
 		init(state: LedgerHardwareDevices.State) {
 			self.allowSelection = state.allowSelection
 			self.showHeaders = state.showHeaders
 			self.ledgers = state.$ledgers
 			self.selectedLedgerID = state.selectedLedgerID
+			self.context = state.context
+
 			if let id = state.selectedLedgerID, let selectedLedger = state.ledgers?[id: id] {
 				self.selectedLedgerControlRequirements = .init(selectedLedger: selectedLedger)
 			} else {
@@ -71,14 +74,21 @@ extension LedgerHardwareDevices {
 				ScrollView {
 					VStack(spacing: 0) {
 						Group {
-							Image(asset: AssetResource.iconHardwareLedger)
-								.frame(.medium)
-								.padding(.vertical, .medium2)
+							if viewStore.context == .settings {
+								Text(L10n.LedgerHardwareDevices.subtitleAllLedgers)
+									.textStyle(.body1HighImportance)
+									.foregroundColor(.app.gray2)
+									.padding(.vertical, .medium1)
+							} else {
+								Image(asset: AssetResource.iconHardwareLedger)
+									.frame(.medium)
+									.padding(.vertical, .medium2)
 
-							Text(viewStore.navigationTitle)
-								.textStyle(.sheetTitle)
-								.foregroundColor(.app.gray1)
-								.padding(.bottom, .medium1)
+								Text(viewStore.navigationTitle)
+									.textStyle(.sheetTitle)
+									.foregroundColor(.app.gray1)
+									.padding(.bottom, .medium1)
+							}
 
 							if viewStore.showHeaders {
 								if let subtitle = viewStore.subtitle {
@@ -89,11 +99,12 @@ extension LedgerHardwareDevices {
 										.padding(.bottom, .medium1)
 								}
 
-								//							Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
-								//								viewStore.send(.whatIsALedgerButtonTapped)
-								//							}
-								//							.buttonStyle(.info)
-								//							.flushedLeft
+								//        FIXME: Uncomment and implement
+								//        Button(L10n.LedgerHardwareDevices.ledgerFactorSourceInfoCaption) {
+								//                viewStore.send(.whatIsALedgerButtonTapped)
+								//        }
+								//        .buttonStyle(.info)
+								//        .flushedLeft
 							}
 						}
 						.multilineTextAlignment(.center)
@@ -108,8 +119,11 @@ extension LedgerHardwareDevices {
 
 						Spacer(minLength: 0)
 					}
-					.padding(.horizontal, .medium1)
 				}
+				.frame(
+					minWidth: 0,
+					maxWidth: .infinity
+				)
 				.footer(visible: viewStore.allowSelection) {
 					WithControlRequirements(
 						viewStore.selectedLedgerControlRequirements,

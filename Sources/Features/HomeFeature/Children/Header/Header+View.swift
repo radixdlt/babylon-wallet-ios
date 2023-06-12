@@ -28,8 +28,9 @@ extension Header {
 						Text(L10n.HomePage.subtitle)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1HighImportance)
+							.lineLimit(2)
 
-						Spacer(minLength: 3 * .large1)
+						Spacer(minLength: 2 * .large1)
 					}
 				}
 				.padding(.leading, .medium1)

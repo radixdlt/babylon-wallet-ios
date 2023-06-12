@@ -52,7 +52,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case let .amountChanged(transferAmountStr):
 			state.transferAmountStr = transferAmountStr
 
-			if let value = try? BigDecimal(localizedFromString: transferAmountStr) {
+			if let value = try? BigDecimal(localizedFromString: transferAmountStr), value > 0 {
 				state.transferAmount = value
 			} else {
 				state.transferAmount = nil
@@ -60,8 +60,9 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			return .send(.delegate(.amountChanged))
 
 		case .maxAmountTapped:
+			let fee: BigDecimal = state.isXRD ? .temporaryStandardFee : 0
 			let sumOfOthers = state.totalTransferSum - (state.transferAmount ?? .zero)
-			let remainingAmount = max(state.balance - sumOfOthers, 0)
+			let remainingAmount = max(state.balance - sumOfOthers - fee, 0)
 			state.transferAmount = remainingAmount
 			state.transferAmountStr = remainingAmount.droppingTrailingZeros.formatWithoutRounding()
 			return .send(.delegate(.amountChanged))

@@ -34,11 +34,23 @@ extension SelectFeePayer {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
 					VStack {
+						Text(L10n.TransactionReview.SelectFeePayer.navigationTitle)
+							.textStyle(.sheetTitle)
+							.foregroundColor(.app.gray1)
+							.padding(.top, .medium3)
+							.padding(.horizontal, .medium1)
+							.padding(.bottom, .small2)
+
 						Text(L10n.TransactionReview.SelectFeePayer.body)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray2)
+							.padding(.horizontal, .large3)
+							.padding(.bottom, .small1)
 
-						Spacer()
-
-						Text(L10n.TransactionReview.SelectFeePayer.selectAccount(viewStore.fee.format()))
+						Text(L10n.TransactionReview.SelectFeePayer.selectAccount)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray2)
+							.padding(.horizontal, .large3)
 
 						ScrollView {
 							VStack(spacing: .small1) {
@@ -57,12 +69,10 @@ extension SelectFeePayer {
 									)
 								}
 							}
-
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .medium2)
 						}
 					}
-					.padding(.horizontal, .small1)
 					.navigationTitle(L10n.TransactionReview.SelectFeePayer.navigationTitle)
 				}
 				.footer {
