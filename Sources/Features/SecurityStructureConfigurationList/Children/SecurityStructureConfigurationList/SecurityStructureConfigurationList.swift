@@ -29,6 +29,13 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.forEach(\.configs, action: /Action.child .. ChildAction.config) {
+				SecurityStructureConfigurationRow()
+			}
+	}
+
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .configsLoaded(configs):
