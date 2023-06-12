@@ -16,7 +16,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		return Self(
 			publicKeysFromOnDeviceHD: { request in
-				let factorSourceID = request.hdOnDeviceFactorSource.id
+				let factorSourceID = request.deviceFactorSource.id
 
 				guard
 					let mnemonicWithPassphrase = try await secureStorageClient
@@ -83,6 +83,9 @@ extension DeviceFactorSourceClient: DependencyKey {
 					return !accounts.allSatisfy(hasControl)
 				} catch {
 					loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
+					if error is KeychainAccess.Status {
+						throw error
+					}
 					return true
 				}
 			}

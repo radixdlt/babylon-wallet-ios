@@ -5,11 +5,11 @@ import SecureStorageClient
 // MARK: - DisplayMnemonic
 public struct DisplayMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let deviceFactorSource: HDOnDeviceFactorSource
+		public let deviceFactorSource: DeviceFactorSource
 
 		public var importMnemonic: ImportMnemonic.State?
 
-		public init(deviceFactorSource: HDOnDeviceFactorSource) {
+		public init(deviceFactorSource: DeviceFactorSource) {
 			self.deviceFactorSource = deviceFactorSource
 		}
 	}

@@ -81,11 +81,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 		Scope(state: \.nonFungibleTokenList, action: /Action.child .. ChildAction.nonFungibleTokenList) {
 			NonFungibleAssetList()
 		}
-
 		Scope(state: \.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
 			FungibleAssetList()
 		}
-		Reduce(self.core)
+		Reduce(core)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -116,14 +115,27 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .portfolioUpdated(portfolio):
-			let xrd = portfolio.fungibleResources.xrdResource.map {
-				FungibleAssetList.Row.State(xrdToken: $0, isSelected: state.mode.xrdRowSelected)
+			let xrd = portfolio.fungibleResources.xrdResource.flatMap { token -> FungibleAssetList.Row.State? in
+				guard token.amount > 0 else { return nil }
+				return FungibleAssetList.Row.State(xrdToken: token, isSelected: state.mode.xrdRowSelected)
 			}
-			let nonXrd = portfolio.fungibleResources.nonXrdResources.map {
-				FungibleAssetList.Row.State(nonXRDToken: $0, isSelected: state.mode.nonXrdRowSelected($0.resourceAddress))
-			}
-			let nfts = portfolio.nonFungibleResources.map {
-				NonFungibleAssetList.Row.State(resource: $0, selectedAssets: state.mode.nftRowSelectedAssets($0.resourceAddress))
+			let nonXrd = portfolio.fungibleResources.nonXrdResources
+				.filter {
+					$0.amount > 0
+				}
+				.map { token in
+					FungibleAssetList.Row.State(
+						nonXRDToken: token,
+						isSelected: state.mode.nonXrdRowSelected(token.resourceAddress)
+					)
+				}
+			let nfts = portfolio.nonFungibleResources.compactMap { resource -> NonFungibleAssetList.Row.State? in
+				guard !resource.tokens.isEmpty else { return nil }
+				return NonFungibleAssetList.Row.State(
+					resource: resource,
+					disabled: state.mode.selectedAssets?.disabledNFTs ?? [],
+					selectedAssets: state.mode.nftRowSelectedAssets(resource.resourceAddress)
+				)
 			}
 
 			state.fungibleTokenList = .init(xrdToken: xrd, nonXrdTokens: .init(uniqueElements: nonXrd))
@@ -152,7 +164,13 @@ extension AssetsView.State {
 
 		let nonFungibleResources = nonFungibleTokenList.rows.compactMap {
 			if let selectedAssets = $0.selectedAssets, !selectedAssets.isEmpty {
-				return Mode.SelectedAssets.NonFungibleTokensPerResource(resourceAddress: $0.resource.resourceAddress, tokens: selectedAssets)
+				let selected = $0.resource.tokens.filter { token in selectedAssets.contains(token.id)
+				}
+
+				return Mode.SelectedAssets.NonFungibleTokensPerResource(
+					resourceAddress: $0.resource.resourceAddress,
+					tokens: selected
+				)
 			}
 			return nil
 		}
@@ -163,20 +181,21 @@ extension AssetsView.State {
 
 		return .init(
 			fungibleResources: fungibleresources,
-			nonFungibleResources: IdentifiedArrayOf(uniqueElements: nonFungibleResources)
+			nonFungibleResources: IdentifiedArrayOf(uniqueElements: nonFungibleResources),
+			disabledNFTs: mode.selectedAssets?.disabledNFTs ?? []
 		)
 	}
 
 	public var chooseButtonTitle: String {
 		guard let selectedAssets else {
-			return "Select Assets" // FIXME: Localize
+			return L10n.AssetTransfer.AddAssets.buttonAssetsNone
 		}
 
 		if selectedAssets.assetsCount == 1 {
-			return "Choose 1 Asset" // FIXME: Localize
+			return L10n.AssetTransfer.AddAssets.buttonAssetsOne
 		}
 
-		return "Choose \(selectedAssets.assetsCount) Assets" // FIXME: Localize
+		return L10n.AssetTransfer.AddAssets.buttonAssets(selectedAssets.assetsCount)
 	}
 }
 
@@ -192,7 +211,10 @@ extension AssetsView.State {
 				public let resourceAddress: ResourceAddress
 				public var tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
 
-				public init(resourceAddress: ResourceAddress, tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>) {
+				public init(
+					resourceAddress: ResourceAddress,
+					tokens: IdentifiedArrayOf<AccountPortfolio.NonFungibleResource.NonFungibleToken>
+				) {
 					self.resourceAddress = resourceAddress
 					self.tokens = tokens
 				}
@@ -200,13 +222,16 @@ extension AssetsView.State {
 
 			public var fungibleResources: AccountPortfolio.FungibleResources
 			public var nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource>
+			public var disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
 
 			public init(
 				fungibleResources: AccountPortfolio.FungibleResources = .init(),
-				nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = []
+				nonFungibleResources: IdentifiedArrayOf<NonFungibleTokensPerResource> = [],
+				disabledNFTs: Set<NonFungibleAssetList.Row.State.AssetID>
 			) {
 				self.fungibleResources = fungibleResources
 				self.nonFungibleResources = nonFungibleResources
+				self.disabledNFTs = disabledNFTs
 			}
 
 			public var assetsCount: Int {
@@ -243,8 +268,8 @@ extension AssetsView.State {
 			selectedAssets?.fungibleResources.nonXrdResources.contains { $0.resourceAddress == resource }
 		}
 
-		func nftRowSelectedAssets(_ resource: ResourceAddress) -> NonFungibleAssetList.Row.State.SelectedAssets? {
-			selectedAssets?.nonFungibleResources[id: resource]?.tokens ?? []
+		func nftRowSelectedAssets(_ resource: ResourceAddress) -> OrderedSet<NonFungibleAssetList.Row.State.AssetID>? {
+			selectedAssets.map { $0.nonFungibleResources[id: resource]?.tokens.ids ?? [] }
 		}
 	}
 }

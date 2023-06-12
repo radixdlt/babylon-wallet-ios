@@ -176,24 +176,20 @@ extension FactorSourceView {
 				.font(.title)
 			#endif // os(macOS)
 
-			Labeled("Kind", value: factorSource.kind.rawValue)
-			Labeled("Label", value: factorSource.label.rawValue)
-			Labeled("Description", value: factorSource.description.rawValue)
-			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
-			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
-
-			if let entityCreatingStorage = factorSource.storage?.entityCreating {
-				NextDerivationIndicesPerNetworkView(
-					nextDerivationIndicesPerNetwork: entityCreatingStorage.nextDerivationIndicesPerNetwork,
-					indentation: indentation.inOneLevel
-				)
-			} else if let offDeviceMnemonic = factorSource.storage?.offDeviceMnemonic {
-				VStack {
-					Labeled("Word count", value: offDeviceMnemonic.wordCount.rawValue)
-					Labeled("Language", value: offDeviceMnemonic.language)
-					Labeled("Passphrase?", value: offDeviceMnemonic.usedBip39Passphrase)
-				}
-				.padding([.leading], indentation.inOneLevel.leadingPadding)
+			FactorSourceCommonView(common: factorSource.common)
+			switch factorSource {
+			case let .device(deviceFactorSource):
+				DeviceFactorSouceView(deviceFactorSource: deviceFactorSource)
+			case let .ledger(ledgerFactorSource):
+				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
+			case let .offDeviceMnemonic(offDeviceMnemonicFactorSource):
+				OffDeviceMnemonicFactorSourceView(offDeviceMnemonicFactorSource: offDeviceMnemonicFactorSource)
+			case let .securityQuestions(questionsFactorSource):
+				// FIXME: impl me
+				Text("\(String(describing: questionsFactorSource))")
+			case let .trustedContact(trustedContact):
+				// FIXME: impl me
+				Text("\(String(describing: trustedContact))")
 			}
 		}
 		.background {
@@ -201,6 +197,53 @@ extension FactorSourceView {
 		}
 		.foregroundColor(.white)
 		.padding([.leading], leadingPadding)
+	}
+}
+
+// MARK: - FactorSourceCommonView
+public struct FactorSourceCommonView: View {
+	public let common: FactorSource.Common
+	public var body: some View {
+		Labeled("ID", value: common.id)
+		Labeled("Added On", value: common.addedOn.ISO8601Format())
+		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
+		Labeled("Supported Curves", value: common.cryptoParameters.supportedCurves.map { String(describing: $0) }.joined())
+	}
+}
+
+// MARK: - DeviceFactorSouceView
+public struct DeviceFactorSouceView: View {
+	public let deviceFactorSource: DeviceFactorSource
+	public var body: some View {
+		Labeled("Name", value: deviceFactorSource.hint.name)
+		Labeled("Model", value: deviceFactorSource.hint.model.rawValue)
+
+		if let nextDerivationIndicesPerNetwork = deviceFactorSource.nextDerivationIndicesPerNetwork {
+			NextDerivationIndicesPerNetworkView(
+				nextDerivationIndicesPerNetwork: nextDerivationIndicesPerNetwork,
+				indentation: .init()
+			)
+		}
+	}
+}
+
+// MARK: - LedgerFactorSourceView
+public struct LedgerFactorSourceView: View {
+	public let ledgerFactorSource: LedgerHardwareWalletFactorSource
+	public var body: some View {
+		Labeled("Name", value: ledgerFactorSource.hint.name)
+		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
+	}
+}
+
+// MARK: - OffDeviceMnemonicFactorSourceView
+public struct OffDeviceMnemonicFactorSourceView: View {
+	public let offDeviceMnemonicFactorSource: OffDeviceMnemonicFactorSource
+	public var body: some View {
+		Labeled("Word count", value: offDeviceMnemonicFactorSource.bip39Parameters.wordCount)
+		Labeled("Language", value: offDeviceMnemonicFactorSource.bip39Parameters.language)
+		Labeled("Passphrase?", value: offDeviceMnemonicFactorSource.bip39Parameters.bip39PassphraseSpecified)
+		Labeled("Label", value: offDeviceMnemonicFactorSource.hint.label)
 	}
 }
 

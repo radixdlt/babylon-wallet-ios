@@ -33,7 +33,6 @@ extension Main {
 				)
 				#endif
 			}
-			.tint(.app.gray1)
 			.presentsDappInteractions()
 		}
 	}

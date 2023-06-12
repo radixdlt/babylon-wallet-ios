@@ -7,7 +7,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let gateway = Radix.Gateway.nebunet
+	let gateway = Radix.Gateway.kisharnet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
@@ -38,8 +38,8 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "3b4fc51ce164be26723264f0a78b7e5ab44a143520c77e0e82bfbb9642e9cfd4")
-		let factorSourceID = try FactorSource.id(fromRoot: root)
-		XCTAssertEqual(factorSourceID.hex(), "6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
+		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
+		XCTAssertEqual(factorSourceID.hex(), "de6facb00a836864511fdf8f181382209e64e83ad462288ea1bc7868f236fb8033")
 	}
 
 	func test_blake_hash() throws {
@@ -60,14 +60,14 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "e358493920c6f967dc16eff9943fcd5765ab8f42b338ee6769d8ba7f1b9e097f")
-		let factorSourceID = try FactorSource.id(fromRoot: root)
-		XCTAssertEqual(factorSourceID.hex(), "41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
+		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
+		XCTAssertEqual(factorSourceID.hex(), "de41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
 	}
 
 	func test_factorSourceID_zoo_zoo__wrong() throws {
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot()).hex(), "09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
-		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo")).hex(), "537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(), factorSourceKind: .device).hex(), "de09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo"), factorSourceKind: .device).hex(), "de537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
 	}
 
 	func test_factor_source_id_cap33() async throws {
@@ -89,12 +89,12 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "156220ef37c5cd3e6da10cdfdba8a0d87ddc4411b4829f60155db3f6bbafc9f8")
-		let factorSourceID = try FactorSource.id(fromRoot: root)
-		XCTAssertEqual(factorSourceID.hex(), "56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
+		let factorSourceID = try FactorSource.id(fromRoot: root, factorSourceKind: .device)
+		XCTAssertEqual(factorSourceID.hex(), "de56ee829c02d24487cbe98993f668ff646146e7c9bd02d1815118908c5355d750")
 	}
 
 	func test_hdOnDeviceFactorSource() throws {
-		let secp256K1FactorMnemonic = try Mnemonic(
+		let mnemonic = try Mnemonic(
 			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
 			language: .english
 		)
@@ -102,11 +102,9 @@ final class ProfileTests: TestCase {
 			$0.date = .constant(stableDate)
 			$0.uuid = .constant(stableUUID)
 		} operation: {
-			XCTAssertNoThrow(try FactorSource.olympia(
-				mnemonic: secp256K1FactorMnemonic,
-				label: factorSourceLabel,
-				description: factorSourceDescription
-			))
+			XCTAssertNoThrow(
+				try DeviceFactorSource.olympia(mnemonic: mnemonic, model: deviceFactorModel, name: deviceFactorName)
+			)
 		}
 	}
 
@@ -127,20 +125,20 @@ final class ProfileTests: TestCase {
 			$0.date = .constant(stableDate)
 			$0.uuid = .constant(stableUUID)
 		} operation: {
-			let babylonFactorSource = try FactorSource.babylon(
+			let babylonFactorSource = try DeviceFactorSource.babylon(
 				mnemonic: curve25519FactorSourceMnemonic,
-				label: factorSourceLabel,
-				description: factorSourceDescription
+				model: deviceFactorModel,
+				name: deviceFactorName
 			)
-			let olympiaFactorSource = try FactorSource.olympia(
+			let olympiaFactorSource = try DeviceFactorSource.olympia(
 				mnemonic: secp256K1FactorMnemonic,
-				label: factorSourceLabel,
-				description: factorSourceDescription
+				model: deviceFactorModel,
+				name: deviceFactorName
 			)
 
 			let profile = Profile(
 				header: snapshotHeader,
-				factorSources: .init(babylonFactorSource.factorSource),
+				deviceFactorSource: babylonFactorSource,
 				appPreferences: .init(gateways: .init(current: gateway))
 			)
 
@@ -149,13 +147,12 @@ final class ProfileTests: TestCase {
 
 		var profile = _profile
 		XCTAssertEqual(profile.appPreferences.gateways.current.network, gateway.network)
-		XCTAssertNil(olympiaFactorSource.factorSource.storage)
-		profile.factorSources.append(olympiaFactorSource.factorSource)
+		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> Profile.Network.Account {
-			let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(
-				kind: .account,
-				networkID: profile.networkID
+			let index = try profile.factorSources.babylonDevice.nextDerivationIndex(
+				for: .account,
+				networkID: networkID
 			)
 
 			let derivationPath = try AccountBabylonDerivationPath(
@@ -213,19 +210,16 @@ final class ProfileTests: TestCase {
 		}
 
 		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<Profile.Network.Persona.Field>) throws -> Profile.Network.Persona {
-			let index = profile.factorSources.babylonDevice.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID)
-
-			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
-				networkID: networkID,
-				index: index,
-				keyKind: .transactionSigning
+			let derivationPath = try profile.factorSources.babylonDevice.derivationPath(
+				forNext: .identity,
+				networkID: profile.networkID
 			)
 			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
 			let publicKey = try hdRoot.derivePublicKey(
 				path: .init(
 					scheme: .cap26,
-					path: derivationPath.derivationPath
+					path: derivationPath.path
 				),
 				curve: .curve25519
 			)
@@ -233,13 +227,13 @@ final class ProfileTests: TestCase {
 			let factorInstance = HierarchicalDeterministicFactorInstance(
 				factorSourceID: babylonFactorSource.id,
 				publicKey: publicKey,
-				derivationPath: derivationPath.wrapAsDerivationPath()
+				derivationPath: derivationPath
 			)
 
 			var persona = try Profile.Network.Persona(networkID: networkID, factorInstance: factorInstance, displayName: name, extraProperties: .init(fields: fields))
 
 			if case var .unsecured(control) = persona.securityState {
-				let path = try derivationPath.switching(keyKind: .authenticationSigning)
+				let path = try derivationPath.asIdentityPath().switching(keyKind: .authenticationSigning)
 				let authPublicKey = try hdRoot.derivePublicKey(
 					path: .init(
 						scheme: .cap26,
@@ -317,7 +311,7 @@ final class ProfileTests: TestCase {
 				.init(arrayLiteral:
 					.init(
 						identityAddress: firstPersona.address,
-						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
@@ -329,7 +323,7 @@ final class ProfileTests: TestCase {
 					),
 					.init(
 						identityAddress: secondPersona.address,
-						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0),
 						sharedAccounts: .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
@@ -384,21 +378,19 @@ final class ProfileTests: TestCase {
 				numberOfPersonasOnAllNetworksInTotal: 3,
 				numberOfNetworks: 2
 			),
-			snapshotVersion: .init(rawValue: 34)
+			snapshotVersion: ProfileSnapshot.Header.Version.minimum
 		)
 
 		XCTAssertNoDifference(profile.header, header)
-		// XCTAssertEqual(profile.creatingDevice, creatingDevice)
 
 		XCTAssertEqual(profile.factorSources.count, 2)
-		for factorSource in profile.factorSources {
-			XCTAssertEqual(factorSource.label, factorSourceLabel)
-			XCTAssertEqual(factorSource.description, factorSourceDescription)
+		for factorSource in profile.factorSources.compactMap({ $0.extract(DeviceFactorSource.self) }) {
+			XCTAssertEqual(factorSource.hint.name, deviceFactorName)
+			XCTAssertEqual(factorSource.hint.model, deviceFactorModel)
 		}
 		let deviceFactorSource = profile.factorSources.babylonDevice
-		XCTAssertNil(profile.factorSources.last.storage)
-		XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .account, networkID: profile.networkID), 3)
-		XCTAssertEqual(deviceFactorSource.entityCreatingStorage.nextForEntity(kind: .identity, networkID: profile.networkID), 2)
+		XCTAssertEqual(try deviceFactorSource.nextDerivationIndex(for: .account, networkID: profile.networkID), 3)
+		XCTAssertEqual(try deviceFactorSource.nextDerivationIndex(for: .identity, networkID: profile.networkID), 2)
 
 		XCTAssertEqual(profile.networks.count, 1)
 		let networkID = gateway.network.id
@@ -429,82 +421,88 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			profile.factorSources.first.id,
-			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot())
+			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot(), factorSourceKind: .device)
 		)
 
 		XCTAssertEqual(
 			profile.factorSources.first(where: { $0.supportsOlympia })!.id,
-			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot())
+			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot(), factorSourceKind: .device)
 		)
 
 		// Account 0
 		XCTAssertEqual(
-			network.accounts[0].address.address,
-			"account_tdx_c_1pycvv2pummryhvmr6tveuva4cgap63lapgu5y4eeqlwstajjxx"
-		)
-		XCTAssertEqual(
 			network.accounts[0].publicKey()?.compressedData.hex(),
-			"7566e3e948d428112d6c40b597e7ea979b3516dfddc3aa5f51e1316303a09ad3"
+			"229c2acaeba87f5231390bfde38da4f4e9f84ab90fb77658aea7983a7af6741d"
 		)
+
 		XCTAssertEqual(
 			network.accounts[0].authPublicKey()?.compressedData.hex(),
-			"03c834335f40429223db22a3cc91f7ca354050081692bd1054b5eb4e379b5a6d"
+			"042f0f24e62932483972b4ff07d63963990e5d7952305babf8014523d65c2b38"
+		)
+
+		XCTAssertEqual(
+			network.accounts[0].address.address,
+			"account_tdx_c_1pyezed90u5qtagu2247rqw7f04vc7wnhsfjz4nf6vuvqtj9kcq"
 		)
 
 		// Account 1
 		XCTAssertEqual(
-			network.accounts[1].address.address,
-			"account_tdx_c_1px9r7zkwfrve4cv3xlehwz8k29vp2q2dp6jhdx2mlkxsh4kqke"
-		)
-		XCTAssertEqual(
 			network.accounts[1].publicKey()?.compressedData.hex(),
-			"216810705185adf3b8076a60d8d05e9da696ca8e87c1124ea909d394b7433719"
+			"150a73661bfae1e6aad771d47bef2b20a92925fcaee3e49762872b2af191b3e7"
 		)
 		XCTAssertEqual(
 			network.accounts[1].authPublicKey()?.compressedData.hex(),
-			"11bef8496426d98e053cf7ce3a85a1a7504fe7ceb1ebbc6f7c14dd7b7071de2e"
+			"82a8ebf9216cef03592ba6d798d67159e154c41b3f2d8d22faf3f4f9b1a5c859"
+		)
+
+		XCTAssertEqual(
+			network.accounts[1].address.address,
+			"account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj"
 		)
 
 		// Account 2
 		XCTAssertEqual(
-			network.accounts[2].address.address,
-			"account_tdx_c_1px0jul7a44s65568d32f82f0lkssjwx6f5t5e44yl6csqurxw3"
-		)
-		XCTAssertEqual(
 			network.accounts[2].publicKey()?.compressedData.hex(),
-			"a82afd5c21188314e60b9045407b7dfad378ba5043bea33b86891f06d94fb1f3"
+			"5cc3c64b1d155494bcf03bf607e0fa4aa8c86fca796d7cafc4f88c24d109fc01"
 		)
 		XCTAssertEqual(
 			network.accounts[2].authPublicKey()?.compressedData.hex(),
-			"5edbfbc93b7cea2e948c6dc85a61e306064a13328a8fed0ffa2843d184c39ac9"
+			"ee4565de7dd845d21fece2579bb1cf8c977dbf03408240d63ad11e53a2aa3bd5"
+		)
+
+		XCTAssertEqual(
+			network.accounts[2].address.address,
+			"account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"
 		)
 
 		// Persona 0
 		XCTAssertEqual(
-			network.personas[0].address.address,
-			"identity_tdx_b_1pjt9eddph3avjs32wswmk306wgpjelluedsg0hwv928qdunqu8"
-		)
-		XCTAssertEqual(
 			network.personas[0].publicKey()?.compressedData.hex(),
-			"573c0dc84196cb4a7dc8ddff1e92a859c98635a64ef5fe0bcf5c7fe5a7dab3e4"
+			"e8b6f865cf2696442ba3106550b3e55d8c65c181066d76f49138306d101d0db7"
 		)
 		XCTAssertEqual(
 			network.personas[0].authPublicKey()?.compressedData.hex(),
-			"83426e4c587553bd3a949a490683a16fdd77e400a05615e5734daac139c7afb7"
+			"bac131975cc66651961835490731f321f70289c306dfae52652cbad44a3647c7"
+		)
+
+		XCTAssertEqual(
+			network.personas[0].address.address,
+			"identity_tdx_c_1pntzwn92848tkaatj4psmgtuvsn83lnknku6av34alxqdrsvjv"
 		)
 
 		// Persona 1
 		XCTAssertEqual(
-			network.personas[1].address.address,
-			"identity_tdx_b_1pshnjvztw6t2hz58jld5mvxvp6ppyjk6ctzu0xhg700scqkhdw"
-		)
-		XCTAssertEqual(
 			network.personas[1].publicKey()?.compressedData.hex(),
-			"6b33fec79f1535ac566b3d840f753942af6447efbe5c50dc343f8ec2122af9b3"
+			"873a41469982a92b52ecb9e5ef6d8267db306b3143efd50d220f867bc3403c22"
 		)
 		XCTAssertEqual(
 			network.personas[1].authPublicKey()?.compressedData.hex(),
-			"44547fabd1e1fd642d96103eb71d80216abf0dc87f0e17ed4a9f5dbc91d2c856"
+			"20a16f3d5df0fb8ebb34fa08edb5143a154c55e857fb5c2273366b8c716ca740"
+		)
+
+		XCTAssertEqual(
+			network.personas[1].address.address,
+			"identity_tdx_c_1p30wtkl76qpyenu88sverfdh0qwf70gulgu29k72myqq2hqg0r"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pLinks.links.count, 2)
@@ -516,7 +514,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedFieldIDs?.count, 2)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
 		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1p95nal0nmrqyl5r4phcspg8ahwnamaduzdd3kaklw3vqeavrwa", "account_tdx_b_1p8ahenyznrqy2w0tyg00r82rwuxys6z8kmrhh37c7maqpydx7p"])
+		XCTAssertEqual(network.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_c_1p82arz264ntf727q2s7f7cm6pqucgqzuru3z7mgeg3gqua0wlj", "account_tdx_c_1pygfwtlv7l90rcsge6t0f0jwn3cuzp05y8geek45qw7s98msmw"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {
@@ -547,9 +545,9 @@ final class ProfileTests: TestCase {
 	}
 }
 
-private let factorSourceLabel: FactorSource.Label = "computer"
-private let factorSourceDescription: FactorSource.Description = "unit test"
-private let creatingDevice: NonEmptyString = "\(factorSourceLabel) \(factorSourceDescription)"
+private let deviceFactorModel: DeviceFactorSource.Hint.Model = "computer"
+private let deviceFactorName: String = "unit test"
+private let creatingDevice: NonEmptyString = "\(deviceFactorModel) \(deviceFactorName)"
 private let stableDate = Date(timeIntervalSince1970: 0)
 private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
 private let device: ProfileSnapshot.Header.UsedDeviceInfo = .init(description: creatingDevice, id: stableUUID, date: stableDate)
@@ -579,5 +577,27 @@ extension EntityProtocol {
 		case let .unsecured(control):
 			return control.authenticationSigning?.publicKey
 		}
+	}
+}
+
+extension DeviceFactorSource {
+	public static func babylon(
+		mnemonic: Mnemonic,
+		model: Hint.Model,
+		name: String,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self.babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
+	}
+
+	public static func olympia(
+		mnemonic: Mnemonic,
+		model: Hint.Model,
+		name: String,
+		addedOn: Date = .now,
+		lastUsedOn: Date = .now
+	) throws -> Self {
+		try Self.olympia(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: lastUsedOn)
 	}
 }

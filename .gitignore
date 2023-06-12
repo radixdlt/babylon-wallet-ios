@@ -14,3 +14,4 @@ fastlane/test_output/
 fastlane/.env.secret
 .bundle
 vendor
+.design

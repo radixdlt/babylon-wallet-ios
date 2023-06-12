@@ -48,12 +48,12 @@ extension NonFungibleAssetList.Row.View {
 			Spacer()
 		}
 		.padding(.horizontal, .medium1)
-		.padding(.vertical, .large3)
+		.frame(height: headerHeight)
 		.background(.app.white)
 		.roundedCorners(viewStore.isExpanded ? .top : .allCorners, radius: .small1)
 		.tokenRowShadow(!viewStore.isExpanded)
 		.onTapGesture {
-			viewStore.send(.isExpandedToggled, animation: .easeIn)
+			viewStore.send(.isExpandedToggled, animation: .easeInOut)
 		}
 	}
 
@@ -63,6 +63,8 @@ extension NonFungibleAssetList.Row.View {
 		}
 		return viewStore.resource.tokens
 	}
+
+	private var headerHeight: CGFloat { HitTargetSize.small.frame.height + 2 * .medium1 }
 }
 
 // MARK: - Private Computed Properties
@@ -73,6 +75,7 @@ extension NonFungibleAssetList.Row.View {
 		asset: AccountPortfolio.NonFungibleResource.NonFungibleToken,
 		index: Int
 	) -> some View {
+		let isDisabled = viewStore.disabled.contains(asset.id)
 		HStack {
 			NFTIDView(
 				id: asset.id.toUserFacingString,
@@ -81,10 +84,12 @@ extension NonFungibleAssetList.Row.View {
 				thumbnail: viewStore.isExpanded ? asset.keyImageURL : nil
 			)
 			if let selectedAssets = viewStore.selectedAssets {
-				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+				CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset.id))
 			}
 		}
+		.opacity(isDisabled ? 0.35 : 1)
 		.padding(.medium1)
+		.frame(minHeight: headerHeight)
 		.background(.app.white)
 		.roundedCorners(
 			.bottom,

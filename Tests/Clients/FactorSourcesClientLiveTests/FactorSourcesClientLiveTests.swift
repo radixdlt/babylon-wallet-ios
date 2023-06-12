@@ -66,38 +66,63 @@ extension Profile.Network.Account: Comparable {
 	}
 }
 
+// MARK: - DeviceFactorSource + Comparable
+extension DeviceFactorSource: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.hint.name < rhs.hint.name
+	}
+}
+
+// MARK: - LedgerHardwareWalletFactorSource + Comparable
+extension LedgerHardwareWalletFactorSource: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.hint.name < rhs.hint.name
+	}
+}
+
 // MARK: - FactorSource + Comparable
 extension FactorSource: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.label.rawValue < rhs.label.rawValue
+		switch (lhs, rhs) {
+		case let (.device(l), .device(r)):
+			return l < r
+		case let (.ledger(l), .ledger(r)):
+			return l < r
+		default: return true
+		}
 	}
 }
 
 extension FactorSource {
-	static func device(_ label: String, olympiaCompat: Bool) -> Self {
-		try! FactorSource(
-			kind: .device,
-			id: .init(data: .random(byteCount: 32)),
-			label: .init(label),
-			description: .init(rawValue: label),
-			parameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon,
-			storage: nil,
-			addedOn: Date(),
-			lastUsedOn: Date()
-		)
+	static func device(_ name: String, olympiaCompat: Bool) -> Self {
+		withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
+		} operation: {
+			let device = try! DeviceFactorSource(
+				common: .init(
+					id: .init(factorSourceKind: .device, hash: .random(byteCount: 32)),
+					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+				),
+				hint: .init(name: name, model: "")
+			)
+			return device.embed()
+		}
 	}
 
-	static func ledger(_ label: String, olympiaCompat: Bool) -> Self {
-		try! FactorSource(
-			kind: .ledgerHQHardwareWallet,
-			id: .init(data: .random(byteCount: 32)),
-			label: .init(label),
-			description: .init(rawValue: label),
-			parameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon,
-			storage: nil,
-			addedOn: Date(),
-			lastUsedOn: Date()
-		)
+	static func ledger(_ name: String, olympiaCompat: Bool) -> Self {
+		withDependencies {
+			$0.date = .constant(.init(timeIntervalSince1970: 0))
+		} operation: {
+			let ledger = try! LedgerHardwareWalletFactorSource(
+				common: .init(
+					id: .init(factorSourceKind: .ledgerHQHardwareWallet, hash: .random(byteCount: 32)),
+					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+				),
+				hint: .init(name: .init(name), model: .nanoS),
+				nextDerivationIndicesPerNetwork: .init()
+			)
+			return ledger.embed()
+		}
 	}
 
 	static let deviceOne = Self.device("One", olympiaCompat: true)

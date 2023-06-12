@@ -3,11 +3,11 @@ import SharedModels
 
 // MARK: - NFTFullView
 struct NFTFullView: View {
-	let url: URL?
+	let url: URL
 	let minAspect: CGFloat
 	let maxAspect: CGFloat
 
-	init(url: URL?, minAspect: CGFloat = .zero, maxAspect: CGFloat = .infinity) {
+	init(url: URL, minAspect: CGFloat = .zero, maxAspect: CGFloat = .infinity) {
 		self.url = url
 		self.minAspect = minAspect
 		self.maxAspect = maxAspect
@@ -31,9 +31,10 @@ struct NFTIDView: View {
 
 	var body: some View {
 		VStack(spacing: .small1) {
-			NFTFullView(url: thumbnail, minAspect: minImageAspect, maxAspect: maxImageAspect)
-				.padding(.bottom, .small1)
-
+			if let thumbnail {
+				NFTFullView(url: thumbnail, minAspect: minImageAspect, maxAspect: maxImageAspect)
+					.padding(.bottom, .small1)
+			}
 			KeyValueView(key: L10n.AssetDetails.NFTDetails.id, value: id)
 		}
 	}

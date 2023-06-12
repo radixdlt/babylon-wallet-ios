@@ -235,7 +235,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 			return convertSoftwareAccountsToBabylon(
 				softwareAccounts,
-				factorSourceID: privateHDFactorSource.id,
+				factorSourceID: privateHDFactorSource.factorSource.id,
 				factorSource: privateHDFactorSource
 			)
 
@@ -270,7 +270,7 @@ extension ImportOlympiaWalletCoordinator {
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				factorSource: FactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase).factorSource
+				factorSource: DeviceFactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			)
 			await send(
 				.internal(.validatedOlympiaSoftwareAccounts(
@@ -300,16 +300,17 @@ extension ImportOlympiaWalletCoordinator {
 			)
 
 			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
-				guard try factorSourceToSave.id == FactorSource.id(fromPrivateHDFactorSource: factorSource) else {
+				guard try factorSourceToSave.id == FactorSource.id(
+					fromPrivateHDFactorSource: factorSource,
+					factorSourceKind: .device
+				) else {
 					throw OlympiaFactorSourceToSaveIDDisrepancy()
 				}
 
 				do {
 					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
-						privateFactorSource: .init(
-							mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase,
-							factorSource: factorSourceToSave
-						),
+						factorSource: factorSource.factorSource.embed(),
+						mnemonicWithPasshprase: factorSource.mnemonicWithPassphrase,
 						saveIntoProfile: true
 					))
 

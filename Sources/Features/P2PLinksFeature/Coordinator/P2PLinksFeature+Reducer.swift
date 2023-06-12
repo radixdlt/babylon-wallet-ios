@@ -32,10 +32,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case destination(PresentationAction<Destinations.Action>)
-		case connection(
-			id: ConnectionPassword,
-			action: P2PLinkRow.Action
-		)
+		case connection(id: ConnectionPassword, action: P2PLinkRow.Action)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {

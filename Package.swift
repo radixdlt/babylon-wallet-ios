@@ -55,6 +55,25 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "AddTrustedContactFactorSourceFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"FactorSourcesClient",
+			"ScanQRFeature",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "AnswerSecurityQuestionsFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"MnemonicClient",
+			"FactorSourcesClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AppFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -148,6 +167,17 @@ package.addModules([
 		tests: .no
 	),
 	.feature(
+		name: "CreateSecurityStructureFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"Profile",
+			"AnswerSecurityQuestionsFeature",
+			"AddTrustedContactFactorSourceFeature",
+			"AppPreferencesClient", // Save SecurityStructureConfig
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"AppPreferencesClient",
@@ -192,6 +222,20 @@ package.addModules([
 		dependencies: [
 			"PersonasClient",
 			"Profile",
+		],
+		tests: .no
+	),
+	.feature(
+		name: "FeaturesPreviewerFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			.product(
+				name: "JSONPreview",
+				package: "JSONPreview",
+				condition: .when(platforms: [.iOS])
+			) {
+				.package(url: "https://github.com/rakuyoMo/JSONPreview.git", from: "2.0.0")
+			},
 		],
 		tests: .no
 	),
@@ -316,9 +360,21 @@ package.addModules([
 		featureSuffixDroppedFromFolderName: true,
 		dependencies: [
 			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+			.product(
+				name: "CodeScanner",
+				package: "CodeScanner",
+				condition: .when(platforms: [.iOS])
+			) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
+		],
+		tests: .no
+	),
+	.feature(
+		name: "SecurityStructureConfigsFeature",
+		featureSuffixDroppedFromFolderName: true,
+		dependencies: [
+			"AppPreferencesClient",
 		],
 		tests: .no
 	),
@@ -327,23 +383,24 @@ package.addModules([
 		dependencies: [
 			"AccountsClient",
 			"AddLedgerFactorSourceFeature",
-			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"AppPreferencesClient",
 			"AuthorizedDAppsFeature",
 			"CacheClient",
 			"DebugInspectProfileFeature",
+			"EditPersonaFeature",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"GatewaySettingsFeature",
-			"ImportMnemonicFeature",
 			"GeneralSettings",
 			"ImportLegacyWalletClient",
+			"ImportMnemonicFeature",
+			"ImportOlympiaLedgerAccountsAndFactorSourcesFeature",
 			"P2PLinksFeature",
 			"PersonasFeature",
+			"ProfileBackupsFeature",
 			"RadixConnectClient",
 			"ScanQRFeature",
-			"EditPersonaFeature",
-			"ProfileBackupsFeature",
+			"SecurityStructureConfigsFeature",
 		],
 		tests: .yes()
 	),
@@ -370,6 +427,7 @@ package.addModules([
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
+			"DeviceFactorSourceClient",
 			"LocalAuthenticationClient",
 			"OnboardingClient",
 		],
@@ -585,7 +643,6 @@ package.addModules([
 			"ROLAClient", // calc expected hashed message for signAuth for validation
 			"RadixConnectClient",
 			"FactorSourcesClient", // FIXME: move models to lower level package
-			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .no
 	),
@@ -725,6 +782,7 @@ package.addModules([
 		dependencies: [
 			"EngineToolkitClient",
 			"GatewayAPI",
+			"TransactionClient",
 		],
 		tests: .no
 	),
@@ -791,6 +849,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			"GatewaysClient",
 			"URLFormatterClient",
 			"QRGeneratorClient",
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
@@ -860,6 +919,7 @@ package.addModules([
 			"EngineToolkit", // address derivation, blake hash
 			"RadixConnectModels",
 			"Resources",
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture"), // actually just CasePaths
 		],
 		tests: .yes(
 			dependencies: [

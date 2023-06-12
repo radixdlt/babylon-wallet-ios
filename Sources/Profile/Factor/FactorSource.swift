@@ -1,202 +1,136 @@
+import CasePaths
 import Cryptography
 import Prelude
 
-// MARK: - _FactorSourceProtocol
-public protocol _FactorSourceProtocol {
-	var kind: FactorSourceKind { get }
-	var id: FactorSourceID { get }
-	var label: FactorSource.Label { get }
-	var description: FactorSource.Description { get }
-	var parameters: FactorSource.Parameters { get }
-	var addedOn: Date { get }
-	var lastUsedOn: Date { get }
-	var storage: FactorSource.Storage? { get }
-}
-
 // MARK: - FactorSource
-/// A FactorSource is the source of FactorInstance(s).
-public struct FactorSource:
-	_FactorSourceProtocol,
-	Sendable,
-	Hashable,
-	Codable,
-	Identifiable,
-	CustomDebugStringConvertible,
-	CustomDumpReflectable
-{
-	/// Kind of factor source
-	public let kind: FactorSourceKind
+public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
+	case device(DeviceFactorSource)
+	case ledger(LedgerHardwareWalletFactorSource)
+	case offDeviceMnemonic(OffDeviceMnemonicFactorSource)
+	case securityQuestions(SecurityQuestionsFactorSource)
+	case trustedContact(TrustedContactFactorSource)
+}
 
-	/// Canonical identifier which uniquely identifies this factor source
-	public let id: FactorSourceID
+extension FactorSource {
+	public var common: FactorSource.Common {
+		get { property(\.common) }
+		set {
+			update(\.common, to: newValue)
+		}
+	}
 
-	/// A user facing **label** about this FactorSource which is displayed
-	/// to the user when she is prompted for this FactorSource during
-	/// for example transaction signing. For most FactorSource kinds
-	/// this value will be a *name*, here are some examples:
-	///
-	/// * `.device`: "iPhone RED"
-	/// * `.ledgerHQHardwareWallet`: "Ledger MOON Edition"
-	/// * `.trustedEntity`: "Sarah"
-	/// * `.offDeviceMnemonic`: "Story about a horse and a battery"
-	/// * `.securityQuestion`: ""
-	///
-	/// The reason why this is mutable (`var`) instead of immutable `let` is
-	/// an implementation detailed on iOS, where reading the device name
-	/// and model is `async` but we want to be able to `sync` create the
-	/// profile, thus this property at a later point in time where an async
-	/// context is available.
-	///
-	public var label: Label; public typealias Label = Tagged<(Self, label: ()), String>
+	public var kind: FactorSourceKind {
+		property(\.kind)
+	}
 
-	/// A user facing **description** about this FactorSource which is displayed
-	/// to the user when she is prompted for this FactorSource during
-	/// for example transaction signing. For most FactorSource kinds
-	/// this value will be a *model*, here are some examples:
-	///
-	/// * `.device`: "iPhone SE 2nd gen"
-	/// * `.ledgerHQHardwareWallet`: "nanoS+"
-	/// * `.trustedEntity`: "Friend"
-	/// * `.offDeviceMnemonic`: "Stored in the place where I played often with my friend A***"
-	/// * `.securityQuestion`: ""
-	///
-	/// The reason why this is mutable (`var`) instead of immutable `let` is
-	/// an implementation detailed on iOS, where reading the device name
-	/// and model is `async` but we want to be able to `sync` create the
-	/// profile, thus this property at a later point in time where an async
-	/// context is available.
-	///
-	public var description: Description; public typealias Description = Tagged<(Self, description: ()), String>
-
-	/// Curve/Derivation scheme
-	public let parameters: Parameters
-
-	/// When this factor source for originally added by the user.
-	public let addedOn: Date
-
-	/// Date of last usage of this factor source
-	///
-	/// This is the only mutable property, it is mutable
-	/// since we will update it every time this FactorSource
-	/// is used.
-	public var lastUsedOn: Date
-
-	/// Some factor source requires extra stored properties, e.g.
-	/// securityQuestions kind which requires storage of:
-	/// * which questions user chose
-	/// * the encryptions of the mnemonic
-	///
-	/// Rather than letting ALL factor source contain ALL possible
-	/// extra stored properties as optionals, which will be `nil`
-	/// for most FactorSource, we model this with one single optional
-	/// being an enym modelling all possible required extra stored
-	/// properties.
-	public var storage: Storage?
-
-	init(
-		kind: FactorSourceKind,
-		id: ID,
-		label: Label,
-		description: Description,
-		parameters: Parameters,
-		storage: Storage?,
-		addedOn: Date,
-		lastUsedOn: Date
+	public mutating func update<Property>(
+		_ writableKeyPath: WritableKeyPath<any FactorSourceProtocol, Property>,
+		to newValue: Property
 	) {
-		self.id = id
-		self.kind = kind
-		self.label = label
-		self.description = description
-		self.parameters = parameters
-		self.storage = storage
-		self.addedOn = addedOn
-		self.lastUsedOn = lastUsedOn
+		switch self {
+		case var .device(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .ledger(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .offDeviceMnemonic(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .securityQuestions(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .trustedContact(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+		}
 	}
 
-	public init(
-		kind: FactorSourceKind,
-		id: ID,
-		label: Label,
-		description: Description,
-		parameters: Parameters,
-		storage: Storage? = nil
-	) {
-		@Dependency(\.date) var date
-
-		self.init(
-			kind: kind,
-			id: id,
-			label: label,
-			description: description,
-			parameters: parameters,
-			storage: storage,
-			addedOn: date(),
-			lastUsedOn: date()
-		)
-	}
-}
-
-// MARK: FactorSource.UsagePurpose
-extension FactorSource {
-	public enum UsagePurpose: Sendable, Hashable {
-		case transactionSigning
-		case authSigning
+	private func property<Property>(_ keyPath: KeyPath<BaseFactorSourceProtocol, Property>) -> Property {
+		switch self {
+		case let .device(factorSource): return factorSource[keyPath: keyPath]
+		case let .ledger(factorSource): return factorSource[keyPath: keyPath]
+		case let .offDeviceMnemonic(factorSource): return factorSource[keyPath: keyPath]
+		case let .securityQuestions(factorSource): return factorSource[keyPath: keyPath]
+		case let .trustedContact(factorSource): return factorSource[keyPath: keyPath]
+		}
 	}
 }
 
 extension FactorSource {
-	public var supportsOlympia: Bool {
-		parameters.supportsOlympia
+	private enum CodingKeys: String, CodingKey {
+		case discriminator, device, ledgerHQHardwareWallet, offDeviceMnemonic, securityQuestions, trustedContact
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
+		try keyedContainer.encode(kind.discriminator, forKey: .discriminator)
+		switch self {
+		case let .device(device):
+			try keyedContainer.encode(device, forKey: .device)
+		case let .ledger(ledger):
+			try keyedContainer.encode(ledger, forKey: .ledgerHQHardwareWallet)
+		case let .offDeviceMnemonic(ledger):
+			try keyedContainer.encode(ledger, forKey: .offDeviceMnemonic)
+		case let .trustedContact(ledger):
+			try keyedContainer.encode(ledger, forKey: .trustedContact)
+		case let .securityQuestions(ledger):
+			try keyedContainer.encode(ledger, forKey: .securityQuestions)
+		}
+	}
+
+	public init(from decoder: Decoder) throws {
+		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try keyedContainer.decode(FactorSourceKind.Discriminator.self, forKey: .discriminator)
+
+		switch discriminator {
+		case .device:
+			self = try .device(
+				keyedContainer.decode(DeviceFactorSource.self, forKey: .device)
+			)
+
+		case .ledgerHQHardwareWallet:
+			self = try .ledger(
+				keyedContainer.decode(LedgerHardwareWalletFactorSource.self, forKey: .ledgerHQHardwareWallet)
+			)
+
+		case .offDeviceMnemonic:
+			self = try .offDeviceMnemonic(
+				keyedContainer.decode(OffDeviceMnemonicFactorSource.self, forKey: .offDeviceMnemonic)
+			)
+
+		case .securityQuestions:
+			self = try .securityQuestions(
+				keyedContainer.decode(SecurityQuestionsFactorSource.self, forKey: .securityQuestions)
+			)
+
+		case .trustedContact:
+			self = try .trustedContact(
+				keyedContainer.decode(TrustedContactFactorSource.self, forKey: .trustedContact)
+			)
+		}
 	}
 }
 
 extension FactorSource {
-	public var customDumpMirror: Mirror {
-		.init(
-			self,
-			children: [
-				"id": String(describing: id),
-				"kind": kind,
-				"label": label,
-				"description": description,
-				"parameters": parameters,
-				"addedOn": addedOn,
-				"lastUsedOn": lastUsedOn,
-				"storage": String(describing: storage),
-			],
-			displayStyle: .struct
-		)
+	public func extract<F>(_ type: F.Type = F.self) -> F? where F: FactorSourceProtocol {
+		F.extract(from: self)
 	}
 
-	public var debugDescription: String {
-		"""
-		"id": \(String(describing: id)),
-		"kind": \(kind),
-		"label": \(label),
-		"description": \(description),
-		"parameters": \(parameters),
-		"addedOn": \(addedOn.ISO8601Format()),
-		"lastUsedOn": \(lastUsedOn.ISO8601Format()),
-		"storage": \(String(describing: storage))
-		"""
+	public func extract<F>(as _: F.Type = F.self) throws -> F where F: FactorSourceProtocol {
+		guard let extracted = extract(F.self) else {
+			throw IncorrectFactorSourceType(expectedKind: F.kind, actualKind: kind)
+		}
+		return extracted
 	}
 }
 
-#if DEBUG
-extension FactorSource {
-	public static let previewValueDevice: Self = {
-		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
-		return try! Self(
-			kind: .device,
-			id: id(fromRoot: mnemonic.hdRoot(passphrase: "")),
-			label: "previewValue",
-			description: "preview description",
-			parameters: .default,
-			storage: .entityCreating(.init()),
-			addedOn: .init(timeIntervalSince1970: 0),
-			lastUsedOn: .init(timeIntervalSince1970: 0)
-		)
-	}()
+// MARK: - IncorrectFactorSourceType
+public struct IncorrectFactorSourceType: Swift.Error {
+	public let expectedKind: FactorSourceKind
+	public let actualKind: FactorSourceKind
 }
-
-#endif

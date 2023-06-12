@@ -1,6 +1,5 @@
 import AppPreferencesClient
 import AuthorizedDAppsFeature
-import CacheClient
 import FeaturePrelude
 import GatewayAPI
 import GatewaySettingsFeature
@@ -19,8 +18,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
-	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.cacheClient) var cacheClient
 
 	public typealias Store = StoreOf<Self>
 
@@ -42,7 +39,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case backButtonTapped
-		case deleteProfileAndFactorSourcesButtonTapped
 
 		case manageP2PLinksButtonTapped
 		case addP2PLinkButtonTapped
@@ -53,19 +49,13 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case generalSettingsButtonTapped
 		case profileBackupsButtonTapped
 		case ledgerHardwareWalletsButtonTapped
+		case mnemonicsButtonTapped
 
 		#if DEBUG
 		case importFromOlympiaWalletButtonTapped
-		case mnemonicsButtonTapped
 		case factorSourcesButtonTapped
 		case debugInspectProfileButtonTapped
 		#endif
-
-		public enum DeleteProfileConfirmationDialogAction: Sendable, Hashable {
-			case deleteProfile
-			case deleteProfileLocalKeepInICloudIfPresent
-			case cancel
-		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -86,7 +76,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case deleteProfileConfirmationDialog(ConfirmationDialogState<ViewAction.DeleteProfileConfirmationDialogAction>)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
 			case authorizedDapps(AuthorizedDapps.State)
@@ -94,21 +83,18 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case generalSettings(GeneralSettings.State)
 			case profileBackups(ProfileBackups.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
-
-			#if DEBUG
-			// FIXME: move out of DEBUG flag once ready...
 			case mnemonics(DisplayMnemonics.State)
 
-			// FIXME: move out of DEBUG flag once ready...
+			#if DEBUG
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.State)
-
 			case debugInspectProfile(DebugInspectProfile.State)
 			case debugManageFactorSources(ManageFactorSources.State)
+
+			case securityStructureConfigs(ManageFactorSources.State)
 			#endif
 		}
 
 		public enum Action: Sendable, Equatable {
-			case deleteProfileConfirmationDialog(ViewAction.DeleteProfileConfirmationDialogAction)
 			case manageP2PLinks(P2PLinksFeature.Action)
 			case gatewaySettings(GatewaySettings.Action)
 			case authorizedDapps(AuthorizedDapps.Action)
@@ -116,14 +102,10 @@ public struct AppSettings: Sendable, FeatureReducer {
 			case generalSettings(GeneralSettings.Action)
 			case profileBackups(ProfileBackups.Action)
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
-
-			#if DEBUG
-			// FIXME: move out of DEBUG flag once ready...
 			case mnemonics(DisplayMnemonics.Action)
 
-			// FIXME: move out of DEBUG flag once ready...
+			#if DEBUG
 			case importOlympiaWalletCoordinator(ImportOlympiaWalletCoordinator.Action)
-
 			case debugInspectProfile(DebugInspectProfile.Action)
 			case debugManageFactorSources(ManageFactorSources.Action)
 			#endif
@@ -151,20 +133,19 @@ public struct AppSettings: Sendable, FeatureReducer {
 			Scope(state: /State.ledgerHardwareWallets, action: /Action.ledgerHardwareWallets) {
 				LedgerHardwareDevices()
 			}
+			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
+				DisplayMnemonics()
+			}
+
 			#if DEBUG
-			// FIXME: move out of DEBUG flag once ready...
 			Scope(state: /State.importOlympiaWalletCoordinator, action: /Action.importOlympiaWalletCoordinator) {
 				ImportOlympiaWalletCoordinator()
 			}
-
 			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
 				DebugInspectProfile()
 			}
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				ManageFactorSources()
-			}
-			Scope(state: /State.mnemonics, action: /Action.mnemonics) {
-				DisplayMnemonics()
 			}
 			#endif
 		}
@@ -186,26 +167,6 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
-
-		case .deleteProfileAndFactorSourcesButtonTapped:
-			state.destination = .deleteProfileConfirmationDialog(
-				.init(titleVisibility: .hidden) {
-					TextState("")
-				} actions: {
-					ButtonState(role: .destructive, action: .send(.deleteProfile)) {
-						TextState("Delete Wallet data")
-					}
-					ButtonState(role: .destructive, action: .send(.deleteProfileLocalKeepInICloudIfPresent)) {
-						TextState("Delete local Wallet data (keep iCloud)")
-					}
-					ButtonState(role: .cancel, action: .send(.cancel)) {
-						TextState("Cancel")
-					}
-				} message: {
-					TextState("Are REALLY you sure you wanna delete wallet data? If you have not backed up your seedphrase you will forever lose access to all your assets of all your accounts and also loose all of your personas.")
-				}
-			)
-			return .none
 
 		case .addP2PLinkButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -237,19 +198,16 @@ public struct AppSettings: Sendable, FeatureReducer {
 			return .none
 
 		case .ledgerHardwareWalletsButtonTapped:
-			state.destination = .ledgerHardwareWallets(.init(allowSelection: false))
+			state.destination = .ledgerHardwareWallets(.init(allowSelection: false, context: .settings, showHeaders: true))
+			return .none
+
+		case .mnemonicsButtonTapped:
+			state.destination = .mnemonics(.init())
 			return .none
 
 		#if DEBUG
-
-		// FIXME: move out of DEBUG flag once ready...
 		case .importFromOlympiaWalletButtonTapped:
 			state.destination = .importOlympiaWalletCoordinator(.init())
-			return .none
-
-		// FIXME: move out of DEBUG flag once ready...
-		case .mnemonicsButtonTapped:
-			state.destination = .mnemonics(.init())
 			return .none
 
 		case .factorSourcesButtonTapped:
@@ -287,11 +245,8 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfile))):
-			return deleteProfile(keepInICloudIfPresent: false)
-
-		case .destination(.presented(.deleteProfileConfirmationDialog(.deleteProfileLocalKeepInICloudIfPresent))):
-			return deleteProfile(keepInICloudIfPresent: true)
+		case let .destination(.presented(.generalSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
+			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 
 		case .destination(.dismiss):
 			switch state.destination {
@@ -309,7 +264,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case .destination(.presented(.importOlympiaWalletCoordinator(.delegate(.finishedMigration)))):
 			state.destination = nil
 			return .none
-		#endif // DEBUG
+		#endif
 
 		case .destination:
 			return .none
@@ -326,14 +281,6 @@ extension AppSettings {
 					await p2pLinksClient.getP2PLinks()
 				}
 			))
-		}
-	}
-
-	fileprivate func deleteProfile(keepInICloudIfPresent: Bool) -> EffectTask<Action> {
-		.task {
-			cacheClient.removeAll()
-			await radixConnectClient.disconnectAndRemoveAll()
-			return .delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent))
 		}
 	}
 }

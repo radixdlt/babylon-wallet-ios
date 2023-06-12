@@ -18,7 +18,9 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		var manualAccountAddressFocused: Bool = false
 
 		var validatedAccountAddress: AccountAddress? {
-			if !manualAccountAddressFocused, !manualAccountAddress.isEmpty {
+			if !manualAccountAddress.isEmpty,
+			   !chooseAccounts.filteredAccounts.contains(where: { $0.address == manualAccountAddress })
+			{
 				return try? AccountAddress(address: manualAccountAddress)
 			}
 			return nil
@@ -109,11 +111,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case var .destination(.presented(.scanAccountAddress(.delegate(.scanned(address))))):
 			state.destination = nil
 
-			// FIXME: We should have a predefined way to handle the qr address prefix
-			let prefix = "radix:"
-			if address.hasPrefix(prefix) {
-				address.removeFirst(prefix.count)
-			}
+			QR.removeAddressPrefixIfNeeded(from: &address)
 
 			state.manualAccountAddress = address
 			return .none

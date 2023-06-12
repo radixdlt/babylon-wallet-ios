@@ -6,11 +6,12 @@ import LedgerHardwareWalletClient
 
 // MARK: - SignWithFactorSourcesOfKindLedger
 public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindReducerProtocol {
-	public static let factorSourceKind = FactorSourceKind.ledgerHQHardwareWallet
-	public typealias State = SignWithFactorSourcesOfKindState<Self>
+	public typealias Factor = LedgerHardwareWalletFactorSource
+	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
 		case onFirstTask
+		case retryButtonTapped
 	}
 
 	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
@@ -19,6 +20,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 
 	public enum DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol {
 		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<SignatureOfEntity>)
+		case failedToSign(SigningFactor)
 	}
 
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
@@ -29,6 +31,9 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .onFirstTask:
+			return signWithSigningFactors(of: state)
+
+		case .retryButtonTapped:
 			return signWithSigningFactors(of: state)
 		}
 	}
@@ -45,12 +50,10 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 
 	public func sign(
-		signingFactor: SigningFactor,
+		signers: SigningFactor.Signers,
+		factor ledger: Factor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		let ledger = try LedgerFactorSource(factorSource: signingFactor.factorSource)
-		let signers = signingFactor.signers
-
 		switch state.signingPurposeWithPayload {
 		case let .signTransaction(_, compiledIntent, _):
 			let dataToSign = Data(compiledIntent.compiledIntent)
@@ -60,14 +63,14 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 			} catch {
 				loggerGlobal.critical("Failed to hash: \(error)")
 			}
-			let ledgerTXDisplayMode: FactorSource.LedgerHardwareWallet.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
+			let ledgerTXDisplayMode: LedgerHardwareWalletFactorSource.SigningDisplayMode = await appPreferencesClient.getPreferences().display.ledgerHQHardwareWalletSigningDisplayMode
 
 			return try await ledgerHardwareWalletClient.signTransaction(.init(
 				ledger: ledger,
 				signers: signers,
 				unhashedDataToSign: dataToSign,
 				ledgerTXDisplayMode: ledgerTXDisplayMode.mode,
-				displayHashOnLedgerDisplay: true
+				displayHashOnLedgerDisplay: false
 			))
 		case let .signAuth(authToSign):
 			do {
@@ -88,7 +91,7 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	}
 }
 
-extension FactorSource.LedgerHardwareWallet.SigningDisplayMode {
+extension LedgerHardwareWalletFactorSource.SigningDisplayMode {
 	// seperation so that we do not accidentally break profile or RadixConnect
 	var mode: P2P.ConnectorExtension.Request.LedgerHardwareWallet.Request.SignTransaction.Mode {
 		switch self {

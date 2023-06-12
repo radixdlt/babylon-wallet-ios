@@ -73,7 +73,7 @@ extension ImportMnemonicWord {
 					placeholder: viewStore.placeholder,
 					text: .init(
 						get: { viewStore.displayText },
-						set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmedInclNewlin())) }
+						set: { viewStore.send(.wordChanged(input: $0.lowercased().trimWhitespacesAndNewLines())) }
 					),
 					hint: viewStore.hint,
 					focus: .on(

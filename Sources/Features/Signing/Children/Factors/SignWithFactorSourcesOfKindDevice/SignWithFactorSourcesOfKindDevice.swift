@@ -3,8 +3,8 @@ import FactorSourcesClient
 import FeaturePrelude
 
 public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducerProtocol {
-	public static let factorSourceKind = FactorSourceKind.device
-	public typealias State = SignWithFactorSourcesOfKindState<Self>
+	public typealias Factor = DeviceFactorSource
+	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
 		case onFirstTask
 	}
@@ -18,6 +18,8 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 			signingFactors: NonEmpty<Set<SigningFactor>>,
 			signatures: Set<SignatureOfEntity>
 		)
+
+		case failedToSign(SigningFactor)
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -41,14 +43,14 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		}
 	}
 
-	func sign(
-		signingFactor: SigningFactor,
+	public func sign(
+		signers: SigningFactor.Signers,
+		factor deviceFactorSource: Factor,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		let deviceFactorSource = try HDOnDeviceFactorSource(factorSource: signingFactor.factorSource)
-		return try await deviceFactorSourceClient.signUsingDeviceFactorSource(
+		try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 			deviceFactorSource: deviceFactorSource,
-			signerEntities: Set(signingFactor.signers.map(\.entity)),
+			signerEntities: Set(signers.map(\.entity)),
 			unhashedDataToSign: state.signingPurposeWithPayload.dataToSign,
 			purpose: .signTransaction(.manifestFromDapp)
 		)

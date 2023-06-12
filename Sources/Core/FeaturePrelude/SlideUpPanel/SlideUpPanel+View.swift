@@ -9,6 +9,31 @@ extension SlideUpPanel.State {
 	}
 }
 
+// MARK: - WithNavigationBar
+public struct WithNavigationBar<Content: View>: View {
+	private let closeAction: () -> Void
+	private let content: Content
+
+	public init(closeAction: @escaping () -> Void, @ViewBuilder content: () -> Content) {
+		self.content = content()
+		self.closeAction = closeAction
+	}
+
+	public var body: some View {
+		NavigationStack {
+			content
+				.presentationDragIndicator(.visible)
+			#if os(iOS)
+				.toolbar {
+					ToolbarItem(placement: .primaryAction) {
+						CloseButton(action: closeAction)
+					}
+				}
+			#endif
+		}
+	}
+}
+
 // MARK: - SlideUpPanel.View
 extension SlideUpPanel {
 	public struct ViewState: Equatable {

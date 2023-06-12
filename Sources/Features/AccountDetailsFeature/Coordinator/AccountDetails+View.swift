@@ -50,7 +50,7 @@ extension AccountDetails {
 
 					AssetsView.View(store: store.scope(state: \.assets, action: { .child(.assets($0)) }))
 						.roundedCorners(.top, radius: .medium1)
-						.padding(.bottom, -2 * .medium2)
+						.ignoresSafeArea(edges: .bottom)
 				}
 				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()
@@ -69,8 +69,8 @@ extension AccountDetails {
 								.foregroundColor(.app.white)
 						}
 						ToolbarItem(placement: .navigationBarTrailing) {
-							Button(action: { viewStore.send(.preferencesButtonTapped) }) {
-								Image(asset: AssetResource.ellipsis)
+							Button(asset: AssetResource.ellipsis) {
+								viewStore.send(.preferencesButtonTapped)
 							}
 							.frame(.small)
 							.foregroundColor(.app.white)
@@ -87,7 +87,7 @@ extension AccountDetails {
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /AccountDetails.Destinations.State.transfer,
 						action: AccountDetails.Destinations.Action.transfer,
-						content: { AssetTransfer.View(store: $0) }
+						content: { AssetTransfer.SheetView(store: $0) }
 					)
 			}
 		}

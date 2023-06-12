@@ -7,6 +7,8 @@ protocol SignWithFactorSourcesOfKindDelegateActionProtocol: Sendable, Equatable 
 		signingFactors: NonEmpty<Set<SigningFactor>>,
 		signatures: Set<SignatureOfEntity>
 	) -> Self
+
+	static func failedToSign(_ signingFactor: SigningFactor) -> Self
 }
 
 // MARK: - SignWithFactorSourcesOfKindInternalActionProtocol
@@ -19,22 +21,21 @@ protocol SignWithFactorSourcesOfKindViewActionProtocol: Sendable, Equatable {
 	static var onFirstTask: Self { get }
 }
 
-// MARK: - FactorSourceKindSpecifierProtocol
-public protocol FactorSourceKindSpecifierProtocol {
-	static var factorSourceKind: FactorSourceKind { get }
-}
-
 // MARK: - SignWithFactorSourcesOfKindState
-public struct SignWithFactorSourcesOfKindState<FactorSourceKindSpecifier: FactorSourceKindSpecifierProtocol>: Sendable, Hashable {
+public struct SignWithFactorSourcesOfKindState<Factor: FactorSourceProtocol>:
+	Sendable,
+	Hashable
+{
 	public let signingFactors: NonEmpty<Set<SigningFactor>>
 	public let signingPurposeWithPayload: SigningPurposeWithPayload
 	public var currentSigningFactor: SigningFactor?
+
 	public init(
 		signingFactors: NonEmpty<Set<SigningFactor>>,
 		signingPurposeWithPayload: SigningPurposeWithPayload,
 		currentSigningFactor: SigningFactor? = nil
 	) {
-		assert(signingFactors.allSatisfy { $0.factorSource.kind == FactorSourceKindSpecifier.factorSourceKind })
+		assert(signingFactors.allSatisfy { $0.factorSource.kind == Factor.kind })
 		self.signingFactors = signingFactors
 		self.signingPurposeWithPayload = signingPurposeWithPayload
 		self.currentSigningFactor = currentSigningFactor
@@ -42,13 +43,22 @@ public struct SignWithFactorSourcesOfKindState<FactorSourceKindSpecifier: Factor
 }
 
 // MARK: - SignWithFactorSourcesOfKindReducerProtocol
-protocol SignWithFactorSourcesOfKindReducerProtocol: Sendable, FeatureReducer, FactorSourceKindSpecifierProtocol where
+protocol SignWithFactorSourcesOfKindReducerProtocol:
+	Sendable,
+	FeatureReducer
+	where
 	DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol,
-	State == SignWithFactorSourcesOfKindState<Self>,
+	State == SignWithFactorSourcesOfKindState<Factor>,
 	InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol,
 	ViewAction: SignWithFactorSourcesOfKindViewActionProtocol
 {
-	func sign(signingFactor: SigningFactor, state: State) async throws -> Set<SignatureOfEntity>
+	associatedtype Factor: FactorSourceProtocol
+
+	func sign(
+		signers: SigningFactor.Signers,
+		factor: Factor,
+		state: State
+	) async throws -> Set<SignatureOfEntity>
 }
 
 extension SignWithFactorSourcesOfKindReducerProtocol {
@@ -57,12 +67,20 @@ extension SignWithFactorSourcesOfKindReducerProtocol {
 			var allSignatures = Set<SignatureOfEntity>()
 			for signingFactor in signingFactors {
 				await send(.internal(.signingWithFactor(signingFactor)))
-				let signatures = try await sign(signingFactor: signingFactor, state: state)
-				allSignatures.append(contentsOf: signatures)
+
+				do {
+					let signatures = try await sign(
+						signers: signingFactor.signers,
+						factor: signingFactor.factorSource.extract(as: Factor.self),
+						state: state
+					)
+					allSignatures.append(contentsOf: signatures)
+				} catch {
+					await send(.delegate(.failedToSign(signingFactor)))
+					break
+				}
 			}
 			await send(.delegate(.done(signingFactors: signingFactors, signatures: allSignatures)))
-		} catch: { _, _ in
-			loggerGlobal.error("Failed to sign with factor source of kind: \(Self.factorSourceKind)")
 		}
 	}
 }

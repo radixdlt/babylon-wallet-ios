@@ -1,12 +1,13 @@
 import FeaturePrelude
 
-extension HDOnDeviceFactorSource {
-	var labelSeedPhraseKind: String {
-		supportsOlympia ? L10n.DisplayMnemonics.labelSeedPhraseKindOlympia : L10n.DisplayMnemonics.labelSeedPhraseKind
-	}
-
-	var labelDate: String {
-		supportsOlympia ? L10n.DisplayMnemonics.labelDateOlympia : L10n.DisplayMnemonics.labelDate
+extension DisplayMnemonicRow.State {
+	var connectedAccounts: String {
+		let accountsCount = accountsForDeviceFactorSource.accounts.count
+		if accountsCount == 1 {
+			return L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
+		} else {
+			return L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accountsCount)
+		}
 	}
 }
 
@@ -22,51 +23,38 @@ extension DisplayMnemonicRow {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				Card(.app.gray5) {
-					viewStore.send(.tapped)
-				} contents: {
-					AccountsForDeviceFactorSourceView(
-						accountsForDeviceFactorSource: viewStore.accountsForDeviceFactorSource
-					)
-				}
-				.shadow(color: .app.cardShadowBlack, radius: .small2)
-			}
-		}
-	}
-}
+				VStack(alignment: .leading) {
+					Button {
+						viewStore.send(.tapped)
+					} label: {
+						HStack {
+							Image(asset: AssetResource.signingKey)
+								.resizable()
+								.frame(.smallest)
 
-// MARK: - AccountsForDeviceFactorSourceView
-struct AccountsForDeviceFactorSourceView: SwiftUI.View {
-	let accountsForDeviceFactorSource: AccountsForDeviceFactorSource
-	var deviceFactorSource: HDOnDeviceFactorSource {
-		accountsForDeviceFactorSource.deviceFactorSource
-	}
+							VStack(alignment: .leading) {
+								Text(L10n.SeedPhrases.SeedPhrase.reveal)
+									.textStyle(.body1Header)
+									.foregroundColor(.app.gray1)
+								Text(viewStore.connectedAccounts)
+									.textStyle(.body2Regular)
+									.foregroundColor(.app.gray2)
+							}
 
-	var body: some View {
-		HStack(spacing: 0) {
-			VStack(alignment: .leading) {
-				Text(deviceFactorSource.labelSeedPhraseKind)
-					.font(.title3)
+							Spacer()
+							Image(asset: AssetResource.chevronRight)
+						}
+					}
 
-				HPair(
-					label: deviceFactorSource.labelDate,
-					item: deviceFactorSource
-						.addedOn
-						.ISO8601Format(.iso8601Date(timeZone: .current))
-				)
-
-				VStack(alignment: .leading, spacing: .small3) {
-					ForEach(accountsForDeviceFactorSource.accounts) { account in
-						SmallAccountCard(account: account)
-							.cornerRadius(.small1)
+					VStack(alignment: .leading, spacing: .small3) {
+						ForEach(viewStore.accountsForDeviceFactorSource.accounts) { account in
+							SmallAccountCard(account: account)
+								.cornerRadius(.small1)
+						}
 					}
 				}
 			}
-			.padding()
-
-			Image(asset: AssetResource.chevronRight)
 		}
-		.multilineTextAlignment(.leading)
 	}
 }
 

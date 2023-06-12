@@ -47,7 +47,7 @@ final class NewConnectionTests: TestCase {
 		await store.receive(.delegate(.newConnection(connectedClient)))
 	}
 
-	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
+	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_not_saved() async throws {
 		let connection = P2PLink(connectionPassword: .placeholder, displayName: "Unnamed")
 
 		let store = TestStore(
@@ -59,8 +59,7 @@ final class NewConnectionTests: TestCase {
 		)
 
 		await store.send(.view(.closeButtonTapped))
-		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(connection)))))
-		await store.receive(.delegate(.newConnection(connection)))
+		await store.receive(.delegate(.dismiss))
 	}
 
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {

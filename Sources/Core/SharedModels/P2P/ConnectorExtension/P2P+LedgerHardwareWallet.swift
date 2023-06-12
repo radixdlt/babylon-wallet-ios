@@ -21,7 +21,7 @@ extension P2P {
 		}
 
 		// N.B. these *might* have the exact same JSON representation as
-		// `FactorSource.LedgerHardwareWallet.Model` but in case we ever
+		// `LedgerHardwareWalletFactorSource.Model` but in case we ever
 		// change the JSON values for CAP21 or for Profile, we want them
 		// to be **decoupled**.
 		public enum Model: String, Sendable, Hashable, Codable {
@@ -31,7 +31,7 @@ extension P2P {
 		}
 
 		// N.B. these *might* have the exact same JSON representation as
-		// `FactorSource.LedgerHardwareWallet.Device` but in case we ever
+		// `LedgerHardwareWalletFactorSource.Device` but in case we ever
 		// change the JSON values for CAP21 or for Profile, we want them
 		// to be **decoupled**.
 		public struct LedgerDevice: Sendable, Hashable, Codable {

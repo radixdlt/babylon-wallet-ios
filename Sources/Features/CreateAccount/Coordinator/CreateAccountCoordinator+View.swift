@@ -31,7 +31,7 @@ extension CreateAccountCoordinator {
 						#if os(iOS)
 							.toolbar {
 								if viewStore.shouldDisplayNavBar {
-									ToolbarItem(placement: .navigationBarLeading) {
+									ToolbarItem(placement: .primaryAction) {
 										CloseButton {
 											ViewStore(store.stateless).send(.view(.closeButtonTapped))
 										}

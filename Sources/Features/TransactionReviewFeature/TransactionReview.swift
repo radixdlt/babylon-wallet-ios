@@ -41,7 +41,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: String?,
-			feeToAdd: BigDecimal = 10, // fix me use estimate from `analyze`
+			feeToAdd: BigDecimal = .temporaryStandardFee, // fix me use estimate from `analyze`
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			customizeGuarantees: TransactionReviewGuarantees.State? = nil
 		) {
@@ -257,6 +257,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				)))
 			}
 
+		case .destination(.presented(.signing(.delegate(.cancelSigning)))):
+			state.destination = nil
+			return cancelSigningEffect(state: &state)
+
 		case .destination(.presented(.signing(.delegate(.failedToSign)))):
 			loggerGlobal.error("Failed sign tx")
 			state.destination = nil
@@ -301,9 +305,22 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.destination = nil
 			return delayedEffect(for: .delegate(.userDismissedTransactionStatus))
 
+		case .destination(.dismiss):
+			if case .signing = state.destination {
+				return cancelSigningEffect(state: &state)
+			} else {
+				return .none
+			}
+
 		default:
 			return .none
 		}
+	}
+
+	private func cancelSigningEffect(state: inout State) -> EffectTask<Action> {
+		loggerGlobal.notice("Cancelled signing")
+		state.canApproveTX = true
+		return .none
 	}
 
 	private func review(_ state: State) -> EffectTask<Action> {
@@ -631,7 +648,7 @@ extension TransactionReview {
 
 			let resourceMetadata = ResourceMetadata(
 				name: metadata?.symbol ?? metadata?.name ?? L10n.TransactionReview.unknown,
-				thumbnail: nil,
+				thumbnail: metadata?.iconURL,
 				type: addressKind.resourceType
 			)
 

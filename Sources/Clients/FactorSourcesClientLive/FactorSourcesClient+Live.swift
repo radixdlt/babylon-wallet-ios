@@ -31,20 +31,23 @@ extension FactorSourcesClient: DependencyKey {
 				await getProfileStore().factorSourcesValues()
 			},
 			addPrivateHDFactorSource: { request in
-				let privateFactorSource = request.privateFactorSource
-				if privateFactorSource.kind == .device {
-					try await secureStorageClient.saveMnemonicForFactorSource(privateFactorSource)
+				let factorSource = request.factorSource
+
+				switch factorSource {
+				case let .device(deviceFactorSource):
+					try await secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
+				default: break
 				}
-				let factorSourceID = privateFactorSource.id
+				let factorSourceID = factorSource.id
 
 				/// We only need to save olympia mnemonics into Profile, the Babylon ones
 				/// already exist in profile, and this function is used only to save the
 				/// imported mnemonic into keychain (done above).
 				if request.saveIntoProfile {
 					do {
-						try await saveFactorSource(privateFactorSource.factorSource)
+						try await saveFactorSource(factorSource)
 					} catch {
-						if privateFactorSource.kind == .device {
+						if factorSource.kind == .device {
 							// We were unlucky, failed to update Profile, thus best to undo the saving of
 							// the mnemonic in keychain (if we can).
 							try? await secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
@@ -102,8 +105,7 @@ extension FactorSourcesClient: DependencyKey {
 						guard var factorSource = factorSources[id: id] else {
 							throw FactorSourceNotFound()
 						}
-
-						factorSource.lastUsedOn = request.lastUsedOn
+						factorSource.common.lastUsedOn = request.lastUsedOn
 						factorSources[id: id] = factorSource
 					}
 					profile.factorSources = .init(rawValue: factorSources)!
@@ -120,7 +122,7 @@ internal func signingFactors(
 	from allFactorSources: IdentifiedArrayOf<FactorSource>,
 	signingPurpose: SigningPurpose
 ) throws -> SigningFactors {
-	var signingFactorsNotNonEmpty: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
+	var signingFactors: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
 	for entity in entities {
 		switch entity.securityState {
@@ -143,7 +145,7 @@ internal func signingFactors(
 			let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
 			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
-			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactorsNotNonEmpty[factorSource.kind] {
+			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactors[factorSource.kind] {
 				if var existingSigningFactor = existingArray[id: factorSource.id] {
 					var signers = existingSigningFactor.signers.rawValue
 					signers[id: signer.id] = signer // update copy of `signers`
@@ -152,16 +154,16 @@ internal func signingFactors(
 				} else {
 					existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
 				}
-				signingFactorsNotNonEmpty[factorSource.kind] = existingArray // write back to Dictionary
+				signingFactors[factorSource.kind] = existingArray // write back to Dictionary
 			} else {
 				// trivial case,
-				signingFactorsNotNonEmpty[factorSource.kind] = .init(uniqueElements: [sigingFactor])
+				signingFactors[factorSource.kind] = .init(uniqueElements: [sigingFactor])
 			}
 		}
 	}
 
 	return SigningFactors(
-		uniqueKeysWithValues: signingFactorsNotNonEmpty.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
+		uniqueKeysWithValues: signingFactors.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
 			assert(!keyValuePair.value.isEmpty, "Incorrect implementation, IdentifiedArrayOf<SigningFactor> should never be empty.")
 			let value: NonEmpty<Set<SigningFactor>> = .init(rawValue: Set(keyValuePair.value))!
 			return (key: keyValuePair.key, value: value)
@@ -185,11 +187,13 @@ extension FactorSourceKind: Comparable {
 		switch self {
 		case .ledgerHQHardwareWallet: return 0
 		case .offDeviceMnemonic: return 1
+		case .securityQuestions: return 2
+		case .trustedContact: return 3
 
 		// we want to sign with device last, since it would allow for us to stop using
 		// ephemeral notary and allow us to implement a AutoPurgingMnemonicCache which
 		// deletes items after 1 sec, thus `device` must come last.
-		case .device: return 2
+		case .device: return .max
 		}
 	}
 }

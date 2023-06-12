@@ -10,8 +10,8 @@ final class ProfileStoreTests: TestCase {
 	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() async {
 		await withDependencies {
 			#if canImport(UIKit)
-			$0.device.$name = deviceLabel.rawValue
-			$0.device.$model = deviceDescription.rawValue
+			$0.device.$name = deviceName
+			$0.device.$model = deviceModel.rawValue
 			#endif
 			$0.uuid = .incrementing
 			$0.mnemonicClient.generate = {
@@ -54,8 +54,8 @@ final class ProfileStoreTests: TestCase {
 			assertFactorSourceSaved: { factorSource in
 				XCTAssertNoDifference(factorSource.kind, .device)
 				XCTAssertFalse(factorSource.supportsOlympia)
-				XCTAssertNoDifference(factorSource.label, deviceLabel)
-				XCTAssertNoDifference(factorSource.description, deviceDescription)
+				XCTAssertNoDifference(factorSource.hint.name, deviceName)
+				XCTAssertNoDifference(factorSource.hint.model, deviceModel)
 			}
 		)
 	}
@@ -72,13 +72,17 @@ final class ProfileStoreTests: TestCase {
 			profileID: profileID,
 			privateFactor: privateFactor,
 			assertProfileSnapshotSaved: { profileSnapshot in
+
 				XCTAssertNoDifference(profileSnapshot.id, profileID)
 
 				XCTAssertNoDifference(
 					profileSnapshot.factorSources.first,
-					privateFactor.factorSource
+					privateFactor.factorSource.embed()
 				)
-				XCTAssertNoDifference(profileSnapshot.header.creatingDevice.description, expectedDeviceDescription)
+				XCTAssertNoDifference(
+					profileSnapshot.header.creatingDevice.description,
+					expectedDeviceDescription
+				)
 			}
 		)
 	}
@@ -90,7 +94,7 @@ private extension ProfileStoreTests {
 		privateFactor: PrivateHDFactorSource,
 		provideProfileSnapshotLoaded: Data? = nil,
 		assertMnemonicWithPassphraseSaved: (@Sendable (MnemonicWithPassphrase) -> Void)? = { _ in /* noop */ },
-		assertFactorSourceSaved: (@Sendable (FactorSource) -> Void)? = { _ in /* noop */ },
+		assertFactorSourceSaved: (@Sendable (DeviceFactorSource) -> Void)? = { _ in /* noop */ },
 		assertProfileSnapshotSaved: (@Sendable (ProfileSnapshot) -> Void)? = { _ in /* noop */ }
 	) async throws {
 		let profileSnapshotSavedIntoSecureStorage = ActorIsolated<ProfileSnapshot?>(nil)
@@ -98,8 +102,8 @@ private extension ProfileStoreTests {
 			$0.uuid = .constant(profileID)
 			$0.mnemonicClient.generate = { _, _ in privateFactor.mnemonicWithPassphrase.mnemonic }
 			#if canImport(UIKit)
-			$0.device.$name = deviceLabel.rawValue
-			$0.device.$model = deviceDescription.rawValue
+			$0.device.$name = deviceName
+			$0.device.$model = deviceModel.rawValue
 			#endif
 			$0.secureStorageClient.loadProfileSnapshotData = { _ in
 				provideProfileSnapshotLoaded
@@ -139,7 +143,10 @@ private extension ProfileStoreTests {
 				switch state {
 				case let .ephemeral(ephemeral):
 					profile = ephemeral.profile
-					XCTAssertNoDifference(ephemeral.profile.factorSources.first, privateFactor.factorSource)
+					XCTAssertNoDifference(
+						ephemeral.profile.factorSources.first,
+						privateFactor.factorSource.embed()
+					)
 					try await sut.commitEphemeral()
 				case let .persisted(persistedProfile):
 					XCTAssertNoDifference(
@@ -167,11 +174,11 @@ private extension ProfileStoreTests {
 }
 
 #if canImport(UIKit)
-private let deviceLabel: FactorSource.Label = "NAME"
-private let deviceDescription: FactorSource.Description = "MODEL"
+private let deviceName: String = "NAME"
+private let deviceModel: DeviceFactorSource.Hint.Model = "MODEL"
 private let expectedDeviceDescription = ProfileStore.deviceDescription(
-	label: deviceLabel,
-	description: deviceDescription
+	name: deviceName,
+	model: deviceModel
 )
 #else
 private let expectedDeviceDescription = ProfileStore.macOSDeviceDescriptionFallback
@@ -181,6 +188,6 @@ extension PrivateHDFactorSource {
 	static let testValue: Self = withDependencies {
 		$0.date = .constant(Date(timeIntervalSince1970: 0))
 	} operation: {
-		Self.testValue(label: deviceLabel, description: deviceDescription)
+		Self.testValue(name: deviceName, model: deviceModel)
 	}
 }

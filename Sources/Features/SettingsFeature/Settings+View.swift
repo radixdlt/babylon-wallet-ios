@@ -63,11 +63,6 @@ extension AppSettings.View {
 				.navigationBarInlineTitleFont(.app.secondaryHeader)
 			#endif
 				.navigationDestinations(with: destinationStore)
-				.confirmationDialog(
-					store: destinationStore,
-					state: /AppSettings.Destinations.State.deleteProfileConfirmationDialog,
-					action: AppSettings.Destinations.Action.deleteProfileConfirmationDialog
-				)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 		}
@@ -98,9 +93,9 @@ extension View {
 			.generalSettings(with: destinationStore)
 			.profileBackups(with: destinationStore)
 			.ledgerHardwareWallets(with: destinationStore)
+			.mnemonics(with: destinationStore)
 		#if DEBUG
 			.importFromOlympiaLegacyWallet(with: destinationStore)
-			.mnemonics(with: destinationStore)
 			.factorSources(with: destinationStore)
 			.debugInspectProfile(with: destinationStore)
 		#endif // DEBUG
@@ -172,7 +167,22 @@ extension View {
 			store: destinationStore,
 			state: /AppSettings.Destinations.State.ledgerHardwareWallets,
 			action: AppSettings.Destinations.Action.ledgerHardwareWallets,
-			destination: { LedgerHardwareDevices.View(store: $0) }
+			destination: {
+				LedgerHardwareDevices.View(store: $0)
+					.background(.app.gray5)
+					.navigationTitle(L10n.Settings.ledgerHardwareWallets)
+					.toolbarBackground(.visible, for: .navigationBar)
+			}
+		)
+	}
+
+	@MainActor
+	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.mnemonics,
+			action: AppSettings.Destinations.Action.mnemonics,
+			destination: { DisplayMnemonics.View(store: $0) }
 		)
 	}
 
@@ -184,16 +194,6 @@ extension View {
 			state: /AppSettings.Destinations.State.importOlympiaWalletCoordinator,
 			action: AppSettings.Destinations.Action.importOlympiaWalletCoordinator,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
-		)
-	}
-
-	@MainActor
-	private func mnemonics(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destinations.State.mnemonics,
-			action: AppSettings.Destinations.Action.mnemonics,
-			destination: { DisplayMnemonics.View(store: $0) }
 		)
 	}
 
@@ -211,6 +211,18 @@ extension View {
 
 	@MainActor
 	private func debugInspectProfile(
+		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AppSettings.Destinations.State.debugInspectProfile,
+			action: AppSettings.Destinations.Action.debugInspectProfile,
+			destination: { DebugInspectProfile.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func securityStructureConfigs(
 		with destinationStore: PresentationStoreOf<AppSettings.Destinations>
 	) -> some View {
 		navigationDestination(
@@ -258,12 +270,6 @@ extension AppSettings.View {
 				}
 				.padding(.bottom, .large3)
 				VStack(spacing: .zero) {
-					Button(L10n.Settings.deleteWalletData) {
-						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(isDestructive: true))
-					.padding(.bottom, .large1)
-
 					Text(viewStore.appVersion)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
@@ -322,6 +328,11 @@ extension AppSettings.View {
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
 			),
+			.init(
+				title: L10n.SeedPhrases.title,
+				icon: .asset(AssetResource.ellipsis),
+				action: .mnemonicsButtonTapped
+			),
 		]
 
 		#if DEBUG
@@ -340,11 +351,6 @@ extension AppSettings.View {
 				title: L10n.Settings.Debug.inspectProfile,
 				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
-			),
-			.init(
-				title: L10n.DisplayMnemonics.seedPhrases,
-				icon: .asset(AssetResource.ellipsis),
-				action: .mnemonicsButtonTapped
 			),
 		])
 		#endif

@@ -105,7 +105,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	// MARK: - Destination
 
 	public struct Destination: ReducerProtocol {
-		public enum State: Equatable, Hashable {
+		public enum State: Hashable {
 			case editPersona(EditPersona.State)
 			case createAuthKey(CreateAuthKey.State)
 			case dAppDetails(SimpleDappDetails.State)
@@ -119,6 +119,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case dAppDetails(SimpleDappDetails.Action)
 
 			case confirmForgetAlert(ConfirmForgetAlert)
+
 			public enum ConfirmForgetAlert: Sendable, Equatable {
 				case confirmTapped
 				case cancelTapped

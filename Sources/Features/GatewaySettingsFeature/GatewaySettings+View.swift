@@ -34,13 +34,12 @@ extension GatewaySettings {
 							store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 							state: /Destinations.State.addNewGateway,
 							action: Destinations.Action.addNewGateway,
-							content: {
-								AddNewGateway.View(store: $0)
-									.presentationDetents([.medium])
-									.presentationDragIndicator(.visible)
-								#if os(iOS)
-									.presentationBackground(.blur)
-								#endif
+							content: { addGatewayStore in
+								WithNavigationBar {
+									ViewStore(addGatewayStore).send(.view(.closeButtonTapped))
+								} content: {
+									AddNewGateway.View(store: addGatewayStore)
+								}
 							}
 						)
 						.sheet(
@@ -66,11 +65,12 @@ extension GatewaySettings {
 				VStack(alignment: .leading, spacing: .small2) {
 					subtitle
 
-					Button(L10n.Gateways.whatIsAGateway) {
-						viewStore.send(.popoverButtonTapped)
-					}
-					.buttonStyle(.info)
-					.padding(.vertical, .medium2)
+					//	FIXME: Uncomment and implement
+					//	Button(L10n.Gateways.whatIsAGateway) {
+					//		viewStore.send(.popoverButtonTapped)
+					//	}
+					//	.buttonStyle(.info)
+					//	.padding(.vertical, .medium2)
 
 					Separator()
 				}

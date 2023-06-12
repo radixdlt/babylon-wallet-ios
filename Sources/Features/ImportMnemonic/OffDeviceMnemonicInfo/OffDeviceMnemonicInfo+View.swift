@@ -2,26 +2,21 @@ import FeaturePrelude
 
 extension OffDeviceMnemonicInfo.State {
 	var viewState: OffDeviceMnemonicInfo.ViewState {
-		.init(story: story, backup: backup)
+		.init(label: label)
 	}
 }
 
 // MARK: - OffDeviceMnemonicInfo.View
 extension OffDeviceMnemonicInfo {
 	public struct ViewState: Equatable {
-		public let story: String
-		public let backup: String
+		public let label: String
 
-		public var isStoryValid: Bool {
-			!story.isEmpty
+		public var isLabelValid: Bool {
+			!label.isEmpty
 		}
 
-		public var isBackupValid: Bool {
-			!backup.isEmpty
-		}
-
-		public var saveWithDescriptionControlState: ControlState {
-			isStoryValid && isBackupValid ? .enabled : .disabled
+		public var saveButtonControlState: ControlState {
+			isLabelValid ? .enabled : .disabled
 		}
 	}
 
@@ -37,39 +32,22 @@ extension OffDeviceMnemonicInfo {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .large1) {
 					AppTextField(
-						primaryHeading: .init(text: L10n.ImportMnemonic.OffDevice.storyPrimaryHeading),
-						secondaryHeading: L10n.Common.optional,
-						placeholder: L10n.ImportMnemonic.OffDevice.storyPlaceholder,
+						primaryHeading: .init(text: "Label"), // FIXME: strings
+						placeholder: "Label", // FIXME: strings
 						text: viewStore.binding(
-							get: \.story,
-							send: { .storyChanged($0) }
+							get: \.label,
+							send: { .labelChanged($0) }
 						),
-						hint: .info(L10n.ImportMnemonic.OffDevice.storyHint)
-					)
-
-					AppTextField(
-						primaryHeading: .init(text: L10n.ImportMnemonic.OffDevice.locationPrimaryHeading),
-						secondaryHeading: L10n.Common.optional,
-						placeholder: L10n.ImportMnemonic.OffDevice.locationPlaceholder,
-						text: viewStore.binding(
-							get: \.backup,
-							send: { .backupChanged($0) }
-						),
-						hint: .info(L10n.ImportMnemonic.OffDevice.locationHint)
+						hint: .info(L10n.ImportMnemonic.OffDevice.storyHint) // FIXME: rename key
 					)
 				}
 				.padding()
 				.footer {
-					Button(L10n.ImportMnemonic.OffDevice.saveWithDescription) {
+					Button("Save external seed phrase") { // FIXME: strings
 						viewStore.send(.saveButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
-					.controlState(viewStore.saveWithDescriptionControlState)
-
-					Button(L10n.ImportMnemonic.OffDevice.saveWithoutDescription) {
-						viewStore.send(.skipButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+					.controlState(viewStore.saveButtonControlState)
 				}
 			}
 		}

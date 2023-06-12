@@ -170,22 +170,30 @@ extension LedgerHardwareWalletClient: DependencyKey {
 	}()
 }
 
-extension LedgerFactorSource {
+extension LedgerHardwareWalletFactorSource {
 	func device() throws -> P2P.LedgerHardwareWallet.LedgerDevice {
-		guard let model = P2P.LedgerHardwareWallet.Model(rawValue: model.rawValue) else {
-			throw UnrecognizedLedgerModel(model: model.rawValue)
+		guard let model = P2P.LedgerHardwareWallet.Model(rawValue: hint.model.rawValue) else {
+			throw UnrecognizedLedgerModel(model: hint.model.rawValue)
 		}
 		return P2P.LedgerHardwareWallet.LedgerDevice(
-			name: NonEmptyString(maybeString: self.name),
-			id: factorSource.id.hex(),
+			name: NonEmptyString(maybeString: hint.name),
+			id: Data(id.hexCodable.data.dropFirst()).hex, // Connector Extension only cares about the hash not the factor source ID prefix.
 			model: model
 		)
 	}
 }
 
+// MARK: - UnrecognizedLedgerModel
+public struct UnrecognizedLedgerModel: Error {
+	public let model: String
+	public init(model: String) {
+		self.model = model
+	}
+}
+
 extension P2P.LedgerHardwareWallet.LedgerDevice {
 	public init(factorSource: FactorSource) throws {
-		self = try LedgerFactorSource(factorSource: factorSource).device()
+		self = try factorSource.extract(as: LedgerHardwareWalletFactorSource.self).device()
 	}
 }
 

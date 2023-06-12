@@ -58,6 +58,7 @@ extension ChooseReceivingAccount.View {
 							.foregroundColor(.app.gray1)
 
 						addressField(viewStore)
+
 						Divider()
 
 						Text(L10n.AssetTransfer.ChooseReceivingAccount.chooseOwnAccount)
@@ -95,7 +96,6 @@ extension ChooseReceivingAccount.View {
 							}
 						}
 					}
-
 				#endif
 			}
 		}
@@ -127,6 +127,7 @@ extension ChooseReceivingAccount.View {
 			}
 		)
 		.autocorrectionDisabled()
+		.keyboardType(.alphabet)
 	}
 
 	private func chooseButton(_ viewStore: ViewStoreOf<ChooseReceivingAccount>) -> some View {
