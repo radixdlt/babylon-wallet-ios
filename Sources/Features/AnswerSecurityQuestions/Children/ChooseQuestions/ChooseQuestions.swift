@@ -30,7 +30,7 @@ public struct ChooseQuestions: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let availableQuestions: NonEmpty<OrderedSet<SecurityQuestion>>
 
-		public let selectionRequirement: SelectionRequirement = .atLeast(CAP23.minimumNumberOfQuestions)
+		public let selectionRequirement: SelectionRequirement = .exactly(CAP23.minimumNumberOfQuestions)
 		public var selectedQuestions: [SecurityQuestion]?
 
 		public init(

@@ -17,7 +17,6 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		}
 
 		public var questions: OrderedSet<SecurityQuestion>
-		public var answers: OrderedDictionary<SecurityQuestion.ID, AnswerToSecurityQuestion> = [:]
 
 		public let purpose: Purpose
 		var root: Path.State
@@ -60,6 +59,11 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case chooseQuestions(ChooseQuestions.State)
 			case answerQuestion(AnswerSecurityQuestionFreeform.State)
+
+			public var answerToQuestion: AnswerToSecurityQuestion? {
+				guard case let .answerQuestion(freeformState) = self else { return nil }
+				return freeformState.answerToQuestion
+			}
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -111,10 +115,9 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case
-			let .root(.answerQuestion(.delegate(.answered(answerToQuestion)))),
-			let .path(.element(id: _, action: .answerQuestion(.delegate(.answered(answerToQuestion))))):
+			.root(.answerQuestion(.delegate(.answered))),
+			.path(.element(id: _, action: .answerQuestion(.delegate(.answered)))):
 
-			state.answers[answerToQuestion.question.id] = answerToQuestion
 			return continueEffect(for: &state)
 
 		default: return .none
@@ -122,7 +125,11 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	}
 
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
-		let unansweredQuestions = state.questions.filter { state.answers[$0.id] == nil }
+		let answers = ([state.root] + state.path).compactMap(\.answerToQuestion)
+		let unansweredQuestions = state.questions.filter { question in
+			!answers.contains(where: { $0.question == question })
+		}
+
 		if let nextQuestion = unansweredQuestions.first {
 			let pathState = Path.State.answerQuestion(
 				.init(
@@ -130,18 +137,17 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 					isLast: unansweredQuestions.count == 1
 				)
 			)
-			if state.root == nil {
-				state.root = pathState
-			} else {
-				state.path.append(pathState)
-			}
+
+			state.path.append(pathState)
+
 			return .none
 		} else {
 			let answers: NonEmpty<OrderedSet<AnswerToSecurityQuestion>> = NonEmpty(
 				rawValue: OrderedSet(
-					uncheckedUniqueElements: state.answers.values.map { $0 }
+					uncheckedUniqueElements: answers
 				)
 			)!
+			precondition(answers.count == state.questions.count)
 			return .task { [purpose = state.purpose] in
 
 				let taskResult = await TaskResult {
@@ -173,9 +179,6 @@ public struct AnswerSecurityQuestionsCoordinator: Sendable, FeatureReducer {
 	}
 
 	func goBackEffect(for state: inout State) -> EffectTask<Action> {
-		if !state.answers.isEmpty {
-			state.answers.removeLast()
-		}
 		state.path.removeLast()
 		return .none
 	}

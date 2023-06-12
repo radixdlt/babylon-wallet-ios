@@ -11,6 +11,9 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 		public let question: SecurityQuestion
 		public var answer: NonEmptyString? = nil
 		public let isLast: Bool
+
+		public var answerToQuestion: AnswerToSecurityQuestion?
+
 		public init(question: SecurityQuestion, isLast: Bool) {
 			self.question = question
 			self.isLast = isLast
@@ -39,7 +42,7 @@ public struct AnswerSecurityQuestionFreeform: Sendable, FeatureReducer {
 				answer: answer,
 				to: state.question
 			)
-
+			state.answerToQuestion = answerToQuestion
 			return .send(.delegate(.answered(answerToQuestion)))
 		}
 	}
