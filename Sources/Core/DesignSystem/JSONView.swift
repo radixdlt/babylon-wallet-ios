@@ -27,7 +27,8 @@ struct UIKitJSONView: UIViewRepresentable {
 	let jsonPreview: JSONPreview
 	init(jsonString: String) {
 		let jsonPreview = JSONPreview()
-		jsonPreview.preview(jsonString, style: .mariana)
+		var style = HighlightStyle.default
+		jsonPreview.preview(jsonString, style: style)
 		self.jsonPreview = jsonPreview
 	}
 

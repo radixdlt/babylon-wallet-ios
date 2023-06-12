@@ -28,11 +28,13 @@ extension DebugInspectProfile {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				GeometryReader { geoProxy in
 					if let json = viewStore.json, viewStore.mode == .rawJSON {
+						let xOffset: CGFloat = 50
 						JSONView(jsonString: json)
 							.frame(
-								maxWidth: .infinity,
-								idealHeight: geoProxy.frame(in: .global).height
+								width: geoProxy.frame(in: .global).width + xOffset,
+								height: geoProxy.frame(in: .global).height
 							)
+							.offset(x: -xOffset)
 					} else {
 						ProfileView(profile: viewStore.profile)
 					}
