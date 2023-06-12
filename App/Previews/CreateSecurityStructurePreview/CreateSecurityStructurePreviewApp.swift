@@ -5,8 +5,8 @@ import FeaturesPreviewerFeature
 // MARK: - CreateSecurityStructureCoordinator.State + EmptyInitializable
 extension CreateSecurityStructureCoordinator.State: EmptyInitializable {}
 
-// MARK: - CreateSecurityStructureCoordinator.View + FeatureViewProtocol
-extension CreateSecurityStructureCoordinator.View: FeatureViewProtocol {
+// MARK: - CreateSecurityStructureCoordinator.View + FeatureView
+extension CreateSecurityStructureCoordinator.View: FeatureView {
 	public typealias Feature = CreateSecurityStructureCoordinator
 }
 

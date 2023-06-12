@@ -12,8 +12,8 @@ extension AnswerSecurityQuestionsCoordinator.State: EmptyInitializable {
 	}
 }
 
-// MARK: - AnswerSecurityQuestionsCoordinator.View + FeatureViewProtocol
-extension AnswerSecurityQuestionsCoordinator.View: FeatureViewProtocol {
+// MARK: - AnswerSecurityQuestionsCoordinator.View + FeatureView
+extension AnswerSecurityQuestionsCoordinator.View: FeatureView {
 	public typealias Feature = AnswerSecurityQuestionsCoordinator
 }
 

@@ -6,8 +6,8 @@ public protocol EmptyInitializable {
 	init()
 }
 
-// MARK: - FeatureViewProtocol
-public protocol FeatureViewProtocol: SwiftUI.View where Feature.View == Self {
+// MARK: - FeatureView
+public protocol FeatureView: SwiftUI.View where Feature.View == Self {
 	associatedtype Feature: FeatureReducer
 
 	@MainActor

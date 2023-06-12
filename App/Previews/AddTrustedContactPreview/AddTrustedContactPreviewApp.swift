@@ -4,8 +4,8 @@ import FeaturesPreviewerFeature
 // MARK: - AddTrustedContactFactorSource.State + EmptyInitializable
 extension AddTrustedContactFactorSource.State: EmptyInitializable {}
 
-// MARK: - AddTrustedContactFactorSource.View + FeatureViewProtocol
-extension AddTrustedContactFactorSource.View: FeatureViewProtocol {
+// MARK: - AddTrustedContactFactorSource.View + FeatureView
+extension AddTrustedContactFactorSource.View: FeatureView {
 	public typealias Feature = AddTrustedContactFactorSource
 }
 

@@ -8,8 +8,8 @@ extension ImportMnemonic.State: EmptyInitializable {
 	}
 }
 
-// MARK: - ImportMnemonic.View + FeatureViewProtocol
-extension ImportMnemonic.View: FeatureViewProtocol {
+// MARK: - ImportMnemonic.View + FeatureView
+extension ImportMnemonic.View: FeatureView {
 	public typealias Feature = ImportMnemonic
 }
 
